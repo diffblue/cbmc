@@ -9,12 +9,16 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Multi-argument std::function construction in C++17 mode.  Layer-1 partial-spec
-pack deduction (cpp11_partial_spec_pack_after_fixed) is fixed, so the converting
-constructor now resolves; previously this passed only VACUOUSLY ("found no match
-for symbol 'function'").  The remaining gap: the handler pointers _M_invoker /
-_M_manager are not assigned during multi-argument construction, so operator()
-dereferences a null _M_invoker.  Single-argument std::function invokes correctly
-and soundly (N5008 [func.wrap.func]), so this is specific to the
-_Function_handler<R(A...), F> pack shape.  Flip to CORE once the multi-argument
-handler wiring is fixed.
+Multi-argument std::function construction and call in C++17 mode.  Layer-1
+partial-spec pack deduction (cpp11_partial_spec_pack_after_fixed) and the member
+function-pointer pack-arity collapse (cpp11_variadic_pack_in_member_funptr_type)
+are both fixed, so the converting constructor now resolves and wires up
+_M_invoker / _M_manager with the correct arity.  The remaining gap is the body
+pack-expansion use: the operator() body
+`_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)` expands the
+parameter pack to a single argument (see
+cpp11_variadic_pack_in_method_body_call), so the multi-argument call is rejected
+/ mis-evaluated.  Single-argument std::function invokes correctly and soundly
+(N5008 [func.wrap.func], [temp.variadic]/5).  Previously this test passed only
+VACUOUSLY.  Flip to CORE once the body pack-expansion uses the full deduced
+arity.
