@@ -1,0 +1,13 @@
+CORE broken-smt-backend no-new-smt wide-pointer-encoding
+main-violation.c
+--wide-pointer-encoding
+^\[main\.assertion\.1\] line \d+ expected to FAIL: p->q can equal &x: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Violation direction of the pointer-containing-object dispatch case: asserting
+p->q != &x must FAIL, confirming the skipped candidate is still resolved and
+the solver does not miss the model (no unsound "no target").

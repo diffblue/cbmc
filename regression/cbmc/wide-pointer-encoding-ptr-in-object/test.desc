@@ -1,0 +1,14 @@
+CORE broken-smt-backend no-new-smt wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^\[main\.assertion\.1\] line \d+ deref into pointer-containing global is sound: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A pointer-containing global reached via an opaque integer address is skipped
+as an address-dispatch candidate in value_set_dereferencet, but is still
+resolved by the solver's backward-constraint refinement: the pointer field is
+read precisely (== &x). See main-violation.c for the violation direction.

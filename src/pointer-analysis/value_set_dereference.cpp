@@ -306,10 +306,17 @@ exprt value_set_dereferencet::handle_dereference_base_case(
         const symbolt &sym = ns.lookup(candidate_name);
         if(sym.is_type || !sym.is_lvalue || sym.type.id() == ID_code)
           continue;
-        // Skip types that contain pointers — the byte_extract from
-        // pointer-containing types causes width mismatches in the
-        // solver. The backward constraint refinement handles these
-        // types correctly without the dispatch.
+        // Skip objects whose type contains a pointer: a byte_extract over a
+        // pointer-containing type would cause width mismatches in the solver.
+        // This is sound -- omitting a candidate only makes the dereferenced
+        // value more nondeterministic, while the pointer itself is still bound
+        // to the correct object by the backward-constraint refinement in
+        // bv_pointerst. So it can only cause spurious failures, never a missed
+        // violation. It can be imprecise for a pointer-containing aggregate
+        // reached via an opaque integer address with a symbolic offset (the
+        // read value is then havoc); see
+        // regression/cbmc/wide-pointer-encoding-ptr-in-object for the cases
+        // that are resolved precisely.
         if(has_subtype(
              sym.type, [](const typet &t) { return t.id() == ID_pointer; }, ns))
           continue;

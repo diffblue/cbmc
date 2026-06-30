@@ -1,0 +1,12 @@
+CORE broken-smt-backend no-new-smt wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^\[main\.assertion\.1\] line \d+ byte_update with a pointer value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Stores a pointer into a plain byte buffer and reads it back, exercising the
+wide pointer encoding's convert_byte_update "value is a pointer" branch.
