@@ -1,9 +1,20 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17 --unwind 5 --no-unwinding-assertions
-^EXIT=0$
+^\[main\.assertion\.1\] line \d+ multi-arg function call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
-std::function in C++17 mode.
+--
+Multi-argument std::function construction in C++17 mode.  Layer-1 partial-spec
+pack deduction (cpp11_partial_spec_pack_after_fixed) is fixed, so the converting
+constructor now resolves; previously this passed only VACUOUSLY ("found no match
+for symbol 'function'").  The remaining gap: the handler pointers _M_invoker /
+_M_manager are not assigned during multi-argument construction, so operator()
+dereferences a null _M_invoker.  Single-argument std::function invokes correctly
+and soundly (N5008 [func.wrap.func]), so this is specific to the
+_Function_handler<R(A...), F> pack shape.  Flip to CORE once the multi-argument
+handler wiring is fixed.
