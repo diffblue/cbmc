@@ -4232,7 +4232,30 @@ exprt cpp_typecheck_resolvet::resolve(
   // For unqualified calls, also search in the namespaces of the
   // argument types. This is required for e.g. operator+(string, string)
   // to be found when called from outside namespace std.
-  if(!qualified && !fargs.has_object)
+  //
+  // N5008 [basic.lookup.argdep]/3.1: if the ordinary unqualified lookup of the
+  // name finds the declaration of a class member, the associated namespaces and
+  // classes are NOT considered (ADL is suppressed).  Without this an unqualified
+  // member call such as `find(x)` inside a member function -- which ordinary
+  // lookup resolves to `this->find` -- would also pull in a same-named member of
+  // the argument's class (e.g. `std::basic_string::find` when `x` is a
+  // `std::string`), making the call ambiguous.  Operators are excluded: they use
+  // the separate [over.match.oper] candidate-gathering, which always includes
+  // ADL-found non-member operators regardless of any member operator.
+  bool ordinary_lookup_found_member = false;
+  for(const auto *id : id_set)
+  {
+    if(!id->class_identifier.empty())
+    {
+      ordinary_lookup_found_member = true;
+      break;
+    }
+  }
+  const bool is_operator_name =
+    id2string(base_name).compare(0, 8, "operator") == 0;
+  if(
+    !qualified && !fargs.has_object &&
+    !(ordinary_lookup_found_member && !is_operator_name))
     resolve_with_arguments(id_set, base_name, fargs);
 
   // Apply the [class.member.lookup]/4 hiding rule to the combined
