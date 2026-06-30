@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ multi-arg function call: SUCCESS$
@@ -9,18 +9,14 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Multi-argument std::function construction and call.  Layer-1 partial-spec pack
-deduction (cpp11_partial_spec_pack_after_fixed), the member function-pointer
-pack-arity collapse (cpp11_variadic_pack_in_member_funptr_type) and the
-method-body pack-expansion use (cpp11_variadic_pack_in_method_body_call) are all
-fixed, so the converting constructor resolves, wires up _M_invoker / _M_manager
-with the correct arity, and operator() forwards both arguments
-(`_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)`) correctly to the
-handler.  The remaining gap is deeper in the dispatch chain
-(_Function_handler::_M_invoke -> std::__invoke_r -> __invoke_impl ->
-*_M_get_pointer(functor)): the invocation yields a wrong result (the call
-returns 1 instead of 5 for add(2,3)) although the operator()-level argument
-forwarding is correct.  Single-argument std::function invokes correctly and
-soundly (N5008 [func.wrap.func], [temp.variadic]/5).  Previously this test passed
-only VACUOUSLY ("found no match for symbol 'function'").  Flip to CORE once the
-multi-argument invoke/__invoke_r dispatch returns the correct result.
+Multi-argument std::function construction and call (C++11).  Now fully works:
+construction resolves and wires up the handler pointers, operator() forwards all
+arguments, and the _M_invoke/__invoke_r dispatch returns the correct result.  The
+final root was the explicit-leading-template-argument + deduced-trailing-pack
+instantiation over-expanding the function parameter pack by one
+(cpp11_explicit_targ_deduced_trailing_pack); fixed in
+cpp_typecheck_resolvet::resolve.  Earlier layers: partial-spec pack deduction
+(cpp11_partial_spec_pack_after_fixed), member function-pointer pack arity
+(cpp11_variadic_pack_in_member_funptr_type / _primary), and method-body pack
+expansion (cpp11_variadic_pack_in_method_body_call).  N5008 [func.wrap.func],
+[temp.variadic]/5, [temp.deduct.call]/3.  Non-vacuous (assertion 2 must FAIL).
