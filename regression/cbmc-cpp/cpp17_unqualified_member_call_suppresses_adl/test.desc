@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unqualified member find resolves to C::find, not arg-class member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
+--
+N5008 [basic.lookup.argdep]/3.1: when ordinary unqualified lookup of a name
+finds the declaration of a class member, the associated namespaces/classes are
+not considered (ADL is suppressed); ADL ([basic.lookup.argdep]/4) never
+considers an associated class's member functions.  Fixed in
+cpp_typecheck_resolvet::resolve: suppress the resolve_with_arguments ADL pass
+when ordinary lookup already found a class member (except for operator names,
+which use [over.match.oper]'s separate candidate-gathering).  This unblocks the
+src/util/xml.h `xmlt::get_element` -> `find(element)` vs `std::basic_string::find`
+ambiguity.  Non-vacuous (assertion 2 must FAIL).
