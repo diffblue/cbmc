@@ -102,6 +102,7 @@ confidently test at that scale yet.
 | 2026-05-12 (tmpl-no-match) | all src/util/ | **10** | **4** | 103 | 0 | `01507a3e6d` — resolve: silently discard template-only no-match per [temp.deduct]/8; eliminates the `invariant_violated_structured` cascade that had been emitted by 60+ files and moves 3 files to OK_CLEAN + 1 to OK_NOISY-to-OK_CLEAN |
 | 2026-05-12 (funcaddr+SIGSEGV) | all src/util/ | 10 | 4 | 103 | 0 | `d612fe6dac` (plain function-pointer target-type deduction per [temp.deduct.funcaddr]; promotes `cpp11_deduct_funcaddr` KNOWNBUG→CORE) + `df5f5d955e` (guard empty declarator-name sub on trailing-return-decltype path; eliminates MSVC `cpp11_future_header` SIGSEGV on preprocessed-header runs) |
 | 2026-05-13 (duration) | all src/util/ | 10 | 4 | 103 | 0 | `2e8e74f8ed` — skip self-referential `common_type_t<duration>` member during class elaboration; unlocks `_MyRep` + constructors + operators on `std::chrono::duration<...>`, MSVC `cpp14_chrono_basic` preprocessed-header run now VERIFIES SUCCESSFUL |
+| 2026-06-30 (variadic) | all src/util/ | **36** | **59** | **22** | 0 | cumulative variadic-pack-expansion + std::function rework (layers 1, 2a/2b/2c-i/2c-ii, 3a, 3b, 3c-i): multi-argument std::function now constructs AND invokes soundly; 95/117 files now produce a goto binary (was 14/117 on 2026-05-13) |
 
 ## Fixes that have landed (in order)
 
