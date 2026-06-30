@@ -9,19 +9,20 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-N5008 [meta.unary.prop], [temp.deduct.call]/4, [temp.deduct.type]:
-is_constructible<pair<const int,int>, pair<int,int>&&> is true (g++/clang++
-agree) -- the converting constructor template pair(pair<U1,U2>&&) deduces
-U1=U2=int and binds the rvalue.  CBMC reports false: deducing the constructor
-template's parameters from the argument deduces U1=int but leaves U2 unassigned,
-so the enable_if non-type parameter's condition (which mentions U2) cannot be
-substituted, typecheck_type of the parameter type throws, and the candidate is
+N5008 [meta.unary.prop], [temp.deduct.call], [temp.arg]: is_constructible
+<pair<const int,int>, pair<int,int>&&> is true (g++/clang++ agree).  CBMC reports
+false: the C++17 converting move constructor pair(pair<U1,U2>&&) (stl_pair.h:708)
+is gated by an __enable_if_t<...> non-type parameter.  Deduction CORRECTLY binds
+U1=U2=int (template_map holds ::651::_U1->int, ::651::_U2->int), but
+template_mapt::apply does not substitute those bound parameters inside the
+`ambiguous` condition expression of the enable_if parameter type, so the
+references survive as bare cpp_names, typecheck_type throws, and the candidate is
 dropped ("found no match for symbol 'pair'").  user_defined_conversion_sequence
 correctly delegates the template converting constructor to new_temporary; the
-defect is in the constructor-template argument deduction.  Root of std::map /
+defect is the substitution gap in template_mapt::apply.  Root of std::map /
 std::unordered_map insert(_Pair&&) overload selection for a convertible pair
 (dog-food: expr.cpp, expr_util.cpp, pointer_predicates.cpp,
 irep_serialization.cpp).  Reproduces only with libstdc++'s full pair machinery
-(minimal hand-written converting ctors deduce both parameters), hence the header
-dependency.  Flip to CORE once deduction assigns every constructor template
-parameter for this source.
+(a hand-written enable_if<...>::type form substitutes correctly), hence the
+header dependency.  Flip to CORE once template_mapt::apply substitutes deduced
+parameters inside an enable_if non-type-parameter condition.
