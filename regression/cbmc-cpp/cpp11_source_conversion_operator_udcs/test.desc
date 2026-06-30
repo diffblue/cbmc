@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ T is_constructible from S via operator T\(\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ S is_convertible to T via operator T\(\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [over.match.copy]/1: converting to class type T from class type S
+considers both T's converting constructors AND S's conversion functions.  CBMC's
+implicit_conversion_sequence / user_defined_conversion_sequence only enumerates
+the target's constructors and ignores the source's conversion operators, so
+is_constructible<T,S> and is_convertible<S,T> are wrongly false when only
+S::operator T() realises the conversion (g++/clang++ agree both are true).
+Header-free.  Flip to CORE once user_defined_conversion_sequence also considers
+the source type's conversion functions.
