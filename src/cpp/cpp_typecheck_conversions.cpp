@@ -2308,6 +2308,40 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           rank += tmp_rank;
           new_expr.swap(tmp_expr);
         }
+        else if(
+          to.id() == ID_struct_tag && func_expr.type().id() == ID_struct_tag)
+        {
+          // N5008 [over.match.copy]/1: a (non-explicit) conversion function of
+          // the source is a candidate when it yields "a type whose
+          // cv-unqualified version is the same as T or is a derived class
+          // thereof".  When the operator yields a class *derived* from the
+          // target class T, the result initializes T by a derived-to-base
+          // conversion (slicing).  standard_conversion_sequence does not model
+          // a class-prvalue derived-to-base value conversion, so build it
+          // explicitly via address-of + pointer derived-to-base conversion +
+          // dereference, exactly as the converting-constructor path above
+          // does.  A non-derived class yields no pointer conversion and is
+          // correctly rejected.
+          unsigned d2b_rank = 0;
+          address_of_exprt addr_func{func_expr, pointer_type(func_expr.type())};
+          exprt casted_ptr;
+          if(standard_conversion_sequence(
+               addr_func, pointer_type(to), casted_ptr, d2b_rank))
+          {
+            dereference_exprt base_deref{casted_ptr};
+            base_deref.add_source_location() = expr.source_location();
+
+            if(found)
+              return false;
+            found = true;
+
+            // [over.ics.scs], [conv.qual]: a derived-to-base conversion is a
+            // Conversion-rank standard conversion (worse than the exact match
+            // a same-type operator yields).
+            rank += d2b_rank + 4;
+            new_expr.swap(base_deref);
+          }
+        }
       }
     }
     if(found)
@@ -4289,11 +4323,10 @@ void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr1, exprt &expr2)
     if(t.id() != ID_struct_tag && t.id() != ID_union_tag)
       return;
     const struct_union_typet &class_type =
-      t.id() == ID_struct_tag
-        ? static_cast<const struct_union_typet &>(
-            follow_tag(to_struct_tag_type(t)))
-        : static_cast<const struct_union_typet &>(
-            follow_tag(to_union_tag_type(t)));
+      t.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                  follow_tag(to_struct_tag_type(t)))
+                              : static_cast<const struct_union_typet &>(
+                                  follow_tag(to_union_tag_type(t)));
     typet target;
     if(!single_arithmetic_conversion_target(*this, class_type, target))
       return;
@@ -4317,11 +4350,10 @@ void cpp_typecheckt::implicit_typecast_arithmetic(exprt &expr)
   if(t.id() == ID_struct_tag || t.id() == ID_union_tag)
   {
     const struct_union_typet &class_type =
-      t.id() == ID_struct_tag
-        ? static_cast<const struct_union_typet &>(
-            follow_tag(to_struct_tag_type(t)))
-        : static_cast<const struct_union_typet &>(
-            follow_tag(to_union_tag_type(t)));
+      t.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                  follow_tag(to_struct_tag_type(t)))
+                              : static_cast<const struct_union_typet &>(
+                                  follow_tag(to_union_tag_type(t)));
     typet target;
     if(single_arithmetic_conversion_target(*this, class_type, target))
       implicit_typecast(expr, target);
