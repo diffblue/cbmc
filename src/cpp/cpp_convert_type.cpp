@@ -106,7 +106,22 @@ void cpp_convert_typet::read_rec(const typet &type)
   }
   else if(type.id()==ID_pointer)
   {
-    // ignore, we unfortunately convert multiple times
+    // We unfortunately convert multiple times: an already-converted pointer
+    // type is re-read here.  Its own top-level cv-qualifiers (e.g. a const
+    // pointer `T* const`, as produced when a cv-qualified template parameter
+    // `const T` is substituted with a pointer type -- N5008 [dcl.ptr],
+    // [basic.type.qualifier]) live as attributes on the pointer node, not in
+    // `c_qualifiers`.  Recover them, otherwise the final `c_qualifiers.write`
+    // (with `is_constant`/`is_volatile` still false) would strip the const off
+    // the re-converted pointer -- which made a deduced `const _Functor&`
+    // parameter become a non-const reference, so a const-pointer argument
+    // could no longer bind it.
+    if(type.get_bool(ID_C_constant))
+      c_qualifiers.is_constant = true;
+    if(type.get_bool(ID_C_volatile))
+      c_qualifiers.is_volatile = true;
+    if(type.get_bool(ID_C_restricted))
+      c_qualifiers.is_restricted = true;
     other.push_back(type);
   }
   else if(type.id() == ID_frontend_vector)
