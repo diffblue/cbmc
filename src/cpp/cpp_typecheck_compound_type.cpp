@@ -638,6 +638,32 @@ void cpp_typecheckt::typecheck_compound_declarator(
   }
 
   {
+    // N5008 [temp.variadic]/5: a data member whose type is a function pointer
+    // whose pointee parameter list contains a pack expansion of an enclosing
+    // class template parameter pack -- e.g. `int (*fp)(A...)` in a *primary*
+    // variadic class template `S<A...>` -- must have that pack expanded into
+    // one parameter per deduced element.  The partial-specialization
+    // instantiation path runs template_mapt::apply over the member types
+    // (which expands such a pointee, see the apply pointer branches), but the
+    // primary-template path type-checks the member declarator here instead, so
+    // the pointee pack would otherwise be substituted as a single (scalar)
+    // element, collapsing `int (*)(A...)` to `int (*)(<first>)` so that an
+    // assignment of a matching function (`s.fp = add`) no longer binds.
+    // expand_parameter_packs is a no-op unless the pointee is a function type
+    // with a parameter naming a pack recorded in pack_args_map (the class
+    // pack); method members are handled by the dedicated block above.
+    if(
+      !is_typedef &&
+      (final_type.id() == ID_pointer ||
+       final_type.id() == ID_frontend_pointer) &&
+      (!template_map.pack_args_map.empty() ||
+       !template_map.pack_size_map.empty()))
+    {
+      typet &pointee = to_type_with_subtype(final_type).subtype();
+      if(pointee.id() == ID_code || pointee.id() == ID_function_type)
+        template_map.expand_parameter_packs(pointee);
+    }
+
     bool is_function_member =
       final_type.id() == ID_code || final_type.id() == ID_function_type;
     bool old_suppress = suppress_elaborate;
