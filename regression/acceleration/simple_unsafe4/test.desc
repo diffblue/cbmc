@@ -5,4 +5,12 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
-The result spuriously is VERIFICATION SUCCESSFUL.
+^VERIFICATION SUCCESSFUL$
+--
+x stays odd, so the assertion x % 2 == 0 genuinely fails once the loop is
+accelerated to its exit. The polynomial-fit coefficients are bounded (see
+fit_polynomial_sliced) so the fit does not depend on the SAT back-end's chosen
+model: without that bound a coefficient could wrap modulo 2^width to a
+non-inductive value, which check_inductive then rejects, dropping the
+acceleration and spuriously reporting VERIFICATION SUCCESSFUL with some
+back-ends (e.g. Riss/IPASIR, as used by the ubuntu-24.04-make-gcc CI job).
