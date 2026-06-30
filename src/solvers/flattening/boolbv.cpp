@@ -123,8 +123,6 @@ bvt boolbvt::convert_bitvector(const exprt &expr)
     return convert_update(to_update_expr(expr));
   else if(expr.id() == ID_update_bit)
     return convert_update_bit(to_update_bit_expr(expr));
-  else if(expr.id()==ID_case)
-    return convert_case(to_case_expr(expr));
   else if(expr.id()==ID_cond)
     return convert_cond(to_cond_expr(expr));
   else if(expr.id()==ID_if)
@@ -390,12 +388,6 @@ literalt boolbvt::convert_rest(const exprt &expr)
   else if(expr.id()==ID_member)
   {
     bvt bv=convert_member(to_member_expr(expr));
-    CHECK_RETURN(bv.size() == 1);
-    return bv[0];
-  }
-  else if(expr.id()==ID_case)
-  {
-    bvt bv = convert_case(to_case_expr(expr));
     CHECK_RETURN(bv.size() == 1);
     return bv[0];
   }
