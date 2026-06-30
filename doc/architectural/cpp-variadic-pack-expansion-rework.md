@@ -611,7 +611,17 @@ any of them.
          result.  Fixed by the symmetric void*-source case in
          `cast_away_constness`; CORE `cpp11_static_cast_void_to_const_funptr`.
        - **2c-ii. `_M_manager` body silently niled under system-header
-         attribution (open; earlier null-handler diagnosis DISPROVEN).**
+       - **2c-ii. `_M_manager` body silently niled (FIXED, CORE).**  Was
+         mis-attributed to system-header handling; the earlier null-handler
+         diagnosis was DISPROVEN.  Real cause: a deduced cv-qualified
+         function-pointer reference parameter lost its const on re-conversion
+         (see ROOT CAUSE below), so the const argument could not bind and the
+         body was discarded.  Fixed in `cpp_convert_typet::read_rec`'s
+         `ID_pointer` branch (recover the re-converted pointer's own
+         cv-qualifiers); CORE `cpp11_deduce_const_funptr_member_template`.  A
+         single `std::function<int(int)> f = &fn;` now verifies (no `_M_manager`
+         no-body).  Historical investigation notes follow.
+
          `_M_manager`'s body conversion throws a *silent* `throw 0` (no
          diagnostic is emitted, `had_template_instantiation` is set, so a nested
          instantiation is involved); `convert_function`'s `catch(int)` for
@@ -729,17 +739,23 @@ any of them.
          the deduced const-qualified function-pointer reference parameter keeps
          its const.
 
-         NEXT: pin the `typecheck_type`/`cpp_convert` line that drops the
-         `#constant` on the (function-)pointer base of a deduced reference
-         parameter and preserve it ([dcl.ref], [temp.deduct.call]/3); then the
-         instantiation-context overload resolution accepts the candidate and the
-         body is no longer niled.  Re-run `sf.cpp` to confirm `_M_manager`
-         converts, then continue the `std::function` chain.
+         FIXED: the dropped `#constant` was in `cpp_convert_typet::read_rec`'s
+         `ID_pointer` branch -- re-converting an already-converted pointer pushed
+         it to `other` without recording its own top-level cv-qualifiers, so the
+         trailing `c_qualifiers.write` (is_constant=false) stripped the const
+         ([dcl.ptr], [basic.type.qualifier]).  Recovering the pointer's
+         cv-qualifiers there makes the deduced parameter `const _Functor&` keep
+         its const, the const argument binds, the candidate is accepted, and the
+         body is no longer niled.  `sf.cpp` (single-arg `std::function`) now
+         verifies; both regression suites pass.
      `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
-     passes only *vacuously* (layer 1 blocks multi-arg construction before these
-     are reached); landing layer 1 needs 2c-ii (and any further layers) fixed so
-     as not to regress it.
-  The dog-food `make_bvrep` files remain blocked on layer 2 (2c-ii and layer 1).
+     passes only *vacuously* (layer 1 blocks *multi-arg* construction before the
+     manager machinery is reached); single-argument construction now reaches and
+     converts `_M_manager` (2c-ii fixed).  Landing layer 1 (multi-arg) needs the
+     partial-spec pack deduction below.
+  The dog-food `make_bvrep` files remain blocked on layer 1 (multi-arg
+  partial-spec pack deduction); single-arg `std::function` construction is now
+  unblocked through 2c-ii.
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
