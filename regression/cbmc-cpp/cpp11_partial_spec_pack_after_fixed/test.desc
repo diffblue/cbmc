@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ deduced pack arity through partial-spec base: SUCCESS$
@@ -16,12 +16,9 @@ trailing arguments rather than collapsing it to one element.  This is the shape
 of libstdc++'s __result_of_impl<false,false,_Functor,_ArgTypes...> behind
 multi-argument std::function.  N5008 [temp.spec.partial.match], [temp.variadic]/5.
 
-A targeted fix exists (expand the deduced pack into positional arguments in
-disambiguate_template_classes, mirroring elaborate_class_template), and it makes
-this test and the synthetic __invoke_result models pass.  It is NOT yet landed
-because it unblocks multi-argument std::function construction far enough to hit
-a separate, pre-existing blocker -- the std::function _Base_manager::_M_create /
-_Function_handler::_M_manager member-function-template bodies are converted but
-do not reach the goto model ("no body"), which also affects single-argument
-std::function and currently makes cpp17_functional_basic pass only vacuously.
-Land this fix together with that body-propagation fix.
+Fixed in cpp_typecheck_resolvet::disambiguate_template_classes: after
+build_template_args (which emits a single scalar convenience binding for the
+pack), expand the deduced pack into one positional argument per element via
+pack_args_map, mirroring elaborate_class_template, so the specialization is
+instantiated with the pack bound to all trailing arguments and sizeof...(A) is
+correct.  Non-vacuous (assertion 2 must FAIL).
