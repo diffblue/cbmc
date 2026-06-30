@@ -5,42 +5,41 @@
 // agree).
 //
 // KNOWN BUG: CBMC reports it FALSE.  Root cause (verified by tracing the
-// front-end), N5008 [temp.deduct.call]/4 + [temp.deduct.type]:
+// front-end), N5008 [temp.deduct.call] + [temp.arg]:
 //
-//   * __is_constructible delegates to the user-defined-conversion / temporary-
-//     construction path, which (correctly, per [over.match.copy]) tries to
-//     construct pair<const int,int> from pair<int,int>&&.
-//   * libstdc++'s C++17 converting move constructor is
-//       template<class _U1, class _U2,
-//                typename __enable_if_t<
-//                  _PCCFP<_U1,_U2>::template _MoveConstructiblePair<_U1,_U2>()
-//                  && _PCCFP<_U1,_U2>::template
-//                       _ImplicitlyMoveConvertiblePair<_U1,_U2>(),
-//                  bool> = true>
+//   * __is_constructible delegates (correctly, [over.match.copy]) to
+//     constructing pair<const int,int> from pair<int,int>&&.
+//   * libstdc++'s C++17 converting move constructor (stl_pair.h:708) is
+//       template<class _U1, class _U2, typename __enable_if_t<
+//         _PCCFP<_U1,_U2>::template _MoveConstructiblePair<_U1,_U2>()
+//         && _PCCFP<_U1,_U2>::template _ImplicitlyMoveConvertiblePair<_U1,_U2>(),
+//         bool> = true>
 //       pair(pair<_U1,_U2>&&);
-//   * Deducing the constructor's template parameters from the argument
-//     pair<int,int>&& deduces _U1=int but leaves _U2 UNASSIGNED.  (A minimal
-//     hand-written pair with the same converting ctor shape deduces both, so
-//     the loss of _U2 is specific to the real declaration's surrounding
-//     machinery; this is why the bug only reproduces with the header.)
-//   * Because _U2 is unassigned, template_map::apply cannot substitute it into
-//     the __enable_if_t<...> non-type parameter's condition, so typecheck_type
-//     of the parameter type throws and the constructor candidate is dropped
-//     (guess_function_template_args returns nil).  No converting constructor is
-//     found -> "found no match for symbol 'pair'" -> __is_constructible false.
+//   * Constructor-template argument deduction CORRECTLY binds _U1=int, _U2=int
+//     (the template_map holds `...::651::_U1 -> int` and `...::651::_U2 -> int`).
+//   * BUT template_mapt::apply fails to substitute those bound _U1/_U2
+//     references where they are nested inside the `ambiguous` condition
+//     expression of the __enable_if_t<...> non-type parameter type.  They
+//     survive as bare cpp_names, so typecheck_type of the parameter type throws
+//     and the candidate is dropped ("found no match for symbol 'pair'") -> the
+//     trait is false.
+//   * A hand-written pair whose enable_if is spelled `enable_if<...>::type`
+//     reproduces neither (apply substitutes there); the gap is specific to the
+//     __enable_if_t alias wrapping a member-function-template constraint
+//     expression, hence the header dependency.
 //
 // user_defined_conversion_sequence is NOT the culprit: it correctly delegates
-// the template converting constructor to new_temporary; the defect is in the
-// constructor-template argument deduction it relies on.
+// the template converting constructor to new_temporary.  The defect is the
+// substitution gap in template_mapt::apply.
 //
 // This is the root of std::map / std::unordered_map insert failing for a
 // convertible pair (the constrained `insert(_Pair&&)` overload's
 // is_constructible<value_type,_Pair&&> guard) -- src/util/expr.cpp,
 // expr_util.cpp, pointer_predicates.cpp, irep_serialization.cpp.
 //
-// Non-vacuous (assertion 2 must FAIL).  Flip to CORE once constructor-template
-// argument deduction deduces every template parameter of the converting
-// constructor for this source.
+// Non-vacuous (assertion 2 must FAIL).  Flip to CORE once template_mapt::apply
+// substitutes deduced parameters inside an enable_if non-type-parameter's
+// condition expression.
 
 #include <utility>
 #include <type_traits>
