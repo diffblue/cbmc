@@ -828,13 +828,34 @@ any of them.
          `int(*)(A...)` (no nested template at all) ALSO mis-verifies (vacuous):
          `s.fp = add; s.fp(2,3)` yields an unconstrained result, although the
          partial-spec `Func<R(A...)>` analogue (cpp11_variadic_pack_in_member_
-         funptr_type, CORE) works.  So the member function-pointer pack expansion
-         fix (3a) did not reach the *direct* variadic-class instantiation path --
-         a separate, cleanly-reducible bug worth its own KNOWNBUG/fix, tracked
-         here as a lead.
-       Pinning 3c requires a faithful valid reduction (union-based erasure, or
-       reproducing the converted-but-unconstrained `_M_invoke` result) before a
-       fix can be made.
+         funptr_type, CORE) works.  **FIXED** (cpp11_variadic_pack_member_funptr_
+         primary, CORE): the primary-template path type-checks the member
+         declarator in `typecheck_compound_declarator` rather than via
+         `template_mapt::apply`, so a data-member function-pointer pointee pack
+         is now expanded there too.
+       * **3c-i. explicit leading template argument + deduced trailing pack
+         (KNOWNBUG, root of the `_M_invoke` failure).** Reducing the partial-spec
+         method->nested-template case further isolates a free-function gap:
+         `invoke_r<int>(fp, 2, 3)` -- an explicit leading template argument with
+         a *multi-element* trailing pack deduced from the call arguments -- is
+         instantiated with one EXTRA pack parameter.  `guess_function_template_
+         args` returns the correctly-sized (3-param) instance, but between the
+         plural-guess `push_back` and `disambiguate_functions` the candidate is
+         re-typed/re-instantiated from its `C_template_arguments`
+         (`[R, F, A0, A1]`) with the pack over-expanded to N+1, so disambiguation
+         rejects it on arity and `resolve` bails via the "all candidates are
+         templates" path (vacuous pass).  A single-element deduced pack works.
+         This is the function-template analogue of `cpp11_partial_spec_pack_
+         after_fixed` and the actual root of the multi-argument `std::function`
+         `_M_invoke`/`__invoke_r` dispatch failure.  KNOWNBUG
+         `cpp11_explicit_targ_deduced_trailing_pack` (header-free, valid C++,
+         non-vacuous).  Verified NOT a regression of the 3b `base$k` rename
+         (disabling it leaves m12 broken and breaks the 3b CORE test).  The exact
+         re-instantiation over-expansion site (reached when disambiguation
+         accesses the instance type) is not yet pinned.
+       Pinning the converted-but-unconstrained `_M_invoke` result for the real
+       std::function still requires a faithful valid reduction (union-based
+       erasure); 3c-i is the function-template root and the next fix target.
   The dog-food `make_bvrep` files remain blocked on layer 3c (multi-arg
   `std::function` invoke/dispatch result); single-arg `std::function`
   construction *and invocation* are sound, and multi-arg construction +
