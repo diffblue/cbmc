@@ -796,17 +796,45 @@ any of them.
        method-body drain recovers the per-pack counts from those names when no
        `#expanded_param_packs` record exists (N5008 [temp.variadic]/5).  CORE
        `cpp11_variadic_pack_in_method_body_call`.
-     - **3c. multi-argument `_M_invoke`/`__invoke_r` dispatch result (NEXT).**
+     - **3c. multi-argument `_M_invoke`/`__invoke_r` dispatch result (NEXT, root
+       not yet pinned).**
        With 3b fixed, `operator()` forwards both arguments correctly to the
        handler (trace: `__args$0=2`, `__args$1=3`, both forwards present,
        `_M_invoker=_M_invoke`, dispatch target `add`), but the invocation still
-       yields a wrong result -- `add(2,3)` returns 1 -- somewhere in
-       `_Function_handler::_M_invoke -> std::__invoke_r -> __invoke_impl ->
-       *_M_get_pointer(functor)`.  Free-function forwarding-pack templates
-       (`invoke(f, a...)` -> `f(static_cast<A&&>(a)...)`) verify correctly in
-       isolation, so this is a `std::function`-internal dispatch issue, not a
-       general pack-expansion gap.  Captured by the (still) non-vacuous KNOWNBUGs
-       `cpp11_function_basic` / `cpp17_functional_basic`.
+       yields a wrong/unconstrained result -- the call returns 1 instead of 5 --
+       somewhere in `_Function_handler::_M_invoke -> std::__invoke_r ->
+       __invoke_impl -> *_M_get_pointer(functor)`.  Notably **all bodies in the
+       chain are converted** (it is not a no-body); the result is simply
+       unconstrained, so with the `r==5` assertion it fails with a counterexample
+       (`r=1`) rather than passing vacuously.  Captured by the (still)
+       non-vacuous KNOWNBUGs `cpp11_function_basic` / `cpp17_functional_basic`.
+
+       Investigation notes (a minimal *valid* header-free reduction has NOT yet
+       been found; each attempt diverged):
+       * Free-function forwarding-pack templates called directly
+         (`invoke(f, a...)` -> `f(static_cast<A&&>(a)...)`) verify correctly in
+         isolation -- so a bare nested forwarding-pack template is fine.
+       * A `void*`-erased model (`static_cast<F*>(d.p)` for a function type
+         `F`) is **ill-formed C++** (g++/clang++ reject the cast), so it is not a
+         faithful model of `std::function`'s union-based `_Any_data` erasure.
+       * A `Func<R(A...)>` (partial-spec, std::function-shaped) method whose body
+         calls a nested function template with the forwarded pack
+         (`invoke_r<R>(fp, static_cast<A&&>(a)...)`) is valid C++ but exhibits a
+         *different* failure in CBMC: the method body fails to convert and the
+         class instance is corrupted (a later `f.fp = add` in `main` decays to
+         nil and the rest of `main` is truncated).  This cascade is a distinct
+         bug from the `_M_invoke` value bug (where bodies DO convert).
+       * A *direct* variadic class `S<A...>` with a function-pointer member
+         `int(*)(A...)` (no nested template at all) ALSO mis-verifies (vacuous):
+         `s.fp = add; s.fp(2,3)` yields an unconstrained result, although the
+         partial-spec `Func<R(A...)>` analogue (cpp11_variadic_pack_in_member_
+         funptr_type, CORE) works.  So the member function-pointer pack expansion
+         fix (3a) did not reach the *direct* variadic-class instantiation path --
+         a separate, cleanly-reducible bug worth its own KNOWNBUG/fix, tracked
+         here as a lead.
+       Pinning 3c requires a faithful valid reduction (union-based erasure, or
+       reproducing the converted-but-unconstrained `_M_invoke` result) before a
+       fix can be made.
   The dog-food `make_bvrep` files remain blocked on layer 3c (multi-arg
   `std::function` invoke/dispatch result); single-arg `std::function`
   construction *and invocation* are sound, and multi-arg construction +
