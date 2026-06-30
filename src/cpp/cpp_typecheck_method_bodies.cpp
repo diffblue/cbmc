@@ -212,12 +212,46 @@ void cpp_typecheckt::typecheck_method_bodies()
     {
       const irept &eprec =
         method_symbol.type.find(irep_idt{"#expanded_param_packs"});
+      std::map<irep_idt, std::size_t> pack_counts;
       if(eprec.is_not_nil() && !eprec.get_sub().empty())
       {
-        std::map<irep_idt, std::size_t> pack_counts;
         for(const auto &e : eprec.get_sub())
           pack_counts[e.id()] = e.get_size_t(ID_size);
-
+      }
+      else if(method_symbol.type.id() == ID_code)
+      {
+        // N5008 [temp.variadic]/5: when a member of a class template partial
+        // specialization `C<R(A...)>` is instantiated, the member's parameter
+        // pack `A... a` is expanded into distinct parameters `a$0..a$k` by
+        // `template_mapt` during instantiation, which -- unlike the in-class
+        // `compound_type` path -- does not leave an `#expanded_param_packs`
+        // record.  Recover the per-pack counts from the already-expanded
+        // parameter names so the body's pack-expansion uses (`a...`, e.g. the
+        // libstdc++ `function<R(A...)>::operator()` body
+        // `_M_invoker(_M_functor, std::forward<A>(__args)...)`) expand to the
+        // full arity instead of collapsing to one argument.  A replicated
+        // parameter is named `base$k`; group by base and count.
+        std::map<irep_idt, std::size_t> counts;
+        for(const auto &p : to_code_type(method_symbol.type).parameters())
+        {
+          const std::string bn = id2string(p.get_base_name());
+          const auto dollar = bn.rfind('$');
+          if(dollar == std::string::npos || dollar + 1 >= bn.size())
+            continue;
+          if(
+            bn.find_first_not_of("0123456789", dollar + 1) != std::string::npos)
+            continue;
+          ++counts[irep_idt{bn.substr(0, dollar)}];
+        }
+        // Only treat as a pack expansion when more than one element was
+        // produced; a single `base$0` is an ordinary case handled by the
+        // single-element substitution below.
+        for(const auto &c : counts)
+          if(c.second >= 2)
+            pack_counts[c.first] = c.second;
+      }
+      if(!pack_counts.empty())
+      {
         // The recorded pack base (if any) that a pack-expansion pattern node
         // mentions.
         std::function<irep_idt(const irept &)> ref_base =

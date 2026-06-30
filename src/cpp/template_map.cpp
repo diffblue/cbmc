@@ -78,6 +78,34 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
       {
         // [temp.variadic]/5: replace the pack-expansion parameter with
         // one parameter per deduced pack element.
+        //
+        // When more than one element is produced, give each replicated
+        // parameter a distinct name `base$k` (mirroring the in-class
+        // `compound_type` expansion), so that the function-body uses of the
+        // pack -- e.g. `fp(a...)`, the libstdc++
+        // `function<R(A...)>::operator()` body
+        // `_M_invoker(_M_functor, std::forward<A>(__args)...)` -- can be
+        // expanded to the matching `base$0..base$k-1` arguments.  Without
+        // distinct names the N replicated parameters collide under one name and
+        // the body call collapses to a single argument.  A single-element pack
+        // keeps the original name (handled by the single-element substitution
+        // in cpp_typecheck_method_bodies).
+        irep_idt pack_base_name;
+        if(pack->size() >= 2)
+        {
+          for(const auto &d : parameter.get_sub())
+            if(d.id() == ID_cpp_declarator)
+            {
+              for(const auto &nn : d.find(ID_name).get_sub())
+                if(nn.id() == ID_name && !nn.get(ID_identifier).empty())
+                {
+                  pack_base_name = nn.get(ID_identifier);
+                  break;
+                }
+              break;
+            }
+        }
+        std::size_t pack_index = 0;
         for(const auto &pt : *pack)
         {
           irept expanded = parameter;
@@ -109,8 +137,20 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
               if(element_is_reference || !declarator_is_reference)
                 static_cast<typet &>(d.add(ID_type)).make_nil();
               d.remove(ID_ellipsis);
+              if(!pack_base_name.empty())
+              {
+                const std::string nm =
+                  id2string(pack_base_name) + "$" + std::to_string(pack_index);
+                for(auto &nn : d.add(ID_name).get_sub())
+                  if(nn.id() == ID_name)
+                  {
+                    nn.set(ID_identifier, nm);
+                    break;
+                  }
+              }
             }
           new_parameters.push_back(expanded);
+          ++pack_index;
         }
         continue;
       }
