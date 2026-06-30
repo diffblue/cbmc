@@ -9,13 +9,14 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution
 
-#include "goto_symex.h"
-
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_code.h>
+
+#include "goto_symex.h"
 
 void goto_symext::havoc_rec(
   statet &state,
@@ -41,6 +42,10 @@ void goto_symext::havoc_rec(
           dest.id()==ID_byte_extract_big_endian)
   {
     havoc_rec(state, guard, to_byte_extract_expr(dest).op());
+  }
+  else if(dest.id() == ID_extractbits)
+  {
+    havoc_rec(state, guard, to_extractbits_expr(dest).src());
   }
   else if(dest.id()==ID_if)
   {

@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/as_const.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
@@ -339,6 +340,13 @@ exprt goto_symex_statet::l2_rename_rvalues(exprt lvalue, const namespacet &ns)
     auto &byte_extract_lvalue = to_byte_extract_expr(lvalue);
     byte_extract_lvalue.op() = l2_rename_rvalues(byte_extract_lvalue.op(), ns);
     byte_extract_lvalue.offset() = rename(byte_extract_lvalue.offset(), ns);
+  }
+  else if(lvalue.id() == ID_extractbits)
+  {
+    // The index is an rvalue:
+    auto &extractbits_lvalue = to_extractbits_expr(lvalue);
+    extractbits_lvalue.src() = l2_rename_rvalues(extractbits_lvalue.src(), ns);
+    extractbits_lvalue.index() = rename(extractbits_lvalue.index(), ns).get();
   }
   else if(lvalue.id() == ID_if)
   {

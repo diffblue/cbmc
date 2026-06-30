@@ -9,8 +9,10 @@ Author: Michael Tautschnig
 #include "field_sensitivity.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/pointer_offset_size.h>
 
 #include "goto_symex_state.h"
@@ -512,15 +514,42 @@ void field_sensitivityt::field_assignments_rec(
     exprt::operandst::const_iterator fs_it = lhs_fs.operands().begin();
     for(const auto &comp : components)
     {
-      const exprt member_rhs = apply(
-        ns,
-        state,
-        simplify_opt(
-          make_byte_extract(
-            ssa_rhs, from_integer(0, c_index_type()), comp.type()),
-          state.value_set,
-          ns),
-        false);
+      exprt extract;
+      if(
+        comp.type().id() != ID_c_bit_field ||
+        to_c_bit_field_type(comp.type()).get_width() %
+            config.ansi_c.char_width ==
+          0)
+      {
+        extract = make_byte_extract(
+          ssa_rhs, from_integer(0, c_index_type()), comp.type());
+      }
+      else
+      {
+        const auto &bf_type = to_c_bit_field_type(comp.type());
+        std::size_t bf_width = bf_type.get_width();
+
+        auto rhs_width = pointer_offset_bits(ssa_rhs.type(), ns);
+        CHECK_RETURN(rhs_width.has_value() && *rhs_width > 0);
+        std::size_t W = numeric_cast_v<std::size_t>(*rhs_width);
+
+        std::size_t bit_offset = 0;
+        if(
+          config.ansi_c.endianness ==
+          configt::ansi_ct::endiannesst::IS_BIG_ENDIAN)
+        {
+          bit_offset = W - bf_width;
+        }
+
+        typecast_exprt bv_rhs{ssa_rhs, bv_typet{W}};
+        extract = extractbits_exprt{
+          std::move(bv_rhs),
+          from_integer(bit_offset, c_index_type()),
+          comp.type()};
+      }
+
+      const exprt member_rhs =
+        apply(ns, state, simplify_opt(extract, state.value_set, ns), false);
 
       const exprt &member_lhs = *fs_it;
       if(

@@ -543,6 +543,15 @@ bool boolbvt::type_conversion(
         return false;
       }
     }
+    else if(
+      src_width == dest_width &&
+      (src_type.id() == ID_union || src_type.id() == ID_union_tag ||
+       dest_type.id() == ID_union || dest_type.id() == ID_union_tag ||
+       dest_type.id() == ID_bv || src_type.id() == ID_bv))
+    {
+      dest = src;
+      return false;
+    }
     else if(dest_type.id() == ID_struct || dest_type.id() == ID_struct_tag)
     {
       const struct_typet &dest_struct =
