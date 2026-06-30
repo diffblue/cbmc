@@ -3488,6 +3488,44 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
     if(!guessed_template_args.has_unassigned())
     {
+      // [temp.variadic]/5: when the selected partial specialization ends in a
+      // template parameter pack (`C<..., A...>`), `build_template_args` emits a
+      // single (scalar) convenience argument for the pack -- the front element
+      // of the deduced binding.  For the actual instantiation we need the pack
+      // expanded into one positional argument per deduced element (mirroring
+      // `elaborate_class_template`), so that the specialization is instantiated
+      // with the pack bound to ALL trailing arguments and `sizeof...(A)` is
+      // correct; otherwise the pack collapses to one element.  This expanded
+      // form is kept SEPARATE from `guessed_template_args`: the latter (and
+      // hence `matcht::cost`) must keep the un-expanded arity so that
+      // partial-ordering selection (which prefers the candidate with the fewer
+      // specialization arguments) is not perturbed by the pack size.
+      cpp_template_args_tct instantiation_args;
+      {
+        const auto &tparams =
+          cpp_declaration.template_type().template_parameters();
+        cpp_template_args_tct::argumentst expanded;
+        for(std::size_t i = 0; i < guessed_template_args.arguments().size();
+            i++)
+        {
+          if(i < tparams.size() && tparams[i].get_bool(ID_ellipsis))
+          {
+            const irep_idt pid = tparams[i].id() == ID_type
+                                   ? tparams[i].type().get(ID_identifier)
+                                   : tparams[i].get(ID_identifier);
+            auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pid);
+            if(pa_it != cpp_typecheck.template_map.pack_args_map.end())
+            {
+              for(const auto &pt : pa_it->second)
+                expanded.push_back(exprt(ID_type, pt));
+              continue;
+            }
+          }
+          expanded.push_back(guessed_template_args.arguments()[i]);
+        }
+        instantiation_args.arguments().swap(expanded);
+      }
+
       // check: we can now typecheck the partial_specialization_args
       // If typechecking fails (e.g., accessing a member of a non-class
       // type), treat it as a substitution failure (SFINAE) and skip
@@ -3727,6 +3765,10 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
             id,
             constrained,
             repeated_params));
+          // Record the pack-expanded specialization arguments for instantiation
+          // (see [temp.variadic]/5 note above); cost/ordering stay based on the
+          // un-expanded `guessed_template_args` passed to the constructor.
+          matches.back().instantiation_args = instantiation_args;
         }
       }
     }
@@ -3778,7 +3820,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   // build instance
   const symbolt &instance = cpp_typecheck.class_template_symbol(
-    source_location, choice, match.specialization_args, match.full_args);
+    source_location, choice, match.instantiation_args, match.full_args);
 
   typet result;
   if(instance.type.id() == ID_union)
