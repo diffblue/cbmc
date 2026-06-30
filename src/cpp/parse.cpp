@@ -5266,11 +5266,21 @@ bool Parser::rMemberInit(exprt &init)
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rMemberInit 3b\n";
 #endif
-    exprt exp;
-    if(!rInitializeExpr(exp))
+    // A parenthesized argument list whose first argument is a
+    // braced-init-list, e.g. `m({a, b}, t)`.  N5008 [class.base.init]/3 +
+    // [dcl.init.list]: each argument of the list may itself be a
+    // braced-init-list.  rFunctionArguments parses a comma-separated list of
+    // initializer-clauses (each via rInitializeExpr, which accepts a leading
+    // `{`), so it handles a leading braced-init-list followed by further
+    // arguments.  (Previously only a single braced-init-list argument was
+    // accepted here, so `m({a, b}, t)` -- e.g. refined_string_exprt's
+    // `: struct_exprt({_length, _content}, type)` -- failed to parse.)
+    exprt args;
+
+    if(!rFunctionArguments(args))
       return false;
 
-    init.operands().push_back(exp);
+    init.operands().swap(args.operands());
 
     if(lex.get_token(tk2) != ')')
       return false;
