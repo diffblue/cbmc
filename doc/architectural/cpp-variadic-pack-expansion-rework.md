@@ -781,24 +781,37 @@ any of them.
        past `end()` when a synthesized call had fewer arguments than parameters,
        corrupting the shared-irep tree and segfaulting in `--cpp11`; now guarded
        so the arity mismatch is diagnosed instead of crashing.)
-     - **3b. pack-expansion use of a parameter pack in a method body (KNOWNBUG,
-       NEXT).** With 3a fixed the converting constructor wires up the invoker
+     - **3b. pack-expansion use of a parameter pack in a method body (FIXED,
+       CORE).** With 3a fixed the converting constructor wires up the invoker
        with the correct arity, but the `operator()` body
-       `_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)` expands the
+       `_M_invoker(_M_functor, std::forward<_ArgTypes>(__args)...)` expanded the
        pack to a single argument.  Root: for a member of a partial-spec class
        `C<R(A...)>`, the parameter pack is expanded during instantiation by
        `template_mapt` (struct-body `expand_parameter_packs`), which -- unlike
-       the in-class `compound_type` path -- neither renames the replicated
-       parameters to `base$k` nor records `#expanded_param_packs`, so the
-       method-body drain in `cpp_typecheck_method_bodies` has nothing to drive
-       the body-use expansion.  KNOWNBUG `cpp11_variadic_pack_in_method_body_call`
-       (header-free, non-vacuous).  Fix direction: have the `template_mapt`
-       expansion follow the `base$k` rename + `#expanded_param_packs` recording
-       convention (or have the method-body drain derive the counts from the
-       deduced class pack).
-  The dog-food `make_bvrep` files remain blocked on layer 3b (multi-arg
-  `std::function` body pack expansion); single-arg `std::function` construction
-  *and invocation* are now sound (layers 1, 2a/2b/2c-i/2c-ii, 3a fixed).
+       the in-class `compound_type` path -- neither renamed the replicated
+       parameters to `base$k` nor recorded `#expanded_param_packs`, so the
+       method-body drain in `cpp_typecheck_method_bodies` had nothing to drive
+       the body-use expansion.  FIXED: `expand_parameter_packs` now names the
+       replicated parameters of a multi-element pack `base$k`, and the
+       method-body drain recovers the per-pack counts from those names when no
+       `#expanded_param_packs` record exists (N5008 [temp.variadic]/5).  CORE
+       `cpp11_variadic_pack_in_method_body_call`.
+     - **3c. multi-argument `_M_invoke`/`__invoke_r` dispatch result (NEXT).**
+       With 3b fixed, `operator()` forwards both arguments correctly to the
+       handler (trace: `__args$0=2`, `__args$1=3`, both forwards present,
+       `_M_invoker=_M_invoke`, dispatch target `add`), but the invocation still
+       yields a wrong result -- `add(2,3)` returns 1 -- somewhere in
+       `_Function_handler::_M_invoke -> std::__invoke_r -> __invoke_impl ->
+       *_M_get_pointer(functor)`.  Free-function forwarding-pack templates
+       (`invoke(f, a...)` -> `f(static_cast<A&&>(a)...)`) verify correctly in
+       isolation, so this is a `std::function`-internal dispatch issue, not a
+       general pack-expansion gap.  Captured by the (still) non-vacuous KNOWNBUGs
+       `cpp11_function_basic` / `cpp17_functional_basic`.
+  The dog-food `make_bvrep` files remain blocked on layer 3c (multi-arg
+  `std::function` invoke/dispatch result); single-arg `std::function`
+  construction *and invocation* are sound, and multi-arg construction +
+  argument forwarding are now correct (layers 1, 2a/2b/2c-i/2c-ii, 3a, 3b
+  fixed).
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
