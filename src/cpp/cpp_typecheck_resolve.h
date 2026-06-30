@@ -195,6 +195,14 @@ protected:
     cpp_template_args_tct specialization_args;
     cpp_template_args_tct full_args;
     irep_idt id;
+    // The specialization arguments used to actually instantiate the selected
+    // template.  Normally identical to `specialization_args`, but for a
+    // partial specialization ending in a parameter pack this holds the pack
+    // expanded into one positional argument per deduced element
+    // (N5008 [temp.variadic]/5), whereas `specialization_args` (and hence
+    // `cost`) keeps the un-expanded form so that partial-ordering selection is
+    // not perturbed by the pack arity.
+    cpp_template_args_tct instantiation_args;
     matcht(
       cpp_template_args_tct _s_args,
       cpp_template_args_tct _f_args,
@@ -206,7 +214,8 @@ protected:
         repeated_params(_repeated),
         specialization_args(_s_args),
         full_args(_f_args),
-        id(_id)
+        id(_id),
+        instantiation_args(_s_args)
     {
     }
 
