@@ -573,6 +573,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       {
         exprt tmp;
         symbol_exprt from(irep_idt(), t1);
+        // [meta.unary.prop], [over.match.copy]/1: the synthesised declval<>()
+        // operand is a class prvalue that may need to bind as the implicit
+        // object argument of a source-side conversion function; mark it so
+        // reference_binding materialises a temporary for that `this` binding.
+        from.set(ID_C_temporary_avoided, true);
         if(implicit_conversion_sequence(from, t2, tmp))
           expr = true_exprt();
         else
@@ -596,6 +601,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         {
           exprt tmp;
           symbol_exprt from(irep_idt(), t2);
+          from.set(ID_C_temporary_avoided, true);
           if(implicit_conversion_sequence(from, dest, tmp))
             expr = true_exprt();
           else
@@ -670,6 +676,11 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       {
         exprt tmp;
         symbol_exprt from(irep_idt(), t1);
+        // [meta.unary.prop], [over.match.copy]/1: the synthesised declval<>()
+        // operand is a class prvalue that may need to bind as the implicit
+        // object argument of a source-side conversion function; mark it so
+        // reference_binding materialises a temporary for that `this` binding.
+        from.set(ID_C_temporary_avoided, true);
         if(implicit_conversion_sequence(from, t2, tmp))
           expr = true_exprt();
         else
@@ -719,6 +730,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           if(is_reference(from_type))
             from_type = to_reference_type(from_type).base_type();
           symbol_exprt from(irep_idt(), from_type);
+          from.set(ID_C_temporary_avoided, true);
           if(implicit_conversion_sequence(from, t1, tmp))
             expr = true_exprt();
           else
