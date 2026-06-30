@@ -834,33 +834,32 @@ any of them.
          `template_mapt::apply`, so a data-member function-pointer pointee pack
          is now expanded there too.
        * **3c-i. explicit leading template argument + deduced trailing pack
-         (KNOWNBUG, root of the `_M_invoke` failure).** Reducing the partial-spec
-         method->nested-template case further isolates a free-function gap:
+         (FIXED, CORE -- the root of the `_M_invoke` failure).** Reducing the
+         partial-spec method->nested-template case isolated a free-function gap:
          `invoke_r<int>(fp, 2, 3)` -- an explicit leading template argument with
-         a *multi-element* trailing pack deduced from the call arguments -- is
-         instantiated with one EXTRA pack parameter.  `guess_function_template_
-         args` returns the correctly-sized (3-param) instance, but between the
-         plural-guess `push_back` and `disambiguate_functions` the candidate is
-         re-typed/re-instantiated from its `C_template_arguments`
-         (`[R, F, A0, A1]`) with the pack over-expanded to N+1, so disambiguation
-         rejects it on arity and `resolve` bails via the "all candidates are
-         templates" path (vacuous pass).  A single-element deduced pack works.
-         This is the function-template analogue of `cpp11_partial_spec_pack_
-         after_fixed` and the actual root of the multi-argument `std::function`
-         `_M_invoke`/`__invoke_r` dispatch failure.  KNOWNBUG
-         `cpp11_explicit_targ_deduced_trailing_pack` (header-free, valid C++,
-         non-vacuous).  Verified NOT a regression of the 3b `base$k` rename
-         (disabling it leaves m12 broken and breaks the 3b CORE test).  The exact
-         re-instantiation over-expansion site (reached when disambiguation
-         accesses the instance type) is not yet pinned.
-       Pinning the converted-but-unconstrained `_M_invoke` result for the real
-       std::function still requires a faithful valid reduction (union-based
-       erasure); 3c-i is the function-template root and the next fix target.
-  The dog-food `make_bvrep` files remain blocked on layer 3c (multi-arg
-  `std::function` invoke/dispatch result); single-arg `std::function`
-  construction *and invocation* are sound, and multi-arg construction +
-  argument forwarding are now correct (layers 1, 2a/2b/2c-i/2c-ii, 3a, 3b
-  fixed).
+         a *multi-element* trailing pack deduced from the call arguments -- was
+         instantiated with one EXTRA function parameter.  The post-instantiation
+         function-parameter-pack expansion in `cpp_typecheck_resolvet::resolve`
+         positioned and sized the expansion using the count of non-pack
+         *template* parameters, which exceeds the non-pack *function* parameter
+         count when a template parameter is not a function parameter (here the
+         explicit return-type parameter `R`); the 2-element pack became three
+         parameters, so `disambiguate_functions` rejected the instance on arity
+         and `resolve` bailed via the "all candidates are templates" path
+         (vacuous pass).  A single-element deduced pack worked.  FIXED by
+         counting the non-pack *function* parameters (and the pack's position
+         among them) directly from the function declarator (N5008
+         [temp.variadic]/4); `pack_size` still derives from the template
+         arguments.  CORE `cpp11_explicit_targ_deduced_trailing_pack`.  Verified
+         NOT a regression of the 3b `base$k` rename.
+       This fix is the **root of multi-argument `std::function`**: with it,
+       `std::function<int(int,int)> f = add; f(2,3)` constructs, wires up the
+       handler pointers, forwards all arguments, AND the `_M_invoke`/`__invoke_r`
+       dispatch returns the correct result.  `cpp11_function_basic` /
+       `cpp17_functional_basic` are now CORE (sound, non-vacuous).
+  Multi-argument `std::function` construction AND invocation are now sound
+  (layers 1, 2a/2b/2c-i/2c-ii, 3a, 3b, 3c-i fixed); the dog-food `make_bvrep`
+  files can be re-checked against this.
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
