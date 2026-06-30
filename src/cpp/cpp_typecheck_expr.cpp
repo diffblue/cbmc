@@ -681,7 +681,21 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         else
         {
           exprt tmp;
-          symbol_exprt from(irep_idt(), t2);
+          // N5008 [meta.unary.prop]: the trait is defined in terms of
+          // `declval<Args>()`, i.e. a value of the argument type.  Build the
+          // source expression from the de-referenced argument type (preserving
+          // cv-qualifiers): a source expression whose type is itself a
+          // reference (e.g. `pair<int,int>&&`) fails to bind to a converting
+          // constructor's reference parameter (`pair(pair<U1,U2>&&)`) during
+          // implicit_conversion_sequence, whereas the de-referenced value type
+          // binds as the by-value argument case already does.  Without this,
+          // is_constructible<pair<const int,int>, pair<int,int>&&> -- the guard
+          // on std::map / std::unordered_map's `insert(_Pair&&)` overload --
+          // was wrongly reported false.
+          typet from_type = t2;
+          if(is_reference(from_type))
+            from_type = to_reference_type(from_type).base_type();
+          symbol_exprt from(irep_idt(), from_type);
           if(implicit_conversion_sequence(from, t1, tmp))
             expr = true_exprt();
           else
