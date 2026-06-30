@@ -62,9 +62,9 @@ retained deliberately, for two reasons:
   what make such a reconstructed pointer usable by the standard memory
   model.
 
-So the address is the component used by pointer equality, relational
-comparison and pointer/integer casts, while object/offset is the
-component used by dereferencing and the rest of the memory model; the
+So the address is the component used by pointer equality and
+pointer/integer casts, while object/offset is the component used by
+dereferencing, relational comparison and the rest of the memory model; the
 invariant above keeps the two views consistent. The cost is the 3x
 wider bitvector.
 
@@ -134,8 +134,10 @@ not provable.
 ### Pointer Equality and Comparison
 
 With the wide encoding, `p == q` compares flat addresses (not object
-identity). Relational comparisons (`<`, `>`, `<=`, `>=`) also use
-flat addresses, making cross-object comparisons well-defined.
+identity). Relational comparisons (`<`, `>`, `<=`, `>=`) are *not* changed
+by this encoding: they remain object/offset-based (a comparison of pointers
+into distinct objects still yields `false`). Making relational comparison
+address-based is left to a dependent follow-up.
 
 ### Pointer-to-Integer Cast (P2I)
 
