@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 #ifdef DEBUG
-#include <iostream>
+#  include <iostream>
 #endif
 
 #include <util/arith_tools.h>
@@ -27,6 +27,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_qualifiers.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck_resolve.h"
+#include "expr2cpp.h"
 
 #include <algorithm>
 
@@ -40,29 +41,29 @@ cpp_scopet *id_map_lookup(cpp_scopest &scopes, const irep_idt &key)
 }
 } // namespace
 
-std::string cpp_typecheckt::template_suffix(
-  const cpp_template_args_tct &template_args)
+std::string
+cpp_typecheckt::template_suffix(const cpp_template_args_tct &template_args)
 {
   // quick hack
-  std::string result="<";
-  bool first=true;
+  std::string result = "<";
+  bool first = true;
 
-  const cpp_template_args_tct::argumentst &arguments=
+  const cpp_template_args_tct::argumentst &arguments =
     template_args.arguments();
 
   for(const auto &expr : arguments)
   {
     if(first)
-      first=false;
+      first = false;
     else
-      result+=',';
+      result += ',';
 
     DATA_INVARIANT(
       expr.id() != ID_ambiguous, "template argument must not be ambiguous");
 
-    if(expr.id()==ID_type)
+    if(expr.id() == ID_type)
     {
-      const typet &type=expr.type();
+      const typet &type = expr.type();
       if(type.id() == ID_struct_tag || type.id() == ID_union_tag)
       {
         // Include cv-qualifiers so that T and const T are distinct
@@ -74,14 +75,14 @@ std::string cpp_typecheckt::template_suffix(
         result += id2string(to_tag_type(type).get_identifier());
       }
       else
-        result+=cpp_type2name(type);
+        result += cpp_type2name(type);
     }
     else // expression
     {
       // [temp.arg.nontype]: a non-type template argument is a
       // converted constant expression; fold constexpr calls in it.
       constant_expression_contextt constant_expression_guard{*this};
-      exprt e=expr;
+      exprt e = expr;
 
       // Recursively resolve constant symbols to their values, so that
       // expressions like "1000000000000000000l * ::value" can be evaluated.
@@ -147,9 +148,25 @@ std::string cpp_typecheckt::template_suffix(
       mp_integer i;
 
       if(e == true)
-        i=1;
+        i = 1;
       else if(e == false)
-        i=0;
+        i = 0;
+      else if(!e.is_constant())
+      {
+        // N5008 [temp.arg.nontype]/1-2: a non-type template argument for a
+        // parameter of reference, pointer, or (C++20) class type designates an
+        // object/value rather than a scalar constant -- e.g.
+        // reference_counting<T>'s `template<typename T, const T &empty =
+        // T::blank>`, whose argument is the static object `T::blank`.  Such an
+        // argument is not a scalar constant, so forcing the integer conversion
+        // below would violate `to_constant_expr`'s precondition and abort.
+        // Use a stable textual representation of the argument for the instance
+        // name instead (equal arguments yield equal suffixes, so the same
+        // specialization is reused).
+        result += cpp_type2name(e.type());
+        result += ':';
+        result += expr2cpp(e, *this);
+      }
       else
       {
         // follow c_enum_tag to c_enum for to_integer
@@ -183,7 +200,7 @@ std::string cpp_typecheckt::template_suffix(
     }
   }
 
-  result+='>';
+  result += '>';
 
   return result;
 }
@@ -200,7 +217,7 @@ void cpp_typecheckt::show_instantiation_stack(std::ostream &out)
       if(a_it != e.full_template_args.arguments().begin())
         out << ", ";
 
-      if(a_it->id()==ID_type)
+      if(a_it->id() == ID_type)
         out << to_string(a_it->type());
       else
         out << to_string(*a_it);
@@ -332,7 +349,7 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   }
 
   // produce new symbol name
-  std::string suffix=template_suffix(full_template_args);
+  std::string suffix = template_suffix(full_template_args);
 
   cpp_scopet *template_scope = id_map_lookup(cpp_scopes, template_symbol.name);
 
@@ -379,32 +396,32 @@ const symbolt &cpp_typecheckt::class_template_symbol(
     identifier,
     is_union ? static_cast<typet>(union_typet()) : struct_typet(),
     template_symbol.mode};
-  new_symbol.pretty_name=template_symbol.pretty_name;
-  new_symbol.location=template_symbol.location;
+  new_symbol.pretty_name = template_symbol.pretty_name;
+  new_symbol.location = template_symbol.location;
   to_struct_union_type(new_symbol.type).make_incomplete();
   new_symbol.type.set(ID_tag, template_symbol.type.find(ID_tag));
   if(template_symbol.type.get_bool(ID_C_class))
     new_symbol.type.set(ID_C_class, true);
   new_symbol.type.set(ID_template_class_instance, true);
-  new_symbol.type.add_source_location()=template_symbol.location;
+  new_symbol.type.add_source_location() = template_symbol.location;
   new_symbol.type.set(
     ID_specialization_template_args, specialization_template_args);
   new_symbol.type.set(ID_full_template_args, full_template_args);
   new_symbol.type.set(ID_identifier, template_symbol.name);
-  new_symbol.base_name=template_symbol.base_name;
+  new_symbol.base_name = template_symbol.base_name;
 
   symbolt *s_ptr;
   symbol_table.move(new_symbol, s_ptr);
 
   // put into template scope
-  cpp_idt &id=cpp_scopes.put_into_scope(*s_ptr, *template_scope);
+  cpp_idt &id = cpp_scopes.put_into_scope(*s_ptr, *template_scope);
 
-  id.id_class=cpp_idt::id_classt::CLASS;
-  id.is_scope=true;
+  id.id_class = cpp_idt::id_classt::CLASS;
+  id.is_scope = true;
   id.prefix = template_scope->get_parent().prefix +
               id2string(s_ptr->base_name) + id2string(suffix) + "::";
-  id.class_identifier=s_ptr->name;
-  id.id_class=cpp_idt::id_classt::CLASS;
+  id.class_identifier = s_ptr->name;
+  id.id_class = cpp_idt::id_classt::CLASS;
 
   return *s_ptr;
 }
@@ -877,8 +894,7 @@ bool cpp_typecheckt::try_resolve_lazy_type(typet &type)
   return true;
 }
 
-void cpp_typecheckt::elaborate_class_template(
-  const typet &type)
+void cpp_typecheckt::elaborate_class_template(const typet &type)
 {
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
     return;
@@ -919,7 +935,7 @@ void cpp_typecheckt::elaborate_class_template(
   const symbolt &symbol = lookup(to_tag_type(type));
 
   // Make a copy, as instantiate will destroy the symbol type!
-  const typet t_type=symbol.type;
+  const typet t_type = symbol.type;
 
   // When force-elaborating empty template instances, catch errors
   // to avoid breaking callers. Errors in system header templates
@@ -2343,19 +2359,19 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << "instantiate_template: " << template_symbol.name << '\n';
 #endif
 
-  if(instantiation_stack.size()==MAX_DEPTH)
+  if(instantiation_stack.size() == MAX_DEPTH)
   {
     show_instantiation_stack(error());
-    error().source_location=source_location;
-    error() << "reached maximum template recursion depth ("
-            << MAX_DEPTH << ")" << eom;
+    error().source_location = source_location;
+    error() << "reached maximum template recursion depth (" << MAX_DEPTH << ")"
+            << eom;
     throw 0;
   }
 
   instantiation_levelt i_level(instantiation_stack, had_template_instantiation);
-  instantiation_stack.back().source_location=source_location;
-  instantiation_stack.back().identifier=template_symbol.name;
-  instantiation_stack.back().full_template_args=full_template_args;
+  instantiation_stack.back().source_location = source_location;
+  instantiation_stack.back().identifier = template_symbol.name;
+  instantiation_stack.back().full_template_args = full_template_args;
 
   // [temp.inst]: instantiating a template is not itself a constant
   // evaluation.  Suspend any enclosing constant-expression context so
@@ -2371,7 +2387,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   cpp_saved_template_mapt saved_map(template_map);
 
-  bool specialization_given=specialization.is_not_nil();
+  bool specialization_given = specialization.is_not_nil();
 
   // If specialization arguments still contain unassigned template
   // parameters, this is a substitution failure during template
@@ -2387,9 +2403,9 @@ const symbolt &cpp_typecheckt::instantiate_template(
   std::cout << "A: <";
   forall_expr(it, specialization_template_args.arguments())
   {
-    if(it!=specialization_template_args.arguments().begin())
+    if(it != specialization_template_args.arguments().begin())
       std::cout << ", ";
-    if(it->id()==ID_type)
+    if(it->id() == ID_type)
       std::cout << to_string(it->type());
     else
       std::cout << to_string(*it);
@@ -2429,14 +2445,14 @@ const symbolt &cpp_typecheckt::instantiate_template(
   }
 
   // produce new symbol name
-  std::string suffix=template_suffix(full_template_args);
+  std::string suffix = template_suffix(full_template_args);
 
   // we need the template scope to see the template parameters
   cpp_scopet *template_scope = id_map_lookup(cpp_scopes, template_symbol.name);
 
-  if(template_scope==nullptr)
+  if(template_scope == nullptr)
   {
-    error().source_location=source_location;
+    error().source_location = source_location;
     error() << "template scope '" << template_symbol.base_name << "' not found"
             << eom;
     throw 0;
@@ -2486,7 +2502,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // The new one is not a template any longer, but we remember the
   // template type that was used.
-  template_typet template_type=new_decl.template_type();
+  template_typet template_type = new_decl.template_type();
   new_decl.remove(ID_is_template);
   new_decl.remove(ID_template_type);
   new_decl.set(ID_C_template, template_symbol.name);
@@ -2971,7 +2987,7 @@ skip_pack_removal_ft:
   irep_idt class_name;
 
   if(is_template_method)
-    class_name=cpp_scopes.current_scope().get_parent().identifier;
+    class_name = cpp_scopes.current_scope().get_parent().identifier;
 
   // sub-scope for fixing the prefix
   cpp_scopet &sub_scope = sub_scope_for_instantiation(*template_scope, suffix);
@@ -2981,7 +2997,7 @@ skip_pack_removal_ft:
     cpp_scopet::id_sett id_set =
       sub_scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
 
-    if(id_set.size()==1)
+    if(id_set.size() == 1)
     {
       // It has already been instantiated!
       const cpp_idt &cpp_id = **id_set.begin();
@@ -2992,7 +3008,7 @@ skip_pack_removal_ft:
           cpp_id.id_class == cpp_idt::id_classt::SYMBOL,
         "id must be class, typedef, or symbol");
 
-      const symbolt &symb=lookup(cpp_id.identifier);
+      const symbolt &symb = lookup(cpp_id.identifier);
 
       // continue if the type is incomplete only
       if(
@@ -3072,26 +3088,26 @@ skip_pack_removal_ft:
     instantiated_with.get_sub().push_back(specialization_template_args);
   }
 
-  #ifdef DEBUG
+#ifdef DEBUG
   std::cout << "CLASS MAP:\n";
   template_map.print(std::cout);
-  #endif
+#endif
 
   // fix the type
   {
-    typet declaration_type=new_decl.type();
+    typet declaration_type = new_decl.type();
 
     // specialization?
     if(specialization_given)
     {
-      if(declaration_type.id()==ID_struct)
+      if(declaration_type.id() == ID_struct)
       {
-        declaration_type=specialization;
-        declaration_type.add_source_location()=source_location;
+        declaration_type = specialization;
+        declaration_type.add_source_location() = source_location;
       }
       else
       {
-        irept tmp=specialization;
+        irept tmp = specialization;
         new_decl.declarators()[0].swap(tmp);
       }
     }
@@ -3540,9 +3556,8 @@ skip_pack_removal_ft:
     {
       saved_scope.restore();
 
-      cpp_declarationt method_decl=
-        static_cast<const cpp_declarationt &>(
-          static_cast<const irept &>(tm));
+      cpp_declarationt method_decl =
+        static_cast<const cpp_declarationt &>(static_cast<const irept &>(tm));
 
       // Member class/union templates are already instantiated as part
       // of the class body by convert_non_template_declaration above.
@@ -3558,8 +3573,7 @@ skip_pack_removal_ft:
       }
 
       // copy the type of the template method
-      template_typet method_type=
-        method_decl.template_type();
+      template_typet method_type = method_decl.template_type();
 
       // If this method has more template parameters than the class
       // template, it is a member function template (e.g.,
@@ -3675,8 +3689,7 @@ skip_pack_removal_ft:
 
       // do template parameters
       // this also sets up the template scope of the method
-      cpp_scopet &method_scope=
-        typecheck_template_parameters(method_type);
+      cpp_scopet &method_scope = typecheck_template_parameters(method_type);
 
       cpp_scopes.go_to(method_scope);
 
@@ -3715,7 +3728,7 @@ skip_pack_removal_ft:
       convert(method_decl);
     }
 
-    const irep_idt& new_symb_id = new_decl.type().get(ID_identifier);
+    const irep_idt &new_symb_id = new_decl.type().get(ID_identifier);
 
     // Move deferred methods of this class to method_bodies.
     // Methods are added to deferred_typechecking during class body
@@ -3732,8 +3745,7 @@ skip_pack_removal_ft:
       // so we need a class_name in the same shape for the
       // substring match below to succeed.
       auto last_sep = class_name.rfind("::");
-      std::size_t tag_pos =
-        last_sep != std::string::npos ? last_sep + 2 : 0;
+      std::size_t tag_pos = last_sep != std::string::npos ? last_sep + 2 : 0;
       if(class_name.compare(tag_pos, 4, "tag-") == 0)
         class_name.erase(tag_pos, 4);
       class_name += "::";
@@ -4023,9 +4035,8 @@ skip_pack_removal_ft:
 
     if(new_decl.member_spec().is_virtual())
     {
-      error().source_location=new_decl.source_location();
-      error() << "invalid use of `virtual' in template declaration"
-              << eom;
+      error().source_location = new_decl.source_location();
+      error() << "invalid use of `virtual' in template declaration" << eom;
       throw 0;
     }
 
@@ -4034,7 +4045,7 @@ skip_pack_removal_ft:
       new_decl.storage_spec().is_register() ||
       new_decl.storage_spec().is_mutable())
     {
-      error().source_location=new_decl.source_location();
+      error().source_location = new_decl.source_location();
       error() << "invalid storage class specified for template field" << eom;
       throw 0;
     }
@@ -4048,7 +4059,7 @@ skip_pack_removal_ft:
       throw 0;
     }
 
-    bool is_static=new_decl.storage_spec().is_static();
+    bool is_static = new_decl.storage_spec().is_static();
     irep_idt access = new_decl.get(ID_C_access);
 
     CHECK_RETURN(!access.empty());
