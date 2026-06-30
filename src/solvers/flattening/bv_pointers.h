@@ -191,6 +191,26 @@ protected:
   bvt get_object_base_address(const mp_integer &object, std::size_t width)
     const;
 
+  /// An addressable object considered by the wide pointer encoding's
+  /// integer-to-pointer reasoning: its object number, byte size and the
+  /// (symbolic) flat base address.
+  struct addressable_objectt
+  {
+    std::size_t number;
+    mp_integer size;
+    bvt base;
+  };
+
+  /// Enumerate the objects that already have a flat base address and a known
+  /// positive size, in object-number order, yielding each one's number, size
+  /// and base. Shared by the integer-to-pointer backward-constraint checks.
+  /// \param width: bit width of the flat addresses
+  std::vector<addressable_objectt> addressable_objects(std::size_t width) const;
+
+  /// The integer value of a little-endian bitvector under the current
+  /// satisfying assignment (`prop.l_get`).
+  mp_integer model_value(const bvt &bv) const;
+
   /// Construct a pointer encoding from given encodings of \p object and \p
   /// offset.
   /// \param object: Encoded object

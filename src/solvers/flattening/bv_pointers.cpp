@@ -1875,9 +1875,35 @@ void bv_pointerst::finish_eager_conversion()
   }
 }
 
+std::vector<bv_pointerst::addressable_objectt>
+bv_pointerst::addressable_objects(std::size_t width) const
+{
+  std::vector<addressable_objectt> result;
+  const auto &objects = pointer_logic.objects;
+  std::size_t number = 0;
+  for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+  {
+    if(object_base_address.find(number) == object_base_address.end())
+      continue;
+    auto size = pointer_offset_size(it->type(), ns);
+    if(!size.has_value() || *size <= 0)
+      continue;
+    result.push_back({number, *size, get_object_base_address(number, width)});
+  }
+  return result;
+}
+
+mp_integer bv_pointerst::model_value(const bvt &bv) const
+{
+  mp_integer result = 0;
+  for(std::size_t i = 0; i < bv.size(); ++i)
+    if(prop.l_get(bv[i]).is_true())
+      result += power(2, i);
+  return result;
+}
+
 bool bv_pointerst::check_SAT_backward_i2p()
 {
-  const auto &objects = pointer_logic.objects;
   bool any_violation = false;
 
   for(const auto &p : pending_i2p)
@@ -1887,35 +1913,15 @@ bool bv_pointerst::check_SAT_backward_i2p()
     if(any_violation)
       break;
 
-    const std::size_t object_bits = p.obj_bv.size();
-    const std::size_t addr_bits = p.addr_bv.size();
+    const mp_integer obj_val = model_value(p.obj_bv);
+    const mp_integer addr_val = model_value(p.addr_bv);
 
-    mp_integer obj_val = 0;
-    for(std::size_t i = 0; i < object_bits; ++i)
-      if(prop.l_get(p.obj_bv[i]).is_true())
-        obj_val += power(2, i);
-
-    mp_integer addr_val = 0;
-    for(std::size_t i = 0; i < addr_bits; ++i)
-      if(prop.l_get(p.addr_bv[i]).is_true())
-        addr_val += power(2, i);
-
-    std::size_t number = 0;
-    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+    for(const auto &obj : addressable_objects(p.addr_bv.size()))
     {
-      if(object_base_address.find(number) == object_base_address.end())
-        continue;
-      auto sz = pointer_offset_size(it->type(), ns);
-      if(!sz.has_value() || *sz <= 0)
-        continue;
-      bvt base = get_object_base_address(number, addr_bits);
-      mp_integer base_val = 0;
-      for(std::size_t i = 0; i < addr_bits; ++i)
-        if(prop.l_get(base[i]).is_true())
-          base_val += power(2, i);
+      const mp_integer base_val = model_value(obj.base);
       if(
-        addr_val >= base_val && addr_val < base_val + *sz &&
-        obj_val != mp_integer(number))
+        addr_val >= base_val && addr_val < base_val + obj.size &&
+        obj_val != mp_integer(obj.number))
       {
         any_violation = true;
         break;
@@ -1935,20 +1941,13 @@ bool bv_pointerst::check_SAT_backward_i2p()
   {
     if(!p.needs_backward_constraints)
       continue;
-    const std::size_t a_bits = p.addr_bv.size();
-    std::size_t num = 0;
-    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++num)
+    for(const auto &obj : addressable_objects(p.addr_bv.size()))
     {
-      if(object_base_address.find(num) == object_base_address.end())
-        continue;
-      auto sz = pointer_offset_size(it->type(), ns);
-      if(!sz.has_value() || *sz <= 0)
-        continue;
-      bvt base = get_object_base_address(num, a_bits);
-      literalt is_this = i2p_object_eq(p, num);
+      literalt is_this = i2p_object_eq(p, obj.number);
       literalt ge = bv_utils.rel(
-        p.addr_bv, ID_ge, base, bv_utilst::representationt::UNSIGNED);
-      bvt end_bv = bv_utils.add(base, bv_utils.build_constant(*sz, a_bits));
+        p.addr_bv, ID_ge, obj.base, bv_utilst::representationt::UNSIGNED);
+      bvt end_bv = bv_utils.add(
+        obj.base, bv_utils.build_constant(obj.size, p.addr_bv.size()));
       literalt lt = bv_utils.rel(
         p.addr_bv, ID_lt, end_bv, bv_utilst::representationt::UNSIGNED);
       prop.l_set_to_true(prop.limplies(prop.land(ge, lt), is_this));
