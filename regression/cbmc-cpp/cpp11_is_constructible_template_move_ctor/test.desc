@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ is_constructible via template move converting ctor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [meta.unary.prop]: is_constructible<T, Args...> is true iff
+`T t(declval<Args>()...)` is well-formed.  For T = pair<const int,int> with a
+template move converting ctor `pair(pair<U1,U2>&&)` and Args = pair<int,int>&&,
+the trait is TRUE.  Fixed in cpp_typecheckt's __is_constructible: build the
+source expression from the de-referenced argument type (a reference-typed source
+did not bind to an rvalue-reference converting-constructor parameter during
+implicit_conversion_sequence).  Reduced from preprocessed <utility>/<type_traits>
+via cvise.  Non-vacuous (assertion 2 must FAIL).
