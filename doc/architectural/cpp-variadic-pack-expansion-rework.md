@@ -554,26 +554,34 @@ any of them.
   diagnosed; two distinct layers remain.** The `_Callable` =
   `__is_invocable_r<R, F&, A...>` constraint ("found no match for symbol
   'function'") was traced to two layers:
-  1. **Partial-spec pack deduction (root, fix identified).** libstdc++'s
+  1. **Partial-spec pack deduction (FIXED, CORE).** libstdc++'s
      `__result_of_impl<false, false, _Functor, _ArgTypes...>` (the base of
      `__invoke_result`) places a parameter pack *after* fixed (non-deduced)
      arguments.  When selected via the partial-specialization disambiguation
      path (`disambiguate_template_classes`, as a dependent base class), the
-     deduced pack is collapsed to a single element -- `build_template_args`
+     deduced pack was collapsed to a single element -- `build_template_args`
      returns the scalar `type_map` convenience binding and, unlike
-     `elaborate_class_template`, this path does not expand it into positional
-     arguments -- so `__invoke_result` is mis-sized and the constraint fails to
-     elaborate.  Isolated header-free by `cpp11_partial_spec_pack_after_fixed`
-     (KNOWNBUG).  A targeted fix (expand the deduced pack in
-     `disambiguate_template_classes`, mirroring `elaborate_class_template`)
-     makes that test and the synthetic `__invoke_result` models pass.
-  2. **`std::function` body conversion (decomposed; one root fixed).** With
-     layer 1 fixed, multi-argument `std::function` construction proceeds far
-     enough to hit a pre-existing blocker that *also* affects single-argument
-     `std::function`: the `_Base_manager::_M_create` body fails to convert (so
-     the member is left "no body" and construction asserts).  Investigating the
-     `_M_create` body conversion (`__dest._M_access<_Functor*>() = new
-     _Functor(...)`) decomposed this into sub-roots:
+     `elaborate_class_template`, this path did not expand it into positional
+     arguments -- so `__invoke_result` was mis-sized and the constraint failed
+     to elaborate.  Isolated header-free by `cpp11_partial_spec_pack_after_fixed`
+     (now CORE).  FIXED: expand the deduced pack into positional arguments via
+     `pack_args_map` in `disambiguate_template_classes`, mirroring
+     `elaborate_class_template` (N5008 [temp.variadic]/5).  Crucially the
+     expanded list is kept SEPARATE from `matcht::specialization_args` in a new
+     `matcht::instantiation_args` field: `matcht::cost` is the specialization-
+     argument count and partial ordering prefers fewer arguments, so expanding
+     in place inflated the cost and mis-ranked a trailing-pack specialization
+     against the primary (regressing `cpp11_variadic_partial_spec_trailing_pack_
+     select` / `cpp11_variadic_tuple_impl_recursion`); cost/ordering stay on the
+     un-expanded form while instantiation uses the expanded one.  Both suites
+     green.
+  2. **`std::function` body conversion (decomposed; layer 2 fully fixed for
+     single-arg).** With layer 1 fixed, single-argument `std::function`
+     construction *and invocation* now verify soundly (`std::function<int(int)>
+     f = g; f(x)` -- a real call with a non-vacuous wrong-assertion check).
+     MULTI-argument `std::function` construction now also resolves the converting
+     constructor (no more "found no match"), exposing the NEXT layer (layer 3,
+     below).  Sub-roots originally found while the single-arg body was broken:
      - **2a. cv-qualifiers on a function type (FIXED, CORE).** `_M_create`'s
        first failure was `invalid conversion 'int(*)(int)' to 'int(int)'`: the
        decayed target `_Functor` was a function *type* not a function *pointer*,
@@ -748,14 +756,23 @@ any of them.
          its const, the const argument binds, the candidate is accepted, and the
          body is no longer niled.  `sf.cpp` (single-arg `std::function`) now
          verifies; both regression suites pass.
-     `cpp17_functional_basic` (`std::function<int(int,int)> f = add;`) still
-     passes only *vacuously* (layer 1 blocks *multi-arg* construction before the
-     manager machinery is reached); single-argument construction now reaches and
-     converts `_M_manager` (2c-ii fixed).  Landing layer 1 (multi-arg) needs the
-     partial-spec pack deduction below.
-  The dog-food `make_bvrep` files remain blocked on layer 1 (multi-arg
-  partial-spec pack deduction); single-arg `std::function` construction is now
-  unblocked through 2c-ii.
+     `cpp17_functional_basic` / `cpp11_function_basic` (`std::function<int(int,
+     int)> f = add; f(3,4)`) are now **non-vacuous KNOWNBUGs**.  They were
+     previously CORE but passed only VACUOUSLY -- at baseline the multi-arg
+     converting constructor failed to resolve ("found no match for symbol
+     'function'") and even a deliberately wrong assertion held.  With layer 1
+     fixed the constructor resolves; single-argument `std::function` invokes
+     correctly and soundly, but the multi-argument path hits **layer 3**.
+  - **Layer 3 (NEXT): multi-argument `_Function_handler<R(A...), F>` handler
+     wiring.** Multi-argument construction now runs but does not assign the
+     handler pointers `_M_invoker` / `_M_manager`, so `operator()` dereferences a
+     null `_M_invoker` (line 591) and the destructor's `_M_manager` deref fails.
+     It is NOT a "no body" (the bodies convert); the pointers are simply never
+     wired up for the `R(A...)` pack shape (single-arg works, so it is
+     pack-specific).  Captured by the two non-vacuous KNOWNBUGs above.
+  The dog-food `make_bvrep` files remain blocked on layer 3 (multi-arg
+  `std::function` handler wiring); single-arg `std::function` construction *and
+  invocation* are now sound (layers 1, 2a/2b/2c-i/2c-ii fixed).
 
 Net: the trailing-return decltype is fully handled across pack shapes -- a
 type-pack nested inside a reference, a value-pack with no type-pack reference,
