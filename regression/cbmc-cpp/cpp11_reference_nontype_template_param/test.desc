@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ reference NTTP defaults to S::blank: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.param]/4, [temp.arg.nontype]/1-2: a non-type template parameter may
+have reference type, its argument designating a static-storage object (an
+address constant).  CBMC drops the declarator's `&` (treating `const T &empty`
+as a value parameter), valuifies the reference argument, and fails to
+instantiate util/reference_counting.h's
+`template <typename T, const T &empty = T::blank>` -- the root of the
+ref_expr_set.cpp / rename_symbol.cpp / replace_symbol.cpp goto-cc cascade.  The
+to_constant_expr abort in the instance-name builder is fixed (template_suffix no
+longer forces a scalar-constant conversion on a non-scalar argument); full
+reference-NTTP support remains.  Flip to CORE once supported.
