@@ -1981,6 +1981,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             if(!suffix.empty() && std::isdigit(suffix[0]))
               id_set.clear();
           }
+          // Set when the template-template-parameter argument was resolved
+          // directly from its deduced template_map binding (see below).
+          bool tt_resolved_from_map = false;
           if(id_set.empty())
           {
             const auto param_set = cpp_scopes.current_scope().lookup(
@@ -1995,15 +1998,30 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 e.id() == ID_type &&
                 e.type().id() == ID_template_parameter_symbol_type)
               {
-                const irep_idt &tmpl_id =
-                  to_template_parameter_symbol_type(e.type()).get_identifier();
-                // Find this template in the scope system
-                auto it = cpp_scopes.id_map.find(tmpl_id);
-                if(it != cpp_scopes.id_map.end())
-                  id_set.insert(it->second);
+                // N5008 [temp.arg.template], [temp.class.spec.match]: the
+                // deduced binding already NAMES the resolved template (e.g. a
+                // partial specialization argument that is a
+                // template-template-parameter forwarded from the enclosing
+                // template, as in the detection idiom's
+                // `has<Op, Arg, void_t<Op<Arg>>>`).  Wire the argument directly
+                // to that template.  Relying on cpp_scopes.id_map.find(tmpl_id)
+                // can fail because the template's scope-id key differs from its
+                // symbol identifier; the empty id_set then falls through to the
+                // global-name fallback, which re-selects the
+                // template-template-PARAMETER itself, leaving the partial-spec
+                // argument unsubstituted and the specialization wrongly
+                // unmatched.
+                arg = type_exprt(to_template_parameter_symbol_type(e.type()));
+                arg.type().add_source_location() = parameter.source_location();
+                template_map.set(parameter, arg);
+                tt_resolved_from_map = true;
+                break;
+                // (id_map lookup retained below for the non-deduced case)
               }
             }
           }
+          if(tt_resolved_from_map)
+            continue;
           // Fallback: search global id_map for the template name.
           if(id_set.empty())
           {
