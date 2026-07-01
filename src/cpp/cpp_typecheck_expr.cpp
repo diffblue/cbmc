@@ -6208,14 +6208,40 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   bool is_generic_lambda = false;
   {
     const irept &check_params = expr.find(ID_parameters);
+    // N5008 [expr.prim.lambda.general]/4: a lambda is generic iff it has an
+    // explicit template-parameter-list or a parameter of (possibly
+    // cv-/ref-qualified) type `auto`.  A parameter whose type is written as a
+    // plain name is generic ONLY when that name is a template parameter (e.g.
+    // the `T` of `[]<class T>(T)`), NOT when it names a concrete type (e.g.
+    // `[](E &x)` for a class E).  Misclassifying an ordinary class-name
+    // parameter as generic replaces it with `signed int` below, so a body that
+    // accesses a member of the parameter fails with "member operator requires
+    // struct/union type ... but got 'signed int'".  Decide genericity by
+    // resolving a cpp_name parameter type: a concrete type means not generic.
+    auto is_generic_param_type = [&](const typet &pt) -> bool
+    {
+      if(has_auto(pt) || pt.id() == ID_auto)
+        return true;
+      if(pt.id() != ID_cpp_name)
+        return false;
+      cpp_save_scopet save_scope(cpp_scopes);
+      cpp_typecheck_resolvet resolver(*this);
+      exprt r = resolver.resolve(
+        to_cpp_name(static_cast<const irept &>(pt)),
+        cpp_typecheck_resolvet::wantt::TYPE,
+        cpp_typecheck_fargst{},
+        false);
+      // Unresolved, or resolved to a (dependent) template parameter -> generic.
+      return r.is_nil() || (r.id() == ID_type &&
+                            r.type().id() == ID_template_parameter_symbol_type);
+    };
+
     for(const auto &p : check_params.get_sub())
     {
       const cpp_declarationt &pdecl = static_cast<const cpp_declarationt &>(p);
       if(pdecl.get_bool("explicit_this"))
         continue;
-      if(
-        has_auto(pdecl.type()) || pdecl.type().id() == ID_cpp_name ||
-        pdecl.type().id() == ID_auto)
+      if(is_generic_param_type(pdecl.type()))
       {
         is_generic_lambda = true;
         break;
@@ -6233,7 +6259,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         cpp_declarationt &pdecl = static_cast<cpp_declarationt &>(p);
         if(pdecl.get_bool("explicit_this"))
           continue;
-        if(has_auto(pdecl.type()) || pdecl.type().id() == ID_cpp_name)
+        if(is_generic_param_type(pdecl.type()))
           replace_auto_in_type(pdecl.type(), signed_int_type());
       }
     }
