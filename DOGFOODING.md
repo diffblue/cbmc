@@ -273,6 +273,28 @@ clusters:
 | 1 | `mallinfo` does not uniquely resolve | `memory_info.cpp` |
 | 1 | `std::unique_ptr<console_message_handlert>` instantiation | `parse_options.cpp` |
 
+17. `8e6dd4afc7` — **lambda parameter with a concrete class-name
+    type** (N5008 [expr.prim.lambda.general]/4).
+    typecheck_expr_lambda treated any lambda parameter whose type is
+    a bare name (cpp_name) as a generic `auto` parameter and replaced
+    it with `signed int`.  An ordinary class-name parameter such as
+    `E &` was therefore replaced, so a lambda body accessing a member
+    of a class-typed parameter failed ("member operator requires
+    struct/union ... but got 'signed int'") and the enclosing body
+    was dropped.  This silently stubbed util/expr.cpp's `exprt::visit`
+    to a no-op (SKIP) -- a reachable soundness loss found via the
+    noisy-file triage.  Fixed by resolving a cpp_name parameter: only
+    an unresolved name or a dependent template parameter is generic; a
+    concrete type is an ordinary parameter.  CORE test
+    `cpp11_lambda_class_reference_parameter`.  NOTE: `exprt::visit`'s
+    outer body is restored, but its traversal (visit_pre_template,
+    which uses `std::stack<exprt*>`) is still dropped because CBMC
+    *eagerly* instantiates an UNUSED allocator-extended `std::stack`
+    constructor template (stl_stack.h:201) whose instantiation fails
+    and aborts visit_pre_template -- a [temp.inst]/2 non-conformance
+    (member/ctor TEMPLATE definitions instantiated without odr-use).
+    Full `exprt::visit` soundness needs the lazy-instantiation work.
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
