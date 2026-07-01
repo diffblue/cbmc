@@ -209,6 +209,34 @@ confidently test at that scale yet.
     `cpp11_explicit_bool_function_ref_return`.  `rename_symbol.cpp`
     now progresses to a distinct `operand of unary * ... is not a
     pointer` error in `expr_iterator.h`.
+14. `307e4cabf7` — **brace-construct a temporary from a reference
+    member** (N5008 [dcl.init.aggr]/1, [dcl.init.list]/3).  `It{arg}`
+    for a class with a user-declared converting constructor must call
+    that constructor, and a reference-member argument must be
+    dereferenced exactly once.  Two fixes:
+    typecheck_expr_explicit_constructor_call classified any 2-param
+    constructor with a reference 2nd parameter as copy/move, so a
+    converting constructor `It(const S&)` was mistaken for one and
+    `It{arg}` did (ill-formed) aggregate initialization — now only a
+    parameter of the class's OWN type counts as copy/move; and the
+    already-type-checked braced operands are marked
+    already_typechecked before new_temporary, so cpp_constructor does
+    not re-type-check (and double-dereference) a reference-member
+    access `*this->root`.  This was the `expr_iterator.h` range-
+    adapter layer of `rename_symbol.cpp`.  CORE test
+    `cpp11_brace_construct_reference_member`.  **`rename_symbol.cpp`
+    now compiles to a goto binary.**
+15. `25f4b86590` — **reference direct-initialization with
+    parentheses/braces** (N5008 [dcl.init.ref], [dcl.init]/16).
+    `T &r(init)` binds the reference like `T &r = init`, but the
+    parser stores the initializer as init_args and a reference is not
+    an object a constructor initializes, so it was reported "declared
+    as reference but is not initialized".  Fixed in convert_new_symbol
+    by attaching the single init_args operand as the reference's value
+    (and clearing init_args).  This was the `replace_symbol.cpp` layer
+    (`const exprt &const_dest(dest);`).  CORE test
+    `cpp11_reference_paren_init`.  **`replace_symbol.cpp` now compiles
+    to a goto binary.**
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
