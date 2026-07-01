@@ -6,17 +6,12 @@
 // S::blank; r.get() returns that reference, so r.get().x == 7.  g++/clang++
 // agree.
 //
-// KNOWN BUG: CBMC mishandles reference non-type template parameters.  The
-// parameter's declarator `&` is dropped (treating `const T &empty` as a value
-// parameter of type T), the reference argument (the static object S::blank) is
-// valuified, and instantiation fails -- currently with a CONVERSION ERROR
-// ("expected constant expression"), previously with an abort in
-// to_constant_expr while building the instance name.  The abort has been fixed
-// (template_suffix no longer forces a scalar-constant conversion on a
-// non-scalar / reference / class-type non-type template argument,
-// [temp.arg.nontype]); full support (keeping the argument as an address of the
-// static object end-to-end so the reference parameter binds correctly) remains.
-// Flip to CORE once reference non-type template parameters are fully supported.
+// This exercises full reference non-type template parameter support: the
+// parameter keeps its reference type (the declarator's `&` is merged into the
+// parameter type), the reference argument is kept as the address of the static
+// object rather than being valuified, and the instance-name suffix is built
+// from the object's identity.  assertion.2 must FAIL, proving the property in
+// assertion.1 is non-vacuous.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
