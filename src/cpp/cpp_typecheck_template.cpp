@@ -1659,7 +1659,18 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(
       {
         // The type is not checked, as it might depend
         // on earlier parameters.
-        parameter = symbol_exprt(identifier, declaration.type());
+        //
+        // N5008 [temp.param]/6 + [dcl.meaning]/1: pointer/reference operators
+        // belong to the declarator, not to the decl-specifier
+        // `declaration.type()`.  A reference non-type parameter such as the
+        // `const T &empty` of util/reference_counting.h's
+        // `template <typename T, const T &empty = T::blank>` therefore has its
+        // `&` in the declarator.  Merge the declarator so the parameter keeps
+        // its reference (or pointer) type; otherwise it is wrongly treated as a
+        // value parameter and a reference argument (an object such as
+        // `T::blank`) is valuified, breaking instantiation.
+        parameter =
+          symbol_exprt(identifier, declarator.merge_type(declaration.type()));
       }
     }
 
@@ -2460,8 +2471,13 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         type = arg.type();
       implicit_typecast(arg, type);
       simplify(arg, *this);
-      // Resolve symbol references to their constant values
-      if(arg.id() == ID_symbol)
+      // Resolve symbol references to their constant values.
+      // N5008 [temp.arg.nontype]/2: for a reference (or pointer) non-type
+      // parameter the argument designates the object itself, not its value, so
+      // it must NOT be replaced by the referenced object's value.
+      if(
+        arg.id() == ID_symbol && !type.get_bool(ID_C_reference) &&
+        type.id() != ID_pointer && type.id() != ID_frontend_pointer)
       {
         const auto *sym =
           symbol_table.lookup(to_symbol_expr(arg).get_identifier());
