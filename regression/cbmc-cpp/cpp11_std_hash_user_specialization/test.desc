@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ std::hash<D> qualified specialization selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.expl.spec]/2, [unord.hash]: specializing std::hash for a user type
+(the standard way to make it an unordered-container key) is written with a
+qualified-id from outside namespace std.  CBMC previously ignored such a
+specialization and used the primary template.  assertion.2 FAILURE proves
+non-vacuity.
