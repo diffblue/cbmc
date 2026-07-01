@@ -191,6 +191,24 @@ confidently test at that scale yet.
     `rename_symbol.cpp` / `replace_symbol.cpp` (they now progress to
     distinct downstream errors: `depth_iterator_baset` instantiation
     and `std::unordered_map<dstringt, exprt>` respectively).
+13. `9a8e231654` — **function type with a pointer/reference return
+    and empty parameter list** (N5008 [dcl.decl]/4,
+    [dcl.ambig.res]).  `rDeclarator` only re-parsed an empty `()` as
+    a function parameter-list when there was no leading ptr-operator,
+    so `int*()` / `int&()` were mis-parsed as `int*` / `int&` (the
+    `()` dropped).  Such a type then failed to match a function-type
+    partial specialization `X<R(A...)>` — the shape of
+    `std::function<R&()>`.  Fixed by also backtracking when the
+    nested declarator is empty (regardless of a ptr-operator), while
+    leaving non-empty groupings such as `int(*)()` untouched.  This
+    was the `depth_iterator_baset` layer of the `rename_symbol.cpp`
+    cascade: `util/expr_iterator.h`'s
+    `std::function<exprt &()> mutate_root; ... if(mutate_root)` had
+    its explicit `operator bool` looked up on the mis-parsed type.
+    CORE tests `cpp11_function_type_ptr_ref_return`,
+    `cpp11_explicit_bool_function_ref_return`.  `rename_symbol.cpp`
+    now progresses to a distinct `operand of unary * ... is not a
+    pointer` error in `expr_iterator.h`.
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
