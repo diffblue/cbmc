@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ qualified explicit specialization selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ primary template used for non-specialized arg: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.expl.spec]/2: an explicit class template specialization may be named
+with a qualified-id from an enclosing namespace (template <> struct ns::G<char>).
+CBMC previously silently skipped such a specialization (treating it like an
+out-of-class nested definition) and used the primary template, which also breaks
+specializing std::hash for a user type outside namespace std.  assertion.3
+FAILURE proves non-vacuity.
