@@ -316,6 +316,28 @@ clusters:
     guess_template_args deduction cascade on std::error_category (guarded from
     crashing, but deduction incomplete).
 
+20. `3077ecc7c0` — **constructor templates in braced-init-list overload
+    resolution** (N5008 [over.match.list]/2.2, [over.match.ctor], [temp.deduct]).
+    `brace_init_is_viable` scanned only ordinary constructor components and
+    missed constructor *templates* (a class stores those behind a
+    `has_template_constructor` flag), so passing a braced-init-list whose
+    parameter's matching constructor is a template -- e.g. constructing a
+    std::pair (element-wise ctor is a template) from `{a, b}` in
+    `map.insert({k, v})` -- was rejected as "found no match for symbol '...'".
+    This was the ROOT of the dominant "no match for symbol 'insert'" dog-food
+    cluster (found by cvise-reducing the noisy preprocessed source; the earlier
+    "eager instantiation" and "member call" framings were both incorrect -- the
+    free-function path fails identically).  Fixed by declaring a non-empty
+    braced-init-list viable when the class has a constructor template, deferring
+    deduction/substitution to implicit_typecast's SFINAE-guarded template-ctor
+    path.  CORE test `cpp11_braced_init_constructor_template`.  Verified: the
+    "no match for 'insert'" noise is cleared across the util dog-food (0 of 30
+    sampled files, was ~47).  A separate braced-default-member-initializer bug
+    uncovered en route is tracked as KNOWNBUG
+    `cpp11_class_member_default_brace_init` (a `pair stored{-1, 7}` class member
+    with no default ctor is default-constructed instead of using the braced
+    initializer).
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
