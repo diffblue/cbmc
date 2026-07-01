@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ pair<DS,DS> constructed with a member unordered_map present: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.inst]/2: a class template specialization named where a
+completely-defined type is required must be implicitly instantiated.  A member
+std::unordered_map<DS,DS> leaves std::pair<DS,DS> registered but incomplete
+(referenced under skip_typechecking_elaborate while type-checking a libstdc++
+typedef), and it is never later elaborated, so the explicit construction
+std::pair<DS,DS>(a,b) reports "found no match for symbol 'pair'".  This is the
+root of the goto-cc cascade on rename_symbol.cpp / replace_symbol.cpp.  Flip to
+CORE once fixed.
