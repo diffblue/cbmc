@@ -3,15 +3,11 @@
 // non-static data member with a braced default member initializer, e.g.
 // `int x{42}`, is initialized to 42.
 //
-// CBMC leaves the braced-init-list unconverted for a scalar member's default
-// member initializer: the raw `initializer_list` flows into GOTO conversion and
-// aborts the bit-vector flattener ("Reached unimplemented
-// boolbv_widtht::get_entry()").  The equivalent `int x = 42;` works.  g++ and
-// clang++ accept `int x{42};`.
+// CBMC previously left the braced-init-list unconverted for a scalar member's
+// default member initializer: the raw `initializer_list` flowed into GOTO
+// conversion and aborted the bit-vector flattener.  The equivalent
+// `int x = 42;` worked.  g++ and clang++ accept `int x{42};`.
 //
-// KNOWN BUG: a braced (as opposed to `=`) default member initializer of a
-// scalar member is not reduced to its single element.  Flip to CORE once the
-// single-element braced-init-list is unwrapped for scalar members.
 // assertion.2 must FAIL (non-vacuity).
 
 extern "C" void __CPROVER_assert(int, const char *);
