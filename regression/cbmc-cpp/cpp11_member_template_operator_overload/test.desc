@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member template wins when free operator needs derived-to-base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ free non-template wins on exact object match: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^(ERROR|error): (invalid implicit conversion|operator 'shl' not defined)
+--
+N5008 [over.match.oper]/3, [over.match.best]/2: a member operator that is a
+function template participates in operator overload resolution; it wins over a
+free operator that needs a derived-to-base conversion for the object, but loses
+to a free non-template operator whose object parameter is an exact match.  This
+is util/message.h's mstreamt shape (the ui_message.cpp / parser.cpp /
+typecheck.cpp cluster).  assertion.3 FAILURE proves non-vacuity.
