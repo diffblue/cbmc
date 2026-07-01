@@ -18,7 +18,7 @@ the compile flags from `build/compile_commands.json`:
 |--------|-------|-------|
 | **OK** (produces .gb, exit 0, no errors) | **1** | `irep_hash.cpp` |
 | Front-end error | 12 | 9 × `unordered_map` + 3 × `__stoa` (see below) |
-| Crash (SIGSEGV) | 2 | `ref_expr_set.cpp`, `output_file.cpp` |
+| Crash (SIGSEGV) | 2 | `ref_expr_set.cpp` (**fixed 2026-06-30, reference-NTTP — see fix #10**), `output_file.cpp` |
 
 ### Recurring root causes
 
@@ -136,6 +136,28 @@ confidently test at that scale yet.
    function bodies (existing error-recovery already clears the
    body) and default template args (per [temp.deduct]/7-8).
    Removes 27 leaked `__stoa` errors from dog-food output.
+10. `15ec1832dc` + `8dd999d43e` — reference/pointer **non-type
+    template parameters**.  `template <typename T, const T &empty
+    = T::blank>` (the shape of `src/util/reference_counting.h`)
+    was mishandled: the declarator's `&` was dropped
+    (`typecheck_template_parameters` used `declaration.type()`
+    alone), so the reference parameter became a value parameter of
+    type `T`, the reference argument (`&T::blank`) was valuified,
+    and `template_suffix` aborted in `to_constant_expr` while
+    naming the instance.  Fixed in three cooperating parts, per
+    N5008 [temp.param]/6, [dcl.meaning]/1, [temp.arg.nontype]/2:
+    (a) build the parameter symbol from
+    `declarator.merge_type(declaration.type())` so it keeps its
+    reference/pointer type; (b) do not valuify a reference/pointer
+    argument in `typecheck_template_args`; (c) build the
+    instance-name suffix of an address-of-object argument from the
+    object's identity.  **`ref_expr_set.cpp` now compiles to a
+    goto binary (was a SIGSEGV/abort).**  CORE tests:
+    `cpp11_reference_nontype_template_param`,
+    `cpp11_reference_nontype_template_param_distinct`,
+    `cpp11_pointer_nontype_template_param`.  (`rename_symbol.cpp`
+    and `replace_symbol.cpp` still fail, but on a distinct
+    `std::unordered_map<dstringt, …>` instantiation issue.)
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
