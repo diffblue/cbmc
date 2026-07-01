@@ -1649,6 +1649,21 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           }
         }
 
+        // A member operator that is a function TEMPLATE is not stored as a
+        // plain ID_code component; it lives in the class's scope.  N5008
+        // [over.match.oper]/3.2 includes such template members in the member
+        // candidate set (e.g. mstreamt's
+        // `template <class T> mstreamt &operator<<(const T&)`), so detect them
+        // with a scope-only lookup.  SCOPE_ONLY does not walk parent scopes, so
+        // this still excludes file-scope free operators (the case the gate
+        // guards against).
+        if(!has_member_op)
+        {
+          cpp_scopet &member_scope = cpp_scopes.get_scope(struct_identifier);
+          if(!member_scope.lookup(op_name, cpp_scopet::SCOPE_ONLY).empty())
+            has_member_op = true;
+        }
+
         if(has_member_op)
         {
           // get that scope
@@ -1738,6 +1753,21 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
               if(free_resolve.is_not_nil())
               {
                 bool free_is_non_template = true;
+                // N5008 [over.match.best]/2: a non-template candidate is
+                // preferred over a function-template specialization only when
+                // their conversion sequences are otherwise indistinguishable.
+                // Prefer the free operator over the member template only when
+                // the free operator's object (first) parameter is an EXACT
+                // match for the object argument's type.  If the free operator
+                // would need a derived-to-base conversion for the object (e.g.
+                // a free `operator<<(std::ostream&, ...)` on a
+                // `messaget::mstreamt` that derives from ostream, versus the
+                // member `mstreamt::operator<<` whose implicit object parameter
+                // is an exact `mstreamt&`), the member has the strictly better
+                // conversion sequence and must win -- otherwise the free
+                // operator's `std::ostream&` result cannot be returned as the
+                // derived `mstreamt&`.
+                bool free_object_param_exact = false;
                 if(free_resolve.id() == ID_symbol)
                 {
                   const symbolt *fsym = symbol_table.lookup(
@@ -1748,8 +1778,32 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
                   {
                     free_is_non_template = false;
                   }
+                  if(fsym != nullptr && fsym->type.id() == ID_code)
+                  {
+                    const auto &fparams = to_code_type(fsym->type).parameters();
+                    if(!fparams.empty())
+                    {
+                      typet p0 = fparams.front().type();
+                      if(
+                        p0.id() == ID_pointer &&
+                        (p0.get_bool(ID_C_reference) ||
+                         p0.get_bool(ID_C_rvalue_reference)))
+                        p0 = to_pointer_type(p0).base_type();
+                      typet obj = to_multi_ary_expr(expr).op0().type();
+                      if(
+                        obj.id() == ID_pointer &&
+                        (obj.get_bool(ID_C_reference) ||
+                         obj.get_bool(ID_C_rvalue_reference)))
+                        obj = to_pointer_type(obj).base_type();
+                      if(
+                        p0.id() == ID_struct_tag && obj.id() == ID_struct_tag &&
+                        to_struct_tag_type(p0).get_identifier() ==
+                          to_struct_tag_type(obj).get_identifier())
+                        free_object_param_exact = true;
+                    }
+                  }
                 }
-                if(free_is_non_template)
+                if(free_is_non_template && free_object_param_exact)
                 {
                   side_effect_expr_function_callt function_call(
                     cpp_name.as_expr(),
