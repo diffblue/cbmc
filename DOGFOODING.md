@@ -295,6 +295,27 @@ clusters:
     (member/ctor TEMPLATE definitions instantiated without odr-use).
     Full `exprt::visit` soundness needs the lazy-instantiation work.
 
+18. `f7e6f5fd89` — **guess_template_args recursion guard**.  A
+    depth guard stops cpp_typecheck_resolvet::guess_template_args from
+    exhausting the stack on a cyclic type graph (e.g. std::error_category
+    reached during deduction).  Defensive; mirrors the alignment() cycle guard.
+19. `56643fec6b` — **__is_constructible with an empty argument pack**
+    (N5008 [meta.unary.prop], [temp.variadic]/5).  is_constructible<T> written
+    as the empty-pack form `bool_constant<__is_constructible(T, Args...)>` (how
+    libstdc++ writes is_default_constructible<T> and std::stack's default-ctor
+    SFINAE) was mis-evaluated: the empty pack became the empty type (not nil),
+    so the trait took the "construct from void" branch and returned false.  This
+    broke std::stack and hence exprt::visit's std::stack<exprt*> traversal
+    (visit_pre_template) -- a silent soundness loss found via the cvise-reduced
+    std::stack repro.  Fixed to treat an empty-pack second argument as the
+    default-constructibility query, evaluated accurately.  CORE test
+    `cpp11_is_constructible_empty_pack`.  `exprt::visit`'s traversal is restored
+    (std::stack<class*> now verifies non-vacuously; expr.cpp / rename_symbol.cpp
+    / replace_symbol.cpp compile clean).  Side effect: `cpp11_regex_match`
+    downgraded to KNOWNBUG -- the correct trait value exposes a separate latent
+    guess_template_args deduction cascade on std::error_category (guarded from
+    crashing, but deduction incomplete).
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
