@@ -1143,7 +1143,19 @@ void cpp_typecheckt::full_member_initialization(
     // If the data member is not POD (or has a non-trivial default
     // constructor because its type has a default member initializer) and is
     // not explicitly initialized, then its default constructor is called.
-    if(!found && (!cpp_is_pod(c.type()) || member_type_has_nsdmi))
+    //
+    // N5008 [class.base.init]/9: a non-static data member that has a default
+    // member initializer and is not named by a mem-initializer-id is
+    // initialized *from that default member initializer*, not
+    // default-constructed.  Such a member is handled by the block below (which
+    // forwards the initializer to the member's constructor), so it must be
+    // excluded here -- otherwise a class-typed member with a braced default
+    // member initializer but no default constructor (e.g. `pair stored{-1, 7}`
+    // where `pair` has only `pair(int, int)`) would additionally get a
+    // default-construction member-initializer and fail with "found no match".
+    if(
+      !found && (!cpp_is_pod(c.type()) || member_type_has_nsdmi) &&
+      c.find(ID_C_default_value).is_nil())
     {
       cpp_namet cppname(mem_name);
 
