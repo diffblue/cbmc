@@ -1,4 +1,4 @@
-CORE broken-smt-backend no-new-smt wide-pointer-encoding
+CORE wide-pointer-encoding
 main.c
 --wide-pointer-encoding
 ^\[main\.assertion\.1\] line \d+ deref into pointer-containing global is sound: SUCCESS$
