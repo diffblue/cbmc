@@ -2606,8 +2606,26 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         if(code_type.return_type().id() != ID_constructor)
           continue;
         const auto &params = code_type.parameters();
+        // A copy/move constructor takes a single (reference) parameter of the
+        // class's OWN type.  A converting constructor such as `It(const S&)`
+        // with S a DIFFERENT type also has two parameters whose second is a
+        // reference, but it is NOT a copy/move constructor -- and being
+        // user-declared it makes the class a non-aggregate ([dcl.init.aggr]/1),
+        // so `It{arg}` must call that constructor rather than perform aggregate
+        // initialization.  Only skip genuine copy/move constructors here.
         if(params.size() == 2 && is_reference(params[1].type()))
-          continue;
+        {
+          typet param_base = to_reference_type(params[1].type()).base_type();
+          param_base.remove(ID_C_constant);
+          param_base.remove(ID_C_volatile);
+          const bool is_self =
+            param_base.id() == ID_struct_tag &&
+            expr.type().id() == ID_struct_tag &&
+            to_struct_tag_type(param_base).get_identifier() ==
+              to_struct_tag_type(expr.type()).get_identifier();
+          if(is_self)
+            continue;
+        }
         has_non_copy_ctor = true;
         break;
       }
@@ -2694,6 +2712,15 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         e.operands() = std::move(expanded);
       }
     }
+
+    // The braced-init operands have already been type-checked above.  Mark
+    // them so that cpp_constructor (reached via new_temporary) does not
+    // re-type-check them: re-type-checking a reference-member access that has
+    // already had its implicit dereference applied (e.g. `*this->root`) would
+    // re-apply that dereference, producing an ill-formed `*(*this->root)`
+    // ("operand of unary * is not a pointer").
+    for(auto &op : e.operands())
+      already_typechecked_exprt::make_already_typechecked(op);
 
     new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
