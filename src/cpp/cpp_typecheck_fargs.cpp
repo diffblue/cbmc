@@ -260,6 +260,21 @@ static bool brace_init_is_viable(
         return true;
     }
   }
+  // N5008 [over.match.list]/2.2 + [temp.deduct]: a constructor template
+  // participates in overload resolution against a brace-init-list as well.
+  // Constructor templates are not stored as ordinary `ID_code` constructor
+  // components (the class carries the `has_template_constructor` flag
+  // instead -- see cpp_typecheck_compound_type.cpp), so the component scan
+  // above cannot see them.  When the class has such a constructor template,
+  // declare a non-empty brace-init-list viable and defer the actual
+  // template-argument deduction / substitution to the conversion step:
+  // `cpp_typecheck_conversionst::implicit_typecast`'s brace-init-to-class
+  // branch already resolves template constructors under an SFINAE guard.
+  // Without this, constructing e.g. a `std::pair` (whose element-wise
+  // constructor is a template) from `{a, b}` -- as in `map.insert({k, v})`
+  // -- is wrongly rejected with "found no match for symbol '...'".
+  if(class_type.get_bool("has_template_constructor"))
+    return true;
   return false;
 }
 
