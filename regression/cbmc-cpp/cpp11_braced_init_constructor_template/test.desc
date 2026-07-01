@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced-init-list initializes class via ctor template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+found no match for symbol
+--
+N5008 [over.match.list]/2.2, [over.match.ctor], [temp.deduct]: constructor
+templates participate in list-initialization of a class from a braced-init-list.
+Constructing a std::pair-like class (element-wise ctor is a template) from
+`{a, b}` was previously rejected as "found no match".  Root cause of the
+dominant "no match for symbol 'insert'" dog-food cluster (std::unordered_map).
