@@ -338,6 +338,21 @@ clusters:
     with no default ctor is default-constructed instead of using the braced
     initializer).
 
+21. `c0aac6156e` — **class member initialized from its braced default
+    member initializer** (N5008 [class.base.init]/9).
+    `full_member_initialization` synthesised BOTH a default-construction
+    member-initializer (for any non-POD member the ctor did not explicitly
+    initialize) AND a separate initializer carrying the default member
+    initializer's value.  For a class-typed member with a braced default member
+    initializer but no default constructor -- `pair stored{-1, 7}` where `pair`
+    has only `pair(int, int)` -- the default-construction one failed with "found
+    no match for symbol 'pair'".  Fixed by excluding a member that has its own
+    default member initializer from the default-construction branch.  CORE test
+    `cpp11_class_member_default_brace_init`.  A separate pre-existing bug found
+    en route -- a *scalar* member's braced default member initializer
+    (`int x{42}`) leaks a raw initializer_list and aborts the bit-vector
+    flattener -- is tracked as KNOWNBUG `cpp11_scalar_member_default_brace_init`.
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
