@@ -172,28 +172,25 @@ confidently test at that scale yet.
     `convert_class_template_specialization`.  CORE tests:
     `cpp11_qualified_class_template_specialization`,
     `cpp11_std_hash_user_specialization`.
-
-## Open bug: incomplete `std::pair<K,V>` with a member unordered_map
-
-`rename_symbol.cpp` / `replace_symbol.cpp` fail with `found no
-match for symbol 'pair'`.  Root cause (KNOWNBUG
-`cpp11_pair_incomplete_member_unordered_map`): when a class has a
-member `std::unordered_map<K,V>`, libstdc++ references the non-const
-`std::pair<K,V>` (distinct from the map's value_type
-`std::pair<const K,V>`) from a typedef that is type-checked while
-`skip_typechecking_elaborate` is set (see
-`cpp_typecheck_declaration.cpp` around typedef typechecking).  That
-registers `std::pair<K,V>` INCOMPLETE and it is never subsequently
-elaborated, so a later explicit construction
-(`std::pair<K,V>(a,b)` as a sub-expression) resolves the existing
-incomplete instance and finds only the implicit members of an
-incomplete class.  The trigger requires a converting constructor
-(e.g. `dstringt(const std::string&)`).  Per N5008 [temp.inst]/2 the
-specialization must be completed when used in a
-completely-defined-type context; the fix must elaborate an existing
-incomplete instance at the construction-site resolve WITHOUT
-disturbing the deferred elaboration of `std::basic_string` (which
-several attempted fixes broke).
+12. `40c2118140` — **incomplete class template instance elaborated
+    at its construction site** (N5008 [temp.inst]/2).  When a class
+    has a member `std::unordered_map<K,V>`, libstdc++ references the
+    non-const `std::pair<K,V>` (distinct from the value_type
+    `std::pair<const K,V>`) from a typedef type-checked while
+    `skip_typechecking_elaborate` is set, leaving `std::pair<K,V>`
+    registered but INCOMPLETE and never later elaborated; a
+    subsequent explicit `std::pair<K,V>(a,b)` then found only the
+    implicit members of an incomplete class (`found no match for
+    symbol 'pair'`).  Fixed in `cpp_typecheck_resolvet::resolve` by
+    elaborating an incomplete `template_class_instance` immediately
+    before `make_constructors` (want == VAR) — i.e. at the actual
+    construction site, not while elaboration is suppressed, so the
+    deferred elaboration of `std::basic_string` is undisturbed.
+    CORE test `cpp11_pair_incomplete_member_unordered_map`.  This
+    removes the `found no match for symbol 'pair'` cascade from
+    `rename_symbol.cpp` / `replace_symbol.cpp` (they now progress to
+    distinct downstream errors: `depth_iterator_baset` instantiation
+    and `std::unordered_map<dstringt, exprt>` respectively).
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
