@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ int\*\(\) is a function type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ int&\(\) is a function type: SUCCESS$
+^\[main\.assertion\.3\] line \d+ int&&\(\) is a function type: SUCCESS$
+^\[main\.assertion\.4\] line \d+ int\*\(char\) is a function type: SUCCESS$
+^\[main\.assertion\.5\] line \d+ int\(\*\)\(\) is a pointer, not a function: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [dcl.decl]/4, [dcl.ambig.res]: an empty () after a ptr/ref-qualified
+declarator is a function parameter-list, so int*(), int&(), int&&() are function
+types; a non-empty parenthesised declarator (int(*)()) stays a grouping.  CBMC
+previously dropped the () for ptr/ref returns, breaking function-type partial
+specializations such as std::function<R&()> (root of the rename_symbol.cpp
+cascade via expr_iterator.h).  assertion.6 FAILURE proves non-vacuity.
