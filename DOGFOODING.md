@@ -353,6 +353,18 @@ clusters:
     (`int x{42}`) leaks a raw initializer_list and aborts the bit-vector
     flattener -- is tracked as KNOWNBUG `cpp11_scalar_member_default_brace_init`.
 
+22. `02cecd4437` — **member list-initialized from a non-empty braced default
+    member initializer** (N5008 [dcl.init.list], [dcl.init.aggr]).  A braced
+    default member initializer of a scalar member (`int x{42}`) left a raw
+    initializer_list in the model, aborting the bit-vector flattener
+    (unimplemented `boolbv_widtht::get_entry`); pointer/floating members got
+    wrong values and POD sub-struct members aborted.  Two sites fixed: the POD
+    default-member-initialization path now delegates to cpp_constructor
+    (forwarding the braced-init-list's elements), and cpp_constructor's
+    single-operand POD assignment now unwraps a single-element braced-init-list
+    to its element for a scalar target ([dcl.init.list]/3.9).  Flips the
+    KNOWNBUG `cpp11_scalar_member_default_brace_init` to CORE.
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
