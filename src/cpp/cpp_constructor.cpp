@@ -175,12 +175,27 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             }
             else
             {
-              exprt val = static_cast<const exprt &>(default_val);
-              typecheck_expr(val);
-              if(val.type() != comp.type())
-                val = typecast_exprt(val, comp.type());
-              block.add(
-                code_frontend_assignt(std::move(member), std::move(val)));
+              // N5008 [dcl.init.list], [dcl.init.aggr]: a non-empty braced
+              // default member initializer initializes the member by
+              // list-initialization -- a scalar from the single element
+              // ([dcl.init.list]/3.9), an aggregate member-wise, a class via
+              // its constructors.  Delegating to cpp_constructor (forwarding
+              // the braced-init-list's elements as the initializer operands)
+              // performs exactly that.  The previous code instead type-checked
+              // the braced-init-list as a whole and cast it to the member type,
+              // which left a raw initializer_list in the model (aborting the
+              // bit-vector flattener for a scalar member, e.g. `int x{42}`).
+              exprt init_val = static_cast<const exprt &>(default_val);
+              exprt::operandst init_ops;
+              if(init_val.id() == ID_initializer_list)
+                init_ops = init_val.operands();
+              else
+                init_ops.push_back(std::move(init_val));
+
+              auto member_init =
+                cpp_constructor(source_location, member, init_ops);
+              if(member_init.has_value())
+                block.add(std::move(*member_init));
             }
           }
         }
@@ -192,11 +207,32 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     }
     else if(operands_tc.size() == 1)
     {
+      exprt rhs = operands_tc.front();
+
+      // N5008 [dcl.init.list]/3.9-3.11: when a scalar (more generally, a
+      // non-class, non-array object) is list-initialized from a
+      // braced-init-list with a single element, it is initialized from that
+      // element.  A brace-init-list that reaches here as a raw
+      // `initializer_list` operand -- e.g. a scalar member's braced default
+      // member initializer `int x{42}` -- would otherwise be assigned to the
+      // scalar wholesale and flow into GOTO conversion unresolved, aborting
+      // the bit-vector flattener.  Unwrap it to its single element.  (An empty
+      // `{}` has already been routed to value-initialization by the caller, so
+      // only the single-element case needs handling here; a multi-element list
+      // for a scalar is ill-formed and is left for the assignment below to
+      // reject.)
+      if(
+        rhs.id() == ID_initializer_list && rhs.operands().size() == 1 &&
+        object_tc.type().id() != ID_struct_tag &&
+        object_tc.type().id() != ID_union_tag)
+      {
+        rhs = to_unary_expr(rhs).op();
+      }
+
       // Override constantness
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
-      side_effect_expr_assignt assign(
-        object_tc, operands_tc.front(), typet(), source_location);
+      side_effect_expr_assignt assign(object_tc, rhs, typet(), source_location);
       typecheck_side_effect_assignment(assign);
       return code_expressiont(std::move(assign));
     }
