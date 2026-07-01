@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ brace-construct temporary from reference member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^(ERROR|error): operand of unary
+--
+N5008 [dcl.init.aggr]/1, [dcl.init.list]/3: a class with a user-declared
+converting constructor is not an aggregate, so It{ref_member} calls the
+constructor; the reference-member argument must be dereferenced exactly once.
+CBMC previously mis-classified the converting constructor as a copy constructor
+(attempting aggregate init) and double-dereferenced the reference member
+(*(*this->root)).  This is the expr_iterator.h layer of the rename_symbol.cpp
+cascade.  assertion.2 FAILURE proves non-vacuity.
