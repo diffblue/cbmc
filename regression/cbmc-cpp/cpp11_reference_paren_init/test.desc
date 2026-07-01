@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ const reference paren-init binds to s: SUCCESS$
+^\[main\.assertion\.2\] line \d+ scalar reference paren-init binds to i: SUCCESS$
+^\[main\.assertion\.3\] line \d+ non-const reference paren-init aliases s: SUCCESS$
+^\[main\.assertion\.4\] line \d+ const reference sees the update through alias: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^(ERROR|error): .*declared as reference but is not initialized
+--
+N5008 [dcl.init.ref], [dcl.init]/16: reference direct-initialization with
+parentheses (T &r(init)) binds the reference like T &r = init.  CBMC previously
+reported such a reference as uninitialized (the parenthesized initializer was
+stored as init_args and not attached).  This is the layer behind the
+replace_symbol.cpp goto-cc cascade (`const exprt &const_dest(dest);`).
+assertion.5 FAILURE proves non-vacuity.
