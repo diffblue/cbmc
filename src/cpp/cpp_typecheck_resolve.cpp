@@ -5373,6 +5373,28 @@ void cpp_typecheck_resolvet::guess_template_args(
   const typet &template_type,
   const typet &desired_type)
 {
+  // Guard against unbounded recursion on a pathological or cyclic type graph
+  // (e.g. a self-referential polymorphic class reached during deduction, as
+  // with std::less<std::error_category>).  A nesting depth far beyond any
+  // well-formed type indicates a cycle; abandon deduction for this branch
+  // rather than exhausting the stack (mirrors the existing cycle guards in the
+  // type-graph walkers, e.g. alignment()).
+  static thread_local unsigned guess_template_args_depth = 0;
+  if(guess_template_args_depth > 128)
+    return;
+  struct depth_guardt
+  {
+    unsigned &d;
+    explicit depth_guardt(unsigned &d) : d(d)
+    {
+      ++d;
+    }
+    ~depth_guardt()
+    {
+      --d;
+    }
+  } depth_guard(guess_template_args_depth);
+
 #ifdef DEBUG
   std::cout << "guess_template_args: TT.id=" << template_type.id()
             << " DT.id=" << desired_type.id() << '\n';
