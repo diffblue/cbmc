@@ -4680,6 +4680,37 @@ resolved_after_strip:
     }
     if(!has_class_type_no_args)
     {
+      // N5008 [temp.inst]/2: constructing an object of a class template
+      // specialization is a context that requires a completely-defined type,
+      // which implicitly instantiates the specialization.  An identifier here
+      // may name a specialization that was registered but left INCOMPLETE
+      // (e.g. std::pair<K,V> referenced internally by std::unordered_map from a
+      // typedef type-checked while elaboration was suppressed).  Elaborate such
+      // an instance before gathering its constructors -- otherwise
+      // make_constructors would find only the implicit members of an incomplete
+      // class ("found no match for symbol '...'").  This fires at the actual
+      // construction site (want == VAR), not while elaboration is suppressed,
+      // so it does not disturb the deferred elaboration of e.g.
+      // std::basic_string.
+      for(auto &id : identifiers)
+      {
+        if(
+          id.id() == ID_type &&
+          (id.type().id() == ID_struct_tag || id.type().id() == ID_union_tag))
+        {
+          const symbolt *instance_sym = cpp_typecheck.symbol_table.lookup(
+            to_tag_type(id.type()).get_identifier());
+          if(
+            instance_sym != nullptr &&
+            (instance_sym->type.id() == ID_struct ||
+             instance_sym->type.id() == ID_union) &&
+            instance_sym->type.get_bool(ID_template_class_instance) &&
+            to_struct_union_type(instance_sym->type).is_incomplete())
+          {
+            cpp_typecheck.elaborate_class_template(id.type());
+          }
+        }
+      }
       make_constructors(identifiers);
       remove_duplicates(identifiers);
     }
