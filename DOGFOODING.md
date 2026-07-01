@@ -237,20 +237,43 @@ confidently test at that scale yet.
     (`const exprt &const_dest(dest);`).  CORE test
     `cpp11_reference_paren_init`.  **`replace_symbol.cpp` now compiles
     to a goto binary.**
+16. `a02982c4e7` — **member template operators in operator overload
+    resolution** (N5008 [over.match.oper]/3.2, [over.match.best]/2).
+    operator_is_overloaded detected member operator candidates only
+    among ID_code components, missing a member operator that is a
+    function template (util/message.h's
+    `mstreamt::template<class T> operator<<(const T&)`), so `a @ b`
+    fell through to a free operator (or reported the operator
+    undefined).  Detect template members via a SCOPE_ONLY lookup, and
+    prefer a free non-template operator over the member template only
+    when the free operator's object parameter is an EXACT match (per
+    [over.match.best]/2) -- not when it needs a derived-to-base
+    conversion (so `mstreamt::operator<<`, exact object, wins over a
+    free `operator<<(std::ostream&, …)`).  CORE test
+    `cpp11_member_template_operator_overload`.  Clears the
+    `_Require_derived_from_ios_base` cluster on ui_message.cpp /
+    parser.cpp / typecheck.cpp (which now progress to distinct
+    downstream errors).
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
-| # files | First error | Root cause (hypothesis) |
-|---------|-------------|-------------------------|
-| 42 | cascade from `std::unordered_map` instantiation | Downstream of basic_string / __stoa failures. |
-| 35 | `invalid implicit conversion from 'char [1l]' to 'struct basic_string'` | Default argument `std::string x = ""` on a constructor; implicit `basic_string(const char*)` not found in this specific inheritance context.  Not reproduced in minimal isolation. |
-| 11 | `found no match for symbol '__stoa'` | libstdc++ `ext/string_conversions.h` variadic template with function-pointer parameter.  Candidate does deduce `<float, float, char>` but outer lookup still fails. |
-| 3  | `std::optional` instantiation fallout | Needs follow-on investigation. |
-| 2  | `use of enum 'validation_modet' without previous declaration` | C++ front-end missing forward declaration for an enum class. |
-| 2  | `'<<expr:side_effect>>' not an lvalue` | prvalue materialization (`std::max<T>(prvalue, …)`) still not handled. |
-| 1  | `parse error before 'virtual bool'`, `const exprt &` | Parse errors in specific headers — need targeted investigation. |
+Dog-food re-baselined 2026-07-01: **42 OK-clean / 64 OK-noisy / 11 FAIL / 0
+CRASH** (was 19 FAIL at the start of the cpp11 front-end work).  Remaining FAIL
+clusters:
 
-*Updated: 2026-05-11*
+| # files | First error | Files |
+|---------|-------------|-------|
+| 2 | `symbol 'read' is unknown` (parser.h:48) | `parser.cpp`, `lispexpr.cpp` |
+| 2 | CONVERSION ERROR on a `virtual_table::messaget/message_handlert` member | `typecheck.cpp`, `ui_message.cpp` |
+| 1 | `found no match for symbol 'optional'` | `simplify_utils.cpp` |
+| 1 | `found no match for symbol 'resize'` | `irep_serialization.cpp` |
+| 1 | `found no match for symbol 'insert'` | `pointer_predicates.cpp` |
+| 1 | `found no match for symbol 'remove'` | `tempfile.cpp` |
+| 1 | parse error before `virtual bool __do_upcast (` | `invariant.cpp` |
+| 1 | `mallinfo` does not uniquely resolve | `memory_info.cpp` |
+| 1 | `std::unique_ptr<console_message_handlert>` instantiation | `parse_options.cpp` |
+
+*Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
 
