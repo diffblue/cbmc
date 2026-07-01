@@ -2,26 +2,26 @@
 // specialization is a context that requires a completely-defined type and thus
 // implicitly instantiates the specialization.  Here std::pair<DS, DS> is
 // constructed explicitly.  g++/clang++ compile this and p.first/p.second hold
-// the constructor arguments, so p.first.no == 5 && p.second.no == 9.
+// the constructor arguments, so p.first.no == 5.
 //
-// KNOWN BUG: when a class (R) has a member std::unordered_map<DS, DS>, the
+// Regression: when a class (R) has a member std::unordered_map<DS, DS>, the
 // libstdc++ hashtable machinery references std::pair<DS, DS> (distinct from the
 // map's value_type std::pair<const DS, DS>) from within a typedef that is
 // type-checked with elaboration suppressed (cpp_typecheckt::
 // skip_typechecking_elaborate, set around typedef typechecking in
 // cpp_typecheck_declaration.cpp).  That leaves std::pair<DS, DS> registered but
-// INCOMPLETE, and it is never subsequently elaborated: the later explicit
-// construction resolves to the existing incomplete instance without going
-// through the elaboration path, so only the implicit members of an incomplete
-// class are found ("found no match for symbol 'pair'").  The trigger requires a
-// converting constructor (here DS(const std::string &)) that makes the trait
-// evaluation reference the non-const std::pair<DS, DS>.
+// INCOMPLETE.  The fix elaborates such an incomplete instance at the
+// construction site (in cpp_typecheck_resolvet::resolve, before
+// make_constructors) so its constructors are found; previously only the
+// implicit members of an incomplete class were found ("found no match for
+// symbol 'pair'").  The trigger requires a converting constructor (here
+// DS(const std::string &)) that makes the trait evaluation reference the
+// non-const std::pair<DS, DS>, and is include-order sensitive (<unordered_map>
+// before <string>).
 //
 // This is the root of the goto-cc cascade on rename_symbol.cpp /
-// replace_symbol.cpp (std::unordered_map<irep_idt, irep_idt> members).  Flip to
-// CORE once an incomplete class template instance used in a
-// completely-defined-type context is elaborated (without disturbing the
-// deferred elaboration of e.g. std::basic_string).
+// replace_symbol.cpp (std::unordered_map<irep_idt, irep_idt> members).
+// assertion.2 must FAIL, proving assertion.1 is non-vacuous.
 
 #include <unordered_map>
 #include <string>
