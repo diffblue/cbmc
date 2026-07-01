@@ -692,10 +692,69 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // __is_constructible(T, Args...) — check if T can be constructed
       // from Args. For scalar types, construction from a compatible type
       // (including references) is always possible.
+      //
+      // N5008 [temp.variadic]/5: an empty pack expansion in the argument list
+      // (e.g. `__is_constructible(T, Args...)` with an empty `Args`, which is
+      // how `std::is_default_constructible<T>` = `is_constructible<T>` and the
+      // SFINAE default template argument of std::stack's default constructor
+      // are written) contributes no arguments.  An empty pack leaves
+      // `type_arg2` as the (now empty) pack NAME, which type-checks to the
+      // empty type rather than to nil.  Detect this precisely -- the raw
+      // second type argument is a cpp_name that resolved to the empty type --
+      // and treat it as "no second argument" (the default-constructibility
+      // query), matching the direct `__is_constructible(T)` form.  A genuine
+      // argument type (including an explicit `void`, whose raw form is a type
+      // keyword, not a cpp_name) is left to the construction check below.
+      const bool empty_pack_second_arg =
+        t2.id() == ID_empty && expr.find("type_arg2").id() == ID_cpp_name;
       if(t2.is_nil())
       {
         // Default constructible — scalars are always default constructible
         expr = true_exprt();
+      }
+      else if(empty_pack_second_arg)
+      {
+        // is_constructible<T> (empty argument pack) is default-constructibility
+        // ([meta.unary.prop]).  Evaluate it accurately for class types: a class
+        // with a user-declared constructor but no default constructor is NOT
+        // default-constructible.  (The direct `t2.is_nil()` branch above
+        // over-approximates to true for compatibility; here we must be precise,
+        // because reporting a non-default-constructible class as constructible
+        // selects a construction that does not exist -- e.g. it exposed a crash
+        // in std::regex's error_category handling.)
+        typet dt = t1;
+        dt.remove(ID_C_constant);
+        dt.remove(ID_C_volatile);
+        if(dt.id() == ID_struct_tag)
+        {
+          const struct_typet &st = follow_tag(to_struct_tag_type(dt));
+          bool has_user_ctor = false;
+          bool has_default_ctor = false;
+          for(const auto &c : st.components())
+          {
+            if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+              continue;
+            if(to_code_type(c.type()).return_type().id() != ID_constructor)
+              continue;
+            has_user_ctor = true;
+            const auto &ps = to_code_type(c.type()).parameters();
+            if(ps.size() == 1 && ps.front().get_this())
+            {
+              has_default_ctor = true;
+              break;
+            }
+          }
+          // No constructor at all -> implicit default constructor; a default
+          // constructor present -> default-constructible; otherwise not.
+          expr = (!has_user_ctor || has_default_ctor)
+                   ? static_cast<exprt>(true_exprt())
+                   : static_cast<exprt>(false_exprt());
+        }
+        else
+        {
+          // Scalars, pointers, enums, arrays: default-constructible.
+          expr = true_exprt();
+        }
       }
       else
       {
