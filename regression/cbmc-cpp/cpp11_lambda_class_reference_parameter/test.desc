@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ lambda with class-reference parameter runs: SUCCESS$
+^\[main\.assertion\.2\] line \d+ lambda with by-value class parameter reads member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^(ERROR|error): member operator requires
+--
+N5008 [expr.prim.lambda.general]/4: a lambda parameter written with a concrete
+class name is not a generic (auto) parameter.  CBMC replaced any cpp_name lambda
+parameter with signed int, so accessing a member of a class-typed lambda
+parameter failed and the enclosing body was dropped -- which stubbed
+util/expr.cpp's exprt::visit to a no-op (a silent soundness loss).  assertion.3
+FAILURE proves non-vacuity.
