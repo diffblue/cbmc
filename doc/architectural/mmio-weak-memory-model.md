@@ -44,9 +44,10 @@ new work lies.
 * **`goto-instrument --nondet-volatile`** (`nondet_volatile.cpp`) replaces every
   read of a `volatile`-qualified lvalue with a fresh non-deterministic value. It
   supports per-variable scoping (`--nondet-volatile-variable`) and read *models*
-  (`--nondet-volatile-model <var>:<fn>`, a `T fn(void)` callback). This is
-  exactly the *read* half of the device-environment model. It does **not**
-  touch volatile writes.
+  (`--nondet-volatile-model <var>:<fn>`, a `T fn(void)` callback). It also (see
+  Phase 1 below) preserves volatile *writes* as observable side effects and
+  supports a write *model* (`--nondet-volatile-write-model <var>:<fn>`, a
+  `void fn(T)` callback). This is the full device-environment model.
 * **The `__CPROVER_mm_io_r`/`__CPROVER_mm_io_w` callback model**
   (`goto-programs/mm_io.cpp`) rewrites pointer-dereference reads/writes into
   calls to user-supplied callbacks, and the `--mmio-region <addr>:<size>`
@@ -58,13 +59,14 @@ new work lies.
   `__sync_synchronize`, atomics). This is the machinery the MMIO *ordering*
   model should reuse — parameterised per region by device-memory type rather
   than globally.
-* **Dead code:** `goto-instrument/mmio.cpp` contains a large `#if 0` block that
-  sketched a 2-entry store buffer for MMIO. It is a stale (~2011) prototype of
-  the weak-memory store buffer, written against an outdated `shared_bufferst`
-  API, and is conceptually mislabelled (store buffering is a property of the
-  *weak* device types, not MMIO in general). It should be **deleted**: its idea
-  survives, correctly, as Phase 2 below (write-combining memory via `wmm/`),
-  not as a bespoke copy.
+* **Removed dead code:** `goto-instrument/mmio.cpp` used to contain a large
+  `#if 0` block sketching a 2-entry store buffer for MMIO. It was a stale
+  (~2011) prototype of the weak-memory store buffer, written against an outdated
+  `shared_bufferst` API, and conceptually mislabelled (store buffering is a
+  property of the *weak* device types, not MMIO in general). It has been
+  **removed**; its idea survives, correctly, as Phase 2 below (write-combining
+  memory via `wmm/`), not as a bespoke copy. `goto-instrument --mmio` therefore
+  no longer rewrites anything.
 
 ## Phased design
 
@@ -79,10 +81,17 @@ Model the device as an external agent, independent of ordering:
 * **Writes → observable side effects that are never eliminated.** A store to a
   device register must survive slicing/optimisation even when its value is
   never read back (which, under non-deterministic reads, is always). This is
-  the piece `--nondet-volatile` is missing, and the initial implementation
-  target: preserve volatile writes as observable events, optionally routed to a
-  write *model* (a `void fn(T)` callback) so the device model can assert on
-  written values — the write-side analogue of `--nondet-volatile-model`.
+  implemented: each write to a volatile lvalue that is modelled as a device
+  emits an `OUTPUT` of the written value (so the store is not sliced away and
+  appears in counterexample traces), and may instead be routed to a write
+  *model* (`--nondet-volatile-write-model <var>:<fn>`, a `void fn(T)` callback)
+  so a device model can assert on written values — the write-side analogue of
+  `--nondet-volatile-model`. The zero-initialisation of globals is not treated
+  as a device write.
+
+Phase 1 is implemented for `volatile`-qualified regions; the read side
+(`--nondet-volatile` and friends) predated this work, the write side was added
+on top.
 
 Region identification in Phase 1 is by `volatile` qualification (the C-level
 signal drivers already use), with `--mmio-region` addresses as an alternative
