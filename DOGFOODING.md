@@ -158,6 +158,42 @@ confidently test at that scale yet.
     `cpp11_pointer_nontype_template_param`.  (`rename_symbol.cpp`
     and `replace_symbol.cpp` still fail, but on a distinct
     `std::unordered_map<dstringt, …>` instantiation issue.)
+11. `37577e13b4` + `9132564dbe` — **explicit class template
+    specialization named with a qualified-id** (N5008
+    [temp.expl.spec]/2).  `template <> struct ns::G<char> {...}`
+    (and `template <> struct std::hash<T> {...}`, the standard way
+    to make a user type an unordered-container key) was silently
+    skipped by `convert_template_declaration` — mistaken for an
+    out-of-class nested definition — so the primary template was
+    used instead of the specialization.  Fixed by distinguishing on
+    the final name component (a specialization's final component
+    carries template arguments; a nested definition's does not) and
+    resolving the qualified name via `resolve_scope` in
+    `convert_class_template_specialization`.  CORE tests:
+    `cpp11_qualified_class_template_specialization`,
+    `cpp11_std_hash_user_specialization`.
+
+## Open bug: incomplete `std::pair<K,V>` with a member unordered_map
+
+`rename_symbol.cpp` / `replace_symbol.cpp` fail with `found no
+match for symbol 'pair'`.  Root cause (KNOWNBUG
+`cpp11_pair_incomplete_member_unordered_map`): when a class has a
+member `std::unordered_map<K,V>`, libstdc++ references the non-const
+`std::pair<K,V>` (distinct from the map's value_type
+`std::pair<const K,V>`) from a typedef that is type-checked while
+`skip_typechecking_elaborate` is set (see
+`cpp_typecheck_declaration.cpp` around typedef typechecking).  That
+registers `std::pair<K,V>` INCOMPLETE and it is never subsequently
+elaborated, so a later explicit construction
+(`std::pair<K,V>(a,b)` as a sub-expression) resolves the existing
+incomplete instance and finds only the implicit members of an
+incomplete class.  The trigger requires a converting constructor
+(e.g. `dstringt(const std::string&)`).  Per N5008 [temp.inst]/2 the
+specialization must be completed when used in a
+completely-defined-type context; the fix must elaborate an existing
+incomplete instance at the construction-site resolve WITHOUT
+disturbing the deferred elaboration of `std::basic_string` (which
+several attempted fixes broke).
 
 ## Remaining recurring errors (full src/util/ sample, 117 files)
 
