@@ -14,7 +14,6 @@ var dir_95992f7eabcbd576bf4841b6d0d09aae =
     [ "boolbv_bv_rel.cpp", "boolbv__bv__rel_8cpp.html", null ],
     [ "boolbv_byte_extract.cpp", "boolbv__byte__extract_8cpp.html", "boolbv__byte__extract_8cpp" ],
     [ "boolbv_byte_update.cpp", "boolbv__byte__update_8cpp.html", null ],
-    [ "boolbv_case.cpp", "boolbv__case_8cpp.html", null ],
     [ "boolbv_complex.cpp", "boolbv__complex_8cpp.html", null ],
     [ "boolbv_concatenation.cpp", "boolbv__concatenation_8cpp.html", null ],
     [ "boolbv_cond.cpp", "boolbv__cond_8cpp.html", null ],

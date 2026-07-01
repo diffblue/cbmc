@@ -1,10 +1,8 @@
 var NAVTREEINDEX4 =
 {
-"bv__pointers_8cpp.html#a65bea15d082c911ff7f01754ea1767d5":[8,0,2,27,1,62,3],
-"bv__pointers_8cpp.html#a7639a5589eb947bdf9aeab9c5f96caf1":[8,0,2,27,1,62,1],
-"bv__pointers_8cpp_source.html":[8,0,2,27,1,62],
-"bv__pointers_8h.html":[8,0,2,27,1,63],
-"bv__pointers_8h_source.html":[8,0,2,27,1,63],
+"bv__pointers_8cpp_source.html":[8,0,2,27,1,61],
+"bv__pointers_8h.html":[8,0,2,27,1,62],
+"bv__pointers_8h_source.html":[8,0,2,27,1,62],
 "bv__pointers__wide_8cpp.html":[8,0,2,6,4],
 "bv__pointers__wide_8cpp.html#a410158ad7a2822d61069379e4e218be0":[8,0,2,6,4,0],
 "bv__pointers__wide_8cpp.html#a65bea15d082c911ff7f01754ea1767d5":[8,0,2,6,4,1],
@@ -16,13 +14,13 @@ var NAVTREEINDEX4 =
 "bv__refinement_8h_source.html":[8,0,2,27,6,0],
 "bv__refinement__loop_8cpp.html":[8,0,2,27,6,1],
 "bv__refinement__loop_8cpp_source.html":[8,0,2,27,6,1],
-"bv__utils_8cpp.html":[8,0,2,27,1,64],
-"bv__utils_8cpp.html#a0ccfcf90b7ad01394439acdb30407923":[8,0,2,27,1,64,1],
-"bv__utils_8cpp.html#a8427c99daf6998afb3cc005cf1d7d088":[8,0,2,27,1,64,2],
-"bv__utils_8cpp.html#a8ef1f10ce54db574def91be7c4931a14":[8,0,2,27,1,64,0],
-"bv__utils_8cpp_source.html":[8,0,2,27,1,64],
-"bv__utils_8h.html":[8,0,2,27,1,65],
-"bv__utils_8h_source.html":[8,0,2,27,1,65],
+"bv__utils_8cpp.html":[8,0,2,27,1,63],
+"bv__utils_8cpp.html#a0ccfcf90b7ad01394439acdb30407923":[8,0,2,27,1,63,1],
+"bv__utils_8cpp.html#a8427c99daf6998afb3cc005cf1d7d088":[8,0,2,27,1,63,2],
+"bv__utils_8cpp.html#a8ef1f10ce54db574def91be7c4931a14":[8,0,2,27,1,63,0],
+"bv__utils_8cpp_source.html":[8,0,2,27,1,63],
+"bv__utils_8h.html":[8,0,2,27,1,64],
+"bv__utils_8h_source.html":[8,0,2,27,1,64],
 "byte__operators_8cpp.html":[8,0,2,30,16],
 "byte__operators_8cpp.html#a0f91de25c75e38bfa5b06eef305a3e3d":[8,0,2,30,16,0],
 "byte__operators_8cpp.html#a424b32f665812317348db304c92152e0":[8,0,2,30,16,4],
@@ -249,5 +247,7 @@ var NAVTREEINDEX4 =
 "bytecode__info_8h.html#ae67e73afba6a675a768c055765aa587e":[8,0,1,0,1,3,41],
 "bytecode__info_8h.html#aebbfc4dbb26ae9e5916d769fcba6c64b":[8,0,1,0,1,3,120],
 "bytecode__info_8h.html#aee59b4b6418f68471206f8c6d223676f":[8,0,1,0,1,3,16],
-"bytecode__info_8h.html#af05357c98b7bd1b17e689e2bf7b57a8f":[8,0,1,0,1,3,137]
+"bytecode__info_8h.html#af05357c98b7bd1b17e689e2bf7b57a8f":[8,0,1,0,1,3,137],
+"bytecode__info_8h.html#af45404c371b7a1be33d10040b17e397f":[8,0,1,0,1,3,117],
+"bytecode__info_8h.html#af5560016dd18c86ea7471969f1054b4d":[8,0,1,0,1,3,42]
 };
