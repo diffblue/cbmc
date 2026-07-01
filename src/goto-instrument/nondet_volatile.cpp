@@ -25,6 +25,8 @@ Date: September 2011
 #include <goto-programs/goto_instruction_code.h>
 #include <goto-programs/goto_model.h>
 
+#include <linking/static_lifetime_init.h>
+
 class nondet_volatilet
 {
 public:
@@ -36,14 +38,16 @@ public:
 
   void operator()()
   {
-    if(!all_nondet && nondet_variables.empty() && variable_models.empty())
+    if(
+      !all_nondet && nondet_variables.empty() && variable_models.empty() &&
+      write_models.empty())
     {
       return;
     }
 
     for(auto &f : goto_model.goto_functions.function_map)
     {
-      nondet_volatile(goto_model.symbol_table, f.second.body);
+      nondet_volatile(goto_model.symbol_table, f.first, f.second.body);
     }
 
     goto_model.goto_functions.update();
@@ -72,11 +76,32 @@ private:
 
   void nondet_volatile(
     symbol_table_baset &symbol_table,
+    const irep_idt &function_id,
     goto_programt &goto_program);
+
+  /// Is a write to \p lhs modelled as a device side effect (so that it should
+  /// be preserved as an observable event)? True for any volatile lvalue in
+  /// --nondet-volatile mode, and for the specifically-selected variables in
+  /// the scoped (--nondet-volatile-variable / --nondet-volatile-model) modes.
+  bool is_modeled_volatile_write(const exprt &lhs, const namespacet &ns) const;
+
+  /// Instrument a write to a volatile lvalue as an observable device side
+  /// effect: route it to the configured write model, or otherwise emit an
+  /// OUTPUT of the written value so the store is not sliced away as dead.
+  void observe_volatile_write(
+    const goto_programt::instructiont &instruction,
+    const irep_idt &function_id,
+    const namespacet &ns,
+    goto_programt &post);
 
   const symbolt &typecheck_variable(const irep_idt &id, const namespacet &ns);
 
   void typecheck_model(
+    const irep_idt &id,
+    const symbolt &variable,
+    const namespacet &ns);
+
+  void typecheck_write_model(
     const irep_idt &id,
     const symbolt &variable,
     const namespacet &ns);
@@ -89,6 +114,7 @@ private:
   bool all_nondet;
   std::set<irep_idt> nondet_variables;
   std::map<irep_idt, irep_idt> variable_models;
+  std::map<irep_idt, irep_idt> write_models;
 };
 
 bool nondet_volatilet::is_volatile(const namespacet &ns, const typet &src)
@@ -212,8 +238,75 @@ void nondet_volatilet::nondet_volatile_lhs(
   }
 }
 
+bool nondet_volatilet::is_modeled_volatile_write(
+  const exprt &lhs,
+  const namespacet &ns) const
+{
+  if(all_nondet)
+    return is_volatile(ns, lhs.type());
+
+  if(lhs.id() == ID_symbol)
+  {
+    const irep_idt &id = to_symbol_expr(lhs).identifier();
+    return nondet_variables.count(id) != 0 || variable_models.count(id) != 0;
+  }
+
+  return false;
+}
+
+void nondet_volatilet::observe_volatile_write(
+  const goto_programt::instructiont &instruction,
+  const irep_idt &function_id,
+  const namespacet &ns,
+  goto_programt &post)
+{
+  // The zero-initialisation of globals in the CPROVER initialisation function
+  // is a language-level artefact, not an action on the device, so it is not
+  // treated as an observable device write.
+  if(function_id == INITIALIZE_FUNCTION)
+    return;
+
+  const exprt &lhs = instruction.assign_lhs();
+
+  // A write model configured for this register observes (and can assert on)
+  // the written value; it supersedes the default observable output.
+  if(lhs.id() == ID_symbol)
+  {
+    const auto it = write_models.find(to_symbol_expr(lhs).identifier());
+
+    if(it != write_models.end())
+    {
+      const symbolt &model_symbol = ns.lookup(it->second);
+
+      post.instructions.push_back(goto_programt::make_function_call(
+        code_function_callt{
+          model_symbol.symbol_expr(), {instruction.assign_rhs()}},
+        instruction.source_location()));
+
+      return;
+    }
+  }
+
+  // Otherwise, if this register is modelled as a device, a write to it is an
+  // observable side effect: it acts on the device rather than merely updating
+  // storage the program later reads. When volatile reads are modelled
+  // non-deterministically the written value is never read back, so without
+  // this the store would be sliced away as dead. Emit an OUTPUT of the written
+  // value so the write is preserved and appears in counterexample traces.
+  if(is_modeled_volatile_write(lhs, ns))
+  {
+    post.instructions.push_back(goto_programt::make_other(
+      code_outputt{
+        "volatile-write",
+        instruction.assign_rhs(),
+        instruction.source_location()},
+      instruction.source_location()));
+  }
+}
+
 void nondet_volatilet::nondet_volatile(
   symbol_table_baset &symbol_table,
+  const irep_idt &function_id,
   goto_programt &goto_program)
 {
   namespacet ns(symbol_table);
@@ -234,27 +327,7 @@ void nondet_volatilet::nondet_volatile(
       nondet_volatile_lhs(
         symbol_table, instruction.assign_lhs_nonconst(), pre, post);
 
-      // A write to a volatile lvalue is an observable side effect: it acts on
-      // the device rather than merely updating storage the program later
-      // reads. When volatile reads are modelled non-deterministically the
-      // written value is never read back, so without this the store would be
-      // sliced away as dead. Emit an OUTPUT of the written value so the write
-      // is preserved and appears in counterexample traces (the device-write
-      // half of the MMIO device-environment model).
-      if(all_nondet)
-      {
-        const namespacet ns(symbol_table);
-        const exprt &lhs = instruction.assign_lhs();
-        if(is_volatile(ns, lhs.type()))
-        {
-          post.instructions.push_back(goto_programt::make_other(
-            code_outputt{
-              "volatile-write",
-              instruction.assign_rhs(),
-              instruction.source_location()},
-            instruction.source_location()));
-        }
-      }
+      observe_volatile_write(instruction, function_id, ns, post);
     }
     else if(instruction.is_function_call())
     {
@@ -359,19 +432,107 @@ void nondet_volatilet::typecheck_model(
   }
 }
 
+void nondet_volatilet::typecheck_write_model(
+  const irep_idt &id,
+  const symbolt &variable,
+  const namespacet &ns)
+{
+  const symbolt *symbol;
+
+  if(ns.lookup(id, symbol))
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "given write model name " + id2string(id) + " not found in symbol table",
+      "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+  }
+
+  if(!symbol->is_function())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "symbol `" + id2string(id) + "` is not a function",
+      "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+  }
+
+  const auto &code_type = to_code_type(symbol->type);
+
+  if(code_type.return_type().id() != ID_empty)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "write model `" + id2string(id) + "` must return void",
+      "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+  }
+
+  if(code_type.parameters().size() != 1)
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "write model `" + id2string(id) +
+        "` must take exactly one parameter (the written value)",
+      "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+  }
+
+  if(variable.type != code_type.parameters().front().type())
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "parameter type of write model `" + id2string(id) +
+        "` is not compatible with the type of the modelled variable " +
+        id2string(variable.name),
+      "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+  }
+}
+
 void nondet_volatilet::typecheck_options(const optionst &options)
 {
   PRECONDITION(!all_nondet);
   PRECONDITION(nondet_variables.empty());
   PRECONDITION(variable_models.empty());
+  PRECONDITION(write_models.empty());
+
+  const namespacet ns(goto_model.symbol_table);
+
+  // Write models are independent of the read-side mode and may be combined
+  // with any of them (including --nondet-volatile), so they are processed
+  // before the read-side options.
+  if(options.is_set(NONDET_VOLATILE_WRITE_MODEL_OPT))
+  {
+    const auto &model_list =
+      options.get_list_option(NONDET_VOLATILE_WRITE_MODEL_OPT);
+
+    for(const auto &s : model_list)
+    {
+      std::string variable;
+      std::string model;
+
+      try
+      {
+        split_string(s, ':', variable, model, true);
+      }
+      catch(const deserialization_exceptiont &)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "cannot split argument `" + s + "` into variable name and model name",
+          "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+      }
+
+      const auto &variable_symbol = typecheck_variable(variable, ns);
+
+      typecheck_write_model(model, variable_symbol, ns);
+
+      const auto p = write_models.insert(std::make_pair(variable, model));
+
+      if(!p.second && p.first->second != model)
+      {
+        throw invalid_command_line_argument_exceptiont(
+          "conflicting write models for variable `" + variable + "`",
+          "--" NONDET_VOLATILE_WRITE_MODEL_OPT);
+      }
+    }
+  }
 
   if(options.get_bool_option(NONDET_VOLATILE_OPT))
   {
     all_nondet = true;
     return;
   }
-
-  const namespacet ns(goto_model.symbol_table);
 
   if(options.is_set(NONDET_VOLATILE_VARIABLE_OPT))
   {
@@ -434,6 +595,7 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   PRECONDITION(!options.is_set(NONDET_VOLATILE_OPT));
   PRECONDITION(!options.is_set(NONDET_VOLATILE_VARIABLE_OPT));
   PRECONDITION(!options.is_set(NONDET_VOLATILE_MODEL_OPT));
+  PRECONDITION(!options.is_set(NONDET_VOLATILE_WRITE_MODEL_OPT));
 
   const bool nondet_volatile_opt = cmdline.isset(NONDET_VOLATILE_OPT);
   const bool nondet_volatile_variable_opt =
@@ -472,6 +634,15 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
         NONDET_VOLATILE_MODEL_OPT,
         cmdline.get_values(NONDET_VOLATILE_MODEL_OPT));
     }
+  }
+
+  // Write models are independent of the (mutually-exclusive) read-side modes
+  // and may be combined with any of them.
+  if(cmdline.isset(NONDET_VOLATILE_WRITE_MODEL_OPT))
+  {
+    options.set_option(
+      NONDET_VOLATILE_WRITE_MODEL_OPT,
+      cmdline.get_values(NONDET_VOLATILE_WRITE_MODEL_OPT));
   }
 }
 

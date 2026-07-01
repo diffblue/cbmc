@@ -23,11 +23,13 @@ class optionst;
 #define NONDET_VOLATILE_OPT "nondet-volatile"
 #define NONDET_VOLATILE_VARIABLE_OPT "nondet-volatile-variable"
 #define NONDET_VOLATILE_MODEL_OPT "nondet-volatile-model"
+#define NONDET_VOLATILE_WRITE_MODEL_OPT "nondet-volatile-write-model"
 
 #define OPT_NONDET_VOLATILE \
   "(" NONDET_VOLATILE_OPT ")" \
   "(" NONDET_VOLATILE_VARIABLE_OPT "):" \
-  "(" NONDET_VOLATILE_MODEL_OPT "):"
+  "(" NONDET_VOLATILE_MODEL_OPT "):" \
+  "(" NONDET_VOLATILE_WRITE_MODEL_OPT "):"
 
 #define HELP_NONDET_VOLATILE \
   " {y--" NONDET_VOLATILE_OPT "} \t " \
@@ -36,7 +38,9 @@ class optionst;
   "makes reads from given volatile variable non-deterministic\n" \
   " {y--" NONDET_VOLATILE_MODEL_OPT "} {uvariable}:{umodel} \t " \
   "models reads from given volatile variable by a call to the given model\n" \
-// clang-format on
+  " {y--" NONDET_VOLATILE_WRITE_MODEL_OPT "} {uvariable}:{umodel} \t " \
+  "models writes to given volatile variable by a call to the given model, " \
+  "which must be a void function taking the written value\n" // clang-format on
 
 void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options);
 
@@ -53,8 +57,7 @@ void nondet_volatile(goto_modelt &goto_model, const optionst &options);
 ///   should be havocked
 void nondet_volatile(
   goto_modelt &goto_model,
-  std::function<bool(const exprt &)> should_havoc = [](const exprt &) {
-    return true;
-  });
+  std::function<bool(const exprt &)> should_havoc = [](const exprt &)
+  { return true; });
 
 #endif // CPROVER_GOTO_INSTRUMENT_NONDET_VOLATILE_H

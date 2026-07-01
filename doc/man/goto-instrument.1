@@ -382,6 +382,38 @@ cbmc --function get_message_test get_message_test-mod.gb
 
 Now the final invocation of \fBcbmc\fR(1) reports verification success.
 .TP
+\fB\-\-nondet\-volatile\-write\-model\fR \fIvariable\fR:\fImodel\fR
+Symmetrically to \fB\-\-nondet\-volatile\-model\fR, writes to a volatile variable
+can be routed to a model. This is useful to observe or check the values a driver
+writes to a device register. The model must be a \fBvoid\fR function taking a
+single parameter of the variable's type, which receives the written value. For
+example, to check that a driver only ever writes values with the \fIENABLE\fR
+bit set to a control register:
+
+.EX
+.in +4n
+\fBextern\fP \fBvolatile\fP uint32_t control;
+
+\fB// model for writes to the variable control\fP
+void \fBcontrol_write_model\fP(uint32_t value) {
+  \fB__CPROVER_assert\fP(value & 1, "ENABLE bit is set");
+}
+.in
+.EE
+
+.EX
+.in +4n
+goto-instrument --nondet-volatile-write-model control:control_write_model \\
+  driver.gb driver-mod.gb
+.in
+.EE
+
+Each write to \fIcontrol\fR is then followed by a call to
+\fIcontrol_write_model\fR with the written value. Even without a model, writes
+to a volatile variable that is modelled as a device (via \fB\-\-nondet\-volatile\fR
+or \fB\-\-nondet\-volatile\-variable\fR) are preserved as observable side effects,
+so that they are not removed as dead code once reads are non-deterministic.
+.TP
 \fB\-\-isr\fR \fIfunction\fR
 instruments an interrupt service routine
 .TP
