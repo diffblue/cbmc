@@ -84,6 +84,26 @@ cpp_typecheckt::template_suffix(const cpp_template_args_tct &template_args)
       constant_expression_contextt constant_expression_guard{*this};
       exprt e = expr;
 
+      // N5008 [temp.arg.nontype]/2: a non-type template argument for a
+      // reference or pointer parameter designates an object (it is the
+      // address of an object with static storage duration), not a value --
+      // e.g. reference_counting<T>'s `const T &empty = T::blank`, whose
+      // argument is `&T::blank`.  Build the instance-name suffix from the
+      // object's identity (its symbol name) rather than folding the referenced
+      // symbol to its value below: equal objects yield equal suffixes (so the
+      // same specialization is reused) and distinct objects yield distinct
+      // suffixes, while folding would both lose that identity and turn the
+      // argument into address-of-a-value, which is not a constant expression.
+      if(
+        e.id() == ID_address_of && e.operands().size() == 1 &&
+        e.operands().front().id() == ID_symbol)
+      {
+        result += '&';
+        result +=
+          id2string(to_symbol_expr(e.operands().front()).get_identifier());
+        continue;
+      }
+
       // Recursively resolve constant symbols to their values, so that
       // expressions like "1000000000000000000l * ::value" can be evaluated.
       // Multiple passes may be needed for chains of symbol references.
