@@ -4632,7 +4632,21 @@ bool Parser::rDeclarator(
 
     if(!should_be_declarator)
     {
-      if((kind==kDeclarator || kind==kCastDeclarator) && d_outer.is_nil())
+      // N5008 [dcl.ambig.res], [dcl.decl]: `(` after the leading part of a
+      // declarator introduces either a parenthesised (nested) declarator or a
+      // function parameter-list.  When there is no leading ptr-operator
+      // (d_outer nil), `T()` is a function and must be re-parsed as such
+      // (backtrack) unless a postfix `(`/`[` follows (e.g. `T(*)()`).  The same
+      // holds when a ptr-operator DOES precede an EMPTY `()`: `int*()` and
+      // `int&()` are functions returning `int*` / `int&`, not a pointer/
+      // reference grouping -- an empty parenthesised declarator would not group
+      // anything.  A non-empty nested declarator (a name or ptr-operator, e.g.
+      // `int*(*p)()`) is a genuine grouping and is left alone.
+      const bool empty_nested =
+        declarator2.name().is_nil() && declarator2.type().is_nil();
+      if(
+        (kind == kDeclarator || kind == kCastDeclarator) &&
+        (d_outer.is_nil() || empty_nested))
       {
         t=lex.LookAhead(0);
         if(t!='[' && t!='(')
