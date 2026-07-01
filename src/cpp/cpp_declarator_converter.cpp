@@ -809,7 +809,25 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       }
     }
     else
+    {
+      // N5008 [dcl.init.ref], [dcl.init]/16: reference direct-initialization
+      // written with parentheses or braces, `T &r(init)` / `T &r{init}`, is
+      // stored by the parser as init_args rather than as a value.  A reference
+      // is not an object initialized by a constructor, so it is not handled by
+      // the object init_args path; attach the single initializer as the symbol
+      // value so convert_initializer performs the reference binding (exactly
+      // like `T &r = init`), and clear init_args so the declaration statement
+      // does not later see leftover init_args.
+      if(
+        new_symbol->value.is_nil() && is_reference(new_symbol->type) &&
+        declarator.init_args().has_operands() &&
+        declarator.init_args().operands().size() == 1)
+      {
+        new_symbol->value = declarator.init_args().operands().front();
+        declarator.remove(ID_init_args);
+      }
       cpp_typecheck.convert_initializer(*new_symbol);
+    }
   }
 
   enforce_rules(*new_symbol);
