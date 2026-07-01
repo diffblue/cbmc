@@ -22,6 +22,7 @@ Date: September 2011
 #include <util/std_expr.h>
 #include <util/string_utils.h>
 
+#include <goto-programs/goto_instruction_code.h>
 #include <goto-programs/goto_model.h>
 
 class nondet_volatilet
@@ -171,8 +172,7 @@ void nondet_volatilet::nondet_volatile_rhs(
   Forall_operands(it, expr)
     nondet_volatile_rhs(symbol_table, *it, pre, post);
 
-  if(expr.id()==ID_symbol ||
-     expr.id()==ID_dereference)
+  if(expr.id() == ID_symbol || expr.id() == ID_dereference)
   {
     const namespacet ns(symbol_table);
 
@@ -189,23 +189,23 @@ void nondet_volatilet::nondet_volatile_lhs(
   goto_programt &pre,
   goto_programt &post)
 {
-  if(expr.id()==ID_if)
+  if(expr.id() == ID_if)
   {
     nondet_volatile_rhs(symbol_table, to_if_expr(expr).cond(), pre, post);
     nondet_volatile_lhs(symbol_table, to_if_expr(expr).true_case(), pre, post);
     nondet_volatile_lhs(symbol_table, to_if_expr(expr).false_case(), pre, post);
   }
-  else if(expr.id()==ID_index)
+  else if(expr.id() == ID_index)
   {
     nondet_volatile_lhs(symbol_table, to_index_expr(expr).array(), pre, post);
     nondet_volatile_rhs(symbol_table, to_index_expr(expr).index(), pre, post);
   }
-  else if(expr.id()==ID_member)
+  else if(expr.id() == ID_member)
   {
     nondet_volatile_lhs(
       symbol_table, to_member_expr(expr).struct_op(), pre, post);
   }
-  else if(expr.id()==ID_dereference)
+  else if(expr.id() == ID_dereference)
   {
     nondet_volatile_rhs(
       symbol_table, to_dereference_expr(expr).pointer(), pre, post);
@@ -233,6 +233,28 @@ void nondet_volatilet::nondet_volatile(
         symbol_table, instruction.assign_rhs_nonconst(), pre, post);
       nondet_volatile_lhs(
         symbol_table, instruction.assign_lhs_nonconst(), pre, post);
+
+      // A write to a volatile lvalue is an observable side effect: it acts on
+      // the device rather than merely updating storage the program later
+      // reads. When volatile reads are modelled non-deterministically the
+      // written value is never read back, so without this the store would be
+      // sliced away as dead. Emit an OUTPUT of the written value so the write
+      // is preserved and appears in counterexample traces (the device-write
+      // half of the MMIO device-environment model).
+      if(all_nondet)
+      {
+        const namespacet ns(symbol_table);
+        const exprt &lhs = instruction.assign_lhs();
+        if(is_volatile(ns, lhs.type()))
+        {
+          post.instructions.push_back(goto_programt::make_other(
+            code_outputt{
+              "volatile-write",
+              instruction.assign_rhs(),
+              instruction.source_location()},
+            instruction.source_location()));
+        }
+      }
     }
     else if(instruction.is_function_call())
     {
@@ -242,9 +264,9 @@ void nondet_volatilet::nondet_volatile(
         to_code_function_call(instruction.code_nonconst());
 
       // do arguments
-      for(exprt::operandst::iterator
-          it=code_function_call.arguments().begin();
-          it!=code_function_call.arguments().end();
+      for(exprt::operandst::iterator it =
+            code_function_call.arguments().begin();
+          it != code_function_call.arguments().end();
           it++)
         nondet_volatile_rhs(symbol_table, *it, pre, post);
 
