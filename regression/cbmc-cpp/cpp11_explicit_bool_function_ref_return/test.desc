@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ explicit operator bool of fn<int&\(\)> in boolean context: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^(ERROR|error): invalid implicit conversion
+--
+N5008 [dcl.decl]/4, [conv.bool]: a class template partial specialization matched
+on a function type with a reference return and no parameters (fn<int&()>, the
+shape of std::function<exprt&()> in util/expr_iterator.h) provides an explicit
+operator bool used in a boolean context.  Requires the empty () after the
+reference return to be parsed as a function parameter-list.  assertion.2 FAILURE
+proves non-vacuity.
