@@ -4,14 +4,11 @@
 // mem-initializer of a constructor names the member.  Here `pair stored{-1, 7}`
 // must initialize `stored` by calling `pair(int, int)` with the list elements.
 //
-// CBMC instead default-constructs the member (ignoring the braced default
-// member initializer), which fails for a class with no default constructor:
+// CBMC previously default-constructed the member (ignoring the braced default
+// member initializer), which failed for a class with no default constructor:
 // "found no match for symbol 'pair'".  g++ and clang++ accept the program.
 //
-// KNOWN BUG: the braced default member initializer of a class-typed member is
-// dropped during implicit default-constructor synthesis.  Flip to CORE once the
-// default member initializer's braced-init-list is forwarded to the member's
-// constructor.  assertion.2 must FAIL (non-vacuity).
+// assertion.2 must FAIL (non-vacuity).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
