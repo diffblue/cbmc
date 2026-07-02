@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unique_ptr member holds its value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+instantiating 'std::__enable_if_t' with <FALSE
+--
+N5008 [temp.inst]/2: member function templates of a class template are not
+instantiated when the enclosing specialization is instantiated; their
+signatures stay dependent on their own template parameters until odr-used.
+
+CBMC concretizes std::unique_ptr<T>'s =delete'd deleter constructor template
+during instantiation of unique_ptr<T> (substituting the default
+_Del=deleter_type=default_delete<T> and evaluating the parameter type), which
+demands std::enable_if_t<false>::type and hard-errors ("instantiating
+std::__enable_if_t with <FALSE, default_delete&&>" at unique_ptr.h:354).  g++
+and clang++ accept the program.
+
+Root cause of the enable_if_t<false> dog-food failures in parse_options.cpp,
+irep_serialization.cpp and ui_message.cpp (all hold std::unique_ptr members).
+This is an instance of the deferred lazy member-function-template instantiation
+work.  Flip to CORE once member function templates are kept dependent (not
+concretized) during class-template instantiation.
