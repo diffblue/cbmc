@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced base-ctor arg selects the vec-taking overload: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+does not uniquely resolve
+--
+N5008 [over.match.list], [over.ics.list], [over.ics.rank]: list-initializing a
+class from a braced-init-list ranks its constructors by the element conversion
+sequences; a constructor taking the elements directly (vec(int) for {7}) is
+preferred over the copy/move constructor (whose ICS from {7} is a user-defined
+conversion).  CBMC treats both as equally viable and reports "symbol 'vec' does
+not uniquely resolve".  Same error class as the "symbol 'codet' does not
+uniquely resolve" dog-food noise (std_code.h, `codet(ID_assume, {std::move(expr)})`).
+Flip to CORE once brace-init overload ranking prefers the direct
+element-taking constructor.
