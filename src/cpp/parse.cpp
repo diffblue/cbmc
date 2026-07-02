@@ -5131,6 +5131,18 @@ bool Parser::optPtrOperator(typet &ptrs)
       typet op(ID_frontend_pointer); // width gets set during conversion
       op.set(ID_C_reference, true);
       set_location(op, tk);
+      // GCC/Clang extension: a reference may carry a restrict-qualifier
+      // (`T & __restrict`).  N5008 [dcl.ref]/1 forbids cv-qualified
+      // references, so `const`/`volatile` are not accepted here; but
+      // `__restrict` on a reference is an aliasing hint that GCC and Clang
+      // accept (libstdc++ uses it, e.g. `__class_type_info::__do_upcast`'s
+      // `__upcast_result& __restrict` parameter in <cxxabi.h>).  Consume and
+      // ignore it -- restrict has no bearing on verification semantics.
+      while(lex.LookAhead(0) == TOK_RESTRICT)
+      {
+        cpp_tokent restrict_tk;
+        lex.get_token(restrict_tk);
+      }
       t_list.push_front(op);
     }
     else if(t==TOK_ANDAND) // &&, these are C++0x rvalue refs
@@ -5141,6 +5153,13 @@ bool Parser::optPtrOperator(typet &ptrs)
       op.set(ID_C_reference, true);
       op.set(ID_C_rvalue_reference, true);
       set_location(op, tk);
+      // See the `&` case above: accept and ignore a GCC/Clang `__restrict`
+      // qualifier on the reference.
+      while(lex.LookAhead(0) == TOK_RESTRICT)
+      {
+        cpp_tokent restrict_tk;
+        lex.get_token(restrict_tk);
+      }
       t_list.push_front(op);
     }
   }
