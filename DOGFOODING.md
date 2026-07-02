@@ -432,6 +432,45 @@ Both "smaller" targets are genuine front-end issues but not quick wins.
 
 *Updated: 2026-07-01*
 
+### 2026-07-02 codet cluster fixed (fixes #24, #25) + re-baseline 85/21/11/0
+
+Tackled the `codet` "does not uniquely resolve" cluster (11 errors in
+std_code.h; std_code.cpp now compiles with **0** errors).  It had **two**
+distinct root causes, both fixed:
+
+* **#24 rank pollution** (`cpp_typecheck_conversions.cpp`,
+  `implicit_conversion_sequence`): on the path where both the standard and the
+  user-defined conversion attempts fail, `rank` was returned without being
+  restored to its saved `backup_rank`, leaking `user_defined_conversion_sequence`'s
+  `+4` penalty.  `cpp_typecheck_fargst::match` tries alternative conversions in
+  sequence sharing one `rank`, so a failed init-list->scalar attempt inflated
+  the next viable single-element conversion's rank — mis-ranking a value
+  constructor's identity element conversion (rank 0) as user-defined (4) and
+  tying it with the copy constructor, violating N5008 [over.ics.rank]/(3.1)
+  (standard beats user-defined).  CORE `cpp11_braced_init_overload_rank`
+  (was KNOWNBUG).
+
+* **#25 inherited base ctors as brace-init candidates**
+  (`cpp_typecheck_fargs.cpp`, `brace_init_is_viable` fallback loop): the loop
+  iterated `from_base` constructor components.  Since `exprt` and
+  `source_locationt` both derive from `irept`, `source_locationt` carried
+  irept's inherited `irept(const irept&)` / `irept(const sharing_treet&)` copy
+  constructors, and `exprt -> const irept&` is a derived-to-base binding — so
+  `source_locationt` looked constructible from an `exprt`, tying
+  `codet(dstringt, source_locationt)` with `codet(dstringt, operandst)`.  Per
+  N5008 [over.match.ctor]/1 + [namespace.udecl]/3 base ctors are not candidates
+  unless inherited via `using` (CBMC materialises those as non-`from_base`
+  components).  Skip `from_base` ctors in the loop.  CORE
+  `cpp11_braced_init_base_ctor` (reproduces pre-fix as ambiguous).
+
+Both fixes: BOTH regression suites green (cbmc-cpp -X libcxx; cbmc -j4),
+clang-format clean.  Dog-food `--expand` re-baseline: **85 clean / 21 noisy /
+11 FAIL / 0 CRASH** (was 83/23/11/0).  The 11 FAILs are the deeper deferred
+issues (enable_if/unique_ptr lazy instantiation, parser 'read', optional/lookup/
+remove "found no match", CONVERSION ERROR).
+
+*Updated: 2026-07-02*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
