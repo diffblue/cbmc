@@ -4253,6 +4253,19 @@ exprt cpp_typecheck_resolvet::resolve(
   }
   const bool is_operator_name =
     id2string(base_name).compare(0, 8, "operator") == 0;
+  // Snapshot the candidates produced by ordinary (scope) lookup, before
+  // ADL augments the set below.  The [class.member.lookup]/4 hiding rule
+  // must only prune base-class members that resolve_with_arguments (ADL)
+  // conservatively *added*.  A base-class member that ordinary lookup
+  // already found in the derived class's scope is there because a
+  // using-declaration (N5008 [namespace.udecl]/3) imported it into the
+  // derived class; per [namespace.udecl]/16 such a member joins the derived
+  // class's members of the same name in a single overload set and is NOT
+  // hidden.  (Members merely visible through inheritance are represented as
+  // flattened `from_base` components whose declaring class is the derived
+  // class, so they never trip the base-of test in the first place.)
+  const cpp_scopest::id_sett ordinary_lookup_id_set = id_set;
+
   if(
     !qualified && !fargs.has_object &&
     !(ordinary_lookup_found_member && !is_operator_name))
@@ -4308,6 +4321,17 @@ exprt cpp_typecheck_resolvet::resolve(
     {
       const irep_idt &cand_class = cand->class_identifier;
       if(cand_class.empty())
+      {
+        filtered.insert(cand);
+        continue;
+      }
+      // A candidate found by ordinary lookup (i.e. present before ADL
+      // augmented the set) is never hidden here: if its declaring class is
+      // a base class, it was brought into the derived class by a
+      // using-declaration and participates in overload resolution
+      // ([namespace.udecl]/16).  Only ADL-added base members are subject to
+      // the hiding rule below.
+      if(ordinary_lookup_id_set.find(cand) != ordinary_lookup_id_set.end())
       {
         filtered.insert(cand);
         continue;
