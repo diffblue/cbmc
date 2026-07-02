@@ -4059,20 +4059,49 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       const struct_typet &vt_struct =
         follow_tag(to_struct_tag_type(this_type.base_type()));
 
-      // Find the vtable pointer component — it may be inherited from a
-      // base class, so search by the ID_is_vtptr flag rather than by name.
+      // Find the vtable pointer component to dispatch through.  A class may
+      // carry several vtable pointers: N5008 [class.virtual]/2 says a class
+      // that introduces new virtual functions (beyond those of its bases) has
+      // them dispatched through its own vtable, which CBMC models as a
+      // separate `virtual_table::<class>` struct with its own vtable pointer
+      // component.  The called function's vtable slot lives in the vtable of
+      // the class that (first) declared it; that slot's base_name is the
+      // function's virtual-name.  Selecting the *first* vtable pointer would
+      // wrongly look up a derived class's new virtual (e.g. `doit()`) in a
+      // base class's vtable and fail with "member ... not found".  So pick the
+      // vtable pointer whose vtable struct actually contains an entry for this
+      // virtual-name, falling back to the first pointer otherwise.
+      const irep_idt virtual_name =
+        expr.function().type().get(ID_C_virtual_name);
       irep_idt vtable_name;
       const struct_typet::componentt *vt_compo_ptr = nullptr;
+      const struct_typet::componentt *first_vtptr = nullptr;
       for(const auto &c : vt_struct.components())
       {
-        if(c.get_bool(ID_is_vtptr))
+        if(!c.get_bool(ID_is_vtptr))
+          continue;
+        if(first_vtptr == nullptr)
+          first_vtptr = &c;
+        const typet &vt_tag = to_pointer_type(c.type()).base_type();
+        if(vt_tag.id() != ID_struct_tag)
+          continue;
+        const struct_typet &candidate_vt =
+          follow_tag(to_struct_tag_type(vt_tag));
+        for(const auto &entry : candidate_vt.components())
         {
-          vt_compo_ptr = &c;
-          vtable_name = c.get_name();
-          break;
+          if(entry.get_base_name() == virtual_name)
+          {
+            vt_compo_ptr = &c;
+            break;
+          }
         }
+        if(vt_compo_ptr != nullptr)
+          break;
       }
+      if(vt_compo_ptr == nullptr)
+        vt_compo_ptr = first_vtptr;
       CHECK_RETURN(vt_compo_ptr != nullptr);
+      vtable_name = vt_compo_ptr->get_name();
       const struct_typet::componentt &vt_compo = *vt_compo_ptr;
 
       vtptr_member.set(ID_component_name, vtable_name);
