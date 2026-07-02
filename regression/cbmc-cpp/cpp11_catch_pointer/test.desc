@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ catch\(int \*\) handler type-checks; normal path runs: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+Invariant check failed
+to_reference_type
+^CONVERSION ERROR$
+--
+N5008 [except.handle]: a `catch(T *)` handler must type-check.  Regression test
+for the invariant violation in cpp_exception_list_rec, which used
+to_reference_type (asserting ID_C_reference) on a genuine pointer handler type.
+Surfaced in CBMC's own typecheck.cpp.
