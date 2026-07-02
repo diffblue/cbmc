@@ -18,9 +18,7 @@
 // `codet(ID_assume, {std::move(expr)})` must pick the
 // `codet(irep_idt, std::vector<exprt>)` constructor.
 //
-// KNOWN BUG: brace-init overload ranking does not prefer the direct
-// element-taking constructor over the copy/move constructor.  Flip to CORE once
-// it does.  assertion.2 must FAIL (non-vacuity).
+// assertion.2 must FAIL (non-vacuity).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
