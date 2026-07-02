@@ -19,6 +19,29 @@ TEST_CASE("cmdlinet::has_option", "[core][util][cmdline]")
   REQUIRE(!cmdline.has_option("c"));
 }
 
+TEST_CASE("cmdlinet::set char option", "[core][util][cmdline]")
+{
+  cmdlinet cmdline;
+  REQUIRE(!cmdline.parse(0, nullptr, "I:D:f:"));
+
+  cmdline.set('I', "/some/path");
+  cmdline.set('I', "/another/path");
+  cmdline.set('D', "FOO=1");
+
+  REQUIRE(cmdline.isset('I'));
+  REQUIRE(cmdline.isset('D'));
+  REQUIRE(!cmdline.isset('f'));
+
+  auto &i_values = cmdline.get_values('I');
+  REQUIRE(i_values.size() == 2);
+  REQUIRE(i_values.front() == "/some/path");
+  REQUIRE(i_values.back() == "/another/path");
+
+  auto &d_values = cmdline.get_values('D');
+  REQUIRE(d_values.size() == 1);
+  REQUIRE(d_values.front() == "FOO=1");
+}
+
 TEST_CASE("cmdline::option_names", "[core][util][cmdline]")
 {
   cmdlinet cmdline;
