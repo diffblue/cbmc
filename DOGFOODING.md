@@ -557,6 +557,32 @@ bug to investigate next, not a regression of this fix.
 
 *Updated: 2026-07-02*
 
+### 2026-07-02 pointer exception-handler fix (fix #29) + 88/21/8/0 (0 crashes)
+
+Fixed the invariant-violation CRASH newly exposed in typecheck.cpp by fix #28.
+
+* **#29 pointer catch-handler type-id computation** (`cpp_exception_id.cpp`,
+  `cpp_exception_list_rec`): a C++ reference is represented internally as a
+  pointer with ID_C_reference; the code extracted the pointee/referent type
+  with `to_reference_type` in BOTH the reference and the plain-pointer branches.
+  `to_reference_type` asserts ID_C_reference, so a genuine pointer handler such
+  as `catch(int *)` tripped its precondition
+  (`can_cast_type<reference_typet>`) and aborted goto-cc.  N5008 [except.handle].
+  Fix: extract the base type with `to_pointer_type` (valid for references too);
+  only the "_ptr" exception-id marker still differs.  CORE `cpp11_catch_pointer`
+  (reproduces pre-fix as an invariant violation).
+
+BOTH regression suites green, clang-format clean.  Dog-food re-baseline:
+**88 clean / 21 noisy / 8 FAIL / 0 CRASH** (was 88/20/8/1): typecheck.cpp no
+longer crashes -- it now compiles to a goto binary, leaving only the
+pre-existing `<< eom` message.h noise.  The 8 remaining FAILs are the deferred
+enable_if/lazy-instantiation work (irep_serialization, parse_options), the
+SFINAE converting-ctor cases (simplify_utils 'optional', tempfile
+std::filesystem 'remove'), std::istream member registration (parser/lispexpr
+'read'), std::basic_regex (interval_union), and memory_info 'mallinfo'.
+
+*Updated: 2026-07-02*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
