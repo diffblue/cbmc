@@ -89,6 +89,22 @@ void cmdlinet::set(const std::string &option, const std::string &value)
   }
 }
 
+void cmdlinet::set(char option, const std::string &value)
+{
+  auto i = getoptnr(option);
+
+  if(i.has_value())
+  {
+    options[*i].isset = true;
+    options[*i].values.push_back(value);
+  }
+  else
+  {
+    throw invalid_command_line_argument_exceptiont(
+      "unknown command line option", std::string(1, option));
+  }
+}
+
 static std::list<std::string> immutable_empty_list;
 
 const std::list<std::string> &cmdlinet::get_values(char option) const
