@@ -365,6 +365,22 @@ clusters:
     to its element for a scalar target ([dcl.init.list]/3.9).  Flips the
     KNOWNBUG `cpp11_scalar_member_default_brace_init` to CORE.
 
+23. `c44adf9046` — **alias-template argument deduction terminates**
+    (N5008 [temp.alias]/2, [temp.deduct.type]).  guess_template_args detected an
+    alias-template pattern by an *unqualified* base-name lookup that ignored
+    qualification.  After expanding a member alias template to its qualified
+    underlying type (libstdc++ regex's `_BracketMatcher<I,C>` ->
+    `__detail::_BracketMatcher<_TraitsT,I,C>`), it re-looked-up the expansion's
+    base name unqualified, re-found the member alias, and re-expanded until the
+    stack overflowed (a crash exposed once fix #19 enabled the deduction path
+    reaching this alias).  Fixed by alias-expanding only unqualified
+    template-ids; deduction now terminates and binds arguments correctly.  CORE
+    test `cpp11_alias_template_deduction` (found by cvise-reducing the regex
+    crash to 43 lines).  `cpp11_regex_match`'s guess_template_args cascade is
+    resolved (its "regex match" assertion now verifies SUCCESSFUL); it stays
+    KNOWNBUG only for a separate, now-reachable libstdc++ locale-facet
+    dereference-modelling gap.
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
