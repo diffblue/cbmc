@@ -381,6 +381,28 @@ clusters:
     KNOWNBUG only for a separate, now-reachable libstdc++ locale-facet
     dereference-modelling gap.
 
+### 2026-07-02 dog-food re-baseline (after fixes #18-23)
+
+`--expand` sweep of all 117 src/util/*.cpp: **83 clean / 23 noisy / 11 FAIL /
+0 CRASH** (was 42 / 64 / 11 / 0 on 2026-07-01).  The session's fixes -- notably
+#20 (braced-init constructor templates) clearing the dominant "no match for
+symbol 'insert'" cluster -- nearly doubled the clean count and cut noise 64->23.
+No regressions, no crashes.
+
+Next-target triage: the remaining FAILs/noise are now diverse.  The highest-
+impact FAIL cluster is `enable_if_t<false>` during `std::unique_ptr` member
+elaboration (parse_options.cpp, irep_serialization.cpp, ui_message.cpp).  Root
+cause diagnosed (backtrace + probe): CBMC concretizes unique_ptr's =delete'd
+deleter constructor *template* during class-template instantiation -- the
+member function template loses its template-ness (is_template=0) and its
+enable_if_t<false> signature is eagerly evaluated -- violating N5008
+[temp.inst]/2 (member function templates stay dependent until odr-used).  This
+is a concrete instance of the deferred lazy member-function-template
+instantiation work; a partial fix leaves a malformed model.  Captured as
+KNOWNBUG `cpp11_unique_ptr_member_enable_if`; the proper fix (keep member
+function templates dependent during class-template instantiation) is scoped as
+a dedicated follow-up rather than rushed.
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
