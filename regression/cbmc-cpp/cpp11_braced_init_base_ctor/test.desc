@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced sibling arg does not match base-inherited ctor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+does not uniquely resolve
+--
+N5008 [over.match.ctor]/1, [namespace.udecl]/3: base-class constructors are not
+candidates for initializing a derived object unless inherited via a
+using-declaration.  A brace-init-list of a sibling type (sharing a common base)
+must not be viable for a class through the base's inherited copy constructor.
+Regression test for the "symbol 'codet' does not uniquely resolve" front-end
+bug (std_code.h): exprt and source_locationt both derive from irept, and
+codet(dstringt, source_locationt) was spuriously viable for
+codet(ID_assume, {std::move(expr)}).
