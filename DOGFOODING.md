@@ -501,6 +501,34 @@ parser std::istream 'read', + scattered CONVERSION ERROR.
 
 *Updated: 2026-07-02*
 
+### 2026-07-02 __restrict-qualified reference fix (fix #27)
+
+Fixed the `invariant.cpp` parse error (and any translation unit that
+transitively includes <typeinfo>).
+
+* **#27 __restrict on a reference declarator** (`cpp/parse.cpp`,
+  `Parser::optPtrOperator`): the parser consumed a cv-qualifier sequence after
+  `*` (so `T * __restrict` parsed) but nothing after `&` / `&&`.  libstdc++'s
+  <cxxabi.h> declares `__class_type_info::__do_upcast` with an
+  `__upcast_result& __restrict __result` parameter -- a GCC/Clang extension
+  ([dcl.ref]/1 forbids cv-qualified references, but both compilers accept a
+  restrict-qualifier on a reference).  So invariant.cpp failed with
+  "parse error before 'virtual bool __do_upcast ('".  Fix: accept and ignore a
+  `__restrict` token after `&` / `&&`; `const` / `volatile` on a reference
+  remain ill-formed and are still rejected.  CORE `cpp11_restrict_reference`
+  (reproduces pre-fix as a parse error; covers lvalue- and rvalue-ref).
+
+Verified directly: invariant.cpp went from parse error to a clean goto binary.
+BOTH regression suites green, clang-format clean.  Note: typecheck.cpp and
+ui_message.cpp remain FAIL with a *pre-existing* messaget/message_handlert
+virtual-table "member not found" error (confirmed identical before and after
+this fix -- it is the messaget/`<< eom` cluster, not a regression).  Dog-food
+aggregate count fluctuates run-to-run for the largest files (typecheck.cpp,
+ui_message.cpp) near the memory/time caps; invariant.cpp is a confirmed,
+reproducible fix.
+
+*Updated: 2026-07-02*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
