@@ -4704,6 +4704,43 @@ resolved_after_strip:
     }
     if(!has_class_type_no_args)
     {
+      // N5008 [basic.scope.hiding]/2: a class or enumeration name is hidden by
+      // a variable, function, or enumerator of the same name declared in the
+      // same scope, wherever that non-type name is visible.  When ordinary
+      // lookup for a value (want == VAR) yields both a type and such a
+      // *different* entity of the same name, the type name is hidden and must
+      // not contribute a constructor candidate.  Without this, a C-style
+      // declaration pair such as `struct S { ... }; S S(void);` -- e.g. POSIX
+      // `struct stat`/`stat()` or glibc `struct mallinfo`/`mallinfo()`
+      // (memory_info.cpp) -- makes the call `S()` ambiguous between the
+      // function and the hidden type's constructor.
+      //
+      // The hiding entity must be a *different* declaration, not the type's own
+      // members: a class's constructors resolve under the class's name too
+      // (their base_name is the class name) but are part of the type, and an
+      // uninstantiated constructor template appears as a non-code
+      // cpp_declaration.  So only a genuine function -- an ID_code symbol whose
+      // return type is not ID_constructor -- counts as hiding here; this keeps
+      // ordinary construction (e.g. `allocator`, `basic_string`) unaffected.
+      // (Type and hiding function necessarily share a scope: RECURSIVE scope
+      // lookup stops at the first scope that declares the name.)
+      auto is_hiding_function = [](const exprt &e)
+      {
+        return e.id() != ID_type && e.type().id() == ID_code &&
+               to_code_type(e.type()).return_type().id() != ID_constructor;
+      };
+      const bool has_hiding_function =
+        std::any_of(identifiers.begin(), identifiers.end(), is_hiding_function);
+      if(has_hiding_function)
+      {
+        identifiers.erase(
+          std::remove_if(
+            identifiers.begin(),
+            identifiers.end(),
+            [](const exprt &e) { return e.id() == ID_type; }),
+          identifiers.end());
+      }
+
       // N5008 [temp.inst]/2: constructing an object of a class template
       // specialization is a context that requires a completely-defined type,
       // which implicitly instantiates the specialization.  An identifier here
