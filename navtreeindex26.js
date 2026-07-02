@@ -1,5 +1,6 @@
 var NAVTREEINDEX26 =
 {
+"classdfcc__cfg__infot.html#aef94d5df9a8ea9ca48aa58c2fc727544":[7,0,382,20],
 "classdfcc__cfg__infot.html#afaf5b1f7b51cf06092b116ec3e4fb8f2":[7,0,382,13],
 "classdfcc__cfg__infot.html#afddcac3ee895c3078d65517121a2aeac":[7,0,382,8],
 "classdfcc__contract__clauses__codegent.html":[7,0,383],
@@ -248,6 +249,5 @@ var NAVTREEINDEX26 =
 "classdfcc__spec__functionst.html#acd60b1384b73a31c9406069f7957db01":[7,0,397,2],
 "classdfcc__spec__functionst.html#acf46fea9e65293103445baa51367ab78":[7,0,397,9],
 "classdfcc__spec__functionst.html#ae01cd450e354bad745285d7676da5a25":[7,0,397,0],
-"classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7":[7,0,397,6],
-"classdfcc__swap__and__wrapt.html":[7,0,398]
+"classdfcc__spec__functionst.html#aee89c7ad74728f279407a672d8393ec7":[7,0,397,6]
 };

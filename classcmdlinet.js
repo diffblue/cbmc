@@ -21,6 +21,7 @@ var classcmdlinet =
     [ "parse", "classcmdlinet.html#ac32a013f44be26fff72c427f28f1d0dd", null ],
     [ "parse_arguments", "classcmdlinet.html#a94de8e43c334d50ff1c81ec4993b135f", null ],
     [ "parse_optstring", "classcmdlinet.html#ad44a2012e1233eae47d50995a1e56efb", null ],
+    [ "set", "classcmdlinet.html#af62344f681b97bbd51ad8594d0f23a08", null ],
     [ "set", "classcmdlinet.html#abb46ce3a9964c020f286513f6fa70654", null ],
     [ "set", "classcmdlinet.html#a17ea4a01226663feb6e2f60a8ac3a6d8", null ],
     [ "set", "classcmdlinet.html#a9efb232dfe1d26a2caf31309298a2360", null ],

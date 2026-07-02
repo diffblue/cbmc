@@ -1,5 +1,6 @@
 var NAVTREEINDEX56 =
 {
+"classremove__instanceoft.html":[7,0,1017],
 "classremove__instanceoft.html#a239af9968edce918c7a108877ba17359":[7,0,1017,2],
 "classremove__instanceoft.html#a64bbc8820607230e1da40e499bc62f9b":[7,0,1017,5],
 "classremove__instanceoft.html#a6c011287d86d10781105474ccfd82bc3":[7,0,1017,1],
@@ -106,8 +107,8 @@ var NAVTREEINDEX56 =
 "classreplication__exprt.html#af7b233e7c592a3e935f38892cfa0436b":[7,0,1027,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[7,0,1,0],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html":[6,0,6,0],
-"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[7,0,1,0,2],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[6,0,6,0,2],
+"classrequire__goto__statements_1_1no__decl__found__exceptiont.html#a767d3177baf716e70eaf79d39950ced5":[7,0,1,0,2],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[6,0,6,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ac12959524eebd6ba47d12ac704e02dc1":[7,0,1,0,1],
 "classrequire__goto__statements_1_1no__decl__found__exceptiont.html#ad237205052e4ff0c9b5cc7fac680fc96":[6,0,6,0,0],
@@ -248,6 +249,5 @@ var NAVTREEINDEX56 =
 "classsat__path__enumeratort.html":[7,0,1041],
 "classsat__path__enumeratort.html#a10a0d6f834f4ffb2aefc7667c5aa946b":[7,0,1041,14],
 "classsat__path__enumeratort.html#a12e03e24e39207f854e4e5b003cebb09":[7,0,1041,22],
-"classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a":[7,0,1041,10],
-"classsat__path__enumeratort.html#a24bb9dff5d2d01662c092d2a0a7bf3f8":[7,0,1041,18]
+"classsat__path__enumeratort.html#a1f0a34f80ddef52dd04035e2414fe76a":[7,0,1041,10]
 };
