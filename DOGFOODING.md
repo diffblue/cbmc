@@ -471,6 +471,36 @@ remove "found no match", CONVERSION ERROR).
 
 *Updated: 2026-07-02*
 
+### 2026-07-02 using-declared overload fix (fix #26) + re-baseline 88/19/10/0
+
+Fixed the "found no match for symbol 'lookup'" FAIL (pointer_predicates.cpp,
+plus lookup noise in many files).
+
+* **#26 using-declared base overloads hidden in member lookup**
+  (`cpp_typecheck_resolve.cpp`, `cpp_typecheck_resolvet::resolve`): the
+  [class.member.lookup]/4 hiding block dropped a candidate whose declaring
+  class is a base of another candidate's declaring class.  That is meant to
+  prune base members that ADL (`resolve_with_arguments`) conservatively adds,
+  but it also ran over ordinary-lookup candidates -- where a base-declared
+  candidate is present only because a using-declaration imported it into the
+  derived class (members merely inherited become flattened `from_base`
+  components whose declaring class is the *derived* class, so they never trip
+  the base-of test).  So `namespacet`'s `using namespace_baset::lookup;`
+  one-argument `const symbolt &lookup(const irep_idt&)` was discarded and
+  `ns.lookup("x")` failed.  Per N5008 [namespace.udecl]/16 a using-declared
+  base member joins the derived class's overload set and is not hidden.  Fix:
+  snapshot the ordinary-lookup candidate set before ADL augments it, and never
+  hide a candidate that was in it.  CORE `cpp11_using_decl_overload`
+  (reproduces pre-fix as "found no match for symbol 'look'").
+
+BOTH regression suites green (cbmc-cpp -X libcxx; cbmc -j4), clang-format clean.
+Dog-food `--expand` re-baseline: **88 clean / 19 noisy / 10 FAIL / 0 CRASH**
+(was 85/21/11/0).  Remaining FAILs: 2 enable_if/unique_ptr (deferred lazy
+instantiation), simplify_utils 'optional', tempfile std::filesystem 'remove',
+parser std::istream 'read', + scattered CONVERSION ERROR.
+
+*Updated: 2026-07-02*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
