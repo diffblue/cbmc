@@ -223,6 +223,24 @@ static bool brace_init_is_viable(
         continue;
       if(to_code_type(c.type()).return_type().id() != ID_constructor)
         continue;
+      // N5008 [over.match.ctor]/1 + [namespace.udecl]/3: the candidate
+      // constructors of a class are its own constructors, not those of its
+      // base classes.  A base constructor becomes a candidate only when it is
+      // inherited with a using-declaration -- and CBMC materialises such an
+      // inheriting constructor as a fresh derived-class component with
+      // `from_base` cleared (see cpp_typecheckt::typecheck_compound_declarator,
+      // "Import base class constructors as derived class constructors").  A
+      // component that is still flagged `from_base` is therefore an
+      // un-inherited base constructor merged only for member layout / access;
+      // it must not make a brace-init-list viable.  Without this guard a
+      // class deriving from `irept` (e.g. `source_locationt`) would appear
+      // constructible from any other `irept`-derived value via the inherited
+      // `irept(const sharing_treet &)` copy constructor -- making
+      // `codet(dstringt, source_locationt)` spuriously viable for
+      // `codet(ID_assume, {std::move(expr)})` and tying with the intended
+      // `codet(dstringt, std::vector<exprt>)`.
+      if(c.get_bool(ID_from_base))
+        continue;
       if(c.get_bool(ID_is_explicit))
         continue;
       const auto &params = to_code_type(c.type()).parameters();
