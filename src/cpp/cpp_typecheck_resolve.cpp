@@ -5373,12 +5373,13 @@ void cpp_typecheck_resolvet::guess_template_args(
   const typet &template_type,
   const typet &desired_type)
 {
-  // Guard against unbounded recursion on a pathological or cyclic type graph
-  // (e.g. a self-referential polymorphic class reached during deduction, as
-  // with std::less<std::error_category>).  A nesting depth far beyond any
-  // well-formed type indicates a cycle; abandon deduction for this branch
-  // rather than exhausting the stack (mirrors the existing cycle guards in the
-  // type-graph walkers, e.g. alignment()).
+  // Defensive backstop against unbounded recursion on a pathological type
+  // graph.  The root cause of the known case (a member alias template whose
+  // qualified expansion was re-treated as the unqualified alias) is fixed
+  // below by only alias-expanding unqualified template-ids; this depth guard
+  // remains as a cheap safety net for any other cyclic type graph reached
+  // during deduction, so a front-end bug degrades to an incomplete deduction
+  // rather than a stack-exhausting crash.
   static thread_local unsigned guess_template_args_depth = 0;
   if(guess_template_args_depth > 128)
     return;
@@ -5442,6 +5443,21 @@ void cpp_typecheck_resolvet::guess_template_args(
     {
       // Check if this is a template alias — if so, expand it and
       // re-try deduction with the underlying type pattern.
+      //
+      // Only an *unqualified* template-id can name an alias that is in scope
+      // for this expansion: the lookup below resolves the base name in the
+      // current scope, ignoring any qualification.  A qualified template-id
+      // (e.g. `ns::Matcher<...>`, typically the alias's own resolved target)
+      // must NOT be treated as the unqualified alias -- doing so re-expands
+      // the alias's target back into the alias and loops indefinitely
+      // (N5008 [temp.alias]: alias expansion is a one-step substitution to the
+      // fully-resolved underlying type, not a repeated re-lookup).  This is
+      // the libstdc++ regex shape, where a member alias template
+      // `_BracketMatcher<icase, collate>` expands to
+      // `__detail::_BracketMatcher<_TraitsT, icase, collate>`; without the
+      // guard, matching the expansion re-finds the member alias and recurses
+      // until the stack is exhausted.
+      if(!cpp_name.is_qualified())
       {
         irep_idt base_name = cpp_name.get_base_name();
         const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
