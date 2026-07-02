@@ -403,6 +403,33 @@ KNOWNBUG `cpp11_unique_ptr_member_enable_if`; the proper fix (keep member
 function templates dependent during class-template instantiation) is scoped as
 a dedicated follow-up rather than rushed.
 
+### 2026-07-02 smaller-target triage (both deeper than surface)
+
+Investigated the two smaller dog-food noise clusters:
+
+* **`<< eom` operator resolution** (message.h, ~15 including files): `m << eom`
+  picks the member template `operator<<(const T&)` over the non-member friend
+  `operator<<(mstreamt&, eomt)`.  NOT self-contained: minimal repros (member
+  template vs friend, incl. enclosing-class friend + ADL + a base class) all
+  resolve correctly; the failure needs the full std::ostringstream inheritance
+  context (mstreamt : std::ostringstream).  A related crash surfaced en route:
+  `std::ostringstream o; o << "hello"` aborts with a padding invariant (heavy
+  ostringstream modelling; separate issue).  Left untracked pending a
+  reproducible minimal case.
+
+* **`codet` "does not uniquely resolve"** (std_code.h, 11 errors): a
+  braced-init-list argument to an overloaded constructor
+  (`codet(ID_assume, {std::move(expr)})`) is ambiguous.  Root diagnosed
+  (probe): list-initializing a class from `{x}` gives the direct value
+  constructor and the copy/move constructor an equal args_distance (4), so
+  overload resolution ties, violating [over.ics.rank] (the value ctor should
+  win; the copy ctor's ICS from the list is a user-defined conversion).
+  Captured as KNOWNBUG `cpp11_braced_init_overload_rank` (minimal, header-free).
+  The fix touches the delicate overload-ranking code and is deferred to a
+  focused, well-validated effort.
+
+Both "smaller" targets are genuine front-end issues but not quick wins.
+
 *Updated: 2026-07-01*
 
 ### 2026-05-13 filesystem stack-overflow fix
