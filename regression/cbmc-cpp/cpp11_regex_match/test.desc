@@ -8,13 +8,20 @@ main.cpp
 Invariant violation: std::less<std::_V2::error_category>::~less
 --
 Was CORE.  Downgraded when the is_constructible empty-pack fix
-(cpp11_is_constructible_empty_pack) corrected __is_constructible<T> with an
-empty argument pack: is_constructible<std::less<std::error_category>> now
-correctly evaluates true, which enables a libstdc++ deduction path CBMC did not
-previously reach.  That path drives cpp_typecheck_resolvet::guess_template_args
-into deep recursion on std::error_category's (polymorphic, self-referential)
-type graph.  A depth guard now prevents the resulting stack overflow (the crash
-this test used to guard against), but the deduction is left incomplete, so the
-regex verification no longer reaches VERIFICATION SUCCESSFUL.  Flip back to CORE
-once guess_template_args handles the std::error_category type cycle (cycle
-detection rather than a depth cutoff) so the deduction completes.
+(cpp11_is_constructible_empty_pack) enabled a libstdc++ deduction path CBMC did
+not previously reach, which drove cpp_typecheck_resolvet::guess_template_args
+into unbounded recursion.
+
+The guess_template_args recursion is now FIXED (see
+cpp11_alias_template_deduction): the root cause was a member alias template
+(regex's _BracketMatcher) whose qualified expansion was re-looked-up unqualified
+and re-expanded the alias forever.  With the fix the deduction terminates and
+the "regex match" assertion now verifies SUCCESSFUL.
+
+This test remains KNOWNBUG for a SEPARATE, newly-reachable reason: the completed
+deduction now instantiates libstdc++'s locale/facet machinery, and
+regex_match's use of it dereferences the global locale's facet pointers
+(std::__try_use_facet: __loc->_M_impl->_M_facets, _RegexTranslatorBase's
+_M_traits) which CBMC does not model as initialised (no locale static-init
+modelling), so those dereferences fail.  Flip back to CORE once the libstdc++
+locale facet pointers are modelled (or stubbed) as validly initialised.
