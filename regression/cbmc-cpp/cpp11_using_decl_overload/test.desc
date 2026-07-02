@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ one-argument overload via using-declaration resolves: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+found no match for symbol 'look'
+--
+N5008 [namespace.udecl]/16, [class.member.lookup]/4: a base-class member
+introduced by a using-declaration joins the derived class's same-named members
+in one overload set and is not hidden by them.  Regression test for the
+"found no match for symbol 'lookup'" front-end bug on CBMC's own namespacet
+(namespace_baset::lookup re-exposed in namespacet via `using`).
