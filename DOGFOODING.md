@@ -529,6 +529,34 @@ reproducible fix.
 
 *Updated: 2026-07-02*
 
+### 2026-07-02 derived-introduced virtual dispatch fix (fix #28) + 88/20/8/1
+
+Fixed the messaget/`typecheckt` virtual-table "member not found" cluster
+(ui_message.cpp, cout_message.cpp now compile).
+
+* **#28 virtual dispatch through the wrong vtable pointer**
+  (`cpp_typecheck_expr.cpp`, `typecheck_side_effect_function_call`): CBMC models
+  each class introducing virtual functions with its own `virtual_table::<class>`
+  struct + vtable pointer, so a derived class adding NEW virtuals carries
+  several vtable pointers (inherited + own).  Virtual-call lowering selected the
+  *first* vtable pointer and looked up the slot there; for a virtual newly
+  introduced by the derived class that first pointer is a base's, whose vtable
+  lacks the slot -> "member 'virtual_table::<base>::<fn>()' of 'struct' not
+  found".  This broke CBMC's own message.h hierarchy (`typecheckt : messaget`
+  adds `typecheck()`; `message_handlert::get_ui()`).  N5008 [class.virtual]/2.
+  Fix: select the vtable pointer whose vtable struct actually contains the
+  called function's virtual-name entry.  CORE `cpp11_derived_new_virtual`
+  (override-through-base-ptr + new derived virtual + override-through-derived-ptr;
+  reproduces pre-fix as "member ... not found").
+
+BOTH regression suites green, clang-format clean.  Dog-food re-baseline:
+**88 clean / 20 noisy / 8 FAIL / 1 CRASH** (was 88/19/10/0): ui_message.cpp and
+cout_message.cpp cleared; typecheck.cpp moved from the vtable FAIL to a distinct,
+newly-exposed invariant violation (generic "Precondition") -- a separate deeper
+bug to investigate next, not a regression of this fix.
+
+*Updated: 2026-07-02*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
