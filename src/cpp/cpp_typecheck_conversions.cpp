@@ -2852,7 +2852,17 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   {
     if(!reference_binding(
          e, to_reference_type(type), new_expr, rank, cv_distance))
+    {
+      // A failed conversion attempt must not leave `rank` modified: the
+      // rank of a non-existent implicit conversion sequence is undefined,
+      // and callers commonly try several alternative conversions in
+      // sequence sharing the same `rank` accumulator (see
+      // `cpp_typecheck_fargst::match`).  A failed attempt that leaks a
+      // partial rank would inflate the next, viable attempt's rank and
+      // corrupt [over.ics.rank] ranking.  Restore the entry value.
+      rank = backup_rank;
       return false;
+    }
 
 #if 0
     simplify_exprt simplify(*this);
@@ -2886,7 +2896,10 @@ bool cpp_typecheckt::implicit_conversion_sequence(
         return true;
       }
 
-      // no conversion
+      // no conversion: restore the entry rank so a failed attempt does
+      // not pollute a subsequent viable conversion's rank (see the note
+      // on the reference-binding failure above).
+      rank = backup_rank;
       return false;
     }
 
