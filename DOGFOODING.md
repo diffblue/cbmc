@@ -781,6 +781,36 @@ silent over-acceptance, not a FAIL).
 
 *Updated: 2026-07-03*
 
+### 2026-07-03 SFINAE enforcement fix: unrecovered no-viable-function is diagnosed
+
+Landed the fix the previous entry deferred.  N5008 [temp.deduct]/8: when
+deduction removes every candidate of a call and there is no non-template
+overload, the call has no viable function and the program is ill-formed.
+resolve() kept its silent `throw 0` for this case (so recoverable callers --
+operator resolution, ADL, ranges pipes -- still absorb it via catch(int)), but a
+new SFINAE-nesting depth (sfinae_context_depth, maintained by sfinae_contextt)
+lets it record, at depth 0 only, a pending "no viable function" marker (cleared
+at every resolve() entry, so it survives only an *unrecovered* propagation).
+typecheck_method_bodies' catch then diagnoses that marker instead of rolling it
+back as unsupported-STL leniency.
+
+`cpp11_sole_template_false_constraint` is now correctly rejected (promoted to
+CORE); `cpp11_sole_template_true_constraint` still verifies (no over-rejection).
+Both regression suites pass; **dog-food unchanged 96/16/5/0**; the C suite is
+unaffected.
+
+The fix also surfaced two pre-existing latent resolution bugs that had been
+silently swallowed (the calls were dropped, bodies truncated, so the tests only
+passed vacuously):
+* Two-parameter requires-constrained `add(T,U)` is dropped -- KNOWNBUG
+  `cpp20_concepts_requires_expr` (was a fully vacuous CORE pass; proven by a
+  deliberately-false assertion still reporting SUCCESS).
+* Empty explicit pack `make_box<>()` ([temp.arg.explicit]/4) is dropped --
+  split out as KNOWNBUG `cpp11_variadic_empty_explicit_pack`; the non-empty
+  cases of `cpp11_variadic_member_alias_pack` stay CORE.
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
