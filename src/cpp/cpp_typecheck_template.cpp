@@ -110,6 +110,16 @@ void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
   const irep_idt symbol_name = class_template_identifier(
     base_name, template_type, partial_specialization_args);
 
+  // N5008 [temp.inst]/1, [temp.point]: record that a *definition* (a class
+  // body) has been seen for this class template (primary template or partial
+  // specialization), so elaborate_class_template only instantiates a
+  // specialization of a template that has actually been defined.  Recorded once
+  // a body is seen and never removed; a genuinely empty defined template
+  // `template<class> struct E {};` still has a (possibly empty) ID_body, so it
+  // is recorded and elaborates normally.
+  if(has_body)
+    defined_class_templates.insert(symbol_name);
+
   // Check if the name is already used by a different template
   // in the same scope (only for primary templates, not partial or full
   // specializations).

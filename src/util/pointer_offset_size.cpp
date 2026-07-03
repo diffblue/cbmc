@@ -315,8 +315,19 @@ std::optional<exprt> member_offset_expr(
     }
     else
     {
-      DATA_INVARIANT(
-        bit_field_bits == 0, "padding ensures offset at byte boundaries");
+      if(bit_field_bits != 0)
+      {
+        // Mirror member_offset() above: the struct is not in a well-formed
+        // byte layout -- an accumulated bit-field / boolean run has not been
+        // padded to a byte boundary before this non-bit-field member.  This
+        // occurs for a class with virtual bases, whose synthetic 1-bit
+        // `@most_derived` flag ([class.mi], modelled as a boolean) is not
+        // padded: the C++ front-end deliberately does not run add_padding() on
+        // classes with base classes (base-subobject layout is not modelled by
+        // its flattened from_base components).  Return "offset not known"
+        // rather than aborting via INVARIANT, consistently with member_offset().
+        return {};
+      }
       const typet &subtype = c.type();
       auto sub_size = size_of_expr(subtype, ns);
       if(!sub_size.has_value())

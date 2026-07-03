@@ -128,6 +128,20 @@ protected:
   // avoid triggering extra instantiations during symbol table iteration.
   std::map<irep_idt, symbolt> sfinae_alternatives;
 
+  // N5008 [temp.inst]/1, [temp.point]: a class template specialization is
+  // implicitly instantiated -- and thereby completed -- only from a
+  // *definition* of the template.  This set records the symbol names of class
+  // templates (primary templates and partial specializations) for which a
+  // definition (a class body) has been seen; typecheck_class_template inserts
+  // into it and elaborate_class_template consults it to refuse instantiating a
+  // specialization of a template that has so far only been forward-declared
+  // (which would fabricate a spurious empty class and permanently mask the
+  // members a later definition adds).  It is kept here rather than as a marker
+  // on the declaration irep so that recording a definition never perturbs
+  // template argument matching or specialization ordering, which compare and
+  // hash the declaration.
+  std::set<irep_idt> defined_class_templates;
+
   cpp_parse_treet &cpp_parse_tree;
   irep_idt current_linkage_spec;
 
