@@ -6,7 +6,7 @@
 #include "edit_distance.h"
 
 levenshtein_automatont::levenshtein_automatont(
-  const std::string &string,
+  std::string_view string,
   std::size_t allowed_errors)
 {
   const std::size_t layer_offset = string.size() + 1;
@@ -49,13 +49,13 @@ levenshtein_automatont::levenshtein_automatont(
   }
 }
 
-bool levenshtein_automatont::matches(const std::string &string) const
+bool levenshtein_automatont::matches(std::string_view string) const
 {
   return get_edit_distance(string).has_value();
 }
 
 std::optional<std::size_t>
-levenshtein_automatont::get_edit_distance(const std::string &string) const
+levenshtein_automatont::get_edit_distance(std::string_view string) const
 {
   auto current = nfa.initial_state(0);
   for(const auto c : string)
