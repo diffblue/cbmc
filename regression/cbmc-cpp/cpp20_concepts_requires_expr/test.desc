@@ -1,9 +1,22 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
-requires-expression with expression requirements.
-CBMC skips requires clauses (treats as always satisfied).
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct]/8, [temp.constr]: the two-parameter function template
+`add(T,U)` constrained by `requires requires(T a, U b){ a + b; }` should be
+viable for `add(1, 2)` (int + int is valid), so the asserts should verify.  CBMC
+instead drops `add` from the candidate set (a latent deduction/requires bug for a
+multi-parameter requires-constrained function template), leaving the call with
+no viable function.
+
+This test previously passed only VACUOUSLY: `add` was silently dropped and the
+call's failure swallowed, so the body was truncated and the asserts were never
+checked (proven: replacing the assertion with a deliberately false one still
+reported VERIFICATION SUCCESSFUL).  The SFINAE-enforcement fix (diagnose an
+unrecovered no-viable-function call) now surfaces the real failure as a
+CONVERSION ERROR.  Flip back to CORE once `add` is resolved correctly.
