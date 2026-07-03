@@ -715,11 +715,23 @@ void cpp_typecheckt::typecheck_method_bodies()
             method_symbol.value.make_nil();
             continue;
           }
-          // If the error originated from template instantiation
-          // (e.g., unsupported STL constructs), suppress it rather
-          // than failing the entire translation unit.
+          // N5008: not standards-conformant, but a pragmatic tolerance for
+          // constructs the C++ front-end cannot yet fully model (complex STL
+          // template metaprogramming, intrinsics, ...).  Rather than fail the
+          // whole translation unit, this suppresses the error and keeps going.
+          // Emit a warning so the resulting incomplete verification is
+          // AUDITABLE rather than silently masked (this leniency has hidden
+          // real front-end gaps -- e.g. std::initializer_list, std::variant,
+          // std::expected, ranges, concepts and NTTP support that CBMC does not
+          // actually model; such uses pass only vacuously).
           if(had_template_instantiation)
           {
+            warning().source_location = method_symbol.location;
+            warning()
+              << "C++ front-end could not fully type-check '"
+              << method_symbol.base_name
+              << "' (unsupported construct); its body is left incomplete, so "
+              << "verification involving it may be unsound" << messaget::eom;
             get_message_handler().set_message_count(
               messaget::M_ERROR, errors_before);
             continue;
