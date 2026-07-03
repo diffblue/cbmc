@@ -648,6 +648,33 @@ avoids it.  Left for a future investigation.
 
 *Updated: 2026-07-03*
 
+### 2026-07-03 lvalue-ref-does-not-bind-rvalue fix (fix #32)
+
+Fixed the latent bug that fix #31 exposed (the two-query main-drop).
+
+* **#32 non-const lvalue reference must not bind an rvalue argument**
+  (`cpp_typecheck_conversions.cpp`, `user_defined_conversion_sequence`): the
+  converting-constructor scan skipped an rvalue-reference parameter for an
+  lvalue argument but had no symmetric check, so it stripped the reference from
+  a non-const lvalue-reference parameter (`X&`) and ran a standard conversion on
+  the referent, treating a `T(X&)` constructor as viable for an rvalue argument
+  and then aborting when the binding failed.  This became reachable once #31
+  preserved value category: is_constructible<T, X&> instantiates the concrete
+  `T(X&)` converting constructor as a class member, and a following
+  is_constructible<T, X&&> query reached it with an rvalue, aborting
+  type-checking ("invalid implicit conversion from X to X&") and dropping the
+  enclosing function body.  N5008 [dcl.init.ref]/5.  Fix: a non-const
+  lvalue-reference constructor parameter is not viable for an rvalue argument.
+  CORE `cpp11_is_constructible_lvalue_rvalue` (two queries lvalue-then-rvalue;
+  reproduces pre-fix by silently dropping main).
+
+BOTH regression suites green, clang-format clean.  Dog-food count unchanged
+(89/21/7/0): this hardens the front-end (no dog-food file was gated on it), and
+confirms fix #31 no longer risks dropping function bodies in code that queries
+is_constructible on one type with both value categories.
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
