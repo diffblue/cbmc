@@ -4119,6 +4119,13 @@ exprt cpp_typecheck_resolvet::resolve(
   cpp_template_args_non_tct template_args;
   template_args.make_nil();
 
+  // Clear any pending "no viable function" marker on entry: it is only
+  // meaningful while a specific failed resolution's `throw 0` propagates
+  // straight to a body conversion.  Entering another resolution means an
+  // intervening (typically recovering) resolution is happening, so a stale
+  // marker must not leak into it.
+  cpp_typecheck.pending_no_viable_call = false;
+
   original_scope = &cpp_typecheck.cpp_scopes.current_scope();
   cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
 
@@ -5123,6 +5130,24 @@ resolved_after_strip:
         }
         if(all_templates)
         {
+          // Deduction failed for every candidate and there is no non-template
+          // overload: a substitution failure ([temp.deduct]/8).  Keep the
+          // silent `throw 0` (a recoverable caller can absorb it via
+          // catch(int) and try alternatives, exactly as before -- do NOT
+          // change this to a distinct exception, which would bypass those
+          // recovery paths).  But when NOT inside a SFINAE context, record the
+          // failure so that, if this throw propagates straight to a function
+          // body's conversion (i.e. is not recovered), the body's handler can
+          // diagnose the genuinely ill-formed "no viable function" call rather
+          // than silently swallowing it as unsupported-STL leniency.  The
+          // marker is cleared at the next resolve() entry, so a recovered
+          // failure never leaks.
+          if(cpp_typecheck.sfinae_context_depth == 0)
+          {
+            cpp_typecheck.pending_no_viable_call = true;
+            cpp_typecheck.pending_no_viable_base_name = base_name;
+            cpp_typecheck.pending_no_viable_location = source_location;
+          }
           throw 0;
         }
         cpp_typecheck.error().source_location = source_location;

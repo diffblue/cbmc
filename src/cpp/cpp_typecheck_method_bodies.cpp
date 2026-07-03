@@ -699,6 +699,22 @@ void cpp_typecheckt::typecheck_method_bodies()
         }
         catch(int)
         {
+          // N5008 [temp.deduct]/8: an UNRECOVERED "no viable function" failure
+          // in this ordinary body (a call whose only candidates were function
+          // templates all removed by substitution failures) must be diagnosed,
+          // not silently swallowed.  pending_no_viable_call is set iff such a
+          // failure's throw reached here without any intervening (recovering)
+          // resolution, so it takes precedence over the unsupported-STL
+          // leniency below.
+          if(pending_no_viable_call)
+          {
+            error().source_location = pending_no_viable_location;
+            error() << "found no match for symbol '"
+                    << pending_no_viable_base_name << "'" << messaget::eom;
+            pending_no_viable_call = false;
+            method_symbol.value.make_nil();
+            continue;
+          }
           // If the error originated from template instantiation
           // (e.g., unsupported STL constructs), suppress it rather
           // than failing the entire translation unit.
