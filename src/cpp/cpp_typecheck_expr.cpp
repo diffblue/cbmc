@@ -790,6 +790,22 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
             from_type = to_reference_type(from_type).base_type();
           symbol_exprt from(irep_idt(), from_type);
           from.set(ID_C_temporary_avoided, true);
+          // N5008 [meta.unary.prop]: is_constructible<T, Args...> is defined via
+          // `declval<Args>()`, whose value category is an lvalue iff the
+          // corresponding Arg is an lvalue-reference type, and an xvalue
+          // (rvalue) otherwise.  Preserve that here: it decides how a
+          // forwarding-reference constructor parameter `U&&` deduces its
+          // template argument (an lvalue argument deduces `U = int&`, an rvalue
+          // deduces `U = int`), which in turn drives SFINAE constraints that
+          // reject rvalues.  For example std::reference_wrapper<const T> guards
+          // its converting constructor with an overload set that deletes the
+          // rvalue form, so it is constructible from `T&` but not from `T&&` /
+          // `T`; without marking the lvalue-reference case as an lvalue,
+          // is_constructible<reference_wrapper<const int>, int&> was wrongly
+          // reported false (the forwarding reference deduced the rvalue form and
+          // selected the deleted overload).
+          if(is_reference(t2) && !is_rvalue_reference(t2))
+            from.set(ID_C_lvalue, true);
           if(implicit_conversion_sequence(from, t1, tmp))
             expr = true_exprt();
           else
