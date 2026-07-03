@@ -2125,6 +2125,29 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
       }
     }
 
+    // N5008 [temp.inst]/1, [temp.point]: only a *defined* class template can be
+    // implicitly instantiated.  If the selected template (the primary template
+    // or the partial specialization chosen above) has so far only been
+    // forward-declared -- no class body has been seen for it, i.e. it is not in
+    // defined_class_templates -- defer: leave the specialization incomplete
+    // rather than fabricating a spurious empty-but-complete class.  Finalising
+    // such an instance drops its link back to the template, so the members
+    // added by a later definition would be permanently masked.  The
+    // specialization is elaborated correctly once the definition is available
+    // and its completeness is actually required.
+    //
+    // The check is on best_match (post specialization matching), not on the
+    // primary template: for e.g. std::function only the partial specialization
+    // function<R(Args...)> is defined while the primary function<T> is
+    // bodyless, so keying off the primary would wrongly defer it.
+    if(
+      best_match->type.id() == ID_cpp_declaration &&
+      defined_class_templates.find(best_match->name) ==
+        defined_class_templates.end())
+    {
+      return;
+    }
+
     instantiate_template(
       type.source_location(), *best_match, best_spec_args, full_args);
   }
