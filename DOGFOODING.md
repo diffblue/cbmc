@@ -675,6 +675,37 @@ is_constructible on one type with both value categories.
 
 *Updated: 2026-07-03*
 
+### 2026-07-03 istream 'read' root-caused; KNOWNBUG captured (no fix landed)
+
+Root-caused the `symbol 'read' is unknown` failures (lispexpr.cpp, parser.cpp).
+Using **cvise on a preprocessed <istream> TU** (predicate: goto-cc reports
+"read is unknown" AND g++ accepts), reduced to a **7-line header-free** repro:
+a class template referenced (`other(S<char>)`) while only forward-declared, then
+defined with a member, then `g_in.read()` -> "unknown".  This mirrors <iosfwd>
+forward-declaring std::basic_istream before <istream> defines it.
+
+Root cause: CBMC eagerly elaborates `S<char>` at the early reference from the
+not-yet-defined primary template ([temp.inst]/1, [temp.point] are violated),
+producing an empty-but-complete class and dropping the instance's template link,
+so the later definition's members are permanently masked.
+
+Two fix attempts were made and **reverted** (both regressed other tests):
+* Deferring when the *primary* template has no class body regressed
+  std::function etc. (primary `function<T>` is bodyless; only the partial
+  specialization is defined).
+* Deferring when the *best-matched* template has no body fixed lispexpr and
+  the previously-regressed pack/function tests, but then left library types
+  incomplete and crashed cpp20 <iostream> with the std::ostringstream bit-field
+  padding invariant (`member_offset_expr`).
+
+A correct fix needs reliable "definition seen" tracking (so a forward-declared-
+then-defined template is distinguished from a bodyless primary whose partial
+specialization carries the definition, and so incomplete instances are never
+used for layout).  Captured as KNOWNBUG `cpp11_fwd_decl_template_member`.
+Dog-food count unchanged (89/21/7/0).
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
