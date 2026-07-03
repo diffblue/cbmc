@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ true-constrained sole template is viable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct]/8: the sole function template `f`'s non-deduced defaulted
+template parameter substitutes to `enable_if<true,int>::type` == int (a valid
+substitution), so `f` is viable and `f(5)` selects it.  Well-formed counterpart
+of cpp11_sole_template_false_constraint; guards against over-rejecting a true
+constraint when the sole candidate's defaulted parameter is checked.
