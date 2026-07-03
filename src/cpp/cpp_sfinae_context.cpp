@@ -35,6 +35,10 @@ sfinae_contextt::sfinae_contextt(cpp_typecheckt &_typecheck)
   // folding is both redundant and able to trigger explosive
   // instantiation cascades.
   typecheck.constant_expression_context = 0;
+  // Record SFINAE nesting so resolve() can tell a genuine substitution failure
+  // (must stay silent, [temp.deduct]/8) apart from an unresolved call in an
+  // ordinary context (a real error).
+  ++typecheck.sfinae_context_depth;
 }
 
 sfinae_contextt::~sfinae_contextt()
@@ -43,6 +47,8 @@ sfinae_contextt::~sfinae_contextt()
   // to the real handler rather than the null one.
   typecheck.set_message_handler(*saved_handler);
   typecheck.constant_expression_context = saved_constant_expression_context;
+  if(typecheck.sfinae_context_depth > 0)
+    --typecheck.sfinae_context_depth;
   // Roll the error count back to the pre-guard value.  Any errors
   // emitted inside the guarded region were either absorbed by the
   // null handler (visible nowhere) or counted against the real

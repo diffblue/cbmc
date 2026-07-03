@@ -142,6 +142,27 @@ protected:
   // hash the declaration.
   std::set<irep_idt> defined_class_templates;
 
+  /// Nesting depth of active `sfinae_contextt` guards (substitution / deduction
+  /// / overload resolution, N5008 [temp.deduct]/8).  Non-zero means a
+  /// substitution failure is a SFINAE failure that must stay silent; zero means
+  /// an ordinary context where an unresolved call is a genuine, diagnosable
+  /// error.  Maintained by `sfinae_contextt` (a friend).
+  unsigned sfinae_context_depth = 0;
+
+  /// Records a pending "no viable function" failure: set by resolve() when, in
+  /// an ordinary (non-SFINAE) context, a call's only candidates are function
+  /// templates all removed by [temp.deduct]/8 substitution failures.  The
+  /// silent `throw 0` is kept (so recoverable callers can still absorb it via
+  /// `catch(int)`), but this flag lets typecheck_method_bodies distinguish an
+  /// UNRECOVERED such failure -- which must be diagnosed and NOT rolled back as
+  /// unsupported-STL leniency -- from an ordinary suppressible instantiation
+  /// failure.  It is cleared at every resolve() entry, so it only survives when
+  /// the throw propagates straight to the body's conversion without any
+  /// intervening (recovering) resolution.
+  bool pending_no_viable_call = false;
+  irep_idt pending_no_viable_base_name;
+  source_locationt pending_no_viable_location;
+
   cpp_parse_treet &cpp_parse_tree;
   irep_idt current_linkage_spec;
 
