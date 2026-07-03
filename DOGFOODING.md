@@ -614,6 +614,40 @@ std::filesystem 'remove'/_Path), std::istream member registration (lispexpr
 
 *Updated: 2026-07-02*
 
+### 2026-07-03 __is_constructible value-category fix (fix #31)
+
+Fixed a genuine `is_constructible` correctness bug (the optional/reference_wrapper
+cluster).  Count unchanged (89/21/7/0) because the fix advances simplify_utils
+past the optional issue to the separate, pre-existing unordered_map/_Hashtable
+cluster.
+
+* **#31 __is_constructible drops the argument value category**
+  (`cpp_typecheck_expr.cpp`): N5008 [meta.unary.prop] defines the trait via
+  `declval<Args>()`, whose value category is an lvalue iff Arg is an
+  lvalue-reference.  The intrinsic built its source expression from the
+  de-referenced argument type without recording the value category, so an
+  lvalue-reference argument was treated as an rvalue.  For
+  std::reference_wrapper<const T> -- converting ctor guarded by an overload set
+  that deletes the rvalue form -- the forwarding reference then deduced the
+  rvalue form and picked the deleted overload, so
+  is_constructible<reference_wrapper<const int>, int&> was wrongly false,
+  breaking std::optional<std::reference_wrapper<const array_exprt>>
+  (simplify_utils.cpp).  Fix: mark the source expression as an lvalue when the
+  argument type is an lvalue reference (rvalue-ref / non-ref stay rvalues, so
+  reference_wrapper remains correctly non-constructible from T&&/T).  CORE
+  `cpp11_is_constructible_value_category` (reproduces pre-fix as assertion.1
+  FAILURE).
+
+BOTH regression suites green, clang-format clean.  Verified directly that the
+intrinsic now matches g++ for int& (true) / int&& (false) / int (false), and
+that simplify_utils's optional error is gone (it now stops at the unordered_map
+cluster instead).  Note: a *separate* latent bug was observed while testing --
+two `__is_constructible` queries on the same SFINAE-deleted-overload type inside
+one function body drop that function's goto body; the single-query CORE test
+avoids it.  Left for a future investigation.
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
