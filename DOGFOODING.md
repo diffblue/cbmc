@@ -583,6 +583,37 @@ std::filesystem 'remove'), std::istream member registration (parser/lispexpr
 
 *Updated: 2026-07-02*
 
+### 2026-07-02 function-hides-type fix (fix #30) + 89/21/7/0
+
+Fixed the memory_info.cpp 'mallinfo' "does not uniquely resolve".
+
+* **#30 a function hides a same-named type in value lookup**
+  (`cpp_typecheck_resolve.cpp`, `cpp_typecheck_resolvet::resolve`): resolving a
+  value (want == VAR) ran make_constructors over every candidate, turning a type
+  candidate into constructors even when a same-named function was also found, so
+  `S()` was ambiguous between the function and the type's constructor.  This is
+  the C-library struct-tag/function pattern: glibc `struct mallinfo`/`mallinfo()`
+  (`struct mallinfo m = mallinfo();`), POSIX `struct stat`/`stat()`.  N5008
+  [basic.scope.hiding]/2: the function hides the type.  Fix: before building
+  constructors, drop type candidates when a genuine same-named function is also
+  present.  Care was taken to identify the *hiding* entity precisely -- an
+  ID_code symbol whose return type is NOT ID_constructor -- so the type's own
+  constructors (base_name == class name) and uninstantiated ctor templates
+  (cpp_declaration) do NOT count; an initial too-broad "any non-type" predicate
+  regressed `allocator`/`basic_string` construction (caught via dog-food:
+  piped_process.cpp `can_receive(0)`), fixed before landing.  CORE
+  `cpp11_function_hides_type` (reproduces pre-fix as "does not uniquely
+  resolve").
+
+BOTH regression suites green, clang-format clean.  Dog-food re-baseline:
+**89 clean / 21 noisy / 7 FAIL / 0 CRASH** (was 88/21/8/0).  Remaining FAILs:
+deferred enable_if/lazy-instantiation (irep_serialization, parse_options),
+SFINAE converting-ctors (simplify_utils 'optional', tempfile/parser
+std::filesystem 'remove'/_Path), std::istream member registration (lispexpr
+'read'), std::basic_regex (interval_union).
+
+*Updated: 2026-07-02*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
