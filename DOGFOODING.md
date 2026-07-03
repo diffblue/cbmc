@@ -706,6 +706,46 @@ Dog-food count unchanged (89/21/7/0).
 
 *Updated: 2026-07-03*
 
+### 2026-07-03 definition-seen tracking (fix #33): istream 'read' resolved
+
+Landed the fix the previous entry deferred.  A class template specialization is
+implicitly instantiated -- and completed -- only from a *definition* of the
+template (N5008 [temp.inst]/1, [temp.point]).  The eager elaboration of a
+specialization referenced while the template was only forward-declared is the
+root of the lispexpr.cpp / parser.cpp `symbol 'read' is unknown` failures
+(<iosfwd> forward-declares std::basic_istream before <istream> defines it).
+
+Fix, three parts:
+* `cpp_typecheckt::defined_class_templates` (a side set, not an irep marker)
+  records each class template -- primary or partial specialization -- for which
+  a class body has been seen; populated in typecheck_class_template.
+* elaborate_class_template defers instantiation of a specialization whose
+  selected template (`best_match`, post specialization matching) is not yet in
+  that set, leaving it incomplete until the definition is available.  Keyed on
+  best_match, not the primary, so std::function (bodyless primary, defined
+  partial specialization) is not wrongly deferred.  Kept off the declaration
+  irep so recording a definition never perturbs template argument matching /
+  specialization ordering (an earlier irep-marker attempt flipped the
+  ambiguous partial-spec selection in cpp20_concepts_ordering).
+* member_offset_expr now degrades gracefully (returns "offset not known")
+  instead of aborting when a class with virtual bases exposes its unpadded
+  1-bit `@most_derived` flag ([class.mi]); giving basic_istream its real members
+  had exposed this latent layout invariant.  Mirrors the sibling member_offset().
+
+Verified: nv/min forward-decl repro resolves the member (assertion.2 gives
+non-vacuity); genuinely-empty defined templates and std::function unaffected;
+cpp20_iostream_basic, cpp20_concepts_ordering, cpp11_function_basic all pass.
+Both regression suites green; KNOWNBUG `cpp11_fwd_decl_template_member` promoted
+to CORE.
+
+Dog-food improved **89/21/7/0 -> 96/16/5/0**: lispexpr.cpp and parser.cpp
+cleared from FAIL.  Remaining 5 FAILs are the deferred clusters (std::basic_regex
+in interval_union; enable_if lazy instantiation in irep_serialization /
+parse_options; optional->unordered_map in simplify_utils; std::filesystem in
+tempfile).
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
