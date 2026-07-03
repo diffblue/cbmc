@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.arg.explicit]/4: a trailing template parameter pack not otherwise
+deduced is an empty sequence, so make_box<>() returns box<> and arity is 0.
+CBMC drops make_box<>() (empty explicit pack for a variadic function template
+with a nested-pack-expansion return type), so the call has no viable function
+([temp.deduct]/8).  Surfaced as a CONVERSION ERROR by the SFINAE-enforcement fix
+(was previously swallowed silently).  Flip to CORE once resolved.  Non-empty
+cases are CORE in cpp11_variadic_member_alias_pack.
