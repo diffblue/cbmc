@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^CONVERSION ERROR$
+--
+^VERIFICATION SUCCESSFUL$
+--
+N5008 [temp.deduct]/8: substituting the deduced arguments into the sole function
+template `f` makes its non-deduced defaulted template parameter have the
+non-existent type `enable_if<false,int>::type` -- a substitution failure that
+removes the only candidate, leaving `f(5)` with no viable function.  The program
+is ill-formed and must be rejected (CONVERSION ERROR); g++/clang++ reject it.
+CBMC wrongly accepts it (VERIFICATION SUCCESSFUL) because a sole function-
+template candidate was deduced from the call argument without substituting /
+checking its defaulted template parameter's enable_if constraint (that check
+previously only ran when a second candidate forced disambiguation).  Flip to
+CORE once fixed.  The well-formed true-constraint counterpart is
+cpp11_sole_template_true_constraint.
