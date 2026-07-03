@@ -811,6 +811,40 @@ passed vacuously):
 
 *Updated: 2026-07-03*
 
+### 2026-07-03 unsupported-construct leniency made visible (was silently masking)
+
+Investigated the "unsupported-STL leniency" -- the `had_template_instantiation`
+rollback in typecheck_method_bodies that suppresses errors and keeps going when
+a *user-code* body cannot be fully type-checked because it instantiates a
+template CBMC cannot model.  Findings:
+* It is **not** standards-conformant (a conforming compiler accepts or rejects);
+  it is a pragmatic tolerance so CBMC can verify the modellable parts of
+  STL-heavy code.
+* It is **not** needed for dog-food: removing it leaves the dog-food count
+  unchanged (96/16/5/0).  Dog-food's own STL gaps go through the *separate*
+  system-header / template-instance suppression branch, not this one.
+* It was **silently masking real front-end gaps**: removing it turns 12 cbmc-cpp
+  CORE tests that pass only VACUOUSLY into CONVERSION ERRORs (and one into a
+  goto-symex precondition crash from aborting the body loop early).
+
+The masked front-end gaps (roadmap -- each is a candidate to fix, after which the
+leniency can be narrowed): `std::initializer_list` (cpp11_initializer_list_class),
+generic-lambda types (cpp14_generic_lambda_types), `std::variant`
+(cpp17_variant_basic), class NTTP brace-init (cpp20_class_nttp_brace), iterator
+concept chains (cpp20_concept_iterator_chain), named/overloaded concepts
+(cpp20_concepts_named/overload), concept type-requirements
+(cpp20_concepts_requires_type), NTTP strings (cpp20_nttp_string), ranges pipes
+(cpp20_ranges_basic), unparenthesized requires (cpp20_requires_unparenthesized),
+`std::expected` (cpp23_expected_basic), pack-indexing (cpp26_pack_indexing_expr).
+
+Decision: rather than fully remove the leniency (which would reject entire TUs
+merely using an unmodelled feature -- honest but far less usable, with zero
+dog-food benefit), make it **visible**: emit a warning when it fires, so the
+incomplete/unsound verification is auditable instead of hidden.  Behaviour is
+otherwise unchanged; both suites stay green and dog-food is unchanged.
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
