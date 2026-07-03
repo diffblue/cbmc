@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member from later definition resolves: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+symbol 'read' is unknown
+--
+N5008 [temp.inst]/1, [temp.point]: a class template specialization is completed
+only from a *definition* of the template.  CBMC eagerly elaborates a
+specialization referenced while the template is only forward-declared, producing
+an empty-but-complete class that masks members added by the later definition
+("symbol 'read' is unknown").  Reduced (cvise, from preprocessed <istream>) form
+of the lispexpr.cpp / parser.cpp dog-food failures (<iosfwd> forward-declares
+std::basic_istream before <istream> defines it).  A fix must defer instantiation
+until the template is defined without mis-firing on partial-specialization-
+defined templates (std::function) or leaving library types incomplete (the
+std::ostringstream layout invariant).  Flip to CORE once fixed.
