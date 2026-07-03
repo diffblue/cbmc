@@ -746,6 +746,41 @@ tempfile).
 
 *Updated: 2026-07-03*
 
+### 2026-07-03 SFINAE: sole function-template false constraint not enforced (KNOWNBUG)
+
+While scoping the remaining enable_if dog-food FAILs (all context-dependent
+cascades not reproducible in isolation), isolated a distinct, header-free
+soundness bug (the one `.kiro/std_function_converting_ctor_plan.md` flagged as a
+separate pre-existing defect): a **sole** function-template candidate whose
+non-deduced, defaulted template parameter carries a false `enable_if` constraint
+(e.g. `template<class T, enable_if_t<always_false<T>::value,int> = 0> int f(T)`)
+is **wrongly accepted** by CBMC (`f(5)` compiles) though g++/clang++ reject it --
+[temp.deduct]/8: the substitution failure removes the only candidate, leaving no
+viable function.  With a *competing* overload the constraint IS enforced (multi-
+candidate disambiguation instantiates and rejects it), so only the sole-candidate
+path is affected.
+
+Root cause (traced): `guess_function_template_args` correctly evaluates the
+defaulted parameter's `enable_if` and rejects the candidate (its SFINAE default-
+argument block returns `nil_exprt()` on the substitution failure), so the
+overload set ends empty.  But the downstream function-call resolution
+(`typecheck_expr_cpp_name` -> `resolve`, which for an all-template empty result
+does an intentional silent `throw 0` to emulate SFINAE for library support, and
+elsewhere resurrects the name) does not turn the empty set into a "no viable
+function" rejection for a real (non-SFINAE) call.  A safe fix must reject the
+sole-candidate real call WITHOUT reintroducing the false-reject / false-accept
+oscillation and std::any/std::apply regressions documented across six prior
+sessions in this exact fallback chain.
+
+Captured as KNOWNBUG `cpp11_sole_template_false_constraint` (header-free) with a
+non-vacuous well-formed companion `cpp11_sole_template_true_constraint` (CORE)
+guarding against over-rejecting a true constraint.  Fix (flip to CORE) deferred:
+the change lives in the delicate overload-resolution fallback and must be gated
+against the whole STL-heavy suite + dog-food.  No dog-food count change (this is
+silent over-acceptance, not a FAIL).
+
+*Updated: 2026-07-03*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
