@@ -1730,6 +1730,23 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           expr.get_bool(ID_C_lvalue))
           continue;
 
+        // [dcl.init.ref]/5: symmetrically, a non-const lvalue-reference
+        // parameter binds only to an lvalue, so such a converting-constructor
+        // candidate is not viable for an rvalue argument.  Skipping it (rather
+        // than letting the reference binding fail hard below) matters once a
+        // forwarding-reference converting-constructor *template* has been
+        // instantiated with an lvalue-reference parameter for an earlier query
+        // (e.g. is_constructible<T, X&>): a later query with an rvalue argument
+        // (is_constructible<T, X&&>) would otherwise reach that concrete
+        // `T(X&)` candidate and abort with "invalid implicit conversion from X
+        // to X&", dropping the enclosing function body.
+        if(
+          is_reference(arg1_type) &&
+          !arg1_type.get_bool(ID_C_rvalue_reference) &&
+          !to_reference_type(arg1_type).base_type().get_bool(ID_C_constant) &&
+          !expr.get_bool(ID_C_lvalue))
+          continue;
+
         if(is_reference(arg1_type))
         {
           typet tmp = to_reference_type(arg1_type).base_type();
