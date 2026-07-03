@@ -46,7 +46,7 @@ bool goto_cc_cmdlinet::in_list(const char *option, const char **list)
   return false;
 }
 
-std::size_t goto_cc_cmdlinet::get_optnr(const std::string &opt_string)
+std::size_t goto_cc_cmdlinet::get_optnr(std::string_view opt_string)
 {
   std::optional<std::size_t> optnr;
   cmdlinet::optiont option;

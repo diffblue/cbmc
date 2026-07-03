@@ -36,7 +36,7 @@ bool cmdlinet::isset(char option) const
     return false;
 }
 
-bool cmdlinet::isset(const char *option) const
+bool cmdlinet::isset(std::string_view option) const
 {
   auto i=getoptnr(option);
   if(i.has_value())
@@ -60,7 +60,7 @@ std::optional<std::string> cmdlinet::value_opt(char option) const
     return {};
 }
 
-void cmdlinet::set(const std::string &option, bool value)
+void cmdlinet::set(std::string_view option, bool value)
 {
   auto i=getoptnr(option);
 
@@ -69,27 +69,27 @@ void cmdlinet::set(const std::string &option, bool value)
   else
   {
     throw invalid_command_line_argument_exceptiont(
-      "unknown command line option", option);
+      "unknown command line option", std::string{option});
   }
 }
 
-void cmdlinet::set(const std::string &option, const std::string &value)
+void cmdlinet::set(std::string_view option, std::string value)
 {
   auto i=getoptnr(option);
 
   if(i.has_value())
   {
     options[*i].isset=true;
-    options[*i].values.push_back(value);
+    options[*i].values.push_back(std::move(value));
   }
   else
   {
     throw invalid_command_line_argument_exceptiont(
-      "unknown command line option", option);
+      "unknown command line option", std::string(option));
   }
 }
 
-static std::list<std::string> immutable_empty_list;
+const static std::list<std::string> immutable_empty_list;
 
 const std::list<std::string> &cmdlinet::get_values(char option) const
 {
@@ -101,12 +101,12 @@ const std::list<std::string> &cmdlinet::get_values(char option) const
     return immutable_empty_list;
 }
 
-std::string cmdlinet::get_value(const char *option) const
+std::string cmdlinet::get_value(std::string_view option) const
 {
   return value_opt(option).value_or("");
 }
 
-std::optional<std::string> cmdlinet::value_opt(const char *option) const
+std::optional<std::string> cmdlinet::value_opt(std::string_view option) const
 {
   auto i=getoptnr(option);
 
@@ -116,8 +116,8 @@ std::optional<std::string> cmdlinet::value_opt(const char *option) const
     return {};
 }
 
-const std::list<std::string> &cmdlinet::get_values(
-  const std::string &option) const
+const std::list<std::string> &
+cmdlinet::get_values(std::string_view option) const
 {
   auto i=getoptnr(option);
 
@@ -128,7 +128,7 @@ const std::list<std::string> &cmdlinet::get_values(
 }
 
 std::list<std::string>
-cmdlinet::get_comma_separated_values(const char *option) const
+cmdlinet::get_comma_separated_values(std::string_view option) const
 {
   std::list<std::string> separated_values;
 
@@ -151,7 +151,7 @@ std::optional<std::size_t> cmdlinet::getoptnr(char option) const
   return std::optional<std::size_t>();
 }
 
-std::optional<std::size_t> cmdlinet::getoptnr(const std::string &option) const
+std::optional<std::size_t> cmdlinet::getoptnr(std::string_view option) const
 {
   for(std::size_t i=0; i<options.size(); i++)
     if(options[i].optstring==option)
@@ -172,6 +172,7 @@ cmdlinet::option_namest cmdlinet::option_names() const
 {
   return option_namest{*this};
 }
+
 void cmdlinet::parse_optstring(const char *optstring)
 {
   while(optstring[0] != 0)
@@ -217,7 +218,7 @@ void cmdlinet::parse_optstring(const char *optstring)
 }
 
 std::vector<std::string>
-cmdlinet::get_argument_suggestions(const std::string &unknown_argument)
+cmdlinet::get_argument_suggestions(std::string_view unknown_argument)
 {
   struct suggestiont
   {

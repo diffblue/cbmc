@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <list>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 class cmdlinet
@@ -74,31 +75,36 @@ public:
   virtual bool parse(int argc, const char **argv, const char *optstring);
 
   std::string get_value(char option) const;
-  std::string get_value(const char *option) const;
+  std::string get_value(std::string_view option) const;
 
   std::optional<std::string> value_opt(char option) const;
-  std::optional<std::string> value_opt(const char *option) const;
+  std::optional<std::string> value_opt(std::string_view option) const;
 
-  const std::list<std::string> &get_values(const std::string &option) const;
+  const std::list<std::string> &get_values(std::string_view option) const;
   const std::list<std::string> &get_values(char option) const;
 
   /// Collect all occurrences of option \p option and split their values on each
   /// comma, merging them into a single list of values.
-  std::list<std::string> get_comma_separated_values(const char *option) const;
+  std::list<std::string>
+  get_comma_separated_values(std::string_view option) const;
 
   virtual bool isset(char option) const;
-  virtual bool isset(const char *option) const;
+  virtual bool isset(std::string_view option) const;
+
   /// Set option \p option to \p value, or \c true if the value is omitted.
-  virtual void set(const std::string &option, bool value = true);
-  virtual void set(const std::string &option, const std::string &value);
-  virtual void set(const std::string &option, const char *value)
+  virtual void set(std::string_view option, bool value = true);
+  virtual void set(std::string_view option, std::string value);
+
+  // This is required to match string literals, which otherwise
+  // are cast to bool
+  virtual void set(std::string_view option, const char *value)
   {
     set(option, std::string{value});
   }
 
   virtual void clear();
 
-  bool has_option(const std::string &option) const
+  bool has_option(std::string_view option) const
   {
     return getoptnr(option).has_value();
   }
@@ -158,7 +164,7 @@ public:
   virtual ~cmdlinet();
 
   std::vector<std::string>
-  get_argument_suggestions(const std::string &unknown_argument);
+  get_argument_suggestions(std::string_view unknown_argument);
 
 protected:
   struct optiont
@@ -193,7 +199,7 @@ protected:
   std::vector<optiont> options;
 
   std::optional<std::size_t> getoptnr(char option) const;
-  std::optional<std::size_t> getoptnr(const std::string &option) const;
+  std::optional<std::size_t> getoptnr(std::string_view option) const;
 };
 
 #endif // CPROVER_UTIL_CMDLINE_H

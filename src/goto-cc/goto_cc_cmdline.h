@@ -27,22 +27,22 @@ public:
   static bool in_list(const char *option, const char **list);
 
   // never fails, will add if not found
-  std::size_t get_optnr(const std::string &option);
+  std::size_t get_optnr(std::string_view option);
 
   /// Set option \p option to \p value.
-  void set(const std::string &opt, const char *value) override
+  void set(std::string_view opt, const char *value) override
   {
     set(opt, std::string{value});
   }
 
-  void set(const std::string &opt, const std::string &value) override
+  void set(std::string_view opt, std::string value) override
   {
     std::size_t nr=get_optnr(opt);
     options[nr].isset=true;
-    options[nr].values.push_back(value);
+    options[nr].values.push_back(std::move(value));
   }
 
-  void set(const std::string &opt, bool value = true) override
+  void set(std::string_view opt, bool value = true) override
   {
     options[get_optnr(opt)].isset = value;
   }
@@ -55,7 +55,7 @@ public:
   {
   public:
     argt():is_infile_name(false) { }
-    explicit argt(const std::string &_arg):is_infile_name(false), arg(_arg) { }
+    explicit argt(std::string _arg):is_infile_name(false), arg(std::move(_arg)) { }
     bool is_infile_name;
     std::string arg;
   };
@@ -68,9 +68,9 @@ public:
   std::string stdin_file;
 
 protected:
-  void add_arg(const std::string &arg)
+  void add_arg(std::string arg)
   {
-    parsed_argv.push_back(argt(arg));
+    parsed_argv.push_back(argt{std::move(arg)});
   }
 
   void add_infile_arg(const std::string &arg);
