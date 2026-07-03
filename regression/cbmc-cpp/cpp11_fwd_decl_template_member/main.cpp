@@ -9,23 +9,21 @@
 // forward-declared, then `S` is defined with a `read()` member.  The call
 // `g_in.read()` must resolve to that member.  g++ and clang++ accept this.
 //
-// CBMC elaborates `S<char>` eagerly at the early reference (from the not-yet-
-// defined primary template), producing a spurious empty-but-complete class and
-// dropping the instance's link back to the template; the later definition's
-// members are then permanently masked, so `g_in.read()` fails with
-// "symbol 'read' is unknown".  This is the reduced form (cvise, from a
+// CBMC used to elaborate `S<char>` eagerly at the early reference (from the
+// not-yet-defined primary template), producing a spurious empty-but-complete
+// class and dropping the instance's link back to the template; the later
+// definition's members were then permanently masked, so `g_in.read()` failed
+// with "symbol 'read' is unknown".  This is the reduced form (cvise, from a
 // preprocessed <istream> translation unit) of the dog-food failures in
 // lispexpr.cpp and parser.cpp, where <iosfwd> forward-declares
 // std::basic_istream before <istream> defines it.
 //
-// KNOWN BUG.  A fix must defer the instantiation until the template is defined,
-// but the obvious guards are unsafe: keying off the primary template's class
-// body mis-fires for partial-specialization-defined templates such as
-// std::function (whose primary is bodyless), and simply leaving the instance
-// incomplete breaks later layout computation for library types (e.g. the
-// std::ostringstream bit-field padding invariant in <iostream>).  A correct fix
-// needs reliable "definition seen" tracking.  Flip to CORE once fixed;
-// assertion.2 must then FAIL (non-vacuity).
+// Fixed by definition-seen tracking: typecheck_class_template records
+// ID_C_template_defined on a class-template declaration once a class body has
+// been seen for it, and elaborate_class_template defers instantiation of a
+// specialization whose selected template is not yet defined, so it is
+// elaborated correctly once the definition is available.  assertion.2 provides
+// non-vacuity (it must FAIL).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
