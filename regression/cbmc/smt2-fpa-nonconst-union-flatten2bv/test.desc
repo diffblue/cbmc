@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.c
 --smt2 --fpa --outfile -
 ^EXIT=0$
@@ -6,15 +6,8 @@ main.c
 --
 ^warning: ignoring
 --
-Issue #9101: `--smt2 --fpa --outfile` aborts with an invariant violation
-("flatten2bv of a non-constant FPA-encoded float is unsupported") when the
-program reinterprets the bits of a non-constant float through a union.
-
-The SMT-LIB FloatingPoint theory deliberately has no fp-to-bitvector
-operator (NaN bit patterns are ambiguous), so the export path must emit a
-fresh BV variable constrained via to_fp round-trip — as it already does for
-explicit typecast_exprt(floatbv→bv).  The union/with path bypasses that
-mechanism and calls flatten2bv directly on the float symbol, hitting the
-invariant.
-
-The native SAT back-end solves the identical program without issue.
+Issue #9101: `--smt2 --fpa --outfile` previously aborted with an invariant
+violation ("flatten2bv of a non-constant FPA-encoded float is unsupported")
+when the program reinterprets the bits of a non-constant float through a
+union.  The fix emits the same bvfromfloat round-trip (declare a fresh BV,
+assert to_fp(bv) == float) that find_symbols uses for explicit typecasts.
