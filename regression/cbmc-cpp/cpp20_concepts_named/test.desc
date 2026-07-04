@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^EXIT=0$
@@ -7,11 +7,3 @@ main.cpp
 --
 Named concept declarations (template<class T> concept X = ...).
 CBMC skips concept constraints (treats as always satisfied).
-
---
-KNOWNBUG (2026-07-04): this program is now rejected with CONVERSION ERROR.
-It previously passed only VACUOUSLY -- the unsupported-STL leniency in
-typecheck_method_bodies silently dropped the un-type-checkable body, so
-nothing was actually verified.  That leniency has been removed; the real
-front-end gap is now visible: named concepts are not fully modelled.
-Flip back to CORE once the gap is closed.
