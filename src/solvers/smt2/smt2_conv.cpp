@@ -5252,14 +5252,10 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_FPA_theory)
     {
-      // A floatbv constant's IEEE-754 interchange bit pattern is exactly its
-      // bit-vector representation, so it is emitted as a literal bit-vector.
-      // This is the only shape that reaches flatten2bv under FPA: a
-      // non-constant float whose bits are read is lowered by
-      // lower_byte_operators into a float typecast, which is handled by the
-      // bvfromfloat round-trip in find_symbols and never reaches here.
       if(expr.is_constant())
       {
+        // A floatbv constant's IEEE-754 interchange bit pattern is exactly
+        // its bit-vector representation, so emit it as a literal BV.
         const ieee_float_spect spec(to_floatbv_type(type));
         const mp_integer value = bvrep2integer(
           to_constant_expr(expr).get_value(), spec.width(), false);
@@ -5267,8 +5263,37 @@ void smt2_convt::flatten2bv(const exprt &expr)
       }
       else
       {
-        UNEXPECTEDCASE(
-          "flatten2bv of a non-constant FPA-encoded float is unsupported");
+        // Non-constant float under FPA theory: the SMT-LIB FP theory has
+        // no fp-to-bitvector operator (NaN bit patterns are ambiguous), so
+        // we declare a fresh BV variable and assert that converting it back
+        // to FP equals the original float value.  This is the same
+        // round-trip that find_symbols uses for typecast(floatbv → bv).
+        const auto &floatbv_type = to_floatbv_type(type);
+        const typecast_exprt tc{expr, bv_typet{floatbv_type.width()}};
+
+        auto it = defined_expressions.find(tc);
+        if(it == defined_expressions.end())
+        {
+          const irep_idt id =
+            "bvfromfloat." + std::to_string(defined_expressions.size());
+          out << "(declare-fun " << id << " () ";
+          convert_type(tc.type());
+          out << ')' << '\n';
+
+          out << "(assert (= ";
+          out << "((_ to_fp " << floatbv_type.get_e() << " "
+              << floatbv_type.get_f() + 1 << ") " << id << ')';
+          convert_expr(expr);
+          out << ')'; // =
+          out << ')' << '\n';
+
+          defined_expressions[tc] = id;
+          out << id;
+        }
+        else
+        {
+          out << it->second;
+        }
       }
     }
     else
