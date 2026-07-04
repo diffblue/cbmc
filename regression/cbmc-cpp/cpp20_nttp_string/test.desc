@@ -1,7 +1,15 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+
+--
+KNOWNBUG (2026-07-04): this program is now rejected with CONVERSION ERROR.
+It previously passed only VACUOUSLY -- the unsupported-STL leniency in
+typecheck_method_bodies silently dropped the un-type-checkable body, so
+nothing was actually verified.  That leniency has been removed; the real
+front-end gap is now visible: string-literal non-type template parameters are not modelled.
+Flip back to CORE once the gap is closed.
