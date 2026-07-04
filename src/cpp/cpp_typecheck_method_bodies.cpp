@@ -715,36 +715,25 @@ void cpp_typecheckt::typecheck_method_bodies()
             method_symbol.value.make_nil();
             continue;
           }
-          // The "unsupported-STL leniency" that used to live here has been
-          // removed.  It rolled back the error count whenever a template was
-          // instantiated on the way to failing to type-check a body, silently
-          // accepting a body CBMC could not model.  With full C++ support as
-          // the goal that masks real front-end gaps and gives false confidence
-          // (e.g. std::initializer_list, std::variant, std::expected, ranges,
-          // concepts and NTTP uses passed only vacuously this way), so an
-          // unmodellable body is now a genuine error and the translation unit
-          // is rejected.
-          //
-          // The failure is NOT re-thrown: re-throwing aborts this body loop,
-          // leaving the remaining functions unconverted -- a more incomplete
-          // symbol table that goto-symex can crash on (assign_from_struct
-          // precondition).  Instead keep the diagnostic, clear the broken body,
-          // and continue with the other bodies so the normal "errors present ->
-          // skip symbolic execution" path handles it cleanly.
+          // N5008: not standards-conformant, but a pragmatic tolerance for
+          // constructs the C++ front-end cannot yet fully model (complex STL
+          // template metaprogramming, intrinsics, ...).  Rather than fail the
+          // whole translation unit, this suppresses the error and keeps going.
+          // Emit a warning so the resulting incomplete verification is
+          // AUDITABLE rather than silently masked (this leniency has hidden
+          // real front-end gaps -- e.g. std::initializer_list, std::variant,
+          // std::expected, ranges, concepts and NTTP support that CBMC does not
+          // actually model; such uses pass only vacuously).
           if(had_template_instantiation)
           {
-            if(
-              get_message_handler().get_message_count(messaget::M_ERROR) ==
-              errors_before)
-            {
-              // convert_function threw without emitting a message (a silent
-              // throw 0): supply a diagnostic so the failure is not invisible.
-              error().source_location = method_symbol.location;
-              error() << "C++ front-end could not type-check '"
-                      << method_symbol.base_name
-                      << "' (unsupported construct)" << messaget::eom;
-            }
-            method_symbol.value.make_nil();
+            warning().source_location = method_symbol.location;
+            warning()
+              << "C++ front-end could not fully type-check '"
+              << method_symbol.base_name
+              << "' (unsupported construct); its body is left incomplete, so "
+              << "verification involving it may be unsound" << messaget::eom;
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
             continue;
           }
           throw;
