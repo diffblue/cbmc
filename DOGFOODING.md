@@ -837,13 +837,19 @@ concept chains (cpp20_concept_iterator_chain), named/overloaded concepts
 (cpp20_ranges_basic), unparenthesized requires (cpp20_requires_unparenthesized),
 `std::expected` (cpp23_expected_basic), pack-indexing (cpp26_pack_indexing_expr).
 
-Decision: rather than fully remove the leniency (which would reject entire TUs
-merely using an unmodelled feature -- honest but far less usable, with zero
-dog-food benefit), make it **visible**: emit a warning when it fires, so the
-incomplete/unsound verification is auditable instead of hidden.  Behaviour is
-otherwise unchanged; both suites stay green and dog-food is unchanged.
+Decision (updated 2026-07-04): **removed** the leniency.  With full C++ support
+as the goal it is a liability -- it masks real front-end gaps and gives false
+confidence -- and it has zero dog-food benefit.  An unmodellable body is now a
+genuine error and the TU is rejected (CONVERSION ERROR).  To avoid the goto-symex
+crash that a naive removal caused (re-throwing aborts the body loop, leaving a
+more-incomplete model), the failure is kept but the loop continues so the normal
+"errors -> skip symex" path rejects cleanly.  The 13 cbmc-cpp tests that passed
+only vacuously via the leniency are reclassified as KNOWNBUGs (each records its
+front-end gap; see the roadmap list above), to be flipped back to CORE as the
+gaps are closed.  Both suites green; dog-food unchanged 96/16/5/0.  (Commits
+4ff453a0af source, 1a782bb8ab tests.)
 
-*Updated: 2026-07-03*
+*Updated: 2026-07-04*
 
 ### 2026-05-13 filesystem stack-overflow fix
 
