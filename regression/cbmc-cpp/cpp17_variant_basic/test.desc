@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -8,11 +8,3 @@ main.cpp
 Invariant violation: lhs/rhs type mismatch in assignment from
 (void)-1 in numeric_traits.h. The (void) cast produces a void
 type that cannot be assigned to int.
-
---
-KNOWNBUG (2026-07-04): this program is now rejected with CONVERSION ERROR.
-It previously passed only VACUOUSLY -- the unsupported-STL leniency in
-typecheck_method_bodies silently dropped the un-type-checkable body, so
-nothing was actually verified.  That leniency has been removed; the real
-front-end gap is now visible: std::variant is not modelled (numeric_traits (void)-1 type mismatch).
-Flip back to CORE once the gap is closed.

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -15,11 +15,3 @@ sized_sentinel_for.  Depends on requirement-parameter binding for conjoined
 requires-expressions ([expr.prim.req.general]/2).  Includes the negative case
 (a non-incrementable type is not an iterator).  See
 doc/architectural/cpp-requires-expression-support.md.
-
---
-KNOWNBUG (2026-07-04): this program is now rejected with CONVERSION ERROR.
-It previously passed only VACUOUSLY -- the unsupported-STL leniency in
-typecheck_method_bodies silently dropped the un-type-checkable body, so
-nothing was actually verified.  That leniency has been removed; the real
-front-end gap is now visible: iterator-concept chains are not fully modelled.
-Flip back to CORE once the gap is closed.
