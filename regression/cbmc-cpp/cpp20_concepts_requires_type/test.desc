@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^EXIT=0$
@@ -9,3 +9,11 @@ main.cpp
 requires-expression with type requirements.
 The requires clause is skipped but SFINAE-like fallback to the
 primary template works.
+
+--
+KNOWNBUG (2026-07-04): this program is now rejected with CONVERSION ERROR.
+It previously passed only VACUOUSLY -- the unsupported-STL leniency in
+typecheck_method_bodies silently dropped the un-type-checkable body, so
+nothing was actually verified.  That leniency has been removed; the real
+front-end gap is now visible: concept type-requirements are not fully modelled.
+Flip back to CORE once the gap is closed.
