@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_SMT2_SMT2_TOKENIZER_H
 #define CPROVER_SOLVERS_SMT2_SMT2_TOKENIZER_H
 
+#include <util/exception_utils.h>
+
 #include <optional>
 #include <sstream>
 #include <string>
@@ -27,34 +29,18 @@ public:
   }
 
   /// Exception thrown by the tokenizer (and the parser built on top of
-  /// it) to report a syntactic error at a known source line.  Holds an
-  /// `std::ostringstream` so that callers can assemble the diagnostic
-  /// piecewise via `operator<<`.
-  class smt2_errort
+  /// it) to report a syntactic error at a known source line.
+  class smt2_errort : public cprover_exception_baset
   {
   public:
-    smt2_errort(smt2_errort &&) = default;
-
-    smt2_errort(const smt2_errort &other)
-    {
-      // ostringstream does not have a copy constructor
-      message << other.message.str();
-      line_no = other.line_no;
-    }
-
     smt2_errort(const std::string &_message, unsigned _line_no)
       : line_no(_line_no)
     {
-      message << _message;
+      _reason << _message;
     }
 
     explicit smt2_errort(unsigned _line_no) : line_no(_line_no)
     {
-    }
-
-    std::string what() const
-    {
-      return message.str();
     }
 
     unsigned get_line_no() const
@@ -62,13 +48,7 @@ public:
       return line_no;
     }
 
-    std::ostringstream &message_ostream()
-    {
-      return message;
-    }
-
   protected:
-    std::ostringstream message;
     unsigned line_no;
   };
 
@@ -198,15 +178,6 @@ private:
   /// consult or update `peeked` -- callers handle that.
   tokent read_token();
 };
-
-/// add to the diagnostic information in the given smt2_tokenizer exception
-template <typename T>
-smt2_tokenizert::smt2_errort
-operator<<(smt2_tokenizert::smt2_errort &&e, const T &message)
-{
-  e.message_ostream() << message;
-  return std::move(e);
-}
 
 bool is_smt2_simple_symbol_character(char);
 

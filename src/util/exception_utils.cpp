@@ -11,7 +11,7 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 
 std::string cprover_exception_baset::what() const
 {
-  return reason;
+  return reason();
 }
 
 std::string invalid_command_line_argument_exceptiont::what() const
@@ -19,7 +19,7 @@ std::string invalid_command_line_argument_exceptiont::what() const
   std::string res;
   res += "Invalid User Input";
   res += "\nOption: " + option;
-  res += "\nReason: " + reason;
+  res += "\nReason: " + reason();
   // Print an optional correct usage message assuming correct input parameters have been passed
   if(!correct_input.empty())
   {
@@ -58,7 +58,7 @@ incorrect_goto_program_exceptiont::incorrect_goto_program_exceptiont(
 
 std::string incorrect_goto_program_exceptiont::what() const
 {
-  std::string ret(reason);
+  std::string ret(reason());
 
   if(!source_location.is_nil())
     ret += " (at: " + source_location.as_string() + ")";
@@ -95,5 +95,5 @@ invalid_source_file_exceptiont::invalid_source_file_exceptiont(
 
 std::string invalid_source_file_exceptiont::what() const
 {
-  return source_location.as_string() + ": " + reason;
+  return source_location.as_string() + ": " + reason();
 }
