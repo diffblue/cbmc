@@ -69,7 +69,18 @@ std::optional<exprt> cpp_typecheckt::build_init_list_argument(
   if(il_tag_id.empty())
     return {};
 
-  struct_tag_typet il_type(il_tag_id);
+  return build_initializer_list_value(struct_tag_typet{il_tag_id}, init_list);
+}
+
+/// Build a `std::initializer_list<E>` value from a braced-init-list, per N5008
+/// [dcl.init.list]/5: a backing `const E[N]` array is synthesised from the list
+/// elements and the initializer_list object is constructed to refer to it (its
+/// modelled `{begin pointer, size}` layout).  \p il_type must be a
+/// `std::initializer_list<E>` struct-tag type.
+std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
+  const struct_tag_typet &il_type,
+  const exprt &init_list)
+{
   const struct_typet &il_struct = follow_tag(il_type);
 
   // The std::initializer_list<U> layout is modelled as a {begin pointer,
@@ -455,6 +466,28 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // Re-acquire symbol reference — earlier type-checking may have
     // invalidated it through symbol table reallocation.
     symbolt &symbol = symbol_table.get_writeable_ref(sym_id);
+
+    // N5008 [dcl.init.list]/5: initializing a std::initializer_list<E> object
+    // itself from a braced-init-list is special -- a backing const E[N] array
+    // is synthesised and the object refers to it.  This is NOT the general
+    // class init-list-constructor path below: initializer_list's own
+    // constructors are copy/default/(const E*, size_t) internal, so that path
+    // would (wrongly) try to match the elements against them and report
+    // "found no match".  Handle it directly.
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      symbol.type.id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(symbol.type).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      auto il_val = build_initializer_list_value(
+        to_struct_tag_type(symbol.type), symbol.value);
+      if(il_val.has_value())
+      {
+        symbol.value = std::move(*il_val);
+        return;
+      }
+    }
 
     // Aggregate initialization: for braced-init-list on non-POD struct
     // types that have no user-declared constructors (only compiler-

@@ -977,6 +977,13 @@ public:
   std::optional<exprt>
   build_init_list_argument(const typet &target_type, const exprt &init_list);
 
+  /// Build a std::initializer_list<E> value from a braced-init-list per N5008
+  /// [dcl.init.list]/5 (synthesise a backing const E[N] array and refer to it).
+  /// \p il_type must be a std::initializer_list<E> struct-tag type.
+  std::optional<exprt> build_initializer_list_value(
+    const struct_tag_typet &il_type,
+    const exprt &init_list);
+
   void reference_initializer(exprt &expr, const reference_typet &type);
 
   void implicit_typecast(exprt &expr, const typet &type) override;
