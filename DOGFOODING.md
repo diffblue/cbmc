@@ -845,6 +845,37 @@ otherwise unchanged; both suites stay green and dog-food is unchanged.
 
 *Updated: 2026-07-03*
 
+### 2026-07-05 CORRECTION: leniency is load-bearing; kept; gap-by-gap instead
+
+Earlier dog-food figures this session were unreliable (measured against stale
+binaries after rebuilds).  Ground truth, re-measured rebuild-then-measure in one
+step:
+
+* Baseline (leniency present): 96 clean / 16 noisy / 5 FAIL.
+* The **SFINAE-enforcement fix** ("unrecovered no-viable-function is diagnosed"
+  above) itself regressed dog-food to **83 / 16 / 18**: its pending_no_viable
+  path surfaces latent *no-viable* front-end gaps (`make_range`, `optional`,
+  `report_invariant_failure`, ...) that the leniency had swallowed.  This was
+  reported as "0 dog-food impact" -- wrong.
+* **Removing** the leniency craters dog-food to **66 / 49**: it genuinely masks
+  ~40 STL front-end gaps CBMC hits compiling its own source.  So it is NOT
+  zero-value; it is load-bearing.  The removal commit was reverted.
+
+Decisions (with correct data): keep the SFINAE-enforcement fix (accept 83/18 --
+the surfaced no-viable errors are honest); do NOT remove the leniency until the
+underlying gaps are closed (removing it now would make CBMC unable to compile
+~40% of its own source); proceed **gap by gap**, re-classifying to CORE as each
+is closed.
+
+First gap closed this way: `std::initializer_list<E>` object initialization
+([dcl.init.list]/5) -- cpp11_initializer_list_class now verifies non-vacuously;
+dog-food-neutral (83/16/18/0).
+
+Always rebuild-then-measure in one step going forward (the staleness that caused
+the bad figures).
+
+*Updated: 2026-07-05*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
