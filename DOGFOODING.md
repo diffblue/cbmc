@@ -896,6 +896,28 @@ separate make_range gap (the `.map(...).collect<...>()` chain over
 
 *Updated: 2026-07-05*
 
+### 2026-07-05 gap closed: function template with a fixed class param + user conversion
+
+N5008 [over.match.funcs]/[over.ics.user]: a function template with a non-deduced
+(fixed) parameter of class type S is viable for an argument convertible to S via
+a user-defined conversion (const char* -> S).  This is util/invariant.h's
+`report_invariant_failure(const std::string&, ..., D&&...)` called with
+`__FILE__` / string literals.  guess_function_template_args ended with a
+post-deduction compatibility check that rejected the candidate whenever a struct
+parameter got a non-struct argument -- ignoring user conversions.  Fixed to
+reject only when no implicit conversion sequence exists (leaving ranking to
+disambiguate_functions).  Header-free non-vacuous CORE test
+cpp11_template_converting_fixed_param.
+
+Dog-food **84/19/14 -> 89/19/9**: closes the report_invariant_failure cluster
+(lower_byte_operators, replace_expr, simplify_expr, symbol_table) plus one more.
+Side effect: cpp23_expected_basic (a *vacuous* pass -- std::expected is not
+modelled) now instantiates more of std::expected and surfaces a real void->int
+gap, so it fails honestly; reclassified KNOWNBUG (flip to CORE once std::expected
+is modelled).  Both suites green.
+
+*Updated: 2026-07-05*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
