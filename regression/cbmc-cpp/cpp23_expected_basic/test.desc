@@ -1,7 +1,15 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp23
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^CONVERSION ERROR$
+--
+std::expected is not modelled by the C++ front-end.  This test previously passed
+only VACUOUSLY (the whole main body was dropped by the unsupported-construct
+leniency, so nothing was verified).  The converting-fixed-parameter fix lets
+more of std::expected instantiate, which now surfaces a real gap ("conversion
+from 'void' to 'signed int'" in expected's internals) rather than silently
+passing.  Flip back to CORE once std::expected is modelled.
