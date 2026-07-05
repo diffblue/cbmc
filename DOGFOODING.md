@@ -876,6 +876,26 @@ the bad figures).
 
 *Updated: 2026-07-05*
 
+### 2026-07-05 gap closed: decltype nested in a trailing return type (make_range)
+
+N5008 [dcl.fct]/[expr.type]: a function template whose trailing return type
+nests a decltype in a template-id -- util/range.h's
+`template <typename C> auto make_range(C &c) -> ranget<decltype(c.begin())>` --
+was removed from the candidate set ("found no match for make_range").
+guess_function_template_args scopes the parameters so a trailing-return decltype
+resolves, but only when the return type *was* a decltype, not when a decltype was
+nested inside it.  Fixed by scanning the trailing return type for any nested
+decltype (cpp_typecheck_resolve.cpp).  Header-free non-vacuous CORE test
+cpp11_trailing_return_decltype_template_arg.
+
+Dog-food **83/16/18 -> 84/19/14**: make_range no longer blocks options.cpp
+(now clean), simplify_expr_if.cpp, std_expr.cpp, xml.cpp (out of FAIL; residual
+non-make_range issues make them noisy).  structured_data.cpp still FAILs on a
+separate make_range gap (the `.map(...).collect<...>()` chain over
+`data.children()`), left for a follow-up.  Both suites green.
+
+*Updated: 2026-07-05*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
