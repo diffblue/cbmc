@@ -1,7 +1,19 @@
 CORE
 main.cpp
 --cpp11
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main\.assertion\.1\] line \d+ initializer_list size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ initializer_list first element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG size \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.list]/5: `std::initializer_list<int> il = {1,2,3}` synthesises a
+backing `const int[3]` array and makes `il` refer to it.  Fixed by
+build_initializer_list_value + routing an explicit initializer_list<E> target to
+it in convert_initializer (previously CBMC tried to match the braced list
+against initializer_list's own constructors and reported "found no match", which
+the unsupported-construct leniency then silently swallowed -- a vacuous pass).
+assertion.3 provides non-vacuity.
