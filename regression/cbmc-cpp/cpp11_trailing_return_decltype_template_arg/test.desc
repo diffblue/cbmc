@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ trailing R<decltype\(c\.begin\(\)\)> deduced: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [dcl.fct]/[expr.type]: a function template whose trailing return type
+nests a decltype inside a template-id (`-> R<decltype(c.begin())>`) must resolve
+the decltype (with parameter names in scope) during deduction.  CBMC only scoped
+parameters when the whole return type was a decltype; fixed by scanning the
+return type for any nested decltype in guess_function_template_args.  This is the
+util/range.h make_range(container) shape.  assertion.2 provides non-vacuity.
