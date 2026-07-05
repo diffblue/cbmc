@@ -7488,7 +7488,31 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         }
         else
         {
-          return nil_exprt();
+          // N5008 [over.match.funcs], [over.ics.user]: a non-class argument
+          // may still be convertible to the struct parameter through a
+          // user-defined conversion (e.g. `const char*` -> S when S has a
+          // converting constructor `S(const char*)`, as in
+          // report_invariant_failure's `std::string` parameters).  Only reject
+          // the candidate when NO implicit conversion sequence exists; genuine
+          // viability and ranking are done later by disambiguate_functions.
+          // Without this, such a function template was wrongly dropped from the
+          // overload set ("found no match").
+          bool convertible = false;
+          const std::size_t errs_before =
+            old_handler.get_message_count(messaget::M_ERROR);
+          try
+          {
+            unsigned rank = 0;
+            convertible = cpp_typecheck.implicit_conversion_sequence(
+              *arg_it, param_type, rank);
+          }
+          catch(...)
+          {
+            convertible = false;
+          }
+          old_handler.set_message_count(messaget::M_ERROR, errs_before);
+          if(!convertible)
+            return nil_exprt();
         }
       }
     }
