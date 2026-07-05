@@ -7314,10 +7314,27 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       }
 
       // For trailing return types with decltype referencing parameters,
-      // put function parameters temporarily into scope.
+      // put function parameters temporarily into scope.  N5008 [expr.type]:
+      // the decltype operand may be nested inside the return type (e.g. as a
+      // template argument, `-> ranget<decltype(c.begin())>`), not only be the
+      // whole return type (`-> decltype(c.begin())`); scan the return type for
+      // any decltype so the parameter names it references resolve during the
+      // type-check below.
+      std::function<bool(const irept &)> contains_decltype =
+        [&](const irept &t) -> bool {
+        if(t.id() == ID_decltype)
+          return true;
+        for(const auto &s : t.get_sub())
+          if(contains_decltype(s))
+            return true;
+        for(const auto &ns : t.get_named_sub())
+          if(contains_decltype(ns.second))
+            return true;
+        return false;
+      };
       if(
         function_type.has_subtype() &&
-        to_type_with_subtype(function_type).subtype().id() == ID_decltype)
+        contains_decltype(to_type_with_subtype(function_type).subtype()))
       {
         for(const auto &p : params)
         {
