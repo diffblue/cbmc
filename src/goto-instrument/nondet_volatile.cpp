@@ -118,6 +118,19 @@ private:
     const goto_programt::instructiont &instruction,
     const namespacet &ns);
 
+  /// Is \p instruction a completion barrier (ARM DSB): a full fence not marked
+  /// ordering-only, or __sync_synchronize? Under early-ack it completes writes.
+  static bool is_completion_barrier(
+    const goto_programt::instructiont &instruction,
+    const namespacet &ns);
+
+  /// Is \p instruction an ordering-only barrier (ARM DMB / Power lwsync)? Under
+  /// early-ack it orders posted writes (by generation) but does not complete
+  /// them.
+  static bool is_ordering_barrier(
+    const goto_programt::instructiont &instruction,
+    const namespacet &ns);
+
   /// A per-register FIFO of posted (not-yet-observed) writes to a weakly
   /// ordered register: a fixed-capacity buffer and its current size. The
   /// buffers have static lifetime so that a posted write can be delayed across
@@ -466,6 +479,40 @@ bool nondet_volatilet::is_barrier(
   return false;
 }
 
+bool nondet_volatilet::is_completion_barrier(
+  const goto_programt::instructiont &instruction,
+  const namespacet &ns)
+{
+  // __sync_synchronize is a full/completion barrier
+  if(instruction.is_function_call())
+  {
+    const exprt &function = instruction.call_function();
+    if(
+      function.id() == ID_symbol &&
+      ns.lookup(to_symbol_expr(function)).base_name == "__sync_synchronize")
+    {
+      return true;
+    }
+  }
+
+  // a full fence that is not marked ordering-only (ARM DSB, or an explicit full
+  // fence)
+  return is_fence(instruction, ns) &&
+         !instruction.code().get_bool(ID_ordering_fence);
+}
+
+bool nondet_volatilet::is_ordering_barrier(
+  const goto_programt::instructiont &instruction,
+  const namespacet &ns)
+{
+  // ARM DMB: a full fence marked ordering-only
+  if(is_fence(instruction, ns))
+    return instruction.code().get_bool(ID_ordering_fence);
+
+  // Power lwsync / a lightweight fence
+  return is_lwfence(instruction, ns);
+}
+
 exprt nondet_volatilet::head_is_oldest(const posted_buffert &b) const
 {
   if(!early_ack)
@@ -793,21 +840,28 @@ void nondet_volatilet::instrument_posted_writes(
         goto_program.destructive_insert(std::next(it), fragment);
       }
     }
-    else if(is_barrier(*it, ns))
+    else if(!early_ack && is_barrier(*it, ns))
     {
-      // a completion barrier (a full fence / __sync_synchronize, i.e. an ARM
-      // DSB), or any barrier when early-ack is off, completes all posted writes
+      // without early-ack, any barrier completes all posted writes
       const source_locationt loc = it->source_location();
       goto_programt fragment;
       emit_drain_all(fragment, ns, loc);
       goto_program.destructive_insert(std::next(it), fragment);
     }
-    else if(early_ack && is_lwfence(*it, ns))
+    else if(early_ack && is_completion_barrier(*it, ns))
     {
-      // an ordering barrier (a lightweight fence, i.e. an ARM DMB) orders
-      // posted writes by generation but does not complete them: bump the
-      // generation, so later writes cannot be observed before writes posted
-      // before it
+      // a completion barrier (a full fence / __sync_synchronize, i.e. an ARM
+      // DSB) completes all posted writes
+      const source_locationt loc = it->source_location();
+      goto_programt fragment;
+      emit_drain_all(fragment, ns, loc);
+      goto_program.destructive_insert(std::next(it), fragment);
+    }
+    else if(early_ack && is_ordering_barrier(*it, ns))
+    {
+      // an ordering barrier (ARM DMB / Power lwsync) orders posted writes by
+      // generation but does not complete them: bump the generation, so later
+      // writes cannot be observed before writes posted before it
       const source_locationt loc = it->source_location();
       goto_programt fragment;
       fragment.add(goto_programt::make_assignment(

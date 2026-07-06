@@ -1721,6 +1721,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // label the assertions
   label_properties(goto_model);
 
+  // The weak MMIO model recognises memory barriers, including those written as
+  // inline assembly (e.g. ARM dmb/dsb, x86 mfence); lower them to fences first.
+  if(cmdline.isset(MMIO_WEAK_OPT) || cmdline.isset(MMIO_WEAK_VARIABLE_OPT))
+  {
+    remove_asm(goto_model, ui_message_handler);
+  }
+
   nondet_volatile(goto_model, options);
 
   // Memory-mapped I/O

@@ -171,6 +171,18 @@ is a completion barrier that flushes all posted writes. This gives the three-way
 distinction: no barrier reorders freely; a `DMB` orders but does not complete; a
 `DSB` orders and completes.
 
+The barrier kind is taken from the source where possible. `remove_asm` lowers
+inline-assembly barriers to fences, and distinguishes the ARM ordering barrier
+`dmb` (marked ordering-only) from the completion barrier `dsb`; Power `lwsync`
+(ordering) and `sync` (completion) are likewise distinguished by their fence
+flags. So a driver that uses `asm volatile("dmb ...")` / `asm volatile("dsb
+...")` — or the accessor macros that expand to them — gets the right
+ordering-vs-completion semantics under `--mmio-early-ack` without any extra
+annotation. The one memory attribute not derivable from the access site is the
+region's memory *type* (weak/strong, gather), which is fixed by how the region
+was mapped (e.g. `ioremap` vs `ioremap_wc`) rather than by the access; that
+remains a per-register option (or a future mapping-API recognition).
+
 ## Soundness stance
 
 For bug-finding we prefer over-approximation: non-deterministic reads soundly

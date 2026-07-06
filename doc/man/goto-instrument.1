@@ -468,7 +468,10 @@ ARM \fBDMB\fR) then acts as an ordering barrier only: it orders posted writes bu
 does not complete them, so a write may still be in flight after it. A full fence
 or \fB__sync_synchronize\fR (an ARM \fBDSB\fR) is a completion barrier that
 completes all posted writes. Without this option every recognised barrier
-completes posted writes.
+completes posted writes. Barriers written as inline assembly are recognised too:
+an ARM \fBdmb\fR (and Power \fBlwsync\fR) is an ordering barrier, while an ARM
+\fBdsb\fR (and Power \fBsync\fR, or \fB__sync_synchronize\fR) is a completion
+barrier.
 .TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime
