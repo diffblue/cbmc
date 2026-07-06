@@ -1053,11 +1053,27 @@ call-site scope.
 
 Ruled out: resetting the scope around the template-converting-constructor
 fallback in `user_defined_conversion_sequence` (that path is not the one taken).
-The correct fix needs deeper tracing of where overload resolution's conversion
-computation consults the current scope; deferred rather than risk a rushed
-change to that code.  Captured as KNOWNBUG `cpp17_out_of_line_udc_conversion`
-(non-vacuous; flips to CORE once fixed).  Both suites green; tree otherwise
-unchanged.
+
+**Fixed** (follow-up, same day): further tracing showed the failure is not a
+scope-lookup issue at all.  During type-checking of the deferred out-of-line
+body, `new_temporary`/`cpp_constructor` builds the `std::string`->`path`
+conversion but finds **no constructor component** on `path` -- its constructor
+components are materialised only after `path` is first constructed in an
+*eager* (non-deferred) context, which never happens here -- and so throws "non-
+POD type has no constructor", which the SFINAE-guarded conversion turns into
+"no viable conversion".  A free function at namespace scope is type-checked
+eagerly, so `path`'s constructor is already materialised there.  Fix in
+`cpp_constructor` ([class.ctor.general]/1): when the ctor-component loop finds
+nothing for a non-POD class being constructed with arguments, resolve the
+constructor by the class's own name in the (already-entered) class scope, where
+overload resolution finds it -- including constructor *templates*, which are
+never stored as plain components.  A genuinely constructor-less class still
+fails with the ordinary "no match".
+
+`cpp17_out_of_line_udc_conversion` is now a **CORE** test.  It keeps the
+out-of-line body (so the front-end fix is exercised) but does not call it, so
+BMC stays trivial (the property is a front-end one).  Dog-food **90/19/8 ->
+91/19/7**: `tempfile.cpp` now compiles.  Both suites green; clang-format clean.
 
 *Updated: 2026-07-06*
 
