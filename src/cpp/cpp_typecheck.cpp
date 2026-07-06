@@ -94,7 +94,7 @@ void cpp_typecheckt::convert(cpp_itemt &item)
     convert(item.get_static_assert());
   else
   {
-    error().source_location=item.source_location();
+    error().source_location = item.source_location();
     error() << "unknown parse-tree element: " << item.id() << eom;
     throw 0;
   }
@@ -108,7 +108,7 @@ void cpp_typecheckt::typecheck()
   cpp_scopet::clear_static_caches();
 
   // default linkage is "automatic"
-  current_linkage_spec=ID_auto;
+  current_linkage_spec = ID_auto;
 
   for(auto &item : cpp_parse_tree.items)
   {
@@ -265,8 +265,7 @@ void cpp_typecheckt::typecheck()
 
 const struct_typet &cpp_typecheckt::this_struct_type()
 {
-  const exprt &this_expr=
-    cpp_scopes.current_scope().this_expr;
+  const exprt &this_expr = cpp_scopes.current_scope().this_expr;
 
   CHECK_RETURN(this_expr.is_not_nil());
   CHECK_RETURN(this_expr.type().id() == ID_pointer);
@@ -409,14 +408,14 @@ bool cpp_typecheck(
   message_handlert &message_handler,
   const namespacet &ns)
 {
-  const unsigned errors_before=
+  const unsigned errors_before =
     message_handler.get_message_count(messaget::M_ERROR);
 
   symbol_tablet symbol_table;
   cpp_parse_treet cpp_parse_tree;
 
-  cpp_typecheckt cpp_typecheck(cpp_parse_tree, symbol_table,
-                               ns.get_symbol_table(), "", message_handler);
+  cpp_typecheckt cpp_typecheck(
+    cpp_parse_tree, symbol_table, ns.get_symbol_table(), "", message_handler);
 
   try
   {
@@ -444,7 +443,7 @@ bool cpp_typecheck(
     cpp_typecheck.error() << e.get_reason() << messaget::eom;
   }
 
-  return message_handler.get_message_count(messaget::M_ERROR)!=errors_before;
+  return message_handler.get_message_count(messaget::M_ERROR) != errors_before;
 }
 
 /// Initialization of static objects:
@@ -491,7 +490,39 @@ void cpp_typecheckt::static_and_dynamic_initialization()
               has_side_effect = true;
           });
       }
-      if(!has_side_effect)
+
+      // N5008 [class.default.ctor]/3 + [basic.start.static]: a class with a
+      // default member initializer (NSDMI) has a non-trivial default
+      // constructor.  A value-less namespace-scope definition (`Q g;` for
+      // `struct Q { int t = 5; };`) must run that constructor so the NSDMI is
+      // applied; merely zero-initializing it (the effect of skipping it here)
+      // would leave the member at 0 instead of its declared default.  Route
+      // such a definition to the default-constructor path below.  Members with
+      // an explicit initializer are unaffected (the initializer overrides the
+      // NSDMI, [class.base.init]/9).
+      const bool has_nsdmi = [this](const typet &type) -> bool
+      {
+        const typet *t = &type;
+        if(t->id() == ID_struct_tag || t->id() == ID_union_tag)
+          t = &lookup(to_tag_type(*t)).type;
+        if(t->id() != ID_struct && t->id() != ID_union)
+          return false;
+        for(const auto &c : to_struct_union_type(*t).components())
+        {
+          if(
+            c.get_bool(ID_is_static) || c.get_bool(ID_is_type) ||
+            c.get_is_padding())
+          {
+            continue;
+          }
+          if(c.find(ID_C_default_value).is_not_nil())
+            return true;
+        }
+        return false;
+      }(symbol.type);
+      const bool needs_default_ctor = symbol.value.is_nil() && has_nsdmi;
+
+      if(!has_side_effect && !needs_default_ctor)
         continue;
     }
 
@@ -499,7 +530,7 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     DATA_INVARIANT(!symbol.is_type, "should not be a type");
     DATA_INVARIANT(symbol.type.id() != ID_code, "should not be code");
 
-    exprt symbol_expr=cpp_symbol_expr(symbol);
+    exprt symbol_expr = cpp_symbol_expr(symbol);
 
     // initializer given?
     if(symbol.value.is_not_nil())
@@ -539,13 +570,13 @@ void cpp_typecheckt::static_and_dynamic_initialization()
     "#cpp_dynamic_initialization#" + id2string(module),
     code_typet({}, typet(ID_constructor)),
     ID_cpp};
-  init_symbol.base_name="#cpp_dynamic_initialization#"+id2string(module);
+  init_symbol.base_name = "#cpp_dynamic_initialization#" + id2string(module);
   init_symbol.value.swap(init_block);
-  init_symbol.module=module;
+  init_symbol.module = module;
 
   symbol_table.insert(std::move(init_symbol));
 
-  disable_access_control=false;
+  disable_access_control = false;
 }
 
 void cpp_typecheckt::do_not_typechecked()
@@ -567,19 +598,19 @@ void cpp_typecheckt::do_not_typechecked()
         DATA_INVARIANT(symbol.type.id() == ID_code, "must be code");
         exprt value = symbol.value;
 
-        if(symbol.base_name=="operator=")
+        if(symbol.base_name == "operator=")
         {
           cpp_declaratort declarator;
           declarator.add_source_location() = symbol.location;
           default_assignop_value(
             lookup(symbol.type.get(ID_C_member_name)), declarator);
           value.swap(declarator.value());
-          cont=true;
+          cont = true;
         }
-        else if(symbol.value.operands().size()==1)
+        else if(symbol.value.operands().size() == 1)
         {
           value = to_unary_expr(symbol.value).op();
-          cont=true;
+          cont = true;
         }
         else
           UNREACHABLE; // Don't know what to do!
@@ -589,8 +620,7 @@ void cpp_typecheckt::do_not_typechecked()
         convert_function(writable_symbol);
       }
     }
-  }
-  while(cont);
+  } while(cont);
 
   for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
   {
@@ -608,7 +638,7 @@ void cpp_typecheckt::clean_up()
     auto cur_it = it;
     it++;
 
-    const symbolt &symbol=cur_it->second;
+    const symbolt &symbol = cur_it->second;
 
     // erase templates and all member functions that have not been converted
     if(symbol.type.get_bool(ID_is_template))
@@ -625,33 +655,31 @@ void cpp_typecheckt::clean_up()
       symbol_table.get_writeable_ref(symbol.name).value.make_nil();
       continue;
     }
-    else if(symbol.type.id()==ID_struct ||
-            symbol.type.id()==ID_union)
+    else if(symbol.type.id() == ID_struct || symbol.type.id() == ID_union)
     {
       // remove methods from 'components'
       struct_union_typet &struct_union_type =
         to_struct_union_type(cur_it.get_writeable_symbol().type);
 
-      const struct_union_typet::componentst &components=
+      const struct_union_typet::componentst &components =
         struct_union_type.components();
 
       struct_union_typet::componentst data_members;
       data_members.reserve(components.size());
 
-      struct_union_typet::componentst &function_members=
-        (struct_union_typet::componentst &)
-        (struct_union_type.add(ID_methods).get_sub());
+      struct_union_typet::componentst &function_members =
+        (struct_union_typet::componentst &)(struct_union_type.add(ID_methods)
+                                              .get_sub());
 
       function_members.reserve(components.size());
 
       for(const auto &compo_it : components)
       {
-        if(compo_it.get_bool(ID_is_static) ||
-           compo_it.get_bool(ID_is_type))
+        if(compo_it.get_bool(ID_is_static) || compo_it.get_bool(ID_is_type))
         {
           // skip it
         }
-        else if(compo_it.type().id()==ID_code)
+        else if(compo_it.type().id() == ID_code)
         {
           function_members.push_back(compo_it);
         }
