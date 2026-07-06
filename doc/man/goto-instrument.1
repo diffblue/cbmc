@@ -418,7 +418,13 @@ so that they are not removed as dead code once reads are non-deterministic.
 instruments an interrupt service routine
 .TP
 \fB\-\-mmio\fR
-instruments memory\-mapped I/O
+Apply the memory\-mapped I/O memory model. This is the entry point for modelling
+device memory. It currently applies the device\-environment model to all
+volatile accesses (equivalent to \fB\-\-nondet\-volatile\fR): reads become
+non\-deterministic and writes are preserved as observable side effects, which is
+the correct model for the strongly\-ordered device\-memory types. An
+ordering\-aware model for the weak device\-memory types is planned on top of the
+\fB\-\-mm\fR weak\-memory engine.
 .TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime

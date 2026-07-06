@@ -118,7 +118,7 @@ int goto_instrument_parse_optionst::doit()
     return CPROVER_EXIT_SUCCESS;
   }
 
-  if(cmdline.args.size()!=1 && cmdline.args.size()!=2)
+  if(cmdline.args.size() != 1 && cmdline.args.size() != 2)
   {
     help();
     return CPROVER_EXIT_USAGE_ERROR;
@@ -173,9 +173,9 @@ int goto_instrument_parse_optionst::doit()
     }
 
     {
-      bool unwind_given=cmdline.isset("unwind");
-      bool unwindset_given=cmdline.isset("unwindset");
-      bool unwindset_file_given=cmdline.isset("unwindset-file");
+      bool unwind_given = cmdline.isset("unwind");
+      bool unwindset_given = cmdline.isset("unwindset");
+      bool unwindset_file_given = cmdline.isset("unwindset-file");
 
       if(unwindset_given && unwindset_file_given)
         throw "only one of --unwindset and --unwindset-file supported at a "
@@ -204,7 +204,7 @@ int goto_instrument_parse_optionst::doit()
             ui_message_handler);
         }
 
-        bool continue_as_loops=cmdline.isset("continue-as-loops");
+        bool continue_as_loops = cmdline.isset("continue-as-loops");
         bool partial_loops = cmdline.isset("partial-loops");
         bool unwinding_assertions = cmdline.isset("unwinding-assertions") ||
                                     (!continue_as_loops && !partial_loops &&
@@ -220,7 +220,7 @@ int goto_instrument_parse_optionst::doit()
             throw "partial loops cannot be used with --continue-as-loops";
         }
 
-        goto_unwindt::unwind_strategyt unwind_strategy=
+        goto_unwindt::unwind_strategyt unwind_strategy =
           goto_unwindt::unwind_strategyt::ASSUME;
 
         if(unwinding_assertions)
@@ -232,11 +232,11 @@ int goto_instrument_parse_optionst::doit()
         }
         else if(partial_loops)
         {
-          unwind_strategy=goto_unwindt::unwind_strategyt::PARTIAL;
+          unwind_strategy = goto_unwindt::unwind_strategyt::PARTIAL;
         }
         else if(continue_as_loops)
         {
-          unwind_strategy=goto_unwindt::unwind_strategyt::CONTINUE;
+          unwind_strategy = goto_unwindt::unwind_strategyt::CONTINUE;
         }
 
         goto_unwindt goto_unwind;
@@ -247,14 +247,14 @@ int goto_instrument_parse_optionst::doit()
           std::string filename = cmdline.value_opt("log").value_or("-");
           bool have_file = filename != "-";
 
-          jsont result=goto_unwind.output_log_json();
+          jsont result = goto_unwind.output_log_json();
 
           if(have_file)
           {
             std::ofstream of(widen_if_needed(filename));
 
             if(!of)
-              throw "failed to open file "+filename;
+              throw "failed to open file " + filename;
 
             of << result;
             of.close();
@@ -288,7 +288,7 @@ int goto_instrument_parse_optionst::doit()
         forall_goto_program_instructions(i_it, goto_program)
         {
           i_it->output(std::cout);
-          std::cout << "Is threaded: " << (is_threaded(i_it)?"True":"False")
+          std::cout << "Is threaded: " << (is_threaded(i_it) ? "True" : "False")
                     << "\n\n";
         }
       }
@@ -365,8 +365,9 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("show-local-safe-pointers") ||
-       cmdline.isset("show-safe-dereferences"))
+    if(
+      cmdline.isset("show-local-safe-pointers") ||
+      cmdline.isset("show-safe-dereferences"))
     {
       // Ensure location numbering is unique:
       goto_model.goto_functions.update();
@@ -476,9 +477,7 @@ int goto_instrument_parse_optionst::doit()
       custom_bitvector_analysist custom_bitvector_analysis;
       custom_bitvector_analysis(goto_model);
       custom_bitvector_analysis.check(
-        goto_model,
-        cmdline.isset("xml-ui"),
-        std::cout);
+        goto_model, cmdline.isset("xml-ui"), std::cout);
 
       return CPROVER_EXIT_SUCCESS;
     }
@@ -553,7 +552,7 @@ int goto_instrument_parse_optionst::doit()
       value_set_analysist value_set_analysis(ns);
       value_set_analysis(goto_model);
 
-      const symbolt &symbol=ns.lookup(ID_main);
+      const symbolt &symbol = ns.lookup(ID_main);
       symbol_exprt main(symbol.name, symbol.type);
 
       std::cout << rw_set_functiont(
@@ -640,23 +639,24 @@ int goto_instrument_parse_optionst::doit()
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("show-claims") ||
-       cmdline.isset("show-properties"))
+    if(cmdline.isset("show-claims") || cmdline.isset("show-properties"))
     {
       const namespacet ns(goto_model.symbol_table);
       show_properties(goto_model, ui_message_handler);
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("document-claims-html") ||
-       cmdline.isset("document-properties-html"))
+    if(
+      cmdline.isset("document-claims-html") ||
+      cmdline.isset("document-properties-html"))
     {
       document_properties_html(goto_model, std::cout);
       return CPROVER_EXIT_SUCCESS;
     }
 
-    if(cmdline.isset("document-claims-latex") ||
-       cmdline.isset("document-properties-latex"))
+    if(
+      cmdline.isset("document-claims-latex") ||
+      cmdline.isset("document-properties-latex"))
     {
       document_properties_latex(goto_model, std::cout);
       return CPROVER_EXIT_SUCCESS;
@@ -728,11 +728,11 @@ int goto_instrument_parse_optionst::doit()
       cmdline.isset("dump-c") || cmdline.isset("dump-cpp") ||
       cmdline.isset("dump-c-type-header"))
     {
-      const bool is_cpp=cmdline.isset("dump-cpp");
+      const bool is_cpp = cmdline.isset("dump-cpp");
       const bool is_header = cmdline.isset("dump-c-type-header");
-      const bool h_libc=!cmdline.isset("no-system-headers");
-      const bool h_all=cmdline.isset("use-all-headers");
-      const bool harness=cmdline.isset("harness");
+      const bool h_libc = !cmdline.isset("no-system-headers");
+      const bool h_all = cmdline.isset("use-all-headers");
+      const bool harness = cmdline.isset("harness");
       namespacet ns(goto_model.symbol_table);
 
       // restore RETURN instructions in case remove_returns had been
@@ -743,7 +743,7 @@ int goto_instrument_parse_optionst::doit()
       // location numbers:
       goto_model.goto_functions.update();
 
-      if(cmdline.args.size()==2)
+      if(cmdline.args.size() == 2)
       {
         std::ofstream out(widen_if_needed(cmdline.args[1]));
 
@@ -810,9 +810,8 @@ int goto_instrument_parse_optionst::doit()
     if(cmdline.isset("reachable-call-graph"))
     {
       do_indirect_call_and_rtti_removal();
-      call_grapht call_graph =
-        call_grapht::create_from_root_function(
-          goto_model, goto_functionst::entry_point(), false);
+      call_grapht call_graph = call_grapht::create_from_root_function(
+        goto_model, goto_functionst::entry_point(), false);
       if(cmdline.isset("xml"))
         call_graph.output_xml(std::cout);
       else if(cmdline.isset("dot"))
@@ -839,7 +838,7 @@ int goto_instrument_parse_optionst::doit()
     {
       namespacet ns(goto_model.symbol_table);
 
-      if(cmdline.args.size()==2)
+      if(cmdline.args.size() == 2)
       {
         std::ofstream out(widen_if_needed(cmdline.args[1]));
 
@@ -883,7 +882,7 @@ int goto_instrument_parse_optionst::doit()
       log.status() << "Horn-clause encoding" << messaget::eom;
       namespacet ns(goto_model.symbol_table);
 
-      if(cmdline.args.size()==2)
+      if(cmdline.args.size() == 2)
       {
         std::ofstream out(widen_if_needed(cmdline.args[1]));
 
@@ -918,7 +917,7 @@ int goto_instrument_parse_optionst::doit()
     }
 
     // write new binary?
-    if(cmdline.args.size()==2)
+    if(cmdline.args.size() == 2)
     {
       log.status() << "Writing GOTO program to '" << cmdline.args[1] << "'"
                    << messaget::eom;
@@ -940,7 +939,7 @@ int goto_instrument_parse_optionst::doit()
     help();
     return CPROVER_EXIT_USAGE_ERROR;
   }
-// NOLINTNEXTLINE(readability/fn_size)
+  // NOLINTNEXTLINE(readability/fn_size)
 }
 
 void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
@@ -949,7 +948,7 @@ void goto_instrument_parse_optionst::do_indirect_call_and_rtti_removal(
   if(function_pointer_removal_done && !force)
     return;
 
-  function_pointer_removal_done=true;
+  function_pointer_removal_done = true;
 
   log.status() << "Function Pointer Removal" << messaget::eom;
   remove_function_pointers(ui_message_handler, goto_model, false);
@@ -983,7 +982,7 @@ void goto_instrument_parse_optionst::do_partial_inlining()
   if(partial_inlining_done)
     return;
 
-  partial_inlining_done=true;
+  partial_inlining_done = true;
 
   if(!cmdline.isset("inline"))
   {
@@ -997,7 +996,7 @@ void goto_instrument_parse_optionst::do_remove_returns()
   if(remove_returns_done)
     return;
 
-  remove_returns_done=true;
+  remove_returns_done = true;
 
   log.status() << "Removing returns" << messaget::eom;
   remove_returns(goto_model);
@@ -1038,7 +1037,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // initialize argv with valid pointers
   if(cmdline.isset("model-argc-argv"))
   {
-    unsigned max_argc=
+    unsigned max_argc =
       safe_string2unsigned(cmdline.get_value("model-argc-argv"));
 
     log.status() << "Adding up to " << max_argc << " command line arguments"
@@ -1071,8 +1070,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     cmdline.isset("reachability-slice-fb") ||
     cmdline.isset("fp-reachability-slice"))
   {
-    if(cmdline.isset("show-custom-bitvector-analysis") ||
-       cmdline.isset("custom-bitvector-analysis"))
+    if(
+      cmdline.isset("show-custom-bitvector-analysis") ||
+      cmdline.isset("custom-bitvector-analysis"))
     {
       config.ansi_c.defines.push_back(
         std::string(CPROVER_PREFIX) + "CUSTOM_BITVECTOR_ANALYSIS");
@@ -1129,8 +1129,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   {
     do_indirect_call_and_rtti_removal(true);
 
-    if(cmdline.isset("show-custom-bitvector-analysis") ||
-       cmdline.isset("custom-bitvector-analysis"))
+    if(
+      cmdline.isset("show-custom-bitvector-analysis") ||
+      cmdline.isset("custom-bitvector-analysis"))
     {
       do_remove_returns();
       thread_exit_instrumentation(goto_model);
@@ -1141,8 +1142,9 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     goto_inline(goto_model, ui_message_handler, true);
   }
 
-  if(cmdline.isset("show-custom-bitvector-analysis") ||
-     cmdline.isset("custom-bitvector-analysis"))
+  if(
+    cmdline.isset("show-custom-bitvector-analysis") ||
+    cmdline.isset("custom-bitvector-analysis"))
   {
     log.status() << "Propagating Constants" << messaget::eom;
     constant_propagator_ait constant_propagator_ai(goto_model);
@@ -1313,10 +1315,10 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("function-inline"))
   {
-    std::string function=cmdline.get_value("function-inline");
+    std::string function = cmdline.get_value("function-inline");
     PRECONDITION(!function.empty());
 
-    bool caching=!cmdline.isset("no-caching");
+    bool caching = !cmdline.isset("no-caching");
 
     do_indirect_call_and_rtti_removal();
 
@@ -1341,7 +1343,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         std::ofstream of(widen_if_needed(filename));
 
         if(!of)
-          throw "failed to open file "+filename;
+          throw "failed to open file " + filename;
 
         of << result;
         of.close();
@@ -1527,8 +1529,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(
     cmdline.isset("remove-pointers") || cmdline.isset("race-check") ||
-    cmdline.isset("mm") || cmdline.isset("isr") || cmdline.isset("mmio") ||
-    cmdline.isset("concurrency"))
+    cmdline.isset("mm") || cmdline.isset("isr") || cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
 
@@ -1552,71 +1553,73 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
     if(cmdline.isset("mm"))
     {
-      std::string mm=cmdline.get_value("mm");
+      std::string mm = cmdline.get_value("mm");
       memory_modelt model;
 
       // strategy of instrumentation
       instrumentation_strategyt inst_strategy;
       if(cmdline.isset("one-event-per-cycle"))
-        inst_strategy=one_event_per_cycle;
+        inst_strategy = one_event_per_cycle;
       else if(cmdline.isset("minimum-interference"))
-        inst_strategy=min_interference;
+        inst_strategy = min_interference;
       else if(cmdline.isset("read-first"))
-        inst_strategy=read_first;
+        inst_strategy = read_first;
       else if(cmdline.isset("write-first"))
-        inst_strategy=write_first;
+        inst_strategy = write_first;
       else if(cmdline.isset("my-events"))
-        inst_strategy=my_events;
+        inst_strategy = my_events;
       else
         /* default: instruments all unsafe pairs */
-        inst_strategy=all;
+        inst_strategy = all;
 
-      const unsigned max_var=
-        cmdline.isset("max-var")?
-        unsafe_string2unsigned(cmdline.get_value("max-var")):0;
-      const unsigned max_po_trans=
-        cmdline.isset("max-po-trans")?
-        unsafe_string2unsigned(cmdline.get_value("max-po-trans")):0;
+      const unsigned max_var =
+        cmdline.isset("max-var")
+          ? unsafe_string2unsigned(cmdline.get_value("max-var"))
+          : 0;
+      const unsigned max_po_trans =
+        cmdline.isset("max-po-trans")
+          ? unsafe_string2unsigned(cmdline.get_value("max-po-trans"))
+          : 0;
 
-      if(mm=="tso")
+      if(mm == "tso")
       {
         log.status() << "Adding weak memory (TSO) Instrumentation"
                      << messaget::eom;
-        model=TSO;
+        model = TSO;
       }
-      else if(mm=="pso")
+      else if(mm == "pso")
       {
         log.status() << "Adding weak memory (PSO) Instrumentation"
                      << messaget::eom;
-        model=PSO;
+        model = PSO;
       }
-      else if(mm=="rmo")
+      else if(mm == "rmo")
       {
         log.status() << "Adding weak memory (RMO) Instrumentation"
                      << messaget::eom;
-        model=RMO;
+        model = RMO;
       }
-      else if(mm=="power")
+      else if(mm == "power")
       {
         log.status() << "Adding weak memory (Power) Instrumentation"
                      << messaget::eom;
-        model=Power;
+        model = Power;
       }
       else
       {
         log.error() << "Unknown weak memory model '" << mm << "'"
                     << messaget::eom;
-        model=Unknown;
+        model = Unknown;
       }
 
-      loop_strategyt loops=arrays_only;
+      loop_strategyt loops = arrays_only;
 
       if(cmdline.isset("force-loop-duplication"))
-        loops=all_loops;
+        loops = all_loops;
       if(cmdline.isset("no-loop-duplication"))
-        loops=no_loop;
+        loops = no_loop;
 
-      if(model!=Unknown)
+      if(model != Unknown)
         weak_memory(
           model,
           value_set_analysis,
@@ -1648,13 +1651,6 @@ void goto_instrument_parse_optionst::instrument_goto_program()
         ui_message_handler);
     }
 
-    // Memory-mapped I/O
-    if(cmdline.isset("mmio"))
-    {
-      log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
-      mmio(value_set_analysis, goto_model, ui_message_handler);
-    }
-
     if(cmdline.isset("concurrency"))
     {
       log.status() << "Sequentializing concurrency" << messaget::eom;
@@ -1676,17 +1672,17 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
   if(cmdline.isset("k-induction"))
   {
-    bool base_case=cmdline.isset("base-case");
-    bool step_case=cmdline.isset("step-case");
+    bool base_case = cmdline.isset("base-case");
+    bool step_case = cmdline.isset("step-case");
 
     if(step_case && base_case)
       throw "please specify only one of --step-case and --base-case";
     else if(!step_case && !base_case)
       throw "please specify one of --step-case and --base-case";
 
-    unsigned k=unsafe_string2unsigned(cmdline.get_value("k-induction"));
+    unsigned k = unsafe_string2unsigned(cmdline.get_value("k-induction"));
 
-    if(k==0)
+    if(k == 0)
       throw "please give k>=1";
 
     log.status() << "Instrumenting k-induction for k=" << k << ", "
@@ -1698,25 +1694,19 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("function-enter"))
   {
     log.status() << "Function enter instrumentation" << messaget::eom;
-    function_enter(
-      goto_model,
-      cmdline.get_value("function-enter"));
+    function_enter(goto_model, cmdline.get_value("function-enter"));
   }
 
   if(cmdline.isset("function-exit"))
   {
     log.status() << "Function exit instrumentation" << messaget::eom;
-    function_exit(
-      goto_model,
-      cmdline.get_value("function-exit"));
+    function_exit(goto_model, cmdline.get_value("function-exit"));
   }
 
   if(cmdline.isset("branch"))
   {
     log.status() << "Branch instrumentation" << messaget::eom;
-    branch(
-      goto_model,
-      cmdline.get_value("branch"));
+    branch(goto_model, cmdline.get_value("branch"));
   }
 
   // add failed symbols
@@ -1732,6 +1722,13 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   label_properties(goto_model);
 
   nondet_volatile(goto_model, options);
+
+  // Memory-mapped I/O
+  if(cmdline.isset("mmio"))
+  {
+    log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
+    mmio(goto_model);
+  }
 
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
@@ -1791,7 +1788,7 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(cmdline.isset("splice-call"))
   {
     log.status() << "Performing call splicing" << messaget::eom;
-    std::string callercallee=cmdline.get_value("splice-call");
+    std::string callercallee = cmdline.get_value("splice-call");
     if(splice_call(
          goto_model.goto_functions,
          callercallee,

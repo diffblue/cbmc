@@ -65,8 +65,9 @@ new work lies.
   `shared_bufferst` API, and conceptually mislabelled (store buffering is a
   property of the *weak* device types, not MMIO in general). It has been
   **removed**; its idea survives, correctly, as Phase 2 below (write-combining
-  memory via `wmm/`), not as a bespoke copy. `goto-instrument --mmio` therefore
-  no longer rewrites anything.
+  memory via `wmm/`). `goto-instrument --mmio` is now the entry point for the
+  MMIO memory model (see below): today it applies the device-environment model,
+  and it is where the Phase-2 ordering model will be added.
 
 ## Phased design
 
@@ -98,6 +99,10 @@ signal drivers already use), with `--mmio-region` addresses as an alternative
 where available. No ordering machinery is required.
 
 ### Phase 2 — ordering and the weak device types
+
+This is the work reserved behind `goto-instrument --mmio`, which today applies
+the Phase-1 device-environment model (correct for the strongly-ordered device
+types) and will grow the reordering model described here.
 
 Tag each MMIO region with a memory type and reuse the `--mm` event-graph +
 fence engine, parameterised per region instead of globally:
