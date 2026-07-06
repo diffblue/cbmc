@@ -131,6 +131,11 @@ register's writes are observed in program order (ARM Device-nGnRnE, x86
 uncacheable); a weakly-ordered register's writes are posted (ARM Device-GRE, x86
 write-combining).
 
+`--mmio-gather` additionally models the gathering attribute (write combining): a
+write to a weakly-ordered register may be merged into the most recent
+not-yet-observed write to the same register, so the device observes only the
+merged value and an intermediate write may be lost.
+
 The remaining design, of which the above is the first slice:
 
 Tag each MMIO region with a memory type and reuse the `--mm` event-graph +
@@ -150,8 +155,10 @@ memory.
 
 ### Phase 3 — refinements
 
-Precise gathering rules (`G`), early-write-acknowledgement (`E`) interaction
-with completion barriers, and selectable per-architecture profiles (ARM device
+Gathering (`G`) is modelled by `--mmio-gather` (see above). The remaining
+refinements are early-write-acknowledgement (`E`) interaction with completion
+barriers (distinguishing an ordering barrier such as `DMB` from a completion
+barrier such as `DSB`), and selectable per-architecture profiles (ARM device
 types, x86 UC/WC).
 
 ## Soundness stance

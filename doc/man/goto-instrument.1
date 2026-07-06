@@ -454,6 +454,13 @@ be outstanding, so that a write may be delayed past that many writes to other
 registers. A larger depth models deeper reordering at the cost of a larger state
 space.
 .TP
+\fB\-\-mmio\-gather\fR
+Model write combining (the gather attribute of weak device memory). A write to a
+weakly\-ordered register may be merged into the most recent not\-yet\-observed
+write to the same register, so the device observes only the merged (latest)
+value and an intermediate write may never be observed. Without this option each
+write is observed (in program order per register).
+.TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime
 .TP

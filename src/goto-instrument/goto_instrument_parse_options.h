@@ -70,6 +70,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(" MMIO_WEAK_OPT ")" \
   "(" MMIO_WEAK_VARIABLE_OPT "):" \
   "(" MMIO_WEAK_DEPTH_OPT "):" \
+  "(" MMIO_GATHER_OPT ")" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
   "(nondet-static-matching):" \

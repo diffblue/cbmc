@@ -204,6 +204,10 @@ private:
   // depth allows more outstanding writes and hence deeper reordering
   std::size_t weak_depth = 1;
 
+  // write combining (--mmio-gather): a write to a weakly-ordered register may
+  // be merged into the most recent not-yet-observed write to the same register
+  bool gather = false;
+
   // the static posted-write buffers, one per weakly-ordered register, and the
   // shared non-deterministic flush choice (populated by setup_weak_buffers)
   std::map<irep_idt, posted_buffert> weak_buffers;
@@ -509,18 +513,46 @@ void nondet_volatilet::emit_enqueue(
   const source_locationt &loc) const
 {
   const typet index_type = size_type();
+  const exprt zero = from_integer(0, index_type);
   const exprt one = from_integer(1, index_type);
   const exprt capacity = from_integer(weak_depth, index_type);
 
-  auto guard = dest.add(
-    goto_programt::make_incomplete_goto(notequal_exprt{b.size, capacity}, loc));
-  emit_observe_head(dest, b, ns, loc);
-  auto label = dest.add(goto_programt::make_skip(loc));
-  guard->complete_goto(label);
-  dest.add(
-    goto_programt::make_assignment(index_exprt{b.buffer, b.size}, value, loc));
-  dest.add(
-    goto_programt::make_assignment(b.size, plus_exprt{b.size, one}, loc));
+  // append value at the tail, observing the head first if the buffer is full
+  const auto emit_append = [&](goto_programt &d)
+  {
+    auto guard = d.add(goto_programt::make_incomplete_goto(
+      notequal_exprt{b.size, capacity}, loc));
+    emit_observe_head(d, b, ns, loc);
+    auto label = d.add(goto_programt::make_skip(loc));
+    guard->complete_goto(label);
+    d.add(goto_programt::make_assignment(
+      index_exprt{b.buffer, b.size}, value, loc));
+    d.add(goto_programt::make_assignment(b.size, plus_exprt{b.size, one}, loc));
+  };
+
+  if(!gather)
+  {
+    emit_append(dest);
+    return;
+  }
+
+  // write combining: if there is a not-yet-observed write to this register, the
+  // new write may (non-deterministically) be merged into it -- the device then
+  // observes only the merged (latest) value -- instead of being appended
+  PRECONDITION(flush_choice.has_value());
+  dest.add(goto_programt::make_assignment(
+    *flush_choice, side_effect_expr_nondett{bool_typet{}, loc}, loc));
+  auto to_append = dest.add(goto_programt::make_incomplete_goto(
+    or_exprt{equal_exprt{b.size, zero}, not_exprt{*flush_choice}}, loc));
+  dest.add(goto_programt::make_assignment(
+    index_exprt{b.buffer, minus_exprt{b.size, one}}, value, loc));
+  auto to_done =
+    dest.add(goto_programt::make_incomplete_goto(true_exprt{}, loc));
+  auto append_label = dest.add(goto_programt::make_skip(loc));
+  to_append->complete_goto(append_label);
+  emit_append(dest);
+  auto done_label = dest.add(goto_programt::make_skip(loc));
+  to_done->complete_goto(done_label);
 }
 
 void nondet_volatilet::setup_weak_buffers(symbol_table_baset &symbol_table)
@@ -874,6 +906,9 @@ void nondet_volatilet::typecheck_options(const optionst &options)
     weak_depth = depth;
   }
 
+  if(options.get_bool_option(MMIO_GATHER_OPT))
+    gather = true;
+
   // Write models are independent of the read-side mode and may be combined
   // with any of them (including --nondet-volatile), so they are processed
   // before the read-side options.
@@ -984,6 +1019,7 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   PRECONDITION(!options.is_set(MMIO_WEAK_OPT));
   PRECONDITION(!options.is_set(MMIO_WEAK_VARIABLE_OPT));
   PRECONDITION(!options.is_set(MMIO_WEAK_DEPTH_OPT));
+  PRECONDITION(!options.is_set(MMIO_GATHER_OPT));
 
   const bool nondet_volatile_opt = cmdline.isset(NONDET_VOLATILE_OPT);
   const bool nondet_volatile_variable_opt =
@@ -1049,6 +1085,11 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       MMIO_WEAK_DEPTH_OPT, cmdline.get_value(MMIO_WEAK_DEPTH_OPT));
+  }
+
+  if(cmdline.isset(MMIO_GATHER_OPT))
+  {
+    options.set_option(MMIO_GATHER_OPT, true);
   }
 }
 

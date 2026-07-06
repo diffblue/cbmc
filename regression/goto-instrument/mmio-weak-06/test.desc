@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-gather
+^EXIT=10$
+^SIGNAL=0$
+device observed the write of 1: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Write combining (--mmio-gather): the write of 1 to reg may be merged into the
+following write of 2, so the device observes only the value 2 and never the
+value 1, even after a barrier. The assertion that the device observed 1 can
+therefore fail.

@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe --mmio-weak
+^EXIT=0$
+^SIGNAL=0$
+device observed the write of 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Without write combining, both writes to reg are observed in program order (at
+the latest by the barrier), so the device observes the value 1 and the assertion
+holds. Compare test.desc, where --mmio-gather allows the first write to be
+combined away.
