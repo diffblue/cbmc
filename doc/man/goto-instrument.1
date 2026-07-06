@@ -435,7 +435,16 @@ a call to \fB__sync_synchronize\fR) or at the end of the enclosing function. A
 later write to a different register can therefore be observed before an earlier
 posted one, which exposes bugs that rely on write ordering without a barrier; a
 barrier between the writes restores program order. This is the first increment
-of the ordering model and is bounded to per\-function, per\-register posting.
+of the ordering model and is bounded to per\-function, per\-register posting. It
+marks every write\-modelled register as weakly ordered; use
+\fB\-\-mmio\-weak\-variable\fR to mark individual registers instead.
+.TP
+\fB\-\-mmio\-weak\-variable\fR \fIvariable\fR
+Mark the given register as weakly ordered (see \fB\-\-mmio\-weak\fR), leaving all
+other registers strongly ordered. This models per\-region device\-memory types:
+strongly\-ordered regions (ARM Device\-nGnRnE, x86 uncacheable) preserve program
+order, whereas weakly\-ordered regions (ARM Device\-GRE, x86 write\-combining) may
+reorder. May be given multiple times.
 .TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime

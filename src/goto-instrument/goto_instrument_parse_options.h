@@ -68,6 +68,7 @@ Author: Daniel Kroening, kroening@kroening.com
   "(isr):" \
   "(mmio)" \
   "(" MMIO_WEAK_OPT ")" \
+  "(" MMIO_WEAK_VARIABLE_OPT "):" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
   "(nondet-static-matching):" \

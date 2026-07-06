@@ -116,8 +116,14 @@ writes out of order, exposing missing-barrier bugs; a barrier between them
 restores program order. Writes to the *same* register coalesce (a later post
 overwrites an earlier one), modelling gathering. Deferral is bounded to within a
 single function, and the multi-outstanding-write reordering is bounded by this
-per-register posted slot; lifting these bounds and per-region memory-type
-tagging are the remaining work.
+per-register posted slot; lifting these bounds is the remaining work.
+
+Per-register memory types are selected with `--mmio-weak-variable <register>`
+(mark a specific register weak, leaving the rest strongly ordered), while
+`--mmio-weak` marks every write-modelled register weak. A strongly-ordered
+register's writes are observed in program order (ARM Device-nGnRnE, x86
+uncacheable); a weakly-ordered register's writes are posted (ARM Device-GRE, x86
+write-combining).
 
 The remaining design, of which the above is the first slice:
 

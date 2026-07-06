@@ -51,7 +51,7 @@ public:
     {
       nondet_volatile(goto_model.symbol_table, f.first, f.second.body);
 
-      if(weak_mmio)
+      if(has_weak_registers())
       {
         instrument_posted_writes(
           goto_model.symbol_table, f.first, f.second.body);
@@ -141,7 +141,23 @@ private:
   std::set<irep_idt> nondet_variables;
   std::map<irep_idt, irep_idt> variable_models;
   std::map<irep_idt, irep_idt> write_models;
-  bool weak_mmio = false;
+
+  // weak MMIO model: which registers are weakly ordered (--mmio-weak marks all
+  // write-modelled registers; --mmio-weak-variable marks specific ones)
+  bool all_weak = false;
+  std::set<irep_idt> weak_registers;
+
+  /// Is the register \p id modelled as weakly ordered device memory?
+  bool is_weak_register(const irep_idt &id) const
+  {
+    return all_weak || weak_registers.count(id) != 0;
+  }
+
+  /// Is any register modelled as weakly ordered?
+  bool has_weak_registers() const
+  {
+    return all_weak || !weak_registers.empty();
+  }
 };
 
 bool nondet_volatilet::is_volatile(const namespacet &ns, const typet &src)
@@ -303,10 +319,11 @@ void nondet_volatilet::observe_volatile_write(
 
     if(it != write_models.end())
     {
-      // Under the weak MMIO model the write model is called by the posted-write
-      // instrumentation (possibly reordered); here we only need to suppress the
+      // A write to a weakly-ordered register is observed by the posted-write
+      // instrumentation (possibly reordered); for a strongly-ordered register
+      // the model is called here, in program order. Either way there is no
       // default observable OUTPUT for a write-modelled register.
-      if(!weak_mmio)
+      if(!is_weak_register(it->first))
       {
         const symbolt &model_symbol = ns.lookup(it->second);
 
@@ -375,7 +392,7 @@ void nondet_volatilet::instrument_posted_writes(
       const irep_idt &id =
         to_symbol_expr(instruction.assign_lhs()).identifier();
       const auto it = write_models.find(id);
-      if(it != write_models.end())
+      if(it != write_models.end() && is_weak_register(id))
         registers.emplace(id, it->second);
     }
   }
@@ -689,7 +706,18 @@ void nondet_volatilet::typecheck_options(const optionst &options)
 
   // the weak MMIO model is independent of the read-side mode
   if(options.get_bool_option(MMIO_WEAK_OPT))
-    weak_mmio = true;
+    all_weak = true;
+
+  if(options.is_set(MMIO_WEAK_VARIABLE_OPT))
+  {
+    const auto &variable_list = options.get_list_option(MMIO_WEAK_VARIABLE_OPT);
+
+    for(const auto &id : variable_list)
+    {
+      typecheck_variable(id, ns);
+      weak_registers.insert(id);
+    }
+  }
 
   // Write models are independent of the read-side mode and may be combined
   // with any of them (including --nondet-volatile), so they are processed
@@ -799,6 +827,7 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   PRECONDITION(!options.is_set(NONDET_VOLATILE_MODEL_OPT));
   PRECONDITION(!options.is_set(NONDET_VOLATILE_WRITE_MODEL_OPT));
   PRECONDITION(!options.is_set(MMIO_WEAK_OPT));
+  PRECONDITION(!options.is_set(MMIO_WEAK_VARIABLE_OPT));
 
   const bool nondet_volatile_opt = cmdline.isset(NONDET_VOLATILE_OPT);
   const bool nondet_volatile_variable_opt =
@@ -852,6 +881,12 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   if(cmdline.isset(MMIO_WEAK_OPT))
   {
     options.set_option(MMIO_WEAK_OPT, true);
+  }
+
+  if(cmdline.isset(MMIO_WEAK_VARIABLE_OPT))
+  {
+    options.set_option(
+      MMIO_WEAK_VARIABLE_OPT, cmdline.get_values(MMIO_WEAK_VARIABLE_OPT));
   }
 }
 
