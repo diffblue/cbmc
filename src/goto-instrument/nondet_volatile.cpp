@@ -127,6 +127,9 @@ private:
     symbol_exprt buffer; // array [weak_depth] of the register's value type
     symbol_exprt size;   // number of pending writes, 0..weak_depth
     irep_idt model;
+    // parallel array of the generation each pending write was issued in; only
+    // populated under the early-acknowledgement model (--mmio-early-ack)
+    std::optional<symbol_exprt> generations;
   };
 
   /// Create the static posted-write buffers (one per weakly-ordered
@@ -158,6 +161,18 @@ private:
     goto_programt &dest,
     const posted_buffert &b,
     const exprt &value,
+    const namespacet &ns,
+    const source_locationt &loc) const;
+
+  /// The condition (used under --mmio-early-ack) under which the head of \p b
+  /// is in the globally-oldest barrier generation, so it may be observed now;
+  /// true_exprt when early-ack is off.
+  exprt head_is_oldest(const posted_buffert &b) const;
+
+  /// Flush all posted writes (a completion barrier / DSB, or program end),
+  /// observing them in generation order under early-ack.
+  void emit_drain_all(
+    goto_programt &dest,
     const namespacet &ns,
     const source_locationt &loc) const;
 
@@ -207,6 +222,15 @@ private:
   // write combining (--mmio-gather): a write to a weakly-ordered register may
   // be merged into the most recent not-yet-observed write to the same register
   bool gather = false;
+
+  // early acknowledgement (--mmio-early-ack): a lightweight fence acts as an
+  // ordering barrier (ARM DMB) -- it orders posted writes by generation but
+  // does not complete them -- while a full fence is a completion barrier (DSB)
+  bool early_ack = false;
+
+  // the current barrier generation (--mmio-early-ack), bumped at each ordering
+  // barrier; posted writes are tagged with, and observed in, generation order
+  std::optional<symbol_exprt> current_gen;
 
   // the static posted-write buffers, one per weakly-ordered register, and the
   // shared non-deterministic flush choice (populated by setup_weak_buffers)
@@ -442,6 +466,36 @@ bool nondet_volatilet::is_barrier(
   return false;
 }
 
+exprt nondet_volatilet::head_is_oldest(const posted_buffert &b) const
+{
+  if(!early_ack)
+    return true_exprt{};
+
+  PRECONDITION(b.generations.has_value());
+  const typet index_type = size_type();
+  const exprt zero = from_integer(0, index_type);
+  const exprt b_head_gen = index_exprt{*b.generations, zero};
+
+  exprt result = true_exprt{};
+  for(const auto &other : weak_buffers)
+  {
+    if(other.second.buffer == b.buffer)
+      continue;
+    PRECONDITION(other.second.generations.has_value());
+    // the other register is empty, or its head is not older than b's head
+    const or_exprt condition{
+      equal_exprt{other.second.size, zero},
+      binary_relation_exprt{
+        index_exprt{*other.second.generations, zero}, ID_ge, b_head_gen}};
+    if(result.is_true())
+      result = condition;
+    else
+      result = and_exprt{result, condition};
+  }
+
+  return result;
+}
+
 // observe (call the model for) the head of the FIFO and shift the remaining
 // entries down; the caller guarantees the buffer is non-empty
 void nondet_volatilet::emit_observe_head(
@@ -464,12 +518,20 @@ void nondet_volatilet::emit_observe_head(
       index_exprt{b.buffer, from_integer(i, index_type)},
       index_exprt{b.buffer, from_integer(i + 1, index_type)},
       loc));
+    if(early_ack)
+    {
+      dest.add(goto_programt::make_assignment(
+        index_exprt{*b.generations, from_integer(i, index_type)},
+        index_exprt{*b.generations, from_integer(i + 1, index_type)},
+        loc));
+    }
   }
   dest.add(
     goto_programt::make_assignment(b.size, minus_exprt{b.size, one}, loc));
 }
 
-// if(size != 0) observe_head -- an unconditional flush of one entry
+// if(size != 0 && head is oldest) observe_head -- an unconditional flush of the
+// oldest observable entry (the generation guard is trivial without early-ack)
 void nondet_volatilet::emit_flush_one(
   goto_programt &dest,
   const posted_buffert &b,
@@ -477,8 +539,11 @@ void nondet_volatilet::emit_flush_one(
   const source_locationt &loc) const
 {
   const exprt zero = from_integer(0, size_type());
-  auto guard = dest.add(
-    goto_programt::make_incomplete_goto(equal_exprt{b.size, zero}, loc));
+  exprt skip_condition = equal_exprt{b.size, zero};
+  if(early_ack)
+    skip_condition = or_exprt{skip_condition, not_exprt{head_is_oldest(b)}};
+  auto guard =
+    dest.add(goto_programt::make_incomplete_goto(skip_condition, loc));
   emit_observe_head(dest, b, ns, loc);
   auto label = dest.add(goto_programt::make_skip(loc));
   guard->complete_goto(label);
@@ -496,8 +561,12 @@ void nondet_volatilet::emit_nondet_flush(
   const exprt zero = from_integer(0, size_type());
   dest.add(goto_programt::make_assignment(
     *flush_choice, side_effect_expr_nondett{bool_typet{}, loc}, loc));
-  auto guard = dest.add(goto_programt::make_incomplete_goto(
-    or_exprt{equal_exprt{b.size, zero}, not_exprt{*flush_choice}}, loc));
+  exprt skip_condition =
+    or_exprt{equal_exprt{b.size, zero}, not_exprt{*flush_choice}};
+  if(early_ack)
+    skip_condition = or_exprt{skip_condition, not_exprt{head_is_oldest(b)}};
+  auto guard =
+    dest.add(goto_programt::make_incomplete_goto(skip_condition, loc));
   emit_observe_head(dest, b, ns, loc);
   auto label = dest.add(goto_programt::make_skip(loc));
   guard->complete_goto(label);
@@ -527,6 +596,11 @@ void nondet_volatilet::emit_enqueue(
     guard->complete_goto(label);
     d.add(goto_programt::make_assignment(
       index_exprt{b.buffer, b.size}, value, loc));
+    if(early_ack)
+    {
+      d.add(goto_programt::make_assignment(
+        index_exprt{*b.generations, b.size}, *current_gen, loc));
+    }
     d.add(goto_programt::make_assignment(b.size, plus_exprt{b.size, one}, loc));
   };
 
@@ -553,6 +627,20 @@ void nondet_volatilet::emit_enqueue(
   emit_append(dest);
   auto done_label = dest.add(goto_programt::make_skip(loc));
   to_done->complete_goto(done_label);
+}
+
+void nondet_volatilet::emit_drain_all(
+  goto_programt &dest,
+  const namespacet &ns,
+  const source_locationt &loc) const
+{
+  // Enough passes to drain every entry: under early-ack each pass observes the
+  // current oldest generation, so at most (registers * depth) passes are
+  // needed; without early-ack a single flush per slot already drains.
+  const std::size_t passes = weak_buffers.size() * weak_depth;
+  for(std::size_t p = 0; p < passes; ++p)
+    for(const auto &b : weak_buffers)
+      emit_flush_one(dest, b.second, ns, loc);
 }
 
 void nondet_volatilet::setup_weak_buffers(symbol_table_baset &symbol_table)
@@ -586,16 +674,40 @@ void nondet_volatilet::setup_weak_buffers(symbol_table_baset &symbol_table)
     size_symbol.is_static_lifetime = true;
     size_symbol.is_thread_local = false;
 
-    weak_buffers.emplace(
-      write_model.first,
-      posted_buffert{
-        buffer_symbol.symbol_expr(),
-        size_symbol.symbol_expr(),
-        write_model.second});
+    posted_buffert entry{
+      buffer_symbol.symbol_expr(),
+      size_symbol.symbol_expr(),
+      write_model.second};
+
+    if(early_ack)
+    {
+      const array_typet generation_type{index_type, capacity};
+      symbolt &generation_symbol = get_fresh_aux_symbol(
+        generation_type,
+        "",
+        "mmio_posted_gen",
+        source_locationt{},
+        ID_C,
+        symbol_table);
+      generation_symbol.is_static_lifetime = true;
+      generation_symbol.is_thread_local = false;
+      entry.generations = generation_symbol.symbol_expr();
+    }
+
+    weak_buffers.emplace(write_model.first, entry);
   }
 
   if(weak_buffers.empty())
     return;
+
+  if(early_ack)
+  {
+    symbolt &generation_symbol = get_fresh_aux_symbol(
+      index_type, "", "mmio_gen", source_locationt{}, ID_C, symbol_table);
+    generation_symbol.is_static_lifetime = true;
+    generation_symbol.is_thread_local = false;
+    current_gen = generation_symbol.symbol_expr();
+  }
 
   symbolt &choice_symbol = get_fresh_aux_symbol(
     bool_typet{},
@@ -629,19 +741,21 @@ void nondet_volatilet::finalize_weak_buffers(symbol_table_baset &symbol_table)
 
   goto_programt &body = entry->second.body;
 
-  // initialise the buffer sizes at the very start of the program
+  // initialise the buffer sizes (and the generation counter) at the very start
+  // of the program
   goto_programt initialisations;
   for(const auto &b : weak_buffers)
     initialisations.add(
       goto_programt::make_assignment(b.second.size, zero, loc));
+  if(early_ack)
+    initialisations.add(
+      goto_programt::make_assignment(*current_gen, zero, loc));
   body.destructive_insert(body.instructions.begin(), initialisations);
 
   // flush any writes still posted when the program ends
   auto end = std::prev(body.instructions.end());
   goto_programt epilogue;
-  for(const auto &b : weak_buffers)
-    for(std::size_t k = 0; k < weak_depth; ++k)
-      emit_flush_one(epilogue, b.second, ns, loc);
+  emit_drain_all(epilogue, ns, loc);
   body.destructive_insert(end, epilogue);
 }
 
@@ -681,12 +795,25 @@ void nondet_volatilet::instrument_posted_writes(
     }
     else if(is_barrier(*it, ns))
     {
+      // a completion barrier (a full fence / __sync_synchronize, i.e. an ARM
+      // DSB), or any barrier when early-ack is off, completes all posted writes
       const source_locationt loc = it->source_location();
       goto_programt fragment;
-      // a barrier completes all posted writes, in order, before proceeding
-      for(const auto &b : weak_buffers)
-        for(std::size_t k = 0; k < weak_depth; ++k)
-          emit_flush_one(fragment, b.second, ns, loc);
+      emit_drain_all(fragment, ns, loc);
+      goto_program.destructive_insert(std::next(it), fragment);
+    }
+    else if(early_ack && is_lwfence(*it, ns))
+    {
+      // an ordering barrier (a lightweight fence, i.e. an ARM DMB) orders
+      // posted writes by generation but does not complete them: bump the
+      // generation, so later writes cannot be observed before writes posted
+      // before it
+      const source_locationt loc = it->source_location();
+      goto_programt fragment;
+      fragment.add(goto_programt::make_assignment(
+        *current_gen,
+        plus_exprt{*current_gen, from_integer(1, size_type())},
+        loc));
       goto_program.destructive_insert(std::next(it), fragment);
     }
   }
@@ -909,6 +1036,9 @@ void nondet_volatilet::typecheck_options(const optionst &options)
   if(options.get_bool_option(MMIO_GATHER_OPT))
     gather = true;
 
+  if(options.get_bool_option(MMIO_EARLY_ACK_OPT))
+    early_ack = true;
+
   // Write models are independent of the read-side mode and may be combined
   // with any of them (including --nondet-volatile), so they are processed
   // before the read-side options.
@@ -1020,6 +1150,7 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   PRECONDITION(!options.is_set(MMIO_WEAK_VARIABLE_OPT));
   PRECONDITION(!options.is_set(MMIO_WEAK_DEPTH_OPT));
   PRECONDITION(!options.is_set(MMIO_GATHER_OPT));
+  PRECONDITION(!options.is_set(MMIO_EARLY_ACK_OPT));
 
   const bool nondet_volatile_opt = cmdline.isset(NONDET_VOLATILE_OPT);
   const bool nondet_volatile_variable_opt =
@@ -1090,6 +1221,11 @@ void parse_nondet_volatile_options(const cmdlinet &cmdline, optionst &options)
   if(cmdline.isset(MMIO_GATHER_OPT))
   {
     options.set_option(MMIO_GATHER_OPT, true);
+  }
+
+  if(cmdline.isset(MMIO_EARLY_ACK_OPT))
+  {
+    options.set_option(MMIO_EARLY_ACK_OPT, true);
   }
 }
 

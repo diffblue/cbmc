@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-early-ack
+^EXIT=10$
+^SIGNAL=0$
+the write has completed after the barrier: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Early acknowledgement (--mmio-early-ack): a lightweight fence is an ordering
+barrier (ARM DMB) that does not complete posted writes. The write to reg may
+therefore still be in flight after the barrier, so the assertion that it has
+landed can fail. Compare dsb.desc, where a full fence (DSB) completes the write.

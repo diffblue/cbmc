@@ -34,6 +34,7 @@ class optionst;
 #define MMIO_WEAK_VARIABLE_OPT "mmio-weak-variable"
 #define MMIO_WEAK_DEPTH_OPT "mmio-weak-depth"
 #define MMIO_GATHER_OPT "mmio-gather"
+#define MMIO_EARLY_ACK_OPT "mmio-early-ack"
 
 #define OPT_NONDET_VOLATILE \
   "(" NONDET_VOLATILE_OPT ")" \

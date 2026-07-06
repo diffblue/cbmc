@@ -461,6 +461,15 @@ write to the same register, so the device observes only the merged (latest)
 value and an intermediate write may never be observed. Without this option each
 write is observed (in program order per register).
 .TP
+\fB\-\-mmio\-early\-ack\fR
+Model early write acknowledgement (the E attribute of weak device memory). A
+lightweight fence (e.g. \fB__CPROVER_fence("WWfence","RWfence","RRfence")\fR, an
+ARM \fBDMB\fR) then acts as an ordering barrier only: it orders posted writes but
+does not complete them, so a write may still be in flight after it. A full fence
+or \fB__sync_synchronize\fR (an ARM \fBDSB\fR) is a completion barrier that
+completes all posted writes. Without this option every recognised barrier
+completes posted writes.
+.TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime
 .TP

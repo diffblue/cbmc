@@ -1,0 +1,12 @@
+CORE
+noorder.c
+--nondet-volatile-write-model A:observe_A --nondet-volatile-write-model B:observe_B --mmio-weak --mmio-early-ack
+^EXIT=10$
+^SIGNAL=0$
+A observed before B: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Without a barrier the writes to A and B may be observed in either order, so the
+device can observe B before A and the ordering assertion fails. Compare
+test.desc, where a DMB restores the ordering.

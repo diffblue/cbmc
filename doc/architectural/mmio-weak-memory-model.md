@@ -155,25 +155,21 @@ memory.
 
 ### Phase 3 — refinements
 
-Gathering (`G`) is modelled by `--mmio-gather` (see above). The remaining
-refinement is early-write-acknowledgement (`E`): distinguishing an ordering
-barrier (ARM `DMB`) from a completion barrier (ARM `DSB`). This does not fit the
-current model as a simple knob, because that model represents a write's effect
-by its *observation* (the write-model call), which conflates two notions:
+Gathering (`G`) is modelled by `--mmio-gather`, and early acknowledgement (`E`)
+by `--mmio-early-ack` (see below). The remaining refinement is selectable
+per-architecture profiles (ARM device types, x86 UC/WC) that bundle these
+attributes into named memory types.
 
-* **ordering** -- a `DMB` must prevent accesses from being reordered across it,
-  but need not force prior writes to have landed; and
-* **completion** -- a `DSB` additionally guarantees prior writes have reached
-  the device.
-
-Today every recognised barrier flushes the posted-write buffers, which enforces
-both at once (equivalent to a `DSB`). Modelling a `DMB` correctly requires
-enforcing ordering across the barrier *without* flushing -- e.g. tagging posted
-writes with a barrier generation and forbidding a later-generation write from
-being observed before an earlier-generation one, while still allowing both to
-remain posted past the `DMB`. That separate completion/ordering state is the
-next increment; per-architecture profiles selecting the barrier semantics (ARM
-device types, x86 UC/WC) sit on top of it.
+Under `--mmio-early-ack` a write's *completion* is separated from its *ordering*.
+A lightweight fence (ARM `DMB`) is an ordering barrier: it bumps a global barrier
+generation but does not flush, so posted writes remain in flight across it.
+Each posted write is tagged with the generation it was issued in, and a write is
+only observed once it is in the globally-oldest outstanding generation -- so
+writes separated by a `DMB` are observed in order, while a `DMB` alone does not
+guarantee a write has landed. A full fence or `__sync_synchronize` (ARM `DSB`)
+is a completion barrier that flushes all posted writes. This gives the three-way
+distinction: no barrier reorders freely; a `DMB` orders but does not complete; a
+`DSB` orders and completes.
 
 ## Soundness stance
 
