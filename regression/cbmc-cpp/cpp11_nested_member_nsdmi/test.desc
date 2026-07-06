@@ -1,0 +1,32 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ nested member NSDMI \(local\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested member NSDMI \(global\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ two-level nested NSDMI: SUCCESS$
+^\[main\.assertion\.4\] line \d+ array-of-NSDMI element: SUCCESS$
+^\[main\.assertion\.5\] line \d+ member array-of-NSDMI element: SUCCESS$
+^\[main\.assertion\.6\] line \d+ aggregate list element preserved: SUCCESS$
+^\[main\.assertion\.7\] line \d+ aggregate NSDMI for unlisted member preserved: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [class.base.init]/9-10 + [class.default.ctor]/3: a class-type member not
+named by a mem-initializer is default-constructed by the enclosing class's
+implicit default constructor, applying the member class's default member
+initializer (NSDMI).  CBMC's default construction of a value-less object
+(cpp_constructor's POD branch) applied only *direct* NSDMIs and never recursed
+into class-type members, so `struct inner { int t = 5; }; struct outer { inner
+q; }; outer o;` left `o.q.t` unconstructed (0) -- even for a local.  Fixed by a
+new predicate has_default_member_initializer (true when a class or a subobject
+carries an NSDMI) that (a) lets an array of such elements fall through to the
+element-wise constructor loop and (b) makes the struct default-construction
+recurse into such members; the static-initialization path uses the same
+predicate for value-less globals.  cpp_is_pod is deliberately left unchanged --
+it governs braced aggregate initialization, which C++14 permits for aggregates
+with NSDMIs -- so assertions 6-7 confirm aggregate init is preserved.
+assertion.8 provides non-vacuity.
