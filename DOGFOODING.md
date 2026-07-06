@@ -992,6 +992,37 @@ array-of-NSDMI global (`Q a[3];`) is likewise not defaulted.  Both suites green.
 
 *Updated: 2026-07-06*
 
+### 2026-07-06 gap closed: nested / array-element member NSDMIs (subobject default construction)
+
+Follow-up closing the "remaining adjacent gaps" noted in the previous entry.
+N5008 [class.base.init]/9-10 + [class.default.ctor]/3: a class-type member not
+named by a mem-initializer is default-constructed by the enclosing class's
+implicit default constructor, applying the member class's NSDMI.  This failed
+even for a *local*: `struct inner { int t = 5; }; struct outer { inner q; };
+outer o;` left `o.q.t == 0`.  Root cause: CBMC default-constructs a value-less
+object through `cpp_constructor`'s POD branch, which applied only the object's
+*direct* default member initializers and never recursed into class-type members;
+and because `cpp_is_pod` (correctly, for aggregate purposes) ignores NSDMIs, no
+real constructor was generated for `outer` either, so the constructor's own
+member-init logic never ran.
+
+Fixed surgically without touching `cpp_is_pod` (so C++14 braced aggregate
+initialization with NSDMIs is preserved): a new predicate
+`has_default_member_initializer` reports whether a class -- or a subobject, or an
+array element -- carries an NSDMI, i.e. whether its default construction is
+non-trivial.  `cpp_constructor` now (a) lets an array of such elements fall
+through to its element-wise constructor loop rather than short-circuiting, and
+(b) recurses into such members during default construction; the static-init path
+uses the same predicate so value-less globals are covered too.  This closes the
+nested-local, nested-global, two-level, array-of-NSDMI (local and member), cases
+in one go.  Header-free non-vacuous CORE test `cpp11_nested_member_nsdmi`
+(includes assertions confirming aggregate initialization is unaffected).
+
+Dog-food unchanged at **90/19/8** (no FAIL closed, no regression).  Both suites
+green.
+
+*Updated: 2026-07-06*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
