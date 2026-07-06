@@ -67,6 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_SHOW_CLASS_HIERARCHY \
   "(isr):" \
   "(mmio)" \
+  "(" MMIO_WEAK_OPT ")" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
   "(nondet-static-matching):" \
@@ -157,7 +158,7 @@ protected:
   void get_goto_program();
   void instrument_goto_program();
 
-  void do_indirect_call_and_rtti_removal(bool force=false);
+  void do_indirect_call_and_rtti_removal(bool force = false);
   void do_remove_const_function_pointers_only();
   void do_partial_inlining();
   void do_remove_returns();

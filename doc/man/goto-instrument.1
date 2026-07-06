@@ -423,8 +423,19 @@ device memory. It currently applies the device\-environment model to all
 volatile accesses (equivalent to \fB\-\-nondet\-volatile\fR): reads become
 non\-deterministic and writes are preserved as observable side effects, which is
 the correct model for the strongly\-ordered device\-memory types. An
-ordering\-aware model for the weak device\-memory types is planned on top of the
-\fB\-\-mm\fR weak\-memory engine.
+ordering\-aware model for the weak device\-memory types is available via
+\fB\-\-mmio\-weak\fR.
+.TP
+\fB\-\-mmio\-weak\fR
+Model weakly ordered device memory (posted writes). A write to a register that
+has a write model (see \fB\-\-nondet\-volatile\-write\-model\fR) is
+non\-deterministically either observed immediately or posted, i.e. deferred so
+that its write\-model call is delivered only at the next barrier (a full fence or
+a call to \fB__sync_synchronize\fR) or at the end of the enclosing function. A
+later write to a different register can therefore be observed before an earlier
+posted one, which exposes bugs that rely on write ordering without a barrier; a
+barrier between the writes restores program order. This is the first increment
+of the ordering model and is bounded to per\-function, per\-register posting.
 .TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime

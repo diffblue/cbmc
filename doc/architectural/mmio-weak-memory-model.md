@@ -104,6 +104,23 @@ This is the work reserved behind `goto-instrument --mmio`, which today applies
 the Phase-1 device-environment model (correct for the strongly-ordered device
 types) and will grow the reordering model described here.
 
+**Implemented (first increment):** `goto-instrument --mmio-weak` models weakly
+ordered device memory as *posted writes*. A write to a register that has a
+write model (`--nondet-volatile-write-model`) is non-deterministically either
+committed immediately (the model is called at the write) or posted — deferred,
+with the model call delivered at the next barrier or at the end of the
+function. A barrier is a full fence or a call to `__sync_synchronize`. Because a
+later write to a different register can be committed while an earlier write is
+still posted, the device (the write model, acting as observer) may see the two
+writes out of order, exposing missing-barrier bugs; a barrier between them
+restores program order. Writes to the *same* register coalesce (a later post
+overwrites an earlier one), modelling gathering. Deferral is bounded to within a
+single function, and the multi-outstanding-write reordering is bounded by this
+per-register posted slot; lifting these bounds and per-region memory-type
+tagging are the remaining work.
+
+The remaining design, of which the above is the first slice:
+
 Tag each MMIO region with a memory type and reuse the `--mm` event-graph +
 fence engine, parameterised per region instead of globally:
 

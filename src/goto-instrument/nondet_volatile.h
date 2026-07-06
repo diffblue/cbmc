@@ -25,6 +25,10 @@ class optionst;
 #define NONDET_VOLATILE_MODEL_OPT "nondet-volatile-model"
 #define NONDET_VOLATILE_WRITE_MODEL_OPT "nondet-volatile-write-model"
 
+// The weak memory-mapped I/O model (--mmio-weak) is processed together with the
+// volatile models because it builds on the volatile write models.
+#define MMIO_WEAK_OPT "mmio-weak"
+
 #define OPT_NONDET_VOLATILE \
   "(" NONDET_VOLATILE_OPT ")" \
   "(" NONDET_VOLATILE_VARIABLE_OPT "):" \
