@@ -967,6 +967,31 @@ suites green.
 
 *Updated: 2026-07-05*
 
+### 2026-07-06 gap closed: NSDMI on a value-less namespace-scope / static object
+
+N5008 [class.default.ctor]/3 + [basic.start.static]: a default member
+initializer (NSDMI) gives a class a non-trivial default constructor, so a
+namespace-scope or file-static object defined without an initializer must run
+that constructor and receive its declared member defaults -- e.g.
+`struct Q { int t = 5; }; Q g;` must leave `g.t == 5`, not 0.  CBMC's
+`static_and_dynamic_initialization` treated such an object as a plain POD and
+merely zero-initialized it (`g.t == 0`), because `cpp_is_pod` ignores NSDMIs.
+The same class used as a *local* was already correct (the default-constructor
+path applies the NSDMI); only the static-init path skipped it.  Fixed by routing
+a value-less definition whose class has a direct NSDMI to that default-
+constructor path; members without an NSDMI keep their static zero-initialization
+([basic.start.static]/2), and objects with an explicit initializer are
+unaffected.  `cpp_is_pod` itself is left unchanged -- it also governs aggregate
+initialization, which legitimately permits NSDMIs since C++14.  Header-free
+non-vacuous CORE test `cpp11_global_nsdmi`.
+
+Dog-food unchanged at **90/19/8** (no FAIL closed, no regression).  Remaining
+adjacent gaps, still open: a nested (member-subobject) NSDMI is not applied even
+for a *local* (`struct O { Q q; }; O o;` leaves `o.q.t != 5`), and an
+array-of-NSDMI global (`Q a[3];`) is likewise not defaulted.  Both suites green.
+
+*Updated: 2026-07-06*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
