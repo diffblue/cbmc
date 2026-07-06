@@ -494,33 +494,15 @@ void cpp_typecheckt::static_and_dynamic_initialization()
       // N5008 [class.default.ctor]/3 + [basic.start.static]: a class with a
       // default member initializer (NSDMI) has a non-trivial default
       // constructor.  A value-less namespace-scope definition (`Q g;` for
-      // `struct Q { int t = 5; };`) must run that constructor so the NSDMI is
-      // applied; merely zero-initializing it (the effect of skipping it here)
-      // would leave the member at 0 instead of its declared default.  Route
-      // such a definition to the default-constructor path below.  Members with
-      // an explicit initializer are unaffected (the initializer overrides the
-      // NSDMI, [class.base.init]/9).
-      const bool has_nsdmi = [this](const typet &type) -> bool
-      {
-        const typet *t = &type;
-        if(t->id() == ID_struct_tag || t->id() == ID_union_tag)
-          t = &lookup(to_tag_type(*t)).type;
-        if(t->id() != ID_struct && t->id() != ID_union)
-          return false;
-        for(const auto &c : to_struct_union_type(*t).components())
-        {
-          if(
-            c.get_bool(ID_is_static) || c.get_bool(ID_is_type) ||
-            c.get_is_padding())
-          {
-            continue;
-          }
-          if(c.find(ID_C_default_value).is_not_nil())
-            return true;
-        }
-        return false;
-      }(symbol.type);
-      const bool needs_default_ctor = symbol.value.is_nil() && has_nsdmi;
+      // `struct Q { int t = 5; };`, or an enclosing class that has such a
+      // class as a member/array element) must run that constructor so the
+      // NSDMI is applied; merely zero-initializing it (the effect of skipping
+      // it here) would leave the member at 0 instead of its declared default.
+      // Route such a definition to the default-constructor path below.
+      // Members with an explicit initializer are unaffected (the initializer
+      // overrides the NSDMI, [class.base.init]/9).
+      const bool needs_default_ctor =
+        symbol.value.is_nil() && has_default_member_initializer(symbol.type);
 
       if(!has_side_effect && !needs_default_ctor)
         continue;

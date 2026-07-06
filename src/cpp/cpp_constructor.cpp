@@ -57,8 +57,12 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       operands.empty() || operands.size() == 1,
       "array constructor must have at most one operand");
 
-    if(operands.empty() && cpp_is_pod(object_tc.type()))
+    if(
+      operands.empty() && cpp_is_pod(object_tc.type()) &&
+      !has_default_member_initializer(object_tc.type()))
+    {
       return {};
+    }
 
     const exprt &size_expr = to_array_type(object_tc.type()).size();
 
@@ -197,6 +201,28 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               if(member_init.has_value())
                 block.add(std::move(*member_init));
             }
+          }
+          else if(has_default_member_initializer(comp.type()))
+          {
+            // N5008 [class.base.init]/9-10: a member with no mem-initializer
+            // and no default member initializer of its own, but whose type has
+            // a non-trivial default constructor because a subobject carries a
+            // default member initializer, is default-constructed.  Delegating
+            // to cpp_constructor with no operands recursively applies the
+            // subobject's initializers (e.g. `struct Q { int t = 5; }; struct
+            // O { Q q; }; O o;` must leave `o.q.t == 5`).  A truly trivial
+            // member is filtered out by has_default_member_initializer, so no
+            // spurious construction code is added.
+            cpp_save_scopet save_scope(cpp_scopes);
+            cpp_scopes.set_scope(
+              to_struct_tag_type(object_tc.type()).get_identifier());
+            member_exprt member(object_tc, comp.get_name(), comp.type());
+            member.set(ID_C_lvalue, true);
+            exprt::operandst no_operands;
+            auto member_init =
+              cpp_constructor(source_location, member, no_operands);
+            if(member_init.has_value())
+              block.add(std::move(*member_init));
           }
         }
         if(!block.statements().empty())

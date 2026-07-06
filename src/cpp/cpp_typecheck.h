@@ -114,6 +114,17 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
+  /// True if default-constructing an object of \p type must run at least one
+  /// default member initializer (NSDMI), directly or in a subobject (a member
+  /// of class type, or an element of an array of class type).  Per N5008
+  /// [class.default.ctor]/3 such a class has a non-trivial default
+  /// constructor, so a value-less object must be default-constructed rather
+  /// than merely zero-initialized.  This is intentionally separate from
+  /// cpp_is_pod, which continues to report such a class as a POD because it
+  /// governs braced *aggregate* initialization -- permitted for aggregates
+  /// with NSDMIs since C++14 ([dcl.init.aggr]).
+  bool has_default_member_initializer(const typet &type) const;
+
   std::optional<codet> cpp_constructor(
     const source_locationt &source_location,
     const exprt &object,
