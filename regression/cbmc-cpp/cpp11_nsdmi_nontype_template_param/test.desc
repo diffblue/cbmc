@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ B=true -> 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ B=false -> 2: SUCCESS$
+^\[main\.assertion\.3\] line \d+ var-tmpl default false -> 9: SUCCESS$
+^\[main\.assertion\.4\] line \d+ var-tmpl default true -> 7: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [class.mem]/[temp.inst]: a default member initializer (NSDMI) that
+references the enclosing class template's non-type parameter must be substituted
+when the template is instantiated.  Fixed in cpp_typecheckt::typecheck_compound_type:
+the NSDMI is stored unparsed and type-checked later (implicit constructor
+generation), by which time the instance's template bindings are no longer in
+scope; so while instantiating (template_map populated) the initializer is now
+type-checked eagerly under a message-suppressing sfinae context to resolve its
+parameter references, falling back to the unparsed form on any failure.
+Previously the parameter was left unresolved: at namespace scope the member got
+the wrong value, and a function-body instantiation failed to type-check (then
+silently swallowed by the unsupported-construct leniency -- a vacuous pass).
+assertion.5 provides non-vacuity.  Covers both an explicit non-type argument and
+one defaulted from a variable template.
