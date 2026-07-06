@@ -535,6 +535,31 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         return code_expressiont{
           side_effect_expr_nondett{object.type(), source_location}};
       }
+      // N5008 [class.ctor.general]/[temp.inst]: the type is non-POD and is
+      // being constructed with arguments, but no constructor is present as a
+      // component of this struct type.  This happens when the target type's
+      // constructors have not been materialised as components at the point an
+      // out-of-line / deferred member-function body is type-checked -- e.g.
+      // constructing std::filesystem::path from a std::string inside
+      // `T::~T()`, where the string->path converting-constructor conversion is
+      // computed while type-checking the deferred destructor body and path's
+      // constructor components are not yet visible there.  A constructor is
+      // named after its class ([class.ctor.general]/1); since the class scope
+      // has already been entered above, resolve the constructor by the class's
+      // own name.  Overload resolution in that scope finds the constructors,
+      // including constructor *templates* (never stored as plain components),
+      // instantiating the matching one.  If the class genuinely has no usable
+      // constructor the call below fails with the ordinary "no match".
+      if(object_tc.type().id() == ID_struct_tag)
+      {
+        const symbolt &tag_symbol =
+          lookup(to_struct_tag_type(object_tc.type()));
+        constructor_name = tag_symbol.base_name;
+      }
+    }
+
+    if(constructor_name.empty())
+    {
       error().source_location = source_location;
       error() << "non-POD type has no constructor" << eom;
       throw 0;
