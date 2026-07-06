@@ -61,12 +61,21 @@ struct mmio_regiont
   mp_integer start_address; ///< First byte address of the region
   mp_integer size;          ///< Size of the region in bytes
   irep_idt object_name;     ///< Backing array symbol name
+  /// Whether the region is weakly ordered device memory (ARM Device-GRE, x86
+  /// write-combining): reads return a non-deterministic value, soundly
+  /// over-approximating any reordering or staleness. A strong region (the
+  /// default) is modelled precisely by its backing array.
+  bool weak;
 
   mmio_regiont(
     const mp_integer &_start_address,
     const mp_integer &_size,
-    const irep_idt &_object_name)
-    : start_address(_start_address), size(_size), object_name(_object_name)
+    const irep_idt &_object_name,
+    bool _weak = false)
+    : start_address(_start_address),
+      size(_size),
+      object_name(_object_name),
+      weak(_weak)
   {
   }
 };

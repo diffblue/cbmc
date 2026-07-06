@@ -488,6 +488,12 @@ exprt mm_iot::get_mmio_object_for_address(
             symbol_table.lookup(region.object_name);
           if(region_symbol)
           {
+            // A weakly-ordered region returns a non-deterministic value, a
+            // sound over-approximation of reordering/staleness; a strong
+            // region is read precisely from its backing array.
+            if(region.weak)
+              return side_effect_expr_nondett{value_type, location};
+
             return region_element(
               *region_symbol, from_integer(offset, c_index_type()), value_type);
           }
@@ -525,9 +531,13 @@ exprt mm_iot::build_conditional_access(
     minus_exprt offset_expr(
       address, from_integer(region.start_address, address.type()));
 
-    // Read value_type from the region, spanning consecutive bytes
+    // Read value_type from the region, spanning consecutive bytes; a weakly-
+    // ordered region yields a non-deterministic value (sound over-approximation
+    // of reordering/staleness) instead of the precise array contents.
     exprt region_access =
-      region_element(*region_symbol, offset_expr, value_type);
+      region.weak
+        ? static_cast<exprt>(side_effect_expr_nondett{value_type, location})
+        : region_element(*region_symbol, offset_expr, value_type);
 
     // Build if-then-else: if (in_range) region[offset] else result
     result = if_exprt(in_range, region_access, result);

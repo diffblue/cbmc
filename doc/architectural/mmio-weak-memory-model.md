@@ -187,8 +187,15 @@ flags. So a driver that uses `asm volatile("dmb ...")` / `asm volatile("dsb
 ordering-vs-completion semantics under `--mmio-early-ack` without any extra
 annotation. The one memory attribute not derivable from the access site is the
 region's memory *type* (weak/strong, gather), which is fixed by how the region
-was mapped (e.g. `ioremap` vs `ioremap_wc`) rather than by the access; that
-remains a per-register option (or a future mapping-API recognition).
+was mapped (e.g. `ioremap` vs `ioremap_wc`) rather than by the access. Because
+that mapping is not in the analysed program, the type is supplied per region by
+address: `--mmio-region <addr>:<size>[:<type>]` declares a region (backed by a
+precise byte-array object) and its type -- `strong` (the default; modelled
+precisely) or `weak` (reads return a non-deterministic value, soundly
+over-approximating reordering/staleness). Address-based declaration recovers the
+per-region type without a points-to analysis; a harness that stubs `ioremap`
+already knows the address and can declare the region, and a future `ioremap`
+library model could emit the declaration automatically.
 
 ## Soundness stance
 

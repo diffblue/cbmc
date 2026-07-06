@@ -1,0 +1,14 @@
+CORE
+main.c
+--mmio-region 0x1000:256:weak _ --no-pointer-check --no-bounds-check
+^EXIT=10$
+^SIGNAL=0$
+value read back from the region: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+A weakly-ordered MMIO region (--mmio-region addr:size:weak) returns a
+non-deterministic value on read -- a sound over-approximation of reordering and
+staleness -- so the read-back is not guaranteed to equal the written value. The
+per-region device-memory type is recovered precisely from the region
+declaration, without a points-to analysis.

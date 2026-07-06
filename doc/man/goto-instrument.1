@@ -478,11 +478,17 @@ an ARM \fBdmb\fR (and Power \fBlwsync\fR) is an ordering barrier, while an ARM
 \fBdsb\fR (and Power \fBsync\fR, or \fB__sync_synchronize\fR) is a completion
 barrier.
 .TP
-\fB\-\-mmio\-region\fR \fIaddress\fR:\fIsize\fR
+\fB\-\-mmio\-region\fR \fIaddress\fR:\fIsize\fR[:\fItype\fR]
 Define a contiguous memory\-mapped I/O region starting at \fIaddress\fR with the
 given \fIsize\fR in bytes. The \fIaddress\fR may use a \fB0x\fR prefix for
 hexadecimal notation. This option may be repeated to define multiple regions.
-Regions must not overlap.
+Regions must not overlap. An optional \fItype\fR (\fBstrong\fR, the default, or
+\fBweak\fR) gives the region's device\-memory type: a \fBstrong\fR region (ARM
+Device\-nGnRnE, x86 uncacheable) is modelled precisely by its backing array,
+whereas a \fBweak\fR region (ARM Device\-GRE, x86 write\-combining) returns a
+non\-deterministic value on read, soundly over\-approximating reordering and
+staleness. Because regions are identified by address, this recovers the
+per\-region memory type without a points\-to analysis.
 .IP
 Each region is modeled as an individual byte\-array object in the symbol table.
 Reads from and writes to constant addresses that fall within a declared region
