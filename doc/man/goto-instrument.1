@@ -478,6 +478,32 @@ an ARM \fBdmb\fR (and Power \fBlwsync\fR) is an ordering barrier, while an ARM
 \fBdsb\fR (and Power \fBsync\fR, or \fB__sync_synchronize\fR) is a completion
 barrier.
 .TP
+\fB\-\-mmio\-region\fR \fIaddress\fR:\fIsize\fR
+Define a contiguous memory\-mapped I/O region starting at \fIaddress\fR with the
+given \fIsize\fR in bytes. The \fIaddress\fR may use a \fB0x\fR prefix for
+hexadecimal notation. This option may be repeated to define multiple regions.
+Regions must not overlap.
+.IP
+Each region is modeled as an individual byte\-array object in the symbol table.
+Reads from and writes to constant addresses that fall within a declared region
+are mapped directly to the corresponding array element. Symbolic addresses are
+handled via a conditional dispatch over all declared regions.
+.IP
+This per\-region model avoids the scalability problems of the single unbounded
+\fB__CPROVER_memory\fR array used by the \fB\-\-mmio\fR callback model: each
+write only updates the targeted region object rather than the entire memory
+array. Both options can be combined.
+.IP
+Example:
+.EX
+.in +4n
+goto\-cc \-o firmware.gb firmware.c
+goto\-instrument \-\-mmio\-region 0x40000000:256 \\
+  \-\-mmio\-region 0x40001000:64 firmware.gb firmware\-mod.gb
+cbmc \-\-no\-pointer\-check \-\-no\-bounds\-check firmware\-mod.gb
+.in
+.EE
+.TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime
 .TP
