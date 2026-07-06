@@ -636,6 +636,19 @@ void nondet_volatilet::emit_enqueue(
   // append value at the tail, observing the head first if the buffer is full
   const auto emit_append = [&](goto_programt &d)
   {
+    // Detect a write burst longer than the modelled reorder depth: if the
+    // buffer is already full when another write is posted, the bounded model
+    // has to drop the oldest posted write and may under-approximate the
+    // reordering. Assert this cannot happen so the user is told (with a
+    // location) to increase --mmio-weak-depth, rather than silently losing
+    // soundness.
+    source_locationt burst_location = loc;
+    burst_location.set_comment(
+      "MMIO write burst exceeds the modelled reorder depth "
+      "(increase --mmio-weak-depth)");
+    d.add(goto_programt::make_assertion(
+      notequal_exprt{b.size, capacity}, burst_location));
+
     auto guard = d.add(goto_programt::make_incomplete_goto(
       notequal_exprt{b.size, capacity}, loc));
     emit_observe_head(d, b, ns, loc);

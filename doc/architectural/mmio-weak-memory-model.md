@@ -121,7 +121,12 @@ registers may be reordered. The FIFO depth is set by `--mmio-weak-depth <n>`
 (default 1): up to `n` writes to a register can be outstanding, so a write may
 be delayed past that many writes to other registers; a deeper buffer exhibits
 reorderings a shallower one cannot (e.g. delaying a write past a subsequent
-write to the same register). The posted-write buffers have static lifetime, so a
+write to the same register). The bound is not a hidden source of unsoundness: if
+a write burst to a single register exceeds the buffer depth, the instrumentation
+asserts the overflow ("MMIO write burst exceeds the modelled reorder depth"), so
+the situation is reported (with a location) as a property violation and the user
+can raise `--mmio-weak-depth`, rather than silently under-approximating. The
+posted-write buffers have static lifetime, so a
 write posted in one function can be delayed past the function's return and
 observed later in the program, until a barrier or the end of the program; this
 catches missing-barrier bugs that span function boundaries.

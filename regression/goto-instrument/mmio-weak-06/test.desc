@@ -1,6 +1,6 @@
 CORE
 test.c
---nondet-volatile-write-model reg:observe --mmio-weak --mmio-gather
+--nondet-volatile-write-model reg:observe --mmio-weak --mmio-gather --mmio-weak-depth 2
 ^EXIT=10$
 ^SIGNAL=0$
 device observed the write of 1: FAILURE$

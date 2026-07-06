@@ -1745,6 +1745,23 @@ void goto_instrument_parse_optionst::instrument_goto_program()
     cmdline.isset(MMIO_WEAK_VARIABLE_OPT))
   {
     remove_asm(goto_model, ui_message_handler);
+
+    // State the reorder-depth assumption explicitly: write reordering is
+    // modelled with a bounded per-register buffer, and a write burst longer
+    // than that depth is reported as a property violation ("MMIO write burst
+    // exceeds the modelled reorder depth") rather than silently
+    // under-approximated.
+    const auto depth = options.is_set(MMIO_WEAK_DEPTH_OPT)
+                         ? options.get_unsigned_int_option(MMIO_WEAK_DEPTH_OPT)
+                         : 1;
+    log.status()
+      << "Memory-mapped I/O: modelling write reordering with a "
+         "per-register buffer of depth "
+      << depth
+      << "; a longer write burst to a single register is reported as "
+         "a property violation (raise --mmio-weak-depth to model "
+         "longer bursts)"
+      << messaget::eom;
   }
 
   nondet_volatile(goto_model, options);

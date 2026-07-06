@@ -454,7 +454,10 @@ model (default 1). Writes to a single register are always observed in program
 order, but with a buffer of depth \fIn\fR up to \fIn\fR writes to a register can
 be outstanding, so that a write may be delayed past that many writes to other
 registers. A larger depth models deeper reordering at the cost of a larger state
-space.
+space. If a write burst to a single register exceeds the buffer depth, it is
+reported as a property violation (\(lqMMIO write burst exceeds the modelled
+reorder depth\(rq) rather than silently under\-approximated, so the bound is
+never a hidden source of unsoundness.
 .TP
 \fB\-\-mmio\-gather\fR
 Model write combining (the gather attribute of weak device memory). A write to a
