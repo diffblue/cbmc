@@ -918,6 +918,26 @@ is modelled).  Both suites green.
 
 *Updated: 2026-07-05*
 
+### 2026-07-05 gap closed: CTAD for functional-notation C(args)
+
+N5008 [over.match.class.deduct]: `C(args)` naming a class template without a
+template-argument-list is class template argument deduction (e.g.
+`std::optional(x)`), not a function call.  The parser emits a function call (C is
+only a template-name), which failed with "found no match for C".  Fixed by
+routing a class-template callee to the explicit-constructor-call / CTAD path in
+typecheck_side_effect_function_call (via deduce_class_template_arguments, which
+returns nullopt for non-class-templates so ordinary calls are unaffected), and
+by resolving *qualified* class-template-ids (std::optional) to their scope in
+deduce_class_template_arguments.  Header-free non-vacuous CORE test
+cpp17_ctad_functional_notation.
+
+Dog-food **89/19/9 -> 90/19/8**: fixes CTAD in simplify_expr_int.cpp.
+simplify_utils.cpp still FAILs on a *separate* std::optional gap
+(is_trivially_destructible_v<basic_string> in _Optional_base), left for a
+follow-up.  Both suites green.
+
+*Updated: 2026-07-05*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
