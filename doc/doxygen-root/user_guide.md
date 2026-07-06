@@ -3,7 +3,7 @@
 For a quick start with CBMC on simple problems, read
 
 * The \ref installation_guide
-* A [short tutorial](cprover-manual/md_cbmc_tutorial.html)
+* A [short tutorial](cprover-manual/md_cbmc-tutorial.html)
 * A [short manual](cprover-manual/index.html)
 
 For a quick start with CBMC on large software projects, read
