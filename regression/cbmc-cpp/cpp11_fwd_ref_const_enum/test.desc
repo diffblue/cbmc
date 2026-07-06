@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ forwarding-ref accepts a const enum lvalue: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.call]/3: a forwarding reference `T&&` deduces T as "lvalue
+reference to A" from an lvalue argument of type A, for any A including an
+enumeration.  CBMC wrongly rejects the call ("found no match" -> CONVERSION
+ERROR) when the argument is a const-qualified ENUM lvalue; a const scalar or a
+non-const enum resolves fine, so the defect is specific to deducing/binding a
+forwarding reference from a const enum argument (the deduced `const E&`
+parameter is dropped during overload resolution).  Surfaced (with the
+separately-fixed heterogeneous-pack defect cpp11_variadic_fwd_ref_heterogeneous)
+by src/util/validate_expressions.cpp's `call_on_expr<...>(ns, vm)`, which
+forwards a `const validation_modet` (enum class).  Flip to CORE once fixed.
