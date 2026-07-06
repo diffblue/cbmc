@@ -116,3 +116,39 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
   // everything else is POD
   return true;
 }
+
+bool cpp_typecheckt::has_default_member_initializer(const typet &type) const
+{
+  // Look through arrays to the (ultimate) element type: an array of a class
+  // type with a default member initializer is itself non-trivially default-
+  // constructed ([class.default.ctor]/3 via [dcl.init]).
+  typet element = type;
+  while(element.id() == ID_array)
+    element = to_array_type(element).element_type();
+
+  if(element.id() != ID_struct_tag)
+    return false;
+
+  const symbolt &symb = lookup(to_struct_tag_type(element));
+  if(!symb.is_type || symb.type.id() != ID_struct)
+    return false;
+
+  for(const auto &c : to_struct_type(symb.type).components())
+  {
+    if(
+      c.get_bool(ID_is_static) || c.get_bool(ID_is_type) ||
+      c.type().id() == ID_code || c.get_is_padding())
+    {
+      continue;
+    }
+
+    // A direct default member initializer, or a subobject that itself carries
+    // one, makes this class's default construction non-trivial.
+    if(c.find(ID_C_default_value).is_not_nil())
+      return true;
+    if(has_default_member_initializer(c.type()))
+      return true;
+  }
+
+  return false;
+}
