@@ -1023,6 +1023,44 @@ green.
 
 *Updated: 2026-07-06*
 
+### 2026-07-06 faithful reproducer captured: out-of-line member breaks a user-defined conversion (tempfile.cpp)
+
+Applied the "reduce with the real headers kept" strategy (cvise on the raw
+`.cpp` with the goto-cc `-I` flags, so libstdc++ stays external and is never
+mangled into an artifact -- unlike a preprocessed reduction).  This turned the
+`tempfile.cpp` dog-food FAIL into a **faithful, minimal, reliable** reproducer:
+
+```cpp
+#include <string>
+struct T { std::string name; ~T(); };
+#include <filesystem>
+T::~T(){ std::filesystem::remove(name); }   // "found no match for symbol 'remove'"
+```
+
+Precise characterisation (all verified): CBMC wrongly rejects
+`std::filesystem::remove(name)` (name : `std::string`) with "found no match" ->
+CONVERSION ERROR **iff** the call sits inside an OUT-OF-LINE, qualified function
+definition -- a class member (`T::~T`, `T::f`, static or not), a namespace
+member (`N::f`), or a nested one (`N::M::f`).  The identical call in a free
+function at namespace scope resolves fine; an explicit `path(name)` works; a
+plain (non-templated) converting constructor works.  So the trigger is: overload
+resolution forms the user-defined `std::string`->`std::filesystem::path`
+conversion through path's *templated, SFINAE-guarded* converting constructor,
+and that resolution fails when the current scope is a nested
+(out-of-line-definition) scope.  Per N5008 [over.ics.user]/[temp.deduct] a
+conversion's viability depends only on source/destination types, not the
+call-site scope.
+
+Ruled out: resetting the scope around the template-converting-constructor
+fallback in `user_defined_conversion_sequence` (that path is not the one taken).
+The correct fix needs deeper tracing of where overload resolution's conversion
+computation consults the current scope; deferred rather than risk a rushed
+change to that code.  Captured as KNOWNBUG `cpp17_out_of_line_udc_conversion`
+(non-vacuous; flips to CORE once fixed).  Both suites green; tree otherwise
+unchanged.
+
+*Updated: 2026-07-06*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
