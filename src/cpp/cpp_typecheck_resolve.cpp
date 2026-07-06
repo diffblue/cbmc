@@ -1247,6 +1247,45 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             code_typet::parametert pack_param = params[pack_idx];
             for(std::size_t i = 1; i < pack_size; ++i)
               params.insert(params.begin() + pack_idx + i, pack_param);
+
+            // N5008 [temp.deduct.call]/1-4 + [temp.variadic]/4: the deduced
+            // elements of a function parameter pack may have DIFFERENT types
+            // (e.g. a forwarding-reference pack `A&&...` called with
+            // heterogeneous lvalue arguments `call_on(i, d)` deduces
+            // A = {int&, double&}).  The loop above expanded the pack into
+            // `pack_size` copies of the FIRST element's parameter, which is
+            // only correct for a homogeneous pack; for a forwarding-reference
+            // pack it leaves later arguments unable to bind to the first
+            // element's reference type (there is no implicit conversion), so
+            // the call is wrongly rejected as "no match".  Assign each expanded
+            // parameter the type of its corresponding deduced pack element.
+            //
+            // Guarded to the parameter patterns that reach this expansion and
+            // for which the parameter type equals its deduced template argument
+            // -- the identity pattern `A` and the forwarding reference `A&&`
+            // (whose `A& &&` collapses to `A&`); for these, template argument
+            // `non_pack_count + i` is exactly the i-th parameter's type.  Other
+            // patterns (where the parameter merely contains `A`) keep the
+            // duplicated form, so this only ever corrects a wrong homogeneous
+            // expansion.
+            if(
+              non_pack_count < template_args.arguments().size() &&
+              template_args.arguments()[non_pack_count].id() == ID_type &&
+              pack_param.type() ==
+                template_args.arguments()[non_pack_count].type())
+            {
+              for(std::size_t i = 0; i < pack_size; ++i)
+              {
+                const std::size_t targ = non_pack_count + i;
+                if(
+                  targ < template_args.arguments().size() &&
+                  template_args.arguments()[targ].id() == ID_type)
+                {
+                  params[pack_idx + i].type() =
+                    template_args.arguments()[targ].type();
+                }
+              }
+            }
           }
         }
       }
