@@ -119,8 +119,10 @@ registers may be reordered. The FIFO depth is set by `--mmio-weak-depth <n>`
 (default 1): up to `n` writes to a register can be outstanding, so a write may
 be delayed past that many writes to other registers; a deeper buffer exhibits
 reorderings a shallower one cannot (e.g. delaying a write past a subsequent
-write to the same register). Deferral is bounded to within a single function;
-lifting that bound is the remaining work.
+write to the same register). The posted-write buffers have static lifetime, so a
+write posted in one function can be delayed past the function's return and
+observed later in the program, until a barrier or the end of the program; this
+catches missing-barrier bugs that span function boundaries.
 
 Per-register memory types are selected with `--mmio-weak-variable <register>`
 (mark a specific register weak, leaving the rest strongly ordered), while

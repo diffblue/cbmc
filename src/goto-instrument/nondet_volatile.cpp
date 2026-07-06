@@ -29,6 +29,8 @@ Date: September 2011
 
 #include <linking/static_lifetime_init.h>
 
+#include <optional>
+
 #include "wmm/fence.h"
 
 class nondet_volatilet
@@ -49,16 +51,22 @@ public:
       return;
     }
 
+    if(has_weak_registers())
+      setup_weak_buffers(goto_model.symbol_table);
+
     for(auto &f : goto_model.goto_functions.function_map)
     {
       nondet_volatile(goto_model.symbol_table, f.first, f.second.body);
 
       if(has_weak_registers())
       {
-        instrument_posted_writes(
-          goto_model.symbol_table, f.first, f.second.body);
+        const namespacet ns(goto_model.symbol_table);
+        instrument_posted_writes(f.first, f.second.body, ns);
       }
     }
+
+    if(has_weak_registers())
+      finalize_weak_buffers(goto_model.symbol_table);
 
     goto_model.goto_functions.update();
   }
@@ -110,17 +118,60 @@ private:
     const goto_programt::instructiont &instruction,
     const namespacet &ns);
 
-  /// Weak MMIO model (--mmio-weak): make writes to write-modelled registers
-  /// "posted". Each such write is non-deterministically either committed
-  /// immediately (the write model is called at the write) or deferred until the
-  /// next barrier or the end of the function. A later write to a different
-  /// register may then be observed before an earlier posted one, exposing
-  /// missing-barrier ordering bugs, while a barrier forces in-order
+  /// A per-register FIFO of posted (not-yet-observed) writes to a weakly
+  /// ordered register: a fixed-capacity buffer and its current size. The
+  /// buffers have static lifetime so that a posted write can be delayed across
+  /// function boundaries, until a barrier or the end of the program.
+  struct posted_buffert
+  {
+    symbol_exprt buffer; // array [weak_depth] of the register's value type
+    symbol_exprt size;   // number of pending writes, 0..weak_depth
+    irep_idt model;
+  };
+
+  /// Create the static posted-write buffers (one per weakly-ordered
+  /// write-modelled register) and the shared non-deterministic flush choice.
+  void setup_weak_buffers(symbol_table_baset &symbol_table);
+
+  /// Initialise the buffer sizes at the start of the entry point and flush any
+  /// writes still posted at the end of the program.
+  void finalize_weak_buffers(symbol_table_baset &symbol_table);
+
+  // helpers building goto fragments for the weak MMIO model; see the
+  // definitions for the exact semantics
+  void emit_observe_head(
+    goto_programt &dest,
+    const posted_buffert &b,
+    const namespacet &ns,
+    const source_locationt &loc) const;
+  void emit_flush_one(
+    goto_programt &dest,
+    const posted_buffert &b,
+    const namespacet &ns,
+    const source_locationt &loc) const;
+  void emit_nondet_flush(
+    goto_programt &dest,
+    const posted_buffert &b,
+    const namespacet &ns,
+    const source_locationt &loc) const;
+  void emit_enqueue(
+    goto_programt &dest,
+    const posted_buffert &b,
+    const exprt &value,
+    const namespacet &ns,
+    const source_locationt &loc) const;
+
+  /// Weak MMIO model (--mmio-weak): make writes to weakly-ordered
+  /// write-modelled registers "posted". Each such write is enqueued and its
+  /// write-model call is delivered non-deterministically at this or a later
+  /// point, or at a barrier, or at the end of the program. A write to one
+  /// register may thus be observed after a later write to another register,
+  /// exposing missing-barrier ordering bugs, while a barrier forces in-order
   /// observation.
   void instrument_posted_writes(
-    symbol_table_baset &symbol_table,
     const irep_idt &function_id,
-    goto_programt &goto_program);
+    goto_programt &goto_program,
+    const namespacet &ns);
 
   const symbolt &typecheck_variable(const irep_idt &id, const namespacet &ns);
 
@@ -152,6 +203,11 @@ private:
   // depth of the per-register posted-write FIFO (--mmio-weak-depth); a larger
   // depth allows more outstanding writes and hence deeper reordering
   std::size_t weak_depth = 1;
+
+  // the static posted-write buffers, one per weakly-ordered register, and the
+  // shared non-deterministic flush choice (populated by setup_weak_buffers)
+  std::map<irep_idt, posted_buffert> weak_buffers;
+  std::optional<symbol_exprt> flush_choice;
 
   /// Is the register \p id modelled as weakly ordered device memory?
   bool is_weak_register(const irep_idt &id) const
@@ -382,163 +438,193 @@ bool nondet_volatilet::is_barrier(
   return false;
 }
 
-void nondet_volatilet::instrument_posted_writes(
-  symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
-  goto_programt &goto_program)
+// observe (call the model for) the head of the FIFO and shift the remaining
+// entries down; the caller guarantees the buffer is non-empty
+void nondet_volatilet::emit_observe_head(
+  goto_programt &dest,
+  const posted_buffert &b,
+  const namespacet &ns,
+  const source_locationt &loc) const
 {
-  const namespacet ns(symbol_table);
-
-  // collect the write-modelled registers written in this function
-  std::map<irep_idt, irep_idt> registers;
-  for(const auto &instruction : goto_program.instructions)
-  {
-    if(instruction.is_assign() && instruction.assign_lhs().id() == ID_symbol)
-    {
-      const irep_idt &id =
-        to_symbol_expr(instruction.assign_lhs()).identifier();
-      const auto it = write_models.find(id);
-      if(it != write_models.end() && is_weak_register(id))
-        registers.emplace(id, it->second);
-    }
-  }
-
-  if(registers.empty())
-    return;
-
-  const std::size_t depth = weak_depth;
   const typet index_type = size_type();
   const exprt zero = from_integer(0, index_type);
   const exprt one = from_integer(1, index_type);
-  const exprt capacity = from_integer(depth, index_type);
 
-  // A per-register FIFO of posted (not-yet-observed) writes: a fixed-capacity
-  // buffer and its current size. Writes to one register are observed in program
-  // order (FIFO), but a write to a register may be delayed past writes to other
-  // registers, up to the buffer depth, until a barrier or the function's exit.
-  struct posted_buffert
-  {
-    symbol_exprt buffer; // array [depth] of the register's value type
-    symbol_exprt size;   // number of pending writes, 0..depth
-    irep_idt model;
-  };
-  std::map<irep_idt, posted_buffert> buffers;
-
-  for(const auto &r : registers)
-  {
-    const symbolt &register_symbol = ns.lookup(r.first);
-    const array_typet buffer_type{register_symbol.type, capacity};
-    const symbol_exprt buffer = get_fresh_aux_symbol(
-                                  buffer_type,
-                                  id2string(function_id),
-                                  "mmio_posted",
-                                  source_locationt{},
-                                  ID_C,
-                                  symbol_table)
-                                  .symbol_expr();
-    const symbol_exprt size = get_fresh_aux_symbol(
-                                index_type,
-                                id2string(function_id),
-                                "mmio_posted_size",
-                                source_locationt{},
-                                ID_C,
-                                symbol_table)
-                                .symbol_expr();
-    buffers.emplace(r.first, posted_buffert{buffer, size, r.second});
-  }
-
-  // a reusable non-deterministic choice flag for interleaving flushes
-  const symbol_exprt choice = get_fresh_aux_symbol(
-                                bool_typet{},
-                                id2string(function_id),
-                                "mmio_flush_choice",
-                                source_locationt{},
-                                ID_C,
-                                symbol_table)
-                                .symbol_expr();
-
-  // observe (call the model for) the head of the FIFO and shift the remaining
-  // entries down; the caller guarantees the buffer is non-empty
-  const auto emit_observe_head =
-    [&](
-      goto_programt &dest, const posted_buffert &b, const source_locationt &loc)
-  {
-    dest.add(goto_programt::make_function_call(
-      code_function_callt{
-        ns.lookup(b.model).symbol_expr(), {index_exprt{b.buffer, zero}}},
-      loc));
-    for(std::size_t i = 0; i + 1 < depth; ++i)
-    {
-      dest.add(goto_programt::make_assignment(
-        index_exprt{b.buffer, from_integer(i, index_type)},
-        index_exprt{b.buffer, from_integer(i + 1, index_type)},
-        loc));
-    }
-    dest.add(
-      goto_programt::make_assignment(b.size, minus_exprt{b.size, one}, loc));
-  };
-
-  // if(size != 0) observe_head -- an unconditional flush of one entry
-  const auto emit_flush_one =
-    [&](
-      goto_programt &dest, const posted_buffert &b, const source_locationt &loc)
-  {
-    auto guard = dest.add(
-      goto_programt::make_incomplete_goto(equal_exprt{b.size, zero}, loc));
-    emit_observe_head(dest, b, loc);
-    auto label = dest.add(goto_programt::make_skip(loc));
-    guard->complete_goto(label);
-  };
-
-  // if(size != 0 && nondet) observe_head -- a non-deterministic flush that lets
-  // a posted write be observed (or not) here, which is what produces reordering
-  const auto emit_nondet_flush =
-    [&](
-      goto_programt &dest, const posted_buffert &b, const source_locationt &loc)
+  dest.add(goto_programt::make_function_call(
+    code_function_callt{
+      ns.lookup(b.model).symbol_expr(), {index_exprt{b.buffer, zero}}},
+    loc));
+  for(std::size_t i = 0; i + 1 < weak_depth; ++i)
   {
     dest.add(goto_programt::make_assignment(
-      choice, side_effect_expr_nondett{bool_typet{}, loc}, loc));
-    auto guard = dest.add(goto_programt::make_incomplete_goto(
-      or_exprt{equal_exprt{b.size, zero}, not_exprt{choice}}, loc));
-    emit_observe_head(dest, b, loc);
-    auto label = dest.add(goto_programt::make_skip(loc));
-    guard->complete_goto(label);
-  };
+      index_exprt{b.buffer, from_integer(i, index_type)},
+      index_exprt{b.buffer, from_integer(i + 1, index_type)},
+      loc));
+  }
+  dest.add(
+    goto_programt::make_assignment(b.size, minus_exprt{b.size, one}, loc));
+}
 
-  // enqueue value v at the tail; if the buffer is full, observe the head first
-  // to make room (a bounded over-approximation of an unbounded buffer)
-  const auto emit_enqueue = [&](
-                              goto_programt &dest,
-                              const posted_buffert &b,
-                              const exprt &v,
-                              const source_locationt &loc)
-  {
-    auto guard = dest.add(goto_programt::make_incomplete_goto(
-      notequal_exprt{b.size, capacity}, loc));
-    emit_observe_head(dest, b, loc);
-    auto label = dest.add(goto_programt::make_skip(loc));
-    guard->complete_goto(label);
-    dest.add(
-      goto_programt::make_assignment(index_exprt{b.buffer, b.size}, v, loc));
-    dest.add(
-      goto_programt::make_assignment(b.size, plus_exprt{b.size, one}, loc));
-  };
+// if(size != 0) observe_head -- an unconditional flush of one entry
+void nondet_volatilet::emit_flush_one(
+  goto_programt &dest,
+  const posted_buffert &b,
+  const namespacet &ns,
+  const source_locationt &loc) const
+{
+  const exprt zero = from_integer(0, size_type());
+  auto guard = dest.add(
+    goto_programt::make_incomplete_goto(equal_exprt{b.size, zero}, loc));
+  emit_observe_head(dest, b, ns, loc);
+  auto label = dest.add(goto_programt::make_skip(loc));
+  guard->complete_goto(label);
+}
 
-  // declare and initialise the buffers at the function's entry
+// if(size != 0 && nondet) observe_head -- a non-deterministic flush that lets
+// a posted write be observed (or not) here, which is what produces reordering
+void nondet_volatilet::emit_nondet_flush(
+  goto_programt &dest,
+  const posted_buffert &b,
+  const namespacet &ns,
+  const source_locationt &loc) const
+{
+  PRECONDITION(flush_choice.has_value());
+  const exprt zero = from_integer(0, size_type());
+  dest.add(goto_programt::make_assignment(
+    *flush_choice, side_effect_expr_nondett{bool_typet{}, loc}, loc));
+  auto guard = dest.add(goto_programt::make_incomplete_goto(
+    or_exprt{equal_exprt{b.size, zero}, not_exprt{*flush_choice}}, loc));
+  emit_observe_head(dest, b, ns, loc);
+  auto label = dest.add(goto_programt::make_skip(loc));
+  guard->complete_goto(label);
+}
+
+// enqueue value at the tail; if the buffer is full, observe the head first to
+// make room (a bounded over-approximation of an unbounded buffer)
+void nondet_volatilet::emit_enqueue(
+  goto_programt &dest,
+  const posted_buffert &b,
+  const exprt &value,
+  const namespacet &ns,
+  const source_locationt &loc) const
+{
+  const typet index_type = size_type();
+  const exprt one = from_integer(1, index_type);
+  const exprt capacity = from_integer(weak_depth, index_type);
+
+  auto guard = dest.add(
+    goto_programt::make_incomplete_goto(notequal_exprt{b.size, capacity}, loc));
+  emit_observe_head(dest, b, ns, loc);
+  auto label = dest.add(goto_programt::make_skip(loc));
+  guard->complete_goto(label);
+  dest.add(
+    goto_programt::make_assignment(index_exprt{b.buffer, b.size}, value, loc));
+  dest.add(
+    goto_programt::make_assignment(b.size, plus_exprt{b.size, one}, loc));
+}
+
+void nondet_volatilet::setup_weak_buffers(symbol_table_baset &symbol_table)
+{
+  const namespacet ns(symbol_table);
+  const typet index_type = size_type();
+  const exprt capacity = from_integer(weak_depth, index_type);
+
+  // one static FIFO per weakly-ordered write-modelled register; static lifetime
+  // lets a posted write be delayed across function boundaries
+  for(const auto &write_model : write_models)
   {
-    goto_programt declarations;
-    declarations.add(goto_programt::make_decl(choice));
-    for(const auto &b : buffers)
-    {
-      declarations.add(goto_programt::make_decl(b.second.buffer));
-      declarations.add(goto_programt::make_decl(b.second.size));
-      declarations.add(goto_programt::make_assignment(b.second.size, zero));
-    }
-    goto_program.destructive_insert(
-      goto_program.instructions.begin(), declarations);
+    if(!is_weak_register(write_model.first))
+      continue;
+
+    const symbolt &register_symbol = ns.lookup(write_model.first);
+    const array_typet buffer_type{register_symbol.type, capacity};
+
+    symbolt &buffer_symbol = get_fresh_aux_symbol(
+      buffer_type, "", "mmio_posted", source_locationt{}, ID_C, symbol_table);
+    buffer_symbol.is_static_lifetime = true;
+    buffer_symbol.is_thread_local = false;
+
+    symbolt &size_symbol = get_fresh_aux_symbol(
+      index_type,
+      "",
+      "mmio_posted_size",
+      source_locationt{},
+      ID_C,
+      symbol_table);
+    size_symbol.is_static_lifetime = true;
+    size_symbol.is_thread_local = false;
+
+    weak_buffers.emplace(
+      write_model.first,
+      posted_buffert{
+        buffer_symbol.symbol_expr(),
+        size_symbol.symbol_expr(),
+        write_model.second});
   }
 
-  // transform writes and flush at barriers
+  if(weak_buffers.empty())
+    return;
+
+  symbolt &choice_symbol = get_fresh_aux_symbol(
+    bool_typet{},
+    "",
+    "mmio_flush_choice",
+    source_locationt{},
+    ID_C,
+    symbol_table);
+  choice_symbol.is_static_lifetime = true;
+  choice_symbol.is_thread_local = false;
+  flush_choice = choice_symbol.symbol_expr();
+}
+
+void nondet_volatilet::finalize_weak_buffers(symbol_table_baset &symbol_table)
+{
+  if(weak_buffers.empty())
+    return;
+
+  const namespacet ns(symbol_table);
+  const exprt zero = from_integer(0, size_type());
+  const source_locationt loc{};
+
+  auto entry =
+    goto_model.goto_functions.function_map.find(goto_functionst::entry_point());
+  if(
+    entry == goto_model.goto_functions.function_map.end() ||
+    !entry->second.body_available())
+  {
+    return;
+  }
+
+  goto_programt &body = entry->second.body;
+
+  // initialise the buffer sizes at the very start of the program
+  goto_programt initialisations;
+  for(const auto &b : weak_buffers)
+    initialisations.add(
+      goto_programt::make_assignment(b.second.size, zero, loc));
+  body.destructive_insert(body.instructions.begin(), initialisations);
+
+  // flush any writes still posted when the program ends
+  auto end = std::prev(body.instructions.end());
+  goto_programt epilogue;
+  for(const auto &b : weak_buffers)
+    for(std::size_t k = 0; k < weak_depth; ++k)
+      emit_flush_one(epilogue, b.second, ns, loc);
+  body.destructive_insert(end, epilogue);
+}
+
+void nondet_volatilet::instrument_posted_writes(
+  const irep_idt &function_id,
+  goto_programt &goto_program,
+  const namespacet &ns)
+{
+  if(weak_buffers.empty())
+    return;
+
+  // the zero-initialisation of the volatile globals is not a device action
+  if(function_id == INITIALIZE_FUNCTION)
+    return;
+
   for(auto it = goto_program.instructions.begin();
       it != goto_program.instructions.end();
       ++it)
@@ -546,18 +632,18 @@ void nondet_volatilet::instrument_posted_writes(
     if(it->is_assign() && it->assign_lhs().id() == ID_symbol)
     {
       const auto b_it =
-        buffers.find(to_symbol_expr(it->assign_lhs()).identifier());
+        weak_buffers.find(to_symbol_expr(it->assign_lhs()).identifier());
 
-      if(b_it != buffers.end())
+      if(b_it != weak_buffers.end())
       {
         const source_locationt loc = it->source_location();
         goto_programt fragment;
         // post the write, then give every register's buffer a chance to be
         // (partly) observed here, which is what produces the reordering
-        emit_enqueue(fragment, b_it->second, it->assign_rhs(), loc);
-        for(const auto &b : buffers)
-          for(std::size_t k = 0; k < depth; ++k)
-            emit_nondet_flush(fragment, b.second, loc);
+        emit_enqueue(fragment, b_it->second, it->assign_rhs(), ns, loc);
+        for(const auto &b : weak_buffers)
+          for(std::size_t k = 0; k < weak_depth; ++k)
+            emit_nondet_flush(fragment, b.second, ns, loc);
         goto_program.destructive_insert(std::next(it), fragment);
       }
     }
@@ -566,27 +652,12 @@ void nondet_volatilet::instrument_posted_writes(
       const source_locationt loc = it->source_location();
       goto_programt fragment;
       // a barrier completes all posted writes, in order, before proceeding
-      for(const auto &b : buffers)
-        for(std::size_t k = 0; k < depth; ++k)
-          emit_flush_one(fragment, b.second, loc);
+      for(const auto &b : weak_buffers)
+        for(std::size_t k = 0; k < weak_depth; ++k)
+          emit_flush_one(fragment, b.second, ns, loc);
       goto_program.destructive_insert(std::next(it), fragment);
     }
   }
-
-  // flush any still-posted writes and release the buffers at the function exit
-  auto end = std::prev(goto_program.instructions.end());
-  const source_locationt loc = end->source_location();
-  goto_programt epilogue;
-  for(const auto &b : buffers)
-    for(std::size_t k = 0; k < depth; ++k)
-      emit_flush_one(epilogue, b.second, loc);
-  for(const auto &b : buffers)
-  {
-    epilogue.add(goto_programt::make_dead(b.second.buffer, loc));
-    epilogue.add(goto_programt::make_dead(b.second.size, loc));
-  }
-  epilogue.add(goto_programt::make_dead(choice, loc));
-  goto_program.destructive_insert(end, epilogue);
 }
 
 void nondet_volatilet::nondet_volatile(
