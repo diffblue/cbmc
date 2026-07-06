@@ -938,6 +938,35 @@ follow-up.  Both suites green.
 
 *Updated: 2026-07-05*
 
+### 2026-07-05 gap closed: NSDMI referencing a non-type template parameter
+
+N5008 [class.mem]/[temp.inst]: a default member initializer (NSDMI) may refer to
+the enclosing class template's parameters, e.g. `template<bool B> struct Z { int
+t = B ? 1 : 2; };`.  The NSDMI is stored unparsed as the component's
+`C_default_value` (cpp_typecheck_compound_type.cpp) and type-checked only later,
+when the implicit default constructor is generated -- by which time the
+instance's template_map bindings are gone.  So a non-type parameter in the
+initializer was left unresolved: at namespace scope the member took the wrong
+value, and a *function-body* instantiation (`Z<true> z;` inside a function)
+failed to type-check and was then silently swallowed by the unsupported-
+construct leniency (vacuous pass).  Fixed by eagerly type-checking the NSDMI
+while instantiating (template_map populated), under a message-suppressing
+`sfinae_contextt` guard, falling back to the unparsed form on any failure.  The
+suppression matters: a plain (un-guarded) early type-check emitted spurious
+diagnostics that turned 73 dog-food files clean->noisy; the sfinae guard keeps
+them clean.  Header-free non-vacuous CORE test
+`cpp11_nsdmi_nontype_template_param` (covers an explicit non-type argument and
+one defaulted from a variable template).
+
+Dog-food unchanged at **90/19/8** (no FAIL closed, no regression): this is a
+distinct front-end gap discovered while investigating simplify_utils.cpp, whose
+own FAIL is a *different* bug -- `is_trivially_destructible_v<basic_string>` as a
+**default template argument** of `_Optional_base` (optional:327), i.e.
+default-non-type-*argument* evaluation, not an NSDMI.  That remains open.  Both
+suites green.
+
+*Updated: 2026-07-05*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
