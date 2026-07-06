@@ -1077,6 +1077,41 @@ BMC stays trivial (the property is a front-end one).  Dog-food **90/19/8 ->
 
 *Updated: 2026-07-06*
 
+### 2026-07-06 gap closed: heterogeneous forwarding-reference parameter pack (+ const-enum KNOWNBUG)
+
+Reduce-with-real-headers cvise on `validate_expressions.cpp` (120 -> 7 lines,
+then narrowed header-free) pinned its `call_on_expr<...>(ns, vm)` "found no
+match" to a variadic FORWARDING-REFERENCE parameter pack `A&&...` called with
+HETEROGENEOUS arguments.  The template-template parameter and the incomplete
+`namespacet` were red herrings; the minimal reproducer is just
+`template<typename... A> void call_on(A&&...); call_on(i, d);` with `i`, `d` of
+different types.
+
+Root cause: `guess_function_template_args` deduced the pack correctly (e.g.
+`A = {int&, double&}`) but, when expanding the single instantiated pack
+parameter into `pack_size` function parameters, it inserted `pack_size` copies
+of the FIRST element's parameter.  That is only valid for a homogeneous pack;
+for a forwarding-reference pack it makes every parameter the first element's
+reference type, so a later argument of a different type cannot bind (no implicit
+conversion) and the call is rejected as "no match".  Fixed per N5008
+[temp.deduct.call]/[temp.variadic] by assigning each expanded parameter its
+corresponding deduced pack-element type.  Header-free non-vacuous CORE test
+`cpp11_variadic_fwd_ref_heterogeneous`.
+
+`validate_expressions.cpp` still FAILs: it also hits a *second, independent*
+defect -- a forwarding reference `T&&` deducing from a **const enum** lvalue
+(its `call_on_expr` forwards a `const validation_modet`, an `enum class`).
+Minimal: `enum class E{}; template<typename T> void f(T&&); const E e; f(e);` ->
+"found no match" (const scalar and non-const enum both work; the deduced
+`const E&` parameter is dropped in overload resolution).  Captured as KNOWNBUG
+`cpp11_fwd_ref_const_enum` for a follow-up.
+
+Dog-food unchanged at **91/19/7** (fix #1 is a real correctness fix but does not
+by itself close validate_expressions, which needs the const-enum fix too; no
+regression).  Both suites green; clang-format clean.
+
+*Updated: 2026-07-06*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
