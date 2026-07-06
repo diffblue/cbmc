@@ -113,10 +113,14 @@ function. A barrier is a full fence or a call to `__sync_synchronize`. Because a
 later write to a different register can be committed while an earlier write is
 still posted, the device (the write model, acting as observer) may see the two
 writes out of order, exposing missing-barrier bugs; a barrier between them
-restores program order. Writes to the *same* register coalesce (a later post
-overwrites an earlier one), modelling gathering. Deferral is bounded to within a
-single function, and the multi-outstanding-write reordering is bounded by this
-per-register posted slot; lifting these bounds is the remaining work.
+restores program order. Writes to a *single* register are observed in program
+order (the posted writes form a per-register FIFO), while writes to *different*
+registers may be reordered. The FIFO depth is set by `--mmio-weak-depth <n>`
+(default 1): up to `n` writes to a register can be outstanding, so a write may
+be delayed past that many writes to other registers; a deeper buffer exhibits
+reorderings a shallower one cannot (e.g. delaying a write past a subsequent
+write to the same register). Deferral is bounded to within a single function;
+lifting that bound is the remaining work.
 
 Per-register memory types are selected with `--mmio-weak-variable <register>`
 (mark a specific register weak, leaving the rest strongly ordered), while

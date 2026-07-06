@@ -32,6 +32,7 @@ class optionst;
 // strongly ordered).
 #define MMIO_WEAK_OPT "mmio-weak"
 #define MMIO_WEAK_VARIABLE_OPT "mmio-weak-variable"
+#define MMIO_WEAK_DEPTH_OPT "mmio-weak-depth"
 
 #define OPT_NONDET_VOLATILE \
   "(" NONDET_VOLATILE_OPT ")" \

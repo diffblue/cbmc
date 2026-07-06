@@ -446,6 +446,14 @@ strongly\-ordered regions (ARM Device\-nGnRnE, x86 uncacheable) preserve program
 order, whereas weakly\-ordered regions (ARM Device\-GRE, x86 write\-combining) may
 reorder. May be given multiple times.
 .TP
+\fB\-\-mmio\-weak\-depth\fR \fIn\fR
+Set the depth of the per\-register posted\-write buffer used by the weak MMIO
+model (default 1). Writes to a single register are always observed in program
+order, but with a buffer of depth \fIn\fR up to \fIn\fR writes to a register can
+be outstanding, so that a write may be delayed past that many writes to other
+registers. A larger depth models deeper reordering at the cost of a larger state
+space.
+.TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime
 .TP

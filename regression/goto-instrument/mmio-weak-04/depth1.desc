@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model A:observe_A --nondet-volatile-write-model B:observe_B --mmio-weak --mmio-weak-depth 1
+^EXIT=0$
+^SIGNAL=0$
+a write to A observed before GO: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+With a depth-1 posted-write buffer (the default), the second write to A forces
+the first to be observed, so a write to A is always observed before the command
+and the property holds. The deeper reordering that violates it requires
+--mmio-weak-depth 2 (see test.desc).
