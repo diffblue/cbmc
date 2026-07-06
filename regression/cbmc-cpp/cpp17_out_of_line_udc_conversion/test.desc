@@ -1,0 +1,29 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ out-of-line member compiles and runs: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [over.match.best] + [over.ics.user] + [temp.deduct]: a user-defined
+conversion via a (templated, SFINAE-guarded) converting constructor is viable
+based only on the source and destination types, not on the scope of the call
+site.  CBMC wrongly rejects `std::filesystem::remove(name)` (name : std::string)
+with "found no match for symbol 'remove'" -> CONVERSION ERROR whenever the call
+appears inside an OUT-OF-LINE, qualified function definition (class member,
+namespace member, or static member); the identical call in a free function at
+namespace scope resolves fine.  The distinguishing factor is that the current
+scope during overload resolution is a nested (out-of-line-definition) scope, in
+which the std::string->std::filesystem::path converting-constructor template
+fails to resolve.
+
+Faithful reproducer, reduced from src/util/tempfile.cpp
+(`temporary_filet::~temporary_filet`) via cvise while keeping the real
+<string>/<filesystem> includes (so libstdc++ stays semantically faithful).
+Reproduces the dog-food FAIL for tempfile.cpp.  assertion.2 provides
+non-vacuity.  Flip to CORE once the converting-constructor conversion resolves
+independently of the call-site scope.
