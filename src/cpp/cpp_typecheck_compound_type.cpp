@@ -1392,7 +1392,35 @@ void cpp_typecheckt::typecheck_compound_declarator(
   // C++11: store default member initializer on the component
   if(!is_method && !is_static && value.is_not_nil() && value.id() != ID_code)
   {
-    component.add(ID_C_default_value, value);
+    exprt default_value = value;
+    // N5008 [class.mem]/[temp.inst]: the default member initializer (NSDMI) may
+    // reference the enclosing template's parameters (e.g. `int t = B ? 1 : 2;`
+    // with a non-type parameter B).  It is stored unparsed and type-checked
+    // later, when the implicit constructor is generated -- by which time the
+    // instance's template parameter bindings are no longer in scope, leaving
+    // the parameter unresolved (wrong value, or a type-check failure when the
+    // specialization is instantiated in a function body).  When instantiating
+    // (template parameters are currently bound), type-check the NSDMI now so
+    // its parameter references are resolved; a plain constant like `B ? 1 : 2`
+    // folds to its value.  On any failure fall back to the unparsed form (the
+    // constructor path type-checks it as before).  For a non-instantiation
+    // compound the map is empty and the initializer is stored as written.
+    if(!template_map.type_map.empty() || !template_map.expr_map.empty())
+    {
+      // Suppress diagnostics: this is a speculative early type-check purely to
+      // resolve template parameters; on any failure we fall back to the
+      // unparsed initializer (the constructor path type-checks it as before).
+      sfinae_contextt sfinae_guard{*this};
+      try
+      {
+        typecheck_expr(default_value);
+      }
+      catch(...)
+      {
+        default_value = value;
+      }
+    }
+    component.add(ID_C_default_value, default_value);
   }
 
   put_compound_into_scope(component);
