@@ -156,10 +156,24 @@ memory.
 ### Phase 3 — refinements
 
 Gathering (`G`) is modelled by `--mmio-gather` (see above). The remaining
-refinements are early-write-acknowledgement (`E`) interaction with completion
-barriers (distinguishing an ordering barrier such as `DMB` from a completion
-barrier such as `DSB`), and selectable per-architecture profiles (ARM device
-types, x86 UC/WC).
+refinement is early-write-acknowledgement (`E`): distinguishing an ordering
+barrier (ARM `DMB`) from a completion barrier (ARM `DSB`). This does not fit the
+current model as a simple knob, because that model represents a write's effect
+by its *observation* (the write-model call), which conflates two notions:
+
+* **ordering** -- a `DMB` must prevent accesses from being reordered across it,
+  but need not force prior writes to have landed; and
+* **completion** -- a `DSB` additionally guarantees prior writes have reached
+  the device.
+
+Today every recognised barrier flushes the posted-write buffers, which enforces
+both at once (equivalent to a `DSB`). Modelling a `DMB` correctly requires
+enforcing ordering across the barrier *without* flushing -- e.g. tagging posted
+writes with a barrier generation and forbidding a later-generation write from
+being observed before an earlier-generation one, while still allowing both to
+remain posted past the `DMB`. That separate completion/ordering state is the
+next increment; per-architecture profiles selecting the barrier semantics (ARM
+device types, x86 UC/WC) sit on top of it.
 
 ## Soundness stance
 
