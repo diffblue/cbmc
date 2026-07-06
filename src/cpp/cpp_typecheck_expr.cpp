@@ -3929,6 +3929,30 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // Phase 4B in the target-type-threading plan).  The stack is set
   // by the `typecheck_side_effect_function_call(exprt &,
   // const target_typet &)` overload.
+  // N5008 [over.match.class.deduct]: `C(args)` where C names a class template
+  // written without a template-argument-list is class template argument
+  // deduction (CTAD), not a function call.  The parser cannot tell C is a type
+  // (it is only a template-name), so it emits a function call; re-route it to
+  // the explicit-constructor-call / CTAD path here (deduce_class_template_
+  // arguments returns nullopt for anything that is not a class template, so an
+  // ordinary function call falls through).  Without this, `std::optional(x)`
+  // and similar failed with "found no match for C".
+  if(expr.function().id() == ID_cpp_name)
+  {
+    const cpp_namet &fn_name = to_cpp_name(expr.function());
+    if(deduce_class_template_arguments(fn_name, expr.arguments()).has_value())
+    {
+      exprt ctor_call("explicit-constructor-call");
+      ctor_call.type() =
+        static_cast<const typet &>(static_cast<const irept &>(fn_name));
+      ctor_call.operands() = expr.arguments();
+      ctor_call.add_source_location() = expr.source_location();
+      typecheck_expr_explicit_constructor_call(ctor_call);
+      expr.swap(ctor_call);
+      return;
+    }
+  }
+
   cpp_typecheck_fargst call_fargs(expr);
   if(!call_target_stack.empty())
     call_fargs.target = call_target_stack.back();

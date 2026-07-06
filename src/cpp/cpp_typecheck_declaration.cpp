@@ -39,20 +39,47 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   // injected-class-name makes the constructor template visible under the bare
   // name) falls through to a normal constructor call instead.
   const cpp_idt *template_id = nullptr;
-  const auto id_set = cpp_scopes.current_scope().lookup(
-    class_template_name.get_base_name(), cpp_scopet::RECURSIVE);
-
-  for(const auto *id : id_set)
+  cpp_scopet::id_sett id_set;
   {
-    if(id->id_class != cpp_idt::id_classt::TEMPLATE)
-      continue;
-    const symbolt *id_sym = symbol_table.lookup(id->identifier);
-    if(
-      id_sym != nullptr && id_sym->type.id() == ID_cpp_declaration &&
-      to_cpp_declaration(id_sym->type).is_class_template())
+    // The base name is looked up in the current scope; for a qualified
+    // class-template-id (e.g. `std::optional`) first resolve the qualification
+    // to its scope and look the base name up there.  Without this, CTAD for a
+    // qualified class template failed (`std::optional(x)` -> "found no match").
+    cpp_save_scopet save_scope(cpp_scopes);
+    if(class_template_name.is_qualified())
     {
-      template_id = id;
-      break;
+      try
+      {
+        cpp_typecheck_resolvet resolver(*this);
+        irep_idt qbase;
+        cpp_template_args_non_tct qargs;
+        resolver.resolve_scope(class_template_name, qbase, qargs);
+        id_set = cpp_scopes.current_scope().lookup(
+          qbase, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+      }
+      catch(...)
+      {
+        return {};
+      }
+    }
+    else
+    {
+      id_set = cpp_scopes.current_scope().lookup(
+        class_template_name.get_base_name(), cpp_scopet::RECURSIVE);
+    }
+
+    for(const auto *id : id_set)
+    {
+      if(id->id_class != cpp_idt::id_classt::TEMPLATE)
+        continue;
+      const symbolt *id_sym = symbol_table.lookup(id->identifier);
+      if(
+        id_sym != nullptr && id_sym->type.id() == ID_cpp_declaration &&
+        to_cpp_declaration(id_sym->type).is_class_template())
+      {
+        template_id = id;
+        break;
+      }
     }
   }
   if(template_id == nullptr)
