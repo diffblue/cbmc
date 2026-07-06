@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ CTAD deduced Box<int>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [over.match.class.deduct]: `C(args)` naming a class template without
+template arguments is class template argument deduction (the std::optional(x)
+shape).  CBMC parsed it as a function call ("found no match for C"); fixed by
+routing a class-template callee to the explicit-constructor-call / CTAD path,
+and by resolving qualified class-template names in deduce_class_template_
+arguments.  assertion.2 provides non-vacuity.
