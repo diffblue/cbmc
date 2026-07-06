@@ -418,13 +418,15 @@ so that they are not removed as dead code once reads are non-deterministic.
 instruments an interrupt service routine
 .TP
 \fB\-\-mmio\fR
-Apply the memory\-mapped I/O memory model. This is the entry point for modelling
-device memory. It currently applies the device\-environment model to all
-volatile accesses (equivalent to \fB\-\-nondet\-volatile\fR): reads become
-non\-deterministic and writes are preserved as observable side effects, which is
-the correct model for the strongly\-ordered device\-memory types. An
-ordering\-aware model for the weak device\-memory types is available via
-\fB\-\-mmio\-weak\fR.
+Model memory\-mapped I/O soundly with no further configuration. All volatile
+accesses are treated as the weakest device\-memory type -- reads become
+non\-deterministic and writes are posted with reordering, write combining and
+early acknowledgement -- which is a sound over\-approximation of any actual
+device mapping, so a program verified under \fB\-\-mmio\fR is correct for any
+mapping. Barrier strength is taken from the program, including inline\-assembly
+\fBdmb\fR/\fBdsb\fR. The individual \fB\-\-mmio\-*\fR and
+\fB\-\-nondet\-volatile\-*\fR options refine this (e.g. to mark only some regions
+weak, or to recover precision when a region's memory type is known).
 .TP
 \fB\-\-mmio\-weak\fR
 Model weakly ordered device memory (posted writes). A write to a register that

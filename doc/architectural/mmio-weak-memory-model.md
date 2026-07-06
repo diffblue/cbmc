@@ -65,9 +65,9 @@ new work lies.
   `shared_bufferst` API, and conceptually mislabelled (store buffering is a
   property of the *weak* device types, not MMIO in general). It has been
   **removed**; its idea survives, correctly, as Phase 2 below (write-combining
-  memory via `wmm/`). `goto-instrument --mmio` is now the entry point for the
-  MMIO memory model (see below): today it applies the device-environment model,
-  and it is where the Phase-2 ordering model will be added.
+  memory via `wmm/`). `goto-instrument --mmio` is the entry point for the MMIO
+  memory model: it applies the weakest device-memory model (sound for any
+  mapping) with no further configuration, and is where the ordering model lives.
 
 ## Phased design
 
@@ -100,9 +100,11 @@ where available. No ordering machinery is required.
 
 ### Phase 2 — ordering and the weak device types
 
-This is the work reserved behind `goto-instrument --mmio`, which today applies
-the Phase-1 device-environment model (correct for the strongly-ordered device
-types) and will grow the reordering model described here.
+This is the model reached by `goto-instrument --mmio`, the single sound default:
+it applies the weakest device-memory model (weak ordering, gather and early
+acknowledgement) to all volatile accesses, which over-approximates any real
+mapping, so no flag combination has to be chosen. The individual options below
+refine it when precision is wanted.
 
 **Implemented (first increment):** `goto-instrument --mmio-weak` models weakly
 ordered device memory as *posted writes*. A write to a register that has a

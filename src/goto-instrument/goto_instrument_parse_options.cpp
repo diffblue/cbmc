@@ -86,7 +86,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "insert_final_assert_false.h"
 #include "interrupt.h"
 #include "k_induction.h"
-#include "mmio.h"
 #include "model_argc_argv.h"
 #include "nondet_static.h"
 #include "nondet_volatile.h"
@@ -1721,21 +1720,34 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   // label the assertions
   label_properties(goto_model);
 
+  // --mmio is the zero-configuration sound model for memory-mapped I/O: it
+  // treats all volatile accesses as the weakest device-memory type, which is a
+  // sound over-approximation of any actual mapping. Reads become
+  // non-deterministic and writes are posted with reordering, write combining
+  // and early acknowledgement; barrier strength is taken from the program
+  // (including inline-assembly dmb/dsb). The individual --mmio-*/
+  // --nondet-volatile-* options refine this when precision is wanted.
+  if(cmdline.isset("mmio"))
+  {
+    log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
+    options.set_option(NONDET_VOLATILE_OPT, true);
+    options.set_option(MMIO_WEAK_OPT, true);
+    options.set_option(MMIO_GATHER_OPT, true);
+    options.set_option(MMIO_EARLY_ACK_OPT, true);
+    if(!options.is_set(MMIO_WEAK_DEPTH_OPT))
+      options.set_option(MMIO_WEAK_DEPTH_OPT, 8);
+  }
+
   // The weak MMIO model recognises memory barriers, including those written as
   // inline assembly (e.g. ARM dmb/dsb, x86 mfence); lower them to fences first.
-  if(cmdline.isset(MMIO_WEAK_OPT) || cmdline.isset(MMIO_WEAK_VARIABLE_OPT))
+  if(
+    cmdline.isset("mmio") || cmdline.isset(MMIO_WEAK_OPT) ||
+    cmdline.isset(MMIO_WEAK_VARIABLE_OPT))
   {
     remove_asm(goto_model, ui_message_handler);
   }
 
   nondet_volatile(goto_model, options);
-
-  // Memory-mapped I/O
-  if(cmdline.isset("mmio"))
-  {
-    log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
-    mmio(goto_model);
-  }
 
   // reachability slice?
   if(cmdline.isset("reachability-slice"))
