@@ -1112,6 +1112,36 @@ regression).  Both suites green; clang-format clean.
 
 *Updated: 2026-07-06*
 
+### 2026-07-06 gap closed: const-qualified enum forwarding-reference (2 dog-food FAILs)
+
+Follow-up fixing the const-enum defect captured as KNOWNBUG in the previous
+entry.  N5008 [temp.deduct.call]/3: a forwarding reference `T&&` deduces `T` as
+"lvalue reference to A" from an lvalue argument, for any A -- so a const enum
+lvalue gives a `const E&` parameter.  CBMC rejected this ("found no match" ->
+CONVERSION ERROR) for a const enum only.
+
+Traced through the full pipeline with probes: deduction produced the correct
+`const E&`, and `template_map.apply` kept it (`base.const=1`), but
+`typecheck_type(function_type)` dropped it (`base.const=0`).  `typecheck_type`
+begins with `cpp_convert_plain_type(type)`, whose "leave-as-is" list included
+`c_enum`, `struct_tag`, and `union_tag` but **omitted `c_enum_tag`**.  A
+cv-qualified `c_enum_tag` therefore fell through to the general conversion path,
+which rebuilds the type and drops its cv-qualifiers (struct/union tags were
+spared), so the deduced parameter became a non-const `E&` that a const enum
+lvalue could not bind.
+
+Fix (N5008 [dcl.enum]/[basic.type.qualifier]): treat `c_enum_tag` as the tag
+reference it is -- add it to the leave-as-is list alongside `struct_tag`/
+`union_tag`.  One line, no rebuild of the type.  Flipped
+`cpp11_fwd_ref_const_enum` KNOWNBUG -> **CORE**.
+
+Dog-food **91/19/7 -> 93/19/5**: both `validate_expressions.cpp` (its
+`call_on_expr<...>(ns, vm)` forwards a `const validation_modet`) and
+`validate_types.cpp` (a `std::optional` construction that likewise forwards a
+const enum) now compile.  Both suites green; clang-format clean.
+
+*Updated: 2026-07-06*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
