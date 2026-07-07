@@ -1,0 +1,37 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced-init arg reads reference member once: SUCCESS$
+^\[main\.assertion\.2\] line \d+ by-value braced-init arg reads reference member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ reference member observes referand mutation: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [dcl.ref]/1 + [expr.unary.op]/1: a reference denotes the object it binds
+to, and the built-in unary * applied to a reference operand yields that object.
+A reference lvalue -- notably an access to a reference data member `this->ref`
+-- is materialised by add_implicit_dereference as an implicit dereference_exprt
+whose operand keeps the reference type.  That node is fully type-checked when it
+is built, but the same argument sub-tree can reach typecheck_expr a second time:
+a braced-init-list call argument such as `combine({ref, base})` is type-checked
+once by the operand walk and again while the call's arguments are converted to
+the parameter's class type (constructing a temporary).  The generic operand walk
+(typecheck_expr_operands, run before typecheck_expr_main) then re-type-checked
+the operand `this->ref`, whose member access re-applied its own implicit
+dereference; the outer * ended up wrapping the already-dereferenced value,
+corrupting `*this->ref` into the ill-formed `*(*this->ref)` and rejecting the
+program with "operand of unary * '*this->ref' is not a pointer".  In modern STL
+this surfaced as spurious "instantiating std::__enable_if_t with <FALSE, ...>"
+cascades (the enable_if frames were correctly SFINAE-suppressed; the fatal error
+was the downstream reference-member double-dereference) -- e.g. compiling
+src/util/irep_serialization.cpp's
+  ireps_container.ireps_on_write.insert({h, ireps_container.ireps_on_write.size()})
+where ireps_container is a reference data member.  Fixed in
+cpp_typecheckt::typecheck_expr by recognising an already-elaborated implicit
+dereference of a reference operand (id==dereference, C_implicit, result type
+set, operand of reference type) and leaving it untouched before its operands are
+walked.  assertion.4 provides non-vacuity.
