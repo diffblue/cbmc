@@ -352,9 +352,17 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
     type.id() == ID_constructor || type.id() == ID_destructor ||
-    type.id() == ID_c_enum || type.id() == ID_struct_tag ||
-    type.id() == ID_union_tag || type.id() == ID_complex)
+    type.id() == ID_c_enum || type.id() == ID_c_enum_tag ||
+    type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+    type.id() == ID_complex)
   {
+    // N5008 [dcl.enum]/[basic.type.qualifier]: a `c_enum_tag` is a tag
+    // reference like `struct_tag`/`union_tag` and must be left untouched here,
+    // so a cv-qualifier carried on it (e.g. a `const E` deduced as the
+    // referent of a forwarding-reference parameter `T&&`) is preserved.
+    // Routing it through the general conversion path below would rebuild the
+    // type and drop the qualifier, so a `const E` lvalue could no longer bind
+    // to the deduced `const E&` parameter.
   }
   else if(type.id() == ID_c_bool)
   {
