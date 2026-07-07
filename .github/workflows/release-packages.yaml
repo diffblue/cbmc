@@ -192,24 +192,6 @@ jobs:
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  homebrew-pr:
-    runs-on: macos-15-intel
-    steps:
-      - name: Get release tag name
-        # The GITHUB_REF we get has refs/tags/ in front of the tag name so we
-        # strip that here
-        run: echo "RELEASE_TAG=${GITHUB_REF/refs\/tags\/}" >> $GITHUB_ENV
-      - name: Configure git user name and email
-        uses: Homebrew/actions/git-user-config@c62170a03ff2bcb9ab097fd7d6acbc905618e42a
-        with:
-          username: db-ci-cprover
-      - name: Create homebrew PR
-        run: |
-          brew update-reset
-          brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
-        env:
-          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
-
   windows-msi-package:
     runs-on: windows-2025
     env:
