@@ -29,6 +29,7 @@ Date:   April 2017
 
 #include "goto_model.h"
 
+#include <algorithm>
 #include <set>
 
 /// Implements MMIO instrumentation for a single function.
@@ -458,6 +459,93 @@ void create_mmio_region_objects(
                    << region.size << " bytes" << messaget::eom;
     }
   }
+}
+
+std::vector<mmio_regiont> collect_ioremap_regions(
+  goto_modelt &goto_model,
+  message_handlert &message_handler)
+{
+  messaget log{message_handler};
+  const namespacet ns(goto_model.symbol_table);
+
+  // ioremap-family functions and whether they map weakly-ordered memory
+  const std::map<irep_idt, bool> ioremap_variants = {
+    {"ioremap", false},
+    {"ioremap_nocache", false},
+    {"ioremap_uc", false},
+    {"devm_ioremap", false},
+    {"ioremap_wc", true},
+    {"devm_ioremap_wc", true}};
+
+  std::vector<mmio_regiont> regions;
+
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    for(auto it = gf_entry.second.body.instructions.begin();
+        it != gf_entry.second.body.instructions.end();
+        ++it)
+    {
+      if(!it->is_function_call() || it->call_function().id() != ID_symbol)
+        continue;
+
+      const irep_idt base_name =
+        ns.lookup(to_symbol_expr(it->call_function())).base_name;
+      const auto variant = ioremap_variants.find(base_name);
+      if(variant == ioremap_variants.end())
+        continue;
+
+      if(it->call_arguments().size() < 2)
+        continue;
+
+      const auto address =
+        numeric_cast<mp_integer>(simplify_expr(it->call_arguments()[0], ns));
+      const auto size =
+        numeric_cast<mp_integer>(simplify_expr(it->call_arguments()[1], ns));
+
+      if(!address.has_value() || !size.has_value())
+      {
+        log.warning() << "cannot derive an MMIO region from " << base_name
+                      << " with a non-constant address or size; these accesses "
+                         "fall under the weak MMIO model"
+                      << messaget::eom;
+        continue;
+      }
+
+      // Rewrite the call to an identity mapping (return the physical address as
+      // a pointer) so accesses through the result target the region.
+      const exprt lhs = it->call_lhs();
+      if(lhs.is_not_nil())
+      {
+        *it = goto_programt::make_assignment(
+          lhs,
+          typecast_exprt{from_integer(*address, size_type()), lhs.type()},
+          it->source_location());
+      }
+      else
+      {
+        it->turn_into_skip();
+      }
+
+      // Skip a region we have already derived (e.g. the same call unwound).
+      const bool already_present = std::any_of(
+        regions.begin(),
+        regions.end(),
+        [&](const mmio_regiont &r) { return r.start_address == *address; });
+      if(already_present)
+        continue;
+
+      const std::string object_name =
+        CPROVER_PREFIX "mmio_region_0x" + integer2string(*address, 16);
+      regions.emplace_back(*address, *size, object_name, variant->second);
+
+      log.status() << "Derived MMIO region from " << base_name << ": 0x"
+                   << integer2string(*address, 16) << " size " << *size
+                   << (variant->second ? " (weak)" : " (strong)")
+                   << messaget::eom;
+    }
+  }
+
+  return regions;
 }
 
 exprt mm_iot::get_mmio_object_for_address(

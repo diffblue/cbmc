@@ -1529,7 +1529,8 @@ void goto_instrument_parse_optionst::instrument_goto_program()
   if(
     cmdline.isset("remove-pointers") || cmdline.isset("race-check") ||
     cmdline.isset("mm") || cmdline.isset("isr") ||
-    cmdline.isset("mmio-region") || cmdline.isset("concurrency"))
+    cmdline.isset("mmio-region") || cmdline.isset("mmio-ioremap") ||
+    cmdline.isset("concurrency"))
   {
     do_indirect_call_and_rtti_removal();
 
@@ -1752,6 +1753,18 @@ void goto_instrument_parse_optionst::instrument_goto_program()
 
       mm_io(goto_model, regions, ui_message_handler);
     }
+
+    // Automatically derive MMIO regions and their device-memory types from
+    // ioremap-family calls (--mmio-ioremap), requiring no manual region
+    // declarations.
+    if(cmdline.isset("mmio-ioremap"))
+    {
+      log.status() << "Instrumenting memory-mapped I/O" << messaget::eom;
+      const std::vector<mmio_regiont> regions =
+        collect_ioremap_regions(goto_model, ui_message_handler);
+      mm_io(goto_model, regions, ui_message_handler);
+    }
+
     if(cmdline.isset("concurrency"))
     {
       log.status() << "Sequentializing concurrency" << messaget::eom;

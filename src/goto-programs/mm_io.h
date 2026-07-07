@@ -100,4 +100,18 @@ void mm_io(
   const std::vector<mmio_regiont> &regions,
   message_handlert &message_handler);
 
+/// Derive MMIO regions from calls to the ioremap family (ioremap, ioremap_wc,
+/// ...). Each call with a constant address and size yields a region whose
+/// device-memory type is taken from the mapping variant (write-combining
+/// variants are weak, the rest strong), and the call is rewritten to an
+/// identity mapping so that accesses through the returned pointer target the
+/// region. Calls with non-constant arguments are left unchanged. Returns the
+/// derived regions (to be passed to \ref mm_io).
+///
+/// \param model: goto model to scan and rewrite
+/// \param message_handler: message handler for status and diagnostics
+/// \return the derived MMIO regions
+std::vector<mmio_regiont>
+collect_ioremap_regions(goto_modelt &model, message_handlert &message_handler);
+
 #endif // CPROVER_GOTO_PROGRAMS_MM_IO_H

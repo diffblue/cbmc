@@ -194,8 +194,12 @@ precise byte-array object) and its type -- `strong` (the default; modelled
 precisely) or `weak` (reads return a non-deterministic value, soundly
 over-approximating reordering/staleness). Address-based declaration recovers the
 per-region type without a points-to analysis; a harness that stubs `ioremap`
-already knows the address and can declare the region, and a future `ioremap`
-library model could emit the declaration automatically.
+already knows the address and can declare the region, and
+`goto-instrument --mmio-ioremap` derives the regions and their types
+automatically from the `ioremap`-family calls in the program (`ioremap` →
+strong, `ioremap_wc` → weak, ...), rewriting each call with a constant address
+and size to an identity mapping so its accesses target the derived region. This
+recovers the memory type with no user configuration at all.
 
 ## Soundness stance
 

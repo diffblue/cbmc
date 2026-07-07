@@ -510,6 +510,16 @@ cbmc \-\-no\-pointer\-check \-\-no\-bounds\-check firmware\-mod.gb
 .in
 .EE
 .TP
+\fB\-\-mmio\-ioremap\fR
+Derive memory\-mapped I/O regions and their device\-memory types automatically
+from calls to the \fBioremap\fR family (\fBioremap\fR, \fBioremap_wc\fR, ...),
+requiring no manual \fB\-\-mmio\-region\fR declarations. Each call with a constant
+address and size becomes a region whose type is taken from the mapping variant
+(write\-combining variants such as \fBioremap_wc\fR are weak, the rest strong),
+and the call is rewritten to an identity mapping so that accesses through the
+returned pointer target the region. Calls with non\-constant arguments are left
+unchanged and fall under the whole\-program weak model.
+.TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime
 .TP
