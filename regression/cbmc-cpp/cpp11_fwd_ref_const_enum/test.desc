@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ forwarding-ref accepts a const enum lvalue: SUCCESS$
@@ -8,14 +8,18 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+^found no match for symbol 'pass'$
 --
-N5008 [temp.deduct.call]/3: a forwarding reference `T&&` deduces T as "lvalue
-reference to A" from an lvalue argument of type A, for any A including an
-enumeration.  CBMC wrongly rejects the call ("found no match" -> CONVERSION
-ERROR) when the argument is a const-qualified ENUM lvalue; a const scalar or a
-non-const enum resolves fine, so the defect is specific to deducing/binding a
-forwarding reference from a const enum argument (the deduced `const E&`
-parameter is dropped during overload resolution).  Surfaced (with the
-separately-fixed heterogeneous-pack defect cpp11_variadic_fwd_ref_heterogeneous)
-by src/util/validate_expressions.cpp's `call_on_expr<...>(ns, vm)`, which
-forwards a `const validation_modet` (enum class).  Flip to CORE once fixed.
+N5008 [temp.deduct.call]/3 + [dcl.enum]/[basic.type.qualifier]: a forwarding
+reference `T&&` deduces T as "lvalue reference to A" from an lvalue argument of
+type A, for any A including an enumeration; a const enum argument gives a
+`const E&` parameter.  CBMC used to reject this ("found no match" -> CONVERSION
+ERROR) for a const enum argument only: the deduced `const E&` parameter had its
+const dropped by cpp_convert_plain_type, which (unlike for struct_tag/union_tag)
+routed a `c_enum_tag` through the general conversion path that rebuilds the type
+and loses cv-qualifiers, so the deduced parameter became a non-const `E&` that a
+const enum lvalue could not bind.  Fixed by treating `c_enum_tag` as a tag
+reference (left untouched, preserving cv) like `struct_tag`/`union_tag`.
+Reduced (via cvise keeping real headers) from src/util/validate_expressions.cpp
+`call_on_expr<...>(ns, vm)`, which forwards a `const validation_modet`
+(enum class).  assertion.2 provides non-vacuity.
