@@ -1,22 +1,23 @@
-// KNOWNBUG (header-free reproducer).
+// Header-free regression test.
 //
 // N5008 [temp.deduct.call]/3: for a forwarding reference `T&&` and an lvalue
 // argument of type A, T is deduced as "lvalue reference to A" (preserving cv-
 // qualifiers).  This must work for an enumeration argument just as for any
-// other type.
+// other type, so a const enum argument yields a `const E&` parameter.
 //
-// CBMC wrongly rejects a call to `template <typename T> ... f(T&&)` when the
-// argument is a `const`-qualified ENUM lvalue ("found no match" ->
-// CONVERSION ERROR).  The identical call with a const scalar (e.g. const int),
-// or with a non-const enum, resolves correctly -- so the defect is specific to
-// deducing/binding a forwarding reference from a const enumeration argument
-// (the deduced parameter `const E&` is dropped in overload resolution).
+// CBMC used to reject a call to `template <typename T> ... f(T&&)` when the
+// argument was a `const`-qualified ENUM lvalue ("found no match" ->
+// CONVERSION ERROR): the deduced `const E&` parameter had its const dropped by
+// cpp_convert_plain_type, which (unlike for struct_tag/union_tag) routed a
+// `c_enum_tag` through the general conversion path that rebuilds the type and
+// loses cv-qualifiers, so the parameter became a non-const `E&` that the const
+// enum lvalue could not bind.  Fixed by treating `c_enum_tag` as a tag
+// reference (left untouched) like `struct_tag`/`union_tag`.
 //
-// Surfaced (together with the separately-fixed heterogeneous-pack defect
+// Surfaced (together with the heterogeneous-pack defect
 // cpp11_variadic_fwd_ref_heterogeneous) by src/util/validate_expressions.cpp,
 // whose `call_on_expr<...>(ns, vm)` forwards a `const validation_modet` (a
-// `enum class`) through a forwarding-reference parameter pack.  Flip to CORE
-// once a forwarding reference deduces from a const enum argument.
+// `enum class`) through a forwarding-reference parameter pack.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
