@@ -1047,7 +1047,16 @@ private:
   typedef std::list<irep_idt> dynamic_initializationst;
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
-  bool in_template_conversion = false;   // Prevent recursion in conversion
+  /// Destination type identifiers whose converting *template* constructor is
+  /// currently being tried by `user_defined_conversion_sequence`'s
+  /// template-constructor fallback.  Prevents unbounded recursion when a
+  /// conversion to `T` would recursively require another conversion to the
+  /// same `T`, while still permitting a *distinct* nested target conversion --
+  /// e.g. evaluating `is_constructible<Wrap, X>` (which converts `X -> Wrap`)
+  /// while already converting `X -> optional<Wrap>`.  A single boolean guard
+  /// blocked that legitimate nested query, wrongly reporting the inner
+  /// conversion (hence the trait) as false.
+  std::set<irep_idt> template_conversions_in_progress;
   bool skip_typechecking_elaborate = false;
   std::unordered_set<irep_idt> deferred_typechecking;
   std::unordered_set<irep_idt> functions_being_typechecked;
