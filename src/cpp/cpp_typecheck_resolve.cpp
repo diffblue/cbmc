@@ -7371,8 +7371,44 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             return true;
         return false;
       };
+      // N5008 [over.match.viable]/2: a call that supplies more arguments than
+      // a non-variadic overload has parameters can never select that overload.
+      // Do not insert synthetic parameter symbols (needed only to resolve a
+      // `decltype` naming a parameter in the trailing return type) for such a
+      // non-viable overload: those symbols are keyed by template scope +
+      // parameter name and are not removed, so speculatively type-checking a
+      // non-viable overload's return type would leave a stale symbol of the
+      // wrong type behind, poisoning a later, viable resolution of the same
+      // template (e.g. the one-parameter container overload of `make_range`
+      // deducing its parameter from the first argument of a two-argument
+      // iterator call, then that stale symbol breaking `make_range(container)`
+      // whose `decltype(c.begin())` is evaluated against the wrong type).
+      std::size_t non_variadic_param_count = 0;
+      bool has_variadic_param = false;
+      for(const auto &p : params)
+      {
+        if(p.id() == ID_ellipsis)
+        {
+          has_variadic_param = true;
+          continue;
+        }
+        if(p.id() != ID_cpp_declaration)
+          continue;
+        const auto &pd = static_cast<const cpp_declarationt &>(p);
+        if(
+          !pd.declarators().empty() &&
+          (pd.declarators().front().get_bool(ID_ellipsis) ||
+           pd.declarators().front().type().get_bool(ID_ellipsis) ||
+           pd.type().get_bool(ID_ellipsis)))
+          has_variadic_param = true;
+        else
+          ++non_variadic_param_count;
+      }
+      const bool too_many_arguments =
+        fargs.in_use && !fargs.has_object && !has_variadic_param &&
+        fargs.operands.size() > non_variadic_param_count;
       if(
-        function_type.has_subtype() &&
+        !too_many_arguments && function_type.has_subtype() &&
         contains_decltype(to_type_with_subtype(function_type).subtype()))
       {
         for(const auto &p : params)
