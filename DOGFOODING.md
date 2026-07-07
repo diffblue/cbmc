@@ -1177,6 +1177,60 @@ noisy bucket).  Both suites green; clang-format clean.
 
 *Updated: 2026-07-07*
 
+### 2026-07-07 gap closed: reference data member in a braced-init-list function argument (irep_serialization.cpp)
+
+`src/util/irep_serialization.cpp` was rejected with a spurious
+`instantiating 'std::__enable_if_t' with <FALSE, bool>` cascade.  A probe on
+`show_instantiation_stack` printing `sfinae_context_depth` showed every
+`enable_if<FALSE>` frame ran at depth >= 1 (correctly SFINAE-suppressed by the
+null handler): the enable_if was a **red herring**.  The only depth-0 (fatal)
+error was downstream, at
+`reference_convert`'s
+`ireps_container.ireps_on_write.insert({h, ireps_container.ireps_on_write.size()})`:
+"operand of unary * '*this->ireps_container' is not a pointer, but got 'struct
+...ireps_containert'", where `ireps_container` is a **reference data member**.
+
+Reduce-with-real-headers plus by-hand minimisation gave a header-free reproducer:
+
+```cpp
+struct vt{ unsigned long a; };
+void g(const vt&){}
+struct Outer{ unsigned long &ref; void f(){ g({ref}); } };
+```
+
+(`vt v{ref};` local init works; only the braced-init-list *argument* `g({ref})`
+fails; a value -- non-reference -- member does not reproduce; no STL, templates
+or SFINAE are needed.)
+
+Root cause (N5008 [dcl.ref]/1, [expr.unary.op]/1: a reference denotes the object
+it binds to; unary `*` on a reference operand yields that object).  A reference
+lvalue -- notably a reference data member `this->ref` -- is materialised by
+`add_implicit_dereference` as an implicit `dereference_exprt` whose operand keeps
+the reference type.  That node is fully type-checked when built (by
+`typecheck_expr_member` during name resolution), but the identical argument
+sub-tree reaches `typecheck_expr` a second time: a braced-init-list call
+argument is type-checked once by the operand walk and again while the call's
+arguments are converted to the parameter's class type (constructing a
+temporary).  The generic operand walk (`typecheck_expr_operands`, run *before*
+`typecheck_expr_main`) then re-type-checked the operand `this->ref`, whose member
+access re-applied its own implicit dereference; the outer `*` wrapped the
+already-dereferenced value, corrupting `*this->ref` into the ill-formed
+`*(*this->ref)`.
+
+Fix: in `cpp_typecheckt::typecheck_expr`, before the operand walk, recognise an
+already-elaborated implicit dereference of a reference operand (id ==
+`dereference`, `C_implicit`, result type set, operand of reference type) and
+leave it untouched -- it is already well-formed and must not be re-elaborated.
+Header-free non-vacuous CORE test `cpp11_reference_member_braced_arg`.
+
+Dog-food **93/20/4 -> 94/20/3, 0 crash**: `irep_serialization.cpp` compiles.
+The three remaining FAILs are unrelated roots (`interval_union.cpp` regex;
+`parse_options.cpp` `unique_ptr`/`default_delete` enable_if -- same dog-food
+error string but a different cause; `simplify_utils.cpp` `optional`).  Both
+suites green; clang-format clean.
+
+*Updated: 2026-07-07*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
