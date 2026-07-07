@@ -131,7 +131,7 @@ files.
    jobs to run simultaneously. `ninja` defaults to building with `# of cores + 2`
    jobs at the same time.
 
-#Building using Make
+# Building using Make
 
 The rest of this section is split up based on the platform being built on.
 Please read the section appropriate for your platform.
@@ -266,7 +266,7 @@ Maven 3 manually.
    gmake -C jbmc/src
    ```
 
-#Working with IDEs and Docker
+# Working with IDEs and Docker
 
 ## Working with Visual Studio on Windows
 
@@ -319,7 +319,7 @@ To compile and run the tools in a Docker container, do the following:
    In the resulting container, the files present in the local file system under
    `local/path/with/files` will be present under `/mnt/analysis`.
 
-#Compilation options and configuration
+# Compilation options and configuration
 
 ## Compiling with CUDD
 
