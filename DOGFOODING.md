@@ -1231,6 +1231,62 @@ suites green; clang-format clean.
 
 *Updated: 2026-07-07*
 
+### 2026-07-07 gap fixed: nested converting-constructor SFINAE across distinct types (partial for simplify_utils.cpp)
+
+`src/util/simplify_utils.cpp` was rejected; root-causing split it into TWO
+independent front-end bugs.  This entry is the first.
+
+`std::optional<std::reference_wrapper<const array_exprt>>(char_seq)`
+(simplify_utils.cpp:525) failed with "found no match for symbol 'optional'".
+Header-free reduction:
+
+```cpp
+template<bool B, class T=void> struct en{}; template<class T> struct en<true,T>{ using type=T; };
+template<class A,class B> constexpr bool ic_v = __is_constructible(A,B);
+struct Wrap { template<class U> Wrap(U&&){} };
+template<class Tp> struct opt {
+  template<class Up = Tp, typename en<ic_v<Tp,Up>, bool>::type = true>
+  opt(Up&&){}
+};
+void f(int b){ opt<Wrap> o(b); }   // error: found no match for symbol 'opt'
+```
+
+Probing showed `ic_v<Wrap,int&>` (i.e. `__is_constructible(Wrap,int&)`)
+evaluated to *false* only in this nested context, though it is true in
+isolation.  `__is_constructible` uses `implicit_conversion_sequence`, whose
+`user_defined_conversion_sequence` reaches the converting *template*-constructor
+via a fallback guarded by a single global boolean `in_template_conversion`
+("prevent recursion in conversion").  Converting `int -> opt<Wrap>` (opt's
+template ctor) set the flag, so the nested `int -> Wrap` conversion needed to
+evaluate `is_constructible<Wrap, int&>` was skipped -> false -> every
+`opt<Wrap>` ctor rejected.
+
+Fix (N5008 [over.ics.user]: a UDCS has at most one user-defined conversion, but
+a nested is_constructible query about a *different* type is a separate
+sequence).  Replaced the boolean with a set keyed by destination type
+(`template_conversions_in_progress`), so a distinct nested target is allowed
+while same-target recursion is still cut.  Two guards keep it cheap and bounded:
+nested re-entry is permitted only inside a constant-expression evaluation
+(`constant_expression_context > 0`, i.e. while checking a converting ctor's
+SFINAE constraint -- ordinary run-time conversions never nest here, which keeps
+the expensive per-candidate `new_temporary` trial from ~doubling compile time on
+numeric-heavy files such as expr.cpp / mp_arith.cpp), and a depth bound
+(`size() < 2`, one nested level -- all the conforming std::optional /
+std::unique_ptr patterns need).  Header-free non-vacuous CORE test
+`cpp11_nested_converting_ctor_sfinae`.
+
+Dog-food unchanged at **94/20/3, 0 crash** (verified perf-neutral: expr.cpp
+40s vs 41s baseline; both suites green; clang-format clean).  simplify_utils.cpp
+does NOT yet compile: it additionally hits a second, independent bug --
+`is_trivially_destructible_v<std::pair<...>>` is wrongly false (the
+`__is_trivially_destructible` trait counts the compiler-generated implicit
+destructor of any class that has a user-declared *constructor*, and does not
+recurse into members).  That is a separate triviality-semantics fix (needs a
+flag distinguishing user-provided from implicit/defaulted destructors) left for
+a follow-up.
+
+*Updated: 2026-07-07*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
