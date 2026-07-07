@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ nested converting ctor was selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ wrapped value is correct: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [over.ics.user]: a user-defined conversion sequence contains at most one
+user-defined conversion, but evaluating whether a converting *template*
+constructor is viable (via an is_constructible-style constraint) is a separate,
+nested query about a possibly-different target type.  user_defined_conversion_
+sequence guarded its converting-template-constructor fallback with a single
+global boolean `in_template_conversion`, which blocked ALL nesting: converting
+`x -> opt<Wrap>` set the flag, so the nested `x -> Wrap` conversion needed to
+evaluate `is_constructible<Wrap, U>` was skipped, the constraint wrongly
+evaluated to false, and every `opt<Wrap>` constructor was rejected ("found no
+match for symbol 'opt'").  This is how
+`std::optional<std::reference_wrapper<const T>>(x)` failed to compile.  Fixed by
+keying the recursion guard on the destination type
+(template_conversions_in_progress) so a distinct nested target is allowed while
+same-target recursion is still cut.  assertion.3 provides non-vacuity.  (Note:
+src/util/simplify_utils.cpp additionally needs a fix to is_trivially_
+destructible for std::pair before it fully compiles; that is a separate gap.)
