@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ 5 \+ 2 == 7: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^found no match for symbol 'make_range'$
+--
+N5008 [temp.deduct]/[expr.type]: resolving a function template whose trailing
+return type contains a decltype naming a parameter (`-> ranget<decltype(c.begin())>`)
+must be independent of previous resolutions of the same template.  CBMC put a
+synthetic parameter symbol into scope to resolve the decltype and never removed
+it, so speculatively matching the one-parameter container overload of
+`make_range` against a two-argument iterator call left a stale symbol of the
+wrong type; the correct resolution of `make_range(container)` then evaluated
+`decltype(c.begin())` against the stale type and failed ("found no match for
+make_range").  Fixed in cpp_typecheck_resolvet::guess_function_template_args by
+refreshing the synthetic symbol's type on each resolution.  Reduced (cvise,
+real headers) from src/util/structured_data.cpp.  assertion.2 provides
+non-vacuity.
