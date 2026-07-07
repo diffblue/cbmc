@@ -1142,6 +1142,41 @@ const enum) now compile.  Both suites green; clang-format clean.
 
 *Updated: 2026-07-06*
 
+### 2026-07-07 gap closed: stale synthetic parameter poisoned decltype-return overload resolution (structured_data.cpp)
+
+`structured_data.cpp`'s `make_range(components).concat(make_range(begin, end))`
+was rejected with "found no match for symbol 'make_range'".  Reduce-with-real-
+headers cvise narrowed it to a header-free chain
+`make_range(container).concat(make_range(iter, iter))` where `make_range` has a
+1-parameter *container* overload with a trailing return type using decltype
+(`auto -> ranget<decltype(c.begin())>`) and a 2-parameter *iterator* overload.
+
+Root cause: `guess_function_template_args` resolves such a trailing-return
+decltype by inserting a synthetic symbol for the parameter (`c`) into the scope
+so `decltype(c.begin())` resolves -- keyed by template-scope + parameter name,
+and never removed.  Resolving the 2-argument iterator call speculatively tried
+the 1-parameter container overload, deduced `c` from the first argument (an
+`int*` iterator), and left a stale `c = int*` symbol behind.  The subsequent,
+correct resolution of `make_range(container)` then found `c` already present,
+skipped its own insertion, and evaluated `decltype(c.begin())` against the stale
+`int*` (which has no `.begin()`) -- failing and removing the only viable
+overload.
+
+Fix (N5008 [over.match.viable]/2): a call with more arguments than a
+non-variadic overload has parameters can never select it, so do not insert the
+synthetic parameter symbols for it -- speculatively type-checking a non-viable
+overload's return type must not pollute the shared scope.  Scoped to
+free-function calls (`!fargs.has_object`) to avoid an object/`this` off-by-one
+for member function templates (an earlier, broader mutate-the-stale-symbol
+attempt caused unbounded recursion crashing simplify_expr.cpp / string_utils.cpp;
+this narrower fix does not mutate or remove any symbol).  Header-free non-vacuous
+CORE test `cpp11_decltype_return_overload_chain`.
+
+Dog-food **93/19/5 -> 93/20/4**: `structured_data.cpp` compiles (now in the
+noisy bucket).  Both suites green; clang-format clean.
+
+*Updated: 2026-07-07*
+
 ### 2026-05-13 filesystem stack-overflow fix
 
 Follow-up to the 2026-05-13 (duration) row: the additional duration
