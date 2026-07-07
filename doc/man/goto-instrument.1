@@ -424,7 +424,9 @@ non\-deterministic and writes are posted with reordering, write combining and
 early acknowledgement -- which is a sound over\-approximation of any actual
 device mapping, so a program verified under \fB\-\-mmio\fR is correct for any
 mapping. Barrier strength is taken from the program, including inline\-assembly
-\fBdmb\fR/\fBdsb\fR. The individual \fB\-\-mmio\-*\fR and
+fences (ARM \fBdmb\fR/\fBdsb\fR, Power \fBsync\fR/\fBlwsync\fR, x86
+\fBmfence\fR/\fBsfence\fR), recognised by mnemonic and so independent of
+\fB\-\-arch\fR. The individual \fB\-\-mmio\-*\fR and
 \fB\-\-nondet\-volatile\-*\fR options refine this (e.g. to mark only some regions
 weak, or to recover precision when a region's memory type is known).
 .TP

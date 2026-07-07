@@ -182,8 +182,14 @@ The barrier kind is taken from the source where possible. `remove_asm` lowers
 inline-assembly barriers to fences, and distinguishes the ARM ordering barrier
 `dmb` (marked ordering-only) from the completion barrier `dsb`; Power `lwsync`
 (ordering) and `sync` (completion) are likewise distinguished by their fence
-flags. So a driver that uses `asm volatile("dmb ...")` / `asm volatile("dsb
-...")` — or the accessor macros that expand to them — gets the right
+flags. The x86 store-ordering fences (`mfence`, `sfence`, which `remove_asm`
+lowers to `__asm_mfence`/`__asm_sfence` calls) are recognised as full barriers
+too. Barriers are thus identified by mnemonic across architectures, so this is
+independent of `--arch` (`config.ansi_c.arch`) -- and indeed the whole type
+model is arch-agnostic: `ioremap`→strong / `ioremap_wc`→weak and the sound weak
+default hold on x86, ARM and Power alike. So a driver that uses
+`asm volatile("dmb ...")` / `asm volatile("dsb ...")` / `asm volatile("mfence")`
+— or the accessor macros that expand to them — gets the right
 ordering-vs-completion semantics under `--mmio-early-ack` without any extra
 annotation. The one memory attribute not derivable from the access site is the
 region's memory *type* (weak/strong, gather), which is fixed by how the region

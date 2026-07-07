@@ -457,43 +457,45 @@ void nondet_volatilet::observe_volatile_write(
   }
 }
 
+// Is this a call to a full memory-barrier intrinsic (a completion barrier)?
+// gcc's __sync_synchronize, or the x86 mfence/sfence store-ordering fences,
+// which remove_asm lowers to __asm_mfence / __asm_sfence calls. (Barriers are
+// recognised by mnemonic across architectures -- ARM dmb/dsb and Power
+// sync/lwsync become ID_fence codets, handled by is_fence/is_lwfence -- so this
+// is independent of --arch / config.ansi_c.arch.)
+static bool is_full_barrier_call(
+  const goto_programt::instructiont &instruction,
+  const namespacet &ns)
+{
+  if(!instruction.is_function_call())
+    return false;
+
+  const exprt &function = instruction.call_function();
+  if(function.id() != ID_symbol)
+    return false;
+
+  const irep_idt base_name = ns.lookup(to_symbol_expr(function)).base_name;
+  return base_name == "__sync_synchronize" || base_name == "__asm_mfence" ||
+         base_name == "__asm_sfence";
+}
+
 bool nondet_volatilet::is_barrier(
   const goto_programt::instructiont &instruction,
   const namespacet &ns)
 {
-  // a full fence, e.g. __CPROVER_fence with all of WW/WR/RW/RR set
-  if(is_fence(instruction, ns))
-    return true;
-
-  // a call to __sync_synchronize (the gcc/Linux full memory barrier)
-  if(instruction.is_function_call())
-  {
-    const exprt &function = instruction.call_function();
-    if(function.id() == ID_symbol)
-    {
-      return ns.lookup(to_symbol_expr(function)).base_name ==
-             "__sync_synchronize";
-    }
-  }
-
-  return false;
+  // a full fence, e.g. __CPROVER_fence with all of WW/WR/RW/RR set (also ARM
+  // dmb/dsb and Power sync), or a full-barrier call (__sync_synchronize, x86
+  // mfence/sfence)
+  return is_fence(instruction, ns) || is_full_barrier_call(instruction, ns);
 }
 
 bool nondet_volatilet::is_completion_barrier(
   const goto_programt::instructiont &instruction,
   const namespacet &ns)
 {
-  // __sync_synchronize is a full/completion barrier
-  if(instruction.is_function_call())
-  {
-    const exprt &function = instruction.call_function();
-    if(
-      function.id() == ID_symbol &&
-      ns.lookup(to_symbol_expr(function)).base_name == "__sync_synchronize")
-    {
-      return true;
-    }
-  }
+  // a full-barrier call (__sync_synchronize, x86 mfence/sfence)
+  if(is_full_barrier_call(instruction, ns))
+    return true;
 
   // a full fence that is not marked ordering-only (ARM DSB, or an explicit full
   // fence)
