@@ -6071,6 +6071,33 @@ void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
 
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
+  // Re-type-check guard for an already-elaborated implicit dereference of a
+  // reference ([dcl.ref]/1, [expr.unary.op]/1: the built-in unary `*` applied
+  // to a reference operand denotes the object the reference is bound to).  A
+  // reference lvalue -- most notably an access to a reference data member
+  // `this->ref` -- is materialised by `add_implicit_dereference` as an implicit
+  // `dereference_exprt` whose operand keeps the reference type.  Such a node is
+  // fully type-checked when it is built (by `typecheck_expr_member` during name
+  // resolution) and is never re-elaborated in the normal flow, but the exact
+  // same sub-tree can reach `typecheck_expr` a second time -- e.g. a
+  // braced-init-list call argument like `g({ref})` is type-checked once by the
+  // operand walk and again while the call's arguments are converted to the
+  // parameter type.  The generic operand walk (`typecheck_expr_operands`, run
+  // before `typecheck_expr_main`) would re-type-check the operand `this->ref`,
+  // whose member access re-applies its own implicit dereference; the outer `*`
+  // then wraps the already-dereferenced value, corrupting `*this->ref` into the
+  // ill-formed `*(*this->ref)` and tripping "operand of unary * ... is not a
+  // pointer".  Since the node is already well-formed (it carries its
+  // non-reference result type), leave it untouched before the operands are
+  // walked.
+  if(
+    expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
+    expr.operands().size() == 1 && expr.type().is_not_nil() &&
+    is_reference(to_unary_expr(expr).op().type()))
+  {
+    return;
+  }
+
   bool override_constantness = expr.get_bool(ID_C_override_constantness);
 
   // We take care of an ambiguity in the C++ grammar.
