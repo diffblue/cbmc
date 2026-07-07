@@ -1912,11 +1912,38 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       // No non-template converting constructor found. Try template
       // constructors via the full constructor resolution path, but
       // only if there are non-explicit template constructors.
+      //
+      // The recursion guard is keyed by the *destination* type rather than a
+      // single global boolean: converting to `to` may legitimately require a
+      // nested conversion to a *different* class type with its own template
+      // constructor (e.g. evaluating `is_constructible<Wrap, X>` -- which
+      // converts `X -> Wrap` -- while already converting `X -> optional<Wrap>`
+      // to check `optional`'s converting-constructor constraint).  A conversion
+      // to the *same* `to` re-entered here is genuine unbounded recursion and
+      // must be cut ([over.ics.user]: a user-defined conversion sequence
+      // contains at most one user-defined conversion, but a nested
+      // is_constructible query about a distinct type is a separate sequence).
+      //
+      // Nested re-entry (the in-progress set is non-empty) is permitted only
+      // inside a constant-expression evaluation (`constant_expression_context
+      // > 0`) -- i.e. while evaluating a converting constructor's SFINAE
+      // constraint, which is exactly where the nested is_constructible query
+      // arises.  Ordinary run-time conversions never need this nesting; letting
+      // them re-enter the (expensive) per-candidate `new_temporary` trial below
+      // roughly doubled compile time on numeric-heavy translation units
+      // (e.g. expr.cpp, mp_arith.cpp).  The `size() < 2` bound additionally
+      // caps nesting depth: one nested level suffices for the conforming
+      // std::optional / std::unique_ptr patterns.
+      const irep_idt to_ctor_key = to_struct_tag_type(to).get_identifier();
       if(
-        !in_template_conversion &&
+        template_conversions_in_progress.find(to_ctor_key) ==
+          template_conversions_in_progress.end() &&
+        (template_conversions_in_progress.empty() ||
+         constant_expression_context > 0) &&
+        template_conversions_in_progress.size() < 2 &&
         struct_type_to.get_bool("has_template_constructor"))
       {
-        in_template_conversion = true;
+        template_conversions_in_progress.insert(to_ctor_key);
         // [over.ics.user] + [temp.deduct]/8: a user-defined
         // conversion that instantiates a template constructor is
         // SFINAE-guarded — substitution failure means "no viable
@@ -1937,7 +1964,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           // template (the same guard used for the initializer_list path).
           ops.push_back(already_typechecked_exprt{expr});
           new_temporary(expr.source_location(), to, ops, tmp_expr);
-          in_template_conversion = false;
+          template_conversions_in_progress.erase(to_ctor_key);
           // [class.conv.ctor]/2 + [over.match.copy]: only
           // non-explicit constructors participate in a user-
           // defined conversion sequence.  `new_temporary` runs
@@ -2099,7 +2126,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         }
         catch(...)
         {
-          in_template_conversion = false;
+          template_conversions_in_progress.erase(to_ctor_key);
         }
       }
 
