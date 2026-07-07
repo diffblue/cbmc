@@ -61,15 +61,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.deb_package_name }}
-      - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: aws-cbmc
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 24.04 package built and uploaded successfully' || 'Ubuntu 24.04 package build failed' }}"
 
       - name: Save ccache
         if: always()
@@ -132,15 +123,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.deb_package_name }}
-      - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: aws-cbmc
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 24.04 Arm package built and uploaded successfully' || 'Ubuntu 24.04 Arm package build failed' }}"
 
       - name: Save ccache
         if: always()
@@ -203,15 +185,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.deb_package_name }}
-      - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: aws-cbmc
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Ubuntu 22.04 package built and uploaded successfully' || 'Ubuntu 22.04 package build failed' }}"
 
       - name: Save ccache
         if: always()
@@ -236,20 +209,6 @@ jobs:
           brew bump-formula-pr --tag "$RELEASE_TAG" --revision "$GITHUB_SHA" cbmc
         env:
           HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.DB_CI_CPROVER_ACCESS_TOKEN }}
-      - name: Checkout CBMC project source code to obtain access to scripts
-        if: always()
-        uses: actions/checkout@v7
-      - name: Slack notification of CI status
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: aws-cbmc
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Homebrew PR submitted successfully' || 'Homebrew PR failed' }}"
-        run: |
-          brew install go
-          go run scripts/slack_notification_action.go
 
   windows-msi-package:
     runs-on: windows-2025
@@ -366,15 +325,6 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           files: ${{ steps.create_packages.outputs.msi_installer }}
-      - name: Slack notification of CI status
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: aws-cbmc
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Windows package built and uploaded successfully' || 'Windows package build failed' }}"
-        run: go run scripts/slack_notification_action.go
 
       - name: Save ccache
         if: always()
@@ -404,12 +354,3 @@ jobs:
           # For security reasons remove stored login credentials from
           # configuration file they are stored at by docker login.
           docker logout
-      - name: Slack notification of CI status
-        uses: rtCamp/action-slack-notify@v2
-        if: success() || failure()
-        env:
-          SLACK_CHANNEL: aws-cbmc
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Docker Image built and submitted to DockerHub successfully' || 'Docker Image build failed' }}"

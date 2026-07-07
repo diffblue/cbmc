@@ -96,11 +96,3 @@ jobs:
             That will initialise an execution of the container based on the image pushed
             as part of this release. The CProver tools are present in the `$PATH` of the
             container.
-      - name: Slack notification of successful release
-        uses: rtCamp/action-slack-notify@v2
-        env:
-          SLACK_CHANNEL: team_open_source
-          SLACK_COLOR: ${{ job.status }}
-          SLACK_USERNAME: Github Actions CI bot
-          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-          SLACK_MESSAGE: "${{ job.status == 'success' && 'Successful creation of new CBMC release page' || 'Failed to create new CBMC release page' }}"
