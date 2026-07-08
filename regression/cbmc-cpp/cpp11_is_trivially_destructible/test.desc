@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\[main\.assertion\.2\].* Plain has trivial dtor: SUCCESS$
+^\[main\.assertion\.3\].* UserDtor: user-provided dtor: SUCCESS$
+^\[main\.assertion\.4\].* DefDtor: =default is trivial: SUCCESS$
+^\[main\.assertion\.6\].* UserDtor not trivial: SUCCESS$
+^\[main\.assertion\.7\].* member with user dtor -> not trivial: SUCCESS$
+^\[main\.assertion\.8\].* virtual dtor -> not trivial: SUCCESS$
+^\[main\.assertion\.9\].* base with user dtor -> not trivial: SUCCESS$
+^\[main\.assertion\.10\].* Poly: trivial implicit dtor: SUCCESS$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
