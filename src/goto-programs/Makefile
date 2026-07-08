@@ -35,6 +35,7 @@ SRC = adjust_float_expressions.cpp \
       remove_complex.cpp \
       remove_const_function_pointers.cpp \
       remove_cpp_exceptions.cpp \
+      remove_exceptions_base.cpp \
       remove_function_pointers.cpp \
       remove_returns.cpp \
       remove_skip.cpp \
