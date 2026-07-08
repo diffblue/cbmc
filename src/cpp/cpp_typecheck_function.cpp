@@ -668,7 +668,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         ref_id.is_member = false;
 
         cpp_declarationt tmp_cpctor;
-        default_cpctor(*class_symbol, tmp_cpctor);
+        default_cpctor(
+          *class_symbol, tmp_cpctor, "ref", pt.get_bool(ID_C_rvalue_reference));
         const irept &inits = tmp_cpctor.declarators()[0].member_initializers();
         // The defaulted constructor's body, at this point, consists solely of
         // the member initializers that move_member_initializers inserted from

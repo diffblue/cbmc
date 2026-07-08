@@ -415,7 +415,8 @@ protected:
   void default_cpctor(
     const symbolt &,
     cpp_declarationt &cpctor,
-    const irep_idt &param_identifier = "ref") const;
+    const irep_idt &param_identifier = "ref",
+    bool is_move = false) const;
 
   void default_assignop(
       const symbolt &symbol, cpp_declarationt &cpctor);
