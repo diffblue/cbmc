@@ -1108,7 +1108,53 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = result ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else if(
-      expr.id() == "__is_trivially_destructible" ||
+      expr.id() == "__has_trivial_destructor" ||
+      expr.id() == "__is_trivially_destructible")
+    {
+      // [class.prop]/1 + [class.dtor]/8: trivially destructible iff scalar,
+      // array thereof, or a class whose destructor is trivial (not virtual,
+      // not user-provided) and whose bases/members are all trivially
+      // destructible.  libstdc++ is_trivially_destructible uses
+      // __has_trivial_destructor, so an unconditional false was unsound.
+      std::function<bool(const typet &, int)> trivially_destructible =
+        [&](const typet &type, int depth) -> bool
+      {
+        if(depth <= 0)
+          return true;
+        if(type.id() == ID_array)
+          return trivially_destructible(
+            to_array_type(type).element_type(), depth - 1);
+        if(type.id() != ID_struct_tag)
+          return true;
+        const auto &st = follow_tag(to_struct_tag_type(type));
+        if(st.get_bool(ID_incomplete))
+          return true;
+        for(const auto &comp : to_struct_type(st).components())
+        {
+          if(comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type))
+            continue;
+          if(comp.get_bool(ID_is_vtptr))
+            continue;
+          if(comp.type().id() == ID_code)
+          {
+            if(to_code_type(comp.type()).return_type().id() == ID_destructor)
+            {
+              if(comp.get_bool(ID_is_virtual))
+                return false;
+              if(!comp.type().get_bool("#is_implicit_dtor"))
+                return false;
+            }
+            continue;
+          }
+          if(!trivially_destructible(comp.type(), depth - 1))
+            return false;
+        }
+        return true;
+      };
+      expr = trivially_destructible(t, 64) ? exprt(true_exprt())
+                                           : exprt(false_exprt());
+    }
+    else if(
       expr.id() == "__is_nothrow_destructible" ||
       expr.id() == "__is_destructible")
     {
