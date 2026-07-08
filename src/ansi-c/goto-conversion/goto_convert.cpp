@@ -786,6 +786,31 @@ void goto_convertt::convert_expression(
   {
     // result _not_ used
     clean_expr_resultt side_effects = clean_expr(expr, mode, false);
+
+    // A `throw` expression: before the exception propagates to a handler, run
+    // the destructors of the automatic objects constructed since entering the
+    // innermost enclosing try block (or, if there is none in this function, all
+    // of the function's automatic objects) ([except.ctor], [except.throw]/4).
+    // The exception object has already been constructed by the throw's own
+    // side-effects, which run first; then the destructors; then the THROW.
+    if(
+      !side_effects.side_effects.instructions.empty() &&
+      side_effects.side_effects.instructions.back().is_throw())
+    {
+      goto_programt::instructiont throw_instruction =
+        side_effects.side_effects.instructions.back();
+      side_effects.side_effects.instructions.pop_back();
+      dest.destructive_append(side_effects.side_effects);
+
+      const node_indext end_node = targets.cpp_try_scope_nodes.empty()
+                                     ? node_indext{0}
+                                     : targets.cpp_try_scope_nodes.back();
+      unwind_destructor_stack(expr.source_location(), dest, mode, end_node);
+
+      dest.add(std::move(throw_instruction));
+      return;
+    }
+
     dest.destructive_append(side_effects.side_effects);
 
     // Any residual expression?
