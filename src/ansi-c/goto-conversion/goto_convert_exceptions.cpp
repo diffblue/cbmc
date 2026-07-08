@@ -108,8 +108,16 @@ void goto_convertt::convert_try_catch(
   goto_programt end;
   goto_programt::targett end_target = end.add(goto_programt::make_skip());
 
+  // Record the scope-tree node at entry to the try block, so that a `throw`
+  // in the try body unwinds (runs destructors of) the automatic objects
+  // constructed since entering the try before control reaches a handler
+  // ([except.ctor], [except.throw]/4).
+  targets.cpp_try_scope_nodes.push_back(targets.scope_stack.get_current_node());
+
   // the first operand is the 'try' block
   convert(to_code(code.op0()), dest, mode);
+
+  targets.cpp_try_scope_nodes.pop_back();
 
   // add the CATCH-pop to the end of the 'try' block
   goto_programt::targett catch_pop_instruction =
