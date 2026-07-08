@@ -669,6 +669,20 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       }
     }
 
+    // Complete the bound of an array of unknown bound from its brace-enclosed
+    // initializer ([dcl.array]/1, [dcl.init.aggr]/5) before constructing it, so
+    // the symbol has a complete type (e.g. for sizeof) and per-element
+    // construction below has a definite element count.  (Scalar/POD element
+    // types are handled on the POD initializer path above.)
+    if(
+      symbol.type.id() == ID_array &&
+      to_array_type(symbol.type).size().is_nil() &&
+      symbol.value.id() == ID_initializer_list)
+    {
+      to_array_type(symbol.type).size() =
+        from_integer(symbol.value.operands().size(), size_type());
+    }
+
     symbol_exprt expr_symbol(symbol.name, symbol.type);
     already_typechecked_exprt::make_already_typechecked(expr_symbol);
 
