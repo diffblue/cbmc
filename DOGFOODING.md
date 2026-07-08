@@ -1507,3 +1507,44 @@ cpp11_throw_dtor_unwinding and cpp11_throw_rethrow.  cbmc-cpp, cbmc and JBMC
 exception tests all pass; dog-food unchanged at 94/21/2, 0 crash.
 
 *Updated: 2026-07-08*
+
+### 2026-07-08 unknown-bound array bound deduction (simplify_utils dog-food FIXED)
+
+Root-caused the src/util/simplify_utils.cpp dog-food FAIL (CONVERSION ERROR
+"expected constant expression, but got '<<expr:nil>>'"): an array of unknown
+bound with a brace initializer, `T a[]{...}`, had its bound deduced only for
+scalar/trivial element types; when T has a user-provided constructor the
+initialization went through per-element construction with a nil (undeduced)
+array size ([dcl.array]/1, [dcl.init.aggr]/5).  The trigger is
+std::optional<std::pair<componentt, mp_integer>> (c_types.h), whose libstdc++
+internals declare such an array.  Reduced with cvise (g++-validity guarded).
+
+Fixed by completing the bound from the initializer count in
+cpp_typecheck_initializer (so the declared symbol has a complete type, e.g. for
+sizeof) and in cpp_constructor's array branch.  New CORE test
+cpp11_array_unknown_bound_ctor.  Dog-food now 95 clean / 21 noisy / 1 FAIL / 0
+crash (simplify_utils moved from FAIL to clean).
+
+Discovered a separate, pre-existing defect (recorded as KNOWNBUG
+cpp11_array_element_brace_init): per-element brace-initialization of a class
+array with a user-provided constructor, `S a[N]{ {a}, {b} }`, aborts -- the
+brace elements are wrapped into an untyped array expression and indexed during
+construction, producing a nil-typed expression that crashes simplify_rec.  A
+direct per-element construction fix was attempted but reverted because it broke
+the real saj_table construction in simplify_utils (nil-typed constructor
+argument); a correct fix needs to construct each element from its
+initializer-clause without that regression.
+
+Remaining dog-food FAIL: src/util/interval_union.cpp -- "symbol '_StateIdT' is
+unknown" while instantiating std::__detail::_NFA<regex_traits>.  _StateIdT is a
+namespace-scope typedef used as the leading return type of an out-of-line
+template member definition (`_StateIdT _NFA<_TraitsT>::_M_insert_backref(...)`);
+during instantiation CBMC appears to resolve that return type in the wrong scope
+(the class, which has dependent bases std::vector<_State<...>> and _NFA_base)
+rather than the definition's namespace, so the typedef is not found.  Not yet
+fixed -- cvise plateaued on the deeply-interdependent regex trait machinery and
+minimal hand-written reproducers of the pattern do not trigger it; needs deeper
+investigation of out-of-line template member return-type lookup during
+instantiation.
+
+*Updated: 2026-07-08*
