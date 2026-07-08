@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ catch\(\.\.\.\) ran and control continued: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[except.handle]/1,15 catch(...) matches any exception and control continues
+after the handler, via the goto-level C++ exception lowering
+(remove_cpp_exceptions).  Non-vacuous.
