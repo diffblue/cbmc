@@ -1478,3 +1478,32 @@ tests all pass; dog-food unchanged at 94/21/2, 0 crash.  New CORE test
 cpp11_throw_catch_cross_function (plus the intra-function tests).
 
 *Updated: 2026-07-08*
+
+### 2026-07-08 destructors during unwinding + rethrow; function_may_throw study
+
+goto-conversion now runs the destructors of automatic objects during C++ stack
+unwinding: on a `throw`, after the exception object is evaluated, the destructor
+stack is unwound up to the innermost enclosing try (or the whole function when
+there is none) before the THROW, so objects constructed in the try are destroyed
+in reverse order as the stack unwinds ([except.ctor], [except.throw]/4).
+Previously the destructor ran only on the normal scope-exit path.
+
+remove_cpp_exceptions now lowers rethrow (`throw;`): the in-flight exception is
+saved into "current exception" globals on handler entry and re-propagated to the
+enclosing handler on a rethrow ([except.throw]/8), instead of wrapping the empty
+throw side-effect into an exception object (which symex rejected).
+
+A sound over-approximating function_may_throw (instrument only call sites of
+possibly-throwing callees) was implemented and then reverted: the per-call
+`inflight == null` dispatch guards prune the solver's state space on
+exception-heavy STL, so dropping them blew up the deque formulas (OOM).  Kept the
+conservative always-throw behaviour, rationale recorded in the pass.  (Also
+noted: JBMC's uncaught_exceptions analysis assumes pointer-typed Java exceptions
+and cannot be reused for C++ value exceptions.)
+
+Verified: dtor-during-unwinding (reverse order, exactly once, scope-precise,
+cross-function) and rethrow work non-vacuously; new CORE tests
+cpp11_throw_dtor_unwinding and cpp11_throw_rethrow.  cbmc-cpp, cbmc and JBMC
+exception tests all pass; dog-food unchanged at 94/21/2, 0 crash.
+
+*Updated: 2026-07-08*
