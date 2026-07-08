@@ -35,6 +35,23 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
   if(object_tc.type().id() == ID_array)
   {
+    // Deduce the bound of an array of unknown bound from its initializer
+    // ([dcl.array]/1, [dcl.init.aggr]/5): the number of elements equals the
+    // number of initializers.  This is needed for element types with a
+    // non-trivial constructor, where initialization goes through per-element
+    // construction below and would otherwise read a nil array size.  (Scalar
+    // and trivial element types are sized on a separate initializer path.)
+    if(to_array_type(object_tc.type()).size().is_nil() && !operands.empty())
+    {
+      const exprt &first_operand = operands.front();
+      const std::size_t deduced_size = first_operand.get_bool(ID_C_array_ini)
+                                         ? first_operand.operands().size()
+                                         : operands.size();
+      array_typet completed_type = to_array_type(object_tc.type());
+      completed_type.size() = from_integer(deduced_size, c_index_type());
+      object_tc.type() = completed_type;
+    }
+
     // We allow only one operand and it must be tagged with '#array_ini'.
     // Note that the operand is an array that is used for copy-initialization.
     // In the general case, a program is not allowed to use this form of
