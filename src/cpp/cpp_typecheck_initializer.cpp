@@ -207,6 +207,17 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
   // we do have an initializer
 
+  // A catch variable ([except.handle]): its value is supplied by the exception
+  // object at runtime, so nondet-initialize it here without synthesising a
+  // constructor.  This is marked #exception_catch_init by typecheck_try_catch;
+  // handling it uniformly (for scalar and class catch variables alike) avoids
+  // trying to construct a class-typed catch variable from the int placeholder.
+  if(symbol.value.get_bool("#exception_catch_init"))
+  {
+    symbol.value = side_effect_expr_nondett{symbol.type, symbol.location};
+    return;
+  }
+
   // [expr.const]: the initializer of a constexpr (or constinit) variable -- and
   // of a const variable usable in constant expressions -- is manifestly
   // constant-evaluated, so __builtin_is_constant_evaluated() is true within it

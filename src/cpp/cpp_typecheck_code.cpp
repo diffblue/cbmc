@@ -1285,14 +1285,22 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
               to_reference_type(declarator.type()).base_type();
           }
 
-          // Give the catch variable a nondet initializer to prevent
-          // the type-checker from trying to call a constructor.
-          // The actual value comes from the exception at runtime.
+          // The catch variable's value is supplied by the exception object at
+          // runtime ([except.handle]); the front-end only needs to declare it.
+          // Mark a placeholder initializer that convert_initializer turns into
+          // a nondet initialization, so the type-checker does not synthesise a
+          // spurious construction.  An `int` 0 placeholder (the previous
+          // behaviour) made a class-typed catch variable try to construct its
+          // class from an int -- which failed ("found no match for symbol 'X'",
+          // argument `signed int`) for every class without a matching int
+          // constructor, including move-only classes whose copy constructor is
+          // deleted.
           if(declarator.value().is_nil())
           {
-            exprt zero = from_integer(0, signed_int_type());
-            already_typechecked_exprt::make_already_typechecked(zero);
-            declarator.value() = std::move(zero);
+            exprt placeholder = from_integer(0, signed_int_type());
+            already_typechecked_exprt::make_already_typechecked(placeholder);
+            placeholder.set("#exception_catch_init", true);
+            declarator.value() = std::move(placeholder);
           }
         }
 
