@@ -139,11 +139,16 @@ void cpp_typecheckt::default_ctor(
   ctor.add_source_location()=source_location;
 }
 
-/// Generate code for implicit default copy constructor
+/// Generate code for implicit default copy or move constructor.
+/// \param is_move: when true, generate a *move* constructor -- each base and
+///   non-static data member is initialized from the corresponding subobject of
+///   the argument cast to an xvalue (static_cast<T&&>), so overload resolution
+///   selects the subobject's move constructor ([class.copy.ctor]/15).
 void cpp_typecheckt::default_cpctor(
   const symbolt &symbol,
   cpp_declarationt &cpctor,
-  const irep_idt &param_identifier_arg) const
+  const irep_idt &param_identifier_arg,
+  bool is_move) const
 {
   source_locationt source_location=symbol.type.source_location();
 
@@ -332,9 +337,29 @@ void cpp_typecheckt::default_cpctor(
     memberexpr.add_source_location()=source_location;
 
     if(mem_c.type().id() == ID_array)
+    {
       memberexpr.set(ID_C_array_ini, true);
+      mem_init.add_to_operands(std::move(memberexpr));
+    }
+    else if(is_move)
+    {
+      // [class.copy.ctor]/15: a defaulted move constructor initializes each
+      // non-static data member from the corresponding member of the argument
+      // cast to an xvalue.  Wrap the source access in static_cast<T&&> so that
+      // overload resolution selects the member's move constructor (falling
+      // back to the copy constructor when there is no viable move
+      // constructor).  For a scalar member the xvalue simply yields its value,
+      // so this coincides with a copy.
+      reference_typet rref = reference_type(mem_c.type());
+      rref.set(ID_C_rvalue_reference, true);
+      exprt cast("explicit-typecast", rref);
+      cast.add_source_location() = source_location;
+      cast.add_to_operands(std::move(memberexpr));
+      mem_init.add_to_operands(std::move(cast));
+    }
+    else
+      mem_init.add_to_operands(std::move(memberexpr));
 
-    mem_init.add_to_operands(std::move(memberexpr));
     initializers.move_to_sub(mem_init);
   }
 }
