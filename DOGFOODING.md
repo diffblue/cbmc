@@ -1365,3 +1365,27 @@ as KNOWNBUG cpp11_throw_move_only; throw/catch of a *copyable* class works, so
 the gap is specifically the exception object's copy-vs-move/elision choice.
 
 *Updated: 2026-07-08*
+
+### 2026-07-08 catch variable nondet-initialized (not constructed from int)
+
+A `catch(T &e)` / `catch(T e)` handler declares the exception variable; the
+front-end initialized it with an `int` 0 placeholder, which for a class-typed
+catch variable made convert_initializer construct the class FROM an int via
+cpp_constructor -- "found no match for symbol 'X' ... argument types: signed
+int" + CONVERSION ERROR -- failing for every class type without a matching int
+constructor (including move-only classes, whose copy constructor is deleted).
+Fix: mark the placeholder (#exception_catch_init) and nondet-initialize the
+catch variable of any type in convert_initializer ([except.handle]/1-3; the
+value is supplied by the exception object at runtime).  Non-vacuous CORE test
+cpp11_throw_move_only.
+
+Both suites green; clang-format clean.  Dog-food improves to **94 clean / 21
+noisy / 2 FAIL / 0 CRASH** (was 94/20/3): parse_options.cpp now compiles
+(it catches exceptions transitively holding a move-only, unique_ptr-backed
+ui_message_handlert).  Remaining FAILs: interval_union.cpp (basic_regex) and
+simplify_utils.cpp (the optional<pair> trivial-destructor instantiation cycle,
+bug 2b).  (Note: CBMC still does not propagate a thrown value into the handler
+body -- throw/catch of even an int leaves the handler unreachable -- a separate
+exception-support limitation.)
+
+*Updated: 2026-07-08*
