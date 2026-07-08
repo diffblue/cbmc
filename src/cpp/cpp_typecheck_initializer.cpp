@@ -214,7 +214,11 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   // trying to construct a class-typed catch variable from the int placeholder.
   if(symbol.value.get_bool("#exception_catch_init"))
   {
-    symbol.value = side_effect_expr_nondett{symbol.type, symbol.location};
+    side_effect_expr_nondett nondet{symbol.type, symbol.location};
+    // Mark the placeholder so the goto-level exception-lowering pass
+    // (remove_cpp_exceptions) can rewrite it to read the thrown value.
+    nondet.set("#exception_catch_init", true);
+    symbol.value = std::move(nondet);
     return;
   }
 
