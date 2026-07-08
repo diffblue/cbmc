@@ -41,6 +41,9 @@ void cpp_typecheckt::default_dtor(
   decl.add(ID_cv).make_nil();
   decl.add(ID_throw_decl).make_nil();
 
+  // [class.dtor]/8: mark implicitly-declared destructor (trivial candidate).
+  decl.type().set("#is_implicit_dtor", true);
+
   dtor.add(ID_type).id(ID_destructor);
   dtor.add(ID_storage_spec).id(ID_cpp_storage_spec);
   dtor.add_to_operands(std::move(decl));

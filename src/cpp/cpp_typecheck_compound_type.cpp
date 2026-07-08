@@ -926,6 +926,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // actually being elaborated), per [dcl.fct.def.default] /
       // [class.copy.ctor]/14.
       value.set("#defaulted_function", true);
+
+      // [class.dtor]/8: an =default destructor is a trivial-destructor candidate.
+      if(
+        component.type().id() == ID_code &&
+        to_code_type(component.type()).return_type().id() == ID_destructor)
+        component.type().set("#is_implicit_dtor", true);
     }
 
     component.set(ID_is_inline, declaration.member_spec().is_inline());
