@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ cross-function base handler sees the thrown value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[except.throw]/4 cross-function propagation (deep -> mid -> main) with base-class
+matching and value carried across returns, via the goto-level C++ exception
+lowering (remove_cpp_exceptions on remove_exceptions_baset).  Non-vacuous.
