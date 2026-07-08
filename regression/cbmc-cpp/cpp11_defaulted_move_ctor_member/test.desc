@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ move-constructed member holds moved value: SUCCESS$
@@ -17,24 +17,11 @@ that xvalue selects the member's move constructor.  A member whose copy
 constructor is deleted but whose move constructor is usable must therefore be
 moved, not copied.
 
-CBMC's defaulted copy/move constructor synthesis (cpp_typecheck_function.cpp,
-default_cpctor in cpp_typecheck_constructor.cpp) generates a memberwise *copy*
-initializer `m(ref.m)` for the move constructor too, and its trivial-member
-gate (is_trivial_copy) inspects only the member's data-member types -- so a
-class like M, whose only data member is an int but whose copy constructor is
-deleted, is treated as trivially copyable and copied.  The copy selects M's
-=delete'd copy constructor ("member 'M::M(this, ...M&...)' is not accessible")
-and the enclosing constructor body is dropped with a CONVERSION ERROR.  g++ and
-clang++ accept this program.
-
-This is the header-free, template-free root cause of the enable_if_t<false>
-dog-food failures in parse_options.cpp, irep_serialization.cpp and
-ui_message.cpp: all hold a std::unique_ptr member, whose copy constructor is
-deleted and move constructor is user-provided; the defaulted move constructor
-of the holder copies (rather than moves) the unique_ptr, and considering its
-=delete'd deleter constructor overload additionally instantiates
-enable_if_t<false>.
-
-Flip to CORE once defaulted move/copy constructor synthesis move/copy-constructs
-non-trivially-copyable members via the member's own move/copy constructor with
-the correct value category.
+Regression test for the fix that makes default_cpctor emit a move initializer
+(static_cast<T&&>(ref.member)) for the move constructor, so the member's own
+move constructor is selected.  assertion.1 checks the moved value is preserved
+(non-vacuous: only holds if the move constructor body is actually elaborated
+and the move runs); assertion.2 is a deliberately-wrong assertion that must
+FAIL.  Before the fix this produced "member 'M::M(this, ...M&...)' is not
+accessible" (the deleted copy constructor was selected) followed by a
+CONVERSION ERROR that dropped the constructor body.
