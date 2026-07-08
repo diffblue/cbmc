@@ -1449,3 +1449,32 @@ per-call-site dispatch + destructor calls during unwinding; such throws
 currently keep the previous (uncaught-approximation) behaviour.
 
 *Updated: 2026-07-08*
+
+### 2026-07-08 shared exception-lowering base + cross-function C++ propagation
+
+Factored the language-agnostic exception-lowering structure out of JBMC's
+remove_exceptions into a shared remove_exceptions_baset (src/goto-programs/):
+catch-stack tracking, per-handler dispatch sequence, call-site + function-end
+propagation, find_universal_exception, DEAD recomputation.  Language-specific
+pieces are virtual hooks (in-flight global, match+dispatch, throw->in-flight,
+handler binding).  JBMC's pass now derives from it (Java: instanceof, Throwable
+reference, landingpad); WITH_JBMC enabled locally so JBMC's exception
+regression tests validate the base (all pass).
+
+remove_cpp_exceptions now derives from the base too and adds cross-function
+propagation.  C++ exceptions are value types: the in-flight exception is a
+pointer-to-exception-object global + an integer type tag; THROW copies the
+value into a per-site static object and sets ptr+tag; a possibly-throwing CALL
+is followed by a guarded dispatch; an unmatched throw falls to the function end
+(propagates to the caller); a handler copies the value into its parameter and
+clears the pointer.  Base-class matching (intra- and cross-function) uses the
+thrown types' cpp_exception_id lists ([except.throw]/4, [except.handle]/1-3).
+
+Verified: intra- and cross-function throw/catch deliver the value to the
+matching handler (by value/reference, base-class, catch(...), multi-level
+propagation, continuation after the handler); uncaught throws make subsequent
+code unreachable (sound).  cbmc-cpp all pass; cbmc all pass; JBMC exception
+tests all pass; dog-food unchanged at 94/21/2, 0 crash.  New CORE test
+cpp11_throw_catch_cross_function (plus the intra-function tests).
+
+*Updated: 2026-07-08*
