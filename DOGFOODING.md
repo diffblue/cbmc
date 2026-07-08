@@ -1417,3 +1417,35 @@ route is a goto-level exception-lowering pass (à la JBMC's remove_exceptions)
 that runs before symex, so symex only sees ordinary gotos/assignments.
 
 *Updated: 2026-07-08*
+
+### 2026-07-08 goto-level C++ exception lowering (remove_cpp_exceptions)
+
+Implemented the C++ counterpart of JBMC's remove_exceptions
+(src/goto-programs/remove_cpp_exceptions.{h,cpp}), run from
+process_goto_program before symex, so exception handling is no longer symex's
+business.  goto-symex previously stubbed symex_throw to assume(false) and
+symex_catch to a no-op, so a thrown value never reached its handler and handler
+bodies were effectively unreachable (both e==42 and e!=42 provable for
+`try { throw 42; } catch(int e)`).
+
+The pass turns CATCH-PUSH/CATCH-POP/THROW into ordinary gotos/assignments: for
+each THROW it matches the innermost active handler whose caught type-id is in
+the thrown type's id set (cpp_exception_list already includes base classes, so
+base-class matching [except.handle]/3 and catch(...) come for free), binds the
+handler parameter to the thrown value (rewriting the front-end's
+#exception_catch_init nondet placeholder to read a per-handler storage), and
+jumps to the handler ([except.throw]/3-4, [except.handle]/1-3,15).  No-op when
+there are no CATCH/THROW.
+
+Handles intra-function try/catch: by value/reference, base-class and catch(...)
+matching, and continuation after the handler.  Non-vacuous CORE tests
+cpp11_throw_catch_value (was KNOWNBUG), cpp11_throw_catch_base,
+cpp11_throw_catchall_continue.  Both suites green; dog-food unchanged at
+94/21/2, 0 crash (the pass runs in cbmc, not goto-cc).
+
+Follow-up: cross-function propagation (an exception unwinding to a caller's
+handler) -- needs an in-flight exception object carried across returns +
+per-call-site dispatch + destructor calls during unwinding; such throws
+currently keep the previous (uncaught-approximation) behaviour.
+
+*Updated: 2026-07-08*
