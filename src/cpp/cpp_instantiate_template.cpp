@@ -2391,6 +2391,53 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
 /// \param specialization: optional explicit specialization type
 #define MAX_DEPTH 50
 
+/// Decide whether two template declarations name the *same* template -- i.e.
+/// whether \p candidate could be the definition of a forward declaration
+/// \p forward.  A forward declaration and its definition necessarily share an
+/// identical signature ([temp.over.link], [basic.link]/11): the same template
+/// parameter list and the same function parameter-type list.  Distinct
+/// overloads of a function template differ in at least one of these -- e.g.
+/// the `std::swap` overloads differ in template-parameter arity (generic
+/// `swap(_Tp&,_Tp&)` has one type parameter; pair `swap(pair<_T1,_T2>&,...)`
+/// has two), while the 3- and 4-iterator `std::equal` overloads share a
+/// two-parameter template list but differ in function-parameter arity.
+/// Matching a forward-declared template to its definition by base name alone
+/// therefore risks binding the wrong overload's parameter list to the deduced
+/// arguments (leaving parameters unbound and aborting the instantiation), so
+/// require both the template-parameter list (arity + each parameter's
+/// type/non-type kind) and the function-parameter arity to agree.
+static bool same_template_signature(
+  const cpp_declarationt &forward,
+  const cpp_declarationt &candidate)
+{
+  const auto &fp = forward.template_type().template_parameters();
+  const auto &cp = candidate.template_type().template_parameters();
+  if(fp.size() != cp.size())
+    return false;
+  for(std::size_t i = 0; i < fp.size(); ++i)
+  {
+    // A type parameter is represented with id ID_type; a non-type parameter
+    // is a value declaration.  Mixing the two is a different template.
+    if((fp[i].id() == ID_type) != (cp[i].id() == ID_type))
+      return false;
+  }
+  if(forward.declarators().empty() || candidate.declarators().empty())
+    return true;
+  // Compare function-parameter arity, distinguishing overloads that share a
+  // template-parameter list (e.g. the 3- and 4-iterator std::equal).
+  const typet f_type = forward.declarators().front().merge_type(forward.type());
+  const typet c_type =
+    candidate.declarators().front().merge_type(candidate.type());
+  const irept &f_params = f_type.find(ID_parameters);
+  const irept &c_params = c_type.find(ID_parameters);
+  if(f_params.is_not_nil() || c_params.is_not_nil())
+  {
+    if(f_params.get_sub().size() != c_params.get_sub().size())
+      return false;
+  }
+  return true;
+}
+
 const symbolt &cpp_typecheckt::instantiate_template(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -2529,7 +2576,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
             to_cpp_declaration(candidate->type);
           if(
             !cand_decl.declarators().empty() &&
-            cand_decl.declarators()[0].value().is_not_nil())
+            cand_decl.declarators()[0].value().is_not_nil() &&
+            same_template_signature(check_decl, cand_decl))
           {
             effective_template = candidate;
             template_scope = id_map_lookup(cpp_scopes, candidate->name);
