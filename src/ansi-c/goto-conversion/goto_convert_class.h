@@ -421,6 +421,11 @@ protected:
     node_indext break_stack_node, continue_stack_node, throw_stack_node,
       leave_stack_node;
 
+    // Stack of scope-tree nodes at entry to each enclosing C++ try block, used
+    // to unwind (run destructors of) automatic objects when a `throw`
+    // propagates to a handler ([except.ctor], [except.throw]/4).
+    std::vector<node_indext> cpp_try_scope_nodes;
+
     targetst()
       : return_set(false),
         has_return_value(false),
