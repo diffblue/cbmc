@@ -70,11 +70,11 @@ class remove_cpp_exceptionst : public remove_exceptions_baset
 public:
   remove_cpp_exceptionst(
     symbol_table_baset &_symbol_table,
+    function_may_throwt _function_may_throw,
     message_handlert &_message_handler)
     : remove_exceptions_baset(
         _symbol_table,
-        // C++ is conservative: any function may throw (sound over-approx).
-        [](const irep_idt &) { return true; },
+        std::move(_function_may_throw),
         _message_handler)
   {
   }
@@ -86,6 +86,10 @@ public:
 protected:
   symbol_exprt inflight_ptr{irep_idt{}, typet{}};
   symbol_exprt inflight_type{irep_idt{}, typet{}};
+  // the exception currently being handled (saved on handler entry), used to
+  // re-propagate on a rethrow (`throw;`)
+  symbol_exprt current_exc_ptr{irep_idt{}, typet{}};
+  symbol_exprt current_exc_type{irep_idt{}, typet{}};
 
   // cpp_exception_id string -> integer tag (assigned to thrown primary types)
   std::map<irep_idt, mp_integer> type_tag;
@@ -194,6 +198,12 @@ bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
     "__CPROVER_cpp_inflight_exception_type",
     signed_int_type(),
     from_integer(0, signed_int_type()));
+  current_exc_ptr = make_global(
+    "__CPROVER_cpp_current_exception", void_ptr, null_pointer_exprt(void_ptr));
+  current_exc_type = make_global(
+    "__CPROVER_cpp_current_exception_type",
+    signed_int_type(),
+    from_integer(0, signed_int_type()));
   return true;
 }
 
@@ -230,6 +240,22 @@ void remove_cpp_exceptionst::set_inflight_exception(
   const source_locationt loc = instr_it->source_location();
   const exprt value =
     uncaught_exceptions_domaint::get_exception_symbol(instr_it->code());
+
+  // A rethrow (`throw;`) has no operand -- get_exception_symbol returns the
+  // throw side-effect itself.  Re-propagate the exception currently being
+  // handled ([except.throw]/8) instead of constructing a new object.
+  if(
+    value.id() == ID_side_effect &&
+    to_side_effect_expr(value).get_statement() == ID_throw)
+  {
+    *instr_it =
+      goto_programt::make_assignment(inflight_type, current_exc_type, loc);
+    goto_program.insert_after(
+      instr_it,
+      goto_programt::make_assignment(inflight_ptr, current_exc_ptr, loc));
+    return;
+  }
+
   const typet thrown_type = value.type();
 
   const std::vector<irep_idt> ids = thrown_type_ids(*instr_it);
@@ -279,25 +305,49 @@ void remove_cpp_exceptionst::prepare_handler(
       const typet var_type = catch_var.type();
       it->assign_rhs_nonconst() =
         dereference_exprt(typecast_exprt(inflight_ptr, pointer_type(var_type)));
-      // then clear the in-flight exception
+      // preserve the exception being handled (for a potential rethrow), then
+      // clear the in-flight exception.  Inserted after `it` in reverse order.
       goto_program.insert_after(
         it,
         goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
+      goto_program.insert_after(
+        it, goto_programt::make_assignment(current_exc_ptr, inflight_ptr, loc));
+      goto_program.insert_after(
+        it,
+        goto_programt::make_assignment(current_exc_type, inflight_type, loc));
       return;
     }
   }
 
-  // catch(...) or no bindable parameter: just clear the in-flight exception on
-  // entry.  Inserted after the handler's first instruction; adequate because
-  // user code does not read the in-flight globals.
+  // catch(...) or no bindable parameter: preserve the exception being handled
+  // (for a potential rethrow) and clear the in-flight exception on entry.
+  // Inserted after the handler's first instruction, in reverse order.
   goto_program.insert_after(
     handler,
     goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
+  goto_program.insert_after(
+    handler,
+    goto_programt::make_assignment(current_exc_ptr, inflight_ptr, loc));
+  goto_program.insert_after(
+    handler,
+    goto_programt::make_assignment(current_exc_type, inflight_type, loc));
 }
 
 void remove_cpp_exceptions(goto_modelt &goto_model, message_handlert &msg)
 {
-  remove_cpp_exceptionst pass(goto_model.symbol_table, msg);
+  // Conservatively treat every function as possibly-throwing, so every call
+  // site gets an exception dispatch.  A sound over-approximation that only
+  // instruments call sites of possibly-throwing callees (transitive "contains a
+  // THROW") was tried, but the per-call `inflight == null` dispatch guards turn
+  // out to prune the solver's state space significantly on exception-heavy STL
+  // code; dropping them for provably non-throwing calls caused a large formula
+  // blow-up (e.g. std::deque tests running out of memory).  The saving in
+  // instructions did not outweigh the lost pruning, so the dispatch is kept
+  // unconditional.
+  remove_exceptions_baset::function_may_throwt function_may_throw =
+    [](const irep_idt &) { return true; };
+
+  remove_cpp_exceptionst pass(goto_model.symbol_table, function_may_throw, msg);
   if(!pass.prepare(goto_model.goto_functions))
     return; // no exceptions: nothing to do
   pass(goto_model.goto_functions);
