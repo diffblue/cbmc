@@ -1296,3 +1296,46 @@ mutual-recursion cycle in `resolve_template_alias` on MSVC's
 thread-local active-set guard that breaks the cycle
 deterministically, restoring the two filesystem tests to PASS and
 bringing the MSVC preprocessed-header pass rate to **26/26**.
+
+### 2026-07-07 trivial-destructor builtins + overloaded-template forward-decl match
+
+Two coupled front-end fixes (the triviality-semantics follow-up noted above,
+plus a latent overload-resolution bug it exposed):
+
+1. `__has_trivial_destructor` / `__is_trivially_destructible` now compute the
+   actual destructor triviality per [class.prop]/1 + [class.dtor]/8 (recursive
+   over bases/members; a destructor is non-trivial when virtual or
+   user-provided).  Implicitly-declared and `= default` destructors are marked
+   `#is_implicit_dtor` (in `default_dtor` and the compound `= default` branch)
+   so they are distinguished from user-provided ones.  Validated 9/9 against
+   g++.  libstdc++ `std::is_trivially_destructible` is defined via
+   `__has_trivial_destructor`, so this was required for correct optional/variant
+   layout selection.
+
+2. Correcting (1) changed libstdc++ instantiation ordering and exposed a latent
+   bug: `instantiate_template` resolved a forward-declared function template to
+   its definition by base name alone.  For `std::swap` (generic `swap(_Tp&,_Tp&)`
+   vs pair `swap(pair<_T1,_T2>&, ...)`) this bound the wrong overload's parameter
+   list to the deduced argument, left a template parameter unbound, and the
+   dependent `pair<_T1,_T2>` threw -- silently dropping the caller's body (an
+   unsound no-op).  Fixed by requiring a matching template signature
+   (parameter arity + kind, and function-parameter arity) per
+   [temp.over.link]/[basic.link]/11.  Non-vacuous CORE tests
+   `cpp11_is_trivially_destructible` and `cpp11_swap_member_overload`;
+   `cpp11_require_swap` now passes soundly.
+
+Both suites green; clang-format clean.  Dog-food unchanged at **94/20/3,
+0 crash** (no regression; verified `simplify_expr.cpp` still clean -- a coarse
+tparam-only signature match had regressed it via the 3-/4-iterator `std::equal`
+overloads, which the function-parameter-arity check resolves).
+
+`simplify_utils.cpp` still does NOT compile: it hits a third, independent bug
+(2b) -- instantiating `std::optional<std::pair<componentt, mp_integer>>`
+recurses `optional<pair>` -> `is_trivially_destructible_v<pair>` ->
+`__is_destructible_impl<pair>` -> back into `optional<pair>`, and
+`is_trivially_destructible_v<pair>` resolves to `nil` ("expected constant
+expression").  CBMC's incomplete-instance cycle break (cpp_instantiate_template
+~3107) does not fire here because the in-progress `optional<pair>` symbol is not
+yet registered when the base-class trait is evaluated.  Left for a follow-up.
+
+*Updated: 2026-07-07*
