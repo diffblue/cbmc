@@ -1339,3 +1339,29 @@ expression").  CBMC's incomplete-instance cycle break (cpp_instantiate_template
 yet registered when the base-class trait is evaluated.  Left for a follow-up.
 
 *Updated: 2026-07-07*
+
+### 2026-07-08 defaulted move constructor moves non-trivial members
+
+A defaulted move constructor now move-constructs each base and non-static data
+member from an xvalue (static_cast<T&&>) so the member's move constructor is
+selected ([class.copy.ctor]/14-15).  Previously default_cpctor emitted a
+memberwise *copy* initializer that was reused for the move constructor too, so
+a member whose copy constructor is deleted but whose move constructor is usable
+(e.g. a std::unique_ptr member) selected the deleted copy constructor -- "member
+'M::M(this, ...M&...)' is not accessible" + CONVERSION ERROR dropping the
+constructor body.  Fix: default_cpctor takes an is_move flag; convert_function
+passes it for an rvalue-reference-parameter defaulted constructor.  Non-vacuous
+CORE test cpp11_defaulted_move_ctor_member; header-free/template-free.
+
+Both suites green; clang-format clean.  This fixes the goto-cc compilation of
+CBMC's own irep_serialization.cpp and ui_message.cpp (which hold std::unique_ptr
+members).  Dog-food unchanged at **94/20/3, 0 crash**: parse_options.cpp still
+FAILs, but on a *distinct* remaining bug -- CBMC constructs a thrown exception
+object with the class's copy constructor rather than moving/eliding from the
+prvalue operand ([except.throw]/3, [class.copy.elision]/3), so throwing a
+move-only exception (parse_options throws exceptions transitively holding a
+move-only, unique_ptr-backed ui_message_handlert) fails.  Captured header-free
+as KNOWNBUG cpp11_throw_move_only; throw/catch of a *copyable* class works, so
+the gap is specifically the exception object's copy-vs-move/elision choice.
+
+*Updated: 2026-07-08*
