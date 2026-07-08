@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ base handler catches derived, value bound: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[except.handle]/3 base-class matching + value binding, via the goto-level C++
+exception lowering (remove_cpp_exceptions).  Non-vacuous.
