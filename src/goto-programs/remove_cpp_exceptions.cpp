@@ -7,22 +7,37 @@ Author: Kiro
 \*******************************************************************/
 
 /// \file
-/// Lower C++ exceptions (CATCH-PUSH/CATCH-POP/THROW) to ordinary control flow.
+/// Lower C++ exceptions (CATCH-PUSH/CATCH-POP/THROW) to ordinary control flow,
+/// deriving from the language-agnostic remove_exceptions_baset.
+///
+/// C++ exceptions are value types matched by cpp_exception_id type tags.  The
+/// in-flight exception is modelled by two globals: a pointer to the exception
+/// object (null when none) and an integer type tag identifying the thrown
+/// type.  A THROW copies the thrown value into a per-throw-site static object,
+/// points the in-flight pointer at it and sets the tag; a handler copies the
+/// value back into its parameter (through the tag-appropriate type) and clears
+/// the pointer.  Handler matching (including base classes) uses the set of
+/// thrown types whose cpp_exception_id list contains the handler's tag, which
+/// is gathered from all THROW instructions in the program.
 
 #include "remove_cpp_exceptions.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
+#include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/remove_exceptions_base.h>
 
 #include <analyses/uncaught_exceptions_analysis.h>
 
+#include <map>
 #include <set>
 
-/// Find the `side_effect_expr_throwt` inside a THROW instruction's code (the
-/// code is a code_expressiont wrapping the throw side-effect).
+/// Find the side_effect_expr_throwt inside a THROW instruction's code.
 static const exprt *find_throw_side_effect(const exprt &e)
 {
   if(e.id() == ID_side_effect && e.get(ID_statement) == ID_throw)
@@ -36,186 +51,255 @@ static const exprt *find_throw_side_effect(const exprt &e)
   return nullptr;
 }
 
-/// The set of exception type-ids a `throw` matches -- the thrown type plus its
-/// base classes (with a `_ptr` suffix for pointer types), as computed by
-/// cpp_exception_list and stored on the throw side-effect's ID_exception_list.
-static std::set<irep_idt> thrown_type_ids(const goto_programt::instructiont &i)
+/// The list of exception type-ids a THROW matches (thrown type + base classes),
+/// as computed by cpp_exception_list and stored on the throw side-effect.
+static std::vector<irep_idt>
+thrown_type_ids(const goto_programt::instructiont &i)
 {
-  std::set<irep_idt> ids;
+  std::vector<irep_idt> ids;
   const exprt *se = find_throw_side_effect(i.code());
   if(se == nullptr)
     return ids;
   for(const auto &entry : se->find(ID_exception_list).get_sub())
-    ids.insert(entry.id());
+    ids.push_back(entry.id());
   return ids;
 }
 
-/// Create (once) a static symbol used to carry a thrown value from a `throw`
-/// to the matching handler's parameter.  Keyed by the handler's catch
-/// variable so that all throws reaching the same handler share the storage.
-static symbol_exprt get_exception_storage(
-  const symbol_exprt &catch_var,
-  const irep_idt &mode,
-  symbol_table_baset &symbol_table)
+class remove_cpp_exceptionst : public remove_exceptions_baset
 {
-  const irep_idt id =
-    id2string(catch_var.get_identifier()) + "#exception_storage";
-  if(const symbolt *existing = symbol_table.lookup(id))
-    return existing->symbol_expr();
+public:
+  remove_cpp_exceptionst(
+    symbol_table_baset &_symbol_table,
+    message_handlert &_message_handler)
+    : remove_exceptions_baset(
+        _symbol_table,
+        // C++ is conservative: any function may throw (sound over-approx).
+        [](const irep_idt &) { return true; },
+        _message_handler)
+  {
+  }
 
-  symbolt sym{id, catch_var.type(), mode};
-  sym.base_name = id;
+  /// Scan all throws to build the type-id tags and per-handler match sets, and
+  /// create the in-flight globals.  Returns false if there are no exceptions.
+  bool prepare(goto_functionst &goto_functions);
+
+protected:
+  symbol_exprt inflight_ptr{irep_idt{}, typet{}};
+  symbol_exprt inflight_type{irep_idt{}, typet{}};
+
+  // cpp_exception_id string -> integer tag (assigned to thrown primary types)
+  std::map<irep_idt, mp_integer> type_tag;
+  // handler tag -> set of thrown-type integer tags it catches (base classes
+  // included)
+  std::map<irep_idt, std::set<mp_integer>> handler_matches;
+  std::size_t object_counter = 0;
+
+  symbol_exprt get_inflight_exception_global() override
+  {
+    return inflight_ptr;
+  }
+
+  exprt no_inflight_exception() override
+  {
+    return equal_exprt(
+      inflight_ptr, null_pointer_exprt(to_pointer_type(inflight_ptr.type())));
+  }
+
+  void add_handler_dispatch(
+    const irep_idt &function_identifier,
+    goto_programt &goto_program,
+    const goto_programt::targett &instr_it,
+    const irep_idt &tag,
+    const goto_programt::targett &handler_target) override;
+
+  void set_inflight_exception(
+    goto_programt &goto_program,
+    const goto_programt::targett &instr_it) override;
+
+  // C++ has no landing-pad instruction; handler binding is done in
+  // prepare_handler at the handler entry.
+  void instrument_exception_handler(
+    goto_programt &,
+    const goto_programt::targett &instr_it,
+    bool) override
+  {
+    instr_it->turn_into_skip();
+  }
+
+  void prepare_handler(
+    goto_programt &goto_program,
+    const goto_programt::targett &handler) override;
+
+  symbol_exprt make_global(
+    const irep_idt &name,
+    const typet &type,
+    const exprt &initial_value);
+
+  exprt clear_inflight() const
+  {
+    return null_pointer_exprt(to_pointer_type(inflight_ptr.type()));
+  }
+};
+
+symbol_exprt remove_cpp_exceptionst::make_global(
+  const irep_idt &name,
+  const typet &type,
+  const exprt &initial_value)
+{
+  if(const symbolt *existing = symbol_table.lookup(name))
+    return existing->symbol_expr();
+  symbolt sym{name, type, ID_cpp};
+  sym.base_name = name;
   sym.is_static_lifetime = true;
   sym.is_lvalue = true;
-  sym.is_file_local = true;
+  sym.value = initial_value;
   symbol_table.insert(std::move(sym));
-  return symbol_exprt(id, catch_var.type());
+  return symbol_exprt(name, type);
 }
 
-/// Rewrite the handler's nondet initializer (`ASSIGN e := nondet`, emitted by
-/// the front-end as a placeholder) into `ASSIGN e := <storage>`, so that the
-/// handler parameter is bound to the thrown value carried in \p storage.
-/// Returns true and sets \p catch_var when the handler declares a parameter.
-static bool bind_handler_parameter(
-  goto_programt &goto_program,
-  goto_programt::targett handler,
-  const irep_idt &mode,
-  symbol_table_baset &symbol_table,
-  symbol_exprt &storage_out)
+bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
 {
-  // The handler block begins with `DECL e`.
-  if(!handler->is_decl())
-    return false; // catch(...) or unnamed: no parameter to bind
-
-  const symbol_exprt catch_var = handler->decl_symbol();
-
-  storage_out = get_exception_storage(catch_var, mode, symbol_table);
-
-  // Find the placeholder init `ASSIGN e := <nondet>` immediately following the
-  // DECL and rewrite it to read from the storage.  Only rewrite once.
-  goto_programt::targett it = std::next(handler);
-  while(it != goto_program.instructions.end() && !it->is_assign())
-    ++it;
-  if(
-    it != goto_program.instructions.end() && it->is_assign() &&
-    it->assign_lhs() == catch_var &&
-    it->assign_rhs().get_bool("#exception_catch_init"))
+  bool has_exceptions = false;
+  for(const auto &gf : goto_functions.function_map)
   {
-    const typet catch_var_type = catch_var.type();
-    it->assign_rhs_nonconst() =
-      typecast_exprt::conditional_cast(storage_out, catch_var_type);
+    for(const auto &i : gf.second.body.instructions)
+    {
+      if(i.is_catch())
+        has_exceptions = true;
+      if(i.is_throw())
+      {
+        has_exceptions = true;
+        const std::vector<irep_idt> ids = thrown_type_ids(i);
+        if(ids.empty())
+          continue;
+        // assign the primary (thrown) type an integer tag
+        auto inserted =
+          type_tag.emplace(ids.front(), mp_integer{(long long)type_tag.size()});
+        const mp_integer tag = inserted.first->second;
+        // this thrown type is caught by handlers for any of its ids (the
+        // thrown type itself or a base class)
+        for(const auto &id : ids)
+          handler_matches[id].insert(tag);
+      }
+    }
   }
+
+  if(!has_exceptions)
+    return false;
+
+  const pointer_typet void_ptr = pointer_type(empty_typet{});
+  inflight_ptr = make_global(
+    "__CPROVER_cpp_inflight_exception", void_ptr, null_pointer_exprt(void_ptr));
+  inflight_type = make_global(
+    "__CPROVER_cpp_inflight_exception_type",
+    signed_int_type(),
+    from_integer(0, signed_int_type()));
   return true;
 }
 
-static void remove_cpp_exceptions_function(
+void remove_cpp_exceptionst::add_handler_dispatch(
+  const irep_idt &,
   goto_programt &goto_program,
-  const irep_idt &mode,
-  symbol_table_baset &symbol_table)
+  const goto_programt::targett &instr_it,
+  const irep_idt &tag,
+  const goto_programt::targett &handler_target)
 {
-  // Innermost-last stack of active catch clauses; each clause is the list of
-  // (type-tag, handler-target) pairs of one try-block.
-  using handlerst = std::vector<std::pair<irep_idt, goto_programt::targett>>;
-  std::vector<handlerst> catch_stack;
+  auto it = handler_matches.find(tag);
+  if(it == handler_matches.end() || it->second.empty())
+    return; // no thrown type matches this handler -- unreachable, emit nothing
 
-  bool any = false;
-  for(const auto &i : goto_program.instructions)
-    if(i.is_catch() || i.is_throw())
-    {
-      any = true;
-      break;
-    }
-  if(!any)
-    return;
-
-  Forall_goto_program_instructions(it, goto_program)
+  // guard: inflight_type is one of the tags this handler catches
+  exprt::operandst disjuncts;
+  for(const mp_integer &m : it->second)
   {
-    if(it->is_catch())
-    {
-      const codet &code = it->code();
-      if(code.get_statement() == ID_push_catch)
-      {
-        const code_push_catcht &pc = to_code_push_catch(code);
-        const auto &exception_list = pc.exception_list();
-        handlerst handlers;
-        auto tgt = it->targets.begin();
-        for(std::size_t k = 0;
-            k < exception_list.size() && tgt != it->targets.end(); ++k, ++tgt)
-        {
-          handlers.emplace_back(exception_list[k].get_tag(), *tgt);
-        }
-        catch_stack.push_back(std::move(handlers));
-      }
-      else // pop
-      {
-        if(!catch_stack.empty())
-          catch_stack.pop_back();
-      }
-      it->turn_into_skip();
-    }
-    else if(it->is_throw())
-    {
-      const std::set<irep_idt> ids = thrown_type_ids(*it);
-
-      // Find the innermost matching handler: a catch clause whose tag is empty
-      // (catch(...)) or is one of the thrown type-ids (base classes included).
-      bool matched = false;
-      goto_programt::targett handler;
-      for(auto clause = catch_stack.rbegin();
-          !matched && clause != catch_stack.rend(); ++clause)
-      {
-        for(const auto &h : *clause)
-        {
-          if(h.first.empty() || ids.count(h.first) != 0)
-          {
-            handler = h.second;
-            matched = true;
-            break;
-          }
-        }
-      }
-
-      if(!matched)
-        continue; // propagates out of this function: left for a later phase
-
-      const exprt value = uncaught_exceptions_domaint::get_exception_symbol(
-        it->code());
-      const source_locationt loc = it->source_location();
-
-      symbol_exprt storage("", empty_typet{});
-      if(bind_handler_parameter(
-           goto_program, handler, mode, symbol_table, storage))
-      {
-        // store the thrown value, then jump to the handler
-        *it = goto_programt::make_assignment(
-          storage,
-          typecast_exprt::conditional_cast(value, storage.type()),
-          loc);
-        goto_program.insert_after(
-          it, goto_programt::make_goto(handler, loc));
-        ++it; // skip the freshly inserted goto
-      }
-      else
-      {
-        // catch(...) with no parameter: just transfer control
-        it->turn_into_skip();
-        goto_program.insert_after(
-          it, goto_programt::make_goto(handler, loc));
-        ++it;
-      }
-    }
+    disjuncts.push_back(
+      equal_exprt(inflight_type, from_integer(m, inflight_type.type())));
   }
+  const exprt guard = disjunction(disjuncts);
+
+  goto_program.insert_after(
+    instr_it,
+    goto_programt::make_goto(
+      handler_target, guard, instr_it->source_location()));
 }
 
-void remove_cpp_exceptions(goto_modelt &goto_model, message_handlert &)
+void remove_cpp_exceptionst::set_inflight_exception(
+  goto_programt &goto_program,
+  const goto_programt::targett &instr_it)
 {
-  for(auto &gf : goto_model.goto_functions.function_map)
+  const source_locationt loc = instr_it->source_location();
+  const exprt value =
+    uncaught_exceptions_domaint::get_exception_symbol(instr_it->code());
+  const typet thrown_type = value.type();
+
+  const std::vector<irep_idt> ids = thrown_type_ids(*instr_it);
+  const mp_integer tag = ids.empty() ? mp_integer{0} : type_tag[ids.front()];
+
+  // per-throw-site static object holding a copy of the thrown value
+  const irep_idt obj_name =
+    "__CPROVER_cpp_exception_object$" + std::to_string(++object_counter);
+  const symbol_exprt exc_obj = make_global(obj_name, thrown_type, nil_exprt{});
+
+  // exc_obj = value
+  *instr_it = goto_programt::make_assignment(exc_obj, value, loc);
+  // inflight_ptr = (void*)&exc_obj  (inserted after -> runs next)
+  goto_program.insert_after(
+    instr_it,
+    goto_programt::make_assignment(
+      inflight_ptr,
+      typecast_exprt(address_of_exprt(exc_obj), inflight_ptr.type()),
+      loc));
+  // inflight_type = tag
+  goto_program.insert_after(
+    instr_it,
+    goto_programt::make_assignment(
+      inflight_type, from_integer(tag, inflight_type.type()), loc));
+}
+
+void remove_cpp_exceptionst::prepare_handler(
+  goto_programt &goto_program,
+  const goto_programt::targett &handler)
+{
+  const source_locationt loc = handler->source_location();
+
+  if(handler->is_decl())
   {
-    const symbolt *fsym =
-      goto_model.symbol_table.lookup(gf.first);
-    const irep_idt mode = fsym != nullptr ? fsym->mode : ID_cpp;
-    remove_cpp_exceptions_function(
-      gf.second.body, mode, goto_model.symbol_table);
+    const symbol_exprt catch_var = handler->decl_symbol();
+
+    // find the placeholder `catch_var = nondet` init after the DECL
+    goto_programt::targett it = std::next(handler);
+    while(it != goto_program.instructions.end() && !it->is_assign())
+      ++it;
+    if(
+      it != goto_program.instructions.end() && it->is_assign() &&
+      it->assign_lhs() == catch_var &&
+      it->assign_rhs().get_bool("#exception_catch_init"))
+    {
+      // catch_var = *(T*)inflight_ptr
+      const typet var_type = catch_var.type();
+      it->assign_rhs_nonconst() =
+        dereference_exprt(typecast_exprt(inflight_ptr, pointer_type(var_type)));
+      // then clear the in-flight exception
+      goto_program.insert_after(
+        it,
+        goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
+      return;
+    }
   }
+
+  // catch(...) or no bindable parameter: just clear the in-flight exception on
+  // entry.  Inserted after the handler's first instruction; adequate because
+  // user code does not read the in-flight globals.
+  goto_program.insert_after(
+    handler,
+    goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
+}
+
+void remove_cpp_exceptions(goto_modelt &goto_model, message_handlert &msg)
+{
+  remove_cpp_exceptionst pass(goto_model.symbol_table, msg);
+  if(!pass.prepare(goto_model.goto_functions))
+    return; // no exceptions: nothing to do
+  pass(goto_model.goto_functions);
   goto_model.goto_functions.update();
 }
