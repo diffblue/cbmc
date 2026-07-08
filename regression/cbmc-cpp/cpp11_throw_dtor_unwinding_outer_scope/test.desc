@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ outer B handler reached: SUCCESS$
+^\[main\.assertion\.2\] line \d+ outer-try object destroyed during unwinding: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [except.ctor]/1-3, [except.throw]/4 -- an automatic object in an outer
+scope that is exited because the exception does not match an inner handler is
+not destroyed during unwinding.  The destructor-unwinding in goto-conversion
+only unwinds up to the innermost enclosing try at the throw site, so `g` here is
+never destroyed (assertion 2 currently FAILS, VERIFICATION FAILED).  Flip to
+CORE once unwinding destroys every scope exited on the way to the handler.
