@@ -1389,3 +1389,31 @@ body -- throw/catch of even an int leaves the handler unreachable -- a separate
 exception-support limitation.)
 
 *Updated: 2026-07-08*
+
+### 2026-07-08 (scoping) exception-value propagation to catch handlers
+
+Scoped the exception-propagation limitation noted with the catch-variable fix.
+Root cause: goto-symex does not model C++ exception control flow.  The C++
+front-end emits CATCH-PUSH / CATCH-POP / THROW instructions, but goto-symex's
+symex_throw is stubbed to `assume(false)` (uncaught approximation) and
+symex_catch is a no-op -- both are #if 0'd out (TODO TG-4667).  So a thrown
+value never reaches the matching handler, the handler body is effectively
+unreachable, and assertions in handlers pass vacuously (`try { throw 42; }
+catch(int e)` proves both e==42 and e!=42) -- a soundness gap that masks bugs in
+handlers and post-try code.  A separate $exception_flag+goto mechanism
+(convert_CPROVER_try_catch / convert_CPROVER_throw) models control flow for the
+CPROVER intrinsics but matches neither the exception type nor the value.
+
+Captured as KNOWNBUG cpp11_throw_catch_value (header-free).  A conforming fix is
+a substantial, dedicated effort (not a safe end-of-session increment to core
+symex): per-frame catch stack; type-aware handler matching via cpp_exception_id
+(incl. base classes and catch(...)); binding the handler parameter to the thrown
+value (resolving the handler's nondet-init overwrite, e.g. via an in-flight
+exception object read by the handler); control transfer to the handler with the
+corresponding goto-symex dispatcher change; and, for the common cross-function
+case, call-stack unwinding with destructor calls during unwinding
+([except.throw]/3-4, [except.handle]/1-3,15, [except.ctor]/1-3).  The lower-risk
+route is a goto-level exception-lowering pass (à la JBMC's remove_exceptions)
+that runs before symex, so symex only sees ordinary gotos/assignments.
+
+*Updated: 2026-07-08*
