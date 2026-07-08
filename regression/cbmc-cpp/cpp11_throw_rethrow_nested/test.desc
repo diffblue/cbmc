@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ outer handler reached after rethrow: SUCCESS$
+^\[main\.assertion\.2\] line \d+ outer rethrow re-propagates the outer exception E\(1\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [except.throw]/8 -- a rethrow in an outer handler that encloses a
+completed inner try/catch re-propagates the inner exception instead of the outer
+one.  remove_cpp_exceptions keeps the exception being handled in a single pair of
+"current exception" globals rather than a stack, so the inner handler clobbers
+the outer exception (assertion 2 currently FAILS, VERIFICATION FAILED).  Flip to
+CORE once the current-exception state is a stack across nested handlers.
