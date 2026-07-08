@@ -20,6 +20,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_cpp_exceptions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_vector.h>
@@ -44,6 +45,10 @@ bool process_goto_program(
   log.status() << "Removal of function pointers and virtual functions"
                << messaget::eom;
   remove_function_pointers(log.get_message_handler(), goto_model, false);
+
+  // lower C++ exceptions (CATCH-PUSH/CATCH-POP/THROW) to gotos/assignments so
+  // that goto-symex need not model exceptions; no-op if there are none
+  remove_cpp_exceptions(goto_model, log.get_message_handler());
 
   mm_io(goto_model, log.get_message_handler());
 
