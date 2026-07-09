@@ -1609,3 +1609,27 @@ out-of-line member return-type resolution -- is still needed; the fix attempt wa
 reverted.  Dog-food remains 95 clean / 21 noisy / 1 FAIL / 0 crash.
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 interval_union out-of-line member scope FIXED (dog-food 0 FAIL)
+
+Follow-up to the KNOWNBUG above: the fix landed.  The correct scope for
+instantiating a class template's (out-of-line) members is the *instantiated
+class's* scope -- its parent chain reaches both the class's own members and,
+through the class's enclosing namespace, namespace-scope names ([temp.inst]/2,
+[basic.lookup.unqual], [dcl.meaning]).  cpp_instantiate_template now enters that
+scope before instantiating each method, instead of restoring the scope that
+first triggered the instantiation.
+
+The earlier attempt entered only the template-parameter scope, which fixed the
+namespace-name case (_StateIdT) but regressed real-STL instantiations such as
+std::unordered_map whose out-of-line members refer to the class's own member
+aliases (e.g. __hashtable_base); the instantiated class scope covers both, so
+there is no regression.  Investigating one such "regression" (as suggested) was
+what revealed the template-parameter scope was itself the wrong scope.
+
+Result: src/util/interval_union.cpp compiles; dog-food is now
+96 clean / 21 noisy / 0 FAIL / 0 crash.  KNOWNBUG
+cpp11_template_outofline_member_ns_return promoted to CORE.  cbmc-cpp, cbmc and
+JBMC exception tests all pass.
+
+*Updated: 2026-07-09*
