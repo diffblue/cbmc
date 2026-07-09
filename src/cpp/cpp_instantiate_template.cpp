@@ -5197,34 +5197,57 @@ skip_pack_removal_ft:
     }
   }
 
-  // [temp.variadic]/5: expand the trailing function parameter pack into its
-  // N elements and expand pack references in the function body.  N is the
-  // number of pack arguments excluding the empty-pack sentinel
-  // (an `ID_type` argument whose type is `ID_empty`, used to encode a pack
-  // that matched zero elements).  N >= 2 expands into individual parameters;
-  // N == 0 removes the pack parameter and its body call-argument references;
-  // N == 1 needs no expansion here (the single element already maps to the
-  // single parameter).
-  std::vector<exprt> pack_arguments;
-  if(
-    !template_type.template_parameters().empty() &&
-    template_type.template_parameters().back().get_bool(ID_ellipsis))
-  {
-    const std::size_t non_pack0 =
-      template_type.template_parameters().size() - 1;
-    for(std::size_t j = non_pack0; j < full_template_args.arguments().size();
-        ++j)
+  // [temp.variadic]/5 + [temp.param]/11: expand the function parameter pack
+  // into its N elements and expand pack references in the function body.  N is
+  // the number of pack arguments excluding the empty-pack sentinel (an
+  // `ID_type` argument whose type is `ID_empty`, used to encode a pack that
+  // matched zero elements).  N >= 2 expands into individual parameters; N == 0
+  // removes the pack parameter and its body call-argument references; N == 1
+  // needs no expansion here (the single element already maps to the single
+  // parameter).
+  //
+  // The template parameter pack need NOT be the last template parameter: a pack
+  // may be followed by further template parameters that are deducible or have
+  // default arguments ([temp.param]/11), e.g. std::_Tuple_impl's forwarding
+  // constructor `template<class _UHead, class... _UTail, class = enable_if_t
+  // <...>>`.  Locate the pack at whatever position it occupies and take its
+  // arguments from the correspondingly-offset run of the flat template-argument
+  // list: parameters before the pack occupy the leading argument slots, the
+  // pack occupies the next (total_args - (num_params - 1)) slots, and any
+  // trailing parameters occupy the remaining slots.  (When the pack is last --
+  // the common case -- this reduces to the previous behaviour: start index =
+  // num_params - 1, run to the end.)
+  const auto &all_template_params = template_type.template_parameters();
+  std::size_t template_pack_index = all_template_params.size();
+  for(std::size_t i = 0; i < all_template_params.size(); ++i)
+    if(all_template_params[i].get_bool(ID_ellipsis))
     {
-      const auto &pa = full_template_args.arguments()[j];
-      if(pa.id() == ID_type && pa.type().id() == ID_empty)
-        continue; // empty-pack sentinel
-      pack_arguments.push_back(pa);
+      template_pack_index = i;
+      break;
+    }
+  const bool has_template_pack =
+    template_pack_index < all_template_params.size();
+
+  std::vector<exprt> pack_arguments;
+  if(has_template_pack)
+  {
+    const std::size_t non_pack0 = all_template_params.size() - 1;
+    const std::size_t total = full_template_args.arguments().size();
+    if(total >= non_pack0)
+    {
+      const std::size_t pack_count = total - non_pack0;
+      for(std::size_t j = template_pack_index;
+          j < template_pack_index + pack_count && j < total;
+          ++j)
+      {
+        const auto &pa = full_template_args.arguments()[j];
+        if(pa.id() == ID_type && pa.type().id() == ID_empty)
+          continue; // empty-pack sentinel
+        pack_arguments.push_back(pa);
+      }
     }
   }
-  if(
-    !template_type.template_parameters().empty() &&
-    template_type.template_parameters().back().get_bool(ID_ellipsis) &&
-    pack_arguments.size() != 1)
+  if(has_template_pack && pack_arguments.size() != 1)
   {
     const std::size_t pack_sz = pack_arguments.size();
 
