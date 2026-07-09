@@ -1,18 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ first element from its brace-clause: SUCCESS$
-^\[main\.assertion\.2\] line \d+ second element from its brace-clause: SUCCESS$
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main\.assertion\.1\] line \d+ elements initialized from their brace-clauses; missing one value-inited: SUCCESS$
+^\[main\.assertion\.2\] line \d+ a constructor ran exactly once per element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [dcl.init.aggr]/2,5 -- per-element brace-initialization of a class
-array with a user-provided constructor (`S a[N]{ {a}, {b} }`) currently aborts:
-the brace elements are wrapped into an array expression whose operands are never
-type-checked, and indexing that array during construction yields a nil-typed
-expression that crashes simplification.  Affects known- and unknown-bound
-arrays alike.  Flip to CORE once each element is constructed directly from its
-initializer-clause.
+[dcl.init.aggr]/2, [dcl.init.list]/3: per-element brace-initialization of a class
+array whose element type has a user-provided constructor; each element is
+constructed from its brace-clause, missing elements value-initialized.
+Previously crashed symex.  Non-vacuous.
