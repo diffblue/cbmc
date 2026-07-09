@@ -1268,15 +1268,32 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             // patterns (where the parameter merely contains `A`) keep the
             // duplicated form, so this only ever corrects a wrong homogeneous
             // expansion.
+            // N5008 [temp.param]/11: the pack's template arguments start at the
+            // pack's POSITION in the template parameter list, which is
+            // `non_pack_count` only when the pack is the last template
+            // parameter.  When further template parameters follow the pack
+            // (e.g. `template<class U, class... W, class X = void>`), the pack
+            // starts earlier: the leading non-pack parameters before it each
+            // consume one argument.  Using `non_pack_count` there would read
+            // the trailing parameters' arguments as pack elements (binding
+            // e.g. `X`'s `void` into the pack), producing an ill-formed
+            // parameter.  Compute the pack's argument start position directly.
+            std::size_t pack_targ_start = 0;
+            for(const auto &tp : tmpl_params)
+            {
+              if(tp.get_bool(ID_ellipsis))
+                break;
+              ++pack_targ_start;
+            }
             if(
-              non_pack_count < template_args.arguments().size() &&
-              template_args.arguments()[non_pack_count].id() == ID_type &&
+              pack_targ_start < template_args.arguments().size() &&
+              template_args.arguments()[pack_targ_start].id() == ID_type &&
               pack_param.type() ==
-                template_args.arguments()[non_pack_count].type())
+                template_args.arguments()[pack_targ_start].type())
             {
               for(std::size_t i = 0; i < pack_size; ++i)
               {
-                const std::size_t targ = non_pack_count + i;
+                const std::size_t targ = pack_targ_start + i;
                 if(
                   targ < template_args.arguments().size() &&
                   template_args.arguments()[targ].id() == ID_type)
@@ -7034,12 +7051,66 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     const auto &params = cpp_declaration.template_type().template_parameters();
     auto &args = template_args.arguments();
 
-    for(std::size_t i = 0; i < args.size() && i < params.size(); i++)
+    // N5008 [temp.param]/11: a template parameter pack of a function template
+    // may be followed by further template parameters, provided they are
+    // deducible from the parameter-type-list or have default arguments.  When a
+    // non-empty pack has been expanded above, it occupies `pack_expansion_size`
+    // slots in `args` instead of one, so every template parameter that FOLLOWS
+    // the pack is shifted right in `args` by (pack_expansion_size - 1).  Map an
+    // argument position back to its template parameter accordingly, and iterate
+    // over every argument position (not only the first params.size()) so a
+    // trailing parameter whose default must be applied (e.g. `class X = void`
+    // after `class... W`) is not skipped and left spuriously unassigned.
+    std::size_t pack_param_index = params.size();
+    if(has_non_empty_pack)
     {
+      for(std::size_t p = 0; p < params.size(); ++p)
+      {
+        if(params[p].get_bool(ID_ellipsis))
+        {
+          pack_param_index = p;
+          break;
+        }
+      }
+    }
+    const std::size_t pack_extra =
+      (has_non_empty_pack && pack_expansion_size > 0 &&
+       pack_param_index < params.size())
+        ? pack_expansion_size - 1
+        : 0;
+
+    // N5008 [temp.variadic]/8: `sizeof...(pack)` is the number of elements in
+    // the pack.  A template parameter that FOLLOWS the pack may have a default
+    // argument that queries the pack size -- e.g. std::_Tuple_impl's forwarding
+    // constructor constraint `enable_if_t<sizeof...(_Tail) == sizeof...(_UTail)>`
+    // on the defaulted trailing parameter.  The pack's size is otherwise
+    // recorded (in pack_size_map) only AFTER this default-application loop, so
+    // the default argument would evaluate `sizeof...(pack)` against a stale
+    // (zero) count and spuriously fail the SFINAE constraint.  Record it now so
+    // the trailing default sees the deduced element count.
+    if(has_non_empty_pack && pack_param_index < params.size())
+    {
+      const irep_idt pack_id =
+        params[pack_param_index].type().get(ID_identifier);
+      if(!pack_id.empty())
+        cpp_typecheck.template_map.pack_size_map[pack_id] = pack_expansion_size;
+    }
+
+    for(std::size_t i = 0; i < args.size(); i++)
+    {
+      // Template-parameter index corresponding to argument position i: the pack
+      // occupies (pack_extra + 1) argument slots, so parameters after it are
+      // reached at an argument index shifted right by pack_extra.
+      std::size_t pi = i;
+      if(pack_extra > 0 && i > pack_param_index + pack_extra)
+        pi = i - pack_extra;
+      if(pi >= params.size())
+        continue;
+
       if(args[i].id() == ID_unassigned || args[i].type().id() == ID_unassigned)
       {
         const template_parametert &param =
-          static_cast<const template_parametert &>(params[i]);
+          static_cast<const template_parametert &>(params[pi]);
 
         // Variadic pack with zero arguments: truncate args here.
         if(param.get_bool(ID_ellipsis))
