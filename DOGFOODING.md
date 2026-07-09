@@ -1734,3 +1734,27 @@ Java-only -- identical on the pre-change baseline -- and are unaffected by these
 C++-front-end changes.)
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 Cluster B re-diagnosis: "template parameter after a pack" (KNOWNBUG)
+
+Re-investigated Cluster B (cpp17_tuple_basic / cpp17_apply_basic).  The earlier
+timeout/crash is gone (pack-expansion rework + char-literal fix landed):
+cpp17_tuple_basic now type-checks and runs symex, failing only because
+std::make_tuple returns a tuple whose element-storing CONSTRUCTORS have no body
+(get<0> reads an uninitialised member).  Root-caused, header-free, to a function
+template with a template parameter FOLLOWING a parameter pack ([temp.param]/11) --
+the shape of std::_Tuple_impl's forwarding constructor
+`template<class _UHead, class... _UTail, class = enable_if_t<...>>`.  Minimal:
+`template<class U, class... W, class X = void> int first(U,W...); first(5,6,7);`
+is well-formed (g++) but CBMC reports "found no match" / CONVERSION ERROR (and,
+inside a template body, drops the body: "no body for callee").
+
+Two layers: (1) deduction's default-argument application mis-aligns the trailing
+parameter once the pack is expanded (a pack-aware arg->param index mapping fixes
+it, verified); (2) even then the deduced instance is rejected at
+disambiguation/instantiation -- STILL OPEN.  The (1) fix greens no end-to-end
+test alone, so it was not committed (per .kiro/decltype_tuple_apply_findings.md
+discipline).  Recorded as KNOWNBUG cpp11_template_param_after_pack with a precise
+[temp.param]/11 reproducer.  No source change; dog-food unchanged.
+
+*Updated: 2026-07-09*

@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ template parameter following a parameter pack: value deduced/returned: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.param]/11 -- a function-template parameter pack may be
+followed by further (deducible or defaulted) template parameters.  CBMC's
+deduction mis-aligns the trailing parameter with its argument once the pack is
+expanded, so `first(5,6,7)` for
+`template<class U, class... W, class X = void> int first(U, W...)` is rejected
+("found no match" / CONVERSION ERROR) even though it is well-formed.  This is the
+current root cause of cpp17_tuple_basic (std::_Tuple_impl's forwarding
+constructor has a template parameter after its pack).  Flip to CORE once a
+template parameter following a parameter pack is deduced/instantiated correctly.
