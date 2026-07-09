@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ out-of-line template member return type resolved; body correct: SUCCESS$
@@ -9,10 +9,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [temp.inst]/2, [basic.lookup.unqual] -- a class template's out-of-line
-member is instantiated with the method scope created under whatever scope first
-triggered the instantiation, rather than under the template's own scope, so a
-namespace-scope typedef in the member's return type is looked up in the wrong
-scope ("symbol 'SID' is unknown").  Reduced from the interval_union.cpp dog-food
-failure.  An unconditional fix regresses real-STL instantiations
-(std::unordered_map); a narrowly-scoped fix is still needed.  Flip to CORE then.
+[temp.inst]/2, [basic.lookup.unqual]: a class template's (out-of-line) member is
+instantiated in the context of the instantiated class, so a namespace-scope
+typedef in the member's return type resolves correctly regardless of where the
+instantiation is triggered.  Reduced from the interval_union.cpp dog-food
+failure ("symbol '_StateIdT' is unknown").  Non-vacuous.
