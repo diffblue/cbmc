@@ -1633,3 +1633,39 @@ cpp11_template_outofline_member_ns_return promoted to CORE.  cbmc-cpp, cbmc and
 JBMC exception tests all pass.
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 operator overload resolution: free non-template over member template
+
+Fixed one of the two sub-causes of the message.h "operator 'shl' not defined"
+dog-food noise.  For `a << b` where a's class has a member operator<< that is a
+function template, CBMC resolved the member candidate first -- instantiating its
+body -- before considering the non-member set; if the member template body is
+ill-formed for the deduced argument (mstreamt's
+`template<class T> operator<<(const T&)` doing `std::ostream << x` for the `eom`
+manipulator type `eomt`) a hard "shl" error was emitted even though the free
+`operator<<(mstreamt&, eomt)` should win.  Now, when the class has a template
+member operator@, the non-member operator@ is resolved first and, if it is a
+non-template that matches every operand exactly, preferred without instantiating
+the member template ([over.match.oper]/3, [over.match.best]/2, [temp.inst]/2).
+
+Cleared 5 of 7 files (message, parser, piped_process, ui_message, cout_message);
+dog-food noisy 21->16, clean 96->101, still 0 FAIL / 0 crash.  New CORE test
+cpp11_operator_free_over_member_template.  cbmc-cpp, cbmc, JBMC exception tests
+all pass.
+
+Remaining shl noise (parse_options.cpp, typecheck.cpp): a distinct sub-cause --
+`std::ostream << <string literal / const char*>` inside a member function
+template body does not resolve to the file-scope free
+`operator<<(basic_ostream<C>&, const char*)` (fails for both string literals and
+const char* values, so not array-decay; specific to the member-template-body
+instantiation context).  Not yet fixed.
+
+Cluster B (cpp17 tuple/apply/make_tuple + unique_ptr_member_enable_if) remains
+KNOWNBUG: per .kiro/decltype_tuple_apply_findings.md it is a documented
+several-day, multi-bug undertaking (pack expansion of nested-pack patterns
+across four substitution sites, a to_struct_tag_type conversion crash on the
+partially-resolved return type, and symex non-termination from inconsistent
+tuple instantiations); a build() pack-binding fix greens tuple_basic but
+regresses std::optional.
+
+*Updated: 2026-07-09*
