@@ -1576,3 +1576,36 @@ tests all pass; dog-food unchanged at 95 clean / 21 noisy / 1 FAIL / 0 crash
 (remaining FAIL: interval_union.cpp regex out-of-line member lookup).
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 interval_union regex out-of-line member return-type scope (analyzed; KNOWNBUG)
+
+Reduced the src/util/interval_union.cpp dog-food failure ("symbol '_StateIdT' is
+unknown" while instantiating std::__detail::_NFA<regex_traits>) to a minimal,
+header-free, g++-valid reproducer (via cvise): a class template with an
+out-of-line member whose leading return type is a namespace-scope typedef,
+instantiated after a namespace-scope overload resolution of operator<< that
+considers an alias-template return type (`bop<I> = I::__type`).
+
+Root cause (pinpointed with instrumentation): when instantiating a class
+template's methods, CBMC restores the scope saved at entry to
+instantiate_template -- the scope that first triggered the instantiation --
+before typecheck_template_parameters creates each method's template scope.  The
+alias-template overload resolution makes _NFA<char> first be instantiated from a
+function-body scope, so the out-of-line member's method scope is created under
+that function-body scope (observed `f()::1::template::N`) instead of under the
+template's own scope (`det::template::M`); the namespace-scope typedef in the
+return type is then looked up in the wrong scope and not found.
+([temp.inst]/2, [basic.lookup.unqual], [dcl.meaning].)
+
+Recorded as KNOWNBUG cpp11_template_outofline_member_ns_return.  An unconditional
+fix (re-enter the template scope before instantiating each method) resolves the
+reproducer and passes cbmc-cpp, but has an unacceptable blast radius: it
+regressed the dog-food from 95 clean/1 FAIL to 17 clean/65 FAIL by breaking
+real-STL template instantiations (std::unordered_map and many others) that rely
+on the restored instantiation-context scope (its using-directives / template-map
+bindings).  A correct narrowly-scoped fix -- preserving the instantiation-context
+using-scopes while ensuring the template's namespace is reachable during
+out-of-line member return-type resolution -- is still needed; the fix attempt was
+reverted.  Dog-food remains 95 clean / 21 noisy / 1 FAIL / 0 crash.
+
+*Updated: 2026-07-09*
