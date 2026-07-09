@@ -1669,3 +1669,31 @@ tuple instantiations); a build() pack-binding fix greens tuple_basic but
 regresses std::optional.
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 string-literal shl sub-cause: root-caused, recorded as KNOWNBUG
+
+Investigated the residual shl dog-food noise in parse_options.cpp and
+typecheck.cpp (after the free-vs-member-template fix cleared 5 of 7 files).  Root
+cause: inside mstreamt's member operator<< template body,
+`static_cast<std::ostream &>(*this) << x` has a reference-typed left operand, and
+CBMC's binary-operator resolution enters the member-operator candidate path only
+when the operand's type node is exactly ID_struct_tag -- so a reference-to-class
+operand never gathers member operator@ candidates ([over.match.oper]/3.2).
+`std::ostream << <int>` therefore misses std::basic_ostream's member
+operator<<(int) and falls back to the built-in shift.  The `<< <const char*>`
+variant additionally needs the combined member + non-member candidate set
+([over.match.oper]/3): the free operator<<(basic_ostream<C>&, const char*)
+competes with the member operator<<(const void*), which CBMC evaluates as
+separate member/non-member paths.
+
+Surgical attempts (a nil-guarded global-scope non-member fallback; stripping the
+reference in the member gate) each fixed synthetic minimal reproducers and passed
+cbmc-cpp, but on the real std::basic_ostream they only turned one error into
+another (shl -> "no match") without clearing a dog-food file, and the gate-strip
+is a broad change to all operator resolution.  Both were reverted.  A clean fix
+requires gathering member + non-member operator candidates together for a
+reference-typed operand.  Recorded as KNOWNBUG
+cpp11_operator_reference_operand_member.  Dog-food unchanged at 101 clean / 16
+noisy / 0 FAIL / 0 crash.
+
+*Updated: 2026-07-09*
