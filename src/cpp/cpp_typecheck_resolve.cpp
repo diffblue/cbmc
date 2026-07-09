@@ -4404,6 +4404,45 @@ exprt cpp_typecheck_resolvet::resolve(
       id_set.swap(filtered);
   }
 
+  // N5008 [over.match.oper]/3.3: for an operator expression `a @ b`, the set of
+  // non-member candidates is the result of the unqualified lookup of operator@
+  // in the context of the expression "except that all member functions are
+  // ignored".  When the expression appears inside a member function of a class
+  // that itself declares operator@ -- e.g. `static_cast<std::ostream &>(*this)
+  // << x` inside messaget::mstreamt::operator<< -- ordinary unqualified lookup
+  // finds that member operator@ and, left in the candidate set, it competes
+  // with (and hides) a free operator@ found by argument-dependent lookup (here
+  // the standard library's operator<<(basic_ostream<C> &, const char *)),
+  // making the free operator unselectable and the built-in shift the only
+  // fallback.  Drop genuine member functions (is_method) from the non-member
+  // operator candidate set.  Non-member friends declared inside a class have
+  // is_method == false and are NOT members, so ADL-found hidden friends still
+  // participate ([over.match.oper]/3.3 second bullet, [basic.lookup.argdep]).
+  // This only applies to the non-member resolution (has_object == false,
+  // unqualified): the member candidate set is gathered by the separate
+  // has_object == true resolution in operator_is_overloaded.
+  const bool op_nonmember_lookup =
+    !qualified && !fargs.has_object && is_operator_name;
+  if(op_nonmember_lookup && !id_set.empty())
+  {
+    cpp_scopest::id_sett non_members;
+    for(auto *cand : id_set)
+    {
+      if(!cand->is_method)
+        non_members.insert(cand);
+    }
+    // Only strip members when a genuine non-member candidate remains.  A set
+    // containing ONLY member candidates is left intact: CBMC also reaches this
+    // non-member resolution as a fallback for a member operator@ whose
+    // has_object resolution did not select a candidate (e.g. a compound-
+    // assignment operator@= that is only a member), and emptying the set there
+    // would spuriously make the operator "unknown".  The [over.match.oper]/3.3
+    // exclusion only needs to fire when a free/ADL operator@ would otherwise be
+    // hidden by an in-scope member operator@ of the same name.
+    if(!non_members.empty() && non_members.size() < id_set.size())
+      id_set.swap(non_members);
+  }
+
   if(id_set.empty() && qualified)
   {
     // The scope might be an un-elaborated template class instance.
@@ -7360,7 +7399,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // any decltype so the parameter names it references resolve during the
       // type-check below.
       std::function<bool(const irept &)> contains_decltype =
-        [&](const irept &t) -> bool {
+        [&](const irept &t) -> bool
+      {
         if(t.id() == ID_decltype)
           return true;
         for(const auto &s : t.get_sub())
@@ -8197,15 +8237,26 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
   // Search in the namespaces associated with the argument types.
   for(const auto &arg : fargs.operands)
   {
-    if(arg.type().id() != ID_struct_tag && arg.type().id() != ID_union_tag)
+    // N5008 [basic.lookup.argdep]/2: if an argument is a reference, its
+    // associated types are those of the referenced type.  CBMC models a
+    // reference as a pointer carrying #reference (as produced by e.g.
+    // `static_cast<std::ostream &>(x)`), so strip a leading reference to reach
+    // the class type; otherwise the class's associated namespace is missed and
+    // an ADL-only operator@ (one hidden from ordinary lookup by an in-scope
+    // member operator@ of the same name) is never found.
+    typet arg_type = arg.type();
+    if(is_reference(arg_type))
+      arg_type = to_reference_type(arg_type).base_type();
+
+    if(arg_type.id() != ID_struct_tag && arg_type.id() != ID_union_tag)
       continue;
 
     const struct_union_typet &final_type =
-      arg.type().id() == ID_struct_tag
+      arg_type.id() == ID_struct_tag
         ? static_cast<const struct_union_typet &>(
-            cpp_typecheck.follow_tag(to_struct_tag_type(arg.type())))
+            cpp_typecheck.follow_tag(to_struct_tag_type(arg_type)))
         : static_cast<const struct_union_typet &>(
-            cpp_typecheck.follow_tag(to_union_tag_type(arg.type())));
+            cpp_typecheck.follow_tag(to_union_tag_type(arg_type)));
 
     // Search in the struct's own scope (for friend declarations)
     const irep_idt &struct_name = final_type.get(ID_name);
