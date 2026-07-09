@@ -1729,11 +1729,23 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
       // instead.
 
       // TODO: need to resolve an incomplete struct (template) here
-      // go into scope of first operand
-      if(to_multi_ary_expr(expr).op0().type().id() == ID_struct_tag)
+      // go into scope of first operand.
+      //
+      // N5008 [over.match.oper]/3.2: the member candidate set for `a @ b` is
+      // the qualified lookup of `T1::operator@`, where T1 is the type of the
+      // left operand.  An lvalue of reference-to-class type (as produced by
+      // e.g. `static_cast<std::ostream &>(x)`) is an lvalue of the referenced
+      // class type and thus has that class's member operators as candidates,
+      // but CBMC represents such an operand with a reference type rather than
+      // the bare struct_tag -- strip a leading reference before deciding
+      // whether the first operand has class type.
+      typet op0_operator_type = to_multi_ary_expr(expr).op0().type();
+      if(is_reference(op0_operator_type))
+        op0_operator_type = to_reference_type(op0_operator_type).base_type();
+      if(op0_operator_type.id() == ID_struct_tag)
       {
         const irep_idt &struct_identifier =
-          to_multi_ary_expr(expr).op0().type().get(ID_identifier);
+          op0_operator_type.get(ID_identifier);
 
         // [over.match.oper]/3.2: the SET OF MEMBER CANDIDATES is
         // the result of a qualified lookup of `T1::operator@`.
@@ -1904,9 +1916,32 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           fargs.has_object = true;
           fargs.in_use = true;
 
-          // should really be a qualified search
-          exprt resolve_result =
-            resolve(cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+          // should really be a qualified search.
+          //
+          // N5008 [over.match.oper]/3: the member and non-member operator@
+          // candidates form ONE overload set.  If no *member* candidate is
+          // viable for these operands, resolution must continue with the
+          // non-member candidates -- it is not an error yet.  CBMC's resolve
+          // throws (rather than returning nil) when the member scope declares
+          // same-named candidates but none is viable for the given arguments;
+          // catch that here so the non-member ("2nd option") path below is
+          // still tried, instead of turning a member-candidate mismatch into a
+          // hard "found no match"/built-in-shift error.  Surfaces for
+          // `static_cast<std::ostream &>(x) << "literal"` inside mstreamt's
+          // member operator<< template body: std::basic_ostream has member
+          // operator<< overloads but none is viable for a `const char *`
+          // argument, so the free operator<<(basic_ostream<C> &, const char *)
+          // must be selected.
+          exprt resolve_result = nil_exprt();
+          try
+          {
+            resolve_result = resolve(
+              cpp_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
+          }
+          catch(int)
+          {
+            resolve_result = nil_exprt();
+          }
 
           if(resolve_result.is_not_nil())
           {
