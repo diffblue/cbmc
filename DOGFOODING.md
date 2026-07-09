@@ -1780,3 +1780,24 @@ recursive forwarding constructors to resolve and stays KNOWNBUG (next layer
 documented in .kiro/decltype_tuple_apply_findings.md).
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 recursive forwarding tuple constructor (empty pack after params) fixed
+
+Fixed the next Cluster B layer: a recursive variadic forwarding constructor (the
+std::_Tuple_impl shape) whose member-initializer builds its base from the tail
+pack, with an enable_if trailing constraint over both the constructor and class
+parameter packs.  Two residual "parameter pack is the last template parameter"
+assumptions in guess_function_template_args were fixed for the EMPTY-pack
+terminal recursion: the default-argument loop no longer truncates trailing
+template parameters at an empty pack, and pack_size_map is recorded even for an
+empty pack so a trailing `sizeof...(pack)` constraint resolves the current pack
+rather than a stale outer same-named pack.  New CORE test
+cpp11_recursive_forwarding_tuple_ctor (a faithful header-free mini-std::tuple).
+
+cbmc-cpp (-X libcxx) + cbmc pass; dog-food unchanged (103 clean / 14 noisy /
+0 FAIL / 0 crash); jbmc's 10 exception/catch failures are pre-existing (confirmed
+identical on the stashed baseline).  cpp17_tuple_basic still needs libstdc++
+std::tuple's many-overload constructor selection (allocator variants + the
+_TupleConstraints SFINAE + Part-2 ODR-use body instantiation) and stays KNOWNBUG.
+
+*Updated: 2026-07-09*

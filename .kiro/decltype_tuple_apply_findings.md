@@ -428,3 +428,34 @@ constructor call `Inh(fwd<UT>(t)...)` in the member-initializer list does not
 resolve (a param-after-pack forwarding constructor invoked recursively over the
 shrinking tail).  This is the next layer for tuple_basic; apply_basic
 additionally needs the Part-2 decltype/invoke_result member-instantiation work.
+
+## LANDED (2026-07-09): recursive forwarding base-ctor with an empty pack + param-after-pack
+
+Committed ac809c0e1e (src) + CORE test cpp11_recursive_forwarding_tuple_ctor.
+The recursive variadic forwarding constructor layer (std::_Tuple_impl shape) is
+fixed: a parameter pack deduced to zero elements at the terminal recursion, with
+further template parameters after it, no longer breaks deduction.  Two residual
+"pack is last" assumptions in guess_function_template_args were fixed: (1) the
+default-argument loop truncated trailing parameters at an empty pack's
+placeholder (now erases only the placeholder and continues, tracking the shift);
+(2) pack_size_map is now recorded even for an empty pack (size 0), so a trailing
+`sizeof...(pack)` default (an enable_if constraint) resolves the CURRENT pack via
+scope-qualified lookup instead of a stale outer same-named pack.  A faithful
+header-free mini-std::tuple (recursion + forwarding + std::forward + enable_if
+<sizeof...(UT)==sizeof...(Tail)> + empty-pack terminal) now stores each element
+correctly.  cbmc-cpp + cbmc pass; dog-food unchanged; jbmc's 10 exception/catch
+failures are pre-existing (confirmed identical on the stashed baseline).
+
+## STILL OPEN for cpp17_tuple_basic: libstdc++ tuple's many-overload ctor selection
+
+Real std::make_tuple STILL returns a tuple with uninitialised members and the
+std::_Tuple_impl / std::_Head_base constructors STILL have no goto bodies, with
+NO diagnostic emitted.  The instantiated std::tuple constructors present are the
+allocator-taking overloads (allocator_arg_t variants) with an unresolved `_Alloc`
+template parameter; the plain forwarding constructor make_tuple selects
+(`tuple(_UElements&&...)` guarded by the _TupleConstraints SFINAE) does not get a
+body.  This is a distinct, larger layer -- libstdc++ std::tuple's ~10 constructor
+overloads plus the _TupleConstraints / is_constructible SFINAE and the Part-2
+ODR-use-driven member-function-body instantiation -- not the recursive-forwarding
+mechanism (which the faithful reproducer above now exercises correctly).
+cpp17_tuple_basic / cpp17_apply_basic stay KNOWNBUG.
