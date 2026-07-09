@@ -1548,3 +1548,31 @@ investigation of out-of-line template member return-type lookup during
 instantiation.
 
 *Updated: 2026-07-08*
+
+### 2026-07-09 per-element brace-init of a class array (bug fixed, KNOWNBUG->CORE)
+
+Fixed the previously-recorded defect: per-element brace-initialization of an
+array whose element type has a user-provided constructor, `S a[N]{ {a}, {b} }`,
+aborted symex.  cpp_constructor's array brace-init branch built an array_exprt
+from the raw brace elements and copy-constructed each element; for a class with a
+user-provided constructor the brace elements are constructor-call list-inits left
+untyped, so indexing that array yielded a nil-typed expression that crashed
+simplify_rec.
+
+Now, when the element type has a user-provided constructor (i.e. is not an
+aggregate, [dcl.init.aggr]/1, [dcl.init.list]/3), each element is constructed in
+place from its own initializer-clause: `{args}` forwards its elements as the
+constructor arguments, a plain value/temporary is a single initializer, and a
+missing clause value-initializes.  Aggregate and scalar element types keep the
+array_exprt path, so an array of an aggregate `{ id, array }` (e.g.
+simplify_utils.cpp's saj_table) is still initialized member-wise.  An earlier
+attempt gated on non-POD-ness and broke saj_table (it has non-trivial members
+but no user constructor); the correct gate is the presence of a user-provided
+constructor.
+
+cpp11_array_element_brace_init flipped KNOWNBUG->CORE; new companion
+cpp11_array_element_brace_init_aggregate CORE.  cbmc-cpp, cbmc and JBMC exception
+tests all pass; dog-food unchanged at 95 clean / 21 noisy / 1 FAIL / 0 crash
+(remaining FAIL: interval_union.cpp regex out-of-line member lookup).
+
+*Updated: 2026-07-09*
