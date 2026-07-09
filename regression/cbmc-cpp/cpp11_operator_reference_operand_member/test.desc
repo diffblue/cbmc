@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member operator<< found via a reference-typed operand: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: [over.match.oper]/3.2 -- a reference-to-class lvalue operand (e.g.
+`static_cast<std::ostream&>(x)`) does not participate in member operator@
+overload resolution because CBMC's gate requires the operand's type node to be
+exactly ID_struct_tag, not a reference to one.  So `ostream << <int>` inside a
+member operator<< template body fails with "operator 'shl' not defined".  This is
+the residual src/util (parse_options.cpp, typecheck.cpp) dog-food shl noise after
+the free-vs-member-template fix.  A clean fix needs the combined member +
+non-member candidate set of [over.match.oper]/3 for reference-typed operands.
+Flip to CORE once that lands.
