@@ -7061,16 +7061,16 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     // over every argument position (not only the first params.size()) so a
     // trailing parameter whose default must be applied (e.g. `class X = void`
     // after `class... W`) is not skipped and left spuriously unassigned.
+    // Locate this function/constructor template's own parameter pack (if any).
+    // It need not be the last template parameter ([temp.param]/11), and it may
+    // be empty (pack_expansion_size == 0) in this instantiation.
     std::size_t pack_param_index = params.size();
-    if(has_non_empty_pack)
+    for(std::size_t p = 0; p < params.size(); ++p)
     {
-      for(std::size_t p = 0; p < params.size(); ++p)
+      if(params[p].get_bool(ID_ellipsis))
       {
-        if(params[p].get_bool(ID_ellipsis))
-        {
-          pack_param_index = p;
-          break;
-        }
+        pack_param_index = p;
+        break;
       }
     }
     const std::size_t pack_extra =
@@ -7079,16 +7079,22 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         ? pack_expansion_size - 1
         : 0;
 
-    // N5008 [temp.variadic]/8: `sizeof...(pack)` is the number of elements in
-    // the pack.  A template parameter that FOLLOWS the pack may have a default
-    // argument that queries the pack size -- e.g. std::_Tuple_impl's forwarding
-    // constructor constraint `enable_if_t<sizeof...(_Tail) == sizeof...(_UTail)>`
-    // on the defaulted trailing parameter.  The pack's size is otherwise
-    // recorded (in pack_size_map) only AFTER this default-application loop, so
-    // the default argument would evaluate `sizeof...(pack)` against a stale
-    // (zero) count and spuriously fail the SFINAE constraint.  Record it now so
-    // the trailing default sees the deduced element count.
-    if(has_non_empty_pack && pack_param_index < params.size())
+    // N5008 [temp.variadic]/8 + [basic.scope.temp]/2: `sizeof...(pack)` counts
+    // the elements of the pack named in the current scope.  A template
+    // parameter that FOLLOWS the pack may have a default argument that queries
+    // the pack size -- e.g. std::_Tuple_impl's forwarding constructor
+    // constraint `enable_if_t<sizeof...(_Tail) == sizeof...(_UTail)>` on the
+    // defaulted trailing parameter.  The pack's size is otherwise recorded (in
+    // pack_size_map) only AFTER this default-application loop, so the default
+    // would evaluate `sizeof...(pack)` against a stale count.  Record it now --
+    // including the EMPTY case (size 0): in a recursive instantiation an
+    // enclosing instance's same-named pack is still in pack_size_map, so unless
+    // THIS instance's (possibly empty) pack is recorded, the scope-qualified
+    // lookup in the sizeof... evaluation finds nothing and falls back to a
+    // suffix match against the stale outer pack (mis-sizing the constraint and
+    // wrongly rejecting the constructor -- the std::_Tuple_impl terminal
+    // recursion).
+    if(pack_param_index < params.size())
     {
       const irep_idt pack_id =
         params[pack_param_index].type().get(ID_identifier);
@@ -7096,12 +7102,22 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         cpp_typecheck.template_map.pack_size_map[pack_id] = pack_expansion_size;
     }
 
+    // An EMPTY pack (deduced to zero elements) occupies one placeholder slot in
+    // `args` (emitted by build_template_args) but zero real arguments.  When
+    // template parameters FOLLOW the pack ([temp.param]/11), dropping the
+    // placeholder shifts those parameters one position ahead of their argument
+    // slots; track that shift so their defaults are still applied (rather than
+    // truncating them away with the pack).
+    std::size_t empty_pack_shift = 0;
+
     for(std::size_t i = 0; i < args.size(); i++)
     {
-      // Template-parameter index corresponding to argument position i: the pack
-      // occupies (pack_extra + 1) argument slots, so parameters after it are
-      // reached at an argument index shifted right by pack_extra.
-      std::size_t pi = i;
+      // Template-parameter index corresponding to argument position i: a
+      // non-empty pack occupies (pack_extra + 1) argument slots, so parameters
+      // after it are reached at an argument index shifted right by pack_extra;
+      // an already-dropped EMPTY pack leaves its following parameters one
+      // position ahead of their argument slots (empty_pack_shift).
+      std::size_t pi = i + empty_pack_shift;
       if(pack_extra > 0 && i > pack_param_index + pack_extra)
         pi = i - pack_extra;
       if(pi >= params.size())
@@ -7112,7 +7128,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         const template_parametert &param =
           static_cast<const template_parametert &>(params[pi]);
 
-        // Variadic pack with zero arguments: truncate args here.
+        // Variadic pack with zero arguments.
         if(param.get_bool(ID_ellipsis))
         {
           const std::string full_id =
@@ -7120,8 +7136,26 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           auto pos = full_id.rfind("::");
           pack_param_name =
             pos != std::string::npos ? full_id.substr(pos + 2) : full_id;
-          args.resize(i);
           variadic_pack_empty = true;
+
+          // N5008 [temp.param]/11: if further template parameters follow the
+          // (empty) pack, do NOT truncate them away -- the empty pack simply
+          // contributes no arguments.  Remove only its placeholder slot and
+          // continue so the trailing parameters still receive their (deducible
+          // or default) arguments.  `first(5)` for
+          // `template<class U, class... W, class X = void> ... first(U, W...)`
+          // must keep and default `X`; truncating dropped it, leaving the call
+          // unresolvable (the residual std::_Tuple_impl terminal recursion).
+          if(pi + 1 < params.size())
+          {
+            args.erase(args.begin() + i);
+            ++empty_pack_shift;
+            --i; // ++i re-examines the now-shifted trailing parameter's slot
+            continue;
+          }
+
+          // The pack is the last template parameter: truncate at it.
+          args.resize(i);
           break;
         }
 
