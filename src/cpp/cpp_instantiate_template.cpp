@@ -3647,6 +3647,25 @@ skip_pack_removal_ft:
     {
       saved_scope.restore();
 
+      // A class template's members -- including those defined out of line --
+      // are instantiated in the context of the (instantiated) class
+      // ([temp.inst]/2, [basic.lookup.unqual], [dcl.meaning]): unqualified name
+      // lookup in a member must reach the class's own members and, through the
+      // class's enclosing namespace, namespace-scope names.
+      // typecheck_template_parameters below creates the method's template scope
+      // under the current scope, so enter the instantiated class's scope first.
+      // Merely restoring the scope that first triggered the instantiation (e.g.
+      // a function body, as when overload resolution instantiates the class)
+      // would look names up there instead -- a namespace-scope name in an
+      // out-of-line member's return type would not be found -- while entering
+      // only the template-parameter scope would miss the class's own members.
+      const irep_idt inst_class_name = new_decl.type().get(ID_identifier);
+      auto inst_scope_it = cpp_scopes.id_map.find(inst_class_name);
+      if(!inst_class_name.empty() && inst_scope_it != cpp_scopes.id_map.end())
+        cpp_scopes.go_to(*inst_scope_it->second);
+      else
+        cpp_scopes.go_to(*template_scope);
+
       cpp_declarationt method_decl =
         static_cast<const cpp_declarationt &>(static_cast<const irept &>(tm));
 
