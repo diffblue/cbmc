@@ -1697,3 +1697,40 @@ cpp11_operator_reference_operand_member.  Dog-food unchanged at 101 clean / 16
 noisy / 0 FAIL / 0 crash.
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 combined operator candidate set for reference-typed operands (shl cluster resolved)
+
+Implemented the N5008 [over.match.oper]/3 combined member + non-member operator
+candidate set for an operator expression whose left operand is an lvalue of
+reference-to-class type (e.g. `static_cast<std::ostream &>(x) << y`, which CBMC
+represents with a reference type rather than a bare struct_tag).  This clears the
+residual "operator 'shl' not defined" noise in src/util/parse_options.cpp and
+typecheck.cpp: inside messaget::mstreamt's member operator<< template body,
+`static_cast<std::ostream &>(*this) << x` now resolves both to basic_ostream's
+member operator<< (for e.g. `<int>`) and to the free
+operator<<(basic_ostream<C> &, const char *) (for `<const char*>`), instead of
+falling back to the built-in shift.
+
+Four coordinated, standards-grounded changes:
+* [over.match.oper]/3.2 -- strip a leading reference from the first operand's
+  type before the member-operator gate (member candidates for a ref-to-class
+  lvalue).
+* [over.match.oper]/3   -- member+non-member candidates are one set: catch
+  resolve()'s throw when the member scope has same-named-but-non-viable
+  candidates and fall through to the non-member path.
+* [over.match.oper]/3.3 -- exclude genuine member functions (cpp_idt::is_method)
+  from the non-member operator candidate set, but only when a non-member remains
+  (friends kept).
+* [basic.lookup.argdep]/2 -- strip a leading reference from each operand type in
+  resolve_with_arguments (ADL), so a reference-typed operand's class associated
+  namespace (and any ADL-only operator hidden by an in-scope member operator) is
+  found.
+
+KNOWNBUG cpp11_operator_reference_operand_member flipped to CORE; added CORE
+cpp11_operator_reference_operand_free.  Validation: cbmc-cpp (-X libcxx) and the
+cbmc suite pass; dog-food (goto-cc --expand) 101 -> 103 clean, 16 -> 14 noisy,
+0 FAIL / 0 crash.  (The 6 failing jbmc exception tests are pre-existing and
+Java-only -- identical on the pre-change baseline -- and are unaffected by these
+C++-front-end changes.)
+
+*Updated: 2026-07-09*
