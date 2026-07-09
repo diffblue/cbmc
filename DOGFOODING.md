@@ -1758,3 +1758,25 @@ discipline).  Recorded as KNOWNBUG cpp11_template_param_after_pack with a precis
 [temp.param]/11 reproducer.  No source change; dog-food unchanged.
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 template parameter after a parameter pack ([temp.param]/11) fixed
+
+Fixed a family of front-end bugs that assumed a function-template parameter pack
+is the LAST template parameter, so a call like `first(5,6,7)` for
+`template<class U, class... W, class X = void> int first(U, W...)` was rejected
+("found no match" / CONVERSION ERROR) though well-formed.  Four coordinated,
+standards-grounded fixes (deduction default-argument alignment; pack-size
+recording before the default loop so a trailing `sizeof...` default is correct;
+guess-side per-element pack type assignment indexed from the pack's position; the
+free-function parameter-pack expander in instantiate_template made
+pack-position-aware).  This is the deduction/instantiation root cause behind
+cpp17_tuple_basic (std::_Tuple_impl's forwarding constructor has a parameter
+after its pack).  Promoted KNOWNBUG cpp11_template_param_after_pack -> CORE.
+
+cbmc-cpp (-X libcxx) + cbmc pass; dog-food unchanged (103 clean / 14 noisy /
+0 FAIL / 0 crash); the 8 jbmc exception failures are pre-existing (confirmed on
+the pre-change baseline, Java-only).  cpp17_tuple_basic itself still needs its
+recursive forwarding constructors to resolve and stays KNOWNBUG (next layer
+documented in .kiro/decltype_tuple_apply_findings.md).
+
+*Updated: 2026-07-09*
