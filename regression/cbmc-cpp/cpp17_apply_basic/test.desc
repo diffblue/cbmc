@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+--
 Reclassified as KNOWNBUG by the member-alias template-parameter identity fix
 (template_map.cpp, per [temp.local]/1).  That fix makes std::decay resolve
 correctly, which reroutes std::apply's invoke_result/decltype instantiation
