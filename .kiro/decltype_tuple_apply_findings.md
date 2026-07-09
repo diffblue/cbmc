@@ -342,3 +342,44 @@ committed.  Recorded as KNOWNBUG cpp11_template_param_after_pack.  Completing
 Cluster B needs layer (2) plus the remaining make_tuple/apply chain
 (apply_basic still hits the decltype/invoke_result member-instantiation gap,
 Part 2).
+
+## UPDATE (2026-07-09 cont.): Layer 2 is multi-sublayer in the instantiation engine
+
+Traced Layer 2 (the deduced param-after-pack instance still rejected after Layer 1
+makes deduction succeed).  Sequence for `first(5,6,7)` with
+`template<class U, class... W, class X = void> int first(U u, W...)`:
+- Layer 1 (deduction, cpp_typecheck_resolve.cpp ~7036 default-arg loop): a
+  pack-aware arg->param index mapping makes X's default apply; guess returns a
+  valid instance whose (already-expanded) function_type is `int(int,int,int)`
+  with flat #C_template_arguments = [int,int,int,void].  VERIFIED.
+- resolve then RE-INSTANTIATES that template_function_instance via
+  instantiate_template(template_symbol, [int,int,int,void]).
+  template_mapt::build (template_map.cpp) correctly binds W={int,int}, X=void
+  (pack_count = nargs - (nparams-1) = 4-2 = 2; VERIFIED via probe).
+- Layer 2a (cpp_instantiate_template.cpp ~5199 free-function pack expander):
+  assumed the pack is the LAST template parameter
+  (`template_parameters().back().get_bool(ID_ellipsis)`) and took pack args from
+  index nparams-1 to the end.  Made it pack-position-aware (find the ellipsis
+  param at any index; pack args = full_template_args[pack_idx .. pack_idx +
+  (total - (nparams-1))); identical when the pack is last).  VERIFIED via probe:
+  it then computes packarg = {int,int} correctly.
+- Layer 2b (STILL OPEN): DESPITE Layer 2a computing {int,int}, the instantiated
+  symbol `first<int,int,int,void>` STILL has parameters [int,int,void] at
+  disambiguate_functions (cpp_typecheck_resolve.cpp ~1810), so it is rejected as
+  non-viable for (5,6,7) -> "found no match" / CONVERSION ERROR.  I.e. the final
+  symbol's parameter list is produced by ANOTHER expansion/substitution path
+  (or a cached earlier instantiation) that still mis-attributes the trailing
+  template arg (X=void) to the pack -- Layer 2a's expander output does not reach
+  the symbol.  The next probe should find which path sets the instantiated
+  symbol's parameters (candidate: an earlier cached instantiation during guess's
+  own disambiguate at cpp_typecheck_resolve.cpp ~1078, or template_map.apply of
+  the function type) and make it pack-position-aware too.
+
+Net: Layer 1 + Layer 2a are correct and behaviour-preserving for the common
+pack-is-last case, but green no end-to-end test while Layer 2b remains, so per
+this file's discipline they were REVERTED.  cpp11_template_param_after_pack stays
+KNOWNBUG.  Fully supporting a template parameter after a pack requires auditing
+EVERY instantiation/resolution path that currently assumes the pack is the last
+template parameter (build fixed; the free-function expander is Layer 2a; Layer 2b
+is a further such path) -- a multi-day effort in the most fragile frontend code,
+consistent with this cluster's documented scope.
