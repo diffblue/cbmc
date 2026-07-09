@@ -383,3 +383,48 @@ EVERY instantiation/resolution path that currently assumes the pack is the last
 template parameter (build fixed; the free-function expander is Layer 2a; Layer 2b
 is a further such path) -- a multi-day effort in the most fragile frontend code,
 consistent with this cluster's documented scope.
+
+## LANDED (2026-07-09): template parameter after a pack — Layers 1, 2a, 2b, 2d fixed
+
+Committed 5c7eef307d (src) + 58cc0bb166 (test flip to CORE).  Four coordinated,
+standards-grounded fixes, each removing a "pack is the last template parameter"
+assumption:
+- Layer 1: deduction default-argument loop maps arg positions to template
+  parameters accounting for the expanded pack width; iterates all arg slots so a
+  trailing parameter's default is applied.
+- Layer 2d: pack_size_map recorded BEFORE that loop so a trailing parameter's
+  `sizeof...(pack)` default (e.g. an enable_if) sees the deduced count
+  ([temp.variadic]/8).
+- Layer 2b: guess-side per-element pack type assignment indexes the pack's
+  arguments from the pack's POSITION in the template parameter list, not from
+  non_pack_count (which is the pack start only when the pack is last).
+- Layer 2a: the free-function parameter-pack expander in
+  cpp_instantiate_template.cpp finds the pack at any position and takes its
+  arguments from the correspondingly-offset run of the flat list.
+
+Result: `first(5,6,7)` for `template<class U, class... W, class X = void>` now
+resolves (direct, via a template body, as a constructor, and with an
+`enable_if<sizeof...(W)==N>` trailing constraint).  cpp11_template_param_after_pack
+flipped KNOWNBUG->CORE.  cbmc-cpp + cbmc pass; dog-food unchanged; the 8 jbmc
+exception failures are pre-existing (confirmed on the stashed baseline, Java-only).
+
+## STILL OPEN for cpp17_tuple_basic: recursive forwarding base-class ctor call
+
+With the above landed, std::make_tuple still returns a tuple with uninitialised
+members (get<0> reads 0) and the _Tuple_impl/_Head_base CONSTRUCTORS still have
+no goto bodies.  The remaining blocker, isolated header-free: a recursive
+variadic *forwarding* constructor whose member-initializer constructs its base
+from the tail pack --
+
+    template<int I, class Head, class... Tail>
+    struct TI<I,Head,Tail...> : TI<I+1,Tail...>, HB<I,Head> {
+      typedef TI<I+1,Tail...> Inh;
+      template<class UH, class... UT, class = eif<sizeof...(UT)==sizeof...(Tail)>>
+      TI(UH&& h, UT&&... t) : Inh(fwd<UT>(t)...), Base(fwd<UH>(h)) {}
+    };
+
+fails with "found no match for symbol 'Inh'" -- the recursive base-class
+constructor call `Inh(fwd<UT>(t)...)` in the member-initializer list does not
+resolve (a param-after-pack forwarding constructor invoked recursively over the
+shrinking tail).  This is the next layer for tuple_basic; apply_basic
+additionally needs the Part-2 decltype/invoke_result member-instantiation work.
