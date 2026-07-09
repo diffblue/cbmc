@@ -1753,6 +1753,11 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         // (which is the typical ADT pattern).  Skip the 1st option
         // entirely if T1 does not declare the operator as a member.
         bool has_member_op = false;
+        // True when the only member operator@ candidate is a function template
+        // (no non-template member component matched): used to prefer a
+        // non-member non-template operator@ before instantiating the member
+        // template's body ([over.match.best]/2, [temp.inst]).
+        bool member_has_template_op = false;
         const struct_typet &class_type =
           follow_tag(struct_tag_typet{struct_identifier});
         for(const auto &c : class_type.components())
@@ -1777,12 +1782,25 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
         // `template <class T> mstreamt &operator<<(const T&)`), so detect them
         // with a scope-only lookup.  SCOPE_ONLY does not walk parent scopes, so
         // this still excludes file-scope free operators (the case the gate
-        // guards against).
-        if(!has_member_op)
+        // guards against).  Also record whether any member candidate is a
+        // function template: if so, a non-member non-template operator@ that is
+        // a perfect match must be preferred *before* the member is resolved,
+        // since resolving a member template instantiates its body.
         {
           cpp_scopet &member_scope = cpp_scopes.get_scope(struct_identifier);
-          if(!member_scope.lookup(op_name, cpp_scopet::SCOPE_ONLY).empty())
+          const auto member_ops =
+            member_scope.lookup(op_name, cpp_scopet::SCOPE_ONLY);
+          if(!member_ops.empty())
             has_member_op = true;
+          for(const auto &id_ptr : member_ops)
+          {
+            const symbolt *s = symbol_table.lookup(id_ptr->identifier);
+            if(s != nullptr && s->type.get_bool(ID_is_template))
+            {
+              member_has_template_op = true;
+              break;
+            }
+          }
         }
 
         if(has_member_op)
@@ -1790,6 +1808,95 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
           // get that scope
           cpp_save_scopet save_scope(cpp_scopes);
           cpp_scopes.set_scope(struct_identifier);
+
+          // If the only member operator@ candidate is a function template, a
+          // non-member non-template operator@ that is an exact match for the
+          // object argument must be preferred ([over.match.oper]/3,
+          // [over.match.best]/2).  Decide this BEFORE resolving the member
+          // candidate: resolving a member function template here instantiates
+          // its body, and a type error in that body (for a T the template is
+          // not meant to handle) would be emitted as a hard error even though
+          // this candidate is ultimately not selected -- whereas only the
+          // selected, odr-used specialization's body may be instantiated
+          // ([temp.inst]/2,4, [basic.def.odr]).  Concretely, for messaget's
+          //   template <class T> mstreamt &operator<<(const T &x)
+          //     { static_cast<std::ostream &>(*this) << x; ... }
+          // and the free `operator<<(mstreamt &, eomt)`, `m << eom` must pick
+          // the free operator; instantiating the member template's body for
+          // T=eomt otherwise fails with "operator 'shl' not defined".
+          if(member_has_template_op)
+          {
+            save_scope.restore(); // leave struct scope for free/ADL lookup
+
+            cpp_typecheck_fargst free_fargs;
+            free_fargs.operands = expr.operands();
+            free_fargs.has_object = false;
+            free_fargs.in_use = true;
+            const exprt free_resolve = resolve(
+              cpp_name, cpp_typecheck_resolvet::wantt::VAR, free_fargs, false);
+
+            bool prefer_free = false;
+            if(free_resolve.is_not_nil() && free_resolve.id() == ID_symbol)
+            {
+              const symbolt *fsym = symbol_table.lookup(
+                to_symbol_expr(free_resolve).get_identifier());
+              if(
+                fsym != nullptr && fsym->type.id() == ID_code &&
+                fsym->type.find(irep_idt{"#fn_template_args"}).is_nil())
+              {
+                // non-template free operator: require a perfect (identity)
+                // match on EVERY parameter, so any member candidate (which is
+                // at best also a perfect match, in which case the program is
+                // ambiguous anyway) is never wrongly overridden.  This is the
+                // only case where preferring the free operator without ranking
+                // the member is guaranteed correct.
+                const auto &fparams = to_code_type(fsym->type).parameters();
+                auto strip = [](typet t)
+                {
+                  if(
+                    t.id() == ID_pointer && (t.get_bool(ID_C_reference) ||
+                                             t.get_bool(ID_C_rvalue_reference)))
+                    t = to_pointer_type(t).base_type();
+                  t.remove(ID_C_constant);
+                  return t;
+                };
+                if(fparams.size() == expr.operands().size())
+                {
+                  bool all_exact = true;
+                  for(std::size_t i = 0; i < fparams.size(); ++i)
+                  {
+                    if(
+                      strip(fparams[i].type()) !=
+                      strip(expr.operands()[i].type()))
+                    {
+                      all_exact = false;
+                      break;
+                    }
+                  }
+                  prefer_free = all_exact;
+                }
+              }
+            }
+
+            if(prefer_free)
+            {
+              side_effect_expr_function_callt function_call(
+                cpp_name.as_expr(),
+                {},
+                uninitialized_typet{},
+                expr.source_location());
+              function_call.arguments().reserve(expr.operands().size());
+              for(const auto &op : as_const(expr).operands())
+                function_call.arguments().push_back(op);
+              typecheck_side_effect_function_call(function_call);
+              expr = function_call;
+              return true;
+            }
+
+            // free operator not preferred: re-enter the struct scope for the
+            // member resolution below.
+            cpp_scopes.set_scope(struct_identifier);
+          }
 
           // build fargs for resolver
           cpp_typecheck_fargst fargs;
