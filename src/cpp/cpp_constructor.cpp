@@ -61,9 +61,93 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     if(!operands.empty() && !operands.front().get_bool(ID_C_array_ini))
     {
-      // C++11 brace-enclosed initialization: build an array expression
-      // from the individual operands and assign it.
-      const auto &array_type = to_array_type(object_tc.type());
+      const array_typet &array_type = to_array_type(object_tc.type());
+      const typet &element_type = array_type.element_type();
+
+      // [dcl.init.aggr]/1, [dcl.init.list]/3: a class with a user-provided
+      // constructor is not an aggregate, so each array element is
+      // list-initialized by a constructor call rather than member-wise.  For
+      // such element types, building an array_exprt from the brace elements (as
+      // the aggregate/scalar path below does) would leave each element's
+      // braced-init-list untyped -- indexing that array during construction
+      // then yields a nil-typed expression that aborts simplification.  Detect a
+      // user-provided constructor exactly as the base-class-aggregate code does
+      // (a constructor component that is neither the default nor a copy/move
+      // constructor, or a constructor template).
+      bool element_has_user_ctor = false;
+      if(element_type.id() == ID_struct_tag)
+      {
+        const struct_typet &element_struct =
+          follow_tag(to_struct_tag_type(element_type));
+        element_has_user_ctor =
+          element_struct.get_bool("has_template_constructor");
+        for(const auto &c : element_struct.components())
+        {
+          if(element_has_user_ctor)
+            break;
+          if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+            continue;
+          const code_typet &ct = to_code_type(c.type());
+          if(ct.return_type().id() != ID_constructor)
+            continue;
+          if(ct.parameters().size() <= 1) // default constructor
+            continue;
+          if(
+            ct.parameters().size() == 2 &&
+            is_reference(ct.parameters()[1].type())) // copy/move constructor
+            continue;
+          element_has_user_ctor = true;
+        }
+      }
+
+      if(element_has_user_ctor)
+      {
+        // Construct each element in place from its own initializer-clause
+        // ([dcl.init.aggr]/2): a brace-init element `{args}` forwards its
+        // elements as the element's constructor arguments; a plain
+        // value/temporary is a single initializer (copy/move construction); an
+        // element without an initializer-clause is value-initialized.
+        exprt tmp_size = array_type.size();
+        make_constant_index(tmp_size);
+        mp_integer array_size;
+        if(to_integer(to_constant_expr(tmp_size), array_size))
+        {
+          error().source_location = source_location;
+          error() << "array size '" << to_string(array_type.size())
+                  << "' is not a constant" << eom;
+          throw 0;
+        }
+
+        const std::size_t n = numeric_cast_v<std::size_t>(array_size);
+        code_blockt new_code;
+        for(std::size_t i = 0; i < n; ++i)
+        {
+          exprt constant = from_integer(i, c_index_type());
+          constant.add_source_location() = source_location;
+          index_exprt index{object_tc, constant};
+          index.add_source_location() = source_location;
+
+          exprt::operandst element_args;
+          if(i < operands.size())
+          {
+            const exprt &init = operands[i];
+            if(init.id() == ID_initializer_list)
+              element_args = init.operands();
+            else
+              element_args.push_back(init);
+          }
+
+          auto element_code =
+            cpp_constructor(source_location, index, element_args);
+          if(element_code.has_value())
+            new_code.add(std::move(element_code.value()));
+        }
+        return std::move(new_code);
+      }
+
+      // C++11 brace-enclosed initialization of an aggregate/scalar element
+      // type: build an array expression from the individual operands and
+      // assign it.
       array_exprt array_val(operands, array_type);
       array_val.add_source_location() = source_location;
       array_val.set(ID_C_array_ini, true);
