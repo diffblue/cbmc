@@ -459,3 +459,53 @@ overloads plus the _TupleConstraints / is_constructible SFINAE and the Part-2
 ODR-use-driven member-function-body instantiation -- not the recursive-forwarding
 mechanism (which the faithful reproducer above now exercises correctly).
 cpp17_tuple_basic / cpp17_apply_basic stay KNOWNBUG.
+
+## CHARACTERIZED (2026-07-09): tuple ctor SFINAE layer = member alias template two-parallel-pack
+
+Traced cpp17_tuple_basic's remaining blocker precisely.  Direct multi-element
+`std::tuple<int,double,char> t(1,2.0,(char)3)` fails (single-element works): the
+forwarding constructor `tuple(_UElements&&...)` is SFINAE-rejected because
+`_ImplicitCtor<...>` -> `_TupleConstraints<true,_Elements...>::
+__is_implicitly_constructible<_UElements...>()` evaluates to FALSE though it
+should be TRUE.  `make_tuple` then has no body and the tuple ctors that DO get
+instantiated are the allocator variants with an unresolved `_Alloc`.
+
+Reduced header-free (regression/cbmc-cpp/cpp11_alias_template_parallel_pack):
+the failure is a MEMBER ALIAS TEMPLATE whose body expands TWO PARALLEL PACKS --
+the alias's own pack and the enclosing class's pack, exactly the
+_TupleConstraints shape:
+
+  template<class... Types> struct C {
+    template<class... Us> using sums = sum_t<same_t<Us,Types>::v...>;  // parallel packs
+    template<class... Us> static constexpr int chk(){ return sums<Us...>::v; }
+  };
+  C<int,double,char>::chk<int,double,char>()  // g++: 3; CBMC: wrong ("no match for 'v'")
+
+The individual pieces work: inlined parallel-pack traits (not via a member alias)
+evaluate correctly; a single member alias template (one pack pattern) works; only
+the member-alias + two-parallel-pack combination fails.
+
+ROOT (traced, probes): when the member alias `sums<Us...>` is resolved
+(resolve_template_alias -> instantiate_template), it is reached with ZERO
+template arguments -- the pack `Us...` passed as the alias's argument list is not
+expanded to the concrete elements.  So the alias's own pack (`Us`) is never bound
+(type_map empty, pack_args_map holds only the enclosing class pack `Types`), and
+the two-parallel-pack body expansion (template_map.cpp apply -> the
+nested-pack `referenced_packs` lock-step loop) collects only `Types` (the one
+pack that IS in pack_args_map), leaving the alias pack reference unresolved.  So
+`same_t<Us,Types>` becomes `same_t<unresolved, Types[i]>` -> mis-evaluates.
+
+MULTI-SUB-BUG (why this is a distinct, larger layer):
+  (a) the pack `Us...` supplied as a template-alias argument list is not expanded
+      before the alias is instantiated (resolve_template_alias gets 0 args) --
+      likely the alias is resolved during the enclosing template's ABSTRACT
+      elaboration (pack unbound) and/or the pack-as-alias-arg expansion path
+      does not run;
+  (b) consequently the alias's own parameter pack is not bound in the map used to
+      substitute its body; and
+  (c) the two-parallel-pack lock-step expander only pairs packs that are BOTH in
+      pack_args_map, so an unbound alias pack is left unresolved.
+Fixing (a)/(b) (bind the alias's pack; expand a pack passed as an alias argument
+list) should let the existing lock-step expander (c) pair both packs.  This is
+the tuple-constraint layer; cpp17_tuple_basic / cpp17_apply_basic stay KNOWNBUG.
+Recorded as KNOWNBUG cpp11_alias_template_parallel_pack.

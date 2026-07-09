@@ -1801,3 +1801,20 @@ std::tuple's many-overload constructor selection (allocator variants + the
 _TupleConstraints SFINAE + Part-2 ODR-use body instantiation) and stays KNOWNBUG.
 
 *Updated: 2026-07-09*
+
+### 2026-07-09 tuple ctor SFINAE layer characterized (member alias template two-parallel-pack)
+
+Traced cpp17_tuple_basic's remaining blocker: std::make_tuple's forwarding
+constructor is SFINAE-rejected because libstdc++'s _TupleConstraints
+(__constructible/__convertible = __and_<is_X<_Types, _UTypes>...>, member alias
+templates expanding TWO parallel packs) mis-evaluates.  Reduced header-free
+(KNOWNBUG cpp11_alias_template_parallel_pack): a member alias template whose body
+expands its own pack in lock-step with the enclosing class's pack is instantiated
+with the alias's pack passed as `Us...` resolving to ZERO arguments, so the
+alias's own pack is never bound and the two-pack body expands against only the
+class pack -> wrong result.  A distinct, larger layer (alias-template pack
+binding + pack-as-alias-argument expansion) than the recursive-forwarding
+mechanism already fixed.  No source change this turn; cbmc-cpp still passes.
+cpp17_tuple_basic / cpp17_apply_basic stay KNOWNBUG.
+
+*Updated: 2026-07-09*
