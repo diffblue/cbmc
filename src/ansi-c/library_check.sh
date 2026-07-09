@@ -23,7 +23,7 @@ for f in "$@"; do
 done
 
 # Make sure all internal library functions have tests exercising them:
-grep '^/\* FUNCTION:' ../*/library/* | cut -f3 -d" " | sort -u > __functions
+grep '^/\* FUNCTION:' ../*/library/* | cut -f3 -d" " | LC_ALL=C sort -u > __functions
 
 # Some functions are not expected to have tests:
 perl -p -i -e 's/^__CPROVER_jsa_synthesise\n//' __functions
@@ -101,7 +101,7 @@ perl -p -i -e 's/^_mm_setr_epi(16|32)\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_setr_pi16\n//' __functions # cbmc/SIMD1
 perl -p -i -e 's/^_mm_subs_ep[iu]16\n//' __functions # cbmc/SIMD1
 
-ls ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | sort -u > __tests
+ls -1 ../../regression/cbmc-library/ | egrep -v '(Makefile|CMakeLists.txt)' | LC_ALL=C sort -u > __tests
 diff -u __tests __functions
 ec="${?}"
 rm __functions __tests
