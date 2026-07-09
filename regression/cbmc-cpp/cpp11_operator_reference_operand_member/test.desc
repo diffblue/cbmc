@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ member operator<< found via a reference-typed operand: SUCCESS$
@@ -8,12 +8,12 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: [over.match.oper]/3.2 -- a reference-to-class lvalue operand (e.g.
-`static_cast<std::ostream&>(x)`) does not participate in member operator@
-overload resolution because CBMC's gate requires the operand's type node to be
-exactly ID_struct_tag, not a reference to one.  So `ostream << <int>` inside a
-member operator<< template body fails with "operator 'shl' not defined".  This is
-the residual src/util (parse_options.cpp, typecheck.cpp) dog-food shl noise after
-the free-vs-member-template fix.  A clean fix needs the combined member +
-non-member candidate set of [over.match.oper]/3 for reference-typed operands.
-Flip to CORE once that lands.
+N5008 [over.match.oper]/3.2: the member candidate set for `a @ b` is the
+qualified lookup of `T1::operator@`, where T1 is the type of the left operand.
+An lvalue of reference-to-class type -- e.g. `static_cast<std::ostream&>(x)`,
+which CBMC represents with a reference type rather than a bare struct_tag --
+is an lvalue of the referenced class type and so has that class's member
+operators as candidates.  Here `static_cast<ostream&>(base) << 42` inside a
+member operator<< template body must select ostream::operator<<(int).
+Regression for the dog-food src/util (parse_options.cpp, typecheck.cpp) shl
+noise.  assertion.2 ("WRONG") must FAIL (non-vacuity).
