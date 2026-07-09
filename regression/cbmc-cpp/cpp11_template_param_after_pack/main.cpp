@@ -23,8 +23,11 @@
 // member).  The same shape called from inside another template body drops that
 // body entirely ("no body for callee").
 //
-// Flip to CORE once a template parameter following a parameter pack is deduced
-// and instantiated correctly.
+// FIXED (now CORE): the deduction default-argument alignment, the free-function
+// parameter-pack expander in instantiate_template, the guess-side per-element
+// pack type assignment, and the trailing-parameter `sizeof...` pack-size
+// recording are all pack-position-aware.  cpp17_tuple_basic itself needs further
+// work (its recursive forwarding constructors) and stays KNOWNBUG.
 // assertion "WRONG" must FAIL (non-vacuity).
 
 extern "C" void __CPROVER_assert(int, const char *);
