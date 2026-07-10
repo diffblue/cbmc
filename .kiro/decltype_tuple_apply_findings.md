@@ -867,3 +867,41 @@ sizeof.../derived-to-base, both fixed).  Also reproduces via direct
 evaluation.  Note: the *inlined* constraint form (constraint directly in the
 ctor's enable_if, no `_TupleConstraints` wrapper) fails even at 2 elements -- a
 broader related variant.
+
+## FIX ATTEMPT: tuple ctor bug traced to recursive non-type pack (2026-07-10)
+
+cpp17_tuple_get_two_pack_ctor_3elem root-cause chain (all steps confirmed):
+  1. `tuple` ctor SFINAE `enable_if_t_<_TupleConstraints<E...>::ic<U...>()>`.
+     Direct test: `_TupleConstraints<int,double,float>::ic<int,double,float>()`
+     evaluates FALSE/nondet at 3 elements (should be true) -> ctor discarded
+     -> "no match for symbol 'tuple'".  So the bug is the CONSTRAINT eval, not
+     the enable_if/ctor context.
+  2. `ic()` returns `and_<is_ctible<E,U>::value...>::value`.  The two-parallel-
+     pack expansion COUNT is correct (cnt<is_ctible<E,U>::value...>::n == 3);
+     `and_<true,true,true>` DIRECT works.  So the args and count are right.
+  3. The failure is in `and_`'s recursion over the member-value bool pack: it
+     routes through `and_<...>` with a forwarded 2-element non-type pack, which
+     is the SAME bug as cpp11_nontype_pack_recursive_two_elem.
+  4. Minimal root (cpp11_nontype_pack_recursive_two_elem): `sum_t<2,3>::v`
+     (recursive non-type pack, EXACTLY 2 elements, at top level) fails.  CBMC
+     error: instantiating sum_t<2,3>, body `2 + sum_t<T...>::v` -> the
+     `sum_t<T...>::v` (deduced non-type pack T={3}) is left UNRESOLVED
+     (`2 + <<expr:cpp_name>>` -> "implicit arithmetic conversion not permitted").
+  5. CONTEXT-SENSITIVE: `sum_t<2,3>::v` at TOP LEVEL (in main's constexpr
+     assertion) fails, but the SAME `sum_t<2,3>` instantiated RECURSIVELY (as a
+     sub-step of `sum_t<1,2,3>`) succeeds.  So it is not a pure substitution bug
+     -- it is that substituting the deduced non-type pack T into the recursive
+     template-id `sum_t<T...>` in the member initializer, and triggering the
+     recursive instantiation `sum_t<3>`, is dropped in the top-level
+     constant-expression instantiation context but works when reached from an
+     enclosing (non-constexpr-eval) instantiation.
+
+FIX SCOPE: this is a non-type-parameter-pack substitution / recursive-
+instantiation-triggering defect in the top-level constant-expression context
+(instantiate_template + template_map.apply of a `Template<pack...>::member`
+value in a constexpr member initializer).  It is the fundamental root of the
+tuple constructor failure; fixing cpp11_nontype_pack_recursive_two_elem should
+cascade.  Deferred as a dedicated pass: the top-level-vs-nested context
+sensitivity indicates an instantiation-ordering interaction that needs careful,
+regression-guarded work rather than a rushed substitution change.  Minimal
+KNOWNBUG already exists: cpp11_nontype_pack_recursive_two_elem.
