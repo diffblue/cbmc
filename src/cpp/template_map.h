@@ -12,12 +12,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_TEMPLATE_MAP_H
 #define CPROVER_CPP_TEMPLATE_MAP_H
 
-#include <map>
-#include <iosfwd>
-
 #include <util/expr.h>
 
 #include "cpp_template_args.h"
+
+#include <iosfwd>
+#include <map>
+#include <set>
+#include <string>
 
 struct template_parametert;
 class template_typet;
@@ -34,6 +36,17 @@ public:
   expr_mapt expr_map;
   pack_size_mapt pack_size_map;
   pack_args_mapt pack_args_map;
+
+  /// Short names of a member alias template's OWN parameter packs while its
+  /// body is being substituted during the enclosing class's instantiation.
+  /// N5008 [temp.alias]/2 + [temp.variadic]/4-5: such a pack is not yet bound
+  /// (it is substituted only at the alias's point of use), so a pack expansion
+  /// whose pattern references one must be left UNEXPANDED here -- otherwise it
+  /// would be driven by the enclosing class pack alone, leaving the alias's own
+  /// pack dangling (e.g. `same_t<Us, Types>::v...` expanding over `Types` only).
+  /// Set (and restored) around the alias-body apply; the nested-pack expander
+  /// consults it to defer.  `mutable` because apply() is const.
+  mutable std::set<std::string> deferred_own_pack_names;
 
   void apply(exprt &dest) const;
   void apply(typet &dest) const;
