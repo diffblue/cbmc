@@ -34,7 +34,6 @@
 // from `al<int>` (P<int>::value == false), so a correct parse must resolve the
 // inner template argument, not merely accept the syntax.
 
-
 extern "C" void __CPROVER_assert(int, const char *);
 
 template <class>
