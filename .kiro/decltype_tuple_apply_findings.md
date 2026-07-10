@@ -1226,3 +1226,21 @@ TWO call-arg-expansion paths also need it: (1) decltype operands via
 expand_call_argument_packs (now pack_expr_map-aware); (2) FUNCTION BODY calls
 (`return add(I...)`) which bypass expand_call_argument_packs and go through the
 method-body / compound expansion -- that path needs the same non-type handling.
+
+## apply/deduced non-type pack: progress + remaining (2026-07-10)
+
+Fixed EXPLICIT non-type pack call arguments (cpp11_nontype_pack_call_args_explicit
+CORE): expand_call_argument_packs now consumes pack_expr_map (96756b56c6) and a
+function-template body runs it when a non-type pack is present (dc8c6e0668).
+Fixed non-type pack VALUE DEDUCTION from a class-template-id arg
+(guess_template_args now fills pack_expr_map, this commit).
+
+REMAINING for the DEDUCED case (cpp11_decltype_return_nontype_pack_call /
+cpp17_apply_basic, which deduce the pack from seq/index_sequence): build_template_
+args (template_map.cpp) emits ONE argument per template PARAMETER -- a single
+placeholder for a pack (lookup_expr(I) = the first value) -- and the
+post-deduction "[temp.variadic]/5 expand pack parameter to N copies" step in
+guess_function_template_args expands only TYPE packs to full arity, not a
+NON-type pack's values.  So the deduced `<1,2>` collapses to `<1>` and impl is
+mis-instantiated ("no match").  NEXT: emit a non-type pack's full element values
+(from pack_expr_map) when expanding the guessed template arguments to full arity.
