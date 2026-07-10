@@ -1,29 +1,22 @@
 // N5008 [temp.class.spec.match] + [temp.variadic]: a recursive class template
-// over a NON-type parameter pack, selected via its `<H, Rest...>` partial
-// specialization, must fold at every arity.
-//
-// KNOWNBUG: `sum_t<a, b>::v` for a recursive NON-type pack template fails to
-// type-check ("could not fully type-check ... unsupported construct") for
-// EXACTLY TWO elements, while 0, 1, 3, and 4 elements all fold correctly:
+// over a NON-type parameter pack, selected via its `<H, T...>` partial
+// specialization, folds at every arity.
 //
 //   template<int...> struct sum_t;
 //   template<> struct sum_t<> { static constexpr int v = 0; };
 //   template<int H, int... T> struct sum_t<H, T...>
 //     { static constexpr int v = H + sum_t<T...>::v; };
-//   sum_t<2, 3>::v            // <-- fails (0/1/3/4-element sums are fine)
 //
-// The non-recursive partial-spec deduction alone (`sizeof...(Rest)` for
-// `sum_t<H, Rest...>`) is correct at every arity, and the TYPE-pack analogue is
-// fine, so the defect is specific to the RECURSIVE non-type-pack fold at the
-// two-element level (the `sum_t<T...>` step forwarding a one-element non-type
-// pack).  g++/clang++ compute sum_t<2,3>::v == 5.
+// This previously failed for EXACTLY TWO elements (`sum_t<2,3>::v`): the nested
+// `sum_t<3>` (trailing pack `T` deduces empty) had its specialization pattern
+// `<H, T...>` re-type-checked with `T...` still present, and a non-type pack
+// expansion over an empty pack was evaluated as an unassigned scalar and threw,
+// so `sum_t<3>` fell back to the incomplete primary.  Now the empty deduced
+// trailing pack is trimmed before the pattern re-type-check
+// ([temp.arg.explicit]/4 note 1, [temp.variadic]/4).
 //
-// This is a residual non-type-pack defect surfaced while reproducing the
-// (now-fixed, cpp11_alias_template_parallel_pack) tuple _TupleConstraints shape
-// with a non-type `sum_t` proxy; the tuple itself uses TYPE packs and is not
-// affected.  Flip to CORE once a recursive non-type-pack fold is correct at two
-// elements.
-// Non-vacuity: assertion 2 ("WRONG must FAIL") must FAIL when the fix lands.
+// CORE (was KNOWNBUG cpp11_nontype_pack_recursive_two_elem).  Non-vacuous: the
+// two-element assertion is exactly the one that used to fail.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
@@ -42,7 +35,11 @@ struct sum_t<H, T...>
 
 int main()
 {
-  __CPROVER_assert(sum_t<2, 3>::v == 5, "recursive non-type pack, 2 elements");
-  __CPROVER_assert(sum_t<2, 3>::v != 5, "WRONG must FAIL");
+  __CPROVER_assert(sum_t<>::v == 0, "0 elements");
+  __CPROVER_assert(sum_t<5>::v == 5, "1 element");
+  __CPROVER_assert(sum_t<2, 3>::v == 5, "2 elements (regression point)");
+  __CPROVER_assert(sum_t<9, 9>::v == 18, "2 elements, equal");
+  __CPROVER_assert(sum_t<1, 2, 3>::v == 6, "3 elements");
+  __CPROVER_assert(sum_t<1, 2, 3, 4>::v == 10, "4 elements");
   return 0;
 }

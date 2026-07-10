@@ -1060,3 +1060,31 @@ NEXT: make the partial-spec pattern re-type-check tolerate an empty deduced
 trailing NON-type pack (mirror the type-pack path) so `sum_t<3>` matches its
 specialization on first elaboration.  Then cpp11_nontype_pack_recursive_two_elem
 and (cascading) cpp17_tuple_get_two_pack_ctor_3elem should green.
+
+## FIX LANDED: recursive partial spec with empty deduced trailing pack (2026-07-10)
+
+Root (localized last turn, fixed now): selecting a recursive class-template
+partial specialization re-type-checks its pattern args ([temp.class.spec.match]).
+For `sum_t<H,T...>` naming itself over the trailing pack, the nested `sum_t<3>`
+(where `T` deduces EMPTY) re-type-checked the pattern `<H,T...>` with the
+non-type `T...` still present; a non-type pack expansion over an empty pack is
+evaluated as an unassigned scalar and throws, so the candidate was rejected as
+SFINAE and `sum_t<3>` fell back to the incomplete primary -> `sum_t<3>::v`
+unresolved inside `sum_t<2,3>` (failed at exactly two elements).
+
+FIX (dc02e33326): before the pattern re-type-check, trim trailing pack-expansion
+arguments corresponding to an empty deduced pack (pattern has more args than the
+actual), per [temp.arg.explicit]/4 note 1 + [temp.variadic]/4 (empty pack
+expansion -> zero elements).  Local to specialization matching; mirrors the
+existing trailing-empty-pack trim of the type-checked result.  A first attempt
+that registered the empty pack as pack_size_map=0 and broadened the
+typecheck_template_args pack-expander gate regressed 5 tuple/variadic CORE tests
+(CONVERSION ERROR) and was reverted in favour of this local trim.
+
+RESULT: whole cbmc-cpp suite green, no regressions.  Flipped to CORE:
+cpp11_nontype_pack_recursive_two_elem, cpp17_tuple_get_two_pack_ctor_3elem (the
+faithful 3-element std::tuple SFINAE-ctor reduction).
+
+STILL KNOWNBUG: cpp17_tuple_basic (get<0> still FAILURE -- a further layer in the
+full libstdc++ tuple) and cpp17_apply_basic (separate `decltype` front-end
+limitation: body left incomplete).
