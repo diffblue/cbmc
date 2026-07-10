@@ -9,14 +9,15 @@ main.cpp
 --
 --
 KNOWNBUG: N5008 [temp.class.spec.match] + [temp.variadic].  A recursive class
-template over a NON-type parameter pack (`sum_t<H, T...>` with
-`v = H + sum_t<T...>::v`) fails to fold for EXACTLY TWO elements
+template PARTIAL SPECIALIZATION over a NON-type parameter pack (`sum_t<H, T...>`
+with `v = H + sum_t<T...>::v`) fails to fold for EXACTLY TWO elements
 (`sum_t<2,3>::v` "could not fully type-check ... unsupported construct"), while
 0/1/3/4-element sums fold correctly and the TYPE-pack analogue is fine.  The
-non-recursive partial-spec deduction is also correct at every arity, so the
-defect is specific to the recursive non-type-pack fold at the two-element level
-(the `sum_t<T...>` step forwarding a one-element non-type pack).  Residual
-surfaced while reproducing the tuple _TupleConstraints shape with a non-type
-proxy (the tuple uses TYPE packs -- see cpp11_alias_template_parallel_pack, now
-CORE).  Flip to CORE once a recursive non-type-pack fold is correct at two
+PRIMARY-template non-type pack forwarding collapse this once shared a root with
+is now fixed (cpp11_nontype_pack_forward_collapse and
+cpp11_nontype_pack_sizeof_expr_forwarded are CORE); the residual is specific to a
+recursive partial-specialization body that names ITSELF over the trailing
+non-type pack (`sum_t<T...>::v`), whose substituted `sum_t<3>` is expanded but
+left unresolved (not recursively instantiated) at the two-element level.  Flip to
+CORE once a recursive non-type-pack partial-specialization fold is correct at two
 elements.
