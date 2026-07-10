@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ sizeof\(Us\)\.\.\. forwarded expands to 2 elements: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.variadic]/4-5.  A pack expansion whose pattern is a
+`sizeof` unary-expression (`sizeof(Us)...`), forwarded from an enclosing function
+template, expands to the wrong element count: `box<sizeof(Us)...>::n` (n =
+sizeof...(Vs)) evaluated in `chk((char)1,(char)2)` is not 2.  A member-value
+pattern `box<Trait<Us>::v...>` forwarded the same way expands correctly
+(cpp11_nontype_value_pack_fn_template, CORE), so the defect is specific to the
+`sizeof(Us)...` sizeof-expression pattern.  Residual non-type-pack defect from
+reproducing the tuple _TupleConstraints shape with a non-type proxy (the tuple
+uses TYPE packs; cpp11_alias_template_parallel_pack is CORE).  Flip to CORE once
+a forwarded `sizeof(Us)...` pack expansion has the correct arity.
