@@ -803,3 +803,41 @@ faithful minimal tuple works at all arities, so the residual is in libstdc++'s
 tuple CONSTRUCTOR machinery at >=3 elements (the _TupleConstraints-guarded
 variadic constructor / element storage), NOT get<> deduction.  Next: cvise the
 preprocessed 3-element case.
+
+## CVISE ISOLATION OF cpp17_tuple_basic 3-ELEMENT BUG (2026-07-10)
+
+Preprocessed the failing `make_tuple(1,2.0,3.0f)`+`get<0>` case (g++ -E, 4277
+lines) and ran cvise with a robustness-guarded interestingness (reduced program
+must (1) compile under g++ and run under valgrind with the assertion HOLDING --
+no uninitialised-value use -- so the program is well-defined and any cbmc failure
+is a genuine bug; (2) still mention `tuple`/`get`; (3) make cbmc report the
+assertion FAILURE).  First pass over-reduced to a degenerate uninitialised-int
+proxy; the valgrind guard fixed that.
+
+Result: a 78-line header-free reproducer that g++ runs correctly (get<0>==1) but
+cbmc rejects with "found no match for symbol 'tuple'".  HOWEVER a faithfulness
+check showed it is a cvise ARTIFACT, NOT the real tuple bug:
+  - Completing the cvise-reduced (incomplete) `_TupleConstraints` with a trivial
+    `static constexpr bool __is_implicitly_constructible = true;` makes cbmc
+    SUCCEED.  The real libstdc++ `_TupleConstraints` is complete, so this
+    reduction's "bug" (cbmc rejecting a SFINAE ctor whose constraint names an
+    INCOMPLETE type) is not the real defect.
+  - clang++ REJECTS the reduced code (missing `template` keyword on a dependent
+    member template; non-type partial-spec argument depending on a partial-spec
+    parameter): it is only g++-extension-accepted, i.e. ill-formed, so cbmc
+    rejecting it is not clearly a bug.  (Not committed as a test.)
+
+Oracle limitation: dual g++/clang validation cannot force faithfulness here --
+clang cannot compile g++-preprocessed libstdc++ (g++ builtins like
+`__remove_reference`), and `g++ -pedantic-errors` does not flag the artifact.
+
+NEXT (build-up instead of reduce-down): start from a hand-written faithful tuple
+that cbmc handles CORRECTLY (recursive `_Tuple_impl`, plain variadic ctor,
+`get<>` via `__get_helper` base deduction -- verified working) and add the real
+libstdc++ features one at a time -- (a) `make_tuple` element decay
+(`__decay_and_strip`), (b) `get`'s `tuple_element`/`_Nth_type` return type,
+(c) the COMPLETE `_TupleConstraints`-based SFINAE constructor with the
+two-parallel-pack `is_constructible<_Elements,_UElements>...` -- until the
+3-element case regresses, isolating the true interaction.  (Individually, each of
+these has a passing test: two-parallel-pack -> cpp11_alias_template_parallel_pack
+CORE; derived-to-base get<> -> cpp11_derived_to_base_variadic_deduction CORE.)
