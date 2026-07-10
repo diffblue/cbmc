@@ -1,61 +1,62 @@
-// N5008 [temp.alias]/2 + [temp.variadic]/4-5: instantiating an alias template
-// whose body is a pack expansion (`sum_t<sizeof(Us)...>`) with a pack that is
-// FORWARDED from an enclosing function template (`sums<Us...>` where `Us` is the
-// caller's own pack) must, at the alias's point of use, expand the body against
-// the concrete pack and fold the resulting constant.
+// N5008 [temp.variadic]/4-5 + [temp.res] (two-phase): a pack expansion whose
+// pattern is a NON-TYPE value dependent on the pack -- `Trait<Us>::value...` --
+// appearing as the template-argument list of a template-id in a FUNCTION
+// TEMPLATE's body must be re-instantiated with the concrete pack when the
+// function template is instantiated, and expand to one argument per element.
 //
-// KNOWNBUG: CBMC fails to fold `sums<Us...>::v` when `sums` is a pack-expansion
-// alias template and `Us` is forwarded from the enclosing function template
-// `chk`.  `chk((char)1, (char)2)` should be a constant 2 (sizeof(char) == 1,
-// summed over two elements), and g++/clang++ compute 2, but CBMC leaves the
-// result unconstrained (the assertion can fail).  The same alias used with
-// EXPLICIT concrete arguments at namespace scope
-// (`sums<char,char>::v`) folds correctly; only the forwarded-pack instantiation
-// inside a function template is affected.  A non-pack-expansion alias
-// (`using al = box<U>;`) forwards and folds fine, so the defect is specific to
-// a pack-expansion alias body instantiated with a forwarded pack.
+// KNOWNBUG: CBMC resolves `box<sz<Us>::v...>` (the `::v` non-type value form)
+// abstractly at the point the function template `chk` is DEFINED (its pack `Us`
+// still unbound) and does NOT re-instantiate it concretely when `chk<char,char>`
+// is instantiated -- only an abstract `box<Non_Type0>` is ever produced, so
+// `box<...>::n` (== `sizeof...(Vs)`) is left unconstrained instead of 2.
 //
-// This masks the (separately fixed) two-parallel-pack member-alias expansion
-// (cpp11_alias_template_parallel_pack) and is a residual blocker for
-// std::tuple's _TupleConstraints (`__and_<is_X<_Types,_UTypes>...>` accessed as
-// a value/type after being instantiated with a forwarded pack).  A class
-// template around the alias is NOT required (this free-function form is the
-// minimal trigger).
+// Decisive contrast (both are dependent template-ids in the same body):
+//   box<sz<Us>...>::n        // TYPE-id pattern    -> re-instantiates, n == 2 (OK)
+//   box<sz<Us>::v...>::n     // ::value pattern    -> stays abstract, n unconstrained
+// A bare pack (`box<Us...>::n`) and a nested type-id (`box<sz<Us>...>::n`) both
+// re-instantiate correctly; only the non-type `::value` pack expansion fails.
+// No class template or alias is needed (an earlier reproducer used a member
+// alias and `sizeof(Us)...`, which added confounds); a free function template
+// with a `Trait<Us>::value...` argument is the minimal trigger.  g++/clang++
+// compute 2.
 //
-// Flip to CORE once a pack-expansion alias template folds when instantiated with
-// a forwarded parameter pack.
+// This is the residual blocker beneath the (separately fixed) two-parallel-pack
+// member-alias expansion (cpp11_alias_template_parallel_pack) and for
+// std::tuple's _TupleConstraints (`__and_<is_X<_Types,_UTypes>...>::value`,
+// which is exactly a `Trait<...>::value` non-type pack instantiated with a
+// forwarded pack).
+//
+// Flip to CORE once a `Trait<Us>::value...` non-type pack expansion in a
+// function-template body is re-instantiated concretely at the function
+// template's point of instantiation.
 // Non-vacuity: assertion 2 ("WRONG must FAIL") must FAIL when the fix lands
-// (chk() == 2).
+// (the count is exactly 2).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
-template <unsigned...>
-struct sum_t;
-template <>
-struct sum_t<>
+template <class T>
+struct sz
 {
-  static constexpr unsigned v = 0;
-};
-template <unsigned H, unsigned... T>
-struct sum_t<H, T...>
-{
-  static constexpr unsigned v = H + sum_t<T...>::v;
+  static constexpr unsigned v = sizeof(T);
 };
 
-template <class... Us>
-using sums = sum_t<sizeof(Us)...>;
+template <unsigned... Vs>
+struct box
+{
+  static constexpr unsigned n = sizeof...(Vs);
+};
 
 template <class... Us>
 constexpr unsigned chk(Us...)
 {
-  return sums<Us...>::v;
+  return box<sz<Us>::v...>::n;
 }
 
 int main()
 {
   __CPROVER_assert(
     chk((char)1, (char)2) == 2,
-    "pack-expansion alias folds with a forwarded pack");
+    "non-type value pack Trait<Us>::value... expands to 2 elements");
   __CPROVER_assert(chk((char)1, (char)2) != 2, "WRONG must FAIL");
   return 0;
 }

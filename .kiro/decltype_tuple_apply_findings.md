@@ -699,3 +699,30 @@ cpp11_alias_template_parallel_pack stays KNOWNBUG) and is the residual blocker
 for std::tuple's _TupleConstraints.  NEXT: fix Bug D (fold a pack-expansion alias
 instantiated with a forwarded pack), then cpp11_alias_template_parallel_pack and
 (pending further layers) cpp17_tuple_basic.
+
+## BUG D PRECISELY CHARACTERIZED (2026-07-10) -- NOT yet fixed
+
+Re-investigated the residual "Bug D" (renamed test:
+cpp11_nontype_value_pack_fn_template).  The earlier "pack-expansion alias with a
+forwarded pack doesn't fold" description was imprecise (the alias and `sizeof`
+were confounds).  DECISIVE finding (instrumentation): a pack expansion whose
+pattern is a NON-TYPE value dependent on the pack -- `Trait<Us>::value...` -- as
+the template-argument list of a template-id in a FUNCTION TEMPLATE's body is
+resolved ABSTRACTLY at the function template's DEFINITION (pack unbound):
+`box<sz<Us>::v...>` produces only `box<Non_Type0>` (INST_BOX probe fired once,
+name `template.box<Non_Type0>`, nargs=2), and is NOT re-instantiated concretely
+when `chk<char,char>` is instantiated (no concrete `box<1,1>` ever appears),
+so `::n`/`::v` is unconstrained.  Controls: the TYPE-id form `box<sz<Us>...>` and
+a bare pack `box<Us...>` DO re-instantiate concretely and work; only the
+non-type `::value` form fails.  typecheck_template_args's expander DOES fire at
+instantiation with Us(2) (TCA_SZ probe), but the concrete box is never
+instantiated -- the abstract `box<Non_Type0>` baked into chk's body at definition
+is reused.  This is the two-phase issue: a dependent non-type template ARGUMENT
+(`sz<Us>::v`) causes the enclosing template-id to be resolved to an abstract
+instance at definition instead of staying dependent (the type-argument form
+stays dependent and re-instantiates).  A correct fix must keep such a template-id
+dependent and re-instantiate it at the function template's point of
+instantiation; this is a substantial two-phase-name-lookup change and was NOT
+attempted this session to avoid a rushed fix in that machinery.  It is the shape
+of std::tuple's `__and_<is_X<_Types,_UTypes>...>::value` and the residual blocker
+for cpp11_alias_template_parallel_pack / cpp17_tuple_basic.
