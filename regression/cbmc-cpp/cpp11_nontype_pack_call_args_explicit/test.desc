@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.variadic]/4-5.  A NON-type parameter pack expanded as CALL ARGUMENTS
+(`add(I...)`) expands to one argument per element, in a function-template body
+and inside a `decltype` return type.  Previously the pack's element values were
+not substituted, so `add(I...)` produced a nondeterministic result; fixed by
+expanding a non-type call-argument pack from pack_expr_map in both
+expand_call_argument_packs and the function-template body.  The explicitly-
+argumented core of std::apply's `__invoke(f, get<I>(t)...)`.  Non-vacuous: each
+assertion would read a nondeterministic value under the old behaviour.
