@@ -8747,8 +8747,19 @@ bool Parser::rSizeofExpr(exprt &exp)
       {
         if(lex.get_token(cp) == ')')
         {
+          // [expr.sizeof]/5 + [temp.variadic]/8: a `sizeof...(P)` pack-size
+          // query counts the elements of the pack P; this is independent of
+          // whether P is a type or a NON-type parameter pack.  A non-type pack
+          // (e.g. `template<unsigned... Vs>`) does not parse as a type-id
+          // (rTypeName fails above), so its name is read with rName here.  Put
+          // it in ID_type_arg (as the cpp_name it is) -- exactly as the
+          // type-pack path does -- rather than as an OPERAND: an operand would
+          // be type-checked as a value expression (collapsing the pack to a
+          // single element / a stray constant) BEFORE the pack-size logic in
+          // typecheck_expr_sizeof runs.  The type_arg path recognises the
+          // `#sizeof_pack` marker and counts the pack from pack_size_map.
           exp = exprt(ID_sizeof);
-          exp.add_to_operands(std::move(pack_expr));
+          exp.add(ID_type_arg) = static_cast<irept &>(pack_expr);
           exp.set("#sizeof_pack", true);
           set_location(exp, tk);
           return true;
