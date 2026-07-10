@@ -726,3 +726,24 @@ instantiation; this is a substantial two-phase-name-lookup change and was NOT
 attempted this session to avoid a rushed fix in that machinery.  It is the shape
 of std::tuple's `__and_<is_X<_Types,_UTypes>...>::value` and the residual blocker
 for cpp11_alias_template_parallel_pack / cpp17_tuple_basic.
+
+## BUG D FIXED -> CORE (2026-07-10): sizeof...(P) for a non-type parameter pack
+
+Re-minimized Bug D to its true root, which was NOT "forwarded pack doesn't fold"
+but a `sizeof...` bug: `box<1,1>::n == 2` (with `n = sizeof...(Vs)` and
+`template<unsigned... Vs>`) failed DIRECTLY -- no chk/alias/forwarding -- and was
+wrong for every arity (box<1>, box<1,2,3>).  A TYPE parameter pack worked.
+DECISIVE (probe): the parser reads `sizeof...(P)` via rTypeName (-> ID_type_arg,
+counted by the `#sizeof_pack` path) for a type pack, but a NON-type pack does not
+parse as a type-id, so its name was read via rName and stored as an OPERAND; the
+operand is type-checked to a stray constant BEFORE typecheck_expr_sizeof's
+pack-count path runs (probe: at typecheck_expr_sizeof, op0_id=constant).  Fix
+(parse.cpp): store the non-type pack's name in ID_type_arg too, so both forms
+take the pack-counting path.  Verified for arities 1/2/3, type packs unaffected,
+full cbmc-cpp green; flipped cpp11_nontype_value_pack_fn_template to CORE.
+
+RESIDUAL for the two-parallel-pack (cpp11_alias_template_parallel_pack, still
+KNOWNBUG): a recursive non-type-pack trait value (`sum_t<...>::v`, sum_t recurses
+over its pack) instantiated with a FORWARDED pack in a function template
+(`sum_t<sizeof(Us)...>::v` inside chk) still does not fold -- distinct from both
+the sizeof... count bug and the alias-expansion bug.  Next target.
