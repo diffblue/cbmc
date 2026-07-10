@@ -17,7 +17,7 @@ is deferred out of class instantiation so `sums<int,double,char>` correctly
 resolves to `sum_t<1,1,1>`, commit "defer a member alias template's own-pack
 expansion during class instantiation").  This test nonetheless remains a
 KNOWNBUG because of a SEPARATE residual defect
-(cpp11_alias_pack_expansion_forwarded_pack): a pack-expansion alias instantiated
+(cpp11_nontype_value_pack_fn_template): a pack-expansion alias instantiated
 with a pack forwarded from an enclosing function template (`sums<Us...>::v` in
 `chk`) does not fold, so `chk()` is left unconstrained rather than the constant
 3.  Flip to CORE once that residual is fixed.
