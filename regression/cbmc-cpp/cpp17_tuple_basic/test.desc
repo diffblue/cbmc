@@ -5,12 +5,18 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
-Reclassified as KNOWNBUG by the member-alias template-parameter identity fix
-(template_map.cpp, per [temp.local]/1).  That fix makes std::decay /
-std::__conditional resolve correctly, which reroutes std::make_tuple/std::get's
-member instantiation through the lazy, ODR-use-driven path; a member body that
-yields a type-trait result is not instantiated there, leaving a decltype
-unresolved ("expected type, but got expression" at the std::get<0> use).
-Pre-existing gap in ODR-use-driven member-function instantiation
-([temp.inst]/4 + [basic.def.odr]) hidden by the eager-substitution path; tracked
-as Part 2 (.kiro/part2_findings.md).
+KNOWNBUG (real libstdc++ <tuple>).  std::make_tuple(1, 2.0, 'a') then
+std::get<0> reads a wrong value.  Narrowed (2026-07-10): a TWO-element tuple is
+fine end-to-end (both `std::tuple<A,B> t(...)` construction and
+`std::make_tuple(a,b)` with `get<0>`), but a THREE-element tuple fails --
+`std::make_tuple(a,b,c)` yields a wrong `get<0>`, and a manual
+`std::tuple<A,B,C> t(a,b,c)` fails constructor resolution ("found no match for
+symbol 'tuple'").  A hand-written faithful minimal (a recursively-inheriting
+`_Tuple_impl` with a distinct-named element pack + a `get`-style
+`__get_helper<I>` deducing the base) works at all arities, so the residual is
+specific to libstdc++'s tuple CONSTRUCTOR machinery at >=3 elements (the
+_TupleConstraints-guarded variadic constructor / element storage), not the
+recursive-inheritance get<> deduction (that derived-to-base deduction, incl. a
+non-empty trailing pack, is fixed -- see
+cpp11_derived_to_base_variadic_deduction).  Next: cvise the preprocessed
+3-element case to isolate the constructor-machinery defect.
