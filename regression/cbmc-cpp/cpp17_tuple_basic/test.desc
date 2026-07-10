@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+--
 KNOWNBUG (real libstdc++ <tuple>).  std::make_tuple(1, 2.0, 'a') then
 std::get<0> reads a wrong value.  Narrowed (2026-07-10): a TWO-element tuple is
 fine end-to-end (both `std::tuple<A,B> t(...)` construction and
