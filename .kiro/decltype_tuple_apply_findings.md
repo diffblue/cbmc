@@ -626,3 +626,47 @@ template's body (it is a single recursive template_mapt::apply that does not
 distinguish the alias-body boundary) and doing so without regressing the many
 existing pack/alias CORE tests -- needs a dedicated, full-suite-validated pass.
 Root cause is fully established; no heuristic (regression-risking) fix was landed.
+
+## CORRECTED via MINIMIZATION (2026-07-10): TWO separate bugs, one now FIXED
+
+Prompted by "are we using the smallest test?", bisected the 11-line `chk`/
+two-arg-trait/recursive-`all_t` reproducer DOWN.  The confounding structure hid
+the actual defect.  Minimization results (each row a controlled change):
+
+- Direct explicit use `C<int,int>::ctible<int,int>::value` (no `chk`): PASSES.
+- Through member fn template `chk`: FAILS.  -> not class elaboration.
+- Alias uses ONLY its own pack `Us` (V1) OR only the class pack (V2): both FAIL.
+  -> NOT about two parallel packs.
+- Single-element pack: PASSES.  Multi-element: FAILS.  -> the >=2 case.
+- Namespace-scope alias, no class, no `chk` (N5): FAILS.  -> not member alias.
+- Free fn template, NO alias (N3): FAILS.  -> not the alias.
+- Type-based pattern `is_1<Us>...` (P1): PASSES.  Value pattern
+  `is_1<Us>::value...` (N5): FAILS.  -> the `::value` member access.
+- Explicit (no pack) `all_t<is_1<int>::value, is_1<char>::value>` (D1): FAILS.
+  Fixed-arity `template<bool,bool>` (E1): PASSES.  -> the VARIADIC NON-TYPE PACK.
+
+TRUE MINIMAL (5 lines, no class/alias/member/pack-expansion):
+    template<bool...> struct all_t{ static constexpr bool value=true; };
+    template<class A> struct is_1{ static constexpr bool value=true; };
+    all_t<is_1<int>::value, is_1<char>::value>::value;   // 2nd is_1 empty
+
+ROOT CAUSE (BUG A, now FIXED, commit 89ae579832): in
+`typecheck_template_args`, the loop consuming the EXTRA arguments matched by a
+variadic parameter pack treated every `ambiguous` argument as a TYPE
+(`typecheck_type`).  For a NON-type pack (`template<bool...>`) the 2nd+ argument
+`is_1<T>::value` was thus resolved as a type-name inside an empty `is_1<T>`
+(`NOMATCH base=value scope=is_1<char>:: ncand=0`).  The 1st argument was fine
+(main loop distinguishes type vs non-type params).  Fix routes a non-type pack's
+extra args through the expression path.  Validated: cbmc-cpp all pass (102
+skipped), new CORE test cpp11_nontype_pack_member_value_args.  Note: the nested-
+pack EXPANDER (template_map.cpp) was proven CORRECT here (it produced
+`is_1<int>::value`/`is_1<char>::value` with the right substituted types) -- so
+the earlier "expander/alias" hypothesis was a red herring.
+
+REMAINING (BUG B, still KNOWNBUG cpp11_alias_template_parallel_pack): a genuine
+TWO-parallel-pack MEMBER alias body `same_t<Us,Types>::v...` (Us + the class
+pack) still evaluates to a WRONG (non-constant) value even after Bug A's fix
+(H1 deduced and H2 explicit-with-`template` both VERIFICATION FAILED, no longer
+a CONVERSION ERROR).  This is a distinct defect from Bug A.  There is also a
+separate PARSER bug: `C<int,char>::ctible<int,char>::value` at namespace scope
+gives "parse error before ', char > ::'".
