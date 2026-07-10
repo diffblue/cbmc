@@ -1088,3 +1088,37 @@ faithful 3-element std::tuple SFINAE-ctor reduction).
 STILL KNOWNBUG: cpp17_tuple_basic (get<0> still FAILURE -- a further layer in the
 full libstdc++ tuple) and cpp17_apply_basic (separate `decltype` front-end
 limitation: body left incomplete).
+
+## cpp17_tuple_basic ROOT ISOLATED: forwarding-ref variadic ctor + recursive base (2026-07-10)
+
+cpp17_tuple_basic (make_tuple(1,2.0,'a'); get<0> reads wrong value) root, isolated
+to a header-free reproducer (cpp11_fwdref_pack_ctor_recursive_base, KNOWNBUG):
+
+A variadic constructor with a FORWARDING-REFERENCE parameter pack
+`tuple(_U&&... __e) : _Tuple_impl<0,_E...>(static_cast<_U&&>(__e)...)`, forwarding
+each element through a RECURSIVE base (`_Tuple_impl<_Idx,_Head,_Tail...> :
+_Tuple_impl<_Idx+1,_Tail...>`), stores the WRONG (nondeterministic) element values
+when the deduced pack `_U` has DISTINCT types (`tuple<int,double>`).  Narrowing:
+  - by-VALUE variadic ctor pack (`_U... __e`) forwarding to the same recursive
+    base: CORRECT (cpp17_tuple_get_two_pack_ctor_3elem, CORE).
+  - forwarding-ref pack into a NON-recursive fixed-arity target
+    (`two(static_cast<U&&>(u)...)`): CORRECT.
+  - forwarding-ref pack with SAME types (`tuple<int,int>`): CORRECT.
+  - forwarding-ref pack + recursive base + DISTINCT types: WRONG / nondeterministic
+    (members left uninitialized); an inlined-head variant even CRASHES with
+    `cpp_typecheck_code.cpp:1782 typecheck_member_initializer: "at least one
+    parameter"`.
+So the defect is the member-initializer processing of a forwarding-reference
+variadic constructor pack expansion `static_cast<_U&&>(__e)...` forwarded into a
+recursive base's own forwarding-reference ctor (the ctor body/member-init is not
+correctly instantiated/bound for heterogeneous deduced `_U`).  Real libstdc++
+uses a non-variadic two-element tuple specialization, so make_tuple hits this
+only at 3+ elements.
+
+cpp17_apply_basic is a SEPARATE issue (std::apply's decltype/invoke_result return
+type stays `<<type:decltype>>` via the lazy ODR-use member-instantiation path;
+tracked in the apply test.desc / part2 findings), not the forwarding-ref bug.
+
+NEXT: fix member-initializer instantiation for a forwarding-reference variadic
+constructor pack expansion forwarding into a recursive base with heterogeneous
+deduced element types.
