@@ -1205,3 +1205,24 @@ call (`decltype(add(1,2))`) and plain `auto`/`decltype(auto)` forwarding returns
 all work; the defect is specific to a decltype return type over a pack-expansion
 call.  Distinct from the std::tuple construction layer -- fixing it should
 unblock cpp17_apply_basic and may help other invoke_result/decltype-return uses.
+
+## apply core: non-type pack call-arg expansion -- root localized (2026-07-10)
+
+cpp11_decltype_return_nontype_pack_call ("no match for symbol 'impl'"): the true
+defect is `add(I...)` -- a NON-type parameter pack expanded as CALL ARGUMENTS.
+Even `return add(I...)` (no decltype) fails; a fixed-arg `decltype(add(1,2))` and
+plain auto/decltype(auto) returns work.  Narrowing (ECAP probe on the decltype
+path): expand_call_argument_packs IS reached, but the deduced pack `I` has
+pack_args_map[I] EMPTY (n=0) and pack_expr_map EMPTY -- only pack_size_map[I]=2
+is set (so sizeof...(I) works).  So the non-type pack records its SIZE but not
+its element VALUES; `add(I...)` has nothing to expand.
+
+Done: expand_call_argument_packs now consumes pack_expr_map for a non-type call-
+arg pack (building block, committed, no regression) -- inert until values exist.
+
+REMAINING (root): the deduced/bound non-type parameter pack's element VALUES must
+be populated into pack_expr_map (guess_template_args / build), not just its size.
+TWO call-arg-expansion paths also need it: (1) decltype operands via
+expand_call_argument_packs (now pack_expr_map-aware); (2) FUNCTION BODY calls
+(`return add(I...)`) which bypass expand_call_argument_packs and go through the
+method-body / compound expansion -- that path needs the same non-type handling.
