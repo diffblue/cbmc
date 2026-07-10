@@ -8,7 +8,7 @@
 // specialization, which is why cpp17_tuple_basic's make_tuple(1,2.0,'a') is the
 // first case to hit this).
 //
-// KNOWNBUG: with a forwarding-reference parameter pack whose deduced elements
+// FIXED (was KNOWNBUG): with a forwarding-reference parameter pack whose elements
 // are of DISTINCT types (`tuple<int,double>` -> `_U = {int,double}`), CBMC
 // stores the wrong element values (get<0> reads a value != the constructor
 // argument).  A same-typed pack (`tuple<int,int>`) is stored correctly, and a
@@ -17,10 +17,9 @@
 // to a forwarding-reference (`_U&&`) parameter pack forwarded through recursive
 // base construction with heterogeneous element types.  g++/clang++ store 1.
 //
-// Root of cpp17_tuple_basic (std::make_tuple(1,2.0,'a'); std::get<0> reads the
-// wrong value).  Flip to CORE once a forwarding-reference variadic constructor
-// pack forwards heterogeneous elements into a recursive base correctly.
-// Non-vacuity: assertion 2 ("WRONG must FAIL") must FAIL when the fix lands.
+// This is the forwarding-reference core of libstdc++ std::tuple's constructor
+// (used for 3+ elements); fixed by substituting the parallel type pack per
+// element in the member-initializer expansion.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
@@ -76,7 +75,8 @@ auto get(tuple<_E...> &__t)
 int main()
 {
   tuple<int, double> t(11, 22.0);
-  __CPROVER_assert(get<0>(t) == 11, "get<0> keeps its value under forwarding");
-  __CPROVER_assert(get<0>(t) != 11, "WRONG must FAIL");
+  __CPROVER_assert(get<0>(t) == 11, "get<0> keeps its int value under forwarding");
+  __CPROVER_assert(
+    get<1>(t) == 22.0, "get<1> keeps its double value under forwarding");
   return 0;
 }

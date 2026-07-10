@@ -1,26 +1,18 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ get<0> keeps its value under forwarding: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.deduct.call]/3 + [dcl.init]/17 + [temp.variadic]/4-5.  A
-variadic constructor taking a forwarding-reference parameter pack `_U&&... __e`
-that forwards each element into a recursive base's constructor (exactly
-libstdc++ std::tuple's constructor over `_Tuple_impl<_Idx,_Head,_Tail...> :
-_Tuple_impl<_Idx+1,_Tail...>`) stores the WRONG element values when the deduced
-pack has DISTINCT element types (`tuple<int,double>`): get<0> reads a
-nondeterministic value instead of the constructor argument, so both `==11` and
-`!=11` can fail.  A same-typed pack (`tuple<int,int>`) and a by-VALUE variadic
-constructor pack (cpp17_tuple_get_two_pack_ctor_3elem, CORE) are stored
-correctly, so the defect is specific to a forwarding-reference (`_U&&`)
-parameter pack forwarded through recursive base construction with heterogeneous
-types.  This is the root of cpp17_tuple_basic (std::make_tuple(1,2.0,'a') then
-std::get<0> reads the wrong value; two-element tuples use a non-variadic
-specialization, so 3+ elements are the first to hit it).  g++/clang++ store 1.
-Flip to CORE once such a forwarding-reference variadic constructor pack forwards
-heterogeneous elements into a recursive base correctly.
+N5008 [temp.variadic]/4-5 + [temp.deduct.call]/3.  A variadic constructor with a
+FORWARDING-REFERENCE parameter pack `tuple(_U&&... __e) :
+_Tuple_impl<0,_E...>(static_cast<_U&&>(__e)...)`, forwarding each element through
+a recursive base, stores the correct element values for a heterogeneously-typed
+pack (tuple<int,double>).  Previously the value pack `u` was replicated to
+`u$k` but the parallel type pack `_U` in `static_cast<_U&&>` was left
+unsubstituted, giving a static_cast type mismatch and an uninitialised member;
+now the type pack's k-th element is substituted in lock-step.  This is the
+forwarding-reference core of libstdc++ std::tuple's 3+-element constructor.
+Non-vacuous: both element reads would be nondeterministic under the old collapse.
