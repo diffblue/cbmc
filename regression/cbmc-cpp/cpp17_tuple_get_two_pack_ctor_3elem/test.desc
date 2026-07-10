@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ g0: SUCCESS$
@@ -7,17 +7,14 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG (header-free, cvise-reduced-then-repaired isolation of
+CORE (was KNOWNBUG; header-free, cvise-reduced-then-repaired isolation of
 cpp17_tuple_basic).  Mirrors libstdc++ std::tuple: a variadic converting
 constructor guarded by a defaulted SFINAE template parameter whose condition is a
-TWO-parallel-pack fold over the class pack and the constructor's own pack
+two-parallel-pack fold over the class pack and the constructor's own pack
 (`_TupleConstraints<_Elements...>::ic<_UElements...>()` ==
-`and_<is_ctible<_Elements,_UElements>::value...>::value`).  For THREE elements
-CBMC fails to evaluate that constraint, reports "found no match for symbol
-'tuple'" during make_tuple's construction, so the tuple is unconstructed and
-get<0> reads a nondeterministic value (get<0> == 1 fails).  Two elements are
-handled correctly, and a plain (unconstrained) variadic constructor is handled
-correctly, so the residual is the two-parallel-pack constexpr constraint in a
-variadic constructor's SFINAE default template argument at >= 3 elements.  Both
-g++ and clang++ accept and run the program with get<0> == 1.  Flip to CORE once
-that constraint is evaluated at >= 3 elements.
+`and_<is_ctible<_Elements,_UElements>::value...>::value`), plus `get<I>` via
+derived-to-base deduction of the `_Tuple_impl<I,...>` base.  This is greened by
+the recursive non-type / bool parameter-pack fixes (the recursive `and_<...>`
+fold over a partial specialization with an empty deduced trailing pack now
+evaluates); make_tuple constructs the tuple and get<0> reads the constructed
+value.  Both g++ and clang++ run it with get<0> == 1.
