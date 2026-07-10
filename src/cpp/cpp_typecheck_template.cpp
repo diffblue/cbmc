@@ -1767,19 +1767,28 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // collapsing the pack to a single element so the surrounding constexpr trait
   // could not be folded for two or more elements.
   if(
-    !template_map.pack_args_map.empty() && !disable_template_arg_pack_expansion)
+    (!template_map.pack_args_map.empty() ||
+     !template_map.pack_expr_map.empty()) &&
+    !disable_template_arg_pack_expansion)
   {
     cpp_template_args_tct::argumentst expanded;
     expanded.reserve(args.size());
     for(auto &arg : args)
     {
       bool did_expand = false;
-      if(
-        (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
-        arg.type().get_bool(ID_ellipsis))
+      // A type pattern carries its ellipsis on the arg's type (a `cpp_name`,
+      // pointer/reference or cv-qualified type); a value pattern -- e.g. the
+      // comma-expression `((void)Pred, true)...` of libc++'s __all/__is_same --
+      // is not a type and carries the ellipsis on the arg node itself.
+      const bool type_pattern =
+        (arg.id() == ID_ambiguous || arg.id() == ID_type);
+      const bool is_expansion =
+        (type_pattern && arg.type().get_bool(ID_ellipsis)) ||
+        arg.get_bool(ID_ellipsis);
+      if(is_expansion)
       {
         // Collect the parameter packs referenced anywhere in the pattern
-        // (suffix match against the active packs).
+        // (suffix match against the active type and non-type packs).
         std::set<irep_idt> referenced_packs;
         std::function<void(const irept &)> collect = [&](const irept &n)
         {
@@ -1795,21 +1804,45 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               if(suffix == id2string(id))
                 referenced_packs.insert(pe.first);
             }
+            for(const auto &pe : template_map.pack_expr_map)
+            {
+              const std::string &key = id2string(pe.first);
+              auto p = key.rfind("::");
+              const std::string suffix =
+                p != std::string::npos ? key.substr(p + 2) : key;
+              if(suffix == id2string(id))
+                referenced_packs.insert(pe.first);
+            }
           }
           for(const auto &c : n.get_named_sub())
             collect(c.second);
           for(const auto &c : n.get_sub())
             collect(c);
         };
-        collect(arg.type());
+        if(type_pattern)
+          collect(arg.type());
+        else
+          collect(arg);
+
+        // A referenced pack is a type pack (pack_args_map) or a non-type pack
+        // (pack_expr_map); this gives its element count.
+        auto pack_len = [&](const irep_idt &pid) -> std::size_t
+        {
+          auto a = template_map.pack_args_map.find(pid);
+          if(a != template_map.pack_args_map.end())
+            return a->second.size();
+          auto e = template_map.pack_expr_map.find(pid);
+          if(e != template_map.pack_expr_map.end())
+            return e->second.size();
+          return 0;
+        };
 
         if(!referenced_packs.empty())
         {
-          const std::size_t n =
-            template_map.pack_args_map.at(*referenced_packs.begin()).size();
+          const std::size_t n = pack_len(*referenced_packs.begin());
           bool consistent = true;
           for(const auto &pid : referenced_packs)
-            if(template_map.pack_args_map.at(pid).size() != n)
+            if(pack_len(pid) != n)
               consistent = false;
           if(consistent)
           {
@@ -1820,18 +1853,78 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               template_mapt element_map = template_map;
               for(const auto &pid : referenced_packs)
               {
-                element_map.type_map[pid] =
-                  template_map.pack_args_map.at(pid)[i];
+                auto a = template_map.pack_args_map.find(pid);
+                if(a != template_map.pack_args_map.end())
+                  element_map.type_map[pid] = a->second[i];
+                else
+                {
+                  auto e = template_map.pack_expr_map.find(pid);
+                  if(e != template_map.pack_expr_map.end())
+                    element_map.expr_map[pid] = e->second[i];
+                }
                 element_map.pack_args_map.erase(pid);
+                element_map.pack_expr_map.erase(pid);
                 element_map.pack_size_map.erase(pid);
               }
-              typet pattern = static_cast<const typet &>(arg.type());
-              pattern.remove(ID_ellipsis);
-              element_map.apply(pattern);
-              exprt type_arg(ID_type);
-              type_arg.type() = pattern;
-              type_arg.add_source_location() = arg.source_location();
-              expanded.push_back(type_arg);
+              if(type_pattern)
+              {
+                typet pattern = static_cast<const typet &>(arg.type());
+                pattern.remove(ID_ellipsis);
+                element_map.apply(pattern);
+                exprt type_arg(ID_type);
+                type_arg.type() = pattern;
+                type_arg.add_source_location() = arg.source_location();
+                expanded.push_back(type_arg);
+              }
+              else
+              {
+                // Value pattern (e.g. comma-expression): substitute each
+                // referenced non-type pack's i-th VALUE for its bare cpp_name
+                // references, then let apply() finish any type/template-arg
+                // substitution.  The comma is folded to its right operand
+                // later in this function ([expr.comma]); binding the discarded
+                // operand's pack reference keeps it well-formed.
+                std::map<std::string, exprt> repl_map;
+                for(const auto &pid : referenced_packs)
+                {
+                  auto e = template_map.pack_expr_map.find(pid);
+                  if(e == template_map.pack_expr_map.end())
+                    continue;
+                  const std::string &key = id2string(pid);
+                  auto p = key.rfind("::");
+                  const std::string suffix =
+                    p != std::string::npos ? key.substr(p + 2) : key;
+                  repl_map[suffix] = e->second[i];
+                }
+                std::function<void(exprt &)> repl = [&](exprt &node)
+                {
+                  if(
+                    node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+                    node.get_sub()[0].id() == ID_name)
+                  {
+                    auto it = repl_map.find(
+                      id2string(node.get_sub()[0].get(ID_identifier)));
+                    if(it != repl_map.end())
+                    {
+                      node = it->second;
+                      return;
+                    }
+                  }
+                  for(auto &op : node.operands())
+                    repl(op);
+                };
+                exprt pattern = arg;
+                pattern.remove(ID_ellipsis);
+                repl(pattern);
+                element_map.apply(pattern);
+                // [expr.comma]: a comma-expression pattern yields its right
+                // operand.  Fold it here so the expanded element is a plain
+                // value argument (the discarded left operand, whose pack
+                // reference is now bound, keeps it well-formed).
+                if(pattern.id() == ID_comma && pattern.operands().size() == 2)
+                  pattern = to_binary_expr(pattern).op1();
+                expanded.push_back(pattern);
+              }
             }
             did_expand = true;
           }

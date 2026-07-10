@@ -1077,6 +1077,39 @@ void template_mapt::apply(typet &type) const
                 was_pack = true;
             }
           }
+          // Bare NON-type parameter pack `T...`: unlike a type pack, whose
+          // ellipsis sits on the cpp_name TYPE, a non-type pack's ellipsis sits
+          // on the `ambiguous` ARG node.  Expand to its element VALUES from
+          // pack_expr_map (N5008 [temp.variadic]/4-5).  Gated on the single
+          // name actually naming a recorded non-type pack, so ordinary
+          // arg-level-ellipsis arguments are untouched.
+          if(
+            !was_pack && arg.id() == "ambiguous" && arg.get_bool(ID_ellipsis) &&
+            static_cast<const exprt &>(arg).type().id() == ID_cpp_name)
+          {
+            const irept::subt &csub =
+              static_cast<const exprt &>(arg).type().get_sub();
+            if(csub.size() == 1 && csub.front().id() == ID_name)
+            {
+              irep_idt ident = csub.front().get(ID_identifier);
+              for(const auto &pe : pack_expr_map)
+              {
+                const std::string &key = id2string(pe.first);
+                auto p = key.rfind("::");
+                const std::string suffix =
+                  p != std::string::npos ? key.substr(p + 2) : key;
+                if(suffix == id2string(ident))
+                {
+                  for(const auto &val : pe.second)
+                    expanded_args.push_back(static_cast<const irept &>(val));
+                  was_pack = true;
+                  break;
+                }
+              }
+              if(!was_pack && matches_empty_pack(ident))
+                was_pack = true;
+            }
+          }
           // [temp.variadic]/4-5: a pack expansion whose pattern is not
           // simply the bare pack (e.g. `typename W<E>::type...`, where the
           // pack `E` is nested inside the pattern) must be expanded once
@@ -1099,6 +1132,15 @@ void template_mapt::apply(typet &type) const
               if(!id.empty())
               {
                 for(const auto &pe : pack_args_map)
+                {
+                  const std::string &key = id2string(pe.first);
+                  auto p = key.rfind("::");
+                  const std::string suffix =
+                    p != std::string::npos ? key.substr(p + 2) : key;
+                  if(suffix == id2string(id))
+                    referenced_packs.insert(pe.first);
+                }
+                for(const auto &pe : pack_expr_map)
                 {
                   const std::string &key = id2string(pe.first);
                   auto p = key.rfind("::");
@@ -1148,13 +1190,24 @@ void template_mapt::apply(typet &type) const
 
             if(!defer_for_own_pack && !referenced_packs.empty())
             {
+              // A referenced pack is either a type pack (pack_args_map) or a
+              // non-type pack (pack_expr_map); this helper gives its length.
+              auto pack_len = [&](const irep_idt &pid) -> std::size_t
+              {
+                auto a = pack_args_map.find(pid);
+                if(a != pack_args_map.end())
+                  return a->second.size();
+                auto e = pack_expr_map.find(pid);
+                if(e != pack_expr_map.end())
+                  return e->second.size();
+                return 0;
+              };
               // All packs in a single expansion expand in lock-step and
               // therefore must have the same length ([temp.variadic]/5).
-              const std::size_t n =
-                pack_args_map.at(*referenced_packs.begin()).size();
+              const std::size_t n = pack_len(*referenced_packs.begin());
               bool consistent = true;
               for(const auto &pid : referenced_packs)
-                if(pack_args_map.at(pid).size() != n)
+                if(pack_len(pid) != n)
                   consistent = false;
               if(consistent)
               {
@@ -1165,8 +1218,19 @@ void template_mapt::apply(typet &type) const
                   template_mapt element_map = *this;
                   for(const auto &pid : referenced_packs)
                   {
-                    element_map.type_map[pid] = pack_args_map.at(pid)[i];
+                    auto a = pack_args_map.find(pid);
+                    if(a != pack_args_map.end())
+                      element_map.type_map[pid] = a->second[i];
+                    else
+                    {
+                      // Non-type pack: bind the i-th VALUE as a scalar
+                      // non-type parameter binding.
+                      auto e = pack_expr_map.find(pid);
+                      if(e != pack_expr_map.end())
+                        element_map.expr_map[pid] = e->second[i];
+                    }
                     element_map.pack_args_map.erase(pid);
+                    element_map.pack_expr_map.erase(pid);
                     element_map.pack_size_map.erase(pid);
                   }
                   exprt element = static_cast<const exprt &>(arg);
@@ -1178,6 +1242,11 @@ void template_mapt::apply(typet &type) const
               }
             }
           }
+          // Generalized pack expansion whose pattern is an EXPRESSION rather
+          // than an `ambiguous` cpp_name (e.g. a comma-expression
+          // `((void)Pred, true)...`, libc++'s __all/__is_same idiom) is
+          // expanded later in typecheck_template_args, which folds the
+          // comma-operator per element ([temp.variadic]/4-5, [expr.comma]).
           if(!was_pack)
             expanded_args.push_back(arg);
         }
@@ -1292,19 +1361,71 @@ void template_mapt::apply(exprt &expr) const
     if(node.id() == ID_template_args)
     {
       irept &args = node.add(ID_arguments);
+      irept::subt new_args;
       for(auto &arg : args.get_sub())
       {
         if(arg.id() != ID_ambiguous)
+        {
+          new_args.push_back(arg);
           continue;
+        }
         // The ambiguous node stores the cpp_name in its "type" field
         const irept &inner = arg.find(ID_type);
-        if(inner.id() != ID_cpp_name)
+        if(
+          inner.id() != ID_cpp_name || inner.get_sub().size() != 1 ||
+          inner.get_sub()[0].id() != ID_name)
+        {
+          new_args.push_back(arg);
           continue;
-        // Check if the cpp_name is a single identifier
-        if(inner.get_sub().size() != 1 || inner.get_sub()[0].id() != ID_name)
-          continue;
+        }
         const std::string target =
           id2string(inner.get_sub()[0].get(ID_identifier));
+
+        // N5008 [temp.variadic]/4-5: a bare NON-type parameter pack expansion
+        // `T...` in a value-context template-id (e.g. `cnt<T...>::n`) expands
+        // to ALL of the pack's element values, not a single scalar.  This is
+        // the value-context analogue of the pack expansion in apply(typet).
+        if(arg.get_bool(ID_ellipsis))
+        {
+          bool handled = false;
+          for(const auto &pe : pack_expr_map)
+          {
+            const std::string &key = id2string(pe.first);
+            auto p = key.rfind("::");
+            const std::string suffix =
+              p != std::string::npos ? key.substr(p + 2) : key;
+            if(suffix == target)
+            {
+              for(const auto &val : pe.second)
+                new_args.push_back(static_cast<const irept &>(val));
+              handled = true;
+              break;
+            }
+          }
+          // A non-type pack that resolved to zero elements: drop the bare
+          // reference (zero-length expansion).
+          if(!handled)
+          {
+            for(const auto &ps : pack_size_map)
+            {
+              if(ps.second != 0)
+                continue;
+              const std::string &key = id2string(ps.first);
+              auto p = key.rfind("::");
+              const std::string suffix =
+                p != std::string::npos ? key.substr(p + 2) : key;
+              if(suffix == target)
+              {
+                handled = true;
+                break;
+              }
+            }
+          }
+          if(handled)
+            continue;
+        }
+
+        bool subst = false;
         for(const auto &entry : expr_map)
         {
           const std::string &key = id2string(entry.first);
@@ -1314,11 +1435,15 @@ void template_mapt::apply(exprt &expr) const
              key.substr(key.size() - target.size()) == target &&
              key[key.size() - target.size() - 1] == ':'))
           {
-            arg = entry.second;
+            new_args.push_back(entry.second);
+            subst = true;
             break;
           }
         }
+        if(!subst)
+          new_args.push_back(arg);
       }
+      args.get_sub() = new_args;
     }
     for(auto &sub : node.get_sub())
       subst_params(sub);
@@ -1585,6 +1710,7 @@ void template_mapt::build(
     shadow(expr_map);
     shadow(pack_size_map);
     shadow(pack_args_map);
+    shadow(pack_expr_map);
   }
 
   // Bind each parameter to its argument(s).  With a parameter pack at index
@@ -1615,16 +1741,15 @@ void template_mapt::build(
     has_pack && nargs >= non_pack ? nargs - non_pack : 0;
   for(std::size_t p = 0; p < nparams; ++p)
   {
-    // A *type* parameter pack must not be scalar-bound to its first
-    // argument here: doing so records type_map[Pack] = <first element>,
-    // which then collapses pack expansions and `sizeof...(Pack)` to a single
-    // element.  Type packs are bound below via pack_args_map / pack_size_map
-    // (and, for a single-element pack, a type_map convenience entry) per
-    // [temp.variadic]/5,8.  Non-type packs are left to the existing scalar
-    // binding (the pack block records only type elements).
-    const bool is_type_pack =
-      static_cast<int>(p) == pack_idx && template_parameters[p].id() == ID_type;
-    if(is_type_pack)
+    // A parameter pack must not be scalar-bound to its first argument here.
+    // For a *type* pack that records type_map[Pack] = <first element>; for a
+    // *non-type* pack that records expr_map[Pack] = <first value>.  Either
+    // way it then collapses pack expansions and `sizeof...(Pack)` to a single
+    // element.  Packs are bound below via pack_size_map and pack_args_map (type
+    // packs) / pack_expr_map (non-type packs), plus a single-element
+    // convenience entry, per [temp.variadic]/5,8.
+    const bool is_pack = static_cast<int>(p) == pack_idx;
+    if(is_pack)
       continue;
     // The argument index for this parameter: parameters at or before the pack
     // align from the front; parameters after the pack are shifted by the
@@ -1670,6 +1795,18 @@ void template_mapt::build(
         pack_types.push_back(instance[j].type());
       }
     }
+    // N5008 [temp.variadic]: collect a NON-type pack's element VALUES (the
+    // value analogue of pack_types), so `Foo<T...>` over it can be expanded to
+    // the concrete constants.  Now that a non-type pack is no longer
+    // scalar-bound in expr_map (see the gate above), this is its only binding.
+    std::vector<exprt> pack_exprs;
+    for(std::size_t j = static_cast<std::size_t>(pack_idx);
+        j < static_cast<std::size_t>(pack_idx) + pack_count && j < nargs;
+        ++j)
+    {
+      if(instance[j].id() != ID_type)
+        pack_exprs.push_back(instance[j]);
+    }
     pack_size_map[pack_id] = pack_sz;
     if(!pack_types.empty())
     {
@@ -1678,6 +1815,18 @@ void template_mapt::build(
       // the type to type_map so template_map.apply() can substitute.
       if(pack_args_map[pack_id].size() == 1)
         type_map[pack_id] = pack_args_map[pack_id].front();
+    }
+    else if(!pack_exprs.empty())
+    {
+      // Non-type parameter pack: bind its element VALUES (the value analogue
+      // of the type-pack branch above), per [temp.variadic]/5,8.  A
+      // single-element non-type pack also gets a scalar expr_map convenience
+      // entry, mirroring the type_map convenience.
+      pack_expr_map[pack_id] = std::move(pack_exprs);
+      if(pack_expr_map[pack_id].size() == 1)
+        expr_map[pack_id] = pack_expr_map[pack_id].front();
+      pack_args_map.erase(pack_id);
+      type_map.erase(pack_id);
     }
     else
     {
@@ -1694,6 +1843,8 @@ void template_mapt::build(
       // binding so the empty pack expands to zero arguments ([temp.variadic]).
       pack_args_map.erase(pack_id);
       type_map.erase(pack_id);
+      pack_expr_map.erase(pack_id);
+      expr_map.erase(pack_id);
     }
   }
 }
