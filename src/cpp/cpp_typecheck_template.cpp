@@ -2561,9 +2561,42 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     args.size() > parameters.size() && !parameters.empty() &&
     parameters.back().get_bool(ID_ellipsis))
   {
+    // N5008 [temp.arg.nontype] + [temp.variadic]/4-5: the arguments matched
+    // by a *non-type* parameter pack (e.g. `template<bool...>`) are non-type
+    // template arguments -- converted constant expressions -- NOT types.  The
+    // main parameter loop above already distinguishes a type parameter
+    // (`parameter.id() == ID_type`) from a non-type one and routes the latter
+    // through the expression branch; the extra-argument loop must make the
+    // same distinction.  Otherwise an `ambiguous` argument such as
+    // `is_trait<T>::value` (the parser cannot tell a type-id from an
+    // expression) is wrongly typechecked as a *type*, which resolves `value`
+    // as a type-name inside a freshly (and only partially) elaborated
+    // `is_trait<T>` and fails with "found no match for symbol 'value'" for the
+    // second and subsequent pack elements (the first element is handled by the
+    // main loop).  This is the shape of libstdc++'s `__and_<is_X<...>...>`
+    // constraint packs.
+    const bool nontype_pack = parameters.back().id() != ID_type;
     for(std::size_t i = parameters.size(); i < args.size(); i++)
     {
       exprt &arg = args[i];
+      if(nontype_pack)
+      {
+        // Treat the argument as a non-type template argument (an
+        // expression), matching the non-type branch of the main loop.
+        if(
+          (arg.id() == ID_ambiguous || arg.id() == ID_type) &&
+          arg.type().id() == ID_cpp_name)
+        {
+          exprt e{ID_cpp_name};
+          e.get_sub() = arg.type().get_sub();
+          e.add_source_location() = arg.source_location();
+          arg.swap(e);
+        }
+        constant_expression_contextt constant_expression_guard{*this};
+        typecheck_expr(arg);
+        simplify(arg, *this);
+        continue;
+      }
       if(arg.id() == ID_type || arg.id() == ID_ambiguous)
       {
         if(arg.id() == ID_ambiguous)
