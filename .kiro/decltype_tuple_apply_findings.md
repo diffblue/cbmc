@@ -509,3 +509,44 @@ Fixing (a)/(b) (bind the alias's pack; expand a pack passed as an alias argument
 list) should let the existing lock-step expander (c) pair both packs.  This is
 the tuple-constraint layer; cpp17_tuple_basic / cpp17_apply_basic stay KNOWNBUG.
 Recorded as KNOWNBUG cpp11_alias_template_parallel_pack.
+
+## REFINED (2026-07-09 cont.): sub-bugs (a)/(b) re-diagnosed; real bug is (c)/(d)
+
+Careful re-tracing with a CLEAN reproducer (deduced args, no explicit-args
+confound) refuted the earlier (a)/(b) framing and found TWO distinct bugs:
+
+BUG 1 (separate, real, NOT the tuple blocker): a QUALIFIED template-id naming a
+STATIC member function template of a class template, WITHOUT the `template`
+keyword, drops the member's explicit template args:
+  `C<int>::chk<int,double,char>()`  (chk = `template<class... Us> static ...`)
+resolve_scope sees the cpp_name `C<int>::chk` with NO template_args for chk (the
+parser did not attach them; `qualified=1` path), so chk is instantiated
+abstractly (sizeof...(Us)==wrong).  Adding `template` (`C<int>::template
+chk<...>()`) fixes it; g++ does not require `template` for the non-dependent
+`C<int>`.  libstdc++'s tuple uses `template` (`_TCC<_Cond>::template
+__is_implicitly_constructible<...>`), so it does NOT hit this.  My earlier
+"resolve_template_alias gets 0 args" finding was this confound.
+
+BUG 2 (the tuple blocker): a MEMBER ALIAS TEMPLATE whose body is a two-parallel-
+pack expansion `Trait<Types, Us>...` (class pack + the alias's own pack) fails
+even with DEDUCED args and no confound (reproducers TY1/TY2, AL-unqual all FAIL;
+g++ OK).  Decisive trace:
+  - The alias IS instantiated with the right args (tc_nargs=3).
+  - `template_mapt::build` DOES bind the alias's own pack (BUILD3:
+    pack_args_map[C<...>::...::27::Us] = {int,double,char}, size 3).
+  - BUT during the alias BODY substitution (template_mapt::apply of
+    `all_t<is_c<Types,Us>::value...>`), the nested-pack `collect()` sees a
+    pack_args_map containing ONLY the class pack `Types` -- the alias's own pack
+    `::27::Us` binding is GONE.  So `collect()` finds only `Types`, the
+    lock-step expander pairs one pack, and `Us` is left unresolved
+    ("found no match for symbol 'value'/'v'").
+So the binding built for the alias's pack is LOST between build() and the body
+apply() -- a template_map lifecycle issue confined to alias instantiation (the
+built pack binding does not survive to the aliased-type substitution).  This is
+the real fix site (NOT "expand the pack-as-alias-arg" and NOT "bind the alias
+pack" -- both already happen; the binding just doesn't reach the body apply).
+
+STATUS: root pinned but not yet fixed (deep template_map lifecycle in
+instantiate_template's alias path).  KNOWNBUG cpp11_alias_template_parallel_pack
+stands; BUG 1 (static qualified template-id without `template`) is a separate
+worthwhile fix.  No source change landed this turn; tree clean.
