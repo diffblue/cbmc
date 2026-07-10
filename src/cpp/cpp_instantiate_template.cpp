@@ -1689,13 +1689,35 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             // unused branches (e.g. conditional_t's false branch).
             bool old_suppress = suppress_elaborate;
             suppress_elaborate = true;
+            // [temp.arg.explicit]/4 note 1 + [temp.variadic]/4: a trailing
+            // parameter pack deduced to an empty sequence contributes zero
+            // arguments.  When the specialization pattern has MORE arguments
+            // than the actual (`<H, T...>` matched against `<3>`), the extra
+            // trailing pack-expansion arguments are those empty packs; drop
+            // them from the pattern before re-type-checking so a NON-type pack
+            // expansion `T...` is not evaluated as an unassigned scalar (which
+            // throws).  This mirrors the trailing-empty-pack trim applied to
+            // the type-checked result below.
+            cpp_template_args_non_tct trimmed_psa = partial_specialization_args;
+            {
+              auto &in_args = trimmed_psa.arguments();
+              while(in_args.size() > full_args_tc.arguments().size() &&
+                    !in_args.empty())
+              {
+                const auto &last = in_args.back();
+                if(
+                  last.get_bool(ID_ellipsis) ||
+                  last.type().get_bool(ID_ellipsis))
+                  in_args.pop_back();
+                else
+                  break;
+              }
+            }
             try
             {
               sfinae_contextt sfinae_guard{*this};
               partial_specialization_args_tc = typecheck_template_args(
-                type.source_location(),
-                primary_template,
-                partial_specialization_args);
+                type.source_location(), primary_template, trimmed_psa);
             }
             catch(...)
             {
