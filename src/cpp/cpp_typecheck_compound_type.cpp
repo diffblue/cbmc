@@ -623,6 +623,51 @@ void cpp_typecheckt::typecheck_compound_declarator(
                 copy.remove(ID_ellipsis);
                 mi_rename(
                   copy, base, id2string(base) + "$" + std::to_string(k));
+                // N5008 [temp.variadic]/4-5: a pack expansion expands ALL packs
+                // it mentions in lock-step.  Having renamed the function
+                // parameter pack `base` to `base$k`, replace any PARALLEL
+                // template TYPE pack in the same pattern (e.g. the `_U` in
+                // `static_cast<_U&&>(u)...`, the std::forward forwarding-
+                // reference idiom of std::tuple's constructor) by its k-th
+                // element type; otherwise it is left as an unsubstituted pack
+                // name, yielding a static_cast type mismatch and an
+                // uninitialised member.
+                {
+                  std::map<std::string, typet> elem_by_short;
+                  for(const auto &pa : template_map.pack_args_map)
+                  {
+                    if(pa.second.size() <= k)
+                      continue;
+                    const std::string full = id2string(pa.first);
+                    auto pp = full.rfind("::");
+                    elem_by_short
+                      [pp != std::string::npos ? full.substr(pp + 2) : full] =
+                        pa.second[k];
+                  }
+                  if(!elem_by_short.empty())
+                  {
+                    std::function<void(irept &)> subst_type = [&](irept &nn)
+                    {
+                      if(
+                        nn.id() == ID_cpp_name && nn.get_sub().size() == 1 &&
+                        nn.get_sub().front().id() == ID_name)
+                      {
+                        auto it = elem_by_short.find(
+                          id2string(nn.get_sub().front().get(ID_identifier)));
+                        if(it != elem_by_short.end())
+                        {
+                          nn = it->second;
+                          return;
+                        }
+                      }
+                      for(auto &s : nn.get_sub())
+                        subst_type(s);
+                      for(auto &ns : nn.get_named_sub())
+                        subst_type(ns.second);
+                    };
+                    subst_type(copy);
+                  }
+                }
                 new_args.push_back(copy);
               }
             }
