@@ -997,3 +997,36 @@ Net: the non-type-pack expansion is handled in at least THREE places
 (template_mapt::build, template_mapt::apply's two branches, and
 typecheck_template_args' expander); a correct fix must make ALL consistently
 non-type-aware with a matching arg form.  Sizeable, dedicated, regression-guarded.
+
+## FIX LANDED: non-type parameter pack expansion (2026-07-10)
+
+ROOT (confirmed by code review of template_mapt::build): a non-type parameter
+pack was SCALAR-BOUND to its first argument in expr_map -- exactly the collapse
+build() already avoids for TYPE packs via the `is_type_pack` gate + pack_args_map.
+So `Foo<T...>` over a non-type pack collapsed to one element for >=2 elements;
+one element worked via the single-element convenience.  "Part 2" (recursive
+instantiation) was disproven: concrete recursion works; the earlier symptom was a
+malformed arg from a partial prototype.
+
+FIX (committed b88cdb0686), mirroring type-pack handling in ALL expansion sites:
+1. template_mapt::pack_expr_map (value analogue of pack_args_map); build()'s gate
+   now skips the scalar bind for ANY pack and records non-type values + a
+   single-element expr_map convenience.
+2. template_mapt::apply expands a bare non-type pack `T...` from pack_expr_map in
+   the type-context expander AND the value-context subst_params.
+3. typecheck_template_args' pack expander made non-type-aware (gated on
+   pack_expr_map) and extended to VALUE patterns: libc++'s comma idiom
+   `((void)Pred,true)...` is expanded per element (each pack ref substituted by
+   its i-th value) and folded to the comma's right operand ([expr.comma]).  This
+   was the sole thing making the bare side and the comma side disagree.
+
+RESULT: whole cbmc-cpp suite green, no regressions (libcxx_comma_in_template_arg
+previously passed only via mutual collapse of both __is_same sides).  Flipped to
+CORE: cpp11_nontype_pack_forward_collapse, cpp11_nontype_pack_sizeof_expr_
+forwarded.
+
+STILL KNOWNBUG (separate issue): a recursive PARTIAL SPECIALIZATION naming itself
+over the trailing non-type pack (`sum_t<H,T...>::v = H + sum_t<T...>::v`,
+`and_<H,T...>`) at two elements -- the substituted `sum_t<3>` is expanded but not
+recursively instantiated/resolved.  Tracks cpp11_nontype_pack_recursive_two_elem
+and cpp17_tuple_get_two_pack_ctor_3elem.
