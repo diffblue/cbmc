@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member template-id after non-dependent class-template-id \(true case\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ member template-id after non-dependent class-template-id \(false case\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG (parser): N5008 [temp.names]/5.  The `template` keyword before a member
+template-id is only required for a dependent nested-name-specifier; for a
+non-dependent class-template-id such as `C<int>` it is optional.  CBMC's parser
+rejects `C<int>::al<char>::value` (parse error before '> :: value') but accepts
+`C<int>::template al<char>::value`.  The bug fires for a member alias template
+and a nested class template alike, needs only a single inner argument, and
+requires the outer name to be a class-template-id (a non-template outer class
+parses fine).  This is the shape of libstdc++'s
+`_TupleConstraints<_Types...>::__constructible<_UTypes...>` (written WITH the
+keyword there, so std::tuple does not hit it).  Flip to CORE once the parser
+accepts a member template-id after a non-dependent class-template-id without the
+`template` keyword.
