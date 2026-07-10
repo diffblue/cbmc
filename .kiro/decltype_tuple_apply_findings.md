@@ -905,3 +905,41 @@ cascade.  Deferred as a dedicated pass: the top-level-vs-nested context
 sensitivity indicates an instantiation-ordering interaction that needs careful,
 regression-guarded work rather than a rushed substitution change.  Minimal
 KNOWNBUG already exists: cpp11_nontype_pack_recursive_two_elem.
+
+## CONSTRAINT-EVAL ROOT: two-part non-type-pack defect (2026-07-10, attempt)
+
+Located the root of cpp11_nontype_pack_recursive_two_elem / the tuple ctor
+constraint failure precisely (probes):
+  ROOT PART 1 (storage gap): template_mapt has NO storage for a NON-type
+  parameter pack's element VALUES.  `pack_args_map` (types) is filled in
+  template_mapt::build only for args with `id()==ID_type`; a non-type pack's
+  args are constants (`instance[j].id()==ID_constant`), so pack_args_map stays
+  empty (only pack_size_map gets the count).  Hence a pack expansion `sum_t<T
+  ...>` over a non-type pack cannot be expanded -- the expander in apply() finds
+  the pack in neither map and leaves `sum_t<T...>::v` unsubstituted, producing
+  `2 + <<expr:cpp_name>>` -> "implicit arithmetic conversion not permitted".
+  Also: the bare-pack ellipsis for a NON-type pack sits on the `ambiguous` ARG
+  node (`arg.get_bool(ID_ellipsis)`), not on `arg.type()` as for a type pack.
+
+  ROOT PART 2 (recursive-instantiation trigger): even after substituting
+  `sum_t<T...>` -> `sum_t<3>` (a prototype fix did this, verified), `sum_t<3>` is
+  NOT instantiated during `sum_t<2,3>`'s member-initializer typecheck, so
+  `sum_t<3>::v` stays unresolved.  `sum_t<3>::v` resolves fine at top level, so
+  this is a nested-instantiation-triggering gap in the member-initializer
+  (constant-expression) context -- related to the Part-2 ODR-use member
+  instantiation findings.
+
+FIX ATTEMPT (reverted): added `pack_expr_mapt pack_expr_map` (irep_idt ->
+vector<exprt>) to template_mapt, populated non-type pack values in build(),
+broadened the bare-pack expander branch to accept the arg-level ellipsis and to
+expand a non-type pack from pack_expr_map.  This correctly expanded `sum_t<T...>`
+-> `sum_t<3>` (probe PEXP) BUT (a) did not green the target -- ROOT PART 2 still
+leaves `sum_t<3>::v` unresolved -- and (b) regressed libcxx_comma_in_template_arg
+(the broadened arg-level-ellipsis condition mis-fires for a comma-in-template-arg
+case).  Reverted rather than ship a partial, regressing change.
+
+COMPLETE FIX needs, together: (1) a precise non-type-bare-pack detection (not the
+blanket arg-level-ellipsis broadening that regressed libcxx_comma_in_template_
+arg), (2) pack_expr_map storage + expander expansion for non-type pack VALUES,
+and (3) triggering the recursive instantiation of the substituted nested value
+(`sum_t<3>`) in the member-initializer context.  Sizeable, regression-guarded.
