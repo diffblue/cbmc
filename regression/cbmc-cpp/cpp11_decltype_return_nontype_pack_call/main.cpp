@@ -1,8 +1,9 @@
 // N5008 [temp.deduct]/2,5 + [dcl.type.simple]/4 + [temp.variadic]/4-5: a
 // function template whose TRAILING RETURN TYPE is a `decltype` of a CALL with a
 // pack expansion, `-> decltype(add(I...))`, must have that return type computed
-// (with `I...` expanded) during deduction/overload resolution.  This is exactly
-// the shape of libstdc++ std::apply's helper:
+// (with `I...` expanded) during deduction/overload resolution, and its body
+// call `add(I...)` must expand to the deduced pack's element values.  This is
+// exactly the shape of libstdc++ std::apply's helper:
 //   template<class _Fn, class _Tuple, size_t... _Idx>
 //   constexpr decltype(auto)
 //   __apply_impl(_Fn&& __f, _Tuple&& __t, index_sequence<_Idx...>)
@@ -10,24 +11,28 @@
 //                          std::get<_Idx>(std::forward<_Tuple>(__t))...); }
 // whose result type is `decltype(__invoke(f, get<_Idx>(t)...))`.
 //
-// KNOWNBUG: CBMC fails to resolve such a function template -- "found no match
-// for symbol 'impl'" -- so the call is left untyped and the enclosing body is
-// not fully type-checked.  A `decltype` of a call with FIXED arguments
-// (`-> decltype(add(1,2))`), and a plain `auto` / `decltype(auto)` return whose
-// body simply forwards, are all handled correctly, so the defect is specific to
-// a decltype return type that contains a PACK EXPANSION in the call.  g++ and
-// clang++ compute r == 3.
+// CORE (was KNOWNBUG): CBMC previously failed to resolve such a function
+// template ("found no match for symbol 'impl'").  Fixed by (1) recording a
+// deduced non-type pack's element values in pack_expr_map (not shadowed by an
+// empty pack_args_map entry), (2) expanding that pack to full arity in the
+// guessed template arguments, and (3) expanding a non-type call-argument pack
+// in both the decltype return type and the body.  g++ and clang++ compute the
+// same values.
 //
-// This is the core of cpp17_apply_basic (std::apply(add, make_tuple(1,2))): a
-// separate layer from the std::tuple construction bugs.  Flip to CORE once a
-// decltype-return-type over a pack-expansion call is resolved.
-// Non-vacuity: assertion 2 ("WRONG must FAIL") must FAIL when the fix lands.
+// Non-vacuous: the returned value is a concrete function of the deduced pack
+// (3 / 6), which under the old behaviour was nondeterministic / a resolution
+// failure.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
 int add(int a, int b)
 {
   return a + b;
+}
+
+int add3(int a, int b, int c)
+{
+  return a + b + c;
 }
 
 template <int...>
@@ -41,10 +46,15 @@ auto impl(seq<I...>) -> decltype(add(I...))
   return add(I...);
 }
 
+template <int... I>
+auto impl3(seq<I...>) -> decltype(add3(I...))
+{
+  return add3(I...);
+}
+
 int main()
 {
-  int r = impl(seq<1, 2>{});
-  __CPROVER_assert(r == 3, "decltype-return pack call yields 3");
-  __CPROVER_assert(r != 3, "WRONG must FAIL");
+  __CPROVER_assert(impl(seq<1, 2>{}) == 3, "decltype-return add(1,2)==3");
+  __CPROVER_assert(impl3(seq<1, 2, 3>{}) == 6, "decltype-return add3(1,2,3)==6");
   return 0;
 }
