@@ -1030,3 +1030,33 @@ over the trailing non-type pack (`sum_t<H,T...>::v = H + sum_t<T...>::v`,
 `and_<H,T...>`) at two elements -- the substituted `sum_t<3>` is expanded but not
 recursively instantiated/resolved.  Tracks cpp11_nontype_pack_recursive_two_elem
 and cpp17_tuple_get_two_pack_ctor_3elem.
+
+## RECURSIVE NON-TYPE-PACK PARTIAL SPEC (cpp11_nontype_pack_recursive_two_elem) — precise root (2026-07-10)
+
+Still KNOWNBUG (deep, pre-existing).  Precisely localized:
+- `sum_t<2,3>` (partial spec `sum_t<H,T...>`, H=2, T={3}) instantiates; its member
+  initializer references `sum_t<T...>` = `sum_t<3>` (trailing 1-element pack ->
+  0-element trailing pack).
+- Elaborating `sum_t<3>` runs partial-specialization matching, which RE-TYPE-CHECKS
+  the specialization PATTERN `<H,T...>` via `typecheck_template_args` under an
+  SFINAE context.  For the empty deduced trailing pack the call throws (`throw 0`
+  from a NESTED substitution, not the arg-count/missing-type checks at
+  cpp_typecheck_template.cpp:1971/2013/2227/2354 — those do NOT fire).  Candidate
+  skipped -> `sum_t<3>` falls back to the INCOMPLETE PRIMARY (forward decl, no
+  members).
+- At top level a later member-access completion recovers `sum_t<3>`; inside
+  `sum_t<2,3>`'s member initializer (SFINAE + suppress_elaborate) the failure is
+  final -> `sum_t<3>::v` stays an unresolved cpp_name.
+- DECISIVE: pre-instantiating any `cc<single>` first makes `cc<2,3>` succeed; the
+  TYPE-pack analogue (`ct<H,class...T>`) folds correctly at all arities — so the
+  reference path exists and the defect is specific to the NON-type empty-trailing-
+  pack pattern re-type-check.
+
+Committed this session: `build_unassigned` now clears pack_expr_map like
+pack_args_map/pack_size_map (db7ed04545) — correct consistency fix, no regression,
+but not sufficient (the SFINAE-fail is in the pattern re-type-check, not the leak).
+
+NEXT: make the partial-spec pattern re-type-check tolerate an empty deduced
+trailing NON-type pack (mirror the type-pack path) so `sum_t<3>` matches its
+specialization on first elaboration.  Then cpp11_nontype_pack_recursive_two_elem
+and (cascading) cpp17_tuple_get_two_pack_ctor_3elem should green.
