@@ -1139,3 +1139,24 @@ the two-parallel-pack pattern (`U` type pack + `u` function-parameter pack) in
 lock-step, leaving the base's members uninitialized (nondeterministic).  FIX
 SITE: member-initializer instantiation (cpp_typecheck_code.cpp typecheck_member_
 initializer + the ctor-body substitution), mirroring expand_call_argument_packs.
+
+## FIX LANDED: forwarding-ref ctor member-init parallel type-pack (2026-07-10)
+
+Fixed the forwarding-reference variadic constructor member-initializer bug
+(cpp11_fwdref_pack_ctor_recursive_base, now CORE).  Root: typecheck_compound_
+declarator replicates the function parameter pack `base -> base$k` in the member-
+initializer argument list but did NOT substitute a PARALLEL template type pack in
+the same pattern.  For `Base(static_cast<_U&&>(u)...)` / `Base(std::forward<_U>(u)
+...)` the `_U` was left as an unsubstituted cpp_name -> static_cast type mismatch
+-> uninitialised (nondeterministic) base subobject for heterogeneous types.
+Fix (2a7ff8e603): when replicating each member-init argument for element k, also
+replace a bare cpp_name naming a template type pack by that pack's k-th element
+type (from template_map.pack_args_map), in lock-step with the value-pack rename
+([temp.variadic]/4-5).  Verified: minimal wrap, static_cast and forward<U> forms,
+and the KNOWNBUG all green; whole cbmc-cpp suite green, no regressions.
+
+STILL KNOWNBUG: cpp17_tuple_basic (real libstdc++ make_tuple(1,2.0,'a'); get<0>
+still FAILURE) has a FURTHER layer beyond the forwarding-ref member-init (the
+hand-written forwarding-ref reproducer and the forward<U> form now work, so the
+residual is elsewhere in the real _Tuple_impl chain -- to re-characterize).
+cpp17_apply_basic remains the separate decltype/invoke_result ODR-use issue.
