@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ derived-to-base deduction: head element \(int\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ derived-to-base deduction: deeper base \(char\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.deduct.call]/4 (derived-to-base deduction).  Deducing a
+class-template base `impl<I, H, T...>` from an argument of a class derived from a
+specialization of `impl` now works, including when (a) the derived class is a
+plain non-template `struct D : impl<...>` and (b) the trailing parameter pack `T`
+deduces to a non-empty pack.  CBMC previously aborted when the argument type was
+not itself a template instantiation, before the derived-to-base dispatch could
+run; fixed by walking the argument class's bases for a specialization of the
+deduced template.  This is the mechanism behind std::get<I> on std::tuple.
+Non-vacuous: f<0> and f<1> deduce different elements of the matched base.
