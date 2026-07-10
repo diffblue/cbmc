@@ -1,0 +1,25 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ forwarded non-type pack keeps 2 elements: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+KNOWNBUG (canonical root of the non-type-pack family).  N5008 [temp.variadic]/4-5.
+Forwarding a NON-type parameter pack `T...` into another template-argument list
+(`cnt<T...>`) collapses to a single element for two or more elements:
+`fwd<2,3>::n` (== sizeof...(V)) is 1, not 2.  A one-element pack works (recorded
+as a scalar type_map entry) and a direct `cnt<2,3>::n` works.  Root: template_mapt
+stores a type pack's element TYPES (pack_args_map) but has no storage for a
+non-type pack's element VALUES (build() collects only ID_type args), so the
+expander cannot expand `T...`.  Masked when both sides of a comparison collapse
+equally (libcxx_comma_in_template_arg) but exposed by any count/value read.
+Shared root of cpp11_nontype_pack_recursive_two_elem,
+cpp11_nontype_pack_sizeof_expr_forwarded, cpp17_tuple_get_two_pack_ctor_3elem.
+Complete fix: store non-type pack values (pack_expr_map) and expand them
+consistently in BOTH the bare-pack and nested-pattern expander branches (a
+bare-only fix regresses libcxx_comma_in_template_arg).  Flip to CORE once a
+forwarded non-type pack of >= 2 elements keeps its arity.

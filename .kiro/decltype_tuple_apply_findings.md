@@ -943,3 +943,30 @@ blanket arg-level-ellipsis broadening that regressed libcxx_comma_in_template_
 arg), (2) pack_expr_map storage + expander expansion for non-type pack VALUES,
 and (3) triggering the recursive instantiation of the substituted nested value
 (`sum_t<3>`) in the member-initializer context.  Sizeable, regression-guarded.
+
+## "PART 2" IS NOT SEPARATE; CANONICAL ROOT = non-type pack forwarding collapse (2026-07-10)
+
+Concrete recursive member initializers work in CBMC (`rec<N>::v`, `rec2<2,3>::v`
+all SUCCESSFUL), so the earlier "Part 2 recursive-instantiation" was an artifact
+of the reverted prototype substituting a MALFORMED / inconsistent non-type arg,
+not a separate defect.
+
+CANONICAL ROOT (new KNOWNBUG cpp11_nontype_pack_forward_collapse): forwarding a
+NON-type parameter pack `T...` into another template-argument list
+(`fwd<2,3>` -> `cnt<T...>::n`) collapses to ONE element for >= 2 elements
+(`fwd<2,3>::n` == 1, not 2).  One element works (single-element pack also gets a
+scalar type_map entry); a direct `cnt<2,3>::n` works.  So `pack_args_map`
+(type-only) has no non-type pack VALUES (build() collects only ID_type args), and
+the expander cannot expand `T...`.  MASKED when both comparison sides collapse
+equally (`__is_same(dummy<Pred...>, dummy<((void)Pred,true)...>)`, hence
+libcxx_comma_in_template_arg passes) but EXPOSED by count/value reads.  This is
+the shared root of cpp11_nontype_pack_recursive_two_elem,
+cpp11_nontype_pack_sizeof_expr_forwarded, cpp17_tuple_get_two_pack_ctor_3elem.
+
+COMPLETE FIX (why the earlier bare-only prototype regressed): must store non-type
+pack values (pack_expr_map) AND expand them CONSISTENTLY in BOTH expander
+branches -- the bare `T...` branch and the nested-pattern `Trait<T>...` branch
+(binding the per-element value in the nested element_map).  Fixing only the bare
+branch makes the two sides of `__is_same(dummy<Pred...>, dummy<((void)Pred,
+true)...>)` disagree (one 2-element, one collapsed) and regresses
+libcxx_comma_in_template_arg.
