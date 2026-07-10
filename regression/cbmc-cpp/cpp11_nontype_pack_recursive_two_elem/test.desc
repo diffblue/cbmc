@@ -1,35 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ recursive non-type pack, 2 elements: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.class.spec.match] + [temp.variadic].  A recursive class
-template PARTIAL SPECIALIZATION over a NON-type parameter pack (`sum_t<H, T...>`
-with `v = H + sum_t<T...>::v`) fails to fold for EXACTLY TWO elements
-(`sum_t<2,3>::v` "could not fully type-check ... unsupported construct"), while
-0/1/3/4-element sums fold correctly and the TYPE-pack analogue is fine.  The
-PRIMARY-template non-type pack forwarding collapse this once shared a root with
-is now fixed (cpp11_nontype_pack_forward_collapse and
-cpp11_nontype_pack_sizeof_expr_forwarded are CORE).
-
-PRECISE ROOT (localized 2026-07-10): while instantiating `sum_t<2,3>` its member
-initializer references `sum_t<3>` (the trailing 1-element pack `T={3}` forwarded
-to a 0-element trailing pack).  Elaborating `sum_t<3>` performs partial-
-specialization matching, which re-type-checks the specialization PATTERN
-`<H, T...>` via typecheck_template_args under an SFINAE context.  For the empty
-deduced trailing pack (`T={}`) that call throws (`throw 0`), so the candidate is
-skipped and `sum_t<3>` falls back to the INCOMPLETE PRIMARY (a forward
-declaration with no members).  At top level a later member-access completion
-recovers `sum_t<3>`, but inside `sum_t<2,3>`'s member initializer (an SFINAE +
-suppress_elaborate context) the failure is final, so `sum_t<3>::v` stays an
-unresolved cpp_name and `H + sum_t<3>::v` cannot be type-checked.  Confirmed:
-pre-instantiating any `cc<single>` first makes `cc<2,3>` succeed.  Fix requires
-the partial-spec pattern re-type-check to tolerate an empty deduced trailing pack
-(so `sum_t<3>` matches its specialization on first elaboration).  Flip to CORE
-once a recursive non-type-pack partial-specialization fold is correct at two
-elements.
+N5008 [temp.class.spec.match] + [temp.variadic].  A recursive class template over
+a NON-type parameter pack, selected via its `<H, T...>` partial specialization,
+folds at 0/1/2/3/4 elements.  Previously failed at exactly two elements: the
+nested `sum_t<3>` (empty deduced trailing pack) re-type-checked its pattern
+`<H, T...>` with the non-type `T...` still present and threw, falling back to the
+incomplete primary.  Fixed by trimming the empty deduced trailing pack before the
+pattern re-type-check.  Non-vacuous: the two-element assertion is the former
+failure point.
