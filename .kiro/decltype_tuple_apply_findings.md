@@ -970,3 +970,30 @@ branches -- the bare `T...` branch and the nested-pattern `Trait<T>...` branch
 branch makes the two sides of `__is_same(dummy<Pred...>, dummy<((void)Pred,
 true)...>)` disagree (one 2-element, one collapsed) and regresses
 libcxx_comma_in_template_arg.
+
+## COMPLETE-FIX ATTEMPT 2 (both branches) -- still insufficient + regressing (2026-07-10)
+
+Re-implemented with pack_expr_map + build population + BOTH expander branches
+(bare non-type `T...` gated on the name being a recorded non-type pack; nested
+`Trait<T>...` collect()/size/consistency extended to pack_expr_map and per-element
+expr_map binding).  Result: still did NOT green fwd<2,3>/sum_t<2,3>, and STILL
+regressed libcxx_comma_in_template_arg.  Reverted.
+
+So the model "store non-type pack values + expand in both apply() branches" is
+NOT sufficient.  Additional interacting moving parts (to investigate in a
+dedicated pass):
+  - The PRIMARY-template non-type pack (fwd<2,3>'s `T`) may not be recorded in
+    pack_expr_map by build() the same way the partial-spec pack is (the primary
+    pack-binding path differs), so the bare branch never fired for it.
+  - The value ARG FORM produced by the expander for a non-type element must
+    match what downstream cpp_name resolution / typecheck_template_args expects
+    (the reverted prototype's `sum_t<3>` was not resolved).
+  - libcxx_comma_in_template_arg's `dummy<Pred...>` (bare) vs
+    `dummy<((void)Pred,true)...>` (nested) must expand CONSISTENTLY; the nested
+    branch also flows through typecheck_template_args' OWN pack expander
+    (cpp_typecheck_template.cpp ~1770, type-only), which likewise needs the
+    non-type path, or the two sides still disagree.
+Net: the non-type-pack expansion is handled in at least THREE places
+(template_mapt::build, template_mapt::apply's two branches, and
+typecheck_template_args' expander); a correct fix must make ALL consistently
+non-type-aware with a matching arg form.  Sizeable, dedicated, regression-guarded.
