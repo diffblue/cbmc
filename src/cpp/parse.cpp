@@ -10712,8 +10712,14 @@ bool Parser::rVarNameCore(exprt &name)
                 if(
                   next == TOK_ANDAND || next == TOK_OROR || next == ')' ||
                   next == ';' || next == ',' || next == ':' || next == '?' ||
-                  next == TOK_SHIFTRIGHT || next == TOK_EQ || next == TOK_NE)
+                  next == TOK_SHIFTRIGHT || next == TOK_EQ || next == TOK_NE ||
+                  next == TOK_SCOPE)
                 {
+                  // A speculative `<...>` immediately followed by `::` is a
+                  // nested-name-specifier `name<...>::member` ([temp.names]):
+                  // it can only be a template-id, never a `<`/`>` comparison
+                  // chain.  This is the `C<int>::al<char>::value` shape (a
+                  // member template-id after a class-template-id qualifier).
                   try_template_args = true;
                 }
             }
@@ -10739,7 +10745,53 @@ bool Parser::rVarNameCore(exprt &name)
 
                   if(i >= 2 && components[i - 2].id() == ID_template_args)
                   {
-                    is_dependent_member = true;
+                    // [temp.names]/4: a template-id qualifier makes the member
+                    // dependent ONLY when its arguments involve a template
+                    // parameter.  A concrete instantiation such as `C<int>::`
+                    // is not dependent, so the member's `<` opens a
+                    // template-argument list.  (Mirrors rName; without this the
+                    // member of a concrete class-template-id -- the shape of
+                    // `C<int>::al<char>::value` -- was wrongly treated as
+                    // dependent and `<` parsed as less-than.)
+                    const irept &qtargs = components[i - 2].find(ID_arguments);
+                    for(const auto &qarg : qtargs.get_sub())
+                    {
+                      irep_idt aid;
+                      if(qarg.id() == ID_name)
+                        aid = qarg.get(ID_identifier);
+                      else if(qarg.id() == ID_cpp_name)
+                      {
+                        if(!qarg.get_sub().empty())
+                          aid = qarg.get_sub().front().get(ID_identifier);
+                      }
+                      else if(qarg.id() == ID_type || qarg.id() == ID_ambiguous)
+                      {
+                        const irept &qt = qarg.find(ID_type);
+                        if(qt.id() == ID_cpp_name && !qt.get_sub().empty())
+                          aid = qt.get_sub().front().get(ID_identifier);
+                        else if(
+                          qt.id() == ID_merged_type && !qt.get_sub().empty())
+                        {
+                          const irept &qfirst = qt.get_sub().front();
+                          if(
+                            qfirst.id() == ID_cpp_name &&
+                            !qfirst.get_sub().empty())
+                            aid = qfirst.get_sub().front().get(ID_identifier);
+                        }
+                      }
+                      if(!aid.empty())
+                      {
+                        new_scopet *afound = lookup_id(aid);
+                        if(
+                          afound != nullptr &&
+                          afound->kind ==
+                            new_scopet::kindt::TYPE_TEMPLATE_PARAMETER)
+                        {
+                          is_dependent_member = true;
+                          break;
+                        }
+                      }
+                    }
                     break;
                   }
 
