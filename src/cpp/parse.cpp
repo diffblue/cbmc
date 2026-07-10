@@ -10712,14 +10712,22 @@ bool Parser::rVarNameCore(exprt &name)
                 if(
                   next == TOK_ANDAND || next == TOK_OROR || next == ')' ||
                   next == ';' || next == ',' || next == ':' || next == '?' ||
-                  next == TOK_SHIFTRIGHT || next == TOK_EQ || next == TOK_NE ||
-                  next == TOK_SCOPE)
+                  next == TOK_SHIFTRIGHT || next == TOK_EQ || next == TOK_NE)
                 {
-                  // A speculative `<...>` immediately followed by `::` is a
-                  // nested-name-specifier `name<...>::member` ([temp.names]):
-                  // it can only be a template-id, never a `<`/`>` comparison
-                  // chain.  This is the `C<int>::al<char>::value` shape (a
-                  // member template-id after a class-template-id qualifier).
+                  try_template_args = true;
+                }
+                else if(
+                  next == TOK_SCOPE && components.size() >= 2 &&
+                  components[components.size() - 2].id() == "::")
+                {
+                  // A speculative `<...>` immediately followed by `::` where the
+                  // name is itself a QUALIFIED member (preceded by `::`) is a
+                  // nested-name-specifier `Qual::member<...>::...` ([temp.names])
+                  // -- it can only be a template-id, never a `<`/`>` comparison
+                  // chain.  This is the `C<int>::al<char>::value` shape.  The
+                  // qualification requirement keeps unqualified names (e.g. a
+                  // `foo<...>::bar` where `foo` is a value in a comparison, or
+                  // concept/requires expressions) on the conservative path.
                   try_template_args = true;
                 }
             }
