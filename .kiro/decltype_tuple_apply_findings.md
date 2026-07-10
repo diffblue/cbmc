@@ -1160,3 +1160,35 @@ still FAILURE) has a FURTHER layer beyond the forwarding-ref member-init (the
 hand-written forwarding-ref reproducer and the forward<U> form now work, so the
 residual is elsewhere in the real _Tuple_impl chain -- to re-characterize).
 cpp17_apply_basic remains the separate decltype/invoke_result ODR-use issue.
+
+## NEXT-LAYER REDUCTION STATUS (2026-07-10)
+
+Forwarding-ref layer: DONE (cpp11_fwdref_pack_ctor_recursive_base, CORE; fix
+2a7ff8e603).
+
+cpp17_tuple_basic NEXT layer: NOT yet isolated to a FAITHFUL minimal test.
+- cvise on the real preprocessed tuple repeatedly produces DEGENERATE artifacts
+  that trigger cbmc "no match"/FAILURE via non-faithful constructs, not the real
+  cause: (a) a bare uninitialised int (UB; g++ passes by luck) -- fixed by a
+  valgrind guard; (b) `std::forward<T>(x)` reduced to a no-call `forward<T>...`
+  function-id pack; (c) a variadic ctor passing the WHOLE pack `u...` to a
+  differently-sized recursive base `base<T...>(u...)` (arity-odd; g++ accepts the
+  variadic ctor) -> "no match for symbol 'base'".  The faithful tail-forwarding
+  form (real tuple) PASSES, so these are reduction artifacts.
+- Incremental FAITHFUL reproductions ALL PASS, ruling out (individually and in
+  combination): forwarding references; real is_constructible/is_convertible
+  (__is_constructible/__is_convertible builtins); _TupleConstraints<bool,...> with
+  __is_implicitly/explicitly_constructible; _ImplicitCtor/_ExplicitCtor enable_if;
+  both `const E&...` and `U&&...` (implicit+explicit) ctors + overload resolution;
+  __valid_args<U...>() constexpr member-function-template SFINAE default arg;
+  _Head_base with the __empty_not_final bool parameter; __decay_and_strip in
+  make_tuple.
+- REMAINING candidates to try next: the tuple<> / tuple<_T1,_T2> partial
+  specializations coexisting with the primary (overload interference); the
+  allocator_arg ctors; _UseOtherCtor / the tuple-from-tuple converting ctors;
+  or a specific COMBINATION.  A stronger cvise interestingness that both runs
+  clean under valgrind AND keeps get<0>==1 meaningful still over-reduces via the
+  forward-no-call path; a `forward`-preserving guard (require the reduced program
+  to still call a 1-arg forwarding function) may be needed.
+
+cpp17_apply_basic: not yet reduced; separate decltype/invoke_result ODR-use layer.
