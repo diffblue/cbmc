@@ -231,6 +231,10 @@ void template_mapt::expand_call_argument_packs(irept &n) const
       // type template argument that is a bare cpp_name whose short name
       // matches a deduced pack.
       const std::vector<typet> *elems = nullptr;
+      // Or a NON-type parameter pack whose element VALUES are recorded in
+      // pack_expr_map (e.g. the `I` in `add(I...)`, a non-type template
+      // parameter pack expanded as call arguments -- N5008 [temp.variadic]/5).
+      const std::vector<exprt> *val_elems = nullptr;
       std::string base;
       bool empty_pack = false;
       // Match a candidate node \p t that is a bare cpp_name (single name
@@ -260,6 +264,19 @@ void template_mapt::expand_call_argument_packs(irept &n) const
             return true;
           }
         }
+        for(const auto &pe : pack_expr_map)
+        {
+          const std::string key = id2string(pe.first);
+          const auto q = key.rfind("::");
+          const std::string ksuf =
+            q != std::string::npos ? key.substr(q + 2) : key;
+          if(ksuf == suf)
+          {
+            val_elems = &pe.second;
+            base = suf;
+            return true;
+          }
+        }
         for(const auto &ps : pack_size_map)
         {
           if(ps.second != 0)
@@ -279,7 +296,7 @@ void template_mapt::expand_call_argument_packs(irept &n) const
       };
       std::function<void(const irept &)> find = [&](const irept &m)
       {
-        if(elems != nullptr || empty_pack)
+        if(elems != nullptr || val_elems != nullptr || empty_pack)
           return;
         // The pack may be the argument's own type (e.g. `declval<A>()`, whose
         // `A` is the node's ID_type) or a bare cpp_name nested anywhere in the
@@ -295,6 +312,42 @@ void template_mapt::expand_call_argument_packs(irept &n) const
           find(nss.second);
       };
       find(arg);
+
+      // N5008 [temp.variadic]/5: a NON-type parameter pack expanded as call
+      // arguments (`add(I...)`) -- expand to one argument per element,
+      // substituting the pack's k-th VALUE for its bare cpp_name reference.
+      if(val_elems != nullptr)
+      {
+        changed = true;
+        for(const exprt &ve : *val_elems)
+        {
+          irept copy = arg;
+          copy.remove(ID_ellipsis);
+          std::function<void(irept &)> repl = [&](irept &m)
+          {
+            if(
+              m.id() == ID_cpp_name && m.get_sub().size() == 1 &&
+              m.get_sub().front().id() == ID_name)
+            {
+              const std::string nm =
+                id2string(m.get_sub().front().get(ID_identifier));
+              const auto p = nm.rfind("::");
+              if((p != std::string::npos ? nm.substr(p + 2) : nm) == base)
+              {
+                m = ve;
+                return;
+              }
+            }
+            for(auto &s : m.get_sub())
+              repl(s);
+            for(auto &ns : m.get_named_sub())
+              repl(ns.second);
+          };
+          repl(copy);
+          new_args.push_back(copy);
+        }
+        continue;
+      }
 
       if(empty_pack)
       {
