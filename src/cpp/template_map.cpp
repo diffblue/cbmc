@@ -1953,6 +1953,7 @@ void template_mapt::build_unassigned(
       t.id() == ID_type ? t.type().get(ID_identifier) : t.get(ID_identifier);
     pack_args_map.erase(pid);
     pack_size_map.erase(pid);
+    pack_expr_map.erase(pid);
   }
 }
 
