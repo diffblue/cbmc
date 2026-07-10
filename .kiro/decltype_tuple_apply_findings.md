@@ -550,3 +550,41 @@ STATUS: root pinned but not yet fixed (deep template_map lifecycle in
 instantiate_template's alias path).  KNOWNBUG cpp11_alias_template_parallel_pack
 stands; BUG 1 (static qualified template-id without `template`) is a separate
 worthwhile fix.  No source change landed this turn; tree clean.
+
+## ROOT CAUSE COMPLETE (2026-07-10): alias body expanded eagerly during class instantiation
+
+Instrumented the transition build() -> alias-body apply() with ordered probes.
+Decisive ordering for the confound-free reproducer
+(`template<class... Types> struct C { template<class... Us> using ctible =
+all_t<is_c<Types,Us>::value...>; ... };`):
+
+  COLLECT_AT refpacks=[Types] packkeys=[Types(3)] packsize=[Types=3]   <-- FIRST
+  AFTER_BUILD sym=C<...>::ctible<Type0> pack_args_map=[Types(3), Us(3)] <-- LATER
+
+i.e. the alias body's parallel-pack expansion `is_c<Types,Us>::value...` runs in
+`template_mapt::apply`'s nested-pack loop **BEFORE** ctible is ever instantiated
+with concrete arguments -- during the enclosing class C<int,double,char>'s
+instantiation.  At that point ONLY the class pack `Types` is bound (present in
+both pack_args_map and pack_size_map); the alias's OWN pack `Us` is entirely
+absent (unbound -- it is still a template parameter of the not-yet-instantiated
+member alias template).  The expander's `collect()` therefore finds only `Types`,
+drives the lock-step expansion by `Types` (n=3), and leaves every `Us` reference
+unsubstituted.  This wrong, half-expanded body
+(`all_t<is_c<int,Us>::value, is_c<double,Us>::value, is_c<char,Us>::value>`, with
+`Us` dangling) is baked into ctible's instance and reused when ctible is later
+used with concrete args -> "found no match for symbol 'value'".
+
+This violates N5008 [temp.alias]/2: an alias template is substituted only at each
+point of use with its own template arguments; C's instantiation must NOT expand a
+member alias template's body pack expansion over the alias's OWN parameter pack.
+
+FIX DIRECTION (next step): in the nested-pack expander (template_map.cpp
+~1078-1140), do NOT expand a pack-expansion pattern that references a parameter
+pack which is NOT bound in the current map (the alias's own, still-a-template
+pack) -- leave the `...` intact so it is expanded later, at the alias's point of
+use, when BOTH packs are bound.  Equivalently, when substituting a member alias
+TEMPLATE's aliased type during the enclosing class's instantiation, apply only
+the class arguments and preserve pack expansions over the alias's own parameters.
+The detection hinges on recognising `Us` as an (unbound) parameter-pack reference
+rather than a concrete name; the pattern must not be collapsed while any pack it
+expands over is unbound.
