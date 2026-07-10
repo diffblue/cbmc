@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ g0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG (header-free, cvise-reduced-then-repaired isolation of
+cpp17_tuple_basic).  Mirrors libstdc++ std::tuple: a variadic converting
+constructor guarded by a defaulted SFINAE template parameter whose condition is a
+TWO-parallel-pack fold over the class pack and the constructor's own pack
+(`_TupleConstraints<_Elements...>::ic<_UElements...>()` ==
+`and_<is_ctible<_Elements,_UElements>::value...>::value`).  For THREE elements
+CBMC fails to evaluate that constraint, reports "found no match for symbol
+'tuple'" during make_tuple's construction, so the tuple is unconstructed and
+get<0> reads a nondeterministic value (get<0> == 1 fails).  Two elements are
+handled correctly, and a plain (unconstrained) variadic constructor is handled
+correctly, so the residual is the two-parallel-pack constexpr constraint in a
+variadic constructor's SFINAE default template argument at >= 3 elements.  Both
+g++ and clang++ accept and run the program with get<0> == 1.  Flip to CORE once
+that constraint is evaluated at >= 3 elements.

@@ -841,3 +841,29 @@ two-parallel-pack `is_constructible<_Elements,_UElements>...` -- until the
 3-element case regresses, isolating the true interaction.  (Individually, each of
 these has a passing test: two-parallel-pack -> cpp11_alias_template_parallel_pack
 CORE; derived-to-base get<> -> cpp11_derived_to_base_variadic_deduction CORE.)
+
+## FAITHFUL REPRODUCER RECOVERED by repairing the cvise artifact (2026-07-10)
+
+The 78-line cvise output was ill-formed (clang rejects: incomplete
+`_TupleConstraints` in a nested-name-specifier, missing `template` keyword, bad
+partial spec).  But its STRUCTURE was the right tuple shape.  Repairing it into
+standard-conforming C++ -- completing `_TupleConstraints` with a REAL
+two-parallel-pack constexpr constraint `and_<is_ctible<_Elements,_UElements>::
+value...>::value`, a proper `_Head_base`, and derived-to-base `get` -- yields a
+clang-clean, g++/clang-run-correct reproducer that STILL fails in CBMC.  So the
+tuple bug is faithful, not an artifact.
+
+Minimal essence (committed as cpp17_tuple_get_two_pack_ctor_3elem, header-free):
+a `tuple<_Elements...>` variadic converting constructor guarded by
+`enable_if_t_<_TupleConstraints<_Elements...>::ic<_UElements...>()>` (a
+two-parallel-pack fold over the class pack and the constructor's own pack) fails
+to evaluate at >= 3 elements -> "found no match for symbol 'tuple'" -> get<0>
+reads nondet.  TWO elements work; a plain unconstrained variadic constructor
+works.  So the trigger is specifically the TWO-parallel-pack constexpr constraint
+in a variadic constructor's SFINAE default template argument at >= 3 elements
+(distinct from the standalone two-parallel-pack alias, which is CORE, and from
+sizeof.../derived-to-base, both fixed).  Also reproduces via direct
+`tuple<int,double,float> t(1,2.0,3.0f)` construction.  NEXT: fix that constraint
+evaluation.  Note: the *inlined* constraint form (constraint directly in the
+ctor's enable_if, no `_TupleConstraints` wrapper) fails even at 2 elements -- a
+broader related variant.
