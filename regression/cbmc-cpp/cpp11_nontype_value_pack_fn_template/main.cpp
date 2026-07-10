@@ -1,49 +1,34 @@
-// N5008 [temp.variadic]/4-5 + [temp.res] (two-phase): a pack expansion whose
-// pattern is a NON-TYPE value dependent on the pack -- `Trait<Us>::value...` --
-// appearing as the template-argument list of a template-id in a FUNCTION
-// TEMPLATE's body must be re-instantiated with the concrete pack when the
-// function template is instantiated, and expand to one argument per element.
+// N5008 [expr.sizeof]/5 + [temp.variadic]/8: `sizeof...(P)` counts the elements
+// of the pack P, independently of whether P is a type or a NON-type parameter
+// pack.
 //
-// KNOWNBUG: CBMC resolves `box<sz<Us>::v...>` (the `::v` non-type value form)
-// abstractly at the point the function template `chk` is DEFINED (its pack `Us`
-// still unbound) and does NOT re-instantiate it concretely when `chk<char,char>`
-// is instantiated -- only an abstract `box<Non_Type0>` is ever produced, so
-// `box<...>::n` (== `sizeof...(Vs)`) is left unconstrained instead of 2.
+// Regression: CBMC's parser stored a non-type parameter pack's name (which does
+// not parse as a type-id, e.g. `template<unsigned... Vs>`) as the OPERAND of the
+// `sizeof...` expression rather than in ID_type_arg.  An operand is type-checked
+// as a value expression before typecheck_expr_sizeof's `#sizeof_pack`
+// pack-counting path runs, collapsing the query to a stray constant -- so
+// `box<1,1>::n` (with `n = sizeof...(Vs)`) did not evaluate to 2 (it was wrong
+// for every arity).  A TYPE parameter pack (`template<class... Vs>`) was
+// unaffected because its name parses as a type-id and goes through ID_type_arg.
 //
-// Decisive contrast (both are dependent template-ids in the same body):
-//   box<sz<Us>...>::n        // TYPE-id pattern    -> re-instantiates, n == 2 (OK)
-//   box<sz<Us>::v...>::n     // ::value pattern    -> stays abstract, n unconstrained
-// A bare pack (`box<Us...>::n`) and a nested type-id (`box<sz<Us>...>::n`) both
-// re-instantiate correctly; only the non-type `::value` pack expansion fails.
-// No class template or alias is needed (an earlier reproducer used a member
-// alias and `sizeof(Us)...`, which added confounds); a free function template
-// with a `Trait<Us>::value...` argument is the minimal trigger.  g++/clang++
-// compute 2.
-//
-// This is the residual blocker beneath the (separately fixed) two-parallel-pack
-// member-alias expansion (cpp11_alias_template_parallel_pack) and for
-// std::tuple's _TupleConstraints (`__and_<is_X<_Types,_UTypes>...>::value`,
-// which is exactly a `Trait<...>::value` non-type pack instantiated with a
-// forwarded pack).
-//
-// Flip to CORE once a `Trait<Us>::value...` non-type pack expansion in a
-// function-template body is re-instantiated concretely at the function
-// template's point of instantiation.
-// Non-vacuity: assertion 2 ("WRONG must FAIL") must FAIL when the fix lands
-// (the count is exactly 2).
+// The fix stores the non-type pack's name in ID_type_arg as well, so both forms
+// take the pack-counting path.  This also surfaced through a pack expansion
+// whose pattern is a non-type value `Trait<Us>::value...` forwarded into a
+// function template (`box<sz<Us>::v...>::n` in `chk`): the count was wrong.
+// g++/clang++ accept the program and compute the shown values.
 
 extern "C" void __CPROVER_assert(int, const char *);
-
-template <class T>
-struct sz
-{
-  static constexpr unsigned v = sizeof(T);
-};
 
 template <unsigned... Vs>
 struct box
 {
   static constexpr unsigned n = sizeof...(Vs);
+};
+
+template <class T>
+struct sz
+{
+  static constexpr unsigned v = sizeof(T);
 };
 
 template <class... Us>
@@ -54,9 +39,18 @@ constexpr unsigned chk(Us...)
 
 int main()
 {
+  // Direct non-type parameter pack sizeof...: count depends on arity, so these
+  // three assertions are non-vacuous (a broken sizeof... cannot satisfy all).
+  __CPROVER_assert(box<1>::n == 1, "sizeof... of a 1-element non-type pack");
+  __CPROVER_assert(box<1, 1>::n == 2, "sizeof... of a 2-element non-type pack");
+  __CPROVER_assert(
+    box<1, 2, 3>::n == 3, "sizeof... of a 3-element non-type pack");
+
+  // A non-type value pack expansion `sz<Us>::v...` forwarded into a function
+  // template, then counted with sizeof...: two `char` arguments -> 2 elements.
   __CPROVER_assert(
     chk((char)1, (char)2) == 2,
-    "non-type value pack Trait<Us>::value... expands to 2 elements");
-  __CPROVER_assert(chk((char)1, (char)2) != 2, "WRONG must FAIL");
+    "non-type value pack Trait<Us>::value... forwarded and counted");
+
   return 0;
 }

@@ -1,26 +1,21 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ non-type value pack Trait<Us>::value\.\.\. expands to 2 elements: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^\[main\.assertion\.1\] line \d+ sizeof\.\.\. of a 1-element non-type pack: SUCCESS$
+^\[main\.assertion\.2\] line \d+ sizeof\.\.\. of a 2-element non-type pack: SUCCESS$
+^\[main\.assertion\.3\] line \d+ sizeof\.\.\. of a 3-element non-type pack: SUCCESS$
+^\[main\.assertion\.4\] line \d+ non-type value pack Trait<Us>::value\.\.\. forwarded and counted: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.variadic]/4-5 + [temp.res] (two-phase).  A pack expansion
-whose pattern is a NON-TYPE value dependent on the pack (`Trait<Us>::value...`),
-used as the template-argument list of a template-id in a FUNCTION TEMPLATE's
-body, is resolved abstractly at the function template's DEFINITION (pack unbound)
-and is NOT re-instantiated concretely when the function template is instantiated
--- only an abstract `box<Non_Type0>` is produced, so `box<...>::n` is left
-unconstrained instead of 2.  The TYPE-id form `box<sz<Us>...>::n`, a bare pack
-`box<Us...>::n`, and a nested type-id all re-instantiate correctly; only the
-non-type `::value` pack expansion fails (verified by instrumentation: the type-id
-form re-instantiates while the `::value` form yields only `box<Non_Type0>`).  No
-class template or alias is needed.  This is the residual blocker beneath the
-fixed two-parallel-pack member-alias expansion
-(cpp11_alias_template_parallel_pack) and for std::tuple's _TupleConstraints
-(`__and_<is_X<_Types,_UTypes>...>::value`).  Flip to CORE once such a non-type
-value pack expansion in a function-template body is re-instantiated concretely at
-the point of instantiation.
+N5008 [expr.sizeof]/5 + [temp.variadic]/8.  `sizeof...(P)` counts the pack's
+elements regardless of whether P is a type or a NON-type parameter pack.  CBMC's
+parser stored a non-type pack's name as the sizeof operand (type-checked as a
+value before the pack-count logic ran), so `box<N...>::n == sizeof...(Vs)` was
+wrong for a non-type pack of every arity; a type pack was unaffected.  Fixed by
+storing the non-type pack's name in ID_type_arg so both forms take the
+pack-counting path.  Non-vacuous: the three direct assertions depend on the pack
+arity (1/2/3).  The forwarded-pack case (`box<sz<Us>::v...>::n` in a function
+template) is the shape that first surfaced this.
