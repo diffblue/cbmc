@@ -588,3 +588,41 @@ the class arguments and preserve pack expansions over the alias's own parameters
 The detection hinges on recognising `Us` as an (unbound) parameter-pack reference
 rather than a concrete name; the pattern must not be collapsed while any pack it
 expands over is unbound.
+
+## FIX ATTEMPT (2026-07-10): sound deferral needs info absent at the expander
+
+Attempted the fix direction (defer the nested-pack expansion while the alias's
+own pack is unbound).  Instrumentation established the hard constraints:
+
+1. At the premature expansion (template_mapt::apply nested-pack loop,
+   template_map.cpp ~1078), the alias's own pack `Us` is an UNMARKED bare `name`
+   node (NODE probe: `node_id=name type_id=nil ell=0`) and is absent from ALL
+   maps (pack_args_map / type_map / pack_size_map show only the class pack
+   `Types`).  So the expander cannot self-detect that `Us` is an (unbound) pack
+   -- it is indistinguishable from an ordinary name (`is_c`, `value`).  A
+   heuristic "defer if the pattern contains any unbound name" over-defers and
+   would regress legitimate concrete-type-in-pack patterns (e.g.
+   `pair<Types, ConcreteType>...`).
+
+2. template_mapt has NO access to cpp_typecheckt / the instantiation stack /
+   scopes, so the expander cannot look `Us` up as a template-parameter pack.
+
+3. The eager expansion happens during an ABSTRACT context (class pack bound, the
+   member alias's own pack unbound) and the half-expanded body is reused; the
+   concrete ctible instantiation (which DOES bind both packs -- AFTER_BUILD
+   probe) does not re-expand correctly because it reuses the baked body.
+
+SOUND FIX (requires a moderately-invasive, carefully-validated change): thread
+the member alias template's OWN parameter-pack names to the substitution as
+"pending/unbound packs" (e.g. add them to a new set on template_mapt, or as an
+ID_unassigned sentinel that the expander treats as "pack present but unbound"),
+recorded at the point the class instantiation substitutes the member alias
+template's body -- so the nested-pack expander DEFERS (leaves the `...` intact)
+whenever the pattern references a pending/unbound pack, and the expansion runs
+only at the alias's point of use (ctible<...>), when both packs are bound
+([temp.alias]/2).  The blocker for landing it this session was locating the
+exact class-instantiation substitution call that reaches the member alias
+template's body (it is a single recursive template_mapt::apply that does not
+distinguish the alias-body boundary) and doing so without regressing the many
+existing pack/alias CORE tests -- needs a dedicated, full-suite-validated pass.
+Root cause is fully established; no heuristic (regression-risking) fix was landed.
