@@ -15,9 +15,13 @@ pack) -- the shape of libstdc++'s std::tuple _TupleConstraints
 two-parallel-pack EXPANSION itself is now fixed (the alias's own-pack expansion
 is deferred out of class instantiation so `sums<int,double,char>` correctly
 resolves to `sum_t<1,1,1>`, commit "defer a member alias template's own-pack
-expansion during class instantiation").  This test nonetheless remains a
-KNOWNBUG because of a SEPARATE residual defect
-(cpp11_nontype_value_pack_fn_template): a pack-expansion alias instantiated
-with a pack forwarded from an enclosing function template (`sums<Us...>::v` in
-`chk`) does not fold, so `chk()` is left unconstrained rather than the constant
-3.  Flip to CORE once that residual is fixed.
+expansion during class instantiation").  The non-type-pack `sizeof...` count bug
+that also obscured this is fixed too (commit "count a non-type parameter pack in
+sizeof...(P) correctly"; see cpp11_nontype_value_pack_fn_template, now CORE).
+This test nonetheless remains a KNOWNBUG because of a further SEPARATE residual:
+a recursive non-type-pack trait value (`sum_t<...>::v`, where `sum_t` recurses
+over its own pack) instantiated with a pack FORWARDED from an enclosing function
+template (`sums<Us...>::v` in `chk`) does not fold, so `chk()` is left
+unconstrained rather than the constant 3.  A minimal witness is
+`sum_t<sizeof(Us)...>::v` accessed inside such a `chk`.  Flip to CORE once that
+residual is fixed.
