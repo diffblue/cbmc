@@ -1122,3 +1122,20 @@ tracked in the apply test.desc / part2 findings), not the forwarding-ref bug.
 NEXT: fix member-initializer instantiation for a forwarding-reference variadic
 constructor pack expansion forwarding into a recursive base with heterogeneous
 deduced element types.
+
+## REFINEMENT: recursion not needed -- member-initializer forwarding-ref pack (2026-07-10)
+
+Simplified below the recursive tuple: even a NON-recursive
+  struct wrap : base2 { template<class...U> wrap(U&&...u) : base2(static_cast<U&&>(u)...) {} };
+  wrap w(11, 22.0);   // base2(int,double)
+stores WRONG (nondeterministic) values for distinct types.  But:
+  - named forwarding-ref params `wrap(A&&x,B&&y):base2(static_cast<A&&>(x),static_cast<B&&>(y))` : CORRECT
+  - the SAME pattern in a FUNCTION body `two mk(U&&...u){ return two(static_cast<U&&>(u)...); }` : CORRECT
+So the gap is specifically the MEMBER-INITIALIZER pack expansion of a
+forwarding-reference pack `Base(static_cast<U&&>(u)...)`: the function-call
+argument-pack expander (template_mapt::expand_call_argument_packs) handles the
+function-body form, but the constructor member-initializer path does not expand
+the two-parallel-pack pattern (`U` type pack + `u` function-parameter pack) in
+lock-step, leaving the base's members uninitialized (nondeterministic).  FIX
+SITE: member-initializer instantiation (cpp_typecheck_code.cpp typecheck_member_
+initializer + the ctor-body substitution), mirroring expand_call_argument_packs.
