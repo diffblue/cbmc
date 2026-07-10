@@ -747,3 +747,35 @@ KNOWNBUG): a recursive non-type-pack trait value (`sum_t<...>::v`, sum_t recurse
 over its pack) instantiated with a FORWARDED pack in a function template
 (`sum_t<sizeof(Us)...>::v` inside chk) still does not fold -- distinct from both
 the sizeof... count bug and the alias-expansion bug.  Next target.
+
+## TWO-PARALLEL-PACK MEMBER ALIAS WORKS FOR TYPE PACKS -> CORE (2026-07-10)
+
+Investigating the "next target" (the two-parallel-pack residual) showed the
+earlier `sum_t<...::v...>` reproducer was an UNFAITHFUL non-type-pack proxy.  The
+tuple's actual _TupleConstraints shape uses a TYPE parameter pack
+(`__and_<is_X<_Types,_UTypes>...>::value`, `template<class...> __and_`).  Tested
+the faithful TYPE-pack pattern -- `and_<is_same<Us,Types>...>::value` via a
+member alias inside `chk` -- and it now PASSES (matched -> true, mismatched ->
+false; direct, 2- and 3-element, all correct).  So after the prior fixes
+(operator combined-candidate-set, param-after-pack, recursive-forwarding-ctor,
+non-type-parameter-pack arguments, member-alias own-pack deferral, sizeof... of
+a non-type pack, qualified-nested-template-id parser), the two-parallel-pack
+member alias -- the real tuple constraint machinery -- is correct.
+
+Rewrote cpp11_alias_template_parallel_pack to the faithful TYPE-pack shape and
+flipped it to CORE (non-vacuous: matched vs mismatched).
+
+RESIDUAL NON-TYPE-PACK DEFECTS (separate from the tuple; new KNOWNBUGs):
+  - cpp11_nontype_pack_recursive_two_elem: a recursive NON-type pack trait
+    (`sum_t<H,T...>{v=H+sum_t<T...>::v}`) fails to type-check for EXACTLY TWO
+    elements (0/1/3/4 work; TYPE analogue works; non-recursive partial-spec
+    deduction works).
+  - cpp11_nontype_pack_sizeof_expr_forwarded: a `sizeof(Us)...` (sizeof
+    unary-expression) pack expansion forwarded through a function template
+    expands to the wrong arity (a `Trait<Us>::v...` member-value pattern
+    forwarded the same way is correct -- cpp11_nontype_value_pack_fn_template).
+
+NOTE: cpp20_concepts_ordering_gcc14 is a documented Clang-20-preprocessor-
+sensitive test; a stale/incremental binary can make it transiently fail.  A
+clean rebuild passes it 5/5 both with and without the sizeof... fix (which is not
+on its code path), confirming no regression.

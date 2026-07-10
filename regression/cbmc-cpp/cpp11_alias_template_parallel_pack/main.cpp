@@ -1,8 +1,8 @@
 // N5008 [temp.variadic]/4-5 + [temp.alias]/2: a MEMBER alias template whose body
 // is a pack expansion over TWO parallel packs -- the alias's own parameter pack
 // and the enclosing class's parameter pack -- must substitute both at the
-// alias's point of use and expand them in lock-step.  This is the shape of
-// libstdc++'s std::tuple constraint machinery (_TupleConstraints):
+// alias's point of use and expand them in lock-step.  This is exactly the shape
+// of libstdc++'s std::tuple constraint machinery (_TupleConstraints):
 //
 //   template <typename... _Types> struct _TupleConstraints {
 //     template <typename... _UTypes>
@@ -10,75 +10,72 @@
 //     ...
 //   };
 //
-// KNOWNBUG: instantiating such a member alias template with a concrete pack does
-// NOT fold to the correct constant -- here `chk(...)` should be a constant 3
-// (each same_t<Us,Types> with Us == Types contributes 1), and g++/clang++
-// compute 3, but CBMC leaves it NON-constant (all of `== 3`, `!= 3`, `== 0`
-// fail, i.e. the result is unconstrained), so std::tuple's forwarding
-// constructor is SFINAE-rejected and std::get<0>(std::make_tuple(1,2.0,'a'))
-// reads an uninitialised member (cpp17_tuple_basic).
+// where __and_ is a TYPE parameter pack template and the constraint is read as
+// `__constructible<_UTypes...>::value`.
 //
-// This is DISTINCT from the (now-fixed, commit "non-type parameter pack
-// arguments are expressions, not types") single-pack non-type-argument bug
-// captured by cpp11_nontype_pack_member_value_args: that one was a hard
-// CONVERSION ERROR ("found no match for symbol 'value'") on the SECOND non-type
-// pack argument.  With that fixed, the residual defect here is specifically the
-// TWO-parallel-pack MEMBER-alias body failing to fold to a constant.  The
-// arguments are deduced (`chk((int)1, (double)2, (char)3)`) to avoid the
-// separate qualified-nested-template-id parser bug
-// (cpp11_qualified_nested_template_id_no_keyword) and the explicit-member-
-// template-argument path.
+// Regression history: this mis-expanded because the member alias template's own
+// pack was expanded (by the enclosing class pack alone) during class
+// instantiation, leaving the alias's own pack dangling; fixed by deferring the
+// own-pack expansion to the alias's point of use ("defer a member alias
+// template's own-pack expansion during class instantiation").  With that (and
+// the combined-candidate / non-type-pack-argument fixes) the two-parallel-pack
+// member alias now expands correctly.
 //
-// Flip to CORE once a two-parallel-pack member-alias body folds to the correct
-// constant.
-// Non-vacuity: assertion 2 ("WRONG must FAIL") must FAIL when the fix lands
-// (chk() == 3), giving VERIFICATION FAILED with a genuine counterexample.
+// Non-vacuity: `chk` is true exactly when every `Us` equals the corresponding
+// `Types` (matched), and false otherwise (mismatched) -- so the assertions
+// distinguish a correct lock-step pairing from any collapsed/one-pack
+// expansion.  g++/clang++ agree.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
-template <class A, class B>
-struct same_t
+template <class...>
+struct and_;
+template <>
+struct and_<>
 {
-  static constexpr int v = 0;
+  static constexpr bool value = true;
 };
-template <class A>
-struct same_t<A, A>
+template <class H, class... T>
+struct and_<H, T...>
 {
-  static constexpr int v = 1;
+  static constexpr bool value = H::value && and_<T...>::value;
 };
 
-template <int...>
-struct sum_t;
-template <>
-struct sum_t<>
+template <class A, class B>
+struct is_same
 {
-  static constexpr int v = 0;
+  static constexpr bool value = false;
 };
-template <int H, int... T>
-struct sum_t<H, T...>
+template <class A>
+struct is_same<A, A>
 {
-  static constexpr int v = H + sum_t<T...>::v;
+  static constexpr bool value = true;
 };
 
 template <class... Types>
 struct C
 {
+  // Two parallel packs: the alias's own `Us` and the enclosing class's `Types`.
   template <class... Us>
-  using sums = sum_t<same_t<Us, Types>::v...>;
+  using all_same = and_<is_same<Us, Types>...>;
   template <class... Us>
-  static constexpr int chk(Us...)
+  static constexpr bool chk(Us...)
   {
-    return sums<Us...>::v;
+    return all_same<Us...>::value;
   }
 };
 
 int main()
 {
+  // Matched: each Us == the corresponding Types -> all_same is true.
   __CPROVER_assert(
-    C<int, double, char>::chk((int)1, (double)2, (char)3) == 3,
-    "member alias template two-parallel-pack expansion");
+    C<int, double, char>::chk((int)1, (double)2, (char)3),
+    "two-parallel-pack member alias: matched packs -> true");
+
+  // Mismatched: the packs pair up but differ -> all_same is false.
   __CPROVER_assert(
-    C<int, double, char>::chk((int)1, (double)2, (char)3) != 3,
-    "WRONG must FAIL");
+    !C<int, char>::chk((char)1, (int)2),
+    "two-parallel-pack member alias: mismatched packs -> false");
+
   return 0;
 }
