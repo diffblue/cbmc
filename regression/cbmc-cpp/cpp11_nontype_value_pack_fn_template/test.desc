@@ -1,22 +1,26 @@
 KNOWNBUG
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ pack-expansion alias folds with a forwarded pack: SUCCESS$
+^\[main\.assertion\.1\] line \d+ non-type value pack Trait<Us>::value\.\.\. expands to 2 elements: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.alias]/2 + [temp.variadic]/4-5.  A pack-expansion alias
-template (`sums = sum_t<sizeof(Us)...>`) instantiated with a pack FORWARDED from
-an enclosing function template (`sums<Us...>` where `Us` is the caller's pack)
-does not fold: `chk((char)1,(char)2)` should be a constant 2 but CBMC leaves it
-unconstrained (g++/clang++ compute 2).  The same alias with explicit concrete
-arguments folds fine, and a non-pack-expansion alias forwards fine, so the defect
-is specific to a pack-expansion alias body instantiated with a forwarded pack.
-Minimal form: a free function template + namespace alias (no class needed).  This
-masks the separately fixed two-parallel-pack member-alias expansion
-(cpp11_alias_template_parallel_pack) and is a residual blocker for std::tuple's
-_TupleConstraints.  Flip to CORE once a pack-expansion alias folds when
-instantiated with a forwarded parameter pack.
+KNOWNBUG: N5008 [temp.variadic]/4-5 + [temp.res] (two-phase).  A pack expansion
+whose pattern is a NON-TYPE value dependent on the pack (`Trait<Us>::value...`),
+used as the template-argument list of a template-id in a FUNCTION TEMPLATE's
+body, is resolved abstractly at the function template's DEFINITION (pack unbound)
+and is NOT re-instantiated concretely when the function template is instantiated
+-- only an abstract `box<Non_Type0>` is produced, so `box<...>::n` is left
+unconstrained instead of 2.  The TYPE-id form `box<sz<Us>...>::n`, a bare pack
+`box<Us...>::n`, and a nested type-id all re-instantiate correctly; only the
+non-type `::value` pack expansion fails (verified by instrumentation: the type-id
+form re-instantiates while the `::value` form yields only `box<Non_Type0>`).  No
+class template or alias is needed.  This is the residual blocker beneath the
+fixed two-parallel-pack member-alias expansion
+(cpp11_alias_template_parallel_pack) and for std::tuple's _TupleConstraints
+(`__and_<is_X<_Types,_UTypes>...>::value`).  Flip to CORE once such a non-type
+value pack expansion in a function-template body is re-instantiated concretely at
+the point of instantiation.
