@@ -6084,10 +6084,15 @@ void cpp_typecheck_resolvet::guess_template_args(
             // the full deduced arity.
             if(deducing_against_base)
               derived_to_base_deduced_packs.insert(pack_id);
-            // Record the pack arguments (possibly empty): an explicit empty
-            // entry lets a zero-length pack expansion in the matched pattern
-            // (e.g. primary<Types...> with Types = <>) expand to no arguments.
-            cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
+            // Record the pack arguments.  For a genuine TYPE pack (or an empty
+            // pack) record pack_args_map -- an explicit empty entry lets a
+            // zero-length pack expansion in the matched pattern expand to no
+            // arguments.  For a NON-type (value) pack do NOT record an empty
+            // pack_args_map entry: the pack-name matcher checks pack_args_map
+            // before pack_expr_map, so an empty type entry would shadow the
+            // deduced values and expand `add(I...)` to zero arguments.
+            if(pack_exprs.empty())
+              cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
             if(!pack_exprs.empty())
             {
               cpp_typecheck.template_map.pack_expr_map[pack_id] = pack_exprs;
