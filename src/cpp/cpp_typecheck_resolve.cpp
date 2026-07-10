@@ -7053,6 +7053,37 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     }
   }
 
+  // [temp.variadic]/5: the same full-arity expansion for a NON-type parameter
+  // pack deduced from a class-template-id argument (the `I` in matching
+  // `seq<I...>` against `seq<1,2>`).  build_template_args emits a single scalar
+  // placeholder (the pack's first VALUE via expr_map); expand it to the full
+  // set of deduced element values recorded in pack_expr_map so the signature --
+  // e.g. a `decltype(add(I...))` return type, or the body `add(I...)` -- sees
+  // the correct arity.  Without this the deduced pack collapses to a single
+  // element and the call has the wrong number of arguments ("no match").
+  {
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    auto &args = template_args.arguments();
+    for(std::size_t i = 0; i < params.size() && i < args.size(); ++i)
+    {
+      if(!params[i].get_bool(ID_ellipsis) || params[i].id() == ID_type)
+        continue;
+      const irep_idt pack_id = params[i].get(ID_identifier);
+      if(pack_id.empty())
+        continue;
+      const auto pe_it = cpp_typecheck.template_map.pack_expr_map.find(pack_id);
+      if(pe_it == cpp_typecheck.template_map.pack_expr_map.end())
+        continue;
+      const std::vector<exprt> &vals = pe_it->second;
+      if(vals.size() <= 1)
+        continue;
+      args[i] = vals[0];
+      for(std::size_t j = 1; j < vals.size(); ++j)
+        args.insert(args.begin() + i + j, vals[j]);
+      break;
+    }
+  }
+
   // For non-empty variadic packs, expand the single deduced pack type
   // to N copies in the template args so that template instantiation
   // sees the correct number of arguments.

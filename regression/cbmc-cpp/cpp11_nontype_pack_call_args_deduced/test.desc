@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.deduct.type] + [temp.variadic]/4-5.  A NON-type parameter pack
+DEDUCED from a class-template-id argument (`I` from matching `seq<I...>` against
+`seq<1,2>`) and expanded as call arguments in the body (`add(I...)`).  Fixed by
+recording the deduced pack's element values in pack_expr_map (guess_template_
+args), expanding the pack to its full arity in the guessed template arguments,
+and expanding the non-type call-argument pack in the body.  The index_sequence-
+style deduction core of std::apply.  Non-vacuous: the assertions would read a
+wrong value under the old behaviour.
