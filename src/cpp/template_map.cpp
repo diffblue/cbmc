@@ -601,8 +601,19 @@ void template_mapt::apply(typet &type) const
             }
           };
           each(false);
+          // N5008 [temp.alias]/2 + [temp.variadic]/4-5: while substituting this
+          // member alias template's body during the enclosing class's
+          // instantiation, its OWN parameters are not yet bound.  Record their
+          // short names so the nested-pack expander defers any pack expansion
+          // whose pattern references one (rather than expanding it over the
+          // enclosing class pack alone and leaving the alias's own pack
+          // dangling).  Saved/restored to nest correctly.
+          std::set<std::string> saved_deferred =
+            std::move(deferred_own_pack_names);
+          deferred_own_pack_names = own_param_names;
           for(auto &sub : decl_type.get_sub())
             apply(static_cast<typet &>(sub));
+          deferred_own_pack_names = std::move(saved_deferred);
           each(true);
         }
         else
@@ -1104,7 +1115,38 @@ void template_mapt::apply(typet &type) const
             };
             collect(static_cast<const exprt &>(arg).type());
 
-            if(!referenced_packs.empty())
+            // [temp.alias]/2 + [temp.variadic]/4-5: if this pack expansion is
+            // in a member alias template's body being substituted during the
+            // enclosing class's instantiation, and its pattern references the
+            // alias's OWN (not yet bound) parameter, leave it UNEXPANDED.
+            // Expanding now would be driven by the enclosing class pack alone,
+            // leaving the alias's own pack dangling (e.g. `same_t<Us,Types>::v
+            // ...` over `Types` only).  It is expanded later, at the alias's
+            // point of use, when its own pack is bound.
+            bool defer_for_own_pack = false;
+            if(!deferred_own_pack_names.empty())
+            {
+              std::function<void(const irept &)> scan = [&](const irept &n)
+              {
+                const irep_idt id = n.get(ID_identifier);
+                if(!id.empty())
+                {
+                  const std::string s = id2string(id);
+                  const auto p = s.rfind("::");
+                  const std::string sn =
+                    p != std::string::npos ? s.substr(p + 2) : s;
+                  if(deferred_own_pack_names.count(sn) != 0)
+                    defer_for_own_pack = true;
+                }
+                for(const auto &c : n.get_named_sub())
+                  scan(c.second);
+                for(const auto &c : n.get_sub())
+                  scan(c);
+              };
+              scan(static_cast<const exprt &>(arg).type());
+            }
+
+            if(!defer_for_own_pack && !referenced_packs.empty())
             {
               // All packs in a single expansion expand in lock-step and
               // therefore must have the same length ([temp.variadic]/5).
