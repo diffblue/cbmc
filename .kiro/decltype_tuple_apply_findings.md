@@ -670,3 +670,32 @@ pack) still evaluates to a WRONG (non-constant) value even after Bug A's fix
 a CONVERSION ERROR).  This is a distinct defect from Bug A.  There is also a
 separate PARSER bug: `C<int,char>::ctible<int,char>::value` at namespace scope
 gives "parse error before ', char > ::'".
+
+## BUG C FIXED + BUG B CORE FIXED + BUG D ISOLATED (2026-07-10)
+
+Bug C (parser, FIXED -> CORE, commit "parse a member template-id after a
+non-dependent class-template-id"): rVarNameCore rejected
+`C<int>::al<char>::value` (no `template` keyword).  Two fixes: (1) accept a
+following `::` in the speculative template-arg check (a `name<...>::` is a
+nested-name-specifier -> template-id), (2) mirror rName so a concrete
+class-template-id qualifier is not treated as dependent ([temp.names]/5).
+
+Bug B core (two-parallel-pack member-alias EXPANSION, FIXED, commit "defer a
+member alias template's own-pack expansion"): during class instantiation the
+member alias body `same_t<Us,Types>::v...` was expanded by the class pack
+`Types` alone (its own pack `Us` unbound), giving `sum_t<1,0,0>`.  Fix defers a
+pack expansion whose pattern references the alias's own (unbound) pack; it is
+expanded at the alias's point of use with both packs bound -> `sum_t<1,1,1>`
+(verified via the resolved instance tag).  No cbmc-cpp regressions.
+
+Bug D (RESIDUAL, KNOWNBUG cpp11_alias_pack_expansion_forwarded_pack): a
+pack-expansion alias `sums = sum_t<sizeof(Us)...>` instantiated with a pack
+FORWARDED from an enclosing function template (`sums<Us...>::v` in `chk`) does
+not fold -- `chk()` is left unconstrained.  Minimal: free fn template + namespace
+alias (NO class needed).  Bisection: no-pack member alias `::v` folds; namespace
+alias with EXPLICIT concrete args folds; only a pack-expansion alias body with a
+FORWARDED pack fails.  This masks Bug B end-to-end (so
+cpp11_alias_template_parallel_pack stays KNOWNBUG) and is the residual blocker
+for std::tuple's _TupleConstraints.  NEXT: fix Bug D (fold a pack-expansion alias
+instantiated with a forwarded pack), then cpp11_alias_template_parallel_pack and
+(pending further layers) cpp17_tuple_basic.
