@@ -37,6 +37,14 @@ public:
   pack_size_mapt pack_size_map;
   pack_args_mapt pack_args_map;
 
+  /// N5008 [temp.variadic]: element VALUES of a NON-type parameter pack (the
+  /// value analogue of pack_args_map, which holds a type pack's element TYPES).
+  /// A non-type pack must NOT be scalar-bound in expr_map (that collapses its
+  /// expansions to a single element); its elements live here instead, and a
+  /// pack expansion `Foo<T...>` over it is expanded from this map.
+  typedef std::map<irep_idt, std::vector<exprt>> pack_expr_mapt;
+  pack_expr_mapt pack_expr_map;
+
   /// Short names of a member alias template's OWN parameter packs while its
   /// body is being substituted during the enclosing class's instantiation.
   /// N5008 [temp.alias]/2 + [temp.variadic]/4-5: such a pack is not yet bound
@@ -86,6 +94,7 @@ public:
     expr_map.swap(template_map.expr_map);
     pack_size_map.swap(template_map.pack_size_map);
     pack_args_map.swap(template_map.pack_args_map);
+    pack_expr_map.swap(template_map.pack_expr_map);
   }
 
   exprt lookup(const irep_idt &identifier) const;
