@@ -5790,6 +5790,46 @@ void cpp_typecheck_resolvet::guess_template_args(
       // Check if it was instantiated from a template
       if(desired_sym->type.find(ID_C_template).is_nil())
       {
+        // N5008 [temp.deduct.call]/4: the argument type A need not itself be a
+        // specialization of the class template named by P -- A may be a
+        // (non-template) class DERIVED from such a specialization, in which
+        // case deduction is performed against the base-class specialization.
+        // The main derived-to-base dispatch below only runs once A has been
+        // confirmed to be a template instantiation, so a plain
+        // `struct D : Base<...>` would otherwise be rejected here.  Walk A's
+        // bases for one that is an instantiation of the template named by P and
+        // retry deduction against it (the recursion descends to deeper bases as
+        // needed).
+        if(desired_type.id() == ID_struct_tag)
+        {
+          const irep_idt dtb_tmpl_name = cpp_name.get_base_name();
+          if(!dtb_tmpl_name.empty())
+          {
+            const irept &dtb_bases = desired_sym->type.find(ID_bases);
+            for(const auto &base : dtb_bases.get_sub())
+            {
+              const typet &base_type =
+                static_cast<const typet &>(base.find(ID_type));
+              if(
+                base_type.id() != ID_struct_tag &&
+                base_type.id() != ID_union_tag)
+                continue;
+              const irep_idt base_id =
+                base_type.id() == ID_struct_tag
+                  ? to_struct_tag_type(base_type).get_identifier()
+                  : to_union_tag_type(base_type).get_identifier();
+              const symbolt *base_sym =
+                cpp_typecheck.symbol_table.lookup(base_id);
+              if(base_sym == nullptr || base_sym->base_name != dtb_tmpl_name)
+                continue;
+              const bool saved_dab = deducing_against_base;
+              deducing_against_base = true;
+              guess_template_args(template_type, base_type);
+              deducing_against_base = saved_dab;
+              return; // dispatched to the base subobject
+            }
+          }
+        }
         mark_targs_conflicting();
         return;
       }
