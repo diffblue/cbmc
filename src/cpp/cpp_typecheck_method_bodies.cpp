@@ -332,6 +332,19 @@ void cpp_typecheckt::typecheck_method_bodies()
       }
     }
 
+    // N5008 [temp.variadic]/5: expand a call-argument pack expansion in the
+    // body (e.g. `add(I...)` over a non-type parameter pack) to one argument
+    // per element, substituting the pack's element value.  The in-class /
+    // decltype paths use expand_call_argument_packs already; a function
+    // template body reaches here without it, so a non-type pack call-argument
+    // expansion would otherwise be left unexpanded.  Gated on a NON-type pack
+    // being present (pack_expr_map): a body with only type / function-parameter
+    // packs is already handled by the expansion above, and re-running the
+    // call-argument expander over it would double-expand a function parameter
+    // pack.
+    if(!template_map.pack_expr_map.empty())
+      template_map.expand_call_argument_packs(static_cast<irept &>(body));
+
     // Per [temp.variadic]/7: substitute non-empty pack parameter
     // names in the body with their actual types.
     if(!template_map.pack_args_map.empty())
