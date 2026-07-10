@@ -779,3 +779,27 @@ NOTE: cpp20_concepts_ordering_gcc14 is a documented Clang-20-preprocessor-
 sensitive test; a stale/incremental binary can make it transiently fail.  A
 clean rebuild passes it 5/5 both with and without the sizeof... fix (which is not
 on its code path), confirming no regression.
+
+## DERIVED-TO-BASE DEDUCTION (non-template derived) FIXED -> CORE (2026-07-10)
+
+Chasing cpp17_tuple_basic's `get<0>` wrong value, minimized the get<> mechanism
+(recursive `_Tuple_impl` inheritance + `__get_helper<I>` deducing
+`_Tuple_impl<I,Head,Tail...>` from the derived tuple).  Two false leads: (a) a
+name collision when the reproducer's outer pack shared the deducer's pack name
+`T` (artifact), (b) it works for a template-instance derived class with distinct
+names.  REAL bug found: derived-to-base deduction from a NON-template derived
+class (`struct D : impl<0,int,char>`) aborted at guess_template_args' "argument
+not instantiated from a template" guard before the derived-to-base dispatch ran.
+Fixed by walking the argument class's bases for a specialization of the deduced
+template and retrying (handles a non-empty trailing pack; deeper index selects a
+deeper base).  cpp11_derived_to_base_variadic_deduction flipped to CORE; full
+cbmc-cpp green.
+
+REAL TUPLE RESIDUAL (cpp17_tuple_basic, still KNOWNBUG): narrowed to element
+count -- a 2-element tuple is fine end-to-end, but a 3-element tuple fails:
+`make_tuple(a,b,c)` gives a wrong `get<0>` and manual `tuple<A,B,C> t(a,b,c)`
+fails constructor resolution ("no match for symbol 'tuple'").  A hand-written
+faithful minimal tuple works at all arities, so the residual is in libstdc++'s
+tuple CONSTRUCTOR machinery at >=3 elements (the _TupleConstraints-guarded
+variadic constructor / element storage), NOT get<> deduction.  Next: cvise the
+preprocessed 3-element case.
