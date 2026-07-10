@@ -1,21 +1,19 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ decltype-return pack call yields 3: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.deduct]/2,5 + [temp.variadic]/4-5.  A function template
-whose trailing return type is a `decltype` of a CALL containing a pack expansion,
-`-> decltype(add(I...))`, is not resolved by CBMC ("found no match for symbol
-'impl'"), leaving the call untyped.  A decltype of a fixed-argument call
-(`decltype(add(1,2))`) and plain `auto`/`decltype(auto)` forwarding returns are
-handled correctly, so the defect is specific to a decltype return type over a
-pack-expansion call.  This is the core of cpp17_apply_basic -- libstdc++
-std::apply's `__apply_impl` returns `decltype(__invoke(f, get<_Idx>(t)...))` --
-and is a separate layer from the std::tuple construction bugs.  g++/clang++
-compute r == 3.  Flip to CORE once a decltype-return-type over a pack-expansion
-call is resolved.
+N5008 [temp.deduct]/2,5 + [temp.variadic]/4-5.  A function template whose
+trailing return type is a `decltype` of a CALL containing a pack expansion,
+`-> decltype(add(I...))`, with the pack DEDUCED from a class-template-id
+argument (`seq<1,2>`).  Previously unresolved ("found no match for symbol
+'impl'"); fixed by recording the deduced non-type pack's element values in
+pack_expr_map (without an empty pack_args_map entry shadowing them), expanding
+the pack to full arity in the guessed template arguments, and expanding the
+non-type call-argument pack in both the decltype return type and the body.  This
+is the core of cpp17_apply_basic -- libstdc++ std::apply's `__apply_impl`
+returns `decltype(__invoke(f, get<_Idx>(t)...))`.  Non-vacuous: the returned
+value is a concrete function of the deduced pack.
