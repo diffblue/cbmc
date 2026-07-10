@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ auto-return pack call yields 3: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [dcl.spec.auto]/3-4 + [temp.variadic]/4-5.  A function template
+with a DEDUCED return type (`auto` / `decltype(auto)`) whose body returns a call
+containing a pack expansion (`decltype(auto) impl(seq<I...>){ return add(I...); }`)
+is left incomplete by the C++ front-end ("C++ front-end could not fully
+type-check 'main' (unsupported construct); its body is left incomplete").  The
+call is never really evaluated, so BOTH assertions are skipped and CBMC reports
+VERIFICATION SUCCESSFUL vacuously -- which does NOT match the desc above, so this
+correctly registers as a known bug.  When the deduced return type is supported,
+the body is checked, assertion 2 ("WRONG must FAIL") fails, and the desc matches
+(promote to CORE).
+
+A TRAILING return type over the same pack call (`-> decltype(add(I...))`) IS
+handled correctly (cpp11_decltype_return_nontype_pack_call, CORE); the defect is
+specific to a DEDUCED return type whose deduction must expand the pack-expansion
+call in the return statement.  This is the remaining layer of cpp17_apply_basic
+(std::apply and __apply_impl return `decltype(auto)`).  g++ runs r == 3; clang++
+accepts.

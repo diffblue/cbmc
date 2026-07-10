@@ -1244,3 +1244,27 @@ guess_function_template_args expands only TYPE packs to full arity, not a
 NON-type pack's values.  So the deduced `<1,2>` collapses to `<1>` and impl is
 mis-instantiated ("no match").  NEXT: emit a non-type pack's full element values
 (from pack_expr_map) when expanding the guessed template arguments to full arity.
+
+## RESOLVED: deduced decltype-return non-type pack call (2026-07-10)
+
+cpp11_decltype_return_nontype_pack_call flipped KNOWNBUG -> CORE.  Full chain of
+fixes for a NON-type parameter pack expanded as call arguments:
+  1. expand_call_argument_packs consumes pack_expr_map (96756b56c6)
+  2. function-template body runs it when a non-type pack is present (dc8c6e0668)
+  3. guess_template_args records the deduced pack's VALUES in pack_expr_map,
+     NOT an empty pack_args_map that would shadow them (7835827b75 + ad1bef578b)
+  4. guessed template args expand a non-type pack to full arity (8a5a0fe9cd)
+New CORE tests: cpp11_nontype_pack_call_args_explicit,
+cpp11_nontype_pack_call_args_deduced, cpp11_decltype_return_nontype_pack_call.
+
+## NEXT LAYER (new KNOWNBUG): auto / decltype(auto) return deduction over a pack call
+cpp11_auto_return_deduce_pack_call (KNOWNBUG, header-free, faithful: g++ runs
+r==3, clang++ accepts).  A DEDUCED return type (`auto`/`decltype(auto)`) whose
+body returns a pack-expansion call leaves the body incomplete ("could not fully
+type-check 'main'").  Trailing `-> decltype(add(I...))` works; the deduced
+return type does not.  This is the remaining cpp17_apply_basic layer (std::apply
+and __apply_impl both return decltype(auto)).  NEXT: make return-type deduction
+(auto/decltype(auto)) expand a pack-expansion call in the return statement --
+likely the same expand_call_argument_packs applied when deducing the return type
+from the return expression (cpp_typecheck_method_bodies / the auto-deduction
+path), mirroring the trailing-decltype handling.
