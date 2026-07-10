@@ -6058,14 +6058,26 @@ void cpp_typecheck_resolvet::guess_template_args(
             // e.g. the empty `_Tail` of `_Tuple_impl<1, int>`).  Counting it
             // as a real element would deduce a one-element pack `<void>`.
             std::vector<typet> pack_elems;
+            // [temp.deduct.type] + [temp.variadic]: a NON-type template
+            // argument (e.g. the `1, 2` of `seq<1,2>`) deduces the pack's
+            // element VALUES, recorded in pack_expr_map -- the value analogue
+            // of pack_args_map -- so a later pack expansion over it (e.g.
+            // `add(I...)`) has the concrete values to substitute.
+            std::vector<exprt> pack_exprs;
             for(std::size_t j = i; j < inst_arguments.size(); j++)
-              if(
-                inst_arguments[j].id() == ID_type &&
-                inst_arguments[j].type().id() != ID_empty)
-                pack_elems.push_back(inst_arguments[j].type());
+            {
+              if(inst_arguments[j].id() == ID_type)
+              {
+                if(inst_arguments[j].type().id() != ID_empty)
+                  pack_elems.push_back(inst_arguments[j].type());
+              }
+              else if(inst_arguments[j].id() != ID_unassigned)
+                pack_exprs.push_back(
+                  static_cast<const exprt &>(inst_arguments[j]));
+            }
 
             cpp_typecheck.template_map.pack_size_map[pack_id] =
-              pack_elems.size();
+              pack_elems.size() + pack_exprs.size();
             // [temp.deduct.call]/4.3: if this pack was deduced from a
             // base-class subobject of a derived-class argument, record it so
             // build_template_args' single placeholder is later expanded to
@@ -6076,7 +6088,14 @@ void cpp_typecheck_resolvet::guess_template_args(
             // entry lets a zero-length pack expansion in the matched pattern
             // (e.g. primary<Types...> with Types = <>) expand to no arguments.
             cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
-            if(!pack_elems.empty())
+            if(!pack_exprs.empty())
+            {
+              cpp_typecheck.template_map.pack_expr_map[pack_id] = pack_exprs;
+              // Keep the pack resolvable as a single value outside a pack
+              // expansion (mirror of the type_map convenience below).
+              cpp_typecheck.template_map.expr_map[pack_id] = pack_exprs.front();
+            }
+            else if(!pack_elems.empty())
             {
               // Keep the pack parameter resolvable as a single type (the
               // first element) outside a pack expansion; build_template_args
