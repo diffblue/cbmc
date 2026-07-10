@@ -1192,3 +1192,16 @@ cpp17_tuple_basic NEXT layer: NOT yet isolated to a FAITHFUL minimal test.
   to still call a 1-arg forwarding function) may be needed.
 
 cpp17_apply_basic: not yet reduced; separate decltype/invoke_result ODR-use layer.
+
+## cpp17_apply_basic CORE LAYER ISOLATED (2026-07-10)
+
+Header-free KNOWNBUG cpp11_decltype_return_nontype_pack_call isolates apply's
+core: a function template with a TRAILING RETURN TYPE that is a `decltype` of a
+CALL containing a pack expansion -- `template<int...I> auto impl(seq<I...>) ->
+decltype(add(I...))` -- is not resolved by CBMC ("found no match for symbol
+'impl'").  This is exactly libstdc++ std::apply's `__apply_impl` return type
+`decltype(__invoke(f, get<_Idx>(t)...))`.  Narrowing: a fixed-argument decltype
+call (`decltype(add(1,2))`) and plain `auto`/`decltype(auto)` forwarding returns
+all work; the defect is specific to a decltype return type over a pack-expansion
+call.  Distinct from the std::tuple construction layer -- fixing it should
+unblock cpp17_apply_basic and may help other invoke_result/decltype-return uses.
