@@ -65,17 +65,35 @@ foreach(SOLVER ${sat_impl})
     if("${SOLVER}" STREQUAL "minisat2")
         message(STATUS "Building solvers with minisat2")
 
-        # once we upgrade to CMake 3.7 or higher we can specify multiple URLs as a
-        # fall-back in case the first URL fails (the Makefile-based build retries up
-        # to 2 times)
-        download_project(PROJ minisat2
-            URL http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz
-            PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/minisat-2.2.1-patch
-            COMMAND cmake -E copy ${CBMC_SOURCE_DIR}/scripts/minisat2_CMakeLists.txt CMakeLists.txt
-            URL_MD5 27faa19ee0508660bd6fb7f894646d42
+        set(minisat2_root ${CBMC_SOURCE_DIR}/3p/minisat-2.2.1-patched)
+
+        # CBMC only uses part of minisat2.
+        # This builds just the parts that are needed.
+        add_library(minisat2-condensed
+            ${minisat2_root}/minisat/simp/SimpSolver.cc
+            ${minisat2_root}/minisat/core/Solver.cc
+            ${minisat2_root}/minisat/utils/Options.cc
         )
 
-        add_subdirectory(${minisat2_SOURCE_DIR} ${minisat2_BINARY_DIR})
+        set_target_properties(
+            minisat2-condensed
+            PROPERTIES
+            CXX_STANDARD 17
+            CXX_STANDARD_REQUIRED true
+            CXX_EXTENSIONS OFF
+            XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY "Developer ID Application: Daniel Kroening"
+        )
+
+        if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+            target_compile_options(minisat2-condensed PUBLIC /w)
+        endif()
+
+        target_include_directories(minisat2-condensed
+            PUBLIC
+            ${minisat2_root}
+        )
+
+        target_link_libraries(minisat2-condensed util)
 
         target_compile_definitions(solvers PUBLIC
             SATCHECK_MINISAT2 HAVE_MINISAT2 __STDC_FORMAT_MACROS __STDC_LIMIT_MACROS
