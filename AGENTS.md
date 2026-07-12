@@ -444,7 +444,6 @@ Traditional makefiles are also available:
 
 ```bash
 cd src
-make minisat2-download
 make -j$(nproc)  # Parallel build
 ```
 
@@ -458,7 +457,8 @@ CBMC can use various SAT/SMT solvers:
 - **Z3**
 - And others
 
-CMake automatically downloads MiniSat during configuration.
+MiniSat is part of the source tree (in `3p/`); CMake automatically downloads
+the other solvers during configuration when they are selected.
 See `COMPILING.md` for detailed build instructions for all platforms.
 
 ---

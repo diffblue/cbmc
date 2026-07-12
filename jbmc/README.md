@@ -28,7 +28,6 @@ Compilation
 Before compilation, run the commands:
 
 ```bash
-make -C src DOWNLOADER=wget minisat2-download
 make -C jbmc/src setup-submodules
 ```
 

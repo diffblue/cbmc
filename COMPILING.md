@@ -79,15 +79,10 @@ files.
    to generate IDE projects by supplying the `-G` flag.  Run `cmake -G` for a
    comprehensive list of supported back-ends.
 
-   As part of this step, CMake will download the back-end solvers (see Section
-   "Compiling with alternative SAT solvers" in this document for configuration
-   options). Should it be necessary to perform this step without network access,
-   a solver can be downloaded ahead of the above `cmake` invocation as follows:
-   ```
-   mkdir -p build/minisat2-download/minisat2-download-prefix/src/
-   wget http://ftp.debian.org/debian/pool/main/m/minisat2/minisat2_2.2.1.orig.tar.gz \
-     -O build/minisat2-download/minisat2-download-prefix/src/minisat2_2.2.1.orig.tar.gz
-   ```
+   The default SAT solver, MiniSat, is part of the source tree (in `3p/`) and
+   does not require a download. When configuring an alternative SAT solver,
+   CMake will download it as part of this step (see Section "Compiling with
+   alternative SAT solvers" in this document for configuration options).
 
    On macOS >10.14, the build will fail unless you explicitly specify
    both the C and C++ compilers to avoid C++ standard library not found
@@ -176,7 +171,6 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
 
 3. To compile, do
    ```
-   make -C src minisat2-download
    make -C src
    ```
    See doc/architectural/compilation-and-development.md for instructions on how
@@ -205,7 +199,6 @@ Follow these instructions:
    ```
 3. To compile CBMC, do
    ```
-   make -C src minisat2-download
    make -C src
    ```
 4. To compile JBMC, you additionally need Maven 3, which has to be installed
@@ -231,7 +224,6 @@ Maven 3 manually.
    ```
 3. To compile CBMC, type
    ```
-   gmake -C src minisat2-download DOWNLOADER=wget TAR=gtar
    gmake -C src
    ```
 4. To compile JBMC, type
@@ -257,7 +249,6 @@ Maven 3 manually.
    ```
 3. To compile CBMC, do
    ```
-   gmake -C src minisat2-download
    gmake -C src
    ```
 4. To compile JBMC, do
@@ -374,8 +365,10 @@ However it is also possible to build CBMC using alternative SAT solvers.
 
 ### Compiling CBMC Using Solver Native Interfaces
 
-The following solvers are supported by CBMC using custom interfaces and can
-be downloaded and compiled by the build process: MiniSAT2, CaDiCaL, and Glucose.
+The following solvers are supported by CBMC using custom interfaces:
+MiniSAT2, CaDiCaL, and Glucose. MiniSAT2 is part of the source tree (in
+`3p/`); CaDiCaL and Glucose can be downloaded and compiled by the build
+process.
 
 For `make`, alternatives to the default (i.e. not MiniSAT and CaDiCaL) can be
 built with the following commands for glucose:
@@ -387,8 +380,8 @@ CBMC can be built with multiple solvers, which can then be selected at runtime
 using the `--sat-solver` option.
 For example, to build CBMC with MiniSAT2 and Glucose, do:
 ```
-make -C src minisat2-download glucose-download
-make -C src MINISAT2=../../minisat-2.2.1 GLUCOSE=../../glucose-syrup
+make -C src glucose-download
+make -C src MINISAT2=../../3p/minisat-2.2.1-patched GLUCOSE=../../glucose-syrup
 ```
 The build sets the default solver based on the priority defined by the
 `#if/#elif` tree defined at the end of

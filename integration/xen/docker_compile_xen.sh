@@ -4,7 +4,6 @@ set -e
 
 cd /tmp/cbmc/src
 
-make minisat2-download
 make -j$(nproc)
 
 mkdir /tmp/xen_compilation
