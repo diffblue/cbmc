@@ -1,16 +1,17 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11
+--cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
 --
-N5008 [temp.arg.explicit]/4: a trailing template parameter pack not otherwise
-deduced is an empty sequence, so make_box<>() returns box<> and arity is 0.
-CBMC drops make_box<>() (empty explicit pack for a variadic function template
-with a nested-pack-expansion return type), so the call has no viable function
-([temp.deduct]/8).  Surfaced as a CONVERSION ERROR by the SFINAE-enforcement fix
-(was previously swallowed silently).  Flip to CORE once resolved.  Non-empty
-cases are CORE in cpp11_variadic_member_alias_pack.
+N5008 [temp.arg.explicit]/4 + [temp.variadic]/4,7.  A trailing template parameter
+pack given an EMPTY explicit argument list (`make_box<>()`) whose return type is
+a non-bare pack-expansion (`box<typename identity<E>::type...>`) is deduced as an
+empty sequence, so arity(make_box<>()) == 0.  Previously the empty pack (only a
+pack_size_map size-0 entry, no pack_args_map/pack_expr_map entry) was not
+recognised in the non-bare pattern, so the argument stayed an unresolved bare
+pack reference and the candidate was dropped ("found no match").  Fixed by also
+collecting empty packs from pack_size_map when gathering a pattern's referenced
+packs.  Non-vacuous: arity is a genuine run-time sizeof...(E).
