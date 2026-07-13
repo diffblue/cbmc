@@ -1,32 +1,27 @@
-// N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5: the core of
-// the remaining cpp17_apply_basic blocker.  A NON-type parameter pack is
-// deduced through an ALIAS TEMPLATE that maps the pack onto a class template
-// with a fixed leading argument:
+// N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5: deducing a
+// parameter pack THROUGH an alias template that maps the pack onto a class
+// template with a fixed leading argument:
 //
 //   template <class T, T... I> struct iseq {};
 //   template <SIZE... I> using idxseq = iseq<SIZE, I...>;      // fixed T = SIZE
 //   template <SIZE... J> int apply_impl(idxseq<J...>) { ... }  // deduce J
 //
-// This is exactly std::index_sequence:
-//   template <size_t... _Idx> using index_sequence
-//     = integer_sequence<size_t, _Idx...>;
-// and the std::apply helper's parameter `index_sequence<_Idx...>`.
+// This is exactly std::index_sequence
+// (`template <size_t... _Idx> using index_sequence = integer_sequence<size_t,
+// _Idx...>`), the parameter type of std::apply's __apply_impl.
 //
-// KNOWNBUG: CBMC fails to deduce the pack through the alias -- "found no match
-// for symbol 'apply_impl'" -- so the call does not resolve.  Deducing directly
-// from the underlying class template `iseq<SIZE, J...>` (without the alias)
-// works; the defect is specific to a pack deduced THROUGH the alias, whose
-// aliased-type pattern must be substituted with the deducing function's pack
-// before matching.  (A hand-written alias happens to succeed only when the
-// deducing function's pack parameter is spelled identically to the alias's own
-// pack parameter -- an accidental name-based match; the real std::index_sequence
-// fails regardless.)
+// CORE (was KNOWNBUG): guess_template_args substituted the alias's parameters
+// into the aliased-type pattern using ID_C_base_name, which is empty for a
+// non-type parameter (stored as a symbol whose name is only the suffix of its
+// scoped identifier), so the substitution never fired and the enclosing
+// function's pack was never deduced ("found no match").  Fixed by deriving the
+// alias parameter's base name robustly.  Covers a NON-type pack and a TYPE pack,
+// each with a deducing-function pack name DIFFERENT from the alias's own
+// parameter name (so it is a genuine substitution, not an accidental name
+// match).
 //
-// This blocks std::apply, whose __apply_impl deduces `size_t... _Idx` from
-// `make_index_sequence<...>` (an index_sequence alias specialisation).
-//
-// g++ compiles and runs r == 3; clang++ accepts.  Flip to CORE once a non-type
-// pack is deduced through an alias template.
+// g++ compiles and runs these values; clang++ accepts.  Non-vacuous: each
+// assertion is a concrete function of the deduced pack.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
@@ -40,17 +35,35 @@ struct iseq
 {
 };
 
+// non-type parameter pack through an alias (std::index_sequence shape)
 template <__SIZE_TYPE__... I>
 using idxseq = iseq<__SIZE_TYPE__, I...>;
 
 template <__SIZE_TYPE__... J>
-int apply_impl(idxseq<J...>)
+int sum_impl(idxseq<J...>)
 {
   return add(J...);
 }
 
+// type parameter pack through an alias with a fixed leading type argument
+template <class... U>
+struct tseq
+{
+};
+
+template <class... U>
+using talias = tseq<int, U...>;
+
+template <class... W>
+int count_impl(talias<W...>)
+{
+  return sizeof...(W);
+}
+
 int main()
 {
-  __CPROVER_assert(apply_impl(idxseq<1, 2>{}) == 3, "alias-pack deduce sum==3");
+  __CPROVER_assert(sum_impl(idxseq<1, 2>{}) == 3, "non-type alias pack: 1+2==3");
+  __CPROVER_assert(
+    count_impl(talias<char, char, char>{}) == 3, "type alias pack: count==3");
   return 0;
 }
