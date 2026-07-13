@@ -1693,3 +1693,69 @@ fix is substantial (source inline member bodies on lazy completion / drive such
 instances through instantiate_template's full flow; medium-high risk, must not
 over-instantiate SFINAE branches).  Recommend a dedicated session with the full
 cbmc-cpp + goto-cc-cbmc baseline, not a quick KNOWNBUG->CORE flip.
+
+## Cluster B (exception semantics) — analysis (2026-07-13)
+
+Two KNOWNBUGs, both already minimal + header-free (only a local
+`__CPROVER_assert` decl); no cvise needed.
+
+### cpp11_throw_rethrow_nested  (root cause CONFIRMED in lowered goto)
+`throw;` inside an outer handler must rethrow the exception the *dynamically
+enclosing* handler is handling (N5008 [except.throw]/8, [except.handle]/1).
+Bug: src/goto-programs/remove_cpp_exceptions.cpp tracks the exception being
+handled in a SINGLE pair of globals `__CPROVER_cpp_current_exception{,_type}`,
+not a stack.  prepare_handler() at handler entry does
+  current_exc = inflight; inflight = clear;
+and set_inflight_exception() for a bare `throw;` does
+  inflight = current_exc;
+Verified in --show-goto-functions for the test:
+  * outer `catch(E&outer)` entry: current_exc := inflight (=E(1))
+  * inner `catch(E&inner)` entry: current_exc := inflight (=E(2))  <-- OVERWRITES
+    E(1); nothing restores it on inner-handler exit
+  * outer `throw;`: inflight := current_exc  == E(2)  (WRONG; must be E(1))
+So assertion 2 (`e.c==1`) FAILS.
+
+Naive fix REJECTED (provably wrong): "save old current_exc at handler entry,
+restore at the catch-var DEAD."  goto-conversion emits `DEAD <catch_var>` on the
+rethrow path IMMEDIATELY BEFORE the trailing `throw;` read (verified: outer's
+`DEAD main::1::1::2::outer` precedes `inflight := current_exc` by one
+instruction).  Restoring at that DEAD would overwrite the value the handler's
+own rethrow is about to read.  Normal-exit DEAD and rethrow-path DEAD are not
+locally distinguishable (inflight is still null at both).
+
+Correct fix (cross-phase, medium complexity, NOT a quick flip):
+per-handler current-exception storage keyed by lexical nesting, so nested
+handlers cannot clobber the enclosing handler's slot and NO exit-restore is
+needed:
+  1. front-end: maintain a handler stack in cpp_typecheckt; in
+     typecheck_try_catch push the catch-var symbol (or a synthesized id for
+     catch(...)) around typecheck_code(catch_block); when typechecking a bare
+     `throw;` (ID_throw side-effect with no operand, cpp_typecheck_expr.cpp
+     ~5777) tag it `#rethrow_handler = <enclosing handler id>`.
+  2. verify the tag survives goto_convert onto the THROW instruction (may need
+     goto_convert to preserve the attribute -- UNVERIFIED, a real risk).
+  3. remove_cpp_exceptions: give each handler its own slot pair keyed by that
+     id; prepare_handler writes inflight into the handler's slot; the rethrow
+     reads the slot named by its `#rethrow_handler`.  Fall back to the single
+     global for untagged/catch(...) cases.
+  (A LIFO current-exception stack is the alternative, but its pop placement runs
+  into the same DEAD-before-rethrow ordering problem.)
+  Both still leave a recursive/looping same-handler reuse limitation, which is
+  pre-existing.
+
+### cpp11_throw_dtor_unwinding_outer_scope  (separate, deeper)
+N5008 [except.ctor]/1-3: every automatic object whose scope is exited during
+unwinding must be destroyed.  Here B is thrown in f() (no enclosing try in f),
+an inner try catches only A, so B propagates to an outer catch(B&); object `g`
+in the outer try's scope (before the inner try) must be destroyed during
+unwinding.  Bug: goto-conversion destructor-unwinding only unwinds locals up to
+the innermost enclosing try at the *throw point* (here f()'s own locals), not
+outer scopes exited because the exception fails to match an inner handler, so
+`g`'s dtor never runs.  This is a goto-convert unwinding-scope issue, distinct
+from the remove_cpp_exceptions current-exception bug.
+
+Conclusion: cluster B is genuine exception-lowering work, not a
+minimal-reproducer/quick-flip.  Reproducers are already minimal + header-free;
+root causes are pinned; recommend a dedicated session for the per-handler
+current-exception storage (with goto_convert attribute-survival verified) and,
+separately, the outer-scope unwinding fix.
