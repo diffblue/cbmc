@@ -5638,11 +5638,45 @@ void cpp_typecheck_resolvet::guess_template_args(
       // `__detail::_BracketMatcher<_TraitsT, icase, collate>`; without the
       // guard, matching the expansion re-finds the member alias and recurses
       // until the stack is exhausted.
-      if(!cpp_name.is_qualified())
+      // Look up the alias template.  An UNqualified name is found in the
+      // current scope chain.  A QUALIFIED alias template-id (e.g.
+      // std::index_sequence, the parameter type of std::apply's __apply_impl)
+      // must be resolved through its qualifiers.  Proper qualified lookup --
+      // unlike the old base-name-only recursive lookup, which is why qualified
+      // names were previously skipped altogether -- resolves an alias's own
+      // expansion target (a qualified class-template-id such as the libstdc++
+      // regex `__detail::_BracketMatcher`) to the CLASS TEMPLATE, not back to
+      // the member alias, so alias expansion terminates naturally without a
+      // recursion guard (N5008 [temp.alias]: expansion is a one-step
+      // substitution to the fully-resolved underlying type).
       {
-        irep_idt base_name = cpp_name.get_base_name();
-        const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
-          base_name, cpp_scopet::RECURSIVE);
+        cpp_scopet::id_sett id_set;
+        if(!cpp_name.is_qualified())
+        {
+          id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+            cpp_name.get_base_name(), cpp_scopet::RECURSIVE);
+        }
+        else
+        {
+          // A resolution failure in this (deduction / possibly SFINAE) context
+          // is not an error -- just skip alias expansion.  resolve_scope moves
+          // the current scope to the alias's declaring scope, so restore it
+          // immediately (an inner cpp_save_scopet) before the substitution and
+          // recursive deduction below, which must resolve the ENCLOSING
+          // function template's pack parameter in its own scope.
+          cpp_save_scopet inner_save_scope(cpp_typecheck.cpp_scopes);
+          try
+          {
+            irep_idt qual_base_name;
+            cpp_template_args_non_tct qual_template_args;
+            cpp_scopet &alias_scope =
+              resolve_scope(cpp_name, qual_base_name, qual_template_args);
+            id_set = alias_scope.lookup(qual_base_name, cpp_scopet::QUALIFIED);
+          }
+          catch(...)
+          {
+          }
+        }
         for(const auto &id_ptr : id_set)
         {
           if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE)
