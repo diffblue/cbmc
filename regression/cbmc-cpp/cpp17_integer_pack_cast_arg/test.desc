@@ -1,21 +1,18 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ cast __integer_pack yields \{0,1\}: 0\+1==1: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: the GCC `__integer_pack` builtin with a CAST argument, as libstdc++
-writes std::make_integer_sequence (`integer_sequence<T, __integer_pack(T(N))...>`,
-note the `T(N)` cast).  The direct form `__integer_pack(N)...` is handled
-(cpp17_integer_pack_builtin, CORE); the cast form is resolved eagerly during the
-alias body substitution and never reaches the typecheck_template_args expansion,
-so CBMC rejects `__integer_pack` and leaves the body incomplete -> VERIFICATION
-SUCCESSFUL vacuously (does NOT match the desc above, so a known bug).  This is the
-remaining cpp17_apply_basic blocker (std::apply deduces its __apply_impl
-index_sequence from a make_index_sequence value).  __integer_pack is GCC-only;
-g++ runs r == 1.  When the cast form is expanded, assertion 2 fails and the desc
-matches (promote to CORE).
+The GCC `__integer_pack` builtin with a CAST argument, as libstdc++ writes
+std::make_integer_sequence (`integer_sequence<T, __integer_pack(T(N))...>`).
+With the `T(N)` cast the pack-expansion argument is stored as an `ambiguous`
+function type (vexing parse: `code` returning `__integer_pack`, parameter `T N`),
+so the plain-call __integer_pack expansion missed it.  Fixed by also recognising
+that shape (count = parameter name N, element type = parameter type T), greening
+deduction from the real std::make_index_sequence (this test uses both a
+hand-written cast alias and the real std::make_index_sequence).  GCC-only builtin
+(Clang uses __make_integer_seq).  Non-vacuous: each assertion is a concrete
+function of the generated pack.
