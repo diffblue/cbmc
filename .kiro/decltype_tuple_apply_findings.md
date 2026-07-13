@@ -1457,3 +1457,20 @@ __integer_pack where the alias body is substituted / eagerly resolved (the path
 that turns `__integer_pack(size_t(2))...` into a resolve of the unknown name),
 mirroring the typecheck_template_args expansion; evaluate the (now concrete) cast
 argument to the count.
+
+## RESOLVED: __integer_pack cast argument / real make_index_sequence (2026-07-13)
+
+cpp17_integer_pack_cast_arg flipped KNOWNBUG -> CORE (36d58f52e8).  libstdc++
+writes make_integer_sequence as `integer_sequence<T, __integer_pack(T(N))...>`;
+the `T(N)` cast triggers the vexing parse so the pack-expansion arg is stored as
+an `ambiguous` function type (`code` returning __integer_pack, parameter `T N`).
+typecheck_template_args now recognises BOTH the plain-call shape (direct) AND
+this ambiguous/function-type shape (count = parameter name N, element type =
+parameter type T).  Real std::make_index_sequence deduction now works.
+
+REMAINING for cpp17_apply_basic: STILL "invalid implicit conversion from
+'<<type:decltype>>' to 'signed int'" at std::apply -- the make_index_sequence
+layer is now closed, so the residual is the decltype(auto) chain through the real
+std::__invoke / std::get<Idx> over std::tuple (and the lazy ODR-use member
+instantiation of part2_findings.md).  Needs a fresh re-narrowing on top of these
+fixes.
