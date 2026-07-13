@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -6,14 +6,14 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5.
-Deducing a parameter pack through a QUALIFIED alias template (`N::idxseq<J...>`).
-The unqualified case is handled (cpp17_alias_template_nontype_pack_deduce, CORE);
-here the alias-expansion branch in guess_template_args is restricted to
-UNqualified template-ids (an anti-recursion guard for a libstdc++ regex
-member-alias shape), so the qualified alias is never expanded and the pack is
-not deduced ("found no match for symbol 'f'", CONVERSION ERROR, EXIT=6) -- so the
-desired-behaviour desc above does not match and this registers as a known bug.
-This is exactly how std::apply uses `std::index_sequence<_Idx...>` (a qualified
-alias) and is the remaining cpp17_apply_basic blocker.  g++ runs r == 3; clang++
-accepts.  Flip to CORE once a qualified alias template's pack is deduced.
+N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5.  Deducing a
+parameter pack through a QUALIFIED alias template (`N::idxseq<J...>`), the
+std::index_sequence shape used by std::apply's __apply_impl.  Previously the
+alias-expansion branch was restricted to unqualified template-ids (the lookup
+used the base name recursively, which for a qualified name found the wrong
+symbol and looped -- the libstdc++ regex member-alias shape), so a qualified
+alias was never expanded ("found no match").  Fixed by resolving a qualified
+alias template-id through its qualifiers (resolve_scope + QUALIFIED lookup) and
+restoring the moved scope before re-deducing.  Covers a non-type and a type pack
+through a namespaced qualified alias.  Non-vacuous: each assertion is a concrete
+function of the deduced pack.
