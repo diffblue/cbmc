@@ -1,30 +1,20 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ nested decltype\(auto\) pack call yields 3: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [dcl.spec.auto]/3-4,11 + [temp.variadic]/4-5.  The minimal core
-of the std::apply blocker: a function template with a DEDUCED return type
-(`decltype(auto)`) whose body calls ANOTHER deduced-return function template,
-passing a MULTI-element non-type parameter pack as the arguments
-(`decltype(auto) apply_impl(seq<V...>){ return invoke(V...); }` where invoke is
-also decltype(auto)).  CBMC leaves the caller's return type an unresolved
-`<<type:decltype>>` ("invalid implicit conversion from '<<type:decltype>>' to
-'signed int'"; "could not fully type-check 'main'"), so the body is incomplete
-and both assertions are skipped -> VERIFICATION SUCCESSFUL vacuously, which does
-NOT match the desc above (so this correctly registers as a known bug).
-
-Requires ALL of: (1) OUTER return type deduced (auto/decltype(auto), not
-trailing decltype); (2) INNER callee a TEMPLATE with a deduced return type (a
-concrete decltype(auto) function works); (3) pack size > 1 (a single-element
-pack works).  A deduced return type over a pack call to a KNOWN function is
-handled (cpp11_auto_return_deduce_pack_call, CORE); the gap is the nested
-deduced-return callee whose return type must be deduced during the outer
-function's own return-type deduction.  This is the exact error of
-cpp17_apply_basic.  g++ runs r == 3; clang++ accepts.  When fixed, the body is
-checked, assertion 2 fails, and the desc matches (promote to CORE).
+N5008 [dcl.spec.auto]/3-4,11 + [temp.variadic]/4-5.  A function template with a
+DEDUCED return type (`decltype(auto)`) whose body calls ANOTHER deduced-return
+function template, passing a MULTI-element non-type parameter pack as the
+arguments (`decltype(auto) apply_impl(seq<V...>){ return invoke(V...); }`), the
+core shape of libstdc++ std::apply's `__apply_impl` -> `std::__invoke`.
+Previously the caller's return type was left an unresolved `<<type:decltype>>`
+("invalid implicit conversion from '<<type:decltype>>' to 'signed int'").
+Fixed by expanding ONLY the non-type call-argument pack in the eager
+auto/decltype(auto) convert_function path, so a nested callee's already-expanded
+function-parameter pack is not re-expanded against the enclosing instantiation's
+unrelated pack size (which corrupted `add(a$0, a$1)` into `add(a$0, a$0)`).
+Non-vacuous: the returned value is a concrete function of the deduced pack.
