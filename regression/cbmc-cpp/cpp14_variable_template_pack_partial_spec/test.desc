@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ pack variable-template partial spec: size 2: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pack variable-template partial spec: size 3: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.spec.partial] + [temp.variadic]/4-5.  A VARIABLE TEMPLATE
+partial specialization whose pattern deduces a parameter PACK
+(`tsize_v<tup<E...>> = sizeof...(E)`) collapses the pack to ONE element:
+tsize_v<tup<int,int>> evaluates to 1 (asserting ==1 succeeds; ==2 fails), so the
+desired-behaviour desc above does not match and this registers as a known bug.
+This is exactly libstdc++'s std::tuple_size_v<tuple<_Types...>>, which
+std::apply uses to size its index sequence -- the wrong arity propagates into
+`__invoke(f, get<Idx>(t)...)` and its decltype(auto) return fails to resolve,
+the residual cpp17_apply_basic error.  The class-template analogue
+(tsize<tup<E...>>::value) is handled; the defect is specific to a
+variable-template partial specialization with a pack.  g++ static_asserts and
+runs 2; clang++ accepts.  When the pack is deduced with full arity, assertion 3
+fails and the desc matches (promote to CORE).
