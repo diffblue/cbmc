@@ -1639,3 +1639,29 @@ method-body expand lambda to replicate (as happens for call args), or (b) teach
 the expand lambda / expand_call_argument_packs to replicate a `...` child whose
 body carries the full expanded member set {base$0..base$N-1}, distributing one
 member per copy.  Non-trivial; well-scoped follow-up.
+
+## PARTIAL: braced-init call-pack fixed; tuple_basic root is deeper (2026-07-13)
+
+FIXED + CORE: cpp11_call_pack_in_braced_init (5106ff335e + 455a1e0e23).  The
+instantiate-time body pack expander (expand_pack in instantiate_template) now
+handles a pack expansion inside a BRACED/aggregate initializer
+(ID_initializer_list), mirroring the function-call argument branch.  Previously
+`box{fwd(e)...}` mis-expanded to a single `fwd(e$0,e$1)` and the body was dropped.
+
+BUT this was NOT cpp17_tuple_basic's root: real std::make_tuple uses a CONSTRUCTOR
+call `tuple<__decay_and_strip<E>::__type...>(std::forward<E>(a)...)`, not a braced
+aggregate init.  cpp17_tuple_basic STILL FAILS (make_tuple<int,int,int> at arity
+>= 3 has no body -> nondet tuple -> get reads garbage; arity 2 works).
+
+Extensive header-free replication FAILS to reproduce the real root -- ALL pass:
+  * paren ctor-call `box3(fwd(e)...)` (P1)
+  * variadic-ctor class `vt<E...>(fwd(e)...)` (P2)
+  * return-type decay pack `vt<decay<E>::type...>(fwd(e)...)` (Q1)
+So the defect is specific to libstdc++'s real recursive _Tuple_impl / _Head_base
+forwarding CONSTRUCTOR at arity >= 3.  Earlier goto dumps showed many tuple ctor
+overloads instantiated with UNASSIGNED template params (_UElements, _Alloc) --
+i.e. the arity-3 forwarding-ctor overload resolution / SFINAE
+(_TupleConstraints, _Implicit/_ExplicitCtor, enable_if) selects/instantiates the
+wrong (bodyless) ctor.  NEXT: trace which tuple<int,int,int> ctor make_tuple's
+body calls and why its body is not instantiated at arity 3 (deep tuple-ctor SFINAE
+area; a substantial standalone task).
