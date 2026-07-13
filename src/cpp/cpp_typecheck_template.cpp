@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
@@ -1747,6 +1748,55 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   cpp_template_args_tct result = (const cpp_template_args_tct &)(template_args);
 
   cpp_template_args_tct::argumentst &args = result.arguments();
+  // GCC `__integer_pack(N)` builtin: in a pack-expansion template argument
+  // `__integer_pack(N)...`, expand to N non-type arguments 0, 1, ..., N-1 (of
+  // the argument's type).  This is the GCC extension backing [intseq.make]:
+  // libstdc++'s std::make_index_sequence is
+  // `integer_sequence<T, __integer_pack(N)...>` on GCC.  It is not an ordinary
+  // callable, so it must be expanded away here -- before the per-argument
+  // type-check below tries (and fails) to resolve the `__integer_pack` name.
+  // The count `N` is a (possibly dependent) constant expression evaluated in
+  // the current instantiation context (template_map active).
+  {
+    cpp_template_args_tct::argumentst expanded;
+    bool changed = false;
+    for(auto &arg : args)
+    {
+      if(
+        arg.id() == ID_side_effect &&
+        arg.get(ID_statement) == ID_function_call &&
+        arg.get_bool(ID_ellipsis) && arg.operands().size() == 2 &&
+        arg.operands()[0].id() == ID_cpp_name &&
+        to_cpp_name(arg.operands()[0]).get_base_name() == "__integer_pack" &&
+        arg.operands()[1].operands().size() == 1)
+      {
+        exprt count = arg.operands()[1].operands()[0];
+        bool ok = false;
+        mp_integer n_val;
+        try
+        {
+          typecheck_expr(count);
+          simplify(count, *this);
+          ok =
+            count.is_constant() && !to_integer(to_constant_expr(count), n_val);
+        }
+        catch(...)
+        {
+        }
+        if(ok && n_val >= 0)
+        {
+          const typet elem_type = count.type();
+          for(mp_integer k = 0; k < n_val; ++k)
+            expanded.push_back(from_integer(k, elem_type));
+          changed = true;
+          continue;
+        }
+      }
+      expanded.push_back(arg);
+    }
+    if(changed)
+      args.swap(expanded);
+  }
 
   // [temp.variadic]/4-5: expand pack-expansion template arguments using the
   // active template_map before matching arguments to parameters.  When a
