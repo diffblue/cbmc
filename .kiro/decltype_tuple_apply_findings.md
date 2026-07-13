@@ -1499,3 +1499,23 @@ NEXT for apply: make decltype(auto) return deduction resolve a pack expansion of
 the real std::get (its overloaded return type per element) -- likely in the
 eager auto-return convert_function path + std::get overload resolution during
 that deduction.
+
+## RESOLVED: decltype(auto) over std::get pack (2026-07-13)
+
+cpp17_decltype_auto_get_pack flipped KNOWNBUG -> CORE (a850a27e97).  Root cause
+(via backtrace): resolving `std::get<I>(t)` (I = substituted non-type pack
+element, a CONSTANT) also considers the by-TYPE `std::get<T>` overloads;
+matching the constant against the TYPE parameter hit typecheck_type's
+"unexpected cpp type: constant" HARD error, aborting the whole overload
+resolution (including the viable by-index overload) -> return type never
+deduced.  Fix: extend the existing template_arg_kind_mismatch machinery
+(apply_template_args candidate loop) to a VALUE in type position, in BOTH the
+ID_type and ID_ambiguous branches of typecheck_template_args ([temp.arg]/2 +
+[temp.deduct]/8: kind mismatch removes just the candidate).  NOTE: the arg came
+through the AMBIGUOUS branch; guarding only ID_type was not enough.
+
+cpp17_apply_basic: MAJOR PROGRESS -- std::apply and __apply_impl now INSTANTIATE
+(instantiation trace visible); residual error is still "invalid implicit
+conversion from '<<type:decltype>>'" one level deeper (std::__invoke's
+decltype(auto) / INVOKE machinery).  Needs one more re-narrowing on top of this
+fix (likely the last layer).
