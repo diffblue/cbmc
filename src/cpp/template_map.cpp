@@ -1218,6 +1218,22 @@ void template_mapt::apply(typet &type) const
                   if(suffix == id2string(id))
                     referenced_packs.insert(pe.first);
                 }
+                // An EMPTY pack (deduced/explicit zero elements) has no
+                // pack_args_map / pack_expr_map entry -- only a pack_size_map
+                // entry of value 0.  Include it so a non-bare pattern that
+                // references it (e.g. `identity<E>::type...` with E = <>) is
+                // recognised as a pack expansion and collapses to zero
+                // arguments, rather than being left as a bare, unresolved pack
+                // reference (N5008 [temp.variadic]/4,7).
+                for(const auto &ps : pack_size_map)
+                {
+                  const std::string &key = id2string(ps.first);
+                  auto p = key.rfind("::");
+                  const std::string suffix =
+                    p != std::string::npos ? key.substr(p + 2) : key;
+                  if(suffix == id2string(id))
+                    referenced_packs.insert(ps.first);
+                }
               }
               for(const auto &c : n.get_named_sub())
                 collect(c.second);
