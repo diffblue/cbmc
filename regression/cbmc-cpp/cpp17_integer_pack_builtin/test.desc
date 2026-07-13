@@ -1,24 +1,15 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ __integer_pack yields \{0,1\}: 0\+1==1: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: the GCC `__integer_pack(N)` builtin, used by libstdc++'s
-std::make_index_sequence (`integer_sequence<T, __integer_pack(N)...>`).  CBMC's
-C++ front-end does not know `__integer_pack` ("symbol '__integer_pack' is
-unknown"), so the make-sequence alias never produces its element pack and any
-deduction/call through it fails ("could not fully type-check 'main'"); the body
-is left incomplete and both assertions are skipped -> VERIFICATION SUCCESSFUL
-vacuously, which does NOT match the desc above (so this registers as a known
-bug).  This is the remaining cpp17_apply_basic blocker: std::apply deduces its
-__apply_impl index_sequence from a make_index_sequence value; in apply_basic the
-__integer_pack error is swallowed during deep decltype/SFINAE resolution and
-surfaces as the unresolved `<<type:decltype>>` return type.  __integer_pack is a
-GCC-only builtin (Clang uses __make_integer_seq); g++ runs r == 1.  When
-supported, __integer_pack generates {0,1}, the body is checked, assertion 2
-fails, and the desc matches (promote to CORE).
+The GCC `__integer_pack(N)` builtin, used by libstdc++'s std::make_index_sequence
+(`integer_sequence<T, __integer_pack(N)...>`).  Previously rejected ("symbol
+'__integer_pack' is unknown"); fixed by expanding a pack-expansion template
+argument `__integer_pack(N)...` to the non-type arguments 0..N-1 (of the
+argument's type) in typecheck_template_args.  Covers the direct and nested-alias
+forms.  GCC-only builtin (Clang uses __make_integer_seq); g++ runs these values.
+Non-vacuous: each assertion is a concrete function of the generated pack.
