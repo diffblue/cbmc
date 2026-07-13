@@ -1417,3 +1417,23 @@ REMAINING for cpp17_apply_basic: STILL fails ("invalid implicit conversion from
 deduction (the real std::__invoke / std::get<Idx> over std::tuple + decltype(auto)
 chain, and the lazy ODR-use member instantiation of part2_findings.md).  Needs a
 fresh re-narrowing on top of this fix.
+
+## MINIMAL REPRODUCER #3 for cpp17_apply_basic (2026-07-13): __integer_pack builtin
+
+After the qualified-alias fix, apply_basic still fails.  Bisected the next layer:
+literal std::index_sequence deduction and getv<I>(t)... expansion now WORK
+(Y2), but std::make_index_sequence<N> (Y1) fails because CBMC's C++ front-end
+does not support the GCC `__integer_pack(N)` builtin ("symbol '__integer_pack'
+is unknown").  libstdc++ (GCC branch) implements make_integer_sequence as
+`integer_sequence<T, __integer_pack(N)...>`.
+
+New KNOWNBUG cpp17_integer_pack_builtin (header-free, GCC-specific -- Clang uses
+__make_integer_seq so rejects; g++ runs r==1):
+  template <class T, T N> using mkseq = iseq<T, __integer_pack(N)...>;
+  sum_impl(mkseq<unsigned long,2>{})   // "symbol '__integer_pack' is unknown"
+
+In apply_basic the __integer_pack error is swallowed during deep decltype/SFINAE
+resolution and surfaces as the unresolved `<<type:decltype>>` return type of
+std::apply.  Fix locus: recognise the `__integer_pack(N)` builtin in the C++
+front-end (ansi-c/cpp builtin handling) and expand it to the pack 0..N-1 in a
+pack-expansion context (also support Clang's __make_integer_seq for portability).
