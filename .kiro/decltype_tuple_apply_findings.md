@@ -1474,3 +1474,28 @@ layer is now closed, so the residual is the decltype(auto) chain through the rea
 std::__invoke / std::get<Idx> over std::tuple (and the lazy ODR-use member
 instantiation of part2_findings.md).  Needs a fresh re-narrowing on top of these
 fixes.
+
+## MINIMAL REPRODUCER #4 for cpp17_apply_basic (2026-07-13): decltype(auto) over std::get pack
+
+After the __integer_pack fixes, make_index_sequence works; apply_basic still
+fails.  Bisected the next layer: a decltype(auto) function whose body expands a
+pack of REAL std::get calls, `return add(std::get<I>(t)...)` (std::apply's
+__apply_impl -> std::__invoke(f, std::get<_Idx>(t)...)).
+
+New KNOWNBUG cpp17_decltype_auto_get_pack (uses <tuple>; header-free replication
+does NOT reproduce -- I/J with hand gets returning references / decltype(auto) /
+via a trait all PASS, so the real std::get overload set is essential).  cbmc:
+"could not fully type-check 'main'" (in apply_basic: unresolved
+`<<type:decltype>>` return type of std::apply).  Tuple by reference, so
+independent of the value-copy bug below.  g++ runs r==3.
+
+SEPARATE deeper layer (NOT on apply's forwarding-ref path, but real): a
+std::tuple passed BY VALUE to a template function then read by std::get yields
+GARBAGE (M: `impl(T t){ return std::get<0>(t); }` -> VERIFICATION FAILED; by
+REFERENCE N works).  This is cpp17_tuple_basic territory (tuple copy / get in
+template context).
+
+NEXT for apply: make decltype(auto) return deduction resolve a pack expansion of
+the real std::get (its overloaded return type per element) -- likely in the
+eager auto-return convert_function path + std::get overload resolution during
+that deduction.
