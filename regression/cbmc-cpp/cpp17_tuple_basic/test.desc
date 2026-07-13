@@ -21,3 +21,11 @@ recursive-inheritance get<> deduction (that derived-to-base deduction, incl. a
 non-empty trailing pack, is fixed -- see
 cpp11_derived_to_base_variadic_deduction).  Next: cvise the preprocessed
 3-element case to isolate the constructor-machinery defect.
+
+ROOT (2026-07-13): std::make_tuple<int,int,int> (arity >= 3) is left WITHOUT a
+body -- its forwarding construction `tuple<...>(std::forward<E>(a)...)` expands a
+call-pack inside a braced/aggregate initializer, which is mis-expanded (single
+`fwd(a$0,a$1,...)` call retaining `...`) so the deferred body fails to convert and
+is dropped -> make_tuple returns a nondeterministic tuple -> std::get reads
+garbage (arity 2 works).  Minimal header-free reproducer:
+cpp11_call_pack_in_braced_init.
