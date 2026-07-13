@@ -1615,3 +1615,27 @@ Full chain that greened std::apply (all committed, each with a CORE test):
   8. constant in type position = template-arg kind mismatch (by-index vs by-type
      std::get overloads)
   9. decltype(auto) return with a body-local using alias (typecheck_return)
+
+## cpp17_tuple_basic root (2026-07-13): call-pack in braced/aggregate initializer
+
+std::make_tuple<int,int,int> (arity >= 3) is left WITHOUT a body -> nondet tuple
+-> std::get reads garbage (arity 2 works).  Root, header-free
+(cpp11_call_pack_in_braced_init): a variadic function-template body that expands
+a pack of CALLS inside a BRACED initializer (`return box2{fwd(e)...}`) mis-expands
+it -- the pack `e` inside `fwd(e)...` is substituted to `e$0, e$1` as args of a
+SINGLE fwd(...) call (keeping the `...`) instead of replicating `fwd(e)` per
+element into `fwd(e$0), fwd(e$1)`.  The malformed body fails convert_function
+(caught in the method-body drain, which make_nils the body -> "no body for
+callee").  A call-pack in a function-CALL arg list (`sum(fwd(e)...)`) IS handled
+(expand_call_argument_packs / method-body expand lambda), and a braced init
+without a call (`box2{e...}`) works.
+
+FIX LOCUS: extend the call-pack expansion to braced/aggregate-initializer
+(ID_initializer_list) elements, so `fwd(e)...` inside `{...}` is replicated per
+element like it is inside a function-call argument list.  The pack members
+arrive already renamed (e$0,e$1) inside a single call retaining the ellipsis, so
+either (a) fix the instantiation-time substitution to leave `fwd(e)...` for the
+method-body expand lambda to replicate (as happens for call args), or (b) teach
+the expand lambda / expand_call_argument_packs to replicate a `...` child whose
+body carries the full expanded member set {base$0..base$N-1}, distributing one
+member per copy.  Non-trivial; well-scoped follow-up.
