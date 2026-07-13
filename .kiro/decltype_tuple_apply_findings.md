@@ -1318,3 +1318,23 @@ in that nested return-type-deduction context, so apply_impl's return stays
 during return-type deduction (convert_function auto path / the resolver's
 return-type computation), ensuring the inner deduced-return callee instance's
 return type is deduced before it is used as the outer return expression's type.
+
+## RESOLVED: nested decltype(auto) pack-call chain (2026-07-13)
+
+cpp17_nested_decltype_auto_pack_call flipped KNOWNBUG -> CORE (65172066c9).
+Root cause bisected precisely: the eager auto/decltype(auto) convert_function
+pack expansion (71d0250ce7) may run on a NESTED deduced-return callee's body
+while the ENCLOSING instantiation's template_map is still active.  At the inner
+convert_function's ENTRY the body was already correctly expanded
+(`add(a$0, a$1)`), but expand_call_argument_packs' value-parameter branch
+(driven by pack_size_map) re-expanded that function-parameter pack against the
+OUTER pack's size, corrupting it to `add(a$0, a$0)`; the callee's return type
+then never resolved.  Fix: only_nontype mode -> the eager path expands ONLY the
+non-type call-argument pack (pack_expr_map), leaving value/function-parameter
+pack expansions to instantiation/the drain.
+
+REMAINING for cpp17_apply_basic: STILL fails with the same error string, so the
+real libstdc++ path has a FURTHER factor beyond this minimal shape (forwarding
+references + real std::__invoke / std::get<Idx> over the real std::tuple, and
+the lazy ODR-use-driven member instantiation of part2_findings.md).  The minimal
+nested-chain layer is now closed; apply_basic needs re-narrowing on top of this.
