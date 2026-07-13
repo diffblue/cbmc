@@ -1437,3 +1437,23 @@ resolution and surfaces as the unresolved `<<type:decltype>>` return type of
 std::apply.  Fix locus: recognise the `__integer_pack(N)` builtin in the C++
 front-end (ansi-c/cpp builtin handling) and expand it to the pack 0..N-1 in a
 pack-expansion context (also support Clang's __make_integer_seq for portability).
+
+## PARTIAL: __integer_pack builtin (2026-07-13)
+
+FIXED direct form: cpp17_integer_pack_builtin KNOWNBUG -> CORE (b2ae70aa08 +
+1b6584da31).  typecheck_template_args now detects a pack-expansion template
+argument `__integer_pack(N)...` (a call to __integer_pack with a constant count)
+and expands it to non-type args 0..N-1 of the argument's type, before the
+per-argument type-check.  Covers direct and nested-alias forms.
+
+REMAINING (cast form = real make_index_sequence): cpp17_integer_pack_cast_arg
+(KNOWNBUG).  libstdc++ writes `integer_sequence<T, __integer_pack(T(N))...>`
+(with the `T(N)` cast).  With the cast, `__integer_pack(T(N))...` is resolved
+EAGERLY during the alias body substitution and never reaches
+typecheck_template_args (verified: my expansion pass's probe never fires for the
+cast case, while it does for the direct case).  So the real std::make_index_sequence
+still fails, and cpp17_apply_basic remains blocked on it.  NEXT: expand
+__integer_pack where the alias body is substituted / eagerly resolved (the path
+that turns `__integer_pack(size_t(2))...` into a resolve of the unknown name),
+mirroring the typecheck_template_args expansion; evaluate the (now concrete) cast
+argument to the count.
