@@ -1519,3 +1519,28 @@ cpp17_apply_basic: MAJOR PROGRESS -- std::apply and __apply_impl now INSTANTIATE
 conversion from '<<type:decltype>>'" one level deeper (std::__invoke's
 decltype(auto) / INVOKE machinery).  Needs one more re-narrowing on top of this
 fix (likely the last layer).
+
+## MINIMAL REPRODUCER #5 for cpp17_apply_basic (2026-07-13): variable-template pack partial spec
+
+After the kind-mismatch fix, the hand-written __apply_impl chain (verbatim body,
+real std::__invoke + std::get + forwarding) PASSES; even a full my_apply replica
+with tuple_size<>::value PASSES.  The residual real-std::apply failure bisects to
+std::tuple_size_v -- and further to a header-free root:
+
+New KNOWNBUG cpp14_variable_template_pack_partial_spec: a VARIABLE TEMPLATE
+partial specialization deducing a PACK collapses the pack to ONE element:
+  template <class T>    constexpr unsigned long tsize_v            = 99;
+  template <class... E> constexpr unsigned long tsize_v<tup<E...>>  = sizeof...(E);
+  tsize_v<tup<int,int>>  == 1 under CBMC (g++/clang: 2; ==1 asserts SUCCESS).
+Exactly libstdc++'s tuple_size_v<tuple<_Types...>>; std::apply sizes _Indices
+with it, so the index sequence gets the wrong arity and the inner __invoke's
+decltype(auto) fails to resolve ("<<type:decltype>>" residual).
+
+Facts: class-template analogue (tsize<tup<E...>>::value) works; non-pack
+variable-template partial spec (sz_v<wrap<T>>) works; failure is independent of
+dependent context (plain main-level use collapses too).  Fix locus: variable
+templates are likely lowered through the same machinery as class-template
+static members / template symbols -- find where a variable-template partial
+spec's pack is deduced (probably reusing the class partial-spec matcher) and why
+the pack binding records only one element (compare the recursive_two_elem fix
+dc02e33326 and the pack_expr_map deduction fixes).
