@@ -1782,3 +1782,59 @@ variant FAILED (non-vacuous).  Full cbmc-cpp: All tests successful, 96 skipped.
 
 Remaining cluster-B item: cpp11_throw_dtor_unwinding_outer_scope (separate
 goto-convert outer-scope-unwinding issue, still KNOWNBUG).
+
+## Cluster B dtor_unwinding_outer_scope — diagnosis (2026-07-13)
+
+N5008 [except.ctor]/1-3, [except.throw]/4: every automatic object whose scope is
+exited during unwinding is destroyed before the catching handler runs.  cbmc
+misses destructors of objects in scopes exited *between the innermost enclosing
+try and the actual catching handler*.
+
+Experiments (g `~G` must run; g++/clang++ both ret 0):
+  * V2 throw directly in the SAME try as g  -> SUCCESS (works).
+  * V3 throw directly in an INNER try, g in the outer try, inner catches A only,
+    B caught by outer -> FAILURE.
+  * V1 throw in a callee f(), g in the outer try, no inner try -> FAILURE.
+So the trigger is NOT the function boundary; it is that the exception is caught
+by a handler that is NOT the innermost enclosing try, so it crosses scope(s)
+holding automatic objects.
+
+Mechanism (verified in --show-goto-functions of the original test):
+  * goto_convert.cpp convert_expression(throw): unwind_destructor_stack runs
+    destructors only up to cpp_try_scope_nodes.back() = the innermost enclosing
+    try IN THE THROWING FUNCTION.  Objects below that node (e.g. g, declared in
+    the outer try before the inner try) are not unwound at the throw.
+  * remove_exceptions_baset::add_exception_dispatch_sequence emits a FLAT
+    dispatch: it scans ALL active catch levels (stack_catch) and jumps directly
+    to the first matching handler at any level.  For the original test the
+    dispatch after `CALL f()` is `IF type==B GOTO <outer B handler>`, which
+    jumps straight past `CALL G::~G(g)` (the enclosing-scope cleanup, which on
+    the NORMAL path already runs g's dtor and re-dispatches correctly).
+The set of destructors to run depends on WHICH handler catches (dynamic): if the
+inner handler had matched, g must NOT be destroyed (it outlives the inner
+handler); if the outer catches, g MUST be destroyed.  So no static unwind
+end_node is correct -- confirmed: unwinding to the outermost try would wrongly
+destroy g when the exception is caught by the inner handler.
+
+Correct fix = level-by-level propagation (NOT a small patch):
+  the exception, when unmatched by the innermost try, must flow to that try's
+  exceptional-exit / enclosing-scope cleanup (running intervening scope
+  destructors, which goto_convert already emits and which are construction-state
+  correct via the scope tree) and then be re-dispatched at the next enclosing
+  level.  Concretely: (1) goto_convert records, per try, an "exceptional exit"
+  target = end of the try body (after the try-body remainder, at the enclosing
+  cleanup); (2) remove_exceptions restricts each throw/call dispatch to the
+  innermost catch level and routes the unmatched case to that exceptional-exit
+  target instead of flat-jumping to an outer handler / function end; enclosing
+  levels are then handled by the dispatches already emitted at their cleanups
+  (and a dispatch must be added at pop_catch for try levels with no intervening
+  call).  Subtlety: the unmatched path must SKIP the remaining try-body
+  statements while still running the intervening scope destructors, so it must
+  target the try's end, not the call's next instruction.
+
+Risk/scope: remove_exceptions_baset is SHARED with Java (jbmc uses it); Java has
+no destructors so only C++ needs the intervening cleanup, but the dispatch
+change affects both.  jbmc IS built here, so the change can be validated against
+BOTH cbmc-cpp and jbmc regression.  Given the size and the subtle
+skip-body-but-run-destructors control flow, this warrants a dedicated,
+dual-suite-validated change rather than a rushed patch; left as KNOWNBUG.
