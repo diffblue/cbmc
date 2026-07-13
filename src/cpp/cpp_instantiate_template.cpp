@@ -4803,6 +4803,47 @@ skip_pack_removal_ft:
           if(guessed.has_unassigned())
             continue;
 
+          // N5008 [temp.variadic]/5: build_template_args emits a single
+          // scalar placeholder per template parameter PACK (the pack's first
+          // element).  For the actual instantiation the pack must be expanded
+          // to one argument per deduced element -- otherwise e.g. the `E` of a
+          // variable-template partial specialization
+          // `tsize_v<tup<E...>> = sizeof...(E)` (libstdc++'s
+          // tuple_size_v<tuple<_Types...>>) collapses to one element and
+          // sizeof...(E) evaluates to 1.  Mirrors the class partial-spec
+          // expansion in disambiguate_template_classes.
+          {
+            const auto &spec_params =
+              spec_decl.template_type().template_parameters();
+            cpp_template_args_tct::argumentst expanded_args;
+            for(std::size_t i = 0; i < guessed.arguments().size(); i++)
+            {
+              if(i < spec_params.size() && spec_params[i].get_bool(ID_ellipsis))
+              {
+                const irep_idt pid =
+                  spec_params[i].id() == ID_type
+                    ? spec_params[i].type().get(ID_identifier)
+                    : spec_params[i].get(ID_identifier);
+                const auto pa_it = template_map.pack_args_map.find(pid);
+                if(pa_it != template_map.pack_args_map.end())
+                {
+                  for(const auto &pt : pa_it->second)
+                    expanded_args.push_back(exprt(ID_type, pt));
+                  continue;
+                }
+                const auto pe_it = template_map.pack_expr_map.find(pid);
+                if(pe_it != template_map.pack_expr_map.end())
+                {
+                  for(const auto &pv : pe_it->second)
+                    expanded_args.push_back(pv);
+                  continue;
+                }
+              }
+              expanded_args.push_back(guessed.arguments()[i]);
+            }
+            guessed.arguments().swap(expanded_args);
+          }
+
           cpp_template_args_tct partial_tc;
           bool sfinae_failed = false;
           {
