@@ -5687,6 +5687,30 @@ void cpp_typecheck_resolvet::guess_template_args(
                 if(targ_type.id() != ID_cpp_name)
                   continue;
 
+                // The alias parameter's base name.  A type parameter carries
+                // it in ID_C_base_name; a NON-type parameter is stored as a
+                // symbol whose name is only the suffix of its scoped identifier
+                // (e.g. `template::20::I`) with an empty ID_C_base_name (the
+                // shape of std::index_sequence's `size_t... _Idx`).  Derive it
+                // robustly so a non-type parameter pack is substituted too;
+                // without this the alias body keeps the alias's own parameter
+                // name and the enclosing function's pack is never deduced.
+                irep_idt alias_param_base = alias_params[i].get(ID_C_base_name);
+                if(alias_param_base.empty())
+                  alias_param_base = alias_params[i].get(ID_base_name);
+                if(alias_param_base.empty())
+                {
+                  std::string id =
+                    id2string(alias_params[i].get(ID_identifier));
+                  if(id.empty())
+                    id = id2string(alias_params[i].type().get(ID_identifier));
+                  const auto pos = id.rfind("::");
+                  alias_param_base = irep_idt{
+                    pos != std::string::npos ? id.substr(pos + 2) : id};
+                }
+                if(alias_param_base.empty())
+                  continue;
+
                 // Find the alias param name in alias_type and replace
                 std::function<void(irept &)> subst;
                 subst = [&](irept &t)
@@ -5697,7 +5721,7 @@ void cpp_typecheck_resolvet::guess_template_args(
                       to_cpp_name(static_cast<const typet &>(t));
                     if(
                       !n.is_qualified() && !n.has_template_args() &&
-                      n.get_base_name() == alias_params[i].get(ID_C_base_name))
+                      n.get_base_name() == alias_param_base)
                     {
                       t = targ_type;
                       return;
