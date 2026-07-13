@@ -1759,3 +1759,26 @@ minimal-reproducer/quick-flip.  Reproducers are already minimal + header-free;
 root causes are pinned; recommend a dedicated session for the per-handler
 current-exception storage (with goto_convert attribute-survival verified) and,
 separately, the outer-scope unwinding fix.
+
+## Cluster B rethrow_nested — FIXED (2026-07-13, commits c7f78e877b + bdce7e00cf)
+
+Implemented the per-handler current-exception slot design (no exit-restore, so
+the DEAD-before-rethrow pitfall is avoided entirely):
+  * cpp_typecheck_code.cpp: static tag_rethrow_handler() tags each bare `throw;`
+    (throw side-effect, empty operands, untagged) lexically inside a handler
+    with the handler's catch-var id; inner handlers typechecked first => each
+    rethrow attributed to its innermost enclosing handler.  Attr "#rethrow_handler".
+  * goto_convert_side_effect.cpp: carries "#rethrow_handler" onto the THROW's
+    side_effect_expr_throwt (op0) so remove_cpp_exceptions can read it.
+  * remove_cpp_exceptions.cpp: handler_slots (catch-var id -> (ptr,type) globals
+    __CPROVER_cpp_handler_exception${N}); prepare_handler (bound case) writes its
+    slot AND the shared current_exc on entry; the rethrow reads its tagged slot
+    if present, else the shared globals.  Dynamic rethrows (in a callee, or in a
+    catch(...) with no catch var) stay on the shared globals -> unchanged.
+Verified: cpp11_throw_rethrow_nested assertion 2 now SUCCESS; added
+cpp11_throw_rethrow_inner_handler (inner rethrow => E(2)); both CORE and pass.
+g++ + clang++ agree on outer=>E1, inner=>E2, sibling=>E7 (all ret 0); WRONG
+variant FAILED (non-vacuous).  Full cbmc-cpp: All tests successful, 96 skipped.
+
+Remaining cluster-B item: cpp11_throw_dtor_unwinding_outer_scope (separate
+goto-convert outer-scope-unwinding issue, still KNOWNBUG).
