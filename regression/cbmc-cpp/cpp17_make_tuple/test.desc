@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -6,18 +6,13 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
-This test passed only vacuously until the parameter-pack-arity fix: the tuple
-elements are compile-time constants, so std::get<0> of t == 1 was folded to
-true and the assertion removed before symbolic execution -- std::get was never
-exercised at run time.
-
-Resolving a directly-deduced type-internal parameter pack to its full arity
-during the deferred method-body drain -- the fix this accompanies -- makes
-std::get<0> a genuine run-time call.  The run-time std::get chain
-std::get -> std::__get_helper -> std::_Tuple_impl::_M_head ->
-std::_Head_base::_M_head is not fully instantiated, so the call returns a
-nondet value and the assertion no longer holds: VERIFICATION FAILED.
-
-This is a known bug in the run-time std::get chain instantiation, a separate
-layer from the pack-arity fix.  Flip back to CORE once that chain instantiates
-correctly so the assertion is verified non-vacuously.
+--
+C++17 std::make_tuple(1, 2.0) + std::get<0>.  Now CORE (non-vacuous): the run-
+time std::get chain (std::get -> __get_helper -> _Tuple_impl::_M_head ->
+_Head_base::_M_head) is instantiated and returns the correct value.  Previously
+this passed only vacuously (constant-folded) and then, after the parameter-pack-
+arity fix made std::get a genuine run-time call, failed because that chain was
+not instantiated; the chain of front-end fixes that greened std::apply (see
+.kiro/decltype_tuple_apply_findings.md) also greened this arity-2 make_tuple.
+Note: 3+-element make_tuple (cpp17_tuple_basic) is still a KNOWNBUG -- the arity
+>= 3 tuple forwarding constructor is not instantiated.
