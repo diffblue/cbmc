@@ -942,6 +942,55 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   subst(named.second);
               };
               subst(req_copy);
+              // [expr.prim.req.general]/2: bind the requirement-parameters of
+              // any requires-expression in the clause as local symbols, so
+              // their uses (e.g. `a` in `requires(T a){ a + a; }`) resolve
+              // while the constraint is checked.  A named concept binds these
+              // during its own instantiation; a requires-expression used
+              // DIRECTLY as a function template's requires-clause reaches here
+              // without that binding, so `a + a` would otherwise fail to
+              // resolve and the (satisfied) constraint be wrongly rejected.
+              // Scope-restored by req_save_scope below.
+              cpp_save_scopet req_save_scope(cpp_typecheck.cpp_scopes);
+              std::function<void(const irept &)> bind_req_params =
+                [&](const irept &node)
+              {
+                const irept &rp = node.find("#requires_params");
+                for(const auto &param : rp.get_sub())
+                {
+                  const irep_idt pname = param.get(ID_name);
+                  if(pname.empty())
+                    continue;
+                  typet ptype = static_cast<const typet &>(param.find(ID_type));
+                  try
+                  {
+                    cpp_typecheck.typecheck_type(ptype);
+                  }
+                  catch(...)
+                  {
+                  }
+                  const irep_idt id = "requires_param::" + id2string(pname);
+                  if(!cpp_typecheck.symbol_table.has_symbol(id))
+                  {
+                    symbolt psym{id, ptype, ID_cpp};
+                    psym.base_name = pname;
+                    psym.is_lvalue = true;
+                    cpp_typecheck.symbol_table.add(psym);
+                  }
+                  else
+                    cpp_typecheck.symbol_table.get_writeable_ref(id).type =
+                      ptype;
+                  cpp_idt &sc =
+                    cpp_typecheck.cpp_scopes.current_scope().insert(pname);
+                  sc.identifier = id;
+                  sc.id_class = cpp_idt::id_classt::SYMBOL;
+                }
+                for(const auto &s : node.get_sub())
+                  bind_req_params(s);
+                for(const auto &ns : node.get_named_sub())
+                  bind_req_params(ns.second);
+              };
+              bind_req_params(req_copy);
               cpp_typecheck.typecheck_expr(req_copy);
               // Constant-fold the substituted constraint so atomic
               // constraints written with type traits (e.g.
