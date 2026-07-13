@@ -91,6 +91,15 @@ protected:
   symbol_exprt current_exc_ptr{irep_idt{}, typet{}};
   symbol_exprt current_exc_type{irep_idt{}, typet{}};
 
+  // Per-handler current-exception slots, keyed by the handler's catch-variable
+  // identifier.  A handler writes its own slot on entry, so a nested/sibling
+  // handler cannot clobber it; a bare `throw;` tagged with a handler id
+  // re-propagates from that handler's slot ([except.throw]/8).  (ptr, type)
+  std::map<irep_idt, std::pair<symbol_exprt, symbol_exprt>> handler_slots;
+
+  // Get-or-create the (ptr, type) slot globals for handler \p id.
+  std::pair<symbol_exprt, symbol_exprt> get_handler_slot(const irep_idt &id);
+
   // cpp_exception_id string -> integer tag (assigned to thrown primary types)
   std::map<irep_idt, mp_integer> type_tag;
   // handler tag -> set of thrown-type integer tags it catches (base classes
@@ -159,6 +168,28 @@ symbol_exprt remove_cpp_exceptionst::make_global(
   sym.value = initial_value;
   symbol_table.insert(std::move(sym));
   return symbol_exprt(name, type);
+}
+
+std::pair<symbol_exprt, symbol_exprt>
+remove_cpp_exceptionst::get_handler_slot(const irep_idt &id)
+{
+  auto found = handler_slots.find(id);
+  if(found != handler_slots.end())
+    return found->second;
+
+  const std::size_t n = handler_slots.size();
+  const pointer_typet void_ptr = pointer_type(empty_typet{});
+  const symbol_exprt slot_ptr = make_global(
+    "__CPROVER_cpp_handler_exception$" + std::to_string(n),
+    void_ptr,
+    null_pointer_exprt(void_ptr));
+  const symbol_exprt slot_type = make_global(
+    "__CPROVER_cpp_handler_exception_type$" + std::to_string(n),
+    signed_int_type(),
+    from_integer(0, signed_int_type()));
+  auto result = std::make_pair(slot_ptr, slot_type);
+  handler_slots.emplace(id, result);
+  return result;
 }
 
 bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
@@ -248,11 +279,23 @@ void remove_cpp_exceptionst::set_inflight_exception(
     value.id() == ID_side_effect &&
     to_side_effect_expr(value).get_statement() == ID_throw)
   {
-    *instr_it =
-      goto_programt::make_assignment(inflight_type, current_exc_type, loc);
+    // A rethrow lexically inside a handler is tagged with that handler's id;
+    // re-propagate from that handler's own slot so a nested/sibling handler
+    // cannot have clobbered it.  Untagged rethrows (e.g. in a callee, or in a
+    // catch(...) with no catch variable) fall back to the shared globals.
+    symbol_exprt src_type = current_exc_type;
+    symbol_exprt src_ptr = current_exc_ptr;
+    const irep_idt handler_id = value.get("#rethrow_handler");
+    if(!handler_id.empty())
+    {
+      const auto slot = get_handler_slot(handler_id);
+      src_ptr = slot.first;
+      src_type = slot.second;
+    }
+
+    *instr_it = goto_programt::make_assignment(inflight_type, src_type, loc);
     goto_program.insert_after(
-      instr_it,
-      goto_programt::make_assignment(inflight_ptr, current_exc_ptr, loc));
+      instr_it, goto_programt::make_assignment(inflight_ptr, src_ptr, loc));
     return;
   }
 
@@ -306,10 +349,19 @@ void remove_cpp_exceptionst::prepare_handler(
       it->assign_rhs_nonconst() =
         dereference_exprt(typecast_exprt(inflight_ptr, pointer_type(var_type)));
       // preserve the exception being handled (for a potential rethrow), then
-      // clear the in-flight exception.  Inserted after `it` in reverse order.
+      // clear the in-flight exception.  In addition to the shared globals
+      // (used by rethrows in callees / catch(...)), write this handler's own
+      // slot so a rethrow lexically inside it re-propagates the right
+      // exception even after a nested handler ran.  Inserted after `it` in
+      // reverse program order.
+      const auto slot = get_handler_slot(catch_var.get_identifier());
       goto_program.insert_after(
         it,
         goto_programt::make_assignment(inflight_ptr, clear_inflight(), loc));
+      goto_program.insert_after(
+        it, goto_programt::make_assignment(slot.first, inflight_ptr, loc));
+      goto_program.insert_after(
+        it, goto_programt::make_assignment(slot.second, inflight_type, loc));
       goto_program.insert_after(
         it, goto_programt::make_assignment(current_exc_ptr, inflight_ptr, loc));
       goto_program.insert_after(

@@ -778,6 +778,10 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_side_effect(
     codet code = code_expressiont(side_effect_expr_throwt(
       expr.find(ID_exception_list), expr.type(), expr.source_location()));
     code.op0().operands().swap(expr.operands());
+    // preserve the enclosing-handler tag on a rethrow (`throw;`) so that
+    // remove_cpp_exceptions can re-propagate that handler's exception
+    if(!expr.get("#rethrow_handler").empty())
+      code.op0().set("#rethrow_handler", expr.get("#rethrow_handler"));
     code.add_source_location() = expr.source_location();
     side_effects.side_effects.add(goto_programt::instructiont(
       std::move(code), expr.source_location(), THROW, nil_exprt(), {}));

@@ -1235,6 +1235,26 @@ void cpp_typecheckt::typecheck_code(codet &code)
     c_typecheck_baset::typecheck_code(code);
 }
 
+/// Tag every bare `throw;` (a throw side-effect with no operand -- a rethrow)
+/// reachable in \p e, but not already tagged, with \p handler_id.  Used to
+/// record, for a rethrow lexically inside a handler, which handler's exception
+/// it re-propagates (N5008 [except.throw]/8).  Because inner handlers are
+/// type-checked before their enclosing handler, a rethrow that already carries
+/// a tag belongs to an inner handler and is left untouched, so each rethrow is
+/// attributed to its innermost enclosing handler.
+static void tag_rethrow_handler(exprt &e, const irep_idt &handler_id)
+{
+  if(
+    e.id() == ID_side_effect && e.get(ID_statement) == ID_throw &&
+    e.operands().empty() && e.get("#rethrow_handler").empty())
+  {
+    e.set("#rethrow_handler", handler_id);
+  }
+
+  for(auto &op : e.operands())
+    tag_rethrow_handler(op, handler_id);
+}
+
 void cpp_typecheckt::typecheck_try_catch(codet &code)
 {
   bool first = true;
@@ -1337,6 +1357,12 @@ void cpp_typecheckt::typecheck_try_catch(codet &code)
 
         // annotate exception ID
         op.set(ID_exception_id, cpp_exception_id(type, *this));
+
+        // record, for any bare `throw;` lexically inside this handler, that it
+        // re-propagates the exception this handler is handling ([except.throw]
+        // /8).  Keyed by the catch variable's identifier, which is also how
+        // remove_cpp_exceptions identifies the handler.
+        tag_rethrow_handler(catch_block, code_decl.symbol().get_identifier());
       }
     }
   }
