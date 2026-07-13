@@ -1585,3 +1585,33 @@ deduction see the body's local declarations that precede the return (process the
 body up to the return, or resolve local aliases first), OR defer more robustly.
 Note the convert_return abort on an unresolved decltype return type is itself a
 robustness bug worth hardening.
+
+## *** cpp17_apply_basic GREEN (2026-07-13) ***
+
+cpp17_apply_basic flipped KNOWNBUG -> CORE: std::apply(add, make_tuple(1,2)) over
+real libstdc++ <tuple> now VERIFICATION SUCCESSFUL.
+
+Final layer: cpp14_local_alias_decltype_auto_pack (KNOWNBUG -> CORE, 2b22a7284d).
+typecheck_return deduced a return type without conversion only for plain `auto`
+(ID_auto); a `decltype(auto)` return (ID_decltype + #auto) fell through and tried
+to convert the return value to the unresolved `<<type:decltype>>` (and aborted
+goto conversion) whenever deduction had been deferred -- which happens when the
+return expression cannot be typed in isolation, e.g. std::apply's body-local
+`using _Indices = ...`.  Fix: handle decltype(auto) in the same placeholder
+branch (deduce without conversion; reference for a parenthesized lvalue).
+
+Full chain that greened std::apply (all committed, each with a CORE test):
+  1. non-type pack call args, explicit (expand_call_argument_packs pack_expr_map;
+     method-body expansion)
+  2. non-type pack call args, deduced (guess_template_args records pack values;
+     guessed-args full-arity; no empty pack_args_map shadow)
+  3. auto/decltype(auto) return over a pack call (eager convert_function body
+     expansion)
+  4. nested decltype(auto) chain (only_nontype expansion, no stale-map corruption)
+  5. pack deduction through alias templates, unqualified (base-name derivation)
+     and qualified (resolve_scope + QUALIFIED lookup, scope restore)
+  6. __integer_pack builtin, direct and cast (make_index_sequence)
+  7. tuple_size_v variable-template pack partial spec (full-arity expansion)
+  8. constant in type position = template-arg kind mismatch (by-index vs by-type
+     std::get overloads)
+  9. decltype(auto) return with a body-local using alias (typecheck_return)

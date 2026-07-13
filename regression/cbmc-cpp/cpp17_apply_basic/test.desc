@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -6,12 +6,13 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Reclassified as KNOWNBUG by the member-alias template-parameter identity fix
-(template_map.cpp, per [temp.local]/1).  That fix makes std::decay resolve
-correctly, which reroutes std::apply's invoke_result/decltype instantiation
-through the lazy, ODR-use-driven path; the member function body that yields the
-decltype result is not instantiated there, so the call's result type stays an
-unresolved `<<type:decltype>>` ("invalid implicit conversion from
-'<<type:decltype>>' to 'signed int'").  Pre-existing gap in ODR-use-driven
-member-function instantiation ([temp.inst]/4 + [basic.def.odr]) hidden by the
-eager-substitution path; tracked as Part 2 (.kiro/part2_findings.md).
+C++17 std::apply(add, make_tuple(1, 2)) over real libstdc++ <tuple>.  Now CORE.
+Greened by a chain of C++ front-end fixes for the machinery std::apply relies
+on: non-type parameter pack call arguments (explicit + deduced), auto /
+decltype(auto) return-type deduction over a pack call and nested decltype(auto)
+chains, parameter-pack deduction through (qualified) alias templates, the GCC
+__integer_pack builtin behind std::make_index_sequence (direct + cast forms),
+std::tuple_size_v (variable-template partial-specialization pack), a value in
+type position as a template-arg kind mismatch (the by-index vs by-type std::get
+overloads), and decltype(auto) return deduction with a body-local `using` alias
+(std::apply's `using _Indices = ...`).  See .kiro/decltype_tuple_apply_findings.md.
