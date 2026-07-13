@@ -1396,3 +1396,24 @@ working (resolve_scope returned empty here -- investigate the correct scope
 lookup for a qualified template-id during deduction); (2) distinguish the regex
 self-loop by comparing the expansion to the input (same alias + same args =
 loop) rather than by symbol id alone.
+
+## RESOLVED: qualified alias-template pack deduction (2026-07-13)
+
+cpp17_qualified_alias_pack_deduce flipped KNOWNBUG -> CORE (8658ea5356).  Also
+greens deduction from the REAL std::index_sequence.  Root cause: guess_template_
+args expanded aliases only for UNqualified template-ids (the base-name recursive
+lookup found the wrong symbol for a qualified name and looped -- the libstdc++
+regex member-alias shape).  Fix: resolve a qualified alias template-id via
+resolve_scope + QUALIFIED lookup; proper qualified lookup resolves the alias's
+own expansion target to the CLASS TEMPLATE (not back to the member alias) so it
+terminates without the restriction.  KEY: resolve_scope MOVES the current scope,
+so an inner cpp_save_scopet restores it before the substitution + recursive
+deduction, which must resolve the enclosing function template's pack in its OWN
+scope (omitting this restore both left the target failing AND regressed
+cpp11_alias_template_deduction).
+
+REMAINING for cpp17_apply_basic: STILL fails ("invalid implicit conversion from
+'<<type:decltype>>' to 'signed int'") -- a further layer beyond index_sequence
+deduction (the real std::__invoke / std::get<Idx> over std::tuple + decltype(auto)
+chain, and the lazy ODR-use member instantiation of part2_findings.md).  Needs a
+fresh re-narrowing on top of this fix.
