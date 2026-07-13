@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5.  The
+core of the remaining cpp17_apply_basic blocker.  A NON-type parameter pack is
+deduced THROUGH an alias template that maps the pack onto a class template with
+a fixed leading argument (`template <SIZE... I> using idxseq = iseq<SIZE, I...>;`
+then `apply_impl(idxseq<J...>)`) -- exactly std::index_sequence
+(`using index_sequence = integer_sequence<size_t, _Idx...>`) as used by
+std::apply's __apply_impl.  CBMC fails to deduce the pack through the alias
+("found no match for symbol 'apply_impl'", CONVERSION ERROR, EXIT=6), so the
+desc above (the desired fixed behaviour: VERIFICATION SUCCESSFUL) does NOT match
+and this correctly registers as a known bug.
+
+Deducing directly from the underlying class template `iseq<SIZE, J...>` (without
+the alias) works; the defect is specific to deduction through the alias, whose
+aliased-type pattern must be substituted with the deducing function's pack
+before matching.  g++ runs r == 3; clang++ accepts.  When fixed, the call
+resolves, the assertion holds, and the desc matches (promote to CORE).

@@ -1338,3 +1338,35 @@ real libstdc++ path has a FURTHER factor beyond this minimal shape (forwarding
 references + real std::__invoke / std::get<Idx> over the real std::tuple, and
 the lazy ODR-use-driven member instantiation of part2_findings.md).  The minimal
 nested-chain layer is now closed; apply_basic needs re-narrowing on top of this.
+
+## MINIMAL REPRODUCER #2 for cpp17_apply_basic (2026-07-13): alias-template pack deduction
+
+After the nested-decltype(auto) fix, apply_basic still fails.  Built up from the
+now-passing nested chain toward the real libstdc++ std::apply and bisected the
+NEXT layer to: a NON-type parameter pack deduced THROUGH an ALIAS TEMPLATE with a
+fixed leading argument.
+
+New KNOWNBUG cpp17_alias_template_nontype_pack_deduce (header-free, faithful:
+g++ runs r==3, clang++ accepts):
+  template <class T, T... I> struct iseq {};
+  template <__SIZE_TYPE__... I> using idxseq = iseq<__SIZE_TYPE__, I...>;
+  template <__SIZE_TYPE__... J> int apply_impl(idxseq<J...>){ return add(J...); }
+  apply_impl(idxseq<1,2>{})   // "found no match for symbol 'apply_impl'"
+This is exactly std::index_sequence (= integer_sequence<size_t, _Idx...>) as
+used by std::apply's __apply_impl parameter.
+
+Bisection facts:
+  * Deducing DIRECTLY from iseq<SIZE, J...> (no alias) WORKS (V3/S2/T1).
+  * A hand-written alias with a PLAIN builtin (unsigned long) deduces only when
+    the deducing function's pack name is spelled identically to the alias's own
+    pack parameter (W1 pass, W2 fail) -- an accidental name-based match.
+  * The real std::index_sequence fails REGARDLESS of the pack name (X1/X2) and
+    with __SIZE_TYPE__/size_t the alias fails even for hand versions (U2/V1).
+  * A recursive make_index_sequence-style metafunction at depth>=2 is a SEPARATE
+    bug (K1), but libstdc++ uses the __integer_pack builtin, not recursion, so
+    it is NOT on the apply path.
+Likely fix locus: alias-template substitution during deduction -- the aliased
+type pattern (iseq<SIZE, _aliasparam...>) must be re-expressed in terms of the
+deducing function's pack before matching, rather than matched by the alias's own
+parameter name (cpp_typecheck_resolve.cpp guess_template_args alias branch +
+resolve_template_alias).
