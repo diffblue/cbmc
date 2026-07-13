@@ -5648,6 +5648,49 @@ skip_pack_removal_ft:
             }
           }
 
+          // N5008 [temp.variadic]/5 + [dcl.init.aggr]/... : a pack expansion in
+          // a BRACED / aggregate initializer, e.g. `box{fwd(e)...}` (the shape
+          // of std::make_tuple / the tuple forwarding constructor,
+          // `tuple<...>(std::forward<E>(a)...)`).  Mirror the function-call
+          // argument branch above: replicate each pack-expansion element (a
+          // bare pack name, or a `...`-carrying pattern that CONTAINS the pack
+          // such as `fwd(e)`) into one element per pack member.  Without this
+          // the recursion descends into the element `fwd(e)` and the
+          // function-call branch wrongly expands its argument `e` in place
+          // (yielding a single `fwd(e$0, e$1)` that retains the `...`), so the
+          // enclosing function-template body fails to convert and is dropped.
+          if(node.id() == ID_initializer_list)
+          {
+            irept::subt &elems = node.get_sub();
+            irept::subt new_elems;
+            for(auto &a : elems)
+            {
+              if(is_pack_name(a))
+              {
+                for(const auto &ename : expanded_names)
+                  new_elems.push_back(make_name(a, ename));
+              }
+              else if(a.get_bool(ID_ellipsis) && contains_pack_name(a))
+              {
+                for(std::size_t k = 0; k < expanded_names.size(); ++k)
+                {
+                  irept copy = substitute_pack(a, expanded_names[k]);
+                  copy.remove(ID_ellipsis);
+                  if(
+                    !type_pack_name.empty() && k < pack_elem_types.size() &&
+                    pack_elem_types[k].is_not_nil())
+                    subst_type_pack(copy, pack_elem_types[k]);
+                  new_elems.push_back(copy);
+                }
+              }
+              else
+              {
+                new_elems.push_back(a);
+              }
+            }
+            elems = new_elems;
+          }
+
           // Expand lambda pack init-captures: [...x = args]
           if(node.id() == irep_idt("lambda"))
           {
