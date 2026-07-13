@@ -125,6 +125,23 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     return;
   }
 
+  // N5008 [temp.variadic]/5 + [dcl.spec.auto]/11: a function-template instance
+  // whose body contains a call-argument pack expansion over a NON-type
+  // parameter pack (e.g. `return add(I...)`) is normally expanded during the
+  // deferred method-body drain (which runs expand_call_argument_packs).  A
+  // function with a DEDUCED return type (`auto` / `decltype(auto)`) is instead
+  // type-checked EAGERLY here, so its return type is known at the call site;
+  // that path bypasses the drain, so without expanding the pack call first both
+  // the return-type deduction and the body type-check below fail on the
+  // unexpanded `add(I...)` (leaving the instance's return type unresolved, so
+  // the call "finds no match").  Expand it now using this instance's deduced
+  // pack values.  Gated on both a deduced return type and a non-type pack being
+  // present (pack_expr_map), so the working deferred path and bodies with only
+  // type / function-parameter packs are untouched; the expansion is idempotent
+  // (an already-expanded call carries no `...`), so a later drain is a no-op.
+  if(has_auto(symbol.type) && !template_map.pack_expr_map.empty())
+    template_map.expand_call_argument_packs(static_cast<irept &>(symbol.value));
+
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);
   cpp_scopet &function_scope=cpp_scopes.set_scope(symbol.name);
