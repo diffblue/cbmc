@@ -1288,3 +1288,33 @@ lazy, ODR-use-driven member-function instantiation, whose body is not
 instantiated at the decltype site ("invalid implicit conversion from
 '<<type:decltype>>' to 'signed int'").  Tracked as Part 2 (part2_findings.md);
 not reproduced by the header-free minimal shapes (all now pass).
+
+## MINIMAL REPRODUCER for the cpp17_apply_basic blocker (2026-07-13)
+
+cpp17_nested_decltype_auto_pack_call (KNOWNBUG, header-free, faithful: g++ runs
+r==3, clang++ accepts).  Exact error of apply_basic ("invalid implicit
+conversion from '<<type:decltype>>' to 'signed int'").
+
+Minimal shape:
+  template <class... A> decltype(auto) invoke(A... a){ return add(a...); }
+  template <int... V>   decltype(auto) apply_impl(seq<V...>){ return invoke(V...); }
+  apply_impl(seq<1,2>{})   // -> invoke(1,2) -> add(1,2) == 3
+
+Bisected trigger -- ALL THREE required:
+  (1) OUTER return type DEDUCED (auto/decltype(auto)); a trailing
+      `-> decltype(invoke(V...))` instead gives "no match for apply_impl".
+  (2) INNER callee a TEMPLATE with a deduced return type; a concrete
+      (non-template) decltype(auto) invoke works.
+  (3) pack size > 1; a single-element pack (seq<7>) works.
+Single-level deduced return over a pack call to a KNOWN function already works
+(cpp11_auto_return_deduce_pack_call, CORE).
+
+Root (hypothesis, to confirm next): when the outer apply_impl's deduced return
+type is computed (eagerly, my convert_function fix expands invoke(V...) ->
+invoke(1,2)), deducing its type requires the INNER invoke(1,2)'s deduced return
+type.  For a >1-element pack the inner instance's decltype(auto) is not resolved
+in that nested return-type-deduction context, so apply_impl's return stays
+`<<type:decltype>>`.  Likely fix locus: nested deduced-return instantiation
+during return-type deduction (convert_function auto path / the resolver's
+return-type computation), ensuring the inner deduced-return callee instance's
+return type is deduced before it is used as the outer return expression's type.
