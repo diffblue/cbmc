@@ -1665,3 +1665,31 @@ i.e. the arity-3 forwarding-ctor overload resolution / SFINAE
 wrong (bodyless) ctor.  NEXT: trace which tuple<int,int,int> ctor make_tuple's
 body calls and why its body is not instantiated at arity 3 (deep tuple-ctor SFINAE
 area; a substantial standalone task).
+
+## Cluster A (deferred/ODR-use member-body instantiation) — reproduction assessment (2026-07-13)
+
+Cluster A = "no body for callee" for a member of a lazily-completed class-template
+instance (cpp20_map_basic: _Rb_tree::operator[]; cpp11_map_insert:
+_M_emplace_hint_unique; and cpp17_tuple_basic's arity-3 ctor is a cousin).
+
+Attempted minimal reproduction, TWO ways, both unproductive:
+  * Hand construction (A1-A6, member fns, member fn templates, static members,
+    address-of, recursive node classes, base-class member calls) -- ALL work
+    (no "no body").  The gap needs the real libstdc++ lazy-completion path.
+  * cvise on preprocessed <map>:
+      - weak oracle (g++ -fsyntax-only + cbmc "no body") -> DEGENERATE 7-line
+        result: a `struct map { void operator[](int); };` with the definition
+        REMOVED (declared-not-defined => trivially "no body", not the bug).
+      - faithful oracle (g++ COMPILE+LINK+RUN exit 0 + cbmc "no body") -> cannot
+        reduce below ~4471 lines: std::map genuinely needs the whole
+        type_traits / stl_tree / allocator machinery to link+run, so cvise
+        can't strip it.  No small faithful reproducer emerges.
+
+Conclusion: cluster A is the Part-2 architectural gap (part2_findings.md): a
+class-template instance completed by lazy substitution has its inline member
+bodies registered with nil value (never sourced+substituted from the primary
+template) -> "no body".  It is NOT reducible to a small header-free test and the
+fix is substantial (source inline member bodies on lazy completion / drive such
+instances through instantiate_template's full flow; medium-high risk, must not
+over-instantiate SFINAE branches).  Recommend a dedicated session with the full
+cbmc-cpp + goto-cc-cbmc baseline, not a quick KNOWNBUG->CORE flip.
