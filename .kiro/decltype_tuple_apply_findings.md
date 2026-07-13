@@ -1544,3 +1544,21 @@ static members / template symbols -- find where a variable-template partial
 spec's pack is deduced (probably reusing the class partial-spec matcher) and why
 the pack binding records only one element (compare the recursive_two_elem fix
 dc02e33326 and the pack_expr_map deduction fixes).
+
+## RESOLVED: variable-template pack partial spec (2026-07-13)
+
+cpp14_variable_template_pack_partial_spec flipped KNOWNBUG -> CORE (a4442157d0).
+Root cause: the variable-template partial-spec matcher in instantiate_template
+instantiated the best match with build_template_args' single-placeholder-per-pack
+args, collapsing the deduced pack to one element (tsize_v<tup<int,int>> == 1).
+Fix: expand a deduced pack (pack_args_map / pack_expr_map) to full arity before
+instantiating, mirroring disambiguate_template_classes.  Real std::tuple_size_v
+now evaluates correctly (test covers it).
+
+cpp17_apply_basic: STILL fails with the same "<<type:decltype>>" error --
+tuple_size_v was a real defect on its path but not the last one.  Next
+re-narrowing: with tuple_size_v fixed, re-run the wrapper-replica bisection
+(the earlier F case "local using + ::value" ALSO failed with a DIFFERENT error,
+"invalid implicit conversion from 'signed int' to '<<type:decltype>>'" -- the
+reverse direction!  That suggests a residual in the local `using Ind = ...`
+alias inside a decltype(auto) function).  Also re-check E (noexcept(...) spec).
