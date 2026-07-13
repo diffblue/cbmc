@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -6,19 +6,11 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.variadic]/5 + [dcl.init.aggr].  A variadic function
-template whose body expands a pack of CALLS inside a BRACED (aggregate)
-initializer (`return box2{fwd(e)...}`) -- the shape of libstdc++ std::make_tuple
-/ the tuple forwarding constructor.  The pack `e` inside `fwd(e)...` is
-substituted to `e$0, e$1` as arguments of a SINGLE `fwd(...)` call (retaining
-the `...`) instead of replicating `fwd(e)` per element to `fwd(e$0), fwd(e$1)`;
-the malformed body then fails to convert and is DROPPED ("no body for callee
-mk<int,int>"), so the call returns a nondeterministic value and the assertion
-fails (VERIFICATION FAILED / EXIT=10 -- does NOT match the desired SUCCESSFUL
-above, so a known bug).  The SAME call-pack inside a function-CALL argument list
-(`sum(fwd(e)...)`) is handled, as is a braced init without a call (`box2{e...}`);
-the defect is specific to a call-pack inside a braced/aggregate initializer.
-This is the root of cpp17_tuple_basic (std::make_tuple<int,int,int> is left
-without a body -> std::get reads garbage).  g++ runs {10,20}; clang++ accepts.
-Flip to CORE once a call-pack in a braced initializer is expanded in a deferred
-body.
+N5008 [temp.variadic]/5 + [dcl.init.aggr].  A variadic function template whose
+body expands a pack of CALLS inside a BRACED (aggregate) initializer
+(`return box{fwd(e)...}`).  Previously the instantiate-time body pack expander
+handled a pack in a function-CALL argument list but not in a braced initializer,
+so `fwd(e)...` was mis-expanded to a single `fwd(e$0, e$1)` and the body was
+dropped ("no body for callee").  Fixed by expanding an ID_initializer_list's
+pack-expansion elements like function-call arguments.  Non-vacuous: the result
+is a concrete function of the forwarded arguments.
