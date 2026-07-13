@@ -2329,6 +2329,23 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           error() << "missing type in template argument" << eom;
           throw 0;
         }
+        // [temp.arg]/2 + [temp.deduct]/8: a VALUE in type position -- e.g. a
+        // constant produced by substituting a non-type template parameter,
+        // like the `I` of `std::get<I>(t)` when overload resolution also
+        // considers the by-TYPE `std::get<T>` overload -- supplied for a TYPE
+        // parameter is a kind mismatch.  While matching a candidate it
+        // silently removes just that candidate; otherwise it is a hard error.
+        // Without this, typecheck_type on the constant is a hard error that
+        // aborts resolution of the remaining (viable) by-index overload.
+        if(arg.type().id() == ID_constant)
+        {
+          if(template_arg_candidate_matching == 0)
+          {
+            error().source_location = arg.source_location();
+            error() << "expected type, but got expression" << eom;
+          }
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
         // [dcl.fct]/3 + [temp.type]: parameter names are not part of a
         // function type, so a function type used as a template argument
         // denotes the same type — and hence the same specialization —
@@ -2455,6 +2472,21 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           error().source_location = arg.source_location();
           error() << "missing type in template argument" << eom;
           throw 0;
+        }
+        // [temp.arg]/2 + [temp.deduct]/8: an ambiguous argument whose type
+        // interpretation is a VALUE (a constant produced by substituting a
+        // non-type template parameter, e.g. the `I` of `std::get<I>(t)` when
+        // the by-TYPE `std::get<T>` overload is also considered) supplied for
+        // a TYPE parameter is a kind mismatch: silently remove the candidate
+        // while matching, hard error otherwise (see the ID_type branch).
+        if(arg.type().id() == ID_constant)
+        {
+          if(template_arg_candidate_matching == 0)
+          {
+            error().source_location = arg.source_location();
+            error() << "expected type, but got expression" << eom;
+          }
+          throw template_arg_kind_mismatch_exceptiont{};
         }
         // [temp.variadic]/5: expand a function parameter pack in a
         // function-type argument (e.g. `_Res(_ArgTypes...)`) and
