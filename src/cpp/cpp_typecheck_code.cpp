@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
@@ -33,14 +34,29 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
 {
-  // Lambda return type deduction: when return_type is auto, just typecheck
-  // the return expression without implicit conversion, then set return_type.
-  if(return_type.id() == ID_auto)
+  // Lambda / C++14 return type deduction: when the declared return type is a
+  // placeholder -- `auto` (ID_auto) or `decltype(auto)` (an ID_decltype marked
+  // `#auto`) -- typecheck the return expression WITHOUT an implicit conversion
+  // (there is no target type yet) and deduce the return type from it.  Without
+  // covering the decltype(auto) case a deferred deduction (convert_function set
+  // defer_auto_return because the return expression could not be typed in
+  // isolation, e.g. it mentions a body-local `using` alias) would fall through
+  // to the normal path below and try to convert the value to the still
+  // unresolved `<<type:decltype>>`, which is an error and aborts goto
+  // conversion.  N5008 [dcl.spec.auto]/2-3.
+  const bool deduced_decltype_auto =
+    return_type.id() == ID_decltype && return_type.get_bool("#auto");
+  if(return_type.id() == ID_auto || deduced_decltype_auto)
   {
     if(code.has_return_value())
     {
       typecheck_expr(code.return_value());
-      return_type = code.return_value().type();
+      typet deduced = code.return_value().type();
+      // decltype(auto) of a parenthesized lvalue deduces a reference type
+      // ([dcl.type.decltype]); mirror the eager path in convert_function.
+      if(deduced_decltype_auto && code.return_value().get_bool(ID_C_lvalue))
+        deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+      return_type = deduced;
     }
     else
       return_type = void_type();
