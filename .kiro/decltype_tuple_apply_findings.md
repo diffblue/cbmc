@@ -1268,3 +1268,23 @@ and __apply_impl both return decltype(auto)).  NEXT: make return-type deduction
 likely the same expand_call_argument_packs applied when deducing the return type
 from the return expression (cpp_typecheck_method_bodies / the auto-deduction
 path), mirroring the trailing-decltype handling.
+
+## RESOLVED: auto / decltype(auto) return deduction over a pack call (2026-07-13)
+
+cpp11_auto_return_deduce_pack_call flipped KNOWNBUG -> CORE.  Root cause: a
+DEDUCED return type (auto/decltype(auto)) is type-checked EAGERLY by
+convert_function (so the return type is known at the call site), bypassing the
+deferred method-body drain that runs expand_call_argument_packs.  The eager path
+type-checked the unexpanded `add(I...)`, failing both the return-type deduction
+and the body type-check -> the instance's return type stayed unresolved ("found
+no match").  Fix (71d0250ce7): expand the body's call-argument packs from the
+instance's pack_expr_map at the start of convert_function, gated on
+has_auto(type) && non-empty pack_expr_map (idempotent, deferred path untouched).
+Covers explicit and deduced packs, auto and decltype(auto).
+
+REMAINING for cpp17_apply_basic: a further layer -- the real libstdc++ path
+routes std::apply through std::__invoke / std::get with decltype(auto) via the
+lazy, ODR-use-driven member-function instantiation, whose body is not
+instantiated at the decltype site ("invalid implicit conversion from
+'<<type:decltype>>' to 'signed int'").  Tracked as Part 2 (part2_findings.md);
+not reproduced by the header-free minimal shapes (all now pass).
