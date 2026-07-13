@@ -1370,3 +1370,29 @@ type pattern (iseq<SIZE, _aliasparam...>) must be re-expressed in terms of the
 deducing function's pack before matching, rather than matched by the alias's own
 parameter name (cpp_typecheck_resolve.cpp guess_template_args alias branch +
 resolve_template_alias).
+
+## RESOLVED (unqualified) + REMAINING (qualified) alias-template pack deduction (2026-07-13)
+
+FIXED: cpp17_alias_template_nontype_pack_deduce KNOWNBUG -> CORE (0c5197b110 +
+d61448546c).  Deducing a pack through an UNqualified alias template
+(`template <SIZE... I> using idxseq = iseq<SIZE, I...>;` then `f(idxseq<J...>)`)
+failed because guess_template_args' alias-substitution matched the alias
+parameter by ID_C_base_name, which is EMPTY for a non-type parameter (a symbol
+whose name is only the suffix of its scoped identifier `template::N::I`).  Fix:
+derive the alias parameter base name robustly (C_base_name, else base_name, else
+identifier suffix).  Covers non-type and type packs, differing pack names.
+
+REMAINING: cpp17_qualified_alias_pack_deduce (KNOWNBUG, committed) -- deducing
+through a QUALIFIED alias (`N::idxseq<J...>` / std::index_sequence), the exact
+apply_basic shape.  The alias-expansion branch is gated on `!is_qualified()` (an
+anti-recursion guard for the libstdc++ regex member-alias shape).  ATTEMPTED and
+REVERTED: (a) qualified lookup via resolve_scope + QUALIFIED lookup did NOT find
+the alias (still "no match"); (b) replacing the guard with a recursion set keyed
+on the alias symbol id REGRESSED cpp11_alias_template_deduction -- the symbol-id
+guard is too blunt: it cannot distinguish the infinite regex self-loop (alias A
+re-expands to A with the SAME args) from legitimate finite nested re-expansion of
+the same alias with DIFFERENT args.  NEXT: (1) get the qualified alias lookup
+working (resolve_scope returned empty here -- investigate the correct scope
+lookup for a qualified template-id during deduction); (2) distinguish the regex
+self-loop by comparing the expansion to the input (same alias + same args =
+loop) rather than by symbol id alone.
