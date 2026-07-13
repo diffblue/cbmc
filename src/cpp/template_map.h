@@ -86,7 +86,16 @@ public:
   /// untouched, so value parameter packs are unaffected.  Invoked from
   /// apply() so the expansion happens in every substitution/instantiation
   /// context, including nested trait instantiations.
-  void expand_call_argument_packs(irept &n) const;
+  ///
+  /// \param n: the node to rewrite in place.
+  /// \param only_nontype: when true, expand ONLY a NON-type parameter pack
+  ///   recorded in pack_expr_map (its element values); leave value /
+  ///   function-parameter pack expansions (driven by pack_size_map) untouched.
+  ///   Used by the eager auto/decltype(auto) convert_function path, which may
+  ///   run while an *enclosing* instantiation's template_map is still active:
+  ///   a function-parameter pack in the (already-instantiated) body must not be
+  ///   re-expanded against an unrelated enclosing pack's size.
+  void expand_call_argument_packs(irept &n, bool only_nontype = false) const;
 
   void swap(template_mapt &template_map)
   {
