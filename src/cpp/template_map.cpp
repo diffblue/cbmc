@@ -202,12 +202,13 @@ replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
   }
 }
 
-void template_mapt::expand_call_argument_packs(irept &n) const
+void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
+  const
 {
   for(auto &s : n.get_sub())
-    expand_call_argument_packs(s);
+    expand_call_argument_packs(s, only_nontype);
   for(auto &ns : n.get_named_sub())
-    expand_call_argument_packs(ns.second);
+    expand_call_argument_packs(ns.second, only_nontype);
 
   if(!(n.id() == ID_side_effect && n.get(ID_statement) == ID_function_call))
     return;
@@ -351,12 +352,27 @@ void template_mapt::expand_call_argument_packs(irept &n) const
 
       if(empty_pack)
       {
+        if(only_nontype)
+        {
+          new_args.push_back(arg);
+          continue;
+        }
         changed = true;
         continue; // zero-length expansion: drop the argument
       }
 
       if(elems == nullptr)
       {
+        if(only_nontype)
+        {
+          // In only-nontype mode leave a value / function-parameter pack
+          // expansion untouched: it is driven by pack_size_map, which in a
+          // nested eager convert_function may belong to an unrelated enclosing
+          // instantiation, and this body's function-parameter pack was already
+          // expanded at instantiation time.
+          new_args.push_back(arg);
+          continue;
+        }
         // N5008 [temp.variadic]/4,5: the argument carries `...` (so it is a
         // pack expansion) but its pattern references no *type* parameter pack
         // -- it is a *value* parameter pack expansion, e.g. `f(a...)` whose

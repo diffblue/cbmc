@@ -139,8 +139,19 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // present (pack_expr_map), so the working deferred path and bodies with only
   // type / function-parameter packs are untouched; the expansion is idempotent
   // (an already-expanded call carries no `...`), so a later drain is a no-op.
+  //
+  // only_nontype: this eager conversion may run while an ENCLOSING
+  // instantiation's template_map is still active (a nested deduced-return
+  // callee -- e.g. std::apply's __apply_impl deducing its return type from
+  // std::__invoke(...), which is itself instantiated here).  A function-
+  // parameter pack in THIS body was already expanded at instantiation time, so
+  // only the non-type call-argument pack must be expanded; expanding a value /
+  // function-parameter pack against the enclosing map's unrelated pack size
+  // would corrupt an already-expanded call (`add(a$0, a$1)` -> `add(a$0,
+  // a$0)`).
   if(has_auto(symbol.type) && !template_map.pack_expr_map.empty())
-    template_map.expand_call_argument_packs(static_cast<irept &>(symbol.value));
+    template_map.expand_call_argument_packs(
+      static_cast<irept &>(symbol.value), /*only_nontype=*/true);
 
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);
