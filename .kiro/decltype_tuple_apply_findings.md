@@ -1562,3 +1562,26 @@ re-narrowing: with tuple_size_v fixed, re-run the wrapper-replica bisection
 "invalid implicit conversion from 'signed int' to '<<type:decltype>>'" -- the
 reverse direction!  That suggests a residual in the local `using Ind = ...`
 alias inside a decltype(auto) function).  Also re-check E (noexcept(...) spec).
+
+## MINIMAL REPRODUCER #6 for cpp17_apply_basic (2026-07-13): local alias in decltype(auto) body
+
+After the tuple_size_v fix, all my_apply replicas that pass make_index_sequence
+INLINE pass; the residual bisects to the LOCAL `using` alias in std::apply's body
+(`using _Indices = ...; return __apply_impl(..., _Indices{})`).
+
+New KNOWNBUG cpp14_local_alias_decltype_auto_pack (header-free):
+  template <int... I> decltype(auto) inner(seq<I...>){ return add(I...); }
+  template <class T>  decltype(auto) outer(T){ using Ind = seq<0,1>; return inner(Ind{}); }
+  outer(0) -> outer's return type NOT deduced ("invalid implicit conversion from
+  'signed int' to '<<type:decltype>>'"), and here it even reaches goto-conversion
+  which ABORTS (convert_return invariant, EXIT=134).  INLINE `inner(seq<0,1>{})`
+  (no alias, R2) works; dependent alias (R3) also fails.  g++ runs r==1.
+
+Root hypothesis: the eager return-type deduction (convert_function auto path)
+typechecks ONLY the return expression, so a preceding local `using`-alias
+declaration in the body is not in scope -> `Ind` unresolved -> `inner(Ind{})`
+type unknown -> outer's decltype unresolved.  NEXT: make the return-type
+deduction see the body's local declarations that precede the return (process the
+body up to the return, or resolve local aliases first), OR defer more robustly.
+Note the convert_return abort on an unresolved decltype return type is itself a
+robustness bug worth hardening.
