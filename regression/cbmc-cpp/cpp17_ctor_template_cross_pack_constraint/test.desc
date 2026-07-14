@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ constrained constructor forwards the value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: minimal header-free form of cpp17_tuple_basic's remaining blocker
+(std::make_tuple at arity >= 3).  A constructor template constrained by a
+SFINAE default argument whose constexpr callee is a member of another class
+template and uses its OWN parameter pack (sizeof...(Us)) is not a viable
+candidate when the construction happens inside a function template's
+instantiated body: overload resolution fails ("found no match"), the failure
+is swallowed, and the calling function template gets no body (nondet return).
+Every ingredient verified necessary by single-dimension toggling; g++ and
+clang++ accept and run this (assert holds at runtime).  Flip to CORE when the
+constrained constructor resolves.
