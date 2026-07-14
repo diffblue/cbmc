@@ -1838,3 +1838,41 @@ change affects both.  jbmc IS built here, so the change can be validated against
 BOTH cbmc-cpp and jbmc regression.  Given the size and the subtle
 skip-body-but-run-destructors control flow, this warrants a dedicated,
 dual-suite-validated change rather than a rushed patch; left as KNOWNBUG.
+
+## Cluster B dtor_unwinding — FIXED level-by-level (2026-07-14, e9df546551 + c4cc61d3a0)
+
+Implemented the level-by-level propagation design:
+  * goto_convert_exceptions.cpp convert_try_catch: per-try exceptional-exit
+    landing (skip + unwind_destructor_stack(try_entry_node -> enclosing try node
+    or 0) + propagate-marker THROW "#exception_propagate"), registered on the
+    push-catch as pseudo-entry EXCEPTIONAL_EXIT_TAG ("@exceptional-exit",
+    defined in remove_exceptions_base.h).
+  * remove_exceptions_base.cpp add_exception_dispatch_sequence: when innermost
+    level has the pseudo-entry -> dispatch ONLY that level's handlers (universal
+    catch(...) = default target), unmatched -> GOTO exceptional exit.  Chaining
+    to enclosing levels is implicit: the propagate marker sits after this try's
+    CATCH-pop, so its own dispatch sees the enclosing level as innermost.
+    instrument_throw: propagate marker => dispatch + turn_into_skip (in-flight
+    state untouched); real throws unchanged.
+  * Key correctness pts: no static unwind depth is correct (dtor set depends on
+    WHICH handler catches, dynamically); throw-site unwinding still handles
+    throw-in-handler (cpp_try_scope_nodes at handler time = enclosing try);
+    DEADs come from the base pass's locals insertion at the propagate dispatch.
+Verified: outer_scope KNOWNBUG -> CORE; new cpp11_throw_dtor_unwinding_levels
+CORE (3-level order innermost-first, no early destruction on inner match,
+rethrow unwinds enclosing scope) -- all cross-checked g++ + clang++; WRONG
+variant FAILED.  Full cbmc-cpp green (96 skipped).  Java: 54 exception dirs run
+before AND after -- identical 11 pre-existing failures (branch baseline), zero
+regression from this change.
+
+REMAINING gap (KNOWNBUG cpp11_throw_dtor_unwinding_call_site): the exceptional
+edge at a CALL site runs no destructors -- objects constructed between try entry
+and a throwing call, and locals of intermediate no-try functions, are never
+destroyed.  Fix needs guarded unwind blocks after possibly-throwing calls
+(goto_convert emitting placeholder-guarded cleanup that the pass rewires);
+separate piece of work.
+
+NOTE: jbmc baseline on this branch has 11 pre-existing failing exception tests
+(catch1/test_catch_super, exception-cleanup, exceptions{1,2,4,5,9,22,26,27},
+nondet_initialize_exception_handler) -- unrelated to this change, verified by
+stash/rebuild/rerun.
