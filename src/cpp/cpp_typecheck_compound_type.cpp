@@ -2542,6 +2542,11 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           // Import base class constructors as derived class constructors
           const irep_idt &last_name = name_sub.back().get(ID_identifier);
           found_ctor = true;
+          // [dcl.init.aggr]/1 (C++17): a class with inherited constructors is
+          // not an aggregate; record this so cpp_constructor does not fall
+          // back to aggregate initialization (which would drop the
+          // constructor arguments).
+          symbol.type.set("has_inherited_constructor", true);
           for(const auto &base : to_struct_type(symbol.type).bases())
           {
             const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
@@ -2577,6 +2582,35 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               new_comp.set(ID_access, access);
               new_comp.set_base_name(symbol.base_name);
               components.push_back(new_comp);
+            }
+
+            // [namespace.udecl]/2 inherits the base's constructor *templates*
+            // as well (e.g. a forwarding constructor `template<class... A>
+            // B(tag_t, A...)`).  They are not components of the base's struct
+            // type; they live in the base's scope as TEMPLATE ids named after
+            // the base.  Register them in the derived class's scope under the
+            // derived class's name, so constructor overload resolution finds
+            // and instantiates them ([class.inhctor.init]: the base subobject
+            // is then initialized by the selected base constructor).
+            {
+              auto base_scope_it = cpp_scopes.id_map.find(base_sym.name);
+              if(base_scope_it != cpp_scopes.id_map.end())
+              {
+                auto &base_scope =
+                  static_cast<cpp_scopet &>(*base_scope_it->second);
+                const auto tmpl_results = base_scope.lookup(
+                  base_sym.base_name,
+                  cpp_scopet::SCOPE_ONLY,
+                  cpp_idt::id_classt::TEMPLATE);
+                for(const auto *tmpl_id : tmpl_results)
+                {
+                  cpp_idt &new_id =
+                    cpp_scopes.current_scope().insert(symbol.base_name);
+                  new_id.id_class = cpp_idt::id_classt::TEMPLATE;
+                  new_id.identifier = tmpl_id->identifier;
+                  new_id.is_member = true;
+                }
+              }
             }
             break;
           }
