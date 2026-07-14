@@ -1876,3 +1876,39 @@ NOTE: jbmc baseline on this branch has 11 pre-existing failing exception tests
 (catch1/test_catch_super, exception-cleanup, exceptions{1,2,4,5,9,22,26,27},
 nondet_initialize_exception_handler) -- unrelated to this change, verified by
 stash/rebuild/rerun.
+
+## Call-site unwinding — FIXED (2026-07-14, fda2531167 + tests commit)
+
+Implemented guarded call-site unwind cleanups (design (a) from the level-by-level
+work):
+  * do_function_call (goto_convert_function_call.cpp) calls
+    emit_cpp_call_unwind_cleanup (goto_convert_exceptions.cpp): after a
+    possibly-throwing call (last instr is a CALL; CPROVER_-prefixed callees and
+    unwind-emitted dtor calls excluded) with a REAL pending destructor call
+    (DEAD-only scope entries don't count) between current scope and innermost
+    try/function base, emit: `IF #cpp_unwind_guard-true GOTO cont; <dtors>;
+    PROPAGATE; cont:` and flag the CALL "#cpp_unwind_cleanup_follows".
+  * Construction-state window: cpp front-end lowers `T x(args)` as DECL
+    (registers dtor) + separate arg-eval + ctor-call statements =>
+    pending_construction_start/symbol members exclude the object until its ctor
+    call converts (matched via address_of(symbol) first arg) or the decl_block
+    ends (trivial/absent ctor).  unwind start-override needs explicit
+    save/restore of scope_stack current node (otherwise later registrations
+    attach to the walked-down node -- b's dtor vanished in `G a, b;`).
+  * "#unwind_path" marking (emit_exceptional_unwind) for ALL exceptional-unwind
+    dtor calls (call-site cleanups, try exc-exit landings, throw sites): the
+    pass must NOT add in-flight dispatch after them (it hijacked control to the
+    handler after the FIRST dtor, skipping the rest -- latent in yesterday's
+    landings, masked by 1-object tests).  [except.terminate] justifies no
+    dispatch: throwing dtor during unwinding terminates.
+  * remove_cpp_exceptions::initialize_globals: pass-created globals are now
+    initialized at the FRONT of __CPROVER_initialize (generated pre-pass;
+    nondet inflight derailed cpp_dynamic_initialization ctor loops =>
+    Constructor9/14, cpp20_compare_header failures -- a LATENT bug exposed
+    because cleanups make the pass run on previously exception-free programs).
+  * NO mode gate in the cleanup: function symbol mode is 'C' on this branch even
+    for C++ functions; the real-dtor-call check confines to C++.
+Verified: call_site KNOWNBUG -> CORE; new cpp11_throw_dtor_call_site_order CORE
+(ctor-throws exact set + reverse order); g++/clang++ agree on all; WRONG FAILS.
+Full cbmc-cpp green (95 skipped).  jbmc exception dirs: identical 11 pre-existing
+failures.  Cluster B is now COMPLETE (rethrow + level-by-level + call-site).
