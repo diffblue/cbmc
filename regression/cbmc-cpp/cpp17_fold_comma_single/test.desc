@@ -1,16 +1,15 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ one-element comma fold yields it: SUCCESS$
-^\[main\.assertion\.2\] line \d+ multi-element comma fold yields last: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [expr.prim.fold] -- a unary right fold over the comma operator with
-a ONE-element pack is mis-expanded to `true` instead of its operand (the
-multi-element case works), so assertion 1 currently FAILS.  g++/clang++
-runtime-verified.  Flip to CORE once the single-element comma fold expands to
-its operand.
+[expr.prim.fold]/2: folds over a one-element pack reduce to the single pattern
+instance (binary folds to one application against the init operand); previously
+the one-element case skipped the fold rewrite and the residual node degraded to
+`true`.  Covers unary right/left, binary, comma and && shapes at one and more
+elements.  Runtime-verified against g++ and clang++.
