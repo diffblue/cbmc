@@ -239,6 +239,22 @@ remove_exceptions_baset::instrument_function_call(
 {
   PRECONDITION(instr_it->type() == FUNCTION_CALL);
 
+  // A call-site unwind cleanup follows this call (emitted by the C++ goto
+  // conversion): it runs the pending destructors and ends in a
+  // propagate-marker THROW whose dispatch replaces the one we would insert
+  // here.  Adding a dispatch here as well would jump to a handler before
+  // those destructors have run.
+  if(instr_it->code().get_bool("#cpp_unwind_cleanup_follows"))
+    return instrumentation_resultt::DID_NOTHING;
+
+  // A destructor call on an exceptional unwind path (emitted by the C++ goto
+  // conversion): an exception is in flight by construction, so an in-flight
+  // dispatch here would jump to a handler mid-unwind and skip the remaining
+  // destructors.  A destructor that throws during unwinding terminates
+  // ([except.terminate]).
+  if(instr_it->code().get_bool("#unwind_path"))
+    return instrumentation_resultt::DID_NOTHING;
+
   // save the address of the next instruction
   goto_programt::targett next_it = instr_it;
   next_it++;
@@ -364,6 +380,15 @@ void remove_exceptions_baset::instrument_exceptions(
         function_identifier, goto_program, instr_it, stack_catch, locals);
       did_something =
         did_something || result != instrumentation_resultt::DID_NOTHING;
+    }
+    else if(
+      instr_it->is_goto() &&
+      instr_it->condition().get_bool("#cpp_unwind_guard"))
+    {
+      // guard of a call-site unwind cleanup: skip the cleanup when no
+      // exception is in flight
+      instr_it->condition_nonconst() = no_inflight_exception();
+      did_something = true;
     }
   }
 

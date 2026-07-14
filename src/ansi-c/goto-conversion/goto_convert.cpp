@@ -465,6 +465,8 @@ void goto_convertt::goto_convert(
   goto_programt &dest,
   const irep_idt &mode)
 {
+  pending_construction_start.reset();
+  suppress_cpp_unwind_cleanup = false;
   goto_convert_rec(code, dest, mode);
 }
 
@@ -717,6 +719,11 @@ void goto_convertt::convert(
   {
     for(const auto &op : code.operands())
       convert(to_code(op), dest, mode);
+
+    // a declaration's lowering (decl + constructor call) is complete here;
+    // close any pending-construction window a trivial or absent constructor
+    // call left open ([except.ctor]/2 window, see convert_frontend_decl)
+    pending_construction_start.reset();
   }
   else if(
     statement == ID_push_catch || statement == ID_pop_catch ||
@@ -805,7 +812,7 @@ void goto_convertt::convert_expression(
       const node_indext end_node = targets.cpp_try_scope_nodes.empty()
                                      ? node_indext{0}
                                      : targets.cpp_try_scope_nodes.back();
-      unwind_destructor_stack(expr.source_location(), dest, mode, end_node);
+      emit_exceptional_unwind(expr.source_location(), dest, mode, end_node);
 
       dest.add(std::move(throw_instruction));
       return;
@@ -890,6 +897,12 @@ void goto_convertt::convert_frontend_decl(
   // top of the destructor stack
   const symbol_exprt symbol_expr(symbol.name, symbol.type);
 
+  // The scope-tree node before this object's registration: while the object's
+  // construction is pending, call-site unwind cleanups unwind from here so the
+  // not-yet-constructed object is not destroyed ([except.ctor]/2).
+  const node_indext node_before_registration =
+    targets.scope_stack.get_current_node();
+
   // Add 'dead' instructions for temporaries bound to references,
   // deferred to the scope stack so they live as long as the reference.
   for(const auto &id : ref_bound_temporaries)
@@ -915,6 +928,19 @@ void goto_convertt::convert_frontend_decl(
     destructor.arguments().push_back(this_expr);
 
     targets.scope_stack.add(destructor, {});
+
+    // The C++ front-end emits `T x(args);` as a DECL (here) followed by
+    // separate statements evaluating the arguments and calling the
+    // constructor.  Until that constructor call completes, the object is not
+    // fully constructed and must not be destroyed by a call-site unwind
+    // cleanup ([except.ctor]/2).  Open the pending-construction window; it is
+    // closed by the conversion of the constructor-call statement for this
+    // symbol (emit_cpp_call_unwind_cleanup).
+    if(code.operands().size() == 1)
+    {
+      pending_construction_start = node_before_registration;
+      pending_construction_symbol = symbol.name;
+    }
   }
 }
 
