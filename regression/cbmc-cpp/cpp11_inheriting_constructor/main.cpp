@@ -1,10 +1,13 @@
 // [class.inhctor.init] / [namespace.udecl]: an inheriting constructor
 // declaration (`using Base::Base;`) makes the base class constructors usable to
 // construct the derived class, forwarding the arguments to the corresponding
-// base constructor.  CBMC currently detects `using Base::Base;` but skips it
-// (inheriting constructors are not implemented), so the derived class is
-// constructed by (mistaken) aggregate initialisation and the constructor
-// arguments -- here a forwarded parameter pack -- are dropped.
+// base constructor.  This includes the base's constructor *templates*
+// ([namespace.udecl]/2) -- here a forwarding constructor with a parameter
+// pack.  Fixed by registering the base's constructor-template ids in the
+// derived class's scope (so overload resolution instantiates them and the
+// base subobject is initialized by the selected base constructor) and by not
+// treating a class with inherited constructors as an aggregate
+// ([dcl.init.aggr]/1, C++17).
 
 struct tag_t
 {

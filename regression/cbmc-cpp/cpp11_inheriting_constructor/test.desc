@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 11 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ inheriting constructor sets the flag: SUCCESS$
@@ -9,10 +9,10 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [class.inhctor.init] -- an inheriting constructor (`using Base::Base;`)
-should make the base constructors usable for the derived class.  CBMC detects
-the using-declaration but skips it (inheriting constructors are not
-implemented), so the derived class is constructed by (mistaken) aggregate
-initialisation and the constructor arguments (here a forwarded parameter pack)
-are dropped, leaving the object default-initialised.  Flip to CORE once
-inheriting constructors are supported.
+[namespace.udecl]/2 + [class.inhctor.init]: an inheriting constructor
+declaration (`using Base::Base;`) inherits the base's constructor *templates*
+as well.  Fixed by registering the base's constructor-template ids in the
+derived class's scope under the derived name (so overload resolution finds and
+instantiates them, initializing the base subobject) and by recording that the
+class has inherited constructors so it is not treated as an aggregate
+([dcl.init.aggr]/1, C++17).  Cross-checked against g++ and clang++.
