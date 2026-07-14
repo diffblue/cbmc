@@ -413,6 +413,15 @@ void remove_function_pointer(
     auto new_call =
       code_function_callt(target->call_lhs(), fun, target->call_arguments());
 
+    // A call-site unwind cleanup emitted by the C++ goto conversion follows
+    // the original call ([except.ctor] destructors + re-dispatch); the C++
+    // exception lowering must not add its own dispatch after the concrete
+    // calls either (it would jump to a handler before those destructors run).
+    // Each concrete call jumps to t_final, which precedes the cleanup, so the
+    // cleanup still guards every branch.
+    if(target->code().get_bool("#cpp_unwind_cleanup_follows"))
+      new_call.set("#cpp_unwind_cleanup_follows", true);
+
     // the signature of the function might not match precisely
     fix_argument_types(new_call);
 
