@@ -14,6 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
+#include <goto-programs/remove_exceptions_base.h>
+
 void goto_convertt::convert_msc_try_finally(
   const codet &code,
   goto_programt &dest,
@@ -108,11 +110,21 @@ void goto_convertt::convert_try_catch(
   goto_programt end;
   goto_programt::targett end_target = end.add(goto_programt::make_skip());
 
+  // Exceptional-exit landing: taken when the in-flight exception matches none
+  // of this try's handlers.  It runs the destructors of the automatic objects
+  // in the scopes between this try and the enclosing one ([except.ctor]: every
+  // object whose scope is exited during unwinding is destroyed), then
+  // re-dispatches at the enclosing level via a propagate-marker THROW.
+  goto_programt exceptional_exit;
+  goto_programt::targett exceptional_exit_target =
+    exceptional_exit.add(goto_programt::make_skip(code.source_location()));
+
   // Record the scope-tree node at entry to the try block, so that a `throw`
   // in the try body unwinds (runs destructors of) the automatic objects
   // constructed since entering the try before control reaches a handler
   // ([except.ctor], [except.throw]/4).
-  targets.cpp_try_scope_nodes.push_back(targets.scope_stack.get_current_node());
+  const node_indext try_scope_node = targets.scope_stack.get_current_node();
+  targets.cpp_try_scope_nodes.push_back(try_scope_node);
 
   // the first operand is the 'try' block
   convert(to_code(code.op0()), dest, mode);
@@ -144,7 +156,39 @@ void goto_convertt::convert_try_catch(
     dest.add(goto_programt::make_goto(end_target));
   }
 
+  // register the exceptional-exit landing as a pseudo-handler entry, so the
+  // exception lowering can route an unmatched exception to it
+  exception_list.push_back(
+    code_push_catcht::exception_list_entryt(EXCEPTIONAL_EXIT_TAG));
+  catch_push_instruction->targets.push_back(exceptional_exit_target);
+
   catch_push_instruction->code_nonconst() = push_catch_code;
+
+  // fill the exceptional-exit landing: unwind the scopes between this try and
+  // the enclosing one (nothing when they coincide), then propagate
+  const node_indext enclosing_node = targets.cpp_try_scope_nodes.empty()
+                                       ? node_indext{0}
+                                       : targets.cpp_try_scope_nodes.back();
+  unwind_destructor_stack(
+    code.source_location(),
+    exceptional_exit,
+    mode,
+    enclosing_node,
+    try_scope_node);
+
+  // propagate-marker THROW: the exception lowering replaces this by a dispatch
+  // at the enclosing level, leaving the in-flight exception untouched
+  side_effect_expr_throwt propagate_expr{
+    irept{}, typet{}, code.source_location()};
+  propagate_expr.set("#exception_propagate", true);
+  codet propagate_code = code_expressiont(std::move(propagate_expr));
+  propagate_code.add_source_location() = code.source_location();
+  exceptional_exit.add(goto_programt::instructiont(
+    std::move(propagate_code), code.source_location(), THROW, nil_exprt(), {}));
+
+  // normal control flow (try-body fall-through and handler completion) jumps
+  // to end_target and never enters the exceptional-exit landing
+  dest.destructive_append(exceptional_exit);
 
   // add the end-target
   dest.destructive_append(end);

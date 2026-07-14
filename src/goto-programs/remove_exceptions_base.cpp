@@ -75,6 +75,74 @@ void remove_exceptions_baset::add_exception_dispatch_sequence(
   const stack_catcht &stack_catch,
   const std::vector<symbol_exprt> &locals)
 {
+  // If the innermost try level carries an exceptional-exit landing (emitted by
+  // the C++ goto conversion), propagate level by level: dispatch only this
+  // level's handlers, and route an unmatched exception to the exceptional
+  // exit, which runs the destructors of the scopes between this try and the
+  // enclosing one ([except.ctor]) and then re-dispatches at the enclosing
+  // level.  A flat multi-level dispatch would jump straight to an outer
+  // handler, skipping those destructors.
+  std::optional<goto_programt::targett> exceptional_exit;
+  if(!stack_catch.empty())
+  {
+    for(const auto &handler : stack_catch.back())
+    {
+      if(handler.first == EXCEPTIONAL_EXIT_TAG)
+        exceptional_exit = handler.second;
+    }
+  }
+
+  if(exceptional_exit.has_value())
+  {
+    // The default jump appears after the dynamic dispatch gotos inserted
+    // below.  It goes to this level's universal handler (catch(...), the last
+    // handler if present, [except.handle]) or else to the exceptional exit.
+    goto_programt::targett default_dispatch =
+      goto_program.insert_after(instr_it);
+
+    const catch_handlerst &handlers = stack_catch.back();
+    goto_programt::targett default_target = *exceptional_exit;
+
+    for(const auto &handler : handlers)
+    {
+      if(handler.first.empty()) // universal handler, catch(...)
+      {
+        default_target = handler.second;
+        if(prepared_handlers.insert(&*default_target).second)
+          prepare_handler(goto_program, default_target);
+      }
+    }
+
+    // Reversed because each insertion is placed immediately after instr_it,
+    // reversing program order.
+    for(std::size_t j = handlers.size(); j > 0;)
+    {
+      j--;
+      if(handlers[j].first.empty() || handlers[j].first == EXCEPTIONAL_EXIT_TAG)
+        continue;
+      const goto_programt::targett new_state_pc = handlers[j].second;
+      if(prepared_handlers.insert(&*new_state_pc).second)
+        prepare_handler(goto_program, new_state_pc);
+      add_handler_dispatch(
+        function_identifier,
+        goto_program,
+        instr_it,
+        handlers[j].first,
+        new_state_pc);
+    }
+
+    *default_dispatch = goto_programt::make_goto(
+      default_target, true_exprt(), instr_it->source_location());
+
+    // add dead instructions
+    for(const auto &local : locals)
+    {
+      goto_program.insert_after(
+        instr_it, goto_programt::make_dead(local, instr_it->source_location()));
+    }
+    return;
+  }
+
   // Jump to the universal handler or function end, as appropriate.  This
   // appears after the dynamic dispatch gotos inserted below.
   goto_programt::targett default_dispatch = goto_program.insert_after(instr_it);
@@ -142,8 +210,21 @@ bool remove_exceptions_baset::instrument_throw(
   add_exception_dispatch_sequence(
     function_identifier, goto_program, instr_it, stack_catch, locals);
 
-  // record the thrown value as the in-flight exception (language-specific)
-  set_inflight_exception(goto_program, instr_it);
+  // A propagate marker (the tail of an exceptional-exit landing) re-dispatches
+  // an exception that is already in flight; the in-flight state must be left
+  // untouched.  Only a real THROW records its thrown value.
+  const codet &code = instr_it->code();
+  const bool is_propagate = code.get_statement() == ID_expression &&
+                            code.op0().id() == ID_side_effect &&
+                            code.op0().get_bool("#exception_propagate");
+
+  if(is_propagate)
+    instr_it->turn_into_skip();
+  else
+  {
+    // record the thrown value as the in-flight exception (language-specific)
+    set_inflight_exception(goto_program, instr_it);
+  }
 
   return true;
 }
