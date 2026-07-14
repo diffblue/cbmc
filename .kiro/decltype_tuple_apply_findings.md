@@ -2208,3 +2208,31 @@ objects already worked.  New CORE test cpp11_throw_dtor_indirect_call
 (virtual + fn-pointer + loop; g++/clang++ verified).  cbmc-cpp green (93
 skipped); jbmc exception+virtual+lambda dirs: identical 11 pre-existing
 failures, zero regression.
+
+## Cluster A instrumentation session (2026-07-14 late night)
+
+Fresh reproduction: signature SHARPENED by today's fixes -- operator[] has a
+body now; only _M_emplace_hint_unique<...> (member fn template, out-of-line
+defined) lacks one.  Probe-driven layer analysis (all probes removed):
+  * map case: body PRESENT at instantiation, through typecheck_member_function,
+    and at add_method_body queueing (value=code).  TWO add_method_body calls:
+    the second dropped by the methods_seen dedupe.  The first entry drains via
+    the SECONDARY deferred-fixpoint loop in typecheck_method_bodies (~line
+    895+), which lacked the main drain's preprocessing (#fn_template_type map
+    restore + #expanded_param_packs expansion) => convert fails ("symbol
+    '__args' is unknown", swallowed) => make_nil => "no body".
+  * FIX COMMITTED: extracted prepare_deferred_method_body (the ~430-line
+    preprocessing block) and called from both drains.  __args error GONE.
+  * REMAINING map layers: "void-typed symbol not permitted" during conversion
+    (next unpeel target), then whatever follows.
+  * Minimal (cpp11_out_of_line_member_template_pack, NEW KNOWNBUG): simpler
+    shape fails EARLIER -- body nil already at typecheck_compound_declarator
+    ENTRY (never attached).  The forward-decl body recovery (~2583
+    same_template_signature parent-scope search) does not find out-of-line
+    MEMBER template definitions for this shape; libstdc++'s case works at
+    attachment (template_methods carries it) but my minimal's doesn't --
+    attachment-path difference worth its own probe next session.
+  * Boundary: arity>=2 with pack fails; arity 1 and non-pack OK (the $k
+    renaming path).
+Suite green 94 skipped.  Next steps: (1) unpeel "void-typed symbol" on map,
+(2) fix out-of-line attachment for the minimal, (3) re-run map/tuple.
