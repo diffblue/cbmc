@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[namespace.udecl]/2 + [class.inhctor.init]: inherited constructor templates
+forward their arguments to the base constructor (plain classes and class
+templates), and the derived class's own constructor takes precedence over an
+inherited one of the same signature.  Cross-checked against g++ and clang++.
