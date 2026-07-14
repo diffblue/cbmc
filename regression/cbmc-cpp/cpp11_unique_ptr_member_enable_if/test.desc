@@ -9,19 +9,15 @@ main.cpp
 --
 instantiating 'std::__enable_if_t' with <FALSE
 --
-N5008 [temp.inst]/2: member function templates of a class template are not
-instantiated when the enclosing specialization is instantiated; their
-signatures stay dependent on their own template parameters until odr-used.
-
-CBMC concretizes std::unique_ptr<T>'s =delete'd deleter constructor template
-during instantiation of unique_ptr<T> (substituting the default
-_Del=deleter_type=default_delete<T> and evaluating the parameter type), which
-demands std::enable_if_t<false>::type and hard-errors ("instantiating
-std::__enable_if_t with <FALSE, default_delete&&>" at unique_ptr.h:354).  g++
-and clang++ accept the program.
-
-Root cause of the enable_if_t<false> dog-food failures in parse_options.cpp,
-irep_serialization.cpp and ui_message.cpp (all hold std::unique_ptr members).
-This is an instance of the deferred lazy member-function-template instantiation
-work.  Flip to CORE once member function templates are kept dependent (not
-concretized) during class-template instantiation.
+KNOWNBUG (morphed): the originally-documented hard error -- concretizing
+unique_ptr's =delete'd deleter constructor template into
+enable_if_t<false>::type during class instantiation ([temp.inst]/2) -- is
+FIXED by the template-machinery work (the disallowed pattern above guards
+against regression).  The remaining failure is a value bug with a single root:
+unique_ptr's default/nullptr *constructor template* specialization is created
+with a nil body (never sourced from the member template of the lazily
+completed instance), so construction is a no-op and the stored pointer stays
+nondet; release/reset/move-assignment and delete preconditions all fail
+downstream.  See cpp11_unique_ptr_default_ctor_null for the minimal form.
+Same deferred member-body instantiation gap as the map/tuple cases.  Flip to
+CORE once member bodies are instantiated on odr-use.
