@@ -2192,3 +2192,19 @@ Covers &&/||/binary/comma; g++/clang++ verified; suite green 93 skipped.
 Fold trilogy complete: N==1 (comma_single), N==0 (empty_pack), N>=2 (already
 worked).  The c_typecheck_expr residual-fold fallback (silent `true`) is now
 only reachable via genuinely unhandled shapes; still worth a diagnostic.
+
+## cpp11_throw_dtor_unwinding_call_site follow-up — indirect calls FIXED (2026-07-14 night)
+
+The named test was already CORE (fixed this morning).  Boundary probing found
+the two residual gaps I predicted in the original design notes: VIRTUAL calls
+and FUNCTION-POINTER calls skipped the call-site cleanup.  Root:
+remove_function_pointers / remove_virtual_functions rebuild the CALL code for
+their dispatch chains, LOSING "#cpp_unwind_cleanup_follows"; the exception
+pass then added per-concrete-call dispatch that jumped to the handler before
+the cleanup (goto-verified for the fn-pointer case).  Fix: both passes carry
+the attribute onto rewritten calls; dispatch-chain branches all jump to
+t_final which precedes the cleanup, so one cleanup guards all.  Loop-scoped
+objects already worked.  New CORE test cpp11_throw_dtor_indirect_call
+(virtual + fn-pointer + loop; g++/clang++ verified).  cbmc-cpp green (93
+skipped); jbmc exception+virtual+lambda dirs: identical 11 pre-existing
+failures, zero regression.
