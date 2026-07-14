@@ -1956,3 +1956,40 @@ pattern kept as regression guard).  The cluster-A fix (source member bodies on
 odr-use; nil-body recovery in cpp_instantiate_template.cpp ~3900 currently only
 covers out-of-class .tcc definitions, not inline member templates) should flip
 BOTH, plus map/tuple.
+
+## cpp11_unique_ptr_default_ctor_null — FIXED (2026-07-14, 7ba91b7d3f + tests)
+
+NOT cluster A after all!  Probe-driven root-cause (temporary env-gated fprintf,
+all removed): the ctor-template body WAS instantiated and convert_function ran,
+but typecheck_code FAILED inside and the failure was SWALLOWED by the
+system-header suppression in cpp_typecheck_function.cpp (catch(int) ->
+value.make_nil() -> silent no-op ctor).  Disabling the suppression exposed:
+  "found no match for symbol '__uniq_ptr_data'" for the member init `_M_t()` --
+candidates lacked a default ctor.  __uniq_ptr_data declares ONLY defaulted move
+members + `using __uniq_ptr_impl::__uniq_ptr_impl;`.  Per N5008
+[namespace.udecl]/2 (P0136) the using-decl inherits ALL base ctors incl. the
+default ctor; [class.inhctor.init]: initialization by an inherited default
+ctor == a defaulted default ctor of the derived class.  CBMC's inheriting-ctor
+import (cpp_typecheck_compound_type.cpp ~2519) SKIPPED base default ctors while
+setting found_ctor=true -> class not default-constructible at all (even the
+plain `struct D:B{using B::B;}; D d;` failed!).
+
+Fix: record inherited_default_ctor in the import loop; track
+found_own_default_ctor at ctor declarations (zero/all-defaulted params); gate
+the implicit-default-ctor synthesis on
+  (!found_ctor || (inherited_default_ctor && !found_own_default_ctor)).
+Base copy/move ctors stay excluded ([over.match.funcs.general]/9).
+
+Verified: default_ctor_null KNOWNBUG -> CORE; new header-free
+cpp11_inheriting_default_ctor CORE (D plain / E move-suppressed / F own-ctor
+precedence + parameterized inherit) -- g++/clang++ runtime cross-checked; full
+suite green (95 skipped).
+
+REMAINING (separate bugs):
+  * cpp11_unique_ptr_member_enable_if still KNOWNBUG: move-ASSIGNMENT of
+    unique_ptr still loses the value (operator= has a body now; next layer down,
+    possibly release()/reset() through tuple get<0> reference-return).
+  * cpp11_inheriting_constructor still KNOWNBUG: PARAMETERIZED inherited ctor
+    value semantics (flag/value not set) -- distinct from default-ctor fix.
+  * The system-header typecheck failure swallowing (make_nil, no diagnostic)
+    masks real bugs -- consider a verbose-mode diagnostic.
