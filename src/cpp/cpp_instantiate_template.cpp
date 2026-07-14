@@ -5310,6 +5310,56 @@ skip_pack_removal_ft:
       }
     }
   }
+  // N5008 [expr.prim.fold]/2: a fold over a ONE-element pack reduces to the
+  // single instance of its pattern (for a binary fold, one application
+  // against the init operand).  The general expansion below is skipped for
+  // N == 1 (the parameter keeps its original name, so references need no
+  // renaming), but fold NODES must still be rewritten: left in the body they
+  // reach the C type-checker's residual-fold fallback, which degrades them to
+  // `true` (wrong for any fold whose value matters, e.g. `(u, ...)`).
+  if(has_template_pack && pack_arguments.size() == 1)
+  {
+    auto &func_decl = new_decl.declarators()[0];
+    if(func_decl.value().is_not_nil())
+    {
+      std::function<void(irept &)> reduce_folds;
+      reduce_folds = [&reduce_folds](irept &node)
+      {
+        if(
+          (node.id() == irep_idt("cpp_right_fold") ||
+           node.id() == irep_idt("cpp_left_fold")) &&
+          !node.get_sub().empty())
+        {
+          // unary fold: the single pattern instance
+          irept pattern = node.get_sub().front();
+          reduce_folds(pattern);
+          node = pattern;
+          return;
+        }
+        if(
+          node.id() == irep_idt("cpp_binary_fold") &&
+          node.get_sub().size() >= 2)
+        {
+          // binary fold: one application of op against the init operand
+          const irep_idt fold_op = node.get(irep_idt("fold_op"));
+          irept bin(fold_op);
+          irept init_expr = node.get_sub()[0];
+          irept pattern = node.get_sub()[1];
+          reduce_folds(init_expr);
+          reduce_folds(pattern);
+          bin.get_sub().push_back(init_expr);
+          bin.get_sub().push_back(pattern);
+          node = bin;
+          return;
+        }
+        for(auto &sub : node.get_sub())
+          reduce_folds(sub);
+        for(auto &named : node.get_named_sub())
+          reduce_folds(named.second);
+      };
+      reduce_folds(func_decl.value());
+    }
+  }
   if(has_template_pack && pack_arguments.size() != 1)
   {
     const std::size_t pack_sz = pack_arguments.size();
