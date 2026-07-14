@@ -27,8 +27,18 @@ Author: Cristina David (Java), Kiro (base extraction)
 #include <goto-programs/goto_program.h>
 
 #include <functional>
+#include <optional>
 #include <set>
 #include <vector>
+
+/// Pseudo exception-id on a push-catch entry whose target is the try block's
+/// exceptional-exit landing rather than a handler.  Emitted by the C++ goto
+/// conversion: when an in-flight exception matches none of a try's handlers,
+/// the dispatch jumps here; the landing runs the destructors of the automatic
+/// objects in the scopes between this try and the enclosing one (N5008
+/// [except.ctor]) and then re-dispatches at the enclosing level via a
+/// propagate-marker THROW ("#exception_propagate").
+#define EXCEPTIONAL_EXIT_TAG "@exceptional-exit"
 
 class goto_functionst;
 class message_handlert;
