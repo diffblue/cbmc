@@ -1052,8 +1052,20 @@ void template_mapt::apply(typet &type) const
         // correct behaviour; leaving it as the bare cpp_name causes
         // downstream `typecheck_template_args` to fail with
         // "too many template arguments".
+        // N5008 [temp.alias]/2 + [temp.inst]/2: a member alias template's OWN
+        // parameter pack (deferred_own_pack_names) is not bound during the
+        // enclosing instantiation -- it binds only at the alias's point of
+        // use.  It must never be collapsed here: the suffix match below is by
+        // bare short name, so a stale zero-size entry for a same-named pack
+        // of an UNRELATED template (the flat map keeps entries of enclosing
+        // and previous builds) would otherwise silently expand it to zero
+        // elements (e.g. std::tuple's _ImplicitCtor `_Args...` folding to
+        // `__is_implicitly_constructible<>()`, wrongly disabling every
+        // constrained tuple constructor at arity >= 3).
         auto matches_empty_pack = [this](irep_idt ident) -> bool
         {
+          if(deferred_own_pack_names.count(id2string(ident)) != 0)
+            return false;
           for(const auto &ps : pack_size_map)
           {
             if(ps.second != 0)
