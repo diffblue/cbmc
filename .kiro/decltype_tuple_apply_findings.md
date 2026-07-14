@@ -2159,3 +2159,19 @@ M9/M10) now PASS, so the residue is yet another real-header detail --
 next suspect: the noexcept(__nothrow_constructible<_UElements...>()) specifier
 on the forwarding ctor, or the _ImplicitDefaultCtor FALSE fold seen for
 tuple<int,int,int> (its __is_implicitly_default_constructible wrongly FALSE).
+
+## cpp17_fold_comma_single — FIXED (2026-07-14 night)
+
+Root: the fn-param-pack expansion in instantiate_template (which also rewrites
+fold nodes) is gated `pack_arguments.size() != 1`; for N==1 the fold node
+survives into the body and c_typecheck_expr.cpp's residual-fold fallback
+(`expr = true_exprt()`, line ~559) degrades it to TRUE.  Fix: N==1 pass
+rewriting unary folds to their pattern and binary folds to one op application
+([expr.prim.fold]/2).  Covers +, &&, comma, binary; g++/clang++ verified.
+
+Side-find: N==0 (empty pack) instantiation loses the whole BODY ("no body for
+callee empty_and<>()") -- pre-existing at HEAD, distinct path (pack-removal).
+Filed as cpp17_fold_empty_pack KNOWNBUG ([expr.prim.fold]/3 identities).
+Also note: the residual-fold fallback in c_typecheck_expr.cpp remains a
+silent-wrong-value trap; consider a warning or hard error there once the
+remaining fold paths are fixed.
