@@ -618,6 +618,11 @@ protected:
   }
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_method_bodies();
+
+  /// Shared preprocessing for a deferred method body about to be converted
+  /// ([temp.inst]/1, [temp.variadic]/5,7); used by both drains in
+  /// typecheck_method_bodies.
+  void prepare_deferred_method_body(symbolt &method_symbol);
   /// Collapse zero-length pack expansions (N5008 [temp.variadic]/7) in
   /// template-argument lists within an instantiated function-template body,
   /// using the empty packs recorded in the current `template_map`.
