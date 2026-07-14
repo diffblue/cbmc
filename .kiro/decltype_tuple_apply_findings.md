@@ -1912,3 +1912,47 @@ Verified: call_site KNOWNBUG -> CORE; new cpp11_throw_dtor_call_site_order CORE
 (ctor-throws exact set + reverse order); g++/clang++ agree on all; WRONG FAILS.
 Full cbmc-cpp green (95 skipped).  jbmc exception dirs: identical 11 pre-existing
 failures.  Cluster B is now COMPLETE (rethrow + level-by-level + call-site).
+
+## cpp11_unique_ptr_member_enable_if — re-diagnosed (2026-07-14)
+
+The KNOWNBUG has MORPHED: the documented enable_if_t<FALSE> hard error
+([temp.inst]/2 concretization of the =delete'd deleter ctor template) is FIXED
+by this session's template work.  Remaining failure bisected to a single root:
+
+  std::unique_ptr<C> p;  =>  p.get() != nullptr  (nondet!)
+
+The default ctor is a CONSTRUCTOR TEMPLATE (`template<typename _Del=_Dp,
+typename=_DeleterConstraint<_Del>> constexpr unique_ptr() noexcept : _M_t(){}`).
+Its specialization symbol is created (symbol table: Type ok, Value EMPTY/nil,
+Flags: macro) but the inline body is never instantiated => silent no-op ctor =>
+member tuple stays nondet.  Everything downstream (V2-V5: move-assign,
+move-ctor, reset, release; delete preconditions "must be dynamic object";
+"deallocated object" derefs) follows from nondet initial pointer.  V1 (direct
+`unique_ptr<C> p(new C(5))`) WORKS (that ctor gets a body).
+
+Evidence: --show-goto-functions has CALL unique_ptr(this) but NO body for it
+(dtor HAS a body); --show-symbol-table shows the ctor symbol with empty Value.
+NOTE: no "no body for callee" warning is printed for it (silent!) -- worth
+fixing the diagnostics in any case.
+
+Hand-written replications (ctor template w/ default args + SFINAE constraint,
+nested DeleterConstraint alias, =delete'd sibling overloads) all WORK.  cvise
+attempts (value-bug oracle, g++ compile+link+ASan-run):
+  * drifted to a DIFFERENT real bug: a declared-only partial spec with
+    kind-mismatched non-type param (`template<long> struct _Tuple_impl<_Idx,_Head>;`
+    vs primary `unsigned long`) kills get<0>'s body ("no body for callee",
+    silent wrong value).  Kept at /tmp (not committed; secondary lead).
+  * with a no-"no body" guard, drifted into a UB artifact (returning address of
+    by-value param; clang segfault) => rejected per faithfulness rule.
+  * -Werror=return-local-addr doesn't catch that shape (static member fn);
+    reduction abandoned -- the real trigger needs the libstdc++ lazy-completion
+    path, consistent with cluster A.
+
+Conclusion: cpp11_unique_ptr_member_enable_if is now definitively a cluster-A
+instance (deferred member-body instantiation).  Added minimal KNOWNBUG
+cpp11_unique_ptr_default_ctor_null (assert default-constructed is null;
+g++/clang++ runtime-verified); updated the stale test.desc (old disallowed
+pattern kept as regression guard).  The cluster-A fix (source member bodies on
+odr-use; nil-body recovery in cpp_instantiate_template.cpp ~3900 currently only
+covers out-of-class .tcc definitions, not inline member templates) should flip
+BOTH, plus map/tuple.
