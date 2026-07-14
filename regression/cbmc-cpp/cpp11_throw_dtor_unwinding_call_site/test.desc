@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ g1 and g2 destroyed during unwinding: SUCCESS$
@@ -8,9 +8,10 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [except.ctor]/1-3 -- the exceptional edge at a call site runs no
-destructors, so objects constructed between try entry and a throwing call (g1)
-and locals of intermediate functions without a try (g2) are never destroyed
-(assertion currently FAILS).  Level-by-level unwinding between try levels is
-fixed; this remaining gap needs guarded call-site unwind blocks emitted by the
-goto conversion.  Flip to CORE once call-site unwinding runs these destructors.
+[except.ctor]/1-3 -- objects constructed between try entry and a throwing call
+(g1) and locals of intermediate functions without a try (g2) are destroyed
+during unwinding.  Fixed by guarded call-site unwind cleanups: after each
+possibly-throwing call the goto conversion emits destructors of the objects
+between the call's scope and the innermost enclosing try (construction-state
+aware) followed by a propagate-marker dispatch.  Cross-checked against g++ and
+clang++.
