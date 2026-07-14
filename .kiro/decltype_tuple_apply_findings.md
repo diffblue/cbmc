@@ -1993,3 +1993,33 @@ REMAINING (separate bugs):
     value semantics (flag/value not set) -- distinct from default-ctor fix.
   * The system-header typecheck failure swallowing (make_nil, no diagnostic)
     masks real bugs -- consider a verbose-mode diagnostic.
+
+## cpp11_unique_ptr_member_enable_if — FIXED end-to-end (2026-07-14)
+
+Continuation of the inheriting-default-ctor fix; three more defaulted-member
+gaps found by layer-wise bisection (reset/release worked; move-ctor and
+move-assign failed):
+  1. default_cpctor base init always sliced source to `const Base&` -> base
+     COPY ctor selected for defaulted MOVE ctors ([class.copy.ctor]/15 wants
+     xvalue -> move ctor; __uniq_ptr_impl(&&) nulls source).  Fix: Base&& slice
+     when is_move.
+  2. Base mem-initializer named base by unqualified name -> "symbol '_Head_base'
+     does not uniquely resolve" in tuple's EBO hierarchy; swallowed by syshdr
+     suppression => _Tuple_impl<0,...> move ctor silently nil ("no body").
+     Fix: cast target from resolved b.type() + record #base_type on the
+     mem-init (mechanism already used by full_member_initialization).
+  3. Defaulted operator= NEVER elaborated (only ctors were) -> empty body,
+     nondet return.  Fix: new convert_function block elaborates via
+     default_assignop_value with is_move threading; base assignment on the move
+     path uses an EXPRESSION assignment (overload-resolves to base operator=,
+     running __uniq_ptr_impl::operator=(&&)'s reset+null) -- the frontend
+     code_frontend_assignt used by the copy path is a direct subobject copy
+     and caused a double delete.
+Debug technique: env-gated syshdr-suppression disable + targeted probes (all
+removed).  Suite green 94 skipped; member_enable_if + new cpp11_unique_ptr_move
+CORE; g++/clang++ runtime cross-checked.
+
+Remaining KNOWNBUGs: cluster A (map/tuple no-body), cpp11_inheriting_constructor
+(parameterized inherited ctor values), cpp20_apple_libcxx_basic,
+cpp23_expected_basic, cpp11_regex_match, cpp20_iterator_traits_category,
+cpp11_throw_dtor_unwinding (none left in cluster B).
