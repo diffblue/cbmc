@@ -7453,13 +7453,75 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             // may lack using-scope links to enclosing inline namespaces
             // (e.g., std::__1 in libc++). The instantiation scope has
             // full visibility of the enclosing namespace.
-            typet param_type = param.type();
-            cpp_typecheck.template_map.apply(param_type);
-            cpp_typecheck.typecheck_type(param_type);
-            // Use the default value
-            exprt default_val = param.default_argument();
-            cpp_typecheck.template_map.apply(default_val);
-            cpp_typecheck.typecheck_expr(default_val);
+            // N5008 [temp.deduct]/5: the values of deduced template
+            // parameters are available when subsequent default template
+            // arguments are instantiated.  A default whose SFINAE guard
+            // names this function template's parameter pack in an explicit
+            // template-argument list (e.g. std::tuple's constructor
+            // constraint `enable_if_t<..._is_implicitly_constructible
+            // <_UElements...>(), bool> = true`) needs the pack's deduced
+            // ELEMENT TYPES bound in the map; the map at this point holds
+            // only enclosing bindings, so the `_UElements...` expansion
+            // collapses to an empty argument list and the constraint is
+            // folded over no arguments, wrongly disabling the constructor.
+            // Try the historical order first (some constraints only resolve
+            // against the enclosing map); on failure, retry with the pack's
+            // deduced element types bound.
+            auto eval_default = [&]() -> exprt
+            {
+              typet param_type = param.type();
+              cpp_typecheck.template_map.apply(param_type);
+              cpp_typecheck.typecheck_type(param_type);
+              // Use the default value
+              exprt default_val = param.default_argument();
+              cpp_typecheck.template_map.apply(default_val);
+              cpp_typecheck.typecheck_expr(default_val);
+              return default_val;
+            };
+            exprt default_val;
+            try
+            {
+              default_val = eval_default();
+            }
+            catch(...)
+            {
+              if(pack_param_index >= params.size())
+                throw; // no pack to bind: nothing more to try
+              const irep_idt pack_id =
+                params[pack_param_index].type().get(ID_identifier);
+              if(pack_id.empty())
+                throw;
+              std::vector<typet> deduced_types;
+              std::vector<exprt> deduced_exprs;
+              for(std::size_t j = pack_param_index;
+                  j < pack_param_index + pack_expansion_size && j < args.size();
+                  ++j)
+              {
+                if(args[j].id() == ID_unassigned)
+                  continue;
+                if(args[j].id() == ID_type)
+                {
+                  if(
+                    args[j].type().id() != ID_unassigned &&
+                    args[j].type().id() != ID_nil)
+                    deduced_types.push_back(args[j].type());
+                }
+                else
+                  deduced_exprs.push_back(args[j]);
+              }
+              if(deduced_types.empty() && deduced_exprs.empty())
+                throw;
+              cpp_saved_template_mapt retry_map(cpp_typecheck.template_map);
+              if(!deduced_types.empty())
+                cpp_typecheck.template_map.pack_args_map[pack_id] =
+                  deduced_types;
+              else
+                cpp_typecheck.template_map.pack_expr_map[pack_id] =
+                  deduced_exprs;
+              cpp_typecheck.get_message_handler().set_message_count(
+                messaget::M_ERROR, sfinae_err_3);
+              default_val = eval_default();
+            }
             args[i] = default_val;
             cpp_typecheck.template_map.set(param, args[i]);
             cpp_typecheck.get_message_handler().set_message_count(
