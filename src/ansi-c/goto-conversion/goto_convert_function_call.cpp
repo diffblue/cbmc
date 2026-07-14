@@ -86,6 +86,11 @@ void goto_convertt::do_function_call(
     // function expressions; skip those.
   }
 
+  // C++: if the callee throws, the automatic objects between this call's
+  // scope and the innermost enclosing try (or the function base) must be
+  // destroyed before a handler runs ([except.ctor]); emit a guarded cleanup
+  emit_cpp_call_unwind_cleanup(dest, mode);
+
   destruct_locals(side_effects.temporaries, dest, ns);
 }
 
