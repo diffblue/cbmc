@@ -6,26 +6,34 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG (real libstdc++ <tuple>).  std::make_tuple(1, 2.0, 'a') then
-std::get<0> reads a wrong value.  Narrowed (2026-07-10): a TWO-element tuple is
-fine end-to-end (both `std::tuple<A,B> t(...)` construction and
-`std::make_tuple(a,b)` with `get<0>`), but a THREE-element tuple fails --
-`std::make_tuple(a,b,c)` yields a wrong `get<0>`, and a manual
-`std::tuple<A,B,C> t(a,b,c)` fails constructor resolution ("found no match for
-symbol 'tuple'").  A hand-written faithful minimal (a recursively-inheriting
-`_Tuple_impl` with a distinct-named element pack + a `get`-style
-`__get_helper<I>` deducing the base) works at all arities, so the residual is
-specific to libstdc++'s tuple CONSTRUCTOR machinery at >=3 elements (the
-_TupleConstraints-guarded variadic constructor / element storage), not the
-recursive-inheritance get<> deduction (that derived-to-base deduction, incl. a
-non-empty trailing pack, is fixed -- see
-cpp11_derived_to_base_variadic_deduction).  Next: cvise the preprocessed
-3-element case to isolate the constructor-machinery defect.
+KNOWNBUG (real libstdc++ <tuple>).  std::make_tuple at arity >= 3 returns a
+nondeterministic tuple, so std::get reads garbage.  Arity boundary confirmed
+(2026-07-14): every arity <= 2 form passes (libstdc++ has a tuple<T1,T2>
+partial specialization); every arity >= 3 make_tuple fails.  Direct
+construction `std::tuple<int,double,char> t(1,2.0,'a')` now WORKS (fixed by
+the defaulted-member/EBO-base-initializer work); only make_tuple's body is
+lost.
 
-ROOT (2026-07-13): std::make_tuple<int,int,int> (arity >= 3) is left WITHOUT a
-body -- its forwarding construction `tuple<...>(std::forward<E>(a)...)` expands a
-call-pack inside a braced/aggregate initializer, which is mis-expanded (single
-`fwd(a$0,a$1,...)` call retaining `...`) so the deferred body fails to convert and
-is dropped -> make_tuple returns a nondeterministic tuple -> std::get reads
-garbage (arity 2 works).  Minimal header-free reproducer:
-cpp11_call_pack_in_braced_init.
+ROOT (sharpened 2026-07-14, via temporarily disabling the system-header
+error suppression): converting make_tuple's body fails with
+  "found no match for symbol '__result_type'"
+-- the return-type typedef
+  typedef tuple<typename __decay_and_strip<_Elements>::__type...> __result_type;
+does not resolve at arity >= 3.  The instantiation backtrace shows the tuple
+constructor-constraint aliases (_ImplicitCtor / _ExplicitCtor / _TCC)
+instantiated with argument types still containing UNRESOLVED __decay_t<T>
+aliases (e.g. `const std::__decay_t<signed_int> &`), and their
+__enable_if_t<FALSE, bool> guards wrongly evaluating FALSE.  The typecheck
+failure is swallowed (system header), the body is dropped, and make_tuple
+returns nondet.
+
+Faithful hand replications all PASS (g++/clang++-verified): nested
+alias-through-struct-typedef pack expansion (das<Es>::__type... with
+das = struct { typedef strip<decay_t<T>>::__type __type; }), constrained
+constructors via member alias templates over a constexpr member function
+(TCC<C>::template ok<Us...>()), and their combination.  Two cvise attempts
+with progressively sharper oracles (g++ compile+link+run plus the exact
+swallowed-error signature) reduced to skeletons that clang++ rejects
+(reduction artifacts), so the trigger is still tied to some further detail of
+the real header.  Flip to CORE once make_tuple's return-type alias pack
+resolves at arity >= 3.
