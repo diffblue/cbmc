@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[unique.ptr.single.ctor] / [unique.ptr.single.asgn]: move construction and
+move assignment transfer ownership and null the source, through the defaulted
+move members of unique_ptr and __uniq_ptr_data and the user-defined
+__uniq_ptr_impl move operations.  Runtime-verified against g++ and clang++.

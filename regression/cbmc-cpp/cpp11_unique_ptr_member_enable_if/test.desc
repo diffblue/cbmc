@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ unique_ptr member holds its value: SUCCESS$
@@ -9,15 +9,13 @@ main.cpp
 --
 instantiating 'std::__enable_if_t' with <FALSE
 --
-KNOWNBUG (morphed): the originally-documented hard error -- concretizing
-unique_ptr's =delete'd deleter constructor template into
-enable_if_t<false>::type during class instantiation ([temp.inst]/2) -- is
-FIXED by the template-machinery work (the disallowed pattern above guards
-against regression).  The remaining failure is a value bug with a single root:
-unique_ptr's default/nullptr *constructor template* specialization is created
-with a nil body (never sourced from the member template of the lazily
-completed instance), so construction is a no-op and the stored pointer stays
-nondet; release/reset/move-assignment and delete preconditions all fail
-downstream.  See cpp11_unique_ptr_default_ctor_null for the minimal form.
-Same deferred member-body instantiation gap as the map/tuple cases.  Flip to
-CORE once member bodies are instantiated on odr-use.
+The original hard error (concretizing unique_ptr's =delete'd deleter
+constructor template into enable_if_t<false>::type, [temp.inst]/2) is fixed;
+the disallowed pattern guards against regression.  The subsequent value bugs
+are fixed by a chain of standards fixes: inherited base default constructors
+([class.inhctor.init]), defaulted move constructors initializing bases from an
+xvalue ([class.copy.ctor]/15) with the base subobject type recorded to
+disambiguate EBO hierarchies like std::tuple's, and defaulted copy/move
+assignment operators elaborated memberwise with base move-assignment going
+through the base's operator= ([class.copy.assign]/12).  assertion.2 is a
+deliberate WRONG-must-FAIL non-vacuity check.

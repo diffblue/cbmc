@@ -24,12 +24,12 @@
 // never contributes an ill-formed enable_if_t<false>.  g++ and clang++ accept
 // this program.
 //
-// KNOWN BUG: requires lazy (odr-use-driven) instantiation of member function
-// templates ([temp.inst]/2).  Root cause of the enable_if_t<false> dog-food
-// failures in parse_options.cpp, irep_serialization.cpp and ui_message.cpp
-// (all of which hold std::unique_ptr members).  Flip to CORE once member
-// function templates are kept dependent during class-template instantiation.
-// assertion.2 must FAIL (non-vacuity).
+// FIXED: the hard error is gone (the =delete constructor template is no
+// longer concretized), and the subsequent value bugs were fixed by modelling
+// C++17 inheriting constructors ([class.inhctor.init]), xvalue base
+// initialization in defaulted move constructors ([class.copy.ctor]/15), and
+// memberwise elaboration of defaulted copy/move assignment operators
+// ([class.copy.assign]/12).  assertion.2 must FAIL (non-vacuity).
 
 #include <memory>
 
