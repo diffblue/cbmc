@@ -5364,6 +5364,55 @@ skip_pack_removal_ft:
   {
     const std::size_t pack_sz = pack_arguments.size();
 
+    // N5008 [expr.prim.fold]/3: with an EMPTY pack, a unary fold yields the
+    // operator's identity (true for &&, false for ||; the comma fold yields
+    // void(), approximated as 0) and a binary fold (init op ... op pack)
+    // yields its init operand.  The pack parameter has already been removed
+    // from the instantiated declaration at this point (pack_idx would be -1),
+    // so the general expansion below -- which rewrites fold nodes -- never
+    // runs and a residual fold would reach the C type-checker's fallback,
+    // degrading to `true` with the function body otherwise lost.  Any fold
+    // remaining in this body folds over this function's own (empty) pack:
+    // folds over an enclosing class's pack were expanded during the class's
+    // instantiation.
+    if(pack_sz == 0 && !new_decl.declarators().empty())
+    {
+      auto &func_decl0 = new_decl.declarators()[0];
+      if(func_decl0.value().is_not_nil())
+      {
+        std::function<void(irept &)> empty_folds;
+        empty_folds = [&empty_folds](irept &node)
+        {
+          if(
+            node.id() == irep_idt("cpp_right_fold") ||
+            node.id() == irep_idt("cpp_left_fold"))
+          {
+            const irep_idt fold_op = node.get(irep_idt("fold_op"));
+            if(fold_op == ID_and)
+              node = true_exprt();
+            else if(fold_op == ID_or)
+              node = false_exprt();
+            else
+              node = from_integer(0, signed_int_type());
+            return;
+          }
+          if(
+            node.id() == irep_idt("cpp_binary_fold") && !node.get_sub().empty())
+          {
+            irept init_expr = node.get_sub()[0];
+            empty_folds(init_expr);
+            node = init_expr;
+            return;
+          }
+          for(auto &sub : node.get_sub())
+            empty_folds(sub);
+          for(auto &named : node.get_named_sub())
+            empty_folds(named.second);
+        };
+        empty_folds(func_decl0.value());
+      }
+    }
+
     auto &func_decl = new_decl.declarators()[0];
     irept &func_params = func_decl.type().add(ID_parameters);
     irept::subt &fp_sub = func_params.get_sub();
@@ -5585,6 +5634,23 @@ skip_pack_removal_ft:
             const irep_idt fold_op = node.get(irep_idt("fold_op"));
             const irept &pack_expr = node.get_sub().front();
             bool is_left = (node.id() == irep_idt("cpp_left_fold"));
+
+            // N5008 [expr.prim.fold]/3: a unary fold over an EMPTY pack
+            // yields the operator's identity -- true for &&, false for ||,
+            // void() for the comma operator (otherwise ill-formed).  Without
+            // this the expansion below reads expanded_names[0] out of
+            // bounds and the instantiation silently loses its body.
+            // Mirrors the class-body fold expansion above.
+            if(expanded_names.empty())
+            {
+              if(fold_op == ID_and)
+                node = true_exprt();
+              else if(fold_op == ID_or)
+                node = false_exprt();
+              else
+                node = from_integer(0, signed_int_type());
+              return;
+            }
 
             if(expanded_names.size() == 1)
             {

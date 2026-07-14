@@ -2175,3 +2175,20 @@ Filed as cpp17_fold_empty_pack KNOWNBUG ([expr.prim.fold]/3 identities).
 Also note: the residual-fold fallback in c_typecheck_expr.cpp remains a
 silent-wrong-value trap; consider a warning or hard error there once the
 remaining fold paths are fixed.
+
+## cpp17_fold_empty_pack — FIXED (2026-07-14 night)
+
+Root (probe-verified): for N==0 the pack parameter is already REMOVED from the
+instantiated declaration, so the body-expansion block (which rewrites fold
+nodes) never runs (pack_idx=-1) and residual folds degrade via the
+c_typecheck_expr fallback; the body conversion then loses the value (nondet).
+Fix: in the pack_sz==0 path, rewrite residual unary folds to their
+[expr.prim.fold]/3 identities (&&->true, ||->false, else 0 approximating
+void()) and binary folds to their init operand; plus an empty-expanded_names
+guard in the general fold expander (OOB indexing hazard).  Safe scoping note:
+any fold left in the body at this point folds over THIS function's own empty
+pack -- enclosing-class-pack folds were expanded during class instantiation.
+Covers &&/||/binary/comma; g++/clang++ verified; suite green 93 skipped.
+Fold trilogy complete: N==1 (comma_single), N==0 (empty_pack), N>=2 (already
+worked).  The c_typecheck_expr residual-fold fallback (silent `true`) is now
+only reachable via genuinely unhandled shapes; still worth a diagnostic.
