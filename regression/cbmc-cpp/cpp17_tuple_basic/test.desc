@@ -10,30 +10,28 @@ KNOWNBUG (real libstdc++ <tuple>).  std::make_tuple at arity >= 3 returns a
 nondeterministic tuple, so std::get reads garbage.  Arity boundary confirmed
 (2026-07-14): every arity <= 2 form passes (libstdc++ has a tuple<T1,T2>
 partial specialization); every arity >= 3 make_tuple fails.  Direct
-construction `std::tuple<int,double,char> t(1,2.0,'a')` now WORKS (fixed by
-the defaulted-member/EBO-base-initializer work); only make_tuple's body is
-lost.
+construction `std::tuple<int,double,char> t(1,2.0,'a')` WORKS; only
+make_tuple's body is lost (its conversion failure is swallowed as a
+system-header body, leaving a nondet return).
 
-ROOT (sharpened 2026-07-14, via temporarily disabling the system-header
-error suppression): converting make_tuple's body fails with
-  "found no match for symbol '__result_type'"
--- the return-type typedef
-  typedef tuple<typename __decay_and_strip<_Elements>::__type...> __result_type;
-does not resolve at arity >= 3.  The instantiation backtrace shows the tuple
-constructor-constraint aliases (_ImplicitCtor / _ExplicitCtor / _TCC)
-instantiated with argument types still containing UNRESOLVED __decay_t<T>
-aliases (e.g. `const std::__decay_t<signed_int> &`), and their
-__enable_if_t<FALSE, bool> guards wrongly evaluating FALSE.  The typecheck
-failure is swallowed (system header), the body is dropped, and make_tuple
-returns nondet.
+ROOT (layered, 2026-07-14): converting make_tuple's body fails with
+"found no match for symbol '__result_type'".
 
-Faithful hand replications all PASS (g++/clang++-verified): nested
-alias-through-struct-typedef pack expansion (das<Es>::__type... with
-das = struct { typedef strip<decay_t<T>>::__type __type; }), constrained
-constructors via member alias templates over a constexpr member function
-(TCC<C>::template ok<Us...>()), and their combination.  Two cvise attempts
-with progressively sharper oracles (g++ compile+link+run plus the exact
-swallowed-error signature) reduced to skeletons that clang++ rejects
-(reduction artifacts), so the trigger is still tied to some further detail of
-the real header.  Flip to CORE once make_tuple's return-type alias pack
-resolves at arity >= 3.
+LAYER 1 (FIXED): the constrained-constructor SFINAE calls folded with an
+EMPTY explicit argument list --
+_TupleConstraints<1,...>::__is_implicitly_constructible<>() -- because the
+constraint alias's own pack `_Args...` was collapsed against stale same-named
+zero-size entries in the flat template map; fixed by gating the empty-pack
+fallback on deferred_own_pack_names ([temp.alias]/2, [temp.inst]/2).  The
+constraints now fold with the full argument list (probe-verified), though for
+tuple the verdict happens to be unchanged (an empty __and_<> is vacuously
+true).
+
+LAYER 2 (REMAINING): constructor overload resolution for
+`__result_type(std::forward<_Elements>(__args)...)` still finds no viable
+candidate: the forwarding constructor appears with an unexpanded `? &&`
+parameter (its _UElements pack not expanded to three parameters) and the
+`const _Elements&...` constructor appears const-STRIPPED (`__decay_t<T> &`),
+so nothing binds three forwarded rvalues.  Flip to CORE once the member
+constructor-template parameter packs of a class-template instance are
+expanded correctly at arity >= 3.
