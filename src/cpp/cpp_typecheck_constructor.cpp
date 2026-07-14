@@ -30,7 +30,8 @@ static void copy_parent(
   const source_locationt &source_location,
   const irep_idt &parent_base_name,
   const irep_idt &arg_name,
-  exprt &block)
+  exprt &block,
+  bool is_move = false)
 {
   exprt op0(
     "explicit-typecast",
@@ -42,9 +43,30 @@ static void copy_parent(
     "explicit-typecast",
     pointer_type(cpp_namet(parent_base_name, source_location).as_type()));
   op1.type().set(ID_C_reference, true);
-  to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
+  if(is_move)
+    op1.type().set(ID_C_rvalue_reference, true);
+  else
+    to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
   op1.get_sub().push_back(cpp_namet(arg_name, source_location));
   op1.add_source_location()=source_location;
+
+  // [class.copy.assign]/12: the implicit move-assignment operator assigns
+  // each base from the corresponding subobject of the source cast to an
+  // xvalue, *as if by the base's move-assignment operator*, so its side
+  // effects run (e.g. libstdc++'s __uniq_ptr_impl::operator=(&&) resets the
+  // target and nulls the moved-from pointer).  Use an expression assignment,
+  // which overload-resolves to the base's operator=; the copy path keeps the
+  // frontend assignment (a direct subobject copy) as before.
+  if(is_move)
+  {
+    side_effect_expr_assignt assign(
+      dereference_exprt(op0), op1, typet(), source_location);
+    assign.lhs().add_source_location() = source_location;
+    code_expressiont code(assign);
+    code.add_source_location() = source_location;
+    block.operands().push_back(code);
+    return;
+  }
 
   code_frontend_assignt code(dereference_exprt(op0), op1);
   code.add_source_location() = source_location;
@@ -61,7 +83,9 @@ static void copy_member(
   const source_locationt &source_location,
   const irep_idt &member_base_name,
   const irep_idt &arg_name,
-  exprt &block)
+  exprt &block,
+  bool is_move = false,
+  const typet &member_type = typet{})
 {
   cpp_namet op0(member_base_name, source_location);
 
@@ -69,6 +93,20 @@ static void copy_member(
   op1.add(ID_component_cpp_name, cpp_namet(member_base_name, source_location));
   op1.copy_to_operands(cpp_namet(arg_name, source_location).as_expr());
   op1.add_source_location()=source_location;
+
+  // [class.copy.assign]/12: the implicit move-assignment operator assigns
+  // each member from the corresponding member of the source cast to an
+  // xvalue, selecting the member's move-assignment operator (for scalars the
+  // xvalue simply yields the value, coinciding with a copy).
+  if(is_move && member_type.is_not_nil() && member_type.id() != ID_empty)
+  {
+    reference_typet rref = reference_type(member_type);
+    rref.set(ID_C_rvalue_reference, true);
+    exprt cast("explicit-typecast", rref);
+    cast.add_source_location() = source_location;
+    cast.add_to_operands(std::move(op1));
+    op1 = std::move(cast);
+  }
 
   side_effect_expr_assignt assign(op0.as_expr(), op1, typet(), source_location);
   assign.lhs().add_source_location() = source_location;
@@ -248,22 +286,36 @@ void cpp_typecheckt::default_cpctor(
     {
       irep_idt ctor_name=parsymb.base_name;
 
-      // Call the parent copy constructor.  N5008 [class.copy.ctor]/14: each
-      // base subobject is copied using its own copy constructor, applied to
-      // the corresponding base subobject of the source.  Slice the source
+      // Call the parent copy/move constructor.  N5008 [class.copy.ctor]/14:
+      // each base subobject is copied using its own copy constructor, applied
+      // to the corresponding base subobject of the source.  Slice the source
       // parameter to a `const Base&` (rather than passing the whole derived
       // object) so overload resolution sees the base type: passing the derived
       // object would let a converting/forwarding constructor template in the
       // base (e.g. `Base(U&&)`) deduce `U` as the derived type and match more
       // closely than the base copy constructor, selecting an unintended
       // constructor ([over.match.best], [temp.deduct]).
+      // For a defaulted MOVE constructor, [class.copy.ctor]/15: each base is
+      // direct-initialized from the corresponding subobject of the argument
+      // cast to an xvalue -- slice to `Base&&` instead, so overload resolution
+      // selects the base's move constructor and its side effects run (e.g.
+      // libstdc++'s __uniq_ptr_impl(__uniq_ptr_impl&&) nulls the moved-from
+      // pointer).
       const cpp_namet cppname(ctor_name, source_location);
 
-      exprt base_ref(
-        "explicit-typecast",
-        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      // Build the slicing cast's target type from the resolved base type
+      // (b.type(), a struct_tag) rather than the base's unqualified name: in
+      // an EBO-recursive hierarchy such as std::tuple's _Tuple_impl /
+      // _Head_base chain, the unqualified name is visible for several
+      // distinct specializations at once and does not uniquely resolve.
+      typet base_t = b.type();
+      base_t.remove(ID_C_base_name);
+      exprt base_ref("explicit-typecast", pointer_type(base_t));
       base_ref.type().set(ID_C_reference, true);
-      to_pointer_type(base_ref.type()).base_type().set(ID_C_constant, true);
+      if(is_move)
+        base_ref.type().set(ID_C_rvalue_reference, true);
+      else
+        to_pointer_type(base_ref.type()).base_type().set(ID_C_constant, true);
       base_ref.get_sub().push_back(
         cpp_namet(param_identifier, source_location));
       base_ref.add_source_location() = source_location;
@@ -271,6 +323,11 @@ void cpp_typecheckt::default_cpctor(
       codet mem_init(ID_member_initializer);
       mem_init.add_source_location()=source_location;
       mem_init.set(ID_member, cppname);
+      // Record the specific base subobject's type so the initializer's
+      // constructor lookup is scoped to that base (see `#base_type` in
+      // typecheck_member_initializer); the unqualified base name alone is
+      // ambiguous in the same hierarchies as above.
+      mem_init.add("#base_type") = b.type();
       mem_init.add_to_operands(std::move(base_ref));
       initializers.move_to_sub(mem_init);
     }
@@ -439,7 +496,8 @@ void cpp_typecheckt::default_assignop(
 /// Generate code for the implicit default assignment operator
 void cpp_typecheckt::default_assignop_value(
   const symbolt &symbol,
-  cpp_declaratort &declarator)
+  cpp_declaratort &declarator,
+  bool is_move)
 {
   // save source location
   source_locationt source_location=declarator.source_location();
@@ -495,7 +553,7 @@ void cpp_typecheckt::default_assignop_value(
     }
     cpp_scopes.current_scope_ptr = saved_scope;
 
-    copy_parent(source_location, symb.base_name, arg_name, block);
+    copy_parent(source_location, symb.base_name, arg_name, block, is_move);
   }
 
   // Then, we copy the members
@@ -531,7 +589,10 @@ void cpp_typecheckt::default_assignop_value(
         copy_array(source_location, mem_name, i, arg_name, block);
     }
     else
-      copy_member(source_location, mem_name, arg_name, block);
+    {
+      copy_member(
+        source_location, mem_name, arg_name, block, is_move, c.type());
+    }
   }
 
   // Finally we add the return statement

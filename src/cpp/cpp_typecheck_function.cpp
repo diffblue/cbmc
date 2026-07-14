@@ -717,6 +717,51 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
+  // [dcl.fct.def.default] + [class.copy.assign]/12-13: an explicitly-defaulted
+  // copy/move assignment operator performs memberwise assignment of the base
+  // subobjects and non-static data members (the source cast to an xvalue for
+  // the move operator, so base/member *move* assignment operators are
+  // selected).  Elaborate the body here, at conversion time, exactly like the
+  // defaulted copy/move constructor above; without this the `= default` body
+  // stays an empty block and the operator silently returns nondet.
+  if(
+    symbol.value.id() == ID_code &&
+    symbol.value.get_bool("#defaulted_function") &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands() &&
+    symbol.base_name == "operator=")
+  {
+    const code_typet &ft = to_code_type(symbol.type);
+    const irep_idt class_id = symbol.type.get(ID_C_member_name);
+    if(ft.parameters().size() == 2 && !class_id.empty())
+    {
+      const typet &pt = ft.parameters()[1].type();
+      const bool is_ref_to_self =
+        pt.id() == ID_pointer &&
+        (pt.get_bool(ID_C_reference) || pt.get_bool(ID_C_rvalue_reference)) &&
+        to_pointer_type(pt).base_type().id() == ID_struct_tag &&
+        to_struct_tag_type(to_pointer_type(pt).base_type()).get_identifier() ==
+          class_id;
+      const symbolt *class_symbol = symbol_table.lookup(class_id);
+      if(is_ref_to_self && class_symbol != nullptr)
+      {
+        // default_assignop_value refers to the source by the parameter name
+        // "ref"; alias it to this operator's actual parameter (see the
+        // defaulted-constructor elaboration above).
+        cpp_idt &ref_id = function_scope.insert(irep_idt{"ref"});
+        ref_id.identifier = ft.parameters()[1].get_identifier();
+        ref_id.id_class = cpp_idt::id_classt::SYMBOL;
+        ref_id.is_member = false;
+
+        cpp_declaratort tmp_declarator;
+        tmp_declarator.add_source_location() = symbol.location;
+        default_assignop_value(
+          *class_symbol, tmp_declarator, pt.get_bool(ID_C_rvalue_reference));
+        symbol.value = tmp_declarator.value();
+      }
+    }
+  }
+
   // [temp.deduct]/8 and the system-header analogue: when the
   // function whose body we are elaborating lives in a system
   // header, any typecheck failure is treated as SFINAE rather
