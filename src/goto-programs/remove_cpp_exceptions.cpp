@@ -24,6 +24,7 @@ Author: Kiro
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -107,6 +108,18 @@ protected:
   std::map<irep_idt, std::set<mp_integer>> handler_matches;
   std::size_t object_counter = 0;
 
+  // globals created by this pass with their initial values; their
+  // initializations must be appended to __CPROVER_initialize, which was
+  // generated before this pass ran (an uninitialized in-flight global reads
+  // as nondet and derails the dispatch)
+  std::vector<std::pair<symbol_exprt, exprt>> created_globals;
+
+public:
+  /// Append initializations of the globals this pass created to
+  /// __CPROVER_initialize (no-op if that function is not in the model).
+  void initialize_globals(goto_functionst &goto_functions);
+
+protected:
   symbol_exprt get_inflight_exception_global() override
   {
     return inflight_ptr;
@@ -167,7 +180,33 @@ symbol_exprt remove_cpp_exceptionst::make_global(
   sym.is_lvalue = true;
   sym.value = initial_value;
   symbol_table.insert(std::move(sym));
-  return symbol_exprt(name, type);
+  symbol_exprt result{name, type};
+  if(initial_value.is_not_nil())
+    created_globals.emplace_back(result, initial_value);
+  return result;
+}
+
+void remove_cpp_exceptionst::initialize_globals(goto_functionst &goto_functions)
+{
+  // CPROVER_PREFIX "initialize" (INITIALIZE_FUNCTION in linking/, which this
+  // module cannot depend on)
+  auto init_it = goto_functions.function_map.find(CPROVER_PREFIX "initialize");
+  if(init_it == goto_functions.function_map.end())
+    return;
+
+  goto_programt &init_body = init_it->second.body;
+  if(init_body.instructions.empty())
+    return;
+  // insert at the very front: __CPROVER_initialize may call C++ dynamic
+  // initialization, whose instrumented dispatches already read the globals
+  goto_programt::targett front = init_body.instructions.begin();
+  const source_locationt loc = front->source_location();
+
+  for(const auto &[global, value] : created_globals)
+  {
+    init_body.insert_before(
+      front, goto_programt::make_assignment(global, value, loc));
+  }
 }
 
 std::pair<symbol_exprt, symbol_exprt>
@@ -403,5 +442,6 @@ void remove_cpp_exceptions(goto_modelt &goto_model, message_handlert &msg)
   if(!pass.prepare(goto_model.goto_functions))
     return; // no exceptions: nothing to do
   pass(goto_model.goto_functions);
+  pass.initialize_globals(goto_model.goto_functions);
   goto_model.goto_functions.update();
 }
