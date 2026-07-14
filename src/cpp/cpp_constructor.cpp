@@ -498,7 +498,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       // [dcl.init.aggr]/1: a class with a user-declared constructor is not an
       // aggregate.  A template constructor is not stored as a regular component
       // (so the scan below would miss it); the struct carries a flag instead.
-      bool has_user_ctor = struct_type.get_bool("has_template_constructor");
+      // C++17: inherited constructors (using Base::Base) also make the class a
+      // non-aggregate.
+      bool has_user_ctor = struct_type.get_bool("has_template_constructor") ||
+                           struct_type.get_bool("has_inherited_constructor");
       for(const auto &c : struct_type.components())
       {
         if(c.type().id() != ID_code || c.get_bool(ID_from_base))
