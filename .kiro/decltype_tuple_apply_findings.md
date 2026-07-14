@@ -2132,3 +2132,30 @@ cpp_typecheck_expr.cpp (~4552), where the enclosing (mk) template_map is
 active and the callee's own pack `Us` must be bound from the explicit args.
 Flipping this KNOWNBUG should flip cpp17_tuple_basic (and possibly the map
 tests).  Suite green, 94 skipped (new KNOWNBUG added).
+
+## cpp17_ctor_template_cross_pack_constraint — FIXED (2026-07-14, 3a941e1d07)
+
+Root: at fn-template SFINAE default-argument evaluation
+(guess_function_template_args, non-type-default branch ~7480), the deduced
+parameter pack's ELEMENT TYPES were absent from the template map (only its
+SIZE was pre-recorded), so an explicit-arg pack expansion in the constraint
+(`ok<Us...>()`) collapsed to `ok<>()` -- folded over no args -> ctor rejected
+-> "no match" -> swallowed -> caller bodyless (nondet).  [temp.deduct]/5.
+
+ARCHITECTURE LESSON: binding the pack elements UNCONDITIONALLY before the
+defaults loop regressed cpp17_tuple_get_two_pack_ctor_3elem (a CORE test whose
+two-parallel-pack constraint only resolves against the enclosing map).  Final
+fix = try historical order first, RETRY ONCE with the deduced pack bound (in a
+cpp_saved_template_mapt frame) on failure.  Both tests pass; suite green (94
+skipped).
+
+Side-find (new KNOWNBUG cpp17_fold_comma_single): unary right fold over comma
+with a ONE-element pack mis-expands to `true` (multi-element correct).
+
+cpp17_tuple_basic: STILL KNOWNBUG (third layer).  With layers 1-2 fixed, the
+real make_tuple still fails "no match for '__result_type'"; probes show all
+minimal variants (incl. __valid_args-style member-fn default + alias hop + V,
+M9/M10) now PASS, so the residue is yet another real-header detail --
+next suspect: the noexcept(__nothrow_constructible<_UElements...>()) specifier
+on the forwarding ctor, or the _ImplicitDefaultCtor FALSE fold seen for
+tuple<int,int,int> (its __is_implicitly_default_constructible wrongly FALSE).
