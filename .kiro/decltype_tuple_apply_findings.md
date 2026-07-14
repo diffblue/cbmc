@@ -2078,3 +2078,30 @@ Debug hack (CBMC_DBG syshdr-suppression disable) applied temporarily and
 REMOVED; tree clean.  This remains the practical route into cluster A: fixing
 the arity>=3 alias-pack resolution would flip tuple_basic and likely help
 map_basic/map_insert.
+
+## cpp17_tuple_basic — instrumentation session (2026-07-14 evening)
+
+Layered root-cause via probes (ALL removed):
+  * FOLD probe (cpp_typecheck_expr constexpr fold): arity 3 folded
+    __is_implicitly_constructible<>() (EMPTY args) vs arity 2's full args.
+  * AMB probe (template_map.apply cpp_name template-args walker): ident=_Args
+    was_pack=1 via matches_empty_pack, with NO _Args in pack_args_map and
+    deferred_own_pack_names.count(_Args)=1 -- collapsed against STALE
+    same-named zero entries (std::template::NNN::_Args=0 from unrelated
+    earlier builds; flat-map V2 violation).
+  * FIX (committed 408608ba8d): matches_empty_pack returns false for
+    deferred_own_pack_names members ([temp.alias]/2 + [temp.inst]/2).
+    Constraints now fold with full args.  For tuple the VERDICT is unchanged
+    (empty __and_<> vacuously true) so the test does not flip, but
+    argument-dependent constraints would fold wrongly without it.
+  * LAYER 2 (remaining, from candidate dump with syshdr suppression disabled):
+    `__result_type(...)` ctor resolution: forwarding ctor shows `? &&`
+    (its _UElements pack NOT expanded to 3 params) and the const _Elements&...
+    ctor shows const STRIPPED (`__decay_t<T> &`).  Both are member ctor
+    TEMPLATES of the instance -- their parameter substitution at arity>=3 is
+    the next target.  Note template_map.apply's member-walk explicitly skips
+    ctors ("have their own empty-pack handling in cpp_instantiate_template")
+    -- that ctor-specific path is where the const/expansion loss must be.
+  * The stale-pack precondition could not be recreated header-free in
+    isolation (needs a same-cascade instantiation history), so no separate
+    KNOWNBUG test for layer 1; the tuple KNOWNBUG covers the stack.
