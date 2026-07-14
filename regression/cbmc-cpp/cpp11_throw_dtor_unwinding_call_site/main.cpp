@@ -7,14 +7,11 @@
 //   g2: a local of an intermediate function (no try) through which the
 //       exception propagates -- destroyed as that function unwinds.
 //
-// KNOWNBUG: destructor-unwinding is emitted only at throw sites (up to the
-// innermost enclosing try of the *throwing* function).  The exceptional edge
-// at a *call site* runs no destructors: objects constructed between the try
-// entry and the call (g1), and locals of intermediate functions without a try
-// (g2), are never destroyed.  Fixing this needs a guarded unwind block after
-// possibly-throwing calls (from the call's scope down to the innermost try),
-// coordinated between goto conversion and the exception-lowering pass.  Flip
-// to CORE once call-site unwinding runs these destructors.
+// Fixed by guarded call-site unwind cleanups: after each possibly-throwing
+// call, the goto conversion emits the destructors of the objects between the
+// call's scope and the innermost enclosing try (or the function base),
+// followed by a propagate-marker dispatch, so the destructors run before any
+// handler.
 
 extern "C" void __CPROVER_assert(int, const char *);
 
