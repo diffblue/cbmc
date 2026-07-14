@@ -1800,6 +1800,12 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   bool found_ctor = false;
   bool found_dtor = false;
+  // the class declares its own default constructor (zero / all-defaulted
+  // parameters)
+  bool found_own_default_ctor = false;
+  // a using-declaration inherits the base's default constructor
+  // ([class.inhctor.init])
+  bool inherited_default_ctor = false;
 
   // we first do everything _but_ the constructors
 
@@ -2268,6 +2274,22 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         if(declaration.is_constructor())
         {
           found_ctor = true;
+          // [class.default.ctor]/1, [class.inhctor.init]: track whether the
+          // class declares its *own* default constructor (no declared
+          // parameters, or all parameters defaulted).  Used below to decide
+          // whether an inherited base default constructor makes the class
+          // default-constructible.
+          bool all_defaulted = true;
+          for(const auto &p : declarator.type().find(ID_parameters).get_sub())
+          {
+            if(p.find(ID_value).is_nil())
+            {
+              all_defaulted = false;
+              break;
+            }
+          }
+          if(all_defaulted)
+            found_own_default_ctor = true;
           continue;
         }
 
@@ -2532,9 +2554,17 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               const code_typet &ctor_type = to_code_type(comp.type());
               if(ctor_type.return_type().id() != ID_constructor)
                 continue;
-              // Skip default and copy/move constructors
+              // A base default constructor is inherited ([namespace.udecl]/2)
+              // and per [class.inhctor.init] initializing the derived object
+              // with it is exactly a defaulted default constructor of the
+              // derived class; record it and synthesize that below.  Base
+              // copy/move constructors are excluded from the candidate set
+              // ([over.match.funcs.general]/9), so they are skipped entirely.
               if(ctor_type.parameters().size() <= 1)
+              {
+                inherited_default_ctor = true;
                 continue;
+              }
               if(
                 ctor_type.parameters().size() == 2 &&
                 ctor_type.parameters()[1].type().id() == ID_pointer &&
@@ -2583,7 +2613,18 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   if(symbol.type.id() == ID_struct)
     do_virtual_table(symbol);
 
-  if(!found_ctor && !cpp_is_pod(symbol.type))
+  // [class.default.ctor]/1: an implicit default constructor exists when the
+  // class has no user-declared constructor.  In addition, a base default
+  // constructor inherited by a using-declaration makes the class default-
+  // constructible even when other constructors are user-declared; per
+  // [class.inhctor.init] initialization by it is exactly a defaulted default
+  // constructor of this class (the base subobject is initialized by the
+  // inherited constructor, everything else default-initializes), so
+  // synthesizing the defaulted default constructor models it precisely.  The
+  // class's own default constructor, if any, takes precedence.
+  if(
+    (!found_ctor || (inherited_default_ctor && !found_own_default_ctor)) &&
+    !cpp_is_pod(symbol.type))
   {
     // C++11: the default constructor is implicitly deleted if any
     // non-static data member is a reference type.
