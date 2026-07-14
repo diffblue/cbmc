@@ -2,21 +2,16 @@
 // std::unique_ptr value-initializes the stored pointer -- a default-
 // constructed unique_ptr is null.  g++ and clang++ agree (runtime-checked).
 //
-// KNOWNBUG: cbmc leaves the stored pointer nondet.  unique_ptr's default
-// constructor is a *constructor template* (constrained on the deleter):
-//   template<typename _Del = _Dp, typename = _DeleterConstraint<_Del>>
-//   constexpr unique_ptr() noexcept : _M_t() { }
-// Its specialization symbol is created during overload resolution, but with a
-// nil body: the inline body is never sourced from the member template of the
-// lazily-completed unique_ptr<C> instance (the deferred member-body
-// instantiation gap, same family as the map/tuple "no body for callee"
-// cases).  The silent nil body makes the constructor call a no-op, so the
-// member stays nondet and every unique_ptr value property downstream
-// (release/reset/move-assignment, delete preconditions) fails from this one
-// root.  Hand-written replications of the constructor-template shape work;
-// the trigger needs the real libstdc++ lazy-completion path (cvise reductions
-// either drift to a different specialization-matching bug or into UB
-// artifacts).  Flip to CORE once member bodies are instantiated on odr-use.
+// Fixed by modelling C++17 inheriting constructors ([namespace.udecl]/2,
+// [class.inhctor.init]): libstdc++'s __uniq_ptr_data inherits its base's
+// constructors via `using __uniq_ptr_impl::__uniq_ptr_impl;` and declares
+// only defaulted move members, so its default construction goes through the
+// inherited base default constructor -- which is exactly equivalent to a
+// defaulted default constructor of the derived class, and is synthesized as
+// such.  Previously the inherited default constructor was skipped, the
+// member initializer `_M_t()` in unique_ptr's constructor found no candidate,
+// the failure was swallowed for system headers, and the constructor became a
+// silent no-op leaving the pointer nondet.
 
 #include <memory>
 
