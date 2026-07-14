@@ -2023,3 +2023,29 @@ Remaining KNOWNBUGs: cluster A (map/tuple no-body), cpp11_inheriting_constructor
 (parameterized inherited ctor values), cpp20_apple_libcxx_basic,
 cpp23_expected_basic, cpp11_regex_match, cpp20_iterator_traits_category,
 cpp11_throw_dtor_unwinding (none left in cluster B).
+
+## cpp11_inheriting_constructor — FIXED (2026-07-14)
+
+Bisection: plain inherited ctors worked (morning's work); inherited ctor
+TEMPLATES failed (V3) -- they are not struct components, so the import loop
+never saw them, and cpp_constructor fell back to aggregate init (dropping
+args).  Two-part fix:
+  1. cpp_typecheck_compound_type.cpp import block: register the base's
+     constructor-template TEMPLATE ids (base scope lookup by base_name) in the
+     derived class's scope under the derived name -- same mechanism as
+     instantiate_template's member-fn-template registration.  Overload
+     resolution then instantiates them; the instantiated base ctor initializes
+     the base subobject via the `this`-upcast call ([class.inhctor.init]).
+  2. cpp_constructor.cpp: `has_inherited_constructor` flag (set at import)
+     ORed into the has_user_ctor aggregate-init gate ([dcl.init.aggr]/1 C++17:
+     inherited ctors make the class a non-aggregate).
+Verified: original KNOWNBUG -> CORE (--cpp20); new header-free
+cpp11_inheriting_ctor_template CORE (plain + class-template + own-ctor
+precedence), all g++/clang++ runtime cross-checked.  Full suite green, 93
+skipped.
+
+Remaining KNOWNBUGs: cluster A (cpp20_map_basic, cpp11_map_insert,
+cpp17_tuple_basic), cpp20_apple_libcxx_basic, cpp23_expected_basic,
+cpp11_regex_match, cpp20_iterator_traits_category,
+cpp11_throw_dtor_unwinding_call_site is CORE now -- checking list: also
+cpp11_unique_ptr tests all CORE.
