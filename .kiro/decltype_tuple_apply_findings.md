@@ -2105,3 +2105,30 @@ Layered root-cause via probes (ALL removed):
   * The stale-pack precondition could not be recreated header-free in
     isolation (needs a same-cascade instantiation history), so no separate
     KNOWNBUG test for layer 1; the tuple KNOWNBUG covers the stack.
+
+## tuple_basic layer 2 — MINIMAL REPRODUCER FOUND (2026-07-14 late)
+
+cpp17_ctor_template_cross_pack_constraint (KNOWNBUG, header-free, 35 lines).
+Essential ingredients (each verified by single-dimension toggling):
+  1. ctor template of a variadic class template, constrained via SFINAE
+     default template arg `enable_if_t<TCs<Es...>::template ok<Us...>(), bool> = true`;
+  2. the constexpr callee `ok` is a MEMBER fn template of a SECOND class
+     template instantiated over the class pack (free constexpr fn => PASS);
+  3. `ok`'s body uses its OWN pack: `sizeof...(Us)` (body using only the
+     class pack or a constant => PASS ... note: `return true` also PASSes;
+     `sizeof...(Us)==1` REPRODUCES);
+  4. construction inside a FUNCTION TEMPLATE's instantiated body
+     (direct construction in main => PASS).
+NON-essential (all toggled out): fwd/forwarding of args, the typedef R, the
+member alias hop (ImplicitCtor), the `bool V` default param, arity >= 2
+(arity 1 reproduces!), forwarding-reference vs by-value pack params.
+Failure mode: "found no match for symbol 'tup'" during mk's body conversion
+=> swallowed => mk bodyless => nondet.  Direct main-scope construction works,
+so the defect is in evaluating the cross-template constexpr constraint (with
+the callee's own pack) while inside another instantiation's body conversion —
+likely the eager constexpr member-fn conversion path in
+cpp_instantiate_template.cpp (~4561) or the constexpr-eval in
+cpp_typecheck_expr.cpp (~4552), where the enclosing (mk) template_map is
+active and the callee's own pack `Us` must be bound from the explicit args.
+Flipping this KNOWNBUG should flip cpp17_tuple_basic (and possibly the map
+tests).  Suite green, 94 skipped (new KNOWNBUG added).
