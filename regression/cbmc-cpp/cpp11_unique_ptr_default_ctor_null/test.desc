@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ default-constructed unique_ptr is null: SUCCESS$
@@ -8,12 +8,10 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [unique.ptr.single.ctor]/1 -- a default-constructed unique_ptr must
-be null, but the constructor-template specialization
-unique_ptr<C>::unique_ptr() is created with a nil body (the inline body is
-never sourced from the member template of the lazily-completed class
-instance), so the call is a silent no-op and the pointer stays nondet
-(assertion currently FAILS).  Root of all unique_ptr value/delete-precondition
-failures in cpp11_unique_ptr_member_enable_if.  Same deferred member-body
-instantiation gap as the map/tuple "no body for callee" cases.  Flip to CORE
-once member bodies are instantiated on odr-use.
+[unique.ptr.single.ctor]/1 -- a default-constructed unique_ptr is null.  Fixed
+by modelling C++17 inheriting constructors ([class.inhctor.init]): a base
+default constructor inherited via using Base::Base makes the derived class
+(here libstdc++'s __uniq_ptr_data, which only declares defaulted move members)
+default-constructible, synthesized as the defaulted default constructor it is
+exactly equivalent to.  Previously the constructor chain silently failed and
+the stored pointer stayed nondet.

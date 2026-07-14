@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+[namespace.udecl]/2 + [class.inhctor.init]: an inherited base default
+constructor makes the derived class default-constructible (also when defaulted
+move members suppress the implicit default constructor), and the class's own
+default constructor takes precedence.  Cross-checked against g++ and clang++.
