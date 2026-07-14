@@ -422,7 +422,9 @@ protected:
       const symbolt &symbol, cpp_declarationt &cpctor);
 
   void default_assignop_value(
-      const symbolt &symbol, cpp_declaratort &declarator);
+    const symbolt &symbol,
+    cpp_declaratort &declarator,
+    bool is_move = false);
 
   void default_dtor(const symbolt &symb, cpp_declarationt &dtor);
 
