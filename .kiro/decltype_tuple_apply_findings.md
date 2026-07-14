@@ -2049,3 +2049,32 @@ cpp17_tuple_basic), cpp20_apple_libcxx_basic, cpp23_expected_basic,
 cpp11_regex_match, cpp20_iterator_traits_category,
 cpp11_throw_dtor_unwinding_call_site is CORE now -- checking list: also
 cpp11_unique_ptr tests all CORE.
+
+## cpp17_tuple_basic — diagnosis sharpened (2026-07-14), still KNOWNBUG
+
+Fresh reproduction after today's fixes:
+  * Direct `std::tuple<int,double,char> t(1,2.0,'a')` PASSES now.
+  * make_tuple matrix: ALL arity<=2 PASS (tuple<T1,T2> partial spec);
+    ALL arity>=3 FAIL (variadic primary).  No "no body" warning (silent).
+  * With syshdr suppression disabled: converting make_tuple's body fails with
+    "found no match for symbol '__result_type'" (the return-type typedef
+    tuple<__decay_and_strip<_Elements>::__type...>), backtrace shows
+    _ImplicitCtor/_ExplicitCtor/_TCC constraint aliases instantiated with
+    UNRESOLVED `__decay_t<signed_int>` argument types and
+    __enable_if_t<FALSE,bool> => constraints wrongly false, body dropped,
+    nondet return.
+  * Old (2026-07-13) braced-init call-pack root note is STALE (that bug was
+    fixed; the residual is this alias-resolution issue).
+  * Hand replications (struct-with-nested-alias-typedef pack expansion;
+    member alias templates over constexpr constraint fn; combined) all PASS.
+  * cvise x2 (sharper oracle second time: exact swallowed-error signature +
+    unresolved-__decay_t marker) both reduced to clang++-rejected artifact
+    skeletons => drifted; trigger tied to further real-header detail
+    (candidates: the tuple(allocator_arg_t,...) ctor family, the tuple<T1,T2>
+    partial spec coexisting with the primary, __is_final/__empty_not_final in
+    _Head_base selection, or the sheer alias nesting depth of __decay_t via
+    __conditional_t).
+Debug hack (CBMC_DBG syshdr-suppression disable) applied temporarily and
+REMOVED; tree clean.  This remains the practical route into cluster A: fixing
+the arity>=3 alias-pack resolution would flip tuple_basic and likely help
+map_basic/map_insert.
