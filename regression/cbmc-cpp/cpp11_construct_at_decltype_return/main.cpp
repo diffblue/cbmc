@@ -5,17 +5,13 @@
 // _Tp and the _Args pack from the call arguments and then form the return
 // type, so the call resolves.
 //
-// KNOWNBUG: with TWO or more call arguments constructing a class-template
-// instance, deduction of `construct_at` fails ("found no match for symbol
-// 'construct_at'") -- the trailing-return `decltype` over the pack-
-// expanded placement-new is not handled during argument deduction.  The
-// plain-return flavour of the same body works
-// (cpp11_construct_at_pack_args); this decltype-return flavour is the
-// residual C++20 std::construct_at blocker of cpp20_map_basic.  Bisection:
-// one call argument works; a plain `_Tp*` return works (p2); the trailing
-// `decltype(new ... _Tp(declval<_Args>()...))` return with >= 2 args
-// fails.  Flip to CORE when the trailing-return decltype over a pack-
-// expanded new-expression is deduced.  g++/clang++ runtime-verified.
+// Was KNOWNBUG: with two or more call arguments constructing a
+// class-template instance, deduction of `construct_at` failed ("found no
+// match") because the trailing-return `decltype` over the pack-expanded
+// placement-new was not expanded during argument deduction.  Fixed by
+// treating a cpp_new initializer's expression-list as a pack-expansion
+// context in template_mapt::expand_call_argument_packs.  g++/clang++
+// runtime-verified.
 extern "C" void __CPROVER_assert(int, const char *);
 
 template <typename T>
