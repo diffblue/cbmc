@@ -1169,16 +1169,31 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
     // N5008 [temp.variadic]/5,8: replay the deduction-time pack bindings
     // recorded on the pseudo-instance (multi-pack member templates, e.g.
-    // std::pair's piecewise constructor).  The template map active during
-    // deduction has been unwound by now; without this the instantiation
-    // below rebuilds the packs from the flat argument list, which cannot
-    // encode the split between two packs (template_mapt::build then keeps
-    // whatever pack state is current -- see its n_packs > 1 branch).
+    // std::pair's piecewise constructor and its delegation target with
+    // non-type index packs).  The template map active during deduction has
+    // been unwound by now; without this the instantiation below rebuilds
+    // the packs from the flat argument list, which cannot encode the split
+    // between the packs (template_mapt::build then keeps whatever pack
+    // state is current -- see its n_packs > 1 branch).
     {
       const irept &packs = e.type().find("#deduced_packs");
       for(const auto &entry : packs.get_sub())
       {
         const irep_idt pid = entry.get(ID_identifier);
+        if(entry.id() == ID_expression)
+        {
+          // non-type pack: element VALUES
+          std::vector<exprt> vals;
+          for(const auto &v : entry.get_sub())
+            vals.push_back(static_cast<const exprt &>(v));
+          cpp_typecheck.template_map.pack_size_map[pid] = vals.size();
+          if(!vals.empty())
+          {
+            cpp_typecheck.template_map.pack_expr_map[pid] = vals;
+            cpp_typecheck.template_map.expr_map[pid] = vals.front();
+          }
+          continue;
+        }
         std::vector<typet> elems;
         for(const auto &t : entry.get_sub())
           elems.push_back(static_cast<const typet &>(t));
@@ -7385,9 +7400,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // is not an instance of), the entire deduction has FAILED; the
           // pack is not "empty", the candidate is not viable.
           if(args[i].get_bool("#deduction_failed"))
-          {
             return nil_exprt();
-          }
 
           const std::string full_id =
             id2string(param.type().get(ID_identifier));
@@ -8075,12 +8088,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   // N5008 [temp.variadic]/5,8: when the template-parameter-list contains
   // MORE THAN ONE parameter pack (e.g. std::pair's piecewise constructor
-  // `template<class... _Args1, class... _Args2>`), the flat
-  // ID_C_template_arguments list recorded on the pseudo-instance cannot
-  // encode how the deduced arguments split between the packs.  Record the
-  // deduction-time pack bindings on the instance so the final
+  // `template<class... _Args1, class... _Args2>`, or its delegation
+  // target `template<class... _Args1, size_t... _Indexes1, ...>`), the
+  // flat ID_C_template_arguments list recorded on the pseudo-instance
+  // cannot encode how the deduced arguments split between the packs.
+  // Record the deduction-time pack bindings on the instance so the final
   // instantiation (whose template_map has been restored by the nested
-  // cpp_saved_template_mapt by then) can replay them.
+  // cpp_saved_template_mapt by then) can replay them.  A TYPE pack's
+  // elements live in pack_args_map; a NON-TYPE pack's element VALUES live
+  // in pack_expr_map -- record both, marking each entry's kind.
   {
     const auto &t_params =
       cpp_declaration.template_type().template_parameters();
@@ -8098,11 +8114,21 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
                                                 : tp.get(ID_identifier);
         const auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pid);
-        irept entry(ID_type);
+        const auto pe_it = cpp_typecheck.template_map.pack_expr_map.find(pid);
+        irept entry(tp.id() == ID_type ? ID_type : ID_expression);
         entry.set(ID_identifier, pid);
-        if(pa_it != cpp_typecheck.template_map.pack_args_map.end())
-          for(const auto &t : pa_it->second)
-            entry.get_sub().push_back(t);
+        if(tp.id() == ID_type)
+        {
+          if(pa_it != cpp_typecheck.template_map.pack_args_map.end())
+            for(const auto &t : pa_it->second)
+              entry.get_sub().push_back(t);
+        }
+        else
+        {
+          if(pe_it != cpp_typecheck.template_map.pack_expr_map.end())
+            for(const auto &v : pe_it->second)
+              entry.get_sub().push_back(v);
+        }
         packs.get_sub().push_back(entry);
       }
       template_function_instance.type().add("#deduced_packs") = packs;
