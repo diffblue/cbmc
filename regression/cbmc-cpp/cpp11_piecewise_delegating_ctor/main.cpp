@@ -16,13 +16,13 @@
 // non-type index packs.  g++/clang++ run this to completion
 // (runtime-verified).
 //
-// KNOWNBUG: resolving the delegation target inside the mem-initializer
-// fails (deduction of the four zipped packs -- the two-pack machinery
-// handles two type packs, not the mixed four-pack form), the swallowed
-// error leaves the piecewise constructor's instance with an EMPTY body,
-// and the constructed pair keeps garbage.  On std::map this is the
-// remaining blocker of cpp20_map_basic: the first insert stores a garbage
-// key, the read-back re-inserts, and unbounded unwinding diverges.
+// Was KNOWNBUG: resolving the delegation target inside the
+// mem-initializer failed (the multi-pack deduction machinery recorded
+// only TYPE pack elements, losing non-type index-pack values), the
+// out-of-line definition attach copied the body but not the
+// ctor-initializer, same-named overloaded definitions were confused, and
+// the drain rebuilt the template map from a flat list that cannot encode
+// the pack split.  All fixed; see test.desc.
 extern "C" void __CPROVER_assert(int, const char *);
 
 struct pc_t
