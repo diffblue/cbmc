@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ int swappable: SUCCESS$
@@ -9,11 +9,15 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [temp.inst]/5 -- an unevaluated operand (the swap call inside the
-__is_swappable-style SFINAE probe's decltype) requires only the declaration of
-the selected overload, but cbmc instantiates the definition.  On std::map this
-surfaces as a collateral std::swap<void> instantiation whose void-typed local
-aborts the enclosing member conversion (the residual map blocker); here it
-makes both is_swappable results mis-evaluate FALSE (both assertions currently
-FAIL).  g++/clang++ runtime-verified.  Flip to CORE once unevaluated operands
-stop instantiating definitions.
+__is_swappable-style SFINAE probe (two-overload __declval chain + decltype
+default template argument), read through a class-local typedef by an in-class
+static data member initializer.  The root cause turned out NOT to be
+[temp.inst]/5 definition-instantiation from the unevaluated operand: bisection
+showed `static const bool value = type::value;` reading ANY class-local
+typedef mis-evaluated, because the in-class initializer was type-checked
+mid-elaboration (sibling members unresolvable) and, on failure, silently left
+as a raw cpp_name that reads as nondet.  Fixed per N5008
+[basic.scope.class] (the initializer is in the scope of the class, so
+earlier-declared member names must resolve): initializers whose value
+still contains a cpp_name are queued and re-type-checked in the class scope
+once the class is complete.  g++/clang++ runtime-verified.

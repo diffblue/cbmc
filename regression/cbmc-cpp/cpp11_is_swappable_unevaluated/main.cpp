@@ -1,17 +1,16 @@
-// N5008 [temp.inst]/5 + [expr.context]: an unevaluated operand (the
-// decltype(swap(declval<T&>(), declval<T&>())) in the __is_swappable-style
-// SFINAE probe) requires only the DECLARATION of the selected overload; the
-// definition is not instantiated.  g++ and clang++ evaluate both assertions
-// below to true (runtime-verified).
+// N5008 [basic.scope.class]: the in-class initializer of a static data
+// member is type-checked in the scope of the class, so it must resolve
+// earlier-declared class-local typedefs (here the
+// `typedef decltype(test<T>(0)) type;` feeding `value = type::value;` in the
+// __is_swappable-style SFINAE probe).  g++ and clang++ evaluate both
+// assertions below to true (runtime-verified).
 //
-// KNOWNBUG: cbmc instantiates the swap DEFINITION from the unevaluated probe
-// (observed on std::map as a collateral `std::swap<void>` instantiation whose
-// void-typed local aborts the enclosing conversion -- the residual blocker of
-// cpp20_map_basic / cpp11_map_insert after the drain-parity and out-of-line
-// attachment fixes).  Here the definition for NoCopy is ill-formed (deleted
-// copy), and its instantiation poisons the probe: both is_swappable<int> and
-// is_swappable<NoCopy> mis-evaluate FALSE.  Flip to CORE once unevaluated
-// operands stop instantiating definitions.
+// Was KNOWNBUG: cbmc type-checked the initializer mid-elaboration, where the
+// class-local typedef was not yet resolvable; the failure was swallowed and
+// the member's value silently left as a raw cpp_name, which read as nondet
+// downstream -- both is_swappable<int> and is_swappable<NoCopy> mis-evaluated
+// FALSE.  Fixed by deferring cpp_name-bearing static-member initializers to
+// the end of the class and re-type-checking them in the class scope.
 //
 extern "C" void __CPROVER_assert(int, const char *);
 template<typename _Tp, typename _Up = _Tp &&> _Up __declval(int);
