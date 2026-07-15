@@ -2236,3 +2236,27 @@ defined) lacks one.  Probe-driven layer analysis (all probes removed):
     renaming path).
 Suite green 94 skipped.  Next steps: (1) unpeel "void-typed symbol" on map,
 (2) fix out-of-line attachment for the minimal, (3) re-run map/tuple.
+
+## cpp11_out_of_line_member_template_pack — FIXED (2026-07-15 early)
+
+Root (probe chain FWD->REG->TM): the out-of-line definition lives ONLY as a
+template_methods entry of the enclosing class template (owner
+`template.tree<Type0>`, entry base emplace, value present); there is NO scope
+TEMPLATE id for it (REG probe: scope_only=0), so neither the instance-scope
+forward-decl recovery (~2583; parent-candidates=1 = only itself) nor the
+class-instantiation deferred recovery (runs only for deferred_typechecking
+entries at class-instantiation time) ever attached it.  The instance's fresh
+member-template symbol stayed bodyless.
+
+FIX: in instantiate_template's member-fn-template branch, when the declarator
+value is nil, search template_methods across template symbols with the OWNER
+matched (class base-name comparison between `<class-instance>::template.<m>`
+and the entry's owning `template.<class><params>`); attach the raw body and
+adopt the definition's parameter names ([dcl.fct]/3).  First filter attempt
+(n_md > n_cls param-count heuristic) was WRONG (the stored template_type holds
+only the member's own list) -- TM probe showed the entry rejected; replaced by
+the owner match.
+
+Verified: minimal -> CORE; suite green 94 skipped.  Map/tuple still fail on
+their NEXT layers ("void-typed symbol not permitted" for map -- unchanged by
+this fix since libstdc++'s attachment already worked via a different route).
