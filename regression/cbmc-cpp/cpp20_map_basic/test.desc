@@ -14,9 +14,11 @@ Reclassified CORE -> KNOWNBUG by the member-typedef conformance fix
 ([temp.inst]/1-2, [dcl.typedef]).  Previously this passed only because the
 non-conformant *truncated* std::map had its operations havoc'd (symex executed
 none of the real container; the property was vacuous).  The fix makes the front
-end conformant and symex now executes the REAL std::map / _Rb_tree machinery,
-which does not complete within resources (the heavy tuple/piecewise pair
-construction, cf. the long-standing cpp11_map_insert KNOWNBUG).
+end conformant and symex now executes the REAL std::map / _Rb_tree machinery.
+The piecewise-construction conformance chain that fixed cpp11_map_insert
+(now CORE, ~1.4s WITH --unwind 5) applies here too, but this test runs
+--cpp20 with NO unwind bound: full unwinding of the _Rb_tree loops does not
+complete within 10 minutes.
 
 Second-tier verification-PERFORMANCE item, not a conformance one; the previous
 "pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
