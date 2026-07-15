@@ -2443,3 +2443,59 @@ passes (d11); delegation to the four-pack target fails with a single
 resolve throw in typecheck_member_initializer -- so the gap is the mixed
 four-pack (type+non-type index) deduction in the mem-initializer
 context, not delegation per se and not the four-pack ctor per se.
+
+## piecewise delegating ctor FIXED -> CORE (2026-07-15 evening)
+
+Six-part fix chain (each bisected header-free; commits in order):
+
+1. #deduced_packs machinery recorded only TYPE pack elements; NON-type
+   index-pack VALUES (pack_expr_map) added to annotate+replay
+   ([temp.variadic]/8).  Minimal: e3/e7 (mixed type+non-type pack target
+   called from any instantiated body).
+2. Out-of-line definition adoption (3 sites: typecheck_class_template_member
+   merges x2 at ~675/~1045, instantiate attach x2 at ~4300/~4560) copied the
+   BODY but not the MEM-INITIALIZER-LIST -- [class.base.init]/1 says the
+   ctor-initializer is part of the definition.  Minimal: f1 (out-of-line
+   delegating, literal index_tuple args).  KEY probe insight: the value was
+   attached by the THIRD site (search which one fires!).
+3. Same-named overloaded member-template definitions (pair's TWO piecewise
+   ctors) confused by base-name-only matching in the attach blocks; added
+   param-count discrimination ([over.load], [dcl.fct]/3).  Minimal: z2
+   (BOTH ctors out-of-line).
+4. Empty-pack mem-init argument removal dropped `sizeof...(EMPTY)` mentions
+   (breaking `_Build_index_tuple<sizeof...(_Args2)>::__type()`, shifting
+   the delegation args); refined to drop only refs OUTSIDE #sizeof_pack
+   ([temp.variadic]/4 vs /8).  Minimal: d10 (build_index<sizeof...> args).
+5. Drain-side: #fn_template_packs persisted on the method symbol +
+   replayed in prepare_deferred_method_body (flat #fn_template_args can't
+   encode multi-pack splits); plus the same sizeof...-aware empty-pack
+   arg removal on member_initializer statements in the prepared body
+   (`second(forward<_Args2>(get<_Indexes2>(t2))...)` with empty packs ->
+   `second()`).
+6. [expr.static.cast]/3: static_cast<Base&&>(derived_lvalue) -- the
+   std::_Tuple_impl MOVE ctor shape `: _Base(static_cast<_Base&&>(__in))`
+   -- was rejected (exact-type-only rref branch in static_typecast).
+   This was EXPOSED as a cpp11_map_insert REGRESSION mid-session (the
+   newly-converting piecewise chain finally CALLED tuple's move ctor,
+   which was bodyless; moved-to tuple's reference member NULL).  Minimal:
+   m2 (25 lines) -> CORE test cpp11_static_cast_base_rref.
+   NOTE argument-order trap: subtype_typecast(from, to) checks `to` is a
+   BASE of `from` -- the lvalue-ref branch's call is a DOWNCAST check.
+
+Wins verified: cpp11_piecewise_delegating_ctor -> CORE;
+`m[1]=42; assert(m[1]==42)` verifies ~1.6s (--cpp11 --unwind 5);
+cpp20_map_basic's PROGRAM verifies UNBOUNDED under --cpp11 (0 of 1427).
+Suite green, 91 skipped.
+
+RESIDUAL: cpp20_map_basic under --cpp20 still KNOWNBUG -- the C++20
+header path constructs the node via std::construct_at/_S_construct
+(constexpr allocator_traits chain); key byte again malloc garbage
+(storage[0]=64), unbounded decrement walk diverges.  NEXT SESSION: find
+which body in the construct_at chain fails/is modeled away under
+--cpp20 (same CVF/armed-gdb recipe; check also the `construct` stdlib
+model gate for the C++20 shapes).
+
+Debug recipes that worked again: armed extern "C" global + noinline
+marker fn breakpoints bracketing the ESCAPING throw among hundreds;
+PSM/pack-map dumps at deduction vs build; PRE/PREP body dumps; the
+uncaught_exceptions RAII dump for cast failures.
