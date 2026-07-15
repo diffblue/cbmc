@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ out-of-line pack body runs: SUCCESS$
@@ -9,9 +9,10 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: [temp.inst]/2 + [temp.mem.func] -- an out-of-line-defined member
-function template with a parameter pack (arity >= 2) loses its body when
-instantiated ("no body for callee"): the out-of-line definition is not
-attached to the instantiated declarator.  Minimal form of the residual
-map/emplace blocker (cpp20_map_basic, cpp11_map_insert).  g++/clang++
-runtime-verified.  Flip to CORE once the definition is attached and converted.
+[temp.mem.func] + [temp.inst]/2: an out-of-line-defined member function
+template of a class template is instantiated from its definition.  Fixed by
+attaching the definition's body (recorded as a template_methods entry of the
+enclosing class template, with the owning class matched to avoid same-name
+cross-template adoption) to the instantiated member-template declarator, and
+switching to the definition's parameter names ([dcl.fct]/3).  Runtime-verified
+against g++ and clang++.

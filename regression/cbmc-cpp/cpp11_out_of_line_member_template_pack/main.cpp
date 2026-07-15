@@ -5,16 +5,11 @@
 // bottom of stl_tree.h), reached from std::map::operator[] -- the residual
 // blocker of cpp20_map_basic / cpp11_map_insert.
 //
-// KNOWNBUG: with a parameter pack at arity >= 2, the instantiated member's
-// body is lost ("no body for callee"), so the call returns nondet.  The
-// out-of-line definition is not attached to the instantiated declarator (nil
-// at typecheck_compound_declarator entry, probe-verified), unlike libstdc++'s
-// case where the definition IS found but was then mishandled by the
-// deferred-member drain (that second defect -- the fixpoint drain missing the
-// function-template map restore and parameter-pack expansion of the main
-// drain -- is FIXED; this attachment gap remains).  Arity 1 and non-pack
-// member templates work.  g++ and clang++ accept and run this (asserts hold).
-// Flip to CORE once the out-of-line definition is attached and converted.
+// FIXED: the out-of-line definition (recorded as a template_methods entry of
+// the enclosing class template) is now attached to the instantiated
+// member-template declarator -- with the owning class template matched, so a
+// same-named member of an unrelated template is not adopted -- and the
+// definition's parameter names are used so its body binds ([dcl.fct]/3).
 
 extern "C" void __CPROVER_assert(int, const char *);
 
