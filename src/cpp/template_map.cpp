@@ -205,6 +205,18 @@ replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
 void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
   const
 {
+  // N5008 [temp.inst]/2: instantiating a class template does not instantiate
+  // its member TEMPLATES -- their bodies still reference their OWN parameter
+  // packs, to be expanded only when the member template itself is
+  // instantiated.  Recursing into a nested template declaration here would
+  // expand (and CONSUME, stripping the `...`) a pack expansion such as
+  // `_Up(std::forward<_Args>(__args)...)` in __new_allocator::construct's
+  // body against the ENCLOSING class instantiation's unrelated pack sizes,
+  // leaving the member template's body unexpandable at its later
+  // instantiation.  Skip nested template declarations.
+  if(n.id() == ID_cpp_declaration && n.get_bool(ID_is_template))
+    return;
+
   for(auto &s : n.get_sub())
     expand_call_argument_packs(s, only_nontype);
   for(auto &ns : n.get_named_sub())
