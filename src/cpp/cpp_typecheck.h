@@ -545,7 +545,12 @@ protected:
 
   /// Static member symbols whose initializers are deferred until
   /// after the class body is fully declared.
-  std::vector<irep_idt> deferred_static_initializers;
+  /// In-class initializers of static data members that could not be
+  /// type-checked during member declaration and are re-attempted once the
+  /// class is complete (N5008 [basic.scope.class]: earlier-declared member
+  /// names, e.g. class-local typedefs, must be in scope for the
+  /// initializer): (member symbol, enclosing class symbol) pairs.
+  std::vector<std::pair<irep_idt, irep_idt>> deferred_static_initializers;
 
   /// Depth of typecheck_compound_body nesting, used to track
   /// recursive template elaboration.
