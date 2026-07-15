@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ fold over member-template pack: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: N5008 [expr.prim.fold] + [temp.variadic]/5 -- a fold expression
+`(a + ...)` over a function parameter pack in a MEMBER function template's
+body is not expanded when the member is instantiated, so the bare pack
+name fails to resolve and the body is dropped ("no body for callee
+S::sum"; the call returns nondet).  Root cause: member function template
+bodies are prepared by prepare_deferred_method_body's pack-expander,
+which -- unlike the free-function-template body expander in
+cpp_instantiate_template (which handles cpp_left_fold/cpp_right_fold/
+cpp_binary_fold) -- has no fold-expression handling.  The identical fold
+in a FREE function template works; the enclosing class need not be a
+template.  Minimal (2 logical lines), header-free, g++/clang++
+runtime-verified.  Flip to CORE when the member-template body expander
+expands fold expressions.
