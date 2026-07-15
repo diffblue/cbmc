@@ -16,18 +16,17 @@ non-conformant *truncated* std::map had its operations havoc'd (symex executed
 none of the real container; the property was vacuous).  The fix makes the front
 end conformant and symex now executes the REAL std::map / _Rb_tree machinery.
 
-Current layer (2026-07-15): reading back an inserted key (`m[1] == 42`)
-mis-evaluates because std::pair's PIECEWISE constructor converts to an
-EMPTY body: it is defined out-of-line in <tuple> as a DELEGATING
-constructor (`: pair(__first, __second,
-_Build_index_tuple<sizeof...(_Args1)>::__type(), ...)`), and the
-delegating mem-initializer of an out-of-line two-pack member template is
-dropped.  The stored key stays zero / the read-back re-inserts, and
-without an unwind bound the tree walk over the resulting nondet-shaped
-tree unwinds without terminating.  The upstream pieces of the chain
-(new-initializer pack expansion, [temp.inst]/2 member-template body
-preservation, [over.match.funcs]/2 object pairing) are fixed and covered
-by cpp11_pack_expansion_new_init / cpp11_member_template_object_arg.
+Current layer (2026-07-15 evening): this exact program verifies fully
+UNBOUNDED under --cpp11 after the delegating-piecewise-constructor chain
+was fixed (cpp11_piecewise_delegating_ctor, cpp11_static_cast_base_rref,
+and the earlier cpp11_* piecewise tests are all CORE, and
+'m[1]=42; assert(m[1]==42)' verifies in ~1.6s bounded).  Under --cpp20
+the headers construct the node through a DIFFERENT chain
+(std::construct_at / _S_construct, C++20 constexpr allocator_traits):
+the stored key byte is again malloc garbage (trace: storage[0]=64), so
+the read-back re-inserts and the unbounded tree walk diverges in the
+_Rb_tree_decrement model.  NEXT: peel the C++20 construct_at chain the
+same way (check which body in it fails to convert or is modeled away).
 
 Second-tier verification-PERFORMANCE item, not a conformance one; the previous
 "pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
