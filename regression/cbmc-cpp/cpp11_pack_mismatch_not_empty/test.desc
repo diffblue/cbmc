@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ swapped a: SUCCESS$
+^\[main\.assertion\.2\] line \d+ swapped b: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^void-typed symbol not permitted$
+--
+N5008 [temp.deduct.type]/8: a form mismatch (P=tuple<_Elements...>& vs
+A=int*) fails the ENTIRE deduction; the pack must not be resurrected as
+empty.  The nil-poisoned pack argument is now tagged #deduction_failed and
+the candidate rejected.  Distilled from libstdc++'s constrained tuple-swap
+overload probed by _Node_handle::swap's `using std::swap;` two-step, whose
+empty-pack resurrection collaterally instantiated swap<void> (void __tmp
+aborting the enclosing conversion -- the map emplace chain).
+g++/clang++ runtime-verified.
