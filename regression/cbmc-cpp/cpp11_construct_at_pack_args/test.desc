@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ two forwarded args construct: SUCCESS$
@@ -8,18 +8,17 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: N5008 [temp.variadic]/5 + [expr.new] -- pack expansion in a
-new-initializer inside a FREE function template (the C++20
-std::construct_at body).  With TWO or more forwarded arguments
-constructing a class-template instance, the instantiated body fails to
-convert ("no body for callee construct_at"); one argument works, and the
-member-template flavour (__new_allocator::construct) is fixed
-(cpp11_pack_expansion_new_init).  Bisection: neither constexpr nor the
-decltype-SFINAE return type nor const members are needed; the trigger is
->= 2 pack args + a class-template target (j1/j6/j8 single-arg variants
-pass, j4/j5/j7 multi-arg variants fail).  This is the remaining
-front-end blocker of cpp20_map_basic: the C++20 headers construct map
-nodes via constexpr allocator_traits::construct -> std::construct_at, so
-the inserted key is never stored and the unbounded read-back diverges.
-Flip to CORE when the free-function new-initializer pack expansion
-handles multiple arguments.  g++/clang++ runtime-verified.
+N5008 [temp.variadic]/5 + [expr.new]: a pack expansion in a
+new-initializer's expression-list inside a FREE function template --
+`::new((void*)__location) _Tp(forward<_Args>(__args)...)`, the C++20
+std::construct_at body -- must replicate the pattern per pack element.
+Was KNOWNBUG (>= 2 forwarded arguments dropped the body, "no body for
+callee construct_at").  Fixed by adding a cpp_new-initializer branch to
+the free-function-template body pack-expander in
+cpp_instantiate_template.cpp, mirroring the existing function-call and
+declarator-init_args branches.  Also required: void-returning constexpr
+member function templates are now deferred rather than eagerly converted
+([temp.inst]/5 -- a void call never yields a constant to fold), so the
+allocator_traits::construct wrapper's body is expanded by the deferred
+pass instead of failing an early eager conversion.  g++/clang++
+runtime-verified.
