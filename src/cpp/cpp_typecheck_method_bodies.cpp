@@ -152,6 +152,97 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
         method_symbol.type.find(irep_idt{"#fn_template_type"})),
       static_cast<const cpp_template_args_tct &>(
         method_symbol.type.find(irep_idt{"#fn_template_args"})));
+
+    // N5008 [temp.variadic]/5,8: with MULTIPLE parameter packs the flat
+    // #fn_template_args list cannot encode the split between the packs
+    // (std::pair's piecewise delegation target, two type packs + two
+    // non-type index packs).  Replay the deduction-time pack bindings
+    // persisted by instantiate_template.
+    const irept &packs =
+      method_symbol.type.find(irep_idt{"#fn_template_packs"});
+    for(const auto &entry : packs.get_sub())
+    {
+      const irep_idt pid = entry.get(ID_identifier);
+      if(entry.id() == ID_expression)
+      {
+        std::vector<exprt> vals;
+        for(const auto &v : entry.get_sub())
+          vals.push_back(static_cast<const exprt &>(v));
+        template_map.pack_size_map[pid] = vals.size();
+        if(!vals.empty())
+        {
+          template_map.pack_expr_map[pid] = vals;
+          template_map.expr_map[pid] = vals.front();
+        }
+        continue;
+      }
+      std::vector<typet> elems;
+      for(const auto &t : entry.get_sub())
+        elems.push_back(static_cast<const typet &>(t));
+      template_map.pack_size_map[pid] = elems.size();
+      template_map.pack_args_map[pid] = elems;
+      if(!elems.empty())
+        template_map.type_map[pid] = elems.front();
+    }
+
+    // N5008 [temp.variadic]/7: an expansion over an EMPTY pack produces an
+    // empty list.  With the pack bindings replayed above, drop
+    // member-initializer arguments that reference an empty pack outside
+    // `sizeof...` (which is just 0, [temp.variadic]/8) -- e.g.
+    // `second(std::forward<_Args2>(std::get<_Indexes2>(__tuple2))...)` in
+    // std::pair's piecewise delegation target with _Args2/_Indexes2 empty
+    // becomes `second()`.  Left in place, the unsubstitutable pack
+    // reference fails the body's conversion and the member is dropped.
+    if(!packs.get_sub().empty())
+    {
+      std::set<std::string> empty_pack_shorts;
+      for(const auto &entry : packs.get_sub())
+      {
+        if(!entry.get_sub().empty())
+          continue;
+        const std::string f = id2string(entry.get(ID_identifier));
+        auto p = f.rfind("::");
+        empty_pack_shorts.insert(p != std::string::npos ? f.substr(p + 2) : f);
+      }
+      if(!empty_pack_shorts.empty())
+      {
+        std::function<bool(const irept &)> refs_ep = [&](const irept &n)
+        {
+          if(n.get_bool("#sizeof_pack"))
+            return false;
+          if(
+            n.id() == ID_name &&
+            empty_pack_shorts.count(id2string(n.get(ID_identifier))))
+            return true;
+          for(const auto &sn : n.get_sub())
+            if(refs_ep(sn))
+              return true;
+          for(const auto &ns : n.get_named_sub())
+            if(refs_ep(ns.second))
+              return true;
+          return false;
+        };
+        std::function<void(irept &)> drop = [&](irept &n)
+        {
+          if(n.id() == ID_code && n.get(ID_statement) == ID_member_initializer)
+          {
+            irept::subt &args = n.get_sub();
+            args.erase(
+              std::remove_if(
+                args.begin(),
+                args.end(),
+                [&](const irept &a) { return refs_ep(a); }),
+              args.end());
+            return;
+          }
+          for(auto &sn : n.get_sub())
+            drop(sn);
+          for(auto &ns : n.get_named_sub())
+            drop(ns.second);
+        };
+        drop(static_cast<irept &>(body));
+      }
+    }
   }
 
   // N5008 [temp.variadic]/5: expand the body / member-initializer uses of a

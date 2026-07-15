@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ first through delegation: SUCCESS$
@@ -9,16 +9,16 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: N5008 [class.base.init]/6 + [temp.variadic]/5 -- std::pair's
-out-of-line DELEGATING piecewise constructor.  The delegation target is a
-member constructor template with FOUR zipped packs (two type packs, two
-non-type index packs); resolving it inside the mem-initializer fails, the
-swallowed error leaves the piecewise instance with an empty body, and the
-constructed pair keeps garbage.  This is the remaining front-end blocker
-of cpp20_map_basic (first insert stores a garbage key; unbounded
-unwinding then diverges on the nondet-shaped tree).  Bisection: delegation
-to a non-pack target works (d7), direct calls of the four-pack ctor work
-(d11), delegation to a four-pack target fails (single resolve throw in
-typecheck_member_initializer).  g++/clang++ runtime-verified.  Flip to
-CORE when the mixed four-pack deduction resolves in the mem-initializer
-context.
+N5008 [class.base.init]/1,/6 + [temp.variadic]/5,8: std::pair's
+out-of-line DELEGATING piecewise constructor, whose delegation target has
+four zipped packs (two type, two non-type index packs).  Was KNOWNBUG;
+fixed by a chain of five front-end changes: (1) non-type pack values
+recorded/replayed in the multi-pack #deduced_packs machinery; (2) the
+out-of-line definition attach/merge sites copy the ctor-initializer along
+with the body ([class.base.init]/1: the ctor-initializer is part of the
+definition); (3) same-named overloaded member-template definitions are
+discriminated by parameter count ([over.load]); (4) empty-pack
+mem-initializer argument removal keeps sizeof... mentions
+([temp.variadic]/8) while dropping genuine expansions ([temp.variadic]/4);
+(5) the drain replays persisted #fn_template_packs so multi-pack members
+convert with the correct pack split.  g++/clang++ runtime-verified.
