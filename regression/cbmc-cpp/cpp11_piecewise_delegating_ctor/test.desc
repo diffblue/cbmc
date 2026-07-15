@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ first through delegation: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second through delegation: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: N5008 [class.base.init]/6 + [temp.variadic]/5 -- std::pair's
+out-of-line DELEGATING piecewise constructor.  The delegation target is a
+member constructor template with FOUR zipped packs (two type packs, two
+non-type index packs); resolving it inside the mem-initializer fails, the
+swallowed error leaves the piecewise instance with an empty body, and the
+constructed pair keeps garbage.  This is the remaining front-end blocker
+of cpp20_map_basic (first insert stores a garbage key; unbounded
+unwinding then diverges on the nondet-shaped tree).  Bisection: delegation
+to a non-pack target works (d7), direct calls of the four-pack ctor work
+(d11), delegation to a four-pack target fails (single resolve throw in
+typecheck_member_initializer).  g++/clang++ runtime-verified.  Flip to
+CORE when the mixed four-pack deduction resolves in the mem-initializer
+context.
