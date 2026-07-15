@@ -2436,3 +2436,10 @@ stored; the read-back re-inserts and unbounded unwinding diverges.
 NEXT: fix the delegating-ctor initializer of out-of-line member-template
 ctors ([class.base.init]/6 delegating constructors); then mb2 should
 verify and cpp20_map_basic likely flips (re-time it).
+KNOWNBUG test filed: cpp11_piecewise_delegating_ctor (105 lines,
+header-free, fails-as-expected).  Bisection within the shape: delegation
+to a NON-pack target passes (d7); DIRECT call of the four-pack target
+passes (d11); delegation to the four-pack target fails with a single
+resolve throw in typecheck_member_initializer -- so the gap is the mixed
+four-pack (type+non-type index) deduction in the mem-initializer
+context, not delegation per se and not the four-pack ctor per se.
