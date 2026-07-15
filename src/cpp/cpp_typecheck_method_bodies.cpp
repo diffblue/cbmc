@@ -267,6 +267,46 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               irept copy = child;
               copy.remove(ID_ellipsis);
               rename(copy, base, id2string(base) + "$" + std::to_string(k));
+              // N5008 [temp.variadic]/5: the k-th element of the expansion
+              // substitutes the k-th element of EVERY pack the pattern
+              // references.  Besides the function-parameter pack renamed
+              // above, a bare reference to a deduced TEMPLATE type pack --
+              // e.g. the explicit argument in `forward<A>(a)...` -- must
+              // become that pack's k-th deduced type; leaving the whole
+              // pack name in place makes the per-element call unresolvable
+              // (deduction fails for every `forward` overload and the
+              // enclosing body is dropped, the _Rb_tree
+              // _M_emplace_hint_unique shape).
+              std::function<void(irept &)> subst_type_pack = [&](irept &t)
+              {
+                if(
+                  t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+                  t.get_sub().front().id() == ID_name)
+                {
+                  const std::string nm =
+                    id2string(t.get_sub().front().get(ID_identifier));
+                  const auto p = nm.rfind("::");
+                  const std::string suf =
+                    p != std::string::npos ? nm.substr(p + 2) : nm;
+                  for(const auto &pe : template_map.pack_args_map)
+                  {
+                    const std::string key = id2string(pe.first);
+                    const auto q = key.rfind("::");
+                    const std::string ksuf =
+                      q != std::string::npos ? key.substr(q + 2) : key;
+                    if(ksuf == suf && pe.second.size() == n && k < n)
+                    {
+                      t = pe.second[k];
+                      return;
+                    }
+                  }
+                }
+                for(auto &s : t.get_sub())
+                  subst_type_pack(s);
+                for(auto &ns : t.get_named_sub())
+                  subst_type_pack(ns.second);
+              };
+              subst_type_pack(copy);
               expand(copy);
               newsub.push_back(copy);
             }

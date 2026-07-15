@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ decl-initializer pack expansion: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/5: expanding `node z(id, forward<A>(a)...)` in a
+member function template must substitute the k-th element of the TYPE pack
+A per generated element, not just rename the function parameter pack.
+Distilled from _Rb_tree::_M_emplace_hint_unique's
+`_Auto_node __z(*this, std::forward<_Args>(__args)...)` (the map residual
+that left emplace bodyless).  g++/clang++ runtime-verified.
