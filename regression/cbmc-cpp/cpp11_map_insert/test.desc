@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 5 --no-unwinding-assertions
 ^EXIT=0$
@@ -7,23 +7,25 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-The frontend now produces a real body for `m[1] = 42;`, so BMC explores the
-fully-inlined libstdc++ std::map::operator[] machinery.  Unlike set::insert
-(which takes the key directly and verifies in ~0.04s of symex), operator[]
-builds a std::pair<const Key, T> by piecewise construction (std::tuple /
-forward_as_tuple / piecewise_construct) and performs a lower_bound search plus
-node insertion -- all inline header code.  Unwinding that to the depth needed
-for correctness makes the SAT formula grow super-exponentially in the unwind
-bound: roughly 0.2M vars / 0.2M clauses at --unwind 3, 1.7M / 2.0M at 4, and
-19.8M / 57.2M (with 81k VCCs, ~24s symex + ~25s SSA conversion) at 5, after
-which the solver runs out of resources.  Disabling pointer/bounds checks does
-not help: the equation size comes from the unwound code itself, not the
-checks.
-
-This is a bounded-model-checking scaling limit on the inlined map machinery,
-independent of the std::_Rb_tree_* compiled-library models CBMC now provides
-(those cover the out-of-line functions; operator[]'s heavy machinery is all
-header/inline code).  Addressing it would need a lighter model/stub for the
-tuple/piecewise pair construction rather than solver tuning.  Kept as
-KNOWNBUG; std::set and std::map find/count/insert(node)/iteration/erase verify
-quickly.
+std::map operator[] insertion, verifying in ~1.4s.  Fixed by a chain of
+front-end conformance fixes to the piecewise-construction machinery
+(see the sibling minimal tests):
+* [temp.deduct.type]/8 pack form mismatch rejects the candidate instead of
+  resurrecting an empty pack (cpp11_pack_mismatch_not_empty: the
+  swap<void> collateral);
+* [expr.ref]/6 reference-member access is an lvalue +
+  [over.best.ics.general]/2 non-viable candidates are not hard errors
+  (cpp11_rvalue_ref_member_lvalue: _Head_base<I, T&&>/_Tuple_impl);
+* [temp.variadic]/5 type-pack element substitution in declaration
+  initializers (cpp11_pack_expansion_decl_init: _M_emplace_hint_unique's
+  _Auto_node);
+* [temp.deduct.type] primary-relative arguments for full-specialization
+  instances (cpp11_pack_deduction_explicit_spec);
+* [temp.param]/14 two independent packs in std::pair's piecewise
+  constructor (cpp11_piecewise_ctor_two_packs);
+* allocator_traits::construct model body gated to the single
+  same-type-argument case, leaving piecewise construction to the real
+  header body.
+The earlier KNOWNBUG note attributed the failure to BMC scaling on the
+inlined machinery; with the mis-instantiated code gone, the formula is
+small.
