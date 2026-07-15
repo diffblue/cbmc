@@ -2322,3 +2322,68 @@ KNOWNBUG (b1..b12, c1..c8, d1..d4 in /tmp, reproduced down to 4 lines):
   make_tuple ctor resolution as before.
 
 Suite green, 92 skipped.  Commits b86fecf1b0 (src), tests commit after.
+
+## cpp11_map_insert FIXED -> CORE (2026-07-15)
+
+Five-layer peel, each layer bisected to a header-free minimal (all now CORE
+tests) and fixed per N5008:
+
+1. swap<void> collateral (m4, 78 lines): [temp.deduct.type]/8 -- pack form
+   mismatch (P=tuple<_Elements...>& vs A=int*) must FAIL deduction, not
+   resurrect the pack as empty.  Fix: tag nil-poisoned pack args
+   "#deduction_failed" at the nil->unassigned conversion; the empty-pack
+   default-application branch rejects.  Test cpp11_pack_mismatch_not_empty.
+2. _Tuple_impl<0,int&&> ctor + _M_head dropped (s9-s12, 6 lines!):
+   [expr.ref]/6 -- member access naming a reference member is an LVALUE;
+   reference_binding treated implicit derefs of non-symbol rvalue refs as
+   xvalues (fix: exempt ID_member).  Plus [over.best.ics.general]/2 -- the
+   unguarded typecheck_side_effect_function_call at
+   cpp_typecheck_conversions.cpp:~1777 hard-failed a non-viable concrete
+   ctor candidate (fix: SFINAE-guard + continue, mirroring site 1871).
+   Test cpp11_rvalue_ref_member_lvalue.
+3. _M_emplace_hint_unique bodyless (e1/e7, 50 lines): [temp.variadic]/5 --
+   the drain's pack expander renamed only the FN param pack (a->a$k) and
+   left the TYPE pack whole in `forward<A>(a)...`, so per-element forward
+   deduction failed.  Fix: subst_type_pack in prepare_deferred_method_body's
+   expand lambda.  Test cpp11_pack_expansion_decl_init.
+   Debug chain that found it: gdb catch throw armed via a convert_function
+   name-matched global + breakpoint on a noinline marker fn in the catch;
+   the escaping throw was resolve() via cpp_constructor/typecheck_decl.
+4. pair piecewise ctor unresolvable (q3, ~25 lines): [temp.deduct.type] --
+   a full specialization instance records EMPTY (specialization-relative)
+   ID_C_template_arguments; deduction read it and bound packs empty.  Fix:
+   preserve ID_full_template_args across elaboration (compound_type swap
+   save/restore) + prefer it in guess_template_args.
+   Test cpp11_pack_deduction_explicit_spec.
+5. two-pack swap in instantiation (p1): [temp.param]/14 -- pair's
+   piecewise ctor has TWO deducible packs; the flat pseudo-instance arg
+   list can't encode the split, and template_mapt::build's single-pack
+   arithmetic SWAPPED them.  Fix: record "#deduced_packs" on the
+   pseudo-instance in guess_function_template_args, replay before the
+   winner's instantiate_template, bypass single-pack arithmetic when
+   n_packs>1.  Test cpp11_piecewise_ctor_two_packs.
+   PLUS: the provide_stdlib_bodies 'construct' model blanket-assigned
+   args[0] into *ptr (piecewise_construct_t into pair -> symex type
+   mismatch abort); gated to the exact same-type 3-param case.
+
+Result: cpp11_map_insert VERIFICATION SUCCESSFUL in ~1.4s -> CORE (old
+"BMC scaling" note was wrong -- the formula was big because of
+mis-instantiated code).  Suite green, 91 skipped.
+
+RESIDUALS (documented, not fixed):
+* cpp20_map_basic: --cpp20 with NO unwind bound; full unwinding of
+  _Rb_tree loops >10min.  KNOWNBUG note refreshed.
+* sizeof...(EMPTY_PACK) inside an arithmetic mem-initializer expression
+  mis-evaluates (w4 probe shape: `first(t1.v + int(sizeof...(A2)))` with
+  A2 empty read t1.v as 0).  Kept out of the piecewise test.
+* Raw OTHER statements (member_initializer / cpp-using) remain in UNCALLED
+  emitted functions (e.g. _Rb_tree_const_iterator default ctor never
+  converted because never odr-used, body emitted unconverted).  Dead code
+  today, but would crash symex if ever reached; consider dropping
+  unconverted bodies at clean_up.
+* cpp17_tuple_basic unchanged (1 of 7 fails; layer-3 make_tuple ctor
+  resolution as before).
+
+Commits: conversions (expr.ref/6 + best.ics), method_bodies (variadic/5),
+resolve+compound_type+template_map (3 pack fixes), stdlib construct gate,
+map_insert flip, cpp20_map_basic note.
