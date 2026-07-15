@@ -1738,15 +1738,18 @@ void template_mapt::build(
   // of libstdc++'s _Function_handler).  Find the (single) pack at whatever
   // position it occupies.
   int pack_idx = -1;
+  std::size_t n_packs = 0;
   for(std::size_t k = 0; k < template_parameters.size(); ++k)
     if(template_parameters[k].get_bool(ID_ellipsis))
     {
-      pack_idx = static_cast<int>(k);
-      break;
+      if(pack_idx < 0)
+        pack_idx = static_cast<int>(k);
+      ++n_packs;
     }
   const bool has_pack = pack_idx >= 0;
+
   if(
-    instance.size() != template_parameters.size() &&
+    n_packs <= 1 && instance.size() != template_parameters.size() &&
     !(has_pack && instance.size() >= template_parameters.size() - 1))
   {
     return; // mismatched template arguments — skip
@@ -1808,6 +1811,45 @@ void template_mapt::build(
     shadow(pack_size_map);
     shadow(pack_args_map);
     shadow(pack_expr_map);
+  }
+
+  // N5008 [temp.param]/14: a member template's template-parameter-list may
+  // contain MULTIPLE parameter packs when each is deducible from the
+  // function parameters (e.g. std::pair's piecewise constructor
+  // `template<class... _Args1, class... _Args2>
+  //  pair(piecewise_construct_t, tuple<_Args1...>, tuple<_Args2...>)`).
+  // The positional `instance` list cannot encode how its elements split
+  // between the packs, so reconstructing pack bindings from it is ill-posed
+  // -- the single-pack arithmetic below would bind the FIRST pack empty and
+  // scalar-bind the second to the first pack's element, swapping the packs
+  // in the instantiated signature.  Deduction has already recorded each
+  // pack's elements in pack_args_map / pack_size_map under this template's
+  // own parameter identifiers (which the shadowing above preserves: their
+  // full ids are our own).  Bind only the non-pack parameters positionally,
+  // consuming each pack's recorded element count from the flat list, and
+  // keep the recorded pack bindings.
+  if(n_packs > 1)
+  {
+    std::size_t arg_idx = 0;
+    for(std::size_t p = 0;
+        p < template_parameters.size() && arg_idx < instance.size();
+        ++p)
+    {
+      if(template_parameters[p].get_bool(ID_ellipsis))
+      {
+        const irep_idt pid =
+          template_parameters[p].id() == ID_type
+            ? template_parameters[p].type().get(ID_identifier)
+            : template_parameters[p].get(ID_identifier);
+        const auto ps_it = pack_size_map.find(pid);
+        if(ps_it != pack_size_map.end())
+          arg_idx += ps_it->second;
+        continue;
+      }
+      set(template_parameters[p], instance[arg_idx]);
+      ++arg_idx;
+    }
+    return;
   }
 
   // Bind each parameter to its argument(s).  With a parameter pack at index
