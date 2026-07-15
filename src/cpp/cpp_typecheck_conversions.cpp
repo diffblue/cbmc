@@ -1774,7 +1774,30 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               {tmp_expr},
               uninitialized_typet{},
               expr.source_location());
-            typecheck_side_effect_function_call(ctor_expr);
+            // N5008 [over.best.ics.general]/2: if no conversion sequence
+            // can be formed for an argument, the candidate is simply not
+            // viable -- it must not be reported as a hard error.  Trying
+            // this constructor may still fail here even though the
+            // standard_conversion_sequence above succeeded on the value:
+            // the constructor call re-binds the ORIGINAL argument to the
+            // reference parameter, and e.g. an xvalue (the implicit
+            // dereference of std::forward's return) cannot bind to the
+            // non-const lvalue-reference parameter of a concrete
+            // candidate such as _Head_base<0, int&&>'s
+            // `_Head_base(const _Head&)`, which instantiates to
+            // `_Head_base(int&)` by reference collapsing ([dcl.ref]/6).
+            // The forwarding-reference constructor template remains the
+            // viable candidate.  Guard with a SFINAE context so the
+            // failed trial's diagnostics are suppressed.
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_side_effect_function_call(ctor_expr);
+            }
+            catch(...)
+            {
+              continue;
+            }
             CHECK_RETURN(ctor_expr.get(ID_statement) == ID_temporary_object);
 
             if(struct_type_to.get_bool(ID_C_constant))
@@ -2648,7 +2671,13 @@ bool cpp_typecheckt::reference_binding(
     !reference_type.get_bool(ID_C_this) && expr.id() == ID_dereference &&
     expr.get_bool(ID_C_implicit) &&
     is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
-    to_dereference_expr(expr).pointer().id() != ID_symbol)
+    to_dereference_expr(expr).pointer().id() != ID_symbol &&
+    // N5008 [expr.ref]/6: a class member access naming a member declared
+    // with reference type is an LVALUE of the referenced type (regardless
+    // of & or &&), so it binds to a non-const lvalue reference -- e.g.
+    // returning std::_Head_base<I, T&&>::_M_head_impl as _Head& in
+    // std::_Tuple_impl::_M_head.
+    to_dereference_expr(expr).pointer().id() != ID_member)
     return false;
 
   if(

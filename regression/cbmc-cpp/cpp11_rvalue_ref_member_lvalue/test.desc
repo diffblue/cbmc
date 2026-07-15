@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ reference member reads through: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reference member aliases x: SUCCESS$
+^\[main\.assertion\.3\] line \d+ local lvalue-ref binding to member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ tuple head bound: SUCCESS$
+^\[main\.assertion\.5\] line \d+ tuple head aliases y: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [expr.ref]/6 (member access naming a reference member is an lvalue of
+the referenced type) and [over.best.ics.general]/2 (a candidate with no
+implicit conversion sequence is non-viable, not a hard error).  Distilled
+from std::_Head_base<I, T&&> / _Tuple_impl<I, T&&>, whose members were
+dropped ("bad reference initializer" swallowed) leaving map/tuple piecewise
+construction bodyless.  g++/clang++ runtime-verified.
