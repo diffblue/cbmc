@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ int swappable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ probe checks the declaration only, not the definition: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+KNOWNBUG: [temp.inst]/5 -- an unevaluated operand (the swap call inside the
+__is_swappable-style SFINAE probe's decltype) requires only the declaration of
+the selected overload, but cbmc instantiates the definition.  On std::map this
+surfaces as a collateral std::swap<void> instantiation whose void-typed local
+aborts the enclosing member conversion (the residual map blocker); here it
+makes both is_swappable results mis-evaluate FALSE (both assertions currently
+FAIL).  g++/clang++ runtime-verified.  Flip to CORE once unevaluated operands
+stop instantiating definitions.
