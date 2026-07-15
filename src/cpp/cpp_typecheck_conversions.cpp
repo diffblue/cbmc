@@ -4158,6 +4158,47 @@ bool cpp_typecheckt::static_typecast(
       new_expr.add_source_location() = e.source_location();
       return true;
     }
+    // N5008 [expr.static.cast]/3: an lvalue (or xvalue) of type cv1 T1 can
+    // be cast to "rvalue reference to cv2 T2" if T2 is reference-compatible
+    // with T1 -- including T2 a BASE of T1 ([dcl.init.ref]/4); the result
+    // designates the base subobject as an xvalue.  This is std::_Tuple_impl's
+    // move constructor shape, `: _Base(static_cast<_Base&&>(__in))`, without
+    // which the tuple move constructor fails to convert and std::map's
+    // piecewise-construction chain breaks.  Also [expr.static.cast]/11: the
+    // inverse (base -> derived) downcast is permitted symmetrically.
+    {
+      typet from = e.type();
+      if(subto.id() == ID_struct_tag && from.id() == ID_struct_tag)
+      {
+        c_qualifierst qual_from;
+        qual_from.read(from);
+        c_qualifierst qual_to;
+        qual_to.read(subto);
+        if(qual_to.is_subset_of(qual_from))
+        {
+          const struct_typet &from_struct =
+            follow_tag(to_struct_tag_type(from));
+          const struct_typet &subto_struct =
+            follow_tag(to_struct_tag_type(subto));
+          if(
+            subtype_typecast(from_struct, subto_struct) ||
+            subtype_typecast(subto_struct, from_struct))
+          {
+            reference_typet rref = to_reference_type(type);
+            if(e.id() == ID_dereference)
+            {
+              make_ptr_typecast(to_dereference_expr(e).pointer(), rref);
+              new_expr.swap(to_dereference_expr(e).pointer());
+              return true;
+            }
+            exprt address_of = address_of_exprt(e);
+            make_ptr_typecast(address_of, rref);
+            new_expr.swap(address_of);
+            return true;
+          }
+        }
+      }
+    }
     return false;
   }
 
