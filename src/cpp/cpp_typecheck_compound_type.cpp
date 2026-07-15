@@ -1370,16 +1370,51 @@ void cpp_typecheckt::typecheck_compound_declarator(
             // so checking type_map/expr_map alone misses packs and falls back
             // to the C type-checker, which mis-handles `sizeof...(T)` as
             // `sizeof(T)`.
+            // Also use it whenever the initializer still CONTAINS a cpp_name
+            // -- e.g. `static const bool value = type::value;` reading a
+            // class-local typedef (the __is_swappable shape) in a
+            // NON-template class.  N5008 [basic.scope.class]: the
+            // initializer is type-checked in the scope of the class, so
+            // earlier-declared member names must resolve; the C type-checker
+            // cannot resolve a cpp_name and would silently leave the
+            // member's value unresolved (read as nondet downstream).
+            std::function<bool(const irept &)> contains_cpp_name =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                return true;
+              for(const auto &s : n.get_sub())
+                if(contains_cpp_name(s))
+                  return true;
+              for(const auto &ns : n.get_named_sub())
+                if(contains_cpp_name(ns.second))
+                  return true;
+              return false;
+            };
             bool use_cpp_typecheck = new_symbol->value.is_not_nil() &&
                                      (!template_map.expr_map.empty() ||
                                       !template_map.type_map.empty() ||
                                       !template_map.pack_args_map.empty() ||
-                                      !template_map.pack_size_map.empty());
+                                      !template_map.pack_size_map.empty() ||
+                                      contains_cpp_name(new_symbol->value));
             if(use_cpp_typecheck)
             {
               bool saved_force = force_elaborate;
               force_elaborate = true;
-              typecheck_expr(new_symbol->value);
+              // N5008 [basic.scope.class]: the initializer is in the scope
+              // of the class -- unqualified lookup must find the class's own
+              // earlier-declared members (e.g. `static const bool value =
+              // type::value;` reading a class-local typedef, the
+              // __is_swappable shape).  Enter the class scope for the
+              // duration.
+              {
+                cpp_save_scopet init_scope_guard(cpp_scopes);
+                if(
+                  cpp_scopes.id_map.find(symbol.name) !=
+                  cpp_scopes.id_map.end())
+                  cpp_scopes.go_to(*cpp_scopes.id_map[symbol.name]);
+                typecheck_expr(new_symbol->value);
+              }
               force_elaborate = saved_force;
               implicit_typecast(new_symbol->value, new_symbol->type);
               simplify(new_symbol->value, *this);
@@ -1408,6 +1443,37 @@ void cpp_typecheckt::typecheck_compound_declarator(
           }
 
           suppress_elaborate = old_suppress;
+
+          // N5008 [basic.scope.class]: the initializer must resolve the
+          // class's earlier-declared member names.  Here, mid-elaboration, a
+          // reference to a sibling member (e.g. `static const bool value =
+          // type::value;` reading a class-local typedef -- the
+          // __is_swappable shape) may not yet resolve; if the value still
+          // contains an unresolved cpp_name, queue it for re-type-checking
+          // once the class is complete (typecheck_compound_body drains the
+          // queue) instead of leaving a silent raw cpp_name that reads as
+          // nondet downstream.
+          {
+            std::function<bool(const irept &)> has_cpp_name =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                return true;
+              for(const auto &s : n.get_sub())
+                if(has_cpp_name(s))
+                  return true;
+              for(const auto &ns : n.get_named_sub())
+                if(has_cpp_name(ns.second))
+                  return true;
+              return false;
+            };
+            if(
+              new_symbol->value.is_not_nil() && has_cpp_name(new_symbol->value))
+            {
+              deferred_static_initializers.emplace_back(
+                new_symbol->name, symbol.name);
+            }
+          }
 
           if(
             !new_symbol->is_macro && new_symbol->type.get_bool(ID_C_constant) &&
@@ -2917,46 +2983,39 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   }
 
   // Process deferred static member initializers now that all
-  // members are declared.
+  // members are declared (N5008 [basic.scope.class]: the initializer is in
+  // the scope of the class, so class-local typedefs and other members must
+  // resolve; retrying at end-of-class makes them resolvable).
   {
     auto deferred = std::move(deferred_static_initializers);
     deferred_static_initializers.clear();
-    for(const auto &sym_name : deferred)
+    for(const auto &[sym_name, class_name] : deferred)
     {
       symbolt &sym = symbol_table.get_writeable_ref(sym_name);
       if(sym.value.is_nil())
         continue;
 
-      if(sym.is_macro)
+      const std::size_t errors_before =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      try
       {
-        // Per [temp.deduct]/8 applied to constexpr-macro init:
-        // initializer substitution may fail if template parameters
-        // are not yet fully substituted at this deferred elaboration
-        // point.  Treat as deduction failure and fall back to a
-        // template_map-directed expression-walk substitution below.
-        try
-        {
-          sfinae_contextt sfinae_guard{*this};
-          c_typecheck_baset::do_initializer(sym);
-        }
-        catch(...)
-        {
-          sym.value.visit_pre(
-            [this](exprt &e)
-            {
-              if(e.id() == ID_symbol)
-              {
-                exprt v =
-                  template_map.lookup(to_symbol_expr(e).get_identifier());
-                if(v.is_not_nil())
-                  e = v;
-              }
-            });
-        }
+        sfinae_contextt sfinae_guard{*this};
+        // unqualified lookup must see the class's own members
+        cpp_save_scopet init_scope_guard(cpp_scopes);
+        auto scope_it = cpp_scopes.id_map.find(class_name);
+        if(scope_it != cpp_scopes.id_map.end())
+          cpp_scopes.go_to(*scope_it->second);
+        typecheck_expr(sym.value);
+        implicit_typecast(sym.value, sym.type);
+        simplify(sym.value, *this);
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
       }
-      else
+      catch(...)
       {
-        c_typecheck_baset::do_initializer(sym);
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
+        continue;
       }
 
       // Mark static const integral members as compile-time constants.
