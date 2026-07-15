@@ -2526,3 +2526,40 @@ header-free).  Bisection path from the real map (--cpp20):
 
 Suite green, 92 skipped (new KNOWNBUG added).  cpp20_map_basic desc
 links to the minimal.
+
+## construct_at pack-args FIXED -> CORE (2026-07-15 night)
+
+Two fixes (commit: instantiate_template + 2 tests):
+1. [temp.variadic]/5 + [expr.new]: free-fn-template body pack-expander
+   (cpp_instantiate_template.cpp ~6280) had no cpp_new-initializer branch.
+   Added one mirroring the function-call/init_args branches:
+   `::new(p) T(forward<Args>(args)...)` now replicates per element.
+   cpp11_construct_at_pack_args -> CORE.
+2. [temp.inst]/5: void-returning constexpr member fn templates (the C++20
+   allocator_traits::construct wrapper) were eagerly converted before the
+   deferred body-pack expander ran, resolving the still-packed
+   construct_at call and dropping the body.  Root-caused via n8 vs n8b
+   (constexpr vs not, identical body/map/annotations -- the ONLY diff was
+   the eager attempt).  Gate: defer void-returning constexpr members
+   (return_type == ID_empty).  Also confined the eager attempt to an
+   inner cpp_saved_template_mapt scope so its forced-empty pack bindings
+   don't leak into the add_method_body requeue snapshot.
+   New CORE cpp11_void_constexpr_wrapper_defer.
+
+Bisection ladder (all /tmp): h3/h6 (fold-in-member-template drop, still
+unfiled bug), k1/k2 (construct_at chain), j1..j8 (arity: >= 2 pack args +
+class-template target triggers), n1..n8 (constexpr wrapper isolation),
+p1/p2 (decltype-return vs plain-return).
+
+RESIDUAL (narrowed, KNOWNBUG cpp11_construct_at_decltype_return): the
+trailing-return `decltype(::new((void*)0) _Tp(declval<_Args>()...))` on
+std::construct_at ITSELF fails argument deduction with >= 2 args
+constructing a class-template instance ("found no match").  Plain-return
+same body works (p2).  This is the sole remaining --cpp20 map blocker.
+NEXT: the trailing-return decltype over a pack-expanded new-expression is
+evaluated during [temp.deduct.call] deduction; find why the pack-expanded
+`_Tp(declval<_Args>()...)` in the return decltype doesn't deduce (likely
+the return-type decltype is type-checked before/without the deduced
+_Args pack, or the new-expression in a decltype isn't handled by the
+deduction-time substitution).  cpp11_map_insert still CORE (no
+regression); suite green 92 skipped.
