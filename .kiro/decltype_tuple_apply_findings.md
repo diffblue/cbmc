@@ -2285,3 +2285,40 @@ cvise (22-line skeleton, clang-rejected, hand-rebuilt):
     default-template-arg SFINAE evaluation must tolerate the collateral
     failure without poisoning the probe result.
 Suite green 94 skipped (new KNOWNBUG added).
+
+## is_swappable root cause CORRECTED + FIXED (2026-07-15)
+
+The [temp.inst]/5 unevaluated-operand theory was WRONG.  Bisection of the
+KNOWNBUG (b1..b12, c1..c8, d1..d4 in /tmp, reproduced down to 4 lines):
+
+    struct wrap { typedef true_type type;
+                  static const bool value = type::value; };  // value nondet!
+
+* The swap<int>/swap<NoCopy> definition conversions observed earlier came
+  from the innocent deferred drain, NOT from the probe (CF/FFI probes).
+* Real defect: the in-class STATIC MEMBER INITIALIZER reading a class-local
+  typedef (qualified or not, decltype or not) was type-checked
+  mid-elaboration: the C type-checker can't resolve cpp_names, and the C++
+  route ran outside the class scope; the failure was swallowed (sfinae
+  guard), leaving sym.value as a raw cpp_name => nondet reads downstream.
+  N5008 [basic.scope.class] requires earlier-declared members (typedefs) to
+  resolve.  NB: static member initializers are NOT complete-class contexts
+  ([class.mem.general]/9 list) -- later-declared siblings stay invisible in
+  g++/clang++.
+* FIX (b86fecf1b0, cpp_typecheck_compound_type.cpp + cpp_typecheck.h):
+  1. route cpp_name-bearing initializers through the C++ type-checker,
+     entering the class scope (cpp_save_scopet + id_map go_to);
+  2. if still unresolved, queue (member, class) on
+     deferred_static_initializers (previously DEAD machinery -- declared,
+     drained at typecheck_compound_body end, but never populated!) and
+     re-type-check in class scope at end-of-class.
+* Collateral: cpp20_apple_libcxx_basic KNOWNBUG -> CORE (real libc++
+  <optional>/<string>/<vector> verify in ~16s; traits no longer nondet).
+  cpp11_is_swappable_unevaluated -> CORE.  New CORE
+  cpp11_static_member_init_class_scope (distilled shapes).
+* Map trio STILL KNOWNBUG, new residual: operator[] return-value
+  dereference failures (dead object / bounds / invalid address) in
+  cpp20_map_basic + cpp11_map_insert; cpp17_tuple_basic fails its layer-3
+  make_tuple ctor resolution as before.
+
+Suite green, 92 skipped.  Commits b86fecf1b0 (src), tests commit after.
