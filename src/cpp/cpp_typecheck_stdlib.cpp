@@ -1328,29 +1328,45 @@ void cpp_typecheckt::provide_stdlib_bodies()
        name.find("__alloc_traits") != std::string::npos ||
        name.find("__new_allocator") != std::string::npos))
     {
-      // construct(alloc&, ptr, args...) → *ptr = arg
-      // For simple types, placement new is equivalent to assignment.
+      // construct(alloc&, ptr, arg) → *ptr = arg
+      // For a SINGLE argument of the constructed type itself, placement new
+      // is equivalent to assignment.  Only then: with several forwarded
+      // arguments (e.g. map's piecewise construction
+      // `construct(alloc, ptr, piecewise_construct, tuple1, tuple2)`) or an
+      // argument of a different type, the value must go through overload
+      // resolution of _Tp's constructors ([expr.new], [over.match.ctor]) --
+      // the blanket `*ptr = args[0]` model would assign a
+      // piecewise_construct_t into a pair (a type-inconsistent assignment
+      // that aborts symbolic execution).  In those cases leave the real
+      // header body in place.
       ensure_parameter_symbols(symbol, symbol_table);
       const auto &params = to_code_type(symbol.type).parameters();
-      if(params.size() >= 3)
+      if(params.size() == 3)
       {
         // params[0] = allocator&, params[1] = T*, params[2] = T&&
         const auto &ptr_param = params[1];
         const auto &val_param = params[2];
-        symbol_exprt ptr_sym(ptr_param.get_identifier(), ptr_param.type());
-        symbol_exprt val_sym(val_param.get_identifier(), val_param.type());
-        // *ptr = val (dereference the rvalue reference)
         typet pointee = to_pointer_type(ptr_param.type()).base_type();
         typet val_base = val_param.type();
         if(val_base.id() == ID_pointer && val_base.get_bool("#reference"))
           val_base = to_pointer_type(val_base).base_type();
-        dereference_exprt deref(ptr_sym, pointee);
-        dereference_exprt val_deref(val_sym, val_base);
-        code_blockt block;
-        block.add(code_frontend_assignt(deref, val_deref));
-        symbol.value = std::move(block);
-        symbol.value.type() = symbol.type;
-        deferred_typechecking.erase(symbol.name);
+        typet pointee_cmp = pointee;
+        typet val_cmp = val_base;
+        pointee_cmp.remove(ID_C_constant);
+        val_cmp.remove(ID_C_constant);
+        if(pointee_cmp == val_cmp)
+        {
+          symbol_exprt ptr_sym(ptr_param.get_identifier(), ptr_param.type());
+          symbol_exprt val_sym(val_param.get_identifier(), val_param.type());
+          // *ptr = val (dereference the rvalue reference)
+          dereference_exprt deref(ptr_sym, pointee);
+          dereference_exprt val_deref(val_sym, val_base);
+          code_blockt block;
+          block.add(code_frontend_assignt(deref, val_deref));
+          symbol.value = std::move(block);
+          symbol.value.type() = symbol.type;
+          deferred_typechecking.erase(symbol.name);
+        }
       }
     }
     else if(
