@@ -2387,3 +2387,52 @@ RESIDUALS (documented, not fixed):
 Commits: conversions (expr.ref/6 + best.ics), method_bodies (variadic/5),
 resolve+compound_type+template_map (3 pack fixes), stdlib construct gate,
 map_insert flip, cpp20_map_basic note.
+
+## cpp20_map_basic session (2026-07-15 afternoon): 4 fixes, 2 CORE tests
+
+Diagnosis path: unbounded run loops forever in _Rb_tree_decrement's model
+(symex explores nondet-shaped tree).  Bisected `m[1]=42; assert(m[1]==42)`
+(mb2): the READ mis-evaluates because the FIRST insert stored a garbage
+key (trace: node storage bytes {3,0,...} -- never written).  Chain: the
+allocator construct path produced no body for
+allocator_traits::construct<pair, piecewise...>.  Four stacked defects,
+each bisected to a header-free minimal (a-series in /tmp):
+
+1. PARSER (parse.cpp rAllocateInitializer): the `...` in a
+   new-initializer's expression-list was consumed with a literal TODO --
+   `::new(p) _Up(forward<_Args>(__args)...)` could never expand.
+   [temp.variadic]/5.  (a3 marker: PRE-body ellipsis count 0.)
+2. template_mapt::expand_call_argument_packs recursed into NESTED member
+   TEMPLATE declarations during class instantiation, consuming their pack
+   expansions against the enclosing map ([temp.inst]/2 gate added).
+3. Free-fn instantiation body expander (cpp_instantiate_template
+   expand_pack) lacked a declarator-init_args branch; recursion corrupted
+   `_Up tmp(forward<_Args>(__args)...)` into ONE
+   `forward<_Args>(__args$0, __args$1)` (a9).  [temp.variadic]/5.
+4. guess_function_template_args' convertibility pre-filter paired the
+   implicit OBJECT argument against the first REAL parameter (skipped the
+   `this` param but not the object operand) -- member templates like
+   `construct(_Up*, pc_t, tuple<int&&>)` rejected as not-convertible
+   (a15, 20 lines).  [over.match.funcs]/2.
+
+Tests: cpp11_member_template_object_arg (fix 4 isolated),
+cpp11_pack_expansion_new_init (full allocator chain, needs 1+2+4).
+Commits: parse.cpp fix, template_map gate, init_args expansion,
+object pairing + tests, map_basic note.
+
+Debug techniques that worked: trace-driven (storage bytes {3,0,..} =
+never-written malloc garbage); PRE/PREP body dumps at
+prepare_deferred_method_body entry/exit to catch marker loss; gdb catch
+throw armed via convert_function-name-matched extern "C" global +
+noinline marker fn in the catch to bracket the ESCAPING throw among
+hundreds of SFINAE throws.
+
+RESIDUAL (cpp20_map_basic stays KNOWNBUG, note refreshed): std::pair's
+piecewise ctor is defined out-of-line in <tuple> as a DELEGATING ctor
+(`: pair(__first, __second, _Build_index_tuple<...>::__type(), ...)`);
+its instance converts to an EMPTY body (delegating mem-initializer of an
+out-of-line two-pack member template dropped), so the key is never
+stored; the read-back re-inserts and unbounded unwinding diverges.
+NEXT: fix the delegating-ctor initializer of out-of-line member-template
+ctors ([class.base.init]/6 delegating constructors); then mb2 should
+verify and cpp20_map_basic likely flips (re-time it).
