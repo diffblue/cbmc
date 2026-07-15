@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ first from forwarded tuple: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second from pack arity: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/5 (pack expansion in a new-initializer's
+expression-list) + [temp.inst]/2 (class instantiation does not instantiate
+member templates -- their pack expansions must survive) +
+[over.match.funcs]/2.  The full allocator_traits -> allocator ->
+__new_allocator::construct chain behind std::map's node construction,
+header-free.  g++/clang++ runtime-verified.
