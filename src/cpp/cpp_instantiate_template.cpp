@@ -2825,6 +2825,37 @@ const symbolt &cpp_typecheckt::instantiate_template(
           params.get_sub().end());
       }
       irept &mi = decl.add(ID_member_initializers);
+      // A reference to the (empty) pack anywhere in an initializer argument
+      // marks it as a pack expansion to be dropped ([temp.variadic]/4: a
+      // pack can only appear expanded; the parser may lose the `...`) --
+      // EXCEPT under `sizeof...`, which is a complete expression whose
+      // value for an empty pack is simply 0 ([temp.variadic]/8), e.g.
+      // `typename _Build_index_tuple<sizeof...(_Args2)>::__type()` in
+      // std::pair's delegating piecewise constructor: that argument must
+      // be KEPT, or the delegation call's arguments shift and the target
+      // constructor no longer resolves.
+      std::function<bool(const irept &)> refs_ep_outside_sizeof =
+        [&](const irept &n) -> bool
+      {
+        if(n.get_bool("#sizeof_pack"))
+          return false;
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep_names.count(p != std::string::npos ? f.substr(p + 2) : f))
+            return true;
+        }
+        if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &sn : n.get_sub())
+          if(refs_ep_outside_sizeof(sn))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(refs_ep_outside_sizeof(ns.second))
+            return true;
+        return false;
+      };
       for(auto &init : mi.get_sub())
       {
         auto &subs = init.get_sub();
@@ -2832,7 +2863,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           std::remove_if(
             subs.begin(),
             subs.end(),
-            [&](const irept &s) { return refs_ep(s); }),
+            [&](const irept &s) { return refs_ep_outside_sizeof(s); }),
           subs.end());
       }
     }
@@ -3001,6 +3032,37 @@ skip_pack_removal:
       }
       // Remove empty pack expressions from member initializers
       irept &mi = decl.add(ID_member_initializers);
+      // A reference to the (empty) pack anywhere in an initializer argument
+      // marks it as a pack expansion to be dropped ([temp.variadic]/4: a
+      // pack can only appear expanded; the parser may lose the `...`) --
+      // EXCEPT under `sizeof...`, which is a complete expression whose
+      // value for an empty pack is simply 0 ([temp.variadic]/8), e.g.
+      // `typename _Build_index_tuple<sizeof...(_Args2)>::__type()` in
+      // std::pair's delegating piecewise constructor: that argument must
+      // be KEPT, or the delegation call's arguments shift and the target
+      // constructor no longer resolves.
+      std::function<bool(const irept &)> refs_ep_outside_sizeof =
+        [&](const irept &n) -> bool
+      {
+        if(n.get_bool("#sizeof_pack"))
+          return false;
+        if(n.id() == ID_template_parameter_symbol_type)
+        {
+          const std::string f = id2string(n.get(ID_identifier));
+          auto p = f.rfind("::");
+          if(ep_names.count(p != std::string::npos ? f.substr(p + 2) : f))
+            return true;
+        }
+        if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
+          return true;
+        for(const auto &sn : n.get_sub())
+          if(refs_ep_outside_sizeof(sn))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(refs_ep_outside_sizeof(ns.second))
+            return true;
+        return false;
+      };
       for(auto &init : mi.get_sub())
       {
         auto &subs = init.get_sub();
@@ -3008,7 +3070,7 @@ skip_pack_removal:
           std::remove_if(
             subs.begin(),
             subs.end(),
-            [&](const irept &s) { return refs_ep(s); }),
+            [&](const irept &s) { return refs_ep_outside_sizeof(s); }),
           subs.end());
       }
     }
@@ -4235,11 +4297,46 @@ skip_pack_removal_ft:
               md_tt.template_parameters().size() <=
               specialization_template_args.arguments().size())
               continue;
+            // N5008 [over.load], [dcl.fct]/3: the definition belonging to
+            // this member is the one whose SIGNATURE matches; matching by
+            // base name alone confuses same-named overloaded member
+            // templates (std::pair's two piecewise constructors: the
+            // 3-parameter delegating one and its 4-parameter target).
+            // Compare the function parameter count as a cheap faithful
+            // discriminator (the parameter TYPES are unsubstituted
+            // cpp_names on both sides and cannot be compared directly).
+            {
+              const typet &d_ftype = new_decl.declarators()[0].type();
+              const typet &m_ftype = md.declarators()[0].type();
+              if(
+                d_ftype.id() == ID_function_type &&
+                m_ftype.id() == ID_function_type &&
+                d_ftype.find(ID_parameters).get_sub().size() !=
+                  m_ftype.find(ID_parameters).get_sub().size())
+                continue;
+            }
             // Copy the body. The body is in parsed (not type-checked)
             // form. It will be type-checked by typecheck_method_bodies
             // with the proper template map.
             new_decl.declarators()[0].add(ID_value) =
               md.declarators()[0].find(ID_value);
+
+            // N5008 [class.base.init]/1: the ctor-initializer is part of
+            // the constructor's DEFINITION.  An out-of-line delegating
+            // constructor template (std::pair's piecewise constructor in
+            // <tuple>, `: pair(__first, __second,
+            // _Build_index_tuple<...>::__type(), ...)`) keeps its
+            // mem-initializer-list on the definition's declarator; without
+            // copying it the instantiated member converts with NO
+            // initializer -- members default-initialized, the delegation
+            // never happens, and the constructed object keeps garbage
+            // (std::map's first insert stored a garbage key).
+            {
+              const irept &m_inits =
+                md.declarators()[0].find(ID_member_initializers);
+              if(m_inits.is_not_nil())
+                new_decl.declarators()[0].member_initializers() = m_inits;
+            }
 
             // [dcl.fct]/3: parameter names are not part of the function
             // type, so an out-of-line definition may name its parameters
@@ -4527,6 +4624,21 @@ skip_pack_removal_ft:
             continue;
           if(md.declarators()[0].find(ID_value).is_nil())
             continue;
+          // N5008 [over.load], [dcl.fct]/3: the definition belonging to this
+          // member is the one whose SIGNATURE matches; base-name matching
+          // alone confuses same-named overloaded member templates (std::
+          // pair's two piecewise constructors).  Compare the function
+          // parameter count as a cheap faithful discriminator.
+          {
+            const typet &d_ftype = new_decl.declarators()[0].type();
+            const typet &m_ftype = md.declarators()[0].type();
+            if(
+              d_ftype.id() == ID_function_type &&
+              m_ftype.id() == ID_function_type &&
+              d_ftype.find(ID_parameters).get_sub().size() !=
+                m_ftype.find(ID_parameters).get_sub().size())
+              continue;
+          }
           // Only adopt from an entry that carries its own template-parameter
           // list (an out-of-line member function template definition always
           // does) and whose OWNING class template matches this member's
@@ -4561,6 +4673,19 @@ skip_pack_removal_ft:
           }
           new_decl.declarators()[0].value() =
             static_cast<const exprt &>(md.declarators()[0].find(ID_value));
+          // N5008 [class.base.init]/1: the ctor-initializer is part of the
+          // constructor's DEFINITION.  An out-of-line delegating constructor
+          // (std::pair's piecewise constructor in <tuple>, `: pair(__first,
+          // __second, _Build_index_tuple<...>::__type(), ...)`) keeps its
+          // mem-initializer-list on the definition's declarator; without
+          // copying it the instantiated member converts with NO initializer
+          // (members default-initialized, the delegation never happens).
+          {
+            const irept &m_inits =
+              md.declarators()[0].find(ID_member_initializers);
+            if(m_inits.is_not_nil())
+              new_decl.declarators()[0].member_initializers() = m_inits;
+          }
           // Use the definition's parameter names so the body's references
           // bind ([dcl.fct]/3).
           {
@@ -4670,6 +4795,51 @@ skip_pack_removal_ft:
       // arguments so method_bodies can restore the template_map.
       ws.type.add(irep_idt{"#fn_template_type"}) = template_type;
       ws.type.add(irep_idt{"#fn_template_args"}) = specialization_template_args;
+      // N5008 [temp.variadic]/5,8: with MULTIPLE parameter packs (std::pair's
+      // piecewise delegation target `template<class... _Args1,
+      // size_t... _Indexes1, class... _Args2, size_t... _Indexes2>`), the
+      // flat #fn_template_args list cannot encode how the arguments split
+      // between the packs; the drain's template-map rebuild would misbind
+      // them and the body would fail to convert (silently dropped for a
+      // system header).  Persist the deduction-time pack bindings -- TYPE
+      // pack elements from pack_args_map, NON-TYPE pack values from
+      // pack_expr_map -- for prepare_deferred_method_body to replay.
+      {
+        std::size_t n_packs = 0;
+        for(const auto &tp : template_type.template_parameters())
+          if(tp.get_bool(ID_ellipsis))
+            ++n_packs;
+        if(n_packs > 1)
+        {
+          irept packs("deduced_packs");
+          for(const auto &tp : template_type.template_parameters())
+          {
+            if(!tp.get_bool(ID_ellipsis))
+              continue;
+            const irep_idt pid = tp.id() == ID_type
+                                   ? tp.type().get(ID_identifier)
+                                   : tp.get(ID_identifier);
+            irept entry(tp.id() == ID_type ? ID_type : ID_expression);
+            entry.set(ID_identifier, pid);
+            if(tp.id() == ID_type)
+            {
+              const auto pa_it = template_map.pack_args_map.find(pid);
+              if(pa_it != template_map.pack_args_map.end())
+                for(const auto &t : pa_it->second)
+                  entry.get_sub().push_back(t);
+            }
+            else
+            {
+              const auto pe_it = template_map.pack_expr_map.find(pid);
+              if(pe_it != template_map.pack_expr_map.end())
+                for(const auto &v : pe_it->second)
+                  entry.get_sub().push_back(v);
+            }
+            packs.get_sub().push_back(entry);
+          }
+          ws.type.add(irep_idt{"#fn_template_packs"}) = packs;
+        }
+      }
 
       // [temp.inst]/5: a function template specialization is implicitly
       // instantiated -- including its definition -- when referenced in a

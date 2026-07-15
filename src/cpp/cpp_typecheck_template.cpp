@@ -679,6 +679,17 @@ void cpp_typecheckt::typecheck_class_template_member(
           declarator.find(ID_value).is_not_nil())
         {
           tmpl_decl.declarators()[0].add(ID_value) = declarator.find(ID_value);
+          // N5008 [class.base.init]/1: the ctor-initializer is part of the
+          // constructor's DEFINITION.  An out-of-line delegating constructor
+          // template (std::pair's piecewise constructor in <tuple>,
+          // `: pair(__first, __second, _Build_index_tuple<...>::__type(),
+          // ...)`) carries its mem-initializer-list on the definition's
+          // declarator; copying only the body converts the member with NO
+          // initializer (members default-initialized, the delegation never
+          // happens, the constructed pair keeps garbage).
+          const irept &m_inits = declarator.find(ID_member_initializers);
+          if(m_inits.is_not_nil())
+            tmpl_decl.declarators()[0].member_initializers() = m_inits;
           return;
         }
       }
@@ -1026,6 +1037,18 @@ void cpp_typecheckt::typecheck_class_template_member(
               }
               td.declarators()[0].add(ID_value) =
                 mcopy.declarators()[0].find(ID_value);
+              // N5008 [class.base.init]/1: the ctor-initializer is part of
+              // the constructor's DEFINITION; an out-of-line delegating
+              // constructor template (std::pair's piecewise constructor)
+              // keeps it on the definition's declarator.  Copy it along
+              // with the body, otherwise the instantiated member converts
+              // with NO initializer and the delegation never happens.
+              {
+                const irept &m_inits =
+                  mcopy.declarators()[0].find(ID_member_initializers);
+                if(m_inits.is_not_nil())
+                  td.declarators()[0].member_initializers() = m_inits;
+              }
 
               // Update existing concrete symbols that have nil body
               // with the now-available body from the .tcc definition.
