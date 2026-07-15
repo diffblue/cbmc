@@ -222,13 +222,31 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
   for(auto &ns : n.get_named_sub())
     expand_call_argument_packs(ns.second, only_nontype);
 
-  if(!(n.id() == ID_side_effect && n.get(ID_statement) == ID_function_call))
+  const bool is_new =
+    n.id() == ID_side_effect && n.get(ID_statement) == ID_cpp_new;
+  if(!(n.id() == ID_side_effect &&
+       (n.get(ID_statement) == ID_function_call || is_new)))
     return;
 
-  for(auto &child : n.get_sub())
+  // N5008 [temp.variadic]/5 + [expr.new]: a new-initializer's
+  // expression-list is a pack-expansion context exactly like a
+  // function-call argument list -- e.g. std::construct_at's trailing return
+  // type `decltype(::new((void*)0) _Tp(declval<_Args>()...))`.  Expand its
+  // elements with the same per-argument logic; for a function call, expand
+  // the ID_arguments operand.
+  irept *child_ptr = nullptr;
+  if(is_new)
+    child_ptr = &n.add(ID_initializer);
+  else
+    for(auto &c : n.get_sub())
+      if(c.id() == ID_arguments)
+      {
+        child_ptr = &c;
+        break;
+      }
+  if(child_ptr != nullptr)
   {
-    if(child.id() != ID_arguments)
-      continue;
+    irept &child = *child_ptr;
 
     bool changed = false;
     irept::subt new_args;
@@ -439,7 +457,6 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
     }
     if(changed)
       child.get_sub() = new_args;
-    break;
   }
 }
 

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ decltype-return construct_at: SUCCESS$
@@ -8,15 +8,14 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-KNOWNBUG: N5008 [temp.deduct.call] + [dcl.fct]/2 + [temp.variadic]/5 -- a
-free function template whose trailing return type is
+N5008 [temp.deduct.call] + [dcl.fct]/2 + [temp.variadic]/5 + [expr.new]:
+a free function template whose trailing return type is
 `decltype(::new((void*)0) _Tp(declval<_Args>()...))` (the C++20
-std::construct_at declaration) fails argument deduction with two or more
-arguments constructing a class-template instance ("found no match for
-symbol 'construct_at'").  The plain-return flavour of the identical body
-works (cpp11_construct_at_pack_args); the trailing-return decltype over a
-pack-expanded new-expression is the residual.  This is the remaining
-front-end blocker of cpp20_map_basic (the C++20 headers route std::map
-node construction through this exact construct_at declaration).  Flip to
-CORE when the trailing-return decltype over a pack-expanded
-new-expression is deduced.  g++/clang++ runtime-verified.
+std::construct_at declaration) must expand the `_Args` pack inside the
+new-initializer of the return-type decltype during argument deduction.
+Was KNOWNBUG (>= 2 args constructing a class-template instance: "found no
+match for symbol 'construct_at'").  Fixed by teaching
+template_mapt::expand_call_argument_packs (which apply(decltype) invokes)
+to treat a cpp_new initializer's expression-list as a pack-expansion
+context, mirroring the function-call argument list it already handled.
+g++/clang++ runtime-verified.
