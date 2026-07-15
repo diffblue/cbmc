@@ -6084,6 +6084,54 @@ skip_pack_removal_ft:
             }
           }
 
+          // N5008 [temp.variadic]/5: a pack expansion in the expression-list
+          // of a declarator's direct-initializer, e.g.
+          // `_Up tmp(forward<_Args>(__args)...)` (the allocator
+          // `construct` body behind std::map's node construction).  Mirror
+          // the function-call argument branch: replicate each `...`-carrying
+          // pattern into one initializer per pack element, substituting the
+          // value pack `a -> a$k` and the type pack in lockstep.  Without
+          // this the recursion descends into the pattern and the
+          // function-call branch wrongly expands the INNER argument list in
+          // place (a single `forward<_Args>(__args$0, __args$1)` that keeps
+          // its `...`), so the enclosing body fails to convert and is
+          // dropped.
+          if(node.id() == ID_cpp_declarator)
+          {
+            irept &init_args = node.add(ID_init_args);
+            irept::subt &ia_sub = init_args.get_sub();
+            if(!ia_sub.empty())
+            {
+              irept::subt new_ia;
+              for(auto &a : ia_sub)
+              {
+                if(is_pack_name(a))
+                {
+                  for(const auto &ename : expanded_names)
+                    new_ia.push_back(make_name(a, ename));
+                }
+                else if(a.get_bool(ID_ellipsis) && contains_pack_name(a))
+                {
+                  for(std::size_t k = 0; k < expanded_names.size(); ++k)
+                  {
+                    irept copy = substitute_pack(a, expanded_names[k]);
+                    copy.remove(ID_ellipsis);
+                    if(
+                      !type_pack_name.empty() && k < pack_elem_types.size() &&
+                      pack_elem_types[k].is_not_nil())
+                      subst_type_pack(copy, pack_elem_types[k]);
+                    new_ia.push_back(copy);
+                  }
+                }
+                else
+                {
+                  new_ia.push_back(a);
+                }
+              }
+              ia_sub = new_ia;
+            }
+          }
+
           for(auto &sub : node.get_sub())
             expand_pack(sub);
           for(auto &named : node.get_named_sub())
