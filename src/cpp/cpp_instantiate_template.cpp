@@ -4487,6 +4487,117 @@ skip_pack_removal_ft:
       }
     }
 
+    // N5008 [temp.mem.func] + [temp.inst]/2: a member function template of a
+    // class template may be defined OUT OF LINE; instantiating it uses that
+    // definition.  The in-class declaration carries no body, and the
+    // out-of-line definition is recorded only as a `template_methods` entry
+    // of the enclosing class template (there is no scope TEMPLATE id for it),
+    // so the instance's member-template declarator arrives here with a nil
+    // value and the specialization would be silently bodyless ("no body for
+    // callee", e.g. std::_Rb_tree::_M_emplace_hint_unique reached from
+    // std::map::operator[]).  Attach the raw definition body (and switch to
+    // the definition's parameter names, [dcl.fct]/3: the definition's names
+    // bind in its body); the deferred method-body drain substitutes the class
+    // and method template parameters at conversion, exactly as for a body
+    // attached at class-instantiation time.
+    if(
+      !new_decl.declarators().empty() &&
+      new_decl.declarators()[0].value().is_nil())
+    {
+      const irep_idt member_base_name =
+        new_decl.declarators()[0].name().get_base_name();
+      bool attached = false;
+      for(const auto &tsp : symbol_table)
+      {
+        if(attached)
+          break;
+        if(!tsp.second.type.get_bool(ID_is_template))
+          continue;
+        if(tsp.second.value.is_nil())
+          continue;
+        const exprt &tms = static_cast<const exprt &>(
+          tsp.second.value.find(ID_template_methods));
+        for(const auto &tm : tms.operands())
+        {
+          const cpp_declarationt &md = static_cast<const cpp_declarationt &>(
+            static_cast<const irept &>(tm));
+          if(md.declarators().empty())
+            continue;
+          if(md.declarators()[0].name().get_base_name() != member_base_name)
+            continue;
+          if(md.declarators()[0].find(ID_value).is_nil())
+            continue;
+          // Only adopt from an entry that carries its own template-parameter
+          // list (an out-of-line member function template definition always
+          // does) and whose OWNING class template matches this member's
+          // enclosing class, so a same-named member of an unrelated template
+          // is not attached (the known hazard of base-name matching).
+          if(md.find(ID_template_type).is_nil())
+            continue;
+          {
+            // template_symbol.name is `<class-instance>::template.<member>...`;
+            // the owner id is `[ns::]template.<class><params>`.  Compare the
+            // class base names (strip the template-argument/parameter lists).
+            const std::string tmpl_name = id2string(template_symbol.name);
+            const auto member_sep = tmpl_name.find("::template.");
+            std::string class_part = member_sep != std::string::npos
+                                       ? tmpl_name.substr(0, member_sep)
+                                       : std::string{};
+            const auto args_pos = class_part.find('<');
+            if(args_pos != std::string::npos)
+              class_part.resize(args_pos);
+            const auto ns_pos = class_part.rfind("::");
+            if(ns_pos != std::string::npos)
+              class_part.erase(0, ns_pos + 2);
+            std::string owner = id2string(tsp.first);
+            const auto tpos = owner.rfind("template.");
+            if(tpos != std::string::npos)
+              owner.erase(0, tpos + std::string("template.").size());
+            const auto owner_args = owner.find('<');
+            if(owner_args != std::string::npos)
+              owner.resize(owner_args);
+            if(class_part.empty() || owner != class_part)
+              continue;
+          }
+          new_decl.declarators()[0].value() =
+            static_cast<const exprt &>(md.declarators()[0].find(ID_value));
+          // Use the definition's parameter names so the body's references
+          // bind ([dcl.fct]/3).
+          {
+            typet &dtype = new_decl.declarators()[0].type();
+            const typet &mtype = md.declarators()[0].type();
+            if(dtype.id() == ID_function_type && mtype.id() == ID_function_type)
+            {
+              irept::subt &dparams = dtype.add(ID_parameters).get_sub();
+              const irept::subt &mparams = mtype.find(ID_parameters).get_sub();
+              for(std::size_t i = 0; i < dparams.size() && i < mparams.size();
+                  ++i)
+              {
+                const irept &mdecl = mparams[i];
+                if(
+                  dparams[i].id() != ID_cpp_declaration ||
+                  mdecl.id() != ID_cpp_declaration)
+                  continue;
+                const auto &m_declaration =
+                  to_cpp_declaration(static_cast<const exprt &>(mdecl));
+                auto &d_declaration = static_cast<cpp_declarationt &>(
+                  static_cast<irept &>(dparams[i]));
+                if(
+                  m_declaration.declarators().size() == 1 &&
+                  d_declaration.declarators().size() == 1)
+                {
+                  d_declaration.declarators()[0].name() =
+                    m_declaration.declarators()[0].name();
+                }
+              }
+            }
+          }
+          attached = true;
+          break;
+        }
+      }
+    }
+
     // Per [temp.inst]/3: member function template type-checking
     // may fail when function template parameters are not in the
     // class template map.  Catch and return the template symbol.
