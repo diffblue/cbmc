@@ -2593,3 +2593,21 @@ Three CORE tests now cover the full C++20 construct_at chain:
 cpp11_construct_at_pack_args, cpp11_void_constexpr_wrapper_defer,
 cpp11_construct_at_decltype_return.  Still-unfiled lead:
 fold-over-member-template-pack drops calls (h3/h6 from the prior session).
+
+## fold-over-member-template-pack MINIMAL REPRODUCER (2026-07-15 late)
+
+The unfiled lead is now filed: cpp17_member_template_fold (KNOWNBUG).
+Bisection (g1..g6): free fn + fold PASS (g1/g6); class member + NO fold
+PASS (g3); MEMBER fn template + fold REPRODUCES (g2/g4/g5), enclosing
+class need NOT be a template.  Minimal g4:
+  struct S { template<typename... A> static int sum(A... a)
+             { return (a + ...); } };
+Root cause: free function templates run instantiate_template's expand_pack
+(which has cpp_left_fold/cpp_right_fold/cpp_binary_fold branches -- from
+the fold trilogy work); MEMBER function templates run
+prepare_deferred_method_body's arg-list/base$k expander, which has NO
+fold handling.  So the member body's fold is left unexpanded, the bare
+pack name fails to resolve (gdb: resolve throw in typecheck_return of
+sum), and the body is dropped.  NEXT: add fold-expression expansion to
+prepare_deferred_method_body's expand lambda (or share the
+instantiate_template fold logic).  g++/clang++ runtime-verified.
