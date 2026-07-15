@@ -2563,3 +2563,33 @@ the return-type decltype is type-checked before/without the deduced
 _Args pack, or the new-expression in a decltype isn't handled by the
 deduction-time substitution).  cpp11_map_insert still CORE (no
 regression); suite green 92 skipped.
+
+## construct_at decltype-return FIXED -> CORE (2026-07-15 late night)
+
+The residual C++20 std::construct_at blocker: its trailing return type
+`decltype(::new((void*)0) _Tp(declval<_Args>()...))` failed argument
+deduction with >= 2 args ("found no match").  Bisection (r1..r7):
+* r2 plain `_Tp*` return: PASS; r7 non-pack fixed 2-arg decltype-new:
+  PASS -> the pack expansion INSIDE the decltype-new is the trigger.
+* apply(decltype) calls expand_call_argument_packs, which only handled a
+  function_call's ID_arguments; a cpp_new's ID_initializer expression-list
+  was never treated as a pack-expansion context, so `declval<_Args>()...`
+  kept its `...` and deduction failed.
+FIX (template_map.cpp): generalise expand_call_argument_packs to also
+expand a cpp_new initializer's expression-list (gate on cpp_new; select
+the ID_initializer named-sub as the arg list), mirroring the sibling
+body-expander cpp_new branch in cpp_instantiate_template.
+cpp11_construct_at_decltype_return -> CORE.
+
+Result: --cpp20 now instantiates construct_at (5 symbols), runs the pair
+piecewise ctor, stores the key.  cpp20_map_basic's FRONT END is fully
+correct; its remaining non-termination is a pure BMC solver-scaling wall
+(at --unwind 5: ~6.5min to build the equation, solver then OOMs), NOT a
+conformance bug -- the same program verifies unbounded under --cpp11.
+map note reclassified accordingly (stays KNOWNBUG as a performance item).
+Suite green, 91 skipped.
+
+Three CORE tests now cover the full C++20 construct_at chain:
+cpp11_construct_at_pack_args, cpp11_void_constexpr_wrapper_defer,
+cpp11_construct_at_decltype_return.  Still-unfiled lead:
+fold-over-member-template-pack drops calls (h3/h6 from the prior session).
