@@ -2499,3 +2499,30 @@ Debug recipes that worked again: armed extern "C" global + noinline
 marker fn breakpoints bracketing the ESCAPING throw among hundreds;
 PSM/pack-map dumps at deduction vs build; PRE/PREP body dumps; the
 uncaught_exceptions RAII dump for cast failures.
+
+## cpp20 construct_at blocker MINIMAL REPRODUCER (2026-07-15 late)
+
+cpp11_construct_at_pack_args (KNOWNBUG, fails-as-expected, 82 lines,
+header-free).  Bisection path from the real map (--cpp20):
+* allocator_traits::construct under --cpp20 is constexpr -> is_macro,
+  value NIL, its CALL absent from _M_construct_node's goto body;
+  std::construct_at absent from the symbol table entirely.
+* Distillation: constexpr is NOT required (h-series: the constexpr
+  member-template h1/h4/h5 all pass); the decltype-SFINAE return and
+  noexcept(placement-new+declval) are NOT required (k8); const members
+  not required (j5 vs j6); the trigger is a FREE function template
+  whose new-initializer expands a pack of >= TWO arguments constructing
+  a CLASS-TEMPLATE instance (j7: wrap<int> + wrap(T,T), 20 lines).
+  One argument passes (j1/j6/j8).  Failure mode: "no body for callee
+  construct_at" -- the instantiated body's conversion fails.
+* Likely locus: the FREE-fn-template body expander's cpp_new-initializer
+  handling for multi-element packs (the member-template flavour was
+  fixed via the parser ellipsis + [temp.inst]/2 gate + init_args branch;
+  a4 from that session was never re-run and is this same gap).
+* SEPARATE bug found during bisection, not filed yet: a member template
+  of a class template with a FOLD over its pack ('*p = (args + ...)')
+  drops the call entirely (h3/h6) -- non-constexpr too.  Worth its own
+  minimal/KNOWNBUG next session.
+
+Suite green, 92 skipped (new KNOWNBUG added).  cpp20_map_basic desc
+links to the minimal.
