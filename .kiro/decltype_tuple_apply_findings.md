@@ -2260,3 +2260,28 @@ the owner match.
 Verified: minimal -> CORE; suite green 94 skipped.  Map/tuple still fail on
 their NEXT layers ("void-typed symbol not permitted" for map -- unchanged by
 this fix since libstdc++'s attachment already worked via a different route).
+
+## Map residual blocker — MINIMAL REPRODUCER (2026-07-15 early)
+
+cpp11_is_swappable_unevaluated (KNOWNBUG).  Chain established via VTS probe +
+cvise (22-line skeleton, clang-rejected, hand-rebuilt):
+  * "void-typed symbol not permitted" = local `__tmp` of std::swap<void>,
+    instantiated COLLATERALLY from the UNEVALUATED probe
+    decltype(swap(declval<_Tp&>(), declval<_Tp&>())) in __is_swappable
+    ([temp.inst]/5 violation: unevaluated operands need declarations only).
+  * Ingredients (verified by construction): the real two-overload __declval
+    chain + the variadic enable_if<and_<is_swappable<E>...>> tuple-swap
+    overload + an inline friend swap.  Without the variadic overload in the
+    set, no reproduction.
+  * Observability: a deleted-copy type makes the (wrongly instantiated)
+    definition ill-formed and poisons the probe => even is_swappable<int>
+    mis-evaluates FALSE.  In the map, the collateral instantiation aborts the
+    enclosing member's conversion (the remaining "no body" on
+    _M_emplace_hint_unique after the drain-parity + attachment fixes).
+  * FIX DIRECTION: the constexpr/SFINAE evaluation paths (cpp_typecheck_expr
+    ~4552 eager convert; instantiate_template function branch) must not
+    convert/instantiate definitions when the call is inside an unevaluated
+    operand (decltype/sizeof/noexcept context tracking), or at minimum the
+    default-template-arg SFINAE evaluation must tolerate the collateral
+    failure without poisoning the probe result.
+Suite green 94 skipped (new KNOWNBUG added).
