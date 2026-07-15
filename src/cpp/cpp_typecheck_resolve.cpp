@@ -1167,6 +1167,28 @@ void cpp_typecheck_resolvet::guess_function_template_args(
       }
     }
 
+    // N5008 [temp.variadic]/5,8: replay the deduction-time pack bindings
+    // recorded on the pseudo-instance (multi-pack member templates, e.g.
+    // std::pair's piecewise constructor).  The template map active during
+    // deduction has been unwound by now; without this the instantiation
+    // below rebuilds the packs from the flat argument list, which cannot
+    // encode the split between two packs (template_mapt::build then keeps
+    // whatever pack state is current -- see its n_packs > 1 branch).
+    {
+      const irept &packs = e.type().find("#deduced_packs");
+      for(const auto &entry : packs.get_sub())
+      {
+        const irep_idt pid = entry.get(ID_identifier);
+        std::vector<typet> elems;
+        for(const auto &t : entry.get_sub())
+          elems.push_back(static_cast<const typet &>(t));
+        cpp_typecheck.template_map.pack_size_map[pid] = elems.size();
+        cpp_typecheck.template_map.pack_args_map[pid] = elems;
+        if(!elems.empty())
+          cpp_typecheck.template_map.type_map[pid] = elems.front();
+      }
+    }
+
     const symbolt &new_symbol = cpp_typecheck.instantiate_template(
       source_location, template_symbol, template_args, template_args);
 
@@ -6024,7 +6046,19 @@ void cpp_typecheck_resolvet::guess_template_args(
           }
         }
       }
-      const irept &inst_args = desired_sym->type.find(ID_C_template_arguments);
+      // N5008 [temp.deduct.type]: compare against the instance's template
+      // arguments relative to the PRIMARY template (which is what the
+      // pattern P names).  ID_C_template_arguments is
+      // specialization-relative (empty for a `template<>` full
+      // specialization -- deducing packs from it collapses them to zero
+      // elements); prefer the primary-relative ID_full_template_args
+      // recorded when the instance was created.
+      const irept &full_inst_args =
+        desired_sym->type.find(ID_full_template_args);
+      const irept &inst_args =
+        full_inst_args.is_not_nil()
+          ? full_inst_args
+          : desired_sym->type.find(ID_C_template_arguments);
       if(inst_args.is_nil())
       {
         mark_targs_conflicting();
@@ -7235,11 +7269,24 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   // Convert deduction-failed markers (ID_nil) to ID_unassigned so that
-  // has_unassigned() detects them and rejects the template.
+  // has_unassigned() detects them and rejects the template.  Keep the
+  // failure distinguishable (#deduction_failed): for a parameter PACK,
+  // ID_unassigned normally means "zero elements deduced", which the
+  // default-application loop below legitimately turns into an empty pack
+  // ([temp.variadic]/7) -- but a pack POISONED by a form mismatch (N5008
+  // [temp.deduct.type]/8: P and A with incompatible forms make the entire
+  // deduction fail) must reject the candidate instead of being resurrected
+  // as an empty pack.  Otherwise e.g. the constrained tuple-swap overload
+  // `swap(tuple<_Elements...>&, ...)` probed with `int*` arguments binds
+  // _Elements to the zero-length-pack sentinel and collaterally
+  // instantiates `swap<void>` from its enable_if constraint.
   for(auto &arg : template_args.arguments())
   {
     if(arg.type().id() == ID_nil)
+    {
       arg.type().id(ID_unassigned);
+      arg.set("#deduction_failed", true);
+    }
   }
 
   // Apply default template arguments for any remaining unassigned parameters.
@@ -7333,6 +7380,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         // Variadic pack with zero arguments.
         if(param.get_bool(ID_ellipsis))
         {
+          // N5008 [temp.deduct.type]/8: if the pack was poisoned by a form
+          // mismatch (P names a class-template specialization the argument
+          // is not an instance of), the entire deduction has FAILED; the
+          // pack is not "empty", the candidate is not viable.
+          if(args[i].get_bool("#deduction_failed"))
+          {
+            return nil_exprt();
+          }
+
           const std::string full_id =
             id2string(param.type().get(ID_identifier));
           auto pos = full_id.rfind("::");
@@ -7540,7 +7596,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   if(template_args.has_unassigned())
+  {
     return nil_exprt(); // give up
+  }
 
   // Build the type of the function.
 
@@ -8006,6 +8064,42 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   exprt template_function_instance(
     ID_template_function_instance, function_type);
+
+  // N5008 [temp.variadic]/5,8: when the template-parameter-list contains
+  // MORE THAN ONE parameter pack (e.g. std::pair's piecewise constructor
+  // `template<class... _Args1, class... _Args2>`), the flat
+  // ID_C_template_arguments list recorded on the pseudo-instance cannot
+  // encode how the deduced arguments split between the packs.  Record the
+  // deduction-time pack bindings on the instance so the final
+  // instantiation (whose template_map has been restored by the nested
+  // cpp_saved_template_mapt by then) can replay them.
+  {
+    const auto &t_params =
+      cpp_declaration.template_type().template_parameters();
+    std::size_t n_packs = 0;
+    for(const auto &tp : t_params)
+      if(tp.get_bool(ID_ellipsis))
+        ++n_packs;
+    if(n_packs > 1)
+    {
+      irept packs("deduced_packs");
+      for(const auto &tp : t_params)
+      {
+        if(!tp.get_bool(ID_ellipsis))
+          continue;
+        const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                                : tp.get(ID_identifier);
+        const auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pid);
+        irept entry(ID_type);
+        entry.set(ID_identifier, pid);
+        if(pa_it != cpp_typecheck.template_map.pack_args_map.end())
+          for(const auto &t : pa_it->second)
+            entry.get_sub().push_back(t);
+        packs.get_sub().push_back(entry);
+      }
+      template_function_instance.type().add("#deduced_packs") = packs;
+    }
+  }
 
   return template_function_instance;
 }

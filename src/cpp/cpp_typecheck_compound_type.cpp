@@ -234,6 +234,12 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         irept saved_c_template = writeable_symbol.type.find(ID_C_template);
         irept saved_c_template_arguments =
           writeable_symbol.type.find(ID_C_template_arguments);
+        // Also keep the primary-template-relative argument list recorded by
+        // class_template_symbol; [temp.deduct.type] deduction against this
+        // instance reads it (a specialization's ID_C_template_arguments is
+        // relative to the specialization's own parameter list).
+        irept saved_full_template_args =
+          writeable_symbol.type.find(ID_full_template_args);
         const bool saved_template_class_instance =
           writeable_symbol.type.get_bool(ID_template_class_instance);
         writeable_symbol.type.swap(type);
@@ -244,6 +250,13 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
           writeable_symbol.type.set(ID_C_template, saved_c_template);
           writeable_symbol.type.set(
             ID_C_template_arguments, saved_c_template_arguments);
+        }
+        if(
+          writeable_symbol.type.find(ID_full_template_args).is_nil() &&
+          saved_full_template_args.is_not_nil())
+        {
+          writeable_symbol.type.set(
+            ID_full_template_args, saved_full_template_args);
         }
         if(saved_template_class_instance)
           writeable_symbol.type.set(ID_template_class_instance, true);
