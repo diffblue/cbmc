@@ -7596,9 +7596,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   if(template_args.has_unassigned())
-  {
     return nil_exprt(); // give up
-  }
 
   // Build the type of the function.
 
@@ -7996,8 +7994,18 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   {
     const auto &params = to_code_type(function_type).parameters();
     auto arg_it = fargs.operands.begin();
-    // skip 'this' parameter
-    std::size_t start = (fargs.has_object && !params.empty()) ? 1 : 0;
+    // N5008 [over.match.funcs]/2: the implicit object argument pairs with
+    // the implicit object parameter -- skip BOTH together.  fargs.operands
+    // begins with the object when has_object is set; the deduced
+    // function_type of a member template may or may not carry a `this`
+    // parameter yet.  Pairing the object operand against the first REAL
+    // parameter (the historical off-by-one) made e.g. a member template
+    // `construct(_Up*, pc_t, ...)` compare the object against `pc_t` and
+    // wrongly reject the candidate as not-convertible.
+    const bool has_this = !params.empty() && params.front().get_this();
+    std::size_t start = has_this ? 1 : 0;
+    if(fargs.has_object && arg_it != fargs.operands.end())
+      ++arg_it;
     for(std::size_t i = start;
         i < params.size() && arg_it != fargs.operands.end();
         ++i, ++arg_it)
