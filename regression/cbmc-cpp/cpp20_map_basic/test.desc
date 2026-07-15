@@ -26,15 +26,22 @@ the headers construct the node through a DIFFERENT chain
 the stored key byte is again malloc garbage (trace: storage[0]=64), so
 the read-back re-inserts and the unbounded tree walk diverges in the
 _Rb_tree_decrement model.  NEXT: peel the C++20 construct_at chain the
-same way.  Peeled: the free-function-template new-initializer pack expansion
-(cpp11_construct_at_pack_args, now CORE) and the void constexpr wrapper
-deferral (cpp11_void_constexpr_wrapper_defer, CORE) are fixed.  The
-RESIDUAL is the trailing-return `decltype(::new ... _Tp(declval<Args>
-()...))` on std::construct_at itself: its argument deduction fails with
->= 2 args (cpp11_construct_at_decltype_return, KNOWNBUG).  That is now
-the sole remaining front-end blocker; once it is fixed the C++20 chain
-should store the key and this test should verify unbounded (as it
-already does under --cpp11).
+same way.  The FRONT-END chain is now complete: the free-function-template
+new-initializer pack expansion (cpp11_construct_at_pack_args), the void
+constexpr wrapper deferral (cpp11_void_constexpr_wrapper_defer), and the
+trailing-return decltype-over-pack-new deduction
+(cpp11_construct_at_decltype_return) are all fixed and CORE.  With them,
+--cpp20 instantiates std::construct_at and runs std::map's piecewise node
+construction (the key is stored correctly).  The REMAINING reason this
+test does not pass is a bounded-model-checking SOLVER-SCALING limit on the
+fully-inlined C++20 container: without an unwind bound the _Rb_tree
+machinery builds a formula the SAT backend cannot discharge in the time
+budget (at --unwind 5 the equation is built in ~6.5min and the solver
+then runs out of resources).  This is not a front-end conformance issue:
+the identical program verifies unbounded under --cpp11 (the C++11 headers
+inline less).  Reclassify to CORE if/when the container machinery is
+made tractable (a lighter model, or bounded --unwind with a coarser
+property).
 
 Second-tier verification-PERFORMANCE item, not a conformance one; the previous
 "pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
