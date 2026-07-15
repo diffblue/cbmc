@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -11,14 +11,11 @@ main.cpp
 --
 Basic STL headers (<optional>, <string>, <vector>) with system libc++.
 
-Reclassified CORE -> KNOWNBUG by the member-typedef conformance fix
-([temp.inst]/1-2, [dcl.typedef]).  Previously this passed only because the
-non-conformant *truncated* std::string / std::vector had their operations
-havoc'd (symex executed none of the real containers; the properties were
-vacuous).  The fix makes the front end conformant and symex now executes the
-REAL container machinery, which does not complete within resources.
-
-Second-tier verification-PERFORMANCE item, not a conformance one; the previous
-"pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
-containers.
+History: passed vacuously pre-conformance (truncated containers, havoc'd
+operations); reclassified KNOWNBUG when the member-typedef conformance fix
+([temp.inst]/1-2, [dcl.typedef]) made symex execute the real containers,
+which then did not complete within resources.  Re-flipped to CORE by the
+[class.mem.general]/7 complete-class static-member-initializer fix: in-class
+initializers reading class-local typedefs/siblings now resolve instead of
+degrading to nondet, and verification completes in ~16s.
 See doc/architectural/cpp-class-template-instantiation-plan.md.
