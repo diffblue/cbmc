@@ -4859,10 +4859,32 @@ skip_pack_removal_ft:
       // below).  On failure (e.g. an unused, ill-formed specialization in a
       // SFINAE context) restore the error count and fall back to the normal
       // deferred path so that overload resolution can proceed.
-      if(new_decl.storage_spec().is_constexpr() || is_cond3)
+      //
+      // N5008 [temp.inst]/5, [expr.const]: eager instantiation is required
+      // only when the specialization must yield a *constant* now (a template
+      // argument, an array bound, a foldable `::value`, ...).  A constexpr
+      // function whose return type is `void` never produces such a value, so
+      // it never needs eager folding; converting it eagerly here -- nested in
+      // the referencing body's degraded, suppression-active context, and
+      // before the deferred body-pack expander runs -- is pure downside.  In
+      // particular a void constexpr member function template wrapping
+      // std::construct_at (the C++20 allocator_traits::construct shape) has a
+      // function-parameter-pack new-initializer expansion that only the
+      // deferred prepare_deferred_method_body pass expands; forcing it eager
+      // resolves the still-packed call and drops the body.  Defer such
+      // functions to the drain, exactly as for a non-constexpr member.
+      const bool eager_returns_void =
+        ws.type.id() == ID_code &&
+        to_code_type(ws.type).return_type().id() == ID_empty;
+      if(
+        (new_decl.storage_spec().is_constexpr() && !eager_returns_void) ||
+        is_cond3)
       {
         const std::size_t errors_before =
           get_message_handler().get_message_count(messaget::M_ERROR);
+        // Pristine copy of the parsed body, restored if the eager conversion
+        // below throws mid-way (see the catch).
+        const exprt saved_body = ws.value;
         // [temp.variadic]/5: if this member function template belongs to a
         // class template instantiation, its body may expand the *class*
         // parameter pack alongside its own (e.g. the constexpr tuple-
@@ -4873,73 +4895,93 @@ skip_pack_removal_ft:
         // resolves both packs; otherwise the class pack stays unbound, the
         // expansion is left unexpanded, and the constexpr call cannot be
         // folded.  build() merges, preserving this function's own pack.
-        cpp_saved_template_mapt saved_eager_map(template_map);
+        // N5008 [temp.point]/1: the eager conversion's template-map
+        // modifications (class-pack binding, forcing not-yet-bound packs to
+        // size 0) must not leak into the deferred-drain requeue below --
+        // add_method_body snapshots the CURRENT template_map, and a leaked
+        // "pack forced empty" entry makes the drain replay a broken map so
+        // the body's genuine (non-empty) pack expansion is dropped.  Confine
+        // the eager map to an inner scope and requeue only after it is
+        // restored.
+        bool eager_ok = false;
         {
-          const irep_idt &member_class = ws.type.get(ID_C_member_name);
-          if(!member_class.empty())
+          cpp_saved_template_mapt saved_eager_map(template_map);
           {
-            const symbolt *class_sym = symbol_table.lookup(member_class);
-            if(
-              class_sym != nullptr &&
-              class_sym->type.find(ID_C_template).is_not_nil() &&
-              class_sym->type.find(ID_C_template_arguments).is_not_nil())
+            const irep_idt &member_class = ws.type.get(ID_C_member_name);
+            if(!member_class.empty())
             {
-              template_map.build(
-                static_cast<const template_typet &>(
-                  class_sym->type.find(ID_C_template)),
-                static_cast<const cpp_template_args_tct &>(
-                  class_sym->type.find(ID_C_template_arguments)));
+              const symbolt *class_sym = symbol_table.lookup(member_class);
+              if(
+                class_sym != nullptr &&
+                class_sym->type.find(ID_C_template).is_not_nil() &&
+                class_sym->type.find(ID_C_template_arguments).is_not_nil())
+              {
+                template_map.build(
+                  static_cast<const template_typet &>(
+                    class_sym->type.find(ID_C_template)),
+                  static_cast<const cpp_template_args_tct &>(
+                    class_sym->type.find(ID_C_template_arguments)));
+              }
             }
           }
+          // N5008 [temp.variadic]/7: a member function template instantiated
+          // with an empty type pack (e.g. std::tuple's
+          // `__is_constructible<>()`) has zero-length pack expansions in its
+          // body.  Record the empty packs and collapse those expansions
+          // (`Tr<U...>` -> `Tr<>`) before the eager conversion, so the body's
+          // `cpp_name`s resolve here instead of being left un-typechecked and
+          // falling back to the deferred path (which cannot resolve them,
+          // making the constexpr body fold to a wrong value).
+          for(const auto &p : template_type.template_parameters())
+          {
+            if(!p.get_bool(ID_ellipsis))
+              continue;
+            const irep_idt pid = p.type().get(ID_identifier);
+            if(
+              !pid.empty() &&
+              template_map.type_map.find(pid) == template_map.type_map.end() &&
+              template_map.pack_args_map.find(pid) ==
+                template_map.pack_args_map.end())
+              template_map.pack_size_map[pid] = 0;
+          }
+          if(ws.value.is_not_nil())
+            remove_empty_pack_expansion_args(ws.value);
+          // STANDARD GAP (N5008 [temp.point]/1, [temp.inst]/5): this eagerly
+          // converts a *constexpr* member function-template specialization's
+          // *definition* inline, nested in the referencing body's conversion,
+          // rather than at the enclosing namespace-scope point of instantiation
+          // (the deferred `typecheck_method_bodies` drain reached via
+          // `add_method_body`, used in the `else` branch below).  The eager
+          // conversion exists because a constexpr specialization used as a
+          // constant (e.g. an `enable_if` non-type argument, or std::tuple's
+          // constructor SFINAE) must be *foldable now*; but doing the full body
+          // conversion in this nested, suppression-active context is a source of
+          // the degradation documented in doc/architectural/cpp-frontend-review-
+          // 2026-06-23-instantiation-context.md.  The correct split is to fold
+          // the constant eagerly while deferring the runtime (GOTO) definition to
+          // the queue; on failure we already fall back to `add_method_body`.
+          try
+          {
+            convert_function(ws);
+            // Prevent the deferred pass from converting it a second time.
+            methods_seen.insert(ws.name);
+            eager_ok = true;
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            // The eager conversion mutates ws.value in place (typecheck_code)
+            // and may throw partway; restore the pristine parsed body so the
+            // deferred drain re-type-checks from it (its
+            // prepare_deferred_method_body pack-expander then handles a
+            // std::construct_at-style new-initializer pack expansion in a
+            // constexpr allocator_traits::construct wrapper).
+            ws.value = saved_body;
+          }
         }
-        // N5008 [temp.variadic]/7: a member function template instantiated
-        // with an empty type pack (e.g. std::tuple's
-        // `__is_constructible<>()`) has zero-length pack expansions in its
-        // body.  Record the empty packs and collapse those expansions
-        // (`Tr<U...>` -> `Tr<>`) before the eager conversion, so the body's
-        // `cpp_name`s resolve here instead of being left un-typechecked and
-        // falling back to the deferred path (which cannot resolve them,
-        // making the constexpr body fold to a wrong value).
-        for(const auto &p : template_type.template_parameters())
-        {
-          if(!p.get_bool(ID_ellipsis))
-            continue;
-          const irep_idt pid = p.type().get(ID_identifier);
-          if(
-            !pid.empty() &&
-            template_map.type_map.find(pid) == template_map.type_map.end() &&
-            template_map.pack_args_map.find(pid) ==
-              template_map.pack_args_map.end())
-            template_map.pack_size_map[pid] = 0;
-        }
-        if(ws.value.is_not_nil())
-          remove_empty_pack_expansion_args(ws.value);
-        // STANDARD GAP (N5008 [temp.point]/1, [temp.inst]/5): this eagerly
-        // converts a *constexpr* member function-template specialization's
-        // *definition* inline, nested in the referencing body's conversion,
-        // rather than at the enclosing namespace-scope point of instantiation
-        // (the deferred `typecheck_method_bodies` drain reached via
-        // `add_method_body`, used in the `else` branch below).  The eager
-        // conversion exists because a constexpr specialization used as a
-        // constant (e.g. an `enable_if` non-type argument, or std::tuple's
-        // constructor SFINAE) must be *foldable now*; but doing the full body
-        // conversion in this nested, suppression-active context is a source of
-        // the degradation documented in doc/architectural/cpp-frontend-review-
-        // 2026-06-23-instantiation-context.md.  The correct split is to fold
-        // the constant eagerly while deferring the runtime (GOTO) definition to
-        // the queue; on failure we already fall back to `add_method_body`.
-        try
-        {
-          convert_function(ws);
-          // Prevent the deferred pass from converting it a second time.
-          methods_seen.insert(ws.name);
-        }
-        catch(...)
-        {
-          get_message_handler().set_message_count(
-            messaget::M_ERROR, errors_before);
+        if(!eager_ok)
           add_method_body(&ws);
-        }
       }
       else
         add_method_body(&ws);
@@ -6266,6 +6308,56 @@ skip_pack_removal_ft:
           // place (a single `forward<_Args>(__args$0, __args$1)` that keeps
           // its `...`), so the enclosing body fails to convert and is
           // dropped.
+          // N5008 [temp.variadic]/5 + [expr.new]: a pack expansion in a
+          // new-initializer's expression-list inside this function-template
+          // body -- `::new((void*)__location) _Tp(forward<_Args>(__args)...)`,
+          // the C++20 std::construct_at body ([specialized.construct]) that
+          // the C++20 headers route std::map's node construction through.
+          // Mirror the function-call argument branch: replicate each
+          // `...`-carrying pattern into one initializer per pack element,
+          // substituting the value pack `a -> a$k` and the type pack in
+          // lockstep.  Without this the recursion descends into the pattern
+          // and the function-call branch expands the INNER argument list in
+          // place (one `forward<_Args>(__args$0, __args$1)` keeping its
+          // `...`), so the body fails to convert and is dropped -- the
+          // constructed object keeps garbage.
+          if(
+            node.id() == ID_side_effect && node.get(ID_statement) == ID_cpp_new)
+          {
+            irept &init = node.add(ID_initializer);
+            irept::subt &in_sub = init.get_sub();
+            if(!in_sub.empty())
+            {
+              irept::subt new_in;
+              for(auto &a : in_sub)
+              {
+                if(is_pack_name(a))
+                {
+                  for(const auto &ename : expanded_names)
+                    new_in.push_back(make_name(a, ename));
+                }
+                else if(a.get_bool(ID_ellipsis) && contains_pack_name(a))
+                {
+                  for(std::size_t k = 0; k < expanded_names.size(); ++k)
+                  {
+                    irept copy = substitute_pack(a, expanded_names[k]);
+                    copy.remove(ID_ellipsis);
+                    if(
+                      !type_pack_name.empty() && k < pack_elem_types.size() &&
+                      pack_elem_types[k].is_not_nil())
+                      subst_type_pack(copy, pack_elem_types[k]);
+                    new_in.push_back(copy);
+                  }
+                }
+                else
+                {
+                  new_in.push_back(a);
+                }
+              }
+              in_sub = new_in;
+            }
+          }
+
           if(node.id() == ID_cpp_declarator)
           {
             irept &init_args = node.add(ID_init_args);
