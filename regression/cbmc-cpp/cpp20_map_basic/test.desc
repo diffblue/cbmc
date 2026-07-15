@@ -26,7 +26,10 @@ the headers construct the node through a DIFFERENT chain
 the stored key byte is again malloc garbage (trace: storage[0]=64), so
 the read-back re-inserts and the unbounded tree walk diverges in the
 _Rb_tree_decrement model.  NEXT: peel the C++20 construct_at chain the
-same way (check which body in it fails to convert or is modeled away).
+same way.  Minimal reproducer filed: cpp11_construct_at_pack_args
+(free-function-template new-initializer pack expansion with >= 2
+forwarded arguments fails to convert; neither constexpr nor the
+decltype-SFINAE return type is needed).
 
 Second-tier verification-PERFORMANCE item, not a conformance one; the previous
 "pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
