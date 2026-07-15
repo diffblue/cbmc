@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifdef DEBUG
 #endif
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/message.h>
 #include <util/symbol_table_base.h>
 
@@ -243,6 +245,206 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
         drop(static_cast<irept &>(body));
       }
     }
+  }
+
+  // N5008 [expr.prim.fold]/1-3: reduce a fold expression over this member
+  // function template's parameter pack.  The free-function-template body
+  // expander in cpp_instantiate_template already handles folds; a MEMBER
+  // function template body is prepared here instead, so without this the
+  // fold's bare pack reference (e.g. `a` in `(a + ...)`) is left
+  // unexpanded, fails to resolve, and the whole body is dropped ("no body
+  // for callee").  A unary right fold `(pat op ...)` over an N-element pack
+  // becomes the right-associated tree `pat0 op (pat1 op ... op patN-1)`; a
+  // unary left fold `(... op pat)` the left-associated tree
+  // `((pat0 op pat1) op ...) op patN-1`; a binary fold `(init op ... op pat)`
+  // is a left fold seeded by `init` ([expr.prim.fold]/2).  An empty pack
+  // yields the operator identity ([expr.prim.fold]/3: && -> true,
+  // || -> false, comma -> void(), approximated as 0); a single element
+  // yields the sole substituted pattern.  Runs for every arity (0, 1, N),
+  // independent of the pack-count-driven expansion below.
+  {
+    // For an N>=2 pack, typecheck_compound_declarator replicated the pack
+    // parameter into `base$0..base$N-1`; recover N per base from those
+    // names.  (#expanded_param_packs records the same when present.)
+    std::map<irep_idt, std::size_t> dollar_counts;
+    const irept &eprec_f =
+      method_symbol.type.find(irep_idt{"#expanded_param_packs"});
+    if(eprec_f.is_not_nil() && !eprec_f.get_sub().empty())
+    {
+      for(const auto &e : eprec_f.get_sub())
+        if(e.get_size_t(ID_size) >= 2)
+          dollar_counts[e.id()] = e.get_size_t(ID_size);
+    }
+    if(method_symbol.type.id() == ID_code)
+    {
+      std::map<irep_idt, std::size_t> scan;
+      for(const auto &p : to_code_type(method_symbol.type).parameters())
+      {
+        const std::string bn = id2string(p.get_base_name());
+        const auto dollar = bn.rfind('$');
+        if(dollar == std::string::npos || dollar + 1 >= bn.size())
+          continue;
+        if(bn.find_first_not_of("0123456789", dollar + 1) != std::string::npos)
+          continue;
+        ++scan[irep_idt{bn.substr(0, dollar)}];
+      }
+      for(const auto &c : scan)
+        if(c.second >= 2)
+          dollar_counts[c.first] = c.second;
+    }
+
+    // For an empty (0) or single-element (1) pack no `base$k` parameters are
+    // produced (the sole element keeps the plain name `base`; an empty pack
+    // leaves no parameter at all), so the element count is taken from the
+    // instantiated pack size recorded in template_map.  When the member
+    // template has exactly one parameter pack this is unambiguous.
+    bool have_low_size = template_map.pack_size_map.size() == 1;
+    std::size_t low_size =
+      have_low_size ? template_map.pack_size_map.begin()->second : 0;
+    if(have_low_size && low_size >= 2)
+      have_low_size = false; // an N>=2 pack is handled via base$k above
+
+    // The base name (renamed to base$k) that a fold pattern references, if
+    // this member replicated an N>=2 pack.
+    std::function<irep_idt(const irept &)> fold_ref_base =
+      [&](const irept &n) -> irep_idt
+    {
+      if(n.id() == ID_name && dollar_counts.count(n.get(ID_identifier)))
+        return n.get(ID_identifier);
+      for(const auto &s : n.get_sub())
+        if(irep_idt r = fold_ref_base(s); !r.empty())
+          return r;
+      for(const auto &ns : n.get_named_sub())
+        if(irep_idt r = fold_ref_base(ns.second); !r.empty())
+          return r;
+      return irep_idt{};
+    };
+    std::function<void(irept &, const irep_idt &, const irep_idt &)>
+      fold_rename = [&](irept &n, const irep_idt &base, const irep_idt &repl)
+    {
+      if(n.id() == ID_name && n.get(ID_identifier) == base)
+        n.set(ID_identifier, repl);
+      for(auto &s : n.get_sub())
+        fold_rename(s, base, repl);
+      for(auto &ns : n.get_named_sub())
+        fold_rename(ns.second, base, repl);
+    };
+
+    auto identity_for = [](const irep_idt &fold_op) -> exprt
+    {
+      // [expr.prim.fold]/3: empty-pack unary fold values.  Only &&, ||, and
+      // comma have a defined identity; comma yields void(), approximated
+      // here (as in the free-function expander) by 0.
+      if(fold_op == ID_and)
+        return true_exprt{};
+      if(fold_op == ID_or)
+        return false_exprt{};
+      return from_integer(0, signed_int_type());
+    };
+
+    std::function<void(irept &)> reduce_folds = [&](irept &node)
+    {
+      const bool is_right = node.id() == irep_idt("cpp_right_fold");
+      const bool is_left = node.id() == irep_idt("cpp_left_fold");
+      const bool is_binary = node.id() == irep_idt("cpp_binary_fold");
+      const irept *pattern = nullptr;
+      irept init_expr;
+      if((is_right || is_left) && !node.get_sub().empty())
+        pattern = &node.get_sub().front();
+      else if(is_binary && node.get_sub().size() >= 2)
+      {
+        init_expr = node.get_sub()[0];
+        pattern = &node.get_sub()[1];
+      }
+      if(pattern != nullptr)
+      {
+        const irep_idt fold_op = node.get(irep_idt("fold_op"));
+        const irept pat = *pattern;
+        const irep_idt base = fold_ref_base(pat);
+        if(!base.empty())
+        {
+          // N>=2: build the associated tree over base$0..base$N-1.
+          const std::size_t n = dollar_counts[base];
+          auto elem = [&](std::size_t k) -> irept
+          {
+            irept c = pat;
+            fold_rename(c, base, id2string(base) + "$" + std::to_string(k));
+            reduce_folds(c);
+            return c;
+          };
+          if(is_binary)
+          {
+            reduce_folds(init_expr);
+            irept result = init_expr; // (((init op e0) op e1) op ...)
+            for(std::size_t k = 0; k < n; ++k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(elem(k));
+              result = bin;
+            }
+            node = result;
+          }
+          else if(is_left)
+          {
+            irept result = elem(0); // ((e0 op e1) op ...) op eN-1
+            for(std::size_t k = 1; k < n; ++k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(elem(k));
+              result = bin;
+            }
+            node = result;
+          }
+          else // right fold: e0 op (e1 op (... op eN-1))
+          {
+            irept result = elem(n - 1);
+            for(int k = static_cast<int>(n) - 2; k >= 0; --k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(elem(static_cast<std::size_t>(k)));
+              bin.get_sub().push_back(result);
+              result = bin;
+            }
+            node = result;
+          }
+          return;
+        }
+        if(have_low_size)
+        {
+          // Empty (0) or single (1) element: the pattern already references
+          // the pack element by its plain name (or none, for 0), so no
+          // renaming is needed.
+          irept single = pat;
+          reduce_folds(single);
+          if(is_binary)
+          {
+            reduce_folds(init_expr);
+            if(low_size == 0)
+              node = init_expr; // (init op ...) with empty pack -> init
+            else
+            {
+              irept bin(fold_op); // (init op e0)
+              bin.get_sub().push_back(init_expr);
+              bin.get_sub().push_back(single);
+              node = bin;
+            }
+          }
+          else if(low_size == 0)
+            node = identity_for(fold_op);
+          else
+            node = single; // single element -> the pattern itself
+          return;
+        }
+      }
+      for(auto &s : node.get_sub())
+        reduce_folds(s);
+      for(auto &ns : node.get_named_sub())
+        reduce_folds(ns.second);
+    };
+    if(!dollar_counts.empty() || have_low_size)
+      reduce_folds(static_cast<irept &>(body));
   }
 
   // N5008 [temp.variadic]/5: expand the body / member-initializer uses of a
