@@ -15,10 +15,19 @@ Reclassified CORE -> KNOWNBUG by the member-typedef conformance fix
 non-conformant *truncated* std::map had its operations havoc'd (symex executed
 none of the real container; the property was vacuous).  The fix makes the front
 end conformant and symex now executes the REAL std::map / _Rb_tree machinery.
-The piecewise-construction conformance chain that fixed cpp11_map_insert
-(now CORE, ~1.4s WITH --unwind 5) applies here too, but this test runs
---cpp20 with NO unwind bound: full unwinding of the _Rb_tree loops does not
-complete within 10 minutes.
+
+Current layer (2026-07-15): reading back an inserted key (`m[1] == 42`)
+mis-evaluates because std::pair's PIECEWISE constructor converts to an
+EMPTY body: it is defined out-of-line in <tuple> as a DELEGATING
+constructor (`: pair(__first, __second,
+_Build_index_tuple<sizeof...(_Args1)>::__type(), ...)`), and the
+delegating mem-initializer of an out-of-line two-pack member template is
+dropped.  The stored key stays zero / the read-back re-inserts, and
+without an unwind bound the tree walk over the resulting nondet-shaped
+tree unwinds without terminating.  The upstream pieces of the chain
+(new-initializer pack expansion, [temp.inst]/2 member-template body
+preservation, [over.match.funcs]/2 object pairing) are fixed and covered
+by cpp11_pack_expansion_new_init / cpp11_member_template_object_arg.
 
 Second-tier verification-PERFORMANCE item, not a conformance one; the previous
 "pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
