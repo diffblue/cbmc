@@ -2611,3 +2611,31 @@ pack name fails to resolve (gdb: resolve throw in typecheck_return of
 sum), and the body is dropped.  NEXT: add fold-expression expansion to
 prepare_deferred_method_body's expand lambda (or share the
 instantiate_template fold logic).  g++/clang++ runtime-verified.
+
+## fold-over-member-template-pack FIXED -> CORE (2026-07-15)
+
+cpp17_member_template_fold flipped KNOWNBUG -> CORE.  Root cause confirmed:
+free function template bodies are expanded by cpp_instantiate_template
+(which reduces cpp_left_fold/cpp_right_fold/cpp_binary_fold), but MEMBER
+function template bodies are prepared by prepare_deferred_method_body
+(cpp_typecheck_method_bodies.cpp), which had NO fold handling -- so the
+fold's bare pack reference (`a` in `(a + ...)`) was left unexpanded,
+failed to resolve, and the whole body was dropped ("no body for callee").
+
+Fix: added a fold-reduction pass to prepare_deferred_method_body, per
+N5008 [expr.prim.fold]:
+ - unary right fold -> right-associated tree e0 op (e1 op (... op eN-1))  (/1)
+ - unary left  fold -> left-associated  tree ((e0 op e1) op ...) op eN-1 (/1)
+ - binary fold left-associated, seeded by init                           (/2)
+ - empty pack -> operator identity (&& true, || false, comma void()/0)   (/3)
+Element source: for N>=2 the replicated params base$0..base$N-1 (count from
+#expanded_param_packs or the names); for 0/1 no such params exist (0: no
+param; 1: the sole element keeps the plain name `base`), so the count is
+taken from template_map.pack_size_map (unambiguous when the member has a
+single pack -- gated on pack_size_map.size()==1).  Pitfall hit & fixed:
+merging eprec AND the base$k scan double-counted (a=4 for a 2-element
+pack); use eprec-or-scan, not both.  Verified arities 0/1/N, right/left/
+binary, class-template member, and a WRONG-value negative (must FAIL,
+non-vacuous); g++ AND clang++ runtime-verified.  Two commits (src, test);
+full suite green (91 skipped, was 92).  Added <util/arith_tools.h> +
+<util/c_types.h> includes for from_integer/signed_int_type.
