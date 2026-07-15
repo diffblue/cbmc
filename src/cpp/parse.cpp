@@ -9126,7 +9126,15 @@ bool Parser::rAllocateInitializer(exprt &init)
     if(lex.LookAhead(0)==TOK_ELLIPSIS)
     {
       lex.get_token();
-      // TODO
+      // N5008 [temp.variadic]/5: a pack expansion in a new-initializer's
+      // expression-list (`::new(p) T(std::forward<Args>(args)...)`, the
+      // shape of allocator construct behind the standard containers).  Mark
+      // the just-parsed argument as a pack expansion, exactly as
+      // rFunctionArguments does; previously the ellipsis was silently
+      // discarded, so the pattern could not be expanded at instantiation
+      // time and the enclosing body was dropped.
+      if(!init.operands().empty())
+        init.operands().back().set(ID_ellipsis, true);
     }
 
     if(lex.LookAhead(0)==',')
