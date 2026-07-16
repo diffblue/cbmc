@@ -267,6 +267,178 @@ static void fold_numeric_traits_integer(symbol_table_baset &symbol_table)
 /// Create a no-op body for an I/O function that returns a reference
 /// to its first parameter (e.g., std::endl returns its ostream& argument,
 /// ostream::_M_insert returns *this).
+/// N5008 [locale.general]/8: at program startup the global locale is
+/// `std::locale::classic()`, the "C" locale.  libstdc++'s facet accessors
+/// (`std::use_facet` via `std::__try_use_facet`) read the facet out of
+/// `__loc->_M_impl->_M_facets`, which is initialised inside libstdc++.so and
+/// therefore invisible to CBMC -- every facet access dereferences a nondet
+/// pointer.  Model the ubiquitous `ctype<char>` facet of the "C" locale:
+/// a static classification table with the C99 7.4 "C"-locale character
+/// classes (`isdigit` is exactly '0'..'9', `isspace` is the six standard
+/// white-space characters, etc.), encoded with the same glibc `_ISbit`
+/// bit-assignments that the parsed <ctype.h>/<bits/ctype_base.h> gave to
+/// `std::ctype_base::digit` and friends (so table entries and user-code
+/// masks agree by construction), and a static `ctype<char>` facet object
+/// whose `_M_table` points at it.  `ctype<char>::is(mask, char)` is already
+/// an inline header body reading `_M_table[(unsigned char)c] & m`, so with
+/// this model it evaluates correctly with no virtual dispatch.
+/// Returns a nil expression if the ctype<char> struct is not in the symbol
+/// table (translation unit does not use <locale>).
+static exprt provide_classic_ctype_char_model(
+  symbol_table_baset &symbol_table,
+  const namespacet &ns)
+{
+  const irep_idt facet_symbol_name = "std::__CPROVER_classic_ctype_char";
+  if(const symbolt *existing = symbol_table.lookup(facet_symbol_name))
+    return existing->symbol_expr();
+
+  const symbolt *ctype_char = symbol_table.lookup("std::tag-ctype<char>");
+  if(
+    ctype_char == nullptr || ctype_char->type.id() != ID_struct ||
+    to_struct_type(ctype_char->type).is_incomplete())
+  {
+    return nil_exprt{};
+  }
+
+  // glibc _ISbit(bit): (bit) < 8 ? ((1 << (bit)) << 8) : ((1 << (bit)) >> 8)
+  auto isbit = [](int bit) -> unsigned
+  { return bit < 8 ? (1u << bit) << 8 : (1u << bit) >> 8; };
+  const unsigned m_upper = isbit(0), m_lower = isbit(1), m_alpha = isbit(2),
+                 m_digit = isbit(3), m_xdigit = isbit(4), m_space = isbit(5),
+                 m_print = isbit(6), m_graph = isbit(7), m_blank = isbit(8),
+                 m_cntrl = isbit(9), m_punct = isbit(10), m_alnum = isbit(11);
+
+  // C99 7.4 "C" locale classification for the 256 unsigned-char values;
+  // bytes 128..255 are in no class in the "C" locale.
+  const typet mask_type = unsignedbv_typet{16}; // ctype_base::mask
+  const std::size_t table_size = 256;
+  array_typet table_type{mask_type, from_integer(table_size, size_type())};
+  exprt::operandst entries;
+  entries.reserve(table_size);
+  for(unsigned c = 0; c < table_size; ++c)
+  {
+    unsigned m = 0;
+    const bool upper = c >= 'A' && c <= 'Z';
+    const bool lower = c >= 'a' && c <= 'z';
+    const bool digit = c >= '0' && c <= '9';
+    const bool alpha = upper || lower;
+    const bool space =
+      c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
+    const bool print = c >= 0x20 && c <= 0x7e;
+    const bool graph = c >= 0x21 && c <= 0x7e;
+    const bool cntrl = c <= 0x1f || c == 0x7f;
+    const bool xdigit =
+      digit || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+    const bool alnum = alpha || digit;
+    const bool punct = graph && !alnum;
+    const bool blank = c == ' ' || c == '\t';
+    if(upper)
+      m |= m_upper;
+    if(lower)
+      m |= m_lower;
+    if(alpha)
+      m |= m_alpha;
+    if(digit)
+      m |= m_digit;
+    if(xdigit)
+      m |= m_xdigit;
+    if(space)
+      m |= m_space;
+    if(print)
+      m |= m_print;
+    if(graph)
+      m |= m_graph;
+    if(blank)
+      m |= m_blank;
+    if(cntrl)
+      m |= m_cntrl;
+    if(punct)
+      m |= m_punct;
+    if(alnum)
+      m |= m_alnum;
+    entries.push_back(from_integer(m, mask_type));
+  }
+  array_exprt table_value{std::move(entries), table_type};
+
+  symbolt table_symbol{
+    "std::__CPROVER_classic_ctype_table", table_type, ID_cpp};
+  table_symbol.base_name = "__CPROVER_classic_ctype_table";
+  table_symbol.pretty_name = table_symbol.base_name;
+  table_symbol.value = std::move(table_value);
+  table_symbol.is_static_lifetime = true;
+  table_symbol.is_lvalue = true;
+  table_symbol.type.set(ID_C_constant, true);
+  symbolt *table_ptr = nullptr;
+  symbol_table.move(table_symbol, table_ptr);
+
+  // The facet object: zero-initialised ctype<char> with _M_table pointing
+  // at the classification table.  The zeroed remainder is never used:
+  // ctype<char>::is reads only _M_table, and no virtual dispatch happens
+  // on this object.
+  const struct_tag_typet facet_type{ctype_char->name};
+  auto facet_zero = zero_initializer(facet_type, ctype_char->location, ns);
+  if(!facet_zero.has_value())
+    return nil_exprt{};
+
+  const address_of_exprt table_address{
+    index_exprt{table_ptr->symbol_expr(), from_integer(0, c_index_type())}};
+
+  // Set the _M_table component (wherever it sits, including inside a base
+  // class component) to the table's address.
+  std::function<bool(exprt &, const typet &)> set_m_table =
+    [&](exprt &value, const typet &type) -> bool
+  {
+    const typet &followed =
+      type.id() == ID_struct_tag
+        ? static_cast<const typet &>(ns.follow_tag(to_struct_tag_type(type)))
+        : type;
+    if(followed.id() != ID_struct || value.id() != ID_struct)
+      return false;
+    const auto &components = to_struct_type(followed).components();
+    // zero_initializer emits one operand per NON-static DATA member; walk
+    // components with the same skip rule (see expr_initializer.cpp) to
+    // keep the operand index aligned.
+    std::size_t op_index = 0;
+    for(const auto &component : components)
+    {
+      if(
+        component.type().id() == ID_code || component.get_bool(ID_is_type) ||
+        component.get_bool(ID_is_static))
+      {
+        continue;
+      }
+      if(op_index >= value.operands().size())
+        return false;
+      const std::string cname = id2string(component.get_name());
+      if(
+        cname == "_M_table" ||
+        (cname.size() > 10 &&
+         cname.compare(cname.size() - 10, 10, "::_M_table") == 0))
+      {
+        value.operands()[op_index] =
+          typecast_exprt::conditional_cast(table_address, component.type());
+        return true;
+      }
+      if(set_m_table(value.operands()[op_index], component.type()))
+        return true;
+      ++op_index;
+    }
+    return false;
+  };
+  if(!set_m_table(*facet_zero, facet_type))
+    return nil_exprt{};
+
+  symbolt facet_symbol{facet_symbol_name, facet_type, ID_cpp};
+  facet_symbol.base_name = "__CPROVER_classic_ctype_char";
+  facet_symbol.pretty_name = facet_symbol.base_name;
+  facet_symbol.value = std::move(*facet_zero);
+  facet_symbol.is_static_lifetime = true;
+  facet_symbol.is_lvalue = true;
+  symbolt *facet_ptr = nullptr;
+  symbol_table.move(facet_symbol, facet_ptr);
+  return facet_ptr->symbol_expr();
+}
+
 static code_blockt make_return_first_param_body(const symbolt &symbol)
 {
   const code_typet &fn_type = to_code_type(symbol.type);
@@ -908,7 +1080,30 @@ void cpp_typecheckt::provide_stdlib_bodies()
     // (except for specific functions we need to override)
     if(symbol.value.is_not_nil() && !is_deferred)
     {
-      if(base == "_S_nothrow_relocate" || base == "_S_use_relocate")
+      if(
+        base.find("__try_use_facet") == 0 &&
+        name.find("<std::tag-ctype<char>>") != std::string::npos &&
+        to_code_type(symbol.type).return_type().id() == ID_pointer)
+      {
+        // Override the header-inline body, which reads the invisible
+        // libstdc++-internal __loc->_M_impl->_M_facets table, with a
+        // return of the modelled classic-"C" ctype<char> facet
+        // ([locale.general]/8: the startup global locale is the "C"
+        // locale).  See provide_classic_ctype_char_model.
+        exprt facet = provide_classic_ctype_char_model(symbol_table, ns);
+        if(facet.is_not_nil())
+        {
+          const typet &ret_type = to_code_type(symbol.type).return_type();
+          ensure_parameter_symbols(symbol, symbol_table);
+          code_blockt block;
+          block.add(code_frontend_returnt(typecast_exprt::conditional_cast(
+            address_of_exprt{facet}, ret_type)));
+          symbol.value = std::move(block);
+          symbol.value.type() = symbol.type;
+          deferred_typechecking.erase(symbol.name);
+        }
+      }
+      else if(base == "_S_nothrow_relocate" || base == "_S_use_relocate")
       {
         // Override: return true so the _S_relocate path is taken
         // (which we model) instead of __uninitialized_move_if_noexcept_a.
@@ -1100,6 +1295,23 @@ void cpp_typecheckt::provide_stdlib_bodies()
       continue;
     }
 
+    // N5008 [locale.general]/8: the program-startup global locale is the
+    // "C" locale, and libstdc++ initialises it inside the shared library
+    // where CBMC cannot see it.  Give the default constructor, the
+    // copy-reference management and the destructor empty bodies (the model
+    // facet below carries the actual classification data), and let
+    // __try_use_facet<ctype<char>> return the modelled classic facet
+    // instead of reading the invisible _M_impl->_M_facets table.
+    if(
+      name == "std::locale::locale(this)" ||
+      name == "std::locale::~locale(this)")
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
     if(base == "Init" && name.find("ios_base") != std::string::npos)
     {
       // ios_base::Init constructor — provide empty body.
