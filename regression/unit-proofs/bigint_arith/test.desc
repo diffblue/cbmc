@@ -1,0 +1,14 @@
+KNOWNBUG
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 3 --no-unwinding-assertions ../../../src/big-int/bigint.cc
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Unit proof for big-int ring identities (commutativity, additive inverse,
+subtraction round-trip, int-agreement) over bounded nondeterministic
+operands.  KNOWNBUG: the propositional reduction runs out of memory (16
+GiB cap) -- BigInt's heap-allocated digit vectors blow up the formula.
+Candidates to unblock: field-sensitive slicing, smaller digit type, or
+SMT back-end.  Flip to CORE when it converges.
