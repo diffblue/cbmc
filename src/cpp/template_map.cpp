@@ -835,12 +835,37 @@ void template_mapt::apply(typet &type) const
       // `#tmpl_param_shadow` marker below and the shadow-removal loop in
       // build() are patches around this; the structural fix is to resolve only
       // by exact scope-qualified identifier.
+      // N5008 [basic.scope.temp]/2 + [temp.deduct]/5: when a template is
+      // being deduced and one of ITS OWN parameters has this short name,
+      // only that parameter's binding may substitute the reference; an
+      // unrelated same-short-name entry (the caller's binding) must not be
+      // baked into the deduced declaration.  See deduction_parameters.
+      bool base_is_deduction_parameter = false;
+      for(const auto &dp : deduction_parameters)
+      {
+        const std::string dp_str = id2string(dp);
+        auto dp_pos = dp_str.rfind("::");
+        if(
+          (dp_pos != std::string::npos ? dp_str.substr(dp_pos + 2) : dp_str) ==
+          id2string(base))
+        {
+          base_is_deduction_parameter = true;
+          break;
+        }
+      }
+
       for(const auto &entry : type_map)
       {
         const std::string &key = id2string(entry.first);
         auto pos = key.rfind("::");
         std::string suffix =
           pos != std::string::npos ? key.substr(pos + 2) : key;
+        if(
+          base_is_deduction_parameter &&
+          deduction_parameters.count(entry.first) == 0)
+        {
+          continue;
+        }
         if(
           suffix == id2string(base) && entry.second.id() != ID_unassigned &&
           entry.second.id() != ID_nil)
@@ -1606,7 +1631,9 @@ typet template_mapt::lookup_type(const irep_idt &identifier) const
     type_map.find(identifier);
 
   if(t_it!=type_map.end())
+  {
     return t_it->second;
+  }
 
   return static_cast<const typet &>(get_nil_irep());
 }

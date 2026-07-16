@@ -635,6 +635,29 @@ exprt try_evaluate_constexpr(
       }
       return std::nullopt; // too many iterations
     }
+    if(code.get_statement() == ID_dowhile)
+    {
+      // C++ [stmt.dowhile]: the body is executed BEFORE the condition is
+      // evaluated.  Needed for e.g. libstdc++ chrono duration's constexpr
+      // `_S_gcd`, whose do-while body computes the gcd used in the
+      // `__divide` member alias's default template arguments; without it
+      // the constant evaluation gave up and the __is_harmonic constraint
+      // degraded to false.
+      for(int iter = 0; iter < 64; ++iter)
+      {
+        if(code.operands()[1].id() != ID_code)
+          return std::nullopt;
+        auto r = execute(to_code(code.operands()[1]), depth + 1);
+        if(r.has_value())
+          return r;
+        exprt cond = eval(code.op0());
+        if(cond.is_false())
+          return std::nullopt; // loop done, no return
+        if(!cond.is_true())
+          return std::nullopt; // can't evaluate condition
+      }
+      return std::nullopt; // too many iterations
+    }
     if(code.get_statement() == ID_assign)
     {
       const auto &lhs = code.op0();
@@ -645,16 +668,48 @@ exprt try_evaluate_constexpr(
     }
     if(code.get_statement() == ID_decl)
     {
-      // Variable declaration — initialize if has value
+      // Variable declaration: bind the declared variable to its
+      // initializer's VALUE when one is present ([dcl.init]); only
+      // default-initialize to zero when there is none.  Dropping the
+      // initializer made e.g. the loop-local remainder in chrono
+      // duration's constexpr _S_gcd start at zero, corrupting the gcd.
       if(code.operands().size() > 0 && code.op0().id() == ID_symbol)
       {
         const auto &sym = to_symbol_expr(code.op0());
-        vars[sym.get_identifier()] = from_integer(0, sym.type());
+        if(code.operands().size() >= 2)
+        {
+          exprt init = eval(code.op1());
+          if(!init.is_constant())
+            return std::nullopt; // can't track this variable's value
+          vars[sym.get_identifier()] = init;
+        }
+        else
+          vars[sym.get_identifier()] = from_integer(0, sym.type());
       }
       return std::nullopt;
     }
     if(code.get_statement() == ID_expression)
-      return std::nullopt; // side-effect expression, skip
+    {
+      // An expression statement may BE an assignment
+      // (`side_effect statement=assign`), e.g. the `__m = __n; __n = __rem;`
+      // steps of chrono duration's constexpr _S_gcd do-while body.  Apply
+      // it to the tracked variables; skipping it froze the loop variables,
+      // so the termination condition never changed and evaluation gave up.
+      if(!code.operands().empty())
+      {
+        const exprt &e = code.op0();
+        if(
+          e.id() == ID_side_effect && e.get(ID_statement) == ID_assign &&
+          e.operands().size() == 2 && e.operands()[0].id() == ID_symbol)
+        {
+          exprt rhs = eval(e.operands()[1]);
+          if(!rhs.is_constant())
+            return std::nullopt; // lost track of a variable's value
+          vars[to_symbol_expr(e.operands()[0]).get_identifier()] = rhs;
+        }
+      }
+      return std::nullopt;
+    }
     if(code.get_statement() == ID_skip)
       return std::nullopt;
 

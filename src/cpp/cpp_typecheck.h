@@ -624,6 +624,16 @@ protected:
   void typecheck_enum_body(symbolt &symbol);
   void typecheck_method_bodies();
 
+  /// N5008 [temp.inst]/5 + [expr.const]: instantiate (convert) the
+  /// definition of a deferred member function NOW, because its value is
+  /// needed for constant evaluation (e.g. a constexpr `_S_gcd` used in a
+  /// DEFAULT TEMPLATE ARGUMENT of a member alias like std::chrono's
+  /// `__divide`, evaluated while the deferred drain has not yet reached
+  /// it).  Looks the identifier up in deferred_method_bodies and the
+  /// method_bodies queue; converts under the entry's recorded template
+  /// map.  Returns true if a conversion was performed.
+  bool convert_deferred_method_now(const irep_idt &identifier);
+
   /// Shared preprocessing for a deferred method body about to be converted
   /// ([temp.inst]/1, [temp.variadic]/5,7); used by both drains in
   /// typecheck_method_bodies.
