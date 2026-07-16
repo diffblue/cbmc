@@ -31,3 +31,12 @@ verifies TRUE in main), so is_trivially_destructible degrades and
 _Optional_base's bool args mismatch between the base specifier and the
 constructor's member initializer.  Flip to CORE when the nested-context
 trait SFINAE resolves.
+
+UPDATE 2026-07-16 (3): the residual is REDUCED to a 5-line header-free
+root cause -- see cpp11_base_nsdmi_implicit_ctor: the implicitly defined
+default constructor of a derived class drops the base's default member
+initializers ([class.base.init]/9.1), so _Optional_payload_base's
+`_M_engaged = false` is lost.  (The earlier nested-context trait-SFINAE
+hypothesis was a red herring for the VALUE failure: with the crash fixed,
+cvise isolated the NSDMI drop as the actual observable defect.)  Flip to
+CORE together with cpp11_base_nsdmi_implicit_ctor.
