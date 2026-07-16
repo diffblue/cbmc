@@ -1001,12 +1001,29 @@ void cpp_typecheckt::full_member_initialization(
           if(!named)
           {
             // members of this base are the flattened components whose
-            // qualified name starts with the base's member prefix
-            // ("B::" for class symbol "tag-B", keeping any namespaces)
+            // qualified name starts with the base's member prefix: the
+            // class symbol name with the "tag-" of its FINAL path
+            // component removed ("ns::tag-B<tag-A>" -> "ns::B<tag-A>::").
+            // The final component boundary is the last "::" OUTSIDE angle
+            // brackets -- a naive rfind("tag-") would strip a template
+            // ARGUMENT's tag instead (e.g. the tag-S in tag-base_<tag-S>),
+            // mismatching every component.
             std::string prefix = id2string(ctorsymb.name);
-            const auto tag_pos = prefix.rfind("tag-");
-            if(tag_pos != std::string::npos)
-              prefix.erase(tag_pos, 4);
+            {
+              std::size_t depth = 0;
+              std::size_t final_component = 0;
+              for(std::size_t i = 0; i + 1 < prefix.size(); ++i)
+              {
+                if(prefix[i] == '<')
+                  ++depth;
+                else if(prefix[i] == '>' && depth > 0)
+                  --depth;
+                else if(depth == 0 && prefix[i] == ':' && prefix[i + 1] == ':')
+                  final_component = i + 2;
+              }
+              if(prefix.compare(final_component, 4, "tag-") == 0)
+                prefix.erase(final_component, 4);
+            }
             prefix += "::";
             for(const auto &c : components)
             {

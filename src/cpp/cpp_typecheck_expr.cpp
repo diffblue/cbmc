@@ -3331,6 +3331,40 @@ void cpp_typecheckt::typecheck_expr_member(
 
   irep_idt struct_identifier = type.get(ID_name);
 
+  // N5008 [expr.prim.id.dtor] + [class.dtor]/1,6: the explicit destructor
+  // call notation is valid for EVERY class, and invoking a TRIVIAL
+  // destructor has no effect.  A class whose destructor is implicitly
+  // declared and trivial has no synthesized destructor symbol (the POD
+  // gate in typecheck_compound_body skips it), so resolving `~X` failed
+  // and the failure escaped e.g. the destructibility SFINAE probe
+  // `decltype(declval<T&>().~T())` -- dropping libstdc++ trait base
+  // specifiers during nested instantiation (the std::optional shape).
+  // Model the call with the same no-op dummy used for scalar
+  // pseudo-destructor calls above.
+  if(
+    expr.find(ID_component_cpp_name).is_not_nil() &&
+    to_cpp_name(expr.find(ID_component_cpp_name)).is_destructor())
+  {
+    bool has_dtor_member = false;
+    for(const auto &c : type.components())
+    {
+      if(
+        c.type().id() == ID_code &&
+        to_code_type(c.type()).return_type().id() == ID_destructor)
+      {
+        has_dtor_member = true;
+        break;
+      }
+    }
+    if(!has_dtor_member)
+    {
+      exprt tmp(ID_cpp_dummy_destructor);
+      tmp.add_source_location() = expr.source_location();
+      expr.swap(tmp);
+      return;
+    }
+  }
+
   if(expr.find(ID_component_cpp_name).is_not_nil())
   {
     cpp_namet component_cpp_name =
