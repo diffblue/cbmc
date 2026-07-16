@@ -2927,3 +2927,28 @@ Diagnostics: BASE-DROP probe + blanket T0 tags + DTORSUB probe; all
 reverted.  Suite green 88 skipped (was 90).  Remaining KNOWNBUGs are the
 two scaling-bound ones only (regex_match, map_basic) -- the KNOWNBUG
 backlog of front-end defects is CLEAR, unit-proof work is unblocked.
+
+## dog-food round + FIRST UNIT PROOFS (2026-07-16)
+
+Dog-food: all previously-blocked files now clean; NEW fix: [stmt.label]/1
+function-scoped labels (cpp convert_function never reset
+labels_defined/labels_used; bigint.cc unblocked); CORE test
+cpp98_function_scoped_labels.  OPEN: goto_program.cpp CONVERSION ERROR
+(codet default-construction no-match) -- next dog-food target.
+
+UNIT PROOFS landed (regression/unit-proofs, registered in CMake):
+- threeval GREEN: 9 Kleene-logic laws over ALL value pairs, 7s.  The
+  proof-of-concept for the roadmap: unit-test contract -> bounded-domain
+  proof via nondet inputs + __CPROVER_assume.
+- strip_string KNOWNBUG: blocked by NEW front-end defect found while
+  building it -- cpp11_self_pointer_move_return: move ctor branching on
+  the source's self-pointer (SSO shape) + return-by-value -> destination
+  clobbered by bitwise copy, pointer targets the dead return temporary.
+  This breaks std::string BY VALUE across the board (t.front() after
+  `t = make()` reads a dead object) -- HIGH-VALUE fix target.
+- bigint_arith KNOWNBUG: solver OOM at 16GiB (digit-vector heap model);
+  try SMT backend / field slicing later.
+Suite green 89 skipped; ctest unit-proofs 4/4.
+LESSON: the unit-proof mission statement held on the very first harness:
+building strip_string's proof immediately flushed out a fundamental
+front-end defect (SSO move-return) that ordinary feature tests missed.
