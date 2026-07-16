@@ -49,3 +49,9 @@ resolution failure inside optional<string>'s instantiation (its base
 list is dropped by recovery, so the object has no members at all --
 trace shows `o={ }`).  Flip to CORE when the nested-context
 __is_destructible_impl<...>::type base-specifier SFINAE resolves.
+
+UPDATE 2026-07-16 (5): the remaining blocker now has a HEADER-FREE
+minimal reproducer: cpp17_dtor_sfinae_base_spec (the decltype-SFINAE
+destructibility probe as a base specifier, elaborated inside a nested
+default-template-argument context).  Fix that test and this one flips
+with it.
