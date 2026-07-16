@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ front through self-pointer: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [class.copy.elis]/[class.copy.ctor] -- returning a local
+by value mis-handles a move constructor that BRANCHES on the source's
+self-pointer state: the constructed destination is clobbered by a
+bitwise copy, leaving the pointer member targeting the return-value
+temporary's buffer (dead object).  The SSO shape: breaks std::string
+returned by value (t.front() reads a dead object), which blocks the
+strip_string unit proof (regression/unit-proofs/strip_string).
+Header-free, 25 essential lines, reduced from the std::string trace;
+g++/clang++ runtime-verified.  Flip to CORE when fixed.
