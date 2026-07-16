@@ -3,6 +3,7 @@ SRC = adjust_float_expressions.cpp \
       class_identifier.cpp \
       compute_called_functions.cpp \
       elf_reader.cpp \
+      elide_cpp_returned_temporaries.cpp \
       ensure_one_backedge_per_target.cpp \
       goto_check.cpp \
       goto_function.cpp \

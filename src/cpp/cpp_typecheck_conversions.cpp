@@ -2630,8 +2630,28 @@ bool cpp_typecheckt::reference_binding(
             .object()
             .get(ID_statement) == ID_temporary_object))))
   {
-    // C++11: const lvalues can bind to T&& through a temporary copy.
-    // Create a temporary and bind the rvalue reference to it.
+    // N5008 [dcl.init.ref]/5.4: an rvalue reference cannot bind to an
+    // lvalue.  [basic.lval]: the value category is determined by the
+    // expression's FORM -- an id-expression, unary *, member access or
+    // subscript is a genuine lvalue, and the candidate is NOT viable
+    // (with a copy constructor available, overload resolution selects
+    // it instead; a previous workaround materialized a bitwise
+    // temporary copy of such lvalues and bound the rvalue reference to
+    // it, mis-selecting the MOVE constructor: for self-referential
+    // classes -- the small-string optimization -- the bitwise copy
+    // breaks the class invariant and the move steals a pointer into
+    // the temporary).  Other expression forms that arrive here with a
+    // stale lvalue marking (constructor temporaries, braced-init
+    // results, value expressions) are PRVALUES; temporary
+    // materialization ([conv.rval], [class.temporary]) binds the
+    // rvalue reference to them.
+    if(
+      expr.id() == ID_symbol || expr.id() == ID_dereference ||
+      expr.id() == ID_member || expr.id() == ID_index)
+    {
+      return false;
+    }
+
     typet base = reference_type.base_type();
     base.remove(ID_C_constant);
     typet expr_base = expr.type();
@@ -4268,11 +4288,30 @@ bool cpp_typecheckt::static_typecast(
   {
     if(!cpp_is_pod(type))
     {
+      // N5008 [dcl.init]/(16.6.2): copy-initialization of a class type
+      // constructs the destination from the source expression; the
+      // constructor is chosen by overload resolution against the
+      // ARGUMENT's value category ([over.match.viable], [over.ics.ref]:
+      // an rvalue reference cannot bind to an lvalue, so an lvalue
+      // source selects the copy constructor and an rvalue source the
+      // move constructor).  For the identity conversion,
+      // `implicit_conversion_sequence` strips the lvalue marking
+      // ([conv.lval] yields a prvalue), which would mis-select the MOVE
+      // constructor for an lvalue source; restore the source's value
+      // category when the conversion changed nothing else.
+      exprt constructor_source = new_expr;
+      if(e.get_bool(ID_C_lvalue))
+      {
+        exprt restored = new_expr;
+        restored.set(ID_C_lvalue, true);
+        if(restored == e)
+          constructor_source = e;
+      }
       exprt temporary;
       new_temporary(
         e.source_location(),
         type,
-        already_typechecked_exprt{new_expr},
+        already_typechecked_exprt{constructor_source},
         temporary);
       new_expr.swap(temporary);
     }
