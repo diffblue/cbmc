@@ -958,7 +958,87 @@ void cpp_typecheckt::full_member_initialization(
       const symbolt &ctorsymb = lookup(b.type());
 
       if(cpp_is_pod(ctorsymb.type))
+      {
+        // N5008 [class.default.ctor]/3 + [class.base.init]/9.1: a default
+        // member initializer makes a class's default constructor
+        // non-trivial, and a base subobject not named in the
+        // mem-initializer-list is initialized by that constructor -- its
+        // NSDMIs must take effect.  CBMC's cpp_is_pod does not consider
+        // NSDMIs, so no constructor was synthesized for such a base and
+        // the skip below silently dropped its initializers (a
+        // default-constructed derived object had nondet members; the
+        // std::optional _Optional_payload_base::_M_engaged shape).  Apply
+        // the base's initializers here, through the flattened `from_base`
+        // components, mirroring the member NSDMI branches below: a
+        // component with its own #default_value is initialized from it,
+        // and a component whose TYPE transitively carries NSDMIs is
+        // default-constructed (cpp_constructor applies them recursively).
+        // Only for a base not named in the mem-initializer-list, and only
+        // for non-virtual bases (the @most_derived machinery is for
+        // constructor-called bases).
+        if(has_default_member_initializer(b.type()) && !b.get_bool(ID_virtual))
+        {
+          // N5008 [dcl.init]/8: an EXPLICIT empty initializer for the base
+          // (`D() : B() {}` / `: B{}`) value-initializes it, which -- the
+          // default constructor being non-trivial because of the NSDMI --
+          // also applies the default member initializers.  Only an
+          // initializer WITH arguments (copy-initialization from another
+          // object) supersedes them.
+          bool named = false;
+          for(const irept &initializer : initializers.get_sub())
+          {
+            if(initializer.find(ID_member).id() != ID_cpp_name)
+              continue;
+            if(
+              to_cpp_name(initializer.find(ID_member)).get_base_name() ==
+                ctorsymb.base_name &&
+              static_cast<const exprt &>(initializer).has_operands())
+            {
+              named = true;
+              break;
+            }
+          }
+          if(!named)
+          {
+            // members of this base are the flattened components whose
+            // qualified name starts with the base's member prefix
+            // ("B::" for class symbol "tag-B", keeping any namespaces)
+            std::string prefix = id2string(ctorsymb.name);
+            const auto tag_pos = prefix.rfind("tag-");
+            if(tag_pos != std::string::npos)
+              prefix.erase(tag_pos, 4);
+            prefix += "::";
+            for(const auto &c : components)
+            {
+              if(
+                !c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+                c.get_bool(ID_is_static) || c.type().id() == ID_code ||
+                c.get_is_padding())
+              {
+                continue;
+              }
+              if(id2string(c.get_name()).compare(0, prefix.size(), prefix) != 0)
+                continue;
+              const irept &default_val = c.find(ID_C_default_value);
+              if(default_val.is_not_nil())
+              {
+                codet mem_init(ID_member_initializer);
+                mem_init.set(ID_member, cpp_namet(c.get_base_name()));
+                mem_init.copy_to_operands(
+                  static_cast<const exprt &>(default_val));
+                final_initializers.move_to_sub(mem_init);
+              }
+              else if(has_default_member_initializer(c.type()))
+              {
+                codet mem_init(ID_member_initializer);
+                mem_init.set(ID_member, cpp_namet(c.get_base_name()));
+                final_initializers.move_to_sub(mem_init);
+              }
+            }
+          }
+        }
         continue;
+      }
 
       irep_idt ctor_name=ctorsymb.base_name;
 
