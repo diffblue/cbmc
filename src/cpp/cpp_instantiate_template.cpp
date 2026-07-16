@@ -3372,9 +3372,30 @@ skip_pack_removal_ft:
       };
 
       std::function<irept(const irept &, const exprt &)> substitute_arg;
-      substitute_arg = [&is_pack_ref, &substitute_arg](
+      substitute_arg = [&is_pack_ref, &substitute_arg, &short_name](
                          const irept &n, const exprt &arg) -> irept
       {
+        // N5008 [temp.variadic]/5: substitute the pack element INTO the
+        // pattern.  A QUALIFIED pack reference (`Ts::v` -- fold over a
+        // member of each pack element, e.g.
+        // `static inline int value = (Ts::v + ...)`) must keep its
+        // trailing components: replace only the leading name component
+        // with the element's struct tag identifier, which resolve_scope
+        // finds directly via id_map/symbol_table (same technique as the
+        // member-initializer pack substitution).  Wholesale replacement
+        // would turn `Ts::v` into just the type, leaving a
+        // type-inconsistent initializer that trips a symex invariant.
+        if(
+          n.id() == ID_cpp_name && n.get_sub().size() > 1 &&
+          n.get_sub().front().id() == ID_name &&
+          id2string(n.get_sub().front().get(ID_identifier)) == short_name &&
+          arg.id() == ID_type && arg.type().id() == ID_struct_tag)
+        {
+          irept result = n;
+          result.get_sub().front().set(
+            ID_identifier, to_struct_tag_type(arg.type()).get_identifier());
+          return result;
+        }
         if(is_pack_ref(n))
           return arg;
         irept result = n;
@@ -3438,6 +3459,54 @@ skip_pack_removal_ft:
             node = result;
           }
           return;
+        }
+
+        // N5008 [expr.prim.fold]/2: binary folds.  Parser layout:
+        // sub[0] = the operand left of `op ...`, sub[1] = the operand right
+        // of `... op`.  `(init op ... op pack)` is a binary LEFT fold
+        // (((init op e0) op e1) ...); `(pack op ... op init)` is a binary
+        // RIGHT fold (e0 op (e1 op (... op init))).
+        if(
+          node.id() == irep_idt("cpp_binary_fold") &&
+          node.get_sub().size() >= 2)
+        {
+          const irep_idt fold_op = node.get(irep_idt("fold_op"));
+          const bool pack_on_right = contains_pack_ref(node.get_sub()[1]);
+          const bool pack_on_left = contains_pack_ref(node.get_sub()[0]);
+          if(pack_on_left || pack_on_right)
+          {
+            irept init_expr =
+              pack_on_right ? node.get_sub()[0] : node.get_sub()[1];
+            const irept pattern =
+              pack_on_right ? node.get_sub()[1] : node.get_sub()[0];
+            expand_folds(init_expr);
+            // [expr.prim.fold]/3: over an empty pack a binary fold yields
+            // its init operand.
+            irept result = init_expr;
+            if(pack_on_right)
+            {
+              for(std::size_t i = 0; i < pack_args.size(); ++i)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(result);
+                bin.get_sub().push_back(substitute_arg(pattern, pack_args[i]));
+                result = bin;
+              }
+            }
+            else
+            {
+              for(int i = static_cast<int>(pack_args.size()) - 1; i >= 0; --i)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(
+                  substitute_arg(pattern, pack_args[std::size_t(i)]));
+                bin.get_sub().push_back(result);
+                result = bin;
+              }
+            }
+            node = result;
+            return;
+          }
         }
 
         for(auto &s : node.get_sub())
