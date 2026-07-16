@@ -2883,3 +2883,24 @@ failure remains the last blocker there.  Commit-hygiene note: an
 --amend after a follow-up `git add` landed on the WRONG commit (the
 test commit); fixed with `git reset --soft HEAD~2` + separate
 re-commits.  Suite green 89 skipped.
+
+## dtor-SFINAE base-specifier blocker: minimal reproducer FILED (2026-07-16)
+
+cpp17_dtor_sfinae_base_spec (KNOWNBUG, header-free, ~40 essential lines):
+the decltype-SFINAE destructibility probe as a base specifier
+(`struct safe : impl<T>::type` with `typedef decltype(test<T>(0)) type`)
+fails to resolve ONLY when elaborated inside a nested
+default-template-argument context (payload's `bool = trait_v<T>` inside
+base_<T> inside opt<T>); per-base recovery cascades: safe<S> loses its
+base -> and_<safe<S>,...> (conditional base needs B1::value) loses its
+base -> opt<S> loses base_ -> nondet members.  Works at user level.
+Reduction notes: (a) first cvise run with only the has_value anchor
+drifted to an EAGER-INSTANTIATION variant (kept at /tmp lost; shape: a
+template-id ARGUMENT `__and_<__is_destructible_safe<int>>` eagerly
+elaborated though never required to be complete per [temp.inst]/1 --
+possibly a second latent defect worth revisiting); (b) precise oracle =
+temporary BASE-DROP fprintf probe in the per-base recovery catch +
+require BASE-DROP of BOTH the trait class and _Optional_base + FAILURE +
+g++/clang accept + runtime OK.  (c) the mimic must stay WELL-FORMED:
+using an undefined impl<T::type> made g++ reject once and_ required
+B1::value.  Probe reverted before commit.  Suite green 90 skipped.
