@@ -2980,3 +2980,51 @@ CONDITIONAL overwrite of the pointer member in the move ctor.  The
 the conditional assignment -- pointer analysis of WHERE the clobber
 comes from (tmp_obj -> t copy) is the next fix step.
 Suite green, 90 skipped.
+
+## delegation-order fix + return-by-value elision (2026-07-16)
+
+BOTH targeted defects FIXED, tests CORE, suite green (89 skipped),
+strip_string unit proof VERIFIES.
+
+1. cpp11_delegating_ctor_decl_order: detector now compares the
+mem-initializer name against the class's injected-class-name
+([class.base.init]/2+/6, [class.pre]) instead of scanning ctor
+components.  Nested-class tags are qualified (outer::inner) and
+template tags carry args -- angle-aware final-component scan (4th
+instance of that pattern!).  goto_program.cpp dog-foods clean.
+
+2. cpp11_self_pointer_move_return: THE BIG ONE.  Root cause: SET RETURN
+VALUE + return-value passing relocate returned objects BITWISE (3 hops)
+and dtor the temporary after copying out.  Fix = new goto pass
+elide_cpp_returned_temporaries ([stmt.return]/2, [class.copy.elis]):
+hidden result-pointer param (Itanium sret), returned front-end
+temporary ($tmp::tmp_obj, instance-range-scoped -- identifiers are
+REUSED across unrelated temporaries, whole-body substitution corrupts
+them!) substituted by *#result; DECL/DEAD/dead_object/post-return dtor
+dropped (caller owns + destroys); call sites pass &lhs (ignored-result:
+fresh slot + dtor call).  Non-temporary returns: move ctor iff
+implicitly movable ([class.copy.elis]/3 -- REFERENCE-param returns must
+COPY; m1 mimic move-only, mv3 ident(const&) both green), else copy,
+else assign.  Gate: symbol-table scan for ctor/dtor symbols by this-
+param (goto-level struct components have NO method components!).
+
+Chained front-end defects unearthed (each needed for strings by value):
+- typecheck_return: wrap the operand BEFORE base implicit_typecast
+  ([conv.lval] strips lvalue -> MOVE ctor mis-selected for lvalues);
+  implicit move only for id-expression naming non-static local;
+  removed the std:: skip (old dtor-chain crash workaround, obsolete).
+- reference_binding: lvalue->T&& temp-copy workaround block now rejects
+  GENUINE lvalues by form ([basic.lval]: symbol/deref/member/index;
+  [dcl.init.ref]/5.4) but still materializes stale-flag prvalues
+  (cpp11_restrict_reference's R{5} needs that; flag-only fix broke m1
+  via synthesized memberwise copy, form-only-reject broke R{5} -- BOTH
+  needed).
+- __builtin_memcmp modelled in ansi-c library (char_traits::compare
+  stub returned NONDET -> every std::string == failed).  NOTE: library
+  functions REQUIRE a matching regression/cbmc-library/<name>/ test or
+  the BUILD fails (library-check.stamp) -- symptom: stale binary,
+  'no body for callee'.
+
+Debug lesson: trace `t.p=tmp_obj!...` pointers name the DEAD SOURCE
+object; --show-goto-functions on make() exposed the ASSIGN hops
+immediately.  Value-category bugs manifest as WRONG CTOR SELECTION.
