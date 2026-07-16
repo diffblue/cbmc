@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ arity 2 sum: SUCCESS$
+^\[main\.assertion\.2\] line \d+ arity 1 sum: SUCCESS$
+^\[main\.assertion\.3\] line \d+ binary seeded: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/5 + [expr.prim.fold]: a fold pattern that is a
+QUALIFIED reference to a member of each pack element (`Ts::v`) keeps its
+trailing components across substitution.  The class-body fold expander
+used to replace the whole qualified name with the element type, so
+`static inline int value = (Ts::v + ...)` became a bare type expression
+and symex CRASHED (invariant "assignments must be type consistent").
+Static constexpr members with the same fold took a different, working
+path, masking the defect.  Found by feature-sweep defect hunting;
+header-free; g++/clang++ runtime-verified.
