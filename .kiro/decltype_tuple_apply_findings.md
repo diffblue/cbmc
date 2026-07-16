@@ -2952,3 +2952,31 @@ Suite green 89 skipped; ctest unit-proofs 4/4.
 LESSON: the unit-proof mission statement held on the very first harness:
 building strip_string's proof immediately flushed out a fundamental
 front-end defect (SSO move-return) that ordinary feature tests missed.
+
+## minimal reproducers round (2026-07-16)
+
+goto_program.cpp dog-food failure ISOLATED ->
+cpp11_delegating_ctor_decl_order (KNOWNBUG): [class.base.init]/6
+delegation recognition is DECLARATION-ORDER dependent.  The detector in
+full_member_initialization (cpp_typecheck_constructor.cpp ~894) scans
+struct components for a constructor whose base_name matches the
+mem-initializer; when the delegating ctor is declared BEFORE its
+target, no ctor component exists yet -> delegation missed -> members
+default-initialized (hard 'found no match' when a member lacks a
+default ctor; silent wrong values otherwise).  Reordering (delegator
+AFTER target) works today -- the o1/o2 probes prove pure order
+dependence.  Real-world shape: goto_programt::instructiont() delegating
+to instructiont(goto_program_instruction_typet), _code has no default
+ctor.  FIX IDEA: recognize delegation syntactically (initializer names
+the class itself) instead of scanning components, or run the check
+after all ctor components are added.
+
+cpp11_self_pointer_move_return SHRUNK 25 -> 14 lines: no copy ctor, no
+payload, assert directly t.p == t.buf.  Minimality probes: empty branch
+body PASSES, unconditional rebase PASSES, `S t = S();` PASSES -- the
+defect needs (a) return-by-value through a function AND (b) a
+CONDITIONAL overwrite of the pointer member in the move ctor.  The
+'bitwise copy clobber' happens only when the move ctor body contains
+the conditional assignment -- pointer analysis of WHERE the clobber
+comes from (tmp_obj -> t copy) is the next fix step.
+Suite green, 90 skipped.
