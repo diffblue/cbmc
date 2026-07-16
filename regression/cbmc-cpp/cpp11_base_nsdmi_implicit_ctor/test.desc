@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ base bool NSDMI applied: SUCCESS$
@@ -7,15 +7,20 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
+^CONVERSION ERROR$
 --
-KNOWNBUG: N5008 [class.base.init]/9.1 + [class.mem.general]/10 -- the
-implicitly defined default constructor of a DERIVED class does not apply
-the base class's default member initializers: `struct B { bool e =
-false; }; struct D : B {}; D d;` leaves d.e nondet.  A direct object of
-the base works, and an explicitly-defaulted `B() = default;` also works;
-only the fully implicit constructor of a base under derivation loses the
-NSDMI.  This is the root of the std::optional<std::string> residual
-(cpp17_optional_string): _Optional_payload_base's `_M_engaged = false`
-was dropped, making has_value() nondet.  Reduced with cvise on
-cbmc-preprocessed source (5 essential lines).  Header-free; g++/clang++
-runtime-verified.  Flip to CORE when fixed.
+Was KNOWNBUG: N5008 [class.base.init]/9.1 + [class.default.ctor]/3 --
+the implicitly defined default constructor of a derived class dropped a
+base's default member initializers when the base counted as POD (CBMC's
+cpp_is_pod does not model NSDMIs, so no constructor is synthesized for
+such a base and the base-initializer loop skipped it).  The synthesized
+derived constructor now applies the base's NSDMIs through the flattened
+from_base components: a component with its own #default_value is
+initialized from it, one whose type transitively carries NSDMIs is
+default-constructed; an explicit base initializer WITH arguments
+supersedes them, while an empty one (value-initialization, [dcl.init]/8)
+still applies them.  Reduced with cvise on cbmc-preprocessed source from
+std::optional<std::string> (whose remaining KNOWNBUG is the independent
+base-specifier resolution failure).  Header-free; g++/clang++
+runtime-verified.
