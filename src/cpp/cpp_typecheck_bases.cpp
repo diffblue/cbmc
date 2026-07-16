@@ -170,8 +170,40 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     }
     else
     {
-      base_symbol_expr = resolve(
-        name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
+      // N5008 [class.derived]/2 + [temp.inst]/3: during template
+      // instantiation, failure to resolve ONE base-specifier (e.g. the
+      // `__is_destructible_impl<...>::type` SFINAE machinery of a
+      // libstdc++ trait) must not abandon the OTHER bases: the sibling
+      // bases are independently valid, and dropping them all left e.g.
+      // std::optional<std::string> without its _Optional_base -- its
+      // constructors' member initializers then crashed the front end on
+      // a derived-to-base cast between "unrelated" structs
+      // (make_ptr_typecast precondition).  Recover per base: nil this
+      // entry (the same graceful degradation the non-throwing failure
+      // paths below use) and continue with the next.  User-code base
+      // errors outside instantiation still throw.
+      if(instantiation_stack.empty())
+      {
+        base_symbol_expr = resolve(
+          name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
+      }
+      else
+      {
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          base_symbol_expr = resolve(
+            name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          base = get_nil_irep();
+          continue;
+        }
+      }
     }
 
     if(base_symbol_expr.id()!=ID_type)
