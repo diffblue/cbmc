@@ -6,20 +6,17 @@
 // _M_local_buf), the move constructor REBASES the pointer to the
 // destination's buffer when the source is self-pointing.
 //
-// KNOWNBUG: when the move constructor CONDITIONALLY overwrites the
-// rebased pointer (branching on the source's self-pointer state, as
-// every SSO move constructor does), the returned object's pointer ends
-// up targeting the RETURN-VALUE TEMPORARY's buffer (a dead object):
-// the trace shows t.p first set to t's own buffer by the constructor,
-// then clobbered to tmp_obj's buffer by a bitwise copy.  Making the
-// assignment unconditional, or removing the branch, works.  This
-// breaks every SSO-style class returned by value -- including
-// std::string: `std::string t = make(); t.front()` reads a dead object
-// (found while building the strip_string unit proof,
-// regression/unit-proofs/strip_string).
+// This used to be a KNOWNBUG: the returned object was relocated
+// BITWISE through the return-value mechanism, so a move constructor
+// that CONDITIONALLY overwrites the rebased pointer (as every SSO move
+// constructor does) left the pointer targeting the return-value
+// temporary's buffer (a dead object) -- std::string returned by value
+// read a dead object.  Fixed by constructing the result directly into
+// caller-provided storage (elide_cpp_returned_temporaries; guaranteed
+// copy elision as real ABIs implement it, Itanium: sret) with
+// [class.copy.elis]/3 implicit move at the return site.
 //
-// g++/clang++ verify at runtime.  Flip to CORE (and the strip_string
-// unit proof with it) when fixed.
+// g++/clang++ verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct S
