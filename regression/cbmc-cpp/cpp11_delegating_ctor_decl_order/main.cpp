@@ -3,27 +3,28 @@
 // is selected by overload resolution and no other member initialization
 // takes place.
 //
-// KNOWNBUG: recognition of the delegation is DECLARATION-ORDER
-// dependent.  When the delegating constructor is declared BEFORE its
-// target, the front end fails to recognize the delegation (the class's
-// constructor components are not yet visible to the detector in
-// full_member_initialization) and falls back to default-initializing
+// Recognition of the delegation used to be DECLARATION-ORDER
+// dependent.  When the delegating constructor was declared BEFORE its
+// target, the front end failed to recognize the delegation (the class's
+// constructor components were not yet visible to the detector in
+// full_member_initialization) and fell back to default-initializing
 // the members:
-//  * if a member has no default constructor, conversion fails hard with
+//  * if a member has no default constructor, conversion failed hard with
 //    "found no match" for a zero-argument constructor call -- this is
 //    how dog-fooding src/goto-programs/goto_program.cpp surfaced it:
 //    goto_programt::instructiont's default constructor delegates and is
 //    declared before its target, and member _code (goto_instruction_codet)
 //    has no default constructor;
-//  * otherwise members are silently default-initialized and the
-//    delegation's effect is lost (wrong values, no diagnostic).
+//  * otherwise members were silently default-initialized and the
+//    delegation's effect was lost (wrong values, no diagnostic).
 //
 // This test captures both flavors: member `c` has no default
-// constructor (hard error today), and the assertions catch the silent
-// wrong-value flavor should conversion start succeeding.  Declaring the
-// delegating constructor AFTER the target makes both work today.
+// constructor (previously a hard error), and the assertions catch the
+// silent wrong-value flavor.  Fixed by recognizing the delegation
+// against the class's injected-class-name ([class.base.init]/2,
+// [class.pre]) instead of scanning for constructor components.
 //
-// g++/clang++ verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct payloadt
