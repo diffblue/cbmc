@@ -1679,6 +1679,16 @@ exprt template_mapt::lookup_by_suffix(
 
   for(const auto &entry : type_map)
   {
+    // N5008 [basic.scope.temp]: a nil-valued entry is a placeholder for a
+    // template parameter that has NO binding in the current instantiation
+    // context (e.g. the parameter of a sibling partial specialization whose
+    // scope shares the reference's path).  It is not a live binding; choosing
+    // it over a bound same-short-name parameter of an enclosing template
+    // (the libstdc++ __strip_reference_wrapper primary-vs-partial-spec `_Tp`
+    // during make_tuple's return-type elaboration) aborts the resolution
+    // that the bound entry would have satisfied.
+    if(entry.second.is_nil())
+      continue;
     const std::string key = id2string(entry.first);
     if(!is_match(key))
       continue;
@@ -1696,6 +1706,9 @@ exprt template_mapt::lookup_by_suffix(
   }
   for(const auto &entry : expr_map)
   {
+    // skip placeholder (unbound) entries -- see the type_map loop above
+    if(entry.second.is_nil())
+      continue;
     const std::string key = id2string(entry.first);
     if(!is_match(key))
       continue;

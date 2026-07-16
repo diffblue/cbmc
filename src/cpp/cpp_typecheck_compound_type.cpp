@@ -541,7 +541,28 @@ void cpp_typecheckt::typecheck_compound_declarator(
       {
         irept copy = param;
         auto &dc = to_cpp_declaration(copy);
-        dc.type() = (*elems)[k];
+        // N5008 [temp.variadic]/8: the k-th expansion substitutes the k-th
+        // pack element INTO the pattern; the pattern's cv-qualifiers are
+        // part of it.  The pattern of `const _Elements&... __elements`
+        // (libstdc++ tuple's converting constructor) parses as a
+        // merged_type [const, cpp_name(_Elements)]; wholesale replacement
+        // with the element would drop the `const`, making the replicated
+        // parameter a non-const `_Elements&` that cannot bind an rvalue
+        // argument ([dcl.init.ref]/5), so the constructor is wrongly
+        // removed from the overload set.  Carry the pattern's
+        // cv-qualifiers onto the (already type-checked) element.
+        typet elem_k = (*elems)[k];
+        if(dc.type().id() == ID_merged_type)
+        {
+          for(const irept &msub : dc.type().get_sub())
+          {
+            if(msub.id() == ID_const)
+              elem_k.set(ID_C_constant, true);
+            else if(msub.id() == ID_volatile)
+              elem_k.set(ID_C_volatile, true);
+          }
+        }
+        dc.type() = elem_k;
         auto &decl = dc.declarators().front();
         decl.type().remove(ID_ellipsis);
         decl.remove(ID_ellipsis);
