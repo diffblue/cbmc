@@ -370,9 +370,13 @@ bool normal_subsumes(
   return true;
 }
 
+} // namespace
+
 // True iff declaration p is STRICTLY more constrained than q ([temp.func.order]
 // + [temp.constr.order]): p's associated constraints subsume q's but not the
-// other way round.
+// other way round.  External linkage: also used by the class-template
+// partial-specialization search in cpp_instantiate_template.cpp
+// ([temp.class.spec.match]/2 with [temp.constr.order]).
 bool template_constraint_strictly_subsumes(
   const symbol_table_baset &symbol_table,
   const cpp_declarationt &p,
@@ -386,6 +390,9 @@ bool template_constraint_strictly_subsumes(
     template_constraint_normal(symbol_table, p, /*dnf=*/false));
   return p_subsumes_q && !q_subsumes_p;
 }
+
+namespace
+{
 
 // Does this (function) template declaration carry any associated constraint?
 bool template_is_constrained(const cpp_declarationt &decl)

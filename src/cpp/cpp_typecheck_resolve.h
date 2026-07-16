@@ -18,6 +18,17 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 class cpp_namet;
 class cpp_typecheck_fargst;
 class cpp_declarationt;
+class symbol_table_baset;
+
+// N5008 [temp.constr.order]/1 + [temp.func.order]: true iff declaration p is
+// STRICTLY more constrained than q (p's associated constraints subsume q's
+// but not vice versa).  Used by overload resolution and by the
+// class-template partial-specialization search
+// ([temp.class.spec.match]/2).
+bool template_constraint_strictly_subsumes(
+  const symbol_table_baset &symbol_table,
+  const cpp_declarationt &p,
+  const cpp_declarationt &q);
 
 class cpp_typecheck_resolvet
 {
