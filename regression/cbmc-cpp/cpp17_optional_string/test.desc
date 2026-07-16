@@ -15,3 +15,19 @@ libstdc++'s _Optional_payload/_Optional_base internals -- an invariant
 violation, not a graceful error.  Found by dog-fooding CBMC's own sources
 (util/simplify_expr.cpp, util/cmdline.cpp).  optional<int> works.  Flip
 to CORE when the constructor chain converts.
+
+UPDATE 2026-07-16 (2): the front-end CRASH is fixed -- two changes:
+(1) [class.derived]/2 per-base recovery in typecheck_compound_bases (one
+failing base specifier no longer drops its siblings during template
+instantiation); (2) make_ptr_typecast degrades to a plain typecast
+instead of tripping its precondition when the relation is not derivable
+from (partially recovered) bases.  cmdline.cpp/simplify_expr.cpp
+dog-fooding is unblocked.  REMAINING (why this stays KNOWNBUG):
+optional<string>'s values are still nondet -- the root is that
+__is_destructible_impl<basic_string>::type (decltype(__test<_Tp>(0))
+SFINAE) fails to resolve ONLY inside optional's nested instantiation
+context (works at user level: __is_destructible_safe<string,0,0>::value
+verifies TRUE in main), so is_trivially_destructible degrades and
+_Optional_base's bool args mismatch between the base specifier and the
+constructor's member initializer.  Flip to CORE when the nested-context
+trait SFINAE resolves.
