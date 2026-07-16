@@ -892,27 +892,58 @@ void cpp_typecheckt::full_member_initialization(
   }
 
   // Delegating constructors (C++11) delegate to another constructor of the
-  // same class. No base class or member initialization should be added.
+  // same class.  N5008 [class.base.init]/6: if a mem-initializer-id
+  // designates the constructor's class, the constructor is a delegating
+  // constructor and no base class or member initialization takes place.
+  // Per [class.base.init]/2 an unqualified mem-initializer-id is looked up
+  // in the scope of the constructor's class, where a name equal to the
+  // class's own name finds the injected-class-name ([class.pre]) -- i.e.
+  // the class itself.  Compare against the class's name directly: scanning
+  // the class's components for an already-declared constructor (as done
+  // previously) made recognition declaration-order dependent, because a
+  // delegating constructor declared before its target sees no constructor
+  // component yet.  (A non-static data member cannot share the name of its
+  // class, [class.mem.general], so a matching simple name can only mean
+  // delegation.)
   if(struct_union_type.id() == ID_struct)
   {
+    // The tag is qualified for nested classes ("outer::inner") and may
+    // carry template arguments for class template specializations
+    // ("S<tag-T>"); the injected-class-name is the plain final component
+    // ([class.pre]).  The component boundary is the last "::" OUTSIDE
+    // angle brackets -- a naive rfind("::") could land inside a template
+    // argument.
+    std::string class_base_name = id2string(struct_union_type.get(ID_tag));
+    {
+      std::size_t depth = 0;
+      std::size_t final_component = 0;
+      for(std::size_t i = 0; i + 1 < class_base_name.size(); ++i)
+      {
+        if(class_base_name[i] == '<')
+          ++depth;
+        else if(class_base_name[i] == '>' && depth > 0)
+          --depth;
+        else if(
+          depth == 0 && class_base_name[i] == ':' &&
+          class_base_name[i + 1] == ':')
+        {
+          final_component = i + 2;
+        }
+      }
+      class_base_name.erase(0, final_component);
+      const std::size_t angle = class_base_name.find('<');
+      if(angle != std::string::npos)
+        class_base_name.erase(angle);
+    }
     for(const auto &initializer : initializers.get_sub())
     {
       const cpp_namet &member_name = to_cpp_name(initializer.find(ID_member));
-      if(!member_name.has_template_args())
+      if(
+        member_name.is_simple_name() && !class_base_name.empty() &&
+        id2string(member_name.get_base_name()) == class_base_name)
       {
-        irep_idt base_name = member_name.get_base_name();
-        for(const auto &c : to_struct_type(struct_union_type).components())
-        {
-          if(
-            c.get_base_name() == base_name && !c.get_bool(ID_from_base) &&
-            !c.get_bool(ID_is_type) && !c.get_bool(ID_is_static) &&
-            c.type().id() == ID_code &&
-            to_code_type(c.type()).return_type().id() == ID_constructor)
-          {
-            // The initializer names the class's own constructor.
-            return;
-          }
-        }
+        // The initializer designates the constructor's class: delegating.
+        return;
       }
     }
   }
