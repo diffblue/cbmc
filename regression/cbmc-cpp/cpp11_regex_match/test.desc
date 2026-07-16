@@ -25,3 +25,11 @@ regex_match's use of it dereferences the global locale's facet pointers
 _M_traits) which CBMC does not model as initialised (no locale static-init
 modelling), so those dereferences fail.  Flip back to CORE once the libstdc++
 locale facet pointers are modelled (or stubbed) as validly initialised.
+
+UPDATE 2026-07-16: the locale-facet layer is now MODELLED (see
+cpp11_locale_ctype_facet): __try_use_facet<ctype<char>> returns a modelled
+classic-"C" facet with a proper classification table, and
+locale()/~locale() have empty model bodies, so the facet dereference
+failures are gone.  The residual blocker is pure BMC SCALING: symbolic
+regex compilation + matching does not converge within 10 minutes at
+--unwind 5.  Not a front-end defect.
