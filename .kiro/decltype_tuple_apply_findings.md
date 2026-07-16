@@ -2806,3 +2806,38 @@ Prerequisites / notes from the dog-fooding rounds so far:
 - Infrastructure idea: a regression/unit-proofs/ suite mirroring unit/
   paths, driven by test.pl with per-harness --unwind bounds; tag slow
   ones thorough.
+
+## chrono + default_targ CORE; optional_string crash fixed (2026-07-16)
+
+1. cpp11_chrono_mixed_duration_add -> CORE.  THREE stacked fixes:
+   (a) [temp.deduct]/5+[basic.scope.temp]/2 deduction restricted to the
+   deduced template's own parameters (current_deduction_parameters +
+   template_map.deduction_parameters + V1 short-name-loop guard) and
+   exception-safe cpp_name swap-restore in typecheck_type ([temp.deduct]/8
+   no-lasting-effect); (b) [temp.inst]/5 convert_deferred_method_now:
+   on-demand conversion of deferred constexpr members needed by constant
+   evaluation in default template args (chrono _S_gcd in __divide);
+   (c) constexpr evaluator gaps: do-while ([stmt.dowhile] body-first),
+   decl initializers ([dcl.init]), expression-statement assigns.  New
+   header-free CORE test cpp11_fn_template_param_shadow.
+   DEBUG-JOURNEY note: 'same call works in main, fails in fn-template
+   body' = deferred-drain ordering/state; census of enable_if<0,...>
+   instantiations via a typecheck_template_args result probe pinpointed
+   the false conjunct (integral_constant<bool,0> from __is_harmonic).
+2. cpp17_default_targ_overload_select -> CORE.  (a) [temp.arg.explicit]/3:
+   too-many-explicit-args is now a silent candidate-removal
+   (template_arg_kind_mismatch_exceptiont) during overload matching;
+   (b) [temp.variadic]/5: member-body fold reducer recognises a
+   single-element pack by the method's own (un-replicated) parameter
+   name, independent of how many packs are in the map.
+3. cpp17_optional_string: CRASH FIXED (still KNOWNBUG for values):
+   per-base recovery in typecheck_compound_bases ([class.derived]/2 --
+   one failing base no longer drops siblings) + make_ptr_typecast
+   degrades to plain typecast on unrelated structs.  Dog-fooding of
+   cmdline.cpp/simplify_expr.cpp UNBLOCKED (0 errors).  REMAINING ROOT:
+   __is_destructible_impl<basic_string>::type (decltype __test SFINAE)
+   fails only inside optional's nested instantiation (fine at user
+   level) -> is_trivially_destructible degrades -> _Optional_base bool
+   args mismatch.  NEXT session: chase the nested-context decltype
+   overload resolution.
+Suite green 89 skipped both runs; probes swept; 8 commits this session.
