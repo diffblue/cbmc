@@ -2666,3 +2666,39 @@ AND verbatim source lines.  LATENT (unfixed, masked): __valid_args
 explicit-arg member-overload selection fails in the make_tuple context ->
 forwarding ctors dropped (RESOLVE-FAIL-T __valid_args); const& ctor now
 matches so end-to-end works.  Worth a follow-up KNOWNBUG if it resurfaces.
+
+## cpp20_iterator_traits_category NONDETERMINISM DIAGNOSED (2026-07-15 late)
+
+The flakiness (1-in-5 FAILED) is ADDRESS-ORDER dependence: with ASLR
+disabled (`setarch $(uname -m) -R cbmc ...`) the failure is DETERMINISTIC
+(6/6 FAILED) -- use this for all debugging.  Failure mode: the selected
+`iterator_traits<vector<int>::iterator>::iterator_category` is
+bidirectional_iterator_tag instead of random_access_iterator_tag (probed
+via is_same asserts /tmp/it.cpp shape).
+
+Root cause located (not yet fixed): in cpp_instantiate_template.cpp's
+partial-specialization search (~line 1830-1925), when several partial
+specializations share the same argument pattern and differ only by
+requires-clauses -- libstdc++'s __iterator_traits member alias `__cat`
+has three such specs (#req___cpp17_input_iterator /
+__cpp17_fwd_iterator / __cpp17_randacc_iterator chains) -- the
+"more specialized" tie-break is a CRUDE COUNT heuristic
+(count_constrained, then arg-list size, then a numeric requires-clause
+count via stoi + #C_concept_constraint counting).  When those counts TIE,
+the winner is whichever candidate is seen first in
+`cpp_scopet::id_sett = std::set<cpp_idt *>` -- POINTER-ordered, hence
+ASLR-dependent.  N5008 [temp.class.spec.match]/2 + [temp.constr.order]
+require selecting the most-constrained SATISFIED spec via constraint
+SUBSUMPTION -- and the proper machinery already exists:
+constraint_subsumes / constraint_strictly_subsumes in
+cpp_typecheck_resolve.cpp (~line 129-305, used by overload resolution).
+
+FIX PLAN (next turn): in the best_match tie-break, when argument
+patterns are equal, evaluate ALL satisfied candidates' requires-clauses
+and pick the one whose associated constraint strictly subsumes the
+others' ([temp.constr.order]/1); fall back to a DETERMINISTIC order
+(e.g. symbol-name comparison) only when subsumption is incomparable
+(ambiguity).  Also audit: iterating `id_sett` (std::set<cpp_idt*>)
+anywhere selection-relevant is a latent nondeterminism source; consider
+name-keyed ordering.  Probes used (all reverted): SPEC-REQ/SPEC-FIRST/
+SPEC-BEST in the search loop.
