@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ empty: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.inst]/1-3 + [dcl.type.decltype] -- a base specifier
+`impl<T>::type` whose member is the classic destructibility probe
+(`decltype(test<T>(0))` over declval/~T() SFINAE overloads) fails to
+resolve when the class is elaborated inside a NESTED instantiation
+context (a member's `bool = trait_v<T>` default template argument within
+a base-class chain); the per-base recovery then cascades and the
+outermost class loses its data-bearing base (nondet members).  The same
+chain elaborated directly at user level resolves fine.  Header-free
+skeleton of libstdc++'s std::optional<std::string> residual
+(cpp17_optional_string); reduced with cvise on cbmc-preprocessed source
++ hand-minimization; g++/clang++ runtime-verified.  Flip to CORE (with
+cpp17_optional_string) when fixed.
