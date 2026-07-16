@@ -1,15 +1,26 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp23
+^\[main\.assertion\.1\] line \d+ has value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
 ^CONVERSION ERROR$
 --
-std::expected is not modelled by the C++ front-end.  This test previously passed
-only VACUOUSLY (the whole main body was dropped by the unsupported-construct
-leniency, so nothing was verified).  The converting-fixed-parameter fix lets
-more of std::expected instantiate, which now surfaces a real gap ("conversion
-from 'void' to 'signed int'" in expected's internals) rather than silently
-passing.  Flip back to CORE once std::expected is modelled.
+C++23 std::expected<int, int> basic usage (construction, has_value,
+operator*), real libstdc++ <expected>.
+
+Was KNOWNBUG ("conversion from 'void' to 'signed int'" on *e): the VOID
+partial specialization `expected<_Tp, _Er> requires is_void_v<_Tp>` was
+selected for _Tp = int.  Its requires-clause substituted and simplified
+to a NUMERIC zero constant (c-bool 0) rather than a Boolean `false`, and
+the satisfaction check only tested is_false() -- so the unsatisfied
+clause counted as satisfied (N5008 [temp.constr.atomic]/3) and the void
+specialization (whose operator* returns void) shadowed the primary.
+Fixed by also treating a zero constant as unsatisfied.  A header-free
+mimic (integral_constant/false_type/is_void_v chain) does NOT reproduce
+the numeric-zero shape; only the full libstdc++ chain does, so this
+with-headers test is the regression test for the fix.
