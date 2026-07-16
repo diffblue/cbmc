@@ -2841,3 +2841,23 @@ Prerequisites / notes from the dog-fooding rounds so far:
    args mismatch.  NEXT session: chase the nested-context decltype
    overload resolution.
 Suite green 89 skipped both runs; probes swept; 8 commits this session.
+
+## optional_string residual REDUCED: base NSDMI drop (2026-07-16)
+
+New KNOWNBUG cpp11_base_nsdmi_implicit_ctor (5 essential lines,
+header-free): `struct B { bool e = false; }; struct D : B {}; D d;`
+leaves d.e NONDET -- the implicitly defined default constructor of a
+DERIVED class does not apply the base's default member initializers
+([class.base.init]/9.1).  Boundaries: direct base object OK; explicit
+`B() = default;` OK; one derivation level suffices.  This is the actual
+root of cpp17_optional_string's nondet has_value()
+(_Optional_payload_base::_M_engaged = false dropped).  LESSON: the
+earlier nested-context trait-SFINAE hypothesis was a red herring for the
+VALUE failure -- it only explained the (now-fixed) crash path; cvise on
+the cbmc-preprocessed default-construction case isolated the true
+observable defect in one round.  Reduction chain: optional<string>
+default-ctor (with-headers, 27k lines preprocessed) -> cvise 16 lines ->
+hand-bisect 5 lines.  FIX SITE hint: implicit/synthesised default ctor
+generation for classes with bases (cpp_typecheck_compound_type ctor
+synthesis) vs the working direct-object path; the explicit `= default`
+path evidently routes through the working code.
