@@ -40,3 +40,12 @@ initializers ([class.base.init]/9.1), so _Optional_payload_base's
 hypothesis was a red herring for the VALUE failure: with the crash fixed,
 cvise isolated the NSDMI drop as the actual observable defect.)  Flip to
 CORE together with cpp11_base_nsdmi_implicit_ctor.
+
+UPDATE 2026-07-16 (4): the NSDMI half of the residual is FIXED
+(cpp11_base_nsdmi_implicit_ctor is CORE): synthesized derived
+constructors now apply POD bases' default member initializers.  The
+remaining blocker for THIS test is the earlier-diagnosed base-specifier
+resolution failure inside optional<string>'s instantiation (its base
+list is dropped by recovery, so the object has no members at all --
+trace shows `o={ }`).  Flip to CORE when the nested-context
+__is_destructible_impl<...>::type base-specifier SFINAE resolves.
