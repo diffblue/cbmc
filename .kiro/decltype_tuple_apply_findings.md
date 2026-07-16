@@ -2639,3 +2639,30 @@ binary, class-template member, and a WRONG-value negative (must FAIL,
 non-vacuous); g++ AND clang++ runtime-verified.  Two commits (src, test);
 full suite green (91 skipped, was 92).  Added <util/arith_tools.h> +
 <util/c_types.h> includes for from_integer/signed_int_type.
+
+## make_tuple arity>=3 FIXED -> CORE (2026-07-15 late)
+
+cpp17_tuple_basic flipped to CORE.  Two root causes, both fixed:
+1. [temp.variadic]/8 CONST DROP: in-class pack replication
+   (cpp_typecheck_compound_type.cpp) replaced the whole pattern
+   `merged_type[const, cpp_name(_Elements)]` of `const _Elements&...` with
+   the raw pack element -> replicated params lost const -> couldn't bind
+   rvalues ([dcl.init.ref]/5) -> tuple's converting ctor removed ->
+   "found no match for symbol '__result_type'" swallowed as system-header
+   leniency -> nondet make_tuple.  Fix: carry pattern const/volatile onto
+   the substituted element.  Minimal header-free CORE test:
+   cpp11_const_pack_pattern_param (pre-fix: hard CONVERSION ERROR).
+2. [basic.scope.temp] NIL-PLACEHOLDER PREFERENCE: lookup_by_suffix
+   (template_map.cpp) scored a sibling partial spec's nil `_Tp`
+   placeholder above the live binding (scope-path length); nil entries now
+   skipped in both type_map and expr_map loops.
+Arity boundary explanation: tuple<_T1,_T2> partial spec (arity<=2) takes a
+different path.  Debug journey pitfalls: (a) show-symbol-table renders a
+typedef'd int as its typedef NAME (looks self-referential but isn't);
+(b) symbol_tablet::move inserts a nil-typed dummy first (probe noise);
+(c) cvise twice over-reduced to different-defect variants (uninit read;
+degraded __valid_args) -- anchor oracles on the precise probe signature
+AND verbatim source lines.  LATENT (unfixed, masked): __valid_args
+explicit-arg member-overload selection fails in the make_tuple context ->
+forwarding ctors dropped (RESOLVE-FAIL-T __valid_args); const& ctor now
+matches so end-to-end works.  Worth a follow-up KNOWNBUG if it resurfaces.
