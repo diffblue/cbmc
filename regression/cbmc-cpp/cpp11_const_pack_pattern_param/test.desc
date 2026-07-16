@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ const pack pattern preserved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/8: pack expansion substitutes each element INTO the
+pattern, cv-qualifiers included.  The in-class parameter-pack replication
+used to replace the whole pattern type `const Es &` with the raw element,
+dropping the const; the non-const `Es &` parameters could not bind rvalue
+arguments ([dcl.init.ref]/5) and the only viable constructor vanished
+("found no match for symbol 'Tup'", main truncated).  Root cause of the
+libstdc++ make_tuple arity >= 3 failure (cpp17_tuple_basic).  Header-free;
+g++/clang++ runtime-verified.
