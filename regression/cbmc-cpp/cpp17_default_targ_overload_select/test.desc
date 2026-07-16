@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ three-arg forwarding ctor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one-arg forwarding ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.arg.explicit] + [temp.deduct]/2 -- a call supplying
+only explicit template arguments to an OVERLOADED member function
+template, appearing as the initializer of a DEFAULT TEMPLATE ARGUMENT of
+another member template (libstdc++ <tuple>'s
+`bool _Valid = __valid_args<_UElements...>()` forwarding-constructor
+shape), finds no viable overload; the enclosing constructor is removed
+from the overload set and resolution fails ("found no match").  The same
+call resolves fine when made directly, and a non-overloaded callee works
+in the same default-argument position -- the broken ingredient is
+overload selection by explicit template arguments inside the
+default-template-argument context.  In real libstdc++ this silently drops
+tuple's perfect-forwarding constructors (masked whenever
+`tuple(const _Elements&...)` also matches).  Header-free; g++/clang++
+runtime-verified.  Flip to CORE when fixed.
