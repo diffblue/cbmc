@@ -2861,3 +2861,25 @@ hand-bisect 5 lines.  FIX SITE hint: implicit/synthesised default ctor
 generation for classes with bases (cpp_typecheck_compound_type ctor
 synthesis) vs the working direct-object path; the explicit `= default`
 path evidently routes through the working code.
+
+## base-NSDMI drop FIXED -> CORE (2026-07-16)
+
+cpp11_base_nsdmi_implicit_ctor flipped to CORE.  Root cause exactly as
+reduced: full_member_initialization's base loop skipped cpp_is_pod bases
+entirely, and cpp_is_pod does not model NSDMIs, so a POD-classified base
+with a default member initializer got NO initialization in the
+synthesized derived ctor ([class.base.init]/9.1 + [class.default.ctor]/3
+violated).  Fix (cpp_typecheck_constructor.cpp): for a non-virtual POD
+base with has_default_member_initializer, emit member-initializers via
+the flattened from_base components (own #default_value -> initialize
+from it; type-with-transitive-NSDMIs -> default-construct through
+cpp_constructor's recursive NSDMI path).  [dcl.init]/8 subtlety probed
+and handled: an explicit EMPTY base initializer (`: B()`) still applies
+NSDMIs (value-init); only an initializer WITH arguments supersedes.
+Edge cases verified: two POD bases; mixed base+own NSDMIs.
+cpp17_optional_string still KNOWNBUG: its optional<string> instance has
+ZERO members (`o={ }` in trace) -- the dropped-base-specifier resolution
+failure remains the last blocker there.  Commit-hygiene note: an
+--amend after a follow-up `git add` landed on the WRONG commit (the
+test commit); fixed with `git reset --soft HEAD~2` + separate
+re-commits.  Suite green 89 skipped.
