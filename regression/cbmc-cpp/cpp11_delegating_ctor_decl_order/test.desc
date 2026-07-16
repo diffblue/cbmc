@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member initialized via delegation: SUCCESS$
+^\[main\.assertion\.2\] line \d+ scalar initialized via delegation: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [class.base.init]/6 -- delegating-constructor
+recognition is declaration-order dependent: a delegating constructor
+declared BEFORE its target is not recognized (constructor components
+not yet visible to the detector), so members are default-initialized
+instead; with a non-default-constructible member this is a hard
+CONVERSION ERROR ("found no match" for a zero-argument constructor).
+Root cause of the goto_program.cpp dog-food failure
+(goto_programt::instructiont's delegating default constructor).
+g++/clang++ runtime-verified.  Flip to CORE when fixed.
