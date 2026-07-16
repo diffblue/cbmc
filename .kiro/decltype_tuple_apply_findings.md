@@ -2702,3 +2702,18 @@ others' ([temp.constr.order]/1); fall back to a DETERMINISTIC order
 anywhere selection-relevant is a latent nondeterminism source; consider
 name-keyed ordering.  Probes used (all reverted): SPEC-REQ/SPEC-FIRST/
 SPEC-BEST in the search loop.
+
+## iterator_traits nondeterminism FIXED -> CORE (2026-07-15 late)
+
+cpp20_iterator_traits_category flipped to CORE.  Fix as planned:
+de-anonymized template_constraint_strictly_subsumes (declared in
+cpp_typecheck_resolve.h) and used it in instantiate_template's
+partial-spec search equal-pattern tie-break, replacing the stoi/count
+heuristic; incomparable constraints now tie-break by SYMBOL NAME
+(deterministic), never by pointer order.  Verification: 6/6 normal +
+3/3 setarch -R runs pass (was 6/6 FAIL under -R); full suite green BOTH
+ways (ran suite once normally and once wrapped in a setarch -R shim
+script -- useful trick: test.pl -c /tmp/cbmc-noaslr.sh).  89 skipped
+(was 90).  Technique note: ASLR-dependent front-end flakiness ->
+setarch -R makes it deterministic; grep for std::set<cpp_idt*>
+iteration when selection-relevant.
