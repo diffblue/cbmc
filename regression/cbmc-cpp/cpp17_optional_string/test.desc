@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ has value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG (front-end CRASH): std::optional<std::string> construction trips
+the make_ptr_typecast precondition (pointer cast between unrelated
+structs) inside typecheck_member_initializer while instantiating
+libstdc++'s _Optional_payload/_Optional_base internals -- an invariant
+violation, not a graceful error.  Found by dog-fooding CBMC's own sources
+(util/simplify_expr.cpp, util/cmdline.cpp).  optional<int> works.  Flip
+to CORE when the constructor chain converts.
