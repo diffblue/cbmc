@@ -6438,8 +6438,17 @@ skip_pack_removal_ft:
             }
           }
 
-          if(node.id() == ID_cpp_declarator)
+          if(
+            node.id() == ID_cpp_declarator &&
+            node.find(ID_init_args).is_not_nil())
           {
+            // Use find-then-add: irept::add would CREATE an empty
+            // ID_init_args entry on every declarator visited, including one
+            // initialised with `= value` -- typecheck_decl later rejects a
+            // declarator carrying both a value and init_args (invariant
+            // "declarator should not have init_args"; dog-fooding CBMC's
+            // own invariant.h crashed on `std::string backtrace = ...`
+            // inside the variadic report_invariant_failure chain).
             irept &init_args = node.add(ID_init_args);
             irept::subt &ia_sub = init_args.get_sub();
             if(!ia_sub.empty())
