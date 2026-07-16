@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ 90 seconds: SUCCESS$
@@ -7,13 +7,29 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
+^CONVERSION ERROR$
 --
-KNOWNBUG: N5008 [time.duration.nonmember] -- mixed-period duration
-operator+ (minutes + seconds) returns nondet: the instantiated operator+
-body fails to convert (resolution of the `__cd` common-type alias /
-`duration` converting-constructor calls inside it finds no match) and the
-failure is swallowed by system-header leniency.  Isolated pieces all work
-(same-type operator+, duration_cast, converting ctor, common_type
-deduction); only the mixed-period operator+ body is affected.  Found by
-feature-sweep defect hunting; g++/clang++ runtime-verified.  Flip to CORE
-when the operator+ body converts.
+Was KNOWNBUG: mixed-period duration operator+ (minutes + seconds)
+returned nondet ([time.duration.nonmember]).  Three stacked front-end
+defects, all fixed:
+1. [temp.deduct]/5 + [basic.scope.temp]/2: deducing the duration
+   converting constructor bound/conflict-checked same-short-name
+   parameters of UNRELATED enclosing templates (operator+'s _Period2 vs
+   the constructor's own _Period2), and the flat-map short-name
+   substitution baked the caller's binding into the deduced signature.
+   Deduction is now restricted to the deduced template's own parameters
+   (current_deduction_parameters / template_map.deduction_parameters).
+   Also made typecheck_type's cpp_name handling exception-safe: a failed
+   SFINAE resolution no longer guts the stored declaration's name node
+   ([temp.deduct]/8: substitution failure has no lasting effect).
+2. [temp.inst]/5 + [expr.const]: the constexpr _S_gcd called in the
+   DEFAULT TEMPLATE ARGUMENTS of duration's __divide member alias sat
+   unconverted in the deferred method-body queue; its definition is now
+   instantiated on demand (convert_deferred_method_now).
+3. [stmt.dowhile] + [dcl.init]: the constexpr evaluator did not execute
+   do-while loops, dropped declaration initializers, and skipped
+   expression-statement assignments, so _S_gcd evaluated to garbage and
+   __is_harmonic degraded to false, deleting the converting constructor.
+See cpp11_fn_template_param_shadow for the minimal header-free layer-1
+reproducer.
