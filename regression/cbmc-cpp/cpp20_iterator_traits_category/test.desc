@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ vector iterator category is random_access: SUCCESS$
@@ -6,20 +6,22 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
 ^CONVERSION ERROR$
 --
-C++20 std::iterator_traits<__normal_iterator<...>>::iterator_category, end to end.
+C++20 std::iterator_traits<vector<int>::iterator>::iterator_category, end
+to end via the constrained __iterator_traits machinery.
 
-The underlying root cause -- selecting the constrained __iterator_traits partial
-specialization by its requires-clause ([temp.class.spec.match]/[temp.constr.order])
--- is now fixed (see cpp20_constrained_partial_spec), so
-iterator_traits<...>::iterator_category resolves to random_access_iterator_tag.
-
-This end-to-end case via std::vector<int>::iterator remains KNOWNBUG: resolving
-the category now lets the full std::vector instantiation proceed, which hits a
-further (separate) front-end instantiation throw that truncates main, so the
-assertion is not yet reached.  That is the next cluster-#1 layer.
-
-The minimal, genuine regression for the constrained-partial-specialization fix
-is cpp20_constrained_partial_spec (CORE).  Reclassify this end-to-end case CORE
-once the remaining std::vector-iterator instantiation issue is resolved.
+Was KNOWNBUG, then FLAKY (run-to-run): libstdc++'s __iterator_traits
+member alias __cat has three partial specializations with the SAME
+argument pattern differing only by requires-clauses that form a
+subsumption chain (__cpp17_input_iterator < __cpp17_fwd_iterator <
+__cpp17_randacc_iterator conjunctions); for a random-access iterator all
+three are satisfied and N5008 [temp.class.spec.match]/2 +
+[temp.constr.order] mandate the most-constrained one.  The tie-break used
+a counting heuristic that fell through to first-seen in the
+pointer-ordered id_set (std::set<cpp_idt*>), so the selected category was
+ASLR-dependent (bidirectional on unlucky runs; deterministic FAILURE
+under `setarch -R`).  Fixed by constraint-subsumption ordering
+(template_constraint_strictly_subsumes) with a deterministic symbol-name
+fallback for incomparable constraints.
