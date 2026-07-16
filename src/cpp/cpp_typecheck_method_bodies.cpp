@@ -412,8 +412,44 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           }
           return;
         }
-        if(have_low_size)
+        // N5008 [temp.variadic]/5: a SINGLE-element function parameter pack
+        // keeps its plain parameter name (no `base$k` replication), so a
+        // fold whose pattern references exactly one of this method's own
+        // parameters is a one-element fold regardless of how many OTHER
+        // packs (e.g. the enclosing class template's) are in the map --
+        // the pack_size_map.size()==1 gate below is only needed for the
+        // EMPTY pack, where no parameter is left to witness the fold's
+        // pack.
+        bool single_by_param = false;
+        if(method_symbol.type.id() == ID_code)
         {
+          std::function<irep_idt(const irept &)> any_name =
+            [&](const irept &n) -> irep_idt
+          {
+            if(n.id() == ID_name && !n.get(ID_identifier).empty())
+              return n.get(ID_identifier);
+            for(const auto &sn : n.get_sub())
+              if(irep_idt r = any_name(sn); !r.empty())
+                return r;
+            for(const auto &ns : n.get_named_sub())
+              if(irep_idt r = any_name(ns.second); !r.empty())
+                return r;
+            return irep_idt{};
+          };
+          const irep_idt pattern_name = any_name(pat);
+          if(!pattern_name.empty())
+          {
+            std::size_t matches = 0;
+            for(const auto &p : to_code_type(method_symbol.type).parameters())
+              if(p.get_base_name() == pattern_name)
+                ++matches;
+            single_by_param = matches == 1;
+          }
+        }
+        if(single_by_param || have_low_size)
+        {
+          const std::size_t n_elems =
+            single_by_param ? std::size_t{1} : low_size;
           // Empty (0) or single (1) element: the pattern already references
           // the pack element by its plain name (or none, for 0), so no
           // renaming is needed.
@@ -422,7 +458,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           if(is_binary)
           {
             reduce_folds(init_expr);
-            if(low_size == 0)
+            if(n_elems == 0)
               node = init_expr; // (init op ...) with empty pack -> init
             else
             {
@@ -432,7 +468,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               node = bin;
             }
           }
-          else if(low_size == 0)
+          else if(n_elems == 0)
             node = identity_for(fold_op);
           else
             node = single; // single element -> the pattern itself
@@ -444,8 +480,13 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       for(auto &ns : node.get_named_sub())
         reduce_folds(ns.second);
     };
-    if(!dollar_counts.empty() || have_low_size)
+    if(
+      !dollar_counts.empty() || have_low_size ||
+      (method_symbol.type.id() == ID_code &&
+       !to_code_type(method_symbol.type).parameters().empty()))
+    {
       reduce_folds(static_cast<irept &>(body));
+    }
   }
 
   // N5008 [temp.variadic]/5: expand the body / member-initializer uses of a
