@@ -2904,3 +2904,26 @@ require BASE-DROP of BOTH the trait class and _Optional_base + FAILURE +
 g++/clang accept + runtime OK.  (c) the mimic must stay WELL-FORMED:
 using an undefined impl<T::type> made g++ reject once and_ required
 B1::value.  Probe reverted before commit.  Suite green 90 skipped.
+
+## dtor-SFINAE base spec + optional<string> FIXED -> CORE (2026-07-16)
+
+Both flipped to CORE.  THREE stacked destructor-resolution fixes
+(cpp_typecheck_expr.cpp, cpp_typecheck_resolve.cpp):
+1. [expr.prim.id.dtor]+[class.dtor]/1,6: `x.~X()` on a class with only an
+   implicit TRIVIAL dtor (no synthesized symbol, POD gate) now uses the
+   scalar pseudo-destructor no-op dummy instead of failing resolution.
+2. [expr.prim.id.dtor]/2: ~_Tp substitution preferred an arbitrary
+   same-short-name flat-map binding (allocator's _Tp!); now prefers the
+   binding designating the CURRENT class scope.
+3. Angle-unaware rfind("::") in the dtor-name extraction landed inside
+   template ARGUMENTS (`~allocator` spelled for basic_string) -- fixed
+   angle-aware at both substitution sites; SAME bug pattern also fixed
+   in the base-NSDMI member-prefix computation (template-instance bases
+   like tag-base_<tag-S> mismatched every component).
+LESSON (recurring pattern #3 now seen 3x): any rfind("::")/rfind("tag-")
+over template-instance tag names MUST be angle-bracket-aware; grep for
+remaining instances would be a worthwhile sweep.
+Diagnostics: BASE-DROP probe + blanket T0 tags + DTORSUB probe; all
+reverted.  Suite green 88 skipped (was 90).  Remaining KNOWNBUGs are the
+two scaling-bound ones only (regex_match, map_basic) -- the KNOWNBUG
+backlog of front-end defects is CLEAR, unit-proof work is unblocked.
