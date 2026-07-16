@@ -3143,32 +3143,75 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         (pos + 1)->id() == ID_name)
       {
         irep_idt param_name = (pos + 1)->get(ID_identifier);
+        // Collect all live struct-typed bindings whose short name matches.
+        // The flat template map may hold SEVERAL same-short-name parameters
+        // of unrelated templates ([basic.scope.temp]/2 -- e.g. the
+        // destructibility probe's `_Tp` = basic_string alongside
+        // allocator's and char_traits' `_Tp` during a libstdc++ trait
+        // evaluation); picking an arbitrary one spelled the WRONG
+        // destructor (`~allocator` looked up in basic_string's scope,
+        // failing and dropping the trait's base specifier).  Per
+        // [expr.prim.id.dtor]/2 the type designated by ~T must be the
+        // object's type, and the destructor name is looked up in that
+        // class's scope -- which is the CURRENT scope here.  Prefer the
+        // binding that designates the current class scope; otherwise keep
+        // the historical first match.
+        const typet *chosen = nullptr;
+        const irep_idt current_scope_id =
+          cpp_typecheck.cpp_scopes.current_scope().identifier;
         for(const auto &entry : cpp_typecheck.template_map.type_map)
         {
           const std::string &key = id2string(entry.first);
           auto p = key.rfind("::");
           std::string suffix = p != std::string::npos ? key.substr(p + 2) : key;
           if(
-            suffix == id2string(param_name) &&
-            entry.second.id() != ID_unassigned && entry.second.id() != ID_nil &&
-            entry.second.id() == ID_struct_tag)
+            suffix != id2string(param_name) ||
+            entry.second.id() != ID_struct_tag)
           {
-            // Skip the name sub-node (it will be replaced)
-            ++pos;
-            // Use the struct's base name for the destructor
-            irep_idt tag = to_struct_tag_type(entry.second).get_identifier();
-            std::string tag_str = id2string(tag);
-            auto last_sep = tag_str.rfind("::");
-            if(last_sep != std::string::npos)
-              tag_str = tag_str.substr(last_sep + 2);
-            if(tag_str.substr(0, 4) == "tag-")
-              tag_str = tag_str.substr(4);
-            auto angle = tag_str.find('<');
-            if(angle != std::string::npos)
-              tag_str = tag_str.substr(0, angle);
-            final_base_name += tag_str;
-            break;
+            continue;
           }
+          if(
+            to_struct_tag_type(entry.second).get_identifier() ==
+            current_scope_id)
+          {
+            chosen = &entry.second;
+            break; // exact designation of the object's class
+          }
+          if(chosen == nullptr)
+            chosen = &entry.second;
+        }
+        if(chosen != nullptr)
+        {
+          // Skip the name sub-node (it will be replaced)
+          ++pos;
+          // Use the struct's base name for the destructor.  The final
+          // path component must be found ANGLE-AWARE: for a template
+          // instance tag like `std::__cxx11::tag-basic_string<char,
+          // std::tag-allocator<char>>` a naive rfind("::") lands inside
+          // the template ARGUMENTS and produces the wrong destructor
+          // name (`~allocator`).
+          irep_idt tag = to_struct_tag_type(*chosen).get_identifier();
+          std::string tag_str = id2string(tag);
+          {
+            std::size_t depth = 0;
+            std::size_t final_component = 0;
+            for(std::size_t i = 0; i + 1 < tag_str.size(); ++i)
+            {
+              if(tag_str[i] == '<')
+                ++depth;
+              else if(tag_str[i] == '>' && depth > 0)
+                --depth;
+              else if(depth == 0 && tag_str[i] == ':' && tag_str[i + 1] == ':')
+                final_component = i + 2;
+            }
+            tag_str = tag_str.substr(final_component);
+          }
+          if(tag_str.substr(0, 4) == "tag-")
+            tag_str = tag_str.substr(4);
+          auto angle = tag_str.find('<');
+          if(angle != std::string::npos)
+            tag_str = tag_str.substr(0, angle);
+          final_base_name += tag_str;
         }
       }
     }
@@ -4160,13 +4203,26 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(const cpp_namet &cpp_name)
         suffix == after_tilde && entry.second.id() != ID_unassigned &&
         entry.second.id() != ID_nil && entry.second.id() == ID_struct_tag)
       {
-        // Get the struct's base name for the destructor
+        // Get the struct's base name for the destructor; the final path
+        // component must be found ANGLE-AWARE (see the matching
+        // substitution in resolve_scope): a naive rfind("::") lands
+        // inside a template instance's ARGUMENTS.
         const irep_idt &tag = to_struct_tag_type(entry.second).get_identifier();
         std::string tag_str = id2string(tag);
-        // Extract unqualified name
-        auto last_sep = tag_str.rfind("::");
-        if(last_sep != std::string::npos)
-          tag_str = tag_str.substr(last_sep + 2);
+        {
+          std::size_t depth = 0;
+          std::size_t final_component = 0;
+          for(std::size_t i = 0; i + 1 < tag_str.size(); ++i)
+          {
+            if(tag_str[i] == '<')
+              ++depth;
+            else if(tag_str[i] == '>' && depth > 0)
+              --depth;
+            else if(depth == 0 && tag_str[i] == ':' && tag_str[i + 1] == ':')
+              final_component = i + 2;
+          }
+          tag_str = tag_str.substr(final_component);
+        }
         if(tag_str.substr(0, 4) == "tag-")
           tag_str = tag_str.substr(4);
         // Remove template args for destructor name
