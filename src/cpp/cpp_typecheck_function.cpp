@@ -781,6 +781,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(is_system_header_body)
     syshdr_guard.emplace(*this);
 
+  // N5008 [stmt.label]/1: labels have function scope -- a label name may
+  // be reused in different functions.  The C type checker resets these
+  // maps per function body (typecheck_function_body); this C++ entry
+  // point must do the same, otherwise a label in one function makes the
+  // same label name in the NEXT function a spurious "duplicate label"
+  // (two functions with a 'zero:' error path, the big-int shape).
+  labels_defined.clear();
+  labels_used.clear();
+
   try
   {
     typecheck_code(to_code(symbol.value));
