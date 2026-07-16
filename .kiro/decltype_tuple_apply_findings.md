@@ -2733,3 +2733,44 @@ libstdc++ chain yields the numeric zero, so cpp23_expected_basic itself
 (with headers) is the regression test.  Suite green, 88 skipped (was
 89).  ALL THREE queued KNOWNBUGs of this session now CORE:
 cpp17_tuple_basic, cpp20_iterator_traits_category, cpp23_expected_basic.
+
+## locale model + defect-hunt + dog-fooding round (2026-07-16)
+
+1. LOCALE ([locale.general]/8 + C99 7.4): modelled the classic ctype<char>
+   facet (provide_classic_ctype_char_model in cpp_typecheck_stdlib.cpp);
+   __try_use_facet<ctype<char>> override must live in the HAS-BODY section
+   (header-inline body) and match base_name by PREFIX (template suffix is
+   appended).  CORE test cpp11_locale_ctype_facet.  regex residual = BMC
+   scaling only.
+2. KNOWNBUG cpp17_default_targ_overload_select: explicit-template-arg call
+   to an OVERLOADED member fn template inside a DEFAULT TEMPLATE ARGUMENT
+   finds no viable overload (libstdc++ tuple __valid_args shape).
+3. FIXED (cpp_instantiate_template.cpp): class-body fold expander (a) broke
+   qualified pack patterns `Ts::v` (wholesale type replacement; now
+   substitutes only the leading name component with the struct-tag id) and
+   (b) had NO cpp_binary_fold branch (parser: sub[0]=left of `op ...`,
+   sub[1]=right; pack side determines association).  Both crashed symex
+   via static inline member inits.  CORE test cpp17_static_member_fold_init.
+4. KNOWNBUG cpp11_chrono_mixed_duration_add: mixed-period operator+ body
+   conversion fails (RESOLVE-FAIL `duration`/`__cd`), swallowed -> nondet.
+5. FIXED (cpp_instantiate_template.cpp): pack expander created EMPTY
+   ID_init_args on every declarator via irept::add-creates-on-absence ->
+   typecheck_decl invariant crash on `S x = value;` in variadic template
+   bodies.  Found by DOG-FOODING cbmc's own util/symbol_table.cpp +
+   simplify_expr_int.cpp (via util/invariant.h backtrace decl).  Reduction
+   pitfall: the crash needs cbmc's own preprocessor WITH #line markers
+   (system-header leniency is location-dependent); g++-preprocessed or
+   marker-stripped sources diverge to CONVERSION ERROR.  CORE test
+   cpp11_decl_value_in_pack_body.
+6. KNOWNBUG cpp17_optional_string (front-end CRASH):
+   optional<std::string> trips make_ptr_typecast precondition (unrelated
+   structs) in typecheck_member_initializer of _Optional_payload.  Also
+   the root of dog-food failures in simplify_expr.cpp / cmdline.cpp.
+   NEXT-fix candidate.
+
+Dog-food set (all OK unless noted): string_utils, parse_options, tempdir,
+unicode, version, irep, expr, type, json_parser, std_expr, cpp_parser,
+arith_tools, std_types, langapi/language, xml_parser; symbol_table +
+simplify_expr_int fixed by (5); simplify_expr + cmdline blocked by (6).
+Suite green, 91 skipped.  shared_ptr: BMC scaling only (no front-end
+defect; not filed).
