@@ -2091,6 +2091,14 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     }
     if(!has_pack)
     {
+      // N5008 [temp.arg.explicit]/3 + [temp.deduct]/2: while matching an
+      // OVERLOADED candidate, an explicit template-argument list that is
+      // too long for this candidate's parameter list is a deduction
+      // failure -- the candidate is removed from the overload set, not a
+      // hard error (`valid<int, double>()` must simply skip the
+      // single-parameter `valid<U>` overload and select the viable one).
+      if(template_arg_candidate_matching > 0)
+        throw template_arg_kind_mismatch_exceptiont{};
       error().source_location = source_location;
       error() << "too many template arguments (expected " << parameters.size()
               << ", but got " << args.size() << ")" << eom;
