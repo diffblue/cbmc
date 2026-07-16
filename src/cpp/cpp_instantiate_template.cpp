@@ -1887,39 +1887,42 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                 best_match = &s;
                 best_spec_args = guessed_args;
               }
-              // C++ [temp.class.order]: when argument patterns are equal,
-              // prefer the more constrained specialization. A specialization
-              // with a simpler concept constraint (fewer requires clauses)
-              // is more constrained than one with additional negations.
+              // N5008 [temp.class.spec.match]/2 + [temp.constr.order]: when
+              // the argument patterns are equally specialized, the more
+              // CONSTRAINED specialization is selected, determined by
+              // constraint subsumption -- not by any counting heuristic.
+              // libstdc++'s __iterator_traits::__cat has three partial
+              // specializations with the same pattern whose requires-clauses
+              // form a subsumption chain (__cpp17_input_iterator subsumed by
+              // __cpp17_fwd_iterator subsumed by __cpp17_randacc_iterator
+              // conjunctions); all three are satisfied for a random-access
+              // iterator and only subsumption picks the right one.  The
+              // previous count-based tie-break fell through to FIRST-SEEN in
+              // the pointer-ordered id_set (std::set<cpp_idt*>), making the
+              // selection ASLR-dependent (run-to-run flakiness; determinize
+              // with `setarch -R` when debugging).
               else if(
                 count_constrained(partial_specialization_args) ==
                   count_constrained(best_partial_args) &&
                 partial_specialization_args.arguments().size() ==
                   best_partial_args.arguments().size())
               {
-                const auto &s_req =
-                  cpp_declaration.template_type().get(ID_C_requires_clause);
-                const auto &best_req =
-                  best_decl.template_type().get(ID_C_requires_clause);
-                // Prefer the specialization with fewer constraints
-                // (simpler concept = more specific).
-                // A requires clause count of "1" is simpler than "2".
-                int s_count = 0, best_count = 0;
-                if(!s_req.empty() && isdigit(id2string(s_req)[0]))
-                  s_count = std::stoi(id2string(s_req));
-                if(!best_req.empty() && isdigit(id2string(best_req)[0]))
-                  best_count = std::stoi(id2string(best_req));
-                // Also count concept constraints on parameters
-                for(const auto &p :
-                    cpp_declaration.template_type().template_parameters())
-                  if(!p.get("#C_concept_constraint").empty())
-                    s_count++;
-                for(const auto &p :
-                    best_decl.template_type().template_parameters())
-                  if(!p.get("#C_concept_constraint").empty())
-                    best_count++;
-                if(s_count < best_count)
+                if(template_constraint_strictly_subsumes(
+                     symbol_table, cpp_declaration, best_decl))
                 {
+                  best_match = &s;
+                  best_spec_args = guessed_args;
+                }
+                else if(
+                  !template_constraint_strictly_subsumes(
+                    symbol_table, best_decl, cpp_declaration) &&
+                  s.name < best_match->name)
+                {
+                  // Constraints are incomparable (or both unconstrained):
+                  // no standard-mandated winner among the satisfied
+                  // candidates.  Break the tie DETERMINISTICALLY by symbol
+                  // name so the selection cannot depend on the iteration
+                  // order of the pointer-keyed id_set.
                   best_match = &s;
                   best_spec_args = guessed_args;
                 }
