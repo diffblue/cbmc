@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ single conversion: SUCCESS$
+^\[main\.assertion\.2\] line \d+ mixed-period add: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct]/5 + [basic.scope.temp]/2: deduction binds only the
+deduced template's own parameters.  An enclosing function template's
+same-short-name parameter (P2 = ratio<1,1>, defaulted and undeducible)
+used to be substituted into the member converting constructor's deduced
+signature (its own P2 = ratio<60,1>) by the flat-map short-name lookup,
+deleting the constructor from the overload set and dropping the enclosing
+body.  Header-free minimal form of the std::chrono mixed-period
+operator+ defect (cpp11_chrono_mixed_duration_add); g++/clang++
+runtime-verified.
