@@ -2717,3 +2717,19 @@ script -- useful trick: test.pl -c /tmp/cbmc-noaslr.sh).  89 skipped
 (was 90).  Technique note: ASLR-dependent front-end flakiness ->
 setarch -R makes it deterministic; grep for std::set<cpp_idt*>
 iteration when selection-relevant.
+
+## cpp23_expected_basic FIXED -> CORE (2026-07-15 late)
+
+"conversion from 'void' to 'signed int'" on *e: the VOID partial spec
+`expected<_Tp,_Er> requires is_void_v<_Tp>` was selected for _Tp=int.
+Probe (REQ-EVAL in instantiate_template's requires eval) showed the
+substituted clause simplified to result-id=constant val=0 -- a NUMERIC
+c-bool 0, which `is_false()` does not recognize, so satisfied stayed
+true.  Fix: `req_copy.is_false() || req_copy.is_zero()`.  NOTE: three
+header-free mimics of the is_void_v chain (bool variable template;
+is_same_v-based; exact integral_constant/false_type/inline-constexpr
+chain h3) all produce a proper `false` and pass PRE-fix -- only the full
+libstdc++ chain yields the numeric zero, so cpp23_expected_basic itself
+(with headers) is the regression test.  Suite green, 88 skipped (was
+89).  ALL THREE queued KNOWNBUGs of this session now CORE:
+cpp17_tuple_basic, cpp20_iterator_traits_category, cpp23_expected_basic.
