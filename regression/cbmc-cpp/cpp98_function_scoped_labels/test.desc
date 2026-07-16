@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ function-scoped labels: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [stmt.label]/1: label scope is the function; the same label name in
+two functions was a spurious "duplicate label" (the defined-labels map
+was not reset per function body in the C++ front end, unlike the C one).
+Found by dog-fooding big-int/bigint.cc.  Header-free; g++/clang++
+runtime-verified.
