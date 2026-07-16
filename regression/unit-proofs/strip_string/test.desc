@@ -1,0 +1,14 @@
+KNOWNBUG
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 6 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Unit proof for strip_string over all strings up to length 3 (no
+leading/trailing whitespace; idempotence).  KNOWNBUG: blocked by
+cpp11_self_pointer_move_return -- std::string returned by value leaves
+its data pointer targeting the return-value temporary's buffer (dead
+object), so front() reads garbage.  Flip to CORE when that front-end
+defect is fixed.
