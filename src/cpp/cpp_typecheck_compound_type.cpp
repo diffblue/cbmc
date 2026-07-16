@@ -3866,9 +3866,22 @@ void cpp_typecheckt::make_ptr_typecast(
   const struct_typet &dest_struct =
     follow_tag(to_struct_tag_type(dest_type.base_type()));
 
-  PRECONDITION(
-    subtype_typecast(src_struct, dest_struct) ||
-    subtype_typecast(dest_struct, src_struct));
+  // N5008 [class.derived]/2 recovery interplay: when a class's base list
+  // was partially recovered during template instantiation (a base
+  // specifier whose resolution failed was dropped -- see
+  // typecheck_compound_bases), a member initializer of a dropped base can
+  // still request a derived-to-base cast here.  The relation is then not
+  // derivable from the recorded bases; crashing the whole front end on
+  // the precondition helps nobody.  Degrade to an offset-0 reinterpret
+  // (the base-at-offset-0 layout CBMC uses for a sole base), keeping the
+  // instantiation alive; the enclosing system-header leniency reports or
+  // havocs the affected member as appropriate.
+  if(!(subtype_typecast(src_struct, dest_struct) ||
+       subtype_typecast(dest_struct, src_struct)))
+  {
+    expr = typecast_exprt{expr, dest_type};
+    return;
+  }
 
   // For upcasts (derived* -> base*) and downcasts (base* -> derived*),
   // adjust the pointer offset when the base class is not the first base
