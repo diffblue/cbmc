@@ -15,6 +15,7 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/options.h>
 
 #include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/elide_cpp_returned_temporaries.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
@@ -49,6 +50,10 @@ bool process_goto_program(
   // lower C++ exceptions (CATCH-PUSH/CATCH-POP/THROW) to gotos/assignments so
   // that goto-symex need not model exceptions; no-op if there are none
   remove_cpp_exceptions(goto_model, log.get_message_handler());
+
+  // Construct C++ returned temporaries directly into caller storage
+  // (N5008 [class.copy.elis]); must follow function pointer removal.
+  elide_cpp_returned_temporaries(goto_model);
 
   mm_io(goto_model, log.get_message_handler());
 

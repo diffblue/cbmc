@@ -137,48 +137,87 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     code.return_value() = std::move(temporary);
   }
 
-  c_typecheck_baset::typecheck_return(code);
-
-  // For non-POD class-type return values, insert a copy constructor call.
+  // N5008 [stmt.return]/2: the operand initializes the function call's
+  // result object by copy-initialization.  For non-POD class types,
+  // materialize the returned temporary by a constructor call chosen by
+  // overload resolution against the operand's VALUE CATEGORY: an lvalue
+  // operand selects the copy constructor, an rvalue the move constructor
+  // ([over.match.viable], [over.ics.ref]).  This must happen BEFORE the
+  // base type-checker's implicit_typecast: computing the conversion
+  // sequence performs the lvalue-to-rvalue conversion ([conv.lval]) and
+  // strips the operand's lvalue marking, after which constructor
+  // selection would see every operand as an rvalue and mis-select the
+  // MOVE constructor -- for self-referential classes (the small-string
+  // optimization) the move then steals a pointer into a bitwise
+  // temporary copy of the source.
   if(
     code.has_return_value() && !is_reference(return_type) &&
     !cpp_is_pod(return_type) &&
-    (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag) &&
-    code.return_value().id() != ID_temporary_object &&
-    code.return_value().id() != ID_side_effect)
+    (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag))
   {
-    // Check that the destructor symbol exists for the return type.
-    const struct_typet &struct_type =
-      follow_tag(to_struct_tag_type(return_type));
-    bool has_dtor = false;
-    for(const auto &c : struct_type.components())
+    typecheck_expr(code.return_value());
+
+    if(
+      code.return_value().id() != ID_temporary_object &&
+      code.return_value().id() != ID_side_effect)
     {
-      if(
-        c.type().id() == ID_code &&
-        to_code_type(c.type()).return_type().id() == ID_destructor)
+      // Check that the destructor symbol exists for the return type.
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(return_type));
+      bool has_dtor = false;
+      for(const auto &c : struct_type.components())
       {
-        const symbolt *dtor_sym;
-        has_dtor = !lookup(c.get_name(), dtor_sym);
-        break;
+        if(
+          c.type().id() == ID_code &&
+          to_code_type(c.type()).return_type().id() == ID_destructor)
+        {
+          const symbolt *dtor_sym;
+          has_dtor = !lookup(c.get_name(), dtor_sym);
+          break;
+        }
+      }
+      if(has_dtor)
+      {
+        // N5008 [class.copy.elis]/3 (implicit move): when the operand is
+        // a (possibly parenthesized) id-expression naming a non-volatile
+        // object with automatic storage duration declared in the body or
+        // parameter list of the function, overload resolution to select
+        // the constructor is first performed treating the operand as an
+        // rvalue -- the MOVE constructor is selected if one exists.  Any
+        // other operand (a global, a class member, the referent of a
+        // reference parameter) is an lvalue and selects the COPY
+        // constructor; treating those as rvalues would move from an
+        // object the function does not own.
+        exprt operand = code.return_value();
+        if(operand.id() == ID_symbol)
+        {
+          const symbolt &operand_symbol =
+            lookup(to_symbol_expr(operand).get_identifier());
+          if(
+            !operand_symbol.is_static_lifetime && operand_symbol.is_lvalue &&
+            operand.type().get_bool(ID_C_volatile) == false)
+          {
+            // treated as an rvalue for constructor selection
+            operand.remove(ID_C_lvalue);
+          }
+        }
+
+        exprt temporary;
+        new_temporary(
+          code.return_value().source_location(),
+          return_type,
+          already_typechecked_exprt{operand},
+          temporary);
+        code.return_value().swap(temporary);
       }
     }
-    if(has_dtor)
-    {
-      // Skip types from the std namespace to avoid crashes from
-      // incomplete destructor chains in STL types.
-      const irep_idt &tag_id = to_struct_tag_type(return_type).get_identifier();
-      if(id2string(tag_id).find("std::") != std::string::npos)
-        return;
 
-      exprt temporary;
-      new_temporary(
-        code.return_value().source_location(),
-        return_type,
-        already_typechecked_exprt{code.return_value()},
-        temporary);
-      code.return_value().swap(temporary);
-    }
+    // The operand is now fully type-checked (and possibly wrapped);
+    // keep the base type-checker from re-type-checking it.
+    already_typechecked_exprt::make_already_typechecked(code.return_value());
   }
+
+  c_typecheck_baset::typecheck_return(code);
 }
 
 void cpp_typecheckt::typecheck_code(codet &code)
