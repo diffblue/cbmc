@@ -2774,3 +2774,35 @@ arith_tools, std_types, langapi/language, xml_parser; symbol_table +
 simplify_expr_int fixed by (5); simplify_expr + cmdline blocked by (6).
 Suite green, 91 skipped.  shared_ptr: BMC scaling only (no front-end
 defect; not filed).
+
+## ROADMAP NOTE (user, 2026-07-16): "unit proofs" for CBMC's own code base
+
+Once the current KNOWNBUG backlog is cleared, start constructing UNIT
+PROOFS: proof harnesses that accompany selected unit tests (unit/ tree,
+Catch2), but -- unlike unit tests, which fully fix all inputs -- take
+NONDETERMINISTIC inputs where appropriate and run through CBMC itself.
+This applies the usual CBMC-on-C methodology to C++ and, crucially,
+dog-food style: within and applied to CBMC's own code base.
+
+Prerequisites / notes from the dog-fooding rounds so far:
+- The C++ front end can already parse+convert a good slice of src/util
+  (irep.cpp, expr.cpp, std_expr.cpp, type.cpp, cpp_parser.cpp, ...).
+- Known blockers to clear first: cpp17_optional_string
+  (make_ptr_typecast crash -- blocks any code using
+  optional<std::string>, e.g. cmdline.cpp/simplify_expr.cpp);
+  cpp11_chrono_mixed_duration_add; cpp17_default_targ_overload_select;
+  shared_ptr BMC scaling (affects any harness touching shared_ptr).
+- Candidate first harnesses (small, self-contained, value-oriented):
+  * util/string_utils (split/strip/escape round-trips with nondet chars)
+  * util/arith_tools (from_integer/numeric_cast round-trips over nondet
+    integers of bounded width)
+  * util/irep (share/detach invariants: set/get round-trip, comparison
+    reflexivity/symmetry over small nondet tree shapes)
+  * big-int (arithmetic identities over bounded nondet operands)
+- Harness shape: a main() that builds bounded-nondet inputs
+  (__CPROVER_assume to constrain), calls the unit under proof, asserts
+  the property the unit test spot-checks -- yielding a proof over ALL
+  inputs in the bounded domain rather than fixed samples.
+- Infrastructure idea: a regression/unit-proofs/ suite mirroring unit/
+  paths, driven by test.pl with per-harness --unwind bounds; tag slow
+  ones thorough.
