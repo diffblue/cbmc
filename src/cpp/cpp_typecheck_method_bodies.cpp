@@ -1,5 +1,6 @@
 #include <algorithm>
 #include <functional>
+#include <optional>
 #include <set>
 /*******************************************************************\
 
@@ -1276,6 +1277,59 @@ void cpp_typecheckt::typecheck_method_bodies()
   }
 
   old_instantiation_stack.swap(instantiation_stack);
+}
+
+bool cpp_typecheckt::convert_deferred_method_now(const irep_idt &identifier)
+{
+  if(functions_being_typechecked.count(identifier) != 0)
+    return false;
+
+  // find the queued entry (lazy map first, then the drain queue)
+  std::optional<method_bodyt> entry;
+  auto d_it = deferred_method_bodies.find(identifier);
+  if(d_it != deferred_method_bodies.end())
+  {
+    entry = std::move(d_it->second);
+    deferred_method_bodies.erase(d_it);
+  }
+  else
+  {
+    for(auto it = method_bodies.begin(); it != method_bodies.end(); ++it)
+    {
+      if(it->method_symbol->name == identifier)
+      {
+        entry = std::move(*it);
+        method_bodies.erase(it);
+        break;
+      }
+    }
+  }
+  if(!entry.has_value())
+    return false;
+
+  symbolt *method_symbol = entry->method_symbol;
+  if(method_symbol == nullptr || method_symbol->value.is_not_nil())
+    return false;
+
+  // Convert under the entry's recorded template map, exactly as the
+  // deferred drain would ([temp.inst]/5: the specialization's definition
+  // is instantiated because its existence affects the semantics -- here,
+  // a constant expression needs its value).  Failure restores the no-body
+  // state; the enclosing evaluation treats it as non-constant.
+  cpp_saved_template_mapt saved_map(template_map);
+  template_map = entry->template_map;
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    convert_function(*method_symbol);
+  }
+  catch(...)
+  {
+    method_symbol->value.make_nil();
+  }
+  get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+  return method_symbol->value.is_not_nil();
 }
 
 void cpp_typecheckt::add_method_body(symbolt *_method_symbol)

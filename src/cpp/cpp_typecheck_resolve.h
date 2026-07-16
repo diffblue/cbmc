@@ -92,6 +92,15 @@ protected:
   /// not be re-expanded here.  Keyed by the pack parameter's identifier.
   std::set<irep_idt> derived_to_base_deduced_packs;
 
+  // N5008 [temp.deduct]/5: the identifiers of the template parameters of
+  // the template CURRENTLY being deduced (registered by build_unassigned).
+  // Unqualified-name deduction must bind only these; a same-short-name
+  // parameter of an unrelated enclosing template (e.g. the caller's `P2`
+  // while deducing a member constructor template's own `P2`,
+  // std::chrono::duration's converting-constructor shape) must be neither
+  // bound nor conflict-checked.  Empty means "no active restriction".
+  std::set<irep_idt> current_deduction_parameters;
+
   /// True while re-deducing against a base-class subobject inside the
   /// derived-to-base branch of guess_template_args, so the pack-matching code
   /// records the deduced pack(s) in \ref derived_to_base_deduced_packs.

@@ -93,10 +93,27 @@ void cpp_typecheckt::typecheck_type(typet &type)
     cpp_namet cpp_name;
     cpp_name.swap(type);
 
-    exprt symbol_expr=resolve(
-      cpp_name,
-      cpp_typecheck_resolvet::wantt::TYPE,
-      cpp_typecheck_fargst());
+    exprt symbol_expr;
+    try
+    {
+      symbol_expr = resolve(
+        cpp_name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
+    }
+    catch(...)
+    {
+      // The swap above moved the name OUT of `type`, so a resolution
+      // failure would otherwise leave an EMPTY cpp_name behind.  When
+      // `type` aliases a stored template declaration (e.g. a constraint
+      // default argument `typename = _Require<...>` evaluated during
+      // overload resolution, std::chrono::duration's converting
+      // constructor), that gutted node PERSISTS: the template must remain
+      // intact for later instantiations (a substitution failure is not an
+      // error and has no lasting effect, N5008 [temp.deduct]/8), so every
+      // later deduction would fail on the empty constraint.  Restore the
+      // original name before propagating the failure.
+      type.swap(cpp_name);
+      throw;
+    }
 
     if(symbol_expr.id()!=ID_type)
     {

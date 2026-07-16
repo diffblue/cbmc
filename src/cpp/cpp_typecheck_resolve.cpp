@@ -126,6 +126,37 @@ void cpp_typecheck_resolvet::apply_template_args(
 
 namespace
 {
+// Save/restore for cpp_typecheck_resolvet::current_deduction_parameters
+// across nested deductions.
+struct deduction_parameters_guardt
+{
+  std::set<irep_idt> &target;
+  std::set<irep_idt> saved;
+  explicit deduction_parameters_guardt(std::set<irep_idt> &t)
+    : target(t), saved(t)
+  {
+  }
+  ~deduction_parameters_guardt()
+  {
+    target.swap(saved);
+  }
+};
+
+// The identifiers of a template declaration's parameters, as registered in
+// the template map by build_unassigned.
+std::set<irep_idt> template_parameter_ids(const template_typet &template_type)
+{
+  std::set<irep_idt> ids;
+  for(const auto &p : template_type.template_parameters())
+  {
+    if(p.id() == ID_type)
+      ids.insert(p.type().get(ID_identifier));
+    else
+      ids.insert(p.get(ID_identifier));
+  }
+  return ids;
+}
+
 // C++20 concept subsumption ([temp.constr.order]).  These helpers implement the
 // partial order on constraints that selects the more-constrained overload.
 //
@@ -3045,7 +3076,9 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
             continue;
           }
           if(cpp_typecheck.suppress_elaborate)
+          {
             throw 0;
+          }
           // Scope-not-found during qualified name lookup is a
           // potential SFINAE failure.  Throw without error message
           // so that template specialization matching can discard
@@ -3543,6 +3576,17 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
     cpp_typecheck.template_map.build_unassigned(
       cpp_declaration.template_type());
+
+    // N5008 [temp.deduct]/5 (via [temp.class.spec.match]): restrict
+    // deduction to this partial specialization's own parameters.
+    deduction_parameters_guardt deduction_parameters_guard{
+      current_deduction_parameters};
+    current_deduction_parameters =
+      template_parameter_ids(cpp_declaration.template_type());
+    deduction_parameters_guardt map_deduction_parameters_guard{
+      cpp_typecheck.template_map.deduction_parameters};
+    cpp_typecheck.template_map.deduction_parameters =
+      current_deduction_parameters;
 
     // iterate over template instance
     //
@@ -6316,6 +6360,21 @@ void cpp_typecheck_resolvet::guess_template_args(
           // template argument?
           if(id.id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
           {
+            // N5008 [temp.deduct]/5: deduction binds only the parameters
+            // of the template being deduced.  The RECURSIVE scope lookup
+            // above also surfaces same-short-name parameters of unrelated
+            // enclosing templates (the caller's `P2` while deducing a
+            // member constructor template's own `P2` -- the
+            // std::chrono::duration converting-constructor shape); binding
+            // or conflict-checking those poisons the enclosing map and
+            // spuriously rejects the candidate.  Skip identifiers that are
+            // not parameters of the current deduction.
+            if(
+              !current_deduction_parameters.empty() &&
+              current_deduction_parameters.count(id.identifier) == 0)
+            {
+              continue;
+            }
             // see if unassigned
             typet &t = cpp_typecheck.template_map.type_map[id.identifier];
             if(t.id() == ID_unassigned)
@@ -6665,6 +6724,7 @@ static bool contains_call_argument_pack(const irept &n)
 ///  - [temp.deduct.call]/4: cv-stripping when P is just T (not T&, T*, etc.)
 ///  - [temp.deduct.call]/4: array-to-pointer decay
 ///  - [temp.deduct.funcaddr]: deduction from function address target type
+
 exprt cpp_typecheck_resolvet::guess_function_template_args(
   const exprt &expr,
   const cpp_typecheck_fargst &fargs)
@@ -6807,6 +6867,17 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   cpp_saved_template_mapt saved_map(cpp_typecheck.template_map);
 
   cpp_typecheck.template_map.build_unassigned(cpp_declaration.template_type());
+
+  // N5008 [temp.deduct]/5: restrict unqualified-name deduction to THIS
+  // template's parameters (see current_deduction_parameters).
+  deduction_parameters_guardt deduction_parameters_guard{
+    current_deduction_parameters};
+  current_deduction_parameters =
+    template_parameter_ids(cpp_declaration.template_type());
+  deduction_parameters_guardt map_deduction_parameters_guard{
+    cpp_typecheck.template_map.deduction_parameters};
+  cpp_typecheck.template_map.deduction_parameters =
+    current_deduction_parameters;
 
   // If this is a template constructor inside an instantiated template class,
   // pre-populate the template map with the class template arguments so that

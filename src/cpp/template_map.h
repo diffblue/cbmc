@@ -97,6 +97,19 @@ public:
   ///   re-expanded against an unrelated enclosing pack's size.
   void expand_call_argument_packs(irept &n, bool only_nontype = false) const;
 
+  // N5008 [basic.scope.temp]/2 + [temp.deduct]/5: while a template is being
+  // DEDUCED, the identifiers of its own parameters.  The short-name fallback
+  // in apply(typet&) (conformance violation V1: it matches a bare parameter
+  // reference by suffix across the whole flat map) must not substitute an
+  // UNRELATED template's same-short-name binding into the deduced
+  // declaration -- e.g. the caller's `P2 = ratio<1,1>` into
+  // std::chrono::duration's converting constructor whose own `P2` is still
+  // being deduced.  When non-empty and a deduction parameter shares the
+  // referenced short name, only the deduced template's own binding may
+  // substitute.  Set/restored by the deduction entry points in
+  // cpp_typecheck_resolve.cpp.
+  std::set<irep_idt> deduction_parameters;
+
   void swap(template_mapt &template_map)
   {
     type_map.swap(template_map.type_map);

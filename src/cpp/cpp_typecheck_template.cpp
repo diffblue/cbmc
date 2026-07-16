@@ -2763,6 +2763,25 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           if(
             e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
           {
+            // N5008 [temp.inst]/5 + [expr.const]: the callee's definition
+            // may still sit in the deferred method-body queue (a constexpr
+            // helper like chrono duration's `_S_gcd`, called in a DEFAULT
+            // TEMPLATE ARGUMENT of a member alias such as `__divide`).
+            // Instantiate it now; without a body the evaluation below
+            // returns nil and the default argument silently degrades
+            // (`__divide` became ratio<1,0>, __is_harmonic false, and the
+            // duration converting constructor vanished -- mixed-period
+            // operator+ returned nondet).
+            {
+              const exprt &fn = to_side_effect_expr_function_call(e).function();
+              if(fn.id() == ID_symbol)
+              {
+                const irep_idt fid = to_symbol_expr(fn).get_identifier();
+                const symbolt *fsym = symbol_table.lookup(fid);
+                if(fsym != nullptr && fsym->value.is_nil())
+                  convert_deferred_method_now(fid);
+              }
+            }
             exprt r = try_evaluate_constexpr(e, symbol_table, *this);
             if(r.is_not_nil())
               e = r;
