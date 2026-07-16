@@ -1391,7 +1391,15 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                 sfinae_contextt sfinae_guard{*this};
                 typecheck_expr(req_copy);
                 simplify(req_copy, *this);
-                if(req_copy.is_false())
+                // N5008 [temp.constr.atomic]/3: the constraint is
+                // unsatisfied when its (converted) value is false.  The
+                // substituted clause may simplify to a NUMERIC zero
+                // constant (a c-bool/int 0, e.g. libstdc++ <expected>'s
+                // `requires is_void_v<_Tp>` with _Tp = int) rather than a
+                // proper Boolean `false`; is_false() alone misses that,
+                // wrongly selecting the void partial specialization for
+                // every expected<_Tp, _Er>.
+                if(req_copy.is_false() || req_copy.is_zero())
                   satisfied = false;
               }
               catch(...)
