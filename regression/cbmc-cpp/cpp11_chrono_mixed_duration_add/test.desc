@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ 90 seconds: SUCCESS$
+^\[main\.assertion\.2\] line \d+ commuted: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [time.duration.nonmember] -- mixed-period duration
+operator+ (minutes + seconds) returns nondet: the instantiated operator+
+body fails to convert (resolution of the `__cd` common-type alias /
+`duration` converting-constructor calls inside it finds no match) and the
+failure is swallowed by system-header leniency.  Isolated pieces all work
+(same-type operator+, duration_cast, converting ctor, common_type
+deduction); only the mixed-period operator+ body is affected.  Found by
+feature-sweep defect hunting; g++/clang++ runtime-verified.  Flip to CORE
+when the operator+ body converts.
