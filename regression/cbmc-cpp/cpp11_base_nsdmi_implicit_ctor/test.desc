@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ base bool NSDMI applied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested int NSDMI applied: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [class.base.init]/9.1 + [class.mem.general]/10 -- the
+implicitly defined default constructor of a DERIVED class does not apply
+the base class's default member initializers: `struct B { bool e =
+false; }; struct D : B {}; D d;` leaves d.e nondet.  A direct object of
+the base works, and an explicitly-defaulted `B() = default;` also works;
+only the fully implicit constructor of a base under derivation loses the
+NSDMI.  This is the root of the std::optional<std::string> residual
+(cpp17_optional_string): _Optional_payload_base's `_M_engaged = false`
+was dropped, making has_value() nondet.  Reduced with cvise on
+cbmc-preprocessed source (5 essential lines).  Header-free; g++/clang++
+runtime-verified.  Flip to CORE when fixed.
