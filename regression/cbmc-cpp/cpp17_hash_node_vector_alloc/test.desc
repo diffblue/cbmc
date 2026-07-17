@@ -32,3 +32,7 @@ member template.  REAL FIX: `T::template name<args>` lookup must fall
 back to T's PRIMARY TEMPLATE's scope with the instance's template map
 ([basic.lookup.qual], [temp.names]/3, [temp.mem]), or member templates
 must be registered when a class instance is completed.
+
+See cpp17_member_template_completed_instance for the sharpened
+diagnosis (member class templates lack scope entries until used;
+registration must happen at instance-body conversion).
