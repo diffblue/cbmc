@@ -14,3 +14,15 @@ converting constructor pair(U1&&, U2&&) is instantiated WITHOUT a body
 symex havocs the call, so both members are garbage.  --cpp17 works
 (enable_if-based pair).  Root blocker for cpp20_map_basic
 (_M_get_insert_unique_pos's _Res(__y, 0)).  Flip to CORE when fixed.
+
+PROGRESS 2026-07-17: the constraint side is fixed -- requires-clause
+call atoms (_S_constructible<...>()) are now constant-folded during
+candidate filtering, so overload resolution no longer keeps unviable
+candidates whose bodies then hard-fail ("invalid implicit conversion
+from 'signed int' to 'struct nodet *'").  RESIDUAL: the correctly
+selected converting constructor's body STILL fails its system-header-
+lenient conversion (silently; symbol left nil) and the pair members
+remain nondet.  Next step: surface that conversion error (disable the
+syshdr guard for this symbol under a debugger) and fix the body-side
+defect -- likely in the explicit(bool) handling or the mem-initializer
+forwarding (first(std::forward<_U1>(__x))).
