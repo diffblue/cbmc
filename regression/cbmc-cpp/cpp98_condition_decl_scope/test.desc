@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ condition value used in branch: SUCCESS$
+^\[main\.assertion\.2\] line \d+ redeclaration after the if: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+FAILURE
+--
+N5008 [stmt.pre]/6: the condition declaration's name is scoped to the
+substatements; redeclaring it after the if-statement is well-formed.
+The name used to leak into the enclosing block ("already declared with
+different type").  Header-free.
