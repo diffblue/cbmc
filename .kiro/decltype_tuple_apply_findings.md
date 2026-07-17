@@ -3176,3 +3176,28 @@ LESSON: fixing a "no body" symptom often unlocks a CHAIN of further
 defects (unordered_set: 3 fixed + 1 residual); commit each layer
 separately and keep the KNOWNBUG with an updated diagnosis until the
 test genuinely verifies.  Suite green 91 skipped throughout.
+
+## residual reproducers round (2026-07-17 evening)
+
+All three residuals now have minimal reproducers:
+1. cpp20_requires_class_param_atom (header-free, first-try mimic!):
+requires atom referencing ENCLOSING CLASS template param unevaluable;
+the s3-vs-s4 bisect proved it: non-template class folds fine, class
+template param does not.  FIX: extend the requires evaluator's
+name_to_type with the class instance's
+ID_C_template/ID_C_template_arguments.
+2. cpp17_member_template_completed_instance: cvise triumphed where
+hand mimics failed 3x -- 26k preprocessed lines -> 39 header-free lines
+in ~15 min (the 90s baseline fear was wrong: reduced cases fail fast,
+so cvise accelerates as it shrinks).  Every piece of the alias chain
+(__uset_hashtable shape, hash<vector> partial-spec DECLARATION) is
+needed for the instantiation order.  Recovery keeps VERIFICATION
+SUCCESSFUL, so the KNOWNBUG fails via a FORBIDDEN-pattern line --
+useful test.desc technique for diagnostic-only defects.
+3. unordered_set residual is NOT front-end: _M_need_rehash/_M_next_bkt
+live in compiled hashtable_c++0x.cc, havoc'd (61 no-body hits) ->
+garbage bucket count -> divergent bucket walks.  Fix = model both in
+cpp_typecheck_stdlib.cpp (like tree.cc): _M_next_bkt >= max(n,13) +
+_M_next_resize bookkeeping; _M_need_rehash compares against
+_M_next_resize.  Functional semantics don't depend on the exact count.
+Suite green 93 skipped.
