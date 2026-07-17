@@ -3122,3 +3122,19 @@ out-of-class static member definition has MEMBER access; front end
 judges from namespace scope).  12 lines.
 Suite green 91 skipped; smt2_solver suite green (bit-to-fp1 'failure'
 was a stale binary).
+
+## tree.cc models + real map blocker (2026-07-17 afternoon)
+
+The four tree.cc models ALREADY EXIST (cpp_typecheck_stdlib.cpp,
+earlier session) and FIRE -- yesterday's "havoc'd insert_and_rebalance"
+was a misread of the model's own parameter ASSUMEs.  Real blocker
+isolated from the lifo counterexample: cpp20_pair_converting_ctor
+KNOWNBUG -- C++20 pair's requires+explicit(bool) converting ctor
+pair(U1&&,U2&&) instantiates WITHOUT a body (macro-flagged constexpr
+symbol, nil value, never deferred-queued; probe: nil=1 deferred=0
+macro=1); symex havocs it.  _M_get_insert_unique_pos's _Res(__y, 0)
+(literal 0 -> rref_signed_int) selects it.  cpp17 pair (enable_if)
+fine.  FIX LEAD: instantiation path for requires-constrained +
+explicit(bool) members must queue the deferred body (family:
+convert_deferred_method_now / _Insert mixin defect).  6-line repro:
+pair<nodet*,nodet*> b(y, 0) under --cpp20.
