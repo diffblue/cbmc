@@ -64,3 +64,17 @@ header (leftmost/rightmost) maintenance and skip the rebalancing
 rotations: recoloring affects only balance, not the container's
 functional semantics.  Once modelled, --paths lifo (or one-shot at
 --unwind 5) is expected to be tractable.
+
+CORRECTION 2026-07-17 (follow-up): the tree.cc entry points ARE already
+modelled (cpp_typecheck_stdlib.cpp: make_rb_insert_and_rebalance_body,
+_Rb_tree_increment/_Rb_tree_decrement successor/predecessor walks,
+make_rb_rebalance_for_erase_body) and the model bodies ARE present in
+the goto program -- the earlier "havoc'd" reading misread the model's
+own parameter ASSUMEs.  The real remaining blocker, isolated from the
+--paths lifo counterexample down to a 6-line reproducer
+(cpp20_pair_converting_ctor): C++20 libstdc++ pair's requires-clause +
+explicit(bool) converting constructor pair(U1&&, U2&&) is instantiated
+WITHOUT a body (constexpr/macro-flagged, nil value, never queued for
+deferred conversion), so _M_get_insert_unique_pos's `_Res(__y, 0)`
+returns garbage and insert misbehaves.  Fix that defect first; then
+retest one-shot and --paths lifo.
