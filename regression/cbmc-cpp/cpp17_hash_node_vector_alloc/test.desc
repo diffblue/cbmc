@@ -14,3 +14,21 @@ instantiation fail to resolve _Vector_base's _Tp_alloc_type/pointer
 incomplete, v[0] reads garbage.  vector-first order works.  Found
 dog-fooding src/util/find_symbols.cpp (unordered_set<irep_idt> +
 std::vector<irep_idt>).  Flip to CORE when fixed.
+
+DIAGNOSIS 2026-07-17: the failing name is `__gnu_cxx::__alloc_traits<
+_Alloc>::template rebind<_Tp>::other` while instantiating
+_Vector_base<K>.  The scope-restricted lookup of `rebind` in the
+__alloc_traits<allocator<K>,K> instance scope finds NOTHING: the
+instance is fully elaborated (19 components, complete) but its member
+TEMPLATE `rebind` was never registered in its scope (member templates
+are only registered when used during the class's own instantiation --
+the _Hash_node-flavoured __alloc_traits instance has its rebind because
+unordered_set used it then).  The recursive fallback then scans the
+whole program for `rebind` and reports "template scope 'rebind' is
+ambiguous" -- with the CORRECT candidate not in the set.  Two sound
+improvements landed (tag-aware scope-of-T candidate filter;
+elaborate-and-retry on empty lookup) but neither registers the missing
+member template.  REAL FIX: `T::template name<args>` lookup must fall
+back to T's PRIMARY TEMPLATE's scope with the instance's template map
+([basic.lookup.qual], [temp.names]/3, [temp.mem]), or member templates
+must be registered when a class instance is completed.
