@@ -3297,6 +3297,74 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
             tag_str = tag_str.substr(0, angle);
           final_base_name += tag_str;
         }
+        else
+        {
+          // N5008 [expr.prim.id.dtor]/1: in ~type-name the type-name may
+          // be a TYPEDEF-NAME naming the class type (e.g. libstdc++'s
+          // `__n->~__node_type()` in _Hashtable_alloc::
+          // _M_deallocate_node_ptr, where __node_type is a class-scope
+          // alias of _Hash_node<...>).  The class's destructor component
+          // is named after the CLASS, so looking up "~__node_type"
+          // fails (silently, dropping the member's body during
+          // instantiation).  Resolve the typedef in the current scope
+          // chain and spell the destructor with the designated class's
+          // own name (final path component, angle-aware).
+          // Resolve the type-name with a fresh sub-resolver, first in
+          // the object's class scope (current), then in the recorded
+          // postfix-expression context, which is where e.g. libstdc++'s
+          // `__n->~__node_type()` finds the alias.
+          typet designated;
+          designated.make_nil();
+          {
+            const cpp_namet type_cpp_name(param_name, source_location);
+            for(int attempt = 0; attempt < 2 && designated.is_nil(); ++attempt)
+            {
+              cpp_save_scopet dtor_td_save_scope(cpp_typecheck.cpp_scopes);
+              if(attempt == 1)
+              {
+                if(cpp_typecheck.access_judgment_scope == nullptr)
+                  break;
+                cpp_typecheck.cpp_scopes.go_to(
+                  *cpp_typecheck.access_judgment_scope);
+              }
+              cpp_typecheck_resolvet sub_resolver(cpp_typecheck);
+              const exprt result = sub_resolver.resolve(
+                type_cpp_name,
+                wantt::TYPE,
+                cpp_typecheck_fargst(),
+                false); // fail_with_exception
+              if(result.id() == ID_type && result.type().id() == ID_struct_tag)
+                designated = result.type();
+            }
+          }
+          if(designated.is_not_nil())
+          {
+            ++pos; // skip the typedef-name sub-node (it is replaced)
+            std::string tag_str =
+              id2string(to_struct_tag_type(designated).get_identifier());
+            {
+              std::size_t depth = 0;
+              std::size_t final_component = 0;
+              for(std::size_t i = 0; i + 1 < tag_str.size(); ++i)
+              {
+                if(tag_str[i] == '<')
+                  ++depth;
+                else if(tag_str[i] == '>' && depth > 0)
+                  --depth;
+                else if(
+                  depth == 0 && tag_str[i] == ':' && tag_str[i + 1] == ':')
+                  final_component = i + 2;
+              }
+              tag_str = tag_str.substr(final_component);
+            }
+            if(tag_str.substr(0, 4) == "tag-")
+              tag_str = tag_str.substr(4);
+            auto angle = tag_str.find('<');
+            if(angle != std::string::npos)
+              tag_str = tag_str.substr(0, angle);
+            final_base_name += tag_str;
+          }
+        }
       }
     }
 
