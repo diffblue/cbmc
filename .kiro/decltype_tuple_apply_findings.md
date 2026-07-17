@@ -3138,3 +3138,41 @@ fine.  FIX LEAD: instantiation path for requires-constrained +
 explicit(bool) members must queue the deferred body (family:
 convert_deferred_method_now / _Insert mixin defect).  6-line repro:
 pair<nodet*,nodet*> b(y, 0) under --cpp20.
+
+## four-KNOWNBUG session (2026-07-17 afternoon)
+
+1. cpp11_unordered_set_insert: THREE front-end defects fixed on its
+chain (all committed): (a) instantiate_template deferred-drain tag-strip
+unbounded rfind("::") -- 5th instance of the angle-aware-scan pattern!
+(b) [class.access.base]/4-5 friendship for derived-to-PRIVATE-base
+conversion; new plumbing cpp_typecheckt::access_judgment_scope (RAII in
+cpp_constructor around its class-scope switch) since candidate matching
+runs with current scope = candidate's class; CORE test
+cpp98_friend_private_base_conversion.  (c) [stmt.pre]/6 if/while
+condition-declaration name leaked into enclosing block; CORE test
+cpp98_condition_decl_scope.  Insert path now converts FULLY; residual =
+bucket-chain walk divergence (unwinding assertion in
+_M_find_before_node at --unwind 30, garbage node pointers) -- STILL
+KNOWNBUG, needs isolation of the insert-side linking.
+2. cpp98_static_member_private_ctor FIXED -> CORE:
+[class.access.general]/7, out-of-class static member initializer now
+typechecked with the member's class scope re-entered
+(cpp_declarator_converter::handle_initializer wrap).  goto_trace.cpp
+dog-foods CLEAN now.
+3. cpp17_hash_node_vector_alloc: two sound lookup improvements (tag-
+aware scope-of-T filter; elaborate-and-retry) but root cause remains:
+a COMPLETED template instance's scope lacks member templates that were
+not used during its own instantiation ('rebind' registered only for
+instances whose rebind was used then).  REAL FIX: [temp.names]/3
+primary-template-scope fallback with instance template map.  KNOWNBUG,
+full diagnosis in desc.
+4. cpp20_pair_converting_ctor: requires-clause CALL atoms
+(_S_constructible<...>()) now constant-folded in candidate filtering
+([temp.constr.atomic]) -- unviable candidates no longer win.  RESIDUAL:
+the RIGHT ctor's body still silently fails conversion (nil symbol,
+syshdr leniency) -- pair members nondet.  KNOWNBUG, next step in desc.
+
+LESSON: fixing a "no body" symptom often unlocks a CHAIN of further
+defects (unordered_set: 3 fixed + 1 residual); commit each layer
+separately and keep the KNOWNBUG with an updated diagnosis until the
+test genuinely verifies.  Suite green 91 skipped throughout.
