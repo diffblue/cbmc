@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ null pointer constant selected: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: a requires atom that CALLS a constexpr static member function
+template (requires(ok<U2>()) where ok's body references the enclosing
+class's parameter) cannot be constant-folded by the satisfaction check;
+the unviable constrained constructor survives and its body fails
+conversion.  Exact shape of libstdc++ C++20 pair's
+requires(_S_constructible<_U1, _U2>()) -- the remaining blocker for
+cpp20_pair_converting_ctor / cpp20_map_basic.  The inline-atom variant
+is CORE (cpp20_requires_class_param_atom).  Header-free.  FIX LEAD:
+the call-atom fold must type-check the callee body with BOTH the
+member's and the class's template maps in scope.  Flip to CORE when
+fixed.
