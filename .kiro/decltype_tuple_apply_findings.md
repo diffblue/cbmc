@@ -3247,3 +3247,37 @@ value_type member interlock is irreducible by hand.  Registration fix
 (instance-body conversion) remains the identified repair.
 3. unordered_set: NO residual (fully CORE since the rehash models).
 Suite green 92 skipped.
+
+## consteval atoms + per-member recovery (2026-07-17 night 2)
+
+1. cpp20_requires_static_call_atom + cpp20_pair_converting_ctor FIXED
+-> CORE.  Four-part fix in the satisfaction check's call-atom fold:
+manifestly-constant-evaluated context ([temp.constr.atomic]/1 --
+constexpr evaluator only folds under constant_expression_context);
+prepare_deferred_method_body for the eagerly-converted callee
+([temp.inst]/1 member map on top of class map); c_bool constant
+recognition (bool spelled c_bool -- is_true/is_false miss it!);
+foldable forms extended to ==/!= atoms BUT results only TRUSTED when
+type-check emitted no recovered diagnostics (unrestricted
+generalization broke std::span -- concept-id atoms error-recover into
+bogus constants; [temp.constr.atomic]/3 keeps unknown safe).
+2. cpp17_member_template_completed_instance FIXED -> CORE by
+PER-MEMBER ERROR RECOVERY in typecheck_compound_body during implicit
+instantiation ([temp.inst]/11 tolerance; user code stays strict).  The
+REAL root cause wasn't registration at all: a mid-body throw (silent
+qualified-lookup SFINAE) dropped every FOLLOWING member of the
+instance, incl. member class templates.  STEP-probe technique (per-item
+index + uncaught_exceptions watcher) found it in minutes.
+find_symbols.cpp dog-foods CLEAN.
+3. cpp20_map_basic next frontier: pair value lost in the sret handoff
+through _M_get_insert_hint_unique_pos's tail call (__pair_base
+"ignoring typecast" suspect).  cpp17_hash_node_vector_alloc residual:
+push_back dropped via silent enable_if<0,void> SFINAE
+(_S_use_relocate constexpr use in return type not covered by the
+stdlib model override).
+DEBUG HAZARD LOGGED: an auto-inserted braceless-if probe before
+`it.get_writeable_symbol().value.make_nil()` made the nil
+UNCONDITIONAL -- always brace-wrap injected probes (the misleading-
+indentation -Werror caught it; earlier T0 inserter's paren-heuristic
+also produced one stray-brace repair).
+Suite green 89 skipped.
