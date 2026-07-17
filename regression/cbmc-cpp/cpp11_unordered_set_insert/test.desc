@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ inserted element is found: SUCCESS$
+^\[main\.assertion\.2\] line \d+ absent element is not found: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.inst]/4 -- unordered_set::insert comes from the
+std::__detail::_Insert CRTP mixin; its odr-used member body is never
+instantiated ("no body for callee ..._Insert<...>::insert"), so insert
+is a no-op and count() is wrong.  Found dog-fooding
+src/util/find_symbols.cpp.  Flip to CORE when fixed.
