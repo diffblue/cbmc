@@ -4714,6 +4714,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
               class_sym->type.find(ID_C_template_arguments)));
         }
         methods_seen.insert(sym_expr->get_identifier());
+        // N5008 [temp.inst]/1: an instantiated member function TEMPLATE
+        // additionally needs its own template map (the #fn_template_*
+        // records) on top of the class map built above -- without it a
+        // body like `__is_constructible(T2, U2)` leaves U2 unresolved
+        // and the conversion fails, so a requires-clause call atom
+        // (pair's _S_constructible<_U1,_U2>()) never folds.
+        prepare_deferred_method_body(writeable);
         try
         {
           convert_function(writeable);
