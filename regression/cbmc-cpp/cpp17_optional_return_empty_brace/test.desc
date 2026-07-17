@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ engaged value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ return \{\} is disengaged: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+FAILURE
+--
+N5008 [stmt.return]/2 + [dcl.init.list]/3.5: `return {};` for a class
+return type value-initializes the result object.  Previously the empty
+braced-init-list entered converting-constructor deduction (std::
+optional's _Requires SFINAE default argument -> "missing type in
+template argument", incomplete bodies, wrong emptiness).  Found
+isolating the goto_trace.cpp dog-food failure.
