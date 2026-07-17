@@ -1,22 +1,20 @@
 // N5008 [basic.lookup.qual] + [temp.names]/3: in `T::template name<args>`
 // the name is looked up in the scope of T only.
 //
-// KNOWNBUG: when the class-template instance T was COMPLETED without its
-// member template `name` ever being used, the instance's scope lacks a
-// registration for it; the resolver's fallback then collects every
-// same-name member template in the program and fails with "template
-// scope 'rebind' is ambiguous" -- the correct candidate is not even in
-// the candidate set.  Root cause of cpp17_hash_node_vector_alloc
+// This used to fail ("template scope 'rebind' is ambiguous"): a
+// mid-body conversion throw during implicit instantiation silently
+// dropped every subsequent member -- including the member class
+// template, whose absence from the instance scope made the fallback
+// collect every same-name member template program-wide.  Fixed by
+// per-member error recovery ([temp.inst]/11 tolerance) in
+// typecheck_compound_body.  Root cause of cpp17_hash_node_vector_alloc
 // (unordered_set's hash-node allocator machinery followed by
 // vector<K>): this is that test reduced by cvise to 39 header-free
 // lines (the alias chain mirrors libstdc++'s __uset_hashtable and the
 // hash<vector<...>> partial-specialization declaration; each part is
 // needed to reproduce the instantiation order).
 //
-// g++/clang++ accept and verify at runtime.  Flip to CORE when fixed
-// (fix lead: fall back to the PRIMARY template's scope with the
-// instance's template map, or register member templates when an
-// instance is completed).
+// g++/clang++ accept and verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 template <int __v>

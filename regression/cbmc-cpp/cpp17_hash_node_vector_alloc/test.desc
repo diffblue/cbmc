@@ -36,3 +36,17 @@ must be registered when a class instance is completed.
 See cpp17_member_template_completed_instance for the sharpened
 diagnosis (member class templates lack scope entries until used;
 registration must happen at instance-body conversion).
+
+UPDATE 2026-07-17 night: the rebind ambiguity and the _Tp_alloc_type
+failures are FIXED (cpp17_member_template_completed_instance is CORE;
+per-member recovery in typecheck_compound_body) and
+src/util/find_symbols.cpp dog-foods CLEAN.  This test's residual:
+vector<K>::push_back's body conversion fails through a SILENT
+qualified-lookup throw -- `type` in std::tag-enable_if<0,void>
+([temp.deduct]/8 SFINAE shape): _S_use_relocate's enable_if evaluates
+FALSE here even though the stdlib model overrides
+_S_nothrow_relocate/_S_use_relocate to true (the override applies to
+the function body, not this constexpr use in a return type), so the
+push_back body's _M_realloc_append call fails substitution and the
+member is dropped.  Next lead: make the model override also cover the
+constexpr evaluation, or model push_back/_M_realloc_append directly.
