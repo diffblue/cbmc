@@ -1181,7 +1181,8 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 // atomic]/3 makes unsatisfaction soft here anyway).
                 if(
                   x.id() == ID_side_effect || x.id() == ID_cpp_name ||
-                  x.id() == ID_function_call)
+                  x.id() == ID_function_call || x.id() == ID_equal ||
+                  x.id() == ID_notequal)
                 {
                   try
                   {
@@ -1219,12 +1220,45 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                           static_cast<cpp_scopet &>(*sc_it->second));
                     }
                     exprt atom = x;
-                    cpp_typecheck.typecheck_expr(atom);
+                    // [temp.constr.atomic]/1 + [expr.const]: an atomic
+                    // constraint's expression is manifestly constant-
+                    // evaluated; type-check it in a constant-expression
+                    // context so the constexpr call evaluator folds a
+                    // call atom (e.g. pair's _S_constructible<...>()).
+                    //
+                    // Only TRUST the folded value when the type-check
+                    // produced no (recovered) diagnostics: an atom over
+                    // constructs CBMC cannot model (e.g. a concept-id
+                    // like std::contiguous_iterator in std::span's
+                    // constructors) may error-recover into a bogus
+                    // constant, wrongly removing a viable candidate.
+                    // Errors here are soft ([temp.constr.atomic]/3
+                    // SFINAE), but the RESULT is then "unknown".
+                    const std::size_t atom_errors_before =
+                      cpp_typecheck.get_message_handler().get_message_count(
+                        messaget::M_ERROR);
+                    {
+                      cpp_typecheckt::constant_expression_contextt
+                        constant_guard{cpp_typecheck};
+                      cpp_typecheck.typecheck_expr(atom);
+                    }
+                    const bool atom_clean =
+                      cpp_typecheck.get_message_handler().get_message_count(
+                        messaget::M_ERROR) == atom_errors_before;
                     simplify(atom, cpp_typecheck);
-                    if(atom.is_true())
-                      return 1;
-                    if(atom.is_false())
-                      return 0;
+                    if(atom_clean)
+                    {
+                      if(atom.is_true())
+                        return 1;
+                      if(atom.is_false())
+                        return 0;
+                      // a folded call returns `bool` spelled as c_bool
+                      // ([basic.fundamental]); its constant value is a
+                      // bit pattern, which is_true/is_false do not
+                      // recognize
+                      if(atom.is_constant() && atom.type().id() == ID_c_bool)
+                        return to_constant_expr(atom).is_zero() ? 0 : 1;
+                    }
                   }
                   catch(...)
                   {
