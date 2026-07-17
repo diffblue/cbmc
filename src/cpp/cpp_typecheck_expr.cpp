@@ -3401,6 +3401,27 @@ void cpp_typecheckt::typecheck_expr_member(
     new_fargs.add_object(op0);
     new_fargs.naming_scope = &naming_scope;
 
+    // N5008 [basic.lookup.qual]/6: for a ~type-name after . or ->, the
+    // type-name is looked up both in the context of the entire
+    // postfix-expression and in the scope of the object's class.  The
+    // resolver only sees the object's class scope (we just entered it);
+    // record the postfix-expression context so the destructor-typedef
+    // substitution in resolve_scope can search it as well.  RAII-restored.
+    struct member_access_scope_guardt
+    {
+      cpp_typecheckt &tc;
+      cpp_scopet *saved;
+      member_access_scope_guardt(cpp_typecheckt &t, cpp_scopet &use_scope)
+        : tc(t), saved(t.access_judgment_scope)
+      {
+        tc.access_judgment_scope = &use_scope;
+      }
+      ~member_access_scope_guardt()
+      {
+        tc.access_judgment_scope = saved;
+      }
+    } member_access_scope_guard{*this, naming_scope};
+
     exprt symbol_expr = resolve(
       component_cpp_name, cpp_typecheck_resolvet::wantt::VAR, new_fargs);
 

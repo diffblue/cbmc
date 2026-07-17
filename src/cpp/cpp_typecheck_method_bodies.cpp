@@ -1045,6 +1045,12 @@ void cpp_typecheckt::typecheck_method_bodies()
         try
         {
           convert_function(method_symbol);
+          // The body is now properly type-checked: it must not be
+          // nil'd by clean_up's deferred-members sweep.  A member
+          // instantiated out of line re-enters deferred_typechecking
+          // when its declarator is converted in a template scope
+          // (typecheck_compound_declarator), so erase it here.
+          deferred_typechecking.erase(method_symbol.name);
         }
         catch(...)
         {
@@ -1064,6 +1070,8 @@ void cpp_typecheckt::typecheck_method_bodies()
         try
         {
           convert_function(method_symbol);
+          // see the matching erase in the template-instantiation branch
+          deferred_typechecking.erase(method_symbol.name);
 
           // C++14: update struct component type after auto return type
           // deduction.
@@ -1307,6 +1315,8 @@ void cpp_typecheckt::typecheck_method_bodies()
         try
         {
           convert_function(method_symbol);
+          // see the matching erase in typecheck_method_bodies
+          deferred_typechecking.erase(method_symbol.name);
         }
         catch(...)
         {

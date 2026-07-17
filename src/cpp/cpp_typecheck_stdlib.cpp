@@ -1003,6 +1003,188 @@ static code_blockt make_rb_rebalance_for_erase_body(
   return block;
 }
 
+/// Synthesize a body for std::__detail::_Prime_rehash_policy::_M_next_bkt.
+///
+/// libstdc++ defines this in its compiled library
+/// (src/c++11/hashtable_c++0x.cc); the headers only declare it, so CBMC
+/// sees no body and havocs the call -- the returned bucket count is
+/// nondeterministic garbage, _M_rehash then installs a garbage-sized
+/// bucket array, and every subsequent bucket-chain walk diverges.
+///
+/// The real routine returns the next prime >= __n from a static prime
+/// table and records the growth threshold `_M_next_resize =
+/// prime * max_load_factor` (a mutable member, hence writable through
+/// the const `this`).  Per N5008 [unord.req] the exact bucket count is
+/// a performance property, not an observable container-semantics one
+/// (general requirements only need consistent bucket indexing and
+/// finite chains), so the model returns max(__n, 13) -- 13 is the
+/// smallest bucket count the real prime table produces for a first
+/// insert -- and sets `_M_next_resize` to the same value (i.e. a
+/// max_load_factor of 1.0, its default; a user-set smaller factor only
+/// changes WHEN growth happens, not functional behaviour).
+static code_blockt
+make_prime_next_bkt_body(const symbolt &symbol, const namespacet &ns)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.size() != 2)
+    return code_blockt();
+
+  const symbol_exprt this_expr(params[0].get_identifier(), params[0].type());
+  const symbol_exprt n_expr(params[1].get_identifier(), params[1].type());
+
+  if(params[0].type().id() != ID_pointer)
+    return code_blockt();
+  const typet &class_type = to_pointer_type(params[0].type()).base_type();
+  if(class_type.id() != ID_struct_tag)
+    return code_blockt();
+  const struct_typet &st = ns.follow_tag(to_struct_tag_type(class_type));
+
+  irep_idt next_resize_name;
+  typet next_resize_type;
+  for(const auto &comp : st.components())
+  {
+    if(id2string(comp.get_base_name()) == "_M_next_resize")
+    {
+      next_resize_name = comp.get_name();
+      next_resize_type = comp.type();
+    }
+  }
+  if(next_resize_name.empty())
+    return code_blockt();
+
+  const typet &size_type = fn_type.return_type();
+  const exprt thirteen = from_integer(13, size_type);
+
+  // result = __n < 13 ? 13 : __n
+  const if_exprt result(
+    binary_relation_exprt(n_expr, ID_lt, thirteen), thirteen, n_expr);
+
+  code_blockt body;
+
+  // this->_M_next_resize = result  (mutable member, [dcl.stc])
+  member_exprt next_resize(
+    dereference_exprt(this_expr), next_resize_name, next_resize_type);
+  body.add(code_frontend_assignt(
+    std::move(next_resize),
+    typecast_exprt::conditional_cast(result, next_resize_type)));
+
+  body.add(code_frontend_returnt(result));
+
+  return body;
+}
+
+/// Synthesize a body for
+/// std::__detail::_Prime_rehash_policy::_M_need_rehash (also defined in
+/// libstdc++'s compiled hashtable_c++0x.cc; see make_prime_next_bkt_body).
+///
+/// Semantics of the real routine: rehash is needed when the element
+/// count after the insertion exceeds the recorded growth threshold; the
+/// second pair member is then the new bucket count to install.  The
+/// model mirrors that with a max_load_factor of 1.0:
+///   if (__n_elt + __n_ins > _M_next_resize)
+///     { new = max(2*(__n_elt+__n_ins), 13); _M_next_resize = new;
+///       return {true, new}; }
+///   return {false, 0};
+/// Doubling keeps the amortised-growth shape of the original; any
+/// deterministic monotone growth preserves container semantics
+/// ([unord.req]).
+static code_blockt
+make_prime_need_rehash_body(const symbolt &symbol, const namespacet &ns)
+{
+  const code_typet &fn_type = to_code_type(symbol.type);
+  const auto &params = fn_type.parameters();
+  if(params.size() != 4)
+    return code_blockt();
+
+  const symbol_exprt this_expr(params[0].get_identifier(), params[0].type());
+  const symbol_exprt n_elt(params[2].get_identifier(), params[2].type());
+  const symbol_exprt n_ins(params[3].get_identifier(), params[3].type());
+
+  if(params[0].type().id() != ID_pointer)
+    return code_blockt();
+  const typet &class_type = to_pointer_type(params[0].type()).base_type();
+  if(class_type.id() != ID_struct_tag)
+    return code_blockt();
+  const struct_typet &st = ns.follow_tag(to_struct_tag_type(class_type));
+
+  irep_idt next_resize_name;
+  typet next_resize_type;
+  for(const auto &comp : st.components())
+  {
+    if(id2string(comp.get_base_name()) == "_M_next_resize")
+    {
+      next_resize_name = comp.get_name();
+      next_resize_type = comp.type();
+    }
+  }
+  if(next_resize_name.empty())
+    return code_blockt();
+
+  // the return type is std::pair<bool, std::size_t>
+  const typet &ret_type = fn_type.return_type();
+  if(ret_type.id() != ID_struct_tag)
+    return code_blockt();
+  const struct_typet &pair_st = ns.follow_tag(to_struct_tag_type(ret_type));
+
+  // build a pair value: start from zero-initialized, then set
+  // first/second by component position
+  auto make_pair_value =
+    [&](const exprt &first_value, const exprt &second_value) -> exprt
+  {
+    auto zero = zero_initializer(ret_type, symbol.location, ns);
+    if(!zero.has_value() || zero->id() != ID_struct)
+      return nil_exprt();
+    struct_exprt pair_value = to_struct_expr(*zero);
+    const auto &comps = pair_st.components();
+    for(std::size_t i = 0; i < comps.size() && i < pair_value.operands().size();
+        ++i)
+    {
+      const std::string bn = id2string(comps[i].get_base_name());
+      if(bn == "first")
+        pair_value.operands()[i] =
+          typecast_exprt::conditional_cast(first_value, comps[i].type());
+      else if(bn == "second")
+        pair_value.operands()[i] =
+          typecast_exprt::conditional_cast(second_value, comps[i].type());
+    }
+    return std::move(pair_value);
+  };
+
+  const typet &size_type = n_elt.type();
+  const plus_exprt total(
+    n_elt, typecast_exprt::conditional_cast(n_ins, size_type));
+  member_exprt next_resize(
+    dereference_exprt(this_expr), next_resize_name, next_resize_type);
+
+  // growth = 2 * total, floored at 13
+  const mult_exprt doubled(from_integer(2, size_type), total);
+  const exprt thirteen = from_integer(13, size_type);
+  const if_exprt new_count(
+    binary_relation_exprt(doubled, ID_lt, thirteen), thirteen, doubled);
+
+  const exprt pair_true = make_pair_value(true_exprt(), new_count);
+  const exprt pair_false =
+    make_pair_value(false_exprt(), from_integer(0, size_type));
+  if(pair_true.is_nil() || pair_false.is_nil())
+    return code_blockt();
+
+  // if(total > _M_next_resize) { _M_next_resize = new_count;
+  //                              return {true, new_count}; }
+  code_blockt then_block;
+  then_block.add(code_frontend_assignt(
+    next_resize,
+    typecast_exprt::conditional_cast(new_count, next_resize_type)));
+  then_block.add(code_frontend_returnt(pair_true));
+
+  code_blockt body;
+  body.add(code_ifthenelset(
+    binary_relation_exprt(total, ID_gt, next_resize), std::move(then_block)));
+  body.add(code_frontend_returnt(pair_false));
+
+  return body;
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
@@ -1428,6 +1610,32 @@ void cpp_typecheckt::provide_stdlib_bodies()
     {
       ensure_parameter_symbols(symbol, symbol_table);
       auto body = make_rb_rebalance_for_erase_body(symbol, ns, symbol_table);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
+      base == "_M_next_bkt" &&
+      name.find("_Prime_rehash_policy") != std::string::npos)
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_prime_next_bkt_body(symbol, ns);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
+      base == "_M_need_rehash" &&
+      name.find("_Prime_rehash_policy") != std::string::npos)
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_prime_need_rehash_body(symbol, ns);
       if(!body.statements().empty())
       {
         symbol.value = std::move(body);
