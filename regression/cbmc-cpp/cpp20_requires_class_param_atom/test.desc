@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ null pointer constant selected: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: N5008 [temp.constr.decl]/1 + [temp.deduct]/5 -- a requires
+atom referencing the ENCLOSING CLASS's template parameter
+(__is_constructible(T2, U2) inside pr<T2>) cannot be evaluated by the
+satisfaction check (only the member template's own parameters are
+substituted), so the unviable constrained constructor stays in the
+overload set and its body fails conversion.  Header-free residual of
+cpp20_pair_converting_ctor (libstdc++ C++20 pair) and thereby
+cpp20_map_basic.  FIX LEAD: extend the evaluator's name substitution
+with the class instance's ID_C_template/ID_C_template_arguments.
+g++/clang++ runtime-verified.  Flip to CORE when fixed.
