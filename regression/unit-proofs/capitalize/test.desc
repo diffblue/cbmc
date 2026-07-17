@@ -1,0 +1,16 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.4\] line \d+ idempotence: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+FAILURE
+--
+Unit proof: capitalize preserves size, upper-cases exactly the first
+character, leaves the tail unchanged, and is idempotent -- proven over
+ALL printable strings up to length 3 via nondeterministic inputs
+(unit-test contract upgraded to a bounded-domain proof over CBMC's own
+src/util/string_utils).
