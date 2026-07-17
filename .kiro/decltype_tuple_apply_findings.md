@@ -3089,3 +3089,36 @@ tractability heuristic -- single-allocation transforms (capitalize,
 strip_string via substr) verify; incremental-append transforms (escape,
 BigInt digits) hit the encoder wall.  Suite green 90 skipped;
 unit-proofs 3 CORE green + 2 KNOWNBUG.
+
+## solver follow-ups + optional-SFINAE isolation (2026-07-17)
+
+1. bigint_arith SMT: --z3 >30min, --cvc5 >20min, both no verdict
+(encoding cheap, SOLVING diverges).  cvc5 first failed on a CBMC SMT2
+bug: datatype selector names with "::" unquoted -> Parse Error.  FIXED
+(smt2: quote datatype selector names via convert_identifier; new
+helper datatype_selector_name, 5 emission sites).  cvc5 1.2.1 installed
+per CI (wget release zip -> /usr/local/bin).
+2. cpp20_map_basic REFRAMED by --paths lifo: verdict in ~1min (vs >15
+min one-shot no-verdict) -- and the counterexample exposes the REAL
+blocker: _Rb_tree_insert_and_rebalance is in libstdc++'s COMPILED
+tree.cc -> havoc'd -> tree linkage nondet -> can NEVER verify.  Needs a
+model of tree.cc entry points (BST-link without rebalancing).  desc
+updated.
+3. cpp11_regex_match desc: full stage profile + unblock candidates
+captured.
+4. optional:754 SFINAE lead ISOLATED (source-level function bisection
+beat cvise: 90s/test x 87k lines was hopeless; killed it).  Trigger:
+`return {};` in ANY function returning optional<T> (even optional<int>)
+-- MY pre-base return wrap (yesterday) fed the empty braced-init-list
+to converting-ctor deduction; _Requires SFINAE default arg then hit
+"missing type in template argument" + wrong emptiness semantics.
+FIXED per [stmt.return]/2 + [dcl.init.list]/3.5: value-initialize the
+returned temporary.  CORE test cpp17_optional_return_empty_brace.
+LESSON: a fix that reroutes expressions through new_temporary must
+handle ALL braced-init shapes ({} = value-init, {args} = list-init).
+5. goto_trace.cpp residual isolated header-free ->
+cpp98_static_member_private_ctor KNOWNBUG ([class.access.general]/7:
+out-of-class static member definition has MEMBER access; front end
+judges from namespace scope).  12 lines.
+Suite green 91 skipped; smt2_solver suite green (bit-to-fp1 'failure'
+was a stale binary).
