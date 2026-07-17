@@ -7,19 +7,14 @@
 // candidate must be removed and pr(const T2&) selected -- for which the
 // literal 0 IS a null pointer constant.
 //
-// KNOWNBUG: the satisfaction check's call-atom constant-fold cannot
-// evaluate the CALL (the static member's body needs the class's and
-// the member's template maps when type-checked from the satisfaction
-// context), leaves the atom "unknown", keeps the unviable candidate,
-// and its body fails conversion ("invalid implicit conversion from
-// 'signed int' to 'struct nodet *'").  This is the exact shape of
-// libstdc++ C++20 pair's `requires(_S_constructible<_U1, _U2>())` --
-// the remaining blocker for cpp20_pair_converting_ctor and thereby
-// cpp20_map_basic.  The same constraint written INLINE
-// (requires(__is_constructible(T2, U2))) works: see the CORE test
+// The satisfaction check's call-atom constant-fold used to leave the
+// CALL "unknown" (the callee body needs a manifestly-constant-evaluated
+// context, its own template map on top of the class map, and c_bool
+// constant recognition); the unviable candidate survived and its body
+// failed conversion.  All fixed; see also the inline-atom variant
 // cpp20_requires_class_param_atom.
 //
-// g++/clang++ verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct nodet
