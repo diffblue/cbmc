@@ -33,3 +33,21 @@ locale()/~locale() have empty model bodies, so the facet dereference
 failures are gone.  The residual blocker is pure BMC SCALING: symbolic
 regex compilation + matching does not converge within 10 minutes at
 --unwind 5.  Not a front-end defect.
+
+STAGE PROFILE 2026-07-17 (timestamped phases + RSS sampler, 16 GiB cap):
+the blow-up is PROGRAM-SIZE-DRIVEN SYMEX.  The fully instantiated
+<regex> machinery yields ~358,000 goto instructions across ~4,233
+functions.  Wall-clock: front end (parse+typecheck+goto conversion)
+28s; function-pointer removal 76s (quadratic-ish over the huge
+program); symbolic execution then runs >18 minutes at ~5.5 GiB RSS
+WITHOUT completing -- the solver is never reached, so neither the SAT
+back-end nor encoding is implicated.  Memory is stable (time-bound,
+not memory-bound).
+
+Unblock candidates, in order of likely payoff: (1) a lighter regex
+model (stub std::regex with a bounded matcher, the way the locale/ctype
+facet layer was modelled); (2) pre-symex reachability slicing /
+--drop-unused-functions to cut the 4,233-function program down before
+BMC; (3) per-loop unwind limits on the regex compiler's inner loops
+instead of a global --unwind 5.  Plain --paths lifo or solver swaps
+will NOT help: the bottleneck precedes the solver.
