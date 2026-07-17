@@ -1,0 +1,13 @@
+CORE smt-backend no-new-smt
+main.cpp
+--z3
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* ok: SUCCESS$
+^\[main\.assertion\.2\] .* fail: FAILURE$
+^VERIFICATION FAILED$
+--
+error running SMT2 solver
+--
+C++ component names such as S::x are not SMT-LIB simple symbols, hence
+datatype selectors must be quoted.

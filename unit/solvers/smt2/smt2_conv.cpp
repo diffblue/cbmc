@@ -942,3 +942,36 @@ TEST_CASE(
     REQUIRE(smt2_dec() == decision_proceduret::resultt::D_UNSATISFIABLE);
   }
 }
+
+TEST_CASE(
+  "smt2_convt quotes datatype selectors of qualified components",
+  "[core][solvers][smt2]")
+{
+  const struct_typet struct_type{
+    {{"S::x", unsignedbv_typet{8}}, {"S::y", unsignedbv_typet{8}}}};
+  const symbol_exprt s{"s", struct_type};
+  const constant_exprt one = from_integer(1, unsignedbv_typet{8});
+
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  smt2_convt conv{ns, "test", "", "QF_BV", smt2_convt::solvert::Z3, out};
+  conv.set_to_true(equal_exprt{
+    member_exprt{
+      with_exprt{s, member_designatort{"S::x"}, one},
+      "S::y",
+      unsignedbv_typet{8}},
+    one});
+  const std::string result = out.str();
+
+  // selector declaration
+  CHECK(result.find("(|struct.0.S::x| (_ BitVec 8))") != std::string::npos);
+  // update helper, which uses the selector of the retained component
+  CHECK(
+    result.find("(define-fun |update-struct.0.S::x| ") != std::string::npos);
+  CHECK(result.find("(|struct.0.S::y| s)") != std::string::npos);
+  // convert_member applied to convert_with
+  CHECK(
+    result.find("(|struct.0.S::y| (|update-struct.0.S::x| s ") !=
+    std::string::npos);
+}
