@@ -1097,6 +1097,66 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                     s->value.id() != ID_symbol)
                     return eval(s->value);
                 }
+                // [temp.constr.atomic]: an atomic constraint is a
+                // constant expression; a clause like libstdc++ C++20
+                // pair's `requires (_S_constructible<_U1, _U2>())` calls
+                // a consteval static member.  The structural cases above
+                // cannot fold a CALL, so type-check and constant-fold the
+                // substituted atom in the candidate's class scope inside
+                // a SFINAE context.  Failures (or a non-constant result)
+                // stay "unknown" and keep the candidate ([temp.constr.
+                // atomic]/3 makes unsatisfaction soft here anyway).
+                if(
+                  x.id() == ID_side_effect || x.id() == ID_cpp_name ||
+                  x.id() == ID_function_call)
+                {
+                  try
+                  {
+                    sfinae_contextt atom_sfinae{cpp_typecheck};
+                    cpp_save_scopet atom_scope{cpp_typecheck.cpp_scopes};
+                    const std::string ctor_id =
+                      id2string(e.type().get(ID_C_template));
+                    // enclosing class of the member template: strip the
+                    // final `::member` component (angle-aware) and insert
+                    // the `tag-` marker
+                    std::size_t depth = 0, final_sep = std::string::npos;
+                    for(std::size_t ci = 0; ci + 1 < ctor_id.size(); ++ci)
+                    {
+                      if(ctor_id[ci] == '<')
+                        ++depth;
+                      else if(ctor_id[ci] == '>' && depth > 0)
+                        --depth;
+                      else if(
+                        depth == 0 && ctor_id[ci] == ':' &&
+                        ctor_id[ci + 1] == ':')
+                        final_sep = ci;
+                    }
+                    if(final_sep != std::string::npos)
+                    {
+                      std::string cls = ctor_id.substr(0, final_sep);
+                      std::size_t lt2 = cls.find('<');
+                      std::size_t se2 =
+                        lt2 == std::string::npos ? std::string::npos : lt2;
+                      std::size_t sep2 = cls.rfind("::", se2);
+                      cls.insert(
+                        sep2 == std::string::npos ? 0 : sep2 + 2, "tag-");
+                      auto sc_it = cpp_typecheck.cpp_scopes.id_map.find(cls);
+                      if(sc_it != cpp_typecheck.cpp_scopes.id_map.end())
+                        cpp_typecheck.cpp_scopes.go_to(
+                          static_cast<cpp_scopet &>(*sc_it->second));
+                    }
+                    exprt atom = x;
+                    cpp_typecheck.typecheck_expr(atom);
+                    simplify(atom, cpp_typecheck);
+                    if(atom.is_true())
+                      return 1;
+                    if(atom.is_false())
+                      return 0;
+                  }
+                  catch(...)
+                  {
+                  }
+                }
                 return -1; // unknown -- conservatively keep the candidate
               };
               if(eval(req_copy) == 0)
