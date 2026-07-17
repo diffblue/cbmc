@@ -155,6 +155,28 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     !cpp_is_pod(return_type) &&
     (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag))
   {
+    // N5008 [stmt.return]/2 + [dcl.init.list]/3.5: `return {};` for a
+    // class return type VALUE-INITIALIZES the result object -- the
+    // default constructor is called.  Passing the empty
+    // braced-init-list on as a constructor argument instead would run
+    // overload resolution over the CONVERTING constructor templates
+    // (e.g. std::optional's `optional(_Up&&)` with its _Requires
+    // SFINAE default argument), where the untyped braced-init-list
+    // produces "missing type in template argument" and wrong
+    // semantics.
+    if(
+      code.return_value().id() == ID_initializer_list &&
+      code.return_value().operands().empty())
+    {
+      exprt temporary;
+      new_temporary(
+        code.return_value().source_location(),
+        return_type,
+        exprt::operandst{},
+        temporary);
+      code.return_value().swap(temporary);
+    }
+
     typecheck_expr(code.return_value());
 
     if(
