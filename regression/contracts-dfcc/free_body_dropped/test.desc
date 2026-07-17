@@ -1,0 +1,15 @@
+CORE dfcc-only
+main.c
+--drop-unused-functions __ --dfcc main
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test checks that goto-instrument --dfcc does not fail when the model
+contains a function symbol that carries the `compiled` marker value while its
+body is not present in the goto functions map. This state arises when
+--drop-unused-functions removes the body of a function (here: a user-provided
+model of free) that is unreachable from the entry point.
+See: https://github.com/diffblue/cbmc/issues/8814
