@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp98
 ^\[main\.assertion\.1\] line \d+ static member built by private ctor: SUCCESS$
@@ -7,10 +7,11 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [class.access.general]/7 -- an out-of-class static data
-member definition has MEMBER access and may call the class's private
-constructor; the front end judges the call from namespace scope and
-rejects it ("member 'S::S(this)' is not accessible").  Residual blocker
-for dog-fooding src/goto-programs/goto_trace.cpp
-(trace_optionst::default_options).  Header-free, 12 essential lines.
-Flip to CORE when fixed.
+N5008 [class.access.general]/7 -- an out-of-class static data member
+definition has MEMBER access and may call the class's private
+constructor.  The front end used to judge the initializer from
+namespace scope ("member 'S::S(this)' is not accessible"); fixed by
+re-entering the member's class scope around the initializer's
+type-checking.  Was the residual blocker for dog-fooding
+src/goto-programs/goto_trace.cpp (trace_optionst::default_options).
+Header-free, 12 essential lines.

@@ -3,11 +3,12 @@
 // member -- it may use the class's private constructors.
 // (The exact shape of goto_trace.h's trace_optionst::default_options.)
 //
-// KNOWNBUG: the front end judges the constructor call in the
+// The front end used to judge the constructor call in the
 // out-of-class static member definition from namespace scope and
-// rejects it: "member 'S::S(this)' is not accessible".
+// reject it ("member 'S::S(this)' is not accessible"); it now
+// re-enters the member's class scope around the initializer.
 //
-// g++/clang++ verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct S
