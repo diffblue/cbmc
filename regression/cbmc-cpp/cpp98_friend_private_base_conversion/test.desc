@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ friend may convert to private base: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+FAILURE
+--
+N5008 [class.access.base]/4-5: derived-to-private-base conversion is
+accessible in a FRIEND of the derived class.  Was judged only from the
+constructor's own class scope at reference-binding time, so the
+conversion was rejected ("no match") and, in libstdc++'s _Hashtable,
+the befriended _Insert mixin's member body was silently dropped
+(unordered_set::insert was a no-op).  Header-free.

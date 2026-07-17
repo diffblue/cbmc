@@ -13,3 +13,23 @@ std::__detail::_Insert CRTP mixin; its odr-used member body is never
 instantiated ("no body for callee ..._Insert<...>::insert"), so insert
 is a no-op and count() is wrong.  Found dog-fooding
 src/util/find_symbols.cpp.  Flip to CORE when fixed.
+
+UPDATE 2026-07-17: three front-end defects in the chain are FIXED and
+the whole insert path now CONVERTS (no missing bodies, no incomplete
+warnings): (1) the deferred-member drain in instantiate_template used
+an unbounded rfind("::") to strip the "tag-" marker, landing inside
+template ARGUMENTS for _Insert<..., _Hashtable_traits<0,1,1>, 1> and
+missing every deferred member (cpp11_unordered_set_insert's original
+"no body"); (2) derived-to-PRIVATE-base conversion in a FRIEND of the
+derived class was rejected ([class.access.base]/4-5; test
+cpp98_friend_private_base_conversion) -- _AllocNode(_Hashtable&
+-> _Hashtable_alloc&) failed and _Insert::insert's body was dropped;
+(3) an if-condition declaration's name leaked into the enclosing block
+([stmt.pre]/6; test cpp98_condition_decl_scope) -- _M_insert_unique's
+`__node` redeclaration failed conversion.  RESIDUAL: with everything
+converting, the bucket-chain walk in _M_find_before_node does not
+terminate within --unwind 30 (unwinding assertion fires; garbage node
+pointers in the trace), so count() still returns wrong values --
+suspect one more defect in the insert-side bucket linking
+(_M_insert_unique_node / _M_insert_bucket_begin) or in the
+single-bucket small-table mode.  Needs isolation.
