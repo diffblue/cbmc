@@ -3201,3 +3201,32 @@ cpp_typecheck_stdlib.cpp (like tree.cc): _M_next_bkt >= max(n,13) +
 _M_next_resize bookkeeping; _M_need_rehash compares against
 _M_next_resize.  Functional semantics don't depend on the exact count.
 Suite green 93 skipped.
+
+## rehash models + requires fix (2026-07-17 late)
+
+1. cpp11_unordered_set_insert FIXED -> CORE (insert/dup/count/erase
+verify UNBOUNDED in ~1.5s!).  Three more layers: (a) models for
+compiled-library _Prime_rehash_policy::_M_next_bkt (max(n,13), mutable
+_M_next_resize) + _M_need_rehash (load-factor-1 doubling) --
+[unord.req] bucket count is performance-only; (b) deferred_typechecking
+erase on SUCCESSFUL body conversion (out-of-line members re-enter the
+set at declarator conversion; clean_up nil'd CONVERTED bodies --
+_M_deallocate_node_ptr); (c) [expr.prim.id.dtor]/1 +
+[basic.lookup.qual]/6 dtor-via-TYPEDEF-name (`__n->~__node_type()`):
+sub-resolver in object's class scope then postfix-expression context
+(access_judgment_scope, set by typecheck_expr_member).  DEBUG WIN: the
+blanket line-tagged throw-0 probe found the silent failure in minutes.
+2. cpp20_requires_class_param_atom FIXED -> CORE:
+[temp.constr.decl]/3 -- map the enclosing class instance's
+ID_C_template/ID_C_template_arguments into the satisfaction check's
+name substitution (member params shadow, [temp.local]).  libstdc++
+pair still KNOWNBUG: atoms are consteval static member CALLS -- fold
+returns unknown (next lead: instantiate _S_constructible with class+
+member args).
+3. cpp17_member_template_completed_instance NOT fixed; diagnosis
+sharpened: the primary's class-BODY scope doesn't exist either (BFS
+proved it); member class templates get scope entries only when USED
+during an instance's own instantiation.  REAL FIX: register member
+class-template declarations at instance-body conversion (mirror the
+template_methods walk's registration of member FUNCTION templates).
+Suite green 91 skipped.
