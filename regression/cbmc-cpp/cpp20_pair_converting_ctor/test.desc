@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ first is y: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second is null: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: C++20 libstdc++ pair's requires-clause + explicit(bool)
+converting constructor pair(U1&&, U2&&) is instantiated WITHOUT a body
+(constexpr/macro-flagged symbol, nil value, never queued deferred);
+symex havocs the call, so both members are garbage.  --cpp17 works
+(enable_if-based pair).  Root blocker for cpp20_map_basic
+(_M_get_insert_unique_pos's _Res(__y, 0)).  Flip to CORE when fixed.
