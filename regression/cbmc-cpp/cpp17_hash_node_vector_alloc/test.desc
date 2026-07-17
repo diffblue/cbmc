@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ vector element after hash-node rebind: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: instantiating unordered_set<K>::insert first (materializing
+allocator<_Hash_node<K,..>> rebinds) makes the LATER vector<K>
+instantiation fail to resolve _Vector_base's _Tp_alloc_type/pointer
+("symbol '_Tp_alloc_type' is unknown") -- vector machinery left
+incomplete, v[0] reads garbage.  vector-first order works.  Found
+dog-fooding src/util/find_symbols.cpp (unordered_set<irep_idt> +
+std::vector<irep_idt>).  Flip to CORE when fixed.
