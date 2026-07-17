@@ -26,6 +26,7 @@
 
 #include <stack>
 #include <unordered_set>
+#include <vector>
 
 /// Issues a command to the solving process which is expected to optionally
 /// return a success status followed by the actual response of interest.
@@ -706,18 +707,34 @@ lookup_decision_procedure_result(
 void smt2_incremental_decision_proceduret::define_object_properties()
 {
   object_properties_defined.resize(object_map.size());
+  // The object map is an unordered map, whose iteration order depends on the
+  // hash values of the object base expressions. These hashes may differ
+  // across platforms and toolchains, for example when the signedness of
+  // `char` differs. Establish a deterministic ordering based on the objects'
+  // unique identifiers before emitting the definitions, so that the solver
+  // receives them in a stable order. The unique identifiers are dense in
+  // [0, object_map.size()), as assigned by track_expression_objects.
+  std::vector<const decision_procedure_objectt *> objects(
+    object_map.size(), nullptr);
   for(const auto &key_value : object_map)
   {
-    const decision_procedure_objectt &object = key_value.second;
-    if(object_properties_defined[object.unique_id])
+    const std::size_t unique_id = key_value.second.unique_id;
+    INVARIANT(
+      unique_id < objects.size() && objects[unique_id] == nullptr,
+      "object identifiers are unique and dense");
+    objects[unique_id] = &key_value.second;
+  }
+  for(const decision_procedure_objectt *object : objects)
+  {
+    if(object_properties_defined[object->unique_id])
       continue;
     else
-      object_properties_defined[object.unique_id] = true;
-    define_dependent_functions(object.size);
+      object_properties_defined[object->unique_id] = true;
+    define_dependent_functions(object->size);
     solver_process->send(object_size_function.make_definition(
-      object.unique_id, convert_expr_to_smt(object.size)));
+      object->unique_id, convert_expr_to_smt(object->size)));
     solver_process->send(is_dynamic_object_function.make_definition(
-      object.unique_id, object.is_dynamic));
+      object->unique_id, object->is_dynamic));
   }
 }
 

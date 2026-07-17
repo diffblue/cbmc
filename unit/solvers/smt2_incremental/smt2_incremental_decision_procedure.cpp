@@ -32,6 +32,7 @@
 #include <goto-symex/path_storage.h>
 #include <solvers/smt2_incremental/smt_to_smt2_string.h>
 
+#include <algorithm>
 #include <deque>
 
 class analysis_execption_with_messaget
@@ -480,22 +481,12 @@ TEST_CASE(
     std::vector<smt_commandt> expected_commands{
       smt_declare_function_commandt{foo_term, {}},
       smt_assert_commandt{smt_core_theoryt::equal(foo_term, term_42)},
-      invalid_pointer_object_size_definition,
       null_object_size_definition,
       null_object_dynamic_definition,
+      invalid_pointer_object_size_definition,
       invalid_pointer_object_dynamic_definition,
       smt_check_sat_commandt{}};
-    REQUIRE(
-      (test.sent_commands.size() == expected_commands.size() &&
-       std::all_of(
-         expected_commands.begin(),
-         expected_commands.end(),
-         [&](const smt_commandt &command) -> bool {
-           return std::find(
-                    test.sent_commands.begin(),
-                    test.sent_commands.end(),
-                    command) != test.sent_commands.end();
-         })));
+    REQUIRE(test.sent_commands == expected_commands);
     SECTION("Get \"foo\" value back")
     {
       test.sent_commands.clear();
@@ -728,6 +719,58 @@ TEST_CASE(
     smt_assert_commandt{
       smt_core_theoryt::equal(expected_fish, expected_chips)}};
   REQUIRE(test.sent_commands == expected_commands);
+}
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret defines object properties in order "
+  "of object identifiers.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  // Objects of distinct sizes, so that their definitions can be told apart.
+  const symbolt a = make_test_symbol("a", signedbv_typet{8});
+  const symbolt b = make_test_symbol("b", signedbv_typet{16});
+  const symbolt c = make_test_symbol("c", signedbv_typet{32});
+  const pointer_typet pointer_type{signedbv_typet{8}, 32};
+  const auto address = [&](const symbolt &symbol)
+  {
+    return typecast_exprt::conditional_cast(
+      address_of_exprt{symbol.symbol_expr()}, pointer_type);
+  };
+  test.procedure.set_to(
+    or_exprt{
+      equal_exprt{address(a), address(b)}, equal_exprt{address(b), address(c)}},
+    false);
+  test.sent_commands.clear();
+  test.mock_responses.push_back(smt_check_sat_responset{smt_sat_responset{}});
+  test.procedure();
+
+  // Following the null and invalid-pointer objects (identifiers 0 and 1), the
+  // objects are identified in the (deterministic) order in which object
+  // tracking encounters them, which is c, b, a for this expression. Their
+  // properties must be defined in the order of their identifiers,
+  // irrespective of the hash values of the objects' base expressions.
+  std::vector<smt_commandt> expected_definitions;
+  const std::vector<std::size_t> object_sizes{0, 0, 4, 2, 1};
+  for(std::size_t id = 0; id < object_sizes.size(); ++id)
+  {
+    expected_definitions.push_back(test.object_size_function.make_definition(
+      id, smt_bit_vector_constant_termt{object_sizes[id], 32}));
+    expected_definitions.push_back(
+      test.is_dynamic_object_function.make_definition(id, false));
+  }
+  std::vector<smt_commandt> sent_definitions;
+  for(const auto &command : test.sent_commands)
+  {
+    if(
+      std::find(
+        expected_definitions.begin(), expected_definitions.end(), command) !=
+      expected_definitions.end())
+    {
+      sent_definitions.push_back(command);
+    }
+  }
+  REQUIRE(sent_definitions == expected_definitions);
 }
 
 TEST_CASE(
