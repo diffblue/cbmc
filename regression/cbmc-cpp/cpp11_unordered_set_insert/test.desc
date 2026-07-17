@@ -26,10 +26,18 @@ cpp98_friend_private_base_conversion) -- _AllocNode(_Hashtable&
 -> _Hashtable_alloc&) failed and _Insert::insert's body was dropped;
 (3) an if-condition declaration's name leaked into the enclosing block
 ([stmt.pre]/6; test cpp98_condition_decl_scope) -- _M_insert_unique's
-`__node` redeclaration failed conversion.  RESIDUAL: with everything
-converting, the bucket-chain walk in _M_find_before_node does not
-terminate within --unwind 30 (unwinding assertion fires; garbage node
-pointers in the trace), so count() still returns wrong values --
-suspect one more defect in the insert-side bucket linking
-(_M_insert_unique_node / _M_insert_bucket_begin) or in the
-single-bucket small-table mode.  Needs isolation.
+`__node` redeclaration failed conversion.  RESIDUAL (isolated 2026-07-17
+evening): NOT a further front-end defect -- the divergence is caused by
+std::__detail::_Prime_rehash_policy::_M_need_rehash and _M_next_bkt,
+which are declared in <bits/hashtable_policy.h> but DEFINED in
+libstdc++'s COMPILED src/c++11/hashtable_c++0x.cc: CBMC havocs them (61
+no-body hits in the --unwind 30 trace).  The havoc'd _M_need_rehash
+returns {true, nondet}, _M_rehash then installs a GARBAGE
+_M_bucket_count (trace: 10376293541461622792) and a matching-size
+bucket array, and every subsequent bucket walk chases nondet pointers
+(_M_find_before_node unwinding assertion).  Same compiled-library
+modeling gap as the _Rb_tree entry points (tree.cc), which are already
+modelled in cpp_typecheck_stdlib.cpp.  FIX: model both functions there
+-- functional correctness does not depend on the bucket count, so
+_M_next_bkt may return max(n, 13) and set _M_next_resize accordingly;
+_M_need_rehash compares element count against _M_next_resize.
