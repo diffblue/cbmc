@@ -3060,3 +3060,32 @@ lighter regex/locale model or aggressive slicing before symex
 Summary: three DIFFERENT dominating stages -- encoding (bigint),
 symex+encoding (map), symex/program-size (regex).  None is a front-end
 defect; all are verification-performance items.
+
+## widened dog-fooding + unit proofs round 2 (2026-07-17)
+
+Dog-food batches 1-5 (mp_arith, source_location, message, format_type,
+byte_operators, pointer_offset_size, goto_program, goto_function,
+remove_returns, json_parser, cmdline, options, expr_util, rename,
+replace_expr, replace_symbol, prefix_filter, piped_process, lispexpr,
+lispirep, string2int, string_container, show_goto_functions, json, xml,
+format_number_range): ALL CLEAN except:
+- find_symbols.cpp -> cpp17_hash_node_vector_alloc KNOWNBUG (hash-node
+  allocator rebind poisons later vector<K> instantiation, order-dep;
+  minimized) + cpp11_unordered_set_insert KNOWNBUG (_Insert CRTP mixin
+  member body never instantiated -- 'no body', count wrong; minimized
+  to unordered_set<int> --cpp11).  Fix leads: deferred-method-body
+  instantiation for mixin bases (same family as
+  convert_deferred_method_now), template-map contamination.
+- goto_trace.cpp + initialize_goto_model.cpp: 'missing type in template
+  argument' at optional:754 (converting-ctor _Requires SFINAE with
+  defaulted _Up=_Tp) -- NOT yet minimized (simple optional<string>
+  probes pass); also graph.h output_dot_generic no-match.  OPEN leads.
+
+Unit proofs: capitalize CORE GREEN (34s; size/first-char/tail/
+idempotence over printable len<=3).  escape KNOWNBUG: solver OOM 16GiB
+-- `result += c` = data-dependent heap reallocation = the symbolic-size
+dynamic-object bit-blasting blow-up (bigint class).  LESSON: harness
+tractability heuristic -- single-allocation transforms (capitalize,
+strip_string via substr) verify; incremental-append transforms (escape,
+BigInt digits) hit the encoder wall.  Suite green 90 skipped;
+unit-proofs 3 CORE green + 2 KNOWNBUG.
