@@ -351,7 +351,25 @@ symbolt &cpp_declarator_convertert::convert(
       symbol.is_extern = false;
 
     // initializer?
-    handle_initializer(symbol, declarator);
+    // N5008 [class.access.general]/7: an out-of-class definition of a
+    // member (reached here through its qualified name) is considered
+    // part of the class for access purposes -- a static data member's
+    // INITIALIZER may use the class's private members, including a
+    // private constructor (goto_trace.h's
+    // trace_optionst::default_options).  resolve_scope entered the
+    // member's class earlier but the scope was restored; re-enter it
+    // around the initializer's type-checking so accessibility is
+    // judged from within the class.
+    if(
+      scope != nullptr && scope->id_class == cpp_idt::id_classt::CLASS &&
+      declarator.name().is_qualified())
+    {
+      cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+      cpp_typecheck.cpp_scopes.go_to(*scope);
+      handle_initializer(symbol, declarator);
+    }
+    else
+      handle_initializer(symbol, declarator);
 
     return symbol;
   }

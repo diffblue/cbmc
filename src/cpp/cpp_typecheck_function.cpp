@@ -23,9 +23,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_template_type.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
-
-#include <cstdio>
-#include <cstdlib>
 #include <functional>
 #include <optional>
 #include <set>
@@ -782,14 +779,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   std::optional<sfinae_contextt> syshdr_guard;
   if(is_system_header_body)
     syshdr_guard.emplace(*this);
-  // TEMPORARY DEBUG
-  if(
-    getenv("CBMC_DBG") &&
-    id2string(symbol.name).find("_M_insert_unique<") != std::string::npos)
-  {
-    fprintf(stderr, "MIU-CONVERT attempt\n");
-    syshdr_guard.reset();
-  }
 
   // N5008 [stmt.label]/1: labels have function scope -- a label name may
   // be reused in different functions.  The C type checker resets these
