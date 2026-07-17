@@ -3028,3 +3028,35 @@ Chained front-end defects unearthed (each needed for strings by value):
 Debug lesson: trace `t.p=tmp_obj!...` pointers name the DEAD SOURCE
 object; --show-goto-functions on make() exposed the ASSIGN hops
 immediately.  Value-category bugs manifest as WRONG CTOR SELECTION.
+
+## stage profiling of the scaling-bound tests (2026-07-17)
+
+Method: timestamped phase lines (awk) + 2s RSS sampler; 16GiB cap.
+
+1. bigint_arith (unit proof): front end+goto 1s, symex 1s (9635 SSA
+steps, 1787 VCCs) -> **propositional reduction OOM** (14GiB @ ~86s).
+--refine and --property single-assertion do NOT help (base constraint
+encoding blows, not the property set).  Culprit: 17955 byte_extracts
+over HEAP DIGIT ARRAYS (BigInt::digit_add/digit_sub/adjust_size SSA
+dominate the equation); dynamic objects with symbolic size flatten
+catastrophically.  UNBLOCK IDEAS: fixed-capacity BigInt model for
+harnesses, or constrain allocation sizes concretely in the harness
+(force adjust_size to a constant), or SMT array theory backend.
+
+2. cpp20_map_basic: front end 5s (16k goto instructions, ~400 fns).
+Unbounded: symex runs >15min (2.2GiB, time-bound).  --unwind 6: symex
+OOM 16GiB @ ~460s.  --unwind 5 (minimum sound for the R-B tree loops;
+unwind<=4 gives spurious FAILURE): symex 33s -> **propositional
+reduction >15min no verdict** (~8GiB, stable).  So: symex-heavy AND
+encoding/solver-bound at the sound unwind.  Twin bottleneck.
+
+3. cpp11_regex_match: **program-size-driven**: 358k goto instructions,
+4233 functions (<regex> fully instantiated).  Front end 28s,
+function-pointer removal 76s, then symex grinds >18min @ 5.5GiB without
+reaching the solver.  Symex-bound via sheer program size; needs a
+lighter regex/locale model or aggressive slicing before symex
+(--drop-unused-functions? reachability slice) to have any chance.
+
+Summary: three DIFFERENT dominating stages -- encoding (bigint),
+symex+encoding (map), symex/program-size (regex).  None is a front-end
+defect; all are verification-performance items.
