@@ -26,3 +26,13 @@ remain nondet.  Next step: surface that conversion error (disable the
 syshdr guard for this symbol under a debugger) and fix the body-side
 defect -- likely in the explicit(bool) handling or the mem-initializer
 forwarding (first(std::forward<_U1>(__x))).
+
+UPDATE 2026-07-17 late: direct class-parameter atoms are fixed
+(cpp20_requires_class_param_atom is CORE), but libstdc++'s pair guards
+its converting constructor with `requires(_S_constructible<_U1,_U2>())`
+-- a CALL to a consteval static member whose BODY references the class
+parameters.  The call-atom constant-fold still returns "unknown" for it
+(the static member's body needs the class template map when type-checked
+from the satisfaction context), so the unviable candidate survives.
+Remaining lead: make the call-atom fold instantiate/evaluate
+_S_constructible with both the member's and the class's arguments.

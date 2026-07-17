@@ -19,3 +19,16 @@ __uset_hashtable and the hash<vector> partial-spec declaration -- each
 part is needed for the instantiation order.  Front-end recovery
 currently keeps verification green, so the FORBIDDEN pattern is what
 makes this fail today.  Flip to CORE when the lookup is fixed.
+
+DIAGNOSIS SHARPENED 2026-07-17 (fix attempt): the primary-template-
+scope fallback for `T::template rebind<args>` ([temp.names]/3) is NOT
+sufficient because the primary template's class-BODY scope does not
+exist either -- scope-tree BFS from the primary's template scope finds
+only the instance scope (empty) and the template-argument sub-scope.
+Member class templates only obtain scope entries when they are USED
+during some instance's own instantiation.  The real fix is to REGISTER
+member class-template declarations in the instance scope when a class
+template instance's body is converted (instantiate_template /
+typecheck_compound_body), mirroring what the template_methods walk
+already does for member FUNCTION templates ("register in the
+instantiated class scope so overload resolution can find it").
