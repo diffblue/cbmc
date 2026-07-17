@@ -4068,12 +4068,22 @@ skip_pack_removal_ft:
       // class name in the symbol-table id of a class-template
       // instantiation.  The id has the form
       //   `[ns1::...::nsN::]tag-Name<args>`,
-      // so the `tag-` token sits after the last `::`, not at
-      // position 0.  The deferred method ids are stored without
-      // the `tag-` token (e.g. `ns::Name<args>::method(this)`),
-      // so we need a class_name in the same shape for the
-      // substring match below to succeed.
-      auto last_sep = class_name.rfind("::");
+      // so the `tag-` token sits after the last `::` PRECEDING the
+      // template-argument list -- `args` may themselves contain `::`
+      // (e.g. `std::__detail::tag-_Hashtable_traits<0,1,1>` inside
+      // `_Insert<...>`), so an unbounded rfind("::") would land inside
+      // an argument, the wrong (or no) `tag-` would be stripped, and
+      // the substring match below would MISS every deferred member:
+      // the instance's inline member bodies would then be nil'd by
+      // clean_up and calls to them havoc'd (unordered_set::insert was
+      // a no-op).  Same shape as queue_deferred_methods_of_instance.
+      // The deferred method ids are stored without the `tag-` token
+      // (e.g. `ns::Name<args>::method(this)`), so we need a class_name
+      // in the same shape for the substring match below to succeed.
+      std::size_t lt_pos = class_name.find('<');
+      std::size_t search_end =
+        lt_pos == std::string::npos ? std::string::npos : lt_pos;
+      auto last_sep = class_name.rfind("::", search_end);
       std::size_t tag_pos = last_sep != std::string::npos ? last_sep + 2 : 0;
       if(class_name.compare(tag_pos, 4, "tag-") == 0)
         class_name.erase(tag_pos, 4);

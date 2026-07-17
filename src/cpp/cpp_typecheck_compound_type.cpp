@@ -3834,6 +3834,57 @@ bool cpp_typecheckt::base_publicly_accessible(
     }
   }
 
+  // N5008 [class.access.base]/4-5: a base class B of N is accessible at R
+  // if (among others) R occurs in a member or FRIEND of class N -- the
+  // access of the base-specifier then does not matter, exactly as a
+  // private member would be nameable there.  libstdc++'s _Hashtable
+  // derives PRIVATELY from _Hashtable_alloc and befriends its _Insert /
+  // _Insert_base mixins, whose members convert __hashtable& to
+  // _Hashtable_alloc& when constructing an _AllocNode; without this rule
+  // the conversion is rejected and the mixin member's body is dropped.
+  {
+    const irept::subt &friends = from.find(ID_C_friends).get_sub();
+    for(const auto &friend_symb : friends)
+    {
+      const auto friend_scope_it =
+        cpp_scopes.id_map.find(friend_symb.get(ID_identifier));
+      const std::string friend_id = id2string(
+        friend_scope_it != cpp_scopes.id_map.end()
+          ? friend_scope_it->second->identifier
+          : friend_symb.get(ID_identifier));
+      // Walk both the current scope chain and the recorded point of
+      // use ([class.access]): overload resolution judges argument
+      // conversions with the current scope moved into the candidate's
+      // class, so the caller's (possibly friend) context is only
+      // available through access_judgment_scope.
+      cpp_scopet *chains[2] = {
+        cpp_scopes.current_scope_ptr, access_judgment_scope};
+      for(cpp_scopet *chain_start : chains)
+      {
+        if(chain_start == nullptr)
+          continue;
+        for(cpp_scopet *pscope = chain_start; !pscope->is_root_scope();
+            pscope = &pscope->get_parent())
+        {
+          const std::string scope_id = id2string(pscope->identifier);
+          if(scope_id == friend_id)
+            return true;
+          // A friend declared as a class template befriends every
+          // instantiation ([temp.friend]); the friend scope points to
+          // the template ("...tag-B"), the current scope to an instance
+          // ("...tag-B<int>").
+          if(
+            scope_id.size() > friend_id.size() &&
+            scope_id.compare(0, friend_id.size(), friend_id) == 0 &&
+            scope_id[friend_id.size()] == '<')
+          {
+            return true;
+          }
+        }
+      }
+    }
+  }
+
   // Walk the inheritance chain checking that all bases are public.
   for(const auto &b : from.bases())
   {
