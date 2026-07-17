@@ -1910,815 +1910,837 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // we first do everything _but_ the constructors
 
   Forall_operands(it, body)
-  {
-    if(it->id() == ID_cpp_declaration)
+  { // N5008 [temp.inst]/11 (and the same pragmatic tolerance the
+    // member-template branch below and the system-header body leniency
+    // already apply): during implicit instantiation of a class
+    // template, failure to process ONE member must not abort the
+    // remaining members.  Previously a mid-body throw (e.g. a
+    // qualified typedef-name member the front end cannot yet resolve)
+    // silently dropped every subsequent member -- including member
+    // class templates, whose absence from the instance scope later
+    // surfaced as a bogus program-wide "template scope '...' is
+    // ambiguous".  User code (empty instantiation stack) keeps strict
+    // error propagation.
+    const std::size_t member_errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    try
     {
-      cpp_declarationt &declaration = to_cpp_declaration(*it);
-
-      if(declaration.member_spec().is_friend())
+      if(it->id() == ID_cpp_declaration)
       {
-        typecheck_friend_declaration(symbol, declaration);
-        continue; // done
-      }
+        cpp_declarationt &declaration = to_cpp_declaration(*it);
 
-      if(declaration.is_template())
-      {
-        if(declaration.is_constructor())
+        if(declaration.member_spec().is_friend())
         {
-          found_ctor = true;
-          // Mark the struct as having a constructor so cpp_is_pod
-          // returns false even though the constructor is a template
-          // and not stored as a regular component.
-          symbol.type.set("has_template_constructor", true);
+          typecheck_friend_declaration(symbol, declaration);
+          continue; // done
         }
-        else if(declaration.type().id() == "cpp-cast-operator")
+
+        if(declaration.is_template())
         {
-          // Phase 4B target-type-threading: mark classes with
-          // template conversion operators so
-          // `user_defined_conversion_sequence` can find them when
-          // looking for [temp.deduct.conv]/1 candidates.  Mirrors
-          // `has_template_constructor` above.
-          symbol.type.set("has_template_conversion_operator", true);
-        }
-        // remember access mode
-        declaration.set(ID_C_access, access);
-        // Per [temp.inst]/11: failure to convert one template member
-        // during class instantiation should not abort processing of
-        // siblings.  Catch and continue.
-        if(!instantiation_stack.empty())
-        {
-          const std::size_t errors_before =
-            get_message_handler().get_message_count(messaget::M_ERROR);
-          try
+          if(declaration.is_constructor())
+          {
+            found_ctor = true;
+            // Mark the struct as having a constructor so cpp_is_pod
+            // returns false even though the constructor is a template
+            // and not stored as a regular component.
+            symbol.type.set("has_template_constructor", true);
+          }
+          else if(declaration.type().id() == "cpp-cast-operator")
+          {
+            // Phase 4B target-type-threading: mark classes with
+            // template conversion operators so
+            // `user_defined_conversion_sequence` can find them when
+            // looking for [temp.deduct.conv]/1 candidates.  Mirrors
+            // `has_template_constructor` above.
+            symbol.type.set("has_template_conversion_operator", true);
+          }
+          // remember access mode
+          declaration.set(ID_C_access, access);
+          // Per [temp.inst]/11: failure to convert one template member
+          // during class instantiation should not abort processing of
+          // siblings.  Catch and continue.
+          if(!instantiation_stack.empty())
+          {
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              convert_template_declaration(declaration);
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+            }
+          }
+          else
           {
             convert_template_declaration(declaration);
           }
-          catch(...)
-          {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-          }
-        }
-        else
-        {
-          convert_template_declaration(declaration);
-        }
-        continue;
-      }
-
-      if(declaration.type().id().empty())
-        continue;
-
-      bool is_typedef = declaration.is_typedef();
-
-      // is it tag-only?
-      if(
-        declaration.type().id() == ID_struct ||
-        declaration.type().id() == ID_union ||
-        declaration.type().id() == ID_c_enum)
-        if(declaration.declarators().empty())
-          declaration.type().set(ID_C_tag_only_declaration, true);
-
-      declaration.name_anon_struct_union();
-      // Per [class.mem]/4 and [temp.inst]/2: the type of a data
-      // member must be complete at the closing `}` of the class.
-      // If `typecheck_type` on the declaration's base type throws
-      // *during* class body processing, the remainder of the
-      // compound body loop is abandoned and the data member does
-      // not register in the class scope.  That in turn causes
-      // sibling method bodies to fail name lookup when
-      // `typecheck_method_bodies` runs later (the classic MSVC
-      // atomic_flag::_Storage failure: methods declared before the
-      // data member reference it; _Storage's type `atomic<long>`
-      // fails to typecheck; atomic_flag's class body is abandoned
-      // with _Storage unregistered; later test_and_set's body
-      // emits `symbol '_Storage' is unknown`).
-      //
-      // Narrow mitigation: when the type is specifically an
-      // unresolved class-template specialization (cpp_name with a
-      // template_args sub-element) inside a plain class body,
-      // catch the failure and keep the unresolved cpp_name so the
-      // declarator loop can still register the member by name.
-      // Method bodies that access the member get a resolvable
-      // identifier; only uses that require the concrete type fail.
-      bool type_is_tpl_cpp_name = false;
-      if(declaration.type().id() == ID_cpp_name)
-      {
-        for(const auto &sub : declaration.type().get_sub())
-          if(sub.id() == ID_template_args)
-          {
-            type_is_tpl_cpp_name = true;
-            break;
-          }
-      }
-      bool kept_unresolved_cpp_name = false;
-      if(instantiation_stack.empty() && type_is_tpl_cpp_name)
-      {
-        const std::size_t errors_before =
-          get_message_handler().get_message_count(messaget::M_ERROR);
-        typet saved_type = declaration.type();
-        try
-        {
-          typecheck_type(declaration.type());
-        }
-        catch(...)
-        {
-          get_message_handler().set_message_count(
-            messaget::M_ERROR, errors_before);
-          declaration.type() = saved_type; // keep unresolved cpp_name
-          kept_unresolved_cpp_name = true;
-        }
-      }
-      else if(!instantiation_stack.empty() && type_is_tpl_cpp_name)
-      {
-        // [temp.inst]/3 semantics applied to member-declaration
-        // elaboration: a class-template specialization's body may
-        // declare members whose type is a metafunction
-        // specialization over the class currently being elaborated
-        // (e.g. `common_type_t<duration>` in MSVC `<chrono>`'s
-        // duration, or `rebind<T>` inside an allocator).  Such
-        // self-references can only resolve after the enclosing
-        // class is fully elaborated; substitution now would either
-        // fail or recurse.
-        //
-        // Per [temp.inst]/3 "the implicit instantiation of a class
-        // template specialization causes the implicit instantiation
-        // of the declarations, but not of the definitions, of the
-        // non-deleted class member functions" — i.e. the standard
-        // already expects the compiler to be tolerant of incomplete
-        // member declarations during class-body elaboration.
-        //
-        // Detect the self-reference by scanning the member's type
-        // for any `cpp_name` whose base matches the current class's
-        // unqualified base name.  On failure, skip the declaration;
-        // a later re-elaboration pass picks it up once the
-        // dependent metafunction can resolve.  This generalizes the
-        // earlier duration-only mitigation (commit 2e8e74f8ed) to
-        // any class whose body contains self-referential metafunction
-        // specializations.
-        const std::string cur = id2string(symbol.name);
-        std::string cur_head = cur;
-        {
-          std::size_t lt = cur_head.find('<');
-          if(lt != std::string::npos)
-            cur_head = cur_head.substr(0, lt);
-        }
-        std::string cur_base = cur_head;
-        {
-          std::size_t pos = cur_head.rfind("::tag-");
-          if(pos != std::string::npos)
-            cur_base = cur_head.substr(pos + 6);
-          else
-          {
-            pos = cur_head.rfind("::");
-            if(pos != std::string::npos)
-              cur_base = cur_head.substr(pos + 2);
-          }
-        }
-        bool is_self_reference = false;
-        if(!cur_base.empty())
-        {
-          std::function<bool(const irept &)> ref_to_self;
-          ref_to_self = [&](const irept &t) -> bool
-          {
-            if(t.id() == ID_cpp_name)
-            {
-              const auto &s = t.get_sub();
-              if(!s.empty() && s.front().id() == ID_name)
-              {
-                const irep_idt &bn = s.front().get(ID_identifier);
-                if(!bn.empty() && id2string(bn) == cur_base)
-                  return true;
-              }
-            }
-            for(const auto &x : t.get_sub())
-              if(ref_to_self(x))
-                return true;
-            for(const auto &x : t.get_named_sub())
-              if(ref_to_self(x.second))
-                return true;
-            return false;
-          };
-          is_self_reference = ref_to_self(declaration.type());
-        }
-        if(is_self_reference)
-        {
-          // Per [temp.inst]/3 + [temp.deduct]/8: elaborate under a
-          // SFINAE immediate-context guard; on failure, skip the
-          // declaration and let a later pass retry.
-          const typet saved_self_ref_type = declaration.type();
-          try
-          {
-            sfinae_contextt sfinae_guard{*this};
-            typecheck_type(declaration.type());
-          }
-          catch(...)
-          {
-            // [temp.inst]/1-2 + [dcl.typedef]: a member typedef declares
-            // the member and forms the aliased type but does not require
-            // the aliased template's *definition* to be instantiated -- a
-            // typedef-name may denote an incomplete type.  When the alias
-            // is self-referential and cannot be eagerly instantiated while
-            // the enclosing class is still incomplete (e.g. libstdc++
-            // vector's `typedef __normal_iterator<const_pointer, vector>
-            // const_iterator;`), keep the unresolved alias so the typedef
-            // NAME is still declared (lazily) and sibling members that
-            // refer to it -- such as
-            // `typedef reverse_iterator<const_iterator>
-            // const_reverse_iterator;` -- resolve, rather than dropping it
-            // and producing a spurious "symbol 'const_iterator' is
-            // unknown".  Non-typedef self-references keep the previous
-            // skip-and-retry behaviour.
-            if(is_typedef)
-            {
-              declaration.type() = saved_self_ref_type;
-              kept_unresolved_cpp_name = true;
-            }
-            else
-              continue;
-          }
-        }
-        else if(is_typedef)
-        {
-          // Per [temp.inst]/1-2 and [dcl.typedef]: a member typedef
-          // aliasing a class-template-id (e.g.
-          // `typedef std::reverse_iterator<const_iterator>
-          //  const_reverse_iterator;` in libstdc++ `basic_string`)
-          // declares the member and forms the aliased type, but does
-          // not require that template's *definition* to be instantiated
-          // -- a typedef-name may denote an incomplete type.  Eagerly
-          // instantiating the definition here can throw (at C++20 the
-          // iterator-concept chain reached through `reverse_iterator`'s
-          // body does); an unguarded failure abandons the rest of the
-          // class body, dropping every later member including the
-          // constructors.  The class is then non-conformantly
-          // misclassified as a POD ([class.prop]: a class with
-          // user-declared constructors is not a POD), so e.g.
-          // `std::string s("ab")` is routed to a bogus `char[]` ->
-          // `basic_string` conversion instead of a constructor call.
-          //
-          // Recover by keeping the unresolved alias (a lazy typedef)
-          // rather than dropping it: a plain skip would leave later
-          // members that name the alias (e.g.
-          // `const_reverse_iterator rbegin() const;`) dangling and throw
-          // again, re-truncating the class.  Keeping the name lets the
-          // body -- and the constructors -- complete, so the class is
-          // conformantly non-POD with its full member set.  (The
-          // aliased template's definition is still instantiated later,
-          // on demand, when its completeness is actually required.)
-          const std::size_t errors_before =
-            get_message_handler().get_message_count(messaget::M_ERROR);
-          const typet saved_member_type = declaration.type();
-          try
-          {
-            typecheck_type(declaration.type());
-          }
-          catch(...)
-          {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-            declaration.type() = saved_member_type; // keep unresolved alias
-            kept_unresolved_cpp_name = true;
-          }
-        }
-        else
-        {
-          typecheck_type(declaration.type());
-        }
-      }
-      else
-      {
-        // Per N5008 [class.mem]/3 + [temp.inst]: the
-        // member-specification declares the full set of members of
-        // the class.  A failure to elaborate one member's type must
-        // not silently drop sibling member-declarations or
-        // access-specifiers from the class body.  If the type is an
-        // inline class/struct/union/enum definition (i.e., a nested
-        // type whose definition is given here) and its elaboration
-        // throws — typically because a base-class template
-        // specialization in the inline definition fails to
-        // instantiate against CBMC's libstdc++ model — the existing
-        // unprotected call below would propagate the throw out of
-        // the body loop, causing every subsequent member declaration
-        // (and `cpp-public`/`cpp-protected` access specifiers) to be
-        // silently abandoned.  The visible symptom is the classic
-        // `symbol 'message_handler' is unknown` failure on CBMC's
-        // own `messaget` class: its `class mstreamt : public
-        // std::ostringstream` inline definition's elaboration aborts
-        // the body loop, so every later `protected:` plus its data
-        // members get dropped from the class scope.  Method bodies
-        // that reference the dropped data members then fail name
-        // lookup at typecheck-method-bodies time.
-        //
-        // Wrap the elaboration in a try/catch, mirroring the
-        // existing `kept_unresolved_cpp_name` pattern above: reset
-        // the error count and `continue;` to the next body item.
-        // The nested type is unusable downstream — references to it
-        // fail at their use site — but the body loop completes,
-        // sibling members register, and access transitions are
-        // preserved.
-        //
-        // Apply the recovery only when this is a NESTED inline
-        // definition AND it has a base-clause.  Inline definitions
-        // without bases (`class X { /* ... */ };`) cannot trigger
-        // the libstdc++ instantiation-chain failure that motivates
-        // the recovery, and keeping the strict behaviour for them
-        // means that genuine member-elaboration errors in plain
-        // user code still surface clearly.  This pattern matches
-        // the libstdc++ recovery use case (a nested class derived
-        // from a template specialization whose model is incomplete)
-        // without relaxing diagnostics for ordinary class members.
-        bool inline_def_with_base = false;
-        if(
-          declaration.type().id() == ID_struct ||
-          declaration.type().id() == ID_union)
-        {
-          const irept &bases = declaration.type().find(ID_bases);
-          if(!bases.get_sub().empty())
-            inline_def_with_base = true;
-        }
-
-        if(instantiation_stack.empty() && inline_def_with_base)
-        {
-          const std::size_t errors_before =
-            get_message_handler().get_message_count(messaget::M_ERROR);
-          try
-          {
-            typecheck_type(declaration.type());
-          }
-          catch(...)
-          {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-            continue;
-          }
-        }
-        else if(
-          is_typedef && !instantiation_stack.empty() &&
-          !declaration.declarators().empty() &&
-          declaration.declarators().front().name().get_base_name() ==
-            "iterator_concept")
-        {
-          // Per [iterator.concepts.general] + [iterator.traits]: among an
-          // iterator type's member typedefs, the C++20 `iterator_concept`
-          // member is used *solely* for concept-based algorithm dispatch
-          // (ITER_CONCEPT); unlike the five required associated types
-          // (value_type, difference_type, pointer, reference,
-          // iterator_category) no member function or sibling member depends
-          // on it structurally.  In libstdc++ it is
-          //   using iterator_concept = std::__detail::__iter_concept<_Iterator>;
-          // a `merged_type` alias-template result, so the cpp_name
-          // self-reference recovery above does not apply to it.
-          //
-          // Per [temp.inst]/1-2 + [dcl.typedef]: this member typedef declares
-          // the member and forms the aliased type but does not require the
-          // aliased template's *definition* to be instantiated; a typedef-name
-          // may denote an incomplete type.  While the enclosing iterator
-          // instance is still being completed, evaluating __iter_concept
-          // reaches back through this very (incomplete) iterator via the
-          // iterator-concept machinery and throws.  An unguarded failure here
-          // would abandon the rest of the class body, dropping every later
-          // member including the member *functions* (operator*, base,
-          // operator++, ...) and leaving the instance complete-looking but
-          // method-less, so a later odr-use of a method finds "no body".
-          // Keep this one inert concept-dispatch alias lazy and continue, so
-          // the sibling methods register; its definition is instantiated
-          // later, on demand, when its completeness is actually required.
-          //
-          // This recovery is deliberately limited to `iterator_concept`: a
-          // failure to form one of the *required* associated-type typedefs
-          // signals that the instance genuinely cannot be completed yet, and
-          // keeping such a type lazy would mis-instantiate the methods and
-          // constructors that depend on it (observed on std::span, whose
-          // iterator's required typedefs fail at this point) -- those retain
-          // the strict abandon-and-retry behaviour.
-          const std::size_t errors_before =
-            get_message_handler().get_message_count(messaget::M_ERROR);
-          const typet saved_member_type = declaration.type();
-          try
-          {
-            typecheck_type(declaration.type());
-          }
-          catch(...)
-          {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-            declaration.type() = saved_member_type; // keep unresolved alias
-            kept_unresolved_cpp_name = true;
-          }
-        }
-        else
-        {
-          typecheck_type(declaration.type());
-        }
-      }
-      bool is_static = declaration.storage_spec().is_static();
-      bool is_mutable = declaration.storage_spec().is_mutable();
-
-      if(
-        declaration.storage_spec().is_extern() ||
-        declaration.storage_spec().is_register())
-      {
-        error().source_location = declaration.storage_spec().location();
-        error() << "invalid storage class specified for field" << eom;
-        throw 0;
-      }
-
-      // In C++11, 'auto' in a class member declaration indicates a
-      // trailing return type (auto f() -> T). The parser stores this
-      // in the storage spec. Only reject 'auto' when there are no
-      // declarators (i.e., it's not a function declaration).
-      if(
-        declaration.storage_spec().is_auto() &&
-        declaration.declarators().empty())
-      {
-        error().source_location = declaration.storage_spec().location();
-        error() << "invalid storage class specified for field" << eom;
-        throw 0;
-      }
-
-      // anonymous member?
-      if(
-        declaration.declarators().empty() &&
-        ((declaration.type().id() == ID_struct_tag &&
-          follow_tag(to_struct_tag_type(declaration.type()))
-            .get_bool(ID_C_is_anonymous)) ||
-         (declaration.type().id() == ID_union_tag &&
-          follow_tag(to_union_tag_type(declaration.type()))
-            .get_bool(ID_C_is_anonymous)) ||
-         declaration.type().get_bool(ID_C_is_anonymous)))
-      {
-        // we only allow this on struct/union types
-        if(
-          declaration.type().id() != ID_union_tag &&
-          declaration.type().id() != ID_struct_tag)
-        {
-          error().source_location = declaration.type().source_location();
-          error() << "member declaration does not declare anything" << eom;
-          throw 0;
-        }
-
-        convert_anon_struct_union_member(declaration, access, components);
-
-        continue;
-      }
-
-      // declarators
-      for(auto &declarator : declaration.declarators())
-      {
-        // Skip the constructors until all the data members
-        // are discovered
-        if(declaration.is_destructor())
-          found_dtor = true;
-
-        if(declaration.is_constructor())
-        {
-          found_ctor = true;
-          // [class.default.ctor]/1, [class.inhctor.init]: track whether the
-          // class declares its *own* default constructor (no declared
-          // parameters, or all parameters defaulted).  Used below to decide
-          // whether an inherited base default constructor makes the class
-          // default-constructible.
-          bool all_defaulted = true;
-          for(const auto &p : declarator.type().find(ID_parameters).get_sub())
-          {
-            if(p.find(ID_value).is_nil())
-            {
-              all_defaulted = false;
-              break;
-            }
-          }
-          if(all_defaulted)
-            found_own_default_ctor = true;
           continue;
         }
 
-        // Per [temp.res] and [temp.inst]/11: type-checking a member
-        // declaration during class template instantiation may fail
-        // because a dependent name cannot be resolved in the current
-        // instantiation context (for example
-        //   typedef typename __alloc_traits::pointer pointer;
-        // when __alloc_traits itself requires further instantiation).
-        // The failure is local to the member being processed; letting
-        // sibling members continue lets the class scope accumulate
-        // the typedefs/members that do not depend on the failing one.
-        if(!instantiation_stack.empty())
+        if(declaration.type().id().empty())
+          continue;
+
+        bool is_typedef = declaration.is_typedef();
+
+        // is it tag-only?
+        if(
+          declaration.type().id() == ID_struct ||
+          declaration.type().id() == ID_union ||
+          declaration.type().id() == ID_c_enum)
+          if(declaration.declarators().empty())
+            declaration.type().set(ID_C_tag_only_declaration, true);
+
+        declaration.name_anon_struct_union();
+        // Per [class.mem]/4 and [temp.inst]/2: the type of a data
+        // member must be complete at the closing `}` of the class.
+        // If `typecheck_type` on the declaration's base type throws
+        // *during* class body processing, the remainder of the
+        // compound body loop is abandoned and the data member does
+        // not register in the class scope.  That in turn causes
+        // sibling method bodies to fail name lookup when
+        // `typecheck_method_bodies` runs later (the classic MSVC
+        // atomic_flag::_Storage failure: methods declared before the
+        // data member reference it; _Storage's type `atomic<long>`
+        // fails to typecheck; atomic_flag's class body is abandoned
+        // with _Storage unregistered; later test_and_set's body
+        // emits `symbol '_Storage' is unknown`).
+        //
+        // Narrow mitigation: when the type is specifically an
+        // unresolved class-template specialization (cpp_name with a
+        // template_args sub-element) inside a plain class body,
+        // catch the failure and keep the unresolved cpp_name so the
+        // declarator loop can still register the member by name.
+        // Method bodies that access the member get a resolvable
+        // identifier; only uses that require the concrete type fail.
+        bool type_is_tpl_cpp_name = false;
+        if(declaration.type().id() == ID_cpp_name)
+        {
+          for(const auto &sub : declaration.type().get_sub())
+            if(sub.id() == ID_template_args)
+            {
+              type_is_tpl_cpp_name = true;
+              break;
+            }
+        }
+        bool kept_unresolved_cpp_name = false;
+        if(instantiation_stack.empty() && type_is_tpl_cpp_name)
         {
           const std::size_t errors_before =
             get_message_handler().get_message_count(messaget::M_ERROR);
+          typet saved_type = declaration.type();
           try
           {
-            typecheck_compound_declarator(
-              symbol,
-              declaration,
-              declarator,
-              components,
-              access,
-              is_static,
-              is_typedef,
-              is_mutable);
+            typecheck_type(declaration.type());
           }
           catch(...)
           {
             get_message_handler().set_message_count(
               messaget::M_ERROR, errors_before);
+            declaration.type() = saved_type; // keep unresolved cpp_name
+            kept_unresolved_cpp_name = true;
           }
         }
-        else if(kept_unresolved_cpp_name)
+        else if(!instantiation_stack.empty() && type_is_tpl_cpp_name)
         {
-          // Phase 3 narrow producer per N5008 [temp.inst]/3.1.  The
-          // existing `kept_unresolved_cpp_name` mitigation upstream
-          // preserved the unresolved cpp_name on the declaration so
-          // a non-typedef data-member declarator can still register.
-          // Below we handle the additional case where
-          // `typecheck_compound_declarator` *itself* fails — most
-          // commonly on a `typedef T name;` form whose aliased
-          // template type cannot be eagerly instantiated.  Without
-          // recovery, the throw escapes `typecheck_compound_body`
-          // and abandons the entire class scope, preventing sibling
-          // members and methods from registering even when they
-          // don't depend on the failing typedef.  Instead we register
-          // the typedef lazily: a typedef symbol with the unresolved
-          // cpp_name as its alias type, marked `ID_C_lazy_member_type`,
-          // and put into the class scope.  Lookups of the typedef
-          // succeed structurally; uses that need the resolved
-          // template instantiation still fail but only at the use
-          // site, with a localized diagnostic.
-          const std::size_t errors_before =
-            get_message_handler().get_message_count(messaget::M_ERROR);
-          try
+          // [temp.inst]/3 semantics applied to member-declaration
+          // elaboration: a class-template specialization's body may
+          // declare members whose type is a metafunction
+          // specialization over the class currently being elaborated
+          // (e.g. `common_type_t<duration>` in MSVC `<chrono>`'s
+          // duration, or `rebind<T>` inside an allocator).  Such
+          // self-references can only resolve after the enclosing
+          // class is fully elaborated; substitution now would either
+          // fail or recurse.
+          //
+          // Per [temp.inst]/3 "the implicit instantiation of a class
+          // template specialization causes the implicit instantiation
+          // of the declarations, but not of the definitions, of the
+          // non-deleted class member functions" — i.e. the standard
+          // already expects the compiler to be tolerant of incomplete
+          // member declarations during class-body elaboration.
+          //
+          // Detect the self-reference by scanning the member's type
+          // for any `cpp_name` whose base matches the current class's
+          // unqualified base name.  On failure, skip the declaration;
+          // a later re-elaboration pass picks it up once the
+          // dependent metafunction can resolve.  This generalizes the
+          // earlier duration-only mitigation (commit 2e8e74f8ed) to
+          // any class whose body contains self-referential metafunction
+          // specializations.
+          const std::string cur = id2string(symbol.name);
+          std::string cur_head = cur;
           {
-            typecheck_compound_declarator(
-              symbol,
-              declaration,
-              declarator,
-              components,
-              access,
-              is_static,
-              is_typedef,
-              is_mutable);
+            std::size_t lt = cur_head.find('<');
+            if(lt != std::string::npos)
+              cur_head = cur_head.substr(0, lt);
           }
-          catch(...)
+          std::string cur_base = cur_head;
           {
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-            const auto &name_sub = declarator.name().get_sub();
-            if(name_sub.empty())
-              throw;
-            const irep_idt base_name = name_sub.front().get(ID_identifier);
-            if(base_name.empty())
-              throw;
-
-            // Capture the class-scope identifier for later
-            // re-resolution by `ensure_member_complete`: the helper
-            // needs to switch into this scope to give member-typedef
-            // resolution a chance.  Also capture the unresolved
-            // cpp_name so the source survives the `declaration.type()`
-            // being mutated by other declarators in the same
-            // declaration list.
-            const irep_idt class_scope_id =
-              cpp_scopes.current_scope().identifier;
-            typet lazy_source = declaration.type();
-
-            if(is_typedef)
-            {
-              // Lazy typedef registration.  Build the symbol the
-              // way `cpp_declarator_convertert` would, but with the
-              // unresolved cpp_name preserved as the aliased type
-              // and the lazy marker so callers know to retry
-              // resolution at the use site (see
-              // `cpp_typecheckt::ensure_member_complete`).
-              const irep_idt sym_name =
-                id2string(cpp_scopes.current_scope().prefix) +
-                id2string(base_name);
-              if(!symbol_table.has_symbol(sym_name))
-              {
-                symbolt typedef_sym;
-                typedef_sym.name = sym_name;
-                typedef_sym.base_name = base_name;
-                typedef_sym.pretty_name = base_name;
-                typedef_sym.type = lazy_source;
-                typedef_sym.type.set(ID_C_lazy_member_type, true);
-                typedef_sym.type.set(ID_lazy_type_source, class_scope_id);
-                typedef_sym.location = declarator.source_location();
-                typedef_sym.mode = ID_cpp;
-                typedef_sym.module = module;
-                typedef_sym.is_type = true;
-                typedef_sym.is_macro = true;
-                if(symbol_table.insert(std::move(typedef_sym)).second)
-                {
-                  cpp_idt &id = cpp_scopes.put_into_scope(
-                    symbol_table.lookup_ref(sym_name));
-                  id.id_class = cpp_idt::id_classt::TYPEDEF;
-                }
-              }
-
-              struct_typet::componentt comp(base_name, lazy_source);
-              comp.set_base_name(base_name);
-              comp.set(ID_access, access);
-              comp.set(ID_is_type, true);
-              comp.set(ID_C_lazy_member_type, true);
-              comp.set(ID_lazy_type_source, class_scope_id);
-              comp.add_source_location() = declarator.source_location();
-              components.push_back(std::move(comp));
-            }
+            std::size_t pos = cur_head.rfind("::tag-");
+            if(pos != std::string::npos)
+              cur_base = cur_head.substr(pos + 6);
             else
             {
-              struct_typet::componentt comp(base_name, lazy_source);
-              comp.set_base_name(base_name);
-              comp.set(ID_access, access);
-              if(is_static)
-                comp.set(ID_is_static, true);
-              if(is_mutable)
-                comp.set(ID_is_mutable, true);
-              comp.set(ID_C_lazy_member_type, true);
-              comp.set(ID_lazy_type_source, class_scope_id);
-              comp.add_source_location() = declarator.source_location();
-              components.push_back(std::move(comp));
+              pos = cur_head.rfind("::");
+              if(pos != std::string::npos)
+                cur_base = cur_head.substr(pos + 2);
             }
+          }
+          bool is_self_reference = false;
+          if(!cur_base.empty())
+          {
+            std::function<bool(const irept &)> ref_to_self;
+            ref_to_self = [&](const irept &t) -> bool
+            {
+              if(t.id() == ID_cpp_name)
+              {
+                const auto &s = t.get_sub();
+                if(!s.empty() && s.front().id() == ID_name)
+                {
+                  const irep_idt &bn = s.front().get(ID_identifier);
+                  if(!bn.empty() && id2string(bn) == cur_base)
+                    return true;
+                }
+              }
+              for(const auto &x : t.get_sub())
+                if(ref_to_self(x))
+                  return true;
+              for(const auto &x : t.get_named_sub())
+                if(ref_to_self(x.second))
+                  return true;
+              return false;
+            };
+            is_self_reference = ref_to_self(declaration.type());
+          }
+          if(is_self_reference)
+          {
+            // Per [temp.inst]/3 + [temp.deduct]/8: elaborate under a
+            // SFINAE immediate-context guard; on failure, skip the
+            // declaration and let a later pass retry.
+            const typet saved_self_ref_type = declaration.type();
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_type(declaration.type());
+            }
+            catch(...)
+            {
+              // [temp.inst]/1-2 + [dcl.typedef]: a member typedef declares
+              // the member and forms the aliased type but does not require
+              // the aliased template's *definition* to be instantiated -- a
+              // typedef-name may denote an incomplete type.  When the alias
+              // is self-referential and cannot be eagerly instantiated while
+              // the enclosing class is still incomplete (e.g. libstdc++
+              // vector's `typedef __normal_iterator<const_pointer, vector>
+              // const_iterator;`), keep the unresolved alias so the typedef
+              // NAME is still declared (lazily) and sibling members that
+              // refer to it -- such as
+              // `typedef reverse_iterator<const_iterator>
+              // const_reverse_iterator;` -- resolve, rather than dropping it
+              // and producing a spurious "symbol 'const_iterator' is
+              // unknown".  Non-typedef self-references keep the previous
+              // skip-and-retry behaviour.
+              if(is_typedef)
+              {
+                declaration.type() = saved_self_ref_type;
+                kept_unresolved_cpp_name = true;
+              }
+              else
+                continue;
+            }
+          }
+          else if(is_typedef)
+          {
+            // Per [temp.inst]/1-2 and [dcl.typedef]: a member typedef
+            // aliasing a class-template-id (e.g.
+            // `typedef std::reverse_iterator<const_iterator>
+            //  const_reverse_iterator;` in libstdc++ `basic_string`)
+            // declares the member and forms the aliased type, but does
+            // not require that template's *definition* to be instantiated
+            // -- a typedef-name may denote an incomplete type.  Eagerly
+            // instantiating the definition here can throw (at C++20 the
+            // iterator-concept chain reached through `reverse_iterator`'s
+            // body does); an unguarded failure abandons the rest of the
+            // class body, dropping every later member including the
+            // constructors.  The class is then non-conformantly
+            // misclassified as a POD ([class.prop]: a class with
+            // user-declared constructors is not a POD), so e.g.
+            // `std::string s("ab")` is routed to a bogus `char[]` ->
+            // `basic_string` conversion instead of a constructor call.
+            //
+            // Recover by keeping the unresolved alias (a lazy typedef)
+            // rather than dropping it: a plain skip would leave later
+            // members that name the alias (e.g.
+            // `const_reverse_iterator rbegin() const;`) dangling and throw
+            // again, re-truncating the class.  Keeping the name lets the
+            // body -- and the constructors -- complete, so the class is
+            // conformantly non-POD with its full member set.  (The
+            // aliased template's definition is still instantiated later,
+            // on demand, when its completeness is actually required.)
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            const typet saved_member_type = declaration.type();
+            try
+            {
+              typecheck_type(declaration.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              declaration.type() = saved_member_type; // keep unresolved alias
+              kept_unresolved_cpp_name = true;
+            }
+          }
+          else
+          {
+            typecheck_type(declaration.type());
           }
         }
         else
         {
-          typecheck_compound_declarator(
-            symbol,
-            declaration,
-            declarator,
-            components,
-            access,
-            is_static,
-            is_typedef,
-            is_mutable);
-        }
-      }
-    }
-    else if(it->id() == "cpp-public")
-      access = ID_public;
-    else if(it->id() == "cpp-private")
-      access = ID_private;
-    else if(it->id() == "cpp-protected")
-      access = ID_protected;
-    else if(it->id() == ID_cpp_using)
-    {
-      cpp_usingt &cpp_using =
-        static_cast<cpp_usingt &>(static_cast<irept &>(*it));
-      // Skip using declarations for conversion operators (e.g.,
-      // using Base::operator T;) as these are not yet supported.
-      bool has_operator = false;
-      for(const auto &sub : cpp_using.name().get_sub())
-      {
-        if(sub.id() == ID_operator)
-        {
-          has_operator = true;
-          break;
-        }
-      }
-      if(has_operator)
-      {
-        // using Base::operator X — import operator from base class.
-        // Resolve the base class and copy matching operator components
-        // into the derived class.
-        try
-        {
-          convert(cpp_using);
-        }
-        catch(...)
-        {
-          // Operator import failed (e.g., base class not fully
-          // instantiated in CRTP patterns). Silently skip.
-        }
-      }
-      else
-      {
-        // C++11 inheriting constructors: using Base::Base;
-        // Detect if this refers to a base class constructor and skip
-        // the normal convert() path which fails on constructor lookup.
-        bool is_inheriting_ctor = false;
-        const auto &name_sub = cpp_using.name().get_sub();
-        if(name_sub.size() >= 3)
-        {
-          const irep_idt &last_name = name_sub.back().get(ID_identifier);
-          for(const auto &base : to_struct_type(symbol.type).bases())
+          // Per N5008 [class.mem]/3 + [temp.inst]: the
+          // member-specification declares the full set of members of
+          // the class.  A failure to elaborate one member's type must
+          // not silently drop sibling member-declarations or
+          // access-specifiers from the class body.  If the type is an
+          // inline class/struct/union/enum definition (i.e., a nested
+          // type whose definition is given here) and its elaboration
+          // throws — typically because a base-class template
+          // specialization in the inline definition fails to
+          // instantiate against CBMC's libstdc++ model — the existing
+          // unprotected call below would propagate the throw out of
+          // the body loop, causing every subsequent member declaration
+          // (and `cpp-public`/`cpp-protected` access specifiers) to be
+          // silently abandoned.  The visible symptom is the classic
+          // `symbol 'message_handler' is unknown` failure on CBMC's
+          // own `messaget` class: its `class mstreamt : public
+          // std::ostringstream` inline definition's elaboration aborts
+          // the body loop, so every later `protected:` plus its data
+          // members get dropped from the class scope.  Method bodies
+          // that reference the dropped data members then fail name
+          // lookup at typecheck-method-bodies time.
+          //
+          // Wrap the elaboration in a try/catch, mirroring the
+          // existing `kept_unresolved_cpp_name` pattern above: reset
+          // the error count and `continue;` to the next body item.
+          // The nested type is unusable downstream — references to it
+          // fail at their use site — but the body loop completes,
+          // sibling members register, and access transitions are
+          // preserved.
+          //
+          // Apply the recovery only when this is a NESTED inline
+          // definition AND it has a base-clause.  Inline definitions
+          // without bases (`class X { /* ... */ };`) cannot trigger
+          // the libstdc++ instantiation-chain failure that motivates
+          // the recovery, and keeping the strict behaviour for them
+          // means that genuine member-elaboration errors in plain
+          // user code still surface clearly.  This pattern matches
+          // the libstdc++ recovery use case (a nested class derived
+          // from a template specialization whose model is incomplete)
+          // without relaxing diagnostics for ordinary class members.
+          bool inline_def_with_base = false;
+          if(
+            declaration.type().id() == ID_struct ||
+            declaration.type().id() == ID_union)
           {
-            const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
-            if(base_sym.base_name == last_name)
+            const irept &bases = declaration.type().find(ID_bases);
+            if(!bases.get_sub().empty())
+              inline_def_with_base = true;
+          }
+
+          if(instantiation_stack.empty() && inline_def_with_base)
+          {
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
             {
-              is_inheriting_ctor = true;
+              typecheck_type(declaration.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              continue;
+            }
+          }
+          else if(
+            is_typedef && !instantiation_stack.empty() &&
+            !declaration.declarators().empty() &&
+            declaration.declarators().front().name().get_base_name() ==
+              "iterator_concept")
+          {
+            // Per [iterator.concepts.general] + [iterator.traits]: among an
+            // iterator type's member typedefs, the C++20 `iterator_concept`
+            // member is used *solely* for concept-based algorithm dispatch
+            // (ITER_CONCEPT); unlike the five required associated types
+            // (value_type, difference_type, pointer, reference,
+            // iterator_category) no member function or sibling member depends
+            // on it structurally.  In libstdc++ it is
+            //   using iterator_concept = std::__detail::__iter_concept<_Iterator>;
+            // a `merged_type` alias-template result, so the cpp_name
+            // self-reference recovery above does not apply to it.
+            //
+            // Per [temp.inst]/1-2 + [dcl.typedef]: this member typedef declares
+            // the member and forms the aliased type but does not require the
+            // aliased template's *definition* to be instantiated; a typedef-name
+            // may denote an incomplete type.  While the enclosing iterator
+            // instance is still being completed, evaluating __iter_concept
+            // reaches back through this very (incomplete) iterator via the
+            // iterator-concept machinery and throws.  An unguarded failure here
+            // would abandon the rest of the class body, dropping every later
+            // member including the member *functions* (operator*, base,
+            // operator++, ...) and leaving the instance complete-looking but
+            // method-less, so a later odr-use of a method finds "no body".
+            // Keep this one inert concept-dispatch alias lazy and continue, so
+            // the sibling methods register; its definition is instantiated
+            // later, on demand, when its completeness is actually required.
+            //
+            // This recovery is deliberately limited to `iterator_concept`: a
+            // failure to form one of the *required* associated-type typedefs
+            // signals that the instance genuinely cannot be completed yet, and
+            // keeping such a type lazy would mis-instantiate the methods and
+            // constructors that depend on it (observed on std::span, whose
+            // iterator's required typedefs fail at this point) -- those retain
+            // the strict abandon-and-retry behaviour.
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            const typet saved_member_type = declaration.type();
+            try
+            {
+              typecheck_type(declaration.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              declaration.type() = saved_member_type; // keep unresolved alias
+              kept_unresolved_cpp_name = true;
+            }
+          }
+          else
+          {
+            typecheck_type(declaration.type());
+          }
+        }
+        bool is_static = declaration.storage_spec().is_static();
+        bool is_mutable = declaration.storage_spec().is_mutable();
+
+        if(
+          declaration.storage_spec().is_extern() ||
+          declaration.storage_spec().is_register())
+        {
+          error().source_location = declaration.storage_spec().location();
+          error() << "invalid storage class specified for field" << eom;
+          throw 0;
+        }
+
+        // In C++11, 'auto' in a class member declaration indicates a
+        // trailing return type (auto f() -> T). The parser stores this
+        // in the storage spec. Only reject 'auto' when there are no
+        // declarators (i.e., it's not a function declaration).
+        if(
+          declaration.storage_spec().is_auto() &&
+          declaration.declarators().empty())
+        {
+          error().source_location = declaration.storage_spec().location();
+          error() << "invalid storage class specified for field" << eom;
+          throw 0;
+        }
+
+        // anonymous member?
+        if(
+          declaration.declarators().empty() &&
+          ((declaration.type().id() == ID_struct_tag &&
+            follow_tag(to_struct_tag_type(declaration.type()))
+              .get_bool(ID_C_is_anonymous)) ||
+           (declaration.type().id() == ID_union_tag &&
+            follow_tag(to_union_tag_type(declaration.type()))
+              .get_bool(ID_C_is_anonymous)) ||
+           declaration.type().get_bool(ID_C_is_anonymous)))
+        {
+          // we only allow this on struct/union types
+          if(
+            declaration.type().id() != ID_union_tag &&
+            declaration.type().id() != ID_struct_tag)
+          {
+            error().source_location = declaration.type().source_location();
+            error() << "member declaration does not declare anything" << eom;
+            throw 0;
+          }
+
+          convert_anon_struct_union_member(declaration, access, components);
+
+          continue;
+        }
+
+        // declarators
+        for(auto &declarator : declaration.declarators())
+        {
+          // Skip the constructors until all the data members
+          // are discovered
+          if(declaration.is_destructor())
+            found_dtor = true;
+
+          if(declaration.is_constructor())
+          {
+            found_ctor = true;
+            // [class.default.ctor]/1, [class.inhctor.init]: track whether the
+            // class declares its *own* default constructor (no declared
+            // parameters, or all parameters defaulted).  Used below to decide
+            // whether an inherited base default constructor makes the class
+            // default-constructible.
+            bool all_defaulted = true;
+            for(const auto &p : declarator.type().find(ID_parameters).get_sub())
+            {
+              if(p.find(ID_value).is_nil())
+              {
+                all_defaulted = false;
+                break;
+              }
+            }
+            if(all_defaulted)
+              found_own_default_ctor = true;
+            continue;
+          }
+
+          // Per [temp.res] and [temp.inst]/11: type-checking a member
+          // declaration during class template instantiation may fail
+          // because a dependent name cannot be resolved in the current
+          // instantiation context (for example
+          //   typedef typename __alloc_traits::pointer pointer;
+          // when __alloc_traits itself requires further instantiation).
+          // The failure is local to the member being processed; letting
+          // sibling members continue lets the class scope accumulate
+          // the typedefs/members that do not depend on the failing one.
+          if(!instantiation_stack.empty())
+          {
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              typecheck_compound_declarator(
+                symbol,
+                declaration,
+                declarator,
+                components,
+                access,
+                is_static,
+                is_typedef,
+                is_mutable);
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+            }
+          }
+          else if(kept_unresolved_cpp_name)
+          {
+            // Phase 3 narrow producer per N5008 [temp.inst]/3.1.  The
+            // existing `kept_unresolved_cpp_name` mitigation upstream
+            // preserved the unresolved cpp_name on the declaration so
+            // a non-typedef data-member declarator can still register.
+            // Below we handle the additional case where
+            // `typecheck_compound_declarator` *itself* fails — most
+            // commonly on a `typedef T name;` form whose aliased
+            // template type cannot be eagerly instantiated.  Without
+            // recovery, the throw escapes `typecheck_compound_body`
+            // and abandons the entire class scope, preventing sibling
+            // members and methods from registering even when they
+            // don't depend on the failing typedef.  Instead we register
+            // the typedef lazily: a typedef symbol with the unresolved
+            // cpp_name as its alias type, marked `ID_C_lazy_member_type`,
+            // and put into the class scope.  Lookups of the typedef
+            // succeed structurally; uses that need the resolved
+            // template instantiation still fail but only at the use
+            // site, with a localized diagnostic.
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              typecheck_compound_declarator(
+                symbol,
+                declaration,
+                declarator,
+                components,
+                access,
+                is_static,
+                is_typedef,
+                is_mutable);
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              const auto &name_sub = declarator.name().get_sub();
+              if(name_sub.empty())
+                throw;
+              const irep_idt base_name = name_sub.front().get(ID_identifier);
+              if(base_name.empty())
+                throw;
+
+              // Capture the class-scope identifier for later
+              // re-resolution by `ensure_member_complete`: the helper
+              // needs to switch into this scope to give member-typedef
+              // resolution a chance.  Also capture the unresolved
+              // cpp_name so the source survives the `declaration.type()`
+              // being mutated by other declarators in the same
+              // declaration list.
+              const irep_idt class_scope_id =
+                cpp_scopes.current_scope().identifier;
+              typet lazy_source = declaration.type();
+
+              if(is_typedef)
+              {
+                // Lazy typedef registration.  Build the symbol the
+                // way `cpp_declarator_convertert` would, but with the
+                // unresolved cpp_name preserved as the aliased type
+                // and the lazy marker so callers know to retry
+                // resolution at the use site (see
+                // `cpp_typecheckt::ensure_member_complete`).
+                const irep_idt sym_name =
+                  id2string(cpp_scopes.current_scope().prefix) +
+                  id2string(base_name);
+                if(!symbol_table.has_symbol(sym_name))
+                {
+                  symbolt typedef_sym;
+                  typedef_sym.name = sym_name;
+                  typedef_sym.base_name = base_name;
+                  typedef_sym.pretty_name = base_name;
+                  typedef_sym.type = lazy_source;
+                  typedef_sym.type.set(ID_C_lazy_member_type, true);
+                  typedef_sym.type.set(ID_lazy_type_source, class_scope_id);
+                  typedef_sym.location = declarator.source_location();
+                  typedef_sym.mode = ID_cpp;
+                  typedef_sym.module = module;
+                  typedef_sym.is_type = true;
+                  typedef_sym.is_macro = true;
+                  if(symbol_table.insert(std::move(typedef_sym)).second)
+                  {
+                    cpp_idt &id = cpp_scopes.put_into_scope(
+                      symbol_table.lookup_ref(sym_name));
+                    id.id_class = cpp_idt::id_classt::TYPEDEF;
+                  }
+                }
+
+                struct_typet::componentt comp(base_name, lazy_source);
+                comp.set_base_name(base_name);
+                comp.set(ID_access, access);
+                comp.set(ID_is_type, true);
+                comp.set(ID_C_lazy_member_type, true);
+                comp.set(ID_lazy_type_source, class_scope_id);
+                comp.add_source_location() = declarator.source_location();
+                components.push_back(std::move(comp));
+              }
+              else
+              {
+                struct_typet::componentt comp(base_name, lazy_source);
+                comp.set_base_name(base_name);
+                comp.set(ID_access, access);
+                if(is_static)
+                  comp.set(ID_is_static, true);
+                if(is_mutable)
+                  comp.set(ID_is_mutable, true);
+                comp.set(ID_C_lazy_member_type, true);
+                comp.set(ID_lazy_type_source, class_scope_id);
+                comp.add_source_location() = declarator.source_location();
+                components.push_back(std::move(comp));
+              }
+            }
+          }
+          else
+          {
+            typecheck_compound_declarator(
+              symbol,
+              declaration,
+              declarator,
+              components,
+              access,
+              is_static,
+              is_typedef,
+              is_mutable);
+          }
+        }
+      }
+      else if(it->id() == "cpp-public")
+        access = ID_public;
+      else if(it->id() == "cpp-private")
+        access = ID_private;
+      else if(it->id() == "cpp-protected")
+        access = ID_protected;
+      else if(it->id() == ID_cpp_using)
+      {
+        cpp_usingt &cpp_using =
+          static_cast<cpp_usingt &>(static_cast<irept &>(*it));
+        // Skip using declarations for conversion operators (e.g.,
+        // using Base::operator T;) as these are not yet supported.
+        bool has_operator = false;
+        for(const auto &sub : cpp_using.name().get_sub())
+        {
+          if(sub.id() == ID_operator)
+          {
+            has_operator = true;
+            break;
+          }
+        }
+        if(has_operator)
+        {
+          // using Base::operator X — import operator from base class.
+          // Resolve the base class and copy matching operator components
+          // into the derived class.
+          try
+          {
+            convert(cpp_using);
+          }
+          catch(...)
+          {
+            // Operator import failed (e.g., base class not fully
+            // instantiated in CRTP patterns). Silently skip.
+          }
+        }
+        else
+        {
+          // C++11 inheriting constructors: using Base::Base;
+          // Detect if this refers to a base class constructor and skip
+          // the normal convert() path which fails on constructor lookup.
+          bool is_inheriting_ctor = false;
+          const auto &name_sub = cpp_using.name().get_sub();
+          if(name_sub.size() >= 3)
+          {
+            const irep_idt &last_name = name_sub.back().get(ID_identifier);
+            for(const auto &base : to_struct_type(symbol.type).bases())
+            {
+              const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
+              if(base_sym.base_name == last_name)
+              {
+                is_inheriting_ctor = true;
+                break;
+              }
+            }
+          }
+          if(!is_inheriting_ctor)
+          {
+            convert(cpp_using);
+
+            // [namespace.udecl]/19: a using-declaration that names an
+            // inherited member makes that member accessible in the
+            // derived class with the access of the using-declaration,
+            // independent of the member's access in the base.  Adjust the
+            // access of the corresponding inherited (from_base)
+            // component(s) so member-access checking honours it -- e.g.
+            // binary_exprt's public `using exprt::op0;` republishes the
+            // protected exprt::op0 as public.
+            if(cpp_using.name().is_qualified() && !name_sub.empty())
+            {
+              const irep_idt &member_name = name_sub.back().get(ID_identifier);
+              if(!member_name.empty())
+              {
+                for(auto &comp : components)
+                {
+                  if(
+                    comp.get_bool(ID_from_base) &&
+                    comp.get_base_name() == member_name)
+                  {
+                    comp.set_access(access);
+                  }
+                }
+              }
+            }
+          }
+          else
+          {
+            // Import base class constructors as derived class constructors
+            const irep_idt &last_name = name_sub.back().get(ID_identifier);
+            found_ctor = true;
+            // [dcl.init.aggr]/1 (C++17): a class with inherited constructors is
+            // not an aggregate; record this so cpp_constructor does not fall
+            // back to aggregate initialization (which would drop the
+            // constructor arguments).
+            symbol.type.set("has_inherited_constructor", true);
+            for(const auto &base : to_struct_type(symbol.type).bases())
+            {
+              const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
+              if(base_sym.base_name != last_name)
+                continue;
+              for(const auto &comp : to_struct_type(base_sym.type).components())
+              {
+                if(comp.type().id() != ID_code)
+                  continue;
+                const code_typet &ctor_type = to_code_type(comp.type());
+                if(ctor_type.return_type().id() != ID_constructor)
+                  continue;
+                // A base default constructor is inherited ([namespace.udecl]/2)
+                // and per [class.inhctor.init] initializing the derived object
+                // with it is exactly a defaulted default constructor of the
+                // derived class; record it and synthesize that below.  Base
+                // copy/move constructors are excluded from the candidate set
+                // ([over.match.funcs.general]/9), so they are skipped entirely.
+                if(ctor_type.parameters().size() <= 1)
+                {
+                  inherited_default_ctor = true;
+                  continue;
+                }
+                if(
+                  ctor_type.parameters().size() == 2 &&
+                  ctor_type.parameters()[1].type().id() == ID_pointer &&
+                  is_reference(ctor_type.parameters()[1].type()))
+                  continue;
+                // Create a derived-class constructor component that
+                // mirrors the base constructor
+                struct_typet::componentt new_comp = comp;
+                new_comp.set(ID_from_base, false);
+                new_comp.set(ID_access, access);
+                new_comp.set_base_name(symbol.base_name);
+                components.push_back(new_comp);
+              }
+
+              // [namespace.udecl]/2 inherits the base's constructor *templates*
+              // as well (e.g. a forwarding constructor `template<class... A>
+              // B(tag_t, A...)`).  They are not components of the base's struct
+              // type; they live in the base's scope as TEMPLATE ids named after
+              // the base.  Register them in the derived class's scope under the
+              // derived class's name, so constructor overload resolution finds
+              // and instantiates them ([class.inhctor.init]: the base subobject
+              // is then initialized by the selected base constructor).
+              {
+                auto base_scope_it = cpp_scopes.id_map.find(base_sym.name);
+                if(base_scope_it != cpp_scopes.id_map.end())
+                {
+                  auto &base_scope =
+                    static_cast<cpp_scopet &>(*base_scope_it->second);
+                  const auto tmpl_results = base_scope.lookup(
+                    base_sym.base_name,
+                    cpp_scopet::SCOPE_ONLY,
+                    cpp_idt::id_classt::TEMPLATE);
+                  for(const auto *tmpl_id : tmpl_results)
+                  {
+                    cpp_idt &new_id =
+                      cpp_scopes.current_scope().insert(symbol.base_name);
+                    new_id.id_class = cpp_idt::id_classt::TEMPLATE;
+                    new_id.identifier = tmpl_id->identifier;
+                    new_id.is_member = true;
+                  }
+                }
+              }
               break;
             }
           }
         }
-        if(!is_inheriting_ctor)
-        {
-          convert(cpp_using);
-
-          // [namespace.udecl]/19: a using-declaration that names an
-          // inherited member makes that member accessible in the
-          // derived class with the access of the using-declaration,
-          // independent of the member's access in the base.  Adjust the
-          // access of the corresponding inherited (from_base)
-          // component(s) so member-access checking honours it -- e.g.
-          // binary_exprt's public `using exprt::op0;` republishes the
-          // protected exprt::op0 as public.
-          if(cpp_using.name().is_qualified() && !name_sub.empty())
-          {
-            const irep_idt &member_name = name_sub.back().get(ID_identifier);
-            if(!member_name.empty())
-            {
-              for(auto &comp : components)
-              {
-                if(
-                  comp.get_bool(ID_from_base) &&
-                  comp.get_base_name() == member_name)
-                {
-                  comp.set_access(access);
-                }
-              }
-            }
-          }
-        }
-        else
-        {
-          // Import base class constructors as derived class constructors
-          const irep_idt &last_name = name_sub.back().get(ID_identifier);
-          found_ctor = true;
-          // [dcl.init.aggr]/1 (C++17): a class with inherited constructors is
-          // not an aggregate; record this so cpp_constructor does not fall
-          // back to aggregate initialization (which would drop the
-          // constructor arguments).
-          symbol.type.set("has_inherited_constructor", true);
-          for(const auto &base : to_struct_type(symbol.type).bases())
-          {
-            const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
-            if(base_sym.base_name != last_name)
-              continue;
-            for(const auto &comp : to_struct_type(base_sym.type).components())
-            {
-              if(comp.type().id() != ID_code)
-                continue;
-              const code_typet &ctor_type = to_code_type(comp.type());
-              if(ctor_type.return_type().id() != ID_constructor)
-                continue;
-              // A base default constructor is inherited ([namespace.udecl]/2)
-              // and per [class.inhctor.init] initializing the derived object
-              // with it is exactly a defaulted default constructor of the
-              // derived class; record it and synthesize that below.  Base
-              // copy/move constructors are excluded from the candidate set
-              // ([over.match.funcs.general]/9), so they are skipped entirely.
-              if(ctor_type.parameters().size() <= 1)
-              {
-                inherited_default_ctor = true;
-                continue;
-              }
-              if(
-                ctor_type.parameters().size() == 2 &&
-                ctor_type.parameters()[1].type().id() == ID_pointer &&
-                is_reference(ctor_type.parameters()[1].type()))
-                continue;
-              // Create a derived-class constructor component that
-              // mirrors the base constructor
-              struct_typet::componentt new_comp = comp;
-              new_comp.set(ID_from_base, false);
-              new_comp.set(ID_access, access);
-              new_comp.set_base_name(symbol.base_name);
-              components.push_back(new_comp);
-            }
-
-            // [namespace.udecl]/2 inherits the base's constructor *templates*
-            // as well (e.g. a forwarding constructor `template<class... A>
-            // B(tag_t, A...)`).  They are not components of the base's struct
-            // type; they live in the base's scope as TEMPLATE ids named after
-            // the base.  Register them in the derived class's scope under the
-            // derived class's name, so constructor overload resolution finds
-            // and instantiates them ([class.inhctor.init]: the base subobject
-            // is then initialized by the selected base constructor).
-            {
-              auto base_scope_it = cpp_scopes.id_map.find(base_sym.name);
-              if(base_scope_it != cpp_scopes.id_map.end())
-              {
-                auto &base_scope =
-                  static_cast<cpp_scopet &>(*base_scope_it->second);
-                const auto tmpl_results = base_scope.lookup(
-                  base_sym.base_name,
-                  cpp_scopet::SCOPE_ONLY,
-                  cpp_idt::id_classt::TEMPLATE);
-                for(const auto *tmpl_id : tmpl_results)
-                {
-                  cpp_idt &new_id =
-                    cpp_scopes.current_scope().insert(symbol.base_name);
-                  new_id.id_class = cpp_idt::id_classt::TEMPLATE;
-                  new_id.identifier = tmpl_id->identifier;
-                  new_id.is_member = true;
-                }
-              }
-            }
-            break;
-          }
-        }
+      }
+      else
+      {
       }
     }
-    else
+    catch(...)
     {
+      if(instantiation_stack.empty())
+        throw;
+      get_message_handler().set_message_count(
+        messaget::M_ERROR, member_errors_before);
     }
   }
 
