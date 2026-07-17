@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ first is y: SUCCESS$
@@ -36,3 +36,7 @@ parameters.  The call-atom constant-fold still returns "unknown" for it
 from the satisfaction context), so the unviable candidate survives.
 Remaining lead: make the call-atom fold instantiate/evaluate
 _S_constructible with both the member's and the class's arguments.
+
+FIXED 2026-07-17 night: with the consteval call-atom fold
+(cpp20_requires_static_call_atom) the unviable converting constructor
+is removed and both members verify.
