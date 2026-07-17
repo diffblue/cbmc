@@ -946,6 +946,79 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 if(targ_v[pi].id() == ID_type)
                   name_to_type[sname] = targ_v[pi].type();
               }
+              // N5008 [temp.constr.decl]/3: the associated constraints of
+              // a constrained member of a class template are formed from
+              // BOTH the member's and the enclosing class template's
+              // parameters; after the class is instantiated, atoms may
+              // still name the CLASS's parameters (libstdc++ C++20
+              // pair<T1,T2>'s converting constructor requires
+              // _S_constructible<...>() over T1/T2).  Map those names to
+              // the class instance's arguments as well (the instance
+              // symbol records them in ID_C_template /
+              // ID_C_template_arguments).
+              {
+                const irep_idt &member_id = e.type().get(ID_C_template);
+                const std::string member_str = id2string(member_id);
+                // enclosing class identifier: strip the final `::member`
+                // component (angle-aware) and insert the `tag-` marker
+                std::size_t depth = 0, final_sep = std::string::npos;
+                for(std::size_t ci = 0; ci + 1 < member_str.size(); ++ci)
+                {
+                  if(member_str[ci] == '<')
+                    ++depth;
+                  else if(member_str[ci] == '>' && depth > 0)
+                    --depth;
+                  else if(
+                    depth == 0 && member_str[ci] == ':' &&
+                    member_str[ci + 1] == ':')
+                    final_sep = ci;
+                }
+                if(final_sep != std::string::npos)
+                {
+                  std::string cls = member_str.substr(0, final_sep);
+                  std::size_t lt2 = cls.find('<');
+                  std::size_t se2 =
+                    lt2 == std::string::npos ? std::string::npos : lt2;
+                  std::size_t sep2 = cls.rfind("::", se2);
+                  cls.insert(sep2 == std::string::npos ? 0 : sep2 + 2, "tag-");
+                  const symbolt *class_sym =
+                    cpp_typecheck.symbol_table.lookup(cls);
+                  if(
+                    class_sym != nullptr &&
+                    class_sym->type.find(ID_C_template).is_not_nil() &&
+                    class_sym->type.find(ID_C_template_arguments).is_not_nil())
+                  {
+                    const template_typet &class_tmpl =
+                      static_cast<const template_typet &>(
+                        class_sym->type.find(ID_C_template));
+                    const cpp_template_args_tct &class_targs =
+                      to_cpp_template_args_tc(
+                        class_sym->type.find(ID_C_template_arguments));
+                    const auto &cparams = class_tmpl.template_parameters();
+                    const auto &cargs = class_targs.arguments();
+                    for(std::size_t pi = 0;
+                        pi < cparams.size() && pi < cargs.size();
+                        ++pi)
+                    {
+                      if(cparams[pi].id() != ID_type)
+                        continue;
+                      const std::string pid =
+                        id2string(cparams[pi].type().get(ID_identifier));
+                      const auto cpos = pid.rfind("::");
+                      const irep_idt sname =
+                        cpos != std::string::npos ? pid.substr(cpos + 2) : pid;
+                      // member parameters shadow class parameters
+                      // ([temp.local]); do not overwrite
+                      if(
+                        cargs[pi].id() == ID_type &&
+                        name_to_type.find(sname) == name_to_type.end())
+                      {
+                        name_to_type[sname] = cargs[pi].type();
+                      }
+                    }
+                  }
+                }
+              }
               exprt req_copy = req_clause;
               std::function<void(irept &)> subst = [&](irept &n)
               {
