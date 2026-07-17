@@ -47,3 +47,20 @@ Second-tier verification-PERFORMANCE item, not a conformance one; the previous
 "pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
 container.
 See doc/architectural/cpp-class-template-instantiation-plan.md.
+
+--paths lifo 2026-07-17: path-wise symex NEUTRALIZES the one-shot
+blow-up completely -- a verdict in ~42-60s at --unwind 5/6/7 (vs. >15
+min without a verdict one-shot).  BUT the verdict is VERIFICATION
+FAILED, and the counterexample REFRAMES this test: the failing
+dereferences are inside std::_Rb_tree_insert_and_rebalance, which is
+defined in libstdc++'s COMPILED tree.cc (not the headers), so CBMC has
+no body for it and havocs the call: the tree linkage after insert is
+nondet garbage.  m[1] == 42 can therefore never verify, at ANY unwind,
+with ANY solver.  The real blocker is a missing model for the tree.cc
+entry points (_Rb_tree_insert_and_rebalance, _Rb_tree_increment,
+_Rb_tree_decrement, _Rb_tree_rebalance_for_erase) -- e.g. in
+src/cpp/library/ next to new.c.  A model may do plain BST linking +
+header (leftmost/rightmost) maintenance and skip the rebalancing
+rotations: recoloring affects only balance, not the container's
+functional semantics.  Once modelled, --paths lifo (or one-shot at
+--unwind 5) is expected to be tractable.

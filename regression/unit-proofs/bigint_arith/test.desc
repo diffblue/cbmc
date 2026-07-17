@@ -12,3 +12,13 @@ operands.  KNOWNBUG: the propositional reduction runs out of memory (16
 GiB cap) -- BigInt's heap-allocated digit vectors blow up the formula.
 Candidates to unblock: field-sensitive slicing, smaller digit type, or
 SMT back-end.  Flip to CORE when it converges.
+
+SMT BACK-ENDS 2026-07-17: --z3 (4.8.12) and --cvc5 (1.2.1) both get
+past encoding easily (the SAT path OOMs at 14 GiB during propositional
+reduction; SMT2 conversion is cheap) but neither SOLVES the formula:
+z3 idle-loops >30 min, cvc5 >20 min (QF_AUFBV resp. ALL+FPA).  The
+--cvc5 run initially failed on a CBMC SMT2-generation bug (unquoted
+"::" in datatype selector names), fixed alongside this note.  So the
+symbolic-size heap-array blow-up shifts from encoding memory (SAT) to
+solve time (SMT); the harness-side fix (concrete digit capacities)
+remains the promising route.
