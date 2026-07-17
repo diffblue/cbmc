@@ -78,3 +78,17 @@ WITHOUT a body (constexpr/macro-flagged, nil value, never queued for
 deferred conversion), so _M_get_insert_unique_pos's `_Res(__y, 0)`
 returns garbage and insert misbehaves.  Fix that defect first; then
 retest one-shot and --paths lifo.
+
+UPDATE 2026-07-17 night: the pair converting-constructor layer is FIXED
+(cpp20_pair_converting_ctor and both requires-atom tests are CORE).
+NEW FRONTIER exposed one level up: _M_get_insert_hint_unique_pos's
+`__res` (a C++20 pair<_Base_ptr,_Base_ptr>, which now has constrained
+constructors and derives from the empty __pair_base) receives GARBAGE
+through the sret-lowered tail call `return _M_get_insert_unique_pos(k)`
+-- the inner call's result {NULL, &header} is correct in ITS __res, but
+the value is lost in the hidden-result handoff (trace: first=NULL+
+177253069).  Suspect the elide_cpp_returned_temporaries substitution
+interacting with the derived-to-__pair_base "ignoring typecast" shape
+in the returned-temporary construction.  Then the garbage position
+flows into _Rb_tree_insert_and_rebalance (__p->_M_left dereference
+failures).

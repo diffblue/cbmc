@@ -4,11 +4,11 @@
 // constrained with a requires-clause and explicit(bool):
 //   constexpr explicit(...) pair(_U1&& __x, _U2&& __y)
 //
-// KNOWNBUG: the front end creates the instantiated constructor symbol
-// flagged constexpr/macro but NEVER converts its body (nil value, not
-// in the deferred queue), and symex treats the bodyless call as havoc:
-// both members are nondeterministic garbage.  --cpp17 (whose pair uses
-// enable_if instead of requires/explicit(bool)) works.
+// This used to fail in two layers, both fixed: the requires-clause
+// call atoms (_S_constructible<...>()) were unevaluable, so an
+// unviable constrained constructor was selected and its body failed
+// conversion (havoc'd members).  See cpp20_requires_static_call_atom
+// and cpp20_requires_class_param_atom for the two mechanisms.
 //
 // This is the REAL remaining blocker for cpp20_map_basic:
 // _Rb_tree::_M_get_insert_unique_pos returns _Res(__y, 0), whose
