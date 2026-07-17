@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ members usable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+template scope 'rebind' is ambiguous
+--
+KNOWNBUG: N5008 [basic.lookup.qual]/[temp.names]/3 -- `T::template
+rebind<int>` lookup fails ("template scope 'rebind' is ambiguous",
+listed in the forbidden-patterns section above) because the completed
+__alloc_traits<> instance's scope lacks its never-used member template
+and the fallback collects every same-name member template program-wide.
+cvise-reduced (39 lines, header-free) from
+cpp17_hash_node_vector_alloc; the alias chain mirrors libstdc++'s
+__uset_hashtable and the hash<vector> partial-spec declaration -- each
+part is needed for the instantiation order.  Front-end recovery
+currently keeps verification green, so the FORBIDDEN pattern is what
+makes this fail today.  Flip to CORE when the lookup is fixed.
