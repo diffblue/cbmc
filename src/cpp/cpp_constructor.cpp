@@ -605,6 +605,26 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     // enter struct scope
     cpp_save_scopet save_scope(cpp_scopes);
+    // Constructor overload resolution below runs with the current scope
+    // moved into the class; record the caller's scope as the point of
+    // use so accessibility of argument conversions -- in particular
+    // derived-to-base conversions relying on FRIENDSHIP of the caller
+    // ([class.access.base]/4) -- is judged from here.  Restored
+    // alongside the scope itself.
+    struct access_scope_guardt
+    {
+      cpp_typecheckt &tc;
+      cpp_scopet *saved;
+      explicit access_scope_guardt(cpp_typecheckt &t)
+        : tc(t), saved(t.access_judgment_scope)
+      {
+        tc.access_judgment_scope = t.cpp_scopes.current_scope_ptr;
+      }
+      ~access_scope_guardt()
+      {
+        tc.access_judgment_scope = saved;
+      }
+    } access_scope_guard{*this};
     cpp_scopes.set_scope(struct_type.get(ID_name));
 
     // find name of constructor

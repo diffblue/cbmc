@@ -133,6 +133,17 @@ public:
 protected:
   cpp_scopest cpp_scopes;
 
+  /// N5008 [class.access]/[class.access.base]: accessibility is judged
+  /// from the point of use.  During overload resolution the current
+  /// scope is moved into candidate classes (e.g. while binding
+  /// constructor arguments), so accessibility checks that only walk the
+  /// current scope chain lose the caller's context -- in particular the
+  /// derived-to-base conversion check in `base_publicly_accessible`,
+  /// which must honour FRIENDSHIP of the point of use
+  /// ([class.access.base]/4).  `resolve_scope` records the scope the
+  /// name was written in here; RAII-restored by the resolver.
+  cpp_scopet *access_judgment_scope = nullptr;
+
   // SFINAE alternative declarations: when two function templates differ
   // only in their SFINAE constraints, the second is stored here (keyed
   // by the primary's symbol name) rather than in the symbol table, to

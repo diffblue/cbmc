@@ -1451,6 +1451,17 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     // libstdc++'s `if (size_type __n = _M_finish - __pos)` in
     // vector::_M_erase_at_end, used by clear()/resize()/erase(first,
     // last), silently behaved as a no-op.)
+    // N5008 [stmt.pre]/6: the name introduced by a condition declaration
+    // is in scope from its point of declaration until the END OF THE
+    // SUBSTATEMENTS; it must NOT be visible in the rest of the enclosing
+    // block (redeclaring the same name after the if-statement is
+    // well-formed -- libstdc++'s _Hashtable::_M_insert_unique declares
+    // `__node_ptr __node` in an if-condition and `_Scoped_node __node`
+    // after it).  Type-check the declaration inside a fresh block scope
+    // so the name does not leak into the enclosing scope.
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.new_block_scope();
+
     codet decl = to_code(code.cond());
     typecheck_code(decl);
 
@@ -1469,7 +1480,9 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     implicit_typecast_bool(cond_expr);
     code.cond() = cond_expr;
 
-    // Type-check the condition and both branches as usual.
+    // Type-check the condition and both branches as usual (still inside
+    // the condition's scope, [stmt.pre]/6: the name is visible in both
+    // substatements).
     c_typecheck_baset::typecheck_ifthenelse(code);
 
     // Wrap so the declaration executes before, and is in scope of, the
@@ -1548,6 +1561,11 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
   if(code.cond().id() == ID_code)
   {
     // Rewrite into: while(true) { decl; if(!var) break; body; }
+    // N5008 [stmt.pre]/6: scope the condition's name to the statement
+    // (see typecheck_ifthenelse).
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.new_block_scope();
+
     codet decl = to_code(code.cond());
     typecheck_code(decl);
 
