@@ -2,6 +2,7 @@ var dfcc__library_8cpp =
 [
     [ "CONTRACTS_PREFIX", "dfcc__library_8cpp.html#a1dd179d135b66894881ae95e5138aa3f", null ],
     [ "add_checked_pragmas", "dfcc__library_8cpp.html#aa699ce3736b7645af2d4502a17dc65df", null ],
+    [ "code_types_match", "dfcc__library_8cpp.html#ae515dc337b1586392962977e554db041", null ],
     [ "create_assignable_builtin_names", "dfcc__library_8cpp.html#a88bbb3f9da6a70870608e83620c24dae", null ],
     [ "create_dfcc_fun_to_name", "dfcc__library_8cpp.html#a5a10cb3543848b4b55385e56e7265b5e", null ],
     [ "create_dfcc_hook", "dfcc__library_8cpp.html#ae5c62739df16c0fbcfd9fe5b667051e9", null ],

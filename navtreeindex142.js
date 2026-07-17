@@ -1,5 +1,6 @@
 var NAVTREEINDEX142 =
 {
+"structjava__primitive__type__infot.html#ab2ccea89393dc05ee8ec34f7b1f273f6":[7,0,727,0],
 "structjava__primitive__type__infot.html#abc9788f6fc83d39269bf08166d341af4":[7,0,727,1],
 "structlabelt.html":[7,0,754],
 "structlabelt.html#a2500f026e1c3539485bc7f6456765dc7":[7,0,754,1],
@@ -248,6 +249,5 @@ var NAVTREEINDEX142 =
 "structnfat.html#a849111840a44fba8d5f15651f6fe66cd":[7,0,877,7],
 "structnfat.html#aa32ee710dbc089334025f2b6cf85b61c":[7,0,877,8],
 "structnfat.html#ad39cc180b8bda2a232b0508bf92a74de":[7,0,877,6],
-"structnfat.html#ae59ece6a48257de3a9610fd809f85d41":[7,0,877,5],
-"structnfat_1_1statet.html":[7,0,877,0]
+"structnfat.html#ae59ece6a48257de3a9610fd809f85d41":[7,0,877,5]
 };

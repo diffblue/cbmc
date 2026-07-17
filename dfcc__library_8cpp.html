@@ -108,6 +108,7 @@ $(document).ready(function(){initNavTree('dfcc__library_8cpp.html',''); initResi
 <code>#include &lt;<a class="el" href="c__types_8h_source.html">util/c_types.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="config_8h_source.html">util/config.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="cprover__prefix_8h_source.html">util/cprover_prefix.h</a>&gt;</code><br />
+<code>#include &lt;<a class="el" href="format__type_8h_source.html">util/format_type.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="src_2util_2message_8h_source.html">util/message.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__expr_8h_source.html">util/pointer_expr.h</a>&gt;</code><br />
 <code>#include &lt;<a class="el" href="pointer__predicates_8h_source.html">util/pointer_predicates.h</a>&gt;</code><br />
@@ -129,7 +130,7 @@ $(document).ready(function(){initNavTree('dfcc__library_8cpp.html',''); initResi
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__library_8cpp__incl.svg" width="2755" height="1048"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="dfcc__library_8cpp__incl.svg" width="3008" height="1048"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="dfcc__library_8cpp_source.html">Go to the source code of this file.</a></p>
@@ -158,6 +159,9 @@ Functions</h2></td></tr>
 <tr class="separator:a88bbb3f9da6a70870608e83620c24dae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa699ce3736b7645af2d4502a17dc65df" id="r_aa699ce3736b7645af2d4502a17dc65df"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__library_8cpp.html#aa699ce3736b7645af2d4502a17dc65df">add_checked_pragmas</a> (<a class="el" href="classsource__locationt.html">source_locationt</a> &amp;<a class="el" href="classait.html">sl</a>)</td></tr>
 <tr class="separator:aa699ce3736b7645af2d4502a17dc65df"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae515dc337b1586392962977e554db041" id="r_ae515dc337b1586392962977e554db041"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="dfcc__library_8cpp.html#ae515dc337b1586392962977e554db041">code_types_match</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;lhs, <a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;rhs)</td></tr>
+<tr class="memdesc:ae515dc337b1586392962977e554db041"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns true iff the two code types are equal when ignoring parameter identifiers and base names.  <br /></td></tr>
+<tr class="separator:ae515dc337b1586392962977e554db041"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="var-members" name="var-members"></a>
 Variables</h2></td></tr>
@@ -184,7 +188,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00046">46</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00047">47</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -213,7 +217,47 @@ Variables</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00221">221</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00222">222</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+
+</div>
+</div>
+<a id="ae515dc337b1586392962977e554db041" name="ae515dc337b1586392962977e554db041"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae515dc337b1586392962977e554db041">&#9670;&#160;</a></span>code_types_match()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">bool</a> code_types_match </td>
+          <td>(</td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>lhs</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classtypet.html">typet</a> &amp;&#160;</td>
+          <td class="paramname"><em>rhs</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">static</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Returns true iff the two code types are equal when ignoring parameter identifiers and base names. </p>
+
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00282">282</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -232,7 +276,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00163">163</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00164">164</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -251,7 +295,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00063">63</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00064">64</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -270,7 +314,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00143">143</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00144">144</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -291,7 +335,7 @@ Variables</h2></td></tr>
 
 <p>Creates the enum to type name mapping. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00049">49</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00050">50</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -310,7 +354,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00153">153</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00154">154</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -334,7 +378,7 @@ template&lt;<a class="el" href="classait.html">typename</a> K , <a class="el" hr
 
 <p>Swaps keys and values in a map. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00037">37</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00038">38</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -366,7 +410,7 @@ template&lt;<a class="el" href="classait.html">typename</a> K , <a class="el" hr
 </div><!-- fragment -->
 <p>Set of functions that contain calls to assignable_malloc or assignable_free. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00462">462</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00504">504</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -426,7 +470,7 @@ template&lt;<a class="el" href="classait.html">typename</a> K , <a class="el" hr
 </div><!-- fragment -->
 <p>set of functions that need to be inlined </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00391">391</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00433">433</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
@@ -459,7 +503,7 @@ template&lt;<a class="el" href="classait.html">typename</a> K , <a class="el" hr
 </div><!-- fragment -->
 <p>set of functions that need to be unwound to assigns clause size with corresponding loop identifiers. </p>
 
-<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00425">425</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="dfcc__library_8cpp_source.html#l00467">467</a> of file <a class="el" href="dfcc__library_8cpp_source.html">dfcc_library.cpp</a>.</p>
 
 </div>
 </div>
