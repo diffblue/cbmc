@@ -3230,3 +3230,20 @@ during an instance's own instantiation.  REAL FIX: register member
 class-template declarations at instance-body conversion (mirror the
 template_methods walk's registration of member FUNCTION templates).
 Suite green 91 skipped.
+
+## residual reproducers round 2 (2026-07-17 night)
+
+1. cpp20_requires_static_call_atom KNOWNBUG filed (header-free, ~30
+lines, first-try repro): requires(ok<U2>()) calling a constexpr static
+member template whose body uses the CLASS parameter -- the call-atom
+fold returns unknown.  Pins the exact remaining pair/map mechanism;
+inline-atom variant already CORE.  FIX: fold must type-check the callee
+with class+member template maps.
+2. Member-template registration: 4th hand-mimic (competitor + alias
+chain + value-dependent default arg + dependent-scope consumer) still
+PASSES -- 39-line cvise reduction confirmed minimal; the incomplete
+struct K + hash<vector> partial-spec declaration + allocator_traits::
+value_type member interlock is irreducible by hand.  Registration fix
+(instance-body conversion) remains the identified repair.
+3. unordered_set: NO residual (fully CORE since the rehash models).
+Suite green 92 skipped.
