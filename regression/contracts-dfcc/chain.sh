@@ -21,6 +21,16 @@ else
   args_cbmc="${args#*" _ "}"
 fi
 
+# An optional pre-processing pass with goto-instrument can be requested by
+# separating its arguments from the main instrumentation arguments using
+# " __ ", as in: --drop-unused-functions __ --dfcc main
+args_pre=""
+if [[ "$args_inst" == *" __ "* ]]
+then
+  args_pre="${args_inst%%" __ "*}"
+  args_inst="${args_inst#*" __ "}"
+fi
+
 dfcc_suffix=""
 if [[ "${use_dfcc}" == "false" ]]; then
   set -- $args_inst
@@ -41,6 +51,12 @@ if [[ "${is_windows}" == "true" ]]; then
   $goto_cc "${name}.c" "/Fe${name}${dfcc_suffix}.gb"
 else
   $goto_cc -o "${name}${dfcc_suffix}.gb" "${name}.c"
+fi
+
+if [[ -n "$args_pre" ]]; then
+  $goto_instrument ${args_pre} "${name}${dfcc_suffix}.gb" \
+    "${name}${dfcc_suffix}-pre.gb"
+  mv "${name}${dfcc_suffix}-pre.gb" "${name}${dfcc_suffix}.gb"
 fi
 
 rm -f "${name}${dfcc_suffix}-mod.gb"

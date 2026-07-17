@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+This test checks that goto-instrument --dfcc does not fail when code
+unrelated to the harness contains a call to free.
+See: https://github.com/diffblue/cbmc/issues/8814
