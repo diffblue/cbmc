@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ members usable: SUCCESS$
@@ -41,3 +41,9 @@ reduction is genuinely minimal; the incomplete `struct K`, the
 `hash<vector<_Alloc>>` partial-specialization declaration and the
 allocator_traits::value_type member interlock to produce the failing
 instantiation order and cannot be simplified away by hand.
+
+FIXED 2026-07-17 night: per-member error recovery in
+typecheck_compound_body during implicit instantiation ([temp.inst]/11
+tolerance): a mid-body throw no longer drops every subsequent member,
+so the member class template registers in the instance scope and the
+lookup succeeds.
