@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ null pointer constant selected: SUCCESS$
@@ -7,13 +7,11 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG: N5008 [temp.constr.decl]/1 + [temp.deduct]/5 -- a requires
-atom referencing the ENCLOSING CLASS's template parameter
-(__is_constructible(T2, U2) inside pr<T2>) cannot be evaluated by the
-satisfaction check (only the member template's own parameters are
-substituted), so the unviable constrained constructor stays in the
-overload set and its body fails conversion.  Header-free residual of
-cpp20_pair_converting_ctor (libstdc++ C++20 pair) and thereby
-cpp20_map_basic.  FIX LEAD: extend the evaluator's name substitution
-with the class instance's ID_C_template/ID_C_template_arguments.
-g++/clang++ runtime-verified.  Flip to CORE when fixed.
+N5008 [temp.constr.decl]/3 -- the associated constraints of a
+constrained member of a class template include the enclosing class
+template's parameters; a requires atom referencing them
+(__is_constructible(T2, U2) inside pr<T2>) is now evaluated by mapping
+the class instance's ID_C_template/ID_C_template_arguments in the
+satisfaction check, so the unviable constrained constructor is removed
+and pr(const T2&) converts the literal 0 as a null pointer constant.
+g++/clang++ runtime-verified.
