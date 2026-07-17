@@ -2840,6 +2840,30 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
           cpp_idt::id_classt::TEMPLATE);
 
+        // N5008 [basic.lookup.qual] + [temp.names]/3: for
+        // `T::template name<args>` the name is looked up in the scope
+        // of T.  When T is a class-template instance whose members
+        // have not been registered yet (its scope was entered without
+        // full elaboration -- e.g. __gnu_cxx::__alloc_traits<A, U>'s
+        // member template `rebind` while instantiating _Vector_base),
+        // the lookup comes back empty and the recursive fallback would
+        // collect every same-name member template in the program
+        // ("template scope 'rebind' is ambiguous", with the correct
+        // candidate not even in the set).  Elaborate the instance and
+        // retry the scope-restricted lookup first.
+        if(
+          id_set.empty() &&
+          !cpp_typecheck.cpp_scopes.current_scope().class_identifier.empty())
+        {
+          struct_tag_typet instance{
+            cpp_typecheck.cpp_scopes.current_scope().class_identifier};
+          cpp_typecheck.elaborate_class_template(instance);
+          id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+            final_base_name,
+            recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
+            cpp_idt::id_classt::TEMPLATE);
+        }
+
         // If no template was found, check if the name is a template
         // template parameter and resolve it via the template map.
         if(id_set.empty())
@@ -3385,11 +3409,33 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
     //       unchanged so the ambiguity error below fires.
     cpp_scopet &current = cpp_typecheck.cpp_scopes.current_scope();
     const std::string prefix = id2string(current.identifier) + "::";
+    // A class-instance scope's identifier carries the "tag-" marker on
+    // its final class component ("__gnu_cxx::tag-__alloc_traits<...>"),
+    // while a member template's identifier is rooted at the class name
+    // WITHOUT it ("__gnu_cxx::__alloc_traits<...>::template.rebind<>").
+    // Build a tag-stripped variant of the prefix so the scope-of-T
+    // filter recognizes the class's own member templates; the "tag-"
+    // token sits after the last "::" preceding the template-argument
+    // list (arguments may contain "::" themselves).
+    std::string untagged_prefix = prefix;
+    {
+      std::size_t lt_pos = untagged_prefix.find('<');
+      std::size_t search_end =
+        lt_pos == std::string::npos ? std::string::npos : lt_pos;
+      std::size_t sep = untagged_prefix.rfind("::", search_end);
+      std::size_t tag_pos = sep != std::string::npos ? sep + 2 : 0;
+      if(untagged_prefix.compare(tag_pos, 4, "tag-") == 0)
+        untagged_prefix.erase(tag_pos, 4);
+    }
     std::set<irep_idt> filtered;
     for(const auto &pt : primary_templates)
     {
-      if(id2string(pt).find(prefix) == 0 || pt == current.identifier)
+      if(
+        id2string(pt).find(prefix) == 0 ||
+        id2string(pt).find(untagged_prefix) == 0 || pt == current.identifier)
+      {
         filtered.insert(pt);
+      }
     }
     if(!filtered.empty() && filtered.size() < primary_templates.size())
       primary_templates = filtered;
