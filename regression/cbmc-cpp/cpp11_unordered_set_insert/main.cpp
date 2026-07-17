@@ -5,11 +5,16 @@
 // _Insert<...>::insert(value_type&&), which must therefore be
 // instantiated.
 //
-// KNOWNBUG: the front end never instantiates that mixin member's body
-// ("no body for callee std::__detail::_Insert<...>::insert"), so the
-// element is never inserted and count() returns 0.
+// This test tracked a CHAIN of five defects, all fixed: the deferred-
+// member drain's tag-strip, friendship-based private-base conversion
+// ([class.access.base]/4-5), condition-declaration scoping
+// ([stmt.pre]/6), models for the compiled-library
+// _Prime_rehash_policy::_M_next_bkt/_M_need_rehash, and the
+// destructor-via-typedef-name substitution ([expr.prim.id.dtor]/1,
+// [basic.lookup.qual]/6) that _M_deallocate_node_ptr's
+// `__n->~__node_type()` needs.
 //
-// g++/clang++ verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <unordered_set>
 
