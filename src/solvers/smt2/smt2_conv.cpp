@@ -1129,6 +1129,19 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   return result;
 }
 
+/// Build the name of a datatype field selector (or member-update helper)
+/// for component \p component_name of the datatype named \p smt_typename.
+/// Component names may contain characters that are not permitted in SMT2
+/// simple symbols (e.g. "::" in C++ qualified names, which cvc5 rejects
+/// with a parse error); quote via convert_identifier as for any other
+/// identifier.
+std::string smt2_convt::datatype_selector_name(
+  const std::string &smt_typename,
+  const irep_idt &component_name)
+{
+  return convert_identifier(smt_typename + "." + id2string(component_name));
+}
+
 std::string smt2_convt::type2id(const typet &type) const
 {
   if(type.id()==ID_floatbv)
@@ -4648,7 +4661,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
     {
       const std::string &smt_typename = datatype_map.at(expr_type);
 
-      out << "(update-" << smt_typename << "." << component_name << " ";
+      out << "("
+          << datatype_selector_name("update-" + smt_typename, component_name)
+          << " ";
       convert_expr(expr.old());
       out << " ";
       convert_expr(value);
@@ -4873,8 +4888,9 @@ void smt2_convt::convert_member(const member_exprt &expr)
     {
       const std::string &smt_typename = datatype_map.at(struct_type);
 
-      out << "(" << smt_typename << "."
-          << struct_type.get_component(name).get_name()
+      out << "("
+          << datatype_selector_name(
+               smt_typename, struct_type.get_component(name).get_name())
           << " ";
       convert_expr(struct_op);
       out << ")";
@@ -6179,8 +6195,8 @@ void smt2_convt::find_symbols_rec(
         if(is_zero_width(component.type(), ns))
           continue;
 
-        out << "(" << smt_typename << "." << component.get_name()
-                      << " ";
+        out << "(" << datatype_selector_name(smt_typename, component.get_name())
+            << " ";
         convert_type(component.type());
         out << ") ";
       }
@@ -6211,10 +6227,12 @@ void smt2_convt::find_symbols_rec(
           continue;
 
         const struct_union_typet::componentt &component=*it;
-        out << "(define-fun update-" << smt_typename << "."
-            << component.get_name() << " "
+        out << "(define-fun "
+            << datatype_selector_name(
+                 "update-" + smt_typename, component.get_name())
+            << " "
             << "((s " << smt_typename << ") "
-            <<  "(v ";
+            << "(v ";
         convert_type(component.type());
         out << ")) " << smt_typename << " "
             << "(mk-" << smt_typename
@@ -6229,8 +6247,8 @@ void smt2_convt::find_symbols_rec(
             out << "v ";
           else if(!is_zero_width(it2->type(), ns))
           {
-            out << "(" << smt_typename << "."
-                << it2->get_name() << " s) ";
+            out << "(" << datatype_selector_name(smt_typename, it2->get_name())
+                << " s) ";
           }
         }
 
