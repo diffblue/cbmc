@@ -3,15 +3,15 @@
 // required to place such objects in an array; g++/clang give
 // sizeof(membuft) == 4 and static_assert that at compile time.
 //
-// KNOWNBUG: CBMC's struct layout ignores the alignas specifier and
-// computes sizeof(membuft) == 1.  This is the libstdc++
-// __aligned_membuf pattern (_Rb_tree_node, _Hash_node storage): any
-// container node built on aligned storage gets a wrong layout.  The
-// same defect exists in C via _Alignas and in both languages via
-// __attribute__((aligned(...))) on members.  Reduced by cvise from
-// cpp20_map_basic's false positive (m[1] == 42 failing).
+// This used to fail (sizeof computed as 1): the C parser built the
+// _Alignas(type) _Alignof-expression on a discarded parser-stack
+// entry; the C++ parser lost the alignas merged into the declaration
+// when rIntegralDeclaration installed the integral type; and the C++
+// front end neither folded ID_C_alignment to a constant nor applied
+// add_padding to explicitly-aligned structs.  This is the libstdc++
+// __aligned_membuf pattern (_Rb_tree_node, _Hash_node storage).
 //
-// g++/clang++ accept and verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ accept and verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct membuft

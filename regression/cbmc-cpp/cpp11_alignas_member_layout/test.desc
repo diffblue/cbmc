@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^VERIFICATION SUCCESSFUL$
@@ -10,3 +10,10 @@ CBMC ignores alignas in struct layout (sizeof 1 instead of 4); the
 libstdc++ __aligned_membuf pattern under std::map/std::unordered_set
 nodes inherits the wrong layout.  Reduced from cpp20_map_basic via
 cvise (valgrind-clean 32-line false positive on m[1] == 42).
+
+FIXED 2026-07-18: three-part fix -- (1) parser.y's _Alignas(type)
+action built the _Alignof on a discarded stack entry (C); (2) the C++
+parser merged alignas into declaration.type() but rIntegralDeclaration
+swapped it away; (3) the C++ front end neither folded the alignment
+expression to a constant nor ran add_padding for explicitly-aligned
+structs.
