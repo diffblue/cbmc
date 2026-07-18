@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ stored value survives: SUCCESS$
@@ -12,3 +12,8 @@ cvise reduction of cpp20_map_basic's false positive: alignas-ignored
 layout (primary, see cpp11_alignas_member_layout) + an empty-base
 copy-assignment typecast the encoder drops.  Both must be fixed for
 the required patterns; the forbidden pattern pins the encoder drop.
+
+FIXED 2026-07-18 by the alignas layout fix (see
+cpp11_alignas_member_layout): with the correct membuft size the store
+is in bounds and, downstream, the empty-base assignment folds away
+before encoding (no "ignoring typecast" warning remains).
