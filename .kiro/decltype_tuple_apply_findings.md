@@ -3281,3 +3281,32 @@ UNCONDITIONAL -- always brace-wrap injected probes (the misleading-
 indentation -Werror caught it; earlier T0 inserter's paren-heuristic
 also produced one stray-brace repair).
 Suite green 89 skipped.
+
+## residual reproducers round (2026-07-18)
+
+1. **alignas layout defect FOUND (major)**: CBMC ignores alignas (and
+_Alignas, __attribute__((aligned))) in struct layout -- sizeof
+`{alignas(int) char}` = 1, g++ says 4.  This is __aligned_membuf =
+the value storage of EVERY _Rb_tree_node and _Hash_node.  It, not the
+"pair sret handoff", is cpp20_map_basic's primary poison (old desc
+theory retracted).  Fix lead: struct layout code in ansi-c (affects C
+too) -- honour ID_alignment padding for members.
+2. Secondary map defect: synthesized copy assignment of an
+empty-base-only class emits struct-to-base typecast; prop encoder's
+`ignoring()` drops the whole constraint ("warning: ignoring
+typecast").  Only reproduces combined with a punned deref shape --
+kept combined in cpp11_map_value_loss_reduced.
+3. push_back drop sharpened: bare `unordered_set<K>*` DECL (no
+object/insert) kills vector<K>::push_back (enable_if<0,void> on
+_S_use_relocate; stdlib override covers bodies, not constexpr uses in
+return types).
+4. qualified-typedef member drop reduced to ~50 header-free lines
+(needs the __uset_hashtable alias chain; 15-line version passes).
+TECHNIQUE: cvise interestingness for false positives MUST gate on
+valgrind + UBSan-clean runtime, or it reduces to UB programs that
+"fail" legitimately (two wasted rounds).  cbmc --preprocess (not g++
+-E) for faithful preprocessed input; add extern __CPROVER_assert decl
+for the g++ leg; -std=gnu++20 for the Q-literal branches.
+test.pl -K semantics: KNOWNBUG descs encode the DESIRED behavior;
+under -K "successful" means the test currently FAILS (correct).
+Suite green 93 skipped.
