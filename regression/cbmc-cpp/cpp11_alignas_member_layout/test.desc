@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+CBMC ignores alignas in struct layout (sizeof 1 instead of 4); the
+libstdc++ __aligned_membuf pattern under std::map/std::unordered_set
+nodes inherits the wrong layout.  Reduced from cpp20_map_basic via
+cvise (valgrind-clean 32-line false positive on m[1] == 42).

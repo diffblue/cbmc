@@ -92,3 +92,14 @@ interacting with the derived-to-__pair_base "ignoring typecast" shape
 in the returned-temporary construction.  Then the garbage position
 flows into _Rb_tree_insert_and_rebalance (__p->_M_left dereference
 failures).
+
+UPDATE 2026-07-18: the "pair sret handoff" suspicion was wrong.  cvise
+reduction (valgrind/UBSan-clean interestingness) isolated the false
+positive to cpp11_map_value_loss_reduced: PRIMARY root cause is
+cpp11_alignas_member_layout -- CBMC ignores alignas in struct layout,
+so __aligned_membuf (_Rb_tree_node storage) has sizeof 1 instead of 4
+and every node value store/load is out of bounds; SECONDARY, the
+synthesized copy assignment of empty-base-only classes (less :
+binary_function, __pair_base) emits a struct-to-base typecast the SAT
+encoder drops ("warning: ignoring typecast").  Fix alignas layout
+first, then re-triage.
