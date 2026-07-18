@@ -18,7 +18,9 @@
 // (base subobject assignment).  g++/clang++ accept, static_assert
 // sizeof(membuft)==sizeof(int), and verify at runtime.
 //
-// KNOWNBUG: verification must succeed with no dropped constraints.
+// FIXED by the alignas layout fix: with the correct membuft size the
+// store is in bounds; the empty-base assignment then folds away before
+// the encoder (no dropped constraint remains).
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct pairt
