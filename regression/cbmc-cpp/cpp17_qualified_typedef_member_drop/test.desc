@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+symbol 'value_type' is unknown
+--
+The underlying member-conversion throw that per-member recovery
+masks: the qualified-typedef-typed member is dropped from the
+instance.  Verification stays vacuously green (incomplete main), so
+this KNOWNBUG fails via the forbidden pattern.
