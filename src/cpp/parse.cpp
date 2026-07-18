@@ -2577,6 +2577,28 @@ bool Parser::rIntegralDeclaration(
   std::cout << std::string(__indent, ' ') << "Parser::rIntegralDeclaration 3\n";
 #endif
 
+  // rDeclaration may already have merged leading specifiers into
+  // declaration.type() -- notably alignas (N5008 [dcl.align]: the
+  // alignment-specifier appertains to the entity being declared).  A
+  // plain swap would silently discard them (alignas(int) was lost this
+  // way); merge instead.
+  if(declaration.type().is_not_nil() && !declaration.type().id().empty())
+  {
+    // declaration.type() may be a merged_type whose seed was the
+    // default-constructed (empty-id) typet; merge only the meaningful
+    // specifiers.
+    if(declaration.type().id() == ID_merged_type)
+    {
+      for(const typet &sub :
+          to_type_with_subtypes(declaration.type()).subtypes())
+      {
+        if(!sub.id().empty() && sub.is_not_nil())
+          merge_types(sub, integral);
+      }
+    }
+    else
+      merge_types(declaration.type(), integral);
+  }
   declaration.type().swap(integral);
   declaration.storage_spec().swap(storage_spec);
   declaration.member_spec().swap(member_spec);

@@ -50,6 +50,34 @@ void cpp_typecheckt::typecheck_type(typet &type)
     throw 0;
   }
 
+  // N5008 [dcl.align]: fold the alignment-specifier to a constant, as
+  // the C front end does (c_typecheck_type.cpp); otherwise an
+  // alignas(type) member reaches struct layout as an unresolved
+  // alignof expression and the alignment is silently treated as 1.
+  // In a dependent context the fold can fail; leave the expression
+  // as-is then -- the instantiation re-typechecks the member.
+  if(type.find(ID_C_alignment).is_not_nil())
+  {
+    exprt &alignment = static_cast<exprt &>(type.add(ID_C_alignment));
+    if(alignment.id() != ID_default && !alignment.is_constant())
+    {
+      const std::size_t errors_before =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      try
+      {
+        exprt tmp = alignment;
+        typecheck_expr(tmp);
+        make_constant(tmp);
+        alignment = std::move(tmp);
+      }
+      catch(...)
+      {
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
+      }
+    }
+  }
+
   if(type.id() == ID_template_parameter_symbol_type)
   {
     // Per [temp.arg]/2: if this template parameter is bound
