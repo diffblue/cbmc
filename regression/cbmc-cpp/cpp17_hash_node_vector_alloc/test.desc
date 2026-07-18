@@ -50,3 +50,9 @@ the function body, not this constexpr use in a return type), so the
 push_back body's _M_realloc_append call fails substitution and the
 member is dropped.  Next lead: make the model override also cover the
 constexpr evaluation, or model push_back/_M_realloc_append directly.
+
+UPDATE 2026-07-18: residual sharpened into
+cpp17_push_back_after_unordered_set_decl -- a bare unordered_set<K>*
+declaration (no object, no insert) already drops vector<K>::push_back.
+Note _Hash_node also uses __aligned_membuf, so
+cpp11_alignas_member_layout applies to the value storage here too.
