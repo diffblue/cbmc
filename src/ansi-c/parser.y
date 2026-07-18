@@ -1232,9 +1232,15 @@ alignas_specifier:
           parser_stack($$).set(ID_size, parser_stack($3));
         }
         | TOK_ALIGNAS '(' type_name ')'
-        { $$ = $1;
+        { // C11 6.7.5: _Alignas(type) is equivalent to
+          // _Alignas(_Alignof(type)); build the _Alignof expression.
+          // (The old action set ID_type_arg on the discarded $3 --
+          // the alignment was silently lost.)
+          $$ = $1;
           parser_stack($$).id(ID_aligned);
-          parser_stack($3).set(ID_type_arg, parser_stack($3));
+          exprt tmp(ID_alignof);
+          tmp.add(ID_type_arg).swap(parser_stack($3));
+          parser_stack($$).set(ID_size, std::move(tmp));
         }
         ;
 

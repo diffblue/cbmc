@@ -2996,12 +2996,24 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // object size 0 -- a valid bit-field read through a pointer/reference then
   // tripped a spurious "pointer outside object bounds".
   //
+  // N5008 [dcl.align]/5 + [expr.sizeof]/2: an alignment-specifier on a
+  // member raises the member's (and thus the class's) alignment
+  // requirement, and sizeof includes the padding needed to place such
+  // objects in an array.  Ignoring alignas gave `struct { alignas(int)
+  // char c; }` size 1 instead of 4 -- libstdc++'s __aligned_membuf
+  // (_Rb_tree_node/_Hash_node value storage) then had every store/load
+  // out of bounds.
+  //
   // We apply the layout once the component list is final, restricted to a
-  // struct that actually *contains a bit-field*.  Other structs are left at
-  // their previous layout on purpose: the rest of the tool models them
-  // self-consistently without ABI alignment padding, and inserting it would
-  // change sizes that pointer reasoning elsewhere relies on.  The bit-field
-  // case is different -- size 0 is an outright bug.  Further restricted to:
+  // struct that actually *contains a bit-field* or carries an explicit
+  // alignment (alignas/_Alignas/__attribute__((aligned)), recorded as
+  // ID_C_alignment on the struct or a member type).  Other structs are
+  // left at their previous layout on purpose: the rest of the tool models
+  // them self-consistently without ABI alignment padding, and inserting
+  // it would change sizes that pointer reasoning elsewhere relies on.
+  // The bit-field and explicit-alignment cases are different -- size 0
+  // resp. an ignored alignment specifier are outright bugs.  Further
+  // restricted to:
   //  * an actual struct (unions are laid out by their own add_padding overload,
   //    deferred);
   //  * with no base classes (base-subobject layout is an ABI subtlety the
@@ -3021,6 +3033,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       bool already_padded = false;
       bool all_sizes_known = true;
       bool has_bit_field = false;
+      bool has_explicit_alignment =
+        struct_type.find(ID_C_alignment).is_not_nil();
       for(const auto &c : struct_type.components())
       {
         if(c.get_is_padding())
@@ -3032,8 +3046,14 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           !c.get_bool(ID_is_type) &&
           !pointer_offset_bits(c.type(), ns).has_value())
           all_sizes_known = false;
+        if(
+          !c.get_bool(ID_is_static) && !c.get_bool(ID_is_type) &&
+          c.type().find(ID_C_alignment).is_not_nil())
+          has_explicit_alignment = true;
       }
-      if(has_bit_field && !already_padded && all_sizes_known)
+      if(
+        (has_bit_field || has_explicit_alignment) && !already_padded &&
+        all_sizes_known)
         add_padding(struct_type, ns);
     }
   }
