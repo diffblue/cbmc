@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp20 --object-bits 12 --unwind 2 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ .*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+cvise reduction of cpp20_map_basic's last layer: the piecewise pair
+construction chain (delegating ctor + _Index_tuple pack-expansion
+mem-init) loses the constructed value; the operator[] reference lands
+at offset 12 instead of 4.  All pointer checks stay green -- pure
+value corruption.
