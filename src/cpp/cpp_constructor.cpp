@@ -490,10 +490,33 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     const struct_typet &struct_type =
       follow_tag(to_struct_tag_type(object_tc.type()));
 
-    // C++17 aggregate initialization with base classes:
-    // If the struct has bases but no user-declared constructors and
-    // multiple operands are provided, do aggregate initialization.
-    if(!struct_type.bases().empty() && operands_tc.size() >= 2)
+    // C++17 aggregate initialization with base classes, and C++20
+    // parenthesized aggregate initialization (P0960, N5008
+    // [dcl.init.general]/16.6.2.2): if the struct has bases but no
+    // user-declared constructors, initialize the elements from the
+    // operands.  For a SINGLE operand this must not shadow copy/move
+    // construction ([dcl.init.general]/16.6.1 considers constructors
+    // first): skip when the operand is the class itself or derived
+    // from it -- the synthesized copy/move constructor handles those.
+    bool single_operand_aggregate = false;
+    if(!struct_type.bases().empty() && operands_tc.size() == 1)
+    {
+      typet op_t = operands_tc.front().type();
+      if(op_t.id() == ID_struct_tag)
+      {
+        const irep_idt &op_id = to_struct_tag_type(op_t).get_identifier();
+        single_operand_aggregate =
+          op_id != to_struct_tag_type(object_tc.type()).get_identifier() &&
+          !subtype_typecast(
+            follow_tag(to_struct_tag_type(op_t)),
+            follow_tag(to_struct_tag_type(object_tc.type())));
+      }
+      else
+        single_operand_aggregate = true;
+    }
+    if(
+      !struct_type.bases().empty() &&
+      (operands_tc.size() >= 2 || single_operand_aggregate))
     {
       // [dcl.init.aggr]/1: a class with a user-declared constructor is not an
       // aggregate.  A template constructor is not stored as a regular component
@@ -509,12 +532,15 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         const code_typet &ct = to_code_type(c.type());
         if(ct.return_type().id() != ID_constructor)
           continue;
-        // Skip default ctor (this only) and copy/move ctor
-        if(ct.parameters().size() <= 1)
-          continue;
-        if(
-          ct.parameters().size() == 2 &&
-          is_reference(ct.parameters()[1].type()))
+        // N5008 [dcl.init.aggr]/1 (C++20 rule): ANY user-declared
+        // constructor -- including a user-declared default or copy/move
+        // constructor -- disqualifies the aggregate.  Only the
+        // compiler-synthesized ones (marked #is_implicit_ctor) are
+        // ignored.  The previous shape-based skip (this-only and
+        // (this, reference) signatures) also skipped USER-declared
+        // default constructors, so `base_type(10)` inside Constructor13
+        // aggregate-initialized a class with user constructors.
+        if(c.type().get_bool("#is_implicit_ctor"))
           continue;
         has_user_ctor = true;
         break;
