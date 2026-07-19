@@ -6,16 +6,14 @@
 // [expr.type.conv]/2 makes `itert{&g}` aggregate-initialize a
 // temporary.
 //
-// KNOWNBUG: as soon as a destructor is declared, CBMC resolves the
-// braced functional cast `itert{&g}` through constructor overload
-// resolution (which only finds the synthesized default/copy
-// constructors) and fails with "found no match for symbol 'itert'".
-// The same initializer works without the destructor, and the
-// declaration form `itert it{&g};` works even with it.  This shape is
-// libstdc++'s iterator construction in <bits/stl_tree.h> and hit the
-// map-rebalance-round reducers.
+// This used to fail ("found no match for symbol 'itert'"): declaring
+// any destructor made the front end synthesize default/copy/move
+// constructors, and the aggregate gate counted those as
+// DISQUALIFYING, sending the braced temporary into constructor
+// overload resolution.  Synthesized constructors are now marked
+// #is_implicit_ctor and ignored by aggregate detection.
 //
-// g++/clang++ accept and verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ accept and verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 struct nodet
