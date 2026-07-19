@@ -113,3 +113,12 @@ _M_get_insert_*_pos's pointer pair).  ALL pointer checks now pass at
 --unwind 6 --paths lifo; theremaining failure is a pure value loss in the
 piecewise pair construction chain -- reduced to
 cpp20_map_piecewise_value_loss (171 header-free lines).
+
+UPDATE 2026-07-19 late: the piecewise construction chain is FIXED
+(P0960 paren-aggregate-init + deleted-implicit-default-ctor;
+cpp20_map_piecewise_value_loss is CORE) -- forward_as_tuple now has a
+real body and the key reaches the node.  The remaining failure at
+--unwind 2 is the next layer: the SECOND operator[] lookup's
+_M_get_insert_hint_unique_pos takes the equivalent-keys path with
+__pos._M_node == NULL (iterator equality/decrement layer), so the
+returned reference is derived from a null hint.
