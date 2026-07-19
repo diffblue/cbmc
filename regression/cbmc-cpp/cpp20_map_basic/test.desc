@@ -103,3 +103,13 @@ synthesized copy assignment of empty-base-only classes (less :
 binary_function, __pair_base) emits a struct-to-base typecast the SAT
 encoder drops ("warning: ignoring typecast").  Fix alignas layout
 first, then re-triage.
+
+UPDATE 2026-07-19: three more layers fixed (GNU __alignof__(expr) in
+C++ -- the __aligned_membuf alignment silently degraded to 1; c_bool
+constants unrecognized by the requires-satisfaction evaluator; a
+throwing constraint evaluation keeping libstdc++ pair's unsatisfiable
+converting constructor alive, which forwarded the literal 0 into
+_M_get_insert_*_pos's pointer pair).  ALL pointer checks now pass at
+--unwind 6 --paths lifo; theremaining failure is a pure value loss in the
+piecewise pair construction chain -- reduced to
+cpp20_map_piecewise_value_loss (171 header-free lines).

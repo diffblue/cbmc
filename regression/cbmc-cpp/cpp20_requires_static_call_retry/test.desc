@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-19: post-throw retry of requires-clause evaluation
+(call atoms only; concept-id folds stay untrusted).
