@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12
 ^VERIFICATION SUCCESSFUL$
@@ -11,3 +11,8 @@ Sharpened repro of cpp17_hash_node_vector_alloc's residual: a bare
 std::unordered_set<K>* declaration (no object) is enough to make the
 later std::vector<K>::push_back body get dropped through a silent
 enable_if<0,void> SFINAE throw on _S_use_relocate.
+
+FIXED 2026-07-18: convert_template_parameter's by-short-name fallback
+captured an enclosing instantiation's same-named parameter for an
+explicitly-unassigned deduction variable ([temp.deduct]/2 clean slate);
+now restricted to identifiers wholly unknown to the template map.

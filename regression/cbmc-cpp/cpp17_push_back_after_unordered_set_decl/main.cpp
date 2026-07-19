@@ -2,19 +2,18 @@
 // std::unordered_set<K>* must not affect the later instantiation of
 // std::vector<K>::push_back.
 //
-// KNOWNBUG: after std::unordered_set<K> is mentioned (a pointer
-// declaration suffices -- no object, no insert), the body of
-// std::vector<K>::push_back is silently dropped: its _M_realloc_append
-// path evaluates vector::_S_use_relocate() to FALSE in the enable_if
-// of a return type ('type' unknown in std::enable_if<0,void> -- a
-// silent [temp.deduct]/8-style throw), even though CBMC's stdlib model
-// overrides _S_nothrow_relocate/_S_use_relocate to true.  The override
-// covers the function bodies but not this constexpr use in a return
-// type.  Symptom: "no body for callee std::vector<...>::push_back".
-// Without the unordered_set mention the same code verifies
-// (cpp11_vector_of_class_push_back-style tests pass).
+// This used to fail ("no body for callee std::vector<...>::push_back")
+// after a bare std::unordered_set<K> mention: while disambiguating
+// std::hash against the pattern hash<vector<bool, _Alloc>>
+// (stl_bvector.h), the pattern's own _Alloc -- an explicitly-unassigned
+// deduction variable -- was resolved BY SHORT NAME through the
+// enclosing unordered_set instantiation's _Alloc = allocator<K>
+// (violating [temp.deduct]/2's clean slate), instantiating a hybrid
+// vector<bool, allocator<K>> whose half-substituted cached instances
+// (a truncated __gnu_cxx::__alloc_traits among them) later poisoned
+// vector<K>.
 //
-// g++/clang++ accept and verify at runtime.  Flip to CORE when fixed.
+// g++/clang++ accept and verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <unordered_set>
 #include <vector>
