@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ vector element after hash-node rebind: SUCCESS$
@@ -56,3 +56,7 @@ cpp17_push_back_after_unordered_set_decl -- a bare unordered_set<K>*
 declaration (no object, no insert) already drops vector<K>::push_back.
 Note _Hash_node also uses __aligned_membuf, so
 cpp11_alignas_member_layout applies to the value storage here too.
+
+FIXED 2026-07-18: the last residual (push_back dropped) fell to the
+[temp.deduct]/2 clean-slate fix; see
+cpp17_push_back_after_unordered_set_decl.

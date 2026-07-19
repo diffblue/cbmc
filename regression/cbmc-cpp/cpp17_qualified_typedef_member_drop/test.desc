@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -11,3 +11,8 @@ The underlying member-conversion throw that per-member recovery
 masks: the qualified-typedef-typed member is dropped from the
 instance.  Verification stays vacuously green (incomplete main), so
 this KNOWNBUG fails via the forbidden pattern.
+
+FIXED 2026-07-18 by the same [temp.deduct]/2 clean-slate fix as
+cpp17_push_back_after_unordered_set_decl: the member's throw came from
+a hybrid half-substituted instance created via the by-short-name
+template-parameter fallback.
