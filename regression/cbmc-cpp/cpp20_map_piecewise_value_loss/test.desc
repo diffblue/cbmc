@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20 --object-bits 12 --unwind 2 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ .*: SUCCESS$
@@ -12,3 +12,8 @@ construction chain (delegating ctor + _Index_tuple pack-expansion
 mem-init) loses the constructed value; the operator[] reference lands
 at offset 12 instead of 4.  All pointer checks stay green -- pure
 value corruption.
+
+FIXED 2026-07-19: C++20 parenthesized aggregate initialization (P0960)
+implemented as constructor-first fallback, plus deleted-implicit-
+default-constructor semantics ([class.default.ctor]/2) so classes with
+a non-default-constructible base convert at all.
