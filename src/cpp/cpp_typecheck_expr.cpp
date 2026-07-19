@@ -2957,6 +2957,14 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         const code_typet &code_type = to_code_type(c.type());
         if(code_type.return_type().id() != ID_constructor)
           continue;
+        // N5008 [dcl.init.aggr]/1: only USER-declared (or inherited)
+        // constructors disqualify an aggregate.  A user-declared
+        // destructor makes the front end synthesize default/copy/move
+        // constructors; treating those as disqualifying sent the braced
+        // temporary `itert{&g}` of a destructor-bearing aggregate into
+        // constructor overload resolution, which found no match.
+        if(c.type().get_bool("#is_implicit_ctor"))
+          continue;
         const auto &params = code_type.parameters();
         // A copy/move constructor takes a single (reference) parameter of the
         // class's OWN type.  A converting constructor such as `It(const S&)`
