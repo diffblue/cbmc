@@ -1102,25 +1102,52 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   bind_req_params(ns.second);
               };
               bind_req_params(req_copy);
-              cpp_typecheck.typecheck_expr(req_copy);
-              // Constant-fold the substituted constraint so atomic
-              // constraints written with type traits (e.g.
-              // `!is_convertible_v<U, size_type>`) collapse to a boolean
-              // constant.  typecheck_expr resolves the trait's `::value` to
-              // a comparison such as notequal(1, 0) but does not fold it;
-              // without this the tri-state eval below sees an opaque
-              // comparison, returns "unknown", and wrongly keeps a candidate
-              // whose requires-clause is actually unsatisfied (e.g. the
-              // libstdc++ span(_It, _End) iterator-sentinel constructor stays
-              // viable for span(ptr, count), is selected, and its `__last -
-              // __first` body is ill-formed).
-              simplify(req_copy, cpp_typecheck);
+              // Keep a substituted-but-untypechecked copy: if the
+              // whole-clause type-check throws, the tri-state evaluator
+              // below can still decide the clause per atom (its call-atom
+              // path prepares deferred callee bodies and type-checks in
+              // the candidate's class scope).  N5008
+              // [temp.constr.atomic]/3 makes a genuine substitution
+              // failure "not satisfied"; without this retry a throw kept
+              // the candidate alive -- libstdc++ pair's converting
+              // constructor with a literal 0 argument threw on first
+              // evaluation exactly this way and beat the viable const-ref
+              // constructor, corrupting every _M_get_insert_*_pos result
+              // in std::map.  A throw the evaluator cannot decide keeps
+              // the candidate (previous behaviour) since wholesale
+              // rejection broke valid concept-using code.
+              const exprt req_substituted = req_copy;
+              bool whole_clause_typecheck_failed = false;
+              try
+              {
+                cpp_typecheck.typecheck_expr(req_copy);
+                // Constant-fold the substituted constraint so atomic
+                // constraints written with type traits (e.g.
+                // `!is_convertible_v<U, size_type>`) collapse to a boolean
+                // constant.  typecheck_expr resolves the trait's `::value` to
+                // a comparison such as notequal(1, 0) but does not fold it;
+                // without this the tri-state eval below sees an opaque
+                // comparison, returns "unknown", and wrongly keeps a candidate
+                // whose requires-clause is actually unsatisfied (e.g. the
+                // libstdc++ span(_It, _End) iterator-sentinel constructor stays
+                // viable for span(ptr, count), is selected, and its `__last -
+                // __first` body is ill-formed).
+                simplify(req_copy, cpp_typecheck);
+              }
+              catch(...)
+              {
+                req_copy = req_substituted;
+                whole_clause_typecheck_failed = true;
+              }
               // [temp.constr.op]: tri-state evaluation of the constraint's
               // boolean structure (1 satisfied, 0 unsatisfied, -1 unknown).
               // typecheck_expr folds atomic constraints to constants but
               // leaves the &&/|| structure, so a single is_false() check
               // misses e.g. or(false, false).  Reject only on a definite
               // 'unsatisfied'; keep the candidate when unknown.
+              const bool clause_mentions_concepts =
+                id2string(e.type().get(ID_C_template)).find("#concept_") !=
+                std::string::npos;
               std::function<int(const exprt &)> eval =
                 [&](const exprt &x) -> int
               {
@@ -1128,6 +1155,26 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   return 1;
                 if(x.is_false())
                   return 0;
+                // N5008 [temp.constr.atomic]/1: the atom is contextually
+                // converted to bool.  A folded trait member such as
+                // bool_constant<...>::value is a constant of type c_bool
+                // (or another integral type), which is_true/is_false do
+                // not recognize -- previously this made a definitively
+                // FALSE clause "unknown", keeping an unsatisfiable
+                // overload (libstdc++ pair's converting constructor with
+                // a literal 0 argument) that then beat the viable one.
+                // Trust such constants only when the candidate's
+                // constraints mention no concept-ids: concept evaluation
+                // still error-recovers into bogus zero constants under
+                // the SFINAE guard (the std::span constructors), so a
+                // concept-tainted 0 must stay "unknown".
+                if(
+                  !clause_mentions_concepts && x.is_constant() &&
+                  (x.type().id() == ID_c_bool || x.type().id() == ID_signedbv ||
+                   x.type().id() == ID_unsignedbv))
+                {
+                  return to_constant_expr(x).is_zero() ? 0 : 1;
+                }
                 if(x.id() == ID_and)
                 {
                   int r = 1;
@@ -1179,10 +1226,16 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 // a SFINAE context.  Failures (or a non-constant result)
                 // stay "unknown" and keep the candidate ([temp.constr.
                 // atomic]/3 makes unsatisfaction soft here anyway).
+                // After a whole-clause type-check failure the clause is
+                // the raw substituted parse tree; only CALL atoms are
+                // safe to fold there (a bare cpp_name may be a
+                // concept-id, whose error recovery yields a bogus
+                // constant -- the std::span constructors' clauses).
                 if(
-                  x.id() == ID_side_effect || x.id() == ID_cpp_name ||
-                  x.id() == ID_function_call || x.id() == ID_equal ||
-                  x.id() == ID_notequal)
+                  x.id() == ID_side_effect || x.id() == ID_function_call ||
+                  (!whole_clause_typecheck_failed &&
+                   (x.id() == ID_cpp_name || x.id() == ID_equal ||
+                    x.id() == ID_notequal)))
                 {
                   try
                   {
