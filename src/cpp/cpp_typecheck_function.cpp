@@ -103,6 +103,10 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // constant-expression context so its statements are not folded.
   non_constant_expression_contextt non_constant_guard{*this};
 
+  // for the deleted-implicit-member recovery below
+  const std::size_t errors_before_conversion =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+
   code_typet &function_type=
     to_code_type(template_subtype(symbol.type));
 
@@ -796,6 +800,52 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
   catch(int)
   {
+    // N5008 [class.default.ctor]/2, [class.copy.ctor]/12,
+    // [class.copy.assign]/7: an implicitly-declared special member
+    // function whose implicit definition would be ill-formed (e.g. a
+    // base class without a default constructor for the implicit
+    // default constructor) is DEFINED AS DELETED -- the program is
+    // only ill-formed if that deleted member is odr-used.  The front
+    // end synthesizes these members eagerly and converting the body
+    // then hard-errors on mere mention of the class (`struct D : B {}`
+    // with B lacking a default constructor).  Treat the failure as a
+    // deletion: drop the body and remove the member from the overload
+    // set (ID_noaccess, the established `= delete` representation); a
+    // later use then fails overload resolution naturally.
+    if(
+      symbol.type.get_bool("#is_implicit_ctor") &&
+      to_code_type(symbol.type).parameters().size() == 1)
+    {
+      // Only the implicit DEFAULT constructor (this-parameter only) is
+      // deleted this way: conversion of implicit copy/move constructors
+      // can fail transiently (ordering of dependent conversions), and
+      // deleting one changes which constructor overload later calls
+      // select -- semantically visible (Constructor13).
+
+      // The diagnostics of the failed implicit definition are not
+      // errors -- the member is merely deleted; restore the count.
+      get_message_handler().set_message_count(
+        messaget::M_ERROR, errors_before_conversion);
+      symbol.value.make_nil();
+      const irep_idt &class_id = symbol.type.get(ID_C_member_name);
+      if(!class_id.empty())
+      {
+        symbolt &class_symbol = symbol_table.get_writeable_ref(class_id);
+        for(auto &c : to_struct_union_type(class_symbol.type).components())
+        {
+          if(c.get_name() == symbol.name)
+          {
+            c.set(ID_access, ID_noaccess);
+            break;
+          }
+        }
+      }
+      disable_access_control = saved_access_control;
+      functions_being_typechecked.erase(symbol.name);
+      deferred_typechecking.erase(symbol.name);
+      return;
+    }
+
     // For system headers, clear the broken body and return.
     // For user code, re-throw.  The `syshdr_guard` destructor (if
     // engaged) runs on the way out and restores handler/error
