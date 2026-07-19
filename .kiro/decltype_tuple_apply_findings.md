@@ -3310,3 +3310,37 @@ for the g++ leg; -std=gnu++20 for the Q-literal branches.
 test.pl -K semantics: KNOWNBUG descs encode the DESIRED behavior;
 under -K "successful" means the test currently FAILS (correct).
 Suite green 93 skipped.
+
+## four-fix round (2026-07-18 evening)
+
+1. **alignas layout FIXED** (3 independent losses): parser.y's
+`_Alignas(type)` action set ID_type_arg on the DISCARDED $3 (fix: build
+the C11 6.7.5 _Alignof equivalence into ID_size on $$); cpp
+rIntegralDeclaration swapped away the alignas merged into
+declaration.type() by rDeclaration (fix: merge pre-collected
+specifiers, skipping the empty-id merge_types seed -- merge_types with
+a default-constructed typet creates merged_type{x, ""}!); cpp never
+folded ID_C_alignment to a constant (fix in typecheck_type, mirroring
+c_typecheck_type, error-count-restoring for dependent contexts) and
+never ran add_padding for explicitly-aligned structs (gate extended
+from bit-field-only).  cpp11_alignas_member_layout +
+cpp11_map_value_loss_reduced CORE; the encoder "ignoring typecast"
+disappeared too (constants fold with correct layout).
+2. **[temp.deduct]/2 clean-slate FIXED** -- the big one:
+convert_template_parameter's lookup_by_suffix fallback captured an
+ENCLOSING instantiation's same-short-name parameter for an explicitly
+UNASSIGNED deduction variable.  unordered_set<K>'s _Alloc=allocator<K>
+leaked into stl_bvector.h's hash<vector<bool,_Alloc>> pattern during
+hash disambiguation -> hybrid vector<bool,allocator<K>> -> truncated
+cached __alloc_traits -> vector<K>::push_back dropped + value_type
+unknown.  Fix: fallback only when the exact id is WHOLLY UNKNOWN to
+the map (present-but-unassigned = active deduction context).  THREE
+tests flipped: push_back_after_unordered_set_decl,
+qualified_typedef_member_drop, hash_node_vector_alloc (fully green).
+TECHNIQUE: backtrace(3) + dladdr fbase-relative offsets + addr2line
+resolved a 40-frame template-machinery recursion in minutes; the
+instantiation-stack probe at class_template_symbol showed the hybrid's
+creation directly.
+Remaining map_basic failure at unwind 6: _Rb_tree_insert_and_rebalance
+__p->_M_left derefs (next frontier; NOT the alignas/pair layers).
+Suite green 89 skipped (4 flips this round).
