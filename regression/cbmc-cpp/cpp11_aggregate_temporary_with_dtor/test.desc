@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member set: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value via member: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A user-declared destructor must not disable aggregate initialization
+of a braced temporary ([dcl.init.aggr]/1, [expr.type.conv]/2); CBMC
+routes itert{&g} to constructor overload resolution and fails with
+"found no match for symbol 'itert'".  Declaration-form brace init
+works; the temporary form is the gap.
