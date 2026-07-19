@@ -1536,6 +1536,41 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
   c_typecheck_baset::typecheck_expr_sizeof(expr);
 }
 
+void cpp_typecheckt::typecheck_expr_alignof(exprt &expr)
+{
+  // GNU __alignof__(expression): the C++ grammar only has the
+  // type-id form (N5008 [expr.alignof]; the expression operand is the
+  // GNU extension), so the parser parses the parenthesised operand as
+  // a type-id -- a name that actually denotes an object mis-parses as
+  // a type and resolution with wantt::TYPE failed ("found no match
+  // for symbol ..."), which in an alignment-specifier position
+  // (libstdc++'s __aligned_membuf: `alignas(__alignof__(_M_t))`)
+  // silently degraded the alignment to 1.  Disambiguate exactly like
+  // typecheck_expr_sizeof above.
+  if(expr.operands().empty())
+  {
+    const typet &type = static_cast<const typet &>(expr.find(ID_type_arg));
+
+    if(type.id() == ID_cpp_name)
+    {
+      cpp_typecheck_fargst fargs;
+
+      exprt symbol_expr = resolve(
+        to_cpp_name(static_cast<const irept &>(type)),
+        cpp_typecheck_resolvet::wantt::BOTH,
+        fargs);
+
+      if(symbol_expr.id() != ID_type)
+      {
+        expr.copy_to_operands(symbol_expr);
+        expr.remove(ID_type_arg);
+      }
+    }
+  }
+
+  c_typecheck_baset::typecheck_expr_alignof(expr);
+}
+
 void cpp_typecheckt::typecheck_expr_ptrmember(exprt &expr)
 {
   typecheck_expr_ptrmember(expr, cpp_typecheck_fargst());
