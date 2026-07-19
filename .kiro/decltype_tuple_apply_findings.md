@@ -3384,3 +3384,27 @@ gate rejected those once bodies were appended).  Also: watch for
 reduction; conversation log had it).
 SIDE GAP noted: aggregate init `itert{&x}` rejected ("found no match
 for symbol") when the struct has a user-declared dtor -- untracked.
+
+## residual capture sweep (2026-07-19 evening)
+
+1. NEW KNOWNBUG cpp11_aggregate_temporary_with_dtor: `itert{&g}`
+(braced functional cast, [expr.type.conv]/2 -> aggregate init per
+[dcl.init.aggr]/1) fails "found no match for symbol" as soon as ANY
+dtor is declared (user or =default) -- the front end routes braced
+temporaries of dtor-bearing classes to ctor overload resolution.
+Matrix: decl-form `itert it{&g}` WORKS; no-dtor temporary WORKS; ALL
+standards affected.  Fix lead: the temporary-object construction path
+must fall back to aggregate init when the class is an aggregate
+(check where cpp_constructor/typecheck_expr_function_call handles
+braced init of class prvalues).
+2. Bodyless-function havoc: NO diagnostics gap -- `no-body` FAILURE
+properties fire for plain, std::-namespaced, and reference-taking
+bodyless functions in cpp mode.  The map-round degenerate reduction
+passed my cvise gate because the gate greped only for
+assertion/dereference failures -- LESSON: interestingness gates
+should reject on ANY non-target FAILURE property (add `grep -qE
+"no-body.*FAILURE" && exit 1`).
+3. Sweep: piecewise value loss already captured
+(cpp20_map_piecewise_value_loss); _Rb_tree_node_base sizeof-28 is the
+documented no-ABI-padding modeling choice (self-consistent); NN_ tag
+prefixes are cpp_type2name display artifacts.
