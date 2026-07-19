@@ -3344,3 +3344,43 @@ creation directly.
 Remaining map_basic failure at unwind 6: _Rb_tree_insert_and_rebalance
 __p->_M_left derefs (next frontier; NOT the alignas/pair layers).
 Suite green 89 skipped (4 flips this round).
+
+## map rebalance round (2026-07-19)
+
+Rebalance derefs were NOT a rebalance bug: three front-end defects
+upstream, all fixed (suite green 88 skipped):
+1. GNU `__alignof__(expr)` in C++ parsed the operand as a TYPE-ID only
+-> object names failed resolution -> silently alignment 1 in
+`alignas(__alignof__(_M_t))` = __aligned_membuf!  Fix: cpp
+typecheck_expr_alignof override mirroring the sizeof disambiguation
+(wantt::BOTH).  cpp11_alignof_expr_member CORE.
+2. requires-satisfaction evaluator blind to c_bool constants (again!
+same class as the call-atom round) -> FALSE clauses "unknown" -> the
+unsatisfiable candidate KEPT and it WON overload resolution.
+Recognize integral constants at eval entry -- but ONLY for
+candidates without concept-ids in their constraints (concept
+error-recovery fabricates zero constants; gate via "#concept_" in the
+mangled name; ungated version broke span AGAIN).
+cpp20_requires_trait_value_atom CORE.
+3. throwing whole-clause typecheck kept the candidate ([temp.constr.
+atomic]/3 says unsatisfied) -- pair(node, 0) selected the CONVERTING
+ctor whose _S_constructible atom threw pre-body-preparation; literal
+0 forwarded into a pointer member = the map __res garbage.  Fix:
+post-throw RETRY of the tri-state eval on the substituted clause
+(call atoms only).  Wholesale reject-on-throw broke 9 concepts tests;
+the retry compromise keeps all green.
+cpp20_requires_static_call_retry CORE.
+Remaining map layer: PIECEWISE pair construction chain loses the
+value (key reads 0, operator[] ref lands at offset 12 not 4; ALL
+pointer checks green).  Reduced to cpp20_map_piecewise_value_loss
+(171 header-free lines).  Small hand mimics of delegation+pack-init
+PASS -- needs the full tuple machinery; next round starts there.
+TECHNIQUE: cvise gates need "no CBMC deref FAILUREs" (excludes
+UB-shaped reductions) + self-contained runtime via cxa stubs
+(bodyless libstdc++ externs like _Rb_tree_insert_and_rebalance let
+reductions exploit CBMC's silent havoc of undefined functions --
+gate rejected those once bodies were appended).  Also: watch for
+`cp x backup` AFTER x was already clobbered (lost the first 124-line
+reduction; conversation log had it).
+SIDE GAP noted: aggregate init `itert{&x}` rejected ("found no match
+for symbol") when the struct has a user-declared dtor -- untracked.
