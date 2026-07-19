@@ -386,6 +386,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
     std::unique_ptr<boolbvt> bv_dimacs =
       std::make_unique<bv_dimacst>(ns, *prop, message_handler, std::cout);
 
+    set_decision_procedure_time_limit(*bv_dimacs);
     return std::make_unique<solvert>(std::move(bv_dimacs), std::move(prop));
   }
 
@@ -394,6 +395,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_dimacs()
   std::unique_ptr<boolbvt> bv_dimacs =
     std::make_unique<bv_dimacst>(ns, *prop, message_handler, *outfile);
 
+  set_decision_procedure_time_limit(*bv_dimacs);
   return std::make_unique<solvert>(
     std::move(bv_dimacs), std::move(prop), std::move(outfile));
 }
@@ -410,6 +412,7 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_external_sat()
   std::unique_ptr<boolbvt> bv_pointers =
     std::make_unique<bv_pointerst>(ns, *prop, message_handler);
 
+  set_decision_procedure_time_limit(*bv_pointers);
   return std::make_unique<solvert>(std::move(bv_pointers), std::move(prop));
 }
 
@@ -504,6 +507,14 @@ solver_factoryt::get_incremental_smt2(std::string solver_command)
         out_filename, message_handler, "--dump-smt-formula"));
   }
 
+  if(options.get_signed_int_option("solver-time-limit") > 0)
+  {
+    messaget{message_handler}.warning()
+      << "solver-time-limit is not propagated to the incremental SMT2 "
+         "back-end and will be ignored"
+      << messaget::eom;
+  }
+
   return std::make_unique<solvert>(
     std::make_unique<smt2_incremental_decision_proceduret>(
       ns, std::move(solver_process), message_handler));
@@ -538,6 +549,7 @@ solver_factoryt::get_smt2(smt2_dect::solvert solver)
     if(options.get_bool_option("fpa"))
       smt2_dec->use_FPA_theory = true;
 
+    set_decision_procedure_time_limit(*smt2_dec);
     return std::make_unique<solvert>(std::move(smt2_dec));
   }
   else if(filename == "-")
@@ -802,5 +814,11 @@ void parse_solver_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-node-refinement", cmdline.get_value("max-node-refinement"));
+  }
+
+  if(cmdline.isset("solver-time-limit"))
+  {
+    options.set_option(
+      "solver-time-limit", cmdline.get_value("solver-time-limit"));
   }
 }

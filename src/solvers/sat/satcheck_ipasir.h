@@ -12,9 +12,12 @@ instructions.
 #ifndef CPROVER_SOLVERS_SAT_SATCHECK_IPASIR_H
 #define CPROVER_SOLVERS_SAT_SATCHECK_IPASIR_H
 
+#include <solvers/hardness_collector.h>
+
 #include "cnf.h"
 
-#include <solvers/hardness_collector.h>
+#include <chrono>
+#include <cstdint>
 
 /// Interface for generic SAT solver interface IPASIR
 class satcheck_ipasirt : public cnf_solvert, public hardness_collectort
@@ -44,10 +47,26 @@ public:
     return true;
   }
 
+  /// \copydoc propt::set_time_limit_milliseconds
+  /// Implemented by registering an `ipasir_set_terminate` callback that
+  /// returns non-zero once the deadline has passed; IPASIR solvers poll
+  /// the callback during solving and stop on a non-zero return.
+  void set_time_limit_milliseconds(uint32_t lim) override
+  {
+    time_limit_milliseconds = lim;
+  }
+
 protected:
   resultt do_prop_solve(const bvt &assumptions) override;
 
   void *solver;
+
+  std::chrono::steady_clock::time_point deadline;
+
+  /// Static thunk passed to `ipasir_set_terminate`. Its `data` is the
+  /// owning solver instance; returns 1 once the per-call deadline has
+  /// been reached.
+  static int terminate_callback(void *data);
 };
 
 #endif // CPROVER_SOLVERS_SAT_SATCHECK_IPASIR_H

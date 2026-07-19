@@ -54,6 +54,15 @@ target_link_libraries(cprover-api-cpp
                       PRIVATE
                       ${LIBRARY_DEPENDENCIES})
 
+# satcheck_minisat2.cpp inside libcprover.<version>.a uses std::thread (see
+# the matching note in src/solvers/CMakeLists.txt).  Because the solvers
+# dependency above is PRIVATE, the `-pthread` link option attached to the
+# solvers target does not propagate to consumers of cprover-api-cpp such as
+# goto-bmc.  Re-publish it as an INTERFACE option so consumers get it.
+if(NOT WIN32)
+    target_link_options(cprover-api-cpp INTERFACE -pthread)
+endif()
+
 # To be able to invoke `ar` on the dependencies we need the paths of the libraries `.a` files.
 # Ths is done by using the cmake generator `$<TARGET_FILE:dependency>`, that in turn will be
 # substituted with the absolute path of the `dependency` output file (a `.a` file in this case).

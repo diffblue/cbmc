@@ -110,6 +110,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/prop/bdd_expr.cpp \
        solvers/sat/external_sat.cpp \
        solvers/sat/satcheck_cadical.cpp \
+       solvers/sat/satcheck_ipasir.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
        solvers/smt2/smt2irep.cpp \
@@ -313,6 +314,9 @@ EXCLUDED_TESTS += satcheck_minisat2.cpp
 endif
 ifeq ($(CADICAL),)
 EXCLUDED_TESTS += satcheck_cadical.cpp
+endif
+ifeq ($(IPASIR),)
+EXCLUDED_TESTS += satcheck_ipasir.cpp
 endif
 
 N_CATCH_TESTS = $(shell ./count_tests.py --exclude-files "$(EXCLUDED_TESTS)")

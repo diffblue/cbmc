@@ -1,0 +1,15 @@
+CORE
+main_multi.c
+--all-properties --solver-time-limit 60
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Exercises --solver-time-limit on the multi-property (incremental) path,
+which issues several solver calls on the same solver instance. This pins
+down that a watchdog interrupt from one (timed-out) solve does not leak
+into subsequent solves on the same instance (see the asynch_interrupt
+handling in satcheck_minisat2). All properties hold and finish well within
+the budget.

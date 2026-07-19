@@ -16,12 +16,13 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/threeval.h>
 
 #include "literal.h"
+#include "solver_resource_limits.h"
 
 #include <cstdint>
 
 /*! \brief TO_BE_DOCUMENTED
 */
-class propt
+class propt : public solver_resource_limitst
 {
 public:
   explicit propt(message_handlert &message_handler) : log(message_handler)
@@ -117,7 +118,12 @@ public:
   virtual void set_frozen(literalt) { }
 
   // Resource limits:
-  virtual void set_time_limit_seconds(uint32_t)
+
+  /// \copydoc solver_resource_limitst::set_time_limit_milliseconds
+  /// This default implementation logs a warning and ignores the limit;
+  /// back-ends with native interrupt support override it to store the limit
+  /// in \ref time_limit_milliseconds and honour it in \ref do_prop_solve.
+  void set_time_limit_milliseconds(uint32_t) override
   {
     log.warning() << "CPU limit ignored (not implemented)" << messaget::eom;
   }
@@ -125,6 +131,11 @@ public:
   std::size_t get_number_of_solver_calls() const;
 
 protected:
+  /// Wall-clock time limit for each solver call, in milliseconds; 0 disables
+  /// it. Stored here so the back-ends share a single member (the seconds
+  /// helper and API live in solver_resource_limitst).
+  uint32_t time_limit_milliseconds = 0;
+
   // solve under the given assumption
   virtual resultt do_prop_solve(const bvt &assumptions) = 0;
 

@@ -132,6 +132,27 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     break;
   }
 
+  if(time_limit_milliseconds != 0)
+  {
+    if(solver == solvert::Z3)
+    {
+      // z3: soft per-query timeout in milliseconds.
+      argv.push_back("-t:" + std::to_string(time_limit_milliseconds));
+    }
+    else if(solver == solvert::CVC5)
+    {
+      // cvc5: per-query time limit in milliseconds.
+      argv.push_back("--tlimit-per=" + std::to_string(time_limit_milliseconds));
+    }
+    else
+    {
+      messaget{message_handler}.warning()
+        << "solver-time-limit is not supported for this SMT2 solver and "
+           "will be ignored"
+        << messaget::eom;
+    }
+  }
+
   int res =
     run(argv[0], argv, stdin_filename, temp_file_stdout(), temp_file_stderr());
 
