@@ -3408,3 +3408,33 @@ should reject on ANY non-target FAILURE property (add `grep -qE
 (cpp20_map_piecewise_value_loss); _Rb_tree_node_base sizeof-28 is the
 documented no-ABI-padding modeling choice (self-consistent); NN_ tag
 prefixes are cpp_type2name display artifacts.
+
+## aggregate + piecewise round (2026-07-19 late)
+
+1. cpp11_aggregate_temporary_with_dtor FIXED -> CORE: #is_implicit_ctor
+marker (rides on decl.type() in default_ctor; copy/move inherit) +
+braced-temporary aggregate gate skips implicit ctors
+([dcl.init.aggr]/1).
+2. cpp20_map_piecewise_value_loss FIXED -> CORE (the 171-line
+reduction): root cause was NOT the pack-expansion mem-init at all --
+forward_as_tuple's body `tuple<_Elements...>(__args...)` is C++20
+P0960 PARENthesized aggregate init (tuple has no matching ctor!);
+unsupported -> body silently dropped -> key havocked.  THREE parts:
+paren-aggregate fallback (ctor-first per [dcl.init.general]/16.6.2.2)
+in explicit_constructor_call + retry-reroute in typecheck_side_effect_
+function_call (catch around typecheck_function_expr; recursion guard
+paren_aggregate_in_progress; error-count snapshots BEFORE the try —
+capturing after the emission left phantom CONVERSION ERRORs twice);
+deleted-implicit-DEFAULT-ctor semantics ([class.default.ctor]/2:
+conversion failure of an implicit this-only ctor = ID_noaccess
+deletion, NOT an error — implicit copy/move excluded, deleting those
+changed overload selection and broke Constructor13); cpp_constructor
+user-ctor scan now marker-based instead of SHAPE-based (this-only
+skip also skipped USER default ctors — combined with my single-operand
+extension that aggregate-initialized Constructor13's `base_type(10)`).
+3. cpp20_map_basic next layer: second lookup's equivalent-keys path
+derives the returned reference from __pos._M_node == NULL (iterator
+equality/decrement).  Fresh frontier, desc updated.
+LESSON: for multi-edit rounds run the FULL suite before flipping —
+the Constructor13 breakage was 2 edits deep in interaction; bisecting
+by reverting one file at a time with the saved copies was fast.
