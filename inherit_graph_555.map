@@ -1,3 +1,41 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" href="$classmessaget_1_1commandt.html" title=" " alt="" coords="5,5,169,31"/>
+<area shape="rect" id="Node000000" href="$classmessaget.html" title="Class that provides messages with a built&#45;in verbosity &#39;level&#39;." alt="" coords="39,104,125,129"/>
+<area shape="rect" id="Node000001" href="$classgoto__convertt.html" title=" " alt="" coords="234,29,346,55"/>
+<area shape="poly" id="edge396_Node000000_Node000001" title=" " alt="" coords="123,96,206,63,241,52,243,57,208,69,125,101"/>
+<area shape="rect" id="Node000004" href="$classpreprocessort.html" title=" " alt="" coords="235,79,345,104"/>
+<area shape="poly" id="edge399_Node000000_Node000004" title=" " alt="" coords="139,107,234,95,235,101,139,112"/>
+<area shape="rect" id="Node000005" href="$classsafety__checkert.html" title=" " alt="" coords="227,128,353,153"/>
+<area shape="poly" id="edge400_Node000000_Node000005" title=" " alt="" coords="139,120,228,131,227,136,138,126"/>
+<area shape="rect" id="Node000006" href="$classtypecheckt.html" title=" " alt="" coords="243,177,337,203"/>
+<area shape="poly" id="edge401_Node000000_Node000006" title=" " alt="" coords="128,132,208,162,246,175,245,180,206,167,127,137"/>
+<area shape="rect" id="Node000002" href="$classcleanert.html" title="Class that allows to clean expressions of side effects and to generate havoc_slice expressions." alt="" coords="482,55,557,80"/>
+<area shape="poly" id="edge397_Node000001_Node000002" title=" " alt="" coords="360,47,482,61,481,66,360,52"/>
+<area shape="rect" id="Node000003" href="$classgoto__convert__functionst.html" title=" " alt="" coords="430,5,609,31"/>
+<area shape="poly" id="edge398_Node000001_Node000003" title=" " alt="" coords="359,32,429,25,430,30,360,37"/>
+<area shape="rect" id="Node000007" href="$classc__typecheck__baset.html" title=" " alt="" coords="446,227,593,252"/>
+<area shape="poly" id="edge402_Node000006_Node000007" title=" " alt="" coords="352,200,460,224,459,229,351,206"/>
+<area shape="rect" id="Node000018" href="$classjava__bytecode__typecheckt.html" title=" " alt="" coords="421,177,617,203"/>
+<area shape="poly" id="edge405_Node000006_Node000018" title=" " alt="" coords="351,187,421,187,421,193,351,193"/>
+<area shape="rect" id="Node000019" href="$classstatement__list__typecheckt.html" title="Class for encapsulating the current state of the type check." alt="" coords="422,128,617,153"/>
+<area shape="poly" id="edge406_Node000006_Node000019" title=" " alt="" coords="351,174,459,151,460,156,352,180"/>
+<area shape="rect" id="Node000008" href="$classansi__c__typecheckt.html" title=" " alt="" coords="665,203,808,228"/>
+<area shape="poly" id="edge403_Node000007_Node000008" title=" " alt="" coords="606,227,665,221,666,226,606,232"/>
+<area shape="rect" id="Node000009" href="$classcpp__typecheckt.html" title=" " alt="" coords="675,252,799,277"/>
+<area shape="poly" id="edge404_Node000007_Node000009" title=" " alt="" coords="606,247,675,255,674,260,606,252"/>
+<area shape="rect" id="Node000017" href="$classnamespace__baset.html" title="Basic interface for a namespace." alt="" coords="12,251,152,276"/>
+<area shape="rect" id="Node000010" href="$classnamespacet.html" title="A namespacet is essentially one or two symbol tables bound together, to allow for symbol lookups in t..." alt="" coords="239,251,341,276"/>
+<area shape="poly" id="edge407_Node000017_Node000010" title=" " alt="" coords="166,261,238,261,238,266,166,266"/>
+<area shape="poly" id="edge408_Node000010_Node000007" title=" " alt="" coords="355,254,446,244,446,250,355,259"/>
+<area shape="rect" id="Node000011" href="$classempty__namespacet.html" title="A namespacet that contains an empty symbol table, for use in tests that need a namespacet but don&#39;t a..." alt="" coords="444,357,595,383"/>
+<area shape="poly" id="edge409_Node000010_Node000011" title=" " alt="" coords="353,278,374,286,433,317,498,355,495,359,430,322,372,291,351,283"/>
+<area shape="rect" id="Node000016" href="$classmulti__namespacet.html" title="A multi namespace is essentially a namespace, with a list of namespaces." alt="" coords="448,276,591,301"/>
+<area shape="poly" id="edge410_Node000010_Node000016" title=" " alt="" coords="355,268,448,278,447,283,355,273"/>
+<area shape="rect" id="Node000013" href="$classsymbol__table__baset.html" title="The symbol table base class interface." alt="" coords="5,365,159,391"/>
+<area shape="rect" id="Node000014" href="$classjournalling__symbol__tablet.html" title="A symbol table wrapper that records which entries have been updated/removedA caller can pass a journa..." alt="" coords="217,301,363,341"/>
+<area shape="poly" id="edge411_Node000013_Node000014" title=" " alt="" coords="141,359,216,338,218,343,143,364"/>
+<area shape="rect" id="Node000015" href="$classsymbol__table__buildert.html" title="Author: Diffblue Ltd." alt="" coords="207,365,373,391"/>
+<area shape="poly" id="edge412_Node000013_Node000015" title=" " alt="" coords="173,375,207,375,207,381,173,381"/>
+<area shape="rect" id="Node000012" href="$classsymbol__tablet.html" title="The symbol table." alt="" coords="233,415,347,440"/>
+<area shape="poly" id="edge413_Node000013_Node000012" title=" " alt="" coords="150,391,236,412,235,417,149,396"/>
+<area shape="poly" id="edge414_Node000012_Node000011" title=" " alt="" coords="354,409,467,380,468,385,356,414"/>
 </map>

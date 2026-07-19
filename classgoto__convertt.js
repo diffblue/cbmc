@@ -20,6 +20,7 @@ var classgoto__convertt =
     [ "case_guard", "classgoto__convertt.html#a5b4b396da0b9b255919f191b1ee73cf7", null ],
     [ "clean_expr", "classgoto__convertt.html#aed71820ae4bd3154a5730614dbe782a1", null ],
     [ "clean_expr_address_of", "classgoto__convertt.html#a0212889f46670525863df1a0d2d57d5e", null ],
+    [ "clean_function_call_operands", "classgoto__convertt.html#aaf09404c215a5a19b24ea6fd5ff4592a", null ],
     [ "collect_operands", "classgoto__convertt.html#a6545c89eb81bbafab65700ac80f26f77", null ],
     [ "convert", "classgoto__convertt.html#ac390d7621af14e22a4e9ac16bc7695e0", null ],
     [ "convert_asm", "classgoto__convertt.html#a8f501ddffd5e3357e99735cd5fd6b04f", null ],

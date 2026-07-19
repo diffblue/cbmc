@@ -279,6 +279,7 @@ var annotated_dup =
     [ "conditional_target_exprt", "classconditional__target__exprt.html", "classconditional__target__exprt" ],
     [ "conditional_target_group_exprt", "classconditional__target__group__exprt.html", "classconditional__target__group__exprt" ],
     [ "cone_of_influencet", "classcone__of__influencet.html", "classcone__of__influencet" ],
+    [ "config_restoret", "structconfig__restoret.html", "structconfig__restoret" ],
     [ "configt", "classconfigt.html", "classconfigt" ],
     [ "conflict_providert", "classconflict__providert.html", "classconflict__providert" ],
     [ "console_message_handlert", "classconsole__message__handlert.html", "classconsole__message__handlert" ],

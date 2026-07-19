@@ -295,6 +295,7 @@ var hierarchy =
     [ "concurrency_instrumentationt", "classconcurrency__instrumentationt.html", null ],
     [ "goto_check_ct::conditiont", "structgoto__check__ct_1_1conditiont.html", null ],
     [ "cone_of_influencet", "classcone__of__influencet.html", null ],
+    [ "config_restoret", "structconfig__restoret.html", null ],
     [ "bv_refinementt::configt", "structbv__refinementt_1_1configt.html", [
       [ "bv_refinementt::infot", "structbv__refinementt_1_1infot.html", [
         [ "string_refinementt::infot", "structstring__refinementt_1_1infot.html", null ]

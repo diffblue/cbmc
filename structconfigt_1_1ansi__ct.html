@@ -133,6 +133,10 @@ Public Types</h2></td></tr>
 , <a class="el" href="structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2fa06f788cfdee3702c759420e80d8cd442">IS_BIG_ENDIAN</a>
  }</td></tr>
 <tr class="separator:ac03460009ec6fe5358dc3ce641d06a2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4fac13753b7adfba6a392b934247a0ba" id="r_a4fac13753b7adfba6a392b934247a0ba"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0ba">argument_evaluation_ordert</a> { <a class="el" href="structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0baa3ba9c296d0eb2686b837d4f10e27243b">LEFT_TO_RIGHT</a>
+, <a class="el" href="structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0baa132e23a80cef8d694ea55b6e790b9e4a">RIGHT_TO_LEFT</a>
+ }</td></tr>
+<tr class="separator:a4fac13753b7adfba6a392b934247a0ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8f293e8c67ef5f2614f8f3f455899864" id="r_a8f293e8c67ef5f2614f8f3f455899864"><td class="memItemLeft" align="right" valign="top">enum class &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a8f293e8c67ef5f2614f8f3f455899864">ost</a> { <a class="el" href="structconfigt_1_1ansi__ct.html#a8f293e8c67ef5f2614f8f3f455899864a060e86d0ae4eccb2d79362cf98986239">NO_OS</a>
 , <a class="el" href="structconfigt_1_1ansi__ct.html#a8f293e8c67ef5f2614f8f3f455899864a6104e63e219587983ec4f1553a7fbbaa">OS_LINUX</a>
 , <a class="el" href="structconfigt_1_1ansi__ct.html#a8f293e8c67ef5f2614f8f3f455899864aa70a5f06705796c1c764c97fc4b2323e">OS_MACOS</a>
@@ -205,6 +209,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:ad08ae339567011176d52a581ba4bfd88" id="r_ad08ae339567011176d52a581ba4bfd88"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#ad08ae339567011176d52a581ba4bfd88">set_LP32</a> ()</td></tr>
 <tr class="memdesc:ad08ae339567011176d52a581ba4bfd88"><td class="mdescLeft">&#160;</td><td class="mdescRight">int=16, long=32, pointer=32  <br /></td></tr>
 <tr class="separator:ad08ae339567011176d52a581ba4bfd88"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9b6242bd822521cd4671f335c565fd8d" id="r_a9b6242bd822521cd4671f335c565fd8d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a9b6242bd822521cd4671f335c565fd8d">set_argument_evaluation_order</a> ()</td></tr>
+<tr class="memdesc:a9b6242bd822521cd4671f335c565fd8d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Sets the architectural parameter recording the order in which compilers evaluate the arguments of a function call from <code>mode</code> and <code>arch_is_x86_family</code>: Visual Studio evaluates right-to-left on all architectures (verified on x86, x64, arm64), GCC evaluates right-to-left on the x86 family only, and left-to-right is used in all other cases.  <br /></td></tr>
+<tr class="separator:a9b6242bd822521cd4671f335c565fd8d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae53a2f3faa9a444814fb8ec6028382fb" id="r_ae53a2f3faa9a444814fb8ec6028382fb"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#ae53a2f3faa9a444814fb8ec6028382fb">set_arch_spec_i386</a> ()</td></tr>
 <tr class="separator:ae53a2f3faa9a444814fb8ec6028382fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac69b95aea546b36440cad3e8b74a7eac" id="r_ac69b95aea546b36440cad3e8b74a7eac"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#ac69b95aea546b36440cad3e8b74a7eac">set_arch_spec_x86_64</a> ()</td></tr>
@@ -306,6 +313,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ad3b96c01f34e9377b113c20cc6e86b6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a221dc8f0d2a57ad2915dbf12b9d12aa7" id="r_a221dc8f0d2a57ad2915dbf12b9d12aa7"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structconfigt_1_1ansi__ct.html#ac03460009ec6fe5358dc3ce641d06a2f">endiannesst</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a221dc8f0d2a57ad2915dbf12b9d12aa7">endianness</a></td></tr>
 <tr class="separator:a221dc8f0d2a57ad2915dbf12b9d12aa7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ef32da5f9a133eabaa179e7b0d8bd62" id="r_a4ef32da5f9a133eabaa179e7b0d8bd62"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0ba">argument_evaluation_ordert</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a4ef32da5f9a133eabaa179e7b0d8bd62">argument_evaluation_order</a></td></tr>
+<tr class="separator:a4ef32da5f9a133eabaa179e7b0d8bd62"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53b8b2a2a639e477694d34035776e674" id="r_a53b8b2a2a639e477694d34035776e674"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">bool</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a53b8b2a2a639e477694d34035776e674">arch_is_x86_family</a> = <a class="el" href="classait.html">false</a></td></tr>
+<tr class="separator:a53b8b2a2a639e477694d34035776e674"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3264df7228b249afdb195d42122a612d" id="r_a3264df7228b249afdb195d42122a612d"><td class="memItemLeft" align="right" valign="top"><a class="el" href="structconfigt_1_1ansi__ct.html#a8f293e8c67ef5f2614f8f3f455899864">ost</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a3264df7228b249afdb195d42122a612d">os</a></td></tr>
 <tr class="separator:a3264df7228b249afdb195d42122a612d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6bc9c3ac2fc058af96d8c7dedf8deec2" id="r_a6bc9c3ac2fc058af96d8c7dedf8deec2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structconfigt_1_1ansi__ct.html#a6bc9c3ac2fc058af96d8c7dedf8deec2">arch</a></td></tr>
@@ -353,6 +364,34 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock">
 <p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00146">146</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 </div><h2 class="groupheader">Member Enumeration Documentation</h2>
+<a id="a4fac13753b7adfba6a392b934247a0ba" name="a4fac13753b7adfba6a392b934247a0ba"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4fac13753b7adfba6a392b934247a0ba">&#9670;&#160;</a></span>argument_evaluation_ordert</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">enum</a> <a class="el" href="classait.html">class</a> <a class="el" href="structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0ba">configt::ansi_ct::argument_evaluation_ordert</a></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">strong</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<table class="fieldtable">
+<tr><th colspan="2">Enumerator</th></tr><tr><td class="fieldname"><a id="a4fac13753b7adfba6a392b934247a0baa3ba9c296d0eb2686b837d4f10e27243b" name="a4fac13753b7adfba6a392b934247a0baa3ba9c296d0eb2686b837d4f10e27243b"></a>LEFT_TO_RIGHT&#160;</td><td class="fielddoc"></td></tr>
+<tr><td class="fieldname"><a id="a4fac13753b7adfba6a392b934247a0baa132e23a80cef8d694ea55b6e790b9e4a" name="a4fac13753b7adfba6a392b934247a0baa132e23a80cef8d694ea55b6e790b9e4a"></a>RIGHT_TO_LEFT&#160;</td><td class="fielddoc"></td></tr>
+</table>
+
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00247">247</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+
+</div>
+</div>
 <a id="ac69d70848faf53f13ee574004dda9987" name="ac69d70848faf53f13ee574004dda9987"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac69d70848faf53f13ee574004dda9987">&#9670;&#160;</a></span>c_standardt</h2>
 
@@ -442,7 +481,7 @@ Static Public Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="ab387c011f5197baecbafce33f6732826a571e24dc3d8793b5c5d3eb370c2aede9" name="ab387c011f5197baecbafce33f6732826a571e24dc3d8793b5c5d3eb370c2aede9"></a>CODEWARRIOR&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00271">271</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00297">297</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -470,7 +509,7 @@ Static Public Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a8bd80421c0f07dad770cf427a8c465cca41c2f549d9f9a30e302d1de8a17ea3f2" name="a8bd80421c0f07dad770cf427a8c465cca41c2f549d9f9a30e302d1de8a17ea3f2"></a>LIB_FULL&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00300">300</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00326">326</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -491,7 +530,7 @@ Static Public Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="aa855cb88e4d8d3cf6eec06f1391c78c5ac57da2b7cc0a311626882e522b027679" name="aa855cb88e4d8d3cf6eec06f1391c78c5ac57da2b7cc0a311626882e522b027679"></a>malloc_failure_mode_assert_then_assume&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00316">316</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00342">342</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -521,7 +560,7 @@ Static Public Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="a8f293e8c67ef5f2614f8f3f455899864a70bd7947623583c30cb7062e8cddc05b" name="a8f293e8c67ef5f2614f8f3f455899864a70bd7947623583c30cb7062e8cddc05b"></a>OS_WIN&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00236">236</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00262">262</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -553,7 +592,7 @@ Static Public Attributes</h2></td></tr>
 <tr><td class="fieldname"><a id="adbaf349966324503f4957fc2d8ff591ea47f45e65244c17ec9fa8771a5c6d60e1" name="adbaf349966324503f4957fc2d8ff591ea47f45e65244c17ec9fa8771a5c6d60e1"></a>ARM&#160;</td><td class="fielddoc"></td></tr>
 </table>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00283">283</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00309">309</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -581,7 +620,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00736">736</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00789">789</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -609,7 +648,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l01285">1285</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l01340">1340</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -685,7 +724,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00327">327</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00354">354</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -705,7 +744,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00281">281</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00306">306</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -724,7 +763,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00707">707</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00758">758</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -743,7 +782,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00619">619</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00664">664</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -762,7 +801,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00150">150</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00169">169</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -781,7 +820,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00529">529</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00568">568</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -800,7 +839,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00678">678</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00727">727</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -820,7 +859,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00356">356</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00385">385</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -840,7 +879,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00220">220</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00243">243</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -859,7 +898,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00406">406</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00437">437</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -878,7 +917,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00432">432</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00465">465</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -897,7 +936,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00461">461</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00496">496</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -916,7 +955,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00648">648</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00695">695</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -936,7 +975,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00489">489</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00526">526</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -957,7 +996,7 @@ Static Public Attributes</h2></td></tr>
 
 <p>Sets up the widths of variables for the Renesas V850. </p>
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00596">596</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00639">639</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -976,7 +1015,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00560">560</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00601">601</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -995,7 +1034,29 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00182">182</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00203">203</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+
+</div>
+</div>
+<a id="a9b6242bd822521cd4671f335c565fd8d" name="a9b6242bd822521cd4671f335c565fd8d"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9b6242bd822521cd4671f335c565fd8d">&#9670;&#160;</a></span>set_argument_evaluation_order()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">void</a> configt::ansi_ct::set_argument_evaluation_order </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Sets the architectural parameter recording the order in which compilers evaluate the arguments of a function call from <code>mode</code> and <code>arch_is_x86_family</code>: Visual Studio evaluates right-to-left on all architectures (verified on x86, x64, arm64), GCC evaluates right-to-left on the x86 family only, and left-to-right is used in all other cases. </p>
+<p>This needs to be re-invoked when either input changes; in particular, goto-cc switches <code>mode</code> after the architecture has been configured. </p>
+
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l00157">157</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -1263,7 +1324,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l01300">1300</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8cpp_source.html#l01355">1355</a> of file <a class="el" href="config_8cpp_source.html">config.cpp</a>.</p>
 
 </div>
 </div>
@@ -1328,7 +1389,39 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00248">248</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00274">274</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+
+</div>
+</div>
+<a id="a53b8b2a2a639e477694d34035776e674" name="a53b8b2a2a639e477694d34035776e674"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a53b8b2a2a639e477694d34035776e674">&#9670;&#160;</a></span>arch_is_x86_family</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classait.html">bool</a> configt::ansi_ct::arch_is_x86_family = <a class="el" href="classait.html">false</a></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00258">258</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+
+</div>
+</div>
+<a id="a4ef32da5f9a133eabaa179e7b0d8bd62" name="a4ef32da5f9a133eabaa179e7b0d8bd62"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4ef32da5f9a133eabaa179e7b0d8bd62">&#9670;&#160;</a></span>argument_evaluation_order</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0ba">argument_evaluation_ordert</a> configt::ansi_ct::argument_evaluation_order</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00252">252</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1430,7 +1523,7 @@ Static Public Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00325">325</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00351">351</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1446,7 +1539,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00294">294</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00320">320</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1464,7 +1557,7 @@ Static Public Attributes</h2></td></tr>
 
 <p>enable debug code in cprover_contracts library </p>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00311">311</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00337">337</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1576,7 +1669,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00298">298</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00324">324</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1592,7 +1685,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00297">297</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00323">323</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1624,7 +1717,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00305">305</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00331">331</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1688,7 +1781,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00323">323</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00349">349</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1704,7 +1797,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00308">308</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00334">334</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1722,7 +1815,7 @@ Static Public Attributes</h2></td></tr>
 
 <p>Maximum value of argc, which is operating-systems dependent: Windows limits the number of characters accepte by CreateProcess, and Unix systems have <a class="el" href="unistd_8c.html#a67d58c6aa6eaeb9560972d86c1e001b7">sysconf(ARG_MAX)</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00330">330</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00356">356</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1754,7 +1847,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00281">281</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00307">307</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1770,7 +1863,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00251">251</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00277">277</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1786,7 +1879,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00243">243</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00269">269</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1818,7 +1911,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00292">292</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00318">318</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1834,7 +1927,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00296">296</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00322">322</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1884,7 +1977,7 @@ Static Public Attributes</h2></td></tr>
 
 <p>use simplified invalid pointer model in cprover_contracts library </p>
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00314">314</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00340">340</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1932,7 +2025,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00307">307</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00333">333</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>
@@ -1964,7 +2057,7 @@ Static Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00295">295</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="config_8h_source.html#l00321">321</a> of file <a class="el" href="config_8h_source.html">config.h</a>.</p>
 
 </div>
 </div>

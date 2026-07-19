@@ -1,5 +1,9 @@
 var structconfigt_1_1ansi__ct =
 [
+    [ "argument_evaluation_ordert", "structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0ba", [
+      [ "LEFT_TO_RIGHT", "structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0baa3ba9c296d0eb2686b837d4f10e27243b", null ],
+      [ "RIGHT_TO_LEFT", "structconfigt_1_1ansi__ct.html#a4fac13753b7adfba6a392b934247a0baa132e23a80cef8d694ea55b6e790b9e4a", null ]
+    ] ],
     [ "c_standardt", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987", [
       [ "C89", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987a8a9f5c7cf9bfd7a6531d354d7cfc1f01", null ],
       [ "C99", "structconfigt_1_1ansi__ct.html#ac69d70848faf53f13ee574004dda9987ad79a339fadaa631d027ba959da7f1892", null ],
@@ -66,6 +70,7 @@ var structconfigt_1_1ansi__ct =
     [ "set_arch_spec_v850", "structconfigt_1_1ansi__ct.html#a4add4d8cbe540dd619e80db62358f34e", null ],
     [ "set_arch_spec_x32", "structconfigt_1_1ansi__ct.html#a0efa0cc1ba49134b4d67ffb4a736bff0", null ],
     [ "set_arch_spec_x86_64", "structconfigt_1_1ansi__ct.html#ac69b95aea546b36440cad3e8b74a7eac", null ],
+    [ "set_argument_evaluation_order", "structconfigt_1_1ansi__ct.html#a9b6242bd822521cd4671f335c565fd8d", null ],
     [ "set_c11", "structconfigt_1_1ansi__ct.html#ae7f98e2473b7b01b85c77b43d6fd09cd", null ],
     [ "set_c17", "structconfigt_1_1ansi__ct.html#abd8082c40740716b5331afc3e77ccd62", null ],
     [ "set_c23", "structconfigt_1_1ansi__ct.html#a1f6804a57421613a1fdd5c2c98940e78", null ],
@@ -81,6 +86,8 @@ var structconfigt_1_1ansi__ct =
     [ "alignment", "structconfigt_1_1ansi__ct.html#abee3d3d223361202f82dd400bc393aca", null ],
     [ "allow_anonymous_struct_embedding", "structconfigt_1_1ansi__ct.html#aa583d153c3ccd5ca495199f1772ab794", null ],
     [ "arch", "structconfigt_1_1ansi__ct.html#a6bc9c3ac2fc058af96d8c7dedf8deec2", null ],
+    [ "arch_is_x86_family", "structconfigt_1_1ansi__ct.html#a53b8b2a2a639e477694d34035776e674", null ],
+    [ "argument_evaluation_order", "structconfigt_1_1ansi__ct.html#a4ef32da5f9a133eabaa179e7b0d8bd62", null ],
     [ "bf16_type", "structconfigt_1_1ansi__ct.html#a3c4101388cc403921d3179527ede3d99", null ],
     [ "bool_width", "structconfigt_1_1ansi__ct.html#ac2ca3220900b00e73ae84111ec8de87a", null ],
     [ "c_standard", "structconfigt_1_1ansi__ct.html#a14e10ba8fd42120750e00232e3ba8294", null ],
