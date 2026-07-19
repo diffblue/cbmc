@@ -165,6 +165,12 @@ void cpp_typecheckt::default_ctor(
   decl.name() = cpp_namet(base_name, source_location);
   decl.type()=typet(ID_function_type);
   decl.type().add_subtype().make_nil();
+  // N5008 [class.default.ctor]/1, [class.copy.ctor]/6: this constructor
+  // is implicitly declared, not user-declared; aggregate detection
+  // ([dcl.init.aggr]/1) must ignore it.  The flag rides on the function
+  // type, mirroring #is_implicit_dtor.  default_cpctor builds on this
+  // declarator too, so implicit copy/move constructors inherit it.
+  decl.type().set("#is_implicit_ctor", true);
   decl.add_source_location()=source_location;
 
   decl.value() = code_blockt();
