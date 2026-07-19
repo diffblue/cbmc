@@ -1,6 +1,6 @@
 CORE
-main.c
-
+main.i
+--arch arm64 --os linux
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$

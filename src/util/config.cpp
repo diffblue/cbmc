@@ -147,8 +147,29 @@ void configt::ansi_ct::set_LP32()
   memory_operand_size=int_width/8;
 }
 
+/// Sets the architectural parameter recording the order in which compilers
+/// evaluate the arguments of a function call from `mode` and
+/// `arch_is_x86_family`: Visual Studio evaluates right-to-left on all
+/// architectures (verified on x86, x64, arm64), GCC evaluates right-to-left
+/// on the x86 family only, and left-to-right is used in all other cases.
+/// This needs to be re-invoked when either input changes; in particular,
+/// goto-cc switches `mode` after the architecture has been configured.
+void configt::ansi_ct::set_argument_evaluation_order()
+{
+  if(
+    mode == flavourt::VISUAL_STUDIO ||
+    (arch_is_x86_family && mode == flavourt::GCC))
+  {
+    argument_evaluation_order = argument_evaluation_ordert::RIGHT_TO_LEFT;
+  }
+  else
+    argument_evaluation_order = argument_evaluation_ordert::LEFT_TO_RIGHT;
+}
+
 void configt::ansi_ct::set_arch_spec_i386()
 {
+  arch_is_x86_family = true;
+  set_argument_evaluation_order();
   set_ILP32();
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   char_is_unsigned=false;
@@ -181,6 +202,8 @@ void configt::ansi_ct::set_arch_spec_i386()
 
 void configt::ansi_ct::set_arch_spec_x86_64()
 {
+  arch_is_x86_family = true;
+  set_argument_evaluation_order();
   set_LP64();
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   long_double_width=16*8;
@@ -219,6 +242,8 @@ void configt::ansi_ct::set_arch_spec_x86_64()
 
 void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   if(subarch=="powerpc")
     set_ILP32();
   else // ppc64 or ppc64le
@@ -280,6 +305,8 @@ void configt::ansi_ct::set_arch_spec_power(const irep_idt &subarch)
 
 void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   if(subarch=="arm64")
   {
     set_LP64();
@@ -326,6 +353,8 @@ void configt::ansi_ct::set_arch_spec_arm(const irep_idt &subarch)
 
 void configt::ansi_ct::set_arch_spec_alpha()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_LP64();
   endianness=endiannesst::IS_LITTLE_ENDIAN;
   long_double_width=16*8;
@@ -355,6 +384,8 @@ void configt::ansi_ct::set_arch_spec_alpha()
 
 void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   if(subarch=="mipsel" ||
      subarch=="mips" ||
      subarch=="mipsn32el" ||
@@ -405,6 +436,8 @@ void configt::ansi_ct::set_arch_spec_mips(const irep_idt &subarch)
 
 void configt::ansi_ct::set_arch_spec_riscv64()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_LP64();
   endianness = endiannesst::IS_LITTLE_ENDIAN;
   long_double_width = 16 * 8;
@@ -431,6 +464,8 @@ void configt::ansi_ct::set_arch_spec_riscv64()
 
 void configt::ansi_ct::set_arch_spec_s390()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_ILP32();
   endianness=endiannesst::IS_BIG_ENDIAN;
   long_double_width=16*8;
@@ -460,6 +495,8 @@ void configt::ansi_ct::set_arch_spec_s390()
 
 void configt::ansi_ct::set_arch_spec_s390x()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_LP64();
   endianness=endiannesst::IS_BIG_ENDIAN;
   char_is_unsigned=true;
@@ -488,6 +525,8 @@ void configt::ansi_ct::set_arch_spec_s390x()
 
 void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   if(subarch=="sparc64")
   {
     set_LP64();
@@ -528,6 +567,8 @@ void configt::ansi_ct::set_arch_spec_sparc(const irep_idt &subarch)
 
 void configt::ansi_ct::set_arch_spec_ia64()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_LP64();
   long_double_width=16*8;
   endianness=endiannesst::IS_LITTLE_ENDIAN;
@@ -559,6 +600,8 @@ void configt::ansi_ct::set_arch_spec_ia64()
 
 void configt::ansi_ct::set_arch_spec_x32()
 {
+  arch_is_x86_family = true;
+  set_argument_evaluation_order();
   // This is a variant of x86_64 that has
   // 32-bit long int and 32-bit pointers.
   set_ILP32();
@@ -595,6 +638,8 @@ void configt::ansi_ct::set_arch_spec_x32()
 /// Sets up the widths of variables for the Renesas V850
 void configt::ansi_ct::set_arch_spec_v850()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   // The Renesas V850 is a 32-bit microprocessor used in
   // many automotive applications.  This spec is written from the
   // architecture manual rather than having access to a running
@@ -618,6 +663,8 @@ void configt::ansi_ct::set_arch_spec_v850()
 
 void configt::ansi_ct::set_arch_spec_hppa()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_ILP32();
   long_double_width=8*8; // different from i386
   endianness=endiannesst::IS_BIG_ENDIAN;
@@ -647,6 +694,8 @@ void configt::ansi_ct::set_arch_spec_hppa()
 
 void configt::ansi_ct::set_arch_spec_sh4()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_ILP32();
   long_double_width=8*8; // different from i386
   endianness=endiannesst::IS_LITTLE_ENDIAN;
@@ -677,6 +726,8 @@ void configt::ansi_ct::set_arch_spec_sh4()
 
 void configt::ansi_ct::set_arch_spec_loongarch64()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_LP64();
   endianness = endiannesst::IS_LITTLE_ENDIAN;
   long_double_width = 16 * 8;
@@ -706,6 +757,8 @@ void configt::ansi_ct::set_arch_spec_loongarch64()
 
 void configt::ansi_ct::set_arch_spec_emscripten()
 {
+  arch_is_x86_family = false;
+  set_argument_evaluation_order();
   set_ILP32();
   endianness = endiannesst::IS_LITTLE_ENDIAN;
   long_double_width = 16 * 8;
@@ -770,6 +823,8 @@ void configt::set_arch(const irep_idt &arch)
     ansi_c.endianness=configt::ansi_ct::endiannesst::NO_ENDIANNESS;
     ansi_c.lib=configt::ansi_ct::libt::LIB_NONE;
     ansi_c.NULL_is_zero=false;
+    ansi_c.arch_is_x86_family = false;
+    ansi_c.set_argument_evaluation_order();
 
     if(sizeof(long int)==8)
       ansi_c.set_64();
@@ -1411,6 +1466,22 @@ void configt::set_from_symbol_table(const symbol_table_baset &symbol_table)
     ansi_c.os=ansi_ct::string_to_os(id2string(string_from_ns(ns, "os")));
 
   ansi_c.NULL_is_zero = unsigned_from_ns(ns, "NULL_is_zero") != 0;
+
+  // goto binaries created before this architecture parameter was introduced
+  // may lack the symbol; keep the default set via set_arch above in that
+  // case. Note that this fallback depends on the loading tool's compiler
+  // flavour (`mode` is not stored in goto binaries), so, e.g., an old
+  // Clang-produced x86-family binary loaded with GCC defaults is modelled
+  // as right-to-left.
+  if(
+    symbol_table.symbols.find(CPROVER_PREFIX "architecture_"
+                                             "argument_evaluation_order") !=
+    symbol_table.symbols.end())
+  {
+    ansi_c.argument_evaluation_order =
+      static_cast<ansi_ct::argument_evaluation_ordert>(
+        unsigned_from_ns(ns, "argument_evaluation_order"));
+  }
 
   // mode, preprocessor (and all preprocessor command line options),
   // lib, string_abstraction not stored in namespace

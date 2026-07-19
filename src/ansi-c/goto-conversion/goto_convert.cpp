@@ -893,11 +893,10 @@ void goto_convertt::convert_assign(
       "function_call sideeffect takes two operands",
       rhs.find_source_location());
 
-    Forall_operands(it, rhs)
-    {
-      side_effects.add(clean_expr(*it, mode));
-      dest.destructive_append(side_effects.side_effects);
-    }
+    auto &rhs_call = to_side_effect_expr_function_call(rhs);
+    side_effects.add(clean_function_call_operands(
+      rhs_call.function(), rhs_call.arguments(), mode));
+    dest.destructive_append(side_effects.side_effects);
 
     do_function_call(
       lhs,

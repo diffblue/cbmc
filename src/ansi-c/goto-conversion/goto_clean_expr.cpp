@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
+#include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
@@ -732,10 +733,20 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
 
   clean_expr_resultt side_effects;
 
-  // TODO: evaluation order
-
-  Forall_operands(it, expr)
-    side_effects.add(clean_expr(*it, mode));
+  if(
+    expr.id() == ID_side_effect &&
+    to_side_effect_expr(expr).get_statement() == ID_function_call)
+  {
+    side_effect_expr_function_callt &call =
+      to_side_effect_expr_function_call(expr);
+    side_effects.add(
+      clean_function_call_operands(call.function(), call.arguments(), mode));
+  }
+  else
+  {
+    Forall_operands(it, expr)
+      side_effects.add(clean_expr(*it, mode));
+  }
 
   if(expr.id() == ID_side_effect)
   {
@@ -852,6 +863,35 @@ goto_convertt::remove_gcc_conditional_expression(
 
   // there might still be junk in expr.op2()
   side_effects.add(clean_expr(expr, mode));
+
+  return side_effects;
+}
+
+goto_convertt::clean_expr_resultt goto_convertt::clean_function_call_operands(
+  exprt &function,
+  exprt::operandst &arguments,
+  const irep_idt &mode)
+{
+  clean_expr_resultt side_effects;
+
+  // The function operand is evaluated before the arguments either way.
+  side_effects.add(clean_expr(function, mode));
+
+  // The C and C++ standards leave the order of evaluation of function call
+  // arguments unspecified; model the fixed order that the configured
+  // architecture/compiler combination uses.
+  if(
+    config.ansi_c.argument_evaluation_order ==
+    configt::ansi_ct::argument_evaluation_ordert::RIGHT_TO_LEFT)
+  {
+    for(auto it = arguments.rbegin(); it != arguments.rend(); ++it)
+      side_effects.add(clean_expr(*it, mode));
+  }
+  else
+  {
+    for(auto &argument : arguments)
+      side_effects.add(clean_expr(argument, mode));
+  }
 
   return side_effects;
 }

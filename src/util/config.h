@@ -233,6 +233,32 @@ public:
     };
     endiannesst endianness;
 
+    // Order in which compilers evaluate the arguments of a function call.
+    // The C and C++ standards leave this order unspecified, but any given
+    // compiler/architecture combination uses a fixed order, which is
+    // observable when argument expressions have side effects. Empirically
+    // confirmed (test programs on native and cross-compiled targets, and
+    // via Compiler Explorer): GCC evaluates right-to-left on the x86 family
+    // (i386, x86_64, x32) and left-to-right on all other architectures
+    // tested (arm64, arm, riscv64, ppc64le, mips64el, s390x, sparc64);
+    // Visual Studio evaluates right-to-left on all architectures tested
+    // (x86, x64, arm64); Clang evaluates left-to-right on all architectures
+    // tested (x86_64, arm64).
+    enum class argument_evaluation_ordert
+    {
+      LEFT_TO_RIGHT,
+      RIGHT_TO_LEFT
+    };
+    argument_evaluation_ordert argument_evaluation_order;
+
+    // whether the architecture set via one of the set_arch_spec_* functions
+    // is a member of the x86 family (i386, x86_64, x32); used to compute
+    // argument_evaluation_order, including when the compiler flavour changes
+    // after the architecture has been configured
+    bool arch_is_x86_family = false;
+
+    void set_argument_evaluation_order();
+
     enum class ost
     {
       NO_OS,
