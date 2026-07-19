@@ -137,6 +137,14 @@ protected:
 
   void rewrite_boolean(exprt &dest);
 
+  /// Remove side effects from the function operand and the argument operands
+  /// of a function call, honouring the argument evaluation order of the
+  /// configured architecture/compiler combination.
+  [[nodiscard]] clean_expr_resultt clean_function_call_operands(
+    exprt &function,
+    exprt::operandst &arguments,
+    const irep_idt &mode);
+
   [[nodiscard]] clean_expr_resultt remove_side_effect(
     side_effect_exprt &expr,
     const irep_idt &mode,

@@ -48,10 +48,8 @@ void goto_convertt::do_function_call(
   if(!new_lhs.is_nil())
     side_effects.add(clean_expr(new_lhs, mode));
 
-  side_effects.add(clean_expr(new_function, mode));
-
-  for(auto &new_argument : new_arguments)
-    side_effects.add(clean_expr(new_argument, mode));
+  side_effects.add(
+    clean_function_call_operands(new_function, new_arguments, mode));
 
   dest.destructive_append(side_effects.side_effects);
 

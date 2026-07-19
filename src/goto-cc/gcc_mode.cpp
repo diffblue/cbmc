@@ -637,6 +637,10 @@ int gcc_modet::doit()
       config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
   }
 
+  // the compiler flavour was changed after the architecture was configured,
+  // so re-derive the mode-dependent architectural parameters
+  config.ansi_c.set_argument_evaluation_order();
+
   if(compiler.mode==compilet::ASSEMBLE_ONLY)
     compiler.object_file_extension="s";
   else

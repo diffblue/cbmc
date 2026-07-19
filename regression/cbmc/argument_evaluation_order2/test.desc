@@ -1,0 +1,13 @@
+CORE
+main.i
+--arch arm64 --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+GCC evaluates function call arguments left-to-right on arm64; check that goto
+conversion models this: f's side effect (n = n + 1) must take effect before
+g's (n = n * 2), giving n == 2. The input is a preprocessed file so that no
+target-specific flags are passed to the native preprocessor.

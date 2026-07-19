@@ -75,6 +75,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/is_goto_binary.cpp \
        goto-programs/label_function_pointer_call_sites.cpp \
        goto-programs/osx_fat_reader.cpp \
+       goto-programs/restore_argument_evaluation_order.cpp \
        goto-programs/restrict_function_pointers.cpp \
        goto-programs/structured_trace_util.cpp \
        goto-programs/remove_returns.cpp \
@@ -144,6 +145,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
+       util/argument_evaluation_order.cpp \
        util/arith_tools.cpp \
        util/bitvector_expr.cpp \
        util/cmdline.cpp \
