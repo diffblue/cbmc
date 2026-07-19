@@ -14,9 +14,16 @@
 // Replacing the piecewise construction with a direct pair(k, 0)
 // construction makes the identical program verify.
 //
-// KNOWNBUG: the assertion must hold.  g++ verifies at runtime
-// (clang++ lacks the GCC __integer_pack builtin used by the gcc
-// libstdc++ shape this reproduces).
+// This used to fail: forward_as_tuple's body constructs
+// `tuple<_Elements...>(__args...)` -- C++20 parenthesized aggregate
+// initialization (P0960), since tuple here has no matching
+// constructor -- which the front end could not resolve; the body was
+// silently dropped and the piecewise-constructed key was havocked.
+// Fixed by implementing the constructor-first paren-aggregate
+// fallback ([dcl.init.general]/16.6.2.2) and deleted-implicit-default-
+// constructor semantics ([class.default.ctor]/2).  g++ verifies at
+// runtime (clang++ lacks the GCC __integer_pack builtin used by the
+// gcc libstdc++ shape this reproduces).
 namespace std {
 template <unsigned long, typename> struct tuple_element;
 template <long __i, typename _Tp>
