@@ -3082,6 +3082,109 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     for(auto &op : e.operands())
       already_typechecked_exprt::make_already_typechecked(op);
 
+    // C++20 parenthesized aggregate initialization (P0960; N5008
+    // [expr.type.conv]/2 via [dcl.init.general]/16.6.2.2): constructors
+    // are considered FIRST, but when overload resolution finds no
+    // viable constructor and T is an aggregate, `T(a1, ..., an)`
+    // initializes the aggregate's elements from the expression-list.
+    // libstdc++'s C++20 forward_as_tuple constructs
+    // `tuple<_Elements...>(__args...)` where tuple has no matching
+    // constructor of its own -- without the fallback the enclosing
+    // body was dropped and std::map's piecewise-constructed key was
+    // lost.
+    if(
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20 &&
+      e.type().id() == ID_struct_tag && !e.operands().empty() &&
+      e.operands().front().id() != ID_initializer_list)
+    {
+      const struct_typet &struct_type =
+        follow_tag(to_struct_tag_type(e.type()));
+      bool user_ctor = struct_type.get_bool("has_template_constructor") ||
+                       struct_type.get_bool("has_inherited_constructor");
+      for(const auto &c : struct_type.components())
+      {
+        if(
+          user_ctor || c.type().id() != ID_code || c.get_bool(ID_from_base) ||
+          to_code_type(c.type()).return_type().id() != ID_constructor)
+          continue;
+        if(!c.type().get_bool("#is_implicit_ctor"))
+          user_ctor = true;
+      }
+      if(!user_ctor)
+      {
+        const std::size_t errors_before_ctor_attempt =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          exprt tmp = expr;
+          new_temporary(e.source_location(), e.type(), e.operands(), tmp);
+          expr.swap(tmp);
+          return;
+        }
+        catch(...)
+        {
+          // no viable constructor: aggregate-initialize below; the
+          // attempt's diagnostics are not errors ([dcl.init.general]
+          // /16.6.2.2 falls back rather than failing)
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before_ctor_attempt);
+        }
+        exprt::operandst ops = e.operands();
+        struct_exprt result({}, e.type());
+        std::size_t idx = 0;
+        bool aggregate_ok = true;
+        for(const auto &c : struct_type.components())
+        {
+          if(
+            c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+            c.type().id() == ID_code)
+            continue;
+          if(c.get_base_name() == "@most_derived")
+          {
+            // the complete object's own flag is true, base subobjects'
+            // flags are false (mirrors cpp_constructor)
+            result.add_to_operands(
+              c.get_bool(ID_from_base) ? static_cast<exprt>(false_exprt())
+                                       : static_cast<exprt>(true_exprt()));
+            continue;
+          }
+          if(idx < ops.size())
+          {
+            exprt val = ops[idx++];
+            if(val.id() == ID_already_typechecked)
+              val = to_already_typechecked_expr(val).get_expr();
+            if(is_reference(c.type()))
+              reference_initializer(val, to_reference_type(c.type()));
+            else
+              implicit_typecast(val, c.type());
+            result.add_to_operands(std::move(val));
+          }
+          else
+          {
+            // [dcl.init.aggr]/5: remaining elements are initialized
+            // from default member initializers or value-initialized;
+            // approximate with zero initialization.
+            const auto zero = ::zero_initializer(
+              c.type(), e.source_location(), namespacet{symbol_table});
+            if(!zero.has_value())
+            {
+              aggregate_ok = false;
+              break;
+            }
+            result.add_to_operands(*zero);
+          }
+        }
+        if(aggregate_ok && idx == ops.size())
+        {
+          result.add_source_location() = expr.source_location();
+          expr = std::move(result);
+          return;
+        }
+        // fall through to the plain constructor path to reproduce the
+        // original diagnostic
+      }
+    }
+
     new_temporary(e.source_location(), e.type(), e.operands(), expr);
   }
 }
@@ -4242,7 +4345,82 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   cpp_typecheck_fargst call_fargs(expr);
   if(!call_target_stack.empty())
     call_fargs.target = call_target_stack.back();
-  typecheck_function_expr(expr.function(), call_fargs);
+  const std::size_t errors_before_function_expr =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    typecheck_function_expr(expr.function(), call_fargs);
+  }
+  catch(...)
+  {
+    // C++20 P0960 (N5008 [expr.type.conv]/2 +
+    // [dcl.init.general]/16.6.2.2): constructors are considered first;
+    // when overload resolution finds no viable constructor and
+    // `T(args)` names an AGGREGATE class type, the expression-list
+    // initializes the aggregate's elements.  Retry through the
+    // explicit-constructor-call path, whose aggregate fallback
+    // implements this.  libstdc++'s C++20 forward_as_tuple body
+    // (`tuple<_Elements...>(__args...)`) was dropped without it,
+    // losing std::map's piecewise-constructed key.  Guarded against
+    // re-entry: the retry's own constructor-first attempt goes through
+    // cpp_constructor, whose synthesized call must not re-reroute.
+    if(
+      config.cpp.cpp_standard < configt::cppt::cpp_standardt::CPP20 ||
+      expr.function().id() != ID_cpp_name || expr.arguments().empty())
+      throw;
+    exprt type_probe;
+    try
+    {
+      cpp_typecheck_fargst no_fargs;
+      type_probe = resolve(
+        to_cpp_name(expr.function()),
+        cpp_typecheck_resolvet::wantt::TYPE,
+        no_fargs,
+        /*fail_with_exception=*/false);
+    }
+    catch(...)
+    {
+      type_probe.make_nil();
+    }
+    if(type_probe.id() != ID_type || type_probe.type().id() != ID_struct_tag)
+      throw;
+    const struct_typet &probe_struct =
+      follow_tag(to_struct_tag_type(type_probe.type()));
+    bool user_ctor = probe_struct.get_bool("has_template_constructor") ||
+                     probe_struct.get_bool("has_inherited_constructor") ||
+                     probe_struct.is_incomplete();
+    for(const auto &c : probe_struct.components())
+    {
+      if(
+        user_ctor || c.type().id() != ID_code || c.get_bool(ID_from_base) ||
+        to_code_type(c.type()).return_type().id() != ID_constructor)
+        continue;
+      if(!c.type().get_bool("#is_implicit_ctor"))
+        user_ctor = true;
+    }
+    const irep_idt probe_id =
+      to_struct_tag_type(type_probe.type()).get_identifier();
+    if(user_ctor || !paren_aggregate_in_progress.insert(probe_id).second)
+      throw;
+    struct guardt
+    {
+      std::set<irep_idt> &set;
+      irep_idt id;
+      ~guardt()
+      {
+        set.erase(id);
+      }
+    } guard{paren_aggregate_in_progress, probe_id};
+    get_message_handler().set_message_count(
+      messaget::M_ERROR, errors_before_function_expr);
+    exprt ctor_call("explicit-constructor-call");
+    ctor_call.type() = type_probe.type();
+    ctor_call.operands() = expr.arguments();
+    ctor_call.add_source_location() = expr.source_location();
+    typecheck_expr_explicit_constructor_call(ctor_call);
+    expr.swap(ctor_call);
+    return;
+  }
 
   if(expr.function().id() == ID_pod_constructor)
   {

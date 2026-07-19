@@ -1095,6 +1095,13 @@ private:
   bool skip_typechecking_elaborate = false;
   std::unordered_set<irep_idt> deferred_typechecking;
   std::unordered_set<irep_idt> functions_being_typechecked;
+
+  // Guards the C++20 parenthesized-aggregate-initialization reroute in
+  // typecheck_side_effect_function_call against re-entry: the
+  // constructor-first attempt inside the rerouted path goes through
+  // cpp_constructor, whose synthesized `T(args)` call would otherwise
+  // reroute again, recursing forever.
+  std::set<irep_idt> paren_aggregate_in_progress;
   std::map<irep_idt, exprt> generic_lambda_map;
   /// Maps a lambda-expression's source location to the symbol name of its
   /// synthesised closure type ([expr.prim.lambda.closure]/1: each lambda has a
