@@ -76,6 +76,59 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
   }
 
   // =====================================================================
+  // Combined division/remainder.
+  // =====================================================================
+  // BigInt::div used to compute the quotient from the divisor instead of
+  // the dividend when the dividend exceeded 64 bits and the divisor fit a
+  // single digit (32 bits).
+  SECTION("combined division/remainder with single-digit divisor")
+  {
+    const BigInt dividend = pow(BigInt{2}, 89) - 1;
+    const BigInt divisor{97};
+    BigInt q, r;
+
+    BigInt::div(dividend, divisor, q, r);
+    REQUIRE(to_string(q) == "6381134223120516880923320");
+    REQUIRE(to_string(r) == "71");
+    REQUIRE(q * divisor + r == dividend);
+
+    // Negative dividend: truncated division, remainder takes the
+    // dividend's sign.
+    BigInt::div(-dividend, divisor, q, r);
+    REQUIRE(to_string(q) == "-6381134223120516880923320");
+    REQUIRE(to_string(r) == "-71");
+    REQUIRE(q * divisor + r == -dividend);
+
+    // Negative divisor: the quotient flips sign, the remainder keeps
+    // the dividend's sign.
+    BigInt::div(dividend, -divisor, q, r);
+    REQUIRE(to_string(q) == "-6381134223120516880923320");
+    REQUIRE(to_string(r) == "71");
+    REQUIRE(q * -divisor + r == dividend);
+
+    // Both negative: the quotient is positive, the remainder keeps the
+    // dividend's sign.
+    BigInt::div(-dividend, -divisor, q, r);
+    REQUIRE(to_string(q) == "6381134223120516880923320");
+    REQUIRE(to_string(r) == "-71");
+    REQUIRE(q * -divisor + r == -dividend);
+
+    // Zero remainder exercises the r.length = 0 path.
+    BigInt::div(dividend * divisor, divisor, q, r);
+    REQUIRE(q == dividend);
+    REQUIRE(r.is_zero());
+
+    // A divisor of more than one digit exercises the long-division
+    // branch, which is otherwise only tested via operator/= and
+    // operator%= that have separate copies of that code.
+    const BigInt divisor2 = pow(BigInt{2}, 41) + 3;
+    BigInt::div(dividend, divisor2, q, r);
+    REQUIRE(to_string(q) == "281474976710272");
+    REQUIRE(to_string(r) == "1151");
+    REQUIRE(q * divisor2 + r == dividend);
+  }
+
+  // =====================================================================
   // Test cases from the clisp test suite in number.tst.
   // =====================================================================
 
