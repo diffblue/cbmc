@@ -1673,7 +1673,25 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
   // If not found, the parameter may have been registered under a different
   // template scope (e.g., forward declaration vs definition). Try matching
   // by base name.
-  if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+  //
+  // N5008 [temp.deduct]/2: deduction starts from a clean slate -- when the
+  // EXACT identifier has an entry in the map (a nil or ID_unassigned
+  // placeholder from build_unassigned), this parameter belongs to an
+  // ACTIVE deduction context and its unbound state is meaningful.  The
+  // by-name fallback must not then capture a same-short-name parameter of
+  // an ENCLOSING instantiation: resolving the `_Alloc` of the pattern
+  // `hash<vector<bool, _Alloc>>` (stl_bvector.h) through unordered_set's
+  // `_Alloc = allocator<K>` instantiated a hybrid vector<bool,
+  // allocator<K>> whose transitively cached, half-substituted instances
+  // (e.g. a truncated __alloc_traits) later broke vector<K> for the same
+  // K.  The fallback stays for identifiers wholly unknown to the map (the
+  // forward-declaration-vs-definition scope mismatch it was added for).
+  if(
+    (e.is_nil() || (e.id() == ID_type && e.type().is_nil())) &&
+    cpp_typecheck.template_map.type_map.find(identifier.identifier) ==
+      cpp_typecheck.template_map.type_map.end() &&
+    cpp_typecheck.template_map.expr_map.find(identifier.identifier) ==
+      cpp_typecheck.template_map.expr_map.end())
   {
     const std::string id_str = id2string(identifier.identifier);
     auto pos = id_str.rfind("::");
@@ -4081,6 +4099,23 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         // `sfinae_contextt` (null message handler) so the failure is
         // silent, mirroring the partial-spec verification in
         // `elaborate_class_template`.
+        // N5008 [temp.spec.partial.match] + [temp.inst]/1: deciding
+        // whether a partial specialization matches is template argument
+        // DEDUCTION; it is not a context that requires any
+        // completely-defined type, so type-checking the pattern must
+        // not implicitly instantiate class templates named in it.
+        // Without suppression, disambiguating e.g. `hash<K>` against
+        // the pattern `hash<vector<bool, _Alloc>>` (stl_bvector.h)
+        // eagerly instantiated `vector` -- with the pattern's
+        // parameters resolved through the ENCLOSING instantiation's
+        // template map (cross-template capture), producing hybrid
+        // instances like vector<bool, allocator<K>> and, transitively,
+        // permanently truncated cached instances (__alloc_traits with
+        // its rebind/value_type members dropped) that later broke
+        // vector<K>::push_back.  elaborate_class_template's matcher
+        // already suppresses; mirror it here.
+        bool old_suppress_pattern = cpp_typecheck.suppress_elaborate;
+        cpp_typecheck.suppress_elaborate = true;
         try
         {
           sfinae_contextt sfinae_guard{cpp_typecheck};
@@ -4103,6 +4138,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           cpp_typecheck.disable_template_arg_pack_expansion = false;
           sfinae_failed = true;
         }
+        cpp_typecheck.suppress_elaborate = old_suppress_pattern;
       }
       if(sfinae_failed)
         continue;
