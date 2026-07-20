@@ -1,0 +1,17 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 10 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof: get_base_name's contract (no separator in the result; the
+result is exactly the tail after the last '/'; the stripped stem is a
+prefix of the base name) proven over ALL printable strings up to
+length 4 via nondeterministic characters.  Exercises std::string
+rfind/substr on the extern-instantiated basic_string<char>, whose
+out-of-line .tcc bodies the front end now instantiates.
