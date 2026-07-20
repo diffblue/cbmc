@@ -379,17 +379,33 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
             comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
             continue;
+          member_exprt member(object_tc, comp.get_name(), comp.type());
+          member.set(ID_C_lvalue, true);
+          exprt val;
           if(idx < operands_tc.size())
-          {
-            member_exprt member(object_tc, comp.get_name(), comp.type());
-            member.set(ID_C_lvalue, true);
-            exprt val =
+            val =
               typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
-            side_effect_expr_assignt assign(
-              std::move(member), std::move(val), typet(), source_location);
-            typecheck_side_effect_assignment(assign);
-            block.add(code_expressiont(std::move(assign)));
+          else
+          {
+            // N5008 [dcl.init.aggr]/5: elements without an explicit
+            // initializer are initialized from their default member
+            // initializer or copy-initialized from {} -- approximate
+            // with zero initialization.  Trailing members were
+            // previously left uninitialized (`aggt x(1, 2)` with three
+            // members read garbage from the third).
+            const auto zero = ::zero_initializer(
+              comp.type(), source_location, namespacet{symbol_table});
+            if(!zero.has_value())
+            {
+              ++idx;
+              continue;
+            }
+            val = *zero;
           }
+          side_effect_expr_assignt assign(
+            std::move(member), std::move(val), typet(), source_location);
+          typecheck_side_effect_assignment(assign);
+          block.add(code_expressiont(std::move(assign)));
           ++idx;
         }
         return std::move(block);
@@ -589,17 +605,39 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
             comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
             continue;
-          if(idx >= operands_tc.size())
-            break;
           member_exprt member(object_tc, comp.get_name(), comp.type());
           member.set(ID_C_lvalue, true);
-          exprt val =
-            typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+          exprt val;
+          if(idx < operands_tc.size())
+          {
+            val =
+              typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+            ++idx;
+          }
+          else
+          {
+            // N5008 [dcl.init.aggr]/5: an aggregate element without an
+            // explicit initializer is initialized from its default
+            // member initializer or copy-initialized from {} --
+            // value-initialization, approximated by zero
+            // initialization.  Previously trailing members were left
+            // uninitialized, so `aggt x(1, 2)` with three members read
+            // garbage from the third.
+            if(comp.get_base_name() == "@most_derived")
+              val = true_exprt();
+            else
+            {
+              const auto zero = ::zero_initializer(
+                comp.type(), source_location, namespacet{symbol_table});
+              if(!zero.has_value())
+                continue;
+              val = *zero;
+            }
+          }
           side_effect_expr_assignt assign(
             std::move(member), std::move(val), typet(), source_location);
           typecheck_side_effect_assignment(assign);
           block.add(code_expressiont(std::move(assign)));
-          ++idx;
         }
         return std::move(block);
       }
