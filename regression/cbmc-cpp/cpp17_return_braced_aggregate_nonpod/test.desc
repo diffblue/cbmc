@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ member preserved: SUCCESS$
@@ -8,8 +8,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-`return {r}` into an aggregate with a non-POD member only tries
-constructor candidates ([stmt.return]/2 requires copy-list-init, which
-for aggregates is aggregate initialization).  Non-return braced init of
-the same class works.  Blocks dog-fooding
-restrict_function_pointers.cpp.
+Fixed 2026-07-20: typecheck_return aggregate-initializes the result
+object from a braced-init-list when the return type is an aggregate
+([stmt.return]/2, [dcl.init.list]/3.4, [dcl.init.aggr]); the
+[dcl.init.list]/3.2 same-class single element still takes the
+copy/move path.
