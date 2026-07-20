@@ -4878,7 +4878,8 @@ exprt cpp_typecheck_resolvet::resolve(
     }
   }
   const bool is_operator_name =
-    id2string(base_name).compare(0, 8, "operator") == 0;
+    id2string(base_name).compare(0, 8, "operator") == 0 &&
+    cpp_typecheck.operator_expr_lookup_depth > 0;
   // Snapshot the candidates produced by ordinary (scope) lookup, before
   // ADL augments the set below.  The [class.member.lookup]/4 hiding rule
   // must only prune base-class members that resolve_with_arguments (ADL)
