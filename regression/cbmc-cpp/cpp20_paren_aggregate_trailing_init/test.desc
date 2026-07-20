@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ given elements: SUCCESS$
+^\[main\.assertion\.2\] line \d+ trailing element value-initialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ base element: SUCCESS$
+^\[main\.assertion\.4\] line \d+ trailing member after base: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-19: both parenthesized-aggregate lowering paths in
+cpp_constructor value-initialize trailing elements per
+[dcl.init.aggr]/5.
