@@ -3528,3 +3528,36 @@ Proof-harness rules: NO std::string::find(char) in SPEC code (memchr
 model loses provenance); use plain loops.  edit_distance KNOWNBUG:
 nfa set/vector symex scaling.
 Suites: cbmc-cpp green 87 skipped; unit-proofs green 4 skipped.
+
+## KNOWNBUG capture round (2026-07-20 afternoon)
+
+All four uncaptured findings now have minimal tests; one became a FIX:
+1. memchr had NO MODEL (either spelling) -- root of the "string::find
+   provenance" finding.  Modeled in ansi-c/library/string.c (C23
+   7.26.5.2, provenance-preserving pointer INTO the object).  NOTE:
+   library additions REQUIRE matching regression/cbmc-library/<name>/
+   tests or the library-check build step FAILS.  cpp17_string_find is
+   CORE now.
+2. EBO allocator struct-VALUE typecast: 10-line repro (string
+   move-assign from temporary).  KNOWNBUG
+   cpp17_string_move_assign_alloc_cast gates on the
+   "warning: ignoring typecast" soundness signal.
+3. unordered_set::insert: clang-GATED cvise this time -> valid
+   23-liner.  Technique: g++-preprocessed libstdc++ is clang-hostile
+   (~21 intrinsic errors); run cvise with gate g++-accepts AND
+   clang-not-reporting-"partial specialization|explicit specialization"
+   (anti-drift), then when small, DE-GNU by hand (__remove_reference /
+   __integer_pack / make_integer_sequence -> recursive impls; strip
+   [[..]] attrs) and finish with the FULL clang gate.  Load-bearing:
+   namespace std AND the free same-named template.
+4. restrict_function_pointers root: NO cvise needed -- targeted probing
+   found `return {r}` into an aggregate with a non-POD member tries
+   only ctor candidates (25-line KNOWNBUG
+   cpp17_return_braced_aggregate_nonpod).  Non-return braced init
+   works; POD member works.  Probe ladder: real-headers repro (28
+   lines) -> header-free -> ingredient bisection (const/nontriviality/
+   return-context).
+cvise cost lesson: criterion runtime matters -- restrict_function_
+pointers' 104k-line TU = 2min/eval, infeasible; manual probing beat
+reduction.  Suites: cbmc-cpp green 90 skipped, unit-proofs green 4
+skipped, cbmc-library memchr tests green, String*/Memory_leak* green.
