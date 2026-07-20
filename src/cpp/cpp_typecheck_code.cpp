@@ -32,6 +32,112 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 
+/// N5008 [stmt.return]/2 + [dcl.init.list]/3.4 + [dcl.init.aggr]: decide
+/// whether a braced-init-list return operand aggregate-initializes the
+/// (class) return type, and if so build the initialization.
+/// \param return_type: the function's return type (a struct_tag)
+/// \param init_list: the braced-init-list operand (typechecked in place)
+/// \return the value initializing the result object, or nullopt when the
+///   return type is not an aggregate for this list (then the constructor
+///   paths in typecheck_return apply)
+std::optional<exprt> cpp_typecheckt::braced_return_aggregate_value(
+  const typet &return_type,
+  exprt &init_list)
+{
+  elaborate_class_template(return_type);
+  const struct_typet &struct_type = follow_tag(to_struct_tag_type(return_type));
+
+  // [dcl.init.aggr]/1 (C++20 rule): an aggregate has no user-declared
+  // constructor.  Compiler-synthesized ones are marked #is_implicit_ctor;
+  // template and inherited constructors are recorded as struct flags.
+  if(
+    struct_type.get_bool("has_template_constructor") ||
+    struct_type.get_bool("has_inherited_constructor"))
+  {
+    return {};
+  }
+  for(const auto &c : struct_type.components())
+  {
+    if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+      continue;
+    if(to_code_type(c.type()).return_type().id() != ID_constructor)
+      continue;
+    if(c.type().get_bool("#is_implicit_ctor"))
+      continue;
+    return {};
+  }
+
+  for(auto &op : init_list.operands())
+    typecheck_expr(op);
+
+  // [dcl.init.list]/3.2: a single element of the same class (or one
+  // derived from it) initializes the object from that element -- the
+  // copy/move path, not aggregate element-wise initialization.
+  if(init_list.operands().size() == 1)
+  {
+    const typet &op_t = init_list.operands().front().type();
+    if(
+      op_t.id() == ID_struct_tag &&
+      (to_struct_tag_type(op_t).get_identifier() ==
+         to_struct_tag_type(return_type).get_identifier() ||
+       subtype_typecast(follow_tag(to_struct_tag_type(op_t)), struct_type)))
+    {
+      return {};
+    }
+  }
+
+  if(!struct_type.bases().empty())
+  {
+    // C++17 aggregates with base classes: cpp_constructor's aggregate
+    // machinery assembles base-subobject plus member initialization.
+    exprt::operandst ctor_args;
+    for(auto &op : init_list.operands())
+      ctor_args.push_back(already_typechecked_exprt{op});
+    exprt temporary;
+    new_temporary(
+      init_list.source_location(), return_type, ctor_args, temporary);
+    return temporary;
+  }
+
+  // Bases-free aggregate: [dcl.init.aggr]/3 -- each element of the list
+  // copy-initializes the corresponding member, in declaration order.
+  struct_exprt result({}, return_type);
+  const auto &ops = init_list.operands();
+  std::size_t idx = 0;
+  for(const auto &c : struct_type.components())
+  {
+    // Padding and non-data components are not aggregate elements
+    // ([dcl.init.aggr]/2, [class.mem]).
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.get_is_padding() ||
+      c.type().id() == ID_code || c.get_base_name() == "@most_derived")
+    {
+      continue;
+    }
+    if(idx < ops.size())
+    {
+      exprt val = ops[idx++];
+      if(is_reference(c.type()))
+        reference_initializer(val, to_reference_type(c.type()));
+      else
+        implicit_typecast(val, c.type());
+      result.add_to_operands(std::move(val));
+    }
+    else
+    {
+      // Fewer initializers than elements ([dcl.init.aggr]/5 would
+      // value-initialize the rest); decline and let the constructor
+      // paths diagnose, matching convert_initializer's behaviour.
+      return {};
+    }
+  }
+  if(idx < ops.size())
+    return {}; // more initializers than elements: ill-formed here
+  already_typechecked_exprt::make_already_typechecked(result);
+  return std::move(result);
+}
+
 void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
 {
   // Lambda / C++14 return type deduction: when the declared return type is a
@@ -96,6 +202,28 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
         temporary);
       code.return_value() = std::move(temporary);
     }
+  }
+  else if(
+    code.has_return_value() &&
+    code.return_value().id() == ID_initializer_list &&
+    !code.return_value().operands().empty() &&
+    return_type.id() == ID_struct_tag && !cpp_is_pod(return_type))
+  {
+    // N5008 [stmt.return]/2 + [dcl.init.list]/3.4: a braced-init-list
+    // operand copy-list-initializes the result object; when the return
+    // type is an AGGREGATE this is aggregate initialization
+    // ([dcl.init.aggr]) -- the list's elements initialize the class's
+    // elements -- not a constructor call.  Without this branch the
+    // single-element unwrap below rerouted `return {r};` to constructor
+    // overload resolution, which only sees the implicit default/copy
+    // constructor and fails ("found no match") whenever the aggregate
+    // has a non-POD member.  When the return type is NOT an aggregate
+    // (or the list is a [dcl.init.list]/3.2 same-class single element),
+    // the helper declines and the pre-existing paths below run.
+    auto aggregate_value =
+      braced_return_aggregate_value(return_type, code.return_value());
+    if(aggregate_value.has_value())
+      code.return_value() = std::move(*aggregate_value);
   }
   else if(
     code.has_return_value() &&
