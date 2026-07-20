@@ -2473,6 +2473,28 @@ std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
   // definition it originates from).
   const irep_idt current_body_line = member.value.source_location().get_line();
 
+  // The base name of the member's own class (e.g. `basic_string` from
+  // `std::__cxx11::tag-basic_string<char,...>`): a candidate definition
+  // must belong to THIS class template.  Same-named members of other
+  // templates (basic_string_view::rfind vs basic_string::rfind) are not
+  // this member's definition ([class.mfct]/1: the definition of a member
+  // function is a member of the class it is declared in), and matching
+  // them by base name attaches a body whose parameter names and
+  // semantics belong elsewhere.
+  std::string class_base;
+  {
+    std::string cn = id2string(class_id);
+    std::size_t clt = cn.find('<');
+    if(clt != std::string::npos)
+      cn.erase(clt);
+    std::size_t csep = cn.rfind("::");
+    if(csep != std::string::npos)
+      cn.erase(0, csep + 2);
+    if(cn.compare(0, 4, "tag-") == 0)
+      cn.erase(0, 4);
+    class_base = cn;
+  }
+
   const cpp_declarationt *match = nullptr;
   bool current_def_found = false;
   std::size_t current_def_param_count = 0;
@@ -2480,6 +2502,20 @@ std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
   {
     if(!tsp.second.type.get_bool(ID_is_template) || tsp.second.value.is_nil())
       continue;
+    // Owner check (see class_base above).
+    bool owner_matches = false;
+    {
+      const std::string tid = id2string(tsp.first);
+      std::size_t tpos = tid.rfind("template.");
+      if(tpos != std::string::npos)
+      {
+        std::string owner = tid.substr(tpos + 9);
+        std::size_t olt = owner.find('<');
+        if(olt != std::string::npos)
+          owner.erase(olt);
+        owner_matches = owner == class_base;
+      }
+    }
     const exprt &tms =
       static_cast<const exprt &>(tsp.second.value.find(ID_template_methods));
     for(const auto &tm : tms.operands())
@@ -2497,7 +2533,10 @@ std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
       const std::size_t md_param_count =
         md.declarators()[0].type().find(ID_parameters).get_sub().size();
       // Identify the definition the currently-attached body came from, by
-      // source line, to learn its parameter arity.
+      // source line, to learn its parameter arity.  This identification is
+      // deliberately NOT owner-filtered: the wrongly-attached body may come
+      // from ANOTHER class's same-named member (string_view.tcc's rfind on
+      // basic_string<char>::rfind).
       if(
         !current_body_line.empty() &&
         md_value.source_location().get_line() == current_body_line)
@@ -2505,6 +2544,8 @@ std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
         current_def_found = true;
         current_def_param_count = md_param_count;
       }
+      if(!owner_matches)
+        continue;
       // Only regular members (template parameters == enclosing class's);
       // member function templates are instantiated on their own path.
       if(
@@ -2625,7 +2666,13 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
     if(sym == nullptr || sym->type.id() != ID_code)
       continue;
     // Inline members only: skip members whose in-class body is nil
-    // (out-of-line, kept in template_methods).  See the doxygen note above.
+    // (out-of-line, kept in template_methods).  Those definitions are
+    // included AFTER the explicit instantiation declaration that created
+    // this instance (libstdc++'s bits/basic_string.tcc at the bottom of
+    // <string>); recording the instance in the owning template's
+    // `instantiated_with` (see typecheck_compound_type's swap-completion)
+    // makes typecheck_class_template_member replay them for this
+    // instance when they arrive.
     if(sym->value.is_nil())
       continue;
     deferred_typechecking.erase(d);
