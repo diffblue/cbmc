@@ -23,39 +23,20 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
   const irep_idt &name=namespace_spec.get_namespace();
 
+  irep_idt final_name(name);
+
+  bool is_anonymous = false;
   if(name.empty())
   {
-    // Anonymous (unique) namespace — generate a unique name.
-    // libc++ uses these in headers like <tuple>.
-    static unsigned anon_ns_counter = 0;
-    irep_idt anon_name("#anon_ns_" + std::to_string(anon_ns_counter++));
-
-    std::string identifier =
-      cpp_scopes.current_scope().prefix + id2string(anon_name);
-
-    if(symbol_table.symbols.find(identifier) == symbol_table.symbols.end())
-    {
-      symbolt symbol;
-      symbol.name = identifier;
-      symbol.base_name = anon_name;
-      symbol.value.make_nil();
-      symbol.type = typet(ID_namespace);
-      symbol.mode = ID_cpp;
-      symbol.module = module;
-      symbol.location = namespace_spec.source_location();
-      symbol_table.add(symbol);
-    }
-
-    cpp_scopet &ns_scope = cpp_scopes.new_namespace(anon_name);
-    ns_scope.prefix = identifier + "::";
-    cpp_scopes.go_to(ns_scope);
-    // Make the anonymous namespace visible in the parent scope
-    // (inline namespace semantics)
-    parent_scope.add_using_scope(ns_scope);
-    return;
+    // N5008 [namespace.unnamed]/1: an unnamed namespace behaves as
+    //   namespace UNIQUE { } using namespace UNIQUE; namespace UNIQUE { body }
+    // where all occurrences in the same scope of a translation unit share
+    // the SAME unique name.  Use a fixed per-scope name so repeated
+    // `namespace { ... }` blocks reuse one namespace, and fall through to
+    // the regular machinery below so the body is actually converted.
+    final_name = "#anon_ns";
+    is_anonymous = true;
   }
-
-  irep_idt final_name(name);
 
   std::string identifier=
     cpp_scopes.current_scope().prefix+id2string(final_name);
@@ -103,6 +84,11 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
     cpp_scopes.new_namespace(final_name);
   }
+
+  // [namespace.unnamed]/1: the implicit using-directive makes the unnamed
+  // namespace's members visible in the enclosing scope.
+  if(is_anonymous)
+    parent_scope.add_using_scope(cpp_scopes.current_scope());
 
   if(namespace_spec.alias().is_not_nil())
   {
