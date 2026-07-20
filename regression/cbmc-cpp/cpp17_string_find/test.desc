@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12 --unwind 10 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ find locates the character: SUCCESS$
+^\[main\.assertion\.2\] line \d+ absent character yields npos: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: memchr/__builtin_memchr models added to the C
+library (C23 7.26.5.2, provenance-preserving); previously find()
+returned NONDET and pointer checks fired inside basic_string::find.

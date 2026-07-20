@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12 --unwind 10 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ assigned prefix: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The assertion holds, but the soundness gate trips: the string's EBO
+allocator base is read as a struct VALUE typecast that the solver
+havocs (boolbvt::conversion_failed, "warning: ignoring typecast").
+Expected future behaviour: no ignored typecast.  Same defect class as
+the trim_from_last_delimiter unit proof's KNOWNBUG.
