@@ -3491,3 +3491,40 @@ flakiness, confirmed at HEAD) -- always confirm regressions at HEAD
 before hunting; (c) instantiation-time expansion sites looked right
 but broke fwdref packs -- prepare/eager are the correct points.
 Suite green 88 skipped.  Map history complete: 8 layers, each CORE.
+
+## Dog-food widening + unit proofs round (2026-07-20)
+
+Sweep: src/util 117/117 convert (after fixes), big-int/langapi/json/
+xmllang/assembler 14/14, goto-programs 67/69.  Four fixes:
+1. [class.copy.assign]/12 bases-by-TYPE in copy_parent + POD cpctor
+   branch (union path needs union_tag_typet -- struct_tag broke
+   cpp11_union_constructor).  _Hashtable_ebo_helper double-base shape.
+2. [namespace.unnamed]/1: anon branch RETURNED before converting body
+   items (everything in `namespace {}` dropped).  Fixed per-scope name
+   #anon_ns through the regular machinery + using-directive.
+3. [over.match.oper]/3 member-strip mis-fired on EXPLICIT
+   `operator==(o)` calls; gated on operator_expr_lookup_depth RAII in
+   operator_is_overloaded.  Only strip in operator-expression lookup.
+4. extern template basic_string<char>: .tcc members were NONDET stubs.
+   THREE cooperating gaps: swap-completion not recorded in
+   instantiated_with (replay skipped the instance); member_exprt
+   callees never pulled deferred_method_bodies (only symbol callees);
+   instantiate_matching_member_body matched bodies across ALL
+   templates by base name (string_view's rfind attached to
+   basic_string's).  Owner filter = template id after "template." up
+   to '<' vs class base name.
+DIAGNOSIS: unit proof over get_base_name caught rfind returning
+nondet -- proofs ARE the dog-food test.  Probe ladder: symbol table
+value -> replay convert -> declconv final_id (retry has $constthis) ->
+handle_initializer sym_val -> drain convert "OK" but val nil'd by
+syshdr sfinae guard -> env-gated guard skip exposed the real error
+("string_view.tcc:101 ... __n unknown").
+NEW SOLVER-GATE LESSON: `warning: ignoring typecast` after
+"converting SSA" = boolbvt::conversion_failed havocs a value; the
+unit-proofs forbidden pattern catches it.  trim_from_last_delimiter
+KNOWNBUG documents the derived-to-base struct VALUE cast gap
+(_Alloc_hider EBO); fix would lower to base-component extraction.
+Proof-harness rules: NO std::string::find(char) in SPEC code (memchr
+model loses provenance); use plain loops.  edit_distance KNOWNBUG:
+nfa set/vector symex scaling.
+Suites: cbmc-cpp green 87 skipped; unit-proofs green 4 skipped.
