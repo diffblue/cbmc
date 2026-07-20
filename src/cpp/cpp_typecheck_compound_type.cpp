@@ -278,6 +278,70 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
           writeable_symbol.type.find(ID_C_template_arguments).is_not_nil())
         {
           queue_deferred_methods_of_instance(writeable_symbol.name);
+
+          // Record the instance in the owning template's
+          // `instantiated_with` list, exactly as instantiate_template
+          // does.  An instance completed HERE was typically created by an
+          // explicit instantiation declaration ([temp.explicit], e.g.
+          // libstdc++'s `extern template class basic_string<char>;`),
+          // which precedes the out-of-line member definitions included
+          // later (bits/basic_string.tcc at the bottom of <string>).
+          // Converting such a definition replays it for every recorded
+          // instance (cpp_typecheck_template.cpp); without this record
+          // the members defined out of line (rfind, find, compare, ...)
+          // silently stayed BODYLESS for this instance and calls to them
+          // were havocked -- N5008 [temp.inst]/4 + Note 4 require them to
+          // be implicitly instantiated when odr-used, and CBMC links no
+          // library that could supply the definitions.
+          {
+            // The owning template's symbol id (`[ns::]template.Name<...>`)
+            // is the scope prefix of the template parameters recorded in
+            // the instance's ID_C_template.
+            const auto &tmpl_type = static_cast<const template_typet &>(
+              writeable_symbol.type.find(ID_C_template));
+            if(!tmpl_type.template_parameters().empty())
+            {
+              const auto &front_param = tmpl_type.template_parameters().front();
+              const std::string param_id = id2string(
+                front_param.id() == ID_type
+                  ? front_param.type().get(ID_identifier)
+                  : front_param.get(ID_identifier));
+              // Find the template symbol that declares exactly this
+              // parameter: its own template_type records the identical
+              // parameter identifier.  (The identifier's scope prefix is a
+              // numbered template SCOPE id, not a symbol id, so it cannot
+              // be looked up directly.)
+              symbolt *template_symbol = nullptr;
+              if(!param_id.empty())
+              {
+                for(const auto &tsp : symbol_table)
+                {
+                  if(!tsp.second.type.get_bool(ID_is_template))
+                    continue;
+                  const auto &cand_tt = static_cast<const template_typet &>(
+                    tsp.second.type.find(ID_template_type));
+                  if(cand_tt.template_parameters().empty())
+                    continue;
+                  const auto &cp = cand_tt.template_parameters().front();
+                  const irep_idt cp_id = cp.id() == ID_type
+                                           ? cp.type().get(ID_identifier)
+                                           : cp.get(ID_identifier);
+                  if(id2string(cp_id) == param_id)
+                  {
+                    template_symbol = symbol_table.get_writeable(tsp.first);
+                    break;
+                  }
+                }
+              }
+              if(template_symbol != nullptr)
+              {
+                irept &instantiated_with =
+                  template_symbol->value.add(ID_instantiated_with);
+                instantiated_with.get_sub().push_back(
+                  writeable_symbol.type.find(ID_C_template_arguments));
+              }
+            }
+          }
         }
       }
       else if(symbol.type.get_bool(ID_C_is_anonymous))
