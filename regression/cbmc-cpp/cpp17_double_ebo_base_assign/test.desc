@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ first base copied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second base copied: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copy ctor base copied: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: copy_parent and the POD-base branch of default_cpctor
+build the slicing casts from the resolved base type (b.type()) instead
+of the base's unqualified name.

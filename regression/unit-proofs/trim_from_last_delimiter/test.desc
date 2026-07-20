@@ -1,0 +1,24 @@
+KNOWNBUG
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 10 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof: trim_from_last_delimiter's contract (empty when the
+delimiter is absent; otherwise the exact prefix up to the LAST
+delimiter) proven over ALL printable strings up to length 4.
+KNOWNBUG: the assertions all hold, but the suite's soundness gate
+trips: a derived-to-base struct VALUE typecast --
+(std::__new_allocator<char>)<basic_string value>, from libstdc++'s
+_Alloc_hider EBO base handling -- reaches the solver, which cannot
+bit-blast struct typecasts and havocs the value ("warning: ignoring
+typecast", boolbvt::conversion_failed).  Here the havocked value is a
+stateless allocator, so the result is unaffected, but the pattern is
+unsound in general: the front end should lower derived-to-base value
+casts to base-component extraction.  g++/clang++ accept the harness
+and it verifies at runtime.
