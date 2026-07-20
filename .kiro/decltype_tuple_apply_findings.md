@@ -3561,3 +3561,30 @@ cvise cost lesson: criterion runtime matters -- restrict_function_
 pointers' 104k-line TU = 2min/eval, infeasible; manual probing beat
 reduction.  Suites: cbmc-cpp green 90 skipped, unit-proofs green 4
 skipped, cbmc-library memchr tests green, String*/Memory_leak* green.
+
+## Three-KNOWNBUG fix round (2026-07-20 evening)
+
+1. [stmt.return]/2 + [dcl.init.aggr]: braced return operands now
+   aggregate-initialize via braced_return_aggregate_value in
+   typecheck_return (C++20 aggregate test with #is_implicit_ctor;
+   [dcl.init.list]/3.2 same-class carve-out; bases route through
+   cpp_constructor's C++17 machinery).  The return path previously
+   ONLY tried constructors after the single-element unwrap.
+2. Injected std::__and_/__or_ fixed-arity replacements RETIRED
+   (cpp_internal_additions).  They conflicted with the real
+   <type_traits> definitions ([basic.def.odr]) -- resolution bound the
+   injected arity-limited primary and e.g. unordered_set's _Insert
+   alias default silently failed.  LESSON: header-shadowing injections
+   rot once the front end learns the real construct; prefer fixing the
+   evaluator.  remove_const_function_pointers.cpp now converts (68/69).
+3. Soundness: value_set_dereference's offset-0 compatible-type case
+   emitted a struct-to-struct VALUE typecast for struct-PREFIX matches
+   (EBO base through converted pointer); boolbv havocs those.  Now
+   denotes the base subobject via get_subexpression_at_offset, typecast
+   fallback preserved.  Validated: cbmc CORE, cbmc-library CORE,
+   cbmc-cpp, unit-proofs -- all green.
+Diagnosis shortcut of the day: renaming test identifiers one at a time
+(and_ -> __and_) exposed the name collision immediately; check
+cpp_internal_additions when a repro only fails with libstdc++ names.
+restrict_function_pointers.cpp still fails (emplace/streamsize chain)
+-- future dog-food target.
