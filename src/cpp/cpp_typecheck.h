@@ -1037,6 +1037,12 @@ public:
   std::optional<exprt>
   build_init_list_argument(const typet &target_type, const exprt &init_list);
 
+  /// [stmt.return]/2 + [dcl.init.aggr]: aggregate initialization of the
+  /// result object from a braced-init-list return operand; nullopt when
+  /// the return type is not an aggregate for this list.
+  std::optional<exprt>
+  braced_return_aggregate_value(const typet &return_type, exprt &init_list);
+
   /// Build a std::initializer_list<E> value from a braced-init-list per N5008
   /// [dcl.init.list]/5 (synthesise a backing const E[N] array and refer to it).
   /// \p il_type must be a std::initializer_list<E> struct-tag type.
