@@ -2486,6 +2486,34 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             sfinae_contextt sfinae_guard{*this};
             typecheck_type(arg.type());
           }
+          else if(template_arg_candidate_matching > 0)
+          {
+            // N5008 [temp.deduct]/8: while matching an overloaded
+            // candidate, an invalid type or expression formed by the
+            // substituted template arguments is a DEDUCTION FAILURE
+            // that removes this candidate from the overload set -- not
+            // a hard error.  E.g. substituting the pack element `I1`
+            // (a constant) of an instantiated mem-initializer
+            // `first(get<I1>(t1)...)` into the by-TYPE `get<T>`
+            // overload's parameter: the constant is no type, the
+            // candidate must simply drop out so the by-index overload
+            // is selected.  The pre-substituted constant case is
+            // handled above; this covers arguments that reach the
+            // type-check still as unresolved names.
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_type(arg.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              throw template_arg_kind_mismatch_exceptiont{};
+            }
+          }
           else
             typecheck_type(arg.type());
         }
@@ -2545,7 +2573,28 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           }
         }
         if(!pack_expanded)
-          typecheck_type(arg.type());
+        {
+          if(template_arg_candidate_matching > 0)
+          {
+            // [temp.deduct]/8 -- see the ID_type branch above: failure
+            // while matching a candidate removes the candidate.
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_type(arg.type());
+            }
+            catch(...)
+            {
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              throw template_arg_kind_mismatch_exceptiont{};
+            }
+          }
+          else
+            typecheck_type(arg.type());
+        }
         typet t = arg.type();
         arg = exprt(ID_type, t);
       }
@@ -2730,6 +2779,29 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         }
         if(!succeeded)
           throw 0;
+      }
+      else if(template_arg_candidate_matching > 0)
+      {
+        // N5008 [temp.deduct]/8 -- see the type-argument branch above:
+        // while matching an overloaded candidate, an invalid
+        // expression formed by the substituted arguments is a
+        // deduction failure that removes this candidate, not a hard
+        // error (e.g. the `forward<_Args1>` of std::pair's expanded
+        // piecewise mem-initializer being tried against an unrelated
+        // same-name overload).
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          typecheck_expr(arg);
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
       }
       else
         typecheck_expr(arg);

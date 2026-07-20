@@ -246,6 +246,19 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
         drop(static_cast<irept &>(body));
       }
     }
+
+    // N5008 [temp.variadic]/5: expand the remaining (non-empty)
+    // pack-expansion mem-initializer arguments with the replayed pack
+    // bindings -- `first(std::forward<_Args1>(std::get<_Indexes1>(
+    // __tuple1))...)` in std::pair's piecewise delegation target mixes
+    // a reference-type pack with a non-type index pack, which the
+    // scalar convenience entries alone cannot expand; the unexpanded
+    // ellipsis failed the body's conversion and the member was
+    // dropped (std::map's piecewise-constructed key was havocked).
+    expand_member_initializer_packs_in_body(
+      static_cast<irept &>(body),
+      template_map.pack_args_map,
+      template_map.pack_expr_map);
   }
 
   // N5008 [expr.prim.fold]/1-3: reduce a fold expression over this member
