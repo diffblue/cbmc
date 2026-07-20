@@ -28,20 +28,24 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \param [out] block: non-typechecked block
 static void copy_parent(
   const source_locationt &source_location,
-  const irep_idt &parent_base_name,
+  const typet &parent_type,
   const irep_idt &arg_name,
   exprt &block,
   bool is_move = false)
 {
-  exprt op0(
-    "explicit-typecast",
-    pointer_type(cpp_namet(parent_base_name, source_location).as_type()));
+  // N5008 [class.copy.assign]/12: each base subobject is identified by
+  // its TYPE.  Build the slicing casts from the resolved base type
+  // rather than the base's unqualified name: with two bases from the
+  // same class template (libstdc++'s _Hashtable_base :
+  // _Hashtable_ebo_helper<1,...>, _Hashtable_ebo_helper<0,...>) the
+  // unqualified name does not uniquely resolve.
+  typet base_t = parent_type;
+  base_t.remove(ID_C_base_name);
+  exprt op0("explicit-typecast", pointer_type(base_t));
   op0.copy_to_operands(exprt("cpp-this"));
   op0.add_source_location()=source_location;
 
-  exprt op1(
-    "explicit-typecast",
-    pointer_type(cpp_namet(parent_base_name, source_location).as_type()));
+  exprt op1("explicit-typecast", pointer_type(base_t));
   op1.type().set(ID_C_reference, true);
   if(is_move)
     op1.type().set(ID_C_rvalue_reference, true);
@@ -270,15 +274,16 @@ void cpp_typecheckt::default_cpctor(
     {
       // For POD bases, generate a direct assignment as an initializer
       // so it runs before member copies (correct C++ init order).
-      exprt op0(
-        "explicit-typecast",
-        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      // Use the resolved base type, not the unqualified name -- see
+      // copy_parent ([class.copy.ctor]/14, the _Hashtable_ebo_helper
+      // double-base shape).
+      typet pod_base_t = b.type();
+      pod_base_t.remove(ID_C_base_name);
+      exprt op0("explicit-typecast", pointer_type(pod_base_t));
       op0.copy_to_operands(exprt("cpp-this"));
       op0.add_source_location() = source_location;
 
-      exprt op1(
-        "explicit-typecast",
-        pointer_type(cpp_namet(parsymb.base_name, source_location).as_type()));
+      exprt op1("explicit-typecast", pointer_type(pod_base_t));
       op1.type().set(ID_C_reference, true);
       to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
       op1.get_sub().push_back(cpp_namet(param_identifier, source_location));
@@ -520,7 +525,7 @@ void cpp_typecheckt::default_assignop_value(
   // would recurse) reusing the union's own type, then return *this.
   if(symbol.type.id() == ID_union)
   {
-    copy_parent(source_location, symbol.base_name, arg_name, block);
+    copy_parent(source_location, union_tag_typet{symbol.name}, arg_name, block);
     block.add(code_returnt(
       dereference_exprt(exprt("cpp-this"), uninitialized_typet())));
     declarator.value() = std::move(block);
@@ -559,7 +564,7 @@ void cpp_typecheckt::default_assignop_value(
     }
     cpp_scopes.current_scope_ptr = saved_scope;
 
-    copy_parent(source_location, symb.base_name, arg_name, block, is_move);
+    copy_parent(source_location, b.type(), arg_name, block, is_move);
   }
 
   // Then, we copy the members
