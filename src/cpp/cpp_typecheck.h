@@ -48,6 +48,11 @@ bool cpp_typecheck(
 /// removes only that candidate from the overload set, so the candidate loop in
 /// `apply_template_args` catches it and skips the candidate rather than
 /// treating it as a hard error.
+void expand_member_initializer_packs_in_body(
+  irept &node,
+  const template_mapt::pack_args_mapt &pack_args_map,
+  const template_mapt::pack_expr_mapt &pack_expr_map);
+
 class template_arg_kind_mismatch_exceptiont
 {
 };
