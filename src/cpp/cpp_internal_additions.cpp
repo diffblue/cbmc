@@ -257,10 +257,14 @@ void cpp_internal_additions(std::ostream &out)
   out << "bool __builtin_sub_overflow_p(...);\n";
   out << "bool __builtin_mul_overflow_p(...);\n";
 
-  // GCC 13+ <type_traits> defines __and_/__or_ using decltype + SFINAE
-  // on pack expansions, which CBMC cannot evaluate. Provide simple
-  // recursive implementations via the preprocessor that replace the
-  // GCC definitions before <type_traits> is included.
+  // NOTE: earlier versions injected fixed-arity std::__and_/__or_
+  // replacements here because CBMC could not evaluate GCC 13's real
+  // definitions (decltype + SFINAE over pack expansions).  The front
+  // end handles those now, and the injected primary declaration
+  // conflicted with the real (and any user) definition of the same
+  // name ([basic.def.odr]): template-id resolution could pick the
+  // injected arity-limited declaration and silently fail.  Only the
+  // __to_address helper remains.
   if(
     config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO &&
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
@@ -268,40 +272,6 @@ void cpp_internal_additions(std::ostream &out)
     // clang-format off
     out <<
       "namespace std {\n"
-      "  template<typename...> struct __and_;\n"
-      "  template<> struct __and_<>\n"
-      "    : integral_constant<bool, true> {};\n"
-      "  template<typename _B1> struct __and_<_B1>\n"
-      "    : _B1 {};\n"
-      "  template<typename _B1, typename _B2> struct __and_<_B1, _B2>\n"
-      "    : integral_constant<bool, _B1::value && _B2::value> {};\n"
-      "  template<typename _B1, typename _B2, typename _B3>\n"
-      "    struct __and_<_B1, _B2, _B3>\n"
-      "    : integral_constant<bool,"
-      " _B1::value && _B2::value && _B3::value>"
-      " {};\n"
-      "  template<typename _B1, typename _B2, typename _B3, typename _B4>\n"
-      "    struct __and_<_B1, _B2, _B3, _B4>\n"
-      "    : integral_constant<bool,"
-      " _B1::value && _B2::value && _B3::value && _B4::value>"
-      " {};\n"
-      "  template<typename...> struct __or_;\n"
-      "  template<> struct __or_<>\n"
-      "    : integral_constant<bool, false> {};\n"
-      "  template<typename _B1> struct __or_<_B1>\n"
-      "    : _B1 {};\n"
-      "  template<typename _B1, typename _B2> struct __or_<_B1, _B2>\n"
-      "    : integral_constant<bool, _B1::value || _B2::value> {};\n"
-      "  template<typename _B1, typename _B2, typename _B3>\n"
-      "    struct __or_<_B1, _B2, _B3>\n"
-      "    : integral_constant<bool,"
-      " _B1::value || _B2::value || _B3::value>"
-      " {};\n"
-      "  template<typename _B1, typename _B2, typename _B3, typename _B4>\n"
-      "    struct __or_<_B1, _B2, _B3, _B4>\n"
-      "    : integral_constant<bool,"
-      " _B1::value || _B2::value || _B3::value || _B4::value>"
-      " {};\n"
       "  template<typename _Tp> constexpr _Tp*\n"
       "    __to_address(_Tp* __ptr) { return __ptr; }\n"
       "}\n";
