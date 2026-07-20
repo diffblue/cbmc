@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ by-index overload selected: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-20: template-argument type-check failures while matching
+overloaded candidates are [temp.deduct]/8 deduction failures (skip the
+candidate), not hard errors.
