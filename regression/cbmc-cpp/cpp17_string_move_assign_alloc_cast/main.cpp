@@ -7,9 +7,9 @@
 // boolbvt::conversion_failed havocs the value and prints
 // "warning: ignoring typecast".  Here the havocked value is an EMPTY
 // (stateless) allocator, so the result happens to be unaffected, but
-// a dropped constraint is a soundness hole in general: the front end
-// or the dereference lowering should produce a base-component
-// extraction (or an empty-struct constant) instead.
+// a dropped constraint is a soundness hole in general -- fixed
+// 2026-07-20: the dereference lowering now produces the base-component
+// selection at offset 0 instead of the typecast.
 // Found by the trim_from_last_delimiter unit proof's soundness gate.
 // g++/clang++ accept and verify at runtime.
 #include <string>

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ assigned prefix: SUCCESS$
@@ -9,8 +9,8 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-The assertion holds, but the soundness gate trips: the string's EBO
-allocator base is read as a struct VALUE typecast that the solver
-havocs (boolbvt::conversion_failed, "warning: ignoring typecast").
-Expected future behaviour: no ignored typecast.  Same defect class as
-the trim_from_last_delimiter unit proof's KNOWNBUG.
+Fixed 2026-07-20: value_set_dereference lowers an offset-0 dereference
+whose type is a struct PREFIX of the object's type to the base
+SUBOBJECT (member selection) instead of a struct value typecast the
+bit-blaster would havoc.  The desc keeps "^warning: ignoring" forbidden
+as the soundness gate.

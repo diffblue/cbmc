@@ -9,9 +9,11 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // decltype(integral_constant<false> object)).  CBMC fails to evaluate
 // the default, the member's type does not form, and the call resolves
 // against only the free std::insert template: "found no match for
-// symbol 'insert'".  BOTH the std namespace and the free insert are
-// load-bearing (removing either makes it pass), pointing at the
-// std-scope resolution/leniency paths.
+// symbol 'insert'".  BOTH the std namespace and the free insert were
+// load-bearing: the root cause was the fixed-arity std::__and_
+// replacement injected by cpp_internal_additions, which conflicted
+// with this file's (and the real <type_traits>) definition of the
+// same name -- retired 2026-07-20.
 // g++/clang++ accept (-std=c++17, no warnings) and verify at runtime.
 
 namespace std {
