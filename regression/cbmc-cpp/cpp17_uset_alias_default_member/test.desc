@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ member insert resolved: SUCCESS$
@@ -8,8 +8,10 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Alias-template default argument reading an inherited static through a
-decltype base chain fails to evaluate inside namespace std; the member
-using it in its return type is dropped and resolution sees only the
-free same-named function template.  Blocks dog-fooding
-remove_const_function_pointers.cpp (unordered_set::insert).
+Fixed 2026-07-20: the arity-limited std::__and_/__or_ replacements
+injected by cpp_internal_additions conflicted with the real definition
+of the same name ([basic.def.odr]) -- resolution picked the injected
+primary declaration and the alias default silently failed.  The front
+end evaluates GCC 13's real decltype+SFINAE definitions now, so the
+injection was retired.  remove_const_function_pointers.cpp converts
+clean.
