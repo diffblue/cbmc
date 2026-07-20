@@ -3438,3 +3438,24 @@ equality/decrement).  Fresh frontier, desc updated.
 LESSON: for multi-edit rounds run the FULL suite before flipping —
 the Constructor13 breakage was 2 edits deep in interaction; bisecting
 by reverting one file at a time with the saved copies was fast.
+
+## capture sweep 2 (2026-07-19 night)
+
+1. Probed adjacent gaps to the P0960 round: deleted implicit COPY ctor
+(private base copy) -- WORKS (no capture needed); P0960 ARRAY form
+`int a[3](1,2,3)` -- WORKS; paren-aggregate with FEWER args than
+members -- FAILED ([dcl.init.aggr]/5 trailing value-init) and FIXED in
+both cpp_constructor lowering paths (zero_initializer for missing
+elements; @most_derived true).  New CORE test
+cpp20_paren_aggregate_trailing_init.
+2. The map null-hint layer RESISTS sanitizer-gated cvise: reductions
+keep converging to guard-eliminated intra-object UB (writing through
+the header base object downcast to node -- ASan is blind to overlay
+within one global) and textual anchors (`grep "== end()"`,
+`key_comp`) get satisfied vacuously (kept as discarded expression /
+variable name).  The layer stays covered by cpp20_map_basic
+(KNOWNBUG, desc has the diagnosis: second lookup's equivalent-keys
+path derives the returned reference from __pos._M_node == NULL).
+Next attack should be direct trace analysis of the real map, not
+reduction.
+Suite green 88 skipped.
