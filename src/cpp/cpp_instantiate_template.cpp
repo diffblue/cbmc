@@ -281,6 +281,179 @@ cpp_scopet &cpp_typecheckt::sub_scope_for_instantiation(
   }
 }
 
+/// N5008 [temp.variadic]/5,7: expand pack-expansion mem-initializers of an
+/// instantiated constructor into one initializer per pack element, with every
+/// referenced pack -- TYPE packs (\p pack_args_map) and NON-TYPE packs
+/// (\p pack_expr_map) alike -- substituted in lockstep.  libstdc++ pair's
+/// piecewise target constructor `first(forward<_Args1>(get<_Indexes1>(
+/// __tuple1))...)` mixes a reference-type pack with a non-type pack; the
+/// previous single-name identifier rewrite (struct_tag one-element type packs
+/// only) left the raw names and the ellipsis behind, the initializer failed
+/// to convert, and the constructed pair was silently dropped.
+static void expand_member_initializer_packs(
+  irept &member_initializers,
+  const template_mapt::pack_args_mapt &pack_args_map,
+  const template_mapt::pack_expr_mapt &pack_expr_map)
+{
+  std::map<std::string, std::vector<typet>> type_packs;
+  std::map<std::string, std::vector<exprt>> expr_packs;
+  auto short_name = [](const irep_idt &full) -> std::string
+  {
+    const std::string f = id2string(full);
+    auto pos = f.rfind("::");
+    return pos != std::string::npos ? f.substr(pos + 2) : f;
+  };
+  for(const auto &pa : pack_args_map)
+    type_packs[short_name(pa.first)] = pa.second;
+  for(const auto &pe : pack_expr_map)
+    expr_packs[short_name(pe.first)] = pe.second;
+  if(type_packs.empty() && expr_packs.empty())
+    return;
+
+  std::function<bool(const irept &, std::size_t &)> pack_arity =
+    [&](const irept &n, std::size_t &arity) -> bool
+  {
+    bool found = false;
+    if(n.id() == ID_name)
+    {
+      const std::string id = id2string(n.get(ID_identifier));
+      auto t_it = type_packs.find(id);
+      auto e_it = expr_packs.find(id);
+      if(t_it != type_packs.end())
+      {
+        arity = t_it->second.size();
+        found = true;
+      }
+      else if(e_it != expr_packs.end())
+      {
+        arity = e_it->second.size();
+        found = true;
+      }
+    }
+    for(const auto &sn : n.get_sub())
+      if(pack_arity(sn, arity))
+        found = true;
+    for(const auto &ns : n.get_named_sub())
+      if(pack_arity(ns.second, arity))
+        found = true;
+    return found;
+  };
+
+  // substitute element k of every referenced pack: a cpp_name that is a
+  // SINGLE name naming a type pack becomes the element type, one naming a
+  // non-type pack the element value
+  std::function<void(irept &, std::size_t)> subst_elem =
+    [&](irept &n, std::size_t k)
+  {
+    if(n.id() == ID_cpp_name)
+    {
+      irep_idt only_name;
+      bool single = true;
+      for(const auto &sub : n.get_sub())
+      {
+        if(sub.id() == ID_name)
+        {
+          if(!only_name.empty())
+            single = false;
+          only_name = sub.get(ID_identifier);
+        }
+        else
+          single = false;
+      }
+      if(single)
+      {
+        auto t_it = type_packs.find(id2string(only_name));
+        if(t_it != type_packs.end() && k < t_it->second.size())
+        {
+          n = t_it->second[k];
+          return;
+        }
+        auto e_it = expr_packs.find(id2string(only_name));
+        if(e_it != expr_packs.end() && k < e_it->second.size())
+        {
+          n = e_it->second[k];
+          return;
+        }
+      }
+    }
+    for(auto &sub : n.get_sub())
+      subst_elem(sub, k);
+    for(auto &ns : n.get_named_sub())
+      subst_elem(ns.second, k);
+  };
+
+  irept::subt new_inits;
+  for(auto &init : member_initializers.get_sub())
+  {
+    std::size_t arity = 0;
+    if(init.get_bool(ID_ellipsis) && pack_arity(init, arity))
+    {
+      // whole-initializer expansion (a base/member pack)
+      for(std::size_t k = 0; k < arity; ++k)
+      {
+        irept copy = init;
+        copy.remove(ID_ellipsis);
+        subst_elem(copy, k);
+        new_inits.push_back(std::move(copy));
+      }
+      // arity 0: the initializer vanishes ([temp.variadic]/7)
+    }
+    else
+    {
+      // argument-level expansion: `member(pattern...)` -- each
+      // ellipsis-carrying argument becomes one argument per element
+      irept::subt new_args;
+      bool changed = false;
+      for(auto &a : init.get_sub())
+      {
+        std::size_t a_arity = 0;
+        if(a.get_bool(ID_ellipsis) && pack_arity(a, a_arity))
+        {
+          for(std::size_t k = 0; k < a_arity; ++k)
+          {
+            irept copy = a;
+            copy.remove(ID_ellipsis);
+            subst_elem(copy, k);
+            new_args.push_back(std::move(copy));
+          }
+          changed = true;
+        }
+        else
+          new_args.push_back(a);
+      }
+      if(changed)
+        init.get_sub().swap(new_args);
+      new_inits.push_back(init);
+    }
+  }
+  member_initializers.get_sub().swap(new_inits);
+}
+
+/// Walk \p node and apply expand_member_initializer_packs to every
+/// member-initializer statement found (the form mem-initializers take once
+/// they are part of a constructor's body).
+void expand_member_initializer_packs_in_body(
+  irept &node,
+  const template_mapt::pack_args_mapt &pack_args_map,
+  const template_mapt::pack_expr_mapt &pack_expr_map)
+{
+  if(node.id() == ID_code && node.get(ID_statement) == ID_member_initializer)
+  {
+    // wrap: the helper expects a list of initializers
+    irept list;
+    list.get_sub().push_back(node);
+    expand_member_initializer_packs(list, pack_args_map, pack_expr_map);
+    if(list.get_sub().size() == 1)
+      node = list.get_sub().front();
+    return;
+  }
+  for(auto &sub : node.get_sub())
+    expand_member_initializer_packs_in_body(sub, pack_args_map, pack_expr_map);
+  for(auto &ns : node.get_named_sub())
+    expand_member_initializer_packs_in_body(
+      ns.second, pack_args_map, pack_expr_map);
+}
+
 /// Create or find the symbol for a class template instantiation.
 ///
 /// Per [temp.inst]/1, class template specializations are implicitly
@@ -5091,6 +5264,17 @@ skip_pack_removal_ft:
           }
           if(ws.value.is_not_nil())
             remove_empty_pack_expansion_args(ws.value);
+          // N5008 [temp.variadic]/5: expand pack-expansion
+          // mem-initializers before the eager conversion (the deferred
+          // drain does this in prepare_deferred_method_body; this
+          // eager path previously left the ellipsis and raw pack names
+          // behind, so std::pair's piecewise target constructor failed
+          // to convert and was silently dropped).
+          if(ws.value.is_not_nil())
+            expand_member_initializer_packs_in_body(
+              static_cast<irept &>(ws.value),
+              template_map.pack_args_map,
+              template_map.pack_expr_map);
           // STANDARD GAP (N5008 [temp.point]/1, [temp.inst]/5): this eagerly
           // converts a *constexpr* member function-template specialization's
           // *definition* inline, nested in the referencing body's conversion,
