@@ -4830,6 +4830,21 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   add_implicit_dereference(expr);
 
   // Trigger elaboration of lazily deferred template method bodies.
+  // A member call's callee is a member_exprt whose component names the
+  // method symbol ([temp.inst]/4: odr-use requires implicit
+  // instantiation) -- e.g. std::string::rfind, whose out-of-line .tcc
+  // body reached the extern-instantiated basic_string<char> only
+  // through the deferred queue.
+  if(expr.function().id() == ID_member)
+  {
+    const irep_idt &component = expr.function().get(ID_component_name);
+    auto it = deferred_method_bodies.find(component);
+    if(it != deferred_method_bodies.end())
+    {
+      method_bodies.push_back(std::move(it->second));
+      deferred_method_bodies.erase(it);
+    }
+  }
   if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
   {
     auto it = deferred_method_bodies.find(sym_expr->get_identifier());
