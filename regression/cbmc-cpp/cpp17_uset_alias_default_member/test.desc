@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member insert resolved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Alias-template default argument reading an inherited static through a
+decltype base chain fails to evaluate inside namespace std; the member
+using it in its return type is dropped and resolution sees only the
+free same-named function template.  Blocks dog-fooding
+remove_const_function_pointers.cpp (unordered_set::insert).
