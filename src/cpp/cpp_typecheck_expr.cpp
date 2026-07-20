@@ -1672,6 +1672,21 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   else if(expr.id() == ID_dereference && expr.get_bool(ID_C_implicit))
     return false;
 
+  // Mark all resolutions below as operator-EXPRESSION candidate gathering
+  // ([over.match.oper]/3) -- see operator_expr_lookup_depth.
+  struct op_expr_guardt
+  {
+    unsigned &depth;
+    explicit op_expr_guardt(unsigned &d) : depth(d)
+    {
+      ++depth;
+    }
+    ~op_expr_guardt()
+    {
+      --depth;
+    }
+  } op_expr_guard{operator_expr_lookup_depth};
+
   PRECONDITION(expr.operands().size() >= 1);
 
   if(expr.id() == "explicit-typecast")

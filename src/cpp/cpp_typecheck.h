@@ -176,6 +176,15 @@ protected:
   /// error.  Maintained by `sfinae_contextt` (a friend).
   unsigned sfinae_context_depth = 0;
 
+  // Non-zero while operator_is_overloaded gathers/resolves candidates for
+  // an operator EXPRESSION (a @ b).  N5008 [over.match.oper]/3: only there
+  // does the non-member candidate lookup ignore member functions and add
+  // ADL candidates regardless of an in-scope member.  An EXPLICIT call
+  // `operator@(x)` uses ordinary [over.call.func] rules instead: a member
+  // found by unqualified lookup makes it a member call and suppresses ADL
+  // ([basic.lookup.argdep]/1).
+  unsigned operator_expr_lookup_depth = 0;
+
   /// Records a pending "no viable function" failure: set by resolve() when, in
   /// an ordinary (non-SFINAE) context, a call's only candidates are function
   /// templates all removed by [temp.deduct]/8 substitution failures.  The
