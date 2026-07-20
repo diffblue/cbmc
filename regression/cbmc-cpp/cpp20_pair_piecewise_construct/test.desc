@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ first from tuple: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second value-initialized: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-20: expand_member_initializer_packs_in_body (deferred
+prepare + eager constexpr-member conversion paths) expands type and
+non-type packs in lockstep per [temp.variadic]/5.
