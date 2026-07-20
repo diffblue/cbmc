@@ -3459,3 +3459,35 @@ path derives the returned reference from __pos._M_node == NULL).
 Next attack should be direct trace analysis of the real map, not
 reduction.
 Suite green 88 skipped.
+
+## map final layer (2026-07-20) -- cpp20_map_basic IS CORE
+
+The 8th and final layer: std::pair's piecewise delegation target
+`first(forward<_Args1>(get<_Indexes1>(__tuple1))...)` never converted.
+TWO defects:
+1. [temp.variadic]/5: mem-init pack expansion only rewrote one-element
+struct_tag TYPE packs by name; mixed reference-type + NON-TYPE index
+packs kept raw names + ellipsis.  New
+expand_member_initializer_packs_in_body (both whole-initializer and
+per-ARGUMENT ellipsis; type+expr packs in lockstep) wired into
+prepare_deferred_method_body (after its #fn_template_packs replay) AND
+the eager constexpr-member conversion path.  NOT at instantiation time
+(packs not yet bound there; eager expansion broke fwdref ctors).
+2. [temp.deduct]/8: template-arg typecheck failures while
+candidate-matching now convert to template_arg_kind_mismatch_
+exceptiont (type/ambiguous/non-type branches) -- get<0> vs by-type
+get<T> overload aborted resolution before.
+DIAGNOSIS PATH: trace showed pair ctor entered but wrote nothing ->
+goto dump: delegated-to ctor bodyless -> 12-line header repro
+(pw.cpp) -> gdb catch-throw backtraces (fatal = last before FNFAIL
+marker) -> NOMATCH probe named the unresolved '_Indexes1' -> body
+dump showed surviving ellipsis.  Header-free bisect: by-type overload
+NECESSARY (gt4 fail vs gt5 pass).
+HAZARDS HIT: (a) probe-strip DELETED an adjacent real fix (labels
+function-scope block sat between probe and try) -- diff EVERY stripped
+file against HEAD before rebuilding; (b) cpp11_recursive_forwarding_
+tuple_ctor fails STANDALONE but passes under test.pl (pre-existing
+flakiness, confirmed at HEAD) -- always confirm regressions at HEAD
+before hunting; (c) instantiation-time expansion sites looked right
+but broke fwdref packs -- prepare/eager are the correct points.
+Suite green 88 skipped.  Map history complete: 8 layers, each CORE.
