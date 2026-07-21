@@ -624,7 +624,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             // uninitialized, so `aggt x(1, 2)` with three members read
             // garbage from the third.
             if(comp.get_base_name() == "@most_derived")
-              val = true_exprt();
+              val = from_integer(1, comp.type());
             else
             {
               const auto zero = ::zero_initializer(
@@ -650,14 +650,13 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       if(component.get_base_name() != "@most_derived")
         continue;
 
-      member_exprt member(object_tc, component.get_name(), bool_typet());
+      member_exprt member(object_tc, component.get_name(), component.type());
       member.add_source_location() = source_location;
       member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
 
-      exprt val = false_exprt();
-
-      if(!component.get_bool(ID_from_base))
-        val = true_exprt();
+      // the flag is a c_bool (see cpp_typecheck_bases.cpp)
+      exprt val = from_integer(
+        component.get_bool(ID_from_base) ? 0 : 1, component.type());
 
       side_effect_expr_assignt assign(
         std::move(member), std::move(val), typet(), source_location);
