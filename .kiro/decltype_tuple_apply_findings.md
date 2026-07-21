@@ -3588,3 +3588,45 @@ Diagnosis shortcut of the day: renaming test identifiers one at a time
 cpp_internal_additions when a repro only fails with libstdc++ names.
 restrict_function_pointers.cpp still fails (emplace/streamsize chain)
 -- future dog-food target.
+
+## Wide dog-food sweep round (2026-07-20 late)
+
+SWEEP: 651 files (goto-instrument, goto-symex, analyses, cprover,
+goto-cc, goto-checker, goto-analyzer, pointer-analysis, solvers/**,
+cpp, ansi-c, +14 small dirs), parallel xargs -P8 with 90s each --
+NOTE: 90s@P8 misclassifies big TUs as TIMEOUT (all sampled timeouts
+pass at 300s sequential); use 300s or sequential for final tallies.
+Initial: 304 pass / 148 fail / 199 timeout.  After this round's 4
+front-end fixes + strto* models: of the 148 fails, 91+ now pass; 57
+genuine fails remain.
+
+FIXES (each with header-free CORE test):
+1. [expr.dynamic.cast]/5-6 cross-casts accepted; runtime check =
+   nondet(null | reinterpret) (56-file group, hardness_collectort).
+2. [dcl.type.elab]/[basic.scope.pdecl] ctor-parameter elaborated tags
+   pre-registered before the member pass (19-file group,
+   cpp_typecheck_resolve.h).  Root: ctors deferred to a SECOND pass.
+3. [temp.deduct]/8 nil-typed template args -> kind-mismatch while
+   candidate matching (12-file group, optional:754 __and_fn chain).
+4. [dcl.init.aggr]/5 braced args: short lists pad with
+   zero_initializer; #is_implicit_ctor exempted in brace_init_is_viable
+   (cpp_scope.h cache[{this,...}] shape).
+LIBRARY: strtoll/strtoul/strtoull modeled (found via string2int unit
+proof -- std::stoll returned NONDET).  cbmc-library tests mandatory.
+
+NEW KNOWNBUGs: cpp17_optional_requires_ctor_pair (direct-init fails +
+symex crash 'assignments must be type consistent' when used -- blocks
+goto_convert*.cpp); unit-proofs/string2optional (wrap_string_conversion
+lambda+catch layer nondet although direct stoll verifies).
+
+REMAINING fail groups (future targets): 5x miniBDD parse error
+('const mini_bddt & u' -- parser, friend decls?); 2x @most_derived
+not-an-lvalue (solver_hardness produce_report); 2x 'transform'
+unknown; 2x 'cast' ambiguous; 2x value_set_dereferencet no-match;
+stoll("literal") picks wstring overload (const char* -> const int*
+hard error instead of user-conversion).
+
+GIT LESSON: grep-by-message for rebase base hashes can match `fixup!`
+lines -- resolve EXACT hashes first; autosquash from a fixup hash
+rebases DETACHED.  Recovery: switch back to branch, rebase with exact
+parent hash.
