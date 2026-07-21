@@ -4028,7 +4028,62 @@ bool cpp_typecheckt::dynamic_typecast(
   else
     return false;
 
-  return static_typecast(e, type, new_expr);
+  if(static_typecast(e, type, new_expr))
+    return true;
+
+  // N5008 [expr.dynamic.cast]/5-6: when the required static up-cast does
+  // not exist, the cast is still well-formed if the operand points to a
+  // POLYMORPHIC class type and the target is a pointer to a complete
+  // class type -- the run-time check then decides: a pointer to the
+  // (possibly cross-cast) subobject when the most-derived object has a
+  // unique public base of the target type, a null pointer otherwise
+  // ([expr.dynamic.cast]/7-8).  This is the shape of
+  //   dynamic_cast<hardness_collectort *>(&prop)
+  // over unrelated interface bases (prop_conv_solver.h).  CBMC does not
+  // track dynamic types precisely enough to evaluate the check, so model
+  // the result as a nondeterministic choice between the reinterpreted
+  // pointer and null: a sound over-approximation of both outcomes
+  // (callers must null-check, exactly as the language requires).
+  if(
+    type.id() == ID_pointer && !is_reference(type) &&
+    to_pointer_type(type).base_type().id() == ID_struct_tag &&
+    e.type().id() == ID_pointer &&
+    to_pointer_type(e.type()).base_type().id() == ID_struct_tag)
+  {
+    const struct_typet &op_struct =
+      follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()));
+    // [expr.dynamic.cast]/6: the operand's class must be polymorphic --
+    // it has (or inherits) a virtual function, visible as a vtable
+    // pointer component.
+    bool polymorphic = false;
+    for(const auto &c : op_struct.components())
+    {
+      if(c.get_base_name() == "@vtable_pointer")
+      {
+        polymorphic = true;
+        break;
+      }
+    }
+    // the target class must be complete ([expr.dynamic.cast]/2)
+    if(
+      polymorphic &&
+      !follow_tag(to_struct_tag_type(to_pointer_type(type).base_type()))
+         .is_incomplete())
+    {
+      side_effect_expr_nondett nondet_choice{
+        bool_typet{}, e.source_location()};
+      null_pointer_exprt null_result{to_pointer_type(type)};
+      new_expr = if_exprt{
+        std::move(nondet_choice),
+        typecast_exprt{e, type},
+        std::move(null_result),
+        type};
+      new_expr.add_source_location() = e.source_location();
+      return true;
+    }
+  }
+
+  return false;
 }
 
 bool cpp_typecheckt::reinterpret_typecast(
