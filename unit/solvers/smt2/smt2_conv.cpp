@@ -74,9 +74,7 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
 
   SECTION("reduction_nor")
   {
-    REQUIRE(
-      get_assert(reduction_nor_exprt{sym}) ==
-      "(assert (not (not (= x (_ bv0 2)))))");
+    REQUIRE(get_assert(reduction_nor_exprt{sym}) == "(assert (= x (_ bv0 2)))");
   }
 
   SECTION("reduction_xor")

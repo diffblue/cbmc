@@ -340,3 +340,61 @@ exprt onehot0_exprt::lower() const
   // same as onehot, but on flipped operand bits
   return let_exprt{symbol, bitnot_exprt{op()}, onehot_lowering(symbol)};
 }
+
+exprt reduction_and_exprt::lower() const
+{
+  auto &operand = op();
+  return equal_exprt{
+    operand, to_bitvector_type(operand.type()).all_ones_expr()};
+}
+
+exprt reduction_nand_exprt::lower() const
+{
+  auto &operand = op();
+  return notequal_exprt{
+    operand, to_bitvector_type(operand.type()).all_ones_expr()};
+}
+
+exprt reduction_or_exprt::lower() const
+{
+  auto &operand = op();
+  return notequal_exprt{
+    operand, to_bitvector_type(operand.type()).all_zeros_expr()};
+}
+
+exprt reduction_nor_exprt::lower() const
+{
+  auto &operand = op();
+  return equal_exprt{
+    operand, to_bitvector_type(operand.type()).all_zeros_expr()};
+}
+
+exprt reduction_xor_exprt::lower() const
+{
+  auto &operand = op();
+  auto width = to_bitvector_type(operand.type()).width();
+  exprt result = extractbit_exprt{operand, 0};
+  for(std::size_t i = 1; i < width; i++)
+    result = xor_exprt{result, extractbit_exprt{operand, i}};
+  return result;
+}
+
+exprt reduction_xnor_exprt::lower() const
+{
+  auto &operand = op();
+  auto width = to_bitvector_type(operand.type()).width();
+  exprt result = extractbit_exprt{operand, 0};
+  for(std::size_t i = 1; i < width; i++)
+    result = xor_exprt{result, extractbit_exprt{operand, i}};
+  return not_exprt{result};
+}
+
+exprt replication_exprt::lower() const
+{
+  auto count = numeric_cast_v<std::size_t>(times());
+  exprt::operandst ops;
+  ops.reserve(count);
+  for(std::size_t i = 0; i < count; i++)
+    ops.push_back(op());
+  return concatenation_exprt{std::move(ops), type()};
+}

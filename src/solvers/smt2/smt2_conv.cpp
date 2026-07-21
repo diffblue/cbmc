@@ -2909,29 +2909,19 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id() == ID_reduction_and)
   {
-    // This is true iff all bits in the operand are true
-    auto &op = to_reduction_and_expr(expr).op();
-    auto all_ones = to_bitvector_type(op.type()).all_ones_expr();
-    convert_expr(equal_exprt{op, all_ones});
+    convert_expr(to_reduction_and_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_nand)
   {
-    // This is the negation of "reduction and"
-    auto &op = to_reduction_nand_expr(expr).op();
-    convert_expr(not_exprt{reduction_and_exprt{op}});
+    convert_expr(to_reduction_nand_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_or)
   {
-    // This is true iff the operand is not zero
-    auto &op = to_reduction_or_expr(expr).op();
-    auto all_zeros = to_bitvector_type(op.type()).all_zeros_expr();
-    convert_expr(notequal_exprt{op, all_zeros});
+    convert_expr(to_reduction_or_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_nor)
   {
-    // This is the negation of "reduction or"
-    auto &op = to_reduction_nor_expr(expr).op();
-    convert_expr(not_exprt{reduction_or_exprt{op}});
+    convert_expr(to_reduction_nor_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_xor)
   {
