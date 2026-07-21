@@ -589,6 +589,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         if(il_val.has_value())
         {
           symbol_exprt expr_sym(symbol.name, symbol.type);
+          expr_sym.set(ID_C_lvalue, true);
           already_typechecked_exprt::make_already_typechecked(expr_sym);
           exprt::operandst ctor_ops;
           already_typechecked_exprt::make_already_typechecked(*il_val);
@@ -620,6 +621,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           // Copy operands since cpp_constructor may modify symbol.value.
           exprt::operandst ops_copy = symbol.value.operands();
           symbol_exprt sym_expr(symbol.name, symbol.type);
+          sym_expr.set(ID_C_lvalue, true);
           already_typechecked_exprt::make_already_typechecked(sym_expr);
           auto init =
             cpp_constructor(symbol.value.source_location(), sym_expr, ops_copy);
@@ -684,6 +686,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     }
 
     symbol_exprt expr_symbol(symbol.name, symbol.type);
+    expr_symbol.set(ID_C_lvalue, true);
     already_typechecked_exprt::make_already_typechecked(expr_symbol);
 
     exprt::operandst ops;
