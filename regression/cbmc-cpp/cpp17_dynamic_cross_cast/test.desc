@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ cross-cast outcomes: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: dynamic_typecast accepts [expr.dynamic.cast]/5-6
+cross-casts (operand polymorphic, target a complete class) and models
+the runtime check as nondet(null, reinterpreted pointer).
