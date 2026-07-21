@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ ADL via template argument: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+symbol 'transform' is unknown
+--
+ADL does not consider the namespaces of a specialization's template
+arguments ([basic.lookup.argdep]/2); the call site's enclosing
+function is silently truncated.  Blocks dog-fooding goto_cc_main.cpp
+(unqualified transform over string iterators).

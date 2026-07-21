@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ function decay in nested brace: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Function-to-pointer decay inside a nested braced-init-list constructor
+argument fails ("address-of code requires a member expression").
+Blocks dog-fooding abstract_environment.cpp (assume_functions map).
