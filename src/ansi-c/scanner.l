@@ -405,9 +405,31 @@ enable_or_disable ("enable"|"disable")
                               PARSER.raw_string_pending_close.size()) !=
                             PARSER.raw_string_pending_close)
                     {
-                      // Not a prefix of end_seq, flush pending chars
-                      for(char pc : PARSER.raw_string_pending_close)
+                      // Not a prefix of end_seq.  Flush pending chars --
+                      // but a SUFFIX of them may begin the real
+                      // terminator (C++ [lex.string]: the literal ends at
+                      // the FIRST )delimiter"): e.g. for `))"` the first
+                      // `)` is content and the second starts the close;
+                      // for delimiter x, `)x)x"` similarly.  Keep the
+                      // longest suffix that is a prefix of end_seq and
+                      // flush only the rest.
+                      const std::string &pend =
+                        PARSER.raw_string_pending_close;
+                      std::size_t keep = 0;
+                      for(std::size_t k = pend.size() - 1; k >= 1; --k)
                       {
+                        if(
+                          end_seq.compare(0, k, pend, pend.size() - k, k) ==
+                          0)
+                        {
+                          keep = k;
+                          break;
+                        }
+                      }
+                      const std::size_t flush_count = pend.size() - keep;
+                      for(std::size_t fi = 0; fi < flush_count; ++fi)
+                      {
+                        char pc = pend[fi];
                         if(pc == '\\')
                           PARSER.string_literal += "\\\\";
                         else if(pc == '"')
@@ -421,7 +443,7 @@ enable_or_disable ("enable"|"disable")
                         else
                           PARSER.string_literal += pc;
                       }
-                      PARSER.raw_string_pending_close.clear();
+                      PARSER.raw_string_pending_close.erase(0, flush_count);
                     }
                     // else: still a prefix, keep accumulating
                   }
