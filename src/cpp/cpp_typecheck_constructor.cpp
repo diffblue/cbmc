@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/anonymous_member.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 /// Generate code to copy the parent.
@@ -835,6 +836,15 @@ void cpp_typecheckt::check_member_initializers(
 ///    Note: The initialization order follows the declaration order.
 /// \param struct_union_type: the class/struct/union
 /// \param [out] initializers: the constructor initializers
+/// best-effort source location of a member-initializer irept
+static source_locationt source_location_of(const irept &initializer)
+{
+  const irept &loc = initializer.find(ID_C_source_location);
+  if(loc.is_not_nil())
+    return static_cast<const source_locationt &>(loc);
+  return source_locationt();
+}
+
 void cpp_typecheckt::full_member_initialization(
   const struct_union_typet &struct_union_type,
   irept &initializers)
@@ -1095,6 +1105,85 @@ void cpp_typecheckt::full_member_initialization(
               }
             }
           }
+        }
+
+        // N5008 [class.base.init]/7: a mem-initializer WITH an
+        // expression-list initializes the (POD) base subobject from it
+        // -- `wrapt(payloadt v) : payloadt(v)` copy-initializes the
+        // base.  This branch previously dropped such initializers
+        // silently (the base stayed nondeterministic; wrong code).  The
+        // mem-initializer-id may also name the base via a TEMPLATE
+        // PARAMETER ([class.base.init]/2: any name denoting the type,
+        // goto-symex/renamed.h's `renamedt(underlyingt v) :
+        // underlyingt(v)`), so match by name first and by resolved type
+        // second.  Lower to an assignment through the sliced base
+        // lvalue, the same shape copy_parent emits.
+        for(const irept &initializer : initializers.get_sub())
+        {
+          if(initializer.find(ID_member).id() != ID_cpp_name)
+            continue;
+          const cpp_namet &init_name = to_cpp_name(initializer.find(ID_member));
+          const exprt &init_expr = static_cast<const exprt &>(initializer);
+          if(init_expr.operands().size() != 1)
+            continue;
+          bool names_this_base =
+            !init_name.has_template_args() &&
+            init_name.get_base_name() == ctorsymb.base_name;
+          if(!names_this_base)
+          {
+            // resolved-type match (template parameter or typedef).  Skip
+            // names of data members outright, and suppress diagnostics
+            // and the error count for the probe: an initializer naming a
+            // MEMBER must not surface a bogus "found no match" from this
+            // speculative type resolution.
+            bool is_member_name = false;
+            for(const auto &c : components)
+            {
+              if(
+                c.get_base_name() == init_name.get_base_name() &&
+                c.type().id() != ID_code && !c.get_bool(ID_is_type))
+              {
+                is_member_name = true;
+                break;
+              }
+            }
+            if(!is_member_name)
+            {
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                typet named_type =
+                  static_cast<const typet &>(initializer.find(ID_member));
+                typecheck_type(named_type);
+                names_this_base =
+                  named_type.id() == ID_struct_tag &&
+                  to_struct_tag_type(named_type).get_identifier() ==
+                    to_struct_tag_type(b.type()).get_identifier();
+              }
+              catch(...)
+              {
+                // not a type
+              }
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+            }
+          }
+          if(!names_this_base)
+            continue;
+
+          typet base_t = b.type();
+          base_t.remove(ID_C_base_name);
+          exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
+          lhs_ptr.copy_to_operands(exprt("cpp-this"));
+          lhs_ptr.add_source_location() = source_location_of(initializer);
+          dereference_exprt lhs(lhs_ptr);
+          exprt rhs = init_expr.operands().front();
+          code_frontend_assignt assign_code(std::move(lhs), std::move(rhs));
+          assign_code.add_source_location() = source_location_of(initializer);
+          final_initializers.move_to_sub(assign_code);
+          break;
         }
         continue;
       }
