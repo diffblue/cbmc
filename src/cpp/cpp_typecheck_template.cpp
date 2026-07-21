@@ -2356,6 +2356,14 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         if(arg.type().is_nil() || arg.type().id().empty())
         {
+          // [temp.deduct]/8: while matching an overloaded candidate, a
+          // template argument that failed to form (nil type -- e.g. a
+          // SFINAE'd-out __enable_if_t inside GCC 13's __and_fn chain,
+          // reached from std::optional's _Requires'd converting
+          // constructors) is a deduction failure that removes just this
+          // candidate, not a hard error.
+          if(template_arg_candidate_matching > 0)
+            throw template_arg_kind_mismatch_exceptiont{};
           error().source_location = arg.source_location();
           error() << "missing type in template argument" << eom;
           throw 0;
@@ -2528,6 +2536,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         if(arg.type().is_nil() || arg.type().id().empty())
         {
+          // [temp.deduct]/8 -- see the ID_type branch above.
+          if(template_arg_candidate_matching > 0)
+            throw template_arg_kind_mismatch_exceptiont{};
           error().source_location = arg.source_location();
           error() << "missing type in template argument" << eom;
           throw 0;
