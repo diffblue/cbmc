@@ -14,6 +14,10 @@
 // Isolated shapes (deleted-default-ctor + defaulted copy;
 // sharing_mapt<exprt, symbol_exprt> alone) all pass -- the trigger
 // needs this TU's context, so this test keeps the include.
+// UPDATE 2026-07-21: one ingredient IS now isolated --
+// goto-symex/renamed.h's base mem-initializer named via the template
+// parameter is silently dropped / errors with std::move; see the
+// header-free cpp17_base_meminit_template_param.
 #include <goto-symex/goto_symex_state.h>
 extern "C" void __CPROVER_assert(bool, const char *);
 

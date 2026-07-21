@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ stream destructor chain verifies: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+The iostream destructor chain trips vtable-pointer bounds checks in
+~basic_ios/~basic_iostream (virtual-base subobject addressing).
+Blocks cpp11_stream_setw and cpp11_ofstream_from_string.
