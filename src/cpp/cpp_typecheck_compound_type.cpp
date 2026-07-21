@@ -1973,6 +1973,56 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   // we first do everything _but_ the constructors
 
+  // N5008 [dcl.type.elab], [basic.scope.pdecl]: an elaborated-type-
+  // specifier `class X` in a member declaration's parameter list
+  // FIRST-declares X in the nearest enclosing namespace scope, and later
+  // members may then use the plain name X (the shape of
+  // `explicit resolvert(class cpp_typecheckt &); ... cpp_typecheckt &m;`).
+  // Constructors are deferred to the second pass below, so their
+  // parameters' elaborated declarations would register only AFTER the
+  // data members that use the name; pre-register them here.  Only
+  // bodyless struct/union types with a tag are elaborated specifiers,
+  // and typecheck_compound_type is idempotent for already-known tags
+  // (tag_scope reuses the existing class).
+  Forall_operands(it, body)
+  {
+    if(it->id() != ID_cpp_declaration)
+      continue;
+    cpp_declarationt &declaration = to_cpp_declaration(*it);
+    if(!declaration.is_constructor() || declaration.is_template())
+      continue;
+    for(auto &declarator : declaration.declarators())
+    {
+      typet &dtype = declarator.type();
+      if(dtype.id() != ID_function_type)
+        continue;
+      for(auto &parameter : dtype.add(ID_parameters).get_sub())
+      {
+        if(parameter.id() != ID_cpp_declaration)
+          continue;
+        auto &param_decl =
+          static_cast<cpp_declarationt &>(static_cast<irept &>(parameter));
+        typet &ptype = param_decl.type();
+        if(
+          (ptype.id() == ID_struct || ptype.id() == ID_union) &&
+          ptype.find(ID_tag).is_not_nil() && ptype.find(ID_body).is_nil() &&
+          !ptype.get_bool(ID_C_tag_only_declaration))
+        {
+          typet tmp = ptype;
+          try
+          {
+            typecheck_compound_type(to_struct_union_type(tmp));
+          }
+          catch(...)
+          {
+            // best-effort pre-registration only; the real parameter
+            // conversion in the second pass diagnoses genuine errors
+          }
+        }
+      }
+    }
+  }
+
   Forall_operands(it, body)
   { // N5008 [temp.inst]/11 (and the same pragmatic tolerance the
     // member-template branch below and the system-header body leniency
