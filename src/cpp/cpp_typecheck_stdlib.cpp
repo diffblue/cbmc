@@ -1504,6 +1504,26 @@ void cpp_typecheckt::provide_stdlib_bodies()
       continue;
     }
     if(
+      (base == "ios_base" || base == "~ios_base") &&
+      name.find("std::ios_base::") == 0)
+    {
+      // libstdc++ defines std::ios_base's constructor and destructor in
+      // its compiled library (src/c++98/ios_init.cc); the headers only
+      // declare them, so CBMC sees no body and havocs every stream's
+      // construction/destruction.  N5008 [ios.base.cons]/1: after the
+      // ios_base() constructor each member has an INDETERMINATE value
+      // (basic_ios::init() establishes the post-conditions later) -- an
+      // empty body is exactly conformant.  ~ios_base only services
+      // callbacks registered via register_callback ([ios.base.callback])
+      // and locale bookkeeping; CBMC's model registers none, so an empty
+      // body is a sound model of the destruction itself.
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+    if(
       base == "_S_copy_chars" && name.find("basic_string") != std::string::npos)
     {
       // _S_copy_chars(p, k1, k2) copies characters from [k1,k2) to p.
