@@ -3630,3 +3630,26 @@ GIT LESSON: grep-by-message for rebase base hashes can match `fixup!`
 lines -- resolve EXACT hashes first; autosquash from a fixup hash
 rebases DETACHED.  Recovery: switch back to branch, rebase with exact
 parent hash.
+
+## Sweep-findings capture round (2026-07-21)
+
+`restrict` FIXED (scanner.l conditional_keyword like _Bool; C11 6.4.1
+vs [lex.key]) -- 5 miniBDD files parse; C-mode restrict unaffected;
+ansi-c suite via goto-cc green (clang_target 2 fails are HEAD-
+pre-existing).  NINE new KNOWNBUGs, all probed manually (no cvise
+needed -- symptom-shape guessing beat reduction every time today):
+virtual-base braced init (@most_derived; ofstream/ostringstream
+family), static_cast ref-downcast of operator* result, ADL via
+template-argument namespaces, own-private-member in braced ctor arg,
+fn-to-ptr decay in nested braces, braced reference init `int &r{x}`,
+raw strings with embedded quotes (lexer stops at first '"'),
+std::function-of-lambda invocation havocs, stoll("literal")
+narrow/wide overload hard error.
+NOT bugs: satcheck_zcore unsafe_str2int (dead code, g++ rejects too);
+goto-bmc api.h + sat solver headers (environmental).
+STILL unlocalized (complex instantiation chains): aligned_buffer
+"type has no size" family (symex_dereference, change_impact);
+'cast does not uniquely resolve' + "string'" no longer reproduced
+after this round's fixes (likely downstream of restrict).
+LESSON: pkill -f with a pattern matching your OWN compound command
+kills the shell mid-commit; pgrep first, or use exact patterns.
