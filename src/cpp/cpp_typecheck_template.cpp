@@ -2820,7 +2820,28 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       // C++17 template<auto>: deduce type from argument
       if(type.id() == ID_auto)
         type = arg.type();
-      implicit_typecast(arg, type);
+      if(template_arg_candidate_matching > 0)
+      {
+        // [temp.deduct]/8: a non-type argument that cannot convert to the
+        // candidate's parameter type while MATCHING (e.g. deducing the
+        // WIDE std::stoll overload for a const char* argument converts
+        // against const wchar_t*) removes the candidate, silently.
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          implicit_typecast(arg, type);
+        }
+        catch(...)
+        {
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+          throw template_arg_kind_mismatch_exceptiont{};
+        }
+      }
+      else
+        implicit_typecast(arg, type);
       simplify(arg, *this);
       // Resolve symbol references to their constant values.
       // N5008 [temp.arg.nontype]/2: for a reference (or pointer) non-type
