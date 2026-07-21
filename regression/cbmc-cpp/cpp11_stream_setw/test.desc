@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ setw inserter converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+`stream << std::setw(n)` fails to resolve the manipulator inserter
+(std::_Setw through the _Require SFINAE chain); the enclosing
+function is silently truncated.  Blocks dog-fooding
+solver_hardness.cpp.

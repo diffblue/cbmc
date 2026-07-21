@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17 -I ../../../src --object-bits 12 ../../../src/analyses/variable-sensitivity/abstract_environment.cpp
+^\[main\.assertion\.1\] line \d+ abstract_environment converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+The static std::map<irep_idt, irep_idt> initializer routes a braced
+pair into the comparator parameter ("cannot initialize type 'struct
+less' using value 'ID_equal'"); context-dependent (isolated shape
+passes).  Blocks dog-fooding variable-sensitivity.
