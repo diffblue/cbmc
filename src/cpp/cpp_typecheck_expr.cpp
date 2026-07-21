@@ -2758,6 +2758,66 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
         op = to_unary_expr(op).op();
         // fall through to the typecast path below
       }
+      else if(
+        expr.type().id() == ID_struct_tag &&
+        (elaborate_class_template(expr.type()), !cpp_is_pod(expr.type())))
+      {
+        // N5008 [expr.type.conv]/2: `T{...}` DIRECT-LIST-INITIALIZES a
+        // prvalue of type T; for a class type that is [dcl.init.list]/3
+        // -- aggregate initialization for aggregates, otherwise
+        // constructor selection per [over.match.list] -- NOT the
+        // C compound-literal member-wise initialization below, which
+        // poured `std::ofstream{name}`'s string into the stream's first
+        // member ("invalid implicit conversion ... to std::streamsize").
+        // The class template is elaborated BEFORE the POD judgment:
+        // cpp_is_pod inspects the members for user-declared special
+        // functions, and an un-elaborated instance would be
+        // misclassified as POD (see convert_initializer).
+
+        // [dcl.init.list]/3.4: aggregates initialize member-wise; the
+        // helper declines for classes with user-declared constructors.
+        if(!op.operands().empty())
+        {
+          auto aggregate_value = braced_return_aggregate_value(expr.type(), op);
+          if(aggregate_value.has_value())
+          {
+            expr.swap(*aggregate_value);
+            return;
+          }
+        }
+
+        // [over.match.list]/1 phase 1: a viable initializer-list
+        // constructor consumes the whole list.
+        if(
+          !op.operands().empty() &&
+          has_viable_init_list_constructor(expr.type(), op))
+        {
+          auto il_val = build_init_list_argument(expr.type(), op);
+          if(il_val.has_value())
+          {
+            already_typechecked_exprt::make_already_typechecked(*il_val);
+            exprt::operandst ctor_args;
+            ctor_args.push_back(std::move(*il_val));
+            exprt temporary;
+            new_temporary(
+              expr.source_location(), expr.type(), ctor_args, temporary);
+            expr.swap(temporary);
+            return;
+          }
+        }
+
+        // [over.match.list]/1 phase 2: the elements are arguments to a
+        // constructor; an empty list value-initializes
+        // ([dcl.init.list]/3.5, the default constructor).
+        exprt::operandst ctor_args;
+        for(auto &element : op.operands())
+          ctor_args.push_back(element);
+        exprt temporary;
+        new_temporary(
+          expr.source_location(), expr.type(), ctor_args, temporary);
+        expr.swap(temporary);
+        return;
+      }
       else
       {
         // just do a normal initialization
