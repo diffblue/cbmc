@@ -2474,17 +2474,31 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     // DATA_INVARIANT — the caller's catch block then drops the
     // problematic candidate and overload resolution can
     // continue or report a localized "no viable conversion".
-    if(op.id() != ID_member)
+    if(op.id() == ID_symbol)
+    {
+      // N5008 [conv.func]/1: an lvalue naming a FREE function converts
+      // to a pointer to the function -- the shape of a function name
+      // inside a nested braced-init-list whose aggregate element is a
+      // function-pointer type (`{ID_not, assume_not}` in a
+      // std::map<irep_idt, assume_function> initializer).
+      address_of_exprt address(op, pointer_type(op.type()));
+      address.set(ID_C_implicit, true);
+      op.swap(address);
+    }
+    else if(op.id() == ID_member)
+    {
+      exprt symb = cpp_symbol_expr(lookup(op.get(ID_component_name)));
+      address_of_exprt address(symb, pointer_type(symb.type()));
+      address.set(ID_C_implicit, true);
+      op.swap(address);
+    }
+    else
     {
       error().source_location = expr.source_location();
       error() << "address-of code requires a member expression "
               << "(operand id=" << op.id() << ")" << eom;
       throw 0;
     }
-    exprt symb = cpp_symbol_expr(lookup(op.get(ID_component_name)));
-    address_of_exprt address(symb, pointer_type(symb.type()));
-    address.set(ID_C_implicit, true);
-    op.swap(address);
   }
 
   if(op.id() == ID_address_of && op.get_bool(ID_C_implicit))
