@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ private member usable in braced arg: SUCCESS$
@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Access to the enclosing class's own private member inside a
-braced-init-list constructor argument is rejected as inaccessible.
-Blocks dog-fooding guard_expr.cpp.
+Fixed 2026-07-21: braced-list elements are typechecked at the call
+site ([class.access.general]/5) and single-element lists bind
+reference parameters ([over.ics.list]/8); guard_expr.cpp converts
+clean.

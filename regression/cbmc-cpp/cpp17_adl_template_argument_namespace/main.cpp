@@ -3,8 +3,8 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // N5008 [basic.lookup.argdep]/2: the associated namespaces of a class
 // template specialization include the namespaces of its TEMPLATE
 // ARGUMENTS.  `transform(w)` must find inner::transform through
-// wrapper<inner::elem>'s argument.  CBMC's ADL does not traverse
-// template arguments: "symbol 'transform' is unknown", and the
+// wrapper<inner::elem>'s argument.  CBMC's ADL used not to traverse
+// template arguments (fixed 2026-07-21): "symbol 'transform' is unknown", and the
 // enclosing function is silently truncated (vacuous success).  The
 // shape of unqualified `transform(s.begin(), ...)` over
 // __gnu_cxx::__normal_iterator<char*, std::basic_string<...>>, which
