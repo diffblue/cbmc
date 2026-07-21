@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck_resolve.h"
 
+#include <deque>
+
 #ifdef DEBUG
 #  include <iostream>
 #endif
@@ -6518,12 +6520,26 @@ void cpp_typecheck_resolvet::guess_template_args(
             // of P.  Walk the base-class list of desired_sym and retry
             // deduction against the first base that is an instantiation
             // of a template whose base_name matches tmpl_base_name.
-            const irept &bases = desired_sym->type.find(ID_bases);
+            // N5008 [temp.deduct.call]/4.3: A may be a class derived
+            // DIRECTLY OR INDIRECTLY from the deduced class template --
+            // e.g. basic_stringstream -> basic_iostream -> basic_ostream
+            // for the <iomanip> inserters.  Breadth-first search the
+            // whole base-class lattice for an instantiation of the
+            // template, preferring the shallowest match ([class.member.
+            // lookup]-style unambiguity is approximated by first hit).
             bool found_base = false;
-            for(const auto &base : bases.get_sub())
+            std::deque<typet> base_worklist;
             {
-              const typet &base_type =
-                static_cast<const typet &>(base.find(ID_type));
+              const irept &bases = desired_sym->type.find(ID_bases);
+              for(const auto &base : bases.get_sub())
+                base_worklist.push_back(
+                  static_cast<const typet &>(base.find(ID_type)));
+            }
+            std::set<irep_idt> bases_seen;
+            while(!base_worklist.empty())
+            {
+              const typet base_type = base_worklist.front();
+              base_worklist.pop_front();
               if(
                 base_type.id() != ID_struct_tag &&
                 base_type.id() != ID_union_tag)
@@ -6532,12 +6548,21 @@ void cpp_typecheck_resolvet::guess_template_args(
                 base_type.id() == ID_struct_tag
                   ? to_struct_tag_type(base_type).get_identifier()
                   : to_union_tag_type(base_type).get_identifier();
+              if(!bases_seen.insert(base_id).second)
+                continue;
               const symbolt *base_sym =
                 cpp_typecheck.symbol_table.lookup(base_id);
               if(base_sym == nullptr)
                 continue;
               if(base_sym->base_name != tmpl_base_name)
+              {
+                // not this one: enqueue ITS bases (indirect derivation)
+                const irept &sub_bases = base_sym->type.find(ID_bases);
+                for(const auto &sub_base : sub_bases.get_sub())
+                  base_worklist.push_back(
+                    static_cast<const typet &>(sub_base.find(ID_type)));
                 continue;
+              }
               // Found a base class that is an instantiation of the
               // template we're deducing against.  Retry deduction
               // against this base.
