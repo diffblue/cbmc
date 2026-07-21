@@ -3,10 +3,10 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // N5008 [class.base.init]/2: a mem-initializer-id may designate the
 // base class by any name denoting that type -- including the template
 // PARAMETER the base is named by (`renamedt(underlyingt v) :
-// underlyingt(v)`).  CBMC converts this but the initialization is
-// silently DROPPED: the base subobject stays nondeterministic and the
-// assertion fails (wrong code, no diagnostic).  With std::move(value)
-// the same shape instead errors "invalid initializer 'underlyingt'".
+// underlyingt(v)`).  CBMC used to convert this but silently DROP the
+// initialization (any explicit POD-base mem-initializer, in fact --
+// even plain-named ones): the base subobject stayed nondeterministic.
+// Fixed 2026-07-21 ([class.base.init]/7 slicing assignment).
 // The shape of goto-symex/renamed.h, part of what blocks the
 // goto_symex_state.h dog-food group.
 // g++/clang++ accept and verify at runtime.
