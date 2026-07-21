@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[apply\.assertion\.1\] line \d+ handler ran through std::function: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Calling through a std::function bound to a lambda does not invoke the
+closure; the callee sees unconstrained arguments.  Blocks dog-fooding
+the with_solver_hardness callers.
