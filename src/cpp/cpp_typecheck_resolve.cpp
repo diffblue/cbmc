@@ -601,6 +601,11 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     exprt e;
     {
       sfinae_contextt sfinae_guard{cpp_typecheck};
+      // [temp.deduct]/8: substitution/conversion failures while deducing
+      // THIS candidate's template arguments remove the candidate; the
+      // matching guard routes them into silent kind-mismatch throws.
+      cpp_typecheckt::template_arg_candidate_matchingt matching_guard{
+        cpp_typecheck};
       try
       {
         e = guess_function_template_args(old_id, fargs);
@@ -1345,7 +1350,25 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         exprt alt_id = old_id;
         alt_id.type() = alt_it->second.type;
         to_symbol_expr(alt_id).set_identifier(alt_name);
-        exprt alt_e = guess_function_template_args(alt_id, fargs);
+        // [temp.deduct]/8: deduction failures for the ALTERNATIVE are
+        // SFINAE failures too -- discard, exactly like the primary
+        // candidate loop above (the hard error otherwise escapes the
+        // whole resolution, e.g. std::stoll("literal") guessing the
+        // WIDE overload's alternative).
+        exprt alt_e;
+        {
+          sfinae_contextt sfinae_guard{cpp_typecheck};
+          cpp_typecheckt::template_arg_candidate_matchingt matching_guard{
+            cpp_typecheck};
+          try
+          {
+            alt_e = guess_function_template_args(alt_id, fargs);
+          }
+          catch(...)
+          {
+            alt_e.make_nil();
+          }
+        }
         if(alt_e.is_not_nil())
         {
           CHECK_RETURN(alt_e.id() != ID_type);
