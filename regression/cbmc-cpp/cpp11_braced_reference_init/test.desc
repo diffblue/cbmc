@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ braced reference binding: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+`int &r{x};` fails with "bad reference initializer"
+([dcl.init.list]/3.10).  Blocks dog-fooding
+statement_list_typecheck.cpp.

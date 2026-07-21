@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ private member usable in braced arg: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Access to the enclosing class's own private member inside a
+braced-init-list constructor argument is rejected as inaccessible.
+Blocks dog-fooding guard_expr.cpp.

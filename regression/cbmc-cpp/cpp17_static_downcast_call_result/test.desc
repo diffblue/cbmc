@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ reference downcast of operator\* result: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+static_cast reference downcast of an operator* call result is rejected
+("type mismatch on static_cast"); the same cast of a plain lvalue
+works.  Blocks dog-fooding goto_rw.cpp (unique_ptr deref).
