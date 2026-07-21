@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/c_types.h>
+
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
@@ -280,9 +282,19 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   if(!vbases.empty())
   {
     // add a flag to determine
-    // if this is the most-derived-object
+    // if this is the most-derived-object.
+    // The flag is a BYTE-wide c_bool, not a 1-bit boolean: layout
+    // offsets are computed bytewise (member_offset/member_offset_expr
+    // refuse structs whose bit-field run is not byte-padded), and the
+    // front end deliberately does not run add_padding() on classes
+    // with bases -- a 1-bit flag made the byte offset of EVERY
+    // subsequent member unknown, so pointer checks rejected ordinary
+    // member writes in virtual-base classes ("pointer outside object
+    // bounds in this->d") and goto-symex aborted on
+    // build_object_descriptor_rec (std::ofstream construction).
     struct_typet::componentt most_derived(
-      cpp_scopes.current_scope().prefix + "::" + "@most_derived", bool_typet());
+      cpp_scopes.current_scope().prefix + "::" + "@most_derived",
+      c_bool_type());
 
     most_derived.set_access(ID_public);
     most_derived.set_base_name("@most_derived");
