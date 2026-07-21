@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ map braced pairs: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+std::map built from braced pairs converts, but at() trips
+"deallocated dynamic object" checks on the tree nodes.
