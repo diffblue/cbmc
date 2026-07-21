@@ -3714,3 +3714,33 @@ the honest fallback and keeps the tracking test faithful.
 e2 (std::function<void(T&)> param + lambda in a fresh TU) MATCHES and
 converts after this round's fixes -- only invocation semantics remain
 broken (cpp17_std_function_lambda_call).
+
+## Minimal-reproducer fix round (2026-07-21 evening)
+
+FOUR fixes (4 src commits):
+1. @most_derived is now a BYTE-wide c_bool -- the 1-bit boolean made
+   every following member's byte offset uncomputable (member_offset
+   refuses unpadded bit-field runs; front end skips add_padding on
+   based classes).  Cured the ENTIRE virtual-base member-access
+   family: ctor writes through `this`, ofstream construction,
+   build_object_descriptor_rec symex abort.  THE root behind weeks of
+   'this->x outside bounds' symptoms.
+2. [expr.type.conv]/2: functional braced casts T{...} of class types
+   direct-list-initialize (aggregate -> il-ctor -> ctor args) instead
+   of the C compound-literal path.  Elaborate BEFORE cpp_is_pod.
+3. [temp.deduct.call]/4.3 derived-to-base deduction is TRANSITIVE
+   (BFS, visited set) -- iomanip inserters resolve through
+   basic_iostream.
+4. [dcl.init]/16.6.2: auto-deduced non-POD from a materialized
+   temporary constructs via the MOVE ctor; the old bitwise
+   assign + temporary destructor freed map tree nodes still
+   referenced ("deallocated dynamic object" in at()).
+   Scoped to statement==temporary_object: wrapping CALL results too
+   regressed optional (extra copy through the _Requires ctor family).
+CORE: map_braced_pairs_at, virtual_base_ctor_member_write.
+LAYERED KNOWNBUGs kept: stream_setw (residual: iostream dtor chain --
+ios_base::~ios_base no-body + vtable-pointer bounds in ~basic_ios);
+ofstream_from_string (verifies standalone; harness timeout + same
+dtor gaps).  NEW next targets: iostream destructor chain, then
+ofstream flips.
+Suites: cbmc-cpp green 95 skipped, unit-proofs green, cbmc CORE green.
