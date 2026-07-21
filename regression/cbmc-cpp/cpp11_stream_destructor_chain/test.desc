@@ -9,5 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 --
 The iostream destructor chain trips vtable-pointer bounds checks in
-~basic_ios/~basic_iostream (virtual-base subobject addressing).
-Blocks cpp11_stream_setw and cpp11_ofstream_from_string.
+~basic_ios/~basic_iostream: devirtualized dispatch with unconstrained
+vtable pointers (unmodeled facet constructors) runs ~basic_ios on
+smaller objects.  Blocks cpp11_stream_setw and
+cpp11_ofstream_from_string.

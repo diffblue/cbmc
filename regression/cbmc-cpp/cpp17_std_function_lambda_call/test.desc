@@ -8,6 +8,9 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Calling through a std::function bound to a lambda does not invoke the
-closure; the callee sees unconstrained arguments.  Blocks dog-fooding
-the with_solver_hardness callers.
+PARTIAL 2026-07-21: the forward<int&> no-body class is fixed
+(cpp_type2name canonicalizes frontend references so instantiation
+identities unify; a post-drain sweep finishes system-header instances
+half-converted under candidate matching).  Remaining: _M_manager
+dispatch imprecision (unconstrained function-pointer candidates,
+bounds failures in ~_Function_base) keeps the invocation unverified.
