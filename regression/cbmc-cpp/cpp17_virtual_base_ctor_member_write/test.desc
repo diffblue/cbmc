@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced init with virtual base: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Constructor-body member writes through `this` in a class with a
+virtual base fail the pointer bounds check (both init forms).  Blocks
+dog-fooding solver_hardness.cpp (ofstream).

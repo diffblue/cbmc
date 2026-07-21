@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --unwind 8 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ raw string content length: SUCCESS$
@@ -9,6 +9,6 @@ main.cpp
 ^PARSING ERROR$
 ^CONVERSION ERROR$
 --
-Raw string literals containing quote characters are terminated at the
-first inner quote instead of the )" delimiter ([lex.string]).  Blocks
-dog-fooding memory-analyzer (gdb_api.h regex patterns).
+Fixed 2026-07-21: the RAW_STRING_CONTENT pending-close flush keeps
+the longest suffix that can still start the )delimiter" terminator;
+memory-analyzer converts clean.

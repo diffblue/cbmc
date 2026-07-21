@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ function decay in nested brace: SUCCESS$
@@ -8,6 +8,5 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Function-to-pointer decay inside a nested braced-init-list constructor
-argument fails ("address-of code requires a member expression").
-Blocks dog-fooding abstract_environment.cpp (assume_functions map).
+Fixed 2026-07-21: the code-typed address-of handles free-function
+symbols ([conv.func]/1) alongside member expressions.

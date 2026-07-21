@@ -3,8 +3,8 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // N5008 [conv.func] + [over.ics.list]: a free function named inside a
 // nested braced-init-list decays to a function pointer when the
 // corresponding aggregate element is a function-pointer type.  CBMC
-// converts the outer constructor call but mishandles the inner
-// aggregate's decay: "address-of code requires a member expression
+// converts the outer constructor call and used to mishandle the inner
+// aggregate's decay (fixed 2026-07-21): "address-of code requires a member expression
 // (operand id=symbol)".  A plain aggregate initializer with the same
 // pair works.  The shape of variable-sensitivity's
 // `std::map<irep_idt, assume_function>{{ID_not, assume_not}, ...}`,
