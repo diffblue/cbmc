@@ -3838,6 +3838,18 @@ void cpp_typecheckt::reference_initializer(
   exprt &expr,
   const reference_typet &reference_type)
 {
+  // N5008 [dcl.init.list]/3.10: list-initialization of a reference with
+  // a single-element braced-init-list initializes the reference FROM
+  // THAT ELEMENT (`symbolt &s{table.get_ref(...)};`).  Unwrap before
+  // computing the binding; multi-element/empty lists (which would bind
+  // to a materialized prvalue temporary) keep the existing diagnosis.
+  if(expr.id() == ID_initializer_list && expr.operands().size() == 1)
+  {
+    exprt element = to_unary_expr(expr).op();
+    typecheck_expr(element);
+    expr.swap(element);
+  }
+
   add_implicit_dereference(expr);
 
   unsigned rank = 0;
