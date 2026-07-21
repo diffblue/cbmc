@@ -3691,3 +3691,26 @@ with virtual base fail bounds check, both init forms, pre-existing,
 = the ofstream/solver_hardness blocker).
 Suites: cbmc-cpp green 91 skipped, ansi-c via goto-cc green (2
 pre-existing clang_target), cbmc CORE green, unit-proofs green.
+
+## Fix-round findings capture (2026-07-21 afternoon)
+
+Six KNOWNBUGs filed.  Minimal: ofstream{string}->streamsize
+misresolution (10 lines); stream << setw (std::_Setw inserter via
+_Require chain -- probable root of with_solver_hardness's
+std::function<void(solver_hardnesst&)> param collapsing to `struct
+nil`); map-from-braced-pairs at() 'deallocated dynamic object' (tree
+nodes; found as a side discovery).  CONTEXT-DEPENDENT (filed as
+one-include / named-source TU reproducers after isolation resisted):
+goto_symex_state.h (empty-arg symbol_exprt + deleted goto_statet
+default ctor demanded by synthesized code -> patht sizeless ->
+aligned_buffer 'type has no size' cascade); abstract_environment.cpp
+(static map<irep_idt,irep_idt> braced pair routed into the COMPARATOR
+param); restrict_function_pointers.cpp (emplace no-match with
+irep_idt keys).  LESSON: cvise at 35-150s/eval on 40-100k-line TUs
+does not converge in reasonable time (two 55-min rounds each got
+~5-30% off); for context-dependent failures the named-source-file
+KNOWNBUG (options line lists the real .cpp, like unit-proofs does) is
+the honest fallback and keeps the tracking test faithful.
+e2 (std::function<void(T&)> param + lambda in a fresh TU) MATCHES and
+converts after this round's fixes -- only invocation semantics remain
+broken (cpp17_std_function_lambda_call).
