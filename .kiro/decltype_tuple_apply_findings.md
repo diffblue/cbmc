@@ -3770,3 +3770,36 @@ METHOD note: include-chain bisection (frame.h beat goto_symex_state.h)
 again outperformed cvise for context-heavy failures.
 NEXT: base-meminit-via-template-param fix (wrong-code!), stream
 destructor vtable bounds, sharing_node segfault, std_function lambda.
+
+## KNOWNBUG fix round (2026-07-21 night)
+
+THREE fixes:
+1. WRONG-CODE fixed: explicit POD-base mem-initializers were dropped
+   ENTIRELY (not just template-param-named ones!) --
+   full_member_initialization's POD branch never consumed them.  Now
+   lowered to slicing assignments ([class.base.init]/7); base matched
+   by name or resolved type ([class.base.init]/2).  HAZARD hit: the
+   speculative typecheck_type probe surfaced errors for MEMBER names
+   (56 suite failures) -- must skip member names + sfinae_contextt +
+   error-count restore.
+2. cpp_type2name: ID_frontend_pointer references rendered via raw-irep
+   fallback, SPLITTING instantiation identity (forward<int&> existed
+   as `ref_signed_int` AND `reference(signedbv...)`; body on one,
+   calls on the other).  Canonicalized.
+3. Post-drain sweep converts half-converted SYSTEM-HEADER instances
+   (eager auto-deduction conversions absorbed by candidate matching;
+   methods_seen blocked re-queueing).  Stamp = #cpp_converted on the
+   value, set at convert_function success.  HAZARD: unstamped
+   user-code lambdas got double-converted -- restrict to system
+   headers.
+std_function invocation: no-body class GONE; residual = _M_manager
+dispatch imprecision (unconstrained fn-ptr candidates incl.
+__do_upcast; bounds failures in ~_Function_base).
+stream dtor chain diagnosis: devirtualized ~basic_ios candidates run
+on facet/pthread objects with unconstrained vtables -- dispatch
+precision, not layout.
+GIT HAZARD REPEATED: grepping log for a commit message to find a
+rebase base MATCHES THE FIXUP LINE ('fixup! <msg>' contains <msg>) ->
+detached-head rebase.  ALWAYS: git log --oneline | grep -v '^\w* fixup!'
+or use exact hashes noted at commit time.
+Suites: cbmc-cpp green 97 skipped, unit-proofs green, cbmc CORE green.
