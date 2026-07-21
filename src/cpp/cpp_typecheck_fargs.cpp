@@ -135,7 +135,14 @@ static bool brace_init_is_viable(
     {
       if(to_code_type(c.type()).return_type().id() != ID_constructor)
         continue;
-      has_user_ctor = true;
+      // N5008 [dcl.init.aggr]/1: only USER-declared constructors
+      // disqualify the aggregate; the compiler-synthesized ones (a
+      // non-POD member triggers their synthesis, e.g. cache keys with a
+      // dstringt field) are implicitly declared and marked
+      // #is_implicit_ctor.  They still contribute a default
+      // constructor for the empty-{} case below.
+      if(!c.type().get_bool("#is_implicit_ctor"))
+        has_user_ctor = true;
       const auto &params = to_code_type(c.type()).parameters();
       // Default ctor: only `this` parameter, or all extras
       // defaulted.
@@ -188,10 +195,13 @@ static bool brace_init_is_viable(
     return has_default_ctor || (!has_user_ctor);
   }
   // Non-empty: accept if there's an init_list ctor, or aggregate
-  // with matching field count.
+  // with enough elements.  N5008 [dcl.init.aggr]/5: the list may have
+  // FEWER initializers than the aggregate has elements -- the remaining
+  // elements are value-initialized (the shape of `cache[{this, name}]`
+  // with a trailing defaulted field).
   if(has_init_list_ctor)
     return true;
-  if(!has_user_ctor && data_field_count == operand.operands().size())
+  if(!has_user_ctor && data_field_count >= operand.operands().size())
     return true;
   // [over.match.list]/2.2 fallback: when no initializer-list ctor
   // is viable, the brace-init-list is treated as the argument list
