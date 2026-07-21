@@ -1,17 +1,20 @@
 // Dog-food reproducer: CBMC's own
 // src/analyses/variable-sensitivity/abstract_environment.cpp (named on
-// the options line) fails to convert at its namespace-scope
-//   static auto inverse_operations =
-//     std::map<irep_idt, irep_idt>{{ID_equal, ID_notequal}, ...};
-// with "initialisation of struct_tag requires initializer list, found
-// symbol instead" and "cannot initialize type 'struct less' using
-// value 'ID_equal'" -- a braced pair is routed to the map's COMPARATOR
-// parameter instead of the initializer_list<value_type>.  A follow-up
-// "symbol 'shared_ptr' does not uniquely resolve" appears downstream.
-// The isolated shape (same declaration in a fresh TU with the same
-// headers, /tmp probing and two cvise rounds) converts CLEAN -- the
-// trigger needs this TU's earlier content, so this test names the real
-// source file.
+// the options line) fails to convert.  UPDATE 2026-07-21 (evening):
+// the original first error -- the static std::map<irep_idt, irep_idt>
+// initializer routing a braced pair into the COMPARATOR parameter --
+// no longer reproduces after the minimal-reproducer round's fixes;
+// the TU now fails at "symbol 'shared_ptr' does not uniquely resolve"
+// (shared_ptr.h:287 context, an untyped braced argument during an
+// internal shared_ptr member's instantiation).  Isolated
+// shared_ptr<const T> shapes (make_shared, copies, empty braced
+// returns) convert CLEAN -- still context-dependent, so this test
+// keeps naming the real source file.
+// When THIS driver file is added as a second source, typechecking
+// even SEGFAULTS (exit 139) while instantiating
+// sharing_mapt<dstringt, shared_ptr<const abstract_objectt>, ...> ->
+// sharing_nodet -> small_shared_n_way_ptrt::is_derived
+// (util/sharing_node.h:187).
 extern "C" void __CPROVER_assert(bool, const char *);
 
 int main()
