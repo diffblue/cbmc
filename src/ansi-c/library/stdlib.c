@@ -455,6 +455,328 @@ long strtol(const char *nptr, char **endptr, int base)
   return res;
 }
 
+/* FUNCTION: strtoll */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+#undef strtoll
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
+// C23 7.24.1.7: same conversion rules as strtol -- this model mirrors
+// CBMC's strtol model above with the result type adjusted.
+long long strtoll(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strtoll");
+#endif
+
+  if(base == 1 || base < 0 || base > 36)
+  {
+    errno = EINVAL;
+    return 0;
+  }
+
+  long long res = 0;
+  _Bool in_number = 0;
+  char sign = 0;
+
+  // 32 chars is an arbitrarily chosen limit
+  int i = 0;
+  for(; i < 31; ++i)
+  {
+    char ch = nptr[i];
+    char sub = 0;
+    if(ch == 0)
+      break;
+    else if(
+      (base == 0 || base == 16) && !in_number && ch == '0' &&
+      (nptr[i + 1] == 'x' || nptr[i + 1] == 'X'))
+    {
+      base = 16;
+      in_number = 1;
+      ++i;
+      continue;
+    }
+    else if(base == 0 && !in_number && ch == '0')
+    {
+      base = 8;
+      in_number = 1;
+      continue;
+    }
+    else if(!in_number && !sign && isspace(ch))
+      continue;
+    else if(!in_number && !sign && (ch == '-' || ch == '+'))
+    {
+      sign = ch;
+      continue;
+    }
+    else if(base > 10 && ch >= 'a' && ch - 'a' < base - 10)
+      sub = 'a' - 10;
+    else if(base > 10 && ch >= 'A' && ch - 'A' < base - 10)
+      sub = 'A' - 10;
+    else if(isdigit(ch))
+    {
+      sub = '0';
+      base = base == 0 ? 10 : base;
+    }
+    else
+      break;
+
+    in_number = 1;
+    _Bool overflow = __builtin_mul_overflow(res, (long long)base, &res);
+    if(overflow || __builtin_add_overflow(res, (long long)(ch - sub), &res))
+    {
+      errno = ERANGE;
+      if(sign == '-')
+        return LLONG_MIN;
+      else
+        return LLONG_MAX;
+    }
+  }
+
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
+
+  if(sign == '-')
+    res *= -1;
+
+  return res;
+}
+
+/* FUNCTION: strtoul */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+#undef strtoul
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
+// C23 7.24.1.7: same conversion rules as strtol -- this model mirrors
+// CBMC's strtol model above with the result type adjusted.
+unsigned long strtoul(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strtoul");
+#endif
+
+  if(base == 1 || base < 0 || base > 36)
+  {
+    errno = EINVAL;
+    return 0;
+  }
+
+  unsigned long res = 0;
+  _Bool in_number = 0;
+  char sign = 0;
+
+  // 32 chars is an arbitrarily chosen limit
+  int i = 0;
+  for(; i < 31; ++i)
+  {
+    char ch = nptr[i];
+    char sub = 0;
+    if(ch == 0)
+      break;
+    else if(
+      (base == 0 || base == 16) && !in_number && ch == '0' &&
+      (nptr[i + 1] == 'x' || nptr[i + 1] == 'X'))
+    {
+      base = 16;
+      in_number = 1;
+      ++i;
+      continue;
+    }
+    else if(base == 0 && !in_number && ch == '0')
+    {
+      base = 8;
+      in_number = 1;
+      continue;
+    }
+    else if(!in_number && !sign && isspace(ch))
+      continue;
+    else if(!in_number && !sign && (ch == '-' || ch == '+'))
+    {
+      sign = ch;
+      continue;
+    }
+    else if(base > 10 && ch >= 'a' && ch - 'a' < base - 10)
+      sub = 'a' - 10;
+    else if(base > 10 && ch >= 'A' && ch - 'A' < base - 10)
+      sub = 'A' - 10;
+    else if(isdigit(ch))
+    {
+      sub = '0';
+      base = base == 0 ? 10 : base;
+    }
+    else
+      break;
+
+    in_number = 1;
+    _Bool overflow = __builtin_mul_overflow(res, (unsigned long)base, &res);
+    if(overflow || __builtin_add_overflow(res, (unsigned long)(ch - sub), &res))
+    {
+      errno = ERANGE;
+      return ULONG_MAX;
+    }
+  }
+
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
+
+  // C23 7.24.1.7/5: for the unsigned variants a leading '-' negates the
+  // converted (unsigned) value.
+  if(sign == '-')
+    res = -res;
+
+  return res;
+}
+
+/* FUNCTION: strtoull */
+
+#ifndef __CPROVER_ERRNO_H_INCLUDED
+#  include <errno.h>
+#  define __CPROVER_ERRNO_H_INCLUDED
+#endif
+
+#ifndef __CPROVER_LIMITS_H_INCLUDED
+#  include <limits.h>
+#  define __CPROVER_LIMITS_H_INCLUDED
+#endif
+
+#undef strtoull
+#undef isdigit
+#undef isspace
+
+int isspace(int);
+int isdigit(int);
+
+#ifndef __GNUC__
+_Bool __builtin_add_overflow();
+_Bool __builtin_mul_overflow();
+#endif
+
+// C23 7.24.1.7: same conversion rules as strtol -- this model mirrors
+// CBMC's strtol model above with the result type adjusted.
+unsigned long long strtoull(const char *nptr, char **endptr, int base)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(nptr), "zero-termination of argument of strtoull");
+#endif
+
+  if(base == 1 || base < 0 || base > 36)
+  {
+    errno = EINVAL;
+    return 0;
+  }
+
+  unsigned long long res = 0;
+  _Bool in_number = 0;
+  char sign = 0;
+
+  // 32 chars is an arbitrarily chosen limit
+  int i = 0;
+  for(; i < 31; ++i)
+  {
+    char ch = nptr[i];
+    char sub = 0;
+    if(ch == 0)
+      break;
+    else if(
+      (base == 0 || base == 16) && !in_number && ch == '0' &&
+      (nptr[i + 1] == 'x' || nptr[i + 1] == 'X'))
+    {
+      base = 16;
+      in_number = 1;
+      ++i;
+      continue;
+    }
+    else if(base == 0 && !in_number && ch == '0')
+    {
+      base = 8;
+      in_number = 1;
+      continue;
+    }
+    else if(!in_number && !sign && isspace(ch))
+      continue;
+    else if(!in_number && !sign && (ch == '-' || ch == '+'))
+    {
+      sign = ch;
+      continue;
+    }
+    else if(base > 10 && ch >= 'a' && ch - 'a' < base - 10)
+      sub = 'a' - 10;
+    else if(base > 10 && ch >= 'A' && ch - 'A' < base - 10)
+      sub = 'A' - 10;
+    else if(isdigit(ch))
+    {
+      sub = '0';
+      base = base == 0 ? 10 : base;
+    }
+    else
+      break;
+
+    in_number = 1;
+    _Bool overflow =
+      __builtin_mul_overflow(res, (unsigned long long)base, &res);
+    if(
+      overflow ||
+      __builtin_add_overflow(res, (unsigned long long)(ch - sub), &res))
+    {
+      errno = ERANGE;
+      return ULLONG_MAX;
+    }
+  }
+
+  if(endptr != 0)
+    *endptr = (char *)nptr + i;
+
+  // C23 7.24.1.7/5: for the unsigned variants a leading '-' negates the
+  // converted (unsigned) value.
+  if(sign == '-')
+    res = -res;
+
+  return res;
+}
+
 /* FUNCTION: atoi */
 
 #undef atoi
