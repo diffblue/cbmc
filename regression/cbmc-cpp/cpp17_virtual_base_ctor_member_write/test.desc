@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ braced init with virtual base: SUCCESS$
@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-Constructor-body member writes through `this` in a class with a
-virtual base fail the pointer bounds check (both init forms).  Blocks
-dog-fooding solver_hardness.cpp (ofstream).
+Fixed 2026-07-21: the synthetic @most_derived flag is a byte-wide
+c_bool instead of a 1-bit boolean, so member byte-offsets in
+virtual-base classes are computable (member_offset refuses unpadded
+bit-field runs) and the pointer checks pass.

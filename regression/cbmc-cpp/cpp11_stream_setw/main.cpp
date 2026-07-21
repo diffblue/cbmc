@@ -1,10 +1,10 @@
 // C++11 [ext.manip]/[iomanip]: `os << std::setw(n)` inserts the
 // smanip returned by setw via the operator<< overload taking the
-// manipulator.  CBMC fails to resolve the inserter for std::_Setw
-// ("operator 'shl' not defined for types 'struct basic_stringstream'
-// and 'struct std::_Setw'", surfaced through the _Require SFINAE
-// chain in <ostream>), and the enclosing function is silently
-// truncated.  First error of solver_hardness.cpp's
+// manipulator.  CBMC used to fail to resolve the inserter
+// ("operator 'shl' not defined") because [temp.deduct.call]/4.3
+// deduction only inspected DIRECT bases -- basic_stringstream derives
+// from basic_ostream only through basic_iostream.  Fixed 2026-07-21
+// (transitive base walk).  First error of solver_hardness.cpp's
 // goto_instruction2string and the likely root of the downstream
 // with_solver_hardness signature collapse.
 // g++/clang++ accept and verify at runtime.

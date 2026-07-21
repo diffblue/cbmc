@@ -8,6 +8,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-std::ofstream{std::string} resolves against a candidate expecting
-std::streamsize and hard-errors; main is silently truncated.  Blocks
-dog-fooding solver_hardness.cpp and goto-harness.
+PARTIALLY fixed 2026-07-21: the construction converts and verifies
+standalone ([expr.type.conv]/2 direct-list-init + byte-wide
+@most_derived), but the full property set exceeds the harness
+timeout; iostream destructor-chain gaps remain (see
+cpp11_stream_setw).
