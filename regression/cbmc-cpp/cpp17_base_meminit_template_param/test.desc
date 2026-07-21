@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ base mem-init via template parameter: SUCCESS$
@@ -8,7 +8,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-A base-class mem-initializer named via the template parameter is
-silently dropped (base subobject stays nondet); the std::move variant
-hard-errors ("invalid initializer 'underlyingt'").  Part of the
-goto_symex_state.h dog-food blocker (renamed.h).
+Fixed 2026-07-21: full_member_initialization lowers explicit POD-base
+mem-initializers to slicing assignments ([class.base.init]/7),
+matching the base by name or by resolved type ([class.base.init]/2,
+covering the template-parameter naming); the plain-named POD-base
+initializer was dropped too.
