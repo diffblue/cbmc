@@ -4348,7 +4348,14 @@ bool cpp_typecheckt::static_typecast(
 
     if(subto.id() == ID_struct_tag && from.id() == ID_struct_tag)
     {
-      if(!expr.get_bool(ID_C_lvalue))
+      // N5008 [expr.static.cast]/2 requires an LVALUE operand for the
+      // base-to-derived reference downcast.  Judge the operand AFTER
+      // add_implicit_dereference: a call with reference return type
+      // (e.g. `*ranges` via unique_ptr::operator*) is an lvalue
+      // ([expr.call]/14) and arrives here as the implicit dereference
+      // `e`, while the original `expr` (the call) carries no lvalue
+      // marking.
+      if(!e.get_bool(ID_C_lvalue) && e.id() != ID_dereference)
         return false;
 
       c_qualifierst qual_from;
@@ -4357,7 +4364,12 @@ bool cpp_typecheckt::static_typecast(
       c_qualifierst qual_to;
       qual_to.read(subto);
 
-      if(!qual_to.is_subset_of(qual_from))
+      // N5008 [expr.static.cast]/2: "cv2 shall be the same
+      // cv-qualification as, or greater cv-qualification than, cv1" --
+      // the TARGET may add qualifiers (base& -> const derived&); only
+      // casting qualifiers AWAY is ill-formed.  The test was reversed,
+      // rejecting any qualification-adding downcast.
+      if(!qual_from.is_subset_of(qual_to))
         return false;
 
       const struct_typet &from_struct = follow_tag(to_struct_tag_type(from));
