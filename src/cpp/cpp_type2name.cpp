@@ -128,6 +128,25 @@ std::string cpp_type2name(const typet &type)
     else
       result += "ptr_" + cpp_type2name(to_pointer_type(type).base_type());
   }
+  else if(type.id() == ID_frontend_pointer)
+  {
+    // A not-yet-lowered parse-time pointer/reference (e.g. a reference
+    // parameter inside std::function<void(int&)>'s template argument)
+    // must produce the SAME name as its lowered ID_pointer form:
+    // otherwise one instantiation of e.g. std::forward<int&> is
+    // created under two identities -- the definition attaches to one
+    // (`forward<ref_signed_int>`) while calls bind the other
+    // (`forward<reference(signedbv...)>`, via the raw-irep fallback),
+    // which stays BODYLESS and havocs (std::function invocation lost
+    // its closure's effects).
+    const typet &base = to_type_with_subtype(type).subtype();
+    if(type.get_bool(ID_C_rvalue_reference))
+      result += "rref_" + cpp_type2name(base);
+    else if(type.get_bool(ID_C_reference))
+      result += "ref_" + cpp_type2name(base);
+    else
+      result += "ptr_" + cpp_type2name(base);
+  }
   else if(type.id()==ID_signedbv || type.id()==ID_unsignedbv)
   {
     // we try to use #c_type
