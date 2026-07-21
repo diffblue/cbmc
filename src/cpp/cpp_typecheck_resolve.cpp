@@ -9237,21 +9237,25 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
 {
   // Argument-dependent lookup (ADL / Koenig lookup):
   // Search in the namespaces associated with the argument types.
-  for(const auto &arg : fargs.operands)
+
+  // Collect the candidates contributed by ONE associated class type:
+  // its own scope (friend declarations) and its enclosing namespaces.
+  // N5008 [basic.lookup.argdep]/2: for a class template
+  // SPECIALIZATION, the associated entities also include those of its
+  // template TYPE arguments -- e.g. the unqualified `transform(it, ...)`
+  // over __gnu_cxx::__normal_iterator<char *, std::basic_string<...>>
+  // finds std::transform only through the basic_string argument.
+  // Recurse over the recorded template arguments (visited-set bounded).
+  std::set<irep_idt> visited;
+  std::function<void(const typet &)> add_associated_class =
+    [&](const typet &type)
   {
-    // N5008 [basic.lookup.argdep]/2: if an argument is a reference, its
-    // associated types are those of the referenced type.  CBMC models a
-    // reference as a pointer carrying #reference (as produced by e.g.
-    // `static_cast<std::ostream &>(x)`), so strip a leading reference to reach
-    // the class type; otherwise the class's associated namespace is missed and
-    // an ADL-only operator@ (one hidden from ordinary lookup by an in-scope
-    // member operator@ of the same name) is never found.
-    typet arg_type = arg.type();
+    typet arg_type = type;
     if(is_reference(arg_type))
       arg_type = to_reference_type(arg_type).base_type();
 
     if(arg_type.id() != ID_struct_tag && arg_type.id() != ID_union_tag)
-      continue;
+      return;
 
     const struct_union_typet &final_type =
       arg_type.id() == ID_struct_tag
@@ -9262,11 +9266,32 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
 
     // Search in the struct's own scope (for friend declarations)
     const irep_idt &struct_name = final_type.get(ID_name);
-    if(struct_name.empty())
-      continue;
+    if(struct_name.empty() || !visited.insert(struct_name).second)
+      return;
+
+    // [basic.lookup.argdep]/2: template type arguments of a class
+    // template specialization contribute their associated entities.
+    const symbolt *class_symbol =
+      cpp_typecheck.symbol_table.lookup(struct_name);
+    if(class_symbol != nullptr)
+    {
+      const irept &template_args =
+        class_symbol->type.find(ID_C_template_arguments);
+      if(template_args.is_not_nil())
+      {
+        for(const auto &targ :
+            static_cast<const cpp_template_args_tct &>(template_args)
+              .arguments())
+        {
+          if(targ.id() == ID_type)
+            add_associated_class(targ.type());
+        }
+      }
+    }
+
     auto scope_it = cpp_typecheck.cpp_scopes.id_map.find(struct_name);
     if(scope_it == cpp_typecheck.cpp_scopes.id_map.end())
-      continue;
+      return;
     cpp_scopet &scope = static_cast<cpp_scopet &>(*scope_it->second);
     auto tmp_set = scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
     id_set.insert(tmp_set.begin(), tmp_set.end());
@@ -9295,5 +9320,17 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
       if(ns->is_root_scope())
         break;
     }
+  };
+
+  for(const auto &arg : fargs.operands)
+  {
+    // N5008 [basic.lookup.argdep]/2: if an argument is a reference, its
+    // associated types are those of the referenced type.  CBMC models a
+    // reference as a pointer carrying #reference (as produced by e.g.
+    // `static_cast<std::ostream &>(x)`), so strip a leading reference to reach
+    // the class type; otherwise the class's associated namespace is missed and
+    // an ADL-only operator@ (one hidden from ordinary lookup by an in-scope
+    // member operator@ of the same name) is never found.
+    add_associated_class(arg.type());
   }
 }
