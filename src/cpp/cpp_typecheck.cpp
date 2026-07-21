@@ -225,6 +225,60 @@ void cpp_typecheckt::typecheck()
       break;
   }
 
+  // A function-template instance can be left HALF-converted: its eager
+  // conversion (required for `auto` return-type deduction,
+  // [dcl.spec.auto]/11) ran nested inside overload-candidate matching
+  // and was absorbed by the SFINAE machinery -- leaving a raw body, an
+  // undeduced return type, and a methods_seen entry that blocks
+  // re-queueing (std::forward<int&> instantiated from
+  // _Function_handler::_M_invoke).  Calls were built against the
+  // half-symbol, so at goto conversion it is a bodyless callee and the
+  // std::function invocation havocs.  [temp.inst]/4: the odr-used
+  // specialization must be instantiated; finish such conversions here,
+  // to a fixpoint (a retry can instantiate further templates).
+  for(std::size_t rounds = 0; rounds < 5; ++rounds)
+  {
+    std::vector<irep_idt> to_finish;
+    for(const auto &entry : symbol_table)
+    {
+      const symbolt &sym = entry.second;
+      // Restricted to bodies from SYSTEM HEADERS: the half-converted
+      // state arises from stdlib instances (std::forward et al.)
+      // whose eager conversion ran under candidate matching; bodies
+      // converted through paths that do not stamp #cpp_converted
+      // (e.g. nested lambdas) must not be re-converted.
+      const std::string sym_file = id2string(sym.location.get_file());
+      const bool system_header = sym_file.find("/usr/include/") == 0 ||
+                                 sym_file.find("/usr/lib/") == 0 ||
+                                 sym_file.find("/Applications/") == 0;
+      if(
+        system_header && sym.type.id() == ID_code &&
+        sym.value.id() == ID_code && sym.mode == ID_cpp &&
+        !sym.value.get_bool("#cpp_converted") && !sym.is_type &&
+        functions_being_typechecked.count(sym.name) == 0 &&
+        deferred_method_bodies.find(sym.name) == deferred_method_bodies.end())
+      {
+        to_finish.push_back(entry.first);
+      }
+    }
+    if(to_finish.empty())
+      break;
+    for(const auto &id : to_finish)
+    {
+      symbolt &sym = symbol_table.get_writeable_ref(id);
+      try
+      {
+        convert_function(sym);
+      }
+      catch(...)
+      {
+        // cannot be completed: leave it; goto conversion will
+        // diagnose the call sites
+      }
+    }
+    typecheck_method_bodies();
+  }
+
   provide_stdlib_bodies();
 
   clean_up();
