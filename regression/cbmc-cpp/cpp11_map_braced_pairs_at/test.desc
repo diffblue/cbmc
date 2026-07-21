@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ map braced pairs: SUCCESS$
@@ -8,5 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-std::map built from braced pairs converts, but at() trips
-"deallocated dynamic object" checks on the tree nodes.
+Fixed 2026-07-21: an auto-deduced non-POD initialized from a
+materialized temporary is constructed via the copy/move constructor
+([dcl.init]/16.6.2) instead of a bitwise assignment followed by the
+temporary's destructor freeing the shared tree nodes.
