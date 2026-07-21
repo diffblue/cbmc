@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ braced reference binding: SUCCESS$
@@ -8,6 +8,6 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-`int &r{x};` fails with "bad reference initializer"
-([dcl.init.list]/3.10).  Blocks dog-fooding
-statement_list_typecheck.cpp.
+Fixed 2026-07-21: reference_initializer unwraps a single-element
+braced-init-list ([dcl.init.list]/3.10); statement_list_typecheck.cpp
+converts clean.

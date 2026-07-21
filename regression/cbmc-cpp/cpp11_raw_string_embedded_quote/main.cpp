@@ -2,9 +2,9 @@
 
 // N5008 [lex.string]: a raw string literal R"(...)" ends only at the
 // matching )" delimiter sequence; QUOTE characters inside the raw text
-// are ordinary characters.  CBMC's lexer terminates the literal at
-// the first inner quote, breaking every following token ("parse error
-// before 'const std :: string'").  The shape of gdb_api.h's regex
+// are ordinary characters.  CBMC's lexer used to terminate the literal
+// at the first inner quote, breaking every following token -- fixed
+// 2026-07-21 (viable-suffix retention in the pending-close flush).  The shape of gdb_api.h's regex
 // patterns, which blocks dog-fooding src/memory-analyzer/*.cpp.
 // g++/clang++ accept and verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);

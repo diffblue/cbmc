@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ ADL via template argument: SUCCESS$
@@ -9,7 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 symbol 'transform' is unknown
 --
-ADL does not consider the namespaces of a specialization's template
-arguments ([basic.lookup.argdep]/2); the call site's enclosing
-function is silently truncated.  Blocks dog-fooding goto_cc_main.cpp
-(unqualified transform over string iterators).
+Fixed 2026-07-21: resolve_with_arguments recurses over the recorded
+template arguments of associated class specializations
+([basic.lookup.argdep]/2); goto_cc_main.cpp and ms_link_cmdline.cpp
+convert clean.

@@ -1,13 +1,13 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ virtual base member set: SUCCESS$
+^\[main\.assertion\.1\] line \d+ braced init with virtual base: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
 --
-Direct-list-initialization of a class with a virtual base fails with
-"'d.@most_derived' not an lvalue"; the parenthesized form works.
-Blocks dog-fooding solver_hardness.cpp (std::ofstream braced init).
+Fixed 2026-07-21: convert_initializer marks the constructed object
+symbol as an lvalue ([expr.prim.id.unqual]), so cpp_constructor's
+synthesized @most_derived writes typecheck on the braced route.

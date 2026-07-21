@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ reference downcast of operator\* result: SUCCESS$
@@ -8,6 +8,6 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-static_cast reference downcast of an operator* call result is rejected
-("type mismatch on static_cast"); the same cast of a plain lvalue
-works.  Blocks dog-fooding goto_rw.cpp (unique_ptr deref).
+Fixed 2026-07-21: the reference-downcast lvalue test judges the
+implicitly dereferenced operand ([expr.call]/14), and the cv-gate
+direction matches [expr.static.cast]/2 (target may ADD qualifiers).
