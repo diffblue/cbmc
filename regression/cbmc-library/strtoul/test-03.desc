@@ -1,0 +1,11 @@
+CORE
+main_03.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+glibc 2.38 and later redirect strtoul to __isoc23_strtoul in C23 mode, with
+_GNU_SOURCE, and in C++.
