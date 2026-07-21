@@ -4210,6 +4210,44 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // explicit template arguments (e.g., duration_cast<seconds>(d)).
   for(auto &arg : expr.arguments())
   {
+    // N5008 [class.access.general]/5: access control for a name is
+    // judged in the context in which the name APPEARS.  The elements of
+    // a braced-init-list argument (`wrapt w({this->member})`) are
+    // expressions of the call site; typecheck them HERE, in the calling
+    // member's scope, and mark them done.  Deferring them to the
+    // conversion machinery (which runs during overload resolution with
+    // a different current scope) mis-judged the enclosing class's own
+    // private members as inaccessible.
+    if(arg.id() == ID_initializer_list)
+    {
+      for(auto &element : arg.operands())
+      {
+        if(
+          element.id() == ID_initializer_list ||
+          element.id() == ID_already_typechecked ||
+          (!element.type().id().empty() && !element.type().is_nil()))
+        {
+          continue; // nested lists keep their target-dependent handling
+        }
+        try
+        {
+          exprt tmp = element;
+          typecheck_expr(tmp);
+          // Expose the element's type on the wrapper so candidate
+          // matching (brace_init_is_viable, fargs) sees it; the later
+          // unwrap in typecheck_expr is unaffected.
+          typet element_type = tmp.type();
+          already_typechecked_exprt::make_already_typechecked(tmp);
+          tmp.type() = std::move(element_type);
+          element.swap(tmp);
+        }
+        catch(...)
+        {
+          // leave the element for the conversion machinery
+        }
+      }
+      continue;
+    }
     if(arg.type().id().empty() || arg.type().is_nil())
     {
       // [temp.deduct.funcaddr]: an argument of the form `&f` or

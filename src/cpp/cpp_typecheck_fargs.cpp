@@ -481,6 +481,21 @@ bool cpp_typecheck_fargst::match(
       distance += rank;
     }
     else if(
+      operand.id() == ID_initializer_list && is_reference(type) &&
+      operand.operands().size() == 1 &&
+      cpp_typecheck.implicit_conversion_sequence(
+        to_unary_expr(operand).op(), type, new_expr, rank, cv_distance))
+    {
+      // N5008 [over.ics.list]/8: for a REFERENCE parameter initialized
+      // from a braced-init-list with a single element, the implicit
+      // conversion sequence is the one converting the element to the
+      // referenced type ([dcl.init.list]/3.10); the reference binding is
+      // computed by implicit_conversion_sequence via reference_binding.
+      // The shape of `wrapt w({this->member})` with
+      // `explicit wrapt(const int &)`.
+      distance += rank;
+    }
+    else if(
       operand.id() == ID_initializer_list && type.id() == ID_struct_tag &&
       id2string(to_struct_tag_type(type).get_identifier())
           .find("tag-initializer_list<") != std::string::npos &&
