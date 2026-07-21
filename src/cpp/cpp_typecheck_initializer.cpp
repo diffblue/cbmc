@@ -323,6 +323,35 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
     typecheck_type(symbol.type);
     implicit_typecast(symbol.value, symbol.type);
+
+    // N5008 [dcl.init]/16.6.2 + [class.copy.elision]: when the deduced
+    // type is a non-POD class and the initializer is a materialized
+    // temporary (or another class-typed expression), the destination is
+    // initialized by the copy/move CONSTRUCTOR chosen by overload
+    // resolution -- not by a bitwise assignment.  Leaving the raw
+    // temporary here made goto conversion ASSIGN the map bitwise and
+    // then run the temporary's DESTRUCTOR: `auto m = std::map<...>{...}`
+    // freed the tree nodes m's copied pointers still referenced, and
+    // every later at() failed with "deallocated dynamic object".
+    // Routing through cpp_constructor selects the move constructor for
+    // the rvalue temporary (ownership transfers; the temporary's
+    // destructor then frees nothing m uses).
+    if(
+      symbol.type.id() == ID_struct_tag && !cpp_is_pod(symbol.type) &&
+      symbol.value.id() == ID_side_effect &&
+      symbol.value.get(ID_statement) == ID_temporary_object)
+    {
+      symbol_exprt destination(symbol.name, symbol.type);
+      destination.set(ID_C_lvalue, true);
+      already_typechecked_exprt::make_already_typechecked(destination);
+      exprt::operandst ops;
+      ops.push_back(symbol.value);
+      already_typechecked_exprt::make_already_typechecked(ops.back());
+      auto constructor =
+        cpp_constructor(symbol.value.source_location(), destination, ops);
+      if(constructor.has_value())
+        symbol.value = constructor.value();
+    }
   }
   else if(cpp_is_pod(symbol.type))
   {
