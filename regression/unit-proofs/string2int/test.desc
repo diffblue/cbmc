@@ -1,0 +1,13 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 8 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof: unsafe_string2int round trip (to_string then parse) over
+all integers in [-999, 999], via the strtoll library model.
