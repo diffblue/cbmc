@@ -3973,20 +3973,40 @@ bool cpp_typecheckt::base_publicly_accessible(
     return true;
 
   // Check if we're inside the derived class or any of its bases — if so,
-  // all bases are accessible regardless of access specifier.
+  // all bases are accessible regardless of access specifier
+  // (N5008 [class.access.base]/5: a base is accessible where a
+  // hypothetical public member of it would be, and members of the
+  // derived class may use their own protected/private bases).  Walk
+  // BOTH the current scope chain and the recorded point of use: during
+  // overload resolution the current scope is moved into the candidate's
+  // class, so the calling member's context — e.g. the mem-initializer
+  // `dereference(..., *this, ...)` of goto_program_dereferencet, whose
+  // base dereference_callbackt is PROTECTED — is only visible through
+  // access_judgment_scope (the same dual walk the friend rule below
+  // uses).
   const irep_idt &from_name = from.get(ID_name);
-  for(cpp_scopet *scope = cpp_scopes.current_scope_ptr; !scope->is_root_scope();
-      scope = &scope->get_parent())
   {
-    if(scope->is_class())
+    cpp_scopet *chains[2] = {
+      cpp_scopes.current_scope_ptr, access_judgment_scope};
+    for(cpp_scopet *chain_start : chains)
     {
-      if(scope->identifier == from_name)
-        return true;
-      // Also allow if from derives from the scope class (e.g., when
-      // resolving a qualified name like ::Base::method() from within
-      // a derived class member function).
-      if(subtype_typecast(from, to_struct_type(lookup(scope->identifier).type)))
-        return true;
+      if(chain_start == nullptr)
+        continue;
+      for(cpp_scopet *scope = chain_start; !scope->is_root_scope();
+          scope = &scope->get_parent())
+      {
+        if(scope->is_class())
+        {
+          if(scope->identifier == from_name)
+            return true;
+          // Also allow if from derives from the scope class (e.g., when
+          // resolving a qualified name like ::Base::method() from within
+          // a derived class member function).
+          if(subtype_typecast(
+               from, to_struct_type(lookup(scope->identifier).type)))
+            return true;
+        }
+      }
     }
   }
 
