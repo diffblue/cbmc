@@ -8,7 +8,9 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-The static std::map<irep_idt, irep_idt> initializer routes a braced
-pair into the comparator parameter ("cannot initialize type 'struct
-less' using value 'ID_equal'"); context-dependent (isolated shape
-passes).  Blocks dog-fooding variable-sensitivity.
+Current state: single-file mode fails with "symbol 'shared_ptr' does
+not uniquely resolve"; two-file mode (this test's shape) SEGFAULTS
+while instantiating sharing_mapt<dstringt, shared_ptr<const ...>>'s
+node machinery (small_shared_n_way_ptrt::is_derived,
+sharing_node.h).  The original map-comparator facet was
+fixed 2026-07-21.  Blocks dog-fooding variable-sensitivity.
