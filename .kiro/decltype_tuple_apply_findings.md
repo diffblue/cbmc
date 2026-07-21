@@ -3744,3 +3744,29 @@ ofstream_from_string (verifies standalone; harness timeout + same
 dtor gaps).  NEW next targets: iostream destructor chain, then
 ofstream flips.
 Suites: cbmc-cpp green 95 skipped, unit-proofs green, cbmc CORE green.
+
+## Capture sweep after minimal-reproducer round (2026-07-21 night)
+
+FIX: std::ios_base ctor/dtor modeled (empty bodies via
+provide_stdlib_bodies, [ios.base.cons]/1 indeterminate members /
+[ios.base.callback] no registered callbacks) -- 'no body for callee
+~ios_base' gone from every stream test.
+NEW KNOWNBUGs: cpp11_stream_destructor_chain (9 lines; vtable-pointer
+bounds in ~basic_ios through virtual-base subobject addressing;
+header-free diamond passes, so the trigger is the full iostream shape)
+and cpp17_base_meminit_template_param (header-free WRONG-CODE class:
+base mem-init named via the template parameter silently dropped, base
+stays nondet; std::move variant errors 'invalid initializer' --
+isolated from goto-symex/renamed.h by include-bisecting frame.h ->
+renamed.h).
+TU updates: abstract_environment's map facet FIXED by the evening
+round; TU now stops at a shared_ptr resolution ambiguity, and in
+two-file mode SEGFAULTS (exit 139) instantiating
+sharing_mapt<dstringt, shared_ptr<const abstract_objectt>> node
+machinery (small_shared_n_way_ptrt::is_derived, sharing_node.h:187) --
+first outright front-end crash in the inventory; isolated
+sharing_mapt shapes pass.
+METHOD note: include-chain bisection (frame.h beat goto_symex_state.h)
+again outperformed cvise for context-heavy failures.
+NEXT: base-meminit-via-template-param fix (wrong-code!), stream
+destructor vtable bounds, sharing_node segfault, std_function lambda.
