@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17 -I ../../../src --object-bits 12 ../../../src/goto-programs/restrict_function_pointers.cpp
+^\[main\.assertion\.1\] line \d+ restrict_function_pointers converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+unordered_map<irep_idt, unordered_set<irep_idt>>::emplace finds no
+match in this TU (context-dependent; the isolated shape passes), plus
+the ofstream{string} constructor misresolution.  The last
+goto-programs dog-food blocker.
