@@ -1,8 +1,9 @@
 // C++11 [ofstream.cons]: std::ofstream has a constructor taking a
-// const std::string& (filename).  CBMC resolves the construction
-// against a wrong candidate and hard-errors with "invalid implicit
-// conversion from 'struct basic_string' to 'std::streamsize'"; the
-// enclosing function is then silently truncated (vacuous success).
+// const std::string& (filename).  CBMC used to route the functional
+// braced cast through the C compound-literal machinery, pouring the
+// string into the stream's first member ("invalid implicit conversion
+// ... to 'std::streamsize'") -- fixed 2026-07-21 ([expr.type.conv]/2
+// direct-list-initialization + byte-wide @most_derived layout).
 // The shape of `auto out = std::ofstream{outfile}` in
 // solver_hardness.cpp/produce_report and goto-harness's doit(),
 // which blocks their dog-fooding.

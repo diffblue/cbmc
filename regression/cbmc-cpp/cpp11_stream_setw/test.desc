@@ -8,7 +8,8 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-`stream << std::setw(n)` fails to resolve the manipulator inserter
-(std::_Setw through the _Require SFINAE chain); the enclosing
-function is silently truncated.  Blocks dog-fooding
-solver_hardness.cpp.
+PARTIALLY fixed 2026-07-21: the inserter now resolves
+([temp.deduct.call]/4.3 transitive base walk) and the assertion
+passes; remaining failures are the iostream DESTRUCTOR chain
+(no body for std::ios_base::~ios_base; vtable-pointer bounds in
+~basic_ios).
