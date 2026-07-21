@@ -594,7 +594,12 @@ enable_or_disable ("enable"|"disable")
 "int"           { loc(); return TOK_INT; }
 "long"          { loc(); return TOK_LONG; }
 "register"      { loc(); return TOK_REGISTER; }
-"restrict"      { loc(); return TOK_RESTRICT; }
+"restrict"      { // C11 6.4.1 keyword; NOT reserved in C++ ([lex.key])
+                  // -- e.g. CBMC's own miniBDD declares
+                  // `mini_bddt restrict(const mini_bddt &, ...)`.
+                  // __restrict/__restrict__ below stay keywords in
+                  // both languages (GNU extension).
+                  return conditional_keyword(!PARSER.cpp98, TOK_RESTRICT); }
 "return"        { loc(); return TOK_RETURN; }
 "short"         { loc(); return TOK_SHORT; }
 "signed"        { loc(); return TOK_SIGNED; }
