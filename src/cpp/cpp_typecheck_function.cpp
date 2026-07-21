@@ -955,6 +955,12 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
   symbol.value.type()=symbol.type;
 
+  // Mark this body as fully type-checked.  The final half-converted
+  // sweep in cpp_typecheckt::typecheck() uses the absence of this flag
+  // to find instances whose eager conversion was absorbed by candidate
+  // matching (see the [dcl.spec.auto]/11 note there).
+  symbol.value.set("#cpp_converted", true);
+
   disable_access_control = saved_access_control;
 
   deferred_typechecking.erase(symbol.name);
