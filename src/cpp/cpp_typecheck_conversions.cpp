@@ -2940,6 +2940,14 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   unsigned backup_rank = rank;
 
   exprt e = expr;
+
+  // A braced-init-list element pre-typechecked at its call site (see
+  // typecheck_side_effect_function_call, [class.access.general]/5) is
+  // wrapped as already-typechecked; the conversion machinery operates
+  // on the real expression inside.
+  while(e.id() == ID_already_typechecked)
+    e = to_already_typechecked_expr(e).get_expr();
+
   add_implicit_dereference(e);
 
   if(is_reference(type))
@@ -3040,9 +3048,12 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
   exprt e = expr;
 
   if(
-    e.id() == ID_initializer_list && cpp_is_pod(type) &&
+    e.id() == ID_initializer_list && (cpp_is_pod(type) || is_reference(type)) &&
     e.operands().size() == 1)
   {
+    // [dcl.init.list]/3.9-3.10, [over.ics.list]/8: a single-element
+    // braced-init-list initializes a scalar, and binds a reference,
+    // from that element.
     e = to_unary_expr(expr).op();
   }
 
