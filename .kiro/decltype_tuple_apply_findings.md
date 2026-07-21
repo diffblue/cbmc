@@ -3653,3 +3653,41 @@ STILL unlocalized (complex instantiation chains): aligned_buffer
 after this round's fixes (likely downstream of restrict).
 LESSON: pkill -f with a pattern matching your OWN compound command
 kills the shell mid-commit; pgrep first, or use exact patterns.
+
+## Sweep-KNOWNBUG fix round (2026-07-21 late morning)
+
+SEVEN of nine flipped to CORE (9 src commits):
+1. [dcl.init.list]/3.10 single-element list -> reference binding
+   (reference_initializer unwrap).
+2. [lex.string] raw strings: pending-close flush must KEEP the longest
+   suffix that can still start )delimiter" (`))"` and `)x)x"` shapes).
+3. [class.access.general]/5 braced-arg elements typechecked at the
+   CALL SITE (pre-typecheck + already_typechecked wrapper CARRYING the
+   element type for matching + icst unwrap) + [over.ics.list]/8
+   single-element list -> reference PARAMETER branch in fargs::match
+   and implicit_typecast.
+4. [expr.static.cast]/2: judge lvalue-ness of the implicitly
+   dereferenced operand ([expr.call]/14) AND the cv-gate was REVERSED
+   (target may ADD qualifiers).
+5. [class.access.base]/5 protected/private OWN base conversions:
+   base_publicly_accessible now walks access_judgment_scope too (the
+   friend rule below it already did) -- killed the
+   value_set_dereferencet group as a bonus.
+6. [basic.lookup.argdep]/2 ADL recurses over TEMPLATE ARGUMENTS of
+   associated specializations (visited-set bounded).
+7. [conv.func]/1 free-function decay in the code-typed address-of
+   (ID_symbol alongside ID_member).
+8. [expr.prim.id.unqual] constructed-object symbol exprs marked lvalue
+   in convert_initializer (fixes @most_derived writes on braced route).
+9. [temp.deduct]/8 hardening: matching guard around candidate
+   deduction, unguarded #sfinae_alt retry, non-type implicit_typecast
+   conversion gate.
+STILL KNOWNBUG: stoll("literal") (residual in alias-template
+instantiation during scope guessing -- resolve_template_alias
+instantiates through convert_non_template_declaration with hard
+errors), std::function-of-lambda invocation, NEW
+cpp17_virtual_base_ctor_member_write (ctor-body writes through `this`
+with virtual base fail bounds check, both init forms, pre-existing,
+= the ofstream/solver_hardness blocker).
+Suites: cbmc-cpp green 91 skipped, ansi-c via goto-cc green (2
+pre-existing clang_target), cbmc CORE green, unit-proofs green.
