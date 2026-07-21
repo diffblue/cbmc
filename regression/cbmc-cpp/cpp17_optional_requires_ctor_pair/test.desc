@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ SFINAE'd candidate dropped: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+std::optional's _Requires'd converting-constructor pair: direct/copy
+initialization fails resolution (half-instantiated candidate), and
+using the constructed object crashes goto-symex (type-inconsistent
+assignment).  Blocks goto_convert*.cpp dog-fooding.

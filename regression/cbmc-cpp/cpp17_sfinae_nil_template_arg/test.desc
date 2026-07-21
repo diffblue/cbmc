@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ conversion completed; op1 has a body: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: nil-typed template arguments thrown while matching
+overloaded candidates convert to template_arg_kind_mismatch_exceptiont
+([temp.deduct]/8) instead of hard-erroring.  The remaining
+data-member variant is cpp17_optional_requires_ctor_pair.
