@@ -12,6 +12,7 @@ Author:
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
@@ -3445,6 +3446,30 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
         }
         if(!has_base_subobject)
         {
+          // N5008 [dcl.init.aggr]/5: when the list has fewer initializers
+          // than the aggregate has elements, the remaining elements are
+          // value-initialized.  Padding is only valid for an AGGREGATE
+          // ([dcl.init.aggr]/1: no user-declared constructor; the
+          // compiler-synthesized ones are marked #is_implicit_ctor) --
+          // for a class with constructors the elements are constructor
+          // arguments instead and missing ones must not be invented.
+          bool has_user_ctor = st.get_bool("has_template_constructor") ||
+                               st.get_bool("has_inherited_constructor");
+          if(!has_user_ctor)
+          {
+            for(const auto &c : comps)
+            {
+              if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+                continue;
+              if(to_code_type(c.type()).return_type().id() != ID_constructor)
+                continue;
+              if(c.type().get_bool("#is_implicit_ctor"))
+                continue;
+              has_user_ctor = true;
+              break;
+            }
+          }
+
           struct_exprt result({}, base_type);
           std::size_t i = 0;
           bool ok = true;
@@ -3468,6 +3493,18 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
                 break;
               }
               result.operands().push_back(std::move(val));
+            }
+            else if(!has_user_ctor)
+            {
+              // value-initialize the remaining element
+              const auto zero = ::zero_initializer(
+                c.type(), orig_expr.source_location(), *this);
+              if(!zero.has_value())
+              {
+                ok = false;
+                break;
+              }
+              result.operands().push_back(*zero);
             }
             else
             {
@@ -4070,8 +4107,7 @@ bool cpp_typecheckt::dynamic_typecast(
       !follow_tag(to_struct_tag_type(to_pointer_type(type).base_type()))
          .is_incomplete())
     {
-      side_effect_expr_nondett nondet_choice{
-        bool_typet{}, e.source_location()};
+      side_effect_expr_nondett nondet_choice{bool_typet{}, e.source_location()};
       null_pointer_exprt null_result{to_pointer_type(type)};
       new_expr = if_exprt{
         std::move(nondet_choice),
