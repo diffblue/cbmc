@@ -250,6 +250,24 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
     if(has_auto(symbol.type))
     {
+      // N5008 [dcl.type.auto.deduct]/4: deduction for `auto` uses the
+      // rules of [temp.deduct.call].  `auto&&` -- an rvalue reference
+      // to a cv-unqualified placeholder -- is a FORWARDING reference
+      // ([temp.deduct.call]/3): if the initializer is an lvalue,
+      // "lvalue reference to A" is used in place of A, and reference
+      // collapsing ([dcl.ref]/6) makes the declared type an lvalue
+      // reference.  Without this, `auto &&r = l;` with l a const
+      // lvalue deduced the non-reference type and failed to bind
+      // ("invalid implicit conversion ... to 'const listt &&'").
+      if(
+        is_rvalue_reference(symbol.type) &&
+        to_pointer_type(symbol.type).base_type().id() == ID_auto &&
+        !to_pointer_type(symbol.type).base_type().get_bool(ID_C_constant) &&
+        symbol.value.get_bool(ID_C_lvalue))
+      {
+        symbol.type.remove(ID_C_rvalue_reference);
+      }
+
       // C++17: auto x{v} deduces to decltype(v)
       typet deduced_type = symbol.value.type();
       if(
