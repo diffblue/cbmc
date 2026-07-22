@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ setw inserter converts: SUCCESS$
@@ -13,3 +13,4 @@ PARTIALLY fixed 2026-07-21: the inserter now resolves
 passes; remaining failures are the iostream DESTRUCTOR chain
 (no body for std::ios_base::~ios_base; vtable-pointer bounds in
 ~basic_ios).
+Fixed 2026-07-22 together with cpp11_stream_destructor_chain.

@@ -3,7 +3,9 @@
 // destructors receive a pointer converted to the base class; writing
 // the vtable pointers during destruction
 // (this->ios_base@vtable_pointer, this->basic_ios@vtable_pointer)
-// fails the pointer bounds checks.  DIAGNOSIS 2026-07-21 (late): the
+// fails the pointer bounds checks.  FIXED 2026-07-22 (see test.desc).
+// Original diagnosis kept below for the record.
+// DIAGNOSIS 2026-07-21 (late): the
 // failing ~basic_ios frames are reached via DEVIRTUALIZED dispatch
 // from unrelated destructor sites (__pthread_cleanup_class's void*
 // __cancel_arg; std::locale facet cache teardown), where the object's
