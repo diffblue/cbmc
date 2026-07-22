@@ -2255,6 +2255,18 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             const typet &p1_base = to_pointer_type(p1).base_type();
             if(p1_base.id() != ID_signedbv && p1_base.id() != ID_unsignedbv)
               continue;
+            // Only the char instantiation: the source is a narrow char
+            // pointer/array, so a wider element type (basic_string<
+            // wchar_t>'s const wchar_t*) must not be offered this
+            // fallback -- the synthesized call would demand a
+            // const char* -> const wchar_t* argument conversion, which
+            // does not exist ([conv.ptr]).
+            if(
+              to_bitvector_type(p1_base).get_width() !=
+              config.ansi_c.char_width)
+            {
+              continue;
+            }
             const typet &p2 = parameters[2].type();
             if(p2.id() != ID_unsignedbv && p2.id() != ID_signedbv)
               continue;
@@ -2267,6 +2279,12 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               {char_ptr, length_expr},
               uninitialized_typet{},
               expr.source_location());
+            // The call is speculative: a failure must leave no trace,
+            // neither the exception nor already-emitted diagnostics
+            // (which would still fail the type-checking run after the
+            // catch below swallows the exception).
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
             try
             {
               typecheck_side_effect_function_call(ctor_expr);
@@ -2280,6 +2298,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             {
               // Fall through; conversion fails as before.
             }
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
             break;
           }
         }
