@@ -2199,6 +2199,37 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           code.operands().clear();
         }
 
+        // [class.base.init]/7: a braced member initializer
+        // list-initializes the member, so [over.match.list]/1 applies:
+        // only a viable initializer-list constructor receives the
+        // braced-init-list as a single argument (phase 1); otherwise
+        // the ELEMENTS of the list are the constructor arguments
+        // (phase 2).  The block-scope declaration path (convert_
+        // initializer) already implements this two-phase selection;
+        // here the raw list (whose elements type-check only against a
+        // target) reached overload resolution whole and untyped, so
+        // every constructor candidate tied: an NSDMI such as
+        // `shared_ptrt nothing{0};` with {shared_ptrt&&, nullptr_t}
+        // constructors reported a bogus ambiguity.
+        {
+          const exprt &inner_se =
+            symbol_expr.id() == ID_already_typechecked
+              ? to_already_typechecked_expr(symbol_expr).get_expr()
+              : symbol_expr;
+          if(
+            code.operands().size() == 1 &&
+            code.op0().id() == ID_initializer_list &&
+            inner_se.type().id() == ID_struct_tag &&
+            !cpp_is_pod(inner_se.type()) &&
+            !has_viable_init_list_constructor(inner_se.type(), code.op0()))
+          {
+            exprt::operandst elements = code.op0().operands();
+            for(auto &element : elements)
+              typecheck_expr(element);
+            code.operands() = std::move(elements);
+          }
+        }
+
         // For default-initialization of a class-type member (no explicit
         // initializer), the selected default constructor must be
         // accessible in this constructor's context ([class.base.init]/12,
