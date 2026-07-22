@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ NSDMI picks the nullptr_t ctor: SUCCESS$
@@ -7,9 +7,6 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-NSDMI list-initialization with a null pointer constant fails overload
-resolution ("does not uniquely resolve") when the class has both
-rvalue-reference and nullptr_t constructors; the same initializer for
-a local variable resolves fine.  From std::shared_ptr NSDMIs in
-variable-sensitivity headers; blocks the abstract_environment dog-food
-TU.
+Fixed 2026-07-22: braced member initializers now use
+[over.match.list]/1 two-phase selection (initializer-list constructor
+only if viable, else the list's elements as constructor arguments).

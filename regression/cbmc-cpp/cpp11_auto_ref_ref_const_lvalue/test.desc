@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ auto&& binds a const lvalue: SUCCESS$
@@ -7,8 +7,6 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-auto&& initialized from a const lvalue deduces the non-reference type
-(missing the [temp.deduct.call]/3 lvalue rule) and fails to bind;
-breaks forwarding-reference function templates called with const
-lvalues (for_each_instruction_if in the restrict_function_pointers
-dog-food TU).
+Fixed 2026-07-22: auto&& from an lvalue now deduces an lvalue
+reference ([dcl.type.auto.deduct]/4, [temp.deduct.call]/3,
+[dcl.ref]/6).

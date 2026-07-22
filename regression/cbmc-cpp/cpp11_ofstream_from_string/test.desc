@@ -13,3 +13,8 @@ standalone ([expr.type.conv]/2 direct-list-init + byte-wide
 @most_derived), but the full property set exceeds the harness
 timeout; iostream destructor-chain gaps remain (see
 cpp11_stream_setw).
+Update 2026-07-22: the front-end blockers are fixed (destructor-chain
+thunk convention + locale/ios_base models; cpp11_stream_destructor_
+chain and cpp11_stream_setw are CORE); this test still times out in
+BMC (filebuf/locale state space), a scaling issue rather than a
+front-end defect.
