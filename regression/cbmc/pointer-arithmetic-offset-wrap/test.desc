@@ -1,0 +1,13 @@
+CORE no-new-smt
+main.c
+--object-bits 16
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Pointer arithmetic whose result offset does not fit the offset field of the
+pointer encoding must not silently wrap around within the object; the result
+is directed to the invalid object instead, keeping the propositional encoding
+consistent with the simplifier's full-width pointer arithmetic.
