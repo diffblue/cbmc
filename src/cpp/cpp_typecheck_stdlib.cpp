@@ -1285,6 +1285,31 @@ void cpp_typecheckt::provide_stdlib_bodies()
           deferred_typechecking.erase(symbol.name);
         }
       }
+      else if(
+        base.find("__try_use_facet") == 0 &&
+        to_code_type(symbol.type).return_type().id() == ID_pointer)
+      {
+        // Facet types OTHER than the modelled ctype<char>: the
+        // header-inline body reads the libstdc++-internal
+        // __loc->_M_impl->_M_facets table, which CBMC does not model
+        // (see above), so every stream construction fails its cache
+        // lookups (_M_cache_locale caching num_put/num_get,
+        // [basic.ios.cons]).  __try_use_facet's contract is to return
+        // a null pointer when the requested facet is absent
+        // ([locale.general]; use_facet throws bad_cast in that case,
+        // has_facet returns false): returning null models a locale
+        // that only provides the facets CBMC implements, and any
+        // genuine USE of an unmodelled facet still fails visibly at
+        // the use site rather than through an unconstrained read.
+        const typet &ret_type = to_code_type(symbol.type).return_type();
+        ensure_parameter_symbols(symbol, symbol_table);
+        code_blockt block;
+        block.add(
+          code_frontend_returnt{null_pointer_exprt{to_pointer_type(ret_type)}});
+        symbol.value = std::move(block);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
       else if(base == "_S_nothrow_relocate" || base == "_S_use_relocate")
       {
         // Override: return true so the _S_relocate path is taken
@@ -1499,6 +1524,162 @@ void cpp_typecheckt::provide_stdlib_bodies()
       // ios_base::Init constructor — provide empty body.
       ensure_parameter_symbols(symbol, symbol_table);
       symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+    if(base == "_M_init" && name.find("std::ios_base::_M_init") == 0)
+    {
+      // std::ios_base::_M_init is defined in libstdc++'s compiled
+      // library (src/c++98/ios_locale.cc); it establishes the
+      // [basic.ios.cons] Table postconditions that basic_ios::init()
+      // delegates: precision() == 6, width() == 0, flags() ==
+      // skipws|dec, exceptions() == goodbit, rdstate() == goodbit.
+      // Synthesize exactly those member assignments (_Ios_Fmtflags:
+      // _S_dec = 1<<1, _S_skipws = 1<<12).
+      ensure_parameter_symbols(symbol, symbol_table);
+      const auto &params = to_code_type(symbol.type).parameters();
+      code_blockt block;
+      if(params.size() == 1 && params[0].type().id() == ID_pointer)
+      {
+        const symbol_exprt this_expr{
+          params[0].get_identifier(), params[0].type()};
+        const typet &base_t = to_pointer_type(params[0].type()).base_type();
+        if(base_t.id() == ID_struct_tag)
+        {
+          const struct_typet &st = ns.follow_tag(to_struct_tag_type(base_t));
+          const std::map<std::string, mp_integer> values = {
+            {"_M_precision", 6},
+            {"_M_width", 0},
+            {"_M_flags", (mp_integer(1) << 1) + (mp_integer(1) << 12)},
+            {"_M_exception", 0},
+            {"_M_streambuf_state", 0}};
+          for(const auto &comp : st.components())
+          {
+            auto v_it = values.find(id2string(comp.get_base_name()));
+            if(v_it == values.end())
+              continue;
+            const member_exprt lhs{
+              dereference_exprt{this_expr}, comp.get_name(), comp.type()};
+            exprt rhs;
+            if(comp.type().id() == ID_c_enum_tag)
+            {
+              rhs = typecast_exprt{
+                from_integer(
+                  v_it->second,
+                  ns.follow_tag(to_c_enum_tag_type(comp.type()))
+                    .underlying_type()),
+                comp.type()};
+            }
+            else
+            {
+              rhs = from_integer(v_it->second, comp.type());
+            }
+            block.add(code_frontend_assignt{lhs, rhs});
+          }
+        }
+      }
+      symbol.value = block;
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+    if(
+      (base == "locale" || base == "~locale") &&
+      name.find("std::locale::") == 0 && symbol.value.is_nil())
+    {
+      // std::locale's constructors and destructor are defined in
+      // libstdc++'s compiled library (src/c++98/locale_init.cc), so
+      // CBMC sees no body and havocs every object holding a locale
+      // (each stream buffer does).  The locale's only data member is
+      // the _Impl pointer; CBMC models all facet access of the global
+      // "C" locale through __try_use_facet (see
+      // provide_classic_ctype_char_model), so the pointer merely needs
+      // to be DETERMINATE: a null _M_impl denotes the modeled global
+      // locale.
+      //   default ctor ([locale.cons]/2, a copy of the global locale):
+      //     this->_M_impl = 0
+      //   copy ctor ([locale.cons]/7):  this->_M_impl = other._M_impl
+      //   destructor ([locale.cons]/9, releases a reference): no-op
+      ensure_parameter_symbols(symbol, symbol_table);
+      const auto &params = to_code_type(symbol.type).parameters();
+      code_blockt block;
+      if(
+        base == "locale" && !params.empty() &&
+        params[0].type().id() == ID_pointer)
+      {
+        const symbol_exprt this_expr{
+          params[0].get_identifier(), params[0].type()};
+        const typet &base_t = to_pointer_type(params[0].type()).base_type();
+        if(base_t.id() == ID_struct_tag)
+        {
+          const struct_typet &st = ns.follow_tag(to_struct_tag_type(base_t));
+          for(const auto &comp : st.components())
+          {
+            if(id2string(comp.get_base_name()) != "_M_impl")
+              continue;
+            const member_exprt lhs{
+              dereference_exprt{this_expr}, comp.get_name(), comp.type()};
+            if(params.size() == 1)
+            {
+              // default constructor
+              block.add(code_frontend_assignt{
+                lhs, null_pointer_exprt{to_pointer_type(comp.type())}});
+            }
+            else if(
+              params.size() == 2 && params[1].type().id() == ID_pointer &&
+              to_pointer_type(params[1].type()).base_type() == base_t)
+            {
+              // copy constructor
+              const symbol_exprt other_expr{
+                params[1].get_identifier(), params[1].type()};
+              const member_exprt rhs{
+                dereference_exprt{other_expr}, comp.get_name(), comp.type()};
+              block.add(code_frontend_assignt{lhs, rhs});
+            }
+            break;
+          }
+        }
+      }
+      symbol.value = block;
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+    if(base == "_M_id" && name.find("std::locale::id::_M_id") == 0)
+    {
+      // std::locale::id::_M_id() is defined in the compiled library;
+      // it lazily assigns and returns the facet's index into the
+      // locale's facet table.  CBMC does not model the facet table
+      // (all lookup goes through the modeled __try_use_facet), so
+      // returning the stored index deterministically is sufficient.
+      ensure_parameter_symbols(symbol, symbol_table);
+      const auto &params = to_code_type(symbol.type).parameters();
+      code_blockt block;
+      if(!params.empty() && params[0].type().id() == ID_pointer)
+      {
+        const symbol_exprt this_expr{
+          params[0].get_identifier(), params[0].type()};
+        const typet &base_t = to_pointer_type(params[0].type()).base_type();
+        if(base_t.id() == ID_struct_tag)
+        {
+          const struct_typet &st = ns.follow_tag(to_struct_tag_type(base_t));
+          for(const auto &comp : st.components())
+          {
+            if(id2string(comp.get_base_name()) != "_M_index")
+              continue;
+            const member_exprt idx{
+              dereference_exprt{this_expr}, comp.get_name(), comp.type()};
+            const typet &ret = to_code_type(symbol.type).return_type();
+            block.add(code_frontend_returnt{
+              idx.type() == ret
+                ? static_cast<exprt>(idx)
+                : static_cast<exprt>(typecast_exprt{idx, ret})});
+            break;
+          }
+        }
+      }
+      symbol.value = block;
       symbol.value.type() = symbol.type;
       deferred_typechecking.erase(symbol.name);
       continue;
