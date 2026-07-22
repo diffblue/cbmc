@@ -85,47 +85,46 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
   {
     const BigInt dividend = pow(BigInt{2}, 89) - 1;
     const BigInt divisor{97};
-    BigInt q, r;
 
-    BigInt::div(dividend, divisor, q, r);
-    REQUIRE(to_string(q) == "6381134223120516880923320");
-    REQUIRE(to_string(r) == "71");
-    REQUIRE(q * divisor + r == dividend);
+    BigInt::divisiont qr = BigInt::div(dividend, divisor);
+    REQUIRE(to_string(qr.quotient) == "6381134223120516880923320");
+    REQUIRE(to_string(qr.remainder) == "71");
+    REQUIRE(qr.quotient * divisor + qr.remainder == dividend);
 
     // Negative dividend: truncated division, remainder takes the
     // dividend's sign.
-    BigInt::div(-dividend, divisor, q, r);
-    REQUIRE(to_string(q) == "-6381134223120516880923320");
-    REQUIRE(to_string(r) == "-71");
-    REQUIRE(q * divisor + r == -dividend);
+    qr = BigInt::div(-dividend, divisor);
+    REQUIRE(to_string(qr.quotient) == "-6381134223120516880923320");
+    REQUIRE(to_string(qr.remainder) == "-71");
+    REQUIRE(qr.quotient * divisor + qr.remainder == -dividend);
 
     // Negative divisor: the quotient flips sign, the remainder keeps
     // the dividend's sign.
-    BigInt::div(dividend, -divisor, q, r);
-    REQUIRE(to_string(q) == "-6381134223120516880923320");
-    REQUIRE(to_string(r) == "71");
-    REQUIRE(q * -divisor + r == dividend);
+    qr = BigInt::div(dividend, -divisor);
+    REQUIRE(to_string(qr.quotient) == "-6381134223120516880923320");
+    REQUIRE(to_string(qr.remainder) == "71");
+    REQUIRE(qr.quotient * -divisor + qr.remainder == dividend);
 
     // Both negative: the quotient is positive, the remainder keeps the
     // dividend's sign.
-    BigInt::div(-dividend, -divisor, q, r);
-    REQUIRE(to_string(q) == "6381134223120516880923320");
-    REQUIRE(to_string(r) == "-71");
-    REQUIRE(q * -divisor + r == -dividend);
+    qr = BigInt::div(-dividend, -divisor);
+    REQUIRE(to_string(qr.quotient) == "6381134223120516880923320");
+    REQUIRE(to_string(qr.remainder) == "-71");
+    REQUIRE(qr.quotient * -divisor + qr.remainder == -dividend);
 
-    // Zero remainder exercises the r.length = 0 path.
-    BigInt::div(dividend * divisor, divisor, q, r);
-    REQUIRE(q == dividend);
-    REQUIRE(r.is_zero());
+    // Zero remainder exercises the remainder.length = 0 path.
+    qr = BigInt::div(dividend * divisor, divisor);
+    REQUIRE(qr.quotient == dividend);
+    REQUIRE(qr.remainder.is_zero());
 
     // A divisor of more than one digit exercises the long-division
     // branch, which is otherwise only tested via operator/= and
     // operator%= that have separate copies of that code.
     const BigInt divisor2 = pow(BigInt{2}, 41) + 3;
-    BigInt::div(dividend, divisor2, q, r);
-    REQUIRE(to_string(q) == "281474976710272");
-    REQUIRE(to_string(r) == "1151");
-    REQUIRE(q * divisor2 + r == dividend);
+    qr = BigInt::div(dividend, divisor2);
+    REQUIRE(to_string(qr.quotient) == "281474976710272");
+    REQUIRE(to_string(qr.remainder) == "1151");
+    REQUIRE(qr.quotient * divisor2 + qr.remainder == dividend);
   }
 
   // =====================================================================
@@ -227,15 +226,15 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
         REQUIRE(m == em);
 
         // Also try the method returning both.
-        BigInt::div(a, b, r, m);
+        BigInt::divisiont qr = BigInt::div(a, b);
         // Again, transform to floored divide.
-        if(!m.is_zero() && a.is_positive() != b.is_positive())
+        if(!qr.remainder.is_zero() && a.is_positive() != b.is_positive())
         {
-          r -= 1;
-          m += b;
+          qr.quotient -= 1;
+          qr.remainder += b;
         }
-        REQUIRE(r == er);
-        REQUIRE(m == em);
+        REQUIRE(qr.quotient == er);
+        REQUIRE(qr.remainder == em);
       }
       }
     }

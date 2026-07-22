@@ -1033,9 +1033,12 @@ BigInt::operator*= (BigInt const &y)
 
 // Division method returning both quotient and remainder.
 
-void
-BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
+BigInt::divisiont BigInt::div(BigInt const &x, BigInt const &y)
 {
+  divisiont result;
+  BigInt &q = result.quotient;
+  BigInt &r = result.remainder;
+
   // Eliminate some trivial cases.
   int cmp = x.ucompare (y);
   if (cmp < 0)
@@ -1044,7 +1047,7 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       r = x;
       q.length = 0;
       q.positive = true;
-      return;
+      return result;
     }
   if (cmp == 0)
     {
@@ -1055,13 +1058,13 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       q.digit[0] = 1;
       if (!y.positive)
 	q.negate();
-      return;
+      return result;
     }
   if (y.length == 0)
     {
     zero:
       error ("Division by zero.");
-      return;
+      return result;
     }
   if (x.is_ulong())
     {
@@ -1126,6 +1129,7 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
   q.adjust();
   q.positive = q.length == 0 || x.positive == y.positive;
   r.positive = r.length == 0 || x.positive;
+  return result;
 }
 
 BigInt &

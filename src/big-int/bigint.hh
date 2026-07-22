@@ -270,8 +270,16 @@ public:
   BigInt &operator++ ()	{ return operator+=(1); } // preincrement
   BigInt &operator-- ()	{ return operator-=(1); } // predecrement
 
-  static void div (BigInt const &, BigInt const &,
-		   BigInt &quot, BigInt &rem) _fasta;
+  // Result of the combined quotient/remainder computation. Returning
+  // fresh objects (rather than filling in caller-provided output
+  // arguments) makes aliasing between inputs and outputs impossible by
+  // construction. The struct is defined after this class.
+  struct divisiont;
+
+  // Combined quotient/remainder computation: quotient = x / y,
+  // remainder = x % y (truncated division, the remainder takes the
+  // sign of x).
+  static divisiont div(BigInt const &, BigInt const &) _fasta;
 
   // Returns the largest x such that 2^x <= abs() or 0 if input is 0
   // Not part of original BigInt.
@@ -290,6 +298,11 @@ public:
   }
 };
 
+struct BigInt::divisiont
+{
+  BigInt quotient;
+  BigInt remainder;
+};
 
 // Functions on BigInt. Implementations in bigint-func.cc.
 
