@@ -843,6 +843,15 @@ BigInt::add (onedig_t const *dig, unsigned len, bool pos)
 void
 BigInt::mul (onedig_t const *dig, unsigned len, bool pos)
 {
+    // Self-aliased operands are not supported: parts of the code below
+    // read the operand after this->digit has been reallocated or
+    // modified. Spell squaring as x * x or use a copy of the operand.
+    if(dig == digit)
+    {
+      error("BigInt::mul: operand must not alias *this.");
+      abort();
+    }
+
   if (len < 2)
     {
       // Handle small dig/len operand efficiently.
@@ -1140,6 +1149,13 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
 BigInt &
 BigInt::operator/= (BigInt const &y)
 {
+  // Self-aliased operands are not supported anywhere in this library.
+  if(this == &y)
+  {
+      error("BigInt::operator/=: operand must not alias *this.");
+      abort();
+  }
+
   // Eliminate some trivial cases.
   int cmp = ucompare (y);
   if (cmp < 0)
@@ -1208,6 +1224,13 @@ BigInt::operator/= (BigInt const &y)
 BigInt &
 BigInt::operator%= (BigInt const &y)
 {
+  // Self-aliased operands are not supported anywhere in this library.
+  if(this == &y)
+  {
+    error("BigInt::operator%=: operand must not alias *this.");
+    abort();
+  }
+
   // Eliminate some trivial cases.
   int cmp = ucompare (y);
   if (cmp < 0)
