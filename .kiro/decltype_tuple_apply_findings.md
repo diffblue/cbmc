@@ -3838,3 +3838,43 @@ lines (rounds 1-3 slow, round 4 finished to 8 lines).
 NAME-SENSITIVITY DEBUGGING: when a repro resists emulation, try
 RENAMING the class in the failing case -- vI (renamed) passed where vG
 (basic_string) failed, pinpointing name-keyed machinery instantly.
+
+## Five-KNOWNBUG fix round (2026-07-22 evening)
+
+FOUR fixed, one sharpened:
+1. STREAM DTOR CHAIN (the big one): NOT dispatch imprecision after
+   all!  Two real roots: (a) no-body locale::locale/ios_base::_M_init/
+   locale::id::_M_id havocking every stream (modeled:
+   [locale.cons], [basic.ios.cons] postconditions; __try_use_facet ->
+   null for unmodeled facets); (b) CONVENTION MISMATCH: virtual-
+   dispatch thunks subtracted subobject offsets while
+   make_ptr_typecast uses FLAT full-object pointers for virtually-
+   inheriting hierarchies (it adjusts only for non-virtual MI).  The
+   4ee7f8dd49 thunk adjustment was correct ONLY for the non-virtual
+   case (cpp11_virtual_dispatch_mi still guards it).  Trace signature:
+   this = &obj + 2^52-k (wrapped negative offset).  Header-free
+   diamond (virtual bases + non-virtual base ABOVE + derived BELOW the
+   join, all five layers required) reproduces; now CORE
+   cpp11_virtual_base_diamond_dtor.  setw fixed too; ofstream = BMC
+   scaling only.
+2. auto&& from lvalue: initializer path missed [temp.deduct.call]/3;
+   drop #rvalue_reference when subtype is cv-unqualified auto and
+   value is lvalue.
+3. NSDMI braced init: member-initializer path lacked
+   [over.match.list]/1 two-phase selection (block-scope path had it);
+   raw untyped lists made ALL ctor candidates tie.
+4. Incomplete-arg instances: check_member_initializers now skips hard
+   errors for template instances ([temp.inst]/2 -- mem-inits belong to
+   the ctor DEFINITION; conversion-time recheck still catches odr-used
+   invalid ones).  SPLIT: completed-later stale-instance reuse is a
+   separate pre-existing defect (new KNOWNBUG
+   cpp17_template_arg_completed_later; ctor variant = symex invariant
+   abort).
+5. umap emplace: diagnosis sharpened -- ANY second distinct
+   instantiation fails (even other map types = global state);
+   unbound _Tp belongs to _Select1st::__1st_type PARTIAL
+   SPECIALIZATIONS failing to rebind under _Hash_code_base
+   re-instantiation.  Header-free replica passes; needs hashtable
+   context.  Deferred.
+Suites: cbmc-cpp green (100 skipped), cbmc CORE green, unit-proofs
+green.
