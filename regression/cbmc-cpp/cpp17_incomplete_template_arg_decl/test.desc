@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+CBMC eagerly instantiates a class-template specialization (and
+converts its constructor) for a function DECLARATION, which
+[temp.inst]/1 does not require; with the incomplete argument type this
+hard-errors "invalid initializer 'underlyingt'".  From
+goto-symex/renamed.h; blocks the goto_symex_state.h dog-food TU.

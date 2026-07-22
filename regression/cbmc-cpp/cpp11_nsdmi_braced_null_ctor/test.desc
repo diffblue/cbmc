@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ NSDMI picks the nullptr_t ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+NSDMI list-initialization with a null pointer constant fails overload
+resolution ("does not uniquely resolve") when the class has both
+rvalue-reference and nullptr_t constructors; the same initializer for
+a local variable resolves fine.  From std::shared_ptr NSDMIs in
+variable-sensitivity headers; blocks the abstract_environment dog-food
+TU.
