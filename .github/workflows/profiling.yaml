@@ -96,6 +96,9 @@ jobs:
 
       - name: Profile PR branch (3 runs per benchmark)
         run: |
+          # Run under a finite (hard) address-space limit, which the profiler
+          # must cope with (it may only lower the soft limit).
+          ulimit -v 25165824
           python3 scripts/profile_cbmc.py --auto --runs 3 --timeout 120 \
             --output-dir profile-results
 

@@ -16,6 +16,30 @@ DWARF_STACK_SIZE = 16384
 _perf_event_cache = None
 
 
+_address_space_clamp_warned = False
+
+
+def _address_space_limits(memory_mb):
+    """Compute the (soft, hard) RLIMIT_AS pair for the perf-record subprocess.
+
+    Only the soft limit is lowered. The hard limit is left untouched: raising
+    it requires privilege, so attempting to set it to RLIM_INFINITY fails
+    whenever the calling shell already imposed a finite hard limit (e.g. via
+    `ulimit -v`). For the same reason the soft limit is clamped to the
+    existing hard limit, which the child inherits from this process."""
+    global _address_space_clamp_warned
+    soft = memory_mb * 1024 * 1024
+    hard = resource.getrlimit(resource.RLIMIT_AS)[1]
+    if hard != resource.RLIM_INFINITY and hard < soft:
+        if not _address_space_clamp_warned:
+            warn(f"Requested memory limit of {memory_mb} MiB exceeds the "
+                 f"inherited hard limit of {hard // (1024 * 1024)} MiB; "
+                 f"using the latter")
+            _address_space_clamp_warned = True
+        soft = hard
+    return soft, hard
+
+
 def _detect_perf_event():
     """Detect whether hardware cycles counter is available, fall back to
     cpu-clock software event (for CI containers/VMs without PMU access).
@@ -96,12 +120,15 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
         "-e", perf_event,
         "-o", str(perf_data), "--"] + cmd
 
+    # Compute the limits here rather than in preexec_fn: any output there
+    # would end up in the captured output, and exceptions abort the child.
+    limits = _address_space_limits(memory_mb)
+
     start = time.monotonic()
     try:
         result = subprocess.run(
             perf_cmd, capture_output=True, text=True, timeout=timeout,
-            preexec_fn=lambda: resource.setrlimit(
-                resource.RLIMIT_AS, (memory_mb * 1024 * 1024, -1)))
+            preexec_fn=lambda: resource.setrlimit(resource.RLIMIT_AS, limits))
         cbmc_stdout = result.stdout + result.stderr
         elapsed = time.monotonic() - start
     except subprocess.TimeoutExpired:
