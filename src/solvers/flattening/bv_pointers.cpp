@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_pointers.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -22,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <solvers/prop/bdd_expr.h>
 #include <solvers/prop/literal_expr.h>
+
+#include <algorithm>
 
 /// Map bytes according to the configured endianness. The key difference to
 /// endianness_mapt is that bv_endianness_mapt is aware of the bit-level
@@ -461,9 +464,17 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 
     std::optional<bytest> size;
 
+    // Sum the integer operands at a width that can represent each of them
+    // (and any address) without loss; offsets that do not fit the pointer
+    // encoding's offset field are detected in offset_arithmetic below rather
+    // than being silently truncated here.
+    std::size_t sum_width = get_address_width(type);
+
     for(const auto &op : plus_expr.operands())
     {
-      if(op.type().id() == ID_pointer)
+      if(op.type().id() != ID_pointer)
+        sum_width = std::max(sum_width, boolbv_width(op.type()));
+      else
       {
         bv = convert_bv(op);
         CHECK_RETURN(bv.size() == bits);
@@ -486,8 +497,10 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       size.has_value(),
       "there should be exactly one pointer-type operand in a pointer-type sum");
 
-    const std::size_t offset_bits = get_offset_width(type);
-    bvt sum = bv_utils.build_constant(0, offset_bits);
+    // One extra bit so that unsigned operands remain non-negative when
+    // interpreted as signed.
+    ++sum_width;
+    bvt sum = bv_utils.build_constant(0, sum_width);
 
     for(const auto &operand : plus_expr.operands())
     {
@@ -506,11 +519,9 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
                                          : bv_utilst::representationt::UNSIGNED;
 
       bvt op = convert_bv(operand);
-      CHECK_RETURN(!op.empty());
+      CHECK_RETURN(!op.empty() && op.size() < sum_width);
 
-      op = bv_utils.extension(op, offset_bits, rep);
-
-      sum = bv_utils.add(sum, op);
+      sum = bv_utils.add(sum, bv_utils.extension(op, sum_width, rep));
     }
 
     return offset_arithmetic(type, bv, *size, sum);
@@ -532,7 +543,14 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       return conversion_failed(minus_expr);
     }
 
-    const unary_minus_exprt neg_op1(minus_expr.rhs());
+    // Negate in a signed type wide enough to represent the negation of any
+    // value of the subtrahend's type: negating an unsigned subtrahend in its
+    // own type would wrap around and yield an out-of-range offset.
+    const signedbv_typet neg_type{
+      std::max(boolbv_width(minus_expr.rhs().type()), get_address_width(type)) +
+      1};
+    const unary_minus_exprt neg_op1{
+      typecast_exprt::conditional_cast(minus_expr.rhs(), neg_type)};
 
     const bvt &bv = convert_bv(minus_expr.lhs());
 
@@ -809,10 +827,13 @@ bvt bv_pointerst::offset_arithmetic(
   const bvt &bv,
   const bytest &x)
 {
-  const std::size_t offset_bits = get_offset_width(type);
+  // Build the constant at full address width so that offsets that do not
+  // fit the pointer encoding's offset field are not silently truncated;
+  // offset_arithmetic below detects them instead.
+  const std::size_t address_bits = get_address_width(type);
 
   return offset_arithmetic(
-    type, bv, bytest{1}, bv_utils.build_constant(x.get(), offset_bits));
+    type, bv, bytest{1}, bv_utils.build_constant(x.get(), address_bits + 1));
 }
 
 bvt bv_pointerst::offset_arithmetic(
@@ -827,8 +848,11 @@ bvt bv_pointerst::offset_arithmetic(
     index.type().id()==ID_signedbv?bv_utilst::representationt::SIGNED:
                                    bv_utilst::representationt::UNSIGNED;
 
-  const std::size_t offset_bits = get_offset_width(type);
-  bv_index=bv_utils.extension(bv_index, offset_bits, rep);
+  // Extend rather than truncate: offsets that do not fit the pointer
+  // encoding's offset field are detected in offset_arithmetic below.
+  const std::size_t address_bits = get_address_width(type);
+  bv_index = bv_utils.extension(
+    bv_index, std::max(bv_index.size(), address_bits) + 1, rep);
 
   return offset_arithmetic(type, bv, factor, bv_index);
 }
@@ -839,20 +863,23 @@ bvt bv_pointerst::offset_arithmetic(
   const exprt &factor,
   const exprt &index)
 {
-  bvt bv_factor = convert_bv(factor);
-  bvt bv_index =
-    convert_bv(typecast_exprt::conditional_cast(index, factor.type()));
+  // Multiply in a signed type that can represent both operands (and any
+  // address) without loss: casting the index to the (typically unsigned)
+  // type of the factor would turn negative indices into large positive ones,
+  // which are out of range now that offsets are no longer truncated.
+  const signedbv_typet product_type{
+    std::max(
+      {boolbv_width(index.type()),
+       boolbv_width(factor.type()),
+       get_address_width(type)}) +
+    1};
+  const bvt bv_factor =
+    convert_bv(typecast_exprt::conditional_cast(factor, product_type));
+  const bvt bv_index =
+    convert_bv(typecast_exprt::conditional_cast(index, product_type));
 
-  bv_utilst::representationt rep = factor.type().id() == ID_signedbv
-                                     ? bv_utilst::representationt::SIGNED
-                                     : bv_utilst::representationt::UNSIGNED;
-
-  bv_index = bv_utils.multiplier(bv_index, bv_factor, rep);
-
-  const std::size_t offset_bits = get_offset_width(type);
-  bv_index = bv_utils.extension(bv_index, offset_bits, rep);
-
-  return offset_arithmetic(type, bv, bytest{1}, bv_index);
+  return offset_arithmetic(
+    type, bv, bytest{1}, bv_utils.signed_multiplier(bv_index, bv_factor));
 }
 
 bvt bv_pointerst::offset_arithmetic(
@@ -872,13 +899,44 @@ bvt bv_pointerst::offset_arithmetic(
   }
 
   const std::size_t offset_bits = get_offset_width(type);
-  bv_index = bv_utils.zero_extension(bv_index, offset_bits);
+
+  // Perform the addition at a width that can represent the mathematical
+  // result: any offset that does not fit the offset field of the pointer
+  // encoding must not silently wrap around within the object (the
+  // simplifier and constant propagation compute pointer arithmetic in
+  // full-width arithmetic, and silent wrap-around makes the propositional
+  // encoding disagree with them; see
+  // https://github.com/model-checking/kani/issues/1150). Instead, direct
+  // any out-of-range result to the "invalid object", mirroring what the
+  // integer-to-pointer conversion does for unknown addresses.
+  const std::size_t ext_bits = std::max(bv_index.size(), offset_bits) + 1;
+
+  // The index is a signed quantity (negative offsets move towards the
+  // start of the object); the current offset is unsigned.
+  bvt bv_index_ext =
+    bv_utils.extension(bv_index, ext_bits, bv_utilst::representationt::SIGNED);
 
   bvt offset_bv = offset_literals(bv, type);
+  bvt offset_ext = bv_utils.extension(
+    offset_bv, ext_bits, bv_utilst::representationt::UNSIGNED);
 
-  bvt bv_tmp = bv_utils.add(offset_bv, bv_index);
+  bvt sum_ext = bv_utils.add(offset_ext, bv_index_ext);
 
-  return object_offset_encoding(object_literals(bv, type), bv_tmp);
+  // The result is representable iff the extension bits (all bits from
+  // offset_bits upwards, including the sign bit) are zero.
+  bvt high_bits(sum_ext.begin() + offset_bits, sum_ext.end());
+  literalt overflow = prop.lor(high_bits);
+
+  bvt bv_tmp(sum_ext.begin(), sum_ext.begin() + offset_bits);
+
+  // On overflow, replace the object by the invalid object so that the
+  // result compares unequal to any pointer into the original object.
+  bvt object_bv = object_literals(bv, type);
+  bvt invalid_object_bv =
+    object_literals(encode(pointer_logic.get_invalid_object(), type), type);
+  bvt new_object_bv = bv_utils.select(overflow, invalid_object_bv, object_bv);
+
+  return object_offset_encoding(new_object_bv, bv_tmp);
 }
 
 bvt bv_pointerst::add_addr(const exprt &expr)

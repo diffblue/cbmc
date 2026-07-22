@@ -47,6 +47,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <map>
 
@@ -843,6 +844,20 @@ exprt smt2_convt::parse_rec(const irept &src, const typet &type)
   return nil_exprt();
 }
 
+/// Extend \p index, the integer operand of pointer arithmetic, to a signed
+/// type that is one bit wider than both the index (\p index_width) and the
+/// address width (\p pointer_width), as bv_pointerst does, such that the
+/// offset computation in \ref smt2_convt::convert_pointer_arithmetic does not
+/// lose any bits.
+static exprt widen_pointer_arithmetic_index(
+  const exprt &index,
+  std::size_t index_width,
+  std::size_t pointer_width)
+{
+  return typecast_exprt::conditional_cast(
+    index, signedbv_typet{std::max(index_width, pointer_width) + 1});
+}
+
 void smt2_convt::convert_address_of_rec(
   const exprt &expr,
   const pointer_typet &result_type)
@@ -889,13 +904,20 @@ void smt2_convt::convert_address_of_rec(
       index_exprt new_index_expr = index_expr;
       new_index_expr.index() = from_integer(0, index.type());
 
+      const typet &element_type = to_array_type(array.type()).element_type();
       address_of_exprt address_of_expr(
-        new_index_expr,
-        pointer_type(to_array_type(array.type()).element_type()));
+        new_index_expr, pointer_type(element_type));
 
-      plus_exprt plus_expr{address_of_expr, index};
+      auto element_size_opt = pointer_offset_size(element_type, ns);
+      CHECK_RETURN(
+        element_size_opt.has_value() && *element_size_opt >= bytest{0});
 
-      convert_expr(plus_expr);
+      const std::size_t pointer_width = boolbv_width(address_of_expr.type());
+      convert_pointer_arithmetic(
+        address_of_expr,
+        widen_pointer_arithmetic_index(
+          index, boolbv_width(index.type()), pointer_width),
+        *element_size_opt);
     }
   }
   else if(expr.id()==ID_member)
@@ -919,13 +941,12 @@ void smt2_convt::convert_address_of_rec(
     const auto offset = member_offset(struct_type, component_name, ns);
     CHECK_RETURN(offset.has_value() && *offset >= bytest{0});
 
-    unsignedbv_typet index_type(boolbv_width(result_type));
-
     // pointer arithmetic
-    out << "(bvadd ";
-    convert_address_of_rec(struct_op, result_type);
-    convert_expr(from_integer(*offset, index_type));
-    out << ")"; // bvadd
+    const std::size_t pointer_width = boolbv_width(result_type);
+    convert_pointer_arithmetic(
+      address_of_exprt{struct_op, pointer_typet{struct_op_type, pointer_width}},
+      from_integer(*offset, signedbv_typet{pointer_width + 1}),
+      bytest{1});
   }
   else if(expr.id()==ID_if)
   {
@@ -4398,63 +4419,106 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
   }
   else if(expr.type().id() == ID_pointer)
   {
-    if(expr.operands().size() == 2)
+    // This is pointer plus integer(s). As in bv_pointerst, sum the integer
+    // operands at a width that can represent each of them (and any address)
+    // without loss, with one extra bit so that unsigned operands remain
+    // non-negative when interpreted as signed.
+    const exprt *pointer = nullptr;
+    std::size_t sum_width = boolbv_width(expr.type());
+
+    for(const auto &op : expr.operands())
     {
-      exprt p = expr.op0(), i = expr.op1();
-
-      if(p.type().id() != ID_pointer)
-        p.swap(i);
-
-      DATA_INVARIANT(
-        p.type().id() == ID_pointer,
-        "one of the operands should have pointer type");
-
-      const auto &base_type = to_pointer_type(expr.type()).base_type();
-      DATA_INVARIANT(
-        base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
-
-      auto element_size_opt = pointer_offset_size(base_type, ns);
-      CHECK_RETURN(
-        element_size_opt.has_value() && *element_size_opt >= bytest{0});
-      bytest element_size = *element_size_opt;
-
-      // First convert the pointer operand
-      out << "(let ((?pointerop ";
-      convert_expr(p);
-      out << ")) ";
-
-      // The addition is done on the offset part only.
-      const std::size_t pointer_width = boolbv_width(p.type());
-      const std::size_t offset_bits =
-        pointer_width - config.bv_encoding.object_bits;
-
-      out << "(concat ";
-      out << "((_ extract " << pointer_width - 1 << ' ' << offset_bits
-          << ") ?pointerop) ";
-      out << "(bvadd ((_ extract " << offset_bits - 1 << " 0) ?pointerop) ";
-
-      if(element_size >= bytest{2})
+      if(op.type().id() == ID_pointer)
       {
-        out << "(bvmul ((_ extract " << offset_bits - 1 << " 0) ";
-        convert_expr(i);
-        out << ") (_ bv" << element_size << " " << offset_bits << "))";
+        DATA_INVARIANT(
+          pointer == nullptr,
+          "there should be exactly one pointer-type operand in a pointer-type "
+          "sum");
+        pointer = &op;
       }
       else
-      {
-        out << "((_ extract " << offset_bits - 1 << " 0) ";
-        convert_expr(i);
-        out << ')'; // extract
-      }
+        sum_width = std::max(sum_width, boolbv_width(op.type()));
+    }
 
-      out << ")))"; // bvadd, concat, let
-    }
-    else
+    DATA_INVARIANT(
+      pointer != nullptr,
+      "there should be exactly one pointer-type operand in a pointer-type sum");
+
+    const signedbv_typet sum_type{sum_width + 1};
+    exprt::operandst summands;
+    for(const auto &op : expr.operands())
     {
-      convert_plus(to_plus_expr(make_binary(expr)));
+      if(&op != pointer)
+        summands.push_back(typecast_exprt::conditional_cast(op, sum_type));
     }
+
+    const auto &base_type = to_pointer_type(pointer->type()).base_type();
+    DATA_INVARIANT(
+      base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
+
+    auto element_size_opt = pointer_offset_size(base_type, ns);
+    CHECK_RETURN(
+      element_size_opt.has_value() && *element_size_opt >= bytest{0});
+
+    convert_pointer_arithmetic(
+      *pointer,
+      summands.size() == 1 ? summands.front()
+                           : plus_exprt{std::move(summands), sum_type},
+      *element_size_opt);
   }
   else
     UNEXPECTEDCASE("unsupported type for +: " + expr.type().id_string());
+}
+
+/// Convert pointer arithmetic: \p pointer advanced by \p offset elements of
+/// \p element_size bytes each. The offset is computed at a width that can
+/// represent the mathematical result, which must not silently wrap around
+/// within the object when it does not fit the offset field of the pointer
+/// encoding: such results instead point to the invalid object. This mirrors
+/// `bv_pointerst::offset_arithmetic`.
+/// \param pointer: pointer-typed operand
+/// \param offset: signed bit-vector typed number of elements
+/// \param element_size: size of each element in bytes
+void smt2_convt::convert_pointer_arithmetic(
+  const exprt &pointer,
+  const exprt &offset,
+  const bytest &element_size)
+{
+  PRECONDITION(pointer.type().id() == ID_pointer);
+  PRECONDITION(offset.type().id() == ID_signedbv);
+
+  const std::size_t pointer_width = boolbv_width(pointer.type());
+  const std::size_t object_bits = config.bv_encoding.object_bits;
+  const std::size_t offset_bits = pointer_width - object_bits;
+  const std::size_t offset_width = to_signedbv_type(offset.type()).get_width();
+  // The current offset is unsigned and the number of bytes to add is signed:
+  // one extra bit suffices to represent the sum.
+  const std::size_t sum_width = std::max(offset_width, offset_bits) + 1;
+
+  out << "(let ((?pointerop ";
+  convert_expr(pointer);
+  out << ")) ";
+
+  out << "(let ((?offset (bvadd ((_ zero_extend " << sum_width - offset_bits
+      << ") ((_ extract " << offset_bits - 1 << " 0) ?pointerop)) "
+      << "((_ sign_extend " << sum_width - offset_width << ") ";
+  if(element_size == bytest{1})
+    convert_expr(offset);
+  else
+    convert_expr(
+      mult_exprt{offset, from_integer(element_size.get(), offset.type())});
+  out << ")))) "; // sign_extend, bvadd, binding, bindings
+
+  // The result is representable iff all bits from offset_bits upwards,
+  // including the sign bit, are zero.
+  out << "(ite (= ((_ extract " << sum_width - 1 << ' ' << offset_bits
+      << ") ?offset) (_ bv0 " << sum_width - offset_bits << ")) ";
+  out << "(concat ((_ extract " << pointer_width - 1 << ' ' << offset_bits
+      << ") ?pointerop) ((_ extract " << offset_bits - 1 << " 0) ?offset)) ";
+  out << "(concat (_ bv" << pointer_logic.get_invalid_object() << ' '
+      << object_bits << ") ((_ extract " << offset_bits - 1
+      << " 0) ?offset)))))";
+  // concat, ite, let, let
 }
 
 /// Converting a constant or symbolic rounding mode to SMT-LIB. Only called when
@@ -4627,9 +4691,27 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
       (expr.op1().type().id() == ID_unsignedbv ||
        expr.op1().type().id() == ID_signedbv))
     {
-      // rewrite p-o to p+(-o)
-      return convert_plus(
-        plus_exprt(expr.op0(), unary_minus_exprt(expr.op1())));
+      // p - i is p + (-i), negated in a signed type wide enough to represent
+      // the negation of any value of i's type: negating an unsigned i in its
+      // own type would wrap around and yield an out-of-range offset.
+      const std::size_t pointer_width = boolbv_width(expr.op0().type());
+      const std::size_t neg_width =
+        std::max(boolbv_width(expr.op1().type()), pointer_width) + 1;
+      const unary_minus_exprt neg_op1{typecast_exprt::conditional_cast(
+        expr.op1(), signedbv_typet{neg_width})};
+
+      const auto &base_type = to_pointer_type(expr.op0().type()).base_type();
+      DATA_INVARIANT(
+        base_type.id() != ID_empty, "no pointer arithmetic over void pointers");
+
+      auto element_size_opt = pointer_offset_size(base_type, ns);
+      CHECK_RETURN(
+        element_size_opt.has_value() && *element_size_opt >= bytest{0});
+
+      convert_pointer_arithmetic(
+        expr.op0(),
+        widen_pointer_arithmetic_index(neg_op1, neg_width, pointer_width),
+        *element_size_opt);
     }
     else
       UNEXPECTEDCASE(

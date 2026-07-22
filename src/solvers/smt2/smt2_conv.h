@@ -143,6 +143,10 @@ protected:
   void convert_is_dynamic_object(const unary_exprt &);
   void convert_plus(const plus_exprt &expr);
   void convert_minus(const minus_exprt &expr);
+  void convert_pointer_arithmetic(
+    const exprt &pointer,
+    const exprt &offset,
+    const bytest &element_size);
   void convert_div(const div_exprt &expr);
   void convert_mult(const mult_exprt &expr);
   void convert_rounding_mode_FPA(const exprt &expr);

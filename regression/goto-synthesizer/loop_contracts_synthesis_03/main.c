@@ -3,7 +3,7 @@
 void main()
 {
   unsigned long long len;
-  __CPROVER_assume(len >= 8);
+  __CPROVER_assume(len >= 8 && len <= __CPROVER_max_malloc_size);
   char *array = malloc(len);
   const char *end = array + len;
   unsigned s = 0;
