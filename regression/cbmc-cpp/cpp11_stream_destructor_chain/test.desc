@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ stream destructor chain verifies: SUCCESS$
@@ -8,8 +8,9 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-The iostream destructor chain trips vtable-pointer bounds checks in
-~basic_ios/~basic_iostream: devirtualized dispatch with unconstrained
-vtable pointers (unmodeled facet constructors) runs ~basic_ios on
-smaller objects.  Blocks cpp11_stream_setw and
-cpp11_ofstream_from_string.
+Fixed 2026-07-22: thunks in virtually-inheriting hierarchies now use
+the flat full-object pointer convention matching make_ptr_typecast,
+and libstdc++'s library-defined locale/ios_base members are modeled
+(locale ctors/dtor, ios_base::_M_init, locale::id::_M_id,
+__try_use_facet null for unmodeled facets).  See also
+cpp11_virtual_base_diamond_dtor for the header-free layout guard.

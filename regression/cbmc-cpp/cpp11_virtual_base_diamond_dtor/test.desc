@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ destructor chain verifies: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Header-free iostream-shaped diamond destructor chain; guards the flat
+pointer convention agreement between make_ptr_typecast and
+virtual-dispatch thunks in virtually-inheriting hierarchies.

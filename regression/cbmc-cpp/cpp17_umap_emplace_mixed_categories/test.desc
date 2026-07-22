@@ -7,8 +7,14 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-A second unordered_map::emplace instantiation with const-lvalue
-arguments (after an rvalue one) fails "found no match for symbol
-'emplace'"; needs a user hash specialization and an unordered_set
-value type.  From restrict_function_pointers.cpp's
+A second DISTINCT unordered_map::emplace instantiation fails "found
+no match for symbol 'emplace'" -- diagnosis 2026-07-22: while
+re-instantiating __detail::_Select1st::operator()<_Tp> (via
+_Hash_code_base) the partial specializations of its member template
+__1st_type fail to rebind their parameters (convert_template_parameter
+finds _Tp unbound in an active-deduction map).  Any second argument
+shape triggers it, even on a DIFFERENT map type (global, not per-map
+state); each call converts fine alone.  A header-free replica of the
+_Select1st shape passes -- the full hashtable context is required.
+From restrict_function_pointers.cpp's
 merge_function_pointer_restrictions; blocks that dog-food TU.

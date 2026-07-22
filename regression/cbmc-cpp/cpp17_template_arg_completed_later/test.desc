@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ instance re-elaborated when completed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+An instance created at a declaration-only point (incomplete argument
+type) is cached and served stale after the type is completed and the
+specialization is used ([temp.point]: the use is a new point of
+instantiation).  The mem-initializer variant SEGFAULTS in
+symex_assign.  Split from cpp17_incomplete_template_arg_decl.
