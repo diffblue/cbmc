@@ -627,7 +627,8 @@ void cpp_typecheckt::check_member_initializers(
   const struct_typet::basest &bases,
   const struct_typet::componentst &components,
   const irept &initializers,
-  const irep_idt &class_identifier)
+  const irep_idt &class_identifier,
+  bool is_template_instance)
 {
   PRECONDITION(initializers.id() == ID_member_initializers);
 
@@ -665,6 +666,17 @@ void cpp_typecheckt::check_member_initializers(
 
       if(!ok)
       {
+        // N5008 [temp.inst]/2: instantiating a class template
+        // specialization instantiates only the DECLARATIONS of its
+        // members; a mem-initializer list belongs to a constructor's
+        // DEFINITION, whose semantic checks are deferred to its own
+        // instantiation ([temp.inst]/4).  A name that cannot be
+        // matched here (e.g. one denoting a still-incomplete base,
+        // renamedt<ssa_exprt> with ssa_exprt forward-declared) is
+        // checked again -- authoritatively -- when the constructor
+        // body is converted.
+        if(is_template_instance)
+          continue;
         error().source_location=member_name.source_location();
         error() << "invalid initializer '" << member_name.to_string() << "'"
                 << eom;
@@ -822,6 +834,11 @@ void cpp_typecheckt::check_member_initializers(
 
     if(!ok)
     {
+      // See the [temp.inst]/2 note above: for a template instance the
+      // authoritative check happens when the member's definition is
+      // instantiated.
+      if(is_template_instance)
+        continue;
       error().source_location=member_name.source_location();
       error() << "invalid initializer '" << base_name << "'" << eom;
       throw 0;

@@ -459,7 +459,8 @@ protected:
     const struct_typet::basest &bases,
     const struct_typet::componentst &components,
     const irept &initializers,
-    const irep_idt &class_identifier = irep_idt());
+    const irep_idt &class_identifier = irep_idt(),
+    bool is_template_instance = false);
 
   bool check_component_access(
     const struct_union_typet::componentt &component,
