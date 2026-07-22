@@ -13,6 +13,6 @@ match in this TU (context-dependent; the isolated shape passes), plus
 the ofstream{string} constructor misresolution.  The last
 goto-programs dog-food blocker.
 Update 2026-07-22: the emplace no-match is isolated as minimal
-KNOWNBUG cpp17_umap_emplace_mixed_categories; a second ingredient
-remains here: invalid implicit conversion 'const list' -> 'const
-list &&' when instantiating for_each_instruction_if with a lambda.
+KNOWNBUG cpp17_umap_emplace_mixed_categories; the second ingredient
+(auto&& from a const lvalue deducing the non-reference type) is
+isolated as minimal KNOWNBUG cpp11_auto_ref_ref_const_lvalue.
