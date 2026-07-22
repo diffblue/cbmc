@@ -11,6 +11,7 @@
 
 #include <cctype>
 #include <climits>
+#include <cstdlib>
 #include <cstring>
 
 // How to report errors.
@@ -779,6 +780,16 @@ BigInt::compare (BigInt const &b) const
 void
 BigInt::add (onedig_t const *dig, unsigned len, bool pos)
 {
+  // dig aliases this->digit when called via x += x or x -= x. The
+  // resize below may free that buffer, turning dig into a dangling
+  // pointer. Self-aliased operands are not supported; spell doubling
+  // as x + x or use a copy of the operand.
+  if(dig == digit)
+  {
+    error("BigInt::add: operand must not alias *this.");
+    abort();
+  }
+
   // Make sure the result fits into this, even with carry.
   resize ((length > len ? length : len) + 1);
 
