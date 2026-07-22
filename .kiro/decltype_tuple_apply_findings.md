@@ -3803,3 +3803,38 @@ rebase base MATCHES THE FIXUP LINE ('fixup! <msg>' contains <msg>) ->
 detached-head rebase.  ALWAYS: git log --oneline | grep -v '^\w* fixup!'
 or use exact hashes noted at commit time.
 Suites: cbmc-cpp green 97 skipped, unit-proofs green, cbmc CORE green.
+
+## Capture + minimization round (2026-07-22)
+
+FIXED (suite-validated): basic_string conversion fallback misfire --
+the name-keyed char*->basic_string fallback also fired for
+basic_string<wchar_t> AND leaked diagnostics from its speculative ctor
+call past the catch (error-count rollback now; same hazard class as
+the mem-init probe!).  std::stoll("lit") CORE + new minimal CORE
+cpp17_wide_string_overload_fallback.  LESSON: any speculative
+typecheck under catch(...) MUST roll back the message count.
+
+Four new minimal KNOWNBUGs distilled from TU reproducers:
+- cpp17_incomplete_template_arg_decl: CBMC instantiates a
+  specialization (converting its ctor!) for a mere function
+  DECLARATION ([temp.inst]/1 violation); THE goto_symex_state.h
+  residual (renamed.h converts clean post-POD-base fix).
+- cpp17_umap_emplace_mixed_categories: 2nd emplace instantiation with
+  const-lvalue args after an rvalue one -> "found no match"; needs
+  user hash + unordered_set value.
+- cpp11_nsdmi_braced_null_ctor: NSDMI T x{0} with {T&&, nullptr_t}
+  ctor set -> bogus ambiguity; LOCAL variable with same init works
+  (8-line cvise convergence).
+- cpp11_auto_ref_ref_const_lvalue: auto&& r = const_lvalue deduces
+  non-reference type (missing [temp.deduct.call]/3 lvalue rule).
+TECHNIQUE: goto-cc -E -o preserves CBMC's exact preprocessing;
+LINEMARKERS MUST BE KEPT (syshdr error-swallowing keys on file path --
+stripping them surfaces unrelated errors).  clang -E output diverges
+(different error paths).  Anti-drift gates again essential: reduction
+#1 drifted to writable-strings extension (add -Werror=write-strings);
+reduction #2 dropped inheritance (pin with grep gates).  Eval time
+DROPS as file shrinks -- a 60s/eval start converges once past ~20k
+lines (rounds 1-3 slow, round 4 finished to 8 lines).
+NAME-SENSITIVITY DEBUGGING: when a repro resists emulation, try
+RENAMING the class in the failing case -- vI (renamed) passed where vG
+(basic_string) failed, pinpointing name-keyed machinery instantly.
