@@ -14,3 +14,7 @@ while instantiating sharing_mapt<dstringt, shared_ptr<const ...>>'s
 node machinery (small_shared_n_way_ptrt::is_derived,
 sharing_node.h).  The original map-comparator facet was
 fixed 2026-07-21.  Blocks dog-fooding variable-sensitivity.
+Update 2026-07-22: the shared_ptr ambiguity is isolated as minimal
+KNOWNBUG cpp11_nsdmi_braced_null_ctor (NSDMI list-init with a null
+pointer constant); the two-file SEGFAULT (sharing_node
+small_shared_n_way_ptrt::is_derived) remains only here.

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ stoll on a string literal: SUCCESS$
@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-std::stoll("literal") resolves against the wstring overload and
-hard-errors instead of using the const char* -> std::string conversion
-([over.ics.user]) with the narrow overload.
+Fixed 2026-07-22: the char-pointer -> basic_string conversion
+fallback fired for basic_string<wchar_t> too and leaked diagnostics
+from its speculative constructor call; see
+cpp17_wide_string_overload_fallback for the minimal guard.
