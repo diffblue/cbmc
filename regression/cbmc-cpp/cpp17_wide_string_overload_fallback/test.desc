@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ narrow literal picks char overload: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Minimal guard for the basic_string conversion-fallback misfire on
+wide-char instantiations (name-keyed fallback + leaked speculative
+diagnostics); distilled from std::stoll(string literal).
