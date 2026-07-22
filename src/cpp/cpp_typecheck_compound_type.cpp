@@ -3025,7 +3025,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               to_struct_type(type).bases(),
               type.components(),
               declarator.member_initializers(),
-              type.get(ID_name));
+              type.get(ID_name),
+              type.get_bool(ID_template_class_instance));
           }
 
           full_member_initialization(type, declarator.member_initializers());
