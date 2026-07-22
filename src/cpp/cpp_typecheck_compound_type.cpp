@@ -1285,8 +1285,22 @@ void cpp_typecheckt::typecheck_compound_declarator(
           break;
         }
 
+        // Hierarchies with VIRTUALLY-inherited bases use the flat
+        // full-object pointer convention throughout: make_ptr_typecast
+        // skips all offset adjustment for them, so every caller (the
+        // synthesized constructor/destructor chains included) passes
+        // the unadjusted object pointer, merely retyped.  A thunk that
+        // subtracted a subobject offset here would push the pointer
+        // OUTSIDE the object (N5008 [class.mi]/[class.dtor]/13 chains
+        // on iostream-shaped diamonds tripped the bounds checks on
+        // every vtable-pointer write).  Only the non-virtual
+        // multiple-inheritance case uses adjusted subobject pointers.
+        std::list<irep_idt> derived_virtual_bases;
+        get_virtual_bases(derived_struct, derived_virtual_bases);
+        const bool flat_pointer_convention = !derived_virtual_bases.empty();
+
         exprt late_cast;
-        if(!is_primary_base)
+        if(!is_primary_base && !flat_pointer_convention)
         {
           // Non-primary base: compute offset and adjust this pointer
           const irep_idt vt_ptr_name =
