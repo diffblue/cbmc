@@ -1029,6 +1029,8 @@ bool Parser::isTypeSpecifier()
          t == TOK_UNION || t == TOK_ENUM || t == TOK_INTERFACE ||
          t == TOK_TYPENAME || t == TOK_TYPEOF || t == TOK_DECLTYPE ||
          t == TOK_UNDERLYING_TYPE || t == TOK_GCC_BUILTIN_REMOVE_CV ||
+         t == TOK_GCC_BUILTIN_REMOVE_CONST ||
+         t == TOK_GCC_BUILTIN_REMOVE_VOLATILE ||
          t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
          t == TOK_GCC_BUILTIN_REMOVE_CVREF ||
          t == TOK_GCC_BUILTIN_REMOVE_POINTER ||
@@ -3891,6 +3893,7 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
   }
   else if(
     t == TOK_GCC_BUILTIN_REMOVE_CV || t == TOK_GCC_BUILTIN_REMOVE_REFERENCE ||
+    t == TOK_GCC_BUILTIN_REMOVE_CONST || t == TOK_GCC_BUILTIN_REMOVE_VOLATILE ||
     t == TOK_GCC_BUILTIN_REMOVE_CVREF || t == TOK_GCC_BUILTIN_REMOVE_POINTER ||
     t == TOK_GCC_BUILTIN_REMOVE_EXTENT ||
     t == TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS ||
@@ -3905,6 +3908,10 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 
     if(t == TOK_GCC_BUILTIN_REMOVE_CV)
       p = typet(ID_remove_cv);
+    else if(t == TOK_GCC_BUILTIN_REMOVE_CONST)
+      p = typet(ID_remove_const);
+    else if(t == TOK_GCC_BUILTIN_REMOVE_VOLATILE)
+      p = typet(ID_remove_volatile);
     else if(t == TOK_GCC_BUILTIN_REMOVE_REFERENCE)
       p = typet(ID_remove_reference);
     else if(t == TOK_GCC_BUILTIN_REMOVE_POINTER)
