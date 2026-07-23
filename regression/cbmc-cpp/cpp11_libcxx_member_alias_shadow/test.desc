@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ class with shadowed member alias converts: SUCCESS$
@@ -12,3 +12,4 @@ Member alias `iterator` unresolvable in libc++ mode when a same-named
 class template is forward-declared at namespace scope; emitted
 diagnostic is also swallowed (run still succeeds).  Root of the
 *_libcxx vector-family failures (__split_buffer).
+Fixed 2026-07-23 (libc++ fix round; see the five src commits).

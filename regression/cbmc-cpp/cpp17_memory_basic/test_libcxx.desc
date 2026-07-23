@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp17 --stdlib libc++
 ^VERIFICATION
@@ -11,3 +11,4 @@ Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
 libc++ <memory>/unique_ptr: symbolic execution aborts with
 'goto_symext::address_arithmetic does not handle struct'
 (__compressed_pair-shaped address arithmetic reaches symex).
+Fixed 2026-07-23 (libc++ fix round; see the five src commits).
