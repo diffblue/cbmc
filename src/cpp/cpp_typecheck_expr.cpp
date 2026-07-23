@@ -5831,11 +5831,41 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       if(has_dtor)
       {
         exprt temporary;
-        new_temporary(
-          arg_it->source_location(),
-          parameter.type(),
-          already_typechecked_exprt{*arg_it},
-          temporary);
+        if(
+          arg_it->id() == ID_initializer_list &&
+          !has_viable_init_list_constructor(parameter.type(), *arg_it))
+        {
+          // N5008 [over.match.list]/1: list-initializing the by-value
+          // parameter's temporary considers initializer-list
+          // constructors with the list as a single argument only in
+          // phase 1; otherwise the ELEMENTS are the constructor
+          // arguments (phase 2).  Passing the raw list as one argument
+          // made overload resolution pick the copy constructor and
+          // then fail converting the first element to the class's
+          // reference ([over.best.ics.general]/4 forbids that user
+          // conversion for constructor candidates): `take({2, a})`
+          // with itemt(int, const valt&) mispaired 2 -> const valt&.
+          exprt::operandst element_ops;
+          element_ops.reserve(arg_it->operands().size());
+          for(auto &element : arg_it->operands())
+          {
+            typecheck_expr(element);
+            element_ops.push_back(already_typechecked_exprt{element});
+          }
+          new_temporary(
+            arg_it->source_location(),
+            parameter.type(),
+            element_ops,
+            temporary);
+        }
+        else
+        {
+          new_temporary(
+            arg_it->source_location(),
+            parameter.type(),
+            already_typechecked_exprt{*arg_it},
+            temporary);
+        }
         arg_it->swap(temporary);
       }
     }
