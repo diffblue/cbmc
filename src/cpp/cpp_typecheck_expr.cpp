@@ -572,12 +572,26 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       else
       {
         exprt tmp;
-        symbol_exprt from(irep_idt(), t1);
+        // N5008 [meta.rel]/[meta.unary.prop]: the trait is defined via
+        // declval<From>(), which is an LVALUE of the underlying type
+        // when From is an lvalue reference (reference collapsing,
+        // [dcl.ref]/6) and an xvalue otherwise -- in either case the
+        // synthesised operand's TYPE is the underlying (non-reference)
+        // type; expressions never have reference type
+        // ([expr.type]/1).  A reference-typed operand tripped
+        // reference_binding's precondition (libc++'s <functional>
+        // instantiates __is_convertible with reference types).
+        typet from_type = t1;
+        if(is_reference(from_type))
+          from_type = to_reference_type(from_type).base_type();
+        symbol_exprt from(irep_idt(), from_type);
         // [meta.unary.prop], [over.match.copy]/1: the synthesised declval<>()
         // operand is a class prvalue that may need to bind as the implicit
         // object argument of a source-side conversion function; mark it so
         // reference_binding materialises a temporary for that `this` binding.
         from.set(ID_C_temporary_avoided, true);
+        if(is_reference(t1) && !is_rvalue_reference(t1))
+          from.set(ID_C_lvalue, true);
         if(implicit_conversion_sequence(from, t2, tmp))
           expr = true_exprt();
         else
@@ -600,8 +614,14 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         else
         {
           exprt tmp;
-          symbol_exprt from(irep_idt(), t2);
+          // See the declval note in __is_convertible above.
+          typet from_type = t2;
+          if(is_reference(from_type))
+            from_type = to_reference_type(from_type).base_type();
+          symbol_exprt from(irep_idt(), from_type);
           from.set(ID_C_temporary_avoided, true);
+          if(is_reference(t2) && !is_rvalue_reference(t2))
+            from.set(ID_C_lvalue, true);
           if(implicit_conversion_sequence(from, dest, tmp))
             expr = true_exprt();
           else
@@ -675,12 +695,18 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       else
       {
         exprt tmp;
-        symbol_exprt from(irep_idt(), t1);
+        // See the declval note in __is_convertible above.
+        typet from_type = t1;
+        if(is_reference(from_type))
+          from_type = to_reference_type(from_type).base_type();
+        symbol_exprt from(irep_idt(), from_type);
         // [meta.unary.prop], [over.match.copy]/1: the synthesised declval<>()
         // operand is a class prvalue that may need to bind as the implicit
         // object argument of a source-side conversion function; mark it so
         // reference_binding materialises a temporary for that `this` binding.
         from.set(ID_C_temporary_avoided, true);
+        if(is_reference(t1) && !is_rvalue_reference(t1))
+          from.set(ID_C_lvalue, true);
         if(implicit_conversion_sequence(from, t2, tmp))
           expr = true_exprt();
         else
