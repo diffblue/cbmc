@@ -3878,3 +3878,36 @@ FOUR fixed, one sharpened:
    context.  Deferred.
 Suites: cbmc-cpp green (100 skipped), cbmc CORE green, unit-proofs
 green.
+
+## Post-fix capture sweep (2026-07-22 night)
+
+Re-survey after the five-fix round PAYS: three fresh minimals, one
+72-line TU replacement, two incidental discoveries.
+- abstract_env: shared_ptr NSDMI ambiguity GONE (two-phase list-init
+  fixed it); next layer = braced arg skipping ref-binding for
+  NON-FIRST ctor reference params (cpp11_braced_arg_ref_param_second,
+  header-free 30 lines; delta_view.push_back({k, v1, v2}) shape;
+  first-position ref works!).
+- vector<pair<T,U>>::emplace_back with non-default-constructible T
+  fails ALONE (cpp17_vector_emplace_nondefault_pair, std-only) --
+  constrained pair ctor evaluates hard instead of SFINAE-discard.
+  Likely the umap-emplace family root; also under sharing_node's
+  pair<ssa_exprt, size_t>.
+- goto_symex_state.h header KNOWNBUG replaced by 72-line reduction:
+  goto_statet base + vector<threadt> + DEFAULTED COPY CTOR demands
+  symbol_exprt() (no default ctor) + inaccessible goto_statet().
+  TECHNIQUE: greedy block-drop bisection (split on blank lines,
+  g++-gate first, then cbmc-gate) converges where cvise stalls at
+  80s/eval -- 43 blocks -> 6 in ~35 min.
+- optional_requires_ctor_pair REGRESSION-SHAPE CHANGE: failure went
+  SILENT (statement + successors dropped from main, 0 properties,
+  vacuous SUCCESS).  The desc's assertion-line pattern caught it --
+  vindicates the non-vacuousness rule.  Silent statement-dropping is
+  itself a to-fix defect.
+- template_arg_completed_later ctor variant = SIGABRT
+  (symex_assign invariant) -- filed separately (..._ctor).
+- abstract_env two-file SEGFAULT relocated: now in
+  typecheck_member_initializer, 17 frames (real null deref, NOT stack
+  overflow); PRE-EXISTING (A/B-verified against pre-NSDMI
+  cpp_typecheck_code.cpp).  Needs a RelWithDebInfo build to pin.
+Suites: cbmc-cpp green, 98 skipped (100 - 5 flips + 3 new KNOWNBUGs).
