@@ -183,6 +183,16 @@ void goto_convert_functionst::convert_function(
       impl = "__delete_array";
     else if(has_prefix(sname, "operatorcpp_delete("))
       impl = "__delete";
+    else if(sname == "__builtin_operator_new")
+    {
+      // Clang's intrinsic with the semantics of ::operator new
+      // ([new.delete.single]; used by libc++'s __libcpp_allocate).
+      // Without a body its nondet result made every libc++ container
+      // allocation potentially null.
+      impl = "__new";
+    }
+    else if(sname == "__builtin_operator_delete")
+      impl = "__delete";
     if(!impl.empty() && symbol_table.has_symbol(impl))
     {
       const symbolt &impl_sym = symbol_table.lookup_ref(impl);
