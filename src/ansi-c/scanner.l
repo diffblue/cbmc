@@ -1403,6 +1403,16 @@ enable_or_disable ("enable"|"disable")
                     TOK_GCC_BUILTIN_REMOVE_CV);
                 }
 
+"__remove_const" { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_CONST);
+                }
+
+"__remove_volatile" { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_VOLATILE);
+                }
+
 "__remove_reference" { return conditional_keyword(
                     PARSER.gcc13_type_traits,
                     TOK_GCC_BUILTIN_REMOVE_REFERENCE);

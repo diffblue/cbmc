@@ -949,6 +949,8 @@ IREP_ID_ONE(bit_cast)
 
 IREP_ID_ONE(spaceship)
 IREP_ID_ONE(remove_cv)
+IREP_ID_ONE(remove_const)
+IREP_ID_ONE(remove_volatile)
 IREP_ID_ONE(remove_reference)
 IREP_ID_ONE(remove_cvref)
 IREP_ID_ONE(remove_pointer)

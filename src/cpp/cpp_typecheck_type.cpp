@@ -430,6 +430,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(
     type.id() == ID_remove_cv || type.id() == ID_remove_reference ||
+    type.id() == ID_remove_const || type.id() == ID_remove_volatile ||
     type.id() == ID_remove_cvref || type.id() == ID_remove_pointer ||
     type.id() == ID_remove_extent || type.id() == ID_remove_all_extents ||
     type.id() == ID_add_lvalue_reference ||
@@ -443,6 +444,15 @@ void cpp_typecheckt::typecheck_type(typet &type)
       tmp_type.remove(ID_C_constant);
       tmp_type.remove(ID_C_volatile);
     }
+
+    // N5008 [meta.trans.cv]/2-3: remove_const removes only the
+    // top-level const, remove_volatile only the top-level volatile
+    // (clang's __remove_const/__remove_volatile builtins, used by
+    // libc++'s __remove_const_t in <__atomic/cxx_atomic_impl.h>).
+    if(type.id() == ID_remove_const)
+      tmp_type.remove(ID_C_constant);
+    if(type.id() == ID_remove_volatile)
+      tmp_type.remove(ID_C_volatile);
 
     if(type.id() == ID_remove_reference || type.id() == ID_remove_cvref)
     {

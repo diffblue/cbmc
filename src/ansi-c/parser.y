@@ -151,6 +151,8 @@ int yyansi_cerror(const std::string &error);
 %token TOK_TYPEOF      "typeof"
 %token TOK_GCC_AUTO_TYPE "__auto_type"
 %token TOK_GCC_BUILTIN_REMOVE_CV "__remove_cv"
+%token TOK_GCC_BUILTIN_REMOVE_CONST "__remove_const"
+%token TOK_GCC_BUILTIN_REMOVE_VOLATILE "__remove_volatile"
 %token TOK_GCC_BUILTIN_REMOVE_REFERENCE "__remove_reference"
 %token TOK_GCC_BUILTIN_REMOVE_CVREF "__remove_cvref"
 %token TOK_GCC_BUILTIN_REMOVE_POINTER "__remove_pointer"
