@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ braced arg binds later ref param: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A braced argument's conversion to a class type skips the address-of
+insertion when binding a reference constructor parameter that is not
+the first parameter.  From sharing_map.h get_delta_view; blocks the
+abstract_environment dog-food TU.

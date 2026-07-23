@@ -18,3 +18,6 @@ state); each call converts fine alone.  A header-free replica of the
 _Select1st shape passes -- the full hashtable context is required.
 From restrict_function_pointers.cpp's
 merge_function_pointer_restrictions; blocks that dog-food TU.
+See also cpp17_vector_emplace_nondefault_pair: a SINGLE emplace_back
+already fails when the pair has a non-default-constructible member
+(constrained-pair-constructor family, [temp.deduct]/8).
