@@ -5789,9 +5789,34 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       // call results), take its address to create the reference binding.
       // For side_effect (function call) results, the result is
       // materialized as a temporary by the GOTO conversion.
-      exprt addr = address_of_exprt(*arg_it);
-      addr.type() = parameter.type();
-      arg_it->swap(addr);
+      //
+      // A struct-literal PRVALUE (a struct_exprt, e.g. libc++'s
+      // `__default_init_tag()` passed to __compressed_pair's
+      // forwarding-reference constructor) has no storage to point at:
+      // [class.temporary]/3, [dcl.init.ref]/5.4 require materializing
+      // a temporary first.  A raw address-of over the literal reached
+      // symbolic execution and aborted address_arithmetic.
+      if(arg_it->id() == ID_struct)
+      {
+        // Wrap the literal in a temporary-object side effect (the
+        // GOTO conversion materializes it into addressable storage);
+        // routing through new_temporary/cpp_constructor here would
+        // re-enter overload resolution mid-argument-conversion.
+        side_effect_exprt tmp_object_expr(
+          ID_temporary_object, arg_it->type(), arg_it->source_location());
+        tmp_object_expr.copy_to_operands(*arg_it);
+        tmp_object_expr.set(ID_C_lvalue, true);
+        tmp_object_expr.set(ID_mode, ID_cpp);
+        exprt addr = address_of_exprt(tmp_object_expr);
+        addr.type() = parameter.type();
+        arg_it->swap(addr);
+      }
+      else
+      {
+        exprt addr = address_of_exprt(*arg_it);
+        addr.type() = parameter.type();
+        arg_it->swap(addr);
+      }
     }
     else if(
       parameter.type().id() == ID_struct_tag &&
