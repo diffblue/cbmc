@@ -1,18 +1,13 @@
 KNOWNBUG
 main.cpp
 --cpp17 -I ../../../src --object-bits 12
-^\[main\.assertion\.1\] line \d+ goto_symex_state\.h converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
 --
-CBMC's goto_symex_state.h does not convert (empty-argument
-symbol_exprt resolution; deleted goto_statet default ctor demanded by
-synthesized code); path_storaget::patht then has no size, blocking
-the goto-symex dog-food group.
-Update 2026-07-22: renamed.h itself converts clean after the POD-base
-mem-initializer fix; the residual "invalid initializer 'underlyingt'"
-is isolated as minimal KNOWNBUG cpp17_incomplete_template_arg_decl
-(eager instantiation for a mere function declaration).
+Reduced goto_symex_statet shape (goto_statet base + vector<threadt> +
+defaulted copy ctor): synthesized copy machinery demands a
+symbol_exprt default construction and an inaccessible goto_statet
+default constructor.  Std-only ingredient:
+cpp17_vector_emplace_nondefault_pair.

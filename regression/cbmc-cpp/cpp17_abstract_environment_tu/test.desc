@@ -18,3 +18,12 @@ Update 2026-07-22: the shared_ptr ambiguity is isolated as minimal
 KNOWNBUG cpp11_nsdmi_braced_null_ctor (NSDMI list-init with a null
 pointer constant); the two-file SEGFAULT (sharing_node
 small_shared_n_way_ptrt::is_derived) remains only here.
+Update 2026-07-22 (late): the shared_ptr NSDMI ambiguity is FIXED
+(two-phase list-init); single-file mode now fails on the braced
+delta_view item binding a later reference constructor parameter --
+minimal KNOWNBUG cpp11_braced_arg_ref_param_second -- and the
+pair<ssa_exprt,...> ingredient is std-only-minimal in
+cpp17_vector_emplace_nondefault_pair.  The two-file SEGFAULT persists,
+now crashing in cpp_typecheckt::typecheck_member_initializer (17-frame
+stack, genuine null dereference, not stack overflow; pre-existing --
+verified against the pre-NSDMI front end).
