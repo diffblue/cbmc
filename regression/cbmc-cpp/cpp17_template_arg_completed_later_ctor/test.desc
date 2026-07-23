@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ stale instance re-elaborated: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Constructor variant of cpp17_template_arg_completed_later: the stale
+incomplete-base instance reaches symex and aborts an invariant in
+symex_assign (SIGABRT) rather than erroring in the front end.

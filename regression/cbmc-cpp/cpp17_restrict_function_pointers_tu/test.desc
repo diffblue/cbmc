@@ -16,3 +16,8 @@ Update 2026-07-22: the emplace no-match is isolated as minimal
 KNOWNBUG cpp17_umap_emplace_mixed_categories; the second ingredient
 (auto&& from a const lvalue deducing the non-reference type) is
 isolated as minimal KNOWNBUG cpp11_auto_ref_ref_const_lvalue.
+Update 2026-07-22 (late): the auto&& ingredient is FIXED
+([temp.deduct.call]/3); the TU now fails ONLY on the emplace
+no-match (cpp17_umap_emplace_mixed_categories; see also the std-only
+cpp17_vector_emplace_nondefault_pair for the constrained-pair-ctor
+family).

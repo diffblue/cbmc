@@ -8,7 +8,10 @@ main.cpp
 --
 ^CONVERSION ERROR$
 --
-std::optional's _Requires'd converting-constructor pair: direct/copy
-initialization fails resolution (half-instantiated candidate), and
-using the constructed object crashes goto-symex (type-inconsistent
-assignment).  Blocks goto_convert*.cpp dog-fooding.
+Update 2026-07-22 (late): the direct-init failure is now SILENT --
+`optionalish o(e);` and every following statement of main are dropped
+from the goto program (0 properties, vacuous VERIFICATION SUCCESSFUL)
+instead of reporting "found no match".  The desc's assertion-line
+pattern catches the vacuousness.  Statement-level error recovery
+swallowing a failing declaration without a diagnostic is itself a
+defect to fix alongside the resolution failure.

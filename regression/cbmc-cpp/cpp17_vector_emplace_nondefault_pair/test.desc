@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12 --unwind 4 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ emplace_back pair with non-default-constructible member: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Instantiating vector<pair<T,U>>::emplace_back with a
+non-default-constructible T hard-fails a constrained pair constructor
+instead of discarding it ([temp.deduct]/8).  Root ingredient of the
+sharing_node pair<ssa_exprt,...> failures in the goto_symex_state and
+abstract_environment dog-food TUs.
