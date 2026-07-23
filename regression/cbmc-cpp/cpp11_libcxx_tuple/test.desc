@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
@@ -7,3 +7,7 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
+libc++ <tuple>: member typedef _BaseT unknown during tuple_element
+instantiation, cascading to 'no match for get'; a direct
+friend-get replica passes, needs the real header machinery.
