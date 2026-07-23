@@ -3911,3 +3911,35 @@ Re-survey after the five-fix round PAYS: three fresh minimals, one
   overflow); PRE-EXISTING (A/B-verified against pre-NSDMI
   cpp_typecheck_code.cpp).  Needs a RelWithDebInfo build to pin.
 Suites: cbmc-cpp green, 98 skipped (100 - 5 flips + 3 new KNOWNBUGs).
+
+## First full libc++ run + compile-only guards (2026-07-23)
+
+Dropping -X libcxx: 26 failures / 8 classes.  FIXED the crash class
+(6 core dumps): __is_convertible/__is_assignable/nothrow twin
+synthesized declval probes with RAW reference types -> tripped
+reference_binding precondition; __is_constructible had the correct
+unwrap+lvalue-mark logic ALL ALONG -- copy it ([meta.rel],
+[expr.type]/1).  4 tests recovered (one also needed --object-bits).
+Two NEW minimal-root KNOWNBUGs:
+- cpp11_libcxx_member_alias_shadow: `using iterator = ...` inside a
+  class UNRESOLVABLE iff a same-named class template is fwd-declared
+  at namespace scope AND --stdlib libc++ mode (parser flavor!)  --
+  plain mode fine, non-std namespace still fires.  AND the emitted
+  diagnostic is SWALLOWED (VERIFICATION SUCCESSFUL anyway) -- gate
+  such tests on the diagnostic text via the forbidden-pattern desc
+  section.  Root of 9 vector-family tests.
+- cpp20_constraint_substitution_failure: WRONG CODE -- substitution
+  failure in a concept-id's argument ([temp.constr.atomic]/3) keeps
+  the constrained overload viable and SELECTED.  Root of 6 cpp20
+  tests.  CVISE DRIFT LESSON x2: reductions land on clang-only
+  extensions (`vector<int>;` statement) or g++/clang concept
+  divergences -- when the dual gate is impossible on preprocessed
+  libc++ (clang builtins), pin the INSTANTIATION CONTEXT line in the
+  gate and hand-validate the final artifact.
+Remaining classes tagged in-place: address_arithmetic symex abort (4),
+tuple _BaseT (2), __tree __pair1_ (1), ranges unary-invariant (1).
+regression/cpp: goto-cc compile-only suite; added twins for the two
+BMC-scaling KNOWNBUGs (ofstream_from_string, regex_match_compile) --
+pattern to keep: every scaling-limited KNOWNBUG should have a
+compile-only guard.  regression/cpp + ansi-c suites green (2
+pre-existing clang_target failures).
