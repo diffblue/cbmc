@@ -222,6 +222,26 @@ simplify_exprt::simplify_ffs(const find_first_set_exprt &expr)
   return from_integer(first_one_bit, expr.type());
 }
 
+/// The cprover_string_*_func built-ins are also used with operands other than
+/// refined_string_exprt, e.g., SMT-LIB-native (ID_string-typed) ones (see
+/// smt2_convt). Only refined_string_exprt operands can be simplified here.
+/// \return True iff \p expr has at least \p min_arity arguments and its first
+///   \p n_strings arguments are refined_string_exprt.
+static bool has_refined_string_arguments(
+  const function_application_exprt &expr,
+  std::size_t n_strings,
+  std::size_t min_arity)
+{
+  PRECONDITION(n_strings <= min_arity);
+  const auto &arguments = expr.arguments();
+  return arguments.size() >= min_arity &&
+         std::all_of(
+           arguments.begin(),
+           std::next(arguments.begin(), n_strings),
+           [](const exprt &e)
+           { return can_cast_expr<refined_string_exprt>(e); });
+}
+
 /// Simplify String.endsWith function when arguments are constant
 /// \param expr: the expression to simplify
 /// \param ns: namespace
@@ -230,6 +250,9 @@ static simplify_exprt::resultt<> simplify_string_endswith(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
+  if(!has_refined_string_arguments(expr, 2, 2))
+    return simplify_exprt::unchanged(expr);
+
   const refined_string_exprt &s1 = to_string_expr(expr.arguments().at(0));
   const auto s1_data_opt = try_get_string_data_array(s1.content(), ns);
 
@@ -258,6 +281,9 @@ static simplify_exprt::resultt<> simplify_string_contains(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
+  if(!has_refined_string_arguments(expr, 2, 2))
+    return simplify_exprt::unchanged(expr);
+
   // We want to get both arguments of any starts-with comparison, and
   // trace them back to the actual string instance. All variables on the
   // way must be constant for us to be sure this will work.
@@ -303,10 +329,10 @@ static simplify_exprt::resultt<> simplify_string_is_empty(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
-  const function_application_exprt &function_app =
-    to_function_application_expr(expr);
-  const refined_string_exprt &s =
-    to_string_expr(function_app.arguments().at(0));
+  if(!has_refined_string_arguments(expr, 1, 1))
+    return simplify_exprt::unchanged(expr);
+
+  const refined_string_exprt &s = to_string_expr(expr.arguments().at(0));
 
   if(!s.length().is_constant())
     return simplify_exprt::unchanged(expr);
@@ -328,6 +354,9 @@ static simplify_exprt::resultt<> simplify_string_compare_to(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
+  if(!has_refined_string_arguments(expr, 2, 2))
+    return simplify_exprt::unchanged(expr);
+
   const refined_string_exprt &s1 = to_string_expr(expr.arguments().at(0));
   const auto s1_data_opt = try_get_string_data_array(s1.content(), ns);
 
@@ -378,6 +407,9 @@ static simplify_exprt::resultt<> simplify_string_index_of(
   const namespacet &ns,
   const bool search_from_end)
 {
+  if(!has_refined_string_arguments(expr, 1, 2))
+    return simplify_exprt::unchanged(expr);
+
   std::size_t starting_index = 0;
 
   // Determine starting index for the comparison (if given)
@@ -522,6 +554,9 @@ static simplify_exprt::resultt<> simplify_string_char_at(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
+  if(!has_refined_string_arguments(expr, 1, 2))
+    return simplify_exprt::unchanged(expr);
+
   if(!expr.arguments().at(1).is_constant())
   {
     return simplify_exprt::unchanged(expr);
@@ -590,6 +625,9 @@ static simplify_exprt::resultt<> simplify_string_equals_ignore_case(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
+  if(!has_refined_string_arguments(expr, 2, 2))
+    return simplify_exprt::unchanged(expr);
+
   // We want to get both arguments of any starts-with comparison, and
   // trace them back to the actual string instance. All variables on the
   // way must be constant for us to be sure this will work.
@@ -635,6 +673,9 @@ static simplify_exprt::resultt<> simplify_string_startswith(
   const function_application_exprt &expr,
   const namespacet &ns)
 {
+  if(!has_refined_string_arguments(expr, 2, 2))
+    return simplify_exprt::unchanged(expr);
+
   // We want to get both arguments of any starts-with comparison, and
   // trace them back to the actual string instance. All variables on the
   // way must be constant for us to be sure this will work.
