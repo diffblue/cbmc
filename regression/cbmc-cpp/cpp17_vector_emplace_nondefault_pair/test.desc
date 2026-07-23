@@ -12,3 +12,12 @@ non-default-constructible T hard-fails a constrained pair constructor
 instead of discarding it ([temp.deduct]/8).  Root ingredient of the
 sharing_node pair<ssa_exprt,...> failures in the goto_symex_state and
 abstract_environment dog-food TUs.
+Diagnosis 2026-07-23: during emplace_back's instantiation, pair's
+SFINAE-constrained default constructor instance (stl_pair.h:544,
+gated on is_default_constructible) is eagerly converted although
+never odr-used ([temp.inst]/4,/11); its mem-initializer `first()`
+finds no symbolish ctor.  The nested failure is swallowed per
+function, but emplace_back's own candidate is lost and the
+[temp.deduct]/8 all-templates-failed path escalates via
+pending_no_viable_call at depth 0.  push_back with an explicit pair
+WORKS -- only the member-template instantiation path is affected.

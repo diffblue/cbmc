@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions --object-bits 12
 ^VERIFICATION
@@ -15,3 +15,4 @@ libc++ vector family: member alias `iterator` unresolvable when a
 same-named class template is forward-declared at namespace scope
 (__split_buffer); minimal root KNOWNBUG
 cpp11_libcxx_member_alias_shadow.
+Fixed 2026-07-23 (libc++ fix round; see the five src commits).
