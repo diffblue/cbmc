@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp11 --unwind 5 --no-unwinding-assertions --stdlib libc++
 ^VERIFICATION
@@ -8,3 +8,7 @@ main.cpp
 ^PARSING ERROR$
 libc++ container member access fails with incomplete type due to
 deferred template elaboration.
+Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
+libc++ <set>: "invalid initializer '__pair1_'" in __tree
+(mem-initializer naming a member of a compressed-pair base;
+__tree line 1341).

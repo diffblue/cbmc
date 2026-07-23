@@ -1,0 +1,11 @@
+CORE
+main.cpp
+-std=c++11
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Compile-only twin of regression/cbmc-cpp/cpp11_regex_match (KNOWNBUG
+there for BMC scaling only); guards the front end.

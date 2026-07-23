@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ unsatisfied constraint, not an error: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Substitution failure inside a concept-id's argument must make the
+atomic constraint unsatisfied ([temp.constr.atomic]/3); CBMC keeps
+the constrained overload viable and selects it (wrong code).  Root of
+the cpp20 *_libcxx failures (same_as inside common_reference_with).
