@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
@@ -2976,6 +2977,62 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
                   static_cast<cpp_scopet &>(*it->second));
                 found = true;
                 break;
+              }
+            }
+            // MEMBER typedefs are stored as struct components, not
+            // standalone symbols ([class.member.lookup]); follow the
+            // parent class's component to the underlying scope exactly
+            // as filter_for_named_scopes does on the slow path.
+            // Without this, a member alias chain such as libc++
+            // __split_buffer's `typedef allocator_traits
+            // __alloc_traits; using iterator = __alloc_traits::
+            // pointer;` bailed out here, the alias stayed
+            // unregistered, and the field declaration `iterator end;`
+            // resolved to the namespace-scope std::iterator template
+            // instead.
+            if(
+              sym == nullptr && id_ptr->is_member &&
+              config.ansi_c.preprocessor ==
+                configt::ansi_ct::preprocessort::CLANG)
+            {
+              const cpp_idt &parent = id_ptr->get_parent();
+              const auto *class_sym =
+                cpp_typecheck.symbol_table.lookup(parent.identifier);
+              if(class_sym != nullptr && class_sym->type.id() == ID_struct)
+              {
+                const struct_typet::componentt *chosen = nullptr;
+                for(const auto &comp :
+                    to_struct_type(class_sym->type).components())
+                {
+                  if(!(comp.get_base_name() == id_ptr->base_name &&
+                       comp.get_bool(ID_is_type)))
+                    continue;
+                  if(comp.get_name() == id_ptr->identifier)
+                  {
+                    chosen = &comp;
+                    break;
+                  }
+                  if(
+                    chosen == nullptr || (chosen->get_bool(ID_from_base) &&
+                                          !comp.get_bool(ID_from_base)))
+                  {
+                    chosen = &comp;
+                  }
+                }
+                if(chosen != nullptr && chosen->type().id() == ID_struct_tag)
+                {
+                  auto it = cpp_typecheck.cpp_scopes.id_map.find(
+                    to_struct_tag_type(chosen->type()).get_identifier());
+                  if(
+                    it != cpp_typecheck.cpp_scopes.id_map.end() &&
+                    it->second->is_scope)
+                  {
+                    cpp_typecheck.cpp_scopes.go_to(
+                      static_cast<cpp_scopet &>(*it->second));
+                    found = true;
+                    break;
+                  }
+                }
               }
             }
           }
