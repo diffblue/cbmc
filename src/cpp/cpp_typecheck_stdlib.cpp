@@ -1888,6 +1888,125 @@ void cpp_typecheckt::provide_stdlib_bodies()
       deferred_typechecking.erase(symbol.name);
     }
     else if(
+      (base == "logic_error" || base == "runtime_error" ||
+       base == "~logic_error" || base == "~runtime_error" ||
+       base == "~length_error" || base == "~out_of_range" ||
+       base == "~invalid_argument" || base == "~domain_error" ||
+       base == "~range_error" || base == "~overflow_error" ||
+       base == "~underflow_error") &&
+      name.find("std::") == 0 && symbol.value.is_nil())
+    {
+      // libc++ defines these exception constructors/destructors in its
+      // compiled library (_LIBCPP_EXPORTED_FROM_ABI); libstdc++'s are
+      // header-inline.  [stdexcept]: the constructors store the
+      // message (observable only through what()); an empty body is a
+      // sufficient model for verification of non-throwing paths, and
+      // throwing paths fail visibly at the throw itself.
+      ensure_parameter_symbols(symbol, symbol_table);
+      symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+    }
+    else if(
+      base == "max_size" && symbol.value.is_nil() &&
+      name.find("vector<") != std::string::npos &&
+      to_code_type(symbol.type).return_type().id() != ID_auto &&
+      !to_code_type(symbol.type).parameters().empty())
+    {
+      // libc++'s vector::max_size (vector:603) can be left bodyless
+      // when its eager conversion is absorbed during instantiation;
+      // __recommend then calls a no-body function and every push_back
+      // havocs.  [vector.capacity]/1 with the default allocator
+      // ([allocator.traits.members]/6: SIZE_MAX / sizeof(value_type),
+      // capped by numeric_limits<difference_type>::max()): synthesize
+      // exactly that constant.
+      const typet &ret = to_code_type(symbol.type).return_type();
+      const typet &this_t = to_code_type(symbol.type).parameters()[0].type();
+      if(
+        ret.id() == ID_unsignedbv && this_t.id() == ID_pointer &&
+        to_pointer_type(this_t).base_type().id() == ID_struct_tag)
+      {
+        const symbolt *class_sym = symbol_table.lookup(
+          to_struct_tag_type(to_pointer_type(this_t).base_type())
+            .get_identifier());
+        if(
+          class_sym != nullptr &&
+          class_sym->type.find(ID_C_template_arguments).is_not_nil())
+        {
+          const auto &targs = static_cast<const cpp_template_args_tct &>(
+            class_sym->type.find(ID_C_template_arguments));
+          if(!targs.arguments().empty() && targs.arguments()[0].id() == ID_type)
+          {
+            auto elem_size = size_of_expr(targs.arguments()[0].type(), ns);
+            const auto elem_size_int = elem_size.has_value()
+                                         ? numeric_cast<mp_integer>(*elem_size)
+                                         : std::optional<mp_integer>{};
+            if(elem_size_int.has_value() && *elem_size_int > 0)
+            {
+              const std::size_t width = to_unsignedbv_type(ret).get_width();
+              const mp_integer size_max = power(2, width) - 1;
+              const mp_integer ptrdiff_max = power(2, width - 1) - 1;
+              const mp_integer value =
+                std::min(size_max / *elem_size_int, ptrdiff_max);
+              code_blockt block;
+              block.add(code_frontend_returnt{from_integer(value, ret)});
+              ensure_parameter_symbols(symbol, symbol_table);
+              symbol.value = std::move(block);
+              symbol.value.type() = symbol.type;
+              deferred_typechecking.erase(symbol.name);
+            }
+          }
+        }
+      }
+    }
+    else if(
+      base.find("__libcpp_operator_new") == 0 && name.find("std::") == 0 &&
+      symbol.value.is_nil())
+    {
+      // libc++'s allocation trampoline (new:269) forwards a variadic
+      // pack to clang's __builtin_operator_new; the instance can be
+      // left bodyless when its eager conversion is absorbed by
+      // candidate matching, so every container allocation returned an
+      // unconstrained (possibly null) pointer.  Its semantics are
+      // those of ::operator new ([new.delete.single]: returns a
+      // non-null pointer to storage of the requested size, or
+      // throws); model it with CBMC's allocator, exactly as
+      // allocator_traits::allocate above.
+      const code_typet &fn_type = to_code_type(symbol.type);
+      const auto &params = fn_type.parameters();
+      if(!params.empty())
+      {
+        const symbol_exprt size_expr(
+          params[0].get_identifier(), params[0].type());
+        const typet ret_type = pointer_type(empty_typet{});
+        side_effect_exprt alloc{
+          ID_allocate, {size_expr, false_exprt()}, ret_type, symbol.location};
+        code_blockt block;
+        block.add(code_frontend_returnt(alloc));
+        ensure_parameter_symbols(symbol, symbol_table);
+        // The return type may still carry an undeduced `auto`
+        // (the failed conversion never deduced it); pin it to void*.
+        to_code_type(symbol.type).return_type() = ret_type;
+        symbol.value = std::move(block);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
+      base.find("__libcpp_operator_delete") == 0 && name.find("std::") == 0 &&
+      symbol.value.is_nil())
+    {
+      // ::operator delete semantics; no-op for verification, exactly
+      // as allocator_traits::deallocate above.
+      code_blockt block;
+      ensure_parameter_symbols(symbol, symbol_table);
+      if(to_code_type(symbol.type).return_type().id() == ID_auto)
+        to_code_type(symbol.type).return_type() = empty_typet{};
+      symbol.value = std::move(block);
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+    }
+    else if(
       base == "allocate" && name.find("__new_allocator") != std::string::npos)
     {
       // __new_allocator::allocate(n) — GCC 15+ calls this directly.
