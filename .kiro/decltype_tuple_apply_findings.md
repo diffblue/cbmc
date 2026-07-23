@@ -3943,3 +3943,36 @@ BMC-scaling KNOWNBUGs (ofstream_from_string, regex_match_compile) --
 pattern to keep: every scaling-limited KNOWNBUG should have a
 compile-only guard.  regression/cpp + ansi-c suites green (2
 pre-existing clang_target failures).
+
+## Libc++ fix round (2026-07-23)
+
+FIVE src commits, FIFTEEN CORE flips (oldest-standard-first order).
+1. By-value braced args: THIRD copy of the [over.match.list]/1
+   two-phase logic (block-scope, member-init, now by-value param
+   temporaries).  Mispairing signature: error names the FIRST element
+   against a LATER param's type (copy-ctor selected with whole list).
+2. Struct-literal rvalue-ref args: materialize via ID_temporary_object
+   side effect.  CRITICAL LESSON: new_temporary/cpp_constructor
+   INSIDE argument conversion re-enters overload resolution --
+   crashed (SEGV follow_tag) on nested braced map pairs.  Bisect
+   lesson: a batch of uncommitted changes must be bisected by
+   disabling ONE AT A TIME and re-enabling; the crash pointed at the
+   WRONG suspect for four rounds.
+3. libc++ fast-path ('::' navigation under suppress_elaborate) missed
+   MEMBER typedefs (stored as struct components, not symbols) --
+   ported filter_for_named_scopes' component-following; CLANG-gated.
+4. __remove_const/__remove_volatile clang builtins: full 5-file
+   plumbing (irep_ids, parser.y, scanner.l clang-gated, parse.cpp,
+   typecheck_type [meta.trans.cv]).
+5. libc++ allocation models: __libcpp_operator_new -> ID_allocate;
+   __builtin_operator_new -> __new at goto conversion; stdexcept
+   ctors/dtors empty ([stdexcept]); vector::max_size constant
+   ([vector.capacity]/1, [allocator.traits.members]/6).  Chain-debug
+   technique: temporarily route sfinae_contextt messages to the real
+   handler (CBMC_DBG) to read SWALLOWED errors -- exposed the whole
+   cascade (remove_const -> atomics void/bool -> operator_new).
+Remaining libc++: tuple _BaseT (2), set comparator null-ref (deeper
+layer; object-bits needed in desc), cpp20 concepts class.
+Emplace family diagnosis sharpened: eager conversion of pair's
+CONSTRAINED default ctor ([temp.inst]/11 violation) poisons
+emplace_back's candidate via pending_no_viable_call at depth 0.
