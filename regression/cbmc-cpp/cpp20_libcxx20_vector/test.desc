@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions
 ^VERIFICATION
@@ -7,3 +7,9 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
+C++20 concepts: substitution failure inside a concept-id's argument
+must yield an unsatisfied constraint ([temp.constr.atomic]/3), not a
+hard 'no match for same_as'; minimal WRONG-CODE root KNOWNBUG
+cpp20_constraint_substitution_failure.  cpp20_ranges_basic
+additionally aborts a unary-operand invariant (std_expr.h:380).

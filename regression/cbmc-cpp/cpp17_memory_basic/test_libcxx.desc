@@ -1,4 +1,4 @@
-CORE libcxx
+KNOWNBUG libcxx
 main.cpp
 --cpp17 --stdlib libc++
 ^VERIFICATION
@@ -7,3 +7,7 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
+libc++ <memory>/unique_ptr: symbolic execution aborts with
+'goto_symext::address_arithmetic does not handle struct'
+(__compressed_pair-shaped address arithmetic reaches symex).
