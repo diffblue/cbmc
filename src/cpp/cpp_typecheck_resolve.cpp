@@ -1241,9 +1241,9 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 // constant -- the std::span constructors' clauses).
                 if(
                   x.id() == ID_side_effect || x.id() == ID_function_call ||
+                  x.id() == ID_cpp_name ||
                   (!whole_clause_typecheck_failed &&
-                   (x.id() == ID_cpp_name || x.id() == ID_equal ||
-                    x.id() == ID_notequal)))
+                   (x.id() == ID_equal || x.id() == ID_notequal)))
                 {
                   try
                   {
@@ -1323,6 +1323,20 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   }
                   catch(...)
                   {
+                    // N5008 [temp.constr.atomic]/3: if substitution of
+                    // the mapped arguments into the atomic constraint
+                    // fails, the constraint is NOT satisfied.  A THROW
+                    // from type-checking the substituted concept-id
+                    // atom is exactly that substitution failure (e.g.
+                    // common_reference_with<T,U> whose
+                    // common_reference_t<T,U> names no ::type) -- the
+                    // constrained overload must lose, not win by
+                    // "unknown".  CBMC-side modelling gaps instead
+                    // error-recover (diagnostics + continue), which the
+                    // atom_clean gate above already maps to "unknown",
+                    // so genuine gaps still keep the candidate.
+                    if(x.id() == ID_cpp_name)
+                      return 0;
                   }
                 }
                 return -1; // unknown -- conservatively keep the candidate
