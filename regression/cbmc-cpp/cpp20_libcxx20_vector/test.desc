@@ -13,3 +13,5 @@ must yield an unsatisfied constraint ([temp.constr.atomic]/3), not a
 hard 'no match for same_as'; minimal WRONG-CODE root KNOWNBUG
 cpp20_constraint_substitution_failure.  cpp20_ranges_basic
 additionally aborts a unary-operand invariant (std_expr.h:380).
+Update 2026-07-24: past the same_as front-end failure
+([temp.constr.atomic]/3 atom classification); residual: semantic FAILUREs.
