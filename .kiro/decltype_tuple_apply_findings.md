@@ -3976,3 +3976,24 @@ layer; object-bits needed in desc), cpp20 concepts class.
 Emplace family diagnosis sharpened: eager conversion of pair's
 CONSTRAINED default ctor ([temp.inst]/11 violation) poisons
 emplace_back's candidate via pending_no_viable_call at depth 0.
+
+## Tuple-chain round (2026-07-24)
+
+Commit 3fa6bff4c8: __make_integer_seq + __type_pack_element (clang
+builtin ALIAS TEMPLATES -- a new builtin category; intercepted in the
+resolver scope-walk / resolve() respectively) + member alias templates
+binding the ENCLOSING specialization's args in resolve_template_alias.
+The enclosing pre-bind needed FOUR containment iterations after
+regressing libstdc++ containers: non-overriding (live bindings win),
+primary-instances only ([temp.spec.partial]: spec params pair with
+PRIMARY args -- positional pairing binds garbage), stop at first
+parameter pack (packs need build()'s machinery), and finally
+CLANG-mode gate.  LESSON: template_map pre-binding is a blunt global
+instrument; scope it aggressively.
+PROCESS INCIDENT: probe-stripping python with multiple lazy .*? +
+re.S regexes on a 9k-line file backtracked for HOURS (cancel didn't
+kill the orphan; pgrep+kill by exact PID).  RULES: literal-string or
+line-based edits only for probe removal; timeout on every scripting
+step; check pgrep after cancels.
+Tuple residual: std::get<I>(tuple&) -- pack template-id in return
+type fails deduction-substitution in full libc++ context only.
