@@ -3186,13 +3186,24 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
               ? ma[1].type()
               : static_cast<const typet &>(static_cast<const irept &>(ma[1]));
           // The count: a constant expression in this context.
+          // The count arrives as a plain expression, or wrapped in a
+          // `type`/`ambiguous` node (a dependent name such as `N`
+          // parses as ambiguous(cpp_name)).
           exprt count = ma[2];
-          if(count.id() == ID_type)
+          if(count.id() == ID_type || count.id() == ID_ambiguous)
             count = static_cast<const exprt &>(
               static_cast<const irept &>(ma[2].type()));
-          cpp_typecheck.typecheck_expr(count);
-          simplify(count, cpp_typecheck);
-          const auto n = numeric_cast<mp_integer>(count);
+          std::optional<mp_integer> n;
+          try
+          {
+            cpp_typecheck.typecheck_expr(count);
+            simplify(count, cpp_typecheck);
+            n = numeric_cast<mp_integer>(count);
+          }
+          catch(...)
+          {
+            // dependent count: not expandable here
+          }
           irep_idt tpl_name;
           // The pack-template argument arrives as `type`,
           // `cpp_name`, or an `ambiguous` node wrapping either.
@@ -4760,7 +4771,55 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
           // arguments cover them; the leading non-pack parameters are
           // what the alias body needs from the enclosing instance.
           if(param.get_bool(ID_ellipsis))
+          {
+            // A TRAILING pack consumes all remaining arguments; bind
+            // it through the pack machinery (mirroring build()), so
+            // pack-arithmetic member alias bodies such as
+            // `iseqt<T, (Is + S)...>` can expand.  Only when the pack
+            // is the LAST parameter -- otherwise the positional
+            // pairing is ambiguous -- and only if unbound
+            // (non-overriding, as for the scalar entries).
+            if(k + 1 != enc_params.size())
+              break;
+            const irep_idt pack_id = param.id() == ID_type
+                                       ? param.type().get(ID_identifier)
+                                       : param.get(ID_identifier);
+            if(
+              pack_id.empty() ||
+              cpp_typecheck.template_map.pack_size_map.find(pack_id) !=
+                cpp_typecheck.template_map.pack_size_map.end())
+            {
+              break;
+            }
+            std::vector<typet> pack_types;
+            std::vector<exprt> pack_exprs;
+            for(std::size_t j = k; j < enc_arg_list.size(); ++j)
+            {
+              if(enc_arg_list[j].id() == ID_type)
+                pack_types.push_back(enc_arg_list[j].type());
+              else
+                pack_exprs.push_back(enc_arg_list[j]);
+            }
+            cpp_typecheck.template_map.pack_size_map[pack_id] =
+              enc_arg_list.size() - k;
+            if(!pack_types.empty())
+            {
+              if(pack_types.size() == 1)
+                cpp_typecheck.template_map.type_map[pack_id] =
+                  pack_types.front();
+              cpp_typecheck.template_map.pack_args_map[pack_id] =
+                std::move(pack_types);
+            }
+            else if(!pack_exprs.empty())
+            {
+              if(pack_exprs.size() == 1)
+                cpp_typecheck.template_map.expr_map[pack_id] =
+                  pack_exprs.front();
+              cpp_typecheck.template_map.pack_expr_map[pack_id] =
+                std::move(pack_exprs);
+            }
             break;
+          }
           const exprt &arg = enc_arg_list[k];
           if(param.id() == ID_type)
           {
