@@ -914,6 +914,7 @@ void smt2_convt::convert_address_of_rec(
 
       const std::size_t pointer_width = boolbv_width(address_of_expr.type());
       convert_pointer_arithmetic(
+        index_expr,
         address_of_expr,
         widen_pointer_arithmetic_index(
           index, boolbv_width(index.type()), pointer_width),
@@ -944,6 +945,7 @@ void smt2_convt::convert_address_of_rec(
     // pointer arithmetic
     const std::size_t pointer_width = boolbv_width(result_type);
     convert_pointer_arithmetic(
+      member_expr,
       address_of_exprt{struct_op, pointer_typet{struct_op_type, pointer_width}},
       from_integer(*offset, signedbv_typet{pointer_width + 1}),
       bytest{1});
@@ -4461,6 +4463,7 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
       element_size_opt.has_value() && *element_size_opt >= bytest{0});
 
     convert_pointer_arithmetic(
+      expr,
       *pointer,
       summands.size() == 1 ? summands.front()
                            : plus_exprt{std::move(summands), sum_type},
@@ -4474,18 +4477,28 @@ void smt2_convt::convert_plus(const plus_exprt &expr)
 /// \p element_size bytes each. The offset is computed at a width that can
 /// represent the mathematical result, which must not silently wrap around
 /// within the object when it does not fit the offset field of the pointer
-/// encoding: such results instead point to the invalid object. This mirrors
+/// encoding: such results instead point to the invalid object, at an
+/// unconstrained offset (registered for \p expr by
+/// \ref smt2_convt::find_symbols). This mirrors
 /// `bv_pointerst::offset_arithmetic`.
+/// \param expr: pointer-arithmetic expression being converted, used to look
+///   up the unconstrained offset
 /// \param pointer: pointer-typed operand
 /// \param offset: signed bit-vector typed number of elements
 /// \param element_size: size of each element in bytes
 void smt2_convt::convert_pointer_arithmetic(
+  const exprt &expr,
   const exprt &pointer,
   const exprt &offset,
   const bytest &element_size)
 {
   PRECONDITION(pointer.type().id() == ID_pointer);
   PRECONDITION(offset.type().id() == ID_signedbv);
+
+  const auto nondet_offset_it = pointer_arithmetic_offsets.find(expr);
+  INVARIANT(
+    nondet_offset_it != pointer_arithmetic_offsets.end(),
+    "pointer arithmetic should have been seen by find_symbols");
 
   const std::size_t pointer_width = boolbv_width(pointer.type());
   const std::size_t object_bits = config.bv_encoding.object_bits;
@@ -4516,8 +4529,7 @@ void smt2_convt::convert_pointer_arithmetic(
   out << "(concat ((_ extract " << pointer_width - 1 << ' ' << offset_bits
       << ") ?pointerop) ((_ extract " << offset_bits - 1 << " 0) ?offset)) ";
   out << "(concat (_ bv" << pointer_logic.get_invalid_object() << ' '
-      << object_bits << ") ((_ extract " << offset_bits - 1
-      << " 0) ?offset)))))";
+      << object_bits << ") " << nondet_offset_it->second << "))))";
   // concat, ite, let, let
 }
 
@@ -4709,6 +4721,7 @@ void smt2_convt::convert_minus(const minus_exprt &expr)
         element_size_opt.has_value() && *element_size_opt >= bytest{0});
 
       convert_pointer_arithmetic(
+        expr,
         expr.op0(),
         widen_pointer_arithmetic_index(neg_op1, neg_width, pointer_width),
         *element_size_opt);
@@ -6445,6 +6458,75 @@ void smt2_convt::find_symbols(const exprt &expr)
       convert_type(expr.type()); // return type
       out << ")\n";              // declare-fun
     }
+  }
+  else if(
+    (expr.id() == ID_plus || expr.id() == ID_minus) &&
+    expr.type().id() == ID_pointer)
+  {
+    declare_pointer_arithmetic_offset(expr, boolbv_width(expr.type()));
+  }
+  else if(expr.id() == ID_address_of)
+  {
+    find_pointer_arithmetic_in_address_of(
+      to_address_of_expr(expr).object(), boolbv_width(expr.type()));
+  }
+}
+
+/// Declare the unconstrained offset that \ref
+/// smt2_convt::convert_pointer_arithmetic uses for results of \p expr that do
+/// not fit the offset field of the pointer encoding. The declaration is a
+/// constant: when \p expr occurs within a quantifier, all instances of the
+/// bound variables share it.
+/// \param expr: pointer-arithmetic expression
+/// \param pointer_width: width of the pointer encoding
+void smt2_convt::declare_pointer_arithmetic_offset(
+  const exprt &expr,
+  std::size_t pointer_width)
+{
+  if(pointer_arithmetic_offsets.find(expr) != pointer_arithmetic_offsets.end())
+    return;
+
+  const irep_idt id = "pointer_arithmetic_offset." +
+                      std::to_string(pointer_arithmetic_offsets.size());
+  out << "; unconstrained offset of out-of-range pointer arithmetic\n";
+  out << "(declare-fun " << id << " () (_ BitVec "
+      << pointer_width - config.bv_encoding.object_bits << "))\n";
+
+  pointer_arithmetic_offsets.emplace(expr, id);
+}
+
+/// Declare the unconstrained offsets for the pointer arithmetic that \ref
+/// smt2_convt::convert_address_of_rec performs when converting the address
+/// of \p object.
+/// \param object: operand of an `address_of` expression, or a sub-expression
+///   thereof
+/// \param pointer_width: width of the pointer encoding
+void smt2_convt::find_pointer_arithmetic_in_address_of(
+  const exprt &object,
+  std::size_t pointer_width)
+{
+  if(object.id() == ID_index)
+  {
+    const index_exprt &index_expr = to_index_expr(object);
+
+    if(index_expr.index() != 0)
+      declare_pointer_arithmetic_offset(index_expr, pointer_width);
+
+    if(index_expr.array().type().id() == ID_array)
+      find_pointer_arithmetic_in_address_of(index_expr.array(), pointer_width);
+  }
+  else if(object.id() == ID_member)
+  {
+    const member_exprt &member_expr = to_member_expr(object);
+    declare_pointer_arithmetic_offset(member_expr, pointer_width);
+    find_pointer_arithmetic_in_address_of(
+      member_expr.struct_op(), pointer_width);
+  }
+  else if(object.id() == ID_if)
+  {
+    const if_exprt &if_expr = to_if_expr(object);
+    find_pointer_arithmetic_in_address_of(if_expr.true_case(), pointer_width);
+    find_pointer_arithmetic_in_address_of(if_expr.false_case(), pointer_width);
   }
 }
 
