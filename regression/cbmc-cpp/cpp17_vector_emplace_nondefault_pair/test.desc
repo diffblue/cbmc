@@ -21,3 +21,15 @@ function, but emplace_back's own candidate is lost and the
 [temp.deduct]/8 all-templates-failed path escalates via
 pending_no_viable_call at depth 0.  push_back with an explicit pair
 WORKS -- only the member-template instantiation path is affected.
+Update 2026-07-24 (mechanism pinned): the candidate SIGNATURE is
+formed with the pack homogenised -- pack_deduced_types deduces
+{symbolish, unsigned long} correctly, but the function-type expansion
+of `_Args&&...` consults pack_args_map, which is only recorded AFTER
+the type is formed (the late recording serves the return-type path),
+so the scalar type_map entry (first element) fills every copy:
+emplace_back's own signature becomes (symbolish&&, symbolish&&) and
+2ul cannot bind.  Recording the pack EARLY fixes this test but
+double-expands two-pack constructors (cpp17_tuple_get_two_pack_ctor_
+3elem): the parameter synthesis writes concrete types positionally
+AND the typecheck-time pack expansion duplicates them.  The proper
+fix is a single expansion point for deduced parameter packs.

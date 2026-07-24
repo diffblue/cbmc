@@ -3997,3 +3997,21 @@ line-based edits only for probe removal; timeout on every scripting
 step; check pgrep after cancels.
 Tuple residual: std::get<I>(tuple&) -- pack template-id in return
 type fails deduction-substitution in full libc++ context only.
+
+## Emplace-family root pinned (2026-07-24 late)
+
+The 'no match for emplace_back' is NOT the constrained-ctor
+escalation after all: probe chain (all-templates-fail -> fargs::match
+param dump) showed the candidate's own SIGNATURE homogenised --
+`_Args&&...` expanded as (symbolish&&, symbolish&&) though
+pack_deduced_types = {symbolish, unsigned long}.  Root: function-type
+formation expands parameter packs via pack_args_map, which the
+deduction records only AFTER the type is formed; the scalar
+type_map[_Args] (first element, set-once by per-element
+guess_template_args) fills every copy.  EARLY recording fixes it but
+double-expands two-pack ctor shapes (parameter synthesis writes
+positional concrete types AND pack expansion duplicates).  NEEDED: a
+single expansion point.  Reverted the experiments; kept the analysis
+here + in the desc.  Probing technique that cracked it: dump ALL
+params of the failing candidate in fargs::match on first
+no-conversion failure.
