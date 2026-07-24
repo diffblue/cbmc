@@ -11,3 +11,11 @@ Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
 libc++ <tuple>: member typedef _BaseT unknown during tuple_element
 instantiation, cascading to 'no match for get'; a direct
 friend-get replica passes, needs the real header machinery.
+Update 2026-07-24: the _BaseT chain is FIXED (__make_integer_seq +
+__type_pack_element clang builtin alias templates; member alias
+templates now bind the enclosing specialization's arguments).  The
+residual is std::get<I>(tuple&): all four overloads are rejected --
+the return type `typename tuple_element<_Ip, tuple<_Tp...>>::type&`
+(a pack template-id inside a qualified name) fails to substitute
+during deduction; a header-free replica of that shape passes, and
+pair's get works.
