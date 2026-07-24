@@ -85,6 +85,11 @@ public:
     return *parent;
   }
 
+  bool has_parent() const
+  {
+    return parent != nullptr;
+  }
+
   void set_parent(cpp_idt &_parent)
   {
     PRECONDITION(_parent.is_scope);

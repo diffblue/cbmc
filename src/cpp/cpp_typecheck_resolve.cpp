@@ -1438,10 +1438,18 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     {
       const symbolt *class_sym =
         cpp_typecheck.symbol_table.lookup(inst_class_tag);
+      // Primary-template instances only: for a PARTIAL SPECIALIZATION
+      // instance, ID_C_template holds the specialization's own
+      // parameter list while ID_C_template_arguments holds the
+      // PRIMARY template's argument list ([temp.spec.partial]) --
+      // pairing them positionally binds garbage (e.g. _Types :=
+      // tuple<int> instead of {int} for
+      // tuple_element<__i, tuple<_Types...>>).
       if(
         class_sym != nullptr &&
         class_sym->type.find(ID_C_template).is_not_nil() &&
-        class_sym->type.find(ID_C_template_arguments).is_not_nil())
+        class_sym->type.find(ID_C_template_arguments).is_not_nil() &&
+        class_sym->type.get(ID_specialization_of).empty())
       {
         cpp_typecheck.template_map.build(
           static_cast<const template_typet &>(
@@ -3155,6 +3163,83 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
       if(template_args.is_not_nil())
       {
+        // Clang's builtin alias template
+        // `__make_integer_seq<Tpl, T, N>` names `Tpl<T, 0, ..., N-1>`
+        // (the compiler-accelerated backing of [intseq.make]; libc++'s
+        // tuple indices are built on it).  It is not an ordinary
+        // template, so rewrite the name to the expanded template-id
+        // before the scope lookup would fail on it -- the analogue of
+        // the GCC `__integer_pack(N)` expansion in
+        // typecheck_template_args.
+        if(
+          final_base_name == "__make_integer_seq" &&
+          template_args.arguments().size() == 3)
+        {
+          const auto &ma = template_args.arguments();
+          // The pack template: a (possibly qualified) name.
+          const exprt &tpl_arg = ma[0];
+          // The element type.
+          // The element type arrives as `type` or an `ambiguous` node
+          // carrying the type.
+          typet elem_type =
+            ma[1].id() == ID_type || ma[1].id() == ID_ambiguous
+              ? ma[1].type()
+              : static_cast<const typet &>(static_cast<const irept &>(ma[1]));
+          // The count: a constant expression in this context.
+          exprt count = ma[2];
+          if(count.id() == ID_type)
+            count = static_cast<const exprt &>(
+              static_cast<const irept &>(ma[2].type()));
+          cpp_typecheck.typecheck_expr(count);
+          simplify(count, cpp_typecheck);
+          const auto n = numeric_cast<mp_integer>(count);
+          irep_idt tpl_name;
+          // The pack-template argument arrives as `type`,
+          // `cpp_name`, or an `ambiguous` node wrapping either.
+          const irept *tpl_node = &static_cast<const irept &>(tpl_arg);
+          if(tpl_node->id() == ID_ambiguous || tpl_node->id() == ID_type)
+          {
+            const irept &t = tpl_arg.type();
+            if(t.id() == ID_cpp_name)
+              tpl_node = &t;
+          }
+          if(tpl_node->id() == ID_cpp_name)
+            tpl_name = to_cpp_name(*tpl_node).get_base_name();
+          if(n.has_value() && *n >= 0 && !tpl_name.empty())
+          {
+            typet elem_tc = elem_type;
+            cpp_typecheck.typecheck_type(elem_tc);
+            cpp_template_args_non_tct expanded_args;
+            auto &eargs = expanded_args.arguments();
+            exprt type_arg{ID_type};
+            type_arg.type() = elem_type;
+            eargs.push_back(static_cast<const exprt &>(type_arg));
+            for(mp_integer i = 0; i < *n; ++i)
+              eargs.push_back(from_integer(i, elem_tc));
+            auto tpl_id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
+              tpl_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+            if(!tpl_id_set.empty())
+            {
+              typet instance = disambiguate_template_classes(
+                tpl_name, tpl_id_set, expanded_args, false);
+              instance.add_source_location() = source_location;
+              cpp_typecheck.elaborate_class_template(instance);
+              if(instance.id() == ID_struct_tag)
+              {
+                cpp_typecheck.cpp_scopes.go_to(
+                  cpp_typecheck.cpp_scopes.get_scope(
+                    to_struct_tag_type(instance).get_identifier()));
+                final_base_name.clear();
+                template_args.make_nil();
+                ++pos;
+                continue;
+              }
+            }
+          }
+          // Not expandable here: fall through to the ordinary lookup
+          // (which will fail with the previous diagnostic).
+        }
+
         auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
           final_base_name,
           recursive ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
@@ -4602,6 +4687,7 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
 
   // find the template alias symbol
   const symbolt *template_sym = nullptr;
+  const cpp_idt *template_id_entry = nullptr;
   for(const auto &id_ptr : id_set)
   {
     const symbolt &s = cpp_typecheck.lookup(id_ptr->identifier);
@@ -4610,11 +4696,109 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
     if(to_cpp_declaration(s.type).is_template_alias())
     {
       template_sym = &s;
+      template_id_entry = id_ptr;
       break;
     }
   }
 
   INVARIANT(template_sym != nullptr, "template alias symbol must exist");
+
+  // N5008 [temp.alias] + [temp.mem]: a member alias template of a
+  // class-template SPECIALIZATION is instantiated with the enclosing
+  // specialization's template arguments bound in addition to its own
+  // (libc++'s `__integer_sequence<_Tp, _Values...>::__to_tuple_indices
+  // <_Sp> = __tuple_indices<(_Values + _Sp)...>` needs the instance's
+  // _Values pack).  instantiate_template builds only the alias's own
+  // parameter map, so pre-bind the enclosing instance's parameters --
+  // exactly as add_method_body does for member function bodies.
+  cpp_saved_template_mapt saved_enclosing_map(cpp_typecheck.template_map);
+  // Gated to the CLANG preprocessor mode: the motivating member alias
+  // templates are libc++'s (__integer_sequence::__to_tuple_indices);
+  // libstdc++ resolution never needed the enclosing pre-bind, and even
+  // the non-overriding form perturbed some libstdc++ shapes.
+  if(
+    template_id_entry != nullptr &&
+    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+  {
+    const cpp_idt *scope_walk = template_id_entry->has_parent()
+                                  ? &template_id_entry->get_parent()
+                                  : nullptr;
+    while(scope_walk != nullptr)
+    {
+      const irep_idt &class_id = scope_walk->class_identifier.empty()
+                                   ? scope_walk->identifier
+                                   : scope_walk->class_identifier;
+      const symbolt *class_sym = cpp_typecheck.symbol_table.lookup(class_id);
+      if(
+        class_sym != nullptr &&
+        class_sym->type.find(ID_C_template).is_not_nil() &&
+        class_sym->type.find(ID_C_template_arguments).is_not_nil())
+      {
+        // NON-OVERRIDING: bind only parameters that the current map
+        // does not already bind.  The resolution may run while another
+        // specialization of the same enclosing template is being
+        // instantiated; its live bindings are authoritative
+        // ([temp.mem], [temp.spec.general]) and overriding them with
+        // the alias registration parent's arguments regressed the
+        // libstdc++ container tests into state-space blowups.
+        const auto &enc_template = static_cast<const template_typet &>(
+          class_sym->type.find(ID_C_template));
+        const auto &enc_args = static_cast<const cpp_template_args_tct &>(
+          class_sym->type.find(ID_C_template_arguments));
+        const auto &enc_params = enc_template.template_parameters();
+        const auto &enc_arg_list = enc_args.arguments();
+        for(std::size_t k = 0; k < enc_params.size() && k < enc_arg_list.size();
+            ++k)
+        {
+          const auto &param = enc_params[k];
+          // A parameter PACK consumes a variable number of arguments;
+          // beyond it the positional pairing is meaningless, and pack
+          // bindings themselves need build()'s pack machinery
+          // (pack_args_map).  Stop here -- the packs that motivated
+          // this pre-binding (__integer_sequence's _Values) are bound
+          // by instantiate_template itself when the alias's OWN
+          // arguments cover them; the leading non-pack parameters are
+          // what the alias body needs from the enclosing instance.
+          if(param.get_bool(ID_ellipsis))
+            break;
+          const exprt &arg = enc_arg_list[k];
+          if(param.id() == ID_type)
+          {
+            const irep_idt &pid = param.type().get(ID_identifier);
+            if(
+              !pid.empty() && arg.id() == ID_type &&
+              cpp_typecheck.template_map.type_map.find(pid) ==
+                cpp_typecheck.template_map.type_map.end())
+            {
+              cpp_typecheck.template_map.set(param, arg);
+            }
+          }
+          else
+          {
+            const irep_idt &pid = param.get(ID_identifier);
+            if(
+              !pid.empty() && arg.id() != ID_type &&
+              cpp_typecheck.template_map.expr_map.find(pid) ==
+                cpp_typecheck.template_map.expr_map.end())
+            {
+              cpp_typecheck.template_map.set(param, arg);
+            }
+          }
+        }
+        break;
+      }
+      if(
+        (!scope_walk->is_class() && !scope_walk->is_scope) ||
+        !scope_walk->has_parent())
+      {
+        break;
+      }
+      const cpp_idt &next = scope_walk->get_parent();
+      if(&next == scope_walk)
+        break;
+      scope_walk = &next;
+    }
+  }
 
   // typecheck template arguments
   cpp_template_args_tct template_args_tc;
@@ -4842,6 +5026,40 @@ exprt cpp_typecheck_resolvet::resolve(
   // resolution would try (and fail) to instantiate `~Foo` as a template.
   if(!base_name.empty() && id2string(base_name)[0] == '~')
     template_args.make_nil();
+
+  // Clang's builtin alias template `__type_pack_element<N, Ts...>`
+  // names the N-th type of the pack (libc++ implements
+  // tuple_element<I, tuple<Ts...>>::type with it).  It is not an
+  // ordinary template; evaluate it directly.
+  if(
+    base_name == "__type_pack_element" && template_args.is_not_nil() &&
+    template_args.arguments().size() >= 1)
+  {
+    exprt count = template_args.arguments()[0];
+    if(count.id() == ID_type)
+      count =
+        static_cast<const exprt &>(static_cast<const irept &>(count.type()));
+    cpp_typecheck.typecheck_expr(count);
+    simplify(count, cpp_typecheck);
+    const auto n = numeric_cast<mp_integer>(count);
+    if(
+      n.has_value() && *n >= 0 &&
+      *n + 1 < mp_integer(template_args.arguments().size()))
+    {
+      const std::size_t idx = numeric_cast_v<std::size_t>(*n) + 1;
+      const exprt &selected = template_args.arguments()[idx];
+      typet result =
+        selected.id() == ID_type || selected.id() == ID_ambiguous
+          ? selected.type()
+          : static_cast<const typet &>(static_cast<const irept &>(selected));
+      cpp_typecheck.typecheck_type(result);
+      exprt result_expr{ID_type};
+      result_expr.type() = result;
+      return result_expr;
+    }
+    // Dependent or out-of-range: substitution failure.
+    throw 0;
+  }
 
 #ifdef DEBUG
   std::cout << "base name: " << base_name << '\n';
