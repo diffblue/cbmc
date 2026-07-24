@@ -913,14 +913,23 @@ bvt bv_pointerst::offset_arithmetic(
 
   bvt bv_tmp(sum_ext.begin(), sum_ext.begin() + offset_bits);
 
-  // On overflow, replace the object by the invalid object so that the
-  // result compares unequal to any pointer into the original object.
+  // On overflow, replace the object by the invalid object and the offset by
+  // a nondeterministic value: the result is a pointer to an unknown address.
+  // Keeping the truncated offset would identify identically-shifted pointers
+  // into *different* objects (both would encode as the invalid object with
+  // the same offset), proving equalities that do not hold under any concrete
+  // address assignment. With a nondeterministic offset, neither equality nor
+  // inequality between such pointers is provable, matching the intended
+  // semantics that the address of an out-of-range pointer is unconstrained.
   bvt object_bv = object_literals(bv, type);
   bvt invalid_object_bv =
     object_literals(encode(pointer_logic.get_invalid_object(), type), type);
   bvt new_object_bv = bv_utils.select(overflow, invalid_object_bv, object_bv);
 
-  return object_offset_encoding(new_object_bv, bv_tmp);
+  bvt nondet_offset_bv = prop.new_variables(offset_bits);
+  bvt new_offset_bv = bv_utils.select(overflow, nondet_offset_bv, bv_tmp);
+
+  return object_offset_encoding(new_object_bv, new_offset_bv);
 }
 
 bvt bv_pointerst::add_addr(const exprt &expr)
