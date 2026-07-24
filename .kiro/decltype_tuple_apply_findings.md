@@ -4015,3 +4015,23 @@ single expansion point.  Reverted the experiments; kept the analysis
 here + in the desc.  Probing technique that cracked it: dump ALL
 params of the failing candidate in fargs::match on first
 no-conversion failure.
+
+## Concepts + pack round (2026-07-24 night)
+
+1. Trailing-pack pre-bind (committed earlier today): fixed libc++
+   tuple's _BaseT typedef fully.
+2. Emplace family root PINNED but unfixed: parameter-pack expansion
+   in function-type formation reads pack_args_map BEFORE deduction
+   records it (late recording serves return types); scalar first-
+   element fills all copies.  Early recording breaks two-pack ctors
+   (double expansion).  NEED: single expansion point.  Experiments
+   reverted; analysis in desc.
+3. [temp.constr.atomic]/3 atom classification (committed): THROW from
+   typechecking a substituted concept-id atom = substitution failure
+   = UNSATISFIED (candidate loses); completed-but-diagnosed = unknown
+   (atom_clean gate keeps modelling gaps conservative).  Unblocked
+   ALL SIX cpp20 libcxx tests past same_as; no suite regressions.
+4. cpp20_constraint_substitution_failure itself: clause DROPPED AT
+   PARSE -- rConditionalExpr can't parse concept TEMPLATE-IDs in
+   requires-clauses ('<' as less-than, whitelist mismatch, only a
+   constraint COUNT stored).  Separate parser fix needed.
