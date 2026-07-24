@@ -11,3 +11,10 @@ Substitution failure inside a concept-id's argument must make the
 atomic constraint unsatisfied ([temp.constr.atomic]/3); CBMC keeps
 the constrained overload viable and selects it (wrong code).  Root of
 the cpp20 *_libcxx failures (same_as inside common_reference_with).
+Update 2026-07-24: the atom classification fix handles evaluated
+clauses, but THIS test's clause never reaches evaluation: the parser
+fails to store a requires-clause whose constraint is a concept
+TEMPLATE-ID (rConditionalExpr parses the '<' as less-than, the
+post-clause token whitelist then mismatches, and only a constraint
+COUNT is kept -- parse.cpp rTempArgList requires-clause fallback).
+Fix direction: parse concept template-ids in requires-clauses.
