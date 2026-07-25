@@ -4763,10 +4763,27 @@ skip_pack_removal_ft:
         if(p.get_bool(ID_ellipsis))
         {
           irep_idt pid = p.type().get(ID_identifier);
+          // N5008 [temp.variadic]/7: a pack is empty only when it is
+          // bound to zero elements.  A pack of TWO or more elements has
+          // no scalar type_map entry (deliberately -- see build()), only
+          // a pack_args_map binding; checking type_map alone declared
+          // every such pack empty, and the removal below then deleted
+          // the `_Args&&...` parameter of e.g. vector<pair<T,U>>::
+          // emplace_back(t, u) whose deduced pack is heterogeneous --
+          // the signature degenerated and every call failed
+          // "found no match".
           if(
             !pid.empty() &&
-            template_map.type_map.find(pid) == template_map.type_map.end())
+            template_map.type_map.find(pid) == template_map.type_map.end() &&
+            template_map.pack_args_map.find(pid) ==
+              template_map.pack_args_map.end() &&
+            template_map.pack_expr_map.find(pid) ==
+              template_map.pack_expr_map.end() &&
+            template_map.pack_size_map.find(pid) ==
+              template_map.pack_size_map.end())
+          {
             template_map.pack_size_map[pid] = 0;
+          }
         }
       }
       if(!template_map.pack_size_map.empty() && !new_decl.declarators().empty())
