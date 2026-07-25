@@ -4035,3 +4035,29 @@ no-conversion failure.
    PARSE -- rConditionalExpr can't parse concept TEMPLATE-IDs in
    requires-clauses ('<' as less-than, whitelist mismatch, only a
    constraint COUNT stored).  Separate parser fix needed.
+
+## Emplace deep-dive round (2026-07-25)
+
+Two hardenings committed ([temp.variadic]/7 pack-empty guard;
+copy-not-swap in function-template registration preserving instance
+bodies per [temp.mem]).  Suite green.  Emplace family NOT fixed:
+- CONFIRMED mechanism pieces: (a) function-template registration
+  SWAP gutted the class-instance body's member declaration (empty
+  cpp_declaration observed in the instance body); (b) the type_map-
+  only pack-empty test wrongly marked 2+-element packs empty; (c) the
+  instantiated symbol is homogenised (this, symbolish&&, symbolish&&)
+  DESPITE pack_args_map = {symbolish, ulong} at build time.
+- REMAINING UNKNOWN: which parameter-expansion path inside the member
+  instantiation consumes the scalar instead of the pack.  The member-
+  pack expansion site in typecheck_compound_declarator sees elems=NULL
+  on an EMPTY declaration; the real expansion happens elsewhere.
+- PROCESS INCIDENT #2: a 'successful fix' was an artifact of the
+  line-based probe STRIPPER eating real code in resolve.cpp (later
+  reverted by checkout).  RULES: after stripping probes, ALWAYS git
+  diff the file against the pre-probe state and re-run the target
+  test before celebrating; keep probe insert/strip pairs symmetric.
+Debugging index for next session: probe convert_non_template_
+declaration's parameter typecheck for the member instance; the
+instantiation stack at that point is instantiate_template(emplace_
+back) -> convert_non_template_declaration -> typecheck_compound_type
+(the class!) -> ... (frames 13-18 of the 2026-07-24 bt).

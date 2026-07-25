@@ -33,3 +33,14 @@ double-expands two-pack constructors (cpp17_tuple_get_two_pack_ctor_
 3elem): the parameter synthesis writes concrete types positionally
 AND the typecheck-time pack expansion duplicates them.  The proper
 fix is a single expansion point for deduced parameter packs.
+Update 2026-07-25: two hardenings landed from this investigation
+([temp.variadic]/7 multi-element packs no longer marked empty at
+member instantiation; function-template registration no longer guts
+class-instance bodies).  The homogenised instance persists through a
+further unidentified path: the instantiated symbol
+emplace_back<symbolish, ulong> still carries (this, symbolish&&,
+symbolish&&) though pack_args_map holds {symbolish, unsigned long} at
+its instantiation, and the instance body's stored declaration is
+intact after the copy fix.  Next probe point: the parameter
+type-checking inside convert_non_template_declaration for the member
+instance (where the `_Args&&...` expansion consumes the pack).
