@@ -246,7 +246,8 @@ void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
   symbol.base_name = base_name;
   symbol.location = cpp_name.source_location();
   symbol.module = module;
-  symbol.type.swap(declaration);
+  // copy, not swap -- see the has_value comment above
+  static_cast<irept &>(symbol.type) = static_cast<const irept &>(declaration);
   symbol.value = exprt(ID_template_decls);
 
   symbol.pretty_name =
@@ -457,7 +458,14 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 
     if(has_value)
     {
-      previous_symbol->type.swap(declaration);
+      // COPY rather than swap: `declaration` may live in a
+      // class-template INSTANCE's stored body, which later member
+      // instantiations re-read ([temp.mem]); swapping gutted the
+      // stored declaration (vector<pair<T,U>>'s emplace_back lost its
+      // `_Args&&...` parameter and every call failed "found no
+      // match").  irep sharing makes the copy cheap.
+      static_cast<irept &>(previous_symbol->type) =
+        static_cast<const irept &>(declaration);
       cpp_scopes.id_map[symbol_name] = &template_scope;
     }
 
