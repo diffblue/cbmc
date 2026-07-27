@@ -19,3 +19,5 @@ the return type `typename tuple_element<_Ip, tuple<_Tp...>>::type&`
 (a pack template-id inside a qualified name) fails to substitute
 during deduction; a header-free replica of that shape passes, and
 pair's get works.
+Residual isolated as minimal KNOWNBUG cpp11_type_pack_element_return
+(__type_pack_element builtin unevaluable in return-type substitution).
