@@ -4061,3 +4061,29 @@ declaration's parameter typecheck for the member instance; the
 instantiation stack at that point is instantiate_template(emplace_
 back) -> convert_non_template_declaration -> typecheck_compound_type
 (the class!) -> ... (frames 13-18 of the 2026-07-24 bt).
+
+## Capture sweep (2026-07-27)
+
+Two header-free minimals distilled:
+- cpp11_type_pack_element_return: __type_pack_element in a RETURN TYPE
+  fails deduction-time substitution (local typedef works; standalone
+  type works).  The get<I>(tuple&) residual, finally reproduced
+  header-free after several prior sessions where replicas passed --
+  the missing ingredient was the builtin in the return-type position
+  specifically (libc++ mode).
+- cpp20_requires_clause_concept_template_id: MULTI-ARGUMENT concept
+  template-id in a requires-clause dropped at parse ('<' as
+  less-than); single-arg concept constraint parses fine.  This is the
+  root of ALL the cpp20 *_libcxx same_as failures and of
+  cpp20_constraint_substitution_failure -- they were mis-attributed
+  last round to the atom-classification evaluator, but the clause
+  never reaches evaluation.
+Emplace homogenization: already captured
+(cpp17_vector_emplace_nondefault_pair); header-free replicas of the
+member-template pack path still pass (out-of-class def + default
+ctor + heterogeneous pack all insufficient alone) -- the trigger
+needs the full instance-reregistration path, so the existing minimal
+(which does reproduce) stays the canonical capture.
+Fix directions now well-scoped: (a) evaluate __type_pack_element in
+return-type substitution; (b) parse concept template-ids in
+requires-clauses (rConditionalExpr / the fallback token whitelist).
