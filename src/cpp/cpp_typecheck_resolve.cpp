@@ -5109,22 +5109,97 @@ exprt cpp_typecheck_resolvet::resolve(
     template_args.arguments().size() >= 1)
   {
     exprt count = template_args.arguments()[0];
-    if(count.id() == ID_type)
+    if(count.id() == ID_type || count.id() == ID_ambiguous)
       count =
         static_cast<const exprt &>(static_cast<const irept &>(count.type()));
-    cpp_typecheck.typecheck_expr(count);
-    simplify(count, cpp_typecheck);
-    const auto n = numeric_cast<mp_integer>(count);
-    if(
-      n.has_value() && *n >= 0 &&
-      *n + 1 < mp_integer(template_args.arguments().size()))
+    std::optional<mp_integer> n;
+    try
     {
-      const std::size_t idx = numeric_cast_v<std::size_t>(*n) + 1;
-      const exprt &selected = template_args.arguments()[idx];
-      typet result =
-        selected.id() == ID_type || selected.id() == ID_ambiguous
-          ? selected.type()
-          : static_cast<const typet &>(static_cast<const irept &>(selected));
+      cpp_typecheck.typecheck_expr(count);
+      simplify(count, cpp_typecheck);
+      n = numeric_cast<mp_integer>(count);
+    }
+    catch(...)
+    {
+      // dependent count: fall through to the substitution-failure throw
+    }
+
+    // N5008 [temp.variadic]/5: a pack-expansion argument `Ts...`
+    // stands for one argument per pack element.  During return-type
+    // substitution ([temp.deduct]/5) the arguments still carry the
+    // unexpanded expansion node; splice the deduced pack elements
+    // from the map before indexing, otherwise the N-th "argument" is
+    // the expansion node itself and its type-check rejects the whole
+    // candidate (the libc++ std::get<I>(tuple&) return type,
+    // KNOWNBUG cpp11_type_pack_element_return).
+    std::vector<typet> element_types;
+    for(std::size_t ai = 1; ai < template_args.arguments().size(); ++ai)
+    {
+      const exprt &arg = template_args.arguments()[ai];
+      const irept &arg_irep = static_cast<const irept &>(arg);
+      const bool is_expansion =
+        arg.get_bool(ID_ellipsis) || arg.type().get_bool(ID_ellipsis);
+      irep_idt pack_name;
+      if(is_expansion)
+      {
+        const irept *t = &static_cast<const irept &>(arg.type());
+        if(arg_irep.id() == ID_cpp_name)
+          t = &arg_irep;
+        if(t->id() == ID_cpp_name)
+        {
+          const auto &sub = t->get_sub();
+          if(sub.size() == 1 && sub.front().id() == ID_name)
+            pack_name = sub.front().get(ID_identifier);
+        }
+      }
+      if(!pack_name.empty())
+      {
+        // find the pack binding by short name
+        const std::vector<typet> *pack = nullptr;
+        for(const auto &entry : cpp_typecheck.template_map.pack_args_map)
+        {
+          const std::string key = id2string(entry.first);
+          const auto pos = key.rfind("::");
+          if(
+            (pos != std::string::npos ? key.substr(pos + 2) : key) ==
+            id2string(pack_name))
+          {
+            pack = &entry.second;
+            break;
+          }
+        }
+        if(pack == nullptr)
+        {
+          // unexpandable here: dependent context
+          throw 0;
+        }
+        for(const auto &pt : *pack)
+          element_types.push_back(pt);
+      }
+      else if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+      {
+        element_types.push_back(arg.type());
+      }
+      else if(arg_irep.id() == ID_cpp_name || arg_irep.id() == ID_merged_type)
+      {
+        element_types.push_back(static_cast<const typet &>(arg_irep));
+      }
+      else
+      {
+        // not a type argument shape we can evaluate here
+        throw 0;
+      }
+    }
+
+    if(n.has_value() && *n >= 0 && *n < mp_integer(element_types.size()))
+    {
+      typet result = element_types[numeric_cast_v<std::size_t>(*n)];
+      // An `ambiguous` argument may carry a nil type (an
+      // expression-flavoured argument); that is not a type pack
+      // element -- substitution failure, not a crash in
+      // typecheck_type.
+      if(result.is_nil())
+        throw 0;
       cpp_typecheck.typecheck_type(result);
       exprt result_expr{ID_type};
       result_expr.type() = result;
