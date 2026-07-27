@@ -18,3 +18,6 @@ TEMPLATE-ID (rConditionalExpr parses the '<' as less-than, the
 post-clause token whitelist then mismatches, and only a constraint
 COUNT is kept -- parse.cpp rTempArgList requires-clause fallback).
 Fix direction: parse concept template-ids in requires-clauses.
+The parse-drop is captured minimally in
+cpp20_requires_clause_concept_template_id (multi-argument concept
+template-id in a requires-clause).

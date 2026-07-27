@@ -1,0 +1,15 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ __type_pack_element as return type: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Clang's __type_pack_element builtin alias template fails to evaluate
+during return-type substitution in overload resolution, rejecting the
+candidate ("found no match").  A local-typedef use works; only the
+return-type path fails.  Residual root of cpp11_tuple_basic /
+cpp11_libcxx_tuple (std::get<I>(tuple&)).

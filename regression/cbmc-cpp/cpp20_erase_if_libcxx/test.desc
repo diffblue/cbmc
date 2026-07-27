@@ -16,3 +16,6 @@ cpp20_constraint_substitution_failure.  cpp20_ranges_basic
 additionally aborts a unary-operand invariant (std_expr.h:380).
 Update 2026-07-24: past the same_as front-end failure
 ([temp.constr.atomic]/3 atom classification); residual: BMC scaling (front end clean).
+The same_as front-end failure is the requires-clause concept-template-id
+parse gap, captured minimally in
+cpp20_requires_clause_concept_template_id.
