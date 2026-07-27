@@ -21,3 +21,6 @@ merge_function_pointer_restrictions; blocks that dog-food TU.
 See also cpp17_vector_emplace_nondefault_pair: a SINGLE emplace_back
 already fails when the pair has a non-default-constructible member
 (constrained-pair-constructor family, [temp.deduct]/8).
+More minimal same-root sibling: cpp17_vector_emplace_nondefault_pair
+(deduced heterogeneous parameter pack homogenized to its first
+element in the member-template instance signature).
