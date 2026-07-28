@@ -27,3 +27,4 @@ cpp17_vector_emplace_nondefault_pair.  The two-file SEGFAULT persists,
 now crashing in cpp_typecheckt::typecheck_member_initializer (17-frame
 stack, genuine null dereference, not stack overflow; pre-existing --
 verified against the pre-NSDMI front end).
+Minimal header-free reproducer: cpp17_pack_cast_tuple_element_segv.
