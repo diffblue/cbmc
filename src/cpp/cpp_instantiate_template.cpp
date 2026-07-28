@@ -2913,6 +2913,102 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // mapping from template parameters to values/types
   template_map.build(template_type, specialization_template_args);
 
+  // N5008 [temp.spec.partial.match]: a partial specialization's parameters
+  // are bound by DEDUCTION from its argument pattern, not positionally from
+  // the instance's template-argument list.  build() above received the FLAT
+  // deduced list, which cannot encode multi-pack or non-trailing-pack splits
+  // (e.g. libc++'s __make_tuple_types_flat<_Tuple<_Types...>,
+  // __tuple_indices<_Idx...>>), so consumers that later need this instance's
+  // parameter bindings -- a member alias template's body resolved via
+  // resolve_template_alias -- would find the packs unbound and fail.
+  // Re-run the pattern deduction here and persist the bindings on the
+  // instance symbol (#spec_template_packs, mirroring #fn_template_packs for
+  // member function templates).
+  irept spec_bindings;
+  {
+    const auto &pattern_args =
+      to_cpp_declaration(template_symbol.type).partial_specialization_args();
+    if(
+      !pattern_args.arguments().empty() &&
+      pattern_args.arguments().size() == full_template_args.arguments().size())
+    {
+      cpp_saved_template_mapt saved_map_for_deduction(template_map);
+      cpp_save_scopet save_scope_for_deduction(cpp_scopes);
+      template_map.build_unassigned(template_type);
+      // Pattern names resolve in the specialization's own scope (the
+      // selection loop in this function does the same before guessing).
+      cpp_scopet *spec_scope = id_map_lookup(cpp_scopes, template_symbol.name);
+      if(spec_scope != nullptr)
+        cpp_scopes.go_to(*spec_scope);
+      cpp_typecheck_resolvet resolver(*this);
+      try
+      {
+        for(std::size_t i = 0; i < full_template_args.arguments().size(); ++i)
+        {
+          if(full_template_args.arguments()[i].id() == ID_type)
+            resolver.guess_template_args(
+              pattern_args.arguments()[i].type(),
+              full_template_args.arguments()[i].type());
+          else
+            resolver.guess_template_args(
+              pattern_args.arguments()[i], full_template_args.arguments()[i]);
+        }
+      }
+      catch(...)
+      {
+        // deduction failure here is non-fatal: we simply persist nothing
+      }
+      for(const auto &param : template_type.template_parameters())
+      {
+        const irep_idt pid = param.id() == ID_type
+                               ? param.type().get(ID_identifier)
+                               : param.get(ID_identifier);
+        if(pid.empty())
+          continue;
+        const bool param_is_pack = param.get_bool(ID_ellipsis);
+        auto pack_t = template_map.pack_args_map.find(pid);
+        if(pack_t != template_map.pack_args_map.end())
+        {
+          irept entry{"pack_types"};
+          entry.set(ID_identifier, pid);
+          for(const auto &t : pack_t->second)
+            entry.get_sub().push_back(t);
+          spec_bindings.get_sub().push_back(std::move(entry));
+          continue;
+        }
+        auto pack_e = template_map.pack_expr_map.find(pid);
+        if(pack_e != template_map.pack_expr_map.end())
+        {
+          irept entry{"pack_exprs"};
+          entry.set(ID_identifier, pid);
+          for(const auto &e : pack_e->second)
+            entry.get_sub().push_back(e);
+          spec_bindings.get_sub().push_back(std::move(entry));
+          continue;
+        }
+        auto st = template_map.type_map.find(pid);
+        if(
+          st != template_map.type_map.end() && st->second.id() != ID_unassigned)
+        {
+          irept entry{param_is_pack ? "pack_types" : "scalar_type"};
+          entry.set(ID_identifier, pid);
+          entry.get_sub().push_back(st->second);
+          spec_bindings.get_sub().push_back(std::move(entry));
+          continue;
+        }
+        auto se = template_map.expr_map.find(pid);
+        if(
+          se != template_map.expr_map.end() && se->second.id() != ID_unassigned)
+        {
+          irept entry{param_is_pack ? "pack_exprs" : "scalar_expr"};
+          entry.set(ID_identifier, pid);
+          entry.get_sub().push_back(se->second);
+          spec_bindings.get_sub().push_back(std::move(entry));
+        }
+      }
+    }
+  }
+
   // N5008 [temp.variadic]/5: when the template ends in a parameter pack, bind
   // that pack to its full deduced element sequence taken from
   // full_template_args.  build() above is driven by
@@ -4070,6 +4166,12 @@ skip_pack_removal_ft:
             ID_C_template,
             to_cpp_declaration(template_symbol.type).template_type());
           cs->type.set(ID_C_template_arguments, specialization_template_args);
+        }
+        if(
+          !spec_bindings.get_sub().empty() &&
+          cs->type.find(irep_idt{"#spec_template_packs"}).is_nil())
+        {
+          cs->type.set(irep_idt{"#spec_template_packs"}, spec_bindings);
         }
       }
     }
