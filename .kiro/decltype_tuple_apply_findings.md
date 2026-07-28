@@ -4139,3 +4139,41 @@ poisons the second resolution pass => statement dropped (vacuous
 SUCCESS caught by desc). Same family as
 cpp17_optional_requires_ctor_pair. Root cause to chase: symbol-table
 cleanup after throwing concept-variable instantiation.
+
+## Round: minimal KNOWNBUG reproducers for the backlog (2026-07-28)
+
+Seven new minimal KNOWNBUG dirs (all runtime-verified; valgrind gate
+added to wrong-code reductions after an uninitialized-read
+degeneration incident):
+- cpp17_function_handler_dispatch (std::function dispatch, 15 lines)
+- cpp11_tuple_leaf_no_body (bodies lost via __make_integer_seq /
+  __type_pack_element; gates 4 tuple descs + set_insert family)
+- cpp20_optional_base_alias_unknown (dependent-base alias unresolved;
+  gates map_basic)
+- cpp20_views_take_call_crash (single views::take call; malformed
+  explicit-typecast, nil type + 2 nil operands, in
+  operator_is_overloaded via guess_function_template_args; MASKS all
+  preprocessed-libc++ reductions)
+- cpp17_hashtable_alias_default_arg (emplace increment lost through
+  alias template with computed bool-NTTP default)
+- cpp17_anon_struct_member_ctor_only (anonymous-struct member of
+  ctor-only type demands a default ctor; from goto_symex_state)
+- cpp17_pack_cast_tuple_element_segv (functional cast to dependent
+  tuple_element type with 2-arg pack; raw SEGV; from
+  abstract_environment_tu; same family as views_take)
+
+Reduction lessons:
+- cvise + crash signatures on preprocessed source can be ENV-FLAKY
+  (cvra: archived variants stopped reproducing outside cvise; env
+  size shifts behavior).  Variant bisection against real headers
+  (deterministic internal path) beat cvise there.
+- Wrong-code interestingness MUST exclude UB: valgrind -q
+  --error-exitcode=99 on the g++ -g binary (a reduction replaced the
+  bug with an uninitialized read that "passed" runtime by luck).
+- Self-archiving test.sh (snapshot first, evaluate the snapshot,
+  archive on success) survives cvise state-loss on SIGINT/timeout.
+- kill cvise instances via /proc/PID/cwd matching, NEVER pkill -f
+  with a pattern that appears in your own command line.
+- restrict_function_pointers_tu front end is FIXED (emplace fix);
+  bounded BMC completes, dog-food assertion passes; vector semantic
+  family + erase_if now fail only in library-modeling layers.
