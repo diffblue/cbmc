@@ -1,0 +1,17 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ views::take call typechecks: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Single call to the std::views::take adaptor object crashes the front
+end: a malformed explicit-typecast (nil type, two nil operands) built
+during guess_function_template_args reaches operator_is_overloaded's
+conversion-operator branch (to_unary_expr aborts: "unary expression
+must have one operand").  Reduced from cpp20_ranges_basic_libcxx.
+The same crash masks all preprocessed-libc++ reductions (vector
+family).  Runtime-faithful: clang++ -std=c++20 -stdlib=libc++ runs
+clean.
