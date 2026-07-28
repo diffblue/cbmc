@@ -550,6 +550,12 @@ protected:
 
   typedef std::list<method_bodyt> method_bodiest;
   std::set<irep_idt> methods_seen;
+
+  // True while instantiate_template converts a member FUNCTION
+  // template instance; gates the concretized-pack-pattern fallback in
+  // typecheck_compound_declarator ([temp.variadic]/5), which must not
+  // fire during CLASS instantiation.
+  bool instantiating_member_function_template = false;
   method_bodiest method_bodies;
 
   // Deferred method bodies for lazy template elaboration.

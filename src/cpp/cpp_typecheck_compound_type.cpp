@@ -587,6 +587,71 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
       const std::vector<typet> *elems =
         is_pack ? referenced_pack(param) : nullptr;
+      // A pack parameter whose PATTERN no longer names the pack: an
+      // earlier scalar substitution can replace the pack reference in
+      // the declaration's type with the FIRST deduced element (the
+      // `_Args&&... __args` of a member template instance arrives
+      // here with type `tag-symbolish` instead of `_Args`), while the
+      // declarator still carries the `...`.  N5008 [temp.variadic]/5:
+      // the expansion must still produce one parameter per pack
+      // element; when exactly one non-empty pack is bound, it is the
+      // authoritative element source (a function parameter pack of a
+      // member template instance can only be that member's own pack).
+      if(
+        elems == nullptr && is_pack && referenced_empty_pack(param).empty() &&
+        instantiating_member_function_template)
+      {
+        // Only when the pattern is fully CONCRETIZED: if any name in
+        // the parameter still spells a template parameter (matched by
+        // suffix against the map), the established per-name paths are
+        // responsible and the fallback must stay out of their way
+        // (std::function's `_ArgTypes...` patterns regressed when it
+        // fired for them).
+        std::function<bool(const irept &)> names_a_parameter =
+          [&](const irept &n) -> bool
+        {
+          if(n.id() == ID_name)
+          {
+            const std::string nm = id2string(n.get(ID_identifier));
+            const auto matches_suffix = [&nm](const irep_idt &key)
+            {
+              const std::string k = id2string(key);
+              const auto pos = k.rfind("::");
+              return (pos != std::string::npos ? k.substr(pos + 2) : k) == nm;
+            };
+            for(const auto &e : template_map.type_map)
+              if(matches_suffix(e.first))
+                return true;
+            for(const auto &e : template_map.pack_args_map)
+              if(matches_suffix(e.first))
+                return true;
+            for(const auto &e : template_map.pack_size_map)
+              if(matches_suffix(e.first))
+                return true;
+          }
+          for(const auto &sub : n.get_sub())
+            if(names_a_parameter(sub))
+              return true;
+          for(const auto &ns : n.get_named_sub())
+            if(ns.first != ID_C_source_location && names_a_parameter(ns.second))
+              return true;
+          return false;
+        };
+        if(!names_a_parameter(param.find(ID_type)))
+        {
+          const std::vector<typet> *only_pack = nullptr;
+          std::size_t n_nonempty = 0;
+          for(const auto &pa : template_map.pack_args_map)
+          {
+            if(pa.second.empty())
+              continue;
+            ++n_nonempty;
+            only_pack = &pa.second;
+          }
+          if(n_nonempty == 1)
+            elems = only_pack;
+        }
+      }
       if(elems == nullptr || elems->size() < 2)
       {
         new_params.push_back(param);

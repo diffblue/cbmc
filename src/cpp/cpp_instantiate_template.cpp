@@ -4580,6 +4580,18 @@ skip_pack_removal_ft:
 
   if(is_template_method && !new_decl.is_typedef())
   {
+    // gates the concretized-pack-pattern fallback (see cpp_typecheck.h)
+    const bool saved_imft = instantiating_member_function_template;
+    instantiating_member_function_template = true;
+    struct imft_guardt
+    {
+      bool &flag;
+      bool saved;
+      ~imft_guardt()
+      {
+        flag = saved;
+      }
+    } imft_guard{instantiating_member_function_template, saved_imft};
     // Apply template_map to parameter types for SFINAE substitution
     for(auto &d : new_decl.declarators())
       template_map.apply(d.type());
