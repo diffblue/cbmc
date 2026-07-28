@@ -8,6 +8,7 @@
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/ieee_float.h>
+#include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
@@ -540,4 +541,77 @@ TEST_CASE(
     string_builtin_app(ID_cprover_string_in_regex_func, {s, re}, bool_typet{});
   conv.set_to(in, true);
   REQUIRE(out.str().find("RegLan") != std::string::npos);
+}
+
+/// Subclass exposing the protected \ref smt2_convt::walk_array_tree method so
+/// the array-model parse direction can be exercised directly.
+class array_tree_smt2_convt : public smt2_convt
+{
+public:
+  using smt2_convt::smt2_convt;
+  using smt2_convt::walk_array_tree;
+};
+
+/// Helper: build an irept node carrying just an id.
+static irept smt_node(const irep_idt &id)
+{
+  irept node;
+  node.id(id);
+  return node;
+}
+
+TEST_CASE(
+  "smt2_convt::walk_array_tree skips non-constant store indices",
+  "[core][solvers][smt2]")
+{
+  // A solver may return an array model whose store term carries a
+  // non-constant index (e.g. for unbounded or non-integer-keyed arrays).
+  // walk_array_tree must skip such an entry rather than abort in
+  // to_constant_expr, while still collecting the well-formed entries.
+  //
+  // Put invariants into throwing mode: without the is_constant() guard,
+  // to_constant_expr fails via an INVARIANT that aborts the unit binary by
+  // default; throwing mode turns that into an exception REQUIRE_NOTHROW can
+  // report as a clean test failure.
+  const cbmc_invariants_should_throwt invariants_throw;
+
+  // The index is parsed against type.size().type(); a bool-typed size makes
+  // a plain symbol index parse to a non-constant (nil) expression, which is
+  // the case the guard handles. (parse_rec coerces arithmetic index types to
+  // constants, so a non-constant index can only arise from a non-arithmetic
+  // index type.)
+  const signedbv_typet element_type{32};
+  const array_typet array_type{element_type, symbol_exprt{"n", bool_typet{}}};
+
+  // (as const <type> 0): a well-formed default entry, collected at index -1
+  // without going through index parsing.
+  irept as_const_header;
+  as_const_header.get_sub().push_back(smt_node("as"));
+  as_const_header.get_sub().push_back(smt_node("const"));
+  as_const_header.get_sub().push_back(irept{}); // type info, unused here
+  irept as_const_node;
+  as_const_node.get_sub().push_back(as_const_header);
+  as_const_node.get_sub().push_back(smt_node("0")); // default value 0
+
+  // (store (as const <type> 0) x 7): the index "x" is a plain symbol, so it
+  // parses to a non-constant under the bool-typed index type and must be
+  // dropped.
+  irept store_node;
+  store_node.get_sub().push_back(smt_node("store"));
+  store_node.get_sub().push_back(as_const_node);
+  store_node.get_sub().push_back(smt_node("x")); // non-constant index
+  store_node.get_sub().push_back(smt_node("7")); // value, must not survive
+
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  array_tree_smt2_convt conv{
+    ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out};
+
+  std::unordered_map<int64_t, exprt> operands_map;
+  REQUIRE_NOTHROW(conv.walk_array_tree(&operands_map, store_node, array_type));
+
+  // The non-constant store was dropped; only the well-formed default remains.
+  REQUIRE(operands_map.size() == 1);
+  REQUIRE(operands_map.count(-1) == 1);
 }
