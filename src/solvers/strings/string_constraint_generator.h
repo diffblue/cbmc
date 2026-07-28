@@ -20,8 +20,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #ifndef CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 #define CPROVER_SOLVERS_REFINEMENT_STRING_CONSTRAINT_GENERATOR_H
 
-#include <limits>
-#include <solvers/strings/string_constraint.h>
 #include <util/constexpr.def>
 #include <util/deprecate.h>
 #include <util/namespace.h>
@@ -29,7 +27,12 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/replace_expr.h>
 #include <util/string_expr.h>
 
+#include <solvers/strings/string_constraint.h>
+
 #include "array_pool.h"
+
+#include <functional>
+#include <limits>
 
 class function_application_exprt;
 
@@ -262,6 +265,14 @@ public:
 
   std::pair<exprt, string_constraintst>
   add_axioms_for_trim(const function_application_exprt &f);
+
+  std::pair<exprt, string_constraintst> add_axioms_for_strip(
+    const array_string_exprt &str,
+    const array_string_exprt &res,
+    const std::function<exprt(const exprt &)> &is_strippable,
+    bool strip_front,
+    bool strip_back,
+    const typet &result_type);
 
   std::pair<exprt, string_constraintst> add_axioms_for_code_point(
     const array_string_exprt &res,
