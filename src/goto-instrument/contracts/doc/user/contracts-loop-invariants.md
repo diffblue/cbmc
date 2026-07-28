@@ -120,7 +120,7 @@ int binary_search(int val, int *buf, int size)
   /* 4. perform a single arbitrary iteration (or exit the loop) */
   if(lb <= ub)
   {
-    if(buf[mid] == val) break;
+    if(buf[mid] == val) goto loop_exit;
     if(buf[mid] < val)
       lb = mid + 1;
     else
@@ -134,6 +134,7 @@ int binary_search(int val, int *buf, int size)
     /* 6. terminate this symbolic execution path; similar to "exit" */
     __CPROVER_assume(false);
   }
+loop_exit:
   return lb > ub ? NOT_FOUND : mid;
 }
 ```
@@ -152,6 +153,14 @@ A few things to note here:
   Therefore, only the symbolic execution path _inside_ this conditional block terminates.
   The code outside of the conditional block continues to be symbolically executed,
   and subsequent assertions do not become vacuously `true`.
+
+- The transformed example uses `goto` for the early loop exit. The original
+  source uses `break`, but this transformed code is no longer inside a C loop,
+  so a `break` statement would be invalid. Loop-invariant checking follows a
+  non-strict approach for exits from the loop: an exit through `break` (or a
+  `goto` that leaves the loop) does not need to re-establish the invariant at
+  the exit target. The invariant is checked for the path that takes another
+  iteration, while the exit path continues with the post-loop code.
 
 ## Additional Resources
 
