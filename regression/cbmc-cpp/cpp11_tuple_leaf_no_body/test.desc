@@ -14,3 +14,10 @@ for callee tuple / get") even though the source defines them.  Gates
 cpp11_libcxx_tuple and the test_libcxx variants of cpp11_tuple_basic,
 cpp17_tuple_basic and cpp17_apply_basic.  clang++ accepts and runs
 clean (clang-only builtins; g++ n/a).
+Update 2026-07-28 (partial): four layers fixed (partial-spec pack
+bindings persisted/replayed as #spec_template_packs; scalar _Idx and
+empty-pack expansion in template-argument lists).  Remaining layer:
+the member ctor template's pack-parameter deduction fails against the
+pattern concretized by cross-scope short-name substitution
+("found no match for symbol '__tuple_impl'"), the
+cpp17_vector_emplace_nondefault_pair family.
