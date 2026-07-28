@@ -19,3 +19,11 @@ Update 2026-07-24: past the same_as front-end failure
 The same_as front-end failure is the requires-clause concept-template-id
 parse gap, captured minimally in
 cpp20_requires_clause_concept_template_id.
+Update 2026-07-28: front end clean; with --object-bits 12 and
+--unwind 5 --no-unwinding-assertions the failure layer is the
+vector-internal-pointer family: after push_back, __begin_/__end_ are
+unconstrained (size() = __end_ - __begin_ fails same-object/overflow
+checks).  Minimal driver: vector<int> v; v.push_back(7);
+assert(v.size()==1).  Header-free reduction blocked on the
+typecheck_method_application crash that all preprocessed-libc++
+sources hit (see cpp20_ranges_basic_libcxx).

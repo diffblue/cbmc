@@ -1,6 +1,6 @@
 KNOWNBUG
 main.cpp
---cpp17 -I ../../../src --object-bits 12 ../../../src/goto-programs/restrict_function_pointers.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions ../../../src/goto-programs/restrict_function_pointers.cpp
 ^\[main\.assertion\.1\] line \d+ restrict_function_pointers converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
@@ -21,3 +21,12 @@ Update 2026-07-22 (late): the auto&& ingredient is FIXED
 no-match (cpp17_umap_emplace_mixed_categories; see also the std-only
 cpp17_vector_emplace_nondefault_pair for the constrained-pair-ctor
 family).
+Update 2026-07-28: FRONT-END FIXED (member-template pack expansion,
+fix for cpp17_vector_emplace_nondefault_pair): both TUs typecheck,
+goto conversion completes and bounded BMC runs to completion;
+main.assertion.1 ("restrict_function_pointers converts") SUCCEEDS.
+Residual: 184 automatic pointer checks fail inside libstdc++
+container internals reached from TU code (semantic library-modeling
+imprecision, e.g. _Fwd_list_base::_M_erase_after), keeping
+VERIFICATION FAILED.  Added --unwind 1 --no-unwinding-assertions so
+the run terminates.
