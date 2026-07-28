@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
+#include <util/config.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
@@ -1924,6 +1925,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // Collect the parameter packs referenced anywhere in the pattern
         // (suffix match against the active type and non-type packs).
         std::set<irep_idt> referenced_packs;
+        std::set<irep_idt> empty_pack_refs;
         std::function<void(const irept &)> collect = [&](const irept &n)
         {
           const irep_idt id = n.get(ID_identifier);
@@ -1946,6 +1948,25 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 p != std::string::npos ? key.substr(p + 2) : key;
               if(suffix == id2string(id))
                 referenced_packs.insert(pe.first);
+            }
+            // N5008 [temp.variadic]/7: an EMPTY pack has no
+            // pack_args_map/pack_expr_map entry, only a zero
+            // pack_size_map entry.  Record it SEPARATELY: it only
+            // drives the expansion as a fallback when no non-empty
+            // pack is referenced (all packs of one expansion share a
+            // length per [temp.variadic]/5, so alongside a live pack a
+            // zero-size suffix match is stale cross-scope state, not
+            // this expansion's pack).
+            for(const auto &ps : template_map.pack_size_map)
+            {
+              if(ps.second != 0)
+                continue;
+              const std::string &key = id2string(ps.first);
+              auto p = key.rfind("::");
+              const std::string suffix =
+                p != std::string::npos ? key.substr(p + 2) : key;
+              if(suffix == id2string(id))
+                empty_pack_refs.insert(ps.first);
             }
           }
           for(const auto &c : n.get_named_sub())
@@ -1971,7 +1992,20 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           return 0;
         };
 
-        if(!referenced_packs.empty())
+        // Fallback: pattern references only EMPTY packs -- a zero-length
+        // expansion ([temp.variadic]/7): contribute no arguments.  Gated
+        // to the CLANG preprocessor mode: the motivating patterns are
+        // libc++'s (__make_tuple_types_flat's __apply_quals with an empty
+        // _Idx), and under libstdc++ the flat template_map's stale
+        // zero-size entries suffix-match unrelated pattern names and this
+        // would wrongly drop live arguments (make_tuple regressed).
+        if(
+          referenced_packs.empty() && !empty_pack_refs.empty() &&
+          config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        {
+          did_expand = true;
+        }
+        else if(!referenced_packs.empty())
         {
           const std::size_t n = pack_len(*referenced_packs.begin());
           bool consistent = true;
