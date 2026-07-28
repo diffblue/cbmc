@@ -4087,3 +4087,55 @@ needs the full instance-reregistration path, so the existing minimal
 Fix directions now well-scoped: (a) evaluate __type_pack_element in
 return-type substitution; (b) parse concept template-ids in
 requires-clauses (rConditionalExpr / the fallback token whitelist).
+
+## Round: type_pack_element / vector_emplace / requires-clause (2026-07-27)
+
+### Fix 1 — __type_pack_element in return-type substitution (2473105b3b)
+Three gaps in the resolve() intercept: (a) count argument arrives
+`ambiguous`-wrapped during return-type substitution ([temp.deduct]/5) —
+unwrap + try/catch, unevaluable => substitution failure; (b) pack
+expansion `Ts...` must be spliced from pack_args_map before indexing
+([temp.variadic]/5); (c) nil-typed expression-flavoured selection =>
+throw 0, not invariant abort (libc++ <variant> core-dumped).
+
+### Fix 2 — concretized pack patterns in member template instances
+In typecheck_compound_declarator's pack loop, a member-template
+instance's pattern `_Args&&... __args` arrives with the declaration
+TYPE scalar-substituted to the first deduced element while the
+declarator keeps `...` — by-name pack lookup fails and the signature
+degenerates. Fallback: expand from the single live pack when NO name
+in the param still spells a template parameter — gated by a new
+`instantiating_member_function_template` RAII flag (ungated it fired
+during CLASS instantiation and broke std::function's
+_Function_handler).
+LESSON (false alarm): manual `sed -n 3p test.desc` flag extraction
+showed the function_basic trio failing; test.pl showed passing.
+test.pl is the ONLY authority.
+
+### Fix 3 — requires-clause concept template-ids (two commits)
+(a) parse.cpp: rConditionalExpr reads `<` in `same_as<T, int>` as
+less-than ([temp.names]/4), so multi-arg concept-ids lost the clause
+(count-only fallback => wrong code). New rConstraintLogicalExpr
+parses the restricted [temp.pre] grammar (atoms via rName which
+consumes template-arg lists; !/()/bool-literals; &&/|| => ID_and/or
+tree) tried before the general parser. TRAILING requires-clauses
+([dcl.decl.general]/4) were skipped entirely: parse them the same
+way; NB rDeclarator REBUILDS the declarator from scratch at the end
+(`declarator=cpp_declaratort()`), so carry the clause in a local and
+attach post-assembly. Satisfaction check conjoins head+trailing
+clauses ([temp.constr.decl]/3).
+(b) cpp_typecheck_resolve.cpp: same-signature twins differing only in
+constraints share one symbol + #sfinae_alt; the alt was only tried on
+deduction failure, so requires-rejection of the primary left ZERO
+candidates and the statement was silently dropped. On requires
+rejection, append the alt to the (local) work list — loop converted
+to index-based to allow appending.
+
+### Residual — cpp20_constraint_substitution_failure (KNOWNBUG)
+Clause parses, constrained candidate correctly rejected; but the
+half-instantiated concept-variable instance left by the GENUINE
+substitution failure (same_as<int, common_reference_t<int,int>>)
+poisons the second resolution pass => statement dropped (vacuous
+SUCCESS caught by desc). Same family as
+cpp17_optional_requires_ctor_pair. Root cause to chase: symbol-table
+cleanup after throwing concept-variable instantiation.
