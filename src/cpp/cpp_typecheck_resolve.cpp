@@ -4801,6 +4801,70 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
                                    ? scope_walk->identifier
                                    : scope_walk->class_identifier;
       const symbolt *class_sym = cpp_typecheck.symbol_table.lookup(class_id);
+      // N5008 [temp.spec.partial.match]: for an instance of a PARTIAL
+      // specialization, the enclosing parameters were bound by deduction
+      // against the argument pattern; replay the persisted deduction-time
+      // bindings (#spec_template_packs, written by instantiate_template) --
+      // the positional pairing below cannot express multi-pack or
+      // non-trailing-pack bindings.  Non-overriding, like the rest of
+      // this pre-bind.
+      if(
+        class_sym != nullptr &&
+        class_sym->type.find(irep_idt{"#spec_template_packs"}).is_not_nil())
+      {
+        const irept &bindings =
+          class_sym->type.find(irep_idt{"#spec_template_packs"});
+        for(const auto &entry : bindings.get_sub())
+        {
+          const irep_idt pid = entry.get(ID_identifier);
+          if(pid.empty())
+            continue;
+          auto &map = cpp_typecheck.template_map;
+          if(entry.id() == irep_idt{"pack_types"})
+          {
+            if(map.pack_size_map.find(pid) != map.pack_size_map.end())
+              continue;
+            std::vector<typet> elems;
+            for(const auto &t : entry.get_sub())
+              elems.push_back(static_cast<const typet &>(t));
+            map.pack_size_map[pid] = elems.size();
+            if(!elems.empty())
+            {
+              if(elems.size() == 1)
+                map.type_map.emplace(pid, elems.front());
+              map.pack_args_map[pid] = std::move(elems);
+            }
+          }
+          else if(entry.id() == irep_idt{"pack_exprs"})
+          {
+            if(map.pack_size_map.find(pid) != map.pack_size_map.end())
+              continue;
+            std::vector<exprt> vals;
+            for(const auto &e : entry.get_sub())
+              vals.push_back(static_cast<const exprt &>(e));
+            map.pack_size_map[pid] = vals.size();
+            if(!vals.empty())
+            {
+              if(vals.size() == 1)
+                map.expr_map.emplace(pid, vals.front());
+              map.pack_expr_map[pid] = std::move(vals);
+            }
+          }
+          else if(
+            entry.id() == irep_idt{"scalar_type"} && !entry.get_sub().empty())
+          {
+            map.type_map.emplace(
+              pid, static_cast<const typet &>(entry.get_sub().front()));
+          }
+          else if(
+            entry.id() == irep_idt{"scalar_expr"} && !entry.get_sub().empty())
+          {
+            map.expr_map.emplace(
+              pid, static_cast<const exprt &>(entry.get_sub().front()));
+          }
+        }
+      }
+
       if(
         class_sym != nullptr &&
         class_sym->type.find(ID_C_template).is_not_nil() &&
@@ -5159,6 +5223,33 @@ exprt cpp_typecheck_resolvet::resolve(
     if(count.id() == ID_type || count.id() == ID_ambiguous)
       count =
         static_cast<const exprt &>(static_cast<const irept &>(count.type()));
+    // N5008 [temp.param]/8: within an instantiation context a non-type
+    // template parameter name denotes its bound argument.  A count that is
+    // (still) a bare parameter reference -- e.g. `_Idx` in libc++'s
+    // `__apply_cv_t<_Tp, __type_pack_element<_Idx, _Types...>>` after the
+    // enclosing expansion bound the packs -- must be substituted from the
+    // template map; the general expression resolution below does not
+    // consult expr_map for such names and mis-resolves them.
+    if(count.id() == ID_cpp_name)
+    {
+      const auto &csub = static_cast<const irept &>(count).get_sub();
+      if(csub.size() == 1 && csub.front().id() == ID_name)
+      {
+        const irep_idt cname = csub.front().get(ID_identifier);
+        for(const auto &entry : cpp_typecheck.template_map.expr_map)
+        {
+          const std::string key = id2string(entry.first);
+          const auto pos = key.rfind("::");
+          if(
+            (pos != std::string::npos ? key.substr(pos + 2) : key) ==
+            id2string(cname))
+          {
+            count = entry.second;
+            break;
+          }
+        }
+      }
+    }
     std::optional<mp_integer> n;
     try
     {
