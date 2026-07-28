@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ functional cast to dependent tuple_element type: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+cvise-reduced from cpp17_abstract_environment_tu (make_shared inside
+CBMC's own abstract_environment.cpp): a functional cast to a
+dependent tuple_element-style member type with a two-element argument
+pack segfaults the front end.  Same malformed-explicit-typecast
+family as cpp20_views_take_call_crash.  g++/clang++/valgrind clean.
