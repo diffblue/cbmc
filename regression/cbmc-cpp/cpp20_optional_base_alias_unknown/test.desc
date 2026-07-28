@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ conversion clean: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free mimic of libc++ std::optional, cvise-reduced from an
+<optional> driver.  Instantiating the class fails to resolve its
+dependent-base machinery: "found no match for symbol
+'__optional_move_assign_base'" followed by "symbol '__base' is
+unknown" (the member alias for the base-class template).  Gates
+cpp20_map_basic_libcxx, whose conversion error ("symbol
+'__null_state_' is unknown", optional line 288) is the same family.
+clang++ -std=c++20 accepts (clang builtins; g++ n/a).

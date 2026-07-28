@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ leaf value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free mimic of libc++ std::tuple, cvise-reduced: the constructor
+chain routes through __make_integer_seq / __type_pack_element
+metafunctions and the instantiated member bodies are dropped ("no body
+for callee tuple / get") even though the source defines them.  Gates
+cpp11_libcxx_tuple and the test_libcxx variants of cpp11_tuple_basic,
+cpp17_tuple_basic and cpp17_apply_basic.  clang++ accepts and runs
+clean (clang-only builtins; g++ n/a).
