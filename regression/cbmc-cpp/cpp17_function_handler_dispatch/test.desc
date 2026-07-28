@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[apply\.assertion\.1\] line \d+ handler ran through std::function: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free mimic of libstdc++'s std::function dispatch, cvise-reduced
+from cpp17_std_function_lambda_call: the callable is stored through the
+_Function_handler pattern and invoked via the _M_invoker function
+pointer; symex never reaches the closure body, so the by-reference
+update is lost and the assertion wrongly fails ([func.wrap.func.inv]).
+g++/clang++ accept and run clean (exit 0).
