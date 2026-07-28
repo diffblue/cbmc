@@ -14,3 +14,4 @@ identities unify; a post-drain sweep finishes system-header instances
 half-converted under candidate matching).  Remaining: _M_manager
 dispatch imprecision (unconstrained function-pointer candidates,
 bounds failures in ~_Function_base) keeps the invocation unverified.
+Minimal header-free reproducer: cpp17_function_handler_dispatch.

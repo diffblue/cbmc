@@ -19,3 +19,4 @@ Update 2026-07-24: past the same_as front-end failure
 The same_as front-end failure is the requires-clause concept-template-id
 parse gap, captured minimally in
 cpp20_requires_clause_concept_template_id.
+Minimal header-free reproducer: cpp20_optional_base_alias_unknown.
