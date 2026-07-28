@@ -21,3 +21,4 @@ during deduction; a header-free replica of that shape passes, and
 pair's get works.
 Residual isolated as minimal KNOWNBUG cpp11_type_pack_element_return
 (__type_pack_element builtin unevaluable in return-type substitution).
+Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
