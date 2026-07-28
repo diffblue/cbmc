@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.2\] line \d+ unconstrained wins for double: SUCCESS$
@@ -7,9 +7,6 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-A requires-clause whose constraint is a multi-argument concept
-template-id is dropped at parse (rConditionalExpr treats '<' as
-less-than; only a constraint count is stored), so the constrained
-overload stays viable for every type (wrong code).  Single-argument
-concept constraints parse fine.  Parser root of
-cpp20_constraint_substitution_failure and the cpp20 *_libcxx class.
+Fixed 2026-07-27: requires-clauses now parse concept template-ids via
+the restricted [temp.pre] grammar (head and trailing clauses;
+[temp.constr.decl]/3 conjunction in the satisfaction check).

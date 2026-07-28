@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12 --unwind 4 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ emplace_back pair with non-default-constructible member: SUCCESS$
@@ -7,40 +7,8 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Instantiating vector<pair<T,U>>::emplace_back with a
-non-default-constructible T hard-fails a constrained pair constructor
-instead of discarding it ([temp.deduct]/8).  Root ingredient of the
-sharing_node pair<ssa_exprt,...> failures in the goto_symex_state and
-abstract_environment dog-food TUs.
-Diagnosis 2026-07-23: during emplace_back's instantiation, pair's
-SFINAE-constrained default constructor instance (stl_pair.h:544,
-gated on is_default_constructible) is eagerly converted although
-never odr-used ([temp.inst]/4,/11); its mem-initializer `first()`
-finds no symbolish ctor.  The nested failure is swallowed per
-function, but emplace_back's own candidate is lost and the
-[temp.deduct]/8 all-templates-failed path escalates via
-pending_no_viable_call at depth 0.  push_back with an explicit pair
-WORKS -- only the member-template instantiation path is affected.
-Update 2026-07-24 (mechanism pinned): the candidate SIGNATURE is
-formed with the pack homogenised -- pack_deduced_types deduces
-{symbolish, unsigned long} correctly, but the function-type expansion
-of `_Args&&...` consults pack_args_map, which is only recorded AFTER
-the type is formed (the late recording serves the return-type path),
-so the scalar type_map entry (first element) fills every copy:
-emplace_back's own signature becomes (symbolish&&, symbolish&&) and
-2ul cannot bind.  Recording the pack EARLY fixes this test but
-double-expands two-pack constructors (cpp17_tuple_get_two_pack_ctor_
-3elem): the parameter synthesis writes concrete types positionally
-AND the typecheck-time pack expansion duplicates them.  The proper
-fix is a single expansion point for deduced parameter packs.
-Update 2026-07-25: two hardenings landed from this investigation
-([temp.variadic]/7 multi-element packs no longer marked empty at
-member instantiation; function-template registration no longer guts
-class-instance bodies).  The homogenised instance persists through a
-further unidentified path: the instantiated symbol
-emplace_back<symbolish, ulong> still carries (this, symbolish&&,
-symbolish&&) though pack_args_map holds {symbolish, unsigned long} at
-its instantiation, and the instance body's stored declaration is
-intact after the copy fix.  Next probe point: the parameter
-type-checking inside convert_non_template_declaration for the member
-instance (where the `_Args&&...` expansion consumes the pack).
+Fixed 2026-07-27: the member-instance parameter pattern arrives with
+its pack reference scalar-substituted to the first element; expansion
+now falls back to the single live pack when the pattern is fully
+concretized (member-function-template instantiations only).  See the
+src commit for the [temp.variadic]/5 grounding.
