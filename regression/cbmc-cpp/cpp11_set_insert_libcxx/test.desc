@@ -12,3 +12,11 @@ Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
 libc++ <set>: "invalid initializer '__pair1_'" in __tree
 (mem-initializer naming a member of a compressed-pair base;
 __tree line 1341).
+Update 2026-07-28: the comparator null-deref is downstream of the
+bodyless-member family -- a single insert already shows "no body for
+callee __tree::__emplace_unique_key_args / __end_node / ~__tree"
+(same class as cpp11_tuple_leaf_no_body, which is the minimal
+reproducer for lost member bodies).  A dedicated header-free
+reduction is blocked: preprocessed-libc++ sources hit the
+cpp20_views_take_call_crash invariant before conversion.  Needs
+--object-bits 12 to get past "too many addressed objects".
