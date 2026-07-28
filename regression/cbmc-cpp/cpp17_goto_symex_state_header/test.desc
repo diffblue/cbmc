@@ -11,3 +11,4 @@ defaulted copy ctor): synthesized copy machinery demands a
 symbol_exprt default construction and an inaccessible goto_statet
 default constructor.  Std-only ingredient:
 cpp17_vector_emplace_nondefault_pair.
+Minimal header-free reproducer: cpp17_anon_struct_member_ctor_only.
