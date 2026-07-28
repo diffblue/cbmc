@@ -156,25 +156,9 @@ string_constraint_generatort::add_axioms_for_substring(
 /// Remove leading and trailing whitespaces
 ///
 /// Add axioms ensuring `res` corresponds to `str` from which leading and
-/// trailing whitespaces have been removed.
-/// Are considered whitespaces, characters whose ascii code are smaller than
-/// that of ' ' (space).
-///
-/// These axioms are:
-///   1. \f$ idx + |{\tt res}| \le |{\tt str}| \f$ where `idx` represents
-///      the index of the first non-space character.
-///   2. \f$ idx \ge 0 \f$
-///   3. \f$ |{\tt str}| \ge idx \f$
-///   4. \f$ |{\tt res}| \ge 0 \f$
-///   5. \f$ |{\tt res}| \le |{\tt str}| \f$
-///        (this is necessary to prevent exceeding the biggest integer)
-///   6. \f$ \forall n<m.\ {\tt str}[n] \le \lq~\rq \f$
-///   7. \f$ \forall n<|{\tt str}|-m-|{\tt res}|.\ {\tt str}[m+|{\tt res}|+n]
-///          \le \lq~\rq \f$
-///   8. \f$ \forall n<|{\tt res}|.\ {\tt str}[idx+n]={\tt res}[n] \f$
-///   9. \f$ (s[m]>{\tt \lq~\rq} \land s[m+|{\tt res}|-1]>{\tt \lq~\rq})
-///          \lor m=|{\tt res}| \f$
-/// \note Some of the constraints among 1, 2, 3, 4 and 5 seems to be redundant
+/// trailing characters whose code is at most that of ' ' (space) have been
+/// removed, as Java's `String.trim` does. See add_axioms_for_strip for the
+/// axioms.
 /// \param f: function application with arguments integer `|res|`, character
 ///   pointer `&res[0]`, refined_string `str`.
 /// \return integer expression which is different from 0 when there is an
@@ -184,78 +168,138 @@ string_constraint_generatort::add_axioms_for_trim(
   const function_application_exprt &f)
 {
   PRECONDITION(f.arguments().size() == 3);
-  string_constraintst constraints;
   const array_string_exprt &str = get_string_expr(array_pool, f.arguments()[2]);
   const array_string_exprt &res =
     array_pool.find(f.arguments()[1], f.arguments()[0]);
-  const typet &index_type = str.length_type();
   const typet &char_type = to_type_with_subtype(str.content().type()).subtype();
-  const symbol_exprt idx = fresh_symbol("index_trim", index_type);
   const exprt space_char = from_integer(' ', char_type);
+  string_constraintst constraints = add_axioms_for_strip(
+    str,
+    res,
+    [&space_char](const exprt &c) -> exprt
+    { return binary_relation_exprt{c, ID_le, space_char}; },
+    strip_endst::BOTH);
+  return {from_integer(0, f.type()), std::move(constraints)};
+}
 
-  // Axiom 1.
-  constraints.existential.push_back(greater_or_equal_to(
-    array_pool.get_or_create_length(str),
-    plus_exprt(idx, array_pool.get_or_create_length(res))));
+/// Remove a maximal run of characters satisfying \p is_strippable from the
+/// front and/or the back of \p str.
+///
+/// Add axioms ensuring `res` is `str` without its longest prefix (if \p ends
+/// is FRONT or BOTH) and its longest suffix (if \p ends is BACK or BOTH)
+/// consisting of characters `c` for which `is_strippable(c)` holds. With
+/// `idx` the index in `str` of the first kept character, these axioms are:
+///   1. \f$ idx + |{\tt res}| \le |{\tt str}| \f$
+///   2. \f$ idx \ge 0 \f$
+///   3. \f$ |{\tt str}| \ge idx \f$
+///   4. \f$ |{\tt res}| \ge 0 \f$
+///   5. \f$ |{\tt res}| \le |{\tt str}| \f$
+///        (this is necessary to prevent exceeding the biggest integer)
+///   6. only if the front is not stripped: \f$ idx = 0 \f$
+///   7. only if the back is not stripped:
+///      \f$ |{\tt res}| = |{\tt str}| - idx \f$
+///   8. if the front is stripped:
+///      \f$ \forall n<idx.\ p({\tt str}[n]) \f$
+///   9. if the back is stripped:
+///      \f$ \forall n<|{\tt str}|-idx-|{\tt res}|.
+///          \ p({\tt str}[idx+|{\tt res}|+n]) \f$
+///   10. \f$ \forall n<|{\tt res}|.\ {\tt str}[idx+n]={\tt res}[n] \f$
+///   11. \f$ e \lor (F \land B) \f$ where \f$ e \f$ is \f$ idx=|{\tt str}| \f$
+///      if the front is stripped and \f$ |{\tt res}|=0 \f$ otherwise,
+///      \f$ F \f$ is \f$ \lnot p({\tt str}[idx]) \f$ if the front is stripped
+///      (true otherwise), and \f$ B \f$ is
+///      \f$ \lnot p({\tt str}[idx+|{\tt res}|-1]) \f$ if the back is stripped
+///      (true otherwise).
+///
+/// \param str: input string
+/// \param res: string expression for the result
+/// \param is_strippable: maps a character expression (of the element type of
+///   \p str) to a Boolean expression \f$ p(c) \f$ that holds iff that
+///   character is to be removed. It is also applied to `str[idx]` and
+///   `str[idx+|res|-1]` in axiom 11, which are out of bounds when the result
+///   is empty; axiom 11 does not depend on their value in that case.
+/// \param ends: which end(s) of \p str to strip
+/// \return the constraints
+string_constraintst string_constraint_generatort::add_axioms_for_strip(
+  const array_string_exprt &str,
+  const array_string_exprt &res,
+  const std::function<exprt(const exprt &)> &is_strippable,
+  strip_endst ends)
+{
+  const bool strip_front = ends != strip_endst::BACK;
+  const bool strip_back = ends != strip_endst::FRONT;
+  string_constraintst constraints;
+  const typet &index_type = str.length_type();
+  const symbol_exprt idx = fresh_symbol("index_strip", index_type);
+  const exprt str_len = array_pool.get_or_create_length(str);
+  const exprt res_len = array_pool.get_or_create_length(res);
 
-  binary_relation_exprt a2(idx, ID_ge, from_integer(0, index_type));
-  constraints.existential.push_back(a2);
+  // Axioms 1 to 5.
+  constraints.existential.push_back(
+    greater_or_equal_to(str_len, plus_exprt{idx, res_len}));
+  constraints.existential.push_back(
+    binary_relation_exprt{idx, ID_ge, from_integer(0, index_type)});
+  constraints.existential.push_back(greater_or_equal_to(str_len, idx));
+  constraints.existential.push_back(
+    greater_or_equal_to(res_len, from_integer(0, index_type)));
+  constraints.existential.push_back(less_than_or_equal_to(res_len, str_len));
 
-  const exprt a3 =
-    greater_or_equal_to(array_pool.get_or_create_length(str), idx);
-  constraints.existential.push_back(a3);
+  // Axioms 6 and 7.
+  if(!strip_front)
+    constraints.existential.push_back(
+      equal_exprt{idx, from_integer(0, index_type)});
+  if(!strip_back)
+    constraints.existential.push_back(
+      equal_exprt{res_len, minus_exprt{str_len, idx}});
 
-  const exprt a4 = greater_or_equal_to(
-    array_pool.get_or_create_length(res), from_integer(0, index_type));
-  constraints.existential.push_back(a4);
+  // Axiom 8: the removed leading characters [0, idx) are strippable.
+  if(strip_front)
+  {
+    const symbol_exprt n = fresh_symbol("QA_strip_front", index_type);
+    constraints.universal.push_back(string_constraintt{
+      n, zero_if_negative(idx), is_strippable(str[n]), message_handler});
+  }
+  // Axiom 9: the removed trailing characters [idx+|res|, |str|) are
+  // strippable.
+  if(strip_back)
+  {
+    const symbol_exprt n = fresh_symbol("QA_strip_back", index_type);
+    const minus_exprt bound{minus_exprt{str_len, idx}, res_len};
+    constraints.universal.push_back(string_constraintt{
+      n,
+      zero_if_negative(bound),
+      is_strippable(str[plus_exprt{idx, plus_exprt{res_len, n}}]),
+      message_handler});
+  }
+  // Axiom 10: res is the kept slice of str.
+  {
+    const symbol_exprt n = fresh_symbol("QA_strip_copy", index_type);
+    constraints.universal.push_back(string_constraintt{
+      n,
+      zero_if_negative(res_len),
+      equal_exprt{res[n], str[plus_exprt{n, idx}]},
+      message_handler});
+  }
 
-  const exprt a5 = less_than_or_equal_to(
-    array_pool.get_or_create_length(res), array_pool.get_or_create_length(str));
-  constraints.existential.push_back(a5);
+  // Axiom 11 (maximality): either the result is empty, or the kept boundary
+  // characters are not strippable. When only the back is stripped, idx is 0,
+  // so idx = |str| would not express an empty result for non-empty str.
+  const exprt result_empty =
+    strip_front ? equal_exprt{idx, str_len}
+                : equal_exprt{res_len, from_integer(0, index_type)};
+  exprt::operandst kept_boundary;
+  if(strip_front)
+    kept_boundary.push_back(not_exprt{is_strippable(str[idx])});
+  if(strip_back)
+  {
+    const plus_exprt last{
+      idx, minus_exprt{res_len, from_integer(1, index_type)}};
+    kept_boundary.push_back(not_exprt{is_strippable(str[last])});
+  }
+  constraints.existential.push_back(
+    or_exprt{result_empty, conjunction(kept_boundary)});
 
-  symbol_exprt n = fresh_symbol("QA_index_trim", index_type);
-  binary_relation_exprt non_print(str[n], ID_le, space_char);
-  string_constraintt a6(n, zero_if_negative(idx), non_print, message_handler);
-  constraints.universal.push_back(a6);
-
-  // Axiom 7.
-  constraints.universal.push_back([&] {
-    const symbol_exprt n2 = fresh_symbol("QA_index_trim2", index_type);
-    const minus_exprt bound(
-      minus_exprt(array_pool.get_or_create_length(str), idx),
-      array_pool.get_or_create_length(res));
-    const binary_relation_exprt eqn2(
-      str[plus_exprt(
-        idx, plus_exprt(array_pool.get_or_create_length(res), n2))],
-      ID_le,
-      space_char);
-    return string_constraintt(
-      n2, zero_if_negative(bound), eqn2, message_handler);
-  }());
-
-  symbol_exprt n3 = fresh_symbol("QA_index_trim3", index_type);
-  equal_exprt eqn3(res[n3], str[plus_exprt(n3, idx)]);
-  string_constraintt a8(
-    n3,
-    zero_if_negative(array_pool.get_or_create_length(res)),
-    eqn3,
-    message_handler);
-  constraints.universal.push_back(a8);
-
-  // Axiom 9.
-  constraints.existential.push_back([&] {
-    const plus_exprt index_before(
-      idx,
-      minus_exprt(
-        array_pool.get_or_create_length(res), from_integer(1, index_type)));
-    const binary_relation_exprt no_space_before(
-      str[index_before], ID_gt, space_char);
-    return or_exprt(
-      equal_exprt(idx, array_pool.get_or_create_length(str)),
-      and_exprt(
-        binary_relation_exprt(str[idx], ID_gt, space_char), no_space_before));
-  }());
-  return {from_integer(0, f.type()), constraints};
+  return constraints;
 }
 
 /// Convert two expressions to pair of chars
