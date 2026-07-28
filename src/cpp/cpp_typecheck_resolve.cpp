@@ -920,8 +920,29 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         if(tsym != nullptr && tsym->type.id() == ID_cpp_declaration)
         {
           const cpp_declarationt &tdecl = to_cpp_declaration(tsym->type);
-          const exprt &req_clause = static_cast<const exprt &>(
+          // N5008 [temp.constr.decl]/3: the associated constraints are
+          // the conjunction of the template-head requires-clause and
+          // the declarator's TRAILING requires-clause
+          // ([dcl.decl.general]/4).
+          exprt req_clause = static_cast<const exprt &>(
             tdecl.template_type().find(ID_C_requires_clause));
+          if(!tdecl.declarators().empty())
+          {
+            const exprt &trailing = static_cast<const exprt &>(
+              tdecl.declarators().front().find(ID_C_requires_clause));
+            if(trailing.is_not_nil() && trailing.id() != ID_nil)
+            {
+              if(req_clause.is_nil() || req_clause.id() == ID_nil)
+                req_clause = trailing;
+              else
+              {
+                exprt conj(ID_and);
+                conj.add_to_operands(std::move(req_clause));
+                conj.add_to_operands(exprt(trailing));
+                req_clause = std::move(conj);
+              }
+            }
+          }
           if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
           {
             // Evaluate the substituted constraint inside a SFINAE context
