@@ -302,6 +302,7 @@ protected:
   bool rMemberInit(exprt &);
 
   bool rName(irept &);
+  bool rConstraintLogicalExpr(exprt &);
   bool rOperatorName(irept &);
   bool rCastOperatorName(irept &);
   bool rPtrToMember(irept &);
@@ -1437,6 +1438,35 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     {
       cpp_tokent req_tk;
       lex.get_token(req_tk);
+
+      // First try the restricted [temp.pre] constraint grammar, which
+      // handles multi-argument concept-ids (`requires same_as<T,
+      // int>`) that the general expression parser reads as
+      // less-than chains.
+      {
+        auto saved_pos = lex.Save();
+        exprt requires_expr;
+        if(rConstraintLogicalExpr(requires_expr))
+        {
+          int next = lex.LookAhead(0);
+          if(
+            next == TOK_TEMPLATE || next == TOK_USING || next == TOK_STRUCT ||
+            next == TOK_CLASS || next == TOK_UNION || next == TOK_ENUM ||
+            next == TOK_VOID || next == TOK_INT || next == TOK_CHAR ||
+            next == TOK_SHORT || next == TOK_LONG || next == TOK_FLOAT ||
+            next == TOK_DOUBLE || next == TOK_BOOL || next == TOK_SIGNED ||
+            next == TOK_UNSIGNED || next == TOK_AUTO || next == TOK_CONSTEXPR ||
+            next == TOK_STATIC || next == TOK_INLINE || next == TOK_EXTERN ||
+            next == TOK_FRIEND || next == TOK_VIRTUAL || next == TOK_TYPEDEF ||
+            next == TOK_TYPENAME || next == TOK_CONST || next == TOK_VOLATILE ||
+            (is_identifier(next) && !is_identifier(lex.LookAhead(1))))
+          {
+            template_type.add(ID_C_requires_clause).swap(requires_expr);
+            goto requires_done;
+          }
+        }
+        lex.Restore(saved_pos);
+      }
 
       // Try to parse the requires clause as an expression.
       // Only accept if the next token after the expression is
@@ -4600,6 +4630,8 @@ bool Parser::rDeclarator(
   bool is_statement)
 {
   int t;
+  // trailing requires-clause carried to the final declarator assembly
+  exprt trailing_requires = nil_exprt{};
 
 #ifdef DEBUG
   indenter _i;
@@ -4886,6 +4918,31 @@ bool Parser::rDeclarator(
           break;
       }
 
+      // C++20 trailing requires clause ([dcl.decl.general]/4): part of
+      // the declarator; its constraint-expression is associated with
+      // the declaration exactly like a template-head clause
+      // ([temp.constr.decl]/2-3).  Parse the restricted [temp.pre]
+      // grammar and record it on the declarator; the satisfaction
+      // check reads it alongside the template-head clause.  On parse
+      // failure fall back to the historical skip.
+      if(lex.LookAhead(0) == TOK_REQUIRES)
+      {
+        auto tr_saved = lex.Save();
+        cpp_tokent tr_tk;
+        lex.get_token(tr_tk);
+        exprt tr_clause;
+        if(rConstraintLogicalExpr(tr_clause))
+        {
+          const int nxt = lex.LookAhead(0);
+          if(nxt == '{' || nxt == ';' || nxt == ',' || nxt == ')')
+          {
+            trailing_requires.swap(tr_clause);
+            goto trailing_requires_done;
+          }
+        }
+        lex.Restore(tr_saved);
+      }
+
       // C++20 trailing requires clause: skip
       if(lex.LookAhead(0) == TOK_REQUIRES)
       {
@@ -4981,6 +5038,7 @@ bool Parser::rDeclarator(
             break;
         }
       }
+    trailing_requires_done:;
 
       if(lex.LookAhead(0)==':')
       {
@@ -5063,6 +5121,9 @@ bool Parser::rDeclarator(
 
   if(method_qualifier.is_not_nil())
     declarator.method_qualifier().swap(method_qualifier);
+
+  if(trailing_requires.is_not_nil())
+    declarator.add(ID_C_requires_clause).swap(trailing_requires);
 
   declarator.type().swap(d_outer);
 
@@ -5400,6 +5461,81 @@ bool Parser::rMemberInit(exprt &init)
 
   C++11 [expr.prim] (A.4)
 */
+/// N5008 [temp.pre] grammar: a requires-clause is a
+/// constraint-logical-or-expression whose primaries are restricted to
+/// primary-expressions -- in practice concept-ids (template-ids over
+/// concepts), bool literals, parenthesized constraint-expressions and
+/// their !/&&/|| combinations.  The general rConditionalExpr cannot
+/// parse a multi-argument concept-id here (it reads the '<' as
+/// less-than, [temp.names]/4 requires recognising the concept), so
+/// parse the restricted grammar directly with rName, which does
+/// consume template argument lists for known templates.
+bool Parser::rConstraintLogicalExpr(exprt &expr)
+{
+  // constraint-logical-and ('||' constraint-logical-and)*
+  auto parse_atom = [this](exprt &atom) -> bool
+  {
+    if(lex.LookAhead(0) == '!')
+    {
+      cpp_tokent tk;
+      lex.get_token(tk);
+      exprt sub;
+      if(!rConstraintLogicalExpr(sub))
+        return false;
+      atom = exprt(ID_not);
+      atom.add_to_operands(std::move(sub));
+      return true;
+    }
+    if(lex.LookAhead(0) == '(')
+    {
+      cpp_tokent tk;
+      lex.get_token(tk);
+      exprt sub;
+      if(!rConstraintLogicalExpr(sub))
+        return false;
+      if(lex.LookAhead(0) != ')')
+        return false;
+      lex.get_token(tk);
+      atom = std::move(sub);
+      return true;
+    }
+    if(lex.LookAhead(0) == TOK_TRUE || lex.LookAhead(0) == TOK_FALSE)
+    {
+      cpp_tokent tk;
+      lex.get_token(tk);
+      atom = tk.kind == TOK_TRUE ? static_cast<exprt>(true_exprt())
+                                 : static_cast<exprt>(false_exprt());
+      return true;
+    }
+    irept name;
+    if(!rName(name))
+      return false;
+    atom = static_cast<const exprt &>(static_cast<const irept &>(name));
+    return true;
+  };
+
+  exprt lhs;
+  if(!parse_atom(lhs))
+    return false;
+  for(;;)
+  {
+    const int next = lex.LookAhead(0);
+    if(next != TOK_ANDAND && next != TOK_OROR)
+      break;
+    cpp_tokent tk;
+    lex.get_token(tk);
+    exprt rhs;
+    if(!parse_atom(rhs))
+      return false;
+    exprt combined(next == TOK_ANDAND ? ID_and : ID_or);
+    combined.add_to_operands(std::move(lhs));
+    combined.add_to_operands(std::move(rhs));
+    lhs = std::move(combined);
+  }
+  expr = std::move(lhs);
+  return true;
+}
+
 bool Parser::rName(irept &name)
 {
 #ifdef DEBUG
