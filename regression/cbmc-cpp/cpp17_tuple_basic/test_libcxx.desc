@@ -18,3 +18,4 @@ into the goto program and verification "succeeds" vacuously.
 Expected-when-fixed now requires main's assertion to be SUCCESS in
 the output; until libc++ tuple deduction actually completes through
 CBMC's front-end, this test stays on the KNOWNBUG list.
+Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
