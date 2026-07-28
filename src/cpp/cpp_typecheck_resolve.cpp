@@ -563,8 +563,12 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     }
   }
 
-  for(const auto &old_id : old_identifiers)
+  // Index-based: a requires-clause rejection of a primary overload may
+  // APPEND its #sfinae_alt twin for consideration (same-signature
+  // overloads differing only in constraints share one symbol).
+  for(std::size_t old_idx = 0; old_idx < old_identifiers.size(); ++old_idx)
   {
+    const exprt old_id = old_identifiers[old_idx];
     // N5008 [temp.deduct.guide]/1: deduction guides are not found by name
     // lookup and are not functions; they are used only when forming the set of
     // implied class-template-argument-deduction candidates
@@ -1373,7 +1377,29 @@ void cpp_typecheck_resolvet::guess_function_template_args(
       }
 
       if(concept_ok && requires_ok)
+      {
         identifiers.push_back(e);
+      }
+      else if(!requires_ok)
+      {
+        // N5008 [over.match.viable]/3 + [temp.constr.decl]: an overload
+        // whose associated constraints are not satisfied is removed --
+        // but a SAME-SIGNATURE twin differing only in constraints
+        // shares this symbol as its #sfinae_alt; give it its own turn
+        // ([over.match.funcs]: each declared overload participates).
+        const irep_idt tmpl_name = e.type().get(ID_C_template);
+        auto alt_it2 = cpp_typecheck.sfinae_alternatives.find(tmpl_name);
+        if(alt_it2 != cpp_typecheck.sfinae_alternatives.end())
+        {
+          const irep_idt alt_name = id2string(tmpl_name) + "#sfinae_alt";
+          if(!cpp_typecheck.symbol_table.has_symbol(alt_name))
+            cpp_typecheck.symbol_table.insert(alt_it2->second);
+          exprt alt_id{ID_symbol};
+          alt_id.type() = alt_it2->second.type;
+          alt_id.set(ID_identifier, alt_name);
+          old_identifiers.push_back(alt_id);
+        }
+      }
     }
     else if(old_id.id() == ID_symbol)
     {
