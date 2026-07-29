@@ -2118,18 +2118,74 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     {
       // maybe the name of the member collides with a parameter of the
       // constructor
+      const exprt &this_e = cpp_scopes.current_scope().this_expr;
+      if(this_e.is_nil() || this_e.type().id() != ID_pointer)
+      {
+        error().source_location = code.source_location();
+        error() << "member initializer outside class context" << eom;
+        throw 0;
+      }
       exprt dereference(
-        ID_dereference,
-        to_pointer_type(cpp_scopes.current_scope().this_expr.type())
-          .base_type());
-      dereference.copy_to_operands(cpp_scopes.current_scope().this_expr);
+        ID_dereference, to_pointer_type(this_e.type()).base_type());
+      dereference.copy_to_operands(this_e);
       cpp_typecheck_fargst deref_fargs;
       deref_fargs.add_object(dereference);
 
       {
+        // N5008 [class.base.init]/2: the mem-initializer-id is looked up
+        // in the scope of the CONSTRUCTOR'S CLASS (so the data member
+        // wins over a same-named constructor parameter).  The scope of
+        // an INSTANTIATED member function template records no
+        // class_identifier (its parent chain goes through the template
+        // scope), and blindly indexing id_map with the empty id inserts
+        // and dereferences a null scope pointer.  Derive the class scope
+        // from `this` instead, and fall back to the current scope's
+        // class_identifier only when set.
         cpp_save_scopet cpp_saved_scope(cpp_scopes);
-        cpp_scopes.go_to(
-          *(cpp_scopes.id_map[cpp_scopes.current_scope().class_identifier]));
+        // Prefer the class named by `this`: for an instantiated member
+        // function template the scope's class_identifier records the
+        // member's template-instance scope (not present in id_map under
+        // that spelling), while the tag type of `this` names the class
+        // symbol whose scope is registered.
+        irep_idt class_id;
+        {
+          const typet &class_tag = to_pointer_type(this_e.type()).base_type();
+          if(class_tag.id() == ID_struct_tag || class_tag.id() == ID_union_tag)
+            class_id = to_tag_type(class_tag).get_identifier();
+        }
+        if(
+          class_id.empty() ||
+          cpp_scopes.id_map.find(class_id) == cpp_scopes.id_map.end())
+        {
+          const irep_idt fallback_id =
+            cpp_scopes.current_scope().class_identifier;
+          if(
+            !fallback_id.empty() &&
+            cpp_scopes.id_map.find(fallback_id) != cpp_scopes.id_map.end())
+          {
+            class_id = fallback_id;
+          }
+        }
+        auto scope_it = cpp_scopes.id_map.find(class_id);
+        if(scope_it == cpp_scopes.id_map.end())
+        {
+          // Class scopes are keyed by the class symbol's name; a tag
+          // identifier carries a `tag-` prefix on the base name --
+          // strip it (mirroring the naming convention in
+          // instantiate_template's `"tag-" + base_name`).
+          const std::string cid = id2string(class_id);
+          const auto pos = cid.rfind("tag-");
+          if(pos != std::string::npos)
+            scope_it =
+              cpp_scopes.id_map.find(cid.substr(0, pos) + cid.substr(pos + 4));
+        }
+        if(scope_it == cpp_scopes.id_map.end() || scope_it->second == nullptr)
+        {
+          error().source_location = code.source_location();
+          error() << "failed to find class scope of member initializer" << eom;
+          throw 0;
+        }
+        cpp_scopes.go_to(*scope_it->second);
         symbol_expr =
           resolve(member, cpp_typecheck_resolvet::wantt::VAR, deref_fargs);
       }

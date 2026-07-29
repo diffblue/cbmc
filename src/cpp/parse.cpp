@@ -2851,6 +2851,18 @@ bool Parser::rOtherDeclaration(
     }
   }
 
+  // N5008 [temp.res.general]/4 + [class.ctor.general]/1: a name
+  // introduced with `typename` denotes a TYPE; a constructor has no
+  // type and its declarator-id is never `typename`-qualified.  Without
+  // this, a statement such as `typename get_typet<I, Ts...>::type
+  // (ts...);` (a functional cast to a dependent member type, the shape
+  // of make_shared's placement-new argument) parses as a constructor
+  // declaration and its "member initializer" later crashes the
+  // type-checker.  [stmt.ambig]/1 resolves the ambiguity in favour of
+  // a declaration only when the statement can BE a declaration.
+  if(is_constructor && type_name.get_bool(ID_typename))
+    is_constructor = false;
+
   if(is_operator && is_constructor)
   {
 #ifdef DEBUG
