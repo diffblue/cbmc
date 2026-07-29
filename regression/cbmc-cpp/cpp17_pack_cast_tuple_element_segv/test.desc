@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ functional cast to dependent tuple_element type: SUCCESS$
@@ -7,8 +7,10 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-cvise-reduced from cpp17_abstract_environment_tu (make_shared inside
-CBMC's own abstract_environment.cpp): a functional cast to a
-dependent tuple_element-style member type with a two-element argument
-pack segfaults the front end.  Same malformed-explicit-typecast
-family as cpp20_views_take_call_crash.  g++/clang++/valgrind clean.
+Fixed 2026-07-28: (a) a typename-qualified name is never a
+constructor declarator-id ([temp.res.general]/4), so the functional
+cast statement no longer parses as a constructor declaration; (b) the
+mem-initializer parameter-collision path derives the class scope from
+`this` ([class.base.init]/2) instead of blindly indexing id_map with
+an instantiated member template's empty/foreign class_identifier
+(null-scope dereference).
