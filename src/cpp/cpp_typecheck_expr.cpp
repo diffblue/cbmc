@@ -1717,6 +1717,16 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 
   if(expr.id() == "explicit-typecast")
   {
+    // N5008 [expr.type.conv]/2: only a single-operand functional cast can
+    // invoke a CONVERSION function; with two or more operands the
+    // expression is direct-initialization and this branch does not apply.
+    // A malformed cast (nil target type) cannot name a conversion function
+    // either -- both shapes occur transiently while
+    // guess_function_template_args substitutes into a candidate signature
+    // (libc++'s views::take call), and to_unary_expr below would abort.
+    if(expr.operands().size() != 1 || expr.type().is_nil())
+      return false;
+
     // the cast operator can be overloaded
 
     typet t = expr.type();
