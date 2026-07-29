@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ emplace with mixed value categories: SUCCESS$
@@ -7,10 +7,8 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Header-free mimic of libstdc++'s unordered_map, cvise-reduced from
-cpp17_umap_emplace_mixed_categories with a valgrind gate to exclude
-undefined-behaviour degeneration.  The hashtable class template is
-reached through an alias template whose default argument computes a
-bool non-type parameter; the emplace() member's increment on the
-NSDMI-initialised counter is lost and the size assertion wrongly
-fails.  g++ and clang++ accept and run clean (exit 0).
+Fixed 2026-07-28: resolve()'s alias branch now elaborates class
+specializations named through alias templates
+([class.mem.general]/26 + [temp.inst]/2), so the enclosing class is
+correctly non-POD, gets its implicit default constructor, and the
+alias-instantiated class's constructors convert.
