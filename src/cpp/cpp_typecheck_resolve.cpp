@@ -2659,6 +2659,21 @@ void cpp_typecheck_resolvet::make_constructors(
         new_identifiers.push_back(pod_constructor3);
       }
     }
+    else if(is_reference(identifier.type()))
+    {
+      // N5008 [expr.type.conv]/1: a functional cast `T(x)` where T is a
+      // REFERENCE type direct-initializes a result of type T from x
+      // (equivalent to a cast).  References are not PODs and have no
+      // constructors, so without a synthesized single-argument
+      // "constructor" the resolution finds no candidate at all -- e.g.
+      // libstdc++'s `_M_invoker(_M_functor, _ArgTypes(__args)...)` in
+      // std::function::operator() with _ArgTypes = int&.  There is no
+      // zero-argument form: a reference must be bound ([dcl.init.ref]).
+      const code_typet t(
+        {code_typet::parametert(identifier.type())}, identifier.type());
+      exprt pod_constructor(ID_pod_constructor, t);
+      new_identifiers.push_back(pod_constructor);
+    }
     else if(identifier.type().id() == ID_struct_tag)
     {
       const struct_typet &struct_type =
