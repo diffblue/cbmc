@@ -18,3 +18,4 @@ Update 2026-07-28: the reference-type functional-cast layer is fixed
 `_ArgTypes(__args)...` over the replicated FUNCTION parameter pack in
 the member instance (the argument list arrives empty at the cast) --
 the concretized-pack family.
+Remaining-layer minimal reproducer: cpp17_pack_cast_fn_type_spec.

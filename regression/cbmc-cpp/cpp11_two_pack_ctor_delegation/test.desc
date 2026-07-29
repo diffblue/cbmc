@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ two-pack delegation: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A member constructor template with two parameter packs
+(indices<Uf...>, Up... u), called from another constructor template's
+mem-initializer delegation, fails deduction ("found no match for
+symbol 'impl'") and the delegating constructor is left bodyless.  The
+direct-call form recovers; the delegation does not.  Header-free
+remaining layer of cpp11_tuple_leaf_no_body (libc++ __tuple_impl) and
+the emplace family.  g++/clang++/valgrind clean.

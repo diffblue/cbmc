@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ pack cast dispatch: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+In a partial specialization over a function type (W<R(Args...)>), a
+member taking the pack (Args... args) with a pack-expanded functional
+cast `Args(args)...` in its body fails conversion ("found no match
+for symbol 'Args'"; the argument list arrives empty at the cast) and
+the member is left bodyless.  The plain variadic form W<Args...>
+works.  Remaining layer of cpp17_function_handler_dispatch
+(libstdc++ std::function::operator()).  g++/clang++/valgrind clean.

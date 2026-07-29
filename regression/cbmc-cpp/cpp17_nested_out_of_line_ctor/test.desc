@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ nested out-of-line ctor ran: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The out-of-line definition of a nested class's constructor inside a
+class template (Outer<T>::sentry::sentry(Outer<T>&)) is never
+attached to the instantiated member: "no body for callee
+sentry::sentry".  Header-free; the shape of libc++ basic_ostream's
+sentry ([ostream.sentry]).  g++/clang++/valgrind clean.

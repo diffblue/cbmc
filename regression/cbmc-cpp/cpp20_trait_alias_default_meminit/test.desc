@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ member typedef mem-init survives: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A computed default template argument containing an alias whose RHS is
+a clang builtin trait type (add_rref_t<T> = __add_rvalue_reference(T))
+breaks the member-typedef mem-initializer of a class instantiated
+later: "symbol '__base' is unknown".  Root of the
+silent-statement-dropping family (cpp20_optional_base_alias_unknown,
+cpp20_ranges_basic_libcxx, cpp17_optional_requires_ctor_pair; libc++
+std::optional's __optional_move_assign_base machinery).
+Without the alias inside the default the same shape converts.
+clang++/valgrind clean (clang-only builtin; g++ n/a).
