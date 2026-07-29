@@ -15,3 +15,8 @@ must have one operand").  Reduced from cpp20_ranges_basic_libcxx.
 The same crash masks all preprocessed-libc++ reductions (vector
 family).  Runtime-faithful: clang++ -std=c++20 -stdlib=libc++ runs
 clean.
+Update 2026-07-28: NOT the same root as
+cpp17_pack_cast_tuple_element_segv (that one is fixed: typename-
+constructor parse rule + mem-initializer null-scope guard; this one
+still crashes with the nil-typecast invariant in
+operator_is_overloaded).
