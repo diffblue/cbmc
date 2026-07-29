@@ -4177,3 +4177,59 @@ Reduction lessons:
 - restrict_function_pointers_tu front end is FIXED (emplace fix);
   bounded BMC completes, dog-food assertion passes; vector semantic
   family + erase_if now fail only in library-modeling layers.
+
+## Round: fixing the minimal-KNOWNBUG backlog (2026-07-28, session 2)
+
+Five KNOWNBUGs flipped to CORE (6 src commits):
+1. cpp17_pack_cast_tuple_element_segv — TWO roots: (a) parse.cpp:
+   typename-prefixed names are never constructor declarator-ids
+   ([temp.res.general]/4); a C::C qualifier-equality rule was tried
+   first and broke libc++ iostream sentry ctors (the parser's ctor
+   name representation makes pair-matching unreliable); (b)
+   typecheck_member_initializer's parameter-collision path derives
+   the class scope from `this` ([class.base.init]/2) instead of a
+   null id_map deref.
+2. cpp20_views_take_call_crash — operator_is_overloaded's
+   conversion-operator branch gated to single-operand, non-nil-typed
+   casts ([expr.type.conv]/2).  cpp20_ranges_basic_libcxx stops
+   crashing but goes VACUOUS (silent-drop family).
+3. cpp17_anon_struct_member_ctor_only — side effect of (1b).
+4. cpp17_hashtable_alias_default_arg — resolve()'s alias branch now
+   elaborates struct_tag results ([class.mem.general]/26 +
+   [temp.inst]/2).  KEY INSIGHT: cpp_is_pod judged the enclosing
+   class POD against the INCOMPLETE alias-named member class, so no
+   implicit ctor was synthesized and the object stayed nondet.
+   Minimal pair: member `H<int> h;` works, `ht<int> h;` fails.
+5. cpp20_constraint_substitution_failure — [expr.type.conv]/1:
+   functional casts T(x) with T a REFERENCE type get a synthesized
+   single-argument pod-constructor (no 0-arg form, [dcl.init.ref]).
+   Root shared with std::function::operator()'s
+   `_ArgTypes(__args)...`.
+
+Partial/documented:
+- cpp11_tuple_leaf_no_body: 4 layers fixed (commit "bind a partial
+  specialization's deduced parameters for members"):
+  #spec_template_packs persistence + replay; scalar non-type pack
+  member substitution; empty-pack tta expansion (CLANG-gated).
+  Residual: member ctor template deduction vs concretized 3-pack
+  pattern (emplace family).
+- cpp17_function_handler_dispatch: reference-cast layer fixed;
+  residual: `_ArgTypes(__args)...` over the replicated FUNCTION
+  parameter pack arrives with an empty argument list.
+- cpp17_template_arg_completed_later: staleness-remark approach
+  (#had_incomplete_arg + re-elaboration) implemented and REVERTED:
+  re-instantiation never rebuilds the BASE list (bases()=0) -- the
+  template's stored declaration loses the base clause after first
+  instantiation.  Fix needs body/base preservation first.
+- Silent-drop family (ranges/optional_base/optional_requires):
+  optional_base's drop chases to a nested trait-alias
+  (`add_rref_t<T>` = __add_rvalue_reference(T)) instantiation
+  failing inside a computed default argument during member-alias
+  processing (p7 minimal pair recorded in findings; the
+  ID_add_rvalue_reference typecheck branch is never reached).
+
+Suites: cbmc-cpp green (24 skipped, down from 29), cbmc CORE green.
+Lessons: test.pl/test.out is the ONLY pass/fail authority (two more
+manual-grep false alarms); ungating CLANG-gated paths regresses
+libstdc++ (twice this round); bisect-by-file-checkout with a 5-test
+sample is the fastest regression isolator.
