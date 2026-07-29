@@ -12,3 +12,10 @@ type) is cached and served stale after the type is completed and the
 specialization is used ([temp.point]: the use is a new point of
 instantiation).  The mem-initializer variant SEGFAULTS in
 symex_assign.  Split from cpp17_incomplete_template_arg_decl.
+Investigated 2026-07-28: a staleness-remark mechanism
+(#had_incomplete_arg on the instance, re-elaboration at the later
+point of instantiation) re-runs the instantiation but the re-run
+never rebuilds the BASE list (bases()=0 across all elaborations): the
+template's stored declaration loses the base-clause information after
+the first instantiation, so re-elaboration needs the body/base-clause
+preserved first.  Deeper than the cache policy.
