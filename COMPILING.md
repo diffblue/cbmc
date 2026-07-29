@@ -167,6 +167,18 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    dnf install java-1.8.0-openjdk-devel maven jq
    ```
+   JBMC requires Java 8 to be the active default JDK; installing it alongside
+   a newer JDK is not sufficient. Verify both the runtime and compiler before
+   building:
+   ```
+   java -version
+   javac -version
+   ```
+   Both commands should report version 1.8. If another JDK is selected, use
+   `update-alternatives --config java` and
+   `update-alternatives --config javac` on Debian-like systems, or
+   `alternatives --config java` and `alternatives --config javac` on
+   Red Hat/Fedora systems, and select Java 8.
 
 2. As a user, get the CBMC source via
    ```
@@ -250,6 +262,10 @@ Maven 3 manually.
    ```
    pkg install openjdk8 wget maven
    ```
+   Make sure the Java 8 installation is active before building. Set
+   `JAVA_HOME` to the OpenJDK 8 directory and prepend its `bin` directory to
+   `PATH` if another JDK is selected, then verify with `java -version` and
+   `javac -version`.
 2. As a user, get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
