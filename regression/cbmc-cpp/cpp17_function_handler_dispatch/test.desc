@@ -13,3 +13,8 @@ _Function_handler pattern and invoked via the _M_invoker function
 pointer; symex never reaches the closure body, so the by-reference
 update is lost and the assertion wrongly fails ([func.wrap.func.inv]).
 g++/clang++ accept and run clean (exit 0).
+Update 2026-07-28: the reference-type functional-cast layer is fixed
+([expr.type.conv]/1); the residual is the expansion of
+`_ArgTypes(__args)...` over the replicated FUNCTION parameter pack in
+the member instance (the argument list arrives empty at the cast) --
+the concretized-pack family.

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ unsatisfied constraint, not an error: SUCCESS$
@@ -7,13 +7,8 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Update 2026-07-27: the requires-clause now PARSES (concept
-template-ids; see cpp20_requires_clause_concept_template_id, CORE)
-and the constrained candidate is correctly rejected -- but the
-half-instantiated concept-variable instance left behind by the
-genuine argument substitution failure (same_as<int,
-common_reference_t<int,int>> with no ::type) poisons the SECOND
-resolution pass: the whole statement is silently dropped (0
-properties, vacuous SUCCESS caught by this desc's assertion-line
-pattern).  Same silent-statement-dropping family as
-cpp17_optional_requires_ctor_pair.
+Fixed 2026-07-28: the reference-type functional-cast fix
+([expr.type.conv]/1 pod-constructor synthesis for reference types)
+removes the failure inside the concept-machinery instantiation that
+previously poisoned the second resolution pass; the unconstrained
+overload wins and the program verifies non-vacuously.
