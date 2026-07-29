@@ -21,3 +21,4 @@ the member ctor template's pack-parameter deduction fails against the
 pattern concretized by cross-scope short-name substitution
 ("found no match for symbol '__tuple_impl'"), the
 cpp17_vector_emplace_nondefault_pair family.
+Remaining-layer minimal reproducer: cpp11_two_pack_ctor_delegation.
