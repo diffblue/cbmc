@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ anonymous-struct member of ctor-only type: SUCCESS$
@@ -13,3 +13,8 @@ an int constructor), instantiated through a member alias, makes the
 front end look for a zero-argument constructor -- "found no match for
 symbol 'symbol_exprt'" with empty argument types, and the enclosing
 statements are dropped.  g++/clang++/valgrind clean.
+Fixed 2026-07-28 as a side effect of the mem-initializer class-scope
+derivation fix: the eager default-constructor synthesis attempt for
+the anonymous-struct member still diagnoses (harmless noise; per
+[class.default.ctor]/4 it should not be defined until odr-used), but
+recovery keeps the program intact and the assertion verifies.
