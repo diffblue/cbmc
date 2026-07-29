@@ -14,3 +14,4 @@ DROPPED (0 properties, vacuous SUCCESS caught by this desc's
 assertion-line pattern): the silent-statement-dropping family
 (cpp20_ranges_basic_libcxx, cpp17_optional_requires_ctor_pair,
 cpp20_constraint_substitution_failure).
+Family-root minimal reproducer: cpp20_trait_alias_default_meminit.

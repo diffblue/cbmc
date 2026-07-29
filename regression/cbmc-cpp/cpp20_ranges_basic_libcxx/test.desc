@@ -17,3 +17,8 @@ is silently DROPPED (0 properties, vacuous VERIFICATION SUCCESSFUL
 caught by this desc's assertion-line pattern) -- the
 silent-statement-dropping family (cpp17_optional_requires_ctor_pair,
 cpp20_constraint_substitution_failure).
+Update 2026-07-29: the silent drop traces to an escaping
+implicit_typecast failure in the range-for over `arr |
+views::take(3)` (distinct from the trait-alias family); header-free
+reduction blocked by the typecheck_method_application crash on
+preprocessed-libc++ sources (reduction in progress).
