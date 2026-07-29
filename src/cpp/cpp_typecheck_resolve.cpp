@@ -5790,6 +5790,23 @@ resolved_after_strip:
       try
       {
         typet result = resolve_template_alias(base_name, id_set, template_args);
+        // N5008 [class.mem.general]/26 + [temp.inst]/2: when the alias
+        // names a class template specialization, contexts that require a
+        // complete type (a non-static data member declaration, sizeof,
+        // base clauses) need the specialization instantiated.  The
+        // class-template branch below elaborates; without doing the same
+        // here a member declared through an alias leaves its class
+        // incomplete, and e.g. cpp_is_pod later mis-judges the enclosing
+        // class as POD (skipping the implicit default constructor, so the
+        // object is never initialised).
+        if(
+          result.id() == ID_struct_tag &&
+          !cpp_typecheck.skip_typechecking_elaborate)
+        {
+          struct_tag_typet instance = to_struct_tag_type(result);
+          instance.add_source_location() = source_location;
+          cpp_typecheck.elaborate_class_template(instance);
+        }
         identifiers.push_back(exprt(ID_type, result));
       }
       catch(int)
