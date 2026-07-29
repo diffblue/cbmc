@@ -1,20 +1,19 @@
 KNOWNBUG libcxx
 main.cpp
 --cpp20 --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-libc++ PARSING ERROR: header fails to parse with libc++.
-Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
-C++20 concepts: substitution failure inside a concept-id's argument
-must yield an unsatisfied constraint ([temp.constr.atomic]/3), not a
-hard 'no match for same_as'; minimal WRONG-CODE root KNOWNBUG
-cpp20_constraint_substitution_failure.  cpp20_ranges_basic
-additionally aborts a unary-operand invariant (std_expr.h:380).
-Update 2026-07-24: past the same_as front-end failure
-([temp.constr.atomic]/3 atom classification); residual: a crash (SIGABRT/invariant).
-The same_as front-end failure is the requires-clause concept-template-id
-parse gap, captured minimally in
-cpp20_requires_clause_concept_template_id.
-Minimal single-call reproducer: cpp20_views_take_call_crash.
+--
+History: first failed as a C++20 concepts front-end gap (same_as
+substitution failure; fixed via the requires-clause template-id parse
+and [temp.constr.atomic]/3 atom classification), then aborted on a
+unary-operand invariant (fixed 2026-07-28 with
+cpp20_views_take_call_crash: single-operand gate in
+operator_is_overloaded, [expr.type.conv]/2).  Residual: main's body
+is silently DROPPED (0 properties, vacuous VERIFICATION SUCCESSFUL
+caught by this desc's assertion-line pattern) -- the
+silent-statement-dropping family (cpp17_optional_requires_ctor_pair,
+cpp20_constraint_substitution_failure).
