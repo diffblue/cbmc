@@ -25,3 +25,7 @@ More minimal same-root sibling: cpp17_vector_emplace_nondefault_pair
 (deduced heterogeneous parameter pack homogenized to its first
 element in the member-template instance signature).
 Minimal header-free reproducer: cpp17_hashtable_alias_default_arg.
+Update 2026-07-28: the alias-elaboration fix
+(cpp17_hashtable_alias_default_arg is CORE) removes the front-end
+layer isolated there; this test still fails on the deeper hashtable
+modeling semantics.
