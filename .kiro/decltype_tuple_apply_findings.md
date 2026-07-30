@@ -4233,3 +4233,36 @@ Lessons: test.pl/test.out is the ONLY pass/fail authority (two more
 manual-grep false alarms); ungating CLANG-gated paths regresses
 libstdc++ (twice this round); bisect-by-file-checkout with a 5-test
 sample is the fastest regression isolator.
+
+## Round: minimal KNOWNBUGs for the fix-round residuals (2026-07-29)
+
+Five new minimal KNOWNBUG dirs (suite green, 29 skipped = 24 + 5 new):
+- cpp11_two_pack_ctor_delegation: two-pack member ctor template fails
+  deduction ONLY when called from another ctor template's mem-init
+  delegation (direct call recovers).  tuple_leaf/emplace remaining
+  layer, header-free ~20 lines.
+- cpp17_pack_cast_fn_type_spec: pack-expanded functional cast
+  `Args(args)...` in a FUNCTION-TYPE partial spec member drops the
+  body; plain variadic form works.  function_handler remaining layer,
+  13 lines.
+- cpp20_trait_alias_default_meminit: alias-of-clang-builtin-trait
+  inside a computed default template argument breaks a later class's
+  member-typedef mem-initializer ("__base unknown").  Root of the
+  silent-drop family (optional machinery).
+- cpp17_nested_out_of_line_ctor: Outer<T>::sentry::sentry defined out
+  of line never attaches (libc++ ostream sentry shape).
+- cpp20_extern_template_copy_ctor_abort: cvise 73k->30 lines; an
+  extern-template-declared copy ctor + a ctor taking an alias of a
+  nested incomplete class chain (clang __remove_reference_t default)
+  aborts typecheck_method_application on copy-ctor use.  THE crash
+  masking all preprocessed-libc++ reductions.  Polished from cvise's
+  self-init degenerate; explicit instantiation added so it links and
+  runs clean under clang+++valgrind.
+
+Triage updates: ranges' silent drop is an escaping implicit_typecast
+in the range-for (distinct root, reduction blocked on the crash
+above); map_basic's __null_state_ = trait-alias-default family.
+cvise ops: dropping stability runs 3->2 and cbmc timeout 90->45s
+doubled throughput; the multi-hour slow phase is
+remove-unused-function on 20k+ line files, token passes then collapse
+quickly.
