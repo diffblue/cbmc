@@ -22,3 +22,4 @@ cpp20_requires_clause_concept_template_id.
 Update 2026-07-28: same vector-internal-pointer family as
 cpp20_vector_basic_libcxx (see its note); header-free reduction
 blocked on the typecheck_method_application crash.
+Masking crash isolated: cpp20_extern_template_copy_ctor_abort.

@@ -26,3 +26,4 @@ checks).  Minimal driver: vector<int> v; v.push_back(7);
 assert(v.size()==1).  Header-free reduction blocked on the
 typecheck_method_application crash that all preprocessed-libc++
 sources hit (see cpp20_ranges_basic_libcxx).
+Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
