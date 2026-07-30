@@ -1611,6 +1611,55 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             ? template_args.arguments().size() - non_pack_count
             : 0;
 
+        // N5008 [temp.variadic]/4-5: with MORE THAN ONE template parameter
+        // pack (e.g. `template<unsigned long... Uf, class... Up>
+        // impl(indices<Uf...>, Up...)`), the flat argument count minus the
+        // non-pack parameters lumps ALL packs together, overestimating the
+        // FUNCTION parameter pack's arity (it corresponds to one specific
+        // template pack).  The deduction-time bindings replayed above
+        // (#deduced_packs) record each pack's own arity by full identifier;
+        // subtract the leading packs' arities so `pack_size` is the arity
+        // of the LAST pack (the one a trailing function parameter pack
+        // expands, as in the libc++/libstdc++ shapes).  If a leading
+        // pack's arity is unrecorded, leave the expansion alone
+        // (conservative: instantiate_template has already expanded
+        // correctly-shaped instances).
+        {
+          std::vector<irep_idt> pack_ids;
+          for(const auto &tp : tmpl_params)
+          {
+            if(!tp.get_bool(ID_ellipsis))
+              continue;
+            pack_ids.push_back(
+              tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                 : tp.get(ID_identifier));
+          }
+          if(pack_ids.size() > 1)
+          {
+            bool all_known = true;
+            std::size_t leading_arity = 0;
+            for(std::size_t k = 0; k + 1 < pack_ids.size(); ++k)
+            {
+              const irep_idt &pid = pack_ids[k];
+              auto ta = cpp_typecheck.template_map.pack_args_map.find(pid);
+              auto te = cpp_typecheck.template_map.pack_expr_map.find(pid);
+              auto ts = cpp_typecheck.template_map.pack_size_map.find(pid);
+              if(ta != cpp_typecheck.template_map.pack_args_map.end())
+                leading_arity += ta->second.size();
+              else if(te != cpp_typecheck.template_map.pack_expr_map.end())
+                leading_arity += te->second.size();
+              else if(ts != cpp_typecheck.template_map.pack_size_map.end())
+                leading_arity += ts->second;
+              else
+                all_known = false;
+            }
+            if(all_known && pack_size >= leading_arity)
+              pack_size -= leading_arity;
+            else if(!all_known)
+              pack_size = 0; // unknown split: do not expand
+          }
+        }
+
         // N5008 [temp.variadic]/4-5: only a genuine *function parameter pack*
         // -- a function parameter declared with a top-level `...`, e.g.
         // `_U... args` -- expands into N function parameters.  A parameter
@@ -6210,7 +6259,6 @@ resolved_after_strip:
     }
 
     disambiguate_functions(new_identifiers, fargs);
-
     // If template-instantiated candidates were all rejected by
     // disambiguate_functions, fall back to non-template overloads
     // which may match via implicit conversions.
@@ -8546,7 +8594,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // is not an instance of), the entire deduction has FAILED; the
           // pack is not "empty", the candidate is not viable.
           if(args[i].get_bool("#deduction_failed"))
+          {
             return nil_exprt();
+          }
 
           const std::string full_id =
             id2string(param.type().get(ID_identifier));
