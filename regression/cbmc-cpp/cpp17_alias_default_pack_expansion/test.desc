@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ SFINAE'd candidate dropped: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Minimal pair vs the now-working direct spelling: expanding
+`__enable_if_t<_Bn::value>...` (an alias template with a defaulted
+second parameter, [temp.alias]) in __and_fn's trailing return breaks
+the constrained-constructor deduction; spelling the same expansion as
+`typename enable_if<_Bn::value, void>::type...` works.  Residual
+layer of cpp17_optional_requires_ctor_pair (libstdc++ _Requires /
+std::optional).  g++/clang++/valgrind run clean.
