@@ -2669,13 +2669,34 @@ void cpp_typecheck_resolvet::make_constructors(
 {
   resolve_identifierst new_identifiers;
 
-  for(const auto &identifier : identifiers)
+  for(const auto &identifier_orig : identifiers)
   {
+    exprt identifier = identifier_orig;
     if(identifier.id() != ID_type)
     {
       // already an expression
       new_identifiers.push_back(identifier);
       continue;
+    }
+
+    // A type substituted from the template map may still be in its
+    // unconverted parse form (a `frontend_pointer` reference, e.g. the
+    // pack element int& behind the functional cast `Args(args)...` in a
+    // function-type partial specialization).  The POD/reference
+    // classification below and the later argument matching need the
+    // converted form ([expr.type.conv] operates on the actual type).
+    if(
+      identifier.type().id() == ID_frontend_pointer ||
+      identifier.type().id() == ID_merged_type)
+    {
+      try
+      {
+        cpp_typecheck.typecheck_type(identifier.type());
+      }
+      catch(...)
+      {
+        // leave unconverted; downstream matching will reject
+      }
     }
 
     // is it a POD?
