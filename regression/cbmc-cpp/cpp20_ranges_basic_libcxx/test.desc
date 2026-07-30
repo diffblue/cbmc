@@ -22,3 +22,4 @@ implicit_typecast failure in the range-for over `arr |
 views::take(3)` (distinct from the trait-alias family); header-free
 reduction blocked by the typecheck_method_application crash on
 preprocessed-libc++ sources (reduction in progress).
+Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
