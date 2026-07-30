@@ -4873,11 +4873,26 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       tmp_object_expr.type().id() == ID_struct_tag ||
       tmp_object_expr.type().id() == ID_union_tag);
 
-    get_component(
+    const bool component_found = get_component(
       expr.source_location(),
       new_object,
       expr.function().get(ID_identifier),
       member);
+    if(!component_found)
+    {
+      // The selected constructor is not among the class's components --
+      // e.g. its registration was skipped during a partial elaboration
+      // (an extern-template'd member of a class whose other members
+      // mention still-incomplete types).  Proceeding would swap a
+      // non-member expression into the call and abort
+      // typecheck_method_application's precondition.  Fail the
+      // conversion recoverably instead ([temp.inst]/17: a failed
+      // required instantiation is diagnosed, not fatal to the tool).
+      error().source_location = expr.source_location();
+      error() << "constructor '" << expr.function().get(ID_identifier)
+              << "' is not a member of its class (partial elaboration?)" << eom;
+      throw 0;
+    }
 
     // special case for the initialization of parents
     if(member.get_bool(ID_C_not_accessible))
