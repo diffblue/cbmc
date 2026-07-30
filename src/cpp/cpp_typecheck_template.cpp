@@ -2009,17 +2009,53 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         };
 
         // Fallback: pattern references only EMPTY packs -- a zero-length
-        // expansion ([temp.variadic]/7): contribute no arguments.  Gated
-        // to the CLANG preprocessor mode: the motivating patterns are
-        // libc++'s (__make_tuple_types_flat's __apply_quals with an empty
-        // _Idx), and under libstdc++ the flat template_map's stale
-        // zero-size entries suffix-match unrelated pattern names and this
-        // would wrongly drop live arguments (make_tuple regressed).
-        if(
-          referenced_packs.empty() && !empty_pack_refs.empty() &&
-          config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        // expansion ([temp.variadic]/7): contribute no arguments.  The
+        // flat template_map's stale zero-size entries can suffix-match
+        // unrelated pattern names (make_tuple regressed when this fired
+        // for them), so ALSO require that no LIVE binding (scalar type or
+        // value) exists for any of the names: a name with a live binding
+        // is an in-scope parameter of some active instantiation, not a
+        // zero-length pack of this expansion.
+        if(referenced_packs.empty() && !empty_pack_refs.empty())
         {
-          did_expand = true;
+          bool any_live_binding = false;
+          for(const auto &pid : empty_pack_refs)
+          {
+            const std::string key = id2string(pid);
+            const auto pos = key.rfind("::");
+            const std::string suffix =
+              pos != std::string::npos ? key.substr(pos + 2) : key;
+            for(const auto &te : template_map.type_map)
+            {
+              const std::string tk = id2string(te.first);
+              const auto tp = tk.rfind("::");
+              if(
+                (tp != std::string::npos ? tk.substr(tp + 2) : tk) == suffix &&
+                te.second.id() != ID_unassigned && te.second.id() != ID_nil)
+              {
+                any_live_binding = true;
+                break;
+              }
+            }
+            if(any_live_binding)
+              break;
+            for(const auto &ee : template_map.expr_map)
+            {
+              const std::string ek = id2string(ee.first);
+              const auto ep = ek.rfind("::");
+              if(
+                (ep != std::string::npos ? ek.substr(ep + 2) : ek) == suffix &&
+                ee.second.id() != ID_unassigned && ee.second.id() != ID_nil)
+              {
+                any_live_binding = true;
+                break;
+              }
+            }
+            if(any_live_binding)
+              break;
+          }
+          if(!any_live_binding)
+            did_expand = true;
         }
         else if(!referenced_packs.empty())
         {
