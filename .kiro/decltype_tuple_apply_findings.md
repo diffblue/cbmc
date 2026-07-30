@@ -4266,3 +4266,48 @@ cvise ops: dropping stability runs 3->2 and cbmc timeout 90->45s
 doubled throughput; the multi-hour slow phase is
 remove-unused-function on 20k+ line files, token passes then collapse
 quickly.
+
+## Round: fix round 3 over the residual minimal KNOWNBUGs (2026-07-30)
+
+Six KNOWNBUG->CORE flips (4 src commits):
+1. cpp11_two_pack_ctor_delegation: guess_function_template_args'
+   post-instantiation pack expansion sized the function pack as
+   args-minus-non-pack-params, lumping MULTIPLE template packs
+   together -> spurious extra parameter -> unbindable.  Fix: subtract
+   leading packs' deduction-time arities (#deduced_packs replay);
+   unknown arity => skip.  [temp.variadic]/4-5.
+2. cpp17_nested_out_of_line_ctor: typecheck_class_template_member had
+   no shape case for name<targs>::name::name (out-of-line member of a
+   NESTED class of a class template) -- silent return dropped the
+   definition.  16-line shape branch.  [temp.mem]+[class.nest].
+3. cpp17_pack_cast_fn_type_spec (+4. cpp17_function_handler_dispatch):
+   make_constructors now converts substituted parse-form types
+   (frontend_pointer) before POD/reference classification, so the
+   pack element int& behind `Args(args)...` gets its
+   [expr.type.conv]/1 candidate.  The dispatch test also had a
+   GENUINE null-functor bug that CBMC then correctly diagnosed --
+   repaired with real static storage (lambdas are not
+   default-constructible; switched to a functor struct).
+5.+6. cpp20_extern_template_copy_ctor_abort +
+   cpp20_trait_alias_default_meminit: MODE ARTIFACT -- the clang
+   builtins (__remove_reference_t, __add_rvalue_reference) lex only
+   under --stdlib libc++ (scanner gate: CLANG mode || gcc14_builtins);
+   under plain --cpp20 they parse as identifiers and fail resolution.
+   Both verify with the right flags; flipped to CORE libcxx.  The
+   ctor-temporary path additionally hardened: get_component's result
+   is now CHECKED (was: swap empty expr -> abort
+   typecheck_method_application; now: recoverable diagnostic,
+   [temp.inst]/17).
+
+BIG unblocking: the preprocessed-libc++ "masking crash" was the same
+mode artifact -- re-fed preprocessed source WITH --stdlib libc++
+reproduces semantic failures directly.  Vector-family reduction
+running (cvv2, wrong-code + valgrind gate, CLANG-mode flags).
+LESSON: reduction harnesses must carry the ORIGINAL test's mode
+flags; a --cpp20-only harness on libc++-preprocessed source chases
+builtin-availability ghosts.
+
+Sweep: optional_base/optional_requires still VACUOUS in both modes
+(distinct drop roots); map_basic still __null_state_; umap/tuple
+libc++ layers unchanged.  cbmc CORE green; cbmc-cpp green 23 skipped
+(29 -> 23).
