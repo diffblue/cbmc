@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[apply\.assertion\.1\] line \d+ handler ran through std::function: SUCCESS$
@@ -7,15 +7,11 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Header-free mimic of libstdc++'s std::function dispatch, cvise-reduced
-from cpp17_std_function_lambda_call: the callable is stored through the
-_Function_handler pattern and invoked via the _M_invoker function
-pointer; symex never reaches the closure body, so the by-reference
-update is lost and the assertion wrongly fails ([func.wrap.func.inv]).
-g++/clang++ accept and run clean (exit 0).
-Update 2026-07-28: the reference-type functional-cast layer is fixed
-([expr.type.conv]/1); the residual is the expansion of
-`_ArgTypes(__args)...` over the replicated FUNCTION parameter pack in
-the member instance (the argument list arrives empty at the cast) --
+Fixed 2026-07-30 by the cpp17_pack_cast_fn_type_spec fix (convert
+substituted types before constructor synthesis) plus the earlier
+reference-cast candidates; the reproducer's null functor storage was
+also repaired (static storage + default-constructible functor) so the
+remaining CBMC diagnosis was a genuine bug in the test itself.
+--
 the concretized-pack family.
 Remaining-layer minimal reproducer: cpp17_pack_cast_fn_type_spec.

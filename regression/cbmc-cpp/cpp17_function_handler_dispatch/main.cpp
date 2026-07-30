@@ -1,7 +1,7 @@
 // Header-free mimic of libstdc++ std::function dispatch (cvise-reduced
 // from cpp17_std_function_lambda_call).  The lambda is stored via the
 // _Function_handler pattern and invoked through the _M_invoker function
-// pointer; the invocation never reaches the closure body, so the
+// pointer; the invocation never reached the callable's body, so the
 // by-reference increment is lost.  g++/clang++ accept and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
 
@@ -28,8 +28,10 @@ void __invoke_r(_Callable __fn, _Args &&...__args) {
 template <typename> class function;
 int _M_functor;
 template <typename _Functor> struct _Base_manager {
-  static _Functor *_M_get_pointer(int) { return 0; }
+  static _Functor storage_;
+  static _Functor *_M_get_pointer(int) { return &storage_; }
 };
+template <typename _Functor> _Functor _Base_manager<_Functor>::storage_;
 template <typename, typename> class _Function_handler;
 template <typename _Res, typename _Functor, typename... _ArgTypes>
 struct _Function_handler<_Res(_ArgTypes...), _Functor> {
@@ -56,6 +58,10 @@ void apply(function<void(int &)> handler) {
   handler(apply_v);
   __CPROVER_assert(apply_v == 42, "handler ran through std::function");
 }
+struct incrementer {
+  void operator()(int &x) const { x += 1; }
+};
 int main() {
-  apply([](int &x) { x += 1; });
+  apply(incrementer{});
+  return 0;
 }
