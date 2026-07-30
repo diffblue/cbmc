@@ -314,8 +314,14 @@ jobs:
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
-  push-docker-image-dockerhub:
+  push-docker-image-ghcr:
     runs-on: ubuntu-24.04
+    # Release images are published to the GitHub Container Registry, which is free
+    # for public packages and needs no Docker Hub credentials. Publishing requires
+    # packages:write on the built-in GITHUB_TOKEN.
+    permissions:
+      contents: read
+      packages: write
     steps:
       - name: Checkout CBMC source
         uses: actions/checkout@v7
@@ -326,13 +332,15 @@ jobs:
           # Isolate the version number from a reference to a tag, for example,
           # '5.20.3' from a string like 'refs/tags/cbmc-5.20.3-exp'
           VERSION=$(echo ${{ github.ref }} | cut -d "/" -f 3 | cut -d "-" -f 2)
-          echo "IMAGE_TAG=diffblue/cbmc:$VERSION" >> $GITHUB_ENV
+          echo "IMAGE_TAG=ghcr.io/diffblue/cbmc:$VERSION" >> $GITHUB_ENV
       - name: Build docker image
         run: docker build -t "$IMAGE_TAG" .
-      - name: Push docker image to DockerHub
+      - name: Push docker image to GitHub Container Registry
         run: |
-          echo ${{ secrets.DOCKERHUB_ACCESS_DB_CI_CPROVER }} | docker login --username=dbcicprover --password-stdin
+          # Login uses the built-in GITHUB_TOKEN via github.actor, so no secrets
+          # are needed.
+          echo "${{ github.token }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
           docker image push "$IMAGE_TAG"
           # For security reasons remove stored login credentials from
           # configuration file they are stored at by docker login.
-          docker logout
+          docker logout ghcr.io

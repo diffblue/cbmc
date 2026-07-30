@@ -82,14 +82,14 @@ jobs:
 
             ## Docker
 
-            We are also releasing new versions as images in [Dockerhub](https://hub.docker.com/r/diffblue/cbmc).
+            We are also releasing new versions as images in the [GitHub Container Registry](https://github.com/diffblue/cbmc/pkgs/container/cbmc).
 
             To run the CProver suite of tools under a Docker container, make sure that
             [Docker](https://www.docker.com/) is already installed in your system and
             set up correctly, and then issue:
 
             ```sh
-            $ docker run -it diffblue/cbmc:${{ env.CBMC_VERSION }}
+            $ docker run -it ghcr.io/diffblue/cbmc:${{ env.CBMC_VERSION }}
             #
             ```
 
