@@ -27,3 +27,9 @@ Update 2026-07-30: the constructor-deduction layer is fixed
 nil static_cast target in get -- the enclosing pre-bind that feeds
 the __type_pack_element chain is CLANG-gated and this reproducer runs
 in GCC mode (ungating regressed libstdc++ suites twice).
+Update 2026-07-30 (round 4): in CLANG mode (--stdlib libc++) the
+__tuple_impl ctor resolution regresses to the no-match layer even
+though the pack-arity fixup computes correctly (probe: npacks=3
+lead=2 size=1); the rebuilt instance is rejected by the second
+disambiguation.  Mode-dependent resolution divergence; needs its own
+session.
