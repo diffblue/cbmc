@@ -5949,6 +5949,30 @@ resolved_after_strip:
             {
               continue;
             }
+            // N5008 [temp.variadic]/7: a template parameter pack given no
+            // arguments (an explicit empty list, `__and_v<>`) matches ZERO
+            // elements.  typecheck_template_args leaves the pack's slot as
+            // an `unassigned` placeholder, which instantiate_template
+            // rejects; replace it with the empty_typet zero-length-pack
+            // sentinel that template_mapt::build recognises (libstdc++'s
+            // _Requires<> = enable_if_t<__and_v<>, bool> in std::optional's
+            // constructor constraints).
+            {
+              const auto &vt_params =
+                decl.template_type().template_parameters();
+              auto &vt_args = tc_args.arguments();
+              for(std::size_t k = 0; k < vt_params.size() && k < vt_args.size();
+                  ++k)
+              {
+                if(
+                  vt_params[k].get_bool(ID_ellipsis) &&
+                  (vt_args[k].id() == ID_unassigned ||
+                   vt_args[k].type().id() == ID_unassigned))
+                {
+                  vt_args[k] = exprt(ID_type, empty_typet());
+                }
+              }
+            }
             const symbolt &inst_sym = cpp_typecheck.instantiate_template(
               source_location, s, tc_args, tc_args);
             // The instantiated symbol is a constexpr variable.
@@ -9585,6 +9609,22 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     return true;
 
   const code_typet &type = to_code_type(expr.type());
+
+  // N5008 [over.match.funcs]/1: the candidate set is built from
+  // DECLARATIONS.  A symbol whose signature still contains a nil type
+  // (`optionalish(? &&)`) is a half-substituted artifact left behind by a
+  // failed deduction ([temp.deduct]/8 says that substitution produced NO
+  // specialization); it can never be called and must not shadow or
+  // ambiguate the genuine candidates re-deduced for this call.
+  for(const auto &p : type.parameters())
+  {
+    const typet *t = &p.type();
+    while((t->id() == ID_pointer || t->id() == ID_frontend_pointer) &&
+          t->has_subtype())
+      t = &to_type_with_subtype(*t).subtype();
+    if(t->is_nil() || t->id().empty())
+      return false;
+  }
 
   // N5008 [class.copy.ctor]/2: a constructor for class X is ill-formed if its
   // first parameter is of type (optionally cv-qualified) X (passed by value)
