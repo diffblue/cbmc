@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ copy ctor typechecks: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+An extern-template-declared copy constructor whose class also has a
+constructor taking an alias of a nested incomplete class-template
+chain (with a clang-builtin __remove_reference_t default argument)
+aborts typecheck_method_application ("expr.function().id() ==
+ID_member") when the copy constructor is used.  Reduced from a
+preprocessed libc++ <vector> driver; this crash masks every
+preprocessed-libc++ reduction (vector semantic family,
+cpp20_ranges_basic_libcxx's silent drop, cpp11_set_insert_libcxx).
+clang++/valgrind clean (clang-only builtin; g++ n/a).

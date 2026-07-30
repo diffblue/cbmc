@@ -20,3 +20,4 @@ reproducer for lost member bodies).  A dedicated header-free
 reduction is blocked: preprocessed-libc++ sources hit the
 cpp20_views_take_call_crash invariant before conversion.  Needs
 --object-bits 12 to get past "too many addressed objects".
+Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
