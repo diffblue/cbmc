@@ -4311,3 +4311,35 @@ Sweep: optional_base/optional_requires still VACUOUS in both modes
 (distinct drop roots); map_basic still __null_state_; umap/tuple
 libc++ layers unchanged.  cbmc CORE green; cbmc-cpp green 23 skipped
 (29 -> 23).
+
+## Round 4: empty packs in variable templates + candidate hygiene (2026-07-30)
+
+Src commit "cpp: empty pack lists in variable templates; drop
+nil-param artifacts":
+- [temp.variadic]/7: `__and_v<>` (explicit empty argument list for a
+  variadic variable template) left an `unassigned` placeholder that
+  instantiate_template rejected; every _Requires<>-constrained
+  constructor deduction failed, and with class-typed arguments the
+  enclosing function was silently dropped.  Normalized to the
+  empty_typet sentinel in the variable-template resolve branch.
+- [over.match.funcs]/1+[temp.deduct]/8: nil-param half-substituted
+  artifacts (`optionalish(? &&)`) are now rejected from candidacy.
+- The zero-length-expansion fallback is precision-gated (no live
+  scalar binding for the matched names) instead of CLANG-mode-gated.
+
+Result: the optional_requires direct-init facet works in reduced form
+(r3/r7/r9/r10 all non-vacuous SUCCESS); the residual layer is the
+ALIAS-WITH-DEFAULTED-PARAMETER expansion `__enable_if_t<_Bn::value>...`
+-- minimal pair committed as cpp17_alias_default_pack_expansion
+(direct spelling works, alias spelling drops main).  A same-shape
+variant (r12) hits a PRE-EXISTING symex_assign type-inconsistency
+(initializer_list assigned to a struct) -- the desc's second facet.
+
+Parked with notes: tuple_leaf CLANG-mode divergence (pack-arity fixup
+computes correctly, npacks=3 lead=2, but the rebuilt instance is
+rejected by the second disambiguation); optional_base's reduced file
+is partially cvise-degenerate (bare `enable_if_t = 0` NTTP) -- the
+real family target is map_basic's __null_state_, which needs its own
+reduction (hand probes u1/u2 with layered anon-union bases pass).
+Ranges' silent drop needs a reduction too (unblocked now).
+cvv2 vector reduction still grinding (658KB).
