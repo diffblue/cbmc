@@ -23,3 +23,7 @@ views::take(3)` (distinct from the trait-alias family); header-free
 reduction blocked by the typecheck_method_application crash on
 preprocessed-libc++ sources (reduction in progress).
 Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
+Update 2026-07-30: the "masking crash" on preprocessed sources was a
+MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
+preprocessed source with the right flags reproduces the SEMANTIC
+failure directly, so header-free reduction is unblocked.
