@@ -23,3 +23,7 @@ Update 2026-07-28: same vector-internal-pointer family as
 cpp20_vector_basic_libcxx (see its note); header-free reduction
 blocked on the typecheck_method_application crash.
 Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
+Update 2026-07-30: the "masking crash" on preprocessed sources was a
+MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
+preprocessed source with the right flags reproduces the SEMANTIC
+failure directly, so header-free reduction is unblocked.
