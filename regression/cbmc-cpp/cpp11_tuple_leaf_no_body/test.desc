@@ -22,3 +22,8 @@ pattern concretized by cross-scope short-name substitution
 ("found no match for symbol '__tuple_impl'"), the
 cpp17_vector_emplace_nondefault_pair family.
 Remaining-layer minimal reproducer: cpp11_two_pack_ctor_delegation.
+Update 2026-07-30: the constructor-deduction layer is fixed
+(cpp11_two_pack_ctor_delegation is CORE); the residual is again the
+nil static_cast target in get -- the enclosing pre-bind that feeds
+the __type_pack_element chain is CLANG-gated and this reproducer runs
+in GCC mode (ungating regressed libstdc++ suites twice).
