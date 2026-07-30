@@ -721,6 +721,22 @@ void cpp_typecheckt::typecheck_class_template_member(
     // without recording it the member's body would exist nowhere and the
     // member would be uninstantiable when ODR-used ([temp.inst]/4).
   }
+  else if(
+    cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == "::" &&
+    cpp_name.get_sub()[3].id() == ID_name &&
+    cpp_name.get_sub()[4].id() == "::" && cpp_name.get_sub()[5].id() == ID_name)
+  {
+    // Out-of-line definition of a member of a nested (non-template) class
+    // of a class template:  Outer<args>::Nested::member
+    // (e.g. basic_ostream<C,T>::sentry::sentry, [ostream.sentry]).
+    // N5008 [temp.mem]/[class.nest]: this defines the member of the nested
+    // class of the class template; record it in the OUTER class template's
+    // template_methods below so each instantiation converts it.  Previously
+    // this shape fell into the silent-return branch and the definition was
+    // dropped ("no body for callee sentry::sentry").
+  }
   else
   {
     return; // TODO
