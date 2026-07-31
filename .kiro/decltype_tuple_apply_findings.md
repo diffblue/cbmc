@@ -4343,3 +4343,19 @@ real family target is map_basic's __null_state_, which needs its own
 reduction (hand probes u1/u2 with layered anon-union bases pass).
 Ranges' silent drop needs a reduction too (unblocked now).
 cvv2 vector reduction still grinding (658KB).
+
+## Round 4 addendum: the vector family root (2026-07-30 late)
+
+cvv2 harvest (73k -> 18 lines, ~20h with the valgrind-gated harness;
+dropping cbmc stability 2->1 tripled throughput in the token phase):
+the whole vector push_back semantic family reduced to a DECLARED-ONLY
+std::move.  clang's builtin std-move treatment makes the program
+link and behave as the [forward]/4 cast; CBMC modelled the bodyless
+instance as an unconstrained call (returned reference NULL,
+moved-through values nondet).  Fix: provide_stdlib_bodies synthesizes
+the return-cast body for declared-only std::move/std::forward
+(prefix match: instance base names carry the template suffix).
+cpp20_bodyless_std_move committed and CORE.  The four gated library
+tests still fail on FURTHER layers (__end_/__begin_ unconstrained) --
+re-reduce from current state next round (the established
+fix-a-layer/re-reduce loop).
