@@ -2139,6 +2139,31 @@ void cpp_typecheckt::provide_stdlib_bodies()
       }
     }
     else if(
+      (base == "move" || base == "forward" ||
+       base.compare(0, 5, "move<") == 0 ||
+       base.compare(0, 8, "forward<") == 0) &&
+      name.find("std::") != std::string::npos && symbol.value.is_nil() &&
+      symbol.type.id() == ID_code &&
+      to_code_type(symbol.type).parameters().size() == 1)
+    {
+      // N5008 [forward]/4-5: std::move(t) is exactly
+      // static_cast<remove_reference_t<T>&&>(t) and std::forward<T>(t)
+      // is static_cast<T&&>(t).  The libc++ headers can leave these as
+      // DECLARATIONS in translation paths where the definition is
+      // elided (clang guarantees the cast semantics via its builtin
+      // std-move treatment); a bodyless instance here turned every
+      // moved-through value nondet (the whole vector push_back family:
+      // size() read garbage).  Synthesize the cast body.
+      ensure_parameter_symbols(symbol, symbol_table);
+      auto body = make_return_first_param_body(symbol);
+      if(!body.statements().empty())
+      {
+        symbol.value = std::move(body);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+    }
+    else if(
       base == "endl" && name.find("std::") != std::string::npos &&
       name.find("basic_ostream") != std::string::npos)
     {
