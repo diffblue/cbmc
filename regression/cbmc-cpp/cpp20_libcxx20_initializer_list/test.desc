@@ -27,3 +27,7 @@ Update 2026-07-30: the "masking crash" on preprocessed sources was a
 MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
 preprocessed source with the right flags reproduces the SEMANTIC
 failure directly, so header-free reduction is unblocked.
+Update 2026-07-30 (round 4): the bodyless std::move root is FIXED
+(cpp20_bodyless_std_move is CORE); the library test still fails on
+further layers (__end_/__begin_ still unconstrained) -- re-reduce
+from the current state next round.
