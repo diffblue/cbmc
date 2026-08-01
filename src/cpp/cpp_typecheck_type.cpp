@@ -411,6 +411,16 @@ void cpp_typecheckt::typecheck_type(typet &type)
       // decltype preserves the reference: decltype(f()) is T& if f returns T&.
       type = e.operands().front().type();
     }
+    else if(
+      e.id() == ID_dereference && e.type().id() != ID_code &&
+      !e.type().get_bool(ID_C_reference))
+    {
+      // N5008 [dcl.type.decltype]/1.5: for any other expression E that is
+      // an lvalue, decltype(E) is T&.  Indirection is an lvalue
+      // ([expr.unary.op]/1), so decltype(*p) must be T&, not T (libc++'s
+      // iter_reference_t is exactly `decltype(*declval<_Tp&>())`).
+      type = ::reference_type(e.type());
+    }
     else
       type = e.type();
 
