@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ val: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Auto-returning static member of a class template must have its return
+type deduced eagerly at instantiation ([dcl.spec.auto.general]/13);
+the queued conversion left the placeholder visible to the call site.
