@@ -33,6 +33,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/range.h>
 #include <util/rational.h>
 #include <util/rational_tools.h>
+#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -2600,12 +2601,38 @@ void smt2_convt::convert_expr(const exprt &expr)
     const let_exprt &let_expr=to_let_expr(expr);
     const auto &variables = let_expr.variables();
     const auto &values = let_expr.values();
+    const exprt where = inline_flattened_array_let_bindings(let_expr);
+
+    bool has_remaining_bindings = false;
+    for(auto &binding : make_range(variables).zip(values))
+    {
+      if(
+        binding.first.type().id() != ID_array ||
+        use_array_theory(binding.second))
+      {
+        has_remaining_bindings = true;
+        break;
+      }
+    }
+
+    if(!has_remaining_bindings)
+    {
+      convert_expr(where);
+      return;
+    }
 
     out << "(let (";
     bool first = true;
 
     for(auto &binding : make_range(variables).zip(values))
     {
+      if(
+        binding.first.type().id() == ID_array &&
+        !use_array_theory(binding.second))
+      {
+        continue;
+      }
+
       if(first)
         first = false;
       else
@@ -2620,7 +2647,7 @@ void smt2_convt::convert_expr(const exprt &expr)
 
     out << ") "; // bindings
 
-    convert_expr(let_expr.where());
+    convert_expr(where);
     out << ')'; // let
   }
   else if(expr.id()==ID_constraint_select_one)
@@ -3701,6 +3728,23 @@ void smt2_convt::convert_floatbv_round_to_integral(
     UNEXPECTEDCASE("TODO floatbv_round_to_integral without FPA");
 }
 
+/// Return the indices of the components that have a non-zero bit-vector width.
+static std::vector<std::size_t> non_zero_width_component_indices(
+  const struct_typet::componentst &components,
+  const namespacet &ns)
+{
+  std::vector<std::size_t> result;
+  result.reserve(components.size());
+
+  for(std::size_t i = 0; i < components.size(); ++i)
+  {
+    if(!is_zero_width(components[i].type(), ns))
+      result.push_back(i);
+  }
+
+  return result;
+}
+
 void smt2_convt::convert_struct(const struct_exprt &expr)
 {
   const struct_typet &struct_type =
@@ -3751,27 +3795,22 @@ void smt2_convt::convert_struct(const struct_exprt &expr)
         convert_expr(op);
     };
 
-    // SMT-LIB 2 concat is binary only
-    std::size_t n_concat = 0;
-    for(std::size_t i = components.size(); i > 1; i--)
+    const auto component_indices =
+      non_zero_width_component_indices(components, ns);
+
+    // SMT-LIB 2 concat is binary only.
+    for(std::size_t i = component_indices.size(); i > 1; --i)
     {
-      if(is_zero_width(components[i - 1].type(), ns))
-        continue;
-      else if(i > 2 || !is_zero_width(components[0].type(), ns))
-      {
-        ++n_concat;
-        out << "(concat ";
-      }
-
-      convert_operand(expr.operands()[i - 1]);
-
-      out << " ";
+      out << "(concat ";
+      convert_operand(expr.operands()[component_indices[i - 1]]);
+      out << ' ';
     }
 
-    if(!is_zero_width(components[0].type(), ns))
-      convert_operand(expr.op0());
+    if(!component_indices.empty())
+      convert_operand(expr.operands()[component_indices.front()]);
 
-    out << std::string(n_concat, ')');
+    if(component_indices.size() > 1)
+      out << std::string(component_indices.size() - 1, ')');
   }
 }
 
@@ -5227,29 +5266,22 @@ void smt2_convt::flatten2bv(const exprt &expr)
       const struct_typet::componentst &components=
         struct_type.components();
 
-      // SMT-LIB 2 concat is binary only
-      std::size_t n_concat = 0;
-      for(std::size_t i=components.size(); i>1; i--)
+      const auto component_indices =
+        non_zero_width_component_indices(components, ns);
+
+      // SMT-LIB 2 concat is binary only.
+      for(std::size_t i = component_indices.size(); i > 1; --i)
       {
-        if(is_zero_width(components[i - 1].type(), ns))
-          continue;
-        else if(i > 2 || !is_zero_width(components[0].type(), ns))
-        {
-          ++n_concat;
-          out << "(concat ";
-        }
-
-        flatten2bv(member_exprt{expr, components[i - 1]});
-
-        out << " ";
+        out << "(concat ";
+        flatten2bv(member_exprt{expr, components[component_indices[i - 1]]});
+        out << ' ';
       }
 
-      if(!is_zero_width(components[0].type(), ns))
-      {
-        flatten2bv(member_exprt{expr, components[0]});
-      }
+      if(!component_indices.empty())
+        flatten2bv(member_exprt{expr, components[component_indices.front()]});
 
-      out << std::string(n_concat, ')'); // concat
+      if(component_indices.size() > 1)
+        out << std::string(component_indices.size() - 1, ')');
     }
     else
       convert_expr(expr);
@@ -6267,6 +6299,26 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
 }
 
+exprt smt2_convt::inline_flattened_array_let_bindings(
+  const let_exprt &let_expr)
+{
+  replace_symbolt substitutions;
+
+  for(auto &binding : make_range(let_expr.variables()).zip(let_expr.values()))
+  {
+    if(
+      binding.first.type().id() == ID_array &&
+      !use_array_theory(binding.second))
+    {
+      substitutions.set(binding.first, binding.second);
+    }
+  }
+
+  exprt where = let_expr.where();
+  substitutions(where);
+  return where;
+}
+
 bool smt2_convt::use_array_theory(const exprt &expr)
 {
   const typet &type = expr.type();
@@ -6304,6 +6356,11 @@ bool smt2_convt::use_array_theory(const exprt &expr)
     const if_exprt &if_expr = to_if_expr(expr);
     return use_array_theory(if_expr.true_case()) ||
            use_array_theory(if_expr.false_case());
+  }
+  else if(expr.id() == ID_let)
+  {
+    return use_array_theory(
+      inline_flattened_array_let_bindings(to_let_expr(expr)));
   }
   else
     return use_datatypes || expr.id() != ID_member;

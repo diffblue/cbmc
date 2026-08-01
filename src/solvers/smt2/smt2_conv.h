@@ -125,6 +125,8 @@ protected:
 
   // tweaks for arrays
   bool use_array_theory(const exprt &);
+  /// Inline array-valued let bindings whose values use bit-vector encoding.
+  exprt inline_flattened_array_let_bindings(const let_exprt &);
   void flatten_array(const exprt &);
 
   // specific expressions go here
