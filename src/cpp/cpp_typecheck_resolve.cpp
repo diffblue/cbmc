@@ -8385,6 +8385,36 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     ++it;
   }
 
+  // N5008 [temp.arg.explicit]/2 + [temp.deduct.general]/2: explicitly
+  // specified template arguments are substituted BEFORE deduction and
+  // are not themselves subject to it; deduction only fills the
+  // remaining parameters.  The pre-population of the map above is
+  // overwritten when a call argument's type deduces a DIFFERENT
+  // binding for an explicitly-given parameter (e.g. `get<W>(1, 2)`
+  // deducing T=int from the int argument although T=W was given, the
+  // argument being convertible to W).  Re-assert the explicit
+  // bindings after the deduction pass so they always win.
+  if(stored_args.is_not_nil())
+  {
+    const cpp_template_args_tct &explicit_args =
+      to_cpp_template_args_tc(stored_args);
+    const auto &params = cpp_declaration.template_type().template_parameters();
+    for(std::size_t i = 0;
+        i < explicit_args.arguments().size() && i < params.size();
+        i++)
+    {
+      if(
+        explicit_args.arguments()[i].id() != ID_unassigned &&
+        explicit_args.arguments()[i].type().id() != ID_unassigned)
+      {
+        exprt resolved_arg = explicit_args.arguments()[i];
+        if(resolved_arg.id() == ID_type)
+          cpp_typecheck.template_map.apply(resolved_arg.type());
+        cpp_typecheck.template_map.set(params[i], resolved_arg);
+      }
+    }
+  }
+
   // see if that has worked out
 
   cpp_template_args_tct template_args =
