@@ -4359,3 +4359,47 @@ cpp20_bodyless_std_move committed and CORE.  The four gated library
 tests still fail on FURTHER layers (__end_/__begin_ unconstrained) --
 re-reduce from current state next round (the established
 fix-a-layer/re-reduce loop).
+
+## Round 5: vector-family re-reduction, four fixes (2026-08-01)
+
+Iterative fix-a-layer/re-reduce on the push_back probe (cvv3..cvv6).
+Reduction lessons: the "one size: FAILURE" criterion escapes into
+sanitizer-invisible UB (cross-object `&a - &b`, null-pointer
+arithmetic) -- ASan/UBSan/valgrind all miss it; structural skeleton
+gates (member-call spellings kept by grep) hold the shape instead.
+ASan and valgrind cannot share one binary (valgrind chokes on ASan
+runtime): build twice.
+
+Layers fixed (each: cvise + hand bisection to header-free minimal,
+src commit + CORE test):
+1. auto-returning static members of class-template instances
+   ([dcl.spec.auto.general]/13): queued conversion left `auto` visible
+   to the call site; now converted eagerly under the method's map.
+   Non-template classes keep the queue (cpp14_auto_member regressed on
+   the first attempt -- gate on is_template_instance).
+2. decltype(*p) is T& ([dcl.type.decltype]/1.5): only implicit
+   dereferences preserved the reference; libc++'s iter_reference_t
+   collapsed to a value type ("'operator*' not an lvalue").
+3. explicit template args survive deduction ([temp.arg.explicit]/2):
+   gfl pre-populated the map but the per-arg deduction pass overwrote
+   it (get<W>(1,2) re-deduced T=int); re-assert after deduction.
+4. C++20 parenthesized aggregate init + CTAD
+   ([dcl.init.general]/16.6.2.2): pair(a, b) in make_pair; multi-op
+   explicit-ctor-call reshaped into an initializer_list operand for
+   ctor-less aggregates.
+
+Diagnosis pattern that found layers 1+: the system-header leniency
+(convert_function catch -> make_nil, no warning when the repair path
+is engaged) hides EVERY failure in this family; the throw@__LINE__
+saturation probe over resolve() + the qual-fail probe located the
+silent SFINAE throws quickly.
+
+Open root (KNOWNBUG cpp20_recursive_member_alias_base): a
+base-specifier naming a RECURSIVE member alias template (_OrImpl's
+`_Result = _OrImpl<sizeof...(_Rest)>::template _Result<_First>`)
+resolves to `empty`; typecheck_compound_bases drops the base
+(bases()=0) and qualified uses inside template bodies then no-body
+their instances.  Non-recursive member aliases work (q14).  This is
+libc++'s _Or/_And metaprogram -- likely also behind other libcxx
+families.  uam standalone (direct __uninitialized_allocator_move call)
+still fails on the same_as/common_reference chain, gated by this.
