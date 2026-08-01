@@ -35,3 +35,9 @@ Update 2026-07-30 (round 4): the bodyless std::move root is FIXED
 (cpp20_bodyless_std_move is CORE); the library test still fails on
 further layers (__end_/__begin_ still unconstrained) -- re-reduce
 from the current state next round.
+Update 2026-08-01 (round 5): four more layers fixed -- auto-return
+static members of class-template instances (eager deduction), decltype
+of indirection is T& ([dcl.type.decltype]/1.5), explicit template args
+survive deduction ([temp.arg.explicit]/2), C++20 parenthesized
+aggregate init/CTAD (make_pair).  Next open root:
+cpp20_recursive_member_alias_base (_Or/_And metaprogram bases drop).
