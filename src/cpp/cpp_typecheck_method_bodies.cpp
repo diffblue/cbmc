@@ -1431,6 +1431,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       }
     }
     bool defer = false;
+    bool auto_member_of_instance = false;
     {
       const irep_idt &class_id = _method_symbol->type.get(ID_C_member_name);
       if(!class_id.empty())
@@ -1454,6 +1455,23 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           bool is_virtual = _method_symbol->type.get_bool(ID_C_is_virtual);
           if(!is_virtual)
             defer = true;
+          // ... except members with an undeduced auto return type: per
+          // N5008 [dcl.spec.auto.general]/13 the deduced return type is
+          // obtained from the definition, and any use of the member in a
+          // context that needs its type requires that deduction to have
+          // happened.  A deferred instance would keep the placeholder in
+          // its symbol type, so a later call site typechecks against
+          // `auto` and mis-converts (the non-member/declarator path
+          // already converts such functions eagerly for the same
+          // reason).  Members of NON-template classes keep the normal
+          // queue: their auto returns are deduced on demand at the call
+          // site, and an eager conversion here would run while the
+          // class is still being elaborated.
+          if(has_auto(_method_symbol->type))
+          {
+            defer = false;
+            auto_member_of_instance = true;
+          }
         }
       }
     }
@@ -1463,6 +1481,29 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       deferred_method_bodies.emplace(
         _method_symbol->name,
         method_bodyt(_method_symbol, method_map, instantiation_stack));
+    }
+    else if(auto_member_of_instance && _method_symbol->value.is_not_nil())
+    {
+      // Undeduced auto return type: per N5008 [dcl.spec.auto.general]/13
+      // the deduced type comes from the definition, and the call site
+      // being typechecked right now needs it -- convert eagerly under
+      // the method's template map instead of queueing (the queue drains
+      // only after the whole translation unit, far too late for the
+      // pending conversion at the call).  Mirrors the eager conversion
+      // in cpp_declarator_convertert for non-member auto functions.
+      template_mapt old_map;
+      old_map.swap(template_map);
+      template_map = method_map;
+      try
+      {
+        convert_function(*_method_symbol);
+        deferred_typechecking.erase(_method_symbol->name);
+      }
+      catch(...)
+      {
+        _method_symbol->value.make_nil();
+      }
+      template_map.swap(old_map);
     }
     else
     {
