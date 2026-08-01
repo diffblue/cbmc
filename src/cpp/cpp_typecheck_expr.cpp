@@ -3055,6 +3055,41 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 
   typecheck_type(expr.type());
 
+  // N5008 [dcl.init.general]/16.6.2.2 (C++20 parenthesized aggregate
+  // initialization): `T(a1, ..., an)` with T an aggregate and no viable
+  // constructor initializes the aggregate's elements from the
+  // expression-list, exactly as the braced form.  An aggregate has no
+  // user-declared constructors ([dcl.init.aggr]/1) -- its members may
+  // (pair<reverse_iterator, ...>), which merely makes it non-POD -- so
+  // re-shape the multi-operand call into the single initializer-list
+  // operand that both the POD typecast path and the non-POD aggregate
+  // branch below expect (`pair(a, b)` from CTAD used to die with
+  // "explicit typecast expects 0 or 1 operands").
+  if(expr.operands().size() > 1 && expr.type().id() == ID_struct_tag)
+  {
+    const struct_typet &agg_type = follow_tag(to_struct_tag_type(expr.type()));
+    bool has_user_ctor = false;
+    for(const auto &c : agg_type.components())
+    {
+      if(
+        c.type().id() == ID_code &&
+        to_code_type(c.type()).return_type().id() == ID_constructor &&
+        !c.get_bool(ID_from_base) && !c.type().get_bool("#is_implicit_ctor"))
+      {
+        has_user_ctor = true;
+        break;
+      }
+    }
+    if(!has_user_ctor)
+    {
+      exprt init_list(ID_initializer_list, expr.type());
+      init_list.operands().swap(expr.operands());
+      init_list.add_source_location() = expr.source_location();
+      expr.operands().clear();
+      expr.add_to_operands(std::move(init_list));
+    }
+  }
+
   if(cpp_is_pod(expr.type()))
   {
     expr.id("explicit-typecast");
