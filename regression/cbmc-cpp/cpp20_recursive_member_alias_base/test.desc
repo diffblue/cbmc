@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ through recursive alias base: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Recursive member alias template as base-specifier resolves to empty
+and the base is dropped (bases()=0); qualified member use in template
+bodies then no-bodies the instance.  Root of libc++'s _Or/_And
+metaprogram (__libcpp_is_contiguous_iterator), sixth layer of the
+vector push_back family (cpp20_vector_basic_libcxx et al.).
+Non-recursive member aliases work.  cvise-reduced from a preprocessed
+<memory>+<iterator> TU; g++/clang++ runtime-verified.
