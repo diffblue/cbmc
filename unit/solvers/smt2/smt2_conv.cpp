@@ -117,6 +117,154 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
   }
 }
 
+/// Helper: extract the "(assert ...)" line under a solver configuration that
+/// enables SMT-LIB datatypes (Z3/CVC5), so structs are *not* flattened.
+static std::string get_assert_with_datatypes(const exprt &expr)
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  std::ostringstream out;
+  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::Z3, out);
+  conv.set_to(expr, true);
+  std::string result = out.str();
+  auto pos = result.rfind("(assert ");
+  REQUIRE(pos != std::string::npos);
+  auto end = result.find_last_not_of('\n');
+  return result.substr(pos, end - pos + 1);
+}
+
+TEST_CASE(
+  "smt2_convt flattened overflow_result_exprt field order",
+  "[core][solvers][smt2]")
+{
+  // overflow_result_exprt has struct type { value, overflow-<kind> }. Under a
+  // solver without datatype support the struct is flattened into a bit-vector.
+  // convert_struct, flatten2bv and convert_member all agree that the *first*
+  // component -- "value" -- occupies the least-significant bits, so the
+  // overflow flag has to be the *first* (most-significant) operand of the
+  // concatenation. Getting this backwards makes ".value" read back as
+  // (result << 1) | overflow_flag and ".overflow-*" read back as the top bit
+  // of the truncated result, which is unsound in both directions.
+  const unsignedbv_typet u8{8};
+  const signedbv_typet s8{8};
+  const symbol_exprt ua{"ua", u8}, ub{"ub", u8};
+  const symbol_exprt sa{"sa", s8}, sb{"sb", s8};
+
+  // Wrap in a notequal_exprt so set_to emits a plain assertion rather than a
+  // definition, and so the emitted text covers the member accessor too.
+  auto value_of = [](const exprt &overflow_result)
+  {
+    const auto &struct_type = to_struct_type(overflow_result.type());
+    const auto &value = struct_type.components().front();
+    return notequal_exprt{
+      member_exprt{overflow_result, value.get_name(), value.type()},
+      from_integer(0, value.type())};
+  };
+
+  SECTION("unsigned mult")
+  {
+    REQUIRE(
+      get_assert(value_of(overflow_result_exprt{ua, ID_mult, ub})) ==
+      "(assert (not (= ((_ extract 7 0) (let ((prod (bvmul "
+      "((_ zero_extend 8) ua) ((_ zero_extend 8) ub)))) "
+      "(concat (ite (bvuge prod (_ bv256 16)) #b1 #b0) "
+      "((_ extract 7 0) prod)))) (_ bv0 8))))");
+  }
+
+  SECTION("signed mult")
+  {
+    REQUIRE(
+      get_assert(value_of(overflow_result_exprt{sa, ID_mult, sb})) ==
+      "(assert (not (= ((_ extract 7 0) (let ( (prod (bvmul "
+      "((_ sign_extend 8) sa) ((_ sign_extend 8) sb)) )) "
+      "(concat (ite (or (bvsge prod (_ bv128 16)) "
+      "(bvslt prod (bvneg (_ bv128 16)))) #b1 #b0) "
+      "((_ extract 7 0) prod)))) (_ bv0 8))))");
+  }
+
+  SECTION("signed plus")
+  {
+    REQUIRE(
+      get_assert(value_of(overflow_result_exprt{sa, ID_plus, sb})) ==
+      "(assert (not (= ((_ extract 7 0) (let ((?sum (bvadd "
+      "((_ sign_extend 1) sa) ((_ sign_extend 1) sb)))) "
+      "(concat (ite (not (= ((_ extract 8 8) ?sum) "
+      "((_ extract 7 7) ?sum))) #b1 #b0) "
+      "((_ extract 7 0) ?sum)))) (_ bv0 8))))");
+  }
+
+  SECTION("signed minus")
+  {
+    REQUIRE(
+      get_assert(value_of(overflow_result_exprt{sa, ID_minus, sb})) ==
+      "(assert (not (= ((_ extract 7 0) (let ((?sum (bvsub "
+      "((_ sign_extend 1) sa) ((_ sign_extend 1) sb)))) "
+      "(concat (ite (not (= ((_ extract 8 8) ?sum) "
+      "((_ extract 7 7) ?sum))) #b1 #b0) "
+      "((_ extract 7 0) ?sum)))) (_ bv0 8))))");
+  }
+
+  SECTION("unsigned plus already has the right layout")
+  {
+    // The extended sum is emitted as-is: the result is in the low `width` bits
+    // and the carry-out is the most-significant bit, which is exactly the
+    // flattening this back-end expects.
+    REQUIRE(
+      get_assert(value_of(overflow_result_exprt{ua, ID_plus, ub})) ==
+      "(assert (not (= ((_ extract 7 0) (let ((?sum (bvadd "
+      "((_ zero_extend 1) ua) ((_ zero_extend 1) ub))))"
+      " ?sum)) (_ bv0 8))))");
+  }
+
+  SECTION("unsigned minus already has the right layout")
+  {
+    REQUIRE(
+      get_assert(value_of(overflow_result_exprt{ua, ID_minus, ub})) ==
+      "(assert (not (= ((_ extract 7 0) (let ((?sum (bvsub "
+      "((_ zero_extend 1) ua) ((_ zero_extend 1) ub))))"
+      " ?sum)) (_ bv0 8))))");
+  }
+
+  SECTION("boolean-only overflow expressions are unaffected")
+  {
+    // The plain *_overflow_exprt variants carry no result, so no struct is
+    // built and no field order is involved. Pinned to show the refactoring of
+    // the keep_result branches left these outputs alone.
+    REQUIRE(
+      get_assert(mult_overflow_exprt{ua, ub}) ==
+      "(assert (let ((prod (bvmul ((_ zero_extend 8) ua) "
+      "((_ zero_extend 8) ub)))) (bvuge prod (_ bv256 16))))");
+    REQUIRE(
+      get_assert(mult_overflow_exprt{sa, sb}) ==
+      "(assert (let ( (prod (bvmul ((_ sign_extend 8) sa) "
+      "((_ sign_extend 8) sb)) )) (or (bvsge prod (_ bv128 16)) "
+      "(bvslt prod (bvneg (_ bv128 16))))))");
+    REQUIRE(
+      get_assert(plus_overflow_exprt{sa, sb}) ==
+      "(assert (let ((?sum (bvadd ((_ sign_extend 1) sa) "
+      "((_ sign_extend 1) sb)))) (not (= ((_ extract 8 8) ?sum) "
+      "((_ extract 7 7) ?sum)))))");
+    REQUIRE(
+      get_assert(minus_overflow_exprt{ua, ub}) ==
+      "(assert (let ((?sum (bvsub ((_ zero_extend 1) ua) "
+      "((_ zero_extend 1) ub))))(= ((_ extract 8 8) ?sum)#b1)))");
+  }
+
+  SECTION("datatypes encoding is unaffected")
+  {
+    // With datatypes the struct is built with a constructor and read with a
+    // selector, so no bit order is involved. Pinned here to make sure the
+    // refactoring of the flattened path did not disturb it.
+    REQUIRE(
+      get_assert_with_datatypes(
+        value_of(overflow_result_exprt{ua, ID_mult, ub})) ==
+      "(assert (not (= (struct.0.value (let ((prod (bvmul "
+      "((_ zero_extend 8) ua) ((_ zero_extend 8) ub)))) "
+      "(mk-struct.0 ((_ extract 7 0) prod) "
+      "(bvuge prod (_ bv256 16))))) (_ bv0 8))))");
+  }
+}
+
 TEST_CASE(
   "smt2_convt no unary concat for zero-width operand",
   "[core][solvers][smt2]")
