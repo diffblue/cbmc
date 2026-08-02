@@ -3080,7 +3080,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         break;
       }
     }
-    if(!has_user_ctor)
+    if(!has_user_ctor && expr.operands().size() > 1)
     {
       exprt init_list(ID_initializer_list, expr.type());
       init_list.operands().swap(expr.operands());
@@ -3092,6 +3092,36 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 
   if(cpp_is_pod(expr.type()))
   {
+    // N5008 [dcl.init.list]/3.2: list-initialization from a braced list
+    // whose single element is of the SAME class type (or derived) is
+    // copy-initialization from that element, not element-wise
+    // aggregate initialization -- `Base{b}` with b a Base copies b.
+    if(
+      expr.operands().size() == 1 &&
+      expr.operands().front().id() == ID_initializer_list &&
+      expr.operands().front().operands().size() == 1 &&
+      expr.type().id() == ID_struct_tag)
+    {
+      exprt &elem = to_unary_expr(expr.operands().front()).op();
+      exprt elem_tc = elem;
+      typecheck_expr(elem_tc);
+      typet elem_type = elem_tc.type();
+      if(is_reference(elem_type))
+        elem_type = to_reference_type(elem_type).base_type();
+      if(
+        elem_type.id() == ID_struct_tag &&
+        (to_struct_tag_type(elem_type).get_identifier() ==
+           to_struct_tag_type(expr.type()).get_identifier() ||
+         subtype_typecast(
+           follow_tag(to_struct_tag_type(elem_type)),
+           follow_tag(to_struct_tag_type(expr.type())))))
+      {
+        already_typechecked_exprt::make_already_typechecked(elem_tc);
+        exprt unwrapped = std::move(elem_tc);
+        expr.operands().clear();
+        expr.add_to_operands(std::move(unwrapped));
+      }
+    }
     expr.id("explicit-typecast");
     typecheck_expr_main(expr);
   }
