@@ -4403,3 +4403,32 @@ their instances.  Non-recursive member aliases work (q14).  This is
 libc++'s _Or/_And metaprogram -- likely also behind other libcxx
 families.  uam standalone (direct __uninitialized_allocator_move call)
 still fails on the same_as/common_reference chain, gated by this.
+
+## Suite-coverage correction (2026-08-02)
+
+User pointed out the C++ regression net is FIVE suites:
+regression/cpp (goto-cc -e), regression/systemc (cbmc
+--validate-goto-model --validate-ssa-equation -e),
+regression/contracts-cpp-dfcc (chain.sh: goto-cc+goto-instrument+cbmc),
+regression/cbmc-cpp, and regression/cbmc for sanity.  Only the last
+two had been running.  Standard commands:
+  cd regression/cpp    && ../test.pl -e -p -c ../../../build/bin/goto-cc
+  cd regression/systemc && ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation"
+  cd regression/contracts-cpp-dfcc && ../test.pl -e -p -c "../chain.sh <goto-cc> <goto-instrument> <cbmc> false true"
+(goto-instrument must be BUILT -- a missing binary shows up as every
+chain test failing with EXIT=127, which mimics a regression.)
+
+Sweep results: cpp had ONE failure (base_init_pod1, predates recent
+rounds -- verified with a worktree build at the round-4 tip); FIXED:
+[class.base.init]/7 braced POD-base mem-initializers now
+aggregate-initialize member-wise with [dcl.init.list]/3.2 same-type
+copy collapse (first two attempts regressed cpp20_map_piecewise
+(symex struct-arity abort) and the copy forms
+(cpp11_brace_init_nonaggregate) -- the working shape routes the
+operands as ONE initializer_list through explicit-constructor-call).
+systemc: 5 pre-existing failures (Cast1, Masc1, Template1, Tuple1,
+Tuple2; three are invariant-violation aborts) -- present at round-4
+tip too; NOT yet worked.  contracts-cpp-dfcc: green.
+
+All five suites now in the per-fix validation set (systemc failures
+tracked as the known baseline until fixed).
