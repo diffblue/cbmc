@@ -356,6 +356,50 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         rhs = to_unary_expr(rhs).op();
       }
 
+      // N5008 [dcl.init.list]/3.2 + /3.4: list-initializing a class from a
+      // braced-init-list whose single element is of the SAME class type is
+      // copy-initialization from that element; any other non-empty list for
+      // an aggregate initializes it member-wise ([dcl.init.aggr]).  A POD
+      // aggregate target (e.g. the base subobject in `Derived() : Base{42}`,
+      // [class.base.init]/7) reached the assignment below with the raw list,
+      // and the element-to-class implicit conversion was rejected
+      // ("invalid implicit conversion from 'signed int' to 'struct Base'").
+      if(
+        rhs.id() == ID_initializer_list &&
+        object_tc.type().id() == ID_struct_tag)
+      {
+        bool same_class_copy = false;
+        if(rhs.operands().size() == 1)
+        {
+          exprt elem = to_unary_expr(rhs).op();
+          typecheck_expr(elem);
+          typet elem_type = elem.type();
+          if(is_reference(elem_type))
+            elem_type = to_reference_type(elem_type).base_type();
+          same_class_copy =
+            elem_type.id() == ID_struct_tag &&
+            to_struct_tag_type(elem_type).get_identifier() ==
+              to_struct_tag_type(object_tc.type()).get_identifier();
+          if(same_class_copy)
+            rhs = std::move(elem);
+        }
+        if(!same_class_copy)
+        {
+          // Member-wise aggregate initialization: hand the list's
+          // elements to the parenthesized-aggregate branch below, which
+          // implements exactly [dcl.init.aggr] (explicit elements in
+          // order, trailing members value-initialized).
+          exprt::operandst elements = rhs.operands();
+          for(auto &e : elements)
+          {
+            typecheck_expr(e);
+            add_implicit_dereference(e);
+          }
+          operands_tc = std::move(elements);
+          goto aggregate_initialization;
+        }
+      }
+
       // Override constantness
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
@@ -365,6 +409,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     }
     else
     {
+    aggregate_initialization:
       // C++20 aggregate parenthesized initialization
       if(object_tc.type().id() == ID_struct_tag)
       {

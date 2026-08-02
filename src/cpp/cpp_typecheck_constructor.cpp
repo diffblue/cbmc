@@ -1141,7 +1141,7 @@ void cpp_typecheckt::full_member_initialization(
             continue;
           const cpp_namet &init_name = to_cpp_name(initializer.find(ID_member));
           const exprt &init_expr = static_cast<const exprt &>(initializer);
-          if(init_expr.operands().size() != 1)
+          if(init_expr.operands().empty())
             continue;
           bool names_this_base =
             !init_name.has_template_args() &&
@@ -1196,7 +1196,24 @@ void cpp_typecheckt::full_member_initialization(
           lhs_ptr.copy_to_operands(exprt("cpp-this"));
           lhs_ptr.add_source_location() = source_location_of(initializer);
           dereference_exprt lhs(lhs_ptr);
-          exprt rhs = init_expr.operands().front();
+          // N5008 [class.base.init]/7: the expression-list or braced-init-
+          // list initializes the base subobject, which for an aggregate can
+          // be MEMBER-WISE (`Derived() : Base{42}` with `struct Base
+          // { int x; }`, [dcl.init.list]/3.4 / [dcl.init.aggr]) -- only a
+          // single operand of the base's own type is a whole-object copy.
+          // Assigning the bare operand mis-typechecked the aggregate form
+          // ("invalid implicit conversion from 'signed int' to 'struct
+          // Base'"), and a multi-operand list was dropped altogether (the
+          // size()!=1 guard above; nondet base).  Route the operands
+          // through an explicit-constructor-call expression instead: its
+          // typecheck performs copy-initialization for the same-type form
+          // and aggregate initialization otherwise.
+          exprt rhs("explicit-constructor-call", base_t);
+          rhs.add_source_location() = source_location_of(initializer);
+          exprt init_list(ID_initializer_list);
+          init_list.operands() = init_expr.operands();
+          init_list.add_source_location() = source_location_of(initializer);
+          rhs.add_to_operands(std::move(init_list));
           code_frontend_assignt assign_code(std::move(lhs), std::move(rhs));
           assign_code.add_source_location() = source_location_of(initializer);
           final_initializers.move_to_sub(assign_code);
