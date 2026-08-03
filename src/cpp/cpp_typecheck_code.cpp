@@ -1955,6 +1955,9 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           deref.add_source_location() = code.source_location();
           exprt target = get_component_rec(deref, base_name, ns);
           target.set(ID_C_lvalue, true);
+          // keep the unwrapped member expression: the
+          // already-typechecked wrapper below carries a nil type
+          const exprt real_target = target;
 
           exprt::operandst wrapped_ops;
           wrapped_ops.reserve(code.operands().size());
@@ -1967,9 +1970,40 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             cpp_constructor(code.source_location(), target, wrapped_ops);
           if(call.has_value())
             code.swap(call.value());
+          else if(code.get_bool("#value_init"))
+          {
+            // N5008 [class.base.init]/7 + [dcl.init.general]/9->/8: an
+            // EXPLICIT empty initializer (`member()` / `member{}`)
+            // value-initializes, which for a scalar/POD member means
+            // zero-initialization -- unlike the synthesized
+            // default-initialization entries, which leave the member
+            // indeterminate ([dcl.init.general]/7) and rightly become a
+            // skip below.
+            const auto zero = ::zero_initializer(
+              real_target.type(), code.source_location(), *this);
+            if(zero.has_value())
+            {
+              // both sides are fully typechecked already; build the
+              // assignment directly (the member expression is an lvalue)
+              side_effect_exprt assign(
+                ID_assign,
+                {real_target, *zero},
+                real_target.type(),
+                code.source_location());
+              code_expressiont new_code(assign);
+              code.swap(new_code);
+            }
+            else
+            {
+              codet skip{ID_skip};
+              skip.add_source_location() = code.source_location();
+              code.swap(skip);
+            }
+          }
           else
           {
-            // value-initialisation with no constructor call (POD member)
+            // default-initialisation with no constructor call (POD
+            // member): indeterminate value, no code
             codet skip{ID_skip};
             skip.add_source_location() = code.source_location();
             code.swap(skip);
