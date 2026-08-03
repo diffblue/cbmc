@@ -1917,9 +1917,17 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // pattern to be a bare `cpp_name` left such qualified patterns unexpanded,
   // collapsing the pack to a single element so the surrounding constexpr trait
   // could not be folded for two or more elements.
+  // The gate must also open when the only pack state is a ZERO size
+  // (pack_size_map): an empty pack has no pack_args_map/pack_expr_map
+  // entry at all, yet its zero-length expansion ([temp.variadic]/7)
+  // must still REMOVE the pattern before the per-argument typecheck
+  // below resolves it (an alias pattern like `__enable_if_t<_Bn::value>`
+  // would otherwise substitute `_Bn::value` with no binding and fail
+  // the whole SFINAE chain, libstdc++'s __and_/__detected_or shapes).
   if(
     (!template_map.pack_args_map.empty() ||
-     !template_map.pack_expr_map.empty()) &&
+     !template_map.pack_expr_map.empty() ||
+     !template_map.pack_size_map.empty()) &&
     !disable_template_arg_pack_expansion)
   {
     cpp_template_args_tct::argumentst expanded;
