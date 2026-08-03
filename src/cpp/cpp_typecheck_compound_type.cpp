@@ -765,6 +765,82 @@ void cpp_typecheckt::typecheck_compound_declarator(
       };
 
       irept &inits = declarator.member_initializers();
+      // N5008 [temp.variadic]/5: a mem-initializer that is ITSELF a pack
+      // expansion (`leaf<T>(u)...` paired with a base-specifier pack,
+      // recorded by the parser via ID_ellipsis) expands to one
+      // mem-initializer per element, all packs it mentions expanding in
+      // lock-step: the function parameter pack `u` becomes `u$k` and any
+      // template type pack in the mem-initializer-id (`leaf<T>`) is
+      // substituted with its k-th element.
+      if(inits.is_not_nil())
+      {
+        irept::subt expanded_inits;
+        bool any_whole = false;
+        for(auto &init : inits.get_sub())
+        {
+          irep_idt fn_pack;
+          if(init.get_bool(ID_ellipsis))
+            fn_pack = mi_ref_base(init);
+          std::size_t arity = 0;
+          if(!fn_pack.empty())
+            arity = pack_counts[fn_pack];
+          if(init.get_bool(ID_ellipsis) && arity > 0)
+          {
+            any_whole = true;
+            for(std::size_t k = 0; k < arity; ++k)
+            {
+              irept copy = init;
+              copy.remove(ID_ellipsis);
+              mi_rename(
+                copy, fn_pack, id2string(fn_pack) + "$" + std::to_string(k));
+              std::map<std::string, typet> elem_by_short;
+              for(const auto &pa : template_map.pack_args_map)
+              {
+                if(pa.second.size() <= k)
+                  continue;
+                const std::string full = id2string(pa.first);
+                auto pp = full.rfind("::");
+                elem_by_short
+                  [pp != std::string::npos ? full.substr(pp + 2) : full] =
+                    pa.second[k];
+              }
+              std::function<void(irept &)> subst_tp = [&](irept &nn)
+              {
+                if(
+                  nn.id() == ID_cpp_name && nn.get_sub().size() == 1 &&
+                  nn.get_sub().front().id() == ID_name)
+                {
+                  auto it = elem_by_short.find(
+                    id2string(nn.get_sub().front().get(ID_identifier)));
+                  if(it != elem_by_short.end())
+                  {
+                    // the cpp_name sits where a TYPE is expected (the
+                    // `type` of a template argument); substitute the
+                    // element type directly
+                    nn = it->second;
+                    return;
+                  }
+                }
+                for(auto &c : nn.get_sub())
+                  subst_tp(c);
+                for(auto &c : nn.get_named_sub())
+                  subst_tp(c.second);
+              };
+              irept &mi_name = copy.add(ID_member);
+              for(auto &sub : mi_name.get_sub())
+                if(sub.id() == ID_template_args)
+                  subst_tp(sub);
+              for(auto &a : copy.get_sub())
+                subst_tp(a);
+              expanded_inits.push_back(std::move(copy));
+            }
+            continue;
+          }
+          expanded_inits.push_back(init);
+        }
+        if(any_whole)
+          inits.get_sub().swap(expanded_inits);
+      }
       if(inits.is_not_nil())
       {
         for(auto &init : inits.get_sub())
