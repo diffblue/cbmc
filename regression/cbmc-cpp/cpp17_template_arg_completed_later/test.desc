@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ instance re-elaborated when completed: SUCCESS$
@@ -36,3 +36,8 @@ base-less and unmarked, closing all retry gates.  A durable fix must
 route every completion of a template instance through
 instantiate_template with its argument bindings, or persist the
 bindings on the instance for the compound-completion path to use.
+Fixed 2026-08-03 (round 9): marked instances are re-instantiated once
+the dropped base's type completes ([temp.point]); the completion swap
+rebuilds the template map from the instance's recorded arguments, and
+bare-template-parameter base/mem-initializer ids resolve through the
+map ([temp.names]/8).
