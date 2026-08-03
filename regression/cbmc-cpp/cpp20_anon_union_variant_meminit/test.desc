@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ variant member value-initialized: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A mem-initializer naming an anonymous-union variant member
+(`: __null_state_()`, [class.base.init]/2) is silently dropped from
+the constructor (empty body; the member stays nondet).
+check_member_initializers recognises the name (has_component_rec) and
+full_member_initialization routes it, but the conversion loses it.
+Blocks precise modelling of libc++ __optional_destruct_base
+(cpp20_map_basic_libcxx's next layers).
