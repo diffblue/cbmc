@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <iostream> // TEMPORARY DEBUG
 #include "cpp_typecheck.h"
 
 #ifdef DEBUG
@@ -2898,6 +2899,16 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // produce new declaration
   cpp_declarationt new_decl = to_cpp_declaration(effective_template->type);
+  // TEMPORARY DEBUG
+  if(
+    getenv("CBMC_DBG") != nullptr &&
+    id2string(template_symbol.base_name).find("impl") != std::string::npos)
+  {
+    const irept &b = new_decl.type().find(ID_bases);
+    std::cerr << "CBMC_DBG inst impl nbases=" << b.get_sub().size() << '\n';
+    if(!b.get_sub().empty())
+      std::cerr << b.get_sub().front().pretty(2, 6) << '\n';
+  }
 
   // The new one is not a template any longer, but we remember the
   // template type that was used.
@@ -3902,8 +3913,119 @@ skip_pack_removal_ft:
       const std::size_t non_pack =
         template_type.template_parameters().size() - 1;
 
+      // The trailing pack's deduced elements.  Prefer the template map
+      // (the primary template's build() records them); for a PARTIAL
+      // SPECIALIZATION with a non-identity pattern (e.g. libc++'s
+      // `__tuple_impl<__tuple_indices<_Indx...>, _Tp...>`) the map holds
+      // nothing, but the pattern re-deduction above (spec_bindings)
+      // recorded them.
+      const irep_idt trailing_pack_id =
+        template_type.template_parameters().back().id() == ID_type
+          ? template_type.template_parameters().back().type().get(
+              ID_identifier)
+          : template_type.template_parameters().back().get(ID_identifier);
+      std::vector<typet> trailing_pack_elems;
+      {
+        auto pa = template_map.pack_args_map.find(trailing_pack_id);
+        if(pa != template_map.pack_args_map.end())
+          trailing_pack_elems = pa->second;
+        else
+        {
+          for(const auto &entry : spec_bindings.get_sub())
+          {
+            if(
+              entry.id() == "pack_types" &&
+              entry.get(ID_identifier) == trailing_pack_id)
+            {
+              for(const auto &t : entry.get_sub())
+                trailing_pack_elems.push_back(static_cast<const typet &>(t));
+              break;
+            }
+          }
+        }
+      }
+      const std::string trailing_pack_short = [&]() -> std::string
+      {
+        const std::string full = id2string(trailing_pack_id);
+        const auto pos = full.rfind("::");
+        return pos != std::string::npos ? full.substr(pos + 2) : full;
+      }();
+
       for(auto &base : bases_sub)
       {
+        // N5008 [temp.variadic]/5.2: a base-specifier pack expansion
+        // (`leaf<T>...`, recorded by the parser via ID_ellipsis)
+        // expands to one base-specifier per pack element, with the
+        // element substituted into the pattern.  This covers patterns
+        // that merely REFERENCE the pack (a template-id); the bare
+        // `Pack...` shape keeps its established path below.
+        if(base.get_bool(ID_ellipsis) && !trailing_pack_elems.empty())
+        {
+          std::function<bool(const irept &)> refs_pack = [&](const irept &n)
+          {
+            if(
+              n.id() == ID_name &&
+              id2string(n.get(ID_identifier)) == trailing_pack_short)
+              return true;
+            for(const auto &c : n.get_sub())
+              if(refs_pack(c))
+                return true;
+            for(const auto &c : n.get_named_sub())
+              if(refs_pack(c.second))
+                return true;
+            return false;
+          };
+          const bool bare_pack_base = [&]() -> bool
+          {
+            const irept &nm = base.find(ID_name);
+            // bare `Pack...`: a cpp_name whose ONLY name component is
+            // the pack and which has no template-argument list
+            if(nm.id() != ID_cpp_name)
+              return false;
+            for(const auto &sub : nm.get_sub())
+              if(sub.id() == ID_template_args)
+                return false;
+            return true;
+          }();
+          if(!bare_pack_base && refs_pack(base.find(ID_name)))
+          {
+            for(const typet &elem : trailing_pack_elems)
+            {
+              irept new_base = base;
+              new_base.remove(ID_ellipsis);
+              exprt elem_arg(ID_type);
+              elem_arg.type() = elem;
+              std::function<void(irept &)> subst = [&](irept &n)
+              {
+                for(auto &c : n.get_sub())
+                {
+                  // replace a cpp_name that IS the bare pack reference
+                  if(c.id() == ID_cpp_name || c.id() == ID_ambiguous)
+                  {
+                    const irept &inner =
+                      c.id() == ID_ambiguous ? c.find(ID_type) : c;
+                    if(
+                      inner.id() == ID_cpp_name &&
+                      inner.get_sub().size() == 1 &&
+                      inner.get_sub().front().id() == ID_name &&
+                      id2string(inner.get_sub().front().get(ID_identifier)) ==
+                        trailing_pack_short)
+                    {
+                      c = elem_arg;
+                      continue;
+                    }
+                  }
+                  subst(c);
+                }
+                for(auto &c : n.get_named_sub())
+                  subst(c.second);
+              };
+              subst(new_base);
+              expanded_bases.push_back(new_base);
+            }
+            continue;
+          }
+        }
         // Check if this base references the pack parameter
         const irept &base_name = base.find(ID_name);
         bool is_pack_base = false;

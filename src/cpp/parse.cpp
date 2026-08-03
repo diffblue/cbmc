@@ -7132,7 +7132,10 @@ bool Parser::rBaseSpecifiers(irept &bases)
     {
       lex.get_token();
 
-      // TODO
+      // N5008 [class.derived.general] grammar: a base-specifier may be a
+      // pack expansion; record it for instantiation-time expansion
+      // ([temp.variadic]/5.2).
+      base.set(ID_ellipsis, true);
     }
 
     bases.get_sub().push_back(irept());
