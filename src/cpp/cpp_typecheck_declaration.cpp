@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_declarator_converter.h"
 #include "cpp_template_type.h"
 #include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 
 std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
@@ -683,6 +684,76 @@ void cpp_typecheckt::convert_non_template_declaration(
   // do the declarators (optional)
   for(auto &d : declaration.declarators())
   {
+    // N5008 [dcl.ambig.res]/1: `T D(a, b, ...)` where every `a, b` could
+    // syntactically be a parameter declaration parses as a FUNCTION
+    // declaration -- but the ambiguity only exists when the names CAN be
+    // types; when a name does not resolve to a type, the construct is a
+    // variable with a parenthesized initializer.  The parser (which has
+    // no name lookup) always produced the function interpretation at
+    // non-statement scope, so `void *&child(__left_);` at namespace
+    // scope became a bogus function declaration whose "parameter type"
+    // `__left_` later failed conversion (libc++'s __tree
+    // __insert_unique node linking).  Re-interpret here, where lookup
+    // is available.
+    if(
+      d.type().id() == ID_function_type && d.value().is_nil() && !is_typedef &&
+      !d.get_is_parameter())
+    {
+      const irept::subt &params = d.type().find(ID_parameters).get_sub();
+      bool all_bare_nontype_names = !params.empty();
+      for(const auto &param : params)
+      {
+        if(param.id() != ID_cpp_declaration)
+        {
+          all_bare_nontype_names = false;
+          break;
+        }
+        const cpp_declarationt &pdecl =
+          static_cast<const cpp_declarationt &>(param);
+        // the ambiguous shape: a bare unqualified name with an empty
+        // declarator
+        if(
+          pdecl.type().id() != ID_cpp_name ||
+          to_cpp_name(pdecl.type()).is_qualified() ||
+          to_cpp_name(pdecl.type()).has_template_args() ||
+          pdecl.declarators().size() != 1 ||
+          pdecl.declarators().front().name().is_not_nil())
+        {
+          all_bare_nontype_names = false;
+          break;
+        }
+        // does the name resolve to a TYPE?  If it can, [dcl.ambig.res]/1
+        // keeps the function interpretation.
+        cpp_typecheck_resolvet resolver(*this);
+        const exprt as_type = resolver.resolve(
+          to_cpp_name(pdecl.type()),
+          cpp_typecheck_resolvet::wantt::TYPE,
+          cpp_typecheck_fargst(),
+          false); // no exception on failure
+        if(as_type.is_not_nil() && as_type.id() == ID_type)
+        {
+          all_bare_nontype_names = false;
+          break;
+        }
+      }
+      if(all_bare_nontype_names)
+      {
+        // variable with parenthesized initializer: the initializer
+        // expressions are the (mis-parsed) parameter names
+        exprt init_args(ID_initializer);
+        for(const auto &param : params)
+        {
+          const cpp_declarationt &pdecl =
+            static_cast<const cpp_declarationt &>(param);
+          init_args.add_to_operands(static_cast<const exprt &>(
+            static_cast<const irept &>(to_cpp_name(pdecl.type()))));
+        }
+        typet var_type = to_type_with_subtype(d.type()).subtype();
+        d.type() = var_type;
+        d.init_args().swap(init_args);
+      }
+    }
+
     // copy the declarator (we destroy the original)
     cpp_declaratort declarator=d;
 
