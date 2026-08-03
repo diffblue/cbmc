@@ -8,10 +8,12 @@
 // expanded to ZERO parameters, and the call found no match
 // ([temp.deduct.call]/1, [temp.variadic]/4).  g++/clang++ run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <unsigned long...> struct indices
+template <unsigned long...>
+struct indices
 {
 };
-template <class...> struct types
+template <class...>
+struct types
 {
 };
 struct impl
