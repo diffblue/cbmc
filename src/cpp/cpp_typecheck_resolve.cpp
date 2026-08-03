@@ -8514,6 +8514,47 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     }
   }
 
+  // N5008 [temp.deduct.call]/1 + [temp.variadic]/4: the elements deduced
+  // for a trailing FUNCTION parameter pack must be recorded as the pack's
+  // template-argument list (pack_args_map), not merely in the scalar
+  // type_map (whose per-element guesses overwrite one another).  With
+  // several template packs (`template<unsigned long... Uf, class... Tf,
+  // class... Up> impl(indices<Uf...>, types<Tf...>, Up...)`, the libc++
+  // __tuple_impl constructor), an empty pre-seeded pack_args_map entry
+  // for Up otherwise survives deduction, the #deduced_packs record
+  // stores arity 0, and instantiate_template expands the trailing pack
+  // to ZERO parameters -- the rebuilt instance is then rejected by the
+  // second disambiguation ("found no match for symbol '__tuple_impl'").
+  if(has_non_empty_pack && !pack_deduced_types.empty())
+  {
+    const auto &t_params =
+      cpp_declaration.template_type().template_parameters();
+    std::size_t n_type_packs = 0;
+    for(const auto &tp : t_params)
+      if(tp.get_bool(ID_ellipsis) && tp.id() == ID_type)
+        ++n_type_packs;
+    // Only the MULTI-pack shape needs this record (the single-pack flow
+    // sizes the pack from the argument count alone and pre-dates this);
+    // overwriting the single-pack state changes the evaluation order of
+    // parallel-pack SFINAE constraints (cpp17_tuple_get_two_pack_ctor).
+    for(auto it_p = t_params.rbegin();
+        n_type_packs >= 2 && it_p != t_params.rend();
+        ++it_p)
+    {
+      if(!it_p->get_bool(ID_ellipsis) || it_p->id() != ID_type)
+        continue;
+      const irep_idt pid = it_p->type().get(ID_identifier);
+      auto &slot = cpp_typecheck.template_map.pack_args_map[pid];
+      if(slot.empty())
+      {
+        slot = pack_deduced_types;
+        cpp_typecheck.template_map.pack_size_map[pid] =
+          pack_deduced_types.size();
+      }
+      break; // the trailing function pack corresponds to the LAST type pack
+    }
+  }
+
   // For non-empty variadic packs, expand the single deduced pack type
   // to N copies in the template args so that template instantiation
   // sees the correct number of arguments.
