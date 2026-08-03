@@ -242,6 +242,13 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
           writeable_symbol.type.find(ID_full_template_args);
         const bool saved_template_class_instance =
           writeable_symbol.type.get_bool(ID_template_class_instance);
+        // The instance's link back to its primary template
+        // (ID_identifier, set by instantiate_template): without it a
+        // later re-elaboration of an empty/incomplete instance
+        // (elaborate_class_template) cannot find the template to
+        // re-instantiate from.
+        const irep_idt saved_template_identifier =
+          writeable_symbol.type.get(ID_identifier);
         writeable_symbol.type.swap(type);
         if(
           writeable_symbol.type.find(ID_C_template).is_nil() &&
@@ -260,6 +267,12 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         }
         if(saved_template_class_instance)
           writeable_symbol.type.set(ID_template_class_instance, true);
+        if(
+          writeable_symbol.type.get(ID_identifier).empty() &&
+          !saved_template_identifier.empty())
+        {
+          writeable_symbol.type.set(ID_identifier, saved_template_identifier);
+        }
         typecheck_compound_body(writeable_symbol);
 
         // An instance completed here (through the incomplete-to-complete
