@@ -15,3 +15,13 @@ assertion-line pattern): the silent-statement-dropping family
 (cpp20_ranges_basic_libcxx, cpp17_optional_requires_ctor_pair,
 cpp20_constraint_substitution_failure).
 Family-root minimal reproducer: cpp20_trait_alias_default_meminit.
+Round-9 re-scoping (2026-08-03): this reduction is degenerate (invalid
+ctor-template shapes; fails on 'symbol _Up unknown').  The REAL
+<optional> driver's fresh diagnostic is precise: `o.has_value()` fails
+with "invalid implicit conversion from 'struct optional' to 'const
+struct __optional_storage_base &'" -- the derived-to-base reference
+conversion through the SFINAE'd move/copy-assign base chain
+(__optional_move_assign_base<bool = ...> etc.) is broken, i.e. an
+intermediate base is dropped.  Queue a fresh cvise reduction with that
+diagnostic + main-dropped criterion; this file should then be replaced
+by the faithful minimal shape.
