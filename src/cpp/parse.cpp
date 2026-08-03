@@ -5367,6 +5367,13 @@ bool Parser::rMemberInit(exprt &init)
 #endif
     // braced-init-list: the '{' was already consumed
     // parse initializer-clause (',' initializer-clause)* ','? '}'
+    if(lex.LookAhead(0) == '}')
+    {
+      // N5008 [dcl.init.general]/9: `member{}` VALUE-initializes;
+      // record it so an empty operand list is distinguishable from a
+      // synthesized default-initialization entry.
+      init.set("#value_init", true);
+    }
     if(lex.LookAhead(0) != '}')
     {
       for(;;)
@@ -5439,6 +5446,10 @@ bool Parser::rMemberInit(exprt &init)
     // read closing parenthesis
     if(lex.get_token(tk2)!=')')
       return false;
+
+    // N5008 [dcl.init.general]/9: `member()` VALUE-initializes.
+    if(init.operands().empty())
+      init.set("#value_init", true);
   }
 
   if(lex.LookAhead(0)==TOK_ELLIPSIS)
