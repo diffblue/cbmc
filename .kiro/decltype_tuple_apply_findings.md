@@ -4432,3 +4432,44 @@ tip too; NOT yet worked.  contracts-cpp-dfcc: green.
 
 All five suites now in the per-fix validation set (systemc failures
 tracked as the known baseline until fixed).
+
+## Round 6: minimal-KNOWNBUG fixing sweep (2026-08-02/03)
+
+Five source fixes, each suite-validated across ALL FIVE suites
+(cbmc-cpp, cbmc, cpp, systemc, contracts-cpp-dfcc):
+
+1. systemc param invariant (5 tests, one root): unconverted member
+   instances keep parse-level parameter names; clean_up now qualifies
+   them ([dcl.fct]/5, [basic.scope.param]).  systemc suite green for
+   the first time.
+2. Three-pack ctor deduction ([temp.deduct.call]/1, [temp.variadic]/4):
+   trailing-pack elements now recorded into the LAST type pack's
+   argument list -- gated to >=2 template packs after the single-pack
+   overwrite regressed cpp17_tuple_get_two_pack_ctor_3elem.  New CORE
+   cpp11_three_pack_ctor_delegation.
+3. ID_identifier preservation across the incomplete-to-complete swap
+   (groundwork; the completed_later family remains parked: the
+   base-specifier's template parameter does not RESOLVE at later
+   points of instantiation -- three strategies failed identically;
+   VACUITY CHECK caught a false "fixed" whose commit was soft-reset).
+4. Zero-length pack expansion with pack_size_map-only state
+   ([temp.variadic]/7): one-line gate fix; fixed BOTH
+   cpp17_alias_default_pack_expansion and
+   cpp17_optional_requires_ctor_pair.
+5. Recursive member aliases ([temp.alias]/2): the cycle-breaker now
+   keys on a binding fingerprint + scope ids and allows ONE bounded
+   same-key re-entry (cap 2 -- cap 8 re-resolved exponentially and
+   timed out cpp20_views_take_call_crash).  Fixed
+   cpp20_recursive_member_alias_base (libc++ _Or/_And root).
+
+Lessons: (a) the same-key re-entry through instantiate_template's
+declaration conversion is LEGITIMATE, not a cycle -- binary
+cycle-breaking silently empties types; (b) vacuity checks remain the
+only guard against celebrating leniency-dropped mains; (c) tuple_leaf
+narrows to the partial-spec base pack (leaf<T>... dropped from the
+instance -- tl9 probe).
+
+Open: ranges views::take drops main ("<<type:auto>>" conversion at
+the range expression; cvv7 reduction running with the
+main-dropped+vacuous criterion); tuple_leaf base pack; map_basic
+__null_state_; completed_later re-elaboration.
