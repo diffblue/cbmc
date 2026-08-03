@@ -1166,6 +1166,30 @@ void cpp_typecheckt::full_member_initialization(
             }
             if(!is_member_name)
             {
+              // N5008 [temp.names]/8: within the instance, a template
+              // parameter denotes its bound argument -- consult the
+              // active template map FIRST (scope-based resolution of
+              // the parameter fails when the class is completed from a
+              // re-elaboration context, [temp.point]).
+              const std::string want = id2string(init_name.get_base_name());
+              for(const auto &te : template_map.type_map)
+              {
+                const std::string key = id2string(te.first);
+                const auto pos = key.rfind("::");
+                if(
+                  (pos != std::string::npos ? key.substr(pos + 2) : key) ==
+                    want &&
+                  te.second.id() == ID_struct_tag &&
+                  to_struct_tag_type(te.second).get_identifier() ==
+                    to_struct_tag_type(b.type()).get_identifier())
+                {
+                  names_this_base = true;
+                  break;
+                }
+              }
+            }
+            if(!is_member_name && !names_this_base)
+            {
               const std::size_t errors_before =
                 get_message_handler().get_message_count(messaget::M_ERROR);
               try
@@ -1296,6 +1320,39 @@ void cpp_typecheckt::full_member_initialization(
         }
 
         drop_empty_pack_template_args(member_type);
+
+        // N5008 [temp.names]/8 + [class.base.init]/2: the
+        // mem-initializer-id may denote the base via a TEMPLATE
+        // PARAMETER; within the instance that parameter denotes its
+        // bound argument.  Consult the active template map first --
+        // scope-based resolution of the parameter fails when the class
+        // is completed from a re-elaboration context ([temp.point]).
+        if(!member_name.is_qualified() && !has_template_args)
+        {
+          const std::string want = id2string(member_name.get_base_name());
+          bool matched_via_map = false;
+          for(const auto &te : template_map.type_map)
+          {
+            const std::string key = id2string(te.first);
+            const auto pos = key.rfind("::");
+            if(
+              (pos != std::string::npos ? key.substr(pos + 2) : key) == want &&
+              te.second.id() == ID_struct_tag &&
+              to_struct_tag_type(te.second).get_identifier() ==
+                to_struct_tag_type(b.type()).get_identifier())
+            {
+              matched_via_map = true;
+              break;
+            }
+          }
+          if(matched_via_map)
+          {
+            final_initializers.move_to_sub(initializer);
+            found = true;
+            break;
+          }
+        }
+
         typecheck_type(member_type);
 
         if(member_type.id() != ID_struct_tag)

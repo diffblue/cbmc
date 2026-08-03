@@ -273,6 +273,28 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         {
           writeable_symbol.type.set(ID_identifier, saved_template_identifier);
         }
+        // N5008 [temp.inst]/2: the members and base-specifiers of a
+        // template instance are typechecked with the template's
+        // parameters bound to the instance's arguments.  This
+        // completion path can be reached from contexts other than
+        // instantiate_template (which builds the map itself) -- e.g. a
+        // re-elaboration triggered at a later point of instantiation
+        // ([temp.point]) after a previously-incomplete argument type
+        // was completed.  Rebuild the map from the arguments recorded
+        // on the instance, exactly as add_method_body does for
+        // deferred method bodies.
+        cpp_saved_template_mapt saved_map_for_completion(template_map);
+        if(
+          writeable_symbol.type.get_bool(ID_template_class_instance) &&
+          writeable_symbol.type.find(ID_C_template).is_not_nil() &&
+          writeable_symbol.type.find(ID_C_template_arguments).is_not_nil())
+        {
+          template_map.build(
+            static_cast<const template_typet &>(
+              writeable_symbol.type.find(ID_C_template)),
+            static_cast<const cpp_template_args_tct &>(
+              writeable_symbol.type.find(ID_C_template_arguments)));
+        }
         typecheck_compound_body(writeable_symbol);
 
         // An instance completed here (through the incomplete-to-complete

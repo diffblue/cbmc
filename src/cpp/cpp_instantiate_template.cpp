@@ -1142,6 +1142,21 @@ bool cpp_typecheckt::try_resolve_lazy_type(typet &type)
   return true;
 }
 
+/// True iff \p type carries the #dropped_incomplete_base marker AND the
+/// recorded base type has meanwhile been COMPLETED, i.e. re-elaboration
+/// at this new point of instantiation ([temp.point]) can now succeed.
+bool cpp_typecheckt::dropped_base_now_complete(const typet &type) const
+{
+  const irep_idt base_id = type.get("#dropped_incomplete_base");
+  if(base_id.empty())
+    return false;
+  const symbolt *base_sym = symbol_table.lookup(base_id);
+  return base_sym != nullptr &&
+         (base_sym->type.id() == ID_struct ||
+          base_sym->type.id() == ID_union) &&
+         !to_struct_union_type(base_sym->type).is_incomplete();
+}
+
 void cpp_typecheckt::elaborate_class_template(const typet &type)
 {
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
@@ -1169,7 +1184,8 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         (sym.type.id() == ID_struct || sym.type.id() == ID_union) &&
         sym.type.get_bool(ID_template_class_instance) &&
         (to_struct_union_type(sym.type).components().empty() ||
-         to_struct_union_type(sym.type).is_incomplete()))
+         to_struct_union_type(sym.type).is_incomplete() ||
+         dropped_base_now_complete(sym.type)))
       {
         // Empty or incomplete template instance — allow elaboration
       }
@@ -1200,7 +1216,8 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // with some components) must still be re-elaborated.
     if(
       !to_struct_union_type(symbol.type).components().empty() &&
-      !to_struct_union_type(symbol.type).is_incomplete())
+      !to_struct_union_type(symbol.type).is_incomplete() &&
+      !dropped_base_now_complete(symbol.type))
     {
       return;
     }
@@ -2380,7 +2397,8 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
       if(
         (sym_now.type.id() == ID_struct || sym_now.type.id() == ID_union) &&
         !to_struct_union_type(sym_now.type).components().empty() &&
-        !to_struct_union_type(sym_now.type).is_incomplete())
+        !to_struct_union_type(sym_now.type).is_incomplete() &&
+        !dropped_base_now_complete(sym_now.type))
       {
         return;
       }
@@ -2407,6 +2425,54 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         defined_class_templates.end())
     {
       return;
+    }
+
+    // A completed instance whose base was dropped cannot be repaired
+    // in place (conversion of an already-complete symbol is a no-op):
+    // reset it to the INCOMPLETE state so the re-instantiation below
+    // runs the ordinary incomplete-to-complete completion, rebuilding
+    // members AND bases against the now-complete base type.
+    {
+      symbolt *sym_ptr = symbol_table.get_writeable(symbol.name);
+      if(
+        sym_ptr != nullptr &&
+        (sym_ptr->type.id() == ID_struct || sym_ptr->type.id() == ID_union) &&
+        dropped_base_now_complete(sym_ptr->type) &&
+        !to_struct_union_type(sym_ptr->type).is_incomplete())
+      {
+        // The first (degenerate) elaboration may have CONVERTED member
+        // bodies against the base-less layout (e.g. a constructor whose
+        // base mem-initializer matched no base and became an empty
+        // block).  The re-instantiation below re-creates the member
+        // declarations, but the declarator converter REUSES existing
+        // symbols including their stale values; erase the instance's
+        // member symbols (methods and their locals) so they are rebuilt
+        // fresh against the repaired layout.
+        std::vector<irep_idt> to_erase;
+        const std::string member_prefix = id2string(symbol.name) + "::";
+        // symbol.name is 'tag-X<...>'; member names are 'X<...>::...'
+        std::string inst_prefix = id2string(symbol.name);
+        const auto tag_pos = inst_prefix.rfind("tag-");
+        if(tag_pos != std::string::npos)
+          inst_prefix.erase(tag_pos, 4);
+        inst_prefix += "::";
+        for(const auto &entry : symbol_table.symbols)
+        {
+          const std::string n = id2string(entry.first);
+          if(n.compare(0, inst_prefix.size(), inst_prefix) == 0)
+            to_erase.push_back(entry.first);
+        }
+        for(const auto &n : to_erase)
+        {
+          methods_seen.erase(n);
+          deferred_typechecking.erase(n);
+          symbol_table.remove(n);
+        }
+        to_struct_union_type(sym_ptr->type).components().clear();
+        sym_ptr->type.remove("#dropped_incomplete_base");
+        to_struct_union_type(sym_ptr->type).make_incomplete();
+        sym_ptr->type.set(ID_template_class_instance, true);
+      }
     }
 
     instantiate_template(
@@ -3571,7 +3637,17 @@ skip_pack_removal_ft:
       if(
         cpp_id.id_class == cpp_idt::id_classt::CLASS &&
         (symb.type.id() == ID_struct || symb.type.id() == ID_union))
-        return symb;
+      {
+        // ... unless a base-specifier was dropped because its type was
+        // still incomplete at the previous (eager) point of
+        // instantiation AND that type has meanwhile been completed; the
+        // present use is a new point of instantiation ([temp.point])
+        // and must rebuild the layout.  While the base's type is STILL
+        // incomplete, rebuilding is pointless (and looped to the
+        // recursion limit), so the degenerate instance is served as-is.
+        if(!dropped_base_now_complete(symb.type))
+          return symb;
+      }
       else if(cpp_id.id_class == cpp_idt::id_classt::TYPEDEF)
         return symb;
       else if(symb.value.is_not_nil() && symb.type.id() == ID_code)
