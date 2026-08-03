@@ -4334,6 +4334,44 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   {
     const auto &name = to_cpp_name(expr.function());
     const irep_idt &bn = name.get_base_name();
+    // Clang's library-support intrinsics: per clang's documentation
+    // __builtin_operator_new/__builtin_operator_delete behave exactly
+    // like a call to '::operator new(args)' / '::operator delete(args)'
+    // (N5008 [new.delete.single]: operator new returns a non-null
+    // pointer to storage of the requested size, or throws; operator
+    // delete deallocates).  They have no declaration the C++ resolver
+    // could find (libc++'s __libcpp_operator_new forwards a variadic
+    // pack to them), so intercept the calls directly: model the
+    // allocation with CBMC's allocator and the deallocation as a no-op,
+    // exactly like the provide_stdlib_bodies model for
+    // __libcpp_operator_new.
+    if(bn == "__builtin_operator_new" && !expr.arguments().empty())
+    {
+      exprt size_arg = expr.arguments().front();
+      typecheck_expr(size_arg);
+      side_effect_exprt alloc{
+        ID_allocate,
+        {std::move(size_arg), false_exprt()},
+        pointer_type(empty_typet{}),
+        expr.source_location()};
+      expr.swap(alloc);
+      return;
+    }
+    if(bn == "__builtin_operator_delete")
+    {
+      for(auto &arg : expr.arguments())
+        typecheck_expr(arg);
+      exprt nil = nil_exprt{};
+      exprt as_void("already_typechecked");
+      // no-op: evaluate to a void constant expression
+      exprt result = exprt(ID_nil);
+      code_skipt skip;
+      exprt void_expr(ID_side_effect, empty_typet{});
+      void_expr.set(ID_statement, ID_skip);
+      void_expr.add_source_location() = expr.source_location();
+      expr.swap(void_expr);
+      return;
+    }
     // GCC built-in floating-point classification
     if(
       (bn == "__builtin_isfinite" || bn == "__builtin_isinf" ||
