@@ -4580,3 +4580,21 @@ map_basic's next layer: map::operator[] no-body (15 failures).
 
 Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
 (libcxx_tuple, fresh).
+
+## Round 9 addendum: harvests + degeneracy lesson (2026-08-04)
+
+- cvv11 (libcxx_tuple): 61-line harvest -> KNOWNBUG
+  cpp11_nontype_base_pack: the partial spec's LEADING NON-TYPE index
+  pack base (`__tuple_leaf<_Indx>...`) drops all bases (type-pack
+  analogue is fixed).  A first expander extension (non-type element
+  recovery) didn't fire -- the leading pack's values aren't in
+  pack_expr_map/spec_bindings at base-expansion time; reverted, needs
+  its own session.
+- cvv9 R2 (set_insert): drifted AGAIN to the zero-size-allocation
+  artifact (`long __libcpp_allocate___size;` uninitialized -> cbmc's
+  NULL-deref complaint is legitimate).  R2 result archived
+  (.kiro/reductions/set_insert_cvv9_r2_114lines.cpp); R3 relaunched
+  with a syntactic gate rejecting bare uninitialized *size* globals.
+  LESSON: wrong-code criteria need explicit anti-degeneracy gates per
+  known escape (uninit size, cross-object arithmetic, ill-formed
+  statements) -- collect these in the harness template.
