@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ leaf int: SUCCESS$
@@ -14,3 +14,6 @@ TWO heterogeneous elements ([temp.variadic]/5): the mem-initializer
 match for symbol 'leaf'").  Single-element packs and the
 tuple_leaf partial-spec shape are fixed; this is the next arity.
 Gates nothing currently; found while fixing cpp11_tuple_leaf_no_body.
+Fixed 2026-08-03: whole-mem-initializer pack expansions replicate per
+element with lock-step substitution of the function parameter pack
+and the mem-initializer-id's type packs ([temp.variadic]/5).
