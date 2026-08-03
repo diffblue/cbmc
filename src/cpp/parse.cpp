@@ -5445,7 +5445,11 @@ bool Parser::rMemberInit(exprt &init)
   {
     lex.get_token();
 
-    // TODO
+    // N5008 [class.base.init] grammar: a mem-initializer may be a pack
+    // expansion (`leaf<T>(u)...`, expanding in lockstep with a
+    // base-specifier pack per [temp.variadic]/5); record it for
+    // instantiation-time expansion (expand_member_initializer_packs).
+    init.set(ID_ellipsis, true);
   }
 
   return true;
