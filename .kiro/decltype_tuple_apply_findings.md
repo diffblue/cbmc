@@ -4548,3 +4548,35 @@ runs (killed cvv7 mid-pass once; recovered from its state file).
 Reductions: cvv9 (set_insert round 2, post root#1+#2) at ~17KB and
 falling; cvv7 (ranges, stricter gates) 83k->9.4KB, relaunched.
 map_basic's next layer: map::operator[] no-body (15 failures).
+
+## Round 9: completed_later landed; hidden friends (2026-08-03/04)
+
+1. completed_later STRUCTURAL FIX (4th attempt, working combination):
+   the #dropped_incomplete_base marker carries the dropped base's
+   NAME and every retry gate checks that type's COMPLETENESS (a bool
+   marker looped to the template recursion limit while the base was
+   still incomplete); the reset erases the instance's STALE MEMBER
+   SYMBOLS (converted against the degenerate layout, silently reused
+   otherwise); the completion swap builds the template map from the
+   instance's recorded arguments ([temp.inst]/2); base-specifier and
+   mem-initializer-id resolution consult the map FIRST for bare
+   template parameters ([temp.names]/8).
+   cpp17_template_arg_completed_later CORE; the _ctor variant is
+   non-vacuous and abort-free but its explicit ctor still converts
+   empty at the rebuild (residual layer, desc'd).
+2. Friend FUNCTION templates were silently DISCARDED by
+   typecheck_friend_declaration (only friend-class-templates were
+   handled): libc++'s range-adaptor hidden friend operator| never
+   existed, so `arr | views::take(3)` fell into C-layer arithmetic
+   conversion and main was dropped.  Now converted at the enclosing
+   namespace scope ([class.friend]/1, [namespace.memdef]/3).
+   cpp20_hidden_friend_operator_template CORE; cvv7's 236-line
+   reduction verifies; the real <ranges> header has a further layer
+   (auto-conversion at the range expr), round-3 reduction running.
+3. optional_base re-scoped: real <optional> now fails PRECISELY on
+   the derived-to-base reference conversion through the SFINAE'd
+   assign-base chain (has_value's this-adjustment) -- fresh reduction
+   queued; the old degenerate reproducer to be replaced.
+
+Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
+(libcxx_tuple, fresh).
