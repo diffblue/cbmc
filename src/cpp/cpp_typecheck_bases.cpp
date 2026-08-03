@@ -184,7 +184,39 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       // entry (the same graceful degradation the non-throwing failure
       // paths below use) and continue with the next.  User-code base
       // errors outside instantiation still throw.
-      if(instantiation_stack.empty())
+      // N5008 [temp.names]/8 + [temp.res.general]: within an
+      // instantiated declaration a template parameter denotes its bound
+      // argument.  When the base-specifier is a BARE template parameter
+      // (`renamedt<T> : T`) and the active template map binds it, use
+      // the binding directly: scope-based resolution of the parameter
+      // name fails when the instance is completed from a context where
+      // the original template scope chain is not entered (the
+      // incomplete-to-complete swap; the map there is built from the
+      // instance's recorded arguments).
+      bool base_from_map = false;
+      if(name.get_sub().size() == 1 && name.get_sub().front().id() == ID_name)
+      {
+        const std::string id =
+          id2string(name.get_sub().front().get(ID_identifier));
+        for(const auto &te : template_map.type_map)
+        {
+          const std::string key = id2string(te.first);
+          const auto pos = key.rfind("::");
+          if(
+            (pos != std::string::npos ? key.substr(pos + 2) : key) == id &&
+            te.second.id() == ID_struct_tag)
+          {
+            base_symbol_expr = type_exprt(te.second);
+            base_from_map = true;
+            break;
+          }
+        }
+      }
+      if(base_from_map)
+      {
+        // resolved via the template map
+      }
+      else if(instantiation_stack.empty())
       {
         base_symbol_expr = resolve(
           name, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst());
@@ -237,6 +269,16 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     if(to_struct_type(base_symbol.type).is_incomplete())
     {
+      // N5008 [class.derived.general]/2 requires a complete base; this
+      // point of instantiation was reached EAGERLY from a context that
+      // per [temp.inst]/1 does not require the specialization's
+      // definition (e.g. the return type of a function DECLARATION,
+      // `renamedt<ssa_exprt> f(const ssa_exprt&);` with ssa_exprt still
+      // incomplete).  Drop the base to keep going, but MARK the class:
+      // a later use after the argument type is completed is a new,
+      // valid point of instantiation ([temp.point]) and must
+      // re-elaborate rather than reuse this degenerate layout.
+      type.set("#dropped_incomplete_base", base_symbol.name);
       base = get_nil_irep();
       continue;
     }
