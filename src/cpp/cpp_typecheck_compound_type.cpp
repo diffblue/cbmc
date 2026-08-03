@@ -3616,6 +3616,17 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
   {
     if(comp.type().id() == ID_code)
     {
+      // N5008 [class.union.anon]/1 prohibits USER-written member
+      // functions; the front end synthesizes special members
+      // (constructors, destructor, assignment) for every class,
+      // including anonymous unions whose variant members are classes.
+      // Those are skipped, not diagnosed.
+      const std::string bn = id2string(comp.get_base_name());
+      const bool is_special = bn == id2string(struct_union_symbol.base_name) ||
+                              (!bn.empty() && bn[0] == '~') ||
+                              bn == "operator=";
+      if(is_special)
+        continue;
       error().source_location = struct_union_symbol.type.source_location();
       error() << "anonymous struct/union member '"
               << struct_union_symbol.base_name
@@ -3635,6 +3646,17 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
 
       if(cpp_scopes.current_scope().contains(base_name))
       {
+        // Re-elaboration of the enclosing template instance re-runs
+        // this scoping; re-inserting the SAME member is idempotent,
+        // not a redeclaration.
+        const auto existing =
+          cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+        bool same_member = false;
+        for(const auto *e : existing)
+          if(e->identifier == comp.get_name())
+            same_member = true;
+        if(same_member)
+          continue;
         error().source_location = comp.source_location();
         error() << "'" << base_name << "' already in scope" << eom;
         throw 0;
@@ -3672,11 +3694,48 @@ void cpp_typecheckt::convert_anon_struct_union_member(
     throw 0;
   }
 
-  if(!cpp_is_pod(struct_union_symbol.type))
+  // N5008 [class.union.anon]/1: an anonymous union shall not have
+  // member functions or static data members; [class.union.general]/3:
+  // its non-static data members must not be reference types.  POD-ness
+  // is NOT required (a C++03-era leftover): libc++'s
+  // __optional_destruct_base holds `union { char __null_state_;
+  // value_type __val_; }` where value_type may be an arbitrary class
+  // (with bases, non-trivial members, ...).
+  for(const auto &c :
+      to_struct_union_type(struct_union_symbol.type).components())
   {
-    error().source_location = struct_union_symbol.type.source_location();
-    error() << "anonymous struct/union member is not POD" << eom;
-    throw 0;
+    if(c.get_bool(ID_is_type) || c.get_bool(ID_from_base))
+      continue;
+    if(c.type().id() == ID_code)
+    {
+      // Special member functions (constructors, the destructor,
+      // assignment) are SYNTHESIZED by the front end for every class
+      // and are not the user-written member functions
+      // [class.union.anon]/1 prohibits.
+      const std::string bn = id2string(c.get_base_name());
+      const irep_idt compound_base = struct_union_symbol.base_name;
+      const bool is_special = bn == id2string(compound_base) ||
+                              (!bn.empty() && bn[0] == '~') ||
+                              bn == "operator=";
+      if(is_special)
+        continue;
+      error().source_location = struct_union_symbol.type.source_location();
+      error() << "anonymous struct/union member with member functions" << eom;
+      throw 0;
+    }
+    if(c.get_bool(ID_is_static))
+    {
+      error().source_location = struct_union_symbol.type.source_location();
+      error() << "anonymous struct/union member with static data members"
+              << eom;
+      throw 0;
+    }
+    if(is_reference(c.type()))
+    {
+      error().source_location = struct_union_symbol.type.source_location();
+      error() << "anonymous struct/union member of reference type" << eom;
+      throw 0;
+    }
   }
 
   // produce an anonymous member
