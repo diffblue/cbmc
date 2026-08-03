@@ -20,3 +20,8 @@ preserved first.  Deeper than the cache policy.
 Round-6 note (2026-08-02): see the companion test's parked findings;
 additionally this variant's get() body (return *this) needs the
 derived-to-private-base conversion once the layout root is fixed.
+Round-9 update: the layout root is FIXED (companion test CORE); this
+variant is now non-vacuous and no longer aborts symex, but the
+explicit constructor still converts to an EMPTY body at the rebuild
+(the mem-initializer via the template parameter is dropped even with
+the map-first matching) -- one residual conversion-ordering layer.
