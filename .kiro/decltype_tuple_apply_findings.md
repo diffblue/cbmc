@@ -4517,3 +4517,34 @@ Harvests:
 
 Standing-rule addition: NEVER `rm -rf /tmp/cvise-*` while any cvise
 runs (killed cvv7 mid-pass once; recovered from its state file).
+
+## Round 8: four fixes, harvest continuation (2026-08-03)
+
+1. [dcl.ambig.res]/1 vexing parse resolved by NAME LOOKUP in
+   convert_non_template_declaration: a function-typed declarator whose
+   "parameters" are all bare non-type names becomes a variable with a
+   parenthesized initializer.  Fixed the set_insert root #1
+   (`void *&child(__left_);` — pointer level lost) AND silently-wrong
+   `int &r(x);` globals.  cpp11_ptr_ref_paren_init_global CORE.
+2. __builtin_operator_new/delete intercepted
+   ([new.delete.single] via clang's documented equivalence): libc++'s
+   __libcpp_operator_new IN-HEADER body (variadic forward to the
+   builtin) previously failed silently ("symbol unknown") whenever it
+   was used instead of the bodyless-model path.  set_insert root #2.
+   cpp11_builtin_operator_new_pack CORE-libcxx.
+3. Whole-mem-initializer lockstep pack expansion ([temp.variadic]/5):
+   round-7 block completed with the substitution-shape fix (raw TYPE
+   where a type is expected, not an exprt wrapper).
+   cpp11_two_leaf_base_pack_meminit CORE.
+4. Value-init vs default-init for empty mem-initializers
+   ([dcl.init.general]/9 vs /7): parser marks `member()` / `member{}`
+   with "#value_init"; the anonymous-union member path
+   zero-initializes those and keeps the indeterminate skip for
+   synthesized default-init entries.  Gotcha: already_typechecked
+   wrappers have nil types and are not lvalues — build the assignment
+   from the UNWRAPPED member expression.
+   cpp20_anon_union_variant_meminit CORE.
+
+Reductions: cvv9 (set_insert round 2, post root#1+#2) at ~17KB and
+falling; cvv7 (ranges, stricter gates) 83k->9.4KB, relaunched.
+map_basic's next layer: map::operator[] no-body (15 failures).
