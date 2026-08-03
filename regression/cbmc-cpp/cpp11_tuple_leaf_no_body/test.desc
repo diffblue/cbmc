@@ -33,3 +33,8 @@ though the pack-arity fixup computes correctly (probe: npacks=3
 lead=2 size=1); the rebuilt instance is rejected by the second
 disambiguation.  Mode-dependent resolution divergence; needs its own
 session.
+Update 2026-08-02: the three-pack ctor deduction layer is FIXED
+(cpp11_three_pack_ctor_delegation is CORE).  The residual here is the
+partial-specialization base PACK (`__tuple_impl<indices<I...>, T...>
+: leaf<T>...`): the instance's inherited leaf bases are dropped, so
+the static_cast-to-base in get() reads outside the object.

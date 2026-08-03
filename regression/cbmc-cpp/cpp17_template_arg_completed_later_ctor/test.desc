@@ -17,3 +17,6 @@ never rebuilds the BASE list (bases()=0 across all elaborations): the
 template's stored declaration loses the base-clause information after
 the first instantiation, so re-elaboration needs the body/base-clause
 preserved first.  Deeper than the cache policy.
+Round-6 note (2026-08-02): see the companion test's parked findings;
+additionally this variant's get() body (return *this) needs the
+derived-to-private-base conversion once the layout root is fixed.
