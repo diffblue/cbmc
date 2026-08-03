@@ -27,3 +27,10 @@ Update 2026-07-30: the "masking crash" on preprocessed sources was a
 MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
 preprocessed source with the right flags reproduces the SEMANTIC
 failure directly, so header-free reduction is unblocked.
+Round-6 note (2026-08-02): still vacuous after the recursive-alias
+fix; the drop is inside views::take machinery itself (the direct
+call form `views::take(3)(arr)` drops main identically -- not the
+pipe operator, not the range-for).  A cvise reduction with the
+main-dropped+vacuous criterion is the next step; the visible
+diagnostic is "conversion from 'signed int [5l]' to '<<type:auto>>'"
+at the range expression.
