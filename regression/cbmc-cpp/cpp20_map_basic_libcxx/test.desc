@@ -23,3 +23,9 @@ Minimal header-free reproducer: cpp20_optional_base_alias_unknown.
 Update 2026-07-29: still "__null_state_ unknown" in
 __optional_destruct_base; same computed-default/optional machinery
 family as cpp20_trait_alias_default_meminit.
+Round-7 update (2026-08-03): the __null_state_ root is FIXED
+(anonymous unions with class-type variant members build;
+cpp20_anon_union_class_variant is CORE).  The test now converts and
+runs BMC (with --object-bits 12): remaining layers are map::operator[]
+no-body and the anon-union variant mem-initializer drop
+(cpp20_anon_union_variant_meminit).
