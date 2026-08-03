@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ leaf int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ leaf char: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Parallel expansion of a base pack and its mem-initializer pack over
+TWO heterogeneous elements ([temp.variadic]/5): the mem-initializer
+`leaf<T>(u)...` fails to resolve per-element constructors ("found no
+match for symbol 'leaf'").  Single-element packs and the
+tuple_leaf partial-spec shape are fixed; this is the next arity.
+Gates nothing currently; found while fixing cpp11_tuple_leaf_no_body.
