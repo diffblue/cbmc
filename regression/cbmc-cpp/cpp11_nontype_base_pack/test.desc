@@ -1,0 +1,17 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ first: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Base-specifier pack expansion over a partial specialization's LEADING
+NON-TYPE pack ([temp.variadic]/5.2): the __tuple_leaf<_Indx>... bases
+are dropped (bases()=0, components()=0).  Root under
+cpp11_libcxx_tuple / tuple_basic / apply_basic.  The type-pack
+analogue is fixed (cpp11_tuple_leaf_no_body).  A first extension
+attempt (non-type element recovery in the base expander) did not fire
+-- the leading pack's values are not in pack_expr_map/spec_bindings at
+base-expansion time; needs its own session.
