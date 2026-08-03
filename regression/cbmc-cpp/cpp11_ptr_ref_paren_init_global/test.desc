@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ through global ref: SUCCESS$
@@ -13,3 +13,6 @@ implicit conversion from 'void *' to 'void'".  Root distilled from
 the set_insert reduction (libc++ __tree __insert_unique's
 __node_base_pointer& __child).  The `= init` spelling and local
 declarations work.
+Fixed 2026-08-03: the declaration/initializer ambiguity is resolved
+by name lookup in the typechecker ([dcl.ambig.res]/1); bare non-type
+names in the parens become the direct-initializer.
