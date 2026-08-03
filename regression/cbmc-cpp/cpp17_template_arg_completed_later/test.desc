@@ -26,3 +26,13 @@ with the template map built and parameter ids copied into the class
 scope), so the rebuild drops the base again or produces an empty
 class.  The fix needs the base-specifier resolution context of the
 ORIGINAL instantiation to be reconstructible; parked.
+Round-7 addendum: resolving the bare-parameter base via the template
+map (instead of scope lookup) works for every rebuild that instantiate
+_template drives (the map binds T), but the FINAL completion after the
+argument type completes arrives through a context WITHOUT the map (the
+declaration conversion path), where the resolve-throw recovery nils
+the base without re-setting the marker -- the instance then completes
+base-less and unmarked, closing all retry gates.  A durable fix must
+route every completion of a template instance through
+instantiate_template with its argument bindings, or persist the
+bindings on the instance for the compound-completion path to use.
