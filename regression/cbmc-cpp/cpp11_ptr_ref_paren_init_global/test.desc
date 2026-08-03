@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ through global ref: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Namespace-scope T*& with parenthesized initializer loses the pointer
+level in parsing ([dcl.init.general]/16.2 direct-init): "invalid
+implicit conversion from 'void *' to 'void'".  Root distilled from
+the set_insert reduction (libc++ __tree __insert_unique's
+__node_base_pointer& __child).  The `= init` spelling and local
+declarations work.
