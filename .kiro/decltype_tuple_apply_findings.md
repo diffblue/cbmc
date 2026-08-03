@@ -4473,3 +4473,47 @@ Open: ranges views::take drops main ("<<type:auto>>" conversion at
 the range expression; cvv7 reduction running with the
 main-dropped+vacuous criterion); tuple_leaf base pack; map_basic
 __null_state_; completed_later re-elaboration.
+
+## Round 7: parser TODOs, anon unions, harvest wave (2026-08-03)
+
+Fixes (all five suites green after each):
+1. TWO literal parser `// TODO`s from the original grammar port
+   discarded pack-expansion ellipses: base-specifiers
+   ([class.derived.general]) and mem-initializers ([class.base.init]).
+   Base-specifier expansion implemented ([temp.variadic]/5.2,
+   template-id patterns, partial-spec trailing pack recovered from
+   spec_bindings) -- cpp11_tuple_leaf_no_body CORE-libcxx.  The
+   arity-2 lockstep ctor case remains (cpp11_two_leaf_base_pack_
+   meminit KNOWNBUG).
+2. Anonymous unions with class-type variant members
+   ([class.union.anon]/1 requires no member functions/static members,
+   NOT POD-ness): the POD gate rejected libc++'s
+   __optional_destruct_base, the map __null_state_ root.  Synthesized
+   special members are exempted; re-scoping is idempotent for
+   re-elaboration.  cpp20_anon_union_class_variant CORE; the variant
+   MEM-INITIALIZER drop is the next layer (cpp20_anon_union_variant_
+   meminit KNOWNBUG); map_basic now converts and runs BMC.
+3. completed_later parked AGAIN with sharper root: the final
+   completion (declaration-conversion path) runs without the template
+   map; the resolve-throw recovery nils the base without re-marking.
+   Durable fix: route ALL instance completions through
+   instantiate_template bindings (or persist bindings on the
+   instance).
+
+Harvests:
+- cvv10 (umap_emplace): reduction drifted (criterion = assertion text
+  only); the original's front-end layer turned out ALREADY FIXED --
+  re-scoped to the semantic-hashtable class.
+- cvv9 (set_insert): 110 lines (archived .kiro/reductions); first
+  distilled root = namespace-scope `T*&
+  name(paren_init)` loses the pointer level ("invalid implicit
+  conversion from 'void *' to 'void'") -- KNOWNBUG
+  cpp11_ptr_ref_paren_init_global.  Re-reduce after fixing.
+- cvv8 (map __null_state_): 11 lines -> fix 2 above.
+- cvv7 (ranges): degenerated to the ill-formed `X<int>;` statement
+  (clang -w accepted it; separate mini-bug: cbmc silently drops main
+  on it).  Relaunched with -Werror=unused-value validity gate +
+  structural greps.
+
+Standing-rule addition: NEVER `rm -rf /tmp/cvise-*` while any cvise
+runs (killed cvv7 mid-pass once; recovered from its state file).
