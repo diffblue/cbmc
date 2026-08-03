@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ pipe through hidden friend: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Hidden friend operator template ([class.friend]/1,
+[namespace.memdef]/3): the ranges pipe idiom's operator| must be
+found and applied; it used to be silently discarded.
