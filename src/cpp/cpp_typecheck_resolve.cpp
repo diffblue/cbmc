@@ -4827,18 +4827,87 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   // returning stale types from a prior scope.  Keep the fix minimal
   // (cycle break only) until the medium-term lazy-elaboration work
   // introduces scope-keyed memoization.
-  static thread_local std::set<std::pair<irep_idt, irept>> active;
-  const irept &args_irep = static_cast<const irept &>(full_template_args);
+  static thread_local std::map<std::pair<irep_idt, irept>, unsigned> active;
+  irept args_irep = static_cast<const irept &>(full_template_args);
+  // A RECURSIVE member alias (libc++'s _OrImpl:
+  // `_Result = _OrImpl<sizeof...(_Rest)>::template _Result<_First>`)
+  // re-enters with the TEXTUALLY IDENTICAL argument spelling
+  // (`<_First>`) at every level while the active template bindings
+  // differ (each level peels one pack element, [temp.alias]/2).  Keying
+  // on the spelling alone misidentified the well-founded recursion as a
+  // cycle and returned the empty placeholder, silently dropping e.g. a
+  // base-specifier using the alias.  Append a fingerprint of the
+  // CURRENT bindings of every name referenced in the arguments, so only
+  // a re-entry with the SAME bindings -- a genuine cycle -- is broken.
+  {
+    irept fingerprint("template_map_fingerprint");
+    std::function<void(const irept &)> collect = [&](const irept &n)
+    {
+      const irep_idt id = n.get(ID_identifier);
+      if(!id.empty())
+      {
+        auto suffix_matches = [&](const irep_idt &key_id)
+        {
+          const std::string k = id2string(key_id);
+          const auto pos = k.rfind("::");
+          return (pos != std::string::npos ? k.substr(pos + 2) : k) ==
+                 id2string(id);
+        };
+        for(const auto &te : cpp_typecheck.template_map.type_map)
+          if(suffix_matches(te.first))
+            fingerprint.get_sub().push_back(te.second);
+        for(const auto &ee : cpp_typecheck.template_map.expr_map)
+          if(suffix_matches(ee.first))
+            fingerprint.get_sub().push_back(ee.second);
+        for(const auto &ps : cpp_typecheck.template_map.pack_size_map)
+          if(suffix_matches(ps.first))
+          {
+            irept sz("pack_size");
+            sz.set(ID_value, std::to_string(ps.second));
+            fingerprint.get_sub().push_back(sz);
+          }
+      }
+      for(const auto &c : n.get_named_sub())
+        collect(c.second);
+      for(const auto &c : n.get_sub())
+        collect(c);
+    };
+    collect(args_irep);
+    // The re-entry levels of a recursive member alias can also differ
+    // ONLY by the enclosing instance the member is looked up in
+    // (One<1>::_Result vs One<0>::_Result share the base_name); add
+    // the candidate identifiers to the key.
+    for(const auto *idp : id_set)
+    {
+      irept scope_id("scope");
+      scope_id.set(ID_identifier, idp->identifier);
+      fingerprint.get_sub().push_back(scope_id);
+    }
+    if(!fingerprint.get_sub().empty())
+      args_irep.add("#map_fingerprint") = fingerprint;
+  }
   std::pair<irep_idt, irept> key{base_name, args_irep};
-  if(!active.insert(key).second)
+  // Re-entry with an identical key is NOT necessarily a cycle: the
+  // legitimate resolution of a member alias delegates to
+  // instantiate_template, whose conversion of the alias declaration
+  // re-resolves the SAME spelled type once more before the outer call
+  // completes (libc++'s recursive _OrImpl::_Result).  Allow a small
+  // bounded number of same-key re-entries -- a genuine mutual-recursion
+  // cycle (the MSVC add_rvalue_reference_t shape this guard exists
+  // for) hits the cap and is still broken conservatively.
+  unsigned &depth = active[key];
+  if(depth >= 2)
     return empty_typet{};
+  ++depth;
   struct guardt
   {
-    std::set<std::pair<irep_idt, irept>> &s;
+    std::map<std::pair<irep_idt, irept>, unsigned> &s;
     std::pair<irep_idt, irept> k;
     ~guardt()
     {
-      s.erase(k);
+      auto it = s.find(k);
+      if(it != s.end() && --it->second == 0)
+        s.erase(it);
     }
   } guard{active, key};
 
