@@ -9,8 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <iostream> // TEMPORARY DEBUG
 #include "cpp_typecheck.h"
+
 
 #ifdef DEBUG
 #  include <iostream>
@@ -2899,16 +2899,6 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // produce new declaration
   cpp_declarationt new_decl = to_cpp_declaration(effective_template->type);
-  // TEMPORARY DEBUG
-  if(
-    getenv("CBMC_DBG") != nullptr &&
-    id2string(template_symbol.base_name).find("impl") != std::string::npos)
-  {
-    const irept &b = new_decl.type().find(ID_bases);
-    std::cerr << "CBMC_DBG inst impl nbases=" << b.get_sub().size() << '\n';
-    if(!b.get_sub().empty())
-      std::cerr << b.get_sub().front().pretty(2, 6) << '\n';
-  }
 
   // The new one is not a template any longer, but we remember the
   // template type that was used.
@@ -3921,8 +3911,7 @@ skip_pack_removal_ft:
       // recorded them.
       const irep_idt trailing_pack_id =
         template_type.template_parameters().back().id() == ID_type
-          ? template_type.template_parameters().back().type().get(
-              ID_identifier)
+          ? template_type.template_parameters().back().type().get(ID_identifier)
           : template_type.template_parameters().back().get(ID_identifier);
       std::vector<typet> trailing_pack_elems;
       {
