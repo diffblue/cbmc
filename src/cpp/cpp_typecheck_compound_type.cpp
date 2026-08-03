@@ -1952,6 +1952,32 @@ void cpp_typecheckt::typecheck_friend_declaration(
         typecheck_type(ftype);
         symbol.type.add(ID_C_friends).move_to_sub(ftype);
       }
+      return;
+    }
+
+    // N5008 [class.friend]/1 + [namespace.memdef]/3: a friend FUNCTION
+    // TEMPLATE defined inside the class is a member of the innermost
+    // enclosing namespace.  These declarations were silently DISCARDED
+    // (only the friend-class-template case above was handled), so e.g.
+    // libc++'s range-adaptor hidden friend
+    //   template<viewable_range V, RangeAdaptorClosure C>
+    //   friend auto operator|(V&&, C)
+    // never existed and `arr | views::take(3)` fell back to arithmetic
+    // conversion.  Convert it as a namespace-scope template.  (A true
+    // hidden friend is only found by ADL; registering it in the
+    // enclosing namespace over-approximates visibility, matching how
+    // non-template friends are handled by the declarator converter.)
+    {
+      cpp_save_scopet saved_scope(cpp_scopes);
+      cpp_scopet *scope = &cpp_scopes.current_scope();
+      while(scope->id_class == cpp_idt::id_classt::CLASS ||
+            scope->id_class == cpp_idt::id_classt::BLOCK_SCOPE ||
+            scope->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+      {
+        scope = &scope->get_parent();
+      }
+      cpp_scopes.go_to(*scope);
+      convert_template_declaration(declaration);
     }
     return;
   }
