@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE libcxx
 main.cpp
---cpp11
+--cpp11 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ leaf value: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
@@ -38,3 +38,10 @@ Update 2026-08-02: the three-pack ctor deduction layer is FIXED
 partial-specialization base PACK (`__tuple_impl<indices<I...>, T...>
 : leaf<T>...`): the instance's inherited leaf bases are dropped, so
 the static_cast-to-base in get() reads outside the object.
+Fixed 2026-08-03: the parser now records the base-specifier pack
+expansion ellipsis ([class.derived.general] grammar; it was consumed
+and DISCARDED -- a literal TODO), and instantiate_template expands
+template-id base patterns per pack element ([temp.variadic]/5.2),
+recovering a partial specialization's trailing pack from the
+re-deduced spec bindings.  Flags corrected to CLANG mode: the
+__make_integer_seq/__type_pack_element builtins only lex there.
