@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12
 ^\[apply\.assertion\.1\] line \d+ handler ran through std::function: SUCCESS$
@@ -15,3 +15,7 @@ half-converted under candidate matching).  Remaining: _M_manager
 dispatch imprecision (unconstrained function-pointer candidates,
 bounds failures in ~_Function_base) keeps the invocation unverified.
 Minimal header-free reproducer: cpp17_function_handler_dispatch.
+Fixed by the round-6 template fixes (2026-08-03 re-test: non-vacuous
+VERIFICATION SUCCESSFUL, 1 assertion; likely the recursive-member-
+alias or zero-length-pack-expansion fix unblocked the _M_manager /
+_Any_data layer).
