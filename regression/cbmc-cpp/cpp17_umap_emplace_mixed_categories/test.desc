@@ -29,3 +29,11 @@ Update 2026-07-28: the alias-elaboration fix
 (cpp17_hashtable_alias_default_arg is CORE) removes the front-end
 layer isolated there; this test still fails on the deeper hashtable
 modeling semantics.
+Round-7 re-scoping (2026-08-03): the front-end no-match layer is GONE
+(both emplace calls now convert; 8 emplace CALL sites in the goto
+program).  The residual is SEMANTIC: size()==1 requires the model to
+reject the duplicate key, i.e. working _Hashtable find/equal
+semantics.  A cvise reduction chasing the assertion drifted to an
+unrelated (and g++-only-spelled) shape and was discarded; this test
+now belongs to the semantic-hashtable class (cf. abstract_environment
+notes), not the minimal-front-end queue.
