@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ through recursive alias base: SUCCESS$
@@ -14,3 +14,7 @@ metaprogram (__libcpp_is_contiguous_iterator), sixth layer of the
 vector push_back family (cpp20_vector_basic_libcxx et al.).
 Non-recursive member aliases work.  cvise-reduced from a preprocessed
 <memory>+<iterator> TU; g++/clang++ runtime-verified.
+Fixed 2026-08-02: the alias cycle-breaker keys on the current
+bindings (fingerprint) and allows the one legitimate same-key
+re-entry, so the well-founded recursion resolves instead of
+collapsing to the empty placeholder.
