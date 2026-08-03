@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ three-pack delegation: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Three template packs in a member constructor template with
+interleaved empty-specialization parameters, deduced through a
+mem-initializer delegation ([temp.deduct.call]/1, [temp.variadic]/4);
+the libc++ __tuple_impl constructor shape.
