@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ SFINAE'd candidate dropped: SUCCESS$
@@ -21,3 +21,6 @@ artifact filter make the direct-initialization facet work in reduced
 form; the residual is the alias-with-defaulted-parameter expansion
 `__enable_if_t<_Bn::value>...` -- minimal pair isolated as
 cpp17_alias_default_pack_expansion.
+Fixed 2026-08-02 together with cpp17_alias_default_pack_expansion
+(the distilled root): empty-pack zero-length expansion of alias
+patterns in SFINAE'd constructor constraints.
