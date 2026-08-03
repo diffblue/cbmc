@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ variant member value-initialized: SUCCESS$
@@ -14,3 +14,7 @@ check_member_initializers recognises the name (has_component_rec) and
 full_member_initialization routes it, but the conversion loses it.
 Blocks precise modelling of libc++ __optional_destruct_base
 (cpp20_map_basic_libcxx's next layers).
+Fixed 2026-08-03: the parser marks explicit empty initializers
+("#value_init") and the anonymous-member path zero-initializes them
+([dcl.init.general]/9); synthesized default-initialization entries
+keep their indeterminate-value skip.
