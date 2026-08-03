@@ -25,3 +25,8 @@ Update 2026-07-30: the "masking crash" on preprocessed sources was a
 MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
 preprocessed source with the right flags reproduces the SEMANTIC
 failure directly, so header-free reduction is unblocked.
+Round-7 (2026-08-03): cvise reduction complete (110 lines, archived in
+findings); the first distilled root is the namespace-scope T*& with
+parenthesized initializer (KNOWNBUG cpp11_ptr_ref_paren_init_global,
+the __insert_unique __child reference shape).  Re-reduce after that
+root is fixed.
