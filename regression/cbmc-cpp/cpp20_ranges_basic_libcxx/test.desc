@@ -34,3 +34,8 @@ pipe operator, not the range-for).  A cvise reduction with the
 main-dropped+vacuous criterion is the next step; the visible
 diagnostic is "conversion from 'signed int [5l]' to '<<type:auto>>'"
 at the range expression.
+Round-9 update: the hidden-friend operator-template root is FIXED
+(cpp20_hidden_friend_operator_template CORE; the 236-line reduction
+verifies).  The real header still drops main on a further layer
+("<<type:auto>>" conversion at the range expression); round-3
+reduction running.
