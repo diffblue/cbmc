@@ -2908,9 +2908,8 @@ static bool same_template_signature(
       std::size_t idx = 0;
       for(const auto &tp : ttype.template_parameters())
       {
-        const irep_idt id = tp.id() == ID_type
-                              ? tp.type().get(ID_identifier)
-                              : tp.get(ID_identifier);
+        const irep_idt id = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                               : tp.get(ID_identifier);
         const std::string ids = id2string(id);
         const auto pos = ids.rfind("::");
         const std::string short_name =
@@ -2928,8 +2927,7 @@ static bool same_template_signature(
       {
         if(pdecl.id() != ID_cpp_declaration)
           continue;
-        for(auto &d :
-            static_cast<cpp_declarationt &>(pdecl).declarators())
+        for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
           d.name() = cpp_namet{};
       }
       std::function<void(irept &)> walk = [&](irept &n)
