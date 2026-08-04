@@ -29,3 +29,7 @@ cpp20_anon_union_class_variant is CORE).  The test now converts and
 runs BMC (with --object-bits 12): remaining layers are map::operator[]
 no-body and the anon-union variant mem-initializer drop
 (cpp20_anon_union_variant_meminit).
+Round-11 (2026-08-04): the same_as wall is FIXED; <map> now CONVERTS
+fully.  Next layer: operator[] and __tree::destroy get NO BODY
+(member definitions not instantiated), the long-documented
+operator[] layer -- now directly diagnosable.
