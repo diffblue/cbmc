@@ -1,27 +1,19 @@
-KNOWNBUG
+CORE libcxx
 main.cpp
---cpp20
-^\[main\.assertion\.1\] line \d+ conversion clean: SUCCESS$
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ base subobject initialized: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-Update 2026-07-28: the alias-elaboration fix
-(cpp17_hashtable_alias_default_arg) resolves the dependent-base
-machinery -- no more conversion errors -- but main's body is silently
-DROPPED (0 properties, vacuous SUCCESS caught by this desc's
-assertion-line pattern): the silent-statement-dropping family
-(cpp20_ranges_basic_libcxx, cpp17_optional_requires_ctor_pair,
-cpp20_constraint_substitution_failure).
-Family-root minimal reproducer: cpp20_trait_alias_default_meminit.
-Round-9 re-scoping (2026-08-03): this reduction is degenerate (invalid
-ctor-template shapes; fails on 'symbol _Up unknown').  The REAL
-<optional> driver's fresh diagnostic is precise: `o.has_value()` fails
-with "invalid implicit conversion from 'struct optional' to 'const
-struct __optional_storage_base &'" -- the derived-to-base reference
-conversion through the SFINAE'd move/copy-assign base chain
-(__optional_move_assign_base<bool = ...> etc.) is broken, i.e. an
-intermediate base is dropped.  Queue a fresh cvise reduction with that
-diagnostic + main-dropped criterion; this file should then be replaced
-by the faithful minimal shape.
+libc++ <optional> enable-if ctor-pair shape: same-signature member ctor
+templates collide on their symbol identifier; the collision branches of
+convert_function_template returned WITHOUT making the template scope a
+secondary scope of the class scope, so the constructor pass's typecheck
+of the dependent NTTP type failed "symbol '_Up' is unknown" and the
+whole instantiation was abandoned (main silently dropped).  Fixed
+2026-08-04 (round 11) by registering the scope exactly as the
+'#sfinae_alt' twin branch already did.  History: earlier degenerate
+38-line reduction gated on this same family; replaced by this faithful
+minimal shape per the round-9 re-scoping note.
