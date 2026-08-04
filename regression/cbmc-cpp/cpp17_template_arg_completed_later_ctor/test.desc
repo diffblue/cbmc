@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ stale instance re-elaborated: SUCCESS$
@@ -25,3 +25,7 @@ variant is now non-vacuous and no longer aborts symex, but the
 explicit constructor still converts to an EMPTY body at the rebuild
 (the mem-initializer via the template parameter is dropped even with
 the map-first matching) -- one residual conversion-ordering layer.
+Fixed 2026-08-04 (round 10): the re-instantiation reset now really
+erases the stale members (angle-aware "tag-" strip; the drain queue is
+purged before the removal), so the rebuilt constructor converts with
+its base mem-initializer intact.
