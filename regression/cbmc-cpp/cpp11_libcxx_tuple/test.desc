@@ -29,3 +29,9 @@ Round-10 update: the non-type base-pack root is FIXED
 (cpp11_nontype_base_pack CORE); the library test now surfaces a
 VISIBLE next layer (tuple_element/get resolution: "found no match for
 symbol 'get'") instead of silent wrong-code.  Re-reduce next.
+Round-11 third batch (2026-08-04): the get redirect now compares
+parameter TYPES position-normalized ([dcl.fct]/5, [temp.over.link]/6);
+the whole family RUNS BMC end-to-end.  Remaining layer visible as
+no-body FAILUREs: std::__1::get<0,...>'s DEFINITION body is not
+instantiated for the call (apply_basic reaches VERIFICATION SUCCESSFUL
+but main is still dropped -- props=0, caught by this desc).

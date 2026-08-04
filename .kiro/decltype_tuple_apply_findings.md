@@ -4679,3 +4679,15 @@ COST: <functional> now converts FULLY; the std::function smoke tests
 900s in the SAT solver and moved CORE -> THOROUGH (scale, documented).
 ranges_pipe next layer: implicit_typecast throw inside alias template
 args during elaborate_class_template (fresh diagnosis needed).
+
+## Round 11 addendum 2: get redirect, third shape (2026-08-04)
+
+same_template_signature now compares parameter TYPES with two
+normalizations ([dcl.fct]/5 names erased; own template params renamed
+positionally per [temp.over.link]/6).  CAUTION captured: comparing
+WITHOUT erasing names broke std::swap (unnamed decl vs named defn,
+bits/move.h) -- cpp11_require_swap caught it.  Tuple family now runs
+BMC end-to-end; next layer: get's DEFINITION body not instantiated at
+the call (no-body FAILUREs; apply_basic vacuous-success, props=0).
+cvt1 relaunch for layer 4 uses criterion "no body for callee
+std::__1::get".
