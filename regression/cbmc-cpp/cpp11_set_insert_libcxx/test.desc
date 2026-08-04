@@ -30,3 +30,13 @@ findings); the first distilled root is the namespace-scope T*& with
 parenthesized initializer (KNOWNBUG cpp11_ptr_ref_paren_init_global,
 the __insert_unique __child reference shape).  Re-reduce after that
 root is fixed.
+Round-10 (2026-08-04): reduction attempt #3 drifted into a THIRD
+degeneracy class (uninitialized local pointer dereference; valgrind
+passed on stack-garbage luck -- ASan does not catch uninit reads and
+MSan needs instrumented libc++).  Parking the cvise approach for this
+test: the "pointer NULL in *__x" criterion is reachable by too many
+valid-for-cbmc programs.  Next attempt should gate the runtime binary
+with -ftrivial-auto-var-init=pattern (making uninit-pointer derefs
+crash deterministically) or require BOTH inserted keys' count
+assertions to fail while pointer checks stay green (pure value-loss
+criterion, as the map_piecewise reduction used successfully).
