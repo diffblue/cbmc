@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ declared-then-defined overload: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+same_template_signature (the pure-declaration -> definition redirect in
+instantiate_template) ignored template-parameter PACK-ness, non-type
+parameters' declared types, and only compared function-parameter arity,
+so `get<0>(x)` over libc++'s <__fwd/get.h> overload family redirected
+the by-index declaration to an UNRELATED same-arity overload's
+definition and the instance lost its parameter list ("found no match
+for symbol 'get'").  Fixed 2026-08-04 (round 11), [temp.over.link]/6.
