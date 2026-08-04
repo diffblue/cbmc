@@ -1611,6 +1611,22 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                     expanded.push_back(exprt(ID_type, pt));
                   continue;
                 }
+                // [temp.variadic]/5 likewise for a NON-TYPE pack: its
+                // deduced element VALUES live in pack_expr_map (e.g.
+                // `_Ip = {0, 1}` from matching
+                // `B<integer_sequence<unsigned long, _Ip...>>` against
+                // `B<integer_sequence<unsigned long, 0, 1>>`, libc++'s
+                // __bind_back_op).  Without splicing them, only the
+                // single-element convenience entry survived and any
+                // pack deduced to TWO or more values mis-instantiated
+                // (sizeof... wrong / selection failed).
+                auto pe_it = template_map.pack_expr_map.find(pid);
+                if(pe_it != template_map.pack_expr_map.end())
+                {
+                  for(const auto &pe : pe_it->second)
+                    expanded.push_back(pe);
+                  continue;
+                }
               }
               expanded.push_back(guessed_args.arguments()[i]);
             }

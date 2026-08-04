@@ -2118,11 +2118,47 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               {
                 typet pattern = static_cast<const typet &>(arg.type());
                 pattern.remove(ID_ellipsis);
-                element_map.apply(pattern);
-                exprt type_arg(ID_type);
-                type_arg.type() = pattern;
-                type_arg.add_source_location() = arg.source_location();
-                expanded.push_back(type_arg);
+                // N5008 [temp.variadic]/5: when the pattern is a bare
+                // reference to a NON-TYPE parameter pack (`_Ip...` in
+                // `integer_sequence<unsigned long, _Ip...>`, libc++'s
+                // __bind_back_op partial specialization), the i-th
+                // argument is the pack's i-th VALUE.  `apply` below only
+                // substitutes TYPE names; the un-substituted `_Ip` then
+                // resolved through the scalar convenience entry -- the
+                // FIRST element -- for every i (deduction compared
+                // `<0,0>` against `<0,1>` and the specialization was
+                // never selected).
+                bool emitted_value = false;
+                if(
+                  pattern.id() == ID_cpp_name &&
+                  pattern.get_sub().size() == 1 &&
+                  pattern.get_sub().front().id() == ID_name)
+                {
+                  const std::string nm =
+                    id2string(pattern.get_sub().front().get(ID_identifier));
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto e = template_map.pack_expr_map.find(pid);
+                    if(e == template_map.pack_expr_map.end())
+                      continue;
+                    const std::string key = id2string(pid);
+                    const auto q = key.rfind("::");
+                    if((q != std::string::npos ? key.substr(q + 2) : key) == nm)
+                    {
+                      expanded.push_back(e->second[i]);
+                      emitted_value = true;
+                      break;
+                    }
+                  }
+                }
+                if(!emitted_value)
+                {
+                  element_map.apply(pattern);
+                  exprt type_arg(ID_type);
+                  type_arg.type() = pattern;
+                  type_arg.add_source_location() = arg.source_location();
+                  expanded.push_back(type_arg);
+                }
               }
               else
               {
@@ -2272,6 +2308,24 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
       {
         if(first_default > i)
           first_default = i;
+        // N5008 [temp.param]/14 + [temp.arg.general]: a default
+        // template-argument may reference PRECEDING template
+        // parameters; when used, it is evaluated with those bound to
+        // the preceding arguments.  TYPE parameters are already bound
+        // eagerly at the end of each iteration, but non-type
+        // (expression) parameters are deferred to the end of the
+        // whole loop -- so a default like libc++ <__functional>'s
+        //   template <size_t _NBound,
+        //             class = make_index_sequence<_NBound>>
+        //   struct __bind_back_op;
+        // threw on the unbound _NBound while resolving the alias and
+        // silently dropped the caller's body.  Bind the preceding
+        // expression parameters now (their args are final).
+        for(std::size_t j = 0; j < i && j < args.size(); ++j)
+        {
+          if(parameters[j].id() != ID_type)
+            template_map.set(parameters[j], args[j]);
+        }
         exprt def = parameter.default_argument();
         template_map.apply(def);
         if(def.id() == ID_type)
