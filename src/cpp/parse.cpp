@@ -1427,6 +1427,10 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     declarator.name() = cpp_namet(name_tk.data.get(ID_C_base_name));
     set_location(declarator.name(), name_tk);
     declarator.value() = constraint;
+    // Marker for the typechecker: failures while evaluating this
+    // initializer are CONSTRAINT UNSATISFACTION, not errors
+    // (N5008 [temp.constr.atomic]/3).
+    declarator.set("#concept", true);
     body.declarators().push_back(declarator);
   }
   else

@@ -13,9 +13,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 #include <util/source_location.h>
+#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -585,7 +587,31 @@ void cpp_declarator_convertert::handle_initializer(
     symbol.value.swap(value);
 
     if(!is_code)
-      cpp_typecheck.convert_initializer(symbol);
+    {
+      if(declarator.get_bool("#concept"))
+      {
+        // N5008 [temp.constr.atomic]/3: if substituting the mapped
+        // template arguments into an atomic constraint results in an
+        // invalid type or expression, the constraint is NOT SATISFIED
+        // -- it is not an error.  A concept's initializer is its
+        // constraint-expression; libc++ evaluates e.g.
+        // `common_reference_with<_Tp, _Up>` for types with no
+        // common_reference<...>::type, relying on the failure folding
+        // to `false`.  Evaluate in a SFINAE context (suppressing
+        // diagnostics) and fold any failure to `false`.
+        try
+        {
+          sfinae_contextt sfinae_guard{cpp_typecheck};
+          cpp_typecheck.convert_initializer(symbol);
+        }
+        catch(...)
+        {
+          symbol.value = false_exprt{};
+        }
+      }
+      else
+        cpp_typecheck.convert_initializer(symbol);
+    }
   }
   else
   {
@@ -844,7 +870,24 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         new_symbol->value = declarator.init_args().operands().front();
         declarator.remove(ID_init_args);
       }
-      cpp_typecheck.convert_initializer(*new_symbol);
+      if(declarator.get_bool("#concept"))
+      {
+        // N5008 [temp.constr.atomic]/3: substitution failure while
+        // evaluating a concept's constraint-expression means the
+        // constraint is NOT SATISFIED -- fold to `false`, do not
+        // error (see the matching case in handle_initializer).
+        try
+        {
+          sfinae_contextt sfinae_guard{cpp_typecheck};
+          cpp_typecheck.convert_initializer(*new_symbol);
+        }
+        catch(...)
+        {
+          new_symbol->value = false_exprt{};
+        }
+      }
+      else
+        cpp_typecheck.convert_initializer(*new_symbol);
     }
   }
 
