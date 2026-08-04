@@ -22,3 +22,7 @@ pair's get works.
 Residual isolated as minimal KNOWNBUG cpp11_type_pack_element_return
 (__type_pack_element builtin unevaluable in return-type substitution).
 Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
+Round-10 update: the non-type base-pack root is FIXED
+(cpp11_nontype_base_pack CORE); the library test now surfaces a
+VISIBLE next layer (tuple_element/get resolution: "found no match for
+symbol 'get'") instead of silent wrong-code.  Re-reduce next.
