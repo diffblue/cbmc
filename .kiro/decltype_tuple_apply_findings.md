@@ -4623,3 +4623,38 @@ Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
    load-bearing; hand sub-shapes pass) -- committed as KNOWNBUG
    cpp20_ranges_pipe_invoke_drop (the invoke_result_t chain drops
    main).  Precise reproducer for its own session.
+
+## Round 11: three walls down (2026-08-04)
+
+1. optional_base (cpp20_optional_base_alias_unknown CORE-libcxx): the
+   same-signature member-template collision branches in
+   convert_function_template returned WITHOUT registering the template
+   scope as a secondary scope (only the #sfinae_alt twin branch did),
+   so the ctor pass's typecheck of a dependent NTTP type
+   (enable_if_t<_Up::...>) failed "symbol '_Up' is unknown" and the
+   whole instantiation was silently abandoned ([temp.inst]/2,
+   [temp.local]).  Also: __add_rvalue_reference et al. are
+   CLANG/gcc14-gated in scanner.l -- builtin-alias tests need
+   --stdlib libc++.
+2. tuple 'get' (cpp11_fwd_decl_template_overload CORE, apply_basic
+   converts): same_template_signature (the pure-declaration ->
+   definition redirect) ignored pack-ness + NTTP declared types
+   ([temp.over.link]/6) and redirected libc++'s by-index get
+   declaration to an unrelated same-arity overload -- the instance
+   lost its parameter list.  5-line cvise harvest.
+3. same_as wall (cpp20_concept_id_substitution_failure CORE): concepts
+   lower to constexpr bool variable templates with no concept marker;
+   a concept-id whose argument substitution is invalid must evaluate
+   FALSE ([temp.names]/9, [temp.constr.atomic]/3) but hard-errored.
+   Parser '#concept' marker + SFINAE-guarded resolve folding to false
+   (expr site + both initializer conversion sites).  The ENTIRE
+   vector/map/initializer_list/erase_if family now converts; next
+   layers are semantic (vector size() pointer-diff checks, map
+   operator[] no-body, construct_at derefs, initializer_list
+   wrong-code, erase_if scale).
+   NOTE: flipping the spec-selection requires-clause catch(...) to
+   unsatisfied per the same clause REGRESSES cpp20_concepts_ordering
+   (trait-based clauses whose EVALUATOR fails, not substitution) --
+   reverted; the targeted concept-id fix suffices.
+4. cvise on rejection signatures is extremely effective: cvt1 466KB ->
+   149 B in ~40 min; cvt2 2.7MB -> 1.9KB.  Both roots fixed same-day.
