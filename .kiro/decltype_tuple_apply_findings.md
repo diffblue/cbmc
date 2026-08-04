@@ -4598,3 +4598,28 @@ Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
   LESSON: wrong-code criteria need explicit anti-degeneracy gates per
   known escape (uninit size, cross-object arithmetic, ill-formed
   statements) -- collect these in the harness template.
+
+## Round 10: tuple root, completed_later completed (2026-08-04)
+
+1. cpp11_nontype_base_pack FIXED (CORE-libcxx): the spec-pattern
+   re-deduction admits EMPTY trailing packs
+   ([temp.spec.partial.match]/2 -- equal-count guard skipped the whole
+   deduction, so the LEADING index pack was never recorded), and the
+   base expander handles every bound pack including non-type VALUE
+   packs ([temp.variadic]/5.2).  The tuple library tests advance from
+   silent wrong-code to a visible next layer (tuple_element/'get'
+   resolution) -- re-reduce next.
+2. completed_later_ctor FIXED (CORE): the round-9 reset had TWO
+   defects -- the "tag-" strip used rfind and matched inside template
+   args (stale members silently survived), and erasing members left
+   dangling pointers in the method-body drain queue (SIGSEGV).
+   Angle-aware component strip + queue purge BEFORE removal.  Both
+   completed_later tests now CORE non-vacuous.
+3. set_insert reduction parked after a THIRD degeneracy class
+   (uninitialized-local-pointer, valgrind-lucky); next attempt should
+   use -ftrivial-auto-var-init=pattern on the runtime gate or a pure
+   value-loss criterion.
+4. Ranges: cvv7 stabilized at a 236-line LOCAL MINIMUM (every line
+   load-bearing; hand sub-shapes pass) -- committed as KNOWNBUG
+   cpp20_ranges_pipe_invoke_drop (the invoke_result_t chain drops
+   main).  Precise reproducer for its own session.
