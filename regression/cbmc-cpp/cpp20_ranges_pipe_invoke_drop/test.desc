@@ -1,0 +1,13 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The ranges pipe's invoke_result_t chain drops main (vacuous SUCCESS
+otherwise; this desc requires the assertion line).  Header-free
+236-line reduction of cpp20_ranges_basic_libcxx's remaining layer;
+every line load-bearing.  clang builtins => CLANG mode.
