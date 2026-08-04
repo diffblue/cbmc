@@ -2891,6 +2891,67 @@ static bool same_template_signature(
     };
     if(arity(f_params) != arity(c_params))
       return false;
+
+    // Compare the parameter TYPES, too: `get(tuple<_Tp...>)` is a
+    // different signature from `get(tuple<>)` (third cvise harvest).
+    // References to the templates' OWN parameters are normalised to
+    // their POSITION (`#0`, `#1`, ...) so the same signature spelled
+    // with differently NAMED parameters still matches -- libc++'s
+    // <__fwd/*.h> declarations must keep redirecting to their
+    // definitions.  Structurally different parameter types then
+    // compare unequal; a wrongly-failed redirect is conservative (the
+    // declaration stays bodyless, the pre-redirect behaviour).
+    const auto normalized =
+      [](const irept &params, const template_typet &ttype) -> std::string
+    {
+      std::map<std::string, std::string> rename;
+      std::size_t idx = 0;
+      for(const auto &tp : ttype.template_parameters())
+      {
+        const irep_idt id = tp.id() == ID_type
+                              ? tp.type().get(ID_identifier)
+                              : tp.get(ID_identifier);
+        const std::string ids = id2string(id);
+        const auto pos = ids.rfind("::");
+        const std::string short_name =
+          pos != std::string::npos ? ids.substr(pos + 2) : ids;
+        if(!short_name.empty())
+          rename[short_name] = "#" + std::to_string(idx);
+        ++idx;
+      }
+      irept copy = params;
+      // Erase the parameter NAMES first: the declaration may leave a
+      // parameter unnamed where the definition names it (`swap(_Tp&,
+      // _Tp&)` vs `swap(_Tp& __a, _Tp& __b)`, libstdc++ bits/move.h) --
+      // only the TYPES are signature ([dcl.fct]/5).
+      for(auto &pdecl : copy.get_sub())
+      {
+        if(pdecl.id() != ID_cpp_declaration)
+          continue;
+        for(auto &d :
+            static_cast<cpp_declarationt &>(pdecl).declarators())
+          d.name() = cpp_namet{};
+      }
+      std::function<void(irept &)> walk = [&](irept &n)
+      {
+        if(n.id() == ID_name)
+        {
+          const auto it = rename.find(id2string(n.get(ID_identifier)));
+          if(it != rename.end())
+            n.set(ID_identifier, it->second);
+        }
+        for(auto &sub : n.get_sub())
+          walk(sub);
+        for(auto &ns : n.get_named_sub())
+          walk(ns.second);
+      };
+      walk(copy);
+      return cpp_type2name(static_cast<const typet &>(copy));
+    };
+    if(
+      normalized(f_params, forward.template_type()) !=
+      normalized(c_params, candidate.template_type()))
+      return false;
   }
   return true;
 }
