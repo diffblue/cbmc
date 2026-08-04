@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ first: SUCCESS$
@@ -15,3 +15,6 @@ analogue is fixed (cpp11_tuple_leaf_no_body).  A first extension
 attempt (non-type element recovery in the base expander) did not fire
 -- the leading pack's values are not in pack_expr_map/spec_bindings at
 base-expansion time; needs its own session.
+Fixed 2026-08-04: the spec-pattern re-deduction admits empty trailing
+packs ([temp.spec.partial.match]/2) and the base expander handles
+every bound pack including non-type value packs ([temp.variadic]/5.2).

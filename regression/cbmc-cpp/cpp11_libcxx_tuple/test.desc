@@ -25,3 +25,7 @@ Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
 Round-9 harvest (2026-08-04): reduced to 61 lines -- the root is the
 LEADING NON-TYPE base pack of the __tuple_impl partial specialization
 (KNOWNBUG cpp11_nontype_base_pack).  Re-test after fixing.
+Round-10 update: the non-type base-pack root is FIXED
+(cpp11_nontype_base_pack CORE); the library test now surfaces a
+VISIBLE next layer (tuple_element/get resolution: "found no match for
+symbol 'get'") instead of silent wrong-code.  Re-reduce next.
