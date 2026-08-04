@@ -2994,9 +2994,25 @@ const symbolt &cpp_typecheckt::instantiate_template(
   {
     const auto &pattern_args =
       to_cpp_declaration(template_symbol.type).partial_specialization_args();
+    // N5008 [temp.spec.partial.match]/2: the specialization's argument
+    // pattern is matched against the actual arguments, a TRAILING pack
+    // pattern matching the (possibly empty) remainder --
+    // `__tuple_impl<__tuple_indices<_Indx...>, _Tp...>` matches
+    // `__tuple_impl<__tuple_indices<0>>` with _Tp = {} ([temp.variadic]).
+    // Requiring equal counts skipped the deduction entirely for empty
+    // trailing packs, so the LEADING pack (_Indx, deduced from the
+    // nested pattern) was never recorded and a base-specifier pack over
+    // it (`__tuple_leaf<_Indx>...`) expanded to nothing.
+    const bool trailing_pack_pattern =
+      !pattern_args.arguments().empty() &&
+      (pattern_args.arguments().back().get_bool(ID_ellipsis) ||
+       pattern_args.arguments().back().find(ID_type).get_bool(ID_ellipsis));
     if(
       !pattern_args.arguments().empty() &&
-      pattern_args.arguments().size() == full_template_args.arguments().size())
+      (pattern_args.arguments().size() ==
+         full_template_args.arguments().size() ||
+       (trailing_pack_pattern && pattern_args.arguments().size() ==
+                                   full_template_args.arguments().size() + 1)))
     {
       cpp_saved_template_mapt saved_map_for_deduction(template_map);
       cpp_save_scopet save_scope_for_deduction(cpp_scopes);
@@ -3018,6 +3034,22 @@ const symbolt &cpp_typecheckt::instantiate_template(
           else
             resolver.guess_template_args(
               pattern_args.arguments()[i], full_template_args.arguments()[i]);
+        }
+        // an unmatched trailing pack pattern deduces the EMPTY pack
+        // ([temp.variadic]/7)
+        if(
+          pattern_args.arguments().size() ==
+          full_template_args.arguments().size() + 1)
+        {
+          const auto &last_param = template_type.template_parameters().back();
+          if(last_param.get_bool(ID_ellipsis))
+          {
+            const irep_idt pid = last_param.id() == ID_type
+                                   ? last_param.type().get(ID_identifier)
+                                   : last_param.get(ID_identifier);
+            if(!pid.empty())
+              template_map.pack_size_map[pid] = 0;
+          }
         }
       }
       catch(...)
@@ -3988,23 +4020,54 @@ skip_pack_removal_ft:
         template_type.template_parameters().back().id() == ID_type
           ? template_type.template_parameters().back().type().get(ID_identifier)
           : template_type.template_parameters().back().get(ID_identifier);
-      std::vector<typet> trailing_pack_elems;
+      // Collect elements (types or non-type values) for EVERY bound
+      // pack, keyed by its short name: the ellipsis'd base pattern may
+      // reference not only the trailing pack but a LEADING one (libc++
+      // __tuple_impl's `__tuple_leaf<_Indx>...` over the non-type index
+      // pack of the partial specialization, [temp.variadic]/5.2).
+      std::map<std::string, std::vector<typet>> pack_type_elems;
+      std::map<std::string, std::vector<exprt>> pack_expr_elems;
       {
-        auto pa = template_map.pack_args_map.find(trailing_pack_id);
-        if(pa != template_map.pack_args_map.end())
-          trailing_pack_elems = pa->second;
-        else
+        auto shorten = [](const irep_idt &full_id) -> std::string
         {
-          for(const auto &entry : spec_bindings.get_sub())
+          const std::string full = id2string(full_id);
+          const auto pos = full.rfind("::");
+          return pos != std::string::npos ? full.substr(pos + 2) : full;
+        };
+        for(const auto &tp : template_type.template_parameters())
+        {
+          if(!tp.get_bool(ID_ellipsis))
+            continue;
+          const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                                  : tp.get(ID_identifier);
+          if(pid.empty())
+            continue;
+          const std::string short_name = shorten(pid);
+          auto pa = template_map.pack_args_map.find(pid);
+          if(pa != template_map.pack_args_map.end())
+            pack_type_elems[short_name] = pa->second;
+          auto pe = template_map.pack_expr_map.find(pid);
+          if(pe != template_map.pack_expr_map.end())
+            pack_expr_elems[short_name] = pe->second;
+        }
+        for(const auto &entry : spec_bindings.get_sub())
+        {
+          const std::string short_name = shorten(entry.get(ID_identifier));
+          if(
+            entry.id() == "pack_types" &&
+            pack_type_elems.find(short_name) == pack_type_elems.end())
           {
-            if(
-              entry.id() == "pack_types" &&
-              entry.get(ID_identifier) == trailing_pack_id)
-            {
-              for(const auto &t : entry.get_sub())
-                trailing_pack_elems.push_back(static_cast<const typet &>(t));
-              break;
-            }
+            for(const auto &t : entry.get_sub())
+              pack_type_elems[short_name].push_back(
+                static_cast<const typet &>(t));
+          }
+          else if(
+            entry.id() == "pack_exprs" &&
+            pack_expr_elems.find(short_name) == pack_expr_elems.end())
+          {
+            for(const auto &e : entry.get_sub())
+              pack_expr_elems[short_name].push_back(
+                static_cast<const exprt &>(e));
           }
         }
       }
@@ -4014,6 +4077,12 @@ skip_pack_removal_ft:
         const auto pos = full.rfind("::");
         return pos != std::string::npos ? full.substr(pos + 2) : full;
       }();
+      std::vector<typet> trailing_pack_elems;
+      {
+        auto it_t = pack_type_elems.find(trailing_pack_short);
+        if(it_t != pack_type_elems.end())
+          trailing_pack_elems = it_t->second;
+      }
 
       for(auto &base : bases_sub)
       {
@@ -4023,13 +4092,55 @@ skip_pack_removal_ft:
         // element substituted into the pattern.  This covers patterns
         // that merely REFERENCE the pack (a template-id); the bare
         // `Pack...` shape keeps its established path below.
-        if(base.get_bool(ID_ellipsis) && !trailing_pack_elems.empty())
+        // Which bound pack does this ellipsis'd base reference?
+        std::string used_pack_short;
+        if(base.get_bool(ID_ellipsis))
+        {
+          std::function<bool(const irept &, const std::string &)> refs_name =
+            [&](const irept &n, const std::string &nm) -> bool
+          {
+            if(n.id() == ID_name && id2string(n.get(ID_identifier)) == nm)
+              return true;
+            for(const auto &c : n.get_sub())
+              if(refs_name(c, nm))
+                return true;
+            for(const auto &c : n.get_named_sub())
+              if(refs_name(c.second, nm))
+                return true;
+            return false;
+          };
+          for(const auto &pe : pack_type_elems)
+            if(refs_name(base.find(ID_name), pe.first))
+            {
+              used_pack_short = pe.first;
+              break;
+            }
+          if(used_pack_short.empty())
+            for(const auto &pe : pack_expr_elems)
+              if(refs_name(base.find(ID_name), pe.first))
+              {
+                used_pack_short = pe.first;
+                break;
+              }
+        }
+        const std::vector<typet> used_type_elems =
+          pack_type_elems.count(used_pack_short)
+            ? pack_type_elems[used_pack_short]
+            : std::vector<typet>{};
+        const std::vector<exprt> used_expr_elems =
+          pack_expr_elems.count(used_pack_short)
+            ? pack_expr_elems[used_pack_short]
+            : std::vector<exprt>{};
+
+        if(
+          base.get_bool(ID_ellipsis) &&
+          (!used_type_elems.empty() || !used_expr_elems.empty()))
         {
           std::function<bool(const irept &)> refs_pack = [&](const irept &n)
           {
             if(
               n.id() == ID_name &&
-              id2string(n.get(ID_identifier)) == trailing_pack_short)
+              id2string(n.get(ID_identifier)) == used_pack_short)
               return true;
             for(const auto &c : n.get_sub())
               if(refs_pack(c))
@@ -4053,12 +4164,21 @@ skip_pack_removal_ft:
           }();
           if(!bare_pack_base && refs_pack(base.find(ID_name)))
           {
-            for(const typet &elem : trailing_pack_elems)
+            const std::size_t n_elems = !used_type_elems.empty()
+                                          ? used_type_elems.size()
+                                          : used_expr_elems.size();
+            for(std::size_t elem_i = 0; elem_i < n_elems; ++elem_i)
             {
               irept new_base = base;
               new_base.remove(ID_ellipsis);
-              exprt elem_arg(ID_type);
-              elem_arg.type() = elem;
+              exprt elem_arg;
+              if(!used_type_elems.empty())
+              {
+                elem_arg = exprt(ID_type);
+                elem_arg.type() = used_type_elems[elem_i];
+              }
+              else
+                elem_arg = used_expr_elems[elem_i];
               std::function<void(irept &)> subst = [&](irept &n)
               {
                 for(auto &c : n.get_sub())
@@ -4073,7 +4193,7 @@ skip_pack_removal_ft:
                       inner.get_sub().size() == 1 &&
                       inner.get_sub().front().id() == ID_name &&
                       id2string(inner.get_sub().front().get(ID_identifier)) ==
-                        trailing_pack_short)
+                        used_pack_short)
                     {
                       c = elem_arg;
                       continue;
