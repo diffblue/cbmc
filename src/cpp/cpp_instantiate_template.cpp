@@ -2825,11 +2825,30 @@ static bool same_template_signature(
     // is a value declaration.  Mixing the two is a different template.
     if((fp[i].id() == ID_type) != (cp[i].id() == ID_type))
       return false;
+    // N5008 [temp.over.link]/6: parameter PACK-ness and a non-type
+    // parameter's declared type are part of the signature, too --
+    // `template<long, class...> get(int)` must not redirect to
+    // `template<int, class> get(void)` (libc++'s <__fwd/get.h>
+    // declares the tuple/pair/array `get` family side by side, so a
+    // loose match binds the wrong overload's parameter list and the
+    // instantiated function loses its parameters).
+    if(fp[i].get_bool(ID_ellipsis) != cp[i].get_bool(ID_ellipsis))
+      return false;
+    if(
+      fp[i].id() != ID_type &&
+      cpp_type2name(fp[i].type()) != cpp_type2name(cp[i].type()))
+      return false;
   }
   if(forward.declarators().empty() || candidate.declarators().empty())
     return true;
-  // Compare function-parameter arity, distinguishing overloads that share a
-  // template-parameter list (e.g. the 3- and 4-iterator std::equal).
+  // Compare the function-parameter lists, distinguishing overloads that
+  // share a template-parameter list (e.g. the 3- and 4-iterator
+  // std::equal, or by-index vs by-type `get` overloads with the same
+  // arity).  Parameter TYPES spelled in terms of template parameters
+  // compare by their parse-level name only (positional normalization is
+  // not attempted); differing spellings of the same type would wrongly
+  // fail this redirect, which is conservative -- the forward declaration
+  // then simply has no body, as before the redirect existed.
   const typet f_type = forward.declarators().front().merge_type(forward.type());
   const typet c_type =
     candidate.declarators().front().merge_type(candidate.type());
