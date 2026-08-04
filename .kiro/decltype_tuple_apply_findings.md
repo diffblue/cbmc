@@ -4658,3 +4658,24 @@ Fleet: cvv7 R3 (ranges), cvv9 R2 (set_insert, ~15KB), cvv11
    reverted; the targeted concept-id fix suffices.
 4. cvise on rejection signatures is extremely effective: cvt1 466KB ->
    149 B in ~40 min; cvt2 2.7MB -> 1.9KB.  Both roots fixed same-day.
+
+## Round 11 addendum: __bind_back_op triple (2026-08-04)
+
+cpp20_nontype_pack_spec_multi CORE-libcxx -- three coordinated fixes
+for the ranges-pipe invoke chain's __bind_back_op shape:
+1. [temp.param]/14: preceding EXPRESSION parameters now bind before a
+   default template-argument is materialized (type params already did).
+2. [intseq.make]: bare (unqualified-use) __make_integer_seq intercepted
+   at resolve() entry, expanding to Tpl<T, 0..N-1> (the resolve_scope
+   intercept only covered qualified uses).
+3. [temp.variadic]/5: a template-argument pack expansion whose pattern
+   is a BARE non-type pack reference now emits the pack's i-th VALUE
+   (apply() only rewrites type names; the scalar convenience entry --
+   the first value -- leaked into every element, `<ul,0,0>` vs
+   `<ul,0,1>`, spec never matched).  Also spliced pack_expr_map in the
+   fn-template guessed-args expansion.
+COST: <functional> now converts FULLY; the std::function smoke tests
+(cpp11_function_basic_libcxx, cpp17_functional_basic_libcxx) exceed
+900s in the SAT solver and moved CORE -> THOROUGH (scale, documented).
+ranges_pipe next layer: implicit_typecast throw inside alias template
+args during elaborate_class_template (fresh diagnosis needed).
