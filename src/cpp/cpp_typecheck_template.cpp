@@ -470,6 +470,26 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
       cpp_scopes.id_map[symbol_name] = &template_scope;
     }
 
+    // Unlike the normal path below (which SWAPS the declaration into
+    // the new symbol, gutting the copy in the enclosing class body),
+    // every same-identifier branch leaves `declaration` intact, so the
+    // constructor pass of typecheck_compound_body will process it
+    // again and typecheck its template-parameter types.  Those may
+    // reference the function template's own parameters (e.g. libc++
+    // <optional>'s enable-if constructor pair
+    //   template<class _Up, enable_if_t<...> = 0> optional(_Up&&);
+    // where the second template parameter's type names _Up) -- per
+    // N5008 [temp.inst]/2 such dependent constructs stay dependent in
+    // the instantiated class's member-template DECLARATION, so `_Up`
+    // must still be resolvable as a template parameter.  Make this
+    // template's scope a secondary scope of the current (class) scope,
+    // exactly as the #sfinae_alt branch above does; otherwise the
+    // lookup of `_Up` fails ("symbol '_Up' is unknown") and the whole
+    // class instantiation is abandoned, silently dropping the user's
+    // statements ([temp.local] name visibility; the placeholder map in
+    // the constructor pass then supplies the parameter's type).
+    cpp_scopes.current_scope().add_secondary_scope(template_scope);
+
     // todo: the old template scope now is useless,
     // and thus, we could delete it
     return;
