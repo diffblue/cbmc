@@ -2449,12 +2449,30 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         // member symbols (methods and their locals) so they are rebuilt
         // fresh against the repaired layout.
         std::vector<irep_idt> to_erase;
-        const std::string member_prefix = id2string(symbol.name) + "::";
-        // symbol.name is 'tag-X<...>'; member names are 'X<...>::...'
+        // symbol.name is '[ns::]tag-X<...>'; member names are
+        // '[ns::]X<...>::...' -- strip the "tag-" that starts the LAST
+        // top-level component (position 0 or right after "::"), NOT one
+        // inside the template argument list (rfind matched
+        // 'tag-ssa_exprt' inside 'tag-renamedt<tag-ssa_exprt>' and the
+        // erase never fired, silently keeping the stale members).
         std::string inst_prefix = id2string(symbol.name);
-        const auto tag_pos = inst_prefix.rfind("tag-");
-        if(tag_pos != std::string::npos)
-          inst_prefix.erase(tag_pos, 4);
+        std::size_t comp_start = 0;
+        {
+          std::size_t depth = 0;
+          for(std::size_t ci = 0; ci + 1 < inst_prefix.size(); ++ci)
+          {
+            if(inst_prefix[ci] == '<')
+              ++depth;
+            else if(inst_prefix[ci] == '>' && depth > 0)
+              --depth;
+            else if(
+              depth == 0 && inst_prefix[ci] == ':' &&
+              inst_prefix[ci + 1] == ':')
+              comp_start = ci + 2;
+          }
+        }
+        if(inst_prefix.compare(comp_start, 4, "tag-") == 0)
+          inst_prefix.erase(comp_start, 4);
         inst_prefix += "::";
         for(const auto &entry : symbol_table.symbols)
         {
@@ -2462,10 +2480,23 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
           if(n.compare(0, inst_prefix.size(), inst_prefix) == 0)
             to_erase.push_back(entry.first);
         }
+        // The drain queue holds POINTERS into the symbol table; purge
+        // entries for the members about to be erased BEFORE removing
+        // them (afterwards the pointers dangle).
+        {
+          const std::set<irep_idt> erase_set(to_erase.begin(), to_erase.end());
+          method_bodies.remove_if(
+            [&](const method_bodyt &mb)
+            {
+              return mb.method_symbol != nullptr &&
+                     erase_set.count(mb.method_symbol->name) != 0;
+            });
+        }
         for(const auto &n : to_erase)
         {
           methods_seen.erase(n);
           deferred_typechecking.erase(n);
+          deferred_method_bodies.erase(n);
           symbol_table.remove(n);
         }
         to_struct_union_type(sym_ptr->type).components().clear();
