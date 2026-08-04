@@ -2856,7 +2856,24 @@ static bool same_template_signature(
   const irept &c_params = c_type.find(ID_parameters);
   if(f_params.is_not_nil() || c_params.is_not_nil())
   {
-    if(f_params.get_sub().size() != c_params.get_sub().size())
+    // [dcl.fct]/4: a parameter list `(void)` declares NO parameters --
+    // count it as zero, or `get(int)` matches `get(void)` by "arity".
+    const auto arity = [](const irept &params) -> std::size_t
+    {
+      const auto &sub = params.get_sub();
+      if(sub.size() == 1 && sub.front().id() == ID_cpp_declaration)
+      {
+        const auto &d = static_cast<const cpp_declarationt &>(sub.front());
+        if(
+          d.type().id() == ID_void &&
+          (d.declarators().empty() ||
+           (d.declarators().size() == 1 && d.declarators()[0].type().is_nil() &&
+            d.declarators()[0].name().id() == ID_nil)))
+          return 0;
+      }
+      return sub.size();
+    };
+    if(arity(f_params) != arity(c_params))
       return false;
   }
   return true;
