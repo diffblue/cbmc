@@ -37,3 +37,6 @@ of indirection is T& ([dcl.type.decltype]/1.5), explicit template args
 survive deduction ([temp.arg.explicit]/2), C++20 parenthesized
 aggregate init/CTAD (make_pair).  Next open root:
 cpp20_recursive_member_alias_base (_Or/_And metaprogram bases drop).
+Round-11 (2026-08-04): same_as wall FIXED; converts fully; runs BMC.
+Next layer: size assertion FAILS (wrong-code, needs reduction with
+value-loss criterion).
