@@ -18,3 +18,9 @@ program).  Expected-when-fixed now requires the main assertion line
 to be SUCCESS in the output; until the libc++ tuple deduction path
 actually completes, this test stays on the KNOWNBUG list.
 Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
+Round-11 third batch (2026-08-04): the get redirect now compares
+parameter TYPES position-normalized ([dcl.fct]/5, [temp.over.link]/6);
+the whole family RUNS BMC end-to-end.  Remaining layer visible as
+no-body FAILUREs: std::__1::get<0,...>'s DEFINITION body is not
+instantiated for the call (apply_basic reaches VERIFICATION SUCCESSFUL
+but main is still dropped -- props=0, caught by this desc).
