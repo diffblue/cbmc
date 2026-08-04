@@ -1,4 +1,4 @@
-CORE libcxx
+THOROUGH libcxx
 main.cpp
 --cpp17 --unwind 5 --no-unwinding-assertions --stdlib libc++
 ^VERIFICATION
@@ -8,3 +8,10 @@ main.cpp
 ^PARSING ERROR$
 libc++ CONVERSION ERROR: incomplete type, missing symbol, or
 implicit conversion failure.
+Round-11 (2026-08-04): moved CORE -> THOROUGH.  The concept-id
+substitution-failure fix and the non-type value-pack expansion fix mean
+<functional> now converts FULLY (71k-line goto program vs the previous
+partial model); the std::function smoke construction then exceeds 900s
+in the SAT solver even with --unwind 2.  Scale, not wrong-code: 1
+property, conversion clean.  Revisit when the solver-side cost of the
+fully-modelled perfect-forwarding machinery is addressed.
