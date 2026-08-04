@@ -6,7 +6,8 @@ template <long, class...> int get(int);
 template <int, class> int get(void);
 // [dcl.fct]/4: `(void)` declares NO parameters -- distinct from (int)
 // even with identical template heads (second cvise harvest).
-template <long, class...> int get(void);
+template <long, class...>
+int get(void);
 
 int x = 5;
 int caller() { return get<0>(x); }
