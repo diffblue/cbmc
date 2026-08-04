@@ -5501,6 +5501,71 @@ exprt cpp_typecheck_resolvet::resolve(
     throw 0;
   }
 
+  // Clang's builtin alias template `__make_integer_seq<Tpl, T, N>`
+  // names `Tpl<T, 0, ..., N-1>` (the compiler-accelerated backing of
+  // [intseq.make]; libc++'s make_integer_sequence and the tuple
+  // indices are built on it).  The resolve_scope interception only
+  // covers QUALIFIED uses (`__make_integer_seq<...>::member`); a bare
+  // use as a type -- e.g. the alias body of
+  //   template <class T, T N>
+  //   using make_integer_sequence = __make_integer_seq<integer_sequence, T, N>;
+  // resolved via resolve_template_alias -- lands here.  Rewrite to the
+  // expanded template-id and continue with ordinary resolution.
+  if(
+    base_name == "__make_integer_seq" && template_args.is_not_nil() &&
+    template_args.arguments().size() == 3)
+  {
+    const auto &ma = template_args.arguments();
+    typet elem_type =
+      ma[1].id() == ID_type || ma[1].id() == ID_ambiguous
+        ? ma[1].type()
+        : static_cast<const typet &>(static_cast<const irept &>(ma[1]));
+    exprt count = ma[2];
+    if(count.id() == ID_type || count.id() == ID_ambiguous)
+      count =
+        static_cast<const exprt &>(static_cast<const irept &>(count.type()));
+    std::optional<mp_integer> n;
+    try
+    {
+      cpp_typecheck.typecheck_expr(count);
+      simplify(count, cpp_typecheck);
+      n = numeric_cast<mp_integer>(count);
+    }
+    catch(...)
+    {
+      // dependent count: not expandable here
+    }
+    irep_idt tpl_name;
+    const irept *tpl_node = &static_cast<const irept &>(ma[0]);
+    if(tpl_node->id() == ID_ambiguous || tpl_node->id() == ID_type)
+    {
+      const irept &t = ma[0].type();
+      if(t.id() == ID_cpp_name)
+        tpl_node = &t;
+    }
+    if(tpl_node->id() == ID_cpp_name)
+      tpl_name = to_cpp_name(*tpl_node).get_base_name();
+    if(n.has_value() && *n >= 0 && !tpl_name.empty())
+    {
+      typet elem_tc = elem_type;
+      cpp_typecheck.typecheck_type(elem_tc);
+      cpp_template_args_non_tct expanded_args;
+      auto &eargs = expanded_args.arguments();
+      exprt type_arg{ID_type};
+      type_arg.type() = elem_type;
+      eargs.push_back(static_cast<const exprt &>(type_arg));
+      for(mp_integer i = 0; i < *n; ++i)
+        eargs.push_back(from_integer(i, elem_tc));
+      base_name = tpl_name;
+      template_args = std::move(expanded_args);
+    }
+    else
+    {
+      // dependent or malformed: substitution failure
+      throw 0;
+    }
+  }
+
 #ifdef DEBUG
   std::cout << "base name: " << base_name << '\n';
   std::cout << "template args: " << template_args.pretty() << '\n';
