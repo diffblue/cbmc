@@ -22,17 +22,23 @@ template <int __v> struct integral_constant {
 };
 template <class _Tp>
 using __add_rvalue_reference_t = __add_rvalue_reference(_Tp);
-template <bool = integral_constant<__is_trivially_constructible(
-              __add_rvalue_reference_t<int>)>::value>
-struct __optional_move_assign_base {
+template <
+  bool = integral_constant<__is_trivially_constructible(
+    __add_rvalue_reference_t<int>)>::value>
+struct __optional_move_assign_base
+{
   int __val_ = 7;
 };
 template <class> struct optional : __optional_move_assign_base<> {
   using __base = __optional_move_assign_base;
-  optional() : __base() {}
+  optional() : __base()
+  {
+  }
   template <class _Up, enable_if_t> optional(_Up &&);
   template <class _Up, enable_if_t<_Up ::__enable_explicit>>
-  optional(_Up &&) : __base() {}
+  optional(_Up &&) : __base()
+  {
+  }
 };
 int main()
 {
