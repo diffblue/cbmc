@@ -4044,8 +4044,59 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
     }
   }
 
-  exprt symbol_expr =
-    resolve(to_cpp_name(expr), cpp_typecheck_resolvet::wantt::VAR, fargs);
+  // N5008 [temp.names]/9: a concept-id is a prvalue of type bool;
+  // [temp.constr.atomic]/3: if substituting its template arguments
+  // yields an invalid type or expression, the constraint is NOT
+  // SATISFIED -- the concept-id evaluates to `false`, it is not an
+  // error.  libc++'s `same_as<_Tp, common_reference_t<_Tp, _Up>>`
+  // (inside common_reference_with) relies on this for types with no
+  // common_reference<...>::type.  Detect a concept-id by its base
+  // name resolving to a concept template (the parser marks concept
+  // declarators with `#concept`), evaluate under a SFINAE guard, and
+  // fold failure to `false`.
+  const bool is_concept_id = [&]() -> bool
+  {
+    const cpp_namet &cn = to_cpp_name(expr);
+    if(!cn.has_template_args() || cn.is_qualified())
+      return false;
+    const auto ids = cpp_scopes.current_scope().lookup(
+      cn.get_base_name(), cpp_scopet::RECURSIVE);
+    for(const auto *idp : ids)
+    {
+      const symbolt *sym = symbol_table.lookup(idp->identifier);
+      if(
+        sym != nullptr && sym->type.get_bool(ID_is_template) &&
+        sym->type.id() == ID_cpp_declaration)
+      {
+        const auto &decl = to_cpp_declaration(sym->type);
+        if(
+          !decl.declarators().empty() &&
+          decl.declarators()[0].get_bool("#concept"))
+          return true;
+      }
+    }
+    return false;
+  }();
+
+  exprt symbol_expr;
+  if(is_concept_id)
+  {
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      symbol_expr =
+        resolve(to_cpp_name(expr), cpp_typecheck_resolvet::wantt::VAR, fargs);
+    }
+    catch(...)
+    {
+      expr = false_exprt{};
+      expr.add_source_location() = source_location;
+      return;
+    }
+  }
+  else
+    symbol_expr =
+      resolve(to_cpp_name(expr), cpp_typecheck_resolvet::wantt::VAR, fargs);
 
   // we want VAR
   CHECK_RETURN(symbol_expr.id() != ID_type);
