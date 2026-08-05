@@ -4748,3 +4748,31 @@ family as wrong-code anti-degeneracy gates.  Relaunched with
 3. LESSON: probe-based cvise criteria die when the probe is stripped
    -- archive the reduction BEFORE removing probes, or key the
    criterion on shippable output only.
+
+## Round 14: symex crash fixed + validation discipline correction (2026-08-05)
+
+1. cpp20_inherited_ctor_symex_crash CORE-libcxx: the partial-spec
+   pattern re-deduction recorded pack bindings only on the instance
+   symbol; the class body then converted with an EMPTY pack map, the
+   sizeof...-based static member initializer failed inside the SFINAE
+   guard, and the RAW parse tree became the member's value (malformed
+   goto assign -> symex invariant).  Fix: record EMPTY packs too and
+   REPLAY all spec_bindings into the active map before body conversion
+   ([temp.inst]/2, [temp.variadic]/7,/8).
+2. CRITICAL PROCESS BUG FOUND: regression/cpp, systemc and
+   contracts-cpp-dfcc validations had been running a STALE goto-cc /
+   goto-instrument for several rounds (only the cbmc target was
+   rebuilt).  A round-8 regression (constexpr scalar paren-init
+   through the [dcl.ambig.res]/1 disambiguation leaving a VOID value:
+   most_vexing_parse) was masked the whole time.  Fixed
+   ([dcl.init.general]/16.9 single paren initializer becomes the
+   symbol value, mirroring the reference case), CORE
+   cpp11_constexpr_enum_paren_init.  RULE: rebuild cbmc goto-cc
+   goto-instrument before every suite validation.
+3. __make_unsigned/__make_signed clang builtins modelled
+   ([meta.trans.sign]) -- CORE cpp11_make_unsigned_builtin; unblocks
+   the <vector> seed past __half_positive.
+4. vector seed's NEXT blocker: "symbol '__s' is unknown" in
+   basic_string<char> anon-union rep, triggered by the extern-template
+   explicit-instantiation declarations (two-instantiation shape passes
+   in isolation; needs the extern-template ingredient).
