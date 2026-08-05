@@ -4776,3 +4776,33 @@ family as wrong-code anti-degeneracy gates.  Relaunched with
    basic_string<char> anon-union rep, triggered by the extern-template
    explicit-instantiation declarations (two-instantiation shape passes
    in isolation; needs the extern-template ingredient).
+
+## Round 15: friend-template unification (2026-08-05)
+
+1. cpp11_friend_template_definition_body CORE: [temp.over.link]/6 --
+   an in-class friend fn-template declaration and its namespace-scope
+   definition (different parameter SPELLINGS) declared TWO symbols;
+   calls hit the bodiless friend ("no body for callee get", the
+   <tuple> access family), and the definition's body failed the
+   private-member access check.  Fixes: signature unification in
+   convert_function_template (equivalence per [temp.over.link]/6-7 +
+   [defns.signature.templ] INCLUDING return type, method
+   cv-qualifiers, constraints -- two suite regressions caught during
+   development: std::_Any_data's const/non-const _M_access pair, and
+   the concept-subsumption overloads); friend fn-templates recorded in
+   C_friends ([class.friend]/1); access check accepts specializations
+   via ID_C_template ([temp.friend]/1).
+2. cvu1 harvested (66 lines): the REMAINING tuple layer is a
+   non-friend get whose RETURN TYPE resolves through the recursive
+   tuple_element/__make_tuple_types_flat machinery -- instance comes
+   out bodiless.  KNOWNBUG cpp11_tuple_get_return_type_body (leaf-ctor
+   value propagation restored; cvise's driver was degenerate
+   self-referential).  tuple_basic's next visible layer: the tuple
+   CONSTRUCTOR no-body.  apply_basic reaches VERIFICATION SUCCESSFUL
+   (vacuity unverified this round).
+3. ranges_pipe: 218/236 lines load-bearing under the fatal-outcome
+   criterion; nil-index_sequence throws during spec selection are
+   RECOVERABLE; the fatal layer is deeper (silent resolve failure in
+   guess_function_template_args); needs a throw-index bisection
+   harness.
+4. cvs1 (__s layer) still reducing (~1MB of 2.7MB).
