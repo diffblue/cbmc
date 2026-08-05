@@ -2827,7 +2827,7 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
 /// arguments (leaving parameters unbound and aborting the instantiation), so
 /// require both the template-parameter list (arity + each parameter's
 /// type/non-type kind) and the function-parameter arity to agree.
-static bool same_template_signature(
+bool cpp_typecheckt::function_template_signatures_equivalent(
   const cpp_declarationt &forward,
   const cpp_declarationt &candidate)
 {
@@ -2835,8 +2835,19 @@ static bool same_template_signature(
   const auto &cp = candidate.template_type().template_parameters();
   if(fp.size() != cp.size())
     return false;
+  // N5008 [temp.over.link]/6-7: equivalence requires EQUIVALENT
+  // constraints -- two templates differing only in a type-constraint
+  // (`template <Integral T>` vs `template <SignedIntegral T>`) or a
+  // requires-clause declare DISTINCT (overloadable, partially-ordered)
+  // entities.
+  if(
+    forward.template_type().find(ID_C_requires_clause) !=
+    candidate.template_type().find(ID_C_requires_clause))
+    return false;
   for(std::size_t i = 0; i < fp.size(); ++i)
   {
+    if(fp[i].get("#C_concept_constraint") != cp[i].get("#C_concept_constraint"))
+      return false;
     // A type parameter is represented with id ID_type; a non-type parameter
     // is a value declaration.  Mixing the two is a different template.
     if((fp[i].id() == ID_type) != (cp[i].id() == ID_type))
@@ -2949,6 +2960,23 @@ static bool same_template_signature(
     if(
       normalized(f_params, forward.template_type()) !=
       normalized(c_params, candidate.template_type()))
+      return false;
+
+    // N5008 [defns.signature.templ]: a function TEMPLATE's signature
+    // also includes the RETURN type; and for member functions the
+    // cv-qualifiers distinguish overloads (std::_Any_data's const and
+    // non-const `_M_access<_Tp>()` differ ONLY there -- unifying them
+    // broke std::function's manager chain).  Compare both, with the
+    // same positional normalization for the return type.
+    const irept &f_ret = f_type.find(ID_return_type);
+    const irept &c_ret = c_type.find(ID_return_type);
+    if(
+      normalized(f_ret, forward.template_type()) !=
+      normalized(c_ret, candidate.template_type()))
+      return false;
+    if(
+      forward.declarators().front().method_qualifier() !=
+      candidate.declarators().front().method_qualifier())
       return false;
   }
   return true;
@@ -3093,7 +3121,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           if(
             !cand_decl.declarators().empty() &&
             cand_decl.declarators()[0].value().is_not_nil() &&
-            same_template_signature(check_decl, cand_decl))
+            function_template_signatures_equivalent(check_decl, cand_decl))
           {
             effective_template = candidate;
             template_scope = id_map_lookup(cpp_scopes, candidate->name);

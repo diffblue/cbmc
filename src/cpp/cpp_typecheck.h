@@ -254,6 +254,13 @@ protected:
     const template_typet &template_type,
     const cpp_template_args_non_tct &partial_specialization_args);
 
+  // N5008 [temp.over.link]/6: are two function-template declarations'
+  // signatures equivalent (identical up to template-parameter renaming
+  // and parameter names)?
+  static bool function_template_signatures_equivalent(
+    const cpp_declarationt &forward,
+    const cpp_declarationt &candidate);
+
   std::string function_template_identifier(
     const irep_idt &base_name,
     const template_typet &template_type,
