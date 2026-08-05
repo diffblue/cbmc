@@ -676,9 +676,13 @@ void goto_convertt::do_havoc_slice(
   }
 
   // insert instructions
-  // assert(rw_ok(argument[0], argument[1]));
-  // char nondet_contents[argument[1]];
-  // __CPROVER_array_replace(p, nondet_contents);
+  //  assert(rw_ok(argument[0], argument[1]));
+  //  unsigned char nondet_contents[argument[1]];
+  //  __CPROVER_array_replace(p, nondet_contents);
+  //
+  // Note that we use "unsigned char" explicitly here to force stable
+  // output on platforms where plain "char" is implementation-defined and signed
+  // by default
 
   r_or_w_ok_exprt ok_expr(ID_w_ok, arguments[0], arguments[1]);
   ok_expr.add_source_location() = source_location;
@@ -689,7 +693,8 @@ void goto_convertt::do_havoc_slice(
     "assertion havoc_slice " + from_expr(ns, identifier, ok_expr));
   dest.add(goto_programt::make_assertion(ok_expr, annotated_location));
 
-  const array_typet array_type(char_type(), simplify_expr(arguments[1], ns));
+  const array_typet array_type(
+    unsigned_char_type(), simplify_expr(arguments[1], ns));
 
   const symbolt &nondet_contents =
     new_tmp_symbol(array_type, "nondet_contents", dest, source_location, mode);
