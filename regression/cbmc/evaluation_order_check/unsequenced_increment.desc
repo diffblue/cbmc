@@ -1,0 +1,13 @@
+CORE
+unsequenced_increment.c
+--evaluation-order-check
+^\[main\.evaluation-order\.1\] line 4 value of i is independent of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+In i++ + i the read of i is unsequenced relative to the side effect of i++,
+which makes the behaviour undefined (C11 6.5p2). The evaluation-order check
+reports that the value of the read depends on the evaluation order.

@@ -1,7 +1,14 @@
-FUTURE
+CORE
 main.c
-
+--evaluation-order-check
+^\[main\.evaluation-order\.1\] line 3 value of x is independent of evaluation order: FAILURE$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
+^warning: ignoring
+--
+The read of x in ++x + x is unsequenced relative to the side effect of ++x,
+which is undefined behaviour (C11 6.5p2); --evaluation-order-check reports
+that the value of the read depends on the evaluation order. This test was
+FUTURE before --evaluation-order-check existed.
