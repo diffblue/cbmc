@@ -22,3 +22,11 @@ faithful shape with the INHERITING CONSTRUCTOR
 front end and CRASHES SYMEX (lhs.type() == rhs.type()) -- banked as
 cpp20_inherited_ctor_symex_crash, which is this test's actual next
 layer.
+Round-15 (2026-08-05): re-reduced with a fatal-outcome criterion: 218
+of 236 lines are load-bearing (13% reduction only).  Diagnosis: the
+index_sequence nil-arg throws during spec SELECTION are recoverable
+([temp.deduct]/8 candidate filtering, _Ip legitimately unassigned);
+the FATAL throw is deeper (guess_function_template_args ->
+resolve_template_alias -> instantiate -> silent resolve failure),
+interleaved with a dozen recoverable throws.  Needs a dedicated
+session with a throw-index-based bisection harness.
