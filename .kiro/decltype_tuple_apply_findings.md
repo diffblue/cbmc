@@ -4691,3 +4691,31 @@ BMC end-to-end; next layer: get's DEFINITION body not instantiated at
 the call (no-body FAILUREs; apply_basic vacuous-success, props=0).
 cvt1 relaunch for layer 4 uses criterion "no body for callee
 std::__1::get".
+
+## Round 12: reduction launches + two bootstrap fixes (2026-08-05)
+
+Launched cvu1 (tuple, criterion "no body for callee std::__1::get",
+seed preprocessed cpp11_tuple_basic 466KB, ~240s/iteration with clang
+pre-gate; 40000s budget).  vector/map harnesses (criteria: "same
+object violation in this->__end_ - this->__begin_: FAILURE" resp.
+"in \*return_value_operator\[\]: FAILURE", both with clang gate;
+vector also ASan/UBSan runtime-clean gate) are WRITTEN but seeding is
+parked: re-parsed preprocessed source loses system-header leniency
+and surfaces a chain of real front-end gaps:
+1. FIXED: constexpr arrays folded to literals (address_of error on
+   &__digits_base_10[i], <charconv>) -- two-part fix (declarator
+   converter keeps is_macro false => static init; resolver keeps
+   symbol expr), CORE cpp17_constexpr_array_element_addr.  First
+   attempt kept the symbol but lost initialization -- assertion
+   caught it (value was nondet).
+2. FIXED: ADL ignored ENUM arguments ([basic.lookup.argdep]/2.3) --
+   libc++ poison-pill make_error_code found only the deleted pill.
+   CORE cpp20_adl_enum_poison_pill.
+3. Seed-local stubs (not bugs to fix now): pthread mutex/condvar
+   NSDMI union braces, `restrict` params (wcsnrtombs), and
+   __uninitialized_allocator_move_if_noexcept bodies.
+4. NEXT (unfixed): basic_string<int> union-rep members __is_long_/
+   __size_/__cap_ unknown in __get_short_size/__get_long_cap when
+   re-parsed outside system headers.
+Seed recipe recorded: cbmc --preprocess | grep -v '^#', prepend
+__CPROVER_assert decl, apply stubs 3.
