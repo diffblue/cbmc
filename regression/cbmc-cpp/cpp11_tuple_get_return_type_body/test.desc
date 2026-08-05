@@ -1,0 +1,14 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ first: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+get's instance loses its body when the return type goes through the
+recursive tuple_element machinery; banked 2026-08-05 (round 15) from
+the cvu1 reduction.  NOTE: main rewritten from cvise's degenerate
+self-referential driver to a well-formed one; re-verify the criterion
+holds when picking this up.
