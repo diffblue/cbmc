@@ -231,6 +231,8 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         // `std::unordered_map<X>::iterator`, ...) accessed inside
         // a sibling template's body fail to resolve because the
         // container instance never gets re-elaborated.
+        const bool saved_is_anonymous =
+          writeable_symbol.type.get_bool(ID_C_is_anonymous);
         irept saved_c_template = writeable_symbol.type.find(ID_C_template);
         irept saved_c_template_arguments =
           writeable_symbol.type.find(ID_C_template_arguments);
@@ -267,6 +269,11 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
         }
         if(saved_template_class_instance)
           writeable_symbol.type.set(ID_template_class_instance, true);
+        // Anonymity likewise survives completion (see the bodyless
+        // branch below): the completing type node was named `#anon_N`
+        // by the FIRST conversion, so its own flag may be absent.
+        if(saved_is_anonymous)
+          writeable_symbol.type.set(ID_C_is_anonymous, true);
         if(
           writeable_symbol.type.get(ID_identifier).empty() &&
           !saved_template_identifier.empty())
@@ -443,6 +450,16 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
       new_type.set(ID_tag, new_symbol->base_name);
       new_type.make_incomplete();
       new_type.add_source_location() = type.source_location();
+      // An anonymous member struct/union stays anonymous while
+      // incomplete: with a GNU attribute (e.g. libc++ <string>'s
+      // `struct __attribute__((__packed__)) { ... };` rep bitfields)
+      // the parser delivers the BODY separately, so this bodyless
+      // first conversion must not lose the flag or the later
+      // anonymous-member injection ([class.union.anon]/1 extended to
+      // GNU anonymous structs) never fires and the members are
+      // unreachable ("symbol '__cap_' is unknown").
+      if(type.get_bool(ID_C_is_anonymous))
+        new_type.set(ID_C_is_anonymous, true);
       new_symbol->type.swap(new_type);
     }
   }
@@ -3800,14 +3817,15 @@ void cpp_typecheckt::convert_anon_struct_union_member(
   const irep_idt &access,
   struct_typet::componentst &components)
 {
-  const struct_union_typet &final_type =
+  // The tag's identifier IS the symbol name; the followed type's
+  // ID_name may be absent when the struct was completed through the
+  // incomplete->complete swap (the GNU-attributed anonymous member
+  // path, where the parser delivers the body separately).
+  const irep_idt tag_identifier =
     declaration.type().id() == ID_struct_tag
-      ? static_cast<const struct_union_typet &>(
-          follow_tag(to_struct_tag_type(declaration.type())))
-      : static_cast<const struct_union_typet &>(
-          follow_tag(to_union_tag_type(declaration.type())));
-  symbolt &struct_union_symbol =
-    symbol_table.get_writeable_ref(final_type.get(ID_name));
+      ? to_struct_tag_type(declaration.type()).get_identifier()
+      : to_union_tag_type(declaration.type()).get_identifier();
+  symbolt &struct_union_symbol = symbol_table.get_writeable_ref(tag_identifier);
 
   if(
     declaration.storage_spec().is_static() ||
