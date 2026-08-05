@@ -882,6 +882,28 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         new_symbol->value = declarator.init_args().operands().front();
         declarator.remove(ID_init_args);
       }
+      // N5008 [dcl.init.general]/16.9: direct-initialization of a
+      // NON-CLASS type from a single parenthesized initializer
+      // initializes it with the (converted) value of that expression.
+      // For a constexpr object this must land in the symbol's VALUE
+      // -- a constexpr symbol is a fold-away macro whose uses
+      // substitute symbol.value, and the generic init_args path
+      // produces a void constructor-call statement instead, so
+      // `constexpr error_type error_collate(_S_error_collate);` (the
+      // libstdc++ regex_constants shape, re-interpreted as a variable
+      // by the [dcl.ambig.res]/1 name-lookup disambiguation) leaked a
+      // VOID value into every use.
+      if(
+        new_symbol->value.is_nil() && new_symbol->is_macro &&
+        new_symbol->type.id() != ID_struct_tag &&
+        new_symbol->type.id() != ID_union_tag &&
+        !is_reference(new_symbol->type) &&
+        declarator.init_args().has_operands() &&
+        declarator.init_args().operands().size() == 1)
+      {
+        new_symbol->value = declarator.init_args().operands().front();
+        declarator.remove(ID_init_args);
+      }
       if(declarator.get_bool("#concept"))
       {
         // N5008 [temp.constr.atomic]/3: substitution failure while
