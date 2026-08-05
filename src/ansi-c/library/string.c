@@ -634,8 +634,8 @@ __CPROVER_HIDE:;
 #else
   __CPROVER_precondition(
     __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
-      ((const char *)src >= (const char *)dst + n) ||
-      ((const char *)dst >= (const char *)src + n),
+      ((const unsigned char *)src >= (const unsigned char *)dst + n) ||
+      ((const unsigned char *)dst >= (const unsigned char *)src + n),
     "memcpy src/dst overlap");
   __CPROVER_precondition(
     __CPROVER_r_ok(src, n), "memcpy source region readable");
@@ -644,10 +644,11 @@ __CPROVER_HIDE:;
 
   if(n > 0)
   {
-    //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-    char src_n[n];
-    __CPROVER_array_copy(src_n, (char *)src);
-    __CPROVER_array_replace((char *)dst, src_n);
+    //for(__CPROVER_size_t i=0; i<n ; i++)
+    //  ((unsigned char *)dst)[i]=((const unsigned char *)src)[i];
+    unsigned char src_n[n];
+    __CPROVER_array_copy(src_n, (unsigned char *)src);
+    __CPROVER_array_replace((unsigned char *)dst, src_n);
   }
 #endif
 
@@ -681,8 +682,8 @@ __CPROVER_HIDE:
 #else
   __CPROVER_precondition(
     __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
-      ((const char *)src >= (const char *)dst + n) ||
-      ((const char *)dst >= (const char *)src + n),
+      ((const unsigned char *)src >= (const unsigned char *)dst + n) ||
+      ((const unsigned char *)dst >= (const unsigned char *)src + n),
     "memcpy src/dst overlap");
   __CPROVER_precondition(
     __CPROVER_r_ok(src, n), "memcpy source region readable");
@@ -692,10 +693,11 @@ __CPROVER_HIDE:
 
   if(n > 0)
   {
-    //for(__CPROVER_size_t i=0; i<n ; i++) ((char *)dst)[i]=((const char *)src)[i];
-    char src_n[n];
-    __CPROVER_array_copy(src_n, (char *)src);
-    __CPROVER_array_replace((char *)dst, src_n);
+    //for(__CPROVER_size_t i=0; i<n ; i++)
+    //  ((unsigned char *)dst)[i]=((const unsigned char *)src)[i];
+    unsigned char src_n[n];
+    __CPROVER_array_copy(src_n, (unsigned char *)src);
+    __CPROVER_array_replace((unsigned char *)dst, src_n);
   }
 #endif
   return dst;
@@ -857,9 +859,9 @@ void *memmove(void *dest, const void *src, size_t n)
 
   if(n > 0)
   {
-    char src_n[n];
-    __CPROVER_array_copy(src_n, (char *)src);
-    __CPROVER_array_replace((char *)dest, src_n);
+    unsigned char src_n[n];
+    __CPROVER_array_copy(src_n, (unsigned char *)src);
+    __CPROVER_array_replace((unsigned char *)dest, src_n);
   }
   #endif
   return dest;
@@ -903,9 +905,9 @@ void *__builtin___memmove_chk(void *dest, const void *src, size_t n, __CPROVER_s
 
   if(n > 0)
   {
-    char src_n[n];
-    __CPROVER_array_copy(src_n, (char *)src);
-    __CPROVER_array_replace((char *)dest, src_n);
+    unsigned char src_n[n];
+    __CPROVER_array_copy(src_n, (unsigned char *)src);
+    __CPROVER_array_replace((unsigned char *)dest, src_n);
   }
   #endif
   return dest;
