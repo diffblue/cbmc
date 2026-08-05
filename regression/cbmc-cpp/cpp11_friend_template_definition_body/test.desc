@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ friend get: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-08-05 (round 15): convert_function_template unifies
+signature-equivalent declarations across parameter spellings
+(equivalence includes return type, method cv-qualifiers, and
+constraints -- the const/non-const _M_access pair and the
+concept-subsumption overloads stay distinct); friend function
+templates are recorded in C_friends and the access check accepts
+their specializations via the instance's ID_C_template link.
