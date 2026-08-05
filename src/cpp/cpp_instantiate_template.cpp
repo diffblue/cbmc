@@ -3244,8 +3244,72 @@ const symbolt &cpp_typecheckt::instantiate_template(
           entry.set(ID_identifier, pid);
           entry.get_sub().push_back(se->second);
           spec_bindings.get_sub().push_back(std::move(entry));
+          continue;
+        }
+        // A pack deduced EMPTY has no element entry at all, only a
+        // zero in pack_size_map ([temp.variadic]/7) -- record it, or
+        // sizeof...(EmptyPack) in a member initializer is unresolvable.
+        auto ps = template_map.pack_size_map.find(pid);
+        if(
+          param_is_pack && ps != template_map.pack_size_map.end() &&
+          ps->second == 0)
+        {
+          irept entry{"pack_empty"};
+          entry.set(ID_identifier, pid);
+          spec_bindings.get_sub().push_back(std::move(entry));
         }
       }
+    }
+  }
+
+  // N5008 [temp.inst]/2 + [temp.spec.partial]: the members of the
+  // instantiated partial specialization are typechecked with the
+  // specialization's OWN parameters bound to their DEDUCED values.
+  // The deduction above ran under a saved-map guard (so the guessing
+  // could not leak), recording into spec_bindings for later alias
+  // resolution -- but the class-body conversion below ALSO needs the
+  // pack bindings: without them `sizeof...(_Idx)` in a static data
+  // member's initializer (libc++ __perfect_forward_impl) resolves
+  // against an empty pack_size_map, the SFINAE guard swallows the
+  // failure, and the RAW initializer reaches goto conversion (symex
+  // then crashes on the malformed assignment).  Replay the bindings
+  // into the active map.
+  for(const auto &entry : spec_bindings.get_sub())
+  {
+    const irep_idt pid = entry.get(ID_identifier);
+    if(entry.id() == "pack_types")
+    {
+      std::vector<typet> elems;
+      for(const auto &t : entry.get_sub())
+        elems.push_back(static_cast<const typet &>(t));
+      template_map.pack_size_map[pid] = elems.size();
+      template_map.pack_args_map[pid] = elems;
+      if(!elems.empty())
+        template_map.type_map[pid] = elems.front();
+    }
+    else if(entry.id() == "pack_exprs")
+    {
+      std::vector<exprt> vals;
+      for(const auto &e : entry.get_sub())
+        vals.push_back(static_cast<const exprt &>(e));
+      template_map.pack_size_map[pid] = vals.size();
+      template_map.pack_expr_map[pid] = vals;
+      if(!vals.empty())
+        template_map.expr_map[pid] = vals.front();
+    }
+    else if(entry.id() == "pack_empty")
+    {
+      template_map.pack_size_map[pid] = 0;
+    }
+    else if(entry.id() == "scalar_type" && !entry.get_sub().empty())
+    {
+      template_map.type_map[pid] =
+        static_cast<const typet &>(entry.get_sub().front());
+    }
+    else if(entry.id() == "scalar_expr" && !entry.get_sub().empty())
+    {
+      template_map.expr_map[pid] =
+        static_cast<const exprt &>(entry.get_sub().front());
     }
   }
 
