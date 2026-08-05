@@ -712,6 +712,18 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.is_type = is_typedef;
   symbol.is_macro =
     (is_typedef && !is_template_parameter) || storage_spec.is_constexpr();
+  // N5008 [dcl.constexpr]/1: a constexpr VARIABLE is still an object;
+  // for an ARRAY the object identity is essential -- its elements are
+  // lvalues ([expr.sub]) and libc++ takes their address
+  // (&__digits_base_10[i] in <charconv>).  Keep it a real, statically
+  // initialized object rather than a fold-away macro (the matching
+  // resolve-side exemption keeps uses as symbol expressions); constant
+  // folding of constant-indexed reads still happens through the
+  // initializer downstream.
+  if(storage_spec.is_constexpr() && !is_typedef && symbol.type.id() == ID_array)
+  {
+    symbol.is_macro = false;
+  }
   symbol.pretty_name = pretty_name;
 
   if(is_code && !symbol.is_type)
