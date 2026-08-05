@@ -2199,6 +2199,17 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         // lvalue for member function calls (this pointer formation)
         e = cpp_symbol_expr(symbol);
       }
+      else if(symbol.type.id() == ID_array)
+      {
+        // Likewise a constexpr ARRAY variable: it is still an object
+        // whose elements are lvalues (N5008 [dcl.constexpr],
+        // [expr.sub]); substituting the brace initializer turned
+        // libc++ <charconv>'s `&__digits_base_10[__value * 2]`
+        // (__itoa::__append2) into address-of an array LITERAL
+        // ("address_of error: ... not an lvalue").  Constant indexing
+        // still folds downstream through the symbol's initializer.
+        e = cpp_symbol_expr(symbol);
+      }
       else
       {
         e = symbol.value;
@@ -10210,6 +10221,40 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
     typet arg_type = type;
     if(is_reference(arg_type))
       arg_type = to_reference_type(arg_type).base_type();
+
+    // N5008 [basic.lookup.argdep]/2.3: for an ENUMERATION type the
+    // associated entities are its innermost enclosing namespace (and,
+    // for a class member, the class).  libc++'s poison-pill pattern
+    // depends on this: error_code's converting constructor does
+    //   using __adl_only::make_error_code;
+    //   *this = make_error_code(__e);
+    // where only ADL over the enum argument (io_errc, future_errc)
+    // can find the real make_error_code overload -- without it the
+    // deleted poison pill is the sole candidate and the whole
+    // <system_error>/<ios> conversion fails.
+    if(arg_type.id() == ID_c_enum_tag)
+    {
+      const irep_idt &enum_name = to_c_enum_tag_type(arg_type).get_identifier();
+      if(!visited.insert(enum_name).second)
+        return;
+      auto enum_scope_it = cpp_typecheck.cpp_scopes.id_map.find(enum_name);
+      if(enum_scope_it == cpp_typecheck.cpp_scopes.id_map.end())
+        return;
+      for(cpp_scopet *ns = &static_cast<cpp_scopet &>(*enum_scope_it->second);
+          ns != nullptr;
+          ns = &ns->get_parent())
+      {
+        if(ns->is_namespace() || ns->is_root_scope())
+        {
+          auto tmp_set = ns->lookup(base_name, cpp_scopet::SCOPE_ONLY);
+          id_set.insert(tmp_set.begin(), tmp_set.end());
+          break; // innermost enclosing namespace only
+        }
+        if(ns->is_root_scope())
+          break;
+      }
+      return;
+    }
 
     if(arg_type.id() != ID_struct_tag && arg_type.id() != ID_union_tag)
       return;
