@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ collate: SUCCESS$
+^\[main\.assertion\.2\] line \d+ ctype: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-08-05 (round 14): the single parenthesized initializer of a
+constexpr non-class object is attached as the symbol's VALUE
+(mirroring the reference-binding case) instead of becoming a void
+constructor-call statement.  History: broken by the round-8
+disambiguation, masked by a stale goto-cc during suite validation.
