@@ -405,6 +405,42 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 
   symbolt *previous_symbol = symbol_table.get_writeable(symbol_name);
 
+  // N5008 [temp.over.link]/6: two function templates whose signatures
+  // are EQUIVALENT (identical up to renaming of their template
+  // parameters) declare the SAME entity.  The identifier above embeds
+  // the parse-level parameter SPELLING, so an in-class friend
+  // declaration (libc++ <tuple>'s
+  //   template <size_t _Jp, class... _Up> friend ... get(tuple<_Up...>&);
+  // ) and the namespace-scope definition
+  //   template <size_t _Ip, class... _Tp> ... get(tuple<_Tp...>&) {...}
+  // land in DIFFERENT symbols: calls resolve to the friend's bodiless
+  // one ("no body for callee"), and the definition's body -- reached
+  // through the instantiation-side redirect -- fails the access check
+  // because THAT symbol is not the declared friend.  Unify: scan the
+  // scope's same-base-name templates for a signature-equivalent symbol
+  // and use it as the previous declaration.
+  if(previous_symbol == nullptr)
+  {
+    const auto id_set =
+      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+    for(const auto *id_ptr : id_set)
+    {
+      symbolt *cand = symbol_table.get_writeable(id_ptr->identifier);
+      if(
+        cand == nullptr || !cand->type.get_bool(ID_is_template) ||
+        cand->type.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &cand_decl = to_cpp_declaration(cand->type);
+      if(cand_decl.declarators().size() != 1)
+        continue;
+      if(!function_template_signatures_equivalent(declaration, cand_decl))
+        continue;
+      previous_symbol = cand;
+      symbol_name = cand->name;
+      break;
+    }
+  }
+
   if(previous_symbol)
   {
     bool previous_has_value = to_cpp_declaration(previous_symbol->type)

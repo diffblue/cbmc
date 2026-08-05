@@ -1995,6 +1995,40 @@ void cpp_typecheckt::typecheck_friend_declaration(
       }
       cpp_scopes.go_to(*scope);
       convert_template_declaration(declaration);
+
+      // N5008 [class.friend]/1 + [temp.friend]/1: the befriended
+      // function TEMPLATE (and thereby its specializations) must be
+      // recorded, or the definition's body -- instantiated when a
+      // call is resolved -- fails the member access check (libc++
+      // <tuple>: the in-class friend `get` reads the private
+      // __base_).  convert_template_declaration does not hand the
+      // symbol back; find the (possibly signature-unified, see
+      // convert_function_template) template by scanning the scope for
+      // a signature-equivalent declaration.
+      if(declaration.declarators().size() == 1)
+      {
+        const irep_idt fbase =
+          declaration.declarators().front().name().get_base_name();
+        const auto id_set =
+          cpp_scopes.current_scope().lookup(fbase, cpp_scopet::SCOPE_ONLY);
+        for(const auto *id_ptr : id_set)
+        {
+          const symbolt *cand = symbol_table.lookup(id_ptr->identifier);
+          if(
+            cand == nullptr || !cand->type.get_bool(ID_is_template) ||
+            cand->type.id() != ID_cpp_declaration)
+            continue;
+          const cpp_declarationt &cand_decl = to_cpp_declaration(cand->type);
+          if(
+            cand_decl.declarators().size() != 1 ||
+            !function_template_signatures_equivalent(declaration, cand_decl))
+            continue;
+          irept friend_entry;
+          friend_entry.set(ID_identifier, cand->name);
+          symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
+          break;
+        }
+      }
     }
     return;
   }
@@ -4164,6 +4198,23 @@ bool cpp_typecheckt::check_component_access(
     {
       if(friend_scope.identifier == pscope->identifier)
         return false; // ok
+
+      // N5008 [temp.friend]/1: a friend FUNCTION TEMPLATE's
+      // specializations are friends, too.  The converting body's
+      // function scope names the SPECIALIZATION; its symbol links back
+      // to the template through ID_C_template (set by
+      // instantiate_template).  Compare that link against the recorded
+      // friend template.
+      {
+        const symbolt *fn_sym = symbol_table.lookup(pscope->identifier);
+        if(
+          fn_sym != nullptr && fn_sym->type.id() == ID_code &&
+          fn_sym->type.get(ID_C_template) == friend_symb.get(ID_identifier) &&
+          !fn_sym->type.get(ID_C_template).empty())
+        {
+          return false; // ok: specialization of a friend template
+        }
+      }
 
       // Check if this scope is an instantiation of the friend template.
       if(pscope->is_class())
