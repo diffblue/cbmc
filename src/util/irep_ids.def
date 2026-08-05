@@ -959,6 +959,8 @@ IREP_ID_ONE(remove_all_extents)
 IREP_ID_ONE(add_lvalue_reference)
 IREP_ID_ONE(add_rvalue_reference)
 IREP_ID_ONE(add_pointer)
+IREP_ID_ONE(make_unsigned)
+IREP_ID_ONE(make_signed)
 
 IREP_ID_TWO(C_ref_qualifier, #ref_qualifier)
 // Projects depending on this code base that wish to extend the list of

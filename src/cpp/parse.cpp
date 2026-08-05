@@ -3945,7 +3945,8 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     t == TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS ||
     t == TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE ||
     t == TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE ||
-    t == TOK_GCC_BUILTIN_ADD_POINTER ||
+    t == TOK_GCC_BUILTIN_ADD_POINTER || t == TOK_GCC_BUILTIN_MAKE_UNSIGNED ||
+    t == TOK_GCC_BUILTIN_MAKE_SIGNED ||
     (is_identifier(t) && lex.LookAhead(1) == '(' &&
      is_identifier_with_text(0, "__decay")))
   {
@@ -3972,6 +3973,10 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
       p = typet(ID_add_rvalue_reference);
     else if(t == TOK_GCC_BUILTIN_ADD_POINTER)
       p = typet(ID_add_pointer);
+    else if(t == TOK_GCC_BUILTIN_MAKE_UNSIGNED)
+      p = typet(ID_make_unsigned);
+    else if(t == TOK_GCC_BUILTIN_MAKE_SIGNED)
+      p = typet(ID_make_signed);
     else
       p = typet(ID_remove_cvref); // __remove_cvref or __decay
 

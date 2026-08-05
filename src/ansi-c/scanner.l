@@ -1076,6 +1076,8 @@ enable_or_disable ("enable"|"disable")
 "__remove_all_extents" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS); }
 "__add_lvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE); }
 "__add_rvalue_reference" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE); }
+"__make_unsigned" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_MAKE_UNSIGNED); }
+"__make_signed" { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_MAKE_SIGNED); }
 "__add_pointer"       { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_POINTER); }
 "__is_referenceable"/[ \t\r\n]*\(  { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_referenceable"  { return make_identifier(); }
