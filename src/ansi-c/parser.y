@@ -160,6 +160,8 @@ int yyansi_cerror(const std::string &error);
 %token TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS "__remove_all_extents"
 %token TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE "__add_lvalue_reference"
 %token TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE "__add_rvalue_reference"
+%token TOK_GCC_BUILTIN_MAKE_UNSIGNED "__make_unsigned"
+%token TOK_GCC_BUILTIN_MAKE_SIGNED "__make_signed"
 %token TOK_GCC_BUILTIN_ADD_POINTER "__add_pointer"
 %token TOK_GCC_FLOAT16 "_Float16"
 %token TOK_GCC_FLOAT32 "_Float32"
