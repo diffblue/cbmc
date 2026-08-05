@@ -4719,3 +4719,12 @@ and surfaces a chain of real front-end gaps:
    re-parsed outside system headers.
 Seed recipe recorded: cbmc --preprocess | grep -v '^#', prepend
 __CPROVER_assert decl, apply stubs 3.
+
+## Round 12 addendum: cvu1 relaunch (2026-08-05)
+
+First cvu1 run finished in ~1h but DEGENERATE: cvise deleted get's
+DEFINITION, making "no body for callee std::__1::get" trivially true
+(a bodiless declaration correctly yields no-body -- not the bug).
+LESSON: no-body criteria need a definition-must-survive anchor, same
+family as wrong-code anti-degeneracy gates.  Relaunched with
+`grep __tuple_leaf` + `grep 'get\(tuple<_Tp\.\.\.>&'` anchors.
