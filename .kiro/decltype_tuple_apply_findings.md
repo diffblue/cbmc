@@ -4728,3 +4728,23 @@ DEFINITION, making "no body for callee std::__1::get" trivially true
 LESSON: no-body criteria need a definition-must-survive anchor, same
 family as wrong-code anti-degeneracy gates.  Relaunched with
 `grep __tuple_leaf` + `grep 'get\(tuple<_Tp\.\.\.>&'` anchors.
+
+## Round 13: packed rep + ranges scoping (2026-08-05)
+
+1. cpp11_packed_anon_struct_member CORE: GNU-attributed member class
+   definitions -- rGCCAttribute's merge_types wrapped the struct and
+   rClassSpec attached TAG+BODY to the WRAPPER (bodyless struct
+   downstream).  Parser unwrap after optAttribute (mirrors the alignas
+   unwrap; packed -> ID_C_packed) + 3 typecheck hardenings
+   (is_anonymous survives the bodyless conversion AND the completion
+   swap; anon-member injection looks up by TAG identifier, ID_name may
+   be absent post-swap).  Unblocks the vector/map reduction seed
+   recipe (basic_string's rep bitfields resolve).
+2. ranges_pipe scoped to its true next layer: the itc-throw shape
+   (1382B archive) passes in direct forms; the faithful
+   inheriting-ctor form crosses the front end and crashes SYMEX
+   (goto_symex.cpp:80 type mismatch) -- banked
+   cpp20_inherited_ctor_symex_crash KNOWNBUG.
+3. LESSON: probe-based cvise criteria die when the probe is stripped
+   -- archive the reduction BEFORE removing probes, or key the
+   criterion on shippable output only.
