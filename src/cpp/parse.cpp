@@ -6996,6 +6996,43 @@ bool Parser::rClassSpec(typet &spec)
   if(!optAttribute(spec))
     return false;
 
+  // Like the alignas unwrap above: a GCC attribute (e.g. libc++
+  // <string>'s `struct __attribute__((__packed__)) { ... }` rep)
+  // turned the struct/union into a merged_type via merge_types.  The
+  // remainder of this function attaches the TAG, bases and BODY to
+  // `spec` -- with the wrapper in place they land on the merged node,
+  // the struct subtype stays bodyless, and the typechecker sees an
+  // incomplete anonymous member whose members never resolve.  Unwrap,
+  // recording the known attributes as flags on the struct/union type;
+  // unwrap only when every subtype is recognised (conservative).
+  if(spec.id() == ID_merged_type)
+  {
+    typet unwrapped;
+    bool packed = false;
+    irept alignment;
+    bool all_known = true;
+    for(auto &sub : to_type_with_subtypes(spec).subtypes())
+    {
+      if(sub.id() == ID_struct || sub.id() == ID_union)
+        unwrapped = sub;
+      else if(sub.id() == ID_packed)
+        packed = true;
+      else if(sub.id() == ID_aligned)
+        alignment = sub.find(ID_size);
+      else
+        all_known = false;
+    }
+    if(unwrapped.is_not_nil() && all_known)
+    {
+      unwrapped.add_source_location() = spec.source_location();
+      if(packed)
+        unwrapped.set(ID_C_packed, true);
+      if(alignment.is_not_nil())
+        unwrapped.set(ID_C_alignment, alignment);
+      spec = unwrapped;
+    }
+  }
+
   if(lex.LookAhead(0) == '{' || lex.LookAhead(0) == ':')
   {
     // no tag
