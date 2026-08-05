@@ -444,7 +444,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
     type.id() == ID_remove_cvref || type.id() == ID_remove_pointer ||
     type.id() == ID_remove_extent || type.id() == ID_remove_all_extents ||
     type.id() == ID_add_lvalue_reference ||
-    type.id() == ID_add_rvalue_reference || type.id() == ID_add_pointer)
+    type.id() == ID_add_rvalue_reference || type.id() == ID_add_pointer ||
+    type.id() == ID_make_unsigned || type.id() == ID_make_signed)
   {
     typet tmp_type = static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(tmp_type);
@@ -523,6 +524,46 @@ void cpp_typecheckt::typecheck_type(typet &type)
       if(is_reference(tmp_type) || is_rvalue_reference(tmp_type))
         tmp_type = to_pointer_type(tmp_type).base_type();
       tmp_type = pointer_type(tmp_type);
+    }
+
+    if(type.id() == ID_make_unsigned || type.id() == ID_make_signed)
+    {
+      // Clang's __make_unsigned(T) / __make_signed(T) builtins, the
+      // compiler-accelerated backing of N5008 [meta.trans.sign]:
+      // the corresponding unsigned (signed) integer type of the same
+      // width; cv-qualifiers are preserved ([meta.trans.sign]/2-3).
+      // Enumerations convert to the signed/unsigned form of their
+      // underlying type.
+      const bool make_uns = type.id() == ID_make_unsigned;
+      typet stripped = tmp_type;
+      const bool was_const = stripped.get_bool(ID_C_constant);
+      const bool was_volatile = stripped.get_bool(ID_C_volatile);
+      stripped.remove(ID_C_constant);
+      stripped.remove(ID_C_volatile);
+      if(stripped.id() == ID_c_enum_tag)
+        stripped = follow_tag(to_c_enum_tag_type(stripped)).underlying_type();
+      typet result;
+      if(stripped.id() == ID_unsignedbv || stripped.id() == ID_signedbv)
+      {
+        const std::size_t width = to_bitvector_type(stripped).get_width();
+        if(make_uns)
+          result = unsignedbv_typet{width};
+        else
+          result = signedbv_typet{width};
+      }
+      else if(stripped.id() == ID_c_bool || stripped.id() == ID_bool)
+      {
+        // not a valid argument per [meta.trans.sign]/1; keep as-is
+        // (substitution failure surfaces at the use site)
+        result = stripped;
+      }
+      else
+        result = stripped;
+      if(was_const)
+        result.set(ID_C_constant, true);
+      if(was_volatile)
+        result.set(ID_C_volatile, true);
+      tmp_type = result;
     }
 
     type = tmp_type;
