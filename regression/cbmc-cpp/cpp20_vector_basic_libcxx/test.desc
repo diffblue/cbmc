@@ -48,3 +48,15 @@ failure CORE); <vector> now CONVERTS fully.  Next layer is semantic:
 with --object-bits 12, `this->__end_ - this->__begin_` (size()) fails
 same-object/overflow checks -- pointer-arithmetic modeling, needs
 fresh scoping.
+Round-12 (2026-08-05): background reduction BOOTSTRAP for this driver
+is parked.  Seeding cvise from preprocessed source (cbmc --preprocess,
+line-markers stripped) removes system-header leniency and surfaces a
+CHAIN of real front-end gaps ahead of this test's own layer; two were
+fixed same-day (constexpr-array element addresses -> CORE
+cpp17_constexpr_array_element_addr; enum-argument ADL poison pill ->
+CORE cpp20_adl_enum_poison_pill), plus three seed-local stubs (pthread
+mutex/condvar NSDMI, `restrict`, __uninitialized_allocator_move stub).
+NEXT blocker in the seed: basic_string<int>'s union rep members
+(__is_long_/__size_/__cap_ "unknown" in __get_short_size/__get_long_cap
+when re-parsed outside system headers).  Fix that, then re-seed; the
+criterion harness is recorded in the findings log.
