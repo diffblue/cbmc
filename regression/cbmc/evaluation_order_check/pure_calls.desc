@@ -1,0 +1,14 @@
+CORE
+pure_calls.c
+--evaluation-order-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.evaluation-order\.1\] line 12 value of a is independent of evaluation order: SUCCESS$
+^\[main\.evaluation-order\.2\] line 12 value of b is independent of evaluation order: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Calls without conflicting side effects are evaluation-order independent:
+the check explores both orders of the calls and finds that the arguments read
+the same values in either order.

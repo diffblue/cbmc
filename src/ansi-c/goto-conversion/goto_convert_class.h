@@ -145,6 +145,75 @@ protected:
     exprt::operandst &arguments,
     const irep_idt &mode);
 
+  //
+  // --evaluation-order-check, see goto_convert_evaluation_order.cpp
+  //
+
+  struct evaluation_order_regiont;
+  struct evaluation_order_subtreet;
+
+  /// Set while lowering a single side effect whose operands
+  /// --evaluation-order-check has already lowered.
+  bool evaluation_order_check_suspended = false;
+
+  bool
+  evaluation_order_check_enabled(const exprt &, const irep_idt &mode) const;
+  bool
+  use_evaluation_order_check(const exprt &expr, const irep_idt &mode) const;
+  bool use_evaluation_order_check(
+    const exprt &function,
+    const exprt::operandst &arguments,
+    const irep_idt &mode) const;
+  bool use_evaluation_order_check(
+    const code_assignt &code,
+    const irep_idt &mode) const;
+
+  [[nodiscard]] clean_expr_resultt clean_expr_evaluation_order(
+    exprt &expr,
+    const irep_idt &mode,
+    bool result_is_used);
+  [[nodiscard]] clean_expr_resultt
+  clean_function_call_operands_evaluation_order(
+    exprt &function,
+    exprt::operandst &arguments,
+    const irep_idt &mode);
+  void convert_assign_evaluation_order(
+    const code_assignt &code,
+    goto_programt &dest,
+    const irep_idt &mode);
+
+  void collect_evaluation_order(
+    exprt &expr,
+    const irep_idt &mode,
+    bool result_is_used,
+    evaluation_order_regiont &region,
+    evaluation_order_subtreet &subtree);
+  void collect_evaluation_order_call_operands(
+    exprt &function,
+    exprt::operandst &arguments,
+    const irep_idt &mode,
+    evaluation_order_regiont &region,
+    evaluation_order_subtreet &subtree);
+  void collect_evaluation_order_operand(
+    exprt &operand,
+    const irep_idt &mode,
+    evaluation_order_regiont &region,
+    evaluation_order_subtreet &subtree);
+  void collect_evaluation_order_lvalue(
+    exprt &lvalue,
+    const irep_idt &mode,
+    evaluation_order_regiont &region,
+    evaluation_order_subtreet &subtree);
+  void add_evaluation_order_event(
+    clean_expr_resultt &&lowered,
+    evaluation_order_regiont &region,
+    evaluation_order_subtreet &&operands,
+    evaluation_order_subtreet &subtree);
+  [[nodiscard]] clean_expr_resultt emit_evaluation_order_region(
+    evaluation_order_regiont &region,
+    const source_locationt &source_location,
+    const irep_idt &mode);
+
   [[nodiscard]] clean_expr_resultt remove_side_effect(
     side_effect_exprt &expr,
     const irep_idt &mode,

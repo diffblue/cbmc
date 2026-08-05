@@ -1,0 +1,14 @@
+CORE
+interleaved_calls.c
+--evaluation-order-check
+^\[main\.assertion\.1\] line 24 c\(\) executes between a\(\) and b\(\): FAILURE$
+^\[main\.assertion\.2\] line 25 b\(\) executes before a\(\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Function calls are indeterminately sequenced, also across the levels of an
+expression: c() may execute between a() and b() although a() + b() is a
+sub-expression of the product.

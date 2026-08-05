@@ -455,6 +455,9 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
   if(!needs_cleaning(expr))
     return {};
 
+  if(use_evaluation_order_check(expr, mode))
+    return clean_expr_evaluation_order(expr, mode, result_is_used);
+
   if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_implies)
   {
     // rewrite into ?:
@@ -867,6 +870,10 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_function_call_operands(
   exprt::operandst &arguments,
   const irep_idt &mode)
 {
+  if(use_evaluation_order_check(function, arguments, mode))
+    return clean_function_call_operands_evaluation_order(
+      function, arguments, mode);
+
   clean_expr_resultt side_effects;
 
   // The function operand is evaluated before the arguments either way.

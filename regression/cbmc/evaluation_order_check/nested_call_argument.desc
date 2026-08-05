@@ -1,0 +1,17 @@
+CORE
+nested_call_argument.c
+--div-by-zero-check --evaluation-order-check
+^\[g\.division-by-zero\.1\] line 10 division by zero in x / y: FAILURE$
+^\[main\.evaluation-order\.\d+\] line 16 value of p is independent of evaluation order: FAILURE$
+^\[main\.evaluation-order\.\d+\] line 18 value of p is independent of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The arguments of f are evaluated in an unspecified order, and so are the
+operands of nested calls such as g's relative to f's other arguments. When
+p-- happens before the call of g, g divides by zero. Moreover, the read of p
+as an argument of g is unsequenced relative to p--. Both the declaration with
+initializer and the call statement are checked.

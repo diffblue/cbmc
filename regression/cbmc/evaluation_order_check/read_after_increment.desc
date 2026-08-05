@@ -1,0 +1,17 @@
+CORE
+read_after_increment.c
+--div-by-zero-check --evaluation-order-check
+^\[main\.evaluation-order\.\d+\] line 12 value of a\[.*tmp_post_i\] is independent of evaluation order: FAILURE$
+^\[main\.division-by-zero\.\d+\] line 12 division by zero in 10 / a\[.*\]: SUCCESS$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The read of a[i] (with the value of i before the increment) may happen before
+or after the call to g, which sets a[0] from 0 to 1: reading a[0] before the
+call would divide by zero. The read happens after i++, and its value is
+checked to be the same at every point after i++ until the end of the full
+expression. The division by zero is reported as this dependence on the
+evaluation order, as the division itself is only evaluated at the end.

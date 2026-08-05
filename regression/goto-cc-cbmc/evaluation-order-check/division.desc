@@ -1,0 +1,13 @@
+CORE
+division.c
+--evaluation-order-check _ --div-by-zero-check
+^\[main\.division-by-zero\.1\] line 12 division by zero in a / b: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+has no effect on goto binaries
+--
+With --evaluation-order-check passed to goto-cc, a / b may also be evaluated
+before f() sets b to 1, which divides by zero.

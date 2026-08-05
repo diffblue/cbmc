@@ -96,6 +96,13 @@ files.
 .TP
 \fB\-\-print\-rejected\-preprocessed\-source\fR \fIfile\fR
 Copy failing (preprocessed) source to \fIfile\fR.
+.TP
+\fB\-\-evaluation\-order\-check\fR
+Execute the side effects of each C expression in all orders that the C
+standard permits, and check that reads within the expression do not depend on
+the evaluation order, see \fBcbmc\fR(1). This takes effect when converting C
+source files, hence must be passed to \fBgoto\-cc\fR rather than to the tools
+that analyse the resulting goto binaries.
 .SH BACKWARD COMPATIBILITY
 .B goto\-cc
 will warn and ignore the use of \fB\-\-object\-bits\fR, which previous versions

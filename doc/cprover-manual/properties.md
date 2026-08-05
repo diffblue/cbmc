@@ -222,6 +222,56 @@ float f = 0.0/0.0; // will generate NaN - CBMC will add assertion
 float g = NAN+0.0; // propagation of NaN value - no assertion generated
 ```
 
+### Evaluation order
+
+The C standard leaves the order in which the operands of most operators, and
+the arguments of a function call, are evaluated unspecified, and the order
+may differ between two evaluations of the same expression. Unless instructed
+otherwise, CBMC evaluates each expression in one fixed order (for function
+call arguments, the order that the configured compiler and architecture were
+observed to use). Programs whose behaviour depends on the evaluation order
+may thus behave differently when compiled, as in this example:
+
+```C
+int b = 0;
+int f(void) { b = 1; return 0; }
+int main() { return 10 / b + f(); }
+```
+
+CBMC calls `f` first and hence does not report the division by zero that
+occurs when a compiler evaluates `10 / b` first.
+
+The option `--evaluation-order-check` (of `cbmc`, `goto-analyzer`, and
+`goto-cc`) makes CBMC consider all evaluation orders that the C standard
+permits:
+
+- the side effects of an expression (function calls, assignments, increments
+  and decrements) are executed in all orders that respect their
+  dependencies, i.e., a side effect happens after the evaluation of its
+  operands;
+- for each side-effect-free operand that reads memory, such as `10 / b`
+  above, an assertion of property class `evaluation-order` checks that its
+  value is the same at all points at which the standard permits the read to
+  happen. These assertions fail when the value depends on the evaluation
+  order, which includes undefined behaviour such as `i++ + i`. As the operand
+  is evaluated at all these points, the enabled checks (such as
+  `--div-by-zero-check`) apply at each of them.
+
+The option takes effect when converting C source code to a goto program. When
+using `goto-cc` to compile goto binaries, the option must be passed to
+`goto-cc`; passing it to `cbmc` only has no effect on goto binaries. Operands
+whose evaluation is sequenced by `&&`, `||`, `?:`, and the comma operator are
+evaluated as a whole relative to the other operands of the expression, and
+expressions that contain statement expressions are evaluated in a fixed
+order. C++ code is not affected by this option.
+
+The cost of the option grows with the number of side effects within one
+expression: n side effects whose order is not fixed are each executed in up
+to n positions, i.e., the expression is analysed with up to n^2 copies of the
+side effects, and a property that depends on the order needs to be refuted for
+all n! orders. Expressions with one side effect only add the assertions
+about reads.
+
 ### Generating function bodies
 
 Sometimes implementations for called functions are not available in the goto

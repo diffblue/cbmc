@@ -1,0 +1,14 @@
+CORE
+division_before_call.c
+--div-by-zero-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Without --evaluation-order-check, goto conversion lowers the expression in
+one fixed evaluation order (the call's side effects first), which misses the
+division by zero that occurs when a conforming compiler evaluates a / b
+before the call. This test documents that baseline behaviour; see
+division_before_call.desc for the checked variant.

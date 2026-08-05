@@ -32,6 +32,7 @@ const char *non_ms_cl_options[]=
   "--i386-macos",
   "--string-abstraction",
   "--no-library",
+  "--evaluation-order-check",
   "--16",
   "--32",
   "--64",

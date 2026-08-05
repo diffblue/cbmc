@@ -196,6 +196,13 @@ goto_modelt initialize_goto_model(
       sources.push_back(file);
   }
 
+  if(!binaries.empty() && config.ansi_c.evaluation_order_check)
+  {
+    msg.warning() << "--evaluation-order-check has no effect on goto binaries; "
+                     "pass it to goto-cc when compiling them"
+                  << messaget::eom;
+  }
+
   language_filest language_files;
   goto_modelt goto_model;
   initialize_from_source_files(
