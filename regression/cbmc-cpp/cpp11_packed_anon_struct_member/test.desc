@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ packed anon bitfield: SUCCESS$
+^\[main\.assertion\.2\] line \d+ named packed nested: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-08-05 (round 13): rClassSpec unwraps the attribute
+merged_type (mirroring its alignas unwrap), recording packed/aligned
+as flags; the anonymity flag also survives the bodyless first
+conversion and the incomplete->complete swap, and the anonymous-member
+injection looks the symbol up by TAG identifier.
