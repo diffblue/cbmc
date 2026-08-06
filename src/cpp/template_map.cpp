@@ -170,8 +170,7 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
 /// `Args` in `static_cast<Args&&>(a)` (the forwarding cast of libstdc++'s
 /// variadic `std::__invoke`), is substituted (yielding `elem&&`, performing
 /// [dcl.ref] reference collapsing).
-static void
-replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
+void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
 {
   const auto is_pack_ref = [&base](const irept &t) -> bool
   {

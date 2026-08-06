@@ -60,6 +60,21 @@ public:
     const typet &template_parameter,
     const typet &desired_type);
 
+  /// [temp.deduct.type]/8: in class-template partial-specialization
+  /// matching ([temp.class.spec.match]/2), a pattern `const T` does NOT
+  /// match a non-const argument -- deduction fails.  Function-call
+  /// deduction is more permissive ([temp.deduct.call]/3 ignores the
+  /// cv-qualification of a reference parameter's referred-to type), so
+  /// the strict behaviour is opt-in for the partial-spec matching
+  /// sites.  Without it, libc++'s alias-pattern specializations
+  ///   tuple_size<__enable_if_tuple_size_imp<const _Tp, ...,
+  ///     integral_constant<size_t, sizeof(tuple_size<_Tp>)>>>
+  /// bind _Tp to the NON-const argument, and re-type-checking the
+  /// pattern then evaluates sizeof(tuple_size<_Tp>) -- re-entering the
+  /// very disambiguation in progress, exponentially (~500k candidate
+  /// iterations for tuple_size<tuple<int, int>>).
+  bool strict_cv_deduction = false;
+
   void guess_template_args(
     const exprt &template_parameter,
     const exprt &desired_expr);

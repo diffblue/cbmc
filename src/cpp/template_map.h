@@ -24,6 +24,16 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 struct template_parametert;
 class template_typet;
 
+/// Substitute, in place, every reference to the type parameter pack named
+/// \p base (matched by short-name suffix) inside \p n with the concrete
+/// element type \p elem ([temp.variadic]/5).  Defined in template_map.cpp;
+/// also used by the template-argument pack expansion in
+/// cpp_typecheck_template.cpp.
+void replace_type_pack_ref(
+  irept &n,
+  const std::string &base,
+  const typet &elem);
+
 class template_mapt
 {
 public:
