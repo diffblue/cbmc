@@ -29,3 +29,10 @@ the whole family RUNS BMC end-to-end.  Remaining layer visible as
 no-body FAILUREs: std::__1::get<0,...>'s DEFINITION body is not
 instantiated for the call (apply_basic reaches VERIFICATION SUCCESSFUL
 but main is still dropped -- props=0, caught by this desc).
+Round-16 (2026-08-06): the get layer is FIXED (multi-pack spec
+absorption + lockstep value substitution; CORE
+cpp11_tuple_get_return_type_body).  Remaining layer: the tuple
+CONSTRUCTOR itself has no body
+(tuple(this, rref_signed_int, rref_signed_int) -- the _EnableUTypesCtor
+enable-if ctor machinery); get assertions still fail through the
+unconstructed object.
