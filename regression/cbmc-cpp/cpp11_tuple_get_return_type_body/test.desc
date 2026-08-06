@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ first: SUCCESS$
@@ -12,3 +12,7 @@ recursive tuple_element machinery; banked 2026-08-05 (round 15) from
 the cvu1 reduction.  NOTE: main rewritten from cvise's degenerate
 self-referential driver to a well-formed one; re-verify the criterion
 holds when picking this up.
+Fixed 2026-08-06 (round 16): multi-pack spec patterns absorb longer
+flat argument lists at both matching sites ([temp.spec.partial.match]
+/2), and the lockstep mem-initializer expansion substitutes non-type
+pack element VALUES ([temp.variadic]/5).
