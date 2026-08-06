@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck_resolve.h"
 
+
 #include <deque>
 
 #ifdef DEBUG
@@ -7289,8 +7290,20 @@ void cpp_typecheck_resolvet::guess_template_args(
         return;
       }
 
-      // Check if it was instantiated from a template
-      if(desired_sym->type.find(ID_C_template).is_nil())
+      // Check if it was instantiated from a template.  N5008
+      // [temp.deduct.type]: deduction against a class-template
+      // specialization needs only the instance's template ARGUMENTS,
+      // not a completed definition -- an instance of a template that
+      // is only forward-declared (`template <class, class> struct
+      // __tree_node;`, libc++'s <__tree> node types) records
+      // full_template_args but never ID_C_template, and rejecting it
+      // here left the pattern `__tree_node<_Tp, _VoidPtr>` undeduced
+      // (its parameters nil), failing the enclosing declaration
+      // ("symbol '__pair1_' is unknown", the std::set shape).
+      if(
+        desired_sym->type.find(ID_C_template).is_nil() &&
+        desired_sym->type.find(ID_full_template_args).is_nil() &&
+        desired_sym->type.find(ID_C_template_arguments).is_nil())
       {
         // N5008 [temp.deduct.call]/4: the argument type A need not itself be a
         // specialization of the class template named by P -- A may be a
