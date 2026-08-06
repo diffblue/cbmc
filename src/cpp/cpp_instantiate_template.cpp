@@ -1572,6 +1572,10 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             cpp_scopes.go_to(*spec_scope);
 
           cpp_typecheck_resolvet resolver(*this);
+          // [temp.deduct.type]/8: partial-specialization matching
+          // rejects cv-mismatched patterns (see the flag's doc in
+          // cpp_typecheck_resolve.h).
+          resolver.strict_cv_deduction = true;
 
           {
             const std::size_t sel_npat =
@@ -3321,6 +3325,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
       if(spec_scope != nullptr)
         cpp_scopes.go_to(*spec_scope);
       cpp_typecheck_resolvet resolver(*this);
+      // [temp.deduct.type]/8: partial-specialization matching
+      // rejects cv-mismatched patterns (see the flag's doc in
+      // cpp_typecheck_resolve.h).
+      resolver.strict_cv_deduction = true;
       try
       {
         const std::size_t sb_npat = pattern_args.arguments().size();
@@ -6358,6 +6366,10 @@ skip_pack_removal_ft:
             cpp_scopes.go_to(*spec_scope);
 
           cpp_typecheck_resolvet resolver(*this);
+          // [temp.deduct.type]/8: partial-specialization matching
+          // rejects cv-mismatched patterns (see the flag's doc in
+          // cpp_typecheck_resolve.h).
+          resolver.strict_cv_deduction = true;
 
           for(std::size_t i = 0; i < full_args_resolved.arguments().size(); i++)
           {

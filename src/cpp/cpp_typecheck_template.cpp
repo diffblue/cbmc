@@ -2189,6 +2189,44 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 }
                 if(!emitted_value)
                 {
+                  // N5008 [temp.variadic]/5: substitute each referenced TYPE
+                  // pack's i-th ELEMENT for its (suffix-matched) cpp_name
+                  // references in the pattern.  template_mapt::apply does not
+                  // substitute bare cpp_names from type_map, so without this
+                  // the emitted argument still names `_Tp` textually and the
+                  // later per-argument typecheck resolves it against whatever
+                  // same-named parameter is live in the enclosing scope --
+                  // for libc++'s tuple_size (primary `class _Tp`, partial
+                  // specialization `class... _Tp`, SAME name) that is the
+                  // PRIMARY's binding, i.e. the whole tuple type, so
+                  // `tuple_size<tuple<_Tp...>>` re-typechecked as
+                  // `tuple_size<tuple<tuple<int,int>, tuple<int,int>>>` and
+                  // the specialization never matched (get/tuple_size and the
+                  // tuple constructor all fell back to bodiless primaries).
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto a = template_map.pack_args_map.find(pid);
+                    if(a == template_map.pack_args_map.end())
+                      continue;
+                    const std::string key = id2string(pid);
+                    const auto q = key.rfind("::");
+                    const std::string short_name =
+                      q != std::string::npos ? key.substr(q + 2) : key;
+                    // The pattern may BE the bare pack reference itself
+                    // (`_Tp...`); replace_type_pack_ref only substitutes
+                    // sub-nodes, so handle the top level here.
+                    if(
+                      pattern.id() == ID_cpp_name &&
+                      pattern.get_sub().size() == 1 &&
+                      pattern.get_sub().front().id() == ID_name &&
+                      id2string(pattern.get_sub().front().get(ID_identifier)) ==
+                        short_name)
+                    {
+                      pattern = a->second[i];
+                    }
+                    else
+                      replace_type_pack_ref(pattern, short_name, a->second[i]);
+                  }
                   element_map.apply(pattern);
                   exprt type_arg(ID_type);
                   type_arg.type() = pattern;
