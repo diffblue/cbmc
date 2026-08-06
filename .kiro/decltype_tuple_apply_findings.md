@@ -4841,3 +4841,41 @@ Fixed; CORE cpp11_lambda_param_trailing_decltype.  The anon-union __s
 layer itself remains unharvested -- reseed with a criterion EXCLUDING
 the lambda shape (e.g. require "__rep" or "basic_string" to survive)
 next time.
+
+## Round 17 (2026-08-06): tuple_size triple fix; host OOM lesson
+
+Tuple ctor no-body root #1 FIXED (three defects, one commit):
+strict cv deduction in partial-spec matching ([temp.deduct.type]/8,
+opt-in flag set at the 3 matching sites); cv-qualified alias-argument
+substitution ([temp.alias]/2); pack ELEMENT substitution in
+template-arg expansion ([temp.variadic]/5 -- bare cpp_names were left
+textual and re-resolved against the PRIMARY's same-named param).
+tuple_size<tuple<int,int>> now correct and fast (was wrong + ~5min).
+CORE: cpp11_tuple_size_alias_spec (27-line header-free).
+
+Tuple ctor next layer (diagnosed, not fixed): __integer_sequence<
+size_t,0,1>::__to_tuple_indices<0> -- template::232::_Values unbound
+at a resolve INSIDE instantiate_template(convert_non_template_
+declaration) nested under resolve_template_alias; the rta pre-bind
+(CLANG-gated, cpp_typecheck_resolve.cpp ~4990) DID bind it, but the
+map is empty again at the throw -- the inner instantiate's
+convert_non_template_declaration path apparently runs after restore
+or in a different map frame.  Resume: probe rta-enter parent + map
+state inside frame #4 (instantiate_template) of the saved bt.
+
+Diagnosis recipe that worked: global `bool cbmc_dbg_in_target` set in
+convert_function for the target symbol; gdb `break __cxa_throw if
+cbmc_dbg_in_target` + ignore-count bisection; swallow-site probes in
+method_bodies/convert_function (cf-catch/cf-nobody found the recovery
+path; error stream at catch holds ONLY instantiation context -- the
+message itself goes to the nulled handler).
+
+OPS LESSON (host died, /tmp lost): 3 cvise jobs x 5 workers x 6GB
+cbmc caps ~ 90GB worst case on a 68GB host.  Budget the FLEET, not
+just each process: at most ONE cvise with --n 4 (4x6=24GB) alongside
+interactive work, or cap per-run ulimit so total_workers x cap <
+RAM/2.  Reduction jobs lost (cw1 tuple-ctor link+run gate; cw2
+<<type:auto>> decay_t criterion; cw3 __pair1_/__node_holder criterion
+with = {} pthread stubs -- NOT plain removal, which breaks constexpr
+mutex() natively).  cw1 is now OBSOLETE (this fix reached deeper via
+direct diagnosis); cw2/cw3 recipes recorded above for relaunch.
