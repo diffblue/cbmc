@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ pair1 declared: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-08-06: the deduction gate accepts instances that record
+full_template_args (or C_template_arguments) without ID_C_template.
+The real cpp11_set_insert_libcxx test has a FURTHER layer: the same
+__pair1_ as a MEMBER fails "invalid initializer" in __tree's ctor.
