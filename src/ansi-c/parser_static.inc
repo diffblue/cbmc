@@ -435,3 +435,190 @@ static void adjust_KnR_parameters(
     }
   }
 }
+
+/*******************************************************************\
+
+Function: nested_function_setup
+
+  Inputs: d - the YYSTYPE of a `declaration` node already initialised
+              with the merged type and declarator for a nested
+              function definition.
+
+ Outputs: A small POD aggregating the bookkeeping needed to undo the
+          parser-side effects of `add_declarator` for a nested
+          function. Pass it back to `nested_function_teardown` after
+          parsing the function body.
+
+ Purpose: Prepare the parser state for a GCC nested function
+          definition. `add_declarator` always treats functions as
+          living in the root scope: it sets the declarator's name to
+          the bare base name and writes an entry into
+          `root_scope().name_map[base]`. For a nested function we
+          want the symbol to live in the *enclosing* function's scope
+          instead, and we must not damage any pre-existing global
+          mapping for the same base name.
+
+          This helper rewrites the declarator's name to the
+          enclosing-scope-prefixed form, fixes up the current scope's
+          name_map entry to match, and restores any prior root-scope
+          entry (or removes the one freshly written by `add_declarator`
+          if there was no prior entry). It also records the parser's
+          current function name so that `nested_function_teardown`
+          can restore it after the nested body has been parsed,
+          rather than clearing it (which would lose the outer
+          function context for subsequent statements in the
+          enclosing body).
+
+\*******************************************************************/
+
+static ansi_c_parsert::nested_function_contextt
+nested_function_setup(const YYSTYPE d)
+{
+  ansi_c_declaratort &declarator =
+    to_ansi_c_declaration(parser_stack(d)).declarator();
+  const irep_idt base = declarator.get_base_name();
+
+  ansi_c_parsert::nested_function_contextt ctx;
+  ctx.base_name = base;
+  // Capture the outer function name *before* create_function_scope
+  // overwrites it with the nested function's name. We restore this in
+  // nested_function_teardown so that statements parsed after the
+  // nested function definition keep the outer function as their
+  // source_location.function (relevant for `__func__` and any other
+  // consumer of that field).
+  ctx.outer_function_name = PARSER.source_location().get_function();
+
+  // add_declarator forced this function into the root scope. Rewrite
+  // the declarator name to use the enclosing scope's prefix, and fix
+  // up the current scope's name_map entry to match.
+  const irep_idt local_name = PARSER.current_scope().prefix + id2string(base);
+  declarator.set_name(local_name);
+  PARSER.current_scope().name_map[base].prefixed_name = local_name;
+
+  // Snapshot any pre-existing root-scope entry for this base name
+  // before we drop the entry that add_declarator just installed.
+  // After the nested function has been parsed we restore the prior
+  // entry (if any), so a global symbol with the same base name keeps
+  // its parser-side mapping. If there was no prior entry, we just
+  // erase the freshly-written one.
+  auto root_it = PARSER.root_scope().name_map.find(base);
+  if(root_it != PARSER.root_scope().name_map.end())
+  {
+    ctx.had_prior_root_entry = true;
+    ctx.prior_root_entry = root_it->second;
+  }
+  else
+  {
+    ctx.had_prior_root_entry = false;
+  }
+
+  return ctx;
+}
+
+/*******************************************************************\
+
+Function: nested_function_teardown
+
+  Inputs: ctx - the bookkeeping returned by nested_function_setup.
+
+ Outputs:
+
+ Purpose: Undo the root-scope side effects of `add_declarator` for a
+          nested function and restore the enclosing function's
+          source-location context. Call after `pop_scope()` for the
+          nested function's body.
+
+\*******************************************************************/
+
+static void
+nested_function_teardown(const ansi_c_parsert::nested_function_contextt &ctx)
+{
+  // Restore (or erase) the root-scope name_map entry. We always
+  // overwrite, because add_declarator unconditionally wrote an entry
+  // for `base` into root_scope.
+  if(ctx.had_prior_root_entry)
+    PARSER.root_scope().name_map[ctx.base_name] = ctx.prior_root_entry;
+  else
+    PARSER.root_scope().name_map.erase(ctx.base_name);
+
+  // Restore the outer function context (the parser-wide source
+  // location's function field) rather than clearing it: parsing
+  // continues inside the enclosing function body, and code there
+  // should still be tagged with the enclosing function name.
+  if(ctx.outer_function_name.empty())
+    PARSER.clear_function();
+  else
+    PARSER.set_function(ctx.outer_function_name);
+}
+
+/*******************************************************************\
+
+Function: nested_function_definition_head
+
+  Inputs: result - YYSTYPE for the resulting declaration;
+          type - YYSTYPE holding the (return) type specifier;
+          declarator - YYSTYPE holding the function declarator (with any
+            post-declarator attributes already merged in).
+
+ Outputs:
+
+ Purpose: Shared mid-rule action for the alternatives of
+          gcc_nested_function_definition. Builds the ansi_c_declaration
+          for the nested function head, relocates it from the root scope
+          into the enclosing local scope (remembering the outer function
+          context via nested_function_setup), and opens the nested
+          function's scope. Mirrors function_head, plus the nested-scope
+          relocation.
+
+\*******************************************************************/
+
+static void nested_function_definition_head(
+  YYSTYPE &result,
+  YYSTYPE type,
+  YYSTYPE declarator)
+{
+  init(result, ID_declaration);
+  parser_stack(result).type().swap(parser_stack(type));
+  PARSER.add_declarator(parser_stack(result), parser_stack(declarator));
+  PARSER.nested_function_context_stack.push_back(nested_function_setup(result));
+  create_function_scope(result);
+}
+
+/*******************************************************************\
+
+Function: nested_function_definition_body
+
+  Inputs: result - YYSTYPE for the resulting declaration statement;
+          declaration - YYSTYPE holding the ansi_c_declaration produced
+            by nested_function_definition_head;
+          body - YYSTYPE holding the parsed function body.
+
+ Outputs:
+
+ Purpose: Shared post-body action for the alternatives of
+          gcc_nested_function_definition. Attaches the body as the
+          declaration's initialiser, closes the nested function's scope,
+          restores the enclosing function context, and wraps the result
+          as a declaration statement so it fits inside a block.
+
+\*******************************************************************/
+
+static void nested_function_definition_body(
+  YYSTYPE &result,
+  YYSTYPE declaration,
+  YYSTYPE body)
+{
+  ansi_c_declarationt &ansi_c_declaration =
+    to_ansi_c_declaration(parser_stack(declaration));
+  DATA_INVARIANT(
+    ansi_c_declaration.declarators().size() == 1, "exactly one declarator");
+  ansi_c_declaration.add_initializer(parser_stack(body));
+  PARSER.pop_scope();
+  nested_function_teardown(PARSER.nested_function_context_stack.back());
+  PARSER.nested_function_context_stack.pop_back();
+
+  // Wrap as a declaration statement so it fits in a block.
+  init(result);
+  statement(result, ID_decl);
+  mto(result, declaration);
+}

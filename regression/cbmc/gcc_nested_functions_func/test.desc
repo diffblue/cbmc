@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Verifies that __func__ in the enclosing function still resolves to
+the enclosing function's name after a GCC nested function has been
+parsed (i.e. the parser restores the outer function context rather
+than clearing it), and that a pre-existing global symbol with the
+same base name as the nested function survives parser-side lookups
+for code following the enclosing function.

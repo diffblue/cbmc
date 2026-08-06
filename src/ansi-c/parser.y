@@ -2380,6 +2380,7 @@ statement:
           declaration_statement
         | statement_attribute
         | stmt_not_decl_or_attr
+        | gcc_nested_function_definition
         ;
 
 stmt_not_decl_or_attr:
@@ -2402,6 +2403,50 @@ declaration_statement:
           init($$);
           statement($$, ID_decl);
           mto($$, $1);
+        }
+        ;
+
+gcc_nested_function_definition:
+          declaration_specifier declarator
+          post_declarator_attributes_opt
+          {
+            // GCC nested function definition. Parse the head like a
+            // top-level function_head, then hand off to the shared helper
+            // which relocates the symbol from the root scope into the
+            // enclosing local scope and remembers the outer function
+            // context.
+            nested_function_definition_head($$, $1, merge($3, $2));
+          }
+          function_body
+        {
+          nested_function_definition_body($$, $4, $5);
+        }
+        | type_specifier declarator
+          post_declarator_attributes_opt
+          {
+            nested_function_definition_head($$, $1, merge($3, $2));
+          }
+          function_body
+        {
+          nested_function_definition_body($$, $4, $5);
+        }
+        | type_qualifier_list identifier_declarator
+          {
+            // GCC accepts a qualifier-only head like
+            //   const foo(int x) { ... }
+            // for a nested function (the return type defaults to
+            // `int` with the given qualifiers; -Wimplicit-int will
+            // warn, but the function is parsed). The other implicit-
+            // int forms (a bare `identifier_declarator`, or a
+            // `declaration_qualifier_list identifier_declarator`
+            // with a storage-class keyword) are rejected by GCC in
+            // nested context, so they are deliberately not mirrored
+            // here.
+            nested_function_definition_head($$, $1, $2);
+          }
+          function_body
+        {
+          nested_function_definition_body($$, $3, $4);
         }
         ;
 

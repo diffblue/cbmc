@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^EXIT=6$
+^SIGNAL=0$
+syntax error
+^PARSING ERROR$
+--
+^VERIFICATION
+--
+GCC rejects implicit-int nested functions, so a storage-class-with-implicit-int
+head (declaration_qualifier_list identifier_declarator) is deliberately not
+accepted (see gcc_nested_function_definition).

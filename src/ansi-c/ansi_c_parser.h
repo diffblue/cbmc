@@ -106,6 +106,25 @@ public:
   // convert a declarator and then add it to existing an declaration
   void add_declarator(exprt &declaration, irept &declarator);
 
+  /// \brief Bookkeeping needed to undo the parser-side effects of
+  ///   `add_declarator` (which forces a function into the root scope)
+  ///   for a single GCC nested function definition. Populated by
+  ///   `nested_function_setup` in `parser_static.inc` and consumed by
+  ///   `nested_function_teardown`.
+  struct nested_function_contextt
+  {
+    irep_idt base_name;
+    irep_idt outer_function_name;
+    bool had_prior_root_entry = false;
+    ansi_c_identifiert prior_root_entry;
+  };
+
+  /// LIFO stack of in-flight nested-function bookkeeping records,
+  /// one per active `gcc_nested_function_definition` rule on the
+  /// parsing stack. A stack rather than a single field is needed
+  /// because GCC permits nested functions inside nested functions.
+  std::vector<nested_function_contextt> nested_function_context_stack;
+
   // adds a tag to the current scope
   void add_tag_with_body(irept &tag);
 

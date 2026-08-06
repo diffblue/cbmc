@@ -619,6 +619,23 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
 
   code_typet &code_type = to_code_type(symbol.type);
 
+  // A function body may contain nested function definitions (a GCC extension).
+  // Each such nested function is type-checked by a recursive call to this
+  // method while we are part-way through the enclosing function's body. That
+  // recursion would otherwise clobber the enclosing function's per-function
+  // state, so we save it here and restore it once the (possibly nested)
+  // function body has been checked. In particular:
+  //  * return_type, so that a `return` in the enclosing body after a nested
+  //    function with a different return type is checked against the enclosing
+  //    function's type (the C++ front-end does the same, see
+  //    cpp_typecheckt::typecheck_function_body); and
+  //  * labels_used/labels_defined, so that a label defined before a nested
+  //    function definition is still visible to a `goto` after it.
+  const typet old_return_type = return_type;
+  const std::map<irep_idt, source_locationt> old_labels_used = labels_used;
+  const std::map<irep_idt, source_locationt> old_labels_defined =
+    labels_defined;
+
   // reset labels
   labels_used.clear();
   labels_defined.clear();
@@ -652,6 +669,12 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
       throw 0;
     }
   }
+
+  // restore the enclosing function's state (see above); this is only relevant
+  // when this body was a nested function definition, but is harmless otherwise
+  return_type = old_return_type;
+  labels_used = old_labels_used;
+  labels_defined = old_labels_defined;
 }
 
 void c_typecheck_baset::apply_asm_label(
