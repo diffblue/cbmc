@@ -6300,6 +6300,24 @@ void cpp_typecheckt::instantiate_generic_lambda(
     if(explicit_ret.is_not_nil() && !explicit_ret.id().empty())
     {
       lambda_return_type = static_cast<const typet &>(explicit_ret);
+      // N5008 [dcl.fct]/8: the parameters are in scope in the trailing
+      // return type -- `[](int __s) -> decltype(__s)` must resolve
+      // `__s` (cvise-reduced from a preprocessed libc++ <string>
+      // seed).  Enter the lambda's scope and register the parameters
+      // before type-checking the return type, exactly as the body
+      // conversion below does.
+      cpp_save_scopet save_scope_for_ret(cpp_scopes);
+      std::string lambda_base_ret = inst_name.substr(scope_prefix.size());
+      cpp_scopet &lambda_scope_ret =
+        cpp_scopes.current_scope().new_scope(lambda_base_ret);
+      lambda_scope_ret.prefix = inst_name + "::";
+      cpp_scopes.go_to(lambda_scope_ret);
+      for(const auto &p : func_params)
+      {
+        const symbolt &psym = symbol_table.lookup_ref(p.get_identifier());
+        cpp_idt &id = cpp_scopes.put_into_scope(psym);
+        id.id_class = cpp_idt::id_classt::SYMBOL;
+      }
       typecheck_type(lambda_return_type);
       deduce_return = false;
     }
@@ -7538,6 +7556,37 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     if(explicit_ret.is_not_nil() && !is_generic_lambda)
     {
       lambda_return_type = static_cast<const typet &>(explicit_ret);
+      // N5008 [dcl.fct]/8: the parameters are in scope in the trailing
+      // return type -- `[](int __s) -> decltype(__s)` must resolve
+      // `__s` (cvise-reduced from a preprocessed libc++ <string>
+      // seed; previously "symbol '__s' is unknown" dropped the whole
+      // enclosing body).  Register the parameters in a scope visible
+      // to the return type's type-check.  The parameter symbols
+      // proper are created below from func_type; here we install
+      // lightweight placeholders keyed by the same identifiers.
+      cpp_save_scopet save_scope_for_ret(cpp_scopes);
+      cpp_scopet &ret_scope =
+        cpp_scopes.current_scope().new_scope(id2string(func_sym_name) + "$ret");
+      ret_scope.prefix = id2string(func_sym_name) + "::";
+      cpp_scopes.go_to(ret_scope);
+      for(const auto &p : func_params)
+      {
+        if(symbol_table.lookup(p.get_identifier()) == nullptr)
+        {
+          auxiliary_symbolt psym;
+          psym.name = p.get_identifier();
+          psym.base_name = p.get_base_name();
+          psym.type = p.type();
+          psym.mode = ID_cpp;
+          psym.module = module;
+          psym.location = loc;
+          psym.is_lvalue = true;
+          symbol_table.insert(psym);
+        }
+        const symbolt &psym_ref = symbol_table.lookup_ref(p.get_identifier());
+        cpp_idt &id = cpp_scopes.put_into_scope(psym_ref);
+        id.id_class = cpp_idt::id_classt::SYMBOL;
+      }
       typecheck_type(lambda_return_type);
       deduce_return = false;
     }
@@ -8022,11 +8071,12 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           // using it avoids re-deducing via `auto`, which double-type-checks
           // the body and mishandles reference-member accesses of by-reference
           // captures.)
-          if(saved_lambda_return_type.is_not_nil())
-            op_decl.type() =
-              static_cast<const typet &>(saved_lambda_return_type);
-          else
-            op_decl.type() = func_type.return_type();
+          // N5008 [dcl.fct]/8: an explicit trailing return type may
+          // reference the parameters (`-> decltype(__s)`), which are
+          // NOT in scope when the closure class's body converts.  Use
+          // the ALREADY-RESOLVED return type (typechecked above with
+          // the parameters registered) rather than the raw parse tree.
+          op_decl.type() = func_type.return_type();
           op_ftype.add(ID_parameters) = saved_lambda_parameters;
         }
         op_dtor.type() = op_ftype;
