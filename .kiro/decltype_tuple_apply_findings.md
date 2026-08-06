@@ -4806,3 +4806,27 @@ family as wrong-code anti-degeneracy gates.  Relaunched with
    guess_function_template_args); needs a throw-index bisection
    harness.
 4. cvs1 (__s layer) still reducing (~1MB of 2.7MB).
+
+## Round 16: multi-pack absorption + lockstep values (2026-08-06)
+
+cpp11_tuple_get_return_type_body CORE-libcxx.  Two roots:
+1. [temp.spec.partial.match]/2: multi-pack spec patterns
+   (__tuple_impl's <size_t... _Indx, class... _Tp>) with npat < nfull
+   FLAT argument lists were rejected at BOTH matching sites (selection
+   loop + spec_bindings re-deduction) -- no __tuple_leaf bases, get's
+   derived-to-base static_cast threw inside the drain, get left
+   bodiless.  Fix: positional prefix + remainder bound as ONE pack,
+   STRICTLY gated to heads with >= 2 packs (single-pack double-binding
+   regressed cpp11_variadic_ctor_pack_multi and
+   cpp11_recursive_forwarding_tuple_ctor -- suite caught both).
+2. [temp.variadic]/5: the whole-mem-initializer lockstep expansion now
+   substitutes NON-TYPE pack element VALUES (elem_expr_by_short) --
+   `__tuple_leaf<_Uf>(__u)...` previously sent every element to
+   __tuple_leaf<0>.
+LESSONS: (a) several regression tests EXPECT VERIFICATION FAILED (a
+"WRONG must FAIL" assertion) -- diagnose by SPECIFIC assertion labels,
+never by exit status or tail; (b) after any stash/pop cycle REBUILD
+before concluding anything (a stale binary re-misled the bisection
+mid-round).
+Tuple family's remaining layer: the tuple CONSTRUCTOR no-body
+(_EnableUTypesCtor enable-if machinery).
