@@ -4905,3 +4905,28 @@ during a UTypes-ctor body conversion; likely another deduction
 leniency (per [temp.deduct.type]/8 the pattern pair<_Up1,_Up2> cannot
 match int) letting a doomed candidate substitute expensive SFINAE.
 Watch total wall-time: ~5min for tc.cpp even now.
+
+## Round 17 cont. 2: cw3 harvest fixed (incomplete-instance deduction)
+
+cw3 converged at 835B; hand-tightened to a 23-line STRICT-C++11 repro
+(the cvise output itself relied on a C++20 typename omission g++
+rejects -- ALWAYS re-verify harvests with g++ -std=c++11, the clang
+gate alone is too lenient).  Root: guess_template_args' template-id
+branch required ID_C_template on the argument instance; a
+forward-declared-only template's instance (tag-__tree_node<int,void>)
+has full_template_args but no C_template -> pattern
+__tree_node_types<_NodePtr, __tree_node<_Tp,_VoidPtr>> undeduced ->
+declaration dropped.  Fixed by accepting recorded template arguments
+([temp.deduct.type] needs no completeness).  CORE:
+cpp11_spec_match_incomplete_instance.
+
+set_insert NEXT layer: same __pair1_ as a MEMBER of __tree now fails
+"invalid initializer '__pair1_'" at <__tree>:1341 (the member decl
+converts, but its use in __tree's ctor mem-init region misfires).
+Then the wrong-code layer (pointer derefs) behind it.
+
+Diagnosis speed lesson: the map-dump probe at convert_template_
+parameter's throw (identifier + type_map one-liner) found in ONE run
+what bt-based bisection took six runs to narrow; prefer it for
+'symbol X is unknown' bugs.  sizeof(empty struct)==0 in CBMC (g++: 1)
+-- do not gate repro assertions on sizeof of possibly-empty structs.
