@@ -5048,10 +5048,20 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
           class_sym->type.find(ID_C_template_arguments));
         const auto &enc_params = enc_template.template_parameters();
         const auto &enc_arg_list = enc_args.arguments();
-        for(std::size_t k = 0; k < enc_params.size() && k < enc_arg_list.size();
-            ++k)
+        // N5008 [temp.variadic]/7: a trailing pack that matched ZERO
+        // arguments is still deduced -- to the empty sequence -- so the
+        // loop must reach the pack parameter even when the instance's
+        // argument list ends before it (`__integer_sequence<size_t>`
+        // with _Values = {}: one argument, two parameters).  Otherwise
+        // the pack stays unbound and the member alias body's
+        // `(_Values + _Sp)...` expansion, finding no pack state, resolves
+        // the bare pack name and fails -- silently dropping the enclosing
+        // conversion (the std::tuple constructor's mem-init shape).
+        for(std::size_t k = 0; k < enc_params.size(); ++k)
         {
           const auto &param = enc_params[k];
+          if(k >= enc_arg_list.size() && !param.get_bool(ID_ellipsis))
+            break;
           // A parameter PACK consumes a variable number of arguments;
           // beyond it the positional pairing is meaningless, and pack
           // bindings themselves need build()'s pack machinery
@@ -5091,7 +5101,7 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
                 pack_exprs.push_back(enc_arg_list[j]);
             }
             cpp_typecheck.template_map.pack_size_map[pack_id] =
-              enc_arg_list.size() - k;
+              k < enc_arg_list.size() ? enc_arg_list.size() - k : 0;
             if(!pack_types.empty())
             {
               if(pack_types.size() == 1)
