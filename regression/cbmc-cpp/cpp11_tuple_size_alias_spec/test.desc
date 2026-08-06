@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ ts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free distillation of libc++'s <__tuple/tuple_size.h>; found
+while diagnosing the bodiless std::tuple constructor (the tuple_size
+mis-selection made _SameSize=false, sending __make_tuple_types into
+the heavy flat machinery and the ctor conversion into a recursion
+error).
