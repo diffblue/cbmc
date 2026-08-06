@@ -4830,3 +4830,14 @@ before concluding anything (a stale binary re-misled the bisection
 mid-round).
 Tuple family's remaining layer: the tuple CONSTRUCTOR no-body
 (_EnableUTypesCtor enable-if machinery).
+
+## Round 16 addendum: lambda trailing decltype (2026-08-06)
+
+cvs1 (the __s anon-union criterion) converged on a SHALLOWER bug
+satisfying the same message: lambda parameters not in scope in their
+own trailing return type ([dcl.fct]/8), doubly broken (pre-scope
+typecheck + raw parse tree re-typechecked in the closure class).
+Fixed; CORE cpp11_lambda_param_trailing_decltype.  The anon-union __s
+layer itself remains unharvested -- reseed with a criterion EXCLUDING
+the lambda shape (e.g. require "__rep" or "basic_string" to survive)
+next time.
