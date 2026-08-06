@@ -1534,6 +1534,30 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                 }
               }
             }
+            // N5008 [temp.spec.partial.match]/2: a TRAILING pack
+            // pattern also matches a LONGER argument list (npat <
+            // nfull), the pack absorbing the remainder --
+            // `__tuple_impl<__tuple_indices<_Indx...>, _Tp...>` (2
+            // pattern entries) vs `<__tuple_indices<0,1>, int, int>`
+            // (3 arguments).  Only MULTI-pack heads take this path:
+            // a single trailing pack is already handled correctly by
+            // template_mapt::build from the flat list, and
+            // double-binding regressed the recursive single-pack
+            // shapes (cpp11_variadic_ctor_pack_multi).
+            else if(
+              !partial_specialization_args.arguments().empty() &&
+              (partial_specialization_args.arguments().back().get_bool(
+                 ID_ellipsis) ||
+               partial_specialization_args.arguments().back().type().get_bool(
+                 ID_ellipsis)))
+            {
+              std::size_t n_packs = 0;
+              for(const auto &tp :
+                  cpp_declaration.template_type().template_parameters())
+                if(tp.get_bool(ID_ellipsis))
+                  ++n_packs;
+              size_ok = n_packs >= 2;
+            }
             if(!size_ok)
               continue;
           }
@@ -1549,16 +1573,113 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
 
           cpp_typecheck_resolvet resolver(*this);
 
-          for(std::size_t i = 0; i < full_args_tc.arguments().size(); i++)
           {
-            if(full_args_tc.arguments()[i].id() == ID_type)
-              resolver.guess_template_args(
-                partial_specialization_args.arguments()[i].type(),
-                full_args_tc.arguments()[i].type());
-            else
-              resolver.guess_template_args(
-                partial_specialization_args.arguments()[i],
-                full_args_tc.arguments()[i]);
+            const std::size_t sel_npat =
+              partial_specialization_args.arguments().size();
+            const bool sel_trailing_pack =
+              sel_npat > 0 &&
+              (partial_specialization_args.arguments().back().get_bool(
+                 ID_ellipsis) ||
+               partial_specialization_args.arguments().back().type().get_bool(
+                 ID_ellipsis));
+            std::size_t sel_n_packs = 0;
+            for(const auto &tp :
+                cpp_declaration.template_type().template_parameters())
+              if(tp.get_bool(ID_ellipsis))
+                ++sel_n_packs;
+            // N5008 [temp.spec.partial.match]/2 multi-pack case (see the
+            // size gate above): positional prefix, then the trailing
+            // pack absorbs the remainder as ONE pack -- per-argument
+            // guessing against the pack pattern would overwrite the
+            // binding with each element.
+            const bool multi_pack_absorb =
+              sel_trailing_pack && sel_n_packs >= 2 &&
+              sel_npat <= full_args_tc.arguments().size();
+            const std::size_t n_positional =
+              multi_pack_absorb
+                ? sel_npat - 1
+                : std::min(sel_npat, full_args_tc.arguments().size());
+            for(std::size_t i = 0; i < n_positional; i++)
+            {
+              if(full_args_tc.arguments()[i].id() == ID_type)
+                resolver.guess_template_args(
+                  partial_specialization_args.arguments()[i].type(),
+                  full_args_tc.arguments()[i].type());
+              else
+                resolver.guess_template_args(
+                  partial_specialization_args.arguments()[i],
+                  full_args_tc.arguments()[i]);
+            }
+            if(!multi_pack_absorb && sel_npat > n_positional)
+            {
+              // original behaviour: remaining pattern entries (equal
+              // or npat > nfull cases) guessed per argument position
+              for(std::size_t i = n_positional;
+                  i < full_args_tc.arguments().size() && i < sel_npat;
+                  i++)
+              {
+                if(full_args_tc.arguments()[i].id() == ID_type)
+                  resolver.guess_template_args(
+                    partial_specialization_args.arguments()[i].type(),
+                    full_args_tc.arguments()[i].type());
+                else
+                  resolver.guess_template_args(
+                    partial_specialization_args.arguments()[i],
+                    full_args_tc.arguments()[i]);
+              }
+            }
+            if(multi_pack_absorb)
+            {
+              const auto &last = partial_specialization_args.arguments().back();
+              const irept &last_t =
+                last.id() == ID_ambiguous || last.id() == ID_type
+                  ? static_cast<const irept &>(last.type())
+                  : static_cast<const irept &>(last);
+              irep_idt pack_id;
+              if(
+                last_t.id() == ID_cpp_name && !last_t.get_sub().empty() &&
+                last_t.get_sub().front().id() == ID_name)
+              {
+                const irep_idt pn = last_t.get_sub().front().get(ID_identifier);
+                const auto ids = cpp_scopes.current_scope().lookup(
+                  pn,
+                  cpp_scopet::RECURSIVE,
+                  cpp_idt::id_classt::TEMPLATE_PARAMETER);
+                for(const auto *idp : ids)
+                  pack_id = idp->identifier;
+              }
+              if(!pack_id.empty())
+              {
+                std::vector<typet> pack_elems;
+                std::vector<exprt> pack_exprs;
+                for(std::size_t j = n_positional;
+                    j < full_args_tc.arguments().size();
+                    j++)
+                {
+                  const auto &a = full_args_tc.arguments()[j];
+                  if(a.id() == ID_type)
+                  {
+                    if(a.type().id() != ID_empty)
+                      pack_elems.push_back(a.type());
+                  }
+                  else if(a.id() != ID_unassigned)
+                    pack_exprs.push_back(a);
+                }
+                template_map.pack_size_map[pack_id] =
+                  pack_elems.size() + pack_exprs.size();
+                if(!pack_exprs.empty())
+                {
+                  template_map.pack_expr_map[pack_id] = pack_exprs;
+                  template_map.expr_map[pack_id] = pack_exprs.front();
+                }
+                else
+                {
+                  template_map.pack_args_map[pack_id] = pack_elems;
+                  if(!pack_elems.empty())
+                    template_map.type_map[pack_id] = pack_elems.front();
+                }
+              }
+            }
           }
 
           cpp_template_args_tct guessed_args =
@@ -3177,12 +3298,19 @@ const symbolt &cpp_typecheckt::instantiate_template(
       !pattern_args.arguments().empty() &&
       (pattern_args.arguments().back().get_bool(ID_ellipsis) ||
        pattern_args.arguments().back().find(ID_type).get_bool(ID_ellipsis));
+    std::size_t sb_n_packs = 0;
+    for(const auto &tp : template_type.template_parameters())
+      if(tp.get_bool(ID_ellipsis))
+        ++sb_n_packs;
     if(
       !pattern_args.arguments().empty() &&
       (pattern_args.arguments().size() ==
          full_template_args.arguments().size() ||
        (trailing_pack_pattern && pattern_args.arguments().size() ==
-                                   full_template_args.arguments().size() + 1)))
+                                   full_template_args.arguments().size() + 1) ||
+       (trailing_pack_pattern && sb_n_packs >= 2 &&
+        pattern_args.arguments().size() <
+          full_template_args.arguments().size())))
     {
       cpp_saved_template_mapt saved_map_for_deduction(template_map);
       cpp_save_scopet save_scope_for_deduction(cpp_scopes);
@@ -3195,7 +3323,13 @@ const symbolt &cpp_typecheckt::instantiate_template(
       cpp_typecheck_resolvet resolver(*this);
       try
       {
-        for(std::size_t i = 0; i < full_template_args.arguments().size(); ++i)
+        const std::size_t sb_npat = pattern_args.arguments().size();
+        const std::size_t sb_nfull = full_template_args.arguments().size();
+        const bool sb_absorb =
+          trailing_pack_pattern && sb_n_packs >= 2 && sb_npat <= sb_nfull;
+        const std::size_t sb_pos =
+          sb_absorb ? sb_npat - 1 : std::min(sb_npat, sb_nfull);
+        for(std::size_t i = 0; i < sb_pos; ++i)
         {
           if(full_template_args.arguments()[i].id() == ID_type)
             resolver.guess_template_args(
@@ -3204,6 +3338,75 @@ const symbolt &cpp_typecheckt::instantiate_template(
           else
             resolver.guess_template_args(
               pattern_args.arguments()[i], full_template_args.arguments()[i]);
+        }
+        if(!sb_absorb)
+        {
+          for(std::size_t i = sb_pos; i < sb_nfull && i < sb_npat; ++i)
+          {
+            if(full_template_args.arguments()[i].id() == ID_type)
+              resolver.guess_template_args(
+                pattern_args.arguments()[i].type(),
+                full_template_args.arguments()[i].type());
+            else
+              resolver.guess_template_args(
+                pattern_args.arguments()[i], full_template_args.arguments()[i]);
+          }
+        }
+        else
+        {
+          // N5008 [temp.spec.partial.match]/2: bind the remainder as
+          // ONE pack (see the selection loop; __tuple_impl's
+          // <long... _Indx, class... _Tp> head instantiated directly
+          // with flat args needs _Tp = {int, int}, or the
+          // __tuple_leaf<_Indx> bases are never created and get's
+          // derived-to-base static_cast silently drops its body).
+          const auto &last = pattern_args.arguments().back();
+          const irept &last_t =
+            last.id() == ID_ambiguous || last.id() == ID_type
+              ? static_cast<const irept &>(last.type())
+              : static_cast<const irept &>(last);
+          irep_idt pack_id;
+          if(
+            last_t.id() == ID_cpp_name && !last_t.get_sub().empty() &&
+            last_t.get_sub().front().id() == ID_name)
+          {
+            const irep_idt pn = last_t.get_sub().front().get(ID_identifier);
+            const auto ids = cpp_scopes.current_scope().lookup(
+              pn,
+              cpp_scopet::RECURSIVE,
+              cpp_idt::id_classt::TEMPLATE_PARAMETER);
+            for(const auto *idp : ids)
+              pack_id = idp->identifier;
+          }
+          if(!pack_id.empty())
+          {
+            std::vector<typet> pack_elems;
+            std::vector<exprt> pack_exprs;
+            for(std::size_t j = sb_pos; j < sb_nfull; ++j)
+            {
+              const auto &a = full_template_args.arguments()[j];
+              if(a.id() == ID_type)
+              {
+                if(a.type().id() != ID_empty)
+                  pack_elems.push_back(a.type());
+              }
+              else if(a.id() != ID_unassigned)
+                pack_exprs.push_back(a);
+            }
+            template_map.pack_size_map[pack_id] =
+              pack_elems.size() + pack_exprs.size();
+            if(!pack_exprs.empty())
+            {
+              template_map.pack_expr_map[pack_id] = pack_exprs;
+              template_map.expr_map[pack_id] = pack_exprs.front();
+            }
+            else
+            {
+              template_map.pack_args_map[pack_id] = pack_elems;
+              if(!pack_elems.empty())
+                template_map.type_map[pack_id] = pack_elems.front();
+            }
+          }
         }
         // an unmatched trailing pack pattern deduces the EMPTY pack
         // ([temp.variadic]/7)

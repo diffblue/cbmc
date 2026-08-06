@@ -843,20 +843,47 @@ void cpp_typecheckt::typecheck_compound_declarator(
                   [pp != std::string::npos ? full.substr(pp + 2) : full] =
                     pa.second[k];
               }
+              // N5008 [temp.variadic]/5 likewise for NON-TYPE packs: the
+              // k-th VALUE substitutes for a bare reference to the pack.
+              // libc++ __tuple_impl's delegating constructor initializes
+              //   __tuple_leaf<_Uf>(std::forward<_Up>(__u))...
+              // where _Uf is the ctor template's own INDEX pack: without
+              // the value substitution both expanded initializers kept
+              // `_Uf` (later resolved through the scalar convenience
+              // entry, i.e. element 0), so EVERY leaf call targeted
+              // __tuple_leaf<0> and the second element was lost.
+              std::map<std::string, exprt> elem_expr_by_short;
+              for(const auto &pe : template_map.pack_expr_map)
+              {
+                if(pe.second.size() <= k)
+                  continue;
+                const std::string full = id2string(pe.first);
+                auto pp = full.rfind("::");
+                elem_expr_by_short
+                  [pp != std::string::npos ? full.substr(pp + 2) : full] =
+                    pe.second[k];
+              }
               std::function<void(irept &)> subst_tp = [&](irept &nn)
               {
                 if(
                   nn.id() == ID_cpp_name && nn.get_sub().size() == 1 &&
                   nn.get_sub().front().id() == ID_name)
                 {
-                  auto it = elem_by_short.find(
-                    id2string(nn.get_sub().front().get(ID_identifier)));
+                  const std::string sn =
+                    id2string(nn.get_sub().front().get(ID_identifier));
+                  auto it = elem_by_short.find(sn);
                   if(it != elem_by_short.end())
                   {
                     // the cpp_name sits where a TYPE is expected (the
                     // `type` of a template argument); substitute the
                     // element type directly
                     nn = it->second;
+                    return;
+                  }
+                  auto it2 = elem_expr_by_short.find(sn);
+                  if(it2 != elem_expr_by_short.end())
+                  {
+                    nn = it2->second;
                     return;
                   }
                 }
