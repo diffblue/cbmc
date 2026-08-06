@@ -4879,3 +4879,29 @@ RAM/2.  Reduction jobs lost (cw1 tuple-ctor link+run gate; cw2
 with = {} pthread stubs -- NOT plain removal, which breaks constexpr
 mutex() natively).  cw1 is now OBSOLETE (this fix reached deeper via
 direct diagnosis); cw2/cw3 recipes recorded above for relaunch.
+
+## Round 17 cont. (2026-08-06 evening): empty-pack pre-bind; next tuple layer
+
+FIXED: member-alias enclosing pre-bind skipped a trailing pack once
+the instance's args ran out ([temp.variadic]/7 -- empty pack is still
+deduced).  __integer_sequence<size_t>::__to_tuple_indices<0> threw on
+unbound _Values; sequence-counter probes proved the <ul,0,1>/<ul,0>
+resolutions bound fine and only the EMPTY <ul> one threw.  CORE:
+cpp11_member_alias_empty_pack (counterfactually verified via
+stash+rebuild).
+
+Tuple ctor NEXT layer (evidence, not yet fixed): with the _Values
+throw gone, the ctor body conversion now dies in a candidate-churn
+storm -- ~39k alternating SFINAE throws on pair's 339::_T1 vs tuple's
+269::_Tp during typecheck_decl of a mem-init temporary
+(resolve_scope -> disambiguate __make_tuple_types -> per-candidate
+typecheck).  Final throw escapes to convert_function's catch(int) with
+EMPTY error stream.  Shape strongly resembles the tuple_size churn
+(fixed by strict_cv_deduction) but through _CtorPredicateFromPair /
+_EnableCtorFromPair (tuple:741-780, pair-taking ctor family whose
+enable_if evaluates against tuple<_Tp...> with _T1/_T2 patterns).
+Resume: identify why the pair-ctor candidates are instantiated at all
+during a UTypes-ctor body conversion; likely another deduction
+leniency (per [temp.deduct.type]/8 the pattern pair<_Up1,_Up2> cannot
+match int) letting a doomed candidate substitute expensive SFINAE.
+Watch total wall-time: ~5min for tc.cpp even now.
