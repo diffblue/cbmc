@@ -7136,9 +7136,23 @@ void cpp_typecheck_resolvet::guess_template_args(
                 // template's parameter. We need to substitute the
                 // alias param name in alias_type with this cpp_name.
                 const irept &targ = targs[i];
-                const irept &targ_type =
+                irept targ_type =
                   targ.id() == ID_ambiguous ? targ.find(ID_type) : targ;
-                if(targ_type.id() != ID_cpp_name)
+                if(targ_type.id() == ID_type)
+                  targ_type = targ_type.find(ID_type);
+                // Substitutable argument shapes: a plain name and a
+                // cv-qualified name (`const _Tp`, libc++'s
+                // __enable_if_tuple_size_imp pattern).  N5008
+                // [temp.alias]/2: the alias-id is equivalent to the
+                // substituted defining-type-id -- including the
+                // argument's cv-qualifiers; dropping them here left
+                // the alias body's parameter name in place, which then
+                // collided with the SPECIALIZATION's identically-named
+                // parameter and deduced it without const, see
+                // strict_cv_deduction.
+                if(
+                  targ_type.id() != ID_cpp_name &&
+                  targ_type.id() != ID_merged_type)
                   continue;
 
                 // The alias parameter's base name.  A type parameter carries
@@ -7714,9 +7728,22 @@ void cpp_typecheck_resolvet::guess_template_args(
     for(const auto &t : to_merged_type(template_type).subtypes())
     {
       if(t.id() == ID_const)
+      {
+        // N5008 [temp.deduct.type]/8: in strict (partial-specialization
+        // matching) mode, a cv-qualified pattern requires a
+        // correspondingly qualified argument; `const T` does not match
+        // a non-const type, so deduction fails (T stays unassigned and
+        // the candidate is discarded by the has_unassigned() check).
+        if(strict_cv_deduction && !desired.get_bool(ID_C_constant))
+          return;
         desired.remove(ID_C_constant);
+      }
       else if(t.id() == ID_volatile)
+      {
+        if(strict_cv_deduction && !desired.get_bool(ID_C_volatile))
+          return;
         desired.remove(ID_C_volatile);
+      }
       else
         guess_template_args(t, desired);
     }
