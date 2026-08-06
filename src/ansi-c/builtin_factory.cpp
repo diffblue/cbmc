@@ -175,32 +175,16 @@ bool builtin_factory(
       if(find_pattern(pattern, gcc_builtin_headers_ia32, s))
         return convert(identifier, s, symbol_table, mh);
 
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_2, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_3, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_4, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_5, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_6, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_7, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_8, s))
-        return convert(identifier, s, symbol_table, mh);
-
-      if(find_pattern(pattern, gcc_builtin_headers_ia32_9, s))
+    }
+    else if(config.ansi_c.arch=="arm64")
+    {
+      // AArch64 has its own NEON builtins and none of the 32-bit-only (e.g.
+      // iWMMXt) builtins, so search only the AArch64 header -- otherwise a
+      // 32-bit ARM signature could win for a NEON name shared by both.
+      if(find_pattern(pattern, gcc_builtin_headers_aarch64, s))
         return convert(identifier, s, symbol_table, mh);
     }
-    else if(config.ansi_c.arch=="arm64" ||
-            config.ansi_c.arch=="armel" ||
+    else if(config.ansi_c.arch=="armel" ||
             config.ansi_c.arch=="armhf" ||
             config.ansi_c.arch=="arm")
     {
