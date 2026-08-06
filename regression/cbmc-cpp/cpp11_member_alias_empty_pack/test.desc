@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ zero indices: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The --stdlib libc++ flag engages the CLANG-preprocessor-gated
+member-alias enclosing pre-bind (the file itself is header-free).
+Counterfactually verified: without the fix main is dropped
+(0 properties, "could not fully type-check" warning).
