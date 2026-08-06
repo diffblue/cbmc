@@ -1033,9 +1033,12 @@ BigInt::operator*= (BigInt const &y)
 
 // Division method returning both quotient and remainder.
 
-void
-BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
+BigInt::divisiont BigInt::div(BigInt const &x, BigInt const &y)
 {
+  divisiont result;
+  BigInt &q = result.quotient;
+  BigInt &r = result.remainder;
+
   // Eliminate some trivial cases.
   int cmp = x.ucompare (y);
   if (cmp < 0)
@@ -1044,7 +1047,7 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       r = x;
       q.length = 0;
       q.positive = true;
-      return;
+      return result;
     }
   if (cmp == 0)
     {
@@ -1055,13 +1058,13 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       q.digit[0] = 1;
       if (!y.positive)
 	q.negate();
-      return;
+      return result;
     }
   if (y.length == 0)
     {
     zero:
       error ("Division by zero.");
-      return;
+      return result;
     }
   if (x.is_ulong())
     {
@@ -1076,7 +1079,7 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
   else if (y.length == 1)
     {
       // This digit_div() transforms the dividend into the quotient.
-      q = y;
+      q = x;
       r.digit[0] = digit_div (q.digit, q.length, y.digit[0]);
       r.length = r.digit[0] ? 1 : 0;
     }
@@ -1105,9 +1108,11 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       if (a[al-1] >= b[bl-1])
 	a[al++] = 0;
 
-      // Prepare q for receiving the quotient.
+      // Prepare q for receiving the quotient. Set the length only
+      // after resizing: resize copies `length` digits from the old
+      // buffer, which may be shorter than the new length.
+      q.resize(al - bl);
       q.length = al - bl;
-      q.resize (q.length);
 
       // Divide.
       digit_div (a, b, bl, q.digit, q.length);
@@ -1117,13 +1122,14 @@ BigInt::div (BigInt const &x, BigInt const &y, BigInt &q, BigInt &r)
       if (scale != 1)
 	digit_div (a, al, scale);
       if (al && a[al - 1] == 0) --al;
+      r.resize(al);
       r.length = al;
-      r.resize (r.length);
       memcpy (r.digit, a, al * sizeof (onedig_t));
     }
   q.adjust();
   q.positive = q.length == 0 || x.positive == y.positive;
   r.positive = r.length == 0 || x.positive;
+  return result;
 }
 
 BigInt &
