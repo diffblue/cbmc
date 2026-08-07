@@ -138,7 +138,7 @@ cprover_library.inc: library/converter$(EXEEXT) library/*.c
 	library/converter$(EXEEXT) library/*.c > $@
 
 %.inc: %.h file_converter$(EXEEXT)
-	./file_converter$(EXEEXT) $< > $@
+	./file_converter$(EXEEXT) --line $< > $@
 
 ansi_c_internal_additions$(OBJEXT): $(BUILTIN_FILES)
 

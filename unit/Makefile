@@ -50,6 +50,7 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
        ansi-c/allocate_objects.cpp \
        ansi-c/expr2c.cpp \
+       ansi-c/file_converter.cpp \
        ansi-c/type2name.cpp \
        ansi-c/c_typecheck_base.cpp \
        big-int/big-int.cpp \
