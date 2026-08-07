@@ -821,9 +821,93 @@ void cpp_typecheckt::typecheck_compound_declarator(
           if(init.get_bool(ID_ellipsis))
             fn_pack = mi_ref_base(init);
           std::size_t arity = 0;
+          bool arity_known = false;
           if(!fn_pack.empty())
+          {
             arity = pack_counts[fn_pack];
-          if(init.get_bool(ID_ellipsis) && arity > 0)
+            arity_known = arity > 0;
+          }
+          // N5008 [temp.variadic]/5,7: a mem-initializer pack expansion
+          // need not mention a FUNCTION parameter pack at all --
+          // `__tuple_leaf<_Ul, _Tl>()...` (libc++ __tuple_impl's
+          // default-constructed tail leaves) expands in lockstep over
+          // TEMPLATE parameter packs only.  Its arity is the (common,
+          // /5) length of the referenced template packs; an EMPTY pack
+          // expansion produces zero mem-initializers, i.e. the
+          // initializer is dropped, NOT kept with a dangling `...`
+          // (which failed to convert and silently discarded the whole
+          // constructor body).
+          if(init.get_bool(ID_ellipsis) && !arity_known)
+          {
+            std::size_t tp_arity = 0;
+            bool found = false, consistent = true;
+            std::function<void(const irept &)> scan = [&](const irept &n)
+            {
+              if(n.id() == ID_name)
+              {
+                const std::string sn = id2string(n.get(ID_identifier));
+                auto probe = [&](std::size_t len)
+                {
+                  if(!found)
+                  {
+                    tp_arity = len;
+                    found = true;
+                  }
+                  else if(tp_arity != len)
+                    consistent = false;
+                };
+                for(const auto &pa : template_map.pack_args_map)
+                {
+                  const std::string full = id2string(pa.first);
+                  auto pp = full.rfind("::");
+                  if(
+                    (pp != std::string::npos ? full.substr(pp + 2) : full) ==
+                    sn)
+                    probe(pa.second.size());
+                }
+                for(const auto &pe : template_map.pack_expr_map)
+                {
+                  const std::string full = id2string(pe.first);
+                  auto pp = full.rfind("::");
+                  if(
+                    (pp != std::string::npos ? full.substr(pp + 2) : full) ==
+                    sn)
+                    probe(pe.second.size());
+                }
+                if(!found)
+                {
+                  for(const auto &ps : template_map.pack_size_map)
+                  {
+                    if(ps.second != 0)
+                      continue;
+                    const std::string full = id2string(ps.first);
+                    auto pp = full.rfind("::");
+                    if(
+                      (pp != std::string::npos ? full.substr(pp + 2) : full) ==
+                      sn)
+                      probe(0);
+                  }
+                }
+              }
+              for(const auto &c : n.get_sub())
+                scan(c);
+              for(const auto &c : n.get_named_sub())
+                scan(c.second);
+            };
+            scan(init);
+            if(found && consistent)
+            {
+              arity = tp_arity;
+              arity_known = true;
+              if(arity == 0)
+              {
+                // zero-length expansion: contributes no mem-initializers
+                any_whole = true;
+                continue;
+              }
+            }
+          }
+          if(init.get_bool(ID_ellipsis) && arity_known && arity > 0)
           {
             any_whole = true;
             for(std::size_t k = 0; k < arity; ++k)
