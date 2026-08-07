@@ -5090,3 +5090,24 @@ drift; cross-preprocessing swaps one builtin gap for another
 -fsyntax-only ERROR-COUNT BASELINE (seed yields 15, all cascades of
 __remove_reference/__integer_pack; reject any variant exceeding it).
 cy1 relaunched with it; cx2 (logic_error empty-args) still grinding.
+
+## Round 22 (2026-08-07 late): TT-scope fix; init_list narrowed; cx3 launched
+
+FIXED: resolve_scope counterpart of the round-21 TT-consumer fix
+([temp.deduct.type]/8) — TT-param as SCOPE component with args
+(`_Alloc<_Tp,_Args...>::template rebind<_Up>`).  CORE
+cpp11_tt_param_scope_rebind.  Real set_insert STILL fails
+__node_allocator: full-fidelity models (nx8/nx9 incl. the SFINAE
+discriminator + _Tp short-name collisions) all PASS — the residual
+needs real-header context; cx3 reduction launched (criterion
+'__node_allocator is unknown', clang+libc++ compile+run gate, --n 2).
+
+initializer_list layer NARROWED: memmove preconditions GONE (round-20
+fixes); the residual wrong-code is inside the
+vector(initializer_list) ctor chain — the ctor IS called with a
+correct {arr,3} temp; size ends wrong.  Next: --trace session on the
+size assertion; suspect __init_with_size / construct_at loop under
+--unwind 5.
+
+Three reductions running (cx2 logic_error, cx3 node_allocator, cy1
+umap baseline-gated), 3+2+3 workers x 4GB = 32GB budget OK.
