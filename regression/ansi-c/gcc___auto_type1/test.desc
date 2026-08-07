@@ -6,3 +6,11 @@ main.c
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+^syntax error
+--
+__auto_type, both unqualified and with type qualifiers (const/volatile/const
+volatile), must parse and deduce the initializer's type, mirroring GCC.  For
+the qualified forms the qualifier's effect is checked at compile time via
+typeof(&x), since __builtin_types_compatible_p ignores top-level qualifiers; a
+dropped qualifier turns a static_assert into a negative-width bit-field, i.e. a
+CONVERSION ERROR.

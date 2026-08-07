@@ -1121,18 +1121,21 @@ declaring_list:
         | TOK_GCC_AUTO_TYPE declarator
           post_declarator_attributes_opt '=' initializer
         {
-          // handled as typeof(initializer)
-          parser_stack($1).id(ID_typeof);
-          parser_stack($1).copy_to_operands(parser_stack($5));
-
-          $2=merge($3, $2);
-
-          // the symbol has to be visible during initialization
-          init($$, ID_declaration);
-          parser_stack($$).type().swap(parser_stack($1));
-          PARSER.add_declarator(parser_stack($$), parser_stack($2));
-          // add the initializer
-          to_ansi_c_declaration(parser_stack($$)).add_initializer(parser_stack($5));
+          // __auto_type var = init; handled as typeof(init) var = init;
+          // Shared logic with the qualified production below lives in
+          // new_auto_type_declaration(); keep the two in sync.
+          new_auto_type_declaration($$, $1, $2, $3, $5, nullptr);
+        }
+        | type_qualifier_list TOK_GCC_AUTO_TYPE declarator
+          post_declarator_attributes_opt '=' initializer
+        {
+          // Qualified __auto_type: 'const/volatile/... __auto_type
+          // var = initializer;' is equivalent to
+          // '<qualifiers> typeof(initializer) var = initializer;'.
+          // Shared logic with the unqualified production above lives in
+          // new_auto_type_declaration(); the qualifier list is merged into
+          // the typeof type there.
+          new_auto_type_declaration($$, $2, $3, $4, $6, &$1);
         }
         | declaring_list ',' gcc_type_attribute_opt declarator
           post_declarator_attributes_opt
