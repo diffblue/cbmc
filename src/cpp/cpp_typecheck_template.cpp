@@ -823,6 +823,26 @@ void cpp_typecheckt::typecheck_class_template_member(
       lookup_scope = &cpp_scopes.get_scope((*outer_ids.begin())->identifier);
       class_tmpl_base_name = cpp_name.get_sub()[2].get(ID_identifier);
     }
+    else
+    {
+      // N5008 [class.mfct]/1 + [namespace.qual]: the same syntactic
+      // shape `A::B<args>::member` also covers a NAMESPACE-qualified
+      // out-of-line member definition -- e.g. libstdc++'s
+      //   template <typename _Traits>
+      //   std::basic_streambuf<_Traits>::basic_streambuf(...) = default;
+      // written INSIDE namespace std with a redundant qualifier
+      // ([namespace.qual] allows it).  Resolve the leading component as
+      // a namespace and look the class template up there; previously
+      // the leading component was looked up as a class TEMPLATE and the
+      // whole definition failed ("class template 'std' not found").
+      const auto ns_ids = cpp_scopes.current_scope().lookup(
+        outer_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::NAMESPACE);
+      if(!ns_ids.empty())
+      {
+        lookup_scope = &cpp_scopes.get_scope((*ns_ids.begin())->identifier);
+        class_tmpl_base_name = cpp_name.get_sub()[2].get(ID_identifier);
+      }
+    }
   }
   auto id_set = lookup_scope->lookup(
     class_tmpl_base_name,
