@@ -697,8 +697,53 @@ void cpp_typecheckt::convert_non_template_declaration(
     // is available.
     if(
       d.type().id() == ID_function_type && d.value().is_nil() && !is_typedef &&
-      !d.get_is_parameter())
+        !d.get_is_parameter() &&
+        // N5008 [dcl.fct]/6: a cv-qualifier-seq in this position belongs
+        // to a (member) function declarator only; a variable cannot have
+        // one, so `... do_close(catalog) const` is unambiguously a
+        // function.  (Read through a CONST reference: the non-const
+        // accessor add()s an empty node, which is not nil.)
+        [&]() -> bool
+      {
+        const irept &mq =
+          static_cast<const cpp_declaratort &>(d).method_qualifier();
+        return mq.is_nil() || mq.id().empty();
+      }())
     {
+      // N5008 [basic.lookup.unqual]/5: for a member declared OUTSIDE
+      // its class (`void messages<char>::do_close(catalog);`), names
+      // after the declarator-id are looked up in the member's class.
+      // Resolve the qualified declarator's scope and perform the
+      // can-it-be-a-type probes there; probing at namespace scope
+      // missed class-scope (and inherited, [class.member.lookup])
+      // typedefs like messages_base::catalog and mis-reinterpreted the
+      // explicit-specialization DECLARATION as a void variable with a
+      // parenthesized initializer (the libstdc++ <locale>/<regex>
+      // `template <> void messages<char>::do_close(catalog) const;`
+      // shape).
+      cpp_save_scopet redisambig_scope_guard(cpp_scopes);
+      {
+        bool name_is_qualified = false;
+        for(const auto &sub : d.name().get_sub())
+          if(sub.id() == "::")
+            name_is_qualified = true;
+        if(name_is_qualified)
+        {
+          try
+          {
+            cpp_typecheck_resolvet scope_resolver(*this);
+            irep_idt scope_base;
+            cpp_template_args_non_tct scope_targs;
+            cpp_scopet &member_scope =
+              scope_resolver.resolve_scope(d.name(), scope_base, scope_targs);
+            cpp_scopes.go_to(member_scope);
+          }
+          catch(...)
+          {
+            // scope unresolvable: keep probing at the current scope
+          }
+        }
+      }
       const irept::subt &params = d.type().find(ID_parameters).get_sub();
       bool all_bare_nontype_names = !params.empty();
       for(const auto &param : params)
