@@ -5053,3 +5053,16 @@ use data members, never sizeof(struct)>=1.
    divergence (cx2 relaunched on that criterion); cy1 (umap) relaunched
    with VALGRIND gate (ftrivial-auto-var-init gate was gameable:
    pattern-init is nonzero natively, nondet in CBMC).
+
+## Round 20 cont.: regex divergence layer 2 (namespace-qualified defs)
+
+cx2 second harvest (252B, minutes to converge): out-of-line member
+definitions with a redundant NAMESPACE qualifier
+(`std::basic_streambuf<_T>::basic_streambuf(...) = default;` inside
+namespace std, [class.mfct]/1 + [namespace.qual]) fell through the
+A::B<args>::member handler (class-only leading-component lookup) and
+killed the TU.  Fixed + CORE cpp11_ns_qualified_member_definition.
+cx2 relaunched on regex layer 3: "found no match for symbol
+'logic_error'" with EMPTY argument types (a __throw_logic_error
+definition whose throw-expression's ctor args vanish).  The symex
+crash criterion remains queued behind it.
