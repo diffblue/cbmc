@@ -3518,6 +3518,46 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
                   id_set.insert(f);
               }
             }
+            else if(
+              e.id() == ID_type &&
+              (e.type().id() == ID_struct_tag || e.type().id() == ID_union_tag))
+            {
+              // N5008 [temp.deduct.type]/8: same as the resolve-with-
+              // arguments site -- deduction binds the TT-parameter to
+              // the argument INSTANCE; a SCOPE use with template
+              // arguments (`_Alloc<_Tp, _Args...>::template
+              // rebind<_Up>`, libc++ __allocator_traits_rebind's
+              // partial-specialization body walking into the member
+              // template) names the TEMPLATE the instance came from.
+              // Derive it here too; otherwise the qualified-name walk
+              // failed and std::set's __node_allocator typedef chain
+              // (__tree line 925) was dropped.
+              const irep_idt inst_id =
+                e.type().id() == ID_struct_tag
+                  ? to_struct_tag_type(e.type()).get_identifier()
+                  : to_union_tag_type(e.type()).get_identifier();
+              const symbolt *inst_sym =
+                cpp_typecheck.symbol_table.lookup(inst_id);
+              if(inst_sym != nullptr)
+              {
+                auto found = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+                  inst_sym->base_name,
+                  cpp_scopet::RECURSIVE,
+                  cpp_idt::id_classt::TEMPLATE);
+                for(const auto &f : found)
+                {
+                  const symbolt *cand =
+                    cpp_typecheck.symbol_table.lookup(f->identifier);
+                  if(
+                    cand != nullptr && cand->type.get_bool(ID_is_template) &&
+                    to_cpp_declaration(cand->type)
+                      .type()
+                      .get(ID_specialization_of)
+                      .empty())
+                    id_set.insert(f);
+                }
+              }
+            }
           }
         }
 
