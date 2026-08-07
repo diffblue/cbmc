@@ -4970,3 +4970,34 @@ Diagnosis efficiency: counting probes keyed by base_name at
 disambiguate/typecheck_template_args entries found the hot template
 in ONE run; the instantiation-stack print at convert_template_
 parameter's throw gave the semantic context without gdb.
+
+## Round 19 (2026-08-07): TUPLE FAMILY COMPLETE — 4 KNOWNBUG -> CORE
+
+std::tuple works end-to-end under libc++ (construction, get, make_tuple
+heterogeneous, apply).  Final layer had three defects
+([temp.variadic]/5,7):
+1. mem-init pack expansion with NO function param pack
+   (`leaf<Ul,Tl>()...`) — arity from template packs' common length;
+   empty -> DROP the initializer (was: dangling `...` failed the ctor).
+2. base-specifier expander substituted only the FIRST referenced pack
+   (parallel packs collapsed to scalar -> leaf<k,int> for
+   tuple<int,double,char>; homogeneous tuples masked it).
+3. apply()'s base-template-args fallback + spec-matching convenience
+   entries concretized >=2-element pack names before the expander.
+
+REGRESSION LESSON (suite caught both): the deduction-side scalar
+convenience entries in cpp_typecheck_resolve.cpp (4411, 7659) are
+LOAD-BEARING for member-alias (cpp11_alias_template_parallel_pack) and
+variable-template (cpp14_variable_template_pack_partial_spec)
+machinery — blanket-gating them to single-element regressed both.
+The >=2 invariant applies ONLY where name-keyed re-expansion follows
+(instantiate spec-matching sites, build(), gfta); deduction-side
+consumers resolve through build_template_args which needs the scalar.
+
+Desc format gotcha: several old KNOWNBUG descs lack the second `--`;
+their history notes sit in the disallowed-regex section and test.pl
+FATALS on unparenthesized '(' in them once the test is CORE.  Insert
+the separator when flipping.
+
+Remaining 14 KNOWNBUGs.  Next: cx1 set member layer (1KB harvest),
+cx2 (240B), cw2 (3.1KB), umap cy1 reducing.
