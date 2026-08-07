@@ -5021,3 +5021,35 @@ gate the template-binding to non-deduced contexts.
 
 Empty-struct sizeof==0 artifact bit twice more in repro assertions —
 use data members, never sizeof(struct)>=1.
+
+## Round 20 (2026-08-07): cx2 + cw2 roots fixed
+
+1. cx2 (regex divergence): [basic.lookup.unqual]/5 -- the
+   [dcl.ambig.res]/1 re-disambiguation probed parameter names at
+   namespace scope; out-of-line member decls need the member's class
+   scope (+ [dcl.fct]/6 cv-qualifier forces function interp).  CORE
+   cpp11_expl_spec_member_decl_class_lookup.  GOTCHA: cpp_declaratort::
+   method_qualifier() non-const accessor add()s an empty node -- gate
+   via const read or id().empty(); the non-const read silently
+   disabled the whole re-disambiguation (suite caught
+   cpp11_ptr_ref_paren_init_global).
+2. cw2 (<<type:auto>>): [dcl.spec.auto.general]/13 -- bodiless
+   `auto end(T);` outranked defined `end(T(&)[N])` via the
+   template-arg-COUNT tie-breaker.  Fix: intermediate ranking key
+   penalising candidates whose TEMPLATE has no body (never-deducible
+   auto).  TWO failed attempts instructive: (a) binary non-template
+   key + partial-ordering delegation regressed erase_if/sort (count
+   key load-bearing for __copy_move stack -- old key selects the
+   ITERATOR __copy_m whose pointer handling happens to verify; the
+   standard-correct pick exposes a LATENT pointer bug, parked);
+   (b) ret==auto penalty was a no-op (ALL not-yet-instantiated
+   candidates show auto at ranking) and I nearly committed it on a
+   vacuous SUCCESS -- tail -1 is NOT verification, ALWAYS check
+   props>0.  CORE cpp20_undeduced_auto_overload_rank.
+   cpp20 family now converts + runs BMC end-to-end (vector 9/5289
+   fails = semantic layer; initializer_list memmove preconditions;
+   erase_if next).
+3. regex symex crash still behind a 'class template std not found'
+   divergence (cx2 relaunched on that criterion); cy1 (umap) relaunched
+   with VALGRIND gate (ftrivial-auto-var-init gate was gameable:
+   pattern-init is nonzero natively, nondet in CBMC).
