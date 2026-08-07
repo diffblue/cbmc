@@ -5001,3 +5001,23 @@ the separator when flipping.
 
 Remaining 14 KNOWNBUGs.  Next: cx1 set member layer (1KB harvest),
 cx2 (240B), cw2 (3.1KB), umap cy1 reducing.
+
+## Round 19 cont.: cx1 root found — TT-param binds instance not template
+
+px-chain bisection of the cx1 harvest: `R<_Alloc<_Tp>, _Up>` with body
+`_Alloc<_Up>` yields allocator<int> for _Up=char — the TT param is
+bound to the argument INSTANCE ([temp.deduct.type]/8 requires the
+TEMPLATE).  Candidate fix (template_parameter_symbol_typet binding,
+mirroring typecheck_template_args' explicit-TT representation) FIXES
+the whole px chain + makes set_insert's conversion clean (only its
+wrong-code layer left!) BUT regresses cpp11_libcxx_tuple (make_tuple
+wrong-code returns) and pushes deque/map past 2^8 objects — instance
+unification was load-bearing somewhere in make_tuple's chain.  Patch
+archived (.kiro/reductions/tt_param_deduction_fix_regressed.patch);
+KNOWNBUG cpp11_tt_param_rebind_instance banked.  Next attempt should
+find WHERE the instance-binding is consumed (probably template_map
+apply of `_Alloc<_Up>` bodies) and fix the CONSUMER instead, or
+gate the template-binding to non-deduced contexts.
+
+Empty-struct sizeof==0 artifact bit twice more in repro assertions —
+use data members, never sizeof(struct)>=1.
