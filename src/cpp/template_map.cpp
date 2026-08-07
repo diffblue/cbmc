@@ -1823,6 +1823,55 @@ void template_mapt::build(
     return; // mismatched template arguments — skip
   }
 
+  // N5008 [temp.variadic]/5,8: with MULTIPLE parameter packs the flat
+  // argument list cannot encode the split between packs -- positional
+  // (re)binding scrambles them.  When the caller (function-template
+  // deduction, guess_function_template_args) has already bound EVERY
+  // pack of this template (live pack_size_map entries), keep those
+  // deduction-time bindings and bind nothing positionally here; the
+  // deferred-body drain replays the same bindings from
+  // #fn_template_packs.  Gated to n_packs >= 2.
+  if(n_packs >= 2)
+  {
+    bool all_packs_bound = true;
+    for(const auto &tp : template_parameters)
+    {
+      if(!tp.get_bool(ID_ellipsis))
+        continue;
+      const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                              : tp.get(ID_identifier);
+      if(pid.empty() || pack_size_map.find(pid) == pack_size_map.end())
+      {
+        all_packs_bound = false;
+        break;
+      }
+    }
+    if(all_packs_bound)
+    {
+      // Same hygiene as the single-pack path below: a pack of two or
+      // more elements must NOT retain a scalar type_map/expr_map
+      // binding (the per-element deduction in
+      // guess_function_template_args leaves the LAST element there) --
+      // apply() would concretize the pack reference in the parameter
+      // pattern and the in-class replication could no longer identify
+      // the pack by name ([temp.variadic]/5).
+      for(const auto &tp : template_parameters)
+      {
+        if(!tp.get_bool(ID_ellipsis))
+          continue;
+        const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                                : tp.get(ID_identifier);
+        const auto ps_it = pack_size_map.find(pid);
+        if(ps_it != pack_size_map.end() && ps_it->second >= 2)
+        {
+          type_map.erase(pid);
+          expr_map.erase(pid);
+        }
+      }
+      return;
+    }
+  }
+
   // Per C++ name-lookup rules, the parameters of the template
   // currently being instantiated SHADOW any same-named parameters
   // from a textually-enclosing template that is also currently

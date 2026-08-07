@@ -3739,12 +3739,30 @@ const symbolt &cpp_typecheckt::instantiate_template(
               // Detect a genuine parameter pack by the top-level ellipsis on
               // the declarator/type only; do NOT remove on a mere nested
               // occurrence of the pack name.
+              //
+              // And only remove it when ITS OWN pack is among the empty
+              // ones: with MULTIPLE template parameter packs (libc++
+              // __tuple_impl's five-pack constructor, `_Ul`/`_Tl` empty
+              // but `_Up` two-element), removing every ellipsis parameter
+              // dropped the NON-empty `_Up&&... __u` too, leaving a
+              // 4-parameter constructor no 6-argument call can match
+              // ([temp.variadic]/7 applies per pack, not per overload).
               for(const auto &d : p.get_sub())
+              {
                 if(
-                  d.id() == ID_cpp_declarator &&
-                  (d.find(ID_type).get_bool(ID_ellipsis) ||
-                   d.get_bool(ID_ellipsis)))
-                  return true;
+                  d.id() != ID_cpp_declarator ||
+                  (!d.find(ID_type).get_bool(ID_ellipsis) &&
+                   !d.get_bool(ID_ellipsis)))
+                  continue;
+                const auto &pd = static_cast<const cpp_declarationt &>(p);
+                const irept *t = &static_cast<const irept &>(pd.type());
+                while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                  t = &t->get_sub().front();
+                std::string own;
+                if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                  own = id2string(t->get_sub().front().get(ID_identifier));
+                return own.empty() || ep_names.count(own) != 0;
+              }
               return false;
             }),
           params.get_sub().end());
@@ -3943,14 +3961,26 @@ skip_pack_removal:
               // N5008 [temp.variadic]/7: remove only a genuine *function
               // parameter pack* (top-level `...`); keep a parameter whose
               // type merely contains a nested empty pack expansion (its
-              // argument list collapses but the parameter remains).  See the
-              // matching predicate earlier in instantiate_template.
+              // argument list collapses but the parameter remains).  And
+              // only when ITS OWN pack is among the empty ones -- see the
+              // matching predicate earlier in instantiate_template
+              // (multi-pack constructors keep their non-empty packs).
               for(const auto &d : p.get_sub())
+              {
                 if(
-                  d.id() == ID_cpp_declarator &&
-                  (d.find(ID_type).get_bool(ID_ellipsis) ||
-                   d.get_bool(ID_ellipsis)))
-                  return true;
+                  d.id() != ID_cpp_declarator ||
+                  (!d.find(ID_type).get_bool(ID_ellipsis) &&
+                   !d.get_bool(ID_ellipsis)))
+                  continue;
+                const auto &pd = static_cast<const cpp_declarationt &>(p);
+                const irept *t = &static_cast<const irept &>(pd.type());
+                while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                  t = &t->get_sub().front();
+                std::string own;
+                if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                  own = id2string(t->get_sub().front().get(ID_identifier));
+                return own.empty() || ep_names.count(own) != 0;
+              }
               return false;
             }),
           params.get_sub().end());
@@ -5682,7 +5712,23 @@ skip_pack_removal_ft:
                       d.id() == ID_cpp_declarator &&
                       (d.find(ID_type).get_bool(ID_ellipsis) ||
                        d.get_bool(ID_ellipsis)))
-                      return true;
+                    {
+                      // N5008 [temp.variadic]/7 applies per pack: with
+                      // MULTIPLE template parameter packs (libc++
+                      // __tuple_impl's five-pack constructor), remove the
+                      // function parameter pack only when ITS OWN pack is
+                      // among the empty ones -- `_Up&&... __u` (two
+                      // elements) must survive `_Ul`/`_Tl` being empty.
+                      const auto &pd = static_cast<const cpp_declarationt &>(p);
+                      const irept *t = &static_cast<const irept &>(pd.type());
+                      while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                        t = &t->get_sub().front();
+                      std::string own;
+                      if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                        own =
+                          id2string(t->get_sub().front().get(ID_identifier));
+                      return own.empty() || ep_names.count(own) != 0;
+                    }
                     // Also check for template_parameter_symbol_typet
                     // referencing empty pack
                     const auto &dtype = d.find(ID_type);
@@ -6877,7 +6923,70 @@ skip_pack_removal_ft:
     template_pack_index < all_template_params.size();
 
   std::vector<exprt> pack_arguments;
+  bool pack_arguments_from_map = false;
+  // N5008 [temp.variadic]/5,8: with MULTIPLE template parameter packs
+  // (libc++ __tuple_impl's five-pack constructor), the positional
+  // arithmetic below (`total - (num_params - 1)` slots at the FIRST
+  // pack's index) cannot split the flat argument list between the
+  // packs.  The FUNCTION parameter pack's elements are recorded
+  // per-pack in the template map by deduction
+  // (guess_function_template_args); source them from there.  Gated to
+  // n_packs >= 2: single-pack shapes keep the positional path.
   if(has_template_pack)
+  {
+    std::size_t n_template_packs = 0;
+    for(const auto &tp : all_template_params)
+      if(tp.get_bool(ID_ellipsis))
+        ++n_template_packs;
+    if(n_template_packs >= 2 && !new_decl.declarators().empty())
+    {
+      // the function parameter pack's TYPE names its template pack
+      // (e.g. `Up` in `Up&&... u`); walk to the innermost cpp_name
+      const irept &fparams0 =
+        new_decl.declarators()[0].type().find(ID_parameters);
+      irep_idt fn_pack_short;
+      for(const auto &fp : fparams0.get_sub())
+      {
+        if(fp.id() != ID_cpp_declaration)
+          continue;
+        const auto &d = static_cast<const cpp_declarationt &>(fp);
+        if(
+          d.declarators().empty() ||
+          !d.declarators().front().type().get_bool(ID_ellipsis))
+          continue;
+        const typet merged = d.declarators().front().merge_type(d.type());
+        const irept *t = &static_cast<const irept &>(merged);
+        while(t->id() != ID_cpp_name && !t->get_sub().empty())
+          t = &t->get_sub().front();
+        if(t->id() == ID_cpp_name && !t->get_sub().empty())
+          fn_pack_short = t->get_sub().front().get(ID_identifier);
+      }
+      if(!fn_pack_short.empty())
+      {
+        for(const auto &tp : all_template_params)
+        {
+          if(!tp.get_bool(ID_ellipsis) || tp.id() != ID_type)
+            continue;
+          const irep_idt pid = tp.type().get(ID_identifier);
+          const std::string pid_str = id2string(pid);
+          const auto pos = pid_str.rfind("::");
+          if(
+            (pos != std::string::npos ? pid_str.substr(pos + 2) : pid_str) !=
+            id2string(fn_pack_short))
+            continue;
+          const auto pa_it = template_map.pack_args_map.find(pid);
+          if(pa_it != template_map.pack_args_map.end())
+          {
+            for(const auto &t : pa_it->second)
+              pack_arguments.push_back(exprt(ID_type, t));
+            pack_arguments_from_map = true;
+          }
+          break;
+        }
+      }
+    }
+  }
+  if(has_template_pack && !pack_arguments_from_map)
   {
     const std::size_t non_pack0 = all_template_params.size() - 1;
     const std::size_t total = full_template_args.arguments().size();
