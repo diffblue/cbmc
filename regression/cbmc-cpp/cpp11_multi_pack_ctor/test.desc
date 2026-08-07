@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ pack arities: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free distillation of libc++ <tuple>'s __tuple_impl constructor
+(std::tuple's __base_ mem-init).  The remaining tuple KNOWNBUG layer
+is __tuple_impl's own mem-init lockstep (leaf construction).
