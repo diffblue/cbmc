@@ -5111,3 +5111,16 @@ size assertion; suspect __init_with_size / construct_at loop under
 
 Three reductions running (cx2 logic_error, cx3 node_allocator, cy1
 umap baseline-gated), 3+2+3 workers x 4GB = 32GB budget OK.
+
+## Round 22 cont.: harvest triage
+
+cx3 (907B) leaned on implicit-typename (C++20-in-cpp11 clang
+extension); strict models pass -> relaunched with g++ error-count
+baseline gate (2125, clang-builtin cascades).  cx2 (102B) criterion
+was GAMED: its 'CONVERSION ERROR' came from the harvest's own invalid
+`main()` while the logic_error no-match is RECOVERED noise (the
+[class.default.ctor]/2 implicit-deletion machinery works: le1/le2
+strict repros verify fine, le2 even exercises throw/catch of the
+derived).  Relaunched with a CAUSAL criterion (no-match within 8
+lines of CONVERSION ERROR).  LESSON for criteria: pair the marker
+with its consequence, not mere co-occurrence.
