@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++
 ^VERIFICATION SUCCESSFUL$
@@ -7,6 +7,7 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+--
 Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
 libc++ <tuple>: member typedef _BaseT unknown during tuple_element
 instantiation, cascading to 'no match for get'; a direct
@@ -39,3 +40,11 @@ CONSTRUCTOR itself has no body
 (tuple(this, rref_signed_int, rref_signed_int) -- the _EnableUTypesCtor
 enable-if ctor machinery); get assertions still fail through the
 unconstructed object.
+Round-19 (2026-08-07): FIXED end-to-end -- the constructor layer fell
+in three stages: has_conflict candidate gates ([temp.deduct.type]/2),
+multi-pack function templates ([temp.variadic]/5,7,8, the five-pack
+__tuple_impl ctor), and multi-pack lockstep in mem-inits and base
+specifiers (heterogeneous leaf types).  CORE with non-vacuous
+assertions; g++/clang++ replicas verified along the way
+(cpp11_multi_pack_ctor, cpp11_tuple_size_alias_spec,
+cpp11_member_alias_empty_pack).
