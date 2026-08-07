@@ -8789,6 +8789,129 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     }
   }
 
+  // N5008 [temp.variadic]/5,8: with MULTIPLE template parameter packs
+  // (libc++ __tuple_impl's five-pack constructor `<size_t... _Uf,
+  // class... _Tf, size_t... _Ul, class... _Tl, class... _Up>`), the
+  // flat positional argument list cannot encode how arguments split
+  // between the packs, and the single-pack surgery below (placeholder
+  // dropping/expansion keyed to the FIRST pack) mis-pairs parameters
+  // with arguments.  The per-pack element bindings recorded by the
+  // deduction above (pack_args_map/pack_expr_map/pack_size_map) are
+  // authoritative ([temp.deduct]); rebuild the flat list by walking
+  // the parameters and splicing each pack's elements (an empty pack
+  // contributes nothing, [temp.variadic]/7).  Gated to n_packs >= 2:
+  // single-pack shapes keep the existing (battle-tested) path.
+  {
+    const auto &mp_params =
+      cpp_declaration.template_type().template_parameters();
+    std::size_t mp_n_packs = 0;
+    for(const auto &tp : mp_params)
+      if(tp.get_bool(ID_ellipsis))
+        ++mp_n_packs;
+    bool mp_all_sized = mp_n_packs >= 2;
+    // The FUNCTION parameter pack's deduced element types live only in
+    // the local pack_deduced_types (they are entered into the map after
+    // this block in the single-pack path); allow exactly ONE unmapped
+    // pack and serve it from there.
+    irep_idt mp_fn_pack;
+    if(mp_all_sized)
+    {
+      for(const auto &tp : mp_params)
+      {
+        if(!tp.get_bool(ID_ellipsis))
+          continue;
+        const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                                : tp.get(ID_identifier);
+        if(pid.empty())
+        {
+          mp_all_sized = false;
+          break;
+        }
+        if(
+          cpp_typecheck.template_map.pack_size_map.find(pid) ==
+          cpp_typecheck.template_map.pack_size_map.end())
+        {
+          if(mp_fn_pack.empty() && tp.id() == ID_type)
+            mp_fn_pack = pid;
+          else
+          {
+            mp_all_sized = false;
+            break;
+          }
+        }
+      }
+    }
+    if(mp_all_sized)
+    {
+      cpp_template_args_tct::argumentst spliced;
+      bool ok = true;
+      for(const auto &tp : mp_params)
+      {
+        const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                                : tp.get(ID_identifier);
+        if(tp.get_bool(ID_ellipsis))
+        {
+          const auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pid);
+          const auto pe_it = cpp_typecheck.template_map.pack_expr_map.find(pid);
+          if(pid == mp_fn_pack)
+          {
+            // the function parameter pack: deduced per-argument above
+            for(const auto &t : pack_deduced_types)
+              spliced.push_back(exprt(ID_type, t));
+            // record the binding so template_mapt::build's multi-pack
+            // gate (and sizeof... evaluation) sees this pack as bound
+            cpp_typecheck.template_map.pack_size_map[pid] =
+              pack_deduced_types.size();
+            cpp_typecheck.template_map.pack_args_map[pid] = pack_deduced_types;
+            // NO scalar type_map convenience entry: build() deliberately
+            // avoids scalar-binding packs of two or more elements -- the
+            // scalar CONCRETIZES the pack reference in the parameter
+            // pattern (`Up&&...` becomes `int&&`), and the in-class
+            // replication (cpp_typecheck_compound_type.cpp) can then no
+            // longer identify the pack by name to expand it per
+            // [temp.variadic]/5.
+            if(pack_deduced_types.size() == 1)
+              cpp_typecheck.template_map.type_map[pid] =
+                pack_deduced_types.front();
+          }
+          else if(pa_it != cpp_typecheck.template_map.pack_args_map.end())
+          {
+            for(const auto &t : pa_it->second)
+              spliced.push_back(exprt(ID_type, t));
+          }
+          else if(pe_it != cpp_typecheck.template_map.pack_expr_map.end())
+          {
+            for(const auto &v : pe_it->second)
+              spliced.push_back(v);
+          }
+          // empty pack: contributes no arguments
+        }
+        else if(tp.id() == ID_type)
+        {
+          const typet t = cpp_typecheck.template_map.lookup_type(pid);
+          if(t.is_nil())
+          {
+            ok = false;
+            break;
+          }
+          spliced.push_back(exprt(ID_type, t));
+        }
+        else
+        {
+          const exprt e = cpp_typecheck.template_map.lookup_expr(pid);
+          if(e.is_nil())
+          {
+            ok = false;
+            break;
+          }
+          spliced.push_back(e);
+        }
+      }
+      if(ok)
+        template_args.arguments().swap(spliced);
+    }
+  }
+
   // Convert deduction-failed markers (ID_nil) to ID_unassigned so that
   // has_unassigned() detects them and rejects the template.  Keep the
   // failure distinguishable (#deduction_failed): for a parameter PACK,
