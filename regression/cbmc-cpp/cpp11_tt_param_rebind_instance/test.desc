@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ resolved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+g++/clang++ accept and the assertion holds natively.  See main.cpp
+header for the candidate fix and its regressions.
