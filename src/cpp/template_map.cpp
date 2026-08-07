@@ -595,8 +595,45 @@ void template_mapt::apply(typet &type) const
                     }
                   }
                 }
+                // N5008 [temp.variadic]/5: an argument that NAMES a
+                // pack of two or more elements (a bare cpp_name, e.g.
+                // the `_Tp` of `__tuple_leaf<_Indx, _Tp>...`) belongs
+                // to the enclosing base-specifier pack expansion; it is
+                // substituted per-element by the base expander in
+                // instantiate_template.  apply() here would collapse it
+                // to a scalar (the heterogeneous tuple<int,double,char>
+                // shape: every leaf became leaf<k, int>).  Leave it.
                 if(!was_pack)
                 {
+                  const irept *nm = &static_cast<const irept &>(arg);
+                  if(nm->id() == ID_ambiguous)
+                    nm = &nm->find(ID_type);
+                  bool names_big_pack = false;
+                  if(
+                    nm->id() == ID_cpp_name && nm->get_sub().size() == 1 &&
+                    nm->get_sub().front().id() == ID_name)
+                  {
+                    const std::string sn =
+                      id2string(nm->get_sub().front().get(ID_identifier));
+                    for(const auto &pe : pack_args_map)
+                    {
+                      const std::string full = id2string(pe.first);
+                      const auto pp = full.rfind("::");
+                      if(
+                        (pp != std::string::npos ? full.substr(pp + 2)
+                                                 : full) == sn &&
+                        pe.second.size() >= 2)
+                      {
+                        names_big_pack = true;
+                        break;
+                      }
+                    }
+                  }
+                  if(names_big_pack)
+                  {
+                    expanded.push_back(arg);
+                    continue;
+                  }
                   apply(static_cast<exprt &>(arg));
                   if(!(arg.id() == ID_type &&
                        static_cast<const exprt &>(arg).type().id() == ID_empty))

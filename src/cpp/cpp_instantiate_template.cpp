@@ -1671,15 +1671,23 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                 }
                 template_map.pack_size_map[pack_id] =
                   pack_elems.size() + pack_exprs.size();
+                // Scalar convenience entries only for SINGLE-element
+                // packs: a >=2-element scalar CONCRETIZES the pack
+                // reference in patterns (base-specifier / parameter
+                // replication is keyed by NAME), collapsing e.g.
+                // `__tuple_leaf<_Indx, _Tp>...` to the first element's
+                // type for every leaf ([temp.variadic]/5; the
+                // heterogeneous tuple<int,double,char> shape).
                 if(!pack_exprs.empty())
                 {
                   template_map.pack_expr_map[pack_id] = pack_exprs;
-                  template_map.expr_map[pack_id] = pack_exprs.front();
+                  if(pack_exprs.size() == 1)
+                    template_map.expr_map[pack_id] = pack_exprs.front();
                 }
                 else
                 {
                   template_map.pack_args_map[pack_id] = pack_elems;
-                  if(!pack_elems.empty())
+                  if(pack_elems.size() == 1)
                     template_map.type_map[pack_id] = pack_elems.front();
                 }
               }
@@ -3403,15 +3411,18 @@ const symbolt &cpp_typecheckt::instantiate_template(
             }
             template_map.pack_size_map[pack_id] =
               pack_elems.size() + pack_exprs.size();
+            // Single-element-only scalar entries; see the matching
+            // comment in the selection loop above.
             if(!pack_exprs.empty())
             {
               template_map.pack_expr_map[pack_id] = pack_exprs;
-              template_map.expr_map[pack_id] = pack_exprs.front();
+              if(pack_exprs.size() == 1)
+                template_map.expr_map[pack_id] = pack_exprs.front();
             }
             else
             {
               template_map.pack_args_map[pack_id] = pack_elems;
-              if(!pack_elems.empty())
+              if(pack_elems.size() == 1)
                 template_map.type_map[pack_id] = pack_elems.front();
             }
           }
@@ -4567,8 +4578,15 @@ skip_pack_removal_ft:
         // element substituted into the pattern.  This covers patterns
         // that merely REFERENCE the pack (a template-id); the bare
         // `Pack...` shape keeps its established path below.
-        // Which bound pack does this ellipsis'd base reference?
-        std::string used_pack_short;
+        // Which bound packs does this ellipsis'd base reference?  Per
+        // N5008 [temp.variadic]/5 ALL packs named in the pattern expand
+        // in LOCKSTEP (same length, /5 sentence 2); substituting only
+        // the first-found pack left any parallel pack collapsed to its
+        // scalar convenience element -- `__tuple_leaf<_Indx, _Tp>...`
+        // instantiated as leaf<0,int>, leaf<1,int>, leaf<2,int> for
+        // tuple<int,double,char> (coincidentally right for homogeneous
+        // element types, wrong otherwise).
+        std::vector<std::string> used_pack_shorts;
         if(base.get_bool(ID_ellipsis))
         {
           std::function<bool(const irept &, const std::string &)> refs_name =
@@ -4586,18 +4604,13 @@ skip_pack_removal_ft:
           };
           for(const auto &pe : pack_type_elems)
             if(refs_name(base.find(ID_name), pe.first))
-            {
-              used_pack_short = pe.first;
-              break;
-            }
-          if(used_pack_short.empty())
-            for(const auto &pe : pack_expr_elems)
-              if(refs_name(base.find(ID_name), pe.first))
-              {
-                used_pack_short = pe.first;
-                break;
-              }
+              used_pack_shorts.push_back(pe.first);
+          for(const auto &pe : pack_expr_elems)
+            if(refs_name(base.find(ID_name), pe.first))
+              used_pack_shorts.push_back(pe.first);
         }
+        const std::string used_pack_short =
+          used_pack_shorts.empty() ? std::string{} : used_pack_shorts.front();
         const std::vector<typet> used_type_elems =
           pack_type_elems.count(used_pack_short)
             ? pack_type_elems[used_pack_short]
@@ -4642,47 +4655,69 @@ skip_pack_removal_ft:
             const std::size_t n_elems = !used_type_elems.empty()
                                           ? used_type_elems.size()
                                           : used_expr_elems.size();
-            for(std::size_t elem_i = 0; elem_i < n_elems; ++elem_i)
+            // [temp.variadic]/5: all packs of one expansion have equal
+            // length; substitute EVERY referenced pack's elem_i-th
+            // element in one pass.
+            bool lockstep_ok = true;
+            for(const auto &ps : used_pack_shorts)
             {
-              irept new_base = base;
-              new_base.remove(ID_ellipsis);
-              exprt elem_arg;
-              if(!used_type_elems.empty())
-              {
-                elem_arg = exprt(ID_type);
-                elem_arg.type() = used_type_elems[elem_i];
-              }
-              else
-                elem_arg = used_expr_elems[elem_i];
-              std::function<void(irept &)> subst = [&](irept &n)
-              {
-                for(auto &c : n.get_sub())
-                {
-                  // replace a cpp_name that IS the bare pack reference
-                  if(c.id() == ID_cpp_name || c.id() == ID_ambiguous)
-                  {
-                    const irept &inner =
-                      c.id() == ID_ambiguous ? c.find(ID_type) : c;
-                    if(
-                      inner.id() == ID_cpp_name &&
-                      inner.get_sub().size() == 1 &&
-                      inner.get_sub().front().id() == ID_name &&
-                      id2string(inner.get_sub().front().get(ID_identifier)) ==
-                        used_pack_short)
-                    {
-                      c = elem_arg;
-                      continue;
-                    }
-                  }
-                  subst(c);
-                }
-                for(auto &c : n.get_named_sub())
-                  subst(c.second);
-              };
-              subst(new_base);
-              expanded_bases.push_back(new_base);
+              const std::size_t len = pack_type_elems.count(ps)
+                                        ? pack_type_elems[ps].size()
+                                        : pack_expr_elems[ps].size();
+              if(len != n_elems)
+                lockstep_ok = false;
             }
-            continue;
+            if(lockstep_ok)
+            {
+              for(std::size_t elem_i = 0; elem_i < n_elems; ++elem_i)
+              {
+                irept new_base = base;
+                new_base.remove(ID_ellipsis);
+                std::function<void(irept &)> subst = [&](irept &n)
+                {
+                  for(auto &c : n.get_sub())
+                  {
+                    // replace a cpp_name that IS a bare pack reference
+                    if(c.id() == ID_cpp_name || c.id() == ID_ambiguous)
+                    {
+                      const irept &inner =
+                        c.id() == ID_ambiguous ? c.find(ID_type) : c;
+                      if(
+                        inner.id() == ID_cpp_name &&
+                        inner.get_sub().size() == 1 &&
+                        inner.get_sub().front().id() == ID_name)
+                      {
+                        const std::string nm =
+                          id2string(inner.get_sub().front().get(ID_identifier));
+                        if(
+                          std::find(
+                            used_pack_shorts.begin(),
+                            used_pack_shorts.end(),
+                            nm) != used_pack_shorts.end())
+                        {
+                          exprt elem_arg;
+                          if(pack_type_elems.count(nm))
+                          {
+                            elem_arg = exprt(ID_type);
+                            elem_arg.type() = pack_type_elems[nm][elem_i];
+                          }
+                          else
+                            elem_arg = pack_expr_elems[nm][elem_i];
+                          c = elem_arg;
+                          continue;
+                        }
+                      }
+                    }
+                    subst(c);
+                  }
+                  for(auto &c : n.get_named_sub())
+                    subst(c.second);
+                };
+                subst(new_base);
+                expanded_bases.push_back(new_base);
+              }
+              continue;
+            }
           }
         }
         // Check if this base references the pack parameter
