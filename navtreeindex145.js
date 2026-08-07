@@ -1,5 +1,8 @@
 var NAVTREEINDEX145 =
 {
+"structsolver__hardnesst.html#af1a9c5d467278c45908f8c174aa8aeea":[7,0,1184,14],
+"structsolver__hardnesst_1_1assertion__statst.html":[7,0,1184,0],
+"structsolver__hardnesst_1_1assertion__statst.html#a09f347fd7e6c7d59838fe1eb7dc85d8b":[7,0,1184,0,1],
 "structsolver__hardnesst_1_1assertion__statst.html#a4937af2fdb9ea6a6c6c11fc82ff75cad":[7,0,1184,0,2],
 "structsolver__hardnesst_1_1assertion__statst.html#ab0054e52624b63cfdee36cf4c8451832":[7,0,1184,0,3],
 "structsolver__hardnesst_1_1assertion__statst.html#acd45a12b140b5b1bfd9d736f8d19ab51":[7,0,1184,0,0],
@@ -246,8 +249,5 @@ var NAVTREEINDEX145 =
 "structunsigned__union__find_1_1nodet.html":[7,0,1341,0],
 "structunsigned__union__find_1_1nodet.html#a702cdc3b41a5c47769b8a298250588c1":[7,0,1341,0,0],
 "structunsigned__union__find_1_1nodet.html#a73add529e4eb06242fb5fe1612df82f1":[7,0,1341,0,2],
-"structunsigned__union__find_1_1nodet.html#af371d1339cfed35ffd27fab2d86729dc":[7,0,1341,0,1],
-"structured__data_8cpp.html":[8,0,2,30,231],
-"structured__data_8cpp.html#ac2c534ca7c130d9d56f893f3839477f1":[8,0,2,30,231,0],
-"structured__data_8cpp.html#affd581d59d4a7e93613034fc2e9ea72f":[8,0,2,30,231,1]
+"structunsigned__union__find_1_1nodet.html#af371d1339cfed35ffd27fab2d86729dc":[7,0,1341,0,1]
 };

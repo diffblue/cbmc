@@ -1,9 +1,16 @@
 <map id="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/file_converter.cpp" name="/home/runner/work/cbmc/cbmc/src/ansi&#45;c/file_converter.cpp">
-<area shape="rect" id="Node000001" title="Convert file contents to C strings." alt="" coords="51,5,235,60"/>
-<area shape="rect" id="Node000002" title=" " alt="" coords="5,108,79,133"/>
-<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,62,68,101,64,97,111,58"/>
-<area shape="rect" id="Node000003" title=" " alt="" coords="103,108,183,133"/>
-<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="146,60,146,94,141,94,141,60"/>
-<area shape="rect" id="Node000004" title=" " alt="" coords="207,108,266,133"/>
-<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,58,216,96,212,100,170,62"/>
+<area shape="rect" id="Node000001" title="Convert file contents to a C character&#45;array initialiser." alt="" coords="156,5,340,60"/>
+<area shape="rect" id="Node000002" href="$file__converter_8h.html" title="Convert file contents to a C character&#45;array initialiser." alt="" coords="5,108,128,133"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="194,62,104,105,102,100,191,58"/>
+<area shape="rect" id="Node000004" title=" " alt="" coords="131,181,189,207"/>
+<area shape="poly" id="edge7_Node000001_Node000004" title=" " alt="" coords="227,62,193,109,179,140,169,169,164,167,174,138,188,107,222,59"/>
+<area shape="rect" id="Node000005" title=" " alt="" coords="203,108,293,133"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="251,60,251,94,245,94,245,60"/>
+<area shape="rect" id="Node000006" title=" " alt="" coords="318,108,391,133"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="282,58,331,97,328,101,279,62"/>
+<area shape="rect" id="Node000007" title=" " alt="" coords="416,108,496,133"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="313,58,416,100,414,105,311,63"/>
+<area shape="rect" id="Node000003" title=" " alt="" coords="31,181,103,207"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="69,134,69,168,64,168,64,134"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="83,131,136,171,132,175,80,135"/>
 </map>

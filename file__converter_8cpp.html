@@ -102,9 +102,11 @@ $(document).ready(function(){initNavTree('file__converter_8cpp.html',''); initRe
 </div><!--header-->
 <div class="contents">
 
-<p>Convert file contents to C strings.  
+<p>Convert file contents to a C character-array initialiser.  
 <a href="#details">More...</a></p>
-<div class="textblock"><code>#include &lt;fstream&gt;</code><br />
+<div class="textblock"><code>#include &quot;<a class="el" href="file__converter_8h_source.html">file_converter.h</a>&quot;</code><br />
+<code>#include &lt;filesystem&gt;</code><br />
+<code>#include &lt;fstream&gt;</code><br />
 <code>#include &lt;iostream&gt;</code><br />
 <code>#include &lt;string&gt;</code><br />
 </div><div class="textblock"><div id="dynsection-0" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
@@ -112,51 +114,21 @@ $(document).ready(function(){initNavTree('file__converter_8cpp.html',''); initRe
 <div id="dynsection-0-summary" class="dynsummary" style="display:block;">
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
-<div class="center"><iframe scrolling="no" frameborder="0" src="file__converter_8cpp__incl.svg" width="272" height="139"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
+<div class="center"><iframe scrolling="no" frameborder="0" src="file__converter_8cpp__incl.svg" width="502" height="212"><p><b>This browser is not able to show SVG: try Firefox, Chrome, Safari, or Opera instead.</b></p></iframe></div>
 </div>
 </div>
 <p><a href="file__converter_8cpp_source.html">Go to the source code of this file.</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:ac7f74b6d740ae782cd9b833c3a0f1e08" id="r_ac7f74b6d740ae782cd9b833c3a0f1e08"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">void</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="file__converter_8cpp.html#ac7f74b6d740ae782cd9b833c3a0f1e08">convert_line</a> (<a class="el" href="classait.html">const</a> std::string &amp;line)</td></tr>
-<tr class="separator:ac7f74b6d740ae782cd9b833c3a0f1e08"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0ddf1224851353fc92bfbff6f499fa97" id="r_a0ddf1224851353fc92bfbff6f499fa97"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">int</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="file__converter_8cpp.html#a0ddf1224851353fc92bfbff6f499fa97">main</a> (<a class="el" href="classait.html">int</a> argc, <a class="el" href="classait.html">char</a> *argv[])</td></tr>
 <tr class="separator:a0ddf1224851353fc92bfbff6f499fa97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Convert file contents to C strings. </p>
+<div class="textblock"><p>Convert file contents to a C character-array initialiser. </p>
 
 <p class="definition">Definition in file <a class="el" href="file__converter_8cpp_source.html">file_converter.cpp</a>.</p>
 </div><h2 class="groupheader">Function Documentation</h2>
-<a id="ac7f74b6d740ae782cd9b833c3a0f1e08" name="ac7f74b6d740ae782cd9b833c3a0f1e08"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ac7f74b6d740ae782cd9b833c3a0f1e08">&#9670;&#160;</a></span>convert_line()</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="classait.html">void</a> convert_line </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="classait.html">const</a> std::string &amp;&#160;</td>
-          <td class="paramname"><em>line</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p class="definition">Definition at line <a class="el" href="file__converter_8cpp_source.html#l00016">16</a> of file <a class="el" href="file__converter_8cpp_source.html">file_converter.cpp</a>.</p>
-
-</div>
-</div>
 <a id="a0ddf1224851353fc92bfbff6f499fa97" name="a0ddf1224851353fc92bfbff6f499fa97"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0ddf1224851353fc92bfbff6f499fa97">&#9670;&#160;</a></span>main()</h2>
 
@@ -183,7 +155,7 @@ Functions</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="file__converter_8cpp_source.html#l00041">41</a> of file <a class="el" href="file__converter_8cpp_source.html">file_converter.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="file__converter_8cpp_source.html#l00019">19</a> of file <a class="el" href="file__converter_8cpp_source.html">file_converter.cpp</a>.</p>
 
 </div>
 </div>

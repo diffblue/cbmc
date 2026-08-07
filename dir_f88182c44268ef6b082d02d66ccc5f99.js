@@ -62,6 +62,7 @@ var dir_f88182c44268ef6b082d02d66ccc5f99 =
     [ "expr2c.h", "expr2c_8h.html", "expr2c_8h" ],
     [ "expr2c_class.h", "expr2c__class_8h.html", "expr2c__class_8h" ],
     [ "file_converter.cpp", "file__converter_8cpp.html", "file__converter_8cpp" ],
+    [ "file_converter.h", "file__converter_8h.html", "file__converter_8h" ],
     [ "gcc_types.cpp", "gcc__types_8cpp.html", "gcc__types_8cpp" ],
     [ "gcc_types.h", "gcc__types_8h.html", "gcc__types_8h" ],
     [ "gcc_version.cpp", "gcc__version_8cpp.html", "gcc__version_8cpp" ],
