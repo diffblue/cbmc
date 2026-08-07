@@ -4930,3 +4930,43 @@ parameter's throw (identifier + type_map one-liner) found in ONE run
 what bt-based bisection took six runs to narrow; prefer it for
 'symbol X is unknown' bugs.  sizeof(empty struct)==0 in CBMC (g++: 1)
 -- do not gate repro assertions on sizeof of possibly-empty structs.
+
+## Round 18 (2026-08-06 night): SFINAE storm + five-pack ctor
+
+FIXED (2 commits):
+1. has_conflict() at the 3 candidate gates ([temp.deduct.type]/2 --
+   ID_nil conflict bindings weren't rejected, doomed candidates paid a
+   full throwing pattern re-typecheck each; 39k throws/400s -> 50
+   throws/5.5s for tuple<int,int> ctor conversion).
+2. Multi-pack function templates (__tuple_impl's 5-pack ctor;
+   [temp.variadic]/5,7,8): gfta flat-args splice from per-pack
+   bindings; build() keeps deduction-time bindings when all packs
+   live (erasing >=2-element scalar residue -- the per-element
+   deduction leaves the LAST element in type_map, which concretizes
+   the pattern and defeats the in-class replication -- THAT was the
+   final piece); own-pack check in BOTH copies of the empty-pack
+   param removal (any-empty-pack removed the non-empty _Up&&... too).
+   All gated n_packs>=2.  CORE: cpp11_multi_pack_ctor (202 = arities
+   2/0/2 through a mem-init).
+
+Instantiation-path map (hard-won; keep): plain-class member template
+ctors go instantiate_template -> is_template_method(5497) ->
+typecheck_compound_declarator(6083); their function-param-pack 1->N
+replication lives in cpp_typecheck_compound_type.cpp ~510-720 keyed
+BY NAME (pack_by_short/referenced_pack).  FREE function templates
+expand at instantiate_template ~6950 (pack_arguments machinery, ALSO
+patched for multi-pack).  Class-template members expand during class
+instantiation (4785 branch).  A scalar type_map binding for a pack
+BREAKS the name-keyed replication -- invariant: packs with >=2
+elements must never have type_map/expr_map scalar entries.
+
+Tuple next layer: __base_ call now resolves; no-body moved INTO
+__tuple_impl's 5-pack ctor instance (mem-init lockstep
+`__tuple_leaf<_Uf,_Tf>(std::forward<_Up>(__u))...` -- three-pack
+lockstep over Uf/Tf/Up; round-16's elem_expr_by_short handles values,
+likely needs the multi-pack treatment for the leaf TYPES too).
+
+Diagnosis efficiency: counting probes keyed by base_name at
+disambiguate/typecheck_template_args entries found the hot template
+in ONE run; the instantiation-stack print at convert_template_
+parameter's throw gave the semantic context without gdb.
