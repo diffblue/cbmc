@@ -1708,7 +1708,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             }
           }
 
-          if(guessed_args.has_unassigned())
+          if(guessed_args.has_unassigned() || guessed_args.has_conflict())
             continue;
 
           // [temp.variadic]/5: expand a deduced function parameter pack
@@ -6385,7 +6385,7 @@ skip_pack_removal_ft:
           cpp_template_args_tct guessed =
             template_map.build_template_args(spec_decl.template_type());
 
-          if(guessed.has_unassigned())
+          if(guessed.has_unassigned() || guessed.has_conflict())
             continue;
 
           // N5008 [temp.variadic]/5: build_template_args emits a single

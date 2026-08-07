@@ -4430,7 +4430,9 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       cpp_typecheck.template_map.build_template_args(
         cpp_declaration.template_type());
 
-    if(!guessed_template_args.has_unassigned())
+    if(
+      !guessed_template_args.has_unassigned() &&
+      !guessed_template_args.has_conflict())
     {
       // [temp.variadic]/5: when the selected partial specialization ends in a
       // template parameter pack (`C<..., A...>`), `build_template_args` emits a
