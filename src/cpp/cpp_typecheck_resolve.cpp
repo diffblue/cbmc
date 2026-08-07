@@ -622,7 +622,6 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         continue;
       }
     }
-
     if(e.is_not_nil())
     {
       CHECK_RETURN(e.id() != ID_type);
@@ -2352,12 +2351,55 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       cv_distance += member_template_const_penalty(old_id, fargs);
       std::size_t template_distance = 0;
 
+      // N5008 [over.match.best]/2.5: a non-template function is
+      // preferred over a function template specialization; between TWO
+      // specializations the tie is broken by partial ordering
+      // ([temp.func.order]), which runs on the equal-distance group
+      // below.  The penalty is therefore BINARY -- template or not --
+      // and must not compare template-argument COUNTS: the count is no
+      // measure of specialization (the more specialized of libc++'s
+      // ranges `end(T (&)[N])` / `end(T)` pair has MORE arguments, and
+      // the count-key wrongly selected the generic one, leaving its
+      // undeduced-auto return in the initializer:
+      // "conversion from '<<type:auto>>'").
       if(!old_id.type().get(ID_C_template).empty())
         template_distance = old_id.type()
                               .find(ID_C_template_arguments)
                               .find(ID_arguments)
                               .get_sub()
                               .size();
+
+      // N5008 [dcl.spec.auto.general]/13: a candidate whose return type
+      // is an `auto` placeholder that can NEVER be deduced -- a
+      // declared-but-never-defined `auto f(T);` overload -- cannot be
+      // used where its type is needed; ranking it above a definable
+      // candidate leaves the placeholder in the caller ("conversion
+      // from '<<type:auto>>'", libc++'s ranges end(T (&)[N]) / end(T)
+      // pair, where the count-based template key otherwise prefers the
+      // bodiless generic).  At ranking time every not-yet-instantiated
+      // candidate still shows `auto`, so the discriminator is the
+      // TEMPLATE's definition: penalise only when the declarator has no
+      // body (nothing to deduce from, ever).  The candidate stays
+      // viable when it is the only match.
+      std::size_t undeduced_auto_penalty = 0;
+      if(
+        old_id.type().id() == ID_code &&
+        to_code_type(old_id.type()).return_type().id() == ID_auto)
+      {
+        const irep_idt tmpl_id = old_id.type().get(ID_C_template);
+        if(!tmpl_id.empty())
+        {
+          const symbolt *tmpl_sym = cpp_typecheck.symbol_table.lookup(tmpl_id);
+          if(
+            tmpl_sym != nullptr && tmpl_sym->type.id() == ID_cpp_declaration &&
+            !to_cpp_declaration(tmpl_sym->type).declarators().empty() &&
+            to_cpp_declaration(tmpl_sym->type)
+              .declarators()[0]
+              .value()
+              .is_nil())
+            undeduced_auto_penalty = 1;
+        }
+      }
 
       // [over.match.best]/1 + [over.ics.rank]: ranking is primarily by
       // the quality of the argument implicit-conversion sequences
@@ -2385,7 +2427,8 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       // with `x`, `y` of the same class.
       std::size_t total_distance =
         // NOLINTNEXTLINE(whitespace/operators)
-        1000000000ULL * args_distance + 1000 * template_distance + cv_distance;
+        1000000000ULL * args_distance + 100000000ULL * undeduced_auto_penalty +
+        1000 * template_distance + cv_distance;
 
       distance_map.insert({total_distance, old_id});
     }
