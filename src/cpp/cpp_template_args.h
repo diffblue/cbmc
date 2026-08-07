@@ -77,6 +77,26 @@ public:
 
     return false;
   }
+
+  /// N5008 [temp.deduct.type]/2: "If [deducing values] cannot be done
+  /// for any P/A pair, ..., or if any template argument remains
+  /// neither deduced nor explicitly specified, template argument
+  /// deduction fails."  A conflicting deduction is recorded as an
+  /// ID_nil binding (see mark_targs_conflicting in
+  /// cpp_typecheck_resolve.cpp); such a candidate must be discarded
+  /// without re-type-checking its pattern -- the re-typecheck throws
+  /// on the nil parameter and is caught as SFINAE, which is correct
+  /// but costs a full pattern conversion per doomed candidate
+  /// (~39,000 of them for std::tuple's constructor overload set,
+  /// dominated by tuple_size<pair<_T1,_T2>> vs tuple<int,int>).
+  bool has_conflict() const
+  {
+    for(const auto &arg : arguments())
+      if(arg.is_nil() || arg.type().is_nil())
+        return true;
+
+    return false;
+  }
 };
 
 inline cpp_template_args_tct &to_cpp_template_args_tc(irept &irep)
