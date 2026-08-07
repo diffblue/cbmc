@@ -5066,3 +5066,27 @@ cx2 relaunched on regex layer 3: "found no match for symbol
 'logic_error'" with EMPTY argument types (a __throw_logic_error
 definition whose throw-expression's ctor args vanish).  The symex
 crash criterion remains queued behind it.
+
+## Round 21 (2026-08-07 night): TT-param CORE flip; cy1 extension-drift
+
+FIXED + FLIPPED: cpp11_tt_param_rebind_instance KNOWNBUG->CORE.
+Consumer-side rework ([temp.deduct.type]/8): a TT-parameter USE with
+its own template-argument list derives the TEMPLATE from the bound
+instance at the resolve-with-args site (cpp_typecheck_resolve.cpp
+~5710); the deduction-side instance binding stays (its unification is
+load-bearing -- the binding-site fix regressed make_tuple + object
+ceiling, archived patch documents it).  px chain + set_insert
+conversion advance; set's next layer: __node_allocator/__node_traits
+unknown (member typedef chain, likely SAME family as the fixed rebind
+-- worth a quick probe next round).  5 suites green.
+
+cy1 (umap) harvest was INVALID C++: partial spec with fewer args than
+primary = g++ extension, clang rejects ([temp.spec.partial.general]).
+Distillations chased a phantom; the REAL libstdc++ shape (explicit
+bool specs, uf4 control) verifies fine, so umap's root is elsewhere.
+LESSON: gcc-preprocessed seeds + g++-only gates allow extension
+drift; cross-preprocessing swaps one builtin gap for another
+(__remove_reference vs __is_array).  Adopted gate: clang
+-fsyntax-only ERROR-COUNT BASELINE (seed yields 15, all cascades of
+__remove_reference/__integer_pack; reject any variant exceeding it).
+cy1 relaunched with it; cx2 (logic_error empty-args) still grinding.
