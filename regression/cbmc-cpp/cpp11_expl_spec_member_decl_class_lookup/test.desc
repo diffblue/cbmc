@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+240-byte cvise harvest (cx2) of the preprocessed libstdc++ <regex>
+seed, hand-tightened to strict C++11.
