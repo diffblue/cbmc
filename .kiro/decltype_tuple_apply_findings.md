@@ -5124,3 +5124,29 @@ strict repros verify fine, le2 even exercises throw/catch of the
 derived).  Relaunched with a CAUSAL criterion (no-match within 8
 lines of CONVERSION ERROR).  LESSON for criteria: pair the marker
 with its consequence, not mere co-occurrence.
+
+## Round 23 (2026-08-08): constexpr-dtor WRONG-CODE root — init_list CORE
+
+MAJOR: cpp20_libcxx20_initializer_list KNOWNBUG->CORE.  Root was a
+SOUNDNESS bug: constexpr member functions get is_macro (constexpr
+evaluator candidates); C++20 constexpr DESTRUCTORS ([dcl.constexpr],
+P0784) were caught too, goto conversion folded the call away, and the
+dtor's SIDE EFFECTS vanished — libc++ _ConstructTransaction's commit
+(`__v_.__end_ = __pos_`) never ran, so EVERY initializer-list/range
+vector was silently EMPTY under --cpp20 (correct under --cpp17!).
+Diagnosis: --trace showed __tx.__pos_ = +3 but no __end_ write; the
+dtor SYMBOL was entirely absent from the goto (call to nonexistent
+symbol = silent havoc, no 'no body' property!).  Header-free repro
+ct3 (constexpr ctor+dtor in nested struct of class template, ref
+member); ct4 = dtor-alone discriminant.  Fix: exclude destructors
+from is_macro.  CORE cpp20_constexpr_dtor_side_effect + flip (desc
+also needed --object-bits 12).
+
+REMAINING cpp20 layer (vector_basic/libcxx20_vector/map): pointer
+checks on `__end_ - __begin_` (same-object violation / overflow on
+null-null? size() over default-constructed vector) — instrumentation
+semantics, next session.
+
+NOTE for symex/goto: a CALL to a symbol ABSENT from the symbol table
+produces NO no-body property — silent havoc.  Worth a general
+diagnostic sweep some round.
