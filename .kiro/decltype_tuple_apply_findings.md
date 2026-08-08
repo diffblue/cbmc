@@ -5150,3 +5150,25 @@ semantics, next session.
 NOTE for symex/goto: a CALL to a symbol ABSENT from the symbol table
 produces NO no-body property — silent havoc.  Worth a general
 diagnostic sweep some round.
+
+## Round 23 cont.: TT-instance family, third round of consumers
+
+cx3-v2 harvest converged to the SAME attractor (typename-omission
+drift under the loose 2125-error baseline) BUT strictifying it by
+hand (adding typenames) kept the failure — harvest drift does not
+always invalidate the shape; ALWAYS try strictifying before
+discarding.  Root: template_map.apply substitutes a TT-instance
+binding TEXTUALLY into qualified names; the scope walk then sees
+`tag-allocator<signed_int>` as a template NAME.  Fixed in
+disambiguate_template_classes' fallback chain (+ guards at
+class_template_symbol/instantiate_template entries).  CORE
+cpp11_tt_instance_tag_scope.  Real set_insert: ONE more layer —
+nested own-param capture in rebind_alloc's alias body
+(allocator_traits' _Tp vs allocator's _Tp, the top-level-only
+#tmpl_param_shadow protection at template_map.cpp ~640; extending it
+to nested refs previously warned as risky — std::function relies on
+nested-capture behavior; needs a careful scoped approach).
+
+Round-23 totals: constexpr-dtor WRONG-CODE fix (init_list CORE flip +
+cpp20_constexpr_dtor_side_effect CORE), TT-instance third-consumer
+fix (cpp11_tt_instance_tag_scope CORE).  13 KNOWNBUGs remain.
