@@ -1,9 +1,10 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+--cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions --object-bits 12
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
+--
 --
 C++20 brace initialization of std::vector with initializer_list
 fails with 'struct nil is still incomplete'. This is a pre-existing
@@ -40,3 +41,9 @@ cpp20_recursive_member_alias_base (_Or/_And metaprogram bases drop).
 Round-11 (2026-08-04): same_as wall FIXED; converts fully; runs BMC.
 Next layer: size assertion FAILS (wrong-code, needs reduction with
 value-loss criterion).
+Round-23 (2026-08-08): FIXED — the wrong-code root was the constexpr
+~_ConstructTransaction being marked as a fold candidate (is_macro),
+so its body (committing __end_) was never emitted and every
+initializer-list vector came out EMPTY.  [dcl.constexpr]; destructors
+excluded from the marking.
+
