@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 --object-bits 12 --unwind 4 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ emplace with mixed value categories: SUCCESS$
@@ -37,3 +37,9 @@ semantics.  A cvise reduction chasing the assertion drifted to an
 unrelated (and g++-only-spelled) shape and was discarded; this test
 now belongs to the semantic-hashtable class (cf. abstract_environment
 notes), not the minimal-front-end queue.
+Round-24 fix (2026-08-08): the residual was NOT hashtable semantics --
+_Scoped_node's variadic ctor instance lost its body ([temp.variadic]/5
+front-element stamping of N>=2 packs in mem-init patterns), the node
+stayed uninitialized, and duplicate detection compared garbage.  Fixed
+by guarding the /7 name-substitution blocks to single-element packs;
+see cpp17_scoped_node_pack_ctor for the minimal reproducer.
