@@ -5172,3 +5172,22 @@ nested-capture behavior; needs a careful scoped approach).
 Round-23 totals: constexpr-dtor WRONG-CODE fix (init_list CORE flip +
 cpp20_constexpr_dtor_side_effect CORE), TT-instance third-consumer
 fix (cpp11_tt_instance_tag_scope CORE).  13 KNOWNBUGs remain.
+
+## Round 24 (2026-08-08): umap root pinned via goto/trace forensics
+
+Both cx2/cy1 harvests RE-degenerated to their old attractors (gates
+insufficient against these shapes) — pivoted to direct diagnosis.
+umap wrong-code root PINNED: _Hashtable::_M_emplace's
+`_Scoped_node __node{this, forward<_Args>(__args)...}` with a pack of
+TWO CLASS-TYPE RVALUES selects the 2-param (node*, alloc*) ctor
+instead of the variadic allocating one; node stays uninitialized;
+duplicate check compares garbage; same-key emplace double-inserts.
+Discriminants: 2 class rvalues required (1 passes, scalars pass,
+braces-vs-parens irrelevant).  KNOWNBUG cpp17_scoped_node_pack_ctor
+(37 lines, runtime-verified).  Forensics chain that worked: goto dump
+-> only ONE pair-ctor instance (ref) -> rvalue _Scoped_node ctor body
+assigns __h/__n only (2-param overload's params) -> trace shows
+single .no write.  NEXT: diagnose the overload selection for the
+2-class-rvalue pack (likely the pack-vs-fixed-arity candidate
+ranking, cpp_typecheck_resolve disambiguation; compare with sn1-sn3
+passing variants).
