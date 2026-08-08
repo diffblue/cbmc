@@ -3898,7 +3898,24 @@ const symbolt &cpp_typecheckt::instantiate_template(
       std::map<std::string, irep_idt> pack_subst;
       for(const auto &pa : template_map.pack_args_map)
       {
-        if(pa.second.empty())
+        // N5008 [temp.variadic]/5: only a SINGLE-element pack may have its
+        // name textually replaced by "the" element -- for that arity the
+        // front element IS the k-th element of every expansion.  A pack
+        // with >= 2 elements referenced inside a not-yet-expanded pack
+        // expansion pattern (e.g. the mem-init argument
+        // `forward_<Args>(a)...` of libstdc++ _Hashtable's _Scoped_node
+        // constructor) must keep the pack NAME: the deferred
+        // per-element expansion substitutes the k-th element in
+        // lockstep.  Stamping the front element here concretized the
+        // pattern to element 0 for every k, the per-element call became
+        // unresolvable, and the constructor body was silently dropped
+        // (the emplaced node stayed uninitialized -- the
+        // unordered_map::emplace duplicate-insert wrong-code shape).
+        // N5008 [temp.variadic]/5: single-element packs only -- see the
+        // guarded mem-init substitution above for why a >=2-element pack
+        // must keep its name (front-element stamping concretizes every
+        // expansion copy to element 0).
+        if(pa.second.size() != 1)
           continue;
         const std::string full = id2string(pa.first);
         auto p = full.rfind("::");
@@ -4118,7 +4135,11 @@ skip_pack_removal:
       std::map<std::string, irep_idt> pack_subst;
       for(const auto &pa : template_map.pack_args_map)
       {
-        if(pa.second.empty())
+        // N5008 [temp.variadic]/5: single-element packs only -- see the
+        // guarded mem-init substitution above for why a >=2-element pack
+        // must keep its name (front-element stamping concretizes every
+        // expansion copy to element 0).
+        if(pa.second.size() != 1)
           continue;
         const std::string full = id2string(pa.first);
         auto p = full.rfind("::");
@@ -5905,7 +5926,9 @@ skip_pack_removal_ft:
         std::map<std::string, irep_idt> pack_subst;
         for(const auto &pa : template_map.pack_args_map)
         {
-          if(pa.second.empty())
+          // N5008 [temp.variadic]/5: single-element packs only -- see the
+          // guarded mem-init substitution above.
+          if(pa.second.size() != 1)
             continue;
           const std::string full = id2string(pa.first);
           auto p = full.rfind("::");
@@ -5946,7 +5969,9 @@ skip_pack_removal_ft:
         std::map<std::string, irep_idt> pack_subst;
         for(const auto &pa : template_map.pack_args_map)
         {
-          if(pa.second.empty())
+          // N5008 [temp.variadic]/5: single-element packs only -- see the
+          // guarded mem-init substitution above.
+          if(pa.second.size() != 1)
             continue;
           const std::string full = id2string(pa.first);
           auto p = full.rfind("::");
