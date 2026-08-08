@@ -4022,6 +4022,51 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
     }
   }
 
+  // N5008 [temp.deduct.type]/8: a deduced template-template-parameter
+  // is bound to the argument INSTANCE; template_map.apply can
+  // substitute that binding textually into a qualified name, so the
+  // scope walk arrives here with the INSTANCE'S TAG as the "template
+  // name" (`tag-allocator<signed_int>` with new template arguments --
+  // libc++ __allocator_traits_rebind's `_Alloc<_Tp>::template
+  // rebind<_Up>`).  Derive the TEMPLATE the instance was created from
+  // (the same convention as the resolve/resolve_scope TT fallbacks).
+  if(effective_id_set.empty())
+  {
+    const symbolt *inst_sym = cpp_typecheck.symbol_table.lookup(base_name);
+    if(inst_sym == nullptr)
+    {
+      // instance tags of non-global templates carry a scope prefix;
+      // try the current prefix chain via the scope-aware lookup
+      const auto inst_ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+        base_name, cpp_scopet::RECURSIVE);
+      if(!inst_ids.empty())
+        inst_sym =
+          cpp_typecheck.symbol_table.lookup((*inst_ids.begin())->identifier);
+    }
+    if(
+      inst_sym != nullptr &&
+      (inst_sym->type.id() == ID_struct || inst_sym->type.id() == ID_union) &&
+      inst_sym->type.find(ID_full_template_args).is_not_nil())
+    {
+      const auto tmpl_ids = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+        inst_sym->base_name,
+        cpp_scopet::RECURSIVE,
+        cpp_idt::id_classt::TEMPLATE);
+      for(auto *tid : tmpl_ids)
+      {
+        const symbolt *cand =
+          cpp_typecheck.symbol_table.lookup(tid->identifier);
+        if(
+          cand != nullptr && cand->type.get_bool(ID_is_template) &&
+          to_cpp_declaration(cand->type)
+            .type()
+            .get(ID_specialization_of)
+            .empty())
+          effective_id_set.insert(tid);
+      }
+    }
+  }
+
   if(effective_id_set.empty())
   {
     cpp_typecheck.show_instantiation_stack(cpp_typecheck.error());
