@@ -5234,3 +5234,18 @@ no-body) cvise running; sig probes for abstract_env/restrict_fp TUs.
 NOTE: cz3's no-body operator[](rref) may share this same root — check
 against the fixed binary when it converges (the reduction runs the
 OLD binary! criterion may go stale — verify harvest against NEW).
+
+## Round 24b probes (parked tests, on the FIXED binary)
+
+- restrict_function_pointers_tu: NO LONGER SCALE-BLOCKED — completes
+  in <90min: 184 of 87623 FAILURE, all pointer-deref class, dominant
+  cluster "deallocated dynamic object" on _M_next/ref_count/hash_code
+  (libstdc++ internals; use-after-free-shaped).  Now a diagnosis
+  target: pick ONE deref property, --trace it, find whether a dtor /
+  deallocate runs early (cf. constexpr-dtor arc) or a body is
+  wrong.  Output kept at /tmp/sig_cpp17_restrict_function_pointers_tu/.
+- abstract_environment_tu: converts + reaches BMC, solver times out
+  at 3600s — genuinely scale class (with ofstream/erase_if).
+- cz1 (vector size.pointer.1) + cz3 (map operator[] rref no-body)
+  criteria RE-VERIFIED against the fixed binary — both still fail,
+  reductions remain valid (cz1 74%, cz3 57% at check time).
