@@ -1430,7 +1430,19 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // recognizes it as a candidate for compile-time folding.
       // (`cpp_declarator_converter` does the same for non-member
       // declarations.)
-      if(declaration.storage_spec().is_constexpr())
+      //
+      // NOT for destructors: a C++20 `constexpr ~T()` ([dcl.constexpr]
+      // allows it since P0784) is no value-producing fold candidate --
+      // its effects are SIDE EFFECTS on the object (libc++ vector's
+      // `constexpr ~_ConstructTransaction() { __v_.__end_ = __pos_; }`
+      // commits the container's new size).  The is_macro marking made
+      // goto conversion treat the call as foldable and the destructor
+      // body was never emitted: every initializer-list/range vector
+      // construction "lost" its elements (size stayed 0) at runtime
+      // under --cpp20 while --cpp17 (non-constexpr dtor) was correct.
+      if(
+        declaration.storage_spec().is_constexpr() &&
+        to_code_type(component.type()).return_type().id() != ID_destructor)
       {
         const irep_idt method_id = component.get_name();
         if(symbolt *m = symbol_table.get_writeable(method_id))
