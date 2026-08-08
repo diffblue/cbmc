@@ -693,7 +693,12 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     std::map<std::string, irep_idt> pack_subst;
     for(const auto &pa : template_map.pack_args_map)
     {
-      if(pa.second.empty())
+      // N5008 [temp.variadic]/5: single-element packs only -- a
+      // >=2-element pack whose name still appears here is a pattern the
+      // per-element expander above substitutes in lockstep; stamping the
+      // front element would concretize every expansion copy to element 0
+      // (the _Hashtable _Scoped_node mem-init shape).
+      if(pa.second.size() != 1)
         continue;
       const std::string full = id2string(pa.first);
       auto p = full.rfind("::");
@@ -733,7 +738,12 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     std::map<std::string, irep_idt> pack_subst;
     for(const auto &pa : template_map.pack_args_map)
     {
-      if(pa.second.empty())
+      // N5008 [temp.variadic]/5: single-element packs only -- a
+      // >=2-element pack whose name still appears here is a pattern the
+      // per-element expander above substitutes in lockstep; stamping the
+      // front element would concretize every expansion copy to element 0
+      // (the _Hashtable _Scoped_node mem-init shape).
+      if(pa.second.size() != 1)
         continue;
       const std::string full = id2string(pa.first);
       auto p = full.rfind("::");
