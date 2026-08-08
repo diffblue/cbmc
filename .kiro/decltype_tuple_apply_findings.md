@@ -5191,3 +5191,19 @@ single .no write.  NEXT: diagnose the overload selection for the
 2-class-rvalue pack (likely the pack-vs-fixed-arity candidate
 ranking, cpp_typecheck_resolve disambiguation; compare with sn1-sn3
 passing variants).
+
+## Round 24 cont.: umap ctor no-body narrowed further
+
+The wrong-SELECTION theory was wrong: the CALL targets the CORRECT
+variadic instance (params a$0/a$1 correctly replicated!) but that
+instance is BODILESS — cf-catch fired for it; the throw is resolve()
+of `make` (the mem-init's callee) during the deferred conversion,
+BEFORE deduction (gfta never entered for 'make'; res-unknown/nomatch
+probes silent — the throw is one of resolve's other exits).
+Discriminant stands: N=2 pack fails, N=1 passes — the mem-init
+call-argument pack expansion `forward_<Args>(a)...` for N>=2 in a
+DEFERRED member conversion (compound_type replication notes say
+single-element substitution is handled in method_bodies; N>=2 path
+suspect).  Resume: dump the scoped ctor's mem-init irep before/after
+replication (compound_type ~590-720 expanded_record), then check
+method_bodies' `a$k` lockstep for the ARG-level pack.
