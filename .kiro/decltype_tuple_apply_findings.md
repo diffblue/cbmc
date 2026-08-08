@@ -5207,3 +5207,30 @@ single-element substitution is handled in method_bodies; N>=2 path
 suspect).  Resume: dump the scoped ctor's mem-init irep before/after
 replication (compound_type ~590-720 expanded_record), then check
 method_bodies' `a$k` lockstep for the ARG-level pack.
+
+## Round 24b (2026-08-08 evening): N>=2 pack front-stamping fixed — 2 flips
+
+Root of the scoped_node/umap family: SIX unguarded "[temp.variadic]/7
+substitute pack names with actual types" blocks
+(cpp_instantiate_template.cpp x4 incl. the mem-init one at ~3924;
+cpp_typecheck_method_bodies.cpp x2 at ~743/784) stamped the FRONT
+element for ANY non-empty pack.  For N>=2 packs inside
+not-yet-expanded patterns (mem-init `forward_<Args>(a)...`), element 0
+was baked in before the per-element expander ran -> per-element call
+unresolvable -> ctor body dropped via implicit-deletion recovery ->
+uninitialized node -> umap duplicate-insert wrong-code.  Fix: guard
+all six to pa.second.size()==1 ([temp.variadic]/5 comments).  Flips:
+cpp17_scoped_node_pack_ctor + cpp17_umap_emplace_mixed_categories ->
+CORE.  5 suites green; runtime g+++clang++ verified.  Diagnosis
+technique that cracked it: STAGE DUMPS (scan for the pack name /
+element tags at entry / after-expand / after-subst of
+prepare_deferred_method_body) — pinned corruption to BEFORE the drain,
+then instantiate-entry probe pinned it to instantiate_template itself.
+Lesson: probe INVENTORY of front()/[0] pack accesses
+(`grep 'pa.second.front()'`) finds this whole defect class; the two
+/7 blocks in method_bodies remain front()-based for N==1 only.
+Background: cz1 (vector pointer-diff) + cz3 (map operator[] rref
+no-body) cvise running; sig probes for abstract_env/restrict_fp TUs.
+NOTE: cz3's no-body operator[](rref) may share this same root — check
+against the fixed binary when it converges (the reduction runs the
+OLD binary! criterion may go stale — verify harvest against NEW).
