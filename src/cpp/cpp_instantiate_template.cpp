@@ -472,6 +472,42 @@ const symbolt &cpp_typecheckt::class_template_symbol(
   const cpp_template_args_tct &specialization_template_args,
   const cpp_template_args_tct &full_template_args)
 {
+  // N5008 [temp.deduct.type]/8: a deduced template-template-parameter
+  // is bound to the argument INSTANCE (see cpp_typecheck_resolve.cpp);
+  // when such a binding flows here as the "template" to instantiate
+  // with NEW arguments (`_Alloc<_Tp>` inside a partial-specialization
+  // body -- libc++ __allocator_traits_rebind's
+  // `_Alloc<_Tp>::template rebind<_Up>`), derive the TEMPLATE the
+  // instance was created from.  Otherwise the instance symbol has no
+  // template scope and instantiation fails ("template scope
+  // 'tag-allocator<...>' not found"), dropping std::set's
+  // __node_allocator typedef chain.
+  if(
+    !template_symbol.type.get_bool(ID_is_template) &&
+    (template_symbol.type.id() == ID_struct ||
+     template_symbol.type.id() == ID_union) &&
+    template_symbol.type.find(ID_full_template_args).is_not_nil())
+  {
+    const auto tmpl_ids = cpp_scopes.get_root_scope().lookup(
+      template_symbol.base_name,
+      cpp_scopet::RECURSIVE,
+      cpp_idt::id_classt::TEMPLATE);
+    for(const auto *tid : tmpl_ids)
+    {
+      const symbolt *cand = symbol_table.lookup(tid->identifier);
+      if(
+        cand != nullptr && cand->type.get_bool(ID_is_template) &&
+        to_cpp_declaration(cand->type).type().get(ID_specialization_of).empty())
+      {
+        return class_template_symbol(
+          source_location,
+          *cand,
+          specialization_template_args,
+          full_template_args);
+      }
+    }
+  }
+
   if(full_template_args.has_unassigned())
   {
     // Template arguments contain unresolved parameters (e.g., from a
@@ -3213,6 +3249,39 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // produce new symbol name
   std::string suffix = template_suffix(full_template_args);
+
+  // N5008 [temp.deduct.type]/8: a deduced template-template-parameter
+  // binding (the argument INSTANCE) may flow here as the "template" to
+  // instantiate with new arguments; derive the TEMPLATE the instance
+  // was created from (see class_template_symbol for the same
+  // treatment and cpp_typecheck_resolve.cpp for the deduction-side
+  // convention).
+  if(
+    !template_symbol.type.get_bool(ID_is_template) &&
+    (template_symbol.type.id() == ID_struct ||
+     template_symbol.type.id() == ID_union) &&
+    template_symbol.type.find(ID_full_template_args).is_not_nil())
+  {
+    const auto tmpl_ids = cpp_scopes.get_root_scope().lookup(
+      template_symbol.base_name,
+      cpp_scopet::RECURSIVE,
+      cpp_idt::id_classt::TEMPLATE);
+    for(const auto *tid : tmpl_ids)
+    {
+      const symbolt *cand = symbol_table.lookup(tid->identifier);
+      if(
+        cand != nullptr && cand->type.get_bool(ID_is_template) &&
+        to_cpp_declaration(cand->type).type().get(ID_specialization_of).empty())
+      {
+        return instantiate_template(
+          source_location,
+          *cand,
+          specialization_template_args,
+          full_template_args,
+          specialization);
+      }
+    }
+  }
 
   // we need the template scope to see the template parameters
   cpp_scopet *template_scope = id_map_lookup(cpp_scopes, template_symbol.name);
