@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ variadic ctor selected: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+g++/clang++ accept and hold natively.  Trace evidence (real umap):
+the rvalue _Scoped_node ctor instance assigns only __h/__n (the
+2-param overload's parameters) and never calls _M_allocate_node;
+the stored pair's key gets NO write (single tmp_obj.no=0 in the
+whole trace); operator== then compares nondet garbage -> FALSE ->
+duplicate insert -> size 2 != 1.
