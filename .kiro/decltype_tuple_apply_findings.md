@@ -5320,3 +5320,28 @@ Affects: vector_basic, libcxx20_vector, map_basic (+ ranges family
 via vector). All need --object-bits 12 + likely --unwind for BMC
 termination once fixed (map_basic BMC no longer terminates without
 unwind — desc flags work needed at flip time).
+
+## Round 26 (2026-08-09): vector onion — two layers peeled, one left
+
+Layer 1 FIXED: alias-instance redecl first-wins ([temp.spec.general]/5;
+_And<...> FALSE→TRUE flip under drain guard killed the drain).
+Layer 2 FIXED: deduction-path alias expansion skipped NON-TYPE args
+([temp.alias]/2; `_Bp` dangled, both allocator_traits::construct
+overloads discarded).  5 suites green ×1 cycle, committed.
+Layer 3 OPEN: drain STILL throws with NO diagnostic — bare throw in
+resolve() from typecheck_side_effect_function_call (gdb catch-throw
+inventory: 26449 throws total; last-before-cf-catch bt =
+resolve→typecheck_expr_cpp_name→typecheck_side_effect_function_call,
+i.e. an unresolvable CALL in the 604 body under the syshdr guard with
+messages suppressed even under DBG2-passthrough = the throw site
+prints nothing (likely the `if(!fail_with_exception) throw 0` style
+silent SFINAE exit).  NEXT: find which call in
+uninitialized_algorithms.h 604-620 fails — candidates:
+allocator_traits construct (now viable?), __make_exception_guard,
+_AllocatorDestroyRangeReverse ctor, std::move_if_noexcept over
+reverse_iterator, ++/!= operators.  Approach: probe resolve()'s
+silent-throw exits to print base_name under DBG2 (there are >1 exits
+without error(); grep `throw 0` near "silent" comments in resolve),
+or bisect by instantiating each callee shape in a repro.
+Probes used this round are all documented in this file's r25 entry
+(sfinae passthrough + drain-scoped setenv + SIGTRAP-at-probe).
