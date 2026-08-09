@@ -5366,3 +5366,25 @@ fails 11 of 5537 (down from 15/5614-era shape; layers 1-2 committed
 rq1 COMBINED, (2) a real prev()/pointer-typedef chain; or drain-probe
 which sub-name of the __to_address resolution throws (the resolve-
 throw probe stack prints innermost-last, so add depth indices).
+
+## Round 26 cont. 3: concepts kernel fixed — compound-requirement eval
+
+ta3 (10-line real-header __to_address(reverse_iterator), banked as
+KNOWNBUG cpp20_to_address_reverse_iterator) revealed the LAYER-3
+kernel: compound-requirement `{E} -> C<T>` evaluation left NESTED
+type-predicate operands (type_arg1/2 named subs under `&&`) unbound —
+apply(exprt)'s unnamed-child recursion goes through the typet
+overload which doesn't know predicate nodes.  Header-free wrong-code
+repro cr1.cpp -> CORE cpp20_compound_requirement_concept.  Fix is
+LOCAL to compound_requirement_is_satisfied (children-first walk);
+GLOBAL apply(exprt) fixes segfaulted cpp20_concept_iterator_chain
+(quadratic re-walk + detach of shared <ranges> concept bodies; two
+variants tried: unconditional expr-routing, depth-guarded outermost
+walk — BOTH exploded; the pre-existing subst_params lambda recursion
+is the amplifier).  LESSON: template_map.apply(exprt) is a hot path
+over SHARED trees — fix consumers, not the walker.
+ta3 STILL drops main after this fix (more __to_address onion:
+next candidates per resolve-throw = element_type/__void_t chain,
+_HasToAddress, or __decay_t of the helper return).  vector family
+still blocked behind it.  same_as/_CmpUnspecifiedParam ordering.h
+noise (recoverable) remains a separate large field.
