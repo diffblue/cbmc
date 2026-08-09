@@ -1,6 +1,6 @@
 CORE libcxx
 main.cpp
---cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions
+--cpp11 --stdlib libc++ --unwind 5 --no-unwinding-assertions --object-bits 12
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
@@ -8,3 +8,9 @@ main.cpp
 ^PARSING ERROR$
 libc++-20 headers use SIMD intrinsics (__algorithm/simd_utils.h)
 that CBMC's parser cannot handle.
+--
+Round-25 (2026-08-08): the member-alias own-parameter capture fix
+([temp.local]/1, pointer_traits/allocator_traits rebind chains) makes
+substantially more container machinery convert; the object count
+crossed 2^8, so --object-bits 12 (the libc++-suite standard) is now
+required.
