@@ -4048,10 +4048,33 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       (inst_sym->type.id() == ID_struct || inst_sym->type.id() == ID_union) &&
       inst_sym->type.find(ID_full_template_args).is_not_nil())
     {
-      const auto tmpl_ids = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+      auto tmpl_ids = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
         inst_sym->base_name,
         cpp_scopet::RECURSIVE,
         cpp_idt::id_classt::TEMPLATE);
+      if(tmpl_ids.empty())
+      {
+        // A namespace-scope template's id is not reachable by the
+        // root-scope RECURSIVE walk (it does not descend into
+        // namespaces).  Per N5008 [namespace.qual]/[basic.lookup.qual]
+        // the template lives in the same scope as its instances: the
+        // instance's scope-tree entry sits INSIDE the template's
+        // parameter scope, so the template's own id is found by an
+        // unqualified lookup in that scope's PARENT (the namespace,
+        // e.g. `std::__1` for `std::__1::allocator<signed_int>` --
+        // the libc++ `_Alloc<_Tp>::template rebind<_Up>` shape of
+        // __allocator_traits_rebind).
+        const auto im_it = cpp_typecheck.cpp_scopes.id_map.find(inst_sym->name);
+        if(im_it != cpp_typecheck.cpp_scopes.id_map.end())
+        {
+          tmpl_ids =
+            static_cast<cpp_scopet &>(im_it->second->get_parent().get_parent())
+              .lookup(
+                inst_sym->base_name,
+                cpp_scopet::SCOPE_ONLY,
+                cpp_idt::id_classt::TEMPLATE);
+        }
+      }
       for(auto *tid : tmpl_ids)
       {
         const symbolt *cand =

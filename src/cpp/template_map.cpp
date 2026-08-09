@@ -724,15 +724,58 @@ void template_mapt::apply(typet &type) const
               s.compare(s.size() - marker.size(), marker.size(), marker) == 0)
               nm.set(ID_identifier, s.substr(0, s.size() - marker.size()));
           };
+          // Descend through pure type-structure wrappers: a pointer /
+          // reference / array declarator around the reference does not
+          // change name binding ([temp.local]/1 -- within the member
+          // alias template's declaration its own parameter name refers
+          // to its own parameter; libc++ pointer_traits<_Tp*>'s
+          // `rebind = _Up*` stores the reference as the POINTEE).
+          // Deliberately do NOT descend into template arguments or
+          // decltype operands: those nested references are handled by
+          // (and other library code relies on) the existing machinery.
+          std::function<void(irept &, bool)> mark_rec =
+            [&](irept &n, bool restore)
+          {
+            if(n.id() == ID_cpp_name)
+            {
+              // A bare own-parameter reference (single name component).
+              mark(n, restore);
+              // A template-id whose ARGUMENTS reference an own
+              // parameter (libc++ allocator_traits' `rebind_alloc =
+              // __allocator_traits_rebind_t<allocator_type, _Other>`):
+              // [temp.local]/1 -- `_Other` names the alias's OWN
+              // parameter wherever it appears in the alias's
+              // declaration, so it must not be captured from an
+              // unrelated enclosing binding either.  mark() itself
+              // only ever touches names in own_param_names, so
+              // enclosing-parameter references inside the arguments
+              // (which the enclosing instantiation MUST substitute,
+              // e.g. `allocator_type`) are unaffected.
+              for(auto &ss : n.get_sub())
+                if(ss.id() == ID_template_args)
+                  for(auto &arg : ss.add(ID_arguments).get_sub())
+                    mark_rec(arg, restore);
+              return;
+            }
+            if(n.id() == ID_ambiguous)
+            {
+              irept &t = n.add(ID_type);
+              if(t.is_not_nil())
+                mark_rec(t, restore);
+              return;
+            }
+            if(
+              n.id() == ID_frontend_pointer || n.id() == ID_pointer ||
+              n.id() == ID_array || n.id() == ID_merged_type)
+            {
+              for(auto &ss : n.get_sub())
+                mark_rec(ss, restore);
+            }
+          };
           const auto each = [&](bool restore)
           {
             for(auto &sub : decl_type.get_sub())
-            {
-              mark(sub, restore);
-              if(sub.id() == ID_merged_type)
-                for(auto &ss : sub.get_sub())
-                  mark(ss, restore);
-            }
+              mark_rec(sub, restore);
           };
           each(false);
           // N5008 [temp.alias]/2 + [temp.variadic]/4-5: while substituting this
