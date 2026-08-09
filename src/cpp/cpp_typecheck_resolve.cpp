@@ -7352,8 +7352,23 @@ void cpp_typecheck_resolvet::guess_template_args(
                 // collided with the SPECIALIZATION's identically-named
                 // parameter and deduced it without const, see
                 // strict_cv_deduction.
+                // A TYPE parameter's argument must itself be a type
+                // spelling (a plain or cv-qualified name).  A NON-TYPE
+                // parameter's argument is an EXPRESSION of arbitrary
+                // shape -- e.g. the `!__has_construct<...>::value`
+                // constraint argument of libc++ allocator_traits'
+                // fallback `construct` overload; N5008 [temp.alias]/2
+                // makes the alias-id equivalent to the substituted
+                // defining-type-id for ANY argument shape.  Skipping
+                // the substitution left the alias's own parameter name
+                // (`_Bp`) in the body, whose typecheck then failed and
+                // discarded BOTH construct overloads (the call became
+                // unresolvable and the enclosing body was dropped:
+                // the vector push_back
+                // __uninitialized_allocator_move_if_noexcept shape).
+                const bool param_is_type = alias_params[i].id() == ID_type;
                 if(
-                  targ_type.id() != ID_cpp_name &&
+                  param_is_type && targ_type.id() != ID_cpp_name &&
                   targ_type.id() != ID_merged_type)
                   continue;
 
