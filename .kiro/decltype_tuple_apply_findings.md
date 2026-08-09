@@ -5424,3 +5424,17 @@ as soft candidate rejection AND make member-initializer elaboration
 contain spec-matching throws (select primary, [temp.deduct]/8).
 Background: rfp trace (prop 2775) running; libcxx20_vector probe
 running; da1 archived.
+
+## Round 27 cont.: rfp + vector probe results
+
+- restrict_fp trace (prop 2775): _Fwd_list_node_base ctor runs with
+  this == &is_deallocated!0 (CBMC-internal symbol!) — a mis-returned
+  pointer (__t/return_value chain) aliases internal bookkeeping;
+  same returned-garbage class as vector's INVALID-514.  Suspect a
+  bodiless/mis-converted allocator or node-create path in libstdc++
+  forward_list (irept/forward_list_as_mapt TU context).  NEXT: find
+  which return_value first goes wild (grep trace backwards from state
+  4313), check no-body/HIDE markers.
+- libcxx20_vector (with --object-bits 12): completes, 22 of 5537
+  FAILURE incl. main.assertion.1 line 9 'size' — same vector family,
+  waiting on the two-phase-lookup fix.
