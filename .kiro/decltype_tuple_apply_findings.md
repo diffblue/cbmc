@@ -5345,3 +5345,24 @@ without error(); grep `throw 0` near "silent" comments in resolve),
 or bisect by instantiating each callee shape in a repro.
 Probes used this round are all documented in this file's r25 entry
 (sfinae passthrough + drain-scoped setenv + SIGTRAP-at-probe).
+
+## Round 26 cont.: layer 3 narrowed to __to_address chain
+
+resolve-throw unwind probe (RAII dtor + std::uncaught_exceptions,
+printing base_name under drain-scoped DBG2 — ANOTHER reusable probe)
+shows the fatal cascade: type -> __enable_if_t -> __to_address ->
+to_address; the LAST __to_address failure propagates to the drain
+catch.  `std::__to_address(reverse_iterator)` must select the
+operator-> helper (pointer_traits<reverse_iterator> has no
+to_address).  Header-free repros of (a) the full
+to_address/helper/decltype chain (ta1.cpp) and (b) the C++20
+requires-disjunction operator-> (rq1.cpp) BOTH PASS — missing
+ingredient is subtler: candidates = std::prev(current).operator->()
+in the else-branch, the `pointer` typedef via
+__rebind_pointer_t/iterator_traits, or interplay of the constrained
+operator-> lookup under the helper's decltype.  vector_basic now
+fails 11 of 5537 (down from 15/5614-era shape; layers 1-2 committed
+3b6ba50735).  NEXT: extend ta1 with (1) constrained operator-> as in
+rq1 COMBINED, (2) a real prev()/pointer-typedef chain; or drain-probe
+which sub-name of the __to_address resolution throws (the resolve-
+throw probe stack prints innermost-last, so add depth indices).
