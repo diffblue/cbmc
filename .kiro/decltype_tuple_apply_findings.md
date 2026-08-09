@@ -5294,3 +5294,29 @@ __nd->__left_ (recursion on nondet left pointers — next layer).
 - Live binary under long cvise fleets is a footgun: rebuilds change
   criteria semantics mid-run (cz3's death was silent).  Copy the
   binary per-fleet next time (cp build/bin/cbmc /tmp/czN/cbmc.pinned).
+
+## Round 25 cont. 2: vector-family root surfaced (not yet fixed)
+
+cpp20_vector_basic diagnosis (fixed binary, --object-bits 12 now
+needed): ctor inits fine (begin/end/cap NULL); push_back allocates,
+constructs 42; __swap_out_circular_buffer's std::swap chain writes
+v.__end_ and v.__end_cap_ CORRECTLY (&dynamic+4) but
+v.__begin_ = INVALID-514 — sourced from
+__uninitialized_allocator_move_if_noexcept<alloc,reverse_iterator×3>
+whose RETURN VALUE is malformed: trace shows
+{ .__t_=NULL, .current=INVALID-514 } — a reverse_iterator with an
+EXTRA __t_ field (std::__exception_guard's member fused into the
+return struct?!) — wrong return type/layout for the
+trivially-movable overload (uninitialized_algorithms.h 638;
+`return std::move(__first1,__last1,__first2)` over reverse_iterators;
+historical swallowed error 'symbol _Bp is unknown' in this
+instantiation — __conditional_t's bool own-param, conditional.h 54).
+NEXT: (1) check __is_cpp17_move_insertable/enable_if selection —
+which overload got instantiated; (2) DBG2-passthrough on its drain
+for the surviving swallowed error; (3) suspect non-type (bool)
+own-params in alias bodies — mark() collects only TYPE param names?
+check own_param_names collection for `bool _Bp`.
+Affects: vector_basic, libcxx20_vector, map_basic (+ ranges family
+via vector). All need --object-bits 12 + likely --unwind for BMC
+termination once fixed (map_basic BMC no longer terminates without
+unwind — desc flags work needed at flip time).
