@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ primary selected \(soft mismatch\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Runtime-verified with g++ and clang++ (-std=c++20): the assertion
+holds natively (primary selected, value=false).  CBMC selects the
+partial specialization instead (no two-phase lookup) and the
+assertion FAILS.  Fix requires point-of-declaration awareness in the
+resolver for dependent unqualified calls inside specialization
+patterns, or a targeted ordering check at the spec-matching site.
