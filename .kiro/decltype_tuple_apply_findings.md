@@ -5249,3 +5249,28 @@ OLD binary! criterion may go stale — verify harvest against NEW).
 - cz1 (vector size.pointer.1) + cz3 (map operator[] rref no-body)
   criteria RE-VERIFIED against the fixed binary — both still fail,
   reductions remain valid (cz1 74%, cz3 57% at check time).
+
+## Round 25 (2026-08-08 late): set_insert CORE'd — 2 fixes, 13th flip
+
+Fix 1 (fifth TT-instance consumer): disambiguate_template_classes'
+instance fallback used ROOT-scope RECURSIVE template lookup which does
+not descend into namespaces; std::__1::allocator unfindable.  Fixed:
+when empty, look up in the GRANDPARENT of the instance's id_map entry
+(instance sits inside the template's param scope; its parent's parent
+is the namespace) — [namespace.qual].
+Fix 2 ([temp.local]/1): #tmpl_param_shadow marking extended from
+top-level bare refs to refs nested in pointer/array/merged_type
+declarators AND template-id arguments (+ ambiguous wrapper).  Root
+chain: pointer_traits<_Tp*>::rebind=_Up* and rebind_alloc=
+__allocator_traits_rebind_t<allocator_type,_Other> captured enclosing
+int; unique_ptr deleter = __tree_node_destructor<allocator<int>>;
+get() returned int*; __emplace_unique_key_args threw at static_cast,
+swallowed by syshdr guard, body dropped, inserts lost.
+KEY DEBUG TECHNIQUE (reusable): sfinae_contextt passthrough under
+CBMC_DBG2 (keep real handler) + setenv("CBMC_DBG2") scoped in
+convert_function to ONE symbol's drain — surfaces THE swallowed error
+with full instantiation context.  Faster than gdb catch throw.
+Impact: 4 libcxx tests crossed 2^8 objects (MORE code converts) —
+--object-bits 12 added; both deque tests now fully VERIFY.
+map tests' residual: __tree::destroy null/deallocated derefs on
+__nd->__left_ (recursion on nondet left pointers — next layer).
