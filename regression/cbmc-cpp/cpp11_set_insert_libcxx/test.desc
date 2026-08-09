@@ -1,42 +1,26 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp11 --unwind 5 --no-unwinding-assertions --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-libc++ container member access fails with incomplete type due to
-deferred template elaboration.
-Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
-libc++ <set>: "invalid initializer '__pair1_'" in __tree
-(mem-initializer naming a member of a compressed-pair base;
-__tree line 1341).
-Update 2026-07-28: the comparator null-deref is downstream of the
-bodyless-member family -- a single insert already shows "no body for
-callee __tree::__emplace_unique_key_args / __end_node / ~__tree"
-(same class as cpp11_tuple_leaf_no_body, which is the minimal
-reproducer for lost member bodies).  A dedicated header-free
-reduction is blocked: preprocessed-libc++ sources hit the
-cpp20_views_take_call_crash invariant before conversion.  Needs
---object-bits 12 to get past "too many addressed objects".
-Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
-Update 2026-07-30: the "masking crash" on preprocessed sources was a
-MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
-preprocessed source with the right flags reproduces the SEMANTIC
-failure directly, so header-free reduction is unblocked.
-Round-7 (2026-08-03): cvise reduction complete (110 lines, archived in
-findings); the first distilled root is the namespace-scope T*& with
-parenthesized initializer (KNOWNBUG cpp11_ptr_ref_paren_init_global,
-the __insert_unique __child reference shape).  Re-reduce after that
-root is fixed.
-Round-10 (2026-08-04): reduction attempt #3 drifted into a THIRD
-degeneracy class (uninitialized local pointer dereference; valgrind
-passed on stack-garbage luck -- ASan does not catch uninit reads and
-MSan needs instrumented libc++).  Parking the cvise approach for this
-test: the "pointer NULL in *__x" criterion is reachable by too many
-valid-for-cbmc programs.  Next attempt should gate the runtime binary
-with -ftrivial-auto-var-init=pattern (making uninit-pointer derefs
-crash deterministically) or require BOTH inserted keys' count
-assertions to fail while pointer checks stay green (pure value-loss
-criterion, as the map_piecewise reduction used successfully).
+--
+History: "invalid initializer '__pair1_'" in __tree; bodyless-member
+family (__emplace_unique_key_args dropped); three cvise degeneracy
+classes (parked).  Round-25 root pair (2026-08-08): (a) fifth
+TT-instance consumer -- disambiguate_template_classes' instance
+fallback could not find a NAMESPACE-scope template (root-scope
+RECURSIVE lookup does not descend into namespaces; fixed by looking
+up in the instance scope's grandparent per [namespace.qual]);
+(b) member-alias own-parameter capture ([temp.local]/1) extended to
+references nested in pointer declarators and template-id arguments
+(pointer_traits<_Tp*>'s `rebind = _Up*`,
+allocator_traits' `rebind_alloc =
+__allocator_traits_rebind_t<allocator_type, _Other>`) -- previously
+only top-level bare references were protected, so `_Up`/`_Other`
+captured unrelated enclosing bindings (int), unique_ptr's deleter
+became __tree_node_destructor<allocator<int>>, get() returned int*,
+and __emplace_unique_key_args' conversion threw (swallowed by the
+system-header SFINAE guard), dropping insert semantics entirely.
+Needs --object-bits 12 past "too many addressed objects".

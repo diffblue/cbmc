@@ -1,6 +1,6 @@
 CORE libcxx
 main.cpp
---cpp11 --unwind 5 --no-unwinding-assertions --stdlib libc++
+--cpp11 --unwind 5 --no-unwinding-assertions --stdlib libc++ --object-bits 12
 ^VERIFICATION
 ^EXIT=(0|10)$
 ^SIGNAL=0$
@@ -8,3 +8,9 @@ main.cpp
 ^PARSING ERROR$
 libc++ container member access fails with incomplete type due to
 deferred template elaboration.
+--
+Round-25 (2026-08-08): the member-alias own-parameter capture fix
+([temp.local]/1, pointer_traits/allocator_traits rebind chains) makes
+substantially more container machinery convert; the object count
+crossed 2^8, so --object-bits 12 (the libc++-suite standard) is now
+required.
