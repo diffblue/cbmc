@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ vec2 \+ vec2 -> vec2: SUCCESS$
+^\[main\.assertion\.2\] line \d+ weird \+ weird -> int, not weird: SUCCESS$
+^\[main\.assertion\.3\] line \d+ no \+ on void\*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Distilled from the std::__to_address(reverse_iterator) cascade (the
+cpp20 vector-family blocker); _HasArrow detection over
+reverse_iterator's constrained operator-> needs concept
+return-type-requirements to evaluate correctly.
