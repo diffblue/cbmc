@@ -5388,3 +5388,39 @@ next candidates per resolve-throw = element_type/__void_t chain,
 _HasToAddress, or __decay_t of the helper return).  vector family
 still blocked behind it.  same_as/_CmpUnspecifiedParam ordering.h
 noise (recoverable) remains a separate large field.
+
+## Round 27 (2026-08-09 evening): __to_address onion — 2 kernels found
+
+Path: ta6 (_And<is_class<RI>,_IsFancyPointer<RI>> direct = FAILURE)
+— every hand-repro passed, so cvise'd preprocessed ta6 (23-line
+harvest in 40 min; markers kept for syshdr attribution; PINNED binary
+per r25 lesson; criterion = specific assertion FAILURE + native
+runtime gate).  Harvest analysis yielded:
+1. KNOWNBUG cpp20_spec_match_two_phase (20 lines, dual-verified):
+   partial-spec pattern `decltype(to_address(_Pointer()))` naming a
+   LATER-declared function is wrongly selected — CBMC lacks two-phase
+   lookup ([temp.res.general]/1, [temp.dep.candidate]/1); natively the
+   sub fails softly and the PRIMARY is chosen.
+2. The real-chain variant: the same late-decl spec-match failure
+   ESCAPES during _IsFancyPointer<RI>'s static-member-initializer
+   elaboration (value member never materializes) → `_Pred::value`
+   unresolvable in __and_helper → _And falsely false_type →
+   __to_address loses both overloads.  Note _HasToAddress in REAL
+   libc++ pointer_traits.h line ~189 names to_address DECLARED BELOW
+   IT (line 231) — the SAME two-phase shape, so fixing #1 correctly
+   (primary selected softly) likely fixes the whole chain.
+Diagnosis details: instance tag scope entered via resolve_scope
+fast-path id_map find WITHOUT elaboration (suppress_elaborate=1);
+tried elaboration there — instance complete, comps=0, value member
+genuinely absent (static members aren't components; the MEMBER SYMBOL
+was never created because the initializer threw).  Reverted that
+speculative fix; the spec-match two-phase fix is the true root.
+FIX SKETCH: at the spec-match candidate loop (instantiate_template
+~1560-1730) and/or resolve-time function lookup, restrict unqualified
+dependent-name candidates to declarations preceding the TEMPLATE
+DEFINITION POINT (store a decl sequence number on symbols?) — large;
+NARROW alternative: treat resolution failure of a pattern decltype
+as soft candidate rejection AND make member-initializer elaboration
+contain spec-matching throws (select primary, [temp.deduct]/8).
+Background: rfp trace (prop 2775) running; libcxx20_vector probe
+running; da1 archived.
