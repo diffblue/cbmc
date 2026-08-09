@@ -542,6 +542,29 @@ void cpp_declarator_convertert::combine_types(
     }
   }
 
+  // N5008 [temp.spec.general]/5 + [basic.def.odr]/1: a template
+  // specialization is defined at most once, and every instantiation of
+  // the same specialization denotes the SAME entity -- the first
+  // instantiation IS its definition.  An alias-template instance is
+  // materialized here as a typedef symbol (its type carries the
+  // #template marker); when a LATER re-instantiation computes a
+  // divergent type, that recomputation happened in a context where
+  // SFINAE-steered selection went wrong (e.g. libc++'s
+  // `_And<...> = decltype(__and_helper<...>(0))` re-evaluated during a
+  // deferred method-body drain, where the system-header recovery guard
+  // swallows the enable_if substitution failure that must select the
+  // false_type overload).  The specialization's meaning cannot change
+  // between points of instantiation ([temp.point]/7): keep the first
+  // definition rather than erroring out (which silently dropped the
+  // enclosing method body -- the vector::push_back
+  // __uninitialized_allocator_move_if_noexcept shape).
+  if(
+    symbol.is_type && symbol.type.find(ID_C_template).is_not_nil() &&
+    decl_type.find(ID_C_template).is_not_nil())
+  {
+    return;
+  }
+
   cpp_typecheck.error().source_location = source_location;
   cpp_typecheck.error() << "symbol '" << symbol.display_name()
                         << "' already declared with different type:\n"
