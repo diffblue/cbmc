@@ -36,6 +36,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_util.h"
 #include "expr2cpp.h"
 
+#include <functional>
+
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,
   const irep_idt &base_name,
@@ -162,6 +164,33 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
           template_mapt cmap;
           cmap.build(cd.template_type(), check_args);
           cmap.apply(cbody);
+          // N5008 [temp.constr.op] + [expr.prim.req.compound]/1: the
+          // concept body may be a CONJUNCTION/DISJUNCTION of type
+          // predicates whose operand types live in the
+          // `type_arg`/`type_arg1`/`type_arg2` NAMED sub-nodes
+          // (libc++ same_as = `__is_same(_Tp,_Up) && __is_same(_Up,_Tp)`).
+          // template_mapt::apply(exprt) does not descend into those
+          // named sub-nodes of NESTED children (its unnamed-children
+          // recursion goes through the typet overload, which does not
+          // know predicate nodes), so the substituted body kept the
+          // bare parameter names, failed to typecheck, and the
+          // requirement evaluated FALSE.  Substitute them with a local
+          // walk over the (small) body -- children first, so a bound
+          // value's own subtree is not re-walked.
+          {
+            std::function<void(irept &)> apply_pred_args = [&](irept &n)
+            {
+              for(auto &c : n.get_sub())
+                apply_pred_args(c);
+              for(const auto &key :
+                  {ID_type_arg, irep_idt{"type_arg1"}, irep_idt{"type_arg2"}})
+              {
+                if(n.find(key).is_not_nil())
+                  cmap.apply(static_cast<typet &>(n.add(key)));
+              }
+            };
+            apply_pred_args(cbody);
+          }
           // Evaluate C's body recursively through typecheck_expr so nested
           // requirements / concept-ids resolve via the same machinery.
           typecheck_expr(cbody);
