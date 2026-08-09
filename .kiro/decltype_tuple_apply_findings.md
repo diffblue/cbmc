@@ -5274,3 +5274,23 @@ Impact: 4 libcxx tests crossed 2^8 objects (MORE code converts) —
 --object-bits 12 added; both deque tests now fully VERIFY.
 map tests' residual: __tree::destroy null/deallocated derefs on
 __nd->__left_ (recursion on nondet left pointers — next layer).
+
+## Round 25 cont.: fleet postmortem
+
+- cz3 (map operator[] rref no-body): criterion DIED mid-flight — the
+  round-25 capture fix removed the no-body; cpp20_map_basic now
+  converts fully into BMC (no unwind flag -> BMC doesn't terminate;
+  cpp20 family needs desc flags work).  Archived harvest.
+- cz1 (vector size.pointer.1): converged 2.7MB -> 163B DEGENERATE:
+  bare struct with UNINIT __begin_/__end_ + subtraction.  Valgrind
+  gate is blind to uninit pointer SUBTRACTION (flags only jumps/deref)
+  and the same-object failure on uninit members is CORRECT cbmc
+  behavior.  LESSON: pointer-diff criteria need an INITIALIZATION
+  witness (e.g. require native binary to assert vector invariants AND
+  cbmc's model to violate them) — else any uninit pair matches.
+  DIAGNOSIS REDIRECT: the real cpp20_vector failures are the
+  uninit/havoc member class — find WHICH ctor/assign body is dropped
+  in the real test instead of reducing.
+- Live binary under long cvise fleets is a footgun: rebuilds change
+  criteria semantics mid-run (cz3's death was silent).  Copy the
+  binary per-fleet next time (cp build/bin/cbmc /tmp/czN/cbmc.pinned).
