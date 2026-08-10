@@ -6129,6 +6129,118 @@ exprt cpp_typecheck_resolvet::resolve(
       id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
         base_name, cpp_scopet::SCOPE_ONLY);
     }
+
+    // N5008 [basic.lookup.qual] + [class.static.data]: the member may
+    // exist as a SYMBOL even when the instance's scope-tree entry is
+    // missing it -- a static data member whose symbol was created by
+    // the lazy-member machinery without a matching scope registration
+    // (the `_Pred::value` of libc++'s __and_helper signature, where
+    // `_Pred` arrives as a textually-spliced instance tag:
+    // `tag-_IsFancyPointer<RI>::value` resolved fine as a symbol but
+    // not through the scope tree, so _And<...> collapsed to
+    // false_type and std::__to_address(reverse_iterator) lost its
+    // overloads).  Fall back to the symbol table directly: member
+    // symbols are named after the instance WITHOUT the `tag-` marker.
+    if(id_set.empty())
+    {
+      std::string scope_str = id2string(cur.identifier);
+      // strip the OUTERMOST `tag-` (angle-bracket depth 0); inner
+      // occurrences belong to template-argument instance tags and are
+      // part of the member symbol's name
+      {
+        int depth = 0;
+        for(std::size_t i = 0; i + 4 <= scope_str.size(); ++i)
+        {
+          if(scope_str[i] == '<')
+            ++depth;
+          else if(scope_str[i] == '>')
+            --depth;
+          else if(depth == 0 && scope_str.compare(i, 4, "tag-") == 0)
+          {
+            scope_str.erase(i, 4);
+            break;
+          }
+        }
+      }
+      const irep_idt member_id = scope_str + "::" + id2string(base_name);
+      const symbolt *member_sym = cpp_typecheck.symbol_table.lookup(member_id);
+      if(
+        member_sym != nullptr && !member_sym->is_type &&
+        member_sym->is_static_lifetime)
+      {
+        // N5008 [temp.inst]/3 + [expr.const]: using the member in a
+        // constant context instantiates its initializer.  The lazy
+        // machinery may have left the raw dependent expression (the
+        // `_HasArrow<...>::value || _HasToAddress<...>::value` of
+        // _IsFancyPointer); evaluate it now, under a SFINAE guard in
+        // the member's class scope, so consumers see the constant.
+        // Return the member directly: registering a scope entry here
+        // would mutate the scope's id container while outer resolve
+        // frames may hold live iterators into it.
+        //
+        // The member's initializer may be only PARTIALLY evaluated at
+        // this point (the class is mid-elaboration; the use that got
+        // us here is the [temp.inst]/9 trigger).  For the disjunction /
+        // conjunction initializers of the detection-trait idiom
+        // (`_HasArrow<...>::value || _HasToAddress<...>::value`,
+        // libc++ _IsFancyPointer), the short-circuit rules
+        // ([expr.log.or]/1, [expr.log.and]/1) let a determinate
+        // constant operand decide the value without evaluating the
+        // remaining (still-unresolved) operand -- exactly what a
+        // conforming implementation's constant evaluator does.  Fold
+        // structurally; no typechecking (re-entering the typechecker
+        // mid-elaboration corrupts the in-flight class).
+        const symbolt *resolved = cpp_typecheck.symbol_table.lookup(member_id);
+        if(resolved != nullptr)
+        {
+          exprt folded = resolved->value;
+          std::function<void(exprt &)> fold_sc = [&](exprt &e)
+          {
+            if(e.id() != ID_or && e.id() != ID_and)
+              return;
+            for(auto &op : e.operands())
+              fold_sc(op);
+            const bool is_or = e.id() == ID_or;
+            for(const auto &op : e.operands())
+            {
+              if(!op.is_constant())
+                continue;
+              const bool v = !to_constant_expr(op).is_zero();
+              if(is_or == v)
+              {
+                const irep_idt tid = e.type().id();
+                if(
+                  tid == ID_c_bool || tid == ID_signedbv ||
+                  tid == ID_unsignedbv)
+                {
+                  e = from_integer(v ? 1 : 0, e.type());
+                }
+                else
+                {
+                  e = v ? static_cast<exprt>(true_exprt{})
+                        : static_cast<exprt>(false_exprt{});
+                }
+                return;
+              }
+            }
+          };
+          if(folded.is_not_nil() && !folded.is_constant())
+          {
+            fold_sc(folded);
+            simplify(folded, cpp_typecheck);
+          }
+          if(folded.is_constant())
+          {
+            exprt result = folded;
+            result.add_source_location() = source_location;
+            return result;
+          }
+          exprt result = cpp_symbol_expr(*resolved);
+          result.add_source_location() = source_location;
+          return result;
+        }
+      }
+    }
   }
 
   if(id_set.empty())
