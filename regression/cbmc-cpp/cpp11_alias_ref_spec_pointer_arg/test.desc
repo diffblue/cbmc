@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ decay_t_<int\*> is int\*: SUCCESS$
+^\[main\.assertion\.2\] line \d+ decay_t_<int&> is int: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Runtime-verified with g++ and clang++ (-std=c++11 and -std=c++20).
