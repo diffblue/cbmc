@@ -1,48 +1,30 @@
-// N5008 [over.match.funcs]/5, [over.match.best], [over.ics.ref]: for a call on
-// a non-const object, an implicit-object parameter binding to a non-const
-// member function is a better match than one binding to a const member
-// function.  This ranking must apply to member function TEMPLATES too.
-//
-// libstdc++'s std::function depends on it: _Any_data has overloaded member
-// function templates
-//   template<class T> T& _M_access();              // non-const
-//   template<class T> const T& _M_access() const;  // const
-// and _Function_base::_Base_manager::_M_create does
-//   __dest._M_access<_Functor*>() = new _Functor(...);
-// on a non-const _Any_data, which must select the non-const _M_access (an
-// lvalue) so the assignment is well-formed.
-//
-// Now handled: for a non-const object, overload resolution between a const and
-// a non-const member function TEMPLATE selects the non-const one.  The deduced
-// function type of an uninstantiated template_function_instance carries no
-// `this` parameter, so the const member-qualifier is recovered from the
-// candidate template's ID_method_qualifier and added to the cv distance (a
-// const member function called on a non-const object ranks worse).
-//
-// Header-free and non-vacuous (assertion 2 must FAIL).
-
-extern "C" void __CPROVER_assert(int, const char *);
-
-struct S
+// N5008 [over.call.func]/3 + [over.ics.rank]/3.2.6: an unqualified
+// member call's implied object argument is (*this); a non-const
+// enclosing member selects the non-const overload of a const /
+// non-const member-template pair.  CBMC's ranking only applied the
+// cv-penalty for EXPLICIT objects, so the pair tied ("does not
+// uniquely resolve") whenever the return types differ, and the
+// CALLER was silently dropped.  Distilled from libc++
+// __tree::find/__lower_bound (std::map::find returned havoc; a
+// find()==end() comparison on an EMPTY map was falsifiable).
+extern "C" void __CPROVER_assert(bool, const char *);
+struct tree
 {
-  int y;
-  template <class T>
-  T &acc()
+  template <class K> int lb(K v)
   {
-    return *(T *)&y;
+    return 1;
   }
-  template <class T>
-  const T &acc() const
+  template <class K> void lb(K v) const
   {
-    return *(const T *)&y;
+  }
+  template <class K> int find(K v)
+  {
+    return lb(v); // non-const this: must select the non-const overload
   }
 };
-
 int main()
 {
-  S s;
-  s.acc<int>() = 5; // non-const s: must select non-const acc() (an lvalue)
-  __CPROVER_assert(s.acc<int>() == 5, "non-const member template selected");
-  __CPROVER_assert(s.acc<int>() == 6, "WRONG must FAIL");
+  tree t;
+  __CPROVER_assert(t.find(5) == 1, "non-const member template selected");
   return 0;
 }
