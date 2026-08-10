@@ -5618,3 +5618,18 @@ adjacency, typecheck-phase only via --show-symbol-table, PINNED
 probe binary; 82k lines, ~50s/iter shrinking).
 Also: mb2 caught operator-> no-match + tuple<?&&> lead for
 operator[] (separate layer, after find is fixed).
+
+## Round 32 final: find/__lower_bound FIXED (implied-object ranking)
+
+Kernel (21 lines, CORE cpp11_member_template_const_overload): const/
+non-const member-TEMPLATE pair with DIFFERING return types ties on
+implicit member calls — member_template_const_penalty required
+fargs.has_object; implicit calls have none.  Fix: derive the implied
+object's constness from the enclosing member's this_expr
+([over.call.func]/3).  Identical returns masked the gap via
+remove_duplicates.  ea1 cvise: 82k → 42 lines in ~2h with the
+TYPECHECK-PHASE criterion (probe binary + --show-symbol-table stops
+before BMC — the runtime-free criterion trick, REUSE THIS).
+mb6 (find==end) + mb4 GREEN.  map_basic still fails 25/5960 — the
+operator[] layer (tuple<?&&> + operator-> rejection leads banked in
+the round-32 opening entry).  5 suites green.
