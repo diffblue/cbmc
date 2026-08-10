@@ -4521,6 +4521,18 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
     // enter the scope of the template
     cpp_typecheck.cpp_scopes.go_to(*template_scope);
 
+    // N5008 [temp.deduct.type]/8: matching a partial specialization's
+    // argument PATTERN uses the strict P/A form rules -- a reference
+    // pattern (`T&`) requires a reference argument and cv-qualifiers
+    // are part of the pattern.  The other spec-matching sites
+    // (instantiate_template / elaborate_class_template) already opt
+    // in; this one deduced `decay_<T&>` from `decay_<int*>` (stripping
+    // the `&`), selecting the reference specialization, so
+    // `decay_t_<int*>` resolved to `int` (libc++
+    // __to_address/__decay_t return-type shape).
+    const bool saved_strict_cv = strict_cv_deduction;
+    strict_cv_deduction = true;
+
     for(std::size_t i = 0; i < n_partial; i++)
     {
       const auto &parg = partial_specialization_args.arguments()[i];
@@ -4574,6 +4586,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
           partial_specialization_args.arguments()[i],
           full_template_args_tc.arguments()[i]);
     }
+
+    strict_cv_deduction = saved_strict_cv;
 
     // see if that has worked out
 
@@ -5055,6 +5069,45 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
     if(!fingerprint.get_sub().empty())
       args_irep.add("#map_fingerprint") = fingerprint;
   }
+  // Distinguish legitimate NESTED resolutions of the same alias
+  // spelling from genuine cycles: the return type of a function
+  // template candidate is substituted after the candidate's deduction
+  // map is reverted, so a nested resolution (e.g. the inner
+  // `__decay_t<decltype(std::__to_address(...))>` while computing the
+  // OUTER __to_address's identically-spelled return type,
+  // pointer_traits.h) reaches here with the SAME spelling and the
+  // SAME visible bindings.  Such nesting differs in the INSTANTIATION
+  // CONTEXT ([temp.point]): add the innermost instantiation frame to
+  // the key.  A genuine mutual-recursion cycle repeats the same frame
+  // and still trips the per-key cap; as a backstop, an absolute
+  // same-spelling depth cap below bounds alternating-frame cycles.
+  {
+    irept ctx("ctx");
+    if(!cpp_typecheck.instantiation_stack.empty())
+    {
+      ctx.set(
+        ID_identifier, cpp_typecheck.instantiation_stack.back().identifier);
+      ctx.set_size_t(
+        irep_idt{"depth"}, cpp_typecheck.instantiation_stack.size());
+    }
+    args_irep.add("#instantiation_ctx") = ctx;
+  }
+  static thread_local std::map<irep_idt, unsigned> spelling_depth;
+  unsigned &sdepth = spelling_depth[base_name];
+  if(sdepth >= 20)
+    return empty_typet{};
+  struct sdepth_guardt
+  {
+    unsigned &d;
+    explicit sdepth_guardt(unsigned &_d) : d(_d)
+    {
+      ++d;
+    }
+    ~sdepth_guardt()
+    {
+      --d;
+    }
+  } sdepth_guard{sdepth};
   std::pair<irep_idt, irept> key{base_name, args_irep};
   // Re-entry with an identical key is NOT necessarily a cycle: the
   // legitimate resolution of a member alias delegates to
@@ -8153,6 +8206,21 @@ void cpp_typecheck_resolvet::guess_template_args(
     // [temp.deduct.type]/8: if P is a reference type, the referred-to
     // type is used for type deduction.
     typet desired = desired_type;
+    // [temp.deduct.type]/8 (P/A form list): in partial-specialization
+    // matching (strict_cv_deduction contexts) a reference pattern `T&`
+    // or `T&&` is matched only by a REFERENCE argument -- `decay_<T&>`
+    // must not match `decay_<int*>` (stripping the `&` and deducing
+    // T=int* wrongly selects the reference specialization, so
+    // `decay_t_<int*>` resolved to `int`; the libc++
+    // __to_address/__decay_t return-type shape).  Reference stripping
+    // remains correct for function-call deduction ([temp.deduct.call]/3),
+    // which does not set strict_cv_deduction.
+    if(
+      strict_cv_deduction && !is_reference(desired) &&
+      !is_rvalue_reference(desired))
+    {
+      return; // reference pattern vs non-reference argument
+    }
     if(is_reference(desired) || is_rvalue_reference(desired))
     {
       // The reference qualifier of P is part of the pattern: an
@@ -8205,6 +8273,11 @@ void cpp_typecheck_resolvet::guess_template_args(
         template_type.get_bool(ID_C_rvalue_reference) !=
           desired_type.get_bool(ID_C_rvalue_reference))
         return; // reference kinds differ -> deduction failure
+      // [temp.deduct.type]/8: see the reference branch above -- in
+      // partial-specialization matching a reference pattern requires a
+      // reference argument.
+      if(strict_cv_deduction && pattern_is_ref && !desired_is_ref)
+        return;
       guess_template_args(
         to_type_with_subtype(template_type).subtype(),
         to_pointer_type(desired_type).base_type());
