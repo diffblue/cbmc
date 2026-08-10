@@ -1,62 +1,13 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp20 --unwind 5 --no-unwinding-assertions --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+--cpp20 --unwind 5 --no-unwinding-assertions --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ vector size: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-libc++ container member access fails with incomplete type due to
-deferred template elaboration.
-Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
-C++20 concepts: substitution failure inside a concept-id's argument
-must yield an unsatisfied constraint ([temp.constr.atomic]/3), not a
-hard 'no match for same_as'; minimal WRONG-CODE root KNOWNBUG
-cpp20_constraint_substitution_failure.  cpp20_ranges_basic
-additionally aborts a unary-operand invariant (std_expr.h:380).
-Update 2026-07-24: past the same_as front-end failure
-([temp.constr.atomic]/3 atom classification); residual: semantic FAILUREs (needs --object-bits 12; deeper layer).
-The same_as front-end failure is the requires-clause concept-template-id
-parse gap, captured minimally in
-cpp20_requires_clause_concept_template_id.
-Update 2026-07-28: front end clean; with --object-bits 12 and
---unwind 5 --no-unwinding-assertions the failure layer is the
-vector-internal-pointer family: after push_back, __begin_/__end_ are
-unconstrained (size() = __end_ - __begin_ fails same-object/overflow
-checks).  Minimal driver: vector<int> v; v.push_back(7);
-assert(v.size()==1).  Header-free reduction blocked on the
-typecheck_method_application crash that all preprocessed-libc++
-sources hit (see cpp20_ranges_basic_libcxx).
-Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
-Update 2026-07-30: the "masking crash" on preprocessed sources was a
-MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
-preprocessed source with the right flags reproduces the SEMANTIC
-failure directly, so header-free reduction is unblocked.
-Update 2026-07-30 (round 4): the bodyless std::move root is FIXED
-(cpp20_bodyless_std_move is CORE); the library test still fails on
-further layers (__end_/__begin_ still unconstrained) -- re-reduce
-from the current state next round.
-Update 2026-08-01 (round 5): four more layers fixed -- auto-return
-static members of class-template instances (eager deduction), decltype
-of indirection is T& ([dcl.type.decltype]/1.5), explicit template args
-survive deduction ([temp.arg.explicit]/2), C++20 parenthesized
-aggregate init/CTAD (make_pair).  Next open root:
-cpp20_recursive_member_alias_base (_Or/_And metaprogram bases drop).
-Round-11 (2026-08-04): the same_as wall is FIXED (concept-id
-substitution failure folds to false, cpp20_concept_id_substitution_
-failure CORE); <vector> now CONVERTS fully.  Next layer is semantic:
-with --object-bits 12, `this->__end_ - this->__begin_` (size()) fails
-same-object/overflow checks -- pointer-arithmetic modeling, needs
-fresh scoping.
-Round-12 (2026-08-05): background reduction BOOTSTRAP for this driver
-is parked.  Seeding cvise from preprocessed source (cbmc --preprocess,
-line-markers stripped) removes system-header leniency and surfaces a
-CHAIN of real front-end gaps ahead of this test's own layer; two were
-fixed same-day (constexpr-array element addresses -> CORE
-cpp17_constexpr_array_element_addr; enum-argument ADL poison pill ->
-CORE cpp20_adl_enum_poison_pill), plus three seed-local stubs (pthread
-mutex/condvar NSDMI, `restrict`, __uninitialized_allocator_move stub).
-NEXT blocker in the seed: basic_string<int>'s union rep members
-(__is_long_/__size_/__cap_ "unknown" in __get_short_size/__get_long_cap
-when re-parsed outside system headers).  Fix that, then re-seed; the
-criterion harness is recorded in the findings log.
+--
+History: the six-layer __to_address chain (see
+cpp20_to_address_reverse_iterator).  Fixed 2026-08-10 by the
+[basic.lookup.qual]/1 qualified-lookup fix; --object-bits 12 needed
+since more of libc++ converts (round-25 note).
