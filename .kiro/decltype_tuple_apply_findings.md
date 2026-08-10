@@ -5572,3 +5572,30 @@ OOM — completes with 25 of 5960 FAILUREs, cluster =
 reference; __tree insert-or-create path).  Now a diagnosable
 wrong-code target (trace one operator[] property); desc will need the
 unwind flags at flip time.
+
+## Round 32 (2026-08-10): map operator[] arc opened
+
+- std::set works on cpp20 (contrast test) — map-SPECIFIC.
+- map::operator[](rref int) is CALLED but BODILESS with NO no-body
+  property (the silent-havoc diagnostic gap again!); return_value
+  havocs to header-interior pointers; 42 written into pointer bits;
+  destroy() then walks garbage (the 25-failure cluster).
+- Drain-scoped cf-catch caught the swallowed error: "found no match
+  for symbol 'operator->'" — candidate IS the correct
+  __tree_iterator::operator-> (return __rebind_pointer_t<...>,
+  __tree:747) but gets REJECTED; immediately preceded by
+  `tuple<? &&>` instantiations (nil type arg!) from map::operator[]'s
+  piecewise path (__emplace_unique_key_args(k, piecewise_construct,
+  forward_as_tuple(k), forward_as_tuple())).  Suspect: the empty
+  forward_as_tuple() / tuple<> machinery produces a nil-typed arg,
+  poisoning the drain; the operator-> rejection may be collateral
+  (candidate return alias failing in-context — standalone
+  __rebind_pointer_t works, mb3.cpp).
+- SEPARATE second defect: mb4.cpp — on an EMPTY map,
+  `m.find(1) == m.end()` evaluates FALSE (find/end comparison wrong
+  or find havoc'd).  8-line repro, real headers.
+NEXT: (1) trace the operator-> rejection: instrument
+disambiguate_functions' rejection reason for that candidate, or
+repro the piecewise emplace chain (tuple<?&&> lead) header-free;
+(2) mb4 find/end as an independent smaller kernel — likely quicker;
+consider starting with it.
