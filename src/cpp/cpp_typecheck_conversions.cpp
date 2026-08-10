@@ -2623,6 +2623,29 @@ bool cpp_typecheckt::reference_binding(
       expr.set(ID_C_lvalue, true);
     else if(expr.get(ID_statement) == ID_function_call)
       expr.set(ID_C_lvalue, true);
+    else if(expr.id() == ID_member)
+    {
+      // N5008 [expr.ref]/8: a member access on a prvalue or xvalue is
+      // itself an xvalue, and [over.match.funcs]/5.3 permits binding
+      // the implied object argument of a member function without a
+      // ref-qualifier to an rvalue.  Walk the member chain: if the
+      // ultimate object is itself a temporary (function-call result or
+      // materialised temporary), the member is callable.  The shape of
+      // `f(...).first->x`, i.e. libc++
+      // `__emplace_unique_key_args(...).first.operator->()` in
+      // std::map::operator[].
+      const exprt *c = &expr;
+      while(c->id() == ID_member)
+        c = &to_member_expr(*c).compound();
+      if(
+        c->get(ID_statement) == ID_temporary_object ||
+        c->get(ID_statement) == ID_function_call)
+      {
+        expr.set(ID_C_lvalue, true);
+      }
+      else
+        return false;
+    }
     else if(expr.get_bool(ID_C_temporary_avoided))
     {
       expr.remove(ID_C_temporary_avoided);
