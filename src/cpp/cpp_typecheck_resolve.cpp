@@ -5830,7 +5830,20 @@ exprt cpp_typecheck_resolvet::resolve(
 
   cpp_scopest::id_sett id_set;
 
-  cpp_scopet::lookup_kindt lookup_kind = cpp_scopet::RECURSIVE;
+  // N5008 [basic.lookup.qual]/1: for a qualified name `S::m`, the
+  // lookup of `m` is restricted to the scope denoted by the
+  // nested-name-specifier (S's scope, its bases and inline/using
+  // namespaces -- the QUALIFIED walk); it must NOT continue into
+  // ENCLOSING scopes.  The unconditional RECURSIVE walk here made a
+  // nonexistent member fall back to a same-named namespace-scope
+  // function, wrongly validating detection-idiom specialization
+  // patterns like libc++ __to_address_helper's
+  // `decltype((void)pointer_traits<_P>::to_address(...))` -- the
+  // member is absent, the pattern must fail softly, but the fallback
+  // found std::to_address and the void-returning specialization was
+  // selected (the cpp20 vector-family __to_address chain).
+  cpp_scopet::lookup_kindt lookup_kind =
+    qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE;
 
   if(template_args.is_nil())
   {
