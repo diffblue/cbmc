@@ -5507,3 +5507,36 @@ candidate reaches fn-type typecheck at all; if yes, find which path
 bypasses the 9492 defaults loop (maybe explicit-template-args path or
 the apply_template_args route at 87/114).
 5 suites green x2 (both commits).
+
+## Round 30 (2026-08-10): recursion arc — probe inventory (no fix yet)
+
+vr5 (__to_address on custom arrow class, real headers) probe results:
+- id_set for `__to_address` is CORRECT (3 __to_address shapes only);
+  the public to_address candidates seen earlier come from other call
+  sites (shared_ptr machinery in <memory>).
+- gfta-enter fired 594x ALL with arg0=tag-arrow_it — the nested
+  deduction for `__to_address(int*)` NEVER happens: no default-ok/
+  default-fail with a _Pointer->int* map ever appears (every map dump
+  shows only 571/572/573/575::_Pointer->tag-arrow_it, one entry per
+  nesting level).
+- No `__p` unknown, no operator-> no-match — everything resolves.
+- decltype results attributed pointer_traits.h:196
+  (`decltype((void)declval<const _P&>().operator->())`, the _HasArrow
+  spec pattern): 328x POINTER + 1x EMPTY.  Natively this decltype is
+  ALWAYS void — the (void) cast is dropped 328 times (or the location
+  attribution is misleading; standalone repro vc1.cpp of the same
+  shape PASSES, so it is context-dependent).
+NEXT (fresh turn): (1) determine whether the 196-attributed pointer
+results are genuinely the _HasArrow pattern (print the full type +
+enclosing candidate at that probe); if yes, find where the void-cast
+is lost during PATTERN typechecking (spec-match context) — that would
+flip _HasArrow<arrow_it> selection and explains everything: spec
+mismatches (int* != void default) -> _HasArrow=false ->
+_IsFancyPointer=false -> fancy __to_address discarded -> ... yet
+defaults succeeded (enable_if<true>) — reconcile via the round-28
+short-circuit fold (first operand constant TRUE from... check).
+(2) The 594x same-arg re-deduction: find the RETRY loop driving it
+(who re-resolves the same call; each retry re-attempts __decay_t →
+260 alias-cycle breaks → void).
+Probes to reuse: gfta-enter/default-ok+map/fntype-pre (this round's
+patch set, in git stash-able form in this entry's history).
