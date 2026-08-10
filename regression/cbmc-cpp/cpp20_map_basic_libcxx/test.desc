@@ -1,47 +1,23 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp20 --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+--cpp20 --stdlib libc++ --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 7 map access: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-libc++ container member access fails with incomplete type due to
-deferred template elaboration.
-Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
-C++20 concepts: substitution failure inside a concept-id's argument
-must yield an unsatisfied constraint ([temp.constr.atomic]/3), not a
-hard 'no match for same_as'; minimal WRONG-CODE root KNOWNBUG
-cpp20_constraint_substitution_failure.  cpp20_ranges_basic
-additionally aborts a unary-operand invariant (std_expr.h:380).
-Update 2026-07-24: past the same_as front-end failure
-([temp.constr.atomic]/3 atom classification); residual: a further CONVERSION ERROR layer.
-The same_as front-end failure is the requires-clause concept-template-id
-parse gap, captured minimally in
-cpp20_requires_clause_concept_template_id.
-Minimal header-free reproducer: cpp20_optional_base_alias_unknown.
-Update 2026-07-29: still "__null_state_ unknown" in
-__optional_destruct_base; same computed-default/optional machinery
-family as cpp20_trait_alias_default_meminit.
-Round-7 update (2026-08-03): the __null_state_ root is FIXED
-(anonymous unions with class-type variant members build;
-cpp20_anon_union_class_variant is CORE).  The test now converts and
-runs BMC (with --object-bits 12): remaining layers are map::operator[]
-no-body and the anon-union variant mem-initializer drop
-(cpp20_anon_union_variant_meminit).
-Round-11 (2026-08-04): the same_as wall is FIXED; <map> now CONVERTS
-fully.  Next layer: operator[] and __tree::destroy get NO BODY
-(member definitions not instantiated), the long-documented
-operator[] layer -- now directly diagnosable.
-Round-12 (2026-08-05): background reduction BOOTSTRAP for this driver
-is parked.  Seeding cvise from preprocessed source (cbmc --preprocess,
-line-markers stripped) removes system-header leniency and surfaces a
-CHAIN of real front-end gaps ahead of this test's own layer; two were
-fixed same-day (constexpr-array element addresses -> CORE
-cpp17_constexpr_array_element_addr; enum-argument ADL poison pill ->
-CORE cpp20_adl_enum_poison_pill), plus three seed-local stubs (pthread
-mutex/condvar NSDMI, `restrict`, __uninitialized_allocator_move stub).
-NEXT blocker in the seed: basic_string<int>'s union rep members
-(__is_long_/__size_/__cap_ "unknown" in __get_short_size/__get_long_cap
-when re-parsed outside system headers).  Fix that, then re-seed; the
-criterion harness is recorded in the findings log.
+--
+std::map<int,int> insert via operator[] and read-back.  Flipped
+KNOWNBUG->CORE 2026-08-10 after the final three layers:
+(1) [basic.lookup.qual]/1 qualified-lookup fix (round 31),
+(2) implied-object constness in member-template overload ranking
+    ([over.call.func]/3; __tree::find/__lower_bound, CORE
+    cpp11_member_template_const_overload),
+(3) member-of-temporary implied-object binding ([expr.ref]/8,
+    [over.match.funcs]/5.3; operator[]'s
+    __emplace_unique_key_args(...).first->__get_value(), CORE
+    cpp11_member_of_temporary_call).
+--object-bits 12: the full <map> conversion exceeds 2^8 objects.
+--unwind 5 --no-unwinding-assertions: __tree recursion; bounded
+harness.  0 of 6002 properties fail; runtime-verified natively with
+clang++ -stdlib=libc++.
