@@ -176,6 +176,12 @@ protected:
   /// error.  Maintained by `sfinae_contextt` (a friend).
   unsigned sfinae_context_depth = 0;
 
+  // Nonzero while a partial-specialization argument PATTERN is being
+  // matched/typechecked ([temp.spec.partial.match]); gates the
+  // two-phase-lookup declaration-order filter in resolve() (N5008
+  // [temp.res.general]/1, [temp.dep.candidate]/1).
+  unsigned two_phase_pattern_depth = 0;
+
   // Non-zero while operator_is_overloaded gathers/resolves candidates for
   // an operator EXPRESSION (a @ b).  N5008 [over.match.oper]/3: only there
   // does the non-member candidate lookup ignore member functions and add
