@@ -2278,9 +2278,38 @@ unsigned cpp_typecheck_resolvet::member_template_const_penalty(
   const exprt &cand,
   const cpp_typecheck_fargst &fargs)
 {
-  if(
-    cand.id() != ID_template_function_instance || !fargs.has_object ||
-    fargs.operands.empty())
+  if(cand.id() != ID_template_function_instance)
+    return 0;
+
+  // Determine the object argument's constness.  For an explicit object
+  // (`obj.f(...)`) it is the first operand.  For an IMPLICIT member
+  // call from within another member function, N5008 [over.call.func]/3:
+  // the implied object argument is `(*this)` -- derive its constness
+  // from the enclosing member's `this` (a const member's this points
+  // to const).  Without this, the const / non-const member-template
+  // overload pair tied and the call was rejected as ambiguous
+  // ("does not uniquely resolve"), silently dropping the caller's
+  // body -- libc++ __tree::find's `__lower_bound(...)` call, the
+  // std::map::find wrong-result shape.
+  bool object_const = false;
+  bool have_object = false;
+  if(fargs.has_object && !fargs.operands.empty())
+  {
+    object_const = fargs.operands.front().type().get_bool(ID_C_constant);
+    have_object = true;
+  }
+  else
+  {
+    const exprt &this_expr =
+      cpp_typecheck.cpp_scopes.current_scope().this_expr;
+    if(this_expr.is_not_nil() && this_expr.type().id() == ID_pointer)
+    {
+      object_const =
+        to_pointer_type(this_expr.type()).base_type().get_bool(ID_C_constant);
+      have_object = true;
+    }
+  }
+  if(!have_object)
     return 0;
   const irep_idt tmpl = cand.type().get(ID_C_template);
   if(tmpl.empty())
@@ -2294,8 +2323,6 @@ unsigned cpp_typecheck_resolvet::member_template_const_penalty(
   const typet &mq = static_cast<const typet &>(
     decl.declarators().front().find(ID_method_qualifier));
   const bool member_const = cpp_typecheck.has_const(mq);
-  const bool object_const =
-    fargs.operands.front().type().get_bool(ID_C_constant);
   return (member_const && !object_const) ? 1 : 0;
 }
 
