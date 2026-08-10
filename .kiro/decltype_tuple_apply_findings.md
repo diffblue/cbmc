@@ -5599,3 +5599,22 @@ disambiguate_functions' rejection reason for that candidate, or
 repro the piecewise emplace chain (tuple<?&&> lead) header-free;
 (2) mb4 find/end as an independent smaller kernel — likely quicker;
 consider starting with it.
+
+## Round 32 cont.: find() root = __lower_bound ambiguity
+
+Bisection: end()==end() PASSES; find(1)==end() FAILS on empty map —
+find() is the wrong side.  __tree::find<signed_int> is CALLED but
+BODILESS (again NO no-body property — silent havoc).  Drain probe:
+"symbol '__lower_bound' does not uniquely resolve" — the const /
+non-const member overload pair (iterator vs const_iterator returns,
+alias-typed params __node_pointer/__iter_pointer printed in the
+candidates UNRESOLVED: __conditional_t<1,...>, __rebind_pointer_t
+<...>) ties instead of the non-const winning on the implicit object
+parameter ([over.match.funcs]/4, [over.ics.rank]/3.2.6).
+Hand-repros lb1-lb3 (incl. alias-typed params + member template
+caller) ALL PASS — context-dependent again.  cvise ea1 RUNNING
+(criterion = 'does not uniquely resolve' + cf-catch find<signed_int>
+adjacency, typecheck-phase only via --show-symbol-table, PINNED
+probe binary; 82k lines, ~50s/iter shrinking).
+Also: mb2 caught operator-> no-match + tuple<?&&> lead for
+operator[] (separate layer, after find is fixed).
