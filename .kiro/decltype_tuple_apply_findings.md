@@ -5438,3 +5438,27 @@ running; da1 archived.
 - libcxx20_vector (with --object-bits 12): completes, 22 of 5537
   FAILURE incl. main.assertion.1 line 9 'size' — same vector family,
   waiting on the two-phase-lookup fix.
+
+## Round 28 (2026-08-09 night): TWO fixes — two-phase + static-member kernels
+
+Fix 1 (commit "two-phase lookup for partial-specialization patterns"):
+two_phase_pattern_depth counter gates a declaration-order filter in
+resolve(): while a partial-spec pattern is typechecked, ordinary-
+lookup candidates declared LATER in the same file are dropped
+([temp.res.general]/1, [temp.dep.candidate]/1); ADL still augments.
+LESSON: the sfinae_context_depth-wide gate broke 43 tests (deferred
+member bodies see later decls legitimately); scope gates to the
+PATTERN only.  cpp20_spec_match_two_phase -> CORE.
+Fix 2 (commit "resolve static members via symbol table + short-
+circuit folding"): (a) qualified member lookup falls back to the
+symbol table when the scope-tree entry is missing (member symbols =
+instance name with OUTERMOST depth-0 tag- stripped); DON'T insert
+scope entries inside resolve (live iterator corruption -> segv);
+(b) partially-evaluated or/and initializers fold by short-circuit
+STRUCTURALLY (no typechecking — re-entering the typechecker
+mid-elaboration segfaults; from_integer only for
+c_bool/signedbv/unsignedbv, else invariant violation).
+ta5/ta6 (_And/_IsFancyPointer kernels) GREEN.  ta3 = one more layer
+(the __to_address alias itself still throws; resolve-throw showed
+type scope=template::8 = enable_if body + __to_address + to_address).
+5 suites green after both fixes.
