@@ -5633,3 +5633,22 @@ before BMC — the runtime-free criterion trick, REUSE THIS).
 mb6 (find==end) + mb4 GREEN.  map_basic still fails 25/5960 — the
 operator[] layer (tuple<?&&> + operator-> rejection leads banked in
 the round-32 opening entry).  5 suites green.
+
+## Round 33 (2026-08-10): map operator[] FIXED — map_basic FLIPPED
+
+Root (match-fail probe in fargs.match printed operand shape):
+operator->'s implied object was `member` of `side_effect
+function_call` — reference_binding's this-gate only whitelisted
+DIRECT temporaries; member-of-temporary (xvalue, [expr.ref]/8,
+[over.match.funcs]/5.3) returned false → operator-> no-match →
+operator[] body dropped → silent havoc.  Fix: walk the member chain;
+ultimate temporary compound ⇒ binding permitted
+(cpp_typecheck_conversions.cpp reference_binding ~2619).
+Kernel mx1 (24 lines): `make(7).first.get()` — pre-fix CONVERSION
+ERROR (hard, not silent — only in-drain it silently drops bodies).
+CORE cpp11_member_of_temporary_call + FLIP cpp20_map_basic_libcxx
+(0/6002, 1 assertion, native clang++ green).  5 suites green.
+The mb2 tuple<?&&> lead was NOISE (recovered deduction attempts);
+the destroy-cluster derefs were downstream of the havoc'd insert.
+8 KNOWNBUGs remain: ranges_basic (vacuous), ranges_pipe, restrict_fp,
+regex, ofstream, abstract_env, erase_if, goto_symex_state_header.
