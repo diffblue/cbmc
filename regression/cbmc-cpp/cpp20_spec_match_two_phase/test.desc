@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ primary selected \(soft mismatch\): SUCCESS$
@@ -13,3 +13,7 @@ partial specialization instead (no two-phase lookup) and the
 assertion FAILS.  Fix requires point-of-declaration awareness in the
 resolver for dependent unqualified calls inside specialization
 patterns, or a targeted ordering check at the spec-matching site.
+Round-28 fix (2026-08-09): ordinary-lookup candidates declared later
+in the same file than the dependent use are filtered in SFINAE
+contexts (approximating the definition-point rule; ADL still adds
+instantiation-point candidates per [temp.point]).
