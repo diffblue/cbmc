@@ -1533,6 +1533,21 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         // error.
         sfinae_contextt spec_sfinae_guard{*this};
 
+        // Scope the two-phase-lookup filter (see resolve()) to the
+        // pattern matching below.
+        struct two_phase_guardt
+        {
+          unsigned &d;
+          explicit two_phase_guardt(unsigned &_d) : d(_d)
+          {
+            ++d;
+          }
+          ~two_phase_guardt()
+          {
+            --d;
+          }
+        } two_phase_guard{two_phase_pattern_depth};
+
         for(const auto *id_ptr : id_set)
         {
           const symbolt &s = lookup(id_ptr->identifier);

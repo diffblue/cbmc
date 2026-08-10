@@ -4660,6 +4660,9 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         try
         {
           sfinae_contextt sfinae_guard{cpp_typecheck};
+          // Scope the two-phase-lookup filter (see resolve()) to the
+          // pattern typecheck below ([temp.res.general]/1).
+          ++cpp_typecheck.two_phase_pattern_depth;
           // For a trailing-pack partial spec the written argument list ends in
           // `T...`, which must be expanded to the deduced pack elements so the
           // completed list can be compared for equality against the
@@ -4673,10 +4676,12 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               primary_template_symbol,
               partial_specialization_args);
           cpp_typecheck.disable_template_arg_pack_expansion = false;
+          --cpp_typecheck.two_phase_pattern_depth;
         }
         catch(...)
         {
           cpp_typecheck.disable_template_arg_pack_expansion = false;
+          --cpp_typecheck.two_phase_pattern_depth;
           sfinae_failed = true;
         }
         cpp_typecheck.suppress_elaborate = old_suppress_pattern;
@@ -5909,6 +5914,59 @@ exprt cpp_typecheck_resolvet::resolve(
   // hidden.  (Members merely visible through inheritance are represented as
   // flattened `from_base` components whose declaring class is the derived
   // class, so they never trip the base-of test in the first place.)
+  // N5008 [temp.res.general]/1 + [temp.dep.candidate]/1 (two-phase name
+  // lookup): when a DEPENDENT unqualified call is re-looked-up during
+  // instantiation, the ordinary-lookup component comprises only
+  // declarations visible at the TEMPLATE DEFINITION point; only ADL is
+  // performed at the point of instantiation.  CBMC resolves at
+  // instantiation time against the full symbol table, so a function
+  // declared AFTER the template wrongly becomes a candidate -- selecting
+  // a partial specialization whose `decltype(f(...))` pattern names a
+  // later-declared `f` (libc++ pointer_traits' _HasToAddress /
+  // to_address ordering; KNOWNBUG cpp20_spec_match_two_phase).
+  //
+  // Approximate the definition-point rule by declaration ORDER within
+  // the same file: a candidate declared later in the SAME file as the
+  // use cannot have been visible at the use's lexical point (valid
+  // programs require prior declaration for non-ADL unqualified calls).
+  // Cross-file candidates are kept (header order is not modelled).
+  // Restricted to SFINAE contexts (deduction / specialization
+  // matching), where mis-added candidates flip selections silently;
+  // ADL below re-adds instantiation-point candidates as [temp.point]
+  // allows.
+  if(
+    !qualified && fargs.in_use && !fargs.has_object &&
+    cpp_typecheck.two_phase_pattern_depth > 0 &&
+    !source_location.get_file().empty())
+  {
+    const irep_idt use_file = source_location.get_file();
+    const auto use_line_str = id2string(source_location.get_line());
+    if(!use_line_str.empty())
+    {
+      const unsigned long use_line = std::stoul(use_line_str);
+      for(auto it = id_set.begin(); it != id_set.end();)
+      {
+        const symbolt *cand_sym =
+          cpp_typecheck.symbol_table.lookup((*it)->identifier);
+        bool drop = false;
+        if(
+          cand_sym != nullptr && !cand_sym->location.get_file().empty() &&
+          cand_sym->location.get_file() == use_file &&
+          (cand_sym->type.id() == ID_code ||
+           cand_sym->type.get_bool(ID_is_template)))
+        {
+          const auto cand_line_str = id2string(cand_sym->location.get_line());
+          if(!cand_line_str.empty() && std::stoul(cand_line_str) > use_line)
+            drop = true;
+        }
+        if(drop)
+          it = id_set.erase(it);
+        else
+          ++it;
+      }
+    }
+  }
+
   const cpp_scopest::id_sett ordinary_lookup_id_set = id_set;
 
   if(
