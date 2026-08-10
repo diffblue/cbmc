@@ -1144,6 +1144,23 @@ bool configt::set(const cmdlinet &cmdline)
     ansi_c.char_is_unsigned = false;
     ansi_c.long_double_width = 8 * 8;
   }
+  else if(
+    os == "freebsd" &&
+    (arch == "powerpc" || arch == "ppc64" || arch == "ppc64le"))
+  {
+    // FreeBSD/PowerPC does not use the 128-bit long double assumed by
+    // set_arch_spec_power(): it is 64-bit, except on powerpc64le since
+    // FreeBSD 16.0, where it is IEEE binary128.  The width is a property
+    // of the release, which the target triple does not carry, so follow
+    // the toolchain when verifying natively and assume FreeBSD >= 16.0
+    // when cross-verifying.
+    if(arch == this_arch && os == this_os)
+      ansi_c.long_double_width = sizeof(long double) * CHAR_BIT;
+    else if(arch == "ppc64le")
+      ansi_c.long_double_width = 16 * 8;
+    else
+      ansi_c.long_double_width = 8 * 8;
+  }
 
   // Let's check some of the type widths in case we run
   // the same architecture and OS that we are verifying for.
