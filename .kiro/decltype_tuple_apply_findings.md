@@ -5462,3 +5462,20 @@ ta5/ta6 (_And/_IsFancyPointer kernels) GREEN.  ta3 = one more layer
 (the __to_address alias itself still throws; resolve-throw showed
 type scope=template::8 = enable_if body + __to_address + to_address).
 5 suites green after both fixes.
+
+## Round 28 cont.: ta3 next kernel + cascade measurement
+
+ta3's fatal is now `invalid implicit conversion from 'void' to
+'signed int *'` — __to_address RESOLVES (fix-2 cascade) but the
+constrained overload's return type
+`__decay_t<decltype(__to_address_helper<_P>::__call(declval<...>()))>`
+evaluates to VOID (the decltype chain fails silently and degrades).
+NEXT KERNEL: return-type decltype of a static member call through
+__to_address_helper — repro shape: constrained fn template whose
+return is __decay_t<decltype(Helper<T>::call(declval<const T&>()))>
+with Helper's call itself decltype-returning.  Once fixed, expect ta3
++ possibly vector family (counts still 11/22 of 5537 — unchanged, so
+the void-return IS the active blocker; map_basic still in BMC).
+Reusable gotchas this round: from_integer invariant on non-bv types;
+scope-entry insertion inside resolve() = live-iterator corruption;
+folding must be structural (no typechecking) mid-elaboration.
