@@ -5563,3 +5563,12 @@ Vector-family residuals: map_basic OOMs in BMC (needs unwind flags
 work — desc has none; solver scale now, not front-end);
 ranges_basic still VACUOUS (main truncated; tied to ranges_pipe).
 5 suites green.
+
+## Round 31 cont.: map_basic re-measured
+
+With --unwind 5 --no-unwinding-assertions --object-bits 12: NO MORE
+OOM — completes with 25 of 5960 FAILUREs, cluster =
+`*return_value_operator[]` derefs (map::operator[] returns a bad
+reference; __tree insert-or-create path).  Now a diagnosable
+wrong-code target (trace one operator[] property); desc will need the
+unwind flags at flip time.
