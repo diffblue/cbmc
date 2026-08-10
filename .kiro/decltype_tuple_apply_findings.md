@@ -5540,3 +5540,26 @@ short-circuit fold (first operand constant TRUE from... check).
 260 alias-cycle breaks → void).
 Probes to reuse: gfta-enter/default-ok+map/fntype-pre (this round's
 patch set, in git stash-able form in this entry's history).
+
+## Round 31 (2026-08-10): __to_address chain COMPLETE — 3 flips
+
+THE fix ([basic.lookup.qual]/1): resolve()'s final-component lookup
+used RECURSIVE unconditionally; qualified names now use QUALIFIED
+(scope+bases+using, no parent escape).  A nonexistent member
+(`pointer_traits<_P>::to_address`) fell back to the same-named
+NAMESPACE function (std::to_address), wrongly validating the
+detection-idiom spec pattern -> void-returning helper spec selected ->
+__to_address returned void.  32-line kernel dz3.cpp (free fn +
+qualified member ref in spec pattern), found via cvise on ha7 (ONLY
+pointer_traits.h included — 1034 lines, <10 min converge, pinned
+binary).  KEY INSIGHT for future arcs: when structural hand-repros
+keep passing, cut the INCLUDE SURFACE down and cvise THAT — the
+poison was an in-header interaction (free std::to_address visible),
+not ecosystem caching.
+FLIPS: cpp20_to_address_reverse_iterator, cpp20_vector_basic_libcxx,
+cpp20_libcxx20_vector (all CORE, non-vacuous, native-verified).
+Round-30's void-cast/(void) lead was a red herring (mis-attribution).
+Vector-family residuals: map_basic OOMs in BMC (needs unwind flags
+work — desc has none; solver scale now, not front-end);
+ranges_basic still VACUOUS (main truncated; tied to ranges_pipe).
+5 suites green.
