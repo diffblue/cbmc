@@ -5479,3 +5479,31 @@ the void-return IS the active blocker; map_basic still in BMC).
 Reusable gotchas this round: from_integer invariant on non-bv types;
 scope-entry insertion inside resolve() = live-iterator corruption;
 folding must be structural (no typechecking) mid-elaboration.
+
+## Round 29 (2026-08-10): decay ref-spec kernel FIXED; recursion arc remains
+
+vr-series bisection (repro-first worked this time): the void-return
+was TWO stacked defects.
+FIXED (commit "strict P/A reference matching + context-aware alias
+cycle keys" + CORE cpp11_alias_ref_spec_pointer_arg):
+(a) disambiguate_template_classes' spec-match loop never opted into
+strict_cv_deduction (4th site, round-17 family): `decay_<T&>` matched
+`decay_<int*>` by stripping `&` -> decay_t_<int*> = int.  13-line
+kernel.  (b) alias cycle keys now include the innermost instantiation
+frame ([temp.point]) + absolute same-spelling depth cap 20.
+REMAINS (vr5.cpp, 16-line real-header): std::__to_address(arrow_it)
+still returns VOID — genuine same-frame recursion: computing the
+fancy overload's return type nests overload resolution of
+__to_address(int*), which AGAIN evaluates the fancy candidate's
+return type BEFORE its default-arg constraint discards it (the
+defaults loop at ~9492 runs inside guess_function_template_args
+before fn-type typecheck at ~9905, so WHY the constraint doesn't
+discard for int* in the NESTED context is the open question —
+standalone eval of the same constraint works, vr6.cpp).  260
+alias-cycle breaks feed empty_typet (void) into the return.  NEXT:
+probe the nested candidate's default-arg eval (is_anonymous catch at
+9603 returns nil correctly?) — instrument whether the int* fancy
+candidate reaches fn-type typecheck at all; if yes, find which path
+bypasses the 9492 defaults loop (maybe explicit-template-args path or
+the apply_template_args route at 87/114).
+5 suites green x2 (both commits).
