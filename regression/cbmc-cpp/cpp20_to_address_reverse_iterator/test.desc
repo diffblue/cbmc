@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp20 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ to_address of reverse_iterator: SUCCESS$
@@ -14,3 +14,8 @@ warning -- 0 assertions survive, so the SUCCESSFUL verdict is
 meaningless until the front-end bug is fixed (the desc's assertion
 line then guards against vacuity).  Verified natively under clang++
 -stdlib=libc++ (assertion holds).
+Round-31 fix (2026-08-10): six layers total -- concepts
+compound-requirements, two-phase lookup, static-member resolution +
+short-circuit folding, reference-pattern spec matching, and finally
+qualified-name lookup escaping to enclosing scopes
+([basic.lookup.qual]/1).
