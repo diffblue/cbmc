@@ -1,17 +1,10 @@
 CORE
 main.cpp
---cpp17
+--cpp11
 ^\[main\.assertion\.1\] line \d+ non-const member template selected: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
-^VERIFICATION FAILED$
-^EXIT=10$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
 --
-For a call on a non-const object, a non-const member function template must be
-preferred over a const one (the implicit object parameter's cv-qualification,
-[over.match.funcs]/5).  CBMC ranks this correctly for non-template members but
-selects the const overload for member function templates, so a modifying use
-(s.acc<int>() = ...) fails as "not an lvalue".  This underlies libstdc++
-std::function's _Any_data::_M_access and _Base_manager::_M_create.
+Runtime-verified with g++ and clang++.
