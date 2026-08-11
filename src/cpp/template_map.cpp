@@ -374,6 +374,40 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
               repl(ns.second);
           };
           repl(copy);
+          // The parser leaves a template-id in an AMBIGUOUS expression
+          // context (`get<_Idx>` as a bare call argument) with an id-less
+          // template-arguments child holding the raw argument list; the
+          // resolver only recognises a proper
+          // `template_args{arguments = ...}` child
+          // (cpp_namet::has_template_args).  With the pack now expanded
+          // to a concrete element the ambiguity is GONE -- normalise the
+          // copy so the element resolves as a template-id
+          // ([temp.names]/2).  Local to this expansion; parse trees
+          // elsewhere keep their shape (several consumers key on the
+          // id-less form to mean "maybe a comparison").
+          std::function<void(irept &)> normalize_targs = [&](irept &m)
+          {
+            if(m.id() == ID_cpp_name && m.get_sub().size() >= 2)
+            {
+              for(std::size_t ci = 1; ci < m.get_sub().size(); ++ci)
+              {
+                irept &child = m.get_sub()[ci];
+                if(
+                  child.id().empty() && !child.get_sub().empty() &&
+                  child.find(ID_arguments).is_nil())
+                {
+                  irept ta(ID_template_args);
+                  ta.add(ID_arguments).get_sub().swap(child.get_sub());
+                  child = ta;
+                }
+              }
+            }
+            for(auto &ms : m.get_sub())
+              normalize_targs(ms);
+            for(auto &mns : m.get_named_sub())
+              normalize_targs(mns.second);
+          };
+          normalize_targs(copy);
           new_args.push_back(copy);
         }
         continue;
