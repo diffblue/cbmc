@@ -7031,18 +7031,19 @@ skip_pack_removal_ft:
     const std::string pack_name =
       pos != std::string::npos ? full_id.substr(pos + 2) : full_id;
 
-    // Helper: check if a parameter references the pack
+    // Helper: check if a parameter references the pack.
+    // N5008 [dcl.fct]/6: a bare `...` parameter is C VARARGS, not a pack
+    // reference -- it must survive the empty-pack removal (an ellipsis
+    // parameter of `decltype(F()()) invoke_(F, ...)` vanished whenever the
+    // trailing template pack deduced empty, and the instantiated overload
+    // stopped matching calls with extra arguments).  Likewise an
+    // ellipsis-marked DECLARATOR only expands THIS pack when its type
+    // names the pack (own-pack rule, as in the member-template strip).
     auto refs_pack = [&pack_name](const irept &p) -> bool
     {
-      if(p.id() == ID_ellipsis)
-        return true;
       if(p.id() == ID_cpp_declaration)
       {
         const auto &d = to_cpp_declaration(p);
-        if(
-          !d.declarators().empty() &&
-          d.declarators().front().type().get_bool(ID_ellipsis))
-          return true;
         if(d.type().id() == ID_cpp_name)
         {
           for(const auto &sub : d.type().get_sub())
