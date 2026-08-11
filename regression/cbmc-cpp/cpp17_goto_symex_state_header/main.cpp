@@ -76,4 +76,10 @@ public:
   /// private copy constructor as a delegate.
   goto_symex_statet(const goto_symex_statet &other) = default;
 };
-int main() { return 0; }
+extern "C" void __CPROVER_assert(bool, const char *);
+int main()
+{
+  int reached = 1;
+  __CPROVER_assert(reached == 1, "goto_symex_state header converts");
+  return 0;
+}
