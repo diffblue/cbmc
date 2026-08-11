@@ -117,10 +117,10 @@ std::ostream &format_rec(std::ostream &os, const typet &type)
       if(first)
         first = false;
       else
-        os << u8" \u00d7 "; // ×
+        os << " \u00d7 "; // ×
       os << format(domain);
     }
-    os << u8" \u2192 "; // → -- we don't use ⟶  since that doesn't render well
+    os << " \u2192 "; // → -- we don't use ⟶  since that doesn't render well
     return os << format(mathematical_function.codomain());
   }
   else
