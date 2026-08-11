@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line 8 regex match: SUCCESS$
@@ -8,10 +8,9 @@ main.cpp
 --
 --
 std::regex construction + regex_match over libstdc++ <regex>.
-Flipped KNOWNBUG->CORE 2026-08-11: the earlier symex crash
-(lhs.type()==rhs.type() via _M_get_deleter) no longer reproduces after
-the rounds 32-35 template-pack and overload-ranking fixes; 0 of 41987
-properties fail, non-vacuous (1 assertion).  Runtime-verified with
-g++ and clang++.
---object-bits 12 --unwind 5 --no-unwinding-assertions: full <regex>
-conversion exceeds 2^8 objects; bounded harness.
+ADDRESS-LAYOUT-DEPENDENT symex invariant violation
+(lhs.type()==rhs.type() via shared_ptr _M_get_deleter): with ASLR
+DISABLED (setarch -R) the run verifies 0 of 41987 (non-vacuous, ~91s);
+with ASLR ENABLED it aborts 3/3.  Some front-end structure iterates in
+pointer order and leaks the order into symbol/type identity.  The
+deterministic ASLR switch is the diagnosis lever (2026-08-11).
