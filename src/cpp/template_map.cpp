@@ -416,11 +416,31 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         // (several distinct non-zero sizes) leave the argument untouched.
         std::set<std::size_t> sizes;
         bool any_pack = false;
+        bool any_empty_pack = false;
         for(const auto &ps : pack_size_map)
         {
           any_pack = true;
           if(ps.second != 0)
             sizes.insert(ps.second);
+          else
+            any_empty_pack = true;
+        }
+        // The pattern names none of the deduced packs, so WHICH pack
+        // governs the expansion is unknown here.  With an EMPTY pack
+        // among the bindings the length is genuinely ambiguous: the
+        // value pack may well be governed by the empty one
+        // ([temp.variadic]/5 -- lengths come from the packs expanded in
+        // the pattern, not from unrelated packs).  Expanding by an
+        // unrelated non-zero size duplicated an EMPTY function-parameter
+        // pack: `decltype(_Op()(_Idx..., __args...))` with `_Idx = {0,1}`
+        // and `_Args` empty expanded `__args...` to TWO dead references
+        // (libc++ __perfect_forward under std::invoke).  Leave the
+        // argument untouched in that case; the instantiation-time
+        // empty-pack strip removes it.
+        if(any_empty_pack && !sizes.empty())
+        {
+          new_args.push_back(arg);
+          continue;
         }
         if(any_pack && sizes.empty())
         {
@@ -2040,7 +2060,60 @@ void template_mapt::build(
             : template_parameters[p].get(ID_identifier);
         const auto ps_it = pack_size_map.find(pid);
         if(ps_it != pack_size_map.end())
+        {
           arg_idx += ps_it->second;
+          continue;
+        }
+        // No deduction-recorded binding for this pack (a stored
+        // instance's args being replayed, e.g. re-instantiating a
+        // partial specialization's members).  Reconstruct the split
+        // positionally by KIND ([temp.variadic]/5: a type pack binds
+        // type arguments, a non-type pack binds constant arguments;
+        // adjacent packs of different kinds are thus separable).  An
+        // `empty_typet` argument at the pack's position is the
+        // "matched zero elements" sentinel (see the single-pack path
+        // below).  Without this, the pack got NO binding and every
+        // subsequent parameter misaligned -- the
+        // `pf<Op, index_sequence<Idx...>, Bound...>` libc++
+        // __perfect_forward shape left `Idx` unbound in member
+        // signatures (ranges views::take dropped main; ek1 kernel
+        // crashed symex).
+        const bool type_pack = template_parameters[p].id() == ID_type;
+        std::vector<typet> ptypes;
+        std::vector<exprt> pexprs;
+        std::size_t psz = 0;
+        while(arg_idx < instance.size())
+        {
+          const exprt &a = instance[arg_idx];
+          const bool arg_is_type = a.id() == ID_type;
+          if(arg_is_type && a.type().id() == ID_empty)
+          {
+            ++arg_idx; // empty-pack sentinel: consume; pack stays empty
+            break;
+          }
+          if(arg_is_type != type_pack)
+            break;
+          if(type_pack)
+            ptypes.push_back(a.type());
+          else
+            pexprs.push_back(a);
+          ++psz;
+          ++arg_idx;
+        }
+        pack_size_map[pid] = psz;
+        if(type_pack && !ptypes.empty())
+        {
+          pack_args_map[pid] = std::move(ptypes);
+          // [temp.variadic]/7 convenience entry for single-element packs
+          if(psz == 1)
+            type_map[pid] = pack_args_map[pid].front();
+        }
+        else if(!type_pack && !pexprs.empty())
+        {
+          pack_expr_map[pid] = std::move(pexprs);
+          if(psz == 1)
+            expr_map[pid] = pack_expr_map[pid].front();
+        }
         continue;
       }
       set(template_parameters[p], instance[arg_idx]);

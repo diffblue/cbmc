@@ -4658,6 +4658,21 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
                 expanded.push_back(exprt(ID_type, pt));
               continue;
             }
+            // [temp.variadic]/5 likewise for a NON-TYPE pack: its deduced
+            // element VALUES live in pack_expr_map, not pack_args_map
+            // (mirroring the same splice in instantiate_template's
+            // specialization matching).  Without it only the scalar
+            // convenience element survived: `pf<Op, index_sequence<Idx...>,
+            // Bound...>` (libc++ __perfect_forward) stored `Idx = {0}`
+            // instead of `{0, 1}`, mis-instantiating the members and
+            // dropping every caller of `decltype(_Op()(_Idx...))`.
+            auto pe_it = cpp_typecheck.template_map.pack_expr_map.find(pid);
+            if(pe_it != cpp_typecheck.template_map.pack_expr_map.end())
+            {
+              for(const auto &pe : pe_it->second)
+                expanded.push_back(pe);
+              continue;
+            }
           }
           expanded.push_back(guessed_template_args.arguments()[i]);
         }
@@ -9945,6 +9960,149 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         {
           auto &decl = static_cast<cpp_declarationt &>(p);
           cpp_typecheck.template_map.apply(decl.type());
+        }
+      }
+
+      // N5008 [temp.variadic]/7: a function parameter pack whose template
+      // pack deduced EMPTY expands to zero parameters, and any expansion
+      // referencing it in the trailing return type yields zero arguments.
+      // Remove the parameter and strip its call-argument references from
+      // the return type -- otherwise the decltype below sees the dead
+      // name (`symbol 'args' is unknown`) and the candidate is dropped:
+      // libc++ __perfect_forward's
+      // `operator()(_Args&&... __args) -> decltype(_Op()(..., __args...))`
+      // called with no arguments (the ranges views::take closure under
+      // std::invoke).
+      {
+        auto short_of = [](const irep_idt &id) -> std::string
+        {
+          const std::string f = id2string(id);
+          const auto pos = f.rfind("::");
+          return pos != std::string::npos ? f.substr(pos + 2) : f;
+        };
+        std::set<std::string> empty_pack_short_names;
+        for(const auto &ps : cpp_typecheck.template_map.pack_size_map)
+          if(ps.second == 0)
+            empty_pack_short_names.insert(short_of(ps.first));
+        if(!empty_pack_short_names.empty())
+        {
+          std::vector<irep_idt> removed_param_names;
+          // The pack parameter may ALREADY have been removed from
+          // `function_type`'s parameter list by the earlier substitution
+          // (its empty expansion), while its call-argument references in
+          // the trailing return type remain.  Recover the parameter NAME
+          // from the original declarator (mirroring instantiate_template's
+          // recovery for the body strip).
+          {
+            const irept &ofparams =
+              function_declarator.type().find(ID_parameters);
+            for(const auto &opi : ofparams.get_sub())
+            {
+              if(opi.id() != ID_cpp_declaration)
+                continue;
+              const auto &opd = static_cast<const cpp_declarationt &>(opi);
+              if(
+                opd.declarators().empty() ||
+                (!opd.declarators().front().get_bool(ID_ellipsis) &&
+                 !opd.declarators().front().type().get_bool(ID_ellipsis) &&
+                 !opd.type().get_bool(ID_ellipsis)))
+                continue;
+              const irept *t = &static_cast<const irept &>(opd.type());
+              while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                t = &t->get_sub().front();
+              std::string own;
+              if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                own = id2string(t->get_sub().front().get(ID_identifier));
+              if(own.empty() || empty_pack_short_names.count(own) == 0)
+                continue;
+              for(const auto &nsub : opd.declarators().front().name().get_sub())
+                if(nsub.id() == ID_name)
+                  removed_param_names.push_back(nsub.get(ID_identifier));
+            }
+          }
+          params.erase(
+            std::remove_if(
+              params.begin(),
+              params.end(),
+              [&](const irept &pi)
+              {
+                if(pi.id() != ID_cpp_declaration)
+                  return false;
+                const auto &pd = static_cast<const cpp_declarationt &>(pi);
+                if(
+                  pd.declarators().empty() ||
+                  (!pd.declarators().front().get_bool(ID_ellipsis) &&
+                   !pd.declarators().front().type().get_bool(ID_ellipsis) &&
+                   !pd.type().get_bool(ID_ellipsis)))
+                  return false;
+                // the pack parameter's type names its template pack
+                const irept *t = &static_cast<const irept &>(pd.type());
+                while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                  t = &t->get_sub().front();
+                std::string own;
+                if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                  own = id2string(t->get_sub().front().get(ID_identifier));
+                if(own.empty() || empty_pack_short_names.count(own) == 0)
+                  return false;
+                for(const auto &nsub :
+                    pd.declarators().front().name().get_sub())
+                  if(nsub.id() == ID_name)
+                    removed_param_names.push_back(nsub.get(ID_identifier));
+                return true;
+              }),
+            params.end());
+          if(!removed_param_names.empty() && function_type.has_subtype())
+          {
+            std::function<bool(const irept &)> refs_removed =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                for(const auto &sn : n.get_sub())
+                  if(
+                    sn.id() == ID_name &&
+                    std::find(
+                      removed_param_names.begin(),
+                      removed_param_names.end(),
+                      sn.get(ID_identifier)) != removed_param_names.end())
+                    return true;
+              for(const auto &sn : n.get_sub())
+                if(refs_removed(sn))
+                  return true;
+              for(const auto &ns : n.get_named_sub())
+                if(refs_removed(ns.second))
+                  return true;
+              return false;
+            };
+            std::function<void(irept &)> strip_refs = [&](irept &node)
+            {
+              if(
+                node.id() == ID_side_effect &&
+                node.get(ID_statement) == ID_function_call)
+              {
+                for(auto &sub : node.get_sub())
+                  if(sub.id() == ID_arguments)
+                  {
+                    auto &asub = sub.get_sub();
+                    asub.erase(
+                      std::remove_if(
+                        asub.begin(),
+                        asub.end(),
+                        [&](const irept &a)
+                        {
+                          return (a.id() == ID_cpp_name ||
+                                  a.get_bool(ID_ellipsis)) &&
+                                 refs_removed(a);
+                        }),
+                      asub.end());
+                  }
+              }
+              for(auto &sub : node.get_sub())
+                strip_refs(sub);
+              for(auto &ns : node.get_named_sub())
+                strip_refs(ns.second);
+            };
+            strip_refs(to_type_with_subtype(function_type).subtype());
+          }
         }
       }
 

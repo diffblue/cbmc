@@ -1437,6 +1437,75 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
               class_sym->type.find(ID_C_template)),
             static_cast<const cpp_template_args_tct &>(
               class_sym->type.find(ID_C_template_arguments)));
+          // N5008 [temp.spec.partial.match]: for an instance of a PARTIAL
+          // specialization the parameters were bound by deduction against
+          // the argument pattern; the positional build above cannot
+          // reconstruct pack bindings (`pf<Op, index_sequence<Idx...>>`'s
+          // non-type `Idx`).  Replay the deduction-time bindings persisted
+          // on the class symbol (#spec_template_packs), non-overriding --
+          // mirroring resolve()'s scope-walk replay.
+          const irept &bindings =
+            class_sym->type.find(irep_idt{"#spec_template_packs"});
+          for(const auto &entry : bindings.get_sub())
+          {
+            const irep_idt pid = entry.get(ID_identifier);
+            if(pid.empty())
+              continue;
+            if(entry.id() == irep_idt{"pack_types"})
+            {
+              if(
+                method_map.pack_size_map.find(pid) !=
+                method_map.pack_size_map.end())
+                continue;
+              std::vector<typet> elems;
+              for(const auto &t : entry.get_sub())
+                elems.push_back(static_cast<const typet &>(t));
+              method_map.pack_size_map[pid] = elems.size();
+              if(!elems.empty())
+              {
+                if(elems.size() == 1)
+                  method_map.type_map.emplace(pid, elems.front());
+                method_map.pack_args_map[pid] = std::move(elems);
+              }
+            }
+            else if(entry.id() == irep_idt{"pack_exprs"})
+            {
+              if(
+                method_map.pack_size_map.find(pid) !=
+                method_map.pack_size_map.end())
+                continue;
+              std::vector<exprt> vals;
+              for(const auto &v : entry.get_sub())
+                vals.push_back(static_cast<const exprt &>(v));
+              method_map.pack_size_map[pid] = vals.size();
+              if(!vals.empty())
+              {
+                if(vals.size() == 1)
+                  method_map.expr_map.emplace(pid, vals.front());
+                method_map.pack_expr_map[pid] = std::move(vals);
+              }
+            }
+            else if(entry.id() == irep_idt{"scalar_type"})
+            {
+              if(
+                !entry.get_sub().empty() &&
+                method_map.type_map.find(pid) == method_map.type_map.end())
+              {
+                method_map.type_map.emplace(
+                  pid, static_cast<const typet &>(entry.get_sub().front()));
+              }
+            }
+            else if(entry.id() == irep_idt{"scalar_expr"})
+            {
+              if(
+                !entry.get_sub().empty() &&
+                method_map.expr_map.find(pid) == method_map.expr_map.end())
+              {
+                method_map.expr_map.emplace(
+                  pid, static_cast<const exprt &>(entry.get_sub().front()));
+              }
+            }
+          }
         }
       }
     }
