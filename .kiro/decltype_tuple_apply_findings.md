@@ -5652,3 +5652,32 @@ The mb2 tuple<?&&> lead was NOISE (recovered deduction attempts);
 the destroy-cluster derefs were downstream of the havoc'd insert.
 8 KNOWNBUGs remain: ranges_basic (vacuous), ranges_pipe, restrict_fp,
 regex, ofstream, abstract_env, erase_if, goto_symex_state_header.
+
+## Round 34 (2026-08-11): perfect-forward pack onion — 3 layers fixed
+
+ranges_basic truncation error surfaced DIRECTLY in output ("conversion
+from int[N] to <<type:auto>>"); bisect: views::all/begin/ref_view all
+OK, take_view CTAD fails.  ranges_pipe re-reduced via __invoke variant
+(rp3).  Chain of harvests (fb1 82k→ stalled slow; fc1/fc2 fast via
+248-line seed → 43 lines; fd1/fe1/ff1 re-grew layers post-fix):
+kernels ek1 (empty trailing pack partial spec — CRASHED symex
+assign_from_struct), ek2 (nonempty trailing pack — scalar-collapsed
+Idx), ek4 (empty member pack decltype under outer deduction — main
+dropped SILENTLY, no diagnostic, hti=0!).
+FIXES (commit 3530826752): (1) build() kind-aware positional pack
+split for multi-pack replays + sentinel; (2) resolve.cpp packaging
+pack_expr_map splice (mirrors instantiate's); (3) apply() value-pack
+sizing: empty pack present ⇒ ambiguous ⇒ leave for strip; (4) member-
+fn-template path: strip empty-pack params + refs in declarator type
+AND DECLARATION type (trailing-return decltype lives there!), sentinel
+gate for ctor expansion, gfta candidate-signature strip, spec-packs
+replay in drain class map.  3 CORE tests (9121cd8cbb).  5 suites green.
+KEY DEBUG LESSONS: build-debug (RelWithDebInfo) + gdb breakpoint at
+error-emission line = decisive when probe ping-pong stalls; thread_local
+marker distinguishes same-line call sites; grep '^KNOWNBUG' matches
+PROSE — count via head -1 only (8 true KNOWNBUGs, not 13).
+NEXT LAYER (ranges_pipe still drops main): "symbol '__bound_args' is
+unknown" — mem-init `__bound_args_(__bound_args...)` with NON-empty
+packs at drain of __perfect_forward_impl ctor (tuple member restored
+in fd1 harvest = f4.cpp still failed WITHOUT it... recheck).  Artifacts:
+/tmp/f4.cpp /tmp/ff1/red.cpp /tmp/rp3.cpp; probes ALL STRIPPED.
