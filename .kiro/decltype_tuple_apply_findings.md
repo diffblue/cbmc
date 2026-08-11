@@ -5702,3 +5702,31 @@ Layer 5 (fh1, 108 lines, STILL drops main): variant with
 `__invoke(_Fp, ...)` varargs + trailing class... pack + decltype(_Op())
 + index_sequence_for<> (EMPTY).  /tmp/fh1/red.cpp saved.  Next: delta
 fh1 vs fg1 (E-edit method) then kernel.
+
+## Round 35 (2026-08-11): layers 5-8 of the perfect-forward onion
+
+L5 (k4, 17 lines, plain cpp11!): bare `...` C-varargs param deleted by
+TWO empty-pack removals (instantiate refs_pack + gfta
+variadic_pack_empty) when an unrelated trailing template pack deduced
+empty — own-pack rule applied at both ([dcl.fct]/6).
+L6 (ek8, wrong-code 4097≠1): apply(exprt) subst_params scalar-
+substituted the PACK name `_Idx` (in `get<_Idx>()...`'s template-args)
+with the convenience/unassigned entry — packs only substitute by
+EXPANSION ([temp.variadic]/5); skip pack names + unassigned there.
+Also: value-pack drop kept when pattern names an UNKNOWN template-arg
+(enclosing-class pack, [temp.variadic]/5 governing-pack rule);
+prepare_deferred_method_body now replays #spec_template_packs.
+L7 (ek9, symex crash): `get<_Idx>...` — bare fn-template-id VALUE
+pattern parses with an ID-LESS template-args child (ambiguous-`<`
+contexts, parser sites 7971/9507/11170 push raw irept).
+has_template_args misses it → expanded elements resolved as the raw
+template → nil args.  PARSE-SIDE NORMALIZATION IS FORBIDDEN: setting
+the id in rTemplateArgs broke 3 tests (cpp11_variadic_ctor_pack_multi,
+cpp11_variadic_get_partial_spec_deduce,
+cpp14_variable_template_pack_partial_spec) — the id-less shape is
+LOAD-BEARING ("maybe comparison").  Fix: normalize ONLY the expansion
+output copy (template_map.cpp val_elems branch).
+Commits: 3-fix bundle + normalize + CORE tests
+cpp11_varargs_trailing_pack_invoke, cpp11_template_id_pack_expansion,
+cpp11_fn_template_id_pack_value.  5 suites green ×2.
+rp3 STILL drops main — layer 8+ reducing (fk1).  probes stripped.
