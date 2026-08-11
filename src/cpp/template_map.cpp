@@ -442,8 +442,65 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
           new_args.push_back(arg);
           continue;
         }
+        // ... unless the pattern nests a name in a TEMPLATE-ARGUMENT
+        // position that this map does not know (e.g. `get<_Idx>()...`
+        // inside a member template being instantiated while `_Idx`
+        // belongs to the ENCLOSING class instance, libc++
+        // __perfect_forward's operator()).  Its governing pack is that
+        // unknown name ([temp.variadic]/5: lengths come from the packs
+        // expanded in the pattern), so neither dropping nor sizing by
+        // THIS map's packs is sound -- leave the argument for the
+        // context that binds it (the method-body drain's class-pack
+        // replay).
+        std::function<bool(const irept &)> names_unknown_targ =
+          [&](const irept &m) -> bool
+        {
+          if(m.id() == ID_template_args)
+          {
+            std::function<bool(const irept &)> has_unknown_name =
+              [&](const irept &t) -> bool
+            {
+              if(
+                t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+                t.get_sub().front().id() == ID_name)
+              {
+                const std::string nm =
+                  id2string(t.get_sub().front().get(ID_identifier));
+                for(const auto &ps : pack_size_map)
+                {
+                  const std::string key = id2string(ps.first);
+                  const auto q = key.rfind("::");
+                  if((q != std::string::npos ? key.substr(q + 2) : key) == nm)
+                    return false; // known pack
+                }
+                return true;
+              }
+              for(const auto &ts : t.get_sub())
+                if(has_unknown_name(ts))
+                  return true;
+              for(const auto &tns : t.get_named_sub())
+                if(has_unknown_name(tns.second))
+                  return true;
+              return false;
+            };
+            if(has_unknown_name(m))
+              return true;
+          }
+          for(const auto &ms : m.get_sub())
+            if(names_unknown_targ(ms))
+              return true;
+          for(const auto &mns : m.get_named_sub())
+            if(names_unknown_targ(mns.second))
+              return true;
+          return false;
+        };
         if(any_pack && sizes.empty())
         {
+          if(names_unknown_targ(arg))
+          {
+            new_args.push_back(arg);
+            continue;
+          }
           changed = true;
           continue; // zero-length value-pack expansion: drop the argument
         }
@@ -1675,19 +1732,52 @@ void template_mapt::apply(exprt &expr) const
             continue;
         }
 
-        bool subst = false;
-        for(const auto &entry : expr_map)
+        // N5008 [temp.variadic]/5: a parameter PACK may only be
+        // substituted by expanding it -- never by a scalar value.  A
+        // pack name in a NON-expanded position (e.g. the `_Idx` of
+        // `get<_Idx>()...`, whose `...` sits on the ENCLOSING call
+        // argument) must stay symbolic for the expansion machinery;
+        // substituting the single-element convenience entry (or an
+        // `ID_unassigned` placeholder from build_unassigned) here
+        // baked a bogus scalar into every element of the later
+        // expansion (libc++ __perfect_forward's operator() body lost
+        // its `get<_Idx>` indices and the call was dropped).
+        auto is_pack_name = [&](const std::string &nm) -> bool
         {
-          const std::string &key = id2string(entry.first);
-          if(
-            key == target ||
-            (key.size() > target.size() + 2 &&
-             key.substr(key.size() - target.size()) == target &&
-             key[key.size() - target.size() - 1] == ':'))
+          for(const auto &ps : pack_size_map)
           {
-            new_args.push_back(entry.second);
-            subst = true;
-            break;
+            const std::string &key = id2string(ps.first);
+            const auto q = key.rfind("::");
+            if((q != std::string::npos ? key.substr(q + 2) : key) == nm)
+              return true;
+          }
+          for(const auto &pe : pack_expr_map)
+          {
+            const std::string &key = id2string(pe.first);
+            const auto q = key.rfind("::");
+            if((q != std::string::npos ? key.substr(q + 2) : key) == nm)
+              return true;
+          }
+          return false;
+        };
+        bool subst = false;
+        if(!is_pack_name(target))
+        {
+          for(const auto &entry : expr_map)
+          {
+            const std::string &key = id2string(entry.first);
+            if(
+              key == target ||
+              (key.size() > target.size() + 2 &&
+               key.substr(key.size() - target.size()) == target &&
+               key[key.size() - target.size() - 1] == ':'))
+            {
+              if(entry.second.id() == ID_unassigned)
+                break;
+              new_args.push_back(entry.second);
+              subst = true;
+              break;
+            }
           }
         }
         if(!subst)

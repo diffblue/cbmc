@@ -8607,7 +8607,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       : expr.type();
 
   if(!tmp.get_bool(ID_is_template))
+  {
     return nil_exprt(); // not a template
+  }
 
   PRECONDITION(expr.id() == ID_symbol);
 
@@ -8617,7 +8619,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // Class templates require explicit template arguments,
   // no guessing!
   if(cpp_declaration.is_class_template())
+  {
     return nil_exprt();
+  }
 
   // we need function arguments for guessing
   if(fargs.operands.empty() && expr.find(ID_C_template_arguments).is_nil())
@@ -8712,7 +8716,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         }
       }
       if(!deduced_from_context)
+      {
         return nil_exprt(); // give up
+      }
     }
   }
 
@@ -9743,7 +9749,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   if(template_args.has_unassigned())
+  {
     return nil_exprt(); // give up
+  }
 
   // Build the type of the function.
 
@@ -9755,12 +9763,19 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   if(variadic_pack_empty && function_type.id() == ID_function_type)
   {
     irept::subt &params = function_type.add(ID_parameters).get_sub();
-    // Remove parameters whose declarator has ellipsis (the pack parameter)
+    // Remove parameters whose declarator has ellipsis AND whose type names
+    // THE empty pack (own-pack rule).  N5008 [dcl.fct]/6: a bare `...`
+    // parameter is C VARARGS -- not a pack reference -- and must survive
+    // (it vanished from `decltype(F()()) invoke_(F, ...)` whenever the
+    // trailing template pack deduced empty, and the instantiated overload
+    // no longer accepted extra arguments).  `B...` with B a non-pack is
+    // likewise varargs; only the empty pack's own parameter expands to
+    // nothing ([temp.variadic]/7).
     params.erase(
       std::remove_if(
         params.begin(),
         params.end(),
-        [](const irept &p)
+        [&pack_param_name](const irept &p)
         {
           if(p.id() == ID_cpp_declaration)
           {
@@ -9768,10 +9783,18 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
             if(!decl.declarators().empty())
             {
               const auto &d = decl.declarators().front();
-              return d.get_bool(ID_ellipsis) || d.type().get_bool(ID_ellipsis);
+              if(!d.get_bool(ID_ellipsis) && !d.type().get_bool(ID_ellipsis))
+                return false;
+              const irept *t = &static_cast<const irept &>(decl.type());
+              while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                t = &t->get_sub().front();
+              std::string own;
+              if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                own = id2string(t->get_sub().front().get(ID_identifier));
+              return own == id2string(pack_param_name);
             }
           }
-          return p.id() == ID_ellipsis;
+          return false;
         }),
       params.end());
     // Also strip ellipsis and pack parameter from nested function pointer types
@@ -10352,7 +10375,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           }
           old_handler.set_message_count(messaget::M_ERROR, errs_before);
           if(!convertible)
+          {
             return nil_exprt();
+          }
         }
       }
     }
