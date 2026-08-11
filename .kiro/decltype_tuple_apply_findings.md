@@ -5730,3 +5730,22 @@ Commits: 3-fix bundle + normalize + CORE tests
 cpp11_varargs_trailing_pack_invoke, cpp11_template_id_pack_expansion,
 cpp11_fn_template_id_pack_value.  5 suites green ×2.
 rp3 STILL drops main — layer 8+ reducing (fk1).  probes stripped.
+
+## Round 35 close: layer 8 parked (possible degenerate)
+
+fk1 (113 lines, archived): new ingredients = `invoke_result_t<void>
+invoke(void());` + `__bind_back_op::operator()(_Fn __f, _BoundArgs)
+-> decltype(invoke(__f))` where invoke's param void(*)() CANNOT take
+__f=int(*)() (verified: both compilers reject the direct call) — yet
+clang FULLY COMPILES the harvest TU (link-only failure on decl-only
+__invoke).  So clang recovers via a SFINAE path CBMC doesn't; the
+shape may be a reduction artifact rather than the true ranges
+blocker (cz1 lesson — criterion drift toward compiler-laziness
+attractors).  Hand kernels ek10/ek11 (compatible + overload-recovery
+variants) both PASS.  PARK; next round: re-reduce ranges_pipe with a
+STRONGER criterion — require native FULL COMPILE+LINK+RUN of a
+variant with bodies (not just -fsyntax-only), plus the assertion
+line, to keep harvests executable.
+Round-35 totals: 4 commits (3-fix bundle, normalize, 2 test commits),
+4 CORE tests, layers 5-7 fixed, 5 suites green, probes stripped,
+tree clean.  ranges_pipe/ranges_basic remain KNOWNBUG (8 total).
