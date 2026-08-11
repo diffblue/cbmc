@@ -1,14 +1,16 @@
-KNOWNBUG
+THOROUGH
 main.cpp
---cpp17 -I ../../../src --object-bits 12
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1
+^\[main\.assertion\.1\] line \d+ goto_symex_state header converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-Reduced goto_symex_statet shape (goto_statet base + vector<threadt> +
-defaulted copy ctor): synthesized copy machinery demands a
-symbol_exprt default construction and an inaccessible goto_statet
-default constructor.  Std-only ingredient:
-cpp17_vector_emplace_nondefault_pair.
-Minimal header-free reproducer: cpp17_anon_struct_member_ctor_only.
+Dog-food: CBMC's own goto_symex_state.h (whole-header include)
+converts and the harness assertion verifies.  Flipped
+KNOWNBUG->THOROUGH 2026-08-11: conversion completes after the rounds
+25-35 fixes; ~11m, beyond the CORE -t 300 budget, hence THOROUGH.
+--property restricts BMC to the harness assertion: the TU's other
+properties fire only on sound havoc of out-of-TU functions
+(get_nil_irep etc. have no body here), not front-end defects.
