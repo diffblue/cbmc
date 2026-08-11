@@ -6210,7 +6210,21 @@ skip_pack_removal_ft:
           full_template_args.arguments().back().type().id() == ID_empty;
         if(m_trailing_pack && (m_short_args || m_sentinel))
         {
-          // the pack parameter's name (e.g. `args` in `Args... args`)
+          // the EMPTY template pack's short name (e.g. `Args`)
+          std::string m_pack_short;
+          {
+            const std::string mf =
+              id2string(mtps.back().type().get(ID_identifier));
+            const auto mp = mf.rfind("::");
+            m_pack_short = mp != std::string::npos ? mf.substr(mp + 2) : mf;
+          }
+          // the pack parameter's name (e.g. `args` in `Args... args`).
+          // N5008 [dcl.fct]/6: `B...` where B is NOT a pack is B followed
+          // by C varargs, not a pack declarator -- only remove a parameter
+          // whose type names THE empty pack (own-pack match, mirroring the
+          // constructor-template removal above); removing a varargs
+          // parameter dropped `operator()(F, B...)` overloads whenever an
+          // unrelated trailing template pack deduced empty.
           irep_idt m_pack_var;
           typet &fdt = new_decl.declarators()[0].type();
           if(fdt.id() == ID_function_type)
@@ -6227,6 +6241,14 @@ skip_pack_removal_ft:
                 (!fpd.declarators().front().get_bool(ID_ellipsis) &&
                  !fpd.declarators().front().type().get_bool(ID_ellipsis) &&
                  !fpd.type().get_bool(ID_ellipsis)))
+                continue;
+              const irept *t = &static_cast<const irept &>(fpd.type());
+              while(t->id() != ID_cpp_name && !t->get_sub().empty())
+                t = &t->get_sub().front();
+              std::string own;
+              if(t->id() == ID_cpp_name && !t->get_sub().empty())
+                own = id2string(t->get_sub().front().get(ID_identifier));
+              if(own != m_pack_short)
                 continue;
               for(const auto &nsub : fpd.declarators().front().name().get_sub())
                 if(nsub.id() == ID_name)
@@ -6260,6 +6282,16 @@ skip_pack_removal_ft:
                     (!opd.declarators().front().get_bool(ID_ellipsis) &&
                      !opd.declarators().front().type().get_bool(ID_ellipsis) &&
                      !opd.type().get_bool(ID_ellipsis)))
+                    continue;
+                  // own-pack match only ([dcl.fct]/6: `B...` with B a
+                  // non-pack is C varargs, not this pack's declarator)
+                  const irept *ot = &static_cast<const irept &>(opd.type());
+                  while(ot->id() != ID_cpp_name && !ot->get_sub().empty())
+                    ot = &ot->get_sub().front();
+                  std::string oown;
+                  if(ot->id() == ID_cpp_name && !ot->get_sub().empty())
+                    oown = id2string(ot->get_sub().front().get(ID_identifier));
+                  if(oown != m_pack_short)
                     continue;
                   for(const auto &nsub :
                       opd.declarators().front().name().get_sub())
