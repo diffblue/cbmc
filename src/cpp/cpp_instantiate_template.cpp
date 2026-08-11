@@ -6187,6 +6187,141 @@ skip_pack_removal_ft:
       // here doesn't invalidate the template specialization, it
       // just means we can't complete this member and bail out to
       // the caller with the template symbol.
+      // N5008 [temp.variadic]/7: when this member function template's own
+      // trailing parameter pack deduced EMPTY (argument list shorter than
+      // the parameter list, or the `empty_typet` zero-elements sentinel at
+      // the pack's position), the pack parameter expands to nothing and
+      // every expansion referencing it -- including in the TRAILING RETURN
+      // TYPE's decltype -- yields zero call arguments.  Strip both before
+      // type-checking; otherwise the decltype resolves against a dead name
+      // (`symbol 'args' is unknown`, libc++ __perfect_forward's
+      // `operator()(_Args&&... __args) -> decltype(_Op()(..., __args...))`
+      // invoked with no arguments) and the member is dropped.
+      {
+        const auto &mtps = template_type.template_parameters();
+        const bool m_trailing_pack =
+          !mtps.empty() && mtps.back().get_bool(ID_ellipsis);
+        const bool m_short_args =
+          full_template_args.arguments().size() < mtps.size();
+        const bool m_sentinel =
+          full_template_args.arguments().size() == mtps.size() &&
+          !full_template_args.arguments().empty() &&
+          full_template_args.arguments().back().id() == ID_type &&
+          full_template_args.arguments().back().type().id() == ID_empty;
+        if(m_trailing_pack && (m_short_args || m_sentinel))
+        {
+          // the pack parameter's name (e.g. `args` in `Args... args`)
+          irep_idt m_pack_var;
+          typet &fdt = new_decl.declarators()[0].type();
+          if(fdt.id() == ID_function_type)
+          {
+            irept &fps = fdt.add(ID_parameters);
+            auto &fsub = fps.get_sub();
+            for(auto it = fsub.begin(); it != fsub.end(); ++it)
+            {
+              if(it->id() != ID_cpp_declaration)
+                continue;
+              const auto &fpd = static_cast<const cpp_declarationt &>(*it);
+              if(
+                fpd.declarators().empty() ||
+                (!fpd.declarators().front().get_bool(ID_ellipsis) &&
+                 !fpd.declarators().front().type().get_bool(ID_ellipsis) &&
+                 !fpd.type().get_bool(ID_ellipsis)))
+                continue;
+              for(const auto &nsub : fpd.declarators().front().name().get_sub())
+                if(nsub.id() == ID_name)
+                  m_pack_var = nsub.get(ID_identifier);
+              fsub.erase(it);
+              break;
+            }
+          }
+          // The parameter may already have been removed by the earlier
+          // substitution; recover the pack parameter's NAME from the
+          // original template declaration (mirroring the recovery in the
+          // constructor-template expansion below).
+          if(
+            m_pack_var.empty() &&
+            template_symbol.type.id() == ID_cpp_declaration)
+          {
+            const cpp_declarationt &m_orig =
+              to_cpp_declaration(template_symbol.type);
+            if(!m_orig.declarators().empty())
+            {
+              const typet &modt = m_orig.declarators().front().type();
+              if(modt.id() == ID_function_type)
+              {
+                for(const auto &opi : modt.find(ID_parameters).get_sub())
+                {
+                  if(opi.id() != ID_cpp_declaration)
+                    continue;
+                  const auto &opd = static_cast<const cpp_declarationt &>(opi);
+                  if(
+                    opd.declarators().empty() ||
+                    (!opd.declarators().front().get_bool(ID_ellipsis) &&
+                     !opd.declarators().front().type().get_bool(ID_ellipsis) &&
+                     !opd.type().get_bool(ID_ellipsis)))
+                    continue;
+                  for(const auto &nsub :
+                      opd.declarators().front().name().get_sub())
+                    if(nsub.id() == ID_name)
+                      m_pack_var = nsub.get(ID_identifier);
+                }
+              }
+            }
+          }
+          if(!m_pack_var.empty())
+          {
+            std::function<bool(const irept &)> m_refs =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                for(const auto &sn : n.get_sub())
+                  if(sn.id() == ID_name && sn.get(ID_identifier) == m_pack_var)
+                    return true;
+              for(const auto &sn : n.get_sub())
+                if(m_refs(sn))
+                  return true;
+              for(const auto &ns : n.get_named_sub())
+                if(m_refs(ns.second))
+                  return true;
+              return false;
+            };
+            std::function<void(irept &)> m_strip = [&](irept &node)
+            {
+              if(
+                node.id() == ID_side_effect &&
+                node.get(ID_statement) == ID_function_call)
+              {
+                for(auto &sub : node.get_sub())
+                  if(sub.id() == ID_arguments)
+                  {
+                    auto &asub = sub.get_sub();
+                    asub.erase(
+                      std::remove_if(
+                        asub.begin(),
+                        asub.end(),
+                        [&](const irept &a) {
+                          return (a.id() == ID_cpp_name ||
+                                  a.get_bool(ID_ellipsis)) &&
+                                 m_refs(a);
+                        }),
+                      asub.end());
+                  }
+              }
+              for(auto &sub : node.get_sub())
+                m_strip(sub);
+              for(auto &ns : node.get_named_sub())
+                m_strip(ns.second);
+            };
+            m_strip(new_decl.declarators()[0].type());
+            // the trailing-return decltype may live in the DECLARATION's
+            // type (the decl-specifier seq), not the declarator's
+            m_strip(new_decl.type());
+            if(new_decl.declarators()[0].value().is_not_nil())
+              m_strip(new_decl.declarators()[0].value());
+          }
+        }
+      }
       try
       {
         sfinae_contextt sfinae_guard{*this};
@@ -6837,11 +6972,23 @@ skip_pack_removal_ft:
   }
 
   // When a variadic template parameter pack has zero arguments (the args
-  // list is shorter than the parameter list), remove pack-expanded
-  // parameters from the function declaration and its nested types.
-  if(
-    full_template_args.arguments().size() <
+  // list is shorter than the parameter list, OR the pack's position holds
+  // the `empty_typet` zero-elements sentinel -- both encodings reach this
+  // point; see template_map.cpp's single-pack binding), remove
+  // pack-expanded parameters from the function declaration and its nested
+  // types.  N5008 [temp.variadic]/7.
+  const bool trailing_pack_is_empty_sentinel =
+    !template_type.template_parameters().empty() &&
+    template_type.template_parameters().back().get_bool(ID_ellipsis) &&
+    full_template_args.arguments().size() ==
       template_type.template_parameters().size() &&
+    !full_template_args.arguments().empty() &&
+    full_template_args.arguments().back().id() == ID_type &&
+    full_template_args.arguments().back().type().id() == ID_empty;
+  if(
+    (full_template_args.arguments().size() <
+       template_type.template_parameters().size() ||
+     trailing_pack_is_empty_sentinel) &&
     !template_type.template_parameters().empty() &&
     template_type.template_parameters().back().get_bool(ID_ellipsis))
   {
@@ -6969,8 +7116,15 @@ skip_pack_removal_ft:
         }
       }
     }
-    // Strip pack variable references from function call arguments in body
-    if(!pack_var_name.empty() && func_decl.value().is_not_nil())
+    // Strip pack variable references from function call arguments in the
+    // body AND in the declarator's type: a trailing return type may spell
+    // the same empty expansion, e.g. libc++ __perfect_forward's
+    // `auto operator()(_Args&&... __args) const
+    //    -> decltype(_Op()(..., __args...))` instantiated with an EMPTY
+    // _Args ([temp.variadic]/5: the expansion yields zero arguments; the
+    // reference must vanish with it, or the instantiated return type names
+    // an unknown symbol and the member is dropped).
+    if(!pack_var_name.empty())
     {
       // Recursively remove pack variable from function call arguments
       std::function<void(irept &)> strip_pack_var;
@@ -7031,7 +7185,9 @@ skip_pack_removal_ft:
         for(auto &named : node.get_named_sub())
           strip_pack_var(named.second);
       };
-      strip_pack_var(func_decl.value());
+      if(func_decl.value().is_not_nil())
+        strip_pack_var(func_decl.value());
+      strip_pack_var(func_decl.type());
     }
   }
 
