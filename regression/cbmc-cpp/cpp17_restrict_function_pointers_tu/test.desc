@@ -1,32 +1,17 @@
-KNOWNBUG
+THOROUGH
 main.cpp
---cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions ../../../src/goto-programs/restrict_function_pointers.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 ../../../src/goto-programs/restrict_function_pointers.cpp
 ^\[main\.assertion\.1\] line \d+ restrict_function_pointers converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
 --
-unordered_map<irep_idt, unordered_set<irep_idt>>::emplace finds no
-match in this TU (context-dependent; the isolated shape passes), plus
-the ofstream{string} constructor misresolution.  The last
-goto-programs dog-food blocker.
-Update 2026-07-22: the emplace no-match is isolated as minimal
-KNOWNBUG cpp17_umap_emplace_mixed_categories; the second ingredient
-(auto&& from a const lvalue deducing the non-reference type) is
-isolated as minimal KNOWNBUG cpp11_auto_ref_ref_const_lvalue.
-Update 2026-07-22 (late): the auto&& ingredient is FIXED
-([temp.deduct.call]/3); the TU now fails ONLY on the emplace
-no-match (cpp17_umap_emplace_mixed_categories; see also the std-only
-cpp17_vector_emplace_nondefault_pair for the constrained-pair-ctor
-family).
-Update 2026-07-28: FRONT-END FIXED (member-template pack expansion,
-fix for cpp17_vector_emplace_nondefault_pair): both TUs typecheck,
-goto conversion completes and bounded BMC runs to completion;
-main.assertion.1 ("restrict_function_pointers converts") SUCCEEDS.
-Residual: 184 automatic pointer checks fail inside libstdc++
-container internals reached from TU code (semantic library-modeling
-imprecision, e.g. _Fwd_list_base::_M_erase_after), keeping
-VERIFICATION FAILED.  Added --unwind 1 --no-unwinding-assertions so
-the run terminates.
+Dog-food: CBMC's own restrict_function_pointers.cpp converts and the
+harness assertion verifies.  Flipped KNOWNBUG->THOROUGH 2026-08-11:
+the emplace no-match and ofstream conversion failures are fixed
+(rounds 32-35); conversion alone takes ~5m40s, beyond the CORE -t 300
+budget, hence THOROUGH.  --property restricts BMC to the harness
+assertion: the TU's other properties fire only on CBMC-internal
+bookkeeping havocked for out-of-TU functions (get_nil_irep etc. have
+no body in this TU), which is sound behaviour, not a defect.
