@@ -1,0 +1,11 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ fn-ptr template-id pack expansion: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Runtime-verified with clang++ (g++ rejects the alias-template pack
+deduction shape).
