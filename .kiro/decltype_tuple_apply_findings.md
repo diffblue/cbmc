@@ -5681,3 +5681,24 @@ unknown" — mem-init `__bound_args_(__bound_args...)` with NON-empty
 packs at drain of __perfect_forward_impl ctor (tuple member restored
 in fd1 harvest = f4.cpp still failed WITHOUT it... recheck).  Artifacts:
 /tmp/f4.cpp /tmp/ff1/red.cpp /tmp/rp3.cpp; probes ALL STRIPPED.
+
+## Round 34 cont.: layer 4 (own-pack varargs) fixed; layer 5 queued
+
+fg1 re-reduction found layer 4: `operator()(_Fn, _BoundArgs...)` — my
+round-34 empty-pack param removal deleted the VARARGS param
+([dcl.fct]/6: `B...` with B non-pack = B + C varargs, NOT a pack
+declarator!) whenever an unrelated trailing template pack deduced
+empty.  Fix: own-pack name constraint in BOTH the in-declaration scan
+and the original-declarator recovery (commit above).  Kernels mp4
+(14-line, plain --cpp11, g++-valid!) + ek5 → CORE
+cpp11_varargs_after_empty_pack + cpp20_mid_pack_decltype_invoke.
+5 suites green.  Diagnosis chain that worked: empty-pack-slot probe →
+post-gfta count (candidate EXISTS, non-template) → match-arity probe
+(nparams=1/2 vs nops=2/3 — param VANISHED) → the removal site.
+PROBE-REPAIR LESSON: python line-insertion before `return` under an
+un-braced `if` SILENTLY REWRITES SEMANTICS — always insert braced,
+verify with sed context print before building.
+Layer 5 (fh1, 108 lines, STILL drops main): variant with
+`__invoke(_Fp, ...)` varargs + trailing class... pack + decltype(_Op())
++ index_sequence_for<> (EMPTY).  /tmp/fh1/red.cpp saved.  Next: delta
+fh1 vs fg1 (E-edit method) then kernel.
