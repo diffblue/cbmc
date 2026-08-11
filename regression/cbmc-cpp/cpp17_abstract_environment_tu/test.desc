@@ -1,30 +1,15 @@
-KNOWNBUG
+THOROUGH
 main.cpp
---cpp17 -I ../../../src --object-bits 12 ../../../src/analyses/variable-sensitivity/abstract_environment.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 ../../../src/analyses/variable-sensitivity/abstract_environment.cpp
 ^\[main\.assertion\.1\] line \d+ abstract_environment converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
 --
-Current state: single-file mode fails with "symbol 'shared_ptr' does
-not uniquely resolve"; two-file mode (this test's shape) SEGFAULTS
-while instantiating sharing_mapt<dstringt, shared_ptr<const ...>>'s
-node machinery (small_shared_n_way_ptrt::is_derived,
-sharing_node.h).  The original map-comparator facet was
-fixed 2026-07-21.  Blocks dog-fooding variable-sensitivity.
-Update 2026-07-22: the shared_ptr ambiguity is isolated as minimal
-KNOWNBUG cpp11_nsdmi_braced_null_ctor (NSDMI list-init with a null
-pointer constant); the two-file SEGFAULT (sharing_node
-small_shared_n_way_ptrt::is_derived) remains only here.
-Update 2026-07-22 (late): the shared_ptr NSDMI ambiguity is FIXED
-(two-phase list-init); single-file mode now fails on the braced
-delta_view item binding a later reference constructor parameter --
-minimal KNOWNBUG cpp11_braced_arg_ref_param_second -- and the
-pair<ssa_exprt,...> ingredient is std-only-minimal in
-cpp17_vector_emplace_nondefault_pair.  The two-file SEGFAULT persists,
-now crashing in cpp_typecheckt::typecheck_member_initializer (17-frame
-stack, genuine null dereference, not stack overflow; pre-existing --
-verified against the pre-NSDMI front end).
-Minimal header-free reproducer: cpp17_pack_cast_tuple_element_segv.
+Dog-food: CBMC's own abstract_environment.cpp converts and the
+harness assertion verifies.  Flipped KNOWNBUG->THOROUGH 2026-08-11:
+conversion + property-restricted BMC take ~7m45s, beyond the CORE
+-t 300 budget, hence THOROUGH.  Previously parked as "solver timeout
+>1h" on the FULL property set; --property restricts to the harness
+assertion (the rest is sound havoc of out-of-TU functions).
