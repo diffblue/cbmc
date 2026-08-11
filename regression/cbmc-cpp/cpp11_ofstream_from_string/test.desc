@@ -1,25 +1,14 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11 --object-bits 12
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-^CONVERSION ERROR$
 --
-PARTIALLY fixed 2026-07-21: the construction converts and verifies
-standalone ([expr.type.conv]/2 direct-list-init + byte-wide
-@most_derived), but the full property set exceeds the harness
-timeout; iostream destructor-chain gaps remain (see
-cpp11_stream_setw).
-Update 2026-07-22: the front-end blockers are fixed (destructor-chain
-thunk convention + locale/ios_base models; cpp11_stream_destructor_
-chain and cpp11_stream_setw are CORE); this test still times out in
-BMC (filebuf/locale state space), a scaling issue rather than a
-front-end defect.
-Update 2026-07-28: no minimal reproducer is constructible -- the
-residual is pure BMC state-space scaling (filebuf/locale), not a
-front-end defect; any reduction that stays slow is just "a big
-program".  Compile-only coverage exists as regression/cpp/
-ofstream_from_string via goto-cc.
+std::ofstream{std::string} construction over libstdc++ <fstream>.
+Flipped KNOWNBUG->CORE 2026-08-11: converts and verifies after the
+rounds 32-35 template-pack/overload fixes (0 of 15085 properties,
+non-vacuous, ~23s).  --unwind 5 --no-unwinding-assertions: bounded
+harness over the locale/facet machinery.
