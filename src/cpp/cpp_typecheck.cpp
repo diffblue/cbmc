@@ -279,6 +279,63 @@ void cpp_typecheckt::typecheck()
     typecheck_method_bodies();
   }
 
+  // Final soundness sweep (N5008 [stmt.return]/3, [conv.ptr]/1): a body
+  // may survive with a HALF-type-checked statement when an inner recovery
+  // swallowed the failure without any catch clearing the value -- e.g. a
+  // `return nullptr;` whose conversion to the function's return type
+  // never ran (the libstdc++ <regex>
+  // _Sp_counted_ptr_inplace::_M_get_deleter shape: the RTTI branch fails,
+  // the tail survives raw, goto conversion emits a type-inconsistent
+  // assignment, and symbolic execution aborts).  A partially-converted
+  // body is neither the program's semantics nor an over-approximation;
+  // demote SYSTEM-HEADER bodies with return/return-type mismatches to
+  // the clean no-body state, whose call-site havoc IS sound.
+  for(const auto &entry : symbol_table)
+  {
+    const symbolt &sym = entry.second;
+    if(
+      sym.type.id() != ID_code || sym.value.id() != ID_code ||
+      sym.mode != ID_cpp || sym.is_type)
+      continue;
+    const std::string sym_file = id2string(sym.location.get_file());
+    if(
+      sym_file.find("/usr/include/") != 0 && sym_file.find("/usr/lib/") != 0 &&
+      sym_file.find("/Applications/") != 0)
+      continue;
+    const typet &expect = to_code_type(sym.type).return_type();
+    if(
+      expect.id() == ID_constructor || expect.id() == ID_destructor ||
+      expect.id() == ID_empty || expect.id() == ID_auto ||
+      expect.id() == ID_decltype)
+      continue;
+    std::function<bool(const irept &)> consistent = [&](const irept &n) -> bool
+    {
+      if(
+        n.id() == ID_code && n.get(ID_statement) == ID_return &&
+        !n.get_sub().empty())
+      {
+        const exprt &v = static_cast<const exprt &>(n.get_sub().front());
+        if(
+          v.type().is_not_nil() && !v.type().id().empty() && v.type() != expect)
+          return false;
+      }
+      for(const auto &sn : n.get_sub())
+        if(!consistent(sn))
+          return false;
+      for(const auto &ns : n.get_named_sub())
+        if(!consistent(ns.second))
+          return false;
+      return true;
+    };
+    if(!consistent(sym.value))
+    {
+      warning().source_location = sym.location;
+      warning() << "C++ front-end left an inconsistent return in '"
+                << sym.base_name << "'; its body is dropped" << eom;
+      symbol_table.get_writeable_ref(entry.first).value.make_nil();
+    }
+  }
+
   provide_stdlib_bodies();
 
   clean_up();
