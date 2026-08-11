@@ -146,6 +146,67 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
 {
   exprt &body = method_symbol.value;
 
+  // N5008 [temp.spec.partial.match]: for a member of a PARTIAL
+  // specialization instance, the enclosing class's parameters were bound
+  // by deduction against the argument pattern; replay the deduction-time
+  // pack bindings persisted on the class symbol (#spec_template_packs),
+  // non-overriding.  Without them a CLASS-level pack reference in the
+  // body -- e.g. the `get<_Idx>()...` call-argument expansion in libc++
+  // __perfect_forward's `operator()` -- has no binding at drain time,
+  // and the fn-param-driven expansion below drops the argument as an
+  // empty pack ([temp.variadic]/7 misapplied), silently truncating the
+  // call.
+  {
+    const irep_idt &class_id = method_symbol.type.get(ID_C_member_name);
+    const symbolt *class_sym =
+      class_id.empty() ? nullptr : symbol_table.lookup(class_id);
+    if(class_sym != nullptr)
+    {
+      const irept &bindings =
+        class_sym->type.find(irep_idt{"#spec_template_packs"});
+      for(const auto &entry : bindings.get_sub())
+      {
+        const irep_idt pid = entry.get(ID_identifier);
+        if(pid.empty())
+          continue;
+        if(entry.id() == irep_idt{"pack_types"})
+        {
+          if(
+            template_map.pack_size_map.find(pid) !=
+            template_map.pack_size_map.end())
+            continue;
+          std::vector<typet> elems;
+          for(const auto &t : entry.get_sub())
+            elems.push_back(static_cast<const typet &>(t));
+          template_map.pack_size_map[pid] = elems.size();
+          if(!elems.empty())
+          {
+            if(elems.size() == 1)
+              template_map.type_map.emplace(pid, elems.front());
+            template_map.pack_args_map[pid] = std::move(elems);
+          }
+        }
+        else if(entry.id() == irep_idt{"pack_exprs"})
+        {
+          if(
+            template_map.pack_size_map.find(pid) !=
+            template_map.pack_size_map.end())
+            continue;
+          std::vector<exprt> vals;
+          for(const auto &v : entry.get_sub())
+            vals.push_back(static_cast<const exprt &>(v));
+          template_map.pack_size_map[pid] = vals.size();
+          if(!vals.empty())
+          {
+            if(vals.size() == 1)
+              template_map.expr_map.emplace(pid, vals.front());
+            template_map.pack_expr_map[pid] = std::move(vals);
+          }
+        }
+      }
+    }
+  }
+
   // Per [temp.inst]/1: restore function template map if this
   // is an instantiated member function template.
   if(method_symbol.type.find(irep_idt{"#fn_template_type"}).is_not_nil())
