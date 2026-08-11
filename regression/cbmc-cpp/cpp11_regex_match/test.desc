@@ -1,53 +1,17 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 8 regex match: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
-Invariant violation: std::less<std::_V2::error_category>::~less
 --
-Was CORE.  Downgraded when the is_constructible empty-pack fix
-(cpp11_is_constructible_empty_pack) enabled a libstdc++ deduction path CBMC did
-not previously reach, which drove cpp_typecheck_resolvet::guess_template_args
-into unbounded recursion.
-
-The guess_template_args recursion is now FIXED (see
-cpp11_alias_template_deduction): the root cause was a member alias template
-(regex's _BracketMatcher) whose qualified expansion was re-looked-up unqualified
-and re-expanded the alias forever.  With the fix the deduction terminates and
-the "regex match" assertion now verifies SUCCESSFUL.
-
-This test remains KNOWNBUG for a SEPARATE, newly-reachable reason: the completed
-deduction now instantiates libstdc++'s locale/facet machinery, and
-regex_match's use of it dereferences the global locale's facet pointers
-(std::__try_use_facet: __loc->_M_impl->_M_facets, _RegexTranslatorBase's
-_M_traits) which CBMC does not model as initialised (no locale static-init
-modelling), so those dereferences fail.  Flip back to CORE once the libstdc++
-locale facet pointers are modelled (or stubbed) as validly initialised.
-
-UPDATE 2026-07-16: the locale-facet layer is now MODELLED (see
-cpp11_locale_ctype_facet): __try_use_facet<ctype<char>> returns a modelled
-classic-"C" facet with a proper classification table, and
-locale()/~locale() have empty model bodies, so the facet dereference
-failures are gone.  The residual blocker is pure BMC SCALING: symbolic
-regex compilation + matching does not converge within 10 minutes at
---unwind 5.  Not a front-end defect.
-
-STAGE PROFILE 2026-07-17 (timestamped phases + RSS sampler, 16 GiB cap):
-the blow-up is PROGRAM-SIZE-DRIVEN SYMEX.  The fully instantiated
-<regex> machinery yields ~358,000 goto instructions across ~4,233
-functions.  Wall-clock: front end (parse+typecheck+goto conversion)
-28s; function-pointer removal 76s (quadratic-ish over the huge
-program); symbolic execution then runs >18 minutes at ~5.5 GiB RSS
-WITHOUT completing -- the solver is never reached, so neither the SAT
-back-end nor encoding is implicated.  Memory is stable (time-bound,
-not memory-bound).
-
-Unblock candidates, in order of likely payoff: (1) a lighter regex
-model (stub std::regex with a bounded matcher, the way the locale/ctype
-facet layer was modelled); (2) pre-symex reachability slicing /
---drop-unused-functions to cut the 4,233-function program down before
-BMC; (3) per-loop unwind limits on the regex compiler's inner loops
-instead of a global --unwind 5.  Plain --paths lifo or solver swaps
-will NOT help: the bottleneck precedes the solver.
+std::regex construction + regex_match over libstdc++ <regex>.
+Flipped KNOWNBUG->CORE 2026-08-11: the earlier symex crash
+(lhs.type()==rhs.type() via _M_get_deleter) no longer reproduces after
+the rounds 32-35 template-pack and overload-ranking fixes; 0 of 41987
+properties fail, non-vacuous (1 assertion).  Runtime-verified with
+g++ and clang++.
+--object-bits 12 --unwind 5 --no-unwinding-assertions: full <regex>
+conversion exceeds 2^8 objects; bounded harness.
