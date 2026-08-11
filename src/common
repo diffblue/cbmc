@@ -38,12 +38,12 @@ endif
   CP_CFLAGS = -MMD -MP
   CXXFLAGS ?= -Wall -O2
 ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
-  CP_CXXFLAGS += -MMD -MP -mmacosx-version-min=10.15 -std=c++17 -stdlib=libc++
+  CP_CXXFLAGS += -MMD -MP -mmacosx-version-min=10.15 -std=c++20 -stdlib=libc++
   CP_CFLAGS += -mmacosx-version-min=10.15
   LINKFLAGS += -mmacosx-version-min=10.15 -stdlib=libc++
   LINKNATIVE += -mmacosx-version-min=10.15 -stdlib=libc++
 else
-  CP_CXXFLAGS += -MMD -MP -std=c++17
+  CP_CXXFLAGS += -MMD -MP -std=c++20
 endif
 ifeq ($(filter -O%,$(CXXFLAGS)),)
   CP_CXXFLAGS += -O2
@@ -58,7 +58,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   endif
   LINKLIB = /usr/bin/libtool -static -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++20 -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
   endif
@@ -70,7 +70,7 @@ else ifeq ($(filter-out FreeBSD OpenBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS +=
   LINKLIB = llvm-ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++20 -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
   endif
@@ -81,7 +81,7 @@ else ifeq ($(filter-out FreeBSD OpenBSD,$(BUILD_ENV_)),)
 else
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++20 -o $@ $^
   ifeq ($(origin CC),default)
     CC     = gcc
     #CC     = icc
@@ -109,13 +109,13 @@ else ifeq ($(BUILD_ENV_),Cygwin)
   CFLAGS ?= -Wall -O2
   CXXFLAGS ?= -Wall -O2
   CP_CFLAGS = -MMD -MP
-  CP_CXXFLAGS += -MMD -MP -std=c++17 -U__STRICT_ANSI__
+  CP_CXXFLAGS += -MMD -MP -std=c++20 -U__STRICT_ANSI__
   # Cygwin-g++ has problems with statically linking exception code.
   # If linking fails, remove -static.
-  LINKFLAGS = -static -std=c++17
+  LINKFLAGS = -static -std=c++20
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^ -static
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++20 -o $@ $^ -static
 ifeq ($(origin CC),default)
   #CC = gcc
   CC = x86_64-w64-mingw32-gcc
@@ -140,12 +140,12 @@ else ifeq ($(BUILD_ENV_),MSVC)
   DEPEXT = .dep
   EXEEXT = .exe
   CFLAGS ?= /W3 /O2 /GF
-  CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF /std:c++17
+  CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF /std:c++20
   CP_CFLAGS =
   CP_CXXFLAGS +=
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ /Z7 /nologo $^ DbgHelp.lib $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) /std:c++17 /Fe$@ /nologo /EHsc $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) /std:c++20 /Fe$@ /nologo /EHsc $^
 ifeq ($(origin CC),default)
   CC = cl
 endif

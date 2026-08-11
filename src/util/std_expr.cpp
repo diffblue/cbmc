@@ -73,15 +73,15 @@ bool constant_exprt::operator==(int rhs) const
 
     if(type_id == ID_integer)
     {
-      return integer_typet{}.zero_expr() == *this;
+      return integer_typet{}.zero_expr() == static_cast<const irept &>(*this);
     }
     else if(type_id == ID_natural)
     {
-      return natural_typet{}.zero_expr() == *this;
+      return natural_typet{}.zero_expr() == static_cast<const irept &>(*this);
     }
     else if(type_id == ID_real)
     {
-      return real_typet{}.zero_expr() == *this;
+      return real_typet{}.zero_expr() == static_cast<const irept &>(*this);
     }
     else if(type_id == ID_rational)
     {
@@ -117,15 +117,15 @@ bool constant_exprt::operator==(int rhs) const
 
     if(type_id == ID_integer)
     {
-      return integer_typet{}.one_expr() == *this;
+      return integer_typet{}.one_expr() == static_cast<const irept &>(*this);
     }
     else if(type_id == ID_natural)
     {
-      return natural_typet{}.one_expr() == *this;
+      return natural_typet{}.one_expr() == static_cast<const irept &>(*this);
     }
     else if(type_id == ID_real)
     {
-      return real_typet{}.one_expr() == *this;
+      return real_typet{}.one_expr() == static_cast<const irept &>(*this);
     }
     else if(type_id == ID_rational)
     {

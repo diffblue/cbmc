@@ -38,13 +38,13 @@ const std::map<irep_idt, infix_opt> infix_map = {
   {ID_mult, {"*"}},
   {ID_div, {"/"}},
   {ID_equal, {"="}},
-  {ID_notequal, {u8"\u2260"}}, // /=, U+2260
-  {ID_and, {u8"\u2227"}},      // wedge, U+2227
-  {ID_or, {u8"\u2228"}},       // vee, U+2228
-  {ID_xor, {u8"\u2295"}},      // + in circle, U+2295
-  {ID_implies, {u8"\u21d2"}},  // =>, U+21D2
-  {ID_le, {u8"\u2264"}},       // <=, U+2264
-  {ID_ge, {u8"\u2265"}},       // >=, U+2265
+  {ID_notequal, {"\u2260"}}, // /=, U+2260
+  {ID_and, {"\u2227"}},      // wedge, U+2227
+  {ID_or, {"\u2228"}},       // vee, U+2228
+  {ID_xor, {"\u2295"}},      // + in circle, U+2295
+  {ID_implies, {"\u21d2"}},  // =>, U+21D2
+  {ID_le, {"\u2264"}},       // <=, U+2264
+  {ID_ge, {"\u2265"}},       // >=, U+2265
   {ID_lt, {"<"}},
   {ID_gt, {">"}},
 };
@@ -100,7 +100,7 @@ static std::ostream &format_rec(std::ostream &os, const multi_ary_exprt &src)
 
   if(src.id() == ID_equal && to_equal_expr(src).op0().is_boolean())
   {
-    operator_str = u8"\u21d4"; // <=>, U+21D4
+    operator_str = "\u21d4"; // <=>, U+21D4
   }
   else
   {
@@ -142,7 +142,7 @@ static std::ostream &format_rec(std::ostream &os, const binary_exprt &src)
 static std::ostream &format_rec(std::ostream &os, const unary_exprt &src)
 {
   if(src.id() == ID_not)
-    os << u8"\u00ac"; // neg, U+00AC
+    os << "\u00ac"; // neg, U+00AC
   else if(src.id() == ID_unary_minus)
     os << '-';
   else if(src.id() == ID_count_leading_zeros)
@@ -443,8 +443,9 @@ void format_expr_configt::setup()
   };
 
   expr_map[ID_forall] =
-    [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    os << u8"\u2200 ";
+    [](std::ostream &os, const exprt &expr) -> std::ostream &
+  {
+    os << "\u2200 ";
     bool first = true;
     for(const auto &symbol : to_quantifier_expr(expr).variables())
     {
@@ -458,8 +459,9 @@ void format_expr_configt::setup()
   };
 
   expr_map[ID_exists] =
-    [](std::ostream &os, const exprt &expr) -> std::ostream & {
-    os << u8"\u2203 ";
+    [](std::ostream &os, const exprt &expr) -> std::ostream &
+  {
+    os << "\u2203 ";
     bool first = true;
     for(const auto &symbol : to_quantifier_expr(expr).variables())
     {
@@ -499,7 +501,7 @@ void format_expr_configt::setup()
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &lambda_expr = to_lambda_expr(expr);
 
-    os << u8"\u03bb ";
+    os << "\u03bb ";
 
     bool first = true;
 
@@ -600,8 +602,8 @@ void format_expr_configt::setup()
   expr_map[ID_object_address] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &object_address_expr = to_object_address_expr(expr);
-    return os << u8"\u275d" << object_address_expr.object_identifier()
-              << u8"\u275e";
+    return os << "\u275d" << object_address_expr.object_identifier()
+              << "\u275e";
   };
 
   expr_map[ID_object_size] =
@@ -619,8 +621,8 @@ void format_expr_configt::setup()
   expr_map[ID_field_address] =
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
     const auto &field_address_expr = to_field_address_expr(expr);
-    return os << format(field_address_expr.base()) << u8".\u275d"
-              << field_address_expr.component_name() << u8"\u275e";
+    return os << format(field_address_expr.base()) << ".\u275d"
+              << field_address_expr.component_name() << "\u275e";
   };
 
   fallback = [](std::ostream &os, const exprt &expr) -> std::ostream & {
