@@ -8,9 +8,13 @@ main.cpp
 --
 --
 std::regex construction + regex_match over libstdc++ <regex>.
-ADDRESS-LAYOUT-DEPENDENT symex invariant violation
-(lhs.type()==rhs.type() via shared_ptr _M_get_deleter): with ASLR
-DISABLED (setarch -R) the run verifies 0 of 41987 (non-vacuous, ~91s);
-with ASLR ENABLED it aborts 3/3.  Some front-end structure iterates in
-pointer order and leaks the order into symbol/type identity.  The
-deterministic ASLR switch is the diagnosis lever (2026-08-11).
+The former ADDRESS-LAYOUT-DEPENDENT symex abort is FIXED (system-header
+bodies left with inconsistent returns are now demoted to the no-body
+state).  Remaining issue: WHICH bodies half-convert still depends on
+allocator address order; on most layouts the test verifies in
+~91-300s, on some the extra havoc pushes BMC past practical time.
+Root cause = an inner recovery swallowing a mid-body type-check
+failure (RTTI branch of _Sp_counted_ptr_inplace::_M_get_deleter et
+al.); fixing the swallow, or making resolution order canonical without
+breaking first-wins consumers (cf. cpp17_std_function_lambda_call),
+will make this flippable (2026-08-11).
