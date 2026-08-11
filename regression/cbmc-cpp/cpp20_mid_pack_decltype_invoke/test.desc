@@ -1,0 +1,12 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ mid param pack in decltype: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Pre-fix: main silently dropped (vacuous SUCCESS); this desc requires
+the assertion line.  Runtime-verified with clang++ (g++ rejects the
+alias-template pack deduction shape).
