@@ -1,0 +1,13 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ mixed pack under outer deduction: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Pre-fix: main silently dropped (no diagnostic), then symex invariant
+violation on the malformed global initializer.
+Runtime-verified with clang++ (g++ rejects the alias-template
+pack deduction shape).
