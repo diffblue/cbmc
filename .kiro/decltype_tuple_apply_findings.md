@@ -5802,3 +5802,23 @@ DIAGNOSIS PATTERN for solver OOM: program-only dump → live-step count
 (syshdr-swallow precision arc), ranges_pipe (fl1 still ~236 lines,
 criterion too slow ~2min/iter — consider re-seeding from the
 90s-typecheck criterion instead), ranges_basic.
+
+## Round 37 close: ranges_pipe reduction exhausted
+
+fm1 (fast 0.18s/iter criterion: native compile+run gates +
+typecheck-phase could-not-typecheck check) reconverged to 236 lines =
+the existing test file is textually MINIMAL.  fl1's slow criterion
+(full BMC 90s/iter) wasted 14h for 12 lines — ALWAYS use the
+typecheck-phase criterion for drop-main bugs.  Remaining ranges work
+= E-delta layer analysis (rounds 34-35 method), NOT reduction.
+CONVERGENT NEXT ARC: the syshdr-guard "report error without throw"
+swallow fix would serve BOTH regex precision AND the ranges drop-main
+family (same "could not fully type-check" leniency).  Candidate
+swallow sites visible in round-36's DBG2 dump: allocator-ctor
+no-match in mem-init recovery, basic_string ctor no-match,
+implicit_typecast failures that print + continue.  Fix pattern: in
+sfinae/null-handler contexts make each site either THROW to the
+body-level recovery or recover to a TYPE-CONSISTENT node — never
+print-and-continue with a half-node.
+KNOWNBUG count: 3 (regex, ranges_pipe, ranges_basic).  Campaign
+start: 21.
