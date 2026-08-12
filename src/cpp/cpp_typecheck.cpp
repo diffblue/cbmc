@@ -279,6 +279,23 @@ void cpp_typecheckt::typecheck()
     typecheck_method_bodies();
   }
 
+  // N5008 [temp.inst]/11: a member whose body was DEFERRED and never
+  // odr-used shall not be implicitly instantiated.  Its symbol still
+  // carries the RAW (un-type-checked) parse tree; goto conversion cannot
+  // consume that (operands keep parse-level types -- the
+  // char_traits::to_int_type / basic_string::find shapes the demotion
+  // sweep below used to catch).  Clear the values so these members are
+  // cleanly bodiless; the deferral map itself is left intact for
+  // diagnostics.
+  for(const auto &entry : deferred_method_bodies)
+  {
+    symbolt *sym = symbol_table.get_writeable(entry.first);
+    if(
+      sym != nullptr && sym->value.is_not_nil() &&
+      !sym->value.get_bool("#cpp_converted"))
+      sym->value.make_nil();
+  }
+
   // Final soundness sweep (N5008 [stmt.return]/3, [conv.ptr]/1): a body
   // may survive with a HALF-type-checked statement when an inner recovery
   // swallowed the failure without any catch clearing the value -- e.g. a
