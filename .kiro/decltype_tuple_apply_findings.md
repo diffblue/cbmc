@@ -5848,3 +5848,25 @@ User asked: is every known problem covered by a test?  Audit result:
    hazard convert_function fixed; would only bite if body typecheck
    throws mid-lambda and is recovered upstream.  Verify before
    testing.
+
+## Round 38 (2026-08-12): lambda return_type hazard — investigated, hardened, grounded
+
+VERDICT: real code hazard, NO reachable trigger.  Evidence:
+(1) code review: plain-assignment restore, skipped on throw; window =
+same-enclosing-body continuation after an expression-level recovery.
+(2) corpus probe (rethrow-detector around the body typecheck): ZERO
+hits across the full cbmc-cpp suite + regex TU.
+(3) direct search: every VALID lambda body tried (goto, local
+classes, try/catch, static locals, range-for, nested lambdas, unions,
+statement-exprs) typechecks — no CBMC-throwing valid body found to
+weaponize a SFINAE-context clobber.
+ACTION: scope-guard hardening (mirrors convert_function) + TWO CORE
+tests: cpp11_lambda_return_context (enclosing double-return conversion
+intact across int-lambdas — would catch any future clobber) and
+cpp11_lambda_break_rejected ([stmt.break]/1 rejects-invalid — the
+loop-context flags turned out CORRECT already; pinned).  Guard scope
+audited: closes at the same block as the old mid-scope restore; no
+return_type reads in between.  5 suites green.
+Every known issue now has committed grounding: 4 KNOWNBUGs (regex,
+ranges_pipe, ranges_basic, syshdr_swallow_demotions), THOROUGH x5,
+CORE tests for all fixed/hardened behavior.
