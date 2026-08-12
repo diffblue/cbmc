@@ -5918,3 +5918,21 @@ instantiate-time ctor mem-init machinery 3760+/7150+ in
 cpp_instantiate_template.cpp, or apply()'s ambiguous-args machinery).
 fn1 reduction: file is minimal for THIS criterion too (whole chain
 load-bearing).  2 KNOWNBUGs + regex-solver remain.
+
+## Round 41 (2026-08-12): alias-qualified using B::B + placeholder hygiene
+
+FIXED: (1) inheriting-ctor detection now resolves the using-qualifier
+through ALIASES ([namespace.udecl]/1 + [class.qual]/2) — libc++'s
+`using __perfect_forward<...>::__perfect_forward;` finally imports;
+the [class.qual]/2 terminal==qualifier-last-name gate keeps ordinary
+member using-decls (std::list `using _Base::_M_impl;`) unaffected
+(list_basic regressed before the gate!).  (2) unassigned placeholders
+now get their TYPE typechecked at return (raw `long` leak into
+`_Ep - _Sp`); the THROW variant regressed is_constructible_real_pair
++ list_basic — placeholder-survival is a load-bearing contract
+(cpp_typecheck_compound_type ~3402 comment says so; verified).
+5 suites green.  RANGES NEXT LAYER: "symbol '_Idx' does not uniquely
+resolve: constructor void() / constructor void(void)" — a scalar _Idx
+use resolving to two synthesized ctor signatures (?!) during pf
+elaboration.  Probes all stripped; base.cpp still drops main.
+KNOWNBUGs: ranges pair + regex-solver.
