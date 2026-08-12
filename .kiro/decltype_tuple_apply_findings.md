@@ -5786,3 +5786,19 @@ visible in the DBG2 dump: mem-init allocator ctor no-match recovery,
 implicit_typecast failures, do_grouping-family string-literal
 returns.  ALSO pending: erase_if VERIFICATION ERROR diagnosis; fl1
 ranges reduction (~2min/iter, slow).
+
+## Round 37 (2026-08-12): erase_if flipped (SMT backend)
+
+ERROR verdict = "SAT checker ran out of memory" (>50G, even ONE
+property, unwind 3, slice-formula, any object-bits).  Equation is
+SMALL (34k steps, 4132 live, 1 VCC, no giant arrays/constants/divs —
+the 323k "/" grep hit was COMMENT slashes, beware).  --smt2 converts
+(13MB) and z3 solves UNSAT in ~4min → CBMC --smt2 end-to-end
+VERIFICATION SUCCESSFUL 6m15.  Flipped THOROUGH smt-backend (README
+tag: tests requiring SMT).  --incremental-smt2-solver z3 FAILS:
+convert_expr_to_smt lacks extractbits (solver-side gap, noted).
+DIAGNOSIS PATTERN for solver OOM: program-only dump → live-step count
+→ op census → SMT2 cross-check → z3.  3 KNOWNBUGs remain: regex
+(syshdr-swallow precision arc), ranges_pipe (fl1 still ~236 lines,
+criterion too slow ~2min/iter — consider re-seeding from the
+90s-typecheck criterion instead), ranges_basic.
