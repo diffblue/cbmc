@@ -14,3 +14,7 @@ solver time beyond the CORE budget).  The SAT backend's bit-blasting
 runs out of memory (>50 GB) on this equation even for the single
 property and unwind 3 -- a flattening scale limit, not a front-end
 defect (the goto conversion is complete: 34k SSA steps, 1 VCC).
+Known solver-side gap: the INCREMENTAL smt2 backend
+(--incremental-smt2-solver) aborts on this TU -- convert_expr_to_smt
+has no extractbits rule (bv[8] extract from a typecast of an indexed
+value, a C++-front-end bv shape); use the classic --smt2 path.
