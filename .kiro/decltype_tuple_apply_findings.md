@@ -5870,3 +5870,25 @@ return_type reads in between.  5 suites green.
 Every known issue now has committed grounding: 4 KNOWNBUGs (regex,
 ranges_pipe, ranges_basic, syshdr_swallow_demotions), THOROUGH x5,
 CORE tests for all fixed/hardened behavior.
+
+## Round 39 (2026-08-12): swallow arc — 2 roots fixed, tracker FLIPPED
+
+ROOT 1 ([temp.inst]/11): still-deferred never-odr-used members carried
+RAW parse trees into goto conversion — now cleared pre-conversion
+(cpp_typecheck.cpp).  Killed ALL to_string demotions.
+ROOT 2: type2name threw std::string on constructor/destructor return
+types (C++ struct components include methods!); cpp recoveries catch
+only int → the exception ESCAPED convert_function mid-body (window
+probes: pass-1 pre-try→no-tc-ok/no-catch), a SECOND conversion then
+mangled the half-body silently.  Fixed: stable CTOR/DTOR spellings.
+regex now converts on EVERY layout (8/8).  DIAGNOSIS GOLD: the
+window-open/close + tc-ok/tc-catch marker pattern; catch-by-TYPE
+probes (string/cstr) identified the foreign exception in one run.
+FLIPPED: cpp11_syshdr_swallow_demotions → CORE.  regex: conversion
+done; solver-time layout variance remains (KNOWNBUG, notes updated).
+RANGES ARC RESUMED: mem-init own-pack expansion fixed (expand_own now
+dispatches on member_initializer nodes too) — '__bound_args unknown'
+gone; NEXT LAYER surfaced cleanly: __tuple_impl 3-pack ctor no-match
+(args [indices,types,indices,types] vs the _Uf/_Tf/_Up ctor —
+deduction of the multi-pack member ctor).  2 KNOWNBUGs left:
+ranges_pipe, ranges_basic (+ regex solver-only).
