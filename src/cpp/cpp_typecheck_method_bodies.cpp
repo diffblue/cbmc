@@ -980,7 +980,17 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
 
       std::function<void(irept &)> expand_own = [&](irept &node)
       {
-        if(node.id() == ID_arguments)
+        // A mem-initializer stores its arguments as positional subs of the
+        // member_initializer code node (no ID_arguments child): the same
+        // [temp.variadic]/5 expansion applies -- the function parameter
+        // pack in `__bound_args_(__bound_args...)` (libc++
+        // __perfect_forward's constructor) must replicate to
+        // `__bound_args$0..$k`.  Only ellipsis-carrying arguments are
+        // touched, so the member-name sub is unaffected.
+        if(
+          node.id() == ID_arguments ||
+          (node.id() == ID_code &&
+           node.get(ID_statement) == ID_member_initializer))
         {
           irept::subt &args = node.get_sub();
           irept::subt out;
