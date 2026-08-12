@@ -5822,3 +5822,29 @@ body-level recovery or recover to a TYPE-CONSISTENT node — never
 print-and-continue with a half-node.
 KNOWNBUG count: 3 (regex, ranges_pipe, ranges_basic).  Campaign
 start: 21.
+
+## Round 37b (2026-08-12): KNOWNBUG coverage audit
+
+User asked: is every known problem covered by a test?  Audit result:
+1. regex / ranges_pipe / ranges_basic: KNOWNBUGs exist ✓.
+2. syshdr print-without-throw swallow: was UNCOVERED → NEW KNOWNBUG
+   cpp11_syshdr_swallow_demotions (std::to_string minimal trigger;
+   DISALLOWED-pattern 'inconsistent return' — verified it FAILS as
+   CORE today; flips when the swallow sites are fixed).  Disallowed
+   patterns = the tool for "works but loses precision" bugs.
+3. Scope-set order-sensitivity (std_function_lambda_call breaks under
+   declaration-order iteration): NOT runnable as a KNOWNBUG (can't
+   encode allocator layout in test.pl); documented as a warning in
+   that test's desc + here.
+4. incremental-smt2 extractbits gap: reproducer = erase_if TU +
+   --incremental-smt2-solver (bv[8] extract from typecast(bv[32],
+   index(...)) — a CPP-frontend bv shape); minimal C/C++ trigger NOT
+   yet found (bitfields, unions, virtual dispatch, char-cast-of-index
+   all pass).  Documented in erase_if desc; upstream test deferred
+   until a small trigger exists.
+5. Speculative, unconfirmed (no test): lambda-body return_type
+   save/restore in typecheck_expr (cpp_typecheck_expr.cpp ~6414) is
+   not exception-safe (plain assignment, no scope guard) — same
+   hazard convert_function fixed; would only bite if body typecheck
+   throws mid-lambda and is recovered upstream.  Verify before
+   testing.
