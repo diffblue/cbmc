@@ -5892,3 +5892,29 @@ gone; NEXT LAYER surfaced cleanly: __tuple_impl 3-pack ctor no-match
 (args [indices,types,indices,types] vs the _Uf/_Tf/_Up ctor —
 deduction of the multi-pack member ctor).  2 KNOWNBUGs left:
 ranges_pipe, ranges_basic (+ regex solver-only).
+
+## Round 40 (2026-08-12): inherited-ctor-template temporaries + mem-init packs
+
+FIXED ([class.inhctor.init]/1 + [conv.ptr]/3): a base ctor TEMPLATE
+inherited via scope alias materialized the temporary as the BASE type;
+`bb(f,0)` returned pf → conversion error → CALLER dropped silently
+(wrong-code, ic3 29-line kernel, CORE
+cpp11_inherited_ctor_template_temp).  Fix: snapshot the written
+cpp_name; retype temp to D + typecast this to B*; gate = ctor NOT a
+D-component (imported non-template ctors already work);
+cpp_constructor rebinding taught the typecast-wrapped form (its
+DATA_INVARIANT aborted the 4 inheriting-ctor tests before the gate +
+shape fix — first attempt DOUBLE-patched, watch for that).
+Also expand_own hardening: unmatched pack expansions kept unless
+governed by a KNOWN-EMPTY pack; pack-size-driven replication fallback.
+5 suites green.
+RANGES STATE: '__bound_args unknown' FIXED; the __tuple_impl no-match
+persists — diagnosis so far: candidate ctor template's gfta SUCCEEDS
+(instance nparams=4, no this/Up) but fargs=4 (the `__u...` delegation
+arg dropped UPSTREAM of resolution, NOT by expand_own's new branch —
+verified by the ti-cand/ti-gfta/ti-nil probe set).  Next: find who
+drops `__u...` from the delegation call before resolution (suspects:
+instantiate-time ctor mem-init machinery 3760+/7150+ in
+cpp_instantiate_template.cpp, or apply()'s ambiguous-args machinery).
+fn1 reduction: file is minimal for THIS criterion too (whole chain
+load-bearing).  2 KNOWNBUGs + regex-solver remain.
