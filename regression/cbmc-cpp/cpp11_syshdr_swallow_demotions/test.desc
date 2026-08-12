@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ to_string size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ to_string digits: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+inconsistent return
+--
+The assertions VERIFY (sound havoc), but the disallowed pattern pins
+that char_traits::to_int_type / basic_string::find / allocator::
+allocate et al. are DEMOTED ("inconsistent return ... body is
+dropped") because inner recoveries under the system-header guard
+print errors without throwing, leaving half-type-checked bodies.
+Fix arc: make each such site throw to the body-level recovery or
+recover to a type-consistent node (see findings log, rounds 36-37);
+then flip this to CORE.  2026-08-12.

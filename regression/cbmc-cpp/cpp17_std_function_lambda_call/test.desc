@@ -19,3 +19,10 @@ Fixed by the round-6 template fixes (2026-08-03 re-test: non-vacuous
 VERIFICATION SUCCESSFUL, 1 assertion; likely the recursive-member-
 alias or zero-length-pack-expansion fix unblocked the _M_manager /
 _Any_data layer).
+ORDER-SENSITIVITY WARNING 2026-08-12: this test's conversion depends
+on scope id-set iteration order (std::set<cpp_idt*> = allocator
+address order).  Under a creation-ordinal (declaration-order)
+comparator, _Base_manager::_M_get_pointer stops converting and this
+test FAILS (no-body property) -- some first-wins resolution consumer
+is tuned to address order by accident.  Any change to scope-set
+ordering must re-validate here first; see findings log round 36.
