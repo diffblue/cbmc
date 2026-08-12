@@ -142,7 +142,10 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CFLAGS ?= /W3 /O2 /GF
   CXXFLAGS ?= /W3 /D_CRT_SECURE_NO_WARNINGS /O2 /GF /std:c++20
   CP_CFLAGS =
-  CP_CXXFLAGS +=
+  # C++20 removes the ability to stream u8 string literals; plain string
+  # literals with \uXXXX escapes are used instead, which requires the
+  # execution character set to be UTF-8.
+  CP_CXXFLAGS += /utf-8
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ /Z7 /nologo $^ DbgHelp.lib $(LIBS)
   LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) /std:c++20 /Fe$@ /nologo /EHsc $^
