@@ -8,13 +8,13 @@ main.cpp
 --
 --
 std::regex construction + regex_match over libstdc++ <regex>.
-The former ADDRESS-LAYOUT-DEPENDENT symex abort is FIXED (system-header
-bodies left with inconsistent returns are now demoted to the no-body
-state).  Remaining issue: WHICH bodies half-convert still depends on
-allocator address order; on most layouts the test verifies in
-~91-300s, on some the extra havoc pushes BMC past practical time.
-Root cause = an inner recovery swallowing a mid-body type-check
-failure (RTTI branch of _Sp_counted_ptr_inplace::_M_get_deleter et
-al.); fixing the swallow, or making resolution order canonical without
-breaking first-wins consumers (cf. cpp17_std_function_lambda_call),
-will make this flippable (2026-08-11).
+CONVERSION is now complete and layout-independent (2026-08-12: the
+type2name ctor/dtor throw and the raw-deferred-body leak are fixed;
+zero demotions in 8/8 layout probes).  Remaining issue is SOLVER TIME
+only: instantiation content still varies with allocator address order
+(scope id-sets iterate in pointer order), so some layouts verify in
+~90-300s and others exceed practical bounds -- with --slice-formula
+--property --smt2, 4 of 7 probe runs finished under 15 min, 3 did
+not.  Needs either order-canonical resolution (blocked on first-wins
+consumers, cf. cpp17_std_function_lambda_call) or further solver-side
+work; conversion-side the front end is done.
