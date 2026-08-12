@@ -1899,6 +1899,34 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
     }
   }
 
+  // An ID_unassigned placeholder (from build_unassigned) marks a
+  // parameter of an ACTIVE deduction with no binding yet; downstream
+  // SFINAE probes rely on it surviving signature type-checking (the
+  // std::pair is_constructible and libstdc++ list shapes), so it is
+  // RETURNED, not treated as unbound.  But its type is the parameter's
+  // UNCHECKED declared type (e.g. a raw `long`); type-check it here so a
+  // scalar use in arithmetic (`_Ep - _Sp` in __make_tuple_indices under
+  // libc++ __perfect_forward) does not abort with "invalid implicit
+  // conversion from '<<type:long>>'" -- the expression then simply fails
+  // to fold to a constant and the caller's dependent-count recovery
+  // applies.
+  if(
+    e.id() == ID_unassigned && e.type().is_not_nil() &&
+    !e.type().id().empty() && e.type().id() != ID_unassigned)
+  {
+    const std::size_t errors_before =
+      cpp_typecheck.get_message_handler().get_message_count(messaget::M_ERROR);
+    try
+    {
+      cpp_typecheck.typecheck_type(e.type());
+    }
+    catch(...)
+    {
+      cpp_typecheck.get_message_handler().set_message_count(
+        messaget::M_ERROR, errors_before);
+    }
+  }
+
   if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
   {
     // N5008 [temp.variadic]/5,7: the identifier may name a template parameter
