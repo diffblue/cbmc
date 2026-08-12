@@ -6411,7 +6411,27 @@ void cpp_typecheckt::instantiate_generic_lambda(
 
     body_code = to_code(static_cast<exprt &>(lambda_expr.add("body")));
 
-    typet old_return_type = return_type;
+    // Save and restore the enclosing function's return type
+    // EXCEPTION-SAFELY (mirroring convert_function's context guard): if
+    // type-checking the lambda body throws and an upstream recovery
+    // (e.g. a SFINAE guard around a default-argument evaluation) absorbs
+    // the exception while the ENCLOSING body continues, a plain
+    // assignment-restore would leave `return_type` set to the lambda's
+    // -- and the enclosing function's later `return` statements would
+    // convert against the wrong type (N5008 [stmt.return]/3 requires
+    // conversion to the enclosing function's return type).  No reachable
+    // trigger is currently known (corpus probe found none; every valid
+    // lambda body tried type-checks), so this is hardening; see
+    // regression/cbmc-cpp/cpp11_lambda_return_context.
+    struct return_type_guardt
+    {
+      typet &ref;
+      const typet saved;
+      ~return_type_guardt()
+      {
+        ref = saved;
+      }
+    } return_type_guard{return_type, return_type};
     if(deduce_return)
       return_type = typet(ID_auto);
     else
@@ -6442,7 +6462,7 @@ void cpp_typecheckt::instantiate_generic_lambda(
         func_type.return_type() = void_type();
     }
 
-    return_type = old_return_type;
+    // (return_type restored by return_type_guard at scope exit)
 
     // Prepend capture initializations
     if(!capture_values.empty())
