@@ -1004,7 +1004,115 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
             }
             const std::string stem = referenced_stem(arg);
             if(stem.empty())
-              continue; // empty pack: drop ([temp.variadic]/7)
+            {
+              // No stem matches this instance's parameters.  Drop the
+              // expansion ONLY when a known-EMPTY pack governs it
+              // ([temp.variadic]/7); an expansion whose pack is not
+              // deducible from the parameter list HERE (e.g. `__u...` in
+              // a delegating mem-initializer processed before the pack
+              // parameters are replicated) must be left for the later
+              // instantiation-time expansion -- dropping it truncated
+              // the __tuple_impl delegation's argument list and the
+              // constructor stopped resolving ([temp.variadic]/5:
+              // lengths come from the packs expanded in the pattern).
+              bool governed_by_empty = false;
+              for(const auto &ps : template_map.pack_size_map)
+              {
+                if(ps.second != 0)
+                  continue;
+                const std::string key = id2string(ps.first);
+                const auto q = key.rfind("::");
+                const std::string suf =
+                  q != std::string::npos ? key.substr(q + 2) : key;
+                std::function<bool(const irept &)> names = [&](const irept &n)
+                {
+                  if(
+                    n.id() == ID_name && id2string(n.get(ID_identifier)) == suf)
+                    return true;
+                  for(const auto &sn : n.get_sub())
+                    if(names(sn))
+                      return true;
+                  for(const auto &ns : n.get_named_sub())
+                    if(names(ns.second))
+                      return true;
+                  return false;
+                };
+                if(names(arg))
+                {
+                  governed_by_empty = true;
+                  break;
+                }
+              }
+              if(governed_by_empty)
+                continue; // zero-length expansion: drop
+              // The pack parameter may not be REPLICATED yet in this
+              // instance's parameter list (path-dependent ordering
+              // between parameter replication and mem-init expansion).
+              // If the fn template's own trailing pack has a recorded
+              // size k >= 1, replicate the argument by pack size,
+              // renaming the value reference `name` -> `name$i`
+              // ([temp.variadic]/5: one element per pack element; the
+              // replicated parameter naming matches
+              // expand_parameter_packs' `base$k` convention).
+              {
+                const irept &fnt2 =
+                  method_symbol.type.find(irep_idt{"#fn_template_type"});
+                std::size_t pack_sz = 0;
+                bool have_sz = false;
+                if(fnt2.is_not_nil())
+                {
+                  const auto &tps2 = static_cast<const template_typet &>(fnt2)
+                                       .template_parameters();
+                  if(!tps2.empty() && tps2.back().get_bool(ID_ellipsis))
+                  {
+                    const irep_idt pid2 =
+                      tps2.back().id() == ID_type
+                        ? tps2.back().type().get(ID_identifier)
+                        : tps2.back().get(ID_identifier);
+                    const auto it2 = template_map.pack_size_map.find(pid2);
+                    if(it2 != template_map.pack_size_map.end())
+                    {
+                      pack_sz = it2->second;
+                      have_sz = true;
+                    }
+                  }
+                }
+                // the VALUE name referenced by the pattern
+                std::function<std::string(const irept &)> first_name =
+                  [&](const irept &n) -> std::string
+                {
+                  if(n.id() == ID_name)
+                    return id2string(n.get(ID_identifier));
+                  for(const auto &sn : n.get_sub())
+                  {
+                    const std::string r = first_name(sn);
+                    if(!r.empty())
+                      return r;
+                  }
+                  for(const auto &ns : n.get_named_sub())
+                  {
+                    const std::string r = first_name(ns.second);
+                    if(!r.empty())
+                      return r;
+                  }
+                  return std::string{};
+                };
+                const std::string vname = first_name(arg);
+                if(have_sz && !vname.empty())
+                {
+                  for(std::size_t k = 0; k < pack_sz; ++k)
+                  {
+                    irept copy = arg;
+                    copy.remove(ID_ellipsis);
+                    rename(copy, vname, vname + "$" + std::to_string(k));
+                    out.push_back(copy);
+                  }
+                  continue;
+                }
+              }
+              out.push_back(arg);
+              continue; // keep for the later expansion pass
+            }
             if(indexed.count(stem))
             {
               for(const auto &kv : indexed.at(stem))

@@ -826,11 +826,29 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       to_side_effect_expr_function_call(statement_expr.expression());
 
     exprt &tmp_this = func_ini.arguments().front();
-    DATA_INVARIANT(
-      to_address_of_expr(tmp_this).object().id() == ID_new_object,
-      "expected new_object operand in address_of expression");
+    if(
+      tmp_this.id() == ID_typecast &&
+      to_typecast_expr(tmp_this).op().id() == ID_address_of)
+    {
+      // An INHERITED constructor ([class.inhctor.init]/1): the temporary
+      // is typed D but the selected base constructor takes B* -- the
+      // materialization wrapped `this` in a derived-to-base conversion
+      // ([conv.ptr]/3).  Rebind the underlying address to the real object,
+      // keeping the conversion.
+      exprt &inner = to_typecast_expr(tmp_this).op();
+      DATA_INVARIANT(
+        to_address_of_expr(inner).object().id() == ID_new_object,
+        "expected new_object operand in address_of expression");
+      inner = address_of_exprt(object_tc);
+    }
+    else
+    {
+      DATA_INVARIANT(
+        to_address_of_expr(tmp_this).object().id() == ID_new_object,
+        "expected new_object operand in address_of expression");
 
-    tmp_this = address_of_exprt(object_tc);
+      tmp_this = address_of_exprt(object_tc);
+    }
 
     const auto &initializer_code = to_code(initializer);
 

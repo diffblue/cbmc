@@ -4340,6 +4340,13 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
+  // For N5008 [class.inhctor.init]/1 (below): remember the NAME the call
+  // was written with -- if it names class D but resolution selects an
+  // INHERITED constructor (a base B's constructor made usable by a
+  // using-declaration), the object to initialize is still a D, not a B.
+  const exprt orig_function_name =
+    expr.function().id() == ID_cpp_name ? expr.function() : nil_exprt();
+
   // [expr.call] re-entrant guard: when typechecking resumes on an
   // already-typechecked subexpression — e.g., when
   // `cpp_constructor`'s operand loop calls `typecheck_expr` on an
@@ -5115,6 +5122,96 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     typecheck_method_application(expr);
     typecheck_function_call_arguments(expr);
+
+    // N5008 [class.inhctor.init]/1: if the call NAMED class D but the
+    // selected constructor is an INHERITED one (its own class B is a
+    // base of D, imported by `using B::B;`), the constructor initializes
+    // the B base subobject of a D object -- the temporary must be typed
+    // D, with the base constructor applied through a derived-to-base
+    // pointer conversion ([conv.ptr]/3).  Without this, the temporary
+    // was typed B and the enclosing context's conversion to D failed
+    // ("invalid implicit conversion from 'struct pf' to 'struct bb'",
+    // the libc++ __bind_back_t shape, whose function-template caller was
+    // then silently dropped).
+    if(orig_function_name.is_not_nil())
+    {
+      exprt type_probe;
+      try
+      {
+        cpp_typecheck_fargst no_fargs;
+        cpp_save_scopet probe_scope(cpp_scopes);
+        type_probe = resolve(
+          to_cpp_name(orig_function_name),
+          cpp_typecheck_resolvet::wantt::TYPE,
+          no_fargs,
+          /*fail_with_exception=*/false);
+      }
+      catch(...)
+      {
+        type_probe.make_nil();
+      }
+      if(
+        type_probe.id() == ID_type && type_probe.type().id() == ID_struct_tag &&
+        tmp_object_expr.type().id() == ID_struct_tag)
+      {
+        const irep_idt d_tag =
+          to_struct_tag_type(type_probe.type()).get_identifier();
+        const irep_idt b_tag =
+          to_struct_tag_type(tmp_object_expr.type()).get_identifier();
+        if(d_tag != b_tag)
+        {
+          const struct_typet &d_struct =
+            follow_tag(to_struct_tag_type(type_probe.type()));
+          bool b_is_base = false;
+          for(const auto &base : d_struct.bases())
+          {
+            if(to_struct_tag_type(base.type()).get_identifier() == b_tag)
+              b_is_base = true;
+          }
+          // Only the TEMPLATE-inheritance path needs this: a base
+          // constructor TEMPLATE is made visible in D via a scope alias
+          // (not as a component of D), so resolution materializes a
+          // B-typed temporary.  Non-template inherited constructors are
+          // imported as D COMPONENTS and are already handled by the
+          // member machinery -- re-patching them double-adjusts `this`
+          // and aborts.  Distinguish by whether the selected
+          // constructor's symbol is among D's components.
+          bool ctor_is_d_component = false;
+          if(b_is_base)
+          {
+            const irep_idt ctor_id = expr.function().get(ID_component_name);
+            for(const auto &c : d_struct.components())
+            {
+              if(c.get_name() == ctor_id)
+              {
+                ctor_is_d_component = true;
+                break;
+              }
+            }
+          }
+          if(
+            b_is_base && !ctor_is_d_component &&
+            d_struct.get_bool("has_inherited_constructor"))
+          {
+            // retype the temporary as D and route the constructor's
+            // `this` through a derived-to-base conversion
+            const typet b_ptr = pointer_type(tmp_object_expr.type());
+            tmp_object_expr.type() = type_probe.type();
+            exprt::operandst &args = expr.arguments();
+            if(!args.empty() && args.front().id() == ID_address_of)
+            {
+              exprt &obj = to_address_of_expr(args.front()).object();
+              if(obj.id() == ID_new_object)
+              {
+                obj.type() = type_probe.type();
+                args.front().type() = pointer_type(type_probe.type());
+                args.front() = typecast_exprt(args.front(), b_ptr);
+              }
+            }
+          }
+        }
+      }
+    }
 
     const code_expressiont new_code(expr);
     tmp_object_expr.add(ID_initializer) = new_code;
