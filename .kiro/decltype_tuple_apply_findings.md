@@ -5749,3 +5749,40 @@ line, to keep harvests executable.
 Round-35 totals: 4 commits (3-fix bundle, normalize, 2 test commits),
 4 CORE tests, layers 5-7 fixed, 5 suites green, probes stripped,
 tree clean.  ranges_pipe/ranges_basic remain KNOWNBUG (8 total).
+
+## Round 36 (2026-08-11): 4 flips + regex abort fixed (sound demotion)
+
+FLIPS: ofstream_from_string -> CORE (0/15085, ~23s);
+restrict_function_pointers_tu, goto_symex_state_header (harness assert
+ADDED), abstract_environment_tu -> THOROUGH (each verifies its
+harness assertion with --property main.assertion.1; 6-11 min > CORE
+budget; other FAILUREs = sound havoc of out-of-TU fns, e.g.
+get_nil_irep bodiless in TU -> +60-displaced return values are
+HAVOC, not front-end bugs).  --property = the principled treatment
+for dog-food converts-tests.
+
+REGEX ARC: crash was ASLR-dependent (3/3 vs 0/3 via setarch -R —
+THE diagnosis lever for layout-dependent bugs).  Root chain:
+(1) scope id-sets std::set<cpp_idt*> iterate in ADDRESS order;
+(2) on some orders, syshdr bodies HALF-typecheck: under
+convert_function's syshdr_guard (null handler), several paths REPORT
+errors WITHOUT THROWING and continue (allocator/basic_string
+no-matches in locale/string bodies; DBG2 passthrough shows them all),
+leaving e.g. `return nullptr;` unconverted ([conv.ptr]/1 skipped);
+(3) goto-convert emits lhs void* := rhs nullptr_t* -> symex abort.
+COMMITTED: final sweep demoting syshdr bodies with inconsistent
+returns to no-body (sound havoc).  regex: abort GONE, verifies on
+most layouts (~91-300s), some layouts slow (more demotions) -> stays
+KNOWNBUG with notes.
+ORDINAL LESSON: a creation-ordinal comparator on the scope sets made
+half-conversion DETERMINISTIC (great for diagnosis) but BROKE
+cpp17_std_function_lambda_call (its _M_get_pointer stops converting
+under creation order!) — resolution order-sensitivity cuts both ways;
+canonical ordering needs the first-wins consumers fixed first.  KEEP
+THE PATCH IDEA for diagnosis sessions (apply locally, don't commit).
+NEXT (regex precision arc): make error-report-without-throw paths
+under syshdr_guard either THROW or recover consistently; candidates
+visible in the DBG2 dump: mem-init allocator ctor no-match recovery,
+implicit_typecast failures, do_grouping-family string-literal
+returns.  ALSO pending: erase_if VERIFICATION ERROR diagnosis; fl1
+ranges reduction (~2min/iter, slow).
