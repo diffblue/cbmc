@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// C++ Language Type Checking
 
 #include "cpp_typecheck.h"
+#include "cpp_typecheck_fargs.h"
+#include "cpp_typecheck_resolve.h"
 
 #include <memory>
 
@@ -3112,6 +3114,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           // Detect if this refers to a base class constructor and skip
           // the normal convert() path which fails on constructor lookup.
           bool is_inheriting_ctor = false;
+          // The matched base's tag (empty when not an inheriting-
+          // constructor using-declaration).
+          irep_idt inhctor_base_tag;
           const auto &name_sub = cpp_using.name().get_sub();
           if(name_sub.size() >= 3)
           {
@@ -3122,7 +3127,63 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               if(base_sym.base_name == last_name)
               {
                 is_inheriting_ctor = true;
+                inhctor_base_tag = base_sym.name;
                 break;
+              }
+            }
+            // N5008 [namespace.udecl]/1 + [class.qual]/2: `using B::B;`
+            // names the constructor when the terminal name names the
+            // QUALIFIER's class -- and the qualifier may spell the base
+            // through an ALIAS TEMPLATE (libc++'s
+            // `using __perfect_forward<...>::__perfect_forward;`, where
+            // __perfect_forward is an alias for __perfect_forward_impl).
+            // The textual comparison above misses that; resolve the
+            // qualifier to a type and compare CLASS IDENTITY with the
+            // bases instead.
+            // [class.qual]/2 gate: the terminal name must spell the
+            // SAME name as the qualifier's last identifier (the class
+            // name or the alias spelling that names it) -- otherwise
+            // this is an ordinary member using-declaration
+            // (`using _Base::_M_impl;`), not constructor inheritance.
+            irep_idt qualifier_last_id;
+            for(std::size_t qi = 0; qi + 2 < name_sub.size(); ++qi)
+              if(name_sub[qi].id() == ID_name)
+                qualifier_last_id = name_sub[qi].get(ID_identifier);
+            if(!is_inheriting_ctor && qualifier_last_id == last_name)
+            {
+              cpp_namet qualifier;
+              qualifier.get_sub().assign(name_sub.begin(), name_sub.end() - 2);
+              exprt resolved;
+              try
+              {
+                cpp_typecheck_fargst no_fargs;
+                cpp_save_scopet save_scope(cpp_scopes);
+                cpp_typecheck_resolvet resolver(*this);
+                resolved = resolver.resolve(
+                  qualifier,
+                  cpp_typecheck_resolvet::wantt::TYPE,
+                  no_fargs,
+                  /*fail_with_exception=*/false);
+              }
+              catch(...)
+              {
+                resolved.make_nil();
+              }
+              if(
+                resolved.id() == ID_type &&
+                resolved.type().id() == ID_struct_tag)
+              {
+                const irep_idt q_tag =
+                  to_struct_tag_type(resolved.type()).get_identifier();
+                for(const auto &base : to_struct_type(symbol.type).bases())
+                {
+                  if(to_struct_tag_type(base.type()).get_identifier() == q_tag)
+                  {
+                    is_inheriting_ctor = true;
+                    inhctor_base_tag = q_tag;
+                    break;
+                  }
+                }
               }
             }
           }
@@ -3158,7 +3219,6 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           else
           {
             // Import base class constructors as derived class constructors
-            const irep_idt &last_name = name_sub.back().get(ID_identifier);
             found_ctor = true;
             // [dcl.init.aggr]/1 (C++17): a class with inherited constructors is
             // not an aggregate; record this so cpp_constructor does not fall
@@ -3168,7 +3228,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             for(const auto &base : to_struct_type(symbol.type).bases())
             {
               const symbolt &base_sym = lookup(to_struct_tag_type(base.type()));
-              if(base_sym.base_name != last_name)
+              if(base_sym.name != inhctor_base_tag)
                 continue;
               for(const auto &comp : to_struct_type(base_sym.type).components())
               {
