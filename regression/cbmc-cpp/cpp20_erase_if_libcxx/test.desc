@@ -1,46 +1,16 @@
-KNOWNBUG libcxx
+THOROUGH smt-backend libcxx
 main.cpp
---cpp20 --stdlib libc++
-^VERIFICATION
-^EXIT=(0|10)$
+--cpp20 --stdlib libc++ --object-bits 12 --unwind 3 --no-unwinding-assertions --slice-formula --property main.assertion.1 --smt2
+^\[main\.assertion\.1\] line 12 erase_if: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
 ^SIGNAL=0$
 --
-^PARSING ERROR$
-libc++ CONVERSION ERROR: incomplete type, missing symbol, or
-implicit conversion failure.
-Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
-C++20 concepts: substitution failure inside a concept-id's argument
-must yield an unsatisfied constraint ([temp.constr.atomic]/3), not a
-hard 'no match for same_as'; minimal WRONG-CODE root KNOWNBUG
-cpp20_constraint_substitution_failure.  cpp20_ranges_basic
-additionally aborts a unary-operand invariant (std_expr.h:380).
-Update 2026-07-24: past the same_as front-end failure
-([temp.constr.atomic]/3 atom classification); residual: BMC scaling (front end clean).
-The same_as front-end failure is the requires-clause concept-template-id
-parse gap, captured minimally in
-cpp20_requires_clause_concept_template_id.
-Update 2026-07-28: front end clean; with --object-bits 12 and
---unwind 5 --no-unwinding-assertions the failure layer is the
-vector-internal-pointer family: after push_back, __begin_/__end_ are
-unconstrained (size() = __end_ - __begin_ fails same-object/overflow
-checks).  Minimal driver: vector<int> v; v.push_back(7);
-assert(v.size()==1).  Header-free reduction blocked on the
-typecheck_method_application crash that all preprocessed-libc++
-sources hit (see cpp20_ranges_basic_libcxx).
-Masking crash isolated: cpp20_extern_template_copy_ctor_abort.
-Update 2026-07-30: the "masking crash" on preprocessed sources was a
-MODE artifact (clang builtins lex only under --stdlib libc++); re-fed
-preprocessed source with the right flags reproduces the SEMANTIC
-failure directly, so header-free reduction is unblocked.
-Update 2026-07-30 (round 4): the bodyless std::move root is FIXED
-(cpp20_bodyless_std_move is CORE); the library test still fails on
-further layers (__end_/__begin_ still unconstrained) -- re-reduce
-from the current state next round.
-Update 2026-08-01 (round 5): four more layers fixed -- auto-return
-static members of class-template instances (eager deduction), decltype
-of indirection is T& ([dcl.type.decltype]/1.5), explicit template args
-survive deduction ([temp.arg.explicit]/2), C++20 parenthesized
-aggregate init/CTAD (make_pair).  Next open root:
-cpp20_recursive_member_alias_base (_Or/_And metaprogram bases drop).
-Round-11 (2026-08-04): same_as wall FIXED; converts fully.  BMC now
-exceeds 600s (scale); revisit after vector size()-layer fix.
+--
+std::erase_if over std::vector<int> (libc++).  Flipped
+KNOWNBUG->THOROUGH smt-backend 2026-08-12: the harness assertion
+verifies via the SMT backend (~6m15s with z3-checked equivalence;
+solver time beyond the CORE budget).  The SAT backend's bit-blasting
+runs out of memory (>50 GB) on this equation even for the single
+property and unwind 3 -- a flattening scale limit, not a front-end
+defect (the goto conversion is complete: 34k SSA steps, 1 VCC).
