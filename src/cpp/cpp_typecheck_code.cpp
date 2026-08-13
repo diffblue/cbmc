@@ -2018,6 +2018,30 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             if(has_user_ctor)
               break; // the constructor-resolve path below handles it
 
+            // N5008 [dcl.init.list]/3.2 + [dcl.init.general]/16.6.1: a
+            // SINGLE initializer of the base's own type (or derived) is
+            // copy-initialization -- the synthesized copy/move
+            // constructor's sliced-reference initializer takes this
+            // form.  The base's implicit copy constructor handles it;
+            // element-wise aggregate initialization here would try to
+            // convert the whole base value to the FIRST member.
+            if(code.operands().size() == 1)
+            {
+              typet op_t = code.operands().front().type();
+              if(is_reference(op_t))
+                op_t = to_reference_type(op_t).base_type();
+              if(
+                op_t.id() == ID_struct_tag &&
+                (to_struct_tag_type(op_t).get_identifier() ==
+                   to_struct_tag_type(b.type()).get_identifier() ||
+                 subtype_typecast(
+                   ns.follow_tag(to_struct_tag_type(op_t)),
+                   ns.follow_tag(to_struct_tag_type(b.type())))))
+              {
+                break; // constructor-resolve path performs the copy
+              }
+            }
+
             // Lower to an assignment of an
             // explicit-constructor-call from an initializer-list --
             // the same shape full_member_initialization's POD-base
