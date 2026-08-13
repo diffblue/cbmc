@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp11
+no match
+^CONVERSION ERROR$
+^EXIT=(6|64)$
+^SIGNAL=0$
+--
+^VERIFICATION SUCCESSFUL$
+--
+Rejects-invalid test: CBMC currently accepts the kind-mismatched
+deduction and verifies the program.  When fixing, mind that
+tuple-family tests rely on CORRECT same-kind deduction
+(cpp14_libcxx_tuple_ctor_kernel).
