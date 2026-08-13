@@ -5956,3 +5956,24 @@ Question: is every known problem covered?  Result:
 REVERT-TEST HYGIENE LESSON: restore with `git checkout HEAD -- file`,
 NEVER the fix commit (an intermediate commit resurrected a stale file
 minus round-40 hardening; caught via git status before any damage).
+
+## Round 42 (2026-08-13): the _Idx layer — pack identification per [temp.variadic]/5
+
+FIXED (3 sub-defects in typecheck_template_args' expansion collector):
+(1) nested-expansion skip — packs inside an ellipsis-marked subtree
+belong to the INNERMOST expansion ([temp.variadic]/5); (2) scope-precise
+name→parameter mapping ([basic.scope.temp]) via RECURSIVE lookup,
+APPLIED ONLY when the looked-up parameter intersects the pack maps
+(unconditional exact matching regressed tuple/function/apply — patterns
+re-typechecked cross-scope legitimately need the suffix fallback);
+(3) live-over-stale same-spelling filter before the length-consistency
+check.  Plus convert_template_parameter: unassigned placeholders now
+take the pack fallbacks (pack maps take precedence over seeded
+placeholders; non-pack placeholders keep survival), and the non-type
+front-element convenience (pack_expr_map analogue of pack_args_map).
+The double-ctor error text decoded: empty-pack sentinel (ID_type of
+empty_typet) fed to make_constructors → POD ctors void()/void(void).
+CORE cpp14_nested_pack_same_spelling pins all of it (assertion 3 also
+guards the swallow).  5 suites green.
+RANGES NEXT LAYER: "found no match for symbol '__tuple_impl'" — ctor
+matching with __tuple_indices/__tuple_types argument pairs.
