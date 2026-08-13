@@ -2026,27 +2026,74 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // (suffix match against the active type and non-type packs).
         std::set<irep_idt> referenced_packs;
         std::set<irep_idt> empty_pack_refs;
+        // N5008 [temp.variadic]/5: a pack whose name appears within the
+        // pattern of a NESTED pack-expansion is expanded by that
+        // innermost expansion, not by this one -- do not descend into
+        // ellipsis-marked subtrees (`_Types` in
+        // `type_pack_element<_Idx, _Types...>...` is the nested
+        // expansion's pack; only `_Idx` governs the outer expansion).
         std::function<void(const irept &)> collect = [&](const irept &n)
         {
+          const irept &root = type_pattern
+                                ? static_cast<const irept &>(arg.type())
+                                : static_cast<const irept &>(arg);
+          if(&n != &root && n.get_bool(ID_ellipsis))
+            return;
           const irep_idt id = n.get(ID_identifier);
           if(!id.empty())
           {
-            for(const auto &pe : template_map.pack_args_map)
+            // N5008 [basic.scope.temp]: the NAME denotes the template
+            // parameter found by lookup from the point of use -- when
+            // several flat-map entries share this spelling (an outer
+            // instantiation's `_Idx` beside the current one), lookup
+            // gives the exact parameter identifier.  Only fall back to
+            // spelling (suffix) matching when lookup finds no template
+            // parameter of that name (patterns re-typechecked outside
+            // their original scope).
+            std::set<irep_idt> exact_params;
+            for(cpp_idt *cid :
+                cpp_scopes.current_scope().lookup(id, cpp_scopet::RECURSIVE))
             {
-              const std::string &key = id2string(pe.first);
+              if(cid->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+                exact_params.insert(cid->identifier);
+            }
+            // The exact filter only applies when the in-scope parameter
+            // is among the map entries: patterns are sometimes
+            // re-typechecked from a scope whose same-spelled parameter
+            // is NOT the one the map was built for (the map key then
+            // legitimately differs), so an empty intersection falls
+            // back to spelling.
+            bool exact_applicable = false;
+            if(!exact_params.empty())
+            {
+              for(const auto &pe : template_map.pack_args_map)
+                if(exact_params.count(pe.first) != 0)
+                  exact_applicable = true;
+              for(const auto &pe : template_map.pack_expr_map)
+                if(exact_params.count(pe.first) != 0)
+                  exact_applicable = true;
+              for(const auto &ps : template_map.pack_size_map)
+                if(exact_params.count(ps.first) != 0)
+                  exact_applicable = true;
+            }
+            auto matches = [&](const irep_idt &key_id) -> bool
+            {
+              if(exact_applicable)
+                return exact_params.count(key_id) != 0;
+              const std::string &key = id2string(key_id);
               auto p = key.rfind("::");
               const std::string suffix =
                 p != std::string::npos ? key.substr(p + 2) : key;
-              if(suffix == id2string(id))
+              return suffix == id2string(id);
+            };
+            for(const auto &pe : template_map.pack_args_map)
+            {
+              if(matches(pe.first))
                 referenced_packs.insert(pe.first);
             }
             for(const auto &pe : template_map.pack_expr_map)
             {
-              const std::string &key = id2string(pe.first);
-              auto p = key.rfind("::");
-              const std::string suffix =
-                p != std::string::npos ? key.substr(p + 2) : key;
-              if(suffix == id2string(id))
+              if(matches(pe.first))
                 referenced_packs.insert(pe.first);
             }
             // N5008 [temp.variadic]/7: an EMPTY pack has no
@@ -2059,13 +2106,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             // this expansion's pack).
             for(const auto &ps : template_map.pack_size_map)
             {
-              if(ps.second != 0)
-                continue;
-              const std::string &key = id2string(ps.first);
-              auto p = key.rfind("::");
-              const std::string suffix =
-                p != std::string::npos ? key.substr(p + 2) : key;
-              if(suffix == id2string(id))
+              if(ps.second == 0 && matches(ps.first))
                 empty_pack_refs.insert(ps.first);
             }
           }
@@ -2078,6 +2119,53 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           collect(arg.type());
         else
           collect(arg);
+
+        // N5008 [temp.variadic]/5 + [basic.scope.temp]: a NAME in the
+        // pattern denotes exactly ONE template parameter.  The flat
+        // template_map can hold entries for SEVERAL parameters with the
+        // same source spelling (an outer instantiation's `_Idx` beside
+        // the current one -- __make_tuple_types_flat's `_Idx` under
+        // __perfect_forward_impl's `_Idx...` in libc++'s tuple).  When
+        // one same-spelling group mixes a live (non-empty) binding with
+        // stale empty ones, the empty entries are cross-scope leftovers:
+        // drop them, otherwise the length-consistency check below sees
+        // 0 vs n and refuses to expand, and the un-expanded scalar
+        // reference later resolves to the empty-pack sentinel (POD
+        // constructors of `void` -- "'_Idx' does not uniquely resolve").
+        {
+          std::map<std::string, std::vector<irep_idt>> by_suffix;
+          for(const auto &pid : referenced_packs)
+          {
+            const std::string key = id2string(pid);
+            const auto q = key.rfind("::");
+            by_suffix[q != std::string::npos ? key.substr(q + 2) : key]
+              .push_back(pid);
+          }
+          for(const auto &grp : by_suffix)
+          {
+            if(grp.second.size() < 2)
+              continue;
+            std::vector<irep_idt> live;
+            for(const auto &pid : grp.second)
+            {
+              auto a = template_map.pack_args_map.find(pid);
+              if(a != template_map.pack_args_map.end() && !a->second.empty())
+              {
+                live.push_back(pid);
+                continue;
+              }
+              auto e = template_map.pack_expr_map.find(pid);
+              if(e != template_map.pack_expr_map.end() && !e->second.empty())
+                live.push_back(pid);
+            }
+            if(!live.empty() && live.size() < grp.second.size())
+            {
+              for(const auto &pid : grp.second)
+                if(std::find(live.begin(), live.end(), pid) == live.end())
+                  referenced_packs.erase(pid);
+            }
+          }
+        }
 
         // A referenced pack is a type pack (pack_args_map) or a non-type pack
         // (pack_expr_map); this gives its element count.
