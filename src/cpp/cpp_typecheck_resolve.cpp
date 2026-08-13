@@ -1927,7 +1927,15 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
     }
   }
 
-  if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+  // The pack fallbacks below also apply when the entry is an
+  // ID_unassigned placeholder: build_unassigned seeds EVERY parameter,
+  // pack or not, but a pack's actual binding lives in
+  // pack_args_map/pack_expr_map/pack_size_map, which take precedence
+  // over the placeholder ([temp.variadic]/5,7).  Non-pack placeholders
+  // (no pack-map entries) still fall through to the survival return.
+  if(
+    e.is_nil() || (e.id() == ID_type && e.type().is_nil()) ||
+    e.id() == ID_unassigned)
   {
     // N5008 [temp.variadic]/5,7: the identifier may name a template parameter
     // *pack* that was bound (in template_map.pack_args_map) to two or more
@@ -1955,9 +1963,29 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
       pack_front.add_source_location() = source_location;
       return pack_front;
     }
+    // ... and the NON-TYPE analogue ([temp.variadic]/5 likewise): a
+    // scalar reference to a multi-element VALUE pack (its elements in
+    // pack_expr_map) resolves to the representative first element; the
+    // per-element lockstep expansion (e.g. `__type_pack_element<_Idx,
+    // _Types...>` inside libc++'s __make_tuple_types_flat member alias)
+    // is applied afterwards by the expansion machinery.  Without this
+    // the reference fell through to an unrelated lookup and failed with
+    // "symbol '_Idx' does not uniquely resolve".
+    const auto pe_it =
+      cpp_typecheck.template_map.pack_expr_map.find(identifier.identifier);
+    if(
+      pe_it != cpp_typecheck.template_map.pack_expr_map.end() &&
+      !pe_it->second.empty())
+    {
+      exprt pack_front = pe_it->second.front();
+      pack_front.add_source_location() = source_location;
+      return pack_front;
+    }
   }
 
-  if(e.is_nil() || (e.id() == ID_type && e.type().is_nil()))
+  if(
+    e.is_nil() || (e.id() == ID_type && e.type().is_nil()) ||
+    e.id() == ID_unassigned)
   {
     // N5008 [temp.variadic]/7 + [temp.arg.explicit]/4: a parameter pack that is
     // empty in this instantiation expands to zero elements.  A scalar reference
@@ -1978,11 +2006,31 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
       empty_pack.add_source_location() = source_location;
       return empty_pack;
     }
+    // A non-pack ID_unassigned placeholder survives (see above); only
+    // genuinely unbound (nil) entries are an error here.
+    if(e.id() == ID_unassigned)
+    {
+      e.add_source_location() = source_location;
+      return e;
+    }
     // Don't print an error message — the caller may catch the exception
     // (e.g., during SFINAE or template argument deduction).
     throw 0;
   }
 
+  // N5008 [temp.variadic]/7: a scalar reference to a pack that is
+  // KNOWN-EMPTY in this instantiation must yield the zero-length-pack
+  // sentinel even when the parameter also carries an ID_unassigned
+  // placeholder (build_unassigned seeds every parameter; the pack's
+  // emptiness is recorded separately in pack_size_map).  Returning the
+  // placeholder instead sent `(unsigned long)?` into a non-type
+  // template argument and the enclosing instantiation failed with
+  // "expected constant expression" -- the `__tuple_indices<_Values...>`
+  // member alias of __make_integer_seq's pack template, instantiated
+  // for a zero-length range (__make_tuple_types<tuple, 2, 2> in libc++
+  // tuple's delegating constructor).  Placeholders for parameters
+  // WITHOUT a pack_size_map entry keep their survival contract (see
+  // the round-41 note above).
   e.add_source_location() = source_location;
 
   return e;
