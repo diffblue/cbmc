@@ -5936,3 +5936,23 @@ resolve: constructor void() / constructor void(void)" — a scalar _Idx
 use resolving to two synthesized ctor signatures (?!) during pf
 elaboration.  Probes all stripped; base.cpp still drops main.
 KNOWNBUGs: ranges pair + regex-solver.
+
+## Round 41b (2026-08-12): coverage audit #2
+
+Question: is every known problem covered?  Result:
+- ranges pair + regex-solver: KNOWNBUGs ✓ (interior layers incl. the
+  current "_Idx does not uniquely resolve" are covered by the failing
+  ranges tests themselves).
+- Round-41 alias-qualified inhctor fix: was UNPINNED → NEW CORE
+  cpp11_inherited_ctor_alias_qualifier (revert-verified: FAILURE
+  pre-fix, wrong-code).
+- Round-41 placeholder-type hygiene (fix 2): NOT standalone-reachable
+  (aq2 kernel passes even with fix reverted — needs the full ranges
+  context); covered via ranges KNOWNBUGs until they flip, then their
+  CORE forms pin it.  Noted here as residual-risk-accepted.
+- Round-39 mem-init own-pack expansion (0aed0eb2d6): revert-test shows
+  NO existing test catches it standalone either — same status: pinned
+  transitively by the ranges KNOWNBUGs; will be pinned by their flips.
+REVERT-TEST HYGIENE LESSON: restore with `git checkout HEAD -- file`,
+NEVER the fix commit (an intermediate commit resurrected a stale file
+minus round-40 hardening; caught via git status before any damage).
