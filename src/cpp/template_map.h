@@ -34,6 +34,11 @@ void replace_type_pack_ref(
   const std::string &base,
   const typet &elem);
 
+void replace_value_pack_ref(
+  irept &n,
+  const std::string &base,
+  const exprt &elem);
+
 class template_mapt
 {
 public:

@@ -1916,6 +1916,137 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
   // The initializer may be a data member (non-type)
   // or a parent class (type).
   // We ask for VAR only, as we get the parent classes via their
+  // N5008 [class.base.init]/7: if the mem-initializer-id denotes a
+  // DIRECT BASE that is an aggregate (no user-declared constructor,
+  // [dcl.init.aggr]/1), the expression-list or braced-init-list
+  // initializes the base subobject per [dcl.init] -- there is no
+  // constructor to resolve (make_constructors only synthesizes the
+  // default and copy signatures, so a one-element initializer like
+  // libc++ tuple's `__tuple_leaf<_Tf>(__u)...` found "no match").
+  // Non-template constructors are lowered eagerly by
+  // full_member_initialization's POD-base branch; an instantiated
+  // constructor TEMPLATE's initializers only pass through here.  Route
+  // the initialization through cpp_constructor on the sliced base
+  // lvalue: it implements the [dcl.init.general]/16.6 dispatch,
+  // including C++17 aggregates with bases and C++20 parenthesized
+  // aggregate initialization (P0960).  Per [class.base.init]/2 a name
+  // that (also) denotes a data member initializes the member, so the
+  // type probe is skipped for member names.
+  if(code.find(ID_member).id() == ID_cpp_name && code.has_operands())
+  {
+    const cpp_namet &mem_name = to_cpp_name(code.find(ID_member));
+    const exprt &this_e = cpp_scopes.current_scope().this_expr;
+    if(this_e.is_not_nil() && this_e.type().id() == ID_pointer)
+    {
+      const typet &class_tag = to_pointer_type(this_e.type()).base_type();
+      if(class_tag.id() == ID_struct_tag)
+      {
+        const namespacet ns(symbol_table);
+        const auto &class_type = ns.follow_tag(to_struct_tag_type(class_tag));
+        bool is_member_name = false;
+        for(const auto &c : class_type.components())
+        {
+          if(
+            c.get_base_name() == mem_name.get_base_name() &&
+            c.type().id() != ID_code && !c.get_bool(ID_is_type))
+          {
+            is_member_name = true;
+            break;
+          }
+        }
+        typet named_type;
+        named_type.make_nil();
+        if(!is_member_name)
+        {
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            sfinae_contextt sfinae_guard{*this};
+            named_type = static_cast<const typet &>(code.find(ID_member));
+            typecheck_type(named_type);
+          }
+          catch(...)
+          {
+            named_type.make_nil();
+          }
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+        }
+        if(named_type.id() == ID_struct_tag)
+        {
+          for(const auto &b : class_type.bases())
+          {
+            if(
+              b.type().id() != ID_struct_tag ||
+              to_struct_tag_type(b.type()).get_identifier() !=
+                to_struct_tag_type(named_type).get_identifier())
+            {
+              continue;
+            }
+            // [dcl.init.aggr]/1: any user-declared constructor
+            // disqualifies the aggregate (C++20 rule); only
+            // compiler-synthesized ones (#is_implicit_ctor) are ignored.
+            const auto &base_struct =
+              ns.follow_tag(to_struct_tag_type(b.type()));
+            // ... and no virtual functions or virtual base classes
+            // ([dcl.init.aggr]/1.3-1.4) -- the vtable pointer component
+            // marks both.
+            bool has_user_ctor =
+              base_struct.get_bool("has_template_constructor") ||
+              base_struct.get_bool("has_inherited_constructor");
+            for(const auto &c : base_struct.components())
+            {
+              if(c.get_bool(ID_is_vtptr))
+              {
+                has_user_ctor = true; // not an aggregate
+                break;
+              }
+            }
+            for(const auto &c : base_struct.components())
+            {
+              if(
+                c.type().id() != ID_code || c.get_bool(ID_from_base) ||
+                to_code_type(c.type()).return_type().id() != ID_constructor ||
+                c.type().get_bool("#is_implicit_ctor"))
+              {
+                continue;
+              }
+              has_user_ctor = true;
+              break;
+            }
+            if(has_user_ctor)
+              break; // the constructor-resolve path below handles it
+
+            // Lower to an assignment of an
+            // explicit-constructor-call from an initializer-list --
+            // the same shape full_member_initialization's POD-base
+            // branch emits; its typecheck applies the [dcl.init]
+            // rules element-wise to the aggregate.
+            typet base_t = b.type();
+            base_t.remove(ID_C_base_name);
+            exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
+            lhs_ptr.copy_to_operands(exprt("cpp-this"));
+            lhs_ptr.add_source_location() = code.source_location();
+            dereference_exprt lhs(lhs_ptr);
+            exprt rhs("explicit-constructor-call", base_t);
+            exprt init_list(ID_initializer_list);
+            for(const auto &op : as_const(code).operands())
+              init_list.copy_to_operands(already_typechecked_exprt{op});
+            rhs.add_to_operands(std::move(init_list));
+            rhs.add_source_location() = code.source_location();
+            code_frontend_assignt assign_code(std::move(lhs), std::move(rhs));
+            assign_code.add_source_location() = code.source_location();
+            codet new_code = assign_code;
+            code.swap(new_code);
+            typecheck_code(code);
+            return;
+          }
+        }
+      }
+    }
+  }
+
   // constructor!
   cpp_typecheck_fargst fargs;
   fargs.in_use = true;
