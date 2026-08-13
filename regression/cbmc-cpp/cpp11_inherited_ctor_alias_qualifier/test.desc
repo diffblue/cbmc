@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ alias-qualified inherited ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Verified to FAIL (wrong-code) with the fix reverted.  Runtime-verified
+with g++ and clang++.
