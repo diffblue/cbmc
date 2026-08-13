@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
+
 /// Generate code to copy the parent.
 /// \param source_location: location for generated code
 /// \param parent_base_name: base name of typechecked parent
@@ -1252,8 +1253,10 @@ void cpp_typecheckt::full_member_initialization(
       // explicitly calls the parent constructor.
       bool found=false;
 
-      for(irept initializer : initializers.get_sub())
+      const irept::subt &inits_sub = initializers.get_sub();
+      for(std::size_t init_idx = 0; init_idx < inits_sub.size(); ++init_idx)
       {
+        irept initializer = inits_sub[init_idx];
         const cpp_namet &member_name=
           to_cpp_name(initializer.find(ID_member));
 
@@ -1305,7 +1308,37 @@ void cpp_typecheckt::full_member_initialization(
         typet member_type=
           static_cast<const typet&>(initializer.find(ID_member));
 
-        // First try matching by base class name directly — this
+        // N5008 [class.base.init]/1-2: a mem-initializer-id designates
+        // the base subobject by the TYPE it denotes.  An initializer
+        // that already records the exact base (`#base_type`, set for
+        // synthesized copy/move-constructor initializers and resolved
+        // explicit ones) is matched by that type -- matching such an
+        // initializer by NAME cross-wired same-named bases: with two
+        // bases from one class template (libc++ tuple's
+        // `__tuple_leaf<takeish>` and `__tuple_leaf<tuple<int>>`), each
+        // base's scan re-matched the FIRST `__tuple_leaf` initializer,
+        // so the second base was initialized against the first base's
+        // recorded type and the constructor call failed to resolve.
+        {
+          const irept &recorded = initializer.find("#base_type");
+          if(recorded.is_not_nil())
+          {
+            const typet &recorded_t = static_cast<const typet &>(recorded);
+            if(
+              recorded_t.id() == ID_struct_tag &&
+              to_struct_tag_type(recorded_t).get_identifier() ==
+                to_struct_tag_type(b.type()).get_identifier())
+            {
+              final_initializers.move_to_sub(initializer);
+              found = true;
+              break;
+            }
+            // recorded for a DIFFERENT base: not this one
+            continue;
+          }
+        }
+
+        // Next, try matching by base class name directly -- this
         // avoids type resolution failures during template instantiation
         // when the base class name is not in scope.
         {

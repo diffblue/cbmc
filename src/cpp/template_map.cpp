@@ -172,6 +172,12 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
 /// [dcl.ref] reference collapsing).
 void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
 {
+  // N5008 [expr.sizeof]/5: in `sizeof...(P)` the pack name is the operand
+  // of a pack-size QUERY, not a reference to an element -- it must stay
+  // unsubstituted so the query is later answered from pack_size_map
+  // (mirrors template_mapt::apply's guard).
+  if(n.get_bool("#sizeof_pack"))
+    return;
   const auto is_pack_ref = [&base](const irept &t) -> bool
   {
     if(
@@ -198,6 +204,51 @@ void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
       ns.second = elem;
     else
       replace_type_pack_ref(ns.second, base, elem);
+  }
+}
+
+/// Value analogue of \ref replace_type_pack_ref for NON-TYPE parameter
+/// packs: substitutes the pack's i-th VALUE for bare `cpp_name`
+/// references to \p base anywhere in the pattern (N5008
+/// [temp.variadic]/5 -- the i-th expansion element instantiates the
+/// pattern with the i-th pack element).  Needed for a non-type pack
+/// referenced inside a TYPE pattern, e.g. `_Idx` in
+/// `tuple_types<__type_pack_element<_Idx, _Types...>...>` (libc++'s
+/// __make_tuple_types): template_mapt::apply substitutes neither bare
+/// cpp_names nor non-type packs, so without this every element resolved
+/// through the scalar convenience entry to the FIRST value.
+void replace_value_pack_ref(
+  irept &n,
+  const std::string &base,
+  const exprt &elem)
+{
+  // see replace_type_pack_ref: keep `sizeof...(P)` operands intact
+  if(n.get_bool("#sizeof_pack"))
+    return;
+  const auto is_pack_ref = [&base](const irept &t) -> bool
+  {
+    if(
+      t.id() != ID_cpp_name || t.get_sub().size() != 1 ||
+      t.get_sub().front().id() != ID_name)
+      return false;
+    const std::string nm = id2string(t.get_sub().front().get(ID_identifier));
+    const auto p = nm.rfind("::");
+    return (p != std::string::npos ? nm.substr(p + 2) : nm) == base;
+  };
+
+  for(auto &s : n.get_sub())
+  {
+    if(is_pack_ref(s))
+      s = elem;
+    else
+      replace_value_pack_ref(s, base, elem);
+  }
+  for(auto &ns : n.get_named_sub())
+  {
+    if(is_pack_ref(ns.second))
+      ns.second = elem;
+    else
+      replace_value_pack_ref(ns.second, base, elem);
   }
 }
 
