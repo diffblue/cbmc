@@ -6023,3 +6023,21 @@ a swallow).  Suspect: ctor instantiated during list-ELEMENT conversion
 inside the new aggregate lowering path misses the odr-use/drain
 bookkeeping (odr_used_by_member_initializer analogue).  tb2/tb6/tb7
 all reduce to this.  Ranges pipe still vacuous behind it.
+
+## Round 43c (2026-08-13): coverage audit #3
+
+Question: every known problem covered by a committed test?  Fixed two
+gaps found:
+- silent ctor-drop arc (tb7) was /tmp-only → NEW KNOWNBUG
+  cpp20_tuple_converting_element (clang-verified kernel; no-body +
+  assertion FAILURE currently).
+- rejects-invalid gap noticed in round 43 (ti1 v1): kind-mismatched
+  non-type pack deduction ACCEPTED ([temp.deduct.type]/17; g++/clang
+  reject with "deduced non-type template argument does not have the
+  same type") → NEW KNOWNBUG cpp11_deduced_nontype_kind_mismatch.
+  (First ri1 draft was a most-vexing-parse false positive — verify the
+  REJECTION REASON, not just the exit code.)
+Still transitively-covered-by-design (documented round 41b): placeholder
+type hygiene, mem-init own-pack expansion (pinned when ranges flips).
+KNOWNBUG census now 5: ranges pipe + ranges basic + regex-solver +
+ctor-drop + kind-mismatch.
