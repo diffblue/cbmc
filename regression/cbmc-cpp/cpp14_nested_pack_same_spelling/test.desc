@@ -1,0 +1,15 @@
+CORE libcxx
+main.cpp
+--cpp14 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ own pack: SUCCESS$
+^\[main\.assertion\.2\] line \d+ full range: SUCCESS$
+^\[main\.assertion\.3\] line \d+ empty range: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Runtime-verified with clang++ (g++ rejects the alias-template pack
+deduction shape).  Assertion 3 (the empty range) additionally guards
+against silent swallowing: pre-fix the enclosing instantiation failed
+and main was truncated after assertion 2.
