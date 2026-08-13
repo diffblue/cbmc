@@ -5977,3 +5977,30 @@ CORE cpp14_nested_pack_same_spelling pins all of it (assertion 3 also
 guards the swallow).  5 suites green.
 RANGES NEXT LAYER: "found no match for symbol '__tuple_impl'" — ctor
 matching with __tuple_indices/__tuple_types argument pairs.
+
+## Round 43 (2026-08-13): tuple ctor onion — 4 fixes, 3 CORE tests
+
+FIXED (commit "libc++ tuple constructor onion"):
+(1) replace_value_pack_ref — non-type pack in TYPE pattern gets i-th
+VALUE ([temp.variadic]/5); tuple_types collapsed to <char,char> before.
+(2) late aggregate base-init lowering in typecheck_member_initializer
+([class.base.init]/7 + [dcl.init.aggr]/1) — ctor-TEMPLATE instantiations
+never pass full_member_initialization; gate = no user ctor AND no vtptr
+(virtual13 caught the missing /1.3-1.4 exclusion); shape = the eager
+path's explicit-constructor-call assignment (cpp_constructor routing
+broke base-less single-operand aggregates — no paren-init path there).
+(3) #base_type-exact matching in full_member_initialization
+([class.base.init]/1-2) — synthesized copy-ctor initializers cross-wired
+same-named __tuple_leaf bases; name shortcut KEPT for explicit inits
+(two_leaf lockstep test relies on positional consumption; ordinal
+variant also failed — dropped arguments).
+(4) #sizeof_pack guards in pack_subst stamping + replace_*_pack_ref +
+subst_elem ([expr.sizeof]/5) — sizeof...(_Tp) degraded to element BYTE
+size under converting-element construction.
+CORE: cpp11_aggregate_base_pack_meminit (g++/clang), 
+cpp14_libcxx_tuple_ctor_kernel, cpp20_tuple_class_element (clang).
+5 suites green.  NEXT LAYER: tb6/tb7 — `get`'s by-value slicing
+static_cast<__tuple_leaf<T>>(__t.__base_) fails ("unexpected
+expression: struct" / "invalid implicit conversion from 'const struct
+__tuple_leaf' to 'struct box'") when the element is CLASS-typed.
+Kernels /tmp/tb6.cpp /tmp/tb7.cpp reproduce.
