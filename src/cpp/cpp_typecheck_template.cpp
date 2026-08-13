@@ -2335,6 +2335,25 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                     else
                       replace_type_pack_ref(pattern, short_name, a->second[i]);
                   }
+                  // ... and the same for NON-TYPE packs referenced inside
+                  // the type pattern ([temp.variadic]/5): `_Idx` in
+                  // `tuple_types<__type_pack_element<_Idx, _Types...>...>`
+                  // (libc++ __make_tuple_types) must become the i-th VALUE;
+                  // apply() substitutes neither bare cpp_names nor value
+                  // packs, and the un-substituted name would later resolve
+                  // through the scalar convenience entry to the FIRST
+                  // element for every i.
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto e = template_map.pack_expr_map.find(pid);
+                    if(e == template_map.pack_expr_map.end())
+                      continue;
+                    const std::string key = id2string(pid);
+                    const auto q = key.rfind("::");
+                    const std::string short_name =
+                      q != std::string::npos ? key.substr(q + 2) : key;
+                    replace_value_pack_ref(pattern, short_name, e->second[i]);
+                  }
                   element_map.apply(pattern);
                   exprt type_arg(ID_type);
                   type_arg.type() = pattern;

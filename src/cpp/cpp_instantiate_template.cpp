@@ -345,6 +345,15 @@ static void expand_member_initializer_packs(
   std::function<void(irept &, std::size_t)> subst_elem =
     [&](irept &n, std::size_t k)
   {
+    // N5008 [expr.sizeof]/5 + [temp.variadic]/8: in `sizeof...(P)` the
+    // pack name is the operand of a pack-size query, not a reference to
+    // an element -- substituting element k here rewrote the name to the
+    // element's TAG, the query could no longer resolve the pack, and the
+    // expression degraded to the element type's BYTE size
+    // (`__make_tuple_indices<sizeof...(_Tp), ...>` under libc++ tuple's
+    // converting-element construction).
+    if(n.get_bool("#sizeof_pack"))
+      return;
     if(n.id() == ID_cpp_name)
     {
       irep_idt only_name;
@@ -3968,6 +3977,15 @@ const symbolt &cpp_typecheckt::instantiate_template(
         };
         std::function<void(irept &)> subst = [&](irept &node)
         {
+          // N5008 [expr.sizeof]/5 + [temp.variadic]/8: in `sizeof...(P)`
+          // the pack name is the operand of a pack-size QUERY, not a
+          // reference to an element.  Stamping the single element's tag
+          // here rewrote the query into a plain sizeof of the element
+          // type -- `__make_tuple_indices<sizeof...(_Tp), ...>` became
+          // the element's BYTE size (libc++ tuple's converting-element
+          // construction, `tuple<tuple<int>> t(3)`).
+          if(node.get_bool("#sizeof_pack"))
+            return;
           if(
             node.id() == ID_name &&
             pack_subst.count(id2string(node.get(ID_identifier))))
@@ -4175,6 +4193,15 @@ skip_pack_removal:
         // Substitute in member initializers
         std::function<void(irept &)> subst = [&](irept &node)
         {
+          // N5008 [expr.sizeof]/5 + [temp.variadic]/8: in `sizeof...(P)`
+          // the pack name is the operand of a pack-size QUERY, not a
+          // reference to an element.  Stamping the single element's tag
+          // here rewrote the query into a plain sizeof of the element
+          // type -- `__make_tuple_indices<sizeof...(_Tp), ...>` became
+          // the element's BYTE size (libc++ tuple's converting-element
+          // construction, `tuple<tuple<int>> t(3)`).
+          if(node.get_bool("#sizeof_pack"))
+            return;
           if(
             node.id() == ID_name &&
             pack_subst.count(id2string(node.get(ID_identifier))))
