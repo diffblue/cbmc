@@ -6004,3 +6004,22 @@ static_cast<__tuple_leaf<T>>(__t.__base_) fails ("unexpected
 expression: struct" / "invalid implicit conversion from 'const struct
 __tuple_leaf' to 'struct box'") when the element is CLASS-typed.
 Kernels /tmp/tb6.cpp /tmp/tb7.cpp reproduce.
+
+## Round 43b (2026-08-13): get-slice layer opened, [dcl.init.list]/3.2 fix
+
+gs3 (18-line, no templates): by-value slicing static_cast broke under
+the NEW aggregate lowering — the synthesized copy ctor's single sliced
+same-type initializer was element-wise-initialized instead of
+copy-initialized ([dcl.init.list]/3.2 + [dcl.init.general]/16.6.1).
+LATENT: all 5 suites were green with the bug present — only the
+kernel caught it.  Fixed (same/derived-type single-operand skip) +
+CORE cpp17_sliced_base_copy.  LESSON: after adding an interception
+path, always test the SYNTHESIZED-member shapes (copy/move ctor)
+against it, suites under-cover them.
+NEXT ARC (tb6/tb7 kernels, /tmp): converting-element tuple ctor
+(tuple<box<int>> t(3)) — instance symbol EXISTS with EMPTY Value, zero
+errors even with DBG2 passthrough: body never converted or queued (not
+a swallow).  Suspect: ctor instantiated during list-ELEMENT conversion
+inside the new aggregate lowering path misses the odr-use/drain
+bookkeeping (odr_used_by_member_initializer analogue).  tb2/tb6/tb7
+all reduce to this.  Ranges pipe still vacuous behind it.
