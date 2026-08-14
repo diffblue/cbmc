@@ -2026,6 +2026,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // (suffix match against the active type and non-type packs).
         std::set<irep_idt> referenced_packs;
         std::set<irep_idt> empty_pack_refs;
+        // Set when a pattern name was mapped to its parameter by SCOPE
+        // LOOKUP (not spelling): the classification is then exact and
+        // the suffix-ambiguity veto below must not second-guess it.
+        bool any_exact_match = false;
         // N5008 [temp.variadic]/5: a pack whose name appears within the
         // pattern of a NESTED pack-expansion is expanded by that
         // innermost expansion, not by this one -- do not descend into
@@ -2076,6 +2080,8 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 if(exact_params.count(ps.first) != 0)
                   exact_applicable = true;
             }
+            if(exact_applicable)
+              any_exact_match = true;
             auto matches = [&](const irep_idt &key_id) -> bool
             {
               if(exact_applicable)
@@ -2086,14 +2092,41 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 p != std::string::npos ? key.substr(p + 2) : key;
               return suffix == id2string(id);
             };
+            // N5008 [temp.variadic]/7 + [basic.scope.temp]: the pack
+            // SIZE recorded for the CURRENT instantiation is
+            // authoritative.  Sequential instantiations of one template
+            // share the parameter identifier, and deduction only
+            // OVERWRITES pack_size_map (an empty pack records no
+            // element entries), so a zero size beside a stale non-empty
+            // pack_args/pack_expr entry means THIS instantiation's pack
+            // is empty -- classify it as such rather than replicating
+            // the stale elements (libc++ __make_tuple_types_flat's
+            // `_Idx` = {0,1,2} beside the empty-range
+            // flat<tuple<box>, __tuple_indices<>>; the raw
+            // __type_pack_element evaluation then threw and the
+            // enclosing instance was half-elaborated -- the silent
+            // constructor-body drop, cpp20_tuple_converting_element).
+            auto current_size_is_zero = [&](const irep_idt &pid) -> bool
+            {
+              auto ps = template_map.pack_size_map.find(pid);
+              return ps != template_map.pack_size_map.end() && ps->second == 0;
+            };
             for(const auto &pe : template_map.pack_args_map)
             {
-              if(matches(pe.first))
+              if(!matches(pe.first))
+                continue;
+              if(current_size_is_zero(pe.first))
+                empty_pack_refs.insert(pe.first);
+              else
                 referenced_packs.insert(pe.first);
             }
             for(const auto &pe : template_map.pack_expr_map)
             {
-              if(matches(pe.first))
+              if(!matches(pe.first))
+                continue;
+              if(current_size_is_zero(pe.first))
+                empty_pack_refs.insert(pe.first);
+              else
                 referenced_packs.insert(pe.first);
             }
             // N5008 [temp.variadic]/7: an EMPTY pack has no
@@ -2190,41 +2223,63 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // zero-length pack of this expansion.
         if(referenced_packs.empty() && !empty_pack_refs.empty())
         {
+          // N5008 [basic.scope.temp]: scope-exact classification is
+          // authoritative -- the veto below guards only the SUFFIX
+          // fallback (where a stale zero-size entry of an unrelated
+          // same-spelled parameter could hijack the expansion).
           bool any_live_binding = false;
-          for(const auto &pid : empty_pack_refs)
+          if(!any_exact_match)
           {
-            const std::string key = id2string(pid);
-            const auto pos = key.rfind("::");
-            const std::string suffix =
-              pos != std::string::npos ? key.substr(pos + 2) : key;
-            for(const auto &te : template_map.type_map)
+            for(const auto &pid : empty_pack_refs)
             {
-              const std::string tk = id2string(te.first);
-              const auto tp = tk.rfind("::");
-              if(
-                (tp != std::string::npos ? tk.substr(tp + 2) : tk) == suffix &&
-                te.second.id() != ID_unassigned && te.second.id() != ID_nil)
+              const std::string key = id2string(pid);
+              const auto pos = key.rfind("::");
+              const std::string suffix =
+                pos != std::string::npos ? key.substr(pos + 2) : key;
+              // The parameter's OWN scalar convenience entry does not
+              // count as live: pack_size_map == 0 is THIS instantiation's
+              // authoritative binding ([temp.variadic]/7 + the
+              // sequential-same-template note above); type_map/expr_map
+              // convenience entries are only overwritten, never erased,
+              // so a leftover from the previous (non-empty) instantiation
+              // of the same template would otherwise veto the zero-length
+              // expansion (libc++ __make_tuple_types_flat's full-range
+              // `_Idx` beside the empty-range one).
+              for(const auto &te : template_map.type_map)
               {
-                any_live_binding = true;
-                break;
+                if(te.first == pid)
+                  continue;
+                const std::string tk = id2string(te.first);
+                const auto tp = tk.rfind("::");
+                if(
+                  (tp != std::string::npos ? tk.substr(tp + 2) : tk) ==
+                    suffix &&
+                  te.second.id() != ID_unassigned && te.second.id() != ID_nil)
+                {
+                  any_live_binding = true;
+                  break;
+                }
               }
-            }
-            if(any_live_binding)
-              break;
-            for(const auto &ee : template_map.expr_map)
-            {
-              const std::string ek = id2string(ee.first);
-              const auto ep = ek.rfind("::");
-              if(
-                (ep != std::string::npos ? ek.substr(ep + 2) : ek) == suffix &&
-                ee.second.id() != ID_unassigned && ee.second.id() != ID_nil)
+              if(any_live_binding)
+                break;
+              for(const auto &ee : template_map.expr_map)
               {
-                any_live_binding = true;
-                break;
+                if(ee.first == pid)
+                  continue;
+                const std::string ek = id2string(ee.first);
+                const auto ep = ek.rfind("::");
+                if(
+                  (ep != std::string::npos ? ek.substr(ep + 2) : ek) ==
+                    suffix &&
+                  ee.second.id() != ID_unassigned && ee.second.id() != ID_nil)
+                {
+                  any_live_binding = true;
+                  break;
+                }
               }
+              if(any_live_binding)
+                break;
             }
-            if(any_live_binding)
-              break;
           }
           if(!any_live_binding)
             did_expand = true;
