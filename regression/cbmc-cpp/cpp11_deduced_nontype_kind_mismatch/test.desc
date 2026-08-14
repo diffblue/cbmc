@@ -9,6 +9,11 @@ no match
 ^VERIFICATION SUCCESSFUL$
 --
 Rejects-invalid test: CBMC currently accepts the kind-mismatched
-deduction and verifies the program.  When fixing, mind that
-tuple-family tests rely on CORRECT same-kind deduction
-(cpp14_libcxx_tuple_ctor_kernel).
+deduction and verifies the program.  Round-44 attempt: enforcing
+[temp.deduct.type]/17 at guess_function_template_args'
+build_template_args point broke the (valid) libc++ tuple kernels --
+CBMC's own machinery parks deduced values with normalized kinds (e.g.
+__make_integer_seq synthesizes values whose recorded type differs from
+the pack's declared type), so internal value-typing must be made
+consistent BEFORE the exact-match rule can be enforced.  Mind
+cpp14_libcxx_tuple_ctor_kernel when retrying.
