@@ -6041,3 +6041,31 @@ Still transitively-covered-by-design (documented round 41b): placeholder
 type hygiene, mem-init own-pack expansion (pinned when ranges flips).
 KNOWNBUG census now 5: ranges pipe + ranges basic + regex-solver +
 ctor-drop + kind-mismatch.
+
+## Round 44 (2026-08-14): ctor-drop arc — 2 layers peeled; /17 parked
+
+PARKED: [temp.deduct.type]/17 kind-mismatch rejection — enforcement at
+build_template_args broke VALID tuple kernels (CBMC parks deduced
+values with normalized kinds; internal value-typing must be fixed
+first).  Guidance in the KNOWNBUG desc.
+FIXED (commit "empty-pack classification and sizeof... survival"):
+(1) pack_size_map==0 is authoritative over stale same-parameter
+element entries (sequential same-template instantiations share the
+identifier; deduction never erases) + scope-exact classification skips
+the suffix-ambiguity veto (the parameter's OWN leftover convenience
+entry vetoed its zero-length expansion — cpp14_nested_pack_same_spelling
+assertion 3 caught the first attempt's gap).  (2) two more
+#sizeof_pack-unguarded stampers in prepare_deferred_method_body.
+DIAGNOSIS TECHNIQUE: instrumented all 20 message-less `throw 0` sites
+(braced insertion — the un-braced-if probe hazard bit again, caught at
+build via -Werror=misleading-indentation); the escaping throw was the
+[temp.deduct]/8 qualified-::type SFINAE throw firing from the DRAIN
+(no deduction in flight).  Half-elaborated instances stay CACHED — an
+instantiation whose member-alias elaboration throws recoverably leaves
+a poisoned symbol (future arc if it recurs).
+REMAINING (cpp20_tuple_converting_element still KNOWNBUG): next layer
+is "found no match for symbol '__tuple_impl'" DURING the drain's
+conversion of tuple's ctor — args (indices, types, indices, types,
+int); the ctor-template deduction fails in the deferred context
+(works eagerly: tb3/tb4 pass).  tb7 kernel reproduces.
+5 suites green.
