@@ -777,6 +777,12 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     {
       std::function<void(irept &)> subst = [&](irept &node)
       {
+        // N5008 [expr.sizeof]/5 + [temp.variadic]/8: `sizeof...(P)` is
+        // a pack-size QUERY; stamping the single element's tag rewrote
+        // it into the element type's BYTE size (the tuple
+        // converting-element silent constructor drop).
+        if(node.get_bool("#sizeof_pack"))
+          return;
         if(
           node.id() == ID_name &&
           pack_subst.count(id2string(node.get(ID_identifier))))
@@ -822,6 +828,10 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     {
       std::function<void(irept &)> subst = [&](irept &node)
       {
+        // see above: keep `sizeof...(P)` operands intact
+        // ([expr.sizeof]/5)
+        if(node.get_bool("#sizeof_pack"))
+          return;
         if(
           node.id() == ID_name &&
           pack_subst.count(id2string(node.get(ID_identifier))))
@@ -1210,12 +1220,6 @@ void cpp_typecheckt::typecheck_method_bodies()
       continue;
 
     prepare_deferred_method_body(method_symbol);
-
-#ifdef DEBUG
-    std::cout << "convert_method_body: " << method_symbol.name << '\n';
-    std::cout << "  is_not_nil: " << body.is_not_nil() << '\n';
-    std::cout << "  !is_zero: " << (!body.is_zero()) << '\n';
-#endif
     if(body.is_not_nil() && body != 0)
     {
       // For template-instantiated methods and methods from system
