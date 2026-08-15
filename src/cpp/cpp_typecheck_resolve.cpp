@@ -9988,21 +9988,34 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // recording is confined to the deduction by the saved_map guard above.
   if(has_non_empty_pack && !pack_deduced_types.empty())
   {
-    for(const auto &param :
-        cpp_declaration.template_type().template_parameters())
+    // N5008 [temp.deduct.call]/1: the pack deduced from the trailing
+    // FUNCTION parameter pack (`_Up... __u`) corresponds to the LAST
+    // type pack of the template's parameter list, and a pack already
+    // deduced from a template-id argument must not be clobbered --
+    // mirroring the pack_args recorder above.  Taking the FIRST type
+    // pack overwrote `_Tf` (deduced {box} from the __tuple_types<_Tf...>
+    // argument) with the trailing pack's {int} in libc++ __tuple_impl's
+    // three-pack constructor, so the substituted signature read
+    // `__tuple_types<int>` and the (correctly deduced) candidate was
+    // rejected -- the converting-element constructor-drop shape.
+    const auto &t_params2 =
+      cpp_declaration.template_type().template_parameters();
+    for(auto it_p = t_params2.rbegin(); it_p != t_params2.rend(); ++it_p)
     {
-      if(param.get_bool(ID_ellipsis) && param.id() == ID_type)
+      if(!it_p->get_bool(ID_ellipsis) || it_p->id() != ID_type)
+        continue;
+      const irep_idt pack_id = it_p->type().get(ID_identifier);
+      if(!pack_id.empty())
       {
-        const irep_idt pack_id = param.type().get(ID_identifier);
-        if(!pack_id.empty())
+        auto &slot = cpp_typecheck.template_map.pack_args_map[pack_id];
+        if(slot.empty())
         {
-          cpp_typecheck.template_map.pack_args_map[pack_id] =
-            pack_deduced_types;
+          slot = pack_deduced_types;
           cpp_typecheck.template_map.pack_size_map[pack_id] =
             pack_expansion_size;
         }
-        break;
       }
+      break;
     }
   }
   else
