@@ -1,0 +1,15 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ converting elem: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "no body for callee std::tuple<int>::tuple(this,int)" and
+assertion FAILURE.  The structural fix is exact scope-qualified
+parameter resolution in template_mapt::apply (violation V1,
+doc/architectural/cpp-frontend-review-2026-06-24-template-map-scope.md);
+deduction_parameters preference (round 45) covers only the
+deduction-side window.  Kernel runtime-verified with clang++.
