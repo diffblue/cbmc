@@ -1,13 +1,11 @@
-// SILENT constructor-body drop (round-43b arc): constructing a tuple
-// whose element is CLASS-typed from a CONVERTING argument
-// (`tuple<box<int>> t(3)`, libc++ <tuple> machinery transliterated
-// below) leaves the instantiated constructor SYMBOL with an EMPTY
-// value -- zero diagnostics, the body is never converted or queued
-// (suspect: odr-use/drain bookkeeping missed for the constructor
-// instantiated during list-element conversion inside the
-// [class.base.init]/7 aggregate lowering).  Verification then reports
-// "no body for callee" and the assertion fails.  The libc++ ranges
-// pipe (views::take) sits behind this layer.
+// Constructing a tuple whose element is CLASS-typed from a CONVERTING
+// argument (`tuple<box<int>> t(3)`, libc++ <tuple> machinery
+// transliterated below).  Historically dropped the instantiated
+// constructor's body silently; root causes fixed across rounds 44-45:
+// [temp.variadic]/7 empty-pack classification beside stale same-name
+// entries, [expr.sizeof]/5 pack-query survival through the
+// single-element stampers, and [temp.deduct.call]/1 trailing-
+// function-pack recording clobbering the LAST type pack's deduction.
 // clang++ accepts and runs clean; g++ rejects the alias-template pack
 // deduction shape.
 // cvise-reduced (83k -> 236 lines, header-free) from the libc++
