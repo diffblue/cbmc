@@ -6069,3 +6069,22 @@ conversion of tuple's ctor — args (indices, types, indices, types,
 int); the ctor-template deduction fails in the deferred context
 (works eagerly: tb3/tb4 pass).  tb7 kernel reproduces.
 5 suites green.
+
+## Round 45 (2026-08-15): FLIP cpp20_tuple_converting_element → CORE
+
+FIXED: (1) the trailing-function-pack RETURN-TYPE recorder (gfta
+~10016) stamped pack_deduced_types into the FIRST type pack — _Tf
+{box}→{int} clobber; now LAST type pack + no-clobber (mirrors the twin
+at ~9309; [temp.deduct.call]/1).  (2) apply()'s ambiguous-ellipsis
+pack expansion prefers deduction_parameters over lexicographic suffix
+match ([basic.scope.temp]/2) — inner/outer same-template instances
+cross-substituted (tuple-in-tuple).  tb7+tb2 green → KNOWNBUG FLIPPED
+(non-vacuous, 1 assertion).  tb6 (outer-OPERAND same-template nesting)
+still fails under documented V1; NOT a committed-test gap (tb6's shape
+is interior to ranges tests + V1 doc).
+DIAGNOSIS: deduction was PERFECT (gfta-args probe); the corruption was
+in SIGNATURE substitution — probe order: match-fail (fargs) → match-try
+(whole signatures) → apply-pack (map state at apply time) pinned the
+clobber window to gfta 9520..10080.
+5 suites green.  RANGES: base.cpp STILL drops main — next probe needed
+(fresh error, round 46).
