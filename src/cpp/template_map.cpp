@@ -1427,8 +1427,34 @@ void template_mapt::apply(typet &type) const
             if(!csub.empty() && csub.front().id() == ID_name)
             {
               irep_idt ident = csub.front().get(ID_identifier);
+              // N5008 [basic.scope.temp]/2: when the template whose
+              // declaration is being substituted is known (an active
+              // deduction, deduction_parameters), ITS parameter is the
+              // one this name denotes -- prefer it over the flat map's
+              // lexicographic first suffix match (two instances of one
+              // template have same-suffix packs; the inner
+              // __tuple_impl<.., int>'s `_Tf` otherwise substitutes
+              // into the outer <.., tuple<int>> candidate's signature,
+              // libc++ tuple-in-tuple).
+              const bool ident_is_deduction_param = [&]() -> bool
+              {
+                for(const auto &dp : deduction_parameters)
+                {
+                  const std::string dstr = id2string(dp);
+                  auto dpos = dstr.rfind("::");
+                  if(
+                    (dpos != std::string::npos ? dstr.substr(dpos + 2)
+                                               : dstr) == id2string(ident))
+                    return true;
+                }
+                return false;
+              }();
               for(const auto &pack_entry : pack_args_map)
               {
+                if(
+                  ident_is_deduction_param &&
+                  deduction_parameters.count(pack_entry.first) == 0)
+                  continue;
                 const std::string &key = id2string(pack_entry.first);
                 auto p = key.rfind("::");
                 std::string suffix =
