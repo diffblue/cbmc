@@ -6088,3 +6088,17 @@ in SIGNATURE substitution — probe order: match-fail (fargs) → match-try
 clobber window to gfta 9520..10080.
 5 suites green.  RANGES: base.cpp STILL drops main — next probe needed
 (fresh error, round 46).
+
+## Round 45b (2026-08-15): coverage audit #4
+
+Gap found + closed: tb6 (same-template nesting, operand-side V1
+collision) was NOT covered — the round-45 findings claimed "interior
+to ranges tests" but base.cpp has no tuple<tuple<int>>(int) shape (its
+converting-element path = tb2, now FIXED).  NEW KNOWNBUG
+cpp20_tuple_nested_same_template (clang-runtime-verified; desc points
+at the V1 structural fix and the round-45 deduction_parameters
+precedent).  AUDIT LESSON: "interior to X" claims must be verified by
+grep against the covering test's source, not assumed from the arc's
+history.
+All other knowns covered: ranges×2, regex-solver, kind-mismatch
+(parked), V1-operand (new).  Census: 5 KNOWNBUGs.
