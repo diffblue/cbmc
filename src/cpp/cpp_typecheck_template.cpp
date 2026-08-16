@@ -3542,6 +3542,84 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
         tag_name.get_sub().empty() ||
         tag_name.get_sub().back().id() != ID_template_args)
       {
+        // N5008 [temp.mem]/1 + [class.nest]/1: a member class template of
+        // a class template may be defined out of line
+        // (`template<class V> template<bool C>
+        //  struct take_view<V>::__sentinel { ... };`, the libc++
+        // take_view sentinel).  The definition completes the in-class
+        // declaration; graft its body onto the member declaration inside
+        // the OUTER class template's parse tree, so instantiating the
+        // outer class carries the complete member ([temp.inst]/1).  The
+        // parser flattens both template-parameter levels into this
+        // declaration's template_type; the member's own parameters are
+        // the trailing ones after the outer template's.
+        do
+        {
+          // form: name <args> :: name  (single-level qualification only)
+          const irept::subt &tsub = tag_name.get_sub();
+          if(
+            tsub.size() != 4 || tsub[0].id() != ID_name ||
+            tsub[1].id() != ID_template_args || tsub[2].id() != "::" ||
+            tsub[3].id() != ID_name)
+            break;
+          const irep_idt outer_name = tsub[0].get(ID_identifier);
+          const irep_idt member_name = tsub[3].get(ID_identifier);
+          const auto outer_ids = cpp_scopes.current_scope().lookup(
+            outer_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+          if(outer_ids.empty())
+            break;
+          symbolt *outer_sym =
+            symbol_table.get_writeable((*outer_ids.begin())->identifier);
+          if(outer_sym == nullptr || !outer_sym->type.get_bool(ID_is_template))
+            break;
+          cpp_declarationt &outer_decl = to_cpp_declaration(outer_sym->type);
+          if(!outer_decl.is_class_template())
+            break;
+          const std::size_t n_outer_params =
+            outer_decl.template_type().template_parameters().size();
+          // find the body-less member class template declaration
+          typet &outer_class = outer_decl.type();
+          irept &body = outer_class.add(ID_body);
+          for(auto &member : body.get_sub())
+          {
+            if(member.id() != ID_cpp_declaration)
+              continue;
+            cpp_declarationt &mdecl = static_cast<cpp_declarationt &>(member);
+            if(!mdecl.get_bool(ID_is_template) || !mdecl.is_class_template())
+              continue;
+            const cpp_namet &mtag =
+              static_cast<const cpp_namet &>(mdecl.type().find(ID_tag));
+            if(mtag.get_base_name() != member_name)
+              continue;
+            if(mdecl.type().find(ID_body).is_not_nil())
+              continue; // already defined
+            // graft: the out-of-line struct body under the member's tag
+            typet new_type = declaration.type();
+            irept new_tag(ID_cpp_name);
+            irept tag_part(ID_name);
+            tag_part.set(ID_identifier, member_name);
+            tag_part.add(ID_C_source_location) = declaration.source_location();
+            new_tag.get_sub().push_back(tag_part);
+            new_type.add(ID_tag) = new_tag;
+            mdecl.type() = new_type;
+            // the member's own template parameters are the ones after
+            // the outer level; keep the member's declared ones if the
+            // counts already match ([temp.mem]: the definition's inner
+            // list corresponds to the member's)
+            const auto &flat_params =
+              declaration.template_type().template_parameters();
+            if(flat_params.size() > n_outer_params)
+            {
+              template_typet member_tt;
+              member_tt.add_source_location() = declaration.source_location();
+              for(std::size_t pi = n_outer_params; pi < flat_params.size();
+                  ++pi)
+                member_tt.template_parameters().push_back(flat_params[pi]);
+              mdecl.add(ID_template_type) = member_tt;
+            }
+            return;
+          }
+        } while(false);
         return;
       }
     }
