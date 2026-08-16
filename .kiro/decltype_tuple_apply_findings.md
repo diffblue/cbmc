@@ -6102,3 +6102,24 @@ grep against the covering test's source, not assumed from the arc's
 history.
 All other knowns covered: ranges×2, regex-solver, kind-mismatch
 (parked), V1-operand (new).  Census: 5 KNOWNBUGs.
+
+## Round 46 (2026-08-16): out-of-line member class templates + ranges layer map
+
+FIXED: out-of-line member-class-template definitions ([temp.mem]/1 +
+[class.nest]/1) — previously silently skipped ("not supported yet",
+convert_template_declaration ~3531); take_view::__sentinel<true>{}
+died "struct nil still incomplete" and killed the TU.  Graft: body
+onto the in-class member declaration in the OUTER template's parse
+tree; member params = flattened list's trailing entries.  19-line
+kernel sv1 (g++/clang) → CORE cpp17_member_class_template_out_of_line.
+5 suites green.
+RANGES MAP (te-kernels, /tmp): te2 take(3) alone → PASSES, main
+intact.  te3 (the pipe) → main dies in anon-take::operator() at
+`take_view(__range, __n)` CTAD (line 234, stmt-tracer pinpointed);
+throw is message-less and NOT any instrumented bare-throw site.
+SECOND wave (post-main): closure_t default-ctor synthesis chain
+resolves pf() → tuple::tuple<> — genuinely ill-formed instantiation
+contained by drain BUT [class.default.ctor]/4 says never define
+un-odr-used implicit default ctors — eager synthesis remains a latent
+hazard (contained; revisit if it surfaces).
+NEXT (round 47): the take_view CTAD layer at te3 line 234.
