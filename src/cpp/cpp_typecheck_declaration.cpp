@@ -307,6 +307,109 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     }
   }
 
+  // Aggregate deduction candidate (N5008 [over.match.class.deduct]/1.8,
+  // C++20): if the class has no constructors of its own, a hypothetical
+  // guide is formed whose parameter types are the AGGREGATE ELEMENT
+  // types; template arguments are deduced from the initializer per
+  // [temp.deduct.call].  Deduce through the data members' declared
+  // types, so a member of dependent-alias type (`range_difference_t<
+  // _View>`, a non-deduced context) constrains nothing while the
+  // plain `_View` member deduces with the /2 adjustments below (libc++
+  // take_view's CTAD from `(__range, __n)`).
+  if(deduced_types.empty())
+  {
+    const symbolt *csym = symbol_table.lookup(template_id->identifier);
+    auto scope_it = cpp_scopes.id_map.find(template_id->identifier);
+    if(
+      csym != nullptr && csym->type.id() == ID_cpp_declaration &&
+      csym->type.get_bool(ID_is_template) &&
+      scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
+    {
+      const cpp_declarationt &cdecl = to_cpp_declaration(csym->type);
+      bool has_ctor = false;
+      std::vector<typet> member_patterns;
+      for(const auto &mem : cdecl.type().find(ID_body).get_sub())
+      {
+        if(mem.id() != ID_cpp_declaration)
+          continue;
+        const cpp_declarationt &mdecl =
+          to_cpp_declaration(static_cast<const exprt &>(mem));
+        if(mdecl.type().id() == ID_constructor)
+        {
+          has_ctor = true;
+          break;
+        }
+        if(mdecl.get_bool(ID_is_template) || mdecl.is_typedef())
+          continue;
+        if(mdecl.storage_spec().is_static())
+          continue;
+        for(const auto &d : mdecl.declarators())
+        {
+          if(d.type().id() == ID_function_type)
+            continue; // member function, not an element
+          member_patterns.push_back(d.merge_type(mdecl.type()));
+        }
+      }
+      if(
+        !has_ctor && !member_patterns.empty() &&
+        arg_types.size() <= member_patterns.size())
+      {
+        // N5008 [temp.deduct.call]/2: for deduction against a by-value
+        // parameter, an array argument decays to a pointer, a function
+        // to a function pointer, and top-level cv-qualification is
+        // dropped.
+        std::vector<typet> adjusted_args = arg_types;
+        for(auto &at : adjusted_args)
+        {
+          if(is_reference(at))
+            at = to_reference_type(at).base_type();
+          if(at.id() == ID_array)
+            at = pointer_type(to_array_type(at).element_type());
+          else if(at.id() == ID_code)
+            at = pointer_type(at);
+          at.remove(ID_C_constant);
+        }
+        cpp_save_scopet save_scope(cpp_scopes);
+        cpp_saved_template_mapt saved_map(template_map);
+        cpp_scopes.go_to(*scope_it->second);
+        template_map.build_unassigned(cdecl.template_type());
+        cpp_typecheck_resolvet resolver(*this);
+        bool deduced_ok = true;
+        try
+        {
+          for(std::size_t i = 0; i < adjusted_args.size(); ++i)
+            resolver.guess_template_args(member_patterns[i], adjusted_args[i]);
+        }
+        catch(...)
+        {
+          deduced_ok = false;
+        }
+        if(deduced_ok)
+        {
+          const cpp_template_args_tct ta =
+            template_map.build_template_args(cdecl.template_type());
+          if(!ta.has_unassigned())
+          {
+            std::vector<typet> dt;
+            bool all_type_args = true;
+            for(const auto &a : ta.arguments())
+            {
+              if(a.id() == ID_type)
+                dt.push_back(a.type());
+              else
+              {
+                all_type_args = false;
+                break;
+              }
+            }
+            if(all_type_args && !dt.empty())
+              deduced_types = std::move(dt);
+          }
+        }
+      }
+    }
+  }
+
   // Positional fallback ([over.match.class.deduct], simplified) when no
   // constructor-pattern guide deduced the arguments:
   //  * a trailing parameter pack absorbs the remaining arguments, so the flat
