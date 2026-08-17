@@ -6143,3 +6143,28 @@ triage must run the drop-check, not just the verdict.
 conversion from 'int[1]' to 'int'" — take_view<int[1]> instantiated
 with the REFERENCE stripped (decltype(declval<R>()) should give
 int(&)[1]; cd3 hand-kernel of that shape passes, so context-specific).
+
+## Round 48 (2026-08-17): aggregate deduction candidate + decay
+
+FIXED: [over.match.class.deduct]/1.8 aggregate deduction candidate —
+deduce through data-member declared types with [temp.deduct.call]/2
+decay (array→pointer etc.); dependent-alias members are non-deduced
+contexts.  take_view<int[1]>→take_view<int*>.  Plus [dcl.init.aggr]/2.2
+base-element routing via cpp_constructor for single base-typed CTAD
+args (iv2 probe found it; braced-variant iv2 ALSO exposed
+"unexpected expression: struct" via the RETURN-value path — separate,
+shallower issue, superseded by the paren routing for the ranges shape).
+cvise cv48: te4→16 lines in ~9 min.  CORE
+cpp20_ctad_aggregate_deduction_decay (g++/clang).  te4 fully converts.
+5 suites green.
+NEXT LAYER (te3, cvise cv49 → /tmp/iv1.cpp 164 lines; minimal probe
+/tmp/iv3.cpp 29 lines clang-verified): the __invoke chain —
+"unexpected expression: signedbv": expanding `A()...` (functional-cast-
+over-pack in decltype trailing returns) substitutes the RAW ELEMENT
+TYPE for the whole cast expression; downstream expr typecheck chokes,
+__invokable_r::_Result never forms, main dies.  Root per
+[temp.variadic]/5: A→int in `A()` must yield the functional cast
+`int()`.  Fix site to find: the walker that replaces cpp_name subs
+with element types inside CALL/cast expressions (likely
+replace_type_pack_ref's `s = elem` on expression subs, or the gfta
+trailing-return expander).
