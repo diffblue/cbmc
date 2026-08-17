@@ -6123,3 +6123,23 @@ contained by drain BUT [class.default.ctor]/4 says never define
 un-odr-used implicit default ctors — eager synthesis remains a latent
 hazard (contained; revisit if it surfaces).
 NEXT (round 47): the take_view CTAD layer at te3 line 234.
+
+## Round 47 (2026-08-17): CTAD paren-aggregate layer fixed
+
+FIXED: single-argument parenthesized aggregate init after CTAD
+([over.match.class.deduct] + [dcl.init.general]/16.6.2.2) — the
+deduced `take_view<int>(3)` fell into the explicit-cast path ("invalid
+explicit cast").  Fix scoped THREE ways after two regression rounds:
+(1) #ctad_deduced flag only (unscoped reshape broke map_piecewise with
+a goto-symex assign_from_struct ABORT — downstream initializer paths
+assert FULL member lists, no [dcl.init.aggr]/5 padding); (2) single
+data member only; (3) same/derived-type operand keeps the copy path.
+cvise fleet cv47: te4 244→13 lines in ~8 min (typecheck-phase
+criterion).  CORE cpp20_ctad_paren_aggregate_single (g++/clang).
+VACUITY LESSON REPEATED: cd3/cd5/cd6 hand-kernels "passed" VACUOUSLY
+(dropped main, VERIFICATION SUCCESSFUL with 0 assertions) — mid-round
+triage must run the drop-check, not just the verdict.
+5 suites green.  NEXT LAYER (te4 still drops): "invalid implicit
+conversion from 'int[1]' to 'int'" — take_view<int[1]> instantiated
+with the REFERENCE stripped (decltype(declval<R>()) should give
+int(&)[1]; cd3 hand-kernel of that shape passes, so context-specific).
