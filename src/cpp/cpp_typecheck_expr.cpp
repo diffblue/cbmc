@@ -3078,7 +3078,10 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     if(!ctad_args.empty())
     {
       if(auto deduced = deduce_class_template_arguments(ctad_name, ctad_args))
+      {
         expr.type() = *deduced;
+        expr.set("#ctad_deduced", true);
+      }
     }
   }
 
@@ -3094,7 +3097,17 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   // operand that both the POD typecast path and the non-POD aggregate
   // branch below expect (`pair(a, b)` from CTAD used to die with
   // "explicit typecast expects 0 or 1 operands").
-  if(expr.operands().size() > 1 && expr.type().id() == ID_struct_tag)
+  // A SINGLE argument takes the same route when it cannot be a
+  // copy/move ([dcl.init.general]/16.6.1 considers constructors first;
+  // for an aggregate only the synthesized copy/move are candidates, so
+  // an argument of a DIFFERENT, non-derived type falls through to
+  // /16.6.2.2 aggregate initialization: `take_view<int>(3)` from the
+  // libc++ views::take CTAD initializes the single member from 3;
+  // previously it fell into the explicit-cast path and died with
+  // "invalid explicit cast").
+  const bool ctad_deduced = expr.get_bool("#ctad_deduced");
+  expr.remove("#ctad_deduced");
+  if(expr.operands().size() >= 1 && expr.type().id() == ID_struct_tag)
   {
     const struct_typet &agg_type = follow_tag(to_struct_tag_type(expr.type()));
     bool has_user_ctor = false;
@@ -3109,7 +3122,53 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         break;
       }
     }
-    if(!has_user_ctor && expr.operands().size() > 1)
+    bool single_is_copyish = false;
+    if(expr.operands().size() == 1)
+    {
+      const exprt &op0 = expr.operands().front();
+      if(op0.id() == ID_initializer_list)
+        single_is_copyish = true; // already list-shaped: leave as-is
+      else
+      {
+        typet op_t = op0.type();
+        if(is_reference(op_t))
+          op_t = to_reference_type(op_t).base_type();
+        if(
+          op_t.id() == ID_struct_tag &&
+          (to_struct_tag_type(op_t).get_identifier() ==
+             to_struct_tag_type(expr.type()).get_identifier() ||
+           subtype_typecast(
+             follow_tag(to_struct_tag_type(op_t)),
+             follow_tag(to_struct_tag_type(expr.type())))))
+          single_is_copyish = true;
+        // an operand of scalar/other type may still CONVERT to the
+        // class via a conversion function; and [dcl.init.aggr]/5's
+        // value-initialization of trailing members is not implemented
+        // by the downstream initializer paths (goto-symex asserts a
+        // full member list).  Route a single operand to aggregate
+        // initialization only when the aggregate has EXACTLY ONE
+        // non-static data member (the libc++ take_view CTAD shape);
+        // other single-operand casts keep the conversion path.
+        std::size_t n_data_members = 0;
+        for(const auto &c : agg_type.components())
+        {
+          if(
+            c.type().id() != ID_code && !c.get_bool(ID_is_type) &&
+            !c.get_bool(ID_is_static) && !c.get_is_padding())
+            ++n_data_members;
+        }
+        if(n_data_members != 1)
+          single_is_copyish = true;
+        // ... and only within the class-template-argument-deduction
+        // flow ([over.match.class.deduct] via the hook above): an
+        // explicitly-written single-argument functional cast keeps the
+        // conversion path (existing behavior; a reshape there produced
+        // mismatched member lists downstream).
+        if(!ctad_deduced)
+          single_is_copyish = true;
+      }
+    }
+    if(!has_user_ctor && !single_is_copyish)
     {
       exprt init_list(ID_initializer_list, expr.type());
       init_list.operands().swap(expr.operands());
