@@ -13,7 +13,7 @@ This document outlines the current release process in a summary form.
 2. After the PR has been merged, pull develop locally and spin off a tag with
    `git tag -a cbmc-<version>`. After some wait, this is going to trigger building
    Linux && Windows jobs and submit PR to [`homebrew`](https://formulae.brew.sh/formula/cbmc)
-   and image to [`docker`](https://hub.docker.com/r/diffblue/cbmc/tags).
+   and image to the [GitHub Container Registry](https://github.com/diffblue/cbmc/pkgs/container/cbmc).
    * The release creation is being driven by the `.github/workflows/regular-release.yaml` file,
      which creates a new release with some template text filled in.
    * After the release has been created, another github action starts building the
