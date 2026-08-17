@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ ctad in template: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Runtime-verified with g++ and clang++.  13-line cvise kernel of the
+libc++ ranges views::take pipe (te4).
