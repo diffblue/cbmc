@@ -3141,6 +3141,27 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
              follow_tag(to_struct_tag_type(op_t)),
              follow_tag(to_struct_tag_type(expr.type())))))
           single_is_copyish = true;
+        // N5008 [dcl.init.aggr]/2.2: the aggregate's elements START with
+        // its direct base classes.  A single operand whose type is a
+        // BASE of the deduced aggregate initializes that base element
+        // (the libc++ `__range_adaptor_closure_t(__bind_back(...))`
+        // CTAD shape); route it through cpp_constructor, whose
+        // aggregate-with-bases branch performs the base-wise
+        // initialization -- the flattened-initializer reshape below
+        // cannot represent a base element.
+        else if(
+          ctad_deduced && op_t.id() == ID_struct_tag &&
+          subtype_typecast(
+            follow_tag(to_struct_tag_type(expr.type())),
+            follow_tag(to_struct_tag_type(op_t))))
+        {
+          exprt::operandst ctor_args = expr.operands();
+          exprt temporary;
+          new_temporary(
+            expr.source_location(), expr.type(), ctor_args, temporary);
+          expr.swap(temporary);
+          return;
+        }
         // an operand of scalar/other type may still CONVERT to the
         // class via a conversion function; and [dcl.init.aggr]/5's
         // value-initialization of trailing members is not implemented
