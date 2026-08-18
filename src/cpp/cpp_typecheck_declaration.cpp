@@ -100,12 +100,16 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   const std::size_t n_type_params = param_is_pack.size();
   const bool has_pack = n_type_params != 0 && param_is_pack.back();
 
-  // Type-check the initializer arguments to obtain their types.
+  // Type-check the initializer arguments to obtain their types.  An
+  // argument that has already been type-checked (the function-call
+  // route type-checks arguments before re-routing to CTAD; a lowered
+  // aggregate VALUE has no second-round handler) is used as-is.
   std::vector<typet> arg_types;
   for(const auto &a : args)
   {
     exprt arg = a;
-    typecheck_expr(arg);
+    if(arg.type().is_nil() || arg.type().id().empty())
+      typecheck_expr(arg);
     arg_types.push_back(arg.type());
   }
 
