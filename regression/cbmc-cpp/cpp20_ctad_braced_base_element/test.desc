@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ decltype through auto-return CTAD: SUCCESS$
@@ -7,8 +7,9 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: hard CONVERSION ERROR ("unexpected expression: struct" at
-the closure(takeish{n}) line).  Suspect: the declaration/return-value
-CTAD hook path, distinct from typecheck_expr_explicit_constructor_call
-(whose paren-variant was fixed in rounds 47-48).  Kernel
-runtime-verified with clang++.
+Fixed in round 51: (a) [dcl.init.aggr]/4.1 whole-base copy in
+cpp_constructor's aggregate-with-bases branch; (b) CTAD argument
+type-checking is idempotent (deduce skips typed args; the call
+re-route wraps them already_typechecked; the base-element detection
+unwraps).  Kernel runtime-verified with clang++ (g++ rejects the
+base-element deduction shape).
