@@ -3125,7 +3125,12 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     bool single_is_copyish = false;
     if(expr.operands().size() == 1)
     {
-      const exprt &op0 = expr.operands().front();
+      // look through an already-typechecked wrapper: the call re-route
+      // wraps arguments it has type-checked, and the base-element
+      // detection below needs the VALUE's type
+      const exprt &op0 = expr.operands().front().id() == ID_already_typechecked
+                           ? to_unary_expr(expr.operands().front()).op()
+                           : expr.operands().front();
       if(op0.id() == ID_initializer_list)
         single_is_copyish = true; // already list-shaped: leave as-is
       else
@@ -4793,6 +4798,16 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       ctor_call.type() =
         static_cast<const typet &>(static_cast<const irept &>(fn_name));
       ctor_call.operands() = expr.arguments();
+      // arguments this route has already type-checked (e.g. through the
+      // call-target loop above) must not be type-checked again: a
+      // lowered aggregate VALUE (struct_exprt) has no second-round
+      // handler ("unexpected expression: struct", the braced
+      // base-element CTAD shape)
+      for(auto &a : ctor_call.operands())
+      {
+        if(a.type().is_not_nil() && !a.type().id().empty())
+          already_typechecked_exprt::make_already_typechecked(a);
+      }
       ctor_call.add_source_location() = expr.source_location();
       typecheck_expr_explicit_constructor_call(ctor_call);
       expr.swap(ctor_call);

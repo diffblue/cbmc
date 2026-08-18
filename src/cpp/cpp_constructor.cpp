@@ -616,6 +616,43 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         {
           if(idx >= operands_tc.size())
             break;
+          // N5008 [dcl.init.aggr]/4.1: when the element is a BASE and
+          // the initializer is of the base's own type (or derived),
+          // the base SUBOBJECT is copy-initialized from it -- a sliced
+          // whole-object copy, not a member-wise splice (member-wise
+          // treated the whole takeish value as the first member's
+          // initializer, leaving the base nondet: the closure CTAD
+          // wrong-code shape).
+          {
+            typet op_t = operands_tc[idx].type();
+            if(is_reference(op_t))
+              op_t = to_reference_type(op_t).base_type();
+            const typet &base_t = struct_type.bases()[b].type();
+            if(
+              op_t.id() == ID_struct_tag && base_t.id() == ID_struct_tag &&
+              (to_struct_tag_type(op_t).get_identifier() ==
+                 to_struct_tag_type(base_t).get_identifier() ||
+               subtype_typecast(
+                 follow_tag(to_struct_tag_type(op_t)),
+                 follow_tag(to_struct_tag_type(base_t)))))
+            {
+              typet clean_base_t = base_t;
+              clean_base_t.remove(ID_C_base_name);
+              address_of_exprt obj_addr(object_tc);
+              typecast_exprt base_ptr(obj_addr, pointer_type(clean_base_t));
+              dereference_exprt base_lval(base_ptr);
+              base_lval.set(ID_C_lvalue, true);
+              exprt val = typecast_exprt::conditional_cast(
+                operands_tc[idx], clean_base_t);
+              side_effect_expr_assignt assign(
+                std::move(base_lval), std::move(val), typet(), source_location);
+              typecheck_side_effect_assignment(assign);
+              block.add(code_expressiont(std::move(assign)));
+              ++idx;
+              continue;
+            }
+          }
+
           // Collect from_base data members belonging to this base
           exprt::operandst base_ops;
           if(operands_tc[idx].id() == ID_initializer_list)
