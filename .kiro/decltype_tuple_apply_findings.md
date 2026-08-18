@@ -6213,3 +6213,18 @@ NOTE: real <ranges> test (cpp20_ranges_basic_libcxx) blocked on
 DIFFERENT layers (atomic header noise + same_as no-match) — the pipe
 KNOWNBUG driver and the real-header test have diverged; treat
 separately when te3 clears.
+
+## Round 50b (2026-08-18): coverage audit #5
+
+Gap found + closed: iv2 (braced base-element aggregate CTAD,
+`closure(takeish{n})`) — round-48 findings called it "separate,
+shallower, superseded"; it is STILL a hard rejects-valid failure
+("unexpected expression: struct" via the return-value CTAD hook) with
+no committed test → NEW KNOWNBUG cpp20_ctad_braced_base_element
+(clang-runtime-verified).  AUDIT LESSON (recurring): "superseded/
+shallower" notes in findings are DEFERRALS, not resolutions — each
+audit must re-run such kernels.
+All other knowns covered: ranges pipe (te3's silent-throw layer
+interior to it), ranges basic (real-header divergence: atomic noise +
+same_as — interior), regex-solver, kind-mismatch (parked), V1-operand.
+Census: 6 KNOWNBUGs.
