@@ -3163,13 +3163,10 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
           return;
         }
         // an operand of scalar/other type may still CONVERT to the
-        // class via a conversion function; and [dcl.init.aggr]/5's
-        // value-initialization of trailing members is not implemented
-        // by the downstream initializer paths (goto-symex asserts a
-        // full member list).  Route a single operand to aggregate
-        // initialization only when the aggregate has EXACTLY ONE
-        // non-static data member (the libc++ take_view CTAD shape);
-        // other single-operand casts keep the conversion path.
+        // class via a conversion function; keep those on the cast path
+        // unless this is aggregate initialization with no more
+        // arguments than elements ([dcl.init.aggr]/5 value-initializes
+        // the rest).
         std::size_t n_data_members = 0;
         for(const auto &c : agg_type.components())
         {
@@ -3178,7 +3175,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
             !c.get_bool(ID_is_static) && !c.get_is_padding())
             ++n_data_members;
         }
-        if(n_data_members != 1)
+        if(n_data_members < 1)
           single_is_copyish = true;
         // ... and only within the class-template-argument-deduction
         // flow ([over.match.class.deduct] via the hook above): an
