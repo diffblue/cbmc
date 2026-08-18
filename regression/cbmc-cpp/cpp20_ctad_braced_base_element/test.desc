@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ decltype through auto-return CTAD: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: hard CONVERSION ERROR ("unexpected expression: struct" at
+the closure(takeish{n}) line).  Suspect: the declaration/return-value
+CTAD hook path, distinct from typecheck_expr_explicit_constructor_call
+(whose paren-variant was fixed in rounds 47-48).  Kernel
+runtime-verified with clang++.
