@@ -6244,3 +6244,30 @@ TE3 (task 2) NOT STARTED this round — the silent-throw instrumentation
 plan stands (error()-adjacent throws in cpp_instantiate_template +
 cpp_declarator_converter, or catch-print-rethrow around
 instantiate_template).
+
+## Round 52 (2026-08-18): te3's silent throw TRIANGULATED to V1
+
+No src changes (probe-only round).  DIAGNOSIS COMPLETE:
+- RAII uncaught_exceptions() tracers (instantiate_template + resolve)
+  — a reusable probe-kit addition: prints the frame an exception
+  ESCAPES from, no per-site instrumentation.
+- Escape chain: innermost failing resolve = `__invoke [take-fn, array,
+  ARRAY]` — the third arg should be INT (get<0>(tuple<int>) from
+  __bind_back_op's `invoke(__f, __args..., get<_Ip>(__bound_args)...)`)
+  — the get-expansion mis-substitutes under the OUTER tuple's live
+  maps.  Then __try_call → _Result → enable_if::type → invoke_result_t
+  alias throws out of operator|'s conversion → main dies.
+- iv8 kernel (dual pack expansions in one decltype arg list, 42 lines,
+  g++/clang): PASSES once given a body — dual expansion per se is
+  FINE.  KERNEL LESSON: declaration-only helpers make no-body FAILURES
+  that look like drops — give kernels bodies.
+- The failing ingredient is get<I>(b) where b's type is the SAME
+  template nested (tuple<int> inside tuple<take, tuple<int>>) — the
+  V1 operand-side collision, ALREADY covered by KNOWNBUG
+  cpp20_tuple_nested_same_template (still failing identically).
+CONCLUSION: cpp20_ranges_pipe_invoke_drop is BLOCKED ON V1.  The
+structural fix (exact scope-qualified parameter resolution replacing
+suffix matching in template_mapt apply/build) is now the campaign's
+single highest-value target: it unlocks the pipe KNOWNBUG + the V1
+KNOWNBUG together.  Round 53 = the V1 arc (its own multi-round effort;
+design in doc/architectural/cpp-frontend-review-2026-06-24-*.md).
