@@ -6228,3 +6228,19 @@ All other knowns covered: ranges pipe (te3's silent-throw layer
 interior to it), ranges basic (real-header divergence: atomic noise +
 same_as — interior), regex-solver, kind-mismatch (parked), V1-operand.
 Census: 6 KNOWNBUGs.
+
+## Round 51 (2026-08-18): FLIP cpp20_ctad_braced_base_element → CORE
+
+FIXED (3 sub-defects): (1) [dcl.init.aggr]/4.1 whole-base copy in
+cpp_constructor's aggregate-with-bases branch — member-wise splice left
+the base NONDET (wrong-code; iv3 assertion caught it — round 48 had
+validated conversion-only, the drop-check-vs-verify lesson AGAIN);
+(2) deduce_class_template_arguments skips already-typed args (the
+4790 call re-route pre-typechecks; struct_exprt has no second-round
+handler); (3) the re-route wraps args already_typechecked + the ecc
+base-element detection unwraps before inspecting.  iv2+iv3 both green
+non-vacuous.  5 suites green.  Census 5.
+TE3 (task 2) NOT STARTED this round — the silent-throw instrumentation
+plan stands (error()-adjacent throws in cpp_instantiate_template +
+cpp_declarator_converter, or catch-print-rethrow around
+instantiate_template).
