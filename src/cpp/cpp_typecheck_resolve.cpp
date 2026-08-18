@@ -2376,8 +2376,7 @@ unsigned cpp_typecheck_resolvet::member_template_const_penalty(
   }
   else
   {
-    const exprt &this_expr =
-      cpp_typecheck.cpp_scopes.current_scope().this_expr;
+    const exprt &this_expr = cpp_typecheck.cpp_scopes.current_scope().this_expr;
     if(this_expr.is_not_nil() && this_expr.type().id() == ID_pointer)
     {
       object_const =
@@ -9094,6 +9093,20 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           typet arg_actual_type = it->type();
           if(arg_type.id() == ID_cpp_name)
           {
+            // N5008 [expr.type]/1 + [temp.deduct.call]/2: an expression
+            // never has reference type -- the operand's recorded
+            // reference wrapper (e.g. a forwarding-reference parameter
+            // `_View&&` passed on to a BY-VALUE pack, libc++'s
+            // `invoke(__closure, __view)` in operator|) is adjusted
+            // away before the by-value deduction, so the array-to-
+            // pointer decay below sees the array (`int(&)[1]` must
+            // deduce `int*`, not reference-to-array).
+            if(is_reference(arg_actual_type))
+              arg_actual_type = to_reference_type(arg_actual_type).base_type();
+            // a reference-to-array is represented as the ARRAY type
+            // carrying the reference bit (`ref_array`), not as a
+            // pointer -- clear it, the [expr.type]/1 adjustment again
+            arg_actual_type.remove(ID_C_reference);
             arg_actual_type.remove(ID_C_constant);
             arg_actual_type.remove(ID_C_volatile);
             if(arg_actual_type.id() == ID_array)
@@ -9149,6 +9162,12 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         typet arg_actual_type = it->type();
         if(arg_type.id() == ID_cpp_name && !is_forwarding_ref)
         {
+          // see the pack branch above: [expr.type]/1 adjustment first,
+          // so a reference-wrapped array argument still decays
+          // ([temp.deduct.call]/2)
+          if(is_reference(arg_actual_type))
+            arg_actual_type = to_reference_type(arg_actual_type).base_type();
+          arg_actual_type.remove(ID_C_reference);
           arg_actual_type.remove(ID_C_constant);
           arg_actual_type.remove(ID_C_volatile);
           if(arg_actual_type.id() == ID_array)
