@@ -6187,3 +6187,29 @@ declval<_XArgs>()... → __invoke deduction fails.  NOTE te3/base.cpp's
 shape uses declval (not A()) here — the declval-forwarding chain into
 pf::operator() is the next dig.  Kernels: iv1 CLEAN now; need a fresh
 kernel of the declval chain (iv6, round 50).
+
+## Round 50 (2026-08-18): trailing value-init; te3's silent throw isolated
+
+FIXED: [dcl.init.aggr]/5 trailing value-initialization in the CTAD
+paren-aggregate route (gate relaxed 1→≥1 data member; the round-47 map
+abort was from the UNSCOPED variant, not the padding — verified by
+canary).  CORE cpp20_ctad_aggregate_trailing_valueinit (g++/clang).
+cvise cv50 → /tmp/iv7.cpp (189 lines) now converts.  5 suites green.
+TE3 BLOCKER REMAINS — precisely characterized: anon-take::operator()'s
+conversion throws int with (a) NO message even under DBG2 passthrough,
+(b) NO instrumented bare-throw site firing, (c) no nested
+convert_function (cf-enter) and no mem-init (mi-zero) in between —
+the throw originates between counted_iterator::operator* conversion
+and the catch, i.e. inside the take_view/closure_t class-instantiation
+machinery during the `__range_adaptor_closure_t(__bind_back(...))`
+expression — an error()-adjacent throw whose message is eaten by a
+non-sfinae null-handler window (candidates: declarator-converter
+error-count games, instantiate's has_unassigned at ~3232 with
+error()-context that my scanner skips).  ROUND-51 PLAN: instrument
+error()-ADJACENT throws in cpp_instantiate_template.cpp +
+cpp_declarator_converter.cpp specifically, or bisect by wrapping
+instantiate_template with a catch-print-rethrow.
+NOTE: real <ranges> test (cpp20_ranges_basic_libcxx) blocked on
+DIFFERENT layers (atomic header noise + same_as no-match) — the pipe
+KNOWNBUG driver and the real-header test have diverged; treat
+separately when te3 clears.
