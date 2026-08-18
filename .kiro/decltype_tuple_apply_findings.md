@@ -6168,3 +6168,22 @@ __invokable_r::_Result never forms, main dies.  Root per
 with element types inside CALL/cast expressions (likely
 replace_type_pack_ref's `s = elem` on expression subs, or the gfta
 trailing-return expander).
+
+## Round 49 (2026-08-18): functional-cast-over-pack + by-value decay
+
+FIXED: (1) [expr.type.conv]+[temp.variadic]/5 — raw-type CALLEE slots
+(from expanding `A()...`) re-formed as explicit-constructor-call in
+typecheck_side_effect_function_call; iv3/iv4/iv5 kernels green, CORE
+cpp11_functional_cast_pack_alias (21-line, g++/clang).  (2)
+[expr.type]/1+[temp.deduct.call]/2 — by-value deduction strips the
+reference wrapper (incl. ref-marked ARRAY, which is_reference alone
+misses — the `ref_array` form!) before array decay, pack + scalar
+paths.  iv1 (164-line cvise) fully converts.  5 suites green.
+TE3 REMAINING LAYER: `__invoke` no-match with fargs (struct, array,
+array) inside __invokable_r<void, take, REF-ARRAY> — the top-level
+_Args binding at the CLASS level (invoke_result_t<closure,int(&)[1]>
+via operator|'s DECLARED types) keeps the ref-array; __try_call →
+declval<_XArgs>()... → __invoke deduction fails.  NOTE te3/base.cpp's
+shape uses declval (not A()) here — the declval-forwarding chain into
+pf::operator() is the next dig.  Kernels: iv1 CLEAN now; need a fresh
+kernel of the declval chain (iv6, round 50).
