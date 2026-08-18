@@ -4420,6 +4420,34 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
+  // N5008 [expr.type.conv]: a functional cast `T(args...)` whose T came
+  // from substituting a template parameter is left by template_map::
+  // apply as a function-call node whose CALLEE slot holds the RAW TYPE
+  // (`A()` with A bound to int in `decltype(F()(A()...))`, the libc++
+  // __invoke/__invokable chain under __range_adaptor_closure).  Rewrite
+  // it to the explicit-constructor-call form the rest of the type
+  // checker expects; otherwise the raw type node reaches expression
+  // type-checking and fails with "unexpected expression: signedbv".
+  if(
+    expr.function().id() != ID_cpp_name && expr.function().id() != ID_symbol &&
+    (expr.function().id() == ID_signedbv ||
+     expr.function().id() == ID_unsignedbv ||
+     expr.function().id() == ID_floatbv || expr.function().id() == ID_bool ||
+     expr.function().id() == ID_c_bool || expr.function().id() == ID_pointer ||
+     expr.function().id() == ID_struct_tag ||
+     expr.function().id() == ID_union_tag ||
+     expr.function().id() == ID_c_enum_tag))
+  {
+    exprt ctor_call("explicit-constructor-call");
+    ctor_call.type() =
+      static_cast<const typet &>(static_cast<const irept &>(expr.function()));
+    ctor_call.operands() = expr.arguments();
+    ctor_call.add_source_location() = expr.source_location();
+    expr.swap(ctor_call);
+    typecheck_expr(expr);
+    return;
+  }
+
   // For N5008 [class.inhctor.init]/1 (below): remember the NAME the call
   // was written with -- if it names class D but resolution selects an
   // INHERITED constructor (a base B's constructor made usable by a
