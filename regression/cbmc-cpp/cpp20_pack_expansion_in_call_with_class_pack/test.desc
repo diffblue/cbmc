@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ base-held bound args expansion: SUCCESS$
@@ -7,18 +7,9 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: "invalid implicit conversion from 'signed int' to 'struct
-tup'" while converting pf's constructor (the tup<B...> member's
-mem-initializer under the partial specialization's two live packs), then
-no body for the constructor and assertion FAILURE.  Runtime-verified
-with g++ and clang++.  This is the remaining blocker of
-cpp20_ranges_pipe_invoke_drop (round-55 diagnosis).
-Round-56 progress: the [temp.variadic]/5 half is FIXED (the bare
-`b...` mem-init argument now resolves to the materialised parameters).
-Remaining: initializing the pack-typed member `tup<B...> bound_` from
-that single argument needs C++20 PARENTHESIZED AGGREGATE initialization
-for a MEMBER ([dcl.init.general]/16.6.2.2) -- the existing routes cover
-CTAD casts (round 47/50) and aggregate BASES ([class.base.init]/7,
-round 43), not aggregate members, so the conversion still fails
-("invalid implicit conversion from 'signed int' to 'struct tup'").
-
+Fixed across rounds 56-57: [temp.variadic]/5 bare pack-expansion
+mem-initializer arguments resolve against the materialised parameters,
+and [dcl.init.general]/16.6.2.2 parenthesized aggregate initialization
+now covers a MEMBER of aggregate class type (previously only functional
+casts after CTAD and aggregate bases).  Runtime-verified with g++ and
+clang++.
