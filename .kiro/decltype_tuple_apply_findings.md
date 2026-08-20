@@ -6338,3 +6338,24 @@ the get<> expansion inside __bind_back_op::operator(); build the kernel
 from __bind_back_op + a base-held tuple rather than a plain member.
 Census 4 unchanged; 5 suites green (round 53 validation still current —
 no src change this round).
+
+## Round 55 (2026-08-20): fold-over-class-pack FIXED; pipe blocker kerneled
+
+Built the base-held kernel family bh1-bh6 (43→32 lines) from the
+round-54 diagnosis.  TWO distinct defects separated:
+(a) FIXED + CORE cpp20_fold_over_class_pack_in_member: the member-body
+fold expander sized packs only from replicated function params or a
+UNIQUE pack_size_map entry; a fold over the ENCLOSING CLASS pack with
+the member's own pack live matched neither → unexpanded
+`cpp_binary_fold` → body dropped.  Now sized from the pack the PATTERN
+names, per-element VALUE substitution ([expr.prim.fold]/1-2 +
+[temp.variadic]/5, empty-pack identity /3).  g++/clang verified.
+(b) NEW KNOWNBUG cpp20_pack_expansion_in_call_with_class_pack (bh3, 39
+lines, g++/clang): the CALL-ARGUMENT expansion form — `Op()(a...,
+get<Ip>(bound_)...)` with a tup<B...> member — mis-converts the
+constructor's mem-init ("invalid implicit conversion from 'signed int'
+to 'struct tup'"), dropping the ctor body.  This is the pipe's
+remaining blocker; the KNOWNBUG makes it minimal + committed (the pipe
+desc's coverage note can retire once this flips).
+5 suites green.  Census 5 (4 + the new one; net 0 since the pipe still
+needs it).
