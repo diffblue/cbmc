@@ -1554,6 +1554,56 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         if(!elems.empty())
           cpp_typecheck.template_map.type_map[pid] = elems.front();
       }
+
+      // N5008 [temp.point]/1 + [basic.scope.temp]/2: while THIS
+      // specialization is instantiated, only its own parameters (plus
+      // the enclosing class-template arguments bound above) may be
+      // substituted.  The flat template map still holds a sibling or
+      // enclosing instantiation's entries, and the short-name bridge in
+      // apply() can pick either when both spell the same parameter --
+      // for two instantiations of the SAME template (tuple<tuple<int>>
+      // containing tuple<int>, whose `_Tf`/`_Up` keys differ only by
+      // the instance prefix) no scope-distance rule can separate them.
+      // Hide the foreign same-short-name entries for the duration of
+      // this instantiation, exactly as build()'s shadow-removal loop
+      // does for the class-parameter case.  (The saved_map above
+      // restores them on the way out.)
+      if(!packs.get_sub().empty())
+      {
+        const auto short_of = [](const irep_idt &id) -> std::string
+        {
+          const std::string s2 = id2string(id);
+          const auto p2 = s2.rfind("::");
+          return p2 != std::string::npos ? s2.substr(p2 + 2) : s2;
+        };
+        std::set<irep_idt> own_ids;
+        std::set<std::string> own_shorts;
+        for(const auto &entry : packs.get_sub())
+        {
+          const irep_idt pid = entry.get(ID_identifier);
+          if(pid.empty())
+            continue;
+          own_ids.insert(pid);
+          own_shorts.insert(short_of(pid));
+        }
+        const auto shadow = [&](auto &m)
+        {
+          for(auto it = m.begin(); it != m.end();)
+          {
+            if(
+              own_ids.count(it->first) == 0 &&
+              own_shorts.count(short_of(it->first)) != 0)
+              it = m.erase(it);
+            else
+              ++it;
+          }
+        };
+        shadow(cpp_typecheck.template_map.type_map);
+        shadow(cpp_typecheck.template_map.expr_map);
+        shadow(cpp_typecheck.template_map.pack_args_map);
+        shadow(cpp_typecheck.template_map.pack_expr_map);
+        shadow(cpp_typecheck.template_map.pack_size_map);
+      }
     }
 
     const symbolt &new_symbol = cpp_typecheck.instantiate_template(
