@@ -6311,3 +6311,30 @@ Checked the two candidates from rounds 46/53:
   documented, no test, since no observable defect exists to pin.
 Census 4: ranges pipe, ranges basic, regex, kind-mismatch — all
 committed; no diagnosed problem lives only in /tmp.
+
+## Round 54 (2026-08-20): pipe blocker re-diagnosed (no src change)
+
+METHODOLOGY CORRECTION (important): with the CBMC_DBG2 sfinae
+passthrough active, SUPPRESSED probe errors print too — the
+`__tuple_leaf does not uniquely resolve` line I recorded in round 53 as
+"the next layer" is a BENIGN caught error (the base-name type probe in
+the [class.base.init]/7 lowering, sfinae-guarded).  Always confirm a
+candidate blocker by running WITHOUT the passthrough (real errors only).
+The pipe desc's round-53 status note is therefore imprecise (harmless:
+it names an error the test does emit under passthrough).
+ACTUAL pipe blocker (unsuppressed): __invoke's overload resolution
+fails with args (anon-take, ARRAY, ARRAY) inside __invokable_r at
+sfinae depth 9 — the second expansion `get<_Ip>(__bound_args_)...` in
+`invoke(__f, __args..., get<_Ip>(__bound_args_)...)` yields the VIEW
+(int(&)[1]) instead of the bound `int 3`.  So the class-level non-type
+pack `_Ip` / `__bound_args_` expansion is contaminated by the FUNCTION
+parameter pack `__args` in the same argument list.  iv8 (hand kernel of
+dual expansions incl. class-level non-type pack) PASSES, so the trigger
+needs more context (candidate: the closure's inherited-ctor/aggregate
+base path putting __bound_args_ in a base subobject, so `get` resolves
+against the base's own parameter map).
+NEXT (round 55): probe `_Ip` size + `__bound_args_`'s resolved type at
+the get<> expansion inside __bind_back_op::operator(); build the kernel
+from __bind_back_op + a base-held tuple rather than a plain member.
+Census 4 unchanged; 5 suites green (round 53 validation still current —
+no src change this round).
