@@ -6379,3 +6379,19 @@ add that route in cpp_constructor's member path (mirror the base
 branch), gated to aggregates with no viable constructor, and re-check
 the map-piecewise canary (the round-47 abort came from an unscoped
 variant of exactly this kind of routing).
+
+## Round 57 (2026-08-20): FLIP cpp20_pack_expansion_in_call_with_class_pack → CORE
+
+FIXED: [dcl.init.general]/16.6.2.2 paren-aggregate initialization of a
+MEMBER of aggregate class type — tried BEFORE constructor resolution
+(which hard-throws converting the whole list to the member type, so a
+post-hoc "if cpp_constructor returned nullopt" branch never ran: first
+attempt wasted, lesson = check whether the failing path THROWS before
+placing a fallback after it).  Gated: aggregates only
+([dcl.init.aggr]/1) + single same/derived-type operand stays
+copy-initialization (/16.6.1).  bh1+bh3 green, 5 suites green,
+map-piecewise canary green.
+Pipe (te3) STILL drops main — next error to be read at round 58 (the
+grep in this round hit only preprocessor noise; re-run with the
+non-noise filter).
+Census 4: ranges pipe, ranges basic, regex, kind-mismatch.
