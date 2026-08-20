@@ -1903,6 +1903,80 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
 
   const cpp_namet &member = to_cpp_name(code.find(ID_member));
 
+  // N5008 [temp.variadic]/5: a mem-initializer argument that is a bare
+  // pack expansion of a FUNCTION parameter pack (`bound_(b...)`) stands
+  // for one argument per pack element.  When the enclosing constructor
+  // belongs to a partial specialization whose pack supplies the
+  // parameters, typecheck_compound_declarator has already materialised
+  // them -- replicated as `b$0..b$N-1` for N >= 2, or kept under the
+  // plain name for a single element -- so resolve the expansion against
+  // those parameters here.  Left unresolved, the still-ellipsis-marked
+  // reference resolves to nil and the member is initialized from
+  // nothing ("invalid implicit conversion from '' to 'struct tup'",
+  // the libc++ __perfect_forward bound-args shape), dropping the body.
+  {
+    exprt::operandst new_ops;
+    bool changed = false;
+    for(const auto &op : as_const(code).operands())
+    {
+      const bool bare_pack_ref =
+        op.id() == ID_cpp_name && op.get_bool(ID_ellipsis) &&
+        op.get_sub().size() == 1 && op.get_sub().front().id() == ID_name;
+      if(!bare_pack_ref)
+      {
+        new_ops.push_back(op);
+        continue;
+      }
+      const std::string base =
+        id2string(op.get_sub().front().get(ID_identifier));
+      // collect replicated parameters base$0.. in order, or the plain one
+      std::vector<irep_idt> repl;
+      bool plain = false;
+      for(const auto *id_ptr : cpp_scopes.current_scope().lookup(
+            irep_idt{base}, cpp_scopet::RECURSIVE))
+      {
+        if(id_ptr->id_class == cpp_idt::id_classt::SYMBOL)
+          plain = true;
+      }
+      if(!plain)
+      {
+        for(std::size_t k = 0;; ++k)
+        {
+          const irep_idt cand{base + "$" + std::to_string(k)};
+          bool found = false;
+          for(const auto *id_ptr :
+              cpp_scopes.current_scope().lookup(cand, cpp_scopet::RECURSIVE))
+            if(id_ptr->id_class == cpp_idt::id_classt::SYMBOL)
+              found = true;
+          if(!found)
+            break;
+          repl.push_back(cand);
+        }
+      }
+      if(plain)
+      {
+        exprt one = op; // single element: the pattern itself
+        one.remove(ID_ellipsis);
+        new_ops.push_back(one);
+        changed = true;
+      }
+      else if(!repl.empty())
+      {
+        for(const auto &r : repl)
+        {
+          cpp_namet nm{r, op.source_location()};
+          exprt e = static_cast<const exprt &>(static_cast<irept &>(nm));
+          new_ops.push_back(e);
+        }
+        changed = true;
+      }
+      else
+        new_ops.push_back(op); // leave to the existing machinery
+    }
+    if(changed)
+      code.operands() = new_ops;
+  }
+
   // Let's first typecheck the operands.
   Forall_operands(it, code)
   {
