@@ -6359,3 +6359,23 @@ remaining blocker; the KNOWNBUG makes it minimal + committed (the pipe
 desc's coverage note can retire once this flips).
 5 suites green.  Census 5 (4 + the new one; net 0 since the pipe still
 needs it).
+
+## Round 56 (2026-08-20): mem-init pack expansion FIXED; member paren-aggregate next
+
+FIXED (committed): [temp.variadic]/5 bare pack-expansion mem-init args
+resolve against the materialised parameters (plain name for 1 element,
+`b$k` for N>=2).  Diagnosis chain: conv-fail probe showed from=NIL →
+mi-entry probe showed the operand is a bare cpp_name with ellipsis=1
+STILL SET → the scope lookup finds the plain parameter `b`, so the
+one-element expansion just needed the ellipsis stripped.
+5 suites green.
+REMAINING (KNOWNBUG desc updated): `tup<B...> bound_` initialized from
+the single resolved argument needs C++20 paren-aggregate init for a
+MEMBER ([dcl.init.general]/16.6.2.2).  Existing coverage: CTAD casts
+(rounds 47/50) + aggregate BASES ([class.base.init]/7, round 43);
+MEMBERS of aggregate class type with a paren list are not routed, so
+implicit conversion int→tup<int> is attempted and fails.  Round 57:
+add that route in cpp_constructor's member path (mirror the base
+branch), gated to aggregates with no viable constructor, and re-check
+the map-piecewise canary (the round-47 abort came from an unscoped
+variant of exactly this kind of routing).
