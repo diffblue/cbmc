@@ -520,6 +520,115 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
             single_by_param = matches == 1;
           }
         }
+        // N5008 [expr.prim.fold]/1: the fold's pack is the one its PATTERN
+        // names -- size it from that pack's own binding instead of
+        // requiring a replicated function parameter or a unique
+        // pack_size_map entry.  This covers a fold over the ENCLOSING
+        // CLASS template's pack inside a member function template that has
+        // its own pack (`(0 + ... + get<_Ip>(bound_))` in libc++'s
+        // __bind_back_op / __perfect_forward shape): both packs are live,
+        // so neither gate above fires and the fold was left unexpanded --
+        // "unexpected expression: cpp_binary_fold", body dropped.
+        bool by_named_pack = false;
+        std::size_t named_pack_n = 0;
+        std::vector<exprt> named_pack_vals;
+        std::string named_pack_short;
+        if(!single_by_param && !have_low_size)
+        {
+          const auto short_of = [](const irep_idt &id) -> std::string
+          {
+            const std::string s2 = id2string(id);
+            const auto q = s2.rfind("::");
+            return q != std::string::npos ? s2.substr(q + 2) : s2;
+          };
+          std::function<void(const irept &, std::set<std::string> &)> names =
+            [&](const irept &n, std::set<std::string> &out)
+          {
+            if(n.id() == ID_name && !n.get(ID_identifier).empty())
+              out.insert(id2string(n.get(ID_identifier)));
+            for(const auto &sn : n.get_sub())
+              names(sn, out);
+            for(const auto &ns : n.get_named_sub())
+              names(ns.second, out);
+          };
+          std::set<std::string> pat_names;
+          names(pat, pat_names);
+          for(const auto &ps : template_map.pack_size_map)
+          {
+            const std::string sh = short_of(ps.first);
+            if(pat_names.count(sh) == 0)
+              continue;
+            by_named_pack = true;
+            named_pack_n = ps.second;
+            named_pack_short = sh;
+            const auto pe = template_map.pack_expr_map.find(ps.first);
+            if(pe != template_map.pack_expr_map.end())
+              named_pack_vals = pe->second;
+            break;
+          }
+        }
+        if(by_named_pack && named_pack_n >= 1)
+        {
+          // Build the associated tree, substituting the k-th VALUE of the
+          // named non-type pack into each pattern copy
+          // ([temp.variadic]/5).
+          auto elem = [&](std::size_t k) -> irept
+          {
+            irept c = pat;
+            if(k < named_pack_vals.size())
+              replace_value_pack_ref(c, named_pack_short, named_pack_vals[k]);
+            reduce_folds(c);
+            return c;
+          };
+          if(is_binary)
+          {
+            reduce_folds(init_expr);
+            irept result = init_expr;
+            for(std::size_t k = 0; k < named_pack_n; ++k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(elem(k));
+              result = bin;
+            }
+            node = result;
+            return;
+          }
+          irept result = elem(0);
+          if(is_left)
+          {
+            for(std::size_t k = 1; k < named_pack_n; ++k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(elem(k));
+              result = bin;
+            }
+          }
+          else
+          {
+            for(std::size_t k = named_pack_n; k-- > 1;)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(elem(k - 1));
+              bin.get_sub().push_back(result);
+              result = bin;
+            }
+          }
+          node = result;
+          return;
+        }
+        if(by_named_pack && named_pack_n == 0)
+        {
+          if(is_binary)
+          {
+            reduce_folds(init_expr);
+            node = init_expr;
+          }
+          else
+            node = identity_for(fold_op);
+          return;
+        }
         if(single_by_param || have_low_size)
         {
           const std::size_t n_elems =
