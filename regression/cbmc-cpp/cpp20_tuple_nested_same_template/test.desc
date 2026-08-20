@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp20 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ converting elem: SUCCESS$
@@ -7,9 +7,8 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: "no body for callee std::tuple<int>::tuple(this,int)" and
-assertion FAILURE.  The structural fix is exact scope-qualified
-parameter resolution in template_mapt::apply (violation V1,
-doc/architectural/cpp-frontend-review-2026-06-24-template-map-scope.md);
-deduction_parameters preference (round 45) covers only the
-deduction-side window.  Kernel runtime-verified with clang++.
+Fixed in round 53 (the V1/V2 arc's first correctness increment): while a
+specialization is instantiated, a sibling/enclosing instantiation's
+same-spelled parameter bindings are hidden ([temp.point]/1 +
+[basic.scope.temp]/2), so apply()'s short-name bridge cannot pick the
+wrong instance's binding.  Kernel runtime-verified with clang++.
