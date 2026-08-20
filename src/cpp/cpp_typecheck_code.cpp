@@ -2580,8 +2580,98 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             wrapped_ops.push_back(already_typechecked_exprt{op});
         }
 
+        // N5008 [dcl.init.general]/16.6.2.2 (C++20 parenthesized
+        // aggregate initialization): a MEMBER of aggregate class type
+        // initialized with a parenthesized expression-list and no
+        // viable constructor is initialized element-wise, as the braced
+        // form ([dcl.init.aggr]/3).  Try that BEFORE constructor
+        // resolution, which otherwise hard-errors converting the whole
+        // list to the member's type ("invalid implicit conversion from
+        // 'signed int' to 'struct tup'" -- the libc++
+        // __perfect_forward bound-args member).  Restricted to
+        // aggregates ([dcl.init.aggr]/1: no user-declared constructor)
+        // and skipped for a single same/derived-type operand, which is
+        // copy-initialization ([dcl.init.general]/16.6.1).
+        std::optional<codet> agg_call;
+        if(!wrapped_ops.empty())
+        {
+          exprt &inner_a =
+            symbol_expr.id() == ID_already_typechecked
+              ? to_already_typechecked_expr(symbol_expr).get_expr()
+              : symbol_expr;
+          if(inner_a.type().id() == ID_struct_tag)
+          {
+            const struct_typet &mt =
+              follow_tag(to_struct_tag_type(inner_a.type()));
+            bool has_user_ctor = mt.get_bool("has_template_constructor") ||
+                                 mt.get_bool("has_inherited_constructor");
+            for(const auto &c : mt.components())
+            {
+              if(
+                c.type().id() == ID_code && !c.get_bool(ID_from_base) &&
+                to_code_type(c.type()).return_type().id() == ID_constructor &&
+                !c.type().get_bool("#is_implicit_ctor"))
+              {
+                has_user_ctor = true;
+                break;
+              }
+            }
+            bool copyish = false;
+            if(wrapped_ops.size() == 1)
+            {
+              const exprt &op0 =
+                wrapped_ops.front().id() == ID_already_typechecked
+                  ? to_already_typechecked_expr(wrapped_ops.front()).get_expr()
+                  : wrapped_ops.front();
+              typet ot = op0.type();
+              if(is_reference(ot))
+                ot = to_reference_type(ot).base_type();
+              if(
+                ot.id() == ID_struct_tag &&
+                (to_struct_tag_type(ot).get_identifier() ==
+                   to_struct_tag_type(inner_a.type()).get_identifier() ||
+                 subtype_typecast(follow_tag(to_struct_tag_type(ot)), mt)))
+                copyish = true;
+            }
+            if(!has_user_ctor && !copyish)
+            {
+              exprt init_list{ID_initializer_list};
+              init_list.operands() = wrapped_ops;
+              init_list.add_source_location() = code.source_location();
+              const typet member_type = inner_a.type();
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
+              std::optional<exprt> agg;
+              try
+              {
+                agg = braced_return_aggregate_value(member_type, init_list);
+              }
+              catch(...)
+              {
+                agg.reset();
+              }
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              if(agg.has_value())
+              {
+                exprt member_lval = inner_a;
+                member_lval.type().set(ID_C_constant, false);
+                member_lval.set(ID_C_lvalue, true);
+                side_effect_expr_assignt assign(
+                  member_lval, *agg, typet(), code.source_location());
+                typecheck_side_effect_assignment(assign);
+                code_expressiont expr_code(assign);
+                expr_code.add_source_location() = code.source_location();
+                agg_call = expr_code;
+              }
+            }
+          }
+        }
+
         auto call =
-          cpp_constructor(code.source_location(), symbol_expr, wrapped_ops);
+          agg_call.has_value()
+            ? agg_call
+            : cpp_constructor(code.source_location(), symbol_expr, wrapped_ops);
 
         if(call.has_value())
           code.swap(call.value());
