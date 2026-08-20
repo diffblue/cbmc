@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ base-held bound args expansion: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "invalid implicit conversion from 'signed int' to 'struct
+tup'" while converting pf's constructor (the tup<B...> member's
+mem-initializer under the partial specialization's two live packs), then
+no body for the constructor and assertion FAILURE.  Runtime-verified
+with g++ and clang++.  This is the remaining blocker of
+cpp20_ranges_pipe_invoke_drop (round-55 diagnosis).
