@@ -6294,3 +6294,20 @@ does not apply there).  Next increment: extend isolation to
 synthesized-member conversion (or hide by the CLASS's own parameter
 ids at convert_function entry for template instances).
 Census 4: ranges pipe, ranges basic, regex, kind-mismatch.
+
+## Round 53b (2026-08-20): coverage audit #6
+
+Checked the two candidates from rounds 46/53:
+- SYNTHESIZED-member V2 collision (te3/pipe's current layer,
+  `__tuple_leaf does not uniquely resolve` in __tuple_impl's implicit
+  copy ctor): hand kernel sy1 (same-template nesting + synthesized copy
+  through leaf bases) VERIFIES CORRECTLY — not standalone-reproducible;
+  VERIFIED interior to the committed KNOWNBUG cpp20_ranges_pipe_invoke_
+  drop (its main.cpp emits exactly that error).  Desc updated to record
+  it as that test's coverage.
+- [class.default.ctor]/4 eager implicit-default-ctor synthesis (round-46
+  note): latent hazard, still no reachable trigger (contained by the
+  drain's recovery); same treatment as the round-38 lambda hazard —
+  documented, no test, since no observable defect exists to pin.
+Census 4: ranges pipe, ranges basic, regex, kind-mismatch — all
+committed; no diagnosed problem lives only in /tmp.

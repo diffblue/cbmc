@@ -30,3 +30,10 @@ the FATAL throw is deeper (guess_function_template_args ->
 resolve_template_alias -> instantiate -> silent resolve failure),
 interleaved with a dozen recoverable throws.  Needs a dedicated
 session with a throw-index-based bisection harness.
+Round-53 status: blocked on the V2 same-template isolation at
+SYNTHESIZED members -- `__tuple_leaf does not uniquely resolve` while
+converting __tuple_impl's implicit copy constructor (no #deduced_packs
+to replay there, so the round-53 shadow hook does not cover it).  Not
+standalone-reproducible by hand (a same-template-nested synthesized
+copy without the tuple machinery verifies correctly), so this test is
+the coverage for that layer.
