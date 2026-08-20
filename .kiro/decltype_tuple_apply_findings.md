@@ -6271,3 +6271,26 @@ suffix matching in template_mapt apply/build) is now the campaign's
 single highest-value target: it unlocks the pipe KNOWNBUG + the V1
 KNOWNBUG together.  Round 53 = the V1 arc (its own multi-round effort;
 design in doc/architectural/cpp-frontend-review-2026-06-24-*.md).
+
+## Round 53 (2026-08-20): FLIP cpp20_tuple_nested_same_template → CORE (V2 increment)
+
+Read the V1 doc FIRST — it recorded increments 1-2 (nearest-scope
+disambiguation DONE; bridge removal proven non-viable, deferred for
+lack of a driving test).  Our new KNOWNBUGs supply that test, and our
+shape is pure V2 (same template nested: keys differ only by instance
+prefix, so no scope-distance rule helps).
+FIXED: at the pseudo-instance → real-instantiation rebuild, hide
+foreign same-short-name bindings ([temp.point]/1 + [basic.scope.temp]/2)
+while replaying #deduced_packs; saved_map restores on exit.  Kernel
+wrong-code → SUCCESS; 5 suites green; doc updated with Increment 3.
+DIAGNOSIS TOOLING that cracked it: RAII uncaught_exceptions() tracers +
+resolve-sequence stamping (correlate "which resolve failed" with "which
+candidates it was offered") — the failing resolve was offered ONLY the
+outer signature.
+TE3 (ranges pipe) STILL DROPS: same class, next site — "__tuple_leaf
+does not uniquely resolve" inside __tuple_impl's COPY ctor conversion
+(a synthesized member, so no #deduced_packs to replay: the shadow hook
+does not apply there).  Next increment: extend isolation to
+synthesized-member conversion (or hide by the CLASS's own parameter
+ids at convert_function entry for template instances).
+Census 4: ranges pipe, ranges basic, regex, kind-mismatch.

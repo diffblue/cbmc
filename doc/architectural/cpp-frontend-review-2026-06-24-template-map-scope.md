@@ -346,3 +346,30 @@ change that moves a site from short-name to exact-id resolution is progress
 toward V1's removal.  Do not add new short-name fallbacks; if a reference cannot
 be resolved by exact id, the fix is to attach the scoped id upstream
 ([temp.res]), not to scan by spelling.
+
+### Increment 3 (2026-08-20): V2 isolation at the rebuild step — DONE
+
+The deferred V2 rework finally acquired its **driving correctness test**:
+`cpp20_tuple_nested_same_template` (constructing `tuple<tuple<int>>` from a
+converting `int`) was wrong-code — the inner `tuple<int>` constructor's body
+was silently dropped.
+
+Diagnosis (RAII `uncaught_exceptions()` exit tracers on `instantiate_template`
+and `resolve`, plus resolve-sequence stamping): deduction, signature
+substitution and the returned pseudo-instance are all CORRECT; the candidate
+signature is then **re-type-checked after the deduction map has unwound**, and
+apply()'s short-name bridge binds `_Tf` to the **outer** instantiation's value
+(`__tuple_types<tuple<int>>` instead of `__tuple_types<int>`).  Two
+instantiations of the *same* template have keys differing only by instance
+prefix, so Increment 1's nearest-scope rule cannot separate them — this is
+exactly the V2 gap.
+
+Fix (`cpp_typecheck_resolve.cpp`, the `#deduced_packs` replay before the real
+instantiation): hide foreign entries whose SHORT name matches one of this
+instantiation's own pack parameters, mirroring `build()`'s shadow-removal loop.
+`cpp_saved_template_mapt` restores them on exit.  All five suites green;
+KNOWNBUG flipped to CORE.
+
+This is the isolation principle of the planned frame stack applied at one
+step, with a test driving it.  The full frame-stack rework remains the
+end state; each further step should likewise be driven by a failing test.
