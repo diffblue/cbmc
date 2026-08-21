@@ -6469,3 +6469,31 @@ base_name=="take_view" (which sub-call throws: typecheck_template_args,
 deduce_class_template_arguments, elaborate_class_template, or the
 constraint check), then kernel that specific sub-path.
 Census 4; tree clean; suites green from round 57.
+
+## Round 60 (2026-08-21): take_view's throw site narrowed by elimination
+
+Probe campaign on the committed 168-line artifact (sd1), all with RAII
+uncaught_exceptions() tracers, definitive ORDERING (innermost first):
+  X-res take_view  ← FIRST, then __invoke, __try_call, _Result,
+  X-targs enable_if (downstream), enable_if, type, invoke_result_t,
+  invoke, operator() ...
+ELIMINATED as the origin of take_view's throw:
+- typecheck_template_args (traced; fires only later, for enable_if)
+- elaborate_class_template (traced; never fires)
+- deduce_class_template_arguments (traced; never fires)
+- instantiate_template (traced; never fires for take_view)
+- ALL 13 message-less `throw 0` sites in cpp_typecheck_resolve.cpp
+  (each instrumented; none fires before X-res take_view)
+- resolve's all-templates SFINAE throw with base_name=="take_view"
+  (targeted probe; never fires)
+So the exception enters resolve(take_view) from a DEEPER callee, and it
+may not be `int` at all (candidates: a std::string throw like the
+round-39 type2name escape, or a throw from typecheck_type /
+implicit_typecast / constant folding).
+FAILED TECHNIQUE (do not repeat): identifying the type by
+std::rethrow_exception(std::current_exception()) inside the RAII
+destructor — crashes (rethrow during unwinding).  SAFE alternative for
+round 61: wrap the resolve CALL SITE (typecheck_expr's cpp_name path)
+in try / catch-by-type (int, std::string, const char*, std::exception,
+...) that PRINTS and RETHROWS; no destructor involved.
+Census 4; tree clean; suites green from round 57.
