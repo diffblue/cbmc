@@ -1,3 +1,43 @@
+# CBMC 6.11.0
+
+This release adds support for anonymous struct embedding via -fms-extensions
+(via #9022), extends the in-tree SMT2 solver with mathematical and string/regex
+types and operations (via #9074), and fixes various front-end and encoding bugs.
+Docker images are now published to GitHub Container Registry instead of Docker
+Hub (via #9143).
+
+## What's Changed
+* Support anonymous struct embedding via -fms-extensions by @chaosape in https://github.com/diffblue/cbmc/pull/9022
+* SMT2: encode mathematical and string/regex types and operations by @tautschnig in https://github.com/diffblue/cbmc/pull/9074
+* Deploy docker images to GHCR instead of Docker Hub by @ThomasPerkins1123 in https://github.com/diffblue/cbmc/pull/9143
+
+## Bug Fixes
+* goto-diff: add missing break in output_functions UI switch by @tautschnig in https://github.com/diffblue/cbmc/pull/9084
+* loop_ids: wrap JSON_UI case body in a block by @tautschnig in https://github.com/diffblue/cbmc/pull/9085
+* ansi-c: treat a constant compound literal as a compile-time constant by @tautschnig in https://github.com/diffblue/cbmc/pull/9047
+* Fix extractbits invariant for non-byte-aligned bitfields by @tautschnig in https://github.com/diffblue/cbmc/pull/8860
+* build(deps): bump actions/cache from 5 to 6 by @dependabot[bot] in https://github.com/diffblue/cbmc/pull/9092
+* Fix crash in --show-global-may-alias on OTHER instructions by @tautschnig in https://github.com/diffblue/cbmc/pull/8876
+* remove `case_exprt` by @kroening in https://github.com/diffblue/cbmc/pull/9093
+* cmdlinet: add set(char, string) for single-char options by @kroening in https://github.com/diffblue/cbmc/pull/9096
+* fix(docs): typo in short tutorial link by @Th0rOnDoR in https://github.com/diffblue/cbmc/pull/9105
+* Remove dead Slack notifications from the release workflows by @tautschnig in https://github.com/diffblue/cbmc/pull/9107
+* Remove the redundant homebrew-pr release job by @tautschnig in https://github.com/diffblue/cbmc/pull/9108
+* Fix Markdown syntax by @mernst in https://github.com/diffblue/cbmc/pull/9109
+* Make sorting deterministic by @mernst in https://github.com/diffblue/cbmc/pull/9110
+* DFCC: complete bodiless declarations when loading the contracts library by @tautschnig in https://github.com/diffblue/cbmc/pull/9117
+* Record function argument evaluation order in configt::ansi_ct by @tautschnig in https://github.com/diffblue/cbmc/pull/9120
+* cprover: treat the __CPROVER_allocate side effect like malloc by @tautschnig in https://github.com/diffblue/cbmc/pull/9079
+* SMT2: tolerate non-constant array indices when parsing array models by @tautschnig in https://github.com/diffblue/cbmc/pull/9063
+* Set signedness of "char *" casts to avoid cross-platform differences. by @rod-chapman in https://github.com/diffblue/cbmc/pull/9081
+* Abort on self-aliased operands in BigInt compound assignments by @tautschnig in https://github.com/diffblue/cbmc/pull/9122
+* ansi-c: support qualified __auto_type by @tautschnig in https://github.com/diffblue/cbmc/pull/9053
+* file_converter: emit a character-array initialiser by @tautschnig in https://github.com/diffblue/cbmc/pull/9041
+* Fix long double width on FreeBSD/PowerPC by @pkubaj in https://github.com/diffblue/cbmc/pull/9148
+* docs: require Java 8 as the active JDK by @tomatotomata in https://github.com/diffblue/cbmc/pull/9142
+
+**Full Changelog**: https://github.com/diffblue/cbmc/compare/cbmc-6.10.0...cbmc-6.11.0
+
 # CBMC 6.10.0
 
 This release includes a workaround for a Z3 unsoundness in prior releases of Z3
