@@ -6441,3 +6441,31 @@ Also confirmed unchanged: the drop itself is silent (no message), so
 the pipe test remains the only carrier of that layer too.
 Census 4, all committed: ranges pipe, ranges basic, regex,
 kind-mismatch.  Nothing diagnosed lives only in /tmp.
+
+## Round 59 (2026-08-21): mechanical reduction + innermost frame identified
+
+MECHANICAL PLAN EXECUTED: cvise with an OUTPUT-ORDERING criterion (main's
+drop must appear with NO error line before it; post-main noise allowed)
+→ 168 lines, saved as .kiro/reductions/ranges_pipe_sd1_168lines.cpp.
+ABLATION: replacing the whole tuple machinery with a trivial holder KEEPS
+the silent drop → tuple/__tuple_impl is NOT required (retires that whole
+line of investigation).  Hand-repairing the ablated file to satisfy the
+clang gate failed (the SFINAE chain needs get<>'s real return shape), so
+sd1 remains the artifact.
+INNERMOST THROWING FRAME (RAII uncaught_exceptions tracers on resolve +
+instantiate_template): `X-res take_view` — i.e. resolving take_view (the
+CTAD/guide path inside anon-take::operator()) throws FIRST; __invoke /
+__try_call / _Result / enable_if::type / invoke_result_t / invoke are all
+DOWNSTREAM consequences.  Rounds 52/54/58 were reading those downstream
+frames.
+KERNEL tv1 (guide-based CTAD, array-ref argument, dependent-alias second
+member) PASSES → the throw needs more than the guide shape; next
+suspects inside resolve(take_view): the `view`/`viewable_range` CONCEPT
+constraint on take_view's parameter (sd1 keeps concepts), or
+tuple_size_v/enable_view evaluation during the guide's return-type
+instantiation.
+NEXT (round 60): instrument resolve() to print the throw ORIGIN for
+base_name=="take_view" (which sub-call throws: typecheck_template_args,
+deduce_class_template_arguments, elaborate_class_template, or the
+constraint check), then kernel that specific sub-path.
+Census 4; tree clean; suites green from round 57.
