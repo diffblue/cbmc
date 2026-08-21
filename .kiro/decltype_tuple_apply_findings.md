@@ -6395,3 +6395,29 @@ Pipe (te3) STILL drops main — next error to be read at round 58 (the
 grep in this round hit only preprocessor noise; re-run with the
 non-noise filter).
 Census 4: ranges pipe, ranges basic, regex, kind-mismatch.
+
+## Round 58 (2026-08-21): pipe blocker re-scoped (diagnosis round, no src change)
+
+RED HERRING RETIRED: the `__tuple_impl` no-match now appears AFTER main's
+drop in the output (line 71 vs 16) — it is the POST-main wave (the
+never-odr-used empty-pack default construction, the [class.default.ctor]/4
+hazard from round 46), NOT main's killer.  LESSON: order the diagnostic
+output (grep -n) before attributing a failure to an error message.
+main dies SILENTLY inside the invoke_result_t/__invoke_of chain (only the
+instantiation stack prints).
+KERNELS BUILT (all PASS, ruling their shapes out): bh7 = bh1 + trailing-
+return decltype with both expansions; bh8 = bh7 + a full
+__invoke/invokable_r/invoke SFINAE chain routed through the closure.
+So the remaining trigger needs something none of bh1/bh3/bh6/bh7/bh8 nor
+iv1-iv8 has: candidates (in order of suspicion) — the hidden-friend
+operator| with concept-constrained parameters (viewable_range /
+_RangeAdaptorClosure) driving the SFINAE, tuple_size_v/tuple_element
+recursion inside __bind_back_t's base computation, or the
+counted_iterator/take_view layer instantiated during the same
+expression.
+NEXT (round 59): bisect te3 downward with cvise using a criterion that
+requires main to DROOP with NO error message before it (i.e. grep -n
+ordering: 'could not fully' appears before any 'no match'), which
+targets the silent throw directly instead of the post-main noise that
+misled rounds 53/58.
+Census 4 unchanged; 5 suites green (round 57 validation current).
