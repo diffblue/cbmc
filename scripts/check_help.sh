@@ -74,6 +74,7 @@ for t in  \
         -all-claims -all-properties -claim -show-claims \
         -document-subgoals \
         -no-propagation -no-simplify -no-simplify-if \
+        -no-if-conversion \
         -floatbv -no-unwinding-assertions \
         -slice-by-trace ; do
         echo "$undoc" >> help_string

@@ -40,6 +40,7 @@ class optionst;
   "(no-simplify)(full-slice)" \
   OPT_REACHABILITY_SLICER \
   "(no-propagation)(no-simplify-if)" \
+  "(no-if-conversion)" \
   "(document-subgoals)(test-preprocessor)" \
   "(show-array-constraints)"  \
   OPT_CONFIG_C_CPP \
