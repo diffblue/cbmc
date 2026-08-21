@@ -450,7 +450,7 @@ void show_compact_goto_trace(
 
     case goto_trace_stept::typet::FUNCTION_CALL:
       // downwards arrow
-      out << '\n' << messaget::faint << u8"\u21b3" << messaget::reset << ' ';
+      out << '\n' << messaget::faint << "\u21b3" << messaget::reset << ' ';
       if(!step.pc->source_location().get_file().empty())
       {
         out << messaget::faint << step.pc->source_location().get_file();
@@ -485,7 +485,7 @@ void show_compact_goto_trace(
 
     case goto_trace_stept::typet::FUNCTION_RETURN:
       // upwards arrow
-      out << messaget::faint << u8"\u21b5" << messaget::reset << '\n';
+      out << messaget::faint << "\u21b5" << messaget::reset << '\n';
       break;
 
     case goto_trace_stept::typet::ASSUME:

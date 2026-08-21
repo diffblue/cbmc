@@ -21,7 +21,7 @@ void format_hooks()
     ID_object_address,
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
       const auto &object_address_expr = to_object_address_expr(expr);
-      os << u8"\u275d" << object_address_expr.object_identifier() << u8"\u275e";
+      os << "\u275d" << object_address_expr.object_identifier() << "\u275e";
       return os;
     });
 
@@ -53,8 +53,8 @@ void format_hooks()
     ID_field_address,
     [](std::ostream &os, const exprt &expr) -> std::ostream & {
       const auto &field_address_expr = to_field_address_expr(expr);
-      os << format(field_address_expr.base()) << u8".\u275d"
-         << field_address_expr.component_name() << u8"\u275e";
+      os << format(field_address_expr.base()) << ".\u275d"
+         << field_address_expr.component_name() << "\u275e";
       return os;
     });
 
