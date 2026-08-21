@@ -73,11 +73,14 @@ class symbol_table_baset;
     " {y--round-to-plus-inf} \t rounding towards plus infinity\n"              \
     " {y--round-to-minus-inf} \t rounding towards minus infinity\n"            \
     " {y--round-to-zero} \t rounding towards zero\n"                           \
-    " {y--no-library} \t disable built-in abstract C library\n"
+    " {y--no-library} \t disable built-in abstract C library\n"                \
+    " {y--evaluation-order-check} \t "                                         \
+    "assert that expression values are independent of evaluation order\n"
 
 #define OPT_CONFIG_LIBRARY                                                     \
   "(malloc-fail-assert)(malloc-fail-null)(malloc-may-fail)"                    \
   "(no-malloc-may-fail)"                                                       \
+  "(evaluation-order-check)"                                                   \
   "(string-abstraction)"                                                       \
   "(dfcc-debug-lib)"                                                           \
   "(dfcc-simple-invalid-pointer-model)"
@@ -234,9 +237,14 @@ public:
     endiannesst endianness;
 
     // Order in which compilers evaluate the arguments of a function call.
-    // The C and C++ standards leave this order unspecified, but any given
-    // compiler/architecture combination uses a fixed order, which is
-    // observable when argument expressions have side effects. Empirically
+    // The C and C++ standards leave this order unspecified, and (unlike for
+    // implementation-defined behaviour) no compiler documents or guarantees
+    // a particular choice: per C11 3.4.4 the choice need not even be
+    // consistent between two call sites in one program. The values below
+    // describe the order the supported compilers have been OBSERVED to use,
+    // which is observable when argument expressions have side effects; use
+    // --evaluation-order-check to verify that a program's behaviour does not
+    // depend on such choices. Empirically
     // confirmed (test programs on native and cross-compiled targets, and
     // via Compiler Explorer): GCC evaluates right-to-left on the x86 family
     // (i386, x86_64, x32) and left-to-right on all other architectures
@@ -250,6 +258,13 @@ public:
       RIGHT_TO_LEFT
     };
     argument_evaluation_ordert argument_evaluation_order;
+
+    // Emit assertions during goto conversion that the value of each full
+    // expression is independent of the evaluation order that the C and C++
+    // standards leave unspecified. When these assertions hold, the fixed
+    // evaluation order used by goto conversion covers all behaviours that a
+    // conforming compiler may produce for the given expression.
+    bool evaluation_order_check = false;
 
     // whether the architecture set via one of the set_arch_spec_* functions
     // is a member of the x86 family (i386, x86_64, x32); used to compute
