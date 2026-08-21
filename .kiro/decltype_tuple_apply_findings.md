@@ -6421,3 +6421,23 @@ ordering: 'could not fully' appears before any 'no match'), which
 targets the silent throw directly instead of the post-main noise that
 misled rounds 53/58.
 Census 4 unchanged; 5 suites green (round 57 validation current).
+
+## Round 58b (2026-08-21): coverage audit #7
+
+STATUS CHANGE checked: the [class.default.ctor]/4 hazard (round 46,
+recorded then as "latent, no reachable trigger") is now KNOWN TO FIRE —
+round 58 showed the post-main wave instantiating a never-odr-used
+empty-pack construction and emitting `no match for symbol
+'__tuple_impl'` where a conforming compiler is silent.  So it is a
+problem we are aware of, and it needed a coverage decision.
+Two hand kernels attempted and BOTH VERIFY CLEAN (no spurious
+instantiation): dc1 (inheriting-ctor closure over a base whose variadic
+ctor is ill-formed when empty) and dc2 (two-base aggregate closure
+built by aggregate initialization — te3's shape).  So it is not
+standalone-reproducible; it is interior to KNOWNBUG
+cpp20_ranges_pipe_invoke_drop, whose desc already records the
+post-main wave (round-58 note).  No new test.
+Also confirmed unchanged: the drop itself is silent (no message), so
+the pipe test remains the only carrier of that layer too.
+Census 4, all committed: ranges pipe, ranges basic, regex,
+kind-mismatch.  Nothing diagnosed lives only in /tmp.
