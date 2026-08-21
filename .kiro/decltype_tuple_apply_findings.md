@@ -6497,3 +6497,34 @@ round 61: wrap the resolve CALL SITE (typecheck_expr's cpp_name path)
 in try / catch-by-type (int, std::string, const char*, std::exception,
 ...) that PRINTS and RETHROWS; no destructor involved.
 Census 4; tree clean; suites green from round 57.
+
+## Round 61 (2026-08-21): the 168-line artifact was DEGENERATE — criterion fixed
+
+Chased take_view's throw to its site by instrumenting EVERY `throw 0`
+(346 sites outside resolve.cpp + 43 inside): the firing site is
+resolve.cpp's disambiguation error+throw, and with the sfinae
+passthrough its message reads:
+  "symbol 'take_view' does not uniquely resolve:
+     constructor struct ranges::take_view ()
+     constructor struct ranges::take_view (struct ranges::take_view)"
+at sd1.cpp:159 — whose text is `take_view;` INSIDE a member function.
+cvise had rewritten the driver so that a bare class name appears as a
+statement.  That is an EMPTY DECLARATION ([dcl.dcl]/3: a
+simple-declaration with no declarator is ill-formed unless it declares a
+class/enum): clang only WARNS (-Wmissing-declarations), g++ ERRORS
+(-fpermissive).  So CBMC's diagnosis is CONFORMING and the artifact is
+INVALID — sd1 (and by extension the round-59/60 "innermost frame"
+conclusions about take_view) is a degenerate harvest, not the pipe bug.
+CRITERION FIX (the actual deliverable): the reduction gate must require
+BOTH compilers to accept with NO warnings —
+  clang++ -std=c++20 -Werror -fsyntax-only  AND
+  g++     -std=c++20 -Werror -fsyntax-only
+in addition to the runtime gate and the output-ordering rule.  My cvise
+notes already warned about degenerate harvests; the warning-free gate is
+the concrete guard and must be in every future criterion.
+STATUS: rounds 59-61's take_view line of investigation is RETIRED.  The
+genuine pipe blocker is still the silent main-drop in te3/the committed
+KNOWNBUG; sd1 must be re-reduced under the corrected gate (round 62).
+Kept: the ablation result from round 59 (tuple machinery NOT required)
+is independent of the degenerate statement and still stands.
+Census 4; tree clean (all probes reverted); suites green from round 57.
