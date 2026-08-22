@@ -108,6 +108,14 @@ void exit(int status)
 #endif
 }
 
+/* FUNCTION: __builtin_exit */
+
+void __builtin_exit(int status)
+{
+  (void)status;
+  __CPROVER_assume(0);
+}
+
 /* FUNCTION: _Exit */
 
 #undef _Exit

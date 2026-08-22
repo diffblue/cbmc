@@ -884,9 +884,15 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
   const symbolt *symbol_ptr;
   if(lookup(identifier, symbol_ptr))
   {
-    error().source_location = expr.source_location();
-    error() << "failed to find symbol '" << identifier << "'" << eom;
-    throw 0;
+    // If this is a built-in, try to add it to the symbol table on the fly,
+    // just like we do for function calls (see
+    // typecheck_side_effect_function_call).
+    if(builtin_factory(identifier) || lookup(identifier, symbol_ptr))
+    {
+      error().source_location = expr.source_location();
+      error() << "failed to find symbol '" << identifier << "'" << eom;
+      throw 0;
+    }
   }
 
   const symbolt &symbol=*symbol_ptr;
