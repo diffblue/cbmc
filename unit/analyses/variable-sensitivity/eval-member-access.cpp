@@ -161,7 +161,6 @@ exprt integer_expression(int i)
 
 exprt top_expression()
 {
-  auto top_value =
-    std::make_shared<abstract_objectt>(integer_typet(), true, false);
-  return top_value->to_constant();
+  abstract_objectt top_value(integer_typet(), true, false);
+  return top_value.abstract_objectt::to_constant();
 }
