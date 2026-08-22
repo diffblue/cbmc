@@ -914,6 +914,10 @@ public:
   {
     return op1();
   }
+
+  /// Lower to concatenation.
+  /// {N{x}} ≡ x :: x :: ... :: x (N times)
+  exprt lower() const;
 };
 
 template <>
@@ -1978,6 +1982,10 @@ public:
     : unary_predicate_exprt(ID_reduction_and, std::move(_op))
   {
   }
+
+  /// Lower to equality with all-ones constant.
+  /// reduction_and(a) ≡ (a = 0xFF...F)
+  exprt lower() const;
 };
 
 template <>
@@ -2015,6 +2023,10 @@ public:
     : unary_predicate_exprt(ID_reduction_or, std::move(_op))
   {
   }
+
+  /// Lower to inequality with zero.
+  /// reduction_or(a) ≡ (a != 0)
+  exprt lower() const;
 };
 
 template <>
@@ -2052,6 +2064,10 @@ public:
     : unary_predicate_exprt(ID_reduction_nor, std::move(_op))
   {
   }
+
+  /// Lower to equality with zero.
+  /// reduction_nor(a) ≡ (a = 0)
+  exprt lower() const;
 };
 
 template <>
@@ -2089,6 +2105,10 @@ public:
     : unary_predicate_exprt(ID_reduction_nand, std::move(_op))
   {
   }
+
+  /// Lower to inequality with all-ones constant.
+  /// reduction_nand(a) ≡ (a != 0xFF...F)
+  exprt lower() const;
 };
 
 template <>
@@ -2126,6 +2146,10 @@ public:
     : unary_predicate_exprt(ID_reduction_xor, std::move(_op))
   {
   }
+
+  /// Lower to XOR of all individual bits.
+  /// reduction_xor(a) ≡ a[0] ^ a[1] ^ ... ^ a[n-1]
+  exprt lower() const;
 };
 
 template <>
@@ -2163,6 +2187,10 @@ public:
     : unary_predicate_exprt(ID_reduction_xnor, std::move(_op))
   {
   }
+
+  /// Lower to negation of XOR of all individual bits.
+  /// reduction_xnor(a) ≡ !(a[0] ^ a[1] ^ ... ^ a[n-1])
+  exprt lower() const;
 };
 
 template <>
