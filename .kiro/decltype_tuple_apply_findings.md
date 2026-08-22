@@ -6528,3 +6528,33 @@ KNOWNBUG; sd1 must be re-reduced under the corrected gate (round 62).
 Kept: the ablation result from round 59 (tuple machinery NOT required)
 is independent of the degenerate statement and still stands.
 Census 4; tree clean (all probes reverted); suites green from round 57.
+
+## Round 62 (2026-08-22): VALID re-reduction + real signature found
+
+Corrected gate (clang -Werror -fsyntax-only + trap-prelude RUN +
+drop-before-any-error ordering) VALIDATED BOTH WAYS: accepts te3,
+REJECTS the round-59 degenerate artifact.  g++ cannot be part of this
+gate (the driver uses clang builtins: __is_lvalue_reference etc.).
+cvise → 191 lines, committed as
+.kiro/reductions/ranges_pipe_valid_191lines.cpp (valid under the gate).
+FIRST suppressed error in the valid artifact (a NEW signature, not the
+retired take_view line):
+  invalid implicit conversion from '<<type:>>' to
+  'ranges::range_difference_t<ptr_signed_int>'
+with the instantiation chain showing an ARGUMENT-PACK BLEED:
+  invoke_result_t with <anon-take, int*, int>      <-- correct
+  __invoke_of    with <anon-take, int*, int*>      <-- second element
+                                                      REPLACED by the first
+  __invokable_r  with <void, anon-take, int*, int*>
+  __try_call     -> no match (args: int)
+So substituting a pack through the alias chain
+(invoke_result_t -> __invoke_of -> __invokable_r) duplicates the FIRST
+element instead of preserving the element list; the resulting `<<type:>>`
+(empty type) then fails conversion to the guide's
+range_difference_t<_View> parameter, and main is dropped.
+NEXT (round 63): kernel it — alias template forwarding a pack into a
+class template with >=2 HETEROGENEOUS elements (ptr + int), assert
+arity/order after substitution; then fix in the alias-substitution path
+(template_map apply for alias templates / typecheck_template_args'
+alias expansion).
+Census 4; tree clean; suites green from round 57.
