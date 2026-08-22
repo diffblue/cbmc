@@ -1,0 +1,15 @@
+CORE
+new.jar
+--show-goto-functions old.jar
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+malloc_site := side_effect statement="allocate"
+--
+^warning: ignoring
+//
+// The org.cprover.CProver.nondetWithoutNull() call in Test.f00 is turned into
+// a nondet side effect by replace_java_nondet and materialised into a `new`
+// (allocate) by convert_nondet; remove_java_new then lowers it. Before that
+// pipeline was added, f00 instead showed a CALL to CProver.nondetWithoutNull
+// with no allocation, so this output is what demonstrates the fix.
