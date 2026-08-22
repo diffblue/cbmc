@@ -25,35 +25,35 @@ typedef union _ieee754_float {
 
 
 float returnsField (uint32_t index) {
-    ieee754_float c;
+  ieee754_float c;
 
-    c.ieee.negative = index & 0x1;
-    c.ieee.exponent = 0;
-    c.ieee.mantissa = 0;
+  c.ieee.negative = index & 0x1;
+  c.ieee.exponent = 0;
+  c.ieee.mantissa = 0;
 
-    return c.f;
+  return c.f;
 }
 
 ieee754_float returnsStructure (uint32_t index) {
-    ieee754_float c;
+  ieee754_float c;
 
-    c.ieee.negative = index & 0x1;
-    c.ieee.exponent = 0;
-    c.ieee.mantissa = 0;
+  c.ieee.negative = index & 0x1;
+  c.ieee.exponent = 0;
+  c.ieee.mantissa = 0;
 
-    return c;
+  return c;
 }
 
 
 void testOne (void) {
-   ieee754_float f1, f2;
+  ieee754_float f1, f2;
 
-   f1 = returnsStructure(0);
-   f2 = returnsStructure(1);
+  f1 = returnsStructure(0);
+  f2 = returnsStructure(1);
 
-   assert(f1.ieee.negative != f2.ieee.negative);
+  assert(f1.ieee.negative != f2.ieee.negative);
 
-   return;
+  return;
 }
 
 

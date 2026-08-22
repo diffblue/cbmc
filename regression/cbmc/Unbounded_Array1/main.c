@@ -1,6 +1,8 @@
 int main()
 {
-  unsigned int n, i, j, ai, aj;
+  unsigned int n = __VERIFIER_nondet_int(),
+               i = __VERIFIER_nondet_unsigned_int(),
+               j = __VERIFIER_nondet_unsigned_int(), ai, aj;
   int a[n];
 
   __CPROVER_assume(n > 10 && n < 10000000);

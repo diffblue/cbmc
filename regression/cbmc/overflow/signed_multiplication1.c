@@ -2,7 +2,7 @@
 
 void main()
 {
-  int x, y, _x, _y;
+  int x, y, _x = __VERIFIER_nondet_int(), _y = __VERIFIER_nondet_int();
 
   x = _x;
   y = _y;

@@ -1,6 +1,6 @@
 int main()
 {
-  int a, b, c, *p;
+  int a, b, c = __VERIFIER_nondet_int(), *p;
 
   if(c)
     p = &a;

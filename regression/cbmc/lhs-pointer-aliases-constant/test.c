@@ -4,7 +4,7 @@ int main()
 {
   int x;
   const char *c = "Hello world";
-  _Bool dummy;
+  _Bool dummy = __VERIFIER_nondet__Bool();
   __CPROVER_assume(dummy);
 
   int *p = (dummy ? &x : (int *)c);

@@ -14,7 +14,7 @@ int f(int j)
 
 int main()
 {
-  int i;
+  int i = __VERIFIER_nondet_int();
 
   __CPROVER_assume(i==3 || i==4);
 

@@ -41,7 +41,10 @@ typedef struct _eth_frame_with_control
 void stack()
 {
   eth_frame_with_control f;
-  unsigned i, i2, j, j2, k, k2, l, l2;
+  unsigned i = __VERIFIER_nondet_unsigned(), i2 = __VERIFIER_nondet_unsigned(),
+           j = __VERIFIER_nondet_unsigned(), j2 = __VERIFIER_nondet_unsigned(),
+           k = __VERIFIER_nondet_unsigned(), k2 = __VERIFIER_nondet_unsigned(),
+           l = __VERIFIER_nondet_unsigned(), l2 = __VERIFIER_nondet_unsigned();
 
   // Safe if 0 <= i < FRAME_LENGTH, viable attack over FRAME_LENGTH
   __CPROVER_assume(i < FRAME_LENGTH);
@@ -76,7 +79,10 @@ void stack()
 void heap()
 {
   eth_frame_with_control *f_heap = malloc(sizeof(eth_frame_with_control));
-  unsigned i, i2, j, j2, k, k2, l, l2;
+  unsigned i = __VERIFIER_nondet_unsigned(), i2 = __VERIFIER_nondet_unsigned(),
+           j = __VERIFIER_nondet_unsigned(), j2 = __VERIFIER_nondet_unsigned(),
+           k = __VERIFIER_nondet_unsigned(), k2 = __VERIFIER_nondet_unsigned(),
+           l = __VERIFIER_nondet_unsigned(), l2 = __VERIFIER_nondet_unsigned();
 
   // Safe if 0 <= i < FRAME_LENGTH, viable attack over FRAME_LENGTH
   __CPROVER_assume(i < FRAME_LENGTH);
