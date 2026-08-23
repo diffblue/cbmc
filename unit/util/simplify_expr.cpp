@@ -710,3 +710,90 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
+
+TEST_CASE("Simplify (x * n) % n", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  SECTION("Integer type: always simplifies")
+  {
+    const integer_typet int_type;
+    const symbol_exprt x{"x", int_type};
+    const auto n = from_integer(7, int_type);
+    REQUIRE(
+      simplify_expr(mod_exprt{mult_exprt{x, n}, n}, ns) ==
+      from_integer(0, int_type));
+  }
+
+  SECTION("Natural type: always simplifies")
+  {
+    const natural_typet nat_type;
+    const symbol_exprt x{"x", nat_type};
+    const auto n = from_integer(7, nat_type);
+    REQUIRE(
+      simplify_expr(mod_exprt{mult_exprt{x, n}, n}, ns) ==
+      from_integer(0, nat_type));
+  }
+
+  SECTION("Constant on the left: (n * x) % n simplifies")
+  {
+    const integer_typet int_type;
+    const symbol_exprt x{"x", int_type};
+    const auto n = from_integer(7, int_type);
+    REQUIRE(
+      simplify_expr(mod_exprt{mult_exprt{n, x}, n}, ns) ==
+      from_integer(0, int_type));
+  }
+
+  SECTION("Unsigned bitvector with power-of-two modulus: simplifies")
+  {
+    const unsignedbv_typet u32{32};
+    const symbol_exprt x{"x", u32};
+    const auto n = from_integer(8, u32);
+    REQUIRE(
+      simplify_expr(mod_exprt{mult_exprt{x, n}, n}, ns) ==
+      from_integer(0, u32));
+  }
+
+  SECTION("Unsigned bitvector with non-power-of-two modulus: no simplification")
+  {
+    const unsignedbv_typet u32{32};
+    const symbol_exprt x{"x", u32};
+    const auto n = from_integer(7, u32);
+    const mod_exprt mod{mult_exprt{x, n}, n};
+    REQUIRE(simplify_expr(mod, ns) == mod);
+  }
+
+  SECTION("Signed bitvector with power-of-two modulus: simplifies")
+  {
+    const signedbv_typet s32{32};
+    const symbol_exprt x{"x", s32};
+    const auto n = from_integer(8, s32);
+    REQUIRE(
+      simplify_expr(mod_exprt{mult_exprt{x, n}, n}, ns) ==
+      from_integer(0, s32));
+  }
+
+  SECTION("Signed bitvector with non-power-of-two modulus: no simplification")
+  {
+    const signedbv_typet s32{32};
+    const symbol_exprt x{"x", s32};
+    const auto n = from_integer(7, s32);
+    const mod_exprt mod{mult_exprt{x, n}, n};
+    REQUIRE(simplify_expr(mod, ns) == mod);
+  }
+
+  SECTION("Signed bitvector with negative power-of-two modulus: simplifies")
+  {
+    // |n| divides 2^width, so the wrapped product is a multiple of n and the
+    // remainder is zero under any modulo convention; no positivity of the
+    // modulus is required.
+    const signedbv_typet s32{32};
+    const symbol_exprt x{"x", s32};
+    const auto n = from_integer(-8, s32);
+    REQUIRE(
+      simplify_expr(mod_exprt{mult_exprt{x, n}, n}, ns) ==
+      from_integer(0, s32));
+  }
+}
