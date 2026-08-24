@@ -1,4 +1,4 @@
-CORE broken-z3-smt-backend broken-smt-backend no-new-smt
+CORE broken-z3-smt-backend no-new-smt thorough-paths
 main.c
 --no-standard-checks
 ^EXIT=0$
@@ -7,3 +7,9 @@ main.c
 --
 ^warning: ignoring
 --
+broken-z3-smt-backend: --z3 uses QF_AUFBV (bitvector, not FPA), so
+the 10 double-precision fmod calls produce a huge formula that Z3
+cannot solve within the test timeout.
+no-new-smt: incremental SMT2 backend does not support floatbv_mod.
+thorough-paths: --paths lifo with 10 assertions takes >5 minutes
+because each path builds a 282-bit integer significand divider.

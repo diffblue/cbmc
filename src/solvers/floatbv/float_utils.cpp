@@ -701,20 +701,178 @@ bvt float_utilst::div(const bvt &src1, const bvt &src2)
 
 bvt float_utilst::rem(const bvt &src1, const bvt &src2)
 {
-  /* The semantics of floating-point remainder implemented as below
-     is the sensible one.  Unfortunately this is not the one required
-     by IEEE-754 or fmod / remainder.  Martin has discussed the
-     'correct' semantics with Christoph and Alberto at length as
-     well as talking to various hardware designers and we still
-     hasn't found a good way to implement them in a solver.
-     We have some approaches that are correct but they really
-     don't scale. */
+  PRECONDITION(src1.size() == src2.size());
 
   const unbiased_floatt unpacked2 = unpack(src2);
 
-  // stub: do (src2.infinity ? src1 : (src1/src2)*src2))
-  return bv_utils.select(
-    unpacked2.infinity, src1, sub(src1, mul(div(src1, src2), src2)));
+  // IEEE 754 fmod/remainder (see doc/proofs/ for Coq/HOL Light proofs).
+  //
+  // Proved properties and corresponding _Float16 exhaustive tests:
+  //   remainder_format     → remainderf/_Float16.desc (|r| <= |y|/2)
+  //   fmod_then_remainder  → remainderf/fmod_bound.desc (|fmod| < |y|)
+  //   comparison_step      → remainderf/_Float16.desc (min-selection)
+  //   special cases        → remainderf/special_cases.desc
+  //   nearest_int_small    → remainderf/_Float16.desc (n ∈ {-1,0,1})
+  //
+  // Step 1: Compute fmod(x, y) via integer significand arithmetic.
+  //   Align significands, compute mx_aligned mod my_aligned.
+  //   Result r_int < my_aligned, so r_int < 2^(f+1) and converts
+  //   to float exactly. (Coq: fmod_then_remainder, remainder_format)
+  // Step 2 (remainder only): Compute remainder(fmod, y) via FMA.
+  //   Since |fmod| < |y|, the quotient n is in {-1, 0, 1}.
+  //   (Coq: nearest_int_small)
+  //   Try n, n+1, n-1 and pick smallest |result|.
+  //   The correct candidate is exact (Coq: fma_remainder_exact).
+  //   Wrong candidates have |result| >= |r_correct|
+  //   (Coq: rounding_preserves_remainder_comparison).
+  //   So min-selection picks the correct IEEE remainder.
+
+  const unbiased_floatt unpacked1 = unpack(src1);
+  const std::size_t frac_bits = unpacked1.fraction.size();
+
+  // Note: |x| < |y| does NOT imply remainder(x,y) = x. While
+  // fmod(x,y) = x when |x| < |y| (truncated quotient is 0), the IEEE
+  // remainder uses round-to-nearest-even, so when |x| > |y|/2 the
+  // nearest integer quotient is ±1 and remainder(x,y) = x ∓ y ≠ x.
+
+  // Exponent difference
+  bvt exp1 =
+    bv_utils.sign_extension(unpacked1.exponent, unpacked1.exponent.size() + 1);
+  bvt exp2 =
+    bv_utils.sign_extension(unpacked2.exponent, unpacked2.exponent.size() + 1);
+  bvt exp_diff = bv_utils.sub(exp1, exp2);
+  literalt ex_ge_ey = !exp_diff.back();
+  bvt abs_exp_diff = bv_utils.absolute_value(exp_diff);
+
+  // Integer width for aligned significands. The maximum exponent
+  // difference is emax - emin_subnormal = 2^e + p - 4, so we need
+  // that plus p significand bits plus 2 guard bits = 2^e + 2p - 2.
+  // This is feasible for half (52 bits), float (302 bits), and
+  // double (2152 bits), but infeasible for long double/quad.
+  // Use the SMT FPA backend for those.
+  // Note: the integer remainder below implicitly performs up to
+  // exponent-difference divide/subtract steps when bit-blasted;
+  // this is inherent to all approaches for computing fmod/remainder.
+  const std::size_t int_width = (std::size_t(1) << spec.e) + 2 * frac_bits - 2;
+  bvt shift_dist = limit_distance(abs_exp_diff, mp_integer(int_width));
+
+  bvt mx = bv_utils.zero_extension(unpacked1.fraction, int_width);
+  bvt my = bv_utils.zero_extension(unpacked2.fraction, int_width);
+
+  // Align: shift the one with larger exponent left
+  bvt mx_aligned = bv_utils.select(
+    ex_ge_ey,
+    bv_utils.shift(mx, bv_utilst::shiftt::SHIFT_LEFT, shift_dist),
+    mx);
+  bvt my_aligned = bv_utils.select(
+    ex_ge_ey,
+    my,
+    bv_utils.shift(my, bv_utilst::shiftt::SHIFT_LEFT, shift_dist));
+
+  // Integer remainder: fmod significand (unsigned)
+  bvt r_int = bv_utils.remainder(
+    mx_aligned, my_aligned, bv_utilst::representationt::UNSIGNED);
+
+  // Integer quotient LSB (needed for remainder tie-breaking).
+  // Only the parity matters; a specialised divider that stops one step
+  // early could avoid computing the full quotient.
+  bvt q_int = bv_utils.divider(
+    mx_aligned, my_aligned, bv_utilst::representationt::UNSIGNED);
+  literalt trunc_q_odd = q_int[0];
+
+  // Pack as float: value = r_int * 2^min(ex,ey), sign = sign(x)
+  bvt min_exp = bv_utils.select(ex_ge_ey, exp2, exp1);
+  // The unbiased_floatt convention:
+  //   value = fraction * 2^(exponent - (frac_size-1))
+  // We want value = r_int * 2^(min_exp - (frac_bits - 1))
+  // With fraction.size() = int_width:
+  //   exponent - (int_width - 1) = min_exp - (frac_bits - 1)
+  //   exponent = min_exp + int_width - frac_bits
+  bvt adjusted_exp = bv_utils.add(
+    bv_utils.sign_extension(min_exp, spec.e + 2),
+    bv_utils.build_constant(
+      mp_integer(int_width) - mp_integer(frac_bits), spec.e + 2));
+  unbiased_floatt fmod_unpacked;
+  fmod_unpacked.fraction = r_int;
+  fmod_unpacked.exponent = adjusted_exp;
+  fmod_unpacked.sign = unpacked1.sign;
+  fmod_unpacked.NaN = const_literal(false);
+  fmod_unpacked.infinity = const_literal(false);
+  fmod_unpacked.zero = bv_utils.is_zero(r_int);
+  // The fmod result is mathematically exact (r_int < my_aligned, so it
+  // fits in p bits), but round_and_pack is needed to normalize the
+  // representation (handle subnormals, adjust exponent).
+  bvt fmod_result = round_and_pack(fmod_unpacked);
+
+  // Handle IEEE 754 special cases (cf. SymFPU
+  // addRemainderSpecialCases in core/remainder.h,
+  // https://github.com/martin-cs/symfpu):
+  //   fmod(x, ±0)    = NaN
+  //   fmod(±inf, y)   = NaN
+  //   fmod(NaN, y)    = NaN
+  //   fmod(x, NaN)    = NaN
+  //   fmod(±0, y)     = ±0 (= x)
+  //   fmod(x, ±inf)   = x
+  literalt nan_result = prop.lor(
+    {unpacked1.infinity, unpacked1.NaN, unpacked2.NaN, unpacked2.zero});
+  ieee_floatt nan_val(
+    ieee_float_spect{spec}, ieee_floatt::rounding_modet::ROUND_TO_EVEN);
+  nan_val.make_NaN();
+  bvt nan_bv = build_constant(nan_val);
+  fmod_result = bv_utils.select(nan_result, nan_bv, fmod_result);
+  // x is ±0 and no NaN condition → return x (±0)
+  fmod_result =
+    bv_utils.select(prop.land(unpacked1.zero, !nan_result), src1, fmod_result);
+  // y is ±inf and no NaN condition → return x
+  fmod_result = bv_utils.select(
+    prop.land(unpacked2.infinity, !nan_result), src1, fmod_result);
+
+  // For fmod (ROUND_TO_ZERO), we're done
+  bvt result = fmod_result;
+
+  if(!rounding_mode_bits.round_to_zero.is_true())
+  {
+    // Step 2: IEEE remainder via conditional subtract.
+    // Since |fmod| < |y|, the nearest integer quotient n is in {-1,0,1}.
+    // (Coq: nearest_int_small, conditional_subtract_closer)
+    //
+    // - |fmod| < |y|/2: remainder = fmod (n = 0)
+    // - |fmod| > |y|/2: remainder = fmod - sign(fmod)*|y| (n = ±1)
+    // - |fmod| = |y|/2: tie-break by quotient parity (pick even n)
+    //
+    // The correction subtracts |y| from |fmod| preserving sign.
+    // In IEEE arithmetic: if signs match, subtract; else add.
+    bvt abs_fmod = abs(fmod_result);
+    bvt abs_y = abs(src2);
+
+    // Compare 2*|fmod| against |y| to avoid |y|/2 subnormal underflow.
+    bvt two = build_constant(
+      ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 2});
+    bvt two_abs_fmod = mul(abs_fmod, two);
+
+    // corrected = fma(-1, y, fmod) or fma(+1, y, fmod)
+    // depending on whether signs match. FMA is exact here
+    // (Coq: fma_remainder_exact).
+    literalt signs_equal = prop.lequal(sign_bit(fmod_result), sign_bit(src2));
+    bvt one = build_constant(
+      ieee_floatt{spec, ieee_floatt::rounding_modet::ROUND_TO_ZERO, 1});
+    bvt neg_one = negate(one);
+    bvt n_val = bv_utils.select(signs_equal, neg_one, one);
+    bvt corrected = fma(n_val, src2, fmod_result);
+
+    // Use correction when 2*|fmod| > |y|, or at tie when quotient is odd.
+    // Skip correction for special cases (NaN, infinity, zero inputs)
+    // where fmod_result is already the final answer.
+    literalt gt_half = relation(two_abs_fmod, relt::GT, abs_y);
+    literalt eq_half = relation(two_abs_fmod, relt::EQ, abs_y);
+    literalt special =
+      prop.lor({nan_result, unpacked1.zero, unpacked2.infinity});
+    literalt use_corrected =
+      prop.land(!special, prop.lor(gt_half, prop.land(eq_half, trunc_q_odd)));
+    result = bv_utils.select(use_corrected, corrected, fmod_result);
+  }
+
+  return result;
 }
 
 bvt float_utilst::negate(const bvt &src)

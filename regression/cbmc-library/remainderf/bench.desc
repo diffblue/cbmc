@@ -1,0 +1,11 @@
+CORE
+bench.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Fully symbolic remainderf verification (~383K variables, ~17s with
+MiniSat after the conditional subtract optimisation).
