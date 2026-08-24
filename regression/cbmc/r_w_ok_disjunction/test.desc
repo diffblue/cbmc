@@ -1,0 +1,13 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--no-pointer-primitive-check --lift-nested-dereferences
+^\[main\.assertion\.1\] line \d+ p could be &g: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Pins the top-level-conjunct restriction: an rw_ok under a disjunction
+(p == &g || rw_ok(...)) does not unconditionally constrain the pointer, so the
+p == &g disjunct is preserved. See GitHub issue diffblue/cbmc#7829.

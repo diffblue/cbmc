@@ -1,0 +1,11 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --bounds-check --no-pointer-primitive-check --lift-nested-dereferences
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that auto-object assumptions from rw_ok propagate correctly to pointer
+aliases. See GitHub issue diffblue/cbmc#7829.

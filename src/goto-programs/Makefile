@@ -20,6 +20,7 @@ SRC = adjust_float_expressions.cpp \
       json_expr.cpp \
       json_goto_trace.cpp \
       label_function_pointer_call_sites.cpp \
+      lift_nested_dereferences.cpp \
       link_goto_model.cpp \
       loop_ids.cpp \
       mm_io.cpp \

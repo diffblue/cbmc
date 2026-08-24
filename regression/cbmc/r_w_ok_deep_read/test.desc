@@ -1,0 +1,13 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--pointer-check --no-pointer-primitive-check --unwind 4 --no-unwinding-assertions --lift-nested-dereferences
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that scalar fields of lazily-created inductive nodes can be read at depth
+using inline chained dereferences (head->next->data); the nested-dereference
+lifting pass hoists the intermediate pointers so the reads verify. The chain is
+finite and bounded by --unwind. See GitHub issue diffblue/cbmc#7829.
