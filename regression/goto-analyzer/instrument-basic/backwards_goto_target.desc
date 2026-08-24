@@ -1,0 +1,13 @@
+CORE
+main.c
+--instrument out.gb --instrument-targets backwards_goto_target --verbosity 9 --vsd
+activate-multi-line-match
+^EXIT=0$
+^SIGNAL=0$
+^Instrumenting example_function\nInstruction \d+ because backwards_goto_target... single history... condition is example_function::argument = 1 ∧ true_from_calling_context = 1... added as assumption$
+--
+^warning: ignoring
+--
+Testing instrumenting at backwards goto targets
+
+

@@ -5,6 +5,7 @@ SRC = goto_analyzer_languages.cpp \
       taint_parser.cpp \
       unreachable_instructions.cpp \
       show_on_source.cpp \
+      static_instrument.cpp \
       static_show_domain.cpp \
       static_simplifier.cpp \
       static_verifier.cpp \

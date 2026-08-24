@@ -80,7 +80,8 @@ protected:
   abstract_object_pointert
   meet_with_value(const abstract_value_pointert &other) const override;
 
-  exprt to_predicate_internal(const exprt &name) const override;
+  exprt to_predicate_internal(const exprt &name, const std::set<exprt> &scope)
+    const override;
 
 private:
   exprt value;
