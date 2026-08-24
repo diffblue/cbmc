@@ -1,0 +1,11 @@
+CORE
+basic2.c
+
+^\[.*\] line \d+ \(1\): SUCCESS$
+^\[.*\] line \d+ \(2\): SUCCESS$
+^\[.*\] line \d+ \(0\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
