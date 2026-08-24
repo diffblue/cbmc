@@ -240,8 +240,18 @@ private:
   /// \return Returns true if the function should be ignored
   bool ignore_function_call_transform(const irep_idt &function_id) const;
 
-  void assume(exprt expr, namespacet ns);
+protected:
+  // These two wrap the interface to the abstract environment.
+  // This allows inheriting from VSD and supplementing the model of the
+  // abstract environment by hooking where it is used rather than
+  // having to re-implement transform.
+  virtual void assume(exprt expr, namespacet ns);
+  virtual bool assign(
+    const exprt &expr,
+    const abstract_object_pointert &value,
+    const namespacet &ns);
 
+private:
   abstract_environmentt abstract_state;
   flow_sensitivityt flow_sensitivity;
 
