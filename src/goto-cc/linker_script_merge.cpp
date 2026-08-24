@@ -358,58 +358,21 @@ void linker_script_merget::symbols_to_pointerize(
     symbols_to_pointerize(linker_values, op, to_pointerize);
 }
 
-#if 0
-The current implementation of this function is less precise than the
-  commented-out version below. To understand the difference between these
-  implementations, consider the following example:
-
-Suppose we have a section in the linker script, 100 bytes long, where the
-address of the symbol sec_start is the start of the section (value 4096) and the
-address of sec_end is the end of that section (value 4196).
-
-The current implementation synthesizes the goto-version of the following C:
-
-    char __sec_array[100];
-    char *sec_start=(&__sec_array[0]);
-    char *sec_end=((&__sec_array[0])+100);
-      // Yes, it is 100 not 99. We're pointing to the end of the memory occupied
-      // by __sec_array, not the last element of __sec_array.
-
-This is imprecise for the following reason: the actual address of the array and
-the pointers shall be some random CBMC-internal address, instead of being 4096
-and 4196. The linker script, on the other hand, would have specified the exact
-position of the section, and we even know what the actual values of sec_start
-and sec_end are from the object file (these values are in the `addresses` list
-of the `data` argument to this function). If the correctness of the code depends
-on these actual values, then CBMCs model of the code is too imprecise to verify
-this.
-
-The commented-out version of this function below synthesizes the following:
-
-    char *sec_start=4096;
-    char *sec_end=4196;
-    __CPROVER_allocated_memory(4096, 100);
-
-This code has both the actual addresses of the start and end of the section and
-tells CBMC that the intermediate region is valid. However, the allocated_memory
-macro does not currently allocate an actual object at the address 4096, so
-symbolic execution can fail. In particular, the 'allocated memory' is part of
-__CPROVER_memory, which does not have a bounded size; this means that (for
-example) calls to memcpy or memset fail, because the first and third arguments
-do not have know n size. The commented-out implementation should be reinstated
-once this limitation of __CPROVER_allocated_memory has been fixed.
-
-In either case, no other changes to the rest of the code (outside this function)
-should be necessary. The rest of this file converts expressions containing the
-linker-defined symbol into pointer types if they were not already, and this is
-the right behaviour for both implementations.
-#endif
+// The implementation of ls_data2instructions synthesizes the goto-version of:
+//
+//     char __sec_array[100];
+//     char *sec_start=(&__sec_array[0]);
+//     char *sec_end=((&__sec_array[0])+100);
+//
+// This is imprecise because the actual address of the array will be a
+// CBMC-internal address rather than the real address from the linker script.
+// If the correctness of the code depends on the actual numeric addresses,
+// CBMC's model is too imprecise to verify this.
 int linker_script_merget::ls_data2instructions(
-    jsont &data,
-    const std::string &linker_script,
-    symbol_tablet &symbol_table,
-    linker_valuest &linker_values)
-#if 1
+  jsont &data,
+  const std::string &linker_script,
+  symbol_tablet &symbol_table,
+  linker_valuest &linker_values)
 {
   std::map<irep_idt, std::size_t> truncated_symbols;
   for(auto &d : to_json_array(data["regions"]))
@@ -596,69 +559,6 @@ int linker_script_merget::ls_data2instructions(
   }
   return 0;
 }
-#else
-{
-  goto_programt::instructionst initialize_instructions=gp.instructions;
-  for(const auto &d : to_json_array(data["regions"]))
-  {
-    unsigned start=safe_string2unsigned(d["start"].value);
-    unsigned size=safe_string2unsigned(d["size"].value);
-    constant_exprt first=from_integer(start, size_type());
-    constant_exprt second=from_integer(size, size_type());
-    const code_typet void_t({}, empty_typet());
-    code_function_callt f(
-      symbol_exprt(CPROVER_PREFIX "allocated_memory", void_t), {first, second});
-
-    source_locationt loc;
-    loc.set_file(linker_script);
-    loc.set_comment("linker script-defined region:\n"+d["commt"].value+":\n"+
-        d["annot"].value);
-    f.add_source_location()=loc;
-
-    goto_programt::instructiont i;
-    i.make_function_call(f);
-    initialize_instructions.push_front(i);
-  }
-
-  if(!symbol_table.has_symbol(CPROVER_PREFIX "allocated_memory"))
-  {
-    symbolt sym{
-      CPROVER_PREFIX "allocated_memory",
-      code_typet({}, empty_typet()),
-      ID_C} sym.pretty_name = CPROVER_PREFIX "allocated_memory";
-    sym.is_lvalue=sym.is_static_lifetime=true;
-    symbol_table.add(sym);
-  }
-
-  for(const auto &d : to_json_array(data["addresses"]))
-  {
-    source_locationt loc;
-    loc.set_file(linker_script);
-    loc.set_comment("linker script-defined symbol: char *"+
-        d["sym"].value+"="+"(char *)"+d["val"].value+"u;");
-
-    symbol_exprt lhs(d["sym"].value, pointer_type(char_type()));
-
-    constant_exprt rhs;
-    rhs.set_value(integer2bvrep(
-      string2integer(d["val"].value), unsigned_int_type().get_width()));
-    rhs.type()=unsigned_int_type();
-
-    exprt rhs_tc =
-      typecast_exprt::conditional_cast(rhs, pointer_type(char_type()));
-
-    linker_values.emplace(
-      irep_idt(d["sym"].value), std::make_pair(lhs, rhs_tc));
-
-    code_assignt assign(lhs, rhs_tc);
-    assign.add_source_location()=loc;
-    goto_programt::instructiont assign_i;
-    assign_i.make_assignment(assign);
-    initialize_instructions.push_front(assign_i);
-  }
-  return 0;
-}
-#endif
 
 int linker_script_merget::get_linker_script_data(
     std::list<irep_idt> &linker_defined_symbols,

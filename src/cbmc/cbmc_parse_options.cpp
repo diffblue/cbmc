@@ -256,6 +256,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("mm"))
     options.set_option("mm", cmdline.get_value("mm"));
 
+  if(cmdline.isset("mmio-region"))
+    options.set_option("mmio-region", cmdline.get_values("mmio-region"));
+
   if(cmdline.isset("symex-complexity-limit"))
   {
     options.set_option(
@@ -1058,6 +1061,8 @@ void cbmc_parse_optionst::help()
     HELP_COVER
     " {y--mm} {uMM} \t memory consistency model for concurrent programs"
     " (default: {ysc})\n"
+    " {y--mmio-region} {uaddr:size} \t"
+    " model MMIO region as individual byte-array object\n"
     HELP_CONFIG_LIBRARY
     HELP_REACHABILITY_SLICER
     " {y--full-slice} \t run full slicer (experimental)\n"
