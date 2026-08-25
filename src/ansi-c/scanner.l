@@ -1273,6 +1273,11 @@ enable_or_disable ("enable"|"disable")
                          TOK_BIT_CAST);
                      }
 
+"dynamic_cast"       { return conditional_keyword(PARSER.cpp98, TOK_DYNAMIC_CAST); }
+"static_cast"        { return conditional_keyword(PARSER.cpp98, TOK_STATIC_CAST); }
+"reinterpret_cast"   { return conditional_keyword(PARSER.cpp98, TOK_REINTERPRET_CAST); }
+"const_cast"         { return conditional_keyword(PARSER.cpp98, TOK_CONST_CAST); }
+
 {CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
 {CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }
 {CPROVER_PREFIX}"exists"       { loc(); return TOK_EXISTS; }
@@ -1387,7 +1392,7 @@ enable_or_disable ("enable"|"disable")
   /* This is a C11 keyword */
 
 "_Alignof"      { return conditional_keyword(
-                    !PARSER.cpp98 &&
+                    (!PARSER.cpp98 || PARSER.cpp11) &&
                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM ||
@@ -1408,7 +1413,7 @@ enable_or_disable ("enable"|"disable")
                   yyless(7);
 
                   return conditional_keyword(
-                    !PARSER.cpp98 &&
+                    (!PARSER.cpp98 || PARSER.cpp11) &&
                     (PARSER.mode==configt::ansi_ct::flavourt::GCC ||
                      PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
                      PARSER.mode==configt::ansi_ct::flavourt::ARM),
