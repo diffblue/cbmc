@@ -601,7 +601,7 @@ bool compilet::write_bin_object_file(
     return true;
   }
 
-  if(write_goto_binary(outfile, src_goto_model))
+  if(write_goto_binary(outfile, src_goto_model, message_handler))
     return true;
 
   const auto cnt = function_body_count(src_goto_model.goto_functions);
