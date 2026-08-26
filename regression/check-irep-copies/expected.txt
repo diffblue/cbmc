@@ -1,0 +1,2 @@
+copy_patterns.cpp:52: warning: 'b' (type exprt) is copy-initialized but never modified; use const reference [cprover-unmodified-irep-copy]
+copy_patterns.cpp:61: warning: 'b' copies 'a' (type exprt) which is not used afterwards; use std::move [cprover-unnecessary-irep-copy]
