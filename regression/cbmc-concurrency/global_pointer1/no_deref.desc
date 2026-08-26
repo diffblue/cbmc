@@ -1,0 +1,8 @@
+CORE pthread
+main.c
+-DNO_DEREF
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
