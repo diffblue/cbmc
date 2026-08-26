@@ -786,11 +786,24 @@ exprt float_bvt::div(
 
   std::size_t fraction_width=
     to_unsignedbv_type(unpacked1.fraction.type()).get_width();
-  std::size_t div_width=fraction_width*2+1;
+
+  // Pre-normalize the dividend.  A subnormal dividend has leading zeros in
+  // its fraction (the hidden bit is 0); dividing it directly would give a
+  // quotient with too few significant bits, so the `have_remainder` sticky
+  // bit is lost during the rounder's normalization shift and ties round the
+  // wrong way (a 1-ULP error).  Left-aligning the fraction and decreasing the
+  // exponent by the same amount preserves the value but guarantees a
+  // normalized dividend, so the minimal division width suffices and
+  // normal/normal division pays no extra cost.
+  exprt dividend_fraction = unpacked1.fraction;
+  exprt dividend_exponent = unpacked1.exponent;
+  normalization_shift(dividend_fraction, dividend_exponent);
+
+  std::size_t div_width = fraction_width * 2 + 1;
 
   // pad fraction1 with zeros
   const concatenation_exprt fraction1(
-    unpacked1.fraction,
+    dividend_fraction,
     from_integer(0, unsignedbv_typet(div_width - fraction_width)),
     unsignedbv_typet(div_width));
 
@@ -814,12 +827,12 @@ exprt float_bvt::div(
     concatenation_exprt(
       result.fraction, have_remainder, unsignedbv_typet(div_width+1));
 
-  // We will subtract the exponents;
-  // to account for overflow, we add a bit.
-  const typecast_exprt exponent1(
-    unpacked1.exponent, signedbv_typet(spec.e + 1));
+  // We will subtract the exponents; allow two extra bits so the more
+  // negative exponent of a freshly normalized (formerly subnormal) dividend
+  // cannot overflow the subtraction.
+  const typecast_exprt exponent1(dividend_exponent, signedbv_typet(spec.e + 2));
   const typecast_exprt exponent2(
-    unpacked2.exponent, signedbv_typet(spec.e + 1));
+    unpacked2.exponent, signedbv_typet(spec.e + 2));
 
   // subtract exponents
   const minus_exprt added_exponent(exponent1, exponent2);
