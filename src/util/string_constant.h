@@ -9,7 +9,10 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_STRING_CONSTANT_H
 #define CPROVER_UTIL_STRING_CONSTANT_H
 
+#include "mp_arith.h"
 #include "std_expr.h"
+
+#include <optional>
 
 class string_constantt : public nullary_exprt
 {
@@ -66,5 +69,14 @@ inline string_constantt &to_string_constant(typet &type)
 {
   return to_string_constant((exprt &)type);
 }
+
+/// If \p expr is the offset-zero decay of a string literal -- that is, an
+/// optional sequence of typecasts wrapping `address_of(index(string_constant,
+/// 0))` -- return the length of that literal as `strlen` would compute it: the
+/// number of bytes up to, but not including, the first NUL.  Returns an empty
+/// optional for anything else (a non-zero offset such as `"abc" + 1`, a
+/// conditional between literals, or a non-literal argument), so that callers
+/// can fall back to a runtime model rather than fold to a wrong constant.
+std::optional<mp_integer> string_literal_length(const exprt &expr);
 
 #endif // CPROVER_ANSI_C_STRING_CONSTANT_H
