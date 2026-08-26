@@ -527,7 +527,6 @@ This is described in more detail \link string_builtin_functiont here. \endlink
   * `cprover_string_delete_char_at` : A call to
     `cprover_string_delete_char_at(s, i)` would be the same thing as
     `cprover_string_delete(s, i, i+1)`.
-  * `cprover_string_copy` : Same as `cprover_string_substring(s, 0)`.
   * `cprover_string_of_int_hex` : Same as `cprover_string_of_int(s, 16)`.
   * `cprover_string_of_double` : Same as `cprover_string_of_float`.
 
