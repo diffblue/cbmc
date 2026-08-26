@@ -389,6 +389,55 @@ TEST_CASE(
     REQUIRE(get_assert(eq) == "(assert (= s1 s2))");
   }
 
+  SECTION("string operators replace_all/from_code/to_code/from_int")
+  {
+    const typet int_type{ID_integer};
+
+    // replace_all replaces every occurrence (str.replace_all), unlike
+    // replace (str.replace, first occurrence only).
+    const auto repl_all = string_builtin_app(
+      ID_cprover_string_replace_all_func, {s1, s2, s1}, string_type);
+    const auto c_repl_all = string_builtin_app(
+      ID_cprover_string_contains_func, {repl_all, s2}, bool_typet{});
+    REQUIRE(
+      get_assert(c_repl_all) ==
+      "(assert (str.contains (str.replace_all s1 s2 s1) s2))");
+
+    // from_code: the single-char string for a code point (str.from_code).
+    const auto fc = string_builtin_app(
+      ID_cprover_string_from_code_func,
+      {from_integer(102, int_type)},
+      string_type);
+    const auto c_fc = string_builtin_app(
+      ID_cprover_string_contains_func, {fc, s1}, bool_typet{});
+    REQUIRE(
+      get_assert(c_fc) == "(assert (str.contains (str.from_code 102) s1))");
+
+    // to_code: the code point of a single-char string, an Int result
+    // (str.to_code); usable directly as a position argument.
+    const auto tc =
+      string_builtin_app(ID_cprover_string_to_code_func, {s2}, int_type);
+    const auto at_tc =
+      string_builtin_app(ID_cprover_string_char_at_func, {s1, tc}, string_type);
+    const auto c_tc = string_builtin_app(
+      ID_cprover_string_contains_func, {at_tc, s1}, bool_typet{});
+    REQUIRE(
+      get_assert(c_tc) ==
+      "(assert (str.contains (str.at s1 (str.to_code s2)) s1))");
+
+    // from_int: the decimal string of a non-negative integer (str.from_int;
+    // SMT-LIB defines it for naturals only -- negative values yield "" and a
+    // front-end needing sign support composes it, e.g.
+    // ite(n < 0, "-" ++ from_int(-n), from_int(n))).
+    const auto fi =
+      string_builtin_app(ID_cprover_string_from_int_func, {tc}, string_type);
+    const auto c_fi = string_builtin_app(
+      ID_cprover_string_contains_func, {fi, s1}, bool_typet{});
+    REQUIRE(
+      get_assert(c_fi) ==
+      "(assert (str.contains (str.from_int (str.to_code s2)) s1))");
+  }
+
   SECTION("regex range/concat/plus/union/inter/comp operators")
   {
     const auto re1 =
