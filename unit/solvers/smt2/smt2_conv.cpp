@@ -7,18 +7,22 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/namespace.h>
+#include <util/pointer_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
 #include <solvers/smt2/smt2_conv.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <testing-utils/use_catch.h>
+
+#include <vector>
 
 TEST_CASE(
   "smt2_convt::convert_identifier character escaping.",
@@ -614,4 +618,112 @@ TEST_CASE(
   // The non-constant store was dropped; only the well-formed default remains.
   REQUIRE(operands_map.size() == 1);
   REQUIRE(operands_map.count(-1) == 1);
+}
+
+/// Collect every "(declare-fun element-address-... )" name emitted while
+/// converting \p expr.
+static std::vector<std::string> element_address_declarations(const exprt &expr)
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  std::ostringstream out;
+  smt2_convt conv(
+    ns, "test", "", "QF_AUFBV", smt2_convt::solvert::GENERIC, out);
+  conv.set_to(expr, true);
+
+  std::vector<std::string> names;
+  const std::string &s = out.str();
+  const std::string marker = "(declare-fun element-address-";
+  for(std::size_t pos = s.find(marker); pos != std::string::npos;
+      pos = s.find(marker, pos + 1))
+  {
+    const std::size_t name_start = pos + std::string("(declare-fun ").size();
+    const std::size_t name_end = s.find(' ', name_start);
+    names.push_back(s.substr(name_start, name_end - name_start));
+  }
+  return names;
+}
+
+/// Full SMT2 emitted while converting \p expr.
+static std::string element_address_smt2(const exprt &expr)
+{
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  std::ostringstream out;
+  smt2_convt conv(
+    ns, "test", "", "QF_AUFBV", smt2_convt::solvert::GENERIC, out);
+  conv.set_to(expr, true);
+  return out.str();
+}
+
+TEST_CASE(
+  "smt2_convt element-address disambiguation by index type",
+  "[core][solvers][smt2]")
+{
+  // Two element_address expressions that share a result (pointer) type but
+  // differ in index type must be declared as two distinct functions, so that
+  // the declared and applied argument sorts never disagree.
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64(); // populate type widths (pointer etc.)
+  const pointer_typet result_type = pointer_type(signedbv_typet{32});
+  const symbol_exprt base{"b", result_type};
+
+  SECTION("distinct bit-vector index widths yield distinct names")
+  {
+    const element_address_exprt ea32{
+      base, symbol_exprt{"i32", signedbv_typet{32}}, result_type};
+    const element_address_exprt ea64{
+      base, symbol_exprt{"i64", signedbv_typet{64}}, result_type};
+
+    const auto names = element_address_declarations(equal_exprt{ea32, ea64});
+
+    REQUIRE(names.size() == 2);
+    REQUIRE(names[0] != names[1]);
+    // the index type is part of the name (suffix after the result type)
+    const bool has_s32 = names[0].find("_s32") != std::string::npos ||
+                         names[1].find("_s32") != std::string::npos;
+    const bool has_s64 = names[0].find("_s64") != std::string::npos ||
+                         names[1].find("_s64") != std::string::npos;
+    REQUIRE(has_s32);
+    REQUIRE(has_s64);
+  }
+
+  SECTION("mathematical integer index is supported (Strata path)")
+  {
+    // An unbounded-integer index with a mathematical element type is exactly
+    // the case the size fallback targets: size_of() yields nothing, so a unit
+    // size is built directly in the integer index type. type2id must render
+    // the integer index type for the name rather than aborting via
+    // UNREACHABLE.
+    const pointer_typet math_result_type = pointer_type(integer_typet{});
+    const element_address_exprt ea_int_i{
+      base, symbol_exprt{"i", integer_typet{}}, math_result_type};
+    const element_address_exprt ea_int_j{
+      base, symbol_exprt{"j", integer_typet{}}, math_result_type};
+
+    const auto names =
+      element_address_declarations(equal_exprt{ea_int_i, ea_int_j});
+
+    // both share the index type, so a single function is declared for them
+    REQUIRE(names.size() == 1);
+    REQUIRE(names[0].find("_Int") != std::string::npos);
+  }
+
+  SECTION("integer index with a bit-vector-sized element uses bv2nat")
+  {
+    // An integer index combined with a bit-vector element type: size_of()
+    // yields a bit-vector byte size that must be converted to the integer
+    // size sort. This exercises the bit-vector -> Int typecast (bv2nat); it
+    // previously aborted in convert_typecast.
+    const element_address_exprt ea_i{
+      base, symbol_exprt{"i", integer_typet{}}, result_type};
+    const element_address_exprt ea_j{
+      base, symbol_exprt{"j", integer_typet{}}, result_type};
+
+    const std::string smt2 = element_address_smt2(equal_exprt{ea_i, ea_j});
+
+    // the byte size (a bit-vector) is converted to the integer index sort
+    REQUIRE(smt2.find("bv2nat") != std::string::npos);
+    REQUIRE(smt2.find("(declare-fun element-address-") != std::string::npos);
+  }
 }
