@@ -43,6 +43,12 @@ public:
     type_map.insert(std::pair<irep_idt, irep_idt>(old_id, new_id));
   }
 
+  /// \return True if, and only if, there is nothing to rename.
+  bool empty() const
+  {
+    return expr_map.empty() && type_map.empty();
+  }
+
   /// Rename symbols in \p dest.
   /// \return True if, and only if, the expression was not modified.
   bool operator()(exprt &dest) const
