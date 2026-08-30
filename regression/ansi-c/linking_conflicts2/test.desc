@@ -3,6 +3,6 @@ main.c
 other.c
 ^EXIT=(64|1)$
 ^SIGNAL=0$
-^\S+\.c(:\d+:\d+|\(\d+\)): error: conflicting function declarations 'foo'$
+^\S+\.c(:\d+:\d+|\(\d+\)): error: duplicate definition of function 'foo'$
 --
 ^warning: ignoring

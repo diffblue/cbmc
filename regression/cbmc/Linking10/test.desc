@@ -1,0 +1,13 @@
+CORE
+main.c
+module.c
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Test that the replace flag is accumulated (|=) across function parameters
+during linking. Param 1 has incomplete-to-complete struct (set_to_new=true),
+param 2 has complete-to-incomplete struct (set_to_new=false). Without |=,
+the replace flag from param 1 would be lost.
