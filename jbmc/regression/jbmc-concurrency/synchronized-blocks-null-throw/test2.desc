@@ -1,0 +1,12 @@
+CORE
+SyncTest
+--cp `../../../../scripts/format_classpath.sh . ../../../lib/java-models-library/target/core-models.jar ../../../lib/java-models-library/target/cprover-api.jar` --java-threading --throw-runtime-exceptions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+With --throw-runtime-exceptions, synchronizing on a null monitor throws a
+catchable NullPointerException: SyncTest.testNull() catches it and
+testNonNull() runs normally, so verification succeeds.
