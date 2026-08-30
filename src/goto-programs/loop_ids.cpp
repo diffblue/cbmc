@@ -39,8 +39,16 @@ void show_loop_ids(
         if(instruction.is_backwards_goto())
         {
           std::cout << "Loop "
-                    << goto_programt::loop_id(function_id, instruction) << ":"
-                    << "\n";
+                    << goto_programt::loop_id(function_id, instruction) << ":";
+
+          if(instruction.loop_hash != 0)
+          {
+            std::cout << " (hash "
+                      << goto_programt::loop_hash_id(function_id, instruction)
+                      << ")";
+          }
+
+          std::cout << "\n";
 
           std::cout << "  " << instruction.source_location() << "\n";
           std::cout << "\n";
@@ -58,7 +66,12 @@ void show_loop_ids(
             id2string(goto_programt::loop_id(function_id, instruction));
 
           xmlt xml_loop("loop", {{"name", id}}, {});
-          xml_loop.new_element("loop-id").data=id;
+          xml_loop.new_element("loop-id").data = id;
+          if(instruction.loop_hash != 0)
+          {
+            xml_loop.new_element("loop-hash").data =
+              id2string(goto_programt::loop_hash_id(function_id, instruction));
+          }
           xml_loop.new_element() = xml(instruction.source_location());
           std::cout << xml_loop << "\n";
         }
@@ -85,9 +98,22 @@ void show_loop_ids_json(
       std::string id =
         id2string(goto_programt::loop_id(function_id, instruction));
 
-      loops.push_back(json_objectt(
+      json_objectt entry(
         {{"name", json_stringt(id)},
-         {"sourceLocation", json(instruction.source_location())}}));
+         {"sourceLocation", json(instruction.source_location())}});
+
+      // clang-format off
+      // clang-format-15 is confused here and wants to indent the body of the
+      // following if by an extra 2 characters; clang-format-18 no longer has
+      // this problem.
+      if(instruction.loop_hash != 0)
+      {
+        const auto hash = goto_programt::loop_hash_id(function_id, instruction);
+        entry["loopHash"] = json_stringt(id2string(hash));
+      }
+      // clang-format on
+
+      loops.push_back(std::move(entry));
     }
   }
 }

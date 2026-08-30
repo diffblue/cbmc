@@ -1,0 +1,22 @@
+# For goto-programs regression tests, see ../Makefile
+
+default: test
+
+include ../../src/config.inc
+include ../../src/common
+
+ifeq ($(BUILD_ENV_),MSVC)
+  exe=../../../src/goto-cc/goto-cl
+  is_windows=true
+else
+  exe=../../../src/goto-cc/goto-cc
+  is_windows=false
+endif
+
+test:
+	@../test.pl -p -c "bash ./chain.sh $(exe) ../../../src/cbmc/cbmc $(is_windows)"
+
+clean:
+	find . -name '*.out' -execdir $(RM) '{}' \;
+	find . -name '*.gb' -execdir $(RM) '{}' \;
+	$(RM) tests.log

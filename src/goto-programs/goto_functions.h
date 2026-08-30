@@ -82,6 +82,7 @@ public:
   void compute_location_numbers();
   void compute_location_numbers(goto_programt &);
   void compute_loop_numbers();
+  void compute_loop_hashes();
   void compute_target_numbers();
   void compute_incoming_edges();
 
