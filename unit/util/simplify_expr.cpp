@@ -710,3 +710,18 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
+
+TEST_CASE("Simplify member of compound literal", "[core][util]")
+{
+  // member(compound_literal((struct){ .counter = 0 }), .counter) folds to 0.
+  // Without the simplify_member compound-literal rule this does not fold, so
+  // this pins that rule independently of the front-end.
+  const signedbv_typet int_type{32};
+  const struct_typet struct_type{{{"counter", int_type}}};
+  const struct_exprt struct_value{{from_integer(0, int_type)}, struct_type};
+  const unary_exprt compound_literal{
+    ID_compound_literal, struct_value, struct_type};
+  const member_exprt member{compound_literal, "counter", int_type};
+
+  REQUIRE(simplify_expr(member, empty_namespace) == from_integer(0, int_type));
+}
