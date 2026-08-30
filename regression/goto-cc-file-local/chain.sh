@@ -47,6 +47,16 @@ if is_in wall "$ALL_ARGS"; then
   fi
 fi
 
+# Allow a test to override the default verbosity by passing "--verbosity N"
+# in its arguments, e.g. to drop below the warning threshold ("--verbosity 1")
+# and check that a warning is *not* shown.  Otherwise default to the verbose
+# setting used by the rest of the suite.
+if [[ "$ALL_ARGS" =~ --verbosity[[:space:]]+([0-9]+) ]]; then
+  verbosity="--verbosity ${BASH_REMATCH[1]}"
+else
+  verbosity="--verbosity 10"
+fi
+
 export_flag=""
 if is_in old-flag "$ALL_ARGS"; then
   export_flag="--export-function-local-symbols"
@@ -59,7 +69,7 @@ if is_in compile-and-link "$ALL_ARGS"; then
     if [[ "${is_windows}" == "true" ]]; then
       "${goto_cc}"                        \
           ${export_flag}                  \
-          --verbosity 10                  \
+          ${verbosity}                  \
           ${wall}                         \
           ${suffix}                       \
           ${SRC}                          \
@@ -68,7 +78,7 @@ if is_in compile-and-link "$ALL_ARGS"; then
     else
       "${goto_cc}"                        \
           ${export_flag}                  \
-          --verbosity 10                  \
+          ${verbosity}                  \
           ${wall}                         \
           ${suffix}                       \
           ${SRC}                          \
@@ -92,7 +102,7 @@ else
     if [[ "${is_windows}" == "true" ]]; then
       "${goto_cc}"                        \
           ${export_flag}                  \
-          --verbosity 10                  \
+          ${verbosity}                  \
           ${wall}                         \
           ${suffix}                       \
           '/c' "${base}.c"                  \
@@ -101,7 +111,7 @@ else
     else
       "${goto_cc}"                        \
           ${export_flag}                  \
-          --verbosity 10                  \
+          ${verbosity}                  \
           ${wall}                         \
           ${suffix}                       \
           -c "${base}.c"                  \
@@ -116,7 +126,7 @@ if is_in final-link "$ALL_ARGS"; then
   if [[ "${is_windows}" == "true" ]]; then
     "${goto_cc}"                        \
         ${export_flag}                  \
-        --verbosity 10                  \
+        ${verbosity}                  \
         ${wall}                         \
         ${suffix}                       \
         ./*.gb                          \
@@ -125,7 +135,7 @@ if is_in final-link "$ALL_ARGS"; then
   else
     "${goto_cc}"                        \
         ${export_flag}                  \
-        --verbosity 10                  \
+        ${verbosity}                  \
         ${wall}                         \
         ${suffix}                       \
         ./*.gb                          \

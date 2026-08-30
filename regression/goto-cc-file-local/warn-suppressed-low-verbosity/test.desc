@@ -1,0 +1,13 @@
+CORE
+main.c
+final-link --verbosity 1
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+is called but has no linked body
+--
+Same file-local-shadowed-stub scenario as warn-static-called-via-extern, but
+run at --verbosity 1 (below the warning threshold).  The scan is gated
+on warnings actually being shown, so no warning must be emitted.  This exercises
+that gating (chain.sh otherwise defaults to --verbosity 10).
