@@ -1,0 +1,11 @@
+CORE
+refuted.c
+
+^\[main\.assertion\.\d+\] .* does not hold for every array-typed bound variable: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+Confirms the array-typed quantifier body is genuinely evaluated: a property
+that does not hold for all arrays must be refuted.
