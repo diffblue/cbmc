@@ -5258,14 +5258,10 @@ void smt2_convt::flatten2bv(const exprt &expr)
   {
     if(use_FPA_theory)
     {
-      // A floatbv constant's IEEE-754 interchange bit pattern is exactly its
-      // bit-vector representation, so it is emitted as a literal bit-vector.
-      // This is the only shape that reaches flatten2bv under FPA: a
-      // non-constant float whose bits are read is lowered by
-      // lower_byte_operators into a float typecast, which is handled by the
-      // bvfromfloat round-trip in find_symbols and never reaches here.
       if(expr.is_constant())
       {
+        // A floatbv constant's IEEE-754 interchange bit pattern is exactly
+        // its bit-vector representation, so emit it as a literal BV.
         const ieee_float_spect spec(to_floatbv_type(type));
         const mp_integer value = bvrep2integer(
           to_constant_expr(expr).get_value(), spec.width(), false);
@@ -5273,8 +5269,16 @@ void smt2_convt::flatten2bv(const exprt &expr)
       }
       else
       {
-        UNEXPECTEDCASE(
-          "flatten2bv of a non-constant FPA-encoded float is unsupported");
+        // Non-constant float under FPA theory: look up the bvfromfloat
+        // auxiliary that find_symbols pre-created for this expression.
+        const auto &floatbv_type = to_floatbv_type(type);
+        const typecast_exprt tc{expr, bv_typet{floatbv_type.width()}};
+
+        auto it = defined_expressions.find(tc);
+        CHECK_RETURN_WITH_DIAGNOSTICS(
+          it != defined_expressions.end(),
+          "flatten2bv: bvfromfloat entry missing for non-constant float");
+        out << it->second;
       }
     }
     else
@@ -6050,6 +6054,37 @@ void smt2_convt::find_symbols(const exprt &expr)
       out << ')' << '\n';
 
       defined_expressions[expr] = id;
+    }
+  }
+  else if(
+    use_FPA_theory && !expr.is_constant() &&
+    expr.type().id() == ID_floatbv)
+  {
+    // Pre-create a bvfromfloat auxiliary for non-constant floatbv
+    // expressions that may be passed to flatten2bv (e.g. when stored
+    // into a union or flattened as part of a struct).  The SMT-LIB FP
+    // theory has no fp-to-bitvector operator, so the round-trip
+    // (declare fresh BV, assert to_fp(BV) == float) must be emitted at
+    // the top level, before flatten2bv is called mid-expression.
+    const auto &floatbv_type = to_floatbv_type(expr.type());
+    const typecast_exprt tc{expr, bv_typet{floatbv_type.width()}};
+
+    if(defined_expressions.find(tc) == defined_expressions.end())
+    {
+      const irep_idt id =
+        "bvfromfloat." + std::to_string(defined_expressions.size());
+      out << "(declare-fun " << id << " () ";
+      convert_type(tc.type());
+      out << ')' << '\n';
+
+      out << "(assert (= ";
+      out << "((_ to_fp " << floatbv_type.get_e() << " "
+          << floatbv_type.get_f() + 1 << ") " << id << ')';
+      convert_expr(expr);
+      out << ')'; // =
+      out << ')' << '\n';
+
+      defined_expressions[tc] = id;
     }
   }
   else if(expr.id() == ID_initial_state)

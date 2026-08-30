@@ -1,0 +1,17 @@
+CORE broken-smt-backend no-new-smt
+main.c
+--smt2 --fpa --outfile -
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Issue #9101: `--smt2 --fpa --outfile` previously aborted with an invariant
+violation ("flatten2bv of a non-constant FPA-encoded float is unsupported")
+when the program reinterprets the bits of a non-constant float through a
+union.  The fix emits the same bvfromfloat round-trip (declare a fresh BV,
+assert to_fp(bv) == float) that find_symbols uses for explicit typecasts.
+
+Tagged broken-smt-backend/no-new-smt because this test explicitly controls
+the output format (--smt2 --fpa --outfile -) and must not be re-run with a
+different solver backend.
