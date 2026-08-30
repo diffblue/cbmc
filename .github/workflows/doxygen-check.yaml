@@ -21,3 +21,30 @@ jobs:
         sudo apt-get install --no-install-recommends -yq doxygen graphviz
     - name: Run Doxygen
       run: ./scripts/run_doxygen.sh
+
+  # Compile the Java examples used in doc/cprover-manual/java-modeling-constructs.md
+  # so that the canonical example sources do not silently stop compiling. They
+  # are compiled against the real CProver API (cprover-api.jar), built from the
+  # java-models-library submodule, rather than a copied-in stub.
+  check-java-examples:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        submodules: recursive
+    - name: Fetch dependencies
+      env:
+        # This is needed in addition to -yq to prevent apt-get from asking for
+        # user input
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt-get update
+        sudo apt-get install --no-install-recommends -yq default-jdk-headless maven
+    - name: Build the CProver API jar
+      run: |
+        cd jbmc/lib/java-models-library
+        mvn -B dependency:copy@copy-dependencies
+    - name: Compile Java modeling examples
+      run: |
+        doc/cprover-manual/examples/test-compilation.sh \
+          jbmc/lib/java-models-library/target/cprover-api.jar
