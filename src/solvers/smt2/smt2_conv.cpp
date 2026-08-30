@@ -46,6 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "smt2_tokenizer.h"
 
+#include <algorithm>
 #include <cstdint>
 #include <map>
 
@@ -5745,6 +5746,22 @@ void smt2_convt::find_symbols(const exprt &expr)
 
     if(id_entry.second)
     {
+      // A function symbol whose signature involves RegLan cannot be declared
+      // as a UF: SMT-LIB's RegLan is not a first-class sort (cvc5: "expected
+      // first-class sort as domain sort"). Such applications (the
+      // cprover_regex_* / to_regex / in_regex intrinsic family) are lowered
+      // inline by convert_expr, so the declaration is not needed.
+      if(expr.type().id() == ID_mathematical_function)
+      {
+        const auto &mf = to_mathematical_function_type(expr.type());
+        auto is_regex = [](const typet &t) { return t.id() == ID_regex; };
+        if(
+          is_regex(mf.codomain()) ||
+          std::any_of(mf.domain().begin(), mf.domain().end(), is_regex))
+        {
+          return;
+        }
+      }
       std::string smt2_identifier=convert_identifier(identifier);
       smt2_identifiers.insert(smt2_identifier);
 

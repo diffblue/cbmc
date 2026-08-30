@@ -271,6 +271,27 @@ TEST_CASE(
     REQUIRE(get_assert(in) == "(assert (str.in_re s1 (str.to_re s2)))");
   }
 
+  SECTION("no UF declaration is emitted for RegLan-signature functions")
+  {
+    // RegLan is not a first-class SMT-LIB sort: cvc5 rejects a
+    // (declare-fun ... RegLan ...) with "expected first-class sort as domain
+    // sort". The regex intrinsics are lowered inline, so find_symbols must
+    // not declare them.
+    const auto re =
+      string_builtin_app(ID_cprover_string_to_regex_func, {s1}, regex_type);
+    const auto in = string_builtin_app(
+      ID_cprover_string_in_regex_func, {s2, re}, bool_typet{});
+    symbol_tablet symbol_table;
+    namespacet ns(symbol_table);
+    std::ostringstream out;
+    smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out);
+    conv.set_to(in, true);
+    const std::string full = out.str();
+    REQUIRE(full.find("RegLan)") == std::string::npos);
+    REQUIRE(
+      full.find("(assert (str.in_re s2 (str.to_re s1)))") != std::string::npos);
+  }
+
   SECTION("regex star lowers to re.*")
   {
     const auto re =
