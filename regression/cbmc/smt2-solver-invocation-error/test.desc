@@ -1,0 +1,16 @@
+CORE
+main.c
+--cprover-smt2 --external-smt2-solver nonexistent_smt2_solver_8362
+^SMT2 solver returned exit code [0-9]+
+^VERIFICATION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+//
+// Regression test for #8362: when invoking the SMT2 solver fails -- here by
+// pointing at a non-existent external solver binary -- the failure must be
+// reported rather than silently ignored. The previous `if(res < 0)` check was
+// dead code (run() never returns a negative value), so no message was produced
+// and the only symptom was an unexplained inconclusive result. We do not match
+// the platform-specific stderr text (e.g. "execvp ... failed") to keep the
+// test portable.
