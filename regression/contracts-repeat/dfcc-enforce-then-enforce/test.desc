@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --enforce-contract foo _ --enforce-contract foo
+^EXIT=6$
+^SIGNAL=0$
+^.*Contract enforcement cannot be applied to a binary that has already been instrumented by the DFCC pipeline.*$
+^.*Only one DFCC pass per binary is supported.*$
+--
+^.*VERIFICATION SUCCESSFUL.*$
+This test enforces a contract on foo under the DFCC pipeline, then runs a
+plain (non-DFCC) --enforce-contract foo on the resulting binary. The
+second invocation must fail with a clean error: without the cross-mode
+guard the non-DFCC path tripped an invariant (abort) on the already
+DFCC-instrumented binary.
