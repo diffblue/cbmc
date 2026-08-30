@@ -1,0 +1,10 @@
+CORE
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+This reproduces GitHub issue #8593: a static pointer initialized from a cast of
+another static object's address used to surface as an invalid pointer.
+--pointer-check exercises that original failure mode directly.
