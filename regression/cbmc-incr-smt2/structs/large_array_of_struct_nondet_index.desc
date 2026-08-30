@@ -16,3 +16,9 @@ This test covers support for examples with large arrays of structs using nondet
 indexes including trace generation. This combination of features is chosen in
 order to avoid array cell sensitivity or struct field sensitivity simplifying
 away the relevant `member_exprt` and `with_exprt` expressions.
+
+Marked THOROUGH because of Windows platform IPC overhead: the incremental
+SMT2 pipeline communicates with the solver via pipes, which takes 473s on
+Windows vs 3s on Linux. Both z3 and cvc5 show identical times, confirming
+this is a platform issue, not solver-dependent. See PR #8868 for the full
+investigation.
