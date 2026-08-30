@@ -10,6 +10,8 @@ Author: Diffblue Ltd.
 /// Unit tests for value_sett
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
+#include <util/invariant.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/symbol_table.h>
@@ -431,5 +433,54 @@ SCENARIO(
             from_integer(0, to_array_type(A_symbol.type).index_type())}));
       }
     }
+  }
+}
+
+TEST_CASE(
+  "value_sett::assign accepts arrays differing in size and index type",
+  "[core][pointer-analysis][value_set]")
+{
+  // Turn invariant violations into exceptions so that a regression of the
+  // relaxed type check shows up as a clean test failure.
+  const cbmc_invariants_should_throwt invariants_throw;
+
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  value_sett value_set;
+
+  const signedbv_typet int_type{32};
+
+  // A struct type used as an array index ("map key").
+  struct_typet key_type{{{"id", int_type}}};
+  key_type.set_tag("key");
+
+  // Two arrays sharing the element type: one indexed by the struct key (a
+  // "map", as used by the Strata heap model), one by the default index type.
+  // The sizes differ as well: the index-type annotation (#index_type) is an
+  // irept comment and hence invisible to type equality, so the size
+  // difference is what exercises the relaxed type check.
+  array_typet map_type{int_type, from_integer(2, int_type)};
+  map_type.index_type_nonconst() = key_type;
+  const array_typet array_type{int_type, from_integer(3, int_type)};
+
+  const symbol_exprt map_lhs{"map_lhs", map_type};
+  const symbol_exprt array_rhs{"array_rhs", array_type};
+
+  SECTION("differing size and index type, same element type")
+  {
+    // Array indices are abstracted to unknown on this path, so the index type
+    // does not affect materialisation and the assignment must be accepted.
+    REQUIRE_NOTHROW(value_set.assign(map_lhs, array_rhs, ns, false, false));
+  }
+
+  SECTION("differing element types are still rejected")
+  {
+    const array_typet other_element_type{
+      unsignedbv_typet{8}, from_integer(2, int_type)};
+    const symbol_exprt bytes_rhs{"bytes_rhs", other_element_type};
+
+    REQUIRE_THROWS_AS(
+      value_set.assign(map_lhs, bytes_rhs, ns, false, false),
+      invariant_failedt);
   }
 }
