@@ -1,4 +1,4 @@
-.TH CRANGLER "1" "June 2022" "crangler-5.59.0" "User Commands"
+.TH CRANGLER "1" "March 1, 2026" "crangler-6.10.0" "User Commands"
 .SH NAME
 crangler \- C source transformation
 .SH SYNOPSIS
@@ -63,10 +63,15 @@ The result is written to standard output.
 }
 .EE
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
+.SH SEE ALSO
+.BR goto\-cc (1),
+.BR goto\-instrument (1)
 .SH COPYRIGHT
-2021, Daniel Kroening
+2021\-2026, Daniel Kroening
