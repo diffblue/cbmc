@@ -35,12 +35,14 @@ TEST_CASE(
 }
 
 /// Helper: extract the "(assert ...)" line from SMT2 output of set_to
-static std::string get_assert(const exprt &red_expr)
+static std::string get_assert(
+  const exprt &red_expr,
+  smt2_convt::solvert solver = smt2_convt::solvert::GENERIC)
 {
   symbol_tablet symbol_table;
   namespacet ns(symbol_table);
   std::ostringstream out;
-  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out);
+  smt2_convt conv(ns, "test", "", "QF_BV", solver, out);
   conv.set_to(red_expr, true);
   std::string result = out.str();
   auto pos = result.find("(assert ");
@@ -117,19 +119,140 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
   }
 }
 
+TEST_CASE("smt2_convt does not emit unary concat", "[core][solvers][smt2]")
+{
+  const unsignedbv_typet u8{8};
+
+  SECTION("concatenation expression with one non-zero-width operand")
+  {
+    const unsignedbv_typet u0{0};
+    const symbol_exprt x{"x", u8};
+    const symbol_exprt z{"z", u0};
+
+    const concatenation_exprt concat{{z, x}, u8};
+    REQUIRE(get_assert(equal_exprt{concat, x}) == "(assert (= x x))");
+  }
+
+  SECTION("struct with one non-zero-width component")
+  {
+    const struct_typet struct_type{
+      {{"empty1", empty_typet{}}, {"empty2", empty_typet{}}, {"value", u8}}};
+    const symbol_exprt value{"value", u8};
+    const struct_exprt construction{
+      {nil_exprt{}, nil_exprt{}, value}, struct_type};
+    const symbol_exprt structure{"structure", struct_type};
+
+    REQUIRE(
+      get_assert(equal_exprt{construction, structure}) ==
+      "(assert (= value structure))");
+  }
+
+  SECTION("struct concatenation preserves component order")
+  {
+    const struct_typet struct_type{
+      {{"low", u8}, {"empty", empty_typet{}}, {"high", u8}}};
+    const symbol_exprt low{"low", u8};
+    const symbol_exprt high{"high", u8};
+    const struct_exprt construction{{low, nil_exprt{}, high}, struct_type};
+    const symbol_exprt structure{"structure", struct_type};
+
+    REQUIRE(
+      get_assert(equal_exprt{construction, structure}) ==
+      "(assert (= (concat high low) structure))");
+  }
+
+  SECTION("datatype struct flattened to a bit-vector")
+  {
+    const struct_typet struct_type{
+      {{"empty1", empty_typet{}}, {"empty2", empty_typet{}}, {"value", u8}}};
+    const symbol_exprt structure{"structure", struct_type};
+    const symbol_exprt value{"value", u8};
+    const typecast_exprt flattened{structure, u8};
+
+    REQUIRE(
+      get_assert(equal_exprt{flattened, value}, smt2_convt::solvert::Z3) ==
+      "(assert (= (struct.0.value structure) value))");
+  }
+
+  SECTION("datatype flattening preserves component order")
+  {
+    const unsignedbv_typet u16{16};
+    const struct_typet struct_type{
+      {{"low", u8}, {"empty", empty_typet{}}, {"high", u8}}};
+    const symbol_exprt structure{"structure", struct_type};
+    const symbol_exprt value{"value", u16};
+    const typecast_exprt flattened{structure, u16};
+
+    REQUIRE(
+      get_assert(equal_exprt{flattened, value}, smt2_convt::solvert::Z3) ==
+      "(assert (= (concat (struct.0.high structure) "
+      "(struct.0.low structure)) value))");
+  }
+}
+
 TEST_CASE(
-  "smt2_convt no unary concat for zero-width operand",
+  "smt2_convt array-valued let uses the emitted array encoding",
   "[core][solvers][smt2]")
 {
-  unsignedbv_typet u8{8};
-  unsignedbv_typet u0{0};
-  symbol_exprt x{"x", u8};
-  symbol_exprt z{"z", u0};
+  const unsignedbv_typet u8{8};
+  array_typet array_type{u8, from_integer(2, u8)};
+  array_type.index_type_nonconst() = u8;
+  const struct_typet struct_type{{{"array", array_type}}};
+  const symbol_exprt structure{"structure", struct_type};
+  const member_exprt member{structure, "array", array_type};
+  const exprt zero = from_integer(0, u8);
 
-  // concat of a zero-width and a non-zero-width operand should emit
-  // the non-zero-width operand directly, not (concat x)
-  concatenation_exprt concat{{z, x}, u8};
-  REQUIRE(get_assert(equal_exprt{concat, x}) == "(assert (= x x))");
+  SECTION("the result encoding follows the let body")
+  {
+    const symbol_exprt scalar{"scalar", u8};
+    const let_exprt let{scalar, zero, member};
+    const index_exprt index{let, zero};
+    const std::string assertion = get_assert(notequal_exprt{index, zero});
+
+    INFO(assertion);
+    REQUIRE(assertion.find("(select") == std::string::npos);
+    REQUIRE(assertion.find("(bvlshr") != std::string::npos);
+  }
+
+  SECTION("flattened array bindings are inlined")
+  {
+    const symbol_exprt bound{"bound", array_type};
+    const index_exprt index{bound, zero};
+    const let_exprt let{bound, member, index};
+    const std::string assertion = get_assert(notequal_exprt{let, zero});
+
+    INFO(assertion);
+    REQUIRE(assertion.find("(select") == std::string::npos);
+    REQUIRE(assertion.find("(bvlshr") != std::string::npos);
+  }
+
+  SECTION("other bindings are retained")
+  {
+    const symbol_exprt scalar{"scalar", u8};
+    const symbol_exprt bound{"bound", array_type};
+    const index_exprt index{bound, zero};
+    const let_exprt let{{scalar, bound}, {zero, member}, index};
+    const std::string assertion = get_assert(notequal_exprt{let, zero});
+
+    INFO(assertion);
+    REQUIRE(assertion.find("(let ((scalar") != std::string::npos);
+    REQUIRE(assertion.find("(select") == std::string::npos);
+    REQUIRE(assertion.find("(bvlshr") != std::string::npos);
+  }
+
+  SECTION("array-theory bindings are retained")
+  {
+    const symbol_exprt array{"array", array_type};
+    const symbol_exprt bound{"bound", array_type};
+    const index_exprt index{bound, zero};
+    const let_exprt let{bound, array, index};
+    const std::string assertion = get_assert(notequal_exprt{let, zero});
+
+    INFO(assertion);
+    REQUIRE(assertion.find("(let ((bound array))") != std::string::npos);
+    REQUIRE(assertion.find("(select bound") != std::string::npos);
+    REQUIRE(assertion.find("(bvlshr") == std::string::npos);
+  }
 }
 
 TEST_CASE("smt2_convt range encoding", "[core][solvers][smt2]")
