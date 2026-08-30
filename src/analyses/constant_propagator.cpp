@@ -19,6 +19,7 @@ Author: Peter Schrammel
 #endif
 
 #include <util/arith_tools.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
@@ -166,6 +167,17 @@ void constant_propagator_domaint::transform(
   {
     const exprt &lhs = from->assign_lhs();
     const exprt &rhs = from->assign_rhs();
+
+    // If we're assigning to the rounding mode, invalidate all
+    // floating-point constants as they may have been computed
+    // with a different rounding mode
+    if(
+      lhs.id() == ID_symbol &&
+      to_symbol_expr(lhs).get_identifier() == rounding_mode_identifier())
+    {
+      values.invalidate_floatbv_constants(ns);
+    }
+
     assign_rec(values, lhs, rhs, ns, cp, true);
   }
   else if(from->is_assume())
@@ -487,6 +499,28 @@ void constant_propagator_domaint::valuest::set_dirty_to_top(
     if(
       (symbol.is_static_lifetime || dirty(id)) &&
       !symbol.type.get_bool(ID_C_constant))
+    {
+      it = replace_const.erase(it);
+    }
+    else
+      it++;
+  }
+}
+
+void constant_propagator_domaint::valuest::invalidate_floatbv_constants(
+  const namespacet &ns)
+{
+  typedef replace_symbolt::expr_mapt expr_mapt;
+  expr_mapt &expr_map = replace_const.get_expr_map();
+
+  for(expr_mapt::iterator it = expr_map.begin(); it != expr_map.end();)
+  {
+    const irep_idt id = it->first;
+    const symbolt &symbol = ns.lookup(id);
+
+    // Remove any variable with floating-point type, as its value
+    // may have been computed with a different rounding mode
+    if(symbol.type.id() == ID_floatbv)
     {
       it = replace_const.erase(it);
     }

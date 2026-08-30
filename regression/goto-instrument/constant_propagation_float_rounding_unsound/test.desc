@@ -1,0 +1,7 @@
+CORE
+main.c
+--constant-propagator --inline --add-library
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
