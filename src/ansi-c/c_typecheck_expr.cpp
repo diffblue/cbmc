@@ -3260,9 +3260,12 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt::conditional_cast(isnan_expr, expr.type());
   }
-  else if(identifier==CPROVER_PREFIX "isfinitef" ||
-          identifier==CPROVER_PREFIX "isfinited" ||
-          identifier==CPROVER_PREFIX "isfiniteld")
+  else if(
+    identifier == CPROVER_PREFIX "isfinitef" ||
+    identifier == CPROVER_PREFIX "isfinited" ||
+    identifier == CPROVER_PREFIX "isfiniteld" ||
+    identifier == "__builtin_isfinite" || identifier == "__builtin_finite" ||
+    identifier == "__builtin_finitef" || identifier == "__builtin_finitel")
   {
     if(expr.arguments().size()!=1)
     {
