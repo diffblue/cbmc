@@ -131,6 +131,13 @@ protected:
   void convert_typecast(const typecast_exprt &expr);
   void convert_floatbv_typecast(const floatbv_typecast_exprt &expr);
   void convert_struct(const struct_exprt &expr);
+  // Emit the SMT-LIB application of a single ADT constructor, taking each of
+  // the constructor's field values from `operands` by matching field name to
+  // component name. Emits `ctor-name` for a nullary constructor.
+  void convert_adt_constructor(
+    const irept &ctor,
+    const struct_union_typet::componentst &components,
+    const exprt::operandst &operands);
   void convert_union(const union_exprt &expr);
   void convert_constant(const constant_exprt &expr);
   void convert_relation(const binary_relation_exprt &);
