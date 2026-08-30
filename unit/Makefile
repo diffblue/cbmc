@@ -54,6 +54,8 @@ SRC += analyses/ai/ai.cpp \
        ansi-c/type2name.cpp \
        ansi-c/c_typecheck_base.cpp \
        big-int/big-int.cpp \
+       cpp/cpp_parser.cpp \
+       cpp/cpp_scanner.cpp \
        compound_block_locations.cpp \
        empty_namespace_test.cpp \
        get_goto_model_from_c_test.cpp \
@@ -63,6 +65,7 @@ SRC += analyses/ai/ai.cpp \
        goto-instrument/cover_instrument.cpp \
        goto-instrument/cover/cover_only.cpp \
        goto-synthesizer/expr_enumerator/expr_enumerator.cpp \
+       goto-programs/elf_reader.cpp \
        goto-programs/goto_program_assume.cpp \
        goto-programs/goto_program_dead.cpp \
        goto-programs/goto_program_declaration.cpp \
@@ -80,6 +83,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/restrict_function_pointers.cpp \
        goto-programs/structured_trace_util.cpp \
        goto-programs/remove_returns.cpp \
+       goto-programs/wp.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/apply_condition.cpp \
        goto-symex/complexity_limiter.cpp \
@@ -114,6 +118,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_cadical.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
+       solvers/smt2/smt2_parser.cpp \
        solvers/smt2/smt2irep.cpp \
        solvers/smt2/smt2_tokenizer.cpp \
        solvers/smt2_incremental/ast/smt_commands.cpp \
@@ -182,6 +187,7 @@ SRC += analyses/ai/ai.cpp \
        util/irep.cpp \
        util/irep_sharing.cpp \
        util/invariant.cpp \
+       util/json.cpp \
        util/json_array.cpp \
        util/json_object.cpp \
        util/lazy.cpp \
