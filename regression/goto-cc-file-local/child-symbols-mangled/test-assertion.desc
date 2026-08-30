@@ -1,0 +1,15 @@
+CORE
+main.c
+final-link assertion-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Companion to test.desc: after linking three TUs that each include the same
+header (so `helper` and its child symbols mangle to the same name and unify),
+run cbmc on the linked model.  This checks the model is actually usable -- the
+mangled symbol_expr references inside instruction bodies and the function's
+parameter_identifiers must be consistent -- which a symbol-table grep alone
+would not catch.
