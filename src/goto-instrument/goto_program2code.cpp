@@ -23,6 +23,24 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <sstream>
 
+/// Recursively rewrite the identifier of every symbol expression that appears
+/// in \p renames, in place.
+static void apply_local_renames(
+  exprt &expr,
+  const std::unordered_map<irep_idt, irep_idt> &renames)
+{
+  if(expr.id() == ID_symbol)
+  {
+    symbol_exprt &se = to_symbol_expr(expr);
+    const auto it = renames.find(se.get_identifier());
+    if(it != renames.end())
+      se.set_identifier(it->second);
+  }
+
+  for(auto &op : expr.operands())
+    apply_local_renames(op, renames);
+}
+
 void goto_program2codet::operator()()
 {
   // labels stored for cleanup
@@ -37,6 +55,11 @@ void goto_program2codet::operator()()
   // gather variable scope information
   build_dead_map();
 
+  // gather function parameter names to avoid collision with local variables
+  build_param_names();
+  used_local_names.clear();
+  local_renames.clear();
+
   // see whether var args are in use, identify va_list symbol
   scan_for_varargs();
 
@@ -48,6 +71,11 @@ void goto_program2codet::operator()()
         toplevel_block);
 
   cleanup_code(toplevel_block, ID_nil);
+
+  // apply renames of local variables that collided with a parameter or another
+  // local, to every reference in the produced code
+  if(!local_renames.empty())
+    apply_local_renames(toplevel_block, local_renames);
 }
 
 void goto_program2codet::build_loop_map()
@@ -97,6 +125,41 @@ void goto_program2codet::build_dead_map()
     {
       dead_map[instruction.dead_symbol().identifier()] =
         instruction.location_number;
+    }
+  }
+}
+
+void goto_program2codet::build_param_names()
+{
+  param_names.clear();
+
+  // Get function parameters from the symbol table
+  const symbolt *func_symbol = nullptr;
+  if(!ns.lookup(func_name, func_symbol) && func_symbol->type.id() == ID_code)
+  {
+    const code_typet &code_type = to_code_type(func_symbol->type);
+    const code_typet::parameterst &parameters = code_type.parameters();
+
+    // Store the base names of parameters as they will be rendered in the C
+    // output. We use the parameter *symbol's* base name rather than the
+    // code-type parameter's base name: for symbol tables imported via
+    // symtab2gb (see #6268) the code-type base name (e.g. "1_x") differs from
+    // the symbol base name ("x") that expr2c actually emits.
+    for(const auto &param : parameters)
+    {
+      irep_idt param_base_name = param.get_base_name();
+
+      const symbolt *param_symbol = nullptr;
+      if(
+        !param.get_identifier().empty() &&
+        !ns.lookup(param.get_identifier(), param_symbol) &&
+        !param_symbol->base_name.empty())
+      {
+        param_base_name = param_symbol->base_name;
+      }
+
+      if(!param_base_name.empty())
+        param_names.insert(param_base_name);
     }
   }
 }
@@ -454,6 +517,67 @@ goto_programt::const_targett goto_program2codet::convert_decl(
 {
   code_frontend_declt d = code_frontend_declt{target->decl_symbol()};
   symbol_exprt &symbol = d.symbol();
+
+  // Check if the local variable's base name conflicts with a function
+  // parameter's base name or with another local variable's base name. If so,
+  // rename the local variable to avoid producing invalid C (a redeclaration in
+  // the same scope, see #6268).
+  //
+  // We only handle identifiers that lack the `function::...` scoping
+  // convention. For scoped identifiers expr2c's own collision handling
+  // (expr2ct::get_shorthands) already derives the enclosing function and emits
+  // valid, non-colliding names, so intercepting here would needlessly change
+  // that established output. Unscoped identifiers (e.g. from symtab2gb-imported
+  // symbol tables, as in #6268) are precisely the case expr2c cannot
+  // disambiguate, because it cannot recover the enclosing function.
+  const symbolt *local_symbol_ptr = nullptr;
+  if(
+    !ns.lookup(symbol.get_identifier(), local_symbol_ptr) &&
+    id2string(symbol.get_identifier()).find("::") == std::string::npos)
+  {
+    const symbolt &local_symbol = *local_symbol_ptr;
+    const irep_idt base_name = local_symbol.base_name;
+    const irep_idt identifier = local_symbol.name;
+
+    if(
+      !base_name.empty() &&
+      (param_names.find(base_name) != param_names.end() ||
+       used_local_names.find(base_name) != used_local_names.end()))
+    {
+      // Generate a unique base name by appending a suffix.
+      irep_idt new_base_name;
+      irep_idt new_identifier;
+      unsigned suffix = 1;
+      do
+      {
+        const std::string suffix_str = "$" + std::to_string(suffix);
+        new_base_name = id2string(base_name) + suffix_str;
+        // Append the same suffix to the identifier so that the new base name
+        // remains a suffix of the identifier; expr2c's id_shorthand() only
+        // emits a symbol's base name when it is a suffix of the identifier.
+        new_identifier = id2string(identifier) + suffix_str;
+        ++suffix;
+      } while(param_names.find(new_base_name) != param_names.end() ||
+              used_local_names.find(new_base_name) != used_local_names.end() ||
+              symbol_table.has_symbol(new_identifier));
+
+      // Register the renamed symbol so that expr2c can look it up, and record
+      // the rename to be applied to all references once conversion completes.
+      symbolt new_symbol = local_symbol;
+      new_symbol.name = new_identifier;
+      new_symbol.base_name = new_base_name;
+      symbol_table.insert(std::move(new_symbol));
+
+      local_renames[identifier] = new_identifier;
+
+      used_local_names.insert(new_base_name);
+    }
+    else
+    {
+      // Track this local variable's base name
+      used_local_names.insert(base_name);
+    }
+  }
 
   goto_programt::const_targett next=target;
   ++next;
