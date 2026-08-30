@@ -149,7 +149,7 @@ private:
   ///   recurses depends only on the number of arguments supplied in the source
   ///   code at compile time.
   template <typename outputt, typename... outputst>
-  void push_outputs(outputt &&output, outputst &&... outputs);
+  void push_outputs(outputt &&output, outputst &&...outputs);
 
   smt_term_to_string_convertert() = default;
 
@@ -160,6 +160,7 @@ private:
   visit(const smt_function_application_termt &function_application) override;
   void visit(const smt_forall_termt &forall) override;
   void visit(const smt_exists_termt &exists) override;
+  void visit(const smt_const_array_termt &const_array) override;
 
 public:
   /// \brief This function is complete the external interface to this class. All
@@ -198,7 +199,8 @@ smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(
   const std::vector<std::reference_wrapper<const elementt>> &outputs)
 {
-  return [=](std::ostream &os) {
+  return [=](std::ostream &os)
+  {
     for(const auto &output : make_range(outputs.rbegin(), outputs.rend()))
     {
       push_outputs(" ", output.get());
@@ -210,11 +212,11 @@ smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(
   const sorted_variablest &output)
 {
-  return [=](std::ostream &os) {
+  return [=](std::ostream &os)
+  {
     const auto push_sorted_variable =
-      [&](const smt_identifier_termt &identifier) {
-        push_outputs("(", identifier, " ", identifier.get_sort(), ")");
-      };
+      [&](const smt_identifier_termt &identifier)
+    { push_outputs("(", identifier, " ", identifier.get_sort(), ")"); };
     for(const auto &bound_variable :
         make_range(output.identifiers.rbegin(), --output.identifiers.rend()))
     {
@@ -238,7 +240,7 @@ void smt_term_to_string_convertert::push_outputs()
 template <typename outputt, typename... outputst>
 void smt_term_to_string_convertert::push_outputs(
   outputt &&output,
-  outputst &&... outputs)
+  outputst &&...outputs)
 {
   push_outputs(std::forward<outputst>(outputs)...);
   push_output(std::forward<outputt>(output));
@@ -293,6 +295,13 @@ void smt_term_to_string_convertert::visit(const smt_exists_termt &exists)
   sorted_variablest bound_variables{exists.bound_variables()};
   auto predicate = exists.predicate();
   push_outputs("(exists (", bound_variables, ") ", std::move(predicate), ")");
+}
+
+void smt_term_to_string_convertert::visit(
+  const smt_const_array_termt &const_array)
+{
+  push_outputs(
+    "((as const ", const_array.get_sort(), ") ", const_array.value(), ")");
 }
 
 std::ostream &
@@ -422,7 +431,8 @@ public:
       parameters.begin(),
       parameters.end(),
       " ",
-      [](const smt_identifier_termt &identifier) {
+      [](const smt_identifier_termt &identifier)
+      {
         return "(" + smt_to_smt2_string(identifier) + " " +
                smt_to_smt2_string(identifier.get_sort()) + ")";
       });

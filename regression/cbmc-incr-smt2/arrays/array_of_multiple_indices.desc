@@ -1,0 +1,14 @@
+CORE
+array_of_multiple_indices.c
+
+Passing problem to incremental SMT2 solving
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Exercises an array_of (via __CPROVER_array_set) read at multiple distinct
+nondet indices. With the constant-array encoding the array is defined once and
+every index is constrained, so the reads agree. Unlike the previous forall
+encoding, this needs no --slice-formula workaround.
+See GitHub issue diffblue/cbmc#8061.
