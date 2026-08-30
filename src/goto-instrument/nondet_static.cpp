@@ -19,6 +19,7 @@ Date: November 2011
 
 #include "nondet_static.h"
 
+#include <util/exception_utils.h>
 #include <util/prefix.h>
 #include <util/std_code.h>
 
@@ -26,7 +27,17 @@ Date: November 2011
 
 #include <linking/static_lifetime_init.h>
 
+#include <map>
 #include <regex>
+#include <vector>
+
+/// \return the "file:variable" key used to identify \p symbol for the
+///   --nondet-static-exclude option.
+static std::string qualified_name(const symbolt &symbol)
+{
+  return id2string(symbol.location.get_file()) + ":" +
+         id2string(symbol.display_name());
+}
 
 /// See the return.
 /// \param symbol_expr: The symbol expression to analyze.
@@ -145,49 +156,72 @@ void nondet_static(
   const std::set<std::string> &except_values)
 {
   const namespacet ns(goto_model.symbol_table);
-  std::set<std::string> to_exclude;
+  symbol_tablet &symbol_table = goto_model.symbol_table;
 
-  for(auto const &except : except_values)
+  // Build the set of "file:variable" keys to exclude. Each requested exclusion
+  // is first looked up as a symbol identifier (e.g. "f::1::bar" or a global
+  // "foo"); if that fails it is treated as a "file:variable" name. Either way
+  // the exclusion has to match some symbol below -- silently ignoring an
+  // unknown exclusion is exactly the bug reported in #8225, so we track which
+  // requested exclusions are actually used and report any that are not.
+  const std::vector<std::string> except_list(
+    except_values.begin(), except_values.end());
+  std::vector<bool> matched(except_list.size(), false);
+  // maps a candidate "file:variable" key to the index of the requesting
+  // exclusion in except_list
+  std::multimap<std::string, std::size_t> to_exclude;
+
+  for(std::size_t i = 0; i < except_list.size(); ++i)
   {
-    const bool file_prefix_found = except.find(":") != std::string::npos;
+    const std::string &except = except_list[i];
+    const symbolt *symbol_ptr = symbol_table.lookup(except);
 
-    if(file_prefix_found)
+    if(symbol_ptr != nullptr)
     {
-      to_exclude.insert(except);
-      if(has_prefix(except, "./"))
-      {
-        to_exclude.insert(except.substr(2, except.length() - 2));
-      }
-      else
-      {
-        to_exclude.insert("./" + except);
-      }
+      // resolved as a symbol identifier
+      to_exclude.emplace(qualified_name(*symbol_ptr), i);
     }
     else
     {
-      irep_idt symbol_name(except);
-      symbolt lookup_results = ns.lookup(symbol_name);
-      to_exclude.insert(
-        id2string(lookup_results.location.get_file()) + ":" + except);
+      // treat as a "file:variable" name (validated via matched[] below)
+      to_exclude.emplace(except, i);
+      if(has_prefix(except, "./"))
+        to_exclude.emplace(except.substr(2, except.length() - 2), i);
+      else
+        to_exclude.emplace("./" + except, i);
     }
   }
-
-  symbol_tablet &symbol_table = goto_model.symbol_table;
 
   for(symbol_tablet::iteratort symbol_it = symbol_table.begin();
       symbol_it != symbol_table.end();
       symbol_it++)
   {
     symbolt &symbol = symbol_it.get_writeable_symbol();
-    std::string qualified_name = id2string(symbol.location.get_file()) + ":" +
-                                 id2string(symbol.display_name());
-    if(to_exclude.find(qualified_name) != to_exclude.end())
+    const std::string name = qualified_name(symbol);
+    const auto range = to_exclude.equal_range(name);
+    if(range.first != range.second)
     {
       symbol.value.set(ID_C_no_nondet_initialization, 1);
+      for(auto it = range.first; it != range.second; ++it)
+        matched[it->second] = true;
     }
     else if(is_nondet_initializable_static(symbol.symbol_expr(), ns))
     {
       symbol.value = side_effect_expr_nondett(symbol.type, symbol.location);
+    }
+  }
+
+  // Report any requested exclusion that did not match a symbol, so that typos
+  // in either the symbol-identifier or the "file:variable" form are surfaced
+  // rather than silently ignored (#8225).
+  for(std::size_t i = 0; i < except_list.size(); ++i)
+  {
+    if(!matched[i])
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "'" + except_list[i] + "' did not match any symbol",
+        "--nondet-static-exclude",
+        "a symbol identifier (e.g. f::1::bar) or a file:variable name");
     }
   }
 
@@ -210,9 +244,8 @@ void nondet_static_matching(goto_modelt &goto_model, const std::string &regex)
       symbol_it++)
   {
     symbolt &symbol = symbol_it.get_writeable_symbol();
-    std::string qualified_name = id2string(symbol.location.get_file()) + ":" +
-                                 id2string(symbol.display_name());
-    if(!std::regex_match(qualified_name, regex_matcher))
+    const std::string name = qualified_name(symbol);
+    if(!std::regex_match(name, regex_matcher))
     {
       symbol.value.set(ID_C_no_nondet_initialization, 1);
     }
