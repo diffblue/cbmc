@@ -20,7 +20,7 @@ public:
     const namespacet &,
     propt &,
     message_handlert &,
-    bool get_array_constraints = false);
+    bool collect_constraint_stats = false);
 
   void finish_eager_conversion() override;
 
