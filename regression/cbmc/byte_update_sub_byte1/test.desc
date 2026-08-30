@@ -1,0 +1,13 @@
+CORE
+main.c
+--little-endian --no-simplify
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Writing a 1-bit zero through a __CPROVER_bitvector[1] pointer must
+clear the MSB of the first byte, not the LSB. The --no-simplify flag
+is needed to exercise the boolbv convert_byte_update path directly.
+This test uses a constant offset (byte 0).
