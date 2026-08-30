@@ -1,0 +1,82 @@
+name: Memory allocator selection
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  # Build cbmc with each CBMC_ALLOCATOR value and confirm the resulting binary
+  # links (or does not link) the expected allocator.
+  cmake-allocator:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - allocator: system
+            packages: ""
+            expect: none
+          - allocator: tcmalloc
+            packages: libgoogle-perftools-dev
+            expect: tcmalloc
+          - allocator: jemalloc
+            packages: libjemalloc-dev
+            expect: jemalloc
+          - allocator: auto
+            packages: libgoogle-perftools-dev
+            expect: tcmalloc
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build g++ flex bison ccache ${{ matrix.packages }}
+      - name: Configure with CBMC_ALLOCATOR=${{ matrix.allocator }}
+        run: cmake -S . -Bbuild -G Ninja -DWITH_JBMC=OFF -DCBMC_ALLOCATOR=${{ matrix.allocator }}
+      - name: Build cbmc
+        run: cmake --build build --target cbmc -j$(nproc)
+      - name: Confirm the binary links the expected allocator
+        run: |
+          echo "Allocators linked into build/bin/cbmc:"
+          ldd build/bin/cbmc | grep -iE "tcmalloc|jemalloc" || true
+          case "${{ matrix.expect }}" in
+            tcmalloc)
+              ldd build/bin/cbmc | grep -q tcmalloc \
+                || { echo "ERROR: tcmalloc not linked"; exit 1; } ;;
+            jemalloc)
+              ldd build/bin/cbmc | grep -q jemalloc \
+                || { echo "ERROR: jemalloc not linked"; exit 1; } ;;
+            none)
+              if ldd build/bin/cbmc | grep -qiE "tcmalloc|jemalloc"; then
+                echo "ERROR: an alternative allocator was unexpectedly linked"
+                exit 1
+              fi ;;
+          esac
+
+  # The Makefile build does not auto-detect an allocator; confirm the documented
+  # manual approach (LIBS=-ltcmalloc_minimal) produces a binary linking tcmalloc.
+  makefile-tcmalloc:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq g++ flex bison ccache libgoogle-perftools-dev
+      - name: Build cbmc with make, linking tcmalloc via LIBS
+        run: |
+          make -C src minisat2-download
+          make -C src CXX="ccache g++" LIBS="-ltcmalloc_minimal" -j$(nproc) cbmc.dir
+      - name: Confirm the binary links tcmalloc
+        run: |
+          ldd src/cbmc/cbmc | grep -iE "tcmalloc" || true
+          ldd src/cbmc/cbmc | grep -q tcmalloc \
+            || { echo "ERROR: tcmalloc not linked"; exit 1; }
