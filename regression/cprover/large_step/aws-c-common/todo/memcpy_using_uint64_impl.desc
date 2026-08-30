@@ -1,0 +1,6 @@
+CORE
+memcpy_using_uint64_impl_contract.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--
