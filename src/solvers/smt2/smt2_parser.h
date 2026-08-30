@@ -164,7 +164,13 @@ protected:
   exprt binary(irep_idt, const exprt::operandst &);
   exprt unary(irep_idt, const exprt::operandst &);
   exprt bv_division(const exprt::operandst &, bool is_signed);
-  exprt bv_mod(const exprt::operandst &, bool is_signed);
+  /// \p sign_follows_divisor distinguishes the SMT-LIB bvsmod
+  /// semantics (remainder sign follows the divisor) from the
+  /// truncated bvsrem semantics (sign follows the dividend).
+  exprt bv_mod(
+    const exprt::operandst &,
+    bool is_signed,
+    bool sign_follows_divisor = false);
 
   std::pair<binding_exprt::variablest, exprt> binding(irep_idt);
   exprt lambda_expression();
