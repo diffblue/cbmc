@@ -233,7 +233,6 @@ protected:
   static dt empty_d;
 
   static void remove_ref(dt *old_data);
-  static void nonrecursive_destructor(dt *old_data);
   void detach();
 
 public:
@@ -547,77 +546,63 @@ void sharing_treet<derivedt, named_subtreest>::remove_ref(dt *old_data)
   if(old_data == &empty_d)
     return;
 
-#if 0
-    nonrecursive_destructor(old_data);
-#else
-
   PRECONDITION(old_data->ref_count != 0);
 
-#ifdef IREP_DEBUG
-  std::cout << "R: " << old_data << " " << old_data->ref_count << '\n';
-#endif
+  if(--old_data->ref_count != 0)
+    return; // still referenced; nothing to delete (common case)
 
-  old_data->ref_count--;
-  if(old_data->ref_count == 0)
+  // For the overwhelmingly common case of shallow trees, delete recursively:
+  // this is as cheap as the natural recursive destructor (no child detaching
+  // and no work-stack allocation). A thread-local counter tracks the recursion
+  // depth; once it reaches a bound we collapse the remainder of the subtree
+  // iteratively instead, so that deeply nested ireps cannot overflow the call
+  // stack. The bound is well below the point at which destruction alone
+  // overflows a small (~1 MiB) stack, while leaving ample headroom for other
+  // frames.
+  static thread_local std::size_t depth = 0;
+
+  if(depth < 512)
   {
-#ifdef IREP_DEBUG
-    std::cout << "D: " << pretty() << '\n';
-    std::cout << "DELETING " << old_data->data << " " << old_data << '\n';
-    old_data->clear();
-    std::cout << "DEALLOCATING " << old_data << "\n";
-#endif
-
-    // may cause recursive call
-    delete old_data;
-
-#ifdef IREP_DEBUG
-    std::cout << "DONE\n";
-#endif
+    ++depth;
+    delete old_data; // recurses via child destructors into remove_ref
+    --depth;
+    return;
   }
-#endif
-}
 
-/// Does the same as remove_ref, but using an explicit stack instead of
-/// recursion.
-template <typename derivedt, typename named_subtreest>
-void sharing_treet<derivedt, named_subtreest>::nonrecursive_destructor(
-  dt *old_data)
-{
-  std::vector<dt *> stack(1, old_data);
+  // Deep subtree: delete old_data and any descendants that thereby reach zero
+  // references using an explicit stack instead of recursion. Each node's
+  // children are detached (pointed at empty_d) before the node is deleted, so
+  // that deleting it does not recurse back into remove_ref.
+  std::vector<dt *> stack;
+  dt *d = old_data;
 
-  while(!stack.empty())
+  while(true)
   {
-    dt *d = stack.back();
-    stack.erase(--stack.end());
-    if(d == &empty_d)
-      continue;
-
-    INVARIANT(d->ref_count != 0, "All contents of the stack must be in use");
-    d->ref_count--;
-
-    if(d->ref_count == 0)
+    for(typename named_subt::iterator it = d->named_sub.begin();
+        it != d->named_sub.end();
+        it++)
     {
-      stack.reserve(
-        stack.size() + std::distance(d->named_sub.begin(), d->named_sub.end()) +
-        d->sub.size());
-
-      for(typename named_subt::iterator it = d->named_sub.begin();
-          it != d->named_sub.end();
-          it++)
-      {
-        stack.push_back(it->second.data);
-        it->second.data = &empty_d;
-      }
-
-      for(typename subt::iterator it = d->sub.begin(); it != d->sub.end(); it++)
-      {
-        stack.push_back(it->data);
-        it->data = &empty_d;
-      }
-
-      // now delete, won't do recursion
-      delete d;
+      dt *const child = it->second.data;
+      it->second.data = &empty_d;
+      if(child != &empty_d && --child->ref_count == 0)
+        stack.push_back(child);
     }
+
+    for(typename subt::iterator it = d->sub.begin(); it != d->sub.end(); it++)
+    {
+      dt *const child = it->data;
+      it->data = &empty_d;
+      if(child != &empty_d && --child->ref_count == 0)
+        stack.push_back(child);
+    }
+
+    delete d; // children detached above, so this does not recurse
+
+    if(stack.empty())
+      break;
+
+    d = stack.back();
+    stack.pop_back();
   }
 }
 
