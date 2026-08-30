@@ -9,6 +9,7 @@ DIRS = analyses \
        goto-analyzer \
        goto-bmc \
        goto-cc \
+       goto-contracts \
        goto-checker \
        goto-diff \
        goto-inspect \
@@ -37,6 +38,7 @@ all: cbmc.dir \
      goto-analyzer.dir \
      goto-bmc.dir \
      goto-cc.dir \
+     goto-contracts.dir \
      goto-diff.dir \
      goto-instrument.dir \
      goto-inspect.dir \
@@ -78,6 +80,10 @@ ansi-c.dir: analyses.dir
 cpp.dir: ansi-c.dir linking.dir
 
 crangler.dir: util.dir json.dir
+
+goto-contracts.dir: util.dir goto-programs.dir langapi.dir \
+                    json.dir \
+                    goto-instrument.dir
 
 languages: util.dir langapi.dir \
            cpp.dir ansi-c.dir xmllang.dir assembler.dir \
