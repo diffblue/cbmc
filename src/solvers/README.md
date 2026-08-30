@@ -505,7 +505,7 @@ This is described in more detail \link string_builtin_functiont here. \endlink
 
 \subsection solvers-deprecated Deprecated primitives:
 
-  * `cprover_string_concat_code_point`, `cprover_string_code_point_at`,
+  * `cprover_string_code_point_at`,
     `cprover_string_code_point_before`, `cprover_string_code_point_count`:
     Java specific, should be part of Java models.
   * `cprover_string_offset_by_code_point`, `cprover_string_concat_char`,
