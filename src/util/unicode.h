@@ -11,15 +11,16 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <string>
+#include <string_view>
 #include <vector>
 
 // we follow the ideas suggested at
 // http://www.utf8everywhere.org/
 
-std::string narrow(const wchar_t *s);
-std::wstring widen(const char *s);
-std::string narrow(const std::wstring &s);
-std::wstring widen(const std::string &s);
+std::string narrow(const wchar_t *);
+std::wstring widen(const char *);
+std::string narrow(std::wstring_view);
+std::wstring widen(std::string_view);
 
 // This removes the need to have a #ifdef whenever using std::fstream.
 #ifdef _WIN32
@@ -28,16 +29,16 @@ std::wstring widen(const std::string &s);
 #  define widen_if_needed(s) (s)
 #endif
 
-std::string utf32_native_endian_to_utf8(const std::basic_string<char32_t> &s);
+std::string utf32_native_endian_to_utf8(const std::basic_string<char32_t> &);
 
 /// \param utf8_str: UTF-8 string
 /// \return UTF-32 encoding of the string
-std::u32string utf8_to_utf32(const std::string &utf8_str);
+std::u32string utf8_to_utf32(std::string_view utf8_str);
 
-std::wstring utf8_to_utf16_native_endian(const std::string &in);
-std::string utf16_native_endian_to_java(const char16_t ch);
-std::string utf16_native_endian_to_java(const std::wstring &in);
-std::string utf16_native_endian_to_java_string(const std::wstring &in);
+std::wstring utf8_to_utf16_native_endian(std::string_view);
+std::string utf16_native_endian_to_java(const char16_t);
+std::string utf16_native_endian_to_java(std::wstring_view);
+std::string utf16_native_endian_to_java_string(std::wstring_view);
 
 std::vector<std::string> narrow_argv(int argc, const wchar_t **argv_wide);
 
