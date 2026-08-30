@@ -1,0 +1,11 @@
+CORE
+main.c
+--mmio-region 0x1000:256 _ --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+A 32-bit MMIO store must update all four region bytes and a 32-bit load must
+read them back. Without multi-byte byte_extract/byte_update modelling the store
+would truncate to one byte and `*w == 0x12345678` would fail.

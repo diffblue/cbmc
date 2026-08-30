@@ -1,0 +1,12 @@
+CORE
+test.c
+--nondet-volatile-variable a
+^EXIT=0$
+^SIGNAL=0$
+OUTPUT address_of\("volatile-write"
+--
+--
+A write to a volatile variable selected with --nondet-volatile-variable is
+preserved as an observable side effect (an OUTPUT of the written value), not
+only in the whole-program --nondet-volatile mode. The zero-initialisation of
+the global is not observed.

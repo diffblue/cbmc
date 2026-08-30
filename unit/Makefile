@@ -74,6 +74,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/goto_program_validate.cpp \
        goto-programs/goto_trace_output.cpp \
        goto-programs/is_goto_binary.cpp \
+       goto-programs/mm_io.cpp \
        goto-programs/label_function_pointer_call_sites.cpp \
        goto-programs/osx_fat_reader.cpp \
        goto-programs/restore_argument_evaluation_order.cpp \
