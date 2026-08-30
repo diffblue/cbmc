@@ -44,17 +44,31 @@ mp_integer ieee_float_spect::max_fraction() const
 
 void ieee_float_spect::from_type(const floatbv_typet &type)
 {
-  std::size_t width=type.get_width();
-  f=type.get_f();
+  std::size_t type_width = type.get_width();
+  f = type.get_f();
   DATA_INVARIANT(f != 0, "mantissa must be at least 1 bit");
   DATA_INVARIANT(
-    f < width,
+    f < type_width,
     "mantissa bits must be less than "
     "originating type width");
-  e=width-f-1;
-  x86_extended=type.get_bool(ID_x86_extended);
+  x86_extended = type.get_bool(ID_x86_extended);
   if(x86_extended)
-    e=e-1; // no hidden bit
+  {
+    // x86 80-bit extended precision: the value width is f+e+2 (sign,
+    // exponent, explicit integer bit, fraction).  The exponent width
+    // for x86 80-bit is always 15.
+    e = 15;
+    std::size_t value_w = f + e + 2;
+    DATA_INVARIANT(
+      type_width >= value_w,
+      "type width must be at least the x86-extended value width");
+    storage_width_bits = (type_width > value_w) ? type_width : 0;
+  }
+  else
+  {
+    e = type_width - f - 1;
+    storage_width_bits = 0;
+  }
 }
 
 ieee_float_valuet ieee_float_valuet::abs() const
@@ -324,6 +338,78 @@ void ieee_float_valuet::unpack(const mp_integer &i)
   PRECONDITION(spec.f != 0);
   PRECONDITION(spec.e != 0);
 
+  if(spec.x86_extended)
+  {
+    // Mirror of the pack() layout above.  We read only the low
+    // value_width() bits and ignore any storage padding above.
+    mp_integer tmp = i;
+    mp_integer pf = power(2, spec.f);
+    fraction = tmp % pf;
+    tmp /= pf;
+
+    mp_integer integer_bit = tmp % 2;
+    tmp /= 2;
+
+    mp_integer pe = power(2, spec.e);
+    exponent = tmp % pe;
+    tmp /= pe;
+
+    sign_flag = (tmp % 2) != 0;
+
+    if(exponent == spec.max_exponent())
+    {
+      if(fraction == 0 && integer_bit == 1)
+      {
+        NaN_flag = false;
+        infinity_flag = true;
+      }
+      else
+      {
+        // Includes "real" NaNs (integer bit = 1, fraction != 0) and the
+        // historical x86 pseudo-encodings (integer bit = 0).  All are
+        // treated as NaN.
+        make_NaN();
+      }
+    }
+    else if(exponent == 0 && integer_bit == 0)
+    {
+      if(fraction == 0)
+      {
+        // signed zero
+        NaN_flag = false;
+        infinity_flag = false;
+      }
+      else
+      {
+        // denormal
+        NaN_flag = false;
+        infinity_flag = false;
+        exponent = -spec.bias() + 1;
+      }
+    }
+    else if(integer_bit == 1)
+    {
+      // normal: re-add the integer bit so `fraction` carries the full
+      // (f+1)-bit significand, matching the IEEE convention used
+      // elsewhere in this class.
+      NaN_flag = false;
+      infinity_flag = false;
+      fraction += pf;
+      exponent -= spec.bias();
+    }
+    else
+    {
+      // Pseudo-denormal: integer bit = 0 with non-zero exponent.  Modern
+      // x86 hardware traps these as invalid, but for analysis purposes we
+      // map them to the value implied by the bit pattern (denormal-like).
+      NaN_flag = false;
+      infinity_flag = false;
+      exponent -= spec.bias();
+    }
+
+    return;
+  }
+
   {
     mp_integer tmp=i;
 
@@ -376,7 +462,52 @@ bool ieee_float_valuet::is_normal() const
 
 mp_integer ieee_float_valuet::pack() const
 {
-  mp_integer result=0;
+  mp_integer result = 0;
+
+  if(spec.x86_extended)
+  {
+    // x86 80-bit extended precision layout (low to high):
+    //   bits   0 .. f-1 : fraction (without integer bit)
+    //   bit       f     : explicit integer bit (1 for normal, 0 for
+    //                     denormal/zero)
+    //   bits f+1 .. f+e : biased exponent
+    //   bit  f+1+e      : sign
+    // Higher bits up to spec.width()-1 are storage padding (zero).
+    if(NaN_flag)
+    {
+      // Quiet NaN: integer bit set, exponent all-ones, fraction MSB set.
+      result += power(2, spec.f);                           // integer bit
+      result += spec.max_exponent() * power(2, spec.f + 1); // exponent
+      result += power(2, spec.f - 1);                       // quiet bit
+    }
+    else if(infinity_flag)
+    {
+      result += power(2, spec.f);                           // integer bit
+      result += spec.max_exponent() * power(2, spec.f + 1); // exponent
+    }
+    else if(fraction == 0 && exponent == 0)
+    {
+      // signed zero -- nothing to do
+    }
+    else if(is_normal())
+    {
+      // fraction holds f+1 bits including the leading 1; the leading 1 is
+      // the explicit integer bit.
+      result += fraction;
+      result += (exponent + spec.bias()) * power(2, spec.f + 1);
+    }
+    else // denormal
+    {
+      // Denormal: integer bit is 0, exponent is 0; fraction holds the
+      // sub-normal mantissa with no leading 1.
+      result += fraction;
+    }
+
+    if(sign_flag)
+      result += power(2, spec.f + 1 + spec.e);
+
+    return result;
+  }
 
   // sign bit
   if(sign_flag)

@@ -1,0 +1,29 @@
+CORE no-new-smt
+roundtrip.i
+--arch x86_64 --os linux --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Verifies that casting a finite `double` to `long double` and back yields
+the original `double` bit-for-bit, and that sign is preserved across
+the promotion.  Exercises both the constant-folding path (compile-time)
+and the symbolic path (nondet input).
+
+This test reads the bit pattern of a `double` via union aliasing
+(`union { double d; uint64_t i; }`) AND casts that `double` to a
+`long double` (x86 80-bit extended) and back.  Under the legacy
+cprover-smt2 backend in FPA mode (`use_FPA_theory == true`) this needs
+the float<->bit-vector boundary support added earlier in this branch:
+flattening an FPA float to its IEEE bits (smt2_convt::flatten2bv), the
+single-argument `((_ to_fp e f) bv)` reinterpretation in CPROVER's smt2
+solver, and the mixed FPA/bit-vector float typecast lowering.
+
+The new SMT2 backend (`--incremental-smt2-solver`) has its own
+pre-existing limitations and is excluded via no-new-smt.
+
+The source is provided as a pre-processed `main.i` so CBMC parses it
+without invoking the host preprocessor; combined with `--arch x86_64
+--os linux`, this lets the test run on any host.

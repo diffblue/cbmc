@@ -1,0 +1,21 @@
+CORE no-new-smt
+x86-bytes.i
+--arch x86_64 --os linux --floatbv --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Verifies the byte layout of x86 80-bit extended `long double` matches the
+hardware reference on x86_64.  Native byte sequences were captured on
+macOS-15 x86_64 (Apple clang 17.0.0).  The new SMT2 backend
+(--incremental-smt2-solver) does not yet implement the byte-extract
+lowering pattern this test relies on; the test is therefore excluded
+from that profile via no-new-smt.
+
+The source is provided as a pre-processed `main.i` so CBMC parses it
+without invoking the host preprocessor; combined with `--arch x86_64
+--os linux`, this lets the test run on any host (FreeBSD/OpenBSD CI
+runners that don't ship gcc, ARM hosts that don't have x86_64 cross
+tooling, etc.).

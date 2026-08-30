@@ -214,3 +214,179 @@ TEST_CASE(
     REQUIRE(ieee_float_valuet::minus_infinity(dp).to_integer() == 0);
   }
 }
+
+TEST_CASE(
+  "ieee_float_spect: x86 extended specs",
+  "[core][util][ieee_float][x86_extended]")
+{
+  // The 80-bit value contains 1 sign + 15 exponent + 1 explicit integer
+  // bit + 63 fraction bits.  Storage may add padding to reach 96 or 128
+  // bits.
+
+  const auto x86_80 = ieee_float_spect::x86_80();
+  REQUIRE(x86_80.f == 63);
+  REQUIRE(x86_80.e == 15);
+  REQUIRE(x86_80.x86_extended);
+  REQUIRE(x86_80.value_width() == 80);
+  REQUIRE(x86_80.width() == 80);
+
+  const auto x86_96 = ieee_float_spect::x86_96();
+  REQUIRE(x86_96.f == 63);
+  REQUIRE(x86_96.e == 15);
+  REQUIRE(x86_96.x86_extended);
+  REQUIRE(x86_96.value_width() == 80);
+  REQUIRE(x86_96.width() == 96);
+
+  const auto x86_128 = ieee_float_spect::x86_128();
+  REQUIRE(x86_128.f == 63);
+  REQUIRE(x86_128.e == 15);
+  REQUIRE(x86_128.x86_extended);
+  REQUIRE(x86_128.value_width() == 80);
+  REQUIRE(x86_128.width() == 128);
+
+  // The bias is 2^(e-1)-1 = 16383.
+  REQUIRE(x86_128.bias() == 16383);
+}
+
+TEST_CASE(
+  "ieee_float_valuet: pack/unpack on x86 80-bit extended (all storage widths)",
+  "[core][util][ieee_float][x86_extended]")
+{
+  // Reference encodings captured on macOS-15 x86_64 hardware (Apple
+  // clang 17.0.0).  The 80-bit value pattern is the same across all
+  // three storage widths; only the leading zero padding differs.
+  //
+  //   1.0L  -> 00 00 00 00 00 00 00 80 ff 3f [+ 0..6 zero pad bytes]
+  //   -1.0L -> 00 00 00 00 00 00 00 80 ff bf [+ 0..6 zero pad bytes]
+  //   2.0L  -> 00 00 00 00 00 00 00 80 00 40 [+ 0..6 zero pad bytes]
+  //   0.5L  -> 00 00 00 00 00 00 00 80 fe 3f [+ 0..6 zero pad bytes]
+  //   0.0L  -> 00 00 00 00 00 00 00 00 00 00 [+ 0..6 zero pad bytes]
+  //
+  // Storage padding is zero on Linux/macOS, so the mp_integer
+  // representation is just the bottom 80 bits of the value, regardless
+  // of whether the storage container is 80, 96 or 128 bits.
+
+  auto from_hex = [](const char *hex) -> mp_integer
+  { return string2integer(hex, 16); };
+
+  // The bottom 80 bits of each reference value, written as a hex
+  // big-endian word.  These are reused for x86_80, x86_96 and x86_128
+  // because the storage padding above the value bits is zero.
+  const mp_integer one_80 = from_hex("3FFF8000000000000000");
+  const mp_integer neg_one_80 = from_hex("BFFF8000000000000000");
+  const mp_integer two_80 = from_hex("40008000000000000000");
+  const mp_integer half_80 = from_hex("3FFE8000000000000000");
+  const mp_integer zero_80 = 0;
+
+  // Smallest positive denormal: J=0, exp=0, frac=1.  Hardware encodes
+  // this as 80 bits with the low fraction bit set and the J-bit clear,
+  // i.e. mp_integer value 1.  Verifies the canonical denormal pattern
+  // from `float_utilst::pack` / `float_bvt::pack` (J=0 for exp=0).
+  const mp_integer smallest_denormal_80 = 1;
+
+  // Positive infinity: J=1, exp=all-1s, frac=0.
+  const mp_integer pos_inf_80 = from_hex("7FFF8000000000000000");
+
+  // A representable quiet NaN: J=1, exp=all-1s, frac with at least one
+  // bit set (here, the fraction MSB so the NaN is "quiet" on hardware
+  // that interprets that bit as the quiet flag).
+  const mp_integer quiet_nan_80 = from_hex("7FFFC000000000000000");
+
+  for(const auto &spec :
+      {ieee_float_spect::x86_80(),
+       ieee_float_spect::x86_96(),
+       ieee_float_spect::x86_128()})
+  {
+    auto make = [&spec](mp_integer i) -> ieee_floatt
+    {
+      ieee_floatt v{spec, ieee_floatt::ROUND_TO_EVEN};
+      v.from_integer(i);
+      return v;
+    };
+
+    // Hardware-reference round-trip for representable integer values.
+    {
+      const auto v = make(1);
+      REQUIRE(v.pack() == one_80);
+
+      ieee_float_valuet u{spec};
+      u.unpack(one_80);
+      REQUIRE(u == v);
+    }
+
+    {
+      const auto v = make(-1);
+      REQUIRE(v.pack() == neg_one_80);
+
+      ieee_float_valuet u{spec};
+      u.unpack(neg_one_80);
+      REQUIRE(u == v);
+    }
+
+    {
+      const auto v = make(2);
+      REQUIRE(v.pack() == two_80);
+
+      ieee_float_valuet u{spec};
+      u.unpack(two_80);
+      REQUIRE(u == v);
+    }
+
+    {
+      const auto v = make(0);
+      REQUIRE(v.pack() == zero_80);
+
+      ieee_float_valuet u{spec};
+      u.unpack(zero_80);
+      REQUIRE(u == v);
+    }
+
+    // Round-trip a range of integers through pack/unpack.
+    for(int i : {-1024, -3, -2, -1, 0, 1, 2, 3, 7, 1024})
+    {
+      const auto v = make(i);
+      ieee_float_valuet u{spec};
+      u.unpack(v.pack());
+      REQUIRE(u == v);
+    }
+
+    // Non-integer encodings: NaN, infinity, smallest denormal.  These
+    // exercise the special-case branches in `unpack`/`pack` that are
+    // not reached by the integer round-trip above.
+
+    // Positive infinity: unpack -> classify as infinity -> pack
+    // re-emits the same canonical pattern.
+    {
+      ieee_float_valuet u{spec};
+      u.unpack(pos_inf_80);
+      REQUIRE(u.is_infinity());
+      REQUIRE(!u.get_sign());
+      REQUIRE(u.pack() == pos_inf_80);
+    }
+
+    // A quiet NaN.  Pack re-emits a canonical NaN pattern, which is
+    // not necessarily bitwise equal to the input (the exact NaN
+    // payload is implementation-defined), so we only check that the
+    // round-trip preserves the NaN classification.
+    {
+      ieee_float_valuet u{spec};
+      u.unpack(quiet_nan_80);
+      REQUIRE(u.is_NaN());
+
+      ieee_float_valuet u2{spec};
+      u2.unpack(u.pack());
+      REQUIRE(u2.is_NaN());
+    }
+
+    // Smallest positive denormal: J=0, exp=0, frac=1.  This catches
+    // the pseudo-denormal bug in the pack path: an x86 denormal must
+    // be encoded with J=0, and `unpack` of J=0+exp=0 must take the
+    // denormal branch (exponent -bias+1) rather than the
+    // pseudo-denormal/normal branch (-bias).
+    {
+      ieee_float_valuet u{spec};
+      u.unpack(smallest_denormal_80);
+      REQUIRE(u.pack() == smallest_denormal_80);
+    }
+  }
+}
