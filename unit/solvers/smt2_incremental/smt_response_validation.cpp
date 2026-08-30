@@ -136,6 +136,43 @@ TEST_CASE("smt get-value response validation", "[core][smt2_incremental]")
         smt_identifier_termt{"a", smt_bool_sortt{}},
         smt_bool_literal_termt{false}}}});
   }
+  SECTION("Integer sorted values.")
+  {
+    const auto identifier_table =
+      table_with_identifiers({{"a", smt_int_sortt{}}});
+    SECTION("Positive value")
+    {
+      CHECK(
+        *validate_smt_response(
+           *smt2irep("((a 42))").parsed_output, identifier_table)
+           .get_if_valid() ==
+        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+          smt_identifier_termt{"a", smt_int_sortt{}},
+          smt_int_constant_termt{42}}}});
+    }
+    SECTION("Negative value")
+    {
+      CHECK(
+        *validate_smt_response(
+           *smt2irep("((a -5))").parsed_output, identifier_table)
+           .get_if_valid() ==
+        smt_get_value_responset{{smt_get_value_responset::valuation_pairt{
+          smt_identifier_termt{"a", smt_int_sortt{}},
+          smt_int_constant_termt{-5}}}});
+    }
+    SECTION("A lone '-' is not a valid integer constant")
+    {
+      CHECK_FALSE(validate_smt_response(
+                    *smt2irep("((a -))").parsed_output, identifier_table)
+                    .get_if_valid());
+    }
+    SECTION("A non-numeric value is not a valid integer constant")
+    {
+      CHECK_FALSE(validate_smt_response(
+                    *smt2irep("((a foobar))").parsed_output, identifier_table)
+                    .get_if_valid());
+    }
+  }
   SECTION("Bit vector sorted values.")
   {
     const auto identifier_table =
