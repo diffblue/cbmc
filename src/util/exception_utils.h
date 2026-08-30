@@ -9,10 +9,13 @@ Author: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 #ifndef CPROVER_UTIL_EXCEPTION_UTILS_H
 #define CPROVER_UTIL_EXCEPTION_UTILS_H
 
-#include <string>
-
 #include "invariant.h"
 #include "source_location.h"
+
+#include <sstream>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 /// Base class for exceptions thrown in the cprover project.
 /// Intended to be used as a convenient way to have a
@@ -30,19 +33,57 @@ public:
   virtual std::string what() const;
   virtual ~cprover_exception_baset() = default;
 
+  cprover_exception_baset() = default;
+
+  cprover_exception_baset(cprover_exception_baset &&) = default;
+
+  // std::ostringstream does not have a copy constructor
+  cprover_exception_baset(const cprover_exception_baset &src)
+  {
+    _reason << src.reason();
+  }
+
+  std::string reason() const
+  {
+    return _reason.str();
+  }
+
 protected:
   /// This constructor is marked protected to ensure this class isn't used
   /// directly. Deriving classes should be used to more precisely describe the
   /// problem that occurred.
   explicit cprover_exception_baset(std::string reason)
-    : reason(std::move(reason))
   {
+    // ostringstream does not have an appropriate constructor
+    _reason << reason;
   }
 
   /// The reason this exception was generated. This is the string returned by
-  /// `what()` unless that method is overridden
-  std::string reason;
+  /// `what()` unless that method is overridden.  This is an ostringstream
+  /// to enable efficient appending with <<.
+  std::ostringstream _reason;
+
+  // to provide access to the _reason field
+  template <typename E, typename T>
+  friend std::enable_if_t<
+    std::is_base_of<cprover_exception_baset, std::decay_t<E>>::value,
+    E &&>
+  operator<<(E &&, const T &);
 };
+
+/// add to the diagnostic information in the given
+/// cprover_exception_baset exception; the type of the
+/// exception is preserved, enabling
+/// `throw some_exceptiont{...} << "text"`
+template <typename E, typename T>
+std::enable_if_t<
+  std::is_base_of<cprover_exception_baset, std::decay_t<E>>::value,
+  E &&>
+operator<<(E &&e, const T &message)
+{
+  e._reason << message;
+  return std::forward<E>(e);
+}
 
 /// Thrown when users pass incorrect command line arguments,
 /// for example passing no files to analysis or setting
@@ -176,9 +217,10 @@ public:
     source_locationt source_location);
   std::string what() const override;
 
-  const std::string &get_reason() const
+  // This method will go away, in favor of cprover_exception_baset::reason
+  std::string get_reason() const
   {
-    return reason;
+    return reason();
   }
 
   const source_locationt &get_source_location() const
