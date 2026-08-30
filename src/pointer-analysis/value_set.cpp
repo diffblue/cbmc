@@ -319,6 +319,20 @@ bool value_sett::make_union_would_change(
 
 bool value_sett::make_union(object_mapt &dest, const object_mapt &src) const
 {
+  if(src.read().empty())
+    return false;
+
+  // If the destination is empty we can just share the (reference-counted)
+  // representation of `src` instead of inserting elements one by one. Queries
+  // over a single symbol repeatedly arrive here with an empty destination, so
+  // this turns an operation that is linear in the size of the value set (with
+  // all the allocation work that entails) into a constant-time one.
+  if(dest.read().empty())
+  {
+    dest = src;
+    return true;
+  }
+
   bool result=false;
 
   for(object_map_dt::const_iterator it=src.read().begin();
