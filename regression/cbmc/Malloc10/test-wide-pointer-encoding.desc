@@ -1,0 +1,11 @@
+CORE no-new-smt broken-smt-backend paths-lifo-expected-failure wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Wide pointer encoding: address reuse allows a malloc'd pointer to
+equal a previously seen pointer (elem), triggering the assertion.

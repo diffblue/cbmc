@@ -1,0 +1,13 @@
+CORE wide-pointer-encoding
+main.c
+--wide-pointer-encoding --verbosity 8
+Generated 1 VCC\(s\), [01] remaining after simplification
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Wide pointer encoding: the VCC may not be simplified away because
+forward propagation of dynamic object addresses is blocked (needed
+for address reuse modeling). The assertion is still proved correct.

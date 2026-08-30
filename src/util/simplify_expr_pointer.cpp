@@ -10,6 +10,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
+#include "config.h"
 #include "expr_util.h"
 #include "namespace.h"
 #include "pointer_expr.h"
@@ -457,10 +458,32 @@ simplify_exprt::resultt<> simplify_exprt::simplify_inequality_address_of(
     tmp0_object.id() == ID_dynamic_object &&
     tmp1_object.id() == ID_dynamic_object)
   {
+    // Standard handling (unchanged from non-wide encoding): distinct
+    // dynamic-object instances are distinct, unless address reuse
+    // (malloc_may_alias) means they might share an address.
     bool equal = to_dynamic_object_expr(tmp0_object).get_instance() ==
                  to_dynamic_object_expr(tmp1_object).get_instance();
 
+    if(!equal && config.bv_encoding.malloc_may_alias)
+      return unchanged(expr);
+
     return make_boolean_expr(expr.id() == ID_equal ? equal : !equal);
+  }
+  else if(
+    config.bv_encoding.malloc_may_alias &&
+    is_symex_dynamic_object(tmp0_object) &&
+    is_symex_dynamic_object(tmp1_object))
+  {
+    // Only with address reuse: symex dynamic objects also appear as
+    // `symex_dynamic::` symbols (not ID_dynamic_object), and two distinct
+    // such objects may share an address. Decide equality only for the
+    // identical object; otherwise leave it to the solver. This broadened
+    // matching is gated on malloc_may_alias so the standard encoding is
+    // unaffected.
+    if(tmp0_object == tmp1_object)
+      return make_boolean_expr(expr.id() == ID_equal);
+
+    return unchanged(expr);
   }
   else if(
     (tmp0_object.id() == ID_symbol && tmp1_object.id() == ID_dynamic_object) ||

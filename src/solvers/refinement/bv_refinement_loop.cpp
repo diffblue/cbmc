@@ -129,6 +129,13 @@ void bv_refinementt::check_SAT()
 
   for(approximationt &approximation : this->approximations)
     check_SAT(approximation);
+
+  // Check backward I2P constraints (from wide pointer encoding)
+  if(wide_pointer_encoding)
+  {
+    if(check_SAT_backward_i2p())
+      progress = true;
+  }
 }
 
 void bv_refinementt::check_UNSAT()
