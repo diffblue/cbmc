@@ -14,46 +14,18 @@ Author: Daniel Kroening, dkr@amazon.com
 #include <util/cout_message.h>
 #include <util/simplify_expr.h>
 
-#include <solvers/sat/satcheck.h>
+#include <solvers/decision_procedure.h>
 
 #include "axioms.h"
-#include "bv_pointers_wide.h"
 #include "simplify_state_expr.h"
 #include "state.h"
+#include "state_encoding_solver_factory.h"
 
-void show_assignment(const bv_pointers_widet &solver)
+#include <memory>
+
+void show_assignment(const decision_proceduret &)
 {
-#if 0
-  for(auto &entry : solver.get_cache())
-  {
-    const auto &expr = entry.first;
-    if(expr.id() == ID_and || expr.id() == ID_or || expr.id() == ID_not)
-      continue;
-    auto value = solver.l_get(entry.second);
-#  if 0
-    std::cout << "|| " << format(expr) << " --> " << value << "\n";
-#  endif
-  }
-#endif
-
-#if 0
-  for(auto &entry : solver.get_map().get_mapping())
-  {
-    const auto &identifier = entry.first;
-    auto symbol = symbol_exprt(identifier, entry.second.type);
-    auto value = solver.get(symbol);
-    std::cout << "|| " << format(symbol) << " --> " << format(value) << "\n";
-  }
-#endif
-
-#if 0
-  for(auto &entry : solver.get_symbols())
-  {
-    const auto &identifier = entry.first;
-    auto value = solver.l_get(entry.second);
-    std::cout << "|| " << identifier << " --> " << value << "\n";
-  }
-#endif
+  // no-op: debug output not available for generic decision procedures
 }
 
 static exprt evaluator_rec(
@@ -106,7 +78,7 @@ static exprt evaluator(
 propertyt::tracet counterexample(
   const std::vector<framet> &frames,
   const workt &work,
-  const bv_pointers_widet &solver,
+  const decision_proceduret &solver,
   const axiomst &axioms,
   const namespacet &ns)
 {
@@ -175,7 +147,8 @@ std::optional<propertyt::tracet> counterexample_found(
   const workt &work,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,
   bool verbose,
-  const namespacet &ns)
+  const namespacet &ns,
+  const std::string &smt2_solver_binary)
 {
   auto &f = frames[work.frame.index];
 
@@ -185,8 +158,11 @@ std::optional<propertyt::tracet> counterexample_found(
     {
       cout_message_handlert message_handler;
       message_handler.set_verbosity(verbose ? 10 : 1);
-      satcheckt satcheck(message_handler);
-      bv_pointers_widet solver(ns, satcheck, message_handler);
+
+      auto solver_bundle =
+        make_state_encoding_solver(ns, smt2_solver_binary, message_handler);
+      decision_proceduret &solver = solver_bundle.solver();
+
       axiomst axioms(solver, address_taken, verbose, ns);
 
       // These are initial states, i.e., initial_state(ς) ⇒ SInitial(ς).
@@ -198,12 +174,15 @@ std::optional<propertyt::tracet> counterexample_found(
       switch(solver())
       {
       case decision_proceduret::resultt::D_SATISFIABLE:
-        if(verbose)
-          show_assignment(solver);
         return counterexample(frames, work, solver, axioms, ns);
       case decision_proceduret::resultt::D_UNSATISFIABLE:
         break;
       case decision_proceduret::resultt::D_ERROR:
+        // D_ERROR covers both hard solver errors and an "unknown" answer.
+        // Treating it as "no counterexample" here would be unsound: the caller
+        // could then declare the property inductive and report SUCCESS,
+        // masking a genuine base-case violation.  Propagate the failure
+        // instead, regardless of backend.
         throw "error reported by solver";
       }
     }
