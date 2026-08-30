@@ -24,7 +24,7 @@ refined_string_exprt convert_exprt_to_string_exprt_unit_test(
   java_string_library_preprocesst &preprocess,
   const exprt &deref,
   const source_locationt &loc,
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   code_blockt &init_code)
 {

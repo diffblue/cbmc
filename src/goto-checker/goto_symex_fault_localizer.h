@@ -31,7 +31,7 @@ public:
     const symex_target_equationt &equation,
     stack_decision_proceduret &solver);
 
-  fault_location_infot operator()(const irep_idt &failed_property_id);
+  fault_location_infot operator()(irep_idt failed_property_id);
 
 protected:
   const optionst &options;
@@ -47,7 +47,7 @@ protected:
   /// and initializes fault_location_info, and returns the SSA step of
   /// the failed property
   const SSA_stept &collect_guards(
-    const irep_idt &failed_property_id,
+    irep_idt failed_property_id,
     localization_pointst &localization_points,
     fault_location_infot &fault_location);
 

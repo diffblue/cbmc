@@ -329,13 +329,13 @@ public:
   virtual void
   methods_provided(std::unordered_set<irep_idt> &methods) const override;
   virtual void convert_lazy_method(
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_table_baset &symbol_table,
     message_handlert &message_handler) override;
 
 protected:
   void convert_single_method(
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_table_baset &symbol_table,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
     message_handlert &message_handler)
@@ -348,13 +348,13 @@ protected:
       message_handler);
   }
   bool convert_single_method(
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_table_baset &symbol_table,
     std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,
     message_handlert &);
   bool convert_single_method_code(
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_table_baset &symbol_table,
     std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
     lazy_class_to_declared_symbols_mapt &class_to_declared_symbols,

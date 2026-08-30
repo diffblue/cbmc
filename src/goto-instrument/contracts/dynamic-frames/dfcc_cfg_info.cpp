@@ -224,7 +224,7 @@ static void tag_loop_instructions(
   }
 }
 
-static bool is_assigned(dirtyt &dirty, const irep_idt &ident, assignst assigns)
+static bool is_assigned(dirtyt &dirty, irep_idt ident, assignst assigns)
 {
   PRECONDITION(!dirty(ident));
   // For each assigns clause target
@@ -307,7 +307,7 @@ struct contract_clausest
 static struct contract_clausest default_loop_contract_clauses(
   const dfcc_loop_nesting_grapht &loop_nesting_graph,
   const std::size_t loop_id,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const assignst &inferred_assigns,
   const bool check_side_effect,
   message_handlert &message_handler,
@@ -392,7 +392,7 @@ static struct contract_clausest default_loop_contract_clauses(
 static dfcc_loop_infot gen_dfcc_loop_info(
   const dfcc_loop_nesting_grapht &loop_nesting_graph,
   const std::size_t loop_id,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   const std::map<std::size_t, dfcc_loop_infot> &loop_info_map,
   dirtyt &dirty,
@@ -484,7 +484,7 @@ static dfcc_loop_infot gen_dfcc_loop_info(
 
 dfcc_cfg_infot::dfcc_cfg_infot(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   const exprt &top_level_write_set,
   const loop_contract_configt &loop_contract_config,

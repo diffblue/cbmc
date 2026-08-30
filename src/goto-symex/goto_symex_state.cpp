@@ -34,7 +34,7 @@ goto_symex_statet::goto_symex_statet(
   bool should_simplify,
   const irep_idt language_mode,
   guard_managert &manager,
-  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
+  std::function<std::size_t(irep_idt)> fresh_l2_name_provider)
   : goto_statet(manager),
     source(_source),
     guard_manager(manager),
@@ -699,7 +699,7 @@ static bool requires_renaming(const typet &type, const namespacet &ns)
 template <levelt level>
 void goto_symex_statet::rename(
   typet &type,
-  const irep_idt &l1_identifier,
+  irep_idt l1_identifier,
   const namespacet &ns)
 {
   // check whether there are symbol expressions in the type; if not, there
@@ -803,7 +803,7 @@ void goto_symex_statet::print_backtrace(std::ostream &out) const
 
 ssa_exprt goto_symex_statet::add_object(
   const symbol_exprt &expr,
-  std::function<std::size_t(const irep_idt &)> index_generator,
+  std::function<std::size_t(irep_idt)> index_generator,
   const namespacet &ns)
 {
   framet &frame = call_stack().top();

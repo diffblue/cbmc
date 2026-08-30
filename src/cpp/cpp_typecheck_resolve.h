@@ -75,7 +75,7 @@ protected:
     const wantt want);
 
   struct_tag_typet disambiguate_template_classes(
-    const irep_idt &base_name,
+    irep_idt base_name,
     const cpp_scopest::id_sett &id_set,
     const cpp_template_args_non_tct &template_args);
 
@@ -124,18 +124,18 @@ protected:
     const cpp_typecheck_fargst &fargs);
 
   exprt do_builtin(
-    const irep_idt &base_name,
+    irep_idt base_name,
     const cpp_typecheck_fargst &fargs,
     const cpp_template_args_non_tct &template_args);
 
   void show_identifiers(
-    const irep_idt &base_name,
+    irep_idt base_name,
     const resolve_identifierst &identifiers,
     std::ostream &out);
 
   void resolve_with_arguments(
     cpp_scopest::id_sett &id_set,
-    const irep_idt &base_name,
+    irep_idt base_name,
     const cpp_typecheck_fargst &fargs);
 
   void filter_for_named_scopes(cpp_scopest::id_sett &id_set);

@@ -60,7 +60,9 @@ public:
 
   // constructors
   exprt() { }
-  explicit exprt(const irep_idt &_id):irept(_id) { }
+  explicit exprt(irep_idt _id) : irept(_id)
+  {
+  }
 
   exprt(irep_idt _id, typet _type)
     : irept(std::move(_id), {{ID_type, std::move(_type)}}, {})
@@ -75,7 +77,7 @@ public:
   {
   }
 
-  exprt(const irep_idt &id, typet type, source_locationt loc)
+  exprt(irep_idt id, typet type, source_locationt loc)
     : exprt(id, std::move(type))
   {
     add_source_location() = std::move(loc);
@@ -305,12 +307,12 @@ public:
   }
 
 protected:
-  exprt &add_expr(const irep_idt &name)
+  exprt &add_expr(irep_idt name)
   {
     return static_cast<exprt &>(add(name));
   }
 
-  const exprt &find_expr(const irep_idt &name) const
+  const exprt &find_expr(irep_idt name) const
   {
     return static_cast<const exprt &>(find(name));
   }

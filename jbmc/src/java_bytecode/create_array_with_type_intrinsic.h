@@ -20,7 +20,7 @@ class symbol_table_baset;
 irep_idt get_create_array_with_type_name();
 
 codet create_array_with_type_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler);
 

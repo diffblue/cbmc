@@ -201,7 +201,7 @@ protected:
     const exprt &rhs,
     points_tot &loc_info_src);
 
-  bool is_tracked(const irep_idt &identifier);
+  bool is_tracked(irep_idt identifier);
 };
 
 inline std::ostream &operator<<(

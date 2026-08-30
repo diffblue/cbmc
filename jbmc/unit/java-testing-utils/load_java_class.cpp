@@ -99,10 +99,9 @@ goto_modelt load_goto_model_from_java_class(
   lazy_goto_modelt lazy_goto_model(
     [](goto_model_functiont &, const abstract_goto_modelt &) {},
     [](goto_modelt &) { return false; },
-    [](const irep_idt &) { return false; },
-    [](const irep_idt &, symbol_table_baset &, goto_functiont &, bool) {
-      return false;
-    },
+    [](irep_idt) { return false; },
+    [](irep_idt, symbol_table_baset &, goto_functiont &, bool)
+    { return false; },
     null_message_handler);
 
   // Configure the path loading

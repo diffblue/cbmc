@@ -79,9 +79,9 @@ public:
   bool merge(const dep_graph_domaint &src, trace_ptrt from, trace_ptrt to);
 
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) final override;
@@ -200,14 +200,14 @@ private:
     dependence_graph_test_get_data_deps(const dep_graph_domaint &);
 
   void control_dependencies(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::const_targett from,
     goto_programt::const_targett to,
     dependence_grapht &dep_graph);
 
   void data_dependencies(
     goto_programt::const_targett from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     goto_programt::const_targett to,
     dependence_grapht &dep_graph,
     const namespacet &ns);
@@ -243,7 +243,7 @@ public:
     }
   }
 
-  void initialize(const irep_idt &function, const goto_programt &goto_program)
+  void initialize(irep_idt function, const goto_programt &goto_program)
   {
     ait<dep_graph_domaint>::initialize(function, goto_program);
 

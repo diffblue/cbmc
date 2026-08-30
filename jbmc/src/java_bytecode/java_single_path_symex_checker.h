@@ -35,7 +35,7 @@ public:
 
   goto_tracet build_full_trace() const override;
   goto_tracet build_shortest_trace() const override;
-  goto_tracet build_trace(const irep_idt &property_id) const override;
+  goto_tracet build_trace(irep_idt property_id) const override;
 };
 
 #endif // CPROVER_JAVA_BYTECODE_JAVA_SINGLE_PATH_SYMEX_CHECKER_H

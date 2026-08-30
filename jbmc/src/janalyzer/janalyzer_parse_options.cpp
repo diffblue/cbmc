@@ -688,7 +688,8 @@ void janalyzer_parse_optionst::process_goto_function(
   // Java virtual functions -> explicit dispatch tables:
   remove_virtual_functions(function, *class_hierarchy);
 
-  auto function_is_stub = [&symbol_table, &model](const irep_idt &id) {
+  auto function_is_stub = [&symbol_table, &model](irep_idt id)
+  {
     return symbol_table.lookup_ref(id).value.is_nil() &&
            !model.can_produce_function(id);
   };
@@ -698,7 +699,7 @@ void janalyzer_parse_optionst::process_goto_function(
   transform_assertions_assumptions(options, function.get_goto_function().body);
 }
 
-bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)
+bool janalyzer_parse_optionst::can_generate_function_body(irep_idt name)
 {
   static const irep_idt initialize_id = INITIALIZE_FUNCTION;
 
@@ -706,7 +707,7 @@ bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)
 }
 
 bool janalyzer_parse_optionst::generate_function_body(
-  const irep_idt &function_name,
+  irep_idt function_name,
   symbol_table_baset &symbol_table,
   goto_functiont &function,
   bool body_available)

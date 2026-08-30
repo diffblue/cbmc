@@ -22,8 +22,7 @@ Author: Elizabeth Polgreen, elizabeth.polgreen@cs.ox.ac.uk
 
 #include "remove_function.h"
 
-void aggressive_slicert::note_functions_to_keep(
-  const irep_idt &destination_function)
+void aggressive_slicert::note_functions_to_keep(irep_idt destination_function)
 {
   if(preserve_all_direct_paths)
   {

@@ -568,7 +568,7 @@ exprt goto_convertt::get_array_argument(const exprt &src)
 }
 
 void goto_convertt::do_array_op(
-  const irep_idt &id,
+  irep_idt id,
   const exprt &lhs,
   const symbol_exprt &function,
   const exprt::operandst &arguments,
@@ -631,7 +631,7 @@ void goto_convertt::do_havoc_slice(
   const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   irep_idt identifier = CPROVER_PREFIX "havoc_slice";
 
@@ -719,7 +719,7 @@ void goto_convertt::do_alloca(
   const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const source_locationt &source_location = function.source_location();
   const auto alloca_type = to_code_type(function.type());
@@ -828,7 +828,7 @@ void goto_convertt::do_function_call_symbol(
   const symbol_exprt &function,
   const exprt::operandst &arguments,
   goto_programt &dest,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   if(function.get_bool(ID_C_invalid_object))
     return; // ignore

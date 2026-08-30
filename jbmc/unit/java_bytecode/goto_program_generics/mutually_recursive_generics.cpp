@@ -91,10 +91,9 @@ SCENARIO(
     const std::vector<codet> &entry_point_code =
       require_goto_statements::require_entry_point_statements(symbol_table);
 
-    const auto has_key_and_value_field = [&](
-      const irep_idt &field,
-      const irep_idt &key_type,
-      const irep_idt &val_type) {
+    const auto has_key_and_value_field =
+      [&](irep_idt field, irep_idt key_type, irep_idt val_type)
+    {
       require_goto_statements::require_struct_component_assignment(
         field, {}, "key", key_type, {}, entry_point_code, symbol_table);
       require_goto_statements::require_struct_component_assignment(
@@ -169,11 +168,9 @@ SCENARIO(
           entry_point_code,
           symbol_table);
 
-      const auto has_x_e_u_fields = [&](
-        const irep_idt &field,
-        const irep_idt &x_type,
-        const irep_idt &e_type,
-        const irep_idt &u_type) {
+      const auto has_x_e_u_fields =
+        [&](irep_idt field, irep_idt x_type, irep_idt e_type, irep_idt u_type)
+      {
         require_goto_statements::require_struct_component_assignment(
           field, {}, "x", x_type, {}, entry_point_code, symbol_table);
         require_goto_statements::require_struct_component_assignment(

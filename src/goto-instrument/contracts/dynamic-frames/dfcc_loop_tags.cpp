@@ -40,16 +40,15 @@ bool dfcc_has_loop_id(
   return loop_id_opt.has_value() && loop_id_opt.value() == loop_id;
 }
 
-static void dfcc_set_loop_tag(
-  goto_programt::instructiont::targett &target,
-  const irep_idt &tag)
+static void
+dfcc_set_loop_tag(goto_programt::instructiont::targett &target, irep_idt tag)
 {
   target->source_location_nonconst().set(tag, true);
 }
 
 static bool has_loop_tag(
   const goto_programt::instructiont::const_targett &target,
-  const irep_idt &tag)
+  irep_idt tag)
 {
   return target->source_location().get_bool(tag);
 }

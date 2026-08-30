@@ -23,7 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 void goto_inlinet::parameter_assignments(
   const goto_programt::targett target,
-  const irep_idt &function_name, // name of called function
+  irep_idt function_name, // name of called function
   const goto_functiont::parameter_identifierst &parameter_identifiers,
   const exprt::operandst &arguments, // arguments of call
   goto_programt &dest)

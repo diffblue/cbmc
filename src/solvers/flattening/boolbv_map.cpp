@@ -39,7 +39,7 @@ void boolbv_mapt::show(std::ostream &out) const
 }
 
 const bvt &boolbv_mapt::get_literals(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const typet &type,
   std::size_t width)
 {
@@ -73,7 +73,7 @@ const bvt &boolbv_mapt::get_literals(
 }
 
 void boolbv_mapt::set_literals(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const typet &type,
   const bvt &literals)
 {
@@ -115,9 +115,7 @@ void boolbv_mapt::set_literals(
   }
 }
 
-void boolbv_mapt::erase_literals(
-  const irep_idt &identifier,
-  const typet &)
+void boolbv_mapt::erase_literals(irep_idt identifier, const typet &)
 {
   mapping.erase(identifier);
 }

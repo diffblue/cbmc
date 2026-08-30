@@ -36,9 +36,9 @@ public:
       pointer_type_selector(pointer_type_selector)
   {}
 
-  void add_needed_method(const irep_idt &);
+  void add_needed_method(irep_idt);
   // Returns true if new
-  bool add_needed_class(const irep_idt &);
+  bool add_needed_class(irep_idt);
 
   void add_all_needed_classes(const pointer_typet &pointer_type);
 
@@ -57,8 +57,8 @@ private:
 
   const select_pointer_typet &pointer_type_selector;
 
-  void add_clinit_call(const irep_idt &class_id);
-  void add_cprover_nondet_initialize_if_it_exists(const irep_idt &class_id);
+  void add_clinit_call(irep_idt class_id);
+  void add_cprover_nondet_initialize_if_it_exists(irep_idt class_id);
 
   void initialize_instantiated_classes_from_pointer(
     const pointer_typet &pointer_type,

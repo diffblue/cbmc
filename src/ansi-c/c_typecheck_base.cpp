@@ -654,9 +654,7 @@ void c_typecheck_baset::typecheck_function_body(symbolt &symbol)
   }
 }
 
-void c_typecheck_baset::apply_asm_label(
-  const irep_idt &asm_label,
-  symbolt &symbol)
+void c_typecheck_baset::apply_asm_label(irep_idt asm_label, symbolt &symbol)
 {
   const irep_idt orig_name=symbol.name;
 

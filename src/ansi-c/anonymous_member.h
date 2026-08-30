@@ -18,12 +18,12 @@ class namespacet;
 
 exprt get_component_rec(
   const exprt &struct_union,
-  const irep_idt &component_name,
+  irep_idt component_name,
   const namespacet &ns);
 
 bool has_component_rec(
   const typet &struct_union_type,
-  const irep_idt &component_name,
+  irep_idt component_name,
   const namespacet &ns);
 
 #endif // CPROVER_ANSI_C_ANONYMOUS_MEMBER_H

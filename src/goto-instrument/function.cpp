@@ -21,8 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 code_function_callt function_to_call(
   symbol_table_baset &symbol_table,
-  const irep_idt &id,
-  const irep_idt &argument)
+  irep_idt id,
+  irep_idt argument)
 {
   // already there?
 
@@ -74,9 +74,7 @@ code_function_callt function_to_call(
   return call;
 }
 
-void function_enter(
-  goto_modelt &goto_model,
-  const irep_idt &id)
+void function_enter(goto_modelt &goto_model, irep_idt id)
 {
   for(auto &gf_entry : goto_model.goto_functions.function_map)
   {
@@ -99,9 +97,7 @@ void function_enter(
   }
 }
 
-void function_exit(
-  goto_modelt &goto_model,
-  const irep_idt &id)
+void function_exit(goto_modelt &goto_model, irep_idt id)
 {
   for(auto &gf_entry : goto_model.goto_functions.function_map)
   {

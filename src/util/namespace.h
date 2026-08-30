@@ -42,7 +42,7 @@ public:
   /// \return A reference to the symbol found.
   /// \remarks: It is a PRECONDITION that the symbol name exists
   ///   in the namespace.
-  const symbolt &lookup(const irep_idt &name) const
+  const symbolt &lookup(irep_idt name) const
   {
     const symbolt *symbol;
     bool not_found = lookup(name, symbol);
@@ -79,7 +79,7 @@ public:
   /// and then symbol_table2.
   /// \return False iff the requested symbol is found in at least one of the
   ///   tables.
-  virtual bool lookup(const irep_idt &name, const symbolt *&symbol) const=0;
+  virtual bool lookup(irep_idt name, const symbolt *&symbol) const = 0;
 };
 
 /// A namespacet is essentially one or two symbol tables bound
@@ -114,7 +114,7 @@ public:
 
   /// See documentation for namespace_baset::lookup(). Note that
   /// \ref namespacet has two symbol tables.
-  bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
+  bool lookup(irep_idt name, const symbolt *&symbol) const override;
 
   /// See documentation for namespace_baset::smallest_unused_suffix().
   std::size_t smallest_unused_suffix(const std::string &prefix) const override;
@@ -151,7 +151,7 @@ public:
   using namespace_baset::lookup;
 
   /// See documentation for namespace_baset::lookup().
-  bool lookup(const irep_idt &name, const symbolt *&symbol) const override;
+  bool lookup(irep_idt name, const symbolt *&symbol) const override;
   /// See documentation for namespace_baset::smallest_unused_suffix().
   std::size_t smallest_unused_suffix(const std::string &prefix) const override;
 

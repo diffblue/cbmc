@@ -24,7 +24,7 @@ bool symbol_table_baset::add(const symbolt &symbol)
 /// \param name: The name of the symbol to remove
 /// \return Returns a boolean indicating whether the process failed
 ///   i.e. false if the symbol was removed, or true if it didn't exist.
-bool symbol_table_baset::remove(const irep_idt &name)
+bool symbol_table_baset::remove(irep_idt name)
 {
   symbolst::const_iterator entry = symbols.find(name);
   if(entry == symbols.end())
@@ -44,7 +44,7 @@ std::vector<irep_idt> symbol_table_baset::sorted_symbol_names() const
   std::sort(
     sorted_names.begin(),
     sorted_names.end(),
-    [](const irep_idt &a, const irep_idt &b) { return a.compare(b) < 0; });
+    [](irep_idt a, irep_idt b) { return a.compare(b) < 0; });
 
   return sorted_names;
 }

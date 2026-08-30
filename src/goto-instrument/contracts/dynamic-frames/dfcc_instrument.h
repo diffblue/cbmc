@@ -51,11 +51,11 @@ public:
     dfcc_contract_clauses_codegent &contract_clauses_codegen);
 
   /// True iff the symbol an internal symbol
-  bool is_internal_symbol(const irep_idt &id) const;
+  bool is_internal_symbol(irep_idt id) const;
 
   /// True iff the symbol must not be instrumented because it is an internal
   /// symbol or a CPROVER symbol
-  bool do_not_instrument(const irep_idt &id) const;
+  bool do_not_instrument(irep_idt id) const;
 
   /// Instruments a GOTO function used as a proof harness. Proof harnesses
   /// are closed functions without parameters, so we declare a local write set
@@ -80,7 +80,7 @@ public:
   /// \param function_pointer_contracts Contract names discovered in calls to
   /// the `obeys_contract` predicate are added to this set.
   void instrument_harness_function(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const loop_contract_configt &loop_contract_config,
     std::set<irep_idt> &function_pointer_contracts);
 
@@ -101,7 +101,7 @@ public:
   /// \param function_pointer_contracts Contracts discovered in calls to
   /// the obeys_contract predicate are added to this set.
   void instrument_function(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const loop_contract_configt &loop_contract_config,
     std::set<irep_idt> &function_pointer_contracts);
 
@@ -126,8 +126,8 @@ public:
   /// \param function_pointer_contracts contracts discovered in calls to
   /// the obeys_contract predicate are added to this set.
   void instrument_wrapped_function(
-    const irep_idt &wrapped_function_id,
-    const irep_idt &initial_function_id,
+    irep_idt wrapped_function_id,
+    irep_idt initial_function_id,
     const loop_contract_configt &loop_contract_config,
     std::set<irep_idt> &function_pointer_contracts);
 
@@ -149,7 +149,7 @@ public:
   /// \param write_set Write set variable to use for instrumentation.
   /// \param function_pointer_contracts Discovered function pointer contracts
   void instrument_goto_program(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &goto_program,
     const exprt &write_set,
     std::set<irep_idt> &function_pointer_contracts);
@@ -185,7 +185,7 @@ protected:
   /// have the static flag set to true and have a source location where the
   /// function field is equal to the given \p function_id .
   /// \param[in] function_id Function name used to collect the statics.
-  std::set<symbol_exprt> get_local_statics(const irep_idt &function_id);
+  std::set<symbol_exprt> get_local_statics(irep_idt function_id);
 
   /// \brief Generates a guarded call to record a locally allocated symbol
   /// and inserts it in the goto_program at the target, and moves the target
@@ -201,7 +201,7 @@ protected:
   /// \param target The instruction pointer to insert at
   /// \param goto_program the goto_program being instrumented
   void insert_add_decl_call(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const exprt &write_set,
     const symbol_exprt &symbol_expr,
     goto_programt::targett &target,
@@ -221,7 +221,7 @@ protected:
   /// \param target The instruction pointer to insert at
   /// \param goto_program the goto_program being instrumented
   void insert_record_dead_call(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const exprt &write_set,
     const symbol_exprt &symbol_expr,
     goto_programt::targett &target,
@@ -231,7 +231,7 @@ protected:
   /// Adds the given local statics to the write set in pre and removes them
   /// post.
   void instrument_goto_function(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functiont &goto_function,
     const exprt &write_set,
     const std::set<symbol_exprt> &local_statics,
@@ -251,7 +251,7 @@ protected:
   /// \param function_pointer_contracts Contracts discovered in calls to
   /// the obeys_contract predicate are added to this set.
   void instrument_instructions(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &goto_program,
     goto_programt::targett first_instruction,
     const goto_programt::targett &last_instruction, // excluding the last
@@ -261,7 +261,7 @@ protected:
   /// Instruments a `DECL x` instruction.
   /// \pre \p target points to a `DECL` instruction
   void instrument_decl(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett &target,
     goto_programt &goto_program,
     dfcc_cfg_infot &cfg_info);
@@ -269,7 +269,7 @@ protected:
   /// Instruments a `DEAD x` instruction.
   /// \pre \p target points to a `DEAD` instruction
   void instrument_dead(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett &target,
     goto_programt &goto_program,
     dfcc_cfg_infot &cfg_info);
@@ -277,7 +277,7 @@ protected:
   /// \brief Instruments the LHS of an assignment instruction instruction by
   /// adding an inclusion check of \p lhs in \p write_set.
   void instrument_lhs(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett &target,
     const exprt &lhs,
     goto_programt &goto_program,
@@ -289,7 +289,7 @@ protected:
   /// added to the \p write_set.
   /// \pre \p target points to an `ASSIGN` instruction.
   void instrument_assign(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett &target,
     goto_programt &goto_program,
     dfcc_cfg_infot &cfg_info);
@@ -319,7 +319,7 @@ protected:
   /// to the __CPROVER_deallocate function.
   /// \pre \p target points to a `CALL __CPROVER_deallocate` instruction.
   void instrument_deallocate_call(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const exprt &write_set,
     goto_programt::targett &target,
     goto_programt &goto_program);
@@ -329,7 +329,7 @@ protected:
   /// and passing `write_set` as an extra argument to the function call.
   /// \pre \p target points to a `CALL` instruction.
   void instrument_function_call(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett &target,
     goto_programt &goto_program,
     dfcc_cfg_infot &cfg_info);
@@ -339,7 +339,7 @@ protected:
   /// a havoc_object instruction.
   /// \pre \p target points to an `OTHER` instruction.
   void instrument_other(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::targett &target,
     goto_programt &goto_program,
     dfcc_cfg_infot &cfg_info);
@@ -350,7 +350,7 @@ protected:
   /// \pre Instructions of the function must already have been instrumented for
   /// DFCC using the same cfg_info.
   void apply_loop_contracts(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functiont &goto_function,
     dfcc_cfg_infot &cfg_info,
     const loop_contract_configt &loop_contract_config,

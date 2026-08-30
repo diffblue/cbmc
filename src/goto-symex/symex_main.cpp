@@ -179,7 +179,7 @@ void goto_symext::symex_assert(
 
 void goto_symext::vcc(
   const exprt &condition,
-  const irep_idt &property_id,
+  irep_idt property_id,
   const std::string &msg,
   statet &state)
 {
@@ -420,7 +420,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
     symex_config.simplify_opt,
     language_mode,
     guard_manager,
-    [storage](const irep_idt &id) { return storage->get_unique_l2_index(id); });
+    [storage](irep_idt id) { return storage->get_unique_l2_index(id); });
 
   CHECK_RETURN(!state->threads.empty());
   CHECK_RETURN(!state->call_stack().empty());
@@ -492,10 +492,8 @@ void goto_symext::initialize_path_storage_from_entry_point_of(
 goto_symext::get_goto_functiont
 goto_symext::get_goto_function(abstract_goto_modelt &goto_model)
 {
-  return [&goto_model](
-           const irep_idt &id) -> const goto_functionst::goto_functiont & {
-    return goto_model.get_goto_function(id);
-  };
+  return [&goto_model](irep_idt id) -> const goto_functionst::goto_functiont &
+  { return goto_model.get_goto_function(id); };
 }
 
 messaget::mstreamt &

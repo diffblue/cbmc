@@ -62,7 +62,7 @@ public:
     bool checks_only=false);
 
   void dereference_expression(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt::const_targett target,
     exprt &expr);
 
@@ -94,7 +94,7 @@ protected:
 };
 
 void dereference(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &,

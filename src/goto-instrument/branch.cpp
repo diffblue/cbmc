@@ -18,9 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "function.h"
 
-void branch(
-  goto_modelt &goto_model,
-  const irep_idt &id)
+void branch(goto_modelt &goto_model, irep_idt id)
 {
   for(auto &gf_entry : goto_model.goto_functions.function_map)
   {

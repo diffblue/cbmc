@@ -57,7 +57,7 @@ exprt prop_conv_solvert::handle(const exprt &expr)
   return literal_exprt(l);
 }
 
-literalt prop_conv_solvert::get_literal(const irep_idt &identifier)
+literalt prop_conv_solvert::get_literal(irep_idt identifier)
 {
   auto result =
     symbols.insert(std::pair<irep_idt, literalt>(identifier, literalt()));

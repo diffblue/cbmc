@@ -28,8 +28,7 @@ std::string shared_bufferst::unique(void)
 }
 
 /// instruments the variable
-const shared_bufferst::varst &shared_bufferst::operator()(
-  const irep_idt &object)
+const shared_bufferst::varst &shared_bufferst::operator()(irep_idt object)
 {
   var_mapt::const_iterator it=var_map.find(object);
   if(it!=var_map.end())
@@ -141,7 +140,7 @@ void shared_bufferst::assignment(
   goto_programt &goto_program,
   goto_programt::targett &t,
   const source_locationt &source_location,
-  const irep_idt &id_lhs,
+  irep_idt id_lhs,
   const exprt &value)
 {
   const namespacet ns(symbol_table);
@@ -177,8 +176,8 @@ void shared_bufferst::delay_read(
   goto_programt &goto_program,
   goto_programt::targett &target,
   const source_locationt &source_location,
-  const irep_idt &read_object,
-  const irep_idt &write_object)
+  irep_idt read_object,
+  irep_idt write_object)
 {
 /* option 1: */
 /* trick using an additional variable whose value is to be defined later */
@@ -226,7 +225,7 @@ void shared_bufferst::flush_read(
   goto_programt &goto_program,
   goto_programt::targett &target,
   const source_locationt &source_location,
-  const irep_idt &write_object)
+  irep_idt write_object)
 {
 #if 0
   // option 1
@@ -266,7 +265,7 @@ void shared_bufferst::write(
   goto_programt &goto_program,
   goto_programt::targett &target,
   const source_locationt &source_location,
-  const irep_idt &object,
+  irep_idt object,
   goto_programt::instructiont &original_instruction,
   const unsigned current_thread)
 {
@@ -328,7 +327,7 @@ void shared_bufferst::det_flush(
   goto_programt &goto_program,
   goto_programt::targett &target,
   const source_locationt &source_location,
-  const irep_idt &object,
+  irep_idt object,
   const unsigned current_thread)
 {
   const std::string identifier=id2string(object);
@@ -431,11 +430,11 @@ void shared_bufferst::det_flush(
 
 /// instruments read
 void shared_bufferst::nondet_flush(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett &target,
   const source_locationt &source_location,
-  const irep_idt &object,
+  irep_idt object,
   const unsigned current_thread,
   const bool tso_pso_rmo) // true: tso/pso/rmo; false: power
 {
@@ -1047,7 +1046,7 @@ void shared_bufferst::affected_by_delay(
 /// instruments the program for the pairs detected through the CFG
 void shared_bufferst::cfg_visitort::weak_memory(
   value_setst &value_sets,
-  const irep_idt &function_id,
+  irep_idt function_id,
   memory_modelt model)
 {
   shared_buffers.message.debug()

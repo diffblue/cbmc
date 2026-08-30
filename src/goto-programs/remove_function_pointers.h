@@ -43,7 +43,7 @@ void remove_function_pointer(
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::targett target,
   const std::unordered_set<symbol_exprt, irep_hash> &functions);
 

@@ -138,7 +138,7 @@ static void init_static_symbols(std::unordered_set<irep_idt> &static_symbols)
   }
 }
 
-bool dfcc_is_cprover_function_symbol(const irep_idt &id)
+bool dfcc_is_cprover_function_symbol(irep_idt id)
 {
   std::unordered_set<irep_idt> function_symbols;
   init_function_symbols(function_symbols);
@@ -148,7 +148,7 @@ bool dfcc_is_cprover_function_symbol(const irep_idt &id)
          has_prefix(str, "__VERIFIER") || has_prefix(str, "nondet");
 }
 
-bool dfcc_is_cprover_static_symbol(const irep_idt &id)
+bool dfcc_is_cprover_static_symbol(irep_idt id)
 {
   std::unordered_set<irep_idt> static_symbols;
   init_static_symbols(static_symbols);
@@ -159,7 +159,7 @@ bool dfcc_is_cprover_static_symbol(const irep_idt &id)
          has_prefix(id2string(id), CPROVER_PREFIX "going_to");
 }
 
-bool dfcc_is_cprover_pointer_predicate(const irep_idt &id)
+bool dfcc_is_cprover_pointer_predicate(irep_idt id)
 {
   return id == CPROVER_PREFIX "pointer_equals" ||
          id == CPROVER_PREFIX "is_fresh" ||

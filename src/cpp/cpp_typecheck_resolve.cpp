@@ -668,7 +668,7 @@ void cpp_typecheck_resolvet::resolve_argument(
 }
 
 exprt cpp_typecheck_resolvet::do_builtin(
-  const irep_idt &base_name,
+  irep_idt base_name,
   const cpp_typecheck_fargst &fargs,
   const cpp_template_args_non_tct &template_args)
 {
@@ -998,7 +998,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 
 /// disambiguate partial specialization
 struct_tag_typet cpp_typecheck_resolvet::disambiguate_template_classes(
-  const irep_idt &base_name,
+  irep_idt base_name,
   const cpp_scopest::id_sett &id_set,
   const cpp_template_args_non_tct &full_template_args)
 {
@@ -1277,7 +1277,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_namespace(
 }
 
 void cpp_typecheck_resolvet::show_identifiers(
-  const irep_idt &base_name,
+  irep_idt base_name,
   const resolve_identifierst &identifiers,
   std::ostream &out)
 {
@@ -2343,7 +2343,7 @@ void cpp_typecheck_resolvet::filter_for_namespaces(
 
 void cpp_typecheck_resolvet::resolve_with_arguments(
   cpp_scopest::id_sett &id_set,
-  const irep_idt &base_name,
+  irep_idt base_name,
   const cpp_typecheck_fargst &fargs)
 {
   // not clear what this is good for

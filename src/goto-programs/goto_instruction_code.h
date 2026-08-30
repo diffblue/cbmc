@@ -422,7 +422,7 @@ public:
   ///   recorded as an input.
   /// \param location: A location to associate with this instruction.
   code_inputt(
-    const irep_idt &description,
+    irep_idt description,
     exprt expression,
     std::optional<source_locationt> location = {});
 
@@ -468,7 +468,7 @@ public:
   ///   recorded as an output.
   /// \param location: A location to associate with this instruction.
   code_outputt(
-    const irep_idt &description,
+    irep_idt description,
     exprt expression,
     std::optional<source_locationt> location = {});
 

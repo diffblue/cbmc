@@ -173,11 +173,11 @@ protected:
 
   /// \brief do the actual replacement of an expr with a new pointer expr
   int replace_expr(
-      exprt &old_expr,
-      const linker_valuest &linker_values,
-      const symbol_exprt &old_symbol,
-      const irep_idt &ident,
-      const std::string &shape);
+    exprt &old_expr,
+    const linker_valuest &linker_values,
+    const symbol_exprt &old_symbol,
+    irep_idt ident,
+    const std::string &shape);
 
   /// \brief fill `to_pointerize` with names of linker symbols appearing in expr
   void symbols_to_pointerize(

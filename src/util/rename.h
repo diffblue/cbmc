@@ -26,6 +26,6 @@ class namespacet;
 ///   suffix
 /// \return Identifier that is not yet part of the namespace.
 [[nodiscard]] irep_idt
-get_new_name(const irep_idt &name, const namespacet &ns, char delimiter = '_');
+get_new_name(irep_idt name, const namespacet &ns, char delimiter = '_');
 
 #endif // CPROVER_UTIL_RENAME_H

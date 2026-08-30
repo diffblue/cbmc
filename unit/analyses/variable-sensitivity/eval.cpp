@@ -12,7 +12,7 @@
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <testing-utils/use_catch.h>
 
-static symbolt simple_symbol(const irep_idt &identifier, const typet &type)
+static symbolt simple_symbol(irep_idt identifier, const typet &type)
 {
   symbolt b1{identifier, type, irep_idt{}};
   b1.base_name = b1.pretty_name = identifier;

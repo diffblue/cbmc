@@ -14,9 +14,9 @@ Author: Daniel Kroening, kroening@kroening.com
 
 bool value_set_domain_fit::transform(
   const namespacet &ns,
-  const irep_idt &function_from,
+  irep_idt function_from,
   locationt from_l,
-  const irep_idt &function_to,
+  irep_idt function_to,
   locationt to_l)
 {
   value_set.changed = false;

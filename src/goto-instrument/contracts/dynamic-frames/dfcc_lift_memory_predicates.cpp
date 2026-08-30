@@ -39,14 +39,13 @@ dfcc_lift_memory_predicatest::dfcc_lift_memory_predicatest(
 }
 
 /// True if a function had at least one of its parameters lifted
-bool dfcc_lift_memory_predicatest::is_lifted_function(
-  const irep_idt &function_id)
+bool dfcc_lift_memory_predicatest::is_lifted_function(irep_idt function_id)
 {
   return lifted_parameters.find(function_id) != lifted_parameters.end();
 }
 
 /// True iff function_id is a core memory predicate
-static bool is_core_memory_predicate(const irep_idt &function_id)
+static bool is_core_memory_predicate(irep_idt function_id)
 {
   return (function_id == CPROVER_PREFIX "pointer_equals") ||
          (function_id == CPROVER_PREFIX "is_fresh") ||
@@ -125,9 +124,8 @@ std::set<irep_idt> dfcc_lift_memory_predicatest::lift_predicates(
   // some predicates were found, build dependency graph
   struct dep_graph_nodet : public graph_nodet<empty_edget>
   {
-    const irep_idt &function_id;
-    explicit dep_graph_nodet(const irep_idt &function_id)
-      : function_id(function_id)
+    irep_idt function_id;
+    explicit dep_graph_nodet(irep_idt function_id) : function_id(function_id)
     {
     }
   };
@@ -215,9 +213,9 @@ static std::optional<std::size_t> is_param_expr(
 }
 
 void dfcc_lift_memory_predicatest::collect_parameters_to_lift(
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
-  const symbolt &function_symbol =
+  const symbolt function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   // map of parameter name to its rank in the signature
   std::map<irep_idt, std::size_t> parameter_rank;
@@ -287,7 +285,7 @@ void dfcc_lift_memory_predicatest::collect_parameters_to_lift(
 }
 
 void dfcc_lift_memory_predicatest::add_pointer_type(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::size_t parameter_rank,
   replace_symbolt &replace_lifted_param)
 {
@@ -328,7 +326,7 @@ void dfcc_lift_memory_predicatest::add_pointer_type(
 }
 
 void dfcc_lift_memory_predicatest::lift_parameters_and_update_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   std::set<irep_idt> &discovered_function_pointer_contracts)
 {
   replace_symbolt replace_lifted_params;
@@ -373,7 +371,7 @@ void dfcc_lift_memory_predicatest::lift_parameters_and_update_body(
 }
 
 void dfcc_lift_memory_predicatest::lift_predicate(
-  const irep_idt &function_id,
+  irep_idt function_id,
   std::set<irep_idt> &discovered_function_pointer_contracts)
 {
   // when this function_id gets processed, any memory predicate it calls has

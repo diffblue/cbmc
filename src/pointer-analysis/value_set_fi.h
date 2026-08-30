@@ -41,13 +41,13 @@ public:
   static object_numberingt object_numbering;
   static numberingt<irep_idt> function_numbering;
 
-  void set_from(const irep_idt &function, unsigned inx)
+  void set_from(irep_idt function, unsigned inx)
   {
     from_function = function_numbering.number(function);
     from_target_index = inx;
   }
 
-  void set_to(const irep_idt &function, unsigned inx)
+  void set_to(irep_idt function, unsigned inx)
   {
     to_function = function_numbering.number(function);
     to_target_index = inx;
@@ -180,9 +180,8 @@ public:
     {
     }
 
-    entryt(const idt &_identifier, const std::string _suffix):
-      identifier(_identifier),
-      suffix(_suffix)
+    entryt(idt _identifier, const std::string _suffix)
+      : identifier(_identifier), suffix(_suffix)
     {
     }
   };
@@ -200,16 +199,14 @@ public:
   std::vector<exprt>
   get_value_set(const exprt &expr, const namespacet &ns) const;
 
-  expr_sett &get(
-    const idt &identifier,
-    const std::string &suffix);
+  expr_sett &get(idt identifier, const std::string &suffix);
 
   void clear()
   {
     values.clear();
   }
 
-  void add_var(const idt &id)
+  void add_var(idt id)
   {
     get_entry(id, "");
   }
@@ -219,7 +216,7 @@ public:
     get_entry(e.identifier, e.suffix);
   }
 
-  entryt &get_entry(const idt &id, const std::string &suffix)
+  entryt &get_entry(idt id, const std::string &suffix)
   {
     return get_entry(entryt(id, suffix));
   }
@@ -271,7 +268,7 @@ public:
     const namespacet &ns);
 
   void do_function_call(
-    const irep_idt &function,
+    irep_idt function,
     const exprt::operandst &arguments,
     const namespacet &ns);
 

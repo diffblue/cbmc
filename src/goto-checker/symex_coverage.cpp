@@ -52,7 +52,7 @@ class goto_program_coverage_recordt : public coverage_recordt
 public:
   goto_program_coverage_recordt(
     const namespacet &ns,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program,
     const symex_coveraget::coveraget &coverage);
 
@@ -131,7 +131,7 @@ rate_detailed(std::size_t covered, std::size_t total, bool per_cent = false)
 
 goto_program_coverage_recordt::goto_program_coverage_recordt(
   const namespacet &ns,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   const symex_coveraget::coveraget &coverage)
   : coverage_recordt("method")

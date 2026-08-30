@@ -33,7 +33,7 @@ protected:
   virtual void generate_function_body_impl(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const = 0;
+    irep_idt function_name) const = 0;
 
 public:
   virtual ~generate_function_bodiest() = default;
@@ -46,7 +46,7 @@ public:
   void generate_function_body(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const;
+    irep_idt function_name) const;
 
 private:
   /// Generate parameter names for unnamed parameters.
@@ -55,7 +55,7 @@ private:
   void generate_parameter_names(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const;
+    irep_idt function_name) const;
 };
 
 std::unique_ptr<generate_function_bodiest> generate_function_bodies_factory(

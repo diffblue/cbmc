@@ -30,7 +30,7 @@ public:
   cover_instrumenter_baset(
     const symbol_table_baset &_symbol_table,
     const goal_filterst &_goal_filters,
-    const irep_idt &_coverage_criterion)
+    irep_idt _coverage_criterion)
     : coverage_criterion(_coverage_criterion),
       ns(_symbol_table),
       goal_filters(_goal_filters)
@@ -54,7 +54,7 @@ public:
   /// \param make_assertion: A function which makes goto program assertions.
   ///    This parameter may be used to customise the expressions asserted.
   void operator()(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &goto_program,
     const cover_blocks_baset &basic_blocks,
     const assertion_factoryt &make_assertion) const
@@ -74,7 +74,7 @@ protected:
 
   /// Override this method to implement an instrumenter
   virtual void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -83,7 +83,7 @@ protected:
   void initialize_source_location(
     source_locationt &source_location,
     const std::string &comment,
-    const irep_idt &function_id) const
+    irep_idt function_id) const
   {
     source_location.set_comment(comment);
     source_location.set(ID_coverage_criterion, coverage_criterion);
@@ -114,7 +114,7 @@ public:
   /// \param make_assertion: A function which makes goto program assertions.
   ///    This parameter may be used to customise the expressions asserted.
   void operator()(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &goto_program,
     const cover_blocks_baset &basic_blocks,
     const cover_instrumenter_baset::assertion_factoryt &make_assertion) const
@@ -140,7 +140,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -160,7 +160,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -180,7 +180,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -200,7 +200,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -220,7 +220,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -240,7 +240,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -260,7 +260,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -280,7 +280,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,
@@ -288,7 +288,7 @@ protected:
 };
 
 void cover_instrument_end_of_function(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const cover_instrumenter_baset::assertion_factoryt &);
 
@@ -305,7 +305,7 @@ public:
 
 protected:
   void instrument(
-    const irep_idt &,
+    irep_idt,
     goto_programt &,
     goto_programt::targett &,
     const cover_blocks_baset &,

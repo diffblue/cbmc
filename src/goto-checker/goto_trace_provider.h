@@ -32,7 +32,7 @@ public:
 
   /// Builds and returns the trace for the FAILed property
   /// with the given \p property_id
-  virtual goto_tracet build_trace(const irep_idt &property_id) const = 0;
+  virtual goto_tracet build_trace(irep_idt property_id) const = 0;
 
   /// Returns the namespace associated with the traces
   virtual const namespacet &get_namespace() const = 0;

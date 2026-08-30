@@ -25,29 +25,31 @@ Author: Chris Smowton, chris.smowton@diffblue.com
 /// \param graph: call graph
 /// \param function: function to query
 /// \return set of called functions
-std::set<irep_idt> get_callees(
-  const call_grapht::directed_grapht &graph, const irep_idt &function);
+std::set<irep_idt>
+get_callees(const call_grapht::directed_grapht &graph, irep_idt function);
 
 /// Get functions that call a given function
 /// \param graph: call graph
 /// \param function: function to query
 /// \return set of caller functions
-std::set<irep_idt> get_callers(
-  const call_grapht::directed_grapht &graph, const irep_idt &function);
+std::set<irep_idt>
+get_callers(const call_grapht::directed_grapht &graph, irep_idt function);
 
 /// Get functions reachable from a given function
 /// \param graph: call graph
 /// \param function: function to query
 /// \return set of reachable functions, including `function`
 std::set<irep_idt> get_reachable_functions(
-  const call_grapht::directed_grapht &graph, const irep_idt &function);
+  const call_grapht::directed_grapht &graph,
+  irep_idt function);
 
 /// Get functions that can reach a given function
 /// \param graph: call graph
 /// \param function: function to query
 /// \return set of functions that can reach the target, including `function`
 std::set<irep_idt> get_reaching_functions(
-  const call_grapht::directed_grapht &graph, const irep_idt &function);
+  const call_grapht::directed_grapht &graph,
+  irep_idt function);
 
 /// Get either callers or callees reachable from a given
 /// list of functions within N steps
@@ -70,7 +72,7 @@ std::set<irep_idt> get_functions_reachable_within_n_steps(
 ///   including the start function
 std::set<irep_idt> get_functions_reachable_within_n_steps(
   const call_grapht::directed_grapht &graph,
-  const irep_idt &start_function,
+  irep_idt start_function,
   std::size_t n);
 
 /// Get list of functions on the shortest path between two functions
@@ -80,8 +82,8 @@ std::set<irep_idt> get_functions_reachable_within_n_steps(
 /// \return list of functions on shortest path
 std::list<irep_idt> get_shortest_function_path(
   const call_grapht::directed_grapht &graph,
-  const irep_idt &src,
-  const irep_idt &dest);
+  irep_idt src,
+  irep_idt dest);
 
 /// Disconnects all functions in the call graph that are unreachable from
 /// a given start function.
@@ -92,6 +94,6 @@ std::list<irep_idt> get_shortest_function_path(
 /// \param function: start function
 void disconnect_unreachable_functions(
   call_grapht::directed_grapht &graph,
-  const irep_idt &function);
+  irep_idt function);
 
 #endif

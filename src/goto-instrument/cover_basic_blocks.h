@@ -51,7 +51,7 @@ public:
   /// \param goto_program: The goto program
   /// \param message_handler: The message handler
   virtual void report_block_anomalies(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program,
     message_handlert &message_handler)
   {
@@ -93,7 +93,7 @@ public:
   /// \param goto_program: The goto program
   /// \param message_handler: The message handler
   void report_block_anomalies(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program,
     message_handlert &message_handler) override;
 

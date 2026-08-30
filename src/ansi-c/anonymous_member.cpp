@@ -39,7 +39,7 @@ static member_exprt make_member_expr(
 
 exprt get_component_rec(
   const exprt &struct_union,
-  const irep_idt &component_name,
+  irep_idt component_name,
   const namespacet &ns)
 {
   const auto &tag_type = to_struct_or_union_tag_type(struct_union.type());
@@ -68,7 +68,7 @@ exprt get_component_rec(
 
 bool has_component_rec(
   const typet &type,
-  const irep_idt &component_name,
+  irep_idt component_name,
   const namespacet &ns)
 {
   const auto &tag_type = to_struct_or_union_tag_type(type);

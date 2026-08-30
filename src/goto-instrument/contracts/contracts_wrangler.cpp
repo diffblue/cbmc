@@ -99,7 +99,7 @@ void contracts_wranglert::add_builtin_pointer_function_symbol(
 
 void contracts_wranglert::mangle(
   const loop_contracts_clauset &loop_contracts,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   messaget log(message_handler);
   // Loop contracts mangling consists of four steps.

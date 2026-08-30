@@ -787,8 +787,7 @@ public:
   void update();
 
   /// Human-readable loop name
-  static irep_idt
-  loop_id(const irep_idt &function_id, const instructiont &instruction)
+  static irep_idt loop_id(irep_idt function_id, const instructiont &instruction)
   {
     return id2string(function_id) + "." +
            std::to_string(instruction.loop_number);
@@ -1243,7 +1242,7 @@ std::list<exprt> expressions_written(const goto_programt::instructiont &);
 
 std::string as_string(
   const namespacet &ns,
-  const irep_idt &function,
+  irep_idt function,
   const goto_programt::instructiont &);
 
 #endif // CPROVER_GOTO_PROGRAMS_GOTO_PROGRAM_H

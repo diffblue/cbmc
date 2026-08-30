@@ -44,7 +44,7 @@ protected:
   code_ifthenelset throw_exception(
     const exprt &cond,
     const source_locationt &original_loc,
-    const irep_idt &exc_name);
+    irep_idt exc_name);
 
   codet check_array_access(
     const exprt &array_struct,
@@ -93,7 +93,7 @@ const std::vector<std::string> exception_needed_classes = {
 code_ifthenelset java_bytecode_instrumentt::throw_exception(
   const exprt &cond,
   const source_locationt &original_loc,
-  const irep_idt &exc_name)
+  irep_idt exc_name)
 {
   irep_idt exc_class_name("java::"+id2string(exc_name));
 

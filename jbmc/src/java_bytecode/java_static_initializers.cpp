@@ -70,12 +70,12 @@ const std::string clinit_function_suffix = ".<clinit>:()V"; // NOLINT(*)
 /// Doesn't check whether the symbol actually exists
 /// \param class_name: class symbol name
 /// \return static initializer wrapper name
-irep_idt clinit_wrapper_name(const irep_idt &class_name)
+irep_idt clinit_wrapper_name(irep_idt class_name)
 {
   return id2string(class_name) + clinit_wrapper_suffix;
 }
 
-irep_idt user_specified_clinit_name(const irep_idt &class_name)
+irep_idt user_specified_clinit_name(irep_idt class_name)
 {
   return id2string(class_name) + user_specified_clinit_suffix;
 }
@@ -83,7 +83,7 @@ irep_idt user_specified_clinit_name(const irep_idt &class_name)
 /// Check if function_id is a clinit wrapper
 /// \param function_id: some function identifier
 /// \return true if the passed identifier is a clinit wrapper
-bool is_clinit_wrapper_function(const irep_idt &function_id)
+bool is_clinit_wrapper_function(irep_idt function_id)
 {
   return has_suffix(id2string(function_id), clinit_wrapper_suffix);
 }
@@ -91,7 +91,7 @@ bool is_clinit_wrapper_function(const irep_idt &function_id)
 /// Check if function_id is a clinit
 /// \param function_id: some function identifier
 /// \return true if the passed identifier is a clinit
-bool is_clinit_function(const irep_idt &function_id)
+bool is_clinit_function(irep_idt function_id)
 {
   return has_suffix(id2string(function_id), clinit_function_suffix);
 }
@@ -99,7 +99,7 @@ bool is_clinit_function(const irep_idt &function_id)
 /// Check if function_id is a user-specified clinit
 /// \param function_id: some function identifier
 /// \return true if the passed identifier is a clinit
-bool is_user_specified_clinit_function(const irep_idt &function_id)
+bool is_user_specified_clinit_function(irep_idt function_id)
 {
   return has_suffix(id2string(function_id), user_specified_clinit_suffix);
 }
@@ -114,7 +114,7 @@ bool is_user_specified_clinit_function(const irep_idt &function_id)
 /// /return returns new symbol.
 static symbolt add_new_variable_symbol(
   symbol_table_baset &symbol_table,
-  const irep_idt &name,
+  irep_idt name,
   const typet &type,
   const exprt &value,
   const bool is_thread_local,
@@ -137,7 +137,7 @@ static symbolt add_new_variable_symbol(
 /// given class.
 /// \param class_name: class symbol name
 /// \return static initializer wrapper-already run global name
-static irep_idt clinit_already_run_variable_name(const irep_idt &class_name)
+static irep_idt clinit_already_run_variable_name(irep_idt class_name)
 {
   return id2string(class_name) + "::clinit_already_run";
 }
@@ -146,7 +146,7 @@ static irep_idt clinit_already_run_variable_name(const irep_idt &class_name)
 /// if a static initializer actually exists.
 /// \param class_name: class symbol name
 /// \return Static initializer symbol name
-static irep_idt clinit_function_name(const irep_idt &class_name)
+static irep_idt clinit_function_name(irep_idt class_name)
 {
   return id2string(class_name) + clinit_function_suffix;
 }
@@ -155,7 +155,7 @@ static irep_idt clinit_function_name(const irep_idt &class_name)
 /// given class.
 /// \param class_name: class symbol name
 /// \return static initializer wrapper-state variable global name
-static irep_idt clinit_state_var_name(const irep_idt &class_name)
+static irep_idt clinit_state_var_name(irep_idt class_name)
 {
   return id2string(class_name) + CPROVER_PREFIX "clinit_state";
 }
@@ -164,7 +164,7 @@ static irep_idt clinit_state_var_name(const irep_idt &class_name)
 /// given class.
 /// \param class_name: class symbol name
 /// \return static initializer wrapper-state local state variable name
-static irep_idt clinit_thread_local_state_var_name(const irep_idt &class_name)
+static irep_idt clinit_thread_local_state_var_name(irep_idt class_name)
 {
   return id2string(class_name) + CPROVER_PREFIX "clinit_threadlocal_state";
 }
@@ -172,7 +172,7 @@ static irep_idt clinit_thread_local_state_var_name(const irep_idt &class_name)
 /// Get name of the static-initialization local variable for a given class.
 /// \param class_name: class symbol name
 /// \return static initializer wrapper-state local variable
-static irep_idt clinit_local_init_complete_var_name(const irep_idt &class_name)
+static irep_idt clinit_local_init_complete_var_name(irep_idt class_name)
 {
   return id2string(class_name) + CPROVER_PREFIX "clinit_wrapper::init_complete";
 }
@@ -228,7 +228,7 @@ gen_clinit_eqexpr(const exprt &expr, const clinit_statest state)
 /// \param message_handler: log
 static void clinit_wrapper_do_recursive_calls(
   symbol_table_baset &symbol_table,
-  const irep_idt &class_name,
+  irep_idt class_name,
   code_blockt &init_body,
   const bool nondet_static,
   const bool replace_clinit,
@@ -304,7 +304,7 @@ static void clinit_wrapper_do_recursive_calls(
 /// \param symbol_table: global symbol table
 /// \return true if a static initializer wrapper is needed
 static bool needs_clinit_wrapper(
-  const irep_idt &class_name,
+  irep_idt class_name,
   const symbol_table_baset &symbol_table)
 {
   if(symbol_table.has_symbol(clinit_function_name(class_name)))
@@ -326,9 +326,9 @@ static bool needs_clinit_wrapper(
 }
 
 static void create_function_symbol(
-  const irep_idt &class_name,
-  const irep_idt &function_name,
-  const irep_idt &function_base_name,
+  irep_idt class_name,
+  irep_idt function_name,
+  irep_idt function_base_name,
   const synthetic_method_typet &synthetic_method_type,
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
@@ -354,7 +354,7 @@ static void create_function_symbol(
 
 // Create symbol for the "clinit_wrapper"
 static void create_clinit_wrapper_function_symbol(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
@@ -369,7 +369,7 @@ static void create_clinit_wrapper_function_symbol(
 
 // Create symbol for the "user_specified_clinit"
 static void create_user_specified_clinit_function_symbol(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods)
 {
@@ -393,7 +393,7 @@ static void create_user_specified_clinit_function_symbol(
 /// \param thread_safe: if true state variables required to make the
 ///   clinit_wrapper thread safe will be created.
 static void create_clinit_wrapper_symbols(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table,
   synthetic_methods_mapt &synthetic_methods,
   const bool thread_safe)
@@ -518,7 +518,7 @@ static void create_clinit_wrapper_symbols(
 /// \param message_handler: log output
 /// \return the body of the static initializer wrapper
 code_blockt get_thread_safe_clinit_wrapper_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const bool replace_clinit,
@@ -716,7 +716,7 @@ code_blockt get_thread_safe_clinit_wrapper_body(
 /// \param message_handler: log output
 /// \return the body of the static initializer wrapper
 code_ifthenelset get_clinit_wrapper_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   const bool nondet_static,
   const bool replace_clinit,
@@ -789,7 +789,7 @@ class_to_declared_symbols(const symbol_table_baset &symbol_table)
 }
 
 code_blockt get_user_specified_clinit_body(
-  const irep_idt &class_id,
+  irep_idt class_id,
   const json_objectt &static_values_json,
   symbol_table_baset &symbol_table,
   std::optional<ci_lazy_methods_neededt> needed_lazy_methods,
@@ -1000,7 +1000,7 @@ void stub_global_initializer_factoryt::create_stub_global_initializer_symbols(
 /// \param message_handler: log output
 /// \return synthetic static initializer body.
 code_blockt stub_global_initializer_factoryt::get_stub_initializer_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   const java_object_factory_parameterst &object_factory_parameters,
   const select_pointer_typet &pointer_type_selector,

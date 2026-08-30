@@ -148,7 +148,7 @@ private:
   /// looking up the symbol or cutting the scope when needed.
   /// \param identifier: Identifier that should be converted.
   /// \return Converted identifier.
-  irep_idt id_shorthand(const irep_idt &identifier);
+  irep_idt id_shorthand(irep_idt identifier);
 };
 
 #endif // CPROVER_STATEMENT_LIST_CONVERTERS_EXPR2STATEMENT_LIST_H

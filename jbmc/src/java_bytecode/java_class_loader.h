@@ -33,7 +33,7 @@ public:
     parse_tree_with_overridest_mapt;
 
   /// A function that yields a list of extra dependencies based on a class name.
-  typedef std::function<std::vector<irep_idt>(const irep_idt &)>
+  typedef std::function<std::vector<irep_idt>(irep_idt)>
     get_extra_class_refs_functiont;
 
   java_class_loadert()
@@ -41,15 +41,15 @@ public:
   }
 
   parse_tree_with_overlayst &
-  operator()(const irep_idt &class_name, message_handlert &);
+  operator()(irep_idt class_name, message_handlert &);
 
   /// Checks whether \p class_name is parseable from the classpath,
   /// ignoring class loading limits.
-  bool can_load_class(const irep_idt &class_name, message_handlert &);
+  bool can_load_class(irep_idt class_name, message_handlert &);
 
   parse_tree_with_overlayst &get_parse_tree(
     java_class_loader_limitt &class_loader_limit,
-    const irep_idt &class_name,
+    irep_idt class_name,
     message_handlert &);
 
   /// Set the argument of the class loader limit \ref java_class_loader_limitt
@@ -84,8 +84,7 @@ public:
   {
     return fixed_keys_map_wrappert<parse_tree_with_overridest_mapt>(class_map);
   }
-  const java_bytecode_parse_treet &get_original_class(
-    const irep_idt &class_name)
+  const java_bytecode_parse_treet &get_original_class(irep_idt class_name)
   {
     return class_map.at(class_name).front();
   }

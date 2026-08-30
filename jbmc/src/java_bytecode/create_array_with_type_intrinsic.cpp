@@ -39,7 +39,7 @@ irep_idt get_create_array_with_type_name()
 /// \param message_handler: any GOTO program conversion errors are logged here
 /// \return new GOTO program body for `org.cprover.CProver.createArrayWithType`.
 codet create_array_with_type_body(
-  const irep_idt &function_id,
+  irep_idt function_id,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {

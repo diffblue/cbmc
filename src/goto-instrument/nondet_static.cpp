@@ -80,10 +80,8 @@ bool is_nondet_initializable_static(
 /// \param [inout] goto_model: Existing goto-functions and symbol table to
 ///   be updated.
 /// \param fct_name: Name of the goto-function to be updated.
-static void nondet_static(
-  const namespacet &ns,
-  goto_modelt &goto_model,
-  const irep_idt &fct_name)
+static void
+nondet_static(const namespacet &ns, goto_modelt &goto_model, irep_idt fct_name)
 {
   goto_functionst::function_mapt::iterator fct_entry =
     goto_model.goto_functions.function_map.find(fct_name);

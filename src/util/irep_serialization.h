@@ -65,7 +65,7 @@ public:
   void reference_convert(const irept &irep, std::ostream &);
 
   irep_idt read_string_ref(std::istream &);
-  void write_string_ref(std::ostream &, const irep_idt &);
+  void write_string_ref(std::ostream &, irep_idt);
 
   void clear() { ireps_container.clear(); }
 

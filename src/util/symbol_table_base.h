@@ -85,7 +85,7 @@ public:
   /// Check whether a symbol exists in the symbol table
   /// \param name: The name of the symbol to look for
   /// \return True if the symbol exists
-  bool has_symbol(const irep_idt &name) const
+  bool has_symbol(irep_idt name) const
   {
     return symbols.find(name) != symbols.end();
   }
@@ -93,7 +93,7 @@ public:
   /// Find a symbol in the symbol table for read-only access.
   /// \param name: The name of the symbol to look for
   /// \return A pointer to the found symbol if it exists, nullptr otherwise.
-  const symbolt *lookup(const irep_idt &name) const
+  const symbolt *lookup(irep_idt name) const
   {
     symbolst::const_iterator it = symbols.find(name);
     return it != symbols.end() ? &it->second : nullptr;
@@ -102,7 +102,7 @@ public:
   /// Find a symbol in the symbol table for read-only access.
   /// \param name: The name of the symbol to look for
   /// \return A reference to the symbol
-  const symbolt &lookup_ref(const irep_idt &name) const
+  const symbolt &lookup_ref(irep_idt name) const
   {
     const symbolt *const symbol = lookup(name);
     INVARIANT(
@@ -112,8 +112,7 @@ public:
 
   /// Collect all symbols the name of which matches \p id or the base name of
   /// which matches \p id.
-  std::list<symbolst::const_iterator>
-  match_name_or_base_name(const irep_idt &id) const
+  std::list<symbolst::const_iterator> match_name_or_base_name(irep_idt id) const
   {
     std::list<symbolst::const_iterator> results;
 
@@ -140,13 +139,13 @@ public:
   /// Find a symbol in the symbol table for read-write access.
   /// \param name: The name of the symbol to look for
   /// \return A pointer to the found symbol if it exists, nullptr otherwise.
-  virtual symbolt *get_writeable(const irep_idt &name) = 0;
+  virtual symbolt *get_writeable(irep_idt name) = 0;
 
   /// Find a symbol in the symbol table for read-write access.
   /// \param name: The name of the symbol to look for.
   /// \return A reference to the symbol.
   /// \throw `std::out_of_range` if no such symbol exists
-  symbolt &get_writeable_ref(const irep_idt &name)
+  symbolt &get_writeable_ref(irep_idt name)
   {
     symbolt *symbol = get_writeable(name);
     if(symbol == nullptr)
@@ -167,7 +166,7 @@ public:
   virtual std::pair<symbolt &, bool> insert(symbolt symbol) = 0;
   virtual bool move(symbolt &symbol, symbolt *&new_symbol) = 0;
 
-  bool remove(const irep_idt &name);
+  bool remove(irep_idt name);
   /// Remove a symbol from the symbol table
   /// \param entry: an iterator pointing at the symbol to remove
   virtual void erase(const symbolst::const_iterator &entry) = 0;
@@ -183,7 +182,7 @@ public:
   {
   private:
     symbolst::iterator it;
-    std::function<void(const irep_idt &id)> on_get_writeable;
+    std::function<void(irep_idt id)> on_get_writeable;
 
   public:
     explicit iteratort(symbolst::iterator it) : it(std::move(it))
@@ -191,8 +190,8 @@ public:
     }
 
     iteratort(
-        const iteratort &it,
-        std::function<void(const irep_idt &id)> on_get_writeable)
+      const iteratort &it,
+      std::function<void(irep_idt id)> on_get_writeable)
       : it(it.it), on_get_writeable(std::move(on_get_writeable))
     {
     }

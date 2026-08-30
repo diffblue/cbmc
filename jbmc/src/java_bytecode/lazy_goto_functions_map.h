@@ -51,13 +51,13 @@ public:
   typedef std::size_t size_type;
 
   typedef std::function<void(
-    const irep_idt &name,
+    irep_idt name,
     goto_functionst::goto_functiont &function,
     journalling_symbol_tablet &function_symbols)>
     post_process_functiont;
-  typedef std::function<bool(const irep_idt &name)> can_generate_function_bodyt;
+  typedef std::function<bool(irep_idt name)> can_generate_function_bodyt;
   typedef std::function<bool(
-    const irep_idt &function_name,
+    irep_idt function_name,
     symbol_table_baset &symbol_table,
     goto_functiont &function,
     bool body_available)>
@@ -103,7 +103,7 @@ public:
   /// Gets the body for a given function.
   /// \param name: The name of the function to search for.
   /// \return The function body corresponding to the given function.
-  const_mapped_type at(const key_type &name) const
+  const_mapped_type at(key_type name) const
   {
     return ensure_function_loaded_internal(name).second;
   }
@@ -111,7 +111,7 @@ public:
   /// Gets the body for a given function.
   /// \param name: The name of the function to search for.
   /// \return The function body corresponding to the given function.
-  mapped_type at(const key_type &name)
+  mapped_type at(key_type name)
   {
     return ensure_function_loaded_internal(name).second;
   }
@@ -121,7 +121,7 @@ public:
   /// \param name: function ID to query
   /// \return true if we can produce a function body, or false if we would leave
   ///   it a bodyless stub.
-  bool can_produce_function(const key_type &name) const
+  bool can_produce_function(key_type name) const
   {
     return language_files.can_convert_lazy_method(name) ||
            driver_program_can_generate_function_body(name);
@@ -130,12 +130,12 @@ public:
   /// Remove the function named \p name from the function map, if it exists.
   /// \return Returns 0 when \p name was not present, and 1 when \p name was
   ///   removed.
-  std::size_t unload(const key_type &name) const
+  std::size_t unload(key_type name) const
   {
     return goto_functions.erase(name);
   }
 
-  void ensure_function_loaded(const key_type &name) const
+  void ensure_function_loaded(key_type name) const
   {
     ensure_function_loaded_internal(name);
   }
@@ -144,7 +144,7 @@ private:
   // This returns a non-const reference, but if you use this method from a
   // const method then you should not return such a reference without making it
   // const first
-  reference ensure_function_loaded_internal(const key_type &name) const
+  reference ensure_function_loaded_internal(key_type name) const
   {
     symbol_table_buildert symbol_table_builder =
       symbol_table_buildert::wrap(symbol_table);
@@ -173,7 +173,7 @@ private:
   ///   this so that our callers can insert a journalling table here if needed.
   /// \return reference to the new or existing goto_functions map entry.
   reference ensure_entry_converted(
-    const key_type &name,
+    key_type name,
     symbol_table_baset &function_symbol_table) const
   {
     // Fill in symbol table entry body if not already done

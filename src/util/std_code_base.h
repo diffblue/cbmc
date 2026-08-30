@@ -31,12 +31,12 @@ public:
   /// \param statement: Specifies the type of the `codet` to be constructed,
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_frontend_assignt.
-  explicit codet(const irep_idt &statement) : exprt(ID_code, empty_typet())
+  explicit codet(irep_idt statement) : exprt(ID_code, empty_typet())
   {
     set_statement(statement);
   }
 
-  codet(const irep_idt &statement, source_locationt loc)
+  codet(irep_idt statement, source_locationt loc)
     : exprt(ID_code, empty_typet(), std::move(loc))
   {
     set_statement(statement);
@@ -46,18 +46,18 @@ public:
   ///   e.g. `ID_block` for a \ref code_blockt or `ID_assign` for a
   ///   \ref code_frontend_assignt.
   /// \param _op: any operands to be added
-  explicit codet(const irep_idt &statement, operandst _op) : codet(statement)
+  explicit codet(irep_idt statement, operandst _op) : codet(statement)
   {
     operands() = std::move(_op);
   }
 
-  codet(const irep_idt &statement, operandst op, source_locationt loc)
+  codet(irep_idt statement, operandst op, source_locationt loc)
     : codet(statement, std::move(loc))
   {
     operands() = std::move(op);
   }
 
-  void set_statement(const irep_idt &statement)
+  void set_statement(irep_idt statement)
   {
     set(ID_statement, statement);
   }

@@ -115,7 +115,7 @@ bool has_subexpr(
   return it != expr.depth_end();
 }
 
-bool has_subexpr(const exprt &src, const irep_idt &id)
+bool has_subexpr(const exprt &src, irep_idt id)
 {
   return has_subexpr(
     src, [&](const exprt &subexpr) { return subexpr.id() == id; });
@@ -163,7 +163,7 @@ bool has_subtype(
   return false;
 }
 
-bool has_subtype(const typet &type, const irep_idt &id, const namespacet &ns)
+bool has_subtype(const typet &type, irep_idt id, const namespacet &ns)
 {
   return has_subtype(
     type, [&](const typet &subtype) { return subtype.id() == id; }, ns);

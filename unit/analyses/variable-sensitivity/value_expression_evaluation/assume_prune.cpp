@@ -25,7 +25,7 @@
 
 static void ASSUME_TRUE(
   symbol_exprt const &x,
-  const irep_idt &id,
+  irep_idt id,
   symbol_exprt const &y,
   abstract_environmentt &env,
   const namespacet &ns)

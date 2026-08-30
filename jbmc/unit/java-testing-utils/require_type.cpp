@@ -34,7 +34,7 @@ pointer_typet require_type::require_pointer(
 /// \return The component with the specified name
 java_class_typet::componentt require_type::require_component(
   const java_class_typet &java_class_type,
-  const irep_idt &component_name)
+  irep_idt component_name)
 {
   const auto &component = std::find_if(
     java_class_type.components().begin(),
@@ -53,7 +53,7 @@ java_class_typet::componentt require_type::require_component(
 /// \return The component with the specified name
 struct_typet::componentt require_type::require_component(
   const struct_typet &struct_type,
-  const irep_idt &component_name)
+  irep_idt component_name)
 {
   const auto &componet = std::find_if(
     struct_type.components().begin(),
@@ -119,7 +119,7 @@ require_type::require_java_method(const typet &type, const size_t num_params)
 ///   parameter name.
 code_typet::parametert require_type::require_parameter(
   const code_typet &function_type,
-  const irep_idt &param_name)
+  irep_idt param_name)
 {
   const auto param = std::find_if(
     function_type.parameters().begin(),
@@ -224,7 +224,7 @@ require_type::require_java_generic_parameter(const typet &type)
 /// \return The given type, cast to a java_generic_parametert
 java_generic_parametert require_type::require_java_generic_parameter(
   const typet &type,
-  const irep_idt &parameter)
+  irep_idt parameter)
 {
   const java_generic_parametert &generic_param =
     require_type::require_java_generic_parameter(type);
@@ -314,17 +314,16 @@ java_generic_class_typet require_type::require_java_generic_class(
   const java_generic_class_typet::generic_typest &generic_type_vars =
     java_generic_class_type.generic_types();
   REQUIRE(generic_type_vars.size() == type_variables.size());
-  REQUIRE(
-    std::equal(
-      type_variables.begin(),
-      type_variables.end(),
-      generic_type_vars.begin(),
-      [](
-        const irep_idt &type_var_name,
-        const java_generic_parametert &param) { //NOLINT
-        REQUIRE(is_java_generic_parameter(param));
-        return param.type_variable().get_identifier() == type_var_name;
-      }));
+  REQUIRE(std::equal(
+    type_variables.begin(),
+    type_variables.end(),
+    generic_type_vars.begin(),
+    [](
+      irep_idt type_var_name,
+      const java_generic_parametert &param) { //NOLINT
+      REQUIRE(is_java_generic_parameter(param));
+      return param.type_variable().get_identifier() == type_var_name;
+    }));
 
   return java_generic_class_type;
 }
@@ -459,7 +458,7 @@ require_type::require_complete_java_non_generic_class(const typet &class_type)
 /// \param identifier: The identifier the symbol type should have
 /// \return The cast version of the input type
 const struct_tag_typet &
-require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
+require_type::require_struct_tag(const typet &type, irep_idt identifier)
 {
   REQUIRE(type.id() == ID_struct_tag);
   const struct_tag_typet &result = to_struct_tag_type(type);
@@ -471,7 +470,7 @@ require_type::require_struct_tag(const typet &type, const irep_idt &identifier)
 }
 
 pointer_typet
-require_type::require_pointer_to_tag(const typet &type, const irep_idt &tag)
+require_type::require_pointer_to_tag(const typet &type, irep_idt tag)
 {
   const auto pointer_type = require_type::require_pointer(type, {});
   require_type::require_struct_tag(pointer_type.base_type(), tag);

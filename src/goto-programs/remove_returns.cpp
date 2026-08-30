@@ -46,25 +46,24 @@ protected:
   symbol_table_baset &symbol_table;
 
   void replace_returns(
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functionst::goto_functiont &function);
 
   bool do_function_calls(
     function_is_stubt function_is_stub,
     goto_programt &goto_program);
 
-  bool
-  restore_returns(const irep_idt &function_id, goto_programt &goto_program);
+  bool restore_returns(irep_idt function_id, goto_programt &goto_program);
 
   void undo_function_calls(
     goto_programt &goto_program);
 
   std::optional<symbol_exprt>
-  get_or_create_return_value_symbol(const irep_idt &function_id);
+  get_or_create_return_value_symbol(irep_idt function_id);
 };
 
 std::optional<symbol_exprt>
-remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
+remove_returnst::get_or_create_return_value_symbol(irep_idt function_id)
 {
   const namespacet ns(symbol_table);
   const auto symbol_expr = return_value_symbol(function_id, ns);
@@ -100,7 +99,7 @@ remove_returnst::get_or_create_return_value_symbol(const irep_idt &function_id)
 /// \param function_id: name of the function to transform
 /// \param function: function to transform
 void remove_returnst::replace_returns(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functionst::goto_functiont &function)
 {
   // look up the function symbol
@@ -220,7 +219,8 @@ void remove_returnst::operator()(goto_functionst &goto_functions)
   for(auto &gf_entry : goto_functions.function_map)
   {
     // NOLINTNEXTLINE
-    auto function_is_stub = [&goto_functions](const irep_idt &function_id) {
+    auto function_is_stub = [&goto_functions](irep_idt function_id)
+    {
       auto findit = goto_functions.function_map.find(function_id);
       INVARIANT(
         findit != goto_functions.function_map.end(),
@@ -292,7 +292,7 @@ void remove_returns(goto_modelt &goto_model)
 
 /// turns an assignment to fkt#return_value back into 'return x'
 bool remove_returnst::restore_returns(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program)
 {
   // do we have X#return_value?
@@ -404,20 +404,19 @@ void restore_returns(goto_modelt &goto_model)
   rr.restore(goto_model.goto_functions);
 }
 
-irep_idt return_value_identifier(const irep_idt &identifier)
+irep_idt return_value_identifier(irep_idt identifier)
 {
   return id2string(identifier) + RETURN_VALUE_SUFFIX;
 }
 
-symbol_exprt
-return_value_symbol(const irep_idt &identifier, const namespacet &ns)
+symbol_exprt return_value_symbol(irep_idt identifier, const namespacet &ns)
 {
   const symbolt &function_symbol = ns.lookup(identifier);
   const typet &return_type = to_code_type(function_symbol.type).return_type();
   return symbol_exprt(return_value_identifier(identifier), return_type);
 }
 
-bool is_return_value_identifier(const irep_idt &id)
+bool is_return_value_identifier(irep_idt id)
 {
   return has_suffix(id2string(id), RETURN_VALUE_SUFFIX);
 }
