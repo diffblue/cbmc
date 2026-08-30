@@ -1197,3 +1197,38 @@ TEST_CASE(
 
   CHECK(test.sent_commands == expected_commands);
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret get_expr returns empty for large "
+  "arrays.",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const auto index_type = signedbv_typet{32};
+  const auto value_type = signedbv_typet{8};
+  // Create an array type with a size exceeding MAX_TRACE_ARRAY_SIZE (1000).
+  const auto large_array_type =
+    array_typet{value_type, from_integer(1001, index_type)};
+  const symbolt large_array = make_test_symbol("large_array", large_array_type);
+  const smt_identifier_termt large_array_term{
+    "large_array",
+    smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}}};
+
+  test.sent_commands.clear();
+  test.procedure.set_to(
+    equal_exprt{large_array.symbol_expr(), large_array.symbol_expr()}, true);
+
+  // Solve to put procedure in suitable state.
+  test.mock_responses.push_back(smt_check_sat_responset{smt_sat_responset{}});
+  test.procedure();
+
+  // Mock the response for getting the array size.
+  test.mock_responses.push_back(smt_get_value_responset{
+    {{{smt_bit_vector_constant_termt{1001, 32}},
+      smt_bit_vector_constant_termt{1001, 32}}}});
+
+  // get_expr should return empty optional for the large array.
+  const auto result =
+    test.procedure.get_expr(large_array_term, large_array_type);
+  REQUIRE_FALSE(result.has_value());
+}

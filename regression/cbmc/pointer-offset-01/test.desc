@@ -1,4 +1,4 @@
-CORE no-new-smt
+CORE
 main.c
 --no-malloc-may-fail --trace
 ^\s*ub.*=(\(char \*\)&)?dynamic_object \+ \d+
