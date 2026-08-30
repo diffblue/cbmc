@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/find_symbols.h>
 #include <util/floatbv_expr.h>
@@ -28,6 +29,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/pointer_predicates.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
@@ -78,6 +80,14 @@ public:
     error_labels = _options.get_list_option("error-label");
     enable_pointer_primitive_check =
       _options.get_bool_option("pointer-primitive-check");
+
+    // Pre-compute pragma strings to avoid repeated string concatenation.
+    for(const auto &entry : name_to_flag)
+    {
+      irep_idt pragma{"checked:" + id2string(entry.first)};
+      all_check_pragmas.emplace_back(pragma);
+      flag_pragma_pairs.emplace_back(entry.second, pragma);
+    }
   }
 
   typedef goto_functionst::goto_functiont goto_functiont;
@@ -220,7 +230,8 @@ protected:
   get_pointer_is_null_condition(const exprt &address, const exprt &size);
   conditionst get_pointer_points_to_valid_memory_conditions(
     const exprt &address,
-    const exprt &size);
+    const exprt &size,
+    bool omit_integer_address_when_nullable = false);
   exprt is_in_bounds_of_some_explicit_allocation(
     const exprt &pointer,
     const exprt &size);
@@ -254,7 +265,22 @@ protected:
     const guardt &guard);
 
   goto_programt new_code;
-  typedef std::set<std::pair<exprt, exprt>> assertionst;
+  struct exprt_pair_hasht
+  {
+    std::size_t operator()(const std::pair<exprt, exprt> &p) const
+    {
+      return p.first.hash() ^ p.second.hash();
+    }
+  };
+  /// Dedup key is (src_expr, guarded_expr): two checks with distinct
+  /// source expressions but identical simplified guarded expressions
+  /// (e.g. both reducing to false_exprt) must remain distinct
+  /// assertions, otherwise we'd silently drop e.g. the int
+  /// division-by-zero check on `10 / 0` because an unrelated
+  /// conversion-overflow check at another line had already simplified
+  /// to false.
+  typedef std::unordered_set<std::pair<exprt, exprt>, exprt_pair_hasht>
+    assertionst;
   assertionst assertions;
 
   /// Remove all assertions containing the symbol in \p lhs as well as all
@@ -302,6 +328,11 @@ protected:
 
   typedef optionst::value_listt error_labelst;
   error_labelst error_labels;
+
+  /// Pre-computed pragma strings.
+  std::vector<irep_idt> all_check_pragmas;
+  /// Pairs of (flag pointer, pragma string) for active check iteration.
+  std::vector<std::pair<bool *, irep_idt>> flag_pragma_pairs;
 
   // the first element of the pair is the base address,
   // and the second is the size of the region
@@ -470,6 +501,21 @@ void goto_check_ct::invalidate(const exprt &lhs)
     invalidate(to_index_expr(lhs).array());
   else if(lhs.id() == ID_member)
     invalidate(to_member_expr(lhs).struct_op());
+  else if(lhs.id() == ID_dereference)
+  {
+    // Writing through a pointer (*p = ...) changes what p points to,
+    // but not p itself. Assertions that only check pointer validity
+    // (pointer_object, is_invalid_pointer, object_size on the pointer
+    // value) are not affected. Only assertions involving dereferences
+    // could be affected by aliasing.
+    for(auto it = assertions.begin(); it != assertions.end();)
+    {
+      if(has_subexpr(it->second, ID_dereference))
+        it = assertions.erase(it);
+      else
+        ++it;
+    }
+  }
   else if(lhs.id() == ID_symbol)
   {
     // clear all assertions about 'symbol'
@@ -1550,8 +1596,8 @@ goto_check_ct::get_pointer_dereferenceable_conditions(
   const exprt &address,
   const exprt &size)
 {
-  auto conditions =
-    get_pointer_points_to_valid_memory_conditions(address, size);
+  auto conditions = get_pointer_points_to_valid_memory_conditions(
+    address, size, /*omit_integer_address_when_nullable=*/true);
   if(auto maybe_null_condition = get_pointer_is_null_condition(address, size))
   {
     conditions.push_front(*maybe_null_condition);
@@ -1781,7 +1827,7 @@ void goto_check_ct::add_guarded_property(
   // add the guard
   exprt guarded_expr = guard(simplified_expr);
 
-  if(assertions.insert(std::make_pair(src_expr, guarded_expr)).second)
+  if(assertions.insert({src_expr, guarded_expr}).second)
   {
     std::string source_expr_string;
     get_language_from_mode(mode)->from_expr(src_expr, source_expr_string, ns);
@@ -1839,7 +1885,9 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
     expr.is_boolean(),
     "'" + expr.id_string() + "' must be Boolean, but got " + expr.pretty());
 
-  exprt::operandst constraints;
+  // Build the conjunction of preceding operands incrementally to avoid
+  // reconstructing it from scratch for each operand.
+  exprt accumulated_constraint = true_exprt{};
 
   for(const auto &op : expr.operands())
   {
@@ -1848,13 +1896,15 @@ void goto_check_ct::check_rec_logical_op(const exprt &expr, const guardt &guard)
       "'" + expr.id_string() + "' takes Boolean operands only, but got " +
         op.pretty());
 
-    auto new_guard = [&guard, &constraints](exprt expr) {
-      return guard(implication(conjunction(constraints), expr));
-    };
+    auto new_guard = [&guard, &accumulated_constraint](exprt expr)
+    { return guard(implication(accumulated_constraint, expr)); };
 
     check_rec(op, new_guard, false);
 
-    constraints.push_back(expr.id() == ID_or ? boolean_negate(op) : op);
+    const exprt next = expr.id() == ID_or ? boolean_negate(op) : exprt{op};
+    accumulated_constraint = accumulated_constraint.is_true()
+                               ? next
+                               : and_exprt{accumulated_constraint, next};
   }
 }
 
@@ -1894,32 +1944,52 @@ bool goto_check_ct::check_rec_member(
   if(!enable_pointer_check)
     return true;
 
-  // we rewrite s->member into *(s+member_offset)
-  // to avoid requiring memory safety of the entire struct
+  // We split the checks into two groups:
+  // 1. Base pointer validity (NULL, invalid, deallocated, dead): these
+  //    depend only on the base pointer, not on which field is accessed.
+  //    By checking the base pointer directly, these checks are
+  //    deduplicated across different field accesses on the same pointer.
+  // 2. Bounds check: this depends on the field offset and size, so it
+  //    must use the offset pointer (s + member_offset).
+
+  const exprt &base_pointer = deref.pointer();
+
+  // Compute the size needed for the field access (offset + field size)
+  // to use as the size argument for the base pointer bounds check.
   auto member_offset_opt = member_offset_expr(member, ns);
 
-  if(member_offset_opt.has_value())
+  if(!member_offset_opt.has_value())
+    return false;
+
+  auto field_size_opt = size_of_expr(member.type(), ns);
+  if(!field_size_opt.has_value())
+    return false;
+
+  // Total size from base: offset + field_size
+  const exprt total_size = plus_exprt{
+    typecast_exprt::conditional_cast(member_offset_opt.value(), size_type()),
+    typecast_exprt::conditional_cast(field_size_opt.value(), size_type())};
+
+  // 1. Generate NULL/invalid/deallocated/dead checks on the BASE pointer.
+  //    Use total_size to ensure the object is large enough for this field.
+  //    These checks are identical across field accesses on the same pointer
+  //    (except for the bounds check which uses different sizes).
+  auto base_conditions =
+    get_pointer_dereferenceable_conditions(base_pointer, total_size);
+
+  for(const auto &c : base_conditions)
   {
-    pointer_typet new_pointer_type = to_pointer_type(deref.pointer().type());
-    new_pointer_type.base_type() = member.type();
-
-    const exprt char_pointer = typecast_exprt::conditional_cast(
-      deref.pointer(), pointer_type(char_type()));
-
-    const exprt new_address_casted = typecast_exprt::conditional_cast(
-      plus_exprt{
-        char_pointer,
-        typecast_exprt::conditional_cast(
-          member_offset_opt.value(), pointer_diff_type())},
-      new_pointer_type);
-
-    dereference_exprt new_deref{new_address_casted};
-    new_deref.add_source_location() = deref.source_location();
-    pointer_validity_check(new_deref, member, guard);
-
-    return true;
+    add_guarded_property(
+      c.assertion,
+      "dereference failure: " + c.description,
+      "pointer dereference",
+      true, // fatal
+      member.find_source_location(),
+      member,
+      guard);
   }
-  return false;
+
+  return true;
 }
 
 void goto_check_ct::check_rec_div(
@@ -2225,8 +2295,63 @@ void goto_check_ct::goto_check(
 
       check_shadow_memory_api_calls(i);
 
-      // the call might invalidate any assertion
-      assertions.clear();
+      // A function call can modify:
+      // 1. The LHS of the call (return value assignment)
+      // 2. Global state (__CPROVER_deallocated, __CPROVER_dead_object, etc.)
+      // 3. Heap contents reachable from its arguments (via dereferences)
+      // 4. Any local whose address is passed in (e.g. f(&p)): the callee
+      //    can write through that address and change the local's value.
+      //
+      // Arguments passed by value cannot otherwise modify the caller's
+      // locals, so assertions about such locals may be kept. We clear
+      // assertions that:
+      // - Reference a __CPROVER_ global (could be modified by the callee)
+      // - Reference the LHS symbol (overwritten by the return value)
+      // - Reference a symbol whose address is taken in an argument
+      {
+        find_symbols_sett lhs_syms;
+        if(i.call_lhs().is_not_nil())
+          find_symbols(i.call_lhs(), lhs_syms);
+
+        // Collect symbols whose address is taken in the call arguments; the
+        // callee may modify these through the passed-in address.
+        find_symbols_sett address_taken_syms;
+        for(const auto &arg : i.call_arguments())
+        {
+          for(auto a_it = arg.depth_begin(), a_end = arg.depth_end();
+              a_it != a_end;
+              ++a_it)
+          {
+            if(a_it->id() == ID_address_of)
+              find_symbols(
+                to_address_of_expr(*a_it).object(), address_taken_syms);
+          }
+        }
+
+        for(auto it = assertions.begin(); it != assertions.end();)
+        {
+          bool must_clear = false;
+
+          find_symbols_sett assertion_syms;
+          find_symbols(it->second, assertion_syms);
+
+          for(const auto &sym_id : assertion_syms)
+          {
+            if(
+              has_prefix(id2string(sym_id), CPROVER_PREFIX) ||
+              lhs_syms.count(sym_id) || address_taken_syms.count(sym_id))
+            {
+              must_clear = true;
+              break;
+            }
+          }
+
+          if(must_clear)
+            it = assertions.erase(it);
+          else
+            ++it;
+        }
+      }
     }
     else if(i.is_set_return_value())
     {
@@ -2347,7 +2472,8 @@ void goto_check_ct::check_shadow_memory_api_calls(
 goto_check_ct::conditionst
 goto_check_ct::get_pointer_points_to_valid_memory_conditions(
   const exprt &address,
-  const exprt &size)
+  const exprt &size,
+  bool omit_integer_address_when_nullable)
 {
   PRECONDITION(local_bitvector_analysis);
   PRECONDITION(address.type().id() == ID_pointer);
@@ -2358,6 +2484,17 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
 
   const exprt in_bounds_of_some_explicit_allocation =
     is_in_bounds_of_some_explicit_allocation(address, size);
+
+  // When there are no explicit allocations,
+  // in_bounds_of_some_explicit_allocation is false_exprt, making
+  // or_exprt(false, X) redundant. Avoid constructing the or_exprt to skip
+  // the simplify_expr call that would just remove it.
+  auto or_alloc = [&](exprt check) -> exprt
+  {
+    if(allocations.empty())
+      return check;
+    return or_exprt{in_bounds_of_some_explicit_allocation, std::move(check)};
+  };
 
   const bool unknown = flags.is_unknown() || flags.is_uninitialized();
 
@@ -2370,52 +2507,47 @@ goto_check_ct::get_pointer_points_to_valid_memory_conditions(
   if(unknown || flags.is_dynamic_heap())
   {
     conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(deallocated(address, ns))),
+      or_alloc(not_exprt(deallocated(address, ns))),
       "deallocated dynamic object"));
   }
 
   if(unknown || flags.is_dynamic_local())
   {
-    conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(dead_object(address, ns))),
-      "dead object"));
+    conditions.push_back(
+      conditiont(or_alloc(not_exprt(dead_object(address, ns))), "dead object"));
   }
 
   if(flags.is_dynamic_heap())
   {
-    const or_exprt object_bounds_violation(
-      object_lower_bound(address, nil_exprt()),
-      object_upper_bound(address, size));
-
     conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(object_bounds_violation)),
+      or_alloc(object_in_bounds(address, size)),
       "pointer outside dynamic object bounds"));
   }
 
   if(unknown || flags.is_dynamic_local() || flags.is_static_lifetime())
   {
-    const or_exprt object_bounds_violation(
-      object_lower_bound(address, nil_exprt()),
-      object_upper_bound(address, size));
-
     conditions.push_back(conditiont(
-      or_exprt(
-        in_bounds_of_some_explicit_allocation,
-        not_exprt(object_bounds_violation)),
+      or_alloc(object_in_bounds(address, size)),
       "pointer outside object bounds"));
   }
 
-  if(unknown || flags.is_integer_address())
+  // The integer-address check is redundant with the NULL check whenever the
+  // latter is generated: the NULL check (see get_pointer_is_null_condition) is
+  // emitted exactly when the pointer is nullable, and it implies the
+  // integer-address disjunct. Skip generating it in that case rather than
+  // generating and then filtering it out. Both decisions use the same flagst.
+  const bool nullable =
+    flags.is_unknown() || flags.is_uninitialized() || flags.is_null();
+
+  if(
+    (unknown || flags.is_integer_address()) &&
+    !(omit_integer_address_when_nullable && nullable))
   {
     conditions.push_back(conditiont(
-      implies_exprt(
-        integer_address(address), in_bounds_of_some_explicit_allocation),
+      allocations.empty()
+        ? exprt{not_exprt(integer_address(address))}
+        : exprt{implies_exprt(
+            integer_address(address), in_bounds_of_some_explicit_allocation)},
       "invalid integer address"));
   }
 
@@ -2506,16 +2638,16 @@ void goto_check_c(
 void goto_check_ct::add_active_named_check_pragmas(
   source_locationt &source_location) const
 {
-  for(const auto &entry : name_to_flag)
-    if(*(entry.second))
-      source_location.add_pragma("checked:" + id2string(entry.first));
+  for(const auto &[flag, pragma] : flag_pragma_pairs)
+    if(*flag)
+      source_location.add_pragma(pragma);
 }
 
 void goto_check_ct::add_all_checked_named_check_pragmas(
   source_locationt &source_location) const
 {
-  for(const auto &entry : name_to_flag)
-    source_location.add_pragma("checked:" + id2string(entry.first));
+  for(const auto &pragma : all_check_pragmas)
+    source_location.add_pragma(pragma);
 }
 
 goto_check_ct::named_check_statust

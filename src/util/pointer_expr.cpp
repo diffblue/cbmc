@@ -252,8 +252,7 @@ exprt prophecy_r_or_w_ok_exprt::lower(const namespacet &ns) const
      not_exprt{is_invalid_pointer_exprt{pointer()}},
      not_exprt{same_object(pointer(), deallocated_ptr())},
      not_exprt{same_object(pointer(), dead_ptr())},
-     not_exprt{object_lower_bound(pointer(), nil_exprt())},
-     not_exprt{object_upper_bound(pointer(), size())}}};
+     object_in_bounds(pointer(), size())}};
 }
 
 exprt prophecy_pointer_in_range_exprt::lower(const namespacet &ns) const
