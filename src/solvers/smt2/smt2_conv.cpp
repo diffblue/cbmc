@@ -2471,6 +2471,27 @@ void smt2_convt::convert_expr(const exprt &expr)
         "overflow check should not be performed on unsupported type",
         op_type.id_string());
   }
+  else if(can_cast_expr<div_overflow_exprt>(expr))
+  {
+    // overflow on signed division: dividend == INT_MIN && divisor == -1
+    // unsigned division never overflows
+    const auto &op0 = to_binary_expr(expr).op0();
+    const auto &op1 = to_binary_expr(expr).op1();
+    const typet &op_type = op0.type();
+
+    if(op_type.id() == ID_signedbv)
+    {
+      const std::size_t width = boolbv_width(op_type);
+      out << "(and (= ";
+      convert_expr(op0);
+      out << " (_ bv" << power(2, width - 1) << " " << width << "))";
+      out << " (= ";
+      convert_expr(op1);
+      out << " (bvneg (_ bv1 " << width << "))))";
+    }
+    else
+      out << "false";
+  }
   else if(expr.id() == ID_saturating_plus || expr.id() == ID_saturating_minus)
   {
     const bool subtract = expr.id() == ID_saturating_minus;

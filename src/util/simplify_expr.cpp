@@ -2614,6 +2614,28 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
   if(op_type_id != ID_signedbv && op_type_id != ID_unsignedbv)
     return unchanged(expr);
 
+  // div_overflow can be simplified when either operand rules out INT_MIN/-1
+  if(can_cast_expr<div_overflow_exprt>(expr))
+  {
+    if(op_type_id == ID_unsignedbv)
+      return false_exprt{};
+    const std::size_t width = to_bitvector_type(expr.op0().type()).get_width();
+    const mp_integer int_min =
+      integer_bitvector_typet{ID_signedbv, width}.smallest();
+    if(expr.op0().is_constant())
+    {
+      const auto op0_val = numeric_cast<mp_integer>(expr.op0());
+      if(op0_val.has_value() && *op0_val != int_min)
+        return false_exprt{};
+    }
+    if(expr.op1().is_constant())
+    {
+      const auto op1_val = numeric_cast<mp_integer>(expr.op1());
+      if(op1_val.has_value() && *op1_val != -1)
+        return false_exprt{};
+    }
+  }
+
   if(!expr.op0().is_constant() || !expr.op1().is_constant())
     return unchanged(expr);
 
@@ -2631,6 +2653,12 @@ simplify_exprt::simplify_overflow_binary(const binary_overflow_exprt &expr)
     no_overflow_result = *op0_value * *op1_value;
   else if(can_cast_expr<shl_overflow_exprt>(expr))
     no_overflow_result = *op0_value << *op1_value;
+  else if(can_cast_expr<div_overflow_exprt>(expr))
+  {
+    if(*op1_value == 0)
+      return unchanged(expr);
+    no_overflow_result = *op0_value / *op1_value;
+  }
   else
     UNREACHABLE;
 

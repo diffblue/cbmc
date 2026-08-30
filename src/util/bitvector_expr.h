@@ -1093,7 +1093,8 @@ public:
   static bool valid_id(const irep_idt &id)
   {
     return id == ID_overflow_plus || id == ID_overflow_mult ||
-           id == ID_overflow_minus || id == ID_overflow_shl;
+           id == ID_overflow_minus || id == ID_overflow_shl ||
+           id == ID_overflow_div;
   }
 
 private:
@@ -1126,9 +1127,7 @@ inline void validate_expr(const binary_overflow_exprt &value)
 /// \return Object of type \ref binary_overflow_exprt
 inline const binary_overflow_exprt &to_binary_overflow_expr(const exprt &expr)
 {
-  PRECONDITION(
-    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_mult ||
-    expr.id() == ID_overflow_minus || expr.id() == ID_overflow_shl);
+  PRECONDITION(binary_overflow_exprt::valid_id(expr.id()));
   const binary_overflow_exprt &ret =
     static_cast<const binary_overflow_exprt &>(expr);
   validate_expr(ret);
@@ -1138,9 +1137,7 @@ inline const binary_overflow_exprt &to_binary_overflow_expr(const exprt &expr)
 /// \copydoc to_binary_overflow_expr(const exprt &)
 inline binary_overflow_exprt &to_binary_overflow_expr(exprt &expr)
 {
-  PRECONDITION(
-    expr.id() == ID_overflow_plus || expr.id() == ID_overflow_mult ||
-    expr.id() == ID_overflow_minus || expr.id() == ID_overflow_shl);
+  PRECONDITION(binary_overflow_exprt::valid_id(expr.id()));
   binary_overflow_exprt &ret = static_cast<binary_overflow_exprt &>(expr);
   validate_expr(ret);
   return ret;
@@ -1216,6 +1213,27 @@ template <>
 inline bool can_cast_expr<shl_overflow_exprt>(const exprt &base)
 {
   return base.id() == ID_overflow_shl;
+}
+
+/// \brief A Boolean expression returning true iff signed division of \p lhs by
+/// \p rhs would overflow. Unsigned division never overflows.
+class div_overflow_exprt : public binary_overflow_exprt
+{
+public:
+  div_overflow_exprt(exprt _lhs, exprt _rhs)
+    : binary_overflow_exprt(std::move(_lhs), ID_overflow_div, std::move(_rhs))
+  {
+  }
+
+  /// Lower a div_overflow_exprt to arithmetic and logic expressions.
+  /// \return Semantically equivalent expression
+  exprt lower() const;
+};
+
+template <>
+inline bool can_cast_expr<div_overflow_exprt>(const exprt &base)
+{
+  return base.id() == ID_overflow_div;
 }
 
 /// \brief A Boolean expression returning true, iff operation \c kind would
