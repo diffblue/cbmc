@@ -13,7 +13,7 @@ add_test_pl_tests(
 add_test_pl_profile(
     "book-examples-paths-lifo"
     "$<TARGET_FILE:cbmc> --paths lifo"
-    "-C;-X;thorough-paths;-X;smt-backend;-X;paths-lifo-expected-failure;${gcc_only_string}-s;paths-lifo"
+    "-C;-X;thorough-paths;-X;smt-backend;${gcc_only_string}-s;paths-lifo"
     "CORE"
 )
 
