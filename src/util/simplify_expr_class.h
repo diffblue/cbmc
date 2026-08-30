@@ -15,15 +15,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <sys/stat.h>
 #endif
 
-#include <set>
-
 #include "expr.h"
 #include "mp_arith.h"
-#include "type.h"
-// #define USE_LOCAL_REPLACE_MAP
-#ifdef USE_LOCAL_REPLACE_MAP
 #include "replace_expr.h"
-#endif
+#include "type.h"
+
+#include <set>
 
 class abs_exprt;
 class address_of_exprt;
@@ -292,10 +289,7 @@ protected:
 #ifdef DEBUG_ON_DEMAND
   bool debug_on;
 #endif
-#ifdef USE_LOCAL_REPLACE_MAP
   replace_mapt local_replace_map;
-#endif
-
 };
 
 #endif // CPROVER_UTIL_SIMPLIFY_EXPR_CLASS_H

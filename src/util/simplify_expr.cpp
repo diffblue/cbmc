@@ -3343,22 +3343,21 @@ simplify_exprt::resultt<> simplify_exprt::simplify_rec(const exprt &expr)
       simplify_node_preorder_result.expr_changed;
   }
 
-#ifdef USE_LOCAL_REPLACE_MAP
-  exprt tmp = simplify_node_result.expr;
-#  if 1
-  replace_mapt::const_iterator it =
-    local_replace_map.find(simplify_node_result.expr);
-  if(it!=local_replace_map.end())
-    simplify_node_result = changed(it->second);
-#  else
-  if(
-    !local_replace_map.empty() &&
-    !replace_expr(local_replace_map, simplify_node_result.expr))
+  // The local_replace_map is populated by simplify_if_preorder: when
+  // simplifying if(cond, T, F), the condition (or its conjuncts/disjuncts)
+  // is mapped to true/false in the respective branch. Here we apply that
+  // map using a hash-based exact-match lookup; we deliberately avoid
+  // replace_expr's recursive traversal so that this stays cheap on deeply
+  // nested expressions. With the substitution always enabled, this lookup
+  // runs on every simplify_rec call, but the !local_replace_map.empty()
+  // guard keeps it free for expressions that contain no such if-then-else.
+  if(!local_replace_map.empty())
   {
-    simplify_node_result = changed(simplify_rec(simplify_node_result.expr));
+    replace_mapt::const_iterator it =
+      local_replace_map.find(simplify_node_result.expr);
+    if(it != local_replace_map.end())
+      simplify_node_result = changed(it->second);
   }
-#  endif
-#endif
 
   if(!simplify_node_result.has_changed())
   {
