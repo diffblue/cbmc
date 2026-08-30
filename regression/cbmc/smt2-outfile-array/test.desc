@@ -1,0 +1,31 @@
+CORE no-new-smt broken-cprover-smt-backend broken-z3-smt-backend
+main.c
+--smt2 --outfile -
+activate-multi-line-match
+\(declare-fun unflatten_base_\d+ \(\) \(Array \(_ BitVec \d+\) \(_ BitVec \d+\)\)\)(?s:.)*\(store unflatten_base_\d+
+^EXIT=0$
+^SIGNAL=0$
+--
+^Invariant check failed
+^warning: ignoring
+--
+Reproducer for #8637: --smt2 --outfile (without an explicit solver) used
+to abort with PRECONDITION(use_as_const) in unflatten when an array LHS
+appeared at a define-fun site with use_as_const == false.
+
+This descriptor pins both the absence of that abort and the structure of
+the new encoding: an `unflatten_base_<n>` array is declared at the top
+level (during find_symbols_rec on the array type), and it is later used
+as the base of a nested `(store ...)` chain that initialises every
+in-range index. The multi-line regex enforces that the declaration
+precedes the first store onto the auxiliary, which would otherwise be a
+forward-reference. `--outfile -` writes to stdout to avoid leaving an
+`outfile.smt2` artifact in the test directory.
+
+The `no-new-smt` tag excludes this test from the incremental SMT2
+back-end (`--incremental-smt2-solver`), which uses a separate code
+path and is incompatible with `--smt2 --outfile`. The
+`broken-cprover-smt-backend` and `broken-z3-smt-backend` tags exclude the
+cprover-smt2 and z3 profiles, which prepend `--cprover-smt2` / `--z3` to the
+test command and switch the back-end to use_as_const = true, in which case
+`unflatten_base_*` declarations are not emitted.
