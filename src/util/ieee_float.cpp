@@ -1051,7 +1051,7 @@ ieee_floatt &ieee_floatt::operator/=(const ieee_floatt &other)
     return *this;
   }
 
-  // x/inf = NaN
+  // inf/inf = NaN, x/inf = 0 for finite x
   if(other.infinity_flag)
   {
     if(infinity_flag)
