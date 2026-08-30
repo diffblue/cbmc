@@ -196,13 +196,16 @@ public:
   /// (returns false) or a composite object made of several SSA expressions as
   /// components (such as a struct with each member becoming an individual SSA
   /// expression, return true in this case).
+  /// \param ns: a namespace to resolve type symbols/tag types
   /// \param expr: the expression to evaluate
   /// \param disjoined_fields_only: whether to expand unions (`false`) or not
   ///   (`true`)
   /// \return False, if and only if, \p expr would be a single field-sensitive
   /// SSA expression.
-  [[nodiscard]] bool
-  is_divisible(const ssa_exprt &expr, bool disjoined_fields_only) const;
+  [[nodiscard]] bool is_divisible(
+    const namespacet &ns,
+    const ssa_exprt &expr,
+    bool disjoined_fields_only) const;
 
 private:
   const std::size_t max_field_sensitivity_array_size;
