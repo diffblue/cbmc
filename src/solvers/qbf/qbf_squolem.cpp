@@ -68,7 +68,7 @@ propt::resultt qbf_squolemt::prop_solve()
   return P_ERROR;
 }
 
-void qbf_squolemt::lcnf(const bvt &bv)
+void qbf_squolemt::do_lcnf(const bvt &bv)
 {
   if(early_decision)
     return; // we don't need no more...

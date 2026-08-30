@@ -63,7 +63,7 @@ std::string satcheck_booleforce_baset::solver_text() const
   return std::string("Booleforce version ")+booleforce_version();
 }
 
-void satcheck_booleforce_baset::lcnf(const bvt &bv)
+void satcheck_booleforce_baset::do_lcnf(const bvt &bv)
 {
   bvt tmp;
 
