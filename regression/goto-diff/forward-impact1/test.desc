@@ -1,0 +1,16 @@
+CORE
+a.c
+b.c --forward-impact
+^EXIT=0$
+^SIGNAL=0$
+\*\* compute \*\*
+^-.*function compute
+^\+.*function compute
+^D.*function compute
+--
+^warning: ignoring
+//
+// --forward-impact propagates impact forward from the change. The D
+// (data-dependence) line is what distinguishes it from --backward-impact (see
+// backward-impact1), so assert it in addition to the syntactic-diff (-/+)
+// markers.
