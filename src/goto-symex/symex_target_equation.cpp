@@ -616,6 +616,115 @@ void symex_target_equationt::convert_assertions(
     });
 }
 
+std::optional<symbol_exprt>
+symex_target_equationt::convert_assertions_incremental(
+  decision_proceduret &decision_procedure)
+{
+  // Always iterate from the beginning to re-convert all assertions
+  // with the current (complete) assumption. Earlier assertions may
+  // have been converted with a partial assumption that was missing
+  // later SSA constraints.
+  SSA_stepst::iterator start = SSA_steps.begin();
+
+  // Count unconverted assertions from where we left off
+  std::size_t number_of_new_assertions = 0;
+  for(auto it = start; it != SSA_steps.end(); ++it)
+  {
+    if(it->is_assert() && !it->ignore && !it->converted)
+      ++number_of_new_assertions;
+  }
+
+  if(number_of_new_assertions == 0)
+    return current_goal_extender;
+
+  // Rebuild the full assumption from ALL assume steps from the beginning
+  // up to the start of the new batch. We must use the current cond_handle
+  // values (set by convert_assumptions) rather than cached ones, because
+  // convert_without_assertions may have been called between incremental
+  // calls, potentially changing the handles.
+  exprt assumption = true_exprt();
+  for(auto it = SSA_steps.begin(); it != start; ++it)
+  {
+    if(it->is_assume() && !it->ignore)
+    {
+      if(assumption.id() == ID_and)
+        assumption.copy_to_operands(it->cond_handle);
+      else
+        assumption = and_exprt(assumption, it->cond_handle);
+    }
+  }
+
+  // Build disjuncts for the new assertions
+  or_exprt::operandst disjuncts;
+  disjuncts.reserve(number_of_new_assertions + 1);
+
+  // On subsequent calls, link to the previous goal extender.
+  // NOT(old_goal_extender) means: if we drop the old extender
+  // (by NOT assuming it false), the old assertions must still
+  // be checked.
+  if(current_goal_extender.has_value())
+    disjuncts.push_back(not_exprt(current_goal_extender.value()));
+
+  std::vector<goto_programt::const_targett> involved_steps;
+
+  SSA_stepst::iterator last_it = start;
+  for(auto it = start; it != SSA_steps.end(); ++it)
+  {
+    auto &step = *it;
+    last_it = it;
+
+    // hide already converted assertions in the error trace
+    if(step.is_assert() && step.converted)
+      step.hidden = true;
+
+    if(step.is_assert() && !step.ignore && !step.converted)
+    {
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream)
+        {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
+
+      implies_exprt implication(assumption, step.cond_expr);
+
+      // do the conversion
+      step.cond_handle = decision_procedure.handle(implication);
+
+      with_solver_hardness(
+        decision_procedure,
+        [&involved_steps, &step](solver_hardnesst &hardness)
+        { involved_steps.push_back(step.source.pc); });
+
+      // store disjunct
+      disjuncts.push_back(not_exprt(step.cond_handle));
+    }
+    else if(step.is_assume())
+    {
+      // the assumptions have been converted before
+      // avoid deep nesting of ID_and expressions
+      if(assumption.id() == ID_and)
+        assumption.copy_to_operands(step.cond_handle);
+      else
+      {
+        assumption = and_exprt(assumption, step.cond_handle);
+      }
+
+      with_solver_hardness(
+        decision_procedure,
+        [&involved_steps, &step](solver_hardnesst &hardness)
+        { involved_steps.push_back(step.source.pc); });
+    }
+  }
+
+  // Save iterator to the last element we processed
+  if(!SSA_steps.empty())
+    incremental_last_converted = std::prev(SSA_steps.end());
+
+  return std::nullopt;
+}
+
 void symex_target_equationt::convert_function_calls(
   decision_proceduret &decision_procedure)
 {
