@@ -1,0 +1,13 @@
+CORE
+main.c
+--unwind 7 --verbosity 9
+^Symex steps: \d+ total$
+^  factorial: \d+ steps \(\d+%\)$
+^Peak memory: \d+ MB$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Tests that per-function symex step counts and peak memory are reported
+at statistics verbosity level.
