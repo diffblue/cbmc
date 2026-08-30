@@ -2100,17 +2100,43 @@ void smt2_convt::convert_expr(const exprt &expr)
     }
     else
     {
-      #if 0
-      out << "(= ((_ extract 0 0) ";
-      // the arguments of the shift need to have the same width
-      out << "(bvlshr ";
-      convert_expr(expr.op0());
-      typecast_exprt tmp(expr.op0().type());
-      tmp.op0()=expr.op1();
-      convert_expr(tmp);
-      out << ")) bin1)"; // bvlshr, extract, =
-      #endif
-      SMT2_TODO("smt2: extractbits with non-constant index");
+      // For non-constant indices, encode
+      //   extractbits(src, idx, T)
+      // as
+      //   ((_ extract result_width-1 0) (bvlshr src idx'))
+      // where idx' has been zero-extended (or, if idx is wider than src,
+      // truncated) to the source width. Truncation is sound because
+      // well-formed extractbits indices satisfy
+      // idx + result_width - 1 < src_width per the contract for
+      // extractbits_exprt, so the upper bits of idx are guaranteed to be
+      // zero. We use zero_extend rather than sign_extend because indices
+      // are non-negative; this stays correct even when idx has a signed
+      // type. Mirrors the encoding used by the incremental SMT2 backend
+      // in convert_expr_to_smt.cpp and the flattening backend in
+      // boolbv_extractbits.cpp.
+      const auto src_width = boolbv_width(extractbits_expr.src().type());
+      const auto index_width = boolbv_width(extractbits_expr.index().type());
+
+      out << "((_ extract " << (width - 1) << " 0) (bvlshr ";
+      flatten2bv(extractbits_expr.src());
+      out << ' ';
+      if(index_width < src_width)
+      {
+        out << "((_ zero_extend " << (src_width - index_width) << ") ";
+        flatten2bv(extractbits_expr.index());
+        out << ")";
+      }
+      else if(index_width > src_width)
+      {
+        out << "((_ extract " << (src_width - 1) << " 0) ";
+        flatten2bv(extractbits_expr.index());
+        out << ")";
+      }
+      else
+      {
+        flatten2bv(extractbits_expr.index());
+      }
+      out << "))"; // bvlshr, extract
     }
   }
   else if(expr.id()==ID_replication)
