@@ -1,0 +1,15 @@
+CORE wide-pointer-encoding no-new-smt broken-smt-backend
+main.c
+--wide-pointer-encoding --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* reachable: assumed address reuse not over-constrained: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+With wide pointer encoding, __CPROVER_assume(p == q) between two dynamic
+objects whose addresses may be reused after free must remain satisfiable: the
+full-bitvector identity forced for assumed pointer equalities
+(boolbv_set_equality_to_true) must not over-constrain the model to UNSAT, so
+the assertion is reachable.

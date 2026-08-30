@@ -1,0 +1,13 @@
+CORE no-new-smt broken-smt-backend wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion ptr != x: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Issue #8200: with wide pointer encoding, a constant integer cast to
+a pointer can equal a string literal's address. The address-based
+pointer equality detects this.

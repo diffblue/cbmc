@@ -1,0 +1,14 @@
+CORE no-new-smt broken-smt-backend paths-lifo-expected-failure wide-pointer-encoding
+main.c
+--wide-pointer-encoding --no-malloc-may-fail
+^\[main.assertion.5\] line 28 assertion __CPROVER_POINTER_OBJECT\(p\) == __CPROVER_POINTER_OBJECT\(p1\): FAILURE$
+^\*\* 13 of 59 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Wide pointer encoding: relational pointer comparisons use flat
+addresses, so p < p1+1 does not imply same_object(p, p1).
+Address reuse for dynamic objects adds further failures.

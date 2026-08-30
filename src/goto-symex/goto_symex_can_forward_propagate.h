@@ -12,8 +12,11 @@ Author: Michael Tautschig, tautschn@amazon.com
 #ifndef CPROVER_GOTO_SYMEX_GOTO_SYMEX_CAN_FORWARD_PROPAGATE_H
 #define CPROVER_GOTO_SYMEX_GOTO_SYMEX_CAN_FORWARD_PROPAGATE_H
 
+#include <util/config.h>
 #include <util/expr.h>
 #include <util/expr_util.h>
+#include <util/pointer_expr.h>
+#include <util/pointer_predicates.h>
 
 class goto_symex_can_forward_propagatet : public can_forward_propagatet
 {
@@ -26,6 +29,13 @@ public:
 protected:
   bool is_constant(const exprt &expr) const override
   {
+    if(config.bv_encoding.malloc_may_alias && expr.id() == ID_address_of)
+    {
+      const exprt &obj = to_address_of_expr(expr).object();
+      if(is_symex_dynamic_object(obj))
+        return false;
+    }
+
     if(expr.id() == ID_mult)
     {
       bool found_non_constant = false;
