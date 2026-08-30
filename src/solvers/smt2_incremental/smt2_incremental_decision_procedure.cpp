@@ -553,7 +553,11 @@ std::optional<exprt> smt2_incremental_decision_proceduret::get_expr(
       response.pretty()};
   }
   return construct_value_expr_from_smt(
-    get_value_response->pairs()[0].get().value(), type, ns);
+    get_value_response->pairs()[0].get().value(),
+    type,
+    ns,
+    object_map,
+    expression_identifiers);
 }
 
 // This is a fall back which builds resulting expression based on getting the
