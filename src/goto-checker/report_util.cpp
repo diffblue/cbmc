@@ -11,8 +11,6 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "report_util.h"
 
-#include <algorithm>
-
 #include <util/json.h>
 #include <util/json_irep.h>
 #include <util/json_stream.h>
@@ -24,10 +22,12 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-programs/json_goto_trace.h>
 #include <goto-programs/xml_goto_trace.h>
 
+#include "bmc_util.h"
 #include "fault_localization_provider.h"
 #include "goto_trace_storage.h"
+#include "proof_explanation.h"
 
-#include "bmc_util.h"
+#include <algorithm>
 
 void report_success(ui_message_handlert &ui_message_handler)
 {
@@ -206,7 +206,8 @@ is_property_less_than(const propertyt &property1, const propertyt &property2)
            std::stoul(id2string(p2.get_line()));
 
   const auto split_property_id =
-    [](const irep_idt &property_id) -> std::pair<std::string, std::size_t> {
+    [](const irep_idt &property_id) -> std::pair<std::string, std::size_t>
+  {
     const auto property_string = id2string(property_id);
     const auto last_dot = property_string.rfind('.');
     std::string property_name;
@@ -252,9 +253,8 @@ get_sorted_properties(const propertiest &properties)
   std::sort(
     sorted_properties.begin(),
     sorted_properties.end(),
-    [](propertiest::const_iterator pit1, propertiest::const_iterator pit2) {
-      return is_property_less_than(*pit1, *pit2);
-    });
+    [](propertiest::const_iterator pit1, propertiest::const_iterator pit2)
+    { return is_property_less_than(*pit1, *pit2); });
   return sorted_properties;
 }
 
@@ -423,7 +423,9 @@ void output_fault_localization_scores(
   messaget &log)
 {
   log.conditional_output(
-    log.debug(), [fault_location](messaget::mstreamt &out) {
+    log.debug(),
+    [fault_location](messaget::mstreamt &out)
+    {
       out << "Fault localization scores:" << messaget::eom;
       for(auto &score_pair : fault_location.scores)
       {
@@ -443,9 +445,8 @@ max_fault_localization_score(const fault_location_infot &fault_location)
            fault_location.scores.end(),
            [](
              fault_location_infot::score_mapt::value_type score_pair1,
-             fault_location_infot::score_mapt::value_type score_pair2) {
-             return score_pair1.second < score_pair2.second;
-           })
+             fault_location_infot::score_mapt::value_type score_pair2)
+           { return score_pair1.second < score_pair2.second; })
     ->first;
 }
 
@@ -669,6 +670,191 @@ void output_error_trace_with_fault_localization(
       {},
       {xml(goto_trace.get_last_step().property_id, fault_location_info, log)});
     log.result() << dest;
+    break;
+  }
+  }
+}
+
+void output_proof_explanation(
+  const std::vector<proof_explanation_stept> &explanation,
+  ui_message_handlert &ui_message_handler)
+{
+  messaget log(ui_message_handler);
+  switch(ui_message_handler.get_ui())
+  {
+  case ui_message_handlert::uit::PLAIN:
+  {
+    if(explanation.empty())
+    {
+      log.result() << "\nProof explanation: no contributing steps found"
+                   << messaget::eom;
+      break;
+    }
+    log.result() << "\nProof explanation:" << messaget::eom;
+    for(const auto &step : explanation)
+    {
+      if(step.in_core)
+        log.result() << "  [core] ";
+      else
+        log.result() << "  ";
+      log.result() << "[" << step.step_type << "] ";
+      if(!step.source_location.get_file().empty())
+        log.result() << step.source_location.get_file() << ":";
+      if(!step.source_location.get_line().empty())
+        log.result() << step.source_location.get_line() << " ";
+      log.result() << step.description << messaget::eom;
+    }
+    break;
+  }
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    json_stream_objectt &json_result =
+      ui_message_handler.get_json_stream().push_back_stream_object();
+    json_stream_arrayt &json_steps =
+      json_result.push_back_stream_array("proofExplanation");
+    for(const auto &step : explanation)
+    {
+      json_objectt json_step;
+      json_step["stepType"] = json_stringt(step.step_type);
+      json_step["description"] = json_stringt(step.description);
+      json_step["inCore"] = jsont::json_boolean(step.in_core);
+      json_objectt json_location;
+      if(!step.source_location.get_file().empty())
+      {
+        json_location["file"] =
+          json_stringt(id2string(step.source_location.get_file()));
+      }
+      if(!step.source_location.get_line().empty())
+      {
+        json_location["line"] =
+          json_stringt(id2string(step.source_location.get_line()));
+      }
+      if(!step.source_location.get_function().empty())
+      {
+        json_location["function"] =
+          json_stringt(id2string(step.source_location.get_function()));
+      }
+      json_step["sourceLocation"] = std::move(json_location);
+      json_steps.push_back(std::move(json_step));
+    }
+    break;
+  }
+  case ui_message_handlert::uit::XML_UI:
+  {
+    xmlt xml_explanation("proof-explanation");
+    for(const auto &step : explanation)
+    {
+      xmlt xml_step("step");
+      xml_step.set_attribute("type", step.step_type);
+      xml_step.set_attribute("description", step.description);
+      xml_step.set_attribute("in-core", step.in_core ? "true" : "false");
+      if(!step.source_location.get_file().empty())
+      {
+        xml_step.set_attribute(
+          "file", id2string(step.source_location.get_file()));
+      }
+      if(!step.source_location.get_line().empty())
+      {
+        xml_step.set_attribute(
+          "line", id2string(step.source_location.get_line()));
+      }
+      xml_explanation.new_element().swap(xml_step);
+    }
+    log.result() << xml_explanation;
+    break;
+  }
+  }
+}
+
+void output_per_property_proof_explanations(
+  const std::map<irep_idt, std::vector<proof_explanation_stept>> &per_property,
+  ui_message_handlert &ui_message_handler)
+{
+  messaget log(ui_message_handler);
+  if(per_property.empty())
+    return;
+  log.result() << "\nPer-property proof explanations:" << messaget::eom;
+  for(const auto &entry : per_property)
+  {
+    log.result() << "\n  Property " << entry.first << ":" << messaget::eom;
+    for(const auto &step : entry.second)
+    {
+      if(!step.in_core)
+        continue;
+      log.result() << "    [" << step.step_type << "] ";
+      if(!step.source_location.get_file().empty())
+        log.result() << step.source_location.get_file() << ":";
+      if(!step.source_location.get_line().empty())
+        log.result() << step.source_location.get_line() << " ";
+      log.result() << step.description << messaget::eom;
+    }
+  }
+}
+
+void output_proof_invariants(
+  const std::vector<proof_invariantt> &invariants,
+  ui_message_handlert &ui_message_handler)
+{
+  messaget log(ui_message_handler);
+  switch(ui_message_handler.get_ui())
+  {
+  case ui_message_handlert::uit::PLAIN:
+  {
+    if(invariants.empty())
+    {
+      log.result() << "\nProof invariants: none" << messaget::eom;
+      break;
+    }
+    log.result() << "\nProof invariants:" << messaget::eom;
+    for(const auto &inv : invariants)
+    {
+      log.result() << "  " << inv.display_name << ": ";
+      for(std::size_t i = 0; i < inv.constraints.size(); ++i)
+      {
+        if(i > 0)
+          log.result() << ", ";
+        log.result() << inv.constraints[i];
+      }
+      log.result() << messaget::eom;
+    }
+    break;
+  }
+  case ui_message_handlert::uit::JSON_UI:
+  {
+    json_stream_objectt &json_result =
+      ui_message_handler.get_json_stream().push_back_stream_object();
+    json_stream_arrayt &json_invariants =
+      json_result.push_back_stream_array("proofInvariants");
+    for(const auto &inv : invariants)
+    {
+      json_objectt json_inv;
+      json_inv["variable"] = json_stringt(id2string(inv.variable));
+      json_inv["displayName"] = json_stringt(inv.display_name);
+      json_arrayt json_constraints;
+      for(const auto &c : inv.constraints)
+        json_constraints.push_back(json_stringt(c));
+      json_inv["constraints"] = std::move(json_constraints);
+      json_invariants.push_back(std::move(json_inv));
+    }
+    break;
+  }
+  case ui_message_handlert::uit::XML_UI:
+  {
+    xmlt xml_invariants("proof-invariants");
+    for(const auto &inv : invariants)
+    {
+      xmlt xml_inv("invariant");
+      xml_inv.set_attribute("variable", id2string(inv.variable));
+      xml_inv.set_attribute("displayName", inv.display_name);
+      for(const auto &c : inv.constraints)
+      {
+        xmlt xml_constraint("constraint");
+        xml_constraint.data = c;
+        xml_inv.new_element().swap(xml_constraint);
+      }
+      xml_invariants.new_element().swap(xml_inv);
+    }
+    log.result() << xml_invariants;
     break;
   }
   }

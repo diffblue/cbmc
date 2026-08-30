@@ -14,6 +14,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "properties.h"
 
+#include <vector>
+
 struct fault_location_infot;
 class goto_trace_storaget;
 class goto_tracet;
@@ -56,6 +58,21 @@ void output_error_trace_with_fault_localization(
   const namespacet &,
   const trace_optionst &,
   const fault_location_infot &,
+  ui_message_handlert &);
+
+struct proof_explanation_stept;
+struct proof_invariantt;
+
+void output_proof_explanation(
+  const std::vector<proof_explanation_stept> &,
+  ui_message_handlert &);
+
+void output_per_property_proof_explanations(
+  const std::map<irep_idt, std::vector<proof_explanation_stept>> &,
+  ui_message_handlert &);
+
+void output_proof_invariants(
+  const std::vector<proof_invariantt> &,
   ui_message_handlert &);
 
 void output_overall_result(

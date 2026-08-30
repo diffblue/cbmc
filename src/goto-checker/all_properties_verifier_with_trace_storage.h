@@ -19,6 +19,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include "goto_trace_storage.h"
 #include "goto_verifier.h"
 #include "incremental_goto_checker.h"
+#include "proof_explanation.h"
 #include "properties.h"
 #include "report_util.h"
 
@@ -80,6 +81,37 @@ public:
     else
     {
       output_properties(properties, iterations, ui_message_handler);
+    }
+    if constexpr(has_get_proof_explanationt<incremental_goto_checkerT>::value)
+    {
+      if(
+        options.get_bool_option("proof-explanation") &&
+        determine_result(properties) == resultt::PASS)
+      {
+        auto explanation = incremental_goto_checker.get_proof_explanation();
+        output_proof_explanation(explanation, ui_message_handler);
+      }
+    }
+    if constexpr(has_get_proof_invariantst<incremental_goto_checkerT>::value)
+    {
+      if(
+        options.get_bool_option("proof-explanation") &&
+        determine_result(properties) == resultt::PASS)
+      {
+        auto invariants = incremental_goto_checker.get_proof_invariants();
+        output_proof_invariants(invariants, ui_message_handler);
+      }
+    }
+    if constexpr(has_get_proof_explanationt<incremental_goto_checkerT>::value)
+    {
+      if(
+        options.get_bool_option("proof-explanation") &&
+        determine_result(properties) == resultt::PASS)
+      {
+        auto per_prop =
+          incremental_goto_checker.get_per_property_proof_explanations();
+        output_per_property_proof_explanations(per_prop, ui_message_handler);
+      }
     }
     output_overall_result(determine_result(properties), ui_message_handler);
     incremental_goto_checker.report();
