@@ -13,16 +13,15 @@ Date: April 2013
 
 #include "call_sequences.h"
 
-#include <stack>
-#include <iostream>
-
 #include <util/simplify_expr.h>
 
 #include <goto-programs/goto_model.h>
+#include <goto-programs/initialize_function.h>
 
 #include <langapi/language_util.h>
 
-#include <linking/static_lifetime_init.h>
+#include <iostream>
+#include <stack>
 
 void show_call_sequences(
   const irep_idt &caller,
