@@ -304,11 +304,15 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
      cmdline.isset("outfile"))
     options.set_option("stop-on-fail", true);
 
+  // Trace generation is opt-in, consistently across the plain, JSON and XML
+  // interfaces: it is enabled by an explicit trace option, or by modes whose
+  // purpose is to produce a trace (--stop-on-fail, --graphml-witness, see
+  // below). Previously the JSON and XML interfaces generated traces for all
+  // failed properties by default, which is very costly on programs with many
+  // (expected) failures, e.g. cover-style reachability checks.
   if(
     cmdline.isset("trace") || cmdline.isset("compact-trace") ||
-    cmdline.isset("stack-trace") || cmdline.isset("stop-on-fail") ||
-    (ui_message_handler.get_ui() != ui_message_handlert::uit::PLAIN &&
-     !cmdline.isset("cover")))
+    cmdline.isset("stack-trace") || cmdline.isset("stop-on-fail"))
   {
     options.set_option("trace", true);
   }

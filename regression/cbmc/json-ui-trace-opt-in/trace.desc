@@ -1,0 +1,11 @@
+CORE
+main.c
+--json-ui --trace
+^EXIT=10$
+^SIGNAL=0$
+"status": "FAILURE"
+"trace": \[
+--
+--
+With --trace, the JSON interface generates counterexample traces for failed
+properties.
