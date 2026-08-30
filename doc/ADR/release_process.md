@@ -60,7 +60,8 @@ anything more, but the process is described below for reference:
 ## Versioning
 
 We adopt an approach approximating SemVer. That is, our version numbers should
-be major.minor.patch. Regular releases (as of 2022-06-23: every other week)
+be major.minor.patch. Regular releases (as of 2024-08-23: every 14th and 28th of
+each month)
 should normally increment the minor version number. This is also where we can
 deprecate undesired features, i.e., mark as deprecated, warn existing users.
 
