@@ -710,3 +710,56 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
+
+TEST_CASE(
+  "Simplify double typecast over fixed-width bitvector types",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  const unsignedbv_typet u16{16};
+  const unsignedbv_typet u32{32};
+  const signedbv_typet s16{16};
+  const signedbv_typet s32{32};
+  const bv_typet bv32{32};
+
+  SECTION("(unsigned)(signed)x where x is unsigned and same width -> x")
+  {
+    const symbol_exprt x{"x", u32};
+    const typecast_exprt outer{typecast_exprt{x, s32}, u32};
+    REQUIRE(simplify_expr(outer, ns) == x);
+  }
+
+  SECTION("(signed)(unsigned)x where x is signed and same width -> x")
+  {
+    const symbol_exprt x{"x", s32};
+    const typecast_exprt outer{typecast_exprt{x, u32}, s32};
+    REQUIRE(simplify_expr(outer, ns) == x);
+  }
+
+  SECTION("(bv)(unsigned)x where x is bv and same width -> x")
+  {
+    const symbol_exprt x{"x", bv32};
+    const typecast_exprt outer{typecast_exprt{x, u32}, bv32};
+    REQUIRE(simplify_expr(outer, ns) == x);
+  }
+
+  SECTION("different widths: inner cast truncates, casts are kept")
+  {
+    // (u32)(s16)x with x : u32 -- the inner cast genuinely truncates, so the
+    // round-trip is not the identity and must not be simplified to x.
+    const symbol_exprt x{"x", u32};
+    const typecast_exprt outer{typecast_exprt{x, s16}, u32};
+    REQUIRE(simplify_expr(outer, ns) != x);
+  }
+
+  SECTION("inner operand type differs from outer type, casts are kept")
+  {
+    // (u32)(s32)x with x : u16 -- the type of x is not the outer type, so the
+    // rule must not fire.
+    const symbol_exprt x{"x", u16};
+    const typecast_exprt outer{typecast_exprt{x, s32}, u32};
+    REQUIRE(simplify_expr(outer, ns) != x);
+  }
+}
