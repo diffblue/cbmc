@@ -710,3 +710,82 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
+
+TEST_CASE("Simplify extractbits over concatenation", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // extractbits(concat(a, b), 0, u8) where a,b are 8-bit -> b
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const extractbits_exprt extract{cat, from_integer(0, u16), u8};
+  const auto result = simplify_expr(extract, ns);
+  REQUIRE(result == b);
+}
+
+TEST_CASE("Simplify extractbits dropping trailing operand", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // extractbits(concat(a, b, c), start=23, end=8) where a,b,c are 8-bit
+  // should drop c and simplify to concat(a, b) or equivalent
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const unsignedbv_typet u24{24};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const symbol_exprt c{"c", u8};
+  const concatenation_exprt cat{{a, b, c}, u24};
+  const extractbits_exprt extract{cat, from_integer(8, u24), u16};
+  const auto result = simplify_expr(extract, ns);
+  // c is entirely below the extracted range and should be dropped
+  const concatenation_exprt expected{{a, b}, u16};
+  REQUIRE(result == expected);
+}
+
+TEST_CASE(
+  "Simplify extractbits dropping leading and trailing operands",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // extractbits(concat(a, b, c), end=8, u8) where a,b,c are 8-bit -> b:
+  // a is entirely above and c entirely below the extracted range, so both
+  // are dropped in a single call (exercises the new_index decrement together
+  // with reducing the concatenation to a single surviving operand).
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u24{24};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const symbol_exprt c{"c", u8};
+  const concatenation_exprt cat{{a, b, c}, u24};
+  const extractbits_exprt extract{cat, from_integer(8, u24), u8};
+  REQUIRE(simplify_expr(extract, ns) == b);
+}
+
+TEST_CASE(
+  "Simplify extractbits within a single operand of a concatenation",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // extractbits(concat(a, b), end=2, u4) where a,b are 8-bit: the extracted
+  // range lies entirely within b, so this reduces to extractbits(b, 2, u4).
+  // Guards the pre-existing single-operand simplification.
+  const unsignedbv_typet u4{4};
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const extractbits_exprt extract{cat, from_integer(2, u16), u4};
+  const extractbits_exprt expected{b, from_integer(2, u16), u4};
+  REQUIRE(simplify_expr(extract, ns) == expected);
+}
