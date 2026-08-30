@@ -57,7 +57,7 @@ SRC = assignments_from_json.cpp \
       simple_method_stubbing.cpp \
       # Empty last line
 
-INCLUDES= -I .. -I ../$(CPROVER_DIR)/src
+INCLUDES= -I .. -I ../$(CPROVER_DIR)/src -I ../$(CPROVER_DIR)/3p
 
 include ../config.inc
 include ../$(CPROVER_DIR)/src/config.inc

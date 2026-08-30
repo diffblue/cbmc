@@ -21,7 +21,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache clang-19 clang++-19
           sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
-          make -C src minisat2-download
       - name: Restore ccache
         id: restore-ccache
         uses: actions/cache/restore@v6
