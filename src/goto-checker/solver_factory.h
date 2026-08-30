@@ -22,6 +22,7 @@ class cmdlinet;
 class message_handlert;
 class namespacet;
 class optionst;
+struct solver_hardnesst;
 class solver_resource_limitst;
 
 class solver_factoryt final
@@ -51,12 +52,21 @@ public:
       std::unique_ptr<boolbvt> p1,
       std::unique_ptr<propt> p2,
       std::unique_ptr<std::ofstream> p3);
+    solvert(
+      std::unique_ptr<boolbvt> p1,
+      std::unique_ptr<propt> p2,
+      std::shared_ptr<solver_hardnesst> p3);
 
     stack_decision_proceduret &decision_procedure() const;
     boolbvt &boolbv_decision_procedure() const;
+    solver_hardnesst *hardness_collector() const;
 
   private:
-    // the objects are deleted in the opposite order they appear below
+    // The objects are deleted in the opposite order in which they appear
+    // below. hardness_ptr is listed first so it is destroyed last: it is
+    // co-owned by the prop, which records into it, so it must outlive prop_ptr
+    // and the decision procedures.
+    std::shared_ptr<solver_hardnesst> hardness_ptr;
     std::unique_ptr<std::ofstream> ofstream_ptr;
     std::unique_ptr<propt> prop_ptr;
     std::unique_ptr<stack_decision_proceduret> decision_procedure_ptr;

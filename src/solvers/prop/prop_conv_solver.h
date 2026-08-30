@@ -9,18 +9,17 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_SOLVERS_PROP_PROP_CONV_SOLVER_H
 #define CPROVER_SOLVERS_PROP_PROP_CONV_SOLVER_H
 
-#include <map>
-#include <string>
-
 #include <util/expr.h>
 #include <util/message.h>
 
 #include <solvers/conflict_provider.h>
-#include <solvers/hardness_collector.h>
 
 #include "prop.h"
 #include "prop_conv.h"
 #include "solver_resource_limits.h"
+
+#include <map>
+#include <string>
 
 class equal_exprt;
 
@@ -98,11 +97,6 @@ public:
   }
 
   std::size_t get_number_of_solver_calls() const override;
-
-  hardness_collectort *get_hardness_collector()
-  {
-    return dynamic_cast<hardness_collectort *>(&prop);
-  }
 
 protected:
   bool post_processing_done = false;
