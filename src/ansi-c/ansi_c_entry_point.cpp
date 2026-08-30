@@ -17,11 +17,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <goto-programs/goto_functions.h>
 
+#include <linking/function_priority_order.h>
 #include <linking/static_lifetime_init.h>
 
 #include "c_nondet_symbol_factory.h"
 #include "expr2c.h"
-
 exprt::operandst build_function_environment(
   const code_typet::parameterst &parameters,
   code_blockt &init_code,
@@ -511,7 +511,12 @@ bool generate_ansi_c_start_function(
 
   record_function_outputs(symbol, init_code, symbol_table);
 
-  // now call destructor functions (a GCC extension)
+  // now call destructor functions (a GCC extension); compute the required
+  // order first. GCC runs destructors in the reverse of the constructor order,
+  // i.e. unprioritised ones first, then descending priority.
+  std::list<
+    std::pair<std::reference_wrapper<const symbolt>, std::optional<mp_integer>>>
+    destructors;
 
   for(const auto &symbol_table_entry : symbol_table.symbols)
   {
@@ -525,10 +530,26 @@ bool generate_ansi_c_start_function(
       code_type.return_type().id() == ID_destructor &&
       code_type.parameters().empty())
     {
-      code_function_callt destructor_call(symbol.symbol_expr());
-      destructor_call.add_source_location() = symbol.location;
-      init_code.add(std::move(destructor_call));
+      const exprt &priority = static_cast<const exprt &>(
+        code_type.return_type().find(ID_destructor_priority));
+      std::optional<mp_integer> priority_int_opt;
+      if(priority.is_not_nil())
+      {
+        priority_int_opt = numeric_cast<mp_integer>(priority);
+        DATA_INVARIANT(
+          priority_int_opt.has_value() && *priority_int_opt >= 0,
+          "destructor priority expected to be non-negative integer");
+      }
+      destructors.emplace_back(symbol, priority_int_opt);
     }
+  }
+
+  for(const auto &sym_ref : order_functions_by_priority(
+        destructors, function_priority_ordert::DESCENDING))
+  {
+    code_function_callt destructor_call{sym_ref.get().symbol_expr()};
+    destructor_call.add_source_location() = sym_ref.get().location;
+    init_code.add(std::move(destructor_call));
   }
 
   // add the entry point symbol
