@@ -32,6 +32,17 @@ public:
   virtual std::vector<exprt> get_value_set(const exprt &expr) const = 0;
 
   virtual const symbolt *get_or_create_failed_symbol(const exprt &expr) = 0;
+
+  /// Get the L1-renamed (SSA, without constant propagation) version of a
+  /// symbol expression. Used by the wide pointer encoding's address-based
+  /// dereference dispatch to read from the correct object instance. L1 rather
+  /// than L2 is required: L2 would substitute the symbol with its current
+  /// value, causing width mismatches in the subsequent `byte_extract`.
+  /// Default implementation returns the expression unchanged.
+  virtual exprt get_renamed_symbol(const exprt &expr) const
+  {
+    return expr;
+  }
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_DEREFERENCE_CALLBACK_H

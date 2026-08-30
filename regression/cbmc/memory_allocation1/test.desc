@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE broken-smt-backend no-wide-pointer-encoding
 main.c
 
 ^EXIT=10$
@@ -12,3 +12,4 @@ main.c
 ^warning: ignoring
 --
 This test only fails when using SMT solvers as back-end on Windows.
+Broken under --wide-pointer-encoding: __CPROVER_allocated_memory has no body. Needs further work.

@@ -1,0 +1,20 @@
+CORE no-new-smt broken-smt-backend wide-pointer-encoding
+main.c
+--wide-pointer-encoding --arch none --little-endian
+^\[main\.assertion\.1\] .* assertion u\.p == 0: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+With --arch none the null pointer is not guaranteed to be the all-zero
+bit pattern (config.ansi_c.NULL_is_zero is false). Because the wide
+pointer encoding keeps the integer address separate from the
+object/offset encoding, a pointer whose bytes are all zero -- here
+obtained by type-punning the integer 0 through a union -- is not treated
+as the null pointer, so `u.p == 0` is not provable.
+
+This is in contrast to the default encoding (see no-arch.desc, tagged
+no-wide-pointer-encoding), which reuses the object/offset bits as the
+integer address and therefore reports VERIFICATION SUCCESSFUL here.

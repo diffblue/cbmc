@@ -1,0 +1,17 @@
+CORE broken-smt-backend no-new-smt wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^\[main\.assertion\.1\] line \d+ device read routed to MMIO handler: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The wide pointer encoding recognises a constant integer address (here the
+device register 0x10) as an integer address via is_integer_address(), so
+the memory-mapped I/O instrumentation routes the read to __CPROVER_mm_io_r.
+Full MMIO support also needs writes to device addresses not to alias real
+objects, which requires a notion of valid integer-address regions; see
+issue #6747's --mmio-region. That is why mm_io1 (which writes) remains
+no-wide-pointer-encoding.

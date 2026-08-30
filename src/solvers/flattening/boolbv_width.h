@@ -21,6 +21,24 @@ public:
   explicit boolbv_widtht(const namespacet &_ns);
   virtual ~boolbv_widtht() = default;
 
+  /// The wide pointer encoding represents a pointer as three components,
+  /// each of the platform pointer width: [object | offset | address].
+  static constexpr std::size_t wide_pointer_width_factor = 3;
+
+  /// Enable/disable the wide pointer encoding for width computations: a
+  /// pointer is then wide_pointer_width_factor times the platform pointer
+  /// width. Must be called before any width queries. Clears the cache.
+  void set_wide_pointer_encoding(bool enabled)
+  {
+    wide_pointer_encoding = enabled;
+    cache.clear();
+  }
+
+  bool get_wide_pointer_encoding() const
+  {
+    return wide_pointer_encoding;
+  }
+
   virtual std::size_t operator()(const typet &type) const
   {
     const auto &entry_opt = get_entry(type);
@@ -46,6 +64,7 @@ public:
 
 protected:
   const namespacet &ns;
+  bool wide_pointer_encoding = false;
 
   struct defined_entryt
   {
