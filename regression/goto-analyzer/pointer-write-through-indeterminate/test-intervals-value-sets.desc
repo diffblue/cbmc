@@ -1,7 +1,8 @@
 CORE
 main.c
 --verify --variable-sensitivity --vsd-values intervals --vsd-pointers value-set
-^\[main.assertion.1\] line 16 assertion \*p == b: SUCCESS
+^\[main.assertion.1\] line 16 assertion \*p == b: UNKNOWN
+^\[main.assertion.2\] line 22 assertion \*p == 5: FAILURE
 ^EXIT=0$
 ^SIGNAL=0$
 --
