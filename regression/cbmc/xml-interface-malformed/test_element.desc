@@ -1,0 +1,14 @@
+CORE
+--xml-interface
+--verbosity 8 < malformed_element.xml
+^EXIT=6$
+^SIGNAL=0$
+<text>syntax error</text>
+--
+double free
+--
+Regression test for the XML-parser double-free on error recovery: an
+unterminated element (syntax error after the START token's mid-rule
+action) must make the parser report a syntax error and exit cleanly,
+rather than double-freeing the START token value during Bison error
+recovery (which aborted with SIGABRT).
