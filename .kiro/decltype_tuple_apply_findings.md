@@ -6736,3 +6736,32 @@ NEXT (round 69): probe the push site inside apply(typet)'s expansion loop
 (the `expanded_args.push_back(wrapped)` for type packs) printing each
 emitted element, filtered to pattern name "invokable_r"; then fix.
 Census 5; tree clean (grep 0); suites green from round 57.
+
+## Round 69 (2026-09-03): the duplication mechanism identified
+
+Probing the expansion OUTPUTS (absolute binary path) on KNOWNBUG
+cpp20_invoke_chain_pack_forwarding:
+- apply(typet)'s ambiguous-ellipsis push site emits CORRECT elements and
+  fires exactly once in the whole run: "PUSH A <- pointer", "PUSH A <-
+  signedbv" (for the alias's own argument list).
+- typecheck_template_args input trace shows the alias body's
+  instantiation of invokable_r receiving:
+      in = type/void  ambiguous/cpp_name  ambiguous/cpp_name  ambiguous/cpp_name
+  i.e. FOUR arguments where the source writes THREE
+  (`invokable_r<void, F, A...>`): the pack was expanded to TWO arguments
+  that are still the BARE NAME `A` (unsubstituted), and each then
+  resolves through the scalar convenience binding (type_map[A] = element
+  0 = pointer) -- producing (void, fn, pointer, pointer).
+MECHANISM: a pack expansion whose pattern is the bare pack reference was
+REPLICATED (correct arity) WITHOUT substituting the k-th element.  This
+is the shape rounds 42/44 fixed for one site ("the pattern may BE the
+bare pack reference itself; replace_type_pack_ref only substitutes
+sub-nodes, so handle the top level here") -- there is evidently ANOTHER
+replication site lacking that top-level substitution.
+CANDIDATES for round 70 (in order): gfta's "Fallback: duplicate the
+single deduced type" loop (cpp_typecheck_resolve.cpp ~9310-9340, which
+inserts copies of args[i] verbatim); the same-shaped duplication in
+typecheck_template_args; instantiate_template's argument splicing.
+Fix will be to substitute element k into each replica (top-level bare
+reference included), per [temp.variadic]/5.
+Census 5; tree clean (grep 0); suites green from round 57.
