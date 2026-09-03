@@ -6765,3 +6765,25 @@ typecheck_template_args; instantiate_template's argument splicing.
 Fix will be to substitute element k into each replica (top-level bare
 reference included), per [temp.variadic]/5.
 Census 5; tree clean (grep 0); suites green from round 57.
+
+## Round 70 (2026-09-03): FLIP cpp20_invoke_chain_pack_forwarding → CORE
+
+FIXED ([temp.variadic]/5): apply()'s template-argument pack-expansion
+replication now substitutes the i-th element into a pattern that IS the
+bare pack reference, instead of relying on apply()'s short-name bridge
+(which picked another live template's same-named `A`, left the replicas
+as the bare name, and let each collapse to the scalar binding = element
+0 -- so (int*, int) reached the callee as (int*, int*)).  Same fix the
+sibling sites already had from rounds 42/44; this was the remaining one.
+Verified: kernel non-vacuous SUCCESS; revert-test = vacuous (main
+dropped, 0 assertions); 5 suites green; g++/clang runtime-verified.
+Diagnosis path that got here (rounds 62-69): valid re-reduction (gate
+with clang -Werror) -> pack-bleed signature -> deduction/binding proven
+correct -> expansion INPUT proven correct -> expansion OUTPUT proven
+correct at one site -> the OTHER site's replicas seen as bare cpp_names
+in typecheck_template_args' input trace.
+RANGES PIPE: still drops main; the fix did not cascade (pipe properties
+still 0).  Next: re-run the round-62 reduction pipeline on the CURRENT
+binary (the 191-line artifact predates rounds 63-70 fixes, so its
+blocker may have moved) and read the first suppressed error.
+Census 4: ranges pipe, ranges basic, regex, kind-mismatch.
