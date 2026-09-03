@@ -6576,3 +6576,32 @@ it was vacuous (main dropped, 0 assertions).  The standing rule caught
 it; kernels must always be checked with --show-properties.
 Census 5: ranges pipe, ranges basic, regex, kind-mismatch, invoke-chain
 pack forwarding (the pipe's minimal blocker).
+
+## Round 64 (2026-09-03): pack-bleed chain traced to an OVERWRITE (no src change)
+
+Measured on KNOWNBUG cpp20_invoke_chain_pack_forwarding (ab2, 27 lines):
+1. The failing resolve is `operator()` with args (fn, ARRAY, ARRAY) — the
+   second element should be `int`.
+2. The existing expander DOES cover this shape: expand_call_argument_packs
+   fires for `declval<A>()...` / `declval<XA>()...` (matched=type,
+   base=A / base=XA) — so the expansion LOGIC is fine.
+3. But at expansion time the binding is already wrong:
+   pack_args_map[template::8::A] = [pointer, pointer] (element 2 = a copy
+   of element 1), likewise template::9::A.
+4. Deduction itself is CORRECT: the forwarding-reference recorder pushes
+   (pointer, signedbv) for `invoke(fn{}, arr, 3)` — verified by probe.
+So a LATER write corrupts pack_args_map (or build() rebuilds it from an
+already-corrupted flat argument list).  Prime suspects, in order:
+  a) template_mapt::build() computing pack elements from the instance's
+     flat ID_C_template_arguments when those args are themselves wrong;
+  b) build_template_args' placeholder expansion (round-45 area) emitting
+     <F, int*, int*>;
+  c) a second deduction round for try_call/__invoke overwriting the entry
+     (the probe showed two later fwd-pushes of `pointer` from `array`).
+NEXT (round 65): probe pack_args_map WRITES (add a debug setter or print
+at each assignment site keyed on short name "A") to catch the overwriting
+site directly, rather than inferring from reads.
+MY SPECULATIVE FIX REVERTED: adding a second call-argument expander to
+apply(exprt) changed nothing (the existing decltype path already
+expands) — do not re-add; the defect is upstream of expansion.
+Census 5; tree clean; suites green from round 57.
