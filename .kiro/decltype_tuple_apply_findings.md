@@ -6658,3 +6658,35 @@ path (mirroring rounds 45/49) rather than to touch the expanders.
 LESSON: when two inputs are under investigation in one round, tag every
 probe line with the input file, or run them in separate commands.
 Census 5; tree clean (grep 0); suites green from round 57.
+
+## Round 67 (2026-09-03): PLUMBING BUG found; corrected data pins the corruption
+
+CRITICAL PROCESS BUG: from round 65 onward I ran probes as
+`../../../build/bin/cbmc` from regression/cbmc-cpp — that path does NOT
+resolve (the binary is ../../build/bin/cbmc from there); `timeout`
+reported "No such file or directory" on stderr, which my greps discarded.
+Every probe run in rounds 65-66 therefore produced NO OUTPUT for
+mechanical reasons, and the "eliminations" recorded there
+(build()'s two writes, gfta recorders 9397/10079, gta 8254/8667,
+apply(typet)'s decltype branch not reached) are VOID — they were never
+actually measured.  RULE: always use the ABSOLUTE binary path in probe
+commands (test.pl runs are unaffected: it resolves its own -c argument
+from the suite directory).
+CORRECTED MEASUREMENT (absolute path, KNOWNBUG
+cpp20_invoke_chain_pack_forwarding), template_mapt::build calls:
+  build for `invoke`      : params <F, PACK:A>      args (fn, pointer, signedbv)   CORRECT
+  build for `invokable_r` : params <anon#1, F, PACK:A> args (void, fn, pointer, POINTER)  WRONG
+So the pack is deduced and bound correctly for `invoke`, and the
+corruption happens when the ARGUMENT LIST for
+`invokable_r<void, F, A...>` is formed inside
+`invoke_result_t<F, A...>`: expanding `A...` there emits the pack's
+SCALAR convenience binding (element 0, the pointer) TWICE instead of its
+two elements.  This is the [temp.variadic]/5 class-template-argument
+expansion path (typecheck_template_args / apply's template_args handling)
+seen in rounds 42/45 — but for a pack referenced through an ALIAS
+template's argument list.
+NEXT (round 68): probe typecheck_template_args' expansion gate for
+invokable_r with the correct path (does the gate open? are the
+referenced_packs found?), then fix so the alias's argument list expands
+element-wise.
+Census 5; tree clean (grep 0); suites green from round 57.
