@@ -1653,6 +1653,38 @@ void template_mapt::apply(typet &type) const
                   }
                   exprt element = static_cast<const exprt &>(arg);
                   element.type().remove(ID_ellipsis);
+                  // N5008 [temp.variadic]/5: the pattern may BE the bare
+                  // pack reference (`A...`).  apply() resolves such a
+                  // reference through the flat map's short-name bridge,
+                  // which picks whichever same-named pack sorts first --
+                  // for the alias body `invokable_r<void, F, A...>`
+                  // substituted while another template's `A` is live, that
+                  // is the WRONG pack, so the replica was left as the bare
+                  // name and later collapsed to the scalar binding
+                  // (element 0) -- every expansion element became the
+                  // first, e.g. (int*, int) -> (int*, int*).  Substitute
+                  // the i-th element for a top-level bare reference here,
+                  // exactly as the sibling expansion sites do.
+                  for(const auto &pid : referenced_packs)
+                  {
+                    const auto a2 = pack_args_map.find(pid);
+                    if(a2 == pack_args_map.end() || i >= a2->second.size())
+                      continue;
+                    const std::string key2 = id2string(pid);
+                    const auto q2 = key2.rfind("::");
+                    const std::string short2 =
+                      q2 != std::string::npos ? key2.substr(q2 + 2) : key2;
+                    const typet &pt = element.type();
+                    if(
+                      pt.id() == ID_cpp_name && pt.get_sub().size() == 1 &&
+                      pt.get_sub().front().id() == ID_name &&
+                      id2string(pt.get_sub().front().get(ID_identifier)) ==
+                        short2)
+                    {
+                      element.type() = a2->second[i];
+                      break;
+                    }
+                  }
                   element_map.apply(element.type());
                   expanded_args.push_back(static_cast<const irept &>(element));
                 }
