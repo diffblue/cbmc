@@ -6690,3 +6690,24 @@ invokable_r with the correct path (does the gate open? are the
 referenced_packs found?), then fix so the alias's argument list expands
 element-wise.
 Census 5; tree clean (grep 0); suites green from round 57.
+
+## Round 67b (2026-09-03): coverage audit #9
+
+Checked whether round 67's mechanism (expanding `A...` in an ALIAS
+template's argument list emitting the scalar binding twice) has a SIMPLER
+uncovered manifestation: kernel al1 — `template<class F, class... A>
+using holder_alias = holder<F, A...>;` used as `holder_alias<F, A...>::
+arity` inside a function template, heterogeneous pack (int*, int),
+non-vacuous (1 assertion) — VERIFIES CORRECTLY (arity 2) under both
+compilers' -Werror.  So plain alias pack forwarding works; the defect
+needs the decltype/`invokable_r` context of the committed KNOWNBUG.  No
+new test.
+Census 5, all committed and each a distinct problem:
+  cpp20_invoke_chain_pack_forwarding  (alias-args pack expansion, 27 lines)
+  cpp20_ranges_pipe_invoke_drop       (full driver; same root + post-main wave)
+  cpp20_ranges_basic_libcxx           (real-header blockers)
+  cpp11_regex_match                   (solver-time variance)
+  cpp11_deduced_nontype_kind_mismatch (parked; documented blocker)
+Nothing diagnosed lives only in /tmp.  (Note: /tmp kernels from earlier
+rounds were cleaned up by the OS; the committed tests and the two saved
+reductions in .kiro/reductions carry everything needed.)
