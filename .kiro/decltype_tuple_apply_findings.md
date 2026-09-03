@@ -6558,3 +6558,21 @@ arity/order after substitution; then fix in the alias-substitution path
 (template_map apply for alias templates / typecheck_template_args'
 alias expansion).
 Census 4; tree clean; suites green from round 57.
+
+## Round 63 / audit #8 (2026-09-03): pack bleed KERNELED → new KNOWNBUG
+
+Round-62's signature is now standalone: kernel ab2 (27 lines, g++ and
+clang -Werror clean, runs clean natively) DROPS MAIN — committed as
+KNOWNBUG cpp20_invoke_chain_pack_forwarding.  Suppressed errors: "no
+match for symbol 'operator()'" (inside __invoke's trailing return) and
+"no match for symbol 'try_call'".  Shape: heterogeneous pack (int*, int)
+forwarded through declval<XA>()... in a static member's decltype and
+then declval<A>()... in __invoke's trailing return.
+NEGATIVE RESULT: the simpler ab1 (alias template forwarding a pack into
+a class template, arity assertion) PASSES — so the bleed needs the
+DECLTYPE/trailing-return double indirection, not merely an alias chain.
+VACUITY CATCH: ab2 first appeared to "pass" (VERIFICATION SUCCESSFUL) —
+it was vacuous (main dropped, 0 assertions).  The standing rule caught
+it; kernels must always be checked with --show-properties.
+Census 5: ranges pipe, ranges basic, regex, kind-mismatch, invoke-chain
+pack forwarding (the pipe's minimal blocker).
