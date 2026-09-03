@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ no pack bleed in invoke chain: SUCCESS$
@@ -7,9 +7,11 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: main is dropped (no assertion at all -- VERIFICATION
-SUCCESSFUL is VACUOUS, check --show-properties), with suppressed errors
-"found no match for symbol 'operator()'" (in __invoke's trailing return)
-and "found no match for symbol 'try_call'".  This is the minimal form of
-the argument-pack bleed diagnosed in round 62 as the ranges pipe's
-blocker.  Runtime-verified with g++ and clang++.
+Fixed in round 70: a pack expansion whose pattern IS the bare pack
+reference is now substituted element-wise in apply()'s template-argument
+replication path ([temp.variadic]/5), instead of relying on the flat
+map's short-name bridge -- which picked another live template's
+same-named pack and left the replicas as the bare name, so every element
+collapsed to the pack's first ((int*, int) became (int*, int*)).
+Verified to FAIL (vacuous: main dropped, 0 assertions) with the fix
+reverted.  Runtime-verified with g++ and clang++.
