@@ -6711,3 +6711,28 @@ Census 5, all committed and each a distinct problem:
 Nothing diagnosed lives only in /tmp.  (Note: /tmp kernels from earlier
 rounds were cleaned up by the OS; the committed tests and the two saved
 reductions in .kiro/reductions carry everything needed.)
+
+## Round 68 (2026-09-03): corruption bracketed to the alias BODY substitution
+
+All probes below used the ABSOLUTE binary path (round-67 rule) on
+KNOWNBUG cpp20_invoke_chain_pack_forwarding.  Measured, in order:
+- resolve_template_alias(invoke_result_t) RECEIVES correct args
+  (fn, pointer, signedbv) and its pack state is A(2).
+- the same function INSTANTIATES the alias with correct args
+  (type/struct_tag type/pointer type/signedbv).
+- apply(typet)'s ambiguous-ellipsis template-argument expansion, when it
+  fires, sees the CORRECT pack: template::10::A / template::11::A =
+  [pointer signedbv].
+- yet template_mapt::build for `invokable_r` receives
+  (void, fn, pointer, POINTER) -- element 2 duplicated.
+So the duplication happens while the alias's BODY
+(`typename invokable_r<void, F, A...>::result`) is substituted -- between
+the correct alias instantiation and invokable_r's argument list.  The
+expansion loop's INPUT is right, so the next probe must capture its
+OUTPUT: print what the ambiguous-ellipsis loop PUSHES for the
+invokable_r pattern (and whether a second substitution pass rewrites the
+pushed elements).
+NEXT (round 69): probe the push site inside apply(typet)'s expansion loop
+(the `expanded_args.push_back(wrapped)` for type packs) printing each
+emitted element, filtered to pattern name "invokable_r"; then fix.
+Census 5; tree clean (grep 0); suites green from round 57.
