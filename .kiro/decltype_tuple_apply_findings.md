@@ -6629,3 +6629,32 @@ instrumentation prefer ONE hand edit per site, printing the SOURCE vector
 before the move.
 Census 5; tree clean (probes reverted, grep 0); suites green from
 round 57.
+
+## Round 66 (2026-09-03): two more eliminations + a correction
+
+On KNOWNBUG cpp20_invoke_chain_pack_forwarding (hand-written probes):
+- guess_template_args' pack recorders (resolve.cpp:8254, :8667): NEVER fire
+- template_mapt::build()'s SECOND pack write (template_map.cpp:2307):
+  NEVER fires (the first, :2423, was already eliminated in round 65)
+- apply(typet)'s `if(type.id() == ID_decltype) expand_call_argument_packs`
+  branch: NEVER REACHED for this kernel (probe counted 0 calls)
+CORRECTION to round 64: the "exp-arg matched=type base=A/XA,
+pack_args_map[A]=[pointer,pointer]" observation therefore did NOT come
+from this kernel — it must have come from the 191-line pipe artifact
+(vd1) that was also being run that round.  So for the KERNEL the story is
+different and simpler: the trailing-return decltype is NOT substituted
+via apply(typet) at all, and no pack_args_map entry for "A" is ever
+written.  The failing resolve sees (fn, ARRAY, ARRAY) because the
+expansion never happens: `declval<A>()...` is left with its ellipsis and
+both arguments come from the same unexpanded pattern.
+NEXT (round 67): find the route that DOES process __invoke's trailing
+return for this kernel — probe guess_function_template_args at its
+`template_map.apply(function_type)` call (print the return type's id and
+whether pack_args_map is empty at that moment); the likely answer is that
+the pack is bound only in type_map (scalar) with NO pack_args_map entry,
+so every expander that keys on pack_args_map is a no-op.  If so the fix
+is to record the deduced function-parameter pack in pack_args_map on this
+path (mirroring rounds 45/49) rather than to touch the expanders.
+LESSON: when two inputs are under investigation in one round, tag every
+probe line with the input file, or run them in separate commands.
+Census 5; tree clean (grep 0); suites green from round 57.
