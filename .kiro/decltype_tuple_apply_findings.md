@@ -6605,3 +6605,27 @@ MY SPECULATIVE FIX REVERTED: adding a second call-argument expander to
 apply(exprt) changed nothing (the existing decltype path already
 expands) — do not re-add; the defect is upstream of expansion.
 Census 5; tree clean; suites green from round 57.
+
+## Round 65 (2026-09-03): overwriter hunt — three sites eliminated
+
+Instrumented (by hand, after two scripted attempts broke the build:
+misleading-indentation + std::move-into-print) the three suspects from
+round 64, printing on WRITE, filtered to short name "A", on KNOWNBUG
+cpp20_invoke_chain_pack_forwarding:
+- template_mapt::build()'s `pack_args_map[pack_id] = pack_types`  -> NEVER fires
+- gfta recorder at ~9397 (twin, no-clobber)                       -> NEVER fires
+- gfta recorder at ~10079 (last-type-pack, no-clobber)            -> NEVER fires
+So the [pointer,pointer] binding for A is written by one of the REMAINING
+sites; next round instrument these, in order:
+  cpp_typecheck_resolve.cpp:8254 and :8667 (guess_template_args' class-
+    template-id pack recorders — most likely, since __invokable_r<void,
+    F, A...> binds its pack from a template-id),
+  :5378, :5488, :4724, :1553,
+  cpp_instantiate_template.cpp:1749, :3517, :3629, :3754,
+  cpp_typecheck_method_bodies.cpp:186, :247.
+TOOLING NOTE: script-inserted probes around `X = std::move(Y);` and
+inside un-braced `if` bodies keep breaking the build (-Werror); for write
+instrumentation prefer ONE hand edit per site, printing the SOURCE vector
+before the move.
+Census 5; tree clean (probes reverted, grep 0); suites green from
+round 57.
