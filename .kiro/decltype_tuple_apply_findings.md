@@ -6970,3 +6970,37 @@ git add, not after the commit block.
 VALIDATION: all five suites green on the fixed build; sc2/sc8/sc10
 kernels non-vacuous; g++/clang -Werror + run clean (sc8/sc10/sc11).
 Census 5 (pipe, ranges basic, regex, kind-mismatch, reference-to-array).
+
+## Round 76 (2026-09-04): reference-to-array FIXED at the parser — wrong-code bug; pipe reaches the solver
+
+ROOT (commit 12bf4563fc): rDeclarator's ARRAY postfix branch never
+composed the parenthesized inner declarator (d_inner) -- only the
+FUNCTION postfix branch did.  `int (&r)[3]` parsed as plain `int r[3]`:
+- WRONG CODE, not just rejection: the "reference" copied the array;
+  writes through it did not alias (ra6 kernel FAILED before the fix).
+- `int (*p)[3] = &arr` failed to convert (same root).
+- Template arguments of type int(&)[N] silently lost the reference
+  (take_view<int(&)[1]> -> take_view<int[1]>): the round-75 layer.
+Fix: after the postfix loop, if d_inner is set and d_outer is an array,
+make_subtype(d_outer, d_inner) + swap ([dcl.meaning.general]/1,
+[dcl.array]).
+EXPOSED SECOND DEFECT: plain `auto` return deduction did not DECAY a
+deduced array ([dcl.type.auto.deduct]/4 -> [temp.deduct.call]/2): the
+goto program returned the array CONTENTS reinterpreted as a pointer
+(cpp20_undeduced_auto_overload_rank caught it -- suite regression, then
+kernel ra9).  Decayed at BOTH deduction sites (eager in
+convert_function, deferred in typecheck_return); the return value is
+converted against the deduced type afterwards, so the type fix also
+fixes the value.
+FLIPPED cpp11_reference_to_array -> CORE, extended to 5 assertions
+(alias binding, direct binding, ALIASING WRITE, pointer-to-array,
+auto-return decay), g++/clang -Werror + runtime verified.
+PIPE CASCADE: the ranges pipe now EMITS its assertion (1 property) --
+the front end is through -- and fails DOWNSTREAM: invariant in
+simplify_expr.cpp:3376 (simplify_rec post-condition: array-typed
+expression simplified to non-array).  This is a BACK-END issue class we
+have not touched before; next round should minimize (likely a byte_extract
+/ reference-to-array interaction) and treat it as a solver-side defect.
+VALIDATION: all five suites green (the parser change is C++-only but
+suite 2 was run fully); probe grep run BEFORE git add this time.
+Census 4 (pipe, ranges basic, regex, kind-mismatch).
