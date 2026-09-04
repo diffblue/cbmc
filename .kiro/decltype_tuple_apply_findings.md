@@ -7031,3 +7031,35 @@ Question: KNOWNBUGs for every problem we are aware of?  VERIFIED:
 ANSWER: YES -- every known problem is covered by a committed KNOWNBUG
 (or already fixed with a CORE test); the new simplify-invariant
 mechanism is covered by the pipe KNOWNBUG and resisted 3 hand kernels.
+
+## Round 78 (2026-09-05): THE RANGES PIPE IS FLIPPED — ctor-pattern CTAD decay
+
+MEASUREMENT CORRECTION FIRST: the round-76 "pipe emits 1 assertion"
+cascade note was taken on the mid-round build; on the finished round-76
+build the pipe was VACUOUS again (155 pointer checks, no
+main.assertion) -- the desc's assertion-line requirement caught the
+premature flip attempt.  Vacuity-check on the FINAL build, not
+mid-round.
+ROOT of the last layer (commit b649ae0bef): constructor-pattern CTAD
+([over.match.class.deduct]/1.1) used RAW argument types -- the round-75
+[temp.deduct.call]/2-3 adjustments existed only in the EXPLICIT-guide
+loop.  `counted_iterator(base_, count_)` with base_ = int(&)[1] against
+ctor (I, int) deduced counted_iterator<int[1]> instead of <int*>:
+- take_view::begin_'s iterator then mismatched the friend's
+  iter_<Other> = counted_iterator<int*> -> silent no-match -> drop.
+- Worse, when construction DID proceed (sc16), the mistyped array
+  member crashed simplify_rec's postcondition -- the round-76 invariant,
+  now understood: front-end mistyping, NOT a back-end bug.
+Fix: factored the adjustment into a shared helper used by both loops.
+KERNEL CHAIN: sc12 (58 lines, driver shape) -> sc12a/c/d bisection
+(decltype chain and outer guide IRRELEVANT; inner ctor-CTAD is the
+trigger) -> sc16 (25 lines, crashes the invariant pre-fix).  New CORE
+cpp20_ctad_ctor_array_decay (also guards the simplify postcondition).
+FLIPPED cpp20_ranges_pipe_invoke_drop -> CORE (non-vacuous:
+main.assertion.1 'ranges take' SUCCESS on the probe-free build).
+The rounds 52-78 arc is closed: 27 rounds, ~15 distinct front-end
+defects between `arr | views::take(3)` and a verified assertion.
+CASCADE: cpp20_ranges_basic_libcxx still 0 main-assertions (its
+separate real-header blockers stand).  VALIDATION: five suites green on
+the probe-free build; sc16 runtime-verified g++/clang.
+Census 3: ranges basic, regex (solver-time), kind-mismatch (parked).
