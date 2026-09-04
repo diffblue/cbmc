@@ -6787,3 +6787,37 @@ still 0).  Next: re-run the round-62 reduction pipeline on the CURRENT
 binary (the 191-line artifact predates rounds 63-70 fixes, so its
 blocker may have moved) and read the first suppressed error.
 Census 4: ranges pipe, ranges basic, regex, kind-mismatch.
+
+## Round 71 (2026-09-04): re-reduction on today's binary — progress marker
+
+RE-CHECKED the remaining KNOWNBUGs on the current build:
+- cpp20_ranges_pipe_invoke_drop : still drops main (0 assertions)
+- cpp20_ranges_basic_libcxx     : still drops main (0 assertions)
+- cpp11_deduced_nontype_kind_mismatch : still accepts the ill-formed
+  program (1 assertion, verifies) -- unchanged, parked
+PROGRESS MARKER: the round-62 saved artifact
+(.kiro/reductions/ranges_pipe_valid_191lines.cpp) NO LONGER drops main on
+today's binary -- rounds 63-70 (incl. round 70's bare-pack-reference fix)
+resolved its blocker.  (It is no longer a correctness artifact: cvise had
+stripped its assertion, so its "1 of 95 failed" is an unrelated pointer
+check in reduced code.)
+FIRST-ERROR PICTURE for the pipe is FLAG/INPUT SENSITIVE:
+- with the test's own flags (--cpp20 --stdlib libc++) and no prepended
+  declaration: first diagnostic is "symbol '_Const' is unknown" (line
+  222, take_view::__sentinel's `template<bool _OtherConst = _Const>`
+  friend), then the drop.
+- with a prepended `extern "C" __CPROVER_assert` declaration and
+  --object-bits 12: the drop is FIRST (silent).
+Kernel sc1 (out-of-line member class template whose friend uses the
+member's own parameter as a default template argument) VERIFIES CLEAN, so
+the _Const layer needs more context (counted_iterator/iterator_t chain or
+the `view` constraint).
+RE-REDUCTION RESISTS: with clang -Werror + run gates, cvise now plateaus
+at 236/245 lines (round 62 reached 191 on the older binary).  Fewer
+mutations still drop main -- consistent with a narrower remaining bug.
+Artifact saved: .kiro/reductions/ranges_pipe_round71_236lines.cpp.
+NEXT (round 72): drive from the _Const layer instead of the silent drop --
+run the pipe with the test's exact flags, confirm _Const is the first
+error, and reduce with a criterion requiring THAT error (it is a concrete,
+diagnosable shape, unlike the silent drop).
+Census 4; tree clean; 5 suites green (round 70).
