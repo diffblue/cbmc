@@ -6933,3 +6933,40 @@ five suites green (cbmc-cpp 1199 tests, cbmc, cpp, systemc,
 contracts-cpp-dfcc); g++/clang -Werror clean and run clean.
 CASCADE: the ranges pipe still drops main (0 properties) -- next layer.
 Census 4 (pipe, ranges basic, regex, kind-mismatch).
+
+## Round 75 (2026-09-04): pipe onion — 3 layers peeled, 2 fixes landed, 1 KNOWNBUG deeper
+
+After the round-74 friend fix, the pipe's next failure was
+`counted_iterator` vs `__sentinel` no-viable-operator== -- NOT the friend
+machinery (probes: gate fires, default substitution fires).  Root: CTAD
+for  take_view(_Range&&, ...) -> take_view<views::all_t<_Range>>  deduced
+NOTHING from the array lvalue (R left unassigned), CBMC fell back and
+eventually produced take_view<int*> where clang has take_view<int(&)[1]>.
+FIX 1 (commit 880291e4a7): [temp.deduct.call]/2-3 in the deduction-guide
+path -- decay A only for non-reference P; for a forwarding reference an
+lvalue argument deduces `lvalue reference to A`; plus the untypechecked
+(frontend_pointer) reference-deduction branch now implements the
+forwarding-reference rule instead of requiring a reference argument.
+Kernel: cpp20_ctad_guide_array_reference (27 lines) FLIPPED to CORE.
+Next layer: holder<int&> h(x) -- paren aggregate init of a NO-BASES
+aggregate with a reference member fell to ctor resolution (the
+16.6.2.2 branch was gated on !bases().empty()).
+FIX 2 (commit feb408b664): extend the paren-aggregate branch to
+bases-free aggregates (excluding classes with '@'-internal components,
+i.e. vtables, per [dcl.init.aggr]/1) and BIND reference elements via
+reference_initializer ([dcl.init.aggr]/4.2 + [dcl.init.ref]) instead of
+assigning through.  New CORE cpp20_aggregate_reference_member_paren_init
+(braced + paren, 2 assertions).
+Next layer (STANDALONE defect, new KNOWNBUG cpp11_reference_to_array):
+reference-to-array is broken at base -- `int (&r)[3] = arr;` is a
+CONVERSION ERROR ([dcl.init.ref]/5 direct binding), and a template
+argument of type int(&)[3] LOSES its reference during instantiation
+(tag-holder<array(...)>).  This is what still blocks the pipe
+(take_view<int(&)[1]>).
+PROCESS: probes leaked into commit 880291e4a7 (cpp_typecheck_resolve
+tracer) -- caught by the standing grep AFTER committing; stripped in
+follow-up commit b08f492f45.  RULE REINFORCED: run the probe grep BEFORE
+git add, not after the commit block.
+VALIDATION: all five suites green on the fixed build; sc2/sc8/sc10
+kernels non-vacuous; g++/clang -Werror + run clean (sc8/sc10/sc11).
+Census 5 (pipe, ranges basic, regex, kind-mismatch, reference-to-array).
