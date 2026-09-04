@@ -105,12 +105,14 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   // route type-checks arguments before re-routing to CTAD; a lowered
   // aggregate VALUE has no second-round handler) is used as-is.
   std::vector<typet> arg_types;
+  std::vector<bool> arg_is_lvalue;
   for(const auto &a : args)
   {
     exprt arg = a;
     if(arg.type().is_nil() || arg.type().id().empty())
       typecheck_expr(arg);
     arg_types.push_back(arg.type());
+    arg_is_lvalue.push_back(arg.get_bool(ID_C_lvalue));
   }
 
   // Explicit deduction guides ([temp.deduct.guide], [over.match.class.deduct]):
@@ -173,7 +175,39 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       try
       {
         for(std::size_t i = 0; i < pattern_types.size(); ++i)
-          resolver.guess_template_args(pattern_types[i], arg_types[i]);
+        {
+          // N5008 [temp.deduct.call]/2-3 adjustments of A before
+          // deduction against the guide's parameter P:
+          // - P not a reference: an array argument decays to a pointer,
+          //   a function to a function pointer, top-level cv is dropped.
+          // - P a forwarding reference and the argument an lvalue: A is
+          //   taken to be `lvalue reference to A`.  This is how libc++'s
+          //   guide  take_view(_Range&&, ...) -> take_view<all_t<_Range>>
+          //   deduces _Range = int(&)[1] from an array (all_t preserves
+          //   the reference; decaying here made iterator_t<int*>
+          //   ill-formed downstream and CTAD failed).
+          const typet &pt = pattern_types[i];
+          const bool pattern_is_ref = pt.id() == ID_frontend_pointer &&
+                                      (pt.get_bool(ID_C_reference) ||
+                                       pt.get_bool(ID_C_rvalue_reference));
+          typet at = arg_types[i];
+          if(!pattern_is_ref)
+          {
+            if(at.id() == ID_array)
+              at = pointer_type(to_array_type(at).element_type());
+            else if(at.id() == ID_code)
+              at = pointer_type(at);
+            at.remove(ID_C_constant);
+          }
+          else if(
+            pt.get_bool(ID_C_rvalue_reference) &&
+            to_type_with_subtype(pt).subtype().id() == ID_cpp_name &&
+            arg_is_lvalue[i] && !is_reference(at) && !is_rvalue_reference(at))
+          {
+            at = reference_type(at);
+          }
+          resolver.guess_template_args(pt, at);
+        }
       }
       catch(...)
       {
