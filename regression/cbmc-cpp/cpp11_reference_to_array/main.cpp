@@ -1,20 +1,31 @@
-// N5008 [dcl.init.ref]/5: a reference to an array type binds directly
-// to an array lvalue of compatible type -- `int (&r)[3] = arr;` is
-// direct binding, no array-to-pointer decay ([conv.array] applies only
-// where a pointer is required).  CBMC rejects the initialization
-// ("invalid implicit conversion from 'signed int [3]' to 'AR'") and,
-// in template contexts, DROPS the reference when the argument is
-// int(&)[3] (holder<int(&)[3]> instantiates with V = int[3]).
-// This underlies the ranges pipe: take_view<int(&)[1]> must hold a
-// reference-to-array; g++ and clang++ accept and run clean.
+// N5008 [dcl.meaning.general]/1 + [dcl.array] + [dcl.init.ref]/5: in
+// `T (D)[N]` the parenthesized declarator applies ON TOP of the array
+// type: `int (&r)[3]` declares a reference to an array (direct
+// binding, no decay) and `int (*p)[3]` a pointer to one.  CBMC's
+// declarator parser dropped the parenthesized inner declarator for
+// ARRAY postfixes (only the function postfix composed it), so the
+// "reference" silently COPIED the array (wrong code: writes through it
+// did not alias) and pointer-to-array initialization failed to
+// convert.  Also [dcl.type.auto.deduct]/4: plain `auto` deduced from
+// an array must DECAY to a pointer to its first element.
 extern "C" void __CPROVER_assert(bool, const char *);
 using AR = int (&)[3];
+template <class T, int N> auto ret(T (&t)[N])
+{
+  return t;
+}
 int main()
 {
   int arr[3]{1, 2, 3};
   AR r = arr;
   __CPROVER_assert(r[2] == 3, "reference-to-array alias");
-  int (&s)[3] = arr;
+  int(&s)[3] = arr;
   __CPROVER_assert(s[0] == 1, "direct reference-to-array");
+  s[0] = 42;
+  __CPROVER_assert(arr[0] == 42, "reference aliases the array");
+  int(*p)[3] = &arr;
+  (*p)[1] = 9;
+  __CPROVER_assert(arr[1] == 9, "pointer-to-array aliases");
+  __CPROVER_assert(ret(arr) == arr, "auto return decays to same address");
   return 0;
 }
