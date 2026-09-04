@@ -1,13 +1,15 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ reference-to-array alias: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ direct reference-to-array: SUCCESS$
+^\[main\.assertion\.3\] line \d+ reference aliases the array: SUCCESS$
+^\[main\.assertion\.4\] line \d+ pointer-to-array aliases: SUCCESS$
+^\[main\.assertion\.5\] line \d+ auto return decays to same address: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-Currently: CONVERSION ERROR ("invalid implicit conversion from 'signed
-int [3]' to 'AR'").  Also, a template argument of reference-to-array
-type loses its reference during instantiation (tag-holder<array(...)>).
+The wrong-code shape (assertion 3) is the important one: before the
+fix the "reference" copied the array and the write did not alias.
