@@ -162,6 +162,17 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
       // ([dcl.type.decltype]); mirror the eager path in convert_function.
       if(deduced_decltype_auto && code.return_value().get_bool(ID_C_lvalue))
         deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+      else if(!deduced_decltype_auto && deduced.id() == ID_array)
+      {
+        // N5008 [dcl.type.auto.deduct]/4: plain `auto` deduces as
+        // [temp.deduct.call]/2 -- an array DECAYS to a pointer to its
+        // first element.  Deducing the array type itself made
+        // `template<class T, int N> auto ret(T (&t)[N]) { return t; }`
+        // return the array CONTENTS reinterpreted as a pointer instead
+        // of its address.  Convert the value accordingly.
+        deduced = pointer_type(to_array_type(deduced).element_type());
+        implicit_typecast(code.return_value(), deduced);
+      }
       return_type = deduced;
     }
     else
