@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ friend default arg names member's own parameter: SUCCESS$
@@ -7,8 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: main is dropped (VERIFICATION SUCCESSFUL is VACUOUS -- check
---show-properties, 0 assertions).  The innermost throwing frame is the
-resolution of `Const` (verified with an uncaught_exceptions tracer on
-resolve).  This is the ranges pipe's current blocker
-(cpp20_ranges_pipe_invoke_drop), reduced to 44 lines.
+N5008 [class.friend]/1 + [temp.local]/1 + [namespace.memdef]/3: the
+friend's name is a namespace member, but its declaration is looked up in
+the class -- here the enclosing member class template's own parameter
+(as a default template argument) and the class's member alias.
