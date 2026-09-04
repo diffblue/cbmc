@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
+#include <util/prefix.h>
 
 #include "cpp_typecheck.h"
 
@@ -559,8 +560,25 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     // construction ([dcl.init.general]/16.6.1 considers constructors
     // first): skip when the operand is the class itself or derived
     // from it -- the synthesized copy/move constructor handles those.
+    // N5008 [dcl.init.aggr]/1: an aggregate also must not have virtual
+    // functions.  CBMC represents those via internal '@'-prefixed
+    // components (vtable pointer); their presence disqualifies the
+    // member-wise path (an operand must not be spliced into a vtable
+    // slot).
+    bool has_internal_component = false;
+    for(const auto &c : struct_type.components())
+    {
+      if(
+        !c.get_bool(ID_from_base) && c.type().id() != ID_code &&
+        !c.get_bool(ID_is_type) && !c.get_bool(ID_is_static) &&
+        has_prefix(id2string(c.get_base_name()), "@"))
+      {
+        has_internal_component = true;
+        break;
+      }
+    }
     bool single_operand_aggregate = false;
-    if(!struct_type.bases().empty() && operands_tc.size() == 1)
+    if(!has_internal_component && operands_tc.size() == 1)
     {
       typet op_t = operands_tc.front().type();
       if(op_t.id() == ID_struct_tag)
@@ -575,8 +593,14 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       else
         single_operand_aggregate = true;
     }
+    // C++20 parenthesized aggregate initialization applies regardless of
+    // whether the aggregate has bases ([dcl.init.general]/16.6.2.2); the
+    // no-bases case matters for aggregates that are non-POD only because
+    // of a member, e.g. a REFERENCE member (`struct R { int &r; }; R
+    // r(x);`), which otherwise fell through to constructor resolution
+    // and failed against the synthesized copy constructor.
     if(
-      !struct_type.bases().empty() &&
+      !has_internal_component &&
       (operands_tc.size() >= 2 || single_operand_aggregate))
     {
       // [dcl.init.aggr]/1: a class with a user-declared constructor is not an
@@ -692,8 +716,16 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           exprt val;
           if(idx < operands_tc.size())
           {
-            val =
-              typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+            // N5008 [dcl.init.aggr]/4.2 + [dcl.init.ref]: a REFERENCE
+            // element is BOUND to its initializer, not assigned through.
+            if(is_reference(comp.type()))
+            {
+              val = operands_tc[idx];
+              reference_initializer(val, to_reference_type(comp.type()));
+            }
+            else
+              val = typecast_exprt::conditional_cast(
+                operands_tc[idx], comp.type());
             ++idx;
           }
           else
