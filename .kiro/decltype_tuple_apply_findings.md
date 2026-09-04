@@ -6855,3 +6855,38 @@ if they differ, fix the graft to register the member's parameters under
 the identifiers its body uses ([temp.local]/1).
 Census 5 (pipe, ranges basic, regex, kind-mismatch, member-friend);
 tree clean; suites green from round 70.
+
+## Round 73 (2026-09-04): root of the friend layer — hoisting breaks class-scope lookup
+
+Probes (uncaught_exceptions tracer + map dumps) on KNOWNBUG
+cpp20_member_class_template_own_param_friend:
+- At the failing resolve of `Const`: scope = the FRIEND's own template
+  scope (template::12), type_map empty, expr_map = {template::12::Other}
+  -- i.e. the enclosing member class template's parameter is neither in
+  scope nor in the map.
+- At the HOIST site (typecheck_friend_declaration): `Const` IS bound
+  (view_<signed_int>::template::10::Const = constant) and V is bound.  So
+  the binding exists when the friend is converted, and is restored away
+  before the friend is instantiated at the call site.
+- The friend's default argument is stored as declarator.value() (a bare
+  cpp_name), which is why my round-72 attempts (apply() on the
+  declaration / on template_type) never touched it.
+EXPERIMENT (worked, then REVERTED as incomplete): substituting the bound
+enclosing parameter into such a bare-cpp_name default at the hoist site
+removes the `Const` throw -- and the innermost throw MOVES to `iter_`,
+the member class template's own member ALIAS template used in the
+friend's parameter type (`_Iter<_OtherConst>` in libc++).
+CONCLUSION: substituting parameters is not enough.  The friend
+declaration is converted at NAMESPACE scope
+([namespace.memdef]/3 is right for its NAME), but per [class.friend]/1 +
+[temp.local]/1 its declaration must be LOOKED UP in the class scope --
+member aliases and enclosing parameters included.  The durable fix is to
+type-check the friend's declaration IN the class scope and register the
+resulting symbol at namespace scope, rather than re-parsing it at
+namespace scope.  That is a contained but real restructuring of
+typecheck_friend_declaration's template branch; it should be done with
+the 44-line KNOWNBUG as the driving test.
+NEXT (round 74): implement that restructuring (convert in class scope,
+register in namespace scope), validate on the KNOWNBUG + 5 suites, then
+re-check the ranges pipe.
+Census 5; tree clean (grep 0); suites green from round 70.
