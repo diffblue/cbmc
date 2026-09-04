@@ -5118,6 +5118,21 @@ bool Parser::rDeclarator(
       break;
   }
 
+  // N5008 [dcl.meaning.general]/1 + [dcl.array]: in `T (D)[N]` the
+  // parenthesized declarator D applies ON TOP of the array type --
+  // `int (&r)[3]` declares a reference to an array of 3 ints and
+  // `int (*p)[3]` a pointer to such an array.  The inner declarator was
+  // parsed into d_inner but composed only by the FUNCTION postfix
+  // branch above; for arrays it was silently dropped, so `int (&r)[3]`
+  // became a plain `int r[3]` (wrong code: the "reference" copied), and
+  // `int (*p)[3] = &arr` failed to convert.
+  if(d_inner.is_not_nil() && d_outer.id() == ID_array)
+  {
+    make_subtype(d_outer, d_inner);
+    d_outer.swap(d_inner);
+    d_inner.make_nil();
+  }
+
   optCvQualify(d_outer);
   if(d_outer.is_not_nil() && !d_outer.has_subtypes())
   {
