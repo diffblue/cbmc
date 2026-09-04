@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ deduction guide preserves array reference: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: CTAD decays the array-lvalue argument to a pointer even
+though the guide's parameter is a forwarding reference, deduction fails,
+and main is dropped (VERIFICATION SUCCESSFUL is vacuous; 0 assertions).
