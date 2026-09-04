@@ -7004,3 +7004,30 @@ have not touched before; next round should minimize (likely a byte_extract
 VALIDATION: all five suites green (the parser change is C++-only but
 suite 2 was run fully); probe grep run BEFORE git add this time.
 Census 4 (pipe, ranges basic, regex, kind-mismatch).
+
+## Round 77 (2026-09-04): coverage audit #10
+
+Question: KNOWNBUGs for every problem we are aware of?  VERIFIED:
+- Census 4: cpp20_ranges_pipe_invoke_drop, cpp20_ranges_basic_libcxx,
+  cpp11_regex_match, cpp11_deduced_nontype_kind_mismatch.  All problems
+  from audits #1-#9 either fixed+CORE or covered by these.
+- NEW MECHANISM since audit #9: the simplify_expr.cpp:3376 invariant
+  (simplify_rec postcondition; array-typed expression simplified to
+  non-array), reached by the pipe after round 76 let it through the
+  front end.  COVERED by the pipe KNOWNBUG (its desc/failure mode).
+  Hand-kernel attempts (all VERIFY CLEAN, negative results recorded):
+  si1 (CTAD guide -> view_<R&> with ref-array member + begin() decay),
+  si2 (ref-array member copied through a by-value call),
+  si3 (range-for over a take_view-shaped counted iterator holding a
+  ref-array member).  Not standalone-reproducible from these shapes;
+  the trigger needs more of the driver (likely the __sentinel friend
+  equality + counted_iterator interaction).  Next reduction should
+  minimize the pipe driver under a "simplify invariant" gate.
+- Interior/hazard items re-checked, unchanged: [class.default.ctor]/4
+  post-main wave (round 58b: dc1/dc2 verify clean; interior to the pipe
+  KNOWNBUG); ranges_basic atomic-noise + same_as layers (interior to
+  its KNOWNBUG); round-38 lambda return_type hazard (no reachable
+  trigger); round-44 kind-mismatch blocker (desc documents it).
+ANSWER: YES -- every known problem is covered by a committed KNOWNBUG
+(or already fixed with a CORE test); the new simplify-invariant
+mechanism is covered by the pipe KNOWNBUG and resisted 3 hand kernels.
