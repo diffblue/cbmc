@@ -115,6 +115,43 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     arg_is_lvalue.push_back(arg.get_bool(ID_C_lvalue));
   }
 
+  // N5008 [temp.deduct.call]/2-3 adjustments of A before deducing
+  // against a (hypothetical or explicit) guide's parameter P
+  // ([over.match.class.deduct]/1: each guide deduces as a function
+  // call): when P is NOT a reference, an array argument decays to a
+  // pointer, a function to a function pointer, and top-level cv is
+  // dropped; when P is a FORWARDING reference and the argument an
+  // lvalue, A is `lvalue reference to A`.  Without the decay,
+  // constructor-pattern deduction (e.g. `wrap(base_, 1)` with a member
+  // of type int(&)[1] against `wrap(I, int)`) yielded wrap<int[1]>
+  // instead of wrap<int*>; the mistyped member broke the goto program
+  // downstream (simplify_rec postcondition).
+  const auto adjust_deduction_arg =
+    [this](const typet &pattern, const typet &arg_type, bool is_lvalue) {
+      const bool pattern_is_ref = pattern.id() == ID_frontend_pointer &&
+                                  (pattern.get_bool(ID_C_reference) ||
+                                   pattern.get_bool(ID_C_rvalue_reference));
+      typet at = arg_type;
+      if(!pattern_is_ref)
+      {
+        if(is_reference(at))
+          at = to_reference_type(at).base_type();
+        if(at.id() == ID_array)
+          at = pointer_type(to_array_type(at).element_type());
+        else if(at.id() == ID_code)
+          at = pointer_type(at);
+        at.remove(ID_C_constant);
+      }
+      else if(
+        pattern.get_bool(ID_C_rvalue_reference) &&
+        to_type_with_subtype(pattern).subtype().id() == ID_cpp_name &&
+        is_lvalue && !is_reference(at) && !is_rvalue_reference(at))
+      {
+        at = reference_type(at);
+      }
+      return at;
+    };
+
   // Explicit deduction guides ([temp.deduct.guide], [over.match.class.deduct]):
   // a guide is one of the entries the class name resolves to whose declarator
   // was flagged at parse time (its constructor-like declaration carried a
@@ -176,37 +213,14 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       {
         for(std::size_t i = 0; i < pattern_types.size(); ++i)
         {
-          // N5008 [temp.deduct.call]/2-3 adjustments of A before
-          // deduction against the guide's parameter P:
-          // - P not a reference: an array argument decays to a pointer,
-          //   a function to a function pointer, top-level cv is dropped.
-          // - P a forwarding reference and the argument an lvalue: A is
-          //   taken to be `lvalue reference to A`.  This is how libc++'s
-          //   guide  take_view(_Range&&, ...) -> take_view<all_t<_Range>>
-          //   deduces _Range = int(&)[1] from an array (all_t preserves
-          //   the reference; decaying here made iterator_t<int*>
-          //   ill-formed downstream and CTAD failed).
-          const typet &pt = pattern_types[i];
-          const bool pattern_is_ref = pt.id() == ID_frontend_pointer &&
-                                      (pt.get_bool(ID_C_reference) ||
-                                       pt.get_bool(ID_C_rvalue_reference));
-          typet at = arg_types[i];
-          if(!pattern_is_ref)
-          {
-            if(at.id() == ID_array)
-              at = pointer_type(to_array_type(at).element_type());
-            else if(at.id() == ID_code)
-              at = pointer_type(at);
-            at.remove(ID_C_constant);
-          }
-          else if(
-            pt.get_bool(ID_C_rvalue_reference) &&
-            to_type_with_subtype(pt).subtype().id() == ID_cpp_name &&
-            arg_is_lvalue[i] && !is_reference(at) && !is_rvalue_reference(at))
-          {
-            at = reference_type(at);
-          }
-          resolver.guess_template_args(pt, at);
+          // e.g. libc++'s guide
+          //   take_view(_Range&&, ...) -> take_view<all_t<_Range>>
+          // deduces _Range = int(&)[1] from an array lvalue (the
+          // forwarding-reference rule; all_t preserves the reference).
+          resolver.guess_template_args(
+            pattern_types[i],
+            adjust_deduction_arg(
+              pattern_types[i], arg_types[i], arg_is_lvalue[i]));
         }
       }
       catch(...)
@@ -312,7 +326,12 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         try
         {
           for(std::size_t i = 0; i < patterns.size(); ++i)
-            resolver.guess_template_args(patterns[i], arg_types[i]);
+          {
+            resolver.guess_template_args(
+              patterns[i],
+              adjust_deduction_arg(
+                patterns[i], arg_types[i], arg_is_lvalue[i]));
+          }
         }
         catch(...)
         {
