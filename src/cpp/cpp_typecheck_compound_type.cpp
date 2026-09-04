@@ -2111,14 +2111,115 @@ void cpp_typecheckt::typecheck_friend_declaration(
     // non-template friends are handled by the declarator converter.)
     {
       cpp_save_scopet saved_scope(cpp_scopes);
+      // The friend's NAME belongs to the innermost enclosing NAMESPACE
+      // ([namespace.memdef]/3), so convert it there.
       cpp_scopet *scope = &cpp_scopes.current_scope();
+      cpp_scopet *class_scope = nullptr;
       while(scope->id_class == cpp_idt::id_classt::CLASS ||
             scope->id_class == cpp_idt::id_classt::BLOCK_SCOPE ||
             scope->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
       {
+        if(
+          class_scope == nullptr &&
+          scope->id_class == cpp_idt::id_classt::CLASS)
+        {
+          class_scope = scope;
+        }
         scope = &scope->get_parent();
       }
+      // N5008 [class.friend]/1 + [temp.local]/1: while the friend's name
+      // is a namespace member, its DECLARATION appears in the class and
+      // is looked up there -- the enclosing (member) class template's
+      // parameters and the class's member types are visible to it.  See
+      // libc++'s take_view::__sentinel
+      //   template <bool _OtherConst = _Const>
+      //   friend bool operator==(_Iter<_OtherConst>, __sentinel);
+      // whose default template argument names the enclosing member class
+      // template's own parameter `_Const`, and whose parameter type names
+      // the member alias `_Iter`.  Converting at namespace scope alone
+      // left both unresolvable; the resulting exception escaped the
+      // enclosing instantiation and silently dropped the caller's body.
+      // Make the class scope visible for lookup during the conversion
+      // (secondary scopes are exactly this: additional lookup scopes
+      // that do not affect naming).
+      // The map active here binds the enclosing template's parameters,
+      // and it is restored before the friend is instantiated at a call
+      // site.  A DEFAULT TEMPLATE ARGUMENT that names one of them would
+      // then be an unevaluatable dependent expression (leaving the
+      // friend with no viable specialisation), so substitute the bound
+      // argument now, while it is still bound; only the friend's own
+      // parameters stay dependent.
+      if(!instantiation_stack.empty())
+      {
+        const auto short_of = [](const irep_idt &id) -> std::string {
+          const std::string t = id2string(id);
+          const auto q = t.rfind("::");
+          return q != std::string::npos ? t.substr(q + 2) : t;
+        };
+        for(auto &param : declaration.template_type().template_parameters())
+        {
+          if(param.id() != ID_cpp_declaration)
+            continue;
+          auto &pdecl = static_cast<cpp_declarationt &>(
+            static_cast<exprt &>(static_cast<irept &>(param)));
+          for(auto &pd : pdecl.declarators())
+          {
+            exprt &dflt = static_cast<exprt &>(pd.add(ID_value));
+            if(
+              dflt.id() != ID_cpp_name || dflt.get_sub().size() != 1 ||
+              dflt.get_sub().front().id() != ID_name)
+              continue;
+            const std::string want =
+              id2string(dflt.get_sub().front().get(ID_identifier));
+            bool done = false;
+            for(const auto &ee : template_map.expr_map)
+            {
+              if(short_of(ee.first) != want || ee.second.is_nil())
+                continue;
+              dflt = ee.second;
+              done = true;
+              break;
+            }
+            if(done)
+              continue;
+            for(const auto &te : template_map.type_map)
+            {
+              if(short_of(te.first) != want || te.second.is_nil())
+                continue;
+              exprt as_type{ID_type};
+              as_type.type() = te.second;
+              dflt = as_type;
+              break;
+            }
+          }
+        }
+      }
       cpp_scopes.go_to(*scope);
+      // N5008 [class.friend]/1 + [temp.local]/1: the class scope stays
+      // attached as a secondary LOOKUP scope (it does not affect
+      // naming), because the friend's declaration -- and later its body,
+      // instantiated from a call site -- must be looked up in the class.
+      // Restricted to a friend declared in a NESTED class: that is the
+      // shape whose members and enclosing template parameters are
+      // otherwise unreachable from the namespace (libc++'s
+      // take_view::__sentinel), and it keeps the members of top-level
+      // class templates out of namespace lookup.
+      if(class_scope != nullptr)
+      {
+        const cpp_scopet *outer = &class_scope->get_parent();
+        bool nested = false;
+        while(!outer->is_global_scope())
+        {
+          if(outer->id_class == cpp_idt::id_classt::CLASS)
+          {
+            nested = true;
+            break;
+          }
+          outer = &outer->get_parent();
+        }
+        if(nested)
+          scope->add_secondary_scope(*class_scope);
+      }
       convert_template_declaration(declaration);
 
       // N5008 [class.friend]/1 + [temp.friend]/1: the befriended
