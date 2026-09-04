@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ deduction guide preserves array reference: SUCCESS$
@@ -7,6 +7,6 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: CTAD decays the array-lvalue argument to a pointer even
-though the guide's parameter is a forwarding reference, deduction fails,
-and main is dropped (VERIFICATION SUCCESSFUL is vacuous; 0 assertions).
+N5008 [temp.deduct.call]/2-3: no decay against a reference parameter;
+for a forwarding reference an lvalue argument deduces `lvalue reference
+to A` -- here R = int(&)[3], preserved by the guide's alias.

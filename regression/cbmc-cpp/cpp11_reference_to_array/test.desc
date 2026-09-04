@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ reference-to-array alias: SUCCESS$
+^\[main\.assertion\.2\] line \d+ direct reference-to-array: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: CONVERSION ERROR ("invalid implicit conversion from 'signed
+int [3]' to 'AR'").  Also, a template argument of reference-to-array
+type loses its reference during instantiation (tag-holder<array(...)>).
