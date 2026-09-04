@@ -6821,3 +6821,37 @@ run the pipe with the test's exact flags, confirm _Const is the first
 error, and reduce with a criterion requiring THAT error (it is a concrete,
 diagnosable shape, unlike the silent drop).
 Census 4; tree clean; 5 suites green (round 70).
+
+## Round 72 (2026-09-04): pipe blocker REDUCED to 44 lines (new KNOWNBUG)
+
+CORRECTION of my own round-71/72 reasoning: the `_Const is unknown`
+message only appears WITH the sfinae passthrough, and I first dismissed
+it as benign (round-54 rule).  But the uncaught_exceptions tracer shows
+`X-res _Const` is the INNERMOST THROWING FRAME on the pipe test -- the
+message is suppressed while the THROW still escapes and drops main.  So
+"suppressed message" != "benign": check the tracer, not just the message.
+NEW KNOWNBUG cpp20_member_class_template_own_param_friend (44 lines,
+g++/clang -Werror clean, runs clean): inside an out-of-line member class
+template, a friend whose DEFAULT TEMPLATE ARGUMENT names the member
+template's own parameter
+  template <class V> template <bool Const> class view_<V>::sentinel_ {
+    template <bool Other = Const> friend bool operator==(iter_<Other>,
+                                                         sentinel_);
+  };
+throws while resolving `Const` (libc++ take_view::__sentinel shape).
+This is the ranges pipe's current blocker, now minimal and committed.
+FIX ATTEMPT THAT FAILED (recorded so it is not repeated): substituting
+the enclosing template arguments into the friend declaration at the
+hoist point in typecheck_friend_declaration (both a targeted version and
+one applying the map to the whole declaration) does NOT stop the throw.
+Inference: the member class template's parameter is never BOUND in the
+map at that point -- likely tied to the round-46 out-of-line graft, which
+copies the member's parameters from the flattened list; their identifiers
+may not match what the body/friend references.
+NEXT (round 73): probe whether template_map holds a binding for the
+member template's own parameter while its members are converted (print
+type_map/expr_map keys + the id the friend's default argument refers to);
+if they differ, fix the graft to register the member's parameters under
+the identifiers its body uses ([temp.local]/1).
+Census 5 (pipe, ranges basic, regex, kind-mismatch, member-friend);
+tree clean; suites green from round 70.
