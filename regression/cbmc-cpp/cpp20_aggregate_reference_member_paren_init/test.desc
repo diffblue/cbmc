@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ reference member braced init: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reference member paren init: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
