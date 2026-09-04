@@ -6890,3 +6890,46 @@ NEXT (round 74): implement that restructuring (convert in class scope,
 register in namespace scope), validate on the KNOWNBUG + 5 suites, then
 re-check the ranges pipe.
 Census 5; tree clean (grep 0); suites green from round 70.
+
+## Round 74 (2026-09-04): FLIP cpp20_member_class_template_own_param_friend
+
+FIX (commit "C++ front-end: look up a friend's declaration in the class
+scope", src/cpp/cpp_typecheck_compound_type.cpp,
+typecheck_friend_declaration's template branch), two parts:
+1. N5008 [class.friend]/1 + [temp.local]/1 -- attach the CLASS scope as a
+   SECONDARY LOOKUP scope while/after converting the friend template, so
+   the class's member types (libc++ `_Iter`) and the enclosing member
+   class template's parameters are visible.  Secondary scopes are lookup
+   only, so the friend keeps its namespace NAME ([namespace.memdef]/3).
+2. Substitute the enclosing template's BOUND arguments into a default
+   template argument that names one of its parameters (stored as
+   declarator.value(), a bare cpp_name), because the map is restored
+   before the friend is instantiated at a call site; otherwise the
+   default is an unevaluatable dependent expression and the friend has no
+   viable specialisation (silent no-match, not a throw).
+DESIGN PATH (record of what does NOT work, all measured):
+- Converting the friend IN the class scope instead: routes through the
+  member paths -- first an `!access.empty()` invariant, then an implicit
+  `this` baked into the template's signature ("expected 3, but got 2").
+  Threading is_friend into the declaration path did not remove it; the
+  `this` is added when the TEMPLATE symbol is created.
+- Attaching the class scope to the FRIEND's own template scope
+  (cpp_scopes.id_map[template]) instead of the namespace: kernels fail --
+  the later instantiation does not look through it.
+- Removing the secondary scope after conversion (RAII guard, both
+  pop_back and by-identity removal): kernels fail -- the class scope must
+  stay attached for the call-site instantiation.  The `remove_secondary_
+  scope` helper was therefore dropped rather than left unused.
+- Permanent attachment for EVERY class regressed 3 of 1199 cbmc-cpp tests
+  (cpp17_tuple_basic and friends: class members leaking into namespace
+  lookup).  Gating it to a friend declared in a NESTED class -- the shape
+  whose members are otherwise unreachable -- keeps those green.
+ISOLATION KERNELS: sc5 (friend template with a DEDUCIBLE parameter, no
+default) already worked, and sc6 (plain function template with defaulted
+non-deducible parameters) already worked -- which is what localised the
+defect to the enclosing-parameter default + member-alias lookup.
+VALIDATION: revert-tested (0 properties without the fix, 1 with); all
+five suites green (cbmc-cpp 1199 tests, cbmc, cpp, systemc,
+contracts-cpp-dfcc); g++/clang -Werror clean and run clean.
+CASCADE: the ranges pipe still drops main (0 properties) -- next layer.
+Census 4 (pipe, ranges basic, regex, kind-mismatch).
