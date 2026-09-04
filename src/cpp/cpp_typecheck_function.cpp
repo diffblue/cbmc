@@ -331,6 +331,17 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         {
           deduced = reference_typet(deduced, config.ansi_c.pointer_width);
         }
+        else if(return_type.id() == ID_auto && deduced.id() == ID_array)
+        {
+          // N5008 [dcl.type.auto.deduct]/4: plain `auto` deduces as
+          // [temp.deduct.call]/2 -- an array decays to a pointer to its
+          // first element.  Deducing the array type itself made
+          // `auto ret(T (&t)[N]) { return t; }` return the array
+          // CONTENTS reinterpreted as a pointer instead of its address
+          // (the return statement is later converted against this
+          // deduced type, so the decayed type also fixes the value).
+          deduced = pointer_type(to_array_type(deduced).element_type());
+        }
         cpp_convert_auto(
           function_type.return_type(), deduced, get_message_handler());
         typecheck_type(function_type.return_type());
