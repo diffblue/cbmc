@@ -9,6 +9,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <exception> // TEMPORARY DEBUG
+#include <iostream> // TEMPORARY DEBUG
 #include "cpp_typecheck_resolve.h"
 
 #include <deque>
@@ -5737,6 +5739,20 @@ exprt cpp_typecheck_resolvet::resolve(
   const cpp_typecheck_fargst &fargs,
   bool fail_with_exception)
 {
+  // TEMPORARY DEBUG
+  struct dbg_res
+  {
+    bool a;
+    const irep_idt n;
+    cpp_typecheckt &tc;
+    ~dbg_res()
+    {
+      if(a && std::uncaught_exceptions() > 0)
+        std::cerr << "CBMC_DBG X-res " << n << " scope="
+                  << tc.cpp_scopes.current_scope().prefix << '\n';
+    }
+  } dbg_res_v{
+    getenv("CBMC_DBG5") != nullptr, cpp_name.get_base_name(), cpp_typecheck};
   irep_idt base_name;
   cpp_template_args_non_tct template_args;
   template_args.make_nil();
@@ -8448,6 +8464,24 @@ void cpp_typecheck_resolvet::guess_template_args(
                                   template_type.get_bool(ID_C_rvalue_reference);
       const bool desired_is_ref = desired_type.get_bool(ID_C_reference) ||
                                   desired_type.get_bool(ID_C_rvalue_reference);
+      // N5008 [temp.deduct.call]/3: if P is a forwarding reference
+      // (an rvalue reference to a cv-unqualified template parameter,
+      // here a bare cpp_name subtype) and the argument is an lvalue
+      // (A arrives as `lvalue reference to A`), the whole reference
+      // type is used for deduction: T&& vs int(&)[3] deduces
+      // T = int(&)[3].  Only in call-style deduction; in
+      // partial-specialization matching (strict_cv_deduction) the
+      // reference kinds must match exactly, per the check below.
+      if(
+        !strict_cv_deduction &&
+        template_type.get_bool(ID_C_rvalue_reference) &&
+        to_type_with_subtype(template_type).subtype().id() == ID_cpp_name &&
+        desired_is_ref && !desired_type.get_bool(ID_C_rvalue_reference))
+      {
+        guess_template_args(
+          to_type_with_subtype(template_type).subtype(), desired_type);
+        return;
+      }
       if(
         pattern_is_ref && desired_is_ref &&
         template_type.get_bool(ID_C_rvalue_reference) !=
