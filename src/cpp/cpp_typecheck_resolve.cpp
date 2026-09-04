@@ -9,8 +9,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <exception> // TEMPORARY DEBUG
-#include <iostream> // TEMPORARY DEBUG
 #include "cpp_typecheck_resolve.h"
 
 #include <deque>
@@ -5739,20 +5737,6 @@ exprt cpp_typecheck_resolvet::resolve(
   const cpp_typecheck_fargst &fargs,
   bool fail_with_exception)
 {
-  // TEMPORARY DEBUG
-  struct dbg_res
-  {
-    bool a;
-    const irep_idt n;
-    cpp_typecheckt &tc;
-    ~dbg_res()
-    {
-      if(a && std::uncaught_exceptions() > 0)
-        std::cerr << "CBMC_DBG X-res " << n << " scope="
-                  << tc.cpp_scopes.current_scope().prefix << '\n';
-    }
-  } dbg_res_v{
-    getenv("CBMC_DBG5") != nullptr, cpp_name.get_base_name(), cpp_typecheck};
   irep_idt base_name;
   cpp_template_args_non_tct template_args;
   template_args.make_nil();
