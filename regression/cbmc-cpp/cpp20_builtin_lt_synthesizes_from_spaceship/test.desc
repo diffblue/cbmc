@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ spaceship-synthesis builtin parses: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Passes trivially where the system preprocessor lacks the builtin
+(clang <= 21, gcc); FAILS with a parse error in an archlinux/clang-22
+container, where libc++'s default_three_way_comparator.h also breaks.
+Fix direction: lex the builtin as a binary type predicate
+(TOK_BINARY_TYPE_PREDICATE family in scanner.l).
