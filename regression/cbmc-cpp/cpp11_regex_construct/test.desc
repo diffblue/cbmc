@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ regex constructed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Symex does not finish within 600s for construction alone; this is the
+scaling core of cpp11_regex_match.  Candidate directions: field
+sensitivity for the stringbuf buffers, or constant propagation through
+the _Scanner/_Compiler recursion.
