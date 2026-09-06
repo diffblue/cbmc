@@ -7063,3 +7063,47 @@ CASCADE: cpp20_ranges_basic_libcxx still 0 main-assertions (its
 separate real-header blockers stand).  VALIDATION: five suites green on
 the probe-free build; sc16 runtime-verified g++/clang.
 Census 3: ranges basic, regex (solver-time), kind-mismatch (parked).
+
+## Round 79 (2026-09-06): decomposing the 3 coarse KNOWNBUGs into minimal ones
+
+User direction: the remaining KNOWNBUGs are too unspecific to pinpoint
+root causes; create further MINIMAL KNOWNBUGs.  Results:
+1. cpp20_ranges_basic_libcxx decomposed into TWO header-free kernels:
+   - NEW KNOWNBUG cpp20_atomic_always_lock_free_constexpr (22 lines):
+     __atomic_always_lock_free folds at runtime but NOT in a
+     constant-expression context ([expr.const]); libc++ <atomic>'s
+     __contention_t_or_largest alias fails, cascading unknowns.
+   - NEW KNOWNBUG cpp20_friend_requires_enclosing_param (43 lines,
+     the MAIN killer): libc++ __range_adaptor_closure's hidden friend
+     operator| constrains itself with same_as<_Tp, remove_cvref_t<...>>
+     where _Tp is the ENCLOSING class template's parameter; the hoisted
+     friend's requires-clause fails to resolve _Tp at namespace scope
+     ("symbol 'Tp' is unknown") and the candidate is dropped
+     ([temp.local]/1).  Sibling of the FIXED round-74 case, but:
+     TOP-LEVEL class template (round-74 gate = nested only) and the
+     parameter sits in the CONSTRAINT (round-74 substitution = default
+     arguments only).  Fix direction: extend the round-74 machinery --
+     widen the secondary-scope gate to top-level class templates (watch
+     the 3-test leak that forced the nested gate!) and substitute bound
+     enclosing parameters into the friend's requires-clause as well.
+   Main-drop chain confirmed on today's binary: operator| candidate
+   dropped -> `<<type:auto>>` conversion error on 'arr' -> drop.
+   (iterator_t<signed_int> / remove_cvref_t<ref_auto()> noise is
+   DOWNSTREAM of the dropped candidate, not a separate root.)
+2. cpp11_deduced_nontype_kind_mismatch: the test itself is already
+   minimal (30 lines).  What was unpinned was its BLOCKER's valid side:
+   NEW CORE cpp14_make_integer_seq_value_types -- the exact
+   __make_integer_seq shape the round-44 enforcement broke, committed
+   as the canary that must stay green when [temp.deduct.type]/17
+   enforcement flips the KNOWNBUG.  (km1, plain deduced packs +
+   decltype: passes -- negative result, the normalization is only
+   observable under enforcement or via the builtin.)
+3. cpp11_regex_match: measured today -- symex does NOT finish in 900s;
+   bisected: CONSTRUCTION alone (std::regex r("hello"), no match)
+   exceeds 600s.  NEW KNOWNBUG cpp11_regex_construct pins the scaling
+   core with hotspots recorded (stringbuf::_M_pbump loops,
+   translate_nocase/ctype::tolower recursion).  The old "solver-time
+   variance" label was stale: it is SYMEX time.
+Census 6 (3 coarse + 3 new minimal); the passthrough probe was
+stripped and the clean build re-verified.  All new tests
+runtime-verified (g++/clang) except km2 (clang-only builtin, noted).
