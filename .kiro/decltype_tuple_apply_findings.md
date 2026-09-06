@@ -7107,3 +7107,34 @@ root causes; create further MINIMAL KNOWNBUGs.  Results:
 Census 6 (3 coarse + 3 new minimal); the passthrough probe was
 stripped and the clean build re-verified.  All new tests
 runtime-verified (g++/clang) except km2 (clang-only builtin, noted).
+
+## Round 80 (2026-09-06): comprehensive picture via dog-fooding + docker
+
+DOG-FOOD (scripts/dogfood_goto_cc.sh --expand, all 117 src/util files):
+99 clean / 10 noisy / 6 fail / 2 crash -- baseline May was 1/15.  Eight
+open signatures recorded in DOGFOODING.md (two crashes: goto_convert
+convert_return after an auto-deduction failure in options.cpp;
+namespace-lookup miss for std::vector<exprt> in simplify_expr.cpp).
+Kernel yields: NEW KNOWNBUG cpp11_array_member_default_init (15 lines,
+rejects-valid: braced DMI of an aggregate member containing an array ->
+"direct assignments to arrays not permitted").  Negative kernels
+recorded: df1 (const-container make_range trailing decltype) PASSES,
+df3 (const std::map + lambda map_first) PASSES, df4 (std::disjunction
+over pack) PASSES -- so signature 1 needs the exact option_map shape and
+signature 4 is the ranget->vector<exprt> CONVERSION, not disjunction
+itself.
+DOCKER (host binary mounted, regression/cbmc-cpp in-container):
+- fedora:41 / libstdc++-14: ONE failure -- valarray1 parse error
+  `struct __make_unsigned` in <type_traits>.  ROOT (host-reproduced
+  with --stdlib libc++): the __make_unsigned/__remove_pointer/... trait
+  keywords are NOT revertible in CBMC's scanner; real compilers lex the
+  builtin only before '(' (gcc) or demote on shadowing declarations
+  (clang -Wkeyword-compat).  CBMC already has the '('-lookahead for
+  __is_referenceable -- extend it to the whole family.  NEW KNOWNBUG
+  cpp11_builtin_trait_shadow_struct (16 lines).  This will break EVERY
+  <string>-including test on gcc>=14 hosts -- highest-priority parser
+  gap for portability.
+- archlinux (newest libstdc++): running.
+- debian:12: host binary needs glibc 2.38 (cannot exec; would need an
+  in-container build).
+Census 8 KNOWNBUGs (3 coarse + 5 minimal).  Tree clean.
