@@ -1858,5 +1858,10 @@ Open signatures (kernel status in brackets):
   (`struct __make_unsigned`): the revertible-builtin-trait keyword bug,
   host-reproducible -> KNOWNBUG cpp11_builtin_trait_shadow_struct.
   Everything else green against libstdc++-14 headers.
-- archlinux run: launched (see /tmp/docker_arch.log).
+- archlinux (gcc 16.2 / libc++ 22): FIVE failures, TWO roots:
+  - 4x the same __make_unsigned revertible-keyword bug (gcc-16
+    <type_traits>, same as fedora): cpp23_to_underlying,
+    cpp23_unreachable, gcc16_list_pushback, valarray1.
+  - 1x NEW: libc++-22 uses P2360 `if constexpr (using T = ...; cond)`
+    in __algorithm/for_each.h -> KNOWNBUG cpp23_alias_init_statement.
 - debian:12 cannot exec the host binary (glibc 2.38 needed).
