@@ -1818,3 +1818,45 @@ mechanism already fixed.  No source change this turn; cbmc-cpp still passes.
 cpp17_tuple_basic / cpp17_apply_basic stay KNOWNBUG.
 
 *Updated: 2026-07-09*
+
+## Sweep 2026-09-06 (branch cpp11-parser-rework-squashed)
+
+`--expand` over all 117 `src/util/*.cpp` (60s timeout/file):
+
+| Status | Count | Delta vs 2026-05-11 |
+|--------|-------|---------------------|
+| OK (clean) | 99 | baseline was 1/15 sampled |
+| OK_NOISY | 10 | errors leak, .gb produced |
+| FAIL | 6 | 3 of these are 60s TIMEOUTS (expr.cpp compiles clean in 79s) |
+| CRASH | 2 | options.cpp, simplify_expr.cpp |
+
+Open signatures (kernel status in brackets):
+1. CRASH goto_convert convert_return "function must return value"
+   (options.cpp; downstream of a `<<type:auto>>` deduction failure in
+   make_range over a const std::map + lambda chain) [df1/df3 hand
+   kernels PASS -- needs the full option_map shape; unkerneled]
+2. CRASH namespace lookup "std::vector<tag-exprt...>" missing
+   (simplify_expr.cpp) [unkerneled]
+3. `zip` "does not uniquely resolve" (std_expr.cpp via range.h:462
+   two-overload zip) [unkerneled]
+4. CBMC's own `disjunction(std::vector<exprt>)` no-match
+   (interval_union.cpp; range-to-vector conversion) [std::disjunction
+   kernel PASSES -- the failure is the ranget->vector conversion]
+5. `operator->` unknown (get_module.cpp, optionalt<reference_wrapper>)
+   [unkerneled]
+6. unique_ptr->unique_ptr invalid conversion + std::chrono to_time_t
+   no-match (timestamper.cpp) [unkerneled]
+7. aligned_buffer/sharing_treet instantiation error (find_symbols.cpp,
+   OK_NOISY) [unkerneled]
+8. Array default-member-initializer rejected -> KNOWNBUG
+   cpp11_array_member_default_init (found via df1 kernelization).
+
+## Docker matrix 2026-09-06
+
+- fedora:41 (gcc/libstdc++ 14.3): full cbmc-cpp suite with the host
+  binary -- ONE failure: valarray1, parse error in <type_traits>
+  (`struct __make_unsigned`): the revertible-builtin-trait keyword bug,
+  host-reproducible -> KNOWNBUG cpp11_builtin_trait_shadow_struct.
+  Everything else green against libstdc++-14 headers.
+- archlinux run: launched (see /tmp/docker_arch.log).
+- debian:12 cannot exec the host binary (glibc 2.38 needed).
