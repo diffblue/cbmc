@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ shadowing struct named like a builtin trait: SUCCESS$
