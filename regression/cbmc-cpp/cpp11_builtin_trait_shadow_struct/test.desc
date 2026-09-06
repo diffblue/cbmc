@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ shadowing struct named like a builtin trait: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Passes in gcc mode on gcc<=13 hosts; fails in CLANG mode anywhere and
+in gcc mode on gcc>=14 hosts (libstdc++-14 <type_traits> unparseable:
+valarray1 and anything including <string> breaks in fedora:41).
+Fix: gcc-style followed-by-'(' lookahead, as already done for
+__is_referenceable in scanner.l.
