@@ -429,8 +429,67 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           member.set(ID_C_lvalue, true);
           exprt val;
           if(idx < operands_tc.size())
+          {
+            // look through an already_typechecked wrapper (nil-typed)
+            const exprt &op_probe =
+              operands_tc[idx].id() == ID_already_typechecked
+                ? to_unary_expr(operands_tc[idx]).op()
+                : operands_tc[idx];
+            if(
+              comp.type().id() == ID_array &&
+              (op_probe.id() == ID_initializer_list ||
+               op_probe.type().id() == ID_array ||
+               to_array_type(comp.type()).size().is_constant()))
+            {
+              // N5008 [dcl.init.aggr]/4.2: an ARRAY element is itself
+              // aggregate-initialized, element-wise -- arrays are not
+              // assignable, so the assignment below would be rejected
+              // ("direct assignments to arrays not permitted"; the
+              // shape of a default member initializer `vec v_{{7,8}};`
+              // whose member contains an array).  Recurse: a braced
+              // list contributes its elements, an already-typed array
+              // VALUE is copied element-wise by the array branch (it
+              // requires the #array_ini tag).
+              exprt array_member = member;
+              already_typechecked_exprt::make_already_typechecked(
+                array_member);
+              exprt::operandst elem_ops;
+              if(op_probe.id() == ID_initializer_list)
+              {
+                for(const auto &el : op_probe.operands())
+                  elem_ops.push_back(already_typechecked_exprt{el});
+              }
+              else if(op_probe.type().id() == ID_array)
+              {
+                exprt aval = op_probe;
+                aval.set(ID_C_array_ini, true);
+                elem_ops.push_back(already_typechecked_exprt{aval});
+              }
+              else
+              {
+                // N5008 [dcl.init.aggr]/16 (brace elision): the
+                // initializer list of the SUBAGGREGATE was elided; the
+                // array element consumes the next N operands.
+                const auto n = numeric_cast_v<std::size_t>(
+                  to_constant_expr(to_array_type(comp.type()).size()));
+                for(std::size_t k = 0; k < n && idx < operands_tc.size();
+                    ++k, ++idx)
+                {
+                  elem_ops.push_back(
+                    already_typechecked_exprt{operands_tc[idx]});
+                }
+                --idx; // the shared ++idx below advances past the last
+              }
+              auto elem_call =
+                cpp_constructor(source_location, array_member, elem_ops);
+              if(elem_call.has_value())
+                block.add(std::move(*elem_call));
+              ++idx;
+              continue;
+            }
             val =
               typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+          }
           else
           {
             // N5008 [dcl.init.aggr]/5: elements without an explicit
@@ -724,8 +783,67 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               reference_initializer(val, to_reference_type(comp.type()));
             }
             else
+            {
+            // look through an already_typechecked wrapper (nil-typed)
+            const exprt &op_probe =
+              operands_tc[idx].id() == ID_already_typechecked
+                ? to_unary_expr(operands_tc[idx]).op()
+                : operands_tc[idx];
+            if(
+              comp.type().id() == ID_array &&
+              (op_probe.id() == ID_initializer_list ||
+               op_probe.type().id() == ID_array ||
+               to_array_type(comp.type()).size().is_constant()))
+            {
+              // N5008 [dcl.init.aggr]/4.2: an ARRAY element is itself
+              // aggregate-initialized, element-wise -- arrays are not
+              // assignable, so the assignment below would be rejected
+              // ("direct assignments to arrays not permitted"; the
+              // shape of a default member initializer `vec v_{{7,8}};`
+              // whose member contains an array).  Recurse: a braced
+              // list contributes its elements, an already-typed array
+              // VALUE is copied element-wise by the array branch (it
+              // requires the #array_ini tag).
+              exprt array_member = member;
+              already_typechecked_exprt::make_already_typechecked(
+                array_member);
+              exprt::operandst elem_ops;
+              if(op_probe.id() == ID_initializer_list)
+              {
+                for(const auto &el : op_probe.operands())
+                  elem_ops.push_back(already_typechecked_exprt{el});
+              }
+              else if(op_probe.type().id() == ID_array)
+              {
+                exprt aval = op_probe;
+                aval.set(ID_C_array_ini, true);
+                elem_ops.push_back(already_typechecked_exprt{aval});
+              }
+              else
+              {
+                // N5008 [dcl.init.aggr]/16 (brace elision): the
+                // initializer list of the SUBAGGREGATE was elided; the
+                // array element consumes the next N operands.
+                const auto n = numeric_cast_v<std::size_t>(
+                  to_constant_expr(to_array_type(comp.type()).size()));
+                for(std::size_t k = 0; k < n && idx < operands_tc.size();
+                    ++k, ++idx)
+                {
+                  elem_ops.push_back(
+                    already_typechecked_exprt{operands_tc[idx]});
+                }
+                --idx; // the shared ++idx below advances past the last
+              }
+              auto elem_call =
+                cpp_constructor(source_location, array_member, elem_ops);
+              if(elem_call.has_value())
+                block.add(std::move(*elem_call));
+              ++idx;
+              continue;
+            }
               val = typecast_exprt::conditional_cast(
                 operands_tc[idx], comp.type());
+            }
             ++idx;
           }
           else
