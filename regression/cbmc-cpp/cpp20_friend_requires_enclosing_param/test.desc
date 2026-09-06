@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ pipe through CRTP closure base: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "symbol 'Tp' is unknown" resolving the friend's
+requires-clause at namespace scope; the candidate is dropped and main
+fails with "invalid implicit conversion from 'struct times2' to
+'signed int'".
