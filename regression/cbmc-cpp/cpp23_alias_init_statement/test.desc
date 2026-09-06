@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp23
+^\[main\.assertion\.1\] line \d+ alias-declaration init-statement: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "parse error before 'using T = int'".
