@@ -11,7 +11,17 @@ int main()
 {
   int r = 0;
   if constexpr(using T = int; sizeof(T) == 4)
-    r = 42;
+    r = 39;
+  if(using T = long; sizeof(T) >= 4)
+    r += 1;
+  switch(using U = int; sizeof(U))
+  {
+  case 4:
+    r += 2;
+    break;
+  default:
+    break;
+  }
   __CPROVER_assert(r == 42, "alias-declaration init-statement");
   return 0;
 }
