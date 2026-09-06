@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ alias picks lock-free type: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "expected constant expression, but got
+'__atomic_always_lock_free(...)'" followed by "symbol 'pick' is
+unknown".  The same builtin folds fine when only read at runtime.
