@@ -11940,10 +11940,27 @@ std::optional<codet> Parser::rIfStatement()
   exprt exp;
   codet init_stmt(ID_skip);
   {
+    // N5008 [stmt.pre] (C++23, P2360R0): an init-statement may also be
+    // an ALIAS-DECLARATION -- `if constexpr (using T = ...; cond)`.
+    // libc++ >= 22 uses this shape in __algorithm/for_each.h, so every
+    // <algorithm>-including translation unit hits it.  rTypedefUsing
+    // consumes the trailing ';' and registers the alias name.
+    if(lex.LookAhead(0) == TOK_USING)
+    {
+      cpp_declarationt alias_decl;
+      if(!rTypedefUsing(alias_decl))
+        return {};
+      init_stmt = codet(ID_decl);
+      init_stmt.add_to_operands(std::move(alias_decl));
+      set_location(init_stmt, tk2);
+    }
+
     // Try: declaration with initializer ';' condition
     auto saved_pos = lex.Save();
     cpp_declarationt init_decl;
-    if(rSimpleDeclaration(init_decl) && lex.LookAhead(0) == ';')
+    if(
+      init_stmt.get_statement() == ID_skip && rSimpleDeclaration(init_decl) &&
+      lex.LookAhead(0) == ';')
     {
         lex.get_token(tk3); // consume ';'
         init_stmt = codet(ID_decl);
@@ -12134,9 +12151,26 @@ std::optional<codet> Parser::rSwitchStatement()
   // C++17 switch with init-statement: switch(init; condition)
   codet init_stmt(ID_skip);
   {
+    // N5008 [stmt.pre] (C++23, P2360R0): an init-statement may also be
+    // an ALIAS-DECLARATION -- `if constexpr (using T = ...; cond)`.
+    // libc++ >= 22 uses this shape in __algorithm/for_each.h, so every
+    // <algorithm>-including translation unit hits it.  rTypedefUsing
+    // consumes the trailing ';' and registers the alias name.
+    if(lex.LookAhead(0) == TOK_USING)
+    {
+      cpp_declarationt alias_decl;
+      if(!rTypedefUsing(alias_decl))
+        return {};
+      init_stmt = codet(ID_decl);
+      init_stmt.add_to_operands(std::move(alias_decl));
+      set_location(init_stmt, tk2);
+    }
+
     auto saved_pos = lex.Save();
     cpp_declarationt init_decl;
-    if(rSimpleDeclaration(init_decl) && lex.LookAhead(0) == ';')
+    if(
+      init_stmt.get_statement() == ID_skip && rSimpleDeclaration(init_decl) &&
+      lex.LookAhead(0) == ';')
     {
         lex.get_token(tk3); // consume ';'
         init_stmt = codet(ID_decl);
