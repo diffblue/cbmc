@@ -7156,3 +7156,48 @@ this round: (1) revertible trait keywords ('('-lookahead, scanner.l,
 mirrors __is_referenceable), (2) P2360 init-statement grammar, (3)
 friend-requires enclosing param (ranges basic main-killer), (4)
 atomic constexpr fold, (5) array DMI, (6) dog-food crash pair.
+
+## Round 81 (2026-09-06): four KNOWNBUGs fixed and flipped; one new pinned
+
+FIX 1 (0d8cc16c22, FLIP fe798a4ad3): revertible builtin trait keywords.
+scanner.l now lexes all 34 conditionally-enabled __is_*/__make_*/
+__remove_*/__add_* trait keywords as builtins only when directly
+followed by '(' (gcc's revertible-identifier rule; the treatment
+__is_referenceable already had).  Verified in fedora:41: valarray1
+passes against gcc-14 headers.  In archlinux, 4 of 5 failures cured.
+FIX 2 (48204eeb6b): array elements of aggregates are initialized
+element-wise ([dcl.init.aggr]/4.2) with [dcl.init.aggr]/16 brace-elision
+scalar consumption -- cures "direct assignments to arrays not
+permitted" for `vec v_{{7,8}};` DMIs.  Diagnosis detour recorded: the
+failing operands are NOT initializer_lists at the aggregate loops
+(already_typechecked wrappers, then bare scalars after upstream
+flattening) -- the site-marker probe (SITE tagging every
+typecheck_side_effect_assignment) located the true site after two
+wrong-hypothesis patches.
+FIX 3 (555d9ef416): P2360 alias-declaration init-statement in if AND
+switch (rTypedefUsing consumes the ';').  Cures libc++-22
+__algorithm/for_each.h.
+FIX 4 (679e71827f): enclosing template parameters are substituted into
+a hoisted friend's REQUIRES-CLAUSE (extension of the round-74
+default-argument substitution; raw-typet splice matching the
+constraint-satisfaction walker's convention; friend's OWN parameters
+excluded per [temp.local]/1 shadowing).  Flips
+cpp20_friend_requires_enclosing_param -- the ranges_basic main killer.
+TWO development hazards caught by the full suite run and recorded:
+- irept::add(name) CREATES the entry: attaching an "empty"
+  requires-clause to clause-less friends demoted the libc++ tuple
+  family into wrong-code (5 failures).  find() first.
+- The walker must test nodes stored as NAMED subs too (ambiguous.type),
+  not only children of get_sub().
+Bisection hazard: restoring bisection-reverted files -- suite 1 caught
+the forgotten cpp_constructor.cpp restore.
+DOCKER re-verification: fedora:41 fully green.  archlinux: for_each
+cured; next layer = clang-22's
+__builtin_lt_synthesizes_from_spaceship in
+default_three_way_comparator.h -> NEW self-gating KNOWNBUG
+cpp20_builtin_lt_synthesizes_from_spaceship (fix direction: binary
+type predicate token).
+VALIDATION: all five suites green.  Census 6 KNOWNBUGs:
+ranges_basic (atomic layer remains), regex_match+regex_construct
+(symex scaling), kind-mismatch (parked), atomic-constexpr,
+spaceship-builtin.
