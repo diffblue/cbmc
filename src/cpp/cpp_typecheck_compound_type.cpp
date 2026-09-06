@@ -2193,6 +2193,82 @@ void cpp_typecheckt::typecheck_friend_declaration(
             }
           }
         }
+
+        // N5008 [temp.local]/1 + [temp.friend]/1: the friend's
+        // REQUIRES-CLAUSE is also part of its declaration and is looked
+        // up in the class -- libc++'s __range_adaptor_closure constrains
+        // its hidden friend operator| with
+        //   requires same_as<_Tp, remove_cvref_t<_Closure>>
+        // where _Tp is the ENCLOSING class template's parameter.  The
+        // clause is resolved when the hoisted friend is instantiated at
+        // a call site, where the enclosing map has been restored -- so,
+        // as for the defaults above, substitute the bound argument now.
+        // Only bare cpp_names naming an enclosing parameter are
+        // replaced; the friend's own parameters stay dependent.
+        if(
+          declaration.template_type().find(ID_C_requires_clause).is_not_nil())
+        {
+          irept &req_clause =
+            declaration.template_type().add(ID_C_requires_clause);
+          // [temp.local]/1 shadowing: a name that is the FRIEND's own
+          // template parameter refers to that parameter, not to the
+          // enclosing template's -- do not substitute it even when an
+          // enclosing binding shares the short name (libc++ <tuple>
+          // reuses _Ip/_Tp for the friend `get`).
+          std::set<std::string> own_param_names;
+          for(const auto &param :
+              declaration.template_type().template_parameters())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            const auto &pdecl2 = static_cast<const cpp_declarationt &>(
+              static_cast<const exprt &>(static_cast<const irept &>(param)));
+            for(const auto &pd2 : pdecl2.declarators())
+            {
+              if(pd2.name().is_simple_name())
+                own_param_names.insert(id2string(pd2.name().get_base_name()));
+            }
+          }
+          // returns true when `node` was a bare cpp_name naming a bound
+          // enclosing parameter and was replaced in place
+          std::function<bool(irept &)> subst_enclosing =
+            [&](irept &node) -> bool {
+              if(
+                node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+                node.get_sub().front().id() == ID_name)
+              {
+                const std::string want =
+                  id2string(node.get_sub().front().get(ID_identifier));
+                if(own_param_names.count(want) != 0)
+                  return false;
+                for(const auto &ee : template_map.expr_map)
+                {
+                  if(short_of(ee.first) != want || ee.second.is_nil())
+                    continue;
+                  node = ee.second;
+                  return true;
+                }
+                for(const auto &te : template_map.type_map)
+                {
+                  if(short_of(te.first) != want || te.second.is_nil())
+                    continue;
+                  // splice the raw type: the constraint-satisfaction
+                  // walker substitutes parameter names the same way and
+                  // its evaluator accepts typet nodes in place of a
+                  // cpp_name
+                  node = te.second;
+                  return true;
+                }
+                return false;
+              }
+              for(auto &child : node.get_sub())
+                subst_enclosing(child);
+              for(auto &named : node.get_named_sub())
+                subst_enclosing(named.second);
+              return false;
+            };
+          subst_enclosing(req_clause);
+        }
       }
       cpp_scopes.go_to(*scope);
       // N5008 [class.friend]/1 + [temp.local]/1: the class scope stays
