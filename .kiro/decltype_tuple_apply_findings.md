@@ -7138,3 +7138,21 @@ DOCKER (host binary mounted, regression/cbmc-cpp in-container):
 - debian:12: host binary needs glibc 2.38 (cannot exec; would need an
   in-container build).
 Census 8 KNOWNBUGs (3 coarse + 5 minimal).  Tree clean.
+
+## Round 80 addendum: archlinux results
+
+archlinux (gcc 16.2 headers, libc++ 22, clang 22): FIVE cbmc-cpp
+failures, TWO roots:
+- FOUR are the same revertible-builtin-trait keyword bug as fedora:41
+  (gcc-16 <type_traits> `struct __make_unsigned`), confirming
+  cpp11_builtin_trait_shadow_struct as the single highest-leverage
+  portability fix.
+- ONE new: libc++-22's for_each uses P2360 (C++23 alias-declaration as
+  init-statement, `if constexpr (using T = ...; cond)`); CBMC's parser
+  rejects it -> NEW KNOWNBUG cpp23_alias_init_statement (9 lines,
+  g++/clang -Werror + runtime verified).
+Census 9 KNOWNBUGs (3 coarse + 6 minimal).  Fix-priority queue from
+this round: (1) revertible trait keywords ('('-lookahead, scanner.l,
+mirrors __is_referenceable), (2) P2360 init-statement grammar, (3)
+friend-requires enclosing param (ranges basic main-killer), (4)
+atomic constexpr fold, (5) array DMI, (6) dog-food crash pair.
