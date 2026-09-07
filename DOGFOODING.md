@@ -1865,3 +1865,38 @@ Open signatures (kernel status in brackets):
   - 1x NEW: libc++-22 uses P2360 `if constexpr (using T = ...; cond)`
     in __algorithm/for_each.h -> KNOWNBUG cpp23_alias_init_statement.
 - debian:12 cannot exec the host binary (glibc 2.38 needed).
+
+## Sweep 2026-09-07 (post round-81 fixes; TIMEOUT=300)
+
+src/util 117 files: **103 clean / 13 noisy / 0 fail / 1 crash** — the
+apples-to-apples comparison with the prior 103/14/0/0 record: the
+options.cpp and simplify_expr.cpp CRASHes seen on 2026-09-06 were one
+regression (valueless-return bodies kept by the leniency recovery —
+FIXED, commit 14beda0b53) and one long-standing namespace-lookup crash
+(simplify_expr.cpp, still open).
+
+`--expand` scope WIDENED (DOGFOOD_DIRS): src/util src/goto-programs
+src/goto-symex src/langapi src/json src/xmllang.  New signature queue
+from the wider sweep (120s/file):
+- `bad reference initializer` (elide_cpp_returned_temporaries.cpp)
+- `found no match: set / json_objectt / xmlt / with_solver_hardness`
+  family (name lookup of class types through headers)
+- `incorrect_goto_program_exceptiont does not uniquely resolve`
+- CONVERSION ERROR family across src/goto-symex/symex_*.cpp
+- empty-output FAILs are mostly per-file timeouts (symex-scale, cf.
+  expr.cpp compiling clean in 79s)
+
+## Docker matrix 2026-09-07
+
+| image | toolchain | cbmc-cpp result |
+|---|---|---|
+| fedora:41 | gcc 14.3 | green (after trait-keyword fix) |
+| ubuntu:24.04 | gcc 13.3 + clang/libc++ 18 | **all green** |
+| archlinux | gcc 16.2 + clang/libc++ 22 | 3 fail (spaceship builtin KNOWNBUG + monadic) |
+| opensuse/tumbleweed | gcc 16.2 + clang/libc++ 23 | 35 fail: NEW libc++-23 layer — pointer-dereference FAILUREs in construct/push_back (semantic, not parse) |
+| debian:12 | too-old glibc for host binary | needs in-container build |
+
+SETUP HAZARDS (cost two wasted runs): install `clang` META-package
+(clang-18 alone ships no `clang++` binary -> "GCC preprocessing
+failed"); install libc++-devel/libc++abi-devel or every
+`--stdlib libc++` test fails on missing headers.
