@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ factory returns derived through base unique_ptr: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "invalid implicit conversion from 'struct unique_ptr' to
+'struct unique_ptr'" on the derived-typed return.
