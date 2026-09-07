@@ -10,9 +10,10 @@
 #     --baseline  only run files from DOGFOOD_BASELINE below; PASS
 #                 if every file in the baseline is OK_CLEAN.  (Used
 #                 as the CI regression target.)
-#     --expand    run ALL .cpp files under src/util/ (produces a
-#                 bigger summary but never exits non-zero).  Used to
-#                 find new bugs during development.
+#     --expand    run ALL .cpp files under the DOGFOOD_DIRS directories
+#                 (produces a bigger summary but never exits non-zero).
+#                 Used to find new bugs during development.  Override
+#                 the directory list with DOGFOOD_DIRS="src/a src/b".
 #   default behaviour is like --expand but limited to the N smallest
 #   files (N=DOGFOOD_SAMPLE_N, default 30).
 #
@@ -32,6 +33,11 @@ DOGFOOD_BASELINE=(
 
 # Default sample size when invoked without --baseline or --expand.
 DOGFOOD_SAMPLE_N="${DOGFOOD_SAMPLE_N:-30}"
+
+# Directories covered by --expand.  Historically only src/util; widened
+# after hand-dog-fooding of goto-conversion and goto-symex sources found
+# distinct front-end bugs (std::optional members, decider callers).
+DOGFOOD_DIRS="${DOGFOOD_DIRS:-src/util src/goto-programs src/goto-symex src/langapi src/json src/xmllang}"
 
 GOTO_CC="${GOTO_CC:-$REPO_ROOT/build/bin/goto-cc}"
 COMPILE_COMMANDS="${COMPILE_COMMANDS:-$REPO_ROOT/build/compile_commands.json}"
@@ -72,7 +78,7 @@ PY
 
 collect_files() {
   local n="$1"
-  find src/util -maxdepth 2 -name '*.cpp' -exec wc -l {} + \
+  find $DOGFOOD_DIRS -maxdepth 2 -name '*.cpp' -exec wc -l {} + \
     | sort -n \
     | head -"$n" \
     | awk '{print $2}' \
@@ -84,7 +90,7 @@ case "$mode" in
     files=("${DOGFOOD_BASELINE[@]}")
     ;;
   expand)
-    mapfile -t files < <(find src/util -name '*.cpp' | sort)
+    mapfile -t files < <(find $DOGFOOD_DIRS -name '*.cpp' | sort)
     ;;
   *)
     mapfile -t files < <(collect_files "$DOGFOOD_SAMPLE_N")
