@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ arrow on pointer element of list range-for: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Found dog-fooding CBMC's own sources (goto-cc over src/util).
