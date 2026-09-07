@@ -1,0 +1,13 @@
+KNOWNBUG
+main.ii
+--cpp23
+^\[main\.assertion\.1\] line \d+ has value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ transformed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: optional::transform never materializes against gcc-16
+headers and main verifies vacuously (0 assertions).  Sibling of
+cpp23_optional_monadic (which uses the host's headers).
