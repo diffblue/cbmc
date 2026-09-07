@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ zip overloads resolve: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Found dog-fooding CBMC's own sources (goto-cc over src/util).

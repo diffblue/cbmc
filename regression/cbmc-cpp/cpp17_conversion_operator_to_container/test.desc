@@ -1,0 +1,10 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ range converts to vector parameter: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Found dog-fooding CBMC's own sources (goto-cc over src/util).
