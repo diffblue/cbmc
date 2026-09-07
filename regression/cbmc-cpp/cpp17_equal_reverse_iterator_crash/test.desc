@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ std::equal over reverse iterators: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: invariant violation (namespace lookup,
+vector<...>::reverse_iterator not found) -- a CRASH, not a drop.
