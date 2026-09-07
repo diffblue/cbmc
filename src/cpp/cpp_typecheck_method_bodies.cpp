@@ -1455,6 +1455,40 @@ void cpp_typecheckt::typecheck_method_bodies()
               << "verification involving it may be unsound" << messaget::eom;
             get_message_handler().set_message_count(
               messaget::M_ERROR, errors_before);
+            // If the failure left the body STRUCTURALLY broken -- a
+            // value-returning function containing a `return` whose
+            // operand was lost mid-type-check -- goto conversion's
+            // convert_return invariant aborts the whole run
+            // (optionst::to_json under the dog-food harness).  Only
+            // then drop the body: a bodyless declaration is a havoc
+            // stub downstream, no less sound than the incomplete body,
+            // and the warning above keeps it auditable.  Bodies that
+            // remain structurally sound are kept, as partial
+            // verification through them is expected by existing tests.
+            const typet &ret_t =
+              to_code_type(method_symbol.type).return_type();
+            if(
+              ret_t.id() != ID_empty && ret_t.id() != ID_constructor &&
+              ret_t.id() != ID_destructor)
+            {
+              std::function<bool(const irept &)> has_valueless_return =
+                [&](const irept &node) -> bool {
+                  if(node.id() == ID_code && node.get(ID_statement) == ID_return)
+                  {
+                    const auto &ret_code =
+                      static_cast<const code_frontend_returnt &>(
+                        static_cast<const codet &>(node));
+                    if(!ret_code.has_return_value())
+                      return true;
+                  }
+                  for(const auto &sub : node.get_sub())
+                    if(has_valueless_return(sub))
+                      return true;
+                  return false;
+                };
+              if(has_valueless_return(method_symbol.value))
+                method_symbol.value.make_nil();
+            }
             continue;
           }
           throw;
