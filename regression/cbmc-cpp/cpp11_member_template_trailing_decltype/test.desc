@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ map over const two-level map: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "found no match for symbol 'map'" resolving the member
+template against the lambda argument.

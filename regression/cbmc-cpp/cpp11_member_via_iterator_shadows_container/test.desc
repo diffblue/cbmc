@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ clear through iterator: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "found no match for symbol 'clear'" -- the container's own
+clear() shadows the element type's clear(enum) in classref lookup.
