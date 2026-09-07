@@ -7234,3 +7234,52 @@ ACTIONS:
    parse errors) -- next reduction target.
 Census 6 + tumbleweed layer to be pinned.  All five suites green on
 the committed tree (validated during the leniency-fix iteration).
+
+## Round 83 (2026-09-07/08): coverage audit #11 — 8 new KNOWNBUGs, census 16
+
+Question: KNOWNBUGs for every known problem, as minimal as possible?
+NEW MINIMAL KNOWNBUGS from the dog-food queue (all g++/clang -Werror +
+runtime verified):
+- cpp11_range_for_pointer_arrow (20 lines): -> on pointer element of a
+  list range-for ("operator-> is unknown"; get_module.cpp).
+- cpp17_conversion_operator_to_container (30 lines): template
+  conversion operator to container param not used ([temp.deduct.conv];
+  interval_union's disjunction call).  Supersedes the round-80
+  df4-negative (std::disjunction itself was fine).
+- cpp17_overload_template_default_nontype (33 lines): zip partial
+  ordering "does not uniquely resolve" (range.h).
+- cpp17_equal_reverse_iterator_crash (12 lines): the LAST dog-food
+  CRASH pinned -- std::equal over rbegin/rend + std::next aborts the
+  namespacet lookup invariant (vector<T>::reverse_iterator never
+  registered; simplify_expr.cpp).  Plain reverse_iterator loops pass
+  (negative kernel k6).
+- cpp17_unique_ptr_derived_return (40 lines): switch-factory returning
+  unique_ptr<const Derived> as unique_ptr<const Base>
+  ([unique.ptr.single.ctor]/26); if-based sibling PASSES (negative
+  kernel k2 -- the switch/two-return shape is load-bearing).
+- cpp11_member_via_iterator_shadows_container (24 lines): container's
+  clear() shadows element's clear(enum) in it-> classref lookup
+  (elide_cpp_returned_temporaries.cpp).
+- cpp11_member_template_trailing_decltype (45 lines): member template
+  trailing decltype naming a data member + lambda param no-match
+  (options.cpp to_json family).
+PREPROCESSED-SOURCE PINS (non-minimal but host-reproducible):
+- gcc16_optional_transform (10k-line .ii): optional::transform
+  vacuously drops against libstdc++-16 (arch residue).
+- libcxx23_vector_pushback (24k-line .ii): WRONG VERDICT on a correct
+  vector program against libc++-23 (representative of tumbleweed's
+  35-failure class; soundness-relevant).
+NEGATIVE RESULTS recorded: k2 (if-based unique_ptr conversion) PASSES;
+k3 (to_time_t with default-duration time_point) RESOLVES -- the
+timestamper to_time_t no-match needs the microseconds-duration
+time_point, unkerneled; k6 (plain reverse_iterator loop) PASSES.
+STILL KNOWN-UNPINNED (documented in DOGFOODING.md, all with file-level
+repro): find_symbols aligned_buffer/sharing_treet instantiation error;
+to_time_t duration variant; symex_*.cpp CONVERSION ERROR family
+(unsampled individually); goto-programs no-match family
+(set/json_objectt/xmlt/with_solver_hardness,
+incorrect_goto_program_exceptiont) -- likely several share roots with
+the pinned lookup kernels (classref shadowing, conversion operator).
+ANSWER: census 16 KNOWNBUGs; every problem recorded in DOGFOODING.md
+or findings now has either a committed KNOWNBUG (minimal where we
+could) or an explicit negative-kernel/unpinned entry with repro path.
