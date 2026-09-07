@@ -1,0 +1,12 @@
+KNOWNBUG
+main.ii
+--cpp20 --unwind 5 --no-unwinding-assertions --object-bits 12
+^\[main\.assertion\.1\] line \d+ vector size: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "vector size: FAILURE" -- wrong verdict on a correct
+program (SOUNDNESS-relevant divergence class, unlike the vacuous
+drops).  Representative of the 35-test tumbleweed/libc++-23 layer.
