@@ -7201,3 +7201,36 @@ VALIDATION: all five suites green.  Census 6 KNOWNBUGs:
 ranges_basic (atomic layer remains), regex_match+regex_construct
 (symex scaling), kind-mismatch (parked), atomic-constexpr,
 spaceship-builtin.
+
+## Round 82 (2026-09-07): historical-context recovery + comprehensive picture
+
+User prompt: check ~/cpp.txt for the wider dog-food scope and docker
+matrix we had before.  RECOVERED: (a) prior dog-food record was
+103/14/0/0 -- my round-80 run (60s timeout) over-reported FAILs and
+under-noticed that the TWO CRASHes were NEW; (b) dog-fooding had
+extended by hand into goto-conversion/goto-symex; (c) docker matrix
+had included ubuntu 22.04/24.04/24.10 with in-container builds.
+ACTIONS:
+1. Apples-to-apples rerun (300s): 103/12/0/2 -- crash pair confirmed
+   as regressions.  options.cpp ROOT: the could-not-fully-type-check
+   leniency keeps bodies; when the failure hits mid-return-conversion
+   the body keeps a VALUELESS return in a value-returning function and
+   goto-convert's convert_return invariant kills the run.  FIX
+   (14beda0b53): nil exactly such structurally-broken bodies (bodyless
+   decl = havoc stub, no less sound).  First attempt nil'd ALL
+   recovered bodies -> 20 suite failures (tests verify through partial
+   bodies) -- scoped version green everywhere.  NOT round-76's decay
+   (neutralization test).  simplify_expr.cpp crash (namespace lookup
+   vector<exprt>) is SEPARATE and still open.
+2. Widened scripts/dogfood_goto_cc.sh --expand to DOGFOOD_DIRS
+   (util, goto-programs, goto-symex, langapi, json, xmllang); new
+   signature queue recorded in DOGFOODING.md.
+3. Docker matrix rebuilt: fedora:41 green; ubuntu:24.04 ALL GREEN
+   (after infra fix: clang META package + libc++-dev -- clang-18 alone
+   has no clang++, causing "GCC preprocessing failed" and a 105-fail
+   mirage); arch 3 fails (known spaceship KNOWNBUG family);
+   tumbleweed/libc++-23 35 fails = NEW SEMANTIC layer
+   (pointer-dereference FAILUREs in deque/vector construct paths, not
+   parse errors) -- next reduction target.
+Census 6 + tumbleweed layer to be pinned.  All five suites green on
+the committed tree (validated during the leniency-fix iteration).
