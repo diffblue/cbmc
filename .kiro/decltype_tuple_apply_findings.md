@@ -7235,7 +7235,7 @@ ACTIONS:
 Census 6 + tumbleweed layer to be pinned.  All five suites green on
 the committed tree (validated during the leniency-fix iteration).
 
-## Round 83 (2026-09-07/08): coverage audit #11 — 8 new KNOWNBUGs, census 16
+## Round 83 (2026-09-07/08): coverage audit #11 — 8 new KNOWNBUGs, census 15
 
 Question: KNOWNBUGs for every known problem, as minimal as possible?
 NEW MINIMAL KNOWNBUGS from the dog-food queue (all g++/clang -Werror +
@@ -7280,6 +7280,6 @@ to_time_t duration variant; symex_*.cpp CONVERSION ERROR family
 (set/json_objectt/xmlt/with_solver_hardness,
 incorrect_goto_program_exceptiont) -- likely several share roots with
 the pinned lookup kernels (classref shadowing, conversion operator).
-ANSWER: census 16 KNOWNBUGs; every problem recorded in DOGFOODING.md
+ANSWER: census 15 KNOWNBUGs (verified by desc-header count); every problem recorded in DOGFOODING.md
 or findings now has either a committed KNOWNBUG (minimal where we
 could) or an explicit negative-kernel/unpinned entry with repro path.
