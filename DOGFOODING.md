@@ -1900,3 +1900,28 @@ SETUP HAZARDS (cost two wasted runs): install `clang` META-package
 (clang-18 alone ships no `clang++` binary -> "GCC preprocessing
 failed"); install libc++-devel/libc++abi-devel or every
 `--stdlib libc++` test fails on missing headers.
+
+## Sweep 2026-09-08 (after the round-86/87/88 fixes)
+
+src/util: **0 FAIL / 0 CRASH** — the simplify_expr.cpp namespace-lookup
+crash is fixed (guard for scope entries without symbols), and the
+options.cpp convert_return crash was fixed in round 82.
+
+Remaining `--expand` FAILs in the widened scope, both in
+src/goto-symex (`symex_throw.cpp`, `symex_set_return_value.cpp`), same
+signature pair:
+1. `found no match for symbol 'symbol_exprt'` with an EMPTY argument
+   list -- an attempted DEFAULT construction of a type that has no
+   default constructor;
+2. `member 'goto_statet::goto_statet(this)' is not accessible` -- the
+   same for goto_statet's `= delete`d default constructor.
+Per [temp.inst]/11 a member of a class template is instantiated only
+when used, so an unused container member (e.g. `map::operator[]`, whose
+body needs default construction) must not be instantiated.
+HAND KERNELS DO NOT REPRODUCE (round 88, all verify clean): deleted
+default ctor with defaulted copy/move (d1); the same plus deleted
+copy-assignment and defaulted move-assignment, matching goto_statet
+exactly (d2); `std::map<int, non-default-constructible>` using only
+emplace/find (d3); the unordered_map variant (d4).  The harness itself
+is the carrier until the eager-instantiation trigger is isolated (a
+99k-line preprocessed pin was judged disproportionate).
