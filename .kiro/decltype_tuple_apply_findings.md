@@ -7475,3 +7475,39 @@ regression test.
 Census 9: ranges_basic, regex pair, kind-mismatch, iterator-shadow,
 functional-cast-deduced-param, unique_ptr internals layer,
 gcc16-optional, libcxx23-vector.
+
+## Round 89 (2026-09-08/09): cvise applied to the goto-symex dog-food FAILs
+
+ANSWER to "can cvise reduce them": yes, and the setup is now running.
+Steps that mattered:
+1. HEADER BISECTION first (cheap, big win): the failure needs only
+     #include <goto-symex/goto_symex_state.h>
+     int main(){return 0;}
+   -- a TWO-LINE translation unit shows BOTH signatures.
+   goto-symex/goto_state.h ALONE (which declares goto_statet) does not,
+   nor util/std_expr.h nor renaming_level.h; so goto_symex_state.h's own
+   contents are the trigger (its `std::vector<threadt>`, threadt having
+   only `explicit threadt(guard_managert&)`, reaching framet's
+   goto_statet containers).
+2. GATE ORDER matters: grep (0.05s) -> g++ -fsyntax-only -Werror
+   -Wno-deprecated-declarations (1.3s; CBMC's own sources use deprecated
+   APIs deliberately, so -Werror alone rejects the unreduced input) ->
+   cbmc --cpp17 (86s).  goto-cc -c is no cheaper (87s): the cost is
+   CBMC type-checking a libstdc++-heavy TU, itself a known perf issue.
+3. Running: /tmp/cv89, 12 workers, started from the 97k-line
+   preprocessed 2-line TU; cvise's working copy was at ~67.7k lines
+   after ~95 min (3.6% through the pass list).  Expect a multi-hour to
+   multi-day run; check `wc -l /tmp/cv89/base.cpp` and the log.
+   (The earlier attempts on the full symex_throw.cpp/
+   symex_set_return_value.cpp .ii files -- /tmp/cv88, /tmp/cv88b -- were
+   abandoned in favour of the smaller, equivalent input.)
+NEGATIVE KERNEL (d5): vector<threadt> with threadt holding
+vector<framet> and framet holding map<int, vector<statet>>, statet
+non-default-constructible, used only via emplace_back/push_back -- the
+front end ACCEPTS it.  So the plain nested-container shape is not the
+trigger; five hand kernels (d1-d5) have now failed to reproduce, which
+is why the machine reduction is the right instrument here.
+PROCESS HAZARD repeated: a `for p in $(pgrep -f cvise)` kill loop killed
+the driving shell again.  Launch with setsid and never pkill by pattern
+from the same shell -- match /proc/PID/cwd and kill individually, or use
+a dedicated cleanup script.
