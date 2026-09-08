@@ -3885,6 +3885,35 @@ exprt c_typecheck_baset::do_special_functions(
     else
       return expr.arguments()[2];
   }
+  else if(identifier == "__atomic_always_lock_free")
+  {
+    // GCC/clang builtin, a CONSTANT EXPRESSION when its arguments are
+    // ([expr.const]; libc++ <atomic> uses it as a template argument in
+    // __libcpp_is_always_lock_free).  The library model in
+    // src/ansi-c/library/gcc.c answers `size <= sizeof(size_t)` at
+    // RUNTIME, which cannot serve a constant-expression context; fold
+    // the same answer here when the size argument is a constant.
+    if(expr.arguments().size() == 2)
+    {
+      exprt size_arg = expr.arguments()[0];
+      typecheck_expr(size_arg);
+      simplify(size_arg, *this);
+      if(size_arg.is_constant())
+      {
+        const auto size_int =
+          numeric_cast<mp_integer>(to_constant_expr(size_arg));
+        if(size_int.has_value())
+        {
+          const bool lock_free =
+            *size_int <= config.ansi_c.pointer_width / config.ansi_c.char_width;
+          exprt result = from_integer(lock_free ? 1 : 0, expr.type());
+          result.add_source_location() = source_location;
+          return result;
+        }
+      }
+    }
+    return nil_exprt();
+  }
   else if(identifier=="__builtin_constant_p")
   {
     // this is a gcc extension to tell whether the argument
