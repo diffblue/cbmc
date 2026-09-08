@@ -1,0 +1,11 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ conversion op to vector: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "found no match for symbol 'C'" resolving the functional
+cast to the deduced parameter inside the instantiated operator.
