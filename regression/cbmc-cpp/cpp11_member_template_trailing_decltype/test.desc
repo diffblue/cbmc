@@ -1,7 +1,7 @@
 KNOWNBUG
 main.cpp
---cpp17 --object-bits 12
-^\[main\.assertion\.1\] line \d+ map over const two-level map: SUCCESS$
+--cpp11
+^\[main\.assertion\.1\] line \d+ trailing decltype through class iterator: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
