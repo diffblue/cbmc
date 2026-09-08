@@ -7458,3 +7458,20 @@ NEGATIVE RESULTS: u4/u5 (switch variants with an extra same-type or
 nullptr-ctor return) still report "no match for symbol 'uptr'" -- a
 SEPARATE explicit-constructor-call issue, not the return conversion.
 Five suites green after each fix.  Census 9.
+
+## Round 88 addendum: dog-food state and the goto-symex signature
+
+src/util is now 0 FAIL / 0 CRASH.  The two remaining --expand FAILs
+(src/goto-symex/symex_throw.cpp, symex_set_return_value.cpp) share one
+signature pair: an attempted DEFAULT CONSTRUCTION of symbol_exprt
+("no match", empty argument list) followed by goto_statet's deleted
+default constructor being reported inaccessible.  Suspected root:
+eager instantiation of an unused class-template member whose body needs
+default construction ([temp.inst]/11) -- the same hazard family as the
+round-46/58b post-main wave.  FOUR hand kernels fail to reproduce
+(recorded in DOGFOODING.md); the harness remains the carrier.  A
+99k-line preprocessed pin was rejected as disproportionate for a
+regression test.
+Census 9: ranges_basic, regex pair, kind-mismatch, iterator-shadow,
+functional-cast-deduced-param, unique_ptr internals layer,
+gcc16-optional, libcxx23-vector.
