@@ -2621,6 +2621,20 @@ bool cpp_typecheckt::reference_binding(
     // `this' has to be an lvalue
     if(expr.get(ID_statement) == ID_temporary_object)
       expr.set(ID_C_lvalue, true);
+    else if(expr.id() == ID_ptrmember)
+    {
+      // N5008 [expr.ref]/2 + [expr.unary.op]/1: E1->E2 is (*E1).E2 and
+      // indirection yields an lvalue, so a class-member access through
+      // -> naming a non-static data member is ALWAYS an lvalue,
+      // whatever flags the expression carries.  An unlowered ptrmember
+      // reaches this gate without its lvalue mark when a member
+      // operator (here operator*) is resolved on it inside a
+      // TRAILING-RETURN decltype during template-argument deduction
+      // (`auto map(F f) const -> decltype(f(*b_))`, the 26-line
+      // trailing-decltype kernel): the candidate was rejected as a
+      // non-lvalue object and the member template silently dropped.
+      expr.set(ID_C_lvalue, true);
+    }
     else if(expr.get(ID_statement) == ID_function_call)
       expr.set(ID_C_lvalue, true);
     else if(expr.id() == ID_member)
