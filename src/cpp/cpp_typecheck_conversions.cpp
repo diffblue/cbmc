@@ -1142,7 +1142,23 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   const symbolt *class_sym = symbol_table.lookup(class_id_with_tag);
   if(class_sym == nullptr)
     return nullptr;
-  const std::string class_prefix = id2string(class_sym->pretty_name) + "::";
+  // For an instantiated class template the members are keyed by the
+  // INSTANCE scope's prefix (`ranget<ptr_signed_int>::`), while the tag
+  // symbol's pretty_name is just the base name (`ranget`) -- scanning
+  // with the latter finds nothing and the conversion operator of a
+  // class-template instance was never considered ([temp.deduct.conv];
+  // the ranget-to-vector dog-food shape).  Take the prefix from the
+  // class's scope when it is registered.
+  std::string class_prefix = id2string(class_sym->pretty_name) + "::";
+  {
+    const auto scope_it = cpp_scopes.id_map.find(class_id_with_tag);
+    if(
+      scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr &&
+      !scope_it->second->prefix.empty())
+    {
+      class_prefix = scope_it->second->prefix;
+    }
+  }
 
   // Collect candidate template-cast-operator symbols up front: the
   // symbol_table grows during instantiation, which would invalidate
