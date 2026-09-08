@@ -7,5 +7,13 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-Currently: "found no match for symbol 'clear'" -- the container's own
-clear() shadows the element type's clear(enum) in classref lookup.
+Currently: "found no match for symbol 'clear'".  Round-84 diagnosis
+CORRECTION: the candidate IS the element's clear(enum); what fails is
+type-checking the enum-name-qualified ARGUMENT (et::B) -- fargs is
+starved and the arity mismatches.  The failure is STATEFUL: a fresh
+re-typecheck of the same argument (after one failed attempt) succeeds
+and the whole TU then converts (crashing later in symex
+assign_from_struct -- a further layer).  A retry inside the argument
+loop did NOT reproduce that recovery; root cause in the qualified-
+enumerator resolution's lazy scope creation is still open.  Bare
+enumerators and direct (non-operator->-rewritten) calls work.
