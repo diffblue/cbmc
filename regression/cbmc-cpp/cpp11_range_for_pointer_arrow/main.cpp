@@ -1,24 +1,23 @@
-// Dog-food kernel (src/util/get_module.cpp): iterating a
-// std::list<const symbolt*> with a range-for and dereferencing the
-// POINTER element with -> fails with "symbol 'operator->' is
-// unknown" -- operator-> is only meaningful for class types
-// ([over.ref]); for a plain pointer the built-in -> must be used.
-// The range-for's element type presumably mis-derives as a class.
-#include <list>
-#include <string>
+// Dog-food kernel (src/util/get_module.cpp): iterating a container of
+// POINTERS with a range-for and dereferencing the pointer element with
+// -> failed with "symbol 'operator->' is unknown".  N5008
+// [stmt.ranged]/1: the loop variable is declared with its full
+// DECLARATOR (`const symbolt *p` declares a pointer); CBMC's
+// desugaring took only the declaration's type, so `p` got the CLASS
+// type and `p->name_len` resolved as an overloaded operator->
+// ([over.ref]) instead of the built-in pointer access ([expr.ref]).
 extern "C" void __CPROVER_assert(bool, const char *);
 struct symbolt
 {
-  std::string name;
+  int name_len;
 };
 int main()
 {
-  symbolt s{"abc"};
-  std::list<const symbolt *> l;
-  l.push_back(&s);
+  symbolt s{3};
+  const symbolt *arr[1] = {&s};
   int n = 0;
-  for(const symbolt *p : l)
-    n += p->name.size();
-  __CPROVER_assert(n == 3, "arrow on pointer element of list range-for");
+  for(const symbolt *p : arr)
+    n = p->name_len;
+  __CPROVER_assert(n == 3, "arrow on pointer element of range-for");
   return 0;
 }
