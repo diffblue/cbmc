@@ -318,7 +318,39 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
 
     typecheck_expr(code.return_value());
 
+    // N5008 [stmt.return]/2 + [dcl.init.general]/16.6.1: the result
+    // object is copy-initialized from the operand, which considers the
+    // class's CONVERTING constructors.  A temporary / call result whose
+    // type is a DIFFERENT class still needs that constructor call --
+    // returning unique_ptr<const Derived> as unique_ptr<const Base>
+    // ([unique.ptr.single.ctor]/26; src/util/timestamper.cpp's factory).
+    // Such operands are otherwise skipped below (already temporaries) and
+    // fall through to implicit_typecast, which knows no user-defined
+    // conversion.
+    bool converting_temporary = false;
     if(
+      code.return_value().id() == ID_temporary_object ||
+      code.return_value().id() == ID_side_effect)
+    {
+      typet op_t = code.return_value().type();
+      if(is_reference(op_t))
+        op_t = to_reference_type(op_t).base_type();
+      converting_temporary =
+        op_t.id() == ID_struct_tag &&
+        to_struct_tag_type(op_t).get_identifier() !=
+          to_struct_tag_type(return_type).get_identifier();
+    }
+    if(converting_temporary)
+    {
+      exprt temporary;
+      new_temporary(
+        code.return_value().source_location(),
+        return_type,
+        already_typechecked_exprt{code.return_value()},
+        temporary);
+      code.return_value().swap(temporary);
+    }
+    else if(
       code.return_value().id() != ID_temporary_object &&
       code.return_value().id() != ID_side_effect)
     {
