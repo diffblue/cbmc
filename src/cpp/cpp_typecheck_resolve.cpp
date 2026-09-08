@@ -4563,6 +4563,15 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
   for(const auto &id_ptr : id_set)
   {
     const irep_idt id = id_ptr->identifier;
+    // A scope entry may name an entity whose SYMBOL does not exist yet:
+    // members of a class-template instance are registered in the scope
+    // as the instance is elaborated, and a member typedef of a not-yet-
+    // elaborated instance (e.g. `vector<T,A>::reverse_iterator` reached
+    // through std::equal over reverse iterators) has an entry but no
+    // symbol.  namespacet::lookup asserts in that case, aborting the
+    // whole run; such an entry is simply not a usable candidate here.
+    if(!cpp_typecheck.symbol_table.has_symbol(id))
+      continue;
     const symbolt &s = cpp_typecheck.lookup(id);
 
     if(s.type.get(ID_specialization_of).empty())
@@ -6589,6 +6598,15 @@ resolved_after_strip:
     for(auto it = id_set.begin(); it != id_set.end();)
     {
       const irep_idt id = (*it)->identifier;
+      // See the note above: a scope entry may exist without its symbol
+      // (member of a class-template instance still being elaborated).
+      // It cannot be a template candidate here; drop it rather than
+      // asserting in namespacet::lookup.
+      if(!cpp_typecheck.symbol_table.has_symbol(id))
+      {
+        it = id_set.erase(it);
+        continue;
+      }
       const symbolt &s = cpp_typecheck.lookup(id);
       if(!s.type.get_bool(ID_is_template))
       {
