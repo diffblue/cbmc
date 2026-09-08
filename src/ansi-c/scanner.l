@@ -1026,6 +1026,8 @@ enable_or_disable ("enable"|"disable")
 "__is_enum"         { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_final"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_interface_class" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__builtin_lt_synthesizes_from_spaceship"/[ \t\r\n]*\( { /* clang >= 22; used by libc++ 22's __utility/default_three_way_comparator.h */ return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__builtin_lt_synthesizes_from_spaceship" { return make_identifier(); }
 "__is_layout_compatible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_nothrow_convertible" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
 "__is_pod"          { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
