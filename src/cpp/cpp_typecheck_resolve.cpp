@@ -10980,13 +10980,22 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     return false;
   }
   else if(
-    expr.id() == ID_symbol && !type.parameters().empty() &&
-    type.parameters().front().get_this())
+    expr.id() == ID_symbol && !fargs.has_object &&
+    !type.parameters().empty() && type.parameters().front().get_this())
   {
     // Instantiated template member function (symbol_exprt with this
     // parameter) called without an explicit object — add a synthetic
     // this for matching purposes. This includes calls with empty
     // operand lists (e.g., variadic methods called with no args).
+    // N5008 [over.match.funcs]/5: the implied object argument is
+    // CONTRIVED only when there is no object; when fargs already
+    // carries one (has_object, operands.front() is the object --
+    // e.g. resolving a member operator* inside a trailing-return
+    // decltype during deduction, where the candidate arrives as a
+    // plain symbol), prepending a second, synthetic object made every
+    // such candidate fail the arity check and silently drop
+    // ("no match for symbol 'map'", the 26-line trailing-decltype
+    // kernel).  Fall through to the direct match instead.
     const typet &object_type =
       to_pointer_type(type.parameters().front().type()).base_type();
     symbol_exprt object(irep_idt(), object_type);
