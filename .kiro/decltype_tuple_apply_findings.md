@@ -7283,3 +7283,41 @@ the pinned lookup kernels (classref shadowing, conversion operator).
 ANSWER: census 15 KNOWNBUGs (verified by desc-header count); every problem recorded in DOGFOODING.md
 or findings now has either a committed KNOWNBUG (minimal where we
 could) or an explicit negative-kernel/unpinned entry with repro path.
+
+## Round 84 (2026-09-08): three flips (range-for declarator, spaceship token, atomic fold); one parked
+
+FIX 1 (5b6446baa5, FLIP): range-for loop variable now merges its FULL
+DECLARATOR ([stmt.ranged]/1) in both the class-range and array
+branches -- `for(const symbolt *p : l)` previously declared p with the
+CLASS type, so p->x hunted for operator-> ([over.ref]).  The `auto`
+family keeps the old path: merging the declarator for `const auto&`
+DOUBLE-APPLIED the ref layers (cpp17_for_range_qualified_auto invariant
+crash caught it; guard = has_auto(decl type)).  Test simplified to an
+array-of-pointers carrier (the list variant only trips the KNOWN
+list-model imprecision: havoc'd element pointers at any unwind).
+FIX 2 (661b1340fd, FLIP): __builtin_lt_synthesizes_from_spaceship
+lexed as TOK_BINARY_TYPE_PREDICATE with the revertible '('-lookahead.
+Verified in the arch container: cures views_take_call_crash AND
+libcxx_compressed_pair_ref (the whole remaining arch residue).
+FIX 3 (d4e0ddbd17, FLIP): __atomic_always_lock_free folded in
+do_special_functions when size is constant ([expr.const]), mirroring
+the library model's answer (size <= pointer width).  Kernel green;
+ranges_basic did NOT cascade -- its operator| pipe expression STILL
+yields <<type:auto>> with the REAL __range_adaptor_closure (two
+conjunct constraints + decltype(auto) + concept-constrained params;
+next layer to kernel, the rb1 kernel's single-constraint shape is
+fixed but insufficient).
+PARKED (03d617dab5 desc enriched): the iterator-shadow no-match.
+Round-84 diagnosis CORRECTION recorded in the desc: the candidate IS
+the element's clear(enum); the enum-name-qualified ARGUMENT et::B
+fails to typecheck and fargs is starved.  The failure is STATEFUL
+(a fresh second typecheck of the same argument succeeds and the TU
+then converts, crashing later in symex assign_from_struct = another
+layer beneath).  A retry inside the argument loop did NOT reproduce
+that recovery -- root cause in qualified-enumerator lazy scope
+creation still open; two fix attempts failed on shifting evidence,
+stopped per the failure-loop rule.
+VALIDATION: five suites green.  Census 12: ranges_basic, regex pair,
+kind-mismatch, iterator-shadow, member-template-trailing-decltype,
+conversion-op-to-container, zip-ordering, unique_ptr-return,
+equal-reverse-crash, gcc16-optional, libcxx23-vector.
