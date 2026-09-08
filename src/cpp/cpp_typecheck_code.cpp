@@ -758,7 +758,19 @@ void cpp_typecheckt::typecheck_code(codet &code)
         deref_expr.copy_to_operands(sym_use(begin_id));
         typecheck_expr(deref_expr);
 
-        typet var_type = cpp_decl.type();
+        // N5008 [stmt.ranged]/1: the loop variable is declared with its
+        // FULL declarator (`for (symbolt *p : l)` declares a pointer).
+        // Taking only the declaration's type ignored the declarator's
+        // pointer/reference layers: `p` got the CLASS type, and `p->x`
+        // then resolved as an overloaded operator-> ([over.ref])
+        // instead of the built-in pointer access ("symbol 'operator->'
+        // is unknown"; the get_module.cpp dog-food shape).
+        // (Only for non-`auto` declarations: the `auto` family stores
+        // its cv/ref layers so that cpp_convert_auto below handles
+        // them; merging the declarator again would double-apply.)
+        typet var_type = has_auto(cpp_decl.type())
+                           ? cpp_decl.type()
+                           : declarator.merge_type(cpp_decl.type());
         // If the declared type contains `auto` (bare `auto`,
         // `const auto&`, `auto*`, `auto&`, etc.), deduce by
         // substituting `auto` with the type of `*__begin`.
@@ -861,7 +873,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
     // Resolve auto type — handle bare `auto`, `const auto&`,
     // `auto*`, `auto&`, etc. by substituting the array element
     // type into any `auto` token within the declared type.
-    typet var_type = cpp_decl.type();
+    // N5008 [stmt.ranged]/1: merge the full declarator, as in the
+    // class-range branch above (`const symbolt *p` is a pointer).
+    typet var_type =
+      has_auto(cpp_decl.type())
+        ? cpp_decl.type()
+        : cpp_decl.declarators().front().merge_type(cpp_decl.type());
     if(has_auto(var_type))
       cpp_convert_auto(var_type, elem_type, get_message_handler());
     typecheck_type(var_type);
