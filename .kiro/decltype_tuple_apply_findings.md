@@ -7381,3 +7381,47 @@ FLIPPED cpp11_member_template_trailing_decltype -> CORE; revert-tested
 Census 11: ranges_basic, regex pair, kind-mismatch, iterator-shadow,
 conversion-op, zip-ordering, unique_ptr-return, equal-reverse-crash,
 gcc16-optional, libcxx23-vector.
+
+## Round 87 (2026-09-08): TWO cpp17 flips (conversion-op scan, partial ordering)
+
+FLIP 1 (68335e1915) cpp17_conversion_operator_to_container:
+[temp.deduct.conv] candidate scan keyed member symbols by the tag
+symbol's pretty_name ("ranget::"), but a class-template INSTANCE
+registers members under the instance scope prefix
+("ranget<ptr_signed_int>::"), so a template conversion operator
+declared in a class template was never a candidate.  Take the prefix
+from the class's registered scope.  Bisection: c1 (non-template class)
+passed, c2 (class template) failed -> the instance prefix.
+RESIDUAL pinned as NEW KNOWNBUG cpp17_functional_cast_deduced_param_
+vector: inside the instantiated operator, `C(begin(), end())` with
+C = std::vector fails ("no match for symbol 'C'").
+FLIP 2 (e845445b28 + 1a00eb46d7) cpp17_overload_template_default_nontype
+-- TWO defects in one helper:
+(a) [temp.deduct.partial]/12: a parameter of the more-general template
+    may stay WITHOUT A VALUE if it is not used in the compared types.
+    The helper required ALL parameters deduced, so any pair carrying a
+    leading defaulted non-type parameter (range.h's
+    `template <bool same_size = true, class C> zip(C&)`) was
+    unorderable in BOTH directions.  Restrict the check to parameters
+    occurring in the compared types.
+(b) [temp.deduct.type]/3: after (a) both directions SUCCEEDED (still
+    unordered) because a template-id pattern `ranget<OtherIt>` matched
+    an unrelated bare cpp_name (the other template's parameter) and
+    bound OtherIt to nothing meaningful.  Require the template names to
+    match; ordering becomes asymmetric and the more specialised
+    overload wins.
+Both revert-tested; five suites green.
+NOT FIXED, diagnosed and recorded in its desc:
+cpp17_unique_ptr_derived_return -- the switch is irrelevant (single
+converting return fails identically; direct-init works).  Root:
+typecheck_return materialises through a constructor only when the
+return type has a DESTRUCTOR and skips already-temporary operands, so a
+converting temporary of a different class type reaches
+implicit_typecast ([stmt.return]/2 + [dcl.init.general]/16.6.1 require
+the converting constructors).  Routing such operands through
+new_temporary FIXES the conversion (kernel u2 verifies) but leaves a
+type-inconsistent assignment that trips goto-symex's symex_assign
+invariant -- reverted; that second layer is the remaining work.
+PROCESS SLIP: commit 68335e1915 mixed src + tests (the standing rule is
+separate commits); noted rather than rewritten.
+Census 11.
