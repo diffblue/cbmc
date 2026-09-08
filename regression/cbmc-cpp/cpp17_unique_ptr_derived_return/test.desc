@@ -20,9 +20,15 @@ converting temporary of a different class type therefore falls through
 to implicit_typecast, which knows no user-defined conversion
 ([stmt.return]/2 + [dcl.init.general]/16.6.1 require considering the
 CONVERTING constructors, [unique.ptr.single.ctor]/26).
-An experiment routing such operands through new_temporary DOES make
-the conversion succeed (kernel u2 verifies), but leaves a
-type-inconsistent assignment that trips goto-symex's
-symex_assign invariant (lhs.type() == rhs.type()) -- the temporary is
-built with the source type somewhere downstream.  Reverted; the
-remaining work is that second layer.
+ROUND-88 UPDATE: the front-end defect IS FIXED (see CORE
+cpp17_converting_return_move_ctor, a header-free carrier of exactly
+this shape, and the commit "converting constructors for class-typed
+return operands").  What remains in THIS test is a DEEPER layer inside
+libstdc++'s unique_ptr: with the conversion now performed, symbolic
+execution aborts on symex_assign's invariant (lhs.type() == rhs.type())
+assigning a raw `pointer` to a
+`unique_ptr<const timestampert, default_delete<...>>` -- i.e. the
+converting constructor's own instantiation (the __uniq_ptr_data /
+tuple-of-pointer internals) produces a mistyped member assignment.
+That internals layer is the remaining work; the test is kept as its
+carrier.
