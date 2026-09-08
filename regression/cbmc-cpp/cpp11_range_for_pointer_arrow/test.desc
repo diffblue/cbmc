@@ -1,7 +1,7 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11 --object-bits 12
-^\[main\.assertion\.1\] line \d+ arrow on pointer element of list range-for: SUCCESS$
+--cpp11
+^\[main\.assertion\.1\] line \d+ arrow on pointer element of range-for: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
