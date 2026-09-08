@@ -7321,3 +7321,38 @@ VALIDATION: five suites green.  Census 12: ranges_basic, regex pair,
 kind-mismatch, iterator-shadow, member-template-trailing-decltype,
 conversion-op-to-container, zip-ordering, unique_ptr-return,
 equal-reverse-crash, gcc16-optional, libcxx23-vector.
+
+## Round 85 (2026-09-08): trailing-decltype KNOWNBUG reduced 45->26 lines + mechanism located
+
+DIAGNOSIS ARC (no fix landed; src tree unchanged, all probes reverted):
+- Kernel bisection: t1 (non-template, int member) PASSES; t2 (class
+  template, raw-pointer member) PASSES; t5 (struct-ref lambda, pointer
+  member) PASSES; t6 (USER operator* iterator) FAILS -> the user
+  operator* inside the trailing decltype is load-bearing.  26-line
+  header-free kernel committed (was 45 lines + <map>/<string>).
+- Probe chain (sfinae passthrough -> RES-IDSET -> FIN-PRE/POST -> CAND
+  -> FM tags in cpp_typecheck_fargst::match): during
+  guess_function_template_args' typecheck_type of the trailing
+  decltype, resolving `operator*` on the member finds the candidate
+  (id_set n=1, itert::operator*($constthis)) but
+  cpp_typecheck_fargst::match sees ops=2 (BOTH struct_tag itert -- the
+  implied object DUPLICATED) vs params=1 (this) -> FM2 arity bail ->
+  candidate silently dropped -> "no match for symbol 'map'".
+- At the operator_is_overloaded resolve site nops=1/has_obj=1 (correct)
+  -- the duplication happens INSIDE resolve between the id_set lookup
+  and match; the exact site was not identified (convert_identifiers'
+  member-expr synthesis + typecheck_expr_member re-resolution is the
+  prime suspect; the 6809 convert_identifiers probe did NOT fire for
+  this call, so the candidate flows through another path).
+- gdb bt at FM2 confirms the whole chain sits under
+  guess_function_template_args -> typecheck_type -> typecheck_expr.
+PROCESS NOTE: line-number-based probe insertion broke the build twice
+(lambda capture, statement splice) -- prefer anchored string edits with
+compile verification per probe round.
+Also re-confirmed on today's build: conversion-op-to-container and
+zip-ordering KNOWNBUGs still fail as recorded.  Suites untouched
+(src unchanged); spot-run of the five recently-flipped tests green.
+NEXT: find the object-duplication site (one targeted probe in
+convert_identifier's typecheck_expr_member call and in
+typecheck_expr_member's fargs handling), fix, then sweep the cpp17
+lookup/conversion quartet.
