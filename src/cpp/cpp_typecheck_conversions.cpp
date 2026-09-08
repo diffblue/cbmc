@@ -9,6 +9,9 @@ Author:
 /// \file
 /// C++ Language Type Checking
 
+#include <functional>
+#include <set>
+
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -1103,12 +1106,87 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
       // pointer types) match guess_template_args' ID_pointer branch rather
       // than its frontend variant.
       cpp_convert_plain_type(A, get_message_handler());
+
+      // N5008 [temp.deduct.type]/3: a P of the form TT<args> is matched
+      // only by an A that is a specialization of the same template TT.
+      // Both P and A are still unresolved cpp_names here (the compared
+      // patterns are taken from the DECLARATIONS), and matching a
+      // template-id pattern against an unrelated bare name would bind
+      // the pattern's arguments to nothing meaningful -- making
+      // deduction succeed in BOTH directions for e.g. range.h's
+      // `zip(ranget<OtherIt>)` vs `zip(containert &)` and leaving the
+      // pair unordered (reported ambiguous instead of selecting the more
+      // specialised overload).  Reject the mismatch here.
+      if(
+        P.id() == ID_cpp_name && A.id() == ID_cpp_name &&
+        !P.get_sub().empty() && !A.get_sub().empty())
+      {
+        bool p_has_args = false;
+        for(const auto &sub : P.get_sub())
+          if(sub.id() == ID_template_args)
+            p_has_args = true;
+        if(
+          p_has_args && P.get_sub().front().get(ID_identifier) !=
+                          A.get_sub().front().get(ID_identifier))
+        {
+          return false;
+        }
+      }
+
       resolver.guess_template_args(P, A);
     }
 
     cpp_template_args_tct guessed =
       template_map.build_template_args(G.template_type());
-    return !guessed.has_unassigned();
+
+    // N5008 [temp.deduct.partial]/12: for partial ordering a template
+    // parameter of G may remain WITHOUT A VALUE provided it is not used
+    // in the types being compared.  Requiring every parameter to be
+    // deduced made any candidate pair whose templates carry a parameter
+    // absent from the parameter-type-list -- e.g. the leading defaulted
+    // non-type parameter of CBMC's own range.h
+    // `template <bool same_size = true, class C> ... zip(C &)` --
+    // unorderable in BOTH directions, so the more specialised overload
+    // never won and the call was reported ambiguous ("does not uniquely
+    // resolve").  Require values only for the parameters that actually
+    // occur in the compared types.
+    std::set<irep_idt> used_names;
+    std::function<void(const irept &)> collect_names =
+      [&](const irept &node) {
+        if(node.id() == ID_cpp_name)
+        {
+          for(const auto &sub : node.get_sub())
+            if(sub.id() == ID_name)
+              used_names.insert(sub.get(ID_identifier));
+        }
+        for(const auto &sub : node.get_sub())
+          collect_names(sub);
+        for(const auto &named : node.get_named_sub())
+          collect_names(named.second);
+      };
+    for(const auto &gp : G_params)
+      collect_names(gp.type());
+
+    const auto &g_params_decl = G.template_type().template_parameters();
+    const auto &guessed_args = guessed.arguments();
+    for(std::size_t pi = 0; pi < g_params_decl.size(); ++pi)
+    {
+      if(pi >= guessed_args.size())
+        break;
+      const exprt &arg = guessed_args[pi];
+      if(arg.id() != ID_unassigned && arg.type().id() != ID_unassigned)
+        continue;
+      const irep_idt pid = g_params_decl[pi].id() == ID_type
+                             ? g_params_decl[pi].type().get(ID_identifier)
+                             : g_params_decl[pi].get(ID_identifier);
+      std::string short_name = id2string(pid);
+      const auto sep = short_name.rfind("::");
+      if(sep != std::string::npos)
+        short_name = short_name.substr(sep + 2);
+      if(used_names.count(irep_idt{short_name}) != 0)
+        return false; // a compared-type parameter stayed undeduced
+    }
+    return true;
   }
   catch(...)
   {
