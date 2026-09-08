@@ -7425,3 +7425,36 @@ invariant -- reverted; that second layer is the remaining work.
 PROCESS SLIP: commit 68335e1915 mixed src + tests (the standing rule is
 separate commits); noted rather than rewritten.
 Census 11.
+
+## Round 88 (2026-09-08): reverse_iterator CRASH fixed; converting-return fixed
+
+FLIP (c5cd3edf52 + 5186cc5fe7) cpp17_equal_reverse_iterator_crash:
+a cpp SCOPE ENTRY may exist without its SYMBOL -- members of a
+class-template instance are registered as the instance is elaborated,
+so a member typedef of a not-yet-elaborated instance
+(`vector<T,A>::reverse_iterator`, reached through std::equal over
+reverse iterators with std::next) has an entry but no symbol.  TWO
+resolution loops looked such entries up unconditionally and
+namespacet::lookup's invariant aborted the run.  Guarded both with the
+has_symbol check the THIRD, adjacent loop already performed.  This was
+the LAST dog-food CRASH: src/util/simplify_expr.cpp now compiles with
+goto-cc (dog-food src/util: 0 fail / 0 crash).
+FIX + NEW CORE (8ab4415d4a + a936bd841f)
+cpp17_converting_return_move_ctor: [stmt.return]/2 +
+[dcl.init.general]/16.6.1 -- the result object is copy-initialized from
+the operand, considering CONVERTING constructors.  typecheck_return
+materialised through a constructor only when the return type had a
+DESTRUCTOR and skipped already-temporary operands, so a converting
+temporary of a different class type reached implicit_typecast.  Now such
+operands go through new_temporary too.  Verified by a 56-line
+header-free carrier (own uptr with a converting move ctor).
+cpp17_unique_ptr_derived_return stays KNOWNBUG but its desc now records
+that the FRONT-END defect is fixed and what remains is a libstdc++
+INTERNALS layer: with the conversion performed, symex_assign's
+invariant fires assigning a raw pointer to
+unique_ptr<const timestampert, default_delete<...>> (the
+__uniq_ptr_data/tuple member init is mistyped).
+NEGATIVE RESULTS: u4/u5 (switch variants with an extra same-type or
+nullptr-ctor return) still report "no match for symbol 'uptr'" -- a
+SEPARATE explicit-constructor-call issue, not the return conversion.
+Five suites green after each fix.  Census 9.
