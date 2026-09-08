@@ -7356,3 +7356,28 @@ NEXT: find the object-duplication site (one targeted probe in
 convert_identifier's typecheck_expr_member call and in
 typecheck_expr_member's fargs handling), fix, then sweep the cpp17
 lookup/conversion quartet.
+
+## Round 86 (2026-09-08): trailing-decltype FIXED and FLIPPED — two implied-object defects
+
+The round-85 "ops=2" was pinned with one more probe (struct tags of
+both operands): ops = [SYNTHETIC anonymous itert symbol, this->b_
+ptrmember].  Root pair (commit in cpp_typecheck_resolve.cpp +
+cpp_typecheck_conversions.cpp):
+1. [over.match.funcs]/5: disambiguate's plain-symbol member branch
+   contrived a synthetic this WITHOUT checking fargs.has_object ->
+   arity bail (FM2).  Guarded.
+2. After 1, the balanced match still failed: NOCONV probe showed the
+   implied object (ptrmember this->b_) carried lvalue=0 in the
+   deduction context, and the C_this reference-binding gate rejected
+   non-lvalues.  [expr.ref]/2 + [expr.unary.op]/1 make -> member
+   access an lvalue BY FORM; the gate now accepts ID_ptrmember (as it
+   already did temporaries/member chains).
+CASCADES: t3 (map iterator) and t4 (vector-of-pair) shapes now pass;
+options.cpp dog-food still 2 noisy errors (separate <<type:auto>>
+family) but the member-template no-match family is cleared.
+cpp17 quartet unchanged (separate roots).
+FLIPPED cpp11_member_template_trailing_decltype -> CORE; revert-tested
+(vacuous without fixes); five suites green.
+Census 11: ranges_basic, regex pair, kind-mismatch, iterator-shadow,
+conversion-op, zip-ordering, unique_ptr-return, equal-reverse-crash,
+gcc16-optional, libcxx23-vector.
