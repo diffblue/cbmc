@@ -1925,3 +1925,31 @@ exactly (d2); `std::map<int, non-default-constructible>` using only
 emplace/find (d3); the unordered_map variant (d4).  The harness itself
 is the carrier until the eager-instantiation trigger is isolated (a
 99k-line preprocessed pin was judged disproportionate).
+
+### cvise reduction of the goto-symex FAILs (started 2026-09-08)
+
+Minimal reproducing INPUT found by header bisection: a two-line
+translation unit
+
+    #include <goto-symex/goto_symex_state.h>
+    int main(){return 0;}
+
+shows BOTH signatures.  `goto-symex/goto_state.h` alone (which declares
+goto_statet) does NOT -- the trigger needs goto_symex_state.h, whose
+`std::vector<threadt>` (threadt has only `explicit threadt(guard_managert&)`)
+reaches framet's goto_statet containers.
+
+cvise runs on that TU preprocessed (97k lines) with a cheapest-first
+gate: grep for goto_statet, then `g++ -std=c++17 -fsyntax-only -Werror
+-Wno-deprecated-declarations` (~1.3s), then
+`cbmc --cpp17` must report "is not accessible" (~86s -- the gate cost is
+dominated by CBMC type-checking a libstdc++-heavy TU, which is itself a
+known performance characteristic).  Expect a long run; the working
+directory is /tmp/cv89.
+
+Additional negative kernel (round 88): d5 -- `std::vector<threadt>`
+where threadt holds `std::vector<framet>` and framet holds
+`std::map<int, std::vector<statet>>` with statet non-default-
+constructible, exercised only through emplace_back/push_back -- is
+ACCEPTED by the front end (no signature).  So the trigger is not the
+plain nested-container shape.
