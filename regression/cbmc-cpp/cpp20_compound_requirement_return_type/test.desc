@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ absent operator- => false: SUCCESS$
+^\[main\.assertion\.2\] line \d+ present operator- => true: SUCCESS$
+^\[main\.assertion\.3\] line \d+ int => true: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: assertions 2 and 3 FAIL -- the return-type-requirement of a
+compound requirement is never satisfied.
