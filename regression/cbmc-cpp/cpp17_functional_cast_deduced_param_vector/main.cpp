@@ -24,13 +24,7 @@ struct ranget
     return C(begin(), end());
   }
 };
-int sum(const std::vector<int> &v)
-{
-  int s = 0;
-  for(int x : v)
-    s += x;
-  return s;
-}
+int sum(const std::vector<int> &v);
 int main()
 {
   int arr[3] = {1, 2, 3};
