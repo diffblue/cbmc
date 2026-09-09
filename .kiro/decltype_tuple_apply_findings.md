@@ -7546,3 +7546,33 @@ Also negative this round: rb2 (CRTP closure friend with TWO conjunct
 constraints, concept-constrained parameters and decltype(auto)) PASSES,
 so that shape is not the ranges_basic blocker either.
 Census 10.
+
+## Round 90 addendum: compound-requirement root sharpened; libc++-23 pin reduced
+
+COMPOUND REQUIREMENT, layer 2 ROOT (sharper, recorded in the desc):
+dumping the substituted concept body shows it is BYTE-IDENTICAL for the
+satisfied and unsatisfied cases -- the template argument is an
+`ambiguous` node with an EMPTY type, i.e. the reference to the concept's
+own parameter is NOT RECOVERABLE from the stored body.  Neither
+template_mapt::apply nor an added by-name walk over `template_args`
+arguments can substitute it (there is no name to match; the walk was
+implemented, changed nothing, and was reverted).  The verdict therefore
+comes from ambient template_map/scope state when `is_int_<...>` is
+resolved -- plain `int` picked the primary (false), `const int` picked
+the specialization (true), both for the wrong reason.  Verified that
+`is_int_<int>`, `is_int_<decltype(a-b)>` and `is_int_<decltype((a-b))>`
+all resolve CORRECTLY outside a requires-expression, so ordinary
+specialization matching is sound.  The fix must make the parameter
+recoverable in the stored body (or route the concept check through the
+normal instantiation path with explicit arguments).
+LIBC++-23 PIN REDUCED: the wrong-verdict carrier is now a TEN-LINE
+program -- one push_back into an empty vector, then size() and [0] --
+both assertions FAIL (was a 24k-line preprocessed copy of
+cpp20_vector_basic_libcxx).  g++ runs it correctly.  libc++ 23 replaced
+vector's three-pointer representation with a `__layout_` member
+(__vector/layout.h; size() is `__layout_.__size()`, and there are
+pointer-based AND size-based layout variants), so CBMC's vector model
+faces a new internal shape.  That is the concrete lead for this
+soundness-relevant class.
+Reduction unaffected all round (94839 lines, 15 workers); all work done
+in build-work against the frozen gate binary.  Census 10.
