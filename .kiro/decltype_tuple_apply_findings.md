@@ -7616,3 +7616,37 @@ PROCESS: the `for p in $(pgrep -f cvise)` kill loop killed the driving
 shell for the THIRD time, and that shell's heredoc write of the
 tightened gate was lost, so a loose gate silently stayed in place.
 /tmp/killcv.sh now does a cwd-matched kill that skips the caller; use it.
+
+## Round 92 (2026-09-09): cv91 artifact, two more negative kernels, new soundness KNOWNBUG
+
+cv91 FINISHED at 28 lines but had drifted into ill-formed C++ (no host
+compiler can gate libc++-23 code) AND was degenerate w.r.t. the root:
+it had DELETED the out-of-line definition, so "member has no body" was
+trivially true.  Kept as /tmp/cv91/reduced28.cpp -- still useful, it
+recovered the SKELETON: vector holding a `__vector_layout` member,
+`reserve` defined out of line calling `layout_.relocate(v)`, the
+parameter type a member alias to a forward-declared 3-parameter
+template whose third argument is a template TEMPLATE parameter used
+CRTP-style.
+HAND KERNELS from that skeleton (sk1, sk2) both VERIFY CLEAN -- five
+negative kernels in total.  So the recovered skeleton is insufficient;
+something else in the real headers is required.
+RELAUNCHED cv91 with a gate that additionally requires the out-of-line
+DEFINITION text to survive (and rejects the old 28-line artifact,
+verified before launch).  22.5k -> 10.7k lines within the round.
+PROBE RESULT (important): find_out_of_line_body is NEVER CALLED for
+__relocate -- the member is not even considered for body attachment.
+With its recorded type being `auto (...) -> void` although declared
+`void`, the DECLARATION's conversion is the prime suspect, not the
+matching logic.  That is the next place to look.
+NEW KNOWNBUG bodyless_call_no_havoc (12 lines): a call to a function
+with NO BODY is modelled as a NO-OP, so `x == 1` after `mutate(&x)`
+(declared, never defined) is PROVED.  With unwinding assertions a
+"no body for callee" property does fail, but the assertion still
+succeeds (unsound reasoning, at least flagged); with
+--no-unwinding-assertions there is no diagnostic at all and the run
+reports VERIFICATION SUCCESSFUL.  This is exactly why the libc++-23
+wrong verdict is silent, and it is a general soundness gap in its own
+right -- CBMC semantics, not a C++ conformance issue.
+Census 12.  cv89 at 45.8k lines (37% through its pass list), cv91
+running; all work continues in build-work against frozen gate binaries.
