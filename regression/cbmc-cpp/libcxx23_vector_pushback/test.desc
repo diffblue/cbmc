@@ -22,18 +22,34 @@ ROUND-90 DIAGNOSIS (bisected):
   definition (layout.h:290) was never matched to the in-class
   declaration (layout.h:196), so the odr-used member has no body
   ([temp.inst]/1 requires implicit instantiation when odr-used).
-- The call is NOT flagged: no "no body for callee" property appears
-  (CBMC does emit those elsewhere), so the state simply never changes
-  and the wrong answer is SILENT.  That missing flag is a second,
-  separable soundness gap.
+- The call is NOT flagged and the wrong answer is SILENT.  Round-91
+  follow-up explains why twice over: goto-symex emits "no body for
+  callee" only when unwinding assertions are enabled
+  (symex_function_call.cpp), and this test needs
+  --no-unwinding-assertions; but even WITH them enabled no property
+  appears, because the callee has NO goto-function entry at all (only
+  the CALL instruction exists), so the missing-body path is never
+  reached.  A call to a function with no entry silently does nothing --
+  a separable soundness gap worth its own fix.
 - NEGATIVE KERNELS (round 90, both VERIFY clean): oo1 -- out-of-line
   definition of a class-template member whose parameter type is a
   MEMBER ALIAS; oo2 -- the same with `constexpr` plus libc++'s three
   attributes (visibility / exclude_from_explicit_instantiation /
   abi_tag) on the in-class declaration only.  So neither the member
   alias nor the attribute asymmetry is the trigger.
-- REMAINING LEAD: the parameter type is
-  `__split_buffer<T, A, __split_buffer_pointer_layout>`, and
-  `__split_buffer` derives CRTP-style from its own template TEMPLATE
-  parameter: `class __split_buffer : _Layout<__split_buffer<T,A,_Layout>,
-  T, A>`.  That TT-parameter CRTP shape is the next thing to kernel.
+- FIVE negative kernels now (oo1-oo3 round 90; sk1, sk2 round 91): the
+  full skeleton recovered by cvise -- vector holding a
+  `__vector_layout` member, `reserve` defined OUT OF LINE calling
+  `layout_.relocate(v)`, the parameter type a member alias to a
+  forward-declared 3-parameter template whose third argument is a
+  template TEMPLATE parameter used CRTP-style, definitions supplied
+  after the declarations -- VERIFIES CLEAN when hand-written.  So the
+  trigger needs something still unidentified from the real headers.
+- Diagnostic fact from a probe: find_out_of_line_body is NEVER CALLED
+  for __relocate, so the member is not even considered for body
+  attachment; combined with its recorded return type `auto (...) -> void`
+  (declared `void`), the DECLARATION itself is likely what fails to
+  convert.  That is where to look next.
+- A reduction with a gate that pins the driver, requires the
+  out-of-line DEFINITION text to survive, and requires the member to
+  remain bodyless is running in /tmp/cv91.
