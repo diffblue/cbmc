@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp20 --show-symbol-table
+^Symbol\.+: sb_layout<tag-sbuf<signed_int,signed_int,template\.sb_layout<Type0,Type1,Type2>>
+^EXIT=0$
+^SIGNAL=0$
+--
+template_parameter_symbol_type
+--
+Pins [temp.type]/1 canonical naming of template TEMPLATE arguments: the
+instantiated name must not embed an internal parameter placeholder.
