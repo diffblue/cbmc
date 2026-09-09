@@ -7855,3 +7855,33 @@ EXPLICITLY deleted default constructor -- consistent with the separate
 [temp.inst]/11 eager-instantiation issue, not with this access bug.
 Three reductions: cv89 DONE (6 lines), cv91 running, cv97 at 22 lines.
 Census 12.
+
+## Round 98 (2026-09-09): FIX LANDED for the six-line root; cv97 delivered 11 lines
+
+FIX (66d1a0e76f, FLIP 8e5eafe0e1): implicit ctor/dtor bodies may name
+their class's OWN members.  Implementation detail that matters: a new
+exact-match context (implicit_definition_class, set by an RAII guard in
+convert_function for #is_implicit_ctor / #is_implicit_dtor bodies) is
+consulted at the TOP of check_component_access, and only for components
+that are NOT from_base.  The earlier coarse attempt (switching
+disable_access_control on for such bodies) fixed the kernel but broke
+regression/cpp/Protection1; this version keeps Protection1 and
+Protection2 rejecting correctly.  Note the first placement attempt also
+failed silently because the guard was inserted after an early return in
+check_component_access -- confirm probes actually FIRE before drawing
+conclusions.
+Revert-tested (2 errors without the fix, none with); five suites green;
+cpp11_private_member_dmi_default_ctor flipped to CORE.
+cv97 FINISHED: the conversion-operator functional-cast reproducer is now
+ELEVEN lines and needs no function bodies at all --
+  struct ranget { int *begin() const; int *end() const;
+                  template <class C> operator C() const
+                  { return C(begin(), end()); } };
+  int sum(std::vector<int>);  ranget r; sum(r);
+committed in place of the previous 30-line version.
+Dog-food status after the fix: both goto-symex files still report
+`goto_statet::goto_statet(this) is not accessible`, which is the
+header's EXPLICITLY deleted default constructor -- the separate
+[temp.inst]/11 eager-instantiation issue, now the only remaining layer
+there.
+Census 11.  cv91 (libc++-23) still running.
