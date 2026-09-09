@@ -7960,3 +7960,29 @@ discarding the candidate ([temp.inst]/1, [temp.deduct]/8: only the
 declaration is needed to decide a candidate).  Two ordered fix
 candidates recorded in the desc.
 Census 10.
+
+## Round 101 (2026-09-09): conversion-operator path corrected; two attempts recorded
+
+Worked fix candidate (a) for cpp17_functional_cast_deduced_param_vector:
+mark Phase-3 instances with `#conversion_exploration` and drop such
+bodies silently when they fail.  RESULT: not a fix -- the "found no
+match for symbol 'C'" errors persisted, main stayed dropped, and a NEW
+first error appeared (`stl_vector.h:707: symbol 'vector' does not
+uniquely resolve`), so nil-ing those bodies perturbs later resolution.
+Reverted.
+Then followed the recorded next step and got the decisive correction: a
+probe on the deferred-body drain shows the ONLY body failure reported
+there is `main` itself.  The operator-body errors carry the operator's
+function context but are emitted while MAIN's body is being converted --
+i.e. the instantiated operator's body is converted INLINE during
+conversion exploration, OUTSIDE Phase 3's sfinae_contextt, and escapes as
+an error-count increase that fails main.
+So the fix is: convert the instantiated conversion operator's body inside
+the sfinae context (or discard candidates whose body conversion raises
+errors).  Deliberately not rushed at the end of a round; recorded in the
+desc.
+Also confirmed this round: Phase 3 ALREADY wraps instantiate_template in
+sfinae_contextt, so the declaration side is fine -- only the body path
+leaks.
+cv98 at 95026 lines and healthy.  Census 10; tree clean; five suites
+green on the committed tree (compound-requirement fix from round 100).
