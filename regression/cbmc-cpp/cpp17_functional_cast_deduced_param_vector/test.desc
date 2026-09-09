@@ -26,3 +26,12 @@ allocator<int>> instead of vector itself ([class.conv.fct] +
 [over.match.ctor]).  A one-line workaround exists in user code (use a
 named member template), which is why this layer only surfaces through
 libc++/CBMC-style ranges adaptors.
+ROUND-96 reduction (cvise with a real g++ -Werror gate): `sum` needs no
+BODY -- a declaration suffices, so the failure is purely in converting
+`ranget` to `const std::vector<int>&` at the call.  (With no body the
+expected verdict is a nondet result, so this test asserts the FRONT END
+resolves the conversion: currently it reports "found no match for
+symbol 'C'".)  A hand-written vector-like target with default, copy and
+SFINAE-free iterator-pair constructors does NOT reproduce (kernel fc11),
+so libstdc++'s real vector -- most likely its constrained iterator-pair
+constructor -- is required.
