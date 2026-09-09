@@ -1,12 +1,14 @@
 KNOWNBUG
 main.ii
 --cpp20 --unwind 5 --no-unwinding-assertions --object-bits 12
-^\[main\.assertion\.1\] line \d+ vector size: SUCCESS$
+^\[main\.assertion\.1\] line \d+ size after one push_back: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value after one push_back: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-Currently: "vector size: FAILURE" -- wrong verdict on a correct
-program (SOUNDNESS-relevant divergence class, unlike the vacuous
-drops).  Representative of the 35-test tumbleweed/libc++-23 layer.
+Currently: BOTH assertions FAIL -- a wrong verdict on a correct program
+(soundness-relevant, unlike the vacuous-drop KNOWNBUGs).  The source is
+ten lines; only the libc++-23 headers are needed to reproduce, hence
+the preprocessed carrier.
