@@ -11,3 +11,21 @@ main.cpp
 --
 Currently: assertions 2 and 3 FAIL -- the return-type-requirement of a
 compound requirement is never satisfied.
+Round-90 diagnosis (TWO stacked defects, both located):
+1. [temp.constr.atomic]/1: the concept's normalised body must be
+   CONTEXTUALLY CONVERTED to bool.  A concept over a trait member
+   (`static const bool value`) folds to a c_bool constant, which
+   exprt::is_true() does not recognise, so every SATISFIED
+   return-type-requirement read as unsatisfied.  Converting the
+   constant (as cpp_typecheck_resolve.cpp's tri-state evaluator already
+   does for requires-clauses) fixes assertion 3.
+2. With that applied, assertion 2 (class with a MEMBER operator-) still
+   fails: the concept body `is_int_<decltype((E))>::value` evaluates
+   FALSE because the explicit specialization is not selected for the
+   substituted type inside the requirement evaluation.
+DO NOT land fix 1 alone: it makes previously-(wrongly)-unsatisfied
+requirements satisfied and regressed 18 cbmc-cpp tests
+(cpp20_vector_*, cpp20_span*, cpp20_ranges_basic, cpp20_erase_if*,
+iterator_traits/concept chains) -- the surrounding C++20 library
+machinery currently depends on the wrong answer.  Both layers must land
+together, ideally with fix 2 first.
