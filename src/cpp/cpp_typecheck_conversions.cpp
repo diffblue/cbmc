@@ -1495,27 +1495,6 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   if(instance == nullptr)
     return nullptr;
 
-  // N5008 [temp.inst]/1 and [temp.deduct]/8: only the DECLARATION of a
-  // conversion function is needed to decide whether a conversion
-  // candidate exists.  Many of the instances created here are LOSING
-  // explorations: resolving a call that constructs a class considers a
-  // user-defined conversion to EVERY candidate constructor's parameter
-  // type, so `template <class C> operator C()` gets instantiated with
-  // C = std::allocator<int>, C = std::initializer_list<int>, ... and the
-  // body `C(begin(), end())` is ill-formed for those.  The body is queued
-  // and converted later by typecheck_method_bodies, OUTSIDE this SFINAE
-  // context, where the failure was reported and left the CALLER's body
-  // incomplete (main dropped, so the whole harness verified vacuously).
-  // Mark the instance so that the drain converts its body with errors
-  // suppressed and simply drops the body if it does not check out: a
-  // losing candidate's body is never called, and the selected
-  // conversion's body converts normally.
-  {
-    symbolt *inst_w = symbol_table.get_writeable(instance->name);
-    if(inst_w != nullptr)
-      inst_w->type.set(ID_C_conversion_exploration, true);
-  }
-
   // The instantiated symbol's type is `code_typet` with one
   // implicit `this` parameter (a pointer).
   if(instance->type.id() != ID_code)
