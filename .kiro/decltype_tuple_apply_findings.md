@@ -7986,3 +7986,44 @@ sfinae_contextt, so the declaration side is fine -- only the body path
 leaks.
 cv98 at 95026 lines and healthy.  Census 10; tree clean; five suites
 green on the committed tree (compound-requirement fix from round 100).
+
+## Round 102 (2026-09-09): the conversion-operator bug is a missing [over.best.ics]/4
+
+Chased cpp17_functional_cast_deduced_param_vector to its actual root and
+had to CORRECT two earlier claims along the way.
+What was tried and REVERTED (three no-ops, each measured):
+  1. a sfinae guard around cpp_typecheck_fargst::match ([over.match.viable]
+     reading) -- error multiset IDENTICAL;
+  2. saving/restoring `pending_no_viable_call` across sfinae_contextt --
+     no effect on the outcome;
+  3. marking Phase-3 conversion instances `#conversion_exploration` and
+     routing their bodies through the drain's suppressing path -- five
+     suites GREEN, but a proper revert test (rebuild with and without,
+     rather than comparing to the STALE frozen binary) gives an IDENTICAL
+     error list.  Committed as e0c1bca951 on the strength of the bad
+     comparison, then REVERTED in 8fbce79be0 with the correction in the
+     message.  Lesson re-learned the hard way: `build/` is frozen at an
+     OLD revision, so it is a gate reference, NEVER a revert test.
+Diagnostic route that worked: trap at the error-emission site
+(cpp_typecheck_resolve.cpp's "found no match for symbol") under gdb.
+That showed the failure is reported from typecheck_method_bodies ->
+convert_function WITHOUT throwing -- which is why an earlier probe placed
+in the catch branch only ever saw `main`.
+THE ROOT CAUSE: the FIRST error is `symbol 'vector' does not uniquely
+resolve` listing four vector constructors, all viable for one `ranget`
+argument via ranget's `template <class C> operator C()`.  g++ 13 and
+clang++ both accept the program, because N5008 [over.best.ics]/4
+excludes USER-DEFINED CONVERSION SEQUENCES when the target is the first
+parameter of a constructor that is a candidate by [over.match.copy] --
+i.e. exactly copy-initialization of a class, which is what passing `r`
+to `sum(std::vector<int>)` is.  With that rule all four constructors are
+non-viable and only ranget's own conversion function survives, with C
+deduced as std::vector<int>.
+One rule explains BOTH layers: it removes the ambiguity and stops the
+bogus C = allocator / C = initializer_list explorations at the root, so
+the losing-candidate body failures never arise.  CBMC has no flag for
+this today; the implementation sketch (RAII guard on the
+user_defined_conversion_sequence -> new_temporary -> cpp_constructor
+path, not leaking into nested initializations, and NOT set for
+direct-initialization) is recorded in the test's desc.
+Census 10; tree clean; cv98 healthy.
