@@ -7718,3 +7718,30 @@ suspected mechanism and a hygiene defect worth fixing on its own.
 NINE negative kernels now (oo1-oo3, sk1, sk2, lv1-lv4).  The sound
 container-validated cv91 reduction is the instrument that should isolate
 the remaining delta.
+
+## Round 95 (2026-09-09): FIX LANDED — canonical template-template-argument naming
+
+Root (round 94) turned into a fix: a template TEMPLATE argument is
+represented as a template_parameter_symbol_type whose identifier
+sometimes carries a numeric scope prefix (`67_std::__1::template.X<...>`)
+and sometimes does not.  template_suffix rendered it RAW, so the same
+specialization got TWO names ([temp.type]/1 requires one) and a lookup
+of one spelling missed the symbol created under the other.  In libc++ 23
+that made `__split_buffer<T,A,__split_buffer_pointer_layout>`'s base
+unfollowable -> inherited `__relocate` invisible -> "found no match" ->
+body dropped -> reserve() a silent no-op.
+FIX (158eb1d2d8): strip the numeric scope prefix when rendering such an
+argument.  EVIDENCE: the placeholder count in a 35-line kernel drops
+14 -> 0; in the libc++-23 .ii it drops to 0 and the inner
+"__relocate: found no match" error DISAPPEARS.
+NEW CORE cpp20_template_template_argument_naming (e6b345bade) pins it
+using test.pl's DISALLOWED-pattern block (no
+template_parameter_symbol_type in the symbol table) plus the expected
+canonical instance name -- a good pattern for hygiene fixes that have no
+behavioural assertion of their own.
+Five suites green with the fix.  The libcxx23_vector_pushback verdict is
+still wrong: the chain has MOVED to the next layer, with
+`__set_sentinel` (in __split_buffer's ~_ConstructTransaction) and `_Bp`
+now reported as no-match.  Those are the next targets; the reductions
+(cv89 25.9k lines, cv91 22.9k) continue undisturbed against frozen
+binaries.
