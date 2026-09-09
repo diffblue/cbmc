@@ -38,6 +38,21 @@ Round-90 diagnosis (TWO stacked defects, both located):
    Verified separately: `is_int_<int>`, `is_int_<decltype(a-b)>` and
    `is_int_<decltype((a-b))>` all resolve CORRECTLY outside a
    requires-expression, so ordinary specialization matching is fine.
+ROUND-99 ATTEMPT (reverted, recorded): evaluate the return-type
+requirement as the CONCEPT-ID `C<decltype((E))>` -- the form a user
+writes, which goes through the normal concept instantiation path instead
+of the manual substitution that cannot work (the stored body's argument
+is an `ambiguous` node with an empty type).  That makes ALL THREE
+assertions of this test pass, but regresses the negative case of CORE
+cpp20_compound_requirement_concept (`{ __t + __t } -> same_as_<_Tp>`
+must be FALSE for a type whose operator+ returns int): the EXPLICIT
+type-constraint argument `_Tp` arrives as an `ambiguous` node wrapping an
+unresolved cpp_name, and type-checking that type in the requirement's
+context does NOT yield the enclosing parameter's binding, so the
+concept-id evaluates satisfied.  Resolving that explicit argument
+correctly is the remaining obstacle -- fix it first, then this route
+should close both layers at once.
+
 DO NOT land fix 1 alone: it makes previously-(wrongly)-unsatisfied
 requirements satisfied and regressed 18 cbmc-cpp tests
 (cpp20_vector_*, cpp20_span*, cpp20_ranges_basic, cpp20_erase_if*,
