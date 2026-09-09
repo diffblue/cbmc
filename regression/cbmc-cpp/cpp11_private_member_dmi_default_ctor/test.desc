@@ -11,3 +11,20 @@ Currently: "member 'goto_statet::propagation' is not accessible
 (private)" followed by "default constructor of 'struct goto_statet' is
 not accessible".  Removing the member's default member initializer, or
 making the member public, avoids it.
+ROUND-97 FIX ATTEMPT AND ITS CONSTRAINT (recorded so it is not
+repeated naively): disabling access control while converting a body
+marked #is_implicit_ctor / #is_implicit_dtor (a guard in
+convert_function) DOES fix this kernel and lets
+src/goto-symex/symex_throw.cpp produce a goto binary -- but it is TOO
+COARSE and broke regression/cpp/Protection1, a rejects-invalid test:
+    class A { int i; A(int); private: A(); };
+    class B : A {};   B b;   // must be REJECTED
+Within B's implicit default constructor, B's OWN private members are
+accessible, but A's PRIVATE default constructor is not
+([class.access.general]/4 grants the class's own context, not its
+bases').  A correct fix must therefore judge access in the context of
+the class that DECLARES the entity -- e.g. by setting
+access_judgment_scope to the constructed class's scope (the mechanism
+round 74 used for friend declarations) rather than switching access
+checking off.  Verified: with the coarse guard reverted, Protection1
+passes again.
