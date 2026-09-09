@@ -1,7 +1,7 @@
 KNOWNBUG
 main.cpp
 --cpp17 --object-bits 12
-^\[main\.assertion\.1\] line \d+ conversion op to vector: SUCCESS$
+^\[main\.assertion\.1\] line \d+ conversion op to vector resolves: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
