@@ -7820,3 +7820,38 @@ libstdc++'s REAL vector is needed (most likely its SFINAE-constrained
 iterator-pair constructor), which is what cv97 will isolate.
 Three reductions now run concurrently: cv89 (goto-symex, 977 lines,
 valid C++), cv91 (libc++-23 reserve), cv97 (conversion operator).
+
+## Round 97 (2026-09-09): cv89 DELIVERED — 99k lines reduced to SIX
+
+cvise finished cv89 with a valid, g++ -Werror-clean SIX-LINE artifact:
+    struct sharing_mapt { long num = 0; };
+    class goto_statet { sharing_mapt propagation; };
+CBMC reports "member 'goto_statet::propagation' is not accessible
+(private)" and then "default constructor of 'struct goto_statet' is not
+accessible".  Root: a `class` (private by default) whose member's TYPE
+carries a default member initializer needs a synthesized default
+constructor, and the member initialization inside that synthesized body
+is access-checked in the CALLER's context instead of the class's
+([class.access.general]/4, [class.default.ctor]/4).  NEW KNOWNBUG
+cpp11_private_member_dmi_default_ctor (10 lines, g++/clang verified).
+This is the root of the goto-symex dog-food failures.
+FIX ATTEMPTS, both reverted, both recorded in the desc:
+1. Marking implicitly-declared constructors PUBLIC in
+   typecheck_compound_declarator ([class.default.ctor]/1) does NOT fix
+   the kernel (the failing check is the member access inside the body).
+2. Disabling access control while converting #is_implicit_ctor /
+   #is_implicit_dtor bodies DOES fix the kernel AND makes
+   symex_throw.cpp produce a goto binary -- but it is TOO COARSE: it
+   broke regression/cpp/Protection1, where `class B : A {}` with A's
+   PRIVATE default constructor must be rejected.  Within B's implicit
+   constructor, B's own privates are accessible but A's are not.  The
+   correct fix judges access in the context of the class that DECLARES
+   the entity (e.g. via access_judgment_scope, the round-74 mechanism),
+   not by switching checking off.  Reverted; Protection1 verified green
+   again.
+Also this round: the remaining dog-food message in symex_throw.cpp is
+`goto_statet::goto_statet(this) is not accessible`, i.e. the header's
+EXPLICITLY deleted default constructor -- consistent with the separate
+[temp.inst]/11 eager-instantiation issue, not with this access bug.
+Three reductions: cv89 DONE (6 lines), cv91 running, cv97 at 22 lines.
+Census 12.
