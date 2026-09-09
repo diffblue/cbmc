@@ -7918,3 +7918,45 @@ failure-loop rule and reverted.  Resolving that explicit argument is the
 single remaining obstacle; the route then closes both layers at once.
 Recorded in the KNOWNBUG desc.  Census 11; suites green on the committed
 tree.
+
+## Round 100 (2026-09-09): compound requirement FIXED and FLIPPED; conversion-op mechanism found
+
+Per the agreed rebalance: stopped the stalled cv91 (unchanged at 22859
+lines for hours; partial artifact kept at /tmp/cv91_partial_22859.cpp),
+left cv98 running, and worked the two items that had a single named
+obstacle -- no speculative kernels this round.
+FIX + FLIP (619a790ffd, ca0b2b29ba) cpp20_compound_requirement_return_type:
+evaluate `{ E } -> C;` as the CONCEPT-ID `C<decltype((E))>` instead of
+cloning and hand-substituting the concept body (which cannot work: the
+stored body's argument is an `ambiguous` node with an EMPTY type).  THREE
+details were each necessary, and each was found by measurement:
+  1. an explicit type-constraint argument (`same_as_<_Tp>`) is an
+     `ambiguous` node wrapping an unresolved cpp_name, and the CURRENT
+     SCOPE at that point is the ROOT -- so it must be resolved through
+     the enclosing template map, not by name lookup;
+  2. the map must then be CLEARED for the evaluation: the concept's own
+     parameters share short names with the enclosing template's, and the
+     resolver's short-name bridge otherwise substituted the enclosing
+     binding, turning `same_as_<int, weird>` into
+     `same_as_<weird, weird>` (V1 in the template-map design doc);
+  3. the verdict must be read with is_true()/is_false() BEFORE
+     is_zero(), because a `bool`-typed constant is not recognised by
+     is_zero() -- the same trap that made the legacy path read every
+     satisfied requirement as unsatisfied.
+Round 90's regression of 18 tests does NOT recur; five suites green;
+revert-tested (2 of 3 assertions fail without the fix).  The legacy path
+remains as a fallback for cases the concept-id cannot decide.
+ranges_basic did NOT cascade (still 0 main assertions) -- its remaining
+layer is separate.
+CONVERSION-OPERATOR MECHANISM (cpp17_functional_cast_deduced_param_vector,
+11-line repro): the operator's parameter C is bound to
+`std::allocator<signed_int>` in one instantiation and
+`std::initializer_list<signed_int>` in another -- vector's CONSTRUCTOR
+PARAMETER types.  CBMC is legitimately exploring user-defined
+conversions to each candidate constructor's parameter, but then
+INSTANTIATES THE OPERATOR'S BODY for those candidates, and
+`allocator<int>(begin(), end())` fails as a HARD error instead of
+discarding the candidate ([temp.inst]/1, [temp.deduct]/8: only the
+declaration is needed to decide a candidate).  Two ordered fix
+candidates recorded in the desc.
+Census 10.
