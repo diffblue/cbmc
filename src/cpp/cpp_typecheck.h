@@ -149,6 +149,15 @@ protected:
   /// name was written in here; RAII-restored by the resolver.
   cpp_scopet *access_judgment_scope = nullptr;
 
+
+  /// While the body of an IMPLICITLY-DEFINED constructor or destructor is
+  /// being converted, the class it belongs to.  N5008
+  /// [class.access.general]/4 + [class.default.ctor]/4: such a definition
+  /// is a member of its class, so the member initializations it performs
+  /// may name the class's OWN private members -- but not a base's
+  /// (regression/cpp/Protection1).  Hence an exact-match context rather
+  /// than a scope chain.
+  irep_idt implicit_definition_class;
   // SFINAE alternative declarations: when two function templates differ
   // only in their SFINAE constraints, the second is stored here (keyed
   // by the primary's symbol name) rather than in the symbol table, to

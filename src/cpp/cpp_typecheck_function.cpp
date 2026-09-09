@@ -93,6 +93,34 @@ void cpp_typecheckt::convert_parameters(
 
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
+  // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of
+  // an implicitly-defined constructor/destructor is a member of its
+  // class, so its member initializations may name that class's own
+  // private members.  Record the class for the access check; an
+  // EXACT-match context is used deliberately, because a base class's
+  // private members remain inaccessible there (regression/cpp/
+  // Protection1: `class B : A {}` with A's private default constructor
+  // must still be rejected).
+  struct implicit_definition_guardt
+  {
+    irep_idt &slot;
+    const irep_idt saved;
+    implicit_definition_guardt(irep_idt &s, const irep_idt &v)
+      : slot(s), saved(s)
+    {
+      if(!v.empty())
+        slot = v;
+    }
+    ~implicit_definition_guardt()
+    {
+      slot = saved;
+    }
+  } implicit_definition_guard{
+    implicit_definition_class,
+    (symbol.type.get_bool("#is_implicit_ctor") ||
+     symbol.type.get_bool("#is_implicit_dtor"))
+      ? symbol.type.get(ID_C_member_name)
+      : irep_idt{}};
   // Guard against recursive type-checking (e.g., constexpr functions
   // that call themselves).
   if(functions_being_typechecked.count(symbol.name))
