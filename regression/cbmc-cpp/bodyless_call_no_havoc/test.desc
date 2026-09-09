@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp17 --no-unwinding-assertions
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+Currently: VERIFICATION SUCCESSFUL with no diagnostic -- the bodyless
+call is a no-op and `x == 1` is "proved".  Either the missing body must
+be reported irrespective of --no-unwinding-assertions, or the call must
+havoc the state the callee could reach.
