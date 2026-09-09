@@ -7885,3 +7885,36 @@ header's EXPLICITLY deleted default constructor -- the separate
 [temp.inst]/11 eager-instantiation issue, now the only remaining layer
 there.
 Census 11.  cv91 (libc++-23) still running.
+
+## Round 99 (2026-09-09): third reduction launched; compound-requirement route found (not landable yet)
+
+cv98 LAUNCHED for the REMAINING goto-symex layer, using the FIXED binary
+(round-98 access fix) so the gate targets what is actually left:
+`goto_statet::goto_statet(this) is not accessible` (the header's
+EXPLICITLY deleted default constructor being attempted) AND
+`no match for symbol 'symbol_exprt'`, with the same real g++ -Werror
+validity gate that made cv89 succeed.  Gate verified accept/reject;
+97031 -> 95814 lines so far.  Negative kernel eg1 (deleted default ctor
+inside map<int, list<pair<int, statet>>>, used only via emplace) VERIFIES
+CLEAN, so the machine reduction is again the right instrument.
+COMPOUND REQUIREMENT: found the right ROUTE and its blocker.  Evaluating
+the return-type requirement as the CONCEPT-ID `C<decltype((E))>` -- the
+form a user writes, which goes through the normal concept instantiation
+path rather than the manual substitution that provably cannot work
+(round-90/94: the stored body's argument is an `ambiguous` node with an
+EMPTY type) -- makes ALL THREE assertions of
+cpp20_compound_requirement_return_type pass, INCLUDING the two that
+round 90 could not fix, and does NOT cause the 18-test regression that
+round 90's contextual-conversion patch did.
+BUT it regresses ONE assertion of CORE cpp20_compound_requirement_concept:
+for `{ __t + __t } -> same_as_<_Tp>` the EXPLICIT type-constraint
+argument `_Tp` arrives as an `ambiguous` node wrapping an unresolved
+cpp_name; type-checking that type in the requirement's context does not
+yield the enclosing parameter's binding, so the concept-id evaluates
+SATISFIED and the required FALSE case is lost.  Two attempts (typecheck
+the arg when it is an ID_type node; then also when it is an
+ambiguous-wrapped cpp_name) both failed, so I stopped per the
+failure-loop rule and reverted.  Resolving that explicit argument is the
+single remaining obstacle; the route then closes both layers at once.
+Recorded in the KNOWNBUG desc.  Census 11; suites green on the committed
+tree.
