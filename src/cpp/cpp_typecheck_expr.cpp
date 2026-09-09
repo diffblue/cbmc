@@ -129,6 +129,143 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
           constraint_args = &sub;
       }
 
+      // N5008 [expr.prim.req.compound]/1: the requirement is satisfied
+      // exactly when C<decltype((E))> is satisfied.  Evaluate that
+      // CONCEPT-ID -- the form a user writes -- so it goes through the
+      // normal concept-instantiation path.  The manual substitution
+      // below cannot work in general: the stored concept body keeps its
+      // template argument as an `ambiguous` node with an EMPTY type, so
+      // neither template_mapt::apply nor a by-name walk can replace the
+      // parameter, and the verdict then depended on ambient scope state
+      // (a satisfied requirement read as unsatisfied for every
+      // trait-based concept, e.g. libc++'s __has_integral_minus).
+      if(!concept_name.empty())
+      {
+        cpp_namet concept_id;
+        concept_id.get_sub().push_back(irept(ID_name));
+        concept_id.get_sub().back().set(ID_identifier, concept_name);
+        irept targs(ID_template_args);
+        irept &args_sub = targs.add(ID_arguments);
+        exprt first_arg{ID_type};
+        first_arg.type() = result_type;
+        args_sub.get_sub().push_back(first_arg);
+        bool args_ok = true;
+        if(constraint_args != nullptr)
+        {
+          for(const auto &a : constraint_args->find(ID_arguments).get_sub())
+          {
+            const exprt &ae = static_cast<const exprt &>(a);
+            typet arg_type = ae.type();
+            // An explicit type-constraint argument (`same_as_<_Tp>`)
+            // is left by the parser as an `ambiguous` node whose type
+            // is an unresolved cpp_name.  Here the CURRENT SCOPE is the
+            // root, so name lookup cannot resolve it -- but the
+            // enclosing template's binding is in the template map;
+            // use it ([temp.names]/1, [temp.arg]/1).
+            if(arg_type.id() == ID_cpp_name)
+            {
+              irep_idt short_name;
+              for(const auto &ns : arg_type.get_sub())
+                if(ns.id() == ID_name)
+                  short_name = ns.get(ID_identifier);
+              bool resolved = false;
+              if(!short_name.empty())
+              {
+                for(const auto &te : template_map.type_map)
+                {
+                  const std::string key = id2string(te.first);
+                  const auto pos = key.rfind("::");
+                  const std::string suffix =
+                    pos != std::string::npos ? key.substr(pos + 2) : key;
+                  if(
+                    suffix == id2string(short_name) &&
+                    te.second.id() != ID_unassigned && te.second.is_not_nil())
+                  {
+                    arg_type = te.second;
+                    resolved = true;
+                    break;
+                  }
+                }
+              }
+              if(!resolved)
+              {
+                try
+                {
+                  typecheck_type(arg_type);
+                  resolved = arg_type.id() != ID_cpp_name;
+                }
+                catch(...)
+                {
+                  resolved = false;
+                }
+              }
+              if(!resolved)
+              {
+                args_ok = false;
+                break;
+              }
+            }
+            exprt as_type{ID_type};
+            as_type.type() = arg_type;
+            args_sub.get_sub().push_back(as_type);
+          }
+        }
+        if(args_ok)
+        {
+          concept_id.get_sub().push_back(targs);
+          exprt as_expr = concept_id.as_expr();
+          as_expr.add_source_location() = expr.source_location();
+          bool decided = false;
+          try
+          {
+            // The synthetic concept-id carries CONCRETE arguments, so no
+            // enclosing bindings are needed to evaluate it -- and they
+            // must not be visible: the concept's own parameters
+            // typically share their short names with the enclosing
+            // template's (`_Tp`/`_Up`), and the resolver's short-name
+            // bridge would then substitute the ENCLOSING binding for
+            // them, making `same_as_<int, weird>` evaluate as
+            // `same_as_<weird, weird>` (V1 in
+            // doc/architectural/cpp-frontend-review-2026-06-24-
+            // template-map-scope.md).  Evaluate with an empty map.
+            cpp_saved_template_mapt saved_concept_map{template_map};
+            template_map.clear();
+            typecheck_expr(as_expr);
+            simplify(as_expr, *this);
+            // [temp.constr.atomic]/1: contextually converted to bool.
+            // A `bool`-typed constant is not recognised by is_zero(),
+            // so test the boolean forms first (the same trap that made
+            // the legacy path read every satisfied requirement as
+            // unsatisfied).
+            if(as_expr.is_true())
+            {
+              satisfied = true;
+              decided = true;
+            }
+            else if(as_expr.is_false())
+            {
+              satisfied = false;
+              decided = true;
+            }
+            else if(as_expr.is_constant())
+            {
+              satisfied = !to_constant_expr(as_expr).is_zero();
+              decided = true;
+            }
+          }
+          catch(...)
+          {
+            // undecidable here: fall through to the legacy path
+          }
+          if(decided)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            return satisfied;
+          }
+        }
+      }
+
       if(!concept_name.empty())
       {
         const auto cids = cpp_scopes.current_scope().lookup(
