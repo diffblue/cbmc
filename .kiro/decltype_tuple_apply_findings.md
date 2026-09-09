@@ -7795,3 +7795,28 @@ go wrong, and the reported candidates are std::allocator's constructors,
 i.e. the lookup scopes into vector's LAST TEMPLATE ARGUMENT instead of
 vector itself ([class.conv.fct] + [over.match.ctor]).  Recorded in the
 desc; that is the fix target.
+
+## Round 96 addendum: third reduction (cv97) and further negative kernels
+
+Set up a THIRD reduction for the conversion-operator failure
+(/tmp/cv97, 4 workers).  This one has a REAL compiler gate -- the target
+is libstdc++, which host g++ understands -- so
+`g++ -std=c++17 -fsyntext-only -Werror` gates validity directly; plus
+pins on `operator C() const` / `C(begin(), end())` and on CBMC still
+reporting "found no match for symbol 'C'".  Verified accept/reject
+before launch; 40 -> 22 lines within the round.
+FINDING from it: the callee needs NO BODY -- `int sum(const
+std::vector<int> &);` as a declaration suffices.  So the failure is
+purely the CONVERSION of `ranget` to `const std::vector<int>&` at the
+call.  The committed reproducer was tightened accordingly.
+NEGATIVE KERNELS this round (all VERIFY, i.e. no "no match"): fc7
+conversion operator to 1- and 2-parameter own templates; fc9 to a
+template with a DEFAULTED second parameter; fc10 through a
+const-reference parameter; fc11 a hand-written vector-like target with
+default/copy/iterator-pair constructors and a defaulted allocator
+parameter.  So none of multi-argument targets, defaulted arguments,
+reference binding, or the constructor-set shape is the trigger:
+libstdc++'s REAL vector is needed (most likely its SFINAE-constrained
+iterator-pair constructor), which is what cv97 will isolate.
+Three reductions now run concurrently: cv89 (goto-symex, 977 lines,
+valid C++), cv91 (libc++-23 reserve), cv97 (conversion operator).
