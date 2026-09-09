@@ -93,3 +93,40 @@ conversion raises errors) so a losing candidate cannot poison the
 enclosing expression.  That is a slightly larger change than the two
 attempts recorded above, which is why it is left for the next round
 rather than rushed.
+
+ROUND-102 DIAGNOSIS -- the missing rule is N5008 [over.best.ics]/4.
+Corrections to the notes above, both established by rebuilding
+build-work with and without a change (the earlier claim compared against
+the STALE frozen reference binary and was wrong):
+  * suppressing the losing candidate's body failure changes NOTHING here
+    (identical error list), so attempt (a) and its variant are no-ops;
+  * `symbol 'vector' does not uniquely resolve` (stl_vector.h:707) was
+    ALREADY the first error before any change, and is the real
+    first-order failure.
+That ambiguity lists four vector constructors -- (const allocator&),
+(size_t, const allocator&), (const vector&), (initializer_list,
+const allocator&) -- all viable for a single `ranget` argument, each via
+a user-defined conversion using ranget's `template <class C> operator
+C()`.  g++ 13 and clang++ both accept the program silently, because
+[over.best.ics]/4 says that when the target is the FIRST PARAMETER of a
+constructor and that constructor is a candidate by [over.match.copy]
+(copy-initialization of a class -- which is what passing `r` to
+`sum(std::vector<int>)` is), USER-DEFINED CONVERSION SEQUENCES ARE NOT
+CONSIDERED.  All four constructors are therefore NON-VIABLE, and the only
+candidate left is ranget's own conversion function with C deduced as
+std::vector<int> ([temp.deduct.conv]).
+This one rule explains BOTH layers: it removes the ambiguity AND stops
+the bogus C = std::allocator<int> / C = std::initializer_list<int>
+explorations at the root, so the losing-candidate body failures never
+arise in the first place.
+IMPLEMENTATION SKETCH (next round): CBMC has no flag for this -- add a
+counter + RAII guard on cpp_typecheckt, set it around the
+constructor-candidate resolution reached from
+user_defined_conversion_sequence -> new_temporary -> cpp_constructor
+(that path IS [over.match.copy]), and honour it in
+user_defined_conversion_sequence by refusing a user-defined conversion
+for that parameter.  Note the guard must apply to the ctor's first
+parameter only, and must NOT leak into nested initializations; also note
+DIRECT-initialization (`std::vector<int> v(r)`) does allow user-defined
+conversions to constructor parameters, so the guard must not be set on
+that path.
