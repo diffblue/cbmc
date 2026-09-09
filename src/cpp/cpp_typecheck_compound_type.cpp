@@ -4433,6 +4433,21 @@ bool cpp_typecheckt::check_component_access(
 
   const irep_idt &struct_identifier = struct_union_type.get(ID_name);
 
+  // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of an
+  // implicitly-defined constructor/destructor is a member of its class, so
+  // the member initializations it performs may name that class's OWN
+  // members whatever their access.  Exact match only: a base class's
+  // private members remain inaccessible there
+  // (regression/cpp/Protection1 -- `class B : A {}` with A's private
+  // default constructor must still be rejected).
+  if(
+    !implicit_definition_class.empty() &&
+    struct_identifier == implicit_definition_class &&
+    !component.get_bool(ID_from_base))
+  {
+    return false; // accessible
+  }
+
   // A member inherited from a base class is, in addition to being
   // accessible as named in the type of the object through which it is
   // used ([class.access.base]/5.2-5.3, handled via struct_identifier
@@ -4690,6 +4705,12 @@ bool cpp_typecheckt::base_publicly_accessible(
   // access_judgment_scope (the same dual walk the friend rule below
   // uses).
   const irep_idt &from_name = from.get(ID_name);
+
+  // N5008 [class.access.general]/4: inside the body of an
+  // implicitly-defined constructor/destructor of this very class, its own
+  // members are accessible.  Exact match only -- a base's private
+  // members stay inaccessible (regression/cpp/Protection1).
+
   {
     cpp_scopet *chains[2] = {
       cpp_scopes.current_scope_ptr, access_judgment_scope};
