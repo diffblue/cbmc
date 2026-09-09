@@ -78,3 +78,18 @@ nil-ing those bodies perturbs later resolution.  Next steps, in order:
      conversions explored here (to allocator, to initializer_list) are
      for DIFFERENT target types and should each be decided
      independently.
+
+ROUND-101 CORRECTION (probe on the deferred-body drain): the operator
+bodies are NOT converted in that drain -- the only body failure reported
+there is `main` itself.  The `found no match for symbol 'C'` errors carry
+the operator's own function context and are emitted while MAIN's body is
+being converted, i.e. the instantiated operator's body is converted
+INLINE during the conversion exploration, outside Phase 3's
+sfinae_contextt, and its errors escape as an ERROR-COUNT increase which
+then makes main's conversion fail.
+NEXT STEP (well-defined): convert the instantiated conversion operator's
+body INSIDE Phase 3's sfinae context (or discard any candidate whose body
+conversion raises errors) so a losing candidate cannot poison the
+enclosing expression.  That is a slightly larger change than the two
+attempts recorded above, which is why it is left for the next round
+rather than rushed.
