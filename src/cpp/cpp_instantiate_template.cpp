@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <cctype>
 #include "cpp_typecheck.h"
 
 #ifdef DEBUG
@@ -73,6 +74,30 @@ cpp_typecheckt::template_suffix(const cpp_template_args_tct &template_args)
         if(type.get_bool(ID_C_volatile))
           result += "volatile ";
         result += id2string(to_tag_type(type).get_identifier());
+      }
+      else if(type.id() == ID_template_parameter_symbol_type)
+      {
+        // N5008 [temp.type]/1: two template-ids refer to the same class
+        // only if their template arguments are identical -- so an
+        // argument's rendering must be CANONICAL.  A template TEMPLATE
+        // argument is represented as a template_parameter_symbol_type
+        // whose identifier sometimes carries a numeric scope prefix
+        // (`67_std::__1::template.X<Type0,...>`) and sometimes does not,
+        // depending on the path that produced it; rendering it raw gives
+        // the same specialization two different names, and a lookup of
+        // the one spelling then misses the symbol created under the
+        // other (libc++-23's `__split_buffer<T, A,
+        // __split_buffer_pointer_layout>`, whose base class instance
+        // could then not be followed, so inherited members were
+        // invisible).  Strip the scope prefix.
+        std::string tid =
+          id2string(to_template_parameter_symbol_type(type).get_identifier());
+        std::size_t k = 0;
+        while(k < tid.size() && isdigit(static_cast<unsigned char>(tid[k])))
+          ++k;
+        if(k > 0 && k < tid.size() && tid[k] == '_')
+          tid.erase(0, k + 1);
+        result += tid;
       }
       else
         result += cpp_type2name(type);
