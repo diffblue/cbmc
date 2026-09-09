@@ -7745,3 +7745,25 @@ still wrong: the chain has MOVED to the next layer, with
 now reported as no-match.  Those are the next targets; the reductions
 (cv89 25.9k lines, cv91 22.9k) continue undisturbed against frozen
 binaries.
+
+### Round 95 CORRECTION (same day)
+
+The claim above that the fix makes the inner "__relocate: found no
+match" error DISAPPEAR is WRONG -- it came from a `head -2` that
+truncated the error list.  Measured properly, the error set is
+IDENTICAL before and after the fix:
+  no match for symbol '_Bp'
+  no match for symbol '__relocate'
+  no match for symbol '__set_sentinel'
+So the verified effect of 158eb1d2d8 is ONLY the naming hygiene it is
+tested for ([temp.type]/1 canonical rendering; placeholder count 14 -> 0
+in the kernel and 0 in the libc++ .ii).  It does NOT change the
+libcxx23_vector_pushback verdict, and the causal chain from round 93/94
+is UNCHANGED: the candidate is still dropped at
+convert_identifier's has_component_rec gate.  The unsubstituted-TT-name
+theory therefore explains the ugly names but is NOT (or not only) what
+makes the base unfollowable -- the remaining reason is still open, and
+the reductions are the instrument for it.
+LESSON (recurring): never conclude "error gone" from a truncated grep;
+diff the FULL error multiset between the frozen and the patched binary,
+as done here.
