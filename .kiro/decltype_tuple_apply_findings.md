@@ -7686,3 +7686,35 @@ member inherited through a TT-parameter CRTP base, including with
 PRIVATE inheritance plus friendship.  All verify clean.
 cv89 at 29.5k lines (69% through its passes); cv91 restarted with the
 validated gate.  Census 11.
+
+## Round 94 (2026-09-09): libc++-23 step-2 root identified — unsubstituted TT argument
+
+Probe ladder on the real .ii (all in build-work, reductions untouched):
+- cpp_typecheck_fargst::match is NEVER called with the 4-parameter
+  candidate, and the per-candidate disambiguate_functions is never
+  reached either -> the candidate is dropped during IDENTIFIER
+  CONVERSION, before overload resolution.
+- The drop site is convert_identifier's
+    has_component_rec(object.type(), identifier, ...)
+  gate.  Printing it shows WHY:
+    objtype = struct_tag std::__1::tag-__split_buffer<
+                signed_int,
+                std::__1::tag-allocator<signed_int>,
+                template_parameter_symbol_type(...)>
+  The THIRD template argument -- the template TEMPLATE argument
+  `__split_buffer_pointer_layout` -- was never substituted; the instance
+  is keyed with an unsubstituted parameter PLACEHOLDER.  Its base
+  (`_Layout<__split_buffer<...>, _Tp, _Alloc>`) therefore cannot be
+  formed properly, the inherited `__relocate` is not found on the object,
+  the candidate is dropped, and the enclosing body is nil'd -> silent
+  no-op (the chain from round 93).
+REPRODUCIBLE HYGIENE FINDING: `template_parameter_symbol_type` leaks into
+instantiated type names in HAND kernels too -- lv2/lv3/lv4 each show 14
+occurrences in the symbol table, sk2 shows 9 -- yet those programs
+VERIFY correctly.  So the leak alone is not sufficient to break lookup;
+some further libc++ ingredient makes it fatal.  No KNOWNBUG filed for the
+leak itself (no observable failure in a kernel); recorded here as the
+suspected mechanism and a hygiene defect worth fixing on its own.
+NINE negative kernels now (oo1-oo3, sk1, sk2, lv1-lv4).  The sound
+container-validated cv91 reduction is the instrument that should isolate
+the remaining delta.
