@@ -35,3 +35,27 @@ symbol 'C'".)  A hand-written vector-like target with default, copy and
 SFINAE-free iterator-pair constructors does NOT reproduce (kernel fc11),
 so libstdc++'s real vector -- most likely its constrained iterator-pair
 constructor -- is required.
+
+ROUND-100 MECHANISM (probe on resolve()'s id_set and the active template
+map, inside the instantiated operator): the operator's parameter C is
+bound to `std::allocator<signed_int>` in one instantiation and to
+`std::initializer_list<signed_int>` in another -- never to
+`std::vector<int>`.  Those are vector's CONSTRUCTOR PARAMETER types, so
+CBMC is exploring user-defined conversions from `ranget` to each
+candidate constructor's parameter ([over.match.copy], [over.best.ics]),
+which is legitimate -- and then instantiating the operator's BODY for
+those candidates.  `allocator<int>(begin(), end())` has no such
+constructor, so the body fails, and that failure escapes as a HARD error
+("found no match for symbol 'C'") instead of merely discarding the
+candidate.
+Per [temp.inst]/1 and [temp.deduct]/8 only the DECLARATION is needed to
+decide a conversion candidate; the body must not be instantiated (or its
+failure must be soft, as in a SFINAE context).  Two candidate fixes to
+try next, in order:
+  1. instantiate the conversion operator's body under sfinae_contextt
+     while exploring conversion candidates, so a failure discards the
+     candidate;
+  2. check whether partial ordering is picking the wrong winner before
+     instantiation at all (the candidate scan in
+     cpp_typecheck_conversions.cpp defers instantiation until a unique
+     winner is chosen -- if `allocator` wins, that ordering is the bug).
