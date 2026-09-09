@@ -9,3 +9,20 @@ main.cpp
 --
 Currently: "found no match for symbol 'C'" resolving the functional
 cast to the deduced parameter inside the instantiated operator.
+ROUND-96 LOCALIZATION (sharp): the failure belongs to the CONVERSION
+OPERATOR path, not to functional casts or deduced parameters:
+  * `C tmp; tmp.push_back(*begin()); return tmp;` inside the SAME
+    operator works, so C really is std::vector<int> there;
+  * `return C();` inside the operator works;
+  * the identical cast `return C(begin(), end());` in a plain MEMBER
+    TEMPLATE `template <class C> C to() const` on the same class
+    VERIFIES (kernel fc6);
+  * `C(b, e)` in a free function template `template <class C> C make(...)`
+    verifies (fc4), and `std::vector<int> v(arr, arr+3)` verifies (fc3).
+Only in the conversion operator does constructor lookup go wrong, and
+the candidates reported are `std::allocator`'s constructors -- i.e. the
+lookup scopes into the LAST template argument of vector<int,
+allocator<int>> instead of vector itself ([class.conv.fct] +
+[over.match.ctor]).  A one-line workaround exists in user code (use a
+named member template), which is why this layer only surfaces through
+libc++/CBMC-style ranges adaptors.
