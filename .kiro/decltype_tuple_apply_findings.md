@@ -7650,3 +7650,39 @@ wrong verdict is silent, and it is a general soundness gap in its own
 right -- CBMC semantics, not a C++ conformance issue.
 Census 12.  cv89 at 45.8k lines (37% through its pass list), cv91
 running; all work continues in build-work against frozen gate binaries.
+
+## Round 93 (2026-09-09): libc++-23 causal chain COMPLETE; real validity gate for cv91
+
+cv91 finished twice more and both artifacts were degenerate (ill-formed
+C++, and the out-of-line definition surviving only as a DECLARATION).
+FIXED THE GATE PROPERLY: built a small container image (cxx23-gate =
+tumbleweed + clang + libc++) and the gate now runs
+`clang++ -std=c++20 -fsyntax-only` inside it (0.35s), plus requires the
+definition's BODY line to survive, plus the bodyless-member semantic
+guard, plus the driver pins and the two verdicts.  Verified to accept
+the real input and reject both earlier degenerate artifacts before
+launching; total gate cost 3.6s.
+CAUSAL CHAIN for the libc++-23 wrong verdict, now complete:
+  1. the out-of-line definition of __vector_layout::__relocate IS parsed
+     and the member IS deferred WITH that body;
+  2. converting the body FAILS -- at layout.h:409 the inner call
+     `__buffer.__relocate(__begin_, __end_, __capacity_)` reports "found
+     no match", though the sole candidate
+     `void __relocate(__split_buffer_pointer_layout*, int*&, int*&, int*&)`
+     matches in arity with the layout's own `int*` members as arguments;
+  3. the no-viable-call recovery nils the body (as designed), leaving an
+     ODR-USED member bodyless;
+  4. a bodyless call is a NO-OP (KNOWNBUG bodyless_call_no_havoc), so
+     reserve() silently does nothing.
+So the defect to fix is the OVERLOAD RESOLUTION in step 2.
+TWO CORRECTIONS of my own earlier notes: (a) `auto (...) -> void` in the
+symbol dump is just CBMC's printer for code types -- a working member
+prints identically, so there is no deduced-return-type anomaly;
+(b) find_out_of_line_body is never called because it is only a FALLBACK
+for bodies that fail AFTER being attached by another route.
+EIGHT negative kernels total (oo1-oo3, sk1, sk2, lv1-lv3): the last
+three cover passing own members as pointer-REFERENCE arguments to a
+member inherited through a TT-parameter CRTP base, including with
+PRIVATE inheritance plus friendship.  All verify clean.
+cv89 at 29.5k lines (69% through its passes); cv91 restarted with the
+validated gate.  Census 11.
