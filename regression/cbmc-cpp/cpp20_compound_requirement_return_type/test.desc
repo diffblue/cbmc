@@ -20,9 +20,24 @@ Round-90 diagnosis (TWO stacked defects, both located):
    constant (as cpp_typecheck_resolve.cpp's tri-state evaluator already
    does for requires-clauses) fixes assertion 3.
 2. With that applied, assertion 2 (class with a MEMBER operator-) still
-   fails: the concept body `is_int_<decltype((E))>::value` evaluates
-   FALSE because the explicit specialization is not selected for the
-   substituted type inside the requirement evaluation.
+   fails.  ROUND-90 ROOT (sharper than "specialization selection"): the
+   STORED concept body's template argument is an `ambiguous` node with an
+   EMPTY type -- the reference to the concept's own parameter is not
+   recoverable from the body at all, so neither template_mapt::apply nor
+   a by-name walk can substitute it (an added walk over `template_args`
+   arguments changes nothing: there is no name to match).  The dumped
+   pre-typecheck body is BYTE-IDENTICAL for the satisfied and the
+   unsatisfied case; the verdict therefore comes from ambient
+   template_map/scope state when `is_int_<...>` is resolved, which is why
+   the same body yields different answers for different Es (plain `int`
+   -> primary/false, `const int` -> specialization/true, both wrong for
+   the wrong reason).  The fix must make the concept's parameter
+   RECOVERABLE in the stored body (or evaluate the concept through the
+   normal instantiation path with explicit arguments) rather than patch
+   the substitution.
+   Verified separately: `is_int_<int>`, `is_int_<decltype(a-b)>` and
+   `is_int_<decltype((a-b))>` all resolve CORRECTLY outside a
+   requires-expression, so ordinary specialization matching is fine.
 DO NOT land fix 1 alone: it makes previously-(wrongly)-unsatisfied
 requirements satisfied and regressed 18 cbmc-cpp tests
 (cpp20_vector_*, cpp20_span*, cpp20_ranges_basic, cpp20_erase_if*,
