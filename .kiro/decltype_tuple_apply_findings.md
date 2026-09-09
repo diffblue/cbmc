@@ -7576,3 +7576,43 @@ faces a new internal shape.  That is the concrete lead for this
 soundness-relevant class.
 Reduction unaffected all round (94839 lines, 15 workers); all work done
 in build-work against the frozen gate binary.  Census 10.
+
+## Round 91 (2026-09-09): libc++-23 root bisected; second reduction set up
+
+BISECTION (all against the frozen build-work binary, cv89 untouched):
+- empty vector: size()/empty() CORRECT.
+- `reserve(4)`: capacity() stays 0 (asserting capacity()==0 SUCCEEDS)
+  while size() stays correct -> reserve has NO EFFECT.
+- ROOT: `__vector_layout<T,A>::__relocate` (which reserve calls) is in
+  the symbol table with an EMPTY body and return type
+  `auto (...) -> void` though declared `void`: the OUT-OF-LINE
+  definition (layout.h:290) was never matched to the in-class
+  declaration (layout.h:196), so an odr-used member has no body
+  ([temp.inst]/1).  No "no body for callee" property is emitted either,
+  so the wrong answer is SILENT -- a second, separable soundness gap.
+NEGATIVE KERNELS (three, all verify clean): oo1 out-of-line member whose
+parameter type is a MEMBER ALIAS; oo2 the same plus constexpr and
+libc++'s three attributes on the declaration only; oo3 the parameter
+type being a CRTP class that derives from its own template TEMPLATE
+parameter (`split_buffer : Layout<split_buffer<T,Layout>, T>`).  So none
+of member-alias, attribute asymmetry, or TT-param CRTP alone is the
+trigger.
+SECOND REDUCTION (/tmp/cv91, 8 workers, ~2s gate) on the 24.5k-line
+`reserve` carrier.  GATE DESIGN LESSONS (two degenerate results before
+it held):
+- Text guards on library identifiers are useless: cvise satisfied
+  `grep "reserve"` + `grep "__relocate"` with the single mangled token
+  `__relocate_with_pivotreserve0` and folded the assertions to
+  constants.
+- Pinning the DRIVER verbatim is necessary but NOT sufficient: cvise
+  then replaced std::vector with a stub whose `capacity()` returns 0,
+  which satisfies the verdicts honestly.
+- What works when no compiler validity gate is available (host clang-18
+  cannot parse libc++-23 headers): gate on the ROOT CAUSE semantically --
+  the symbol table must still contain a `::__relocate(` symbol with an
+  EMPTY Value -- plus the driver pins and the two verdicts.  Verified to
+  accept the real input and REJECT the stub before launching.
+PROCESS: the `for p in $(pgrep -f cvise)` kill loop killed the driving
+shell for the THIRD time, and that shell's heredoc write of the
+tightened gate was lost, so a loose gate silently stayed in place.
+/tmp/killcv.sh now does a cwd-matched kill that skips the caller; use it.
