@@ -7767,3 +7767,31 @@ the reductions are the instrument for it.
 LESSON (recurring): never conclude "error gone" from a truncated grep;
 diff the FULL error multiset between the frozen and the patched binary,
 as done here.
+
+## Round 96 (2026-09-09): functional-cast KNOWNBUG localized; cv89 artifact is VALID
+
+cv89 reached 1370 lines (89% of its pass list) and its artifact COMPILES
+CLEANLY with g++ -Werror -- the container/compiler gate paid off.  Manual
+inspection shows the reduced program provokes CBMC into attempting
+DEFAULT CONSTRUCTION of several classes that have none (symbol_exprt,
+guard_exprt, goto_statet, even the abstract symbol_table_baset).  Two
+hand kernels (id1: member with a deleted default ctor; id2: the same
+inside std::list<std::pair<int, holder>>) VERIFY CLEAN, so the trigger
+is still not the obvious shape; cvise will finish the job.  Manual
+bisection on a COPY (never the live base.cpp) showed removing framet's
+`std::map<..., goto_state_listt, ...>` member changes WHICH class is
+default-constructed rather than curing it.
+FUNCTIONAL-CAST KNOWNBUG (cpp17_functional_cast_deduced_param_vector)
+LOCALIZED to the CONVERSION-OPERATOR path by five kernels:
+  fc1 `return C();` in the operator -- works
+  fc5 `C tmp; tmp.push_back(*begin());` in the operator -- works, so C
+      really is std::vector<int> there
+  fc6 the identical cast in a plain member template `C to() const` --
+      VERIFIES
+  fc4 `C(b, e)` in a free function template -- verifies
+  fc3 `std::vector<int> v(arr, arr+3)` -- verifies
+Only inside `template <class C> operator C()` does constructor lookup
+go wrong, and the reported candidates are std::allocator's constructors,
+i.e. the lookup scopes into vector's LAST TEMPLATE ARGUMENT instead of
+vector itself ([class.conv.fct] + [over.match.ctor]).  Recorded in the
+desc; that is the fix target.
