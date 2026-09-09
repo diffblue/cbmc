@@ -59,3 +59,22 @@ try next, in order:
      instantiation at all (the candidate scan in
      cpp_typecheck_conversions.cpp defers instantiation until a unique
      winner is chosen -- if `allocator` wins, that ordering is the bug).
+
+ROUND-101 ATTEMPT (a), reverted: mark the instance created in
+user_defined_conversion_sequence's Phase 3 with
+`#conversion_exploration` and, in typecheck_method_bodies, drop such a
+body silently when its conversion fails.  Result: the "found no match
+for symbol 'C'" errors still appear (so the failing bodies are NOT the
+symbols carrying the flag -- the deferred entry is evidently keyed
+differently), main is still dropped, AND a new first error appears
+(`stl_vector.h:707: symbol 'vector' does not uniquely resolve`), i.e.
+nil-ing those bodies perturbs later resolution.  Next steps, in order:
+  1. find which symbol the failing deferred body actually belongs to
+     (print the symbol name at the failure and compare with the
+     instance name from Phase 3) before flagging anything;
+  2. then prefer fix candidate (b): stop the losing candidates from
+     being instantiated at all -- verify whether partial ordering
+     ([over.match.conv], [temp.deduct.conv]) is even reached, since the
+     conversions explored here (to allocator, to initializer_list) are
+     for DIFFERENT target types and should each be decided
+     independently.
