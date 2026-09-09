@@ -1347,6 +1347,14 @@ void cpp_typecheckt::typecheck_method_bodies()
                    file.find("/usr/lib/") == 0 ||
                    file.find("/Applications/") == 0;
       }
+      // A conversion-function instance created only to explore a
+      // conversion candidate ([temp.inst]/1; see
+      // user_defined_conversion_sequence) may have an ill-formed body for
+      // that candidate -- the candidate is then simply not viable, which
+      // is not an error in the enclosing context.
+      if(method_symbol.type.get_bool(ID_C_conversion_exploration))
+        suppress = true;
+
       if(suppress)
       {
         // Save/restore error count instead of using null_handler.
