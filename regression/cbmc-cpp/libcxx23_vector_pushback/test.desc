@@ -12,3 +12,28 @@ Currently: BOTH assertions FAIL -- a wrong verdict on a correct program
 (soundness-relevant, unlike the vacuous-drop KNOWNBUGs).  The source is
 ten lines; only the libc++-23 headers are needed to reproduce, hence
 the preprocessed carrier.
+ROUND-90 DIAGNOSIS (bisected):
+- An EMPTY vector is modelled correctly (size()==0, empty()).
+- `reserve(4)` has NO EFFECT: capacity() is still 0 afterwards
+  (asserting capacity()==0 SUCCEEDS), while size() stays correct.
+- Root: `__vector_layout<T,A>::__relocate`, which reserve calls, is
+  present in the symbol table with an EMPTY body and return type
+  `auto (...) -> void` although it is declared `void` -- the OUT-OF-LINE
+  definition (layout.h:290) was never matched to the in-class
+  declaration (layout.h:196), so the odr-used member has no body
+  ([temp.inst]/1 requires implicit instantiation when odr-used).
+- The call is NOT flagged: no "no body for callee" property appears
+  (CBMC does emit those elsewhere), so the state simply never changes
+  and the wrong answer is SILENT.  That missing flag is a second,
+  separable soundness gap.
+- NEGATIVE KERNELS (round 90, both VERIFY clean): oo1 -- out-of-line
+  definition of a class-template member whose parameter type is a
+  MEMBER ALIAS; oo2 -- the same with `constexpr` plus libc++'s three
+  attributes (visibility / exclude_from_explicit_instantiation /
+  abi_tag) on the in-class declaration only.  So neither the member
+  alias nor the attribute asymmetry is the trigger.
+- REMAINING LEAD: the parameter type is
+  `__split_buffer<T, A, __split_buffer_pointer_layout>`, and
+  `__split_buffer` derives CRTP-style from its own template TEMPLATE
+  parameter: `class __split_buffer : _Layout<__split_buffer<T,A,_Layout>,
+  T, A>`.  That TT-parameter CRTP shape is the next thing to kernel.
