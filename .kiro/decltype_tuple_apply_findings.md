@@ -7511,3 +7511,38 @@ PROCESS HAZARD repeated: a `for p in $(pgrep -f cvise)` kill loop killed
 the driving shell again.  Launch with setsid and never pkill by pattern
 from the same shell -- match /proc/PID/cwd and kill individually, or use
 a dedicated cleanup script.
+
+## Round 90 (2026-09-09): productive work alongside the running reduction
+
+SAFETY FIRST: the cvise gate invoked build/bin/cbmc, so ANY rebuild
+would have moved the target mid-reduction.  Froze the gate on a COPY
+(/tmp/cv89/cbmc_frozen, test.sh updated, gate re-verified) and created a
+SEPARATE build tree (build-work, -j8) for all further work.  The
+reduction continued undisturbed throughout (97031 -> 94927 lines).
+NEW KNOWNBUG cpp20_compound_requirement_return_type (35 lines,
+g++/clang -Werror + runtime verified), found by following
+cpp20_ranges_basic_libcxx's diagnostic chain to libc++'s
+incrementable_traits: `{ a - b } -> integral_` evaluates as UNSATISFIED
+even when it holds ([expr.prim.req.compound]/1).  This is a WRONG-VALUE
+concept bug, not a diagnostic, and the prime suspect for the remaining
+ranges_basic layer (difference_type/iterator_traits detection).
+TWO STACKED DEFECTS located inside compound_requirement_is_satisfied:
+1. [temp.constr.atomic]/1 contextual conversion: the concept body folds
+   to a c_bool constant and exprt::is_true() does not recognise it, so
+   every SATISFIED return-type-requirement read false.  Fixing this made
+   the builtin case (int) pass.
+2. The class-with-member-operator case still failed: the body
+   `is_int_<decltype((E))>::value` evaluates FALSE because the explicit
+   specialization is not selected for the substituted type inside the
+   requirement evaluation.
+CRITICAL NEGATIVE RESULT: landing fix 1 ALONE regressed 18 cbmc-cpp
+tests (cpp20_vector_*, cpp20_span*, cpp20_ranges_basic, cpp20_erase_if*,
+iterator_traits/concept chains) -- causation confirmed by re-running
+three of them against the frozen pre-fix binary (all pass there).  The
+C++20 library machinery currently depends on the wrong answer, so the
+two layers must land TOGETHER, ideally fix 2 first.  Reverted; both
+layers recorded in the KNOWNBUG's desc.
+Also negative this round: rb2 (CRTP closure friend with TWO conjunct
+constraints, concept-constrained parameters and decltype(auto)) PASSES,
+so that shape is not the ranges_basic blocker either.
+Census 10.
