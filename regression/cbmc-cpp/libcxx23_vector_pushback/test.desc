@@ -45,11 +45,30 @@ ROUND-90 DIAGNOSIS (bisected):
   template TEMPLATE parameter used CRTP-style, definitions supplied
   after the declarations -- VERIFIES CLEAN when hand-written.  So the
   trigger needs something still unidentified from the real headers.
-- Diagnostic fact from a probe: find_out_of_line_body is NEVER CALLED
-  for __relocate, so the member is not even considered for body
-  attachment; combined with its recorded return type `auto (...) -> void`
-  (declared `void`), the DECLARATION itself is likely what fails to
-  convert.  That is where to look next.
+- ROUND-93 CAUSAL CHAIN, now complete (probes into the deferral,
+  odr-use, recovery and overload paths):
+    1. the out-of-line definition IS parsed (qualified, with body) and
+       the member IS deferred with that body attached;
+    2. converting the body FAILS: at layout.h:409 the inner call
+       `__buffer.__relocate(__begin_, __end_, __capacity_)` reports
+       "found no match for symbol '__relocate'", although the single
+       candidate `void __relocate(__split_buffer_pointer_layout *,
+       int *&, int *&, int *&)` matches in arity and the arguments are
+       the layout's own `int *` members;
+    3. the no-viable-call recovery then NILS the body (by design), so an
+       odr-used member is left bodyless;
+    4. a bodyless call is a NO-OP (KNOWNBUG bodyless_call_no_havoc), so
+       reserve() silently does nothing and capacity() stays 0.
+  The defect to fix is the failing overload resolution in step 2.
+  CORRECTION of an earlier note: `auto (...) -> void` in the symbol dump
+  is merely CBMC's printer for code types (a WORKING member prints
+  identically), not a deduced return type; and find_out_of_line_body is
+  not called because it is only a FALLBACK for bodies that fail to
+  convert after being attached by a different route.
+- EIGHT negative kernels (oo1-oo3, sk1, sk2, lv1-lv3): all verify clean,
+  including passing own members as pointer-REFERENCE arguments to a
+  member inherited through a TT-parameter CRTP base with PRIVATE
+  inheritance plus friendship.  Hence the machine reduction.
 - A reduction with a gate that pins the driver, requires the
   out-of-line DEFINITION text to survive, and requires the member to
   remain bodyless is running in /tmp/cv91.
