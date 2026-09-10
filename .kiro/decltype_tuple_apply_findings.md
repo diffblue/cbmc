@@ -8027,3 +8027,37 @@ user_defined_conversion_sequence -> new_temporary -> cpp_constructor
 path, not leaking into nested initializations, and NOT set for
 direct-initialization) is recorded in the test's desc.
 Census 10; tree clean; cv98 healthy.
+
+## Round 103 (2026-09-09): [over.best.ics]/4 IMPLEMENTED -- functional-cast KNOWNBUG fixed and flipped
+
+Implemented the round-102 diagnosis (8c0891bf1f + flip). Two matched
+halves, BOTH necessary (each measured):
+  1. typecheck_function_call_arguments ran DIRECT-initialization for
+     class-argument-to-by-value-parameter (new_temporary on the raw
+     argument) -- the fused model that made every vector ctor viable.
+     Now routes a DIFFERENT-class argument through implicit_typecast
+     ([over.match.copy] two-step).  Derived-to-base slicing stays on the
+     ctor path (standard conversion).
+  2. copy_init_ctor_exploration counter (RAII) around UDCS's
+     ctor-candidate branch, honoured at UDCS entry AND at
+     find_template_conversion_specialisation (the reference-binding
+     template-conversion-operator route), with the
+     constant_expression_context exemption mirroring the existing
+     is_constructible re-entry rule.  Without it the losing operator
+     instances (C=allocator, C=initializer_list) are still created and
+     their bodies still fail in the drain (3 residual errors measured).
+Diagnostic that unlocked it: trapping at the "does not uniquely
+resolve" emission showed the ambiguity arises under
+typecheck_function_call_arguments -> new_temporary -> cpp_constructor --
+NOT under user_defined_conversion_sequence, which is why round-103's
+first guard attempt alone changed nothing.
+The old preprocessed repro then exposed a SECOND issue: constructing
+vector from UNDEFINED begin()/end() makes symex unwind an unbounded
+loop (hang) -- that is expected BMC behaviour, not a bug.  Replaced with
+a bounded 3-element static range summed through the conversion;
+runtime-verified g++ 13 AND clang++; CBMC: 1 assertion SUCCESS,
+VERIFICATION SUCCESSFUL, non-vacuous.
+Proper revert test (rebuild with/without): 0 assertions + 5 errors ->
+1 assertion + 0 errors.  Five suites green.  No cascade to the other
+front-end KNOWNBUGs (checked iterator-shadow, unique_ptr_derived,
+optional_transform).  Census 9.
