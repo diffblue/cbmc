@@ -513,6 +513,16 @@ void cpp_typecheckt::typecheck_type(typet &type)
       if(tmp_type.id() != ID_empty && !is_reference(tmp_type))
       {
         pointer_typet rref = pointer_type(tmp_type);
+        // CBMC's convention marks an rvalue reference with BOTH
+        // `#reference` and `#rvalue_reference` (see
+        // cpp_convert_type.cpp); is_reference() tests only the former.
+        // With only the rvalue flag the result read as a plain POINTER
+        // downstream: a function template parameter declared
+        // `__add_rvalue_reference(_Tp)` (gcc-16 <optional>'s
+        // is_trivially_move_assignable_v helper) made every call
+        // non-viable, since the scalar argument would not convert to
+        // `_Tp *`.
+        rref.set(ID_C_reference, true);
         rref.set(ID_C_rvalue_reference, true);
         tmp_type = std::move(rref);
       }
