@@ -8235,3 +8235,36 @@ suspect union-payload/engaged-flag modelling).  Original carrier
 restored to the test.
 Five suites green; revert-tested (2 errors -> 0).
 Census 7 (unchanged: optional_transform stays for its semantic layer).
+
+## Round 109 (2026-09-10): optional's "semantic" failure is a SILENTLY DROPPED BODY
+
+Diagnosis (all measured, probes stripped):
+  * counterexample trace: ZERO writes to return_value_transform; `r :=
+    return_value_transform` copies unconstrained garbage (68/FALSE) --
+    main's goto and the [over.match.copy]-era return plumbing are
+    CORRECT (call passes &return_value_transform as #result; both
+    transform branches construct into *#result).
+  * the value never arrives because _Optional_payload_base::_M_apply
+    (construct_at + _M_engaged=true) is BODYLESS in the goto model.
+  * convert_function enters _M_apply with value=code, exits NORMALLY
+    with value=nil (RAII exit-probe + uncaught_exceptions): the body's
+    typecheck_code THROWS int; the SYSTEM-HEADER leniency in
+    convert_function nils the body silently; with it disabled the
+    DRAIN's unsupported-STL leniency catches the rethrow -- the real
+    error is invisible under BOTH layers.  NILSITE tagging pinned the
+    exact make_nil (post-repair-attempt branch).
+  * probe-insertion hygiene: two of the scripted NILSITE probes landed
+    inside UNBRACED ifs and silently changed control flow (build
+    caught one via -Werror=misleading-indentation; the other made a
+    make_nil unconditional).  ALWAYS brace scripted insertions.
+  * negative kernels m1/c1/c2: member-template chain, placement new,
+    full gcc-16 construct_at shape (nested requires with placement-new
+    requirement + noexcept(noexcept) + if-constexpr array branch) all
+    pass in isolation.
+FLEET cv110 launched on the carrier with a SEMANTIC gate (typecheck
+clean AND both assertions FAILURE) -- this pins the silent drop while
+excluding drift into visible front-end errors.  cv107 (goto-symex
+carrier) still running.  The bodyless-call vacuity amplifier is the
+same phenomenon as bodyless_call_no_havoc -- one more datapoint that a
+"no body for callee" warning/property would pay for itself.
+Census 7.
