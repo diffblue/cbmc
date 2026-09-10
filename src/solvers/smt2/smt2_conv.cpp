@@ -944,13 +944,17 @@ void smt2_convt::convert_address_of_rec(
         expr.id_string());
 }
 
-static bool has_quantifier(const exprt &expr)
+static bool has_smt_binder(const exprt &expr, bool use_lambda_for_array)
 {
   bool result = false;
-  expr.visit_post([&result](const exprt &node) {
-    if(node.id() == ID_exists || node.id() == ID_forall)
-      result = true;
-  });
+  expr.visit_post(
+    [&result, use_lambda_for_array](const exprt &node)
+    {
+      if(
+        node.id() == ID_exists || node.id() == ID_forall ||
+        (use_lambda_for_array && node.id() == ID_array_comprehension))
+        result = true;
+    });
   return result;
 }
 
@@ -984,8 +988,9 @@ literalt smt2_convt::convert(const exprt &expr)
   // Note that here we are always converting, so we do not need to consider
   // other literal kinds, only "|B###|"
 
-  // Z3 refuses get-value when a defined symbol contains a quantifier.
-  if(has_quantifier(prepared_expr))
+  // Z3 refuses get-value when a defined symbol contains a quantifier or a
+  // lambda, including array comprehensions introduced during preparation.
+  if(has_smt_binder(prepared_expr, use_lambda_for_array))
   {
     out << "(declare-fun ";
     convert_literal(l);
@@ -5531,17 +5536,10 @@ void smt2_convt::set_to(const exprt &expr, bool value)
           convert_expr(prepared_rhs);
           out << ')' << ')' << '\n';
         }
-        else if(use_lambda_for_array)
+        else if(has_smt_binder(prepared_rhs, use_lambda_for_array))
         {
-          // The body emitted below may contain a `(lambda ...)` from
-          // `unflatten` (used as a stand-in for `(as const ...)` for
-          // back-ends with `use_as_const = false`).  Z3 rejects
-          // `get-value` on symbols whose `define-fun` body contains
-          // a lambda, so we use `declare-fun` + `assert (= ...)` here.
-          // Back-ends with `use_lambda_for_array = false` (the
-          // default, currently every back-end other than Z3) keep
-          // using the `define-fun` form below, so their SMT2 output
-          // is unaffected.
+          // Stop binder-containing definitions at their origin, before an
+          // alias can expand them into a get-value term rejected by Z3.
           out << "(declare-fun " << smt2_identifier;
           out << " () ";
           convert_type(equal_expr.lhs().type());
