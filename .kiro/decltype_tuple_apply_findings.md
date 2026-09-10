@@ -8097,3 +8097,38 @@ OPERATIONAL lessons: `timeout` INSIDE the tumbleweed image exits 125
 kill_pid_queue) when the gate spawns root-owned `sudo docker` children
 -- added ubuntu to the docker group and gate uses `sg docker -c`.
 Census 8 (was 11 at yesterday's start).
+
+## Round 105 (2026-09-10): unscoped-enumerator scope registration; iterator-shadow flipped
+
+FIX + FLIP (237eb08e57 + flip) cpp11_member_via_iterator_shadows_container.
+The stored diagnosis was STALE ON BOTH COUNTS: neither std::list nor the
+iterator's operator-> is load-bearing (kernels /tmp/k105 is1-is6).  The
+decisive split: `ins.clear(kindt::CALL)` FAILS for a plain member call
+(is3) while the identical argument to a FREE function (is4) and `enum
+class` (is5) and standalone initializer (is6) all pass.  Probes showed
+resolve() THROWS for `kindt::CALL` in ALL contexts (is6 recovers via a
+downstream fallback; the member-call path resolves during
+typecheck_function_expr, BEFORE the argument retry pass, so the nil-typed
+argument made the correct candidate non-viable).  ROOT CAUSE
+([dcl.enum]/12, C++11): unscoped enumerators were registered ONLY in the
+enclosing scope -- typecheck_enum_type enters the enum's own scope before
+typecheck_enum_body only for `enum class` -- so resolve_scope correctly
+entered `kindt::` but the qualified lookup found nothing (probe: enum
+scope entered, n=0 qualified, n=1 recursive).  Fix: additionally register
+each unscoped enumerator in the enum's own scope.  Scoped enums
+unchanged.  Revert-tested 2 errors -> 0; five suites green.
+DIAGNOSTIC lesson: an intermediate "fix" (probe-typecheck deferred
+funcaddr-candidate arguments and keep non-function results) targeted the
+DEFERRAL, which was only the masking layer -- the probe showed the
+typecheck itself throwing, which redirected the investigation to resolve
+and then to the missing scope registration.  The deferral change was
+discarded once the real fix made it unnecessary (kernels pass without
+it).
+Fleets: cv98 at ~34k lines; cv105 at 6 lines/44KB and still token-
+shrinking -- artifact already readable: _Optional_payload<int> declared
+via 4 partial specializations selected by trait-valued bool NTTPs, and
+_Optional_base's member uses the PRIMARY `_Optional_payload<int>` with
+defaulted arguments -- consistent with the '_M_payload is unknown'
+signature if the specialization choice or default-NTTP evaluation
+fails.  Wait for the fleet to finish before concluding.
+Census 7.
