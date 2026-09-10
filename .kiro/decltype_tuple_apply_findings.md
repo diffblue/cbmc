@@ -8268,3 +8268,29 @@ carrier) still running.  The bodyless-call vacuity amplifier is the
 same phenomenon as bodyless_call_no_havoc -- one more datapoint that a
 "no body for callee" warning/property would pay for itself.
 Census 7.
+
+## Round 110 (2026-09-10, partial): _Storage ctor conversion throws under a foreign map
+
+Continued the optional body-drop hunt with counted-throw trapping
+(CTP-THROW n=1..4, __builtin_trap on CBMC_DBGT_N): the FOURTH identical
+throw (unbound std::template::963::_Tp during resolve_template_alias's
+argument typecheck) is the one that kills the body -- and the function
+being converted at that moment is _Storage's (in_place_t, _Args&&...)
+constructor (eager conversion nested under main's expression
+typecheck), NOT _M_apply as the earlier round assumed: _M_apply's
+"drop" is a CASCADE (its body's construct_at call resolution needs
+_Storage's ctor).  KEY evidence: at the throw the template map holds
+ONLY optional<int>::template::1014::_From -- a variable-template
+parameter from a COMPLETELY DIFFERENT evaluation -- so the eager
+conversion runs under a foreign map (the _Storage instantiation's own
+_Args/_Tp bindings are absent).  The drain paths SWAP maps cleanly
+(checked: method_bodies swap per entry; the eager path at
+method_bodies.cpp:1901 swaps too), so the leak is in whichever nesting
+converts _Storage's ctor eagerly HERE.
+STOPPED per the failure-loop rule after the guess-target tracking probe
+came back empty (the throw may not be under the guess my earlier stack
+capture showed -- stacks from different runs may differ).  cv110's
+artifact will decide.  All probes stripped; tree clean.
+Fleets: cv107 ~67k lines (slow, big carrier); cv110 27 lines/106KB
+(token passes on long preprocessed lines).
+Census 7.
