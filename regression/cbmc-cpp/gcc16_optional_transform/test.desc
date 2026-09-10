@@ -11,3 +11,19 @@ main.ii
 Currently: optional::transform never materializes against gcc-16
 headers and main verifies vacuously (0 assertions).  Sibling of
 cpp23_optional_monadic (which uses the host's headers).
+
+ROUND-104 TRIAGE: the first error is `symbol '_M_payload' is unknown`
+while instantiating _Optional_base<int, TRUE, TRUE>.  gcc-16's payload
+is `_Storage<_Stored_type> _M_payload;` where _Storage is a NESTED
+member UNION template with a defaulted bool NTTP
+(`template<typename _Up, bool = is_trivially_destructible_v<_Up>>`)
+and P0848 conditionally-trivial destructors (`~_Storage() = default;`
+plus `constexpr ~_Storage() requires (!is_trivially_destructible_v<_Up>)`).
+Four hand kernels all PASS (negative results, /tmp/k104/os1-os4):
+plain constrained dual dtor; union with defaulted trait NTTP; the same
+nested inside a class template; variable-template trait in the NTTP and
+requires-clause.  Per the no-hand-guessing rule the carrier is being
+cvise-reduced instead: /tmp/cv105, gate = pinned driver + tumbleweed
+g++ 16.2 validity (docker image gcc16-gate, via `sg docker` -- root-owned
+`sudo` children crash cvise's kill_pid_queue with psutil.AccessDenied)
++ CBMC `_M_payload' is unknown` + `could not fully type-check`.
