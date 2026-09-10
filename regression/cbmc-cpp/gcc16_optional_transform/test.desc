@@ -53,3 +53,15 @@ cannot evaluate and the payload member never materializes.  A second
 independent defect: the NAMED-parameter form of the same declaration
 does not parse (gcc16_builtin_type_param_named).  Fixing the
 instantiate defect should cascade here; re-check this test after.
+
+ROUND-107: both builtin-type-parameter defects FIXED (token gate keyed
+to host gcc version, cdbc0ff145; missing #reference flag on
+__add_rvalue_reference's result, 656607287e) and their tests are CORE.
+This test now gets PAST the payload layer and fails at the NEXT one:
+`optional<int> o = 42` finds no viable constructor -- the converting
+constructor is the template `optional(_Up)` constrained by
+`requires __not_constructing_bool_from_optional<_Up>`, a VARIABLE
+TEMPLATE with a PARTIAL SPECIALIZATION for bool (P0602-era libstdc++
+shape).  Candidates show the template was considered but deduction or
+constraint evaluation failed for _Up = int.  Next: kernel the
+variable-template-partial-specialization requires-clause.
