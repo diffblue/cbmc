@@ -965,6 +965,9 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 to_cpp_template_args_tc(e.type().find(ID_C_template_arguments));
               const auto &targ_v = targs.arguments();
               std::map<irep_idt, typet> name_to_type;
+              // Full parameter identifiers, for the TEMPLATE MAP during
+              // atom evaluation (see below).
+              std::map<irep_idt, typet> id_to_type;
               for(std::size_t pi = 0; pi < params.size() && pi < targ_v.size();
                   ++pi)
               {
@@ -976,7 +979,10 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 const irep_idt sname =
                   pos != std::string::npos ? pid.substr(pos + 2) : pid;
                 if(targ_v[pi].id() == ID_type)
+                {
                   name_to_type[sname] = targ_v[pi].type();
+                  id_to_type[pid] = targ_v[pi].type();
+                }
               }
               // N5008 [temp.constr.decl]/3: the associated constraints of
               // a constrained member of a class template are formed from
@@ -1046,6 +1052,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                         name_to_type.find(sname) == name_to_type.end())
                       {
                         name_to_type[sname] = cargs[pi].type();
+                        id_to_type[pid] = cargs[pi].type();
                       }
                     }
                   }
@@ -1325,6 +1332,31 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                     {
                       cpp_typecheckt::constant_expression_contextt
                         constant_guard{cpp_typecheck};
+                      // N5008 [temp.constr.atomic]/1: the atom is
+                      // evaluated with the parameter mapping of the
+                      // constrained declaration.  The by-name rewrite
+                      // above only reaches parameters spelled in the
+                      // CLAUSE ITSELF; a member named in the atom may
+                      // have defaults referring to the enclosing
+                      // class's parameters in ITS OWN declaration
+                      // (gcc-16 <optional>:
+                      // `template <typename, typename = remove_cv_t
+                      // <_Tp>> static constexpr bool
+                      // __not_constructing_bool_from_optional`, named
+                      // by the converting constructor's
+                      // requires-clause).  Resolving that default
+                      // needs the bindings in the TEMPLATE MAP, so
+                      // install them for the duration of the atom's
+                      // typecheck; a throw here previously read as
+                      // "constraint unsatisfied" and silently removed
+                      // the candidate.
+                      cpp_saved_template_mapt saved_map{
+                        cpp_typecheck.template_map};
+                      for(const auto &binding : id_to_type)
+                      {
+                        cpp_typecheck.template_map.type_map[binding.first] =
+                          binding.second;
+                      }
                       cpp_typecheck.typecheck_expr(atom);
                     }
                     const bool atom_clean =
