@@ -211,6 +211,16 @@ protected:
   /// the throw propagates straight to the body's conversion without any
   /// intervening (recovering) resolution.
   bool pending_no_viable_call = false;
+
+  /// Non-zero while overload resolution is exploring a class's
+  /// CONSTRUCTOR candidates as part of a user-defined conversion
+  /// sequence (copy-initialization, [over.match.copy]).  N5008
+  /// [over.best.ics]/4: when the target is the first parameter of such a
+  /// constructor candidate, user-defined conversion sequences are NOT
+  /// considered -- otherwise a `template <class C> operator C()` on the
+  /// argument makes EVERY constructor viable (C deduced as each
+  /// parameter type) and resolution reports a bogus ambiguity.
+  unsigned copy_init_ctor_exploration = 0;
   irep_idt pending_no_viable_base_name;
   source_locationt pending_no_viable_location;
 

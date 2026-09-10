@@ -1202,6 +1202,12 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
   const exprt &expr,
   const typet &to)
 {
+  // N5008 [over.best.ics]/4: see cpp_typecheck.h.  Reference binding of
+  // a constructor candidate's parameter must not instantiate the
+  // argument's template conversion operator.
+  if(copy_init_ctor_exploration > 0 && constant_expression_context == 0)
+    return nullptr;
+
   if(expr.type().id() != ID_struct_tag)
     return nullptr;
 
@@ -1680,6 +1686,17 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   PRECONDITION(!is_reference(expr.type()));
   PRECONDITION(!is_reference(to));
 
+  // N5008 [over.best.ics]/4: while constructor candidates of a
+  // copy-initialization are being explored, a user-defined conversion
+  // sequence for a candidate's parameter is not considered (also
+  // [over.ics.user]: at most one user-defined conversion per sequence).
+  // Nested queries inside a constant-expression evaluation (SFINAE
+  // constraints such as `is_constructible`) are separate conversion
+  // sequences and stay allowed, mirroring the template-constructor
+  // fallback's re-entry rule below.
+  if(copy_init_ctor_exploration > 0 && constant_expression_context == 0)
+    return false;
+
   const typet &from = expr.type();
 
   new_expr.make_nil();
@@ -1695,6 +1712,22 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
   if(to.id() == ID_struct_tag)
   {
+    // See [over.best.ics]/4 note above: everything in this branch
+    // explores CONSTRUCTOR candidates of the target, so a user-defined
+    // conversion sequence must not be used for their parameters.
+    struct explorationt final
+    {
+      explicit explorationt(unsigned &c) : counter(c)
+      {
+        ++counter;
+      }
+      ~explorationt()
+      {
+        --counter;
+      }
+      unsigned &counter;
+    } exploration_guard{copy_init_ctor_exploration};
+
     // Ensure the target type is complete before looking for constructors.
     // For libc++ std::function, the type may be incomplete from a
     // forward declaration and needs elaboration.

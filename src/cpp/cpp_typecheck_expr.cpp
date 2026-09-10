@@ -6398,6 +6398,32 @@ void cpp_typecheckt::typecheck_function_call_arguments(
         continue;
       }
 
+      // N5008 [over.match.copy] + [over.best.ics]/4: copy-initializing
+      // a by-value parameter from a DIFFERENT class is a TWO-STEP
+      // process -- first convert the argument to the parameter's class
+      // (candidates: the class's converting constructors AND the
+      // argument's conversion functions), then initialize from that
+      // rvalue.  Resolving the parameter class's constructors directly
+      // against the raw argument instead runs direct-initialization,
+      // where a `template <class C> operator C()` on the argument makes
+      // EVERY constructor viable via a user-defined conversion of its
+      // first parameter (forbidden by [over.best.ics]/4), reporting a
+      // bogus ambiguity across all of std::vector's constructors.
+      // Derived-to-base by-value (slicing) stays on the constructor
+      // path: binding derived to `const base &` is a standard
+      // conversion, not a user-defined one.
+      if(
+        arg_it->type().id() == ID_struct_tag &&
+        arg_it->type() != parameter.type() &&
+        !subtype_typecast(
+          follow_tag(to_struct_tag_type(arg_it->type())),
+          follow_tag(to_struct_tag_type(parameter.type()))))
+      {
+        implicit_typecast(*arg_it, parameter.type());
+        ++arg_it;
+        continue;
+      }
+
       // Non-POD class-type pass-by-value: call copy constructor.
       // Check that the destructor symbol exists (needed for the
       // temporary) to avoid crashes during goto conversion.
