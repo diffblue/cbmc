@@ -65,3 +65,15 @@ TEMPLATE with a PARTIAL SPECIALIZATION for bool (P0602-era libstdc++
 shape).  Candidates show the template was considered but deduction or
 constraint evaluation failed for _Up = int.  Next: kernel the
 variable-template-partial-specialization requires-clause.
+
+ROUND-108: the requires-clause layer is FIXED (dc5148daf2: atoms are
+evaluated under the declaration's parameter mapping; CORE test
+cpp20_requires_member_variable_template).  With it the ORIGINAL
+preprocessed carrier type-checks COMPLETELY -- no front-end errors --
+so the reduced 50-line artifact no longer represents the remaining
+defect and the original carrier is restored here.  The remaining layer
+is SEMANTIC: both assertions FAIL (has_value / *r == 84) although g++
+-16 compiled binaries pass them -- suspect the modelling of
+_Optional_payload's union storage or the engaged flag through
+optional::transform.  Next: goto-level comparison (--show-goto-functions
+on the ctor/transform path) or unwind trace of _M_engaged.
