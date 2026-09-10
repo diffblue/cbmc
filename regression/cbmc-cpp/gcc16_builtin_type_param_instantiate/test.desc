@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp23
+^\[main\.assertion\.1\] line \d+ function template named, not called: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Instantiating a function template whose (unnamed) parameter type is a
+type-yielding builtin, `template <typename _Tp> void
+probe(__add_rvalue_reference(_Tp));`, by merely NAMING it
+(`probe<int> && true`) reports `symbol '__add_rvalue_reference' is
+unknown`: during instantiation the parameter's builtin type node
+degrades to a plain name lookup instead of the ID_add_rvalue_reference
+type route (cpp_typecheck_type.cpp handles the node when it survives
+as a type).  This is the ROOT of gcc16_optional_transform's
+`_M_payload is unknown`: _Optional_payload's defaulted bool NTTP is
+`is_trivially_move_assignable_v<_Tp> && ...` where that _v helper is
+exactly this shape, so evaluating the default fails, the
+specialization choice fails, and the payload member never materializes.
+VALIDITY: gcc-16-only builtin; certified by g++ 16.2 in the gcc16-gate
+docker image (tumbleweed).
+Derived from the cvise-reduced gcc16_optional_transform artifact
+(round 106 manual backward delta, /tmp/k106 h1-h4; the load-bearing
+chain was established by 14 checked deltas: a0->a5->e2->e4->f1->h1,
+with f2 proving a PORTABLE `_Tp&&` parameter works).
