@@ -41,3 +41,15 @@ has a 1-arg partial specialization and a 3-arg one, and _Optional_base
 names `_Optional_payload<int>` with all defaults -- the choice among
 partial specializations under defaulted, trait-valued NTTPs is the
 suspect layer.
+
+ROUND-106 ROOT CAUSE (backward-delta on the 50-line artifact): the
+load-bearing element is `is_trivially_move_assignable_v<_Tp>` -- a
+FUNCTION template whose parameter type is the gcc-16 type-yielding
+builtin `__add_rvalue_reference(_Tp)` -- named inside _Optional_payload's
+defaulted bool NTTP conjunction.  Instantiating that function template
+reports `symbol '__add_rvalue_reference' is unknown` (see
+gcc16_builtin_type_param_instantiate, 8 lines), so the NTTP default
+cannot evaluate and the payload member never materializes.  A second
+independent defect: the NAMED-parameter form of the same declaration
+does not parse (gcc16_builtin_type_param_named).  Fixing the
+instantiate defect should cascade here; re-check this test after.
