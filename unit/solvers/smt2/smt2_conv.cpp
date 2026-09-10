@@ -615,3 +615,66 @@ TEST_CASE(
   REQUIRE(operands_map.size() == 1);
   REQUIRE(operands_map.count(-1) == 1);
 }
+
+TEST_CASE(
+  "SMT value definitions stop at actual binder origins",
+  "[core][solvers][smt2]")
+{
+  // Cause-effect design: B1 selects Z3's lambda array encoding, B2 says the
+  // prepared value contains an array comprehension, and B3 selects a Boolean
+  // handle rather than a typed assignment. R1 (B1,B2,B3) declares and asserts
+  // a Boolean handle; R2 (B1,B2,!B3) declares and asserts the typed origin;
+  // R3 (B1,!B2,!B3) keeps define-fun. Constraint: an array comprehension is an
+  // SMT binder only for a back-end that emits it as a lambda.
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  smt2_convt conv{ns, "binder origin", "", "ALL", smt2_convt::solvert::Z3, out};
+  const unsignedbv_typet byte{8};
+  const unsignedbv_typet index_type{64};
+  const array_typet array_type{byte, from_integer(2, index_type)};
+  const symbol_exprt index{"i", index_type};
+  const array_comprehension_exprt comprehension{
+    index, typecast_exprt{index, byte}, array_type};
+
+  SECTION("Boolean handle containing an array comprehension")
+  {
+    // Causes: B1, B2, and B3. Effect R1: declare and constrain the handle at
+    // its origin, so later get-value queries never expand the binder.
+    const equal_exprt predicate{
+      index_exprt{comprehension, from_integer(1, index_type)},
+      from_integer(1, byte)};
+    conv.handle(predicate);
+    const std::string output = out.str();
+    CHECK(output.find("(declare-fun B0 () Bool)") != std::string::npos);
+    CHECK(output.find("(assert (= B0 ") != std::string::npos);
+    CHECK(output.find("(lambda ((i ") != std::string::npos);
+    CHECK(output.find("(define-fun B0 ") == std::string::npos);
+  }
+
+  SECTION("Typed assignment whose prepared value contains a binder")
+  {
+    // Causes: B1, B2, and !B3. Effect R2: use the same declaration-and-equality
+    // form and preserve the complete lambda body.
+    const symbol_exprt array{"array", array_type};
+    conv.set_to(equal_exprt{array, comprehension}, true);
+    const std::string output = out.str();
+    CHECK(output.find("(declare-fun array () (Array ") != std::string::npos);
+    CHECK(output.find("(assert (= array ") != std::string::npos);
+    CHECK(output.find("(lambda ((i ") != std::string::npos);
+    CHECK(output.find("(define-fun array ") == std::string::npos);
+  }
+
+  SECTION("Binder-free typed assignment")
+  {
+    // Causes: B1, !B2, and !B3. Effect R3: retain the existing define-fun
+    // form; selecting Z3 alone must not force every value through
+    // declare/assert.
+    const symbol_exprt plain{"plain", byte};
+    conv.set_to(equal_exprt{plain, from_integer(7, byte)}, true);
+    const std::string output = out.str();
+    CHECK(
+      output.find("(define-fun plain () (_ BitVec 8) ") != std::string::npos);
+    CHECK(output.find("(declare-fun plain ") == std::string::npos);
+  }
+}
