@@ -9102,10 +9102,21 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         declarator.type().get_bool(ID_C_rvalue_reference))
       {
         // The base type (from the declaration) should be a template param
+        // N5008 [temp.deduct.call]/3: a forwarding reference is an
+        // rvalue reference to a cv-unqualified BARE template parameter
+        // of this template.  A template-id like `uptr<U>` is also a
+        // cpp_name here, but `uptr<U>&&` is an ORDINARY rvalue-reference
+        // parameter: treating it as forwarding made an
+        // (CBMC-)lvalue-marked prvalue argument deduce against
+        // `uptr<derived>&` and fail, rejecting unique_ptr's converting
+        // constructor for `unique_ptr<const derived>(new derived())`.
+        // Require a single unadorned name (no template arguments, no
+        // scope qualification).
         const auto &base = arg_declaration.type();
         if(
-          base.id() == ID_cpp_name ||
-          base.id() == ID_template_parameter_symbol_type)
+          base.id() == ID_template_parameter_symbol_type ||
+          (base.id() == ID_cpp_name && base.get_sub().size() == 1 &&
+           base.get_sub().front().id() == ID_name))
           is_forwarding_ref = true;
       }
 
@@ -9230,9 +9241,12 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       }
       else if(
         is_rvalue_reference(arg_type) && is_lvalue &&
-        (to_pointer_type(arg_type).base_type().id() == ID_cpp_name ||
-         to_pointer_type(arg_type).base_type().id() ==
-           ID_template_parameter_symbol_type))
+        (to_pointer_type(arg_type).base_type().id() ==
+           ID_template_parameter_symbol_type ||
+         (to_pointer_type(arg_type).base_type().id() == ID_cpp_name &&
+          to_pointer_type(arg_type).base_type().get_sub().size() == 1 &&
+          to_pointer_type(arg_type).base_type().get_sub().front().id() ==
+            ID_name)))
       {
         typet lvalue_ref_type = ::reference_type(it->type());
         guess_template_args(
