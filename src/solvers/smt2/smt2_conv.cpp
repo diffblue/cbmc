@@ -6450,26 +6450,31 @@ void smt2_convt::convert_type(const typet &type)
 
 void smt2_convt::find_symbols(const typet &type)
 {
-  std::set<irep_idt> recstack;
-  find_symbols_rec(type, recstack);
+  type_visitsett visited;
+  find_symbols_rec(type, visited, type_discoveryt::SORTS_AND_EXPRESSIONS);
 }
 
+/// Discover type dependencies, visiting each tag once per discovery mode.
+/// Array-size expressions retain their full dependencies even when their
+/// containing type is only reached through a pointer.
 void smt2_convt::find_symbols_rec(
   const typet &type,
-  std::set<irep_idt> &recstack)
+  type_visitsett &visited,
+  type_discoveryt discovery)
 {
   if(type.id()==ID_array)
   {
     const array_typet &array_type=to_array_type(type);
     find_symbols(array_type.size());
-    find_symbols_rec(array_type.element_type(), recstack);
+    find_symbols_rec(array_type.element_type(), visited, discovery);
   }
   else if(type.id()==ID_complex)
   {
-    find_symbols_rec(to_complex_type(type).subtype(), recstack);
+    find_symbols_rec(to_complex_type(type).subtype(), visited, discovery);
 
-    if(use_datatypes &&
-       datatype_map.find(type)==datatype_map.end())
+    if(
+      discovery == type_discoveryt::SORTS_AND_EXPRESSIONS && use_datatypes &&
+      datatype_map.find(type) == datatype_map.end())
     {
       const std::string smt_typename =
         "complex." + std::to_string(datatype_map.size());
@@ -6493,8 +6498,9 @@ void smt2_convt::find_symbols_rec(
   {
     // Cater for mutually recursive struct types
     bool need_decl=false;
-    if(use_datatypes &&
-       datatype_map.find(type)==datatype_map.end())
+    if(
+      discovery == type_discoveryt::SORTS_AND_EXPRESSIONS && use_datatypes &&
+      datatype_map.find(type) == datatype_map.end())
     {
       const std::string smt_typename =
         "struct." + std::to_string(datatype_map.size());
@@ -6506,7 +6512,7 @@ void smt2_convt::find_symbols_rec(
       to_struct_type(type).components();
 
     for(const auto &component : components)
-      find_symbols_rec(component.type(), recstack);
+      find_symbols_rec(component.type(), visited, discovery);
 
     // Declare the corresponding SMT type if we haven't already.
     if(need_decl)
@@ -6597,32 +6603,41 @@ void smt2_convt::find_symbols_rec(
       to_union_type(type).components();
 
     for(const auto &component : components)
-      find_symbols_rec(component.type(), recstack);
+      find_symbols_rec(component.type(), visited, discovery);
   }
   else if(type.id()==ID_code)
   {
     const code_typet::parameterst &parameters=
       to_code_type(type).parameters();
     for(const auto &param : parameters)
-      find_symbols_rec(param.type(), recstack);
+      find_symbols_rec(param.type(), visited, discovery);
 
-    find_symbols_rec(to_code_type(type).return_type(), recstack);
+    find_symbols_rec(to_code_type(type).return_type(), visited, discovery);
   }
   else if(type.id()==ID_pointer)
   {
-    find_symbols_rec(to_pointer_type(type).base_type(), recstack);
+    // Pointers are bitvectors, so the pointed-to datatype is not a sort
+    // dependency. Still discover expressions in that type, such as VLA sizes
+    // used by element_address. This also avoids declaring a recursive pointee
+    // before a by-value member's tag alias has been registered.
+    find_symbols_rec(
+      to_pointer_type(type).base_type(),
+      visited,
+      type_discoveryt::EXPRESSIONS_ONLY);
   }
   else if(type.id() == ID_struct_tag)
   {
     const auto &struct_tag = to_struct_tag_type(type);
     const irep_idt &id = struct_tag.get_identifier();
 
-    if(recstack.find(id) == recstack.end())
+    // A pointer-only visit must not suppress a later by-value visit in the
+    // same traversal. Both modes still terminate cycles through type tags.
+    if(visited.emplace(id, discovery).second)
     {
       const auto &base_struct = ns.follow_tag(struct_tag);
-      recstack.insert(id);
-      find_symbols_rec(base_struct, recstack);
-      datatype_map[type] = datatype_map[base_struct];
+      find_symbols_rec(base_struct, visited, discovery);
+      if(discovery == type_discoveryt::SORTS_AND_EXPRESSIONS)
+        datatype_map[type] = datatype_map[base_struct];
     }
   }
   else if(type.id() == ID_union_tag)
@@ -6630,15 +6645,16 @@ void smt2_convt::find_symbols_rec(
     const auto &union_tag = to_union_tag_type(type);
     const irep_idt &id = union_tag.get_identifier();
 
-    if(recstack.find(id) == recstack.end())
+    if(visited.emplace(id, discovery).second)
     {
-      recstack.insert(id);
-      find_symbols_rec(ns.follow_tag(union_tag), recstack);
+      find_symbols_rec(ns.follow_tag(union_tag), visited, discovery);
     }
   }
   else if(type.id() == ID_state)
   {
-    if(datatype_map.find(type) == datatype_map.end())
+    if(
+      discovery == type_discoveryt::SORTS_AND_EXPRESSIONS &&
+      datatype_map.find(type) == datatype_map.end())
     {
       datatype_map[type] = "state";
       out << "(declare-sort state 0)\n";
@@ -6649,9 +6665,9 @@ void smt2_convt::find_symbols_rec(
     const auto &mathematical_function_type =
       to_mathematical_function_type(type);
     for(auto &d_type : mathematical_function_type.domain())
-      find_symbols_rec(d_type, recstack);
+      find_symbols_rec(d_type, visited, discovery);
 
-    find_symbols_rec(mathematical_function_type.codomain(), recstack);
+    find_symbols_rec(mathematical_function_type.codomain(), visited, discovery);
   }
 }
 
