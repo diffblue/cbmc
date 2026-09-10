@@ -27,3 +27,17 @@ cvise-reduced instead: /tmp/cv105, gate = pinned driver + tumbleweed
 g++ 16.2 validity (docker image gcc16-gate, via `sg docker` -- root-owned
 `sudo` children crash cvise's kill_pid_queue with psutil.AccessDenied)
 + CBMC `_M_payload' is unknown` + `could not fully type-check`.
+
+ROUND-106: carrier replaced by the finished cvise artifact (fleet
+/tmp/cv105): 7327 lines -> 50 lines.  VALIDITY NOTE: the artifact uses
+gcc-16-only builtins (__add_rvalue_reference as a type-yielding
+builtin, variable-template partial specializations of the _v traits),
+so g++ 13 / clang 18 REJECT it -- validity is certified by g++ 16.2 in
+the `gcc16-gate` docker image (tumbleweed), which accepts it with the
+__CPROVER_assert declaration prefixed.  CBMC still reports the pinned
+signature (`symbol '_M_payload' is unknown`).  Visible structure: the
+_Optional_payload primary takes 3 trait-valued defaulted bool NTTPs,
+has a 1-arg partial specialization and a 3-arg one, and _Optional_base
+names `_Optional_payload<int>` with all defaults -- the choice among
+partial specializations under defaulted, trait-valued NTTPs is the
+suspect layer.
