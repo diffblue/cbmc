@@ -80,6 +80,29 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 
     scope_identifier.id_class=cpp_idt::id_classt::SYMBOL;
 
+    // N5008 [dcl.enum]/12: an UNSCOPED enumeration's enumerators can
+    // also be referred to with the scope-resolution syntax
+    // (`kindt::CALL`, C++11).  The current scope here is the ENCLOSING
+    // scope for an unscoped enum (only `enum class` switches to the
+    // enum's own scope before this function), so additionally register
+    // the enumerator in the enum's scope; without this,
+    // `resolve_scope` correctly entered `kindt::` but the qualified
+    // lookup of the enumerator found nothing and the whole expression
+    // failed ("found no match" with a nil-typed argument when it was a
+    // member-call argument).
+    if(!enum_symbol.type.get_bool(ID_C_class))
+    {
+      auto scope_it = cpp_scopes.id_map.find(enum_symbol.name);
+      if(
+        scope_it != cpp_scopes.id_map.end() && scope_it->second->is_scope &&
+        &*scope_it->second != &cpp_scopes.current_scope())
+      {
+        cpp_idt &in_enum_scope = cpp_scopes.put_into_scope(
+          *new_symbol, static_cast<cpp_scopet &>(*scope_it->second));
+        in_enum_scope.id_class = cpp_idt::id_classt::SYMBOL;
+      }
+    }
+
     ++i;
   }
 }
