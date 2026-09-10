@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unused deleted implicit ctors are not an error: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [class.default.ctor]/2: a defaulted default constructor whose
+member or base has no default constructor is defined as DELETED;
+/4 + [dcl.fct.def.delete]/2: that is an error only when the deleted
+definition is odr-USED.  Nothing here odr-uses them.  g++ 13 and
+clang++ 18 accept silently; CBMC eagerly generates the implicit
+definitions and reports "found no match for symbol 'symbol_exprt'"
+(ssa_exprt's implicit default ctor), the same for guard_exprt
+(goto_statet's), and "member 'goto_statet::goto_statet(this)' is not
+accessible" (the derived `final`'s).
+Reduced by cvise (fleet /tmp/cv98, 99,167-line goto-symex dog-food
+carrier from src/goto-symex/goto_state.h) to 11 lines.
