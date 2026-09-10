@@ -8132,3 +8132,43 @@ defaulted arguments -- consistent with the '_M_payload is unknown'
 signature if the specialization choice or default-NTTP evaluation
 fails.  Wait for the fleet to finish before concluding.
 Census 7.
+
+## Round 106 (2026-09-10): both fleets harvested; gcc16 root cause = builtin-typed parameter
+
+BOTH fleets finished. cv98's 11-line artifact (deleted implicit default
+ctors, [class.default.ctor]/2) turned out to pass on the CURRENT tree --
+the round-98 deleted-implicit-member recovery already handles it; the
+fleet's FROZEN binary predated that fix.  Landed directly as CORE
+(cpp11_deleted_implicit_default_ctor_unused).  The ORIGINAL 99k carrier
+still fails on the current tree (goto_statet not-accessible +
+CONVERSION ERROR), so /tmp/cv107 now re-reduces it against TODAY'S
+binary with a 3-signature gate (not-accessible + no-match symbol_exprt
++ CONVERSION ERROR).  GATE LESSON (new): the frozen reference binary
+must be CURRENT at launch, or the reduction converges to already-fixed
+shapes.  Also: verify KNOWNBUG flips with the tag flipped to CORE --
+test.pl SKIPS KNOWNBUG dirs by default, so "All tests successful" on a
+KNOWNBUG dir is a no-op, not a verdict.
+Residual cosmetic issue found on the way: the round-98 recovery resets
+the ERROR COUNT but the deleted-implicit-member diagnostics' TEXT has
+already been printed to stderr (noise, not a failure).
+cv105's 50-line artifact was root-caused by MANUAL BACKWARD DELTA (14
+checked steps, each validated by docker g++16 + signature): forward
+hand-construction had missed 6 times (g1-g6 all pass) -- reducing FROM
+the failing artifact beats constructing TOWARD it.  Chain
+a0->a5->e2->e4->f1->h1: the load-bearing element is a function template
+whose parameter type is the gcc-16 TYPE-YIELDING BUILTIN
+`__add_rvalue_reference(_Tp)`, named (not called) in a defaulted bool
+NTTP.  TWO independent defects, both new minimal KNOWNBUGs:
+  * gcc16_builtin_type_param_instantiate (8 lines): instantiating the
+    unnamed form degrades the builtin to a plain symbol lookup
+    ("symbol '__add_rvalue_reference' is unknown") although
+    cpp_typecheck_type.cpp HAS an ID_add_rvalue_reference route -- the
+    parameter's builtin node evidently does not survive to that route
+    during instantiation.  This is the root of optional_transform.
+  * gcc16_builtin_type_param_named: `probe(__add_rvalue_reference(_Tp)
+    v)` with a NAMED declarator is a PARSE error (cast-vs-declaration
+    disambiguation).
+Census 9 (8 - iterator-shadow flip already counted + 2 new gcc16 splits
+... recount: bodyless_call_no_havoc, deduced_nontype, regex x2,
+ranges_basic_libcxx, gcc16_optional_transform, libcxx23_vector_pushback,
+gcc16_builtin_type_param_named, gcc16_builtin_type_param_instantiate).
