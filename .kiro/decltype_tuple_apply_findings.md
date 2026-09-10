@@ -8172,3 +8172,36 @@ Census 9 (8 - iterator-shadow flip already counted + 2 new gcc16 splits
 ... recount: bodyless_call_no_havoc, deduced_nontype, regex x2,
 ranges_basic_libcxx, gcc16_optional_transform, libcxx23_vector_pushback,
 gcc16_builtin_type_param_named, gcc16_builtin_type_param_instantiate).
+
+## Round 107 (2026-09-10): both gcc16 builtin-param defects fixed; two flips
+
+Fixed both round-106 KNOWNBUGs (cdbc0ff145 + 656607287e + flip commit):
+  1. TOKEN GATE: the scanner's type-yielding builtin tokens
+     (__add_rvalue_reference & friends) were enabled only when the HOST
+     gcc is >= 14 (cpp_parser.cpp ran `gcc_versiont().get("gcc")`).
+     Wrong axis: a preprocessed .ii from gcc-16 must parse regardless of
+     host toolchain.  Enabled for GCC + CLANG flavors; collision scan of
+     gcc-13 libstdc++ and llvm-18 libc++ found all occurrences are
+     builtin USES (longer identifiers like __add_rvalue_reference_helper
+     are protected by flex maximal munch + the trailing-context rule).
+     This ALSO fixed the "named parameter parse error" defect -- the
+     parse error was just the identifier fallback, not a
+     disambiguation bug as first assumed.
+  2. FLAG: typecheck_type's ID_add_rvalue_reference route set only
+     #rvalue_reference; CBMC's convention needs #reference TOO
+     (is_reference() tests only that).  Without it the type read as a
+     plain POINTER: fargs.match rejected `signed int -> signed int *`,
+     making every call/named-use of such a specialization non-viable.
+DIAGNOSTIC chain worth keeping: "template 'probe' not found" was a
+SECONDARY message from the C++20 aggregate-paren-init retry probing the
+name as a TYPE; the primary "found no match" came from the deferred
+pending_no_viable_call report in the method-bodies drain; the decisive
+measurements were the FM probe showing P[pointer ref=0 rref=1] for the
+builtin route vs P[pointer ref=1 rref=1] for a hand-written T&&, plus
+gdb `finish` on fargs.match returning 0.
+Revert-tested (T1: 3 errors -> 0, T2: 4 -> 0); five suites green; both
+tests CORE.  gcc16_optional_transform now fails one layer further:
+`optional<int> o = 42` -- the requires-constrained converting ctor
+(variable template with bool partial specialization) is not selected.
+cv107 running (goto-symex carrier vs CURRENT binary).
+Census 7.
