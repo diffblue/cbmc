@@ -8205,3 +8205,33 @@ tests CORE.  gcc16_optional_transform now fails one layer further:
 (variable template with bool partial specialization) is not selected.
 cv107 running (goto-symex carrier vs CURRENT binary).
 Census 7.
+
+## Round 108 (2026-09-10): requires-clause parameter mapping fixed — optional's front-end layers ALL done
+
+FIX (dc5148daf2) + CORE test cpp20_requires_member_variable_template:
+[temp.constr.atomic]/1 -- requires-clause atoms must be evaluated under
+the constrained declaration's parameter mapping.  The by-name rewrite
+in resolve()'s requires filter only reaches parameters spelled in the
+CLAUSE; a member variable template named by the atom can have defaults
+referring to the ENCLOSING class's parameters in its own declaration
+(gcc-16 <optional>'s __not_constructing_bool_from_optional, second
+parameter defaulting over _Tp).  Resolving the default threw, and the
+throw -> "constraint unsatisfied" mapping silently removed the only
+viable converting constructor.  Fix: install the full-identifier
+bindings (member's own + enclosing class instance's) into template_map
+around the atom's typecheck (cpp_saved_template_mapt).
+Kernel chain (all measured): v3 non-member variable template WORKS, v4
+member with non-dependent default WORKS, v5 plain member constant
+WORKS, v7 dependent default UNUSED in requires WORKS, v2 dependent
+default + requires FAILS.  The wrapper-probe on fargs.match showed the
+deduced candidate NEVER reached matching (only the copy ctor did);
+the ATOM-THROW probe pinpointed the drop.  NOTE: in-class partial
+specializations of member variable templates need g++16 (docker) for
+validity -- g++13 rejects them -- but the minimal kernel avoids them
+entirely, so the CORE test is g++13/clang++18-runtime-verified.
+gcc16_optional_transform: with this fix the ORIGINAL carrier
+type-checks completely; remaining layer is SEMANTIC (assertions fail;
+suspect union-payload/engaged-flag modelling).  Original carrier
+restored to the test.
+Five suites green; revert-tested (2 errors -> 0).
+Census 7 (unchanged: optional_transform stays for its semantic layer).
