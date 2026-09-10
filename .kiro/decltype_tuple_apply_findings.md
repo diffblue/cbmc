@@ -8061,3 +8061,39 @@ Proper revert test (rebuild with/without): 0 assertions + 5 errors ->
 1 assertion + 0 errors.  Five suites green.  No cascade to the other
 front-end KNOWNBUGs (checked iterator-shadow, unique_ptr_derived,
 optional_transform).  Census 9.
+
+## Round 104 (2026-09-10): forwarding-reference misclassification fixed; gcc16 reduction launched
+
+FIX + FLIP (3450c733c8 + flip) cpp17_unique_ptr_derived_return, whose
+stored diagnosis ("symex-side __uniq_ptr_data") was STALE -- the current
+binary failed in the FRONT END.  Reduction of the dog-food kernel to
+/tmp/k104 up1-up10 isolated it: deduction for unique_ptr's converting
+constructor `unique_ptr(unique_ptr<_Up,_Ep>&&)` fails ONLY when the
+argument is a PRVALUE temporary (up9 xvalue works, up8 const& works,
+up10/up6 prvalue fail).  Probes at guess_function_template_args showed
+identical argument TYPES for the pass/fail pair -- only the expr id
+differs (dereference vs side_effect).  Root cause: is_forwarding_ref
+classified ANY cpp_name base under && as a forwarding reference,
+INCLUDING template-ids like `unique_ptr<_Up,_Ep>`; the CBMC-#lvalue-
+marked temporary then took the [temp.deduct.call]/3 lvalue special case
+and deduced against "lvalue reference to unique_ptr<const derived>",
+failing every template candidate.  Fix: require a bare single unadorned
+name in BOTH classification sites.
+REJECTED alternative (measured): treating side_effect results as
+prvalues in the two lvalueness tests fixed the kernels but broke
+cpp11_deque_pushback_libcxx + cpp17_deque_basic_libcxx (goto_convert
+new_tmp_symbol `!mode.empty()` invariant) -- the VALUE CATEGORY hack
+compensated in the wrong layer; the classification was the actual bug.
+Revert-tested: 3 bad lines -> 0; five suites green.
+gcc16_optional_transform triaged: `_M_payload' is unknown` instantiating
+_Optional_base -- gcc-16's _Storage is a nested member union template
+with defaulted bool NTTP + P0848 dual constrained dtors.  os1-os4
+kernels all pass (negative), so per the no-hand-guessing rule a THIRD
+fleet /tmp/cv105 now reduces the 7327-line carrier (8 workers, nice 12;
+36-core host, cv98 unaffected at 10 workers).  Gate: pinned driver +
+docker tumbleweed g++ 16.2 validity + both CBMC error signatures.
+OPERATIONAL lessons: `timeout` INSIDE the tumbleweed image exits 125
+(host-side timeout instead); cvise CRASHES (psutil.AccessDenied in
+kill_pid_queue) when the gate spawns root-owned `sudo docker` children
+-- added ubuntu to the docker group and gate uses `sg docker -c`.
+Census 8 (was 11 at yesterday's start).
