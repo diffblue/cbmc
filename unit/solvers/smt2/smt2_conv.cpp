@@ -13,11 +13,18 @@
 #include <util/mathematical_types.h>
 #include <util/message.h>
 #include <util/namespace.h>
+#include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include <goto-programs/json_goto_trace.h>
+
+#include <ansi-c/ansi_c_language.h>
+#include <langapi/mode.h>
 #include <solvers/smt2/smt2_conv.h>
 #include <solvers/smt2/smt2_dec.h>
+#include <solvers/smt2/smt2irep.h>
+#include <testing-utils/config_restore.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(
@@ -543,11 +550,12 @@ TEST_CASE(
   REQUIRE(out.str().find("RegLan") != std::string::npos);
 }
 
-/// Subclass exposing the protected \ref smt2_convt::walk_array_tree method so
+/// Subclass exposing protected array-model parsing methods so
 /// the array-model parse direction can be exercised directly.
 class array_tree_smt2_convt : public smt2_convt
 {
 public:
+  using smt2_convt::parse_rec;
   using smt2_convt::smt2_convt;
   using smt2_convt::walk_array_tree;
 };
@@ -614,4 +622,150 @@ TEST_CASE(
   // The non-constant store was dropped; only the well-formed default remains.
   REQUIRE(operands_map.size() == 1);
   REQUIRE(operands_map.count(-1) == 1);
+}
+
+TEST_CASE(
+  "SMT unavailable array model elements retain types through JSON traces",
+  "[core][solvers][smt2]")
+{
+  const config_restoret restore_config;
+  config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+  config.ansi_c.set_arch_spec_x86_64();
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream output;
+  if(!get_language_from_mode(ID_C))
+    register_language(new_ansi_c_language);
+  null_message_handlert messages;
+  array_tree_smt2_convt solver{
+    ns, "partial array model", "", "ALL", smt2_convt::solvert::GENERIC, output};
+  const unsignedbv_typet byte{8};
+  const unsignedbv_typet index_type{64};
+  array_typet array_type{byte, from_integer(2, index_type)};
+  const exprt unknown_byte{ID_unknown, byte};
+  const exprt seven = from_integer(7, byte);
+  const exprt nine = from_integer(9, byte);
+  exprt::operandst expected;
+  std::string model;
+  SECTION("Missing symbolic default")
+  {
+    // U1: unrecognized array symbol + size one => one typed unknown, never
+    // zero or untyped nil. Indexing it reproduces the observed trace crash.
+    array_type.size() = from_integer(1, index_type);
+    model = "unavailable_array";
+    expected = {unknown_byte};
+  }
+  SECTION("Unsupported lambda model")
+  {
+    // U2: lambda models remain unsupported. Do not interpret the body or
+    // invent bytes merely to render a trace; both elements stay unknown.
+    model = "(lambda ((i (_ BitVec 64))) #x07)";
+    expected = {unknown_byte, unknown_byte};
+  }
+  SECTION("Partial store without a default")
+  {
+    // U3: known index one remains nine; the missing index zero is unknown.
+    model = "(store unavailable_array #x0000000000000001 #x09)";
+    expected = {unknown_byte, nine};
+  }
+  SECTION("Known default")
+  {
+    // U4: a supported constant model retains every concrete default value.
+    model = "((as const (Array (_ BitVec 64) (_ BitVec 8))) #x07)";
+    expected = {seven, seven};
+  }
+  SECTION("Known default and store through a let binding")
+  {
+    // U5: existing binding resolution and stores retain all known values.
+    model =
+      "(let ((base ((as const (Array (_ BitVec 64) "
+      "(_ BitVec 8))) #x07))) "
+      "(store base #x0000000000000001 #x09))";
+    expected = {seven, nine};
+  }
+  SECTION("Unavailable parsed default")
+  {
+    // U6: parse_rec returns nil for an unknown Boolean default; normalize
+    // that actual element to typed unknown as well as a missing default.
+    array_type.element_type() = bool_typet{};
+    model = "((as const (Array (_ BitVec 64) Bool)) unavailable_bool)";
+    expected = {
+      exprt{ID_unknown, bool_typet{}}, exprt{ID_unknown, bool_typet{}}};
+  }
+  SECTION("Unavailable parsed store value")
+  {
+    // U7: an unknown explicit store value is unknown, not the true default;
+    // the untouched index keeps its known true value.
+    array_type.element_type() = bool_typet{};
+    model =
+      "(store ((as const (Array (_ BitVec 64) Bool)) true) "
+      "#x0000000000000000 unavailable_bool)";
+    expected = {exprt{ID_unknown, bool_typet{}}, true_exprt{}};
+  }
+  SECTION("Unknown array size")
+  {
+    // U8: preserve the existing contiguous-prefix representation: known
+    // index zero followed by a typed unknown default for an unknown size.
+    array_type.size() = symbol_exprt{"length", index_type};
+    model = "(store unavailable_array #x0000000000000000 #x09)";
+    expected = {nine, unknown_byte};
+  }
+  SECTION("Nonconstant store index retains the known default")
+  {
+    // U10: the existing walker skips a nonconstant index. Its known default
+    // must survive normalization, and the rejected store must not appear.
+    array_type.size() = symbol_exprt{"length", bool_typet{}};
+    model = "(store ((as const (Array Bool (_ BitVec 8))) #x07) x #x09)";
+    expected = {seven};
+  }
+  SECTION("Nonconstant store index without a default")
+  {
+    // U11: skipping an unrepresentable index leaves a typed unknown default,
+    // with no invented value from the rejected store.
+    array_type.size() = symbol_exprt{"length", bool_typet{}};
+    model = "(store unavailable_array x #x09)";
+    expected = {unknown_byte};
+  }
+  SECTION("Zero length")
+  {
+    // U9: zero-size models remain empty, with no invented placeholder byte.
+    array_type.size() = from_integer(0, index_type);
+    model = "unavailable_array";
+  }
+  std::istringstream input{model};
+  const auto parsed = smt2irep(input, messages);
+  REQUIRE(parsed.has_value());
+  const exprt actual = solver.parse_rec(*parsed, array_type);
+  REQUIRE(actual.id() == ID_array);
+  REQUIRE(actual.operands().size() == expected.size());
+  for(std::size_t i = 0; i < expected.size(); ++i)
+  {
+    const index_exprt selected{actual, from_integer(i, index_type)};
+    CHECK(simplify_expr(selected, ns) == expected[i]);
+    REQUIRE(actual.operands()[i].type() == array_type.element_type());
+
+    // The same model value passes through the actual JSON DECL exporter,
+    // including its simplify_expr call that previously lost the byte type.
+    // Unknown values must render explicitly as unknown, with no data field.
+    const symbolt symbol{"selected", array_type.element_type(), ID_C};
+    if(!symbol_table.has_symbol(symbol.name))
+      symbol_table.insert(symbol);
+    goto_trace_stept step{};
+    step.type = goto_trace_stept::typet::DECL;
+    step.full_lhs = symbol.symbol_expr();
+    step.full_lhs_value = selected;
+    const json_nullt location;
+    json_objectt assignment;
+    convert_decl(
+      assignment, {location, step, ns}, trace_optionst::default_options);
+    if(expected[i].id() == ID_unknown)
+    {
+      CHECK(assignment["value"]["name"].value == "unknown");
+      const auto &value = to_json_object(assignment["value"]);
+      CHECK(value.find("data") == value.end());
+    }
+    else
+      CHECK(assignment["value"]["name"].value != "unknown");
+  }
+  REQUIRE(actual == array_exprt{expected, array_type});
 }

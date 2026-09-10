@@ -589,12 +589,19 @@ exprt smt2_convt::parse_array(
 {
   std::unordered_map<int64_t, exprt> operands_map;
   walk_array_tree(&operands_map, src, type);
+  // Preserve element types when trace simplification selects unavailable
+  // model data, as boolbvt::bv_get_unbounded_array does. Unknown elements
+  // represent missing information, not concrete solver values.
+  const exprt unknown_element{ID_unknown, type.element_type()};
+  for(auto &entry : operands_map)
+    if(entry.second.is_nil())
+      entry.second = unknown_element;
   exprt::operandst operands;
   // Try to find the default value, if there is none then set it
   auto maybe_default_op = operands_map.find(-1);
   exprt default_op;
   if(maybe_default_op == operands_map.end())
-    default_op = nil_exprt();
+    default_op = unknown_element;
   else
     default_op = maybe_default_op->second;
   int64_t i = 0;
