@@ -77,3 +77,27 @@ is SEMANTIC: both assertions FAIL (has_value / *r == 84) although g++
 _Optional_payload's union storage or the engaged flag through
 optional::transform.  Next: goto-level comparison (--show-goto-functions
 on the ctor/transform path) or unwind trace of _M_engaged.
+
+ROUND-109 RECLASSIFICATION: the "semantic layer" is another MASKED
+FRONT-END failure, not union modelling.  Measured chain:
+  * the trace never writes return_value_transform; r is copied from it
+    unconstrained, so the counterexample picks arbitrary values;
+  * _Optional_payload_base::_M_apply (which construct_at's the value
+    and sets _M_engaged=true) exists in the goto model ONLY as a CALL
+    -- all its symbols are bodyless;
+  * convert_function ENTERS _M_apply with value=code and EXITS normally
+    with value=nil: typecheck_code(body) THROWS and the system-header
+    leniency (catch(int) -> is_system_header_body -> repair attempt ->
+    make_nil) silently drops the body; with that leniency env-disabled
+    the drain's unsupported-STL leniency catches it instead -- two
+    layers of deliberate tolerance hide the real error entirely;
+  * the end-of-run "functions with no body" report DOES list
+    _M_apply, construct_at and _Construct -- the existing visibility
+    mechanism, easy to overlook.
+Negative kernels (/tmp/k109 m1, c1, c2): member-template call chains,
+placement new, and the full gcc-16 construct_at shape (requires-clause
+with placement-new requirement, noexcept(noexcept(...)),
+if-constexpr array branch) all PASS in isolation.  Fleet /tmp/cv110
+reduces the carrier under a SEMANTIC gate: typecheck must stay CLEAN
+(no ^file lines) while both assertions FAIL -- that pins the silent
+body-drop without letting the reduction drift into front-end errors.
