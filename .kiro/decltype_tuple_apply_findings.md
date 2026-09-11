@@ -8531,3 +8531,40 @@ fastest way to localize silent resolution failures -- two runs pinpoint
 the exact give-up among ~25 candidates.  Scripted insertions braced
 this time (round-109 lesson applied).
 Census 6 unchanged; suites untouched this round (no landed src change).
+
+## Round 117 (2026-09-11): silent-escape recovery LANDED (symex crash resolved); cv116 drift post-mortem; cv117 up
+
+FIX (b44419e7a9): the method-body drain's ordinary-body catch(int)
+rethrow could ESCAPE cpp_typecheckt::typecheck() into typecheck_main's
+catch(int), whose UNCOMMITTED error() stream leaves the message count
+unchanged -- the front end reported SUCCESS over a half-processed
+symbol table (clean_up skipped; class types kept code-typed method
+components, violating [class.mem.general]/4's object model) and symex
+crashed in assign_from_struct (cpp14_perfect_forward_struct_arity).
+The fix splits the rethrow by COMMITTED-DIAGNOSTIC state:
+  * count moved -> propagate (CONVERSION ERROR; rejects-invalid tests).
+  * silent escape -> the existing auditable-incomplete-body tolerance.
+THREE orderings measured: blanket recovery broke 31 rejects-invalid
+tests; gate-before-template-tolerance broke 17 valid optional/variant/
+concepts tests (their recoveries commit diagnostics that enclosing
+contexts reset); diagnosed-rethrow AFTER the template tolerance breaks
+none.  Revert-tested (Invariant crash without, clean with); 5 suites
+green.  The KNOWNBUG stays (underlying [dcl.fct]/6 varargs root open);
+its desc updated.  Also caught: `test.pl -c <bindir>` (not
+<bindir>/cbmc) makes every test fail -- check the -c argument before
+believing a mass failure.
+cv116 POST-MORTEM (two NEW gate lessons):
+  1. pin `int main()` -- cvise absorbed the driver into a redefinition
+     of __CPROVER_assert and the "no entry point" run still passed the
+     mechanism greps;
+  2. the definition-presence pin must be a body line OF THE FUNCTION
+     checked called-but-undefined -- pinning the _ConstructTransaction
+     line (emplace helper) let cvise hollow push_back to a declaration
+     while keeping the pin.
+cv117 relaunched with the hardened gate (push_back's own
+`{ emplace_back(__x); }` + `int main()` + goto-model main present).
+Census 5: deduced_nontype (parked), perfect_forward_struct_arity
+(crash gone, varargs root), regex x2, ranges_basic_libcxx (varargs
+root), libcxx23_vector_pushback (cv117).  The [dcl.fct]/6 three-site
+varargs fix now blocks TWO census entries -- top candidate for a
+dedicated round.
