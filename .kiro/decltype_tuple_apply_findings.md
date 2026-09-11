@@ -8294,3 +8294,31 @@ artifact will decide.  All probes stripped; tree clean.
 Fleets: cv107 ~67k lines (slow, big carrier); cv110 27 lines/106KB
 (token passes on long preprocessed lines).
 Census 7.
+
+## Round 111 (2026-09-10/11): --no-body-assertions lands; bodyless_call_no_havoc CORE; third fleet up
+
+Resolved the verification-semantics census item with a measured,
+default-preserving design:
+  * MEASUREMENT: made the no-body VCC unconditional and ran the two big
+    suites -- exactly TWO tests break (String_Abstraction15: intentional
+    declared-only malloc; cpp11_list_pushback_libcxx: object-bits
+    blowup).  The nondet-stub idiom is real, so the default stays.
+  * DESIGN: new opt-in flag --no-body-assertions (OPT_BMC + help +
+    cbmc_parse_options wiring + symex_configt member) emits the failing
+    `no-body` property regardless of --no-unwinding-assertions.
+    Bounded-loop harnesses can now demand missing-body diagnosis.
+  * bodyless_call_no_havoc flipped to CORE using the flag; desc records
+    the measurement and that state-havoc remains future work.
+    WIRING lesson: an OPT_BMC entry alone parses but does NOT reach
+    optionst -- cbmc_parse_options must set_option explicitly (found
+    when the first build accepted the flag and ignored it).
+Also: cpp20_ranges_basic_libcxx's failure mode has CHANGED after this
+week's fixes -- now `arr | std::views::take(3)` dies converting the
+ARRAY argument to a raw `<<type:auto>>` parameter ("implicit arithmetic
+conversion not permitted").  Two abbreviated-template kernels (auto&&
+param, operator| with auto&&) PASS, so a THIRD fleet /tmp/cv111 reduces
+the 84k-line preprocessed carrier (5 workers, nice 15; host clang++
+-stdlib=libc++ validity gate, no docker needed).
+Fleets now: cv107 (goto-symex, ~94k), cv110 (optional semantic, 26
+lines/80KB token passes), cv111 (ranges auto, starting).
+Census 6.
