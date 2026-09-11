@@ -87,3 +87,19 @@ VISIBLE front-end errors that are the actual lead --
 and three vector members (push_back/size/operator[]) end up bodyless.
 Next: probe the ~_ConstructTransaction error directly (RESOLVE-THROW /
 RTHROW kit) -- visible errors need no reduction.
+
+ROUND-119: FIRST visible error fixed (trailing zero-length-pack
+sentinel counted against packless vector<_Tp, _Allocator>; sentinels
+now stripped in typecheck_template_args when the target has no trailing
+pack).  Probe trail: TMA probe showed vector (2 params) receiving
+[cpp_name][struct_tag][ambiguous:empty]; the sentinel is CBMC's own
+[temp.variadic]/7 recording convention, and it arrives AMBIGUOUS-
+wrapped (first strip attempt matched only ID_type and missed).  The
+NEXT layer is now exposed: `found no match for symbol '_Bp'` (twice)
+resolving libc++'s `_If` alias -- `typename _IfImpl<_Cond>::template
+_Select<_IfRes, _ElseRes>` with bool NTTPs -- plus the residual
+__set_sentinel overload mismatch in ~_ConstructTransaction (implicit
+object argument `struct __split_buffer` vs candidates on
+`__split_buffer_pointer_layout*`: derived-to-base `this` conversion
+through the CRTP template-template base; hand kernels t1-t4 of the
+bare shapes all PASS, so the failing ingredient is narrower).
