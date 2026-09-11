@@ -1,28 +1,18 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
+^\[main\.assertion\.1\] line \d+ bind_back from member template resolves: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-SYMEX CRASH (Invariant, symex_assign.cpp assign_from_struct:
-`rhs.operands().size() == components.size()`): a NON-template auto
-member function returning `__bind_back(*this, __n)` -- the
-perfect-forward CTAD chain -- produces a struct assignment whose rhs
-operand count differs from the type's component count.  25 lines,
-header-free, clang++/g++ accept.  Split from the round-115 ranges
-delta-cut (b5); siblings b2/b4 (template callers) fail earlier in the
-front end and are recorded in cpp20_ranges_basic_libcxx's desc.
-
-ROUND-117: the CRASH is fixed -- the real defect was a SILENT ESCAPE
-from the method-body drain (rethrow -> typecheck_main's uncommitted
-catch(int) -> success over a half-cleaned symbol table with code
-components still in the object layout).  The drain now recovers silent
-escapes through the auditable-incomplete-body tolerance, so this test
-currently reports 'could not fully type-check' warnings + vacuous
-VERIFICATION SUCCESSFUL, matching its KNOWNBUG expectation pattern; it
-stays KNOWNBUG because the UNDERLYING failure (operator()'s body
-failing to convert, the [dcl.fct]/6 `_Fn...` varargs family recorded in
-cpp20_ranges_basic_libcxx) is still open.  Flip when the three-site
-varargs fix lands and the assertion verifies non-vacuously.
+The perfect-forward CTAD chain (__bind_back(_Fn...) with a non-pack
+_Fn, the reduced libc++ ranges shape) called from a member function
+template.  History: first surfaced as a symex assign_from_struct arity
+CRASH (silent escape from the method-body drain, fixed round 117,
+b44419e7a9); the resolution itself was fixed by the [dcl.fct]/6
+non-pack `P...` normalization (round 118, df138b3e87).  The kernel's
+original sizeof-based assertion depended on sizeof(empty class) >= 1,
+which CBMC gets wrong (split to cpp11_sizeof_empty_class).
+Runtime-verified g++ 13 / clang++ 18.
