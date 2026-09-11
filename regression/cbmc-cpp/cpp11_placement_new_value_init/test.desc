@@ -1,0 +1,12 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ placement new value-init zeroes a scalar: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently the assertion FAILS: `::new((void*)&v) int()` does not store
+0.  Seven lines, header-free; runtime-verified g++ 13 / clang++ 18 with
+a placement-new definition returning its pointer.
