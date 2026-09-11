@@ -37,6 +37,7 @@ symex_configt::symex_configt(const optionst &options)
       options.get_bool_option("self-loops-to-assumptions")),
     simplify_opt(options.get_bool_option("simplify")),
     unwinding_assertions(options.get_bool_option("unwinding-assertions")),
+    no_body_assertions(options.get_bool_option("no-body-assertions")),
     partial_loops(options.get_bool_option("partial-loops")),
     run_validation_checks(options.get_bool_option("validate-ssa-equation")),
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
