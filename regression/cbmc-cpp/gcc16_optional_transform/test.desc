@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.ii
 --cpp23
 ^\[main\.assertion\.1\] line \d+ has value: SUCCESS$
@@ -8,120 +8,12 @@ main.ii
 ^SIGNAL=0$
 --
 --
-Currently: optional::transform never materializes against gcc-16
-headers and main verifies vacuously (0 assertions).  Sibling of
-cpp23_optional_monadic (which uses the host's headers).
-
-ROUND-104 TRIAGE: the first error is `symbol '_M_payload' is unknown`
-while instantiating _Optional_base<int, TRUE, TRUE>.  gcc-16's payload
-is `_Storage<_Stored_type> _M_payload;` where _Storage is a NESTED
-member UNION template with a defaulted bool NTTP
-(`template<typename _Up, bool = is_trivially_destructible_v<_Up>>`)
-and P0848 conditionally-trivial destructors (`~_Storage() = default;`
-plus `constexpr ~_Storage() requires (!is_trivially_destructible_v<_Up>)`).
-Four hand kernels all PASS (negative results, /tmp/k104/os1-os4):
-plain constrained dual dtor; union with defaulted trait NTTP; the same
-nested inside a class template; variable-template trait in the NTTP and
-requires-clause.  Per the no-hand-guessing rule the carrier is being
-cvise-reduced instead: /tmp/cv105, gate = pinned driver + tumbleweed
-g++ 16.2 validity (docker image gcc16-gate, via `sg docker` -- root-owned
-`sudo` children crash cvise's kill_pid_queue with psutil.AccessDenied)
-+ CBMC `_M_payload' is unknown` + `could not fully type-check`.
-
-ROUND-106: carrier replaced by the finished cvise artifact (fleet
-/tmp/cv105): 7327 lines -> 50 lines.  VALIDITY NOTE: the artifact uses
-gcc-16-only builtins (__add_rvalue_reference as a type-yielding
-builtin, variable-template partial specializations of the _v traits),
-so g++ 13 / clang 18 REJECT it -- validity is certified by g++ 16.2 in
-the `gcc16-gate` docker image (tumbleweed), which accepts it with the
-__CPROVER_assert declaration prefixed.  CBMC still reports the pinned
-signature (`symbol '_M_payload' is unknown`).  Visible structure: the
-_Optional_payload primary takes 3 trait-valued defaulted bool NTTPs,
-has a 1-arg partial specialization and a 3-arg one, and _Optional_base
-names `_Optional_payload<int>` with all defaults -- the choice among
-partial specializations under defaulted, trait-valued NTTPs is the
-suspect layer.
-
-ROUND-106 ROOT CAUSE (backward-delta on the 50-line artifact): the
-load-bearing element is `is_trivially_move_assignable_v<_Tp>` -- a
-FUNCTION template whose parameter type is the gcc-16 type-yielding
-builtin `__add_rvalue_reference(_Tp)` -- named inside _Optional_payload's
-defaulted bool NTTP conjunction.  Instantiating that function template
-reports `symbol '__add_rvalue_reference' is unknown` (see
-gcc16_builtin_type_param_instantiate, 8 lines), so the NTTP default
-cannot evaluate and the payload member never materializes.  A second
-independent defect: the NAMED-parameter form of the same declaration
-does not parse (gcc16_builtin_type_param_named).  Fixing the
-instantiate defect should cascade here; re-check this test after.
-
-ROUND-107: both builtin-type-parameter defects FIXED (token gate keyed
-to host gcc version, cdbc0ff145; missing #reference flag on
-__add_rvalue_reference's result, 656607287e) and their tests are CORE.
-This test now gets PAST the payload layer and fails at the NEXT one:
-`optional<int> o = 42` finds no viable constructor -- the converting
-constructor is the template `optional(_Up)` constrained by
-`requires __not_constructing_bool_from_optional<_Up>`, a VARIABLE
-TEMPLATE with a PARTIAL SPECIALIZATION for bool (P0602-era libstdc++
-shape).  Candidates show the template was considered but deduction or
-constraint evaluation failed for _Up = int.  Next: kernel the
-variable-template-partial-specialization requires-clause.
-
-ROUND-108: the requires-clause layer is FIXED (dc5148daf2: atoms are
-evaluated under the declaration's parameter mapping; CORE test
-cpp20_requires_member_variable_template).  With it the ORIGINAL
-preprocessed carrier type-checks COMPLETELY -- no front-end errors --
-so the reduced 50-line artifact no longer represents the remaining
-defect and the original carrier is restored here.  The remaining layer
-is SEMANTIC: both assertions FAIL (has_value / *r == 84) although g++
--16 compiled binaries pass them -- suspect the modelling of
-_Optional_payload's union storage or the engaged flag through
-optional::transform.  Next: goto-level comparison (--show-goto-functions
-on the ctor/transform path) or unwind trace of _M_engaged.
-
-ROUND-109 RECLASSIFICATION: the "semantic layer" is another MASKED
-FRONT-END failure, not union modelling.  Measured chain:
-  * the trace never writes return_value_transform; r is copied from it
-    unconstrained, so the counterexample picks arbitrary values;
-  * _Optional_payload_base::_M_apply (which construct_at's the value
-    and sets _M_engaged=true) exists in the goto model ONLY as a CALL
-    -- all its symbols are bodyless;
-  * convert_function ENTERS _M_apply with value=code and EXITS normally
-    with value=nil: typecheck_code(body) THROWS and the system-header
-    leniency (catch(int) -> is_system_header_body -> repair attempt ->
-    make_nil) silently drops the body; with that leniency env-disabled
-    the drain's unsupported-STL leniency catches it instead -- two
-    layers of deliberate tolerance hide the real error entirely;
-  * the end-of-run "functions with no body" report DOES list
-    _M_apply, construct_at and _Construct -- the existing visibility
-    mechanism, easy to overlook.
-Negative kernels (/tmp/k109 m1, c1, c2): member-template call chains,
-placement new, and the full gcc-16 construct_at shape (requires-clause
-with placement-new requirement, noexcept(noexcept(...)),
-if-constexpr array branch) all PASS in isolation.  Fleet /tmp/cv110
-reduces the carrier under a SEMANTIC gate: typecheck must stay CLEAN
-(no ^file lines) while both assertions FAIL -- that pins the silent
-body-drop without letting the reduction drift into front-end errors.
-
-ROUND-110 (partial): the dropped body is NOT _M_apply's own fault --
-the throw originates while EAGERLY converting
-`_Optional_payload_base<int>::_Storage<int,1>::_Storage(in_place_t,
-rref_signed_int)` (CF-entry sequencing: _Optional_base ctor ->
-_Optional_payload_base ctor -> _Storage ctor -> throw n=3/n=4), inside
-its mem-initializer `_M_value(std::forward<_Args>(__args)...)`.  Fatal
-stack: cpp_constructor -> resolve -> guess_function_template_args ->
-typecheck_expr -> resolve(cpp_name with template args) ->
-apply_template_args x2 -> typecheck_template_args ->
-resolve_template_alias -> typecheck_template_args -> unbound
-`std::template::963::_Tp` (convert_template_parameter throw).  At the
-throw the template map contains ONLY
-`optional<int>::template::1014::_From` (the variable template's
-parameter) -- evidence that the resolution runs under a FOREIGN
-evaluation's map rather than the _Storage instantiation's own
-(_Args/_Tp bindings absent).  Four identical throws; the fourth
-propagates into the system-header leniency which nils the body.
-forward's declaration here uses `typename remove_reference<_Tp>::type&`
-(no alias), so the alias on the stack belongs to some candidate's
-default/constraint evaluation -- NOT yet identified; a tracking probe
-for the active guess target printed empty and the manual hunt was
-STOPPED per the failure-loop rule.  Fleet /tmp/cv110 (semantic gate)
-will pin the minimal shape.
+Full gcc-16 <optional> transform through a preprocessed carrier
+(tumbleweed g++ 16.2).  Fixed in three layers: the host-keyed builtin
+token gate + the missing #reference flag on __add_rvalue_reference
+(round 107), requires-clause atoms evaluated under the declaration's
+parameter mapping (round 108), and empty argument-pack expansion in
+requires-expression requirements (round 112, the silent _M_apply body
+drop).  History of the diagnosis, including the symptom-gate drift
+post-mortem, is in .kiro/decltype_tuple_apply_findings.md rounds
+104-112.
