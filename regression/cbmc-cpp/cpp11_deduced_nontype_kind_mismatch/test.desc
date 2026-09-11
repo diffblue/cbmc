@@ -17,3 +17,24 @@ __make_integer_seq synthesizes values whose recorded type differs from
 the pack's declared type), so internal value-typing must be made
 consistent BEFORE the exact-match rule can be enforced.  Mind
 cpp14_libcxx_tuple_ctor_kernel when retrying.
+
+ROUND-115 attempt (three variants, all measured, all reverted):
+enforcing /17 at guess_function_template_args with the deduced values'
+recorded types.  (1) Full type+width comparison: rejects the invalid
+kernel AND both make_integer_seq canaries stay green, but SEVEN valid
+tuple/ranges tests break -- the check also caught explicitly-supplied
+arguments (get<0>) where [temp.arg.nontype] permits conversion.
+(2) Excluding explicitly-given parameters: five valid tests still break
+-- their deduced size_t indices are RECORDED as plain int (width 32),
+CBMC's internal kind normalization.  (3) Equal-width-only (sign
+mismatch at same width): still three valid tests break
+(tuple_get_return_type_body, ranges_pipe_invoke_drop,
+tuple_class_element) -- equal-width sign-mixed recordings occur in
+valid programs too.  CONCLUSION firmed up: recorded template-argument
+value types carry NO reliable signal at ANY width; the prerequisite is
+normalizing the recorded value types at template-argument CONVERSION
+time ([temp.arg.nontype]: convert to the parameter's type when the
+argument list is built), after which the /17 comparison becomes exact.
+The relocated-check variant (at the template-id pack-deduction site,
+using the pack parameter's symbol-table entry) does not fire at all:
+template parameters have no symbol-table entries.
