@@ -1,12 +1,25 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp17 --no-unwinding-assertions
+--cpp17 --no-unwinding-assertions --no-body-assertions
+no body for callee mutate
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 --
-Currently: VERIFICATION SUCCESSFUL with no diagnostic -- the bodyless
-call is a no-op and `x == 1` is "proved".  Either the missing body must
-be reported irrespective of --no-unwinding-assertions, or the call must
-havoc the state the callee could reach.
+SOUNDNESS: a call to a function with no available body is modelled as
+"assign nondet to the lhs, change nothing else", so `x == 1` after
+`mutate(&x)` is "proved".  The dedicated `--no-body-assertions` option
+(added for this test) emits the failing `no-body` property regardless of
+the unwinding-assertions setting, so any test that bounds loops with
+--no-unwinding-assertions can still demand a diagnosis for missing
+bodies.  Measured before landing: making the property UNCONDITIONAL
+breaks exactly two intentional-stub tests (String_Abstraction15's
+declared-only malloc under --string-abstraction, and
+cpp11_list_pushback_libcxx via an object-bits blowup), so the default
+stays opt-in.  The deeper resolution -- havocking the state reachable
+through the callee -- remains future work; the assertion at least makes
+the vacuity visible.
+Found while diagnosing libcxx23_vector_pushback (silently bodyless
+libc++ member) and confirmed again by gcc16_optional_transform's
+silently dropped _Storage constructor (round 109/110).
