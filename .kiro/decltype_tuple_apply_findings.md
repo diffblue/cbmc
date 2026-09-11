@@ -8322,3 +8322,30 @@ the 84k-line preprocessed carrier (5 workers, nice 15; host clang++
 Fleets now: cv107 (goto-symex, ~94k), cv110 (optional semantic, 26
 lines/80KB token passes), cv111 (ranges auto, starting).
 Census 6.
+
+## Round 112 (2026-09-11): cv110 drifted to degenerate — replaced by mechanism-pinned cv112
+
+HARVEST POST-MORTEM (cv110): the artifact (17KB, 5 lines) still
+satisfied its gate (typecheck clean + both assertions FAILURE) but had
+DRIFTED: the reduction deleted the optional members' DEFINITIONS
+outright, so the assertions fail for the boring declared-only reason.
+GATE LESSON (extends the round-98 catalogue): a SYMPTOM gate (verdict
+lines) does not survive 90+% reduction -- the reducer finds a cheaper
+route to the same symptom.  For silent-body-drop bugs the gate must pin
+the MECHANISM: definition text present (grep -F of the exact signature
++ a body line) AND the instantiation CALLED in --show-goto-functions
+AND its definition ABSENT there AND typecheck clean.
+KEY performance discovery: the mechanism gate is ~1.5s/test because
+--show-goto-functions stops after goto conversion -- the earlier
+"expensive semantic gate" assumption (BMC+solver per test) was wrong,
+and the same trick should be used for ANY front-end-layer gate from now
+on (typecheck-only gates never need a solver run).
+Also re-established on the current binary: _Storage's (in_place_t,...)
+ctor IS present in the goto model now; the one genuinely dropped body
+in the optional carrier is _M_apply (called-but-undefined analysis over
+--show-goto-functions output; the other 17 called-but-undefined are
+extern ABI stubs).  Round-110's "_Storage ctor conversion throws" is
+still the right lead (its conversion THROW recovered; _M_apply's did
+not), but the census of dropped bodies is exactly {_M_apply}.
+cv112: 8 workers on the 10201-line carrier, gate as above.  cv110
+killed via /tmp/killcv.sh (verified 0 procs).
