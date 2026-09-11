@@ -14,3 +14,15 @@ operand count differs from the type's component count.  25 lines,
 header-free, clang++/g++ accept.  Split from the round-115 ranges
 delta-cut (b5); siblings b2/b4 (template callers) fail earlier in the
 front end and are recorded in cpp20_ranges_basic_libcxx's desc.
+
+ROUND-117: the CRASH is fixed -- the real defect was a SILENT ESCAPE
+from the method-body drain (rethrow -> typecheck_main's uncommitted
+catch(int) -> success over a half-cleaned symbol table with code
+components still in the object layout).  The drain now recovers silent
+escapes through the auditable-incomplete-body tolerance, so this test
+currently reports 'could not fully type-check' warnings + vacuous
+VERIFICATION SUCCESSFUL, matching its KNOWNBUG expectation pattern; it
+stays KNOWNBUG because the UNDERLYING failure (operator()'s body
+failing to convert, the [dcl.fct]/6 `_Fn...` varargs family recorded in
+cpp20_ranges_basic_libcxx) is still open.  Flip when the three-site
+varargs fix lands and the assertion verifies non-vacuously.
