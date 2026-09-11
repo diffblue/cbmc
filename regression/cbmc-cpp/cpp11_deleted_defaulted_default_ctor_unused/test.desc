@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unused deleted defaulted ctor is not an error: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [dcl.fct.def.default]/5: `goto_symex_statet() = default;` with a
+base whose member lacks a default constructor is DELETED, not an error
+(g++ silently accepts; clang++ warns -Wdefaulted-function-deleted).
+Sibling of cpp11_deleted_implicit_default_ctor_unused; the `= default`
+is the load-bearing delta (cvise fleet cv107, 97k -> 13 lines, gate
+pinned all three error signatures against the current binary after the
+cv98 stale-binary lesson).
