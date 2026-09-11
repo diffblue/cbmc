@@ -384,6 +384,9 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   // all (other) checks supported by goto_check
   PARSE_OPTIONS_GOTO_CHECK(cmdline, options);
 
+  if(cmdline.isset("no-body-assertions"))
+    options.set_option("no-body-assertions", true);
+
   if(cmdline.isset("partial-loops"))
   {
     options.set_option("partial-loops", true);
