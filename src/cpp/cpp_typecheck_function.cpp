@@ -851,8 +851,17 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     // deletion: drop the body and remove the member from the overload
     // set (ID_noaccess, the established `= delete` representation); a
     // later use then fails overload resolution naturally.
+    // N5008 [dcl.fct.def.default]/5: an EXPLICITLY-DEFAULTED default
+    // constructor whose implicit definition would be ill-formed is
+    // likewise defined as deleted (`goto_symex_statet() = default;`
+    // deriving from a class without a default constructor); recover it
+    // through the same deletion path as the implicit one.
+    const bool defaulted_default_ctor =
+      symbol.type.id() == ID_code &&
+      to_code_type(symbol.type).return_type().id() == ID_constructor &&
+      symbol.value.get_bool("#defaulted_function");
     if(
-      symbol.type.get_bool("#is_implicit_ctor") &&
+      (symbol.type.get_bool("#is_implicit_ctor") || defaulted_default_ctor) &&
       to_code_type(symbol.type).parameters().size() == 1)
     {
       // Only the implicit DEFAULT constructor (this-parameter only) is
