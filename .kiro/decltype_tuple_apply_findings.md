@@ -8349,3 +8349,37 @@ still the right lead (its conversion THROW recovered; _M_apply's did
 not), but the census of dropped bodies is exactly {_M_apply}.
 cv112: 8 workers on the 10201-line carrier, gate as above.  cv110
 killed via /tmp/killcv.sh (verified 0 procs).
+
+## Round 112 (cont.): gcc16_optional_transform FIXED AND FLIPPED — census 6
+
+The mechanism-pinned reduction (cv112, ~15 min to a usable snapshot)
+plus backward deltas delivered the trigger: a requires-expression
+requirement containing a call-argument/new-initializer pack expansion
+over an EMPTY pack.  `construct_at`'s constraint
+`requires { ::new((void*)0) _Tp(declval<_Args>()...); }` with _Args
+deduced empty kept the unexpanded scalar, threw on the unbound pack,
+read as UNSATISFIED, removed construct_at from the overload set, and
+the calling member's (_M_apply) body was silently dropped.  FIX
+(071ddf25be): run template_map.expand_call_argument_packs on the
+requirement operand in requirement_expression_is_valid AND
+compound_requirement_is_satisfied.  With it the FULL 10201-line gcc-16
+carrier verifies both assertions; five suites green; revert-tested
+(3 FAILURE lines -> 527 SUCCESS lines on the carrier).
+Measured deltas: union vs struct IRRELEVANT; member-template-ness
+IRRELEVANT; class-template caller REQUIRED (h2 negative); EMPTY pack
+REQUIRED (one-arg construct_at call does not trigger, e1 negative).
+NEW KNOWNBUG split out (cpp11_empty_pack_new_initializer): the BODY-side
+sibling -- new-initializer empty-pack expansion during function-template
+instantiation ("symbol '__args' is unknown"); ordinary call arguments
+work.  First fix attempt (mirroring the function-call branch in
+cpp_instantiate_template's expanded_names walker) was NOT REACHED
+(probe) and reverted.
+Also this round: --show-goto-functions-based mechanism gates are ~1.5s
+(no solver); cv112 stopped after the fix (target achieved); the
+optional saga (rounds 104-112) closes with THREE landed front-end fixes
++ one CORE kernel each and one residual body-side KNOWNBUG.
+Fleet board: cv107 (goto-symex) still grinding ~94k; cv111 (ranges
+auto) at ~400 lines token passes.
+Census 6: deduced_nontype (parked), regex x2 (performance),
+ranges_basic_libcxx (cv111), libcxx23_vector_pushback,
+empty_pack_new_initializer (NEW).
