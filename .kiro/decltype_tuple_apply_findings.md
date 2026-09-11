@@ -8499,3 +8499,35 @@ open.
 Census 6: deduced_nontype (parked, prerequisite defined),
 perfect_forward_struct_arity (NEW), regex x2 (perf),
 ranges_basic_libcxx (b2/b4 kernels), libcxx23_vector_pushback.
+
+## Round 116 (2026-09-11): cv116 launched; ranges mechanism FULLY localized ([dcl.fct]/6 varargs)
+
+Task 1: cv116 launched on libcxx23_vector_pushback with the mechanism
+gate (push_back definition text pinned via its _ConstructTransaction
+body line + CALLed-but-undefined in --show-goto-functions + docker
+cxx23-gate clang validity; ~2s/test).  Verified accept/reject before
+launch.  Current binary as frozen reference (cv98 lesson).  69% in 10
+minutes.
+Task 2 (ranges __bind_back): mechanism now FULLY localized by
+GNIL/RTHROW site tagging (numbered prints at every nil-return of
+guess_function_template_args and every throw of resolve):
+  * deduction leaves _Fn UNASSIGNED (GNIL 7 has_unassigned) and
+    resolve's all-templates [temp.deduct]/8 throw (RTHROW 11) fires;
+    b3 and b4 BOTH fail deduction -- the b3/b4 split is RECOVERY.
+  * ROOT: [dcl.fct]/6 + [temp.variadic]/1 -- `_Fn...` with non-pack _Fn
+    is `_Fn, ...` (deducible parameter + C varargs); CBMC treats every
+    ellipsis declarator as a pack and consumes ALL call arguments into
+    _Fn.
+  * TWO fix attempts reverted: (1) deduction-side is_pack=false alone
+    breaks the b3 recovery (instantiated candidate loses arity match);
+    (2) + signature-side ellipsis on guess's function_type (marker on
+    the ID_parameters node per code_typet::has_ellipsis) still fails --
+    overload matching uses the signature built by the INSTANTIATION
+    path, so the same [dcl.fct]/6 conversion must be added in
+    instantiate_template as well.  Three-site design recorded in the
+    desc; a candidate for a dedicated round.
+PROBE-KIT: numbered exit-site tagging (RTHROW n / GNIL n) is now the
+fastest way to localize silent resolution failures -- two runs pinpoint
+the exact give-up among ~25 candidates.  Scripted insertions braced
+this time (round-109 lesson applied).
+Census 6 unchanged; suites untouched this round (no landed src change).
