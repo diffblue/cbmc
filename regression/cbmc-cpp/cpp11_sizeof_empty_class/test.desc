@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ empty struct has size >= 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [class]/4 + [expr.sizeof]/2: a complete object of class type has
+NONZERO size; g++/clang give sizeof(empty) == 1.  CBMC lays empty
+classes out with size 0.  MEASURED (round 118): adding the single
+padding byte in typecheck_compound_type breaks 46 tests (empty
+closures, decltype packs, EBO-adjacent shapes) -- the tool models
+zero-sized empty classes self-consistently, so the fix needs a
+coordinated layout change (padding byte + every consumer that assumes
+empty classes are zero-sized), not a point patch.  Split from the
+round-118 perfect-forward investigation, where sizeof(closure) >= 1
+failed for an empty closure struct.
