@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/cprover_prefix.h>
 #include <util/expr_util.h>
 #include <util/mathematical_expr.h>
+#include <util/replace_symbol.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
@@ -344,6 +345,25 @@ void c_typecheck_baset::typecheck_redefinition_non_type(
     // update the type to enable the use of sizeof(x) on the
     // right-hand side of a definition of x
     old_symbol.type=new_symbol.type;
+
+    // The array size was just refined from "unknown" to a concrete value.
+    // Any symbol expression referring to this symbol in code that was
+    // typechecked before this definition still carries the old, size-less
+    // array type.  Rewrite them so that the symbol's type and the types
+    // carried on its symbol expressions stay consistent; otherwise the same
+    // object ends up typed both as a sized and as a size-less array.
+    symbol_exprt updated_symbol_expr = old_symbol.symbol_expr();
+    unchecked_replace_symbolt array_type_updates;
+    array_type_updates.insert(updated_symbol_expr, updated_symbol_expr);
+    for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+    {
+      if(
+        !it->second.is_type && !it->second.is_macro &&
+        it->second.value.is_not_nil())
+      {
+        array_type_updates(it.get_writeable_symbol().value);
+      }
+    }
   }
 
   // do initializer, this may change the type
