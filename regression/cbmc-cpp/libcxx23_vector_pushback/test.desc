@@ -72,3 +72,18 @@ ROUND-90 DIAGNOSIS (bisected):
 - A reduction with a gate that pins the driver, requires the
   out-of-line DEFINITION text to survive, and requires the member to
   remain bodyless is running in /tmp/cv91.
+
+ROUND-118: cv117's artifact (19 lines) is DEGENERATE -- cvise split
+push_back into TWO overloads so the pinned definition text belongs to
+the overload NOT selected by `v.push_back(7)` (its const_reference
+also lost its const, flipping overload resolution).  GATE LESSON #4:
+called-but-undefined checks keyed on a NAME are defeated by overload
+sets; a robust pin needs the full signature or a uniquely-named
+function.  DO NOT re-reduce blindly: the original carrier has TWO
+VISIBLE front-end errors that are the actual lead --
+  * conditional.h:40: instantiating 'std::__1::vector' ...
+  * __split_buffer:721 function ~_ConstructTransaction: instantiating
+    'std::__1::vector' ...
+and three vector members (push_back/size/operator[]) end up bodyless.
+Next: probe the ~_ConstructTransaction error directly (RESOLVE-THROW /
+RTHROW kit) -- visible errors need no reduction.
