@@ -125,3 +125,16 @@ function_type, so the varargs conversion must be implemented THERE as
 well (three sites total).  Reverted; the design is sound per
 [dcl.fct]/6 but needs the instantiate_template leg.  Both attempts'
 diffs preserved in this desc's history via git.
+
+ROUND-118: the [dcl.fct]/6 root is FIXED by SINGLE-SITE normalization at
+function-template registration (df138b3e87) -- the earlier three-site
+design collapsed once the normalization happened before anything else
+consumes the declaration.  reduced.cpp's front-end error is GONE (it
+now runs into BMC on its drifted nonsense driver -- carrier retired).
+The ORIGINAL libc++ main.cpp still fails with the same type:auto
+message: the REAL __bind_back is `__bind_back(_Fn&&, _Args&&...)` (a
+genuine pack) so its failing layer is DIFFERENT from the reduced
+carrier's -- the reduction drifted the mechanism (the gate pinned the
+error text, not the failing declaration).  Next: re-reduce main.cpp
+with a mechanism-pinned gate (call present + operator| resolution
+failing) against the CURRENT binary, all gate lessons applied.
