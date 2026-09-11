@@ -1,12 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
-^\[main\.assertion\.1\] line \d+ placement new value-init zeroes a scalar: SUCCESS$
+^\[main\.assertion\.1\] line \d+ default-init leaves storage: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value-init zero then DMI: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-Currently the assertion FAILS: `::new((void*)&v) int()` does not store
-0.  Seven lines, header-free; runtime-verified g++ 13 / clang++ 18 with
-a placement-new definition returning its pointer.
+N5008 [expr.new]/17: `::new(p) int` default-initializes (storage kept),
+`::new(p) podt()` value-initializes (zero, then the default member
+initializer b = 5).  Header-free; runtime-verified g++ 13 / clang++ 18
+with a placement-new definition returning its pointer.  (The first
+assertion relies on CBMC keeping the prior value under
+default-initialization, which is one valid indeterminate value.)

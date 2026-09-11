@@ -1,14 +1,18 @@
-// N5008 [expr.new]/17 + [dcl.init.general]/9: a new-initializer that is
-// an empty pair of parentheses value-initializes the object; for a
-// scalar that is zero-initialization.  Split from
-// cpp11_empty_pack_new_initializer: CBMC's placement new with `int()`
-// leaves the storage unchanged (7 survives), independent of templates.
 extern "C" void __CPROVER_assert(bool, const char *);
 void *operator new(unsigned long, void *) noexcept;
+struct podt
+{
+  int a;
+  int b = 5;
+};
 int main()
 {
   int v = 7;
-  ::new((void *)&v) int();
-  __CPROVER_assert(v == 0, "placement new value-init zeroes a scalar");
+  ::new((void *)&v) int; // default-init: unchanged
+  __CPROVER_assert(v == 7, "default-init leaves storage");
+  podt p;
+  p.a = 3;
+  ::new((void *)&p) podt(); // value-init: a zeroed, b from DMI
+  __CPROVER_assert(p.a == 0 && p.b == 5, "value-init zero then DMI");
   return 0;
 }
