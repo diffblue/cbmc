@@ -77,3 +77,18 @@ A hand kernel of that shape in isolation RESOLVES fine (b1: __bind_back
 gets deduced, only its BODY is absent since the artifact declares it
 bodyless), so the failing ingredient is still narrower -- next step is
 delta-cutting reduced.cpp between the b1 shape and the carrier.
+
+ROUND-115 (delta-cut b1..b5, /tmp/k114): the __bind_back layer is
+pinned to 33-line kernels.  MEASURED: b3 (call `__bind_back(take, 3)`
+directly from main) WORKS; b4 (the same call inside a FREE auto-return
+function template) FAILS; b2 (inside a member function template) FAILS;
+b5 (inside a NON-template auto member) typechecks but CRASHES symex
+(filed separately as cpp14_perfect_forward_struct_arity).  So the
+failing ingredient is BODY CONVERSION CONTEXT, not the __bind_back
+declaration itself.  Attempted (reverted, no effect): the R114
+treatment (cpp_saved_template_mapt + prepare_deferred_method_body)
+around BOTH eager convert_function sites in cpp_declarator_converter --
+the failure is not (only) a missing template map on that path;
+b4 keeps failing with 'could not fully type-check'.  Next diagnosis
+step: RESOLVE-THROW probe inside b4's make_closure conversion to see
+which name dies and under which map.
