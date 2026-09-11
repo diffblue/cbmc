@@ -6984,6 +6984,20 @@ void cpp_typecheckt::typecheck_method_application(
     has_auto(to_code_type(method_symbol.type).return_type()) &&
     method_symbol.value.is_not_nil())
   {
+    // N5008 [temp.inst]/1: this EAGER conversion of a member function
+    // template instance must run under the instance's template map,
+    // exactly as the deferred drain does -- the drain's shared
+    // preprocessing installs the bindings from #fn_template_type /
+    // #fn_template_args and expands replicated parameter packs.
+    // Without it the body was converted under the CALLER's map (empty
+    // at translation-unit level), the body's use of the method's own
+    // template parameter threw ("unbound template parameter"), the
+    // auto return type never resolved, and the CALL SITE reported the
+    // argument conversion into a raw `auto` (libc++ ranges
+    // `arr | std::views::take(3)`: the closure-producing
+    // take::operator()(_Np)'s body names _Np()).
+    cpp_saved_template_mapt saved_map(template_map);
+    prepare_deferred_method_body(method_symbol);
     convert_function(method_symbol);
   }
 
