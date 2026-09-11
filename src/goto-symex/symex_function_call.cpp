@@ -318,8 +318,12 @@ void goto_symext::symex_function_call_post_clean(
 
   if(!goto_function.body_available())
   {
-    // create a fatal assertion
-    if(symex_config.unwinding_assertions)
+    // Create a fatal assertion.  With no_body_assertions this is
+    // emitted regardless of the unwinding-assertions setting: a
+    // bodyless call is otherwise modelled as "assign nondet to the lhs
+    // and change nothing else", which proves vacuously that state
+    // reachable through the callee is unchanged.
+    if(symex_config.unwinding_assertions || symex_config.no_body_assertions)
     {
       const auto &symbol = ns.lookup(identifier);
       const std::string property_id =
