@@ -8383,3 +8383,27 @@ auto) at ~400 lines token passes.
 Census 6: deduced_nontype (parked), regex x2 (performance),
 ranges_basic_libcxx (cv111), libcxx23_vector_pushback,
 empty_pack_new_initializer (NEW).
+
+## Round 113 (2026-09-11): ranges carrier 84k -> 58 lines; load-bearing set measured
+
+cv111 finished (9 long lines); cv113 polished the FORMATTED copy to 115
+self-contained lines (formatted-file relaunch is now standard practice:
+token passes on one-line preprocessed output crawl, but a clang-format
+round-trip re-enables the line-based passes).  Manual deltas t0-t11
+took it to 58 lines with each step signature-checked.  Load-bearing:
+__perfect_forward_impl's `decltype(_Op()(_Idx..., __args...))` return
+type (double pack expansion inside decltype) + the
+`__range_adaptor_closure_t(__bind_back(*this, _Np()))` CTAD chain +
+the convertible_to-constrained take_view overload.  Not load-bearing:
+counted_iterator, the out-of-line __sentinel member template,
+iterator_t/__maybe_const/index_sequence aliases, view concepts, the
+invoke chain.  The `<<type:auto>>` conversion error thus most likely
+arises when the closure's operator() (inherited from
+__perfect_forward_impl) is considered for `__closure(__view)`: its
+return decltype cannot evaluate, the auto return of the friend
+operator| never resolves, and the ARGUMENT conversion into the
+unresolved `auto` is reported.  Next: probe which parameter/return slot
+still holds `auto` at the failure, then fix the decltype pack
+expansion.
+Fleet: cv107 at ~26k lines (77%), gate slow but progressing; cv111 and
+cv113 retired.  Census 6 unchanged.
