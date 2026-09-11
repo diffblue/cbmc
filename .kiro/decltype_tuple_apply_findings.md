@@ -8407,3 +8407,32 @@ still holds `auto` at the failure, then fix the decltype pack
 expansion.
 Fleet: cv107 at ~26k lines (77%), gate slow but progressing; cv111 and
 cv113 retired.  Census 6 unchanged.
+
+## Round 114 (2026-09-11): eager auto-return map fix landed; ranges peeled one layer
+
+FIX (fcfcf403ba) + CORE kernel cpp14_eager_auto_return_member_template:
+typecheck_method_application's EAGER conversion of auto-return methods
+ran WITHOUT the member-function-template instance's parameter bindings
+-- prepare_deferred_method_body (the drains' shared preprocessing:
+#fn_template_type/#fn_template_args map install + pack expansion) was
+skipped on that one path.  A body naming the method's own template
+parameter threw "unbound template parameter" (CTP probe: map EMPTY at
+the throw), the auto return stayed undeduced, and the call site
+degraded -- the libc++ pipe expression fell through to C bitwise-or,
+producing the round-113 `<<type:auto>>` message.  14-line kernel;
+revert-tested (1 error -> 0); runtime-verified g++/clang++; 5 suites
+green.  This is the FOURTH member of the foreign/empty-map family
+(R100 concept args, R108 requires atoms, R112 requirement packs, now
+eager conversions) -- pattern: EVERY out-of-drain body/constraint
+evaluation must install the declaration's parameter mapping first.
+Ranges carrier peels one layer: next failure is a SILENT resolve throw
+on `__bind_back(*this, _Np())` (RESOLVE-THROW probe caught it; no
+message).  Negative kernel b1 (perfect_forward CTAD chain in isolation)
+resolves fine, so the trigger is narrower; next round delta-cuts
+between b1 and the carrier.
+PROBE-KIT addition that earned its keep: the RESOLVE-THROW RAII probe
+(uncaught_exceptions in a destructor at resolve() entry) catches SILENT
+resolution failures that neither the no-match message nor the CTP probe
+sees.
+cv107: still converging (~400 lines, long-line token phase).
+Census 6.
