@@ -1,6 +1,6 @@
 KNOWNBUG libcxx
-main.cpp
---cpp20 --stdlib libc++
+reduced.cpp
+--cpp20
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
@@ -39,3 +39,15 @@ Round-9 update: the hidden-friend operator-template root is FIXED
 verifies).  The real header still drops main on a further layer
 ("<<type:auto>>" conversion at the range expression); round-3
 reduction running.
+
+ROUND-113: failure mode CHANGED by this week's fixes -- now the pipe
+`arr | std::views::take(3)` fails converting the ARRAY argument to a
+raw `<<type:auto>>` parameter ("implicit arithmetic conversion not
+permitted").  Reduced by cvise (cv111 84k -> 9 long lines; cv113 polish
+on the formatted copy -> 115 self-contained lines, reduced.cpp; gate =
+pinned error pair + host clang++ validity, NO docker).  The original
+libc++ main.cpp stays for reference; the desc now runs reduced.cpp.
+Visible machinery kept by the reduction: constrained friend
+operator| (viewable_range/_RangeAdaptorClosure concept parameters),
+__perfect_forward/__bind_back CTAD chain, invoke_result_t
+decltype chain, counted_iterator CTAD in take_view::begin.
