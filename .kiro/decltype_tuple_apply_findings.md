@@ -8456,3 +8456,46 @@ Census 6: cpp11_deduced_nontype_kind_mismatch (parked),
 cpp11_empty_pack_new_initializer, cpp11_regex_construct,
 cpp11_regex_match (performance), cpp20_ranges_basic_libcxx
 (__bind_back layer, 58-line carrier), libcxx23_vector_pushback.
+
+## Round 115 (2026-09-11): two cpp11 fixes landed + flipped; /17 stays parked with firm evidence; ranges pinned to kernels
+
+Oldest-first pass over the census per user direction.
+LANDED (each 5-suite validated, revert-tested, runtime-verified):
+  1. 285c1506ea -- instantiate_template's strip_pack_var also strips
+     empty-pack expansions from NEW-INITIALIZERS (id-less ID_initializer
+     node).  Found by a DBGQ probe bisect over instantiate_template's
+     phases (call-arg count 1 -> 0 between the empty-sentinel strip and
+     the pack-expansion phase); the drain-side expand_own and the
+     expanded_names walker never run for free function templates, so
+     the two earlier fix attempts were placed in dead code.  FLIPPED
+     cpp11_empty_pack_new_initializer with a class-typed kernel.
+  2. c3f5de6fab -- `new T()` VALUE-initializes, `new T`
+     default-initializes ([expr.new]/17 + [dcl.init.general]/9): new
+     irep id #value_initialization set by the parser on parenthesised
+     new-initializers; typecheck_expr_new prepends a zero-init
+     side-effect assignment for POD types (DMI code follows, /9.2
+     ordering).  First lhs attempt hit symex type-consistency (use a
+     fresh ID_new_object lhs + typed side_effect_expr_assignt, NOT the
+     already_typechecked-wrapped object).  Negative shape measured:
+     `new int` unchanged.  NEW test cpp11_placement_new_value_init
+     filed AND flipped same round.
+PARKED with firmer evidence: [temp.deduct.type]/17 enforcement.  Three
+measured variants (full compare / explicit-args excluded / equal-width
+only) break 7 / 5 / 3 VALID tests respectively -- recorded deduced-value
+types carry no reliable signal at any width (size_t indices recorded as
+int, sign-mixed recordings in valid programs).  Prerequisite nailed
+down: normalize recorded values to the parameter's type at
+template-argument CONVERSION time ([temp.arg.nontype]), then /17 is an
+exact comparison.  Also: template parameters have NO symbol-table
+entries (the relocated variant never fired).
+RANGES __bind_back layer: delta-cut to 33-line kernels.  b3 (main) OK;
+b4 (free auto-return fn template) FAILS; b2 (member fn template) FAILS;
+b5 (non-template auto member) typechecks then CRASHES symex
+(assign_from_struct arity) -- filed as
+cpp14_perfect_forward_struct_arity.  R114-style map installation at
+cpp_declarator_converter's eager sites has NO effect (reverted) -- the
+failing ingredient is the body-conversion context, mechanism still
+open.
+Census 6: deduced_nontype (parked, prerequisite defined),
+perfect_forward_struct_arity (NEW), regex x2 (perf),
+ranges_basic_libcxx (b2/b4 kernels), libcxx23_vector_pushback.
