@@ -377,6 +377,62 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     throw 0;
   }
 
+  // N5008 [dcl.fct]/6 + [temp.variadic]/1: a parameter written `P...`
+  // (no comma) is a FUNCTION PARAMETER PACK only when P contains an
+  // unexpanded parameter pack; when P names an ordinary (non-pack)
+  // template parameter it means `P, ...` -- one deducible parameter
+  // followed by C varargs.  The parser cannot decide this (it marks
+  // every `cpp_name...` declarator as a pack); normalize here, where
+  // this template's parameter list is known: strip the declarator's
+  // pack marker and append the C-varargs entry.  Downstream deduction,
+  // candidate matching and instantiation then all see the standard
+  // form (libc++'s reduced `__bind_back(_Fn...)`, whose calls lost
+  // every candidate to a conflicted _Fn deduction).
+  {
+    std::set<std::string> non_pack_short_names;
+    for(const auto &tp : declaration.template_type().template_parameters())
+    {
+      if(tp.get_bool(ID_ellipsis))
+        continue;
+      const irep_idt pid = tp.id() == ID_type ? tp.type().get(ID_identifier)
+                                              : tp.get(ID_identifier);
+      const std::string pids = id2string(pid);
+      const auto pos = pids.rfind("::");
+      non_pack_short_names.insert(
+        pos != std::string::npos ? pids.substr(pos + 2) : pids);
+    }
+    typet &dtor_type = declarator.type();
+    if(dtor_type.id() == ID_function_type && !non_pack_short_names.empty())
+    {
+      irept::subt &params = dtor_type.add(ID_parameters).get_sub();
+      for(std::size_t i = 0; i < params.size(); ++i)
+      {
+        if(params[i].id() != ID_cpp_declaration)
+          continue;
+        auto &pdecl = static_cast<cpp_declarationt &>(params[i]);
+        if(pdecl.declarators().size() != 1)
+          continue;
+        auto &pdtor = pdecl.declarators().front();
+        if(!pdtor.get_has_ellipsis())
+          continue;
+        const irept &tn = pdecl.type();
+        if(
+          tn.id() != ID_cpp_name || tn.get_sub().size() != 1 ||
+          tn.get_sub().front().id() != ID_name)
+          continue;
+        if(
+          non_pack_short_names.count(
+            id2string(tn.get_sub().front().get(ID_identifier))) == 0)
+          continue;
+        // `P...` with non-pack P: parameter P, then C varargs
+        pdtor.remove(ID_ellipsis);
+        pdtor.type().remove(ID_ellipsis);
+        params.insert(params.begin() + i + 1, irept(ID_ellipsis));
+        ++i;
+      }
+    }
+  }
+
   irep_idt base_name = cpp_name.get_base_name();
 
   template_typet &template_type = declaration.template_type();
