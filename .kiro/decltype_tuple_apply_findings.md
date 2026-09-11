@@ -8568,3 +8568,34 @@ Census 5: deduced_nontype (parked), perfect_forward_struct_arity
 root), libcxx23_vector_pushback (cv117).  The [dcl.fct]/6 three-site
 varargs fix now blocks TWO census entries -- top candidate for a
 dedicated round.
+
+## Round 118 (2026-09-11): [dcl.fct]/6 varargs FIXED single-site; perfect_forward FLIPPED; two new datapoints
+
+FIX (df138b3e87) + CORE test cpp11_nonpack_ellipsis_varargs: `P...`
+with a non-pack P is `P, ...` ([dcl.fct]/6 + [temp.variadic]/1),
+normalized ONCE at typecheck_function_template -- strip the
+declarator's pack marker, append the bare ID_ellipsis varargs entry
+(the exact parse form of a hand-written `P, ...`).  The parser
+deliberately defers this decision (it is semantic).  The previously
+planned THREE-site fix collapsed to one site because normalization at
+registration precedes every consumer.  b1-b4 kernels all clean;
+revert-tested; five suites green.
+FLIPPED cpp14_perfect_forward_struct_arity (crash fixed R117 +
+resolution fixed R118; kernel's __bind_back given a body, assertion
+decoupled from empty-class sizeof).
+NEW KNOWNBUG cpp11_sizeof_empty_class: sizeof(empty class) == 0
+violates [class]/4 + [expr.sizeof]/2.  MEASURED: the one-line padding
+fix breaks 46 tests (empty closures, decltype packs) -- CBMC models
+zero-sized empty classes self-consistently; a real fix is a coordinated
+layout project.  Parked with the measurement.
+RANGES: reduced.cpp's front-end error GONE (carrier retired); the
+ORIGINAL libc++ main.cpp still fails IDENTICALLY because the real
+__bind_back takes `(_Fn&&, _Args&&...)` (genuine pack) -- the reduction
+had DRIFTED the mechanism (gate pinned the error text).  Third instance
+of gate drift; plan: re-reduce main.cpp with a mechanism-pinned gate
+against the current binary.
+cv117 still reducing (~15k lines).
+Census 5: deduced_nontype (parked, prerequisite defined),
+sizeof_empty_class (parked, measured), regex x2 (perf),
+ranges_basic_libcxx (re-reduction planned), libcxx23_vector_pushback
+(cv117).
