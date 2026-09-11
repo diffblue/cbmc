@@ -2535,6 +2535,30 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const template_typet::template_parameterst &parameters =
     template_type.template_parameters();
 
+  // N5008 [temp.variadic]/7: a pack that matched zero elements
+  // contributes NO arguments.  CBMC records such a pack inside a class
+  // instance's template-argument list as a trailing ID_type argument of
+  // type ID_empty (the zero-length-pack sentinel).  When those recorded
+  // arguments are re-used to name another template -- e.g. libc++-23's
+  // `__split_buffer<_Tp, _Allocator, _Layout>` naming `vector<_Tp,
+  // _Allocator>` back through a layout alias, with an enclosing pack
+  // empty -- the sentinel must not count against a template WITHOUT a
+  // trailing pack ("too many template arguments (expected 2, but got
+  // 3)", the libc++-23 vector/__split_buffer layout recursion).  Strip
+  // trailing sentinels when this template cannot absorb them.
+  if(
+    parameters.size() < args.size() && !parameters.empty() &&
+    !parameters.back().get_bool(ID_ellipsis))
+  {
+    while(
+      args.size() > parameters.size() && !args.empty() &&
+      (args.back().id() == ID_type || args.back().id() == ID_ambiguous) &&
+      args.back().type().id() == ID_empty)
+    {
+      args.pop_back();
+    }
+  }
+
   if(parameters.size() < args.size())
   {
     // Check if the last parameter is a parameter pack (ellipsis)
