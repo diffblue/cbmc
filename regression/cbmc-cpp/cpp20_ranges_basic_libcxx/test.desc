@@ -92,3 +92,24 @@ the failure is not (only) a missing template map on that path;
 b4 keeps failing with 'could not fully type-check'.  Next diagnosis
 step: RESOLVE-THROW probe inside b4's make_closure conversion to see
 which name dies and under which map.
+
+ROUND-116 (probe session, all findings measured):
+  * GNIL/RTHROW tagging localized the failure exactly: deduction of
+    `__bind_back(_Fn...)` leaves _Fn UNASSIGNED
+    (guess_function_template_args' has_unassigned() give-up), then
+    resolve's all-templates [temp.deduct]/8 throw fires.  b3 and b4
+    BOTH fail deduction -- b3 recovers through a later retry, so the
+    b3/b4 split is about RECOVERY, not deduction.
+  * ROOT: [dcl.fct]/6 + [temp.variadic]/1 -- `_Fn...` with a non-pack
+    _Fn is `_Fn, ...` (one deducible parameter + C VARARGS), not a
+    function parameter pack.  CBMC's deduction treats every
+    ellipsis-marked declarator as a pack and consumes ALL call
+    arguments into _Fn.
+  * Attempted fix (reverted): flipping is_pack=false on positive
+    identification (bare name matching a non-pack template parameter)
+    breaks b3 as well -- with is_pack=false the INSTANTIATED candidate's
+    parameter list lacks the `...` varargs marker (code_typet
+    has_ellipsis), so a 2-argument call fails arity matching.  The
+    complete fix must BOTH deduce _Fn from the first argument only AND
+    mark the instantiated code_typet as variadic ([dcl.fct]/6).  That
+    signature-side propagation is the open piece.
