@@ -8436,3 +8436,23 @@ resolution failures that neither the no-match message nor the CTP probe
 sees.
 cv107: still converging (~400 lines, long-line token phase).
 Census 6.
+
+## Round 114 (cont.): cv107 harvested — defaulted-default-ctor deletion fixed
+
+cv107 finished (97k -> 13 lines, ~18h; the mechanism gate pinned all
+three signatures against the CURRENT binary, so unlike cv98 the
+artifact landed on a REAL residual defect).  The 13-line artifact's
+load-bearing delta vs the fixed implicit sibling:
+`goto_symex_statet() = default;` -- [dcl.fct.def.default]/5 requires an
+ill-formed explicitly-defaulted default ctor to be DELETED, not a hard
+error.  FIX (7f510b3e4a): extend convert_function's deletion recovery
+gate from #is_implicit_ctor to also cover #defaulted_function bodies
+with constructor return type and only the this parameter; copy/move
+excluded as before.  Revert-tested (CONVERSION ERROR -> verifies);
+5 suites green; CORE test cpp11_deleted_defaulted_default_ctor_unused.
+The goto-symex dog-food carrier is thereby CLOSED (both siblings CORE).
+ALL reduction fleets now retired; none running.
+Census 6: cpp11_deduced_nontype_kind_mismatch (parked),
+cpp11_empty_pack_new_initializer, cpp11_regex_construct,
+cpp11_regex_match (performance), cpp20_ranges_basic_libcxx
+(__bind_back layer, 58-line carrier), libcxx23_vector_pushback.
