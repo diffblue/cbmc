@@ -9365,6 +9365,12 @@ bool Parser::rAllocateInitializer(exprt &init)
 
   init.clear();
 
+  // N5008 [expr.new]/17: `new T()` -- a new-initializer that is an
+  // empty pair of parentheses -- VALUE-initializes, whereas `new T`
+  // (no new-initializer) default-initializes.  Both leave the operand
+  // list empty, so record the parentheses for the type checker.
+  init.set(ID_C_value_initialization, true);
+
   if(lex.LookAhead(0)==')')
   {
     lex.get_token();
