@@ -51,3 +51,16 @@ Visible machinery kept by the reduction: constrained friend
 operator| (viewable_range/_RangeAdaptorClosure concept parameters),
 __perfect_forward/__bind_back CTAD chain, invoke_result_t
 decltype chain, counted_iterator CTAD in take_view::begin.
+
+ROUND-113 (cont., manual deltas t0-t11 on the cvise artifact):
+reduced.cpp is now 58 lines.  MEASURED load-bearing set: the
+__perfect_forward_impl operator() with return type
+`decltype(_Op()(_Idx..., __args...))` (a decltype whose call expands
+BOTH a non-type template pack and the function parameter pack) plus
+the CTAD chain `__range_adaptor_closure_t(__bind_back(*this, _Np()))`;
+replacing bind_back with a plain callable loses the signature (t11),
+as does removing the constrained take_view overload (t7 invalid).
+NOT load-bearing (removed): counted_iterator + input_or_output_iterator
+(t4), the __sentinel out-of-line member template (t3), iterator_t /
+__maybe_const / the whole make_index_sequence alias chain (t5), the
+view/enable_view concepts (t6), the invoke/invoke_result_t chain (t9).
