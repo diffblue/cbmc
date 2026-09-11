@@ -64,3 +64,16 @@ NOT load-bearing (removed): counted_iterator + input_or_output_iterator
 (t4), the __sentinel out-of-line member template (t3), iterator_t /
 __maybe_const / the whole make_index_sequence alias chain (t5), the
 view/enable_view concepts (t6), the invoke/invoke_result_t chain (t9).
+
+ROUND-114: FIRST layer fixed (eager auto-return conversion now runs
+under the instance's template map; CORE kernel
+cpp14_eager_auto_return_member_template).  The carrier's remaining
+failure: resolving `__bind_back(*this, _Np())` throws SILENTLY
+(RESOLVE-THROW probe; no unbound-parameter, no no-match message) --
+deduction/instantiation of its trailing return type
+`decltype(__bind_back_t<_Fn>())` against the CTAD-defaulted
+`__perfect_forward_impl<_Op, integer_sequence<unsigned long, 0>>` base.
+A hand kernel of that shape in isolation RESOLVES fine (b1: __bind_back
+gets deduced, only its BODY is absent since the artifact declares it
+bodyless), so the failing ingredient is still narrower -- next step is
+delta-cutting reduced.cpp between the b1 shape and the carrier.
