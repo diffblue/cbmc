@@ -2849,6 +2849,43 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   auto code = cpp_constructor(
     expr.find_source_location(), object_expr, initializer.operands());
 
+  // N5008 [expr.new]/17: a new-initializer that is an EMPTY pair of
+  // parentheses value-initializes the object ([dcl.init.general]/9); for
+  // a scalar or a class without a user-provided default constructor that
+  // means zero-initialization first.  A new-expression WITHOUT any
+  // new-initializer default-initializes instead (indeterminate for a
+  // scalar).  Both leave the operand list empty; the parser marks the
+  // parenthesised form (#value_initialization).  cpp_constructor's POD
+  // path treats both as default-initialization, so `::new(p) int()` (the
+  // shape std::construct_at takes with no arguments) left the storage
+  // unchanged.  Emit the zero-initialization here, ahead of whatever
+  // cpp_constructor produced (default member initializers, which
+  // [dcl.init.general]/9.2 applies after zero-initialization).
+  const typet &new_object_type = to_pointer_type(expr.type()).base_type();
+  if(
+    initializer.get_bool(ID_C_value_initialization) &&
+    initializer.operands().empty() &&
+    expr.get(ID_statement) == ID_cpp_new && cpp_is_pod(new_object_type))
+  {
+    const auto zero =
+      ::zero_initializer(new_object_type, expr.find_source_location(), *this);
+    if(zero.has_value())
+    {
+      exprt zero_target(ID_new_object, new_object_type);
+      zero_target.set(ID_C_lvalue, true);
+      side_effect_expr_assignt zero_assign{
+        std::move(zero_target),
+        zero.value(),
+        new_object_type,
+        expr.find_source_location()};
+      code_blockt value_init;
+      value_init.add(code_expressiont{std::move(zero_assign)});
+      if(code.has_value())
+        value_init.add(std::move(code.value()));
+      code = std::move(value_init);
+    }
+  }
+
   if(code.has_value())
     expr.add(ID_initializer).swap(code.value());
   else
