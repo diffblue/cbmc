@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+SYMEX CRASH (Invariant, symex_assign.cpp assign_from_struct:
+`rhs.operands().size() == components.size()`): a NON-template auto
+member function returning `__bind_back(*this, __n)` -- the
+perfect-forward CTAD chain -- produces a struct assignment whose rhs
+operand count differs from the type's component count.  25 lines,
+header-free, clang++/g++ accept.  Split from the round-115 ranges
+delta-cut (b5); siblings b2/b4 (template callers) fail earlier in the
+front end and are recorded in cpp20_ranges_basic_libcxx's desc.
