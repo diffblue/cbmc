@@ -8614,3 +8614,27 @@ __split_buffer:721 ~_ConstructTransaction, both "instantiating
 std::__1::vector"), and three members end up bodyless.  Probe those
 directly next round with the RTHROW/RESOLVE-THROW kit.
 All fleets retired again.
+
+## Round 119 (2026-09-11/12): sentinel-leak fix landed — vector_pushback's first visible error gone
+
+FIX (e1b15e7d97): trailing zero-length-pack sentinels ([temp.variadic]/7
+recording convention: `empty`-typed trailing argument, often
+AMBIGUOUS-wrapped) leaked into template-ids naming PACKLESS templates
+when a class instance's recorded arguments were re-used -- libc++-23's
+__split_buffer -> __vector_layout alias -> vector<_Tp, _Allocator>
+chain failed with "too many template arguments (expected 2, but got
+3)".  typecheck_template_args now strips trailing sentinels when the
+target has no trailing pack.  Probe trail: the TMA-site print gave the
+exact template + argument ids in one run; first strip attempt missed
+because the sentinel arrives ambiguous-wrapped (match ID_type AND
+ID_ambiguous).  Revert-tested (TMA 1 -> 0); five suites green.
+vector_pushback's NEXT layer exposed and recorded: `no match for
+symbol '_Bp'` in libc++'s _IfImpl<_Cond>::template _Select alias chain
+(bool NTTP through a member alias template of an explicitly-
+specialized-by-value class) + the __set_sentinel derived-to-base
+implicit-object mismatch through the CRTP template-template base
+(bare-shape kernels t1-t4 all pass; ingredient narrower).
+Ranges original: UNCHANGED by this fix (different root, as expected --
+its __bind_back is a genuine pack shape).
+Census 6 dirs unchanged; both libc++ carriers now have concrete,
+distinct next layers.
