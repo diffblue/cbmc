@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ P\.\.\. deduces P from arg0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [dcl.fct]/6: `_Fn __f...` (equivalently `_Fn...` unnamed) with a
+non-pack _Fn is `_Fn, ...`; normalized at function-template
+registration.  Runtime-verified g++ 13 / clang++ 18.
