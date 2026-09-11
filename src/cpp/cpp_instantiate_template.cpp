@@ -7215,6 +7215,31 @@ skip_pack_removal_ft:
       std::function<void(irept &)> strip_pack_var;
       strip_pack_var = [&pack_var_name, &strip_pack_var](irept &node)
       {
+        // N5008 [temp.variadic]/5: an empty pack expansion yields zero
+        // arguments.  Drop both a bare value-pack argument (`a`) and a
+        // pattern argument that is a pack expansion referencing the pack
+        // (e.g. `static_cast<A&&>(a)...`, marked with ID_ellipsis), so
+        // `f(static_cast<A&&>(a)...)` with an empty pack becomes `f()`.
+        auto is_empty_expansion = [&pack_var_name](const irept &a) -> bool
+        {
+          std::function<bool(const irept &)> refs_pack =
+            [&](const irept &n) -> bool
+          {
+            if(n.id() == ID_cpp_name)
+              for(const auto &s : n.get_sub())
+                if(s.id() == ID_name && s.get(ID_identifier) == pack_var_name)
+                  return true;
+            for(const auto &s : n.get_sub())
+              if(refs_pack(s))
+                return true;
+            for(const auto &ns : n.get_named_sub())
+              if(refs_pack(ns.second))
+                return true;
+            return false;
+          };
+          const bool bare = a.id() == ID_cpp_name && refs_pack(a);
+          return bare || (a.get_bool(ID_ellipsis) && refs_pack(a));
+        };
         // If this is a function_call side_effect, strip pack var from args
         if(
           node.id() == ID_side_effect &&
@@ -7227,41 +7252,27 @@ skip_pack_removal_ft:
             {
               irept::subt &arg_sub = sub.get_sub();
               arg_sub.erase(
-                std::remove_if(
-                  arg_sub.begin(),
-                  arg_sub.end(),
-                  [&pack_var_name](const irept &a)
-                  {
-                    // N5008 [temp.variadic]/5: an empty pack expansion yields
-                    // zero arguments.  Drop both a bare value-pack argument
-                    // (`a`) and a pattern argument that is a pack expansion
-                    // referencing the pack (e.g. `static_cast<A&&>(a)...`,
-                    // marked with ID_ellipsis), so `f(static_cast<A&&>(a)...)`
-                    // with an empty pack becomes `f()`.
-                    std::function<bool(const irept &)> refs_pack =
-                      [&](const irept &n) -> bool
-                    {
-                      if(n.id() == ID_cpp_name)
-                        for(const auto &s : n.get_sub())
-                          if(
-                            s.id() == ID_name &&
-                            s.get(ID_identifier) == pack_var_name)
-                            return true;
-                      for(const auto &s : n.get_sub())
-                        if(refs_pack(s))
-                          return true;
-                      for(const auto &ns : n.get_named_sub())
-                        if(refs_pack(ns.second))
-                          return true;
-                      return false;
-                    };
-                    const bool bare = a.id() == ID_cpp_name && refs_pack(a);
-                    return bare || (a.get_bool(ID_ellipsis) && refs_pack(a));
-                  }),
+                std::remove_if(arg_sub.begin(), arg_sub.end(), is_empty_expansion),
                 arg_sub.end());
               break;
             }
           }
+        }
+        // N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's
+        // expression-list is a pack-expansion context exactly like a call
+        // argument list -- `::new(p) _Tp(static_cast<_Args&&>(__args)...)`
+        // (std::construct_at) with an EMPTY _Args must become
+        // `::new(p) _Tp()`.  The parser stores that list as an id-less
+        // node under ID_initializer, so it was missed here and the
+        // instantiated body failed with "symbol '__args' is unknown".
+        if(
+          node.id() == ID_side_effect && node.get(ID_statement) == ID_cpp_new &&
+          node.find(ID_initializer).is_not_nil())
+        {
+          irept::subt &init_sub = node.add(ID_initializer).get_sub();
+          init_sub.erase(
+            std::remove_if(init_sub.begin(), init_sub.end(), is_empty_expansion),
+            init_sub.end());
         }
         // Recurse into sub-nodes
         for(auto &sub : node.get_sub())
