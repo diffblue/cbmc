@@ -1,24 +1,17 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ value-initialized through empty pack: SUCCESS$
+^\[main\.assertion\.1\] line \d+ default-constructed through empty pack: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
 --
-N5008 [temp.variadic]/5 + [expr.new]: instantiating a function template
-whose BODY contains a new-initializer pack expansion over an EMPTY pack
-(`::new((void*)__location) _Tp(static_cast<_Args&&>(__args)...)` with
-_Args = {}) fails with "symbol '__args' is unknown" -- the drain's
-per-element expander handles ordinary CALL argument lists (the plain
-call sibling kernel passes) but not the new-initializer's expression
-list.  Split from the round-112 investigation (the REQUIREMENT-side
-empty-pack expansion is fixed; this is the body-side sibling).  The
-walker in cpp_typecheck_method_bodies.cpp ~745 (`is_arg_list`) and the
-N==0 path of cpp_instantiate_template.cpp are the places to look; a
-first attempt that mirrored the function-call branch inside
-cpp_instantiate_template's expanded_names walker was NOT REACHED for
-this shape (probe confirmed) and was reverted.
-Runtime-verified g++ 13 / clang++ 18 (placement-new definition supplied
-in the harness).
+Body-side sibling of cpp20_requires_empty_pack_expansion: the
+new-initializer pack expansion over an EMPTY pack during function
+template instantiation.  The target is a class with a user-provided
+default constructor so the assertion observes the constructor call
+itself; a scalar target (`::new(p) int()`) additionally needs
+placement-new VALUE-initialization, which is a separate gap
+(cpp11_placement_new_value_init).  Runtime-verified g++ 13 / clang++ 18
+(placement-new definition supplied in the harness).
