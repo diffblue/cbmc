@@ -113,3 +113,15 @@ ROUND-116 (probe session, all findings measured):
     complete fix must BOTH deduce _Fn from the first argument only AND
     mark the instantiated code_typet as variadic ([dcl.fct]/6).  That
     signature-side propagation is the open piece.
+
+ROUND-116 (cont.): the two-part varargs fix (deduction-side
+is_pack=false + signature-side ellipsis marker on
+guess_function_template_args' function_type, marker correctly on the
+ID_parameters node) still leaves b2/b3/b4 failing AND regresses b3's
+previous recovery -- overload matching runs against the signature the
+INSTANTIATION path builds (instantiate_template ->
+convert_non_template_declaration), not (only) guess's local
+function_type, so the varargs conversion must be implemented THERE as
+well (three sites total).  Reverted; the design is sound per
+[dcl.fct]/6 but needs the instantiate_template leg.  Both attempts'
+diffs preserved in this desc's history via git.
