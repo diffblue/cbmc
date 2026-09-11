@@ -1446,6 +1446,30 @@ void cpp_typecheckt::typecheck_method_bodies()
           // std::expected, ranges, concepts and NTTP support that CBMC does not
           // actually model; such uses pass only vacuously).
           if(had_template_instantiation)
+            goto tolerated_incomplete_body;
+          // A failure that already COMMITTED a diagnostic (the error
+          // count moved) and did not come through a template
+          // instantiation is a genuine rejection: let it propagate so
+          // the run ends with CONVERSION ERROR ([intro.compliance]/2.2
+          // -- the rejects-invalid tests depend on it).
+          if(
+            get_message_handler().get_message_count(messaget::M_ERROR) !=
+            errors_before)
+          {
+            throw;
+          }
+          // The remaining case is a SILENT escape (no committed
+          // diagnostic, no template frame): it used to `throw;` out of
+          // cpp_typecheckt::typecheck() entirely and hit
+          // typecheck_main's silent catch(int) -- reported as SUCCESS
+          // over a HALF-CLEANED symbol table (clean_up never ran,
+          // class types kept their code-typed method components,
+          // [class.mem.general]/4) and symbolic execution crashed
+          // pairing a 0-operand initializer against them
+          // (cpp14_perfect_forward_struct_arity).  A warned,
+          // structurally-sound recovery is strictly better than a
+          // silent success.
+        tolerated_incomplete_body:
           {
             warning().source_location = method_symbol.location;
             warning()
@@ -1491,7 +1515,6 @@ void cpp_typecheckt::typecheck_method_bodies()
             }
             continue;
           }
-          throw;
         }
       }
     }
