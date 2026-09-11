@@ -8599,3 +8599,18 @@ Census 5: deduced_nontype (parked, prerequisite defined),
 sizeof_empty_class (parked, measured), regex x2 (perf),
 ranges_basic_libcxx (re-reduction planned), libcxx23_vector_pushback
 (cv117).
+
+## Round 118 (cont.): cv117 degenerate — gate lesson #4; vector_pushback has a VISIBLE-error lead
+
+cv117's 19-line artifact split push_back into an overload SET: the
+pinned body belongs to the overload NOT selected (const_reference lost
+its const, flipping resolution) and "called-but-undefined" holds
+trivially for the genuinely bodyless overload.  GATE LESSON #4:
+name-keyed called-but-undefined pins are defeated by overload sets --
+pin the full signature, or verify the SELECTED overload.
+Decision: NO further blind reduction for vector_pushback -- the
+original carrier shows two VISIBLE errors (conditional.h:40 and
+__split_buffer:721 ~_ConstructTransaction, both "instantiating
+std::__1::vector"), and three members end up bodyless.  Probe those
+directly next round with the RTHROW/RESOLVE-THROW kit.
+All fleets retired again.
