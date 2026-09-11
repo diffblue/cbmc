@@ -83,6 +83,18 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
   try
   {
     sfinae_contextt sfinae_guard{*this};
+    // N5008 [temp.variadic]/5 + [expr.prim.req]/2: the requirement is
+    // checked with the constrained declaration's parameter mapping,
+    // including PACK bindings.  A call-argument (or new-initializer)
+    // pack expansion over an EMPTY pack must disappear before
+    // typechecking -- without this, `::new((void*)0)
+    // _Tp(declval<_Args>()...)` with _Args deduced empty (value-
+    // initialization through std::construct_at) kept the unexpanded
+    // scalar `declval<_Args>()`, its resolution threw on the unbound
+    // pack parameter, and the whole candidate was removed: the CALLER's
+    // body then failed to convert and was silently dropped
+    // (gcc-16 <optional>'s _M_apply, reduced to a 30-line kernel).
+    template_map.expand_call_argument_packs(op);
     typecheck_expr(op);
   }
   catch(...)
@@ -105,6 +117,8 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
   {
     sfinae_contextt sfinae_guard{*this};
     exprt op = to_unary_expr(expr).op();
+    // see requirement_expression_is_valid: empty packs must be expanded
+    template_map.expand_call_argument_packs(op);
     typecheck_expr(op);
 
     const irept &constraint = expr.find("#constraint");
