@@ -8702,3 +8702,42 @@ cpp20_ranges_basic_libcxx (no verdict), libcxx23_vector_pushback
 Carrier main.ii: ZERO front-end diagnostics remain.
 New pre-existing gap noted: qualified TT-arg (`outer::layoutt`) →
 'expected template name for template template parameter'.
+
+## Round 122 (2026-09-12): lambda member-template capture + __builtin_assume_aligned; census 4 -> 5 (one new minimal KNOWNBUG filed)
+
+Fix 1 (5f88b148bf): typecheck_expr_lambda's enclosing-member scan
+checked struct COMPONENTS only; a member function TEMPLATE lives just
+in the class scope, so the `[&]` lambda's unqualified call to it
+(vector::emplace_back's slow-path lambda) resolved against the
+CLOSURE's own this and the body was silently dropped
+([class.mfct.non.static]/3, [expr.prim.lambda.capture]/8).  Now the
+class scope's TEMPLATE ids are consulted and such lambdas take the
+function-pointer lowering.  47-line kernel lm1 = CORE test
+cpp17_lambda_calls_enclosing_member_template; control kernel lm2
+(plain members) passed pre-fix — the contrast IS the diagnosis.
+Fix 2 (039479859b): __builtin_assume_aligned modeled (identity, no
+alignment assume/assert) in ansi-c library.  TWO build-system lessons:
+(a) the ansi-c target has a library-check completeness gate — a model
+without a matching regression/cbmc-library/<name>/ test FAILS the
+build (test therefore lands in the SAME commit); (b) `--target cbmc`
+does NOT recompile the object embedding cprover_library.inc — build
+`--target ansi-c` and verify with
+`strings .../cprover_library.cpp.o | grep <name>`.
+cv123 (24-line artifact): GATE DRIFT again — the `.no-body...__lambda_2`
+regex matched the CALLEE NAME `__if_likely_else<...tag-__lambda_2_closure>`
+of a body-deleted template.  Lesson: pin `no body for callee <NAME>(`
+(the message text with the callee's own name up to its paren), never
+the property id.
+Carrier libcxx23_vector_pushback: zero front-end errors, zero
+no-body; 17/1081 semantic failures (pointer arithmetic in __size —
+the vector allocation modeling layer).
+Ranges re-probe: reduced.cpp retired (stale artifact); the REAL
+main.cpp now shows a single diagnostic — array argument to deduced
+parameter at `arr | std::views::take(3)`: "conversion from 'signed
+int [5l]' to '<<type:auto>>'" ([temp.deduct.call]/2).  That is round
+123's primary target.
+Filed cpp11_qualified_tt_argument (header-free, 24 lines): qualified
+template-name as TT-argument rejected ([temp.arg.template]/1).
+Census: 5 KNOWNBUG = deduced_nontype_kind_mismatch (rejects-invalid),
+sizeof_empty_class, ranges (array-to-auto), vector_pushback (semantic
+layer), qualified_tt_argument (new, minimal, diagnosed).
