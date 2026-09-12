@@ -7960,7 +7960,34 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
             break;
           }
         if(comp == nullptr)
-          continue; // not a member of the enclosing class
+        {
+          // Not a data member or member function component.  A member
+          // TEMPLATE of the enclosing class is not a struct component
+          // at all -- it lives only in the class SCOPE -- yet an
+          // unqualified call to it in the body is, per N5008
+          // [class.mfct.non.static]/3, `(*this).name(...)` on the
+          // ENCLOSING object, and [expr.prim.lambda.capture]/8 makes
+          // the capture-default capture that `this`.  Treated as "not
+          // a member", the closure path resolved the call against the
+          // closure's own `this`, the implicit-object conversion
+          // threw, and the body was silently dropped (libc++
+          // vector::emplace_back's `[&] { __emplace_back_slow_path(
+          // std::forward<_Args>(__args)...); }`).  Route it the same
+          // way as a member function odr-use.
+          const irep_idt &enclosing_id = enclosing_struct.get(ID_name);
+          if(
+            !enclosing_id.empty() &&
+            cpp_scopes.id_map.find(enclosing_id) != cpp_scopes.id_map.end())
+          {
+            const auto tmpl_hits =
+              cpp_scopes.get_scope(enclosing_id)
+                .lookup(
+                  name, cpp_scopet::QUALIFIED, cpp_idt::id_classt::TEMPLATE);
+            if(!tmpl_hits.empty())
+              member_context_unsupported = true;
+          }
+          continue;
+        }
         if(comp->type().id() == ID_code)
         {
           // odr-use of a member function -- not modellable as a data-member
