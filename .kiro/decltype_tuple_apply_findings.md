@@ -8638,3 +8638,25 @@ Ranges original: UNCHANGED by this fix (different root, as expected --
 its __bind_back is a genuine pack shape).
 Census 6 dirs unchanged; both libc++ carriers now have concrete,
 distinct next layers.
+
+## Round 120 (2026-09-12): vector_pushback reduced to 61 lines with BOTH errors intact
+
+Forward kernels (if1/if2/ct1 + post-hoc ka/kb) all PASS -- six misses
+confirm the no-hand-guessing rule again.  cv120 (visible-error-pair
+gate: BOTH `no match for '_Bp'` AND `no match for '__set_sentinel'`
+texts pinned + docker clang validity + driver + int main()) +
+formatted-relaunch cv121 delivered a 61-line reproducer carrying BOTH
+errors -- the visible-error-pair gate did NOT drift (unlike the
+mechanism-gate attempts cv116/cv117 on the same carrier; pinning TWO
+distinct diagnostics appears drift-resistant).
+Negative results this round: widening resolve_template_alias's
+CLANG-gated enclosing-instance pre-bind to GCC mode has NO effect on
+either error (env-gated experiment, reverted).
+Artifact structure (in the desc): _Bp = class's own NTTP as alias
+argument in a member alias, resolved from outside with the instance
+map missing; __set_sentinel = using-declaration from a TT-dependent
+base called via a nested class's parent pointer.  The artifact's
+injected-class-name qualification and in-progress `vector` argument
+are the suspected load-bearing extras that ka/kb lack.
+Census 6 dirs unchanged; next round probes reduced.cpp directly
+(~1s/run).
