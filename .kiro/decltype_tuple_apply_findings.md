@@ -8660,3 +8660,45 @@ injected-class-name qualification and in-progress `vector` argument
 are the suspected load-bearing extras that ka/kb lack.
 Census 6 dirs unchanged; next round probes reduced.cpp directly
 (~1s/run).
+
+## Round 121 (2026-09-12): vector_pushback front-end CLEARED — 3 fixes, 2 surprise flips, census 6 -> 4
+
+Probing the 61-line reproducer directly (1s/run) paid off exactly as
+hoped — three root causes, all in the template-parameter substitution
+machinery, all N5008-grounded:
+1. 400b2bbddd apply()'s short-name bridge: a caller's TYPE-param
+   binding (struct_tag) acted as a template-name ([temp.names]/2
+   violation).  New template_template_parameters set in template_mapt
+   (from ID_is_template) gates the struct_tag-as-template-name rewrite;
+   deduction_parameters-only gating was too tight (broke
+   cpp17_replace_first_arg{,_sizeof} — the motivating TT case).
+2. 3a4e13b168 same bridge's fall-through wholesale-replaced the
+   template-id (dropping the argument list) — the typedef silently got
+   the caller's binding and downstream bodies died in the
+   deferred-method suppression.  CORE tests
+   cpp11_alias_template_short_name_capture{,2} (ip1/ip3 kernels).
+3. 5face51cef resolve's TT-param branch: root-scope RECURSIVE
+   short-name search cannot descend into namespaces; binding's id IS
+   the template symbol id — use cpp_scopes.id_map (entry is the
+   TEMPLATE_SCOPE, id class 9; the TEMPLATE id lives in its parent
+   scope, SCOPE_ONLY).  Base-drop chain: raw param type ->
+   typecheck_compound_bases drops base -> using-declared overloads
+   fail this-conversion.  CORE test cpp11_tt_param_base_in_namespace
+   (assertion pinned; pre-fix pass is vacuous).
+Method note: the all-catch instrumentation script (auto-inserting
+env-gated prints after every `catch(...)` in src/cpp) found the silent
+body-drop in minutes — reusable.
+reduced.cpp deleted from the KNOWNBUG dir: cv120-cv122 converged on a
+degenerate no-base shape (clang -fsyntax-only never instantiates, so
+the using-decl-from-non-base went unchecked) — reduction gates cannot
+hold a shape clang only diagnoses on instantiation.
+SURPRISE FLIPS: cpp11_regex_construct (26s) and cpp11_regex_match
+(77s) now verify — the symex scaling gap closed somewhere in rounds
+100-121; 21/27 assertions, suite green.
+Census: 4 KNOWNBUG dirs: cpp11_deduced_nontype_kind_mismatch
+(rejects-invalid), cpp11_sizeof_empty_class (VERIFICATION FAILED),
+cpp20_ranges_basic_libcxx (no verdict), libcxx23_vector_pushback
+(dropped emplace_back lambda body + __builtin_assume_aligned model).
+Carrier main.ii: ZERO front-end diagnostics remain.
+New pre-existing gap noted: qualified TT-arg (`outer::layoutt`) →
+'expected template name for template template parameter'.
