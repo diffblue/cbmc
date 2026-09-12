@@ -138,3 +138,21 @@ carrier's -- the reduction drifted the mechanism (the gate pinned the
 error text, not the failing declaration).  Next: re-reduce main.cpp
 with a mechanism-pinned gate (call present + operator| resolution
 failing) against the CURRENT binary, all gate lessons applied.
+
+ROUND-122 re-probe (post 400b2bbddd/3a4e13b168/5face51cef/5f88b148bf/
+039479859b): the picture CHANGED --
+  * reduced.cpp is a STALE cvise artifact (bodiless begin()/end(),
+    `int arr`, bare `__CPROVER_assert;`): nondet-driven loop, symex
+    does not terminate; with --unwind 6 the expected deref failures.
+    Do not chase it.
+  * the REAL main.cpp (--cpp20 --stdlib libc++) now fails with a
+    single crisp front-end diagnostic in 37s:
+      in expression 'arr': conversion from 'signed int [5l]' to
+      '<<type:auto>>': implicit arithmetic conversion not permitted
+    at the `arr | std::views::take(3)` call -- an ARRAY argument
+    binding to a deduced parameter ([temp.deduct.call]/2: array
+    argument decays / binds to reference depending on P's form).
+    main is then dropped (recovered) and SUCCESSFUL is vacuous.
+NEXT: attack the array-to-auto binding at the range pipe; consider
+regenerating reduced.cpp with a gate pinned on the NEW diagnostic
+text and an instantiation-forcing validity check.
