@@ -125,6 +125,13 @@ public:
   // cpp_typecheck_resolve.cpp.
   std::set<irep_idt> deduction_parameters;
 
+  // Keys of entries whose PARAMETER is a template template parameter
+  // (N5008 [temp.param]/1 template-head form).  Only these entries may
+  // substitute as the TEMPLATE-NAME of a template-id in apply()
+  // ([temp.names]/2); a same-short-named TYPE parameter binding must
+  // not.  Populated by set() from the parameter's ID_is_template mark.
+  std::set<irep_idt> template_template_parameters;
+
   void swap(template_mapt &template_map)
   {
     type_map.swap(template_map.type_map);
@@ -132,6 +139,8 @@ public:
     pack_size_map.swap(template_map.pack_size_map);
     pack_args_map.swap(template_map.pack_args_map);
     pack_expr_map.swap(template_map.pack_expr_map);
+    template_template_parameters.swap(
+      template_map.template_template_parameters);
   }
 
   exprt lookup(const irep_idt &identifier) const;
@@ -163,6 +172,7 @@ public:
     expr_map.clear();
     pack_size_map.clear();
     pack_args_map.clear();
+    template_template_parameters.clear();
   }
 
   void set(
