@@ -1214,9 +1214,29 @@ void template_mapt::apply(typet &type) const
                 break;
               }
             }
+            // N5008 [temp.names]/2: only a TEMPLATE-NAME may be
+            // followed by a template-argument-list.  Treating a
+            // matched map entry as the template of `name<args...>` is
+            // only sound for a TEMPLATE TEMPLATE parameter -- which
+            // this flat map cannot distinguish from a TYPE parameter
+            // EXCEPT during deduction, where deduction_parameters
+            // names the candidate's own parameters (the motivating
+            // `_SomeTemplate -> tag-allocator<tag-A>` binding).  An
+            // ORDINARY type parameter of a CALLER that merely shares
+            // the short name (V1 short-name bridging) must not hijack
+            // the template-name: libc++'s
+            // `__conditional_t<bool _Bp, class _If, class _Then>`
+            // binds ITS `_If` to the caller's first argument, and the
+            // bridge rewrote `_If<_Bp, int, _ElseRes>` inside
+            // conditional's DEFINITION into `vec<_Bp, int, _ElseRes>`
+            // -- a synthesized nonsense template-id whose failed
+            // resolution silently dropped vector members
+            // (libcxx23_vector_pushback).
             if(
               has_targs && !has_scope_separator &&
-              entry.second.id() == ID_struct_tag)
+              entry.second.id() == ID_struct_tag &&
+              (deduction_parameters.count(entry.first) != 0 ||
+               template_template_parameters.count(entry.first) != 0))
             {
               const std::string ident =
                 id2string(to_struct_tag_type(entry.second).get_identifier());
@@ -2524,6 +2544,12 @@ void template_mapt::set(
     }
     else
       type_map[identifier] = tmp;
+
+    // Record template template parameters (marked ID_is_template by
+    // typecheck_template_parameters): only their bindings may act as
+    // the TEMPLATE-NAME of a template-id in apply() ([temp.names]/2).
+    if(parameter.get_bool(ID_is_template))
+      template_template_parameters.insert(identifier);
   }
   else
   {
