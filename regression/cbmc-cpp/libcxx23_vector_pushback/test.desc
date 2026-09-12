@@ -103,3 +103,25 @@ object argument `struct __split_buffer` vs candidates on
 `__split_buffer_pointer_layout*`: derived-to-base `this` conversion
 through the CRTP template-template base; hand kernels t1-t4 of the
 bare shapes all PASS, so the failing ingredient is narrower).
+
+ROUND-120: cv120/cv121 (visible-error gate on the _Bp + __set_sentinel
+pair, formatted-relaunch applied) delivered reduced.cpp: 24561 -> 61
+lines, still showing BOTH errors, clang-valid (docker cxx23-gate; the
+#pragma clang attribute lines need clang).  The two mechanisms as
+visible in the artifact:
+  * _Bp: `conditional<int _Bp, class _ElseRes>`'s member alias
+    `type = _If<_Bp, int, _ElseRes>` -- the class's OWN non-type
+    parameter as the NTTP argument of another alias -- resolved from
+    outside via __conditional_t with the instance map missing _Bp
+    (probe: scope=conditional<0,...>, map holds _If's params only).
+    The artifact's use site qualifies through the INJECTED-CLASS-NAME
+    (`integral_constant<...>::integral_constant::value`) and passes the
+    in-progress `vector` as an argument -- hand kernels without those
+    (ka) PASS, so one of them is load-bearing.
+  * __set_sentinel: the member comes into __split_buffer via a
+    USING-DECLARATION from the template-template-dependent base
+    (`using __base_type::__set_sentinel;`), called through the nested
+    class's parent pointer from ~_ConstructTransaction.  Hand kernel kb
+    (same shape, no in-progress enclosing instantiation) PASSES.
+Next: probe directly on reduced.cpp (61 lines, ~1s per run) -- BP-map
+probe at the failing resolve + the injected-class-name path.
