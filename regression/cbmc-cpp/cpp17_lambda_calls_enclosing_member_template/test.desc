@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 44 slow path via lambda: SUCCESS$
+^\[main\.assertion\.2\] line 46 fast path via lambda: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A `[&]` lambda inside a member function template calls a sibling
+member function TEMPLATE of the enclosing class unqualified, expanding
+the enclosing function's parameter pack (libc++ vector::emplace_back's
+__if_likely_else fast/slow-path lambdas).  Per N5008
+[class.mfct.non.static]/3 the call is `(*this).slow_path(...)` on the
+ENCLOSING object, which the capture-default captures
+([expr.prim.lambda.capture]/8).  Previously the member template was
+not recognised as a member of the enclosing class, the closure's own
+`this` was used, and the lambda bodies were silently dropped.
