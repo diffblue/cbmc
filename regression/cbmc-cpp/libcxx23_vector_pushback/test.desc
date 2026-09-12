@@ -125,3 +125,27 @@ visible in the artifact:
     (same shape, no in-progress enclosing instantiation) PASSES.
 Next: probe directly on reduced.cpp (61 lines, ~1s per run) -- BP-map
 probe at the failing resolve + the injected-class-name path.
+
+ROUND-121 (2026-09-12): THREE fixes landed off this carrier; every
+front-end diagnostic is now GONE from main.ii (--cpp20 --stdlib
+libc++):
+  * 400b2bbddd  _Bp: apply()'s short-name bridge no longer lets a
+    caller's TYPE parameter binding act as a template-name
+    ([temp.names]/2); template_template_parameters set added.
+  * 3a4e13b168  companion: nor wholesale-replace the template-id
+    (the argument-list-discarding fall-through); CORE tests
+    cpp11_alias_template_short_name_capture{,2}.
+  * 5face51cef  __set_sentinel: TT-param binding now resolves to
+    namespace-nested templates via cpp_scopes.id_map (root RECURSIVE
+    search cannot descend); the _Layout<...> base is no longer
+    dropped.  CORE test cpp11_tt_param_base_in_namespace.
+reduced.cpp deleted: cvise (cv120-cv122) converged on a degenerate
+no-base shape (clang -fsyntax-only never instantiates the template, so
+the using-declaration-from-non-base is unchecked) which stopped
+representing the real defect.
+REMAINING (why still KNOWNBUG, now VERIFICATION FAILED not a
+front-end error):
+  * emplace_back<int>'s internal lambda __lambda_2 body is dropped
+    (.no-body ...__lambda_2_cl...) -- next reduction/probe target.
+  * no model for __builtin_assume_aligned (separate, back-end-ish:
+    __add_alignment_assumption no-body FAILURE).
