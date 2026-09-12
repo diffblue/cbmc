@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+found no match
+--
+Same defect as cpp11_alias_template_short_name_capture but with a
+COMPLETED class (not the in-progress one) as the same-short-named
+argument, and the alias chain used directly at function scope: the
+member alias's `_If<_Bp, ...>` must resolve to the namespace-scope
+alias template, not to __conditional_t's `_If` type parameter's
+binding `S`.
