@@ -6100,13 +6100,50 @@ exprt cpp_typecheck_resolvet::resolve(
         // in the symbol table and find its scope entry.
         if(cpp_typecheck.symbol_table.has_symbol(tmpl_id))
         {
-          const symbolt &tmpl_sym = cpp_typecheck.lookup(tmpl_id);
-          irep_idt tmpl_base = tmpl_sym.base_name;
-          // Search from root scope to find the template
-          auto found = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
-            tmpl_base, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
-          for(const auto &f : found)
-            id_set.insert(f);
+          // The binding names the bound template SYMBOL directly; its
+          // scope entry is in id_map under the same identifier.  Use
+          // that -- a by-name search from the root scope cannot find
+          // templates nested in namespaces (RECURSIVE walks towards
+          // enclosing scopes, it does not descend): libc++'s
+          // `std::__1::__split_buffer_pointer_layout` was missed and
+          // the TT-param base `_Layout<__split_buffer, _Tp, _Alloc>`
+          // then resolved to the raw parameter, dropping the base
+          // class ([temp.param]/1, [temp.names]/2: the parameter's
+          // binding is the template to use at the use site).
+          auto it = cpp_typecheck.cpp_scopes.id_map.find(tmpl_id);
+          if(
+            it != cpp_typecheck.cpp_scopes.id_map.end() &&
+            it->second->id_class == cpp_idt::id_classt::TEMPLATE)
+          {
+            id_set.insert(it->second);
+          }
+          else if(
+            it != cpp_typecheck.cpp_scopes.id_map.end() &&
+            it->second->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+          {
+            // id_map holds the template's SCOPE entry; the TEMPLATE
+            // id lives in the scope that declared the template.  Look
+            // the short name up there (SCOPE_ONLY: exactly that
+            // scope).
+            const symbolt &tmpl_sym = cpp_typecheck.lookup(tmpl_id);
+            auto found = static_cast<cpp_scopet &>(it->second->get_parent())
+                           .lookup(
+                             tmpl_sym.base_name,
+                             cpp_scopet::SCOPE_ONLY,
+                             cpp_idt::id_classt::TEMPLATE);
+            for(const auto &f : found)
+              id_set.insert(f);
+          }
+          else
+          {
+            const symbolt &tmpl_sym = cpp_typecheck.lookup(tmpl_id);
+            irep_idt tmpl_base = tmpl_sym.base_name;
+            // Fallback: search from root scope to find the template
+            auto found = cpp_typecheck.cpp_scopes.get_root_scope().lookup(
+              tmpl_base, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+            for(const auto &f : found)
+              id_set.insert(f);
+          }
         }
       }
       else if(
