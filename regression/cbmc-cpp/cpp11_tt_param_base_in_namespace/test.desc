@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[run\.assertion\.1\] line 48 TT-param base resolved through namespace-nested template: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+found no match
+--
+A class template with a template-template parameter used as its BASE
+CLASS (`struct buft : _Layout<_Tp, _Alloc, buft<...>>`), where the
+bound template lives inside a (nested inline) namespace, and the base's
+members are imported by using-declaration and called through a nested
+class's parent pointer -- libc++'s
+__split_buffer/__split_buffer_pointer_layout/_ConstructTransaction
+shape.  The TT-param binding must resolve to the namespace-nested
+template at the use site (N5008 [temp.param]/1, [temp.names]/2); a
+failure here silently drops the base and the using-declared overload
+set, and the assertion becomes vacuous (hence it is pinned).
