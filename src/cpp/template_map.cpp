@@ -1331,6 +1331,22 @@ void template_mapt::apply(typet &type) const
                      // `<_Up, _Types...>` references get
                      // substituted.
             }
+            // N5008 [temp.names]/2: a name followed by a
+            // template-argument-list is a TEMPLATE-NAME use.  A TYPE
+            // parameter's binding must then not replace the whole
+            // template-id either (that discards the argument list):
+            // in `_If<_Bp, int, _ElseRes>` inside libc++
+            // conditional's definition, a caller's same-short-named
+            // type parameter `_If` (bound to e.g. vector<T> by
+            // __conditional_t) is NOT what the template-id names --
+            // the namespace-scope alias template `_If` is.  Skip the
+            // entry so normal resolution finds the template.
+            if(
+              has_targs && deduction_parameters.count(entry.first) == 0 &&
+              template_template_parameters.count(entry.first) == 0)
+            {
+              continue;
+            }
             type = entry.second;
             return;
           }
