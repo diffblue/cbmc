@@ -1,0 +1,14 @@
+CORE gcc-only
+main.c
+--pointer-check --bounds-check
+^\[main\.assertion\.5\] line \d+ reachable after a false alignment claim: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The model returns its first argument, also for a pointer to const and in the
+three-argument form, and neither assumes nor checks the alignment claim: the
+final assertion must be reachable.
