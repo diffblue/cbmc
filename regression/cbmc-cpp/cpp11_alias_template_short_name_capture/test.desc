@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+found no match
+--
+Tests that a caller alias template's ordinary TYPE parameter which
+shares its short name with a namespace-scope alias template used
+inside another template's member alias does not capture that
+template-name (N5008 [temp.names]/2): `__conditional_t`'s `_If`
+parameter (bound to the in-progress class `vec<int>`) must not
+substitute into conditional's `using type = _If<_Bp, int, _ElseRes>`
+-- neither as the template-name (yielding nonsense
+`vec<_Bp, int, _ElseRes>`) nor by wholesale replacement of the
+template-id (yielding `vec<int>` and dropping the argument list).
+Mirrors libc++'s __conditional_t/conditional pair as used by
+vector's __trivially_relocatable member alias.
