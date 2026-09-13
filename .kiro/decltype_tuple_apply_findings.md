@@ -8835,3 +8835,40 @@ case; ranges now shares its root with the variadic fold KNOWNBUG.
 Census 4: deduced_nontype_kind_mismatch (rejects-invalid),
 fold_in_trailing_decltype_variadic (NEW, N>=2, diagnosed),
 ranges (same N>=2 trailing-decltype root), vector_pushback (semantic).
+
+## Round 126 (2026-09-13): the <<type:auto>> chain fully mapped; layer 1 of 2 fixed
+
+The shared ranges/__bind_back root decomposes into TWO layers:
+ 1. FIXED (b79138d38c): per-scope pack_size_map zero-seeds from
+    typecheck_function_template outlive a [temp.over.link]/6
+    declaration+definition merge; the stale zero reads as "empty pack"
+    and the empty-pack strip deletes `std::forward<_Args>(__args)...`
+    from the stored trailing-return decltype.  Fix = purge seeds +
+    detach the superseded scope (new cpp_idt::remove_secondary_scope).
+ 2. REMAINING: guess_function_template_args' speculative
+    instantiation registers skeleton parameters in the ENCLOSING
+    NAMESPACE (`std::__args` via convert_non_template_declaration,
+    put_into_scope with current scope std::) -- post-merge, `__args`
+    in the live template scope resolves ambiguously.  Pre-existing
+    leak, masked in the single-declaration case.
+Method: the layer split emerged from a kernel LADDER around the
+redeclaration axis -- k131 (single definition) PASSES vs k129
+(declaration+definition) FAILS with byte-identical decltype text;
+that axis was found only after five NON-reproducing kernels
+approximated the libc++ shape (k126-k128 etc.).  The pack-size-write
+tracer (auto-inserted prints at every pack_size_map[..]= site, with
+brace-safe insertion after two -Werror=misleading-indentation rounds)
+and the put_into_scope name filter were the decisive probes.
+Fix-in-progress note: N>=2 typecheck_type placeholder expansion
+(typed nondets for [dcl.type.decltype]) was implemented and works for
+the k129 DECLARATION typecheck but is moot until layer 2 lands; the
+c6/variadic kernel N=2 case additionally needed the pack-on-LEFT
+binary-fold form in the free-function body expander
+([expr.prim.fold]/2), which DID land in round 125's follow-up commit
+(0144460e20 covered typecheck_type; the body-side pack-on-left gap
+was fixed this round inside cpp_instantiate_template.cpp -- wait, NO:
+that edit was REVERTED with the probe cleanup; re-verify c6 next
+round and re-land if missing).
+Census 4 (unchanged): deduced_nontype_kind_mismatch,
+fold_in_trailing_decltype_variadic (+redecl.cpp, diagnosed to layer
+2), ranges (same), vector_pushback.
