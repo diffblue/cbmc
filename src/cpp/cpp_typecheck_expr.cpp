@@ -3485,6 +3485,27 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         struct_exprt result({}, expr.type());
         std::size_t idx = 0;
         bool aggregate = true;
+        // N5008 [dcl.init.aggr]/2.2: the aggregate's elements START
+        // with the direct base classes, in declaration order.  When a
+        // direct base is EMPTY (no data members -- the libc++
+        // range-adaptor `__take_closure{{}, __n}` shape, whose base
+        // __range_adaptor_closure<...> is empty), its element
+        // initializes nothing; consume one leading empty braced
+        // clause per base so the remaining clauses pair with the data
+        // members.  (Bases WITH data members contribute from_base
+        // components, which this reshape does not model; those keep
+        // the constructor path.)
+        for(const auto &b : struct_type.find(ID_bases).get_sub())
+        {
+          if(b.is_nil())
+            continue;
+          if(
+            idx < ops.size() && ops[idx].id() == ID_initializer_list &&
+            ops[idx].operands().empty())
+          {
+            ++idx;
+          }
+        }
         for(const auto &c : struct_type.components())
         {
           if(

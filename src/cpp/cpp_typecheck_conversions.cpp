@@ -3619,14 +3619,15 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
                                    ? follow_tag(to_struct_tag_type(base_type))
                                    : to_struct_type(base_type);
         const auto &comps = st.components();
-        // A class with base subobjects cannot be initialised by assigning
-        // the brace elements to its own data members in order: the base
-        // subobjects would be omitted, yielding a struct value with fewer
-        // operands than the type has components (which later aborts
-        // goto-symex's assign_from_struct).  Such a type is either a
-        // non-aggregate -- list-initialization selects a constructor
-        // ([dcl.init.list]/3) -- or a C++17 aggregate with bases (not
-        // handled here); defer to the constructor path below.
+        // A class with base subobjects that have DATA MEMBERS cannot be
+        // initialised by assigning the brace elements to its own data
+        // members in order: the base subobjects would be omitted,
+        // yielding a struct value with fewer operands than the type has
+        // components (which later aborts goto-symex's
+        // assign_from_struct).  Such a type is either a non-aggregate --
+        // list-initialization selects a constructor ([dcl.init.list]/3)
+        // -- or a C++17 aggregate with bases (not handled here); defer
+        // to the constructor path below.
         bool has_base_subobject = false;
         for(const auto &c : comps)
         {
@@ -3637,6 +3638,32 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           {
             has_base_subobject = true;
             break;
+          }
+        }
+        // N5008 [dcl.init.aggr]/2.2: the aggregate's elements START
+        // with the direct base classes, in declaration order.  When
+        // every direct base is EMPTY (no data members -- the libc++
+        // range-adaptor `__take_closure{{}, __n}` shape, whose base
+        // __range_adaptor_closure<...> is empty), a base element's
+        // clause initializes nothing; consume one leading braced
+        // clause per base so the remaining clauses pair with the data
+        // members.  Bases WITH data members keep the constructor-path
+        // deferral above.
+        std::size_t leading_base_clauses = 0;
+        if(!has_base_subobject)
+        {
+          for(const auto &b : st.find(ID_bases).get_sub())
+          {
+            if(b.is_nil())
+              continue;
+            if(
+              leading_base_clauses < orig_expr.operands().size() &&
+              orig_expr.operands()[leading_base_clauses].id() ==
+                ID_initializer_list &&
+              orig_expr.operands()[leading_base_clauses].operands().empty())
+            {
+              ++leading_base_clauses;
+            }
           }
         }
         if(!has_base_subobject)
@@ -3666,7 +3693,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           }
 
           struct_exprt result({}, base_type);
-          std::size_t i = 0;
+          std::size_t i = leading_base_clauses;
           bool ok = true;
           for(const auto &c : comps)
           {
