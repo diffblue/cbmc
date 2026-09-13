@@ -519,13 +519,128 @@ void cpp_typecheckt::typecheck_type(typet &type)
               node = pattern;
             return;
           }
-          // pack_n >= 2 requires the replicated `<base>$k` value
-          // parameters, which are only created later (during the
-          // called specialization's own instantiation); they are not
-          // in scope while this trailing-return decltype is checked.
-          // Leave the fold unexpanded for the body pass to handle.
-          // (Header-free reproducers of the N>=2 trailing-decltype
-          // fold are tracked in cpp17_fold_in_trailing_decltype.)
+          // pack_n >= 2: this trailing-return decltype is typechecked
+          // during DEDUCTION, before the replicated `<base>$k` value
+          // parameters exist -- their names cannot be used.  But
+          // N5008 [dcl.type.decltype] only needs the TYPE of the
+          // fold, and the pack's element TYPES are already deduced
+          // (pack_args_map).  Expand the fold with typed PLACEHOLDER
+          // operands: each pack-name reference in the pattern is
+          // replaced by an already-typechecked nondet of the k-th
+          // element type, so the operator tree typechecks to the
+          // fold's result type and the placeholder values are
+          // discarded with the decltype expression.  (Value-category
+          // caveat: the placeholders are prvalues; a pattern whose
+          // decltype hinges on the parameter's lvalueness would get T
+          // rather than T& -- acceptable for the arithmetic fold
+          // shapes of libc++'s __bind_back/ranges chain.)
+          const auto pack_args_it = [&]()
+          {
+            for(auto it = template_map.pack_args_map.begin();
+                it != template_map.pack_args_map.end();
+                ++it)
+            {
+              if(it->second.size() == pack_n)
+                return it;
+            }
+            return template_map.pack_args_map.end();
+          }();
+          if(pack_args_it == template_map.pack_args_map.end())
+            return;
+          const std::vector<typet> &elem_types = pack_args_it->second;
+          irep_idt base;
+          std::function<void(const irept &)> find_base = [&](const irept &n)
+          {
+            if(!base.empty())
+              return;
+            if(
+              n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+              n.get_sub().front().id() == ID_name)
+              base = n.get_sub().front().get(ID_identifier);
+            for(const auto &sn : n.get_sub())
+              find_base(sn);
+            for(const auto &ns : n.get_named_sub())
+              find_base(ns.second);
+          };
+          find_base(pattern);
+          if(base.empty())
+            return;
+          std::function<void(irept &, const typet &)> replace =
+            [&](irept &n, const typet &t)
+          {
+            if(
+              n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+              n.get_sub().front().id() == ID_name &&
+              n.get_sub().front().get(ID_identifier) == base)
+            {
+              typet elem_t = t;
+              typecheck_type(elem_t);
+              exprt placeholder =
+                side_effect_expr_nondett{elem_t, source_locationt{}};
+              already_typechecked_exprt::make_already_typechecked(placeholder);
+              n = placeholder;
+              return;
+            }
+            for(auto &sn : n.get_sub())
+              replace(sn, t);
+            for(auto &ns : n.get_named_sub())
+              replace(ns.second, t);
+          };
+          auto elem = [&](std::size_t k) -> irept
+          {
+            irept c = pattern;
+            replace(c, elem_types[k]);
+            return c;
+          };
+          if(is_binary)
+          {
+            irept result = init_expr;
+            if(binary_pack_on_left)
+            {
+              for(int k = static_cast<int>(pack_n) - 1; k >= 0; --k)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(elem(static_cast<std::size_t>(k)));
+                bin.get_sub().push_back(result);
+                result = bin;
+              }
+            }
+            else
+            {
+              for(std::size_t k = 0; k < pack_n; ++k)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(result);
+                bin.get_sub().push_back(elem(k));
+                result = bin;
+              }
+            }
+            node = result;
+          }
+          else if(is_left)
+          {
+            irept result = elem(0);
+            for(std::size_t k = 1; k < pack_n; ++k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(result);
+              bin.get_sub().push_back(elem(k));
+              result = bin;
+            }
+            node = result;
+          }
+          else // right fold
+          {
+            irept result = elem(pack_n - 1);
+            for(int k = static_cast<int>(pack_n) - 2; k >= 0; --k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(elem(static_cast<std::size_t>(k)));
+              bin.get_sub().push_back(result);
+              result = bin;
+            }
+            node = result;
+          }
           return;
         }
         for(auto &s : node.get_sub())
