@@ -7805,6 +7805,36 @@ skip_pack_removal_ft:
             return;
           }
 
+          // N5008 [expr.prim.fold]/2: `(pack op ... op init)` -- the
+          // pack operand FIRST -- is a binary RIGHT fold,
+          // e0 op (e1 op (... op init)).  Only the pack-on-the-right
+          // form above was expanded; the pack-on-the-left form (the
+          // `(__x + ... + 0)` shape of the trailing-decltype fold
+          // tests and libc++'s __bind_back chain) reached the C
+          // type-checker unexpanded ("unexpected expression:
+          // cpp_binary_fold") and dropped the body.
+          if(
+            node.id() == irep_idt("cpp_binary_fold") &&
+            node.get_sub().size() >= 2 && contains_pack_name(node.get_sub()[0]))
+          {
+            const irep_idt fold_op = node.get(irep_idt("fold_op"));
+            const irept &pack_expr = node.get_sub()[0];
+            const irept &init_expr = node.get_sub()[1];
+
+            irept result = init_expr;
+            for(int i = static_cast<int>(expanded_names.size()) - 1; i >= 0;
+                --i)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(substitute_pack(
+                pack_expr, expanded_names[static_cast<std::size_t>(i)]));
+              bin.get_sub().push_back(result);
+              result = bin;
+            }
+            node = result;
+            return;
+          }
+
           // Look for function call arguments containing pack_var...
           if(
             node.id() == ID_side_effect &&
