@@ -89,6 +89,12 @@ public:
   /// constructs as permissive extensions, so we always return true.
   bool empty_brace_value_initializes_scalar() const override;
 
+  /// N5008 [class]/4 + [expr.sizeof]/2: sizeof a class type is never 0.
+  bool sizeof_yields_nonzero_for_class() const override
+  {
+    return true;
+  }
+
   friend class cpp_typecheck_resolvet;
   friend class cpp_declarator_convertert;
 

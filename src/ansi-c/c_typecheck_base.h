@@ -108,6 +108,16 @@ protected:
   /// for C++.
   virtual bool empty_brace_value_initializes_scalar() const;
 
+  /// Whether sizeof applied to a class type is at least 1 at the
+  /// current language level.  Per N5008 [class]/4 + [expr.sizeof]/2 a
+  /// complete object of class type has nonzero size in C++; in C
+  /// (GNU mode) an empty struct is a zero-size extension.  Default
+  /// covers the C side; cpp_typecheckt overrides for C++.
+  virtual bool sizeof_yields_nonzero_for_class() const
+  {
+    return false;
+  }
+
   virtual exprt::operandst::const_iterator do_designated_initializer(
     exprt &result,
     designatort &designator,
