@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line 44 range pipe through CRTP closure: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+End-to-end range-pipe shape mirroring libc++ views::take: a CRTP
+__range_adaptor_closure base with a hidden friend template operator|
+([temp.friend]/1), a take-closure created by aggregate initialization
+with an empty-base element ([dcl.init.aggr]/2.2), and an array lvalue
+binding the constrained forwarding reference ([temp.deduct.call]/2-3).
+Exercises the round-123 friend-hoist and aggregate-base fixes
+together.
