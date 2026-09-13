@@ -8741,3 +8741,38 @@ template-name as TT-argument rejected ([temp.arg.template]/1).
 Census: 5 KNOWNBUG = deduced_nontype_kind_mismatch (rejects-invalid),
 sizeof_empty_class, ranges (array-to-auto), vector_pushback (semantic
 layer), qualified_tt_argument (new, minimal, diagnosed).
+
+## Round 123 (2026-09-13): 3 fixes + 1 flip; census 5 -> 4
+
+Fix 1 (f2b09a546e): hoisted friend function templates re-resolved the
+INJECTED-CLASS-NAME at namespace scope where it denotes the template
+needing args ([temp.local]/1, [class.pre]/2) -- the friend had no
+viable specialisation and the range pipe fell back to a bogus
+arithmetic-conversion diagnostic.  Substitute the converting
+instantiation's struct_tag into the friend's declarator types at hoist
+time (same pattern as the existing default-arg + requires-clause
+substitutions).  Kernel discipline note: the first kernel rp1
+reproduced on the FIRST TRY this round (contrast rounds 120-122's
+seven straight kernel misses) -- the difference was starting from a
+pinned, per-layer diagnostic instead of a whole-carrier failure.
+Fix 2 (4b5753d5c2): two braced-list reshape loops (conversions.cpp
+implicit path + expr.cpp explicit-ctor-call aggregate branch) paired
+clauses with data members only; [dcl.init.aggr]/2.2 puts direct BASES
+first.  Empty bases now consume one leading {} clause each.  THREE
+pairing loops existed; the first two edits were measured no-ops for
+the kernel (ab1 passes via the initializer path, ab2's return-expr
+goes through the explicit-ctor-call branch) -- gdb marker + bt was
+what located the right loop, not reading code.
+Fix 3 (98fcce4870): sizeof(class) >= 1 realised at sizeof evaluation
+([class]/4, [expr.sizeof]/2) via a new virtual hook following the
+empty_brace_value_initializes_scalar idiom; C-mode GNU zero-size
+empty structs stay observable (asserted in a C-mode check).  FLIP
+cpp11_sizeof_empty_class.
+Ranges: kernels rp1-rp8 all pass now; the real main.cpp still fails
+with `<<type:auto>>` -- remaining layer sits in a decltype-nested
+call whose callee presents a raw `auto` (suspect __perfect_forward's
+ref-qualified operator() set).  Reduction with the exact-text gate is
+the round-124 opener.
+Census 4: deduced_nontype_kind_mismatch (rejects-invalid),
+qualified_tt_argument (minimal, diagnosed), ranges (auto layer),
+vector_pushback (semantic pointer layer).
