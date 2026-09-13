@@ -8872,3 +8872,20 @@ round and re-land if missing).
 Census 4 (unchanged): deduced_nontype_kind_mismatch,
 fold_in_trailing_decltype_variadic (+redecl.cpp, diagnosed to layer
 2), ranges (same), vector_pushback.
+
+## Round 126 (addendum): N>=2 fold fixes RE-LANDED (71b93eca3d) + FLIP
+
+The findings-log self-check caught the accidental revert immediately
+(c6 re-verified FAILING right after the notes commit) -- the two
+validated edits were reconstructed and landed as 71b93eca3d:
+typecheck_type N>=2 placeholder expansion + pack-on-left binary fold
+in the free-function body expander.  br4/c1/c3/c6 all pass; FLIP
+cpp17_fold_in_trailing_decltype_variadic (main.cpp; redecl.cpp stays
+as the layer-2 reproducer).  Suites green x2.
+PROCESS RULE (new): validated-but-uncommitted edits must be committed
+BEFORE probe-cleanup `git checkout` sweeps; cleanup by checkout is
+only safe when the working tree holds probes ONLY.
+Census 3: cpp11_deduced_nontype_kind_mismatch (rejects-invalid),
+cpp20_ranges_basic_libcxx (layer 2: deduction-skeleton parameter leak
+into enclosing namespace; redecl.cpp reproduces),
+libcxx23_vector_pushback (semantic pointer layer).
