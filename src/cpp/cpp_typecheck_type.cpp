@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/mathematical_types.h>
@@ -399,6 +400,142 @@ void cpp_typecheckt::typecheck_type(typet &type)
       return;
 
     exprt e=static_cast<const exprt &>(type.find(ID_expr_arg));
+
+    // N5008 [expr.prim.fold] in a trailing-return-type decltype
+    // ([dcl.fct]/8): fold-expressions are normally reduced in the
+    // method-body pass, which does not run on a trailing return type;
+    // the unexpanded `cpp_binary_fold`/`cpp_{left,right}_fold` then
+    // fails to typecheck ("found no match for symbol '<fn>'"),
+    // dropping the whole declaration.  When exactly one parameter
+    // pack is bound in the current instantiation (pack_size_map), the
+    // fold's element count is that size; reduce the fold to the
+    // associated operator tree over the pattern here.  For a
+    // single-element pack the sole element keeps the plain parameter
+    // name (N5008 [temp.variadic]/5), so the pattern is used verbatim;
+    // for an empty pack the identity value is used
+    // ([expr.prim.fold]/3).  N>=2 (which requires replicated `$k`
+    // parameters not yet present at this point) is left to the body
+    // pass.
+    if(template_map.pack_size_map.size() == 1)
+    {
+      const std::size_t pack_n = template_map.pack_size_map.begin()->second;
+      const irep_idt fold_id_binary{"cpp_binary_fold"};
+      const irep_idt fold_id_left{"cpp_left_fold"};
+      const irep_idt fold_id_right{"cpp_right_fold"};
+      std::function<void(irept &)> reduce = [&](irept &node)
+      {
+        const bool is_binary = node.id() == fold_id_binary;
+        const bool is_left = node.id() == fold_id_left;
+        const bool is_right = node.id() == fold_id_right;
+        if(is_binary || is_left || is_right)
+        {
+          const irep_idt fold_op = node.get("fold_op");
+          // Identify the pack-side of a binary fold by which operand
+          // references a bound pack's parameter name (N5008
+          // [expr.prim.fold]/2): `(pack op ... op init)` has the pack
+          // on the LEFT (sub[0]); `(init op ... op pack)` on the
+          // RIGHT (sub[1]).  A unary fold has the pattern as its sole
+          // operand.
+          std::function<bool(const irept &)> names_a_param =
+            [&](const irept &n) -> bool
+          {
+            // a bare cpp_name / name that is NOT the pack's own type
+            // parameter short-name but a value parameter -- for the
+            // single/replicated value pack the pattern references the
+            // PARAMETER, whose base name we detect structurally below;
+            // here we only need "contains any cpp_name".
+            if(n.id() == ID_cpp_name)
+              return true;
+            for(const auto &sn : n.get_sub())
+              if(names_a_param(sn))
+                return true;
+            for(const auto &ns : n.get_named_sub())
+              if(names_a_param(ns.second))
+                return true;
+            return false;
+          };
+          irept init_expr;
+          irept pattern;
+          bool binary_pack_on_left = false;
+          if(is_binary && node.get_sub().size() >= 2)
+          {
+            const bool left_has = names_a_param(node.get_sub()[0]);
+            const bool right_has = names_a_param(node.get_sub()[1]);
+            // Prefer the side that references a name; if both do, the
+            // init operand is the one WITHOUT the fold's pack -- fall
+            // back to right-is-pattern (the common `(init op ... op
+            // pack)`).
+            if(left_has && !right_has)
+            {
+              pattern = node.get_sub()[0];
+              init_expr = node.get_sub()[1];
+              binary_pack_on_left = true;
+            }
+            else
+            {
+              init_expr = node.get_sub()[0];
+              pattern = node.get_sub()[1];
+            }
+          }
+          else if(!node.get_sub().empty())
+            pattern = node.get_sub().front();
+          else
+            return;
+          reduce(pattern);
+          if(is_binary)
+            reduce(init_expr);
+          auto identity = [&]() -> irept
+          {
+            if(fold_op == ID_and)
+              return true_exprt{};
+            if(fold_op == ID_or)
+              return false_exprt{};
+            return from_integer(0, signed_int_type());
+          };
+          if(pack_n == 0)
+          {
+            node = is_binary ? init_expr : identity();
+            return;
+          }
+          // pack_n == 1: the single element keeps the plain name.
+          if(pack_n == 1)
+          {
+            if(is_binary)
+            {
+              irept bin(fold_op);
+              if(binary_pack_on_left)
+              {
+                bin.get_sub().push_back(pattern);
+                bin.get_sub().push_back(init_expr);
+              }
+              else
+              {
+                bin.get_sub().push_back(init_expr);
+                bin.get_sub().push_back(pattern);
+              }
+              node = bin;
+            }
+            else
+              node = pattern;
+            return;
+          }
+          // pack_n >= 2 requires the replicated `<base>$k` value
+          // parameters, which are only created later (during the
+          // called specialization's own instantiation); they are not
+          // in scope while this trailing-return decltype is checked.
+          // Leave the fold unexpanded for the body pass to handle.
+          // (Header-free reproducers of the N>=2 trailing-decltype
+          // fold are tracked in cpp17_fold_in_trailing_decltype.)
+          return;
+        }
+        for(auto &s : node.get_sub())
+          reduce(s);
+        for(auto &ns : node.get_named_sub())
+          reduce(ns.second);
+      };
+      reduce(e);
+    }
+
     typecheck_expr(e);
 
     if(e.type().id() == ID_c_bit_field)
