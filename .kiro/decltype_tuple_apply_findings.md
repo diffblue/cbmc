@@ -8804,3 +8804,34 @@ Census 4: deduced_nontype_kind_mismatch (rejects-invalid),
 fold_in_trailing_decltype (NEW, 11 lines, diagnosed),
 ranges (reduced2.cpp + bind_back.h:60 pin), vector_pushback
 (semantic pointer layer).
+
+## Round 125 (2026-09-13): fold-in-trailing-decltype (size 0/1) fixed; census 4 -> stays 4 (1 flip, 1 new split-out)
+
+Fix (0144460e20): fold-expressions in a trailing-return-type decltype
+were never reduced (the reducer runs only in the method-body pass,
+which doesn't touch the return type), so the declaration was dropped.
+Now reduced in typecheck_type's decltype branch when one pack is bound
+(pack_size_map): empty -> identity ([expr.prim.fold]/3), single ->
+plain param name ([temp.variadic]/5); binary-fold pack side detected
+structurally.  Isolation ladder that pinned it precisely: fold in body
+(PASS), fixed-return fold (PASS), fold in LOCAL decltype (PASS), fold
+in TRAILING decltype (FAIL) -- only the trailing position, confirming
+the reducer-doesn't-run-here root.
+SCOPE LIMIT (honest, documented): size >= 2 needs the replicated
+`<base>$k` value parameters, which don't exist while the trailing
+return type is checked (they're created during the called
+specialization's body instantiation).  Left for the body pass; split
+out as cpp17_fold_in_trailing_decltype_variadic (KNOWNBUG).  Two wrong
+approaches tried and reverted before landing the N<=1 scope: (a)
+keeping N>=2 replication in typecheck_type emitted `$k` names that
+don't resolve (no worse, but no help); (b) the binary-fold operand
+order was initially wrong (assumed sub[0]=init) -- the parser puts the
+pack operand first for `(pack op ... op init)`, fixed by structural
+pack-side detection.
+FLIP cpp17_fold_in_trailing_decltype (size 0/1 CORE).
+Ranges: reduced2.cpp STILL <<type:auto>> -- its __bind_back trailing
+decltype instantiates the bound-args pack at size >= 2, the deferred
+case; ranges now shares its root with the variadic fold KNOWNBUG.
+Census 4: deduced_nontype_kind_mismatch (rejects-invalid),
+fold_in_trailing_decltype_variadic (NEW, N>=2, diagnosed),
+ranges (same N>=2 trailing-decltype root), vector_pushback (semantic).
