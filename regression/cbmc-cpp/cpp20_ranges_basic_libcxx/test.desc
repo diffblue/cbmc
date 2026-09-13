@@ -211,3 +211,9 @@ the size>=2 trailing-decltype pack case -- needs the replicated
 `<base>$k` value parameters (or an equivalent pack-element expression
 source) available at return-type-check time; that is the shared fix
 for both this test and the variadic KNOWNBUG.
+
+ROUND-126: shared-root progress -- the stale pack-seed layer is fixed
+(b79138d38c); the remaining blocker is the deduction-skeleton
+parameter leak into the enclosing namespace scope (see
+cpp17_fold_in_trailing_decltype_variadic ROUND-126 note; header-free
+reproducer redecl.cpp there).
