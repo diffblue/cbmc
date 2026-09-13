@@ -2269,6 +2269,63 @@ void cpp_typecheckt::typecheck_friend_declaration(
             };
           subst_enclosing(req_clause);
         }
+
+        // N5008 [temp.local]/1 + [class.pre]/2: within the class
+        // template's scope its own name is the INJECTED-CLASS-NAME and
+        // is equivalent to the name followed by its template arguments
+        // -- here, the arguments of the instantiation being converted.
+        // A hoisted friend's PARAMETER written as the bare class name
+        // (libc++'s hidden friend
+        //   template<class _View> friend auto operator|(_View&&,
+        //     __range_adaptor_closure_t __closure)
+        // shape, our range-adaptor kernels) would otherwise be
+        // re-resolved AFTER hoisting, at namespace scope, where the
+        // bare name is the class TEMPLATE needing arguments -- the
+        // friend then has no viable specialisation and `arr | take(3)`
+        // falls back to a bogus arithmetic conversion.  Substitute the
+        // bare name with this instantiation's struct_tag in the
+        // friend's declarator types now.  The friend's own template
+        // parameters shadow ([temp.local]/1) and are skipped via the
+        // same own-parameter check as for defaults and the
+        // requires-clause.
+        {
+          std::set<std::string> own_param_names2;
+          for(const auto &param :
+              declaration.template_type().template_parameters())
+          {
+            if(param.id() != ID_cpp_declaration)
+              continue;
+            const auto &pdecl2 = static_cast<const cpp_declarationt &>(
+              static_cast<const exprt &>(static_cast<const irept &>(param)));
+            for(const auto &pd2 : pdecl2.declarators())
+            {
+              if(pd2.name().is_simple_name())
+                own_param_names2.insert(id2string(pd2.name().get_base_name()));
+            }
+          }
+          const std::string class_base = id2string(symbol.base_name);
+          struct_tag_typet self_tag{symbol.name};
+          std::function<void(irept &)> subst_self = [&](irept &node)
+          {
+            if(
+              node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+              node.get_sub().front().id() == ID_name &&
+              id2string(node.get_sub().front().get(ID_identifier)) ==
+                class_base &&
+              own_param_names2.count(class_base) == 0)
+            {
+              node = self_tag;
+              return;
+            }
+            for(auto &child : node.get_sub())
+              subst_self(child);
+            for(auto &named : node.get_named_sub())
+              subst_self(named.second);
+          };
+          for(auto &d : declaration.declarators())
+            subst_self(d.type());
+          subst_self(declaration.type());
+        }
       }
       cpp_scopes.go_to(*scope);
       // N5008 [class.friend]/1 + [temp.local]/1: the class scope stays
