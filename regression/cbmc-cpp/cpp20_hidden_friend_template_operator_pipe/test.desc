@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line 28 array lvalue binds forwarding ref of constrained friend: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A hidden friend function TEMPLATE of a class template uses the
+injected-class-name as a parameter type and a constrained forwarding
+reference for the piped operand (the libc++ range-adaptor
+`operator|` shape, N5008 [temp.friend]/1, [temp.local]/1,
+[temp.deduct.call]/2-3).  The friend must remain callable after
+hoisting to namespace scope, with the bare class name denoting the
+defining instantiation.
