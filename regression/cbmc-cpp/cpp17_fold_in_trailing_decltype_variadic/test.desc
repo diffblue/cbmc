@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line 9 two-element fold in trailing decltype: SUCCESS$
@@ -38,3 +38,10 @@ NEXT: quarantine the deduction skeleton's parameter registration (a
 guessed-conversion under guess_function_template_args must not
 register ids in the enclosing namespace scope, or must remove them
 when the speculation completes).
+
+ROUND-126 (later): N>=2 landed (placeholder expansion in
+typecheck_type + pack-on-left binary fold in the body expander);
+main.cpp passes and the test is CORE.  redecl.cpp (the
+declaration+definition pair) remains a reproducer for the
+deduction-skeleton parameter leak (layer 2) -- it is NOT part of this
+test's run.
