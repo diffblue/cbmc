@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 21 aggregate init with template base initializer: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+C++17 aggregate initialization with a base-class element (N5008
+[dcl.init.aggr]/2.2): `derived{{}, 7}` in a RETURN expression, where
+derived's base is an EMPTY class template instance (the libc++
+__take_closure/__range_adaptor_closure shape).  The leading {} clause
+initializes the base element; previously it was paired with the first
+data member and the enclosing body was silently dropped.
