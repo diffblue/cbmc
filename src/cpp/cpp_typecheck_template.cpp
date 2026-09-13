@@ -551,6 +551,52 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 
     if(has_value)
     {
+      // N5008 [temp.over.link]/6: this DEFINITION and the previous
+      // bodiless DECLARATION declare the same entity, but each got its
+      // own template scope, and typecheck_function_template seeded
+      // pack_size_map[<old-scope>::<pack>] = 0 for the declaration's
+      // packs.  Once the definition supersedes it, that stale zero is
+      // indistinguishable from a genuinely-empty pack: downstream
+      // pack-size decisions (template_mapt::apply's call-argument
+      // expansion, the instantiation-time empty-pack strip) then
+      // treat the pack as empty and strip pack-expansion arguments
+      // from the stored trailing-return decltype -- libc++'s
+      // __bind_back declaration+definition pair lost
+      // `std::forward<_Args>(__args)...` and every range pipe died
+      // with "conversion ... to '<<type:auto>>'".  Erase the
+      // superseded scope's seeds.
+      for(const auto &op : to_cpp_declaration(previous_symbol->type)
+                             .template_type()
+                             .template_parameters())
+      {
+        if(!op.get_bool(ID_ellipsis))
+          continue;
+        const irep_idt opid = op.type().get(ID_identifier);
+        if(opid.empty())
+          continue;
+        auto ps_it = template_map.pack_size_map.find(opid);
+        if(ps_it != template_map.pack_size_map.end() && ps_it->second == 0)
+          template_map.pack_size_map.erase(ps_it);
+      }
+
+      // The declaration's template scope was also attached as a
+      // SECONDARY lookup scope of the enclosing scope (see the tail
+      // of this function); with the definition's scope attached too,
+      // the function parameters (`__args`) of the two scopes make
+      // every unqualified reference ambiguous ("symbol '__args' does
+      // not uniquely resolve").  Detach the superseded scope.
+      {
+        auto old_scope_it = cpp_scopes.id_map.find(symbol_name);
+        if(
+          old_scope_it != cpp_scopes.id_map.end() &&
+          old_scope_it->second != nullptr &&
+          old_scope_it->second->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE)
+        {
+          cpp_scopes.current_scope().remove_secondary_scope(
+            *old_scope_it->second);
+        }
+      }
+
       // COPY rather than swap: `declaration` may live in a
       // class-template INSTANCE's stored body, which later member
       // instantiations re-read ([temp.mem]); swapping gutted the
