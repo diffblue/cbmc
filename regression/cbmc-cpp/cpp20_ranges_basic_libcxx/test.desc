@@ -201,3 +201,13 @@ noexcept(noexcept(...)), forward_as_tuple's tuple<_Ts&&...>).
 NEXT: probe reduced2.cpp directly (fast) for the remaining
 ingredient; the fold KNOWNBUG may share the root (trailing-decltype
 evaluation scope for pack constructs).
+
+ROUND-125: the trailing-decltype fold fix (0144460e20) covers size
+0/1 packs; the ranges __bind_back trailing decltype instantiates its
+pack at size >= 2 (the bound-args pack), which remains deferred (see
+cpp17_fold_in_trailing_decltype_variadic).  reduced2.cpp still shows
+<<type:auto>>; same root as the variadic fold KNOWNBUG.  NEXT: lift
+the size>=2 trailing-decltype pack case -- needs the replicated
+`<base>$k` value parameters (or an equivalent pack-element expression
+source) available at return-type-check time; that is the shared fix
+for both this test and the variadic KNOWNBUG.
