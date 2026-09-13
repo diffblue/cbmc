@@ -156,3 +156,28 @@ ROUND-122 re-probe (post 400b2bbddd/3a4e13b168/5face51cef/5f88b148bf/
 NEXT: attack the array-to-auto binding at the range pipe; consider
 regenerating reduced.cpp with a gate pinned on the NEW diagnostic
 text and an instantiation-forcing validity check.
+
+ROUND-123: two fixes landed off this test's diagnosis --
+  * f2b09a546e injected-class-name in hoisted friend templates
+    ([temp.local]/1): the range_adaptor `friend int operator|(_View&&,
+    range_adaptor)` shape now resolves (CORE test
+    cpp20_hidden_friend_template_operator_pipe);
+  * 4b5753d5c2 empty-base elements in aggregate list-init
+    ([dcl.init.aggr]/2.2): `__take_closure{{}, __n}` (CORE tests
+    cpp17_aggregate_init_empty_base, cpp20_range_pipe_crtp_closure).
+Kernels rp1-rp8 (friend template, constrained forwarding ref, array
+lvalue, CRTP closure base, decltype(auto) return, invoke-style
+body) now ALL pass, but the REAL main.cpp STILL shows
+  in expression 'arr': conversion from 'signed int [5l]' to
+  '<<type:auto>>'
+The remaining layer: gdb places the failing conversion inside
+typecheck_function_call_arguments during a DECLTYPE evaluation nested
+in template-alias args (resolve_template_alias ->
+typecheck_template_args -> typecheck_type -> typecheck_expr -> call),
+i.e. some libc++ callee (suspect: __perfect_forward's four
+ref-qualified `auto operator()(_Args&&...)` overloads with deleted
+counterparts, via __bind_back) presents a parameter/return still
+typed `auto` when the call is checked.  NEXT: cvise-reduce main.cpp
+pinned on the exact text "to '<<type:auto>>'" (front-end error text
+with callee name anchor per the round-122 gate rule); all shallower
+layers are fixed so the reduction cannot converge onto them.
