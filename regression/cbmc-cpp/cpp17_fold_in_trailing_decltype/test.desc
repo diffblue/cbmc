@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 9 bare fold in trailing decltype: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [expr.prim.fold] + [dcl.fct]/8: a fold-expression over the
+function's own parameter pack inside its trailing-return-type
+decltype.  CBMC fails the declaration with "found no match for symbol
+'wrap'" (the trailing decltype cannot be evaluated, so the template
+has no viable specialisation at the call).  11 lines, header-free,
+accepted by g++/clang -std=c++17.  Found round 124 while kerneling
+the cpp20_ranges_basic_libcxx auto layer; sibling shapes: a pack
+expansion inside a braced-init-list in a trailing decltype fails the
+same way (fw2 in /tmp/k124), while the parenthesised constructor-call
+form works (fw6).
