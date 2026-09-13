@@ -2812,7 +2812,14 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               cpp_namet scope_name;
               for(std::size_t si = 0; si + 2 < cn->get_sub().size(); si++)
                 scope_name.get_sub().push_back(cn->get_sub()[si]);
-              // Resolve the scope prefix as a type
+              // Resolve the scope prefix as a type.  Restore the
+              // error count on failure: the prefix may be a NAMESPACE
+              // (`user<outer::box>`), for which the TYPE resolution
+              // EMITS "found no match" before throwing -- the count
+              // would otherwise abort the conversion even though the
+              // resolve_scope fallback below succeeds.
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
               cpp_typecheck_resolvet resolver{*this};
               try
               {
@@ -2835,6 +2842,37 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                                  .lookup(template_name, cpp_scopet::SCOPE_ONLY);
                     }
                   }
+                }
+              }
+              catch(...)
+              {
+                get_message_handler().set_message_count(
+                  messaget::M_ERROR, errors_before);
+              }
+            }
+            // N5008 [temp.arg.template]/1: the template-argument names
+            // an accessible class template -- as an id-expression that
+            // may be QUALIFIED, including by a NAMESPACE
+            // (`user<outer::box>`).  The type-prefix fallback above
+            // cannot resolve a namespace prefix; walk the full scope
+            // chain with resolve_scope, which handles namespace and
+            // class qualifiers alike (cpp11_qualified_tt_argument).
+            if(id_set.empty() && cn != nullptr && cn->get_sub().size() >= 3)
+            {
+              cpp_save_scopet save_scope{cpp_scopes};
+              cpp_typecheck_resolvet resolver{*this};
+              try
+              {
+                irep_idt last_base_name;
+                cpp_template_args_non_tct last_args;
+                cpp_scopet &qual_scope =
+                  resolver.resolve_scope(*cn, last_base_name, last_args);
+                if(last_args.is_nil() && !last_base_name.empty())
+                {
+                  id_set = qual_scope.lookup(
+                    last_base_name,
+                    cpp_scopet::QUALIFIED,
+                    cpp_idt::id_classt::TEMPLATE);
                 }
               }
               catch(...)
