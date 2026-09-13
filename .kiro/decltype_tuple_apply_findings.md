@@ -8776,3 +8776,31 @@ the round-124 opener.
 Census 4: deduced_nontype_kind_mismatch (rejects-invalid),
 qualified_tt_argument (minimal, diagnosed), ranges (auto layer),
 vector_pushback (semantic pointer layer).
+
+## Round 124 (2026-09-13): qualified TT-args fixed + flip; ranges auto layer cornered to trailing-decltype pack constructs
+
+Fix (01f0893220): TT-argument fallback now resolves NAMESPACE-qualified
+template-names via resolve_scope ([temp.arg.template]/1); the old
+TYPE-prefix attempt also EMITTED "found no match" whose count survived
+the catch (restore it).  FLIP cpp11_qualified_tt_argument.
+An unexpected interaction: that fix ALSO healed the ranges test's own
+<<type:auto>> path (the original seed no longer errors under the
+current binary at the original site) -- frozen-gate reductions
+cv124-cv126 diverged onto the RESIDUAL bind_back.h:60 failure, which
+still reproduces both on the original seed (recovered; main dropped,
+vacuous SUCCESS) and on reduced2.cpp against the CURRENT binary.
+bind_back.h:60 diagnosis: resolving std::forward<_Args>(__args) inside
+the trailing decltype with the map FULLY BOUND -- the failure is the
+trailing-return-type evaluation of pack constructs, not binding.
+Kernel ladder froze the boundary: plain-call decltype PASSES,
+parens-ctor + forwarded pack PASSES, braced-init + pack expansion
+FAILS, bare FOLD fails in 11 lines (filed
+cpp17_fold_in_trailing_decltype).
+Infra notes: cxx23-gate image needs -stdlib=libc++ AND in-image
+preprocessing (host clang-18 headers incompatible with image
+clang-23); docker-created files are root-owned -- cp+chmod before
+cvise; formatted-relaunch applied twice (cv125, cv126).
+Census 4: deduced_nontype_kind_mismatch (rejects-invalid),
+fold_in_trailing_decltype (NEW, 11 lines, diagnosed),
+ranges (reduced2.cpp + bind_back.h:60 pin), vector_pushback
+(semantic pointer layer).
