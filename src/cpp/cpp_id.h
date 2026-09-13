@@ -116,6 +116,17 @@ public:
   {
     return using_scopes.size();
   }
+  void remove_secondary_scope(const cpp_idt &other)
+  {
+    for(auto it = secondary_scopes.begin(); it != secondary_scopes.end();)
+    {
+      if(*it == &other)
+        it = secondary_scopes.erase(it);
+      else
+        ++it;
+    }
+  }
+
   void truncate_secondary_scopes(std::size_t n)
   {
     PRECONDITION(n <= secondary_scopes.size());
