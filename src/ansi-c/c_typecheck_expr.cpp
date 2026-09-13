@@ -1182,6 +1182,21 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       throw 0;
     }
 
+    // N5008 [class]/4 + [expr.sizeof]/2: a complete object of class
+    // type has nonzero size, so sizeof applied to a class is never 0.
+    // CBMC's layout keeps empty classes at object size 0 on purpose
+    // (adding a padding byte would change every empty-class
+    // struct_exprt's component count and the pointer reasoning that
+    // relies on the flattened layout); realise the nonzero-size
+    // guarantee at the SIZEOF evaluation instead, matching the
+    // gcc/clang value of 1.
+    if(
+      sizeof_yields_nonzero_for_class() && type.id() == ID_struct_tag &&
+      size_of_opt.value().is_zero())
+    {
+      size_of_opt = from_integer(1, size_type());
+    }
+
     new_expr = size_of_opt.value();
   }
 
