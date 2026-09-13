@@ -181,3 +181,23 @@ typed `auto` when the call is checked.  NEXT: cvise-reduce main.cpp
 pinned on the exact text "to '<<type:auto>>'" (front-end error text
 with callee name anchor per the round-122 gate rule); all shallower
 layers are fixed so the reduction cannot converge onto them.
+
+ROUND-124: the qualified-TT-argument fix (01f0893220) removed the
+<<type:auto>> failure from THIS test's own path partway through the
+round -- the frozen-gate reduction cv124-cv126 keeps reproducing it
+(reduced2.cpp, ~880 lines, verified against the CURRENT binary), and
+the ORIGINAL preprocessed seed still throws (recovered) at libc++
+bind_back.h:60: resolving `std::forward<_Args>(__args)` inside
+__bind_back's trailing decltype, with the template map FULLY BOUND
+(_Fn=pointer, _Args=signedbv, pack size 1) -- so the failure is in
+evaluating the trailing-return decltype, not in parameter binding.
+main is still dropped (vacuous SUCCESS).
+Kernel ladder: fw5 (plain call decltype) PASSES; fw6 (parens ctor +
+forward pack) PASSES; fw2 (braced init + pack expansion) FAILS; br4
+(bare FOLD in trailing decltype) FAILS in 11 lines -- filed as
+cpp17_fold_in_trailing_decltype.  The exact real-code ingredient
+beyond these is still open (suspects: decay_t chain,
+noexcept(noexcept(...)), forward_as_tuple's tuple<_Ts&&...>).
+NEXT: probe reduced2.cpp directly (fast) for the remaining
+ingredient; the fold KNOWNBUG may share the root (trailing-decltype
+evaluation scope for pack constructs).
