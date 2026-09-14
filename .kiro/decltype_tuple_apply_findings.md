@@ -9015,3 +9015,32 @@ unexpanded).
 FLEETS at close: cv129 (SEGV, 32k lines), cv130 (transform, 41k).
 Census 4: kind-mismatch (parked), ranges (reduced3 + mis sibling),
 libcxx23_string_fill_ctor, make_integer_seq_spec_fold (NEW).
+
+## Round 131 (2026-09-14): three fixes + flip; census 4 -> 3
+
+Fix 1 (d54eaf54d8 + fixup): class-body fold expansion for PARTIAL
+SPECS used positional full_template_args slicing; the spec's pack is
+DEDUCED ([temp.spec.partial.match]), so `sum_of<make_index_sequence
+<3>>`'s _Ip became the whole sequence TYPE.  Now prefers the replayed
+pack_expr_map/pack_args_map bindings.  FLIP
+cpp17_make_integer_seq_spec_fold.  (Hygiene slip: a stray
+probe include reached the commit -- the probe-grep gate was skipped
+once; fixed up immediately.  Gate is non-optional, rushed or not.)
+Fix 2 (5732080289): __make_integer_seq called through libc++'s impl
+alias receives its sequence template as a TT-PARAM BINDING
+(template_parameter_symbol_type), which the builtin expansion's
+template-name extraction didn't understand -- the whole
+make_index_sequence chain died as "substitution failure" and every
+tuple-indices consumer (__perfect_forward/__bind_back) lost bodies.
+23-line kernel mis2 = CORE cpp17_make_integer_seq_tt_alias.  reduced3
+advances past <<type:auto>> to "no match for '__bind_back_t'".
+Fix 3 (P2255): __reference_{constructs,converts}_from_temporary were
+always-false defaults; implemented per [dcl.init.ref]/5.4 approximation
+(CORE cpp17_reference_from_temporary_traits).  Found via the cv130
+artifact (77 lines, g++-valid) whose libstdc++-13 _S_test/_Dangle
+machinery uses them; the artifact's own blocker is likely ELSEWHERE
+(next round: bisect its 77 lines directly).
+HARVEST state: cv130 DONE (77-line transform artifact, saved);
+cv129 (SEGV) at ~770 lines, still grinding overnight.
+Census 3: kind-mismatch (parked), ranges (reduced3 at __bind_back_t
+layer), libcxx23_string_fill_ctor.
