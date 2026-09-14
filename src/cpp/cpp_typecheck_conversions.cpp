@@ -2616,8 +2616,23 @@ bool cpp_typecheckt::reference_related(
   {
     const auto &from_s = to_struct_type(from_followed);
     const auto &to_s = to_struct_type(to_followed);
-    return subtype_typecast(from_s, to_s) &&
-           base_publicly_accessible(from_s, to_s);
+    if(!subtype_typecast(from_s, to_s))
+      return false;
+    // N5008 [namespace.udecl]/16,19 + [over.match.funcs]/5: a base
+    // member republished in the derived class by a USING-DECLARATION
+    // is a member of the DERIVED class for access purposes; calling it
+    // on a derived object adjusts the implicit object argument to the
+    // base even when the inheritance edge itself is PRIVATE (libc++'s
+    // `class __split_buffer : _Layout<...>` -- class default access --
+    // with `public: using __base_type::__relocate;`).  The
+    // accessibility of the base class gates ordinary derived-to-base
+    // conversions ([class.access.base]/5), not the implicit-object
+    // binding of an accessible member; member access itself is
+    // enforced separately.  The reference type carries ID_C_this
+    // exactly for the implicit object parameter.
+    if(reference_type.get_bool(ID_C_this))
+      return true;
+    return base_publicly_accessible(from_s, to_s);
   }
 
   if(
