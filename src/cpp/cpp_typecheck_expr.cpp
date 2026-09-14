@@ -1019,6 +1019,48 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         }
       }
     }
+    else if(
+      expr.id() == "__reference_constructs_from_temporary" ||
+      expr.id() == "__reference_converts_from_temporary")
+    {
+      // P2255R2 / N5008 [meta.rel] tab:meta.rel: true iff T (t1) is a
+      // reference type bound to a value of type U (t2) via a
+      // MATERIALIZED TEMPORARY ([dcl.init.ref]/5.4,
+      // [class.temporary]).  Approximation without user-defined
+      // conversions:
+      //  * T not a reference, or U nil/void -> false;
+      //  * U a reference type: the initializer is a glvalue; a
+      //    reference-compatible binding creates no temporary -> false;
+      //  * U a non-reference (prvalue): a temporary is materialized
+      //    unless T is a non-const lvalue reference (which cannot bind
+      //    a temporary, [dcl.init.ref]/5.1) -> true for `const T&` and
+      //    `T&&` on the same (up to cv) or derived-to-base type.
+      bool result = false;
+      if(is_reference(t1) && t2.is_not_nil() && t2.id() != ID_empty)
+      {
+        if(!is_reference(t2))
+        {
+          const typet &referred = to_reference_type(t1).base_type();
+          const bool t1_is_rvalue_ref = is_rvalue_reference(t1);
+          const bool referred_const = referred.get_bool(ID_C_constant);
+          if(t1_is_rvalue_ref || referred_const)
+          {
+            typet a = referred, b = t2;
+            a.remove(ID_C_constant);
+            a.remove(ID_C_volatile);
+            b.remove(ID_C_constant);
+            b.remove(ID_C_volatile);
+            if(a == b)
+              result = true;
+            else if(a.id() == ID_struct_tag && b.id() == ID_struct_tag)
+              result = subtype_typecast(
+                follow_tag(to_struct_tag_type(b)),
+                follow_tag(to_struct_tag_type(a)));
+          }
+        }
+      }
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
     else
       // conservatively return false for traits we cannot evaluate
       expr = false_exprt();
