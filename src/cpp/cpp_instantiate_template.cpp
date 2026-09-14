@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <iostream> // TEMPORARY DEBUG
 #include <cctype>
 #include "cpp_typecheck.h"
 
@@ -4461,9 +4462,47 @@ skip_pack_removal_ft:
       const std::size_t non_pack =
         template_type.template_parameters().size() - 1;
       std::vector<exprt> pack_args;
-      for(std::size_t k = non_pack; k < full_template_args.arguments().size();
+      // N5008 [temp.spec.partial.match] + [temp.variadic]: for a
+      // PARTIAL SPECIALIZATION, the pack parameter's elements are
+      // DEDUCED from matching the argument pattern -- they are not a
+      // positional tail of full_template_args (which holds the
+      // PRIMARY's arguments; e.g. `sum_of<integer_sequence<size_t,
+      // _Ip...>>` instantiated as sum_of<make_index_sequence<3>> has
+      // full args = [the sequence TYPE] while _Ip = {0,1,2}).  The
+      // spec-match deduction recorded the elements in the replayed
+      // template map; use them when present.  Positional slicing
+      // remains the primary-template behaviour.
+      const auto deduced_exprs = template_map.pack_expr_map.find(
+        pack_base_name);
+      const auto deduced_types = template_map.pack_args_map.find(
+        pack_base_name);
+      if(
+        deduced_exprs != template_map.pack_expr_map.end() &&
+        !deduced_exprs->second.empty())
+      {
+        for(const auto &e : deduced_exprs->second)
+          pack_args.push_back(e);
+      }
+      else if(
+        deduced_types != template_map.pack_args_map.end() &&
+        !deduced_types->second.empty())
+      {
+        for(const auto &t : deduced_types->second)
+        {
+          exprt te{ID_type};
+          te.type() = t;
+          pack_args.push_back(te);
+        }
+      }
+      else
+      {
+        for(
+          std::size_t k = non_pack; k < full_template_args.arguments().size();
           ++k)
-        pack_args.push_back(full_template_args.arguments()[k]);
+        {
+          pack_args.push_back(full_template_args.arguments()[k]);
+        }
+      }
 
       auto is_pack_ref = [&short_name](const irept &n) -> bool
       {
