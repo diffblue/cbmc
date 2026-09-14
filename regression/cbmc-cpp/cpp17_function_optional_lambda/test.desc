@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 34 transform through optional-returning lambda: SUCCESS$
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+--
+A capturing lambda converts to std::function<std::optional<T>(T)> and
+is invoked through a member (the instructiont::transform shape from
+CBMC's own sources, round-129 dog-food).  The libstdc++ constraint
+chain _Requires<_Callable<F>> evaluates __invoke_result<F&,
+_ArgTypes...> with the enclosing partial specialization's pack, which
+must be pre-bound during member-template deduction ([temp.mem]); the
+class-tag derivation must survive the function-type argument's
+parentheses.  EXIT 10 tolerated: the harness still reports a no-body
+for std::function's internal _Function_handler manager (separate,
+pre-existing gap).
