@@ -699,6 +699,24 @@ void cpp_typecheckt::convert_non_template_declaration(
         if(params.get_sub().size() > 0)
         {
           cpp_save_scopet save_scope(cpp_scopes);
+          // N5008 [dcl.fct]/8: the parameters are in scope in the
+          // trailing return type -- but only for ITS typecheck.  This
+          // conversion may run at NAMESPACE scope (the deduction-time
+          // skeleton instantiation under
+          // guess_function_template_args); registering the temporary
+          // parameter ids directly into the current scope leaked
+          // `std::__args`-style entries that survive the save_scope
+          // guard (it restores the current-scope POINTER only).  A
+          // later lookup of the parameter from the function template's
+          // own scope then sees both the leaked entry and the real
+          // parameter ("symbol '__args' does not uniquely resolve" --
+          // the libc++ __bind_back declaration+definition pair, the
+          // last layer of the range-pipe '<<type:auto>>' failure).
+          // Quarantine the temporaries in a fresh block scope: name
+          // lookup never descends into child scopes, so once
+          // save_scope restores the parent, the block and its ids are
+          // unreachable.
+          cpp_scopes.new_block_scope();
           for(const auto &p : params.get_sub())
           {
             const cpp_declarationt &pdecl =
