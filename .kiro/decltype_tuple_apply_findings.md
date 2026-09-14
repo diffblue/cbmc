@@ -9044,3 +9044,30 @@ HARVEST state: cv130 DONE (77-line transform artifact, saved);
 cv129 (SEGV) at ~770 lines, still grinding overnight.
 Census 3: kind-mismatch (parked), ranges (reduced3 at __bind_back_t
 layer), libcxx23_string_fill_ctor.
+
+## Round 132 (2026-09-14/15): dog-food SEGV fixed (structured bindings) + range-for reference binding
+
+Fix (fcfeb83e6f), from the cv129 17-line reproducer:
+ 1. [stmt.ranged]/1 allows a STRUCTURED-BINDING for-range-declaration;
+    the parser mis-parsed `auto [a, b]` as an ARRAY declarator (comma
+    size!), and typecheck dereferenced the empty declarator name --
+    the irept::get SEGV on remove_cpp_exceptions.cpp.  New
+    Parser::rForRangeBindings + for_range lowering that prepends a
+    structured_binding statement over *__begin (reuses
+    [dcl.struct.bind] decomposition).
+ 2. Discovered by the fix's own kernel: `auto &&__range` must bind by
+    REFERENCE ([stmt.ranged]/1); the iterator-path lowering copied the
+    range BY VALUE, silently losing every mutating loop's writes
+    (`for(auto &x : r) x = ...` wrote into the copy).  Now binds by
+    reference for lvalue initializers.  This was a LATENT WRONG-CODE
+    (not crash/reject) bug affecting all iterator range-fors --
+    arguably the most soundness-relevant find of the week.  CORE test
+    cpp17_structured_bindings_range_for pins both.
+cv132 (mini-reduction of the 77-line transform artifact): converged
+at 75 lines with NOTHING removable -- the failure requires BOTH the
+early __umap_hashtable instantiation of __invoke_result AND the later
+function-ctor use; filed as KNOWNBUG
+cpp17_invoke_result_cache_poisoning (cache-poisoning family).
+Census 4: kind-mismatch (parked), ranges (__bind_back_t layer,
+untouched this round), libcxx23_string_fill_ctor,
+invoke_result_cache_poisoning (NEW, 75 lines, characterized).
