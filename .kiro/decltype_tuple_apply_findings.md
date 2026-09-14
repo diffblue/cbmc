@@ -8889,3 +8889,34 @@ Census 3: cpp11_deduced_nontype_kind_mismatch (rejects-invalid),
 cpp20_ranges_basic_libcxx (layer 2: deduction-skeleton parameter leak
 into enclosing namespace; redecl.cpp reproduces),
 libcxx23_vector_pushback (semantic pointer layer).
+
+## Round 127 (2026-09-14): layers 2+3 of the range-pipe chain fixed
+
+Fix A (7a2694d606): [dcl.fct]/8 trailing-return temporary parameter
+symbols were put_into_scope'd into the CURRENT scope -- during a
+deduction-skeleton instantiation that is the enclosing NAMESPACE, and
+cpp_save_scopet restores only the scope POINTER, so `std::__args`
+leaked permanently and made post-merge parameter lookup ambiguous.
+Quarantine: register them in a fresh BLOCK scope (lookup never
+descends into children).  redecl.cpp graduates to CORE
+cpp17_trailing_decltype_pack_redecl.
+Fix B (26c302f28a): auto-return member instances were converted TWICE
+(the eager call-site conversion + the drain; the drain's own comment
+warns against exactly this).  The re-typecheck of the converted body
+refused to re-bind a materialised forwarded xvalue ("int & to
+int &&", [forward]/4 + [dcl.init.ref]/5.3).  Dequeue after the eager
+conversion.  48-line CORE test cpp17_forward_in_auto_return_member.
+Kernel-ladder method note: SEVEN kernels this round; the productive
+axes were REDECLARATION (k131 vs k129), MEMBER-BODY context (k138 vs
+k133), and AUTO RETURN (k144 vs k145) -- each found by a single-delta
+pair where hand-built full approximations kept passing.  The
+convert-twice diagnosis came from a one-line convert_function entry
+counter (printed 2 for the instance).
+Ranges REAL pipe: STILL <<type:auto>> with the same RT anchor;
+kernels of the whole visible shape pass.  Remaining suspects:
+requires-clause, noexcept(noexcept), decay_t/tuple chain, inline
+namespace __1.  Round 128 = mechanical reduction (five fixed layers
+cannot recapture the gate).
+Census 3: deduced_nontype_kind_mismatch (rejects-invalid),
+ranges (layer 6+), vector_pushback (semantic pointer layer,
+untouched this round).
