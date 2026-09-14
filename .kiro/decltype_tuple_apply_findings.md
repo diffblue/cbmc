@@ -8947,6 +8947,11 @@ before the PRIVATE-inheritance axis was spotted in the carrier source
 Also this round: convert_function made idempotent via the existing
 #cpp_converted flag (the slow_path was ALSO converted twice; the
 guard is now structural rather than per-call-site dequeues).
+CORRECTION: that guard was initially SWEPT AGAIN by a probe-cleanup
+checkout (second violation of the round-126 process rule) -- caught
+by the immediate post-commit grep and re-landed as its own commit.
+Rule upgraded: after ANY probe-cleanup checkout, grep for the
+intended fix's distinctive token BEFORE claiming it in notes.
 Desc note: the flip needs --stdlib libc++ (libc++-23 builtin
 semantics for the preprocessed source) and keeps the harness-matched
 unwind bound (the now-real relocation loop over nondet capacity does
