@@ -8992,3 +8992,26 @@ Census 3: deduced_nontype_kind_mismatch (parked),
 cpp20_ranges_basic_libcxx, libcxx23_string_fill_ctor (NEW).
 Round 130: harvest cv129 (crash = top priority), cv128; then the
 dogfood transform family.
+
+## Round 130 (2026-09-14): dog-food transform sub-shape fixed; ranges artifact harvested
+
+Fix (ed78322744): the member-template enclosing-class-tag derivation
+(guess_function_template_args' pre-bind) inserted "tag-" using a
+'<'/'>'-only depth scan; a FUNCTION-TYPE spec argument
+(std::function<_Rp(_ArgTypes...)>) spells parentheses whose inner
+'::' was mistaken for the class-name qualifier -- the enclosing
+_Rp/_ArgTypes were never bound during ctor deduction and libstdc++'s
+_Requires<_Callable<F>> chain collapsed ("no match for 'transform'",
+the round-129 dog-food family).  Parens now tracked.  CORE test
+cpp17_function_optional_lambda (EXIT 10 tolerated: separate
+_Function_handler no-body).  The REAL instructiont::transform site
+STILL fails -- one more ingredient; cv130 reducing (83k lines).
+cv128 harvested: reduced3.cpp (193 lines) -- remaining machinery is
+__make_integer_seq -> __perfect_forward_impl spec pack _Idx... in a
+member trailing decltype.  Sibling kernel mis1 FILED as
+cpp17_make_integer_seq_spec_fold (fold over the builtin-deduced spec
+pack in a static member initializer leaves '<<expr:static_cast>> + 0'
+unexpanded).
+FLEETS at close: cv129 (SEGV, 32k lines), cv130 (transform, 41k).
+Census 4: kind-mismatch (parked), ranges (reduced3 + mis sibling),
+libcxx23_string_fill_ctor, make_integer_seq_spec_fold (NEW).
