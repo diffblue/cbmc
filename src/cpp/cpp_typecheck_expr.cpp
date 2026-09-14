@@ -7057,6 +7057,27 @@ void cpp_typecheckt::typecheck_method_application(
     cpp_saved_template_mapt saved_map(template_map);
     prepare_deferred_method_body(method_symbol);
     convert_function(method_symbol);
+    // The method-bodies drain warns that convert must never run twice
+    // for the same symbol; this EAGER conversion leaves the queued
+    // entry behind, and the drain then re-typechecked the
+    // already-converted body.  A resolved std::forward call's xvalue
+    // result is materialised as a #reference-typed expression, so the
+    // re-typecheck rejected re-binding it to the rvalue-reference
+    // parameter ("invalid implicit conversion from 'signed int &' to
+    // 'signed int &&'" -- N5008 [forward]/4, [dcl.init.ref]/5.3;
+    // libc++'s take-closure `auto operator()(_Np&&)` forwarding into
+    // __bind_back, the last layer of the range-pipe failure).
+    // Remove the queue entry.
+    for(auto it = method_bodies.begin(); it != method_bodies.end(); ++it)
+    {
+      if(
+        it->method_symbol != nullptr &&
+        it->method_symbol->name == method_symbol.name)
+      {
+        method_bodies.erase(it);
+        break;
+      }
+    }
   }
 
   // build new function expression
