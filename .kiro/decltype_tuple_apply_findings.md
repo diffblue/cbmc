@@ -8920,3 +8920,37 @@ cannot recapture the gate).
 Census 3: deduced_nontype_kind_mismatch (rejects-invalid),
 ranges (layer 6+), vector_pushback (semantic pointer layer,
 untouched this round).
+
+## Round 128 (2026-09-14): libcxx23_vector_pushback FLIPPED — census 3 -> 2
+
+THE VECTOR CARRIER IS CORE.  The final layer (2b90dc6dc7):
+reference_related gated every derived-to-base reference binding on
+base_publicly_accessible, so a member USING-DECLARED (public) from a
+PRIVATE (class-default!) TT base rejected its implicit-object binding
+([namespace.udecl]/16,19 + [over.match.funcs]/5 vs
+[class.access.base]/5) -- `class __split_buffer : _Layout<...>` with
+`public: using __base_type::__relocate;`.  __emplace_back_slow_path
+went bodiless via the tolerated-incomplete recovery, push_back left
+__end_ garbage (the `~memory_resource + huge-offset` pointer in the
+trace was the nondet), and the 17 pointer failures followed.  Skip
+the accessibility gate exactly for ID_C_this reference bindings.
+Diagnosis chain that worked: counterexample trace (--trace) showed
+the garbage pointer originating at slow_path's return; goto-functions
+showed the explicit nondet fall-off-the-end body; the CF entry
+counter showed TWO conversion attempts both entering conv=0; the RT
+guard + CF-adjacent grep surfaced the real diagnostic ("invalid
+implicit conversion from 'struct __split_buffer' to 'struct
+__split_buffer_pointer_layout &'"); the RR probe split it into
+sub=1/acc=0.  Two kernel misses (k147, k148 -- public struct bases)
+before the PRIVATE-inheritance axis was spotted in the carrier source
+(class vs struct default!).
+Also this round: convert_function made idempotent via the existing
+#cpp_converted flag (the slow_path was ALSO converted twice; the
+guard is now structural rather than per-call-site dequeues).
+Desc note: the flip needs --stdlib libc++ (libc++-23 builtin
+semantics for the preprocessed source) and keeps the harness-matched
+unwind bound (the now-real relocation loop over nondet capacity does
+not terminate unbounded).
+Census 2: cpp11_deduced_nontype_kind_mismatch (rejects-invalid,
+parked), cpp20_ranges_basic_libcxx (cv128 at ~910 lines, 97%,
+still reducing -- harvest next round).
