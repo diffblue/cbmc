@@ -217,3 +217,20 @@ ROUND-126: shared-root progress -- the stale pack-seed layer is fixed
 parameter leak into the enclosing namespace scope (see
 cpp17_fold_in_trailing_decltype_variadic ROUND-126 note; header-free
 reproducer redecl.cpp there).
+
+ROUND-127: TWO more layers peeled --
+  * 7a2694d606 trailing-return temporary parameter registrations
+    quarantined in a block scope (the deduction-skeleton leak;
+    CORE test cpp17_trailing_decltype_pack_redecl);
+  * 26c302f28a auto-return member bodies no longer converted TWICE
+    (eager + drain); the re-typecheck refused to re-bind a forwarded
+    xvalue ("int & to int &&"); CORE test
+    cpp17_forward_in_auto_return_member (48 lines).
+The REAL pipe still fails with the same <<type:auto>> text and the
+same RT anchor (std::forward at bind_back.h:60 under take_view.h:348
+operator()) -- kernels k133-k146 of exactly that shape now PASS, so
+the remaining ingredient is among: __bind_back's requires-clause,
+noexcept(noexcept(...)), decay_t/tuple chains, inline namespace __1,
+or attribute wrappers.  NEXT (round 128): mechanical reduction of the
+original seed pinned on the exact <<type:auto>> text -- five layers
+are now fixed, so the reduction cannot converge onto any of them.
