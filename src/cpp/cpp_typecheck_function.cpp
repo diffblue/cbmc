@@ -125,6 +125,19 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // that call themselves).
   if(functions_being_typechecked.count(symbol.name))
     return;
+
+  // Idempotence: a body that completed conversion carries
+  // #cpp_converted (set at the end of this function).  The
+  // method-bodies drain warns that convert must never run twice for
+  // one symbol, but eager call-site conversions (auto-return
+  // deduction, callee-body preparation) and the drain can both reach
+  // the same instance; the second run re-typechecks the
+  // already-typechecked body, which does not re-typecheck cleanly
+  // (materialised references, resolved calls -- e.g. re-binding a
+  // forwarded xvalue fails, N5008 [forward]/4 + [dcl.init.ref]/5.3).
+  if(symbol.value.get_bool("#cpp_converted"))
+    return;
+
   functions_being_typechecked.insert(symbol.name);
 
   // A function body is a run-time context: suspend any enclosing
