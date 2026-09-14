@@ -234,3 +234,16 @@ noexcept(noexcept(...)), decay_t/tuple chains, inline namespace __1,
 or attribute wrappers.  NEXT (round 128): mechanical reduction of the
 original seed pinned on the exact <<type:auto>> text -- five layers
 are now fixed, so the reduction cannot converge onto any of them.
+
+ROUND-130: cv128 converged to reduced3.cpp (193 lines, formatted;
+reproduces 1x <<type:auto>> on the round-130 binary).  The visible
+remaining machinery: __make_integer_seq -> index_sequence_for ->
+__perfect_forward_impl partial spec deducing _Idx..., whose member
+operator() trailing decltype expands `get<_Idx>(__bound_args_)...`.
+Sibling kernel filed: cpp17_make_integer_seq_spec_fold (a fold over
+the __make_integer_seq-deduced spec pack in a static member fails the
+same family).  ALSO this round: ed78322744 fixed the member-template
+class-tag derivation across function-type spec arguments (the
+dog-food transform family's first sub-shape; capturing/capture-less
+lambda kernels now pass) -- the REAL instructiont::transform site
+still fails (cv130 reducing it).
