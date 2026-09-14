@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE libcxx
 main.ii
---cpp20 --unwind 5 --no-unwinding-assertions --object-bits 12
+--cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions --object-bits 12
 ^\[main\.assertion\.1\] line \d+ size after one push_back: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ value after one push_back: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
@@ -149,3 +149,15 @@ front-end error):
     (.no-body ...__lambda_2_cl...) -- next reduction/probe target.
   * no model for __builtin_assume_aligned (separate, back-end-ish:
     __add_alignment_assumption no-body FAILURE).
+
+ROUND-128 FLIP: the last semantic failure was reference_related
+rejecting the implicit-object derived-to-base binding for a member
+using-declared from a PRIVATE (class-default) TT base
+([namespace.udecl]/16,19, [over.match.funcs]/5) --
+__emplace_back_slow_path was bodiless and push_back left __end_
+nondet.  Fixed; both assertions verify with the flags above
+(--stdlib libc++ added: the preprocessed source uses libc++-23
+builtin semantics).  CORE test cpp11_using_decl_private_tt_base locks
+the kernel.  Note: WITHOUT the unwind bound symex does not terminate
+(the now-real relocation loop over a nondet-capacity buffer) -- the
+bound matches the single-push_back harness.
