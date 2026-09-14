@@ -9035,9 +9035,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         for(std::size_t i = 0; i + 1 < class_name.size(); ++i)
         {
           const char c = class_name[i];
-          if(c == '<')
+          // A template argument can be a FUNCTION TYPE spelled with
+          // parentheses (partial specializations like
+          // `function<_Rp(_ArgTypes...)>` instantiate to
+          // `std::function<(cpp_declaration(...))->(...)>::template.X`);
+          // the `::` inside those parens is NOT a scope separator of
+          // the class name.  Track both bracket kinds at depth.
+          if(c == '<' || c == '(')
             ++depth;
-          else if(c == '>')
+          else if(c == '>' || c == ')')
             --depth;
           else if(depth == 0 && c == ':' && class_name[i + 1] == ':')
             insert_pos = i + 2;
