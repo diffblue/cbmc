@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 49 forward through auto-return member: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+An auto-returning member function template forwards its parameter to
+an rvalue-reference callee (N5008 [dcl.spec.auto], [forward]/4,
+[dcl.init.ref]/5.3 -- the libc++ take-closure shape).  The eager
+auto-return conversion must not leave the body queued for a second
+conversion: the re-typecheck refused to re-bind the materialised
+xvalue and silently dropped the body.
