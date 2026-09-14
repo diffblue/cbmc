@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+--
+found no match for symbol 'transform'
+--
+libstdc++-13's __invoke_result/_S_test machinery instantiated TWICE:
+first through __umap_hashtable's default template argument
+(__cache_default -> __is_nothrow_invocable<hash,int>, at a global
+variable's type), then through std::function's _Callable constraint
+during a member call's ctor deduction.  The second use fails ("found
+no match for symbol 'transform'") ONLY when the first is present --
+cvise could remove nothing from the 75 lines, so every piece
+(including the seemingly unrelated unordered_map machinery) is
+load-bearing: a cached-instance-poisoning interaction, the
+"permanently truncated cached instances" family.  Reduced from
+CBMC's own adjust_float_expressions.cpp (the instructiont::transform
+dog-food family, round 129); the parenthesised-class-tag sub-shape
+was already fixed (ed78322744).  g++/clang accept.
