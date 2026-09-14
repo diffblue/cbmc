@@ -634,11 +634,29 @@ void cpp_typecheckt::typecheck_code(codet &code)
         // twice).
         const std::string range_id = scope_prefix + "__for_range" + loc_suffix;
         const std::string range_base = "__for_range" + loc_suffix;
+
+        // N5008 [stmt.ranged]/1: `auto &&__range = for-range-
+        // initializer` -- a REFERENCE.  Materialising the range BY
+        // VALUE iterates a copy, so a mutating loop body
+        // (`for(auto &x : r) x = ...;`) silently loses its writes.
+        // Bind by reference for an lvalue initializer; keep the copy
+        // for prvalues (approximating the lifetime-extended
+        // temporary, which no aliasing can observe).
+        const bool range_is_lvalue =
+          range_op.get_bool(ID_C_lvalue) || range_op.id() == ID_symbol ||
+          range_op.id() == ID_member || range_op.id() == ID_index ||
+          range_op.id() == ID_dereference;
+        typet range_sym_type = range_type;
+        if(range_is_lvalue)
+        {
+          range_sym_type = pointer_type(range_type);
+          range_sym_type.set(ID_C_reference, true);
+        }
         {
           auxiliary_symbolt sym;
           sym.name = range_id;
           sym.base_name = range_base;
-          sym.type = range_type;
+          sym.type = range_sym_type;
           sym.mode = ID_cpp;
           sym.module = module;
           sym.location = loc;
@@ -652,11 +670,14 @@ void cpp_typecheckt::typecheck_code(codet &code)
             cpp_scopes.put_into_scope(symbol_table.lookup_ref(range_id));
           id.id_class = cpp_idt::id_classt::SYMBOL;
         }
-        symbol_exprt range_sym_expr(range_id, range_type);
+        symbol_exprt range_sym_expr(range_id, range_sym_type);
 
         codet range_init(ID_assign);
         range_init.copy_to_operands(range_sym_expr);
-        range_init.copy_to_operands(range_op);
+        if(range_is_lvalue)
+          range_init.copy_to_operands(address_of_exprt(range_op));
+        else
+          range_init.copy_to_operands(range_op);
         range_init.add_source_location() = loc;
 
         // Build __range.begin() and __range.end() calls.  The
@@ -773,6 +794,64 @@ void cpp_typecheckt::typecheck_code(codet &code)
         // array path does: extract its base name and type
         // (deducing `auto` from `*__begin`).
         cpp_declarationt &cpp_decl = static_cast<cpp_declarationt &>(decl_op);
+
+        // N5008 [stmt.ranged]/1: the for-range-declaration may be a
+        // STRUCTURED-BINDING declaration (`for(auto [a, b] : range)`),
+        // recorded by the parser as a `bindings` attribute with no
+        // declarator.  Lower it by prepending a structured_binding
+        // statement over `*__begin` to the loop body ([dcl.struct.
+        // bind]); the existing statement handler decomposes it.
+        if(!cpp_decl.find(irep_idt("bindings")).get_sub().empty())
+        {
+          exprt deref_expr(ID_dereference);
+          deref_expr.copy_to_operands(sym_use(begin_id));
+
+          codet sb(irep_idt("structured_binding"), {std::move(deref_expr)});
+          sb.add(irep_idt("bindings")) = cpp_decl.find(irep_idt("bindings"));
+          if(cpp_decl.get_bool(ID_C_reference))
+            sb.set(ID_C_reference, true);
+          sb.add_source_location() = loc;
+
+          code_blockt body_with_sb;
+          body_with_sb.add(std::move(sb));
+          body_with_sb.add(std::move(to_code(body)));
+          body_with_sb.add_source_location() = loc;
+
+          const bool old_break_is_allowed2 = break_is_allowed;
+          const bool old_continue_is_allowed2 = continue_is_allowed;
+          break_is_allowed = continue_is_allowed = true;
+          typecheck_code(body_with_sb);
+          break_is_allowed = old_break_is_allowed2;
+          continue_is_allowed = old_continue_is_allowed2;
+
+          exprt cond(ID_notequal);
+          cond.copy_to_operands(sym_use(begin_id));
+          cond.copy_to_operands(sym_use(end_id));
+          typecheck_expr(cond);
+
+          exprt iter(ID_side_effect);
+          iter.set(ID_statement, ID_preincrement);
+          iter.copy_to_operands(sym_use(begin_id));
+          typecheck_expr(iter);
+
+          code_fort for_code(
+            code_skipt{},
+            std::move(cond),
+            std::move(iter),
+            std::move(body_with_sb));
+          for_code.add_source_location() = loc;
+
+          code_blockt outer;
+          outer.add(std::move(range_init));
+          outer.add(std::move(begin_init));
+          outer.add(std::move(end_init));
+          outer.add(std::move(for_code));
+          outer.add_source_location() = loc;
+
+          code = std::move(outer);
+          return;
+        }
+
         PRECONDITION(!cpp_decl.declarators().empty());
         cpp_declaratort &declarator = cpp_decl.declarators().front();
         const irep_idt &var_base_name =

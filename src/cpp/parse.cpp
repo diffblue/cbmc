@@ -248,6 +248,7 @@ protected:
   bool rTypedef(cpp_declarationt &);
   bool rTypedefUsing(cpp_declarationt &);
   std::optional<codet> rTypedefStatement();
+  bool rForRangeBindings(cpp_declarationt &);
   bool rTypeSpecifier(typet &, bool);
   bool isTypeSpecifier();
   bool rLinkageSpec(cpp_linkage_spect &);
@@ -12310,6 +12311,55 @@ std::optional<codet> Parser::rDoStatement()
 
   C++11 [stmt.iter] (A.5)
 */
+
+// C++17 [stmt.ranged]/1: the for-range-declaration may be a
+// structured-binding declaration `auto [a, b]`.  Parse the optional
+// ref-qualifier and the identifier-list; record the names as a
+// "bindings" attribute on the declaration (the typecheck-side
+// for_range lowering decomposes per [dcl.struct.bind]).  Returns
+// false if the lookahead is not a binding list.
+bool Parser::rForRangeBindings(cpp_declarationt &declaration)
+{
+  const int t0 = lex.LookAhead(0);
+  if(
+    t0 != '[' && !(t0 == '&' && lex.LookAhead(1) == '[') &&
+    !(t0 == TOK_ANDAND && lex.LookAhead(1) == '['))
+  {
+    return false;
+  }
+
+  cpp_tokent tk;
+  bool is_ref = false;
+  while(lex.LookAhead(0) == '&' || lex.LookAhead(0) == TOK_ANDAND)
+  {
+    lex.get_token(tk);
+    is_ref = true;
+  }
+  if(lex.get_token(tk) != '[')
+    return false;
+
+  irept bindings(ID_nil);
+  while(lex.LookAhead(0) != ']')
+  {
+    if(lex.LookAhead(0) == ',')
+    {
+        lex.get_token(tk);
+        continue;
+    }
+    cpp_tokent name_tk;
+    if(!is_identifier(lex.get_token(name_tk)))
+        return false;
+    irept binding(name_tk.data.get(ID_C_base_name));
+    set_location(binding, name_tk);
+    bindings.get_sub().push_back(std::move(binding));
+  }
+  lex.get_token(tk); // ]
+
+  declaration.add(irep_idt("bindings")) = std::move(bindings);
+  if(is_ref)
+    declaration.set(ID_C_reference, true);
+  return true;
+}
 std::optional<codet> Parser::rForStatement()
 {
   cpp_tokent tk1, tk2, tk3, tk4;
@@ -12328,7 +12378,26 @@ std::optional<codet> Parser::rForStatement()
     if(rTypeSpecifier(declaration.type(), true))
     {
         cpp_declaratort declarator;
-        if(
+        if(rForRangeBindings(declaration) && lex.LookAhead(0) == ':')
+        {
+          lex.get_token(tk3); // consume ':'
+          exprt range;
+          if(rInitializeExpr(range) && lex.get_token(tk4) == ')')
+          {
+          if(auto body = rStatement())
+          {
+            codet statement("for_range");
+            statement.add_to_operands(
+              static_cast<exprt &>(static_cast<irept &>(declaration)));
+            statement.add_to_operands(std::move(range));
+            statement.add_to_operands(std::move(*body));
+            set_location(statement, tk1);
+            return std::move(statement);
+          }
+          return {};
+          }
+        }
+        else if(
           rDeclarator(declarator, kArgDeclarator, true, false) &&
           lex.LookAhead(0) == ':')
         {
