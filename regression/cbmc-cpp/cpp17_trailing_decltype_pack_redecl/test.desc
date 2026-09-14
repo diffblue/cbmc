@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 53 bind_back shape with template-arg pack: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A function template DECLARATION followed by its DEFINITION
+([temp.over.link]/6), with a parameter pack expanded inside the
+trailing-return-type decltype (`std::forward<_Args>(__args)...` --
+the libc++ __bind_back shape).  Locks the round-126/127 pair of
+fixes: the superseded declaration scope's pack_size_map zero-seeds
+are purged on merge (b79138d38c), and the trailing-return temporary
+parameter registrations are quarantined in a block scope so they
+cannot leak into the enclosing namespace and make the parameter
+lookup ambiguous (7a2694d606).
