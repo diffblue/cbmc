@@ -1,0 +1,21 @@
+KNOWNBUG libcxx
+main.ii
+--cpp11 --stdlib libc++ --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ size after fill ctor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ content after fill ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Representative of the round-129 libc++-23 sweep's persistent string
+failure family: `std::string s(3, 'x')` against libc++-23 headers
+(preprocessed in the cxx23-gate image; 17.5k lines).  Two pinned
+diagnostics: `found no match for symbol '__rep'` (basic_string's
+internal union rep accessor chain, __init_internal_buffer /
+~basic_string) and `offset-of of member failed to find component
+'__first_padding_' ` (datasizeof.h:44, _LIBCPP_DATASIZEOF machinery --
+N5008 [basic.types.general] object-representation tail padding).  The
+sweep (/tmp/docker_tumbleweed3.log, 2026-09-14) counts ~28 persistent
+libc++-23 failures of which the string family is the largest block;
+the vector family flipped CORE in round 128.
