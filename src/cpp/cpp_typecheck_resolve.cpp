@@ -5985,6 +5985,40 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     if(tpl_node->id() == ID_cpp_name)
       tpl_name = to_cpp_name(*tpl_node).get_base_name();
+
+    // N5008 [temp.param]/1 + [intseq.make]: libc++ wraps the builtin
+    // in an impl alias whose first argument is a TEMPLATE-TEMPLATE
+    // parameter (`__make_integer_seq<_BaseType, _Tp, _SequenceSize>`);
+    // at the alias's instantiation the parameter's BINDING names the
+    // real sequence template.  Resolve the name through the template
+    // map (a template_parameter_symbol_type binding carries the bound
+    // template's canonical identifier -- take its base name for the
+    // ordinary resolution below).
+    // N5008 [temp.param]/1 + [intseq.make]: libc++ wraps the builtin
+    // in an impl alias whose first argument is a TEMPLATE-TEMPLATE
+    // parameter (`__make_integer_seq<_BaseType, _Tp, _SequenceSize>`);
+    // by this point the parameter has been substituted with its
+    // BINDING -- an `ambiguous`/`type` node whose type is a
+    // template_parameter_symbol_type naming the bound sequence
+    // template canonically (`template.integer_sequence<Type0,
+    // Non_Type1>`).  Take the template's base name from it.
+    if(
+      tpl_name.empty() &&
+      (ma[0].id() == ID_ambiguous || ma[0].id() == ID_type) &&
+      ma[0].type().id() == ID_template_parameter_symbol_type)
+    {
+      const std::string bound = id2string(
+        to_template_parameter_symbol_type(ma[0].type()).get_identifier());
+      auto q = bound.rfind("::");
+      std::string base = q != std::string::npos ? bound.substr(q + 2) : bound;
+      if(base.compare(0, 9, "template.") == 0)
+        base = base.substr(9);
+      auto angle = base.find('<');
+      if(angle != std::string::npos)
+        base = base.substr(0, angle);
+      if(!base.empty())
+        tpl_name = base;
+    }
     if(n.has_value() && *n >= 0 && !tpl_name.empty())
     {
       typet elem_tc = elem_type;
