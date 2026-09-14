@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 20 size via TT-param impl alias: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The clang builtin __make_integer_seq invoked through libc++'s impl
+alias, whose first argument is a TEMPLATE-TEMPLATE parameter (N5008
+[intseq.make], [temp.param]/1).  The builtin expansion must resolve
+the parameter's binding (a template_parameter_symbol_type) to the
+bound sequence template.  Clang-only builtin: g++ rejects this file.
