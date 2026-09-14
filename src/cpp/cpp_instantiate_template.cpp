@@ -9,9 +9,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include <iostream> // TEMPORARY DEBUG
-#include <cctype>
 #include "cpp_typecheck.h"
+
+#include <cctype>
 
 #ifdef DEBUG
 #  include <iostream>
@@ -4472,10 +4472,10 @@ skip_pack_removal_ft:
       // spec-match deduction recorded the elements in the replayed
       // template map; use them when present.  Positional slicing
       // remains the primary-template behaviour.
-      const auto deduced_exprs = template_map.pack_expr_map.find(
-        pack_base_name);
-      const auto deduced_types = template_map.pack_args_map.find(
-        pack_base_name);
+      const auto deduced_exprs =
+        template_map.pack_expr_map.find(pack_base_name);
+      const auto deduced_types =
+        template_map.pack_args_map.find(pack_base_name);
       if(
         deduced_exprs != template_map.pack_expr_map.end() &&
         !deduced_exprs->second.empty())
@@ -4496,9 +4496,8 @@ skip_pack_removal_ft:
       }
       else
       {
-        for(
-          std::size_t k = non_pack; k < full_template_args.arguments().size();
-          ++k)
+        for(std::size_t k = non_pack; k < full_template_args.arguments().size();
+            ++k)
         {
           pack_args.push_back(full_template_args.arguments()[k]);
         }
