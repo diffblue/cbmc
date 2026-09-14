@@ -8959,3 +8959,36 @@ not terminate unbounded).
 Census 2: cpp11_deduced_nontype_kind_mismatch (rejects-invalid,
 parked), cpp20_ranges_basic_libcxx (cv128 at ~910 lines, 97%,
 still reducing -- harvest next round).
+
+## Round 129 (2026-09-14): broad discovery — sweep + dog-food + crash reduction
+
+LIBC++-23 SWEEP (new wrapper /tmp/cbmc-libcxx23.sh: host test.pl, per
+-test in-image clang-23/libc++ preprocessing, host cbmc --stdlib
+libc++; NOT identical methodology to the round-82 log so counts are
+not directly comparable): 102/1251 failed.
+  vs the old 35-class: 7 HEALED (the vector/map/list/set family --
+  the rounds 120-128 fixes did carry over), 28 persistent (iostream/
+  locale/tuple/string), ~61 "new" of which a chunk are WRAPPER
+  ARTIFACTS (multi-file tests: the wrapper preprocesses only one
+  source -- Array4, Linking1) and the rest are the suite-under-libc++
+  frontier (string internals, tuple chain, filesystem, regex-again).
+  Representative KNOWNBUG filed: libcxx23_string_fill_ctor (17.5k-line
+  .ii, TWO pinned diagnostics: __rep no-match + datasizeof
+  offset-of '__first_padding_').  The string family is the largest
+  persistent block.
+DOG-FOOD (--expand over util/goto-programs/goto-symex/langapi/json/
+xmllang): first run at default 60s timeout over-reported (26 blank
+FAILs were timeouts; 300s rerun in flight at close).  REAL named
+families: 4x "no match for 'transform'" (instructiont::transform
+taking a lambda returning std::optional<exprt> --
+adjust_float_expressions.cpp:221 is the pinned site), 3x json_objectt,
+2x xmlt, 1x ambiguous incorrect_goto_program_exceptiont, 1x optional
+_Requires, 1x bad reference initializer, and ONE CRASH:
+remove_cpp_exceptions.cpp SEGVs in irept::get under typecheck_code
+(cv129 crash reduction launched -- crash gates never drift).
+FLEETS at close: cv128 (ranges <<type:auto>>, 747 lines, still
+grinding), cv129 (SEGV, from 89k lines).
+Census 3: deduced_nontype_kind_mismatch (parked),
+cpp20_ranges_basic_libcxx, libcxx23_string_fill_ctor (NEW).
+Round 130: harvest cv129 (crash = top priority), cv128; then the
+dogfood transform family.
