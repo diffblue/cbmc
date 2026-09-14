@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 42 value bindings sum: SUCCESS$
+^\[main\.assertion\.2\] line 46 ref bindings wrote through: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Structured bindings as the for-range-declaration (N5008
+[stmt.ranged]/1, [dcl.struct.bind]) over an iterator range, by value
+and by reference; the reference form must write through to the
+original range object (`auto &&__range` binds by reference).
+Reduced from a SEGV on CBMC's own remove_cpp_exceptions.cpp
+(round-129 dog-food).
