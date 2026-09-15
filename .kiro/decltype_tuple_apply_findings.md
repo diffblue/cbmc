@@ -9104,3 +9104,35 @@ sharing_mapt member as the reproducer (much smaller than the ranges
 pipe); then the goto-statet deleted-ctor accessibility misreport.
 Census 4 (unchanged): kind-mismatch (parked), ranges (shared root
 with the new family), string_fill_ctor, invoke_result_cache_poisoning.
+
+## Round 134 (2026-09-15): nargs=0 family diagnosed to the exact mechanism; reduction running
+
+DIAGNOSIS COMPLETE (probes, no fix yet):
+ * The dog-food goto-symex failure = EAGER conversion of
+   `std::pair<symex_targett::sourcet, goto_statet>::pair()` (the
+   libstdc++ `pair() : first(), second()` definition): its
+   member-initializer for `second` default-constructs goto_statet
+   whose default ctor is `= delete` (represented as ID_noaccess), and
+   typecheck_member_initializer's
+   check_default_constructor_access hard-errors ("member
+   'goto_statet::goto_statet(this)' is not accessible").  Per N5008
+   [temp.inst]/4 that pair::pair() DEFINITION is never instantiated
+   by a conforming compiler (not odr-used).  The preceding
+   "no match for symbol 'symbol_exprt'" (nargs=0, no location) is the
+   SAME family one level down (symbol_exprt has no default ctor at
+   all).
+ * A recovery-widening attempt (extend the deleted-implicit-ctor
+   catch in convert_function to template-instance default ctors,
+   [temp.inst]/4) did NOT heal the case -- the failing conversion is
+   NESTED inside another function's body conversion, so the catch
+   guards the WRONG symbol.  Reverted (no unverified fixes).
+ * Three targeted kernels PASS (pair alone; list<pair>; map<int,
+   list<pair>> with push_back + operator[]) -- the real trigger has a
+   further ingredient; cv134 (goto_state.ii, 94k lines, BOTH error
+   texts pinned, goto-cc gate ~120s) is grinding overnight.
+NEXT (round 135): harvest cv134; the fix belongs where the EAGER
+conversion is initiated (skip or defer instance special members whose
+definition fails to instantiate, deleting rather than erroring), not
+in the outer catch.
+Census 4 (unchanged): kind-mismatch (parked), ranges (same nargs=0
+family), string_fill_ctor, invoke_result_cache_poisoning.
