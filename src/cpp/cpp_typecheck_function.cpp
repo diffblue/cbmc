@@ -736,9 +736,70 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
             all_members_trivial = false;
         }
       }
+      // N5008 [class.copy.ctor]/14: an explicitly-defaulted copy/move
+      // constructor performs a memberwise copy/move.  The skeleton's
+      // per-base/member DEFAULT initializers are tolerable for members
+      // the trivial fast path below overwrites -- but when a BASE or
+      // MEMBER has a DELETED (ID_noaccess) or no default constructor,
+      // the skeleton is guaranteed ill-formed where the defaulted copy
+      // is NOT (`goto_symex_statet(const&) = default` deriving from
+      // goto_statet with `goto_statet() = delete`; CBMC's own
+      // goto-symex sources).  Generate the memberwise copy for that
+      // case as well.
+      bool skeleton_needs_deleted_default = false;
+      if(class_symbol != nullptr && class_symbol->type.id() == ID_struct)
+      {
+        auto default_ctor_deleted = [&](const typet &t) -> bool
+        {
+          if(t.id() != ID_struct_tag)
+            return false;
+          const symbolt *ts =
+            symbol_table.lookup(to_struct_tag_type(t).get_identifier());
+          if(ts == nullptr || ts->type.id() != ID_struct)
+            return false;
+          bool has_any_ctor = false;
+          for(const auto &comp : to_struct_type(ts->type).components())
+          {
+            if(
+              comp.type().id() != ID_code ||
+              to_code_type(comp.type()).return_type().id() != ID_constructor)
+              continue;
+            has_any_ctor = true;
+            if(to_code_type(comp.type()).parameters().size() == 1)
+              return comp.get(ID_access) == ID_noaccess;
+          }
+          // constructors exist but no default constructor at all
+          return has_any_ctor;
+        };
+        for(const auto &b : to_struct_type(class_symbol->type).bases())
+        {
+          if(default_ctor_deleted(b.type()))
+          {
+            skeleton_needs_deleted_default = true;
+            break;
+          }
+        }
+        if(!skeleton_needs_deleted_default)
+        {
+          for(const auto &comp :
+              to_struct_type(class_symbol->type).components())
+          {
+            if(
+              comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
+              comp.get_bool(ID_is_static) || comp.get_is_padding() ||
+              comp.type().id() == ID_code)
+              continue;
+            if(default_ctor_deleted(comp.type()))
+            {
+              skeleton_needs_deleted_default = true;
+              break;
+            }
+          }
+        }
+      }
       if(
         is_ref_to_self && class_symbol != nullptr && !has_virtual_base &&
-        all_members_trivial)
+        (all_members_trivial || skeleton_needs_deleted_default))
       {
         // default_cpctor emits initializers that refer to the source
         // object by the parameter name "ref".  Make "ref" resolve to this
