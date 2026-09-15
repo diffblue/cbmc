@@ -9071,3 +9071,36 @@ cpp17_invoke_result_cache_poisoning (cache-poisoning family).
 Census 4: kind-mismatch (parked), ranges (__bind_back_t layer,
 untouched this round), libcxx23_string_fill_ctor,
 invoke_result_cache_poisoning (NEW, 75 lines, characterized).
+
+## Round 133 (2026-09-15): ranges layer probed to a shared signature; dog-food re-sweep
+
+RANGES (original seed): the forward@bind_back.h:60 failure is a
+SILENT all-templates deduction failure with **fargs nargs=0** -- the
+call reaches resolve with NO arguments.  Three stripper hypotheses
+eliminated by probes: expand_call_argument_packs' two drop sites
+(neither fires), the instantiate-side ellipsis-arg expansion (STRIP
+probe silent), and the stored declaration (INTACT: prev=0 -- no
+redeclaration in the real header! -- ell=6, no empty arg lists).  So
+the args are lost between storage and the resolve, on a path not yet
+instrumented.
+KEY CROSS-LINK: the dog-food goto-symex family shows the SAME
+signature -- `found no match for symbol 'symbol_exprt'` with EMPTY
+"argument types:" -- plus "member 'goto_statet::goto_statet(this)'
+is not accessible" (a DELETED default ctor, `goto_statet() = delete`,
+misreported as inaccessible).  Suspect family: EAGER instantiation of
+unused members that require default construction
+(sharing_mapt<exprt, symbol_exprt, ...> internals) -- N5008
+[temp.inst]/11 forbids instantiating unneeded members.  One shared
+root would explain both the ranges pipe and the goto-symex block.
+DOG-FOOD RE-SWEEP (300s, util+goto-programs+goto-symex+langapi+json+
+xmllang): 62 OK / 25 OK_NOISY / 28 FAIL / 0 CRASH, vs round-129's
+first pass (34 FAIL incl. timeout-blanks + 1 CRASH).  The crash is
+FIXED (structured bindings); util/goto-programs/langapi/json/xmllang
+are majority-clean; the FAIL block is concentrated in goto-symex =
+the nargs=0/deleted-ctor family above + pair/lambda-closure stragglers.
+Round 134 plan: instrument fargs construction for constructor-call
+resolution (the nargs=0 divergence point), using goto_state.h's
+sharing_mapt member as the reproducer (much smaller than the ranges
+pipe); then the goto-statet deleted-ctor accessibility misreport.
+Census 4 (unchanged): kind-mismatch (parked), ranges (shared root
+with the new family), string_fill_ctor, invoke_result_cache_poisoning.
