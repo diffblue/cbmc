@@ -9192,3 +9192,54 @@ range-for + assert silently dropped → vacuous SUCCESS. Desc updated to pin the
 assertion line; stays KNOWNBUG. NEXT ROUND: find the remaining unsupported
 construct (13-line reproducer is now main.cpp itself; instrument the recovery
 message's throw site to get the underlying first error).
+
+## Round 136 (2026-09-16) — front-end determinism
+
+**LANDED `f8b4bd120f`**: `cpp_idt::ordinal` (creation counter, default member
+init) + `id_sett = std::set<cpp_idt*, id_ordinal_lesst>`; cpp_scopest::id_sett
+unified. Verified: identical goto-functions md5 across argv/env-length shifts
+(regex_construct + regex_match). Same commit: `member_template_object_viable()`
+— [over.match.funcs]/5 non-const member template NOT viable on const object
+(template_function_instance has no `this` param → const/non-const pair tied →
+order). Fixed std::function `_M_get_pointer` no-body.
+
+**Reverse-ordinal experiment** (comparator flipped) is THE tool for flushing
+order-sensitive sites: each difference in goto-function sets between forward
+and reverse order is a latent bug. Found and fixed 3 more:
+- `48a8569bcc` unnamed pack `Args&&...` spelled ellipsis on DECLARATOR vs named
+  form on TYPE → friend make_shared decl vs definition not equivalent → tie by
+  order → bodiless friend won → `_Compiler` ctor havoc'd → regex tests were
+  VACUOUS in the "fast 25s" layouts. CORE cpp11_friend_unnamed_pack_definition.
+- `8305ba2cc8` partial-spec ordering by DEDUCTION ([temp.spec.partial.order]):
+  new `partial_specialization_at_least_as_specialised()` (strict cv). Heuristic
+  keys + unstable std::sort had `traits<T*>` beat `traits<const T*>` for
+  `const char*` (17-line ps1 kernel; libstdc++ iterator_traits → _Executor over
+  basic_regex<const char>). Also: primary now infinite cost
+  ([temp.spec.partial.match]/1; `un<T>` used to beat `un<pack<A,B>>`), and
+  chrono common_type<duration,duration> (4 params) no longer sorts behind
+  generic <_Tp1,_Tp2>. PITFALL: first draft put primary into the deduction tie
+  group → primary "won" by id → chrono regressed; primary must be excluded.
+  CORE cpp11_partial_spec_ordering_{cv_pointer,mixed}.
+- `d92bb8b276` QUALIFIED friend function template (`friend bool
+  __detail::__regex_algo_impl(...)`) — [namespace.memdef]/3 refers to existing
+  template; was converted in innermost namespace → no friend recorded →
+  match_results private vector base binding "bad reference initializer" →
+  regex_match havoc. Unique-arity acceptance (spelling differs by qualification).
+  CORE cpp11_qualified_friend_template.
+- `3e05ba3533` regex tests: THOROUGH full BMC (>30 min real symex now) + CORE
+  test_conversion.desc gates on body temporaries (_M_disjunction,
+  __regex_algo_impl, _Executor::_M_main).
+
+**Residual order-sensitivity noted (forward vs reverse diff, not fixed)**:
+(a) hybrid facet instantiations `num_get<wchar_t, istreambuf_iterator<char>>`
+etc. appear in forward order only — by-suffix template_map fallback capturing
+enclosing `_CharT` (the [temp.deduct]/2 family noted in convert_template_parameter);
+(b) `shared_ptr<const _NFA>(shared_ptr<_NFA>&&)` delegates to the CONST-LVALUE
+converting `__shared_ptr` ctor in forward order vs the rvalue one in reverse
+([over.ics.rank]/3.2.3 should prefer &&); mv1/mv2 kernels pass — trigger has
+more ingredients (std::move + SFINAE default arg). Both deterministic now.
+Also: `un<pack<X...>>` pattern doesn't match `pack<int,char>` (pack in
+template-id with 2 args) — separate gap.
+
+Suites ×5 green on HEAD (12 skipped incl. 2 THOROUGH regex). Revert-tests: all
+5 new gates FAIL on 69eb368eae sources. Census unchanged (4).
