@@ -2820,10 +2820,27 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           if(parameters[j].id() != ID_type)
             template_map.set(parameters[j], args[j]);
         }
+        // N5008 [temp.param]/12-14 + [temp.arg.general]/1: the default
+        // argument is substituted with THIS template's preceding
+        // parameters bound to the preceding arguments -- and with
+        // nothing else.  It is a raw cpp_name (`istreambuf_iterator<
+        // _CharT>`, salvaged from localefwd.h's forward declaration),
+        // so applying the FULL map let its short-name bridge bind
+        // `_CharT` to whichever same-named parameter of an ENCLOSING
+        // instantiation sorted first: `num_get<wchar_t>` named inside
+        // `__try_use_facet<numpunct<char>>` became the hybrid
+        // `num_get<wchar_t, istreambuf_iterator<char>>` (libstdc++'s
+        // _GLIBCXX_STD_FACET table; ~130 bogus facet instantiations per
+        // <regex> translation unit, and which ones existed depended on
+        // candidate order).  Substitute through a map holding only the
+        // preceding parameters of this template.
+        template_mapt default_map;
+        for(std::size_t j = 0; j < i && j < args.size(); ++j)
+          default_map.set(parameters[j], args[j]);
         exprt def = parameter.default_argument();
-        template_map.apply(def);
+        default_map.apply(def);
         if(def.id() == ID_type)
-          template_map.apply(def.type());
+          default_map.apply(def.type());
         args.push_back(def);
       }
 
