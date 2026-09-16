@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+User-reported: out-of-class definition of a member of a member class
+template of a class template, two-level template header
+  template <typename T, uint8_t N, bool W> template <bool E>
+  void Outer<T, N, W>::reference<E>::on_write() { ... }
+Two defects: the parser treated `reference<` after the dependent
+qualifier `Outer<T, N, W>::` as less-than (N5008 [temp.dep.type]/1,5 +
+[temp.names]/3: a member of the current instantiation needs no
+`template` keyword; decided by a tentative `<...>` parse followed by
+`::`), and the typechecker's class-template-member path dropped the
+7-component shape, leaving the member bodiless ([temp.mem]/1: the
+definition is grafted onto the member's in-class declaration).

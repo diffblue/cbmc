@@ -895,6 +895,118 @@ void cpp_typecheckt::typecheck_class_template_member(
     // this shape fell into the silent-return branch and the definition was
     // dropped ("no body for callee sentry::sentry").
   }
+  else if(
+    cpp_name.get_sub().size() == 7 && cpp_name.get_sub()[0].id() == ID_name &&
+    cpp_name.get_sub()[1].id() == ID_template_args &&
+    cpp_name.get_sub()[2].id() == "::" &&
+    cpp_name.get_sub()[3].id() == ID_name &&
+    cpp_name.get_sub()[4].id() == ID_template_args &&
+    cpp_name.get_sub()[5].id() == "::" && cpp_name.get_sub()[6].id() == ID_name)
+  {
+    // N5008 [temp.mem]/1 + [class.nest]/1: out-of-line definition of a
+    // member of a member CLASS TEMPLATE of a class template, written with
+    // a two-level template header:
+    //   template <typename T, uint8_t N, bool W>
+    //   template <bool E>
+    //   void Outer<T, N, W>::reference<E>::on_write() { ... }
+    // (user-reported).  The definition completes the in-class
+    // declaration; graft its body (and parameter list, whose NAMES the
+    // body uses) onto the member's declaration inside the nested class
+    // template's parse tree in the OUTER class template, so every
+    // instantiation of Outer<...>::reference<...> carries the complete
+    // member ([temp.inst]/1).  Previously this shape fell into the
+    // silent-return branch: "no body for callee ...::on_write".  The
+    // inner template parameters must keep the declaration's names
+    // (they are not renamed here); a mismatch leaves the member
+    // bodiless as before.
+    const irep_idt outer_name = cpp_name.get_sub()[0].get(ID_identifier);
+    const irep_idt inner_name = cpp_name.get_sub()[3].get(ID_identifier);
+    const irep_idt member_name = cpp_name.get_sub()[6].get(ID_identifier);
+    const auto outer_ids = cpp_scopes.current_scope().lookup(
+      outer_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+    for(const auto *outer_id : outer_ids)
+    {
+      symbolt *outer_sym = symbol_table.get_writeable(outer_id->identifier);
+      if(
+        outer_sym == nullptr || !outer_sym->type.get_bool(ID_is_template) ||
+        outer_sym->type.find(ID_specialization_of).is_not_nil())
+        continue;
+      cpp_declarationt &outer_decl = to_cpp_declaration(outer_sym->type);
+      if(!outer_decl.is_class_template())
+        continue;
+      const std::size_t n_outer_params =
+        outer_decl.template_type().template_parameters().size();
+      irept &outer_body = outer_decl.type().add(ID_body);
+      for(auto &member : outer_body.get_sub())
+      {
+        if(member.id() != ID_cpp_declaration)
+          continue;
+        cpp_declarationt &mdecl = static_cast<cpp_declarationt &>(member);
+        if(!mdecl.get_bool(ID_is_template) || !mdecl.is_class_template())
+          continue;
+        const cpp_namet &mtag =
+          static_cast<const cpp_namet &>(mdecl.type().find(ID_tag));
+        if(mtag.get_base_name() != inner_name)
+          continue;
+        // the inner template parameters are the trailing ones of the
+        // definition's flattened list; their names must agree
+        {
+          const auto &flat = declaration.template_type().template_parameters();
+          const auto &inner = mdecl.template_type().template_parameters();
+          if(flat.size() != n_outer_params + inner.size())
+            return;
+          for(std::size_t pi = 0; pi < inner.size(); ++pi)
+          {
+            const auto name_of = [](const template_parametert &tp)
+            {
+              const irep_idt id = tp.id() == ID_type
+                                    ? tp.type().get(ID_identifier)
+                                    : tp.get(ID_identifier);
+              const std::string ids = id2string(id);
+              const auto pos = ids.rfind("::");
+              return pos == std::string::npos ? ids : ids.substr(pos + 2);
+            };
+            if(
+              name_of(static_cast<const template_parametert &>(
+                flat[n_outer_params + pi])) !=
+              name_of(static_cast<const template_parametert &>(inner[pi])))
+              return;
+          }
+        }
+        irept &inner_body = mdecl.type().add(ID_body);
+        const std::size_t n_def_params =
+          declarator.type().find(ID_parameters).get_sub().size();
+        for(auto &inner_member : inner_body.get_sub())
+        {
+          if(inner_member.id() != ID_cpp_declaration)
+            continue;
+          cpp_declarationt &idecl =
+            static_cast<cpp_declarationt &>(inner_member);
+          if(idecl.get_bool(ID_is_template))
+            continue;
+          for(auto &idtor : idecl.declarators())
+          {
+            if(
+              idtor.name().get_base_name() != member_name ||
+              idtor.type().id() != ID_function_type ||
+              idtor.type().find(ID_parameters).get_sub().size() !=
+                n_def_params ||
+              idtor.find(ID_value).is_not_nil())
+              continue;
+            // graft: parameter list (names), body, mem-initializers
+            idtor.type() = declarator.type();
+            idtor.add(ID_value) = declarator.find(ID_value);
+            const irept &m_inits = declarator.find(ID_member_initializers);
+            if(m_inits.is_not_nil())
+              idtor.member_initializers() = m_inits;
+            return;
+          }
+        }
+        return;
+      }
+    }
+    return;
+  }
   else
   {
     return; // TODO
