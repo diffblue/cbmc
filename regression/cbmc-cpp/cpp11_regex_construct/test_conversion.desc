@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11 --show-symbol-table
+^Symbol\.+: std::__detail::_Compiler<std::__cxx11::tag-regex_traits<char>>::_M_disjunction\(this\)::\$tmp::return_value__M_insert_alt$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+could not fully type-check
+--
+Conversion-level gate for std::regex construction: the body of the
+_Compiler recursive-descent parser must be present (a `$tmp` of
+_M_disjunction exists only when its body was converted).  In the
+vacuous layouts described in test.desc the _Compiler constructor was
+bodiless and none of the _M_* compiler members were even instantiated.
