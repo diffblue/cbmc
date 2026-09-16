@@ -1,0 +1,16 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts _ --no-standard-checks --unwinding-assertions --unwind 3
+^EXIT=0$
+^SIGNAL=0$
+^\[main.loop_assigns.\d+\] line 30 Check assigns clause inclusion for loop .*: SUCCESS$
+^\[main.assertion.1\] .* assertion i == n: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^\[cmp\.assigns\.\d+\] .* is assignable: FAILURE$
+--
+This test checks that a contract-less loop inside a *called* function does not
+have its loop-local variables checked against the assigns clause of an enclosing
+loop that *does* have a contract. Before the fix, the callee's loop locals
+(`res`, `pa`, `pb`, `k`) were spuriously reported as not assignable. See the
+discussion in model-checking/kani#4790.
