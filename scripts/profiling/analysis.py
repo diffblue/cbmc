@@ -188,6 +188,13 @@ def interpret_results(results, all_folded, source_sites=None):
                 per_bench.get(key, {}).get(r["name"], 0) + f["samples"]
 
     if not total_samples:
+        timed_out = [r["name"] for r in results if r.get("timed_out")]
+        if timed_out:
+            return [
+                "No samples collected — the following benchmark runs were "
+                "killed by the timeout before completing: "
+                + ", ".join(timed_out)
+                + ". Increase --timeout or use smaller benchmarks."]
         return ["Insufficient samples collected — try longer-running benchmarks."]
 
     def pct(n):

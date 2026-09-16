@@ -13,6 +13,15 @@ from .utils import die, info, ok, warn
 # Empirically validated: max stack depth 57 vs 54 at full size.
 DWARF_STACK_SIZE = 16384
 
+# Sampling frequency for perf record. For benchmarks that are expected to
+# run long (large timeout), DWARF stack recording at 997 Hz produces
+# multi-GB perf.data files and enough recording overhead that the benchmark
+# itself may no longer finish within the timeout. 297 Hz still yields plenty
+# of samples on runs of a minute or more.
+SAMPLING_FREQ = 997
+SAMPLING_FREQ_LONG = 297
+LONG_RUN_TIMEOUT = 300
+
 _perf_event_cache = None
 
 
@@ -89,13 +98,21 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     # CI containers/VMs).
     perf_event = _detect_perf_event()
 
+    freq = SAMPLING_FREQ if timeout <= LONG_RUN_TIMEOUT else SAMPLING_FREQ_LONG
+
+    # --no-buildid: skip build-id collection when recording. Results are
+    # analyzed in place immediately (binaries referenced by path), and
+    # build-id post-processing has been observed to hang perf record for
+    # minutes after the benchmark completed when ~/.debug contains stale
+    # cache entries, running the enclosing timeout out.
     perf_cmd = [
-        "perf", "record", "-g",
+        "perf", "record", "--no-buildid", "-g",
         "--call-graph", f"dwarf,{DWARF_STACK_SIZE}",
-        "-F", "997",
+        "-F", str(freq),
         "-e", perf_event,
         "-o", str(perf_data), "--"] + cmd
 
+    timed_out = False
     start = time.monotonic()
     try:
         result = subprocess.run(
@@ -107,7 +124,11 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     except subprocess.TimeoutExpired:
         elapsed = timeout
         cbmc_stdout = ""
-        warn(f"[{name}] Timed out after {timeout}s — partial profile collected")
+        timed_out = True
+        warn(f"[{name}] KILLED by {timeout}s timeout — the benchmark did not "
+             f"finish and any profile data is partial. Increase --timeout or "
+             f"use a smaller benchmark; recording overhead can be reduced "
+             f"further by lowering the sampling frequency.")
 
     cbmc_output.write_text(cbmc_stdout)
 
@@ -118,16 +139,27 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     ok(f"[{name}] perf data: {perf_data} "
        f"({perf_data.stat().st_size // 1024}K, {elapsed:.1f}s)")
 
-    # Parse perf report
+    # Parse perf report. --no-inline: the flat lines parsed below need no
+    # inlined-frame resolution, and resolving them makes perf report spawn
+    # addr2line processes that have been observed to hang indefinitely on
+    # stale ~/.debug build-id cache entries. The timeout is a second line of
+    # defence against such hangs; without it a stuck perf report stalls the
+    # whole profiling run without any indication of what went wrong.
     report_txt = bench_dir / "perf-report.txt"
-    report = subprocess.run(
-        ["perf", "report", "-i", str(perf_data), "--stdio",
-         "--no-children", "--percent-limit", "0.5", "-n"],
-        capture_output=True, text=True)
-    report_txt.write_text(report.stdout)
+    try:
+        report = subprocess.run(
+            ["perf", "report", "-i", str(perf_data), "--stdio", "--no-inline",
+             "--no-children", "--percent-limit", "0.5", "-n"],
+            capture_output=True, text=True, timeout=300)
+        report_stdout = report.stdout
+    except subprocess.TimeoutExpired:
+        report_stdout = ""
+        warn(f"[{name}] perf report timed out after 300s — no hotspot data "
+             f"for this benchmark")
+    report_txt.write_text(report_stdout)
 
     functions = []
-    for line in report.stdout.splitlines():
+    for line in report_stdout.splitlines():
         m = re.match(r'\s+([\d.]+)%\s+(\d+)\s+\S+\s+(\S+)\s+\[.\]\s+(.*)', line)
         if m:
             functions.append({
@@ -136,6 +168,19 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
                 "module": m.group(3),
                 "symbol": m.group(4),
             })
+
+    if not functions:
+        # perf.data exists but yielded no usable samples. Without this
+        # warning such a run is indistinguishable from a genuinely short
+        # benchmark in the final report.
+        if timed_out:
+            warn(f"[{name}] perf.data yielded no parsed samples; the run was "
+                 f"killed by the timeout, so the recording is likely "
+                 f"truncated or unusable.")
+        else:
+            warn(f"[{name}] perf.data ({perf_data.stat().st_size // 1024}K) "
+                 f"yielded no parsed samples — the benchmark may be too "
+                 f"short, or perf report failed to process the recording.")
 
     # Parse CBMC timing from verbose output
     timings = {}
@@ -164,6 +209,7 @@ def run_benchmark(cbmc, bench, output_dir, timeout, memory_mb, skip_solver):
     return {
         "name": name,
         "elapsed": elapsed,
+        "timed_out": timed_out,
         "timings": timings,
         "functions": functions[:30],
         "perf_data": str(perf_data),
@@ -227,6 +273,7 @@ def run_profile_set(cbmc, benchmarks, output_dir, fg_dir, timeout, memory_mb,
         result = {
             "name": last["name"],
             "elapsed": avg_elapsed,
+            "timed_out": any(r.get("timed_out") for r in run_list),
             "timings": avg_timings,
             "functions": last["functions"],
             "perf_data": last["perf_data"],
@@ -251,8 +298,11 @@ def generate_flamegraph(fg_dir, result, title_suffix=""):
     svg = bench_dir / "flamegraph.svg"
 
     try:
+        # --no-inline for the same reason as in run_benchmark: inlined-frame
+        # resolution is not needed for flamegraphs and can hang on stale
+        # build-id cache entries.
         script = subprocess.run(
-            ["perf", "script", "-i", perf_data],
+            ["perf", "script", "--no-inline", "-i", perf_data],
             capture_output=True, text=True, timeout=120)
         if script.returncode != 0:
             warn(f"[{result['name']}] perf script failed (exit {script.returncode})")
