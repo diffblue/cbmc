@@ -5725,7 +5725,30 @@ bool Parser::rName(irept &name)
                         }
                       }
                       if(has_dependent_arg)
-                        return true;
+                      {
+                        // N5008 [temp.dep.type]/1,5 + [temp.names]/3: a
+                        // member of the CURRENT INSTANTIATION named in a
+                        // nested-name-specifier is found by lookup in the
+                        // class template, so `Outer<T, N, W>::reference<E>::
+                        // on_write` (the out-of-class definition of a member
+                        // of a nested member class template, two-level
+                        // `template<...> template<...>` header;
+                        // user-reported) needs no `template` keyword: `<`
+                        // opens template arguments.  The parser does not
+                        // model class-template member scopes, so decide
+                        // tentatively: if `<...>` parses as a template
+                        // argument list AND is followed by `::`, it is a
+                        // template-id component (a less-than expression can
+                        // never be followed by `::` inside a name).
+                        auto saved_pos = lex.Save();
+                        irept probe_args;
+                        const bool is_template_id =
+                          rTemplateArgs(probe_args) &&
+                          lex.LookAhead(0) == TOK_SCOPE;
+                        lex.Restore(saved_pos);
+                        if(!is_template_id)
+                          return true;
+                      }
                       // Concrete instantiation — fall through to
                       // try parsing '<' as template args.
                       break;
