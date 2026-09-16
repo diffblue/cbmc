@@ -6628,14 +6628,86 @@ bool Parser::rInitializeExpr(exprt &expr)
         return false;
     }
 
-    // C++20 designated initializer: .member = expr or .member{expr}
+    // C++20 designated initializer `.member = expr` / `.member{expr}`
+    // ([dcl.init.aggr]/3), and GNU's array designator `[index] = expr`
+    // (accepted by g++ and clang++ in C++ mode; user-reported
+    // `static constexpr uint8_t sz[3] = { [0] = 1, [1] = 8, [2] = 1 }`),
+    // including chained designators (`[i].m`, `[i][j]`).  The designator
+    // list is built in the C front end's shape -- ID_member entries with
+    // #component_name, ID_index entries with the index operand -- so the
+    // shared do_initializer machinery handles both.  A leading `[` is only
+    // a designator when it is not the start of a lambda: the brackets must
+    // not be empty, and after the closing `]` a designator continues with
+    // `=`, `.` or `[` -- never `{`, which is a lambda's body
+    // (libc++ <format>'s `__handles_{[] { ... }()...}`).
+    bool is_designator = false;
     if(
       t == '.' && is_identifier(lex.LookAhead(1)) &&
-      (lex.LookAhead(2) == '=' || lex.LookAhead(2) == '{'))
+      (lex.LookAhead(2) == '=' || lex.LookAhead(2) == '{' ||
+       lex.LookAhead(2) == '.' || lex.LookAhead(2) == '['))
     {
-      cpp_tokent dot_tk, name_tk;
-      lex.get_token(dot_tk);
-      lex.get_token(name_tk);
+      is_designator = true;
+    }
+    else if(t == '[')
+    {
+      // scan to the matching ']' and inspect the following token
+      std::size_t depth = 0;
+      for(std::size_t i = 0;; ++i)
+      {
+        const int la = lex.LookAhead(i);
+        if(la == '[')
+          ++depth;
+        else if(la == ']')
+        {
+          if(--depth == 0)
+          {
+            const int after = lex.LookAhead(i + 1);
+            is_designator =
+              i > 1 && (after == '=' || after == '.' || after == '[');
+            break;
+          }
+        }
+        else if(la == '\0' || la == ';' || la == '}')
+          break;
+      }
+    }
+
+    if(is_designator)
+    {
+      cpp_tokent first_tk;
+      exprt designator;
+      for(;;)
+      {
+        const int d = lex.LookAhead(0);
+        if(d == '.' && is_identifier(lex.LookAhead(1)))
+        {
+          cpp_tokent dot_tk, name_tk;
+          lex.get_token(dot_tk);
+          lex.get_token(name_tk);
+          if(designator.operands().empty())
+            first_tk = dot_tk;
+          exprt member(ID_member);
+          member.set(ID_component_name, name_tk.data.get(ID_C_base_name));
+          designator.add_to_operands(std::move(member));
+        }
+        else if(d == '[')
+        {
+          cpp_tokent lb_tk;
+          lex.get_token(lb_tk);
+          if(designator.operands().empty())
+            first_tk = lb_tk;
+          exprt index_expr;
+          if(!rCommaExpression(index_expr))
+            return false;
+          if(lex.get_token(tk) != ']')
+            return false;
+          exprt index(ID_index);
+          index.add_to_operands(std::move(index_expr));
+          designator.add_to_operands(std::move(index));
+        }
+        else
+          break;
+      }
 
       if(lex.LookAhead(0) == '=')
       {
@@ -6653,11 +6725,7 @@ bool Parser::rInitializeExpr(exprt &expr)
       }
 
       exprt desig(ID_designated_initializer);
-      set_location(desig, dot_tk);
-      exprt member(ID_member);
-      member.set(ID_component_name, name_tk.data.get(ID_C_base_name));
-      exprt designator;
-      designator.add_to_operands(std::move(member));
+      set_location(desig, first_tk);
       desig.add(ID_designator).swap(designator);
       desig.add_to_operands(std::move(tmp));
       expr.add_to_operands(std::move(desig));
