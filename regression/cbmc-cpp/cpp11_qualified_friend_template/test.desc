@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [namespace.memdef]/3 + [temp.friend]/1: a friend function
+template declared with a QUALIFIED name (`friend int det::algo(...)`)
+refers to the template previously declared in that namespace and
+introduces no new name; the referred-to template is a friend, so its
+body may bind a reference to the class's PRIVATE base.  libstdc++'s
+match_results (privately derived from vector<sub_match>) befriends
+`__detail::__regex_algo_impl`, whose `_Unchecked& __res = __m` failed
+"bad reference initializer" and left every std::regex_match a havoc
+stub.  The unqualified friend path looked the name up in the innermost
+enclosing namespace and recorded nothing.
