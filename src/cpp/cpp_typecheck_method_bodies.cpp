@@ -1856,6 +1856,44 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
             }
           }
         }
+        // N5008 [temp.dep.type]/1 + [temp.mem]: a member of a member class
+        // template of a class template is in the scope of BOTH templates;
+        // its body may name the ENCLOSING template's parameters
+        // (`Outer<T, N>::Inner<U>::g() { return k + N; }`).  Only the
+        // innermost instance's parameters were bound above, so `N` (or
+        // `T` used as an expression) resolved to an unbound template
+        // parameter and the body was dropped ("could not fully
+        // type-check").  Bind every enclosing class-template instance's
+        // parameters as well, innermost first (an inner binding is not
+        // overridden: a parameter is only unbound if no inner instance
+        // bound it).
+        if(class_sym != nullptr)
+        {
+          auto scope_it = cpp_scopes.id_map.find(class_id);
+          if(scope_it != cpp_scopes.id_map.end() && scope_it->second)
+          {
+            for(cpp_scopet *enclosing =
+                  &static_cast<cpp_scopet *>(scope_it->second)->get_parent();
+                !enclosing->is_root_scope();
+                enclosing = &enclosing->get_parent())
+            {
+              if(!enclosing->is_class())
+                continue;
+              const symbolt *enclosing_sym =
+                symbol_table.lookup(enclosing->identifier);
+              if(
+                enclosing_sym == nullptr ||
+                enclosing_sym->type.find(ID_C_template).is_nil() ||
+                enclosing_sym->type.find(ID_C_template_arguments).is_nil())
+                continue;
+              method_map.build(
+                static_cast<const template_typet &>(
+                  enclosing_sym->type.find(ID_C_template)),
+                static_cast<const cpp_template_args_tct &>(
+                  enclosing_sym->type.find(ID_C_template_arguments)));
+            }
+          }
+        }
       }
     }
     bool defer = false;
