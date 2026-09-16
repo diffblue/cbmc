@@ -9183,3 +9183,12 @@ layout flakiness, pass on pristine HEAD). Revert-tests: packed test fails
 Census (4): cpp11_deduced_nontype_kind_mismatch (parked),
 cpp20_ranges_basic_libcxx (nargs=0 — RETEST after 791d57d2b0!),
 libcxx23_string_fill_ctor, cpp17_invoke_result_cache_poisoning.
+
+**R135 addendum — ranges retest after 791d57d2b0**: /tmp/r124_orig.cpp
+(libc++ seed) VERIFIES (810 props, 0 fail). nargs=0 CONFIRMED fixed by the
+defaulted-copy fix (R133 cross-link was right). But cpp20_ranges_basic_libcxx
+main.cpp (libstdc++) now trips "could not fully type-check 'main'" recovery →
+range-for + assert silently dropped → vacuous SUCCESS. Desc updated to pin the
+assertion line; stays KNOWNBUG. NEXT ROUND: find the remaining unsupported
+construct (13-line reproducer is now main.cpp itself; instrument the recovery
+message's throw site to get the underlying first error).
