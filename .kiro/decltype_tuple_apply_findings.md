@@ -9136,3 +9136,50 @@ definition fails to instantiate, deleting rather than erroring), not
 in the outer catch.
 Census 4 (unchanged): kind-mismatch (parked), ranges (same nargs=0
 family), string_fill_ctor, invoke_result_cache_poisoning.
+
+## Round 135 (2026-09-15)
+
+**FIX LANDED `791d57d2b0`**: defaulted copy/move ctor with deleted-default
+base/member ([class.copy.ctor]/14). The `=default` skeleton kept per-member
+DEFAULT initializers; for classes with non-trivial members the memberwise-copy
+replacement never ran, so `goto_symex_statet(const&) = default` demanded
+deleted `goto_statet()` → "not accessible" hard error. Fix: also generate the
+memberwise copy when a base/member default ctor is deleted (ID_noaccess) or
+absent. UNCONDITIONAL widening regressed cpp11_locale_ctype_facet (dropped
+dtor body) + slowed regex past budget — the narrow gate is deliberate.
+/tmp/gs.ii (97k-line goto_state.cpp) typechecks end-to-end (9 min).
+cv134 killed (obsolete). Auxiliary empty-name skips (code.cpp/constructor.cpp)
+proven unnecessary — reverted.
+
+**USER BUG REPORT (~/CBMC_ISSUES.md) FIXED `332cb4db74` + test `c177c3ca5a`**:
+packed enums ignored in C++ mode. Two defects: (1) enum_type.cpp never
+consulted ID_C_packed — now tracks enumerator range and re-types underlying +
+enumerator symbol values when packed && base defaulted ([dcl.enum]/8; scoped
+enums keep fixed int per [dcl.enum]/5); (2) rEnumSpec: attribute between
+enum-key and name merge_types'd the spec into merged_type → tag/body landed on
+wrapper → anonymous bodyless enum. Unwrapped like rClassSpec's struct unwrap.
+PITFALL AVOIDED: first draft evaluated all values before creating any symbol —
+broke [dcl.enum]/5 self-references (glibc pthread enums) — 94 libcxx-variant
+failures. Two-phase value-then-re-type scheme instead.
+
+**MAJOR INFRA DISCOVERY — front-end run-to-run NONDETERMINISM**:
+`cpp_scopet::id_sett = std::set<cpp_idt*>` orders resolution candidates by
+HEAP ADDRESS → instantiation order varies with argv/env LENGTH (!). Proven:
+identical binary, different argv path → goto-functions md5 differs by 633k
+lines; regex_construct flips 25s ↔ >900s. cpp11_regex_{construct,match} suite
+failures in this round were THIS (pristine HEAD passes with its layout; any
+src/cpp text change can tip it). ORDINAL FIX DRAFTED (/tmp/k135/ordinal.diff:
+cpp_idt::ordinal + comparator): makes output deterministic across layouts BUT
+surfaces an order-sensitive latent bug (cpp17_function_optional_lambda +
+cpp17_std_function_lambda_call: _M_get_pointer no-body FAILURE) — the ordinal
+order differs from today's lucky pointer order somewhere in candidate
+selection. FOLLOW-UP: land ordinal + fix the surfaced resolution bug together.
+Also scope_sett (std::set<cpp_scopet*>) same hazard, unused in iteration.
+
+Suites ×5: green except cpp11_regex_{construct,match} (proven pre-existing
+layout flakiness, pass on pristine HEAD). Revert-tests: packed test fails
+3 asserts on HEAD~ sources; gs.ii 2 errors without 791d57d2b0.
+
+Census (4): cpp11_deduced_nontype_kind_mismatch (parked),
+cpp20_ranges_basic_libcxx (nargs=0 — RETEST after 791d57d2b0!),
+libcxx23_string_fill_ctor, cpp17_invoke_result_cache_poisoning.
