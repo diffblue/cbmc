@@ -131,8 +131,8 @@ public:
       const option_names_iteratort operator++(int);
       const std::string &operator*();
 
-      bool operator==(const option_names_iteratort &other);
-      bool operator!=(const option_names_iteratort &other);
+      bool operator==(const option_names_iteratort &other) const;
+      bool operator!=(const option_names_iteratort &other) const;
 
     private:
       const cmdlinet *command_line = nullptr;

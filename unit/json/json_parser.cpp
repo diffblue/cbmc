@@ -113,7 +113,7 @@ SCENARIO("Loading JSON files")
 
         REQUIRE(json_object.find("one") != json_object.end());
         REQUIRE(json_object["one"].value.size() == 1);
-        REQUIRE(json_object["one"].value == u8"\u0001");
+        REQUIRE(json_object["one"].value == "\u0001");
 
         REQUIRE(json_object.find("latin") != json_object.end());
         REQUIRE(json_object["latin"].value == "B");
@@ -125,10 +125,10 @@ SCENARIO("Loading JSON files")
         REQUIRE(json_object["trema"].value == "ÿ");
 
         REQUIRE(json_object.find("high") != json_object.end());
-        REQUIRE(json_object["high"].value == u8"\uFFFF");
+        REQUIRE(json_object["high"].value == "\uFFFF");
 
         REQUIRE(json_object.find("several") != json_object.end());
-        REQUIRE(json_object["several"].value == u8"aAb\u2FC3\uFFFF");
+        REQUIRE(json_object["several"].value == "aAb\u2FC3\uFFFF");
       }
     }
   }

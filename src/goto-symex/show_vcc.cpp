@@ -71,9 +71,9 @@ show_vcc_plain(messaget::mstreamt &out, const symex_target_equationt &equation)
       }
 
     // Unicode equivalent of "|--------------------------"
-    out << messaget::faint << u8"\u251c";
+    out << messaget::faint << "\u251c";
     for(unsigned i = 0; i < 26; i++)
-      out << u8"\u2500";
+      out << "\u2500";
     out << messaget::reset << '\n';
 
     // split property into multiple disjunts, if applicable

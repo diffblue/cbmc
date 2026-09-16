@@ -767,7 +767,8 @@ static void instantiate_sync_fetch(
   exprt::operandst arguments{
     parameter_exprs[0],
     parameter_exprs[1],
-    from_integer(std::memory_order_seq_cst, signed_int_type())};
+    from_integer(
+      static_cast<int>(std::memory_order_seq_cst), signed_int_type())};
 
   block.add(code_returnt{side_effect_expr_function_callt{
     symbol_exprt::typeless(atomic_name).with_source_location(source_location),
@@ -798,8 +799,10 @@ static void instantiate_sync_bool_compare_and_swap(
      address_of_exprt{parameter_exprs[1]},
      address_of_exprt{parameter_exprs[2]},
      from_integer(0, c_bool_type()),
-     from_integer(std::memory_order_seq_cst, signed_int_type()),
-     from_integer(std::memory_order_seq_cst, signed_int_type())},
+     from_integer(
+       static_cast<int>(std::memory_order_seq_cst), signed_int_type()),
+     from_integer(
+       static_cast<int>(std::memory_order_seq_cst), signed_int_type())},
     typet{},
     source_location}});
 }

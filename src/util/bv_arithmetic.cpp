@@ -156,17 +156,17 @@ bool bv_arithmetict::operator>=(const bv_arithmetict &other)
   return value>=other.value;
 }
 
-bool bv_arithmetict::operator==(const bv_arithmetict &other)
+bool bv_arithmetict::operator==(const bv_arithmetict &other) const
 {
   return value==other.value;
 }
 
-bool bv_arithmetict::operator==(int i)
+bool bv_arithmetict::operator==(int i) const
 {
   return value==i;
 }
 
-bool bv_arithmetict::operator!=(const bv_arithmetict &other)
+bool bv_arithmetict::operator!=(const bv_arithmetict &other) const
 {
   return value!=other.value;
 }
