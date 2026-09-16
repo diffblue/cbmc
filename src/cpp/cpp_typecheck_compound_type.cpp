@@ -2109,6 +2109,104 @@ void cpp_typecheckt::typecheck_friend_declaration(
     // hidden friend is only found by ADL; registering it in the
     // enclosing namespace over-approximates visibility, matching how
     // non-template friends are handled by the declarator converter.)
+    // N5008 [namespace.memdef]/3 + [temp.friend]/1: a friend function
+    // template declared with a QUALIFIED name refers to a template
+    // previously declared in the named namespace and introduces NO new
+    // name.  libstdc++'s match_results (privately derived from
+    // vector<sub_match>) befriends
+    //   template<class _Bp, class _Ap, class _Cp, class _Rp>
+    //   friend bool __detail::__regex_algo_impl(_Bp, _Bp,
+    //     match_results<_Bp, _Ap>&, const basic_regex<_Cp, _Rp>&, ...);
+    // whose body binds `_Unchecked& __res = __m` (base& from derived&).
+    // The unqualified path below looked the name up in the INNERMOST
+    // enclosing namespace (std::__cxx11), found nothing, recorded no
+    // friend, and the derived-to-base binding was rejected as
+    // inaccessible ("bad reference initializer") -- every
+    // std::regex_match body was silently dropped and regex_match()
+    // became a havoc stub.  Resolve the qualifier to its scope and
+    // record the signature-equivalent template found there.
+    if(
+      declaration.declarators().size() == 1 &&
+      declaration.declarators().front().name().is_qualified())
+    {
+      const cpp_namet &friend_name = declaration.declarators().front().name();
+      cpp_save_scopet saved_scope(cpp_scopes);
+      cpp_typecheck_resolvet cpp_typecheck_resolve(*this);
+      irep_idt fbase;
+      cpp_template_args_non_tct fargs_unused;
+      cpp_scopet *target_scope = nullptr;
+      try
+      {
+        target_scope = &cpp_typecheck_resolve.resolve_scope(
+          friend_name, fbase, fargs_unused);
+      }
+      catch(int)
+      {
+        target_scope = nullptr;
+      }
+      if(target_scope != nullptr)
+      {
+        // Candidates: the scope's function templates of that name with
+        // the same template-parameter and function-parameter counts.
+        // The friend spells types from the CLASS's scope
+        // (`__detail::_RegexExecutorPolicy`) where the definition, in
+        // its own namespace, writes them unqualified, so the textual
+        // signature comparison can fail on spelling alone; when the
+        // arity match is UNIQUE it is the referred-to template
+        // ([namespace.memdef]/3 -- a qualified friend names an existing
+        // entity).  Several arity-equal overloads fall back to the
+        // spelling-normalised signature equivalence.
+        const auto count_params = [](const cpp_declarationt &d) -> std::size_t
+        {
+          const irept &ps = d.declarators().front().type().find(ID_parameters);
+          return ps.get_sub().size();
+        };
+        const std::size_t friend_tparams =
+          declaration.template_type().template_parameters().size();
+        const std::size_t friend_params = count_params(declaration);
+        std::vector<const symbolt *> arity_matches;
+        for(const auto *id_ptr :
+            target_scope->lookup(fbase, cpp_scopet::SCOPE_ONLY))
+        {
+          const symbolt *cand = symbol_table.lookup(id_ptr->identifier);
+          if(
+            cand == nullptr || !cand->type.get_bool(ID_is_template) ||
+            cand->type.id() != ID_cpp_declaration)
+            continue;
+          const cpp_declarationt &cand_decl = to_cpp_declaration(cand->type);
+          if(
+            cand_decl.declarators().size() != 1 ||
+            cand_decl.template_type().template_parameters().size() !=
+              friend_tparams ||
+            count_params(cand_decl) != friend_params)
+            continue;
+          arity_matches.push_back(cand);
+        }
+        const symbolt *befriended = nullptr;
+        if(arity_matches.size() == 1)
+          befriended = arity_matches.front();
+        else
+        {
+          for(const symbolt *cand : arity_matches)
+          {
+            if(function_template_signatures_equivalent(
+                 declaration, to_cpp_declaration(cand->type)))
+            {
+              befriended = cand;
+              break;
+            }
+          }
+        }
+        if(befriended != nullptr)
+        {
+          irept friend_entry;
+          friend_entry.set(ID_identifier, befriended->name);
+          symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
+        }
+      }
+      return;
+    }
+
     {
       cpp_save_scopet saved_scope(cpp_scopes);
       // The friend's NAME belongs to the innermost enclosing NAMESPACE
