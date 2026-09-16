@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.param]/12-14 + [temp.arg.general]/1: a default template
+argument given on a forward declaration (`template <class _CharT, class
+_InIter = It<_CharT>> struct num_get;`, libstdc++'s <bits/localefwd.h>)
+is substituted with THIS template's preceding parameters bound to the
+preceding arguments.  The raw default was applied through the full
+template map, whose short-name bridge bound `_CharT` to a same-named
+parameter of an ENCLOSING instantiation (numpunct<char>::probe naming
+num_get<wchar_t>): the hybrid num_get<wchar_t, It<char>> resulted --
+~130 bogus facet instantiations per <regex> TU, and which existed
+depended on candidate order.  The kernel places the enclosing template
+before the definition so its parameter scope sorts first.
