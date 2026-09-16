@@ -12746,15 +12746,32 @@ std::optional<codet> Parser::rGCCAsmStatement()
   std::cout << std::string(__indent, ' ') << "Parser::rGCCAsmStatement 3\n";
 #endif // DEBUG
 
-  while(lex.LookAhead(0)!=')')
+  // An empty operand list followed by another one is written `::`
+  // (`asm("" : "=r"(t) :: );` -- no inputs, empty clobbers), which the
+  // lexer delivers as ONE TOK_SCOPE token.  Treat it as two ':'
+  // separators: the first ends the current (empty) list, the second is
+  // still pending when the loop comes round.
+  bool pending_colon = false;
+
+  while(pending_colon || lex.LookAhead(0) != ')')
   {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rGCCAsmStatement 4\n";
 #endif // DEBUG
 
     // get ':'
-    if(lex.get_token(tk)!=':')
-      return {};
+    if(pending_colon)
+      pending_colon = false;
+    else
+    {
+      const int sep = lex.get_token(tk);
+      if(sep == TOK_SCOPE)
+        pending_colon = true;
+      else if(sep != ':')
+        return {};
+    }
+    if(pending_colon)
+      continue;
 
     for(;;)
     {
