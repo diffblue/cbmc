@@ -1714,8 +1714,23 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // their values to be inlined as nondet during goto conversion,
       // before the model bodies are available.
       const std::string bname = id2string(static_symbol.base_name);
-      if(bname != "_S_use_relocate" && bname != "_S_nothrow_relocate")
+      // N5008 [class.static.data]/3 + [dcl.constexpr]/1: a constexpr
+      // static data member is implicitly inline and its in-class
+      // declaration IS its definition.  A SCALAR one stays an `extern`
+      // macro folded into its uses (unfolded initializers of scalars,
+      // e.g. constexpr calls, must not become dynamic initialisation);
+      // an ARRAY one is an object that must exist and be statically
+      // initialised -- static_lifetime_init
+      // skips macros, and left `extern` with the macro flag
+      // (`static constexpr uint8_t sz[3] = {1, 8, 1};`, user-reported)
+      // it was never initialised and every `A::sz[i]` read nondet.
+      const bool scalar_constant = static_symbol.type.id() != ID_array;
+      if(
+        scalar_constant && bname != "_S_use_relocate" &&
+        bname != "_S_nothrow_relocate")
         static_symbol.is_macro = true;
+      if(!scalar_constant && value.is_not_nil())
+        static_symbol.is_extern = false;
     }
 
     // TODO: not sure about this: should be defined separately!
