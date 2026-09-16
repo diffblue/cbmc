@@ -9243,3 +9243,33 @@ template-id with 2 args) — separate gap.
 
 Suites ×5 green on HEAD (12 skipped incl. 2 THOROUGH regex). Revert-tests: all
 5 new gates FAIL on 69eb368eae sources. Census unchanged (4).
+
+## Round 137 (2026-09-16) — user bug reports Issues 2–4 (~/CBMC_ISSUES.md)
+
+- `546bdc7711` Issue 4: asm `::` — lexer yields TOK_SCOPE; rGCCAsmStatement
+  now treats it as two separators. CORE cpp11_asm_empty_operand_lists.
+- `f5b2d46446` Issue 3: GNU `[i] = v` array designators in rInitializeExpr
+  (C-front-end designator shape; `[` is a designator only when non-empty and
+  followed by `=`/`.`/`[` — NOT `{`, which broke libc++ <format> lambdas in
+  init lists). Found alongside: constexpr static ARRAY members were extern
+  macros → never initialised → nondet reads (even without designators). Now
+  objects with static init. PITFALL: making SCALAR constexpr members objects
+  routed unfolded constexpr-call initialisers into dynamic init → solver
+  invariant nil type (cpp17_out_of_line_udc_conversion). Scalars stay macros.
+  CORE cpp11_gnu_designated_array_initializer.
+- `44bb3d7be3` Issue 2: `template<..> template<..> void O<T>::R<E>::f()`:
+  (a) rName treated `R<` after dependent qualifier as less-than — tentative
+  `<...>` parse + following `::` decides; (b) typecheck_class_template_member
+  7-component shape grafts param list + body + mem-inits onto the member decl
+  inside the nested class template in the OUTER template's parse tree.
+  CORE cpp11_nested_member_template_out_of_line.
+- `d9374a4431` Adjacent gap: bodies of members of a nested member class
+  template couldn't see ENCLOSING template params (`N`, `T` in expressions):
+  add_method_body built the map from the member's class only; now walks
+  enclosing class scopes. CORE cpp11_nested_member_template_enclosing_params
+  (+ inclass.desc).
+
+Note: parser's `#template` sub-scope key is overwritten per template in a
+class (id_map["#template"]) — member-template info lost; not needed now.
+Suites ×5 green; ansi-c: only pre-existing clang-only failures (env). Revert
+tests: 5/5 gates fail on 467dfd6b51. Census unchanged (4).
