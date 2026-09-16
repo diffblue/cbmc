@@ -2,14 +2,25 @@ CORE
 main.cpp
 --cpp11 --show-symbol-table
 ^Symbol\.+: std::__detail::_Compiler<std::__cxx11::tag-regex_traits<char>>::_M_disjunction\(this\)::\$tmp::return_value__M_insert_alt$
+^Symbol\.+: std::shared_ptr<const std::__detail::tag-_NFA<std::__cxx11::tag-regex_traits<char>>>::shared_ptr\(this,rref_struct_tag\(identifier=std::tag-shared_ptr<std::__detail::tag-_NFA<std::__cxx11::tag-regex_traits<char>>>\)\)::\$tmp::return_value_move<
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
 could not fully type-check
+^Symbol\.+: std::num_get<wchar_t,std::tag-istreambuf_iterator<char,
+^Symbol\.+: std::num_get<char,std::tag-istreambuf_iterator<wchar_t,
 --
 Conversion-level gate for std::regex construction: the body of the
 _Compiler recursive-descent parser must be present (a `$tmp` of
-_M_disjunction exists only when its body was converted).  In the
-vacuous layouts described in test.desc the _Compiler constructor was
-bodiless and none of the _M_* compiler members were even instantiated.
+_M_disjunction exists only when its body was converted); the converting
+move constructor `shared_ptr<const _NFA>(shared_ptr<_NFA>&&)` odr-used
+by _Compiler::_M_get_nfa must have a body (it was bodiless in one
+candidate order: the already-instantiated const& specialization and
+the && deduction placeholder tied, then the ODR-used member was never
+queued); and no HYBRID facet instantiation such as
+num_get<wchar_t, istreambuf_iterator<char>> may exist (a default
+template argument bound to an enclosing instantiation's same-named
+parameter, [temp.param]/14).  In the vacuous layouts described in
+test.desc the _Compiler constructor was bodiless and none of the _M_*
+compiler members were even instantiated.

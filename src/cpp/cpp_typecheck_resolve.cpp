@@ -1497,8 +1497,45 @@ void cpp_typecheck_resolvet::guess_function_template_args(
   // the caller falls back to the non-template resolution path.
   if(!identifiers.empty())
   {
+    // N5008 [temp.inst]/1 + [over.match.funcs]: a function template
+    // specialization is ONE candidate.  The class scope lists every
+    // already-materialised specialization as a plain symbol next to the
+    // template itself, so once a member template has been instantiated
+    // for some arguments, the same specialization enters the set twice:
+    // as the deduction placeholder (template_function_instance) and as
+    // the existing symbol.  Left alone the pair tied on every key and
+    // made the call ambiguous ("found no match" after the fallbacks) --
+    // or, ranked differently, made the winner depend on whether the
+    // specialization had been instantiated earlier (candidate order):
+    // libstdc++'s `shared_ptr<const _NFA>(shared_ptr<_NFA>&&)` lost its
+    // body that way.  Drop the symbol when its placeholder is present.
+    std::set<irep_idt> materialised;
+    for(const auto &inst : identifiers)
+    {
+      if(inst.id() != ID_template_function_instance)
+        continue;
+      const irep_idt tmpl_name = inst.type().get(ID_C_template);
+      if(tmpl_name.empty())
+        continue;
+      const symbolt *tmpl_sym = cpp_typecheck.symbol_table.lookup(tmpl_name);
+      if(tmpl_sym == nullptr)
+        continue;
+      const irep_idt existing =
+        cpp_typecheck.existing_function_template_instance(
+          *tmpl_sym,
+          static_cast<const cpp_template_args_tct &>(
+            inst.type().find(ID_C_template_arguments)));
+      if(!existing.empty())
+        materialised.insert(existing);
+    }
     for(auto &nt : non_templates)
+    {
+      if(
+        nt.id() == ID_symbol &&
+        materialised.count(to_symbol_expr(nt).get_identifier()) != 0)
+        continue;
       identifiers.push_back(std::move(nt));
+    }
   }
 
   disambiguate_functions(identifiers, fargs);
@@ -2598,6 +2635,35 @@ void cpp_typecheck_resolvet::disambiguate_functions(
                               .find(ID_arguments)
                               .get_sub()
                               .size();
+      // An ALREADY-INSTANTIATED function template specialization enters
+      // the candidate set as a plain symbol without ID_C_template; it
+      // carries #fn_template_type instead.  It is still a specialization
+      // ([over.match.best]/2.5 distinguishes by whether the candidate IS
+      // one, not by whether it was instantiated earlier).  Ranked as a
+      // non-template it beat the not-yet-instantiated sibling overload
+      // whose conversion sequence is BETTER: libstdc++'s
+      // `shared_ptr(shared_ptr<_Yp>&& __r) : __shared_ptr<_Tp>(
+      // std::move(__r))` bound the xvalue to the const& converting
+      // constructor whenever that one had been instantiated first (a
+      // candidate-order accident), copying instead of moving.
+      else if(old_id.id() == ID_symbol)
+      {
+        // The marker lives on the symbol's type in the symbol table; the
+        // candidate expression carries a copy of the component type only.
+        const symbolt *cand_sym = cpp_typecheck.symbol_table.lookup(
+          to_symbol_expr(old_id).get_identifier());
+        if(
+          cand_sym != nullptr &&
+          cand_sym->type.find(irep_idt{"#fn_template_type"}).is_not_nil())
+        {
+          template_distance = std::max<std::size_t>(
+            1,
+            cand_sym->type.find(irep_idt{"#fn_template_args"})
+              .find(ID_arguments)
+              .get_sub()
+              .size());
+        }
+      }
 
       // N5008 [dcl.spec.auto.general]/13: a candidate whose return type
       // is an `auto` placeholder that can NEVER be deduced -- a
