@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [basic.lookup.unqual]/1 + [expr.ref]/1: the explicit template
+arguments of a member template-id (`r.is_derived<I>()`,
+`(*p).template f<I>()`, `p->template f<I>()`) are expressions of the
+enclosing postfix-expression, not of the object's class.  They were
+type-checked in the object's class scope (entered to resolve the member
+name), so an argument naming the CALLER's template parameter `I` found
+nothing and the call had no candidates ("found no match for symbol
+'is_derived'") -- CBMC's own small_shared_n_way_ptrt::is_derived,
+blocking field_sensitivity.cpp and complexity_limiter.cpp in the
+dog-food sweep.
