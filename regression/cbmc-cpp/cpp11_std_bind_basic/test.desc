@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+std::bind (libstdc++ _Bind / _Bind_helper machinery): even the simplest
+`std::bind(add, 2, 3)()` fails while instantiating the
+`__and_<is_pointer, __not_, is_constructible, ...>` chain of
+_Mu/__volget with "member operator got incomplete type on left hand
+side", and main's body is dropped.  Dog-food carrier:
+src/goto-symex/goto_symex.h:72 constructs shadow_memoryt from
+`std::bind(&goto_symext::symex_assign, this, _1, _2, _3)` (a member
+function pointer with three placeholders converted to std::function),
+whose type stays `nil` so no shadow_memoryt constructor matches.

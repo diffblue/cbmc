@@ -10965,12 +10965,24 @@ void cpp_typecheck_resolvet::apply_template_args(
 
   // We typecheck the template arguments in the context
   // of the original scope!
+  //
+  // N5008 [basic.lookup.unqual]/1 + [expr.ref]/1: the template arguments
+  // of a member template-id (`r.is_derived<I>()`, `p->template f<I>()`)
+  // are expressions of the enclosing postfix-expression, not of the
+  // object's class.  typecheck_expr_member enters the object's class
+  // scope before resolving the member name, so `original_scope` is that
+  // class scope there; an argument naming the CALLER's template
+  // parameter (`I` of the enclosing member template, CBMC's own
+  // small_shared_n_way_ptrt::is_derived) found nothing and the call had
+  // no candidates ("found no match for symbol 'is_derived'", the
+  // goto-symex dog-food block).  Use the recorded point of use.
   cpp_template_args_tct template_args_tc;
 
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
 
-    cpp_typecheck.cpp_scopes.go_to(*original_scope);
+    cpp_typecheck.cpp_scopes.go_to(
+      fargs.naming_scope != nullptr ? *fargs.naming_scope : *original_scope);
 
     template_args_tc = cpp_typecheck.typecheck_template_args(
       source_location, template_symbol, template_args_non_tc);
