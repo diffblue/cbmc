@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.over.link]/6 + [dcl.fct]/3: an in-class friend declaration
+of a function template with an UNNAMED parameter pack (`make(Args
+&&...)`, libstdc++'s shared_ptr befriending make_shared) declares the
+same template as the namespace-scope definition naming the pack.  The
+parser records the `...` of the unnamed form on the declarator and of
+the named form on the declarator's type; signature equivalence now
+unifies the two, so the call resolves to the definition's body.
+Previously the pair tied and the winner depended on candidate order --
+when the bodiless friend won, std::regex's _Compiler constructor was a
+havoc stub.
