@@ -6805,6 +6805,37 @@ bool Parser::rEnumSpec(typet &spec)
   if(!optAttribute(spec))
     return false;
 
+  // Like the struct/union unwrap in rClassSpec: a GCC attribute
+  // (user-reported `enum __attribute__((__packed__)) E { ... }`)
+  // turned the enum-specifier into a merged_type via merge_types; the
+  // remainder of this function attaches the TAG, underlying type and
+  // BODY to `spec`, so with the wrapper in place they landed on the
+  // merged node and the enum stayed anonymous and bodyless.  Unwrap,
+  // recording the known attributes as flags on the enum type; unwrap
+  // only when every subtype is recognised (conservative).
+  if(spec.id() == ID_merged_type)
+  {
+    typet unwrapped;
+    bool packed = false;
+    bool all_known = true;
+    for(auto &sub : to_type_with_subtypes(spec).subtypes())
+    {
+      if(sub.id() == ID_c_enum)
+        unwrapped = sub;
+      else if(sub.id() == ID_packed)
+        packed = true;
+      else
+        all_known = false;
+    }
+    if(unwrapped.is_not_nil() && all_known)
+    {
+      unwrapped.add_source_location() = spec.source_location();
+      if(packed)
+        unwrapped.set(ID_C_packed, true);
+      spec = unwrapped;
+    }
+  }
+
   if(lex.LookAhead(0)!='{' &&
      lex.LookAhead(0)!=':')
   {

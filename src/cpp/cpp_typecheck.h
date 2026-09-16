@@ -692,7 +692,7 @@ protected:
   {
     UNREACHABLE;
   }
-  void typecheck_enum_body(symbolt &symbol);
+  void typecheck_enum_body(symbolt &symbol, bool underlying_defaulted);
   void typecheck_method_bodies();
 
   /// N5008 [temp.inst]/5 + [expr.const]: instantiate (convert) the
