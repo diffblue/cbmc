@@ -3248,6 +3248,43 @@ bool cpp_typecheckt::function_template_signatures_equivalent(
   return true;
 }
 
+irep_idt cpp_typecheckt::existing_function_template_instance(
+  const symbolt &template_symbol,
+  const cpp_template_args_tct &template_args)
+{
+  cpp_scopet *template_scope = id_map_lookup(cpp_scopes, template_symbol.name);
+  if(template_scope == nullptr)
+    return irep_idt();
+  // template_suffix diagnoses a non-constant expression argument (a
+  // class-type NTTP still spelled as a constructor call at this point);
+  // such an argument list names no existing instance -- silently.
+  std::string suffix;
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    suffix = template_suffix(template_args);
+  }
+  catch(...)
+  {
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return irep_idt();
+  }
+  cpp_scopet::id_sett sub_set =
+    template_scope->lookup(suffix, cpp_scopet::SCOPE_ONLY);
+  if(sub_set.size() != 1 || !(*sub_set.begin())->is_template_scope())
+    return irep_idt();
+  cpp_scopet &sub_scope = static_cast<cpp_scopet &>(**sub_set.begin());
+  cpp_scopet::id_sett id_set =
+    sub_scope.lookup(template_symbol.base_name, cpp_scopet::SCOPE_ONLY);
+  if(id_set.size() != 1)
+    return irep_idt();
+  const cpp_idt &cpp_id = **id_set.begin();
+  if(cpp_id.id_class != cpp_idt::id_classt::SYMBOL)
+    return irep_idt();
+  return cpp_id.identifier;
+}
+
 const symbolt &cpp_typecheckt::instantiate_template(
   const source_locationt &source_location,
   const symbolt &template_symbol,
