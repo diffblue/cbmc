@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+User-reported: `__attribute__((__packed__))` on an enum was honoured by
+the C front end but ignored by the C++ front end, so
+`static_assert(sizeof(E) == 1)` failed on packed-enum ABIs (1-byte
+instruction fields in firmware).  The underlying type of an unscoped
+enum without enumeration-base is implementation-defined (N5008
+[dcl.enum]/8); packed selects the smallest sufficient type, matching
+g++/clang++.  Scoped enums have a fixed underlying type ([dcl.enum]/5)
+and are not affected.
