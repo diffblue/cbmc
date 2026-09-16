@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.order] across several shapes: declaration
+order reversed, pointer depth (T** over T*), a fixed-arity template-id
+pattern over a pack pattern (pack<A,B> over pack<X...>), reference
+cv-qualification (const T& over T&); and [temp.spec.partial.match]/1:
+the primary template never competes with a matching partial
+specialisation (`un<T>` used to beat `un<pack<A,B>>` on the
+parameter-count heuristic).

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.order]/1 + [temp.func.order]: `traits<const
+T*>` is more specialised than `traits<T*>` (the latter deduces from the
+former, not vice versa; [temp.deduct.type]/8 makes cv part of the
+pattern).  libstdc++'s iterator_traits<const char*> shape: choosing
+`_Tp*` with `_Tp = const char` made value_type `const char`, so
+std::regex's _Executor was instantiated over basic_regex<const char,
+...> and matched no constructor.  Previously the pair tied on the
+count heuristics and std::sort left the choice to candidate order.

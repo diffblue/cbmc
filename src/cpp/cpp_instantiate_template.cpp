@@ -2327,6 +2327,34 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
               const cpp_template_args_non_tct &best_partial_args =
                 best_decl.partial_specialization_args();
 
+              // N5008 [temp.spec.partial.order]/1 + [temp.func.order]:
+              // the more specialised of two matching partial
+              // specialisations is the one whose pattern the other's
+              // DEDUCES FROM but not vice versa.  Decide by deduction
+              // first; the counting heuristics below are fallbacks for
+              // pairs the deduction leaves unordered.  Without this,
+              // `traits<T*>` and `traits<const T*>` (libstdc++'s
+              // iterator_traits<_Tp*>/<const _Tp*>) tied on the counts
+              // and the tie fell to candidate ORDER -- for `const char*`
+              // the `_Tp*` specialisation won with `_Tp = const char`,
+              // so `value_type` stayed `const char` and every regex
+              // _Executor was built over basic_regex<const char, ...>,
+              // an instantiation that matches no _Executor constructor.
+              const bool s_at_least =
+                partial_specialization_at_least_as_specialised(
+                  cpp_declaration, best_decl, best_match->name);
+              const bool best_at_least =
+                partial_specialization_at_least_as_specialised(
+                  best_decl, cpp_declaration, s.name);
+              if(s_at_least && !best_at_least)
+              {
+                best_match = &s;
+                best_spec_args = guessed_args;
+                continue;
+              }
+              if(best_at_least && !s_at_least)
+                continue;
+
               // Count non-trivial arguments. A cpp_name with template
               // args (e.g., pack<Rp...>) counts as constrained.
               auto count_constrained = [](const cpp_template_args_non_tct &args)

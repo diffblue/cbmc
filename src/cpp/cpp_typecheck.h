@@ -1031,6 +1031,19 @@ public:
     const irep_idt &F_scope_id,
     const irep_idt &G_scope_id);
 
+  /// N5008 [temp.spec.partial.order]/1 + [temp.func.order]: returns true if
+  /// class-template partial specialisation F is at-least-as-specialised as
+  /// G.  Each specialisation is viewed as the function template
+  /// `template<params> void f(X<args>)` and the argument patterns are
+  /// compared position by position by deducing G's template parameters
+  /// from F's (inert) patterns; every G parameter occurring in the compared
+  /// patterns must be deduced.  Expression (non-type) arguments compare
+  /// structurally unless G's is a bare template parameter.
+  bool partial_specialization_at_least_as_specialised(
+    const cpp_declarationt &F,
+    const cpp_declarationt &G,
+    const irep_idt &G_scope_id);
+
   bool reference_related(const exprt &expr, const reference_typet &type) const;
 
   bool reference_compatible(

@@ -1196,6 +1196,132 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
   (void)F_scope_id;
 }
 
+bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
+  const cpp_declarationt &F,
+  const cpp_declarationt &G,
+  const irep_idt &G_scope_id)
+{
+  const auto &F_args = F.partial_specialization_args().arguments();
+  const auto &G_args = G.partial_specialization_args().arguments();
+  if(F_args.empty() || F_args.size() != G_args.size())
+    return false;
+
+  cpp_save_scopet save_scope{cpp_scopes};
+  cpp_saved_template_mapt saved_map{template_map};
+
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    template_map.clear();
+    // Only G's parameters are deducible; F's appear in A with F's scope
+    // prefix and are treated as concrete ("transformed") types.
+    template_map.build_unassigned(G.template_type());
+
+    auto scope_it = cpp_scopes.id_map.find(G_scope_id);
+    if(scope_it != cpp_scopes.id_map.end())
+      cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
+
+    cpp_typecheck_resolvet resolver{*this};
+    // [temp.deduct.type]/8: cv-qualifiers are part of the pattern -- a P
+    // of `const T*` must NOT deduce from an A of `T*`, or `T*` and
+    // `const T*` would each be at least as specialised as the other.
+    resolver.strict_cv_deduction = true;
+    for(std::size_t i = 0; i < G_args.size(); ++i)
+    {
+      const exprt &fa = F_args[i];
+      const exprt &ga = G_args[i];
+      const bool f_is_type = fa.id() == ID_type || fa.id() == ID_ambiguous;
+      const bool g_is_type = ga.id() == ID_type || ga.id() == ID_ambiguous;
+      if(f_is_type != g_is_type)
+        return false;
+      if(g_is_type)
+      {
+        typet A = fa.id() == ID_ambiguous
+                    ? static_cast<const typet &>(fa.find(ID_type))
+                    : fa.type();
+        typet P = ga.id() == ID_ambiguous
+                    ? static_cast<const typet &>(ga.find(ID_type))
+                    : ga.type();
+        cpp_convert_plain_type(A, get_message_handler());
+        // [temp.deduct.type]/3: a template-id pattern only matches a
+        // specialisation of the SAME template.
+        if(
+          P.id() == ID_cpp_name && A.id() == ID_cpp_name &&
+          !P.get_sub().empty() && !A.get_sub().empty())
+        {
+          bool p_has_args = false;
+          for(const auto &sub : P.get_sub())
+            if(sub.id() == ID_template_args)
+              p_has_args = true;
+          if(
+            p_has_args && P.get_sub().front().get(ID_identifier) !=
+                            A.get_sub().front().get(ID_identifier))
+          {
+            return false;
+          }
+        }
+        resolver.guess_template_args(P, A);
+      }
+      else
+      {
+        // Non-type argument: G's bare template parameter deduces from
+        // anything; otherwise the expressions must agree structurally.
+        if(ga.id() == ID_cpp_name && ga.get_sub().size() == 1)
+          continue;
+        if(fa != ga)
+          return false;
+      }
+    }
+
+    cpp_template_args_tct guessed =
+      template_map.build_template_args(G.template_type());
+
+    // [temp.deduct.partial]/12: only the parameters that occur in the
+    // compared patterns need a value.
+    std::set<irep_idt> used_names;
+    std::function<void(const irept &)> collect_names = [&](const irept &node)
+    {
+      if(node.id() == ID_cpp_name)
+      {
+        for(const auto &sub : node.get_sub())
+          if(sub.id() == ID_name)
+            used_names.insert(sub.get(ID_identifier));
+      }
+      for(const auto &sub : node.get_sub())
+        collect_names(sub);
+      for(const auto &named : node.get_named_sub())
+        collect_names(named.second);
+    };
+    for(const auto &ga : G_args)
+      collect_names(ga);
+
+    const auto &g_params_decl = G.template_type().template_parameters();
+    const auto &guessed_args = guessed.arguments();
+    for(std::size_t pi = 0; pi < g_params_decl.size(); ++pi)
+    {
+      if(pi >= guessed_args.size())
+        break;
+      const exprt &arg = guessed_args[pi];
+      if(arg.id() != ID_unassigned && arg.type().id() != ID_unassigned)
+        continue;
+      const irep_idt pid = g_params_decl[pi].id() == ID_type
+                             ? g_params_decl[pi].type().get(ID_identifier)
+                             : g_params_decl[pi].get(ID_identifier);
+      std::string short_name = id2string(pid);
+      const auto sep = short_name.rfind("::");
+      if(sep != std::string::npos)
+        short_name = short_name.substr(sep + 2);
+      if(used_names.count(irep_idt{short_name}) != 0)
+        return false;
+    }
+    return true;
+  }
+  catch(...)
+  {
+    return false;
+  }
+}
+
 /// Phase 4B core helper: deduction + partial ordering + instantiation
 /// for template conversion operators.  See header for the contract.
 const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
