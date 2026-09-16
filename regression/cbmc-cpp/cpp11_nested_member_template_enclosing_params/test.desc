@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.dep.type]/1 + [temp.mem]: members of a member class
+template of a class template may use the ENCLOSING template's
+parameters (`N`, or `T` as an expression).  Only the innermost
+instance's parameters were bound while converting a deferred member
+body, so `k + N` hit an unbound template parameter and the body was
+dropped ("could not fully type-check").  Covers constructor with
+mem-initializer, const member with renamed parameters, and a static
+member, all defined out of line with two-level headers.
