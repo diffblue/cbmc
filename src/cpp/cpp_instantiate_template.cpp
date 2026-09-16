@@ -3158,7 +3158,26 @@ bool cpp_typecheckt::function_template_signatures_equivalent(
         if(pdecl.id() != ID_cpp_declaration)
           continue;
         for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
+        {
           d.name() = cpp_namet{};
+          // N5008 [dcl.fct]/3 + [temp.variadic]/4: a function parameter
+          // pack is a parameter pack whether or not the declarator names
+          // it.  The parser records the `...` of an UNNAMED pack
+          // (`make_shared(_Args&&...)`, libstdc++'s in-class friend
+          // declaration) on the DECLARATOR, but that of a named one
+          // (`make_shared(_Args&&... __args)`, the definition) on the
+          // declarator's TYPE.  Same signature, two spellings: unify
+          // onto the type so the friend declaration redirects to its
+          // definition -- otherwise the tie between the two
+          // "different" templates broke by candidate ORDER, and when
+          // the bodiless friend won the whole regex compiler was a
+          // havoc stub (vacuous cpp11_regex_* verdicts).
+          if(d.get_bool(ID_ellipsis))
+          {
+            d.remove(ID_ellipsis);
+            d.type().set(ID_ellipsis, true);
+          }
+        }
       }
       std::function<void(irept &)> walk = [&](irept &n)
       {
