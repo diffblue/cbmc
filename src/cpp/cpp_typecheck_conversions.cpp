@@ -3026,6 +3026,22 @@ bool cpp_typecheckt::reference_binding(
     to_dereference_expr(expr).pointer().id() != ID_member)
     return false;
 
+  // N5008 [over.ics.rank]/3.2.3: of two reference bindings of an RVALUE
+  // (here an xvalue: the implicit dereference of an unnamed rvalue
+  // reference, e.g. the result of std::move), the one binding an rvalue
+  // reference is better than the one binding an lvalue reference.  The
+  // const& and && converting constructors of libstdc++'s __shared_ptr
+  // (`shared_ptr(shared_ptr<_Yp>&& __r) : __shared_ptr<_Tp>(std::move(
+  // __r))`) both bound the xvalue with identical rank, and which one
+  // was selected came down to candidate order.  Record the preference
+  // in the lowest-order key, as for the cv tie-break of /3.2.6.
+  const bool binds_xvalue_to_lvalue_reference =
+    !is_rvalue_reference(reference_type) && expr.id() == ID_dereference &&
+    expr.get_bool(ID_C_implicit) &&
+    is_rvalue_reference(to_dereference_expr(expr).pointer().type()) &&
+    to_dereference_expr(expr).pointer().id() != ID_symbol &&
+    to_dereference_expr(expr).pointer().id() != ID_member;
+
   if(
     expr.get_bool(ID_C_lvalue) ||
     reference_type.base_type().get_bool(ID_C_constant) ||
@@ -3033,6 +3049,8 @@ bool cpp_typecheckt::reference_binding(
   {
     if(reference_compatible(expr, reference_type, rank, cv_distance))
     {
+      if(binds_xvalue_to_lvalue_reference && cv_distance != nullptr)
+        ++*cv_distance;
       if(!expr.get_bool(ID_C_lvalue))
       {
         // create temporary object

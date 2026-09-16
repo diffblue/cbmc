@@ -1044,6 +1044,14 @@ public:
     const cpp_declarationt &G,
     const irep_idt &G_scope_id);
 
+  /// The symbol of the already-materialised specialization of function
+  /// template \p template_symbol for \p template_args, or the empty
+  /// identifier when it has not been instantiated yet.  Mirrors the
+  /// "instance already" lookup in instantiate_template.
+  irep_idt existing_function_template_instance(
+    const symbolt &template_symbol,
+    const cpp_template_args_tct &template_args);
+
   bool reference_related(const exprt &expr, const reference_typet &type) const;
 
   bool reference_compatible(

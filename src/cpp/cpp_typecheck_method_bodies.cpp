@@ -1548,7 +1548,7 @@ void cpp_typecheckt::typecheck_method_bodies()
       gather_referenced(ns.second, referenced);
   };
 
-  while(!deferred_method_bodies.empty())
+  while(!deferred_method_bodies.empty() || !deferred_typechecking.empty())
   {
     std::set<irep_idt> referenced;
     for(const auto &s : symbol_table.symbols)
@@ -1618,9 +1618,37 @@ void cpp_typecheckt::typecheck_method_bodies()
         to_emit.push_back(d.first);
     }
 
+    // The same reachability rule for members still parked in
+    // deferred_typechecking (declared in a template scope, body never
+    // type-checked): a converted body that names one odr-uses it
+    // ([temp.inst]/4).  Overload resolution reaches such a member as an
+    // already-instantiated SYMBOL candidate -- unlike the template
+    // candidate path, which instantiates and queues -- so a member
+    // selected that way could stay bodiless and become a havoc stub.
+    // libstdc++'s `shared_ptr<const _NFA>(shared_ptr<_NFA>&&)`,
+    // odr-used by _Compiler::_M_get_nfa's `return std::move(_M_nfa)`,
+    // had a body in one candidate order and none in the other.
+    std::vector<symbolt *> to_queue;
+    for(const irep_idt &id : deferred_typechecking)
+    {
+      if(
+        referenced.count(id) == 0 &&
+        odr_used_by_member_initializer.count(id) == 0)
+        continue;
+      symbolt *sym = symbol_table.get_writeable(id);
+      if(
+        sym == nullptr || sym->value.is_nil() ||
+        sym->value.id() == ID_cpp_not_typechecked ||
+        methods_seen.count(id) != 0)
+        continue;
+      to_queue.push_back(sym);
+    }
+    for(symbolt *sym : to_queue)
+      add_method_body(sym);
+
     // Remaining deferred members are referenced by no converted body:
     // do not instantiate them ([temp.inst]/11).
-    if(to_emit.empty())
+    if(to_emit.empty() && method_bodies.empty())
       break;
 
     for(const auto &id : to_emit)
