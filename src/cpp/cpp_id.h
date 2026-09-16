@@ -24,6 +24,17 @@ class cpp_idt
 public:
   cpp_idt();
 
+  /// Deterministic creation ordinal.  Scope lookups collect candidate
+  /// sets of `cpp_idt *`; ordering those by POINTER made candidate
+  /// iteration -- and thus overload resolution and template
+  /// instantiation order -- depend on heap layout (observably varying
+  /// with argv/environment size, flipping cbmc-cpp regex tests between
+  /// 25s and timeout).  Order by construction instead.
+  std::size_t ordinal = next_ordinal();
+
+  /// Next value of \ref ordinal (a process-wide counter).
+  static std::size_t next_ordinal();
+
   enum class id_classt
   {
     UNKNOWN,

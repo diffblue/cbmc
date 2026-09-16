@@ -148,6 +148,10 @@ protected:
   /// recovered from the candidate template's ID_method_qualifier (the deduced
   /// function type of an uninstantiated template_function_instance carries no
   /// `this` parameter, so disambiguate_functions cannot rank it).
+  bool member_template_object_viable(
+    const exprt &cand,
+    const cpp_typecheck_fargst &fargs);
+
   unsigned member_template_const_penalty(
     const exprt &cand,
     const cpp_typecheck_fargst &fargs);
