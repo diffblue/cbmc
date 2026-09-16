@@ -2432,6 +2432,48 @@ void cpp_typecheck_resolvet::filter(
 /// declarator (`ID_method_qualifier`) and return the cv penalty that the
 /// instantiated overload would have received: 1 for a const member function
 /// called on a non-const object, 0 otherwise.
+/// N5008 [over.match.funcs]/5: a non-static member function's implicit
+/// object parameter is a reference to `cv X`, where cv is the function's
+/// cv-qualification; a const object argument therefore cannot bind to a
+/// NON-const member -- that candidate is not viable ([over.match.viable]).
+/// A member-template candidate is still a `template_function_instance`
+/// here (its code type carries no `this` parameter), so the real
+/// implicit-object check on the instantiated symbol never sees it; the
+/// const/non-const pair then TIED on distance and the tie broke by
+/// candidate ORDER.  Under the heap-address ordering of scope lookups
+/// that was silently layout-dependent: `__source._M_access<_Functor*>()`
+/// on a `const _Any_data&` (libstdc++ std::function's _M_get_pointer)
+/// instantiated the non-const overload, which then failed the real
+/// `this` check, leaving std::function invocation bodiless.
+/// \return false when the object argument is const and the candidate is a
+///   non-const member template.
+bool cpp_typecheck_resolvet::member_template_object_viable(
+  const exprt &cand,
+  const cpp_typecheck_fargst &fargs)
+{
+  if(cand.id() != ID_template_function_instance)
+    return true;
+  if(!fargs.has_object || fargs.operands.empty())
+    return true;
+  if(!fargs.operands.front().type().get_bool(ID_C_constant))
+    return true;
+  const irep_idt tmpl = cand.type().get(ID_C_template);
+  if(tmpl.empty())
+    return true;
+  const symbolt *tsym = cpp_typecheck.symbol_table.lookup(tmpl);
+  if(tsym == nullptr || tsym->type.id() != ID_cpp_declaration)
+    return true;
+  const cpp_declarationt &decl = to_cpp_declaration(tsym->type);
+  if(decl.declarators().empty())
+    return true;
+  // static member templates have no implicit object parameter
+  if(decl.storage_spec().is_static())
+    return true;
+  const typet &mq = static_cast<const typet &>(
+    decl.declarators().front().find(ID_method_qualifier));
+  return cpp_typecheck.has_const(mq);
+}
+
 unsigned cpp_typecheck_resolvet::member_template_const_penalty(
   const exprt &cand,
   const cpp_typecheck_fargst &fargs)
@@ -2529,6 +2571,9 @@ void cpp_typecheck_resolvet::disambiguate_functions(
   {
     unsigned args_distance;
     unsigned cv_distance = 0;
+
+    if(!member_template_object_viable(old_id, fargs))
+      continue;
 
     if(disambiguate_functions(old_id, args_distance, fargs, &cv_distance))
     {

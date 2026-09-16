@@ -27,7 +27,17 @@ public:
     is_scope=true;
   }
 
-  typedef std::set<cpp_idt *> id_sett;
+  struct id_ordinal_lesst
+  {
+    bool operator()(const cpp_idt *a, const cpp_idt *b) const
+    {
+      return a->ordinal < b->ordinal;
+    }
+  };
+
+  // Ordered by cpp_idt::ordinal, NOT by pointer: candidate iteration
+  // order must be deterministic (see cpp_idt::ordinal).
+  typedef std::set<cpp_idt *, id_ordinal_lesst> id_sett;
 
   enum lookup_kindt { SCOPE_ONLY, QUALIFIED, RECURSIVE };
 

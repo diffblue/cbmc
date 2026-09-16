@@ -27,7 +27,8 @@ public:
   }
 
   typedef std::set<cpp_scopet *> scope_sett;
-  typedef std::set<cpp_idt *> id_sett;
+  // Deterministically ordered (see cpp_scopet::id_sett).
+  typedef cpp_scopet::id_sett id_sett;
 
   cpp_scopet &current_scope()
   {
