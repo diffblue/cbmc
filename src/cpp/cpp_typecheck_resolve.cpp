@@ -44,6 +44,7 @@ extern exprt try_evaluate_constexpr(
 #include "cpp_util.h"
 
 #include <algorithm>
+#include <limits>
 #include <set>
 #include <string>
 
@@ -4636,6 +4637,13 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
     full_template_args_tc,
     full_template_args_tc,
     primary_template_symbol.name));
+  // N5008 [temp.spec.partial.match]/1: the primary template is used
+  // only when NO partial specialisation matches; it never competes on
+  // the specialisation-argument count below.  `cost` is that count, so a
+  // primary with fewer template parameters than a matching
+  // specialisation (`un<T>` vs `un<pack<A, B>>`, two parameters) used to
+  // win outright.
+  matches.back().cost = std::numeric_limits<std::size_t>::max();
 
   for(const auto &id_ptr : id_set)
   {
@@ -5164,6 +5172,62 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
   CHECK_RETURN(!matches.empty());
 
   std::sort(matches.begin(), matches.end());
+
+  // N5008 [temp.spec.partial.order]/1: when more than one partial
+  // specialisation matches, the one selected is the one that is MORE
+  // SPECIALISED than the others -- each viewed as a function template
+  // over its argument pattern and ordered by deduction
+  // ([temp.func.order]).  The keys sorted on above (argument count,
+  // constrained-argument count, repeated parameters) are heuristics that
+  // get real library shapes wrong in both directions: `traits<_Tp*>` and
+  // `traits<const _Tp*>` (libstdc++ iterator_traits) tie for
+  // `const char*` and std::sort -- unstable -- left the winner to
+  // candidate ORDER (`_Tp = const char` made regex's _Executor operate on
+  // basic_regex<const char, ...> and match no constructor); and chrono's
+  // `common_type<duration<R1,P1>, duration<R2,P2>>` (four parameters)
+  // sorted BEHIND the generic `common_type<_Tp1, _Tp2>`.  Decide by
+  // deduction first; the sorted keys, then the symbol identifier, break
+  // only genuinely unordered pairs -- deterministically.  The primary
+  // (baseline, infinite cost) is used only when nothing else matched
+  // ([temp.spec.partial.match]/1).
+  if(matches.size() > 1)
+  {
+    const auto decl_of = [&](const matcht &m) -> const cpp_declarationt &
+    { return to_cpp_declaration(cpp_typecheck.lookup(m.id).type); };
+    const auto is_primary = [&](const matcht &m)
+    { return m.id == primary_template_symbol.name; };
+    std::size_t best = 0;
+    for(std::size_t i = 1; i < matches.size(); ++i)
+    {
+      if(is_primary(matches[i]))
+        continue;
+      if(is_primary(matches[best]))
+      {
+        best = i;
+        continue;
+      }
+      const bool i_at_least =
+        cpp_typecheck.partial_specialization_at_least_as_specialised(
+          decl_of(matches[i]), decl_of(matches[best]), matches[best].id);
+      const bool best_at_least =
+        cpp_typecheck.partial_specialization_at_least_as_specialised(
+          decl_of(matches[best]), decl_of(matches[i]), matches[i].id);
+      if(i_at_least && !best_at_least)
+        best = i;
+      else if(i_at_least == best_at_least)
+      {
+        // unordered by deduction: sorted keys, then identifier
+        if(matches[i] < matches[best])
+          best = i;
+        else if(
+          !(matches[best] < matches[i]) &&
+          id2string(matches[i].id) < id2string(matches[best].id))
+          best = i;
+      }
+    }
+    if(best != 0)
+      std::swap(matches[0], matches[best]);
+  }
 
 #if 0
   for(std::vector<matcht>::const_iterator
