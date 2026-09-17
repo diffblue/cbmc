@@ -10039,9 +10039,14 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // unresolvable (the residual std::_Tuple_impl terminal recursion).
           if(pi + 1 < params.size())
           {
-            args.erase(args.begin() + i);
-            ++empty_pack_shift;
-            --i; // ++i re-examines the now-shifted trailing parameter's slot
+            // Keep the pack's slot as an explicit EMPTY type argument
+            // (the convention instantiate_template drops for an empty
+            // pack) rather than erasing it: erased, the trailing
+            // parameters' arguments slid into the pack's position, and
+            // the instance was built with e.g. `_Result`'s value as the
+            // sole element of `_Args` -- `_Bind::operator()<int>(int&&)`
+            // for a zero-argument call (libstdc++ std::bind).
+            args[i] = exprt(ID_type, empty_typet());
             continue;
           }
 
