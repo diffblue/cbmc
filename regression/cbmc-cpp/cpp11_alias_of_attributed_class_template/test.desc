@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+unexpected expression
+--
+User-reported as "invalid application of 'sizeof' to an incomplete
+type" on `using lreg_t = G<uint16_t> __attribute__((aligned(16)));` --
+a consequence of the class template G being lost to its trailing
+attributes (cpp11_class_template_trailing_attributes); the attribute
+on the alias itself is ignored by g++ and clang++ alike.
