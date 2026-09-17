@@ -550,6 +550,9 @@ protected:
 
   void static_and_dynamic_initialization();
   void do_not_typechecked();
+  /// Clear the placeholders of implicitly-defined special members that
+  /// were never odr-used (called once, after every body is elaborated).
+  void clear_not_typechecked();
   void clean_up();
   void provide_stdlib_bodies();
 
