@@ -39,13 +39,33 @@ template_mapt::function_parameter_pack(const typet &param_type) const
   if(sub.size() != 1 || sub.front().id() != ID_name)
     return nullptr;
   const std::string base = id2string(sub.front().get(ID_identifier));
-  for(const auto &entry : pack_args_map)
+  const auto short_name = [](const irep_idt &full) -> std::string
   {
-    const std::string key = id2string(entry.first);
+    const std::string key = id2string(full);
     const auto p = key.rfind("::");
-    if((p != std::string::npos ? key.substr(p + 2) : key) == base)
+    return p != std::string::npos ? key.substr(p + 2) : key;
+  };
+  // N5008 [temp.deduct]/5 + [basic.scope.temp]/2: while a template is
+  // being deduced (deduction_parameters non-empty) and one of ITS OWN
+  // packs has this short name, only that pack's binding may drive the
+  // expansion -- the flat map also holds same-named packs of enclosing
+  // or previous instantiations (`_ArgTypes` of `__invoke_result` next
+  // to `_ArgTypes` of the `result_of<_Functor(_ArgTypes...)>` partial
+  // specialization being matched), and taking the first suffix match
+  // expanded the pattern with the WRONG pack's elements (mirrors the
+  // gate in apply()'s cpp_name branch).
+  bool base_is_deduction_parameter = false;
+  for(const auto &dp : deduction_parameters)
+    if(short_name(dp) == base)
+      base_is_deduction_parameter = true;
+  const auto admissible = [&](const irep_idt &full) -> bool
+  {
+    return short_name(full) == base && (!base_is_deduction_parameter ||
+                                        deduction_parameters.count(full) != 0);
+  };
+  for(const auto &entry : pack_args_map)
+    if(admissible(entry.first))
       return &entry.second;
-  }
   // A pack deduced to zero elements has no pack_args_map entry, only a
   // pack_size_map entry of value 0; expand it to an empty parameter list.
   static const std::vector<typet> empty_pack;
@@ -53,9 +73,7 @@ template_mapt::function_parameter_pack(const typet &param_type) const
   {
     if(entry.second != 0)
       continue;
-    const std::string key = id2string(entry.first);
-    const auto p = key.rfind("::");
-    if((p != std::string::npos ? key.substr(p + 2) : key) == base)
+    if(admissible(entry.first))
       return &empty_pack;
   }
   return nullptr;
