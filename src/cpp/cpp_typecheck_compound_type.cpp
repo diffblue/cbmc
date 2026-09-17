@@ -1082,7 +1082,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
         }
       }
 
-      final_type.add(irep_idt{"#expanded_param_packs"}).swap(expanded_record);
+      // merge with a record left by template_mapt::expand_parameter_packs
+      // (an enclosing class pack expanded before this declarator was seen)
+      irept &record = final_type.add(irep_idt{"#expanded_param_packs"});
+      for(const auto &e : expanded_record.get_sub())
+        record.get_sub().push_back(e);
     }
   }
 
@@ -1101,8 +1105,11 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // expand_parameter_packs is a no-op unless the pointee is a function type
     // with a parameter naming a pack recorded in pack_args_map (the class
     // pack); method members are handled by the dedicated block above.
+    // A member TYPEDEF of such a function pointer type (libstdc++'s
+    // `_Res (*_Invoker_type)(const _Any_data&, _ArgTypes&&...)` spelled
+    // with `typedef` rather than `using`) needs the same expansion: left
+    // collapsed, the invoker call in `operator()` had the wrong arity.
     if(
-      !is_typedef &&
       (final_type.id() == ID_pointer ||
        final_type.id() == ID_frontend_pointer) &&
       (!template_map.pack_args_map.empty() ||
