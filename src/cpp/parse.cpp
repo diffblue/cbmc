@@ -8578,13 +8578,27 @@ bool Parser::rTypeName(typet &tname)
   if(!rDeclarator(declarator, kCastDeclarator, false, false))
     return false;
 
+  tname.swap(declarator.type());
+
+  // N5008 [dcl.fct]/6-7: a cv-qualifier-seq (and ref-qualifier) after the
+  // parameter list of a function declarator is part of the FUNCTION type
+  // (it qualifies the implicit object parameter, `int (S::*)(int) const`).
+  // rDeclarator reports it separately as the declarator's method qualifier;
+  // a type-id has no declarator to keep it on, so attach it to the innermost
+  // function type it belongs to.  It was previously merged into the type as
+  // if it were a cv-qualifier of the declared type, which turned
+  // `int (S::*)(int) const` into a pointer-to-member of `const int` with the
+  // return type lost (the alias-declaration spelling; the typedef spelling
+  // keeps its declarator and never saw this).
   if(!declarator.method_qualifier().id().empty())
   {
-    tname.swap(declarator.method_qualifier());
-    merge_types(declarator.type(), tname);
+    irept *t = &static_cast<irept &>(tname);
+    while(t->id() != ID_function_type && t->id() != ID_code &&
+          !t->get_sub().empty())
+      t = &t->get_sub().front();
+    if(t->id() == ID_function_type || t->id() == ID_code)
+      t->add(ID_method_qualifier) = declarator.method_qualifier();
   }
-  else
-    tname.swap(declarator.type());
 
   // Preserve pack expansion ellipsis from the declarator.
   // rDeclarator sets ellipsis on d_outer (which may be nil);
