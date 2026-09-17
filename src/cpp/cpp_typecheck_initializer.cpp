@@ -85,7 +85,9 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
 
   // The std::initializer_list<U> layout is modelled as a {begin pointer,
   // size} pair; extract the element type U from the pointer member.
-  typet elem_type;
+  // a default-constructed typet is NOT nil (empty id); the is_nil()
+  // test below needs an explicit nil
+  typet elem_type(ID_nil);
   const struct_typet::componentt *ptr_comp = nullptr;
   const struct_typet::componentt *size_comp = nullptr;
   for(const auto &m : il_struct.components())
