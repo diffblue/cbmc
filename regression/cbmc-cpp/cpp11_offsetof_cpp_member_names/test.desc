@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+unexpected expression
+--
+User-reported: `offsetof(CMD, in_dtype)` on an alias of a typedef'd
+anonymous packed struct -- "offset-of of member failed to find
+component".  In fact offsetof failed for EVERY C++ class: the C++ front
+end qualifies component names (`S::d`) and keeps the spelling as the
+base name, while the shared offsetof implementation looked the
+designator up by component name.  N5008 [support.types.layout]/1:
+offsetof(type, member-designator) has the same semantics as in C.
