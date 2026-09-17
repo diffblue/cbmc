@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.variadic]/5: a pack expansion whose pattern is a function
+type naming the pack inside a parameter position, F(decay<Bs>::type...),
+must be expanded per element (previously only a bare Bs... was), and the
+expanded function type must be type-checked so the partial specialization
+B<F(A...)> matches ([temp.arg.type]/1).  The shape of libstdc++'s
+_Bind_helper / std::bind result type.
