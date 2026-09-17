@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+std::is_invocable / invoke_result over a _Bind object evaluated BEFORE any
+direct call of it.  The result_of partial specialization used to pick up a
+stale same-named _ArgTypes pack ([temp.deduct]/5 -- only the template being
+deduced binds its own parameter) and the primary result_of (no ::type) was
+cached as the instance, so the traits were false even though a direct call
+worked; order-dependent, hence the trait-first layout.

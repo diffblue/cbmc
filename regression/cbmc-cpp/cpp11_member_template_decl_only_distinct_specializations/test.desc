@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.spec]/4: each specialization of a member function template is
+a distinct entity, whether or not it is defined.  Declaration-only member
+templates (libstdc++'s SFINAE probes _S_test<F, A...>, used only inside
+decltype) with the same parameter signature collapsed onto one unsuffixed
+symbol, so every later specialization reported the FIRST one's return
+type.  Three shapes: pack + decltype, decltype only, pack only.
