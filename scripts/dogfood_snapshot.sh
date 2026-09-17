@@ -51,13 +51,13 @@ MEM_KIB="${MEM_KIB:-12000000}"
 
 if [ "${1:-}" = "--compare" ]; then
   old="$2"; new="$3"
-  join -j1 \
-    <(grep -E "^(OK|OK_NOISY|FAIL|CRASH) " "$old" | awk '{print $2, $1}' | sort) \
-    <(grep -E "^(OK|OK_NOISY|FAIL|CRASH) " "$new" | awk '{print $2, $1}' | sort) \
+  # FAIL/CRASH lines carry a trailing ':' after the file name; strip it so
+  # a status change (FAIL -> OK_NOISY) joins on the same key.
+  status_of() { grep -E "^(OK|OK_NOISY|FAIL|CRASH) " "$1" | awk '{sub(/:$/, "", $2); print $2, $1}' | sort; }
+  join -j1 <(status_of "$old") <(status_of "$new") \
     | awk '$2!=$3{printf "%-50s %-9s -> %s\n", $1, $2, $3}'
   echo "--- only in $new:"
-  comm -13 <(grep -E "^(OK|OK_NOISY|FAIL|CRASH) " "$old" | awk '{print $2}' | sort) \
-           <(grep -E "^(OK|OK_NOISY|FAIL|CRASH) " "$new" | awk '{print $2}' | sort)
+  comm -13 <(status_of "$old" | awk '{print $1}') <(status_of "$new" | awk '{print $1}')
   exit 0
 fi
 
