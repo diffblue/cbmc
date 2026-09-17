@@ -18,6 +18,8 @@
 #                 file named by DOGFOOD_FILES (paths relative to the repo;
 #                 takes precedence over DOGFOOD_DIRS) -- used to re-run
 #                 exactly the set of an earlier sweep for a comparison.
+#                 With DOGFOOD_OUTDIR set, each file's full goto-cc output
+#                 is written to $DOGFOOD_OUTDIR/<path with / -> _>.txt.
 #   default behaviour is like --expand but limited to the N smallest
 #   files (N=DOGFOOD_SAMPLE_N, default 30).
 #
@@ -117,6 +119,13 @@ for cpp in "${files[@]}"; do
           -o /tmp/dogfood_out.gb 2>&1)
   exit_code=$?
   has_gb=$([ -f /tmp/dogfood_out.gb ] && echo yes || echo no)
+  # Keep the full goto-cc output per file when DOGFOOD_OUTDIR is set, so
+  # the error signatures behind OK_NOISY/FAIL can be harvested afterwards
+  # (the summary line only carries the count / first line).
+  if [ -n "${DOGFOOD_OUTDIR:-}" ]; then
+    mkdir -p "$DOGFOOD_OUTDIR"
+    printf '%s\n' "$out" > "$DOGFOOD_OUTDIR/$(echo "$cpp" | tr '/' '_').txt"
+  fi
   errors=$(echo "$out" | grep -cE "error:|CONVERSION ERROR|PARSING ERROR")
   if [ $exit_code -eq 139 ] || echo "$out" | grep -q "dumped core"; then
     echo "CRASH    $cpp"
