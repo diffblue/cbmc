@@ -752,6 +752,28 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         const struct_union_typet &struct_union_type =
           follow_tag(to_struct_or_union_tag_type(type));
 
+        // The designator names the member as written.  In C the
+        // component's name IS that spelling; the C++ front end qualifies
+        // component names with the class (`S::d`) and keeps the spelling
+        // as the base name, so `offsetof(S, d)` found no component 'd'
+        // for ANY C++ class (user-reported on a typedef'd packed struct;
+        // N5008 [support.types.layout]/1 -- offsetof(type, member-
+        // designator) is the same as in C).  Map the spelling to the
+        // component's name by base name when the direct lookup fails.
+        if(!struct_union_type.has_component(component_name))
+        {
+          for(const auto &c : struct_union_type.components())
+          {
+            if(
+              c.get_base_name() == component_name && !c.get_bool(ID_is_type) &&
+              !c.get_bool(ID_is_static) && c.type().id() != ID_code)
+            {
+              component_name = c.get_name();
+              break;
+            }
+          }
+        }
+
         // direct member?
         if(struct_union_type.has_component(component_name))
         {
