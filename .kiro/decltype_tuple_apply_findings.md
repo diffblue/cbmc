@@ -9457,3 +9457,75 @@ dirs in regression/cbmc-cpp overall (`grep -l ^KNOWNBUG */test.desc`).
   `git add` also drops the STAGED fix (lost fix A once — keep a copy).
 Tracked census: 4 + cpp11_type_identity_cv_in_parameter_types = 5; 12 KNOWNBUG
 dirs overall.
+
+## Round 142 (2026-09-17/18) — dog-food signatures
+
+Process: suites now run against a SNAPSHOT of the binaries (/tmp/r142/binN)
+so rebuilding build-work cannot taint them; probes stripped before every
+snapshot.  `pkill -f` banned (kill by PID).
+- `bdf68aea55` non-member `operator@=` candidates ([over.match.oper]/3.2):
+  ALL ten free compound assignments were "no match" (guard_exprt friend ops,
+  symex_atomic_section.cpp). `=` keeps member-only ([over.ass]/1).
+- `33841b6bb3` do_not_typechecked() re-run after the half-converted-instance
+  fixpoint; never-used placeholders cleared once at the very end
+  (clear_not_typechecked).  Late odr-use of `less<int>::less(const less&)`
+  from `_Rb_tree_key_compare(const _Key_compare&)` was bodiless (havoc).
+- `ceb8555b2b` renaming_level.cpp `'identifier' unknown`: `renamedt<ssa_exprt,
+  L0>` named (by-value return type of a declaration) while ssa_exprt was
+  incomplete → base dropped → re-elaborated later NESTED inside
+  `renamedt<exprt,L2>`'s instantiation (its friend decl names the other
+  specialization) with EMPTY specialization args → build() skipped →
+  `underlyingt` = exprt from the enclosing map → get() returned `const exprt&`.
+  Primary template: build the map from full args when spec args are empty.
+  Kernel needs the exact ORDER: decl while incomplete → completion → other
+  specialization used (fd6.cpp). Real TU now compiles (rl.gb).
+- `9dbf1efd8d` has_unassigned() recursive: `is_constructible<T, ?&>` from
+  std::pair's DEPRECATED `pair(__zero_as_null_pointer_constant, _U2&&, ...)`
+  constraint with `_U2` undeduced instantiated T's forwarding ctor with `?`
+  → "no match for 'set'" ×6 in every goto-symex TU + bodiless members.
+  Verified on /tmp/r142/setn.cpp (lexical_loops TU: 2 errors → 0); NO
+  self-contained kernel found (un1..un5 all clean) — the trigger needs the
+  full lexical_loops/deque chain. Committed on real-TU evidence.
+- `6a5f1ff9c7` std::function<R()> (EMPTY pack) call operator bodiless:
+  expand_parameter_packs removed the parameter at substitution time but never
+  wrote #expanded_param_packs, so the drain left `forward<A>(args)...` →
+  'args' unknown (silently dropped body). Record 0 / ≥2 (1 keeps the name).
+  Plus: member TYPEDEF of a fn-pointer whose pointee expands the class pack
+  wasn't expanded (data members were) — `using` alias took the other path,
+  which is why libstdc++'s std::function<int(int,int)> worked.
+- `f79ced4347` [dcl.init.list]/3.4: memberwise "fast path" for braced init
+  of a class WITH user-declared ctors bypassed constructors → nested
+  `{"a",{"first",1}}` into pair<const string, pair<const string,int>> LOST
+  the inner string (wrong result, no diagnostic). Now constructor path.
+- `4e6a451594` `T(const T&) = default;` body generated ONLY when all members
+  trivially copyable; otherwise EMPTY → members default-initialised.
+  `std::pair<const std::string,int>` COPY lost the string; pair<int,function>
+  copy gave an empty function. Soundness bug, silent. Now always memberwise
+  (virtual bases still excluded).
+  Tests `42d9b321d3`, `50282e0764`, `60409dc8d8` (7 dirs), all g++/clang++
+  verified, all fail on the pre-fix snapshot.
+Sweep (74 subset) relaunched at 60409dc8d8 — harvest next round.
+
+OPEN, with kernels in /tmp/r142:
+- Temporaries for braced-list ARGUMENTS die before use ([class.temporary]/6):
+  sp5.cpp `pair<int,pair<int,function>> s{1,{2,one}}` → inner temp's
+  function copied from a dead/NULL source (`__x->_M_manager` invalid);
+  xm2.cpp `takes_map({{"name", id}})` → `_S_copy_chars` dead pointers;
+  xm1.cpp `xmlt("loop", {{"name",id}}, {})` → "no match for 'xmlt'"
+  (3-param ctor with map&&/list&& from braces). This is the loop_ids /
+  show_properties / path_storage residue.
+- zip ambiguity (symex_assign): zip2/zip3.cpp — inside a member template
+  body, `zip<b>(ranget<...>{...})` sees the `containert&` overload as viable
+  with a by-value-looking param (`struct ranget (struct ranget)`); from main
+  the same call resolves. Not [over.ics.ref] in general — context-specific.
+- map::emplace with exactly 2 args (em1.cpp): libstdc++13's
+  `auto&& [__a, __v] = __args...;` (structured binding of a PACK, GCC
+  extension) → `get<0>` NULL deref. Pre-existing, affects every 2-arg emplace.
+- Aggregate holding std::function copied (fc3 A): deallocated object in
+  _M_create. Pre-existing.
+- goto_symex_state.cpp: `template<> ... rename<L1>` explicit member
+  specialization ("bad template-function-specialization name"),
+  `pair<const string, list>` instantiation error; solver_hardness.h:177
+  incomplete type; sharing_map.h "instantiating sharing_mapt" noise (now
+  visible in renaming_level.cpp).
+Census unchanged (12 KNOWNBUG dirs).
