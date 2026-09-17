@@ -9396,3 +9396,64 @@ Suites ×5 green; revert-tests 5/5 fail on pre-round. Census unchanged (5).
 Tracked census: 4 (cpp11_deduced_nontype_kind_mismatch, cpp20_ranges_basic_libcxx,
 libcxx23_string_fill_ctor, cpp17_invoke_result_cache_poisoning); 11 KNOWNBUG
 dirs in regression/cbmc-cpp overall (`grep -l ^KNOWNBUG */test.desc`).
+
+## Round 141 (2026-09-17) — _Bind -> std::function, alias pmf, subset sweep
+
+- Sweep infra: `54a20bcc98` `--files LIST` / `DOGFOOD_FILES` (re-run exactly an
+  earlier sweep's file set); `9fbae627c1` --compare joins FAIL lines (trailing
+  ':'); `d083269182` `DOGFOOD_OUTDIR` keeps each file's full goto-cc output in
+  <snap>/out/ (the summary only had counts — signatures were unharvestable).
+  74-file r138 subset @54a20bcc98 (pre-bind-fixes): 51 OK / 23 NOISY / 0 FAIL;
+  vs r138: auto_objects, complexity_limiter, field_sensitivity FAIL -> OK_NOISY,
+  no regressions.  NOTE the default DOGFOOD_DIRS set is 239 TUs (not 1074).
+- `_Bind` -> `std::function` (goto-symex shadow_memoryt carrier /tmp/k138/bind1
+  VERIFIES).  Five layers, in the order found:
+  1. `7a71333e6d` function_parameter_pack picked the FIRST suffix match in
+     pack_args_map: `__invoke_result`'s `_ArgTypes`={int} while matching
+     `result_of<_Functor(_ArgTypes...)>` → one-param pattern → primary
+     result_of cached (incomplete placeholder) → `is_invocable<_Bind&,int>`
+     false, but ONLY if evaluated before a direct call (order-dependent).
+     Gate on deduction_parameters ([temp.deduct]/5) like apply() does.
+  2. `0a62c8dcb3` typecheck_type(ID_code) with cpp_declaration params:
+     declarator `&&` over a substituted reference type → collapse in place
+     ([dcl.ref]/7 — N5008 numbering; /6 in older drafts), keep the node shape
+     (converting to `parameter` nodes REGRESSED the whole suite: the spec
+     matcher compares the parsed shape).
+  3. `02696e61d5` GFTA records the deduced pack's ELEMENTS (not only the size)
+     before applying defaults, so `_Result = _Res_type<tuple<_Args...>>`
+     expands correctly for 2+ placeholders. Gated on a default NAMING the pack:
+     unconditional recording regressed cpp17_tuple_get_two_pack_ctor_3elem
+     (two same-spelled `_UElements` in the flat map while
+     `enable_if_t<ic<_UElements...>()>` in a parameter TYPE is evaluated).
+  4. `f594d9d0ad` typeid key via cpp_type2name: ansi-c type2name threw on a
+     class whose member templates have `unassigned` parameter types →
+     `_Function_handler::_M_manager` body dropped for std::_Bind functors.
+  5. `1629586ca0` declaration-only member template specializations with the
+     same signature collapsed onto ONE unsuffixed symbol
+     (typecheck_member_function suffixing was gated on `value.is_not_nil()`)
+     → every later `_S_test<F,A...>` probe returned the FIRST's type: a
+     void-returning bind made all later binds void (pair5/bs4/mt5 kernels).
+     [temp.spec]/4.  20-line header-free kernel: mt5.cpp.
+  Tests `8832b2337b` (7 dirs). Revert-tested against a real HEAD build in a
+  worktree (/tmp/r141/headtree) — 7/7 FAIL. Suites ×5 green.
+  Exploratory but UNNEEDED (saved /tmp/r141/exploratory_scoping.patch, not
+  committed): spec_bindings deduction for a single trailing pack absorbing 2+
+  args (observed: `_Functor` stale in the map for `__result_of_impl<..,F&,int&,
+  int&>` at class-apply time, harmless in the end); class-body/base apply scoped
+  to own params; has_param over pack maps. Latent — revisit if a pack-bleed
+  shows up in a class body.
+- `2b81f44d16` alias `using PMF = int (S::*)(int) const;`: rTypeName merged
+  the method qualifier into the decl-specifier type (2017 hack to make libc++'s
+  `_Rp (_Class::*)() const` vs `()` differ) → pointer to member of `const int`,
+  return type lost. Now attached to the function_type and applied to the
+  implicit object parameter (`const S* this`, [dcl.fct]/6-7).
+  FOUND OPEN: (a) pointer-to-DATA-member `s.*pmd` unsupported (declaration
+  dropped, `s.*pd` → `pd`; typedef/alias/raw all) — [expr.mptr.oper]/4;
+  (b) type identity ignores cv nested in parameter types (`void(*)(const int*)`
+  == `void(*)(int*)` for is_same) — KNOWNBUG cpp11_type_identity_cv_in_parameter_types.
+- PITFALLS: `pkill -f <pattern>` matched my own shell TWICE this round (kill by
+  PID only); running suites while rebuilding = phantom failures (do not touch
+  build-work until <suite>.done exists); `git checkout HEAD -- file` after
+  `git add` also drops the STAGED fix (lost fix A once — keep a copy).
+Tracked census: 4 + cpp11_type_identity_cv_in_parameter_types = 5; 12 KNOWNBUG
+dirs overall.
