@@ -67,6 +67,63 @@ void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
 {
   typet &type = declaration.type();
 
+  // N5008 [dcl.attr.grammar]/5 + [dcl.type.class.deduct]: GNU attributes
+  // written after the class body -- `template <class T> struct G { ... }
+  // __attribute__((packed, aligned(16)));` (user-reported) -- are merged
+  // around the class-specifier by the parser (a merged_type of attribute
+  // nodes and the struct), exactly as for a non-template class, where the
+  // type-converter later folds them.  A class TEMPLATE's declaration is
+  // stored as parsed, so the merged node had no tag ("class templates must
+  // not be anonymous") and every use of `G` failed.  Fold the recognised
+  // attributes onto the struct as the flags the layout code reads.
+  if(type.id() == ID_merged_type)
+  {
+    std::vector<typet> flat;
+    std::function<void(const typet &)> flatten = [&](const typet &t)
+    {
+      if(t.id() == ID_merged_type)
+      {
+        for(const auto &sub : to_type_with_subtypes(t).subtypes())
+          flatten(sub);
+      }
+      else
+        flat.push_back(t);
+    };
+    flatten(type);
+    typet unwrapped;
+    bool have_class = false, packed = false, all_known = true;
+    bool have_alignment = false;
+    irept alignment;
+    for(const auto &sub : flat)
+    {
+      if(sub.id() == ID_struct || sub.id() == ID_union)
+      {
+        if(have_class)
+          all_known = false; // two classes: not the shape we fold
+        have_class = true;
+        unwrapped = sub;
+      }
+      else if(sub.id() == ID_packed)
+        packed = true;
+      else if(sub.id() == ID_aligned)
+      {
+        have_alignment = true;
+        alignment = sub.find(ID_size);
+      }
+      else
+        all_known = false;
+    }
+    if(have_class && all_known)
+    {
+      unwrapped.add_source_location() = type.source_location();
+      if(packed)
+        unwrapped.set(ID_C_packed, true);
+      if(have_alignment)
+        unwrapped.set(ID_C_alignment, alignment);
+      type = unwrapped;
+    }
+  }
+
   const cpp_namet &cpp_name = static_cast<const cpp_namet &>(type.find(ID_tag));
 
   if(cpp_name.is_nil())

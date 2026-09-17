@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+unexpected expression
+--
+User-reported: `template <class T> struct G { ... } __attribute__((packed,
+aligned(16)));` -- "class templates must not be anonymous", then `G`
+unknown everywhere.  The parser merges trailing attributes around the
+class-specifier (merged_type of attribute nodes and the struct); for a
+class TEMPLATE the declaration is kept as parsed, so the merged node had
+no tag.  Fold the recognised attributes onto the struct as the layout
+flags (N5008 [dcl.attr.grammar]/5: the attributes appertain to the
+class).  Both instantiations must be 16 bytes (packed, then aligned).
