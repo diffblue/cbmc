@@ -797,9 +797,20 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
           }
         }
       }
-      if(
-        is_ref_to_self && class_symbol != nullptr && !has_virtual_base &&
-        (all_members_trivial || skeleton_needs_deleted_default))
+      // N5008 [dcl.fct.def.default]/5 + [class.copy.ctor]/14-15: an
+      // explicitly-defaulted copy/move constructor that is not deleted is
+      // defined exactly as the implicit one -- a memberwise copy/move of
+      // the bases and members -- whatever the members' types.  This used
+      // to be generated only when every member was trivially copyable
+      // (all_members_trivial, computed above and kept for the diagnostic
+      // record): for any other class the body stayed EMPTY, so the members
+      // were default-initialised instead of copied.  `std::pair<int,
+      // std::function<int()>>`'s defaulted copy constructor produced an
+      // empty std::function (the call operator reached
+      // __throw_bad_function_call), and every class holding such a member
+      // with `T(const T &) = default;` copied nothing.
+      (void)all_members_trivial;
+      if(is_ref_to_self && class_symbol != nullptr && !has_virtual_base)
       {
         // default_cpctor emits initializers that refer to the source
         // object by the parameter name "ref".  Make "ref" resolve to this
