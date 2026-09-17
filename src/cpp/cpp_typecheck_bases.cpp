@@ -150,15 +150,21 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       }
       if(has_param)
       {
-        for(auto &sub : name.get_sub())
-        {
-          if(sub.id() == ID_template_args)
-          {
-            irept::subt &args = sub.add(ID_arguments).get_sub();
-            for(auto &arg : args)
-              template_map.apply(static_cast<exprt &>(arg));
-          }
-        }
+        // N5008 [temp.variadic]/5: substitute the WHOLE template-id, not
+        // each argument on its own.  A pack expansion `A...` is a single
+        // argument node that must become one argument per pack element;
+        // applying the map per argument could only replace it by the
+        // pack's scalar (first) element, so `RO<F(A...)> : impl<F, A...>`
+        // (libstdc++'s `result_of<_Functor(_ArgTypes...)> :
+        // __invoke_result<_Functor, _ArgTypes...>`) derived from
+        // impl<F, A0> whenever the pack was deduced from a function-type
+        // pattern with two or more parameters -- result_of<F&(int&, int&)>
+        // then had no `type` and every std::bind result type failed.
+        typet name_type;
+        static_cast<irept &>(name_type) = static_cast<const irept &>(name);
+        template_map.apply(name_type);
+        if(name_type.id() == ID_cpp_name)
+          static_cast<irept &>(name) = static_cast<const irept &>(name_type);
       }
     }
 
