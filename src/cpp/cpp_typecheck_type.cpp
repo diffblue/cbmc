@@ -256,12 +256,28 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
         if(parameters.empty() || !parameters.front().get_this())
         {
-          // Add 'this' to the parameters
-          code_typet::parametert a0(pointer_type(class_object));
+          // Add 'this' to the parameters.  N5008 [dcl.fct]/6-7 +
+          // [over.match.funcs]/4: the function type's cv-qualifier-seq
+          // qualifies the implicit object parameter, so `int (S::*)(int)
+          // const` and `int (S::*)(int)` are distinct types (the
+          // libc++ __member_pointer_traits_imp partial specializations on
+          // both) and `&S::f` for a const member matches the former.
+          typet object_type = class_object;
+          const irept &method_qualifier =
+            to_pointer_type(type).base_type().find(ID_method_qualifier);
+          if(method_qualifier.is_not_nil() && !method_qualifier.id().empty())
+          {
+            if(has_const(static_cast<const typet &>(method_qualifier)))
+              object_type.set(ID_C_constant, true);
+            if(has_volatile(static_cast<const typet &>(method_qualifier)))
+              object_type.set(ID_C_volatile, true);
+          }
+          code_typet::parametert a0(pointer_type(object_type));
           a0.set_base_name(ID_this);
           a0.set_this();
           parameters.insert(parameters.begin(), a0);
         }
+        to_pointer_type(type).base_type().remove(ID_method_qualifier);
       }
     }
 
