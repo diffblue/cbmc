@@ -602,6 +602,12 @@ give a compact trace
 \fB\-\-stack\-trace\fR
 give a stack trace only
 .TP
+\fB\-\-proof\-explanation\fR
+When all properties are proved (UNSAT), show a word\-level explanation
+identifying which assignments and assumptions contribute to the proof.
+Uses the SAT solver's unsat core to determine the minimal set of
+relevant program steps.
+.TP
 \fB\-\-flush\fR
 flush every line of output
 .TP
