@@ -6927,18 +6927,24 @@ bool Parser::rEnumSpec(typet &spec)
   if(spec.id() == ID_merged_type)
   {
     typet unwrapped;
+    bool have_enum = false;
     bool packed = false;
     bool all_known = true;
     for(auto &sub : to_type_with_subtypes(spec).subtypes())
     {
       if(sub.id() == ID_c_enum)
+      {
+        have_enum = true;
         unwrapped = sub;
+      }
       else if(sub.id() == ID_packed)
         packed = true;
       else
         all_known = false;
     }
-    if(unwrapped.is_not_nil() && all_known)
+    // (a default-constructed typet is not nil -- test the flag, not
+    // unwrapped.is_not_nil())
+    if(have_enum && all_known)
     {
       unwrapped.add_source_location() = spec.source_location();
       if(packed)
