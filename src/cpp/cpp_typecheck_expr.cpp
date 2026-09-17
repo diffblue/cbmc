@@ -7454,6 +7454,24 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
     if(op0.id() == ID_dereference)
     {
       op0 = to_dereference_expr(op0).pointer();
+      // N5008 [expr.mptr.oper]/3: the object expression's REFERENCE type
+      // is not part of the bound object -- a call `ref().*pmf` whose
+      // operand is a function returning `S&` (the front end's
+      // dereference of a reference-typed pointer) binds a plain `S*`.
+      // Keeping the reference flag made the implicit `this` conversion
+      // reject "S& to S*" (libstdc++ `__invoke_memfun_deref`:
+      // `((*std::forward<_Tp>(__t)).*__f)(...)`, every std::bind over a
+      // member function pointer).
+      if(
+        op0.type().id() == ID_pointer &&
+        (op0.type().get_bool(ID_C_reference) ||
+         op0.type().get_bool(ID_C_rvalue_reference)))
+      {
+        typet plain = op0.type();
+        plain.remove(ID_C_reference);
+        plain.remove(ID_C_rvalue_reference);
+        op0 = typecast_exprt{op0, plain};
+      }
     }
     else
     {
