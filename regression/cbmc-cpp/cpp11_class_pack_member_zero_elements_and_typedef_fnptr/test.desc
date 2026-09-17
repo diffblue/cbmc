@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [temp.variadic]/5,7: a class template's member operator()(A... args)
+whose body expands the class pack (forward<A>(args)...) for an EMPTY pack
+-- the parameter disappears, and the body's expansion must be recorded as
+zero elements (it was not recorded when the class pack expansion happened
+at substitution time, so 'args' stayed in the body: every
+std::function<R()> call operator was bodiless).  Also a member typedef of a
+function-pointer type whose pointee expands the class pack
+(`typedef R (*invoker_t)(const any_data &, A &&...)`, libstdc++'s
+_Invoker_type spelled with typedef) must expand it like a data member.

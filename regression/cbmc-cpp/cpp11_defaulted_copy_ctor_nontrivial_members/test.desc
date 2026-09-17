@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [dcl.fct.def.default]/5 + [class.copy.ctor]/14-15: an explicitly
+defaulted copy/move constructor is defined as the memberwise copy/move of
+bases and members regardless of the members' types.  It was generated only
+when every member was trivially copyable; otherwise the body stayed EMPTY
+and the members were default-initialised: copying std::pair<const
+std::string, int> lost the string, copying a pair holding a std::function
+produced an empty function.
