@@ -125,6 +125,17 @@ std::string cpp_type2name(const typet &type)
       result += "rref_" + cpp_type2name(to_pointer_type(type).base_type());
     else if(is_reference(type))
       result += "ref_" + cpp_type2name(to_reference_type(type).base_type());
+    else if(type.find(ID_to_member).is_not_nil())
+    {
+      // N5008 [dcl.mptr]: a pointer to member `T C::*` is a distinct type
+      // from `T*`; naming both `ptr_T` made `memfun<int S::*>` and
+      // `memfun<int*>` the SAME instance (the second use silently reused
+      // the first's members).
+      result +=
+        "memptr_" +
+        cpp_type2name(static_cast<const typet &>(type.find(ID_to_member))) +
+        "_" + cpp_type2name(to_pointer_type(type).base_type());
+    }
     else
       result += "ptr_" + cpp_type2name(to_pointer_type(type).base_type());
   }

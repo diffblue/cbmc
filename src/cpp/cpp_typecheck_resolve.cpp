@@ -8716,6 +8716,42 @@ void cpp_typecheck_resolvet::guess_template_args(
     }
     guess_template_args(to_reference_type(template_type).base_type(), desired);
   }
+  else if(
+    (template_type.id() == ID_pointer ||
+     template_type.id() == ID_frontend_pointer) &&
+    template_type.find(ID_to_member).is_not_nil())
+  {
+    // N5008 [temp.deduct.type]/8: the form `T C::*` -- a pointer to
+    // member of a class named by a template parameter, deducing both the
+    // member type and the class (`__result_of_memfun<_Res _Class::*,
+    // _Arg, _Args...>`, the libstdc++ trait every std::bind / std::invoke
+    // over a member function pointer resolves through).  A pointer
+    // pattern without `to_member` never matched a pointer-to-member
+    // argument's shape, so the primary (`__failure_type`) was chosen and
+    // `std::bind(&S::f, &s, _1)` had no result type.
+    if(
+      desired_type.id() != ID_pointer ||
+      desired_type.find(ID_to_member).is_nil())
+      return; // a pointer-to-member pattern needs a pointer-to-member
+    // the class: the pattern's nested-name-specifier keeps the parser's
+    // trailing `::` component (typecheck_type pops it the same way)
+    typet pattern_class =
+      static_cast<const typet &>(template_type.find(ID_to_member));
+    if(
+      pattern_class.id() == ID_cpp_name && !pattern_class.get_sub().empty() &&
+      pattern_class.get_sub().back().id() == "::")
+      pattern_class.get_sub().pop_back();
+    guess_template_args(
+      pattern_class,
+      static_cast<const typet &>(desired_type.find(ID_to_member)));
+    // the member type: for a member function the argument's code type
+    // carries the implicit object parameter; deducing the whole code
+    // type keeps the re-formed `_Res _Class::*` identical to the
+    // argument (typecheck_type adds `this` only when absent)
+    guess_template_args(
+      to_type_with_subtype(template_type).subtype(),
+      to_pointer_type(desired_type).base_type());
+  }
   else if(template_type.id() == ID_pointer)
   {
     if(desired_type.id() == ID_pointer)
