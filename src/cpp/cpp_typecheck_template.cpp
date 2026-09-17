@@ -3222,6 +3222,51 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             template_map.expand_parameter_packs(arg.type());
             template_map.apply(arg.type());
             pack_expanded = true;
+            // N5008 [temp.arg.type]/1: the argument is a type-id and is
+            // type-checked like any other; expansion of its parameter
+            // pack does not exempt it.  Left as parsed, `_Bind<__func_type(
+            // typename decay<_BoundArgs>::type...)>` (libstdc++'s
+            // _Bind_helper, the type of every std::bind result) named its
+            // specialization with the RAW return typedef and parameter
+            // patterns, the partial specialization `_Bind<F(A...)>` bound
+            // F to an unresolvable name, and every std::bind result was an
+            // incomplete placeholder ("member operator got incomplete
+            // type").  A type that still cannot be checked (a dependent
+            // context) keeps the expanded form, as before.
+            // Only when the expanded type still names something to resolve:
+            // an already-plain function type (`F(int&&, char&&)`) keeps its
+            // parsed form, which is what the partial-specialization matcher
+            // compares against.
+            std::function<bool(const irept &)> has_cpp_name =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                return true;
+              for(const auto &c : n.get_sub())
+                if(has_cpp_name(c))
+                  return true;
+              for(const auto &c : n.get_named_sub())
+                if(c.first != ID_C_source_location && has_cpp_name(c.second))
+                  return true;
+              return false;
+            };
+            if(has_cpp_name(arg.type()))
+            {
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
+              typet checked = arg.type();
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                typecheck_type(checked);
+                arg.type() = checked;
+              }
+              catch(...)
+              {
+                get_message_handler().set_message_count(
+                  messaget::M_ERROR, errors_before);
+              }
+            }
           }
         }
         // Skip typecheck_type for types that are already resolved
@@ -3363,6 +3408,51 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             template_map.expand_parameter_packs(arg.type());
             template_map.apply(arg.type());
             pack_expanded = true;
+            // N5008 [temp.arg.type]/1: the argument is a type-id and is
+            // type-checked like any other; expansion of its parameter
+            // pack does not exempt it.  Left as parsed, `_Bind<__func_type(
+            // typename decay<_BoundArgs>::type...)>` (libstdc++'s
+            // _Bind_helper, the type of every std::bind result) named its
+            // specialization with the RAW return typedef and parameter
+            // patterns, the partial specialization `_Bind<F(A...)>` bound
+            // F to an unresolvable name, and every std::bind result was an
+            // incomplete placeholder ("member operator got incomplete
+            // type").  A type that still cannot be checked (a dependent
+            // context) keeps the expanded form, as before.
+            // Only when the expanded type still names something to resolve:
+            // an already-plain function type (`F(int&&, char&&)`) keeps its
+            // parsed form, which is what the partial-specialization matcher
+            // compares against.
+            std::function<bool(const irept &)> has_cpp_name =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                return true;
+              for(const auto &c : n.get_sub())
+                if(has_cpp_name(c))
+                  return true;
+              for(const auto &c : n.get_named_sub())
+                if(c.first != ID_C_source_location && has_cpp_name(c.second))
+                  return true;
+              return false;
+            };
+            if(has_cpp_name(arg.type()))
+            {
+              const std::size_t errors_before =
+                get_message_handler().get_message_count(messaget::M_ERROR);
+              typet checked = arg.type();
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                typecheck_type(checked);
+                arg.type() = checked;
+              }
+              catch(...)
+              {
+                get_message_handler().set_message_count(
+                  messaget::M_ERROR, errors_before);
+              }
+            }
           }
         }
         if(!pack_expanded)
