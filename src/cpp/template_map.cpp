@@ -74,6 +74,127 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
     {
       const std::vector<typet> *pack = function_parameter_pack(
         static_cast<const typet &>(parameter.find(ID_type)));
+
+      // N5008 [temp.variadic]/5: the pattern of a pack expansion need not
+      // be the bare pack.  `_Bind<__func_type(typename decay<_BoundArgs>::
+      // type...)>` (libstdc++'s _Bind_helper, the type of every std::bind
+      // result) and `B<F(decay<Bs>...)>` name the pack INSIDE the
+      // parameter's type; only bare `Bs...` was expanded, so the
+      // specialization was instantiated with the raw unexpanded pattern
+      // as its argument and the class stayed an incomplete placeholder
+      // ("member operator got incomplete type").  Expand a non-bare
+      // pattern once per element, with every referenced pack bound to its
+      // i-th element inside a copy of the pattern (the same scheme as the
+      // template-argument expander in apply()).
+      std::vector<typet> nested_pack_elements;
+      if(pack == nullptr)
+      {
+        bool has_ellipsis = false;
+        for(const auto &d : parameter.get_sub())
+          if(
+            d.id() == ID_cpp_declarator &&
+            (d.get_bool(ID_ellipsis) || d.find(ID_type).get_bool(ID_ellipsis)))
+            has_ellipsis = true;
+        const typet &pattern =
+          static_cast<const typet &>(parameter.find(ID_type));
+        if(has_ellipsis || pattern.get_bool(ID_ellipsis))
+        {
+          std::set<irep_idt> referenced_packs;
+          std::function<void(const irept &)> collect = [&](const irept &n)
+          {
+            const irep_idt id = n.get(ID_identifier);
+            if(!id.empty())
+            {
+              const auto suffix_of = [](const irep_idt &key) -> std::string
+              {
+                const std::string k = id2string(key);
+                const auto p = k.rfind("::");
+                return p != std::string::npos ? k.substr(p + 2) : k;
+              };
+              for(const auto &pe : pack_args_map)
+                if(suffix_of(pe.first) == id2string(id))
+                  referenced_packs.insert(pe.first);
+              for(const auto &ps : pack_size_map)
+                if(suffix_of(ps.first) == id2string(id))
+                  referenced_packs.insert(ps.first);
+            }
+            for(const auto &c : n.get_named_sub())
+              collect(c.second);
+            for(const auto &c : n.get_sub())
+              collect(c);
+          };
+          collect(pattern);
+          if(!referenced_packs.empty())
+          {
+            const auto pack_len = [&](const irep_idt &pid) -> std::size_t
+            {
+              auto a = pack_args_map.find(pid);
+              return a != pack_args_map.end() ? a->second.size() : 0;
+            };
+            const std::size_t n = pack_len(*referenced_packs.begin());
+            bool consistent = true;
+            for(const auto &pid : referenced_packs)
+              if(pack_len(pid) != n)
+                consistent = false;
+            if(consistent)
+            {
+              for(std::size_t i = 0; i < n; i++)
+              {
+                template_mapt element_map = *this;
+                for(const auto &pid : referenced_packs)
+                {
+                  element_map.type_map[pid] = pack_args_map.at(pid)[i];
+                  // The pattern names the pack by its SHORT name; apply()
+                  // resolves that through the map's short-name bridge, which
+                  // must find the scalar element binding -- not a live
+                  // same-named pack of an enclosing instantiation (the
+                  // function template `bind`'s `_BoundArgs` while
+                  // `_Bind_helper<..., _BoundArgs...>::type` is formed).
+                  // Shadow every same-short-name pack entry.
+                  const std::string short_name = [&]()
+                  {
+                    const std::string k = id2string(pid);
+                    const auto p = k.rfind("::");
+                    return p != std::string::npos ? k.substr(p + 2) : k;
+                  }();
+                  const auto shadow = [&](auto &m)
+                  {
+                    for(auto it = m.begin(); it != m.end();)
+                    {
+                      const std::string k = id2string(it->first);
+                      const auto p = k.rfind("::");
+                      if(
+                        (p != std::string::npos ? k.substr(p + 2) : k) ==
+                        short_name)
+                        it = m.erase(it);
+                      else
+                        ++it;
+                    }
+                  };
+                  shadow(element_map.pack_args_map);
+                  shadow(element_map.pack_size_map);
+                  shadow(element_map.pack_expr_map);
+                  // [temp.deduct]/5: while a function template is being
+                  // deduced, apply() substitutes a short name only from that
+                  // template's own parameters (deduction_parameters).  The
+                  // element binding belongs to the CLASS template whose
+                  // member is being formed (`_Bind_helper`'s `_BoundArgs`,
+                  // not `bind`'s); admit it, or the reference stays
+                  // unsubstituted.
+                  if(!element_map.deduction_parameters.empty())
+                    element_map.deduction_parameters.insert(pid);
+                }
+                typet element = pattern;
+                element.remove(ID_ellipsis);
+                element_map.apply(element);
+                nested_pack_elements.push_back(element);
+              }
+              pack = &nested_pack_elements;
+            }
+          }
+        }
+      }
+
       if(pack != nullptr)
       {
         // [temp.variadic]/5: replace the pack-expansion parameter with
