@@ -7304,6 +7304,17 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 
   const cpp_namet cpp_name(strop, expr.source_location());
 
+  // N5008 [over.match.oper]/3: for `a @= b` with a class-type left operand
+  // the candidate functions are the MEMBER candidates (`T1::operator@=`)
+  // and the NON-MEMBER candidates (unqualified lookup of `operator@=` in
+  // the context of the expression, ignoring member functions, plus ADL).
+  // Only the member form was ever tried, so a free `guard_exprt
+  // &operator|=(guard_exprt &, const guard_exprt &)` -- the friend
+  // operators of CBMC's own guard_exprt, and every free compound
+  // assignment operator -- was "no match".  Try the member form silently
+  // first; when it does not resolve, form the non-member call (its
+  // diagnostics, if any, are the ones reported).
+
   // expr.op0() is already typechecked
   exprt member(ID_member);
   member.set(ID_component_cpp_name, cpp_name);
@@ -7315,9 +7326,40 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
     uninitialized_typet{},
     expr.source_location());
 
-  typecheck_side_effect_function_call(new_expr);
+  // [over.match.oper]/3.2: for `=` the set of non-member candidates is
+  // empty (and [over.ass]/1 requires operator= to be a member), so the
+  // member form is the only one -- and its diagnostics are the ones wanted.
+  if(statement == ID_assign)
+  {
+    typecheck_side_effect_function_call(new_expr);
+    expr = new_expr;
+    return;
+  }
 
-  expr = new_expr;
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_side_effect_function_call(new_expr);
+    expr = new_expr;
+    return;
+  }
+  catch(int)
+  {
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+  }
+
+  side_effect_expr_function_callt free_call(
+    cpp_name.as_expr(),
+    {already_typechecked_exprt{to_binary_expr(expr).op0()},
+     to_binary_expr(expr).op1()},
+    uninitialized_typet{},
+    expr.source_location());
+
+  typecheck_side_effect_function_call(free_call);
+
+  expr = free_call;
 }
 
 void cpp_typecheckt::typecheck_side_effect_inc_dec(side_effect_exprt &expr)
