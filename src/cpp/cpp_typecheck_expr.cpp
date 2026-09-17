@@ -3812,8 +3812,18 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
   t.remove(ID_C_constant);
   t.remove(ID_C_volatile);
 
-  // Canonical key so that equal types share a single type_info object.
-  const std::string key = type2name(t, *this);
+  // Canonical key so that equal types share a single type_info object
+  // ([expr.typeid]/1: the type_info denotes the type).  Use the C++
+  // front-end's own type naming -- for a class type that is its tag
+  // identifier, unique per class ([basic.scope.scope], [class.pre]) --
+  // rather than the C linker's structural type2name, which spells out
+  // every component of a class: a class template instance's components
+  // include its member templates, whose declared parameter types are
+  // still template parameters (`unassigned`) and made type2name throw,
+  // so `typeid(_Functor)` in libstdc++'s _Function_handler::_M_manager
+  // aborted for any functor with a member template (std::_Bind ->
+  // std::function).
+  const std::string key = cpp_type2name(t);
   const irep_idt sym_id = "typeid$" + key;
 
   if(!symbol_table.has_symbol(sym_id))
