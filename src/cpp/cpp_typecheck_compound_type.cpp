@@ -4166,8 +4166,16 @@ void cpp_typecheckt::typecheck_member_function(
   //   * Constructors/destructors: their template parameters are deduced
   //     from the parameter types, so the signature already distinguishes
   //     specializations.
-  //   * Instances without a body (`value` nil): nothing to give a
-  //     distinct symbol.
+  // Instances WITHOUT a body are suffixed too: N5008 [temp.spec]/4 makes
+  // each specialization a distinct entity regardless of whether it is
+  // defined, and a declaration-only member template's specializations
+  // differ in their RETURN type -- libstdc++'s detection probes
+  // (`__result_of_other_impl::_S_test<_Fn, _Args...>`,
+  // `__is_invocable_impl::_S_test`, `_Safe_tuple_element_t`'s helpers)
+  // are exactly that: `decltype(_S_test<F, A...>(0))` is their only use.
+  // Collapsing them onto one unsuffixed symbol handed every later
+  // specialization the FIRST one's return type (a void-returning
+  // std::bind made every other std::bind in the TU void).
   // A same-signature non-template overload occupying the unsuffixed name
   // (condition 3, e.g. std::_Any_data's `_M_access()` alongside the
   // accessor template `_M_access<T>()`) is handled by instantiate_template:
@@ -4182,8 +4190,7 @@ void cpp_typecheckt::typecheck_member_function(
                                  id2string(component.get_base_name()) +
                                  id2string(f_id);
   const bool suffix_instance =
-    component.get_bool("#member_fn_template_instance") && !is_ctor_or_dtor &&
-    value.is_not_nil();
+    component.get_bool("#member_fn_template_instance") && !is_ctor_or_dtor;
   // Record the unsuffixed name (signature without the template-argument
   // suffix) so instantiate_template can detect condition 3 -- a same-signature
   // non-template overload occupying that name -- reliably, i.e. after the
