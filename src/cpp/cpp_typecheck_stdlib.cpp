@@ -491,7 +491,7 @@ make_rb_insert_and_rebalance_body(const symbolt &symbol, const namespacet &ns)
                              : to_struct_type(base_type);
 
   irep_idt color_name, parent_name, left_name, right_name;
-  typet color_type;
+  typet color_type(ID_nil);
   for(const auto &comp : st.components())
   {
     const std::string bn = id2string(comp.get_base_name());

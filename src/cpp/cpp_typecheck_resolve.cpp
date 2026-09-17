@@ -643,7 +643,8 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             if(cc.empty())
               continue;
             // Get the deduced type from fargs
-            typet actual_type;
+            // explicit nil: a default-constructed typet is not nil
+            typet actual_type(ID_nil);
             if(!fargs.operands.empty())
               actual_type = fargs.operands[0].type();
             if(actual_type.is_nil())
@@ -824,7 +825,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                     return -1;
                   const auto &struct_type = to_struct_type(
                     cpp_typecheck.follow_tag(to_struct_tag_type(actual_type)));
-                  typet return_type;
+                  typet return_type(ID_nil);
                   for(const auto &comp : struct_type.components())
                   {
                     if(
@@ -840,7 +841,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   // Extract expected type from constraint template args.
                   // Structure: cpp_name(name, template_args(arguments=(...)))
                   // The arguments named sub contains nodes with type subs.
-                  typet expected_type;
+                  typet expected_type(ID_nil);
                   for(const auto &sub : constraint.get_sub())
                   {
                     if(sub.id() == ID_template_args)
