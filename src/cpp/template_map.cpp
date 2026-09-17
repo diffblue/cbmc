@@ -229,21 +229,39 @@ void template_mapt::expand_parameter_packs(typet &function_type) const
         // the body call collapses to a single argument.  A single-element pack
         // keeps the original name (handled by the single-element substitution
         // in cpp_typecheck_method_bodies).
-        irep_idt pack_base_name;
-        if(pack->size() >= 2)
+        irep_idt declared_name;
+        for(const auto &d : parameter.get_sub())
+          if(d.id() == ID_cpp_declarator)
+          {
+            for(const auto &nn : d.find(ID_name).get_sub())
+              if(nn.id() == ID_name && !nn.get(ID_identifier).empty())
+              {
+                declared_name = nn.get(ID_identifier);
+                break;
+              }
+            break;
+          }
+        // Record the expansion (parameter name -> element count) on the
+        // function type, as typecheck_compound_declarator does for the
+        // expansions it performs itself: the method-body drain reads
+        // #expanded_param_packs to expand the body's `forward<A>(args)...`
+        // to the same names.  N5008 [temp.variadic]/7: a pack of ZERO
+        // elements must be recorded too -- the parameter disappears here,
+        // and without the record the body kept a reference to the dead
+        // name (`symbol 'args' is unknown`; every `std::function<R()>`
+        // call operator was bodiless).
+        // (a single element keeps the parameter's own name and needs no
+        // record -- the drain's single-element substitution handles it)
+        if(!declared_name.empty() && pack->size() != 1)
         {
-          for(const auto &d : parameter.get_sub())
-            if(d.id() == ID_cpp_declarator)
-            {
-              for(const auto &nn : d.find(ID_name).get_sub())
-                if(nn.id() == ID_name && !nn.get(ID_identifier).empty())
-                {
-                  pack_base_name = nn.get(ID_identifier);
-                  break;
-                }
-              break;
-            }
+          irept entry(declared_name);
+          entry.set_size_t(ID_size, pack->size());
+          function_type.add(irep_idt{"#expanded_param_packs"})
+            .get_sub()
+            .push_back(entry);
         }
+        const irep_idt pack_base_name =
+          pack->size() >= 2 ? declared_name : irep_idt{};
         std::size_t pack_index = 0;
         for(const auto &pt : *pack)
         {
