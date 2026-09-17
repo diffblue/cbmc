@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.param]/14 + [temp.variadic]/7: a member function template
+<class... Args, class Result = ...> called with zero arguments deduces Args
+empty; the pack's slot must stay a positional empty marker (so Result is not
+shifted into the pack), and the body's forward<Args>(args)... expansion must
+be stripped although the pack is not the trailing template parameter.
