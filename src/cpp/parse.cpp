@@ -319,6 +319,7 @@ protected:
   bool rEnumSpec(typet &);
   bool rEnumBody(irept &);
   bool rClassSpec(typet &);
+  void unwrap_attributed_class_spec(typet &);
   bool rBaseSpecifiers(irept &);
   bool rClassBody(exprt &);
   bool rClassMember(cpp_itemt &);
@@ -2609,6 +2610,25 @@ bool Parser::rIntegralDeclaration(
 #endif
 
   merge_types(cv_q, integral);
+
+  // `struct S { ... } __attribute__((packed, aligned(16)))`: the trailing
+  // attributes were read as cv-qualifiers and merged in front of the class
+  // (user-reported on a class TEMPLATE, where the merged_type is then not a
+  // class template at all: "class templates must not be anonymous", and
+  // every later use of the name fails).  Fold them onto the class node.
+  if(
+    integral.id() == ID_merged_type &&
+    std::any_of(
+      to_type_with_subtypes(integral).subtypes().begin(),
+      to_type_with_subtypes(integral).subtypes().end(),
+      [](const typet &t)
+      {
+        return (t.id() == ID_struct || t.id() == ID_union) &&
+               t.find(ID_body).is_not_nil();
+      }))
+  {
+    unwrap_attributed_class_spec(integral);
+  }
 
 #ifdef DEBUG
   std::cout << std::string(__indent, ' ') << "Parser::rIntegralDeclaration 3\n";
@@ -7070,6 +7090,68 @@ bool Parser::rEnumBody(irept &body)
 
   C++11 [class] (A.8).  Also handles INTERFACE (MS extension).
 */
+/// Fold GCC attributes merged around a class-specifier back onto the
+/// struct/union node as flags.  merge_types turns `__attribute__((packed))
+/// struct S {...}` and `struct S {...} __attribute__((packed, aligned(16)))`
+/// alike into a merged_type whose subtypes are the attribute nodes and the
+/// class; the remainder of parsing and, for a class TEMPLATE, the
+/// typechecker's `is_class_template()` test expect the class node itself
+/// (N5008 [dcl.attr.grammar]/5: an attribute appertains to the entity it
+/// follows).  Attributes are folded only when every merged subtype is
+/// recognised (conservative); nested merged_types (`packed, aligned(16)`
+/// parsed into one attribute group) are flattened first.
+void Parser::unwrap_attributed_class_spec(typet &spec)
+{
+  if(spec.id() != ID_merged_type)
+    return;
+  std::vector<typet> flat;
+  std::function<void(const typet &)> flatten = [&](const typet &t)
+  {
+    if(t.id() == ID_merged_type)
+    {
+      for(const auto &sub : to_type_with_subtypes(t).subtypes())
+        flatten(sub);
+    }
+    else
+      flat.push_back(t);
+  };
+  flatten(spec);
+  typet unwrapped;
+  bool have_class = false;
+  bool packed = false;
+  bool have_alignment = false;
+  irept alignment;
+  bool all_known = true;
+  for(const auto &sub : flat)
+  {
+    if(sub.id() == ID_struct || sub.id() == ID_union)
+    {
+      if(have_class)
+        all_known = false; // two classes: not the shape we fold
+      have_class = true;
+      unwrapped = sub;
+    }
+    else if(sub.id() == ID_packed)
+      packed = true;
+    else if(sub.id() == ID_aligned)
+    {
+      have_alignment = true;
+      alignment = sub.find(ID_size);
+    }
+    else
+      all_known = false;
+  }
+  if(have_class && all_known)
+  {
+    unwrapped.add_source_location() = spec.source_location();
+    if(packed)
+      unwrapped.set(ID_C_packed, true);
+    if(have_alignment)
+      unwrapped.set(ID_C_alignment, alignment);
+    spec = unwrapped;
+  }
+}
+
 bool Parser::rClassSpec(typet &spec)
 {
   cpp_tokent tk;
@@ -7119,18 +7201,26 @@ bool Parser::rClassSpec(typet &spec)
   if(spec.id() == ID_merged_type)
   {
     typet unwrapped;
+    bool have_class = false;
+    bool have_alignment = false;
     irept alignment;
     for(auto &sub : to_type_with_subtypes(spec).subtypes())
     {
       if(sub.id() == ID_struct || sub.id() == ID_union)
+      {
+        have_class = true;
         unwrapped = sub;
+      }
       else if(sub.id() == ID_aligned)
+      {
+        have_alignment = true;
         alignment = sub.find(ID_size);
+      }
     }
-    if(unwrapped.is_not_nil())
+    if(have_class)
     {
       unwrapped.add_source_location() = spec.source_location();
-      if(alignment.is_not_nil())
+      if(have_alignment)
         unwrapped.set(ID_C_alignment, alignment);
       spec = unwrapped;
     }
@@ -7148,33 +7238,7 @@ bool Parser::rClassSpec(typet &spec)
   // incomplete anonymous member whose members never resolve.  Unwrap,
   // recording the known attributes as flags on the struct/union type;
   // unwrap only when every subtype is recognised (conservative).
-  if(spec.id() == ID_merged_type)
-  {
-    typet unwrapped;
-    bool packed = false;
-    irept alignment;
-    bool all_known = true;
-    for(auto &sub : to_type_with_subtypes(spec).subtypes())
-    {
-      if(sub.id() == ID_struct || sub.id() == ID_union)
-        unwrapped = sub;
-      else if(sub.id() == ID_packed)
-        packed = true;
-      else if(sub.id() == ID_aligned)
-        alignment = sub.find(ID_size);
-      else
-        all_known = false;
-    }
-    if(unwrapped.is_not_nil() && all_known)
-    {
-      unwrapped.add_source_location() = spec.source_location();
-      if(packed)
-        unwrapped.set(ID_C_packed, true);
-      if(alignment.is_not_nil())
-        unwrapped.set(ID_C_alignment, alignment);
-      spec = unwrapped;
-    }
-  }
+  unwrap_attributed_class_spec(spec);
 
   if(lex.LookAhead(0) == '{' || lex.LookAhead(0) == ':')
   {
