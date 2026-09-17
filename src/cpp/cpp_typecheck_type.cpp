@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <ansi-c/merged_type.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_declaration.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
@@ -307,6 +308,48 @@ void cpp_typecheckt::typecheck_type(typet &type)
     for(auto &param : parameters)
     {
       typecheck_type(param.type());
+
+      // A code type formed by template substitution from a parsed
+      // function type may still carry a parameter as an unconverted
+      // cpp_declaration (decl-specifier type + declarator).  When the
+      // declarator applies a reference to a type that -- after
+      // substitution -- is itself a reference (`_Mu_type<_BArgs,
+      // _CallArgs>&&...` with an element `int&&`, libstdc++'s
+      // _Bind::_Res_type), N5008 [dcl.ref]/7 collapses the two: an
+      // rvalue reference to `TR` is `TR`, any other combination is an
+      // lvalue reference to `T`.  Fold the collapsed reference into the
+      // declaration's type and drop the declarator's, keeping the node's
+      // shape; left as a reference-to-reference the parameter is
+      // structurally unequal to the `_ArgTypes...` pattern element and
+      // `result_of<_Functor(_ArgTypes...)>` never matches.
+      if(param.id() == ID_cpp_declaration)
+      {
+        cpp_declarationt &declaration =
+          static_cast<cpp_declarationt &>(static_cast<exprt &>(param));
+        typet &decl_type = declaration.type();
+        const bool type_is_ref = decl_type.id() == ID_pointer &&
+                                 (decl_type.get_bool(ID_C_reference) ||
+                                  decl_type.get_bool(ID_C_rvalue_reference));
+        if(type_is_ref && !declaration.declarators().empty())
+        {
+          typet &declarator_type = declaration.declarators().front().type();
+          const bool declarator_is_ref =
+            (declarator_type.id() == ID_frontend_pointer ||
+             declarator_type.id() == ID_pointer) &&
+            (declarator_type.get_bool(ID_C_reference) ||
+             declarator_type.get_bool(ID_C_rvalue_reference)) &&
+            to_type_with_subtype(declarator_type).subtype().is_nil();
+          if(declarator_is_ref)
+          {
+            const bool both_rvalue =
+              declarator_type.get_bool(ID_C_rvalue_reference) &&
+              decl_type.get_bool(ID_C_rvalue_reference);
+            if(!both_rvalue)
+              decl_type.remove(ID_C_rvalue_reference);
+            declarator_type.make_nil();
+          }
+        }
+      }
 
       // C/C++ function parameters of function or array type decay to
       // pointer type (C99 6.7.5.3, C++11 [dcl.fct] p5).
