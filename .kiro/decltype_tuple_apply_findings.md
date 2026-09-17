@@ -9332,3 +9332,67 @@ by saved PID. Census: 5 (+cpp11_std_bind_basic).
 Issue 7 as literally described didn't reproduce standalone (enum class : uint8_t
 bitfields pack to 2 in all my shapes); covered by test anyway.
 Suites ×5 green; revert-tests 5/5 fail on pre-round. Census unchanged (5).
+
+## Round 140 (2026-09-17) — sentinel audit, std::bind, snapshot sweep
+
+- `8779217ba6` scripts/dogfood_snapshot.sh: background sweep from a frozen
+  worktree + frozen goto-cc (development on the main tree cannot disturb it).
+  NOTE: it iterates the FULL compile_commands (1074 TUs) at nice 19 — at
+  ~1–2 min/TU that is >1 day; r133/r138 logs cover a 74-file subset, so the
+  `--compare` will only overlap on those. Consider `--limit`/subset next time.
+- `ca2cafedd7` is_not_nil() sentinel audit: 20 hits, 6 genuine (initializer
+  elem_type, resolve actual/return/expected_type, stdlib color_type, rEnumSpec
+  unwrap `have_enum`). Default-constructed irept is NOT nil — explicit bools.
+- std::bind (KNOWNBUG cpp11_std_bind_basic → CORE, all 3 forms). SIX layers,
+  each a separate commit + header-free CORE kernel:
+  1. `4f5fa3a321` expand_parameter_packs: NON-bare pattern
+     (`__func_type(decay<_BoundArgs>::type...)`) expanded per element via a
+     per-element map copy (shadow same-short-name packs, admit the class pack
+     into deduction_parameters), then typecheck ONLY if a cpp_name remains —
+     type-checking an already-plain `F(int&&, char&&)` broke the matcher (ro11).
+  2. `315985dc4c` typecheck_compound_bases applied the map PER ARGUMENT →
+     `A...` collapsed to A0 → `result_of<F(A...)> : __invoke_result<F,A...>`
+     had no ::type. Apply to the whole cpp_name.
+  3. `fb2ad7ce29` `<class... Args, class Result = ...>` with zero call args:
+     GFTA erased the empty slot (Result slid into the pack) → keep the
+     empty_typet sentinel; instantiate_template's member-template empty-pack
+     strip was gated on `mtps.back()` → locate the pack anywhere.
+  4. `a63ab17c11` expand_call_argument_packs substituted only the governing
+     pack; `_Mu<_Bound_args>()(get<_Indexes>(...), ...)...` fetched get<0>
+     twice → add(2,2). New substitute_other_packs_lockstep.
+  5. `393d5941c5` `(ref().*pmf)(..)`: bound object kept the reference flag →
+     "S& to S*" rejected (__invoke_memfun_deref).
+  6. `4b03a527dd` `T C::*` pattern deduction ([temp.deduct.type]/8) was
+     missing → __result_of_memfun never matched. Deduce class + whole code
+     type (this param included; typecheck_type adds `this` only when absent).
+     EXPOSED: cpp_type2name named `int S::*` and `int*` both `ptr_signed_int`
+     → same instance; now `memptr_C_T`.
+  Tests `cb8f28c114` (9 dirs), all runtime-verified g++/clang++, all FAIL on
+  the pre-round binary /tmp/cbmc_fwd6.
+- STILL OPEN (next round): `_Bind` → `std::function` (dog-food shadow_memoryt
+  carrier /tmp/k138/bind1.cpp; kernels /tmp/k140/bf1,bf2,bf6,bf9).
+  `is_invocable<B&,int>` false when `__invoke_result<B&,int>::type` is
+  evaluated BEFORE any direct call (order-dependent!). Root: the alias body
+  `result_of<_Fn&(_Mu_type<_BArgs,_CallArgs>&&...)>` reaches DTC via
+  resolve_scope with the arg as an ID_code whose params are still
+  cpp_declaration(type=int&& , declarator &&) — typecheck_type(ID_code)
+  ignores declarators, so no [dcl.ref]/6 collapsing → spec `F(A...)` fails →
+  primary result_of (no ::type) → incomplete placeholder instance cached
+  (class_template_symbol), poisoning later uses. Tried: (a) typecheck when a
+  param needs collapsing (gate in typecheck_template_args) — never reached
+  (ambiguous branch, has_pack false since the ellipsis sits on the declarator
+  TYPE); (b) converting cpp_declaration params in typecheck_type(ID_code) —
+  REGRESSES everything (the matcher compares the parsed shape). Needs a
+  design: collapse declarator-over-reference right where the alias body is
+  substituted (template_map apply of function_type params), not at typecheck.
+  Also pre-existing: `using PMF = int (S::*)(int) const;` (alias form) loses
+  return type + const (typedef form fine) — /tmp/k140/pm6.cpp.
+- PITFALLS this round: a probe inserted before an un-braced `if` body became
+  the body (make_nil ran unconditionally → "no entry point"); a `to_pointer_type`
+  probe without its include broke the build silently while I kept testing a
+  STALE binary — always check "Built target". Re-running suites while
+  rebuilding gives phantom failures (cpp17_string_view_libcxx,
+  cpp17_structured_binding passed on the final binary; full rerun done).
+Tracked census: 4 (cpp11_deduced_nontype_kind_mismatch, cpp20_ranges_basic_libcxx,
+libcxx23_string_fill_ctor, cpp17_invoke_result_cache_poisoning); 11 KNOWNBUG
+dirs in regression/cbmc-cpp overall (`grep -l ^KNOWNBUG */test.desc`).
