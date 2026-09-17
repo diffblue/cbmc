@@ -9273,3 +9273,42 @@ Note: parser's `#template` sub-scope key is overwritten per template in a
 class (id_map["#template"]) — member-template info lost; not needed now.
 Suites ×5 green; ansi-c: only pre-existing clang-only failures (env). Revert
 tests: 5/5 gates fail on 467dfd6b51. Census unchanged (4).
+
+## Round 138 (2026-09-16) — reverse-ordinal flush + dog-food
+
+Reverse-ordinal diff (flip comparator in cpp_scope.h, diff goto-function sets)
+on 21 STL tests: all identical except regex (hybrids + shared_ptr ctor) and a
+print-only `enum memory_order` vs `std::memory_order` param spelling in
+shared_ptr/unique_ptr tests (typedef vs tag resolution order; harmless, noted).
+
+- `d0ab0d7671` default template args substituted with OWN preceding params only
+  ([temp.param]/12-14): raw forward-decl default `istreambuf_iterator<_CharT>`
+  applied through FULL map → short-name bridge captured enclosing `_CharT` →
+  ~130 hybrid facets/TU. Kernel needs enclosing template's scope to sort
+  before the definition's (cpp11_default_template_arg_own_parameter).
+- `8e2563c12a` shared_ptr<const _NFA>(shared_ptr<_NFA>&&) chain (4 fixes):
+  dedupe placeholder vs already-instantiated symbol (new
+  existing_function_template_instance(); template_suffix may THROW on
+  class-NTTP ctor-call args → catch + restore error count, else
+  cpp20_nttp_string/class_nttp_brace regress); instantiated specialisations
+  ranked as templates via symbol-table #fn_template_type ([over.match.best]/2.5);
+  [over.ics.rank]/3.2.3 xvalue→&& beats const& (cv key); fixpoint drain also
+  queues referenced deferred_typechecking members ([temp.inst]/4).
+  Regex fwd/rev now IDENTICAL (3517). Gate extended in test_conversion.desc.
+- `8d8fa1e0fa` member template-id explicit args typechecked in fargs.naming_scope
+  ([basic.lookup.unqual]/1): `p->template is_derived<I>()` with caller's `I` had
+  no candidates → small_shared_n_way_ptr.h → field_sensitivity/complexity_limiter
+  dog-food. CORE cpp11_member_template_arg_caller_scope. KNOWNBUG filed:
+  cpp11_std_bind_basic (std::bind unsupported even `bind(add,2,3)()`; dog-food
+  carrier goto_symex.h:72 shadow_memoryt from bound member pointer).
+
+Dog-food (TIMEOUT=300, idle box): util/goto-programs part: NO per-file
+regressions vs r133, 2 improved. goto-symex TUs take >300s each (e.g.
+field_sensitivity 330s OK_NOISY) → the script's FAIL list is timeout-polluted;
+raise TIMEOUT to ≥900 next time. Real remaining signatures: shadow_memoryt
+(std::bind), 'set' noisy (pre-existing), goto_symex.cpp `'<<type:>>' to bool`,
+goto_symex_state.cpp pair<const string, list> inst, path_storage lambda→const
+conversion, renaming_level 'identifier' unknown, solver_hardness incomplete
+type, symex_assign 'zip' ambiguous, symex_atomic_section 'operator|='.
+PITFALL: pkill/pgrep -f with the script name matches the invoking shell — kill
+by saved PID. Census: 5 (+cpp11_std_bind_basic).
