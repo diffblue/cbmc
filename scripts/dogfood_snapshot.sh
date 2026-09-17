@@ -20,7 +20,12 @@
 #     memory (ulimit -v, default 12 GiB).
 #
 # Usage:
-#   scripts/dogfood_snapshot.sh [COMMIT] [GOTO_CC] [DIRS...]
+#   scripts/dogfood_snapshot.sh [--files LIST] [COMMIT] [GOTO_CC] [DIRS...]
+#     --files LIST  sweep exactly the files listed (one repo-relative
+#                   path per line) instead of DIRS -- e.g. the file set of
+#                   an earlier sweep log, for a like-for-like --compare:
+#                   grep -E '^(OK|OK_NOISY|FAIL|CRASH) ' OLD.log |
+#                     awk '{print $2}' | sed 's/:$//' > LIST
 #     COMMIT   git rev to snapshot (default HEAD)
 #     GOTO_CC  goto-cc binary to freeze (default build-work/bin/goto-cc)
 #     DIRS     directories (relative to the repo) to sweep; default is
@@ -56,6 +61,12 @@ if [ "${1:-}" = "--compare" ]; then
   exit 0
 fi
 
+files_list=""
+if [ "${1:-}" = "--files" ]; then
+  files_list="$(cd "$(dirname "$2")" && pwd)/$(basename "$2")"
+  shift 2
+fi
+
 commit="$(git -C "$REPO_ROOT" rev-parse --short "${1:-HEAD}")"
 goto_cc="${2:-$REPO_ROOT/build-work/bin/goto-cc}"
 shift $(( $# >= 2 ? 2 : $# )) || true
@@ -84,6 +95,7 @@ export GOTO_CC="$snap/goto-cc"
 export COMPILE_COMMANDS="$snap/compile_commands.json"
 export TIMEOUT="$TIMEOUT"
 ${dirs:+export DOGFOOD_DIRS="$dirs"}
+${files_list:+export DOGFOOD_FILES="$files_list"}
 echo "snapshot: $commit  goto-cc: $goto_cc  started: \$(date -u +%FT%TZ)"
 nice -n 19 ionice -c 3 scripts/dogfood_goto_cc.sh --expand
 rc=\$?

@@ -13,7 +13,11 @@
 #     --expand    run ALL .cpp files under the DOGFOOD_DIRS directories
 #                 (produces a bigger summary but never exits non-zero).
 #                 Used to find new bugs during development.  Override
-#                 the directory list with DOGFOOD_DIRS="src/a src/b".
+#                 the directory list with DOGFOOD_DIRS="src/a src/b", or
+#                 give an explicit newline-separated list of files in the
+#                 file named by DOGFOOD_FILES (paths relative to the repo;
+#                 takes precedence over DOGFOOD_DIRS) -- used to re-run
+#                 exactly the set of an earlier sweep for a comparison.
 #   default behaviour is like --expand but limited to the N smallest
 #   files (N=DOGFOOD_SAMPLE_N, default 30).
 #
@@ -90,7 +94,11 @@ case "$mode" in
     files=("${DOGFOOD_BASELINE[@]}")
     ;;
   expand)
-    mapfile -t files < <(find $DOGFOOD_DIRS -name '*.cpp' | sort)
+    if [ -n "${DOGFOOD_FILES:-}" ]; then
+      mapfile -t files < <(grep -v '^\s*$' "$DOGFOOD_FILES")
+    else
+      mapfile -t files < <(find $DOGFOOD_DIRS -name '*.cpp' | sort)
+    fi
     ;;
   *)
     mapfile -t files < <(collect_files "$DOGFOOD_SAMPLE_N")
