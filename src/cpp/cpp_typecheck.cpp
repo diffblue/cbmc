@@ -277,7 +277,20 @@ void cpp_typecheckt::typecheck()
       }
     }
     typecheck_method_bodies();
+    // N5008 [class.copy.ctor]/14, [temp.inst]/4: the bodies finished in
+    // this round may odr-use implicitly-defined special members (the
+    // comparator copy in `_Rb_tree_key_compare(const _Key_compare&)`)
+    // that no earlier phase used; elaborate them now.  Previously the
+    // not-yet-used ones had already been cleared at the end of the first
+    // do_not_typechecked() pass, so such a late use hit a bodiless
+    // `less<int>::less(const less&)` (havoc, "no body for callee").
+    do_not_typechecked();
   }
+
+  // N5008 [class.copy.ctor]/14, [class.default.ctor]/4: an implicitly-defined
+  // special member that is never odr-used is not defined at all; clear the
+  // remaining placeholders once every body has been elaborated.
+  clear_not_typechecked();
 
   // N5008 [temp.inst]/11: a member whose body was DEFERRED and never
   // odr-used shall not be implicitly instantiated.  Its symbol still
@@ -731,7 +744,10 @@ void cpp_typecheckt::do_not_typechecked()
       }
     }
   } while(cont);
+}
 
+void cpp_typecheckt::clear_not_typechecked()
+{
   for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
   {
     if(it->second.value.id() == ID_cpp_not_typechecked)
