@@ -373,6 +373,43 @@ void replace_value_pack_ref(
   }
 }
 
+/// N5008 [temp.variadic]/5,7: "all of the parameter packs expanded by a
+/// pack expansion shall have the same number of arguments", and the k-th
+/// element of the expansion instantiates the pattern with the k-th element
+/// of EVERY pack it expands.  \p copy is the k-th instance of a pattern whose
+/// governing pack \p base has already been substituted; substitute the k-th
+/// element of every OTHER same-length pack the pattern references -- a
+/// non-type pack zipped with a type pack (libstdc++ _Bind::__call's
+/// `_Mu<_Bound_args>()(std::get<_Indexes>(_M_bound_args), __args)...`), or
+/// the converse.  Left in place, the other pack's name later resolved
+/// through its scalar convenience entry to the FIRST element for every k
+/// (`get<0>` twice: `std::bind(add, 2, 3)()` computed add(2, 2)).
+void template_mapt::substitute_other_packs_lockstep(
+  irept &copy,
+  const std::string &base,
+  std::size_t k,
+  std::size_t n) const
+{
+  auto short_name = [](const irep_idt &full) -> std::string
+  {
+    const std::string f = id2string(full);
+    const auto q = f.rfind("::");
+    return q != std::string::npos ? f.substr(q + 2) : f;
+  };
+  for(const auto &pe : pack_args_map)
+  {
+    const std::string sn = short_name(pe.first);
+    if(sn != base && pe.second.size() == n && k < n)
+      replace_type_pack_ref(copy, sn, pe.second[k]);
+  }
+  for(const auto &pe : pack_expr_map)
+  {
+    const std::string sn = short_name(pe.first);
+    if(sn != base && pe.second.size() == n && k < n)
+      replace_value_pack_ref(copy, sn, pe.second[k]);
+  }
+}
+
 void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
   const
 {
@@ -546,6 +583,11 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
               repl(ns.second);
           };
           repl(copy);
+          substitute_other_packs_lockstep(
+            copy,
+            base,
+            static_cast<std::size_t>(&ve - &val_elems->front()),
+            val_elems->size());
           // The parser leaves a template-id in an AMBIGUOUS expression
           // context (`get<_Idx>` as a bare call argument) with an id-less
           // template-arguments child holding the raw argument list; the
@@ -729,11 +771,12 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
       }
 
       changed = true;
-      for(const typet &elem : *elems)
+      for(std::size_t k = 0; k < elems->size(); ++k)
       {
         irept copy = arg;
         copy.remove(ID_ellipsis);
-        replace_type_pack_ref(copy, base, elem);
+        replace_type_pack_ref(copy, base, (*elems)[k]);
+        substitute_other_packs_lockstep(copy, base, k, elems->size());
         new_args.push_back(copy);
       }
     }
