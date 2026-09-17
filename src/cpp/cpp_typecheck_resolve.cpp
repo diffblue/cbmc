@@ -10017,7 +10017,64 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       const irep_idt pack_id =
         params[pack_param_index].type().get(ID_identifier);
       if(!pack_id.empty())
+      {
         cpp_typecheck.template_map.pack_size_map[pack_id] = pack_expansion_size;
+        // N5008 [temp.variadic]/5 + [temp.param]/14: a defaulted parameter
+        // following the pack may also EXPAND it -- libstdc++'s
+        // `_Bind::operator()<class... _Args, class _Result =
+        // _Res_type<tuple<_Args...>>>`.  The single-pack flow records the
+        // deduced elements in pack_args_map only after this loop (see the
+        // multi-pack record below), so the default's `tuple<_Args...>`
+        // found the size but no elements and fell back to the scalar
+        // binding: `tuple<int>` for a two-argument call, and
+        // `_Safe_tuple_element_t<1, tuple<int>>` (the second placeholder)
+        // failed -- every std::bind with two or more placeholders had no
+        // call operator.  Record the elements now, for this instance's
+        // own pack only ([basic.scope.temp]/2) and only when there are
+        // two or more (a single element keeps the established scalar
+        // path; see the multi-pack note on evaluation order).
+        // Only when a following parameter's DEFAULT ARGUMENT names the
+        // pack: recording the elements unconditionally adds a second
+        // same-spelled pack to the flat map while a constraint in a
+        // following parameter's TYPE (`enable_if_t<ic<_UElements...>()>`,
+        // the std::tuple converting constructor) is being evaluated, and
+        // the callee's own same-named pack is then shadowed
+        // (cpp17_tuple_get_two_pack_ctor_3elem).
+        const std::string pack_short = [&]()
+        {
+          const std::string f = id2string(pack_id);
+          const auto pos = f.rfind("::");
+          return pos != std::string::npos ? f.substr(pos + 2) : f;
+        }();
+        std::function<bool(const irept &)> names_pack = [&](const irept &n)
+        {
+          if(n.id() == ID_name && id2string(n.get(ID_identifier)) == pack_short)
+            return true;
+          for(const auto &c : n.get_sub())
+            if(names_pack(c))
+              return true;
+          for(const auto &c : n.get_named_sub())
+            if(names_pack(c.second))
+              return true;
+          return false;
+        };
+        bool default_names_pack = false;
+        for(std::size_t j = pack_param_index + 1; j < params.size(); ++j)
+          if(
+            params[j].has_default_argument() &&
+            names_pack(params[j].default_argument()))
+            default_names_pack = true;
+        if(
+          default_names_pack &&
+          pack_deduced_types.size() == pack_expansion_size &&
+          pack_expansion_size >= 2 &&
+          cpp_typecheck.template_map.pack_args_map.find(pack_id) ==
+            cpp_typecheck.template_map.pack_args_map.end())
+        {
+          cpp_typecheck.template_map.pack_args_map[pack_id] =
+            pack_deduced_types;
+        }
+      }
     }
 
     // An EMPTY pack (deduced to zero elements) occupies one placeholder slot in
