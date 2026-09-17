@@ -35,7 +35,9 @@
 # SNAP_ROOT (where snapshots live, default /tmp/dogfood-snapshots).
 #
 # Output: <snapshot>/sweep.log (per-file OK/OK_NOISY/FAIL/CRASH lines and
-# the summary), <snapshot>/DONE when finished (contains the exit code).
+# the summary), <snapshot>/out/<file>.txt (each file's full goto-cc output,
+# for harvesting the error signatures), <snapshot>/DONE when finished
+# (contains the exit code).
 # Compare two sweeps with:
 #   scripts/dogfood_snapshot.sh --compare OLD.log NEW.log
 # Clean up a finished snapshot with:
@@ -96,6 +98,7 @@ export COMPILE_COMMANDS="$snap/compile_commands.json"
 export TIMEOUT="$TIMEOUT"
 ${dirs:+export DOGFOOD_DIRS="$dirs"}
 ${files_list:+export DOGFOOD_FILES="$files_list"}
+export DOGFOOD_OUTDIR="$snap/out"
 echo "snapshot: $commit  goto-cc: $goto_cc  started: \$(date -u +%FT%TZ)"
 nice -n 19 ionice -c 3 scripts/dogfood_goto_cc.sh --expand
 rc=\$?
