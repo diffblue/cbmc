@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+std::bind with two or more placeholders.  _Bind::operator()'s defaulted
+_Result parameter expands the call's own _Args pack (tuple<_Args...>,
+[temp.param]/14 + [temp.variadic]/5); the pack's deduced ELEMENTS must be
+recorded before the default is evaluated, or the default saw tuple<int> for a
+two-argument call and _Safe_tuple_element_t<1, ...> (the second placeholder)
+failed, leaving the call operator with no viable overload.

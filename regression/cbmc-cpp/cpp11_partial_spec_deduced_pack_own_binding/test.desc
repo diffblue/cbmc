@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.deduct]/5 + [basic.scope.temp]/2: a partial specialization
+impl<false, F, A...> used twice with different arities; its member typedef
+decltype(_S_test<F, A...>(0)) and a base-specifier impl<...>::type must see
+the instance's OWN bindings (the libstdc++ __result_of_impl /
+__invoke_result shape, a void- then int-returning std::bind).
