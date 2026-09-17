@@ -9312,3 +9312,23 @@ conversion, renaming_level 'identifier' unknown, solver_hardness incomplete
 type, symex_assign 'zip' ambiguous, symex_atomic_section 'operator|='.
 PITFALL: pkill/pgrep -f with the script name matches the invoking shell — kill
 by saved PID. Census: 5 (+cpp11_std_bind_basic).
+
+## Round 139 (2026-09-17) — user Issues 5–8
+
+- `567813aced` Issue 5: trailing `__attribute__` after a class-TEMPLATE body →
+  merged_type kept as parsed → no tag → "must not be anonymous". Fold in
+  parser (new unwrap_attributed_class_spec, shared with rClassSpec) + in
+  typecheck_class_template. Issue 6 (alias with aligned attr) was a
+  consequence; alias attr itself ignored (g++/clang++ too).
+  ALSO FOUND: rClassSpec/alignas unwraps used `irept alignment;` default
+  (NOT nil!) → phantom #alignment on every `struct __attribute__((packed)) X`
+  → "unexpected expression: " + wrong sizes (P 3→4). Likely the user's Issue
+  7 trigger (attribute before name + bitfields). PITFALL: default typet/irept
+  `is_not_nil()` is TRUE — use explicit bools.
+- `7ff88a6891` Issue 8: offsetof failed for EVERY C++ class — shared
+  typecheck_expr_builtin_offsetof looked up by component NAME (C++: `S::d`),
+  designator is the spelling (= base_name). Fixed in c_typecheck_expr.cpp
+  (base-name fallback, no-op for C). ansi-c suite green (clang-only env fails).
+Issue 7 as literally described didn't reproduce standalone (enum class : uint8_t
+bitfields pack to 2 in all my shapes); covered by test anyway.
+Suites ×5 green; revert-tests 5/5 fail on pre-round. Census unchanged (5).
