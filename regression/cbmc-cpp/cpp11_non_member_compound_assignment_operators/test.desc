@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [over.match.oper]/3: compound assignment on a class-type operand
+considered only the member candidate T1::operator@=; a non-member
+operator@= (including a friend declared in-class and defined out of line,
+CBMC's guard_exprt) was "found no match".  All ten compound operators as free
+functions, plus the member-wins and different-right-operand cases.

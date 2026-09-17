@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [class.copy.ctor]/14 + [temp.inst]/4: the comparator copy in libstdc++
+_Rb_tree_key_compare(const _Key_compare&) odr-uses the implicitly-defined
+copy constructor of std::less<int> only from a body finished in the LAST
+elaboration stage (the half-converted-instance fixpoint); by then the
+not-yet-used implicit members had already been cleared, so the copy
+constructor was bodiless and the pair construction havocked.  Implicit
+members used late are now elaborated; the clearing happens once at the end.
