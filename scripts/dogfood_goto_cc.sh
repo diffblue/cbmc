@@ -63,9 +63,9 @@ esac
 
 # Extract the -I flags that CMake uses for cbmc.  Use irep_hash.cpp as
 # representative since every util file compiles with the same set.
-INCLUDES=$(python3 - <<'PY'
+INCLUDES=$(python3 - "$COMPILE_COMMANDS" <<'PY'
 import json, sys
-with open("build/compile_commands.json") as f:
+with open(sys.argv[1]) as f:
     cmds = json.load(f)
 for c in cmds:
     if c["file"].endswith("/util/irep_hash.cpp"):
