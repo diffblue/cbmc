@@ -3482,8 +3482,33 @@ const symbolt &cpp_typecheckt::instantiate_template(
   // save old scope
   cpp_save_scopet saved_scope(cpp_scopes);
 
-  // mapping from template parameters to values/types
-  template_map.build(template_type, specialization_template_args);
+  // mapping from template parameters to values/types.
+  //
+  // N5008 [temp.inst]/2-3, [temp.spec.partial.match]: for a PRIMARY
+  // template the specialization's template arguments ARE the
+  // template-argument list.  An instance symbol re-elaborated later (it
+  // was named while an argument class was still incomplete -- renamedt<
+  // ssa_exprt, L0> in a parameter type before ssa_exprt's definition)
+  // arrives with its stored specialization arguments EMPTY and only the
+  // full arguments set; build() then rejected the arity mismatch and the
+  // body was substituted with whatever the ENCLOSING instantiation had
+  // bound to the same-named parameters -- `renamedt<exprt, L2>`'s
+  // `underlyingt` = exprt when the re-elaboration was triggered from its
+  // friend declaration, so `renamedt<ssa_exprt, L0>::get()` returned
+  // `const exprt &` (goto-symex renaming_level: "'identifier' is
+  // unknown").  Use the full arguments in that case.
+  const bool primary_with_empty_spec_args =
+    specialization_template_args.arguments().empty() &&
+    !full_template_args.arguments().empty() &&
+    template_symbol.type.id() == ID_cpp_declaration &&
+    to_cpp_declaration(template_symbol.type)
+      .partial_specialization_args()
+      .arguments()
+      .empty();
+  template_map.build(
+    template_type,
+    primary_with_empty_spec_args ? full_template_args
+                                 : specialization_template_args);
 
   // N5008 [temp.spec.partial.match]: a partial specialization's parameters
   // are bound by DEDUCTION from its argument pattern, not positionally from
