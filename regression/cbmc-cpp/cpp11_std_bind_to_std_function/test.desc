@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+Conversion of a libstdc++ _Bind object to std::function: the converting
+constructor's _Callable constraint evaluates __invoke_result<_Bind&, Args...>
+BEFORE any direct call.  Requires (1) [temp.deduct]/5: the partial
+specialization result_of<_Functor(_ArgTypes...)> must expand ITS OWN
+_ArgTypes pack, not a same-named pack of an enclosing instantiation
+(function_parameter_pack short-name bleed); (2) [dcl.ref]/7: a declarator
+reference over a substituted reference type collapses; (3) [expr.typeid]/1:
+typeid(_Functor) in _Function_handler::_M_manager for a class with member
+templates.  Third assertion is the goto-symex shadow_memoryt dog-food shape.
