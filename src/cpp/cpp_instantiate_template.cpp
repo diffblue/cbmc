@@ -6371,24 +6371,41 @@ skip_pack_removal_ft:
       // (`symbol 'args' is unknown`, libc++ __perfect_forward's
       // `operator()(_Args&&... __args) -> decltype(_Op()(..., __args...))`
       // invoked with no arguments) and the member is dropped.
+      // N5008 [temp.param]/14: the pack need not be the LAST template
+      // parameter -- it may be followed by parameters that are deducible
+      // or defaulted (libstdc++ `_Bind::operator()<class... _Args,
+      // class _Result = _Res_type<tuple<_Args...>>>`, invoked with no
+      // arguments).  Locate the (single) pack at whatever position it
+      // occupies; the deduced argument list then carries the
+      // `empty_typet` sentinel at the pack's own slot and the trailing
+      // parameters' arguments after it.  Gated to the trailing shape
+      // only, `std::bind(f, 2, 3)()` kept `forward<_Args>(__args)...` in
+      // the body and the call operator was silently dropped.
       {
         const auto &mtps = template_type.template_parameters();
-        const bool m_trailing_pack =
-          !mtps.empty() && mtps.back().get_bool(ID_ellipsis);
-        const bool m_short_args =
-          full_template_args.arguments().size() < mtps.size();
-        const bool m_sentinel =
-          full_template_args.arguments().size() == mtps.size() &&
-          !full_template_args.arguments().empty() &&
-          full_template_args.arguments().back().id() == ID_type &&
-          full_template_args.arguments().back().type().id() == ID_empty;
-        if(m_trailing_pack && (m_short_args || m_sentinel))
+        std::size_t m_pack_pos = mtps.size();
+        std::size_t m_n_packs = 0;
+        for(std::size_t mi = 0; mi < mtps.size(); ++mi)
+          if(mtps[mi].get_bool(ID_ellipsis))
+          {
+            if(m_pack_pos == mtps.size())
+              m_pack_pos = mi;
+            ++m_n_packs;
+          }
+        const auto &m_args = full_template_args.arguments();
+        const bool m_single_pack = m_n_packs == 1;
+        const bool m_short_args = m_args.size() < mtps.size();
+        const bool m_sentinel = m_single_pack && m_args.size() == mtps.size() &&
+                                m_pack_pos < m_args.size() &&
+                                m_args[m_pack_pos].id() == ID_type &&
+                                m_args[m_pack_pos].type().id() == ID_empty;
+        if(m_single_pack && (m_short_args || m_sentinel))
         {
           // the EMPTY template pack's short name (e.g. `Args`)
           std::string m_pack_short;
           {
             const std::string mf =
-              id2string(mtps.back().type().get(ID_identifier));
+              id2string(mtps[m_pack_pos].type().get(ID_identifier));
             const auto mp = mf.rfind("::");
             m_pack_short = mp != std::string::npos ? mf.substr(mp + 2) : mf;
           }
