@@ -3853,9 +3853,21 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 
           struct_exprt result({}, base_type);
           std::size_t i = leading_base_clauses;
-          bool ok = true;
+          // N5008 [dcl.init.list]/3.4: a class with a user-declared
+          // constructor is not an aggregate ([dcl.init.aggr]/1); its
+          // braced elements are constructor arguments, resolved by the
+          // constructor path below.  Building a memberwise struct value
+          // here instead bypassed the constructors: for a nested
+          // `{1, {2, lambda}}` into std::pair<int, std::pair<int,
+          // std::function<int()>>> the inner pair's std::function was
+          // copied bitwise from a temporary before that temporary's
+          // constructor had run, and the call operator later reached
+          // __throw_bad_function_call.  Skip the memberwise path.
+          bool ok = !has_user_ctor;
           for(const auto &c : comps)
           {
+            if(!ok)
+              break;
             if(
               c.get_is_padding() || c.type().id() == ID_code ||
               c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
