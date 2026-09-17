@@ -111,6 +111,13 @@ public:
   ///   a function-parameter pack in the (already-instantiated) body must not be
   ///   re-expanded against an unrelated enclosing pack's size.
   void expand_call_argument_packs(irept &n, bool only_nontype = false) const;
+  /// Substitute the k-th element of every same-length pack other than
+  /// \p base referenced in \p copy (lockstep expansion, [temp.variadic]/5).
+  void substitute_other_packs_lockstep(
+    irept &copy,
+    const std::string &base,
+    std::size_t k,
+    std::size_t n) const;
 
   // N5008 [basic.scope.temp]/2 + [temp.deduct]/5: while a template is being
   // DEDUCED, the identifiers of its own parameters.  The short-name fallback
