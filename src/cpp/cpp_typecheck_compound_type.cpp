@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_typecheck_resolve.h"
 
+#include <functional>
 #include <memory>
 
 #ifdef DEBUG
@@ -1192,16 +1193,31 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // pointer/reference type so overload resolution can form the
     // argument conversion ([over.match]); for ordinary, already-formed
     // parameters this is a no-op.
+    // The same holds one level down: a parameter whose type is a POINTER TO
+    // FUNCTION with the class's pack in its parameter list -- `fn(R (*g)
+    // (A...))` of a `fn<R(A...)>` specialization instantiated with a
+    // reference argument type -- gets the pack elements substituted as raw
+    // frontend_pointers too; left unconverted, the constructor took a
+    // `void (*)(<<type:frontend_pointer>>)` no argument could match.
     if(is_function_member && final_type.id() == ID_code)
     {
-      for(auto &param : to_code_type(final_type).parameters())
+      std::function<void(typet &)> convert_frontend_pointers = [&](typet &t)
       {
-        if(param.type().id() == ID_frontend_pointer)
+        if(t.id() == ID_frontend_pointer)
         {
-          cpp_convert_plain_type(param.type(), get_message_handler());
-          typecheck_type(param.type());
+          cpp_convert_plain_type(t, get_message_handler());
+          typecheck_type(t);
         }
-      }
+        else if(t.id() == ID_pointer)
+          convert_frontend_pointers(to_pointer_type(t).base_type());
+        else if(t.id() == ID_code)
+        {
+          for(auto &param : to_code_type(t).parameters())
+            convert_frontend_pointers(param.type());
+        }
+      };
+      for(auto &param : to_code_type(final_type).parameters())
+        convert_frontend_pointers(param.type());
     }
   }
 
