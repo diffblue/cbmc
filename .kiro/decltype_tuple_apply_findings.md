@@ -9715,3 +9715,123 @@ failures — the suite is goto-cc based).
   divergences remain dominated by this.
 - Upstream branch updated: + `845292c2a6`/`5bace5625d` (pragma pack, test);
   ansi-c + cbmc suites green on develop+8.
+
+## Round 146 (2026-09-18) — C++ class layout for real, base subobjects, range-for, rvalue refs
+
+- PADDING GATE REMOVED: every C++ class and union now gets add_padding()
+  (sizeof/offsetof/alignof match g++ on x86-64).  Prerequisite: all
+  struct_exprt construction sites in src/cpp go through
+  `zero_struct_value()` (zero_initializer, so padding components present)
+  + `set_struct_member_value()` (by component NAME; operands correspond to
+  the non-code/non-static/non-type components, as zero_initializer's
+  struct case).  Sites: braced return (cpp_typecheck_code.cpp),
+  implicit_typecast braced class init (2), initializer_list value (2:
+  conversions + cpp_typecheck_initializer build_initializer_list_value),
+  explicit-type braced init (2, cpp_typecheck_expr), constexpr aggregate
+  return, lambda closure value (captures by member name), aggregate
+  variable init (cpp_typecheck_initializer), vtable values (padding
+  components → zero).  The 24 cbmc-cpp failures of the round-145
+  experiment all came from these.
+- Base-class flattening: base padding components renamed `$padN$bK'
+  (two bases both had `$pad2' → symex `field_generation == 1');
+  padding.cpp treats pre-existing padding components as opaque (their
+  bit-vector type must not contribute alignment).
+- Base subobject layout (Itanium ABI 2.4 approximation):
+  cpp_typecheck_bases marks the first component of each direct base with
+  ID_C_base_alignment (= alignment(base)); padding.cpp aligns there and
+  folds it into the struct alignment (also in alignment_rec, incl. the
+  packed branch); tail (byte) padding of a NON-POD base (cpp_is_pod) is
+  dropped so derived members may start in it (dsize < sizeof); POD bases
+  keep sizeof.  Bit-field pads are kept (GCC starts derived bit-fields at
+  the next byte).  Test cpp_base_subobject_layout.
+- `#pragma pack' in C++: scanner already tracked the stack; tokens now
+  carry `pragma_pack' (cpp_tokent), Parser::apply_pragma_pack merges the
+  pragma-marked `aligned' node into each non-static data member
+  declaration (also anonymous struct/union members), pack(1) at the
+  closing brace sets ID_C_packed; cpp_typecheck_type propagates
+  ID_C_pragma_pack across cpp_name resolution.  Test cpp_pragma_pack.
+- `alignas(32) T m;' / `__attribute__((aligned)) T m;' with a TYPEDEF-NAME
+  T: rOtherDeclaration swapped the type and lost the leading specifier
+  (rIntegralDeclaration had the merge).  Alignment merge rule everywhere
+  (cpp_typecheck_type cpp_name resolution, ansi_c_convert_typet::
+  set_attributes, c_typecheck_type already_typechecked + typedef paths):
+  declaration `aligned(k)' only increases; a typedef's alignment stays
+  when larger (g++; clang rejects the lowering case).  Tests
+  cpp11_alignas_on_typedef_name_member, ansi-c/Struct_Padding13.
+- packed struct: members of NON-POD class type are not packed (GCC:
+  "ignoring packed attribute because of unpacked non-POD field"; clang
+  same) — ID_C_non_pod set on the class at layout time, read by
+  padding.cpp.  Test cpp_packed_non_pod_member.
+- Range-based for: (a) the for-range-declaration is in its own block
+  scope ([stmt.ranged]/1) — two sequential loops reusing the variable
+  name shared ONE symbol (second `symbol_table.insert' silently failed;
+  `pair.second.empty()' resolved against loop 1's type:
+  symex_atomic_section.cpp sweep FAIL); (b) `auto &x' / `T &x' loop
+  variables were BY-VALUE copies (declarator's `&' dropped): writes lost,
+  std::list element copied bitwise, `S &' gave a type-inconsistent
+  assignment (symex invariant).  Tests cpp11_range_for_variable_scope,
+  cpp11_range_for_reference_variable.
+- Rvalue references ([dcl.init.ref]/5.3): `W &&' from an expression of
+  unrelated type (int prvalue, string literal, const char* lvalue) now
+  creates the temporary via the converting constructor (was rejected with
+  non-const lvalue refs); /5.4 lvalue rejection only for reference-RELATED
+  types; string literals are lvalues (ID_string_constant); [over.ics.rank]
+  /3.2.3 tie-break W&& over const W& via cv_distance; `Base &&' bound to
+  a Derived prvalue gets the derived-to-base pointer adjustment in
+  typecheck_function_call_arguments (was a symex address_arithmetic
+  invariant).  xm1 (`xmlt("loop", {{"name", id}}, {})') type-checks now;
+  the map-heavy variants blow up the SAT solver (8 GiB), not a front-end
+  issue.  Test cpp11_rvalue_reference_from_converting_constructor.
+- Explicit instantiation of an OVERLOADED member template
+  (`template renamedt<exprt, L1> goto_symex_statet::rename<L1>(...)'):
+  convert_explicit_instantiation bailed out with >1 candidates and the
+  fallback path could not resolve `L1'; now picks by parameter count or
+  accepts without instantiating.  goto_symex_state.cpp rc=0 (the
+  `pair<const string, list>' error is gone too); residual non-fatal
+  "no match for 'rename'" noise when rename_address<L1> is instantiated
+  from the explicit instantiation at line 405 (definition of the typet
+  overload comes at 727) — not reproduced in an 8-minute reduced TU.
+- More layout rules found by the fuzzer after that: members flattened in
+  from a PACKED base keep the packed layout (component ID_C_packed);
+  `alignas(16) void *p' aligns the POINTER (cpp_typecheck_type hoists as
+  C does; references too); a class defined under `#pragma pack(n)'
+  records n on its type: base subobject alignment capped, members'
+  contribution to the class alignment capped, the class's own `aligned'
+  still raises (alignment_rec: struct/union branch applies the cap before
+  a_int; the member-cap of a struct_tag stays after) -- for a type
+  defined IN PLACE the same attribute object is definition cap and member
+  cap, so add_padding_gcc caps the PLACEMENT separately
+  (`apply_pragma_pack(it_type, alignment(it_type))') and add_padding(union)
+  sizes the union without the cap (`union { long a; } aligned(16)' under
+  pack(4): at 4, 16 bytes); the in-place type's `aligned'
+  (ID_C_type_alignment) and cap travel on the member's tag type in C++ as
+  in C (typecheck_compound_type; convert_anon_struct_union_member for
+  anonymous members); the parser's pragma-marked `aligned' node must not
+  be folded as an alignment by unwrap_attributed_class_spec.
+- `aligned(k)' on a declaration vs an aligned typedef: max, typedef keeps
+  its marking when larger, `packed, aligned(k)' exact; the member's own k
+  is kept as ID_C_member_alignment for the packed-struct rule (there the
+  type's alignment is ignored but the member's attribute counts: fuzz
+  seeds 138/199 regressed without it).
+- `__builtin_offsetof(D, c)' with c in both D and a base named the base's
+  (first component with that base name): derived member hides
+  ([class.member.lookup]).
+- COW hazard learned the hard way: `typet copy = type;' inside
+  add_padding(union) shared the irep with the caller's `type', whose
+  `components()' reference the later push_back detached -- segfault in
+  the caller's loop.  Never copy a typet you are about to mutate while a
+  caller holds references into it; remove/re-add the attribute instead.
+- Fuzzer at the end of the round: C 0/200 (all round-145 corner seeds
+  fixed: the array member's pragma cap sits on the element type while its
+  `aligned' sits on the array), C++ 16/150 (from 142/150), of which 14 are
+  `struct alignas(16) S {...} __attribute__((aligned(4)))': g++ lets the
+  trailing attribute WIN (alignof 4), clang and N5008 [dcl.align]/4 take
+  the strictest (16) -- we follow the standard; 1 is the empty-class model
+  (size 0, sizeof reports 1: `struct {} aligned(2)' 1 vs 2, an empty
+  member takes a byte); 1 was the packed non-POD rule refined: GCC's
+  "UNPACKED non-POD field" -- a non-POD class type that is itself packed
+  (also `packed, aligned(8)') IS packed in the enclosing packed struct.
+- cbmc vs goto-cc gave different offsets for the same TU once: not a
+  config difference but the array cap bug above showing in different
+  evaluation orders; keep the goto-cc STATIC_ASSERT form of the ansi-c
+  tests as a cross-check.
