@@ -9664,3 +9664,54 @@ failures — the suite is goto-cc based).
   /tmp/dogfood-snapshots/60409dc8d8-20260917-235038/sweep.log <new>/sweep.log`.
   Remove its worktree afterwards (`git worktree remove --force <snap>/tree`),
   and /tmp/r144/upstream when the upstream branch has been dealt with.
+
+## Round 145 (2026-09-18) — fuzzer extension, pragma pack, pack generations, gate experiment
+
+- layout_fuzz.py extended (`f09e664e9e`): anonymous struct/union members,
+  `#pragma pack(push,n)`, `_Alignas`/`alignas` (members; class in C++),
+  aligned typedefs, C++ bases incl. empty ones.  C: 101/300 → 5/300 after
+  `1ae25089fa`; remaining 5 seeds in /tmp/r145/remaining (pack(1)/pack(2) +
+  packed + aligned corner cases: `_Alignas(32)` member under pack(1);
+  packed struct under pack(2) with `long long m[8] packed,aligned(4)` + `:0`;
+  zero-width bit-fields in a packed union under pragma contribute
+  alignment).  Test ansi-c/Struct_Padding12 (`ca02844b1c`).
+- `#pragma pack(n)` redesigned (`1ae25089fa`): separate per-member cap
+  (ID_C_pragma_pack, parser → ansi_c_convert_type → padding.cpp
+  apply_pragma_pack): alignment = min(n, max(natural, own aligned(k)));
+  packed struct under pragma still byte-aligned; struct-typed members capped
+  (were excluded in parser.y); bit-fields DENSE under any pragma (GCC) but
+  zero-width `:0` aligns to full type; named bit-field of a packed struct
+  under pragma contributes min(n,natural).  `_Alignas(16) void *q` applies
+  to the POINTER (hoisted in c_typecheck_type ID_pointer branch, together
+  with the cap); `struct {..} __attribute__((aligned(8)))` in-place type
+  alignment (ID_C_type_alignment) ignored in packed struct; array member
+  attribute = element type's.
+- pf4 FIXED (`ec8c968b62`): template_mapt::generation_map + set_pack_size()
+  (all 31 direct pack_size_map assignments routed through it);
+  expand_call_argument_packs picks the most recently bound same-suffix pack
+  (was: first LIVE one → outer `__is_constructible_impl::_Args` element
+  injected into std::function's empty `_S_test::_Args` expansion);
+  typecheck_template_args' live-binding veto compares generations.  sp5,
+  nb_a, pf3/pf4 pass; xm1/xm2 (braced list → `std::map&&`/`std::list&&`
+  params of xmlt ctor) still open.  Test
+  cpp11_empty_pack_expansion_innermost_binding.
+- C++ fuzzer at HEAD: 142/150 divergent, of which 85 were CRASHES
+  (`size_of_expr_rec: bit_field_bits == 0`): class with BASES + bit-field
+  run followed by a member was never padded (gate skipped bases).  Fixed:
+  pad classes with bases when they contain a bit-field; base-flattened
+  padding components don't count as "already padded"; unique padding names
+  (`fresh_padding_name`, `$pad3$`) — second crash was symex `declare:
+  field_generation == 1` from duplicate `$bit_field_padN`.  Test
+  cpp11_derived_class_bit_field_layout.
+- GATE EXPERIMENT (pad every base-less struct + unions), isolated cbmc-cpp
+  run on /tmp/r145/binX: 24 tests fail: lambda captures (closure
+  struct_exprt built per data member), initializer_list synthesis
+  (cpp_typecheck_initializer.cpp:142 → vacuous pass!), unordered containers,
+  virtual9 (vtable struct value), brace-init paths, pair value in stdlib.
+  Root cause: ~10 struct_exprt construction sites in src/cpp emit one
+  operand per DATA member, none for padding components (list: grep
+  struct_exprt src/cpp).  Landing the gate removal needs a padding-aware
+  struct-value builder used by all of them.  NOT landed; fuzzer C++ mode
+  divergences remain dominated by this.
+- Upstream branch updated: + `845292c2a6`/`5bace5625d` (pragma pack, test);
+  ansi-c + cbmc suites green on develop+8.
