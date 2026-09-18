@@ -31,6 +31,36 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <unordered_set>
 
+/// GCC: an `aligned(k)' attribute on a declaration only INCREASES the
+/// alignment of the declared object.  When \p type already carries the
+/// alignment of a typedef (which may be below the natural alignment), the
+/// larger of the two applies: `typedef int __attribute__((aligned(16))) T;
+/// T x __attribute__((aligned(4)));' gives x alignment 16, and the typedef's
+/// marking (ID_C_typedef_alignment) is kept in that case.
+/// Together with `packed' the attribute sets the alignment EXACTLY (`T m
+/// __attribute__((packed, aligned(1)))' is byte-aligned whatever T's
+/// typedef says).
+static void
+add_declaration_alignment(typet &type, const exprt &alignment, bool packed)
+{
+  const exprt &existing = static_cast<const exprt &>(type.find(ID_C_alignment));
+  const auto given = numeric_cast<mp_integer>(alignment);
+  const auto existing_value = existing.is_nil()
+                                ? std::optional<mp_integer>{}
+                                : numeric_cast<mp_integer>(existing);
+  if(
+    !packed && given.has_value() && existing_value.has_value() &&
+    *existing_value >= *given)
+  {
+    // the member's own attribute still counts where the type's alignment
+    // is ignored -- in a packed struct (padding.cpp
+    // explicit_member_alignment)
+    type.add(ID_C_member_alignment) = alignment;
+    return;
+  }
+  type.add(ID_C_alignment) = alignment;
+}
+
 void c_typecheck_baset::typecheck_type(typet &type)
 {
   // we first convert, and then check
@@ -58,7 +88,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     if(packed)
       type.set(ID_C_packed, true);
     if(alignment.is_not_nil())
-      type.add(ID_C_alignment, alignment);
+      add_declaration_alignment(type, alignment, packed);
     if(pragma_pack.is_not_nil())
       type.add(ID_C_pragma_pack, pragma_pack);
     if(_typedef.is_not_nil())
@@ -1727,7 +1757,8 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   if(is_packed)
     type.set(ID_C_packed, true);
   if(alignment.is_not_nil())
-    type.set(ID_C_alignment, alignment);
+    add_declaration_alignment(
+      type, static_cast<const exprt &>(alignment), is_packed);
   if(pragma_pack.is_not_nil())
     type.set(ID_C_pragma_pack, pragma_pack);
 
