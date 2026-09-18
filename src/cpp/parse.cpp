@@ -2690,7 +2690,19 @@ bool Parser::rIntegralDeclaration(
       if(lex.get_token(tk)!=';')
         return false;
 
-      // TODO
+      // N5008 [class.bit]/2: an unnamed bit-field is not a member, but it
+      // still occupies its bits (`struct { char c; int : 3; char d; }' is 3
+      // bytes, and `int : 0' aligns the next bit-field to an int
+      // boundary).  Keep it as a nameless declarator; the typechecker gives
+      // the component an anonymous name.  It used to be discarded.
+      cpp_declaratort declarator;
+      set_location(declarator, tk);
+      typet bit_field_type(ID_c_bit_field);
+      bit_field_type.set(ID_size, width);
+      bit_field_type.add_subtype().make_nil();
+      set_location(bit_field_type, tk);
+      declarator.type() = std::move(bit_field_type);
+      declaration.declarators().push_back(declarator);
     }
     return true;
 
