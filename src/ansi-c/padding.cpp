@@ -316,6 +316,28 @@ underlying_width(const c_bit_field_typet &type, const namespacet &ns)
     return {};
 }
 
+/// A padding component's name must be unique within the struct: the
+/// components of a (padded) C++ base class are flattened into the derived
+/// class together with their `$pad<N>' components, and the derived class's
+/// own layout may want the same index.
+static irep_idt fresh_padding_name(
+  const struct_typet::componentst &components,
+  const std::string &prefix,
+  std::size_t index)
+{
+  std::string name = prefix + std::to_string(index);
+  auto taken = [&](const std::string &n)
+  {
+    for(const auto &c : components)
+      if(c.get_name() == n)
+        return true;
+    return false;
+  };
+  while(taken(name))
+    name += "$";
+  return name;
+}
+
 static struct_typet::componentst::iterator pad_bit_field(
   struct_typet::componentst &components,
   struct_typet::componentst::iterator where,
@@ -325,7 +347,8 @@ static struct_typet::componentst::iterator pad_bit_field(
     unsignedbv_typet(pad_bits), pad_bits);
 
   struct_typet::componentt component(
-    "$bit_field_pad" + std::to_string(where - components.begin()),
+    fresh_padding_name(
+      components, "$bit_field_pad", where - components.begin()),
     padding_type);
 
   component.set_is_padding(true);
@@ -341,7 +364,7 @@ static struct_typet::componentst::iterator pad(
   const unsignedbv_typet padding_type(pad_bits);
 
   struct_typet::componentt component(
-    "$pad" + std::to_string(where - components.begin()),
+    fresh_padding_name(components, "$pad", where - components.begin()),
     padding_type);
 
   component.set_is_padding(true);
