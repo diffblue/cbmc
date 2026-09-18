@@ -1138,6 +1138,23 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
     suppress_elaborate = old_suppress;
 
+    // N5008 [class.mem.general]/14: a non-static data member shall have a
+    // complete type, and [temp.inst]/2: the specialization is implicitly
+    // instantiated when completeness affects the semantics.  An instance
+    // named only through a typedef/alias has its elaboration deferred to
+    // first use (convert_non_template_declaration), and this member IS that
+    // use: without it the class was laid out with an incomplete member type
+    // (no size, no alignment -- `struct F { uint8_t t; aligned_alias_t w; }'
+    // lost its padding).  Arrays of such a type likewise.
+    if(!is_function_member && !is_static && !is_typedef)
+    {
+      const typet *element = &final_type;
+      while(element->id() == ID_array)
+        element = &to_array_type(*element).element_type();
+      if(element->id() == ID_struct_tag || element->id() == ID_union_tag)
+        elaborate_class_template(*element);
+    }
+
     // N5008 [temp.variadic]/7: a function/constructor parameter that is a pack
     // expansion over a pack empty in this instantiation contributes no
     // parameters.  Such a parameter resolves to the empty_typet zero-length
