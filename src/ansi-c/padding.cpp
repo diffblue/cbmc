@@ -44,13 +44,40 @@ Author: Daniel Kroening, kroening@kroening.com
 /// The alignment a member of a packed struct/union keeps: its own
 /// `aligned(n)' attribute.  An alignment that belongs to the member's TYPE
 /// (a typedef's `aligned', marked ID_C_typedef_alignment) is ignored there,
-/// as GCC ignores the alignment of an aligned class type in a packed struct.
-static std::optional<mp_integer> explicit_member_alignment(const typet &type)
+/// as GCC ignores the alignment of an aligned class type in a packed struct
+/// (also when that type is defined in place, ID_C_type_alignment).  A
+/// `#pragma pack(n)' cap in force for the member still applies.
+static std::optional<mp_integer> explicit_member_alignment(const typet &_type)
 {
-  const exprt &given = static_cast<const exprt &>(type.find(ID_C_alignment));
-  if(given.is_nil() || given.get_bool(ID_C_typedef_alignment))
+  // an alignment specifier on an array member sits on the element type
+  const typet *type = &_type;
+  while(type->id() == ID_array && type->find(ID_C_alignment).is_nil())
+    type = &to_array_type(*type).element_type();
+  const exprt &given = static_cast<const exprt &>(type->find(ID_C_alignment));
+  if(
+    given.is_nil() || given.get_bool(ID_C_typedef_alignment) ||
+    given.get_bool(ID_C_type_alignment))
     return {};
-  return numeric_cast<mp_integer>(given);
+  auto result = numeric_cast<mp_integer>(given);
+  const auto cap = numeric_cast<mp_integer>(
+    static_cast<const exprt &>(type->find(ID_C_pragma_pack)));
+  if(result.has_value() && cap.has_value() && *cap < *result)
+    result = cap;
+  return result;
+}
+
+/// GCC `#pragma pack(n)': "The alignment of a member will be on a boundary
+/// that is either a multiple of n or a multiple of the size of the member,
+/// whichever is smaller" -- the cap applies after the member's own
+/// `aligned(k)' (which can only increase the natural alignment):
+/// min(n, max(natural, k)).
+static mp_integer apply_pragma_pack(const typet &type, mp_integer alignment)
+{
+  const auto cap = numeric_cast<mp_integer>(
+    static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
+  if(cap.has_value() && *cap > 0 && *cap < alignment)
+    return *cap;
+  return alignment;
 }
 
 static mp_integer alignment_rec(
@@ -106,21 +133,20 @@ static mp_integer alignment_rec(
     a_int > 0 && !type.get_bool(ID_C_packed) &&
     given_alignment.get_bool(ID_C_typedef_alignment))
   {
-    return a_int;
+    return apply_pragma_pack(type, a_int);
   }
   // alignment and packing: GCC's `aligned' attribute can only increase the
   // alignment, unless `packed' is specified as well, in which case the
   // alignment is exactly the given one (both larger and smaller than the
   // natural one).  `struct S { ... } __attribute__((packed, aligned(16)))'
   // has alignment 16, and a member of that type is placed on a 16-byte
-  // boundary.  The exception is the pair induced by #pragma pack(n) (marked
-  // by the parser): that only caps the alignment at n, handled below.
+  // boundary.  (#pragma pack(n) is a separate cap, ID_C_pragma_pack, applied
+  // on every path by apply_pragma_pack.)
   // (For a packed struct or union the members' OWN `aligned(n)' attributes
   // still count: `struct P { char c; int x __attribute__((aligned(4))); }
   // __attribute__((packed))' has x at offset 4 and alignment 4, and a
   // `packed, aligned(4)' struct with an aligned(8) member has alignment 8.)
-  else if(
-    type.get_bool(ID_C_packed) && !given_alignment.get_bool(ID_C_pragma_pack))
+  else if(type.get_bool(ID_C_packed))
   {
     mp_integer result = a_int > 0 ? a_int : 1;
     if(type.id() == ID_struct || type.id() == ID_union)
@@ -130,9 +156,28 @@ static mp_integer alignment_rec(
         const auto member_alignment = explicit_member_alignment(c.type());
         if(member_alignment.has_value() && *member_alignment > result)
           result = *member_alignment;
+        // GCC: a named bit-field of a packed struct declared under
+        // `#pragma pack(n)' still contributes min(n, natural) (observed:
+        // `struct { short m : 9; bool b[8]; } __attribute__((packed))'
+        // under pack(2) has alignment 2)
+        if(
+          c.type().id() == ID_c_bit_field && !c.get_anonymous() &&
+          to_c_bit_field_type(c.type())
+            .underlying_type()
+            .find(ID_C_pragma_pack)
+            .is_not_nil())
+        {
+          result = std::max(
+            result,
+            alignment_rec(
+              to_c_bit_field_type(c.type()).underlying_type(),
+              ns,
+              in_progress,
+              done));
+        }
       }
     }
-    return result;
+    return apply_pragma_pack(type, result);
   }
 
   // compute default
@@ -231,24 +276,11 @@ static mp_integer alignment_rec(
   else
     result=1;
 
-  if(a_int > 0)
-  {
-    if(type.get_bool(ID_C_packed))
-    {
-      // #pragma pack(n): "The alignment of a member will be on a boundary
-      // that is either a multiple of n or a multiple of the size of the
-      // member, whichever is smaller."
-      if(a_int < result)
-        result = a_int;
-    }
-    else if(a_int > result)
-    {
-      // aligned(n) without packed: increase only
-      result = a_int;
-    }
-  }
+  // aligned(n) without packed: increase only
+  if(a_int > result)
+    result = a_int;
 
-  return result;
+  return apply_pragma_pack(type, result);
 }
 
 static std::optional<std::size_t>
@@ -454,9 +486,14 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     {
       a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
 
-      // A zero-width bit-field causes alignment to the base-type.
       if(to_c_bit_field_type(it_type).get_width()==0)
       {
+        // A zero-width bit-field causes alignment to the base-type -- its
+        // FULL alignment, not capped by #pragma pack(n) (GCC: `#pragma
+        // pack(4)' with `char c; long long : 0; char d;' puts d at 8).
+        typet underlying = to_c_bit_field_type(it_type).underlying_type();
+        underlying.remove(ID_C_pragma_pack);
+        a = alignment(underlying, ns);
       }
       else
       {
@@ -465,7 +502,13 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         // packed struct (byte-aligned bit-fields) and for UNNAMED bit-fields
         // (System V ABI: "unnamed bit-fields' types do not affect the
         // alignment of a structure or union").
-        if(max_alignment < a && !struct_is_packed && !it->get_anonymous())
+        const bool under_pragma_pack = to_c_bit_field_type(it_type)
+                                         .underlying_type()
+                                         .find(ID_C_pragma_pack)
+                                         .is_not_nil();
+        if(
+          max_alignment < a && !it->get_anonymous() &&
+          (!struct_is_packed || under_pragma_pack))
           max_alignment=a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
@@ -477,7 +520,10 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         // the current unit, it starts at the next one; the remaining bits
         // are padding.  `struct { uint8_t a : 6, b : 1, c : 4, d : 5; }' is
         // thus 3 bytes, not 2.  A packed struct places bit-fields densely.
-        if(!struct_is_packed && !it->get_is_padding())
+        // Under `#pragma pack(n)' -- any n -- GCC lays bit-fields out
+        // densely, like in a packed struct (`char c; short s : 14; char d;'
+        // under pack(8) has d at 3; without the pragma at 4).
+        if(!struct_is_packed && !under_pragma_pack && !it->get_is_padding())
         {
           const auto unit_bits =
             underlying_width(to_c_bit_field_type(it_type), ns);

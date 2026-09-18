@@ -191,13 +191,21 @@ void ansi_c_convert_typet::read_rec(const typet &type)
     packed=true;
   else if(type.id()==ID_aligned)
   {
-    aligned=true;
-
-    // may come with size or not
-    if(type.find(ID_size).is_nil())
-      alignment=exprt(ID_default);
+    if(type.get_bool(ID_C_pragma_pack))
+    {
+      // the #pragma pack(n) cap synthesised by the parser for a member
+      pragma_pack = static_cast<const exprt &>(type.find(ID_size));
+    }
     else
-      alignment=static_cast<const exprt &>(type.find(ID_size));
+    {
+      aligned = true;
+
+      // may come with size or not
+      if(type.find(ID_size).is_nil())
+        alignment = exprt(ID_default);
+      else
+        alignment = static_cast<const exprt &>(type.find(ID_size));
+    }
   }
   else if(type.id()==ID_transparent_union)
   {
@@ -705,4 +713,7 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
 
   if(aligned)
     type.set(ID_C_alignment, alignment);
+
+  if(pragma_pack.is_not_nil())
+    type.set(ID_C_pragma_pack, pragma_pack);
 }

@@ -49,6 +49,7 @@ void c_typecheck_baset::typecheck_type(typet &type)
     c_qualifiers += c_qualifierst(already_typechecked.get_type());
     bool packed=type.get_bool(ID_C_packed);
     exprt alignment=static_cast<const exprt &>(type.find(ID_C_alignment));
+    irept pragma_pack = type.find(ID_C_pragma_pack);
     irept _typedef=type.find(ID_C_typedef);
 
     type = already_typechecked.get_type();
@@ -58,6 +59,8 @@ void c_typecheck_baset::typecheck_type(typet &type)
       type.set(ID_C_packed, true);
     if(alignment.is_not_nil())
       type.add(ID_C_alignment, alignment);
+    if(pragma_pack.is_not_nil())
+      type.add(ID_C_pragma_pack, pragma_pack);
     if(_typedef.is_not_nil())
       type.add(ID_C_typedef, _typedef);
 
@@ -81,9 +84,34 @@ void c_typecheck_baset::typecheck_type(typet &type)
     typecheck_array_type(to_array_type(type));
   else if(type.id()==ID_pointer)
   {
-    typecheck_type(to_pointer_type(type).base_type());
+    typet &base_type = to_pointer_type(type).base_type();
+    typecheck_type(base_type);
     INVARIANT(
       to_bitvector_type(type).get_width() > 0, "pointers must have width");
+    // C11 6.7.5 / GCC: an alignment specifier in the declaration specifiers
+    // (`_Alignas(16) void *q;', `__attribute__((aligned(16))) void *q;')
+    // applies to the declared OBJECT, the pointer, not to the pointed-to
+    // type.  The parser merges it into the base type; hoist it -- unless it
+    // is the base type's own alignment (a typedef's, or that of a type
+    // defined in place), which stays where it is.
+    const exprt &base_alignment =
+      static_cast<const exprt &>(base_type.find(ID_C_alignment));
+    if(
+      base_alignment.is_not_nil() &&
+      !base_alignment.get_bool(ID_C_typedef_alignment) &&
+      !base_alignment.get_bool(ID_C_type_alignment) &&
+      type.find(ID_C_alignment).is_nil())
+    {
+      type.add(ID_C_alignment) = base_alignment;
+      base_type.remove(ID_C_alignment);
+    }
+    // likewise the #pragma pack(n) cap, a property of the declared member
+    const irept &base_pragma_pack = base_type.find(ID_C_pragma_pack);
+    if(base_pragma_pack.is_not_nil() && type.find(ID_C_pragma_pack).is_nil())
+    {
+      type.add(ID_C_pragma_pack) = base_pragma_pack;
+      base_type.remove(ID_C_pragma_pack);
+    }
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -805,6 +833,7 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
 
   bool is_packed = type.get_bool(ID_C_packed);
   irept alignment = type.find(ID_C_alignment);
+  irept pragma_pack = type.find(ID_C_pragma_pack);
 
   if(type.find(ID_tag).is_nil())
   {
@@ -915,7 +944,17 @@ void c_typecheck_baset::typecheck_compound_type(struct_union_typet &type)
   if(is_packed)
     type.set(ID_C_packed, true);
   if(alignment.is_not_nil())
+  {
+    // An `aligned' written on the type's own DEFINITION (`struct { ... }
+    // __attribute__((aligned(8))) m;' -- typically an anonymous member) is
+    // the type's alignment, not the member's: GCC ignores it inside a
+    // packed struct, while a member's own attribute is kept (padding.cpp).
+    if(have_body)
+      static_cast<exprt &>(alignment).set(ID_C_type_alignment, true);
     type.set(ID_C_alignment, alignment);
+  }
+  if(pragma_pack.is_not_nil())
+    type.set(ID_C_pragma_pack, pragma_pack);
 }
 
 void c_typecheck_baset::typecheck_compound_body(
@@ -1679,6 +1718,7 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
   c_qualifierst c_qualifiers(type);
   bool is_packed = type.get_bool(ID_C_packed);
   irept alignment = type.find(ID_C_alignment);
+  irept pragma_pack = type.find(ID_C_pragma_pack);
 
   c_qualifiers += c_qualifierst(symbol.type);
   type = symbol.type;
@@ -1688,6 +1728,8 @@ void c_typecheck_baset::typecheck_typedef_type(typet &type)
     type.set(ID_C_packed, true);
   if(alignment.is_not_nil())
     type.set(ID_C_alignment, alignment);
+  if(pragma_pack.is_not_nil())
+    type.set(ID_C_pragma_pack, pragma_pack);
 
   // CPROVER extensions
   if(symbol.base_name == CPROVER_PREFIX "rational")

@@ -1841,27 +1841,18 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
-          if(parser_stack($2).id() != ID_struct &&
-             parser_stack($2).id() != ID_union &&
-             !PARSER.pragma_pack.empty() &&
+          if(!PARSER.pragma_pack.empty() &&
              PARSER.pragma_pack.back() != 0)
           {
-            // communicate #pragma pack(n) alignment constraints by
-            // by both setting packing AND alignment for individual struct/union
-            // members; see padding.cpp for more details
-            init($$);
-            set($$, ID_packed);
-            $2=merge($2, $$);
-
+            // communicate the #pragma pack(n) alignment CAP to the
+            // individual struct/union members as a pragma-marked `aligned'
+            // node: GCC lays a member out at min(n, max(natural, its own
+            // aligned(k))) -- see padding.cpp.  (A member's own attributes
+            // stay separate; the conversion keeps the two apart.)
             init($$);
             set($$, ID_aligned);
-            // #pragma pack(n) caps the alignment at n (the natural alignment
-            // stays when it is smaller), unlike the attribute pair
-            // packed, aligned(n), which sets it to exactly n; mark the
-            // alignment so that padding.cpp can tell the two apart
-            exprt pragma_pack_alignment = PARSER.pragma_pack.back();
-            pragma_pack_alignment.set(ID_C_pragma_pack, true);
-            parser_stack($$).set(ID_size, pragma_pack_alignment);
+            parser_stack($$).set(ID_C_pragma_pack, true);
+            parser_stack($$).set(ID_size, PARSER.pragma_pack.back());
             $2=merge($2, $$);
           }
 
