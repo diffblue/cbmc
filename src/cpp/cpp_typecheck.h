@@ -830,6 +830,7 @@ protected:
   void typecheck_expr_typeid(exprt &);
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
+  void complete_type_operand(exprt &expr);
   void typecheck_expr_alignof(exprt &) override;
   void typecheck_expr_lambda(exprt &);
   void typecheck_expr_delete(exprt &);
