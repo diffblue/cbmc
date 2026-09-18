@@ -53,14 +53,30 @@ static std::optional<bytest> explicit_member_alignment(const typet &_type)
   const typet *type = &_type;
   while(type->id() == ID_array && type->find(ID_C_alignment).is_nil())
     type = &to_array_type(*type).element_type();
-  const exprt &given = static_cast<const exprt &>(type->find(ID_C_alignment));
+  // the member's own `aligned(k)' when a larger typedef alignment was kept
+  // as the type's alignment (c_typecheck_type.cpp add_declaration_alignment)
+  const exprt &member_given =
+    static_cast<const exprt &>(type->find(ID_C_member_alignment));
+  const exprt &given =
+    member_given.is_not_nil()
+      ? member_given
+      : static_cast<const exprt &>(type->find(ID_C_alignment));
   if(
     given.is_nil() || given.get_bool(ID_C_typedef_alignment) ||
     given.get_bool(ID_C_type_alignment))
     return {};
   auto result = numeric_cast<bytest>(given);
-  const auto cap = numeric_cast<bytest>(
-    static_cast<const exprt &>(type->find(ID_C_pragma_pack)));
+  // the cap may sit on the array type or on the element type (the parser
+  // attaches the member's attributes at different levels)
+  std::optional<bytest> cap;
+  for(const typet *t = &_type; !cap.has_value();
+      t = &to_array_type(*t).element_type())
+  {
+    cap = numeric_cast<bytest>(
+      static_cast<const exprt &>(t->find(ID_C_pragma_pack)));
+    if(t->id() != ID_array)
+      break;
+  }
   if(result.has_value() && cap.has_value() && *cap < *result)
     result = cap;
   return result;
@@ -78,6 +94,32 @@ static bytest apply_pragma_pack(const typet &type, bytest alignment)
   if(cap.has_value() && *cap > bytest{0} && *cap < alignment)
     return *cap;
   return alignment;
+}
+
+/// \return the alignment of the C++ base-class subobject that starts with
+///   component \p c (recorded by cpp_typecheck_bases.cpp), 0 otherwise
+static bytest
+base_subobject_alignment(const struct_union_typet::componentt &c)
+{
+  const irep_idt &recorded = c.get(ID_C_base_alignment);
+  return recorded.empty() ? bytest{0}
+                          : bytest{string2integer(id2string(recorded))};
+}
+
+/// \return whether \p type is (an array of) a C++ class that is not a POD --
+///   the C++ front end records this on the struct type (ID_C_non_pod);
+///   GCC and Clang do not pack such members of a packed struct
+static bool is_non_pod_class(const typet &type, const namespacet &ns)
+{
+  const typet *t = &type;
+  while(t->id() == ID_array)
+    t = &to_array_type(*t).element_type();
+  if(t->id() == ID_struct_tag)
+    t = &ns.follow_tag(to_struct_tag_type(*t));
+  // GCC's "UNPACKED non-POD field": a non-POD class that is itself packed
+  // is packed in the enclosing struct like any other member
+  return t->id() == ID_struct && t->get_bool(ID_C_non_pod) &&
+         !t->get_bool(ID_C_packed);
 }
 
 static bytest alignment_rec(
@@ -148,7 +190,7 @@ static bytest alignment_rec(
   // `packed, aligned(4)' struct with an aligned(8) member has alignment 8.)
   else if(type.get_bool(ID_C_packed))
   {
-    bytest result = a_int > bytest{0} ? a_int : bytest{1};
+    bytest result{1};
     if(type.id() == ID_struct || type.id() == ID_union)
     {
       for(const auto &c : to_struct_union_type(type).components())
@@ -156,6 +198,12 @@ static bytest alignment_rec(
         const auto member_alignment = explicit_member_alignment(c.type());
         if(member_alignment.has_value() && *member_alignment > result)
           result = *member_alignment;
+        // a C++ base subobject keeps the base's alignment
+        result = std::max(result, base_subobject_alignment(c));
+        // a non-POD C++ class member is not packed (see add_padding_gcc)
+        if(!member_alignment.has_value() && is_non_pod_class(c.type(), ns))
+          result =
+            std::max(result, alignment_rec(c.type(), ns, in_progress, done));
         // GCC: a named bit-field of a packed struct declared under
         // `#pragma pack(n)' still contributes min(n, natural) (observed:
         // `struct { short m : 9; bool b[8]; } __attribute__((packed))'
@@ -176,7 +224,18 @@ static bytest alignment_rec(
               done));
         }
       }
+      // A class DEFINED under `#pragma pack(n)' (the C++ parser records the
+      // cap on the class type) has what its members contribute capped at n;
+      // its own `aligned' is not: `struct S { ...; E m __attribute__((
+      // aligned(16))); } __attribute__((packed, aligned(8)))' under pack(1)
+      // has alignment 8.
+      result = apply_pragma_pack(type, result);
+      if(a_int > result)
+        result = a_int;
+      return result;
     }
+    if(a_int > result)
+      result = a_int;
     return apply_pragma_pack(type, result);
   }
 
@@ -192,13 +251,29 @@ static bytest alignment_rec(
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
     {
+      // a C++ base subobject keeps the base's alignment
+      result = std::max(result, base_subobject_alignment(c));
       // padding is an artefact of the layout, and an unnamed bit-field's
       // type does not affect the alignment (System V ABI)
       if(c.get_is_padding())
         continue;
       if(c.type().id() == ID_c_bit_field && c.get_anonymous())
         continue;
-      result = std::max(result, alignment_rec(c.type(), ns, in_progress, done));
+      if(c.get_bool(ID_C_packed))
+      {
+        // flattened in from a packed C++ base: byte-aligned unless the
+        // member says otherwise
+        const auto member_alignment = explicit_member_alignment(c.type());
+        if(member_alignment.has_value())
+          result = std::max(result, *member_alignment);
+        continue;
+      }
+      // (the member's own #pragma pack cap applies to what it contributes;
+      // for a type defined in place it sits on the type itself)
+      result = std::max(
+        result,
+        apply_pragma_pack(
+          c.type(), alignment_rec(c.type(), ns, in_progress, done)));
     }
   }
   else if(type.id()==ID_unsignedbv ||
@@ -272,11 +347,28 @@ static bytest alignment_rec(
       to_c_bit_field_type(type).underlying_type(), ns, in_progress, done);
   }
 
+  if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    // the definition's `#pragma pack' cap applies to the members'
+    // contribution, the type's own `aligned' raises (see above)
+    result = apply_pragma_pack(type, result);
+    if(a_int > result)
+      result = a_int;
+    return result;
+  }
+
   // aligned(n) without packed: increase only
   if(a_int > result)
     result = a_int;
 
-  return apply_pragma_pack(type, result);
+  // The `#pragma pack' cap of an ARRAY member sits on the element type (the
+  // parser merges the pragma into the declaration's type), the member's
+  // own `aligned' on the array: `unsigned short m[5]
+  // __attribute__((aligned(8)))' under pack(1) is at offset 1.
+  const typet *capped = &type;
+  while(capped->id() == ID_array && capped->find(ID_C_pragma_pack).is_nil())
+    capped = &to_array_type(*capped).element_type();
+  return apply_pragma_pack(*capped, result);
 }
 
 static std::optional<std::size_t>
@@ -507,6 +599,45 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     const typet it_type=it->type();
     bytest a{1};
 
+    // A padding component that is already there (the C++ front end flattens
+    // the components of a padded BASE class into the derived class) is laid
+    // out where it is: no alignment of its own (its bit-vector type would
+    // suggest one), no effect on the struct's alignment.  Bit-field padding
+    // takes the bit-field path below.
+    if(it->get_is_padding() && it_type.id() != ID_c_bit_field)
+    {
+      if(bit_field_bits != 0)
+      {
+        const std::size_t pad_bits = config.ansi_c.char_width - bit_field_bits;
+        it = pad_bit_field(components, it, pad_bits);
+        bit_field_bits = 0;
+        offset += bytest{1};
+      }
+      auto size = pointer_offset_size(it_type, ns);
+      if(size.has_value())
+        offset += *size;
+      continue;
+    }
+
+    // The first component of a C++ base-class subobject: the subobject is
+    // aligned for the base (Itanium C++ ABI 2.4; cpp_typecheck_bases.cpp).
+    const bytest base_alignment = base_subobject_alignment(*it);
+
+    // a member flattened in from a PACKED C++ base class keeps the base's
+    // packed layout (marked ID_C_packed on the component)
+    const bool member_is_packed = struct_is_packed || it->get_bool(ID_C_packed);
+
+    // A member flattened in from a C++ base class keeps its offset within
+    // the base subobject: the base was laid out on its own, its padding
+    // components are here, and only the subobject as a whole is placed (at
+    // the base's alignment, ID_C_base_alignment on its first component).
+    // Re-aligning such a member individually would be wrong where the
+    // subobject sits below the member's alignment -- a base whose alignment
+    // a `#pragma pack' on the derived class capped (`alignas(32) bool' at
+    // 32 within the base, the base at 8).  Nor does it raise the derived
+    // class's alignment beyond the base's.
+    const bool from_base = it->get_bool(ID_from_base);
+
     if(it_type.id()==ID_c_bit_field)
     {
       a = alignment(to_c_bit_field_type(it_type).underlying_type(), ns);
@@ -532,11 +663,38 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
                                          .find(ID_C_pragma_pack)
                                          .is_not_nil();
         if(
-          max_alignment < a && !it->get_anonymous() &&
-          (!struct_is_packed || under_pragma_pack))
+          max_alignment < a && !it->get_anonymous() && !from_base &&
+          (!member_is_packed || under_pragma_pack))
           max_alignment=a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
+
+        if(base_alignment > bytest{1})
+        {
+          // a base subobject starting with a bit-field: byte-align the
+          // subobject for the base first
+          if(bit_field_bits != 0)
+          {
+            const std::size_t pad_bits =
+              config.ansi_c.char_width - bit_field_bits;
+            it = pad_bit_field(components, it, pad_bits);
+            bit_field_bits = 0;
+            offset += bytest{1};
+          }
+          const bytest displacement = offset % base_alignment;
+          if(displacement != bytest{0})
+          {
+            const bytest pad_bytes = base_alignment - displacement;
+            it = pad(
+              components,
+              it,
+              numeric_cast_v<std::size_t>(
+                pad_bytes * config.ansi_c.char_width));
+            offset += pad_bytes;
+          }
+          if(max_alignment < base_alignment)
+            max_alignment = base_alignment;
+        }
 
         // System V ABI (and the Itanium C++ ABI): a bit-field must be
         // contained in a storage unit of its declared type, where the
@@ -548,7 +706,9 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         // Under `#pragma pack(n)' -- any n -- GCC lays bit-fields out
         // densely, like in a packed struct (`char c; short s : 14; char d;'
         // under pack(8) has d at 3; without the pragma at 4).
-        if(!struct_is_packed && !under_pragma_pack && !it->get_is_padding())
+        if(
+          !member_is_packed && !under_pragma_pack && !it->get_is_padding() &&
+          !from_base)
         {
           const auto unit_bits =
             underlying_width(to_c_bit_field_type(it_type), ns);
@@ -578,7 +738,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     else if(it_type.id() == ID_bool)
     {
       a = alignment(it_type, ns);
-      if(max_alignment < a)
+      if(max_alignment < a && !from_base)
         max_alignment = a;
 
       ++bit_field_bits;
@@ -587,16 +747,27 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       offset += bytest{bytes};
       continue;
     }
-    else if(struct_is_packed)
+    else if(from_base)
+      a = bytest{1}; // placed where the base's layout put it (see above)
+    else if(member_is_packed)
     {
       // packed: byte-aligned, unless the MEMBER itself says `aligned(n)'
       // (the alignment of its type is ignored -- an aligned(16) struct
       // member of a packed struct sits at offset 1)
       const auto member_alignment = explicit_member_alignment(it_type);
       a = member_alignment.has_value() ? *member_alignment : bytest{1};
+      // ... or is a non-POD C++ class, which GCC and Clang do not pack
+      // ("ignoring packed attribute because of unpacked non-POD field")
+      if(!member_alignment.has_value() && is_non_pod_class(it_type, ns))
+        a = alignment(it_type, ns);
     }
     else
-      a=alignment(it_type, ns);
+    {
+      // the member's #pragma pack cap; for a struct/union type defined in
+      // place the cap sits on the type itself, whose own alignment
+      // (alignment_rec) is not capped -- its placement is
+      a = apply_pragma_pack(it_type, alignment(it_type, ns));
+    }
 
     // complete a run of bit-fields to a byte boundary
     if(bit_field_bits != 0)
@@ -609,7 +780,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 
     // check minimum alignment
     if(
-      !struct_is_packed && a < config.ansi_c.alignment &&
+      !member_is_packed && !from_base && a < config.ansi_c.alignment &&
       !it_type.get_bool(ID_C_packed) &&
       (it_type.id() != ID_struct_tag ||
        !ns.follow_tag(to_struct_tag_type(it_type)).get_bool(ID_C_packed)) &&
@@ -623,6 +794,14 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     // unnamed, does not raise the struct's alignment
     if(max_alignment < a && it_type.id() != ID_c_bit_field)
       max_alignment=a;
+
+    // the first member of a base subobject is placed at the base's alignment
+    if(base_alignment > a)
+    {
+      a = base_alignment;
+      if(max_alignment < a)
+        max_alignment = a;
+    }
 
     if(a != bytest{1})
     {
@@ -652,6 +831,18 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     pad_bit_field(components, components.end(), pad_bits);
     bit_field_bits = 0;
     offset += bytest{1};
+  }
+
+  // A class defined under `#pragma pack(n)' (the C++ parser records n on
+  // the class type): its alignment is capped at n -- also the alignment
+  // its flattened base-class members would otherwise contribute (the
+  // members declared in the class carry the cap individually).  An
+  // explicit `aligned' on the struct (below) may raise it again.
+  {
+    const auto cap = numeric_cast<bytest>(
+      static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
+    if(cap.has_value() && *cap > bytest{0} && max_alignment > *cap)
+      max_alignment = *cap;
   }
 
   // any explicit alignment for the struct?
@@ -700,8 +891,21 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
 void add_padding(union_typet &type, const namespacet &ns)
 {
+  // The union's own alignment: its members' (each capped by a `#pragma
+  // pack(n)' it was declared under) and an explicit `aligned' on the type.
+  // The cap on the union TYPE is that of its use as a member of an
+  // enclosing struct -- `union { long a; } __attribute__((aligned(16)))'
+  // under pack(4) is placed at a 4-byte boundary but is 16 bytes long.
+  // (Take the cap off `type' itself for the computation instead of working
+  // on a copy: a copy would share the irep, and the caller holds a
+  // reference into type.components() that a later copy-on-write detach
+  // would leave dangling.)
+  const exprt cap = static_cast<const exprt &>(type.find(ID_C_pragma_pack));
+  type.remove(ID_C_pragma_pack);
   bitst max_alignment_bits =
     bytes_to_bits(alignment(type, ns), config.ansi_c.char_width);
+  if(cap.is_not_nil())
+    type.add(ID_C_pragma_pack) = cap;
   bitst size_bits{0};
 
   // check per component, and ignore those without fixed size

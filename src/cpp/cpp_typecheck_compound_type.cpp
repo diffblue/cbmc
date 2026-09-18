@@ -147,6 +147,18 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
   // first save qualifiers
   c_qualifierst qualifiers(type);
 
+  // The attributes of a class type defined in PLACE as a member type
+  // (`struct { ... } __attribute__((aligned(16))) n;' under `#pragma
+  // pack(4)') belong to the tag type the member gets, as the C front end
+  // has it (c_typecheck_type.cpp): the `aligned' is the type's own
+  // alignment (ID_C_type_alignment: ignored inside a packed struct, but it
+  // sizes the type), the #pragma pack cap is that of the member's
+  // placement.  Left on the class symbol alone, the member was placed at
+  // the type's full alignment.
+  exprt in_place_alignment =
+    static_cast<const exprt &>(type.find(ID_C_alignment));
+  const irept in_place_pragma_pack = type.find(ID_C_pragma_pack);
+
   // now clear them from the type
   type.remove(ID_C_constant);
   type.remove(ID_C_volatile);
@@ -480,6 +492,17 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
     struct_tag_typet tag_type(symbol_name);
     qualifiers.write(tag_type);
     type.swap(tag_type);
+  }
+
+  if(has_body)
+  {
+    if(in_place_alignment.is_not_nil())
+    {
+      in_place_alignment.set(ID_C_type_alignment, true);
+      type.add(ID_C_alignment) = in_place_alignment;
+    }
+    if(in_place_pragma_pack.is_not_nil())
+      type.add(ID_C_pragma_pack) = in_place_pragma_pack;
   }
 }
 
@@ -3951,55 +3974,52 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // clean up!
   symbol.type.remove(ID_body);
 
-  // N5008 [class.bit]/1, [basic.align]/1: a bit-field is packed into and
-  // padded to a whole allocation unit, and the enclosing object is padded up
-  // to its alignment.  The C front-end realises this via add_padding(); the
-  // C++ front-end historically did not, so a bit-field-only struct (e.g.
-  // libstdc++'s `__max_size_type`, `struct { unsigned _M_msb : 1; ... }`) had
-  // object size 0 -- a valid bit-field read through a pointer/reference then
-  // tripped a spurious "pointer outside object bounds".
+  // Class layout ([class.mem], [class.bit], [dcl.align], [expr.sizeof]):
+  // every class and union is laid out with the alignment padding of the
+  // platform ABI (System V / Itanium C++ ABI, as GCC and Clang do) by the
+  // same add_padding() the C front end uses: bit-field runs are completed
+  // to allocation units, members are placed at their alignment, alignas /
+  // __attribute__((aligned)) / packed / #pragma pack are honoured, and the
+  // object is padded up to its alignment.  sizeof and offsetof then agree
+  // with the native compiler, and byte-level reasoning (pointer casts,
+  // memcpy, unions) sees the real layout.  Every struct VALUE the front end
+  // builds carries the padding components (zero_struct_value /
+  // set_struct_member_value), and every site that treats components as
+  // user-visible data members skips is_padding() ones.
   //
-  // N5008 [dcl.align]/5 + [expr.sizeof]/2: an alignment-specifier on a
-  // member raises the member's (and thus the class's) alignment
-  // requirement, and sizeof includes the padding needed to place such
-  // objects in an array.  Ignoring alignas gave `struct { alignas(int)
-  // char c; }` size 1 instead of 4 -- libstdc++'s __aligned_membuf
-  // (_Rb_tree_node/_Hash_node value storage) then had every store/load
-  // out of bounds.
+  // A class with base classes is laid out over its flattened components:
+  // the base subobjects first (marked ID_C_base_alignment on their first
+  // component, tail padding of a non-POD base dropped -- see
+  // cpp_typecheck_bases.cpp), then the class's own members; this
+  // approximates the Itanium base-subobject layout.
   //
-  // We apply the layout once the component list is final, restricted to a
-  // struct that actually *contains a bit-field* or carries an explicit
-  // alignment (alignas/_Alignas/__attribute__((aligned)), recorded as
-  // ID_C_alignment on the struct or a member type).  Other structs are
-  // left at their previous layout on purpose: the rest of the tool models
-  // them self-consistently without ABI alignment padding, and inserting
-  // it would change sizes that pointer reasoning elsewhere relies on.
-  // The bit-field and explicit-alignment cases are different -- size 0
-  // resp. an ignored alignment specifier are outright bugs.  Further
-  // restricted to:
-  //  * an actual struct (unions are laid out by their own add_padding overload,
-  //    deferred);
-  //  * with no base classes (base-subobject layout is an ABI subtlety the
-  //    flattened from_base components do not model) -- unless it contains a
-  //    bit-field: a bit-field run must be completed to a byte boundary
-  //    whatever the bases (size_of_expr_rec's "padding ensures offset at byte
-  //    boundaries" invariant), so `struct D : B { int m : 28; short s; }'
-  //    is laid out over its flattened components (the base subobject first),
-  //    approximating the Itanium layout;
-  //  * not already padded (idempotent across any re-entry); and
-  //  * whose data members all have a known size (a dependent template member
-  //    has none -- and each instantiation re-typechecks the body from the
-  //    parse tree, so the concrete instance is padded in its own right).
-  // The inserted components are marked is_padding(); every site that treats
-  // components as user-visible data members skips them.
-  if(symbol.type.id() == ID_struct)
+  // Applied once the component list is final, restricted to a class that is
+  // not already padded (idempotent across any re-entry) and whose data
+  // members all have a known size (a dependent template member has none --
+  // and each instantiation re-typechecks the body from the parse tree, so
+  // the concrete instance is padded in its own right).
+  if(symbol.type.id() == ID_union)
+  {
+    union_typet &union_type = to_union_type(symbol.type);
+    const namespacet ns(symbol_table);
+    bool already_padded = false;
+    bool all_sizes_known = true;
+    for(const auto &c : union_type.components())
+    {
+      if(c.get_is_padding())
+        already_padded = true;
+      else if(
+        c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+        !c.get_bool(ID_is_type) &&
+        !pointer_offset_bits(c.type(), ns).has_value())
+        all_sizes_known = false;
+    }
+    if(!already_padded && all_sizes_known)
+      add_padding(union_type, ns);
+  }
+  else if(symbol.type.id() == ID_struct)
   {
     struct_typet &struct_type = to_struct_type(symbol.type);
-    bool has_bit_field = false;
-    for(const auto &c : struct_type.components())
-      if(c.type().id() == ID_c_bit_field)
-        has_bit_field = true;
-    if(struct_type.bases().empty() || has_bit_field)
     {
       const namespacet ns(symbol_table);
       bool already_padded = false;
@@ -4041,10 +4061,14 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
         }
       }
-      if(
-        (has_bit_field || has_explicit_alignment) && !already_padded &&
-        all_sizes_known)
+      if(!already_padded && all_sizes_known)
       {
+        // GCC and Clang ignore `packed' for a member whose type is a
+        // non-POD class ("ignoring packed attribute because of unpacked
+        // non-POD field"): record POD-ness for the layout of enclosing
+        // packed structs (padding.cpp).
+        if(!cpp_is_pod(struct_type))
+          struct_type.set(ID_C_non_pod, true);
         add_padding(struct_type, ns);
         // Record the resulting alignment on the struct when it stems from an
         // explicit specifier, so that an enclosing struct sees it (above)
@@ -4551,6 +4575,17 @@ void cpp_typecheckt::convert_anon_struct_union_member(
     compound_type = union_tag_typet(struct_union_symbol.name);
   else
     compound_type = struct_tag_typet(struct_union_symbol.name);
+
+  // the in-place type's own `aligned' and the member's #pragma pack cap
+  // travel on the tag type (typecheck_compound_type); the layout reads
+  // them from the member's type
+  if(declaration.type().find(ID_C_alignment).is_not_nil())
+    compound_type.add(ID_C_alignment) = declaration.type().find(ID_C_alignment);
+  if(declaration.type().find(ID_C_pragma_pack).is_not_nil())
+  {
+    compound_type.add(ID_C_pragma_pack) =
+      declaration.type().find(ID_C_pragma_pack);
+  }
 
   struct_typet::componentt component(identifier, compound_type);
   component.set_access(access);
