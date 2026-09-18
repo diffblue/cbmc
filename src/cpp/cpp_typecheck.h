@@ -835,6 +835,7 @@ protected:
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
   void complete_type_operand(exprt &expr);
+  bool convert_explicit_instantiation(cpp_declarationt &declaration);
   bool is_lvalue_expression(const exprt &expr) const;
   void typecheck_expr_alignof(exprt &) override;
   void typecheck_expr_lambda(exprt &);
