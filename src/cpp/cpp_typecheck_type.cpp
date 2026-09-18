@@ -119,6 +119,17 @@ void cpp_typecheckt::typecheck_type(typet &type)
   if(type.id()==ID_cpp_name)
   {
     c_qualifierst qualifiers(type);
+    // GCC type attributes written on this type-name (`uint32_t
+    // __attribute__((aligned(8)))' in a typedef/alias, `packed' likewise)
+    // sit on the cpp_name node; carry them over to the resolved type as the
+    // C front end does for typedef names (c_typecheck_type.cpp).  GCC: "When
+    // used as part of a typedef, the aligned attribute can both increase and
+    // decrease alignment" -- except for a class type, where GCC ignores
+    // attributes applied outside the definition (`using A = S
+    // __attribute__((aligned(16)))' leaves S's layout alone).
+    const exprt given_alignment =
+      static_cast<const exprt &>(type.find(ID_C_alignment));
+    const bool given_packed = type.get_bool(ID_C_packed);
 
     cpp_namet cpp_name;
     cpp_name.swap(type);
@@ -201,6 +212,16 @@ void cpp_typecheckt::typecheck_type(typet &type)
     }
 
     qualifiers.write(type);
+
+    if(
+      type.id() != ID_struct_tag && type.id() != ID_union_tag &&
+      type.id() != ID_struct && type.id() != ID_union)
+    {
+      if(given_alignment.is_not_nil())
+        type.add(ID_C_alignment) = given_alignment;
+      if(given_packed)
+        type.set(ID_C_packed, true);
+    }
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
