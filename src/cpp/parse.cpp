@@ -1643,8 +1643,11 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     break;
 
   case tdk_instantiation:
-    // Repackage the decl
+    // Repackage the decl; N5008 [temp.explicit]: `template decl;' is an
+    // explicit instantiation, which the typechecker instantiates rather
+    // than declares.
     decl=body;
+    decl.set("#explicit_instantiation", true);
     break;
 
   case tdk_specialization:

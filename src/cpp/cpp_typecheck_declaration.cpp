@@ -574,8 +574,92 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
   // templates are done in a dedicated function
   if(declaration.is_template())
     convert_template_declaration(declaration);
+  else if(
+    declaration.get_bool("#explicit_instantiation") &&
+    convert_explicit_instantiation(declaration))
+  {
+    // done
+  }
   else
     convert_non_template_declaration(declaration);
+}
+
+/// N5008 [temp.explicit]: `template renamedt<ssa_exprt, L0>
+/// goto_symex_statet::rename_ssa<L0>(ssa_exprt, const namespacet &);' (an
+/// explicit instantiation of a function template, possibly a member
+/// template named with a qualifier) instantiates the template for the given
+/// -- or, without a template-argument-list, deduced -- arguments.  Treated
+/// as a plain declaration it re-declared the member with a template-id
+/// name ("found no match for symbol 'L0'", "already declared with different
+/// type").  Instantiate it like an explicit specialization without a body;
+/// anything else (an explicit class instantiation `template class X<int>;',
+/// a function without template arguments) keeps the previous handling.
+/// \return true when the declaration has been handled
+bool cpp_typecheckt::convert_explicit_instantiation(
+  cpp_declarationt &declaration)
+{
+  if(declaration.declarators().size() != 1)
+    return false;
+  cpp_declaratort &declarator = declaration.declarators().front();
+  if(declarator.type().id() != ID_function_type)
+    return false;
+
+  cpp_save_scopet saved_scope(cpp_scopes);
+  cpp_namet &cpp_name = declarator.name();
+
+  if(!cpp_name.has_template_args())
+  {
+    // `template long twice(long);' -- the arguments are deduced from the
+    // function type ([temp.explicit]/2, [temp.deduct.decl]).  Nothing needs
+    // declaring: the specialization is instantiated on use exactly as an
+    // implicit instantiation would be.  Declared as written, it introduced
+    // a bodiless NON-template `twice(long)' that hid the template.
+    irep_idt bn;
+    cpp_template_args_non_tct dummy_args;
+    cpp_typecheck_resolvet resolver(*this);
+    cpp_scopet &target_scope = resolver.resolve_scope(cpp_name, bn, dummy_args);
+    const auto templates = target_scope.lookup(
+      bn, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+    return !templates.empty();
+  }
+
+  irep_idt base_name;
+  cpp_template_args_non_tct template_args_non_tc;
+  cpp_scopest::id_sett id_set;
+  if(cpp_name.get_sub().size() == 2 && cpp_name.get_sub()[0].id() == ID_name)
+  {
+    base_name = cpp_name.get_sub()[0].get(ID_identifier);
+    template_args_non_tc = to_cpp_template_args_non_tc(cpp_name.get_sub()[1]);
+    id_set = cpp_scopes.current_scope().lookup(
+      base_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+  }
+  else
+  {
+    cpp_typecheck_resolvet resolver(*this);
+    cpp_scopet &target_scope =
+      resolver.resolve_scope(cpp_name, base_name, template_args_non_tc);
+    id_set = target_scope.lookup(
+      base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+    cpp_scopes.go_to(target_scope);
+  }
+
+  // drop specializations of the template from the candidate set
+  for(auto it = id_set.begin(); it != id_set.end();)
+  {
+    auto next = std::next(it);
+    if(lookup((*it)->identifier).type.find(ID_specialization_of).is_not_nil())
+      id_set.erase(it);
+    it = next;
+  }
+  if(id_set.size() != 1 || template_args_non_tc.is_nil())
+    return false;
+
+  const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
+  cpp_template_args_tct template_args = typecheck_template_args(
+    declaration.source_location(), template_symbol, template_args_non_tc);
+  instantiate_template(
+    cpp_name.source_location(), template_symbol, template_args, template_args);
+  return true;
 }
 
 codet cpp_typecheckt::convert_anonymous_union(cpp_declarationt &declaration)
