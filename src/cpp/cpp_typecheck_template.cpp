@@ -1877,21 +1877,49 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   if(cpp_name.get_sub().back().id() == ID_template_args)
   {
     // proper specialization with arguments
+    // N5008 [temp.expl.spec]/2-3: an explicit specialization may be declared
+    // in any scope in which the template could be defined -- for a MEMBER
+    // template of a class, at namespace scope with a qualified name
+    // (`template <> renamedt<ssa_exprt, L1> goto_symex_statet::
+    // set_indices<L1>(...)').  Resolve the nested-name-specifier to its
+    // scope and look the template up there; the unqualified case keeps the
+    // current scope.
+    std::string base_name;
+    cpp_scopest::id_sett id_set;
     if(
-      cpp_name.get_sub().size() != 2 || cpp_name.get_sub()[0].id() != ID_name ||
-      cpp_name.get_sub()[1].id() != ID_template_args)
+      cpp_name.get_sub().size() == 2 && cpp_name.get_sub()[0].id() == ID_name &&
+      cpp_name.get_sub()[1].id() == ID_template_args)
     {
-      // currently we are more restrictive
-      // than the standard
+      base_name = cpp_name.get_sub()[0].get(ID_identifier).c_str();
+      id_set =
+        cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+    }
+    else if(
+      cpp_name.get_sub().size() >= 4 &&
+      cpp_name.get_sub()[cpp_name.get_sub().size() - 2].id() == ID_name)
+    {
+      irep_idt scoped_base_name;
+      cpp_template_args_non_tct scoped_template_args;
+      cpp_typecheck_resolvet resolver(*this);
+      cpp_scopet &target_scope = resolver.resolve_scope(
+        cpp_name, scoped_base_name, scoped_template_args);
+      base_name = id2string(scoped_base_name);
+      id_set = target_scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
+      // the specialization is a member of that class: define it there, with
+      // the now-unqualified name (as an in-class definition would be)
+      cpp_scopes.go_to(target_scope);
+      irept template_args_node = cpp_name.get_sub().back();
+      cpp_name.get_sub().clear();
+      cpp_name.get_sub().push_back(irept{ID_name});
+      cpp_name.get_sub().back().set(ID_identifier, base_name);
+      cpp_name.get_sub().push_back(template_args_node);
+    }
+    else
+    {
       error().source_location = cpp_name.source_location();
       error() << "bad template-function-specialization name" << eom;
       throw 0;
     }
-
-    std::string base_name = cpp_name.get_sub()[0].get(ID_identifier).c_str();
-
-    const auto id_set =
-      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
 
     if(id_set.empty())
     {
@@ -1911,7 +1939,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
     cpp_template_args_tct template_args = typecheck_template_args(
       declaration.source_location(),
       template_symbol,
-      to_cpp_template_args_non_tc(cpp_name.get_sub()[1]));
+      to_cpp_template_args_non_tc(cpp_name.get_sub().back()));
 
     cpp_name.get_sub().pop_back();
 
