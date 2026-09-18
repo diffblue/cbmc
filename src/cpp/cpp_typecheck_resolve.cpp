@@ -1609,7 +1609,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
           std::vector<exprt> vals;
           for(const auto &v : entry.get_sub())
             vals.push_back(static_cast<const exprt &>(v));
-          cpp_typecheck.template_map.pack_size_map[pid] = vals.size();
+          cpp_typecheck.template_map.set_pack_size(pid, vals.size());
           if(!vals.empty())
           {
             cpp_typecheck.template_map.pack_expr_map[pid] = vals;
@@ -1620,7 +1620,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         std::vector<typet> elems;
         for(const auto &t : entry.get_sub())
           elems.push_back(static_cast<const typet &>(t));
-        cpp_typecheck.template_map.pack_size_map[pid] = elems.size();
+        cpp_typecheck.template_map.set_pack_size(pid, elems.size());
         cpp_typecheck.template_map.pack_args_map[pid] = elems;
         if(!elems.empty())
           cpp_typecheck.template_map.type_map[pid] = elems.front();
@@ -4881,7 +4881,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               full_template_args_tc.arguments()[j].id() == ID_type &&
               full_template_args_tc.arguments()[j].type().id() != ID_empty)
               pack_elems.push_back(full_template_args_tc.arguments()[j].type());
-          cpp_typecheck.template_map.pack_size_map[pack_id] = pack_elems.size();
+          cpp_typecheck.template_map.set_pack_size(pack_id, pack_elems.size());
           cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
           if(!pack_elems.empty())
             cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
@@ -5587,7 +5587,7 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
             std::vector<typet> elems;
             for(const auto &t : entry.get_sub())
               elems.push_back(static_cast<const typet &>(t));
-            map.pack_size_map[pid] = elems.size();
+            map.set_pack_size(pid, elems.size());
             if(!elems.empty())
             {
               if(elems.size() == 1)
@@ -5602,7 +5602,7 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
             std::vector<exprt> vals;
             for(const auto &e : entry.get_sub())
               vals.push_back(static_cast<const exprt &>(e));
-            map.pack_size_map[pid] = vals.size();
+            map.set_pack_size(pid, vals.size());
             if(!vals.empty())
             {
               if(vals.size() == 1)
@@ -5695,8 +5695,8 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
               else
                 pack_exprs.push_back(enc_arg_list[j]);
             }
-            cpp_typecheck.template_map.pack_size_map[pack_id] =
-              k < enc_arg_list.size() ? enc_arg_list.size() - k : 0;
+            cpp_typecheck.template_map.set_pack_size(
+              pack_id, k < enc_arg_list.size() ? enc_arg_list.size() - k : 0);
             if(!pack_types.empty())
             {
               if(pack_types.size() == 1)
@@ -8540,8 +8540,8 @@ void cpp_typecheck_resolvet::guess_template_args(
                   static_cast<const exprt &>(inst_arguments[j]));
             }
 
-            cpp_typecheck.template_map.pack_size_map[pack_id] =
-              pack_elems.size() + pack_exprs.size();
+            cpp_typecheck.template_map.set_pack_size(
+              pack_id, pack_elems.size() + pack_exprs.size());
             // [temp.deduct.call]/4.3: if this pack was deduced from a
             // base-class subobject of a derived-class argument, record it so
             // build_template_args' single placeholder is later expanded to
@@ -9020,7 +9020,7 @@ void cpp_typecheck_resolvet::deduce_function_parameter_pack(
   if(pack_id.empty())
     return;
 
-  cpp_typecheck.template_map.pack_size_map[pack_id] = pack_elems.size();
+  cpp_typecheck.template_map.set_pack_size(pack_id, pack_elems.size());
   if(!pack_elems.empty())
   {
     cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
@@ -9760,8 +9760,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       if(slot.empty())
       {
         slot = pack_deduced_types;
-        cpp_typecheck.template_map.pack_size_map[pid] =
-          pack_deduced_types.size();
+        cpp_typecheck.template_map.set_pack_size(
+          pid, pack_deduced_types.size());
       }
       break; // the trailing function pack corresponds to the LAST type pack
     }
@@ -9876,8 +9876,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               spliced.push_back(exprt(ID_type, t));
             // record the binding so template_mapt::build's multi-pack
             // gate (and sizeof... evaluation) sees this pack as bound
-            cpp_typecheck.template_map.pack_size_map[pid] =
-              pack_deduced_types.size();
+            cpp_typecheck.template_map.set_pack_size(
+              pid, pack_deduced_types.size());
             cpp_typecheck.template_map.pack_args_map[pid] = pack_deduced_types;
             // NO scalar type_map convenience entry: build() deliberately
             // avoids scalar-binding packs of two or more elements -- the
@@ -10009,7 +10009,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         params[pack_param_index].type().get(ID_identifier);
       if(!pack_id.empty())
       {
-        cpp_typecheck.template_map.pack_size_map[pack_id] = pack_expansion_size;
+        cpp_typecheck.template_map.set_pack_size(pack_id, pack_expansion_size);
         // N5008 [temp.variadic]/5 + [temp.param]/14: a defaulted parameter
         // following the pack may also EXPAND it -- libstdc++'s
         // `_Bind::operator()<class... _Args, class _Result =
@@ -10504,8 +10504,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
         if(slot.empty())
         {
           slot = pack_deduced_types;
-          cpp_typecheck.template_map.pack_size_map[pack_id] =
-            pack_expansion_size;
+          cpp_typecheck.template_map.set_pack_size(
+            pack_id, pack_expansion_size);
         }
       }
       break;
@@ -10537,7 +10537,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           !pack_id.empty() && !bound &&
           cpp_typecheck.template_map.pack_args_map.find(pack_id) ==
             cpp_typecheck.template_map.pack_args_map.end())
-          cpp_typecheck.template_map.pack_size_map[pack_id] = 0;
+          cpp_typecheck.template_map.set_pack_size(pack_id, 0);
         break;
       }
     }

@@ -526,48 +526,67 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
           id2string(t.get_sub().front().get(ID_identifier));
         const auto p = nm.rfind("::");
         const std::string suf = p != std::string::npos ? nm.substr(p + 2) : nm;
+        auto has_suffix = [&](const irep_idt &key_id) -> bool
+        {
+          const std::string key = id2string(key_id);
+          const auto q = key.rfind("::");
+          return (q != std::string::npos ? key.substr(q + 2) : key) == suf;
+        };
+        // Several packs may share the short name (different templates
+        // reuse `_Args`; instantiations nest, so an enclosing template's
+        // live pack sits in the map next to the current template's EMPTY
+        // one).  Take the most recently bound candidate: it is the
+        // innermost declaration, the one the reference denotes (see
+        // template_mapt::generation_map).  Preferring any live pack first
+        // expanded std::function's `declval<_Args>()...` (empty here) with
+        // the enclosing `__is_constructible_impl<T, _Args...>' element.
+        std::size_t best_generation = 0;
+        bool found = false;
         for(const auto &pe : pack_args_map)
         {
-          const std::string key = id2string(pe.first);
-          const auto q = key.rfind("::");
-          const std::string ksuf =
-            q != std::string::npos ? key.substr(q + 2) : key;
-          if(ksuf == suf)
+          if(!has_suffix(pe.first))
+            continue;
+          const std::size_t g = generation_of(pe.first);
+          if(!found || g > best_generation)
           {
+            found = true;
+            best_generation = g;
             elems = &pe.second;
-            base = suf;
-            return true;
+            val_elems = nullptr;
+            empty_pack = false;
           }
         }
         for(const auto &pe : pack_expr_map)
         {
-          const std::string key = id2string(pe.first);
-          const auto q = key.rfind("::");
-          const std::string ksuf =
-            q != std::string::npos ? key.substr(q + 2) : key;
-          if(ksuf == suf)
+          if(!has_suffix(pe.first))
+            continue;
+          const std::size_t g = generation_of(pe.first);
+          if(!found || g > best_generation)
           {
+            found = true;
+            best_generation = g;
+            elems = nullptr;
             val_elems = &pe.second;
-            base = suf;
-            return true;
+            empty_pack = false;
           }
         }
         for(const auto &ps : pack_size_map)
         {
-          if(ps.second != 0)
+          if(ps.second != 0 || !has_suffix(ps.first))
             continue;
-          const std::string key = id2string(ps.first);
-          const auto q = key.rfind("::");
-          const std::string ksuf =
-            q != std::string::npos ? key.substr(q + 2) : key;
-          if(ksuf == suf)
+          const std::size_t g = generation_of(ps.first);
+          if(!found || g > best_generation)
           {
+            found = true;
+            best_generation = g;
+            elems = nullptr;
+            val_elems = nullptr;
             empty_pack = true;
-            base = suf;
-            return true;
           }
         }
-        return false;
+        if(found)
+          base = suf;
+        return found;
       };
       std::function<void(const irept &)> find = [&](const irept &m)
       {
@@ -2569,7 +2588,7 @@ void template_mapt::build(
           ++psz;
           ++arg_idx;
         }
-        pack_size_map[pid] = psz;
+        set_pack_size(pid, psz);
         if(type_pack && !ptypes.empty())
         {
           pack_args_map[pid] = std::move(ptypes);
@@ -2685,7 +2704,7 @@ void template_mapt::build(
       if(instance[j].id() != ID_type)
         pack_exprs.push_back(instance[j]);
     }
-    pack_size_map[pack_id] = pack_sz;
+    set_pack_size(pack_id, pack_sz);
     if(!pack_types.empty())
     {
       pack_args_map[pack_id] = std::move(pack_types);
@@ -2727,6 +2746,12 @@ void template_mapt::build(
   }
 }
 
+std::size_t template_mapt::next_generation()
+{
+  static std::size_t counter = 0;
+  return ++counter;
+}
+
 void template_mapt::set(
   const template_parametert &parameter,
   const exprt &value)
@@ -2739,6 +2764,7 @@ void template_mapt::set(
     typet tmp=value.type();
 
     irep_idt identifier=parameter.type().get(ID_identifier);
+    generation_map[identifier] = next_generation();
 
     // Skip template_parameter_symbol_typet values with numeric
     // scope IDs — these are unresolved template template parameters.
@@ -2791,6 +2817,7 @@ void template_mapt::set(
 
     irep_idt identifier=parameter.get(ID_identifier);
     expr_map[identifier]=value;
+    generation_map[identifier] = next_generation();
   }
 }
 
