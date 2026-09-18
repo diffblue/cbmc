@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -87,6 +88,12 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     bool type_mismatch = false;
     for(const auto &compo : vt_type.components())
     {
+      if(compo.get_is_padding())
+      {
+        // a padding component of the vtable's layout: zero
+        values.operands().push_back(from_integer(0, compo.type()));
+        continue;
+      }
       std::map<irep_idt, exprt>::const_iterator cit2 =
         value_map.find(compo.get_base_name());
       CHECK_RETURN(cit2 != value_map.end());

@@ -3894,7 +3894,13 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
             }
           }
 
-          struct_exprt result({}, base_type);
+          // The value starts out all-zero so that the layout's padding
+          // components are present ([dcl.init.aggr]/5 value-initialises
+          // the elements without an initializer anyway).
+          auto result_opt =
+            zero_struct_value(base_type, orig_expr.source_location());
+          struct_exprt result =
+            result_opt.has_value() ? *result_opt : struct_exprt({}, base_type);
           std::size_t i = leading_base_clauses;
           // N5008 [dcl.init.list]/3.4: a class with a user-declared
           // constructor is not an aggregate ([dcl.init.aggr]/1); its
@@ -3906,7 +3912,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           // copied bitwise from a temporary before that temporary's
           // constructor had run, and the call operator later reached
           // __throw_bad_function_call.  Skip the memberwise path.
-          bool ok = !has_user_ctor;
+          bool ok = !has_user_ctor && result_opt.has_value();
           for(const auto &c : comps)
           {
             if(!ok)
@@ -3928,25 +3934,9 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
                 ok = false;
                 break;
               }
-              result.operands().push_back(std::move(val));
+              set_struct_member_value(result, st, c, std::move(val));
             }
-            else if(!has_user_ctor)
-            {
-              // value-initialize the remaining element
-              const auto zero = ::zero_initializer(
-                c.type(), orig_expr.source_location(), *this);
-              if(!zero.has_value())
-              {
-                ok = false;
-                break;
-              }
-              result.operands().push_back(*zero);
-            }
-            else
-            {
-              ok = false;
-              break;
-            }
+            // (the remaining elements keep their zero value)
           }
           if(ok && i == orig_expr.operands().size())
           {
@@ -4133,7 +4123,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           {
             if(
               c.type().id() == ID_code || c.get_bool(ID_is_type) ||
-              c.get_bool(ID_is_static))
+              c.get_bool(ID_is_static) || c.get_is_padding())
             {
               continue;
             }
@@ -4143,15 +4133,21 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
               size_comp = &c;
           }
 
-          if(ptr_comp && size_comp)
+          auto result_opt =
+            zero_struct_value(type, orig_expr.source_location());
+          if(ptr_comp && size_comp && result_opt.has_value())
           {
-            struct_exprt result({}, type);
+            struct_exprt &result = *result_opt;
             index_exprt first_elem(
               arr_ref, from_integer(0, c_index_type()), elem_type);
             address_of_exprt addr(first_elem);
             addr.type() = ptr_comp->type();
-            result.add_to_operands(std::move(addr));
-            result.add_to_operands(from_integer(n, size_comp->type()));
+            set_struct_member_value(result, struct_type, *ptr_comp, addr);
+            set_struct_member_value(
+              result,
+              struct_type,
+              *size_comp,
+              from_integer(n, size_comp->type()));
             result.add_source_location() = orig_expr.source_location();
             expr = std::move(result);
             return;
@@ -4169,14 +4165,21 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     {
       const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
       const auto &ops = orig_expr.operands();
-      struct_exprt result({}, type);
+      // all-zero start: padding components present, missing elements
+      // value-initialised ([dcl.init.aggr]/5)
+      auto result_opt = zero_struct_value(type, orig_expr.source_location());
+      struct_exprt result =
+        result_opt.has_value() ? *result_opt : struct_exprt({}, type);
       std::size_t idx = 0;
-      bool ok = true;
+      bool ok = result_opt.has_value();
       for(const auto &c : struct_type.components())
       {
+        if(!ok)
+          break;
         if(
           c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          c.get_bool(ID_is_static) || c.type().id() == ID_code ||
+          c.get_is_padding())
         {
           continue;
         }
@@ -4192,11 +4195,7 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
             ok = false;
             break;
           }
-          result.add_to_operands(std::move(val));
-        }
-        else
-        {
-          result.add_to_operands(constant_exprt(irep_idt(), c.type()));
+          set_struct_member_value(result, struct_type, c, std::move(val));
         }
       }
       if(ok)

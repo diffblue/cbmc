@@ -1792,6 +1792,56 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 /// (whose elaboration convert_non_template_declaration defers to first use)
 /// is therefore elaborated here; without this `sizeof(alias_t)` reported an
 /// incomplete type when the alias was the only mention of the instance.
+/// A struct VALUE must have one operand per component of its type -- data
+/// members AND the padding components inserted by the layout (add_padding),
+/// in the type's order.  Sites that assemble a struct value from per-member
+/// values start from this all-zero value and overwrite the members they set
+/// (set_struct_member_value); the padding stays zero.  Building the value
+/// from the data members alone (which the C++ front end used to do) left it
+/// short by the padding components: goto conversion / symex then paired
+/// operands with the wrong components or aborted
+/// (`assign_from_struct: rhs.operands().size() == components.size()').
+/// \return the zero value, or nothing when the type cannot be zero-initialised
+///   (an incomplete or dependent member type)
+std::optional<struct_exprt> cpp_typecheckt::zero_struct_value(
+  const typet &type,
+  const source_locationt &loc)
+{
+  const namespacet ns(symbol_table);
+  const auto zero = ::zero_initializer(type, loc, ns);
+  if(!zero.has_value() || zero->id() != ID_struct)
+    return {};
+  return to_struct_expr(*zero);
+}
+
+/// Overwrite the operand of \p value that corresponds to \p component (a
+/// component of \p struct_type, the followed type of value.type()).
+void cpp_typecheckt::set_struct_member_value(
+  struct_exprt &value,
+  const struct_typet &struct_type,
+  const struct_union_typet::componentt &component,
+  exprt member_value)
+{
+  // Operands correspond to the components that are not methods, member
+  // types or static members (see zero_initializer's struct case).
+  std::size_t i = 0;
+  for(const auto &c : struct_type.components())
+  {
+    if(
+      c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static))
+      continue;
+    if(c.get_name() == component.get_name())
+    {
+      PRECONDITION(i < value.operands().size());
+      value.operands()[i] = std::move(member_value);
+      return;
+    }
+    ++i;
+  }
+  UNREACHABLE;
+}
+
 void cpp_typecheckt::complete_type_operand(exprt &expr)
 {
   if(!expr.operands().empty() || expr.find(ID_type_arg).is_nil())
@@ -3546,9 +3596,13 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       if(!has_non_copy_ctor)
       {
         const auto &ops = expr.operands().front().operands();
-        struct_exprt result({}, expr.type());
+        // all-zero start: the layout's padding components are present
+        auto result_opt =
+          zero_struct_value(expr.type(), expr.source_location());
+        struct_exprt result =
+          result_opt.has_value() ? *result_opt : struct_exprt({}, expr.type());
         std::size_t idx = 0;
-        bool aggregate = true;
+        bool aggregate = result_opt.has_value();
         // N5008 [dcl.init.aggr]/2.2: the aggregate's elements START
         // with the direct base classes, in declaration order.  When a
         // direct base is EMPTY (no data members -- the libc++
@@ -3572,9 +3626,12 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         }
         for(const auto &c : struct_type.components())
         {
+          if(!aggregate)
+            break;
           if(
             c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-            c.get_bool(ID_is_static) || c.type().id() == ID_code)
+            c.get_bool(ID_is_static) || c.type().id() == ID_code ||
+            c.get_is_padding())
           {
             continue;
           }
@@ -3588,7 +3645,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
               reference_initializer(val, to_reference_type(c.type()));
             else
               implicit_typecast(val, c.type());
-            result.add_to_operands(std::move(val));
+            set_struct_member_value(result, struct_type, c, std::move(val));
           }
           else
           {
@@ -3704,20 +3761,30 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
             messaget::M_ERROR, errors_before_ctor_attempt);
         }
         exprt::operandst ops = e.operands();
-        struct_exprt result({}, e.type());
+        // all-zero start: the layout's padding components are present, and
+        // [dcl.init.aggr]/5's remaining elements (default member
+        // initializers or value-initialization) are approximated by zero.
+        auto result_opt = zero_struct_value(e.type(), e.source_location());
+        struct_exprt result =
+          result_opt.has_value() ? *result_opt : struct_exprt({}, e.type());
         std::size_t idx = 0;
-        bool aggregate_ok = true;
+        bool aggregate_ok = result_opt.has_value();
         for(const auto &c : struct_type.components())
         {
+          if(!aggregate_ok)
+            break;
           if(
             c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
-            c.type().id() == ID_code)
+            c.type().id() == ID_code || c.get_is_padding())
             continue;
           if(c.get_base_name() == "@most_derived")
           {
             // the complete object's own flag is true, base subobjects'
             // flags are false (mirrors cpp_constructor)
-            result.add_to_operands(
+            set_struct_member_value(
+              result,
+              struct_type,
+              c,
               c.get_bool(ID_from_base) ? static_cast<exprt>(false_exprt())
                                        : static_cast<exprt>(true_exprt()));
             continue;
@@ -3731,21 +3798,7 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
               reference_initializer(val, to_reference_type(c.type()));
             else
               implicit_typecast(val, c.type());
-            result.add_to_operands(std::move(val));
-          }
-          else
-          {
-            // [dcl.init.aggr]/5: remaining elements are initialized
-            // from default member initializers or value-initialized;
-            // approximate with zero initialization.
-            const auto zero = ::zero_initializer(
-              c.type(), e.source_location(), namespacet{symbol_table});
-            if(!zero.has_value())
-            {
-              aggregate_ok = false;
-              break;
-            }
-            result.add_to_operands(*zero);
+            set_struct_member_value(result, struct_type, c, std::move(val));
           }
         }
         if(aggregate_ok && idx == ops.size())
@@ -5905,19 +5958,31 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
             const auto &st =
               follow_tag(to_struct_tag_type(code_type.return_type()));
             const auto &comps = st.components();
-            struct_exprt s({}, code_type.return_type());
+            auto s_opt =
+              zero_struct_value(code_type.return_type(), tmp.source_location());
+            struct_exprt s = s_opt.has_value()
+                               ? *s_opt
+                               : struct_exprt({}, code_type.return_type());
             std::size_t i = 0;
             for(const auto &c : comps)
             {
+              if(!s_opt.has_value())
+                break;
               if(c.get_is_padding() || c.type().id() == ID_code)
                 continue;
               if(i < tmp.operands().size())
-                s.operands().push_back(typecast_exprt::conditional_cast(
-                  tmp.operands()[i++], c.type()));
+              {
+                set_struct_member_value(
+                  s,
+                  st,
+                  c,
+                  typecast_exprt::conditional_cast(
+                    tmp.operands()[i++], c.type()));
+              }
               else
                 break;
             }
-            if(i == tmp.operands().size())
+            if(s_opt.has_value() && i == tmp.operands().size())
             {
               // Verify all fields are constant (no remaining symbols
               // from unevaluated parameters).
@@ -8838,24 +8903,44 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       // direct-initialised, in member order, from the captured entities'
       // values at this (capture) point.
       struct_tag_typet closure_tag_type(closure_sym_name);
-      exprt::operandst init;
-      init.reserve(capture_members.size());
+      // The closure object's value has one operand per component of the
+      // closure type: the captures by member NAME (the members were
+      // declared in capture_members order, but the layout may have inserted
+      // padding components between them), everything else zero.
+      const struct_typet &closure_struct_type = follow_tag(closure_tag_type);
+      auto closure_value_opt = zero_struct_value(closure_tag_type, loc);
+      struct_exprt closure_value = closure_value_opt.has_value()
+                                     ? *closure_value_opt
+                                     : struct_exprt({}, closure_tag_type);
       for(const auto &name : capture_members)
       {
         const exprt &entity = capture_values.at(name);
+        exprt value = entity;
         if(by_ref_captures.count(name))
         {
           // [expr.prim.lambda.capture]: bind the reference member to the
           // captured entity (a reference is modelled as the entity's address).
           address_of_exprt addr(entity);
           addr.type() = reference_type(entity.type());
-          init.push_back(std::move(addr));
+          value = std::move(addr);
         }
-        else
-          init.push_back(entity);
+        if(!closure_value_opt.has_value())
+        {
+          closure_value.add_to_operands(std::move(value));
+          continue;
+        }
+        for(const auto &c : closure_struct_type.components())
+        {
+          if(c.get_base_name() == name && !c.get_is_padding())
+          {
+            set_struct_member_value(
+              closure_value, closure_struct_type, c, std::move(value));
+            break;
+          }
+        }
       }
       side_effect_exprt tmp(ID_temporary_object, closure_tag_type, loc);
-      tmp.add_to_operands(struct_exprt(std::move(init), closure_tag_type));
+      tmp.add_to_operands(std::move(closure_value));
       tmp.set(ID_C_lvalue, true);
       tmp.set(ID_mode, ID_cpp);
       expr.swap(tmp);
