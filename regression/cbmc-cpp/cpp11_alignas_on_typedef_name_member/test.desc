@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+alignas / __attribute__((aligned)) before a typedef-name in a member
+declaration; the stronger of the specifier and the typedef alignment wins.
