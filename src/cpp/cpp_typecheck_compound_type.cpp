@@ -3980,7 +3980,12 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   //  * an actual struct (unions are laid out by their own add_padding overload,
   //    deferred);
   //  * with no base classes (base-subobject layout is an ABI subtlety the
-  //    flattened from_base components do not model);
+  //    flattened from_base components do not model) -- unless it contains a
+  //    bit-field: a bit-field run must be completed to a byte boundary
+  //    whatever the bases (size_of_expr_rec's "padding ensures offset at byte
+  //    boundaries" invariant), so `struct D : B { int m : 28; short s; }'
+  //    is laid out over its flattened components (the base subobject first),
+  //    approximating the Itanium layout;
   //  * not already padded (idempotent across any re-entry); and
   //  * whose data members all have a known size (a dependent template member
   //    has none -- and each instantiation re-typechecks the body from the
@@ -3990,20 +3995,23 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   if(symbol.type.id() == ID_struct)
   {
     struct_typet &struct_type = to_struct_type(symbol.type);
-    if(struct_type.bases().empty())
+    bool has_bit_field = false;
+    for(const auto &c : struct_type.components())
+      if(c.type().id() == ID_c_bit_field)
+        has_bit_field = true;
+    if(struct_type.bases().empty() || has_bit_field)
     {
       const namespacet ns(symbol_table);
       bool already_padded = false;
       bool all_sizes_known = true;
-      bool has_bit_field = false;
       bool has_explicit_alignment =
         struct_type.find(ID_C_alignment).is_not_nil();
       for(const auto &c : struct_type.components())
       {
+        // padding flattened in from a (padded) base subobject does not mean
+        // THIS class has been laid out: its own members still follow
         if(c.get_is_padding())
-          already_padded = true;
-        else if(c.type().id() == ID_c_bit_field)
-          has_bit_field = true;
+          already_padded = already_padded || !c.get_bool(ID_from_base);
         else if(
           c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
           !c.get_bool(ID_is_type) &&
