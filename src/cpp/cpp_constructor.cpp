@@ -1062,6 +1062,17 @@ void cpp_typecheckt::new_temporary(
   // create temporary object
   side_effect_exprt tmp_object_expr(ID_temporary_object, type, source_location);
   tmp_object_expr.set(ID_mode, ID_cpp);
+  // N5008 [class.temporary]/2, [conv.rval]: the temporary object materialised
+  // here is an object with identity; binding a reference to it (a const T&
+  // or T&& parameter, [dcl.init.ref]/5.3) refers to THIS object and must not
+  // materialise a second one.  The front end marks such an object with
+  // ID_C_lvalue (as typecheck_function_expr does for `T(args)`); without the
+  // mark, reference binding wrapped `T{args}` into another temporary_object
+  // and goto conversion turned that into a bitwise copy of the constructed
+  // object -- a self-pointing member (std::function's _M_manager /
+  // _M_functor, a string's local buffer pointer) then pointed into an object
+  // that was already dead when the callee used it.
+  tmp_object_expr.set(ID_C_lvalue, true);
 
   exprt new_object(ID_new_object);
   new_object.add_source_location() = tmp_object_expr.source_location();
