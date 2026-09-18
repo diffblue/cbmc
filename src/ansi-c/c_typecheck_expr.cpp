@@ -760,18 +760,31 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
         // N5008 [support.types.layout]/1 -- offsetof(type, member-
         // designator) is the same as in C).  Map the spelling to the
         // component's name by base name when the direct lookup fails.
+        // N5008 [class.member.lookup]: a member declared in the class
+        // hides the same-named member of a base class (flattened in
+        // first, marked ID_from_base), so prefer the class's own member.
         if(!struct_union_type.has_component(component_name))
         {
+          const struct_union_typet::componentt *from_base_match = nullptr;
           for(const auto &c : struct_union_type.components())
           {
             if(
               c.get_base_name() == component_name && !c.get_bool(ID_is_type) &&
               !c.get_bool(ID_is_static) && c.type().id() != ID_code)
             {
+              if(c.get_bool(ID_from_base))
+              {
+                if(from_base_match == nullptr)
+                  from_base_match = &c;
+                continue;
+              }
               component_name = c.get_name();
+              from_base_match = nullptr;
               break;
             }
           }
+          if(from_base_match != nullptr)
+            component_name = from_base_match->get_name();
         }
 
         // direct member?
