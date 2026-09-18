@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+Invariant check failed
+--
+Bit-fields in a class with base classes: the class must be padded (crash
+otherwise); base padding components do not count as the derived class being
+padded; padding names are made unique.
