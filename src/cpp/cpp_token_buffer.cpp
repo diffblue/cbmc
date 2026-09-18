@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_token_buffer.h"
 
+#include <util/arith_tools.h>
+
 int cpp_token_buffert::LookAhead(unsigned offset)
 {
   PRECONDITION(current_pos <= token_vector.size());
@@ -92,6 +94,14 @@ void cpp_token_buffert::read_token()
     const irept &pragmas = ansi_c_parser.source_location().find(ID_pragma);
     if(pragmas.is_not_nil())
       tokens.back().data.add_source_location().add(ID_pragma) = pragmas;
+  }
+
+  // the #pragma pack(n) state after the scanner consumed the pragmas that
+  // precede this token
+  if(!ansi_c_parser.pragma_pack.empty())
+  {
+    const auto n = numeric_cast<int>(ansi_c_parser.pragma_pack.back());
+    tokens.back().pragma_pack = n.has_value() ? *n : 0;
   }
 
   // std::cout << "TOKEN: " << kind << " " << tokens.back().text << '\n';
