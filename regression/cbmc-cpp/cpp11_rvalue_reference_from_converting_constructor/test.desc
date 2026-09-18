@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no match for symbol
+no body for callee
+Invariant check failed
+--
+rvalue references to class type from expressions of unrelated type
+([dcl.init.ref]/5.3): the temporary is created via the converting
+constructor (previously only const lvalue references got a temporary), and
+[over.ics.rank]/3.2.3 prefers the && overload for it.  Base&& bound to a
+Derived prvalue needs the derived-to-base pointer adjustment (was a symex
+invariant violation).
