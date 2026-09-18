@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+A braced functional cast T{args} bound to a reference parameter was copied
+bitwise into a second temporary (the first one already dead), so
+self-referential members (std::function, std::string SSO) dangled.
