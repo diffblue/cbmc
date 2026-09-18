@@ -3982,15 +3982,45 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           !c.get_bool(ID_is_type) &&
           !pointer_offset_bits(c.type(), ns).has_value())
           all_sizes_known = false;
-        if(
-          !c.get_bool(ID_is_static) && !c.get_bool(ID_is_type) &&
-          c.type().find(ID_C_alignment).is_not_nil())
-          has_explicit_alignment = true;
+        if(!c.get_bool(ID_is_static) && !c.get_bool(ID_is_type))
+        {
+          // the member's own alignment specifier, or that of its class
+          // type (`struct { ... } __attribute__((aligned(16)))' as a
+          // member is placed on a 16-byte boundary and pads the struct)
+          const typet *element = &c.type();
+          while(element->id() == ID_array)
+            element = &to_array_type(*element).element_type();
+          if(
+            c.type().find(ID_C_alignment).is_not_nil() ||
+            element->find(ID_C_alignment).is_not_nil())
+          {
+            has_explicit_alignment = true;
+          }
+          else if(
+            (element->id() == ID_struct_tag || element->id() == ID_union_tag) &&
+            ns.follow_tag(to_struct_or_union_tag_type(*element))
+              .find(ID_C_alignment)
+              .is_not_nil())
+          {
+            has_explicit_alignment = true;
+          }
+        }
       }
       if(
         (has_bit_field || has_explicit_alignment) && !already_padded &&
         all_sizes_known)
+      {
         add_padding(struct_type, ns);
+        // Record the resulting alignment on the struct when it stems from an
+        // explicit specifier, so that an enclosing struct sees it (above)
+        // and lays this one out on the boundary GCC uses.
+        if(has_explicit_alignment && struct_type.find(ID_C_alignment).is_nil())
+        {
+          struct_type.set(
+            ID_C_alignment,
+            from_integer(alignment(struct_type, ns), size_type()));
+        }
+      }
     }
   }
 
