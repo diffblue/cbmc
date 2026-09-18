@@ -9567,3 +9567,92 @@ failures — the suite is goto-cc based).
   start: 51/23/0; r138: 3 FAIL).  auto_objects, complexity_limiter,
   field_sensitivity FAIL→OK_NOISY; six goto-programs files NOISY→OK.  Log:
   /tmp/dogfood-snapshots/60409dc8d8-20260917-235038/sweep.log (tree removed).
+
+## Round 144 (2026-09-18) — braced temporaries, layout fuzzing, upstream prep, sweep signatures
+
+- `ceb3e898a2` `T{args}` temporary bound to a reference was copied BITWISE
+  into a second temporary (new_temporary lacked the ID_C_lvalue mark the
+  `T(args)` ctor path sets) → self-pointing members (std::function, SSO
+  string) dangled.  Kernel bt1/bt2 (/tmp/r144).  [class.temporary]/2.
+- DEFERRED (root cause found, kernel /tmp/r144/pf4.cpp, ~1 min):
+  `take({2, one})` with `pair<int, std::function<int()>>`: pair's
+  `pair(U1&&,U2&&)` body is dropped (convert_function catch → nil, system
+  header) because `is_constructible<function, int(*)()>` evaluates FALSE in
+  the nested context: `_Callable<F, _Decay_t<F>, __invoke_result<_DFunc&,
+  _ArgTypes...>>` — the EMPTY `_ArgTypes` expansion is REFUSED by
+  typecheck_template_args when exact scope lookup fails and a same-suffix
+  LIVE pack exists (`std::template::171::_Args=1` from the enclosing
+  `__is_constructible_impl`) → "wrong number of function arguments:
+  expected 0, but got 1".  First-instantiation-context dependent: pf5/pf6
+  (any earlier `std::function<int()> g = one;`) pass.  Proper fix = scope-
+  exact pack resolution instead of suffix heuristics.  Speculative
+  "bind enclosing specialization args" changes tried and reverted.
+- Layout fuzzer `scripts/layout_fuzz.py` (gcc/g++ vs cbmc sizeof/alignof/
+  offsetof).  C mode 25/40 → 0/220.  Fixes `98d1b989af` (GCC rules:
+  aligned(n) increase-only unless typedef — new ID_C_typedef_alignment
+  marker set by both front ends; packed aggregates: member's own aligned(n)
+  exact, type alignment ignored, struct alignment = max, tail padding;
+  unnamed bit-fields and padding components don't raise alignment; packed
+  unions), C++ `939a6a1d6b` (unnamed bit-field was DISCARDED by the parser:
+  `// TODO`), `e7b9b6abc9` (attribute GROUP on a member declarator lost the
+  base type: `long m __attribute__((packed, aligned(2)))` became int),
+  `4b44b66f08` (typedef attribute applies to class types; alias-declaration
+  ignores it — g++/clang++ agree), tests `5e651f583e`.
+  C++ mode remaining divergences = plain structs/unions NOT padded at all
+  (deliberate gate in cpp_typecheck_compound_type.cpp ~3960: pad only with
+  bit-fields/explicit alignment).  EXPERIMENT (gate removed + unions padded)
+  → 1/60 (empty struct of one unnamed bit-field + aligned(2) → size 1 not
+  2); needs an ISOLATED cbmc-cpp run (first attempt had a silently failed
+  build (grep " error " missed "error:"), second collided with another
+  suite in the same regression dir).  Backup of gated file:
+  /tmp/r144/compound_type_before_gate_experiment.cpp.  TODO next round.
+- Upstream prep: worktree /tmp/r144/upstream, branch
+  `upstream-c-layout-fixes` off origin/develop (166a7d4af3): cycle guard
+  (C part), memoize, packed+aligned, storage units, GCC rules (+ C++ typedef
+  flag in develop's declarator converter), tests+fuzzer.  Built;
+  ansi-c (gcc + c++-fe variants) and cbmc suites green.  NOT pushed.
+- Structured bindings (map::emplace 2-arg signature, kernel em1 + sb1..sb6):
+  ONE hidden `__sb` symbol per SCOPE (second declaration retyped it),
+  prvalue sources not materialised (tuple-like lowering kept a pointer to a
+  destroyed temporary), tuple-like bindings were COPIES (writes through
+  `auto&&[r,s]` to a reference member lost).  Fixed: `__sb$N`, `__sb$obj`
+  materialisation ([dcl.struct.bind]/1 + [class.temporary]/6), bindings as
+  references to get<i>(e) ([dcl.struct.bind]/4).
+- Value category: new `cpp_typecheckt::is_lvalue_expression` — a
+  temporary_object / compound_literal / struct / array literal is a prvalue
+  although marked #lvalue (C semantics of compound literals!); used by
+  reference_binding (non-const T& rejects prvalues, [over.ics.ref]/3: `f(S&)`
+  vs `f(S)` with `S{1,2}` was AMBIGUOUS) and by forwarding-reference
+  deduction (else `emplace(1, W{5})` deduced W& and then had no match).
+- ADL suppression ([basic.lookup.argdep]/3.1) missed member function
+  TEMPLATES (scope entry has no class_identifier) → `zip<b>(ranget<..>{..})`
+  inside ranget<It>::zip pulled in ranget<J>::zip from the argument's class
+  → "does not uniquely resolve" (util/range.h signature).  Now: parent scope
+  is a class ⇒ member.
+- Pitfalls (hit again): `pgrep -f <pattern>` matches the invoking shell →
+  kill by PID list only; never run two test.pl suites in the same regression
+  dir (they clobber each other's test.out); grep build output for "error"
+  not " error ".
+- Also this round: `044d6bbf54` qualified explicit specialization of member
+  templates (`template<> R C::f<L1>(...)`, goto_symex_state.cpp);
+  `bf63edc744` explicit INSTANTIATION declarations (`template R C::f<L0>(..);`
+  and deduced `template long twice(long);` — the latter had declared a
+  bodiless non-template hiding the template); `ab7817e78c` frontend_pointer
+  pack elements inside function-pointer PARAMETERS (`fn(R(*)(A...))` with
+  A=hard&); `6e9663f963` named parameters in function-type template args
+  (`std::function<void(T &hardness)>` was a distinct never-elaborated
+  instance → solver_hardness.cpp now compiles).  Kernels /tmp/r144/{es1,es2,
+  ei1,ei2,ic1..ic13,sb1..sb6,lr,tr1,wsl}.cpp.
+- Regression caught by suites before commit: is_lvalue_expression must
+  exempt the implicit object parameter (`std::move(*this).with(...)`) and
+  treat a dereference of a MEMBER of rvalue-reference type as an lvalue
+  ([expr.ref]/6; test cpp11_rvalue_ref_member_lvalue).
+- Suites ×5 green on /tmp/r144/bin22 (= final HEAD of the C++ series);
+  ansi-c (both goto-cc variants) green on bin14 (C series).
+- Sweep signatures status: solver_hardness.cpp COMPILES (rc=0); loop_ids.cpp
+  rc=0 (xmlt/json_objectt braced-list arg noise remains = the deferred pf4
+  family); goto_symex_state.cpp: remaining `rename<level>(...)` no match at
+  :608 (member template with explicit args inside a member template),
+  `pair<const string, list>` instantiation, 'set'/'stack' no-match noise
+  (has_unassigned-like, new trigger); path_storage: bigint `negate` no match.
+  Next: wider sweep on the final binary.
