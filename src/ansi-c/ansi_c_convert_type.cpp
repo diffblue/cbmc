@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_convert_type.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/message.h>
@@ -712,7 +713,32 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
     type.set(ID_C_packed, true);
 
   if(aligned)
-    type.set(ID_C_alignment, alignment);
+  {
+    // GCC: an `aligned(k)' attribute on a declaration only INCREASES the
+    // alignment; when the (already converted) type carries the alignment of
+    // a typedef -- `typedef S __attribute__((aligned(16))) T; T m
+    // __attribute__((aligned(4)));' -- the larger of the two applies
+    // (16 here; the typedef's, which may be below the natural alignment,
+    // keeps its typedef marking).
+    const exprt &existing =
+      static_cast<const exprt &>(type.find(ID_C_alignment));
+    const auto existing_value = existing.is_nil()
+                                  ? std::optional<mp_integer>{}
+                                  : numeric_cast<mp_integer>(existing);
+    const auto new_value = numeric_cast<mp_integer>(alignment);
+    // (with `packed' the attribute sets the alignment exactly)
+    if(
+      packed || !(existing_value.has_value() && new_value.has_value() &&
+                  *existing_value >= *new_value))
+    {
+      type.set(ID_C_alignment, alignment);
+    }
+    else
+    {
+      // kept for a packed struct, where the type's alignment is ignored
+      type.set(ID_C_member_alignment, alignment);
+    }
+  }
 
   if(pragma_pack.is_not_nil())
     type.set(ID_C_pragma_pack, pragma_pack);
