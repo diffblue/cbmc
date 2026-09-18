@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [temp.explicit]: explicit instantiation declarations of member and free
+function templates (with a template-argument-list, or with the arguments
+deduced from the function type) and of a class template.  The parser passed
+them on as plain declarations: "no match for symbol L0", "already declared
+with different type", and a bodiless non-template twice(long) hiding the
+template.
