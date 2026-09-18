@@ -1781,7 +1781,28 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
     }
   }
 
+  complete_type_operand(expr);
   c_typecheck_baset::typecheck_expr_sizeof(expr);
+}
+
+/// N5008 [expr.sizeof]/1, [expr.alignof]/1: the operand type must be complete,
+/// and [temp.inst]/2: a class template specialization is implicitly
+/// instantiated when the completeness of the class type affects the semantics
+/// of the program.  A specialization named only through a typedef/alias
+/// (whose elaboration convert_non_template_declaration defers to first use)
+/// is therefore elaborated here; without this `sizeof(alias_t)` reported an
+/// incomplete type when the alias was the only mention of the instance.
+void cpp_typecheckt::complete_type_operand(exprt &expr)
+{
+  if(!expr.operands().empty() || expr.find(ID_type_arg).is_nil())
+    return;
+  typet &type_arg = static_cast<typet &>(expr.add(ID_type_arg));
+  typecheck_type(type_arg);
+  const typet *t = &type_arg;
+  while(t->id() == ID_array)
+    t = &to_array_type(*t).element_type();
+  elaborate_class_template(*t);
+  already_typechecked_typet::make_already_typechecked(type_arg);
 }
 
 void cpp_typecheckt::typecheck_expr_alignof(exprt &expr)
@@ -1816,6 +1837,7 @@ void cpp_typecheckt::typecheck_expr_alignof(exprt &expr)
     }
   }
 
+  complete_type_operand(expr);
   c_typecheck_baset::typecheck_expr_alignof(expr);
 }
 
