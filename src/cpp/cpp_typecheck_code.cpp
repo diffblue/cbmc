@@ -1109,6 +1109,60 @@ void cpp_typecheckt::typecheck_code(codet &code)
     const irept &bindings = code.find(irep_idt("bindings"));
     const auto &binding_list = bindings.get_sub();
 
+    // N5008 [dcl.struct.bind]/1: the declaration introduces a hidden variable
+    // `e' per structured-binding declaration; each one gets its own symbol
+    // (a second declaration in the same scope must not reuse -- with a
+    // different type -- the first one's).
+    const std::string sb_scope_prefix =
+      id2string(cpp_scopes.current_scope().prefix);
+    std::string sb_hidden_id = sb_scope_prefix + "__sb";
+    for(std::size_t n = 1; symbol_table.has_symbol(sb_hidden_id); ++n)
+      sb_hidden_id = sb_scope_prefix + "__sb$" + std::to_string(n);
+
+    // N5008 [dcl.struct.bind]/1 with [class.temporary]/6: for `auto &&[a, b]
+    // = prvalue' (or `const auto &') the hidden variable is a reference bound
+    // to a materialised temporary whose lifetime is EXTENDED to that of the
+    // reference; for `auto [a, b] = prvalue' it is an object initialised from
+    // the prvalue.  Either way the source must outlive the initialiser's
+    // full-expression: the tuple-like lowering below keeps a pointer to the
+    // source and calls get<i> on it afterwards, so a prvalue source is
+    // materialised here into an object of the enclosing scope (the bindings
+    // otherwise read a temporary that had already been destroyed).
+    code_blockt sb_prologue;
+    sb_prologue.add_source_location() = loc;
+    // (A braced aggregate literal `S{7, 8}' is a prvalue in C++ although
+    // the shared C machinery marks a compound literal as an lvalue; treat
+    // the value-producing expression forms as prvalues regardless.)
+    const bool init_is_prvalue =
+      !init.get_bool(ID_C_lvalue) || init.id() == ID_struct ||
+      init.id() == ID_array || init.id() == ID_side_effect ||
+      init.id() == ID_typecast || init.id() == ID_compound_literal;
+    if(init_is_prvalue && !is_reference(init.type()))
+    {
+      const std::string obj_id = sb_hidden_id + "$obj";
+      auxiliary_symbolt sym;
+      sym.name = obj_id;
+      sym.base_name = "__sb$obj";
+      sym.type = init.type();
+      sym.mode = ID_cpp;
+      sym.module = module;
+      sym.location = loc;
+      sym.is_file_local = true;
+      sym.is_thread_local = true;
+      sym.is_lvalue = true;
+      symbol_table.insert(std::move(sym));
+      // like the other hidden symbols of this lowering, `e' is assigned,
+      // not declared here: a declaration would scope it to this block
+      symbol_exprt obj_expr(obj_id, init.type());
+      codet assign(ID_assign);
+      assign.copy_to_operands(obj_expr);
+      assign.copy_to_operands(init);
+      assign.add_source_location() = loc;
+      sb_prologue.add(std::move(assign));
+      obj_expr.set(ID_C_lvalue, true);
+      init = obj_expr;
+    }
+
     // Get the struct type
     typet init_type = init.type();
     if(init_type.id() == ID_struct_tag)
@@ -1130,7 +1184,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
       const std::string scope_prefix =
         id2string(cpp_scopes.current_scope().prefix);
-      const std::string sb_id = scope_prefix + "__sb";
+      const std::string sb_id = sb_hidden_id;
       {
         auxiliary_symbolt sym;
         sym.name = sb_id;
@@ -1185,6 +1239,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
         block.add(std::move(assign));
       }
 
+      if(!sb_prologue.statements().empty())
+      {
+        for(auto &st : block.statements())
+          sb_prologue.add(std::move(st));
+        block = std::move(sb_prologue);
+      }
       code.swap(block);
       return;
     }
@@ -1301,16 +1361,14 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
         const std::string scope_prefix =
           id2string(cpp_scopes.current_scope().prefix);
-        const bool is_ref = code.get_bool(ID_C_reference);
 
         // __sb is a reference (pointer) to the source object -- the original
-        // lvalue or the materialised temporary.  We deliberately do not copy
-        // the whole object even for an `auto` (by-value) binding: copying it
-        // would invoke its copy constructor, which for some library types
-        // (e.g. std::tuple, whose constructors are heavily constrained) cannot
-        // be evaluated here.  Each `auto` binding is still an independent copy
-        // of get<i>(e), so the bindings are value-independent of the source.
-        const std::string sb_id = scope_prefix + "__sb";
+        // lvalue or the materialised temporary (`__sb$obj', see above).  We
+        // deliberately do not copy the whole object for an `auto` (by-value)
+        // binding of an lvalue: copying it would invoke its copy constructor,
+        // which for some library types (e.g. std::tuple, whose constructors
+        // are heavily constrained) cannot be evaluated here.
+        const std::string sb_id = sb_hidden_id;
         typet sb_type = pointer_type(init.type());
         sb_type.set(ID_C_reference, true);
         {
@@ -1366,9 +1424,26 @@ void cpp_typecheckt::typecheck_code(codet &code)
 
           // The binding refers to the result of get<i>; a reference for an
           // auto& binding, a copy for an auto binding.
+          // N5008 [dcl.struct.bind]/4: each binding is a REFERENCE (Ti& or
+          // Ti&&) initialised with get<i>(e) -- writing through `r' in
+          // `auto &&[r, s] = std::pair<int &, int>(z, 1); r = 10;' writes z.
+          // A get<i> returning a reference arrives here as an lvalue
+          // dereference of its result; bind by address.  A get<i>
+          // returning a prvalue would bind Ti&& to a temporary whose
+          // lifetime is extended to the binding's: keep it as a copy.
           typet binding_type = get_call.type();
-          if(!is_ref && is_reference(binding_type))
-            binding_type = to_reference_type(binding_type).base_type();
+          exprt binding_init = get_call;
+          if(is_reference(binding_type))
+          {
+            // (not the current representation of reference returns, kept
+            // for robustness)
+          }
+          else if(get_call.get_bool(ID_C_lvalue))
+          {
+            binding_type = pointer_type(binding_type);
+            binding_type.set(ID_C_reference, true);
+            binding_init = address_of_exprt{get_call};
+          }
 
           const std::string var_id = scope_prefix + id2string(name);
           {
@@ -1391,11 +1466,17 @@ void cpp_typecheckt::typecheck_code(codet &code)
           symbol_exprt var_expr{var_id, binding_type};
           codet assign{ID_assign};
           assign.copy_to_operands(var_expr);
-          assign.copy_to_operands(get_call);
+          assign.copy_to_operands(binding_init);
           assign.add_source_location() = loc;
           block.add(std::move(assign));
         }
 
+        if(!sb_prologue.statements().empty())
+        {
+          for(auto &st : block.statements())
+            sb_prologue.add(std::move(st));
+          block = std::move(sb_prologue);
+        }
         code.swap(block);
         return;
       }
@@ -1429,7 +1510,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
     const bool is_ref = code.get_bool(ID_C_reference);
 
     // Hidden variable for the source object
-    const std::string sb_id = scope_prefix + "__sb";
+    const std::string sb_id = sb_hidden_id;
     {
       auxiliary_symbolt sym;
       sym.name = sb_id;
@@ -1508,6 +1589,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
         block.add(std::move(assign));
       }
 
+      if(!sb_prologue.statements().empty())
+      {
+        for(auto &st : block.statements())
+          sb_prologue.add(std::move(st));
+        block = std::move(sb_prologue);
+      }
       code = std::move(block);
       return;
     }
@@ -1557,6 +1644,12 @@ void cpp_typecheckt::typecheck_code(codet &code)
       block.add(std::move(assign));
     }
 
+    if(!sb_prologue.statements().empty())
+    {
+      for(auto &st : block.statements())
+        sb_prologue.add(std::move(st));
+      block = std::move(sb_prologue);
+    }
     code = std::move(block);
   }
   else
