@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Invariant check failed
+--
+Classes with base classes are laid out over their flattened components: base
+subobjects aligned for the base (ID_C_base_alignment), tail padding of a
+non-POD base reused, POD base tail padding kept (Itanium C++ ABI 2.4).
