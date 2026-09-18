@@ -94,7 +94,7 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
   {
     if(
       m.type().id() == ID_code || m.get_bool(ID_is_type) ||
-      m.get_bool(ID_is_static))
+      m.get_bool(ID_is_static) || m.get_is_padding())
       continue;
     if(!ptr_comp)
     {
@@ -139,14 +139,19 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
     arr_sym.value = array_exprt{std::move(typed_elems), arr_type};
     symbol_table.insert(std::move(arr_sym));
 
-    struct_exprt il_val{{}, il_type};
+    // all-zero start so that the layout's padding components are present
+    auto il_val_opt = zero_struct_value(il_type, init_list.source_location());
+    if(!il_val_opt.has_value())
+      return {};
+    struct_exprt &il_val = *il_val_opt;
     symbol_exprt arr_ref{arr_id, arr_type};
     arr_ref.set(ID_C_lvalue, true);
     index_exprt first{arr_ref, from_integer(0, c_index_type()), elem_type};
     address_of_exprt addr{first};
     addr.type() = ptr_comp->type();
-    il_val.add_to_operands(std::move(addr));
-    il_val.add_to_operands(from_integer(n, size_comp->type()));
+    set_struct_member_value(il_val, il_struct, *ptr_comp, std::move(addr));
+    set_struct_member_value(
+      il_val, il_struct, *size_comp, from_integer(n, size_comp->type()));
     il_val.add_source_location() = init_list.source_location();
     return std::move(il_val);
   }
@@ -681,9 +686,15 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           }
         }
 
-        struct_exprt result({}, symbol.type);
+        // all-zero start so that the layout's padding components are present
+        auto result_opt = zero_struct_value(symbol.type, symbol.location);
+        struct_exprt result =
+          result_opt.has_value() ? *result_opt : struct_exprt({}, symbol.type);
+        aggregate = aggregate && result_opt.has_value();
         for(const auto &c : struct_type.components())
         {
+          if(!aggregate)
+            break;
           // [class.bit]/1, [class.mem]: padding inserted for ABI layout is not
           // a member; aggregate initialisation matches initialiser-clauses to
           // members positionally, so a padding component must not consume one.
@@ -704,7 +715,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
               reference_initializer(val, to_reference_type(c.type()));
             else
               implicit_typecast(val, c.type());
-            result.add_to_operands(std::move(val));
+            set_struct_member_value(result, struct_type, c, std::move(val));
           }
           else
           {

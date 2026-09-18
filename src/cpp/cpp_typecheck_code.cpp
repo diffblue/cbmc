@@ -100,8 +100,13 @@ std::optional<exprt> cpp_typecheckt::braced_return_aggregate_value(
   }
 
   // Bases-free aggregate: [dcl.init.aggr]/3 -- each element of the list
-  // copy-initializes the corresponding member, in declaration order.
-  struct_exprt result({}, return_type);
+  // copy-initializes the corresponding member, in declaration order.  The
+  // value starts out all-zero so that the layout's padding components are
+  // present (zero_struct_value).
+  auto result_opt = zero_struct_value(return_type, init_list.source_location());
+  if(!result_opt.has_value())
+    return {};
+  struct_exprt &result = *result_opt;
   const auto &ops = init_list.operands();
   std::size_t idx = 0;
   for(const auto &c : struct_type.components())
@@ -122,7 +127,7 @@ std::optional<exprt> cpp_typecheckt::braced_return_aggregate_value(
         reference_initializer(val, to_reference_type(c.type()));
       else
         implicit_typecast(val, c.type());
-      result.add_to_operands(std::move(val));
+      set_struct_member_value(result, struct_type, c, std::move(val));
     }
     else
     {
