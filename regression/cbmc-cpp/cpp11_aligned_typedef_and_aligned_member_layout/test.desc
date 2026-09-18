@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+GCC alignment semantics in C++: packed + aligned(n) is exactly n (alignof);
+a struct containing an aligned class-template instance (directly, as an
+array, via typedef/alias -- also when the member is the instance's first
+use) is padded to its alignment; aligned(n) in a typedef/alias of a scalar
+applies, on an alias of a class type it is ignored (as g++ does).
