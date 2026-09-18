@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no match for symbol
+--
+The goto_symex_state.cpp shape: overloaded member templates with a non-type
+(enum) template parameter, explicit instantiation with explicit argument.
