@@ -1755,8 +1755,8 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                   else if(a.id() != ID_unassigned)
                     pack_exprs.push_back(a);
                 }
-                template_map.pack_size_map[pack_id] =
-                  pack_elems.size() + pack_exprs.size();
+                template_map.set_pack_size(
+                  pack_id, pack_elems.size() + pack_exprs.size());
                 // Scalar convenience entries only for SINGLE-element
                 // packs: a >=2-element scalar CONCRETIZES the pack
                 // reference in patterns (base-specifier / parameter
@@ -3637,8 +3637,8 @@ const symbolt &cpp_typecheckt::instantiate_template(
               else if(a.id() != ID_unassigned)
                 pack_exprs.push_back(a);
             }
-            template_map.pack_size_map[pack_id] =
-              pack_elems.size() + pack_exprs.size();
+            template_map.set_pack_size(
+              pack_id, pack_elems.size() + pack_exprs.size());
             // Single-element-only scalar entries; see the matching
             // comment in the selection loop above.
             if(!pack_exprs.empty())
@@ -3668,7 +3668,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
                                    ? last_param.type().get(ID_identifier)
                                    : last_param.get(ID_identifier);
             if(!pid.empty())
-              template_map.pack_size_map[pid] = 0;
+              template_map.set_pack_size(pid, 0);
           }
         }
       }
@@ -3760,7 +3760,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
       std::vector<typet> elems;
       for(const auto &t : entry.get_sub())
         elems.push_back(static_cast<const typet &>(t));
-      template_map.pack_size_map[pid] = elems.size();
+      template_map.set_pack_size(pid, elems.size());
       template_map.pack_args_map[pid] = elems;
       if(!elems.empty())
         template_map.type_map[pid] = elems.front();
@@ -3770,14 +3770,14 @@ const symbolt &cpp_typecheckt::instantiate_template(
       std::vector<exprt> vals;
       for(const auto &e : entry.get_sub())
         vals.push_back(static_cast<const exprt &>(e));
-      template_map.pack_size_map[pid] = vals.size();
+      template_map.set_pack_size(pid, vals.size());
       template_map.pack_expr_map[pid] = vals;
       if(!vals.empty())
         template_map.expr_map[pid] = vals.front();
     }
     else if(entry.id() == "pack_empty")
     {
-      template_map.pack_size_map[pid] = 0;
+      template_map.set_pack_size(pid, 0);
     }
     else if(entry.id() == "scalar_type" && !entry.get_sub().empty())
     {
@@ -3887,7 +3887,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         if(pack_elems.size() > have)
         {
           template_map.pack_args_map[pack_id] = pack_elems;
-          template_map.pack_size_map[pack_id] = pack_elems.size();
+          template_map.set_pack_size(pack_id, pack_elems.size());
           // A parameter pack may only appear in a pack-expansion context, so
           // it must not retain a scalar type_map binding: build() recorded the
           // pack's single collapsed element as type_map[pack_id], which would
@@ -6016,7 +6016,7 @@ skip_pack_removal_ft:
             template_map.pack_size_map.find(pid) ==
               template_map.pack_size_map.end())
           {
-            template_map.pack_size_map[pid] = 0;
+            template_map.set_pack_size(pid, 0);
           }
         }
       }
@@ -6762,7 +6762,7 @@ skip_pack_removal_ft:
               template_map.type_map.find(pid) == template_map.type_map.end() &&
               template_map.pack_args_map.find(pid) ==
                 template_map.pack_args_map.end())
-              template_map.pack_size_map[pid] = 0;
+              template_map.set_pack_size(pid, 0);
           }
           if(ws.value.is_not_nil())
             remove_empty_pack_expansion_args(ws.value);

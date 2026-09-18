@@ -423,7 +423,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     {
       irep_idt pid = p.type().get(ID_identifier);
       if(!pid.empty())
-        template_map.pack_size_map[pid] = 0;
+        template_map.set_pack_size(pid, 0);
     }
   }
 
@@ -2551,34 +2551,47 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           // authoritative -- the veto below guards only the SUFFIX
           // fallback (where a stale zero-size entry of an unrelated
           // same-spelled parameter could hijack the expansion).
+          // A same-spelled LIVE scalar binding of another template vetoes
+          // the zero-length expansion only when it is the more recent
+          // (innermost) binding.  Instantiations nest and different
+          // templates reuse parameter names: while std::pair's converting
+          // constructor was being checked, `__is_constructible_impl<T,
+          // _Args...>` had bound `_Args` to one type, and std::function's
+          // `__result_of_other_impl::_S_test<_Fn, _Args...>` -- reached from
+          // there with an EMPTY `_Args` -- was vetoed by that outer binding:
+          // `declval<_Args>()...` kept one element, the call had one
+          // argument too many, `_Callable<F>` came out false and
+          // pair<int, std::function<int()>>'s constructor lost its body.
+          // The parameter's OWN scalar convenience entry never counts:
+          // pack_size_map == 0 is THIS instantiation's authoritative binding
+          // ([temp.variadic]/7); type_map/expr_map entries are only
+          // overwritten, never erased.
           bool any_live_binding = false;
           if(!any_exact_match)
           {
             for(const auto &pid : empty_pack_refs)
             {
+              const std::size_t own_generation =
+                template_map.generation_of(pid);
               const std::string key = id2string(pid);
               const auto pos = key.rfind("::");
               const std::string suffix =
                 pos != std::string::npos ? key.substr(pos + 2) : key;
-              // The parameter's OWN scalar convenience entry does not
-              // count as live: pack_size_map == 0 is THIS instantiation's
-              // authoritative binding ([temp.variadic]/7 + the
-              // sequential-same-template note above); type_map/expr_map
-              // convenience entries are only overwritten, never erased,
-              // so a leftover from the previous (non-empty) instantiation
-              // of the same template would otherwise veto the zero-length
-              // expansion (libc++ __make_tuple_types_flat's full-range
-              // `_Idx` beside the empty-range one).
+              auto same_suffix = [&](const irep_idt &other) -> bool
+              {
+                if(other == pid)
+                  return false;
+                const std::string ok = id2string(other);
+                const auto op = ok.rfind("::");
+                return (op != std::string::npos ? ok.substr(op + 2) : ok) ==
+                       suffix;
+              };
               for(const auto &te : template_map.type_map)
               {
-                if(te.first == pid)
-                  continue;
-                const std::string tk = id2string(te.first);
-                const auto tp = tk.rfind("::");
                 if(
-                  (tp != std::string::npos ? tk.substr(tp + 2) : tk) ==
-                    suffix &&
-                  te.second.id() != ID_unassigned && te.second.id() != ID_nil)
+                  same_suffix(te.first) && te.second.id() != ID_unassigned &&
+                  te.second.id() != ID_nil &&
+                  template_map.generation_of(te.first) > own_generation)
                 {
                   any_live_binding = true;
                   break;
@@ -2588,14 +2601,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
                 break;
               for(const auto &ee : template_map.expr_map)
               {
-                if(ee.first == pid)
-                  continue;
-                const std::string ek = id2string(ee.first);
-                const auto ep = ek.rfind("::");
                 if(
-                  (ep != std::string::npos ? ek.substr(ep + 2) : ek) ==
-                    suffix &&
-                  ee.second.id() != ID_unassigned && ee.second.id() != ID_nil)
+                  same_suffix(ee.first) && ee.second.id() != ID_unassigned &&
+                  ee.second.id() != ID_nil &&
+                  template_map.generation_of(ee.first) > own_generation)
                 {
                   any_live_binding = true;
                   break;
