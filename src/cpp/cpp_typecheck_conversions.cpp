@@ -9,9 +9,6 @@ Author:
 /// \file
 /// C++ Language Type Checking
 
-#include <functional>
-#include <set>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -32,6 +29,7 @@ Author:
 #include "cpp_util.h"
 
 #include <functional>
+#include <set>
 
 /// Lvalue-to-rvalue conversion
 ///
@@ -2873,6 +2871,39 @@ bool cpp_typecheckt::reference_compatible(
 /// reference 'type'.
 /// \return True iff an the reference can be bound to the expression. The result
 ///   of the conversion is stored in 'new_expr'.
+/// N5008 [basic.lval]: the value category of an expression, as far as
+/// reference binding and forwarding-reference deduction need it.  The front
+/// end marks a materialised temporary (temporary_object) with ID_C_lvalue --
+/// it is an object with identity -- and the shared C representation marks a
+/// braced aggregate literal (compound_literal, an lvalue in C) likewise; as
+/// C++ expressions both are prvalues.  A dereference of an UNNAMED rvalue
+/// reference (the result of std::move, a T&& return) is an xvalue; a named
+/// one -- a variable or a class member of rvalue-reference type
+/// ([expr.ref]/6) -- is an lvalue.
+bool cpp_typecheckt::is_lvalue_expression(const exprt &expr) const
+{
+  if(!expr.get_bool(ID_C_lvalue))
+    return false;
+  if(
+    expr.id() == ID_side_effect &&
+    expr.get(ID_statement) == ID_temporary_object)
+    return false;
+  if(
+    expr.id() == ID_compound_literal || expr.id() == ID_struct ||
+    expr.id() == ID_array)
+    return false;
+  if(expr.id() == ID_dereference && expr.operands().size() == 1)
+  {
+    const exprt &pointer = to_dereference_expr(expr).pointer();
+    if(
+      pointer.type().id() == ID_pointer &&
+      pointer.type().get_bool(ID_C_rvalue_reference) &&
+      pointer.id() != ID_symbol && pointer.id() != ID_member)
+      return false;
+  }
+  return true;
+}
+
 bool cpp_typecheckt::reference_binding(
   exprt expr,
   const reference_typet &reference_type,
@@ -3042,9 +3073,21 @@ bool cpp_typecheckt::reference_binding(
     to_dereference_expr(expr).pointer().id() != ID_symbol &&
     to_dereference_expr(expr).pointer().id() != ID_member;
 
+  // N5008 [dcl.init.ref]/5, [over.ics.ref]/3: a non-const lvalue reference
+  // binds only to an lvalue: `void f(S &); f(S{1, 2});' does not match, and
+  // with `f(S)' also declared the by-value overload is the only viable one
+  // (it was reported ambiguous, e.g. ranget::zip(containert &) vs
+  // zip(ranget<I>) called with a prvalue).
+  // The implicit object parameter (ID_C_this) is exempt: a member function
+  // may be called on an rvalue object ([over.match.funcs]/5 -- the
+  // ref-qualifier, when present, is checked by the caller); the object
+  // expression is marked ID_C_lvalue at the top of this function.
+  const bool expr_is_lvalue =
+    is_lvalue_expression(expr) ||
+    (reference_type.get_bool(ID_C_this) && expr.get_bool(ID_C_lvalue));
+
   if(
-    expr.get_bool(ID_C_lvalue) ||
-    reference_type.base_type().get_bool(ID_C_constant) ||
+    expr_is_lvalue || reference_type.base_type().get_bool(ID_C_constant) ||
     is_rvalue_reference(reference_type))
   {
     if(reference_compatible(expr, reference_type, rank, cv_distance))
