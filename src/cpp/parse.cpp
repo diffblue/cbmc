@@ -401,6 +401,7 @@ protected:
   irep_idt current_function;
 
   void merge_types(const typet &src, typet &dest);
+  void apply_pragma_pack(cpp_declarationt &declaration, int pack);
 
   void set_location(irept &dest, const cpp_tokent &token)
   {
@@ -7164,6 +7165,8 @@ void Parser::unwrap_attributed_class_spec(typet &spec)
   bool packed = false;
   bool have_alignment = false;
   irept alignment;
+  irept pragma_pack;
+  bool have_pragma_pack = false; // (a default-constructed irept is not nil)
   bool all_known = true;
   for(const auto &sub : flat)
   {
@@ -7176,6 +7179,13 @@ void Parser::unwrap_attributed_class_spec(typet &spec)
     }
     else if(sub.id() == ID_packed)
       packed = true;
+    else if(sub.id() == ID_aligned && sub.get_bool(ID_C_pragma_pack))
+    {
+      // the #pragma pack(n) cap of the member (apply_pragma_pack), not an
+      // alignment of the type
+      pragma_pack = sub.find(ID_size);
+      have_pragma_pack = true;
+    }
     else if(sub.id() == ID_aligned)
     {
       have_alignment = true;
@@ -7365,6 +7375,22 @@ bool Parser::rClassSpec(typet &spec)
 #endif
 
   ((exprt&)spec.add(ID_body)).operands().swap(body.operands());
+
+  // `#pragma pack(n)' in effect at the closing brace: the class's own
+  // alignment is capped at n (its base subobjects too -- see
+  // cpp_typecheck_bases.cpp); pack(1) makes it packed, as the C grammar's
+  // pragma_packed rule has it
+  {
+    cpp_tokent next;
+    lex.LookAhead(0, next);
+    if(next.pragma_pack == 1)
+      spec.set(ID_C_packed, true);
+    if(next.pragma_pack > 0)
+    {
+      spec.add(ID_C_pragma_pack) =
+        from_integer(next.pragma_pack, signed_int_type());
+    }
+  }
   return true;
 }
 
@@ -7589,12 +7615,52 @@ bool Parser::rClassMember(cpp_itemt &member)
     }
 
     cpp_token_buffert::post pos=lex.Save();
+    cpp_tokent first_token;
+    lex.LookAhead(0, first_token);
     if(rDeclaration(member.make_declaration()))
+    {
+      apply_pragma_pack(member.get_declaration(), first_token.pragma_pack);
       return true;
+    }
 
     lex.Restore(pos);
     return rAccessDecl(member.make_declaration());
   }
+}
+
+/// `#pragma pack(n)' (a GCC/MSVC extension, not N5008) caps the alignment
+/// of every data member declared while it is in effect.  As the C grammar
+/// does (parser.y member_declaring_list), communicate the cap to the
+/// member's type as a pragma-marked `aligned' node; ansi_c_convert_typet
+/// turns it into ID_C_pragma_pack and padding.cpp applies it.  Only
+/// non-static data members are laid out: skip member functions, static
+/// members and nested type definitions.
+void Parser::apply_pragma_pack(cpp_declarationt &declaration, int pack)
+{
+  if(pack <= 0)
+    return;
+  if(declaration.declarators().empty())
+  {
+    // an anonymous struct/union member (`struct { ... };', a GCC
+    // extension) is a data member too; a nested class DEFINITION is not
+    const typet &t = declaration.type();
+    const bool anonymous_member = (t.id() == ID_struct || t.id() == ID_union) &&
+                                  t.find(ID_body).is_not_nil() &&
+                                  t.find(ID_tag).is_nil();
+    if(!anonymous_member)
+      return;
+  }
+  if(declaration.storage_spec().is_static())
+    return;
+  for(const auto &d : declaration.declarators())
+  {
+    if(d.type().id() == ID_function_type)
+      return;
+  }
+  typet attr(ID_aligned);
+  attr.set(ID_C_pragma_pack, true);
+  attr.add(ID_size, from_integer(pack, signed_int_type()));
+  merge_types(attr, declaration.type());
 }
 
 /*
