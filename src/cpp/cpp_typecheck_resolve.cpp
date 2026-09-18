@@ -9491,16 +9491,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           // reference case handled below.
           if(is_forwarding_ref)
           {
-            bool elem_is_lvalue = it->get_bool(ID_C_lvalue);
-            if(
-              elem_is_lvalue && it->id() == ID_dereference &&
-              it->operands().size() == 1 &&
-              it->operands().front().type().id() == ID_pointer &&
-              it->operands().front().type().get_bool(ID_C_rvalue_reference) &&
-              it->operands().front().id() != ID_symbol)
-            {
-              elem_is_lvalue = false;
-            }
+            const bool elem_is_lvalue = cpp_typecheck.is_lvalue_expression(*it);
             typet deduced_type =
               elem_is_lvalue ? ::reference_type(it->type()) : it->type();
             pack_deduced_types.push_back(deduced_type);
@@ -9539,19 +9530,11 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
       // [temp.deduct.call]/3: forwarding reference — if the parameter is
       // T&& where T is a template parameter, and the argument is an
-      // lvalue, deduce T as "lvalue reference to A".
-      // Exception: a dereference of an rvalue reference (e.g., the
-      // result of std::move) is an xvalue, not an lvalue.
-      // Named rvalue reference variables are lvalues, not xvalues.
-      bool is_lvalue = it->get_bool(ID_C_lvalue);
-      if(
-        is_lvalue && it->id() == ID_dereference && it->operands().size() == 1 &&
-        it->operands().front().type().id() == ID_pointer &&
-        it->operands().front().type().get_bool(ID_C_rvalue_reference) &&
-        it->operands().front().id() != ID_symbol)
-      {
-        is_lvalue = false;
-      }
+      // lvalue, deduce T as "lvalue reference to A".  A materialised
+      // temporary or a dereference of an unnamed rvalue reference (the
+      // result of std::move) is not an lvalue (is_lvalue_expression);
+      // named rvalue reference variables are.
+      const bool is_lvalue = cpp_typecheck.is_lvalue_expression(*it);
       if(is_forwarding_ref && is_lvalue)
       {
         // Per [temp.deduct.call]/3: for forwarding reference T&&
