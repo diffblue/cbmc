@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [expr.sizeof]/1, [expr.alignof]/1 + [temp.inst]/2: sizeof/alignof
+require a complete type, which implicitly instantiates the class template
+specialization.  An instance named only through a typedef/alias (whose
+elaboration is deferred to first use) was reported as an incomplete type
+('invalid application of sizeof to an incomplete type').

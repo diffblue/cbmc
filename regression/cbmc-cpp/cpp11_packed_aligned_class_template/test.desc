@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+GNU attributes after a class-template body: packed, aligned(16) on the
+template, alignas, attribute before the body, nested aligned instances, a
+plain struct containing an aligned instance (W), typedef/alias of the
+instance.  sizeof and alignof must follow GCC (aligned(n) together with
+packed gives exactly n).
