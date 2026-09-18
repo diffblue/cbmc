@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+A member function parameter that is a POINTER TO FUNCTION whose parameter
+list expands the class's pack (`fn(R (*g)(A...))' of fn<R(A...)>) kept a
+raw frontend_pointer for a reference pack element (A = hard&), so the
+constructor took `void (*)(<<type:frontend_pointer>>)' and no argument
+matched (goto-symex's with_solver_hardness(std::function<void(T &)>).

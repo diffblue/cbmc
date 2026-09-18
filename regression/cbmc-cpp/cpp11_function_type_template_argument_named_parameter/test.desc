@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+[dcl.fct]/3: a named parameter inside a function-type template argument
+does not change the type; the named spelling produced a separate, never
+elaborated class template instance.

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [temp.expl.spec]/2-3: an explicit specialization of a class's member
+function template declared at namespace scope with a qualified name
+(`template <> renamedt<..., L1> goto_symex_statet::set_indices<L1>(...)').
+Only `name<args>' (two-part names) was accepted: 'bad template-function-
+specialization name'.  Type and non-type parameters, in and outside a
+namespace; a free function specialization for contrast.
