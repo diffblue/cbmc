@@ -45,7 +45,7 @@ class Gen:
         self.rng = rng
         self.cxx = cxx
         self.decls = []
-        self.structs = []  # (name, [member names], is_union)
+        self.structs = []  # (name, [member names], is_union, has_bases)
         self.enums = []    # (name, base, bits)
         self.typedefs = []  # names of typedef'd (possibly aligned) types
         self.counter = 0
@@ -107,15 +107,49 @@ class Gen:
         # array of scalar
         return self.rng.choice(SCALARS)[0], self.rng.choice([1, 2, 3, 5, 8])
 
+    def alignas_spec(self):
+        # alignas / _Alignas must not be weaker than the natural alignment
+        # ([dcl.align]/5), so only large values are generated
+        return ("alignas(%d) " if self.cxx else "_Alignas(%d) ") % self.rng.choice([16, 32])
+
+    def gen_anonymous_member(self, lines, members):
+        # C11 [6.7.2.1]/13 / GNU: an anonymous struct or union member; its
+        # members are accessed as if they were members of the enclosing type
+        key = "union" if self.rng.random() < 0.5 else "struct"
+        inner = []
+        for _ in range(self.rng.randint(1, 3)):
+            m = self.fresh("a")
+            t, arr = self.member_type(3)
+            if arr:
+                inner.append("    %s %s[%d];" % (t, m, arr))
+            else:
+                inner.append("    %s %s;" % (t, m))
+            members.append((m, False))
+        lines.append("  %s\n  {\n%s\n  }%s;" % (key, "\n".join(inner), self.attr(key)))
+
     def gen_struct(self, depth=0):
         is_union = self.rng.random() < 0.15
         name = self.fresh("U" if is_union else "S")
         members = []
         lines = []
+        bases = []
+        # C++: base classes (including empty ones; [class.mem], Itanium ABI
+        # base-subobject layout).  Unions cannot have bases.
+        if self.cxx and not is_union and self.rng.random() < 0.3:
+            candidates = [b for b in self.structs if not b[2] and not b[3]]
+            if self.rng.random() < 0.4:
+                empty = self.fresh("EB")
+                self.decls.append("struct %s {};" % empty)
+                bases.append(empty)
+            for b in self.rng.sample(candidates, min(len(candidates), self.rng.randint(1, 2))):
+                bases.append(b[0])
         n = self.rng.randint(1, 7)
         for _ in range(n):
             m = self.fresh("m")
             r = self.rng.random()
+            if r < 0.06 and not is_union:
+                self.gen_anonymous_member(lines, members)
+                continue
             if r < 0.45:
                 # bit-field
                 if self.rng.random() < 0.3 and self.enums:
@@ -137,18 +171,32 @@ class Gen:
             else:
                 t, arr = self.member_type(depth)
                 member_attr = ""
+                prefix = ""
                 if self.rng.random() < 0.15:
                     member_attr = " __attribute__((aligned(%d)))" % self.rng.choice([2, 4, 8, 16])
                     if self.rng.random() < 0.5:
                         member_attr = " __attribute__((packed, aligned(%d)))" % self.rng.choice([1, 2, 4])
+                elif self.rng.random() < 0.08:
+                    prefix = self.alignas_spec()
                 if arr:
-                    lines.append("  %s %s[%d]%s;" % (t, m, arr, member_attr))
+                    lines.append("  %s%s %s[%d]%s;" % (prefix, t, m, arr, member_attr))
                 else:
-                    lines.append("  %s %s%s;" % (t, m, member_attr))
+                    lines.append("  %s%s %s%s;" % (prefix, t, m, member_attr))
                 members.append((m, False))
         key = "union" if is_union else "struct"
-        self.decls.append("%s %s\n{\n%s\n}%s;" % (key, name, "\n".join(lines), self.attr(key)))
-        self.structs.append((name, members, is_union))
+        head = "%s %s" % (key, name)
+        if self.cxx and self.rng.random() < 0.08:
+            head = "%s alignas(%d) %s" % (key, self.rng.choice([16, 32]), name)
+        if bases:
+            head += " : " + ", ".join("public " + b for b in bases)
+        decl = "%s\n{\n%s\n}%s;" % (head, "\n".join(lines), self.attr(key))
+        # #pragma pack(n) around some declarations (GCC/MSVC extension:
+        # member alignment capped at n)
+        if self.rng.random() < 0.12:
+            n_pack = self.rng.choice([1, 2, 4, 8])
+            decl = "#pragma pack(push, %d)\n%s\n#pragma pack(pop)" % (n_pack, decl)
+        self.decls.append(decl)
+        self.structs.append((name, members, is_union, bool(bases)))
 
     def type_name(self, s):
         if self.cxx:
