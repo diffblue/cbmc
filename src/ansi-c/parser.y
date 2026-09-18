@@ -1855,7 +1855,13 @@ member_declaring_list:
 
             init($$);
             set($$, ID_aligned);
-            parser_stack($$).set(ID_size, PARSER.pragma_pack.back());
+            // #pragma pack(n) caps the alignment at n (the natural alignment
+            // stays when it is smaller), unlike the attribute pair
+            // packed, aligned(n), which sets it to exactly n; mark the
+            // alignment so that padding.cpp can tell the two apart
+            exprt pragma_pack_alignment = PARSER.pragma_pack.back();
+            pragma_pack_alignment.set(ID_C_pragma_pack, true);
+            parser_stack($$).set(ID_size, pragma_pack_alignment);
             $2=merge($2, $$);
           }
 
