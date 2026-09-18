@@ -60,6 +60,28 @@ public:
   typedef std::map<irep_idt, std::vector<exprt>> pack_expr_mapt;
   pack_expr_mapt pack_expr_map;
 
+  /// The order in which parameters were bound (a process-wide counter,
+  /// recorded by build()/set()).  Instantiations nest -- a member template's
+  /// map is built on top of the enclosing class's -- and different templates
+  /// reuse parameter NAMES (`_Args`, `_ArgTypes`); when a pack reference can
+  /// only be matched by its short name, the most recently bound candidate is
+  /// the innermost declaration and, per N5008 [basic.scope.scope] (name
+  /// hiding), the one the reference denotes.  Missing entries are oldest.
+  typedef std::map<irep_idt, std::size_t> generation_mapt;
+  generation_mapt generation_map;
+  static std::size_t next_generation();
+  /// bind a pack's element count, recording the binding's generation
+  void set_pack_size(const irep_idt &id, std::size_t size)
+  {
+    pack_size_map[id] = size;
+    generation_map[id] = next_generation();
+  }
+  std::size_t generation_of(const irep_idt &id) const
+  {
+    auto it = generation_map.find(id);
+    return it == generation_map.end() ? 0 : it->second;
+  }
+
   /// Short names of a member alias template's OWN parameter packs while its
   /// body is being substituted during the enclosing class's instantiation.
   /// N5008 [temp.alias]/2 + [temp.variadic]/4-5: such a pack is not yet bound
@@ -146,6 +168,7 @@ public:
     pack_size_map.swap(template_map.pack_size_map);
     pack_args_map.swap(template_map.pack_args_map);
     pack_expr_map.swap(template_map.pack_expr_map);
+    generation_map.swap(template_map.generation_map);
     template_template_parameters.swap(
       template_map.template_template_parameters);
   }
@@ -179,6 +202,8 @@ public:
     expr_map.clear();
     pack_size_map.clear();
     pack_args_map.clear();
+    pack_expr_map.clear();
+    generation_map.clear();
     template_template_parameters.clear();
   }
 

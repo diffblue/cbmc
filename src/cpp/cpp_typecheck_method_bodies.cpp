@@ -178,7 +178,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           std::vector<typet> elems;
           for(const auto &t : entry.get_sub())
             elems.push_back(static_cast<const typet &>(t));
-          template_map.pack_size_map[pid] = elems.size();
+          template_map.set_pack_size(pid, elems.size());
           if(!elems.empty())
           {
             if(elems.size() == 1)
@@ -195,7 +195,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           std::vector<exprt> vals;
           for(const auto &v : entry.get_sub())
             vals.push_back(static_cast<const exprt &>(v));
-          template_map.pack_size_map[pid] = vals.size();
+          template_map.set_pack_size(pid, vals.size());
           if(!vals.empty())
           {
             if(vals.size() == 1)
@@ -232,7 +232,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
         std::vector<exprt> vals;
         for(const auto &v : entry.get_sub())
           vals.push_back(static_cast<const exprt &>(v));
-        template_map.pack_size_map[pid] = vals.size();
+        template_map.set_pack_size(pid, vals.size());
         if(!vals.empty())
         {
           template_map.pack_expr_map[pid] = vals;
@@ -243,7 +243,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       std::vector<typet> elems;
       for(const auto &t : entry.get_sub())
         elems.push_back(static_cast<const typet &>(t));
-      template_map.pack_size_map[pid] = elems.size();
+      template_map.set_pack_size(pid, elems.size());
       template_map.pack_args_map[pid] = elems;
       if(!elems.empty())
         template_map.type_map[pid] = elems.front();
@@ -1318,7 +1318,7 @@ void cpp_typecheckt::typecheck_method_bodies()
             if(
               !pid.empty() &&
               template_map.type_map.find(pid) == template_map.type_map.end())
-              template_map.pack_size_map[pid] = 0;
+              template_map.set_pack_size(pid, 0);
           }
         }
       }
@@ -1690,7 +1690,7 @@ void cpp_typecheckt::typecheck_method_bodies()
               if(
                 !pid.empty() &&
                 template_map.type_map.find(pid) == template_map.type_map.end())
-                template_map.pack_size_map[pid] = 0;
+                template_map.set_pack_size(pid, 0);
             }
           }
         }
@@ -1837,7 +1837,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
               std::vector<typet> elems;
               for(const auto &t : entry.get_sub())
                 elems.push_back(static_cast<const typet &>(t));
-              method_map.pack_size_map[pid] = elems.size();
+              method_map.set_pack_size(pid, elems.size());
               if(!elems.empty())
               {
                 if(elems.size() == 1)
@@ -1854,7 +1854,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
               std::vector<exprt> vals;
               for(const auto &v : entry.get_sub())
                 vals.push_back(static_cast<const exprt &>(v));
-              method_map.pack_size_map[pid] = vals.size();
+              method_map.set_pack_size(pid, vals.size());
               if(!vals.empty())
               {
                 if(vals.size() == 1)
