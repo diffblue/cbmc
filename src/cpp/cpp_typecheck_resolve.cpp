@@ -6412,10 +6412,18 @@ exprt cpp_typecheck_resolvet::resolve(
   // `std::string`), making the call ambiguous.  Operators are excluded: they use
   // the separate [over.match.oper] candidate-gathering, which always includes
   // ADL-found non-member operators regardless of any member operator.
+  // A member function TEMPLATE's scope entry carries no class_identifier;
+  // it is a class member all the same (its parent scope is the class), so
+  // `zip<b>(x)` inside ranget<It>::zip(containert &) must not also collect
+  // ranget<J>::zip from the argument's class -- that made the call to the
+  // sibling overload ambiguous with the same-named member of the argument's
+  // class instance.
   bool ordinary_lookup_found_member = false;
   for(const auto *id : id_set)
   {
-    if(!id->class_identifier.empty())
+    if(
+      !id->class_identifier.empty() ||
+      (id->has_parent() && id->get_parent().is_class()))
     {
       ordinary_lookup_found_member = true;
       break;
