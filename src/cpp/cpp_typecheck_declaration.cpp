@@ -651,8 +651,45 @@ bool cpp_typecheckt::convert_explicit_instantiation(
       id_set.erase(it);
     it = next;
   }
-  if(id_set.size() != 1 || template_args_non_tc.is_nil())
+  if(template_args_non_tc.is_nil())
     return false;
+
+  // Several member templates of that name (overloads, e.g. rename(exprt,
+  // ns) and rename(typet &, id, ns)): N5008 [temp.explicit]/4 selects the
+  // one whose declaration matches the explicit instantiation's declarator.
+  // Approximate by the number of function parameters; if that does not
+  // single one out, accept the declaration without instantiating anything
+  // (instantiation happens on use), as for an explicit instantiation
+  // without template arguments above.  Bailing out here sent the
+  // declaration down the ordinary path, which could not resolve the
+  // template argument `L1' of `template renamedt<exprt, L1>
+  // goto_symex_statet::rename<L1>(exprt, const namespacet &);'.
+  if(id_set.size() > 1)
+  {
+    const std::size_t n_params =
+      declarator.type().find(ID_parameters).get_sub().size();
+    for(auto it = id_set.begin(); it != id_set.end();)
+    {
+      auto next = std::next(it);
+      const typet &t = lookup((*it)->identifier).type;
+      bool keep = false;
+      if(t.id() == ID_cpp_declaration)
+      {
+        const cpp_declarationt &decl = to_cpp_declaration(t);
+        if(decl.declarators().size() == 1)
+        {
+          const typet &ft = decl.declarators().front().type();
+          keep = ft.id() == ID_function_type &&
+                 ft.find(ID_parameters).get_sub().size() == n_params;
+        }
+      }
+      if(!keep)
+        id_set.erase(it);
+      it = next;
+    }
+    if(id_set.size() != 1)
+      return true;
+  }
 
   const symbolt &template_symbol = lookup((*id_set.begin())->identifier);
   cpp_template_args_tct template_args = typecheck_template_args(
