@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+Structured bindings: a hidden variable per declaration (they shared one),
+prvalue sources materialised so auto&&/const auto& and the tuple-like
+lowering do not read a destroyed temporary, and tuple-like bindings are
+references to get<i>(e) ([dcl.struct.bind]/4).  Covers libstdc++ 13
+std::map::emplace(k, v) (`auto&& [__a, __v] = pair<_Args&...>(__args...)`).
