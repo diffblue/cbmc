@@ -2154,6 +2154,31 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
 
 /// \par parameters: location, non-typechecked template arguments
 /// \return typechecked template arguments
+/// N5008 [dcl.fct]/3 + [temp.type]: parameter names are not part of a
+/// function type, so `fn<void(hard &hardness)>` and `fn<void(hard &)>`
+/// denote the same specialization.  A function-type template argument may
+/// arrive with its parameters still as unconverted cpp_declarations (as
+/// `code` or, straight from the parser, `function_type`) carrying the
+/// names; strip them so both spellings are identical (the named one used
+/// to become a distinct, never-elaborated instance: "member operator got
+/// incomplete type", goto-symex's with_solver_hardness).
+static void strip_function_type_parameter_names(typet &type)
+{
+  if(type.id() != ID_code && type.id() != ID_function_type)
+    return;
+  irept &params = type.add(ID_parameters);
+  for(auto &param : params.get_sub())
+  {
+    if(param.id() != ID_cpp_declaration)
+      continue;
+    for(auto &d : param.get_sub())
+    {
+      if(d.id() == ID_cpp_declarator)
+        d.add(ID_name).make_nil();
+    }
+  }
+}
+
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -3206,20 +3231,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // (`std::function<void(const T&)>`) and therefore denotes the
         // same, fully elaborated specialization rather than a distinct,
         // never-elaborated one.
-        if(arg.type().id() == ID_code)
-        {
-          irept &params = arg.type().add(ID_parameters);
-          for(auto &param : params.get_sub())
-          {
-            if(param.id() != ID_cpp_declaration)
-              continue;
-            for(auto &d : param.get_sub())
-            {
-              if(d.id() == ID_cpp_declarator)
-                d.add(ID_name).make_nil();
-            }
-          }
-        }
+        // (The argument arrives as `code' or, straight from the parser, as
+        // `function_type'; both carry the parameters as cpp_declarations.)
+        strip_function_type_parameter_names(arg.type());
         // [temp.variadic]/5: if a function-type template argument
         // contains a function parameter pack (e.g. `_Res(_ArgTypes...)`
         // in a partial specialization pattern), expand the pack using
@@ -3413,6 +3427,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
           }
           throw template_arg_kind_mismatch_exceptiont{};
         }
+        strip_function_type_parameter_names(arg.type());
         // [temp.variadic]/5: expand a function parameter pack in a
         // function-type argument (e.g. `_Res(_ArgTypes...)`) and
         // substitute the remaining template parameters, keeping the
