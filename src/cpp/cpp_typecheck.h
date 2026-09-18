@@ -835,6 +835,13 @@ protected:
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
   void complete_type_operand(exprt &expr);
+  std::optional<struct_exprt>
+  zero_struct_value(const typet &type, const source_locationt &loc);
+  static void set_struct_member_value(
+    struct_exprt &value,
+    const struct_typet &struct_type,
+    const struct_union_typet::componentt &component,
+    exprt member_value);
   bool convert_explicit_instantiation(cpp_declarationt &declaration);
   bool is_lvalue_expression(const exprt &expr) const;
   void typecheck_expr_alignof(exprt &) override;
