@@ -1225,7 +1225,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
   if(cpp_name.is_nil())
   {
-    // Yes, there can be members without name.
+    // Yes, there can be members without name: N5008 [class.bit]/2, an
+    // unnamed bit-field.  It is not a member (not put into scope, not
+    // initialisable), but it occupies its bits in the layout, so it gets an
+    // anonymous component like the C front end's `$anonN'.
     base_name = irep_idt();
   }
   else if(cpp_name.is_simple_name())
@@ -1329,11 +1332,19 @@ void cpp_typecheckt::typecheck_compound_declarator(
     identifier = base_name;
   }
 
+  if(base_name.empty() && final_type.id() == ID_c_bit_field)
+  {
+    identifier = cpp_scopes.current_scope().prefix + "$anon_bit_field" +
+                 std::to_string(components.size());
+  }
+
   struct_typet::componentt component(identifier, final_type);
   component.set(ID_access, access);
   component.set_base_name(base_name);
   component.set_pretty_name(base_name);
   component.add_source_location() = cpp_name.source_location();
+  if(base_name.empty() && final_type.id() == ID_c_bit_field)
+    component.set_anonymous(true);
 
   if(declarator.get_bool("#member_fn_template_instance"))
     component.set("#member_fn_template_instance", true);
