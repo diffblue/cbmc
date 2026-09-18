@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <algorithm>
 #include <map>
+#include <optional>
 #include <set>
 
 // Recursion guard for `alignment`.  The public entry wraps a call
@@ -40,6 +41,18 @@ Author: Daniel Kroening, kroening@kroening.com
 // incomplete; an incomplete type has no alignment, so returning 1
 // (the minimum alignment) for a cyclic tag is a safe
 // approximation.
+/// The alignment a member of a packed struct/union keeps: its own
+/// `aligned(n)' attribute.  An alignment that belongs to the member's TYPE
+/// (a typedef's `aligned', marked ID_C_typedef_alignment) is ignored there,
+/// as GCC ignores the alignment of an aligned class type in a packed struct.
+static std::optional<mp_integer> explicit_member_alignment(const typet &type)
+{
+  const exprt &given = static_cast<const exprt &>(type.find(ID_C_alignment));
+  if(given.is_nil() || given.get_bool(ID_C_typedef_alignment))
+    return {};
+  return numeric_cast<mp_integer>(given);
+}
+
 static mp_integer alignment_rec(
   const typet &type,
   const namespacet &ns,
@@ -82,9 +95,19 @@ static mp_integer alignment_rec(
       a_int = *a;
   }
 
-  // alignment but no packing
-  if(a_int>0 && !type.get_bool(ID_C_packed))
+  // alignment but no packing: GCC's `aligned' attribute "can only increase
+  // the alignment" of a type or object -- `long m[2] __attribute__((aligned
+  // (4)))' keeps its natural 8 -- EXCEPT when it is part of a typedef, where
+  // "the aligned attribute can both increase and decrease alignment"
+  // (`typedef uint32_t __attribute__((aligned(1))) unaligned_u32;').  The
+  // typedef case is marked by the front ends (ID_C_typedef_alignment); the
+  // increase-only case falls through to max(n, natural) below.
+  if(
+    a_int > 0 && !type.get_bool(ID_C_packed) &&
+    given_alignment.get_bool(ID_C_typedef_alignment))
+  {
     return a_int;
+  }
   // alignment and packing: GCC's `aligned' attribute can only increase the
   // alignment, unless `packed' is specified as well, in which case the
   // alignment is exactly the given one (both larger and smaller than the
@@ -92,15 +115,25 @@ static mp_integer alignment_rec(
   // has alignment 16, and a member of that type is placed on a 16-byte
   // boundary.  The exception is the pair induced by #pragma pack(n) (marked
   // by the parser): that only caps the alignment at n, handled below.
+  // (For a packed struct or union the members' OWN `aligned(n)' attributes
+  // still count: `struct P { char c; int x __attribute__((aligned(4))); }
+  // __attribute__((packed))' has x at offset 4 and alignment 4, and a
+  // `packed, aligned(4)' struct with an aligned(8) member has alignment 8.)
   else if(
-    a_int > 0 && type.get_bool(ID_C_packed) &&
-    !given_alignment.get_bool(ID_C_pragma_pack))
+    type.get_bool(ID_C_packed) && !given_alignment.get_bool(ID_C_pragma_pack))
   {
-    return a_int;
+    mp_integer result = a_int > 0 ? a_int : 1;
+    if(type.id() == ID_struct || type.id() == ID_union)
+    {
+      for(const auto &c : to_struct_union_type(type).components())
+      {
+        const auto member_alignment = explicit_member_alignment(c.type());
+        if(member_alignment.has_value() && *member_alignment > result)
+          result = *member_alignment;
+      }
+    }
+    return result;
   }
-  // no alignment, packing
-  else if(a_int==0 && type.get_bool(ID_C_packed))
-    return 1;
 
   // compute default
   mp_integer result;
@@ -115,7 +148,15 @@ static mp_integer alignment_rec(
     // get the max
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
+    {
+      // padding is an artefact of the layout, and an unnamed bit-field's
+      // type does not affect the alignment (System V ABI)
+      if(c.get_is_padding())
+        continue;
+      if(c.type().id() == ID_c_bit_field && c.get_anonymous())
+        continue;
       result = std::max(result, alignment_rec(c.type(), ns, in_progress, done));
+    }
   }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
@@ -190,11 +231,22 @@ static mp_integer alignment_rec(
   else
     result=1;
 
-  // #pragma pack(n): "The alignment of a member will be on a boundary that
-  // is either a multiple of n or a multiple of the size of the member,
-  // whichever is smaller."
-  if(a_int>0 && a_int<result)
-    result=a_int;
+  if(a_int > 0)
+  {
+    if(type.get_bool(ID_C_packed))
+    {
+      // #pragma pack(n): "The alignment of a member will be on a boundary
+      // that is either a multiple of n or a multiple of the size of the
+      // member, whichever is smaller."
+      if(a_int < result)
+        result = a_int;
+    }
+    else if(a_int > result)
+    {
+      // aligned(n) without packed: increase only
+      result = a_int;
+    }
+  }
 
   return result;
 }
@@ -409,8 +461,11 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       else
       {
         // Otherwise, ANSI-C says that bit-fields do not get padded!
-        // We consider the type for max_alignment, however.
-        if(max_alignment<a)
+        // We consider the type for max_alignment, however -- except in a
+        // packed struct (byte-aligned bit-fields) and for UNNAMED bit-fields
+        // (System V ABI: "unnamed bit-fields' types do not affect the
+        // alignment of a structure or union").
+        if(max_alignment < a && !struct_is_packed && !it->get_anonymous())
           max_alignment=a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
@@ -461,6 +516,14 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       offset += bytes;
       continue;
     }
+    else if(struct_is_packed)
+    {
+      // packed: byte-aligned, unless the MEMBER itself says `aligned(n)'
+      // (the alignment of its type is ignored -- an aligned(16) struct
+      // member of a packed struct sits at offset 1)
+      const auto member_alignment = explicit_member_alignment(it_type);
+      a = member_alignment.has_value() ? *member_alignment : 1;
+    }
     else
       a=alignment(it_type, ns);
 
@@ -475,7 +538,8 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 
     // check minimum alignment
     if(
-      a < config.ansi_c.alignment && !it_type.get_bool(ID_C_packed) &&
+      !struct_is_packed && a < config.ansi_c.alignment &&
+      !it_type.get_bool(ID_C_packed) &&
       (it_type.id() != ID_struct_tag ||
        !ns.follow_tag(to_struct_tag_type(it_type)).get_bool(ID_C_packed)) &&
       (it_type.id() != ID_union_tag ||
@@ -484,12 +548,12 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       a=config.ansi_c.alignment;
     }
 
-    if(max_alignment<a)
+    // a zero-width bit-field aligns the next member to its type but, being
+    // unnamed, does not raise the struct's alignment
+    if(max_alignment < a && it_type.id() != ID_c_bit_field)
       max_alignment=a;
 
-    if(
-      a != 1 &&
-      (!struct_is_packed || it_type.find(ID_C_alignment).is_not_nil()))
+    if(a != 1)
     {
       // we may need to align it
       const mp_integer displacement = offset % a;
@@ -532,9 +596,9 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         max_alignment = *tmp_i;
     }
   }
-  // Is the struct packed, without any alignment specification?
-  else if(struct_is_packed)
-    return; // done
+  // A packed struct without an alignment specification is padded at the end
+  // only to the alignment its explicitly aligned members demand
+  // (max_alignment collected above is 1 when there is none).
 
   // There may be a need for 'end of struct' padding.
   // We use 'max_alignment'.
@@ -578,11 +642,8 @@ void add_padding(union_typet &type, const namespacet &ns)
   }
 
   // Is the union packed?
-  if(type.get_bool(ID_C_packed))
-  {
-    // The size needs to be a multiple of 1 char only.
-    max_alignment_bits = config.ansi_c.char_width;
-  }
+  // A packed union has alignment 1 unless it carries `aligned(n)' or a
+  // member does; alignment() above accounts for all of these.
 
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
