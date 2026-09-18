@@ -62,10 +62,8 @@ static mp_integer alignment_rec(
   // we need to consider a number of different cases:
   // - alignment specified in the source, which will be recorded in
   // ID_C_alignment
-  // - alignment induced by packing ("The alignment of a member will
-  // be on a boundary that is either a multiple of n or a multiple of
-  // the size of the member, whichever is smaller."); both
-  // ID_C_alignment and ID_C_packed will be set
+  // - alignment specified together with packing (`packed, aligned(n)');
+  // both ID_C_alignment and ID_C_packed will be set
   // - natural alignment, when neither ID_C_alignment nor ID_C_packed
   // are set
   // - dense packing with only ID_C_packed set.
@@ -87,6 +85,19 @@ static mp_integer alignment_rec(
   // alignment but no packing
   if(a_int>0 && !type.get_bool(ID_C_packed))
     return a_int;
+  // alignment and packing: GCC's `aligned' attribute can only increase the
+  // alignment, unless `packed' is specified as well, in which case the
+  // alignment is exactly the given one (both larger and smaller than the
+  // natural one).  `struct S { ... } __attribute__((packed, aligned(16)))'
+  // has alignment 16, and a member of that type is placed on a 16-byte
+  // boundary.  The exception is the pair induced by #pragma pack(n) (marked
+  // by the parser): that only caps the alignment at n, handled below.
+  else if(
+    a_int > 0 && type.get_bool(ID_C_packed) &&
+    !given_alignment.get_bool(ID_C_pragma_pack))
+  {
+    return a_int;
+  }
   // no alignment, packing
   else if(a_int==0 && type.get_bool(ID_C_packed))
     return 1;
@@ -179,8 +190,9 @@ static mp_integer alignment_rec(
   else
     result=1;
 
-  // if an alignment had been provided and packing was requested, take
-  // the smallest alignment
+  // #pragma pack(n): "The alignment of a member will be on a boundary that
+  // is either a multiple of n or a multiple of the size of the member,
+  // whichever is smaller."
   if(a_int>0 && a_int<result)
     result=a_int;
 
