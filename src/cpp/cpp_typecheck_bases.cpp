@@ -9,7 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
+
+#include <ansi-c/padding.h>
 
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -310,6 +313,13 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     const struct_typet &base_struct_type=
       to_struct_type(base_symbol.type);
 
+    // Itanium C++ ABI 2.4 (base subobject layout, approximated on the
+    // flattened components): the direct base subobject starts at the next
+    // offset suitably aligned for the BASE (add_padding reads the marker on
+    // its first component), and a base that is not a POD for the purpose of
+    // layout does not keep its tail padding -- the derived class's members
+    // may start in it (dsize(B) < sizeof(B)).  A POD base keeps sizeof(B).
+    const std::size_t first_new = to_struct_type(type).components().size();
     add_base_components(
       base_struct_type,
       class_access,
@@ -317,6 +327,29 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       bases,
       vbases,
       virtual_base);
+    auto &components = to_struct_type(type).components();
+    if(components.size() > first_new)
+    {
+      const namespacet ns(symbol_table);
+      mp_integer base_alignment = alignment(base_struct_type, ns);
+      // `#pragma pack(n)' around the derived class definition caps the
+      // base subobject's alignment as well (GCC)
+      const auto pack = numeric_cast<mp_integer>(
+        static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
+      if(pack.has_value() && *pack > 0 && *pack < base_alignment)
+        base_alignment = *pack;
+      components[first_new].set(
+        ID_C_base_alignment, integer2string(base_alignment));
+      if(!cpp_is_pod(base_struct_type))
+      {
+        while(components.size() > first_new &&
+              components.back().get_is_padding() &&
+              components.back().type().id() != ID_c_bit_field)
+        {
+          components.pop_back();
+        }
+      }
+    }
   }
 
   // Remove bases that were invalidated (set to nil) during validation.
@@ -455,6 +488,23 @@ void cpp_typecheckt::add_base_components(
     struct_typet::componentt &component=dest_c.back();
     component.set(ID_from_base, true);
     component.set_access(new_access);
+
+    // a member of a PACKED base keeps the base's packed layout in the
+    // derived class (padding.cpp reads the mark; `struct P { char c; long
+    // l; } __attribute__((packed)); struct D : P { int m; }' has m at 12)
+    if(from.get_bool(ID_C_packed))
+      component.set(ID_C_packed, true);
+
+    // A padding component of the base's layout is named by its index in
+    // the base (`$pad2'); two bases contribute clashing names, and the
+    // derived class's own padding may want the same index.  Component
+    // names must be unique within a struct type.
+    if(component.get_is_padding())
+    {
+      component.set_name(
+        id2string(component.get_name()) + "$b" +
+        std::to_string(dest_c.size() - 1));
+    }
 
     // put into scope
   }
