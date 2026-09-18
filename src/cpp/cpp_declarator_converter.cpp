@@ -733,6 +733,13 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   symbol.is_weak = storage_spec.is_weak();
   symbol.module = cpp_typecheck.module;
   symbol.is_type = is_typedef;
+  // GCC: an `aligned' attribute that is part of a typedef sets the alignment
+  // exactly (it may decrease it); see ansi-c/padding.cpp
+  if(is_typedef && symbol.type.find(ID_C_alignment).is_not_nil())
+  {
+    static_cast<exprt &>(symbol.type.add(ID_C_alignment))
+      .set(ID_C_typedef_alignment, true);
+  }
   symbol.is_macro =
     (is_typedef && !is_template_parameter) || storage_spec.is_constexpr();
   // N5008 [dcl.constexpr]/1: a constexpr VARIABLE is still an object;

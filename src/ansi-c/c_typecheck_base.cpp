@@ -812,6 +812,14 @@ void c_typecheck_baset::typecheck_declaration(
       // now check other half of type
       typecheck_type(symbol.type);
 
+      // GCC: an `aligned' attribute that is part of a typedef sets the
+      // alignment exactly (it may decrease it); see padding.cpp
+      if(full_spec.is_typedef && symbol.type.find(ID_C_alignment).is_not_nil())
+      {
+        static_cast<exprt &>(symbol.type.add(ID_C_alignment))
+          .set(ID_C_typedef_alignment, true);
+      }
+
       if(!full_spec.alias.empty())
       {
         if(symbol.value.is_not_nil())
