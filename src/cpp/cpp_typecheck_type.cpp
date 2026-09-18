@@ -132,6 +132,9 @@ void cpp_typecheckt::typecheck_type(typet &type)
     const exprt given_alignment =
       static_cast<const exprt &>(type.find(ID_C_alignment));
     const bool given_packed = type.get_bool(ID_C_packed);
+    // the `#pragma pack(n)' cap of a member (parse.cpp apply_pragma_pack)
+    const exprt given_pragma_pack =
+      static_cast<const exprt &>(type.find(ID_C_pragma_pack));
 
     cpp_namet cpp_name;
     cpp_name.swap(type);
@@ -221,10 +224,36 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(!class_type || !in_alias_declaration)
     {
       if(given_alignment.is_not_nil())
-        type.add(ID_C_alignment) = given_alignment;
+      {
+        // N5008 [dcl.align]/5: the alignment-specifier cannot make the
+        // alignment weaker than what the type otherwise requires -- here
+        // the alignment a typedef-name carries (`typedef short
+        // __attribute__((aligned(8))) T; alignas(2) T m;' keeps 8, as g++
+        // does).  Keep the stronger of the two.
+        const exprt &typedef_alignment =
+          static_cast<const exprt &>(type.find(ID_C_alignment));
+        const auto given = numeric_cast<mp_integer>(given_alignment);
+        const auto existing = typedef_alignment.is_nil()
+                                ? std::optional<mp_integer>{}
+                                : numeric_cast<mp_integer>(typedef_alignment);
+        if(
+          given_packed ||
+          !(given.has_value() && existing.has_value() && *existing > *given))
+        {
+          type.add(ID_C_alignment) = given_alignment;
+        }
+        else
+        {
+          // kept for a packed struct, where the type's alignment is
+          // ignored (padding.cpp explicit_member_alignment)
+          type.add(ID_C_member_alignment) = given_alignment;
+        }
+      }
       if(given_packed)
         type.set(ID_C_packed, true);
     }
+    if(given_pragma_pack.is_not_nil())
+      type.add(ID_C_pragma_pack) = given_pragma_pack;
   }
   else if(type.id()==ID_struct ||
           type.id()==ID_union)
@@ -238,6 +267,36 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // the pointer/reference might have a qualifier,
     // but do subtype first
     typecheck_type(to_pointer_type(type).base_type());
+
+    // N5008 [dcl.align]/1 + GCC: an alignment specifier in the declaration
+    // specifiers (`alignas(16) void *p;', `__attribute__((aligned(16)))
+    // void *p;') appertains to the declared OBJECT -- the pointer -- not to
+    // the pointed-to type.  The parser merges it into the base type; hoist
+    // it, as the C front end does (c_typecheck_type.cpp) -- unless it is
+    // the base type's own alignment (a typedef's, or that of a type defined
+    // in place).  Likewise the #pragma pack(n) cap of the member.  A
+    // reference member is stored as a pointer and g++ aligns it the same
+    // way.
+    {
+      typet &base_type = to_pointer_type(type).base_type();
+      const exprt &base_alignment =
+        static_cast<const exprt &>(base_type.find(ID_C_alignment));
+      if(
+        base_alignment.is_not_nil() &&
+        !base_alignment.get_bool(ID_C_typedef_alignment) &&
+        !base_alignment.get_bool(ID_C_type_alignment) &&
+        type.find(ID_C_alignment).is_nil())
+      {
+        type.add(ID_C_alignment) = base_alignment;
+        base_type.remove(ID_C_alignment);
+      }
+      const irept &base_pragma_pack = base_type.find(ID_C_pragma_pack);
+      if(base_pragma_pack.is_not_nil() && type.find(ID_C_pragma_pack).is_nil())
+      {
+        type.add(ID_C_pragma_pack) = base_pragma_pack;
+        base_type.remove(ID_C_pragma_pack);
+      }
+    }
 
     // C++11 reference collapsing: if this is a reference/rvalue reference
     // and the base type is also a reference, collapse them.

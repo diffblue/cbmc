@@ -3006,6 +3006,24 @@ bool Parser::rOtherDeclaration(
       return false;
   }
 
+  // As in rIntegralDeclaration: rDeclaration may already have merged
+  // leading specifiers into declaration.type() -- notably alignas (N5008
+  // [dcl.align]) -- which a plain swap would discard (`alignas(32) T m;'
+  // with a typedef-name T lost its alignment, unlike `alignas(32) short m;').
+  if(declaration.type().is_not_nil() && !declaration.type().id().empty())
+  {
+    if(declaration.type().id() == ID_merged_type)
+    {
+      for(const typet &sub :
+          to_type_with_subtypes(declaration.type()).subtypes())
+      {
+        if(!sub.id().empty() && sub.is_not_nil())
+          merge_types(sub, type_name);
+      }
+    }
+    else
+      merge_types(declaration.type(), type_name);
+  }
   declaration.type().swap(type_name);
   declaration.storage_spec().swap(storage_spec);
   declaration.member_spec().swap(member_spec);
@@ -7199,8 +7217,26 @@ void Parser::unwrap_attributed_class_spec(typet &spec)
     unwrapped.add_source_location() = spec.source_location();
     if(packed)
       unwrapped.set(ID_C_packed, true);
+    if(have_pragma_pack)
+      unwrapped.add(ID_C_pragma_pack) = pragma_pack;
     if(have_alignment)
-      unwrapped.set(ID_C_alignment, alignment);
+    {
+      // `struct alignas(16) S { ... } __attribute__((aligned(4)))': the
+      // class-head alignas is already on the class node; g++ takes the
+      // strictest of the specifiers ([dcl.align]/5)
+      const exprt &existing =
+        static_cast<const exprt &>(unwrapped.find(ID_C_alignment));
+      const auto existing_value = existing.is_nil()
+                                    ? std::optional<mp_integer>{}
+                                    : numeric_cast<mp_integer>(existing);
+      const auto given_value =
+        numeric_cast<mp_integer>(static_cast<const exprt &>(alignment));
+      if(!(existing_value.has_value() && given_value.has_value() &&
+           *existing_value > *given_value))
+      {
+        unwrapped.set(ID_C_alignment, alignment);
+      }
+    }
     spec = unwrapped;
   }
 }
