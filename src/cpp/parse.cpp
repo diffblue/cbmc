@@ -879,6 +879,9 @@ bool Parser::rTypedefUsing(cpp_declarationt &declaration)
 
   declaration.set_is_typedef();
   declaration.type()=typet(ID_typedef);
+  // an alias-declaration, as opposed to a typedef: GCC ignores a GNU type
+  // attribute on a class type here (see cpp_typecheckt::typecheck_type)
+  declaration.set("#alias_declaration", true);
 
   if(!is_identifier(lex.get_token(tk)))
     return false;

@@ -124,9 +124,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // sit on the cpp_name node; carry them over to the resolved type as the
     // C front end does for typedef names (c_typecheck_type.cpp).  GCC: "When
     // used as part of a typedef, the aligned attribute can both increase and
-    // decrease alignment" -- except for a class type, where GCC ignores
-    // attributes applied outside the definition (`using A = S
-    // __attribute__((aligned(16)))' leaves S's layout alone).
+    // decrease alignment" -- `typedef S __attribute__((aligned(16))) S16;'
+    // gives alignof 16 for a class S as well, but in an ALIAS-DECLARATION
+    // g++ ignores the attribute on a class type ("ignoring attributes
+    // applied to class type outside of definition": `using A = S
+    // __attribute__((aligned(16)))' leaves S's alignment alone).
     const exprt given_alignment =
       static_cast<const exprt &>(type.find(ID_C_alignment));
     const bool given_packed = type.get_bool(ID_C_packed);
@@ -213,9 +215,10 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     qualifiers.write(type);
 
-    if(
-      type.id() != ID_struct_tag && type.id() != ID_union_tag &&
-      type.id() != ID_struct && type.id() != ID_union)
+    const bool class_type = type.id() == ID_struct_tag ||
+                            type.id() == ID_union_tag ||
+                            type.id() == ID_struct || type.id() == ID_union;
+    if(!class_type || !in_alias_declaration)
     {
       if(given_alignment.is_not_nil())
         type.add(ID_C_alignment) = given_alignment;
