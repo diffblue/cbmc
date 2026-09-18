@@ -5166,6 +5166,15 @@ bool Parser::rDeclarator(
     d_inner.make_nil();
   }
 
+  // Trailing cv-qualifiers / GNU attributes on the declarator (`long m
+  // __attribute__((packed, aligned(2)))'): d_outer now holds attribute
+  // nodes only -- a single node, or a merged_type of several -- and no
+  // place for the declaration's base type.  cpp_declaratort::merge_type
+  // fills the type chain's NIL leaf with the base type, and for a
+  // merged_type continues with its LAST subtype; without a nil leaf the
+  // base type was hung below the last attribute (`packed{long}') and the
+  // conversion lost it (`long' became `int': size 4).  Give every
+  // attribute-only d_outer a nil leaf.
   optCvQualify(d_outer);
   if(d_outer.is_not_nil() && !d_outer.has_subtypes())
   {
@@ -5175,6 +5184,16 @@ bool Parser::rDeclarator(
     nil.make_nil();
     merged_type.move_to_sub(nil);
     d_outer.swap(merged_type);
+  }
+  else if(d_outer.id() == ID_merged_type)
+  {
+    auto &sub = to_type_with_subtypes(d_outer).subtypes();
+    if(!sub.empty() && !sub.back().is_nil() && !sub.back().has_subtypes())
+    {
+      typet nil;
+      nil.make_nil();
+      sub.push_back(nil);
+    }
   }
 
 #ifdef DEBUG
