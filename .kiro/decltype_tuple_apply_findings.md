@@ -9529,3 +9529,37 @@ OPEN, with kernels in /tmp/r142:
   incomplete type; sharing_map.h "instantiating sharing_mapt" noise (now
   visible in renaming_level.cpp).
 Census unchanged (12 KNOWNBUG dirs).
+
+## Round 143 (2026-09-18) — user Issues 5–7 re-test (still failing on -2253)
+
+User's repro files not on this machine; reconstructed from descriptions.
+Three real bugs found, all in LAYOUT (not parsing), C-shared code touched
+→ ansi-c suite run too (`../test.pl -e -p -c "$B/goto-cc --native-compiler
+gcc" -X fake-gcc-version -X clang-only` and the `-xc++ -D_Bool=bool -I
+test-c++-front-end -s c++-front-end` variant; plain `-c cbmc` gives 89 bogus
+failures — the suite is goto-cc based).
+- `ed1ef10775` padding.cpp alignment_rec: packed+aligned(n) = exactly n
+  (GCC), min(n,natural) only for #pragma pack(n) — parser.y now marks the
+  synthesized alignment constant with new irep id `C_pragma_pack`
+  (irep_ids.def → full rebuild). alignof(H)=2→16; `struct Q {char; H}`
+  17→32 bytes.
+- `14c987a3fa` storage-unit rule for bit-fields (SysV ABI): dense bit stream
+  → `{u8 a:6, r:1, b:4, c:5}` 2→3 bytes; pre-pass removed, run completion in
+  the main loop (pre-pass double-padded once unit pads existed). Ground truth
+  table gcc==clang for A1 A1p B1..B7 (/tmp/r143/su.c).
+- `e665c1274e` sizeof/alignof + non-static data member elaborate a
+  typedef'd class template instance ([temp.inst]/2) — the actual Issue 6:
+  `using T = G<u16>; sizeof(T)` with T the only mention → "incomplete type".
+  New `cpp_typecheckt::complete_type_operand`.
+- `43e42df33f` C++ padding gate follows struct tags/arrays to the class's
+  ID_C_alignment and records the alignment on the padded struct.
+- `3f540d3283` typedef attribute aligned/packed carried across cpp_name
+  resolution for non-class types (GCC typedef semantics; class types: GCC
+  ignores, so do we).  clang++ ignores `using X = u32 __attribute__((aligned))`
+  while g++ honours it — not tested.
+- Tests `e153ce94c5`: ansi-c/Struct_Padding8,9; cbmc/Bitfields6 (gcc-only);
+  cbmc-cpp ×4.  Suites: cbmc-cpp 1302, cbmc 1175, ansi-c 262 (gcc + c++-fe
+  variants), cpp 245, systemc 27, dfcc 2 — all green on /tmp/r143/bin5.
+- NOT fixed: `int x __attribute__((aligned(2)))` w/o packed cannot decrease
+  (GCC keeps natural) — alignment_rec "trusts blindly" (pa_cbmc.c case N).
+- Status appended to ~/CBMC_ISSUES.md.
