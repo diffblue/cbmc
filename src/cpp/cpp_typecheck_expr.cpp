@@ -6587,7 +6587,22 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       else
       {
         exprt addr = address_of_exprt(*arg_it);
-        addr.type() = parameter.type();
+        const typet &ref_base = to_reference_type(parameter.type()).base_type();
+        if(
+          arg_it->type().id() == ID_struct_tag &&
+          ref_base.id() == ID_struct_tag &&
+          to_struct_tag_type(arg_it->type()).get_identifier() !=
+            to_struct_tag_type(ref_base).get_identifier())
+        {
+          // N5008 [dcl.init.ref]/5.3.1: `Base &&' bound to a Derived
+          // prvalue -- the reference is to the BASE subobject: a
+          // derived-to-base pointer adjustment, not a retyped address
+          // (symex rejected the mistyped address_of).
+          make_ptr_typecast(addr, to_reference_type(parameter.type()));
+          addr.type() = parameter.type();
+        }
+        else
+          addr.type() = parameter.type();
         arg_it->swap(addr);
       }
     }

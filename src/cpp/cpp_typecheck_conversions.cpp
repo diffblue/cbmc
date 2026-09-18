@@ -3002,30 +3002,42 @@ bool cpp_typecheckt::reference_binding(
     // results, value expressions) are PRVALUES; temporary
     // materialization ([conv.rval], [class.temporary]) binds the
     // rvalue reference to them.
-    if(
+    // /5.4 only applies when T1 is reference-related to T2; an lvalue of
+    // an unrelated type (`const char *p; w(p);' for `void w(W &&)') goes
+    // through /5.3: a temporary W is copy-initialised from p (converting
+    // constructor or conversion function) and the rvalue reference binds
+    // to it -- handled below.
+    const bool genuine_lvalue_form =
       expr.id() == ID_symbol || expr.id() == ID_dereference ||
-      expr.id() == ID_member || expr.id() == ID_index)
+      expr.id() == ID_member || expr.id() == ID_index ||
+      expr.id() == ID_string_constant; // [expr.prim.literal]: an lvalue
+    const bool unrelated_lvalue_to_class =
+      genuine_lvalue_form && reference_type.base_type().id() == ID_struct_tag &&
+      (expr.type().id() != ID_struct_tag ||
+       !reference_related(expr, reference_type));
+    if(!unrelated_lvalue_to_class)
     {
+      if(genuine_lvalue_form)
+        return false;
+
+      typet base = reference_type.base_type();
+      base.remove(ID_C_constant);
+      typet expr_base = expr.type();
+      expr_base.remove(ID_C_constant);
+      if(base == expr_base)
+      {
+        exprt tmp = expr;
+        tmp.remove(ID_C_lvalue);
+        tmp.set(ID_statement, ID_temporary_object);
+        if(reference_compatible(tmp, reference_type, rank))
+        {
+          new_expr = tmp;
+          rank += 4;
+          return true;
+        }
+      }
       return false;
     }
-
-    typet base = reference_type.base_type();
-    base.remove(ID_C_constant);
-    typet expr_base = expr.type();
-    expr_base.remove(ID_C_constant);
-    if(base == expr_base)
-    {
-      exprt tmp = expr;
-      tmp.remove(ID_C_lvalue);
-      tmp.set(ID_statement, ID_temporary_object);
-      if(reference_compatible(tmp, reference_type, rank))
-      {
-        new_expr = tmp;
-        rank += 4;
-        return true;
-      }
-    }
-    return false;
   }
 
   // C++11: xvalues (implicit dereferences of rvalue references) cannot
@@ -3255,15 +3267,17 @@ bool cpp_typecheckt::reference_binding(
   if(reference_type.get_bool(ID_C_this))
     return false;
 
+  // N5008 [dcl.init.ref]/5.3: a temporary is created and bound only when
+  // the reference is an lvalue reference to a non-volatile const type OR an
+  // rvalue reference (`void w(W &&); w(5);' with W(int) -- /5.3.2: the
+  // initializer is copy-initialised into a temporary of the referenced
+  // type via the converting constructor).  Rvalue references were rejected
+  // here together with non-const lvalue references, so `std::string &&'
+  // parameters could not take a string literal.
   if(
-    !reference_type.base_type().get_bool(ID_C_constant) ||
-    reference_type.base_type().get_bool(ID_C_volatile))
-    return false;
-
-  // TODO: handle the case for implicit parameters
-  if(
-    !reference_type.base_type().get_bool(ID_C_constant) &&
-    !expr.get_bool(ID_C_lvalue))
+    !is_rvalue_reference(reference_type) &&
+    (!reference_type.base_type().get_bool(ID_C_constant) ||
+     reference_type.base_type().get_bool(ID_C_volatile)))
     return false;
 
   exprt arg_expr = expr;
@@ -3273,6 +3287,13 @@ bool cpp_typecheckt::reference_binding(
     // required to initialize the temporary
     arg_expr.set(ID_C_lvalue, true);
   }
+
+  // N5008 [over.ics.rank]/3.2.3: the temporary is an rvalue; of `W &&' and
+  // `const W &' (same converting constructor, otherwise identical
+  // sequences) the rvalue reference binding is better.  Record the lvalue
+  // reference's disadvantage in the lowest-order key, as for /3.2.6.
+  if(!is_rvalue_reference(reference_type) && cv_distance != nullptr)
+    ++*cv_distance;
 
   if(user_defined_conversion_sequence(
        arg_expr, reference_type.base_type(), new_expr, rank))
