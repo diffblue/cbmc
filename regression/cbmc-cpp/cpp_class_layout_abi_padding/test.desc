@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Invariant check failed
+--
+All classes and unions get ABI alignment padding (previously only those with
+bit-fields or explicit alignment); struct values built by the front end carry
+the padding components.
