@@ -9656,3 +9656,11 @@ failures — the suite is goto-cc based).
   `pair<const string, list>` instantiation, 'set'/'stack' no-match noise
   (has_unassigned-like, new trigger); path_storage: bigint `negate` no match.
   Next: wider sweep on the final binary.
+- Wider sweep (default --expand dirs: util, goto-programs, goto-symex,
+  langapi, json, xmllang; 239 files) launched at c6f5cd3046:
+  /tmp/dogfood-snapshots/c6f5cd3046-20260918-091406 (sweep.log, out/, DONE
+  when finished; single-threaded, nice 19 — several hours).  Compare the
+  74-file subset with `scripts/dogfood_snapshot.sh --compare
+  /tmp/dogfood-snapshots/60409dc8d8-20260917-235038/sweep.log <new>/sweep.log`.
+  Remove its worktree afterwards (`git worktree remove --force <snap>/tree`),
+  and /tmp/r144/upstream when the upstream branch has been dealt with.
