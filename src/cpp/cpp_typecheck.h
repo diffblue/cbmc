@@ -638,6 +638,10 @@ protected:
   /// parameter packs must be matched/deduced rather than substituted with an
   /// (unrelated) enclosing instantiation's pack.
   bool disable_template_arg_pack_expansion = false;
+  /// true while the type of an alias-declaration (`using T = ...;') is
+  /// typechecked; GCC ignores a GNU type attribute applied to a class type
+  /// there, but honours it in a typedef
+  bool in_alias_declaration = false;
 
   /// When true, suppress_elaborate is ignored. Used during constexpr
   /// member evaluation to ensure referenced templates can be
