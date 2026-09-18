@@ -778,7 +778,19 @@ void cpp_typecheckt::convert_non_template_declaration(
       if(is_typedef)
       {
         skip_typechecking_elaborate = true;
-        typecheck_type(declaration_type);
+        const bool old_alias = in_alias_declaration;
+        in_alias_declaration = declaration.get_bool("#alias_declaration");
+        try
+        {
+          typecheck_type(declaration_type);
+        }
+        catch(...)
+        {
+          in_alias_declaration = old_alias;
+          skip_typechecking_elaborate = false;
+          throw;
+        }
+        in_alias_declaration = old_alias;
         skip_typechecking_elaborate = false;
       }
       else
