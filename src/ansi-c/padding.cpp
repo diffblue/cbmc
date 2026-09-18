@@ -385,49 +385,6 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 {
   struct_typet::componentst &components = type.components();
 
-  // First make bit-fields appear on byte boundaries
-  {
-    std::size_t bit_field_bits=0;
-
-    for(struct_typet::componentst::iterator
-        it=components.begin();
-        it!=components.end();
-        it++)
-    {
-      if(it->type().id()==ID_c_bit_field &&
-         to_c_bit_field_type(it->type()).get_width()!=0)
-      {
-        // count the bits
-        const std::size_t width = to_c_bit_field_type(it->type()).get_width();
-        bit_field_bits+=width;
-      }
-      else if(it->is_boolean())
-      {
-        ++bit_field_bits;
-      }
-      else if(bit_field_bits!=0)
-      {
-        // not on a byte-boundary?
-        if((bit_field_bits % config.ansi_c.char_width) != 0)
-        {
-          const std::size_t pad = config.ansi_c.char_width -
-                                  bit_field_bits % config.ansi_c.char_width;
-          it = pad_bit_field(components, it, pad);
-        }
-
-        bit_field_bits=0;
-      }
-    }
-
-    // Add padding at the end?
-    if((bit_field_bits % config.ansi_c.char_width) != 0)
-    {
-      const std::size_t pad =
-        config.ansi_c.char_width - bit_field_bits % config.ansi_c.char_width;
-      pad_bit_field(components, components.end(), pad);
-    }
-  }
-
   mp_integer offset=0;
   mp_integer max_alignment=0;
   std::size_t bit_field_bits=0;
@@ -457,6 +414,34 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
           max_alignment=a;
 
         std::size_t w=to_c_bit_field_type(it_type).get_width();
+
+        // System V ABI (and the Itanium C++ ABI): a bit-field must be
+        // contained in a storage unit of its declared type, where the
+        // storage units are the type-sized slots counted from the start of
+        // the struct.  When the bit-field does not fit into what remains of
+        // the current unit, it starts at the next one; the remaining bits
+        // are padding.  `struct { uint8_t a : 6, b : 1, c : 4, d : 5; }' is
+        // thus 3 bytes, not 2.  A packed struct places bit-fields densely.
+        if(!struct_is_packed && !it->get_is_padding())
+        {
+          const auto unit_bits =
+            underlying_width(to_c_bit_field_type(it_type), ns);
+          if(unit_bits.has_value() && *unit_bits > 0)
+          {
+            const mp_integer position =
+              offset * config.ansi_c.char_width + bit_field_bits;
+            const mp_integer room = *unit_bits - position % *unit_bits;
+            if(room < w)
+            {
+              const std::size_t pad_bits = numeric_cast_v<std::size_t>(room);
+              it = pad_bit_field(components, it, pad_bits);
+              bit_field_bits += pad_bits;
+              offset += bit_field_bits / config.ansi_c.char_width;
+              bit_field_bits %= config.ansi_c.char_width;
+            }
+          }
+        }
+
         bit_field_bits += w;
         const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
         bit_field_bits %= config.ansi_c.char_width;
@@ -479,8 +464,14 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
     else
       a=alignment(it_type, ns);
 
-    DATA_INVARIANT(
-      bit_field_bits == 0, "padding ensures offset at byte boundaries");
+    // complete a run of bit-fields to a byte boundary
+    if(bit_field_bits != 0)
+    {
+      const std::size_t pad_bits = config.ansi_c.char_width - bit_field_bits;
+      it = pad_bit_field(components, it, pad_bits);
+      bit_field_bits = 0;
+      ++offset;
+    }
 
     // check minimum alignment
     if(
@@ -517,6 +508,15 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
 
     if(size.has_value())
       offset += *size;
+  }
+
+  // complete a trailing run of bit-fields (see above)
+  if(bit_field_bits != 0)
+  {
+    const std::size_t pad_bits = config.ansi_c.char_width - bit_field_bits;
+    pad_bit_field(components, components.end(), pad_bits);
+    bit_field_bits = 0;
+    ++offset;
   }
 
   // any explicit alignment for the struct?
