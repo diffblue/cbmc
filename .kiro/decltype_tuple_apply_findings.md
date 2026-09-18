@@ -9563,3 +9563,7 @@ failures — the suite is goto-cc based).
 - NOT fixed: `int x __attribute__((aligned(2)))` w/o packed cannot decrease
   (GCC keeps natural) — alignment_rec "trusts blindly" (pa_cbmc.c case N).
 - Status appended to ~/CBMC_ISSUES.md.
+- Sweep (74-file subset) at 60409dc8d8: 59 OK / 17 OK_NOISY / 0 FAIL (r141
+  start: 51/23/0; r138: 3 FAIL).  auto_objects, complexity_limiter,
+  field_sensitivity FAIL→OK_NOISY; six goto-programs files NOISY→OK.  Log:
+  /tmp/dogfood-snapshots/60409dc8d8-20260917-235038/sweep.log (tree removed).
