@@ -536,6 +536,18 @@ void cpp_typecheckt::typecheck_code(codet &code)
     exprt range_op = code.op1();
     codet body = to_code(code.op2());
 
+    // N5008 [stmt.ranged]/1: the range-based for is equivalent to a BLOCK
+    // `{ auto &&__range = ...; for(...) { for-range-declaration = *__begin;
+    // statement } }' -- the for-range-declaration lives in its own scope,
+    // one per loop.  Without this the loop variable was declared in the
+    // enclosing scope: two sequential loops `for(const auto &pair : m1)'
+    // `for(const auto &pair : m2)' in one function shared the symbol
+    // `<scope>::pair' (the second insert silently failed), the second loop
+    // reused the FIRST loop's variable and type, and `pair.second.empty()'
+    // resolved against the wrong class (symex_atomic_section.cpp).
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.new_block_scope();
+
     // Type-check the range expression
     typecheck_expr(range_op);
 
@@ -881,21 +893,14 @@ void cpp_typecheckt::typecheck_code(codet &code)
         // then resolved as an overloaded operator-> ([over.ref])
         // instead of the built-in pointer access ("symbol 'operator->'
         // is unknown"; the get_module.cpp dog-food shape).
-        // (Only for non-`auto` declarations: the `auto` family stores
-        // its cv/ref layers so that cpp_convert_auto below handles
-        // them; merging the declarator again would double-apply.)
-        typet var_type = has_auto(cpp_decl.type())
-                           ? cpp_decl.type()
-                           : declarator.merge_type(cpp_decl.type());
-        // If the declared type contains `auto` (bare `auto`,
-        // `const auto&`, `auto*`, `auto&`, etc.), deduce by
-        // substituting `auto` with the type of `*__begin`.
-        // The previous check `var_type.id() == ID_auto` only
-        // matched bare `auto`, leaving a `merged_type(const, auto)`
-        // for `const auto&` un-deduced, surfacing later as
-        //   member operator requires struct/union type on left
-        //   hand side but got '<<type:auto>>'
-        // when the loop variable is used.
+        // The `&' of `const auto &x' is a declarator layer as well:
+        // taking the declaration's type alone made every reference loop
+        // variable a by-VALUE copy of the element (`for(auto &x : v) x =
+        // 7;' left v unchanged; a `const auto &' to a std::list element
+        // was a bitwise copy whose self-referential sentinel no longer
+        // pointed at itself).  cpp_convert_auto descends through the
+        // reference layer and substitutes `auto' by the element type.
+        typet var_type = declarator.merge_type(cpp_decl.type());
         if(has_auto(var_type))
           cpp_convert_auto(var_type, deref_expr.type(), get_message_handler());
         typecheck_type(var_type);
@@ -920,9 +925,18 @@ void cpp_typecheckt::typecheck_code(codet &code)
         }
         symbol_exprt var_expr(var_id, var_type);
 
+        // for-range-declaration = *__begin; -- a reference variable (a
+        // pointer in CBMC's model) is bound to the element's address
         codet assign_elem(ID_assign);
         assign_elem.copy_to_operands(var_expr);
-        assign_elem.copy_to_operands(deref_expr);
+        if(is_reference(var_type) || is_rvalue_reference(var_type))
+        {
+          address_of_exprt elem_addr(deref_expr);
+          elem_addr.type() = var_type;
+          assign_elem.copy_to_operands(std::move(elem_addr));
+        }
+        else
+          assign_elem.copy_to_operands(deref_expr);
         assign_elem.add_source_location() = loc;
 
         // Loop condition: __begin != __end (operator!= resolution)
@@ -990,11 +1004,9 @@ void cpp_typecheckt::typecheck_code(codet &code)
     // `auto*`, `auto&`, etc. by substituting the array element
     // type into any `auto` token within the declared type.
     // N5008 [stmt.ranged]/1: merge the full declarator, as in the
-    // class-range branch above (`const symbolt *p` is a pointer).
-    typet var_type =
-      has_auto(cpp_decl.type())
-        ? cpp_decl.type()
-        : cpp_decl.declarators().front().merge_type(cpp_decl.type());
+    // class-range branch above (`const symbolt *p` is a pointer, `auto
+    // &x' a reference -- see there).
+    typet var_type = declarator.merge_type(cpp_decl.type());
     if(has_auto(var_type))
       cpp_convert_auto(var_type, elem_type, get_message_handler());
     typecheck_type(var_type);
@@ -1055,11 +1067,18 @@ void cpp_typecheckt::typecheck_code(codet &code)
     side_effect_exprt iter(ID_preincrement, size_type(), loc);
     iter.copy_to_operands(idx_expr);
 
-    // var = range[__range_i]
+    // var = range[__range_i]  (a reference variable: var = &range[i])
     index_exprt elem(range_op, idx_expr);
     codet assign_elem(ID_assign);
     assign_elem.copy_to_operands(var_expr);
-    assign_elem.copy_to_operands(elem);
+    if(is_reference(var_type) || is_rvalue_reference(var_type))
+    {
+      address_of_exprt elem_addr(elem);
+      elem_addr.type() = var_type;
+      assign_elem.copy_to_operands(std::move(elem_addr));
+    }
+    else
+      assign_elem.copy_to_operands(elem);
     assign_elem.add_source_location() = loc;
 
     // Type-check the body
