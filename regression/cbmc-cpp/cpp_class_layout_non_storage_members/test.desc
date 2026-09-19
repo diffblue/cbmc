@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Member typedefs, static data members and member functions occupy no storage;
+the layout used to treat them as data (user Issues 5 and 7).
