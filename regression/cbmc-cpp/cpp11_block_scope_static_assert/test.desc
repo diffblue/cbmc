@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=(6|64)$
+^SIGNAL=0$
+static assertion failed: block-scope failure is diagnosed$
+--
+^warning: ignoring
+--
+A block-scope static_assert(false) outside any template instantiation is an
+error ([dcl.pre]/10); inside an instantiation it stays a warned skip
+([temp.res.general]/6).
