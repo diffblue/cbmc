@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+found no match
+--
+N5008 [expr.type.conv]/2, [class.temporary]/2: member access on the
+value-initialised prvalue `T()' of a class without constructors.

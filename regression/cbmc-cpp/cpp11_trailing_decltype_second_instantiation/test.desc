@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+found no match
+--
+N5008 [dcl.fct]/8, [temp.inst]: each specialization's trailing decltype is
+evaluated against its own parameter types; the shared synthetic parameter
+symbol is retyped per deduction.
