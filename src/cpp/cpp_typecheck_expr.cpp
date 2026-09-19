@@ -373,6 +373,21 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
   if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
+  else if(expr.id() == ID_string_constant)
+  {
+    // N5008 [lex.string]/6: an ordinary string literal has type "array of n
+    // const char" (the C front-end types it `char[n]', C's rule).  The
+    // constness matters for overload resolution: `std::string s("...")`
+    // must select the non-template `basic_string(const char *)` -- with
+    // a `char[n]' argument that candidate needs a qualification
+    // conversion on top of the array-to-pointer conversion, and the
+    // string_view constructor template `basic_string(const _Tp &)`
+    // (deducing `_Tp = char[n]`, an identity binding) won instead,
+    // returning the wrong length.
+    c_typecheck_baset::typecheck_expr_main(expr);
+    if(expr.type().id() == ID_array)
+      to_array_type(expr.type()).element_type().set(ID_C_constant, true);
+  }
   else if(expr.id() == "cpp-this")
     typecheck_expr_this(expr);
   else if(expr.id() == ID_pointer_to_member)
