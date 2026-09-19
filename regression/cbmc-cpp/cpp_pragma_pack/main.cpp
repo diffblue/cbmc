@@ -29,6 +29,7 @@ struct AN
 };
 struct AM { char c; struct { long long a4; } __attribute__((aligned(16))) n; };
 struct AU { char c; union { long a; } __attribute__((aligned(16))) u; char d; };
+struct AB { char c; bool m __attribute__((aligned(8))); char d; } __attribute__((packed, aligned(4))); // the cap survives the bool's conversion
 struct B1 { long l; short s; };
 struct BD : B1 { char c; int i; };  // base subobject and the class capped at 4
 #pragma pack()
@@ -50,6 +51,7 @@ int main()
   __CPROVER_assert(sizeof(AU) == 24 && __builtin_offsetof(AU, u) == 4 && __builtin_offsetof(AU, d) == 20, "aligned(16) union type under pack(4): placed at 4, but 16 bytes long");
   __CPROVER_assert(sizeof(BD) == 20 && alignof(BD) == 4 && __builtin_offsetof(BD, i) == 16, "derived class under pack(4): base (12 bytes, align 4) then c, i");
   __CPROVER_assert(sizeof(D0) == 22 && alignof(D0) == 2 && __builtin_offsetof(D0, i) == 18, "derived class under pack(2) of a base defined outside: the base members do not raise the alignment above 2");
+  __CPROVER_assert(sizeof(AB) == 8 && __builtin_offsetof(AB, m) == 4, "bool member with aligned(8) under pack(4): capped to 4");
   Cls k{1, 2};
   __CPROVER_assert(k.f() == 2, "member function of a packed class");
   return 0;

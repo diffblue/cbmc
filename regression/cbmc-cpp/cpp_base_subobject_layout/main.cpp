@@ -31,6 +31,17 @@ struct alignas(32) A3 { short m4 : 13; float m7; };
 struct A11 : public A3 { A3 m12; unsigned long m13; short m15; } __attribute__((packed, aligned(8)));
 struct A2 : public A3 { char c; };
 struct A4 : public A3 { char c; } __attribute__((packed));
+struct E0 { void operator()(int *) const {} };
+template <int I, class H> struct HB { H h; HB() : h() {} };
+struct TI2 {};
+struct TI1 : TI2, HB<1, E0> { TI1() {} };
+struct TI0 : TI1, HB<0, int *> { TI0() {} };
+struct TU : TI0 { TU() {} };                 // the base's padding keeps its place
+struct ZB { char m7[3]; unsigned short : 0; unsigned m9 : 6; } __attribute__((packed)); // :0 aligns m9 to 4: 5 bytes
+struct ZD : ZB { unsigned m42 : 5; char m43; } __attribute__((packed));                // the base's `:0' is not re-applied
+struct ZO { char o; };
+struct ZB4 { char m7; unsigned : 0; unsigned m9 : 6; } __attribute__((packed));     // 5 bytes, m9 at 4
+struct ZD4 : ZO, ZB4 { char m43; } __attribute__((packed));                         // ZB4 at 1: m9 at 5, not re-aligned to 8
 int main()
 {
   __CPROVER_assert(sizeof(D1) == 24 && __builtin_offsetof(D1, c) == 16, "POD base keeps its tail padding");
@@ -48,6 +59,11 @@ int main()
   __CPROVER_assert(sizeof(PD1) == 12 && __builtin_offsetof(PD1, m) == 8, "derived from a packed base");
   __CPROVER_assert(sizeof(PD2) == 16 && __builtin_offsetof(PD2, m) == 12, "packed base with an anonymous union");
   __CPROVER_assert(sizeof(PD3) == 16 && __builtin_offsetof(PD3, m) == 12 && __builtin_offsetof(PD3, l) == 1, "the packed base's members keep their packed offsets");
+  TU u; int x = 3;
+  *(int **)((char *)&u + 8) = &x;
+  __CPROVER_assert(static_cast<HB<0, int *> &>(u).h == &x && sizeof(TU) == 16, "flattened base layout keeps the base's padding between its subobjects");
+  __CPROVER_assert(sizeof(ZB) == 5 && sizeof(ZD) == 7 && __builtin_offsetof(ZD, m43) == 6, "a zero-width bit-field of a flattened base keeps the base's layout");
+  __CPROVER_assert(sizeof(ZB4) == 5 && sizeof(ZD4) == 7 && __builtin_offsetof(ZD4, m43) == 6, "base at an odd offset: its zero-width bit-field is not re-applied at the absolute offset");
   D3 d3; d3.l = 1; d3.s = 2; d3.c = 3;
   D4 d4; d4.b = 1; d4.i = 5;
   __CPROVER_assert(d3.l == 1 && d3.s == 2 && d3.c == 3 && d4.b && d4.i == 5 && d4.l == 0, "members accessible");
