@@ -390,6 +390,20 @@ void cpp_typecheckt::typecheck_type(typet &type)
       constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(size_expr);
       simplify(size_expr, *this);
+
+      // Give a constant bound the index type, as the C front-end
+      // (typecheck_array_type) and string literals (string_constantt) do.
+      // Array types are compared structurally, so `const char[4]' spelled
+      // as a declarator (bound typed `int') was a different type from
+      // `decltype("abc")' or `T4' for `typedef const char T4[4];' (bound
+      // typed `long'): `is_same<remove_reference_t<decltype("abc")>,
+      // const char[4]>' was false.  A dependent bound is left alone so it
+      // still matches a `T (&)[N]' pattern.
+      if(size_expr.is_constant())
+      {
+        make_index_type(size_expr);
+        simplify(size_expr, *this);
+      }
     }
 
     typecheck_type(to_array_type(type).element_type());
@@ -824,6 +838,12 @@ void cpp_typecheckt::typecheck_type(typet &type)
       // an lvalue, decltype(E) is T&.  Indirection is an lvalue
       // ([expr.unary.op]/1), so decltype(*p) must be T&, not T (libc++'s
       // iter_reference_t is exactly `decltype(*declval<_Tp&>())`).
+      type = ::reference_type(e.type());
+    }
+    else if(e.id() == ID_string_constant && e.type().id() == ID_array)
+    {
+      // N5008 [expr.prim.literal]/1: a string literal is an lvalue, so
+      // decltype("abc") is `const char (&)[4]' ([dcl.type.decltype]/1.5).
       type = ::reference_type(e.type());
     }
     else
