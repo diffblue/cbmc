@@ -22,19 +22,46 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
-
 /// Generate code to copy the parent.
 /// \param source_location: location for generated code
 /// \param parent_base_name: base name of typechecked parent
 /// \param arg_name: name of argument that is being copied
 /// \param [out] block: non-typechecked block
+/// \return whether the class has no storage member (an empty class: its
+///   base subobjects have zero size, [intro.object]/9)
+static bool class_is_empty(const struct_typet &type)
+{
+  for(const auto &c : type.components())
+  {
+    if(
+      c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+      !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+      !(c.type().id() == ID_c_bit_field &&
+        to_c_bit_field_type(c.type()).get_width() == 0))
+    {
+      return false;
+    }
+  }
+  return true;
+}
+
 static void copy_parent(
   const source_locationt &source_location,
   const typet &parent_type,
   const irep_idt &arg_name,
   exprt &block,
-  bool is_move = false)
+  bool is_move = false,
+  bool parent_is_empty = false)
 {
+  // An EMPTY base subobject has zero size ([intro.object]/9: only a complete
+  // object of empty class type has its one byte) -- there is nothing to
+  // copy.  The base's one-byte complete-object layout (`$empty') must not
+  // be assigned through a pointer into the derived object: that byte is
+  // the first byte of whatever the derived class stores there (libstdc++'s
+  // std::allocator base of _List_impl sits over _M_node._M_next).
+  if(parent_is_empty && !is_move)
+    return;
+
   // N5008 [class.copy.assign]/12: each base subobject is identified by
   // its TYPE.  Build the slicing casts from the resolved base type
   // rather than the base's unqualified name: with two bases from the
@@ -566,7 +593,13 @@ void cpp_typecheckt::default_assignop_value(
     }
     cpp_scopes.current_scope_ptr = saved_scope;
 
-    copy_parent(source_location, b.type(), arg_name, block, is_move);
+    copy_parent(
+      source_location,
+      b.type(),
+      arg_name,
+      block,
+      is_move,
+      class_is_empty(base_struct));
   }
 
   // Then, we copy the members
