@@ -9835,3 +9835,22 @@ failures — the suite is goto-cc based).
   config difference but the array cap bug above showing in different
   evaluation orders; keep the goto-cc STATIC_ASSERT form of the ansi-c
   tests as a cross-check.
+
+## Round 147 (2026-09-19) — user Issues 5 and 7 (re-test on -2293 still failing)
+
+- Both had ONE root cause, in padding.cpp: a C++ class type lists member
+  functions, static data members and member typedefs as components, and
+  add_padding/alignment_rec laid them out as data (`using value_type =
+  T;' → a T-sized member; `static uint32_t counter;' → 4 bytes).  Issue 5
+  (attributed class template with a member alias): 30 instead of 16.
+  Issue 7: the `enum class : uint8_t' bit-field was never the problem; a
+  static member in the bit-field struct was (4 instead of 2).  Fixed
+  `10a267511b' (is_layout_member everywhere in padding.cpp); the base
+  subobject marker must go on the first STORAGE component of the base
+  (the constructor got it before; regression/systemc Cast1 caught the
+  slip).  Test cpp_class_layout_non_storage_members (both shapes).
+  Status appended to ~/CBMC_ISSUES.md.
+- Lesson: the round-146 "pad everything" made this bug universal (any
+  class with a member typedef or static + alignment); the bit-field gate
+  had hidden it for years.  When adding a layout pass over C++
+  components, filter is_type/is_static/ID_code first.
