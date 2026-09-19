@@ -1967,6 +1967,20 @@ void cpp_typecheckt::typecheck_compound_declarator(
           }
           catch(...)
           {
+            // The initializer is lost or left raw: every read of the member
+            // is nondet from here on (the round-149 enumerator-designator
+            // shape hid behind exactly this silence).  A member of a class
+            // template being elaborated may legitimately fail here
+            // (SFINAE-like, retried at its use); everything else is worth
+            // a word.
+            if(template_map.type_map.empty() && template_map.expr_map.empty())
+            {
+              warning().source_location = new_symbol->location;
+              warning() << "C++ front-end could not type-check the "
+                        << "initializer of static member '"
+                        << new_symbol->base_name << "'; reads of it are nondet"
+                        << eom;
+            }
             if(new_symbol->is_macro)
             {
               new_symbol->value.visit_pre(

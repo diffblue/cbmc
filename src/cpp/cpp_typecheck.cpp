@@ -100,6 +100,32 @@ void cpp_typecheckt::convert(cpp_itemt &item)
   }
 }
 
+/// A system-header item whose type checking failed is dropped: later uses
+/// of it fail to resolve or read as nondet.  The SFINAE guard around the
+/// attempt swallowed the diagnostics that would have explained what went
+/// wrong, so record the item; typecheck() reports them.
+void cpp_typecheckt::report_dropped_system_item(const cpp_itemt &item)
+{
+  std::string what;
+  if(item.is_declaration())
+  {
+    const auto &declarators = item.get_declaration().declarators();
+    if(!declarators.empty())
+      what = "'" + declarators.front().name().to_string() + "'";
+    else
+      what = "declaration";
+  }
+  else if(item.is_namespace_spec())
+    what = "namespace '" +
+           id2string(item.get_namespace_spec().get_namespace()) + "'";
+  else if(item.is_linkage_spec())
+    what = "linkage specification";
+  else
+    what = "item";
+  dropped_system_items.push_back(
+    what + " at " + item.source_location().as_string());
+}
+
 /// typechecking main method
 void cpp_typecheckt::typecheck()
 {
@@ -131,6 +157,7 @@ void cpp_typecheckt::typecheck()
       }
       catch(...)
       {
+        report_dropped_system_item(item);
       }
     }
     else
@@ -141,6 +168,7 @@ void cpp_typecheckt::typecheck()
       }
       catch(int)
       {
+        // diagnostics were emitted; the error count fails the translation
       }
     }
   }
@@ -236,6 +264,7 @@ void cpp_typecheckt::typecheck()
   // std::function invocation havocs.  [temp.inst]/4: the odr-used
   // specialization must be instantiated; finish such conversions here,
   // to a fixpoint (a retry can instantiate further templates).
+  std::set<irep_idt> unfinished;
   for(std::size_t rounds = 0; rounds < 5; ++rounds)
   {
     std::vector<irep_idt> to_finish;
@@ -272,8 +301,8 @@ void cpp_typecheckt::typecheck()
       }
       catch(...)
       {
-        // cannot be completed: leave it; goto conversion will
-        // diagnose the call sites
+        // cannot be completed (a later round may still manage)
+        unfinished.insert(id);
       }
     }
     typecheck_method_bodies();
@@ -285,6 +314,18 @@ void cpp_typecheckt::typecheck()
     // do_not_typechecked() pass, so such a late use hit a bodiless
     // `less<int>::less(const less&)` (havoc, "no body for callee").
     do_not_typechecked();
+  }
+  for(const auto &id : unfinished)
+  {
+    const symbolt *sym = symbol_table.lookup(id);
+    if(sym == nullptr || sym->value.get_bool("#cpp_converted"))
+      continue;
+    // The function stays bodyless, a havoc stub for every caller -- goto
+    // conversion does not diagnose that.
+    warning().source_location = sym->location;
+    warning() << "C++ front-end dropped the body of '" << sym->base_name
+              << "' (unsupported construct); calls to it return nondet"
+              << messaget::eom;
   }
 
   // N5008 [class.copy.ctor]/14, [class.default.ctor]/4: an implicitly-defined
@@ -401,6 +442,19 @@ void cpp_typecheckt::typecheck()
         }
       }
     }
+  }
+
+  if(!dropped_system_items.empty())
+  {
+    // One line at the default verbosity, the list at debug level: a
+    // dropped declaration is unresolved (or nondet) wherever it is used,
+    // which is exactly what a user chasing a wrong verdict needs to know.
+    warning() << "C++ front-end dropped " << dropped_system_items.size()
+              << " system-header declaration(s) it could not type-check; "
+              << "uses of them do not resolve or read as nondet "
+              << "(--verbosity 9 lists them)" << eom;
+    for(const auto &item : dropped_system_items)
+      debug() << "dropped system-header " << item << eom;
   }
 }
 
