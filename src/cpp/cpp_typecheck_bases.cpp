@@ -328,7 +328,17 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       vbases,
       virtual_base);
     auto &components = to_struct_type(type).components();
-    if(components.size() > first_new)
+    // the marker goes on the first component that occupies storage (the
+    // layout ignores member functions, static members and member types)
+    std::size_t first_storage = first_new;
+    while(first_storage < components.size() &&
+          (components[first_storage].type().id() == ID_code ||
+           components[first_storage].get_bool(ID_is_static) ||
+           components[first_storage].get_bool(ID_is_type)))
+    {
+      ++first_storage;
+    }
+    if(first_storage < components.size())
     {
       const namespacet ns(symbol_table);
       mp_integer base_alignment = alignment(base_struct_type, ns);
@@ -338,7 +348,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
         static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
       if(pack.has_value() && *pack > 0 && *pack < base_alignment)
         base_alignment = *pack;
-      components[first_new].set(
+      components[first_storage].set(
         ID_C_base_alignment, integer2string(base_alignment));
       if(!cpp_is_pod(base_struct_type))
       {
