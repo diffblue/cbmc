@@ -4015,7 +4015,13 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         all_sizes_known = false;
     }
     if(!already_padded && all_sizes_known)
+    {
+      // as for classes below: a union is a non-POD when a member is
+      // (GCC's packed rule)
+      if(!cpp_is_pod(union_type))
+        union_type.set(ID_C_non_pod, true);
       add_padding(union_type, ns);
+    }
   }
   else if(symbol.type.id() == ID_struct)
   {
@@ -4069,6 +4075,39 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         // packed structs (padding.cpp).
         if(!cpp_is_pod(struct_type))
           struct_type.set(ID_C_non_pod, true);
+        // GCC (cp/class.cc check_field_decls): a packed class with a data
+        // member of unpacked non-POD class type "cannot be packed" -- the
+        // other members are still packed individually, but the class is no
+        // longer a packed type: used as a member of another packed struct it
+        // is aligned naturally (clang differs; `packed' is a GNU extension,
+        // GCC is the reference).
+        if(struct_type.get_bool(ID_C_packed))
+        {
+          for(const auto &c : struct_type.components())
+          {
+            if(
+              c.type().id() == ID_code || c.get_bool(ID_is_static) ||
+              c.get_bool(ID_is_type) || c.get_bool(ID_from_base) ||
+              c.get_is_padding())
+              continue;
+            const typet *t = &c.type();
+            while(t->id() == ID_array)
+              t = &to_array_type(*t).element_type();
+            // (the member's own `packed' attribute does not help: GCC looks
+            // at the member's TYPE)
+            if(t->id() != ID_struct_tag)
+              continue;
+            const struct_typet &member_struct =
+              follow_tag(to_struct_tag_type(*t));
+            if(
+              member_struct.get_bool(ID_C_non_pod) &&
+              !member_struct.get_bool(ID_C_packed))
+            {
+              struct_type.set(ID_C_packed_cancelled, true);
+              break;
+            }
+          }
+        }
         add_padding(struct_type, ns);
         // Record the resulting alignment on the struct when it stems from an
         // explicit specifier, so that an enclosing struct sees it (above)

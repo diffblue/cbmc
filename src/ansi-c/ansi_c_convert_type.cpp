@@ -35,6 +35,15 @@ void ansi_c_convert_typet::read_rec(const typet &type)
         c_qualifiers.is_constant = true;
       if(subtype.get_bool(ID_C_volatile))
         c_qualifiers.is_volatile = true;
+      // A subtype that is an already converted plain type (the C++ front
+      // end merges a declarator's attributes onto a declaration type it
+      // has typechecked once for all declarators) may carry a `#pragma
+      // pack' cap; it is COUNTED below (c_bool, char, ...) and rebuilt
+      // fresh by write(), so the cap must be carried explicitly.  (An
+      // alignment on it is merged by the caller, see set_attributes.)
+      if(pragma_pack.is_nil() && subtype.find(ID_C_pragma_pack).is_not_nil())
+        pragma_pack =
+          static_cast<const exprt &>(subtype.find(ID_C_pragma_pack));
       read_rec(subtype);
     }
   }
@@ -731,7 +740,15 @@ void ansi_c_convert_typet::set_attributes(typet &type) const
       packed || !(existing_value.has_value() && new_value.has_value() &&
                   *existing_value >= *new_value))
     {
+      // replacing a typedef's (exact) alignment: the result is exact too
+      const bool exact = !packed && existing.get_bool(ID_C_typedef_alignment);
       type.set(ID_C_alignment, alignment);
+      if(exact)
+      {
+        static_cast<exprt &>(type.add(ID_C_alignment))
+          .set(ID_C_typedef_alignment, true);
+        type.set(ID_C_member_alignment, alignment);
+      }
     }
     else
     {

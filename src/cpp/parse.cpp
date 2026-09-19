@@ -7414,13 +7414,14 @@ bool Parser::rClassSpec(typet &spec)
 
   // `#pragma pack(n)' in effect at the closing brace: the class's own
   // alignment is capped at n (its base subobjects too -- see
-  // cpp_typecheck_bases.cpp); pack(1) makes it packed, as the C grammar's
-  // pragma_packed rule has it
+  // cpp_typecheck_bases.cpp).  The members carry the cap individually, so
+  // pack(1) already lays the class out like `packed'; it is NOT marked
+  // packed (unlike the C grammar's pragma_packed rule): GCC's non-POD rule
+  // for packed structs distinguishes a `packed' class type from one merely
+  // defined under `#pragma pack(1)' (only the attribute sets TYPE_PACKED).
   {
     cpp_tokent next;
     lex.LookAhead(0, next);
-    if(next.pragma_pack == 1)
-      spec.set(ID_C_packed, true);
     if(next.pragma_pack > 0)
     {
       spec.add(ID_C_pragma_pack) =
