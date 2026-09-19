@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+found no match
+--
+N5008 [dcl.init.list]/1 + [over.match.list]/1: explicit initializer-list
+constructors are candidates in direct-list-initialization (`T x{...}',
+`T{...}', `new T{...}'); the parser marks the direct forms
+(ID_C_direct_list_init) so the type checker can tell them from
+copy-list-initialization (a function argument), where the explicit
+constructor must not be chosen.
