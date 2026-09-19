@@ -58,7 +58,19 @@ add_declaration_alignment(typet &type, const exprt &alignment, bool packed)
     type.add(ID_C_member_alignment) = alignment;
     return;
   }
+  // The larger attribute replaces a typedef's alignment; the typedef had set
+  // the type's alignment EXACTLY (possibly below the natural one), so the
+  // result is exact too: `typedef U __attribute__((aligned(1))) T; T m
+  // __attribute__((aligned(8)));' with a 16-byte-aligned U gives 8, not 16.
+  const bool exact =
+    existing.is_not_nil() && existing.get_bool(ID_C_typedef_alignment);
   type.add(ID_C_alignment) = alignment;
+  if(exact)
+  {
+    static_cast<exprt &>(type.add(ID_C_alignment))
+      .set(ID_C_typedef_alignment, true);
+    type.add(ID_C_member_alignment) = alignment;
+  }
 }
 
 void c_typecheck_baset::typecheck_type(typet &type)

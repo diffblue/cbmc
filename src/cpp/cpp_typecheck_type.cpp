@@ -240,7 +240,18 @@ void cpp_typecheckt::typecheck_type(typet &type)
           given_packed ||
           !(given.has_value() && existing.has_value() && *existing > *given))
         {
+          // replacing a typedef's (exact) alignment: the result is exact
+          // too (`typedef U __attribute__((aligned(1))) T; T m
+          // __attribute__((aligned(8)))' with a 16-byte-aligned U gives 8)
+          const bool exact =
+            !given_packed && typedef_alignment.get_bool(ID_C_typedef_alignment);
           type.add(ID_C_alignment) = given_alignment;
+          if(exact)
+          {
+            static_cast<exprt &>(type.add(ID_C_alignment))
+              .set(ID_C_typedef_alignment, true);
+            type.add(ID_C_member_alignment) = given_alignment;
+          }
         }
         else
         {
