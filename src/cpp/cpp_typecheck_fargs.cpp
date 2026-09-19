@@ -323,6 +323,18 @@ static bool brace_init_is_viable(
 /// (`cpp_typecheck_conversionst::implicit_typecast`'s
 /// brace-to-initializer_list branch), which calls
 /// `implicit_typecast(val, elem_type)` per element.
+/// N5008 [over.ics.list]/10: for a parameter of REFERENCE type the
+/// list-initialization rules apply to the referenced type, so
+/// `std::initializer_list<X> &&' (libstdc++'s shape for several
+/// constructors) and `const std::initializer_list<X> &' accept a
+/// brace-init-list like `std::initializer_list<X>' does.
+static const typet &init_list_referent(const typet &type)
+{
+  if(is_reference(type) || is_rvalue_reference(type))
+    return to_pointer_type(type).base_type();
+  return type;
+}
+
 static bool brace_init_to_init_list_is_viable(
   const exprt &operand,
   const typet &target_type,
@@ -500,10 +512,12 @@ bool cpp_typecheck_fargst::match(
       distance += rank;
     }
     else if(
-      operand.id() == ID_initializer_list && type.id() == ID_struct_tag &&
-      id2string(to_struct_tag_type(type).get_identifier())
+      operand.id() == ID_initializer_list &&
+      init_list_referent(type).id() == ID_struct_tag &&
+      id2string(to_struct_tag_type(init_list_referent(type)).get_identifier())
           .find("tag-initializer_list<") != std::string::npos &&
-      brace_init_to_init_list_is_viable(operand, type, cpp_typecheck))
+      brace_init_to_init_list_is_viable(
+        operand, init_list_referent(type), cpp_typecheck))
     {
       // [over.ics.list]/4: brace-init-list to `std::initializer_list<X>`
       // is a viable conversion only if every element of the list has

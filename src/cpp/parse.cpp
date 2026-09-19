@@ -315,6 +315,7 @@ protected:
 
   bool rFunctionArguments(exprt &);
   bool rInitializeExpr(exprt &);
+  static void mark_direct_list_init(exprt &);
 
   bool rEnumSpec(typet &);
   bool rEnumBody(irept &);
@@ -4615,6 +4616,7 @@ bool Parser::rDeclaratorWithInit(
       {
         if(!rInitializeExpr(declarator.value()))
           return false;
+        mark_direct_list_init(declarator.value());
       }
     }
     else if(t==':')
@@ -6684,6 +6686,17 @@ bool Parser::rArgDeclaration(cpp_declarationt &declaration)
 
   C++11 [dcl.init] (A.7)
 */
+/// N5008 [dcl.init.list]/1: `T x{...}', `T{...}' and `new T{...}' are
+/// DIRECT-list-initialization, where explicit constructors are candidates
+/// ([over.match.list]/1 excludes them from being chosen only in
+/// copy-list-initialization).  The type checker cannot tell the two forms
+/// apart from the braced list alone, so the parser marks the direct form.
+void Parser::mark_direct_list_init(exprt &expr)
+{
+  if(expr.id() == ID_initializer_list)
+    expr.set(ID_C_direct_list_init, true);
+}
+
 bool Parser::rInitializeExpr(exprt &expr)
 {
   if(lex.LookAhead(0)!='{')
@@ -9655,6 +9668,7 @@ bool Parser::rAllocateType(
     // this is a C++11 extension
     if(!rInitializeExpr(initializer))
       return false;
+    mark_direct_list_init(initializer);
   }
 
   return true;
@@ -11153,6 +11167,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
           exprt exp2;
           if(!rInitializeExpr(exp2))
             return false;
+          mark_direct_list_init(exp2);
 
           exp=exprt("explicit-constructor-call");
           exp.type().swap(type);
@@ -11192,6 +11207,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
           exprt exp2;
           if(!rInitializeExpr(exp2))
             return false;
+          mark_direct_list_init(exp2);
 
           typet type2;
           type2.swap(exp);
