@@ -37,6 +37,15 @@ std::optional<mp_integer> member_offset(
     if(comp.get_name() == member)
       return result;
 
+    // member typedefs, static members and methods of a C++ class occupy no
+    // storage (as in size_of_expr_rec)
+    if(
+      comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+      comp.type().id() == ID_code)
+    {
+      continue;
+    }
+
     if(comp.type().id() == ID_c_bit_field)
     {
       const std::size_t w = to_c_bit_field_type(comp.type()).get_width();
@@ -86,6 +95,15 @@ std::optional<mp_integer> member_offset_bits(
   {
     if(comp.get_name()==member)
       return offset;
+
+    // member typedefs, static members and methods of a C++ class occupy no
+    // storage (as in size_of_expr_rec)
+    if(
+      comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+      comp.type().id() == ID_code)
+    {
+      continue;
+    }
 
     auto member_bits = pointer_offset_bits(comp.type(), ns);
     if(!member_bits.has_value())
@@ -296,6 +314,15 @@ std::optional<exprt> member_offset_expr(
     if(c.get_name() == member)
       break;
 
+    // member typedefs, static members and methods of a C++ class occupy no
+    // storage (as in size_of_expr_rec)
+    if(
+      c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+      c.type().id() == ID_code)
+    {
+      continue;
+    }
+
     if(c.type().id() == ID_c_bit_field)
     {
       std::size_t w = to_c_bit_field_type(c.type()).get_width();
@@ -458,6 +485,15 @@ static std::optional<exprt> size_of_expr_rec(
 
     for(const auto &c : union_type.components())
     {
+      // member typedefs, static members and methods of a C++ union occupy
+      // no storage
+      if(
+        c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
+        c.type().id() == ID_code)
+      {
+        continue;
+      }
+
       const typet &subtype = c.type();
       exprt sub_size;
 

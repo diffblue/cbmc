@@ -124,10 +124,15 @@ static bool is_non_pod_class(const typet &type, const namespacet &ns)
     t = &to_array_type(*t).element_type();
   if(t->id() == ID_struct_tag)
     t = &ns.follow_tag(to_struct_tag_type(*t));
+  else if(t->id() == ID_union_tag)
+    t = &ns.follow_tag(to_union_tag_type(*t));
   // GCC's "UNPACKED non-POD field": a non-POD class that is itself packed
-  // is packed in the enclosing struct like any other member
-  return t->id() == ID_struct && t->get_bool(ID_C_non_pod) &&
-         !t->get_bool(ID_C_packed);
+  // is packed in the enclosing struct like any other member -- unless its
+  // own `packed' was cancelled by an unpacked non-POD member of its own
+  // (ID_C_packed_cancelled, cpp_typecheck_compound_type.cpp)
+  return (t->id() == ID_struct || t->id() == ID_union) &&
+         t->get_bool(ID_C_non_pod) &&
+         (!t->get_bool(ID_C_packed) || t->get_bool(ID_C_packed_cancelled));
 }
 
 static mp_integer alignment_rec(
@@ -211,7 +216,7 @@ static mp_integer alignment_rec(
         // a C++ base subobject keeps the base's alignment
         result = std::max(result, base_subobject_alignment(c));
         // a non-POD C++ class member is not packed (see add_padding_gcc)
-        if(!member_alignment.has_value() && is_non_pod_class(c.type(), ns))
+        if(is_non_pod_class(c.type(), ns))
           result =
             std::max(result, alignment_rec(c.type(), ns, in_progress, done));
         // GCC: a named bit-field of a packed struct declared under
@@ -666,9 +671,11 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         // A zero-width bit-field causes alignment to the base-type -- its
         // FULL alignment, not capped by #pragma pack(n) (GCC: `#pragma
         // pack(4)' with `char c; long long : 0; char d;' puts d at 8).
+        // One flattened in from a base class already did its work in the
+        // base's own layout (see from_base above).
         typet underlying = to_c_bit_field_type(it_type).underlying_type();
         underlying.remove(ID_C_pragma_pack);
-        a = alignment(underlying, ns);
+        a = from_base ? 1 : alignment(underlying, ns);
       }
       else
       {
@@ -776,9 +783,10 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       const auto member_alignment = explicit_member_alignment(it_type);
       a = member_alignment.has_value() ? *member_alignment : 1;
       // ... or is a non-POD C++ class, which GCC and Clang do not pack
-      // ("ignoring packed attribute because of unpacked non-POD field")
-      if(!member_alignment.has_value() && is_non_pod_class(it_type, ns))
-        a = alignment(it_type, ns);
+      // ("ignoring packed attribute because of unpacked non-POD field"):
+      // its natural alignment, raised (only) by the member's own `aligned'
+      if(is_non_pod_class(it_type, ns))
+        a = std::max(a, alignment(it_type, ns));
     }
     else
     {

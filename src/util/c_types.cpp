@@ -307,6 +307,15 @@ union_typet::find_widest_union_component(const namespacet &ns) const
 
   for(const auto &comp : comps)
   {
+    // member typedefs, static members and methods of a C++ union occupy no
+    // storage
+    if(
+      comp.get_bool(ID_is_type) || comp.get_bool(ID_is_static) ||
+      comp.type().id() == ID_code)
+    {
+      continue;
+    }
+
     auto element_width = pointer_offset_bits(comp.type(), ns);
 
     if(!element_width.has_value())
