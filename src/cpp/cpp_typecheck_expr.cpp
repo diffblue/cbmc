@@ -3099,7 +3099,23 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     }
 
     new_expr->add_source_location() = expr.source_location();
-    expr = *new_expr;
+
+    // N5008 [expr.type.conv]/2 + [class.temporary]/2: `T()' for a class
+    // type is a prvalue whose temporary is materialised when a member is
+    // accessed (`B().g()', `T().m').  A bare struct constant has no object
+    // to bind the implicit object parameter to ("found no match for symbol
+    // 'g'"); produce the same compound literal the one-operand and braced
+    // forms produce, which the member-access code knows how to address.
+    if(expr.type().id() == ID_struct_tag || expr.type().id() == ID_union_tag)
+    {
+      exprt tmp(ID_compound_literal, expr.type());
+      tmp.add_to_operands(std::move(*new_expr));
+      tmp.add_source_location() = expr.source_location();
+      tmp.set(ID_C_lvalue, true);
+      expr = std::move(tmp);
+    }
+    else
+      expr = *new_expr;
   }
   else if(expr.operands().size() == 1)
   {
