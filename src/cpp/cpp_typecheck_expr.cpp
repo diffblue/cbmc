@@ -2975,8 +2975,28 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
       expr.find_source_location(),
       &cpp_scopes.current_scope());
 
-  auto code = cpp_constructor(
-    expr.find_source_location(), object_expr, initializer.operands());
+  // N5008 [expr.new]/23 + [dcl.init.list]/3: `new T{...}' is
+  // direct-list-initialization; [over.match.list]/1 phase 1 tries the
+  // initializer-list constructors with the whole list as the argument,
+  // phase 2 the elements (the parenthesised form's operands).
+  exprt::operandst new_args = initializer.operands();
+  if(
+    initializer.id() == ID_initializer_list && !new_args.empty() &&
+    has_viable_init_list_constructor(
+      to_pointer_type(expr.type()).base_type(), initializer))
+  {
+    auto il_val = build_init_list_argument(
+      to_pointer_type(expr.type()).base_type(), initializer);
+    if(il_val.has_value())
+    {
+      already_typechecked_exprt::make_already_typechecked(*il_val);
+      new_args.clear();
+      new_args.push_back(std::move(*il_val));
+    }
+  }
+
+  auto code =
+    cpp_constructor(expr.find_source_location(), object_expr, new_args);
 
   // N5008 [expr.new]/17: a new-initializer that is an EMPTY pair of
   // parentheses value-initializes the object ([dcl.init.general]/9); for
@@ -3282,7 +3302,10 @@ bool cpp_typecheckt::has_viable_init_list_constructor(
       continue;
     if(to_code_type(c.type()).return_type().id() != ID_constructor)
       continue;
-    if(c.get_bool(ID_is_explicit))
+    // N5008 [over.match.list]/1: explicit constructors ARE candidates; only
+    // in copy-list-initialization is choosing one ill-formed.  The parser
+    // marks the direct forms (`T x{...}', `T{...}', `new T{...}').
+    if(c.get_bool(ID_is_explicit) && !init_list.get_bool(ID_C_direct_list_init))
       continue;
     const auto &params = to_code_type(c.type()).parameters();
     if(params.size() < 2)
