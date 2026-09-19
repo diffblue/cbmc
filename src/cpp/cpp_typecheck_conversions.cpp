@@ -4533,8 +4533,9 @@ bool cpp_typecheckt::const_typecast(
     if(type != new_expr.type())
       return false;
 
-    // add proper typecast
-    typecast_exprt typecast_expr(expr, type);
+    // add proper typecast -- to the CONVERTED operand (the array-to-pointer
+    // conversion above, [expr.const.cast]/1), not to the array itself
+    typecast_exprt typecast_expr(new_expr, type);
     new_expr.swap(typecast_expr);
     return true;
   }
@@ -4732,7 +4733,13 @@ bool cpp_typecheckt::reinterpret_typecast(
   {
     // pointer to pointer: we ok it all.
     // This is more generous than the standard.
-    new_expr = typecast_exprt::conditional_cast(expr, type);
+    // The cast applies to the CONVERTED operand `e' ([expr.reinterpret.cast]
+    // /1: the array-to-pointer conversion above): casting the original
+    // array (`reinterpret_cast<int *>(buf)' for `unsigned char buf[4]', the
+    // aligned-storage idiom) produced a typecast of an array value, which
+    // symbolic execution cannot relate to the object's address (pointer
+    // differences UNKNOWN, reads through it FAILURE).
+    new_expr = typecast_exprt::conditional_cast(e, type);
     return true;
   }
 

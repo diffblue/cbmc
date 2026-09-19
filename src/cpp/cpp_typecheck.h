@@ -240,6 +240,8 @@ protected:
   void convert(cpp_declarationt &);
   void convert(cpp_declaratort &);
   void convert(cpp_static_assertt &);
+  static void
+  propagate_constants(exprt &expr, const symbol_table_baset &symbol_table);
 
   void convert_initializer(symbolt &symbol);
   void convert_function(symbolt &symbol);
