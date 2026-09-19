@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 /// \param source_location: source location for generated code
@@ -610,6 +611,87 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     const struct_typet &struct_type =
       follow_tag(to_struct_tag_type(object_tc.type()));
+
+    // N5008 [dcl.init.general]/16.6.3 + [over.match.copy]: initialising a
+    // class T from a single operand of a DIFFERENT class S (not derived
+    // from T) is a user-defined conversion -- the conversion functions of
+    // S yielding T, or a converting constructor of T whose parameter takes
+    // S without a further user-defined conversion ([over.best.ics.general]
+    // /4) -- followed by copy/move construction from the result.  g++ and
+    // clang apply the same to direct-initialization (CWG 2327).  Overload
+    // resolution over ALL constructors, each argument free to use a
+    // user-defined conversion, made `std::vector<int> v = range;'
+    // ambiguous: the conversion function TEMPLATE `operator C() const'
+    // reaches vector(size_type), vector(vector &&) and
+    // vector(initializer_list) alike, with a different C each time.
+    if(operands_tc.size() == 1)
+    {
+      typet source_type = operands_tc.front().type();
+      if(is_reference(source_type))
+        source_type = to_reference_type(source_type).base_type();
+      // A constructor of T whose parameter takes S itself (by value or
+      // reference, or a base of S) is an exact match and wins the
+      // ordinary overload resolution below; only when no such constructor
+      // exists can the conversion functions of S decide.
+      bool has_direct_ctor = false;
+      if(
+        source_type.id() == ID_struct_tag &&
+        to_struct_tag_type(source_type).get_identifier() !=
+          to_struct_tag_type(object_tc.type()).get_identifier())
+      {
+        for(const auto &c : struct_type.components())
+        {
+          if(
+            c.type().id() != ID_code ||
+            to_code_type(c.type()).return_type().id() != ID_constructor)
+            continue;
+          const auto &params = to_code_type(c.type()).parameters();
+          if(params.size() < 2)
+            continue;
+          typet pt = params[1].type();
+          if(is_reference(pt))
+            pt = to_reference_type(pt).base_type();
+          if(pt.id() != ID_struct_tag)
+            continue;
+          if(
+            to_struct_tag_type(pt).get_identifier() ==
+              to_struct_tag_type(source_type).get_identifier() ||
+            subtype_typecast(
+              follow_tag(to_struct_tag_type(source_type)),
+              follow_tag(to_struct_tag_type(pt))))
+          {
+            has_direct_ctor = true;
+            break;
+          }
+        }
+      }
+      if(
+        !has_direct_ctor && source_type.id() == ID_struct_tag &&
+        to_struct_tag_type(source_type).get_identifier() !=
+          to_struct_tag_type(object_tc.type()).get_identifier() &&
+        !subtype_typecast(
+          follow_tag(to_struct_tag_type(source_type)), struct_type))
+      {
+        exprt converted;
+        unsigned rank = 0;
+        bool converts = false;
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          converts = user_defined_conversion_sequence(
+            operands_tc.front(), object_tc.type(), converted, rank);
+        }
+        catch(...)
+        {
+          converts = false;
+        }
+        if(converts && converted.is_not_nil())
+        {
+          already_typechecked_exprt::make_already_typechecked(converted);
+          return cpp_constructor(source_location, object, {converted});
+        }
+      }
+    }
 
     // C++17 aggregate initialization with base classes, and C++20
     // parenthesized aggregate initialization (P0960, N5008
