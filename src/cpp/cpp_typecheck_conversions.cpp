@@ -4072,6 +4072,47 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       }
     }
 
+    // N5008 [over.ics.list]/10 + [dcl.init.list]/3.10: a brace-init-list
+    // for a REFERENCE to std::initializer_list<T> (`initializer_list<T> &&',
+    // `const initializer_list<T> &', libstdc++ and user code alike)
+    // initializes a temporary initializer_list -- the conversion below --
+    // and binds the reference to it.
+    if(
+      orig_expr.id() == ID_initializer_list && type.id() == ID_pointer &&
+      is_reference(type) &&
+      to_pointer_type(type).base_type().id() == ID_struct_tag &&
+      id2string(
+        to_struct_tag_type(to_pointer_type(type).base_type()).get_identifier())
+          .find("tag-initializer_list<") != std::string::npos)
+    {
+      const typet &il_type = to_pointer_type(type).base_type();
+      exprt il_value = orig_expr;
+      implicit_typecast(il_value, il_type);
+      if(il_value.type() == il_type)
+      {
+        // The initializer_list object itself lives alongside its backing
+        // array (see below); the reference binds to that object.
+        const auto il_id = "__init_list$" + std::to_string(anon_counter++);
+        auxiliary_symbolt il_sym;
+        il_sym.name = il_id;
+        il_sym.base_name = il_id;
+        il_sym.type = il_type;
+        il_sym.mode = ID_cpp;
+        il_sym.is_static_lifetime = true;
+        il_sym.is_lvalue = true;
+        il_sym.location = orig_expr.source_location();
+        il_sym.value = il_value;
+        symbol_table.add(il_sym);
+        symbol_exprt il_ref(il_id, il_type);
+        il_ref.set(ID_C_lvalue, true);
+        il_ref.add_source_location() = orig_expr.source_location();
+        address_of_exprt bound{il_ref, to_pointer_type(type)};
+        bound.add_source_location() = orig_expr.source_location();
+        expr = std::move(bound);
+        return;
+      }
+    }
+
     // Brace-init-list to std::initializer_list<T> conversion (C++11):
     // {a, b, c} creates a backing array and constructs the
     // initializer_list with _begin and _size.
