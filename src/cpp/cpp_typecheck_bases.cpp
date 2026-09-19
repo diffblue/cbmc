@@ -334,14 +334,36 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     while(first_storage < components.size() &&
           (components[first_storage].type().id() == ID_code ||
            components[first_storage].get_bool(ID_is_static) ||
-           components[first_storage].get_bool(ID_is_type)))
+           components[first_storage].get_bool(ID_is_type) ||
+           (components[first_storage].type().id() == ID_c_bit_field &&
+            to_c_bit_field_type(components[first_storage].type()).get_width() ==
+              0)))
     {
       ++first_storage;
     }
-    if(first_storage < components.size())
+    const namespacet ns(symbol_table);
+    mp_integer base_alignment = alignment(base_struct_type, ns);
+    if(first_storage >= components.size())
     {
-      const namespacet ns(symbol_table);
-      mp_integer base_alignment = alignment(base_struct_type, ns);
+      // an EMPTY base (its padding was dropped): no subobject to place, but
+      // an over-aligned one (`struct alignas(16) E {};') still aligns the
+      // derived class -- record it as the class's alignment requirement.
+      // (g++ and clang do not cap it under `#pragma pack', unlike a
+      // non-empty base's alignment.)
+      const exprt &current =
+        static_cast<const exprt &>(type.find(ID_C_alignment));
+      const auto current_value = current.is_nil()
+                                   ? std::optional<mp_integer>{}
+                                   : numeric_cast<mp_integer>(current);
+      if(
+        base_alignment > 1 &&
+        !(current_value.has_value() && *current_value >= base_alignment))
+      {
+        type.add(ID_C_alignment) = from_integer(base_alignment, size_type());
+      }
+    }
+    else
+    {
       // `#pragma pack(n)' around the derived class definition caps the
       // base subobject's alignment as well (GCC)
       const auto pack = numeric_cast<mp_integer>(
@@ -423,6 +445,9 @@ void cpp_typecheckt::add_base_components(
   if(is_virtual)
     vbases.insert(from_name);
 
+  // where this base subobject starts in `to' (see the copy loop below)
+  const std::size_t first_of_from = to.components().size();
+
   // look at the the parents of the base type
   for(const auto &b : from.bases())
   {
@@ -456,6 +481,15 @@ void cpp_typecheckt::add_base_components(
 
   // add the components
   struct_typet::componentst &dest_c=to.components();
+  // The recursion above appended the components of `from's own bases; the
+  // components `from' adds itself are inserted at their position within
+  // `from's layout (`from' has been laid out: its padding sits between and
+  // after its base subobjects, e.g. after an empty-typed member of its first
+  // base and before its second base -- appending it at the end put the
+  // padding after the second base's pointer, so a byte-offset access hit
+  // the wrong bytes).  `cursor' walks `from.components()' and `dest_c' in
+  // step.
+  std::size_t cursor = first_of_from;
 
   // Access of a base member, as inherited through an edge with the
   // given protection ([class.access.base]/1), preserving inaccessible
@@ -471,8 +505,29 @@ void cpp_typecheckt::add_base_components(
     return member == ID_private ? ID_noaccess : ID_private;
   };
 
+  // An EMPTY base class has no storage member of its own -- only the byte
+  // that makes it a nonzero-sized complete object ([class]/4).  As a base
+  // subobject it may have zero size ([intro.object]/9; the Itanium ABI's
+  // empty base optimisation): drop its padding on flattening.
+  bool base_is_empty = true;
   for(const auto &c : from.components())
   {
+    if(
+      c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+      !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+      !(c.type().id() == ID_c_bit_field &&
+        to_c_bit_field_type(c.type()).get_width() == 0))
+    {
+      base_is_empty = false;
+      break;
+    }
+  }
+
+  for(const auto &c : from.components())
+  {
+    if(base_is_empty && c.get_is_padding())
+      continue;
+
     const irep_idt new_access = inherited_access(access, c.get_access());
 
     if(c.get_bool(ID_from_base))
@@ -483,19 +538,25 @@ void cpp_typecheckt::add_base_components(
       // class's access: an intermediate base may have changed it with a
       // using-declaration ([namespace.udecl]/19), e.g. binary_exprt's
       // public `using exprt::op0;` republishing the protected op0.
-      for(auto &d : dest_c)
+      for(std::size_t i = 0; i < dest_c.size(); ++i)
       {
+        auto &d = dest_c[i];
         if(d.get_bool(ID_from_base) && d.get_name() == c.get_name())
+        {
           d.set_access(new_access);
+          if(i >= first_of_from)
+            cursor = i + 1;
+        }
       }
       continue;
     }
 
-    // copy the component
-    dest_c.push_back(c);
+    // copy the component, at its position within `from's layout
+    auto inserted = dest_c.insert(dest_c.begin() + cursor, c);
+    ++cursor;
 
     // now twiddle the copy
-    struct_typet::componentt &component=dest_c.back();
+    struct_typet::componentt &component = *inserted;
     component.set(ID_from_base, true);
     component.set_access(new_access);
 

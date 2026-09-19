@@ -4017,9 +4017,29 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     if(!already_padded && all_sizes_known)
     {
       // as for classes below: a union is a non-POD when a member is
-      // (GCC's packed rule)
+      // (GCC's packed rule), and an EMPTY union is a one-byte object
       if(!cpp_is_pod(union_type))
         union_type.set(ID_C_non_pod, true);
+      bool has_storage = false;
+      for(const auto &c : union_type.components())
+      {
+        if(
+          c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+          !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+          !(c.type().id() == ID_c_bit_field &&
+            to_c_bit_field_type(c.type()).get_width() == 0))
+        {
+          has_storage = true;
+          break;
+        }
+      }
+      if(!has_storage)
+      {
+        struct_typet::componentt empty_byte(
+          "$empty", unsignedbv_typet(config.ansi_c.char_width));
+        empty_byte.set_is_padding(true);
+        union_type.components().push_back(std::move(empty_byte));
+      }
       add_padding(union_type, ns);
     }
   }
@@ -4075,6 +4095,34 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         // packed structs (padding.cpp).
         if(!cpp_is_pod(struct_type))
           struct_type.set(ID_C_non_pod, true);
+        // N5008 [class]/4 (and [intro.object]/9): a complete object of class
+        // type has a nonzero size; an empty class is one byte (more when
+        // over-aligned, add_padding pads it up).  The byte is a padding
+        // component, so the class has a real object with an address and an
+        // empty MEMBER occupies its byte; an empty BASE subobject is folded
+        // away on flattening (cpp_typecheck_bases.cpp).  sizeof used to
+        // special-case the zero-sized object to report 1.
+        bool has_storage = false;
+        for(const auto &c : struct_type.components())
+        {
+          // (a zero-width bit-field occupies no storage either, [class.bit]/2)
+          if(
+            c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+            !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+            !(c.type().id() == ID_c_bit_field &&
+              to_c_bit_field_type(c.type()).get_width() == 0))
+          {
+            has_storage = true;
+            break;
+          }
+        }
+        if(!has_storage)
+        {
+          struct_typet::componentt empty_byte(
+            "$empty", unsignedbv_typet(config.ansi_c.char_width));
+          empty_byte.set_is_padding(true);
+          struct_type.components().push_back(std::move(empty_byte));
+        }
         // GCC (cp/class.cc check_field_decls): a packed class with a data
         // member of unpacked non-POD class type "cannot be packed" -- the
         // other members are still packed individually, but the class is no

@@ -129,6 +129,10 @@ static bool brace_init_is_viable(
   bool has_init_list_ctor = false;
   for(const auto &c : class_type.components())
   {
+    // layout padding (including the byte of an empty class) is not an
+    // aggregate element ([dcl.init.aggr]/2)
+    if(c.get_is_padding())
+      continue;
     if(c.get_bool(ID_is_type) || c.get_bool(ID_is_static))
       continue;
     if(c.type().id() == ID_code)
