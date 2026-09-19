@@ -41,9 +41,20 @@ ENUM_BASES = ["unsigned char", "signed char", "unsigned short", "short",
 
 
 class Gen:
-    def __init__(self, rng, cxx):
+    def __init__(self, rng, cxx, virtual=False, virtual_all=False):
         self.rng = rng
         self.cxx = cxx
+        # C++: virtual member functions (Itanium C++ ABI 2.4 II: the vptr
+        # at offset 0 of a dynamic class whose bases are not dynamic).  Off
+        # by default: the layout of a dynamic class is a separate rule set
+        # from the plain-data layout.
+        self.virtual = virtual and cxx
+        # ... plus classes deriving from dynamic bases (primary base, shared
+        # vptr) and virtual bases (laid out after the non-virtual part).
+        # CBMC models both differently (one vptr per class that declares
+        # virtual functions; virtual bases flattened in front with a
+        # most-derived marker), so this mode reports KNOWN divergences.
+        self.virtual_all = virtual_all and self.virtual
         self.decls = []
         self.structs = []  # (name, [member names], is_union, has_bases)
         self.enums = []    # (name, base, bits)
@@ -135,14 +146,24 @@ class Gen:
         bases = []
         # C++: base classes (including empty ones; [class.mem], Itanium ABI
         # base-subobject layout).  Unions cannot have bases.
+        dynamic = False
         if self.cxx and not is_union and self.rng.random() < 0.3:
-            candidates = [b for b in self.structs if not b[2] and not b[3]]
+            candidates = [b for b in self.structs if not b[2] and not b[3]
+                          and (self.virtual_all or not (len(b) > 4 and b[4]))]
             if self.rng.random() < 0.4:
                 empty = self.fresh("EB")
                 self.decls.append("struct %s {};" % empty)
                 bases.append(empty)
             for b in self.rng.sample(candidates, min(len(candidates), self.rng.randint(1, 2))):
-                bases.append(b[0])
+                if self.virtual_all and self.rng.random() < 0.35:
+                    # a virtual base ([class.mi]/4): shared, laid out after
+                    # the non-virtual part (Itanium C++ ABI 2.4 III)
+                    bases.append("virtual " + b[0])
+                    dynamic = True
+                else:
+                    bases.append(b[0])
+                if len(b) > 4 and b[4]:
+                    dynamic = True
         n = self.rng.randint(1, 7)
         for _ in range(n):
             m = self.fresh("m")
@@ -185,6 +206,18 @@ class Gen:
                 members.append((m, False))
         if self.cxx:
             self.gen_non_storage_members(name, lines, is_union)
+        if self.virtual and not is_union and self.rng.random() < 0.4:
+            # virtual member functions: the class is dynamic and carries a
+            # vptr at offset 0 unless a primary base supplies one (Itanium
+            # C++ ABI 2.4 II).  Declared at a random position so that a
+            # vptr placed where the first virtual function appears (rather
+            # than at the start) shows up.
+            extras = ["  virtual int %s() { return 1; }" % self.fresh("vf")]
+            if self.rng.random() < 0.3:
+                extras.append("  virtual ~%s() {}" % name)
+            for e in extras:
+                lines.insert(self.rng.randint(0, len(lines)), e)
+            dynamic = True
         key = "union" if is_union else "struct"
         head = "%s %s" % (key, name)
         trailing = self.attr(key)
@@ -197,6 +230,12 @@ class Gen:
                 trailing = ""
         if bases:
             head += " : " + ", ".join("public " + b for b in bases)
+        if dynamic:
+            # GCC ignores `packed' on a class with a vptr or virtual bases
+            # in a way that differs from clang; keep those out of the
+            # dynamic-class runs (aligned() is fine).
+            trailing = trailing.replace("packed, ", "").replace(
+                " __attribute__((packed))", "")
         decl = "%s\n{\n%s\n}%s;" % (head, "\n".join(lines), trailing)
         # #pragma pack(n) around some declarations (GCC/MSVC extension:
         # member alignment capped at n)
@@ -204,7 +243,7 @@ class Gen:
             n_pack = self.rng.choice([1, 2, 4, 8])
             decl = "#pragma pack(push, %d)\n%s\n#pragma pack(pop)" % (n_pack, decl)
         self.decls.append(decl)
-        self.structs.append((name, members, is_union, bool(bases)))
+        self.structs.append((name, members, is_union, bool(bases), dynamic))
 
     def gen_non_storage_members(self, name, lines, is_union):
         # N5008 [class.mem]: member typedefs/alias-declarations, static data
@@ -254,7 +293,15 @@ def native_values(gen, cc, cxx, workdir):
         for m, is_bf in s[1]:
             if is_bf:
                 continue
-            lines.append('  printf("%s.%s %%zu\\n", offsetof(%s, %s));' % (s[0], m, tn, m))
+            if cxx and len(s) > 4 and s[4]:
+                # N5008 [support.types.layout]/1: offsetof is conditionally
+                # supported for a non-standard-layout class and g++ rejects
+                # it through a virtual base; measure a dynamic class on an
+                # object instead.
+                lines.append('  { %s o; printf("%s.%s %%zu\\n", (size_t)((char *)&o.%s - (char *)&o)); }'
+                             % (tn, s[0], m, m))
+            else:
+                lines.append('  printf("%s.%s %%zu\\n", offsetof(%s, %s));' % (s[0], m, tn, m))
     lines.append("  return 0;\n}")
     src = os.path.join(workdir, "probe.%s" % ("cpp" if cxx else "c"))
     with open(src, "w") as f:
@@ -295,8 +342,12 @@ def cbmc_unit(gen, values, cxx, workdir):
             if is_bf:
                 continue
             off = values["%s.%s" % (s[0], m)]
-            lines.append('  __CPROVER_assert(offsetof(%s, %s) == %d, "offsetof %s.%s == %d");'
-                         % (tn, m, off, s[0], m, off))
+            if cxx and len(s) > 4 and s[4]:
+                lines.append('  { %s o; __CPROVER_assert((char *)&o.%s - (char *)&o == %d, "offsetof %s.%s == %d"); }'
+                             % (tn, m, off, s[0], m, off))
+            else:
+                lines.append('  __CPROVER_assert(offsetof(%s, %s) == %d, "offsetof %s.%s == %d");'
+                             % (tn, m, off, s[0], m, off))
     lines.append("  return 0;\n}")
     src = os.path.join(workdir, "unit.%s" % ("cpp" if cxx else "c"))
     with open(src, "w") as f:
@@ -319,6 +370,11 @@ def main():
     ap.add_argument("--cbmc", default="build-work/bin/cbmc")
     ap.add_argument("--cc", default=None, help="native compiler (gcc / g++)")
     ap.add_argument("--cxx", action="store_true", help="generate C++")
+    ap.add_argument("--virtual", action="store_true",
+                    help="C++: virtual member functions (root dynamic classes)")
+    ap.add_argument("--virtual-all", action="store_true",
+                    help="C++: also dynamic bases and virtual bases "
+                         "(known divergences from the Itanium ABI)")
     ap.add_argument("--seed", type=int, default=1)
     ap.add_argument("--iterations", type=int, default=50)
     ap.add_argument("--structs", type=int, default=6)
@@ -332,7 +388,8 @@ def main():
     for it in range(args.iterations):
         seed = args.seed + it
         rng = random.Random(seed)
-        gen = Gen(rng, args.cxx)
+        gen = Gen(rng, args.cxx, args.virtual or args.virtual_all,
+                  args.virtual_all)
         for _ in range(rng.randint(1, 3)):
             gen.gen_enum()
         for i in range(args.structs):
