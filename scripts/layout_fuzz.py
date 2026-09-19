@@ -183,13 +183,21 @@ class Gen:
                 else:
                     lines.append("  %s%s %s%s;" % (prefix, t, m, member_attr))
                 members.append((m, False))
+        if self.cxx:
+            self.gen_non_storage_members(name, lines, is_union)
         key = "union" if is_union else "struct"
         head = "%s %s" % (key, name)
+        trailing = self.attr(key)
         if self.cxx and self.rng.random() < 0.08:
             head = "%s alignas(%d) %s" % (key, self.rng.choice([16, 32]), name)
+            # g++ lets a trailing `aligned(k)' override a class-head alignas;
+            # clang and N5008 [dcl.align]/4 take the strictest.  Do not
+            # generate the combination (a known, deliberate divergence).
+            if "aligned" in trailing:
+                trailing = ""
         if bases:
             head += " : " + ", ".join("public " + b for b in bases)
-        decl = "%s\n{\n%s\n}%s;" % (head, "\n".join(lines), self.attr(key))
+        decl = "%s\n{\n%s\n}%s;" % (head, "\n".join(lines), trailing)
         # #pragma pack(n) around some declarations (GCC/MSVC extension:
         # member alignment capped at n)
         if self.rng.random() < 0.12:
@@ -197,6 +205,34 @@ class Gen:
             decl = "#pragma pack(push, %d)\n%s\n#pragma pack(pop)" % (n_pack, decl)
         self.decls.append(decl)
         self.structs.append((name, members, is_union, bool(bases)))
+
+    def gen_non_storage_members(self, name, lines, is_union):
+        # N5008 [class.mem]: member typedefs/alias-declarations, static data
+        # members and member functions are members but not subobjects -- they
+        # must not take part in the layout.  A user-declared constructor makes
+        # the class a non-POD (C++03 [class]/9), which changes the tail-padding
+        # rule for base subobjects and GCC's packed rule for members of that
+        # type.  Insert them at random positions between the data members.
+        extras = []
+        if self.rng.random() < 0.35:
+            t = self.rng.choice(SCALARS)[0]
+            if self.rng.random() < 0.5:
+                extras.append("  using %s = %s;" % (self.fresh("vt"), t))
+            else:
+                extras.append("  typedef %s %s;" % (t, self.fresh("td")))
+        if self.rng.random() < 0.3 and not is_union:
+            t = self.rng.choice(SCALARS)[0]
+            if self.rng.random() < 0.5:
+                extras.append("  static constexpr %s %s = 0;" % (t, self.fresh("k")))
+            else:
+                extras.append("  static %s %s;" % (t, self.fresh("s")))
+        if self.rng.random() < 0.3:
+            extras.append("  int %s() const { return 1; }" % self.fresh("f"))
+        if self.rng.random() < 0.25 and not is_union:
+            # a user-provided default constructor: the class is a non-POD
+            extras.append("  %s() {}" % name)
+        for e in extras:
+            lines.insert(self.rng.randint(0, len(lines)), e)
 
     def type_name(self, s):
         if self.cxx:
