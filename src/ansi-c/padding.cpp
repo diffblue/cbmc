@@ -89,8 +89,14 @@ static std::optional<mp_integer> explicit_member_alignment(const typet &_type)
 /// min(n, max(natural, k)).
 static mp_integer apply_pragma_pack(const typet &type, mp_integer alignment)
 {
+  // the front ends record the cap on the element type of an array member
+  // (its own `aligned' sits on the array): `signed char m[8]
+  // __attribute__((packed, aligned(4)))' under `#pragma pack(2)' is at 2
+  const typet *t = &type;
+  while(t->find(ID_C_pragma_pack).is_nil() && t->id() == ID_array)
+    t = &to_array_type(*t).element_type();
   const auto cap = numeric_cast<mp_integer>(
-    static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
+    static_cast<const exprt &>(t->find(ID_C_pragma_pack)));
   if(cap.has_value() && *cap > 0 && *cap < alignment)
     return *cap;
   return alignment;
