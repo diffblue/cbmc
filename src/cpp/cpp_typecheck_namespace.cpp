@@ -122,6 +122,7 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
         }
         catch(...)
         {
+          report_dropped_system_item(item);
         }
       }
       else
