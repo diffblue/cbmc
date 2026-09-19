@@ -10789,7 +10789,18 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           const std::string sym_name =
             id2string(cpp_typecheck.cpp_scopes.current_scope().prefix) +
             id2string(pname);
-          if(!cpp_typecheck.symbol_table.has_symbol(sym_name))
+          // The synthetic symbol is keyed by template scope + parameter
+          // name, shared by every specialization of the template: its type
+          // must be the CURRENT deduction's, or the second instantiation
+          // (`make_range(map)' after `make_range(vector)') evaluates
+          // `decltype(c.begin())' against the first one's parameter type
+          // and returns the wrong ranget (an unrelated class: "found no
+          // match for symbol 'ranget'", the whole body dropped).
+          if(cpp_typecheck.symbol_table.has_symbol(sym_name))
+          {
+            cpp_typecheck.symbol_table.get_writeable_ref(sym_name).type = ptype;
+          }
+          else
           {
             auxiliary_symbolt psym;
             psym.name = sym_name;
