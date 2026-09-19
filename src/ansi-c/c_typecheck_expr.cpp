@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
+#include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/suffix.h>
 #include <util/symbol_table_base.h>
@@ -1061,6 +1062,12 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     string_constantt s(source_location.get_function());
     s.add_source_location()=source_location;
     s.set(ID_C_lvalue, true);
+    // C11 6.4.2.2/1 and N5008 [dcl.fct.def.general]/8 declare it as
+    // `static const char __func__[] = "...";' -- the element type is const.
+    // In C++ this decides overload resolution: a `char[n]' argument for a
+    // `const std::string &' parameter (every INVARIANT macro) picks the
+    // string_view constructor template over `basic_string(const char *)'.
+    s.type().element_type().set(ID_C_constant, true);
     expr.swap(s);
   }
   else
@@ -1128,6 +1135,11 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   {
     type.swap(static_cast<typet &>(expr.add(ID_type_arg)));
     typecheck_type(type);
+
+    // N5008 [expr.sizeof]/2: applied to a reference type, the result is the
+    // size of the referenced type (C++ only; C has no references).
+    if(is_reference(type) || is_rvalue_reference(type))
+      type = to_pointer_type(type).base_type();
   }
   else
   {

@@ -705,6 +705,24 @@ bool cpp_typecheckt::standard_conversion_sequence(
     {
       if(!standard_conversion_array_to_pointer(curr_expr, new_expr))
         return false;
+
+      // C++03 [conv.array]/2: a string literal (`const char[n]', N5008
+      // [lex.string]/6) converts to `char *'.  N5008 dropped this, but
+      // GCC and clang still accept `char *p = "...";' with a warning, so
+      // we do too -- ranked below every standard conversion (a `const
+      // char *' candidate must always beat it).
+      if(expr.id() == ID_string_constant)
+      {
+        typet from_base = to_pointer_type(new_expr.type()).base_type();
+        from_base.remove(ID_C_constant);
+        const typet &to_base = to_pointer_type(type).base_type();
+        if(!to_base.get_bool(ID_C_constant) && to_base == from_base)
+        {
+          new_expr = typecast_exprt{new_expr, type};
+          rank += 4;
+          return true;
+        }
+      }
     }
   }
   else if(curr_expr.type().id() == ID_code && type.id() == ID_pointer)
