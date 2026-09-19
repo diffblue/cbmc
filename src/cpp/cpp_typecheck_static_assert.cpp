@@ -17,8 +17,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 /// Replace symbol expressions that refer to constant variables with their
 /// compile-time values, enabling constant folding in static_assert.
-static void
-propagate_constants(exprt &expr, const symbol_table_baset &symbol_table)
+void cpp_typecheckt::propagate_constants(
+  exprt &expr,
+  const symbol_table_baset &symbol_table)
 {
   if(expr.id() == ID_symbol)
   {

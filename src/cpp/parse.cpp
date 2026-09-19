@@ -11078,6 +11078,12 @@ bool Parser::rPrimaryExpr(exprt &exp)
       if(lex.get_token(tk2)!=')')
         return false;
 
+      // N5008 [dcl.type.decltype]/1.3-1.5 distinguish an UNPARENTHESIZED
+      // id-expression or member access (declared type) from `(x)' (T& for
+      // an lvalue); record the parentheses on just those two shapes.
+      if(exp2.id() == ID_cpp_name || exp2.id() == ID_member)
+        exp2.set(ID_C_parenthesized, true);
+
       exp.swap(exp2);
     }
 
