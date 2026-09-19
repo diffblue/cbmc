@@ -505,23 +505,52 @@ void cpp_typecheckt::typecheck_code(codet &code)
   {
     PRECONDITION(code.operands().size() == 1 || code.operands().size() == 2);
 
-    typecheck_expr(code.op0());
+    {
+      // N5008 [dcl.pre]/10: the condition is a constant expression.
+      constant_expression_contextt constant_expression_guard{*this};
+      typecheck_expr(code.op0());
+    }
     if(code.operands().size() == 2)
       typecheck_expr(code.op1());
 
     implicit_typecast_bool(code.op0());
+    propagate_constants(code.op0(), symbol_table);
     simplify(code.op0(), *this);
 
     if(code.op0().is_constant() && code.op0() == false_exprt())
     {
-      // Per [temp.res.general]/6 (C++23): static_assert(false) in a
-      // template body (e.g., MSVC's std::declval guard) should not
-      // be fatal.  Convert to a runtime assertion so the body can
-      // continue processing.  The assertion will fire at runtime
-      // if the function is actually called.
+      // N5008 [dcl.pre]/10: a failed static_assert makes the program
+      // ill-formed -- at block scope exactly as at namespace scope.  A
+      // block-scope failure used to become a silent `skip', so a wrong
+      // constant evaluation on our side (or a genuinely failing assertion)
+      // went unnoticed.  Inside a template instantiation the assertion
+      // may be the "no valid specialization" guard of [temp.res.general]
+      // /6 (MSVC's std::declval), which is not fatal for the enclosing
+      // program: keep the skip there, but say so.
+      std::string message;
+      if(code.operands().size() == 2 && code.op1().id() == ID_string_constant)
+        message = ": " + id2string(to_string_constant(code.op1()).value());
+      if(instantiation_stack.empty())
+      {
+        error().source_location = code.source_location();
+        error() << "static assertion failed" << message << eom;
+        throw 0;
+      }
+      warning().source_location = code.source_location();
+      warning() << "static assertion failed in a template instantiation"
+                << message << " (ignored, [temp.res.general]/6)" << eom;
       code = codet{ID_skip};
       return;
     }
+    if(!code.op0().is_constant())
+    {
+      // our constant evaluation fell short; the check is dropped
+      warning().source_location = code.source_location();
+      warning() << "static_assert condition could not be evaluated; the "
+                << "assertion is not checked" << eom;
+    }
+    code = codet{ID_skip};
+    return;
   }
   else if(statement == "for_range")
   {
