@@ -4087,6 +4087,37 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   else if(symbol.type.id() == ID_struct)
   {
     struct_typet &struct_type = to_struct_type(symbol.type);
+
+    // Itanium C++ ABI 2.4 II.1: a dynamic class without a primary base
+    // (no non-virtual dynamic base) has its virtual pointer at offset 0,
+    // before any base subobject and any data member -- wherever the first
+    // virtual function is declared in the class body.  The pointer
+    // component was appended where that declaration was met (`struct A {
+    // int a; virtual int f(); }' had `a' at 0).  A class whose base is
+    // dynamic shares that base's vptr in the ABI; we keep a separate
+    // pointer for it (a known divergence, see the notes), so only the
+    // root case is moved.
+    {
+      auto &components = struct_type.components();
+      bool has_base_vtptr = false;
+      auto own_vtptr = components.end();
+      for(auto it = components.begin(); it != components.end(); ++it)
+      {
+        if(!it->get_bool(ID_is_vtptr))
+          continue;
+        if(it->get_bool(ID_from_base))
+          has_base_vtptr = true;
+        else if(own_vtptr == components.end())
+          own_vtptr = it;
+      }
+      if(!has_base_vtptr && own_vtptr != components.end())
+      {
+        struct_typet::componentt vtptr = *own_vtptr;
+        components.erase(own_vtptr);
+        components.insert(components.begin(), std::move(vtptr));
+      }
+    }
+
     {
       const namespacet ns(symbol_table);
       bool already_padded = false;
@@ -5298,51 +5329,14 @@ void cpp_typecheckt::make_ptr_typecast(
       return;
     }
 
-    // Walk the inheritance chain from derived to base. At each level,
-    // check if the target base is reachable through the first direct
-    // base. If not, compute the offset of the non-first base's first
-    // component.
-    bool needs_offset = false;
-    const struct_typet *current = derived;
-    while(current->get(ID_name) != base_name)
+    // The base subobject's offset is computed from the layout for every
+    // base, the first one included: the first base is NOT at offset 0 when
+    // the derived class is dynamic and its bases are not (Itanium C++ ABI
+    // 2.4 II.1: the vptr comes first, `struct D : R { virtual void f(); }'
+    // has R at 8).  The offset-0 shortcut for the first base moved R's
+    // constructor onto the vptr.
     {
-      const auto &bases = current->bases();
-      if(bases.empty())
-        break;
-
-      const struct_typet &first_base =
-        to_struct_type(lookup(bases.front().type()).type);
-      std::set<irep_idt> first_base_set;
-      first_base_set.insert(first_base.get(ID_name));
-      get_bases(first_base, first_base_set);
-
-      if(
-        first_base.get(ID_name) == base_name || first_base_set.count(base_name))
-      {
-        current = &first_base;
-        continue;
-      }
-
-      // base is reachable through a non-first base.
-      for(std::size_t i = 1; i < bases.size(); ++i)
-      {
-        const struct_typet &nth_base =
-          to_struct_type(lookup(bases[i].type()).type);
-        std::set<irep_idt> nth_base_set;
-        nth_base_set.insert(nth_base.get(ID_name));
-        get_bases(nth_base, nth_base_set);
-
-        if(nth_base.get(ID_name) == base_name || nth_base_set.count(base_name))
-        {
-          needs_offset = true;
-          break;
-        }
-      }
-      break;
-    }
-
-    if(needs_offset)
-    {
+      (void)base_name;
       // N5008 [intro.object]/[class.derived]: a non-virtual base subobject
       // occupies a contiguous region of the derived object; its byte offset is
       // the offset of its lowest-addressed data member.  add_base_components
@@ -5384,9 +5378,12 @@ void cpp_typecheckt::make_ptr_typecast(
       std::set<irep_idt> base_member_names;
       for(const auto &c : base->components())
       {
+        // padding components are named per class (`$pad7') and recur in
+        // every class that flattens a base with the same shape: they do
+        // not identify the base subobject
         if(
           c.type().id() == ID_code || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static))
+          c.get_bool(ID_is_static) || c.get_is_padding())
           continue;
         base_member_names.insert(c.get_name());
       }
