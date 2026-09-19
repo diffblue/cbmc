@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+static assertion failed
+--
+N5008 [dcl.type.decltype]/1.3-1.6 for 37 expression shapes, checked with
+block-scope static_assert (itself newly checked) and two aliasing reads.
