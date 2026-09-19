@@ -9854,3 +9854,121 @@ failures — the suite is goto-cc based).
   class with a member typedef or static + alignment); the bit-field gate
   had hidden it for years.  When adding a layout pass over C++
   components, filter is_type/is_static/ID_code first.
+
+## Round 148 (2026-09-19) — fuzzer: non-storage members; empty-class model; string literals are const; sweep signatures
+
+- Fuzzer (scripts/layout_fuzz.py) now emits member typedefs/`using`,
+  static (constexpr) data members, const member functions and user
+  default constructors (non-POD bases).  First C++ run: 91/100 divergent.
+  Findings, all fixed (`f8a16c381b`):
+  - offsetof / union sizes counted non-storage components
+    (pointer_offset_size.cpp member_offset/_expr/_bits, c_types.cpp
+    find_widest_union_component): skip is_type / is_static / ID_code.
+  - `typedef T __attribute__((aligned(k))) TA;' then `TA m
+    __attribute__((aligned(j)))' with j > k: EXACT j, the typedef marking
+    stays (ID_C_typedef_alignment kept, ID_C_member_alignment added) --
+    c_typecheck_type.cpp add_declaration_alignment, ansi_c_convert_type.cpp
+    set_attributes, cpp_typecheck_type.cpp.
+  - a `bool' member under `#pragma pack' lost its cap:
+    ansi_c_convert_typet::read_rec's merged_type branch must carry
+    ID_C_pragma_pack from an already-converted plain subtype.
+  - GCC's packed cancellation (`ignoring packed attribute because of
+    unpacked non-POD field'): the class -- struct OR union -- loses
+    TYPE_PACKED when a data member (bases do not count; the member's own
+    attributes are irrelevant) is of an UNPACKED non-POD class type; from
+    then on non-POD members are placed at `max(member attr, type
+    alignment)'.  ID_C_packed_cancelled (new irep id) set in
+    cpp_typecheck_compound_type.cpp, honoured by padding.cpp
+    is_non_pod_class and both alignment paths.  Unions are marked
+    ID_C_non_pod as well.  clang differs on part of this (packed is a GNU
+    extension: GCC is the reference; the clang-divergent cases are under
+    `#ifndef __clang__' in cpp_packed_non_pod_member).
+  - a class defined under `#pragma pack(1)' is NOT a packed TYPE for the
+    rule above (only the attribute sets TYPE_PACKED) -- the parser no
+    longer marks it ID_C_packed; the per-member caps already give the
+    layout (fuzz seed 9080: `PPT m20' with `typedef PP aligned(4) PPT'
+    inside a packed non-POD class stayed at 4 in g++, we gave 1).
+  - a zero-width bit-field flattened in from a base does its alignment
+    in the BASE's layout only; re-applying it at the derived class's
+    absolute offset moved the following members (seed 9095: base at an
+    odd offset).  padding.cpp: from_base → a = 1 for width 0.
+- Empty-class object model (`2e7e4ad87e`), N5008 [class]/4 (complete
+  objects of class type have nonzero size), [intro.object]/9 (distinct
+  addresses), [class.derived]/... (a base class subobject may have zero
+  size): a struct/union with no storage member gets a 1-byte `$empty'
+  padding component before add_padding (zero-width bit-fields do not
+  count as storage); flattening a base drops the base's `$empty' (EBO);
+  the base's own components are inserted at their position in the base's
+  layout (fixed a latent bug: a base's padding landed after its second
+  base's members -- libstdc++ tuple / unique_ptr byte-offset reads); an
+  over-aligned empty base raises the class alignment, uncapped by
+  `#pragma pack' (g++ and clang agree); the pragma cap applies to
+  non-empty bases only; copy_parent skips empty bases (struct-assigning
+  the `$empty' byte through a base pointer clobbered
+  `_List_impl::_M_node._M_next' in std::list -- the base's byte overlaps
+  the derived's first member); cpp_typecheck_fargs brace-init viability
+  skips padding components.  Test cpp_empty_class_object_size.
+- String literals (`working tree, this commit`): N5008 [lex.string]/6 --
+  `const char[n]', an lvalue.  The C front-end typed them `char[n]' (C's
+  rule) and the C++ resolver then ranked `std::string s("...")' wrong:
+  the string_view constructor template `basic_string(const _Tp &)'
+  (identity binding, _Tp = char[n]) beat the non-template
+  `basic_string(const char *)' (qualification conversion on top of
+  array-to-pointer, +4), and the INVARIANT macros' `f(__FILE__, __func__,
+  ...)' printed "symbol 'basic_string' does not uniquely resolve" (30 of
+  the 52 OK_NOISY sweep diagnostics, 17 in xml_expr.cpp alone -> 0).
+  `__func__' is `static const char[]' (C11 6.4.2.2, [dcl.fct.def.general]/8)
+  in both front-ends.  The C++03 [conv.array]/2 literal-to-`char *'
+  conversion stays accepted (g++/clang warn), ranked below every standard
+  conversion (rank 4).  Two more found on the way: `sizeof(T &)' returned
+  the pointer size ([expr.sizeof]/2: size of the referenced type);
+  `decltype("abc")' lacked the reference; and C++ array bounds were not
+  normalised to the index type, so `const char[4]' spelled in a declarator
+  (bound `int') was structurally unequal to `decltype(arr)' / a typedef
+  (bound `long') -- `is_same' false, partial specialisations not matching.
+  cpp_typecheck_type: constant bounds get make_index_type (dependent bounds
+  untouched so `T (&)[N]' still deduces).  Test
+  cpp_string_literal_const_type.
+- Sweep OK_NOISY census (239 files at cfecc3e05f: 189 OK / 52 OK_NOISY /
+  0 FAIL).  Signatures and status:
+  1. `no match for symbol 'set'` x115 (all in files instantiating
+     natural_loops): the unconstrained forwarding constructor template
+     `loop_templatet(InstructionSet &&)' is instantiated -- BODY included
+     -- while the resolver merely tests whether a `_Deque_iterator'
+     converts to `loop_templatet' for some candidate's parameter (a
+     pair/map value_type constructor).  A real compiler instantiates only
+     the declaration for viability and never the body unless selected;
+     CBMC's resolve() instantiates the whole function.  Harmless (the
+     candidate is not selected) but the fix is architectural: defer body
+     instantiation to the selected candidate, or mute diagnostics of
+     speculative instantiations.  NOT done this round.
+  2. `symbol 'basic_string' does not uniquely resolve' x30: fixed above.
+  3. `json_objectt' x11 + `invalid implicit conversion from
+     '<<type:auto>>' to json_objectt' x3 + `sizeof' of an incomplete type
+     x5: not yet analysed (json_expr.cpp, json_goto_trace.cpp,
+     show_*_json.cpp -- likely one `auto' return-type deduction in
+     json.h).
+  4. `rename<level>' x3: known (round 144).
+  Mini re-sweep of the 47 files that carried these signatures with the
+  round-148 goto-cc: see /tmp/r148/mini/sweep.log (in progress at the end
+  of the round); a full sweep at the new HEAD takes ~7 h
+  (`scripts/dogfood_snapshot.sh --files /tmp/r146/sweep_files.txt HEAD
+  build-work/bin/goto-cc').
+- KNOWNBUG census: exactly 5 test.desc files start with KNOWNBUG
+  (cpp11_deduced_nontype_kind_mismatch [rejects-invalid],
+  cpp11_type_identity_cv_in_parameter_types,
+  cpp17_invoke_result_cache_poisoning, cpp20_ranges_basic_libcxx,
+  libcxx23_string_fill_ctor); all still fail; none promotable.  The
+  earlier "12" was notes text matching `^KNOWNBUG->'.
+- g++ behaviours NOT followed (clang agrees with us; layout of attributes
+  is implementation-defined, N5008 [dcl.attr.grammar]/6):
+  - a later packed class with an unpacked non-POD member of class type S4
+    changes how an EARLIER `typedef S4 aligned(1)' member is laid out in
+    another class (seed 9011: m32@52 vs 49);
+  - `typedef S aligned(2) T;' is ignored by g++ (alignof(T) = 8) when S
+    has a member with a `packed' attribute (seed 10109); clang honours it.
+- Pre-existing, noted for later: /tmp/r148/dc1.cpp -- reinterpret_cast of
+  an `alignas' char-array member inside a template: pointer difference
+  UNKNOWN; decltype of other lvalue expressions (`(x)', `a[i]',
+  assignments) still yields T, not T& ([dcl.type.decltype]/1.5 -- only
+  `*p' and string literals are handled).
