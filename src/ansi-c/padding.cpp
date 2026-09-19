@@ -96,6 +96,15 @@ static mp_integer apply_pragma_pack(const typet &type, mp_integer alignment)
   return alignment;
 }
 
+/// \return whether component \p c occupies storage: a C++ class type also
+///   lists its member functions, static data members and member typedefs
+///   as components, which the layout must ignore
+static bool is_layout_member(const struct_union_typet::componentt &c)
+{
+  return c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+         !c.get_bool(ID_is_type);
+}
+
 /// \return the alignment of the C++ base-class subobject that starts with
 ///   component \p c (recorded by cpp_typecheck_bases.cpp), 0 otherwise
 static mp_integer
@@ -194,6 +203,8 @@ static mp_integer alignment_rec(
     {
       for(const auto &c : to_struct_union_type(type).components())
       {
+        if(!is_layout_member(c))
+          continue;
         const auto member_alignment = explicit_member_alignment(c.type());
         if(member_alignment.has_value() && *member_alignment > result)
           result = *member_alignment;
@@ -252,6 +263,8 @@ static mp_integer alignment_rec(
     // (should really be the smallest common denominator)
     for(const auto &c : to_struct_union_type(type).components())
     {
+      if(!is_layout_member(c))
+        continue;
       // a C++ base subobject keeps the base's alignment
       result = std::max(result, base_subobject_alignment(c));
       // padding is an artefact of the layout, and an unnamed bit-field's
@@ -476,6 +489,9 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
       it != components.end();
       it++)
   {
+    if(!is_layout_member(*it))
+      continue;
+
     // there is exactly one case in which padding is not added:
     // if we continue a bit-field with size>0 and the same underlying width
 
@@ -593,6 +609,12 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       it!=components.end();
       it++)
   {
+    // member functions, static data members and member typedefs of a C++
+    // class occupy no storage (a member typedef `using value_type = T;'
+    // used to be laid out as a T-sized member, misplacing what follows)
+    if(!is_layout_member(*it))
+      continue;
+
     const typet it_type=it->type();
     mp_integer a=1;
 
@@ -908,6 +930,8 @@ void add_padding(union_typet &type, const namespacet &ns)
   // check per component, and ignore those without fixed size
   for(const auto &c : type.components())
   {
+    if(!is_layout_member(c))
+      continue;
     auto s = pointer_offset_bits(c.type(), ns);
     if(s.has_value())
       size_bits = std::max(size_bits, *s);
