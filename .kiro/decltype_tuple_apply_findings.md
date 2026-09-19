@@ -10003,3 +10003,205 @@ failures — the suite is goto-cc based).
 - Suites ×7 green on /tmp/r149/bin1.  g++ 13 rejects "non-trivial"
   designated array initializers (gaps / out of order): keep test shapes
   sequential from 0 so the reproducers stay g++-verifiable.
+
+## Round 150 (2026-09-19) — catch(...) audit, sweep cluster (json_objectt), decltype lvalues, casts of arrays, dynamic-class vptr, block-scope static_assert
+
+### #4a: the json_objectt / `<<type:auto>>` / `vector does not uniquely resolve` cluster
+
+Six distinct front-end bugs, all reproduced with kernels and fixed
+(commits `c6a131ef62`, `c084e7b70e`, `aecdf4f987`):
+- N5008 [over.match.list]/1 + [dcl.init.list]/1: explicit initializer-list
+  constructors are candidates in DIRECT-list-initialization (`T x{...}',
+  `T{...}', `new T{...}').  has_viable_init_list_constructor excluded them
+  for every form (the only thing it could do without knowing the form); the
+  parser now marks the three direct forms on the braced list
+  (ID_C_direct_list_init).  Root cause of `json_objectt o{{k, v}, ...}'
+  (explicit `json_objectt(std::initializer_list<...> &&)') and thus the
+  FAIL + 11 noisy files of the sweep.
+- [over.ics.list]/10: a parameter `std::initializer_list<X> &&' or `const
+  std::initializer_list<X> &' accepts a brace-init-list (fargs matching
+  strips the reference; the conversion builds the initializer_list object as
+  a static auxiliary symbol next to its backing array and binds the
+  reference to it -- `reference_binding' on the struct constant gave
+  `address_of({...})', which symex rejects: "address_arithmetic does not
+  handle struct").
+- `new T{...}' now runs [over.match.list] phase 1 (whole list as the
+  initializer_list argument) before falling back to the elements.
+- [dcl.init.general]/16.6.3 + [over.match.copy] + [over.best.ics.general]/4:
+  initialising class T from a single operand of a DIFFERENT class S (not
+  derived) goes through S's conversion functions (or a ctor of T taking S
+  without a further user-defined conversion).  cpp_constructor ran plain
+  overload resolution over ALL of T's ctors with a user-defined conversion
+  allowed for the argument, so `std::vector<int> v = range;'
+  (util/range.h `operator containert()', a conversion function TEMPLATE)
+  was ambiguous between vector(size_type), vector(vector&&),
+  vector(initializer_list) -- each reachable with a different C.  Route
+  applied only when no ctor of T takes S directly (exact match wins).  g++
+  and clang give direct-init the same treatment (CWG 2327; verified: `W
+  w(r)' with `W(unsigned long)' available still picks `operator W()').
+  Lesson: the first version of the route also fired for `std::vector<int>
+  v{1,2,3}' (source class initializer_list<int> ≠ vector) and broke it via
+  the UDCS ctor path; hence the "no direct ctor" guard.
+- [expr.type.conv]/2 + [class.temporary]/2: `T()' for a class without
+  user-declared constructors was a bare struct constant → `B().g()' had no
+  object for `this' ("found no match for symbol 'g'").  Now a compound
+  literal like `T{}' / `T(x)'.
+- Trailing-return decltype of a function template naming a parameter
+  (`-> ranget<decltype(c.begin())>'): the synthetic parameter symbol used
+  to evaluate it is keyed by template scope + name (shared by all
+  specializations) and kept the FIRST deduction's type; the second
+  instantiation (`make_range(map)' after `make_range(vector)') evaluated
+  against the vector's type, built the wrong ranget and lost its body.
+  Retyped per deduction (cpp_typecheck_resolve.cpp).  Every TU calling
+  make_range on two container types was affected.
+- Lesson (cost ~40 min): build-work/goto-cc was STALE after a cbmc-only
+  rebuild; goto-cc kept "failing" a kernel cbmc passed.  Always rebuild
+  cbmc AND goto-cc (the suites use both).
+
+### #4b design note: `found no match for symbol 'set'` ×115 (speculative body instantiation)
+
+Shape (natural_loops.h): `loop_templatet(InstructionSet &&)' -- an
+unconstrained forwarding constructor template -- is instantiated, BODY
+included, while the resolver only tests whether some `_Deque_iterator'
+converts to `loop_templatet' for a candidate's parameter (a pair / map
+value_type constructor).  The body `loop_instructions(std::forward<...>(x))'
+then fails (`std::set' from an iterator) and the failure is printed although
+the candidate is never selected.  A conforming compiler instantiates only the
+DECLARATION for viability ([temp.inst]/4: a function template specialization
+is implicitly instantiated when referenced in a context that requires a
+definition to exist; overload resolution does not) and the body only if the
+candidate is chosen ([temp.inst]/11 forbids instantiating what is not
+needed).  CBMC's `resolve()' instantiates the whole function for every
+viable candidate.
+
+Fix options, in order of preference:
+1. Two-phase instantiation in cpp_typecheck_resolvet: during candidate
+   collection instantiate the SIGNATURE only (deduced parameter/return
+   types; the body stays a deferred method body), select, then instantiate
+   the body of the winner via the existing deferred-body machinery
+   (typecheck_method_bodies already handles bodies whose declaration is
+   known).  Risk: places that read the instantiated body's type
+   information during resolution (return type of `auto' functions; those
+   must still instantiate the body -- [dcl.spec.auto.general]/12 makes that
+   legitimate).  This is the correct design and removes the ×115 signature
+   and the libc++ `std::declval' static_assert warnings alike.
+2. Cheaper: mute diagnostics of candidate instantiations (a sfinae_contextt
+   around the per-candidate instantiation) and demote the failed
+   candidate to non-viable -- semantically wrong in the rare case where the
+   body error is a hard error in real C++ (the candidate IS selected and
+   ill-formed), but that program does not compile with g++ either.
+3. Do nothing: the noise is harmless (the candidate is not selected).
+Recommended: option 1 as its own round (touches resolve(),
+instantiate_template, method-body deferral; needs the full suites and the
+dog-food sweep).
+
+### #3: catch(...) audit (148 sites in src/cpp)
+
+Classification by catch body: 46 EMPTY, 19 NIL (make_nil / return nil), 46
+OTHER (fallbacks), 14 RETHROW, 13 SKIP, 11 RETURN.  The speculative /
+probing sites (resolver trials, SFINAE, deduction guides, scope probes) are
+correct as they are.  Definition-path sites that swallowed a failure and left
+a nil value -- a silent havoc / nondet -- now report:
+- system-header ITEMS (cpp_typecheck.cpp and cpp_typecheck_namespace.cpp:
+  top-level and namespace-scope declarations under /usr/include): recorded
+  by report_dropped_system_item, one warning with the count at the end of
+  typecheck(), the list at --verbosity 9.  Measured: zero drops for a TU
+  including vector/string/map/memory/algorithm/sstream/functional/set/
+  unordered_map/list/deque/optional/variant/tuple/chrono, so the warning only
+  appears when something genuinely fails.
+- system-header method BODIES (typecheck_method_bodies "suppress" path):
+  "dropped the body of system-header function 'f'; calls to it return
+  nondet".  Note goto conversion also emits a `no body for callee' property
+  (FAILURE) at the call site, so the havoc was never fully silent at
+  verification time -- but the type-check-time cause was.  Test
+  cpp11_dropped_library_body_warning (a header under an `/include/' path
+  with `__builtin_shuffle').
+- the deferred-conversion fixpoint (cpp_typecheck.cpp, 5 rounds): failures
+  collected in a set and reported once after the loop.
+- auto-return functions converted eagerly (method_bodies ~1996).
+- static member initializers (typecheck_compound_declarator): "could not
+  type-check the initializer of static member 'k'; reads of it are nondet",
+  outside template elaboration only.
+Wording deliberately differs from "could not fully type-check" (46 tests
+forbid that phrase) so no existing test changes meaning.
+
+### #6: decltype, static_assert at block scope, casts of arrays
+
+- N5008 [dcl.type.decltype]/1: (1.3) unparenthesized id-expression / member
+  access → declared type (member access now looks up the COMPONENT's declared
+  type: `decltype(cs.m)' is `int' for `const S cs', not `const int');
+  (1.5) any other lvalue → T& (subscript, assignment, compound assignment,
+  prefix increment, comma, conditional yielding lvalues); parenthesized
+  `(x)' / `(s.m)' → T&: the parser now records ID_C_parenthesized on a
+  parenthesized cpp_name / member access (only those two shapes), read in
+  the decltype handler before the type check rebuilds the node.  37 shapes
+  in cpp11_decltype_lvalue_expressions agree with g++/clang; the runtime
+  effect: `decltype(arr[1]) r = arr[0]; r = 5;' used to COPY.
+- Found on the way: a block-scope `static_assert' was never checked
+  (turned into `skip' unconditionally, with a [temp.res.general]/6 comment
+  meant for template bodies).  Now: constant false outside any template
+  instantiation → error ([dcl.pre]/10); inside an instantiation → warning
+  + skip; non-constant → warning ("not checked").  libc++'s std::declval
+  body (`static_assert(!__is_same(_Tp,_Tp))') produces the instantiation
+  warning 5× in libcxx23_string_fill_ctor -- a symptom of speculative body
+  instantiation (see #4b).  propagate_constants became a static member so
+  both paths fold constant variables.  Test cpp11_block_scope_static_assert.
+- Casts of an array operand ([expr.reinterpret.cast]/1, [expr.const.cast]
+  /1): const_typecast and reinterpret_typecast performed the array-to-
+  pointer conversion and then cast the ORIGINAL array (`typecast_exprt(expr,
+  ...)' instead of the converted `e'/`new_expr'): `(char *)a.s' was a
+  typecast of an array value, pointer differences UNKNOWN, reads through
+  `reinterpret_cast<T *>(storage)' FAILURE -- the /tmp/r148/dc1.cpp
+  aligned-storage idiom (libstdc++ node storage).  static_cast was right.
+  Test cpp11_cast_of_array_decays.
+- KNOWNBUG census: still 5 (deduced_nontype_kind_mismatch [rejects-
+  invalid], type_identity_cv_in_parameter_types,
+  invoke_result_cache_poisoning, ranges_basic_libcxx, libcxx23_string_fill
+  _ctor); none promotable this round.
+
+### #5: fuzzer -- virtual functions and virtual bases
+
+- scripts/layout_fuzz.py `--virtual': virtual member functions at random
+  positions (dynamic root classes); `--virtual-all': additionally classes
+  deriving from dynamic bases and `virtual' bases.  Offsets of dynamic
+  classes are measured on an object (`(char*)&o.m - (char*)&o'):
+  [support.types.layout]/1 makes offsetof conditionally-supported for
+  non-standard-layout classes and g++ rejects it through a virtual base;
+  unions keep offsetof (a union with a non-trivial member has no default
+  constructor).  `packed' is not generated on dynamic classes (GCC/clang
+  differ).
+- First `--virtual' run: 26/40 divergent.  Fixed (Itanium C++ ABI 2.4
+  II.1): the vptr of a dynamic class without a primary base is at offset 0
+  -- CBMC appended `@vtable_pointer' where the first virtual function was
+  declared (`struct A { int a; virtual int f(); }' had a at 0) and after
+  the flattened bases (`struct D : R { virtual ... }' had R at 0).  The
+  component is moved to the front in typecheck_compound_body when no base
+  carries a vptr.  This exposed make_ptr_typecast's "first base is at
+  offset 0" shortcut (R's constructor ran on the vptr); the base offset is
+  now always computed from the layout by component name.  After: 1/40, and
+  that one a pre-existing pragma-pack corner (below).  Test
+  cpp11_dynamic_class_vptr_at_offset_zero (layout + dispatch + base ctor).
+- Known, documented divergences (`--virtual-all' reports them; 33/40):
+  (a) a class with a dynamic non-virtual base shares that PRIMARY base's
+  vptr in the ABI and adds no storage for new virtuals; CBMC creates a
+  `virtual_table::X' struct + its own `@vtable_pointer' per class that
+  declares virtual functions (`struct X : P { virtual g(); }' 24 vs 16;
+  `Z : Y' 24 vs 16).  Dispatch selects the pointer whose vtable has the
+  entry (cpp_typecheck_expr.cpp ~5440).  A faithful model: derived vtable
+  struct embeds the primary base's vtable struct as its first member, the
+  base's pointer is set to `&vtable_X.@base', derived-only virtuals
+  dispatch via `((virtual_table::X *)this->P::@vtable_pointer)->g'.
+  Touches compound_type (no new vptr when a primary base exists),
+  cpp_typecheck_virtual_table.cpp (vtable objects), constructors (init),
+  expr dispatch.  Not done: a full round of its own.
+  (b) virtual bases: the ABI places them after the non-virtual part with a
+  vptr (also for classes WITHOUT virtual functions: `V : virtual R' is
+  vptr, v, r = 16); CBMC flattens them in front like ordinary bases and
+  adds a 1-byte `@most_derived' marker (V = r, marker, v = 12).
+  (c) primary base first: `S : R, P' with P dynamic puts P at 0, R after
+  P's dsize; CBMC keeps declaration order.
+- Pre-existing corner found by the run (fixed): `#pragma pack(2)' did not
+  cap an ARRAY member's exact `packed, aligned(4)' (the cap is recorded on
+  the element type; apply_pragma_pack now looks through arrays).  Tests:
+  ansi-c/pragma_pack5 (STATIC_ASSERT form; runs in both C and C++ modes),
+  cpp_pragma_pack PA.
