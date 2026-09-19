@@ -1793,12 +1793,17 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // declaration IS its definition.  A SCALAR one stays an `extern`
       // macro folded into its uses (unfolded initializers of scalars,
       // e.g. constexpr calls, must not become dynamic initialisation);
-      // an ARRAY one is an object that must exist and be statically
-      // initialised -- static_lifetime_init
+      // an ARRAY (or class-type) one is an object that must exist and be
+      // statically initialised -- static_lifetime_init
       // skips macros, and left `extern` with the macro flag
       // (`static constexpr uint8_t sz[3] = {1, 8, 1};`, user-reported)
       // it was never initialised and every `A::sz[i]` read nondet.
-      const bool scalar_constant = static_symbol.type.id() != ID_array;
+      // A class-type member (`static constexpr P p = {.x = 3, .y = 4};')
+      // is an object too: the macro substitution folds scalar reads only,
+      // so `A::p.x' read nondet.
+      const bool scalar_constant = static_symbol.type.id() != ID_array &&
+                                   static_symbol.type.id() != ID_struct_tag &&
+                                   static_symbol.type.id() != ID_union_tag;
       if(
         scalar_constant && bname != "_S_use_relocate" &&
         bname != "_S_nothrow_relocate")
@@ -1935,7 +1940,24 @@ void cpp_typecheckt::typecheck_compound_declarator(
                 typecheck_expr(new_symbol->value);
               }
               force_elaborate = saved_force;
-              implicit_typecast(new_symbol->value, new_symbol->type);
+              // A braced initializer of an aggregate goes through the
+              // shared do_initializer, which handles nested braces and the
+              // GNU `[i] = v' / `.m = v' designators; an implicit typecast
+              // of the list threw (`static constexpr uint8_t sz[D_COUNT] =
+              // {[D_U64] = 8, ...}' with enumerator indices, user-reported
+              // Issue 3; `static constexpr std::array<int, 3> a = {1, 2,
+              // 3};'), the catch below swallowed it and the member stayed
+              // uninitialised.
+              if(
+                new_symbol->value.id() == ID_initializer_list &&
+                (new_symbol->type.id() == ID_array ||
+                 new_symbol->type.id() == ID_struct_tag ||
+                 new_symbol->type.id() == ID_union_tag))
+              {
+                do_initializer(new_symbol->value, new_symbol->type, true);
+              }
+              else
+                implicit_typecast(new_symbol->value, new_symbol->type);
               simplify(new_symbol->value, *this);
             }
             else
@@ -2010,7 +2032,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
       }
       else
       {
-        symbol_exprt symexpr = symbol_exprt::typeless(new_symbol->name);
+        // The constructor call must name a TYPED object: with a typeless
+        // symbol the generated `this' pointer has a nil type, which the
+        // solver rejects once the object is really initialised
+        // (static_and_dynamic_initialization runs this code for a
+        // constexpr class-type member, `static constexpr Q q{11};').
+        symbol_exprt symexpr = cpp_symbol_expr(*new_symbol);
 
         exprt::operandst ops;
         ops.push_back(value);
