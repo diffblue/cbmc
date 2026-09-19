@@ -9972,3 +9972,34 @@ failures — the suite is goto-cc based).
   UNKNOWN; decltype of other lvalue expressions (`(x)', `a[i]',
   assignments) still yields T, not T& ([dcl.type.decltype]/1.5 -- only
   `*p' and string literals are handled).
+
+## Round 149 (2026-09-19) — user Issue 3 re-test (regression on -2333)
+
+- Report: `static constexpr uint8_t sz[D_COUNT] = {[D_INVALID] = 1, ...}'
+  (anonymous-enum bound and designators) aborted in symex on d5a575752c:
+  numeric_cast_v on a c_enum_tag constant -- the array bound.  Two bugs:
+  (1) the C++ type checker left constant bounds with their own type;
+  fixed in round 148 (`5c5e4b0c1e', make_index_type for constant bounds)
+  BEFORE the report reached us; (2) with the crash gone, the designated
+  list was silently dropped: enumerator names → `use_cpp_typecheck' path
+  in typecheck_compound_declarator → `implicit_typecast(list, array)'
+  threw → catch(...) swallowed → nondet reads.  Now braced initializers
+  of array/class-type constexpr members go through do_initializer.
+- Found alongside (same code): `static constexpr std::array<int,3> a =
+  {1,2,3}' lost the same way whenever a template map was active (any TU
+  including <array>); class-type constexpr static members were extern
+  macros → `A::p.x' nondet ([class.static.data]/3: objects now, like
+  arrays since f5b2d46446); the ctor call for a non-POD one used
+  `symbol_exprt::typeless' → nil `this' type → solver invariant once the
+  object was really initialised.  Scalars stay macros (round-137 pitfall).
+- Lesson: `catch(...)' around a static-member initializer must not leave
+  the value nil without a trace -- that produced a silent nondet for
+  three different shapes.  Check the symbol-table Value column first
+  when a constexpr member reads wrong.
+- Debug recipe: the sfinae_contextt guard swallows the error() text;
+  comment it out temporarily to see "invalid implicit conversion from
+  '<<type:>>'", or break on cpp_typecheck_conversions.cpp `throw 0' with
+  build-debug.
+- Suites ×7 green on /tmp/r149/bin1.  g++ 13 rejects "non-trivial"
+  designated array initializers (gaps / out of order): keep test shapes
+  sequential from 0 so the reproducers stay g++-verifiable.
