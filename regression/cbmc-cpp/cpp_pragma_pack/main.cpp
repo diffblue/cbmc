@@ -34,6 +34,9 @@ struct B1 { long l; short s; };
 struct BD : B1 { char c; int i; };  // base subobject and the class capped at 4
 #pragma pack()
 struct N2 { char c; double d; };
+#pragma pack(push, 2)
+struct PA { char c; signed char m[8] __attribute__((packed, aligned(4))); }; // the cap also binds an ARRAY member's exact alignment
+#pragma pack(pop)
 int main()
 {
   __CPROVER_assert(sizeof(P1) == 5 && alignof(P1) == 1, "pack(1)");
@@ -52,6 +55,7 @@ int main()
   __CPROVER_assert(sizeof(BD) == 20 && alignof(BD) == 4 && __builtin_offsetof(BD, i) == 16, "derived class under pack(4): base (12 bytes, align 4) then c, i");
   __CPROVER_assert(sizeof(D0) == 22 && alignof(D0) == 2 && __builtin_offsetof(D0, i) == 18, "derived class under pack(2) of a base defined outside: the base members do not raise the alignment above 2");
   __CPROVER_assert(sizeof(AB) == 8 && __builtin_offsetof(AB, m) == 4, "bool member with aligned(8) under pack(4): capped to 4");
+  __CPROVER_assert(sizeof(PA) == 10 && __builtin_offsetof(PA, m) == 2, "packed, aligned(4) array member under pack(2): at 2");
   Cls k{1, 2};
   __CPROVER_assert(k.f() == 2, "member function of a packed class");
   return 0;

@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+UNKNOWN
+--
+N5008 [expr.reinterpret.cast]/1, [expr.const.cast]/1: casts of an array
+operand apply the array-to-pointer conversion; the libstdc++ node storage
+idiom (`reinterpret_cast<T *>(storage)') depends on it.
