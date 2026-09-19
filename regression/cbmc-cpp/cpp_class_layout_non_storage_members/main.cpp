@@ -16,6 +16,10 @@ uint32_t H3::counter = 0;
 struct H4 { static int x; char c; };
 struct H5 { typedef long big; char c; };
 struct H6 { char c; static long double ld; alignas(1) char d; };
+struct B1 { long l; short s; };
+struct H7 : B1 { using vt = unsigned long; signed char c; }; // offsetof must skip the alias
+union U1 { typedef unsigned long td; signed char m : 3; } __attribute__((packed));
+union U2 { short m; using vt = float; static double sd; int f() const { return 0; } };
 template <typename T> struct G
 {
   static_assert(sizeof(T) <= 16, "fits");
@@ -36,6 +40,9 @@ int main()
   __CPROVER_assert(sizeof(H4) == 1, "static data member takes no storage");
   __CPROVER_assert(sizeof(H5) == 1, "member typedef takes no storage");
   __CPROVER_assert(sizeof(H6) == 2 && alignof(H6) == 1, "a static member's type does not align the class");
+  __CPROVER_assert(sizeof(H7) == 24 && offsetof(H7, c) == 16, "offsetof skips the member alias");
+  __CPROVER_assert(sizeof(U1) == 1 && alignof(U1) == 1, "union: a member typedef does not size it");
+  __CPROVER_assert(sizeof(U2) == 2 && alignof(U2) == 2, "union: alias, static member and method take no storage");
   __CPROVER_assert(sizeof(G<uint16_t>) == 16 && alignof(G<uint16_t>) == 16, "attributed class template with a member alias");
   __CPROVER_assert(sizeof(lreg_t) == 16, "alias of the instance");
   __CPROVER_assert(sizeof(K<uint16_t>) == 16 && alignof(K<uint16_t>) == 16, "aligned class template with a member alias");
