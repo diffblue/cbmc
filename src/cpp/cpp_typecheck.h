@@ -1228,6 +1228,10 @@ private:
   unsigned constant_expression_context = 0;
   friend class sfinae_contextt;
 
+  /// system-header declarations dropped because their type checking failed
+  std::vector<std::string> dropped_system_items;
+  void report_dropped_system_item(const cpp_itemt &item);
+
   /// True while instantiating a template that was referenced from within a
   /// constant-expression context (so its definition may have to be folded
   /// now).  N5008 [temp.point]/1, [temp.inst]/5: a `constexpr` specialization

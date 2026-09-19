@@ -1372,6 +1372,14 @@ void cpp_typecheckt::typecheck_method_bodies()
           // Type-checking failed — clear the partially-checked body
           // so the function is cleanly in the "no body" state.
           method_symbol.value.make_nil();
+          // A bodyless function is a havoc stub downstream: every call
+          // returns nondet and assigns nothing.  Silently dropping a
+          // library body hid exactly that unsoundness; say it once.
+          warning().source_location = method_symbol.location;
+          warning() << "C++ front-end dropped the body of system-header "
+                    << "function '" << method_symbol.base_name
+                    << "' (unsupported construct); calls to it return "
+                    << "nondet" << messaget::eom;
         }
         get_message_handler().set_message_count(
           messaget::M_ERROR, errors_before);
@@ -1996,6 +2004,11 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       catch(...)
       {
         _method_symbol->value.make_nil();
+        warning().source_location = _method_symbol->location;
+        warning() << "C++ front-end dropped the body of '"
+                  << _method_symbol->base_name
+                  << "' (its return type could not be deduced); calls to "
+                  << "it return nondet" << messaget::eom;
       }
       template_map.swap(old_map);
     }
