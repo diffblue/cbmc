@@ -155,7 +155,6 @@ protected:
   /// name was written in here; RAII-restored by the resolver.
   cpp_scopet *access_judgment_scope = nullptr;
 
-
   /// While the body of an IMPLICITLY-DEFINED constructor or destructor is
   /// being converted, the class it belongs to.  N5008
   /// [class.access.general]/4 + [class.default.ctor]/4: such a definition

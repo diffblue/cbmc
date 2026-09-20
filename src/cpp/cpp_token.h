@@ -24,7 +24,7 @@ public:
   std::string text;
   unsigned line_no;
   irep_idt filename;
-  /// the `#pragma pack(n)' in effect where this token was read (0: none);
+  /// the `\#pragma pack(n)' in effect where this token was read (0: none);
   /// the scanner maintains the pack stack, the C++ parser reads it per
   /// declaration through the token it starts with
   int pragma_pack = 0;

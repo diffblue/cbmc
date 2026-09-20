@@ -340,10 +340,9 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
       typet op_t = code.return_value().type();
       if(is_reference(op_t))
         op_t = to_reference_type(op_t).base_type();
-      converting_temporary =
-        op_t.id() == ID_struct_tag &&
-        to_struct_tag_type(op_t).get_identifier() !=
-          to_struct_tag_type(return_type).get_identifier();
+      converting_temporary = op_t.id() == ID_struct_tag &&
+                             to_struct_tag_type(op_t).get_identifier() !=
+                               to_struct_tag_type(return_type).get_identifier();
     }
     if(converting_temporary)
     {

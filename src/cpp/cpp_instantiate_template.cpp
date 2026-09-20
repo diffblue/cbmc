@@ -1213,7 +1213,7 @@ bool cpp_typecheckt::try_resolve_lazy_type(typet &type)
   return true;
 }
 
-/// True iff \p type carries the #dropped_incomplete_base marker AND the
+/// True iff \p type carries the `\#dropped_incomplete_base` marker AND the
 /// recorded base type has meanwhile been COMPLETED, i.e. re-elaboration
 /// at this new point of instantiation ([temp.point]) can now succeed.
 bool cpp_typecheckt::dropped_base_now_complete(const typet &type) const
@@ -7417,7 +7417,8 @@ skip_pack_removal_ft:
             {
               irept::subt &arg_sub = sub.get_sub();
               arg_sub.erase(
-                std::remove_if(arg_sub.begin(), arg_sub.end(), is_empty_expansion),
+                std::remove_if(
+                  arg_sub.begin(), arg_sub.end(), is_empty_expansion),
                 arg_sub.end());
               break;
             }
@@ -7436,7 +7437,8 @@ skip_pack_removal_ft:
         {
           irept::subt &init_sub = node.add(ID_initializer).get_sub();
           init_sub.erase(
-            std::remove_if(init_sub.begin(), init_sub.end(), is_empty_expansion),
+            std::remove_if(
+              init_sub.begin(), init_sub.end(), is_empty_expansion),
             init_sub.end());
         }
         // Recurse into sub-nodes

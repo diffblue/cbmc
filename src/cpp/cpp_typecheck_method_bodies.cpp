@@ -135,7 +135,7 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
 /// the key clue for the real fix.
 /// Shared preprocessing for a deferred method body about to be converted:
 /// restore an instantiated member function template's template map
-/// ([temp.inst]/1, from #fn_template_type / #fn_template_args), expand the
+/// ([temp.inst]/1, from `\#fn_template_type` / `\#fn_template_args`), expand the
 /// body's uses of replicated function parameter packs ([temp.variadic]/5)
 /// and drop zero-length pack expansions ([temp.variadic]/7).  Used by BOTH
 /// the main typecheck_method_bodies drain and the deferred-member fixpoint
@@ -1654,7 +1654,7 @@ void cpp_typecheckt::typecheck_method_bodies()
           // structurally-sound recovery is strictly better than a
           // silent success.
         tolerated_incomplete_body:
-          {
+        {
           // This is USER code (library bodies take the `suppress' branch
           // above).  The body stays structurally sound but incomplete;
           // that is not a result a verifier may report as SUCCESSFUL:
@@ -1701,8 +1701,8 @@ void cpp_typecheckt::typecheck_method_bodies()
             if(has_valueless_return(method_symbol.value))
               method_symbol.value.make_nil();
           }
-            continue;
-          }
+          continue;
+        }
         }
       }
     }

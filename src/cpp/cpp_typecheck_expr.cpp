@@ -2591,7 +2591,7 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
             if(fn_type != nullptr && fn_type->parameters().size() >= 1)
             {
               auto matches_enum_operand =
-                [this](const typet &param_type, const exprt &operand) -> bool
+                [](const typet &param_type, const exprt &operand) -> bool
               {
                 typet ot = operand.type();
                 if(is_reference(ot))
@@ -3013,8 +3013,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   const typet &new_object_type = to_pointer_type(expr.type()).base_type();
   if(
     initializer.get_bool(ID_C_value_initialization) &&
-    initializer.operands().empty() &&
-    expr.get(ID_statement) == ID_cpp_new && cpp_is_pod(new_object_type))
+    initializer.operands().empty() && expr.get(ID_statement) == ID_cpp_new &&
+    cpp_is_pod(new_object_type))
   {
     const auto zero =
       ::zero_initializer(new_object_type, expr.find_source_location(), *this);
