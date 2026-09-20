@@ -1458,12 +1458,21 @@ void cpp_typecheckt::typecheck_method_bodies()
     }
   } restore_deferred{*this, saved_deferred};
 
-  while(!method_bodies.empty())
+  while(!method_bodies.empty() || release_referenced_held_back_bodies())
   {
     // Dangerous not to take a copy here. We'll have to make sure that
     // convert is never called with the same symbol twice.
     method_bodyt &method_body = *method_bodies.begin();
     symbolt &method_symbol = *method_body.method_symbol;
+
+    // a speculatively instantiated candidate: convert the body only once
+    // something converted refers to it (release_referenced_held_back_bodies)
+    if(speculative_instances.count(method_symbol.name) != 0)
+    {
+      held_back_bodies.push_back(method_body);
+      method_bodies.erase(method_bodies.begin());
+      continue;
+    }
 
     template_map.swap(method_body.template_map);
     instantiation_stack.swap(method_body.instantiation_stack);
@@ -1960,6 +1969,71 @@ bool cpp_typecheckt::convert_deferred_method_now(const irep_idt &identifier)
   }
   get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
   return method_symbol->value.is_not_nil();
+}
+
+/// Move every held-back speculative body that some converted body (or
+/// initializer) now refers to back onto the work list.
+/// \return whether any body was released
+bool cpp_typecheckt::release_referenced_held_back_bodies()
+{
+  if(held_back_bodies.empty())
+    return false;
+
+  std::set<irep_idt> held;
+  for(const auto &mb : held_back_bodies)
+    held.insert(mb.method_symbol->name);
+
+  // references hide in named sub-trees too (a temporary object's
+  // `#initializer' holds its constructor call), so walk the whole tree
+  std::set<irep_idt> referenced;
+  std::function<void(const irept &)> scan = [&](const irept &n)
+  {
+    if(n.id() == ID_symbol)
+    {
+      const irep_idt &id = n.get(ID_identifier);
+      if(held.count(id) != 0)
+        referenced.insert(id);
+    }
+    for(const auto &sub : n.get_sub())
+      scan(sub);
+    for(const auto &ns : n.get_named_sub())
+      scan(ns.second);
+  };
+  for(const auto &entry : symbol_table.symbols)
+  {
+    const symbolt &sym = entry.second;
+    if(sym.value.is_nil() || held.count(sym.name) != 0)
+      continue;
+    scan(sym.value);
+  }
+
+  bool released = false;
+  for(auto it = held_back_bodies.begin(); it != held_back_bodies.end();)
+  {
+    if(referenced.count(it->method_symbol->name) != 0)
+    {
+      speculative_instances.erase(it->method_symbol->name);
+      method_bodies.push_back(*it);
+      it = held_back_bodies.erase(it);
+      released = true;
+    }
+    else
+      ++it;
+  }
+  return released;
+}
+
+/// End of type checking: a speculative instance nothing refers to is not
+/// instantiated ([temp.inst]/11); it stays a bodyless declaration.
+void cpp_typecheckt::drop_unreferenced_held_back_bodies()
+{
+  for(auto &mb : held_back_bodies)
+  {
+    debug() << "not instantiating the body of the unselected candidate '"
+            << mb.method_symbol->name << "'" << eom;
+    mb.method_symbol->value.make_nil();
+  }
+  held_back_bodies.clear();
 }
 
 void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
