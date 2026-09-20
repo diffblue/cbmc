@@ -2449,6 +2449,12 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
              ctor_sym->type.find(irep_idt{"#fn_template_args"}).is_not_nil());
           const bool ctor_is_explicit =
             ctor_sym != nullptr && ctor_sym->type.get_bool(ID_is_explicit);
+          // N5008 [temp.inst]/4, /11: this constructor template was
+          // instantiated to test a candidate conversion; its body is
+          // needed only if the candidate is selected (see
+          // speculative_instances).
+          if(ctor_is_template_specialization)
+            speculative_instances.insert(ctor_sym->name);
           if(
             ctor_sym != nullptr &&
             (!ctor_is_template_specialization || ctor_is_explicit))

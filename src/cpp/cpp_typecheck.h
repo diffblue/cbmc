@@ -595,6 +595,20 @@ protected:
   typedef std::list<method_bodyt> method_bodiest;
   std::set<irep_idt> methods_seen;
 
+  // N5008 [temp.inst]/4, /11: a function template specialization
+  // instantiated only to test a candidate's viability during overload
+  // resolution (a converting constructor template tried for a
+  // user-defined conversion) must not have its BODY instantiated unless
+  // the candidate is selected -- the body may be ill-formed for those
+  // arguments, and a conforming compiler never sees it.  Such instances
+  // are recorded here; their queued bodies are held back until a
+  // reference to them appears in some converted body, and dropped
+  // silently at the end if none does.
+  std::set<irep_idt> speculative_instances;
+  method_bodiest held_back_bodies;
+  bool release_referenced_held_back_bodies();
+  void drop_unreferenced_held_back_bodies();
+
   // True while instantiate_template converts a member FUNCTION
   // template instance; gates the concretized-pack-pattern fallback in
   // typecheck_compound_declarator ([temp.variadic]/5), which must not
