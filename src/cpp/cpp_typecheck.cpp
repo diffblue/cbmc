@@ -328,6 +328,12 @@ void cpp_typecheckt::typecheck()
               << messaget::eom;
   }
 
+  // N5008 [temp.inst]/11: candidate instances that a converted body does
+  // refer to after all are instantiated now; the rest are not
+  while(release_referenced_held_back_bodies())
+    typecheck_method_bodies();
+  drop_unreferenced_held_back_bodies();
+
   // N5008 [class.copy.ctor]/14, [class.default.ctor]/4: an implicitly-defined
   // special member that is never odr-used is not defined at all; clear the
   // remaining placeholders once every body has been elaborated.
