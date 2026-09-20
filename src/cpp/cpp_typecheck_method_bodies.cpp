@@ -424,12 +424,27 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       const bool is_binary = node.id() == irep_idt("cpp_binary_fold");
       const irept *pattern = nullptr;
       irept init_expr;
+      // N5008 [expr.prim.fold]/2: `(init op ... op pack)' is a binary LEFT
+      // fold, `(pack op ... op init)' a binary RIGHT fold -- the pack may be
+      // on either side.
+      bool binary_pack_left = false;
       if((is_right || is_left) && !node.get_sub().empty())
         pattern = &node.get_sub().front();
       else if(is_binary && node.get_sub().size() >= 2)
       {
-        init_expr = node.get_sub()[0];
-        pattern = &node.get_sub()[1];
+        if(
+          fold_ref_base(node.get_sub()[1]).empty() &&
+          !fold_ref_base(node.get_sub()[0]).empty())
+        {
+          binary_pack_left = true;
+          init_expr = node.get_sub()[1];
+          pattern = &node.get_sub()[0];
+        }
+        else
+        {
+          init_expr = node.get_sub()[0];
+          pattern = &node.get_sub()[1];
+        }
       }
       if(pattern != nullptr)
       {
@@ -447,7 +462,20 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
             reduce_folds(c);
             return c;
           };
-          if(is_binary)
+          if(is_binary && binary_pack_left)
+          {
+            reduce_folds(init_expr);
+            irept result = init_expr; // e0 op (e1 op (... op init))
+            for(int k = static_cast<int>(n) - 1; k >= 0; --k)
+            {
+              irept bin(fold_op);
+              bin.get_sub().push_back(elem(static_cast<std::size_t>(k)));
+              bin.get_sub().push_back(result);
+              result = bin;
+            }
+            node = result;
+          }
+          else if(is_binary)
           {
             reduce_folds(init_expr);
             irept result = init_expr; // (((init op e0) op e1) op ...)
@@ -584,12 +612,25 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
           {
             reduce_folds(init_expr);
             irept result = init_expr;
-            for(std::size_t k = 0; k < named_pack_n; ++k)
+            if(binary_pack_left) // e0 op (e1 op (... op init))
             {
-              irept bin(fold_op);
-              bin.get_sub().push_back(result);
-              bin.get_sub().push_back(elem(k));
-              result = bin;
+              for(int k = static_cast<int>(named_pack_n) - 1; k >= 0; --k)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(elem(static_cast<std::size_t>(k)));
+                bin.get_sub().push_back(result);
+                result = bin;
+              }
+            }
+            else
+            {
+              for(std::size_t k = 0; k < named_pack_n; ++k)
+              {
+                irept bin(fold_op);
+                bin.get_sub().push_back(result);
+                bin.get_sub().push_back(elem(k));
+                result = bin;
+              }
             }
             node = result;
             return;
@@ -645,9 +686,17 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               node = init_expr; // (init op ...) with empty pack -> init
             else
             {
-              irept bin(fold_op); // (init op e0)
-              bin.get_sub().push_back(init_expr);
-              bin.get_sub().push_back(single);
+              irept bin(fold_op); // (init op e0), or (e0 op init)
+              if(binary_pack_left)
+              {
+                bin.get_sub().push_back(single);
+                bin.get_sub().push_back(init_expr);
+              }
+              else
+              {
+                bin.get_sub().push_back(init_expr);
+                bin.get_sub().push_back(single);
+              }
               node = bin;
             }
           }
