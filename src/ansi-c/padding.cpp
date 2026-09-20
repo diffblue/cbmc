@@ -46,7 +46,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// (a typedef's `aligned', marked ID_C_typedef_alignment) is ignored there,
 /// as GCC ignores the alignment of an aligned class type in a packed struct
 /// (also when that type is defined in place, ID_C_type_alignment).  A
-/// `#pragma pack(n)' cap in force for the member still applies.
+/// `\#pragma pack(n)' cap in force for the member still applies.
 static std::optional<mp_integer> explicit_member_alignment(const typet &_type)
 {
   // an alignment specifier on an array member sits on the element type
@@ -82,7 +82,7 @@ static std::optional<mp_integer> explicit_member_alignment(const typet &_type)
   return result;
 }
 
-/// GCC `#pragma pack(n)': "The alignment of a member will be on a boundary
+/// GCC `\#pragma pack(n)': "The alignment of a member will be on a boundary
 /// that is either a multiple of n or a multiple of the size of the member,
 /// whichever is smaller" -- the cap applies after the member's own
 /// `aligned(k)' (which can only increase the natural alignment):

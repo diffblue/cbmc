@@ -5122,7 +5122,7 @@ bool Parser::rDeclarator(
       }
     trailing_requires_done:;
 
-      if(lex.LookAhead(0)==':')
+      if(lex.LookAhead(0) == ':')
       {
 #ifdef DEBUG
         std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 11\n";
@@ -5138,7 +5138,7 @@ bool Parser::rDeclarator(
           return false;
       }
 
-      break;                // "T f(int)(char)" is invalid.
+      break; // "T f(int)(char)" is invalid.
     }
     else if(t=='[')         // array
     {
@@ -6846,11 +6846,11 @@ bool Parser::rInitializeExpr(exprt &expr)
     else if(!rInitializeExpr(tmp))
     {
       if(!SyntaxError())
-        return false;        // too many errors
+        return false; // too many errors
 
       SkipTo('}');
       lex.get_token(tk);
-      return true;           // error recovery
+      return true; // error recovery
     }
     else
     {
@@ -6864,24 +6864,24 @@ bool Parser::rInitializeExpr(exprt &expr)
       expr.operands().back().set(ID_ellipsis, true);
     }
 
-    t=lex.LookAhead(0);
-    if(t=='}')
+    t = lex.LookAhead(0);
+    if(t == '}')
     {
       // done!
     }
-    else if(t==',')
+    else if(t == ',')
     {
       lex.get_token(tk);
-      t=lex.LookAhead(0);
+      t = lex.LookAhead(0);
     }
     else
     {
       if(!SyntaxError())
-        return false;        // too many errors
+        return false; // too many errors
 
       SkipTo('}');
       lex.get_token(tk);
-      return true;           // error recovery
+      return true; // error recovery
     }
   }
 
@@ -7679,7 +7679,7 @@ bool Parser::rClassMember(cpp_itemt &member)
   }
 }
 
-/// `#pragma pack(n)' (a GCC/MSVC extension, not N5008) caps the alignment
+/// `\#pragma pack(n)' (a GCC/MSVC extension, not N5008) caps the alignment
 /// of every data member declared while it is in effect.  As the C grammar
 /// does (parser.y member_declaring_list), communicate the cap to the
 /// member's type as a pragma-marked `aligned' node; ansi_c_convert_typet
@@ -8690,7 +8690,7 @@ bool Parser::rCastExpr(exprt &exp)
           exprt op;
           op.swap(exp);
 
-          exp=exprt("explicit-typecast");
+          exp = exprt("explicit-typecast");
           exp.type().swap(tname);
           exp.add_to_operands(std::move(op));
           set_location(exp, tk1);
@@ -9030,9 +9030,9 @@ bool Parser::rUnaryExpr(exprt &exp)
     return true;
   }
 
-  if(t=='*' || t=='&' || t=='+' ||
-     t=='-' || t=='!' || t=='~' ||
-     t==TOK_INCR || t==TOK_DECR)
+  if(
+    t == '*' || t == '&' || t == '+' || t == '-' || t == '!' || t == '~' ||
+    t == TOK_INCR || t == TOK_DECR)
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -11056,7 +11056,7 @@ bool Parser::rPrimaryExpr(exprt &exp)
       return true;
     }
 
-    if(lex.LookAhead(0)=='{') // GCC extension
+    if(lex.LookAhead(0) == '{') // GCC extension
     {
       if(auto code = rCompoundStatement())
       {
@@ -12026,7 +12026,7 @@ std::optional<codet> Parser::rStatement()
                 << "Parser::rStatement RETURN 3\n";
 #endif
 
-      if(lex.get_token(tk2)!=';')
+      if(lex.get_token(tk2) != ';')
         return {};
     }
 
@@ -12329,12 +12329,12 @@ std::optional<codet> Parser::rIfStatement()
     // consumes the trailing ';' and registers the alias name.
     if(lex.LookAhead(0) == TOK_USING)
     {
-      cpp_declarationt alias_decl;
-      if(!rTypedefUsing(alias_decl))
-        return {};
-      init_stmt = codet(ID_decl);
-      init_stmt.add_to_operands(std::move(alias_decl));
-      set_location(init_stmt, tk2);
+        cpp_declarationt alias_decl;
+        if(!rTypedefUsing(alias_decl))
+          return {};
+        init_stmt = codet(ID_decl);
+        init_stmt.add_to_operands(std::move(alias_decl));
+        set_location(init_stmt, tk2);
     }
 
     // Try: declaration with initializer ';' condition
@@ -12540,12 +12540,12 @@ std::optional<codet> Parser::rSwitchStatement()
     // consumes the trailing ';' and registers the alias name.
     if(lex.LookAhead(0) == TOK_USING)
     {
-      cpp_declarationt alias_decl;
-      if(!rTypedefUsing(alias_decl))
-        return {};
-      init_stmt = codet(ID_decl);
-      init_stmt.add_to_operands(std::move(alias_decl));
-      set_location(init_stmt, tk2);
+        cpp_declarationt alias_decl;
+        if(!rTypedefUsing(alias_decl))
+          return {};
+        init_stmt = codet(ID_decl);
+        init_stmt.add_to_operands(std::move(alias_decl));
+        set_location(init_stmt, tk2);
     }
 
     auto saved_pos = lex.Save();

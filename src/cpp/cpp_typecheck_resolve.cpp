@@ -8798,8 +8798,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       // partial-specialization matching (strict_cv_deduction) the
       // reference kinds must match exactly, per the check below.
       if(
-        !strict_cv_deduction &&
-        template_type.get_bool(ID_C_rvalue_reference) &&
+        !strict_cv_deduction && template_type.get_bool(ID_C_rvalue_reference) &&
         to_type_with_subtype(template_type).subtype().id() == ID_cpp_name &&
         desired_is_ref && !desired_type.get_bool(ID_C_rvalue_reference))
       {
@@ -11409,8 +11408,8 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     return false;
   }
   else if(
-    expr.id() == ID_symbol && !fargs.has_object &&
-    !type.parameters().empty() && type.parameters().front().get_this())
+    expr.id() == ID_symbol && !fargs.has_object && !type.parameters().empty() &&
+    type.parameters().front().get_this())
   {
     // Instantiated template member function (symbol_exprt with this
     // parameter) called without an explicit object — add a synthetic
