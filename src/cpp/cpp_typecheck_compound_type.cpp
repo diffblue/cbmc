@@ -1811,6 +1811,16 @@ void cpp_typecheckt::typecheck_compound_declarator(
       if(!scalar_constant && value.is_not_nil())
         static_symbol.is_extern = false;
     }
+    else if(declaration.member_spec().is_inline() && value.is_not_nil())
+    {
+      // N5008 [class.static.data]/3: an inline static data member's
+      // in-class declaration is its definition.  Left `extern', the
+      // initializer of `static inline const V iv[2] = {...}' was never run
+      // (the dynamic-initialization pass skips extern symbols) and the
+      // constructor-call code sat in the symbol's value, which the static
+      // initializer then tried to assign (type mismatch in symex).
+      static_symbol.is_extern = false;
+    }
 
     // TODO: not sure about this: should be defined separately!
     dynamic_initializations.push_back(static_symbol.name);
@@ -2053,12 +2063,28 @@ void cpp_typecheckt::typecheck_compound_declarator(
         // constexpr class-type member, `static constexpr Q q{11};').
         symbol_exprt symexpr = cpp_symbol_expr(*new_symbol);
 
-        exprt::operandst ops;
-        ops.push_back(value);
-        auto defcode = cpp_constructor(source_locationt(), symexpr, ops);
-        CHECK_RETURN(defcode.has_value());
+        if(
+          value.id() == ID_initializer_list &&
+          new_symbol->type.id() == ID_array)
+        {
+          // N5008 [dcl.init.aggr]/4: an ARRAY of class type is initialised
+          // element by element from the braced list -- the same path a
+          // namespace-scope `V vs[2] = {V(1, 2), V(3, 4)};' takes.  Handing
+          // the list to cpp_constructor as ONE operand made it a single
+          // N-argument constructor call ("found no match for symbol 'V'",
+          // user-reported Issue 12).
+          new_symbol->value = value;
+          convert_initializer(*new_symbol);
+        }
+        else
+        {
+          exprt::operandst ops;
+          ops.push_back(value);
+          auto defcode = cpp_constructor(source_locationt(), symexpr, ops);
+          CHECK_RETURN(defcode.has_value());
 
-        new_symbol->value.swap(defcode.value());
+          new_symbol->value.swap(defcode.value());
+        }
       }
     }
   }
