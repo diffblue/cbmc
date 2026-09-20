@@ -10205,3 +10205,25 @@ forbid that phrase) so no existing test changes meaning.
   the element type; apply_pragma_pack now looks through arrays).  Tests:
   ansi-c/pragma_pack5 (STATIC_ASSERT form; runs in both C and C++ modes),
   cpp_pragma_pack PA.
+
+## Round 151 (2026-09-20) — user Issues 9–11 (next layer of the whole-file compile)
+
+- Issue 9 (`return {.a = i, ...}') and Issue 10 (`return {}' for a union
+  return type) had one cause: cpp_typecheckt::implicit_typecast's braced-
+  list-to-class conversion is a positional member-wise loop; a
+  designated_initializer element or an empty list for a union_tag never
+  reached anything that understood them.  Both shapes are routed to
+  do_initializer (which also handles nested designators and value-
+  initialised remaining members) BEFORE the member-wise block -- the first
+  attempt placed the branch after it and changed nothing (the earlier
+  "brace-init to class with init-list ctor / member-wise" block at
+  ~3840 already consumed the list).  Lesson: implicit_typecast has three
+  braced-list blocks in sequence; a new rule must go before the first
+  that matches.
+- Issue 11: typecheck_expr_lambda built operator()'s parameters from
+  `pdecl.type()' alone -- the declarator (pointer/array/function) was
+  dropped, so NO lambda with a pointer parameter ever worked, and no test
+  in cbmc-cpp had one (the suite had zero `[](T *p)' lambdas).  Fixed with
+  merge_type + adjust_function_parameter.  `int &p' worked only because
+  the reference lives on the decl-specifier type in our representation.
+- Suites ×7 green on /tmp/r151/bin1.  Both tests g++/clang-verified.
