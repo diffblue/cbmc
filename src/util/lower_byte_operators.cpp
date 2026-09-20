@@ -510,6 +510,19 @@ static exprt unpack_array_vector_no_known_bounds(
                                     ? to_vector_type(src.type()).size()
                                     : to_array_type(src.type()).size();
 
+  if(array_vector_size.is_nil())
+  {
+    // The source array/vector has no statically known size (an incomplete
+    // type whose extent is genuinely unknown here, e.g. an extern array
+    // declared without a bound). Represent it as a zero-length comprehension;
+    // any byte access into it is then out of bounds and becomes nondet/fails,
+    // which is the behaviour the extern6 regression exercises.
+    return array_comprehension_exprt{
+      std::move(array_comprehension_index),
+      std::move(body),
+      array_typet{bv_typet{bits_per_byte}, from_integer(0, size_type())}};
+  }
+
   return array_comprehension_exprt{
     std::move(array_comprehension_index),
     std::move(body),
@@ -1055,8 +1068,22 @@ static exprt unpack_rec(
       }
     }
 
-    auto const src_as_bitvector = typecast_exprt::conditional_cast(
+    // When the source width is not a multiple of the byte size, round up
+    // to the next byte boundary and zero-extend the source so that all
+    // byte-sized extractbits operations remain within bounds. The padding
+    // bits (the high bits of the final partial byte) are unspecified and are
+    // filled with zero.
+    const mp_integer padded_bits =
+      total_bits % bits_per_byte == 0
+        ? total_bits
+        : total_bits + bits_per_byte - total_bits % bits_per_byte;
+    exprt src_as_bitvector = typecast_exprt::conditional_cast(
       src, bv_typet{numeric_cast_v<std::size_t>(total_bits)});
+    if(padded_bits > total_bits)
+    {
+      src_as_bitvector = zero_extend_exprt{
+        src_as_bitvector, bv_typet{numeric_cast_v<std::size_t>(padded_bits)}};
+    }
     auto const byte_type = bv_typet{bits_per_byte};
     exprt::operandst byte_operands;
     array_typet array_type{

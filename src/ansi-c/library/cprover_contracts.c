@@ -138,7 +138,7 @@ __CPROVER_HIDE:;
     !(offset > 0) | (offset + size <= __CPROVER_max_malloc_size),
     "no offset bits overflow on CAR upper bound computation");
   return (__CPROVER_contracts_car_t){
-    .is_writable = ptr != 0, .size = size, .lb = ptr, .ub = (char *)ptr + size};
+    ptr != 0, size, ptr, (unsigned char *)ptr + size};
 }
 
 /// \brief Initialises a __CPROVER_contracts_car_set_ptr_t object
@@ -187,7 +187,7 @@ __CPROVER_HIDE:;
     "no offset bits overflow on CAR upper bound computation");
   __CPROVER_contracts_car_t *elem = set->elems + idx;
   *elem = (__CPROVER_contracts_car_t){
-    .is_writable = ptr != 0, .size = size, .lb = ptr, .ub = (char *)ptr + size};
+    ptr != 0, size, ptr, (unsigned char *)ptr + size};
 }
 
 /// \brief Invalidates all cars in the \p set that point into the same object
@@ -547,7 +547,7 @@ __CPROVER_HIDE:;
   __CPROVER_contracts_car_set_insert(
     &(set->contract_assigns),
     idx,
-    ((char *)ptr) - __CPROVER_POINTER_OFFSET(ptr),
+    ((unsigned char *)ptr) - __CPROVER_POINTER_OFFSET(ptr),
     __CPROVER_OBJECT_SIZE(ptr));
 }
 
@@ -832,7 +832,7 @@ __CPROVER_HIDE:;
   __CPROVER_assert(
     !(offset > 0) | (offset + size <= __CPROVER_max_malloc_size),
     "no offset bits overflow on CAR upper bound computation");
-  void *ub = (void *)((char *)ptr + size);
+  void *ub = (void *)((unsigned char *)ptr + size);
   __CPROVER_contracts_car_t *elem = set->contract_assigns.elems;
   __CPROVER_size_t idx = set->contract_assigns.max_elems;
   __CPROVER_bool incl = 0;
@@ -925,7 +925,7 @@ __CPROVER_HIDE:;
 /// \param[in] set The write set to check the operation against
 /// \param[in] ptr Pointer to the havoced object
 /// \return True iff the range of bytes starting at
-/// `(char *)ptr - __CPROVER_POINTER_OFFSET(ptr)` and of size
+/// `(unsigned char *)ptr - __CPROVER_POINTER_OFFSET(ptr)` and of size
 /// `__CPROVER_OBJECT_SIZE(ptr)` is contained in `set->contract_assigns` or
 /// `set->allocated`.
 __CPROVER_bool __CPROVER_contracts_write_set_check_havoc_object(
@@ -935,7 +935,7 @@ __CPROVER_bool __CPROVER_contracts_write_set_check_havoc_object(
 __CPROVER_HIDE:;
   return __CPROVER_contracts_write_set_check_assignment(
     set,
-    (char *)ptr - __CPROVER_POINTER_OFFSET(ptr),
+    (unsigned char *)ptr - __CPROVER_POINTER_OFFSET(ptr),
     __CPROVER_OBJECT_SIZE(ptr));
 }
 
@@ -1527,7 +1527,7 @@ __CPROVER_HIDE:;
     // this cast is safe because we prove that ub and lb are ordered
     __CPROVER_size_t max_offset = ub_offset - lb_offset;
     __CPROVER_assume(offset <= max_offset);
-    *ptr = (char *)lb + offset;
+    *ptr = (unsigned char *)lb + offset;
     __CPROVER_assert(
       write_set->linked_ptr_pred_ctx->ptr_pred != ptr,
       "__CPROVER_pointer_in_range_dfcc does not conflict with other pointer "

@@ -9,7 +9,7 @@ jobs:
   run-10-random-tests:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -22,10 +22,10 @@ jobs:
           sudo apt-get install --no-install-recommends -y build-essential flex bison maven ccache clang-19 clang++-19
           sudo apt-get install --no-install-recommends -y csmith libcsmith-dev
           make -C src minisat2-download
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-CSMITH
           restore-keys: |
@@ -46,3 +46,9 @@ jobs:
         run: |
           export PATH=$PWD/src/cbmc:$PWD/src/goto-cc:$PWD/src/goto-instrument:$PATH
           scripts/csmith.sh 10
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

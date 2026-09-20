@@ -29,6 +29,11 @@ public:
 
   static bvt build_constant(const mp_integer &i, std::size_t width);
 
+  /// Returns the unsigned integer value of the constant bitvector \p bv.
+  /// This is the inverse of \ref build_constant for non-negative values.
+  /// \pre all literals in \p bv are constant (see \ref is_constant)
+  static mp_integer from_constant(const bvt &bv);
+
   bvt incrementer(const bvt &op, literalt carry_in);
   bvt inc(const bvt &op) { return incrementer(op, const_literal(true)); }
   void incrementer(bvt &op, literalt carry_in, literalt &carry_out);

@@ -1,0 +1,11 @@
+CORE
+main.c
+--refine-strings --smt2
+^--refine-strings is not supported with an SMT2 back-end
+^EXIT=1$
+^SIGNAL=0$
+--
+^VERIFICATION
+--
+--refine-strings is a SAT (bit-vector refinement) procedure that cannot run on
+an SMT2 back-end; combining it with --smt2 must be rejected as a usage error.

@@ -1253,7 +1253,7 @@ void ieee_float_valuet::from_expr(const constant_exprt &expr)
   unpack(bvrep2integer(expr.get_value(), spec.width(), false));
 }
 
-mp_integer ieee_floatt::to_integer() const
+mp_integer ieee_float_valuet::to_integer() const
 {
   if(NaN_flag || infinity_flag || is_zero())
     return 0;

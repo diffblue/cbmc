@@ -8,8 +8,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ansi_c_language.h"
 
+#include <util/arith_tools.h>
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/get_base_name.h>
+#include <util/replace_symbol.h>
 #include <util/symbol_table.h>
 
 #include <linking/linking.h>
@@ -106,6 +109,44 @@ bool ansi_c_languaget::parse(
   return result;
 }
 
+/// Adjust non-extern file-scope incomplete array definitions (tentative
+/// definitions without a size) to an array of size 1, per C standard 6.9.2(5),
+/// and rewrite the type carried on any symbol expressions referring to them so
+/// that the symbol's type and its uses in code stay consistent.
+static void adjust_tentative_array_definitions(symbol_table_baset &symbol_table)
+{
+  unchecked_replace_symbolt array_type_updates;
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  {
+    const symbolt &symbol = it->second;
+    if(
+      symbol.is_static_lifetime && !symbol.is_extern && !symbol.is_type &&
+      !symbol.is_macro && symbol.type.id() == ID_array &&
+      to_array_type(symbol.type).size().is_nil())
+    {
+      symbolt &writeable_symbol = it.get_writeable_symbol();
+      symbol_exprt previous_expr = writeable_symbol.symbol_expr();
+      to_array_type(writeable_symbol.type).size() =
+        from_integer(1, size_type());
+      array_type_updates.insert(previous_expr, writeable_symbol.symbol_expr());
+    }
+  }
+
+  if(array_type_updates.empty())
+    return;
+
+  // Apply the type updates to the values (initializers) of all symbols.
+  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  {
+    if(
+      !it->second.is_type && !it->second.is_macro &&
+      it->second.value.is_not_nil())
+    {
+      array_type_updates(it.get_writeable_symbol().value);
+    }
+  }
+}
+
 bool ansi_c_languaget::typecheck(
   symbol_table_baset &symbol_table,
   const std::string &module,
@@ -128,6 +169,12 @@ bool ansi_c_languaget::typecheck(
   {
     return true;
   }
+
+  // C standard 6.9.2(5): non-extern file-scope incomplete array definitions
+  // are adjusted to an array of size 1. Done here (in the front end, before
+  // linking) so the symbol's type and the types carried on symbol expressions
+  // in code stay consistent.
+  adjust_tentative_array_definitions(new_symbol_table);
 
   remove_internal_symbols(
     new_symbol_table, message_handler, keep_file_local, keep);

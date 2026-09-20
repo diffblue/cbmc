@@ -22,14 +22,12 @@ Author: Michael Tautschnig
 #include <util/std_expr.h>
 #include <util/symbol_table.h>
 
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 {
   config.set_arch("none");
-
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
 
   array_typet array_type(char_type(), from_integer(2, size_type()));
   symbol_exprt array("A", array_type);
@@ -38,7 +36,7 @@ TEST_CASE("Simplify pointer_offset(address of array index)", "[core][util]")
 
   exprt p_o=pointer_offset(address_of);
 
-  exprt simp=simplify_expr(p_o, ns);
+  exprt simp = simplify_expr(p_o, empty_namespace);
 
   REQUIRE(simp.is_constant());
   const mp_integer offset_value =
@@ -53,24 +51,20 @@ TEST_CASE("Simplify byte extract", "[core][util]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
   // byte-extracting type T at offset 0 from an object of type T yields the
   // object
   symbol_exprt s("foo", size_type());
   byte_extract_exprt be =
     make_byte_extract(s, from_integer(0, c_index_type()), size_type());
 
-  exprt simp = simplify_expr(be, ns);
+  exprt simp = simplify_expr(be, empty_namespace);
 
   REQUIRE(simp == s);
 }
 
 TEST_CASE("expr2bits and bits2expr respect bit order", "[core][util]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
 
@@ -122,9 +116,6 @@ TEST_CASE("Simplify extractbit", "[core][util]")
   const cmdlinet cmdline;
   config.set(cmdline);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
-
   // binary: 1101 1110 1010 1101 1011 1110 1110 1111
   //         ^MSB                               LSB^
   //              bit23^                  bit4^
@@ -133,13 +124,13 @@ TEST_CASE("Simplify extractbit", "[core][util]")
   const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
 
   exprt eb1 = extractbit_exprt(deadbeef, 4);
-  bool unmodified = simplify(eb1, ns);
+  bool unmodified = simplify(eb1, empty_namespace);
 
   REQUIRE(!unmodified);
   REQUIRE(eb1 == false_exprt());
 
   exprt eb2 = extractbit_exprt(deadbeef, 23);
-  unmodified = simplify(eb2, ns);
+  unmodified = simplify(eb2, empty_namespace);
 
   REQUIRE(!unmodified);
   REQUIRE(eb2 == true_exprt());
@@ -152,13 +143,10 @@ TEST_CASE("Simplify extractbits", "[core][util]")
   const cmdlinet cmdline;
   config.set(cmdline);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
-
   const exprt deadbeef = from_integer(0xdeadbeef, unsignedbv_typet(32));
 
   exprt eb = extractbits_exprt(deadbeef, 8, unsignedbv_typet(8));
-  bool unmodified = simplify(eb, ns);
+  bool unmodified = simplify(eb, empty_namespace);
 
   REQUIRE(!unmodified);
   REQUIRE(eb == from_integer(0xbe, unsignedbv_typet(8)));
@@ -166,8 +154,7 @@ TEST_CASE("Simplify extractbits", "[core][util]")
 
 TEST_CASE("Simplify shift", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   REQUIRE(
     simplify_expr(shl_exprt(from_integer(5, signedbv_typet(8)), 1), ns) ==
@@ -192,8 +179,7 @@ TEST_CASE("Simplify shift", "[core][util]")
 
 TEST_CASE("Simplify dynamic object comparison", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   dynamic_object_exprt dynamic_object(signedbv_typet(8));
   dynamic_object.set_instance(1);
@@ -238,23 +224,19 @@ TEST_CASE("Simplify pointer_object equality", "[core][util]")
   const cmdlinet cmdline;
   config.set(cmdline);
 
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
   exprt p_o_void =
     pointer_object(null_pointer_exprt{pointer_type(empty_typet{})});
   exprt p_o_int =
     pointer_object(null_pointer_exprt{pointer_type(signedbv_typet(32))});
 
-  exprt simp = simplify_expr(equal_exprt{p_o_void, p_o_int}, ns);
+  exprt simp = simplify_expr(equal_exprt{p_o_void, p_o_int}, empty_namespace);
 
   REQUIRE(simp == true);
 }
 
 TEST_CASE("Simplify cast from bool", "[core][util]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   {
     // this checks that ((int)B)==1 turns into B
@@ -307,8 +289,7 @@ TEST_CASE("Simplify cast from bool", "[core][util]")
 
 TEST_CASE("simplify_expr boolean expressions", "[core][util]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
+  const namespacet &ns = empty_namespace;
 
   SECTION("Binary boolean operations")
   {
@@ -520,24 +501,18 @@ TEST_CASE("Simplifying cast expressions", "[core][util]")
 
 TEST_CASE("Simplify bitor", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
-
   SECTION("Simplification for raw bitvector")
   {
     bv_typet bv{4};
     constant_exprt zero = from_integer(0, bv);
     symbol_exprt b{"B", bv};
 
-    REQUIRE(simplify_expr(bitor_exprt{b, zero}, ns) == b);
+    REQUIRE(simplify_expr(bitor_exprt{b, zero}, empty_namespace) == b);
   }
 }
 
 TEST_CASE("Simplify inequality", "[core][util]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
-
   {
     // This checks that 3 < (B ? 4 : 5) simplifies to true, just like (B ? 4 :
     // 5) > 3 simplifies to true.
@@ -546,12 +521,12 @@ TEST_CASE("Simplify inequality", "[core][util]")
     if_exprt if_b{b, from_integer(4, sbv), from_integer(5, sbv)};
 
     binary_relation_exprt comparison_gt{if_b, ID_gt, from_integer(3, sbv)};
-    exprt simp = simplify_expr(comparison_gt, ns);
+    exprt simp = simplify_expr(comparison_gt, empty_namespace);
 
     REQUIRE(simp == true_exprt{});
 
     binary_relation_exprt comparison_lt{from_integer(3, sbv), ID_lt, if_b};
-    simp = simplify_expr(comparison_lt, ns);
+    simp = simplify_expr(comparison_lt, empty_namespace);
 
     REQUIRE(simp == true_exprt{});
   }
@@ -561,39 +536,33 @@ TEST_CASE("Simplify bitxor", "[core][util]")
 {
   config.set_arch("none");
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
-
   SECTION("Simplification for c_bool")
   {
     constant_exprt false_c_bool = from_integer(0, c_bool_type());
 
     REQUIRE(
-      simplify_expr(bitxor_exprt{false_c_bool, false_c_bool}, ns) ==
+      simplify_expr(
+        bitxor_exprt{false_c_bool, false_c_bool}, empty_namespace) ==
       false_c_bool);
   }
 }
 
 TEST_CASE("Simplify power", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   SECTION("Simplification for power")
   {
     symbol_exprt a{"a", integer_typet{}};
 
     REQUIRE(
-      simplify_expr(power_exprt{a, from_integer(1, integer_typet{})}, ns) == a);
+      simplify_expr(
+        power_exprt{a, from_integer(1, integer_typet{})}, empty_namespace) ==
+      a);
   }
 }
 
 TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
 {
   config.set_arch("none");
-
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
 
   SECTION("Same element size: (char*)(unsigned_char_ptr + 1)")
   {
@@ -604,7 +573,7 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
     plus_exprt ptr_plus_1{ptr, from_integer(1, pointer_diff_type())};
     typecast_exprt cast{ptr_plus_1, char_ptr_type};
 
-    exprt result = simplify_expr(cast, ns);
+    exprt result = simplify_expr(cast, empty_namespace);
 
     // Expected: (char*)ptr + 1
     plus_exprt expected{
@@ -621,7 +590,7 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
     plus_exprt ptr_plus_1{ptr, from_integer(1, pointer_diff_type())};
     typecast_exprt cast{ptr_plus_1, char_ptr_type};
 
-    exprt result = simplify_expr(cast, ns);
+    exprt result = simplify_expr(cast, empty_namespace);
 
     // Expected: (char*)ptr + 4
     plus_exprt expected{
@@ -632,8 +601,7 @@ TEST_CASE("Simplify pointer cast of pointer arithmetic", "[core][util]")
 
 TEST_CASE("Simplify quantifier", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
+  const namespacet &ns = empty_namespace;
 
   SECTION("Simplification for exists")
   {
@@ -656,57 +624,42 @@ TEST_CASE("Simplify quantifier", "[core][util]")
 
 TEST_CASE("Simplify all-zero constant in bitand", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const unsignedbv_typet u8{8};
   const symbol_exprt x{"x", u8};
   const auto zero = from_integer(0, u8);
   const bitand_exprt band{x, zero};
-  REQUIRE(simplify_expr(band, ns) == zero);
+  REQUIRE(simplify_expr(band, empty_namespace) == zero);
 }
 
 TEST_CASE("Simplify all-ones constant in bitor", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const unsignedbv_typet u8{8};
   const symbol_exprt x{"x", u8};
   const auto ones = from_integer(255, u8);
   const bitor_exprt bor{x, ones};
-  REQUIRE(simplify_expr(bor, ns) == ones);
+  REQUIRE(simplify_expr(bor, empty_namespace) == ones);
 }
 
 TEST_CASE("Simplify all-zero constant in bitand with bv_typet", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const bv_typet bv8{8};
   const symbol_exprt x{"x", bv8};
   const auto zero = bv8.all_zeros_expr();
   const bitand_exprt band{x, zero};
-  REQUIRE(simplify_expr(band, ns) == zero);
+  REQUIRE(simplify_expr(band, empty_namespace) == zero);
 }
 
 TEST_CASE("Simplify all-ones constant in bitor with bv_typet", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const bv_typet bv8{8};
   const symbol_exprt x{"x", bv8};
   const auto ones = bv8.all_ones_expr();
   const bitor_exprt bor{x, ones};
-  REQUIRE(simplify_expr(bor, ns) == ones);
+  REQUIRE(simplify_expr(bor, empty_namespace) == ones);
 }
 
 TEST_CASE("Simplify flatten nested OR", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const symbol_exprt a{"a", bool_typet{}};
   const symbol_exprt b{"b", bool_typet{}};
   const symbol_exprt c{"c", bool_typet{}};
@@ -714,14 +667,11 @@ TEST_CASE("Simplify flatten nested OR", "[core][util]")
   // (a || (b || c)) should flatten to (a || b || c)
   const or_exprt inner{b, c};
   const or_exprt nested{a, inner};
-  REQUIRE(simplify_expr(nested, ns) == or_exprt{a, b, c});
+  REQUIRE(simplify_expr(nested, empty_namespace) == or_exprt{a, b, c});
 }
 
 TEST_CASE("Simplify flatten nested AND", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const symbol_exprt a{"a", bool_typet{}};
   const symbol_exprt b{"b", bool_typet{}};
   const symbol_exprt c{"c", bool_typet{}};
@@ -729,43 +679,34 @@ TEST_CASE("Simplify flatten nested AND", "[core][util]")
   // (a && (b && c)) should flatten to (a && b && c)
   const and_exprt inner{b, c};
   const and_exprt nested{a, inner};
-  REQUIRE(simplify_expr(nested, ns) == and_exprt{a, b, c});
+  REQUIRE(simplify_expr(nested, empty_namespace) == and_exprt{a, b, c});
 }
 
 TEST_CASE("Simplify complementary pair in OR", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const symbol_exprt a{"a", bool_typet{}};
 
   // (a || !a) should simplify to true
   const or_exprt expr{a, not_exprt{a}};
-  REQUIRE(simplify_expr(expr, ns) == true_exprt{});
+  REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
 
 TEST_CASE("Simplify complementary pair in AND", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const symbol_exprt a{"a", bool_typet{}};
 
   // (a && !a) should simplify to false
   const and_exprt expr{a, not_exprt{a}};
-  REQUIRE(simplify_expr(expr, ns) == false_exprt{});
+  REQUIRE(simplify_expr(expr, empty_namespace) == false_exprt{});
 }
 
 TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
 {
-  const symbol_tablet symbol_table;
-  const namespacet ns{symbol_table};
-
   const symbol_exprt a{"a", bool_typet{}};
   const symbol_exprt b{"b", bool_typet{}};
 
   // (a || (b || !a)) should simplify to true (after flattening)
   const or_exprt inner{b, not_exprt{a}};
   const or_exprt expr{a, inner};
-  REQUIRE(simplify_expr(expr, ns) == true_exprt{});
+  REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }

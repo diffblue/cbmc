@@ -1,0 +1,12 @@
+CORE no-new-smt
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests IEEE 754 ROUND_TO_AWAY (mode 4) for non-tie and tie cases.
+The non-tie test catches a bug in float_bvt where non-tie results
+were incorrectly rounded away from zero instead of to nearest.

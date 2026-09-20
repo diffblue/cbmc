@@ -260,12 +260,13 @@ void smt2_solvert::setup_commands()
       std::cout << ")\n";
     };
 
-    commands["echo"] = [this]() {
-      if(next_token() != smt2_tokenizert::STRING_LITERAL)
+    commands["echo"] = [this]()
+    {
+      auto str_token = next_token();
+      if(str_token != smt2_tokenizert::STRING_LITERAL)
         throw error("expected string literal");
 
-      std::cout << smt2_format(constant_exprt(
-                     smt2_tokenizer.get_buffer(), string_typet()))
+      std::cout << smt2_format(constant_exprt(str_token.text, string_typet()))
                 << '\n';
     };
 

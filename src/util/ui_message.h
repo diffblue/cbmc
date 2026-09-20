@@ -94,13 +94,17 @@ protected:
 
   const char *level_string(unsigned level);
 
-  std::string command(unsigned c) const override
-  {
-    if(message_handler)
-      return message_handler->command(c);
-    else
-      return std::string();
-  }
+  std::string command(unsigned c) const override;
+
+public:
+  /// Returns true iff \p c is a Select Graphic Rendition (SGR) parameter
+  /// value used by messaget for terminal styling -- 0..4 (reset/bold/
+  /// faint/italic/underline) and 31..36 / 91..96 (foreground colours and
+  /// their bright variants). The values listed here are kept in lock-step
+  /// with the corresponding `messaget::commandt` constants in message.h /
+  /// message.cpp; if a new styling command is added there, it should be
+  /// added here too so it is suppressed on the structured UIs.
+  static bool is_sgr_style_command(unsigned c);
 };
 
 #define OPT_FLUSH "(flush)"

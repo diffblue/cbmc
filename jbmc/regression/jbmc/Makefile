@@ -2,21 +2,34 @@ default: tests.log
 
 include ../../src/config.inc
 
-test:
-	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
+# SHARD restricts the long-running symex-driven-lazy-loading run to a single
+# shard "<index>/<count>" (see test.pl --shard); the parent Makefile sets it to
+# spread this profile across parallel workers. An empty SHARD runs the whole
+# profile. Each shard writes a distinct log so concurrent shards do not clobber
+# one another.
+SHARD =
+symex_driven_log = symex-driven-loading$(if $(SHARD),-$(firstword $(subst /, ,$(SHARD))))
+# With BDD_GUARDS the bdd-expected-timeout tests are additionally excluded
+# (preserving the historic behaviour of this Makefile).
 ifeq ($(filter %DBDD_GUARDS, $(CXXFLAGS)),)
-	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -s symex-driven-loading
+symex_driven_extra_exclude =
 else
-	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -X bdd-expected-timeout -s symex-driven-loading
+symex_driven_extra_exclude = -X bdd-expected-timeout
 endif
+symex_driven_opts = -X symex-driven-lazy-loading-expected-failure $(symex_driven_extra_exclude) $(if $(SHARD),--shard $(SHARD)) -s $(symex_driven_log)
+
+.PHONY: test test-normal test-symex-driven-lazy-loading
+test: test-normal test-symex-driven-lazy-loading
+
+test-normal:
+	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
+
+test-symex-driven-lazy-loading:
+	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" $(symex_driven_opts)
 
 tests.log: ../$(CPROVER_DIR)/regression/test.pl
 	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation"
-ifeq ($(filter %DBDD_GUARDS, $(CXXFLAGS)),)
-	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -s symex-driven-loading
-else
-	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure -X bdd-expected-timeout -s symex-driven-loading
-endif
+	@../$(CPROVER_DIR)/regression/test.pl -e -p -c "../../../src/jbmc/jbmc --validate-goto-model --validate-ssa-equation --symex-driven-lazy-loading" -X symex-driven-lazy-loading-expected-failure $(symex_driven_extra_exclude) -s symex-driven-loading
 
 show:
 	@for dir in *; do \
@@ -28,7 +41,7 @@ show:
 clean:
 	find -name '*.out' -execdir $(RM) '{}' \;
 	find -name '*.gb' -execdir $(RM) '{}' \;
-	$(RM) tests.log tests-symex-driven-loading.log
+	$(RM) tests.log tests-symex-driven-loading*.log
 
 %.class: %.java ../../src/org.cprover.jar
 	javac -g -cp ../../src/org.cprover.jar:. $<

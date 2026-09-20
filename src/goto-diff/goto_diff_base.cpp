@@ -57,6 +57,7 @@ void goto_difft::output_functions() const
     case ui_message_handlert::uit::XML_UI:
     {
       msg.error() << "XML output not supported yet" << messaget::eom;
+      break;
     }
   }
 }

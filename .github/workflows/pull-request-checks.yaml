@@ -5,7 +5,8 @@ on:
   pull_request:
     branches: [ develop ]
 env:
-  cvc5-version: "1.2.1"
+  cvc5-version: "1.3.4"
+  z3-version: "4.8.10"
   linux-vcpus: 4
   windows-vcpus: 4
   # Per-test virtual memory limit (KB) for test.pl.
@@ -18,7 +19,7 @@ jobs:
   check-ubuntu-24_04-make-gcc:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -31,16 +32,14 @@ jobs:
           sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-24.04-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -96,6 +95,12 @@ jobs:
             exit 1
           fi
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 25 to 34 minutes
   check-ubuntu-24_04-make-clang:
     runs-on: ubuntu-24.04
@@ -103,7 +108,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -118,16 +123,14 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -164,6 +167,12 @@ jobs:
           make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job has been copied from the one above it, and modified to only build CBMC
   # and run the `regression/cbmc/` regression tests against Z3. The rest of the tests
   # (unit/regression) have been stripped based on the rationale that they are going
@@ -177,7 +186,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -190,10 +199,10 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -212,11 +221,17 @@ jobs:
       - name: Run regression/cbmc tests with z3 as the backend
         run: make -C regression/cbmc test-z3
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 42 minutes
   check-ubuntu-24_04-cmake-gcc:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -229,16 +244,14 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -286,6 +299,12 @@ jobs:
             exit 1
           fi
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 20 to 38 minutes
   check-ubuntu-22_04-make-clang:
     runs-on: ubuntu-22.04
@@ -293,7 +312,7 @@ jobs:
       CC: "ccache /usr/bin/clang"
       CXX: "ccache /usr/bin/clang++"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -308,16 +327,14 @@ jobs:
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-22.04-make-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -358,11 +375,17 @@ jobs:
           make -C regression/cbmc test-cprover-smt2
           make -C jbmc/regression test-parallel JOBS=${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-22_04-cmake-gcc:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -375,16 +398,14 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -412,11 +433,17 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 14 to 46 minutes
   check-ubuntu-24_04-cmake-gcc-14:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -435,16 +462,14 @@ jobs:
           sudo ln -sf cpp-14 /usr/bin/cpp
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -465,11 +490,17 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-24_04-arm-cmake-gcc:
     runs-on: ubuntu-24.04-arm
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -482,16 +513,14 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-arm64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-arm64-static.zip cvc5-Linux-arm64-static/bin/cvc5
-          rm cvc5-Linux-arm64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-24.04-Arm-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -519,11 +548,17 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 14 to 60 minutes
   check-ubuntu-22_04-cmake-gcc-32bit:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -536,16 +571,14 @@ jobs:
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc-5 from the releases page and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Linux-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-Linux-x86_64-static.zip cvc5-Linux-x86_64-static/bin/cvc5
-          rm cvc5-Linux-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-22.04-Release-32-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -566,11 +599,22 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 2 to 24 minutes
   check-ubuntu-24_04-cmake-gcc-KNOWNBUG:
     runs-on: ubuntu-24.04
+    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
+    # from the matching ccache produced in the same workflow run. The cmake
+    # configure flags below must stay in sync with that job's so the compile
+    # commands hash identically and ccache hits in full.
+    needs: check-ubuntu-24_04-cmake-gcc
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -581,10 +625,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3 clang libc++-dev libc++abi-dev
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -595,7 +638,7 @@ jobs:
           echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
           echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
       - name: Configure using CMake
-        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++
+        run: cmake -H. -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -Dsat_impl="minisat2;cadical"
       - name: Zero ccache stats and limit in size
         run: ccache -z --max-size=500M
       - name: Build with Ninja
@@ -613,11 +656,18 @@ jobs:
           git checkout -- memory_allocation1 printf1 printf3 union12 va_list3
           ../test.pl -c "cbmc --cprover-smt2" -I broken-smt-backend -K
 
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 7 to 30 minutes
   check-ubuntu-24_04-cmake-gcc-THOROUGH:
     runs-on: ubuntu-24.04
+    # Sequenced after check-ubuntu-24_04-cmake-gcc so that this job benefits
+    # from the matching ccache produced in the same workflow run. The cmake
+    # configure flags below must stay in sync with that job's so the compile
+    # commands hash identically and ccache hits in full.
+    needs: check-ubuntu-24_04-cmake-gcc
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -628,10 +678,9 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3 clang libc++-dev libc++abi-dev
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -652,11 +701,13 @@ jobs:
       - name: Run tests
         run: cd build; ctest . -V -L THOROUGH -j${{env.linux-vcpus}}
 
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc, which this job depends on.
   # This job takes approximately 39 to 69 minutes
   check-macos-15-intel-make-clang:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -666,16 +717,14 @@ jobs:
           brew install flex bison parallel ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc5 binary and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS-x86_64-static.zip
-          unzip -j -d /usr/local/bin cvc5-macOS-x86_64-static.zip cvc5-macOS-x86_64-static/bin/cvc5
-          rm cvc5-macOS-x86_64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -734,27 +783,31 @@ jobs:
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=4
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 36 to 85 minutes
   check-macos-14-cmake-clang:
     runs-on: macos-14
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
         run: brew install ninja maven flex bison ccache z3
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
-      - name: Download cvc5 binary and make sure it can be deployed
-        run: |
-          wget https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-macOS-arm64-static.zip
-          unzip -j -d /usr/local/bin cvc5-macOS-arm64-static.zip cvc5-macOS-arm64-static/bin/cvc5
-          rm cvc5-macOS-arm64-static.zip
-          cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
         with:
-          save-always: true
+          version: ${{ env.cvc5-version }}
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
           path: .ccache
           key: ${{ runner.os }}-Release-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -778,13 +831,24 @@ jobs:
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 49 to 70 minutes
-  check-vs-2025-cmake-build-and-test:
+  # Note: as of June 2026 the "windows-2025" runner label is being migrated to
+  # the Windows Server 2025 image that ships Visual Studio 2026 (MSVC 14.5x)
+  # instead of VS 2022/2025 (MSVC 14.4x); see actions/runner-images#14017.
+  # During the rollout both images are served under this label, so this job may
+  # run on either toolset.
+  check-vs-2026-cmake-build-and-test:
     runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
@@ -793,10 +857,10 @@ jobs:
         id: cache-key
         run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
       - name: Cache Chocolatey packages
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
-            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\lib\winflexbison3
             C:\ProgramData\chocolatey\bin
           key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
           restore-keys: |
@@ -809,32 +873,43 @@ jobs:
               exit 1
             }
           }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue))
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            # Only contact the Chocolatey servers when the package is not
+            # already present (restored from the cache above or pre-installed on
+            # the runner).  This lets the step succeed from cache when the
+            # Chocolatey infrastructure is unavailable.
+            choco install -y winflexbison3
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "winflexbison3 restored from cache; skipping Chocolatey install."
           }
           Require-Tool win_flex
           Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-          Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
-          Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
-          echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
-          New-Item -ItemType directory "C:\tools\cvc5"
-          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-x86_64-static.zip -OutFile .\cvc5-Win64-x86_64-static.zip
-          Expand-Archive -LiteralPath '.\cvc5-Win64-x86_64-static.Zip'
-          Move-Item -Path .\cvc5-Win64-x86_64-static\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
-          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+      - name: Install Z3
+        uses: ./.github/actions/install-z3
+        with:
+          version: ${{ env.z3-version }}
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -905,13 +980,19 @@ jobs:
           $env:CBMC_TEST_MEMLIMIT = "3000000"
           ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 65 to 84 minutes
   check-vs-2022-make-build-and-test:
     runs-on: windows-2022
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Setup MSBuild
@@ -920,10 +1001,11 @@ jobs:
         id: cache-key
         run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
       - name: Cache Chocolatey packages
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
-            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\lib\winflexbison3
+            C:\ProgramData\chocolatey\lib\wget
             C:\ProgramData\chocolatey\bin
           key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3-strawberryperl-wget
           restore-keys: |
@@ -936,11 +1018,31 @@ jobs:
               exit 1
             }
           }
-          choco install -y winflexbison3 strawberryperl wget
-          if($LastExitCode -ne 0)
+          # Only contact the Chocolatey servers for packages that are not
+          # already present (restored from the cache above or pre-installed on
+          # the runner -- which ships Strawberry Perl).  This lets the step
+          # succeed from cache when the Chocolatey infrastructure is unavailable.
+          #
+          # `perl` is only used to run regression's test.pl, so any Perl
+          # interpreter already on PATH is sufficient; we therefore install
+          # strawberryperl only when no perl at all is found (strawberryperl,
+          # unlike winflexbison3/wget, is intentionally not cached).
+          $toInstall = @()
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue)) { $toInstall += 'winflexbison3' }
+          if (-not (Get-Command perl     -ErrorAction SilentlyContinue)) { $toInstall += 'strawberryperl' }
+          if (-not (Get-Command wget.exe -ErrorAction SilentlyContinue)) { $toInstall += 'wget' }
+          if ($toInstall.Count -gt 0)
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            choco install -y $toInstall
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "All Chocolatey dependencies already present; skipping install."
           }
           Require-Tool win_flex
           Require-Tool win_bison
@@ -949,24 +1051,24 @@ jobs:
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
           echo "c:\Strawberry\" >> $env:GITHUB_PATH
-          Invoke-WebRequest -Uri https://github.com/Z3Prover/z3/releases/download/z3-4.8.10/z3-4.8.10-x64-win.zip -OutFile .\z3.zip
-          Expand-Archive -LiteralPath '.\z3.Zip' -DestinationPath C:\tools
-          echo "c:\tools\z3-4.8.10-x64-win\bin;" >> $env:GITHUB_PATH
-          New-Item -ItemType directory "C:\tools\cvc5"
-          Invoke-WebRequest -Uri https://github.com/cvc5/cvc5/releases/download/cvc5-${{env.cvc5-version}}/cvc5-Win64-x86_64-static.zip -OutFile .\cvc5-Win64-x86_64-static.zip
-          Expand-Archive -LiteralPath '.\cvc5-Win64-x86_64-static.Zip'
-          Move-Item -Path .\cvc5-Win64-x86_64-static\cvc5-Win64-x86_64-static\bin\cvc5.exe c:\tools\cvc5\cvc5.exe
-          echo "c:\tools\cvc5;" >> $env:GITHUB_PATH
+      - name: Install Z3
+        uses: ./.github/actions/install-z3
+        with:
+          version: ${{ env.z3-version }}
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ env.cvc5-version }}
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Confirm cvc5 solver is available and log the version installed
         run: cvc5 --version
       - name: Initialise Developer Command Line
         uses: ilammy/msvc-dev-cmd@v1
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-make-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -1006,13 +1108,19 @@ jobs:
           $env:CBMC_TEST_MEMLIMIT = "3000000"
           make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 7 to 32 minutes
   windows-msi-package:
     runs-on: windows-2025
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Setup Visual Studio environment
@@ -1021,10 +1129,10 @@ jobs:
         id: cache-key
         run: echo "month=$(Get-Date -Format 'yyyy-MM')" >> $env:GITHUB_OUTPUT
       - name: Cache Chocolatey packages
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
-            C:\ProgramData\chocolatey\lib
+            C:\ProgramData\chocolatey\lib\winflexbison3
             C:\ProgramData\chocolatey\bin
           key: ${{ runner.os }}-choco-${{ steps.cache-key.outputs.month }}-winflexbison3
           restore-keys: |
@@ -1037,20 +1145,31 @@ jobs:
               exit 1
             }
           }
-          choco install winflexbison3
-          if($LastExitCode -ne 0)
+          if (-not (Get-Command win_flex -ErrorAction SilentlyContinue))
           {
-            Write-Output "::error ::Dependency installation via Chocolatey failed."
-            exit $LastExitCode
+            # Only contact the Chocolatey servers when the package is not
+            # already present (restored from the cache above or pre-installed on
+            # the runner).  This lets the step succeed from cache when the
+            # Chocolatey infrastructure is unavailable.
+            choco install -y winflexbison3
+            if($LastExitCode -ne 0)
+            {
+              Write-Output "::error ::Dependency installation via Chocolatey failed."
+              exit $LastExitCode
+            }
+          }
+          else
+          {
+            Write-Output "winflexbison3 restored from cache; skipping Chocolatey install."
           }
           Require-Tool win_flex
           Require-Tool win_bison
           nuget install clcache -OutputDirectory "c:\tools" -ExcludeVersion -Version 4.1.0
           echo "c:\tools\clcache\clcache-4.1.0" >> $env:GITHUB_PATH
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-msbuild-${{ github.ref }}-${{ github.sha }}-PKG
           restore-keys: |
@@ -1097,10 +1216,10 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison libxml2-utils ccache python3
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-24.04-dogfood-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -1123,12 +1242,18 @@ jobs:
       - name: Run dog-food harness on extended sample (report only)
         continue-on-error: true
         run: ./scripts/dogfood_goto_cc.sh
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
 
   # This job takes approximately 2 to 3 minutes
   check-string-table:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check for unused irep ids
         run: ./scripts/string_table_check.sh
 
@@ -1136,15 +1261,42 @@ jobs:
   check-docker-image:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Download test dependencies
         run: |
           sudo apt update
           sudo apt install openjdk-11-jdk-headless
+      - name: Set up Docker Buildx
+        id: setup-buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Cache Docker build mounts (apt downloads + ccache)
+        uses: actions/cache@v6
+        id: docker-cache-mount
+        with:
+          path: docker-cache-mount
+          key: docker-cache-mount-${{ github.sha }}
+          restore-keys: |
+            docker-cache-mount-
+      - name: Inject build mounts into BuildKit
+        # Docker layer caching cannot speed up the build on a source-changing
+        # PR, because `COPY . /tmp/cbmc` invalidates the build layer.  Instead
+        # we persist the Dockerfile's apt and ccache `--mount=type=cache`
+        # contents across runs: this step restores them into the buildx builder
+        # before the build and extracts them again afterwards (saved by the
+        # actions/cache step above).  ccache then reuses objects across source
+        # changes.  Note: on pull requests from forks the actions/cache write is
+        # restricted, so the cache is read-only there and this gracefully
+        # degrades to an uncached build.
+        uses: reproducible-containers/buildkit-cache-dance@v3
+        with:
+          builder: ${{ steps.setup-buildx.outputs.name }}
+          cache-dir: docker-cache-mount
+          dockerfile: Dockerfile
+          skip-extraction: ${{ steps.docker-cache-mount.outputs.cache-hit }}
       - name: Build docker image
-        run: docker build -t cbmc .
+        run: docker buildx build --load -t cbmc .
       - name: Smoke test goto-cc
         run: docker run -v ${PWD}/.github/workflows/smoke_test_assets:/mnt/smoke -t cbmc goto-cc -o /mnt/smoke/test.goto /mnt/smoke/test.c
       - name: Smoke test cbmc
@@ -1160,7 +1312,7 @@ jobs:
   include-what-you-use:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies

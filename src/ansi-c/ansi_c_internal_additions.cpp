@@ -18,41 +18,35 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "ansi_c_parser.h"
 
 const char gcc_builtin_headers_types[] =
-  "#line 1 \"gcc_builtin_headers_types.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_types.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_generic[] =
-  "#line 1 \"gcc_builtin_headers_generic.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_generic.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_math[] =
-  "#line 1 \"gcc_builtin_headers_math.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_math.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_mem_string[] =
-  "#line 1 \"gcc_builtin_headers_mem_string.h\"\n"
 // NOLINTNEXTLINE(whitespace/line_length)
 #include "compiler_headers/gcc_builtin_headers_mem_string.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_omp[] = "#line 1 \"gcc_builtin_headers_omp.h\"\n"
+const char gcc_builtin_headers_omp[] =
 #include "compiler_headers/gcc_builtin_headers_omp.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_tm[] = "#line 1 \"gcc_builtin_headers_tm.h\"\n"
+const char gcc_builtin_headers_tm[] =
 #include "compiler_headers/gcc_builtin_headers_tm.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_ubsan[] =
-  "#line 1 \"gcc_builtin_headers_ubsan.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_ubsan.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_ia32[] =
-  "#line 1 \"gcc_builtin_headers_ia32.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_ia32.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 const char gcc_builtin_headers_ia32_2[] =
@@ -81,41 +75,38 @@ const char gcc_builtin_headers_ia32_9[] =
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_alpha[] =
-  "#line 1 \"gcc_builtin_headers_alpha.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_alpha.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char gcc_builtin_headers_arm[] = "#line 1 \"gcc_builtin_headers_arm.h\"\n"
+const char gcc_builtin_headers_arm[] =
 #include "compiler_headers/gcc_builtin_headers_arm.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_mips[] =
-  "#line 1 \"gcc_builtin_headers_mips.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_mips.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
 const char gcc_builtin_headers_power[] =
-  "#line 1 \"gcc_builtin_headers_power.h\"\n"
 #include "compiler_headers/gcc_builtin_headers_power.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char arm_builtin_headers[] = "#line 1 \"arm_builtin_headers.h\"\n"
+const char arm_builtin_headers[] =
 #include "compiler_headers/arm_builtin_headers.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char cw_builtin_headers[] = "#line 1 \"cw_builtin_headers.h\"\n"
+const char cw_builtin_headers[] =
 #include "compiler_headers/cw_builtin_headers.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char clang_builtin_headers[] = "#line 1 \"clang_builtin_headers.h\"\n"
+const char clang_builtin_headers[] =
 #include "compiler_headers/clang_builtin_headers.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
-const char cprover_builtin_headers[] = "#line 1 \"cprover_builtin_headers.h\"\n"
+const char cprover_builtin_headers[] =
 #include "cprover_builtin_headers.inc" // IWYU pragma: keep
   ;                                    // NOLINT(whitespace/semicolon)
 
-const char windows_builtin_headers[] = "#line 1 \"windows_builtin_headers.h\"\n"
+const char windows_builtin_headers[] =
 #include "compiler_headers/windows_builtin_headers.inc" // IWYU pragma: keep
   ; // NOLINT(whitespace/semicolon)
 
@@ -348,6 +339,9 @@ void ansi_c_architecture_strings(std::string &code)
   code+=architecture_string(config.ansi_c.alignment, "alignment");
   code+=architecture_string(config.ansi_c.memory_operand_size, "memory_operand_size"); // NOLINT(whitespace/line_length)
   code+=architecture_string(static_cast<int>(config.ansi_c.endianness), "endianness"); // NOLINT(whitespace/line_length)
+  code += architecture_string(
+    static_cast<int>(config.ansi_c.argument_evaluation_order),
+    "argument_evaluation_order");
   code+=architecture_string(id2string(config.ansi_c.arch), "arch");
   code+=architecture_string(configt::ansi_ct::os_to_string(config.ansi_c.os), "os"); // NOLINT(whitespace/line_length)
   code+=architecture_string(config.ansi_c.NULL_is_zero, "NULL_is_zero");

@@ -10,13 +10,13 @@ jobs:
   FreeBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: freebsd-15.0-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -71,17 +71,23 @@ jobs:
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
             # # gmake -C jbmc/regression test-parallel JOBS=2
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 7 to 34 minutes
   OpenBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: openbsd-7.7-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -133,17 +139,23 @@ jobs:
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
             # # gmake -C jbmc/regression test-parallel JOBS=2
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   # This job takes approximately 6 to 29 minutes
   NetBSD:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: netbsd-10.1-gmake-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -197,3 +209,10 @@ jobs:
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
             # # gmake -C jbmc/regression test-parallel JOBS=2
+
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

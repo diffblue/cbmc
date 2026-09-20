@@ -1,4 +1,4 @@
-#include <string.h>
+void *memset(void *, int, __CPROVER_size_t);
 
 struct mystruct {
   int x;

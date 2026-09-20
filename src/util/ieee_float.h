@@ -270,14 +270,45 @@ public:
 
   // performs conversions from IEEE float-point format
   // to something else
+
+  /// Reinterpret this value as a native \c double. This is a bit-exact
+  /// reinterpretation of the packed IEEE 754 representation, not a rounding
+  /// conversion, and therefore does not depend on any rounding mode.
+  /// \pre the value is in IEEE 754 double (binary64) format, i.e.
+  ///   \ref is_double returns true.
+  /// \return the corresponding \c double
   double to_double() const;
+
+  /// Reinterpret this value as a native \c float. This is a bit-exact
+  /// reinterpretation of the packed IEEE 754 representation, not a rounding
+  /// conversion, and therefore does not depend on any rounding mode.
+  /// \note from_float() followed by to_float() may return a different bit
+  ///   pattern for NaN.
+  /// \pre the value is in IEEE 754 single (binary32) format, i.e.
+  ///   \ref is_float returns true.
+  /// \return the corresponding \c float
   float to_float() const;
+
+  /// \return true iff this value is in IEEE 754 double (binary64) format
   bool is_double() const;
+  /// \return true iff this value is in IEEE 754 single (binary32) format
   bool is_float() const;
   mp_integer pack() const;
   void extract_base2(mp_integer &_exponent, mp_integer &_fraction) const;
   void extract_base10(mp_integer &_exponent, mp_integer &_fraction) const;
-  mp_integer to_integer() const; // this always rounds to zero
+
+  /// Convert to an integer, always rounding towards zero (truncation), i.e.
+  /// modelling a C cast such as `(int)f`. NaN, infinities and zero map to 0.
+  ///
+  /// Because the rounding is fixed (truncation), this conversion does not
+  /// depend on any rounding mode and so belongs on \ref ieee_float_valuet
+  /// rather than \ref ieee_floatt. A rounding-mode-respecting float-to-integer
+  /// conversion (the analogue of `lrint`) would instead belong on
+  /// \ref ieee_floatt; see also \ref ieee_floatt::round_to_integral, which
+  /// rounds to an integral *floating-point* value according to the configured
+  /// rounding mode.
+  /// \return the truncated integer value
+  mp_integer to_integer() const;
 
   // output
   void print(std::ostream &out) const;
@@ -396,12 +427,6 @@ public:
   void from_integer(const mp_integer &i);
   void from_base10(const mp_integer &exp, const mp_integer &frac);
   void build(const mp_integer &exp, const mp_integer &frac);
-
-  // performs conversions from IEEE float-point format
-  // to something else
-  double to_double() const;
-  float to_float() const;
-  mp_integer to_integer() const; // this always rounds to zero
 
   // conversions
   void change_spec(const ieee_float_spect &dest_spec);

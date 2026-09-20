@@ -1,0 +1,13 @@
+KNOWNBUG
+allocate3.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--
+--
+The calloc lowering __CPROVER_allocate(size, 1) requests zero-initialised
+memory, but the cprover state encoder drops the zero-init operand and models
+nondeterministic contents (matching malloc/posix_memalign/realloc), so
+`p[0] == 0` is currently REFUTED rather than SUCCESS.  Marked KNOWNBUG to
+document the limitation; promote to CORE if/when zeroing is modelled.

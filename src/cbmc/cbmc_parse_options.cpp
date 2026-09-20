@@ -23,7 +23,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-programs/process_goto_program.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/remove_skip.h>
-#include <goto-programs/remove_unused_functions.h>
 #include <goto-programs/set_properties.h>
 #include <goto-programs/show_goto_functions.h>
 #include <goto-programs/show_properties.h>
@@ -409,6 +408,19 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
 
   if(cmdline.isset("refine-strings"))
   {
+    // The refined-string solver is a SAT (bit-vector refinement) procedure and
+    // cannot run on an SMT2 back-end. The SMT2 back-end instead lowers string
+    // operations to the SMT-LIB theory of strings directly. Reject the
+    // contradictory combination rather than silently ignoring one of them.
+    if(cmdline.isset("smt2") || cmdline.isset("incremental-smt2-solver"))
+    {
+      log.error() << "--refine-strings is not supported with an SMT2 back-end; "
+                     "the SMT2 back-end handles strings via the SMT-LIB theory "
+                     "of strings"
+                  << messaget::eom;
+      exit(CPROVER_EXIT_USAGE_ERROR);
+    }
+
     options.set_option("refine-strings", true);
     options.set_option("string-printable", cmdline.isset("string-printable"));
   }
@@ -925,13 +937,6 @@ bool cbmc_parse_optionst::process_goto_program(
   // add failed symbols
   // needs to be done before pointer analysis
   add_failed_symbols(goto_model.symbol_table);
-
-  if(options.get_bool_option("drop-unused-functions"))
-  {
-    // Entry point will have been set before and function pointers removed
-    log.status() << "Removing unused functions" << messaget::eom;
-    remove_unused_functions(goto_model, log.get_message_handler());
-  }
 
   // remove skips such that trivial GOTOs are deleted and not considered
   // for coverage annotation:

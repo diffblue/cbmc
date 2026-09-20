@@ -83,6 +83,9 @@ int ms_cl_modet::doit()
     config.ansi_c.set_64();
 
   config.ansi_c.mode=configt::ansi_ct::flavourt::VISUAL_STUDIO;
+  // the compiler flavour was changed after the architecture was configured,
+  // so re-derive the mode-dependent architectural parameters
+  config.ansi_c.set_argument_evaluation_order();
   compiler.object_file_extension="obj";
 
   // determine actions to be undertaken

@@ -1,0 +1,10 @@
+CORE
+allocate1.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S\d+\(ς\) ⇒ S\d+\(ς\[❝main::\$tmp::malloc_value❞:=allocate\(ς, 4 \* cast\(10, unsignedbv\[\d+\]\)\)\]\)$
+^\[main\.pointer\.1\] line \d+ pointer .* safe: SUCCESS$
+^\[main\.pointer\.2\] line \d+ pointer .* safe: SUCCESS$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

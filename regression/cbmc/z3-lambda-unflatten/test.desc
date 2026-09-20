@@ -1,0 +1,30 @@
+CORE broken-cprover-smt-backend no-new-smt
+main.c
+--z3 --outfile -
+activate-multi-line-match
+\(declare-fun \|[^|]*memcpy[^|]*::1::1::src_n!0@1#2\| \(\) \(Array \(_ BitVec (?:32|64)\) \(_ BitVec 8\)\)\)\n\(assert \(= \|[^|]*memcpy[^|]*::1::1::src_n!0@1#2\| \(lambda
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Pins the SMT2 emitted under `--z3` to a `(declare-fun ...) (assert (= ...
+(lambda ...)))` form rather than `(define-fun ... (lambda ...))` -- which Z3
+rejects on `(get-value ...)`.  The lambda comes from CBMC's array
+comprehension lowering for the variable-length `src` array; without the
+`set_to` re-routing introduced when `use_lambda_for_array` is true (gated on
+`use_lambda_for_array`, currently only Z3) the SMT2 would emit a
+`define-fun` body that prevents Z3 from returning a model.
+
+The regex tolerates the two ways the memcpy SSA symbol is named:
+`memcpy::1::1::src_n` on glibc/BSD targets and
+`__builtin___memcpy_chk::1::1::src_n` on macOS where `<string.h>`
+expands `memcpy(...)` to the FORTIFY_SOURCE-fortified builtin.  It
+also accepts either `(_ BitVec 32)` or `(_ BitVec 64)` for the array
+index sort so the test can run on both i386 and 64-bit
+configurations.
+
+A future change that re-enables `use_as_const = true` for Z3 (i.e. after
+Z3Prover/z3#9550 is fixed and the minimum Z3 version is bumped) must
+also update or remove this regex; the test exists precisely to flag such a
+silent regression.

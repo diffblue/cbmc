@@ -6,23 +6,21 @@ Author: Diffblue
 
 \*******************************************************************/
 
-#include <ansi-c/expr2c.h>
-#include <testing-utils/use_catch.h>
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/config.h>
-#include <util/namespace.h>
-#include <util/symbol_table.h>
+
+#include <ansi-c/expr2c.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("rol_2_c_conversion_unsigned", "[core][ansi-c][expr2c]")
 {
   auto lhs = from_integer(31, unsignedbv_typet(32));
   auto rhs = from_integer(3, unsignedbv_typet(32));
   auto rol = shift_exprt(lhs, ID_rol, rhs);
-  CHECK(
-    expr2c(rol, namespacet{symbol_tablet{}}) ==
-    "31 << 3 % 32 | 31 >> 32 - 3 % 32");
+  CHECK(expr2c(rol, empty_namespace) == "31 << 3 % 32 | 31 >> 32 - 3 % 32");
 }
 
 TEST_CASE("rol_2_c_conversion_signed", "[core][ansi-c][expr2c]")
@@ -37,7 +35,7 @@ TEST_CASE("rol_2_c_conversion_signed", "[core][ansi-c][expr2c]")
   auto rhs = from_integer(3, signedbv_typet(8));
   auto rol = shift_exprt(lhs, ID_rol, rhs);
   CHECK(
-    expr2c(rol, namespacet{symbol_tablet{}}) ==
+    expr2c(rol, empty_namespace) ==
     "(unsigned char)31 << 3 % 8 | (unsigned char)31 >> 8 - 3 % 8");
 }
 
@@ -46,9 +44,7 @@ TEST_CASE("ror_2_c_conversion_unsigned", "[core][ansi-c][expr2c]")
   auto lhs = from_integer(31, unsignedbv_typet(32));
   auto rhs = from_integer(3, unsignedbv_typet(32));
   auto ror = shift_exprt(lhs, ID_ror, rhs);
-  CHECK(
-    expr2c(ror, namespacet{symbol_tablet{}}) ==
-    "31 >> 3 % 32 | 31 << 32 - 3 % 32");
+  CHECK(expr2c(ror, empty_namespace) == "31 >> 3 % 32 | 31 << 32 - 3 % 32");
 }
 
 TEST_CASE("ror_2_c_conversion_signed", "[core][ansi-c][expr2c]")
@@ -63,6 +59,6 @@ TEST_CASE("ror_2_c_conversion_signed", "[core][ansi-c][expr2c]")
   auto rhs = from_integer(3, integer_bitvector_typet(ID_signedbv, 32));
   auto ror = shift_exprt(lhs, ID_ror, rhs);
   CHECK(
-    expr2c(ror, namespacet{symbol_tablet{}}) ==
+    expr2c(ror, empty_namespace) ==
     "(unsigned int)31 >> 3 % 32 | (unsigned int)31 << 32 - 3 % 32");
 }

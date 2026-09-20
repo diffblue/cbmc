@@ -637,7 +637,21 @@ literalt boolbvt::convert_typecast(const typecast_exprt &expr)
   const bvt &bv = convert_bv(expr.op());
 
   if(!bv.empty())
+  {
+    // For a floating-point source, casting to bool yields "value is non-zero",
+    // and -0 must count as zero even though its sign bit is set. Mask the sign
+    // via float_utilst::is_zero rather than OR-ing all bits together. This
+    // mirrors the IS_C_BOOL (_Bool) destination case in type_conversion.
+    if(expr.op().type().id() == ID_floatbv)
+    {
+      float_utilst float_utils(prop, to_floatbv_type(expr.op().type()));
+      return !float_utils.is_zero(bv);
+    }
+
+    // Other bitvector sources (fixedbv, integers, ...) intentionally fall
+    // through: they have no -0, so OR-ing all bits is a correct non-zero test.
     return prop.lor(bv);
+  }
 
   return SUB::convert_rest(expr);
 }

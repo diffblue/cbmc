@@ -131,7 +131,7 @@ files.
    jobs to run simultaneously. `ninja` defaults to building with `# of cores + 2`
    jobs at the same time.
 
-#Building using Make
+# Building using Make
 
 The rest of this section is split up based on the platform being built on.
 Please read the section appropriate for your platform.
@@ -167,6 +167,15 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    ```
    dnf install java-1.8.0-openjdk-devel maven jq
    ```
+   JBMC requires a Java 8 toolchain in the build shell, but Java 8 does not
+   need to be the system-wide default JDK. If another JDK is selected by
+   default, set `JAVA_HOME` to the Java 8 installation and prepend its `bin`
+   directory to `PATH` for the build. Verify both the runtime and compiler:
+   ```
+   java -version
+   javac -version
+   ```
+   Both commands should report version 1.8.
 
 2. As a user, get the CBMC source via
    ```
@@ -250,6 +259,10 @@ Maven 3 manually.
    ```
    pkg install openjdk8 wget maven
    ```
+   Java 8 needs only be selected for the build shell, not as the system-wide
+   default. Set `JAVA_HOME` to the OpenJDK 8 directory and prepend its `bin`
+   directory to `PATH` if another JDK is selected, then verify with
+   `java -version` and `javac -version`.
 2. As a user, get the CBMC source via
    ```
    git clone https://github.com/diffblue/cbmc cbmc-git
@@ -266,7 +279,7 @@ Maven 3 manually.
    gmake -C jbmc/src
    ```
 
-#Working with IDEs and Docker
+# Working with IDEs and Docker
 
 ## Working with Visual Studio on Windows
 
@@ -319,7 +332,7 @@ To compile and run the tools in a Docker container, do the following:
    In the resulting container, the files present in the local file system under
    `local/path/with/files` will be present under `/mnt/analysis`.
 
-#Compilation options and configuration
+# Compilation options and configuration
 
 ## Compiling with CUDD
 

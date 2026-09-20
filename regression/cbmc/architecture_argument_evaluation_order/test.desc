@@ -1,0 +1,12 @@
+CORE
+main.i
+--arch i386 --os linux --show-symbol-table
+architecture_argument_evaluation_order
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+This test checks that the architecture symbol recording the target's function
+argument evaluation order (unspecified in C, but fixed per compiler and
+architecture) is present in the symbol table.

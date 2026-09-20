@@ -105,6 +105,7 @@ void show_loop_ids(
       break;
 
     case ui_message_handlert::uit::JSON_UI:
+    {
       json_objectt json_result;
       json_arrayt &loops=json_result["loops"].make_array();
 
@@ -113,5 +114,6 @@ void show_loop_ids(
 
       std::cout << ",\n" << json_result;
       break;
+    }
   }
 }

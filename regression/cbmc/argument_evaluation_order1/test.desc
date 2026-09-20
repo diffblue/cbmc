@@ -1,0 +1,13 @@
+CORE
+main.i
+--arch x86_64 --os linux
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+GCC evaluates function call arguments right-to-left on the x86 family; check
+that goto conversion models this: g's side effect (n = n * 2) must take
+effect before f's (n = n + 1), giving n == 1. The input is a preprocessed
+file so that no target-specific flags are passed to the native preprocessor.

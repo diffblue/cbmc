@@ -11,9 +11,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/mathematical_types.h>
-#include <util/namespace.h>
 #include <util/string_utils.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/constant_abstract_value.h>
@@ -21,6 +19,7 @@
 #include <analyses/variable-sensitivity/value_set_abstract_object.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <ansi-c/ansi_c_language.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 std::shared_ptr<const constant_abstract_valuet>
@@ -182,12 +181,10 @@ std::string expr_to_str(const exprt &expr)
   if(expr.id() == ID_min_value)
     return "min";
 
-  auto st = symbol_tablet{};
-  auto ns = namespacet{st};
   auto expr_str = std::string{};
 
   auto lang = new_ansi_c_language();
-  lang->from_expr(expr, expr_str, ns);
+  lang->from_expr(expr, expr_str, empty_namespace);
 
   return expr_str;
 }

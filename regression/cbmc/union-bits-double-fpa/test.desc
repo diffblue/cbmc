@@ -1,0 +1,33 @@
+CORE broken-cprover-smt-backend
+main.c
+--floatbv --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Reads a `double` via a union after writing its IEEE-754 bit pattern.
+Under `--cprover-smt2` this forces the SMT2 back-end to emit the
+single-operand bit-pattern overload of `to_fp`, which CPROVER's smt2
+parser previously rejected with "unexpected token in an expression";
+the parser fix in this commit accepts the overload and routes it
+through a bit-level reinterpret typecast.
+
+`--no-simplify` keeps the constant union read from being folded
+away before it reaches the SMT2 back-end, so the parser entry is
+actually exercised on the `--cprover-smt2` path.
+
+The smt2_solver-level tests under regression/smt2_solver/fp/
+(bit-to-fp2, bit-to-fp3, bit-to-fp-bad-width) directly cover the
+parser entry under every CI profile.  This test additionally pins
+down the user-visible end-to-end scenario the PR exists to fix.
+
+The test is tagged `broken-cprover-smt-backend` (mirroring
+union-double-bits-fpa, the inverse direction): CPROVER's in-tree
+SMT2 solver does not fully support the SMT-LIB FloatingPoint
+theory beyond constant folding.  The test still passes under the
+SAT, paths-lifo, and incremental-smt2 (z3) CI profiles -- those
+don't reach `smt2_convt::flatten2bv` / `smt2_parsert` for this
+program but do validate that the C-level scenario produces the
+expected results.

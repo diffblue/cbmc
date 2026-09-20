@@ -95,6 +95,7 @@ public:
   {
     set(option, std::string{value});
   }
+  virtual void set(char option, const std::string &value);
 
   virtual void clear();
 

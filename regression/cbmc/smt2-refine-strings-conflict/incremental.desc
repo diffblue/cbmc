@@ -1,0 +1,11 @@
+CORE
+main.c
+--refine-strings --incremental-smt2-solver z3
+^--refine-strings is not supported with an SMT2 back-end
+^EXIT=1$
+^SIGNAL=0$
+--
+^VERIFICATION
+--
+The same usage error must fire for the incremental SMT2 back-end. The check
+happens during option parsing, so no solver is invoked.

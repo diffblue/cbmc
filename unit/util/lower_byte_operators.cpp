@@ -18,8 +18,8 @@
 #include <util/simplify_utils.h>
 #include <util/std_types.h>
 #include <util/string_constant.h>
-#include <util/symbol_table.h>
 
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
@@ -29,8 +29,7 @@ TEST_CASE("byte extract and bits", "[core][util][lowering][byte_extract]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   const unsignedbv_typet u16{16};
   const exprt sixteen_bits = from_integer(0x1234, u16);
@@ -99,8 +98,7 @@ SCENARIO("byte_extract_lowering", "[core][util][lowering][byte_extract]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   GIVEN("A byte_extract over a POD")
   {
@@ -367,8 +365,7 @@ SCENARIO("byte_update_lowering", "[core][util][lowering][byte_update]")
   cmdlinet cmdline;
   config.set(cmdline);
 
-  const symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   GIVEN("A byte_update of a POD")
   {

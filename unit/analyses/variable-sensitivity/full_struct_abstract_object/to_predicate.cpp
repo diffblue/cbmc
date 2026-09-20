@@ -7,13 +7,11 @@
 \*******************************************************************/
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
-#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-
 #include <analyses/variable-sensitivity/full_struct_abstract_object/struct_builder.h>
+#include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_test_helpers.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
-
-#include <util/symbol_table.h>
 
 SCENARIO(
   "struct to predicate",
@@ -24,8 +22,7 @@ SCENARIO(
     vsd_configt::constant_domain());
   abstract_environmentt environment(object_factory);
   environment.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   GIVEN("full_struct_abstract_object to predicate")
   {

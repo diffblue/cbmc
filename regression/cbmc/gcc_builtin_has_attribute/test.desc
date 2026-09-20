@@ -1,0 +1,15 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+Tests that __builtin_has_attribute(expr, attr) parses (both the bare-name
+and name-with-arguments forms) and is modelled as a compile-time constant
+(false) -- the _Static_assert mirrors the Linux fortify-string strscpy
+pattern and only compiles if the builtin folds to a constant.

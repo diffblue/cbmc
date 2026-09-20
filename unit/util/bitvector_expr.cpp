@@ -6,10 +6,10 @@
 #include <util/cout_message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
 #include <solvers/sat/satcheck.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 TEST_CASE(
@@ -77,9 +77,7 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
   console_message_handlert message_handler;
   message_handler.set_verbosity(0);
   satcheckt satcheck{message_handler};
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
-  boolbvt boolbv{ns, satcheck, message_handler};
+  boolbvt boolbv{empty_namespace, satcheck, message_handler};
   unsignedbv_typet u8{8};
 
   GIVEN("A bit-vector that is one-hot")
@@ -140,5 +138,38 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
     {
       REQUIRE(boolbv() == decision_proceduret::resultt::D_UNSATISFIABLE);
     }
+  }
+}
+
+TEMPLATE_TEST_CASE(
+  "reduction expression sub classes",
+  "[core][util][expr]",
+  reduction_and_exprt,
+  reduction_or_exprt,
+  reduction_nand_exprt,
+  reduction_nor_exprt,
+  reduction_xor_exprt,
+  reduction_xnor_exprt)
+{
+  const symbol_exprt sym{"x", unsignedbv_typet{4}};
+  const TestType red{sym};
+
+  SECTION("can_cast_expr true for matching expression")
+  {
+    REQUIRE(can_cast_expr<TestType>(red));
+  }
+
+  SECTION("can_cast_expr false for non-matching expression")
+  {
+    const plus_exprt binary{sym, sym};
+    REQUIRE_FALSE(can_cast_expr<TestType>(binary));
+  }
+
+  SECTION("expr_try_dynamic_cast round-trip")
+  {
+    const exprt &base = red;
+    auto *p = expr_try_dynamic_cast<TestType>(base);
+    REQUIRE(p != nullptr);
+    REQUIRE(p->op() == sym);
   }
 }

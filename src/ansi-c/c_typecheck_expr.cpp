@@ -288,6 +288,20 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     expr = make_boolean_expr(gcc_types_compatible_p(subtypes[0], subtypes[1]));
     expr.add_source_location()=source_location;
   }
+  else if(expr.id() == ID_gcc_builtin_has_attribute)
+  {
+    // __builtin_has_attribute(expr-or-type, attribute-name).  CBMC does
+    // not model the full set of GCC attributes, so we conservatively
+    // report that the operand does NOT carry the queried attribute.  This
+    // is the sound choice for the kernel's fortify-string _Static_asserts
+    // (which assert a buffer is a NUL-terminated C-string, i.e. NOT marked
+    // __nonstring); returning false keeps those assertions satisfied.  The
+    // first operand is unevaluated (a compile-time query), so it is simply
+    // discarded.
+    source_locationt source_location = expr.source_location();
+    expr = make_boolean_expr(false);
+    expr.add_source_location() = source_location;
+  }
   else if(expr.id()==ID_clang_builtin_convertvector)
   {
     // This has one operand and a type, and acts like a typecast
@@ -959,8 +973,8 @@ void c_typecheck_baset::typecheck_expr_operands(exprt &expr)
       if(s_it == symbol_table.symbols.end())
       {
         error().source_location = expr.source_location();
-        error() << "failed to find bound symbol `" << identifier
-                << "' in symbol table" << eom;
+        error() << "failed to find bound symbol " << quote_begin << identifier
+                << quote_end << " in symbol table" << eom;
         throw 0;
       }
 
@@ -5038,6 +5052,10 @@ protected:
     {
       return is_constant_address_of(to_address_of_expr(e).object());
     }
+    // For these expressions constancy is exactly the constancy of all
+    // operands, so recurse below.  This covers the aggregates
+    // (ID_struct/ID_union/ID_array) and, likewise, a compound literal, whose
+    // constancy is that of its single initializer operand.
     else if(
       e.id() == ID_typecast || e.id() == ID_array_of || e.id() == ID_plus ||
       e.id() == ID_mult || e.id() == ID_array || e.id() == ID_with ||
@@ -5046,7 +5064,8 @@ protected:
       e.id() == ID_le || e.id() == ID_gt || e.id() == ID_ge ||
       e.id() == ID_if || e.id() == ID_not || e.id() == ID_and ||
       e.id() == ID_or || e.id() == ID_bitnot || e.id() == ID_bitand ||
-      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector)
+      e.id() == ID_bitor || e.id() == ID_bitxor || e.id() == ID_vector ||
+      e.id() == ID_compound_literal)
     {
       return std::all_of(
         e.operands().begin(), e.operands().end(), [this](const exprt &op) {

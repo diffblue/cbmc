@@ -15,6 +15,7 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     # these tests dump the raw SMT2 output (using --outfile)
     ['array_of_bool_as_bitvec', 'test-smt2-outfile.desc'],
     ['deterministic-smt-output', 'test.desc'],
+    ['z3-lambda-unflatten', 'test.desc'],
     # these tests expect input from stdin
     ['json-interface1', 'test_wrong_option.desc'],
     ['json-interface1', 'test.desc'],
@@ -53,6 +54,8 @@ ExcludedTests = list(map(lambda s: os.path.join(test_base_dir, s[0], s[1]), [
     ['export-symex-ready-goto', 'test-bad-usage.desc'],
     ['unknown-argument-suggestion', 'test.desc'],
     ['sat-solver-error', 'test.desc'],
+    ['smt2-refine-strings-conflict', 'test.desc'],
+    ['smt2-refine-strings-conflict', 'incremental.desc'],
     # this one produces XML intermingled with main XML output when used with --xml-ui
     ['graphml_witness2', 'test.desc'],
     # these are producing coverage goals which aren't included in the schema

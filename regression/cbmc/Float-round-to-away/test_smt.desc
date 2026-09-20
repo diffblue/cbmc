@@ -1,0 +1,10 @@
+CORE no-new-smt
+main.c
+--smt2 --z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests ROUND_TO_AWAY via the SMT path (float_bvt encoding).

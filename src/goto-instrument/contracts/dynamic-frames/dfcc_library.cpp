@@ -12,6 +12,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/format_type.h>
 #include <util/message.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
@@ -265,20 +266,35 @@ std::set<irep_idt> dfcc_libraryt::get_missing_funs()
   // go over all library functions
   for(const auto &pair : dfcc_fun_to_name)
   {
-    symbol_tablet::symbolst::const_iterator found =
-      goto_model.symbol_table.symbols.find(pair.second);
-
-    if(
-      found == goto_model.symbol_table.symbols.end() ||
-      found->second.value.is_nil())
-    {
+    // check for an actual body in the goto functions map instead of relying
+    // on the symbol's value: a symbol may carry the `compiled` marker value
+    // even when its body was dropped, e.g. by `--drop-unused-functions`
+    if(!dfcc_utilst::function_symbol_with_body_exists(goto_model, pair.second))
       missing.insert(pair.second);
-    }
   }
   return missing;
 }
 
 bool dfcc_libraryt::loaded = false;
+
+/// Returns true iff the two code types are equal when ignoring parameter
+/// identifiers and base names.
+static bool code_types_match(const typet &lhs, const typet &rhs)
+{
+  if(lhs == rhs)
+    return true;
+  code_typet lhs_code = to_code_type(lhs);
+  code_typet rhs_code = to_code_type(rhs);
+  for(code_typet *code_type : {&lhs_code, &rhs_code})
+  {
+    for(auto &parameter : code_type->parameters())
+    {
+      parameter.set_identifier(irep_idt{});
+      parameter.set_base_name(irep_idt{});
+    }
+  }
+  return lhs_code == rhs_code;
+}
 
 void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
 {
@@ -318,12 +334,38 @@ void dfcc_libraryt::load(std::set<irep_idt> &to_instrument)
   // compute missing library functions before modifying the symbol table
   std::set<irep_idt> missing = get_missing_funs();
 
-  // copy all loaded symbols to the main symbol table
+  // Copy all loaded symbols to the main symbol table. Functions that already
+  // exist in the model but have no body in the goto functions map are
+  // completed using the library implementation: the model may declare, say,
+  // `free` (via stdlib.h) without its body ever being linked in when all
+  // calls to it are unreachable from the entry point, or a body may have
+  // been removed by `--drop-unused-functions`, which leaves the symbol value
+  // set to the `compiled` marker. The DFCC library requires the
+  // implementations of the functions loaded above in either case. Symbols
+  // whose value holds a not-yet-converted body are left alone.
   for(const auto &symbol_pair : tmp_symbol_table.symbols)
   {
-    const auto &sym = symbol_pair.first;
-    if(!goto_model.symbol_table.has_symbol(sym))
-      goto_model.symbol_table.insert(symbol_pair.second);
+    auto insert_result = goto_model.symbol_table.insert(symbol_pair.second);
+    symbolt &existing = insert_result.first;
+    if(
+      !insert_result.second && symbol_pair.second.type.id() == ID_code &&
+      symbol_pair.second.value.is_not_nil() && existing.type.id() == ID_code &&
+      (existing.value.is_nil() || existing.is_compiled()) &&
+      !dfcc_utilst::function_symbol_with_body_exists(
+        goto_model, symbol_pair.first))
+    {
+      if(!code_types_match(existing.type, symbol_pair.second.type))
+      {
+        log.warning() << "dfcc_libraryt::load: replacing declaration of '"
+                      << symbol_pair.first << "' of type '"
+                      << format(existing.type)
+                      << "' with the CPROVER library implementation of type '"
+                      << format(symbol_pair.second.type) << "'"
+                      << messaget::eom;
+      }
+      existing.type = symbol_pair.second.type;
+      existing.value = symbol_pair.second.value;
+    }
   }
 
   // compile all missing library functions to GOTO

@@ -70,7 +70,7 @@ regression/solver-hardness/solver-hardness-simple/solver_hardness.json
 regression/goto-instrument-wmm-core/*/*.txt
 regression/goto-instrument-wmm-core/*/*.dot
 jbmc/regression/**/tests.log
-jbmc/regression/**/tests-symex-driven-loading.log
+jbmc/regression/**/tests-symex-driven-loading*.log
 unit/memory-analyzer/input.inc
 unit/memory-analyzer/test.inc
 unit/gdb.txt

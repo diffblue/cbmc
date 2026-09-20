@@ -76,6 +76,51 @@ TEST_CASE("arbitrary precision integers", "[core][big-int][bigint]")
   }
 
   // =====================================================================
+  // Compound assignment with an operand equal to the left-hand side.
+  // =====================================================================
+  // Self-aliased operands (x += x) are not supported and abort at
+  // runtime: operator+= and operator-= pass the operand's digit buffer
+  // into add(), which resizes (and possibly frees) this->digit before
+  // reading that buffer. The tests below use a distinct copy of the
+  // operand, which is the supported spelling; they still exercise the
+  // buffer growth in add() with equal-length operands.
+  SECTION("compound assignment with equal operands")
+  {
+    // Scanning from a string produces a buffer without spare capacity:
+    // 2^192 - 1 occupies six 32-bit digits, the doubled value needs
+    // seven, forcing the reallocation inside add().
+    BigInt x("6277101735386680763835789423207666416102355444464034512895");
+    const BigInt x_copy(x);
+    x += x_copy;
+    REQUIRE(
+      to_string(x) ==
+      "12554203470773361527671578846415332832204710888928069025790");
+
+    BigInt y("6277101735386680763835789423207666416102355444464034512895");
+    const BigInt y_copy(y);
+    y -= y_copy;
+    REQUIRE(y.is_zero());
+
+    // Squaring through a copy of the operand; z *= z would abort.
+    BigInt z("18446744073709551616"); // 2^64
+    const BigInt z_copy(z);
+    z *= z_copy;
+    REQUIRE(to_string(z) == "340282366920938463463374607431768211456");
+
+    // Division and remainder with equal operands take the
+    // value-equality fast path; w /= w and v %= v would abort.
+    BigInt w("340282366920938463463374607431768211456"); // 2^128
+    const BigInt w_copy(w);
+    w /= w_copy;
+    REQUIRE(to_string(w) == "1");
+
+    BigInt v("340282366920938463463374607431768211456");
+    const BigInt v_copy(v);
+    v %= v_copy;
+    REQUIRE(v.is_zero());
+  }
+
+  // =====================================================================
   // Test cases from the clisp test suite in number.tst.
   // =====================================================================
 

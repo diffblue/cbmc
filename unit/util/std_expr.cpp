@@ -6,8 +6,6 @@ Author: Diffblue Ltd
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -16,7 +14,9 @@ Author: Diffblue Ltd
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 TEST_CASE("for a division expression...", "[unit][util][std_expr]")
 {
@@ -40,8 +40,7 @@ TEST_CASE("object descriptor expression", "[unit][util][std_expr]")
 {
   config.ansi_c.set_LP64();
 
-  symbol_tablet symbol_table;
-  const namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   array_typet array_type(signed_int_type(), from_integer(2, size_type()));
   struct_typet struct_type({{"foo", array_type}});

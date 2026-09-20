@@ -1,0 +1,17 @@
+CORE
+main.c
+-fms-extensions -c -o main.gb
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+With -fms-extensions, goto-cc must accept a *tagged* struct/union as an
+anonymous member: it contributes its size and injects its members. The
+_Static_asserts (checked at conversion) require exact layout, and the
+field accesses require member injection. This is the pattern used by the
+Linux kernel's struct filename (struct __filename_head). Member sizes are
+fixed-width so the layout asserts hold on both 32-bit and 64-bit targets.
+Without -fms-extensions the member is ignored (standard GCC), which is
+covered by regression/ansi-c/anonymous_member*.

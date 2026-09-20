@@ -1,0 +1,15 @@
+CORE dfcc-only
+main.c
+--dfcc main
+^EXIT=0$
+^SIGNAL=0$
+ASSIGN free_called := 1$
+IF free::__write_set_to_check = NULL THEN GOTO
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test checks that a user-provided model of free that is present in the
+model with a body is preserved by goto-instrument --dfcc: the body must not be
+replaced by the built-in library model, and it must be instrumented with a
+ghost write set parameter like any other function.

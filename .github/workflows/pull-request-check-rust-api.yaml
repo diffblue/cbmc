@@ -19,7 +19,7 @@ jobs:
       CC: "ccache /usr/bin/clang-13"
       CXX: "ccache /usr/bin/clang++-13"
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
@@ -32,10 +32,10 @@ jobs:
           sudo apt-get install --no-install-recommends -yq clang-13 clang++-13 flex bison libxml2-utils ccache
       - name: Log cargo/rust version
         run: cargo --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-22.04-cmake-clang-${{ github.ref }}-${{ github.sha }}-PR
           restore-keys: |
@@ -69,20 +69,26 @@ jobs:
           CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
 
 
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
   check-macos-15-intel-cmake-clang-rust:
     runs-on: macos-15-intel
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           submodules: recursive
       - name: Fetch dependencies
         run: brew install cmake ninja flex bison ccache
       - name: Log cargo/rust version
         run: cargo --version
-      - name: Prepare ccache
-        uses: actions/cache@v5
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
         with:
-          save-always: true
           path: .ccache
           key: ${{ runner.os }}-Release-Minisat-${{ github.ref }}-${{ github.sha }}-PR-Rust-API
           restore-keys: |
@@ -109,3 +115,9 @@ jobs:
           cd src/libcprover-rust;\
           cargo clean;\
           CBMC_INCLUDE_DIR=../../${{env.default_include_dir}} CBMC_LIB_DIR=../../${{env.default_build_dir}}/lib CBMC_VERSION=$VERSION cargo test -- --test-threads=1
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}

@@ -1,0 +1,75 @@
+name: 'Install Z3 (Windows)'
+description: |
+  Download and install a Z3 release binary on a Windows runner.
+
+  Downloaded archives are verified against a hard-coded SHA-256 hash
+  table embedded in this action; an unknown (version, arch) pair
+  causes the step to fail. To support a new Z3 version, append a row
+  to the case statement in the "Resolve Z3 asset hash" step. Hashes
+  can be obtained by downloading the asset and running:
+    sha256sum z3-<VERSION>-<ARCH>.zip
+
+  After this action runs, `z3` is on PATH for subsequent steps (the
+  PATH update only takes effect from the next step onward; the action
+  verifies the binary in-place via its absolute path).
+
+  Linux and macOS runners install Z3 via the system package manager
+  (apt / brew) elsewhere in the workflow; this action only covers
+  Windows, which has no comparable distribution channel.
+
+inputs:
+  version:
+    description: 'Z3 version, e.g. 4.8.10'
+    required: true
+  arch:
+    description: 'Architecture suffix used in the upstream asset name'
+    required: false
+    default: 'x64-win'
+
+runs:
+  using: composite
+  steps:
+    - name: install-z3 is currently Windows-only
+      if: runner.os != 'Windows'
+      shell: bash
+      run: |
+        echo "::error ::install-z3 currently only supports Windows; install Z3 via apt (Linux) or brew (macOS) directly"
+        exit 1
+
+    - name: Resolve Z3 asset hash
+      if: runner.os == 'Windows'
+      id: meta
+      shell: bash
+      run: |
+        set -euo pipefail
+        case "${{ inputs.version }}-${{ inputs.arch }}" in
+          4.8.10-x64-win)
+            sha256=688c8f96f4f89cb474de4ecd740c812c6e695318e4b50fd790722513285b2fcb ;;
+          *)
+            echo "::error ::install-z3 has no SHA-256 entry for Z3 ${{ inputs.version }} (${{ inputs.arch }}); add a case to .github/actions/install-z3/action.yaml"
+            exit 1
+            ;;
+        esac
+        echo "sha256=${sha256}" >> "$GITHUB_OUTPUT"
+
+    - name: Install Z3 (Windows)
+      if: runner.os == 'Windows'
+      shell: pwsh
+      env:
+        VERSION: ${{ inputs.version }}
+        ARCH: ${{ inputs.arch }}
+        EXPECTED_SHA256: ${{ steps.meta.outputs.sha256 }}
+      run: |
+        $ErrorActionPreference = 'Stop'
+        $name = "z3-$env:VERSION-$env:ARCH"
+        $url = "https://github.com/Z3Prover/z3/releases/download/z3-$env:VERSION/$name.zip"
+        Invoke-WebRequest -Uri $url -OutFile '.\z3.zip'
+        $actual = (Get-FileHash -Algorithm SHA256 '.\z3.zip').Hash.ToLower()
+        if ($actual -ne $env:EXPECTED_SHA256) {
+          Write-Error "SHA-256 mismatch for $name.zip`n  expected: $env:EXPECTED_SHA256`n  actual:   $actual"
+          exit 1
+        }
+        Expand-Archive -LiteralPath '.\z3.zip' -DestinationPath 'C:\tools' -Force
+        Remove-Item '.\z3.zip'
+        echo "C:\tools\$name\bin" >> $env:GITHUB_PATH
+        & "C:\tools\$name\bin\z3.exe" --version

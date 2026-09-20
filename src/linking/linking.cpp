@@ -677,12 +677,16 @@ void linkingt::duplicate_object_symbol(
         log.warning().source_location = new_symbol.location;
 
         log.warning() << "conflicting initializers for"
-                      << " variable '" << old_symbol.name << "'\n";
-        log.warning() << "using old value in module " << old_symbol.module
-                      << " " << old_symbol.value.find_source_location() << '\n'
+                      << " variable " << messaget::quote_begin
+                      << old_symbol.name << messaget::quote_end << '\n';
+        log.warning() << "using old value in module " << messaget::quote_begin
+                      << old_symbol.module << messaget::quote_end << " "
+                      << old_symbol.value.find_source_location() << '\n'
                       << from_expr(ns, old_symbol.name, tmp_old) << '\n';
-        log.warning() << "ignoring new value in module " << new_symbol.module
-                      << " " << new_symbol.value.find_source_location() << '\n'
+        log.warning() << "ignoring new value in module "
+                      << messaget::quote_begin << new_symbol.module
+                      << messaget::quote_end << " "
+                      << new_symbol.value.find_source_location() << '\n'
                       << from_expr(ns, new_symbol.name, tmp_new)
                       << messaget::eom;
       }

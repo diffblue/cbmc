@@ -1,0 +1,8 @@
+CORE
+allocate2.c
+--text --solve --inline
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.pointer\.1\] line \d+ pointer .* safe: REFUTED$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

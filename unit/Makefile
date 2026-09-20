@@ -50,10 +50,12 @@ SRC += analyses/ai/ai.cpp \
        analyses/variable-sensitivity/variable_sensitivity_test_helpers.cpp \
        ansi-c/allocate_objects.cpp \
        ansi-c/expr2c.cpp \
+       ansi-c/file_converter.cpp \
        ansi-c/type2name.cpp \
        ansi-c/c_typecheck_base.cpp \
        big-int/big-int.cpp \
        compound_block_locations.cpp \
+       empty_namespace_test.cpp \
        get_goto_model_from_c_test.cpp \
        goto-cc/armcc_cmdline.cpp \
        goto-checker/properties/property_status.cpp \
@@ -74,6 +76,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/is_goto_binary.cpp \
        goto-programs/label_function_pointer_call_sites.cpp \
        goto-programs/osx_fat_reader.cpp \
+       goto-programs/restore_argument_evaluation_order.cpp \
        goto-programs/restrict_function_pointers.cpp \
        goto-programs/structured_trace_util.cpp \
        goto-programs/remove_returns.cpp \
@@ -112,6 +115,7 @@ SRC += analyses/ai/ai.cpp \
        solvers/sat/satcheck_minisat2.cpp \
        solvers/smt2/smt2_conv.cpp \
        solvers/smt2/smt2irep.cpp \
+       solvers/smt2/smt2_tokenizer.cpp \
        solvers/smt2_incremental/ast/smt_commands.cpp \
        solvers/smt2_incremental/ast/smt_index.cpp \
        solvers/smt2_incremental/ast/smt_responses.cpp \
@@ -142,11 +146,12 @@ SRC += analyses/ai/ai.cpp \
        solvers/strings/string_refinement/string_refinement.cpp \
        solvers/strings/string_refinement/substitute_array_list.cpp \
        solvers/strings/string_refinement/union_find_replace.cpp \
+       util/argument_evaluation_order.cpp \
        util/arith_tools.cpp \
        util/bitvector_expr.cpp \
-       util/case_expr.cpp \
        util/cmdline.cpp \
        util/dense_integer_map.cpp \
+       util/dstring.cpp \
        util/edit_distance.cpp \
        util/expr_cast/expr_cast.cpp \
        util/expr_initializer.cpp \
@@ -185,6 +190,7 @@ SRC += analyses/ai/ai.cpp \
        util/mathematical_types.cpp \
        util/memory_info.cpp \
        util/message.cpp \
+       util/ui_message.cpp \
        util/optional_utils.cpp \
        util/output_file.cpp \
        util/parse_options.cpp \
@@ -205,10 +211,12 @@ SRC += analyses/ai/ai.cpp \
        util/string2int.cpp \
        util/structured_data.cpp \
        util/string_utils/capitalize.cpp \
+       util/string_utils/escape.cpp \
        util/string_utils/escape_non_alnum.cpp \
        util/string_utils/join_string.cpp \
        util/string_utils/split_string.cpp \
        util/string_utils/strip_string.cpp \
+       util/string_utils/trim_from_last_delimiter.cpp \
        util/string_utils/wrap_line.cpp \
        util/symbol_table.cpp \
        util/symbol.cpp \

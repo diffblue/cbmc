@@ -70,6 +70,14 @@ console_message_handlert::console_message_handlert(bool _always_flush)
 /// \param c: ECMA-48 command code
 std::string console_message_handlert::command(unsigned c) const
 {
+  // messaget::quote_begin and messaget::quote_end render as a single
+  // quote on every UI; we agree with ui_message_handlert here on what
+  // '<' / '>' mean. If quote_begin / quote_end are ever re-encoded to
+  // values outside the SGR range (see comment in message.cpp), this
+  // arm needs to be updated in lock-step.
+  if(c == '<' || c == '>')
+    return "'";
+
   if(!use_SGR)
     return std::string();
 

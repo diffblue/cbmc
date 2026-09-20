@@ -9,17 +9,15 @@ Author: Diffblue Ltd.
 /// \file
 /// Unit tests for bdd_expr
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/prop/bdd_expr.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
+
+#include <solvers/prop/bdd_expr.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 SCENARIO("bdd_expr", "[core][solver][prop][bdd_expr]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
   bdd_exprt bdd_expr_converter;
 
   GIVEN("A bdd for x&!x")

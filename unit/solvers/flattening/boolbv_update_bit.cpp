@@ -15,10 +15,10 @@ Author: Daniel Kroening
 #include <util/cout_message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <solvers/flattening/boolbv.h>
 #include <solvers/sat/satcheck.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 SCENARIO(
@@ -31,9 +31,7 @@ SCENARIO(
   GIVEN("A satisfiable bit-vector formula f with update_bit")
   {
     satcheckt satcheck{message_handler};
-    symbol_tablet symbol_table;
-    namespacet ns{symbol_table};
-    boolbvt boolbv{ns, satcheck, message_handler};
+    boolbvt boolbv{empty_namespace, satcheck, message_handler};
 
     unsignedbv_typet u32{32};
     boolbv << equal_exprt(

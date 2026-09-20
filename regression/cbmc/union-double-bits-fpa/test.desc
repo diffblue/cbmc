@@ -1,0 +1,35 @@
+CORE broken-cprover-smt-backend
+main.c
+--floatbv --no-simplify
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+End-to-end documentation of the user-visible scenario that motivated
+the new `flatten2bv` handling: reading the IEEE-754 bit pattern of
+an FPA-encoded `double` through a union.  The SMT-LIB FloatingPoint
+theory has no operator for that bit pattern (fp.to_ubv / fp.to_sbv are
+value conversions, not a bit-pattern reinterpret), so under FPA the
+cprover-smt2 / `--smt2 --fpa` path previously hit an invariant here.
+
+`--no-simplify` keeps the constant union read from being folded
+away before it reaches the SMT2 back-end.  `double` is IEEE
+binary64 on every supported target, so no architecture pinning is
+needed.
+
+The test is tagged `broken-cprover-smt-backend` because CPROVER's
+in-tree SMT2 solver does not fully support the SMT-LIB
+FloatingPoint theory beyond constant folding: even with the new
+flatten2bv path it returns "ERROR" on assertions involving
+FPA-encoded values, which is a solver-side limitation.  Under the
+SAT and incremental-SMT2 (z3) CI profiles `use_FPA_theory` is
+false, so the new code path is not exercised by this regression
+test in CI; that coverage lives in `unit/solvers/smt2/smt2_conv.cpp`
+(the "flatten2bv FPA-encoded float constant" test case), which drives
+`flatten2bv` directly with `use_FPA_theory == true` and aborts
+without the fix.  This regression test still passes under the SAT
+and incremental-SMT2 (z3) profiles via the bv-encoded path, and
+has been confirmed manually under `--z3 --fpa` to be
+solver-compatible.

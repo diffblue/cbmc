@@ -1,0 +1,14 @@
+CORE
+main.c
+--error-label ERROR --drop-unused-functions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^\[unreachable\.
+--
+The ERROR label is inside an unreachable function that --drop-unused-functions
+removes before goto_check_c turns error labels into assertions. The
+error-label-derived assertion is therefore elided together with the dropped
+function, demonstrating that moving the removal ahead of goto_check_c does not
+change observable behaviour.

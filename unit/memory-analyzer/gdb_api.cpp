@@ -28,9 +28,10 @@ struct compile_test_filet
     std::ofstream of(tmp().c_str());
     REQUIRE(of.is_open());
 
-    of <<
+    const char test_c[] =
 #include <memory-analyzer/test.inc> // IWYU pragma: keep
       ;                             // NOLINT(whitespace/semicolon)
+    of << test_c;
     of.close();
 
     REQUIRE(run("gcc", {"gcc", "-g", "-o", compiled(), tmp()}) == 0);
@@ -84,9 +85,10 @@ void gdb_api_internals_test()
     std::ofstream of(tmp().c_str());
     REQUIRE(of.is_open());
 
-    of <<
+    const char input_txt[] =
 #include <memory-analyzer/input.inc> // IWYU pragma: keep
       ;                              // NOLINT(whitespace/semicolon)
+    of << input_txt;
     of.close();
 
     gdb_api_testt gdb_api(args);

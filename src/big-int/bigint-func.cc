@@ -20,7 +20,7 @@ pow (BigInt const &x, unsigned y)
       y >>= 1;
       if (y == 0)
 	return r;
-      a *= a;
+      a = a * a;
     }
 }
 
@@ -44,7 +44,7 @@ pow (BigInt const &x, BigInt const &y, BigInt const &m)
       b /= 2;
       if (b.is_zero())
 	return r;
-      a *= a;
+      a = a * a;
     }
 }
 

@@ -120,6 +120,11 @@ smt_sortt convert_type_to_smt_sort(const typet &type)
   {
     return convert_type_to_smt_sort(*array_type);
   }
+  // Note: the SMT-LIB theory-of-strings types (String/RegLan) and the
+  // cprover_string_*/cprover_regex_* built-ins are intentionally not supported
+  // by this incremental back-end; they are lowered only by the non-incremental
+  // smt2_convt (see src/solvers/smt2/smt2_conv.cpp). Such inputs reach the
+  // UNIMPLEMENTED_FEATURE below.
   UNIMPLEMENTED_FEATURE("Generation of SMT formula for type: " + type.pretty());
 }
 
@@ -1658,12 +1663,6 @@ static smt_termt dispatch_expr_to_smt_conversion(
   {
     return convert_expr_to_smt(*multiply, converted);
   }
-#if 0
-  else if(expr.id() == ID_floatbv_rem)
-  {
-    convert_floatbv_rem(to_binary_expr(expr));
-  }
-#endif
   if(const auto address_of = expr_try_dynamic_cast<address_of_exprt>(expr))
   {
     return convert_expr_to_smt(*address_of, converted, object_map);

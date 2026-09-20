@@ -7,13 +7,12 @@ Author: Diffblue Ltd.
 
 \*******************************************************************/
 
-#include <testing-utils/use_catch.h>
-
-#include <solvers/strings/string_constraint_generator.h>
-
 #include <util/namespace.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table.h>
+
+#include <solvers/strings/string_constraint_generator.h>
+#include <testing-utils/empty_namespace.h>
+#include <testing-utils/use_catch.h>
 
 /// Get the simplified return value of get_numeric_value_from_character called
 /// with a radix
@@ -25,12 +24,10 @@ static exprt actual(
   const unsigned long radix_ul)
 {
   const constant_exprt chr = from_integer(character, char_type);
-  symbol_tablet symtab;
-  const namespacet ns(symtab);
   return simplify_expr(
     get_numeric_value_from_character(
       chr, char_type, int_type, strict_formatting, radix_ul),
-    ns);
+    empty_namespace);
 }
 
 SCENARIO(

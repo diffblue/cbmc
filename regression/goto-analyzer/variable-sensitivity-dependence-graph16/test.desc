@@ -6,5 +6,8 @@ activate-multi-line-match
 ^SIGNAL=0$
 // Assignment from the result of a function call to a function with no body
 // should have a data dependency on the function
-^Data dependencies: 18 \[f2\]\n(.*\n).*\/\/ 19 file .*main.c line 15 function main\n.*t2 := .*nondet.*
+// The concrete node/line numbers are matched as \d+ because static_lifetime_init
+// no longer inserts the incomplete-array size patch (done in the front end
+// now), which shifts instruction numbering.
+^Data dependencies: \d+ \[f2\]\n(.*\n).*\/\/ \d+ file .*main.c line 15 function main\n.*t2 := .*nondet.*
 --

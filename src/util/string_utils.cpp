@@ -18,26 +18,27 @@ Author: Daniel Poetzl
 /// in the middle of the string is left unchanged
 /// \param s: the string to strip
 /// \return The stripped string
-std::string strip_string(const std::string &s)
+std::string strip_string(std::string_view s)
 {
   auto pred=[](char c){ return std::isspace(c); };
 
-  std::string::const_iterator left
-    =std::find_if_not(s.begin(), s.end(), pred);
+  std::string_view::const_iterator left =
+    std::find_if_not(s.begin(), s.end(), pred);
   if(left==s.end())
     return "";
 
-  std::string::size_type i=std::distance(s.begin(), left);
+  std::size_t i = std::distance(s.begin(), left);
 
-  std::string::const_reverse_iterator right
-    =std::find_if_not(s.rbegin(), s.rend(), pred);
-  std::string::size_type j=std::distance(right, s.rend())-1;
+  std::string_view::const_reverse_iterator right =
+    std::find_if_not(s.rbegin(), s.rend(), pred);
+  std::size_t j = std::distance(right, s.rend()) - 1;
 
-  return s.substr(i, (j-i+1));
+  // copy happens here; this could return a view in the future
+  return std::string{s.substr(i, (j - i + 1))};
 }
 
 void split_string(
-  const std::string &s,
+  std::string_view s,
   char delim,
   std::vector<std::string> &result,
   bool strip,
@@ -54,42 +55,48 @@ void split_string(
     return;
   }
 
-  std::string::size_type n=s.length();
+  std::size_t n = s.length();
   INVARIANT(n > 0, "Empty string case should already be handled");
 
-  std::string::size_type start=0;
-  std::string::size_type i;
+  std::size_t start = 0;
+  std::size_t i;
 
   for(i=0; i<n; i++)
   {
     if(s[i]==delim)
     {
-      std::string new_s=s.substr(start, i-start);
+      // result owns std::strings rather than string_views: callers
+      // routinely pass a temporary as `s` (e.g. some_function()
+      // returning std::string), so the input may not outlive the
+      // result.
+      std::string new_s = std::string{s.substr(start, i - start)};
 
       if(strip)
         new_s=strip_string(new_s);
 
       if(!remove_empty || !new_s.empty())
-        result.push_back(new_s);
+        result.push_back(std::move(new_s));
 
       start=i+1;
     }
   }
 
-  std::string new_s=s.substr(start, n-start);
+  // result owns std::strings rather than string_views: see the
+  // comment above the first push_back in the loop.
+  std::string new_s = std::string{s.substr(start, n - start)};
 
   if(strip)
     new_s=strip_string(new_s);
 
   if(!remove_empty || !new_s.empty())
-    result.push_back(new_s);
+    result.push_back(std::move(new_s));
 
   if(!remove_empty && result.empty())
     result.push_back("");
 }
 
 void split_string(
-  const std::string &s,
+  std::string_view s,
   char delim,
   std::string &left,
   std::string &right,
@@ -102,31 +109,26 @@ void split_string(
 
   if(result.size() != 2)
   {
-    throw deserialization_exceptiont{"expected string '" + s +
-                                     "' to contain two substrings "
-                                     "delimited by " +
-                                     delim + " but has " +
-                                     std::to_string(result.size())};
+    throw deserialization_exceptiont{
+      "expected string '" + std::string{s} +
+      "' to contain two substrings "
+      "delimited by " +
+      delim + " but has " + std::to_string(result.size())};
   }
 
   left=result[0];
   right=result[1];
 }
 
-std::vector<std::string> split_string(
-  const std::string &s,
-  char delim,
-  bool strip,
-  bool remove_empty)
+std::vector<std::string>
+split_string(std::string_view s, char delim, bool strip, bool remove_empty)
 {
   std::vector<std::string> result;
   split_string(s, delim, result, strip, remove_empty);
   return result;
 }
 
-std::string trim_from_last_delimiter(
-  const std::string &s,
-  const char delim)
+std::string trim_from_last_delimiter(std::string_view s, const char delim)
 {
   std::string result;
   const size_t index=s.find_last_of(delim);
@@ -135,7 +137,7 @@ std::string trim_from_last_delimiter(
   return result;
 }
 
-std::string escape(const std::string &s)
+std::string escape(std::string_view s)
 {
   std::string result;
 
@@ -150,7 +152,7 @@ std::string escape(const std::string &s)
   return result;
 }
 
-std::string escape_non_alnum(const std::string &to_escape)
+std::string escape_non_alnum(std::string_view to_escape)
 {
   std::ostringstream escaped;
   for(auto &ch : to_escape)
@@ -172,11 +174,12 @@ std::string escape_non_alnum(const std::string &to_escape)
   }
   return escaped.str();
 }
-std::string capitalize(const std::string &str)
+
+std::string capitalize(std::string_view s)
 {
-  if(str.empty())
-    return str;
-  std::string capitalized = str;
+  if(s.empty())
+    return std::string{};
+  std::string capitalized = std::string{s}; // copy
   capitalized[0] = toupper(capitalized[0]);
   return capitalized;
 }

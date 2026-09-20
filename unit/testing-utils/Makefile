@@ -1,5 +1,6 @@
 SRC = \
   call_graph_test_utils.cpp \
+  empty_namespace.cpp \
   free_form_cmdline.cpp \
   get_goto_model_from_c.cpp \
   invariant.cpp \

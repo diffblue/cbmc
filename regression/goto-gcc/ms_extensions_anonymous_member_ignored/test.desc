@@ -1,0 +1,15 @@
+CORE
+main.c
+-c -o main.gb
+^EXIT=0$
+^SIGNAL=0$
+declaration does not declare anything
+--
+^CONVERSION ERROR$
+--
+Without -fms-extensions, goto-cc ignores a tagged struct/union used as an
+anonymous member (standard gcc/Clang behaviour): it injects no members and
+contributes no size.  The _Static_assert requires sizeof(struct filename)
+to exclude the tagged member; were the member accepted (as with
+-fms-extensions) the size would differ and conversion would fail.  This is
+the no-flag counterpart of ms_extensions_anonymous_member.

@@ -9,10 +9,10 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/abstract_object.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 // NOLINTNEXTLINE(whitespace/line_length)
@@ -93,13 +93,11 @@ SCENARIO(
       variable_sensitivity_object_factoryt::configured_with(config);
     abstract_environmentt environment{object_factory};
     environment.make_top();
-    symbol_tablet symbol_table;
-    namespacet ns(symbol_table);
 
     WHEN("merging TOP with 1")
     {
       auto top1 = make_top_object();
-      auto op2 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, environment, empty_namespace);
 
       auto result = abstract_objectt::merge(top1, op2, widen_modet::no);
 
@@ -138,7 +136,7 @@ SCENARIO(
     WHEN("merging BOTTOM with 1")
     {
       auto op1 = make_bottom_object();
-      auto op2 = make_constant(val1, environment, ns);
+      auto op2 = make_constant(val1, environment, empty_namespace);
 
       auto result = abstract_objectt::merge(op1, op2, widen_modet::no);
 

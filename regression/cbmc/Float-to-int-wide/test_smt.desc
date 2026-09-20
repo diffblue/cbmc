@@ -1,0 +1,10 @@
+CORE smt-backend no-new-smt
+main.c
+--z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Float-to-integer conversion for values needing more bits than the fraction (SMT path).

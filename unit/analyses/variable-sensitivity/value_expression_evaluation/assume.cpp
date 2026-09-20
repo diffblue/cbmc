@@ -9,10 +9,10 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/namespace.h>
-#include <util/symbol_table.h>
 
 #include <analyses/variable-sensitivity/abstract_environment.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
+#include <testing-utils/empty_namespace.h>
 
 // NOLINTNEXTLINE(whitespace/line_length)
 #include <analyses/variable-sensitivity/constant_abstract_value.h> // IWYU pragma: keep
@@ -170,8 +170,7 @@ SCENARIO(
     variable_sensitivity_object_factoryt::configured_with(config);
   abstract_environmentt environment{object_factory};
   environment.make_top();
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
+  const namespacet &ns = empty_namespace;
 
   assume_testert assumeTester(environment, ns);
 

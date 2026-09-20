@@ -338,6 +338,33 @@ exprt state_encodingt::evaluate_expr_rec(
   }
   else if(what.id() == ID_side_effect)
   {
+    const auto &side_effect = to_side_effect_expr(what);
+    if(
+      side_effect.get_statement() == ID_allocate &&
+      side_effect.operands().size() == 2 &&
+      side_effect.type().id() == ID_pointer)
+    {
+      // __CPROVER_allocate is handled like the malloc call (see the malloc
+      // handling in function_call_symbol below): tie the allocation to the
+      // current state so that the live_object, writeable_object and
+      // object_size axioms apply to the result. Without this, the generic
+      // allocate side effect is left uninterpreted, and "pointer safe"
+      // properties over the allocated object are spuriously refuted.
+      // c_typecheck_expr rejects an ID_allocate without exactly two
+      // operands (size, zero-init flag), so the size() == 2 check documents
+      // that invariant rather than building an allocation from a partial
+      // operand list; the side effect's type is always void *, so the
+      // ID_pointer conjunct is defensive only.
+      //
+      // NOTE: operands()[1] is the zero-initialisation flag (calloc lowers to
+      // __CPROVER_allocate(size, 1)); like the malloc/posix_memalign/realloc
+      // cases this backend does not model zeroing, so the allocated contents
+      // are left nondeterministic.  TODO: model zeroing.
+      auto size_evaluated = evaluate_expr_rec(
+        loc, state, side_effect.operands().front(), bound_symbols);
+      return allocate_exprt{
+        state, size_evaluated, to_pointer_type(side_effect.type())};
+    }
     // leave as is
     return what;
   }

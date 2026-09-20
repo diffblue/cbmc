@@ -4022,8 +4022,9 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
 {
   if(cpp_scopes.current_scope().class_identifier.empty())
   {
-    error().source_location = expr.find_source_location();
-    error() << "`this' is not allowed here" << eom;
+    error().source_location=expr.find_source_location();
+    error() << quote_begin << "this" << quote_end << " is not allowed here"
+            << eom;
     throw 0;
   }
 

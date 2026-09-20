@@ -39,6 +39,16 @@ pointer_offset_size(const typet &type, const namespacet &ns);
 std::optional<mp_integer>
 pointer_offset_bits(const typet &type, const namespacet &ns);
 
+/// Returns true iff \p type has effective width of zero bits.
+/// In addition to the obvious \c ID_empty, this recognises
+/// struct/union types whose components are all zero-width and arrays
+/// of zero-width elements, mirroring the semantics that the
+/// bit-blasting back-ends use to skip such types. Tag types
+/// (\c ID_struct_tag, \c ID_union_tag, \c ID_c_enum_tag) are unwrapped
+/// via \p ns before further recursion; \c ID_c_enum types recurse
+/// into their underlying integer type.
+bool is_zero_width(const typet &type, const namespacet &ns);
+
 std::optional<mp_integer>
 compute_pointer_offset(const exprt &expr, const namespacet &ns);
 

@@ -9,6 +9,7 @@
 #include <util/symbol_table.h>
 
 #include <solvers/smt2_incremental/object_tracking.h>
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
 
 #include <string>
@@ -135,13 +136,11 @@ TEST_CASE("Tracking object base expressions", "[core][smt2_incremental]")
       actual_invalid_object_pointer->second.base_expression ==
       invalid_object_pointer);
   }
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
   SECTION("Check objects of compound expression not yet tracked")
   {
     CHECK_FALSE(objects_are_already_tracked(compound_expression, object_map));
   }
-  track_expression_objects(compound_expression, ns, object_map);
+  track_expression_objects(compound_expression, empty_namespace, object_map);
   SECTION("Tracking expression objects")
   {
     CHECK(object_map.size() == 5);
@@ -212,8 +211,6 @@ TEST_CASE("Tracking dynamic object status.", "[core][smt2_incremental]")
   config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
   config.ansi_c.set_arch_spec_x86_64();
   smt_object_mapt object_map = initial_smt_object_map();
-  symbol_tablet symbol_table;
-  namespacet ns{symbol_table};
   exprt base_object;
   bool expected_dynamic_status;
   using rowt =
@@ -224,7 +221,8 @@ TEST_CASE("Tracking dynamic object status.", "[core][smt2_incremental]")
     rowt{symbol_exprt{SYMEX_DYNAMIC_PREFIX "bar", unsignedbv_typet{8}}, true},
     rowt{from_integer(42, make_type_dynamic(signedbv_typet{16})), true});
   INFO("base_object is - " + base_object.pretty(1, 0));
-  track_expression_objects(address_of_exprt{base_object}, ns, object_map);
+  track_expression_objects(
+    address_of_exprt{base_object}, empty_namespace, object_map);
   const auto object = object_map.find(base_object);
   REQUIRE(object != object_map.end());
   REQUIRE(object->second.is_dynamic == expected_dynamic_status);

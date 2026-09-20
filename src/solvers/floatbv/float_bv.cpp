@@ -381,6 +381,10 @@ exprt float_bvt::to_integer(
   const exprt &rm,
   const ieee_float_spect &spec)
 {
+  // Keep in sync with float_utilst::to_integer — the body below is a
+  // line-for-line translation of that function between the exprt and
+  // literalt/bvt APIs.
+
   const unbiased_floatt unpacked=unpack(src, spec);
 
   rounding_mode_bitst rounding_mode_bits(rm);
@@ -388,10 +392,35 @@ exprt float_bvt::to_integer(
   // Right now hard-wired to round-to-zero, which is
   // the usual case in ANSI-C.
 
-  // if the exponent is positive, shift right
-  exprt offset=from_integer(spec.f, signedbv_typet(spec.e));
-  const minus_exprt distance(offset, unpacked.exponent);
-  const lshr_exprt shift_result(unpacked.fraction, distance);
+  const std::size_t fraction_width =
+    to_unsignedbv_type(unpacked.fraction.type()).get_width();
+
+  // Extend the fraction to dest_width if needed, padding with zeros
+  // at the LSB end (like float_utilst does).
+  exprt fraction = unpacked.fraction;
+  std::size_t effective_width = fraction_width;
+
+  if(dest_width > fraction_width)
+  {
+    effective_width = dest_width;
+    fraction = concatenation_exprt(
+      fraction,
+      from_integer(0, unsignedbv_typet(dest_width - fraction_width)),
+      unsignedbv_typet(effective_width));
+  }
+
+  // if the exponent is positive, shift right by (effective_width - 1) minus
+  // the exponent. The shift distance is built in a signed type wide enough to
+  // hold both `effective_width - 1` and the (sign-extended) exponent, so it
+  // does not wrap for wide destination types -- e.g. a narrow source such as
+  // _Float16 (spec.e = 5) converted to a 64-bit integer. Keep in sync with
+  // float_utilst::to_integer.
+  const signedbv_typet distance_type(std::max(
+    static_cast<std::size_t>(spec.e), address_bits(effective_width) + 1));
+  const exprt offset = from_integer(effective_width - 1, distance_type);
+  const minus_exprt distance(
+    offset, typecast_exprt(unpacked.exponent, distance_type));
+  const lshr_exprt shift_result(fraction, distance);
 
   // if the exponent is negative, we have zero anyways
   exprt result=shift_result;
@@ -1299,8 +1328,8 @@ exprt float_bvt::fraction_rounding_decision(
   // round to zero
   false_exprt round_to_zero;
 
-  // round to away
-  const auto round_to_away = or_exprt(rounding_bit, sticky_bit);
+  // round-to-nearest (ties to away)
+  const auto round_to_away = rounding_bit;
 
   // now select appropriate one
   // clang-format off

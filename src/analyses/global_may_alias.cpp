@@ -146,7 +146,8 @@ void global_may_alias_domaint::transform(
   case END_FUNCTION: // No action required
     break;
   case OTHER:
-    DATA_INVARIANT(false, "Unclear what is a safe over-approximation of OTHER");
+    // Treated as a no-op (best-effort, as for FUNCTION_CALL above): the
+    // OTHER forms reaching this analysis, e.g. OUTPUT, do not create aliases.
     break;
   case INCOMPLETE_GOTO:
   case NO_INSTRUCTION_TYPE:

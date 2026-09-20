@@ -58,7 +58,7 @@ ifeq ($(filter-out OSX OSX_Universal,$(BUILD_ENV_)),)
   endif
   LINKLIB = /usr/bin/libtool -static -o $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ $^ $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
   endif
@@ -70,7 +70,7 @@ else ifeq ($(filter-out FreeBSD OpenBSD,$(BUILD_ENV_)),)
   CP_CXXFLAGS +=
   LINKLIB = llvm-ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^
   ifeq ($(origin CC),default)
     CC     = clang
   endif
@@ -81,7 +81,7 @@ else ifeq ($(filter-out FreeBSD OpenBSD,$(BUILD_ENV_)),)
 else
   LINKLIB = ar rcT $@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) -o $@ -Wl,--start-group $^ -Wl,--end-group $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -o $@ $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) -std=c++17 -o $@ $^
   ifeq ($(origin CC),default)
     CC     = gcc
     #CC     = icc
@@ -145,7 +145,7 @@ else ifeq ($(BUILD_ENV_),MSVC)
   CP_CXXFLAGS +=
   LINKLIB = lib /NOLOGO /OUT:$@ $^
   LINKBIN = $(CXX) $(LINKFLAGS) /Fe$@ /Z7 /nologo $^ DbgHelp.lib $(LIBS)
-  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) /Fe$@ /nologo /EHsc $^
+  LINKNATIVE = $(HOSTCXX) $(HOSTLINKFLAGS) /std:c++17 /Fe$@ /nologo /EHsc $^
 ifeq ($(origin CC),default)
   CC = cl
 endif

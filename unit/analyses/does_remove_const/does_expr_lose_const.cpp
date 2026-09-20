@@ -11,10 +11,8 @@ Author: Diffblue Ltd.
 
 #include <util/c_types.h>
 #include <util/mathematical_types.h>
-#include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
-#include <util/symbol_table.h>
 
 #include <goto-programs/goto_program.h>
 
@@ -26,8 +24,6 @@ Author: Diffblue Ltd.
 SCENARIO("does_expr_lose_const",
   "[core][analyses][does_remove_const][does_expr_remove_const]")
 {
-  symbol_tablet symbol_table;
-  namespacet ns(symbol_table);
   goto_programt program;
   does_remove_constt does_remove_const(program);
   does_remove_const_testt does_remove_const_test(does_remove_const);

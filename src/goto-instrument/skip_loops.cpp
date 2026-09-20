@@ -78,7 +78,7 @@ static bool parse_loop_ids(
       return true;
 
     std::string fn=val.substr(0, delim);
-    unsigned nr=safe_string2unsigned(val.substr(delim+1));
+    unsigned nr = safe_string2unsigned(std::string_view{val}.substr(delim + 1));
 
     loop_map[fn].insert(nr);
 

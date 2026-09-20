@@ -96,6 +96,13 @@ for i in `find . -name Makefile`; do
 done
 ```
 
+goto-cc honours the `-fms-extensions` flag: when given, it accepts an
+anonymous member that is a *tagged* struct or union (a Microsoft/GCC
+extension used, for instance, throughout the Linux kernel), injecting that
+member's fields into the enclosing struct and accounting for its size.
+Without the flag such a member is ignored, matching the default gcc and
+Clang behaviour.
+
 Here are additional examples on how to use goto-cc:
 
 -   \ref man_goto-cc-linux "Linux Kernel"

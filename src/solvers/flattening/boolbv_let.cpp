@@ -80,7 +80,7 @@ bvt boolbvt::convert_let(const let_exprt &expr)
       const exprt lowered_value = has_byte_operator(pair.second)
                                     ? lower_byte_operators(pair.second, ns)
                                     : pair.second;
-      record_array_let_binding(pair.first, pair.second);
+      record_array_let_binding(pair.first, lowered_value);
     }
   }
 
