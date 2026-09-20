@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -14,3 +14,7 @@ nested `sum_t<3>` (empty deduced trailing pack) re-type-checked its pattern
 incomplete primary.  Fixed by trimming the empty deduced trailing pack before the
 pattern re-type-check.  Non-vacuous: the two-element assertion is the former
 failure point.
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: (no diagnostic before the drop)

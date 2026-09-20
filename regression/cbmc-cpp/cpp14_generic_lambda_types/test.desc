@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp14
 ^VERIFICATION SUCCESSFUL$
@@ -6,3 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 C++14 generic lambda with struct and double argument types
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: member operator requires struct/union type on left hand side but got 'const signed int'

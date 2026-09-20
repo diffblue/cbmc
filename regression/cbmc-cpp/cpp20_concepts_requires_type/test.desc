@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^EXIT=0$
@@ -9,3 +9,7 @@ main.cpp
 requires-expression with type requirements.
 The requires clause is skipped but SFINAE-like fallback to the
 primary template works.
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: (no diagnostic before the drop)

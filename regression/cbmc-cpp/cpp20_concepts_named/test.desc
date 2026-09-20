@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^EXIT=0$
@@ -7,3 +7,7 @@ main.cpp
 --
 Named concept declarations (template<class T> concept X = ...).
 CBMC skips concept constraints (treats as always satisfied).
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: function must have return type

@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+User-reported Issue 13: conversion function templates with defaulted
+(SFINAE) template parameters ([temp.deduct.conv]/1, [temp.deduct]/5).
