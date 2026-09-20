@@ -11,7 +11,7 @@ Date:   December 2016
 /// \file
 /// Remove exception handling (Java): the language-specific hooks of the shared
 /// remove_exceptions_baset lowering.  Java exceptions are Throwable references
-/// (an @inflight_exception pointer global), matched with java_instanceof, and
+/// (an `\@inflight_exception` pointer global), matched with java_instanceof, and
 /// bound at code_landingpadt instructions.
 
 #include "remove_exceptions.h"
@@ -30,8 +30,8 @@ Date:   December 2016
 #include "remove_instanceof.h"
 
 /// Java specialization of the shared exception-lowering base.  Exceptions are
-/// Throwable references carried in the @inflight_exception global; handlers are
-/// matched with java_instanceof (optionally lowered to a @class_identifier
+/// Throwable references carried in the `\@inflight_exception` global; handlers are
+/// matched with java_instanceof (optionally lowered to a `\@class_identifier`
 /// check) and bound at code_landingpadt instructions.
 class remove_exceptionst : public remove_exceptions_baset
 {
@@ -83,7 +83,7 @@ protected:
     bool may_catch) override;
 };
 
-/// Returns the the global @inflight_exception, holding a reference to an
+/// Returns the global `\@inflight_exception`, holding a reference to an
 /// exception that has been thrown but not yet caught.
 symbol_exprt remove_exceptionst::get_inflight_exception_global()
 {

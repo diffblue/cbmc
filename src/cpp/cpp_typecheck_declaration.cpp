@@ -86,7 +86,6 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   if(template_id == nullptr)
     return {};
 
-
   // The template's type parameters, noting a trailing parameter pack.
   std::vector<bool> param_is_pack;
   {
@@ -127,30 +126,31 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   // instead of wrap<int*>; the mistyped member broke the goto program
   // downstream (simplify_rec postcondition).
   const auto adjust_deduction_arg =
-    [this](const typet &pattern, const typet &arg_type, bool is_lvalue) {
-      const bool pattern_is_ref = pattern.id() == ID_frontend_pointer &&
-                                  (pattern.get_bool(ID_C_reference) ||
-                                   pattern.get_bool(ID_C_rvalue_reference));
-      typet at = arg_type;
-      if(!pattern_is_ref)
-      {
-        if(is_reference(at))
-          at = to_reference_type(at).base_type();
-        if(at.id() == ID_array)
-          at = pointer_type(to_array_type(at).element_type());
-        else if(at.id() == ID_code)
-          at = pointer_type(at);
-        at.remove(ID_C_constant);
-      }
-      else if(
-        pattern.get_bool(ID_C_rvalue_reference) &&
-        to_type_with_subtype(pattern).subtype().id() == ID_cpp_name &&
-        is_lvalue && !is_reference(at) && !is_rvalue_reference(at))
-      {
-        at = reference_type(at);
-      }
-      return at;
-    };
+    [](const typet &pattern, const typet &arg_type, bool is_lvalue)
+  {
+    const bool pattern_is_ref = pattern.id() == ID_frontend_pointer &&
+                                (pattern.get_bool(ID_C_reference) ||
+                                 pattern.get_bool(ID_C_rvalue_reference));
+    typet at = arg_type;
+    if(!pattern_is_ref)
+    {
+      if(is_reference(at))
+        at = to_reference_type(at).base_type();
+      if(at.id() == ID_array)
+        at = pointer_type(to_array_type(at).element_type());
+      else if(at.id() == ID_code)
+        at = pointer_type(at);
+      at.remove(ID_C_constant);
+    }
+    else if(
+      pattern.get_bool(ID_C_rvalue_reference) &&
+      to_type_with_subtype(pattern).subtype().id() == ID_cpp_name &&
+      is_lvalue && !is_reference(at) && !is_rvalue_reference(at))
+    {
+      at = reference_type(at);
+    }
+    return at;
+  };
 
   // Explicit deduction guides ([temp.deduct.guide], [over.match.class.deduct]):
   // a guide is one of the entries the class name resolves to whose declarator
@@ -287,8 +287,8 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       csym->type.get_bool(ID_is_template) &&
       scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
     {
-      const cpp_declarationt &cdecl = to_cpp_declaration(csym->type);
-      for(const auto &mem : cdecl.type().find(ID_body).get_sub())
+      const cpp_declarationt &class_decl = to_cpp_declaration(csym->type);
+      for(const auto &mem : class_decl.type().find(ID_body).get_sub())
       {
         if(!deduced_types.empty())
           break;
@@ -319,7 +319,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         cpp_save_scopet save_scope(cpp_scopes);
         cpp_saved_template_mapt saved_map(template_map);
         cpp_scopes.go_to(*scope_it->second);
-        template_map.build_unassigned(cdecl.template_type());
+        template_map.build_unassigned(class_decl.template_type());
 
         cpp_typecheck_resolvet resolver(*this);
         bool deduced_ok = true;
@@ -341,7 +341,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         if(deduced_ok)
         {
           const cpp_template_args_tct ta =
-            template_map.build_template_args(cdecl.template_type());
+            template_map.build_template_args(class_decl.template_type());
           if(!ta.has_unassigned())
           {
             std::vector<typet> dt;
@@ -382,10 +382,10 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
       csym->type.get_bool(ID_is_template) &&
       scope_it != cpp_scopes.id_map.end() && scope_it->second != nullptr)
     {
-      const cpp_declarationt &cdecl = to_cpp_declaration(csym->type);
+      const cpp_declarationt &class_decl = to_cpp_declaration(csym->type);
       bool has_ctor = false;
       std::vector<typet> member_patterns;
-      for(const auto &mem : cdecl.type().find(ID_body).get_sub())
+      for(const auto &mem : class_decl.type().find(ID_body).get_sub())
       {
         if(mem.id() != ID_cpp_declaration)
           continue;
@@ -429,7 +429,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         cpp_save_scopet save_scope(cpp_scopes);
         cpp_saved_template_mapt saved_map(template_map);
         cpp_scopes.go_to(*scope_it->second);
-        template_map.build_unassigned(cdecl.template_type());
+        template_map.build_unassigned(class_decl.template_type());
         cpp_typecheck_resolvet resolver(*this);
         bool deduced_ok = true;
         try
@@ -444,7 +444,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         if(deduced_ok)
         {
           const cpp_template_args_tct ta =
-            template_map.build_template_args(cdecl.template_type());
+            template_map.build_template_args(class_decl.template_type());
           if(!ta.has_unassigned())
           {
             std::vector<typet> dt;

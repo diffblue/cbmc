@@ -1167,19 +1167,19 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
     // resolve").  Require values only for the parameters that actually
     // occur in the compared types.
     std::set<irep_idt> used_names;
-    std::function<void(const irept &)> collect_names =
-      [&](const irept &node) {
-        if(node.id() == ID_cpp_name)
-        {
-          for(const auto &sub : node.get_sub())
-            if(sub.id() == ID_name)
-              used_names.insert(sub.get(ID_identifier));
-        }
+    std::function<void(const irept &)> collect_names = [&](const irept &node)
+    {
+      if(node.id() == ID_cpp_name)
+      {
         for(const auto &sub : node.get_sub())
-          collect_names(sub);
-        for(const auto &named : node.get_named_sub())
-          collect_names(named.second);
-      };
+          if(sub.id() == ID_name)
+            used_names.insert(sub.get(ID_identifier));
+      }
+      for(const auto &sub : node.get_sub())
+        collect_names(sub);
+      for(const auto &named : node.get_named_sub())
+        collect_names(named.second);
+    };
     for(const auto &gp : G_params)
       collect_names(gp.type());
 

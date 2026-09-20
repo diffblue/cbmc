@@ -22,11 +22,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
-/// Generate code to copy the parent.
-/// \param source_location: location for generated code
-/// \param parent_base_name: base name of typechecked parent
-/// \param arg_name: name of argument that is being copied
-/// \param [out] block: non-typechecked block
 /// \return whether the class has no storage member (an empty class: its
 ///   base subobjects have zero size, [intro.object]/9)
 static bool class_is_empty(const struct_typet &type)
@@ -45,6 +40,13 @@ static bool class_is_empty(const struct_typet &type)
   return true;
 }
 
+/// Generate code to copy the parent.
+/// \param source_location: location for generated code
+/// \param parent_type: type of the typechecked parent
+/// \param arg_name: name of argument that is being copied
+/// \param [out] block: non-typechecked block
+/// \param is_move: generate a move rather than a copy
+/// \param parent_is_empty: the parent is an empty class (nothing to copy)
 static void copy_parent(
   const source_locationt &source_location,
   const typet &parent_type,
@@ -112,6 +114,8 @@ static void copy_parent(
 /// \param member_base_name: name of a member
 /// \param arg_name: name of argument that is being copied
 /// \param [out] block: non-typechecked block
+/// \param is_move: generate a move rather than a copy
+/// \param member_type: the member's type, when known
 static void copy_member(
   const source_locationt &source_location,
   const irep_idt &member_base_name,
@@ -217,6 +221,9 @@ void cpp_typecheckt::default_ctor(
 }
 
 /// Generate code for implicit default copy or move constructor.
+/// \param symbol: the class
+/// \param [out] cpctor: the generated constructor declaration
+/// \param param_identifier_arg: identifier of the constructor's parameter
 /// \param is_move: when true, generate a *move* constructor -- each base and
 ///   non-static data member is initialized from the corresponding subobject of
 ///   the argument cast to an xvalue (static_cast<T&&>), so overload resolution
@@ -657,6 +664,7 @@ void cpp_typecheckt::default_assignop_value(
 /// \param components: the components of the class
 /// \param initializers: the constructor initializers
 /// \param class_identifier: the identifier of the class being constructed
+/// \param is_template_instance: the class is a template instance
 void cpp_typecheckt::check_member_initializers(
   const struct_typet::basest &bases,
   const struct_typet::componentst &components,
@@ -880,13 +888,6 @@ void cpp_typecheckt::check_member_initializers(
   }
 }
 
-/// Build the full initialization list of the constructor. First, all the
-/// direct-parent constructors are called. Second, all the non-pod data members
-/// are initialized.
-///
-///    Note: The initialization order follows the declaration order.
-/// \param struct_union_type: the class/struct/union
-/// \param [out] initializers: the constructor initializers
 /// best-effort source location of a member-initializer irept
 static source_locationt source_location_of(const irept &initializer)
 {
@@ -896,6 +897,13 @@ static source_locationt source_location_of(const irept &initializer)
   return source_locationt();
 }
 
+/// Build the full initialization list of the constructor. First, all the
+/// direct-parent constructors are called. Second, all the non-pod data members
+/// are initialized.
+///
+///    Note: The initialization order follows the declaration order.
+/// \param struct_union_type: the class/struct/union
+/// \param [out] initializers: the constructor initializers
 void cpp_typecheckt::full_member_initialization(
   const struct_union_typet &struct_union_type,
   irept &initializers)

@@ -283,7 +283,7 @@ static void fold_numeric_traits_integer(symbol_table_baset &symbol_table)
 /// an inline header body reading `_M_table[(unsigned char)c] & m`, so with
 /// this model it evaluates correctly with no virtual dispatch.
 /// Returns a nil expression if the ctype<char> struct is not in the symbol
-/// table (translation unit does not use <locale>).
+/// table (translation unit does not use `<locale>`).
 static exprt provide_classic_ctype_char_model(
   symbol_table_baset &symbol_table,
   const namespacet &ns)

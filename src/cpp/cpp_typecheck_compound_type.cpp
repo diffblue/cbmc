@@ -2405,7 +2405,8 @@ void cpp_typecheckt::typecheck_friend_declaration(
       // parameters stay dependent.
       if(!instantiation_stack.empty())
       {
-        const auto short_of = [](const irep_idt &id) -> std::string {
+        const auto short_of = [](const irep_idt &id) -> std::string
+        {
           const std::string t = id2string(id);
           const auto q = t.rfind("::");
           return q != std::string::npos ? t.substr(q + 2) : t;
@@ -2459,8 +2460,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
         // as for the defaults above, substitute the bound argument now.
         // Only bare cpp_names naming an enclosing parameter are
         // replaced; the friend's own parameters stay dependent.
-        if(
-          declaration.template_type().find(ID_C_requires_clause).is_not_nil())
+        if(declaration.template_type().find(ID_C_requires_clause).is_not_nil())
         {
           irept &req_clause =
             declaration.template_type().add(ID_C_requires_clause);
@@ -2486,41 +2486,42 @@ void cpp_typecheckt::typecheck_friend_declaration(
           // returns true when `node` was a bare cpp_name naming a bound
           // enclosing parameter and was replaced in place
           std::function<bool(irept &)> subst_enclosing =
-            [&](irept &node) -> bool {
-              if(
-                node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
-                node.get_sub().front().id() == ID_name)
-              {
-                const std::string want =
-                  id2string(node.get_sub().front().get(ID_identifier));
-                if(own_param_names.count(want) != 0)
-                  return false;
-                for(const auto &ee : template_map.expr_map)
-                {
-                  if(short_of(ee.first) != want || ee.second.is_nil())
-                    continue;
-                  node = ee.second;
-                  return true;
-                }
-                for(const auto &te : template_map.type_map)
-                {
-                  if(short_of(te.first) != want || te.second.is_nil())
-                    continue;
-                  // splice the raw type: the constraint-satisfaction
-                  // walker substitutes parameter names the same way and
-                  // its evaluator accepts typet nodes in place of a
-                  // cpp_name
-                  node = te.second;
-                  return true;
-                }
+            [&](irept &node) -> bool
+          {
+            if(
+              node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
+              node.get_sub().front().id() == ID_name)
+            {
+              const std::string want =
+                id2string(node.get_sub().front().get(ID_identifier));
+              if(own_param_names.count(want) != 0)
                 return false;
+              for(const auto &ee : template_map.expr_map)
+              {
+                if(short_of(ee.first) != want || ee.second.is_nil())
+                  continue;
+                node = ee.second;
+                return true;
               }
-              for(auto &child : node.get_sub())
-                subst_enclosing(child);
-              for(auto &named : node.get_named_sub())
-                subst_enclosing(named.second);
+              for(const auto &te : template_map.type_map)
+              {
+                if(short_of(te.first) != want || te.second.is_nil())
+                  continue;
+                // splice the raw type: the constraint-satisfaction
+                // walker substitutes parameter names the same way and
+                // its evaluator accepts typet nodes in place of a
+                // cpp_name
+                node = te.second;
+                return true;
+              }
               return false;
-            };
+            }
+            for(auto &child : node.get_sub())
+              subst_enclosing(child);
+            for(auto &named : node.get_named_sub())
+              subst_enclosing(named.second);
+            return false;
+          };
           subst_enclosing(req_clause);
         }
 

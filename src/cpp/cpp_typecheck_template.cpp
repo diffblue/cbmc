@@ -2152,8 +2152,6 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
   return template_scope;
 }
 
-/// \par parameters: location, non-typechecked template arguments
-/// \return typechecked template arguments
 /// N5008 [dcl.fct]/3 + [temp.type]: parameter names are not part of a
 /// function type, so `fn<void(hard &hardness)>` and `fn<void(hard &)>`
 /// denote the same specialization.  A function-type template argument may
@@ -2179,6 +2177,8 @@ static void strip_function_type_parameter_names(typet &type)
   }
 }
 
+/// \par parameters: location, non-typechecked template arguments
+/// \return typechecked template arguments
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -2827,10 +2827,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     parameters.size() < args.size() && !parameters.empty() &&
     !parameters.back().get_bool(ID_ellipsis))
   {
-    while(
-      args.size() > parameters.size() && !args.empty() &&
-      (args.back().id() == ID_type || args.back().id() == ID_ambiguous) &&
-      args.back().type().id() == ID_empty)
+    while(args.size() > parameters.size() && !args.empty() &&
+          (args.back().id() == ID_type || args.back().id() == ID_ambiguous) &&
+          args.back().type().id() == ID_empty)
     {
       args.pop_back();
     }
