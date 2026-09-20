@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+User-reported Issue 12: in-class static constexpr / inline const arrays of
+class type are initialised element-wise ([dcl.init.aggr]/4) and are
+definitions ([class.static.data]/3).
