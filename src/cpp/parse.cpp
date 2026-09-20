@@ -359,6 +359,7 @@ protected:
   bool rPostfixExpr(exprt &);
   bool rPrimaryExpr(exprt &);
   bool rLambdaExpr(exprt &);
+  unsigned lambda_uid_counter = 0;
   bool rVarName(exprt &);
   bool rVarNameCore(exprt &);
   bool maybeTemplateArgs();
@@ -10311,6 +10312,12 @@ bool Parser::rLambdaExpr(exprt &exp)
 
   exp = exprt("lambda");
   set_location(exp, tk);
+  // N5008 [expr.prim.lambda.closure]/1: every lambda-expression has its own
+  // closure type.  The type checker keys the closure it synthesises on this
+  // number, not on the source line: the lexer records no column, so two
+  // lambdas on one line (one-line class definitions, macros) shared a
+  // closure and the second call ran the first lambda's body.
+  exp.set("#lambda_uid", lambda_uid_counter++);
 
   // Parse lambda capture
   irept &capture = exp.add("lambda_capture");
