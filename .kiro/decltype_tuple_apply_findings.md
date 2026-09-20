@@ -10268,3 +10268,83 @@ forbid that phrase) so no existing test changes meaning.
   develop changes to watch: function argument evaluation order (goto
   conversion), char-signedness-independent library models, `case_exprt'
   removed, `is_zero_width' now in util/pointer_offset_size.
+
+## Round 153 (2026-09-20) — Issues 12/13, incomplete-body policy, speculative instantiation, CI of PR #8878
+
+- Issue 12 (`7223967426'): in-class `static constexpr V vs[N] = {V(..),
+  V(..)}' -- the braced list went to cpp_constructor as ONE operand
+  (N-argument ctor call).  Route: convert_initializer (the namespace-scope
+  path).  Also `inline' static members were still extern ([class.static.
+  data]/3) so `static inline const V iv[2]' never initialised and the
+  ctor-call code sat in the symbol value (symex type mismatch).
+- Issue 13a (`783571b701'): conversion function template with a defaulted
+  (SFINAE) parameter: [temp.deduct]/5 defaults were not applied after
+  [temp.deduct.conv] deduction; the default may name the ENCLOSING class's
+  T, so the class instance's template args are bound first (as
+  instantiate_template does).
+- Issue 13b (`af9ac6b7ab', SOUNDNESS POLICY): an incompletely type-checked
+  USER function is an error now (CONVERSION ERROR, exit 6); the tolerated
+  path (warning + truncated body + SUCCESS) stays for library bodies only.
+  Running the suite with the new policy exposed 16 cbmc-cpp tests whose
+  main() had been truncated -- including MY OWN lambda matrix, where the
+  `auto...' cases after property 7 had never been checked (13 properties
+  now vs 7).  Lesson: when a test "passes", check `--show-properties`
+  count against the source, and grep "could not fully type-check" -- a
+  vacuous SUCCESS is the most dangerous outcome.  The 16 are KNOWNBUG with
+  the underlying diagnostic in each test.desc: 3x "function must have
+  return type" (concept-constrained declarations), 2x "expected constant
+  expression" (NTTP string/brace), 2x concept static_assert, variant ctor
+  (libstdc++ & libc++), pack indexing, generic lambda member access, ranges
+  `_Partial', nontype pack recursion, function reference param, requires
+  type.  Each is a real bug to fix.
+- Empty packs in binary folds (`(xs + ... + 0)' with 0 args) and
+  `sizeof...(xs)' over a FUNCTION parameter pack: fixed in
+  cpp_typecheck_method_bodies (pack side by "mentions a pack name",
+  including a name nothing binds -- the empty pack leaves no parameter;
+  this method's pack size found by class prefix of the pack_size_map key
+  when several packs are live).
+- #4a speculative instantiation (`99a882799a'): converting-constructor
+  templates tried during UDCS matching are recorded (speculative_instances)
+  in user_defined_conversion_sequence right after find_ctor; their queued
+  bodies are HELD BACK in typecheck_method_bodies and released when a
+  converted body refers to them (whole-irep scan incl. named subs: the
+  temporary object's #initializer holds the call); at the end of
+  typecheck() the unreferenced are left bodyless silently.  Kernel
+  /tmp/r152/sp2.cpp; ensure_one_backedge_per_target.cpp compiles with 0
+  errors (was the `set' x115 signature).  Free-function templates never
+  had the problem (their unselected instances are not converted).  The
+  general two-phase design remains the long-term answer; this closes the
+  observed shape.
+- #4b dynamic layout: not started this round (see round 150 design).
+- CI of PR #8878 (draft, pushed by the user at 21:01 = fae543ad76): every
+  build job red.  Causes and status:
+  * clang -Werror: 2 unused `this' captures → FIXED (`c32cc298e9'); the
+    front-end libs now build with clang++ -Werror locally
+    (/tmp/r152/clangbuild).  Always build with clang before pushing.
+  * MSVC: variable named `cdecl' → renamed.  Windows builds otherwise
+    untested locally.
+  * check_help: --no-body-assertions missing from man pages → added.
+  * doxygen: doc-comment `#word'/`@word' link requests, wrong \param
+    lists (my round-148 class_is_empty insertion stole copy_parent's doc),
+    `<locale>' → fixed; 5 dev-notes .md files excluded from doxygen (they
+    are review logs, not API docs).  Local `scripts/run_doxygen.sh' clean.
+  * clang-format: whole-branch diff had 10 src files → formatted; 314
+    regression test files + .kiro → EXCLUDED for now
+    (.clang-format-ignore, run_diff.sh --exclude=.kiro/*).  Reformatting
+    the tests shifts `line N' expectations in test.desc; do per individual
+    PR.
+  * Ubuntu 22.04 (gcc 11 / libstdc++ 11): cbmc-cpp 2 failures --
+    `std::vector<int> v(a, a+3)' fails with libstdc++-11 headers ("no
+    match for symbol 'vector'" at stl_vector.h:653, the _RequireInputIter
+    range ctor) -- reproduce with `g++-11 -E' preprocessed input
+    (/tmp/r152/v11_g++-11.cpp); cpp11_locale_ctype_facet likewise.  Our
+    front end is tuned to libstdc++ 13; CI has 22.04 jobs.
+  * JBMC: 13/726 jbmc + strings + concurrency tests fail (exceptions1,
+    exceptions2, catch1, finally3 ...) -- our remove_exceptions
+    refactoring into remove_exceptions_baset (shared with C++) broke Java
+    exception lowering.  Needs a JBMC build (WITH_JBMC=ON, JDK) to
+    reproduce; not done here.
+  * unit test irep_sharing "FAILED" lines are the expected-failure
+    scenario, not a regression.
+  * Not yet looked at: FreeBSD/NetBSD/OpenBSD beyond the clang warning,
+    macOS (same), 32-bit gcc, arm, run-10-random-tests, windows-msi.
