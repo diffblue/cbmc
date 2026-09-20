@@ -1,4 +1,4 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -15,3 +15,7 @@ sized_sentinel_for.  Depends on requirement-parameter binding for conjoined
 requires-expressions ([expr.prim.req.general]/2).  Includes the negative case
 (a non-incrementable type is not an iterator).  See
 doc/architectural/cpp-requires-expression-support.md.
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: static assertion failed: It io
