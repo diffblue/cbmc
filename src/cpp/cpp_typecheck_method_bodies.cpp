@@ -376,6 +376,35 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     bool have_low_size = template_map.pack_size_map.size() == 1;
     std::size_t low_size =
       have_low_size ? template_map.pack_size_map.begin()->second : 0;
+    // Several packs may be live (enclosing templates, library instances);
+    // this method's own pack is the one keyed under its template's name.
+    if(!have_low_size && !template_map.pack_size_map.empty())
+    {
+      // key shape: `<class>::template::<n>::<pack>'; the method's name is
+      // `<class>::<method><args>' -- match on the class prefix
+      std::string prefix =
+        id2string(method_symbol.name)
+          .substr(0, id2string(method_symbol.name).find('<'));
+      const auto last_scope = prefix.rfind("::");
+      prefix = last_scope == std::string::npos
+                 ? std::string{}
+                 : prefix.substr(0, last_scope + 2);
+      std::size_t matches = 0, matched_size = 0;
+      for(const auto &ps : template_map.pack_size_map)
+      {
+        const std::string key = id2string(ps.first);
+        if(!prefix.empty() && key.compare(0, prefix.size(), prefix) == 0)
+        {
+          ++matches;
+          matched_size = ps.second;
+        }
+      }
+      if(matches == 1)
+      {
+        have_low_size = true;
+        low_size = matched_size;
+      }
+    }
     if(have_low_size && low_size >= 2)
       have_low_size = false; // an N>=2 pack is handled via base$k above
 
@@ -428,13 +457,51 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       // fold, `(pack op ... op init)' a binary RIGHT fold -- the pack may be
       // on either side.
       bool binary_pack_left = false;
+      // does this operand name a pack: a replicated `base$k' name (N>=2), a
+      // pack recorded in the template map (0/1 elements), or one of this
+      // method's own parameters (a single-element pack keeps its name)
+      std::function<bool(const irept &)> mentions_pack =
+        [&](const irept &n) -> bool
+      {
+        if(n.id() == ID_name)
+        {
+          const irep_idt &id = n.get(ID_identifier);
+          if(dollar_counts.count(id))
+            return true;
+          for(const auto &ps : template_map.pack_size_map)
+          {
+            const std::string full = id2string(ps.first);
+            const auto q = full.rfind("::");
+            if(
+              (q == std::string::npos ? full : full.substr(q + 2)) ==
+              id2string(id))
+              return true;
+          }
+          if(method_symbol.type.id() == ID_code)
+            for(const auto &prm : to_code_type(method_symbol.type).parameters())
+              if(prm.get_base_name() == id)
+                return true;
+          // an EMPTY function parameter pack leaves no parameter behind: a
+          // name that nothing in scope binds is the pack
+          if(cpp_scopes.current_scope()
+               .lookup(id, cpp_scopet::RECURSIVE)
+               .empty())
+            return true;
+        }
+        for(const auto &sub : n.get_sub())
+          if(mentions_pack(sub))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(mentions_pack(ns.second))
+            return true;
+        return false;
+      };
       if((is_right || is_left) && !node.get_sub().empty())
         pattern = &node.get_sub().front();
       else if(is_binary && node.get_sub().size() >= 2)
       {
         if(
-          fold_ref_base(node.get_sub()[1]).empty() &&
-          !fold_ref_base(node.get_sub()[0]).empty())
+          !mentions_pack(node.get_sub()[1]) && mentions_pack(node.get_sub()[0]))
         {
           binary_pack_left = true;
           init_expr = node.get_sub()[1];
@@ -718,6 +785,57 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
        !to_code_type(method_symbol.type).parameters().empty()))
     {
       reduce_folds(static_cast<irept &>(body));
+    }
+
+    // N5008 [expr.sizeof]/5: `sizeof...(xs)' over this method's FUNCTION
+    // parameter pack.  The general handler looks the name up among template
+    // parameters and pack-size keys, which name the TYPE pack
+    // (`_lambda_tp_0'), not `xs'; an N>=2 pack is counted from its
+    // replicated parameters, a 0/1 pack from the recorded size (an empty pack
+    // leaves no parameter to resolve `xs' to: "symbol 'xs' is unknown").
+    if(!dollar_counts.empty() || have_low_size)
+    {
+      std::function<void(irept &)> reduce_sizeof_packs = [&](irept &node)
+      {
+        if(node.get_bool("#sizeof_pack"))
+        {
+          const irept &ta = node.find(ID_type_arg);
+          if(ta.id() == ID_cpp_name && !ta.get_sub().empty())
+          {
+            const irep_idt &nm = ta.get_sub().front().get(ID_identifier);
+            const auto dc = dollar_counts.find(nm);
+            if(dc != dollar_counts.end())
+            {
+              static_cast<exprt &>(node) =
+                from_integer(dc->second, size_type());
+              return;
+            }
+            if(have_low_size && !nm.empty())
+            {
+              bool is_param = false;
+              if(method_symbol.type.id() == ID_code)
+                for(const auto &prm :
+                    to_code_type(method_symbol.type).parameters())
+                  if(prm.get_base_name() == nm)
+                    is_param = true;
+              const bool unbound = cpp_scopes.current_scope()
+                                     .lookup(nm, cpp_scopet::RECURSIVE)
+                                     .empty();
+              if(is_param || unbound)
+              {
+                static_cast<exprt &>(node) =
+                  from_integer(low_size, size_type());
+                return;
+              }
+            }
+          }
+        }
+        for(auto &sub : node.get_sub())
+          reduce_sizeof_packs(sub);
+        for(auto &ns : node.get_named_sub())
+          reduce_sizeof_packs(ns.second);
+      };
+      reduce_sizeof_packs(static_cast<irept &>(body));
     }
   }
 
@@ -1528,48 +1646,52 @@ void cpp_typecheckt::typecheck_method_bodies()
           // silent success.
         tolerated_incomplete_body:
           {
-            warning().source_location = method_symbol.location;
-            warning()
-              << "C++ front-end could not fully type-check '"
-              << method_symbol.base_name
-              << "' (unsupported construct); its body is left incomplete, so "
-              << "verification involving it may be unsound" << messaget::eom;
-            get_message_handler().set_message_count(
-              messaget::M_ERROR, errors_before);
-            // If the failure left the body STRUCTURALLY broken -- a
-            // value-returning function containing a `return` whose
-            // operand was lost mid-type-check -- goto conversion's
-            // convert_return invariant aborts the whole run
-            // (optionst::to_json under the dog-food harness).  Only
-            // then drop the body: a bodyless declaration is a havoc
-            // stub downstream, no less sound than the incomplete body,
-            // and the warning above keeps it auditable.  Bodies that
-            // remain structurally sound are kept, as partial
-            // verification through them is expected by existing tests.
-            const typet &ret_t =
-              to_code_type(method_symbol.type).return_type();
-            if(
-              ret_t.id() != ID_empty && ret_t.id() != ID_constructor &&
-              ret_t.id() != ID_destructor)
+          // This is USER code (library bodies take the `suppress' branch
+          // above).  The body stays structurally sound but incomplete;
+          // that is not a result a verifier may report as SUCCESSFUL:
+          // count it as an error so the run ends in CONVERSION ERROR
+          // (user-reported Issue 13: the rest of main() was dropped after
+          // a failed conversion and the run exited 0 with no properties).
+          error().source_location = method_symbol.location;
+          error() << "C++ front-end could not fully type-check '"
+                  << method_symbol.base_name
+                  << "' (unsupported construct); its body is left "
+                  << "incomplete, so verification involving it would be "
+                  << "unsound" << messaget::eom;
+          // If the failure left the body STRUCTURALLY broken -- a
+          // value-returning function containing a `return` whose
+          // operand was lost mid-type-check -- goto conversion's
+          // convert_return invariant aborts the whole run
+          // (optionst::to_json under the dog-food harness).  Only
+          // then drop the body: a bodyless declaration is a havoc
+          // stub downstream, no less sound than the incomplete body,
+          // and the warning above keeps it auditable.  Bodies that
+          // remain structurally sound are kept, as partial
+          // verification through them is expected by existing tests.
+          const typet &ret_t = to_code_type(method_symbol.type).return_type();
+          if(
+            ret_t.id() != ID_empty && ret_t.id() != ID_constructor &&
+            ret_t.id() != ID_destructor)
+          {
+            std::function<bool(const irept &)> has_valueless_return =
+              [&](const irept &node) -> bool
             {
-              std::function<bool(const irept &)> has_valueless_return =
-                [&](const irept &node) -> bool {
-                  if(node.id() == ID_code && node.get(ID_statement) == ID_return)
-                  {
-                    const auto &ret_code =
-                      static_cast<const code_frontend_returnt &>(
-                        static_cast<const codet &>(node));
-                    if(!ret_code.has_return_value())
-                      return true;
-                  }
-                  for(const auto &sub : node.get_sub())
-                    if(has_valueless_return(sub))
-                      return true;
-                  return false;
-                };
-              if(has_valueless_return(method_symbol.value))
-                method_symbol.value.make_nil();
-            }
+              if(node.id() == ID_code && node.get(ID_statement) == ID_return)
+              {
+                const auto &ret_code =
+                  static_cast<const code_frontend_returnt &>(
+                    static_cast<const codet &>(node));
+                if(!ret_code.has_return_value())
+                  return true;
+              }
+              for(const auto &sub : node.get_sub())
+                if(has_valueless_return(sub))
+                  return true;
+              return false;
+            };
+            if(has_valueless_return(method_symbol.value))
+              method_symbol.value.make_nil();
+          }
             continue;
           }
         }
