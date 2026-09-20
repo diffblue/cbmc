@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+User-reported Issue 11: a lambda parameter's declarator (pointer, array,
+function, reference to array) is part of its type ([dcl.fct]/5).
