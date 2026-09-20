@@ -7040,6 +7040,15 @@ void cpp_typecheckt::instantiate_generic_lambda(
         {
           const symbolt &outer_sym = symbol_table.lookup_ref(
             to_symbol_expr(cap.second).get_identifier());
+          // [expr.prim.lambda.capture]/6: `[&r = k]' -- see the non-generic
+          // path
+          if(outer_sym.base_name != cap.first)
+          {
+            cpp_idt &cid = cpp_scopes.current_scope().insert(cap.first);
+            cid.identifier = outer_sym.name;
+            cid.id_class = cpp_idt::id_classt::SYMBOL;
+            continue;
+          }
           cpp_idt &cid = cpp_scopes.put_into_scope(outer_sym);
           cid.id_class = cpp_idt::id_classt::SYMBOL;
           continue;
@@ -8511,6 +8520,17 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           {
             const symbolt &outer_sym = symbol_table.lookup_ref(
               to_symbol_expr(cap.second).get_identifier());
+            // N5008 [expr.prim.lambda.capture]/6: an init-capture `[&r =
+            // k]' declares `r' as a reference to the initializer; the body
+            // names it `r', not `k'.  Enter the outer symbol under the
+            // capture's own name.
+            if(outer_sym.base_name != cap.first)
+            {
+              cpp_idt &cid = cpp_scopes.current_scope().insert(cap.first);
+              cid.identifier = outer_sym.name;
+              cid.id_class = cpp_idt::id_classt::SYMBOL;
+              continue;
+            }
             cpp_idt &cid = cpp_scopes.put_into_scope(outer_sym);
             cid.id_class = cpp_idt::id_classt::SYMBOL;
             continue;
@@ -8654,6 +8674,15 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         {
           const symbolt &outer_sym = symbol_table.lookup_ref(
             to_symbol_expr(cap.second).get_identifier());
+          // [expr.prim.lambda.capture]/6: `[&r = k]' -- see the non-generic
+          // path
+          if(outer_sym.base_name != cap.first)
+          {
+            cpp_idt &cid = cpp_scopes.current_scope().insert(cap.first);
+            cid.identifier = outer_sym.name;
+            cid.id_class = cpp_idt::id_classt::SYMBOL;
+            continue;
+          }
           cpp_idt &cid = cpp_scopes.put_into_scope(outer_sym);
           cid.id_class = cpp_idt::id_classt::SYMBOL;
           continue;
@@ -8777,11 +8806,15 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   {
     // The closure type must be identical across repeated type-checks of the
     // same lambda-expression (e.g. during auto return type deduction, which
-    // type-checks the body twice, possibly in different scopes).  Key it on the
-    // source location and create it only once.
-    const std::string loc_key = id2string(loc.get_file()) + ":" +
-                                id2string(loc.get_line()) + ":" +
-                                id2string(loc.get_column());
+    // type-checks the body twice, possibly in different scopes).  Key it on
+    // the parser's per-lambda number and create it only once.  (The source
+    // location is the fallback for a lambda built without the parser; it has
+    // no column, so two lambdas on one line would share a closure.)
+    const std::string loc_key = expr.find("#lambda_uid").is_not_nil()
+                                  ? "uid:" + id2string(expr.get("#lambda_uid"))
+                                  : id2string(loc.get_file()) + ":" +
+                                      id2string(loc.get_line()) + ":" +
+                                      id2string(loc.get_column());
     irep_idt closure_sym_name = lambda_closure_map[loc_key];
 
     // Collect the by-copy captures in a fixed (sorted) order shared between the
@@ -8853,7 +8886,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           irept template_parameters;
           std::set<irep_idt> seen_type_params;
           std::size_t auto_index = 0;
-          auto add_type_param = [&](const irep_idt &tpname)
+          auto add_type_param = [&](const irep_idt &tpname, bool is_pack)
           {
             if(!seen_type_params.insert(tpname).second)
               return;
@@ -8865,6 +8898,12 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
             tp_name.get_sub().push_back(irept(ID_name));
             tp_name.get_sub().back().set(ID_identifier, tpname);
             tp_dtor.name() = tp_name;
+            // N5008 [dcl.spec.auto.general]/3 + [temp.param]: `auto... xs'
+            // invents a template parameter PACK (`template <class... T>
+            // operator()(T... xs)'); without the marking the pack accepted
+            // exactly one argument.
+            if(is_pack)
+              tp_dtor.set_has_ellipsis();
             tp.declarators().push_back(tp_dtor);
             template_parameters.get_sub().push_back(irept());
             template_parameters.get_sub().back().swap(tp);
@@ -8878,7 +8917,12 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
             {
               const irep_idt tpname =
                 "_lambda_tp_" + std::to_string(auto_index++);
-              add_type_param(tpname);
+              const bool is_pack =
+                pdecl.type().get_bool(ID_ellipsis) ||
+                (!pdecl.declarators().empty() &&
+                 (pdecl.declarators().front().get_bool(ID_ellipsis) ||
+                  pdecl.declarators().front().type().get_bool(ID_ellipsis)));
+              add_type_param(tpname, is_pack);
               typet cn(ID_cpp_name);
               irept nm(ID_name);
               nm.set(ID_identifier, tpname);
@@ -8889,7 +8933,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
               pdecl.type().id() == ID_cpp_name &&
               !pdecl.type().get_sub().empty())
             {
-              add_type_param(pdecl.type().get_sub().front().get(ID_identifier));
+              add_type_param(
+                pdecl.type().get_sub().front().get(ID_identifier), false);
             }
           }
           op_ftype.add(ID_parameters) = op_params;

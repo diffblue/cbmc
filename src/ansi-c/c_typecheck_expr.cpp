@@ -557,8 +557,16 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
     // C++11 noexcept operator — evaluate as true (safe approximation).
     expr = true_exprt();
   }
-  else if(expr.id() == "cpp_right_fold" || expr.id() == "cpp_left_fold")
+  else if(
+    expr.id() == "cpp_right_fold" || expr.id() == "cpp_left_fold" ||
+    expr.id() == "cpp_binary_fold")
   {
+    // An unexpanded fold-expression ([expr.prim.fold]) only reaches the C
+    // type checker in a placeholder type check of a generic lambda's body
+    // (the parameter pack stands in as a single `int'); the real body is
+    // instantiated with the pack expanded.  A placeholder value keeps that
+    // check going.  The binary forms `(pack op ... op init)' were missing
+    // here and failed the lambda ("unexpected expression: cpp_binary_fold").
     expr = true_exprt();
   }
   else if(expr.id() == ID_cpp_name)
@@ -1151,6 +1159,11 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       type = signed_int_type();
     else
       type = op.type();
+
+    // N5008 [expr.sizeof]/2: applied to a reference, the result is the size
+    // of the referenced type (C++ only; C has no references)
+    if(is_reference(type) || is_rvalue_reference(type))
+      type = to_pointer_type(type).base_type();
   }
 
   exprt new_expr;
