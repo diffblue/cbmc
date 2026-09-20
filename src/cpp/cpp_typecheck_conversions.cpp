@@ -3691,6 +3691,29 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       }
     }
 
+    // N5008 [dcl.init.aggr]/3 designated-initializer-list, and
+    // [dcl.init.list]/3.5 `{}' for a union: the shared do_initializer
+    // knows designators (`return {.a = i, .b = 2};', user-reported Issue
+    // 9) and value-initialises a POD union from an empty list (`return
+    // {};' with a union return type, Issue 10); the positional loop below
+    // knows neither ("invalid implicit conversion from '<<type:>>'").
+    if(
+      orig_expr.id() == ID_initializer_list && cpp_is_pod(type) &&
+      ((type.id() == ID_struct_tag && std::any_of(
+                                        orig_expr.operands().begin(),
+                                        orig_expr.operands().end(),
+                                        [](const exprt &op) {
+                                          return op.id() ==
+                                                 ID_designated_initializer;
+                                        })) ||
+       type.id() == ID_union_tag))
+    {
+      exprt value = orig_expr;
+      do_initializer(value, type, false);
+      expr = std::move(value);
+      return;
+    }
+
     // C++11 [dcl.init.list]/3.5: non-empty brace-init list to a
     // class (or reference-to-class) type with an accessible
     // `initializer_list<U>` constructor.
