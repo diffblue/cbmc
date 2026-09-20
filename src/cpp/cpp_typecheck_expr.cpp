@@ -8354,8 +8354,19 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     // C++23 deducing this: skip explicit object parameter
     if(pdecl.get_bool("explicit_this"))
       continue;
-    typet ptype = pdecl.type();
+    // N5008 [dcl.fct]/5, [dcl.meaning]: the parameter's type is the
+    // decl-specifier type as modified by the declarator -- `int *p' is a
+    // pointer, `W *win' likewise.  Taking the decl-specifier type alone
+    // dropped every pointer (and array) declarator of a lambda parameter:
+    // `[](W *win) { return win->soc; }' saw `win' as a `W' ("operand of
+    // unary * is not a pointer", user-reported Issue 11).
+    typet ptype = pdecl.declarators().empty()
+                    ? pdecl.type()
+                    : pdecl.declarators().front().merge_type(pdecl.type());
     typecheck_type(ptype);
+    // [dcl.fct]/5: "array of T" / "function returning T" parameters are
+    // adjusted to pointers (`int *p[2]' is `int **')
+    adjust_function_parameter(ptype);
     irep_idt pname;
     // Per N5008 [dcl.fct]/16: a lambda parameter may be unnamed
     // (e.g. `[](std::size_t) { ... }`).  Probe the declarator
