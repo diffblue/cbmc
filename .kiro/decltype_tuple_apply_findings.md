@@ -10227,3 +10227,44 @@ forbid that phrase) so no existing test changes meaning.
   merge_type + adjust_function_parameter.  `int &p' worked only because
   the reference lives on the decl-specifier type in our representation.
 - Suites ×7 green on /tmp/r151/bin1.  Both tests g++/clang-verified.
+
+## Round 152 (2026-09-20) — lambda feature matrix, develop merge
+
+- Lambda matrix (45 shapes, /tmp/r151/lm/cases.txt; all 45 pass now, all
+  g++-accepted).  Four bugs, fixed in `c7aca07d65':
+  1. closure cache keyed by file:line (no column from the C++ lexer): two
+     lambdas on one line, or `[this]' lambdas in two one-line member
+     functions, shared ONE closure -- the second call ran the first body
+     (h.b() returned a()'s value; `[*this]' hit an equal_exprt invariant).
+     Parser numbers each lambda-expression (#lambda_uid); the cache keys on
+     it.  Template instantiations still share (as before).
+  2. `[&r = k]': outer symbol entered under its own name; body could not
+     see `r'.  Alias entry under the capture name (3 sites: generic path,
+     generic-try path, closure path).
+  3. `auto... xs' → invented template parameter was not a pack (one-arg
+     only).  set_has_ellipsis on the invented parameter when the declarator
+     carries `...'.
+  4. `(xs + ... + 0)' (pack on the LEFT, a binary right fold) unexpanded
+     in cpp_typecheck_method_bodies.cpp's reduce_folds (assumed init in
+     sub[0]); both orders now, also for the named-pack and single-element
+     paths.  The C type checker's placeholder (`true') for unexpanded
+     unary folds now covers the binary form -- it only fires in the
+     generic lambda's throw-away int-placeholder type check.
+  Also: sizeof of a reference-typed expression (the type form was fixed
+  in round 148).
+- Lesson: feature-matrix testing is cheap and finds silent-wrong-answer
+  bugs (finding 1 is a wrong VALUE, no diagnostic).  Next candidates:
+  structured bindings, range-for over custom ranges, `constexpr if',
+  designated init edge cases, `using enum', operator overloading matrix.
+- Develop merge (`5fd686969a'): 168 commits behind, 2306 ahead; a MERGE
+  produced only 6 conflicted files / 8 hunks.  A literal rebase of 2306
+  commits would replay each against develop's message-style change
+  (quote_begin/quote_end touched ~every error message) and is not worth
+  it: the branch is not going upstream as-is (upstreaming is via curated
+  branches like upstream-c-layout-fixes).  Validated on a worktree first
+  (all 7 suites green incl. develop's new tests), then redone on the
+  branch with the same resolutions; tag `pre-develop-merge-2026-09-20'
+  marks the pre-merge HEAD (`git reset --hard' to it undoes the merge).
+  develop changes to watch: function argument evaluation order (goto
+  conversion), char-signedness-independent library models, `case_exprt'
+  removed, `is_zero_width' now in util/pointer_offset_size.
