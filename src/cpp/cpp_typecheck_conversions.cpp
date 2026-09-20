@@ -1529,6 +1529,67 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
       guessed_args =
         template_map.build_template_args(cand_decl.template_type());
 
+      // N5008 [temp.deduct]/5: template arguments that were not deduced
+      // are obtained from default template arguments -- the SFINAE
+      // constraint idiom `template <class U, class = enable_if_t<...>>
+      // operator U() const'.  Only `U' is deducible from the target
+      // ([temp.deduct.conv]/1); the defaulted parameter was left
+      // unassigned and the candidate dropped ("invalid implicit
+      // conversion", user-reported Issue 13).  A default whose
+      // substitution fails is a deduction failure ([temp.deduct]/8).
+      if(guessed_args.has_unassigned())
+      {
+        // The default may name the ENCLOSING class template's parameters
+        // (`enable_if_t<is_convertible_v<T, U>>' in `Wrap<T>'): bind them
+        // from the class instance's recorded arguments, as
+        // instantiate_template does for nested templates.
+        for(cpp_scopet *scope = &cpp_scopes.current_scope();
+            scope != nullptr && !scope->is_root_scope();
+            scope = &scope->get_parent())
+        {
+          if(!scope->is_class())
+            continue;
+          const symbolt *class_sym = symbol_table.lookup(scope->identifier);
+          if(
+            class_sym != nullptr &&
+            class_sym->type.find(ID_C_template).is_not_nil() &&
+            class_sym->type.find(ID_C_template_arguments).is_not_nil())
+          {
+            template_map.build(
+              static_cast<const template_typet &>(
+                class_sym->type.find(ID_C_template)),
+              static_cast<const cpp_template_args_tct &>(
+                class_sym->type.find(ID_C_template_arguments)));
+          }
+        }
+        const auto &params = cand_decl.template_type().template_parameters();
+        auto &args = guessed_args.arguments();
+        for(std::size_t i = 0; i < params.size() && i < args.size(); ++i)
+        {
+          const bool unassigned =
+            args[i].id() == ID_unassigned ||
+            (args[i].id() == ID_type && args[i].type().id() == ID_unassigned);
+          if(!unassigned || !params[i].has_default_argument())
+            continue;
+          if(params[i].id() == ID_type)
+          {
+            typet default_type = params[i].default_argument().type();
+            template_map.apply(default_type);
+            typecheck_type(default_type);
+            args[i] = exprt(ID_type);
+            args[i].type() = default_type;
+          }
+          else
+          {
+            exprt default_val = params[i].default_argument();
+            template_map.apply(default_val);
+            typecheck_expr(default_val);
+            args[i] = default_val;
+          }
+          template_map.set(params[i], args[i]);
+        }
+      }
+
       if(!guessed_args.has_unassigned())
       {
         // [temp.deduct]/5 with [temp.constr.decl]/1: after successful
