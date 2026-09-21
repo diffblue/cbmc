@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/padding.h>
 
@@ -343,8 +344,11 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     std::vector<std::size_t> layout_order;
     if(primary_index < resolved_bases.size())
       layout_order.push_back(primary_index);
+    // Itanium C++ ABI 2.4 II.3: the virtual bases are not part of the
+    // non-virtual part; they are laid out once each after the class's own
+    // members (append_virtual_bases, from typecheck_compound_body)
     for(std::size_t i = 0; i < resolved_bases.size(); ++i)
-      if(i != primary_index)
+      if(i != primary_index && !resolved_bases[i].is_virtual)
         layout_order.push_back(i);
 
     for(const std::size_t i : layout_order)
@@ -430,30 +434,99 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       [](const irept &b) { return b.is_nil(); }),
     bases_irep.end());
 
-  if(!vbases.empty())
+  // The virtual bases' members, so that name lookup and the detection of
+  // overriders of their virtual functions see them while the class's own
+  // members are processed; typecheck_compound_body moves them behind the
+  // own members afterwards, where the layout places them.
+  append_virtual_bases(type, bases, vbases);
+}
+
+void cpp_typecheckt::append_virtual_bases(
+  struct_typet &type,
+  std::set<irep_idt> &bases,
+  std::set<irep_idt> &vbases)
+{
+  // Itanium C++ ABI 2.4 II.3: after the non-virtual part (bases and own
+  // members) come the virtual bases, once each, in inheritance graph order
+  // (depth-first, left to right, a class before the virtual bases of its own
+  // bases -- get_virtual_bases produces that order).  Each is placed like a
+  // direct base: at the next offset aligned for it, without its tail padding
+  // when it is not a POD for the purpose of layout.
+  std::list<irep_idt> vbase_ids;
+  get_virtual_bases(type, vbase_ids);
+  if(vbase_ids.empty())
+    return;
+
+  // the access a virtual base's members have in this class: that of the
+  // direct base-specifier naming it, public when it is only indirect
+  std::map<irep_idt, irep_idt> direct_access;
+  for(const auto &b : type.bases())
   {
-    // add a flag to determine
-    // if this is the most-derived-object.
-    // The flag is a BYTE-wide c_bool, not a 1-bit boolean: layout
-    // offsets are computed bytewise (member_offset/member_offset_expr
-    // refuse structs whose bit-field run is not byte-padded), and the
-    // front end deliberately does not run add_padding() on classes
-    // with bases -- a 1-bit flag made the byte offset of EVERY
-    // subsequent member unknown, so pointer checks rejected ordinary
-    // member writes in virtual-base classes ("pointer outside object
-    // bounds in this->d") and goto-symex aborted on
-    // build_object_descriptor_rec (std::ofstream construction).
-    struct_typet::componentt most_derived(
-      cpp_scopes.current_scope().prefix + "::" + "@most_derived",
-      c_bool_type());
+    if(b.get_bool(ID_virtual) && b.type().id() == ID_struct_tag)
+    {
+      direct_access[to_struct_tag_type(b.type()).get_identifier()] =
+        b.get(ID_access);
+    }
+  }
 
-    most_derived.set_access(ID_public);
-    most_derived.set_base_name("@most_derived");
-    most_derived.set_pretty_name("@most_derived");
-    most_derived.add_source_location()=type.source_location();
-    put_compound_into_scope(most_derived);
+  const namespacet ns(symbol_table);
+  auto &components = type.components();
 
-    to_struct_type(type).components().push_back(most_derived);
+  for(const irep_idt &vbase_id : vbase_ids)
+  {
+    const symbolt *vbase_symbol = symbol_table.lookup(vbase_id);
+    if(vbase_symbol == nullptr || vbase_symbol->type.id() != ID_struct)
+      continue;
+    const struct_typet &vbase_struct = to_struct_type(vbase_symbol->type);
+
+    const auto access_it = direct_access.find(vbase_id);
+    const irep_idt access =
+      access_it != direct_access.end() ? access_it->second : ID_public;
+
+    // add_base_components copies the non-virtual part of the base (it does
+    // not descend into virtual bases and skips their components).  The
+    // duplicate tracking is shared with the non-virtual part: a class
+    // occurring twice as a non-virtual base (also through two distinct
+    // virtual bases) would give two components of the same name, which the
+    // flattened layout cannot represent -- rejected as before.
+    const std::size_t first_new = components.size();
+    add_base_components(vbase_struct, access, type, bases, vbases, true);
+
+    for(std::size_t i = first_new; i < components.size(); ++i)
+      components[i].set(ID_C_virtual_base, vbase_id);
+
+    std::size_t first_storage = first_new;
+    while(first_storage < components.size() &&
+          (components[first_storage].type().id() == ID_code ||
+           components[first_storage].get_bool(ID_is_static) ||
+           components[first_storage].get_bool(ID_is_type) ||
+           (components[first_storage].type().id() == ID_c_bit_field &&
+            to_c_bit_field_type(components[first_storage].type()).get_width() ==
+              0)))
+    {
+      ++first_storage;
+    }
+    if(first_storage < components.size())
+    {
+      // `#pragma pack(n)' around the class definition caps the virtual
+      // base's alignment as it caps a non-virtual base's (GCC)
+      mp_integer base_alignment = alignment(vbase_struct, ns);
+      const auto pack = numeric_cast<mp_integer>(
+        static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
+      if(pack.has_value() && *pack > 0 && *pack < base_alignment)
+        base_alignment = *pack;
+      components[first_storage].set(
+        ID_C_base_alignment, integer2string(base_alignment));
+      if(!cpp_is_pod(vbase_struct))
+      {
+        while(components.size() > first_new &&
+              components.back().get_is_padding() &&
+              components.back().type().id() != ID_c_bit_field)
+        {
+          components.pop_back();
+        }
+      }
+    }
   }
 }
 
@@ -506,6 +579,12 @@ void cpp_typecheckt::add_base_components(
       continue;
 
     const bool is_virtual_base = b.get_bool(ID_virtual);
+
+    // a virtual base is part of the most derived object, not of this
+    // subobject's non-virtual part (Itanium C++ ABI 2.4 II.3); it is laid
+    // out by append_virtual_bases
+    if(is_virtual_base)
+      continue;
 
     // recursive call
     const std::size_t before = to.components().size();
@@ -572,6 +651,7 @@ void cpp_typecheckt::add_base_components(
     if(
       c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
       !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+      c.get(ID_C_virtual_base).empty() &&
       !(c.type().id() == ID_c_bit_field &&
         to_c_bit_field_type(c.type()).get_width() == 0))
     {
@@ -583,6 +663,11 @@ void cpp_typecheckt::add_base_components(
   for(const auto &c : from.components())
   {
     if(base_is_empty && c.get_is_padding())
+      continue;
+
+    // `from's own virtual bases (and the padding in front of them) are not
+    // in its non-virtual part
+    if(!c.get(ID_C_virtual_base).empty())
       continue;
 
     const irep_idt new_access = inherited_access(access, c.get_access());

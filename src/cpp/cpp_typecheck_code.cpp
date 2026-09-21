@@ -116,7 +116,7 @@ std::optional<exprt> cpp_typecheckt::braced_return_aggregate_value(
     if(
       c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
       c.get_bool(ID_is_static) || c.get_is_padding() ||
-      c.type().id() == ID_code || c.get_base_name() == "@most_derived")
+      c.type().id() == ID_code)
     {
       continue;
     }
@@ -2595,13 +2595,34 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       throw 0;
     }
 
+    // The base subobject's address.  For a VIRTUAL base this is the complete
+    // object's constructor (the initializer runs under `@most_derived'), so
+    // the offset is the static one of this class's own layout -- it must
+    // be: the virtual pointers, through which a virtual-base offset is
+    // otherwise read, are installed only after the bases are constructed.
     make_ptr_typecast(
-      this_expr, to_pointer_type(code_type.parameters().front().type()));
+      this_expr,
+      to_pointer_type(code_type.parameters().front().type()),
+      /*static_virtual_base_offset=*/true);
 
     function_call.arguments().push_back(this_expr);
 
     for(const auto &op : as_const(code).operands())
       function_call.arguments().push_back(op);
+
+    // Itanium C++ ABI 5.1.4: a base subobject is constructed by the
+    // base-object constructor (C2): pass `false' for the hidden
+    // `@most_derived' parameter of a class with virtual bases, so that it
+    // neither constructs the virtual bases ([class.base.init]/13: the most
+    // derived class does) nor installs complete-object virtual pointers.
+    for(const auto &parameter : code_type.parameters())
+    {
+      if(parameter.get_base_name() == "@most_derived")
+      {
+        function_call.arguments().push_back(false_exprt());
+        break;
+      }
+    }
 
     // done building the expression, check the argument types
     typecheck_function_call_arguments(function_call);

@@ -3693,8 +3693,6 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
           {
             continue;
           }
-          if(c.get_base_name() == "@most_derived")
-            continue;
           if(idx < ops.size())
           {
             exprt val = ops[idx++];
@@ -3835,18 +3833,6 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
             c.get_bool(ID_is_type) || c.get_bool(ID_is_static) ||
             c.type().id() == ID_code || c.get_is_padding())
             continue;
-          if(c.get_base_name() == "@most_derived")
-          {
-            // the complete object's own flag is true, base subobjects'
-            // flags are false (mirrors cpp_constructor)
-            set_struct_member_value(
-              result,
-              struct_type,
-              c,
-              c.get_bool(ID_from_base) ? static_cast<exprt>(false_exprt())
-                                       : static_cast<exprt>(true_exprt()));
-            continue;
-          }
           if(idx < ops.size())
           {
             exprt val = ops[idx++];

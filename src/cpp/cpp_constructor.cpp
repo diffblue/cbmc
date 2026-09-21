@@ -937,16 +937,11 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             // initialization.  Previously trailing members were left
             // uninitialized, so `aggt x(1, 2)` with three members read
             // garbage from the third.
-            if(comp.get_base_name() == "@most_derived")
-              val = from_integer(1, comp.type());
-            else
-            {
-              const auto zero = ::zero_initializer(
-                comp.type(), source_location, namespacet{symbol_table});
-              if(!zero.has_value())
-                continue;
-              val = *zero;
-            }
+            const auto zero = ::zero_initializer(
+              comp.type(), source_location, namespacet{symbol_table});
+            if(!zero.has_value())
+              continue;
+            val = *zero;
           }
           side_effect_expr_assignt assign(
             std::move(member), std::move(val), typet(), source_location);
@@ -957,28 +952,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       }
     }
 
-    // set most-derived bits
     code_blockt block;
-    for(const auto &component : struct_type.components())
-    {
-      if(component.get_base_name() != "@most_derived")
-        continue;
-
-      member_exprt member(object_tc, component.get_name(), component.type());
-      member.add_source_location() = source_location;
-      member.set(ID_C_lvalue, object_tc.get_bool(ID_C_lvalue));
-
-      // the flag is a c_bool (see cpp_typecheck_bases.cpp)
-      exprt val = from_integer(
-        component.get_bool(ID_from_base) ? 0 : 1, component.type());
-
-      side_effect_expr_assignt assign(
-        std::move(member), std::move(val), typet(), source_location);
-
-      typecheck_side_effect_assignment(assign);
-
-      block.add(code_expressiont(std::move(assign)));
-    }
 
     // enter struct scope
     cpp_save_scopet save_scope(cpp_scopes);
