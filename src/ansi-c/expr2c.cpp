@@ -82,15 +82,22 @@ irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
     has_suffix(id2string(identifier), id2string(symbol->base_name)))
     return symbol->base_name;
 
-  // If the symbol is in the symbol table and has a non-empty base_name,
-  // prefer it over `rfind("::")`-based extraction.  C++ mangled names
-  // can contain `::` inside template arguments (e.g.,
-  // `f(ref_struct_tag(identifier=std::tag-X<...>))`) which would
-  // otherwise produce confusing shorthand fragments.
-  if(found && !symbol->base_name.empty())
-    return symbol->base_name;
-
   std::string sh=id2string(identifier);
+
+  // A C++ function's identifier is its base name followed by the mangled
+  // parameter list, `ns::f(ref_struct_tag(identifier=std::tag-X<...>))`;
+  // the `::` inside the parameter list would otherwise yield a confusing
+  // shorthand fragment, so prefer the base name.  Restrict this to that
+  // shape: a Java method identifier `java::A.m:()V` carries its descriptor
+  // after a colon, and JBMC's concurrency instrumentation matches the
+  // expr2java rendering `org.cprover.CProver.getCurrentThreadId:()I` that the
+  // `::` split below produces (java_bytecode_concurrency_instrumentation.cpp).
+  if(
+    found && !symbol->base_name.empty() &&
+    sh.find(id2string(symbol->base_name) + "(") != std::string::npos)
+  {
+    return symbol->base_name;
+  }
 
   // Use depth-aware separator: don't pick `::` inside angle brackets.
   // Without depth-awareness, identifiers containing template arg lists
