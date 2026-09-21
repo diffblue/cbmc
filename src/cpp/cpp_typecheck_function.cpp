@@ -138,7 +138,25 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(symbol.value.get_bool("#cpp_converted"))
     return;
 
-  functions_being_typechecked.insert(symbol.name);
+  // Released on every exit path -- an early return, or a failure thrown out
+  // of the body conversion.  A name left behind made every later attempt to
+  // convert the body (the method-body drain, after a first try inside a
+  // SFINAE guard had failed silently) return at the recursion guard above,
+  // and the function silently ended up without a body.
+  struct being_typecheckedt
+  {
+    being_typecheckedt(std::unordered_set<irep_idt> &set, const irep_idt &name)
+      : set(set), name(name)
+    {
+      set.insert(name);
+    }
+    ~being_typecheckedt()
+    {
+      set.erase(name);
+    }
+    std::unordered_set<irep_idt> &set;
+    irep_idt name;
+  } being_typechecked{functions_being_typechecked, symbol.name};
 
   // A function body is a run-time context: suspend any enclosing
   // constant-expression context so its statements are not folded.
@@ -1091,7 +1109,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   disable_access_control = saved_access_control;
 
   deferred_typechecking.erase(symbol.name);
-  functions_being_typechecked.erase(symbol.name);
 }
 
 /// for function overloading
