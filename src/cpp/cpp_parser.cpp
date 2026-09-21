@@ -50,6 +50,10 @@ bool cpp_parsert::parse()
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11;
   token_buffer.ansi_c_parser.cpp20 =
     config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20;
+  // it's not C: the C-standard-gated keywords (static_assert, thread_local,
+  // ... in C23) are those of the C++ standard selected above
+  token_buffer.ansi_c_parser.c17 = false;
+  token_buffer.ansi_c_parser.c23 = false;
   // _Float32/64/32x/64x are TS 18661-3 types. GCC 13+ supports them
   // as built-in types in C++ mode; older GCC and clang do not.
   token_buffer.ansi_c_parser.ts_18661_3_Floatn_types = *support_float16;
@@ -57,15 +61,11 @@ bool cpp_parsert::parse()
   token_buffer.ansi_c_parser.float16_type = *support_float16;
   token_buffer.ansi_c_parser.bf16_type = *support_float16;
   token_buffer.ansi_c_parser.fp16_type = *support_float16;
-  // __remove_cv, __remove_reference, __remove_cvref are GCC 13+ builtins.
-  // Older libstdc++ uses these as regular identifiers (template aliases).
-  token_buffer.ansi_c_parser.gcc13_type_traits =
-    *support_float16 ||
-    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
   token_buffer.ansi_c_parser.clang_preprocessor =
     config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG;
-  // GCC 14+ uses __is_array, __is_function, __is_reference, etc. as builtins
-  // in <type_traits>. Older GCC uses template specialization instead.
+  // GCC 13+/14+ use __remove_cv, __is_array, __is_function, __is_reference,
+  // etc. as builtins in <type_traits>. Older GCC uses template
+  // specialization instead.
   {
     // The type-yielding builtins (__add_rvalue_reference(T), ...) are
     // RESERVED names that gcc >= 14 and clang treat as keywords when
