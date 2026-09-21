@@ -10598,3 +10598,18 @@ forbid that phrase) so no existing test changes meaning.
   touched 237 descs whose EMPTY ignore section is followed by notes -- and a
   suite run in flight read the mangled files (test.pl died on a note text
   taken as regex).  Reverted; never edit descs by pattern while a run is on.
+- Later in round 156 (`416709c7cf', `7443990f77'): include-what-you-use
+  (7 unnecessary includes) and two more libstdc++ 11 shapes, reproduced by
+  putting a `gcc -> gcc-11' symlink dir first in PATH (cbmc detects the
+  host gcc for keyword gating and headers, so preprocessing with g++-11 -E
+  alone is NOT faithful: `__remove_cv' and `_Float32' become keywords).
+  * `std::string{string_view}': apply_template_args' per-candidate loop
+    caught only template_arg_kind_mismatch_exceptiont; the constrained
+    default of `__test<F,T>(int)' (gcc 11's is_convertible helper) throws
+    a plain int from the resolver when its call has no viable function,
+    which escaped and aborted the class body (the `type' typedef's
+    `typecheck_type' in typecheck_compound_body has no recovery).  Now the
+    int is a candidate failure too.  This broke the 22.04 unit-proofs.
+  * use_facet<ctype<char>> (11 reads _M_facets directly; 13 uses
+    __try_use_facet): the stdlib override now matches both.
+  * unit-proofs/capitalize is THOROUGH (OOM with the 11 headers).
