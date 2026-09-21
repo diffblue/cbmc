@@ -12,7 +12,6 @@ Author:
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
