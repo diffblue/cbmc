@@ -4524,6 +4524,15 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
         identifier, fargs.operands, source_location))
     {
+      // As the C front end does: one symbol per instantiated type, with an
+      // implementation.  A single `__atomic_load_n' symbol shared by calls
+      // on `long long*' and `int*' pointers (libstdc++'s
+      // _Sp_counted_base::_M_release) had the return type of whichever
+      // call came first, so the other call's result was of the wrong type
+      // (--validate-goto-model: "function returns expression of wrong
+      // type") and there was no body to execute.
+      materialize_gcc_polymorphic_builtin(
+        identifier, *gcc_polymorphic, source_location);
       expr = std::move(*gcc_polymorphic);
       return;
     }
