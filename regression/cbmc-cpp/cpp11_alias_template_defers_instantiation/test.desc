@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+could not fully type-check
+dropped
+--
+N5008 [temp.inst]/1: an alias declaration does not require a complete type,
+so `using str = basic_str<char>;' (an alias TEMPLATE naming a class template
+specialization whose argument is still incomplete) must not instantiate it.
+The typedef branch of convert_non_template_declaration cleared
+skip_typechecking_elaborate instead of restoring it when the alias template's
+own declaration was converted underneath, so the outer resolver elaborated
+the class (libstdc++ 11 pmr::string: "dropped 4 system-header declarations";
+here: `a' never constructed, assertion 1 failed).
