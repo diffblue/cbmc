@@ -72,7 +72,8 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       // such element types, building an array_exprt from the brace elements (as
       // the aggregate/scalar path below does) would leave each element's
       // braced-init-list untyped -- indexing that array during construction
-      // then yields a nil-typed expression that aborts simplification.  Detect a
+      // then yields a nil-typed expression that aborts simplification.  Detect
+      // a
       // user-provided constructor exactly as the base-class-aggregate code does
       // (a constructor component that is neither the default nor a copy/move
       // constructor, or a constructor template).

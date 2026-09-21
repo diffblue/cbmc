@@ -2963,7 +2963,8 @@ bool Parser::rOtherDeclaration(
     else if(trailing_return_type.is_not_nil())
     {
       // N5008 [temp.deduct.guide]: a deduction-guide is written as
-      //   template-name ( parameter-declaration-clause ) -> simple-template-id ;
+      //   template-name ( parameter-declaration-clause )
+      //     -> simple-template-id ;
       // It parses like a constructor (its name is a class[-template] name) but,
       // unlike a real constructor, carries a trailing return type naming the
       // guided specialization.  Preserve that type as the declaration type and
@@ -5120,7 +5121,9 @@ bool Parser::rDeclarator(
             break;
         }
       }
-    trailing_requires_done:;
+    trailing_requires_done:
+    {
+    }
 
       if(lex.LookAhead(0) == ':')
       {
@@ -6607,7 +6610,8 @@ bool Parser::rArgDeclList(irept &arglist)
 /*
   parameter.declaration                               [dcl.fct]
   : attribute.specifier.seq? decl.specifier.seq declarator
-  | attribute.specifier.seq? decl.specifier.seq declarator '=' initializer.clause
+  | attribute.specifier.seq? decl.specifier.seq declarator
+      '=' initializer.clause
   | attribute.specifier.seq? decl.specifier.seq abstract.declarator?
   | attribute.specifier.seq? decl.specifier.seq abstract.declarator?
     '=' initializer.clause
@@ -8746,7 +8750,7 @@ bool Parser::rTypeName(typet &tname)
   // keeps its declarator and never saw this).
   if(!declarator.method_qualifier().id().empty())
   {
-    irept *t = &static_cast<irept &>(tname);
+    irept *t = &tname;
     while(t->id() != ID_function_type && t->id() != ID_code &&
           !t->get_sub().empty())
       t = &t->get_sub().front();
@@ -11377,9 +11381,11 @@ bool Parser::rVarNameCore(exprt &name)
                   next == TOK_SCOPE && components.size() >= 2 &&
                   components[components.size() - 2].id() == "::")
                 {
-                  // A speculative `<...>` immediately followed by `::` where the
+                  // A speculative `<...>` immediately followed by `::` where
+                  // the
                   // name is itself a QUALIFIED member (preceded by `::`) is a
-                  // nested-name-specifier `Qual::member<...>::...` ([temp.names])
+                  // nested-name-specifier `Qual::member<...>::...`
+                  // ([temp.names])
                   // -- it can only be a template-id, never a `<`/`>` comparison
                   // chain.  This is the `C<int>::al<char>::value` shape.  The
                   // qualification requirement keeps unqualified names (e.g. a

@@ -2772,7 +2772,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     instantiate_template(
       type.source_location(), *best_match, best_spec_args, full_args);
   }
-}
+} // NOLINT(readability/fn_size)
 
 /// Find and instantiate the out-of-line definition body of a class-template
 /// instance member function, selected by **signature** (parameter arity), not
@@ -3844,7 +3844,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
         identity_trailing_pack = false;
       for(std::size_t k = 0; identity_trailing_pack && k < psa.size(); ++k)
       {
-        const irept *a = &static_cast<const irept &>(psa[k]);
+        const irept *a = &psa[k];
         if(a->id() == ID_ambiguous || a->id() == ID_type)
           a = &a->find(ID_type);
         // A bare parameter reference is a cpp_name with no template-argument
@@ -3852,12 +3852,16 @@ const symbolt &cpp_typecheckt::instantiate_template(
         if(a->id() != ID_cpp_name)
           identity_trailing_pack = false;
         else
+        {
           for(const auto &sub : a->get_sub())
+          {
             if(sub.id() == ID_template_args)
             {
               identity_trailing_pack = false;
               break;
             }
+          }
+        }
       }
     }
     if(identity_trailing_pack)
@@ -3994,7 +3998,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
                    !d.get_bool(ID_ellipsis)))
                   continue;
                 const auto &pd = static_cast<const cpp_declarationt &>(p);
-                const irept *t = &static_cast<const irept &>(pd.type());
+                const irept *t = &pd.type();
                 while(t->id() != ID_cpp_name && !t->get_sub().empty())
                   t = &t->get_sub().front();
                 std::string own;
@@ -4238,7 +4242,7 @@ skip_pack_removal:
                    !d.get_bool(ID_ellipsis)))
                   continue;
                 const auto &pd = static_cast<const cpp_declarationt &>(p);
-                const irept *t = &static_cast<const irept &>(pd.type());
+                const irept *t = &pd.type();
                 while(t->id() != ID_cpp_name && !t->get_sub().empty())
                   t = &t->get_sub().front();
                 std::string own;
@@ -6060,7 +6064,7 @@ skip_pack_removal_ft:
                       // among the empty ones -- `_Up&&... __u` (two
                       // elements) must survive `_Ul`/`_Tl` being empty.
                       const auto &pd = static_cast<const cpp_declarationt &>(p);
-                      const irept *t = &static_cast<const irept &>(pd.type());
+                      const irept *t = &pd.type();
                       while(t->id() != ID_cpp_name && !t->get_sub().empty())
                         t = &t->get_sub().front();
                       std::string own;
@@ -6459,7 +6463,7 @@ skip_pack_removal_ft:
                  !fpd.declarators().front().type().get_bool(ID_ellipsis) &&
                  !fpd.type().get_bool(ID_ellipsis)))
                 continue;
-              const irept *t = &static_cast<const irept &>(fpd.type());
+              const irept *t = &fpd.type();
               while(t->id() != ID_cpp_name && !t->get_sub().empty())
                 t = &t->get_sub().front();
               std::string own;
@@ -6502,7 +6506,7 @@ skip_pack_removal_ft:
                     continue;
                   // own-pack match only ([dcl.fct]/6: `B...` with B a
                   // non-pack is C varargs, not this pack's declarator)
-                  const irept *ot = &static_cast<const irept &>(opd.type());
+                  const irept *ot = &opd.type();
                   while(ot->id() != ID_cpp_name && !ot->get_sub().empty())
                     ot = &ot->get_sub().front();
                   std::string oown;
@@ -6787,10 +6791,13 @@ skip_pack_removal_ft:
           // conversion exists because a constexpr specialization used as a
           // constant (e.g. an `enable_if` non-type argument, or std::tuple's
           // constructor SFINAE) must be *foldable now*; but doing the full body
-          // conversion in this nested, suppression-active context is a source of
-          // the degradation documented in doc/architectural/cpp-frontend-review-
+          // conversion in this nested, suppression-active context is a source
+          // of
+          // the degradation documented in
+          // doc/architectural/cpp-frontend-review-
           // 2026-06-23-instantiation-context.md.  The correct split is to fold
-          // the constant eagerly while deferring the runtime (GOTO) definition to
+          // the constant eagerly while deferring the runtime (GOTO) definition
+          // to
           // the queue; on failure we already fall back to `add_method_body`.
           try
           {
@@ -7518,7 +7525,7 @@ skip_pack_removal_ft:
           !d.declarators().front().type().get_bool(ID_ellipsis))
           continue;
         const typet merged = d.declarators().front().merge_type(d.type());
-        const irept *t = &static_cast<const irept &>(merged);
+        const irept *t = &merged;
         while(t->id() != ID_cpp_name && !t->get_sub().empty())
           t = &t->get_sub().front();
         if(t->id() == ID_cpp_name && !t->get_sub().empty())

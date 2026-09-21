@@ -352,7 +352,8 @@ std::optional<exprt> member_offset_expr(
         // padded: the C++ front-end deliberately does not run add_padding() on
         // classes with base classes (base-subobject layout is not modelled by
         // its flattened from_base components).  Return "offset not known"
-        // rather than aborting via INVARIANT, consistently with member_offset().
+        // rather than aborting via INVARIANT, consistently with
+        // member_offset().
         return {};
       }
       const typet &subtype = c.type();

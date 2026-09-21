@@ -868,7 +868,8 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         // instantiation was reached from a constant-expression context (so the
         // constant can be folded now -- e.g. a `constexpr` specialization used
         // as an `enable_if` non-type argument, an array bound, or std::tuple's
-        // constructor SFINAE), or when it has a deduced (`auto`/`decltype(auto)`)
+        // constructor SFINAE), or when it has a deduced
+        // (`auto`/`decltype(auto)`)
         // return type that must be deduced before any call site (mirroring the
         // non-macro branch below).  When reached for an ordinary run-time call
         // it is otherwise deferred to the clean method-body drain, exactly like

@@ -219,11 +219,11 @@ remove_cpp_exceptionst::get_handler_slot(const irep_idt &id)
   const std::size_t n = handler_slots.size();
   const pointer_typet void_ptr = pointer_type(empty_typet{});
   const symbol_exprt slot_ptr = make_global(
-    "__CPROVER_cpp_handler_exception$" + std::to_string(n),
+    CPROVER_PREFIX "cpp_handler_exception$" + std::to_string(n),
     void_ptr,
     null_pointer_exprt(void_ptr));
   const symbol_exprt slot_type = make_global(
-    "__CPROVER_cpp_handler_exception_type$" + std::to_string(n),
+    CPROVER_PREFIX "cpp_handler_exception_type$" + std::to_string(n),
     signed_int_type(),
     from_integer(0, signed_int_type()));
   auto result = std::make_pair(slot_ptr, slot_type);
@@ -263,15 +263,19 @@ bool remove_cpp_exceptionst::prepare(goto_functionst &goto_functions)
 
   const pointer_typet void_ptr = pointer_type(empty_typet{});
   inflight_ptr = make_global(
-    "__CPROVER_cpp_inflight_exception", void_ptr, null_pointer_exprt(void_ptr));
+    CPROVER_PREFIX "cpp_inflight_exception",
+    void_ptr,
+    null_pointer_exprt(void_ptr));
   inflight_type = make_global(
-    "__CPROVER_cpp_inflight_exception_type",
+    CPROVER_PREFIX "cpp_inflight_exception_type",
     signed_int_type(),
     from_integer(0, signed_int_type()));
   current_exc_ptr = make_global(
-    "__CPROVER_cpp_current_exception", void_ptr, null_pointer_exprt(void_ptr));
+    CPROVER_PREFIX "cpp_current_exception",
+    void_ptr,
+    null_pointer_exprt(void_ptr));
   current_exc_type = make_global(
-    "__CPROVER_cpp_current_exception_type",
+    CPROVER_PREFIX "cpp_current_exception_type",
     signed_int_type(),
     from_integer(0, signed_int_type()));
   return true;
@@ -345,7 +349,7 @@ void remove_cpp_exceptionst::set_inflight_exception(
 
   // per-throw-site static object holding a copy of the thrown value
   const irep_idt obj_name =
-    "__CPROVER_cpp_exception_object$" + std::to_string(++object_counter);
+    CPROVER_PREFIX "cpp_exception_object$" + std::to_string(++object_counter);
   const symbol_exprt exc_obj = make_global(obj_name, thrown_type, nil_exprt{});
 
   // exc_obj = value

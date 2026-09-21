@@ -297,7 +297,8 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
           if(cbody.is_nil())
             continue;
           // Build C's argument list: decltype((E)) prepended to the explicit
-          // type-constraint arguments ([temp.names]/9, [expr.prim.req.compound]).
+          // type-constraint arguments ([temp.names]/9,
+          // [expr.prim.req.compound]).
           cpp_template_args_tct check_args;
           exprt prepended{ID_type};
           prepended.type() = result_type;
@@ -495,7 +496,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         }
         else
         {
-          // a < b ? less : (a > b ? greater : (a == b ? equivalent : unordered))
+          // a < b ? less : (a > b ? greater : (a == b ? equivalent :
+          // unordered))
           binary_relation_exprt eq{op0, ID_equal, op1};
           eq.type() = bool_typet();
           eq.add_source_location() = loc;
@@ -537,7 +539,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     if(expr.operands().size() == 1)
       satisfied = requirement_expression_is_valid(to_unary_expr(expr).op());
     else
-      // Defensive: a malformed/empty requirement node (can arise from a      // requirement form the parser did not fully model, seen in the deep
+      // Defensive: a malformed/empty requirement node (can arise from a
+      // requirement form the parser did not fully model, seen in the deep
       // <ranges> concept chain).  Do not abort on it (to_unary_expr would
       // trip an invariant); treat the unmodelled requirement as satisfied so
       // it neither crashes nor spuriously fails the concept.
@@ -1011,7 +1014,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
             from_type = to_reference_type(from_type).base_type();
           symbol_exprt from(irep_idt(), from_type);
           from.set(ID_C_temporary_avoided, true);
-          // N5008 [meta.unary.prop]: is_constructible<T, Args...> is defined via
+          // N5008 [meta.unary.prop]: is_constructible<T, Args...> is defined
+          // via
           // `declval<Args>()`, whose value category is an lvalue iff the
           // corresponding Arg is an lvalue-reference type, and an xvalue
           // (rvalue) otherwise.  Preserve that here: it decides how a
@@ -1023,7 +1027,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           // rvalue form, so it is constructible from `T&` but not from `T&&` /
           // `T`; without marking the lvalue-reference case as an lvalue,
           // is_constructible<reference_wrapper<const int>, int&> was wrongly
-          // reported false (the forwarding reference deduced the rvalue form and
+          // reported false (the forwarding reference deduced the rvalue form
+          // and
           // selected the deleted overload).
           if(is_reference(t2) && !is_rvalue_reference(t2))
             from.set(ID_C_lvalue, true);
@@ -1516,7 +1521,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else
     c_typecheck_baset::typecheck_expr_main(expr);
-}
+} // NOLINT(readability/fn_size)
 
 void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 {
@@ -4892,7 +4897,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // reset to 0 by non_constant_expression_contextt while elaborating ordinary
   // run-time function bodies).
   //
-  // While in a constant-evaluated context, fold to true.  Otherwise -- crucially
+  // While in a constant-evaluated context, fold to true.  Otherwise --
+  // crucially
   // -- do NOT fold to false here; leave the call in place.  Folding to false at
   // type-check time would bake a run-time answer into any function body that
   // forwards the built-in (e.g. std::is_constant_evaluated /
@@ -8258,7 +8264,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     }
   }
 
-  // this/*this capture in a member-function context.  [expr.prim.lambda.capture]
+  // this/*this capture in a member-function context.
+  // [expr.prim.lambda.capture]
   // / [expr.prim.lambda.closure]: `[this]` (and a capture-default that odr-uses
   // members) captures the enclosing object by reference; `[*this]` captures it
   // by copy.  We model this as captures of the odr-used non-static data members
