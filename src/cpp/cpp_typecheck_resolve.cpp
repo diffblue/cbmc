@@ -117,6 +117,22 @@ void cpp_typecheck_resolvet::apply_template_args(
     {
       continue;
     }
+    catch(int)
+    {
+      // N5008 [temp.deduct.general]/5 + [temp.deduct]/8: substituting the
+      // explicit template arguments -- and the DEFAULT arguments of the
+      // parameters they leave out -- into this candidate failed (a silent
+      // `throw 0' from the resolver, e.g. no viable function for the call in
+      // a constrained default `class = decltype(test_aux<To1>(declval<
+      // From1>()))').  That removes this candidate only; the sibling
+      // `template<class, class> test(...)' of libstdc++ 11's
+      // __is_convertible_helper must still be tried.  Before, the failure
+      // escaped the class body being instantiated (is_convertible<const
+      // unsigned&, string_view> in basic_string's _If_sv constraint) and
+      // `std::string{string_view}' had no viable constructor with the 11
+      // headers.
+      continue;
+    }
 
     if(e.is_not_nil())
     {
