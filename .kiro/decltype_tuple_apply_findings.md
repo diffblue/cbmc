@@ -10348,3 +10348,96 @@ forbid that phrase) so no existing test changes meaning.
     scenario, not a regression.
   * Not yet looked at: FreeBSD/NetBSD/OpenBSD beyond the clang warning,
     macOS (same), 32-bit gcc, arm, run-10-random-tests, windows-msi.
+
+## Round 154 (2026-09-21) — CI red items (JBMC, libstdc++ 11), #4b dynamic layout (a)+(c)
+
+- JBMC (13 jbmc + 14 jbmc-concurrency failures on PR #8878): two unrelated
+  causes, neither in remove_exceptions_baset itself.
+  * `fbe1260a70' goto_convert.cpp: the exceptional unwind emitted before a
+    THROW ([except.ctor]) also emits the scopes' DEAD markers; Java's
+    `athrow' throws a local REFERENCE that remove_exceptions reads when it
+    replaces the THROW by `@inflight_exception := e' -- `e' was DEAD by
+    then, every handler matched a nondet exception ("no uncaught
+    exception" FAILURE at the ctor call, all four catch bodies reached).
+    Gate: `mode != ID_java' -- NOT `mode == ID_cpp': the C++ front end
+    gives `main' and extern "C" functions mode ID_C (linkage), and they
+    unwind (cpp11_throw_dtor_unwinding caught the first attempt).
+  * `df3cee85f3' expr2c id_shorthand: 2bb468a367 preferred base_name when
+    the symbol exists; Java `java::A.m:()V' then rendered as `m', and the
+    --java-threading instrumentation matches the full
+    `org.cprover.CProver.getCurrentThreadId:()I' string.  Now base_name is
+    preferred only when the identifier contains `base_name(' (C++ function
+    shape).
+  * JBMC build: cmake -DWITH_JBMC=ON at /tmp/r153/jbuild (ccache);
+    core-models.jar is jbmc/lib/java-models-library/target/core-models.jar
+    (tests reference it via `../../../lib/...`); run suites with
+    `cd jbmc/regression/<suite>; ../../../regression/test.pl -e -p -c
+    "$JBMC --validate-goto-model --validate-ssa-equation"`.  All green:
+    jbmc 726, jbmc-strings 551, strings-smoke-tests 124, jbmc-concurrency
+    40, jbmc-inheritance 11, jbmc-generics 3 (/tmp/r154/js2).
+- libstdc++ 11 `std::vector<int> v(a, a+3)' (`af82932b3d' + test
+  cpp11_sfinae_probe_inside_copy_init): root cause is NOT deduction.  The
+  [over.best.ics.general]/4 guard (copy_init_ctor_exploration) blocks
+  user-defined conversions for the ctor candidates of a copy-init; its
+  "nested queries stay allowed" exemption was keyed on
+  constant_expression_context, which sfinae_contextt resets to 0.  A
+  `const char*' -> basic_string probe (gcc 11's `basic_string(const
+  _CharT*, const _Alloc&)' is a ctor TEMPLATE under `__cpp_deduction_guides',
+  LWG 3076, so the non-template ctor loop finds nothing and the
+  template fallback runs new_temporary under a sfinae guard) deduced the
+  range ctor, evaluated `_RequireInputIter<const char*>', instantiated
+  `is_convertible<random_access_iterator_tag, input_iterator_tag>' whose
+  gcc-11 implementation is `__test_aux<_To1>(declval<_From1>())' -- that
+  derived-to-base copy-init went through user_defined_conversion_sequence
+  (class-type by value) and was refused; the class was cached with its
+  base dropped (cpp_typecheck_bases silently nils an unresolvable base
+  during instantiation) and no `value'.  gcc 13 uses the __is_convertible
+  builtin, hence 13-only tuning never saw it.  Fix: sfinae_contextt saves
+  and clears copy_init_ctor_exploration too.
+  * Tried and REJECTED: returning nil from guess_function_template_args
+    as soon as a `#deduction_failed' (conflicting deduction) marker exists,
+    before default evaluation ([temp.deduct.type]/2).  Standards-correct
+    but our conflict marking is not reliable enough: libc++ tuple tests
+    (cpp11_libcxx_tuple, *_libcxx.desc) then resolved `std::get<0>' wrongly.
+  * Debug technique that found it: env-gated bypass of the SFINAE null
+    handler + prints at the silent `throw 0' sites (resolve 6790 qualified
+    lookup, 7579 all-templates no-match), `stdbuf -o0' to keep stdout and
+    stderr ordered, gdb `catch throw int' with build-debug for the throw
+    site.  All probes removed.
+  * Still open on gcc 11 headers (harmless): `using string =
+    basic_string<char>' in namespace pmr instantiates std::basic_string
+    with the still-incomplete polymorphic_allocator ([temp.inst]/1: an
+    alias must not require completeness) -> "dropped 4 system-header
+    declarations" warning.  `_Float32' typedef conflicts only when the
+    HOST gcc (13, keyword) differs from the preprocessing gcc (11): a
+    cross-version artefact of my reproduction, not a CI issue.
+- #4b (a)+(c) `0291a96f7f' + test cpp11_primary_base_shared_vptr: Itanium
+  2.4 II.1 primary-base vptr sharing and primary-base-first layout.
+  Helpers in cpp_typecheck_virtual_table.cpp: primary_base (first
+  non-virtual dynamic base), vtable_pointer_component (own vptr or the
+  primary chain's), vtable_chain (`virtual_table::C' structs down the
+  chain), vtable_pointer_value (address of the embedded `@base' inside the
+  most-derived sharing class's vtable object).  A class with a primary
+  base gets no `@vtable_pointer'; `virtual_table::X' has `@base :
+  virtual_table::P' first; do_virtual_table nests values; dispatch casts
+  the shared pointer to `virtual_table::<declaring class>*'; thunks
+  adjust only for bases with their own pointer; typecheck_compound_bases
+  resolves all bases then lays out primary first (bases() keeps
+  declaration order = construction order).  Fuzzer `--virtual' 58/60
+  (the 2 are pre-existing typedef-alignment corners, also on the old
+  binary: seed27 `typedef S4 __attribute__((aligned(1))) T15' member after
+  a bit-field; seed44 alignof of a struct with an aligned-typedef member),
+  `--virtual-all' 26/40 -- all 14 remaining divergences involve virtual
+  bases.
+  * (b) virtual bases NOT done: the ABI places them after the non-virtual
+    part with a vptr even without virtual functions; CBMC flattens them in
+    front and uses the byte `@most_derived' marker, which the ctor/dtor/
+    initializer/aggregate code reads in ~12 places and make_ptr_typecast's
+    flat-pointer convention depends on.  Replacing the marker by the
+    Itanium C1/C2 constructor split is a round of its own.
+- Pre-push check: clang++ -Werror full build incl. JBMC
+  (/tmp/r154/clangbuild, -DWITH_JBMC=ON) rc=0 at e7be6830d5 and cbmc
+  rebuilt there after 0291a96f7f; unit (611 cases) and java-unit (110)
+  pass; run_diff.sh CPPLINT e7359e5ccd..HEAD clean; all 7 suites green on
+  /tmp/r154/bin3 (cbmc-cpp 1347+2 new, cbmc 1197, cpp 245, systemc 27,
+  dfcc 2, ansi-c 269x2).
