@@ -3177,7 +3177,20 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         declarator.find(ID_init_args).is_nil(),
         "declarator should not have init_args");
       if(symbol.value.id() == ID_code)
+      {
         new_code.copy_to_operands(symbol.value);
+        // N5008 [stmt.dcl]/3: a block-scope object with static storage
+        // duration is initialized the first time control passes through
+        // its declaration -- the constructor call just emitted (executed at
+        // every pass, an approximation).  The symbol itself keeps zero
+        // initialization ([basic.start.static]/2); leaving the constructor
+        // CODE as its value made __CPROVER_initialize assign a code block
+        // to the object (`static const pair<...> __classnames[] = {...}' in
+        // libstdc++'s regex_traits::lookup_classname; --validate-goto-model
+        // rejects the assignment).
+        if(symbol.is_static_lifetime)
+          symbol_table.get_writeable_ref(symbol.name).value.make_nil();
+      }
     }
     else
     {
