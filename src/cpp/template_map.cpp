@@ -482,12 +482,16 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
   if(is_new)
     child_ptr = &n.add(ID_initializer);
   else
+  {
     for(auto &c : n.get_sub())
+    {
       if(c.id() == ID_arguments)
       {
         child_ptr = &c;
         break;
       }
+    }
+  }
   if(child_ptr != nullptr)
   {
     irept &child = *child_ptr;
@@ -986,7 +990,7 @@ void template_mapt::apply(typet &type) const
                 // shape: every leaf became leaf<k, int>).  Leave it.
                 if(!was_pack)
                 {
-                  const irept *nm = &static_cast<const irept &>(arg);
+                  const irept *nm = &arg;
                   if(nm->id() == ID_ambiguous)
                     nm = &nm->find(ID_type);
                   bool names_big_pack = false;

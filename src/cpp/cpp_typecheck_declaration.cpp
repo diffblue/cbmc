@@ -481,8 +481,10 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
     if(has_pack)
       deduced_types = arg_types;
     else
+    {
       for(std::size_t i = 0; i < n_type_params && i < arg_types.size(); ++i)
         deduced_types.push_back(arg_types[i]);
+    }
   }
 
   irept template_args(ID_template_args);

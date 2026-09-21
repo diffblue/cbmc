@@ -88,7 +88,8 @@ public:
   /// (it is substituted only at the alias's point of use), so a pack expansion
   /// whose pattern references one must be left UNEXPANDED here -- otherwise it
   /// would be driven by the enclosing class pack alone, leaving the alias's own
-  /// pack dangling (e.g. `same_t<Us, Types>::v...` expanding over `Types` only).
+  /// pack dangling (e.g. `same_t<Us, Types>::v...` expanding over `Types`
+  /// only).
   /// Set (and restored) around the alias-body apply; the nested-pack expander
   /// consults it to defer.  `mutable` because apply() is const.
   mutable std::set<std::string> deferred_own_pack_names;

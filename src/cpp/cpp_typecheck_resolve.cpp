@@ -1801,7 +1801,8 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         // TEMPLATE parameters (used only to size the pack), which can exceed
         // the number of non-pack function parameters when a template parameter
         // is not a function parameter -- e.g. an explicit leading return-type
-        // parameter `R` in `template<class R, class F, class... A> R f(F, A&&...)`
+        // parameter `R` in `template<class R, class F, class... A> R f(F,
+        // A&&...)`
         // called as `f<int>(...)`.  Using the template count to position the
         // expansion then inserts one parameter too many.  Count the non-pack
         // function parameters (and the pack's position among them) directly.
@@ -1918,7 +1919,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
     identifiers.push_back(symbol_exprt(new_symbol.name, inst_type));
   }
-}
+} // NOLINT(readability/fn_size)
 
 void cpp_typecheck_resolvet::remove_templates(resolve_identifierst &identifiers)
 {
@@ -3704,7 +3705,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           irep_idt tpl_name;
           // The pack-template argument arrives as `type`,
           // `cpp_name`, or an `ambiguous` node wrapping either.
-          const irept *tpl_node = &static_cast<const irept &>(tpl_arg);
+          const irept *tpl_node = &tpl_arg;
           if(tpl_node->id() == ID_ambiguous || tpl_node->id() == ID_type)
           {
             const irept &t = tpl_arg.type();
@@ -4267,7 +4268,7 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   base_name = final_base_name;
 
   return cpp_typecheck.cpp_scopes.current_scope();
-}
+} // NOLINT(readability/fn_size)
 
 /// disambiguate partial specialization
 typet cpp_typecheck_resolvet::disambiguate_template_classes(
@@ -5349,7 +5350,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
   return result;
 #endif
-}
+} // NOLINT(readability/fn_size)
 
 typet cpp_typecheck_resolvet::resolve_template_alias(
   const irep_idt &base_name,
@@ -6050,7 +6051,7 @@ exprt cpp_typecheck_resolvet::resolve(
       irep_idt pack_name;
       if(is_expansion)
       {
-        const irept *t = &static_cast<const irept &>(arg.type());
+        const irept *t = &arg.type();
         if(arg_irep.id() == ID_cpp_name)
           t = &arg_irep;
         if(t->id() == ID_cpp_name)
@@ -6152,7 +6153,7 @@ exprt cpp_typecheck_resolvet::resolve(
       // dependent count: not expandable here
     }
     irep_idt tpl_name;
-    const irept *tpl_node = &static_cast<const irept &>(ma[0]);
+    const irept *tpl_node = &ma[0];
     if(tpl_node->id() == ID_ambiguous || tpl_node->id() == ID_type)
     {
       const irept &t = ma[0].type();
@@ -6405,11 +6406,14 @@ exprt cpp_typecheck_resolvet::resolve(
   //
   // N5008 [basic.lookup.argdep]/3.1: if the ordinary unqualified lookup of the
   // name finds the declaration of a class member, the associated namespaces and
-  // classes are NOT considered (ADL is suppressed).  Without this an unqualified
+  // classes are NOT considered (ADL is suppressed).  Without this an
+  // unqualified
   // member call such as `find(x)` inside a member function -- which ordinary
-  // lookup resolves to `this->find` -- would also pull in a same-named member of
+  // lookup resolves to `this->find` -- would also pull in a same-named member
+  // of
   // the argument's class (e.g. `std::basic_string::find` when `x` is a
-  // `std::string`), making the call ambiguous.  Operators are excluded: they use
+  // `std::string`), making the call ambiguous.  Operators are excluded: they
+  // use
   // the separate [over.match.oper] candidate-gathering, which always includes
   // ADL-found non-member operators regardless of any member operator.
   // A member function TEMPLATE's scope entry carries no class_identifier;
@@ -7815,7 +7819,7 @@ resolved_after_strip:
   }
 
   return result;
-}
+} // NOLINT(readability/fn_size)
 
 void cpp_typecheck_resolvet::guess_template_args(
   const exprt &template_expr,
@@ -10353,7 +10357,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               const auto &d = decl.declarators().front();
               if(!d.get_bool(ID_ellipsis) && !d.type().get_bool(ID_ellipsis))
                 return false;
-              const irept *t = &static_cast<const irept &>(decl.type());
+              const irept *t = &decl.type();
               while(t->id() != ID_cpp_name && !t->get_sub().empty())
                 t = &t->get_sub().front();
               std::string own;
@@ -10611,7 +10615,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
                  !opd.declarators().front().type().get_bool(ID_ellipsis) &&
                  !opd.type().get_bool(ID_ellipsis)))
                 continue;
-              const irept *t = &static_cast<const irept &>(opd.type());
+              const irept *t = &opd.type();
               while(t->id() != ID_cpp_name && !t->get_sub().empty())
                 t = &t->get_sub().front();
               std::string own;
@@ -10640,7 +10644,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
                    !pd.type().get_bool(ID_ellipsis)))
                   return false;
                 // the pack parameter's type names its template pack
-                const irept *t = &static_cast<const irept &>(pd.type());
+                const irept *t = &pd.type();
                 while(t->id() != ID_cpp_name && !t->get_sub().empty())
                   t = &t->get_sub().front();
                 std::string own;
@@ -11698,7 +11702,7 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
       auto enum_scope_it = cpp_typecheck.cpp_scopes.id_map.find(enum_name);
       if(enum_scope_it == cpp_typecheck.cpp_scopes.id_map.end())
         return;
-      for(cpp_scopet *ns = &static_cast<cpp_scopet &>(*enum_scope_it->second);
+      for(cpp_scopet *ns = static_cast<cpp_scopet *>(enum_scope_it->second);
           ns != nullptr;
           ns = &ns->get_parent())
       {

@@ -135,7 +135,8 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
 /// the key clue for the real fix.
 /// Shared preprocessing for a deferred method body about to be converted:
 /// restore an instantiated member function template's template map
-/// ([temp.inst]/1, from `\#fn_template_type` / `\#fn_template_args`), expand the
+/// ([temp.inst]/1, from `\#fn_template_type` / `\#fn_template_args`), expand
+/// the
 /// body's uses of replicated function parameter packs ([temp.variadic]/5)
 /// and drop zero-length pack expansions ([temp.variadic]/7).  Used by BOTH
 /// the main typecheck_method_bodies drain and the deferred-member fixpoint
@@ -1434,7 +1435,7 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // template-argument lists in the body (e.g. `Tr<U...>` -> `Tr<>` for an
   // empty `U`).
   remove_empty_pack_expansion_args(body);
-}
+} // NOLINT(readability/fn_size)
 
 void cpp_typecheckt::typecheck_method_bodies()
 {
@@ -2154,7 +2155,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           if(scope_it != cpp_scopes.id_map.end() && scope_it->second)
           {
             for(cpp_scopet *enclosing =
-                  &static_cast<cpp_scopet *>(scope_it->second)->get_parent();
+                  &(static_cast<cpp_scopet *>(scope_it->second)->get_parent());
                 !enclosing->is_root_scope();
                 enclosing = &enclosing->get_parent())
             {
