@@ -10441,3 +10441,98 @@ forbid that phrase) so no existing test changes meaning.
   pass; run_diff.sh CPPLINT e7359e5ccd..HEAD clean; all 7 suites green on
   /tmp/r154/bin3 (cbmc-cpp 1347+2 new, cbmc 1197, cpp 245, systemc 27,
   dfcc 2, ansi-c 269x2).
+
+## Round 155 (2026-09-21) — pmr::string alias (reverted), test formatting, MI layout bugs, virtual-base design
+
+- pmr::string alias (gcc 11 `<string>`): cause found -- the typedef branch of
+  convert_non_template_declaration CLEARS skip_typechecking_elaborate on exit
+  instead of restoring it, so after the nested conversion of the alias
+  template's own declaration the outer resolver eagerly elaborates the class
+  the alias names ([temp.inst]/1 does not permit that).  Fixing it
+  (b79b14f901) regressed cpp20_ranges_pipe_invoke_drop (libc++ ranges shape):
+  a `tuple<int>' only named through `__apply_cv_t' stays unelaborated and the
+  later `tuple(_Up... __u)' deduction from an object of that type produces an
+  EMPTY pack (the deduction runs from the mem-initializer
+  `__bound_args_(__bound_args...)' of __perfect_forward_impl; elaborating
+  incomplete instances at guess_function_template_args entry did not reach
+  it).  Reverted (115fdcff36); test cpp11_alias_template_defers_instantiation
+  kept as KNOWNBUG.  Also tried: keep eager elaboration but roll it back on
+  failure (incomplete_member_exceptiont thrown at [class.mem.general]/14,
+  rethrown through the 13 member-recovery catch(...) blocks of
+  typecheck_compound_body, reset_class_template_instance from the
+  dropped-base path) -- the re-elaboration then hit dangling class-scope ids
+  (convert_identifier "type must not be nil"): the scope's `sub' entries of
+  erased member symbols must be removed too.  Both threads are follow-ups;
+  the user-visible effect today is only the "dropped 4 system-header
+  declaration(s)" warning with gcc 11 headers (pmr::string itself is
+  unsupported there anyway: `size_type' unknown in basic_string with a
+  non-std allocator).
+- clang-format of the branch's test sources (cc99813456): 337 files;
+  `regression' removed from .clang-format-ignore.  The repository's
+  `Standard: c++17' makes clang-format 15 split a built-in `<=>' into
+  `<= >' (only cpp20_spaceship_builtin_strong_ordering was affected; the
+  `operator<=>' declarations and the other `a <=> b' tests format fine), so
+  that block is wrapped in clang-format off/on -- a per-directory
+  .clang-format with `Standard: c++20' was tried first and dropped: it
+  changes the requires-clause formatting and forces reformatting every
+  cbmc-cpp file, and clang-format 15 does not reach a fixed point on a
+  compound requirement in that mode.  12 test.desc `line N' expectations
+  updated from the actual output.  The cbmc-cpp suite showed that the front
+  end is NOT line-number sensitive (only the pmr regression above failed).
+- Two pre-existing MI layout bugs found while preparing the virtual-base
+  work (7717d7bf9c + test cpp11_virtual_thunk_base_offset):
+  (1) thunk `this' adjustments were computed at the overrider's declaration,
+  before add_padding: `T : P, Q' adjusted by 12 instead of 16, so T::m read
+  t and q from wrong addresses (the round-154 test only returned constants
+  and did not catch it).  Now build_virtual_thunk_body +
+  finalize_virtual_thunks after the layout.  (2) `U : T', `T : P, Q': the
+  recursion in add_base_components kept P's tail padding (only DIRECT
+  non-POD bases had it dropped) and lost Q's base-alignment mark (set on
+  T's copy of Q's first component), so U's Q subobject sat at 20.  Fuzzer
+  `--virtual' 58/60 and plain `--cxx' 60/60 after; the 2 are the known
+  typedef-alignment corners (seed27/seed44).
+- #4b(b) virtual bases: NOT implemented -- design worked out, and the
+  current model shown UNSOUND for MI: `D : B1, B2' both `: virtual V',
+  `B2 *p = &d; p->b2' writes/reads B1's member (B2's flattened layout is
+  applied at D's address by the flat pointer convention; /tmp/r155/vb1.cpp:
+  the trace shows `o.b1=3' after B2's constructor).  Faithful (Itanium 2.4 +
+  2.5 + 2.6.2) design:
+  * layout: non-virtual part (primary base at 0, other nv bases, own
+    members), then the virtual bases once each (inheritance-graph order),
+    components marked ID_C_virtual_base=V; every class with vbases has a
+    vptr (own if no primary base); no `@most_derived' member.  When
+    flattening a base, skip its vbase-marked components (they are the
+    derived class's vbases); mark the padding before/among them so it is
+    skipped too (nvsize).
+  * vbase offsets live in the vtable struct (`@vbase_offset::V' entries in
+    `virtual_table::X' for each vbase of X; create the struct + vptr for
+    classes with vbases even without virtual functions).  `X* -> V*' =
+    `(V*)((char*)p + ((virtual_table::X*)p->ROOT::@vtable_pointer)->
+    @vbase_offset::V)'; member access `p->v' for a vbase member rewrites
+    to `((V*)p)->v' unless the object is a complete-object lvalue.  The
+    most-derived constructor uses STATIC offsets for its vbase ctor calls
+    (before the vptrs are installed).
+  * constructors get hidden parameters with defaults so ordinary calls are
+    untouched: `bool @most_derived = true' (the existing `@most_derived'
+    name resolution then finds the parameter) and, for classes with
+    vbases, `vtt::X *@vtt = &vtt::X@X'.  C1 (flag true): vbases (`false,
+    &@vtt->V'), nv bases (`false, &@vtt->A'), install ALL final vptrs
+    (vtable_pointer_value), members.  C2 (flag false): nv bases, install
+    only the own/shared vptr from `@vtt->@own', members.  `vtt::X' =
+    {@own; nested vtt::A per nv base with vbases; nested vtt::V per vbase
+    with vbases} -- the Itanium VTT; construction vtables
+    `virtual_table::T@D%S' = S's complete table with D-relative offsets.
+    Accepted deviation: X's C2 does not re-install its non-primary bases'
+    secondary vptrs (calls through such a base pointer during X's ctor body
+    reach the base's own functions).  Destructors: `bool @most_derived =
+    true'; D2 does not touch vptrs.
+  * thunks generated per (most-derived X, base B, function f) in
+    do_virtual_table with static offsets (also for vbase subobjects, whose
+    offset in X is static); the flat_pointer_convention special case goes.
+  * remove `@most_derived' handling (cpp_constructor.cpp, aggregate init,
+    function.cpp copy/assign, code.cpp, initializer.cpp).
+  * get_virtual_bases gives V before its own vbases; construction order
+    ([class.base.init]/13) needs bases-first; g++ layout order to be checked.
+  Estimated a round of its own; fuzzer `--virtual-all' (26/40 now, all
+  vbase cases) is the oracle; iostream-shaped diamonds (systemc suite,
+  cpp11_virtual_base_diamond_dtor) the regression risk.
