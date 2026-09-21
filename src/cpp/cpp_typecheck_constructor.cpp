@@ -22,6 +22,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
+#include <algorithm>
+#include <functional>
+
 /// \return whether the class has no storage member (an empty class: its
 ///   base subobjects have zero size, [intro.object]/9)
 static bool class_is_empty(const struct_typet &type)
@@ -384,11 +387,20 @@ void cpp_typecheckt::default_cpctor(
   const struct_typet::componentst &components=
     to_struct_type(symbol.type).components();
 
+  std::list<irep_idt> cpctor_vbases;
+  if(symbol.type.id() == ID_struct)
+    get_virtual_bases(to_struct_type(symbol.type), cpctor_vbases);
+
   for(const auto &mem_c : components)
   {
     // Take care of virtual tables
     if(mem_c.get_bool(ID_is_vtptr))
     {
+      // a class with virtual bases installs them in
+      // full_member_initialization, under `@most_derived' and before the
+      // bases are constructed
+      if(!cpctor_vbases.empty())
+        continue;
       // the vtable of the most derived class sharing this pointer
       exprt address = vtable_pointer_value(symbol, mem_c);
       if(address.is_nil())
@@ -662,6 +674,21 @@ void cpp_typecheckt::check_member_initializers(
 {
   PRECONDITION(initializers.id() == ID_member_initializers);
 
+  // N5008 [class.base.init]/1: a mem-initializer-id may also name an
+  // INDIRECT virtual base (the most derived class initializes it, /13)
+  std::list<irep_idt> virtual_base_ids;
+  if(!class_identifier.empty())
+  {
+    const symbolt *class_symbol = symbol_table.lookup(class_identifier);
+    if(class_symbol != nullptr && class_symbol->type.id() == ID_struct)
+      get_virtual_bases(to_struct_type(class_symbol->type), virtual_base_ids);
+  }
+  const auto is_virtual_base = [&](const irep_idt &id)
+  {
+    return std::find(virtual_base_ids.begin(), virtual_base_ids.end(), id) !=
+           virtual_base_ids.end();
+  };
+
   for(const auto &initializer : initializers.get_sub())
   {
     PRECONDITION(initializer.is_not_nil());
@@ -681,8 +708,10 @@ void cpp_typecheckt::check_member_initializers(
       drop_empty_pack_template_args(member_type);
       typecheck_type(member_type);
 
-      // check for a direct parent
-      bool ok=false;
+      // check for a direct parent (or a virtual base)
+      bool ok =
+        member_type.id() == ID_struct_tag &&
+        is_virtual_base(to_struct_tag_type(member_type).get_identifier());
       for(const auto &b : bases)
       {
         if(
@@ -729,6 +758,15 @@ void cpp_typecheckt::check_member_initializers(
       const irep_idt &base_id = to_struct_tag_type(b.type()).get_identifier();
       const symbolt &base_sym = lookup(base_id);
       if(base_sym.base_name == base_name)
+      {
+        ok = true;
+        break;
+      }
+    }
+
+    for(const irep_idt &vbase_id : virtual_base_ids)
+    {
+      if(lookup(vbase_id).base_name == base_name)
       {
         ok = true;
         break;
@@ -849,6 +887,9 @@ void cpp_typecheckt::check_member_initializers(
           ok = true;
         }
 
+        if(is_virtual_base(to_struct_tag_type(member_type).get_identifier()))
+          ok = true;
+
         for(const auto &b : bases)
         {
           if(
@@ -900,6 +941,49 @@ void cpp_typecheckt::full_member_initialization(
     struct_union_type.components();
 
   PRECONDITION(initializers.id() == ID_member_initializers);
+
+  bool has_virtual_bases = false;
+  if(struct_union_type.id() == ID_struct)
+  {
+    std::list<irep_idt> vbase_ids;
+    get_virtual_bases(to_struct_type(struct_union_type), vbase_ids);
+    has_virtual_bases = !vbase_ids.empty();
+  }
+
+  // For a class with virtual bases: `if(@most_derived)' followed by the
+  // installation of all the complete object's virtual pointers.
+  const auto install_vptrs = [&]() -> codet
+  {
+    code_blockt vptr_block;
+    const symbolt *class_symbol;
+    if(!lookup(struct_union_type.get(ID_name), class_symbol))
+    {
+      // the non-virtual part's pointers first: a virtual base's pointer is
+      // reached through this class's own (just installed) vtable
+      for(int pass = 0; pass < 2; ++pass)
+      {
+        for(const auto &c : components)
+        {
+          if(
+            !c.get_bool(ID_is_vtptr) ||
+            c.get(ID_C_virtual_base).empty() != (pass == 0))
+          {
+            continue;
+          }
+          exprt address = vtable_pointer_value(*class_symbol, c);
+          if(address.is_nil())
+            continue;
+          already_typechecked_exprt::make_already_typechecked(address);
+          exprt ptrmember(ID_ptrmember);
+          ptrmember.set(ID_component_name, c.get_name());
+          ptrmember.operands().push_back(exprt("cpp-this"));
+          vptr_block.add(code_frontend_assignt(ptrmember, address));
+        }
+      }
+    }
+    return code_ifthenelset(
+      cpp_namet("@most_derived").as_expr(), std::move(vptr_block));
+  };
 
   // N5008 [temp.variadic]/7: normalise each member-initializer's base-id by
   // dropping pack-expansion arguments over empty packs (e.g.
@@ -1027,21 +1111,130 @@ void cpp_typecheckt::full_member_initialization(
 
     if(!vbases.empty())
     {
-      code_blockt block;
-
-      while(!vbases.empty())
+      // Itanium C++ ABI 5.1.4 (complete-object constructor): the complete
+      // object's virtual pointers are installed FIRST -- before any base
+      // constructor runs -- because a base-object constructor (C2, called
+      // with `@most_derived' false) leaves the pointers alone, and its body
+      // may reach a virtual base member only through the vtable's virtual-
+      // base offsets, which are those of this most derived object.  (The
+      // ABI's construction vtables, which additionally keep virtual calls
+      // during a base's construction dispatching to that base's overriders
+      // per N5008 [class.cdtor]/4, are not modelled: such a call reaches
+      // the most derived class's overrider.)
       {
-        const symbolt &symb=lookup(vbases.front());
-        if(!cpp_is_pod(symb.type))
+        codet vptrs = install_vptrs();
+        final_initializers.move_to_sub(vptrs);
+      }
+
+      // N5008 [class.base.init]/13.1: the virtual bases are constructed by
+      // the most derived class, a virtual base after the virtual bases of
+      // its own hierarchy (`W' before `V : virtual W').  get_virtual_bases
+      // lists them in inheritance graph (layout) order.
+      code_blockt block;
+      std::list<irep_idt> construction_order;
+      std::function<void(const irep_idt &)> add_vbase =
+        [&](const irep_idt &vbase_id)
+      {
+        if(
+          std::find(
+            construction_order.begin(), construction_order.end(), vbase_id) !=
+          construction_order.end())
+          return;
+        const symbolt &symb = lookup(vbase_id);
+        if(symb.type.id() == ID_struct)
+        {
+          std::list<irep_idt> own;
+          get_virtual_bases(to_struct_type(symb.type), own);
+          for(const auto &o : own)
+            add_vbase(o);
+        }
+        construction_order.push_back(vbase_id);
+      };
+      for(const auto &v : vbases)
+        add_vbase(v);
+
+      for(const auto &vbase_id : construction_order)
+      {
+        const symbolt &symb = lookup(vbase_id);
+
+        // N5008 [class.base.init]/1: a mem-initializer may name a virtual
+        // base, direct or indirect ([class.base.init]/7 -- it is then the
+        // one that initializes it in the most derived class's constructor)
+        std::optional<irept> user_initializer;
+        for(const irept &initializer : initializers.get_sub())
+        {
+          if(initializer.find(ID_member).id() != ID_cpp_name)
+            continue;
+          const cpp_namet &name = to_cpp_name(initializer.find(ID_member));
+          const irept &recorded = initializer.find("#base_type");
+          if(recorded.is_not_nil())
+          {
+            const typet &recorded_t = static_cast<const typet &>(recorded);
+            if(
+              recorded_t.id() == ID_struct_tag &&
+              to_struct_tag_type(recorded_t).get_identifier() == vbase_id)
+            {
+              user_initializer = initializer;
+              break;
+            }
+            continue;
+          }
+          bool is_data = false;
+          for(const auto &c : components)
+          {
+            if(
+              c.get_base_name() == name.get_base_name() &&
+              c.type().id() != ID_code && !c.get_bool(ID_is_type))
+            {
+              is_data = true;
+              break;
+            }
+          }
+          if(is_data)
+            continue;
+          if(
+            !name.has_template_args() && name.get_base_name() == symb.base_name)
+          {
+            user_initializer = initializer;
+            break;
+          }
+          // the type the mem-initializer-id denotes (a qualified name, a
+          // template-id, a typedef or a template parameter)
+          try
+          {
+            typet member_type =
+              static_cast<const typet &>(initializer.find(ID_member));
+            drop_empty_pack_template_args(member_type);
+            typecheck_type(member_type);
+            if(
+              member_type.id() == ID_struct_tag &&
+              to_struct_tag_type(member_type).get_identifier() == vbase_id)
+            {
+              user_initializer = initializer;
+              break;
+            }
+          }
+          catch(...)
+          {
+          }
+        }
+
+        if(user_initializer.has_value())
+        {
+          codet mem_init = static_cast<const codet &>(*user_initializer);
+          mem_init.add("#base_type") = struct_tag_typet(vbase_id);
+          block.move_to_sub(mem_init);
+        }
+        else if(!cpp_is_pod(symb.type))
         {
           // default initializer
           const cpp_namet cppname(symb.base_name);
 
           codet mem_init(ID_member_initializer);
           mem_init.set(ID_member, cppname);
+          mem_init.add("#base_type") = struct_tag_typet(vbase_id);
           block.move_to_sub(mem_init);
         }
-        vbases.pop_front();
       }
 
       code_ifthenelset cond(
@@ -1049,10 +1242,14 @@ void cpp_typecheckt::full_member_initialization(
       final_initializers.move_to_sub(cond);
     }
 
-    // Subsequently, we need to call the non-POD parent constructors
+    // Subsequently, we need to call the non-POD parent constructors (the
+    // direct virtual bases were dealt with above, with the indirect ones)
     for(const auto &b : to_struct_type(struct_union_type).bases())
     {
       DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
+
+      if(b.get_bool(ID_virtual))
+        continue;
 
       const symbolt &ctorsymb = lookup(b.type());
 
@@ -1450,18 +1647,18 @@ void cpp_typecheckt::full_member_initialization(
         mem_init.add("#base_type") = b.type();
         final_initializers.move_to_sub(mem_init);
       }
-
-      if(b.get_bool(ID_virtual))
-      {
-        codet tmp(ID_member_initializer);
-        tmp.swap(final_initializers.get_sub().back());
-
-        code_ifthenelset cond(
-          cpp_namet("@most_derived").as_expr(), std::move(tmp));
-
-        final_initializers.get_sub().back().swap(cond);
-      }
     }
+  }
+
+  // A base without virtual bases has installed its own vtables (it does
+  // not distinguish complete-object and base-object construction): the
+  // complete object's are installed again, now that all bases are
+  // constructed -- from here on, N5008 [class.cdtor]/4 holds for the
+  // members' initialization and the constructor body.
+  if(has_virtual_bases)
+  {
+    codet vptrs = install_vptrs();
+    final_initializers.move_to_sub(vptrs);
   }
 
   // Then, we add the member initializers
@@ -1470,6 +1667,9 @@ void cpp_typecheckt::full_member_initialization(
     // Take care of virtual tables
     if(c.get_bool(ID_is_vtptr))
     {
+      // a class with virtual bases installed them above
+      if(has_virtual_bases)
+        continue;
       // the vtable of the most derived class sharing this pointer
       const symbolt *class_symbol;
       if(lookup(struct_union_type.get(ID_name), class_symbol))

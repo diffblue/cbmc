@@ -506,6 +506,74 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
   }
 }
 
+/// The class's vtable struct `virtual_table::<class>`, created on first use:
+/// a class with a primary base (Itanium C++ ABI 2.4 II.1) embeds that base's
+/// vtable struct as first member `@base` and shares its virtual pointer;
+/// otherwise the class gets its own `@vtable_pointer` component.
+irep_idt cpp_typecheckt::ensure_virtual_table(
+  const symbolt &symbol,
+  struct_typet::componentst &components)
+{
+  const irep_idt vt_name = "virtual_table::" + id2string(symbol.name);
+
+  if(!symbol_table.has_symbol(vt_name))
+  {
+    // first time: create a virtual-table symbol type
+    type_symbolt vt_symb_type{vt_name, struct_typet(), ID_cpp};
+    vt_symb_type.base_name = "virtual_table::" + id2string(symbol.base_name);
+    vt_symb_type.pretty_name = vt_symb_type.base_name;
+    vt_symb_type.module = module;
+    vt_symb_type.location = symbol.location;
+    vt_symb_type.type.set(ID_name, vt_symb_type.name);
+
+    const bool failed = !symbol_table.insert(std::move(vt_symb_type)).second;
+    CHECK_RETURN(!failed);
+
+    // Itanium C++ ABI 2.4 II.1 (as implemented by g++ and clang; N5008
+    // leaves the layout of a dynamic class to the implementation): a
+    // class with a primary base -- its first non-virtual dynamic base --
+    // shares that base's virtual pointer and adds no storage for its own
+    // virtual functions; their vtable entries follow the primary base's
+    // in the same vtable.  Modelled by embedding the primary base's
+    // vtable struct as the first member `@base' of this class's vtable
+    // struct: the shared pointer, cast to `virtual_table::<this class>*',
+    // reaches the new entries.  A class without a primary base (a root
+    // dynamic class, or one whose dynamic bases are all virtual) gets its
+    // own virtual pointer.
+    const irep_idt primary = primary_base(symbol.name);
+    const std::vector<irep_idt> primary_chain =
+      primary.empty() ? std::vector<irep_idt>{} : vtable_chain(primary);
+    if(!primary_chain.empty())
+    {
+      struct_typet &vt_struct =
+        to_struct_type(symbol_table.get_writeable_ref(vt_name).type);
+      struct_typet::componentt base_vt(
+        id2string(vt_name) + "::@base",
+        struct_tag_typet(primary_chain.front()));
+      base_vt.set_base_name("@base");
+      base_vt.set_pretty_name("@base");
+      base_vt.set(ID_access, ID_public);
+      base_vt.add_source_location() = symbol.location;
+      vt_struct.components().push_back(base_vt);
+    }
+    else
+    {
+      // add a virtual-table pointer
+      struct_typet::componentt compo(
+        id2string(symbol.name) + "::@vtable_pointer",
+        pointer_type(struct_tag_typet(vt_name)));
+      compo.set_base_name("@vtable_pointer");
+      compo.set_pretty_name(id2string(symbol.base_name) + "@vtable_pointer");
+      compo.set(ID_is_vtptr, true);
+      compo.set(ID_access, ID_public);
+      components.push_back(compo);
+      put_compound_into_scope(compo);
+    }
+  }
+
+  return vt_name;
+}
+
 void cpp_typecheckt::typecheck_compound_declarator(
   const symbolt &symbol,
   const cpp_declarationt &declaration,
@@ -1557,71 +1625,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
       typecheck_member_function(
         symbol, component, initializers, method_qualifier, value);
 
-      // get the virtual-table symbol type
-      irep_idt vt_name = "virtual_table::" + id2string(symbol.name);
-
-      if(!symbol_table.has_symbol(vt_name))
-      {
-        // first time: create a virtual-table symbol type
-        type_symbolt vt_symb_type{vt_name, struct_typet(), ID_cpp};
-        vt_symb_type.base_name =
-          "virtual_table::" + id2string(symbol.base_name);
-        vt_symb_type.pretty_name = vt_symb_type.base_name;
-        vt_symb_type.module = module;
-        vt_symb_type.location = symbol.location;
-        vt_symb_type.type.set(ID_name, vt_symb_type.name);
-
-        const bool failed =
-          !symbol_table.insert(std::move(vt_symb_type)).second;
-        CHECK_RETURN(!failed);
-
-        // Itanium C++ ABI 2.4 II.1 (as implemented by g++ and clang; N5008
-        // leaves the layout of a dynamic class to the implementation): a
-        // class with a primary base -- its first non-virtual dynamic base --
-        // shares that base's virtual pointer and adds no storage for its own
-        // virtual functions; their vtable entries follow the primary base's
-        // in the same vtable.  Modelled by embedding the primary base's
-        // vtable struct as the first member `@base' of this class's vtable
-        // struct: the shared pointer, cast to `virtual_table::<this class>*',
-        // reaches the new entries.  A class without a primary base (a root
-        // dynamic class, or one whose dynamic bases are all virtual) gets its
-        // own virtual pointer.
-        const irep_idt primary = primary_base(symbol.name);
-        const std::vector<irep_idt> primary_chain =
-          primary.empty() ? std::vector<irep_idt>{} : vtable_chain(primary);
-        if(!primary_chain.empty())
-        {
-          struct_typet &vt_struct =
-            to_struct_type(symbol_table.get_writeable_ref(vt_name).type);
-          struct_typet::componentt base_vt(
-            id2string(vt_name) + "::@base",
-            struct_tag_typet(primary_chain.front()));
-          base_vt.set_base_name("@base");
-          base_vt.set_pretty_name("@base");
-          base_vt.set(ID_access, ID_public);
-          base_vt.add_source_location() = symbol.location;
-          vt_struct.components().push_back(base_vt);
-        }
-        else
-        {
-          // add a virtual-table pointer
-          struct_typet::componentt compo(
-            id2string(symbol.name) + "::@vtable_pointer",
-            pointer_type(struct_tag_typet(vt_name)));
-          compo.set_base_name("@vtable_pointer");
-          compo.set_pretty_name(
-            id2string(symbol.base_name) + "@vtable_pointer");
-          compo.set(ID_is_vtptr, true);
-          compo.set(ID_access, ID_public);
-          components.push_back(compo);
-          put_compound_into_scope(compo);
-        }
-      }
-
-      typet &vt = symbol_table.get_writeable_ref(vt_name).type;
-      INVARIANT(
-        vt.id() == ID_struct, "Virtual tables must be stored as struct");
-      struct_typet &virtual_table = to_struct_type(vt);
+      // get the virtual-table symbol type (created, with the class's own
+      // virtual pointer or the embedding of the primary base's table, on
+      // first use)
+      const irep_idt vt_name = ensure_virtual_table(symbol, components);
+      struct_typet &virtual_table =
+        to_struct_type(symbol_table.get_writeable_ref(vt_name).type);
 
       component.set(ID_virtual_name, virtual_name);
       component.set(ID_is_virtual, is_virtual);
@@ -1657,6 +1666,24 @@ void cpp_typecheckt::typecheck_compound_declarator(
         to_pointer_type(this_parameter.type())
           .base_type()
           .set(ID_identifier, virtual_base);
+
+        // The thunk has the base's signature: a virtual destructor of a
+        // class with virtual bases takes the hidden `@most_derived'
+        // parameter (see add_this_to_method_type), which a call through
+        // the vtable of a base WITHOUT virtual bases does not pass -- such
+        // a call destroys the complete object, so the thunk passes `true'
+        // (build_virtual_thunk_body).
+        if(
+          !code_type.parameters().empty() &&
+          code_type.parameters().back().get_base_name() == "@most_derived")
+        {
+          const symbolt *base_symbol = symbol_table.lookup(virtual_base);
+          std::list<irep_idt> base_vbases;
+          if(base_symbol != nullptr && base_symbol->type.id() == ID_struct)
+            get_virtual_bases(to_struct_type(base_symbol->type), base_vbases);
+          if(base_vbases.empty())
+            code_type.parameters().pop_back();
+        }
 
         // create symbols for the parameters
         code_typet::parameterst &args = code_type.parameters();
@@ -3770,6 +3797,52 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
   }
 
+  // Itanium C++ ABI 2.4 II.3: the virtual bases follow the non-virtual
+  // part (bases and own members).  A class with virtual bases is dynamic:
+  // it has a virtual pointer even without virtual functions (its own, or
+  // the primary base's), and its vtable carries the offsets of its
+  // virtual bases (`@vbase_offset::<V>', 2.5.2), which a cast or a member
+  // access through a pointer to this class reads at run time -- where a
+  // virtual base lies depends on the most derived object.
+  if(symbol.type.id() == ID_struct)
+  {
+    struct_typet &struct_type = to_struct_type(symbol.type);
+    std::list<irep_idt> vbase_ids;
+    get_virtual_bases(struct_type, vbase_ids);
+    if(!vbase_ids.empty())
+    {
+      // the virtual bases' components (added with the bases, see
+      // typecheck_compound_bases) go behind the non-virtual part
+      std::stable_partition(
+        components.begin(),
+        components.end(),
+        [](const struct_typet::componentt &c)
+        { return c.get(ID_C_virtual_base).empty(); });
+
+      const irep_idt vt_name = ensure_virtual_table(symbol, components);
+      struct_typet &vt_struct =
+        to_struct_type(symbol_table.get_writeable_ref(vt_name).type);
+      for(const irep_idt &vbase_id : vbase_ids)
+      {
+        const irep_idt entry_name =
+          id2string(vt_name) + "::@vbase_offset::" + id2string(vbase_id);
+        bool present = false;
+        for(const auto &c : vt_struct.components())
+          if(c.get_name() == entry_name)
+            present = true;
+        if(present)
+          continue;
+        struct_typet::componentt entry(entry_name, pointer_diff_type());
+        entry.set_base_name("@vbase_offset::" + id2string(vbase_id));
+        entry.set_pretty_name(entry.get_base_name());
+        entry.set(ID_access, ID_public);
+        entry.set(ID_C_virtual_base, vbase_id);
+        entry.add_source_location() = symbol.location;
+        vt_struct.components().push_back(entry);
+      }
+    }
+  }
+
   // Add the default dtor, if needed
   // (we have to do the destructor before building the virtual tables,
   //  as the destructor may be virtual!)
@@ -4105,9 +4178,10 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       {
         if(!it->get_bool(ID_is_vtptr))
           continue;
-        if(it->get_bool(ID_from_base))
+        // a virtual base's pointer is not in the non-virtual part
+        if(it->get_bool(ID_from_base) && it->get(ID_C_virtual_base).empty())
           has_base_vtptr = true;
-        else if(own_vtptr == components.end())
+        else if(!it->get_bool(ID_from_base) && own_vtptr == components.end())
           own_vtptr = it;
       }
       if(!has_base_vtptr && own_vtptr != components.end())
@@ -4229,6 +4303,42 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
         }
         add_padding(struct_type, ns);
+        // The padding placed in front of or among the virtual bases (and the
+        // class's tail padding) is not part of the non-virtual part either:
+        // mark every padding component after the last non-virtual-part
+        // storage component so that flattening this class as a base copies
+        // only its non-virtual part (dsize, Itanium C++ ABI 2.4).
+        {
+          auto &comps = struct_type.components();
+          std::size_t last_nv = 0;
+          bool any_nv = false;
+          for(std::size_t i = 0; i < comps.size(); ++i)
+          {
+            const auto &c = comps[i];
+            if(
+              c.type().id() != ID_code && !c.get_bool(ID_is_static) &&
+              !c.get_bool(ID_is_type) && !c.get_is_padding() &&
+              c.get(ID_C_virtual_base).empty())
+            {
+              last_nv = i;
+              any_nv = true;
+            }
+          }
+          bool has_vbase_components = false;
+          for(const auto &c : comps)
+            if(!c.get(ID_C_virtual_base).empty())
+              has_vbase_components = true;
+          if(has_vbase_components)
+          {
+            for(std::size_t i = any_nv ? last_nv + 1 : 0; i < comps.size(); ++i)
+            {
+              if(
+                comps[i].get_is_padding() &&
+                comps[i].get(ID_C_virtual_base).empty())
+                comps[i].set(ID_C_virtual_base, "$padding");
+            }
+          }
+        }
         // Record the resulting alignment on the struct when it stems from an
         // explicit specifier, so that an enclosing struct sees it (above)
         // and lays this one out on the boundary GCC uses.
@@ -4244,9 +4354,13 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   // The thunks' `this' adjustments are base-subobject offsets, which include
   // the alignment padding between base subobjects added by the layout above:
-  // rebuild their bodies now.
+  // rebuild their bodies now.  Likewise the virtual-base offsets held in
+  // the vtables.
   if(symbol.type.id() == ID_struct)
+  {
     finalize_virtual_thunks(symbol);
+    set_virtual_base_offsets(symbol);
+  }
 
   // Process deferred static member initializers now that all
   // members are declared (N5008 [basic.scope.class]: the initializer is in
@@ -4587,6 +4701,33 @@ void cpp_typecheckt::add_this_to_method_type(
 
   code_typet::parameterst &parameters = type.parameters();
   parameters.insert(parameters.begin(), parameter);
+
+  // A constructor or destructor of a class with virtual bases gets a hidden
+  // trailing parameter `@most_derived' (defaulted to true): the Itanium C++
+  // ABI's complete-object (C1/D1) versus base-object (C2/D2) constructor
+  // and destructor distinction (5.1.4), which decides whether the virtual
+  // bases are constructed/destroyed by this call ([class.base.init]/13,
+  // [class.dtor]/14) and whether the complete object's virtual pointers
+  // are installed.  Ordinary construction of a complete object uses the
+  // default; a base subobject's constructor is called with `false' by the
+  // derived constructor (typecheck_member_initializer) and destructor.
+  const irep_idt &ret = type.return_type().id();
+  if(
+    (ret == ID_constructor || ret == ID_destructor) &&
+    compound_symbol.type.id() == ID_struct)
+  {
+    std::list<irep_idt> vbase_ids;
+    get_virtual_bases(to_struct_type(compound_symbol.type), vbase_ids);
+    if(!vbase_ids.empty())
+    {
+      code_typet::parametert most_derived{bool_typet{}};
+      most_derived.set_base_name("@most_derived");
+      most_derived.default_value() = true_exprt();
+      if(!cpp_scopes.current_scope().get_parent().is_template_scope())
+        convert_parameter(compound_symbol.mode, most_derived);
+      parameters.push_back(most_derived);
+    }
+  }
 }
 
 void cpp_typecheckt::add_anonymous_members_to_scope(
@@ -4793,6 +4934,34 @@ bool cpp_typecheckt::get_component(
 
     if(component.get_name() == component_name)
     {
+      // A member of a VIRTUAL base reached through a pointer or reference
+      // (the object is a dereference): its position depends on the most
+      // derived object, so go through the pointer conversion to the virtual
+      // base, which reads the offset from the vtable (Itanium C++ ABI
+      // 2.5.2).  A complete object (a named variable) uses its own layout.
+      const irep_idt virtual_base = component.get(ID_C_virtual_base);
+      if(
+        !virtual_base.empty() && virtual_base != "$padding" &&
+        object.id() == ID_dereference && object.type().id() == ID_struct_tag &&
+        symbol_table.has_symbol(virtual_base))
+      {
+        exprt pointer = to_dereference_expr(object).pointer();
+        if(pointer.type().id() == ID_pointer)
+        {
+          struct_tag_typet vbase_tag(virtual_base);
+          if(object.type().get_bool(ID_C_constant))
+            vbase_tag.set(ID_C_constant, true);
+          make_ptr_typecast(pointer, pointer_type(vbase_tag));
+          dereference_exprt vbase_object(pointer);
+          vbase_object.type() = vbase_tag;
+          vbase_object.set(ID_C_lvalue, object.get_bool(ID_C_lvalue));
+          vbase_object.add_source_location() = source_location;
+          tmp =
+            member_exprt(vbase_object, component.get_name(), component.type());
+          tmp.add_source_location() = source_location;
+        }
+      }
+
       member.swap(tmp);
 
       bool not_ok = check_component_access(component, final_type);
@@ -5113,9 +5282,9 @@ void cpp_typecheckt::get_virtual_bases(
   const struct_typet &type,
   std::list<irep_idt> &vbases) const
 {
-  if(std::find(vbases.begin(), vbases.end(), type.get(ID_name)) != vbases.end())
-    return;
-
+  // Inheritance graph order (Itanium C++ ABI 2.4 II.3, depth-first and
+  // left-to-right), each virtual base once at its first occurrence; the
+  // virtual bases of a virtual base follow it.
   for(const auto &b : type.bases())
   {
     DATA_INVARIANT(b.id() == ID_base, "base class expression expected");
@@ -5127,8 +5296,13 @@ void cpp_typecheckt::get_virtual_bases(
       continue;
     const struct_typet &base = to_struct_type(base_sym.type);
 
-    if(b.get_bool(ID_virtual))
+    if(
+      b.get_bool(ID_virtual) &&
+      std::find(vbases.begin(), vbases.end(), base.get(ID_name)) ==
+        vbases.end())
+    {
       vbases.push_back(base.get(ID_name));
+    }
 
     get_virtual_bases(base, vbases);
   }
@@ -5273,7 +5447,8 @@ bool cpp_typecheckt::base_publicly_accessible(
 
 void cpp_typecheckt::make_ptr_typecast(
   exprt &expr,
-  const pointer_typet &dest_type)
+  const pointer_typet &dest_type,
+  bool static_virtual_base_offset)
 {
   typet src_type = expr.type();
 
@@ -5323,103 +5498,118 @@ void cpp_typecheckt::make_ptr_typecast(
   }
 
   {
-    const irep_idt &base_name = base->get(ID_name);
-
-    // Skip offset adjustment for virtual inheritance — the layout
-    // involves virtual base pointers that member_offset cannot handle.
-    std::list<irep_idt> virtual_bases;
-    get_virtual_bases(*derived, virtual_bases);
-    if(!virtual_bases.empty())
+    // Where does the base subobject start in the derived class's layout?
+    // Its non-virtual part's first storage component, found by name among
+    // the derived class's components (flattened bases keep their component
+    // names); components of the derived class's virtual bases carry
+    // ID_C_virtual_base -- the base is then reached through a virtual base.
+    const namespacet ns(symbol_table);
+    std::set<irep_idt> base_member_names;
+    for(const auto &c : base->components())
     {
-      expr = typecast_exprt(expr, dest_type);
-      return;
+      if(
+        c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+        c.get_bool(ID_is_static) || c.get_is_padding() ||
+        !c.get(ID_C_virtual_base).empty())
+      {
+        continue;
+      }
+      base_member_names.insert(c.get_name());
     }
 
-    // The base subobject's offset is computed from the layout for every
-    // base, the first one included: the first base is NOT at offset 0 when
-    // the derived class is dynamic and its bases are not (Itanium C++ ABI
-    // 2.4 II.1: the vptr comes first, `struct D : R { virtual void f(); }'
-    // has R at 8).  The offset-0 shortcut for the first base moved R's
-    // constructor onto the vptr.
+    std::optional<mp_integer> base_offset;
+    irep_idt through_virtual_base;
+    for(const auto &comp : derived->components())
     {
-      (void)base_name;
-      // N5008 [intro.object]/[class.derived]: a non-virtual base subobject
-      // occupies a contiguous region of the derived object; its byte offset is
-      // the offset of its lowest-addressed data member.  add_base_components
-      // flattens a base's data members into the derived class preserving their
-      // (fully-qualified) names, so the base's members appear in `derived`
-      // under exactly the names they carry in `base`.  Identify them by exact
-      // component name (robust to namespaces / nested hierarchies) and take the
-      // minimum offset.
-      //
-      // The offset must be computed over the DATA-ONLY layout that
-      // goto-conversion/symex uses: member typedefs (ID_is_type), member
-      // functions (ID_code) and static members carry no per-object storage.
-      // member_offset() sums pointer_offset_bits over *all* preceding
-      // components and so over-counts the many member typedefs of library
-      // classes (e.g. std::vector's _Vector_impl, whose data pointers would
-      // appear at offset 104+ instead of 0), which does not match the actual
-      // object layout.  Sum only the storage-bearing components instead.
-      const namespacet ns(symbol_table);
-      const auto data_offset_bits =
-        [&](const irep_idt &member) -> std::optional<mp_integer>
+      if(base_member_names.find(comp.get_name()) == base_member_names.end())
+        continue;
+      const auto off = member_offset(*derived, comp.get_name(), ns);
+      if(!off.has_value())
+        break;
+      if(!base_offset.has_value() || *off < *base_offset)
       {
-        mp_integer off = 0;
-        for(const auto &c : derived->components())
+        base_offset = off;
+        through_virtual_base = comp.get(ID_C_virtual_base);
+      }
+    }
+
+    if(base_offset.has_value())
+    {
+      if(through_virtual_base.empty() || static_virtual_base_offset)
+      {
+        // a non-virtual base subobject (or a virtual base of THIS complete
+        // object): static offset
+        if(*base_offset != 0)
         {
-          if(c.get_name() == member)
-            return off;
+          exprt char_ptr =
+            typecast_exprt(expr, pointer_type(unsigned_char_type()));
+          exprt offset_expr = from_integer(
+            is_upcast ? *base_offset : -*base_offset, pointer_diff_type());
+          expr = typecast_exprt(plus_exprt(char_ptr, offset_expr), dest_type);
+          return;
+        }
+      }
+      else if(is_upcast)
+      {
+        // Itanium C++ ABI 2.5.2: a virtual base's position depends on the
+        // most derived object; read its offset from the vtable of the
+        // derived class (`@vbase_offset::<V>' in `virtual_table::<derived>',
+        // reached through the derived class's virtual pointer), and add the
+        // static position of the base within that virtual base's
+        // non-virtual part.
+        const irep_idt derived_id = derived->get(ID_name);
+        const irep_idt vtptr_name = vtable_pointer_component(derived_id);
+        const irep_idt vt_name = "virtual_table::" + id2string(derived_id);
+        const symbolt *vt_symbol = symbol_table.lookup(vt_name);
+        std::optional<mp_integer> vbase_start;
+        for(const auto &comp : derived->components())
+        {
           if(
-            c.type().id() == ID_code || c.get_bool(ID_is_type) ||
-            c.get_bool(ID_is_static))
+            comp.get(ID_C_virtual_base) != through_virtual_base ||
+            comp.type().id() == ID_code || comp.get_bool(ID_is_type) ||
+            comp.get_bool(ID_is_static))
+          {
             continue;
-          const auto bits = pointer_offset_bits(c.type(), ns);
-          if(!bits.has_value())
-            return {};
-          off += *bits;
+          }
+          const auto off = member_offset(*derived, comp.get_name(), ns);
+          if(
+            off.has_value() &&
+            (!vbase_start.has_value() || *off < *vbase_start))
+            vbase_start = off;
         }
-        return {};
-      };
-
-      std::set<irep_idt> base_member_names;
-      for(const auto &c : base->components())
-      {
-        // padding components are named per class (`$pad7') and recur in
-        // every class that flattens a base with the same shape: they do
-        // not identify the base subobject
+        const struct_typet::componentt *vptr_comp = nullptr;
+        for(const auto &c : derived->components())
+          if(c.get_name() == vtptr_name)
+            vptr_comp = &c;
+        const irep_idt entry_name = id2string(vt_name) + "::@vbase_offset::" +
+                                    id2string(through_virtual_base);
         if(
-          c.type().id() == ID_code || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static) || c.get_is_padding())
-          continue;
-        base_member_names.insert(c.get_name());
-      }
-
-      bool found = false;
-      mp_integer best = 0;
-      for(const auto &comp : derived->components())
-      {
-        if(base_member_names.find(comp.get_name()) == base_member_names.end())
-          continue;
-        const auto off_bits = data_offset_bits(comp.get_name());
-        if(off_bits.has_value() && (!found || *off_bits < best))
+          vptr_comp != nullptr && vt_symbol != nullptr &&
+          vt_symbol->type.id() == ID_struct && vbase_start.has_value() &&
+          to_struct_type(vt_symbol->type).has_component(entry_name))
         {
-          best = *off_bits;
-          found = true;
+          const exprt derived_ptr =
+            typecast_exprt(expr, pointer_type(struct_tag_typet(derived_id)));
+          member_exprt vptr(
+            dereference_exprt(derived_ptr),
+            vptr_comp->get_name(),
+            vptr_comp->type());
+          typecast_exprt vt_view(vptr, pointer_type(struct_tag_typet(vt_name)));
+          member_exprt vbase_offset(
+            dereference_exprt(vt_view), entry_name, pointer_diff_type());
+          exprt char_ptr =
+            typecast_exprt(expr, pointer_type(unsigned_char_type()));
+          exprt within_vbase =
+            from_integer(*base_offset - *vbase_start, pointer_diff_type());
+          expr = typecast_exprt(
+            plus_exprt(char_ptr, plus_exprt(vbase_offset, within_vbase)),
+            dest_type);
+          return;
         }
       }
-
-      if(found && best != 0)
-      {
-        // bits -> bytes
-        const mp_integer best_bytes = best / 8;
-        exprt char_ptr =
-          typecast_exprt(expr, pointer_type(unsigned_char_type()));
-        exprt offset_expr = from_integer(
-          is_upcast ? best_bytes : -best_bytes, pointer_diff_type());
-        exprt adjusted = plus_exprt(char_ptr, offset_expr);
-        expr = typecast_exprt(adjusted, dest_type);
-        return;
-      }
+      // a downcast from a virtual base has no static offset
+      // ([expr.static.cast]/2 forbids it; dynamic_cast is modelled
+      // elsewhere): plain retyping
     }
   }
 

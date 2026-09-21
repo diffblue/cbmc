@@ -435,8 +435,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
           c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
           c.get_bool(ID_is_static) || c.type().id() == ID_code)
           continue;
-        if(c.get_base_name() == "@most_derived")
-          continue;
 
         const irep_idt &mem = c.get_base_name();
         cpp_namet lhs(mem, loc);
@@ -514,8 +512,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
           c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
           c.get_bool(ID_is_static) || c.type().id() == ID_code)
           continue;
-        if(c.get_base_name() == "@most_derived")
-          continue;
 
         const irep_idt &mem = c.get_base_name();
         exprt lhs_expr;
@@ -584,8 +580,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         if(
           c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
           c.get_bool(ID_is_static) || c.type().id() == ID_code)
-          continue;
-        if(c.get_base_name() == "@most_derived")
           continue;
 
         const irep_idt &mem = c.get_base_name();

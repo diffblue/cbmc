@@ -19,7 +19,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 std::optional<codet> cpp_typecheckt::cpp_destructor(
   const source_locationt &source_location,
   const exprt &object,
-  bool force_direct)
+  bool force_direct,
+  bool base_subobject)
 {
   elaborate_class_template(object.type());
 
@@ -86,17 +87,24 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
 
     irep_idt dtor_name;
     irep_idt dtor_symbol_name;
+    bool has_most_derived_parameter = false;
 
     for(const auto &c : components)
     {
       const typet &type = c.type();
 
+      // (not a thunk of the destructor for a base's vtable, which shares
+      // its name)
       if(
         !c.get_bool(ID_from_base) && type.id() == ID_code &&
-        to_code_type(type).return_type().id() == ID_destructor)
+        to_code_type(type).return_type().id() == ID_destructor &&
+        type.get("#thunk_target").empty())
       {
         dtor_name = c.get_base_name();
         dtor_symbol_name = c.get_name();
+        for(const auto &parameter : to_code_type(type).parameters())
+          if(parameter.get_base_name() == "@most_derived")
+            has_most_derived_parameter = true;
         break;
       }
     }
@@ -115,6 +123,13 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
 
     side_effect_expr_function_callt function_call(
       std::move(member), {}, uninitialized_typet{}, source_location);
+
+    // Itanium C++ ABI 5.1.4: a base subobject is destroyed by the
+    // base-object destructor (D2) of a class with virtual bases -- hidden
+    // parameter `@most_derived' false: it leaves the virtual bases to the
+    // most derived class's destructor (N5008 [class.dtor]/14)
+    if(base_subobject && has_most_derived_parameter)
+      function_call.arguments().push_back(false_exprt());
 
     typecheck_side_effect_function_call(function_call);
 

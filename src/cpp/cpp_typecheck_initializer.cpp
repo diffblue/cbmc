@@ -705,8 +705,6 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           {
             continue;
           }
-          if(c.get_base_name() == "@most_derived")
-            continue;
           if(idx < ops.size())
           {
             exprt val = ops[idx++];

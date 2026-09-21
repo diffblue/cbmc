@@ -76,6 +76,18 @@ void cpp_typecheckt::build_virtual_thunk_body(
     expr_call.arguments().push_back(
       lookup(args[j].get_identifier()).symbol_expr());
 
+  // the target's hidden `@most_derived' parameter, which the thunk (of the
+  // base's signature) lacks: a virtual call reaches the complete object's
+  // destructor
+  const code_typet::parameterst &target_parameters =
+    to_code_type(target_type).parameters();
+  if(
+    target_parameters.size() == args.size() + 1 &&
+    target_parameters.back().get_base_name() == "@most_derived")
+  {
+    expr_call.arguments().push_back(true_exprt());
+  }
+
   if(
     code_type.return_type().id() != ID_empty &&
     code_type.return_type().id() != ID_destructor)
@@ -113,6 +125,89 @@ void cpp_typecheckt::finalize_virtual_thunks(const symbolt &symbol)
   }
 }
 
+void cpp_typecheckt::set_virtual_base_offsets(const symbolt &symbol)
+{
+  PRECONDITION(symbol.type.id() == ID_struct);
+  const struct_typet &struct_type = to_struct_type(symbol.type);
+  const namespacet ns(symbol_table);
+
+  std::list<irep_idt> vbase_ids;
+  get_virtual_bases(struct_type, vbase_ids);
+  if(vbase_ids.empty())
+    return;
+
+  // where each virtual base starts in this complete object: its first
+  // storage component (marked with the virtual base's identifier)
+  std::map<irep_idt, mp_integer> vbase_offset;
+  for(const auto &c : struct_type.components())
+  {
+    const irep_idt vb = c.get(ID_C_virtual_base);
+    if(
+      vb.empty() || vb == "$padding" || c.type().id() == ID_code ||
+      c.get_bool(ID_is_type) || c.get_bool(ID_is_static))
+    {
+      continue;
+    }
+    const auto off = member_offset(struct_type, c.get_name(), ns);
+    if(off.has_value() && vbase_offset.find(vb) == vbase_offset.end())
+      vbase_offset[vb] = *off;
+  }
+
+  // every vtable object of this complete object
+  for(const auto &c : struct_type.components())
+  {
+    if(!c.get_bool(ID_is_vtptr))
+      continue;
+    const exprt value = vtable_pointer_value(symbol, c);
+    if(value.id() != ID_address_of)
+      continue;
+    // the vtable object, through the embedded `@base' members
+    exprt object = to_address_of_expr(value).object();
+    while(object.id() == ID_member)
+      object = to_member_expr(object).compound();
+    if(object.id() != ID_symbol)
+      continue;
+    // the subobject whose pointer this is starts where the pointer lies
+    const auto subobject_offset = member_offset(struct_type, c.get_name(), ns);
+    if(!subobject_offset.has_value())
+      continue;
+
+    // patch the offsets in the object's value, at every embedding level
+    symbolt *vt_object =
+      symbol_table.get_writeable(to_symbol_expr(object).get_identifier());
+    if(vt_object == nullptr || vt_object->value.id() != ID_struct)
+      continue;
+    std::function<void(exprt &)> patch = [&](exprt &value)
+    {
+      if(value.type().id() != ID_struct_tag)
+        return;
+      const struct_typet &vt_type =
+        ns.follow_tag(to_struct_tag_type(value.type()));
+      const auto &comps = vt_type.components();
+      auto &ops = value.operands();
+      if(ops.size() != comps.size())
+        return;
+      for(std::size_t i = 0; i < comps.size(); ++i)
+      {
+        if(comps[i].get_base_name() == "@base")
+        {
+          patch(ops[i]);
+          continue;
+        }
+        const irep_idt vb = comps[i].get(ID_C_virtual_base);
+        if(vb.empty())
+          continue;
+        const auto vb_it = vbase_offset.find(vb);
+        if(vb_it == vbase_offset.end())
+          continue; // an empty virtual base: no storage to locate
+        ops[i] =
+          from_integer(vb_it->second - *subobject_offset, comps[i].type());
+      }
+    };
+    patch(vt_object->value);
+  }
+}
+
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 {
   PRECONDITION(symbol.type.id() == ID_struct);
@@ -122,38 +217,56 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
   const struct_typet &struct_type=to_struct_type(symbol.type);
 
-  for(std::size_t i=0; i < struct_type.components().size(); i++)
-  {
-    const struct_typet::componentt &compo=struct_type.components()[i];
-    if(!compo.get_bool(ID_is_virtual))
-      continue;
-
-    const code_typet &code_type=to_code_type(compo.type());
-    DATA_INVARIANT(code_type.parameters().size() > 0, "parameters expected");
-
-    const pointer_typet &parameter_pointer_type=
-      to_pointer_type(code_type.parameters()[0].type());
-
-    const irep_idt &class_id =
-      parameter_pointer_type.base_type().get(ID_identifier);
-
-    std::map<irep_idt, exprt> &value_map =
-      vt_value_maps[class_id];
-
-    exprt e=symbol_exprt(compo.get_name(), code_type);
-
-    if(compo.get_bool(ID_is_pure_virtual))
+  // The inherited entries first (a later non-virtual base's overrider of
+  // an earlier base's function wins; those of a virtual base -- laid out
+  // last, yet the least derived on its path -- never override), then the
+  // class's own overriders and their thunks, which win over everything.
+  for(int pass = 0; pass < 3; ++pass)
+    for(std::size_t i = 0; i < struct_type.components().size(); i++)
     {
-      pointer_typet code_pointer_type=pointer_type(code_type);
-      e=null_pointer_exprt(code_pointer_type);
-      value_map[compo.get(ID_virtual_name)] = e;
+      const struct_typet::componentt &compo = struct_type.components()[i];
+      if(!compo.get_bool(ID_is_virtual))
+        continue;
+      const bool from_virtual_base = !compo.get(ID_C_virtual_base).empty();
+      if(pass == 0 && (!compo.get_bool(ID_from_base) || from_virtual_base))
+        continue;
+      if(pass == 1 && !from_virtual_base)
+        continue;
+      if(pass == 2 && compo.get_bool(ID_from_base))
+        continue;
+
+      const code_typet &code_type = to_code_type(compo.type());
+      DATA_INVARIANT(code_type.parameters().size() > 0, "parameters expected");
+
+      const pointer_typet &parameter_pointer_type =
+        to_pointer_type(code_type.parameters()[0].type());
+
+      const irep_idt &class_id =
+        parameter_pointer_type.base_type().get(ID_identifier);
+
+      std::map<irep_idt, exprt> &value_map = vt_value_maps[class_id];
+
+      if(
+        pass == 1 &&
+        value_map.find(compo.get(ID_virtual_name)) != value_map.end())
+      {
+        continue;
+      }
+
+      exprt e = symbol_exprt(compo.get_name(), code_type);
+
+      if(compo.get_bool(ID_is_pure_virtual))
+      {
+        pointer_typet code_pointer_type = pointer_type(code_type);
+        e = null_pointer_exprt(code_pointer_type);
+        value_map[compo.get(ID_virtual_name)] = e;
+      }
+      else
+      {
+        address_of_exprt address(e);
+        value_map[compo.get(ID_virtual_name)] = address;
+      }
     }
-    else
-    {
-      address_of_exprt address(e);
-      value_map[compo.get(ID_virtual_name)] = address;
-    }
-  }
 
   // The value of the vtable struct `vt_name' for a complete object of
   // `symbol': the entries of its class, and -- as the first member `@base' --
@@ -189,6 +302,13 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
         values.operands().push_back(std::move(base_value));
         continue;
       }
+      if(!compo.get(ID_C_virtual_base).empty())
+      {
+        // `@vbase_offset::<V>': filled in by set_virtual_base_offsets once
+        // the class's layout (padding included) is final
+        values.operands().push_back(from_integer(0, compo.type()));
+        continue;
+      }
       if(map_it == vt_value_maps.end())
         return nil_exprt{};
       const auto cit2 = map_it->second.find(compo.get_base_name());
@@ -202,11 +322,33 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     return std::move(values);
   };
 
-  // create virtual-table symbol variables
-  for(std::map<irep_idt, std::map<irep_idt, exprt> >::const_iterator cit =
-      vt_value_maps.begin(); cit!=vt_value_maps.end(); cit++)
+  // create virtual-table symbol variables: one per class of the hierarchy
+  // that has a vtable struct -- with virtual functions, or (Itanium C++ ABI
+  // 2.5.2) with virtual bases only, whose vtable holds just their offsets
+  std::vector<irep_idt> classes_with_vtable;
   {
-    const symbolt &late_cast_symb = lookup(cit->first);
+    std::set<irep_idt> seen;
+    std::vector<irep_idt> work{symbol.name};
+    while(!work.empty())
+    {
+      const irep_idt c = work.back();
+      work.pop_back();
+      if(!seen.insert(c).second)
+        continue;
+      if(symbol_table.has_symbol("virtual_table::" + id2string(c)))
+        classes_with_vtable.push_back(c);
+      const symbolt *sym = symbol_table.lookup(c);
+      if(sym == nullptr || sym->type.id() != ID_struct)
+        continue;
+      for(const auto &base : to_struct_type(sym->type).bases())
+        if(base.type().id() == ID_struct_tag)
+          work.push_back(to_struct_tag_type(base.type()).get_identifier());
+    }
+  }
+
+  for(const irep_idt &class_id : classes_with_vtable)
+  {
+    const symbolt &late_cast_symb = lookup(class_id);
     const symbolt &vt_symb_type =
       lookup("virtual_table::" + id2string(late_cast_symb.name));
 
