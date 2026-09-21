@@ -9,27 +9,36 @@
 // member.  The exact libc++ <tuple> get shape.
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;
-template <size_t, class> struct tuple_element;
-template <class... _Tp> class tuple;
+template <size_t, class>
+struct tuple_element;
+template <class... _Tp>
+class tuple;
 template <size_t _Ip, class... _Tp>
-struct tuple_element<_Ip, tuple<_Tp...>> {
+struct tuple_element<_Ip, tuple<_Tp...>>
+{
   typedef int type;
 };
-template <class... _Tp> class tuple {
+template <class... _Tp>
+class tuple
+{
   int __x_;
   template <size_t _Jp, class... _Up>
   friend typename tuple_element<_Jp, tuple<_Up...>>::type &
   get(tuple<_Up...> &) noexcept;
 
 public:
-  tuple(int v) : __x_(v) {}
+  tuple(int v) : __x_(v)
+  {
+  }
 };
 template <size_t _Ip, class... _Tp>
 inline typename tuple_element<_Ip, tuple<_Tp...>>::type &
-get(tuple<_Tp...> &__t) noexcept {
+get(tuple<_Tp...> &__t) noexcept
+{
   return __t.__x_;
 }
-int main() {
+int main()
+{
   tuple<int, int> t(5);
   __CPROVER_assert(get<0>(t) == 5, "friend get");
   return 0;

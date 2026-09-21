@@ -13,12 +13,19 @@ template <class T>
 struct S
 {
   T v;
-  static int sval() { return 7; }
-  ~S() { __CPROVER_assert(0, "must never appear"); }
+  static int sval()
+  {
+    return 7;
+  }
+  ~S()
+  {
+    __CPROVER_assert(0, "must never appear");
+  }
 };
 
 int main()
 {
-  __CPROVER_assert(S<int>::sval() == 7, "static member used, no object created");
+  __CPROVER_assert(
+    S<int>::sval() == 7, "static member used, no object created");
   return 0;
 }

@@ -62,8 +62,10 @@ int main()
 
   // Three arguments, to exercise the loop beyond the first extra element.
   __CPROVER_assert(
-    (all_of<is_small<char>::value, is_small<short>::value, is_small<bool>::
-       value>::value),
+    (all_of<
+      is_small<char>::value,
+      is_small<short>::value,
+      is_small<bool>::value>::value),
     "non-type parameter pack: three true arguments fold to true");
 
   return 0;

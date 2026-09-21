@@ -10,17 +10,20 @@
 // __contention_t_or_largest shape (aliases.h), one of the two
 // remaining blockers of cpp20_ranges_basic_libcxx.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <bool, class T, class F> struct conditional_
+template <bool, class T, class F>
+struct conditional_
 {
   using type = T;
 };
-template <class T, class F> struct conditional_<false, T, F>
+template <class T, class F>
+struct conditional_<false, T, F>
 {
   using type = F;
 };
 template <bool B, class T, class F>
 using conditional_t_ = typename conditional_<B, T, F>::type;
-template <class T> struct lock_free
+template <class T>
+struct lock_free
 {
   static const bool value = __atomic_always_lock_free(sizeof(T), nullptr);
 };
@@ -28,6 +31,7 @@ using contention_t = long long;
 using pick = conditional_t_<lock_free<contention_t>::value, contention_t, int>;
 int main()
 {
-  __CPROVER_assert(sizeof(pick) == sizeof(long long), "alias picks lock-free type");
+  __CPROVER_assert(
+    sizeof(pick) == sizeof(long long), "alias picks lock-free type");
   return 0;
 }

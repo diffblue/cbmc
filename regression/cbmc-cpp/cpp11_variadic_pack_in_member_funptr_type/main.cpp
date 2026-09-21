@@ -32,9 +32,11 @@ int add(int a, int b)
 int main()
 {
   Func<int(int, int)> f;
-  f.fp = add; // binds only if Fp is int(*)(int,int), not the collapsed int(*)(int)
+  f.fp =
+    add; // binds only if Fp is int(*)(int,int), not the collapsed int(*)(int)
   int r = f.fp(2, 3);
-  __CPROVER_assert(r == 5, "member function-pointer pack expanded to full arity");
+  __CPROVER_assert(
+    r == 5, "member function-pointer pack expanded to full arity");
   __CPROVER_assert(r == 0, "WRONG must FAIL");
   return 0;
 }

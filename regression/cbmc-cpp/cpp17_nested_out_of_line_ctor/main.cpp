@@ -7,18 +7,24 @@
 // separate, pre-existing defect).  g++/clang++/valgrind run clean.
 
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct Outer {
-  struct sentry {
+template <class T>
+struct Outer
+{
+  struct sentry
+  {
     sentry(Outer &o);
     bool ok_;
   };
   int v;
 };
-template <class T> Outer<T>::sentry::sentry(Outer<T> &o) : ok_(false) {
-  if (o.v)
+template <class T>
+Outer<T>::sentry::sentry(Outer<T> &o) : ok_(false)
+{
+  if(o.v)
     ok_ = true;
 }
-int main() {
+int main()
+{
   Outer<int> o;
   o.v = 1;
   Outer<int>::sentry s(o);

@@ -106,8 +106,8 @@ struct tuple : _Tuple_impl<0, _Elements...>
 {
   template <
     typename... _UElements,
-    enable_if_t_<_TupleConstraints<_Elements...>::template ic<_UElements...>()> =
-      true>
+    enable_if_t_<
+      _TupleConstraints<_Elements...>::template ic<_UElements...>()> = true>
   tuple(_UElements... __e) : _Tuple_impl<0, _Elements...>(__e...)
   {
   }

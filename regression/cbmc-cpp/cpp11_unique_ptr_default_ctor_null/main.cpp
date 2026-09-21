@@ -28,6 +28,7 @@ struct C
 int main()
 {
   std::unique_ptr<C> p;
-  __CPROVER_assert(p.get() == nullptr, "default-constructed unique_ptr is null");
+  __CPROVER_assert(
+    p.get() == nullptr, "default-constructed unique_ptr is null");
   return 0;
 }

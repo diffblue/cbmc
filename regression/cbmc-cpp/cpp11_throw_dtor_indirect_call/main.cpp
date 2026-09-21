@@ -80,7 +80,8 @@ int main()
   }
   catch(B &)
   {
-    __CPROVER_assert(destroyed == 1, "destroyed across a function-pointer call");
+    __CPROVER_assert(
+      destroyed == 1, "destroyed across a function-pointer call");
   }
 
   destroyed = 0;

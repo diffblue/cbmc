@@ -28,7 +28,9 @@ template <typename>
 struct container
 {
   ref_t<int> member;
-  container(char *, long) {}
+  container(char *, long)
+  {
+  }
 };
 
 // A declaration whose signature instantiates container<wchar_t> *before* the

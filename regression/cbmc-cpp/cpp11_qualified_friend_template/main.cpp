@@ -3,7 +3,10 @@ template <class T>
 struct vec
 {
   T v[2];
-  int size() const { return 2; }
+  int size() const
+  {
+    return 2;
+  }
 };
 namespace ns
 {
@@ -29,8 +32,12 @@ class results : private vec<I>
   typedef vec<I> _Unchecked;
   template <class I2, class A2>
   friend int det::algo(I2, results<I2, A2> &);
+
 public:
-  results() { this->v[0] = 5; }
+  results()
+  {
+    this->v[0] = 5;
+  }
 };
 } // namespace inner
 namespace det
@@ -46,6 +53,8 @@ int algo(I s, inner::results<I, A> &m)
 int main()
 {
   ns::inner::results<int, char> r;
-  __CPROVER_assert(ns::det::algo(1, r) == 8, "qualified friend template binds private-base reference");
+  __CPROVER_assert(
+    ns::det::algo(1, r) == 8,
+    "qualified friend template binds private-base reference");
   return 0;
 }

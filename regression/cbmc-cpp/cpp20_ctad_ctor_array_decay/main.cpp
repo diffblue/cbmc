@@ -8,14 +8,16 @@
 // to non-array).  This was the ranges pipe's last blocker
 // (counted_iterator(base_, count_) with base_ = int(&)[1]).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class I> struct wrap
+template <class I>
+struct wrap
 {
   wrap(I i, int) : cur_(i)
   {
   }
   I cur_;
 };
-template <class V> struct holder
+template <class V>
+struct holder
 {
   V base_;
   auto make()

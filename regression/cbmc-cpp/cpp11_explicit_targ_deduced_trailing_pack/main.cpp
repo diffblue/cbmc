@@ -30,7 +30,7 @@
 extern "C" void __CPROVER_assert(int, const char *);
 
 template <class R, class F, class... A>
-R invoke_r(F f, A &&... a)
+R invoke_r(F f, A &&...a)
 {
   return f(static_cast<A &&>(a)...);
 }
@@ -44,7 +44,8 @@ int main()
 {
   int (*fp)(int, int) = add;
   int r = invoke_r<int>(fp, 2, 3); // explicit R, deduce F + trailing pack A
-  __CPROVER_assert(r == 5, "explicit-targ + deduced trailing pack instantiates");
+  __CPROVER_assert(
+    r == 5, "explicit-targ + deduced trailing pack instantiates");
   __CPROVER_assert(r == 0, "WRONG must FAIL");
   return 0;
 }

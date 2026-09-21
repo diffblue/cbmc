@@ -6,9 +6,12 @@
 // member and malformed initialiser.  Distilled from libc++
 // __perfect_forward under the ranges views::take pipe.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T, T...> struct integer_sequence;
-template <long... I> using index_sequence = integer_sequence<unsigned long, I...>;
-template <long N> int get()
+template <class T, T...>
+struct integer_sequence;
+template <long... I>
+using index_sequence = integer_sequence<unsigned long, I...>;
+template <long N>
+int get()
 {
   return static_cast<int>(N);
 }
@@ -19,10 +22,13 @@ struct op
     return a() * 10 + b();
   }
 };
-template <class...> struct pf;
-template <class Op, long... Idx> struct pf<Op, index_sequence<Idx...>>
+template <class...>
+struct pf;
+template <class Op, long... Idx>
+struct pf<Op, index_sequence<Idx...>>
 {
-  template <class...> auto operator()() -> decltype(Op()(get<Idx>...))
+  template <class...>
+  auto operator()() -> decltype(Op()(get<Idx>...))
   {
     return Op()(get<Idx>...);
   }
@@ -30,7 +36,8 @@ template <class Op, long... Idx> struct pf<Op, index_sequence<Idx...>>
 struct bb : pf<op, index_sequence<0, 1>>
 {
 } c;
-template <class F> decltype(F()()) invoke_(F f)
+template <class F>
+decltype(F()()) invoke_(F f)
 {
   return f();
 }

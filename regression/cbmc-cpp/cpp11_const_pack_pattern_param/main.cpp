@@ -22,7 +22,9 @@ template <typename... Es>
 struct Tup
 {
   int first;
-  Tup(const Es &... e) : first(sum(e...)) {}
+  Tup(const Es &...e) : first(sum(e...))
+  {
+  }
   static int sum(int a, double b, char c)
   {
     return a + (int)b + (c == 'a');

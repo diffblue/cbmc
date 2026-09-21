@@ -62,7 +62,8 @@ struct NoFoo
 int main()
 {
   __CPROVER_assert(has<foo_t, WithFoo>::value, "Op<WithFoo> valid -> detected");
-  __CPROVER_assert(!has<foo_t, NoFoo>::value, "Op<NoFoo> invalid -> not detected");
+  __CPROVER_assert(
+    !has<foo_t, NoFoo>::value, "Op<NoFoo> invalid -> not detected");
   __CPROVER_assert(!has<foo_t, WithFoo>::value, "WRONG must FAIL");
   return 0;
 }

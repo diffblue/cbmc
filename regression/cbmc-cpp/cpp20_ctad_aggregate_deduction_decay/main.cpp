@@ -11,10 +11,16 @@ extern "C" void __CPROVER_assert(bool, const char *);
 namespace std
 {
 template <class _From, class>
-concept convertible_to = requires { _From(); };
-template <class> using iter_difference_t = int;
-template <class _Rp> using range_difference_t = iter_difference_t<_Rp>;
-template <class _View> struct take_view
+concept convertible_to = requires
+{
+  _From();
+};
+template <class>
+using iter_difference_t = int;
+template <class _Rp>
+using range_difference_t = iter_difference_t<_Rp>;
+template <class _View>
+struct take_view
 {
   _View __base_;
   range_difference_t<_View> __count_;

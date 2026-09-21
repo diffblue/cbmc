@@ -20,59 +20,109 @@ extern "C" void __CPROVER_assert(bool, const char *);
 struct P
 {
   int p;
-  P() : p(1) {}
-  virtual int f() { return 10; }
-  virtual int h() { return 100; }
+  P() : p(1)
+  {
+  }
+  virtual int f()
+  {
+    return 10;
+  }
+  virtual int h()
+  {
+    return 100;
+  }
 };
 
 // shares P's vptr: sizeof(X) == sizeof(P) + sizeof(int)
 struct X : P
 {
   int x;
-  X() : x(2) {}
-  int f() override { return 20; }
-  virtual int g() { return 30; }
+  X() : x(2)
+  {
+  }
+  int f() override
+  {
+    return 20;
+  }
+  virtual int g()
+  {
+    return 30;
+  }
 };
 
 // three levels: Y's entries follow X's, which follow P's
 struct Y : X
 {
   int y;
-  Y() : y(3) {}
-  int g() override { return 40; }
-  int h() override { return 400; }
-  virtual int k() { return 50; }
+  Y() : y(3)
+  {
+  }
+  int g() override
+  {
+    return 40;
+  }
+  int h() override
+  {
+    return 400;
+  }
+  virtual int k()
+  {
+    return 50;
+  }
 };
 
 struct R
 {
   int r;
-  R() : r(7) {}
+  R() : r(7)
+  {
+  }
 };
 
 // primary base P laid out first although R is declared first
 struct S : R, P
 {
   int s;
-  S() : s(9) {}
-  int f() override { return 11; }
+  S() : s(9)
+  {
+  }
+  int f() override
+  {
+    return 11;
+  }
 };
 
 struct Q
 {
   int q;
-  Q() : q(5) {}
-  virtual int m() { return 60; }
+  Q() : q(5)
+  {
+  }
+  virtual int m()
+  {
+    return 60;
+  }
 };
 
 // two dynamic bases: P is primary (shares the vptr), Q keeps its own
 struct T : P, Q
 {
   int t;
-  T() : t(9) {}
-  int f() override { return 12; }
-  int m() override { return 61; }
-  virtual int g() { return 13; }
+  T() : t(9)
+  {
+  }
+  int f() override
+  {
+    return 12;
+  }
+  int m() override
+  {
+    return 61;
+  }
+  virtual int g()
+  {
+    return 13;
+  }
 };
 
 int main()

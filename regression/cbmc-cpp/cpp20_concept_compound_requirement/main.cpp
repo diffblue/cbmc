@@ -8,13 +8,19 @@ template <class A, class B>
 concept SameAs = __is_same(A, B);
 
 template <class T>
-concept PreIncReturnsRef = requires(T a) {
-  { ++a } -> SameAs<T &>;
+concept PreIncReturnsRef = requires(T a)
+{
+  {
+    ++a
+    } -> SameAs<T &>;
 };
 
 template <class T>
-concept PlusReturnsValue = requires(T a) {
-  { a + a } -> SameAs<T>;
+concept PlusReturnsValue = requires(T a)
+{
+  {
+    a + a
+    } -> SameAs<T>;
 };
 
 int main()

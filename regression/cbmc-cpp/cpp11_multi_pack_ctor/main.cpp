@@ -9,15 +9,21 @@
 // pack arities (Uf=2, Ul=0, Up=2 -> 202).
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;
-template <size_t...> struct idx {};
-template <class...> struct types {};
+template <size_t...>
+struct idx
+{
+};
+template <class...>
+struct types
+{
+};
 struct S
 {
   int total;
   template <size_t... Uf, class... Tf, size_t... Ul, class... Tl, class... Up>
-  explicit S(idx<Uf...>, types<Tf...>, idx<Ul...>, types<Tl...>, Up &&... u)
-    : total(static_cast<int>(sizeof...(Uf) * 100 + sizeof...(Ul) * 10 +
-                             sizeof...(Up)))
+  explicit S(idx<Uf...>, types<Tf...>, idx<Ul...>, types<Tl...>, Up &&...u)
+    : total(static_cast<int>(
+        sizeof...(Uf) * 100 + sizeof...(Ul) * 10 + sizeof...(Up)))
   {
   }
 };

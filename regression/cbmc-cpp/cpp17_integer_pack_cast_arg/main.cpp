@@ -60,6 +60,7 @@ int main()
     sum_impl(mkseq<unsigned long, 2>{}) == 1, "cast pack {0,1}: 0+1==1");
   // std::make_index_sequence<3> == index_sequence<0, 1, 2>; add3 == 3
   __CPROVER_assert(
-    real_impl(std::make_index_sequence<3>{}) == 3, "real seq {0,1,2}: 0+1+2==3");
+    real_impl(std::make_index_sequence<3>{}) == 3,
+    "real seq {0,1,2}: 0+1+2==3");
   return 0;
 }

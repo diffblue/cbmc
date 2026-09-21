@@ -10,13 +10,21 @@
 // shape; here, main itself).
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;
-template <size_t...> struct idx {};
-template <class T, T... Vs> struct iseq
+template <size_t...>
+struct idx
+{
+};
+template <class T, T... Vs>
+struct iseq
 {
   template <size_t S>
   using to_idx = idx<(Vs + S)...>;
 };
-template <size_t... Is> int len(idx<Is...>) { return sizeof...(Is); }
+template <size_t... Is>
+int len(idx<Is...>)
+{
+  return sizeof...(Is);
+}
 int main()
 {
   // the enclosing instance's pack Vs is EMPTY: to_idx<0> = idx<>

@@ -12,7 +12,7 @@ int main()
   asm volatile("" : "=r"(b) : "r"(a) : "memory");
   asm("" : : : "memory");
   asm("" ::: "memory");
-  asm("" : "=r"(b) :: "memory");
+  asm("" : "=r"(b)::"memory");
   asm("nop" ::);
   int x = dontcare<int>();
   int reached = 1;

@@ -11,7 +11,9 @@ extern "C" void __CPROVER_assert(int, const char *);
 struct S
 {
   int v;
-  S(const char *) : v(7) {}
+  S(const char *) : v(7)
+  {
+  }
 };
 
 template <typename U = int>

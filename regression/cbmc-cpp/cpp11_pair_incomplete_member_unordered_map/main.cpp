@@ -23,8 +23,8 @@
 // replace_symbol.cpp (std::unordered_map<irep_idt, irep_idt> members).
 // assertion.2 must FAIL, proving assertion.1 is non-vacuous.
 
-#include <unordered_map>
 #include <string>
+#include <unordered_map>
 
 struct DS
 {

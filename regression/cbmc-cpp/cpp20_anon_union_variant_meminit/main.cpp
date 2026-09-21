@@ -16,7 +16,8 @@ struct allocator : __non_trivial_if
 template <class>
 struct __optional_destruct_base
 {
-  union {
+  union
+  {
     char __null_state_;
     allocator __val_;
   };

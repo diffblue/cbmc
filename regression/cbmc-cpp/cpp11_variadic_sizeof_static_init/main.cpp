@@ -17,6 +17,7 @@ int main()
 {
   __CPROVER_assert(
     counter<int, char, long>::n == 3, "sizeof...(T) in static init is 3");
-  __CPROVER_assert(counter<>::n == 0, "sizeof...(T) in static init is 0 (empty)");
+  __CPROVER_assert(
+    counter<>::n == 0, "sizeof...(T) in static init is 0 (empty)");
   return 0;
 }

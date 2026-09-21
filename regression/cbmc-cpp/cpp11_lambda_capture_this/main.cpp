@@ -8,7 +8,9 @@ struct Counter
 {
   int v;
 
-  Counter(int start) : v(start) {}
+  Counter(int start) : v(start)
+  {
+  }
 
   // [this]: member access is by reference (the live object)
   int peek_via_this() const
@@ -44,7 +46,8 @@ int main()
 {
   Counter c(10);
   __CPROVER_assert(c.peek_via_this() == 10, "[this] reads the live member");
-  __CPROVER_assert(c.peek_via_eq() == 10, "[=] in member reads the live member");
+  __CPROVER_assert(
+    c.peek_via_eq() == 10, "[=] in member reads the live member");
 
   c.bump(5);
   __CPROVER_assert(c.v == 15, "[this] modifies the live member");

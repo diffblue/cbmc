@@ -35,7 +35,8 @@ struct S<T &&>
 
 int main()
 {
-  __CPROVER_assert(S<int &>::v == 1, "lvalue-reference specialization selected");
+  __CPROVER_assert(
+    S<int &>::v == 1, "lvalue-reference specialization selected");
   __CPROVER_assert(
     S<int &&>::v == 2, "rvalue-reference specialization selected");
   return 0;

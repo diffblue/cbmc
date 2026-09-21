@@ -8,7 +8,8 @@
 // corresponding template parameter").  CBMC currently ACCEPTS and
 // verifies successfully.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <unsigned long...> struct indices
+template <unsigned long...>
+struct indices
 {
 };
 struct impl
@@ -18,7 +19,8 @@ struct impl
   // [temp.deduct.type]/17 -- the deduced value's type must match the
   // corresponding template parameter's type EXACTLY (long != unsigned
   // long), so this candidate never matches.
-  template <long... _Uf> impl(indices<_Uf...>) : n(sizeof...(_Uf))
+  template <long... _Uf>
+  impl(indices<_Uf...>) : n(sizeof...(_Uf))
   {
   }
 };

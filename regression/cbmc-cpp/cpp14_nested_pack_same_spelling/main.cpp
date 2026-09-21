@@ -10,24 +10,29 @@
 // resolve: constructor void () / constructor void (void)").
 // g++ rejects the alias-template pack deduction shape; clang accepts.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <long...> struct tuple_indices
+template <long...>
+struct tuple_indices
 {
 };
-template <class _IdxType, _IdxType... _Values> struct integer_seq
+template <class _IdxType, _IdxType... _Values>
+struct integer_seq
 {
-  template <long> using to_indices = tuple_indices<_Values...>;
+  template <long>
+  using to_indices = tuple_indices<_Values...>;
 };
 template <long _Ep, long _Sp>
 using make_indices_imp =
   typename __make_integer_seq<integer_seq, long, _Ep - _Sp>::
     template to_indices<_Sp>;
-template <class... T> struct tuple_types
+template <class... T>
+struct tuple_types
 {
   static const int size = sizeof...(T);
 };
 template <long _Idx, class... _Types>
 using type_pack_element = __type_pack_element<_Idx, _Types...>;
-template <class _TupleTypes, class _Idxs> struct make_tuple_types_flat;
+template <class _TupleTypes, class _Idxs>
+struct make_tuple_types_flat;
 // the outer expansion is governed by _Idx ONLY; _Types is consumed by
 // the nested type_pack_element<_Idx, _Types...>
 template <template <class...> class _Tuple, class... _Types, long... _Idx>
@@ -35,14 +40,16 @@ struct make_tuple_types_flat<_Tuple<_Types...>, tuple_indices<_Idx...>>
 {
   using type = tuple_types<type_pack_element<_Idx, _Types...>...>;
 };
-template <class _Tp, long _Ep, long _Sp> struct make_tuple_types
+template <class _Tp, long _Ep, long _Sp>
+struct make_tuple_types
 {
   using type =
     typename make_tuple_types_flat<_Tp, make_indices_imp<_Ep, _Sp>>::type;
 };
 // another template whose pack is ALSO spelled _Idx: instantiated FIRST
 // with a non-empty pack, leaving a same-spelling entry in the flat map
-template <class _Op, class _Sq, class... _Bound> struct pf_impl;
+template <class _Op, class _Sq, class... _Bound>
+struct pf_impl;
 template <class _Op, long... _Idx, class... _Bound>
 struct pf_impl<_Op, tuple_indices<_Idx...>, _Bound...>
 {
@@ -53,12 +60,11 @@ struct pf_impl<_Op, tuple_indices<_Idx...>, _Bound...>
   }
   // the make_tuple_types use INSIDE the same instantiation, with an
   // EMPTY range (Ep == Sp) and a NON-EMPTY one
-  using full = typename make_tuple_types<tuple_types<_Bound...>,
-                                         static_cast<long>(sizeof...(_Bound)),
-                                         0>::type;
-  using empty = typename make_tuple_types<tuple_types<_Bound...>,
-                                          2,
-                                          2>::type;
+  using full = typename make_tuple_types<
+    tuple_types<_Bound...>,
+    static_cast<long>(sizeof...(_Bound)),
+    0>::type;
+  using empty = typename make_tuple_types<tuple_types<_Bound...>, 2, 2>::type;
 };
 int main()
 {

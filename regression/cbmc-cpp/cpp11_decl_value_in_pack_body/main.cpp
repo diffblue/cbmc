@@ -18,18 +18,20 @@ extern "C" void __CPROVER_assert(bool, const char *);
 struct S
 {
   int tag;
-  S(const char *s) : tag(s[0]) {}
+  S(const char *s) : tag(s[0])
+  {
+  }
 };
 
 template <typename... Params>
-int inner(const int line, const S &condition, Params &&... params)
+int inner(const int line, const S &condition, Params &&...params)
 {
   S backtrace = "b";
   return backtrace.tag + condition.tag + line;
 }
 
 template <typename... Diagnostics>
-int outer(int line, S reason, S condition, Diagnostics &&... diagnostics)
+int outer(int line, S reason, S condition, Diagnostics &&...diagnostics)
 {
   return inner(line, reason, condition, 0);
 }

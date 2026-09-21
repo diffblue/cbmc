@@ -1,7 +1,20 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-struct __attribute__((packed)) H { unsigned char o : 4; unsigned char k : 4; unsigned short w; };
-struct __attribute__((packed)) P { unsigned char o; unsigned short w; };
-struct Q { unsigned char o; unsigned short w; } __attribute__((packed));
+struct __attribute__((packed)) H
+{
+  unsigned char o : 4;
+  unsigned char k : 4;
+  unsigned short w;
+};
+struct __attribute__((packed)) P
+{
+  unsigned char o;
+  unsigned short w;
+};
+struct Q
+{
+  unsigned char o;
+  unsigned short w;
+} __attribute__((packed));
 int main()
 {
   __CPROVER_assert(sizeof(P) == 3, "attribute before name: packed honoured");

@@ -7,13 +7,16 @@
 // constructor and fail ("found no match for symbol 'leaf'"), dropping
 // the body (wrong-code).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class _Hp> struct leaf
+template <class _Hp>
+struct leaf
 {
   _Hp __value_;
 };
-template <class... _Tp> struct impl : leaf<_Tp>...
+template <class... _Tp>
+struct impl : leaf<_Tp>...
 {
-  template <class... _Up> impl(_Up... __u) : leaf<_Up>{__u}...
+  template <class... _Up>
+  impl(_Up... __u) : leaf<_Up>{__u}...
   {
   }
 };

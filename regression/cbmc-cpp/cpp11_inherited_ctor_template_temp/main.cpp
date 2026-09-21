@@ -7,25 +7,31 @@
 // wrong-code).  Distilled from libc++ __bind_back_t under the ranges
 // views::take pipe.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class... T> struct tupish
+template <class... T>
+struct tupish
 {
   int n;
-  template <class... U> tupish(U... u) : n(static_cast<int>(sizeof...(U)))
+  template <class... U>
+  tupish(U... u) : n(static_cast<int>(sizeof...(U)))
   {
   }
 };
-template <class Op, class... Bound> struct pf
+template <class Op, class... Bound>
+struct pf
 {
   tupish<Bound...> bound_;
-  template <class... A> pf(A... a) : bound_(a...)
+  template <class... A>
+  pf(A... a) : bound_(a...)
   {
   }
 };
-template <class Fn, class B> struct bb : pf<int, Fn, B>
+template <class Fn, class B>
+struct bb : pf<int, Fn, B>
 {
   using pf<int, Fn, B>::pf;
 };
-template <class Fn, class... A> auto make(Fn f, A... a) -> bb<Fn, int>
+template <class Fn, class... A>
+auto make(Fn f, A... a) -> bb<Fn, int>
 {
   return bb<Fn, int>(f, 0);
 }
@@ -34,6 +40,7 @@ struct takeish
 };
 int main()
 {
-  __CPROVER_assert(make(takeish(), 5).bound_.n == 2, "inherited ctor into member pack");
+  __CPROVER_assert(
+    make(takeish(), 5).bound_.n == 2, "inherited ctor into member pack");
   return 0;
 }

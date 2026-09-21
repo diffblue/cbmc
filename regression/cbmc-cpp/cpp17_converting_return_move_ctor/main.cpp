@@ -25,14 +25,16 @@ struct derived_t : base_t
     return 2;
   }
 };
-template <class T> struct uptr
+template <class T>
+struct uptr
 {
   T *p_;
   explicit uptr(T *p) : p_(p)
   {
   }
   // converting move constructor ([unique.ptr.single.ctor]/26 shape)
-  template <class U> uptr(uptr<U> &&o) : p_(o.release())
+  template <class U>
+  uptr(uptr<U> &&o) : p_(o.release())
   {
   }
   T *release()

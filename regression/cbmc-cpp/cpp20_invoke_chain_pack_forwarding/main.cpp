@@ -9,7 +9,8 @@
 // showed invoke_result_t<F,int*,int> becoming __invoke_of<F,int*,int*>).
 // 27 lines; g++ and clang++ both accept (-Werror) and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> T &&declval();
+template <class T>
+T &&declval();
 struct fn
 {
   int operator()(int *p, int n)
@@ -19,7 +20,8 @@ struct fn
 };
 template <class F, class... A>
 decltype(declval<F>()(declval<A>()...)) __invoke(F, A &&...);
-template <class, class F, class... A> struct invokable_r
+template <class, class F, class... A>
+struct invokable_r
 {
   template <class XF, class... XA>
   static decltype(__invoke(declval<XF>(), declval<XA>()...)) try_call(int);
@@ -27,7 +29,8 @@ template <class, class F, class... A> struct invokable_r
 };
 template <class F, class... A>
 using invoke_result_t = typename invokable_r<void, F, A...>::result;
-template <class F, class... A> invoke_result_t<F, A...> invoke(F f, A &&...a)
+template <class F, class... A>
+invoke_result_t<F, A...> invoke(F f, A &&...a)
 {
   return f(static_cast<A &&>(a)...);
 }

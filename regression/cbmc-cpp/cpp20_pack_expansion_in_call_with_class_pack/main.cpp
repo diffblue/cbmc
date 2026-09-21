@@ -11,19 +11,23 @@
 // expansion form.
 // g++ and clang++ both accept and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <unsigned long...> struct iseq
+template <unsigned long...>
+struct iseq
 {
 };
-template <class T> struct tup
+template <class T>
+struct tup
 {
   T v_;
 };
-template <int I, class T> T get(tup<T> t)
+template <int I, class T>
+T get(tup<T> t)
 {
   return t.v_;
 }
 // bound args held in a BASE subobject (libc++ __perfect_forward shape)
-template <class Op, class Seq, class... B> struct pf_impl;
+template <class Op, class Seq, class... B>
+struct pf_impl;
 template <class Op, unsigned long... Ip, class... B>
 struct pf_impl<Op, iseq<Ip...>, B...>
 {
@@ -31,7 +35,8 @@ struct pf_impl<Op, iseq<Ip...>, B...>
   pf_impl(B... b) : bound_{b...}
   {
   }
-  template <class... A> auto operator()(A &&...a)
+  template <class... A>
+  auto operator()(A &&...a)
   {
     return Op()(static_cast<A &&>(a)..., get<Ip>(bound_)...);
   }

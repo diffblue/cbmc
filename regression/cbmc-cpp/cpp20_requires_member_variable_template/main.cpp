@@ -5,10 +5,11 @@ struct optional
   template <typename, typename = _Tp>
   static constexpr bool ok = true;
   int val = 0;
-  optional() {}
+  optional()
+  {
+  }
   template <typename _Up = _Tp>
-    requires ok<_Up>
-  optional(_Up v) : val(v)
+  requires ok<_Up> optional(_Up v) : val(v)
   {
   }
 };

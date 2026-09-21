@@ -34,8 +34,8 @@ struct prt
   {
   }
   template <class U = T>
-    requires(is_constructible<T, U>::value)
-  constexpr prt(U &&b) : second(static_cast<U &&>(b))
+  requires(is_constructible<T, U>::value) constexpr prt(U &&b)
+    : second(static_cast<U &&>(b))
   {
   }
   ~prt()

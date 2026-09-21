@@ -62,7 +62,8 @@ int count_impl(talias<W...>)
 
 int main()
 {
-  __CPROVER_assert(sum_impl(idxseq<1, 2>{}) == 3, "non-type alias pack: 1+2==3");
+  __CPROVER_assert(
+    sum_impl(idxseq<1, 2>{}) == 3, "non-type alias pack: 1+2==3");
   __CPROVER_assert(
     count_impl(talias<char, char, char>{}) == 3, "type alias pack: count==3");
   return 0;

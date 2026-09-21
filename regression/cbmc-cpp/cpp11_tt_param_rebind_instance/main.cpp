@@ -16,13 +16,15 @@
 // of rebind instances was load-bearing for sharing; needs scoped
 // rework.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class, class> struct R;
+template <class, class>
+struct R;
 template <template <class> class _Alloc, class _Tp, class _Up>
 struct R<_Alloc<_Tp>, _Up>
 {
   typedef _Alloc<_Up> type;
 };
-template <class T> struct allocator
+template <class T>
+struct allocator
 {
   T v;
 };

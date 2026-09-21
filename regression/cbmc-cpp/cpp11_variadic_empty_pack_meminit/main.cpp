@@ -29,19 +29,24 @@ extern "C" void __CPROVER_assert(int, const char *);
 struct Base
 {
   int tag;
-  Base() : tag(7) {}
+  Base() : tag(7)
+  {
+  }
 };
 
 template <class... T>
 struct Derived : Base
 {
-  Derived(const T &... t) : Base(t...) {} // T empty => Base(t...) is Base()
+  Derived(const T &...t) : Base(t...)
+  {
+  } // T empty => Base(t...) is Base()
 };
 
 int main()
 {
   Derived<> d; // empty parameter pack
-  __CPROVER_assert(static_cast<Base &>(d).tag == 7, "empty-pack base initialized");
+  __CPROVER_assert(
+    static_cast<Base &>(d).tag == 7, "empty-pack base initialized");
   __CPROVER_assert(static_cast<Base &>(d).tag == 0, "WRONG must FAIL");
   return 0;
 }

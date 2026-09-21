@@ -13,11 +13,16 @@ namespace std
 struct strong_ordering
 {
   int _v;
-  constexpr explicit strong_ordering(int v) : _v(v) {}
+  constexpr explicit strong_ordering(int v) : _v(v)
+  {
+  }
   static const strong_ordering less;
   static const strong_ordering equal;
   static const strong_ordering greater;
-  constexpr bool operator==(strong_ordering o) const { return _v == o._v; }
+  constexpr bool operator==(strong_ordering o) const
+  {
+    return _v == o._v;
+  }
 };
 constexpr strong_ordering strong_ordering::less{-1};
 constexpr strong_ordering strong_ordering::equal{0};
@@ -27,9 +32,14 @@ constexpr strong_ordering strong_ordering::greater{1};
 int main()
 {
   int a = 1, b = 2;
+  // clang-format off
+  // (clang-format 15 with the repository's c++17 setting splits `<=>')
   std::strong_ordering r = a <=> b;
   __CPROVER_assert(r == std::strong_ordering::less, "1 <=> 2 is less");
-  __CPROVER_assert((5 <=> 5) == std::strong_ordering::equal, "5 <=> 5 is equal");
-  __CPROVER_assert((9 <=> 4) == std::strong_ordering::greater, "9 <=> 4 greater");
+  __CPROVER_assert(
+    (5 <=> 5) == std::strong_ordering::equal, "5 <=> 5 is equal");
+  __CPROVER_assert(
+    (9 <=> 4) == std::strong_ordering::greater, "9 <=> 4 greater");
+  // clang-format on
   return 0;
 }

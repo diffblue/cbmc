@@ -23,14 +23,16 @@ int main()
 {
   instr i;
   int bump = 2;
-  i.transform([&bump](exprt2 e) -> std::optional<exprt2> {
-    if(e.v == 5)
+  i.transform(
+    [&bump](exprt2 e) -> std::optional<exprt2>
     {
-      e.v = 5 + bump;
-      return e;
-    }
-    return {};
-  });
+      if(e.v == 5)
+      {
+        e.v = 5 + bump;
+        return e;
+      }
+      return {};
+    });
   __CPROVER_assert(i.val == 7, "transform through optional-returning lambda");
   return 0;
 }

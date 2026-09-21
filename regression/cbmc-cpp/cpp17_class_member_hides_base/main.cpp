@@ -19,7 +19,9 @@
 
 struct exprt
 {
-  static void check(const exprt &, int = 0) {}
+  static void check(const exprt &, int = 0)
+  {
+  }
 };
 
 struct expr_protectedt : public exprt

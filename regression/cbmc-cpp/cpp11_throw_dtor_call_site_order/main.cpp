@@ -46,7 +46,8 @@ static void ctor_throws()
   catch(B &)
   {
     __CPROVER_assert(destroyed == 1, "enclosing object a destroyed");
-    __CPROVER_assert(gdtor == 0, "object with throwing constructor NOT destroyed");
+    __CPROVER_assert(
+      gdtor == 0, "object with throwing constructor NOT destroyed");
   }
 }
 

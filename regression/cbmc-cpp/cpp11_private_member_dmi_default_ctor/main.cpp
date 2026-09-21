@@ -23,6 +23,7 @@ int main()
 {
   goto_statet s;
   (void)s;
-  __CPROVER_assert(1, "class with private DMI-bearing member default-constructs");
+  __CPROVER_assert(
+    1, "class with private DMI-bearing member default-constructs");
   return 0;
 }

@@ -10,14 +10,17 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 struct tree
 {
-  template <class K> int lb(K v)
+  template <class K>
+  int lb(K v)
   {
     return 1;
   }
-  template <class K> void lb(K v) const
+  template <class K>
+  void lb(K v) const
   {
   }
-  template <class K> int find(K v)
+  template <class K>
+  int find(K v)
   {
     return lb(v); // non-const this: must select the non-const overload
   }

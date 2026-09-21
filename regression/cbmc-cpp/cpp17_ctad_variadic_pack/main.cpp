@@ -11,13 +11,15 @@ struct T3
 {
   A x;
   B y;
-  T3(A a, B b, Rest...) : x(a), y(b) {}
+  T3(A a, B b, Rest...) : x(a), y(b)
+  {
+  }
 };
 template <typename A, typename B, typename... Rest>
 T3(A, B, Rest...) -> T3<A, B, Rest...>;
 int main()
 {
-  int p, q; // nondet
+  int p, q;              // nondet
   auto t = T3{p, q, 99}; // T3<int,int,int>, Rest = <int>
   __CPROVER_assert(t.x == p, "leading parameter A bound to first argument");
   __CPROVER_assert(t.y == q, "leading parameter B bound to second argument");

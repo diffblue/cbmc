@@ -8,22 +8,38 @@ struct impl
 {
   typedef int type;
   static constexpr int n = sizeof...(A);
-  int m() const { return n; }
+  int m() const
+  {
+    return n;
+  }
 };
-template <class Sig> struct RO;
-template <class F, class... A> struct RO<F(A...)> : public impl<F, A...> {};
+template <class Sig>
+struct RO;
+template <class F, class... A>
+struct RO<F(A...)> : public impl<F, A...>
+{
+};
 // control: the same base clause on a primary template
-template <class F, class... A> struct RO2 : public impl<F, A...> {};
+template <class F, class... A>
+struct RO2 : public impl<F, A...>
+{
+};
 using FP = int (*)(int, int);
 int main()
 {
   RO<FP(int, int)> r;
-  __CPROVER_assert(r.m() == 2, "member function through base with pack (function-type pattern)");
+  __CPROVER_assert(
+    r.m() == 2,
+    "member function through base with pack (function-type pattern)");
   RO2<FP, int, int> r2;
-  __CPROVER_assert(r2.m() == 2, "member function through base with pack (plain primary)");
-  __CPROVER_assert(RO2<FP, int, int>::n == 2, "static through base (plain primary)");
-  __CPROVER_assert(RO<FP(int, int)>::n == 2, "static through base (function-type pattern)");
-  __CPROVER_assert(RO<FP &(int &, char &&)>::n == 2, "reference return and parameters");
+  __CPROVER_assert(
+    r2.m() == 2, "member function through base with pack (plain primary)");
+  __CPROVER_assert(
+    RO2<FP, int, int>::n == 2, "static through base (plain primary)");
+  __CPROVER_assert(
+    RO<FP(int, int)>::n == 2, "static through base (function-type pattern)");
+  __CPROVER_assert(
+    RO<FP &(int &, char &&)>::n == 2, "reference return and parameters");
   RO<FP(int, int)>::type t = 1;
   __CPROVER_assert(t == 1, "typedef through base (function-type pattern)");
   return 0;

@@ -17,11 +17,17 @@ struct cond<true, T, F>
 
 // simple-requirement: satisfied iff `a + a` is a valid expression.
 template <class T>
-concept Addable = requires(T a) { a + a; };
+concept Addable = requires(T a)
+{
+  a + a;
+};
 
 // type-requirement: satisfied iff T::value_type names a type.
 template <class T>
-concept HasValueType = requires { typename T::value_type; };
+concept HasValueType = requires
+{
+  typename T::value_type;
+};
 
 struct WithVT
 {
@@ -36,7 +42,8 @@ int main()
 
   // concept-id as a non-type bool template argument: picks branch T for true.
   typename cond<Addable<int>, int, char>::type picked_true = 0;
-  __CPROVER_assert(sizeof(picked_true) == sizeof(int), "Addable<int> selected int");
+  __CPROVER_assert(
+    sizeof(picked_true) == sizeof(int), "Addable<int> selected int");
 
   return 0;
 }

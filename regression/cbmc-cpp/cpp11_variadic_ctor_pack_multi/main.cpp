@@ -23,8 +23,13 @@ template <unsigned long I, typename H>
 struct HeadBase
 {
   H h;
-  HeadBase(const H &x) : h(x) {}
-  static H &M_head(HeadBase &b) { return b.h; }
+  HeadBase(const H &x) : h(x)
+  {
+  }
+  static H &M_head(HeadBase &b)
+  {
+    return b.h;
+  }
 };
 
 template <unsigned long, typename...>
@@ -33,7 +38,9 @@ struct TImpl;
 template <unsigned long I>
 struct TImpl<I>
 {
-  TImpl() {}
+  TImpl()
+  {
+  }
 };
 
 template <unsigned long I, typename Head, typename... Tail>
@@ -41,8 +48,13 @@ struct TImpl<I, Head, Tail...> : TImpl<I + 1, Tail...>, HeadBase<I, Head>
 {
   typedef HeadBase<I, Head> _Base;
   typedef TImpl<I + 1, Tail...> _Inherited;
-  TImpl(const Head &h, const Tail &... t) : _Inherited(t...), _Base(h) {}
-  static Head &M_head(TImpl &t) { return _Base::M_head(t); }
+  TImpl(const Head &h, const Tail &...t) : _Inherited(t...), _Base(h)
+  {
+  }
+  static Head &M_head(TImpl &t)
+  {
+    return _Base::M_head(t);
+  }
 };
 
 template <unsigned long I, typename Head, typename... Tail>

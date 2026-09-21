@@ -31,10 +31,15 @@
 
 template <typename _Tp, typename _Up>
 struct __replace_first_arg
-{ };
+{
+};
 
-template <template <typename, typename...> class _SomeTemplate,
-          typename _Up, typename _Tp, typename... _Types>
+template <
+  template <typename, typename...>
+  class _SomeTemplate,
+  typename _Up,
+  typename _Tp,
+  typename... _Types>
 struct __replace_first_arg<_SomeTemplate<_Tp, _Types...>, _Up>
 {
   using type = _SomeTemplate<_Up, _Types...>;

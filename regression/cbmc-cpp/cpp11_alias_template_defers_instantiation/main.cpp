@@ -12,18 +12,25 @@
 
 extern "C" void __CPROVER_assert(bool, const char *);
 
-template <class C> struct traits { };
+template <class C>
+struct traits
+{
+};
 
-template <class C, class T, class A> struct basic_str
+template <class C, class T, class A>
+struct basic_str
 {
   C c;
   A a; // requires a complete allocator when the class is instantiated
-  basic_str() : c(0) { }
+  basic_str() : c(0)
+  {
+  }
 };
 
 namespace pmr
 {
-template <class T> class poly_alloc; // only declared here
+template <class T>
+class poly_alloc; // only declared here
 
 template <class C, class T = traits<C>>
 using basic_str = ::basic_str<C, T, poly_alloc<C>>;
@@ -35,11 +42,14 @@ using wstr = basic_str<wchar_t>;
 // directly: likewise
 using str2 = ::basic_str<char, traits<char>, poly_alloc<char>>;
 
-template <class T> class poly_alloc
+template <class T>
+class poly_alloc
 {
 public:
   int k;
-  poly_alloc() : k(3) { }
+  poly_alloc() : k(3)
+  {
+  }
 };
 } // namespace pmr
 
@@ -49,6 +59,7 @@ int main()
   __CPROVER_assert(s.a.k == 3, "member constructed (alias template)");
   pmr::str2 s2;
   __CPROVER_assert(s2.a.k == 3, "member constructed (alias)");
-  __CPROVER_assert(sizeof(pmr::str) == 2 * sizeof(int), "layout has the member");
+  __CPROVER_assert(
+    sizeof(pmr::str) == 2 * sizeof(int), "layout has the member");
   return 0;
 }

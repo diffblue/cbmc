@@ -73,6 +73,7 @@ decltype(auto) outer3(T)
 int main()
 {
   __CPROVER_assert(outer(0) == 1, "local alias seq<0,1>: 0+1==1");
-  __CPROVER_assert(outer3(0) == 6, "dependent local alias seq<1,2,3>: 1+2+3==6");
+  __CPROVER_assert(
+    outer3(0) == 6, "dependent local alias seq<1,2,3>: 1+2+3==6");
   return 0;
 }

@@ -14,11 +14,13 @@
 // __is_referenceable -- the same lookahead is needed for the whole
 // revertible-trait family.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct __make_unsigned
+template <class T>
+struct __make_unsigned
 {
   using __type = T;
 };
-template <> struct __make_unsigned<char>
+template <>
+struct __make_unsigned<char>
 {
   using __type = unsigned char;
 };

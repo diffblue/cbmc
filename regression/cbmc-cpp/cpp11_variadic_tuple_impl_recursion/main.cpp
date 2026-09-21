@@ -28,7 +28,9 @@ template <unsigned long I, typename H>
 struct HeadBase
 {
   H val;
-  HeadBase(H &&h) : val(h) {}
+  HeadBase(H &&h) : val(h)
+  {
+  }
 };
 
 template <unsigned long, typename...>
@@ -37,7 +39,9 @@ struct TImpl;
 template <unsigned long I>
 struct TImpl<I>
 {
-  TImpl() {}
+  TImpl()
+  {
+  }
 };
 
 template <unsigned long I, typename Head, typename... Tail>
@@ -45,7 +49,9 @@ struct TImpl<I, Head, Tail...> : TImpl<I + 1, Tail...>, HeadBase<I, Head>
 {
   typedef TImpl<I + 1, Tail...> Inherited;
   typedef HeadBase<I, Head> Base;
-  TImpl(Head &&h, Tail &&... t) : Inherited(fwd<Tail>(t)...), Base(fwd<Head>(h)) {}
+  TImpl(Head &&h, Tail &&...t) : Inherited(fwd<Tail>(t)...), Base(fwd<Head>(h))
+  {
+  }
 };
 
 int main()
@@ -54,8 +60,11 @@ int main()
   int b = nondet_int();
   int c = nondet_int();
   TImpl<0, int, int, int> t(fwd<int>(a), fwd<int>(b), fwd<int>(c));
-  __CPROVER_assert(static_cast<HeadBase<0, int> &>(t).val == a, "element 0 in HeadBase<0>");
-  __CPROVER_assert(static_cast<HeadBase<2, int> &>(t).val == c, "element 2 in HeadBase<2>");
-  __CPROVER_assert(static_cast<HeadBase<2, int> &>(t).val == a, "WRONG must FAIL");
+  __CPROVER_assert(
+    static_cast<HeadBase<0, int> &>(t).val == a, "element 0 in HeadBase<0>");
+  __CPROVER_assert(
+    static_cast<HeadBase<2, int> &>(t).val == c, "element 2 in HeadBase<2>");
+  __CPROVER_assert(
+    static_cast<HeadBase<2, int> &>(t).val == a, "WRONG must FAIL");
   return 0;
 }

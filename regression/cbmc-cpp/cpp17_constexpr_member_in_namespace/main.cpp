@@ -15,7 +15,8 @@
 //   expected constant expression, but got
 //   'operator(bool)((const struct integral_constant *)&...)'
 
-namespace n {
+namespace n
+{
 
 template <bool _v>
 struct integral_constant
@@ -23,7 +24,10 @@ struct integral_constant
   static constexpr bool value = _v;
   using value_type = bool;
   using type = integral_constant<_v>;
-  constexpr operator value_type() const noexcept { return value; }
+  constexpr operator value_type() const noexcept
+  {
+    return value;
+  }
 };
 
 using true_type = integral_constant<true>;

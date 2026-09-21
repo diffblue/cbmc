@@ -44,7 +44,8 @@ struct L2
 int main()
 {
   __CPROVER_assert(
-    IR<L2 &, bool, bool>::n == 2, "deduced pack arity through partial-spec base");
+    IR<L2 &, bool, bool>::n == 2,
+    "deduced pack arity through partial-spec base");
   __CPROVER_assert(IR<L2 &, bool, bool>::n == 1, "WRONG must FAIL");
   return 0;
 }

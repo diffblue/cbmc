@@ -10,19 +10,30 @@
 // clang++/valgrind run clean (clang-only builtin; g++ n/a).
 
 extern "C" void __CPROVER_assert(bool, const char *);
-template <int v> struct integral_constant {
+template <int v>
+struct integral_constant
+{
   static constexpr int value = v;
 };
-template <class T> using add_rref_t = __add_rvalue_reference(T);
-template <bool = integral_constant<__is_trivially_constructible(
-              add_rref_t<int>)>::value>
-struct base {};
-template <class T> struct opt : base<> {
+template <class T>
+using add_rref_t = __add_rvalue_reference(T);
+template <
+  bool =
+    integral_constant<__is_trivially_constructible(add_rref_t<int>)>::value>
+struct base
+{
+};
+template <class T>
+struct opt : base<>
+{
   using __base = base<>;
   int x;
-  opt() : __base(), x(1) {}
+  opt() : __base(), x(1)
+  {
+  }
 };
-int main() {
+int main()
+{
   opt<int> o;
   __CPROVER_assert(o.x == 1, "member typedef mem-init survives");
   return 0;

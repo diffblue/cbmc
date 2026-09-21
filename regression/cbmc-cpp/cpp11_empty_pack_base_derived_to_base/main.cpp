@@ -27,7 +27,10 @@ template <unsigned long __i, typename _Head>
 struct Head_base
 {
   _Head _M_head_impl;
-  static _Head &_M_head(Head_base &__b) { return __b._M_head_impl; }
+  static _Head &_M_head(Head_base &__b)
+  {
+    return __b._M_head_impl;
+  }
 };
 
 template <typename... _E>
@@ -39,7 +42,10 @@ template <unsigned long __i, typename _Head, typename... _Tail>
 struct Impl : Empty<_Tail...>, Head_base<__i, _Head>
 {
   typedef Head_base<__i, _Head> _Base;
-  static _Head &_M_head(Impl &__t) { return _Base::_M_head(__t); }
+  static _Head &_M_head(Impl &__t)
+  {
+    return _Base::_M_head(__t);
+  }
 };
 
 int main()

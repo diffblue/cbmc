@@ -18,45 +18,46 @@
 
 extern "C" void __CPROVER_assert(int, const char *);
 
-template<bool, typename T = void>
+template <bool, typename T = void>
 struct enable_if
 {
 };
-template<typename T>
+template <typename T>
 struct enable_if<true, T>
 {
   typedef T type;
 };
-template<bool B, typename T = void>
+template <bool B, typename T = void>
 using enable_if_t = typename enable_if<B, T>::type;
 
-template<typename... Ts>
+template <typename... Ts>
 struct TCs
 {
-  template<typename... Us>
+  template <typename... Us>
   static constexpr bool ok()
   {
     return sizeof...(Us) == sizeof...(Ts);
   }
 };
 
-template<typename... Es>
+template <typename... Es>
 struct tup
 {
   int first;
-  template<typename... Us,
-           enable_if_t<TCs<Es...>::template ok<Us...>(), bool> = true>
-  tup(Us &&... u) : first(pick(u...))
+  template <
+    typename... Us,
+    enable_if_t<TCs<Es...>::template ok<Us...>(), bool> = true>
+  tup(Us &&...u) : first(pick(u...))
   {
   }
-  template<typename U0, typename... R>
+  template <typename U0, typename... R>
   static int pick(U0 &&u0, R &&...)
   {
     return (int)u0;
   }
 };
 
-template<typename... Es>
+template <typename... Es>
 tup<Es...> mk(Es... e)
 {
   return tup<Es...>(e...);

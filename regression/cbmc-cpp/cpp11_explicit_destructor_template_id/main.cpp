@@ -10,7 +10,9 @@
 
 struct Base
 {
-  ~Base() {}
+  ~Base()
+  {
+  }
 };
 
 template <class T>
@@ -22,7 +24,10 @@ struct Node : Base
 template <class T>
 struct Wrap
 {
-  static void destroy(Node<T> *n) { n->~Node<T>(); }
+  static void destroy(Node<T> *n)
+  {
+    n->~Node<T>();
+  }
 
   template <class... A>
   void build(Node<T> *n)

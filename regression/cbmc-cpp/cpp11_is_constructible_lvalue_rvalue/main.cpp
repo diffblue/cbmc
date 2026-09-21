@@ -48,7 +48,6 @@ int main()
   __CPROVER_assert(
     from_lvalue && !from_rvalue,
     "two is_constructible queries on one type resolve independently");
-  __CPROVER_assert(
-    !(from_lvalue && !from_rvalue), "WRONG must FAIL");
+  __CPROVER_assert(!(from_lvalue && !from_rvalue), "WRONG must FAIL");
   return 0;
 }

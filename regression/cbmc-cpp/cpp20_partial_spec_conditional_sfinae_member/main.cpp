@@ -48,10 +48,12 @@ struct cref<A, B, void_t<cond_res<A, B>>>
 template <class T>
 struct Outer
 {
-  cref<T, T> same;    // T, T -> common type exists -> specialization (tag 2)
+  cref<T, T> same;     // T, T -> common type exists -> specialization (tag 2)
   cref<int, T *> diff; // int, int* -> no common type -> primary (tag 1)
   int v;
-  Outer() : v(7) {}
+  Outer() : v(7)
+  {
+  }
 };
 
 int main()

@@ -4,12 +4,20 @@
 // or `struct`.  CBMC's `__is_base_of` builtin must accept both.
 #include <type_traits>
 
-struct base_t {};
-struct derived_t : base_t {};
+struct base_t
+{
+};
+struct derived_t : base_t
+{
+};
 
-static_assert(std::is_base_of<base_t, derived_t>::value, "derived_t derives from base_t");
+static_assert(
+  std::is_base_of<base_t, derived_t>::value,
+  "derived_t derives from base_t");
 static_assert(std::is_base_of<base_t, base_t>::value, "base_t is its own base");
-static_assert(!std::is_base_of<derived_t, base_t>::value, "base_t does not derive from derived_t");
+static_assert(
+  !std::is_base_of<derived_t, base_t>::value,
+  "base_t does not derive from derived_t");
 
 int main()
 {

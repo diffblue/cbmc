@@ -4,7 +4,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\[main\.assertion\.1\] line 50 namespaced constexpr operator bool resolved: SUCCESS$
+^\[main\.assertion\.1\] line 54 namespaced constexpr operator bool resolved: SUCCESS$
 --
 ^CONVERSION ERROR$
 ^expected constant expression, but got 'operator\(bool\)\(\(const struct integral_constant \*\)&.*'$

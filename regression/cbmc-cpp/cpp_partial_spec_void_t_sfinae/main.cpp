@@ -48,7 +48,9 @@ struct Outer
   has_mem<T> hm;
   can_foo<T> cf;
   int v;
-  Outer() : v(7) {}
+  Outer() : v(7)
+  {
+  }
 };
 
 int main()

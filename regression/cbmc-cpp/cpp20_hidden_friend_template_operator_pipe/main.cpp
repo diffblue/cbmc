@@ -25,6 +25,7 @@ int main()
   int arr[] = {1, 2, 3, 4, 5};
   range_adaptor<int> take3;
   int r = arr | take3;
-  __CPROVER_assert(r == 2, "array lvalue binds forwarding ref of constrained friend");
+  __CPROVER_assert(
+    r == 2, "array lvalue binds forwarding ref of constrained friend");
   return 0;
 }

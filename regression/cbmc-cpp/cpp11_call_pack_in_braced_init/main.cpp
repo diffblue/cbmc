@@ -31,13 +31,13 @@ T &&fwd(T &x)
 }
 
 template <class... E>
-box2 mk2(E &&... e)
+box2 mk2(E &&...e)
 {
   return box2{fwd(e)...};
 }
 
 template <class... E>
-box3 mk3(E &&... e)
+box3 mk3(E &&...e)
 {
   return box3{fwd(e)...};
 }
@@ -47,7 +47,6 @@ int main()
   auto b = mk2(10, 20);
   __CPROVER_assert(b.a == 10 && b.b == 20, "arity 2: {10,20}");
   auto c = mk3(10, 20, 30);
-  __CPROVER_assert(
-    c.a == 10 && c.b == 20 && c.c == 30, "arity 3: {10,20,30}");
+  __CPROVER_assert(c.a == 10 && c.b == 20 && c.c == 30, "arity 3: {10,20,30}");
   return 0;
 }

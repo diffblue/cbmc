@@ -9,7 +9,10 @@ void *operator new(unsigned long, void *) noexcept;
 template <typename T>
 T &&my_declval() noexcept;
 template <typename _Tp, typename... _Args>
-  requires requires { ::new((void *)0) _Tp(my_declval<_Args>()...); }
+requires requires
+{
+  ::new((void *)0) _Tp(my_declval<_Args>()...);
+}
 constexpr _Tp *my_construct_at(_Tp *__location, _Args &&...__args)
 {
   return ::new((void *)__location) _Tp(static_cast<_Args &&>(__args)...);

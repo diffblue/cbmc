@@ -32,7 +32,7 @@ template <class T>
 T &&declval();
 
 template <class F, class... Args>
-auto invoke_fn(F &&f, Args &&... a)
+auto invoke_fn(F &&f, Args &&...a)
   -> decltype(static_cast<F &&>(f)(static_cast<Args &&>(a)...));
 
 template <class F, class... A>

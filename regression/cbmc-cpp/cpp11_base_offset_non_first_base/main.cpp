@@ -29,7 +29,9 @@ struct B
 };
 struct C : B
 {
-  ~C() {}
+  ~C()
+  {
+  }
 };
 struct D : A, C
 {

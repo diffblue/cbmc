@@ -23,7 +23,7 @@
 extern "C" void __CPROVER_assert(int, const char *);
 
 template <class F, class... A>
-int invk(F f, A &&... a)
+int invk(F f, A &&...a)
 {
   return f(static_cast<A &&>(a)...);
 }

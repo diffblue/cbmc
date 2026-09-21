@@ -3,8 +3,14 @@
 struct S
 {
   int v;
-  int &get() { return v; }
-  const int &get() const { return v; }
+  int &get()
+  {
+    return v;
+  }
+  const int &get() const
+  {
+    return v;
+  }
 };
 
 // Trailing-return decltype referencing the function parameter: the

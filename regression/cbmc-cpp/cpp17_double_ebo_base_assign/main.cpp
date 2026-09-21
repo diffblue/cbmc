@@ -39,11 +39,9 @@ int main()
   b = a; // implicit copy assignment: one base per TYPE
 
   __CPROVER_assert(
-    static_cast<ebo_helper<1, hasher> &>(b).value.h == 7,
-    "first base copied");
+    static_cast<ebo_helper<1, hasher> &>(b).value.h == 7, "first base copied");
   __CPROVER_assert(
-    static_cast<ebo_helper<0, equal> &>(b).value.e == 9,
-    "second base copied");
+    static_cast<ebo_helper<0, equal> &>(b).value.e == 9, "second base copied");
 
   table c(a); // implicit copy constructor, POD bases
   __CPROVER_assert(

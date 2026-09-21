@@ -28,7 +28,7 @@ template <class T>
 T &&declval();
 
 template <class F, class... Args>
-auto invk(F &&f, Args &&... a)
+auto invk(F &&f, Args &&...a)
   -> decltype(static_cast<F &&>(f)(static_cast<Args &&>(a)...));
 
 struct C

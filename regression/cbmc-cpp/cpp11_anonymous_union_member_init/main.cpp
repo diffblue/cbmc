@@ -15,7 +15,9 @@ struct OptInit
   };
   bool engaged;
   // initialize the anonymous-union member directly in the init list
-  OptInit() : value(0), engaged(false) {}
+  OptInit() : value(0), engaged(false)
+  {
+  }
 };
 
 struct OptAssign
@@ -26,7 +28,9 @@ struct OptAssign
     int value;
   };
   bool engaged;
-  OptAssign() : none(0), engaged(false) {}
+  OptAssign() : none(0), engaged(false)
+  {
+  }
   OptAssign &operator=(int v)
   {
     value = v;

@@ -14,7 +14,9 @@ template <class T>
 struct S
 {
   T v;
-  S() : v(0) {}
+  S() : v(0)
+  {
+  }
   S(T a, T b)
   {
     __CPROVER_assert(0, "must never appear");

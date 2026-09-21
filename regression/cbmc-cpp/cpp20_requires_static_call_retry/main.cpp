@@ -38,8 +38,7 @@ struct prt
   {
   }
   template <class U = T>
-    requires(ok<U>())
-  constexpr prt(U &&b) : second(static_cast<U &&>(b))
+  requires(ok<U>()) constexpr prt(U &&b) : second(static_cast<U &&>(b))
   {
   }
   ~prt()
