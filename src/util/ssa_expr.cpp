@@ -67,7 +67,8 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
 /// and add "..component_name" or "[[index]]" to \p os.
 ///
 /// Uses `std::string` concatenation rather than `std::ostream`: see
-/// initialize_ssa_identifier above for the rationale (this is a symex hot path).
+/// initialize_ssa_identifier above for the rationale (this is a symex hot
+/// path).
 static void build_ssa_identifier_rec(
   const exprt &expr,
   const irep_idt &l0,

@@ -542,7 +542,8 @@ void cpp_typecheckt::default_assignop_value(
   std::string arg_name("ref");
 
   // [class.copy.assign]: the implicit copy-assignment operator of a union
-  // copies the object representation.  A union has no bases and member-by-member
+  // copies the object representation.  A union has no bases and
+  // member-by-member
   // copy is not meaningful, so emit a single whole-object copy `*this = ref`
   // via copy_parent (a frontend assignment, not an `operator=` call, which
   // would recurse) reusing the union's own type, then return *this.

@@ -7,6 +7,7 @@
 #include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/floatbv_expr.h>
@@ -288,7 +289,8 @@ static exprt provide_classic_ctype_char_model(
   symbol_table_baset &symbol_table,
   const namespacet &ns)
 {
-  const irep_idt facet_symbol_name = "std::__CPROVER_classic_ctype_char";
+  const irep_idt facet_symbol_name =
+    "std::" CPROVER_PREFIX "classic_ctype_char";
   if(const symbolt *existing = symbol_table.lookup(facet_symbol_name))
     return existing->symbol_expr();
 
@@ -361,8 +363,8 @@ static exprt provide_classic_ctype_char_model(
   array_exprt table_value{std::move(entries), table_type};
 
   symbolt table_symbol{
-    "std::__CPROVER_classic_ctype_table", table_type, ID_cpp};
-  table_symbol.base_name = "__CPROVER_classic_ctype_table";
+    "std::" CPROVER_PREFIX "classic_ctype_table", table_type, ID_cpp};
+  table_symbol.base_name = CPROVER_PREFIX "classic_ctype_table";
   table_symbol.pretty_name = table_symbol.base_name;
   table_symbol.value = std::move(table_value);
   table_symbol.is_static_lifetime = true;
@@ -429,7 +431,7 @@ static exprt provide_classic_ctype_char_model(
     return nil_exprt{};
 
   symbolt facet_symbol{facet_symbol_name, facet_type, ID_cpp};
-  facet_symbol.base_name = "__CPROVER_classic_ctype_char";
+  facet_symbol.base_name = CPROVER_PREFIX "classic_ctype_char";
   facet_symbol.pretty_name = facet_symbol.base_name;
   facet_symbol.value = std::move(*facet_zero);
   facet_symbol.is_static_lifetime = true;
@@ -554,7 +556,8 @@ make_rb_insert_and_rebalance_body(const symbolt &symbol, const namespacet &ns)
 
   // if (__insert_left) {
   //   __p->_M_left = __x;
-  //   if (__p == &__header) { __header._M_parent = __x; __header._M_right = __x; }
+  //   if (__p == &__header)
+  //   { __header._M_parent = __x; __header._M_right = __x; }
   //   else if (__p == __header._M_left) __header._M_left = __x;
   // } else {
   //   __p->_M_right = __x;
@@ -2242,4 +2245,4 @@ void cpp_typecheckt::provide_stdlib_bodies()
       }
     }
   }
-}
+} // NOLINT(readability/fn_size)

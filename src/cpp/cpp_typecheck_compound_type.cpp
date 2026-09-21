@@ -798,7 +798,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // `...` on these arguments (as it does on call arguments), and a
       // parameter pack may only appear in a pack expansion, so any argument
       // that references a replicated pack's base name is one and is replaced by
-      // one copy per element.  This must happen before check_member_initializers
+      // one copy per element.  This must happen before
+      // check_member_initializers
       // converts the initializer list below; the method-body drain handles the
       // ordinary body but the initializer list is converted here.
       std::map<irep_idt, std::size_t> pack_counts;
@@ -1450,7 +1451,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
       // [class.copy.ctor]/14.
       value.set("#defaulted_function", true);
 
-      // [class.dtor]/8: an =default destructor is a trivial-destructor candidate.
+      // [class.dtor]/8: an =default destructor is a trivial-destructor
+      // candidate.
       if(
         component.type().id() == ID_code &&
         to_code_type(component.type()).return_type().id() == ID_destructor)
@@ -3244,13 +3246,15 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             // (value_type, difference_type, pointer, reference,
             // iterator_category) no member function or sibling member depends
             // on it structurally.  In libstdc++ it is
-            //   using iterator_concept = std::__detail::__iter_concept<_Iterator>;
+            //   using iterator_concept =
+            //     std::__detail::__iter_concept<_Iterator>;
             // a `merged_type` alias-template result, so the cpp_name
             // self-reference recovery above does not apply to it.
             //
             // Per [temp.inst]/1-2 + [dcl.typedef]: this member typedef declares
             // the member and forms the aliased type but does not require the
-            // aliased template's *definition* to be instantiated; a typedef-name
+            // aliased template's *definition* to be instantiated; a
+            // typedef-name
             // may denote an incomplete type.  While the enclosing iterator
             // instance is still being completed, evaluating __iter_concept
             // reaches back through this very (incomplete) iterator via the
