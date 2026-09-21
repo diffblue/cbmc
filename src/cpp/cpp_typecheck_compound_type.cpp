@@ -1681,96 +1681,20 @@ void cpp_typecheckt::typecheck_compound_declarator(
           CHECK_RETURN(!failed);
         }
 
-        // do the body of the function
-        // For multiple inheritance, adjust the 'this' pointer from
-        // the base subobject to the derived class.
-        const auto &this_param = args[0];
-        exprt this_expr = lookup(this_param.get_identifier()).symbol_expr();
-        const typet &target_type =
-          to_code_type(component.type()).parameters()[0].type();
-
-        // A base subobject that shares this class's virtual pointer (the
-        // primary-base chain, Itanium C++ ABI 2.4 II.1) is at offset 0 and
-        // needs no `this' adjustment; any other dynamic base subobject
-        // starts at the offset of its own virtual pointer.
-        const struct_typet &derived_struct =
-          to_struct_type(symbol_table.lookup_ref(symbol.name).type);
-        const irep_idt base_vtptr = vtable_pointer_component(virtual_base);
-        const bool is_primary_base =
-          !base_vtptr.empty() &&
-          base_vtptr == vtable_pointer_component(symbol.name);
-
-        // Hierarchies with VIRTUALLY-inherited bases use the flat
-        // full-object pointer convention throughout: make_ptr_typecast
-        // skips all offset adjustment for them, so every caller (the
-        // synthesized constructor/destructor chains included) passes
-        // the unadjusted object pointer, merely retyped.  A thunk that
-        // subtracted a subobject offset here would push the pointer
-        // OUTSIDE the object (N5008 [class.mi]/[class.dtor]/13 chains
-        // on iostream-shaped diamonds tripped the bounds checks on
-        // every vtable-pointer write).  Only the non-virtual
-        // multiple-inheritance case uses adjusted subobject pointers.
-        std::list<irep_idt> derived_virtual_bases;
-        get_virtual_bases(derived_struct, derived_virtual_bases);
-        const bool flat_pointer_convention = !derived_virtual_bases.empty();
-
-        exprt late_cast;
-        if(!is_primary_base && !flat_pointer_convention)
-        {
-          // Non-primary base: compute offset and adjust this pointer
-          auto base_off = base_vtptr.empty()
-                            ? std::optional<mp_integer>{}
-                            : member_offset(derived_struct, base_vtptr, *this);
-          if(base_off.has_value() && *base_off > 0)
-          {
-            auto char_ptr =
-              typecast_exprt(this_expr, pointer_type(unsigned_char_type()));
-            auto adjusted = minus_exprt(
-              char_ptr, from_integer(*base_off, pointer_diff_type()));
-            late_cast = typecast_exprt(adjusted, target_type);
-          }
-          else
-            late_cast = typecast_exprt(this_expr, target_type);
-        }
-        else
-        {
-          late_cast = typecast_exprt(this_expr, target_type);
-        }
-
-        // Thunk calls must be direct (non-virtual) to avoid infinite
-        // recursion through the vtable.
-        typet direct_type = component.type();
-        direct_type.remove(ID_C_is_virtual);
-
-        side_effect_expr_function_callt expr_call(
-          symbol_exprt(component.get_name(), direct_type),
-          {late_cast},
-          uninitialized_typet{},
-          source_locationt{});
-        expr_call.arguments().reserve(args.size());
-
-        // Skip the first parameter (this) — it was already added as
-        // late_cast above.
-        for(std::size_t j = 1; j < args.size(); ++j)
-        {
-          expr_call.arguments().push_back(
-            lookup(args[j].get_identifier()).symbol_expr());
-        }
-
-        if(
-          code_type.return_type().id() != ID_empty &&
-          code_type.return_type().id() != ID_destructor)
-        {
-          expr_call.type() = to_code_type(component.type()).return_type();
-
-          func_symb.value =
-            code_blockt{{code_frontend_returnt(std::move(expr_call))}};
-        }
-        else
-        {
-          func_symb.value =
-            code_blockt{{code_expressiont(std::move(expr_call))}};
-        }
+        // The body adjusts `this' from the base subobject to the derived
+        // class and calls the overrider directly.  The adjustment is the
+        // offset of the base subobject, which is final only once the class
+        // has been laid out (base alignment padding, add_padding); the body
+        // is built here from the current layout and rebuilt with the final
+        // one in do_virtual_table.  Record what it needs.
+        func_symb.type.set("#thunk_target", component.get_name());
+        func_symb.type.set("#thunk_base", virtual_base);
+        build_virtual_thunk_body(
+          func_symb,
+          component.get_name(),
+          component.type(),
+          virtual_base,
+          to_struct_type(symbol_table.lookup_ref(symbol.name).type));
 
         // add this new function to the list of components
 
@@ -4291,6 +4215,12 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
     }
   }
+
+  // The thunks' `this' adjustments are base-subobject offsets, which include
+  // the alignment padding between base subobjects added by the layout above:
+  // rebuild their bodies now.
+  if(symbol.type.id() == ID_struct)
+    finalize_virtual_thunks(symbol);
 
   // Process deferred static member initializers now that all
   // members are declared (N5008 [basic.scope.class]: the initializer is in

@@ -570,6 +570,24 @@ protected:
 
   void do_virtual_table(const symbolt &symbol);
 
+  /// Rebuild the bodies of the class's virtual-function thunks once the class
+  /// is laid out (the `this' adjustments are base-subobject offsets).
+  void finalize_virtual_thunks(const symbolt &symbol);
+
+  /// Build (or rebuild) the body of the thunk \p thunk that a virtual
+  /// function \p target (a component of \p derived) is entered through when
+  /// called on the base subobject of class \p base_class: adjust `this' from
+  /// the base subobject to the derived object and call \p target directly.
+  /// The adjustment is the offset of the base subobject in \p derived's
+  /// layout (Itanium C++ ABI 2.5.3 non-virtual thunk); a base sharing the
+  /// derived class's virtual pointer is at offset 0.
+  void build_virtual_thunk_body(
+    symbolt &thunk,
+    const irep_idt &target,
+    const typet &target_type,
+    const irep_idt &base_class,
+    const struct_typet &derived);
+
   /// Itanium C++ ABI 2.4: the primary base class of a dynamic class is its
   /// first non-virtual dynamic base class in declaration order; the class
   /// shares the primary base's virtual pointer (and vtable) instead of adding
