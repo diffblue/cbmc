@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Virtual functions and a virtual destructor across a virtual base shared by
+two bases: dispatch through V*, B1* and B2& reaches the most derived
+overrider (thunks adjust `this' by the virtual base's offset in the
+complete object), a virtual-base member is read through the vtable's
+virtual-base offset (Itanium C++ ABI 2.5.2), V is constructed and
+destroyed exactly once per complete object (N5008 [class.base.init]/13,
+[class.dtor]/14: by the most derived class, via the hidden `@most_derived'
+constructor/destructor parameter), and both bases' constructors update the
+single V.

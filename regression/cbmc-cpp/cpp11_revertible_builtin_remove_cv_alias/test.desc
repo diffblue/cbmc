@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+Alias templates named __remove_cv / __remove_reference (libstdc++ <= 12) are
+ordinary identifiers: the builtin reading needs a following '('.  Reference
+compilers: g++ 11, clang 18 (-Wkeyword-compat).  Sibling
+cpp11_revertible_builtin_remove_cv covers the builtin reading.

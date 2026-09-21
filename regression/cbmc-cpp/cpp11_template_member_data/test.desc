@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11
+--cpp11 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\].*deep-template member exchange prev: SUCCESS$
@@ -22,3 +22,5 @@ specializations by sizeof(T), _Atomic_storage/_Atomic_integral/
 _Atomic_integral_facade inheritance chain, type_traits SFINAE) to
 trigger.  Keeping this test ensures the simple pattern remains
 working when the complex fix lands.
+`--64': the expected values are those of the LP64 data model (the 32-bit CI
+build otherwise computes ILP32 layouts/types).

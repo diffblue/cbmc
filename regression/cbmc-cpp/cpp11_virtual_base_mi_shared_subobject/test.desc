@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.mi]/4-6: `D : B1, B2' with `B1 : virtual V' and `B2 : virtual V'
+has ONE V subobject, and a member of V reached through a B2* is that one.
+The flattened model gave every path its own copy at a static offset, so
+B2's constructor wrote V's member into B1's storage.  Layout per the
+Itanium C++ ABI 2.4 (as g++ and clang implement it): the non-virtual parts
+first, the virtual base after the class's own members.
