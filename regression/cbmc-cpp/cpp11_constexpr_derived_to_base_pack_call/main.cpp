@@ -24,7 +24,10 @@ template <unsigned long, typename _H>
 struct HB
 {
   _H v;
-  static _H &mh(HB &b) { return b.v; }
+  static _H &mh(HB &b)
+  {
+    return b.v;
+  }
 };
 
 template <unsigned long, typename...>
@@ -36,7 +39,10 @@ template <unsigned long _I, typename _H, typename... _T>
 struct TI<_I, _H, _T...> : TI<_I + 1, _T...>, HB<_I, _H>
 {
   typedef HB<_I, _H> _B;
-  static _H &mh(TI &t) { return _B::mh(t); }
+  static _H &mh(TI &t)
+  {
+    return _B::mh(t);
+  }
 };
 
 template <typename... _E>

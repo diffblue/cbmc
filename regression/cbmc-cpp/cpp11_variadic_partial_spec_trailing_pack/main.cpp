@@ -35,7 +35,8 @@ struct Rec<I, H, T...> : Rec<I + 1, T...>
 int main()
 {
   Rec<0, int, int, int> r;
-  __CPROVER_assert(static_cast<Rec<2, int> &>(r).depth == 2, "recursion reached depth 2");
+  __CPROVER_assert(
+    static_cast<Rec<2, int> &>(r).depth == 2, "recursion reached depth 2");
   __CPROVER_assert(static_cast<Rec<2, int> &>(r).depth == 9, "WRONG must FAIL");
   return 0;
 }

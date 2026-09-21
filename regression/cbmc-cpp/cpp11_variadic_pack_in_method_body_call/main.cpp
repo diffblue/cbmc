@@ -24,7 +24,10 @@ struct Func<R(A...)>
 {
   using Fp = R (*)(A...);
   Fp fp = nullptr;
-  R go(A... a) { return fp(a...); } // body pack-expansion use of `a`
+  R go(A... a)
+  {
+    return fp(a...);
+  } // body pack-expansion use of `a`
 };
 
 int add(int a, int b)

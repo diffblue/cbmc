@@ -55,6 +55,7 @@ auto impl3(seq<I...>) -> decltype(add3(I...))
 int main()
 {
   __CPROVER_assert(impl(seq<1, 2>{}) == 3, "decltype-return add(1,2)==3");
-  __CPROVER_assert(impl3(seq<1, 2, 3>{}) == 6, "decltype-return add3(1,2,3)==6");
+  __CPROVER_assert(
+    impl3(seq<1, 2, 3>{}) == 6, "decltype-return add3(1,2,3)==6");
   return 0;
 }

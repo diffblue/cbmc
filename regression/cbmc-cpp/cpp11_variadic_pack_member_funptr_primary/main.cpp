@@ -33,7 +33,8 @@ int add(int a, int b)
 int main()
 {
   S<int, int> s;
-  s.fp = add; // binds only if fp is int(*)(int,int), not the collapsed int(*)(int)
+  s.fp =
+    add; // binds only if fp is int(*)(int,int), not the collapsed int(*)(int)
   int r = s.fp(2, 3);
   __CPROVER_assert(r == 5, "primary variadic class member funptr full arity");
   __CPROVER_assert(r == 0, "WRONG must FAIL");

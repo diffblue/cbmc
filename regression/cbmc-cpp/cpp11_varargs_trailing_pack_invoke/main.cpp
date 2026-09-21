@@ -10,7 +10,8 @@ struct bb
     return 7;
   }
 } c;
-template <class F, class...> decltype(F()()) invoke_(F f, ...)
+template <class F, class...>
+decltype(F()()) invoke_(F f, ...)
 {
   return f();
 }

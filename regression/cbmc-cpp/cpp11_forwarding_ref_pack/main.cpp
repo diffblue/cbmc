@@ -11,7 +11,7 @@
 // dangling/garbage reference and forwarded the wrong value.  Header-free.
 
 template <typename... A>
-int first_of(A &&... a)
+int first_of(A &&...a)
 {
   int arr[] = {a...};
   return arr[0];
@@ -19,10 +19,16 @@ int first_of(A &&... a)
 
 // Perfect-forwarding through a variadic wrapper to a target that distinguishes
 // lvalues from rvalues.
-int g(int &) { return 1; }   // lvalue
-int g(int &&) { return 2; }  // rvalue
+int g(int &)
+{
+  return 1;
+} // lvalue
+int g(int &&)
+{
+  return 2;
+} // rvalue
 template <typename... A>
-int fwd_to_g(A &&... a)
+int fwd_to_g(A &&...a)
 {
   return g(static_cast<A &&>(a)...);
 }

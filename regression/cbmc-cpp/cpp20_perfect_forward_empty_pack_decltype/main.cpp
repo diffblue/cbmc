@@ -7,8 +7,10 @@
 // unrelated non-empty class-level pack Idx.  Distilled from libc++
 // __perfect_forward under std::invoke (ranges views::take pipe).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T, T...> struct integer_sequence;
-template <long... I> using index_sequence = integer_sequence<unsigned long, I...>;
+template <class T, T...>
+struct integer_sequence;
+template <long... I>
+using index_sequence = integer_sequence<unsigned long, I...>;
 struct op
 {
   int operator()(long, long)
@@ -16,8 +18,10 @@ struct op
     return 7;
   }
 };
-template <class...> struct pf;
-template <class Op, long... Idx> struct pf<Op, index_sequence<Idx...>>
+template <class...>
+struct pf;
+template <class Op, long... Idx>
+struct pf<Op, index_sequence<Idx...>>
 {
   template <class... Args>
   auto operator()(Args... args) -> decltype(Op()(Idx..., args...))
@@ -28,7 +32,8 @@ template <class Op, long... Idx> struct pf<Op, index_sequence<Idx...>>
 struct bb : pf<op, index_sequence<0, 1>>
 {
 } c;
-template <class F> decltype(F()()) invoke_(F f)
+template <class F>
+decltype(F()()) invoke_(F f)
 {
   return f();
 }

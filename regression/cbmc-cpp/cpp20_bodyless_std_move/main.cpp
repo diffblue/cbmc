@@ -10,20 +10,29 @@
 // clang++/valgrind run the program clean.
 extern "C" void __CPROVER_assert(bool, const char *);
 
-namespace std {
-inline namespace {
-template <class _Tp> _Tp move(_Tp &&);
+namespace std
+{
+inline namespace
+{
+template <class _Tp>
+_Tp move(_Tp &&);
 int __end_;
-struct vector {
-  long size() { return __end_; }
-  void push_back() {
+struct vector
+{
+  long size()
+  {
+    return __end_;
+  }
+  void push_back()
+  {
     __end_++;
     __end_ = move(__end_);
   }
 };
 } // namespace
 } // namespace std
-int main() {
+int main()
+{
   std::vector v;
   v.push_back();
   __CPROVER_assert(v.size(), "one size");

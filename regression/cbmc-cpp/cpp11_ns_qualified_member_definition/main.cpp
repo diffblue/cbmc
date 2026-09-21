@@ -9,7 +9,8 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 namespace std
 {
-template <typename> struct basic_streambuf
+template <typename>
+struct basic_streambuf
 {
   basic_streambuf(const basic_streambuf &);
 };

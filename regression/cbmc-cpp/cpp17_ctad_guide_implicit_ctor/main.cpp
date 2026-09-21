@@ -11,12 +11,14 @@ template <typename T>
 struct Wrap
 {
   T val;
-  Wrap(T *p) : val(*p) {}
+  Wrap(T *p) : val(*p)
+  {
+  }
 };
 int main()
 {
-  int x; // nondet
-  Wrap w{&x};            // implicit guide: Wrap<int>, val = *p
+  int x;      // nondet
+  Wrap w{&x}; // implicit guide: Wrap<int>, val = *p
   __CPROVER_assert(w.val == x, "implicit guide Wrap(T*)->Wrap<int>: val == *p");
   return 0;
 }

@@ -59,7 +59,8 @@ struct Mgr
 int main()
 {
   Mgr<FP>::clone();
-  __CPROVER_assert(sink == 42, "member-template deduction from const funptr arg");
+  __CPROVER_assert(
+    sink == 42, "member-template deduction from const funptr arg");
   __CPROVER_assert(sink == 0, "WRONG must FAIL");
   return 0;
 }

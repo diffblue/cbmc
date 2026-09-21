@@ -29,6 +29,7 @@ int main()
 {
   std::vector<std::pair<symbolish, unsigned long>> v;
   v.emplace_back(symbolish{1}, 2ul);
-  __CPROVER_assert(v.size() == 1, "emplace_back pair with non-default-constructible member");
+  __CPROVER_assert(
+    v.size() == 1, "emplace_back pair with non-default-constructible member");
   return 0;
 }

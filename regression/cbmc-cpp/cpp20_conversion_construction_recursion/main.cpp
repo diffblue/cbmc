@@ -23,8 +23,7 @@ public:
   unsigned long _M_val = 0;
   MS() = default;
   template <typename T>
-    requires std::integral<T>
-  constexpr MS(T i) noexcept : _M_val(i)
+  requires std::integral<T> constexpr MS(T i) noexcept : _M_val(i)
   {
   }
   constexpr explicit MS(const MD &dd) noexcept;

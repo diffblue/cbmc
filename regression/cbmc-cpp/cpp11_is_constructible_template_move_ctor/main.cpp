@@ -29,7 +29,8 @@ extern "C" void __CPROVER_assert(int, const char *);
 template <class, class>
 struct pair
 {
-  template <class U1, class U2> pair(pair<U1, U2> &&); // template move converting ctor
+  template <class U1, class U2>
+  pair(pair<U1, U2> &&); // template move converting ctor
 };
 
 int main()

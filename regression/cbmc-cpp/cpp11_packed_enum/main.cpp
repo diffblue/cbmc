@@ -7,9 +7,20 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // firmware ABIs pack enums to get 1-byte instruction fields, and the
 // C++ front end ignored the attribute while the C front end honoured
 // it.
-typedef enum { A = 0, B = 1 } __attribute__((__packed__)) E1;
-typedef enum { N = -1, P = 100 } __attribute__((__packed__)) E2;
-typedef enum { W = 100000 } __attribute__((__packed__)) E3;
+typedef enum
+{
+  A = 0,
+  B = 1
+} __attribute__((__packed__)) E1;
+typedef enum
+{
+  N = -1,
+  P = 100
+} __attribute__((__packed__)) E2;
+typedef enum
+{
+  W = 100000
+} __attribute__((__packed__)) E3;
 typedef struct
 {
   E1 e;

@@ -15,11 +15,13 @@ struct messages_base
 {
   typedef int catalog;
 };
-template <typename> struct messages : messages_base
+template <typename>
+struct messages : messages_base
 {
   void do_close(catalog) const;
 };
-template <> void messages<char>::do_close(catalog) const;
+template <>
+void messages<char>::do_close(catalog) const;
 int main()
 {
   __CPROVER_assert(sizeof(messages_base::catalog) == sizeof(int), "converts");

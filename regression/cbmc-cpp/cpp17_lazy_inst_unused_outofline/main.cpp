@@ -6,7 +6,10 @@ template <class T>
 struct S
 {
   T value;
-  void good() { value = value; }
+  void good()
+  {
+    value = value;
+  }
   void bad();
 };
 

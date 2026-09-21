@@ -68,7 +68,8 @@ int main()
   b.tag = 0;
   f2(b);
   __CPROVER_assert(
-    a.tag == 2, "member template wins when free operator needs derived-to-base");
+    a.tag == 2,
+    "member template wins when free operator needs derived-to-base");
   __CPROVER_assert(b.tag == 3, "free non-template wins on exact object match");
   __CPROVER_assert(a.tag == 3, "WRONG must FAIL");
   return 0;

@@ -13,39 +13,55 @@
 // the end of the class and re-type-checking them in the class scope.
 //
 extern "C" void __CPROVER_assert(int, const char *);
-template<typename _Tp, typename _Up = _Tp &&> _Up __declval(int);
-template<typename _Tp> _Tp __declval(long);
-template<typename _Tp> auto declval() noexcept -> decltype(__declval<_Tp>(0));
-struct true_type { static const bool value = true; };
-struct false_type { static const bool value = false; };
+template <typename _Tp, typename _Up = _Tp &&>
+_Up __declval(int);
+template <typename _Tp>
+_Tp __declval(long);
+template <typename _Tp>
+auto declval() noexcept -> decltype(__declval<_Tp>(0));
+struct true_type
+{
+  static const bool value = true;
+};
+struct false_type
+{
+  static const bool value = false;
+};
 
 namespace stdx
 {
-template<typename T>
+template <typename T>
 void swap(T &a, T &b)
 {
-  T tmp = a; a = b; b = tmp;
+  T tmp = a;
+  a = b;
+  b = tmp;
 }
 struct do_is_swappable
 {
-  template<typename T, typename = decltype(swap(declval<T &>(), declval<T &>()))>
+  template <
+    typename T,
+    typename = decltype(swap(declval<T &>(), declval<T &>()))>
   static true_type test(int);
-  template<typename> static false_type test(...);
+  template <typename>
+  static false_type test(...);
 };
-template<typename T>
+template <typename T>
 struct is_swappable : do_is_swappable
 {
   typedef decltype(test<T>(0)) type;
   static const bool value = type::value;
 };
-}
+} // namespace stdx
 
 // swap's DECLARATION is viable for NoCopy (unevaluated probe succeeds), but
 // its DEFINITION is ill-formed (deleted copy constructor); a conforming
 // implementation never instantiates the definition ([temp.inst]/5).
 struct NoCopy
 {
-  NoCopy() {}
+  NoCopy()
+  {
+  }
   NoCopy(const NoCopy &) = delete;
   NoCopy &operator=(const NoCopy &) = delete;
 };

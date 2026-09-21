@@ -9,14 +9,16 @@ template <typename T>
 struct Vec
 {
   T val;
-  Vec(int, T v) : val(v) {}
+  Vec(int, T v) : val(v)
+  {
+  }
 };
 template <typename T>
 Vec(int, T) -> Vec<T>;
 int main()
 {
-  Vec v{3, 'a'};   // guide: Vec<char>
-  v.val = 321;     // 321 == 0x141; a char member keeps only the low byte (65)
+  Vec v{3, 'a'}; // guide: Vec<char>
+  v.val = 321;   // 321 == 0x141; a char member keeps only the low byte (65)
   __CPROVER_assert(v.val == 65, "guide Vec<char>: 321 truncates to 65");
   return 0;
 }

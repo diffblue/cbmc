@@ -10,21 +10,26 @@
 // spurious mismatch.  Keep this green while flipping the KNOWNBUG.
 // (g++ rejects __make_integer_seq -- clang-only shape.)
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class A, class B> struct is_same_
+template <class A, class B>
+struct is_same_
 {
   static const bool value = false;
 };
-template <class A> struct is_same_<A, A>
+template <class A>
+struct is_same_<A, A>
 {
   static const bool value = true;
 };
-template <class T, T... I> struct int_seq
+template <class T, T... I>
+struct int_seq
 {
 };
-template <unsigned long... I> using indices = int_seq<unsigned long, I...>;
+template <unsigned long... I>
+using indices = int_seq<unsigned long, I...>;
 template <unsigned long N>
 using make_indices = __make_integer_seq<int_seq, unsigned long, N>;
-template <unsigned long... I> bool check(int_seq<unsigned long, I...>)
+template <unsigned long... I>
+bool check(int_seq<unsigned long, I...>)
 {
   bool oks[] = {is_same_<decltype(I), unsigned long>::value...};
   bool ok = true;
@@ -35,7 +40,6 @@ template <unsigned long... I> bool check(int_seq<unsigned long, I...>)
 int main()
 {
   __CPROVER_assert(
-    check(make_indices<2>{}),
-    "make_integer_seq values keep the declared type");
+    check(make_indices<2>{}), "make_integer_seq values keep the declared type");
   return 0;
 }

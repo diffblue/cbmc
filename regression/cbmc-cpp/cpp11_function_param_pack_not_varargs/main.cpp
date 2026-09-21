@@ -17,7 +17,10 @@ struct handler;
 template <typename R, typename... Args>
 struct handler<R(Args...)>
 {
-  static R val(Args...) { return (R)7; }
+  static R val(Args...)
+  {
+    return (R)7;
+  }
 };
 
 int main()
@@ -25,7 +28,8 @@ int main()
   // The address of the partial-specialization's static member has type
   // int(*)(int) -- no spurious variadic ellipsis -- so it binds to fp.
   int (*fp)(int) = &handler<int(int)>::val;
-  __CPROVER_assert(fp != 0, "address of pack static member has non-varargs type");
+  __CPROVER_assert(
+    fp != 0, "address of pack static member has non-varargs type");
   __CPROVER_assert(fp(3) == 7, "the pack-parameter function is callable");
   return 0;
 }

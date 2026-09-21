@@ -22,20 +22,74 @@ struct It
   It(const It &) = default;
   It &operator=(const It &) = default;
 
-  int &operator*() const { return *p; }
-  It &operator++() { ++p; return *this; }
-  It operator++(int) { It t = *this; ++p; return t; }
-  It &operator--() { --p; return *this; }
-  It operator--(int) { It t = *this; --p; return t; }
-  It &operator+=(difference_type n) { p += n; return *this; }
-  It &operator-=(difference_type n) { p -= n; return *this; }
-  It operator+(difference_type n) const { It t = *this; t += n; return t; }
-  It operator-(difference_type n) const { It t = *this; t -= n; return t; }
-  difference_type operator-(const It &o) const { return p - o.p; }
-  int &operator[](difference_type n) const { return p[n]; }
-  friend It operator+(difference_type n, const It &i) { return i + n; }
-  bool operator==(const It &o) const { return p == o.p; }
-  auto operator<=>(const It &o) const { return p <=> o.p; }
+  int &operator*() const
+  {
+    return *p;
+  }
+  It &operator++()
+  {
+    ++p;
+    return *this;
+  }
+  It operator++(int)
+  {
+    It t = *this;
+    ++p;
+    return t;
+  }
+  It &operator--()
+  {
+    --p;
+    return *this;
+  }
+  It operator--(int)
+  {
+    It t = *this;
+    --p;
+    return t;
+  }
+  It &operator+=(difference_type n)
+  {
+    p += n;
+    return *this;
+  }
+  It &operator-=(difference_type n)
+  {
+    p -= n;
+    return *this;
+  }
+  It operator+(difference_type n) const
+  {
+    It t = *this;
+    t += n;
+    return t;
+  }
+  It operator-(difference_type n) const
+  {
+    It t = *this;
+    t -= n;
+    return t;
+  }
+  difference_type operator-(const It &o) const
+  {
+    return p - o.p;
+  }
+  int &operator[](difference_type n) const
+  {
+    return p[n];
+  }
+  friend It operator+(difference_type n, const It &i)
+  {
+    return i + n;
+  }
+  bool operator==(const It &o) const
+  {
+    return p == o.p;
+  }
+  auto operator<=>(const It &o) const
+  {
+    return p <= > o.p;
+  }
 };
 
 // A non-iterator: only dereferenceable, not incrementable.

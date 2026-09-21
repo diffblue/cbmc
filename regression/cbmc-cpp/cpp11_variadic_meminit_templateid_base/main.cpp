@@ -22,8 +22,13 @@ template <unsigned long I, typename H>
 struct HeadBase
 {
   H val;
-  HeadBase(const H &h) : val(h) {}
-  static const H &head(const HeadBase &b) { return b.val; }
+  HeadBase(const H &h) : val(h)
+  {
+  }
+  static const H &head(const HeadBase &b)
+  {
+    return b.val;
+  }
 };
 
 template <unsigned long, typename...>
@@ -32,14 +37,17 @@ struct TupleImpl;
 template <unsigned long I>
 struct TupleImpl<I>
 {
-  TupleImpl() {}
+  TupleImpl()
+  {
+  }
 };
 
 template <unsigned long I, typename Head, typename... Tail>
-struct TupleImpl<I, Head, Tail...> : TupleImpl<I + 1, Tail...>, HeadBase<I, Head>
+struct TupleImpl<I, Head, Tail...> : TupleImpl<I + 1, Tail...>,
+                                     HeadBase<I, Head>
 {
   // base-id named directly as a template-id (no _Inherited typedef)
-  TupleImpl(const Head &h, const Tail &... t)
+  TupleImpl(const Head &h, const Tail &...t)
     : TupleImpl<I + 1, Tail...>(t...), HeadBase<I, Head>(h)
   {
   }
@@ -54,7 +62,9 @@ const Head &get(const TupleImpl<I, Head, Tail...> &t)
 template <typename... T>
 struct Tuple : TupleImpl<0, T...>
 {
-  Tuple(const T &... a) : TupleImpl<0, T...>(a...) {}
+  Tuple(const T &...a) : TupleImpl<0, T...>(a...)
+  {
+  }
 };
 
 int main()

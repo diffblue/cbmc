@@ -10,7 +10,9 @@ struct Pair
 {
   A a;
   B b;
-  Pair(A x, B y) : a(x), b(y) {}
+  Pair(A x, B y) : a(x), b(y)
+  {
+  }
 };
 template <typename A, typename B>
 Pair(A, B) -> Pair<A, B>;

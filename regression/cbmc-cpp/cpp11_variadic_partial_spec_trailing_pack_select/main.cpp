@@ -19,21 +19,26 @@ template <typename...>
 struct Picker
 {
   int n;
-  Picker() : n(-1) {} // primary: sentinel
+  Picker() : n(-1)
+  {
+  } // primary: sentinel
 };
 
 template <typename First, typename... Rest>
 struct Picker<First, Rest...>
 {
   int n;
-  Picker() : n((int)sizeof(First)) {} // partial spec: size of the deduced First
+  Picker() : n((int)sizeof(First))
+  {
+  } // partial spec: size of the deduced First
 };
 
 int main()
 {
   Picker<char, int, long> p; // 3 args => two-element trailing pack
   __CPROVER_assert(
-    p.n == (int)sizeof(char), "trailing-pack partial spec selected, First=char");
+    p.n == (int)sizeof(char),
+    "trailing-pack partial spec selected, First=char");
   __CPROVER_assert(p.n == -1, "WRONG must FAIL (primary not selected)");
   return 0;
 }

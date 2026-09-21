@@ -10,14 +10,18 @@ union U
 {
   char empty;
   int value;
-  U(int x) : value(x) {} // a union constructor initialising one member
+  U(int x) : value(x)
+  {
+  } // a union constructor initialising one member
 };
 
 struct Opt
 {
   U payload;
   bool engaged;
-  Opt(int x) : payload(x), engaged(true) {}
+  Opt(int x) : payload(x), engaged(true)
+  {
+  }
 };
 
 int main()

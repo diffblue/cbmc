@@ -11,28 +11,45 @@ struct Tracker
 {
   int v;
   int *self;
-  Tracker(int x) : v(x), self(&v) {}
+  Tracker(int x) : v(x), self(&v)
+  {
+  }
   Tracker(const Tracker &o) : v(o.v), self(&v)
   {
     __CPROVER_assert(o.self == &o.v, "the copy source is the live object");
   }
-  ~Tracker() { self = nullptr; }
+  ~Tracker()
+  {
+    self = nullptr;
+  }
 };
 struct Inner
 {
   int a;
   Tracker t;
-  Inner(int a_, const Tracker &t_) : a(a_), t(t_) {}
-  Inner(const Inner &o) : a(o.a), t(o.t) {}
+  Inner(int a_, const Tracker &t_) : a(a_), t(t_)
+  {
+  }
+  Inner(const Inner &o) : a(o.a), t(o.t)
+  {
+  }
 };
 struct Outer
 {
   int x;
   Inner in;
-  Outer(int x_, const Inner &in_) : x(x_), in(in_) {}
+  Outer(int x_, const Inner &in_) : x(x_), in(in_)
+  {
+  }
 };
-int take(const Inner &in) { return in.a + in.t.v; }
-int take_rv(Inner &&in) { return in.a + in.t.v; }
+int take(const Inner &in)
+{
+  return in.a + in.t.v;
+}
+int take_rv(Inner &&in)
+{
+  return in.a + in.t.v;
+}
 int main()
 {
   __CPROVER_assert(take({1, 2}) == 3, "A: braced list to const T&");
@@ -42,10 +59,13 @@ int main()
   Outer o{10, {1, 2}};
   __CPROVER_assert(o.in.a == 1 && o.in.t.v == 2, "E: nested braces");
   Outer r(10, Inner{5, 6});
-  __CPROVER_assert(r.in.a == 5 && r.in.t.v == 6, "F: parens ctor, T{} argument");
+  __CPROVER_assert(
+    r.in.a == 5 && r.in.t.v == 6, "F: parens ctor, T{} argument");
   Outer u{10, Inner{5, 6}};
-  __CPROVER_assert(u.in.a == 5 && u.in.t.v == 6, "G: braces ctor, T{} argument");
+  __CPROVER_assert(
+    u.in.a == 5 && u.in.t.v == 6, "G: braces ctor, T{} argument");
   Outer t{10, Inner(5, 6)};
-  __CPROVER_assert(t.in.a == 5 && t.in.t.v == 6, "H: braces ctor, T() argument");
+  __CPROVER_assert(
+    t.in.a == 5 && t.in.t.v == 6, "H: braces ctor, T() argument");
   return 0;
 }

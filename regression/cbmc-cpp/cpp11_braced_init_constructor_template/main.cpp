@@ -46,7 +46,8 @@ int main()
   Map m;
   m.insert({5, 9}); // braced-init-list -> pair via the constructor template
   __CPROVER_assert(
-    g_a == 5 && g_b == 9, "braced-init-list initializes class via ctor template");
+    g_a == 5 && g_b == 9,
+    "braced-init-list initializes class via ctor template");
   __CPROVER_assert(g_a != 5, "WRONG must FAIL");
   return 0;
 }

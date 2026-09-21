@@ -43,6 +43,7 @@ int main()
   // reference bindings mutate through the range
   for(auto &[a, b] : r)
     a = b;
-  __CPROVER_assert(r.data[0].first == 2 && r.data[1].first == 4, "ref bindings wrote through");
+  __CPROVER_assert(
+    r.data[0].first == 2 && r.data[1].first == 4, "ref bindings wrote through");
   return 0;
 }

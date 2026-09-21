@@ -16,33 +16,39 @@
 // CONSTRAINT, not a default argument.  One of the two remaining
 // blockers of cpp20_ranges_basic_libcxx.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T, class U> struct is_same_
+template <class T, class U>
+struct is_same_
 {
   static const bool value = false;
 };
-template <class T> struct is_same_<T, T>
+template <class T>
+struct is_same_<T, T>
 {
   static const bool value = true;
 };
-template <class T> struct remove_cvref_
+template <class T>
+struct remove_cvref_
 {
   using type = T;
 };
-template <class T> struct remove_cvref_<T &>
+template <class T>
+struct remove_cvref_<T &>
 {
   using type = T;
 };
-template <class T> struct remove_cvref_<T &&>
+template <class T>
+struct remove_cvref_<T &&>
 {
   using type = T;
 };
 template <class T, class U>
 concept same_as_ = is_same_<T, typename remove_cvref_<U>::type>::value;
-template <class Tp> struct closure_base
+template <class Tp>
+struct closure_base
 {
   template <class View, class Closure>
-    requires same_as_<Tp, Closure>
-  friend decltype(auto) operator|(View &&v, Closure &&c)
+  requires same_as_<Tp, Closure> friend decltype(auto)
+  operator|(View &&v, Closure &&c)
   {
     return c(v);
   }

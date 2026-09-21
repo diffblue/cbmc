@@ -46,7 +46,8 @@ int main()
 {
   // Reached only if the out-of-line wrapper::cleanup() above type-checked
   // (before the fix the whole translation unit failed with CONVERSION ERROR).
-  __CPROVER_assert(sizeof(wrapper) > 0, "front-end accepted the out-of-line body");
+  __CPROVER_assert(
+    sizeof(wrapper) > 0, "front-end accepted the out-of-line body");
   // Non-vacuity guard: a deliberately wrong property that must FAIL.
   __CPROVER_assert(sizeof(wrapper) == 0, "WRONG: must fail");
   return 0;

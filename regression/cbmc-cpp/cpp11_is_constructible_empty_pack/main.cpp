@@ -28,7 +28,9 @@ using is_ctible = bool_constant<__is_constructible(T, A...)>;
 struct D
 {
   int v;
-  D() : v(7) {}
+  D() : v(7)
+  {
+  }
 }; // user default ctor
 struct Agg
 {
@@ -37,7 +39,9 @@ struct Agg
 struct ND
 {
   int v;
-  ND(int x) : v(x) {}
+  ND(int x) : v(x)
+  {
+  }
 }; // no default ctor
 
 int main()
@@ -45,7 +49,8 @@ int main()
   __CPROVER_assert(
     is_ctible<int>::value == 1, "is_constructible<int> (empty pack) is true");
   __CPROVER_assert(
-    is_ctible<D>::value == 1, "is_constructible<D> (user default ctor) is true");
+    is_ctible<D>::value == 1,
+    "is_constructible<D> (user default ctor) is true");
   __CPROVER_assert(
     is_ctible<ND>::value == 0,
     "is_constructible<ND> (no default ctor) is false");

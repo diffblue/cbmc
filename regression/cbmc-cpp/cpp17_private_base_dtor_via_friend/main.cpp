@@ -13,7 +13,8 @@
 // (`<namespace>::tag-<class_name>`).  The mismatched comparison meant
 // the derived-from check never matched, and the access was rejected.
 
-namespace ns {
+namespace ns
+{
 
 template <typename _T1, typename _T2>
 struct pair;
@@ -21,11 +22,12 @@ struct pair;
 template <typename U1, typename U2>
 class __pair_base
 {
-  template <typename _T1, typename _T2> friend struct pair;
+  template <typename _T1, typename _T2>
+  friend struct pair;
   __pair_base() = default;
   ~__pair_base() = default;
-  __pair_base(const __pair_base&) = default;
-  __pair_base& operator=(const __pair_base&) = delete;
+  __pair_base(const __pair_base &) = default;
+  __pair_base &operator=(const __pair_base &) = delete;
 };
 
 template <typename _T1, typename _T2>

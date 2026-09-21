@@ -13,20 +13,32 @@
 // arity (zero here -> dropped).
 extern "C" void __CPROVER_assert(bool, const char *);
 typedef unsigned long size_t;
-template <size_t...> struct idx {};
-template <class...> struct types {};
-template <size_t I, class T> struct leaf
+template <size_t...>
+struct idx
+{
+};
+template <class...>
+struct types
+{
+};
+template <size_t I, class T>
+struct leaf
 {
   T val;
-  leaf() : val() {}
-  explicit leaf(T &&t) : val(t) {}
+  leaf() : val()
+  {
+  }
+  explicit leaf(T &&t) : val(t)
+  {
+  }
 };
-template <class Idx, class... Tp> struct impl;
+template <class Idx, class... Tp>
+struct impl;
 template <size_t... Ix, class... Tp>
 struct impl<idx<Ix...>, Tp...> : leaf<Ix, Tp>...
 {
   template <size_t... Uf, class... Tf, size_t... Ul, class... Tl, class... Up>
-  explicit impl(idx<Uf...>, types<Tf...>, idx<Ul...>, types<Tl...>, Up &&... u)
+  explicit impl(idx<Uf...>, types<Tf...>, idx<Ul...>, types<Tl...>, Up &&...u)
     : leaf<Uf, Tf>(static_cast<Up &&>(u))..., leaf<Ul, Tl>()...
   {
   }
@@ -34,7 +46,12 @@ struct impl<idx<Ix...>, Tp...> : leaf<Ix, Tp>...
 int main()
 {
   impl<idx<0, 1, 2>, int, double, char> t(
-    idx<0, 1, 2>(), types<int, double, char>(), idx<>(), types<>(), 1, 2.0,
+    idx<0, 1, 2>(),
+    types<int, double, char>(),
+    idx<>(),
+    types<>(),
+    1,
+    2.0,
     'a');
   __CPROVER_assert(static_cast<leaf<0, int> &>(t).val == 1, "leaf0");
   __CPROVER_assert(static_cast<leaf<1, double> &>(t).val == 2.0, "leaf1");

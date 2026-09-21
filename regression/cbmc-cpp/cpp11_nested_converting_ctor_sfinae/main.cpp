@@ -19,34 +19,34 @@
 // This is exactly how `std::optional<std::reference_wrapper<const T>>(x)`
 // failed to compile (e.g. in src/util/simplify_utils.cpp).
 
-template<bool B, class T = void>
+template <bool B, class T = void>
 struct en
 {
 };
-template<class T>
+template <class T>
 struct en<true, T>
 {
   using type = T;
 };
 
-template<class A, class B>
+template <class A, class B>
 constexpr bool ic_v = __is_constructible(A, B);
 
 struct Wrap
 {
   int v;
-  template<class U>
+  template <class U>
   Wrap(U &&u) : v((int)u)
   {
   }
 };
 
-template<class Tp>
+template <class Tp>
 struct opt
 {
   Tp storage;
   int tag;
-  template<class Up = Tp, typename en<ic_v<Tp, Up>, bool>::type = true>
+  template <class Up = Tp, typename en<ic_v<Tp, Up>, bool>::type = true>
   opt(Up &&u) : storage(static_cast<Up &&>(u)), tag(7)
   {
   }

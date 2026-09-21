@@ -22,8 +22,12 @@ template <unsigned long I, typename H>
 struct HeadBase
 {
   H h;
-  HeadBase() : h(0) {}
-  HeadBase(const H &x) : h(x) {}
+  HeadBase() : h(0)
+  {
+  }
+  HeadBase(const H &x) : h(x)
+  {
+  }
 };
 
 template <unsigned long, typename...>
@@ -32,13 +36,15 @@ struct TImpl;
 template <unsigned long I>
 struct TImpl<I>
 {
-  TImpl() {}
+  TImpl()
+  {
+  }
 };
 
 template <unsigned long I, typename Head, typename... Tail>
 struct TImpl<I, Head, Tail...> : HeadBase<I, Head>, TImpl<I + 1, Tail...>
 {
-  TImpl(const Head &head, const Tail &... tail)
+  TImpl(const Head &head, const Tail &...tail)
     : TImpl<I + 1, Tail...>(tail...), HeadBase<I, Head>(head)
   {
   }
@@ -51,6 +57,7 @@ int main()
   TImpl<0, int, int> t(a, b);
   __CPROVER_assert(static_cast<HeadBase<0, int> &>(t).h == a, "head0 == a");
   __CPROVER_assert(static_cast<HeadBase<1, int> &>(t).h == b, "head1 == b");
-  __CPROVER_assert(static_cast<HeadBase<1, int> &>(t).h == a, "WRONG must FAIL");
+  __CPROVER_assert(
+    static_cast<HeadBase<1, int> &>(t).h == a, "WRONG must FAIL");
   return 0;
 }

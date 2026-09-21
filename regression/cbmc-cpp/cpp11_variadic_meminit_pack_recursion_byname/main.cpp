@@ -18,7 +18,9 @@ template <unsigned long I, typename H>
 struct HeadBase
 {
   H val;
-  HeadBase(const H &h) : val(h) {}
+  HeadBase(const H &h) : val(h)
+  {
+  }
 };
 
 template <unsigned long, typename...>
@@ -27,7 +29,9 @@ struct TImpl;
 template <unsigned long I>
 struct TImpl<I>
 {
-  TImpl() {}
+  TImpl()
+  {
+  }
 };
 
 template <unsigned long I, typename Head, typename... Tail>
@@ -35,7 +39,9 @@ struct TImpl<I, Head, Tail...> : TImpl<I + 1, Tail...>, HeadBase<I, Head>
 {
   typedef TImpl<I + 1, Tail...> Inherited;
   typedef HeadBase<I, Head> Base;
-  TImpl(const Head &h, const Tail &... t) : Inherited(t...), Base(h) {}
+  TImpl(const Head &h, const Tail &...t) : Inherited(t...), Base(h)
+  {
+  }
 };
 
 int main()
@@ -46,6 +52,7 @@ int main()
   TImpl<0, int, int, int> t(a, b, c);
   __CPROVER_assert(static_cast<HeadBase<0, int> &>(t).val == a, "element 0");
   __CPROVER_assert(static_cast<HeadBase<2, int> &>(t).val == c, "element 2");
-  __CPROVER_assert(static_cast<HeadBase<2, int> &>(t).val == a, "WRONG must FAIL");
+  __CPROVER_assert(
+    static_cast<HeadBase<2, int> &>(t).val == a, "WRONG must FAIL");
   return 0;
 }

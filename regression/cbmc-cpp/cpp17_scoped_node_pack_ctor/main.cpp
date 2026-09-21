@@ -11,9 +11,21 @@
 // TWO class-type rvalues required (one passes; scalars pass);
 // braces vs parens irrelevant.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct remove_ref { typedef T type; };
-template <class T> struct remove_ref<T &> { typedef T type; };
-template <class T> struct remove_ref<T &&> { typedef T type; };
+template <class T>
+struct remove_ref
+{
+  typedef T type;
+};
+template <class T>
+struct remove_ref<T &>
+{
+  typedef T type;
+};
+template <class T>
+struct remove_ref<T &&>
+{
+  typedef T type;
+};
 template <class T>
 T &&forward_(typename remove_ref<T>::type &t)
 {
@@ -26,12 +38,16 @@ T &&forward_(typename remove_ref<T>::type &&t)
 }
 struct key
 {
-  key() : no(0) {}
+  key() : no(0)
+  {
+  }
   unsigned no;
 };
 struct val
 {
-  val() : x(0) {}
+  val() : x(0)
+  {
+  }
   int x;
 };
 struct node
@@ -41,13 +57,15 @@ struct node
 struct alloc_base
 {
   node storage;
-  template <class... Args> node *make(Args &&... a)
+  template <class... Args>
+  node *make(Args &&...a)
   {
     storage.stored = sizeof...(Args);
     return &storage;
   }
 };
-template <class T> struct table : alloc_base
+template <class T>
+struct table : alloc_base
 {
   struct scoped
   {
@@ -55,19 +73,21 @@ template <class T> struct table : alloc_base
     {
     }
     template <class... Args>
-    scoped(alloc_base *h, Args &&... a)
+    scoped(alloc_base *h, Args &&...a)
       : n_(h->make(forward_<Args>(a)...)), h_(h)
     {
     }
     node *n_;
     alloc_base *h_;
   };
-  template <class... Args> int emp(int, Args &&... args)
+  template <class... Args>
+  int emp(int, Args &&...args)
   {
     scoped s(this, forward_<Args>(args)...);
     return s.n_->stored;
   }
-  template <class... Args> int emplace(Args &&... args)
+  template <class... Args>
+  int emplace(Args &&...args)
   {
     return emp(1, forward_<Args>(args)...);
   }

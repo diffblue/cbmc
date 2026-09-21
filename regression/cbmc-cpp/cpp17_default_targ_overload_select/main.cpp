@@ -67,7 +67,7 @@ struct Tup
     typename... Us,
     bool V = valid_args<Us...>(),
     typename enable_if<V, bool>::type = true>
-  Tup(Us &&... u) : v((int)(u + ...))
+  Tup(Us &&...u) : v((int)(u + ...))
   {
   }
 };

@@ -21,14 +21,12 @@ public:
   unsigned long _M_val = 0;
   MS() = default;
   template <typename T>
-    requires std::integral<T>
-  constexpr MS(T i) noexcept : _M_val(i)
+  requires std::integral<T> constexpr MS(T i) noexcept : _M_val(i)
   {
   }
   constexpr explicit MS(const MD &dd) noexcept;
   template <typename T>
-    requires std::integral<T>
-  constexpr explicit operator T() const noexcept
+  requires std::integral<T> constexpr explicit operator T() const noexcept
   {
     return _M_val;
   }
@@ -39,16 +37,14 @@ public:
   MS _M_rep;
   MD() = default;
   template <typename T>
-    requires std::integral<T>
-  constexpr MD(T i) noexcept : _M_rep(i)
+  requires std::integral<T> constexpr MD(T i) noexcept : _M_rep(i)
   {
   }
   constexpr explicit MD(const MS &dd) noexcept : _M_rep(dd)
   {
   }
   template <typename T>
-    requires std::integral<T>
-  constexpr explicit operator T() const noexcept
+  requires std::integral<T> constexpr explicit operator T() const noexcept
   {
     return static_cast<T>(_M_rep);
   }
@@ -56,7 +52,7 @@ public:
 constexpr MS::MS(const MD &dd) noexcept : _M_val(dd._M_rep._M_val)
 {
 }
-}
+} // namespace d
 
 int main()
 {

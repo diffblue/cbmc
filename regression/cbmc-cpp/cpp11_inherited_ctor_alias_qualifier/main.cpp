@@ -7,30 +7,37 @@
 // to default-initialization (wrong-code: assertion FAILURE).  The libc++
 // __perfect_forward shape.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class... T> struct tupish
+template <class... T>
+struct tupish
 {
   int n;
-  template <class... U> tupish(U... u) : n(static_cast<int>(sizeof...(U)))
+  template <class... U>
+  tupish(U... u) : n(static_cast<int>(sizeof...(U)))
   {
   }
 };
-template <class Op, class... Bound> struct pf_impl
+template <class Op, class... Bound>
+struct pf_impl
 {
   tupish<Bound...> bound_;
-  template <class... A> pf_impl(A... a) : bound_(a...)
+  template <class... A>
+  pf_impl(A... a) : bound_(a...)
   {
   }
 };
 // the alias-template qualifier, as in libc++'s __perfect_forward
-template <class Op, class... Bound> using pf = pf_impl<Op, Bound...>;
+template <class Op, class... Bound>
+using pf = pf_impl<Op, Bound...>;
 struct takeish
 {
 };
-template <class Fn, class B> struct bb : pf<int, Fn, B>
+template <class Fn, class B>
+struct bb : pf<int, Fn, B>
 {
   using pf<int, Fn, B>::pf;
 };
-template <class Fn, class... A> auto make(Fn f, A... a) -> bb<Fn, int>
+template <class Fn, class... A>
+auto make(Fn f, A... a) -> bb<Fn, int>
 {
   return bb<Fn, int>(f, 0);
 }

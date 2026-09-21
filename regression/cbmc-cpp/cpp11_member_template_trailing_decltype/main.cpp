@@ -27,10 +27,12 @@ struct itert
     return *p_;
   }
 };
-template <class It> struct ranget
+template <class It>
+struct ranget
 {
   It b_;
-  template <class F> auto map(F f) const -> decltype(f(*b_))
+  template <class F>
+  auto map(F f) const -> decltype(f(*b_))
   {
     return f(*b_);
   }

@@ -1,7 +1,16 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <functional>
-struct One { int operator()() const { return 1; } };
-int two() { return 2; }
+struct One
+{
+  int operator()() const
+  {
+    return 1;
+  }
+};
+int two()
+{
+  return 2;
+}
 int main()
 {
   std::function<int()> a = One{};

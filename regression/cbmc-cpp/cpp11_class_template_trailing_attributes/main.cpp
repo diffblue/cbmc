@@ -14,6 +14,7 @@ int main()
   g.b = 3;
   static_assert(sizeof(G<uint16_t>) == 16, "packed then aligned(16)");
   static_assert(sizeof(G<uint8_t>) == 16, "second instantiation");
-  __CPROVER_assert(g.a == 7 && g.b == 3, "attributed class template instantiates");
+  __CPROVER_assert(
+    g.a == 7 && g.b == 3, "attributed class template instantiates");
   return 0;
 }

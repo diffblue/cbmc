@@ -1,8 +1,14 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <functional>
-int add(int a, int b) { return a + b; }
+int add(int a, int b)
+{
+  return a + b;
+}
 int g_acc = 0;
-void vadd(int b) { g_acc += b; }
+void vadd(int b)
+{
+  g_acc += b;
+}
 int main()
 {
   // A void-returning bind first: its result_of / __invoke_result chain must

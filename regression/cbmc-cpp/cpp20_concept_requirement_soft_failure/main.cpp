@@ -16,11 +16,17 @@ struct HasFooMember
 
 // simple-requirement using a (missing) overloaded operator on a class type.
 template <class T>
-concept Addable = requires(T a) { a + a; };
+concept Addable = requires(T a)
+{
+  a + a;
+};
 
 // simple-requirement using a member call.
 template <class T>
-concept HasFoo = requires(T a) { a.foo(); };
+concept HasFoo = requires(T a)
+{
+  a.foo();
+};
 
 int main()
 {

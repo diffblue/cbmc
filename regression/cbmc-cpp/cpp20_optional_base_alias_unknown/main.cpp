@@ -15,9 +15,13 @@
 // (--stdlib libc++); clang++ accepts and runs this clean.
 extern "C" void __CPROVER_assert(bool, const char *);
 
-template <bool> struct enable_if;
-template <bool _Bp> using enable_if_t = enable_if<_Bp>;
-template <int __v> struct integral_constant {
+template <bool>
+struct enable_if;
+template <bool _Bp>
+using enable_if_t = enable_if<_Bp>;
+template <int __v>
+struct integral_constant
+{
   static const int value = __v;
 };
 template <class _Tp>
@@ -29,12 +33,15 @@ struct __optional_move_assign_base
 {
   int __val_ = 7;
 };
-template <class> struct optional : __optional_move_assign_base<> {
+template <class>
+struct optional : __optional_move_assign_base<>
+{
   using __base = __optional_move_assign_base;
   optional() : __base()
   {
   }
-  template <class _Up, enable_if_t> optional(_Up &&);
+  template <class _Up, enable_if_t>
+  optional(_Up &&);
   template <class _Up, enable_if_t<_Up ::__enable_explicit>>
   optional(_Up &&) : __base()
   {

@@ -14,7 +14,8 @@ struct box
   {
   }
 };
-template <class T> struct leaf
+template <class T>
+struct leaf
 {
   T value_;
   T get()

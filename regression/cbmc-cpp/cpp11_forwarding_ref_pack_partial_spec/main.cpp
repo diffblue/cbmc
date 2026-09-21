@@ -49,7 +49,10 @@ template <typename R, typename... A, typename F>
 struct fhandler<R(A...), F>
 {
   // Forwarding-reference pack after a leading parameter.
-  static R invoke(const Data &, A &&...) { return (R)5; }
+  static R invoke(const Data &, A &&...)
+  {
+    return (R)5;
+  }
 };
 
 template <typename Sig>
@@ -59,20 +62,29 @@ struct myfunc<R(A...)>
 {
   R (*invoker)(const Data &, A &&...);
   Data data;
-  myfunc() : invoker(0) {}
-  template <typename F,
-            typename = typename enable_if<!is_same<F, myfunc>::value>::type>
+  myfunc() : invoker(0)
+  {
+  }
+  template <
+    typename F,
+    typename = typename enable_if<!is_same<F, myfunc>::value>::type>
   myfunc(F &&)
   {
     typedef fhandler<R(A...), typename decay<F>::type> H;
     invoker = &H::invoke;
   }
-  R operator()(A... a) const { return invoker(data, static_cast<A &&>(a)...); }
+  R operator()(A... a) const
+  {
+    return invoker(data, static_cast<A &&>(a)...);
+  }
 };
 
 struct Fn
 {
-  int operator()(int) const { return 5; }
+  int operator()(int) const
+  {
+    return 5;
+  }
 };
 
 int main()
@@ -80,6 +92,7 @@ int main()
   myfunc<int(int)> f = Fn{};
   __CPROVER_assert(
     f.invoker != 0, "forwarding-ref pack member function address is assigned");
-  __CPROVER_assert(f(0) == 5, "type-erased call through the forwarding-ref pack");
+  __CPROVER_assert(
+    f(0) == 5, "type-erased call through the forwarding-ref pack");
   return 0;
 }

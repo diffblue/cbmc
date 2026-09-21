@@ -48,12 +48,20 @@ struct payload
   T x;
 };
 
-struct trivial { int x; };
+struct trivial
+{
+  int x;
+};
 struct nontrivial
 {
   int *p;
-  ~nontrivial() { delete p; }
-  nontrivial() : p(nullptr) {}
+  ~nontrivial()
+  {
+    delete p;
+  }
+  nontrivial() : p(nullptr)
+  {
+  }
 };
 
 int main()

@@ -13,17 +13,22 @@
 // begin() ([range.take]).
 // g++ and clang++ both accept (-Werror) and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> T __declval(int);
-template <class T> decltype(__declval<T>(0)) declval();
+template <class T>
+T __declval(int);
+template <class T>
+decltype(__declval<T>(0)) declval();
 struct
 {
-  template <class T, int N> int operator()(T (&)[N])
+  template <class T, int N>
+  int operator()(T (&)[N])
   {
     return N;
   }
 } arr_size;
-template <class R> using all_t = decltype(declval<R>());
-template <class V> struct holder
+template <class R>
+using all_t = decltype(declval<R>());
+template <class V>
+struct holder
 {
   V base_;
   int size()
@@ -31,7 +36,8 @@ template <class V> struct holder
     return arr_size(base_);
   }
 };
-template <class R> holder(R &&) -> holder<all_t<R>>;
+template <class R>
+holder(R &&) -> holder<all_t<R>>;
 int main()
 {
   int arr[3]{1, 2, 3};

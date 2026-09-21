@@ -17,8 +17,7 @@ template <class T, class U>
 concept same_as = __is_same(T, U);
 
 template <class T>
-int pick(T v)
-  requires same_as<T, int>
+int pick(T v) requires same_as<T, int>
 {
   return 1;
 }

@@ -1,23 +1,44 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <type_traits>
 #include <utility>
-struct S { int k; int mul(int a) const { return k * a; } int mul2(int a) { return k * a; } };
+struct S
+{
+  int k;
+  int mul(int a) const
+  {
+    return k * a;
+  }
+  int mul2(int a)
+  {
+    return k * a;
+  }
+};
 typedef int (S::*PMF)(int) const;
 typedef int (S::*PMF2)(int);
-template <class T> struct success { typedef T type; };
-struct failure {};
+template <class T>
+struct success
+{
+  typedef T type;
+};
+struct failure
+{
+};
 struct deref_impl
 {
   template <class _Fp, class _Tp1, class... _Args1>
-  static success<decltype(((*std::declval<_Tp1>()).*std::declval<_Fp>())(std::declval<_Args1>()...))> _S_test(int);
-  template <class...> static failure _S_test(...);
+  static success<decltype(((*std::declval<_Tp1>()).*std::declval<_Fp>())(
+    std::declval<_Args1>()...))>
+  _S_test(int);
+  template <class...>
+  static failure _S_test(...);
 };
 template <class _MemPtr, class _Arg, class... _Args>
 struct deref : private deref_impl
 {
   typedef decltype(_S_test<_MemPtr, _Arg, _Args...>(0)) type;
 };
-template <class _MemPtr, class _Arg, class... _Args> struct memfun;
+template <class _MemPtr, class _Arg, class... _Args>
+struct memfun;
 template <class _Res, class _Class, class _Arg, class... _Args>
 struct memfun<_Res _Class::*, _Arg, _Args...>
 {

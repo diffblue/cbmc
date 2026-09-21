@@ -26,14 +26,23 @@ struct Str
 {
   // member `find` callable with one argument via the defaulted second
   // parameter -- mirrors std::basic_string::find(const basic_string&, size_t=0)
-  unsigned long find(const Str &, unsigned long pos = 0) const { return 0; }
+  unsigned long find(const Str &, unsigned long pos = 0) const
+  {
+    return 0;
+  }
 };
 } // namespace ns
 
 struct C
 {
-  int find(const ns::Str &) const { return 42; } // C's own member find
-  int get(const ns::Str &s) const { return find(s); }
+  int find(const ns::Str &) const
+  {
+    return 42;
+  } // C's own member find
+  int get(const ns::Str &s) const
+  {
+    return find(s);
+  }
 };
 
 int main()
@@ -41,7 +50,9 @@ int main()
   C c;
   ns::Str s;
   int r = c.get(s);
-  __CPROVER_assert(r == 42, "unqualified member find resolves to C::find, not arg-class member");
+  __CPROVER_assert(
+    r == 42,
+    "unqualified member find resolves to C::find, not arg-class member");
   __CPROVER_assert(r == 0, "WRONG must FAIL");
   return 0;
 }

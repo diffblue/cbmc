@@ -10,10 +10,16 @@ template <class D>
 struct base
 {
 private:
-  int secret() const { return 7; }
+  int secret() const
+  {
+    return 7;
+  }
 
 public:
-  static int call(D &d) { return d.secret(); }
+  static int call(D &d)
+  {
+    return d.secret();
+  }
 };
 
 struct derived : base<derived>

@@ -16,18 +16,27 @@ private:
   friend B; // simple-type-specifier friend declaration (no keyword)
 
 public:
-  A() : secret(0) {}
-  int get() const { return secret; }
+  A() : secret(0)
+  {
+  }
+  int get() const
+  {
+    return secret;
+  }
 };
 struct B
 {
   A a;
-  void set(int n) { a.secret = n; } // permitted: B is a friend of A
+  void set(int n)
+  {
+    a.secret = n;
+  } // permitted: B is a friend of A
 };
 int main()
 {
   B b;
   b.set(42);
-  __CPROVER_assert(b.a.get() == 42, "friend B (no keyword) may write A's private");
+  __CPROVER_assert(
+    b.a.get() == 42, "friend B (no keyword) may write A's private");
   return 0;
 }

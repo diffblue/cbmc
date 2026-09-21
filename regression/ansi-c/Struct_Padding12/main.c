@@ -13,10 +13,10 @@
   int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
 #ifdef __GNUC__
-#include <stddef.h>
-#include <stdbool.h>
+#  include <stdbool.h>
+#  include <stddef.h>
 
-#pragma pack(push, 4)
+#  pragma pack(push, 4)
 struct A
 {
   float m;
@@ -32,13 +32,13 @@ struct C
   short s;
   long l;
 } __attribute__((packed));
-#pragma pack(pop)
+#  pragma pack(pop)
 STATIC_ASSERT(sizeof(struct A) == 4 && _Alignof(struct A) == 1);
 STATIC_ASSERT(sizeof(struct B) == 12 && _Alignof(struct B) == 4);
 STATIC_ASSERT(offsetof(struct B, d) == 4);
 STATIC_ASSERT(sizeof(struct C) == 11 && _Alignof(struct C) == 1);
 
-#pragma pack(push, 1)
+#  pragma pack(push, 1)
 struct D
 {
   long m __attribute__((aligned(4)));
@@ -58,13 +58,13 @@ struct F
   char c;
   int i __attribute__((aligned(8)));
 };
-#pragma pack(pop)
+#  pragma pack(pop)
 STATIC_ASSERT(sizeof(struct D) == 9 && _Alignof(struct D) == 1);
 STATIC_ASSERT(sizeof(struct E) == 10 && _Alignof(struct E) == 1);
 STATIC_ASSERT(offsetof(struct E, d) == 1);
 STATIC_ASSERT(sizeof(struct F) == 5 && offsetof(struct F, i) == 1);
 
-#pragma pack(push, 8)
+#  pragma pack(push, 8)
 struct G
 {
   char c;
@@ -87,13 +87,13 @@ struct J
   int i : 31;
   char d;
 };
-#pragma pack(pop)
+#  pragma pack(pop)
 STATIC_ASSERT(sizeof(struct G) == 8 && offsetof(struct G, i) == 4);
 STATIC_ASSERT(sizeof(struct H) == 16 && offsetof(struct H, i) == 8);
 STATIC_ASSERT(sizeof(struct I) == 4 && offsetof(struct I, d) == 3);
 STATIC_ASSERT(sizeof(struct J) == 8 && offsetof(struct J, d) == 5);
 
-#pragma pack(push, 2)
+#  pragma pack(push, 2)
 struct K
 {
   char c;
@@ -121,7 +121,7 @@ union O
   int i[8];
   void *p;
 };
-#pragma pack(pop)
+#  pragma pack(pop)
 STATIC_ASSERT(sizeof(struct K) == 14 && offsetof(struct K, i) == 2);
 STATIC_ASSERT(offsetof(struct K, d) == 6);
 STATIC_ASSERT(sizeof(struct L) == 14 && offsetof(struct L, b) == 2);

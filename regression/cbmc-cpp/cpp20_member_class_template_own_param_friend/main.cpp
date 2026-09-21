@@ -12,7 +12,8 @@
 // and main is silently dropped.
 // g++ and clang++ both accept (-Werror) and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct iter_holder
+template <class T>
+struct iter_holder
 {
   T v_;
   T base() const
@@ -20,11 +21,14 @@ template <class T> struct iter_holder
     return v_;
   }
 };
-template <bool, class T> using maybe_const = T;
-template <class V> struct view_
+template <bool, class T>
+using maybe_const = T;
+template <class V>
+struct view_
 {
   V base_;
-  template <bool> class sentinel_;
+  template <bool>
+  class sentinel_;
   auto end()
   {
     return sentinel_<true>{};
@@ -39,7 +43,8 @@ template <bool Const>
 class view_<V>::sentinel_
 {
 public:
-  template <bool Other> using iter_ = iter_holder<maybe_const<Other, V>>;
+  template <bool Other>
+  using iter_ = iter_holder<maybe_const<Other, V>>;
   // friend whose default template argument names the member class
   // template's OWN parameter
   template <bool Other = Const>

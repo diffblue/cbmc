@@ -18,7 +18,8 @@ int main()
   __CPROVER_assert(lam(4) == 5, "closure object operator() call");
 
   // deduced as the closure type and passed/stored by value
-  __CPROVER_assert(apply_by_value(lam, 4) == 5, "closure passed by value to template");
+  __CPROVER_assert(
+    apply_by_value(lam, 4) == 5, "closure passed by value to template");
 
   // copied as an object
   auto lam2 = lam;

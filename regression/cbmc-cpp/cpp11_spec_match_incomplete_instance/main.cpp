@@ -10,12 +10,15 @@
 // ("symbol '__pair1_' is unknown").  cvise-reduced from the
 // preprocessed libc++ <set> seed (835 bytes -> this).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class> struct pointer_traits;
-template <class _Tp> struct pointer_traits<_Tp *>
+template <class>
+struct pointer_traits;
+template <class _Tp>
+struct pointer_traits<_Tp *>
 {
   typedef _Tp element_type;
 };
-template <class, class> struct __tree_node;
+template <class, class>
+struct __tree_node;
 template <
   class _NodePtr,
   class = typename pointer_traits<_NodePtr>::element_type>
@@ -25,8 +28,7 @@ struct __tree_node_types<_NodePtr, __tree_node<_Tp, _VoidPtr>>
 {
   typedef int __end_node_type;
 };
-typename __tree_node_types<__tree_node<int, void> *>::__end_node_type
-  __pair1_;
+typename __tree_node_types<__tree_node<int, void> *>::__end_node_type __pair1_;
 int main()
 {
   __CPROVER_assert(sizeof(__pair1_) >= 1, "pair1 declared");

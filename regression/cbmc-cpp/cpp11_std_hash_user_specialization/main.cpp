@@ -35,7 +35,8 @@ int main()
 {
   D a{3};
   std::hash<D> h;
-  __CPROVER_assert(h(a) == 103, "std::hash<D> qualified specialization selected");
+  __CPROVER_assert(
+    h(a) == 103, "std::hash<D> qualified specialization selected");
   __CPROVER_assert(h(a) == 3, "WRONG must FAIL");
   return 0;
 }

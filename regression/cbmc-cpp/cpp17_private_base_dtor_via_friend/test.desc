@@ -4,7 +4,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\[main\.assertion\.1\] line 43 pair-with-private-base-destructor elaborates: SUCCESS$
+^\[main\.assertion\.1\] line 45 pair-with-private-base-destructor elaborates: SUCCESS$
 --
 ^CONVERSION ERROR$
 ^.*' is not accessible$

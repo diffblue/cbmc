@@ -7,18 +7,27 @@
 // argument types.  g++/clang++ accept and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
 
-template <typename _Tp> struct vector {
-  struct {
+template <typename _Tp>
+struct vector
+{
+  struct
+  {
     _Tp _M_val;
   };
 };
-struct nullary_exprt {};
-struct symbol_exprt : nullary_exprt {
-  symbol_exprt(int) {}
+struct nullary_exprt
+{
+};
+struct symbol_exprt : nullary_exprt
+{
+  symbol_exprt(int)
+  {
+  }
   using variablest = vector<symbol_exprt>;
 };
 
-int main() {
+int main()
+{
   symbol_exprt s(1);
   (void)s;
   __CPROVER_assert(true, "anonymous-struct member of ctor-only type");

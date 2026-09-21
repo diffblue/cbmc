@@ -5,7 +5,8 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 struct op
 {
-  template <class F, class B, class... R> int operator()(F, B...)
+  template <class F, class B, class... R>
+  int operator()(F, B...)
   {
     return 7;
   }

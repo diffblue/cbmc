@@ -21,7 +21,8 @@
 
 extern "C" void __CPROVER_assert(int, const char *);
 
-namespace ns {
+namespace ns
+{
 template <class T, bool I, bool C>
 struct Matcher
 {

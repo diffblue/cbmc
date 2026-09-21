@@ -48,7 +48,8 @@ int main()
   // S(T&) overload -- so W<const int> IS constructible from int&.
   const bool from_lvalue = __is_constructible(W<const int>, int &);
   __CPROVER_assert(
-    from_lvalue, "constructible from an lvalue (S(T&) binds, deleted S(T&&) not)");
+    from_lvalue,
+    "constructible from an lvalue (S(T&) binds, deleted S(T&&) not)");
   __CPROVER_assert(!from_lvalue, "WRONG must FAIL");
   return 0;
 }

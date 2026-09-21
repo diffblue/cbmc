@@ -51,7 +51,7 @@ struct tuple_element<1, Pair>
 
 int main()
 {
-  Pair p{2, 1}; // stored_second = 2, stored_first = 1
+  Pair p{2, 1};    // stored_second = 2, stored_first = 1
   auto [a, b] = p; // a = get<0>(p) = 1, b = get<1>(p) = 2
   __CPROVER_assert(a == 1, "structured binding 0 uses get<0>");
   __CPROVER_assert(b == 2, "structured binding 1 uses get<1>");

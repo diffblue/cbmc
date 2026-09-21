@@ -6,8 +6,10 @@
 // libc++ __perfect_forward under the ranges views::take closure.
 // clang++-validated; g++ rejects the alias-template pack deduction shape.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T, T...> struct integer_sequence;
-template <long... I> using index_sequence = integer_sequence<unsigned long, I...>;
+template <class T, T...>
+struct integer_sequence;
+template <long... I>
+using index_sequence = integer_sequence<unsigned long, I...>;
 struct op
 {
   int operator()(long, long)
@@ -15,11 +17,13 @@ struct op
     return 7;
   }
 };
-template <class...> struct pf;
+template <class...>
+struct pf;
 template <class Op, long... Idx, class... Bound>
 struct pf<Op, index_sequence<Idx...>, Bound...>
 {
-  template <class...> auto operator()() -> decltype(Op()(Idx...))
+  template <class...>
+  auto operator()() -> decltype(Op()(Idx...))
   {
     return Op()(Idx...);
   }
@@ -27,7 +31,8 @@ struct pf<Op, index_sequence<Idx...>, Bound...>
 struct bb : pf<op, index_sequence<0, 1>>
 {
 } c;
-template <class F> decltype(F()()) invoke_(F f)
+template <class F>
+decltype(F()()) invoke_(F f)
 {
   return f();
 }

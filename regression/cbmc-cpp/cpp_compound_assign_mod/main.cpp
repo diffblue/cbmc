@@ -18,7 +18,9 @@ struct BigNum
   int v;
 
   // Non-POD: user-declared destructor.
-  ~BigNum() { }
+  ~BigNum()
+  {
+  }
 
   BigNum &operator%=(const BigNum &rhs)
   {

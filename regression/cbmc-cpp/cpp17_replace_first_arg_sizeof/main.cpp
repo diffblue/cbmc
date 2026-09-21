@@ -8,10 +8,15 @@
 
 template <typename _Tp, typename _Up>
 struct __replace_first_arg
-{ };
+{
+};
 
-template <template <typename, typename...> class _SomeTemplate,
-          typename _Up, typename _Tp, typename... _Types>
+template <
+  template <typename, typename...>
+  class _SomeTemplate,
+  typename _Up,
+  typename _Tp,
+  typename... _Types>
 struct __replace_first_arg<_SomeTemplate<_Tp, _Types...>, _Up>
 {
   using type = _SomeTemplate<_Up, _Types...>;
@@ -38,8 +43,7 @@ int main()
   R x;
   typename R::value_type y;
   // R must be allocator<B>, so R::value_type = B (sizeof = 1, not 12).
-  __CPROVER_assert(
-    sizeof(y) == sizeof(B), "rebind through TT param yields B");
+  __CPROVER_assert(sizeof(y) == sizeof(B), "rebind through TT param yields B");
   __CPROVER_assert(sizeof(y) != sizeof(A), "rebind not stale at A");
   return 0;
 }

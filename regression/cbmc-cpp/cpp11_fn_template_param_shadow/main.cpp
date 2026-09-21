@@ -53,8 +53,7 @@ template <typename ToDur, typename R, typename P>
 constexpr ToDur duration_cast(const duration<R, P> &d)
 {
   return ToDur(static_cast<typename ToDur::rep>(
-    d.count() * (P::num * ToDur::period::den) /
-    (P::den * ToDur::period::num)));
+    d.count() * (P::num * ToDur::period::den) / (P::den * ToDur::period::num)));
 }
 
 // enclosing fn template parameters named R2/P2 too ([basic.scope.temp]/2:

@@ -59,8 +59,7 @@ int main()
     }
     j++;
   }
-  __CPROVER_assert(
-    round_trip && j == input.size(), "unescape round-trip");
+  __CPROVER_assert(round_trip && j == input.size(), "unescape round-trip");
 
   return 0;
 }

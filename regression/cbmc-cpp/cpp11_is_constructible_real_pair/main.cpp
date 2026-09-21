@@ -28,18 +28,20 @@
 //
 // Non-vacuous (assertion 2 must FAIL).
 
-#include <utility>
 #include <type_traits>
+#include <utility>
 
 extern "C" void __CPROVER_assert(int, const char *);
 
 int main()
 {
   __CPROVER_assert(
-    std::is_constructible<std::pair<const int, int>, std::pair<int, int> &&>::value,
+    std::is_constructible<std::pair<const int, int>, std::pair<int, int> &&>::
+      value,
     "pair<const int,int> is_constructible from pair<int,int>&&");
   __CPROVER_assert(
-    !std::is_constructible<std::pair<const int, int>, std::pair<int, int> &&>::value,
+    !std::is_constructible<std::pair<const int, int>, std::pair<int, int> &&>::
+      value,
     "WRONG must FAIL");
   return 0;
 }

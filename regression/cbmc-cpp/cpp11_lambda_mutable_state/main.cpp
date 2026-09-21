@@ -10,7 +10,11 @@
 int main()
 {
   int a = 10;
-  auto f = [a]() mutable { a += 1; return a; };
+  auto f = [a]() mutable
+  {
+    a += 1;
+    return a;
+  };
   int r1 = f();
   int r2 = f();
   __CPROVER_assert(

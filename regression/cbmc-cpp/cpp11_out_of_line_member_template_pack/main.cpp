@@ -13,24 +13,24 @@
 
 extern "C" void __CPROVER_assert(int, const char *);
 
-template<typename K>
+template <typename K>
 struct tree
 {
   int stored;
   tree() : stored(0)
   {
   }
-  template<typename... Args>
+  template <typename... Args>
   int emplace(Args... args); // defined out of line below
-  template<typename U0, typename... R>
+  template <typename U0, typename... R>
   static int first_of(U0 u0, R...)
   {
     return (int)u0;
   }
 };
 
-template<typename K>
-template<typename... Args>
+template <typename K>
+template <typename... Args>
 int tree<K>::emplace(Args... args)
 {
   stored = first_of(args...);

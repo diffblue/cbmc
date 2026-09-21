@@ -5,7 +5,8 @@
 // reports 'found no match' for the callee instead.
 #include <vector>
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class It> struct ranget
+template <class It>
+struct ranget
 {
   It b_, e_;
   It begin() const
@@ -16,7 +17,8 @@ template <class It> struct ranget
   {
     return e_;
   }
-  template <class C> operator C() const
+  template <class C>
+  operator C() const
   {
     return C(begin(), end());
   }

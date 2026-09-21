@@ -11,19 +11,24 @@
 // the suspected remaining blocker of cpp20_ranges_basic_libcxx.
 // g++ and clang++ both accept and run clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct is_int_
+template <class T>
+struct is_int_
 {
   static const bool value = false;
 };
-template <> struct is_int_<int>
+template <>
+struct is_int_<int>
 {
   static const bool value = true;
 };
 template <class T>
 concept integral_ = is_int_<T>::value;
 template <class T>
-concept has_integral_minus = requires(const T &a, const T &b) {
-  { a - b } -> integral_;
+concept has_integral_minus = requires(const T &a, const T &b)
+{
+  {
+    a - b
+    } -> integral_;
 };
 struct no_minus
 {
