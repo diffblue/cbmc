@@ -1266,7 +1266,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
     if(symbol.value.is_not_nil() && !is_deferred)
     {
       if(
-        base.find("__try_use_facet") == 0 &&
+        (base.find("__try_use_facet") == 0 || base.find("use_facet") == 0) &&
         name.find("<std::tag-ctype<char>>") != std::string::npos &&
         to_code_type(symbol.type).return_type().id() == ID_pointer)
       {
@@ -1274,7 +1274,11 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // libstdc++-internal __loc->_M_impl->_M_facets table, with a
         // return of the modelled classic-"C" ctype<char> facet
         // ([locale.general]/8: the startup global locale is the "C"
-        // locale).  See provide_classic_ctype_char_model.
+        // locale).  See provide_classic_ctype_char_model.  libstdc++ 13
+        // routes use_facet through __try_use_facet; libstdc++ 11's
+        // use_facet<_Facet>(const locale&) reads the table itself and
+        // returns `const _Facet&' (a pointer here), so it is overridden the
+        // same way.
         exprt facet = provide_classic_ctype_char_model(symbol_table, ns);
         if(facet.is_not_nil())
         {
