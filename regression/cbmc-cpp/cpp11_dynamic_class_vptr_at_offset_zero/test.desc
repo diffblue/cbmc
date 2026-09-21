@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17
+--cpp17 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -11,3 +11,5 @@ Itanium C++ ABI 2.4 II.1: vptr at offset 0 of a dynamic class whose bases
 are not dynamic; base subobject offsets computed from the layout (not assumed
 0 for the first base).  Classes with dynamic bases (shared vptr) and virtual
 bases are still modelled differently (see the notes).
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

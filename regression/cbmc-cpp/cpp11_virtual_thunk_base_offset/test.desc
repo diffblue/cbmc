@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11
+--cpp11 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -14,3 +14,5 @@ thunk body was built when the overrider was declared, before add_padding ran,
 with the unpadded offset (12 instead of 16 here); it is now rebuilt after the
 layout (finalize_virtual_thunks).  Before: T::m read t and q from the wrong
 addresses (pointer-outside-object-bounds and assertion failures).
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

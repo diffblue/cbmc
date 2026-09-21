@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp20 --object-bits 11 --no-unwinding-assertions
+--cpp20 --object-bits 11 --no-unwinding-assertions --64
 ^\[main\.assertion\.1\] line \d+ zipped two-pack expansion folds: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ zipped two-pack expansion folds \(false\): SUCCESS$
 ^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
@@ -21,3 +21,5 @@ template arguments are now brought into the active template map when the
 constexpr member function template definition is instantiated.  Assertions 1-2
 prove the zipped expansion folds to the correct value; assertion 3 (a wrong
 value) must FAIL, proving non-vacuity.
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

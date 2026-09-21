@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17
+--cpp17 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -16,3 +16,5 @@ alias-declaration (g++); packed structs: byte-aligned members except those
 with their own aligned(n); unnamed bit-fields occupy bits but never raise the
 alignment; a two-attribute group on a member declarator keeps the base type
 (`long m __attribute__((packed, aligned(2)))' had become an int).
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

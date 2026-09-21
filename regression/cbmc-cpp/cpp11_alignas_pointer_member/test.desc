@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11
+--cpp11 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -8,3 +8,5 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.
