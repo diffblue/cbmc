@@ -1420,10 +1420,37 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // For type-only arguments, keep the conservative limit.
     if(same_template_depth >= 2)
     {
+      // N5008 [temp.variadic]: a variadic template recursing on its pack
+      // (`__and_<B1, B2, Bn...> : ... __and_<B2, Bn...>`, libstdc++ 11's
+      // conjunction) converges on the ARGUMENT COUNT: allow the elaboration
+      // when this instance has strictly fewer template arguments than every
+      // enclosing instance of the same template (the depth limit below
+      // otherwise silently skipped the third level, `__and_' of five or
+      // more traits, and every tuple<A, B, C> constructor constraint
+      // evaluated false).
+      {
+        bool fewer_than_all_parents = true;
+        for(const auto &entry : instantiation_stack)
+        {
+          if(
+            entry.identifier == primary_template.name &&
+            entry.full_template_args.arguments().size() <=
+              full_args.arguments().size())
+          {
+            fewer_than_all_parents = false;
+            break;
+          }
+        }
+        if(fewer_than_all_parents)
+          has_converging_int_args = true;
+      }
+
       // Check if current args have a non-type integer constant that
       // is strictly less than the corresponding arg in every parent.
       for(const auto &arg : full_args.arguments())
       {
+        if(has_converging_int_args)
+          break;
         if(arg.id() == ID_type || !arg.is_constant())
           continue;
         mp_integer current_val;
