@@ -930,9 +930,9 @@ void goto_convertt::convert_frontend_decl(
 
   if(destructor.is_not_nil())
   {
-    // add "this"
+    // add "this" (in front of any hidden flag argument, see get_destructor)
     address_of_exprt this_expr(symbol_expr, pointer_type(symbol.type));
-    destructor.arguments().push_back(this_expr);
+    destructor.arguments().insert(destructor.arguments().begin(), this_expr);
 
     targets.scope_stack.add(destructor, {});
 

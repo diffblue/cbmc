@@ -14,6 +14,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
 
@@ -40,9 +41,16 @@ code_function_callt get_destructor(const namespacet &ns, const typet &type)
       {
         const code_typet &code_type = to_code_type(op.type());
 
+        // `this', plus -- for the destructor of a C++ class with virtual
+        // bases -- the hidden `@most_derived' flag, which is `true' for a
+        // complete object (the Itanium C++ ABI's D1 destructor, 5.1.4)
+        const bool with_most_derived_flag =
+          code_type.parameters().size() == 2 &&
+          code_type.parameters().back().get_base_name() == "@most_derived";
+
         if(
           code_type.return_type().id() == ID_destructor &&
-          code_type.parameters().size() == 1)
+          (code_type.parameters().size() == 1 || with_most_derived_flag))
         {
           const typet &arg_type = code_type.parameters().front().type();
 
@@ -55,7 +63,10 @@ code_function_callt get_destructor(const namespacet &ns, const typet &type)
             ns.follow_tag(to_struct_tag_type(base_type)) == type)
           {
             const symbol_exprt symbol_expr(op.get(ID_name), op.type());
-            return code_function_callt(symbol_expr);
+            code_function_callt call(symbol_expr);
+            if(with_most_derived_flag)
+              call.arguments().push_back(true_exprt());
+            return call;
           }
         }
       }
@@ -98,10 +109,10 @@ void destruct_locals(
           .insert(std::move(stub_sym));
       }
 
-      // add "this"
+      // add "this" (in front of any hidden flag argument)
       address_of_exprt this_expr(
         symbol.symbol_expr(), pointer_type(symbol.type));
-      destructor.arguments().push_back(this_expr);
+      destructor.arguments().insert(destructor.arguments().begin(), this_expr);
 
       dest.add(goto_programt::make_function_call(
         destructor, destructor.source_location()));

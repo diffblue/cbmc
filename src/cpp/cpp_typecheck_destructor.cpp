@@ -14,6 +14,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <algorithm>
+#include <functional>
+
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
 {
   for(const auto &c : to_struct_type(symbol.type).components())
@@ -65,7 +68,17 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
   const struct_union_typet::componentst &components =
     to_struct_union_type(symbol.type).components();
 
-  // take care of virtual methods
+  std::list<irep_idt> vbase_ids;
+  if(symbol.type.id() == ID_struct)
+    get_virtual_bases(to_struct_type(symbol.type), vbase_ids);
+  const bool has_virtual_bases = !vbase_ids.empty();
+
+  // take care of virtual methods: the vtables of this class as the complete
+  // object.  A class with virtual bases does so only in the complete-object
+  // destructor (D1, `@most_derived'); its base-object destructor (D2) keeps
+  // the most derived object's tables, whose virtual-base offsets the bodies
+  // below rely on (Itanium C++ ABI 5.1.4; see full_member_initialization).
+  code_blockt vptr_block;
   for(const auto &c : components)
   {
     if(c.get_bool(ID_is_vtptr))
@@ -83,9 +96,19 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
       ptrmember.operands().push_back(this_expr);
 
       code_frontend_assignt assign(ptrmember, address);
-      block.add(assign);
+      vptr_block.add(assign);
       continue;
     }
+  }
+  if(has_virtual_bases)
+  {
+    block.add(code_ifthenelset(
+      cpp_namet("@most_derived").as_expr(), std::move(vptr_block)));
+  }
+  else
+  {
+    for(const auto &assign : vptr_block.statements())
+      block.add(assign);
   }
 
   // call the data member destructors in the reverse order
@@ -155,13 +178,13 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
 
   const auto &bases = to_struct_type(symbol.type).bases();
 
-  // call the base destructors in the reverse order
-  for(class_typet::basest::const_reverse_iterator bit = bases.rbegin();
-      bit != bases.rend();
-      bit++)
+  // the destructor call for the base subobject of class `base_type' at
+  // `this' (the address adjusted by the subobject's offset, for a virtual
+  // base the one of this complete object -- N5008 [class.dtor]/14 only has
+  // the most derived class's destructor destroy the virtual bases, after the
+  // direct non-virtual ones)
+  const auto destroy_base = [&](const typet &base_type) -> std::optional<codet>
   {
-    DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
-
     // Cast `this_expr` to a `Base*` before dereferencing.  Without
     // the explicit cast, `c_typecheck_baset::typecheck_expr_dereference`
     // (called when `cpp_destructor` builds a member-call expression
@@ -180,20 +203,75 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
     // base subobject's class type, pinning member-access lookup to
     // its own scope.  Mark the cast as already-type-checked so the
     // operand walk doesn't undo it.
-    typecast_exprt cast_this{this_expr, pointer_type(bit->type())};
+    exprt cast_this = this_expr;
+    make_ptr_typecast(
+      cast_this,
+      pointer_type(base_type),
+      /*static_virtual_base_offset=*/true);
     cast_this.add_source_location() = source_location;
     already_typechecked_exprt::make_already_typechecked(cast_this);
 
-    dereference_exprt object{cast_this, bit->type()};
+    dereference_exprt object{cast_this, base_type};
     object.add_source_location() = source_location;
 
     const bool disabled_access_control = disable_access_control;
     disable_access_control = true;
-    auto dtor_code = cpp_destructor(source_location, object);
+    auto dtor_code = cpp_destructor(
+      source_location, object, /*force_direct=*/true, /*base_subobject=*/true);
     disable_access_control = disabled_access_control;
+    return dtor_code;
+  };
 
+  // call the direct non-virtual base destructors in the reverse order
+  for(class_typet::basest::const_reverse_iterator bit = bases.rbegin();
+      bit != bases.rend();
+      bit++)
+  {
+    DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
+    if(bit->get_bool(ID_virtual))
+      continue;
+    auto dtor_code = destroy_base(bit->type());
     if(dtor_code.has_value())
       block.add(dtor_code.value());
+  }
+
+  // then, in the complete-object destructor only, the virtual bases in the
+  // reverse of their construction order (a virtual base after those whose
+  // hierarchy contains it -- the reverse of full_member_initialization)
+  if(has_virtual_bases)
+  {
+    std::list<irep_idt> construction_order;
+    std::function<void(const irep_idt &)> add_vbase =
+      [&](const irep_idt &vbase_id)
+    {
+      if(
+        std::find(
+          construction_order.begin(), construction_order.end(), vbase_id) !=
+        construction_order.end())
+        return;
+      const symbolt &symb = lookup(vbase_id);
+      if(symb.type.id() == ID_struct)
+      {
+        std::list<irep_idt> own;
+        get_virtual_bases(to_struct_type(symb.type), own);
+        for(const auto &o : own)
+          add_vbase(o);
+      }
+      construction_order.push_back(vbase_id);
+    };
+    for(const auto &v : vbase_ids)
+      add_vbase(v);
+
+    code_blockt vbase_block;
+    for(auto it = construction_order.rbegin(); it != construction_order.rend();
+        ++it)
+    {
+      auto dtor_code = destroy_base(struct_tag_typet(*it));
+      if(dtor_code.has_value())
+        vbase_block.add(dtor_code.value());
+    }
+    block.add(code_ifthenelset(
+      cpp_namet("@most_derived").as_expr(), std::move(vbase_block)));
   }
 
   return std::move(block);

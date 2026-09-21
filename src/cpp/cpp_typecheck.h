@@ -557,6 +557,14 @@ protected:
   void clean_up();
   void provide_stdlib_bodies();
 
+  /// Lay out the class's virtual bases after its non-virtual part (Itanium
+  /// C++ ABI 2.4 II.3); their components are marked ID_C_virtual_base with
+  /// the virtual base's class identifier.
+  void append_virtual_bases(
+    struct_typet &type,
+    std::set<irep_idt> &bases,
+    std::set<irep_idt> &vbases);
+
   void add_base_components(
         const struct_typet &from,
         const irep_idt &access,
@@ -570,9 +578,22 @@ protected:
 
   void do_virtual_table(const symbolt &symbol);
 
+  /// The class's vtable struct `virtual_table::<class>`, created on first
+  /// use (with the class's own virtual pointer, or embedding the primary
+  /// base's table); returns its identifier.
+  irep_idt ensure_virtual_table(
+    const symbolt &symbol,
+    struct_typet::componentst &components);
+
   /// Rebuild the bodies of the class's virtual-function thunks once the class
   /// is laid out (the `this' adjustments are base-subobject offsets).
   void finalize_virtual_thunks(const symbolt &symbol);
+
+  /// Fill in the `@vbase_offset::<V>' entries of the class's vtable objects
+  /// (Itanium C++ ABI 2.5.2): the position of each virtual base in this
+  /// complete object relative to the subobject owning the pointer.  Needs
+  /// the final layout, so runs after padding.
+  void set_virtual_base_offsets(const symbolt &symbol);
 
   /// Build (or rebuild) the body of the thunk \p thunk that a virtual
   /// function \p target (a component of \p derived) is entered through when
@@ -832,10 +853,14 @@ protected:
 
   const struct_typet &this_struct_type();
 
+  /// The destructor call for \p object; \p base_subobject when it is a base
+  /// subobject destroyed by a derived class's destructor (the base-object
+  /// destructor of a class with virtual bases is then requested).
   std::optional<codet> cpp_destructor(
     const source_locationt &source_location,
     const exprt &object,
-    bool force_direct = true);
+    bool force_direct = true,
+    bool base_subobject = false);
 
   // expressions
   void explicit_typecast_ambiguity(exprt &);
@@ -1214,7 +1239,15 @@ public:
     const struct_typet &from,
     const struct_typet &to) const;
 
-  void make_ptr_typecast(exprt &expr, const pointer_typet &dest_type);
+  /// Convert the class pointer \p expr to the base (or derived) class pointer
+  /// type \p dest_type, adjusting it by the base subobject's offset.  A base
+  /// reached through a VIRTUAL base is located through the vtable at run
+  /// time unless \p static_virtual_base_offset asks for this class's own
+  /// layout (the complete object's constructor/destructor).
+  void make_ptr_typecast(
+    exprt &expr,
+    const pointer_typet &dest_type,
+    bool static_virtual_base_offset = false);
 
   // the C++ typecasts
 

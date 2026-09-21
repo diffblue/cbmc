@@ -68,6 +68,19 @@ classes_with_special_member_functions(const symbol_table_baset &symbol_table)
   return result;
 }
 
+/// Is \p code_type that of a destructor taking `this' -- and, for a class
+/// with virtual bases, the hidden `@most_derived' flag (Itanium C++ ABI
+/// 5.1.4: complete-object versus base-object destructor)?
+static bool is_complete_object_destructor_type(const code_typet &code_type)
+{
+  if(code_type.return_type().id() != ID_destructor)
+    return false;
+  if(code_type.parameters().size() == 1)
+    return true;
+  return code_type.parameters().size() == 2 &&
+         code_type.parameters().back().get_base_name() == "@most_derived";
+}
+
 /// Find the destructor symbol of the class named by \p struct_tag, if
 /// any, and return its symbol expression.
 static std::optional<symbol_exprt>
@@ -82,12 +95,8 @@ find_destructor(const typet &struct_tag, const symbol_table_baset &symbol_table)
       continue;
 
     const code_typet &code_type = to_code_type(symbol.type);
-    if(
-      code_type.return_type().id() != ID_destructor ||
-      code_type.parameters().size() != 1)
-    {
+    if(!is_complete_object_destructor_type(code_type))
       continue;
-    }
 
     const typet &this_type = code_type.parameters().front().type();
     if(
@@ -172,8 +181,9 @@ static bool is_destructor_call_on(
     return false;
 
   if(
-    to_code_type(function.type()).return_type().id() != ID_destructor ||
-    instruction.call_arguments().size() != 1)
+    !is_complete_object_destructor_type(to_code_type(function.type())) ||
+    instruction.call_arguments().size() !=
+      to_code_type(function.type()).parameters().size())
   {
     return false;
   }
@@ -487,6 +497,9 @@ void elide_cpp_returned_temporaries(goto_modelt &goto_model)
         {
           code_function_callt destructor_call{
             *destructor, {address_of_exprt{slot}}};
+          // the complete object's destructor
+          if(to_code_type(destructor->type()).parameters().size() == 2)
+            destructor_call.arguments().push_back(true_exprt{});
           after = std::next(body.insert_after(
             i_it,
             goto_programt::make_function_call(
