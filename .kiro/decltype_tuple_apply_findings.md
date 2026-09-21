@@ -10536,3 +10536,65 @@ forbid that phrase) so no existing test changes meaning.
   Estimated a round of its own; fuzzer `--virtual-all' (26/40 now, all
   vbase cases) is the oracle; iostream-shaped diamonds (systemc suite,
   cpp11_virtual_base_diamond_dtor) the regression risk.
+
+## Round 156 (2026-09-21) — alias-template deferral landed, first CI triage of PR #8878
+
+- Alias-template deferral (`4a683ac8a4'): the round-155 revert was undone
+  and the real gap closed.  Root cause of the cpp20_ranges_pipe_invoke_drop
+  failure was NOT pack deduction (the `_Up' pack shadowing, the flat
+  template map and the `tuple(_Up...)<>' empty-pack instantiation were red
+  herrings: that instantiation fails identically on the old binary and is
+  swallowed).  It was `using invoke_result_t = __invoke_of<F, A...>::type':
+  with the flag correctly restored, skip_typechecking_elaborate was still
+  set while __invoke_of's BODY was being elaborated (reached through the
+  qualified name), so its base `enable_if<...>' stayed unelaborated and
+  `type' never resolved ("type has no size").  Fix: typecheck_compound_body
+  clears the flag for its duration (a class body has real uses).  Two
+  alternatives tried and dropped as unnecessary: clearing the template map
+  around lazy class elaboration; prioritising a member's own/class pack
+  ids over same-named leaked packs in expand_member_initializer_packs /
+  remove_empty_pack_expansion_args (a real latent hazard -- the short-name
+  keyed `type_packs' map is overwritten by whichever full id sorts last --
+  but not what broke here).  cpp11_alias_template_defers_instantiation is
+  CORE; pmr::string no longer dropped on gcc-11 headers.
+- CI triage (push at 14:19).  Green: clang-format, doxygen, BSDs, macOS
+  cmake, dogfood, random tests, perf, docker, string-table, CodeQL.  Fixed
+  here:
+  * cpplint on changed lines, 71 findings (`5195b80499').  `run_diff.sh
+    CPPLINT <merge-base>' must be part of the pre-push check -- the
+    earlier `e7359e5ccd..HEAD' range missed everything older.
+  * `--validate-goto-model --validate-ssa-equation' is passed to EVERY
+    cbmc-cpp test by both the CMake and the Makefile harnesses; my suite
+    runs never had it.  Three tests aborted: cpp11_future_header
+    (`__atomic_load_n' single shared symbol -> return type of the first
+    call, C++ front end now materialises per-type built-in symbols like
+    the C front end, `44e0a0692c'), cpp11_regex_construct/match
+    test_conversion (block-scope static array of pairs kept its
+    constructor CODE as symbol value -> __CPROVER_initialize assigned a
+    block; value cleared after emitting the call).  From now on run
+    cbmc-cpp with the validation flags.
+  * test.pl dies on a desc without `^EXIT=' ("Missing EXIT test") -- it
+    aborted the whole cbmc-cpp-libcxx run at cpp11_sole_template_false_
+    constraint; also every failure listed for 32-bit/arm after that point
+    is unknown for the same reason.
+  * 32-bit build: layout tests assert LP64 -> `--64' / `-m64' in the
+    option line (11 cbmc-cpp + 3 ansi-c).  `cbmc --32' locally is a good
+    approximation for enumerating them.
+  * unit-proofs/strip_string OOMs the runner (3.2 GB) -> THOROUGH.
+  * Visual Studio: pragma_pack5 uses GNU attributes -> `#ifdef __GNUC__';
+    __builtin_memchr/memcmp/assume_aligned -> gcc-only; unit/count_tests.py
+    UnicodeDecodeError (cp1252 default on the Windows runner, em dash in an
+    existing unit test) -> open with encoding="utf-8".
+  * macOS make-clang: cpp/regex_match_compile fails on Apple's libc++
+    <regex> -> gcc-only.
+  Not reproducible / left: z3 job's cbmc/complex2 reports ERROR for both
+  properties (same z3 4.8.12 passes locally with gcc and clang builds;
+  likely solver resource kill under -j); include-what-you-use job fails on
+  generated files missing (`ansi_c_y.tab.cpp', `cprover_library.inc') --
+  a job-setup problem, look at develop's job for the expected setup;
+  Ubuntu 22.04 make-clang cpp11_locale_ctype_facet abort still to be
+  reproduced with g++-11 preprocessed input + validation flags.
+- Pitfall of the day: a script that "fixed" `--\n--\n' in test.desc files
+  touched 237 descs whose EMPTY ignore section is followed by notes -- and a
+  suite run in flight read the mangled files (test.pl died on a note text
+  taken as regex).  Reverted; never edit descs by pattern while a run is on.
