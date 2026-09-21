@@ -2670,6 +2670,28 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
+  // A typedef/alias declaration defers the elaboration of the class template
+  // specialization it NAMES (skip_typechecking_elaborate, N5008 [temp.inst]/1).
+  // That deferral is about the alias's own type only: once a class body IS
+  // being type-checked -- here, possibly because a qualified name looked into
+  // it ([temp.inst]/2) from within that alias -- its bases and members are
+  // real uses, and the specializations they require must be elaborated.
+  // Otherwise `using invoke_result_t = __invoke_of<F, A...>::type' left
+  // __invoke_of's base `enable_if<...>' unelaborated and `type' unresolved.
+  struct skip_elaborate_guardt final
+  {
+    explicit skip_elaborate_guardt(bool &_flag) : flag(_flag), saved(_flag)
+    {
+      flag = false;
+    }
+    ~skip_elaborate_guardt()
+    {
+      flag = saved;
+    }
+    bool &flag;
+    const bool saved;
+  } skip_elaborate_guard{skip_typechecking_elaborate};
+
   ++compound_body_depth;
 
   cpp_save_scopet saved_scope(cpp_scopes);

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^EXIT=0$
@@ -17,12 +17,10 @@ skip_typechecking_elaborate instead of restoring it when the alias template's
 own declaration was converted underneath, so the outer resolver elaborated
 the class (libstdc++ 11 pmr::string: "dropped 4 system-header declarations";
 here: `a' never constructed, assertion 1 failed).
-KNOWNBUG: fixing this by restoring skip_typechecking_elaborate after the
-nested alias-template conversion (b79b14f901, reverted) broke
-cpp20_ranges_pipe_invoke_drop: a specialization only named through an alias
-template stays unelaborated and a later variadic constructor deduction from
-an object of that type yields an empty pack.  That deduction-time
-elaboration gap must be closed first (elaborate incomplete template
-instances used as call-argument types; the guess_function_template_args
-entry did not suffice -- the failing deduction runs elsewhere, from the
-mem-initializer `__bound_args_(__bound_args...)' of __perfect_forward_impl).
+Fixing this needed two parts: restore skip_typechecking_elaborate after the
+nested alias-template conversion, and clear it while a class BODY is being
+type-checked (typecheck_compound_body) -- a body reached from within an alias
+(a qualified name looked into the class, [temp.inst]/2) has real uses in its
+bases and members; leaving the flag set left `__invoke_of<...>`'s base
+`enable_if<...>` unelaborated and `invoke_result_t<...>` unresolved
+(cpp20_ranges_pipe_invoke_drop).
