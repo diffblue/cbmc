@@ -27,7 +27,6 @@ Author: Cristina David (Java), Kiro (base extraction)
 #include <goto-programs/goto_program.h>
 
 #include <functional>
-#include <optional>
 #include <set>
 #include <vector>
 

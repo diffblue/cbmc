@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>
-#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
 extern exprt try_evaluate_constexpr(

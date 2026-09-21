@@ -26,7 +26,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/c_qualifiers.h>
-#include <ansi-c/type2name.h>
 
 #include "cpp_exception_id.h"
 #include "cpp_sfinae_context.h"

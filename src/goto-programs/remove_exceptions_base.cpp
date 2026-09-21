@@ -18,8 +18,6 @@ Author: Cristina David (Java), Kiro (base extraction)
 #include <goto-programs/goto_functions.h>
 #include <goto-programs/remove_skip.h>
 
-#include <analyses/uncaught_exceptions_analysis.h>
-
 bool remove_exceptions_baset::function_or_callees_may_throw(
   const goto_programt &goto_program) const
 {
