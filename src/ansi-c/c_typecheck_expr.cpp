@@ -2650,67 +2650,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {
-        irep_idt identifier_with_type = gcc_polymorphic->identifier();
-        auto &parameters = to_code_type(gcc_polymorphic->type()).parameters();
-        INVARIANT(
-          !parameters.empty(),
-          "GCC polymorphic built-ins should have at least one parameter");
-
-        // For all atomic/sync polymorphic built-ins (which are the ones handled
-        // by typecheck_gcc_polymorphic_builtin), looking at the first parameter
-        // suffices to distinguish different implementations.
-        if(parameters.front().type().id() == ID_pointer)
-        {
-          identifier_with_type =
-            id2string(identifier) + "_" +
-            type_to_partial_identifier(
-              to_pointer_type(parameters.front().type()).base_type(), *this);
-        }
-        else
-        {
-          identifier_with_type =
-            id2string(identifier) + "_" +
-            type_to_partial_identifier(parameters.front().type(), *this);
-        }
-        gcc_polymorphic->identifier(identifier_with_type);
-
-        if(!symbol_table.has_symbol(identifier_with_type))
-        {
-          for(std::size_t i = 0; i < parameters.size(); ++i)
-          {
-            const std::string base_name = "p_" + std::to_string(i);
-
-            parameter_symbolt new_symbol;
-
-            new_symbol.name =
-              id2string(identifier_with_type) + "::" + base_name;
-            new_symbol.base_name = base_name;
-            new_symbol.location = f_op.source_location();
-            new_symbol.type = parameters[i].type();
-            new_symbol.is_parameter = true;
-            new_symbol.is_lvalue = true;
-            new_symbol.mode = ID_C;
-
-            parameters[i].set_identifier(new_symbol.name);
-            parameters[i].set_base_name(new_symbol.base_name);
-
-            symbol_table.add(new_symbol);
-          }
-
-          symbolt new_symbol{
-            identifier_with_type, gcc_polymorphic->type(), ID_C};
-          new_symbol.base_name = identifier_with_type;
-          new_symbol.location = f_op.source_location();
-          code_blockt implementation =
-            instantiate_gcc_polymorphic_builtin(identifier, *gcc_polymorphic);
-          typet parent_return_type = return_type;
-          return_type = to_code_type(gcc_polymorphic->type()).return_type();
-          typecheck_code(implementation);
-          return_type = parent_return_type;
-          new_symbol.value = implementation;
-
-          symbol_table.add(new_symbol);
-        }
+        materialize_gcc_polymorphic_builtin(
+          identifier, *gcc_polymorphic, f_op.source_location());
 
         f_op = std::move(*gcc_polymorphic);
       }
@@ -2837,6 +2778,69 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     expr.swap(tmp);
   else
     typecheck_function_call_arguments(expr);
+}
+
+void c_typecheck_baset::materialize_gcc_polymorphic_builtin(
+  const irep_idt &identifier,
+  symbol_exprt &gcc_polymorphic,
+  const source_locationt &source_location)
+{
+  irep_idt identifier_with_type = gcc_polymorphic.get_identifier();
+  auto &parameters = to_code_type(gcc_polymorphic.type()).parameters();
+  INVARIANT(
+    !parameters.empty(),
+    "GCC polymorphic built-ins should have at least one parameter");
+
+  if(parameters.front().type().id() == ID_pointer)
+  {
+    identifier_with_type =
+      id2string(identifier) + "_" +
+      type_to_partial_identifier(
+        to_pointer_type(parameters.front().type()).base_type(), *this);
+  }
+  else
+  {
+    identifier_with_type =
+      id2string(identifier) + "_" +
+      type_to_partial_identifier(parameters.front().type(), *this);
+  }
+  gcc_polymorphic.set_identifier(identifier_with_type);
+
+  if(!symbol_table.has_symbol(identifier_with_type))
+  {
+    for(std::size_t i = 0; i < parameters.size(); ++i)
+    {
+      const std::string base_name = "p_" + std::to_string(i);
+
+      parameter_symbolt new_symbol;
+
+      new_symbol.name = id2string(identifier_with_type) + "::" + base_name;
+      new_symbol.base_name = base_name;
+      new_symbol.location = source_location;
+      new_symbol.type = parameters[i].type();
+      new_symbol.is_parameter = true;
+      new_symbol.is_lvalue = true;
+      new_symbol.mode = ID_C;
+
+      parameters[i].set_identifier(new_symbol.name);
+      parameters[i].set_base_name(new_symbol.base_name);
+
+      symbol_table.add(new_symbol);
+    }
+
+    symbolt new_symbol{identifier_with_type, gcc_polymorphic.type(), ID_C};
+    new_symbol.base_name = identifier_with_type;
+    new_symbol.location = source_location;
+    code_blockt implementation =
+      instantiate_gcc_polymorphic_builtin(identifier, gcc_polymorphic);
+    typet parent_return_type = return_type;
+    return_type = to_code_type(gcc_polymorphic.type()).return_type();
+    c_typecheck_baset::typecheck_code(implementation);
+    return_type = parent_return_type;
+    new_symbol.value = implementation;
+
+    symbol_table.add(new_symbol);
+  }
 }
 
 exprt c_typecheck_baset::do_special_functions(
