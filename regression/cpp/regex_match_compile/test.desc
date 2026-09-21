@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.cpp
 -std=c++11
 ^EXIT=0$
@@ -9,3 +9,5 @@ main.cpp
 --
 Compile-only twin of regression/cbmc-cpp/cpp11_regex_match (KNOWNBUG
 there for BMC scaling only); guards the front end.
+gcc-only: the front end is tuned to libstdc++'s <regex>; Apple's libc++ headers
+(Xcode 16) fail to type-check (invalid implicit conversion in __mutex/mutex.h).

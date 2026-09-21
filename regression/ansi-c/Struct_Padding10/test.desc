@@ -1,8 +1,11 @@
 CORE
 main.c
-
+-m64
 ^EXIT=0$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+--
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`-m64'); the test is not meaningful in a 32-bit configuration.
