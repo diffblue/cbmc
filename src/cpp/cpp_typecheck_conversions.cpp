@@ -2279,20 +2279,26 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       //
       // Nested re-entry (the in-progress set is non-empty) is permitted only
       // inside a constant-expression evaluation (`constant_expression_context
-      // > 0`) -- i.e. while evaluating a converting constructor's SFINAE
-      // constraint, which is exactly where the nested is_constructible query
-      // arises.  Ordinary run-time conversions never need this nesting; letting
-      // them re-enter the (expensive) per-candidate `new_temporary` trial below
-      // roughly doubled compile time on numeric-heavy translation units
-      // (e.g. expr.cpp, mp_arith.cpp).  The `size() < 2` bound additionally
-      // caps nesting depth: one nested level suffices for the conforming
-      // std::optional / std::unique_ptr patterns.
+      // > 0`) or a substitution (`sfinae_context_depth > 0`) -- i.e. while
+      // evaluating a converting constructor's SFINAE constraint, which is
+      // exactly where the nested is_constructible/is_convertible query
+      // arises (sfinae_contextt suspends the constant-expression context, so
+      // the depth is what identifies a constraint evaluation there: libstdc++
+      // 11's `is_convertible<default_delete<D>, default_delete<B>>` probe,
+      // `__test_aux<_To1>(declval<_From1>())`, inside the unique_ptr<U, E>&&
+      // converting constructor's constraint needs default_delete's converting
+      // constructor template).  Ordinary run-time conversions never need this
+      // nesting; letting them re-enter the (expensive) per-candidate
+      // `new_temporary` trial below roughly doubled compile time on
+      // numeric-heavy translation units (e.g. expr.cpp, mp_arith.cpp).  The
+      // `size() < 2` bound additionally caps nesting depth: one nested level
+      // suffices for the conforming std::optional / std::unique_ptr patterns.
       const irep_idt to_ctor_key = to_struct_tag_type(to).get_identifier();
       if(
         template_conversions_in_progress.find(to_ctor_key) ==
           template_conversions_in_progress.end() &&
         (template_conversions_in_progress.empty() ||
-         constant_expression_context > 0) &&
+         constant_expression_context > 0 || sfinae_context_depth > 0) &&
         template_conversions_in_progress.size() < 2 &&
         struct_type_to.get_bool("has_template_constructor"))
       {
