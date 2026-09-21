@@ -12,12 +12,106 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_typecheck.h"
 
 #include <functional>
+
+void cpp_typecheckt::build_virtual_thunk_body(
+  symbolt &thunk,
+  const irep_idt &target,
+  const typet &target_type,
+  const irep_idt &base_class,
+  const struct_typet &derived)
+{
+  const code_typet &code_type = to_code_type(thunk.type);
+  const code_typet::parameterst &args = code_type.parameters();
+  PRECONDITION(!args.empty());
+
+  exprt this_expr = lookup(args[0].get_identifier()).symbol_expr();
+  const typet &this_target_type =
+    to_code_type(target_type).parameters()[0].type();
+
+  // A base subobject that shares the derived class's virtual pointer (the
+  // primary-base chain, Itanium C++ ABI 2.4 II.1) is at offset 0 and needs
+  // no adjustment; any other dynamic base subobject starts at the offset of
+  // its own virtual pointer in the derived class's layout.
+  const irep_idt base_vtptr = vtable_pointer_component(base_class);
+  const bool is_primary_base =
+    !base_vtptr.empty() &&
+    base_vtptr == vtable_pointer_component(derived.get(ID_name));
+
+  exprt late_cast;
+  std::optional<mp_integer> base_off;
+  if(!is_primary_base && !base_vtptr.empty())
+    base_off = member_offset(derived, base_vtptr, *this);
+  if(base_off.has_value() && *base_off > 0)
+  {
+    auto char_ptr =
+      typecast_exprt(this_expr, pointer_type(unsigned_char_type()));
+    auto adjusted =
+      minus_exprt(char_ptr, from_integer(*base_off, pointer_diff_type()));
+    late_cast = typecast_exprt(adjusted, this_target_type);
+  }
+  else
+    late_cast = typecast_exprt(this_expr, this_target_type);
+
+  // the call must be direct (non-virtual): it would otherwise dispatch back
+  // through the vtable
+  typet direct_type = target_type;
+  direct_type.remove(ID_C_is_virtual);
+
+  side_effect_expr_function_callt expr_call(
+    symbol_exprt(target, direct_type),
+    {late_cast},
+    uninitialized_typet{},
+    source_locationt{});
+  expr_call.arguments().reserve(args.size());
+
+  // the first parameter (this) was added as late_cast above
+  for(std::size_t j = 1; j < args.size(); ++j)
+    expr_call.arguments().push_back(
+      lookup(args[j].get_identifier()).symbol_expr());
+
+  if(
+    code_type.return_type().id() != ID_empty &&
+    code_type.return_type().id() != ID_destructor)
+  {
+    expr_call.type() = to_code_type(target_type).return_type();
+    thunk.value = code_blockt{{code_frontend_returnt(std::move(expr_call))}};
+  }
+  else
+  {
+    thunk.value = code_blockt{{code_expressiont(std::move(expr_call))}};
+  }
+}
+
+void cpp_typecheckt::finalize_virtual_thunks(const symbolt &symbol)
+{
+  PRECONDITION(symbol.type.id() == ID_struct);
+
+  for(const auto &compo : to_struct_type(symbol.type).components())
+  {
+    if(compo.type().id() != ID_code || compo.get_bool(ID_from_base))
+      continue;
+    const irep_idt target = compo.type().get("#thunk_target");
+    if(target.empty())
+      continue;
+    symbolt *thunk = symbol_table.get_writeable(compo.get_name());
+    const symbolt *target_symbol = symbol_table.lookup(target);
+    if(thunk == nullptr || target_symbol == nullptr)
+      continue;
+    build_virtual_thunk_body(
+      *thunk,
+      target,
+      target_symbol->type,
+      compo.type().get("#thunk_base"),
+      to_struct_type(symbol.type));
+  }
+}
 
 void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 {

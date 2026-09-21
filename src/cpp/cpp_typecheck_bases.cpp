@@ -508,6 +508,7 @@ void cpp_typecheckt::add_base_components(
     const bool is_virtual_base = b.get_bool(ID_virtual);
 
     // recursive call
+    const std::size_t before = to.components().size();
     add_base_components(
       to_struct_type(symb.type),
       sub_access,
@@ -515,6 +516,24 @@ void cpp_typecheckt::add_base_components(
       bases,
       vbases,
       is_virtual_base);
+
+    // As for a direct base (typecheck_compound_bases): an indirect base that
+    // is not a POD for the purpose of layout does not keep its tail padding
+    // -- `from' laid its own members and further bases out in it (Itanium
+    // C++ ABI 2.4: dsize(B) < sizeof(B)), and `from's copy of that padding
+    // has already been dropped.  Keeping it here shifted every later
+    // component of `from' (`U : T', `T : P, Q': P's tail padding survived in
+    // U next to T's own alignment padding, putting Q's virtual pointer on a
+    // misaligned offset and every later member 4 bytes off).
+    if(!cpp_is_pod(symb.type))
+    {
+      auto &dest = to.components();
+      while(dest.size() > before && dest.back().get_is_padding() &&
+            dest.back().type().id() != ID_c_bit_field)
+      {
+        dest.pop_back();
+      }
+    }
   }
 
   // add the components
@@ -582,6 +601,17 @@ void cpp_typecheckt::add_base_components(
         if(d.get_bool(ID_from_base) && d.get_name() == c.get_name())
         {
           d.set_access(new_access);
+          // `from' marked the first component of each of its direct base
+          // subobjects with the base's alignment (typecheck_compound_bases);
+          // the recursion above copied the component from the base's own
+          // type, which carries no such mark: propagate it, or the subobject
+          // is not aligned in `to'.
+          if(
+            c.find(ID_C_base_alignment).is_not_nil() &&
+            d.find(ID_C_base_alignment).is_nil())
+          {
+            d.set(ID_C_base_alignment, c.get(ID_C_base_alignment));
+          }
           if(i >= first_of_from)
             cursor = i + 1;
         }
