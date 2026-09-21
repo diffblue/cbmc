@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 harness.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 6 --no-unwinding-assertions
 ^\[main\.assertion\.4\] line \d+ idempotence: SUCCESS$
@@ -14,3 +14,5 @@ character, leaves the tail unchanged, and is idempotent -- proven over
 ALL printable strings up to length 3 via nondeterministic inputs
 (unit-test contract upgraded to a bounded-domain proof over CBMC's own
 src/util/string_utils).
+THOROUGH: with libstdc++ 11 (Ubuntu 22.04) the proof's SAT instance exceeds the
+CI runner's memory (it needs 0.75 GB with libstdc++ 13).
