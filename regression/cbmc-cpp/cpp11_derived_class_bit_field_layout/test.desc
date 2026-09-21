@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17
+--cpp17 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -14,3 +14,5 @@ Invariant check failed
 Bit-fields in a class with base classes: the class must be padded (crash
 otherwise); base padding components do not count as the derived class being
 padded; padding names are made unique.
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

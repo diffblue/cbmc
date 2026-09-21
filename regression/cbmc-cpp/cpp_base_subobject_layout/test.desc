@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17
+--cpp17 --64
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -12,3 +12,5 @@ Invariant check failed
 Classes with base classes are laid out over their flattened components: base
 subobjects aligned for the base (ID_C_base_alignment), tail padding of a
 non-POD base reused, POD base tail padding kept (Itanium C++ ABI 2.4).
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.
