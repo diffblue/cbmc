@@ -1317,6 +1317,27 @@ void cpp_typecheckt::provide_stdlib_bodies()
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
       }
+      else if(
+        base.find("has_facet") == 0 &&
+        to_code_type(symbol.type).return_type().id() == ID_c_bool &&
+        name.find("locale") != std::string::npos)
+      {
+        // libstdc++ 11's has_facet<_Facet>(const locale&) reads the same
+        // internal __loc._M_impl->_M_facets table (libstdc++ 13's goes
+        // through __try_use_facet, modelled above).  Answer as that model
+        // does: the classic ctype<char> facet is present, every other facet
+        // is absent ([locale.general]/8; _M_cache_locale then caches a null
+        // num_put/num_get pointer instead of failing on the table read).
+        ensure_parameter_symbols(symbol, symbol_table);
+        code_blockt block;
+        const typet &ret_type = to_code_type(symbol.type).return_type();
+        block.add(code_frontend_returnt{from_integer(
+          name.find("<std::tag-ctype<char>>") != std::string::npos ? 1 : 0,
+          ret_type)});
+        symbol.value = std::move(block);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
       else if(base == "_S_nothrow_relocate" || base == "_S_use_relocate")
       {
         // Override: return true so the _S_relocate path is taken
