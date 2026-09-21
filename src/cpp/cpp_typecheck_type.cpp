@@ -931,6 +931,20 @@ void cpp_typecheckt::typecheck_type(typet &type)
     typet tmp_type = static_cast<const typet &>(type.find(ID_type_arg));
     typecheck_type(tmp_type);
 
+    // N5008 [meta.trans.other]/3: remove_cvref_t<T> is
+    // remove_cv_t<remove_reference_t<T>> -- the reference goes first, the
+    // cv-qualifiers are those of the referenced type (`const int &' -> int)
+    if(type.id() == ID_remove_cvref)
+    {
+      if(
+        tmp_type.id() == ID_pointer &&
+        (tmp_type.get_bool(ID_C_reference) ||
+         tmp_type.get_bool(ID_C_rvalue_reference)))
+      {
+        tmp_type = to_pointer_type(tmp_type).base_type();
+      }
+    }
+
     if(type.id() == ID_remove_cv || type.id() == ID_remove_cvref)
     {
       tmp_type.remove(ID_C_constant);
@@ -946,7 +960,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(type.id() == ID_remove_volatile)
       tmp_type.remove(ID_C_volatile);
 
-    if(type.id() == ID_remove_reference || type.id() == ID_remove_cvref)
+    if(type.id() == ID_remove_reference)
     {
       if(
         tmp_type.id() == ID_pointer &&
