@@ -10,7 +10,8 @@
 // an array must DECAY to a pointer to its first element.
 extern "C" void __CPROVER_assert(bool, const char *);
 using AR = int (&)[3];
-template <class T, int N> auto ret(T (&t)[N])
+template <class T, int N>
+auto ret(T (&t)[N])
 {
   return t;
 }

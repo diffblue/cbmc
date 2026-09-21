@@ -31,7 +31,6 @@ zero:
 int main()
 {
   __CPROVER_assert(
-    f(0) == 0 && f(1) == 1 && g(0) == 2 && g(1) == 3,
-    "function-scoped labels");
+    f(0) == 0 && f(1) == 1 && g(0) == 2 && g(1) == 3, "function-scoped labels");
   return 0;
 }

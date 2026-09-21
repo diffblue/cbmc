@@ -5,7 +5,14 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // declares the for-range-declaration; the loop variable is scoped to the
 // loop.  Two sequential loops may reuse the name with DIFFERENT types, and
 // the name is free again after the loop.
-struct L { int n; bool empty() const { return n == 0; } };
+struct L
+{
+  int n;
+  bool empty() const
+  {
+    return n == 0;
+  }
+};
 struct statet
 {
   std::pair<int, std::pair<unsigned, L>> a[2];

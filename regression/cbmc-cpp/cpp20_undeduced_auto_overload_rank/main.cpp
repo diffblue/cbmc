@@ -9,11 +9,13 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 struct
 {
-  template <class T, int N> auto operator()(T (&t)[N])
+  template <class T, int N>
+  auto operator()(T (&t)[N])
   {
     return t;
   }
-  template <class T> auto operator()(T);
+  template <class T>
+  auto operator()(T);
 } end_fn;
 int main()
 {

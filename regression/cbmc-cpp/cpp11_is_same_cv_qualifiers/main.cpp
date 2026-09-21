@@ -26,7 +26,8 @@ int main()
   __CPROVER_assert(!__is_same(const int, int), "const int != int");
   __CPROVER_assert(!__is_same(int, const int), "int != const int");
   __CPROVER_assert(!__is_same(volatile int, int), "volatile int != int");
-  __CPROVER_assert(!__is_same(const int *, int *), "const int* != int* (nested cv)");
+  __CPROVER_assert(
+    !__is_same(const int *, int *), "const int* != int* (nested cv)");
   __CPROVER_assert(__is_same(int, int), "int == int");
   __CPROVER_assert(__is_same(const int, const int), "const int == const int");
 

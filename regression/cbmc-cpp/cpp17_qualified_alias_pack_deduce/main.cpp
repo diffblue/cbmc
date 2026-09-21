@@ -45,7 +45,7 @@ struct tseq
 // type pack through a qualified alias with a fixed leading type argument
 template <class... U>
 using talias = tseq<int, U...>;
-}
+} // namespace N
 
 template <__SIZE_TYPE__... J>
 int sum_impl(N::idxseq<J...>)

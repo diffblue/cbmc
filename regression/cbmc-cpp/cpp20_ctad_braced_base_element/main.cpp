@@ -11,7 +11,8 @@
 // clang++ accepts and runs clean; g++ rejects the base-element
 // deduction shape.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class F> struct closure : F
+template <class F>
+struct closure : F
 {
 };
 struct takeish
@@ -24,7 +25,8 @@ struct takeish
 };
 template <class F, class... A>
 decltype(F()(A()...)) probe(F, A...);
-template <class F, class... A> struct invokable
+template <class F, class... A>
+struct invokable
 {
   using result = decltype(probe(F(), A()...));
 };

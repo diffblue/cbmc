@@ -4,7 +4,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
-^\[main\.assertion\.1\] line 26 constexpr get\(\) resolved in class scope: SUCCESS$
+^\[main\.assertion\.1\] line 29 constexpr get\(\) resolved in class scope: SUCCESS$
 --
 ^CONVERSION ERROR$
 ^symbol 'value' is unknown$

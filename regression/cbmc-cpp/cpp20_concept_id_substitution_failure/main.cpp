@@ -9,17 +9,33 @@
 // conversion (cvise-reduced from the vector driver, archived as
 // .kiro/reductions/vector_same_as_cvt2_50lines.cpp).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class, class> concept same_as = true;
-template <class> struct common_reference;
+template <class, class>
+concept same_as = true;
+template <class>
+struct common_reference;
 template <class... _Types>
 using common_reference_t = common_reference<_Types...>::type;
 template <class _Up>
 concept common_reference_with = same_as<_Up, common_reference_t<_Up>>;
-template <bool, class _If, class _Else> struct cond { using type = _Else; };
-template <class I, class E> struct cond<true, I, E> { using type = I; };
-struct A {}; struct B {};
+template <bool, class _If, class _Else>
+struct cond
+{
+  using type = _Else;
+};
+template <class I, class E>
+struct cond<true, I, E>
+{
+  using type = I;
+};
+struct A
+{
+};
+struct B
+{
+};
 using r = cond<common_reference_with<int>, A, B>::type;
-int main() {
+int main()
+{
   __CPROVER_assert(sizeof(r) == sizeof(B), "unsatisfied concept picks else");
   return 0;
 }

@@ -2,7 +2,10 @@ extern "C" void __CPROVER_assert(bool, const char *);
 template <class _CharT>
 struct It
 {
-  static int w() { return sizeof(_CharT); }
+  static int w()
+  {
+    return sizeof(_CharT);
+  }
 };
 // default given on the FORWARD declaration ([temp.param]/12), as in
 // libstdc++'s <bits/localefwd.h>; the DEFINITION follows later, after
@@ -33,11 +36,17 @@ struct numpunct
 template <class _CharT, class _InIter>
 struct num_get
 {
-  static int w() { return _InIter::w(); }
+  static int w()
+  {
+    return _InIter::w();
+  }
 };
 int main()
 {
-  __CPROVER_assert(numpunct<char>::probe() == 100 + 40 + 2, "defaults bind the named template's own _CharT");
-  __CPROVER_assert(numpunct<wchar_t>::probe() == 100 + 40 + 2, "again from a wchar_t context");
+  __CPROVER_assert(
+    numpunct<char>::probe() == 100 + 40 + 2,
+    "defaults bind the named template's own _CharT");
+  __CPROVER_assert(
+    numpunct<wchar_t>::probe() == 100 + 40 + 2, "again from a wchar_t context");
   return 0;
 }

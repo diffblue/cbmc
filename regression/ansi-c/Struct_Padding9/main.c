@@ -11,7 +11,7 @@
   int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
 #ifdef __GNUC__
-#include <stddef.h>
+#  include <stddef.h>
 
 struct H
 {
@@ -51,14 +51,14 @@ STATIC_ASSERT(_Alignof(struct P) == 8);
 STATIC_ASSERT(offsetof(struct P, x) == 1);
 
 // #pragma pack(n) caps at n: a short keeps its natural alignment 2
-#pragma pack(push, 4)
+#  pragma pack(push, 4)
 struct R
 {
   char c;
   short s;
   long long l;
 };
-#pragma pack(pop)
+#  pragma pack(pop)
 STATIC_ASSERT(sizeof(struct R) == 12);
 STATIC_ASSERT(offsetof(struct R, s) == 2);
 STATIC_ASSERT(offsetof(struct R, l) == 4);

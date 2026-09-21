@@ -14,7 +14,9 @@ extern "C" void __CPROVER_assert(bool, const char *);
 struct payload
 {
   int v;
-  payload() : v(0) {}
+  payload() : v(0)
+  {
+  }
 };
 
 struct holder

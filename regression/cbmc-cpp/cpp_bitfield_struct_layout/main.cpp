@@ -20,6 +20,7 @@ int main()
   __CPROVER_assert(sizeof(M) == 4, "bit-field-only struct has its ABI size");
   M m;
   m.b = 5;
-  __CPROVER_assert(read_ref(m) == 5, "read bit-field through reference (in bounds)");
+  __CPROVER_assert(
+    read_ref(m) == 5, "read bit-field through reference (in bounds)");
   return 0;
 }

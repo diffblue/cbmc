@@ -10,7 +10,9 @@ template <typename T>
 struct Box
 {
   T v;
-  Box(T x) : v(x) {}
+  Box(T x) : v(x)
+  {
+  }
 };
 template <typename T>
 Box(T) -> Box<T>;

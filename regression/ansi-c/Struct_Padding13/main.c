@@ -40,25 +40,30 @@ typedef unsigned char __attribute__((aligned(8))) T8c;
 struct W
 {
   char c;
-  T8c x __attribute__((aligned(4))); // packed struct: the member's own 4 counts, the typedef's 8 not
+  T8c x __attribute__((aligned(
+    4))); // packed struct: the member's own 4 counts, the typedef's 8 not
 } __attribute__((packed));
-#pragma pack(push, 1)
+#  pragma pack(push, 1)
 struct X
 {
   int m3 : 2;
-  unsigned short m4[5] __attribute__((aligned(8))); // pack(1) caps the member's aligned(8): at 1
+  unsigned short m4[5]
+    __attribute__((aligned(8))); // pack(1) caps the member's aligned(8): at 1
   signed char m5 : 6;
   long long m6;
 } __attribute__((packed, aligned(16)));
-#pragma pack(pop)
-#pragma pack(push, 4)
+#  pragma pack(pop)
+#  pragma pack(push, 4)
 struct V
 {
   char c;
-  union { long a; } __attribute__((aligned(16))) u; // placed at 4, 16 bytes long
+  union
+  {
+    long a;
+  } __attribute__((aligned(16))) u; // placed at 4, 16 bytes long
   char d;
 };
-#pragma pack(pop)
+#  pragma pack(pop)
 
 STATIC_ASSERT(_Alignof(struct A) == 4);
 STATIC_ASSERT(__builtin_offsetof(struct A, x) == 4);

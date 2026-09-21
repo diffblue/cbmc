@@ -15,15 +15,20 @@
 //     substituted to `<ul,0,0>` and the specialization never matched.
 // clang builtins => CLANG mode; clang++ runs this clean.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class _Tp, _Tp... _Ip> struct integer_sequence {};
+template <class _Tp, _Tp... _Ip>
+struct integer_sequence
+{
+};
 template <long... _Ip>
 using index_sequence = integer_sequence<unsigned long, _Ip...>;
 template <long _Ep>
-using make_index_sequence = __make_integer_seq<integer_sequence, unsigned long, _Ep>;
+using make_index_sequence =
+  __make_integer_seq<integer_sequence, unsigned long, _Ep>;
 template <long _NBound, class = make_index_sequence<_NBound>>
 struct __bind_back_op;
 template <long _NBound, unsigned long... _Ip>
-struct __bind_back_op<_NBound, integer_sequence<unsigned long, _Ip...>> {
+struct __bind_back_op<_NBound, integer_sequence<unsigned long, _Ip...>>
+{
   static const int value = 1 + sizeof...(_Ip);
 };
 int main()

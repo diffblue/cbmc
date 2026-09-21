@@ -9,14 +9,17 @@ template <typename T>
 struct Box
 {
   T v;
-  Box(T x) : v(x) {}
+  Box(T x) : v(x)
+  {
+  }
 };
 template <typename T>
 Box(T) -> Box<long>;
 int main()
 {
-  Box b{5};                 // guide forces Box<long>
-  b.v = 4000000000L;        // exceeds INT_MAX; fits only in a long member
-  __CPROVER_assert(b.v == 4000000000L, "guide forced Box<long>: value not truncated");
+  Box b{5};          // guide forces Box<long>
+  b.v = 4000000000L; // exceeds INT_MAX; fits only in a long member
+  __CPROVER_assert(
+    b.v == 4000000000L, "guide forced Box<long>: value not truncated");
   return 0;
 }

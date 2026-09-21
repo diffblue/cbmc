@@ -7,20 +7,30 @@
 // template is required.  g++/clang++/valgrind run clean.
 
 extern "C" void __CPROVER_assert(bool, const char *);
-template <unsigned long...> struct indices {};
-struct impl {
+template <unsigned long...>
+struct indices
+{
+};
+struct impl
+{
   int v_;
   template <unsigned long... Uf, class... Up>
-  impl(indices<Uf...>, Up... u) : v_(0) {
+  impl(indices<Uf...>, Up... u) : v_(0)
+  {
     int arr[] = {(v_ = u)...};
     (void)arr;
   }
 };
-struct tup {
+struct tup
+{
   impl base_;
-  template <class... Up> tup(Up... u) : base_(indices<0>(), u...) {}
+  template <class... Up>
+  tup(Up... u) : base_(indices<0>(), u...)
+  {
+  }
 };
-int main() {
+int main()
+{
   tup t(42);
   __CPROVER_assert(t.base_.v_ == 42, "two-pack delegation");
   return 0;

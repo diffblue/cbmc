@@ -40,7 +40,8 @@ int main()
   ns::G<char> g;
   ns::G<int> gi;
   __CPROVER_assert(g.v() == 2, "qualified explicit specialization selected");
-  __CPROVER_assert(gi.v() == 1, "primary template used for non-specialized arg");
+  __CPROVER_assert(
+    gi.v() == 1, "primary template used for non-specialized arg");
   __CPROVER_assert(g.v() == 1, "WRONG must FAIL");
   return 0;
 }

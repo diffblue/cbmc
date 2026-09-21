@@ -38,7 +38,8 @@ struct Fn<R(A...)>
 int main()
 {
   Fn<bool(bool, bool)> g = [](bool p, bool q) { return p && q; };
-  __CPROVER_assert(g.tag == 7, "nested-trait two-arg-pack constructor selected");
+  __CPROVER_assert(
+    g.tag == 7, "nested-trait two-arg-pack constructor selected");
   __CPROVER_assert(g.tag == 0, "WRONG must FAIL");
   return 0;
 }

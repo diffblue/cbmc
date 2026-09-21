@@ -17,7 +17,8 @@ struct pt
     return v < o.v;
   }
 };
-#if defined(__has_builtin) && __has_builtin(__builtin_lt_synthesizes_from_spaceship)
+#if defined(__has_builtin) &&                                                  \
+  __has_builtin(__builtin_lt_synthesizes_from_spaceship)
 template <class L, class R>
 struct synth
 {

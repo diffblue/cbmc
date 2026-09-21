@@ -13,6 +13,7 @@
 int main()
 {
   std::function<int(int)> f = [](int x) { return x + 1; };
-  __CPROVER_assert(f(4) == 5, "std::function holds a lambda closure and calls it");
+  __CPROVER_assert(
+    f(4) == 5, "std::function holds a lambda closure and calls it");
   return 0;
 }

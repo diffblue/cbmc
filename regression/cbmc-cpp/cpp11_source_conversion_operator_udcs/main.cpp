@@ -42,8 +42,10 @@ struct S
 
 int main()
 {
-  __CPROVER_assert(__is_constructible(T, S), "T is_constructible from S via operator T()");
-  __CPROVER_assert(__is_convertible_to(S, T), "S is_convertible to T via operator T()");
+  __CPROVER_assert(
+    __is_constructible(T, S), "T is_constructible from S via operator T()");
+  __CPROVER_assert(
+    __is_convertible_to(S, T), "S is_convertible to T via operator T()");
   __CPROVER_assert(!__is_constructible(T, S), "WRONG must FAIL");
   return 0;
 }

@@ -39,7 +39,7 @@ struct _Tuple_impl<_Idx, _Head, _Tail...> : _Tuple_impl<_Idx + 1, _Tail...>,
                                             _Head_base<_Idx, _Head>
 {
   template <class _UHead, class... _UTail>
-  _Tuple_impl(_UHead &&__h, _UTail &&... __t)
+  _Tuple_impl(_UHead &&__h, _UTail &&...__t)
     : _Tuple_impl<_Idx + 1, _Tail...>(static_cast<_UTail &&>(__t)...),
       _Head_base<_Idx, _Head>(static_cast<_UHead &&>(__h))
   {
@@ -49,7 +49,8 @@ template <unsigned long _Idx, class _Head>
 struct _Tuple_impl<_Idx, _Head> : _Head_base<_Idx, _Head>
 {
   template <class _UHead>
-  _Tuple_impl(_UHead &&__h) : _Head_base<_Idx, _Head>(static_cast<_UHead &&>(__h))
+  _Tuple_impl(_UHead &&__h)
+    : _Head_base<_Idx, _Head>(static_cast<_UHead &&>(__h))
   {
   }
 };
@@ -57,7 +58,7 @@ template <class... _E>
 struct tuple : _Tuple_impl<0, _E...>
 {
   template <class... _U>
-  tuple(_U &&... __e) : _Tuple_impl<0, _E...>(static_cast<_U &&>(__e)...)
+  tuple(_U &&...__e) : _Tuple_impl<0, _E...>(static_cast<_U &&>(__e)...)
   {
   }
 };
@@ -75,7 +76,8 @@ auto get(tuple<_E...> &__t)
 int main()
 {
   tuple<int, double> t(11, 22.0);
-  __CPROVER_assert(get<0>(t) == 11, "get<0> keeps its int value under forwarding");
+  __CPROVER_assert(
+    get<0>(t) == 11, "get<0> keeps its int value under forwarding");
   __CPROVER_assert(
     get<1>(t) == 22.0, "get<1> keeps its double value under forwarding");
   return 0;

@@ -16,9 +16,10 @@ template <typename T>
 P(T) -> P<T, int>;
 int main()
 {
-  int n;        // nondet
-  P p{n};       // guide: P<int,int>; aggregate a=n, b value-initialised to 0
+  int n;  // nondet
+  P p{n}; // guide: P<int,int>; aggregate a=n, b value-initialised to 0
   __CPROVER_assert(p.a == n, "guide P<int,int>: first member from argument");
-  __CPROVER_assert(p.b == 0, "guide P<int,int>: second member value-initialised");
+  __CPROVER_assert(
+    p.b == 0, "guide P<int,int>: second member value-initialised");
   return 0;
 }

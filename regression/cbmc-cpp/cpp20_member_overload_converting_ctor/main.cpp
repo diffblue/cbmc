@@ -21,7 +21,9 @@ template <typename P, typename C>
 struct Iter
 {
   P p;
-  Iter() : p(0) {}
+  Iter() : p(0)
+  {
+  }
   template <typename Q>
   Iter(const Iter<Q, C> &) : p(0)
   {
@@ -34,9 +36,18 @@ struct Vec
   typedef Iter<T *, Vec> iterator;
   typedef Iter<const T *, Vec> const_iterator;
   int n;
-  iterator begin() { return iterator{}; }
-  iterator end() { return iterator{}; }
-  void erase(const_iterator, const_iterator) { n = n - 1; }
+  iterator begin()
+  {
+    return iterator{};
+  }
+  iterator end()
+  {
+    return iterator{};
+  }
+  void erase(const_iterator, const_iterator)
+  {
+    n = n - 1;
+  }
 };
 template <typename T>
 void doit(Vec<T> &c)
@@ -48,6 +59,7 @@ int main()
   Vec<int> v;
   v.n = 3;
   doit(v);
-  __CPROVER_assert(v.n == 2, "member erase(iterator->const_iterator) in template body");
+  __CPROVER_assert(
+    v.n == 2, "member erase(iterator->const_iterator) in template body");
   return 0;
 }

@@ -10,6 +10,7 @@ int main()
   v.push_back(2);
   v.push_back(3);
   std::erase_if(v, [](int x) { return x == 2; });
-  __CPROVER_assert(v.size() == 2, "size is 2 after erase_if removes one element");
+  __CPROVER_assert(
+    v.size() == 2, "size is 2 after erase_if removes one element");
   return 0;
 }

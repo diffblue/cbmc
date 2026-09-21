@@ -13,7 +13,10 @@ template <class T>
 struct S
 {
   T v;
-  void use() { v = v; }
+  void use()
+  {
+    v = v;
+  }
   S operator+(const S &) const
   {
     __CPROVER_assert(0, "must never appear");

@@ -9,16 +9,20 @@
 // incomplete -- cannot initialize", a hard error that killed the
 // whole translation unit.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class V> struct take_view
+template <class V>
+struct take_view
 {
   V base_;
-  template <bool> class __sentinel;
+  template <bool>
+  class __sentinel;
   auto end()
   {
     return __sentinel<true>{};
   }
 };
-template <class V> template <bool B> class take_view<V>::__sentinel
+template <class V>
+template <bool B>
+class take_view<V>::__sentinel
 {
 };
 int main()

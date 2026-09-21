@@ -32,7 +32,10 @@ struct handler;
 template <typename R, typename... Args, typename F>
 struct handler<R(Args...), F>
 {
-  static R invoke(Args... a) { return (R)42; }
+  static R invoke(Args... a)
+  {
+    return (R)42;
+  }
 };
 
 template <typename Sig>
@@ -48,7 +51,10 @@ struct func<R(Args...)>
   {
     invoker = &handler<R(Args...), F>::invoke;
   }
-  R call(Args... a) const { return invoker(a...); }
+  R call(Args... a) const
+  {
+    return invoker(a...);
+  }
 };
 
 int main()

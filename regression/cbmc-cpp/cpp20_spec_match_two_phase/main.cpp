@@ -13,7 +13,8 @@
 // from the vector-family root to this adjacent genuine defect; the
 // harvest is archived in .kiro/reductions/da1_and_helper_23line.cpp.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class, class = void> struct HasToAddress
+template <class, class = void>
+struct HasToAddress
 {
   static const bool value = false;
 };
@@ -24,7 +25,8 @@ struct HasToAddress<_Pointer, decltype(to_address(_Pointer()))>
 {
   static const bool value = true;
 };
-template <class _Pointer> void __to_address(_Pointer);
+template <class _Pointer>
+void __to_address(_Pointer);
 template <class _Pointer>
 auto to_address(_Pointer __p) -> decltype(__to_address(__p));
 

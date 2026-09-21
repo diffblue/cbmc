@@ -9,12 +9,22 @@
 // g++/clang++/valgrind run clean.
 
 extern "C" void __CPROVER_assert(bool, const char *);
-void sink(const int &, int &r) { r += 1; }
-template <typename> struct W;
-template <typename R, typename... Args> struct W<R(Args...)> {
-  void run(Args... args) { sink(0, Args(args)...); }
+void sink(const int &, int &r)
+{
+  r += 1;
+}
+template <typename>
+struct W;
+template <typename R, typename... Args>
+struct W<R(Args...)>
+{
+  void run(Args... args)
+  {
+    sink(0, Args(args)...);
+  }
 };
-int main() {
+int main()
+{
   int v = 41;
   W<void(int &)> w;
   w.run(v);

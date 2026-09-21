@@ -12,8 +12,15 @@ template <class T>
 struct S
 {
   T value;
-  void good() { value = value; }
-  void bad() { T t; t.no_such_method(); } // ill-formed for T=int; never called
+  void good()
+  {
+    value = value;
+  }
+  void bad()
+  {
+    T t;
+    t.no_such_method();
+  } // ill-formed for T=int; never called
 };
 
 int main()

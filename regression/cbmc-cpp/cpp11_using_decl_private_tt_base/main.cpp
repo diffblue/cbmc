@@ -10,8 +10,7 @@ struct layoutt
     __last = nullptr;
   }
 };
-template <class _Tp, class _Alloc,
-          template <class, class, class> class _Layout>
+template <class _Tp, class _Alloc, template <class, class, class> class _Layout>
 class buft : _Layout<buft<_Tp, _Alloc, _Layout>, _Tp, _Alloc>
 {
   // class default: the base is PRIVATE ([class.access.base]/2).

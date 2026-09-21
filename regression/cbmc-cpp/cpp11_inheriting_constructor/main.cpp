@@ -18,7 +18,9 @@ struct Base
 {
   T value;
   bool set;
-  Base() : value(0), set(false) {}
+  Base() : value(0), set(false)
+  {
+  }
   template <class... A>
   Base(tag_t, A... a) : value(a...), set(true)
   {

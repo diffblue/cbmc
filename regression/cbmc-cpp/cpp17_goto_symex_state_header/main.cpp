@@ -19,7 +19,6 @@
 #include <util/symbol_table.h>
 
 #include <analyses/guard.h>
-
 #include <goto-symex/call_stack.h>
 #include <goto-symex/field_sensitivity.h>
 #include <goto-symex/goto_state.h>

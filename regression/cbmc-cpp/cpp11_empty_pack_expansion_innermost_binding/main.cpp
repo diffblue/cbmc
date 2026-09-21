@@ -12,12 +12,22 @@ extern "C" void __CPROVER_assert(bool, const char *);
 // [basic.scope.scope]: the innermost declaration is the one denoted -- the
 // most recently bound pack wins.  The failure was order dependent: any
 // earlier std::function<int()> construction in the TU hid it.
-int one() { return 1; }
-int take(const std::pair<int, std::function<int()>> &p) { return p.first + p.second(); }
+int one()
+{
+  return 1;
+}
+int take(const std::pair<int, std::function<int()>> &p)
+{
+  return p.first + p.second();
+}
 int main()
 {
-  __CPROVER_assert(take({2, one}) == 3, "braced list to const pair<int, function>& -- first use of function<int()>");
+  __CPROVER_assert(
+    take({2, one}) == 3,
+    "braced list to const pair<int, function>& -- first use of "
+    "function<int()>");
   std::pair<int, std::pair<int, std::function<int()>>> s{1, {2, one}};
-  __CPROVER_assert(s.second.first == 2 && s.second.second() == 1, "nested braces");
+  __CPROVER_assert(
+    s.second.first == 2 && s.second.second() == 1, "nested braces");
   return 0;
 }

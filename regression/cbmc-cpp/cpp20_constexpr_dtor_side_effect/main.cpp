@@ -7,13 +7,15 @@
 // under --cpp20 (correct under --cpp17, where the destructor is not
 // constexpr).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct vec
+template <class T>
+struct vec
 {
   T *end_;
   T buf[4];
   struct Tx
   {
-    constexpr explicit Tx(vec &v, long n) : v_(v), pos_(v.end_), new_end_(v.end_ + n)
+    constexpr explicit Tx(vec &v, long n)
+      : v_(v), pos_(v.end_), new_end_(v.end_ + n)
     {
     }
     constexpr ~Tx()

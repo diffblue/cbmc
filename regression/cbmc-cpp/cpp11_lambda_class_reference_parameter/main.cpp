@@ -39,7 +39,8 @@ int main()
   by_val(e);
 
   __CPROVER_assert(e.v == 7, "lambda with class-reference parameter runs");
-  __CPROVER_assert(seen == 3, "lambda with by-value class parameter reads member");
+  __CPROVER_assert(
+    seen == 3, "lambda with by-value class parameter reads member");
   __CPROVER_assert(e.v == 0, "WRONG must FAIL");
   return 0;
 }

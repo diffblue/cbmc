@@ -10,7 +10,10 @@ struct integral_constant
 {
   static constexpr _Tp value = __v;
   using value_type = _Tp;
-  constexpr value_type get() const { return value; }
+  constexpr value_type get() const
+  {
+    return value;
+  }
 };
 
 template <bool B>

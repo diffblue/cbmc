@@ -10,8 +10,8 @@
   int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
 #ifdef __GNUC__
-#include <stddef.h>
-#include <stdint.h>
+#  include <stddef.h>
+#  include <stdint.h>
 
 struct A1
 {

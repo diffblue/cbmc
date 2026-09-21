@@ -22,8 +22,12 @@ int main()
 
   // [=, &r]: default copy with an explicit by-reference override
   int c = 1, r = 2;
-  auto mixed = [=, &r](int x) { r += x; return c + r; };
-  c = 50; // snapshot, unaffected
+  auto mixed = [=, &r](int x)
+  {
+    r += x;
+    return c + r;
+  };
+  c = 50;             // snapshot, unaffected
   int got = mixed(3); // r becomes 2+3=5, returns 1+5 = 6
   __CPROVER_assert(got == 6, "capture-default with explicit override");
   __CPROVER_assert(r == 5, "explicit by-reference override modifies referent");

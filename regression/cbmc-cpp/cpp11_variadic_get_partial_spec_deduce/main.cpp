@@ -29,7 +29,9 @@ template <unsigned long I, typename H, typename... Tl>
 struct W<I, H, Tl...>
 {
   H head;
-  W(const H &h) : head(h) {}
+  W(const H &h) : head(h)
+  {
+  }
 };
 
 // Deduce H and the (here two-element) trailing pack Tl from the argument.
@@ -49,7 +51,8 @@ int main()
 {
   int a = nondet_int();
   W<0, int, int, int> w(a);
-  __CPROVER_assert(first<0>(w) == a, "head value deduced through trailing pack");
+  __CPROVER_assert(
+    first<0>(w) == a, "head value deduced through trailing pack");
   __CPROVER_assert(ntail<0>(w) == 2, "trailing pack has two elements");
   __CPROVER_assert(first<0>(w) == a + 1, "WRONG must FAIL");
   return 0;

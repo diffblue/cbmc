@@ -33,7 +33,7 @@ int main()
 {
   __CPROVER_assert(is_fn<int *()>::v == 1, "int*() is a function type");
   __CPROVER_assert(is_fn<int &()>::v == 1, "int&() is a function type");
-  __CPROVER_assert(is_fn<int &&()>::v == 1, "int&&() is a function type");
+  __CPROVER_assert(is_fn < int && () > ::v == 1, "int&&() is a function type");
   __CPROVER_assert(is_fn<int *(char)>::v == 1, "int*(char) is a function type");
   __CPROVER_assert(
     is_fn<int (*)()>::v == 0, "int(*)() is a pointer, not a function");

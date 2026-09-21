@@ -14,6 +14,7 @@ int main()
   int a = 10;
   auto f = [a](int x) { return x + a; };
   a = 20;
-  __CPROVER_assert(f(5) == 15, "by-copy capture snapshots the value at capture time");
+  __CPROVER_assert(
+    f(5) == 15, "by-copy capture snapshots the value at capture time");
   return 0;
 }

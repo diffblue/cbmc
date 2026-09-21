@@ -6,24 +6,32 @@
 // previously failed to resolve the component and dropped the
 // dependent typedef (std::set's __node_allocator chain).
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class _Tp, class _Up, bool = true> struct R
+template <class _Tp, class _Up, bool = true>
+struct R
 {
 };
-template <template <class, class...> class _Alloc, class _Tp, class... _Args,
-          class _Up>
+template <
+  template <class, class...>
+  class _Alloc,
+  class _Tp,
+  class... _Args,
+  class _Up>
 struct R<_Alloc<_Tp, _Args...>, _Up, true>
 {
   typedef typename _Alloc<_Tp, _Args...>::template rebind<_Up> type;
 };
-template <class T> struct allocator
+template <class T>
+struct allocator
 {
   T v;
-  template <class U> struct rebind
+  template <class U>
+  struct rebind
   {
     typedef allocator<U> other;
   };
 };
-template <class T> struct node
+template <class T>
+struct node
 {
   T value;
 };

@@ -6,8 +6,11 @@ struct integer_sequence
 };
 // libc++: the builtin is wrapped in an impl alias whose first
 // parameter is a TEMPLATE-TEMPLATE parameter.
-template <template <class _T, _T...> class _BaseType, class _Tp,
-          _Tp _SequenceSize>
+template <
+  template <class _T, _T...>
+  class _BaseType,
+  class _Tp,
+  _Tp _SequenceSize>
 using __make_integer_sequence_impl =
   __make_integer_seq<_BaseType, _Tp, _SequenceSize>;
 template <class _Tp, _Tp _Ep>

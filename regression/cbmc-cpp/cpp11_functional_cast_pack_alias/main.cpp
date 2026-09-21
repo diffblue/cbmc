@@ -20,7 +20,8 @@ struct taker
 };
 template <class F, class... A>
 decltype(F()(A()...)) probe(F, A...);
-template <class F, class... A> struct invokable
+template <class F, class... A>
+struct invokable
 {
   using result = decltype(probe(F(), A()...));
 };

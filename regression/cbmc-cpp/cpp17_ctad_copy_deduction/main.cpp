@@ -11,13 +11,15 @@ template <typename T>
 struct Box
 {
   T v;
-  Box(T x) : v(x) {}
+  Box(T x) : v(x)
+  {
+  }
 };
 int main()
 {
-  int n; // nondet
-  Box b{n};            // Box<int>
-  Box c{b};            // copy deduction: Box<int>
+  int n;    // nondet
+  Box b{n}; // Box<int>
+  Box c{b}; // copy deduction: Box<int>
   __CPROVER_assert(c.v == n, "copy-deduced Box<int> preserves the value");
   return 0;
 }

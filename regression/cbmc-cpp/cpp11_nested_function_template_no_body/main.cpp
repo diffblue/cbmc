@@ -31,18 +31,23 @@
 // converts: assertion 1 must SUCCEED and assertion 2 (a wrong value) must FAIL,
 // proving non-vacuity.
 
-template <bool, typename> struct enable_if;
-template <typename _Tp> struct enable_if<true, _Tp>
+template <bool, typename>
+struct enable_if;
+template <typename _Tp>
+struct enable_if<true, _Tp>
 {
   typedef _Tp type;
 };
 template <bool _Cond, typename _Tp = void>
 using __enable_if_t = enable_if<_Cond, _Tp>::type;
-template <unsigned long, typename> struct tuple_element;
+template <unsigned long, typename>
+struct tuple_element;
 template <long __i, typename _Tp>
 using __tuple_element_t = tuple_element<__i, _Tp>::type;
-template <typename... _Types> void __find_uniq_type_in_pack();
-template <long, typename...> struct _Nth_type;
+template <typename... _Types>
+void __find_uniq_type_in_pack();
+template <long, typename...>
+struct _Nth_type;
 template <typename _Tp0, typename... _Rest>
 struct _Nth_type<0, _Tp0, _Rest...>
 {
@@ -51,14 +56,19 @@ struct _Nth_type<0, _Tp0, _Rest...>
 int _M_head_impl;
 struct _Head_base
 {
-  static int &_M_head(_Head_base) { return _M_head_impl; }
+  static int &_M_head(_Head_base)
+  {
+    return _M_head_impl;
+  }
 };
-template <unsigned long, typename...> struct _Tuple_impl;
+template <unsigned long, typename...>
+struct _Tuple_impl;
 template <unsigned long _Idx, typename _Head>
 struct _Tuple_impl<_Idx, _Head> : _Head_base
 {
 };
-template <typename... _Elements> struct tuple : _Tuple_impl<0, _Elements...>
+template <typename... _Elements>
+struct tuple : _Tuple_impl<0, _Elements...>
 {
 };
 template <unsigned long __i, typename... _Types>

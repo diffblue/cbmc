@@ -8,28 +8,34 @@
 // live the fold was left unexpanded ("unexpected expression:
 // cpp_binary_fold") and the whole member body was dropped.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <unsigned long...> struct iseq
+template <unsigned long...>
+struct iseq
 {
 };
-template <class... T> struct tup
+template <class... T>
+struct tup
 {
   int n_;
   tup(T... t) : n_(sizeof...(T))
   {
   }
 };
-template <unsigned long I, class... T> int get(tup<T...> t)
+template <unsigned long I, class... T>
+int get(tup<T...> t)
 {
   return t.n_;
 }
-template <class Seq, class... B> struct pf;
-template <unsigned long... Ip, class... B> struct pf<iseq<Ip...>, B...>
+template <class Seq, class... B>
+struct pf;
+template <unsigned long... Ip, class... B>
+struct pf<iseq<Ip...>, B...>
 {
   tup<B...> bound_;
   pf(B... b) : bound_(b...)
   {
   }
-  template <class... A> int call(A &&...a)
+  template <class... A>
+  int call(A &&...a)
   {
     return (0 + ... + get<Ip>(bound_));
   }

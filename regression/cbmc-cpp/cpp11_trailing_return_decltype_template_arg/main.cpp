@@ -23,8 +23,14 @@ auto mk(C &c) -> R<decltype(c.begin())>
 
 struct Cont
 {
-  int *begin() { return 0; }
-  int *end() { return 0; }
+  int *begin()
+  {
+    return 0;
+  }
+  int *end()
+  {
+    return 0;
+  }
 };
 
 int main()

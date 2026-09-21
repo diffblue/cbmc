@@ -55,7 +55,8 @@ int sum3_impl(iseq<unsigned long, I...>)
 int main()
 {
   // mkseq<unsigned long, 2> == iseq<unsigned long, 0, 1>; add(0, 1) == 1
-  __CPROVER_assert(sum_impl(mkseq<unsigned long, 2>{}) == 1, "pack {0,1}: 0+1==1");
+  __CPROVER_assert(
+    sum_impl(mkseq<unsigned long, 2>{}) == 1, "pack {0,1}: 0+1==1");
   // mkidx<3> == iseq<unsigned long, 0, 1, 2>; add3(0, 1, 2) == 3
   __CPROVER_assert(
     sum3_impl(mkidx<3>{}) == 3, "nested-alias pack {0,1,2}: 0+1+2==3");

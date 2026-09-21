@@ -17,8 +17,7 @@ struct layoutt
     (void)__new_size;
   }
 };
-template <class _Tp, class _Alloc,
-          template <class, class, class> class _Layout>
+template <class _Tp, class _Alloc, template <class, class, class> class _Layout>
 struct buft : _Layout<_Tp, _Alloc, buft<_Tp, _Alloc, _Layout>>
 {
   using __base_type = _Layout<_Tp, _Alloc, buft>;

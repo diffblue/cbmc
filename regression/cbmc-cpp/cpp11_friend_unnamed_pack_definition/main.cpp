@@ -7,8 +7,11 @@ struct box
   T v;
   template <class Y, class... Args>
   friend box<Y> make(Args &&...);
+
 private:
-  box(int, T x) : v(x) {}
+  box(int, T x) : v(x)
+  {
+  }
 };
 
 template <class T, class... Args>

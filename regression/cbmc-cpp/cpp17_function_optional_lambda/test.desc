@@ -1,7 +1,7 @@
 CORE
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line 34 transform through optional-returning lambda: SUCCESS$
+^\[main\.assertion\.1\] line 36 transform through optional-returning lambda: SUCCESS$
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --

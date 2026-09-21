@@ -10,10 +10,16 @@ struct base
 {
 protected:
   int v;
-  int get() const { return v; }
+  int get() const
+  {
+    return v;
+  }
 
 public:
-  void set(int x) { v = x; }
+  void set(int x)
+  {
+    v = x;
+  }
 };
 
 struct mid : base

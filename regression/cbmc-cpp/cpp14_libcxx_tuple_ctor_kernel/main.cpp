@@ -7,13 +7,16 @@
 // aggregate base initialization from an instantiated ctor template.
 // g++ rejects the alias-template pack deduction shape; clang accepts.
 extern "C" void __CPROVER_assert(bool, const char *);
-template <unsigned long...> struct __tuple_indices
+template <unsigned long...>
+struct __tuple_indices
 {
 };
-template <class... _Tp> struct __tuple_types
+template <class... _Tp>
+struct __tuple_types
 {
 };
-template <class _IdxType, _IdxType... _Values> struct __integer_sequence
+template <class _IdxType, _IdxType... _Values>
+struct __integer_sequence
 {
   template <unsigned long _Sp>
   using __to_tuple_indices = __tuple_indices<(_Values + _Sp)...>;
@@ -27,15 +30,20 @@ struct __make_tuple_indices
 {
   typedef __make_tuple_indices_t<_Ep, _Sp> type;
 };
-template <class _Tp, class _Up> struct __apply_cv
+template <class _Tp, class _Up>
+struct __apply_cv
 {
   typedef _Up type;
 };
 template <class _Tp, class _Up>
 using __apply_cv_t = typename __apply_cv<_Tp, _Up>::type;
-template <class _TupleTypes, class _Idxs> struct __make_tuple_types_flat;
-template <template <class...> class _Tuple, class... _Types,
-          unsigned long... _Idx>
+template <class _TupleTypes, class _Idxs>
+struct __make_tuple_types_flat;
+template <
+  template <class...>
+  class _Tuple,
+  class... _Types,
+  unsigned long... _Idx>
 struct __make_tuple_types_flat<_Tuple<_Types...>, __tuple_indices<_Idx...>>
 {
   template <class _Tp>
@@ -47,11 +55,12 @@ struct __make_tuple_types
 {
   static_assert(_Sp <= _Ep, "");
   typedef typename __make_tuple_types_flat<
-    _Tp, typename __make_tuple_indices<_Ep, _Sp>::type>::
-    template __apply_quals<_Tp>
-      type;
+    _Tp,
+    typename __make_tuple_indices<_Ep, _Sp>::type>::template __apply_quals<_Tp>
+    type;
 };
-template <class _Hp> struct __tuple_leaf
+template <class _Hp>
+struct __tuple_leaf
 {
   _Hp __value_;
   _Hp get()
@@ -59,7 +68,8 @@ template <class _Hp> struct __tuple_leaf
     return __value_;
   }
 };
-template <class...> struct __tuple_impl;
+template <class...>
+struct __tuple_impl;
 template <unsigned long... _Indx, class... _Tp>
 struct __tuple_impl<__tuple_indices<_Indx...>, _Tp...> : __tuple_leaf<_Tp>...
 {
@@ -74,7 +84,8 @@ struct __tuple_impl<__tuple_indices<_Indx...>, _Tp...> : __tuple_leaf<_Tp>...
   {
   }
 };
-template <class... _Tp> struct tuple
+template <class... _Tp>
+struct tuple
 {
   __tuple_impl<typename __make_tuple_indices<sizeof...(_Tp)>::type, _Tp...>
     __base_;

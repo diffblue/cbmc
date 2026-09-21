@@ -38,7 +38,8 @@ struct Fn<R(A...)>
 
 int main()
 {
-  Fn<bool(bool, bool)> g = [](bool p, bool q) { return p && q; }; // two-arg pack
+  Fn<bool(bool, bool)> g = [](bool p, bool q)
+  { return p && q; }; // two-arg pack
   __CPROVER_assert(g.tag == 7, "two-arg-pack SFINAE constructor selected");
   __CPROVER_assert(g.tag == 0, "WRONG must FAIL");
   return 0;

@@ -45,7 +45,8 @@ int main()
 {
   int v = __VERIFIER_nondet_int();
   tuple<int, int> a(v);
-  tuple<int, int> b = a; // copies the _Tuple_impl base via its defaulted copy ctor
+  tuple<int, int> b =
+    a; // copies the _Tuple_impl base via its defaulted copy ctor
   __CPROVER_assert(b.h == v, "defaulted base copy constructor preserves value");
   return 0;
 }

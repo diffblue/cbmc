@@ -35,8 +35,8 @@ struct pr
   {
   }
   template <class U2 = T2>
-    requires(__is_constructible(T2, U2))
-  pr(U2 &&b) : second(static_cast<U2 &&>(b))
+  requires(__is_constructible(T2, U2)) pr(U2 &&b)
+    : second(static_cast<U2 &&>(b))
   {
   }
 };

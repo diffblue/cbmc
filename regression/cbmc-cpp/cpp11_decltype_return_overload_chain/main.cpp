@@ -25,7 +25,9 @@ template <typename It>
 struct ranget
 {
   It b, e;
-  ranget(It b, It e) : b(b), e(e) {}
+  ranget(It b, It e) : b(b), e(e)
+  {
+  }
   int count() const
   {
     int n = 0;
@@ -58,8 +60,14 @@ auto make_range(C &c) -> ranget<decltype(c.begin())>
 struct vec
 {
   int a[5];
-  int *begin() { return a; }
-  int *end() { return a + 5; }
+  int *begin()
+  {
+    return a;
+  }
+  int *end()
+  {
+    return a + 5;
+  }
 };
 
 int main()

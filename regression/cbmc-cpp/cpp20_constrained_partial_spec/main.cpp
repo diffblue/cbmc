@@ -13,10 +13,16 @@
 namespace d
 {
 template <typename T>
-concept has_cat = requires { typename T::cat; };
+concept has_cat = requires
+{
+  typename T::cat;
+};
 template <typename T>
-concept no_cat = !requires { typename T::cat; };
-}
+concept no_cat = !requires
+{
+  typename T::cat;
+};
+} // namespace d
 
 template <typename T, typename = void>
 struct traits
@@ -24,15 +30,13 @@ struct traits
 };
 
 template <typename T>
-  requires d::has_cat<T>
-struct traits<T, void>
+requires d::has_cat<T> struct traits<T, void>
 {
   using cat = typename T::cat;
 };
 
 template <typename T>
-  requires d::no_cat<T>
-struct traits<T, void>
+requires d::no_cat<T> struct traits<T, void>
 {
   using cat = int;
 };

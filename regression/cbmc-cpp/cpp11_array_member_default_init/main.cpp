@@ -16,6 +16,7 @@ struct holder
 int main()
 {
   holder h;
-  __CPROVER_assert(h.v_.data_[0] == 7, "array member in default member initializer");
+  __CPROVER_assert(
+    h.v_.data_[0] == 7, "array member in default member initializer");
   return 0;
 }

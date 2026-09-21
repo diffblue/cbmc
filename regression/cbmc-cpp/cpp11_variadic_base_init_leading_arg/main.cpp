@@ -17,7 +17,9 @@ struct Base
 {
   T value;
   bool set;
-  Base() : value(0), set(false) {}
+  Base() : value(0), set(false)
+  {
+  }
   template <class... A>
   Base(tag_t, A... a) : value(a...), set(true)
   {
@@ -27,7 +29,9 @@ struct Base
 template <class T>
 struct Derived : Base<T>
 {
-  Derived() {}
+  Derived()
+  {
+  }
   template <class... A>
   Derived(tag_t, A... a) : Base<T>(tag_t{}, a...)
   {
@@ -38,6 +42,7 @@ int main()
 {
   Derived<int> d(tag_t{}, 5);
   __CPROVER_assert(d.set, "pack forwarded to base initializer sets the flag");
-  __CPROVER_assert(d.value == 5, "pack forwarded to base initializer sets value");
+  __CPROVER_assert(
+    d.value == 5, "pack forwarded to base initializer sets value");
   return 0;
 }

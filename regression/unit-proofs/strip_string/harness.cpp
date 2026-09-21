@@ -12,9 +12,9 @@
 // across translation units, [basic.def.odr]/13.)
 #include <util/string_utils.h>
 
-#include "../../../src/util/string_utils.cpp" // IWYU pragma: keep
-
 #include <cctype>
+
+#include "../../../src/util/string_utils.cpp" // IWYU pragma: keep
 
 extern "C" void __CPROVER_assert(bool, const char *);
 extern "C" void __CPROVER_assume(bool);
@@ -56,8 +56,7 @@ int main()
   }
 
   // idempotence
-  __CPROVER_assert(
-    strip_string(stripped) == stripped, "strip is idempotent");
+  __CPROVER_assert(strip_string(stripped) == stripped, "strip is idempotent");
 
   return 0;
 }

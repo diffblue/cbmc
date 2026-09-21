@@ -35,7 +35,8 @@ int main()
   {
     r = *p;
   }
-  __CPROVER_assert(r == 7, "catch(int *) handler type-checks; normal path runs");
+  __CPROVER_assert(
+    r == 7, "catch(int *) handler type-checks; normal path runs");
   __CPROVER_assert(r != 7, "WRONG must FAIL");
   return 0;
 }

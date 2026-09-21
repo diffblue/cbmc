@@ -8,31 +8,31 @@
 
 extern "C" void __CPROVER_assert(int, const char *);
 
-template<typename... U>
+template <typename... U>
 int last_of(U... u)
 {
   return (u, ...);
 }
 
-template<typename... U>
+template <typename... U>
 int sum_r(U... u)
 {
   return (u + ...);
 }
 
-template<typename... U>
+template <typename... U>
 int sum_l(U... u)
 {
   return (... + u);
 }
 
-template<typename... U>
+template <typename... U>
 int sum_b(U... u)
 {
   return (100 + ... + u);
 }
 
-template<typename... U>
+template <typename... U>
 bool all_of(U... u)
 {
   return (u && ...);
@@ -41,7 +41,8 @@ bool all_of(U... u)
 int main()
 {
   __CPROVER_assert(last_of(7) == 7, "one-element comma fold yields it");
-  __CPROVER_assert(last_of(1, 2, 9) == 9, "multi-element comma fold yields last");
+  __CPROVER_assert(
+    last_of(1, 2, 9) == 9, "multi-element comma fold yields last");
   __CPROVER_assert(sum_r(7) == 7, "one-element right fold");
   __CPROVER_assert(sum_l(7) == 7, "one-element left fold");
   __CPROVER_assert(sum_b(7) == 107, "one-element binary fold");

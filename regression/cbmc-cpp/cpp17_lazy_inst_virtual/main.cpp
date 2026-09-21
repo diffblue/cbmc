@@ -7,8 +7,13 @@
 template <class T>
 struct Base
 {
-  virtual T id(T x) { return x; }
-  virtual ~Base() {}
+  virtual T id(T x)
+  {
+    return x;
+  }
+  virtual ~Base()
+  {
+  }
 };
 
 int main()
