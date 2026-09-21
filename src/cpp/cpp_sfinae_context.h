@@ -103,6 +103,7 @@ private:
   message_handlert *saved_handler;
   std::size_t saved_error_count;
   unsigned saved_constant_expression_context;
+  unsigned saved_copy_init_ctor_exploration;
   null_message_handlert null_handler;
 };
 
