@@ -800,8 +800,15 @@ void goto_convertt::convert_expression(
     // of the function's automatic objects) ([except.ctor], [except.throw]/4).
     // The exception object has already been constructed by the throw's own
     // side-effects, which run first; then the destructors; then the THROW.
+    // Not for Java: a Java `athrow' throws a local REFERENCE that the
+    // exception lowering reads when it replaces the THROW ([except.throw] is
+    // C++'s exception-object model, Java's is JLS 14.18); unwinding the scope
+    // here marked that local DEAD before the read, so every Java handler saw
+    // a nondeterministic exception (13 jbmc regression tests).  The gate is
+    // "not Java" rather than "C++": the C++ front-end gives `main` and
+    // `extern "C"` functions C linkage (mode ID_C), and they unwind too.
     if(
-      !side_effects.side_effects.instructions.empty() &&
+      mode != ID_java && !side_effects.side_effects.instructions.empty() &&
       side_effects.side_effects.instructions.back().is_throw())
     {
       goto_programt::instructiont throw_instruction =
