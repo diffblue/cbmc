@@ -898,18 +898,6 @@ void cpp_typecheckt::convert_non_template_declaration(
       // as indicated by the !is_typedef check below.
       if(is_typedef)
       {
-        // Save and RESTORE the flag rather than clearing it: this conversion
-        // nests when an alias template is instantiated from another typedef
-        // (`using string = basic_string<char>;` in namespace pmr resolves
-        // the alias template `pmr::basic_string`, whose own declaration is
-        // converted here).  Clearing the flag on the way out made the outer
-        // resolver elaborate `std::basic_string<char, ..., polymorphic_
-        // allocator<char>>` while polymorphic_allocator was still only
-        // declared -- an instantiation N5008 [temp.inst]/1 does not permit
-        // (an alias declaration does not require a complete type), which
-        // left the class laid out with an incomplete member and, for user
-        // code, a member never constructed.
-        const bool old_skip = skip_typechecking_elaborate;
         skip_typechecking_elaborate = true;
         const bool old_alias = in_alias_declaration;
         in_alias_declaration = declaration.get_bool("#alias_declaration");
@@ -920,11 +908,11 @@ void cpp_typecheckt::convert_non_template_declaration(
         catch(...)
         {
           in_alias_declaration = old_alias;
-          skip_typechecking_elaborate = old_skip;
+          skip_typechecking_elaborate = false;
           throw;
         }
         in_alias_declaration = old_alias;
-        skip_typechecking_elaborate = old_skip;
+        skip_typechecking_elaborate = false;
       }
       else
       {
