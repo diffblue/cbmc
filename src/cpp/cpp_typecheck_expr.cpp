@@ -5427,56 +5427,77 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       const struct_typet &vt_struct =
         follow_tag(to_struct_tag_type(this_type.base_type()));
 
-      // Find the vtable pointer component to dispatch through.  A class may
-      // carry several vtable pointers: N5008 [class.virtual]/2 says a class
-      // that introduces new virtual functions (beyond those of its bases) has
-      // them dispatched through its own vtable, which CBMC models as a
-      // separate `virtual_table::<class>` struct with its own vtable pointer
-      // component.  The called function's vtable slot lives in the vtable of
-      // the class that (first) declared it; that slot's base_name is the
-      // function's virtual-name.  Selecting the *first* vtable pointer would
-      // wrongly look up a derived class's new virtual (e.g. `doit()`) in a
-      // base class's vtable and fail with "member ... not found".  So pick the
-      // vtable pointer whose vtable struct actually contains an entry for this
-      // virtual-name, falling back to the first pointer otherwise.
+      // Find the vtable struct holding the called function's slot and the
+      // vtable pointer to reach it.  The slot lives in the vtable struct of
+      // the class that declares the function (its base_name is the
+      // function's virtual-name).  Itanium C++ ABI 2.4 II.1: a class with a
+      // primary base shares that base's virtual pointer, and its own vtable
+      // struct embeds the primary base's as first member `@base'; so the
+      // pointer to dispatch through is the one of the primary-base chain
+      // (vtable_pointer_component), cast to the declaring class's vtable
+      // struct.  A class with several dynamic non-primary bases has several
+      // pointers; the one whose chain holds the slot is the one to use.
       const irep_idt virtual_name =
         expr.function().type().get(ID_C_virtual_name);
-      irep_idt vtable_name;
-      const struct_typet::componentt *vt_compo_ptr = nullptr;
-      const struct_typet::componentt *first_vtptr = nullptr;
-      for(const auto &c : vt_struct.components())
+      const irep_idt declaring_class = this_type.base_type().get(ID_identifier);
+      const irep_idt vt_name = "virtual_table::" + id2string(declaring_class);
+      irep_idt vtptr_name = vtable_pointer_component(declaring_class);
+      irep_idt slot_vt_name = vt_name;
+      const auto vt_has_entry = [this, &virtual_name](const irep_idt &vt_id)
       {
-        if(!c.get_bool(ID_is_vtptr))
-          continue;
-        if(first_vtptr == nullptr)
-          first_vtptr = &c;
-        const typet &vt_tag = to_pointer_type(c.type()).base_type();
-        if(vt_tag.id() != ID_struct_tag)
-          continue;
-        const struct_typet &candidate_vt =
-          follow_tag(to_struct_tag_type(vt_tag));
-        for(const auto &entry : candidate_vt.components())
-        {
+        const symbolt *vt_sym = symbol_table.lookup(vt_id);
+        if(vt_sym == nullptr || vt_sym->type.id() != ID_struct)
+          return false;
+        for(const auto &entry : to_struct_type(vt_sym->type).components())
           if(entry.get_base_name() == virtual_name)
+            return true;
+        return false;
+      };
+      if(vtptr_name.empty() || !vt_has_entry(vt_name))
+      {
+        // fall back to a vtable pointer of the class whose vtable struct
+        // has the entry
+        vtptr_name.clear();
+        for(const auto &c : vt_struct.components())
+        {
+          if(!c.get_bool(ID_is_vtptr))
+            continue;
+          const typet &vt_tag = to_pointer_type(c.type()).base_type();
+          if(vt_tag.id() != ID_struct_tag)
+            continue;
+          const irep_idt candidate =
+            to_struct_tag_type(vt_tag).get_identifier();
+          if(vtptr_name.empty())
           {
-            vt_compo_ptr = &c;
+            vtptr_name = c.get_name();
+            slot_vt_name = candidate;
+          }
+          if(vt_has_entry(candidate))
+          {
+            vtptr_name = c.get_name();
+            slot_vt_name = candidate;
             break;
           }
         }
-        if(vt_compo_ptr != nullptr)
-          break;
       }
-      if(vt_compo_ptr == nullptr)
-        vt_compo_ptr = first_vtptr;
-      CHECK_RETURN(vt_compo_ptr != nullptr);
-      vtable_name = vt_compo_ptr->get_name();
-      const struct_typet::componentt &vt_compo = *vt_compo_ptr;
+      CHECK_RETURN(!vtptr_name.empty());
 
-      vtptr_member.set(ID_component_name, vtable_name);
+      vtptr_member.set(ID_component_name, vtptr_name);
+      typecheck_expr(vtptr_member);
+
+      // the shared pointer has the primary-base chain's static type; view it
+      // as a pointer to the declaring class's vtable struct
+      const pointer_typet slot_vt_pointer =
+        pointer_type(struct_tag_typet(slot_vt_name));
+      if(vtptr_member.type() != slot_vt_pointer)
+      {
+        vtptr_member = typecast_exprt(vtptr_member, slot_vt_pointer);
+      }
+      already_typechecked_exprt::make_already_typechecked(vtptr_member);
 
       // look for the right entry
       irep_idt vtentry_component_name =
-        to_pointer_type(vt_compo.type()).base_type().get_string(ID_identifier) +
+        id2string(slot_vt_name) +
         "::" + expr.function().type().get_string(ID_C_virtual_name);
 
       exprt vtentry_member(ID_ptrmember);

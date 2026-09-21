@@ -1573,16 +1573,47 @@ void cpp_typecheckt::typecheck_compound_declarator(
           !symbol_table.insert(std::move(vt_symb_type)).second;
         CHECK_RETURN(!failed);
 
-        // add a virtual-table pointer
-        struct_typet::componentt compo(
-          id2string(symbol.name) + "::@vtable_pointer",
-          pointer_type(struct_tag_typet(vt_name)));
-        compo.set_base_name("@vtable_pointer");
-        compo.set_pretty_name(id2string(symbol.base_name) + "@vtable_pointer");
-        compo.set(ID_is_vtptr, true);
-        compo.set(ID_access, ID_public);
-        components.push_back(compo);
-        put_compound_into_scope(compo);
+        // Itanium C++ ABI 2.4 II.1 (as implemented by g++ and clang; N5008
+        // leaves the layout of a dynamic class to the implementation): a
+        // class with a primary base -- its first non-virtual dynamic base --
+        // shares that base's virtual pointer and adds no storage for its own
+        // virtual functions; their vtable entries follow the primary base's
+        // in the same vtable.  Modelled by embedding the primary base's
+        // vtable struct as the first member `@base' of this class's vtable
+        // struct: the shared pointer, cast to `virtual_table::<this class>*',
+        // reaches the new entries.  A class without a primary base (a root
+        // dynamic class, or one whose dynamic bases are all virtual) gets its
+        // own virtual pointer.
+        const irep_idt primary = primary_base(symbol.name);
+        const std::vector<irep_idt> primary_chain =
+          primary.empty() ? std::vector<irep_idt>{} : vtable_chain(primary);
+        if(!primary_chain.empty())
+        {
+          struct_typet &vt_struct =
+            to_struct_type(symbol_table.get_writeable_ref(vt_name).type);
+          struct_typet::componentt base_vt(
+            id2string(vt_name) + "::@base",
+            struct_tag_typet(primary_chain.front()));
+          base_vt.set_base_name("@base");
+          base_vt.set_pretty_name("@base");
+          base_vt.set(ID_access, ID_public);
+          base_vt.add_source_location() = symbol.location;
+          vt_struct.components().push_back(base_vt);
+        }
+        else
+        {
+          // add a virtual-table pointer
+          struct_typet::componentt compo(
+            id2string(symbol.name) + "::@vtable_pointer",
+            pointer_type(struct_tag_typet(vt_name)));
+          compo.set_base_name("@vtable_pointer");
+          compo.set_pretty_name(
+            id2string(symbol.base_name) + "@vtable_pointer");
+          compo.set(ID_is_vtptr, true);
+          compo.set(ID_access, ID_public);
+          components.push_back(compo);
+          put_compound_into_scope(compo);
+        }
       }
 
       typet &vt = symbol_table.get_writeable_ref(vt_name).type;
@@ -1658,24 +1689,16 @@ void cpp_typecheckt::typecheck_compound_declarator(
         const typet &target_type =
           to_code_type(component.type()).parameters()[0].type();
 
-        // Check if this base class is at a non-zero offset (i.e., not
-        // the first/primary base). Only non-primary bases need pointer
-        // adjustment.
+        // A base subobject that shares this class's virtual pointer (the
+        // primary-base chain, Itanium C++ ABI 2.4 II.1) is at offset 0 and
+        // needs no `this' adjustment; any other dynamic base subobject
+        // starts at the offset of its own virtual pointer.
         const struct_typet &derived_struct =
           to_struct_type(symbol_table.lookup_ref(symbol.name).type);
-        bool is_primary_base = false;
-        for(const auto &base : derived_struct.bases())
-        {
-          if(
-            base.type().id() == ID_struct_tag &&
-            to_struct_tag_type(base.type()).get_identifier() == virtual_base)
-          {
-            is_primary_base = true;
-            break;
-          }
-          // First base with a vtable is the primary base
-          break;
-        }
+        const irep_idt base_vtptr = vtable_pointer_component(virtual_base);
+        const bool is_primary_base =
+          !base_vtptr.empty() &&
+          base_vtptr == vtable_pointer_component(symbol.name);
 
         // Hierarchies with VIRTUALLY-inherited bases use the flat
         // full-object pointer convention throughout: make_ptr_typecast
@@ -1695,9 +1718,9 @@ void cpp_typecheckt::typecheck_compound_declarator(
         if(!is_primary_base && !flat_pointer_convention)
         {
           // Non-primary base: compute offset and adjust this pointer
-          const irep_idt vt_ptr_name =
-            id2string(virtual_base) + "::@vtable_pointer";
-          auto base_off = member_offset(derived_struct, vt_ptr_name, *this);
+          auto base_off = base_vtptr.empty()
+                            ? std::optional<mp_integer>{}
+                            : member_offset(derived_struct, base_vtptr, *this);
           if(base_off.has_value() && *base_off > 0)
           {
             auto char_ptr =

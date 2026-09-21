@@ -570,6 +570,33 @@ protected:
 
   void do_virtual_table(const symbolt &symbol);
 
+  /// Itanium C++ ABI 2.4: the primary base class of a dynamic class is its
+  /// first non-virtual dynamic base class in declaration order; the class
+  /// shares the primary base's virtual pointer (and vtable) instead of adding
+  /// one.  Returns the primary base's class identifier, or an empty id when
+  /// \p class_id has none (its dynamic bases, if any, are all virtual).
+  irep_idt primary_base(const irep_idt &class_id) const;
+
+  /// The `@vtable_pointer` component through which virtual functions of
+  /// class \p class_id are dispatched: the class's own pointer, or that of
+  /// the primary-base chain it shares.  Empty when the class is not dynamic.
+  irep_idt vtable_pointer_component(const irep_idt &class_id) const;
+
+  /// The vtable structs on the primary-base chain of \p class_id, most
+  /// derived first: `virtual_table::C` for C = class_id (if it declares
+  /// virtual functions), then its primary base, and so on.  Each vtable
+  /// struct embeds the next one as its first member `@base`.
+  std::vector<irep_idt> vtable_chain(const irep_idt &class_id) const;
+
+  /// The address to store into the vtable pointer component \p vtptr of a
+  /// complete object of class \p most_derived: the (possibly embedded) vtable
+  /// object `virtual_table::T@most_derived` of the most derived class T of
+  /// \p most_derived's hierarchy whose vtable chain reaches the pointer's
+  /// vtable struct.  Nil when no such object exists.
+  exprt vtable_pointer_value(
+    const symbolt &most_derived,
+    const struct_typet::componentt &vtptr) const;
+
   // we need to be able to delay the typechecking
   // of method bodies to handle methods with
   // bodies in the class definition
