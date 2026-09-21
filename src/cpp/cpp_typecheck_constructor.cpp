@@ -389,23 +389,10 @@ void cpp_typecheckt::default_cpctor(
     // Take care of virtual tables
     if(mem_c.get_bool(ID_is_vtptr))
     {
-      const cpp_namet cppname(mem_c.get_base_name(), source_location);
-
-      const symbolt *virtual_table_symbol_type;
-      if(lookup(
-           to_pointer_type(mem_c.type()).base_type().get(ID_identifier),
-           virtual_table_symbol_type))
+      // the vtable of the most derived class sharing this pointer
+      exprt address = vtable_pointer_value(symbol, mem_c);
+      if(address.is_nil())
         continue;
-
-      const symbolt *virtual_table_symbol_var;
-      if(lookup(
-           id2string(virtual_table_symbol_type->name) + "@" +
-             id2string(symbol.name),
-           virtual_table_symbol_var))
-        continue;
-
-      exprt var = virtual_table_symbol_var->symbol_expr();
-      address_of_exprt address(var);
       CHECK_RETURN(address.type() == mem_c.type());
 
       already_typechecked_exprt::make_already_typechecked(address);
@@ -1482,23 +1469,13 @@ void cpp_typecheckt::full_member_initialization(
     // Take care of virtual tables
     if(c.get_bool(ID_is_vtptr))
     {
-      const cpp_namet cppname(c.get_base_name(), c.source_location());
-
-      const symbolt *virtual_table_symbol_type;
-      if(lookup(
-           to_pointer_type(c.type()).base_type().get(ID_identifier),
-           virtual_table_symbol_type))
+      // the vtable of the most derived class sharing this pointer
+      const symbolt *class_symbol;
+      if(lookup(struct_union_type.get(ID_name), class_symbol))
         continue;
-
-      const symbolt *virtual_table_symbol_var;
-      if(lookup(
-           id2string(virtual_table_symbol_type->name) + "@" +
-             id2string(struct_union_type.get(ID_name)),
-           virtual_table_symbol_var))
+      exprt address = vtable_pointer_value(*class_symbol, c);
+      if(address.is_nil())
         continue;
-
-      exprt var = virtual_table_symbol_var->symbol_expr();
-      address_of_exprt address(var);
       CHECK_RETURN(address.type() == c.type());
 
       already_typechecked_exprt::make_already_typechecked(address);

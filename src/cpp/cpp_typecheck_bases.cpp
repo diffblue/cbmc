@@ -91,6 +91,14 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
   irept::subt &bases_irep=type.add(ID_bases).get_sub();
 
+  struct resolved_baset
+  {
+    const symbolt *symbol;
+    irep_idt access;
+    bool is_virtual;
+  };
+  std::vector<resolved_baset> resolved_bases;
+
   for(auto &base : bases_irep)
   {
     cpp_namet &name = static_cast<cpp_namet &>(base.add(ID_name));
@@ -310,75 +318,105 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     cpp_scopes.current_scope().add_secondary_scope(
       static_cast<cpp_scopet &>(*cpp_scopes.id_map[base_symbol.name]));
 
-    const struct_typet &base_struct_type=
-      to_struct_type(base_symbol.type);
+    // the base subobject is laid out below, once every base is resolved:
+    // Itanium C++ ABI 2.4 II.1 puts the PRIMARY base (the first non-virtual
+    // dynamic base in declaration order) at offset 0, before the other bases,
+    // whatever its position in the base-specifier-list
+    resolved_bases.push_back({&base_symbol, class_access, virtual_base});
+  }
 
-    // Itanium C++ ABI 2.4 (base subobject layout, approximated on the
-    // flattened components): the direct base subobject starts at the next
-    // offset suitably aligned for the BASE (add_padding reads the marker on
-    // its first component), and a base that is not a POD for the purpose of
-    // layout does not keep its tail padding -- the derived class's members
-    // may start in it (dsize(B) < sizeof(B)).  A POD base keeps sizeof(B).
-    const std::size_t first_new = to_struct_type(type).components().size();
-    add_base_components(
-      base_struct_type,
-      class_access,
-      type,
-      bases,
-      vbases,
-      virtual_base);
-    auto &components = to_struct_type(type).components();
-    // the marker goes on the first component that occupies storage (the
-    // layout ignores member functions, static members and member types)
-    std::size_t first_storage = first_new;
-    while(first_storage < components.size() &&
-          (components[first_storage].type().id() == ID_code ||
-           components[first_storage].get_bool(ID_is_static) ||
-           components[first_storage].get_bool(ID_is_type) ||
-           (components[first_storage].type().id() == ID_c_bit_field &&
-            to_c_bit_field_type(components[first_storage].type()).get_width() ==
-              0)))
+  // lay out the base subobjects: primary base first, then the others in
+  // declaration order.  The bases() of the type keep declaration order (the
+  // order of construction, N5008 [class.base.init]/13).
+  {
+    std::size_t primary_index = resolved_bases.size();
+    for(std::size_t i = 0; i < resolved_bases.size(); ++i)
     {
-      ++first_storage;
-    }
-    const namespacet ns(symbol_table);
-    mp_integer base_alignment = alignment(base_struct_type, ns);
-    if(first_storage >= components.size())
-    {
-      // an EMPTY base (its padding was dropped): no subobject to place, but
-      // an over-aligned one (`struct alignas(16) E {};') still aligns the
-      // derived class -- record it as the class's alignment requirement.
-      // (g++ and clang do not cap it under `#pragma pack', unlike a
-      // non-empty base's alignment.)
-      const exprt &current =
-        static_cast<const exprt &>(type.find(ID_C_alignment));
-      const auto current_value = current.is_nil()
-                                   ? std::optional<mp_integer>{}
-                                   : numeric_cast<mp_integer>(current);
       if(
-        base_alignment > 1 &&
-        !(current_value.has_value() && *current_value >= base_alignment))
+        !resolved_bases[i].is_virtual &&
+        !vtable_pointer_component(resolved_bases[i].symbol->name).empty())
       {
-        type.add(ID_C_alignment) = from_integer(base_alignment, size_type());
+        primary_index = i;
+        break;
       }
     }
-    else
+    std::vector<std::size_t> layout_order;
+    if(primary_index < resolved_bases.size())
+      layout_order.push_back(primary_index);
+    for(std::size_t i = 0; i < resolved_bases.size(); ++i)
+      if(i != primary_index)
+        layout_order.push_back(i);
+
+    for(const std::size_t i : layout_order)
     {
-      // `#pragma pack(n)' around the derived class definition caps the
-      // base subobject's alignment as well (GCC)
-      const auto pack = numeric_cast<mp_integer>(
-        static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
-      if(pack.has_value() && *pack > 0 && *pack < base_alignment)
-        base_alignment = *pack;
-      components[first_storage].set(
-        ID_C_base_alignment, integer2string(base_alignment));
-      if(!cpp_is_pod(base_struct_type))
+      const symbolt &base_symbol = *resolved_bases[i].symbol;
+      const irep_idt class_access = resolved_bases[i].access;
+      const bool virtual_base = resolved_bases[i].is_virtual;
+      const struct_typet &base_struct_type = to_struct_type(base_symbol.type);
+
+      // Itanium C++ ABI 2.4 (base subobject layout, approximated on the
+      // flattened components): the direct base subobject starts at the next
+      // offset suitably aligned for the BASE (add_padding reads the marker on
+      // its first component), and a base that is not a POD for the purpose of
+      // layout does not keep its tail padding -- the derived class's members
+      // may start in it (dsize(B) < sizeof(B)).  A POD base keeps sizeof(B).
+      const std::size_t first_new = to_struct_type(type).components().size();
+      add_base_components(
+        base_struct_type, class_access, type, bases, vbases, virtual_base);
+      auto &components = to_struct_type(type).components();
+      // the marker goes on the first component that occupies storage (the
+      // layout ignores member functions, static members and member types)
+      std::size_t first_storage = first_new;
+      while(
+        first_storage < components.size() &&
+        (components[first_storage].type().id() == ID_code ||
+         components[first_storage].get_bool(ID_is_static) ||
+         components[first_storage].get_bool(ID_is_type) ||
+         (components[first_storage].type().id() == ID_c_bit_field &&
+          to_c_bit_field_type(components[first_storage].type()).get_width() ==
+            0)))
       {
-        while(components.size() > first_new &&
-              components.back().get_is_padding() &&
-              components.back().type().id() != ID_c_bit_field)
+        ++first_storage;
+      }
+      const namespacet ns(symbol_table);
+      mp_integer base_alignment = alignment(base_struct_type, ns);
+      if(first_storage >= components.size())
+      {
+        // an EMPTY base (its padding was dropped): no subobject to place, but
+        // an over-aligned one (`struct alignas(16) E {};') still aligns the
+        // derived class -- record it as the class's alignment requirement.
+        // (g++ and clang do not cap it under `#pragma pack', unlike a
+        // non-empty base's alignment.)
+        const exprt &current =
+          static_cast<const exprt &>(type.find(ID_C_alignment));
+        const auto current_value = current.is_nil()
+                                     ? std::optional<mp_integer>{}
+                                     : numeric_cast<mp_integer>(current);
+        if(
+          base_alignment > 1 &&
+          !(current_value.has_value() && *current_value >= base_alignment))
         {
-          components.pop_back();
+          type.add(ID_C_alignment) = from_integer(base_alignment, size_type());
+        }
+      }
+      else
+      {
+        // `#pragma pack(n)' around the derived class definition caps the
+        // base subobject's alignment as well (GCC)
+        const auto pack = numeric_cast<mp_integer>(
+          static_cast<const exprt &>(type.find(ID_C_pragma_pack)));
+        if(pack.has_value() && *pack > 0 && *pack < base_alignment)
+          base_alignment = *pack;
+        components[first_storage].set(
+          ID_C_base_alignment, integer2string(base_alignment));
+        if(!cpp_is_pod(base_struct_type))
+        {
+          while(components.size() > first_new &&
+                components.back().get_is_padding() &&
+                components.back().type().id() != ID_c_bit_field)
+          {
+            components.pop_back();
+          }
         }
       }
     }
