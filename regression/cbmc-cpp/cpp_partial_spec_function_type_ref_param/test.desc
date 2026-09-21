@@ -1,12 +1,16 @@
 CORE
 main.cpp
-
+--cpp11
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+--
 A partial specialization over a function type must be matched when a
 parameter of the argument is a reference or pointer; the deduced
 template argument must retain the reference/pointer ([temp.deduct.type]).
+`--cpp11': static_assert is a C++11 keyword; the test used to pass in the
+default (C++98) mode only through an uninitialized parser flag (the arm64 CI
+runner rejected it).

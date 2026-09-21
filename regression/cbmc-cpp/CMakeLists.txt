@@ -5,6 +5,20 @@ else()
   set(gcc_only "")
 endif()
 
+# Tests tagged `libstdcxx12' need libstdc++ >= 12: cbmc preprocesses with the
+# HOST gcc (not necessarily the compiler cmake builds with), so ask it.
+find_program(HOST_GCC gcc)
+if(HOST_GCC)
+  execute_process(
+    COMMAND ${HOST_GCC} -dumpversion
+    OUTPUT_VARIABLE HOST_GCC_VERSION
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    ERROR_QUIET)
+  if(HOST_GCC_VERSION AND HOST_GCC_VERSION VERSION_LESS "12")
+    list(APPEND gcc_only -X libstdcxx12)
+  endif()
+endif()
+
 # On GCC < 13, system header processing leaves more incomplete template
 # symbols that cause --validate-goto-model to crash. Run validation
 # only on GCC 13+ where headers are well-supported.
@@ -33,5 +47,6 @@ if(CLANG_FOUND AND LIBCXX_FOUND)
       -I libcxx
       ${gcc_only}
   )
-  set_tests_properties("cbmc-cpp-libcxx-CORE" PROPERTIES TIMEOUT 900)
+  # ~15 minutes of libc++ header-heavy tests on the CI runners
+  set_tests_properties("cbmc-cpp-libcxx-CORE" PROPERTIES TIMEOUT 2400)
 endif()

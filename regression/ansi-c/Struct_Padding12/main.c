@@ -12,7 +12,9 @@
 #define STATIC_ASSERT(condition)                                               \
   int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
 
-#ifdef __GNUC__
+// The values are those of x86-64 (LP64, the x86-64 psABI bit-field and
+// alignment rules); elsewhere the test is vacuous.
+#if defined(__GNUC__) && defined(__x86_64__)
 #  include <stdbool.h>
 #  include <stddef.h>
 

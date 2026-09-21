@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp20
+--cpp20 --64
 ^\[main\.assertion\.1\] line \d+ alias picks lock-free type: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
@@ -10,3 +10,5 @@ main.cpp
 Currently: "expected constant expression, but got
 '__atomic_always_lock_free(...)'" followed by "symbol 'pick' is
 unknown".  The same builtin folds fine when only read at runtime.
+`--64': the expected values are those of the LP64 data model (the 32-bit CI
+build otherwise computes ILP32 layouts/types).
