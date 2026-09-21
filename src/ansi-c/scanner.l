@@ -1037,9 +1037,9 @@ enable_or_disable ("enable"|"disable")
 "__builtin_lt_synthesizes_from_spaceship"/[ \t\r\n]*\( { /* clang >= 22; used by libc++ 22's __utility/default_three_way_comparator.h */ return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__builtin_lt_synthesizes_from_spaceship" { return make_identifier(); }
 "__is_layout_compatible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
-"__is_nothrow_convertible" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_convertible"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_BINARY_TYPE_PREDICATE); }
 "__is_pod"          { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_pointer_interconvertible_base_of" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
+"__is_pointer_interconvertible_base_of"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_BINARY_TYPE_PREDICATE); }
 "__is_polymorphic"  { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_array"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_class"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
@@ -1465,8 +1465,14 @@ enable_or_disable ("enable"|"disable")
 
 "__typeof__"    { loc(); return TOK_TYPEOF; }
 
-"__remove_cv"   { return conditional_keyword(
-                    PARSER.gcc13_type_traits,
+ /* __remove_cv, __remove_reference and __remove_cvref are gcc >= 13
+    "revertible" builtins (see the __is_* traits above): a builtin only
+    when directly followed by '(' -- libstdc++ <= 12 declares alias
+    templates of these names, used as `__remove_cv<_Tp>`.  Keyed on the
+    '(' rather than on the HOST gcc's version, as the input may be a
+    translation unit preprocessed by a newer gcc. */
+"__remove_cv"/[[:space:]]*"(" { return conditional_keyword(
+                    PARSER.cpp98 && PARSER.gcc14_builtins,
                     TOK_GCC_BUILTIN_REMOVE_CV);
                 }
 
@@ -1480,8 +1486,8 @@ enable_or_disable ("enable"|"disable")
                     TOK_GCC_BUILTIN_REMOVE_VOLATILE);
                 }
 
-"__remove_reference" { return conditional_keyword(
-                    PARSER.gcc13_type_traits,
+"__remove_reference"/[[:space:]]*"(" { return conditional_keyword(
+                    PARSER.cpp98 && PARSER.gcc14_builtins,
                     TOK_GCC_BUILTIN_REMOVE_REFERENCE);
                 }
 
@@ -1490,8 +1496,8 @@ enable_or_disable ("enable"|"disable")
                     TOK_GCC_BUILTIN_REMOVE_REFERENCE);
                 }
 
-"__remove_cvref" { return conditional_keyword(
-                    PARSER.gcc13_type_traits,
+"__remove_cvref"/[[:space:]]*"(" { return conditional_keyword(
+                    PARSER.cpp98 && PARSER.gcc14_builtins,
                     TOK_GCC_BUILTIN_REMOVE_CVREF);
                 }
 

@@ -35,13 +35,14 @@ public:
       cpp98(false),
       cpp11(false),
       cpp20(false),
+      c17(false),
+      c23(false),
       for_has_scope(false),
       ts_18661_3_Floatn_types(false),
       __float128_is_keyword(false),
       float16_type(false),
       bf16_type(false),
       fp16_type(false),
-      gcc13_type_traits(false),
       clang_preprocessor(false),
       gcc14_builtins(false)
   {
@@ -79,12 +80,10 @@ public:
   bool float16_type;
   bool bf16_type;
   bool fp16_type;
-  // GCC 13+ type trait builtins: __remove_cv, __remove_reference,
-  // __remove_cvref
-  bool gcc13_type_traits;
   bool clang_preprocessor;
-  // GCC 14+ type trait builtins: __is_array, __is_function,
-  // __is_reference, __is_member_pointer, etc.
+  // The "revertible" type trait builtins of GCC 13+/14+ and clang
+  // (__remove_cv, __is_array, __is_function, __is_reference, ...): a
+  // builtin when directly followed by '(' (scanner trailing context).
   bool gcc14_builtins;
 
   typedef ansi_c_identifiert identifiert;
