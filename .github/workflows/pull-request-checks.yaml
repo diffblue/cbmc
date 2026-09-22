@@ -751,9 +751,16 @@ jobs:
           ./unit_tests "[z3]"
       - name: Run JBMC unit tests
         run: cd jbmc/unit; ./unit_tests
-      - name: Preprocess libc++ headers for debugging
+      - name: Run regression tests
+        run: |
+          export PATH=$PATH:`pwd`/src/solvers
+          make -C regression test-parallel JOBS=4
+      - name: Preprocess the failing cbmc-cpp tests for debugging
         if: always()
         run: |
+          # Every cbmc-cpp test that failed, preprocessed with the host
+          # toolchain (Apple libc++), so that the failure can be reproduced
+          # on Linux from the artifact (`cbmc <flags> test_X.ii')
           mkdir -p macos-preprocessed
           cbmc=src/cbmc/cbmc
           for hdr in vector iterator; do
@@ -761,13 +768,14 @@ jobs:
             echo "int main() {}" >> pp_$hdr.cpp
             $cbmc --cpp11 --preprocess pp_$hdr.cpp > macos-preprocessed/$hdr.ii 2>/dev/null || true
           done
-          # Preprocess failing test programs
-          for t in Address_of_Method1 Vector1 STL1 STL2 cpp11_vector_size cpp17_any_basic cpp20_coroutine_types; do
-            src="regression/cbmc-cpp/$t/main.cpp"
-            if [ -f "$src" ]; then
-              flags=$(sed -n '3p' "regression/cbmc-cpp/$t/test.desc")
-              $cbmc $flags --preprocess "$src" > "macos-preprocessed/test_$t.ii" 2>/dev/null || true
-            fi
+          # test.pl's log: a "Test 'NAME'" block per test, "[FAILED]" lines within
+          for t in $(awk -v q="'" '/^Test / { t = $2; gsub(q, "", t) } /\[FAILED\]/ { print t }' regression/cbmc-cpp/tests*.log 2>/dev/null | sort -u); do
+            for src in regression/cbmc-cpp/$t/main.cpp regression/cbmc-cpp/$t/main.ii; do
+              if [ -f "$src" ]; then
+                flags=$(sed -n '3p' "regression/cbmc-cpp/$t/test.desc")
+                $cbmc $flags --preprocess "$src" > "macos-preprocessed/test_$t.ii" 2>/dev/null || true
+              fi
+            done
           done
       - name: Upload preprocessed headers
         if: always()
@@ -776,10 +784,6 @@ jobs:
           name: macos-preprocessed-headers
           path: macos-preprocessed/
           retention-days: 7
-      - name: Run regression tests
-        run: |
-          export PATH=$PATH:`pwd`/src/solvers
-          make -C regression test-parallel JOBS=4
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=4
 
@@ -930,9 +934,17 @@ jobs:
       - name: Print ccache stats
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Preprocess MSVC headers for debugging
+      - name: Run tests
+        run: |
+          Set-Location build
+          $env:CBMC_TEST_MEMLIMIT = "3000000"
+          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
+      - name: Preprocess the failing cbmc-cpp tests for debugging
         if: always()
         run: |
+          # Every cbmc-cpp test that failed, preprocessed with the MSVC
+          # toolchain, so that the failure can be reproduced on Linux from
+          # the artifact (`cbmc --winx64 <flags> test_X.ii')
           New-Item -ItemType Directory -Force -Path msvc-preprocessed
           $cbmc = "build\bin\Release\cbmc.exe"
           foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map", "optional", "vector", "list", "set", "thread", "mutex", "filesystem", "chrono", "valarray", "iostream", "memory", "functional")) {
@@ -940,31 +952,20 @@ jobs:
             $src | Set-Content "pp_$hdr.cpp"
             & $cbmc --cpp17 --preprocess "pp_$hdr.cpp" 2>$null | Set-Content "msvc-preprocessed\$hdr.ii"
           }
-          foreach ($hdr in @("array", "numeric")) {
-            $src = "#include <$hdr>`nint main() {}"
-            $src | Set-Content "pp_${hdr}_20.cpp"
-            & $cbmc --cpp20 --preprocess "pp_${hdr}_20.cpp" 2>$null | Set-Content "msvc-preprocessed\${hdr}_cpp20.ii"
+          # test.pl's log: a "Test 'NAME'" block per test, "[FAILED]" lines within
+          $tests = @()
+          $current = ""
+          foreach ($line in (Get-ChildItem "regression\cbmc-cpp\tests*.log" -ErrorAction SilentlyContinue | Get-Content)) {
+            if ($line -match "^Test '([^']+)'") { $current = $Matches[1] }
+            elseif ($line -match "\[FAILED\]" -and $current -ne "") { $tests += $current }
           }
-          # Preprocess all cbmc-cpp test programs that fail on MSVC
-          $tests = @(
-            "STL1", "STL2", "Vector1",
-            "cpp11_condition_variable_header", "cpp11_future_header",
-            "cpp11_map_insert", "cpp11_map_verify", "cpp11_set_insert",
-            "cpp11_shared_ptr", "cpp11_vector_front_body",
-            "cpp11_vector_probe", "cpp11_vector_push_back",
-            "cpp11_vector_pushback", "cpp11_vector_verify",
-            "cpp14_chrono_basic", "cpp17_filesystem_basic",
-            "cpp17_filesystem_path_ops", "cpp17_mutex_basic",
-            "cpp17_numeric_basic", "cpp17_shared_ptr",
-            "cpp17_string_view", "cpp17_string_view_basic",
-            "cpp17_thread_basic", "cpp17_valarray_basic",
-            "cpp17_vector_basic", "cpp20_iostream_basic"
-          )
+          $tests = $tests | Sort-Object -Unique
           foreach ($t in $tests) {
-            $src = "regression\cbmc-cpp\$t\main.cpp"
-            if (Test-Path $src) {
-              $flags = (Get-Content "regression\cbmc-cpp\$t\test.desc" | Select-Object -Index 2).Trim()
-              & $cbmc $flags.Split(" ") --preprocess $src 2>$null | Set-Content "msvc-preprocessed\test_$t.ii"
+            foreach ($src in @("regression\cbmc-cpp\$t\main.cpp", "regression\cbmc-cpp\$t\main.ii")) {
+              if (Test-Path $src) {
+                $flags = (Get-Content "regression\cbmc-cpp\$t\test.desc" | Select-Object -Index 2).Trim()
+                & $cbmc $flags.Split(" ") --preprocess $src 2>$null | Set-Content "msvc-preprocessed\test_$t.ii"
+              }
             }
           }
       - name: Upload preprocessed headers
@@ -974,11 +975,6 @@ jobs:
           name: msvc-preprocessed-headers
           path: msvc-preprocessed/
           retention-days: 7
-      - name: Run tests
-        run: |
-          Set-Location build
-          $env:CBMC_TEST_MEMLIMIT = "3000000"
-          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
 
       - name: Save ccache
         if: always()
