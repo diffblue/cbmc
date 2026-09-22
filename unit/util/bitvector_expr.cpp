@@ -110,9 +110,9 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
     }
   }
 
-  GIVEN("A bit-vector that is one-hot 0")
+  GIVEN("A bit-vector that is one-hot")
   {
-    boolbv << onehot0_exprt{from_integer(0xfe, u8)}.lower();
+    boolbv << onehot0_exprt{from_integer(64, u8)}.lower();
 
     THEN("the lowering of onehot0 is true")
     {
@@ -120,9 +120,19 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
     }
   }
 
-  GIVEN("A bit-vector that is not one-hot 0")
+  GIVEN("A bit-vector that is zero")
   {
-    boolbv << onehot0_exprt{from_integer(0x7e, u8)}.lower();
+    boolbv << onehot0_exprt{from_integer(0, u8)}.lower();
+
+    THEN("the lowering of onehot0 is true")
+    {
+      REQUIRE(boolbv() == decision_proceduret::resultt::D_SATISFIABLE);
+    }
+  }
+
+  GIVEN("A bit-vector with two bits set")
+  {
+    boolbv << onehot0_exprt{from_integer(5, u8)}.lower();
 
     THEN("the lowering of onehot0 is false")
     {
@@ -130,9 +140,9 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
     }
   }
 
-  GIVEN("A bit-vector that is not one-hot 0")
+  GIVEN("A bit-vector with all bits but one set")
   {
-    boolbv << onehot0_exprt{from_integer(0xff, u8)}.lower();
+    boolbv << onehot0_exprt{from_integer(0xfe, u8)}.lower();
 
     THEN("the lowering of onehot0 is false")
     {
