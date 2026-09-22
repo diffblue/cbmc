@@ -4949,6 +4949,9 @@ bool cpp_typecheckt::get_component(
       // derived object, so go through the pointer conversion to the virtual
       // base, which reads the offset from the vtable (Itanium C++ ABI
       // 2.5.2).  A complete object (a named variable) uses its own layout.
+      // A constructor or destructor of the complete object (its virtual
+      // pointer installs, marked `#complete_object') uses the class's own
+      // layout: a static offset, independent of the vtable in place.
       const irep_idt virtual_base = component.get(ID_C_virtual_base);
       if(
         !virtual_base.empty() && virtual_base != "$padding" &&
@@ -4961,7 +4964,10 @@ bool cpp_typecheckt::get_component(
           struct_tag_typet vbase_tag(virtual_base);
           if(object.type().get_bool(ID_C_constant))
             vbase_tag.set(ID_C_constant, true);
-          make_ptr_typecast(pointer, pointer_type(vbase_tag));
+          make_ptr_typecast(
+            pointer,
+            pointer_type(vbase_tag),
+            /*static_virtual_base_offset=*/object.get_bool("#complete_object"));
           dereference_exprt vbase_object(pointer);
           vbase_object.type() = vbase_tag;
           vbase_object.set(ID_C_lvalue, object.get_bool(ID_C_lvalue));

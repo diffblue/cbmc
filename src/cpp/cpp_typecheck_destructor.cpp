@@ -53,7 +53,10 @@ void cpp_typecheckt::default_dtor(
 }
 
 /// produces destructor code for a class object
-codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
+codet cpp_typecheckt::dtor(
+  const symbolt &symbol,
+  const symbol_exprt &this_expr,
+  codet &prologue)
 {
   PRECONDITION(symbol.type.id() == ID_struct || symbol.type.id() == ID_union);
 
@@ -93,6 +96,7 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
 
       exprt ptrmember(ID_ptrmember);
       ptrmember.set(ID_component_name, c.get_name());
+      ptrmember.set("#complete_object", true);
       ptrmember.operands().push_back(this_expr);
 
       code_frontend_assignt assign(ptrmember, address);
@@ -100,16 +104,16 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
       continue;
     }
   }
+  // N5008 [class.cdtor]/4: a virtual call from the destructor's body
+  // dispatches to THIS class's overriders -- the pointers are installed on
+  // entry, before the body (the prologue), not after it.
   if(has_virtual_bases)
   {
-    block.add(code_ifthenelset(
-      cpp_namet("@most_derived").as_expr(), std::move(vptr_block)));
+    prologue = code_ifthenelset(
+      cpp_namet("@most_derived").as_expr(), std::move(vptr_block));
   }
   else
-  {
-    for(const auto &assign : vptr_block.statements())
-      block.add(assign);
-  }
+    prologue = std::move(vptr_block);
 
   // call the data member destructors in the reverse order
   for(struct_union_typet::componentst::const_reverse_iterator
@@ -230,6 +234,30 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
     DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
     if(bit->get_bool(ID_virtual))
       continue;
+
+    // Itanium C++ ABI 2.6.2 / N5008 [class.cdtor]/4: a base with virtual
+    // bases is destroyed under this complete object's construction vtables
+    // (see full_member_initialization)
+    if(bit->type().id() == ID_struct_tag)
+    {
+      code_blockt installs;
+      for(auto &install : construction_vtable_installs(
+            symbol, to_struct_tag_type(bit->type()).get_identifier()))
+      {
+        already_typechecked_exprt::make_already_typechecked(install.second);
+        exprt ptrmember(ID_ptrmember);
+        ptrmember.set(ID_component_name, install.first.get_name());
+        ptrmember.set("#complete_object", true);
+        ptrmember.operands().push_back(this_expr);
+        installs.add(code_frontend_assignt(ptrmember, install.second));
+      }
+      if(!installs.statements().empty())
+      {
+        block.add(code_ifthenelset(
+          cpp_namet("@most_derived").as_expr(), std::move(installs)));
+      }
+    }
+
     auto dtor_code = destroy_base(bit->type());
     if(dtor_code.has_value())
       block.add(dtor_code.value());
