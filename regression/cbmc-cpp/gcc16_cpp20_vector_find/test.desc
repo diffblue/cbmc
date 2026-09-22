@@ -1,0 +1,15 @@
+KNOWNBUG gcc16
+main.cpp
+--cpp20 --unwind 5 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only; passes with gcc 11-15
+headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
+select the code paths) and running cbmc on the .ii file.
+Untriaged: the C++20 __find_if uses __invoke on the predicate with a
+forwarded const int &.

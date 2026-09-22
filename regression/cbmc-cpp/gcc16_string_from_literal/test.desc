@@ -1,0 +1,15 @@
+KNOWNBUG gcc16
+main.cpp
+--cpp17 --unwind 6 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only; passes with gcc 11-15
+headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
+select the code paths) and running cbmc on the .ii file.
+Symptom: `no body for callee basic_string<...>::_M_construct<1>(...)' at
+basic_string.tcc; the assertion is then FAILURE.
