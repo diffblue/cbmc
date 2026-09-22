@@ -1331,6 +1331,26 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
 
   const symbolt &symbol = lookup(to_tag_type(type));
 
+  // N5008 [temp.inst]/2, [temp.class.spec.match]: while the partial
+  // specializations of THIS specialization are being matched (below),
+  // typechecking a candidate's requires-clause or argument pattern may
+  // name the specialization again (`typename _Iter::difference_type' with
+  // `_Iter' bound to it).  Its completeness cannot be required by its own
+  // matching; treating the nested request as satisfied by the incomplete
+  // instance ends the recursion (libstdc++'s incrementable_traits<int *>
+  // under -std=c++20 recursed until the stack overflowed).
+  if(!elaborations_in_progress.insert(symbol.name).second)
+    return;
+  struct in_progress_guardt
+  {
+    std::set<irep_idt> &set;
+    irep_idt name;
+    ~in_progress_guardt()
+    {
+      set.erase(name);
+    }
+  } in_progress_guard{elaborations_in_progress, symbol.name};
+
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type = symbol.type;
 
