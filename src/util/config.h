@@ -390,6 +390,12 @@ public:
     } cpp_standard;
     static cpp_standardt default_cpp_standard();
 
+    /// True while `cpp_standard` is the built-in default rather than a
+    /// standard selected on the command line (or by a platform rule); the
+    /// C++ front-end then follows the host compiler's default dialect
+    /// (see apply_host_default_cxx_standard).
+    bool standard_is_default = true;
+
     void set_cpp98()
     {
       cpp_standard = cpp_standardt::CPP98;
