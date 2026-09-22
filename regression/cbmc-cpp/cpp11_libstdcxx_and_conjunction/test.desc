@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+replace_type_pack_ref (template_map.cpp) substitutes a pack used as a
+nested-name-specifier (`_Bn::value') per element; the header-free shape is
+cpp11_variadic_pack_element_under_cast.
