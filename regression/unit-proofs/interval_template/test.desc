@@ -1,0 +1,16 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof for interval_templatet<int> (src/util/interval_template.h) over
+ALL bounded intervals and points: meet is the exact intersection (and empty
+iff disjoint), join contains the union, is_less_than_eq / == / singleton and
+make_le_than agree with the bounds.  unit/util/interval_template.cpp checks
+fixed samples of the same operations.
