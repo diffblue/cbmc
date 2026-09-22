@@ -1150,6 +1150,16 @@ enable_or_disable ("enable"|"disable")
 "__is_trivially_assignable" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_trivially_constructible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__reference_constructs_from_temporary" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+ /* GCC 14 builtin traits used by libstdc++ 16 (`__bool_constant<
+    __is_invocable(_Fn, _ArgTypes...)>`, `__array_rank(_Tp)`); the same
+    revertible-identifier rule as above: libstdc++ also declares
+    `struct __is_invocable`. */
+"__is_invocable"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_BINARY_TYPE_PREDICATE); }
+"__is_invocable" { return make_identifier(); }
+"__is_nothrow_invocable"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_invocable" { return make_identifier(); }
+"__array_rank"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__array_rank" { return make_identifier(); }
 "__reference_converts_from_temporary" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 
 "__if_exists"       { return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }

@@ -2063,6 +2063,19 @@ void template_mapt::apply(exprt &expr) const
       continue; // handled separately or not relevant
     if(named.second.id() == ID_nil)
       continue;
+    if(named.first == "type_args")
+    {
+      // the argument list of a builtin trait (Parser::rTypePredicate): a
+      // pack expansion `Args...' is expanded by the trait's typecheck from
+      // pack_args_map and must stay a pack reference here
+      for(auto &arg : named.second.get_sub())
+      {
+        typet &t = static_cast<exprt &>(arg).type();
+        if(!t.get_bool(ID_ellipsis))
+          apply(t);
+      }
+      continue;
+    }
     apply(static_cast<typet &>(named.second));
   }
 

@@ -10247,28 +10247,56 @@ bool Parser::rTypePredicate(exprt &expr)
     break;
 
   case TOK_BINARY_TYPE_PREDICATE:
+  {
     if(lex.get_token(tk)!='(')
       return false;
+    // The complete argument list, in order, each argument a `type' node
+    // whose type may carry `ellipsis' for a pack expansion `Args...';
+    // variadic traits (`__is_invocable(Fn, Args...)') need all of them.
+    irept &type_args = expr.add("type_args");
+    auto record_arg = [&](const typet &t, bool ellipsis)
+    {
+      exprt arg(ID_type);
+      arg.type() = t;
+      if(ellipsis)
+        arg.type().set(ID_ellipsis, true);
+      type_args.get_sub().push_back(std::move(arg));
+    };
     if(!rTypeName(tname1))
       return false;
+    bool ellipsis1 = false;
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
       lex.get_token(tk);
+      ellipsis1 = true;
+    }
+    record_arg(tname1, ellipsis1);
     if(lex.LookAhead(0) == ',')
     {
       lex.get_token(tk);
       if(!rTypeName(tname2))
         return false;
+      bool ellipsis2 = false;
       if(lex.LookAhead(0) == TOK_ELLIPSIS)
+      {
         lex.get_token(tk);
-      // consume any additional type arguments (variadic traits)
+        ellipsis2 = true;
+      }
+      record_arg(tname2, ellipsis2);
+      // any additional type arguments (variadic traits)
       while(lex.LookAhead(0) == ',')
       {
         lex.get_token(tk);
         typet extra;
         if(!rTypeName(extra))
           return false;
+        bool ellipsis = false;
         if(lex.LookAhead(0) == TOK_ELLIPSIS)
+        {
           lex.get_token(tk);
+          ellipsis = true;
+        }
+        record_arg(extra, ellipsis);
       }
     }
     if(lex.get_token(tk)!=')')
@@ -10276,6 +10304,7 @@ bool Parser::rTypePredicate(exprt &expr)
     expr.add("type_arg1").swap(tname1);
     expr.add("type_arg2").swap(tname2);
     break;
+  }
 
   default:
     UNREACHABLE;
