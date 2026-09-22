@@ -345,26 +345,33 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       return;
     }
 
+    // N5008 [dcl.type.auto.deduct]/4 + [temp.deduct.call]/1: the type
+    // deduced for `auto' is that of the initializer EXPRESSION, which is
+    // never a reference type ([expr.type]/1) -- `auto c = static_cast<T
+    // &&>(a)' declares an object of type T, not a reference.  The front
+    // end represents a reference-typed expression as a marked pointer;
+    // read the referent.
+    add_implicit_dereference(symbol.value);
     cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
     typecheck_type(symbol.type);
-    implicit_typecast(symbol.value, symbol.type);
+    if(symbol.type.id() != ID_struct_tag || cpp_is_pod(symbol.type))
+      implicit_typecast(symbol.value, symbol.type);
 
     // N5008 [dcl.init]/16.6.2 + [class.copy.elision]: when the deduced
-    // type is a non-POD class and the initializer is a materialized
-    // temporary (or another class-typed expression), the destination is
-    // initialized by the copy/move CONSTRUCTOR chosen by overload
-    // resolution -- not by a bitwise assignment.  Leaving the raw
-    // temporary here made goto conversion ASSIGN the map bitwise and
-    // then run the temporary's DESTRUCTOR: `auto m = std::map<...>{...}`
-    // freed the tree nodes m's copied pointers still referenced, and
-    // every later at() failed with "deallocated dynamic object".
-    // Routing through cpp_constructor selects the move constructor for
-    // the rvalue temporary (ownership transfers; the temporary's
-    // destructor then frees nothing m uses).
-    if(
-      symbol.type.id() == ID_struct_tag && !cpp_is_pod(symbol.type) &&
-      symbol.value.id() == ID_side_effect &&
-      symbol.value.get(ID_statement) == ID_temporary_object)
+    // type is a non-POD class, the destination is initialized by the
+    // copy/move CONSTRUCTOR chosen by overload resolution (a prvalue of the
+    // class type initializes the object directly) -- not by a bitwise
+    // assignment.  Leaving the raw initializer here made goto conversion
+    // ASSIGN bitwise and then run the source's DESTRUCTOR where the source
+    // is a temporary: `auto m = std::map<...>{...}` freed the tree nodes
+    // m's copied pointers still referenced, `auto g = make_guard()` (a
+    // function-call prvalue -- libstdc++ 16's
+    // `auto __guard = std::__allocate_guarded_obj(__alloc)` in
+    // std::list::_M_create_node) freed the node just allocated, and
+    // `auto b = a;` shared a's resources with b, which both destructors
+    // then released.  Routing through cpp_constructor selects the copy or
+    // move constructor as for an explicitly typed declaration.
+    if(symbol.type.id() == ID_struct_tag && !cpp_is_pod(symbol.type))
     {
       symbol_exprt destination(symbol.name, symbol.type);
       destination.set(ID_C_lvalue, true);
