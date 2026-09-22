@@ -43,8 +43,8 @@ output_type narrow(input_type input)
 template <typename output_type, typename input_type>
 output_type narrow_or_throw_out_of_range(input_type input)
 {
-  auto const result = narrow_cast<input_type>(input);
-  if(result != input)
+  auto const result = narrow_cast<output_type>(input);
+  if(static_cast<input_type>(result) != input)
   {
     throw std::out_of_range{"narrowing gave a different value than expected"};
   }
