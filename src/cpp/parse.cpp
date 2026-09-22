@@ -10480,17 +10480,30 @@ bool Parser::rLambdaExpr(exprt &exp)
     if(lex.get_token(tk) != ')')
       return false;
 
-    // optional mutable
-    if(lex.LookAhead(0) == TOK_MUTABLE)
+    // N5008 [expr.prim.lambda.general]: lambda-specifier-seq -- any order
+    // of `consteval', `constexpr', `mutable', `static' (C++23 P1169; MSVC's
+    // STL uses `[](_Ty _Val) static { ... }' in every mode).  `static' makes
+    // the call operator a static member function: no `this' -- which
+    // this model does not distinguish for a captureless lambda.
+    for(bool more = true; more;)
     {
-      lex.get_token(tk);
-      // [expr.prim.lambda.closure]: a mutable lambda's operator() is non-const.
-      exp.set("mutable", true);
+      switch(lex.LookAhead(0))
+      {
+      case TOK_MUTABLE:
+        lex.get_token(tk);
+        // [expr.prim.lambda.closure]: a mutable lambda's operator() is
+        // non-const.
+        exp.set("mutable", true);
+        break;
+      case TOK_CONSTEXPR:
+      case TOK_CONSTEVAL:
+      case TOK_STATIC:
+        lex.get_token(tk);
+        break;
+      default:
+        more = false;
+      }
     }
-
-    // optional constexpr (C++17)
-    if(lex.LookAhead(0) == TOK_CONSTEXPR)
-      lex.get_token(tk);
 
     // optional attributes (e.g., __attribute__((__always_inline__)))
     {

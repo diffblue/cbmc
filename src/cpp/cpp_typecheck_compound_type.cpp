@@ -525,6 +525,8 @@ irep_idt cpp_typecheckt::ensure_virtual_table(
     vt_symb_type.module = module;
     vt_symb_type.location = symbol.location;
     vt_symb_type.type.set(ID_name, vt_symb_type.name);
+    // the tag expr2c prints for `struct <tag>' (nil otherwise)
+    vt_symb_type.type.set(ID_tag, vt_symb_type.base_name);
 
     const bool failed = !symbol_table.insert(std::move(vt_symb_type)).second;
     CHECK_RETURN(!failed);
@@ -2650,7 +2652,15 @@ void cpp_typecheckt::typecheck_friend_declaration(
     }
 
     cpp_save_scopet saved_scope(cpp_scopes);
-    cpp_scopes.go_to_global_scope();
+    // N5008 [class.friend]/11: an unqualified elaborated-type-specifier
+    // (`friend class B;') is looked up -- and, if undeclared, declared --
+    // in the innermost enclosing namespace, never in the class.  A
+    // simple-type-specifier (`friend _Tidy_guard<vector>;', MSVC's
+    // <vector>) names an existing type by ordinary lookup from the class
+    // scope: the injected-class-name `vector' and the class's template
+    // parameters are visible there ([temp.local]/1).
+    if(ftype.id() != ID_cpp_name)
+      cpp_scopes.go_to_global_scope();
     typecheck_type(ftype);
     symbol.type.add(ID_C_friends).move_to_sub(ftype);
 
