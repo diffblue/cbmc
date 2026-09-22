@@ -10761,3 +10761,79 @@ Design as in the round-155 notes, implemented and verified:
   <locale> has_facet on libstdc++ 11, VS 2022 job (173 tests), z3 complex2,
   macOS jobs; the recursive-and_ issue is the blocker for std::bind/tuple
   with >= 3 elements on gcc-11 hosts.
+
+## Round 158 (2026-09-22): known-issue sweep before the push
+
+Commits (oldest first): 93e4e14377 (shrinking-pack recursion + has_facet),
+d5f0d74db4 (default dialect = host compiler), ac62f2eb88 (static lambdas,
+friend simple-type-specifier, vtable tags), 7bf90d798e (tests + CI
+artifacts), b59f34c0b1 ([class.cdtor]/4 + construction vtables).
+
+- #2 `__and_<B1,B2,Bn...>` (an.cpp, n>=5): NOT a pack-binding bug -- the
+  packs were bound right (4,3,2).  elaborate_class_template's
+  `same_template_depth >= 2` limit silently `return`ed for the third nested
+  instantiation of one template unless a non-type integer argument
+  decreased; the pack recursion converges on the ARGUMENT COUNT.  Fixed by
+  admitting an instance with strictly fewer template args than every
+  enclosing instance.  Debugging lesson: the "instantiating ..." lines in
+  the error output are the instantiation STACK, not a log of instantiations
+  (they showed and_<6>, and_<5>, and_<6> -- the last is the bool_constant
+  base's frame being reported with a stale identifier).  Unlocked the
+  libstdc++ 11 tuple/bind tests; has_facet<F>(const locale&) (libstdc++ 11
+  reads the facet table directly) now overridden like __try_use_facet:
+  ctype<char> present, others absent -> cpp11_stream_setw/destructor_chain
+  pass on gcc-11 hosts; all four `libstdcxx12' tags removed (mechanism kept
+  in CMakeLists.txt).
+- #3 default C++ standard: cpp_languaget::preprocess/parse call
+  apply_host_default_cxx_standard() (ansi-c/gcc_version.cpp): if
+  config.cpp.standard_is_default (set in configt::set: no --cpp*/--std and
+  no platform rule), query gcc_versiont(preprocessor executable) and take
+  default_cxx_standard (mapping extended to 202002L/202302L/>).  Both
+  gcc 13 and gcc 11 hosts -> C++17.  cbmc-cpp 1358 + systemc/cpp/dfcc/ansi-c
+  green with C++17 as the default for the 276 tests without a flag.  The C
+  default (C11 hardcoded; gcc >= 8 defaults gnu17, gcc 15 gnu23) NOT
+  changed: C23 keywords (bool/true/false) would change test semantics;
+  separate decision.
+- #4 VS 2022 log classification (173 tests): 112 PARSING ERROR -- 60 in
+  __msvc_bit_utils.hpp (STATIC LAMBDAS `[](_Ty) static {}`), 32 in
+  xstring/vector/numeric (same construct), 12 ucrt float.h/corecrt_math.h
+  (unknown, need the .ii), 22 test sources with GNU-only syntax
+  (__attribute__, asm, pragma pack -- candidates for `gcc-only' tags:
+  cpp11_alias_of_attributed_class_template, cpp11_alignas_*,
+  cpp11_asm_empty_operand_lists, cpp11_enum_class_bitfield_packing,
+  cpp11_gnu_alignment_attribute_rules, cpp11_leading_packed_attribute_layout,
+  cpp11_offsetof_cpp_member_names, cpp11_packed_*, cpp11_sizeof_alias_of_...,
+  cpp17_conversion_template_defaulted_parameter, cpp17_optional_deduction_guide,
+  cpp_base_subobject_layout, cpp_empty_class_object_size,
+  cpp_packed_non_pod_member, cpp_pragma_pack, gcc16_*, ofstream_from_string;
+  NOT tagged yet -- verify each against the next run's artifacts first);
+  20 "could not fully type-check"; 17 other CONVERSION ERROR; 7 VERIFICATION
+  FAILED; 5 invariants (cpp11_initializer_list_class, cpp11_map_insert
+  (symex_other.cpp:268 Unreachable), cpp11_non_member_compound_assignment_
+  operators, cpp11_return_braced_init_list, cpp_list_init_non_viable_init_
+  list_ctor_decl).  Artifacts: /tmp/r157/msvc-pp (46 .ii of run
+  35633151968), /tmp/r157/macos-pp.  After the static-lambda + friend fixes,
+  locally on the MSVC .ii: 15 of 26 fully pass; remaining classes:
+  variable-template SFINAE (`is_pointer_v', `conjunction_v', the duration
+  constraint at __msvc_chrono.hpp:127 -- 14 hits), utility:140 `swap',
+  `strong_ordering' (10), `_Tmap_traits'/`pair' (map), `_Base' (mutex),
+  `_List_iterator' (STL1), symex invariant in cpp11_map_insert.
+  CI workflow: both preprocess steps now run AFTER the tests and read the
+  failing test names from tests.log (awk on "Test 'NAME'"/"[FAILED]"), so
+  every failing cbmc-cpp test is uploaded, not a fixed list.
+- #5 construction vtables: implemented at the direct-base level (see the
+  commit message); dtor vptr installs moved to a PROLOGUE (the body used to
+  run with the derived class's tables -- ~B saw D::f even without vbases).
+  The vbase-pointer install lvalues are marked `#complete_object' -> static
+  offset in get_component (the dynamic path read the table currently in
+  place, which between base constructions is a construction table of another
+  layout: "pointer outside object bounds").  The repeated-non-virtual-base
+  deviation is moot: such a hierarchy is rejected at layout.
+- #6: vtable ID_tag set.  Fuzzer corners seed27/seed44 investigated and left:
+  both are `typedef S __attribute__((aligned(k))) T' of a CLASS type used as
+  a member.  seed44: g++'s alignof(S26) is 4 or 2 depending on whether an
+  unrelated earlier struct used T6 (GCC quirk; clang and CBMC say 2 in both
+  cases).  seed27: aligned(1) class typedef after a bit-field in a dynamic
+  class -- g++ 16 / clang 11 (they disagree); non-dynamic case both say 3
+  (next byte after the bit-field), CBMC 4.  Not modelling GCC-only quirks.
+- Dog-food/docker/unit-proof phase started (see below).
