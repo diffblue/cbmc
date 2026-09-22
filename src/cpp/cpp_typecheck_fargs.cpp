@@ -373,12 +373,36 @@ static bool brace_init_to_init_list_is_viable(
   if(!found)
     return false;
 
-  // Each element must have an ICS to `elem_type`.
+  // Each element must have an ICS to `elem_type` -- N5008
+  // [over.ics.list]/4-7: an element that is itself a braced-init-list is
+  // list-initialization of the element type (an aggregate, a class with a
+  // matching constructor: `{{"k", v}, ...}' to initializer_list<pair<K,
+  // V>>, std::map's and json_objectt's shapes), or, for a scalar element
+  // type, the conversion of its single member.
   for(const auto &op : operand.operands())
   {
     exprt new_expr;
     unsigned rank = 0;
     exprt op_copy = op;
+    if(op.id() == ID_initializer_list)
+    {
+      if(brace_init_is_viable(op, elem_type, cpp_typecheck))
+        continue;
+      if(
+        op.operands().size() == 1 &&
+        cpp_typecheck.implicit_conversion_sequence(
+          to_unary_expr(op).op(), elem_type, new_expr, rank))
+      {
+        continue;
+      }
+      if(
+        op.operands().empty() && (cpp_typecheck.cpp_is_pod(elem_type) ||
+                                  elem_type.id() == ID_struct_tag))
+      {
+        continue; // value-initialization ([dcl.init.list]/3.5)
+      }
+      return false;
+    }
     if(!cpp_typecheck.implicit_conversion_sequence(
          op_copy, elem_type, new_expr, rank))
       return false;
