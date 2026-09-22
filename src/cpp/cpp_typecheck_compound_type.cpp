@@ -2988,6 +2988,45 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
         bool is_typedef = declaration.is_typedef();
 
+        // N5008 [temp.inst]/1, [basic.def.odr]: a declaration whose every
+        // declarator forms a pointer or reference to the decl-specifier's
+        // type (`typedef _Rb_tree_node<_Val> *_Link_type;',
+        // `_Base_ptr _M_parent;') does not require that type to be complete,
+        // so a class template specialization it names is not instantiated
+        // here; it is where completeness is required.  libstdc++'s
+        // `std::set<X>' named while X is still incomplete otherwise
+        // instantiated the node type -- with its
+        // `unsigned char _M_storage[sizeof(X)]' -- too early.
+        struct skip_elaborate_for_indirectiont
+        {
+          skip_elaborate_for_indirectiont(bool &flag, bool indirection)
+            : flag(flag), saved(flag)
+          {
+            if(indirection)
+              flag = true;
+          }
+          ~skip_elaborate_for_indirectiont()
+          {
+            flag = saved;
+          }
+          bool &flag;
+          bool saved;
+        } skip_elaborate_for_indirection{
+          skip_typechecking_elaborate,
+          // ... nor does a member FUNCTION declaration for its return type
+          // ([temp.inst]/1; typecheck_compound_declarator instantiates the
+          // type of a data member, which does need it)
+          !declaration.declarators().empty() &&
+            std::all_of(
+              declaration.declarators().begin(),
+              declaration.declarators().end(),
+              [](const cpp_declaratort &d)
+              {
+                return d.type().id() == ID_pointer ||
+                       d.type().id() == ID_frontend_pointer ||
+                       d.type().id() == ID_code;
+              })};
+
         // is it tag-only?
         if(
           declaration.type().id() == ID_struct ||

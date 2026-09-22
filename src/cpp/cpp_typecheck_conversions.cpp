@@ -4875,6 +4875,19 @@ bool cpp_typecheckt::static_typecast(
 {
   exprt e = expr;
 
+  // N5008 [expr.static.cast]/11, [temp.inst]/2: a cast between pointers or
+  // references to classes needs the classes complete (their base-class
+  // relation); a class template specialization named only through a
+  // typedef so far is instantiated here.
+  for(const typet *t : {&type, &expr.type()})
+  {
+    const typet *pointee = t;
+    while(pointee->id() == ID_pointer)
+      pointee = &to_pointer_type(*pointee).base_type();
+    if(pointee->id() == ID_struct_tag || pointee->id() == ID_union_tag)
+      elaborate_class_template(*pointee);
+  }
+
   if(check_constantness && type.id() == ID_pointer)
   {
     if(e.id() == ID_dereference && e.get_bool(ID_C_implicit))

@@ -1543,8 +1543,74 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // instantiation) is the same regardless of which context first
     // required the specialization ([temp.spec.general]/7: at most one
     // point of instantiation per translation unit).
-    for(auto &arg : full_args_tc.arguments())
+    //
+    // Only when there ARE partial specializations to match: without any,
+    // the elaboration is not required by [temp.inst]/1 and would be
+    // premature -- libstdc++'s `__alloc_traits<A>::rebind<_Rb_tree_node<X>>
+    // ::other' in a `std::set<X>' named while X is still incomplete
+    // instantiated the node (and its `unsigned char _M_storage[sizeof(X)]')
+    // too early, leaving it half-elaborated for good.
+    // ... and only for the argument positions whose pattern in some
+    // partial specialization is itself a template-id (`base<holder<T>>'):
+    // a plain parameter pattern (`_Up') matches any type, complete or not.
+    std::vector<bool> pattern_needs_structure(
+      full_args_tc.arguments().size(), false);
+    if(primary_template.type.get(ID_specialization_of).empty())
     {
+      cpp_scopet *template_scope =
+        id_map_lookup(cpp_scopes, primary_template.name);
+      if(template_scope != nullptr)
+      {
+        for(const auto *id_ptr : template_scope->get_parent().lookup(
+              primary_template.base_name, cpp_scopet::SCOPE_ONLY))
+        {
+          const symbolt *s = symbol_table.lookup(id_ptr->identifier);
+          if(
+            s == nullptr || s->type.get(ID_specialization_of).empty() ||
+            s->type.id() != ID_cpp_declaration)
+          {
+            continue;
+          }
+          const auto &pattern_args =
+            to_cpp_declaration(s->type).partial_specialization_args();
+          for(std::size_t i = 0; i < pattern_args.arguments().size() &&
+                                 i < pattern_needs_structure.size();
+              ++i)
+          {
+            const auto &pattern = pattern_args.arguments()[i];
+            const irept &pattern_type =
+              pattern.id() == ID_type || pattern.id() == ID_ambiguous
+                ? static_cast<const irept &>(pattern.type())
+                : static_cast<const irept &>(pattern);
+            // a template-id anywhere in the pattern (`holder<T>',
+            // `holder<T> *'); a concrete type (`void' of allocator<void>)
+            // or a bare parameter needs nothing of the argument
+            std::function<bool(const irept &)> has_template_id =
+              [&](const irept &n) -> bool
+            {
+              if(n.id() == ID_cpp_name)
+                for(const auto &sub : n.get_sub())
+                  if(sub.id() == ID_template_args)
+                    return true;
+              for(const auto &sub : n.get_sub())
+                if(has_template_id(sub))
+                  return true;
+              for(const auto &named : n.get_named_sub())
+                if(has_template_id(named.second))
+                  return true;
+              return false;
+            };
+            if(has_template_id(pattern_type))
+              pattern_needs_structure[i] = true;
+          }
+        }
+      }
+    }
+    for(std::size_t i = 0; i < full_args_tc.arguments().size(); ++i)
+    {
+      auto &arg = full_args_tc.arguments()[i];
+      if(!pattern_needs_structure[i])
+        continue;
       if(arg.id() != ID_type)
         continue;
       const typet &arg_type = arg.type();
