@@ -14,6 +14,7 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 #include <util/std_expr.h>
 
 #include <solvers/sat/satcheck.h>
+#include <solvers/strings/string_builtin_function.h>
 #include <solvers/strings/string_refinement.h>
 #include <testing-utils/empty_namespace.h>
 #include <testing-utils/use_catch.h>
@@ -113,8 +114,44 @@ SCENARIO("string refinement", "[core][solvers][strings][string_refinement]")
       THEN("the model of array1 is an array of length 15")
       {
         const exprt array_model = solver.get(array1);
-        REQUIRE(can_cast_expr<array_exprt>(array_model));
-        REQUIRE(to_array_expr(array_model).operands().size() == 15);
+        REQUIRE(can_cast_expr<array_of_exprt>(array_model));
+        REQUIRE(
+          to_array_type(array_model.type()).size() ==
+          from_integer(15, int_type));
+      }
+    }
+
+    WHEN("a string has unconstrained contents")
+    {
+      const auto size = GENERATE(0, 1, 4194304);
+      CAPTURE(size);
+      const exprt length = from_integer(size, int_type);
+      solver.set_to(equal_exprt{length1, length}, true);
+
+      REQUIRE(solver() == decision_proceduret::resultt::D_SATISFIABLE);
+
+      THEN("its model stores the repeated character without expanding it")
+      {
+        const exprt array_model = solver.get(array1);
+        REQUIRE(can_cast_expr<array_of_exprt>(array_model));
+        REQUIRE(to_array_type(array_model.type()).size() == length);
+        REQUIRE(
+          to_array_of_expr(array_model).what() == from_integer('?', char_type));
+      }
+    }
+
+    WHEN("a short unconstrained string is evaluated by a string operation")
+    {
+      solver.set_to(equal_exprt{length1, from_integer(3, int_type)}, true);
+      REQUIRE(solver() == decision_proceduret::resultt::D_SATISFIABLE);
+
+      THEN("the operation can evaluate its compact model")
+      {
+        const auto value = eval_string(
+          to_array_string_expr(array1),
+          [&](const exprt &expr) { return solver.get(expr); });
+        REQUIRE(value.has_value());
+        REQUIRE(*value == std::vector<mp_integer>{'?', '?', '?'});
       }
     }
 
