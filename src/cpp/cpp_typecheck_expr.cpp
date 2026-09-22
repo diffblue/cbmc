@@ -693,6 +693,25 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.id() == ID_typeid)
     typecheck_expr_typeid(expr);
   else if(
+    expr.id() == "__is_invocable" || expr.id() == "__is_nothrow_invocable")
+  {
+    typecheck_expr_is_invocable(expr);
+  }
+  else if(expr.id() == "__array_rank")
+  {
+    // N5008 [meta.unary.prop.query]: rank<T> is the number of array
+    // dimensions of T (GCC 14's builtin, libstdc++ 16's std::rank).
+    typet t = static_cast<const typet &>(expr.find(ID_type_arg));
+    typecheck_type(t);
+    std::size_t rank = 0;
+    while(t.id() == ID_array)
+    {
+      ++rank;
+      t = to_array_type(t).element_type();
+    }
+    expr = from_integer(rank, size_type());
+  }
+  else if(
     expr.id() == "__is_constructible" || expr.id() == "__is_assignable" ||
     expr.id() == "__is_convertible_to" || expr.id() == "__is_convertible" ||
     expr.id() == "__is_trivially_constructible" ||
@@ -1687,6 +1706,156 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 {
   typecheck_expr_member(expr, cpp_typecheck_fargst());
+}
+
+/// The type arguments of a builtin trait recorded by the parser in
+/// "type_args" (see Parser::rTypePredicate), typechecked, with a pack
+/// expansion `Args...' replaced by the elements of the pack (N5008
+/// [temp.variadic]/5); the pack is the template parameter of that name in
+/// scope, bound in template_map by the enclosing instantiation.
+std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
+{
+  std::vector<typet> result;
+  for(const auto &arg : expr.find("type_args").get_sub())
+  {
+    const typet &raw = static_cast<const exprt &>(arg).type();
+    if(
+      raw.get_bool(ID_ellipsis) && raw.id() == ID_cpp_name &&
+      raw.get_sub().size() == 1 && raw.get_sub().front().id() == ID_name)
+    {
+      const irep_idt &base_name = raw.get_sub().front().get(ID_identifier);
+      bool expanded = false;
+      for(const auto *id_ptr : cpp_scopes.current_scope().lookup(
+            base_name,
+            cpp_scopet::RECURSIVE,
+            cpp_idt::id_classt::TEMPLATE_PARAMETER))
+      {
+        const auto pa = template_map.pack_args_map.find(id_ptr->identifier);
+        if(pa != template_map.pack_args_map.end())
+        {
+          for(const auto &t : pa->second)
+            result.push_back(t);
+          expanded = true;
+          break;
+        }
+        const auto ps = template_map.pack_size_map.find(id_ptr->identifier);
+        if(ps != template_map.pack_size_map.end() && ps->second == 0)
+        {
+          expanded = true; // an empty pack contributes nothing
+          break;
+        }
+      }
+      if(expanded)
+        continue;
+    }
+    typet t = raw;
+    t.remove(ID_ellipsis);
+    typecheck_type(t);
+    if(
+      t.id() == ID_empty && raw.id() == ID_cpp_name &&
+      raw.get_bool(ID_ellipsis))
+      continue; // an empty pack resolved to the empty-pack sentinel
+    result.push_back(t);
+  }
+  return result;
+}
+
+/// N5008 [meta.rel]/6-7, [func.require]/1: `__is_invocable(Fn, Args...)'
+/// (GCC 14's builtin, libstdc++ 16's std::is_invocable) holds iff
+/// INVOKE(declval<Fn>(), declval<Args>()...) is well-formed when treated as
+/// an unevaluated operand: for a pointer to member with at least one
+/// argument the member is applied to the first argument (an object, a
+/// reference or a pointer to it), otherwise Fn is called with the arguments.
+/// The nothrow form is treated as the plain form: the front-end does not
+/// model exception specifications of calls.
+void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
+{
+  const std::vector<typet> args = builtin_trait_type_args(expr);
+  if(args.empty())
+  {
+    error().source_location = expr.source_location();
+    error() << expr.id() << " expects at least one type argument" << eom;
+    throw 0;
+  }
+
+  // declval<T>(): an lvalue of T for an lvalue reference T, an xvalue
+  // otherwise -- the reference is dropped from the operand's type and the
+  // lvalue-ness recorded, as the other traits' `from' operands do.
+  auto declval = [](const typet &t) -> exprt
+  {
+    typet base = is_reference(t) ? to_reference_type(t).base_type() : t;
+    exprt e{ID_nondet_symbol, base};
+    e.set(ID_C_temporary_avoided, true);
+    if(is_reference(t) && !is_rvalue_reference(t))
+      e.set(ID_C_lvalue, true);
+    // not to be looked up or converted again by the probe's typecheck
+    return already_typechecked_exprt{std::move(e)};
+  };
+
+  const typet fn_type =
+    is_reference(args[0]) ? to_reference_type(args[0]).base_type() : args[0];
+  if(fn_type.id() == ID_empty)
+  {
+    expr = false_exprt();
+    return;
+  }
+
+  exprt probe;
+  const bool pointer_to_member =
+    fn_type.id() == ID_pointer && fn_type.find(ID_to_member).is_not_nil();
+  if(pointer_to_member && args.size() >= 2)
+  {
+    // (a0.*pm)(a1, ...) resp. a0.*pm for a data member.  The object
+    // operand may be a prvalue in the language ([expr.mptr.oper]/2); the
+    // front-end's pointer-to-member conversion takes the object's address
+    // and so wants an lvalue -- for the probe an lvalue is as good.
+    exprt object = declval(args[1]);
+    if(!is_reference(args[1]) && args[1].id() != ID_pointer)
+      to_already_typechecked_expr(object).get_expr().set(ID_C_lvalue, true);
+    exprt pm(ID_pointer_to_member);
+    pm.add_to_operands(std::move(object), declval(args[0]));
+    pm.add_source_location() = expr.source_location();
+    if(to_pointer_type(fn_type).base_type().id() == ID_code)
+    {
+      side_effect_expr_function_callt call{
+        std::move(pm), {}, typet{}, expr.source_location()};
+      for(std::size_t i = 2; i < args.size(); ++i)
+        call.arguments().push_back(declval(args[i]));
+      probe = std::move(call);
+    }
+    else if(args.size() == 2)
+      probe = std::move(pm);
+    else
+    {
+      expr = false_exprt();
+      return;
+    }
+  }
+  else
+  {
+    side_effect_expr_function_callt call{
+      declval(args[0]), {}, typet{}, expr.source_location()};
+    for(std::size_t i = 1; i < args.size(); ++i)
+      call.arguments().push_back(declval(args[i]));
+    probe = std::move(call);
+  }
+
+  // [temp.deduct]/8: the probe's ill-formedness is a substitution
+  // failure, not an error of the program
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  bool invocable = false;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_expr(probe);
+    invocable = true;
+  }
+  catch(...)
+  {
+  }
+  get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+  expr = invocable ? exprt(true_exprt()) : exprt(false_exprt());
 }
 
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
@@ -7851,7 +8020,10 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
     throw 0;
   }
 
-  typecheck_expr_main(op1);
+  // (the synthesised declval<>() operand of an __is_invocable probe is
+  // already typed and has no expression form to re-check)
+  if(op1.id() != ID_nondet_symbol)
+    typecheck_expr_main(op1);
 
   if(op0.type().id() != ID_pointer)
   {
