@@ -2735,6 +2735,98 @@ void cpp_typecheckt::typecheck_friend_declaration(
   }
 }
 
+/// Register the member declared by \p declarator lazily: the type could not
+/// be resolved now (a typedef aliasing a class template specialization that
+/// cannot be instantiated yet, or a data member of such a type).  The member
+/// gets the unresolved type marked `ID_C_lazy_member_type` and, for a
+/// typedef, a typedef symbol in the class scope, so that sibling members that
+/// name it still resolve; a use that needs the resolved type retries at the
+/// use site (ensure_member_complete).
+/// \return false when the declarator has no usable name
+bool cpp_typecheckt::register_lazy_member(
+  const cpp_declarationt &declaration,
+  const cpp_declaratort &declarator,
+  struct_typet::componentst &components,
+  const irep_idt &access,
+  bool is_static,
+  bool is_typedef,
+  bool is_mutable)
+{
+  const auto &name_sub = declarator.name().get_sub();
+  if(name_sub.empty())
+    return false;
+  const irep_idt base_name = name_sub.front().get(ID_identifier);
+  if(base_name.empty())
+    return false;
+
+  // Capture the class-scope identifier for later
+  // re-resolution by `ensure_member_complete`: the helper
+  // needs to switch into this scope to give member-typedef
+  // resolution a chance.  Also capture the unresolved
+  // cpp_name so the source survives the `declaration.type()`
+  // being mutated by other declarators in the same
+  // declaration list.
+  const irep_idt class_scope_id = cpp_scopes.current_scope().identifier;
+  typet lazy_source = declaration.type();
+
+  if(is_typedef)
+  {
+    // Lazy typedef registration.  Build the symbol the
+    // way `cpp_declarator_convertert` would, but with the
+    // unresolved cpp_name preserved as the aliased type
+    // and the lazy marker so callers know to retry
+    // resolution at the use site (see
+    // `cpp_typecheckt::ensure_member_complete`).
+    const irep_idt sym_name =
+      id2string(cpp_scopes.current_scope().prefix) + id2string(base_name);
+    if(!symbol_table.has_symbol(sym_name))
+    {
+      symbolt typedef_sym;
+      typedef_sym.name = sym_name;
+      typedef_sym.base_name = base_name;
+      typedef_sym.pretty_name = base_name;
+      typedef_sym.type = lazy_source;
+      typedef_sym.type.set(ID_C_lazy_member_type, true);
+      typedef_sym.type.set(ID_lazy_type_source, class_scope_id);
+      typedef_sym.location = declarator.source_location();
+      typedef_sym.mode = ID_cpp;
+      typedef_sym.module = module;
+      typedef_sym.is_type = true;
+      typedef_sym.is_macro = true;
+      if(symbol_table.insert(std::move(typedef_sym)).second)
+      {
+        cpp_idt &id =
+          cpp_scopes.put_into_scope(symbol_table.lookup_ref(sym_name));
+        id.id_class = cpp_idt::id_classt::TYPEDEF;
+      }
+    }
+
+    struct_typet::componentt comp(base_name, lazy_source);
+    comp.set_base_name(base_name);
+    comp.set(ID_access, access);
+    comp.set(ID_is_type, true);
+    comp.set(ID_C_lazy_member_type, true);
+    comp.set(ID_lazy_type_source, class_scope_id);
+    comp.add_source_location() = declarator.source_location();
+    components.push_back(std::move(comp));
+  }
+  else
+  {
+    struct_typet::componentt comp(base_name, lazy_source);
+    comp.set_base_name(base_name);
+    comp.set(ID_access, access);
+    if(is_static)
+      comp.set(ID_is_static, true);
+    if(is_mutable)
+      comp.set(ID_is_mutable, true);
+    comp.set(ID_C_lazy_member_type, true);
+    comp.set(ID_lazy_type_source, class_scope_id);
+    comp.add_source_location() = declarator.source_location();
+    components.push_back(std::move(comp));
+  }
+  return true;
+}
+
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
   // A typedef/alias declaration defers the elaboration of the class template
@@ -3510,7 +3602,11 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               // failure of this member alone, the class cannot be completed
               // until the dependency is defined (see typecheck_compound_type).
               // A typedef, a pointer or a function declarator does not need
-              // the complete type ([temp.inst]/1): its failure is local.
+              // the complete type ([temp.inst]/1): its failure is local, and
+              // a typedef is kept as a lazily resolved member so that the
+              // members naming it (`typedef _Node *_Node_ptr;' after
+              // `typedef _Rb_tree_node<_Val> _Node;' in libstdc++ 16's
+              // _Node_traits) still resolve.
               if(
                 !is_typedef && declarator.type().id() != ID_code &&
                 declarator.type().id() != ID_function_type &&
@@ -3521,6 +3617,17 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               }
               get_message_handler().set_message_count(
                 messaget::M_ERROR, errors_before);
+              if(is_typedef)
+              {
+                register_lazy_member(
+                  declaration,
+                  declarator,
+                  components,
+                  access,
+                  is_static,
+                  is_typedef,
+                  is_mutable);
+              }
             }
             catch(...)
             {
@@ -3566,79 +3673,16 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             {
               get_message_handler().set_message_count(
                 messaget::M_ERROR, errors_before);
-              const auto &name_sub = declarator.name().get_sub();
-              if(name_sub.empty())
-                throw;
-              const irep_idt base_name = name_sub.front().get(ID_identifier);
-              if(base_name.empty())
-                throw;
-
-              // Capture the class-scope identifier for later
-              // re-resolution by `ensure_member_complete`: the helper
-              // needs to switch into this scope to give member-typedef
-              // resolution a chance.  Also capture the unresolved
-              // cpp_name so the source survives the `declaration.type()`
-              // being mutated by other declarators in the same
-              // declaration list.
-              const irep_idt class_scope_id =
-                cpp_scopes.current_scope().identifier;
-              typet lazy_source = declaration.type();
-
-              if(is_typedef)
+              if(!register_lazy_member(
+                   declaration,
+                   declarator,
+                   components,
+                   access,
+                   is_static,
+                   is_typedef,
+                   is_mutable))
               {
-                // Lazy typedef registration.  Build the symbol the
-                // way `cpp_declarator_convertert` would, but with the
-                // unresolved cpp_name preserved as the aliased type
-                // and the lazy marker so callers know to retry
-                // resolution at the use site (see
-                // `cpp_typecheckt::ensure_member_complete`).
-                const irep_idt sym_name =
-                  id2string(cpp_scopes.current_scope().prefix) +
-                  id2string(base_name);
-                if(!symbol_table.has_symbol(sym_name))
-                {
-                  symbolt typedef_sym;
-                  typedef_sym.name = sym_name;
-                  typedef_sym.base_name = base_name;
-                  typedef_sym.pretty_name = base_name;
-                  typedef_sym.type = lazy_source;
-                  typedef_sym.type.set(ID_C_lazy_member_type, true);
-                  typedef_sym.type.set(ID_lazy_type_source, class_scope_id);
-                  typedef_sym.location = declarator.source_location();
-                  typedef_sym.mode = ID_cpp;
-                  typedef_sym.module = module;
-                  typedef_sym.is_type = true;
-                  typedef_sym.is_macro = true;
-                  if(symbol_table.insert(std::move(typedef_sym)).second)
-                  {
-                    cpp_idt &id = cpp_scopes.put_into_scope(
-                      symbol_table.lookup_ref(sym_name));
-                    id.id_class = cpp_idt::id_classt::TYPEDEF;
-                  }
-                }
-
-                struct_typet::componentt comp(base_name, lazy_source);
-                comp.set_base_name(base_name);
-                comp.set(ID_access, access);
-                comp.set(ID_is_type, true);
-                comp.set(ID_C_lazy_member_type, true);
-                comp.set(ID_lazy_type_source, class_scope_id);
-                comp.add_source_location() = declarator.source_location();
-                components.push_back(std::move(comp));
-              }
-              else
-              {
-                struct_typet::componentt comp(base_name, lazy_source);
-                comp.set_base_name(base_name);
-                comp.set(ID_access, access);
-                if(is_static)
-                  comp.set(ID_is_static, true);
-                if(is_mutable)
-                  comp.set(ID_is_mutable, true);
-                comp.set(ID_C_lazy_member_type, true);
-                comp.set(ID_lazy_type_source, class_scope_id);
-                comp.add_source_location() = declarator.source_location();
-                components.push_back(std::move(comp));
+                throw;
               }
             }
           }

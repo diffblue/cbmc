@@ -359,6 +359,14 @@ protected:
 
   bool dropped_base_now_complete(const typet &type) const;
   void erase_instance_members(const symbolt &symbol);
+  bool register_lazy_member(
+    const cpp_declarationt &declaration,
+    const cpp_declaratort &declarator,
+    struct_typet::componentst &components,
+    const irep_idt &access,
+    bool is_static,
+    bool is_typedef,
+    bool is_mutable);
   /// the class template specializations whose elaborate_class_template is
   /// on the call stack (see there)
   std::set<irep_idt> elaborations_in_progress;
