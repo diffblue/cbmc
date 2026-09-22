@@ -2022,7 +2022,7 @@ void template_mapt::apply(typet &type) const
       }
     }
   }
-}
+} // NOLINT(readability/fn_size)
 
 /// \return true when \p n is a node that template_mapt::apply(typet &)
 ///   dispatches on (a type, or a component of a `cpp_name': a name, a
