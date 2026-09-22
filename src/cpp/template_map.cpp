@@ -346,6 +346,24 @@ void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
     return (p != std::string::npos ? nm.substr(p + 2) : nm) == base;
   };
 
+  // `Pack::member' -- the pack used as a nested-name-specifier (the
+  // `_Bn::value' of libstdc++'s __and_fn/__or_fn, also inside the
+  // parser-form function type of an ambiguous `bool(_Bn::value)'): the
+  // qualifier becomes the element's class.
+  const auto is_qualified_pack_ref = [&base](const irept &t) -> bool
+  {
+    if(
+      t.id() != ID_cpp_name || t.get_sub().size() < 3 ||
+      t.get_sub().front().id() != ID_name || t.get_sub()[1].id() != "::")
+      return false;
+    return id2string(t.get_sub().front().get(ID_identifier)) == base;
+  };
+  if(is_qualified_pack_ref(n) && elem.id() == ID_struct_tag)
+  {
+    n.get_sub().front().set(
+      ID_identifier, to_struct_tag_type(elem).get_identifier());
+  }
+
   if(is_pack_ref(n.find(ID_type)))
     static_cast<irept &>(n.add(ID_type)) = elem;
   for(auto &s : n.get_sub())
