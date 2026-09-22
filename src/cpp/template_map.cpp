@@ -2006,6 +2006,25 @@ void template_mapt::apply(typet &type) const
   }
 }
 
+/// \return true when \p n is a node that template_mapt::apply(typet &)
+///   dispatches on (a type, or a component of a `cpp_name': a name, a
+///   `::', a template-argument list, an operator-function-id), false when
+///   it is an operand expression.
+static bool is_type_side_node(const irept &n)
+{
+  const irep_idt &id = n.id();
+  return id == ID_cpp_name || id == ID_name || id == "::" ||
+         id == ID_template_args || id == ID_operator || id == ID_decltype ||
+         id == ID_array || id == ID_pointer || id == ID_frontend_pointer ||
+         id == ID_struct || id == ID_union || id == ID_code ||
+         id == ID_function_type || id == ID_merged_type ||
+         id == ID_template_parameter_symbol_type || id == ID_struct_tag ||
+         id == ID_union_tag || id == ID_typedef_type || id == ID_c_enum_tag ||
+         id == ID_nil || id == ID_empty || id == ID_signedbv ||
+         id == ID_unsignedbv || id == ID_bool || id == ID_c_bool ||
+         id == ID_floatbv;
+}
+
 void template_mapt::apply(exprt &expr) const
 {
   // A `sizeof...(Pack)` pack-size query must keep its pack name unsubstituted:
@@ -2029,9 +2048,24 @@ void template_mapt::apply(exprt &expr) const
     apply(static_cast<typet &>(named.second));
   }
 
-  // Also apply to all sub-nodes (the unnamed children)
+  // Also apply to all sub-nodes (the unnamed children).  A sub-node that
+  // is a TYPE (or a component of a cpp_name) is substituted as one; any
+  // other sub-node is an operand expression and must be substituted as an
+  // expression, so that its OWN type and operands are visited -- the
+  // type-side dispatch has no case for expression nodes and a parameter
+  // reference under a cast was left untouched: the `Bn' of
+  // `!bool(Bn::value)' in libstdc++'s `__or_fn' pack expansion
+  // (`__first_t<false_type, __enable_if_t<!bool(_Bn::value)>...>') only
+  // for its first element, so `__or_<false_type, true_type>' was
+  // false_type ([temp.variadic]/5: the i-th element instantiates the
+  // pattern with the i-th pack element).
   for(auto &sub : expr.get_sub())
-    apply(static_cast<typet &>(sub));
+  {
+    if(is_type_side_node(sub))
+      apply(static_cast<typet &>(sub));
+    else
+      apply(static_cast<exprt &>(sub));
+  }
 
   // Handle sizeof...(Pack) — replace with pack size constant
   if(expr.id() == ID_sizeof)
