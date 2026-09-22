@@ -1051,7 +1051,7 @@ enable_or_disable ("enable"|"disable")
 "__is_union"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_value_class"  { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_literal_type" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
-"__is_integral"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_integral"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
  /* Revertible builtin type traits: GCC and clang recognise these
     as builtins ONLY when the identifier is directly followed by '('
     (gcc calls them "revertible identifiers"; clang demotes the
@@ -1062,20 +1062,16 @@ enable_or_disable ("enable"|"disable")
     headers unparseable.  Mirror the compilers' rule with a trailing
     context, falling back to a plain identifier otherwise -- the same
     treatment __is_referenceable already receives below. */
-"__is_integral"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_integral" { return make_identifier(); }
 "__is_void"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_void" { return make_identifier(); }
-"__is_floating_point"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_floating_point"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_floating_point"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_floating_point" { return make_identifier(); }
-"__is_arithmetic"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_arithmetic"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_arithmetic"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_arithmetic" { return make_identifier(); }
 "__is_null_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_null_pointer" { return make_identifier(); }
-"__is_pointer"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_pointer" { return make_identifier(); }
 "__is_reference"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
 "__is_reference" { return make_identifier(); }
@@ -1093,17 +1089,13 @@ enable_or_disable ("enable"|"disable")
 "__is_member_function_pointer" { return make_identifier(); }
 "__is_member_object_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
 "__is_member_object_pointer" { return make_identifier(); }
-"__is_signed"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_signed"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_signed"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_signed" { return make_identifier(); }
-"__is_unsigned"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_unsigned"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_unsigned"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_unsigned" { return make_identifier(); }
-"__is_const"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_const"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_const"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_const" { return make_identifier(); }
-"__is_volatile"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
-"__is_volatile"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_volatile"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && (PARSER.gcc14_builtins || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_volatile" { return make_identifier(); }
 "__is_scoped_enum"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
 "__is_scoped_enum" { return make_identifier(); }
