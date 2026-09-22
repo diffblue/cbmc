@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+implicit_pod_assignment_call (cpp_typecheck_expr.cpp) rewrites
+`C::operator=(x)' on a POD base without a declared operator= into the
+builtin assignment of the base subobject.  Found by dog-fooding gcc 16's
+libstdc++ (std::list).

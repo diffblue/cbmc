@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+elaborate_class_template refuses to re-enter the elaboration of a
+specialization whose partial specializations are being matched
+(elaborations_in_progress).

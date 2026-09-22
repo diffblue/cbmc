@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+template_mapt::apply(exprt &) substitutes operand sub-nodes as expressions
+(their own type and operands are visited); only type nodes and cpp_name
+components use the type-side dispatch.
