@@ -10837,3 +10837,125 @@ artifacts), b59f34c0b1 ([class.cdtor]/4 + construction vtables).
   class -- g++ 16 / clang 11 (they disagree); non-dynamic case both say 3
   (next byte after the bit-field), CBMC 4.  Not modelling GCC-only quirks.
 - Dog-food/docker/unit-proof phase started (see below).
+
+### Round 158, part 2 (2026-09-22): dog-fooding, gcc 16 headers, Docker
+
+Commits after f532f05700: 1eb0a281f1 (constexpr eager convert with untyped
+operator node), 2d6b1b8358 + aaf2636912 (narrow.h bug + unit proofs),
+654057ac42 (no instantiation through pointer/function declarators),
+9be71d28cd (nested braces to initializer_list<X>), 810fb63000 (pack
+substitution under a cast), 298ab5a323 (incomplete_dependency retry),
+da2f42356b (elaborations_in_progress), e330446e74 (`_Bn::value' per
+element), 539b74c950 (udcs under sfinae + rvalue-ref rank), f2ed24328b
+(auto initialization), 69b37c25fa (POD base operator= by qualified name),
+5ae978aaff (__is_invocable/__is_nothrow_invocable/__array_rank),
+a5b5bec107 (13 tests), 8255e10618 (cpplint).  All suites green on the
+final binaries (s14: cbmc-cpp 1375/29 skipped, cbmc 1197, cpp 245, systemc
+27, dfcc 2, ansi-c 269 x2, unit-proofs 12, cbmc-library 517, goto-cc-cbmc
+14); clang -Werror build clean; whole-branch clang-format and cpplint
+clean.  Pre-existing flex warnings (scanner.l 1065/1070/1073: the second
+`__is_integral'/`__is_floating_point'/`__is_arithmetic' rules with the
+`[ \t\r\n]*\(' trailing context can never match after the
+`[[:space:]]*"("' ones) -- harmless, not touched.
+
+- Dog-food src/util (97 OK / 17 noisy / 3 FAIL before): the 15 numeric_limits
+  "noisy" files were `max()`'s `__INT_MAX__ * 2U + 1` typechecked lazily
+  without types (1eb0a281f1).  find_symbols.cpp (std::set<symbol_exprt> with
+  symbol_exprt forward-declared): `_Rb_tree_node<X>' with
+  `_M_storage[sizeof(X)]' instantiated through `_Link_type' typedef and the
+  allocator rebind's template argument.  Final design (after two dead ends):
+  (1) pointer/function declarators in a class body typechecked under
+  skip_typechecking_elaborate; up-front elaboration of template-instance
+  arguments only for template-id patterns; static_cast and overloaded
+  operators elaborate on demand.  (2) `incomplete_dependency_exceptiont':
+  thrown by the cpp sizeof (throw_if_incomplete_dependency) when the operand
+  is a plain class that is only declared; rethrown by the per-member catches
+  for DATA members (typedef/pointer/function declarators swallow it), caught
+  in typecheck_compound_type's swap path which puts the incomplete instance
+  back and erases the member symbols created so far (erase_instance_members,
+  the dropped-base repair code factored out) so the next point of
+  instantiation redoes it; caught in typecheck_template_args for a template
+  ARGUMENT (retried with skip_typechecking_elaborate).  Dead ends: (a) a
+  skip flag around every template ARGUMENT typecheck broke libc++'s
+  tuple_size partial-spec matching (the instance's full_template_args are
+  needed while matching) and (b) skipping the elaboration in
+  elaborate_class_template when an argument class is incomplete broke
+  `vector<K> v;' with K never defined.  Note the parser forms:
+  declarator types are `function_type' / `frontend_pointer', not
+  ID_code/ID_pointer.
+- json_objectt({{"k", v}, ...}) (loop_ids.cpp etc.): nested braces to
+  initializer_list<pair<...>> -- brace_init_to_init_list_is_viable now
+  list-initializes the element type.
+- `std::__or_<false_type, true_type>' was false_type: template_mapt::apply
+  (exprt&) visited operand sub-nodes with the TYPE dispatch, which has no
+  case for a cast; `!bool(_Bn::value)' kept `_Bn' for elements 2..n.  Fixed
+  by dispatching operand sub-nodes as expressions (is_type_side_node).
+  Consequences: (a) std::from_chars for unsigned (config.cpp, string2int.cpp)
+  works; (b) `std::__and_<true_type,false_type>' -- the ambiguous
+  `bool(_Bn::value)' (function type or cast, kept as `ambiguous' with a
+  parser-form `code' type) -- was still wrong; fixed in replace_type_pack_ref
+  (a pack used as nested-name-specifier is replaced per element).  Doing it
+  in apply()'s `code' branch instead substituted the pack's scalar
+  convenience entry into unexpanded patterns (pair's constraints broke) --
+  V1 (flat map, scalar entry for a pack) strikes again.  (c) Once __and_ was
+  right, `pair<int, function<int()>> p(1, f)' had no constructor:
+  is_constructible<function<int()>, int(*&&)()> was false because
+  user_defined_conversion_sequence refused nested queries under
+  copy_init_ctor_exploration unless constant_expression_context > 0 (a
+  sfinae_contextt suspends it; now sfinae_context_depth counts too) and
+  because the two instantiations of function's converting-constructor
+  template (`const F&' and `F&&') tied for an rvalue ([over.ics.rank]/3.2.3:
+  rvalue-reference binding is better -- ranks now in units of two with the
+  const-lvalue binding one step worse).  (d) `incrementable_traits<int*>'
+  under C++20 recursed to a stack overflow: `typename _Iter::difference_type'
+  with _Iter = int* fell through to a name-based scope search that found the
+  class being matched.  elaborate_class_template now refuses re-entry for a
+  specialization whose matching is in progress (elaborations_in_progress).
+  A resolve_scope check rejecting a template parameter bound to a non-class
+  type as nested-name-specifier ([basic.lookup.qual.general]/1) was tried
+  and dropped: with the flat template map `_Tp' is sometimes bound to an
+  unrelated (even function) type, and the hard error where the name-based
+  fallback used to carry on broke libc++ 23's vector (iter_move).
+- gcc 16 headers (Docker image gcc16-test = Ubuntu 24.04 + gcc-16 PPA; the
+  .ii files in /tmp/r157/gcc16pp were produced INSIDE the image because the
+  predefined macros matter: g++-16 -E with gcc 16's libstdc++ on the host
+  through -I hides the builtins).  29 of 1362 failed.  Root causes fixed:
+  (1) `__is_invocable(F, Args...)', `__is_nothrow_invocable', `__array_rank'
+  are GCC 14 builtins libstdc++ 16 relies on (`_Rb_tree::_M_key_compare'
+  static_assert -> every std::set/map insert was a no-body call): scanner
+  revertible identifiers, rTypePredicate records all arguments in
+  "type_args" (ellipsis-marked for packs; template_mapt::apply leaves those
+  alone), typecheck_expr_is_invocable probes INVOKE (call, or
+  pointer-to-member applied to the first argument) under a sfinae_contextt
+  with nondet_symbol declval operands (convert_pmop skips its re-typecheck
+  for them).  (2) `auto __guard = std::__allocate_guarded_obj(__alloc)'
+  (std::list::_M_create_node): `auto x = <class prvalue>' was a bitwise
+  copy plus destruction of the temporary -> the node was freed at once;
+  `auto b = a;' likewise skipped the copy constructor, and `auto c =
+  static_cast<T&&>(a)' deduced a REFERENCE.  convert_initializer now
+  dereferences a reference-typed initializer before deduction and routes
+  every class-typed auto initialization through cpp_constructor.  (3)
+  `_List_size::operator=(_List_size())' in _List_node_header::_M_init: the
+  implicitly-declared copy assignment of a POD base is not declared by the
+  front end; implicit_pod_assignment_call rewrites the qualified call into
+  the builtin assignment of the base subobject.  Remaining gcc 16 failures
+  (from the .ii files): std_bind (`operator()' no match), stream_setw
+  (system_error `assign'/`category'), map_basic (timeout), unordered_set
+  insert, vector_find, cpp_string_literal_const_type (also gcc 15), pair
+  copy in defaulted_copy_ctor_nontrivial_members.
+- Docker: ubuntu 22.04/26.04, fedora 41 as in part 1; arch/tumbleweed
+  (gcc 16.2 release) do not build CBMC itself: -Werror on
+  unused-but-set-variable (smt2_conv.cpp:5407) and the new
+  -Wsfinae-incomplete (namespace.h:90 "defining namespacet, which previously
+  failed to be complete in a SFINAE context") -- a develop issue, not the
+  front end; the library_check step additionally needs `diffutils' on
+  arch (Error 127 = no `diff'); with -Wno-error for both, gcc 16.2 then
+  hits -Werror=array-bounds in util/threeval.h:26 -- a full run needs
+  -DCMAKE_CXX_FLAGS=-Wno-error (relaunched, results in
+  /tmp/r157/docker/{arch,tumbleweed}.log).  gcc16-test image: cpp suite
+  green; cbmc-cpp 29 failures before the fixes of this part, of which
+  set/list/range-for/structured-binding/map_braced_pairs/hash_node/
+  non_member_compound_assignment now pass on the preprocessed files.
+- Suites: two test.pl runs were accidentally started concurrently in
+  regression/cbmc-cpp (s10/s11) -- their results were unreliable; s12/s13
+  re-run cleanly.
