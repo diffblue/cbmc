@@ -1228,6 +1228,68 @@ bool cpp_typecheckt::dropped_base_now_complete(const typet &type) const
          !to_struct_union_type(base_sym->type).is_incomplete();
 }
 
+/// Erase the member symbols (methods and their locals) of the class template
+/// instance \p symbol, and purge them from the method-body queues, so that a
+/// re-instantiation rebuilds them: the declarator converter REUSES existing
+/// symbols including their stale values.
+void cpp_typecheckt::erase_instance_members(const symbolt &symbol)
+{
+  // A degenerate elaboration may have CONVERTED member bodies against a
+  // wrong layout (e.g. a constructor whose base mem-initializer matched no
+  // base and became an empty block), or have created the member symbols
+  // and then failed.
+  std::vector<irep_idt> to_erase;
+  // symbol.name is '[ns::]tag-X<...>'; member names are
+  // '[ns::]X<...>::...' -- strip the "tag-" that starts the LAST
+  // top-level component (position 0 or right after "::"), NOT one
+  // inside the template argument list (rfind matched
+  // 'tag-ssa_exprt' inside 'tag-renamedt<tag-ssa_exprt>' and the
+  // erase never fired, silently keeping the stale members).
+  std::string inst_prefix = id2string(symbol.name);
+  std::size_t comp_start = 0;
+  {
+    std::size_t depth = 0;
+    for(std::size_t ci = 0; ci + 1 < inst_prefix.size(); ++ci)
+    {
+      if(inst_prefix[ci] == '<')
+        ++depth;
+      else if(inst_prefix[ci] == '>' && depth > 0)
+        --depth;
+      else if(
+        depth == 0 && inst_prefix[ci] == ':' && inst_prefix[ci + 1] == ':')
+        comp_start = ci + 2;
+    }
+  }
+  if(inst_prefix.compare(comp_start, 4, "tag-") == 0)
+    inst_prefix.erase(comp_start, 4);
+  inst_prefix += "::";
+  for(const auto &entry : symbol_table.symbols)
+  {
+    const std::string n = id2string(entry.first);
+    if(n.compare(0, inst_prefix.size(), inst_prefix) == 0)
+      to_erase.push_back(entry.first);
+  }
+  // The drain queue holds POINTERS into the symbol table; purge
+  // entries for the members about to be erased BEFORE removing
+  // them (afterwards the pointers dangle).
+  {
+    const std::set<irep_idt> erase_set(to_erase.begin(), to_erase.end());
+    method_bodies.remove_if(
+      [&](const method_bodyt &mb)
+      {
+        return mb.method_symbol != nullptr &&
+               erase_set.count(mb.method_symbol->name) != 0;
+      });
+  }
+  for(const auto &n : to_erase)
+  {
+    methods_seen.erase(n);
+    deferred_typechecking.erase(n);
+    deferred_method_bodies.erase(n);
+    symbol_table.remove(n);
+  }
+}
+
 void cpp_typecheckt::elaborate_class_template(const typet &type)
 {
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
@@ -2788,6 +2850,9 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // reset it to the INCOMPLETE state so the re-instantiation below
     // runs the ordinary incomplete-to-complete completion, rebuilding
     // members AND bases against the now-complete base type.
+    // The re-instantiation re-creates the member declarations; erase the
+    // stale member symbols first so they are rebuilt against the repaired
+    // layout.
     {
       symbolt *sym_ptr = symbol_table.get_writeable(symbol.name);
       if(
@@ -2796,65 +2861,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         dropped_base_now_complete(sym_ptr->type) &&
         !to_struct_union_type(sym_ptr->type).is_incomplete())
       {
-        // The first (degenerate) elaboration may have CONVERTED member
-        // bodies against the base-less layout (e.g. a constructor whose
-        // base mem-initializer matched no base and became an empty
-        // block).  The re-instantiation below re-creates the member
-        // declarations, but the declarator converter REUSES existing
-        // symbols including their stale values; erase the instance's
-        // member symbols (methods and their locals) so they are rebuilt
-        // fresh against the repaired layout.
-        std::vector<irep_idt> to_erase;
-        // symbol.name is '[ns::]tag-X<...>'; member names are
-        // '[ns::]X<...>::...' -- strip the "tag-" that starts the LAST
-        // top-level component (position 0 or right after "::"), NOT one
-        // inside the template argument list (rfind matched
-        // 'tag-ssa_exprt' inside 'tag-renamedt<tag-ssa_exprt>' and the
-        // erase never fired, silently keeping the stale members).
-        std::string inst_prefix = id2string(symbol.name);
-        std::size_t comp_start = 0;
-        {
-          std::size_t depth = 0;
-          for(std::size_t ci = 0; ci + 1 < inst_prefix.size(); ++ci)
-          {
-            if(inst_prefix[ci] == '<')
-              ++depth;
-            else if(inst_prefix[ci] == '>' && depth > 0)
-              --depth;
-            else if(
-              depth == 0 && inst_prefix[ci] == ':' &&
-              inst_prefix[ci + 1] == ':')
-              comp_start = ci + 2;
-          }
-        }
-        if(inst_prefix.compare(comp_start, 4, "tag-") == 0)
-          inst_prefix.erase(comp_start, 4);
-        inst_prefix += "::";
-        for(const auto &entry : symbol_table.symbols)
-        {
-          const std::string n = id2string(entry.first);
-          if(n.compare(0, inst_prefix.size(), inst_prefix) == 0)
-            to_erase.push_back(entry.first);
-        }
-        // The drain queue holds POINTERS into the symbol table; purge
-        // entries for the members about to be erased BEFORE removing
-        // them (afterwards the pointers dangle).
-        {
-          const std::set<irep_idt> erase_set(to_erase.begin(), to_erase.end());
-          method_bodies.remove_if(
-            [&](const method_bodyt &mb)
-            {
-              return mb.method_symbol != nullptr &&
-                     erase_set.count(mb.method_symbol->name) != 0;
-            });
-        }
-        for(const auto &n : to_erase)
-        {
-          methods_seen.erase(n);
-          deferred_typechecking.erase(n);
-          deferred_method_bodies.erase(n);
-          symbol_table.remove(n);
-        }
+        erase_instance_members(symbol);
         to_struct_union_type(sym_ptr->type).components().clear();
         sym_ptr->type.remove("#dropped_incomplete_base");
         to_struct_union_type(sym_ptr->type).make_incomplete();

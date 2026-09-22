@@ -57,6 +57,16 @@ class template_arg_kind_mismatch_exceptiont
 {
 };
 
+/// Thrown when type-checking fails because a class that is only DECLARED so
+/// far is required to be complete (N5008 [expr.sizeof]/1, [class.mem]).  A
+/// class template specialization being instantiated when this happens
+/// cannot be completed YET; typecheck_compound_type puts the incomplete
+/// instance back so that a later context requiring the complete type (after
+/// the class is defined, [temp.point]) instantiates it again.
+class incomplete_dependency_exceptiont
+{
+};
+
 class cpp_typecheckt:public c_typecheck_baset
 {
 public:
@@ -348,6 +358,7 @@ protected:
     const cpp_template_args_tct &full_template_args);
 
   bool dropped_base_now_complete(const typet &type) const;
+  void erase_instance_members(const symbolt &symbol);
   void elaborate_class_template(const typet &type) override;
 
   const symbolt &instantiate_template(
@@ -936,6 +947,7 @@ protected:
   void typecheck_expr_typeid(exprt &);
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
+  void throw_if_incomplete_dependency(const exprt &expr);
   void complete_type_operand(exprt &expr);
   std::optional<struct_exprt>
   zero_struct_value(const typet &type, const source_locationt &loc);

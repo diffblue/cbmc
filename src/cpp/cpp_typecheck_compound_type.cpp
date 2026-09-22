@@ -317,7 +317,35 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
             static_cast<const cpp_template_args_tct &>(
               writeable_symbol.type.find(ID_C_template_arguments)));
         }
-        typecheck_compound_body(writeable_symbol);
+        try
+        {
+          typecheck_compound_body(writeable_symbol);
+        }
+        catch(const incomplete_dependency_exceptiont &)
+        {
+          // N5008 [temp.inst]/1-2 + [temp.point]: an implicit instantiation
+          // that fails because a type it depends on is not complete YET
+          // (libstdc++'s `_Rb_tree_node<X>' with its `unsigned char
+          // _M_storage[sizeof(X)]', reached through `std::set<X>' while X
+          // is only declared) must not leave the specialization as a
+          // half-built, "complete" class: put the incomplete instance back
+          // so the next context that requires the complete type (after X
+          // is defined) instantiates it again.
+          if(saved_template_class_instance)
+          {
+            writeable_symbol.type.swap(type);
+            erase_instance_members(writeable_symbol);
+            if(
+              writeable_symbol.type.find(ID_C_template).is_nil() &&
+              saved_c_template.is_not_nil())
+            {
+              writeable_symbol.type.set(ID_C_template, saved_c_template);
+              writeable_symbol.type.set(
+                ID_C_template_arguments, saved_c_template_arguments);
+            }
+          }
+          throw;
+        }
 
         // An instance completed here (through the incomplete-to-complete
         // swap) rather than through instantiate_template -- e.g. the
@@ -3476,6 +3504,24 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                 is_typedef,
                 is_mutable);
             }
+            catch(const incomplete_dependency_exceptiont &)
+            {
+              // A DATA member of a type that cannot be completed yet: not a
+              // failure of this member alone, the class cannot be completed
+              // until the dependency is defined (see typecheck_compound_type).
+              // A typedef, a pointer or a function declarator does not need
+              // the complete type ([temp.inst]/1): its failure is local.
+              if(
+                !is_typedef && declarator.type().id() != ID_code &&
+                declarator.type().id() != ID_function_type &&
+                declarator.type().id() != ID_pointer &&
+                declarator.type().id() != ID_frontend_pointer)
+              {
+                throw;
+              }
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+            }
             catch(...)
             {
               get_message_handler().set_message_count(
@@ -3836,6 +3882,37 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       else
       {
       }
+    }
+    catch(const incomplete_dependency_exceptiont &)
+    {
+      // A data member of a type that cannot be completed yet: the class
+      // cannot be completed until the dependency is defined (see
+      // typecheck_compound_type).  A typedef, pointer or function member
+      // does not need the complete type ([temp.inst]/1): local failure.
+      if(instantiation_stack.empty())
+        throw;
+      bool data_member = false;
+      if(it->id() == ID_cpp_declaration)
+      {
+        const cpp_declarationt &declaration = to_cpp_declaration(*it);
+        if(!declaration.is_typedef())
+        {
+          for(const auto &d : declaration.declarators())
+          {
+            if(
+              d.type().id() != ID_code && d.type().id() != ID_function_type &&
+              d.type().id() != ID_pointer &&
+              d.type().id() != ID_frontend_pointer)
+            {
+              data_member = true;
+            }
+          }
+        }
+      }
+      if(data_member)
+        throw;
+      get_message_handler().set_message_count(
+        messaget::M_ERROR, member_errors_before);
     }
     catch(...)
     {

@@ -1801,7 +1801,43 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
   }
 
   complete_type_operand(expr);
+  throw_if_incomplete_dependency(expr);
   c_typecheck_baset::typecheck_expr_sizeof(expr);
+}
+
+/// N5008 [expr.sizeof]/1: the operand shall not be an incomplete class type.
+/// When the class is a plain class that is only declared so far (not a
+/// template specialization that failed to instantiate), the enclosing
+/// instantiation may well succeed later in the translation unit
+/// ([temp.point]): report it as an incomplete_dependency_exceptiont, which
+/// typecheck_compound_type turns into "instantiate again later".
+void cpp_typecheckt::throw_if_incomplete_dependency(const exprt &expr)
+{
+  const typet *t = nullptr;
+  if(!expr.operands().empty())
+    t = &to_unary_expr(expr).op().type();
+  else if(expr.find(ID_type_arg).is_not_nil())
+    t = &static_cast<const typet &>(expr.find(ID_type_arg));
+  else
+    return;
+  while(t->id() == ID_array || t->id() == ID_already_typechecked)
+  {
+    t = t->id() == ID_array ? &to_array_type(*t).element_type()
+                            : &to_type_with_subtype(*t).subtype();
+  }
+  if(t->id() != ID_struct_tag && t->id() != ID_union_tag)
+    return;
+  const symbolt *s = symbol_table.lookup(to_tag_type(*t).get_identifier());
+  if(
+    s == nullptr || (s->type.id() != ID_struct && s->type.id() != ID_union) ||
+    !to_struct_union_type(s->type).is_incomplete() ||
+    s->type.get_bool(ID_template_class_instance))
+  {
+    return;
+  }
+  // Not reported: the instantiation is retried where the complete type is
+  // required; if the class is never defined, that use reports the error.
+  throw incomplete_dependency_exceptiont{};
 }
 
 /// N5008 [expr.sizeof]/1, [expr.alignof]/1: the operand type must be complete,
