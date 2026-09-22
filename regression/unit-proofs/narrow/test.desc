@@ -1,0 +1,16 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof for src/util/narrow.h over ALL long inputs: narrow_cast is a
+static_cast, narrow<> keeps every representable value, and
+narrow_or_throw_out_of_range throws for exactly the values that do not fit.
+The last property FAILED before the fix in narrow.h: the function narrowed to
+input_type (a no-op) and so never threw -- found by this proof.
