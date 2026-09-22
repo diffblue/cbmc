@@ -5909,7 +5909,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         // typedef in the function's own (class) scope.  Walk the
         // full irept tree to detect any unresolved cpp_name
         // anywhere in the body.
-        std::function<void(const irept &)> has_cpp_name = [&](const irept &n)
+        //
+        // Likewise an expression node WITHOUT a type: the parsed body's
+        // operators (`__INT_MAX__ * 2U + 1', libstdc++'s
+        // numeric_limits<unsigned>::max, in an explicit specialization
+        // whose members are queued) carry no type until type-checked, and
+        // substituting them made the caller's `>' fail with "conversion
+        // from '<<type:>>' ... not permitted".
+        std::function<void(const irept &)> needs_typecheck = [&](const irept &n)
         {
           if(needs_eager_convert)
             return;
@@ -5918,12 +5925,23 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
             needs_eager_convert = true;
             return;
           }
+          if(
+            (n.id() == ID_plus || n.id() == ID_minus || n.id() == ID_mult ||
+             n.id() == ID_div || n.id() == ID_mod || n.id() == ID_shl ||
+             n.id() == ID_shr || n.id() == ID_bitand || n.id() == ID_bitor ||
+             n.id() == ID_bitxor || n.id() == ID_unary_minus ||
+             n.id() == ID_bitnot || n.id() == ID_typecast || n.id() == ID_if) &&
+            n.find(ID_type).is_nil())
+          {
+            needs_eager_convert = true;
+            return;
+          }
           for(const auto &s : n.get_sub())
-            has_cpp_name(s);
+            needs_typecheck(s);
           for(const auto &ns : n.get_named_sub())
-            has_cpp_name(ns.second);
+            needs_typecheck(ns.second);
         };
-        has_cpp_name(symbol_ptr->value);
+        needs_typecheck(symbol_ptr->value);
       }
       if(needs_eager_convert)
       {
