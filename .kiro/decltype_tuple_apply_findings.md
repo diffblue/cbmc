@@ -10959,3 +10959,33 @@ clean.  Pre-existing flex warnings (scanner.l 1065/1070/1073: the second
 - Suites: two test.pl runs were accidentally started concurrently in
   regression/cbmc-cpp (s10/s11) -- their results were unreliable; s12/s13
   re-run cleanly.
+
+### Round 158, part 3 (2026-09-22): gcc 16.2 build, flex, KNOWNBUG tests
+
+- gcc 16.2 (arch, tumbleweed) now builds cbmc/goto-cc with -Werror
+  (03ba0cc6a9, 686a4adb68): smt2_conv.cpp unused loop counter;
+  struct_encoding.h `std::reference_wrapper<const namespacet>' on a
+  forward-declared namespacet (-Wsfinae-incomplete: include namespace.h);
+  variable_sensitivity_domain_factoryt::make's `d->is_bottom()' speculatively
+  devirtualized to the DERIVED dependence domain's override reading past the
+  64-byte object (-Warray-bounds) -- qualified non-virtual call.  Arch run
+  after the fixes: 18 of 1381 failed (2 libc++ not installed, the rest the
+  gcc 16 header classes below).
+- flex "rule cannot be matched" (4565615abb): eight revertible builtins had
+  two rules with the same `(' trailing context (gcc14_builtins vs CLANG
+  flavour/preprocessor); merged with the union of the conditions.
+- gcc 16 header failures reduced to KNOWNBUG gcc16 tests (0c802ee47b,
+  6451e97233): bind (_Bind::operator() with explicit object parameter +
+  enable_if default template argument), stream ctype facet vtable,
+  cpp20 map lookup (silent), string from literal (`_M_construct<bool>' no
+  body -- also behind pair<const string,int> copy, string_literal_const_type,
+  nested_braces_user_ctor_class's nontermination and regex_match),
+  unordered_set insert (silent), cpp20 vector find (iterator outside
+  storage), common_reference_with<const W&, const W&> (concepts), std::set of
+  a late class (gcc 16's _Node_traits/__rb_tree::_Node shape; the typedef
+  `_Node' is now kept lazily under instantiation, f03cbcf03c, the layout
+  problem remains).  Plus one host bug found on the way:
+  common_reference_with<W&, const W&> false with every libstdc++
+  (cpp20_common_reference_with_cv_differing_references, KNOWNBUG).
+  Method: preprocess in the gcc16-test image (`g++-16 -E -D__CPROVER__'),
+  run cbmc on the .ii on the host; each test verifies with gcc 13 headers.
