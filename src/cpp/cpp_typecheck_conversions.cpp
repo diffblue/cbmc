@@ -1892,12 +1892,21 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   // copy-initialization are being explored, a user-defined conversion
   // sequence for a candidate's parameter is not considered (also
   // [over.ics.user]: at most one user-defined conversion per sequence).
-  // Nested queries inside a constant-expression evaluation (SFINAE
-  // constraints such as `is_constructible`) are separate conversion
-  // sequences and stay allowed, mirroring the template-constructor
-  // fallback's re-entry rule below.
-  if(copy_init_ctor_exploration > 0 && constant_expression_context == 0)
+  // Nested queries inside a constant-expression evaluation or a
+  // substitution (SFINAE constraints such as `is_constructible`, whose
+  // sfinae_contextt suspends the constant-expression context) are separate
+  // conversion sequences and stay allowed, mirroring the
+  // template-constructor fallback's re-entry rule below.  Without the
+  // substitution case, `is_constructible<function<int()>, int (*&&)()>`
+  // evaluated inside std::pair's constructor constraint
+  // (`_PCC::_MoveConstructiblePair`) was false, and
+  // `pair<int, function<int()>> p(1, f)` found no constructor.
+  if(
+    copy_init_ctor_exploration > 0 && constant_expression_context == 0 &&
+    sfinae_context_depth == 0)
+  {
     return false;
+  }
 
   const typet &from = expr.type();
 
@@ -2077,6 +2086,17 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           !expr.get_bool(ID_C_lvalue))
           continue;
 
+        // N5008 [over.ics.rank]/3.2.3: of two reference bindings of an
+        // rvalue argument, the one to an rvalue reference is better than the
+        // one to an lvalue reference -- the converting-constructor template
+        // instantiated for both `const X &' and `X &&' (is_constructible
+        // queries) otherwise ties at the same rank ("ambiguous") for an
+        // rvalue X.  Rank the rvalue-reference binding one step better.
+        const bool binds_rvalue_to_const_lref =
+          is_reference(arg1_type) &&
+          !arg1_type.get_bool(ID_C_rvalue_reference) &&
+          !expr.get_bool(ID_C_lvalue);
+
         if(is_reference(arg1_type))
         {
           typet tmp = to_reference_type(arg1_type).base_type();
@@ -2132,6 +2152,10 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
             if(struct_type_to.get_bool(ID_C_constant))
               ctor_expr.type().set(ID_C_constant, true);
+
+            // see binds_rvalue_to_const_lref: rank in units of two so that
+            // the reference-binding tie-break fits between two ranks
+            tmp_rank = 2 * tmp_rank + (binds_rvalue_to_const_lref ? 1 : 0);
 
             // Track the best-ranked viable candidate per
             // [over.match.best].  A strictly lower rank replaces
