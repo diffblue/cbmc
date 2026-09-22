@@ -1,0 +1,13 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Fails with gcc 13's libstdc++ (and gcc 16's): "static assertion failed:
+cv-differing lvalue references", main dropped.  Found while reducing the gcc
+16 failure of cpp20_concept_conjunction_requires_params (2026-09-22).
