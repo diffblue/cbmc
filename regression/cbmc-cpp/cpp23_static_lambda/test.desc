@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp23
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+`static' in a lambda-specifier-seq was a parse error; the MSVC 14.51 (Visual
+Studio 2026) STL uses static lambdas unconditionally, so every test including
+<vector>, <string>, <numeric> or <filesystem> failed to parse on the Windows CI
+runner (reproduced with the run's msvc-preprocessed-headers artifact).
