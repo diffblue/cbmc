@@ -4862,6 +4862,94 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 // conversion+rewriting) is tracked as a success criterion of the
 // target-type-threading plan, see
 // doc/architectural/cpp-frontend-plan-target-type-threading.md §7.6.
+/// N5008 [class.copy.assign]/2: a class without a user-declared copy
+/// assignment operator has one declared implicitly, and it can be named --
+/// `_List_size::operator=(_List_size())' in libstdc++ 16's
+/// _List_node_header::_M_init assigns the base subobject through it.  The
+/// front end declares that operator only for non-POD classes (a POD is
+/// assigned bitwise), so the qualified name found no function.  When \p expr
+/// is a call `C::operator=(x)' with one argument, `C' a POD class without a
+/// declared assignment operator and `this' available (a member function of
+/// `C' or of a class derived from it), rewrite it to the builtin assignment
+/// `static_cast<C &>(*this) = x' ([expr.ass]).
+/// \return true when \p expr was rewritten
+bool cpp_typecheckt::implicit_pod_assignment_call(
+  side_effect_expr_function_callt &expr)
+{
+  if(expr.function().id() != ID_cpp_name || expr.arguments().size() != 1)
+    return false;
+  const irept::subt &subs = to_cpp_name(expr.function()).get_sub();
+  if(
+    subs.size() < 4 || subs[subs.size() - 2].id() != ID_operator ||
+    subs.back().id() != "=" || subs[subs.size() - 3].id() != "::")
+  {
+    return false;
+  }
+  if(cpp_scopes.current_scope().this_expr.is_nil())
+    return false;
+
+  // the qualifier, `C'
+  cpp_namet qualifier;
+  qualifier.add(ID_C_source_location) = expr.function().source_location();
+  for(std::size_t i = 0; i + 3 < subs.size(); ++i)
+    qualifier.get_sub().push_back(subs[i]);
+  exprt resolved;
+  try
+  {
+    cpp_typecheck_fargst no_fargs;
+    resolved = resolve(
+      qualifier,
+      cpp_typecheck_resolvet::wantt::TYPE,
+      no_fargs,
+      /*fail_with_exception=*/false);
+  }
+  catch(...)
+  {
+    return false;
+  }
+  if(
+    resolved.id() != ID_type || resolved.type().id() != ID_struct_tag ||
+    !cpp_is_pod(resolved.type()))
+  {
+    return false;
+  }
+  for(const auto &c :
+      follow_tag(to_struct_tag_type(resolved.type())).components())
+  {
+    if(c.get_base_name() == "operator=")
+      return false;
+  }
+
+  // static_cast<C &>(*this)
+  exprt this_expr("cpp-this");
+  this_expr.add_source_location() = expr.source_location();
+  typecheck_expr(this_expr);
+  exprt object{ID_dereference, typet{}};
+  object.add_to_operands(already_typechecked_exprt{this_expr});
+  object.add_source_location() = expr.source_location();
+  typecheck_expr(object);
+  object.set(ID_C_lvalue, true);
+  exprt lhs{ID_static_cast, reference_type(resolved.type())};
+  lhs.add_to_operands(already_typechecked_exprt{object});
+  lhs.add_source_location() = expr.source_location();
+  typecheck_expr(lhs);
+  add_implicit_dereference(lhs);
+
+  // (the argument was typechecked with the call; see
+  // typecheck_side_effect_function_call)
+  exprt rhs = expr.arguments().front();
+  if(rhs.id() != ID_already_typechecked && rhs.type().is_not_nil())
+    rhs = already_typechecked_exprt{rhs};
+  side_effect_exprt assignment{
+    ID_assign,
+    {already_typechecked_exprt{lhs}, rhs},
+    typet{},
+    expr.source_location()};
+  typecheck_expr(assignment);
+  expr.swap(assignment);
+  return true;
+}
+
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
@@ -5270,6 +5358,12 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
   catch(...)
   {
+    if(implicit_pod_assignment_call(expr))
+    {
+      get_message_handler().set_message_count(
+        messaget::M_ERROR, errors_before_function_expr);
+      return;
+    }
     // C++20 P0960 (N5008 [expr.type.conv]/2 +
     // [dcl.init.general]/16.6.2.2): constructors are considered first;
     // when overload resolution finds no viable constructor and
