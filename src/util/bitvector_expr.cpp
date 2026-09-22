@@ -307,7 +307,9 @@ exprt zero_extend_exprt::lower() const
   }
 }
 
-static exprt onehot_lowering(const exprt &expr)
+/// Returns a pair of expressions: the first is true iff at least one bit
+/// of \p expr is set, the second is true iff more than one bit is set.
+static std::pair<exprt, exprt> onehot_lowering_helper(const exprt &expr)
 {
   exprt one_seen = false_exprt{};
   const auto width = to_bitvector_type(expr.type()).get_width();
@@ -321,22 +323,24 @@ static exprt onehot_lowering(const exprt &expr)
     one_seen = or_exprt{one_seen, bit};
   }
 
-  auto more_than_one_seen = disjunction(more_than_one_seen_disjuncts);
-
-  return and_exprt{one_seen, not_exprt{more_than_one_seen}};
+  return {one_seen, disjunction(more_than_one_seen_disjuncts)};
 }
 
 exprt onehot_exprt::lower() const
 {
   auto symbol = symbol_exprt{"onehot-op", op().type()};
+  auto [one_seen, more_than_one_seen] = onehot_lowering_helper(symbol);
 
-  return let_exprt{symbol, op(), onehot_lowering(symbol)};
+  // exactly one bit is set
+  return let_exprt{
+    symbol, op(), and_exprt{one_seen, not_exprt{more_than_one_seen}}};
 }
 
 exprt onehot0_exprt::lower() const
 {
   auto symbol = symbol_exprt{"onehot-op", op().type()};
+  auto [one_seen, more_than_one_seen] = onehot_lowering_helper(symbol);
 
-  // same as onehot, but on flipped operand bits
-  return let_exprt{symbol, bitnot_exprt{op()}, onehot_lowering(symbol)};
+  // at most one bit is set
+  return let_exprt{symbol, op(), not_exprt{more_than_one_seen}};
 }

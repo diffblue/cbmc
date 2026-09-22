@@ -1936,7 +1936,9 @@ inline onehot_exprt &to_onehot_expr(exprt &expr)
 }
 
 /// \brief A Boolean expression returning true iff the given
-/// operand consists of exactly one '0' and '1' otherwise.
+/// operand contains at most one '1', i.e., the operand is either
+/// one-hot or zero. This matches the semantics of SystemVerilog's
+/// $onehot0.
 class onehot0_exprt : public unary_predicate_exprt
 {
 public:
