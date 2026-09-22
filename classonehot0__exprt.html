@@ -103,7 +103,7 @@ $(document).ready(function(){initNavTree('classonehot0__exprt.html',''); initRes
 </div><!--header-->
 <div class="contents">
 
-<p>A Boolean expression returning true iff the given operand consists of exactly one '0' and '1' otherwise.  
+<p>A Boolean expression returning true iff the given operand contains at most one '1', i.e., the operand is either one-hot or zero.  
  <a href="classonehot0__exprt.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>&gt;</code></p>
@@ -475,9 +475,10 @@ Additional Inherited Members</h2></td></tr>
 <tr class="separator:a814e2786a229866ee405fbb89c8c9ebe inherit pro_static_attribs_classsharing__treet"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>A Boolean expression returning true iff the given operand consists of exactly one '0' and '1' otherwise. </p>
+<div class="textblock"><p>A Boolean expression returning true iff the given operand contains at most one '1', i.e., the operand is either one-hot or zero. </p>
+<p>This matches the semantics of SystemVerilog's $onehot0. </p>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01940">1940</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01942">1942</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a4d9ef77c1c93cac31007f6e480762c7b" name="a4d9ef77c1c93cac31007f6e480762c7b"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a4d9ef77c1c93cac31007f6e480762c7b">&#9670;&#160;</a></span>onehot0_exprt()</h2>
@@ -503,7 +504,7 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01943">1943</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l01945">1945</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
 
 </div>
 </div>
@@ -525,7 +526,7 @@ Additional Inherited Members</h2></td></tr>
 
 <p>lowering to extractbit </p>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__expr_8cpp_source.html#l00336">336</a> of file <a class="el" href="bitvector__expr_8cpp_source.html">bitvector_expr.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8cpp_source.html#l00339">339</a> of file <a class="el" href="bitvector__expr_8cpp_source.html">bitvector_expr.cpp</a>.</p>
 
 </div>
 </div>

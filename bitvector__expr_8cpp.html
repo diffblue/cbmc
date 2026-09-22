@@ -117,12 +117,13 @@ $(document).ready(function(){initNavTree('bitvector__expr_8cpp.html',''); initRe
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="func-members" name="func-members"></a>
 Functions</h2></td></tr>
-<tr class="memitem:a7da7a4d034bee2cb7b0b0015ab303975" id="r_a7da7a4d034bee2cb7b0b0015ab303975"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> <a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8cpp.html#a7da7a4d034bee2cb7b0b0015ab303975">onehot_lowering</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
-<tr class="separator:a7da7a4d034bee2cb7b0b0015ab303975"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae1610c7342f9c81055d85bf66d499691" id="r_ae1610c7342f9c81055d85bf66d499691"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classait.html">static</a> std::pair&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="bitvector__expr_8cpp.html#ae1610c7342f9c81055d85bf66d499691">onehot_lowering_helper</a> (<a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;expr)</td></tr>
+<tr class="memdesc:ae1610c7342f9c81055d85bf66d499691"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns a pair of expressions: the first is true iff at least one bit of <code>expr</code> is set, the second is true iff more than one bit is set.  <br /></td></tr>
+<tr class="separator:ae1610c7342f9c81055d85bf66d499691"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
-<a id="a7da7a4d034bee2cb7b0b0015ab303975" name="a7da7a4d034bee2cb7b0b0015ab303975"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a7da7a4d034bee2cb7b0b0015ab303975">&#9670;&#160;</a></span>onehot_lowering()</h2>
+<a id="ae1610c7342f9c81055d85bf66d499691" name="ae1610c7342f9c81055d85bf66d499691"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ae1610c7342f9c81055d85bf66d499691">&#9670;&#160;</a></span>onehot_lowering_helper()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -131,7 +132,7 @@ Functions</h2></td></tr>
   <td class="mlabels-left">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="classait.html">static</a> <a class="el" href="classexprt.html">exprt</a> onehot_lowering </td>
+          <td class="memname"><a class="el" href="classait.html">static</a> std::pair&lt; <a class="el" href="classexprt.html">exprt</a>, <a class="el" href="classexprt.html">exprt</a> &gt; onehot_lowering_helper </td>
           <td>(</td>
           <td class="paramtype"><a class="el" href="classait.html">const</a> <a class="el" href="classexprt.html">exprt</a> &amp;&#160;</td>
           <td class="paramname"><em>expr</em></td><td>)</td>
@@ -145,7 +146,9 @@ Functions</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="bitvector__expr_8cpp_source.html#l00310">310</a> of file <a class="el" href="bitvector__expr_8cpp_source.html">bitvector_expr.cpp</a>.</p>
+<p>Returns a pair of expressions: the first is true iff at least one bit of <code>expr</code> is set, the second is true iff more than one bit is set. </p>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8cpp_source.html#l00312">312</a> of file <a class="el" href="bitvector__expr_8cpp_source.html">bitvector_expr.cpp</a>.</p>
 
 </div>
 </div>

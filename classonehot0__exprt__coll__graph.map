@@ -1,5 +1,5 @@
 <map id="onehot0_exprt" name="onehot0_exprt">
-<area shape="rect" id="Node000001" title="A Boolean expression returning true iff the given operand consists of exactly one &#39;0&#39; and &#39;1&#39; otherwi..." alt="" coords="31,475,147,500"/>
+<area shape="rect" id="Node000001" title="A Boolean expression returning true iff the given operand contains at most one &#39;1&#39;,..." alt="" coords="31,475,147,500"/>
 <area shape="rect" id="Node000002" href="$classunary__predicate__exprt.html" title="A base class for expressions that are predicates, i.e., Boolean&#45;typed, and that take exactly one argu..." alt="" coords="5,401,173,427"/>
 <area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="92,440,92,475,87,475,87,440"/>
 <area shape="rect" id="Node000003" href="$classunary__exprt.html" title="Generic base class for unary expressions." alt="" coords="39,328,139,353"/>

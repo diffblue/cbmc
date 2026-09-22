@@ -821,7 +821,7 @@
 <!-- Node44 -->
 <g id="Node000044" class="node">
 <title>Node44</title>
-<g id="a_Node000044"><a xlink:href="classonehot0__exprt.html" target="_top" xlink:title="A Boolean expression returning true iff the given operand consists of exactly one &#39;0&#39; and &#39;1&#39; otherwi...">
+<g id="a_Node000044"><a xlink:href="classonehot0__exprt.html" target="_top" xlink:title="A Boolean expression returning true iff the given operand contains at most one &#39;1&#39;,...">
 <polygon fill="white" stroke="#666666" points="1181.5,-389 1094.5,-389 1094.5,-370 1181.5,-370 1181.5,-389"/>
 <text text-anchor="middle" x="1138" y="-377" font-family="Helvetica,sans-Serif" font-size="10.00">onehot0_exprt</text>
 </a>

@@ -11,7 +11,7 @@
 <!-- Node1 -->
 <g id="Node000001" class="node">
 <title>Node1</title>
-<g id="a_Node000001"><a xlink:title="A Boolean expression returning true iff the given operand consists of exactly one &#39;0&#39; and &#39;1&#39; otherwi...">
+<g id="a_Node000001"><a xlink:title="A Boolean expression returning true iff the given operand contains at most one &#39;1&#39;,...">
 <polygon fill="#999999" stroke="#666666" points="106.5,-19 19.5,-19 19.5,0 106.5,0 106.5,-19"/>
 <text text-anchor="middle" x="63" y="-7" font-family="Helvetica,sans-Serif" font-size="10.00">onehot0_exprt</text>
 </a>
