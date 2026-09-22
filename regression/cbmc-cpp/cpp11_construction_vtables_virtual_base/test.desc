@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Construction vtables (Itanium C++ ABI 2.6.2) for the direct bases with
+virtual bases of a complete object: `virtual_table::X@B@D' holds B's
+overriders with D's virtual-base offsets, installed in B's subobject
+pointers (including the shared virtual base's) around B's base-object
+constructor and destructor, so a virtual call from B's constructor -- also
+through a V* -- reaches B's overrider (N5008 [class.cdtor]/4).  Only the
+complete object installs them (it alone knows the offsets); a base-object
+constructor of a class that is itself a base leaves the tables its caller
+installed -- the documented approximation for deeper levels (the ABI passes
+a VTT).

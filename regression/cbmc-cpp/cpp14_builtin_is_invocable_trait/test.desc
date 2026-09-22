@@ -1,0 +1,14 @@
+CORE gcc-only
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+Scanner: revertible identifiers (a builtin only when followed by `(').
+Parser: rTypePredicate keeps every argument in "type_args".  Typecheck:
+typecheck_expr_is_invocable probes the call under a sfinae_contextt.

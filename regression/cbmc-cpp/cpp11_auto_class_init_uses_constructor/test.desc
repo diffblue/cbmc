@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+convert_initializer (cpp_typecheck_initializer.cpp): a class-typed `auto'
+variable is initialized through cpp_constructor like an explicitly typed
+one.  Found by dog-fooding gcc 16's libstdc++ (std::list, std::set).

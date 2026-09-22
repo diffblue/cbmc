@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^found no match
+--
+user_defined_conversion_sequence (cpp_typecheck_conversions.cpp).  Exposed
+once std::__and_ evaluated correctly (cpp11_libstdcxx_and_conjunction).
