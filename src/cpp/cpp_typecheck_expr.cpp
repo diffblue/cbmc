@@ -4424,6 +4424,10 @@ void cpp_typecheckt::typecheck_expr_ptrmember(
   op.add_to_operands(std::move(tmp));
   op.add_source_location() = expr.source_location();
   typecheck_expr_dereference(op);
+  // a virtual pointer install of the complete object's constructor or
+  // destructor (see get_component)
+  if(expr.get_bool("#complete_object"))
+    op.set("#complete_object", true);
 
   expr.id(ID_member);
   typecheck_expr_member(expr, fargs);

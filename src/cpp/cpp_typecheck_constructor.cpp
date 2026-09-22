@@ -976,6 +976,7 @@ void cpp_typecheckt::full_member_initialization(
           already_typechecked_exprt::make_already_typechecked(address);
           exprt ptrmember(ID_ptrmember);
           ptrmember.set(ID_component_name, c.get_name());
+          ptrmember.set("#complete_object", true);
           ptrmember.operands().push_back(exprt("cpp-this"));
           vptr_block.add(code_frontend_assignt(ptrmember, address));
         }
@@ -1252,6 +1253,41 @@ void cpp_typecheckt::full_member_initialization(
         continue;
 
       const symbolt &ctorsymb = lookup(b.type());
+
+      // Itanium C++ ABI 2.6.2 / N5008 [class.cdtor]/4: while a base with
+      // virtual bases is constructed (its base-object constructor installs
+      // no virtual pointers), its subobject's pointers hold the
+      // construction vtables of THIS complete object -- the base's
+      // overriders with this object's virtual-base offsets -- so that a
+      // virtual call from the base's constructor reaches the base's
+      // overrider.  Only the complete object knows the offsets: a
+      // base-object constructor of this class leaves the tables its own
+      // caller installed (a documented approximation for deeper levels;
+      // the ABI passes a VTT for those).
+      if(struct_union_type.id() == ID_struct)
+      {
+        const symbolt *class_symbol;
+        if(!lookup(struct_union_type.get(ID_name), class_symbol))
+        {
+          code_blockt installs;
+          for(auto &install : construction_vtable_installs(
+                *class_symbol, to_struct_tag_type(b.type()).get_identifier()))
+          {
+            already_typechecked_exprt::make_already_typechecked(install.second);
+            exprt ptrmember(ID_ptrmember);
+            ptrmember.set(ID_component_name, install.first.get_name());
+            ptrmember.set("#complete_object", true);
+            ptrmember.operands().push_back(exprt("cpp-this"));
+            installs.add(code_frontend_assignt(ptrmember, install.second));
+          }
+          if(!installs.statements().empty())
+          {
+            codet cond = code_ifthenelset(
+              cpp_namet("@most_derived").as_expr(), std::move(installs));
+            final_initializers.move_to_sub(cond);
+          }
+        }
+      }
 
       if(cpp_is_pod(ctorsymb.type))
       {

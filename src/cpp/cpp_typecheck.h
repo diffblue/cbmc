@@ -493,7 +493,11 @@ protected:
 
   void default_dtor(const symbolt &symb, cpp_declarationt &dtor);
 
-  codet dtor(const symbolt &symb, const symbol_exprt &this_expr);
+  /// The implicit code of the destructor of \p symb: the base and member
+  /// destructor calls (returned, to follow the body) and, in \p prologue,
+  /// the installation of the class's virtual pointers (to precede it).
+  codet
+  dtor(const symbolt &symb, const symbol_exprt &this_expr, codet &prologue);
 
   void check_member_initializers(
     const struct_typet::basest &bases,
@@ -594,6 +598,19 @@ protected:
   /// complete object relative to the subobject owning the pointer.  Needs
   /// the final layout, so runs after padding.
   void set_virtual_base_offsets(const symbolt &symbol);
+
+  /// The direct non-virtual bases of the class that have virtual bases: the
+  /// ones with construction vtables (Itanium C++ ABI 2.6.2).
+  std::vector<irep_idt>
+  construction_vtable_bases(const irep_idt &class_id) const;
+
+  /// For the base subobject \p base_id of the complete object \p symbol:
+  /// each virtual pointer of the subobject with the address of the
+  /// construction vtable (`virtual_table::X@B@D') to hold while the base is
+  /// constructed or destroyed.
+  std::vector<std::pair<struct_typet::componentt, exprt>>
+  construction_vtable_installs(const symbolt &symbol, const irep_idt &base_id)
+    const;
 
   /// Build (or rebuild) the body of the thunk \p thunk that a virtual
   /// function \p target (a component of \p derived) is entered through when

@@ -287,8 +287,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
        to_multi_ary_expr(to_multi_ary_expr(symbol.value).op0()).op0().id() !=
          ID_already_typechecked))
     {
-      symbol.value.copy_to_operands(
-        dtor(msymb, to_symbol_expr(function_scope.this_expr)));
+      codet prologue = code_skipt();
+      codet epilogue =
+        dtor(msymb, to_symbol_expr(function_scope.this_expr), prologue);
+      symbol.value.copy_to_operands(epilogue);
+      if(prologue.get_statement() != ID_skip)
+      {
+        exprt::operandst &statements = symbol.value.operands();
+        statements.insert(statements.begin(), prologue);
+      }
     }
   }
 
