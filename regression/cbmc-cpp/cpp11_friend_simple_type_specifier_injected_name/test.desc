@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^found no match
+--
+The friend's type was type-checked in the global scope for the
+simple-type-specifier form as well, so the injected-class-name did not
+resolve ("found no match for symbol 'vector'"; MSVC <vector> line 464).
