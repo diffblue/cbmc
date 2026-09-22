@@ -1986,7 +1986,7 @@ void cpp_typecheckt::throw_if_incomplete_dependency(const exprt &expr)
   if(!expr.operands().empty())
     t = &to_unary_expr(expr).op().type();
   else if(expr.find(ID_type_arg).is_not_nil())
-    t = &static_cast<const typet &>(expr.find(ID_type_arg));
+    t = static_cast<const typet *>(&expr.find(ID_type_arg));
   else
     return;
   while(t->id() == ID_array || t->id() == ID_already_typechecked)
