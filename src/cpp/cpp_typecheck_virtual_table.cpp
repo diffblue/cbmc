@@ -18,7 +18,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck.h"
 
+#include <algorithm>
 #include <functional>
+#include <set>
 
 void cpp_typecheckt::build_virtual_thunk_body(
   symbolt &thunk,
@@ -153,12 +155,20 @@ void cpp_typecheckt::set_virtual_base_offsets(const symbolt &symbol)
       vbase_offset[vb] = *off;
   }
 
-  // every vtable object of this complete object
+  // every vtable object of this complete object, and the construction
+  // tables of its direct bases with virtual bases (do_virtual_table)
+  std::vector<std::pair<struct_typet::componentt, exprt>> pointers;
   for(const auto &c : struct_type.components())
+    if(c.get_bool(ID_is_vtptr))
+      pointers.emplace_back(c, vtable_pointer_value(symbol, c));
+  for(const irep_idt &base_id : construction_vtable_bases(symbol.name))
+    for(auto &install : construction_vtable_installs(symbol, base_id))
+      pointers.push_back(std::move(install));
+
+  for(const auto &pointer : pointers)
   {
-    if(!c.get_bool(ID_is_vtptr))
-      continue;
-    const exprt value = vtable_pointer_value(symbol, c);
+    const struct_typet::componentt &c = pointer.first;
+    const exprt &value = pointer.second;
     if(value.id() != ID_address_of)
       continue;
     // the vtable object, through the embedded `@base' members
@@ -380,6 +390,127 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
     bool failed = !symbol_table.insert(std::move(vt_symb_var)).second;
     CHECK_RETURN(!failed);
   }
+
+  // Itanium C++ ABI 2.6.2 (construction vtables), for the direct bases that
+  // have virtual bases: while such a base subobject is constructed or
+  // destroyed, its virtual pointers must point to tables with the BASE's
+  // overriders (N5008 [class.cdtor]/4) but THIS complete object's virtual
+  // base offsets.  One object per (vtable struct X of the base's hierarchy,
+  // base B): `virtual_table::X@B@D', a copy of the base's complete-object
+  // table `virtual_table::X@B'; set_virtual_base_offsets fills in the
+  // offsets.  A base without virtual bases needs none: its own tables
+  // serve, and its constructor installs them itself.
+  for(const irep_idt &base_id : construction_vtable_bases(symbol.name))
+  {
+    for(const auto &named : symbol_table.symbols)
+    {
+      const std::string name = id2string(named.first);
+      const std::string suffix = "@" + id2string(base_id);
+      if(
+        name.compare(0, 15, "virtual_table::") != 0 ||
+        name.size() <= suffix.size() ||
+        name.compare(name.size() - suffix.size(), suffix.size(), suffix) != 0 ||
+        named.second.is_type)
+      {
+        continue;
+      }
+      // exactly `virtual_table::X@B' (not a construction table `X@Y@B')
+      if(std::count(name.begin(), name.end(), '@') != 1)
+        continue;
+      symbolt construction = named.second;
+      construction.name = name + "@" + id2string(symbol.name);
+      construction.base_name =
+        id2string(named.second.base_name) + "@" + id2string(symbol.base_name);
+      if(!symbol_table.has_symbol(construction.name))
+      {
+        bool failed = !symbol_table.insert(std::move(construction)).second;
+        CHECK_RETURN(!failed);
+      }
+    }
+  }
+}
+
+std::vector<irep_idt>
+cpp_typecheckt::construction_vtable_bases(const irep_idt &class_id) const
+{
+  std::vector<irep_idt> result;
+  const symbolt *sym = symbol_table.lookup(class_id);
+  if(sym == nullptr || sym->type.id() != ID_struct)
+    return result;
+  for(const auto &base : to_struct_type(sym->type).bases())
+  {
+    if(base.get_bool(ID_virtual) || base.type().id() != ID_struct_tag)
+      continue;
+    const irep_idt base_id = to_struct_tag_type(base.type()).get_identifier();
+    const symbolt *base_sym = symbol_table.lookup(base_id);
+    if(base_sym == nullptr || base_sym->type.id() != ID_struct)
+      continue;
+    std::list<irep_idt> vbases;
+    get_virtual_bases(to_struct_type(base_sym->type), vbases);
+    if(!vbases.empty())
+      result.push_back(base_id);
+  }
+  return result;
+}
+
+std::vector<std::pair<struct_typet::componentt, exprt>>
+cpp_typecheckt::construction_vtable_installs(
+  const symbolt &symbol,
+  const irep_idt &base_id) const
+{
+  std::vector<std::pair<struct_typet::componentt, exprt>> result;
+  const symbolt *base_sym = symbol_table.lookup(base_id);
+  if(symbol.type.id() != ID_struct || base_sym == nullptr)
+    return result;
+  const struct_typet &struct_type = to_struct_type(symbol.type);
+  const struct_typet &base_struct = to_struct_type(base_sym->type);
+
+  // the virtual pointers of the base subobject: those of its non-virtual
+  // part (same component names in the derived class) and those of its
+  // virtual bases (components marked with the virtual base)
+  std::set<irep_idt> base_component_names;
+  for(const auto &c : base_struct.components())
+    if(c.get(ID_C_virtual_base).empty())
+      base_component_names.insert(c.get_name());
+  std::list<irep_idt> base_vbases;
+  get_virtual_bases(base_struct, base_vbases);
+
+  // The virtual bases' pointers first: a member access to one goes through
+  // the complete object's vtable, which the non-virtual part's pointer
+  // still holds at that point (the installs run in this order).
+  for(int pass = 0; pass < 2; ++pass)
+    for(const auto &c : struct_type.components())
+    {
+      if(!c.get_bool(ID_is_vtptr))
+        continue;
+      const irep_idt vb = c.get(ID_C_virtual_base);
+      if(vb.empty() != (pass == 1))
+        continue;
+      const bool in_base =
+        vb.empty() ? base_component_names.count(c.get_name()) != 0
+                   : std::find(base_vbases.begin(), base_vbases.end(), vb) !=
+                       base_vbases.end();
+      if(!in_base)
+        continue;
+      // the table the base's own constructor would install, renamed to the
+      // construction table of this complete object
+      exprt value = vtable_pointer_value(*base_sym, c);
+      if(value.id() != ID_address_of)
+        continue;
+      exprt *object = &to_address_of_expr(value).object();
+      while(object->id() == ID_member)
+        object = &to_member_expr(*object).compound();
+      if(object->id() != ID_symbol)
+        continue;
+      const irep_idt construction_name =
+        id2string(to_symbol_expr(*object).get_identifier()) + "@" +
+        id2string(symbol.name);
+      if(!symbol_table.has_symbol(construction_name))
+        continue;
+      to_symbol_expr(*object).set_identifier(construction_name);
+      result.emplace_back(c, value);
+    }
+  return result;
 }
 
 irep_idt cpp_typecheckt::primary_base(const irep_idt &class_id) const
