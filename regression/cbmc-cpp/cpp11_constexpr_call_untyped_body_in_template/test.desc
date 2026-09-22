@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^not permitted
+--
+typecheck_side_effect_function_call's constexpr evaluator converts the
+callee's body eagerly (in the callee's own scope) not only when it still
+contains cpp_names but also when an operator node of the parsed body carries
+no type yet.  Found by dog-fooding src/util (15 of 117 files).
