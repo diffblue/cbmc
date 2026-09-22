@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <ansi-c/ansi_c_entry_point.h>
 #include <ansi-c/c_preprocess.h>
+#include <ansi-c/gcc_version.h>
 #include <linking/linking.h>
 #include <linking/remove_internal_symbols.h>
 
@@ -60,6 +61,9 @@ bool cpp_languaget::preprocess(
   std::ostream &outstream,
   message_handlert &message_handler)
 {
+  // the dialect decides the preprocessor's -std= flag
+  apply_host_default_cxx_standard();
+
   if(path.empty())
     return c_preprocess(instream, outstream, message_handler);
 
@@ -86,6 +90,10 @@ bool cpp_languaget::parse(
   const std::string &path,
   message_handlert &message_handler)
 {
+  // the dialect decides the preprocessor's -std= flag and the parser's
+  // keyword set (also for an already-preprocessed input)
+  apply_host_default_cxx_standard();
+
   // store the path
 
   parse_path=path;

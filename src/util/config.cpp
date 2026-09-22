@@ -1366,6 +1366,12 @@ bool configt::set(const cmdlinet &cmdline)
     cpp.set_cpp14();
   }
 
+  // the built-in default stands until the C++ front-end asks the host
+  // compiler for its default dialect (apply_host_default_cxx_standard);
+  // a standard selected here is final
+  cpp.standard_is_default =
+    !explicit_cpp_standard && cpp.cpp_standard == cppt::default_cpp_standard();
+
   // set the upper bound for argc
   if(os == "windows")
   {
