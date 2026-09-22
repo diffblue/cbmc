@@ -2011,6 +2011,19 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
   else if(expr.id() == ID_dereference && expr.get_bool(ID_C_implicit))
     return false;
 
+  // N5008 [over.match.oper]/3, [temp.inst]/2: the operand classes' members
+  // are looked up, so a class template specialization named so far only
+  // through a typedef (`reverse_iterator' of a container) is instantiated
+  // now.
+  for(const auto &op : expr.operands())
+  {
+    const typet &t = is_reference(op.type())
+                       ? to_reference_type(op.type()).base_type()
+                       : op.type();
+    if(t.id() == ID_struct_tag || t.id() == ID_union_tag)
+      elaborate_class_template(t);
+  }
+
   // Mark all resolutions below as operator-EXPRESSION candidate gathering
   // ([over.match.oper]/3) -- see operator_expr_lookup_depth.
   struct op_expr_guardt
