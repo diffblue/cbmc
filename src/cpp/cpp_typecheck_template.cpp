@@ -3399,7 +3399,39 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
             }
           }
           else
-            typecheck_type(arg.type());
+          {
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              typecheck_type(arg.type());
+            }
+            catch(const incomplete_dependency_exceptiont &)
+            {
+              // N5008 [temp.inst]/1: naming a class template specialization
+              // as a template ARGUMENT does not require it to be complete.
+              // Its instantiation was attempted on the way (the argument's
+              // type was resolved) and failed because a class it depends on
+              // is only declared so far; the specialization is left
+              // incomplete, to be instantiated where completeness is
+              // required (libstdc++'s `rebind<_Rb_tree_node<_Val>>::other'
+              // in a `std::set<X>' named before X is defined).
+              get_message_handler().set_message_count(
+                messaget::M_ERROR, errors_before);
+              const bool old_skip = skip_typechecking_elaborate;
+              skip_typechecking_elaborate = true;
+              try
+              {
+                typecheck_type(arg.type());
+              }
+              catch(...)
+              {
+                skip_typechecking_elaborate = old_skip;
+                throw;
+              }
+              skip_typechecking_elaborate = old_skip;
+            }
+          }
         }
       tm_resolved:
         // Per [temp.arg]/2: resolve remaining template parameter
