@@ -1,12 +1,19 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp14
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
+^CONVERSION ERROR$
+--
 C++14 generic lambda with struct and double argument types
 
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: member operator requires struct/union type on left hand side but got 'const signed int'
+Was KNOWNBUG since round 152 (main() partially type-checked): the
+function-pointer lowering of a closure-eligible generic lambda type-checked
+the body with `signed int` for every `auto` parameter, and `pt.x` on
+`const auto &pt' was reported as an error ("member operator requires
+struct/union type ... got 'const signed int'").  Fixed 2026-09-23: that
+placeholder body is tried silently ([temp.inst]: the template operator()'s
+body is checked at instantiation).
