@@ -489,6 +489,207 @@ void expand_member_initializer_packs_in_body(
       ns.second, pack_args_map, pack_expr_map);
 }
 
+/// N5008 [expr.prim.fold]/1-3: expand the fold expressions in \p node that
+/// fold over the template parameter pack \p short_name, whose elements
+/// (types as `ID_type` expressions, or non-type values) are \p pack_args.
+/// A unary right fold `(pat op ...)` over N elements becomes the
+/// right-associated tree `pat0 op (pat1 op ... op patN-1)`, a unary left fold
+/// `(... op pat)` the left-associated tree; a binary fold is seeded by its
+/// init operand ([expr.prim.fold]/2).  An empty pack yields the operator's
+/// identity ([expr.prim.fold]/3: `&&' -> true, `||' -> false, otherwise 0);
+/// a single element the sole substituted pattern.  Every bare reference to
+/// the pack inside the pattern (a type position such as `sizeof(Ts)` or
+/// `__is_same(T, Ts)`, or a value position) is replaced by the element.
+static void expand_folds_over_pack(
+  irept &node,
+  const std::string &short_name,
+  const std::vector<exprt> &pack_args)
+{
+  auto is_pack_ref = [&short_name](const irept &n) -> bool
+  {
+    if(n.id() == ID_name)
+      return id2string(n.get(ID_identifier)) == short_name;
+    if(n.id() == ID_cpp_name && !n.get_sub().empty())
+    {
+      const auto &front = n.get_sub().front();
+      if(front.id() == ID_name)
+        return id2string(front.get(ID_identifier)) == short_name;
+    }
+    return false;
+  };
+
+  std::function<bool(const irept &)> contains_pack_ref;
+  contains_pack_ref = [&is_pack_ref, &contains_pack_ref](const irept &n) -> bool
+  {
+    if(is_pack_ref(n))
+      return true;
+    for(const auto &s : n.get_sub())
+      if(contains_pack_ref(s))
+        return true;
+    for(const auto &ns : n.get_named_sub())
+      if(contains_pack_ref(ns.second))
+        return true;
+    return false;
+  };
+
+  std::function<irept(const irept &, const exprt &)> substitute_arg;
+  substitute_arg = [&is_pack_ref, &substitute_arg, &short_name](
+                     const irept &n, const exprt &arg) -> irept
+  {
+    // N5008 [temp.variadic]/5: substitute the pack element INTO the
+    // pattern.  A QUALIFIED pack reference (`Ts::v` -- fold over a
+    // member of each pack element, e.g.
+    // `static inline int value = (Ts::v + ...)`) must keep its
+    // trailing components: replace only the leading name component
+    // with the element's struct tag identifier, which resolve_scope
+    // finds directly via id_map/symbol_table (same technique as the
+    // member-initializer pack substitution).  Wholesale replacement
+    // would turn `Ts::v` into just the type, leaving a
+    // type-inconsistent initializer that trips a symex invariant.
+    if(
+      n.id() == ID_cpp_name && n.get_sub().size() > 1 &&
+      n.get_sub().front().id() == ID_name &&
+      id2string(n.get_sub().front().get(ID_identifier)) == short_name &&
+      arg.id() == ID_type && arg.type().id() == ID_struct_tag)
+    {
+      irept result = n;
+      result.get_sub().front().set(
+        ID_identifier, to_struct_tag_type(arg.type()).get_identifier());
+      return result;
+    }
+    if(is_pack_ref(n))
+      return arg;
+    irept result = n;
+    for(auto &s : result.get_sub())
+      s = substitute_arg(s, arg);
+    // A pack reference in a TYPE position is a named sub-node: the
+    // `type_arg` of `sizeof(Ts)`, `type_arg1`/`type_arg2` of a builtin trait
+    // (`__is_same(T, Ts)`), the `type` of an `ambiguous` template argument
+    // (`W<Ts>`).  Substitute the element's TYPE there (an `ID_type`
+    // expression wrapper is the value-position form).
+    for(auto &ns : result.get_named_sub())
+    {
+      if(ns.first == ID_C_source_location)
+        continue;
+      if(is_pack_ref(ns.second) && arg.id() == ID_type)
+        ns.second = arg.type();
+      else
+        ns.second = substitute_arg(ns.second, arg);
+    }
+    return result;
+  };
+
+  std::function<void(irept &)> expand_folds;
+  expand_folds = [&](irept &node)
+  {
+    if(
+      (node.id() == irep_idt("cpp_right_fold") ||
+       node.id() == irep_idt("cpp_left_fold")) &&
+      !node.get_sub().empty() && contains_pack_ref(node.get_sub().front()))
+    {
+      const irep_idt fold_op = node.get(irep_idt("fold_op"));
+      const irept &pack_expr = node.get_sub().front();
+      bool is_left = (node.id() == irep_idt("cpp_left_fold"));
+
+      if(pack_args.empty())
+      {
+        if(fold_op == ID_and)
+          node = true_exprt();
+        else if(fold_op == ID_or)
+          node = false_exprt();
+        else
+          node = from_integer(0, signed_int_type());
+        return;
+      }
+
+      if(pack_args.size() == 1)
+      {
+        node = substitute_arg(pack_expr, pack_args[0]);
+        return;
+      }
+
+      if(is_left)
+      {
+        irept result = substitute_arg(pack_expr, pack_args[0]);
+        for(std::size_t i = 1; i < pack_args.size(); ++i)
+        {
+          irept bin(fold_op);
+          bin.get_sub().push_back(result);
+          bin.get_sub().push_back(substitute_arg(pack_expr, pack_args[i]));
+          result = bin;
+        }
+        node = result;
+      }
+      else
+      {
+        irept result =
+          substitute_arg(pack_expr, pack_args[pack_args.size() - 1]);
+        for(int i = static_cast<int>(pack_args.size()) - 2; i >= 0; --i)
+        {
+          irept bin(fold_op);
+          bin.get_sub().push_back(substitute_arg(pack_expr, pack_args[i]));
+          bin.get_sub().push_back(result);
+          result = bin;
+        }
+        node = result;
+      }
+      return;
+    }
+
+    // N5008 [expr.prim.fold]/2: binary folds.  Parser layout:
+    // sub[0] = the operand left of `op ...`, sub[1] = the operand right
+    // of `... op`.  `(init op ... op pack)` is a binary LEFT fold
+    // (((init op e0) op e1) ...); `(pack op ... op init)` is a binary
+    // RIGHT fold (e0 op (e1 op (... op init))).
+    if(node.id() == irep_idt("cpp_binary_fold") && node.get_sub().size() >= 2)
+    {
+      const irep_idt fold_op = node.get(irep_idt("fold_op"));
+      const bool pack_on_right = contains_pack_ref(node.get_sub()[1]);
+      const bool pack_on_left = contains_pack_ref(node.get_sub()[0]);
+      if(pack_on_left || pack_on_right)
+      {
+        irept init_expr = pack_on_right ? node.get_sub()[0] : node.get_sub()[1];
+        const irept pattern =
+          pack_on_right ? node.get_sub()[1] : node.get_sub()[0];
+        expand_folds(init_expr);
+        // [expr.prim.fold]/3: over an empty pack a binary fold yields
+        // its init operand.
+        irept result = init_expr;
+        if(pack_on_right)
+        {
+          for(std::size_t i = 0; i < pack_args.size(); ++i)
+          {
+            irept bin(fold_op);
+            bin.get_sub().push_back(result);
+            bin.get_sub().push_back(substitute_arg(pattern, pack_args[i]));
+            result = bin;
+          }
+        }
+        else
+        {
+          for(int i = static_cast<int>(pack_args.size()) - 1; i >= 0; --i)
+          {
+            irept bin(fold_op);
+            bin.get_sub().push_back(
+              substitute_arg(pattern, pack_args[std::size_t(i)]));
+            bin.get_sub().push_back(result);
+            result = bin;
+          }
+        }
+        node = result;
+        return;
+      }
+    }
+
+    for(auto &s : node.get_sub())
+      expand_folds(s);
+    for(auto &ns : node.get_named_sub())
+      expand_folds(ns.second);
+  };
+
+  expand_folds(node);
+}
+
 /// Create or find the symbol for a class template instantiation.
 ///
 /// Per [temp.inst]/1, class template specializations are implicitly
@@ -4858,180 +5059,8 @@ skip_pack_removal_ft:
         }
       }
 
-      auto is_pack_ref = [&short_name](const irept &n) -> bool
-      {
-        if(n.id() == ID_name)
-          return id2string(n.get(ID_identifier)) == short_name;
-        if(n.id() == ID_cpp_name && !n.get_sub().empty())
-        {
-          const auto &front = n.get_sub().front();
-          if(front.id() == ID_name)
-            return id2string(front.get(ID_identifier)) == short_name;
-        }
-        return false;
-      };
-
-      std::function<bool(const irept &)> contains_pack_ref;
-      contains_pack_ref = [&is_pack_ref,
-                           &contains_pack_ref](const irept &n) -> bool
-      {
-        if(is_pack_ref(n))
-          return true;
-        for(const auto &s : n.get_sub())
-          if(contains_pack_ref(s))
-            return true;
-        for(const auto &ns : n.get_named_sub())
-          if(contains_pack_ref(ns.second))
-            return true;
-        return false;
-      };
-
-      std::function<irept(const irept &, const exprt &)> substitute_arg;
-      substitute_arg = [&is_pack_ref, &substitute_arg, &short_name](
-                         const irept &n, const exprt &arg) -> irept
-      {
-        // N5008 [temp.variadic]/5: substitute the pack element INTO the
-        // pattern.  A QUALIFIED pack reference (`Ts::v` -- fold over a
-        // member of each pack element, e.g.
-        // `static inline int value = (Ts::v + ...)`) must keep its
-        // trailing components: replace only the leading name component
-        // with the element's struct tag identifier, which resolve_scope
-        // finds directly via id_map/symbol_table (same technique as the
-        // member-initializer pack substitution).  Wholesale replacement
-        // would turn `Ts::v` into just the type, leaving a
-        // type-inconsistent initializer that trips a symex invariant.
-        if(
-          n.id() == ID_cpp_name && n.get_sub().size() > 1 &&
-          n.get_sub().front().id() == ID_name &&
-          id2string(n.get_sub().front().get(ID_identifier)) == short_name &&
-          arg.id() == ID_type && arg.type().id() == ID_struct_tag)
-        {
-          irept result = n;
-          result.get_sub().front().set(
-            ID_identifier, to_struct_tag_type(arg.type()).get_identifier());
-          return result;
-        }
-        if(is_pack_ref(n))
-          return arg;
-        irept result = n;
-        for(auto &s : result.get_sub())
-          s = substitute_arg(s, arg);
-        return result;
-      };
-
-      std::function<void(irept &)> expand_folds;
-      expand_folds = [&](irept &node)
-      {
-        if(
-          (node.id() == irep_idt("cpp_right_fold") ||
-           node.id() == irep_idt("cpp_left_fold")) &&
-          !node.get_sub().empty() && contains_pack_ref(node.get_sub().front()))
-        {
-          const irep_idt fold_op = node.get(irep_idt("fold_op"));
-          const irept &pack_expr = node.get_sub().front();
-          bool is_left = (node.id() == irep_idt("cpp_left_fold"));
-
-          if(pack_args.empty())
-          {
-            if(fold_op == ID_and)
-              node = true_exprt();
-            else if(fold_op == ID_or)
-              node = false_exprt();
-            else
-              node = from_integer(0, signed_int_type());
-            return;
-          }
-
-          if(pack_args.size() == 1)
-          {
-            node = substitute_arg(pack_expr, pack_args[0]);
-            return;
-          }
-
-          if(is_left)
-          {
-            irept result = substitute_arg(pack_expr, pack_args[0]);
-            for(std::size_t i = 1; i < pack_args.size(); ++i)
-            {
-              irept bin(fold_op);
-              bin.get_sub().push_back(result);
-              bin.get_sub().push_back(substitute_arg(pack_expr, pack_args[i]));
-              result = bin;
-            }
-            node = result;
-          }
-          else
-          {
-            irept result =
-              substitute_arg(pack_expr, pack_args[pack_args.size() - 1]);
-            for(int i = static_cast<int>(pack_args.size()) - 2; i >= 0; --i)
-            {
-              irept bin(fold_op);
-              bin.get_sub().push_back(substitute_arg(pack_expr, pack_args[i]));
-              bin.get_sub().push_back(result);
-              result = bin;
-            }
-            node = result;
-          }
-          return;
-        }
-
-        // N5008 [expr.prim.fold]/2: binary folds.  Parser layout:
-        // sub[0] = the operand left of `op ...`, sub[1] = the operand right
-        // of `... op`.  `(init op ... op pack)` is a binary LEFT fold
-        // (((init op e0) op e1) ...); `(pack op ... op init)` is a binary
-        // RIGHT fold (e0 op (e1 op (... op init))).
-        if(
-          node.id() == irep_idt("cpp_binary_fold") &&
-          node.get_sub().size() >= 2)
-        {
-          const irep_idt fold_op = node.get(irep_idt("fold_op"));
-          const bool pack_on_right = contains_pack_ref(node.get_sub()[1]);
-          const bool pack_on_left = contains_pack_ref(node.get_sub()[0]);
-          if(pack_on_left || pack_on_right)
-          {
-            irept init_expr =
-              pack_on_right ? node.get_sub()[0] : node.get_sub()[1];
-            const irept pattern =
-              pack_on_right ? node.get_sub()[1] : node.get_sub()[0];
-            expand_folds(init_expr);
-            // [expr.prim.fold]/3: over an empty pack a binary fold yields
-            // its init operand.
-            irept result = init_expr;
-            if(pack_on_right)
-            {
-              for(std::size_t i = 0; i < pack_args.size(); ++i)
-              {
-                irept bin(fold_op);
-                bin.get_sub().push_back(result);
-                bin.get_sub().push_back(substitute_arg(pattern, pack_args[i]));
-                result = bin;
-              }
-            }
-            else
-            {
-              for(int i = static_cast<int>(pack_args.size()) - 1; i >= 0; --i)
-              {
-                irept bin(fold_op);
-                bin.get_sub().push_back(
-                  substitute_arg(pattern, pack_args[std::size_t(i)]));
-                bin.get_sub().push_back(result);
-                result = bin;
-              }
-            }
-            node = result;
-            return;
-          }
-        }
-
-        for(auto &s : node.get_sub())
-          expand_folds(s);
-        for(auto &ns : node.get_named_sub())
-          expand_folds(ns.second);
-      };
-
-      irept &body = new_decl.type().add(ID_body);
-      expand_folds(body);
+      expand_folds_over_pack(
+        new_decl.type().add(ID_body), short_name, pack_args);
     }
 
     // Expand variadic base classes: Bases... → Base0, Base1, ...
@@ -7441,6 +7470,61 @@ skip_pack_removal_ft:
       bind_requires_params(init);
       init.visit_pre(bind_requires_params);
 
+      // N5008 [expr.prim.fold]/1-2: expand a fold over this variable
+      // template's parameter pack in the initializer
+      // (`constexpr bool has_v = (__is_same(T, Ts) || ...)`), as for a
+      // function template's body; left in place, the fold node degraded to
+      // `true` in the C type-checker's residual-fold fallback.
+      {
+        const auto &vt_params = template_type.template_parameters();
+        std::size_t vt_pack_index = vt_params.size();
+        for(std::size_t i = 0; i < vt_params.size(); ++i)
+        {
+          if(vt_params[i].get_bool(ID_ellipsis))
+          {
+            vt_pack_index = i;
+            break;
+          }
+        }
+        if(vt_pack_index < vt_params.size())
+        {
+          const auto &pack_param = vt_params[vt_pack_index];
+          const irep_idt pack_id = pack_param.id() == ID_type
+                                     ? pack_param.type().get(ID_identifier)
+                                     : pack_param.get(ID_identifier);
+          std::vector<exprt> vt_pack_args;
+          const auto pa_it = template_map.pack_args_map.find(pack_id);
+          const auto pe_it = template_map.pack_expr_map.find(pack_id);
+          if(pa_it != template_map.pack_args_map.end())
+          {
+            for(const auto &t : pa_it->second)
+              vt_pack_args.push_back(exprt(ID_type, t));
+          }
+          else if(pe_it != template_map.pack_expr_map.end())
+            vt_pack_args = pe_it->second;
+          else
+          {
+            // positional: the pack takes the trailing run of the flat list
+            const std::size_t non_pack = vt_params.size() - 1;
+            const auto &fargs = full_template_args.arguments();
+            for(std::size_t j = vt_pack_index;
+                j < fargs.size() && j < fargs.size() - non_pack + vt_pack_index;
+                ++j)
+            {
+              if(fargs[j].id() == ID_type && fargs[j].type().id() == ID_empty)
+                continue; // empty-pack sentinel
+              vt_pack_args.push_back(fargs[j]);
+            }
+          }
+          const std::string pack_str = id2string(pack_id);
+          const auto pos = pack_str.rfind("::");
+          expand_folds_over_pack(
+            init,
+            pos != std::string::npos ? pack_str.substr(pos + 2) : pack_str,
+            vt_pack_args);
+        }
+      }
+
       bool old_suppress = suppress_elaborate;
       suppress_elaborate = false;
       convert_non_template_declaration(new_decl);
@@ -8623,6 +8707,27 @@ skip_pack_removal_ft:
         };
         expand_pack(func_decl.value());
       }
+    }
+    else if(pack_idx < 0 && pack_sz >= 2 && func_decl.value().is_not_nil())
+    {
+      // N5008 [expr.prim.fold]/1-2: a fold over the TEMPLATE parameter pack
+      // of a function template WITHOUT a function parameter pack --
+      // `(sizeof(Ts) + ...)`, `(__is_same(T, Ts) || ...)` -- is expanded
+      // by the fold expander above only through the function parameter
+      // pack's names; with none the fold node survived into the body and
+      // the C type-checker's residual-fold fallback degraded it to `true`.
+      // Expand against the template pack's elements, as for a class
+      // template's body.
+      const auto &pack_param = all_template_params[template_pack_index];
+      const irep_idt pack_id = pack_param.id() == ID_type
+                                 ? pack_param.type().get(ID_identifier)
+                                 : pack_param.get(ID_identifier);
+      const std::string pack_str = id2string(pack_id);
+      const auto pos = pack_str.rfind("::");
+      expand_folds_over_pack(
+        func_decl.value(),
+        pos != std::string::npos ? pack_str.substr(pos + 2) : pack_str,
+        pack_arguments);
     }
   }
 
