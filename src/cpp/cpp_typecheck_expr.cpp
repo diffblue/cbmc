@@ -37,6 +37,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <functional>
 
+// cpp_instantiate_template.cpp
+extern exprt try_evaluate_constexpr(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns);
+
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,
   const irep_idt &base_name,
@@ -6219,7 +6225,25 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       // for already-resolved methods that just happen to lack a code
       // type on their `value`.
       bool needs_eager_convert = false;
+      // N5008 [temp.inst]/5, [expr.const]: a NON-member constexpr function
+      // (template specialization) whose definition still sits in the deferred
+      // queue -- first referenced by a run-time call, now needed as a constant
+      // (`constexpr auto c = wrap<double>()` after `wrap<double>()` in a
+      // plain expression) -- is converted under the queue entry's recorded
+      // template map.  Folding the PARSED body here instead substituted
+      // `inner<T>()` into the caller's scope, where `T` is unbound ("found no
+      // match for symbol 'inner'").
       if(
+        args_are_constant_pre &&
+        symbol_ptr->type.get(ID_C_member_name).empty() &&
+        symbol_ptr->value.type().id() != ID_code &&
+        convert_deferred_method_now(sym_expr->get_identifier()))
+      {
+        symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
+        eligible_constexpr =
+          symbol_ptr != nullptr && symbol_ptr->value.type().id() == ID_code;
+      }
+      else if(
         args_are_constant_pre &&
         !symbol_ptr->type.get(ID_C_member_name).empty() &&
         symbol_ptr->value.type().id() != ID_code)
@@ -6882,6 +6906,22 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           // Unsupported statement type.
           // Fall back to treating as a regular function call.
           can_evaluate = false;
+        }
+      }
+
+      // The statement-level substitution above handles straight-line
+      // bodies; a body with a loop over a local array (libstdc++'s
+      // __find_uniq_type_in_pack, std::variant's alternative lookup) needs
+      // the interpreting evaluator ([expr.const]/5: a constant expression
+      // may execute a constexpr function's loops).  Try it before giving up.
+      if(!can_evaluate && args_are_constant)
+      {
+        exprt r = try_evaluate_constexpr(expr, symbol_table, *this);
+        if(r.is_not_nil())
+        {
+          r.add_source_location() = expr.source_location();
+          expr.swap(r);
+          return;
         }
       }
 

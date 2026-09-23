@@ -1943,11 +1943,19 @@ bool cpp_typecheckt::convert_deferred_method_now(const irep_idt &identifier)
   if(functions_being_typechecked.count(identifier) != 0)
     return false;
 
-  // find the queued entry (lazy map first, then the drain queue)
+  // find the queued entry (lazy map first, then the drain queue); a queued
+  // symbol still carries its PARSED body (value.id() == ID_code without a
+  // code type), a converted one a body typed with its code type
   std::optional<method_bodyt> entry;
   auto d_it = deferred_method_bodies.find(identifier);
   if(d_it != deferred_method_bodies.end())
   {
+    if(
+      d_it->second.method_symbol == nullptr ||
+      d_it->second.method_symbol->value.type().id() == ID_code)
+    {
+      return false;
+    }
     entry = std::move(d_it->second);
     deferred_method_bodies.erase(d_it);
   }
@@ -1957,6 +1965,12 @@ bool cpp_typecheckt::convert_deferred_method_now(const irep_idt &identifier)
     {
       if(it->method_symbol->name == identifier)
       {
+        if(
+          it->method_symbol == nullptr ||
+          it->method_symbol->value.type().id() == ID_code)
+        {
+          return false;
+        }
         entry = std::move(*it);
         method_bodies.erase(it);
         break;
@@ -1967,28 +1981,44 @@ bool cpp_typecheckt::convert_deferred_method_now(const irep_idt &identifier)
     return false;
 
   symbolt *method_symbol = entry->method_symbol;
-  if(method_symbol == nullptr || method_symbol->value.is_not_nil())
-    return false;
 
-  // Convert under the entry's recorded template map, exactly as the
-  // deferred drain would ([temp.inst]/5: the specialization's definition
-  // is instantiated because its existence affects the semantics -- here,
-  // a constant expression needs its value).  Failure restores the no-body
-  // state; the enclosing evaluation treats it as non-constant.
-  cpp_saved_template_mapt saved_map(template_map);
-  template_map = entry->template_map;
-  const std::size_t errors_before =
-    get_message_handler().get_message_count(messaget::M_ERROR);
-  try
+  // Convert under the entry's recorded template map and instantiation
+  // stack, exactly as the deferred drain would ([temp.inst]/5: the
+  // specialization's definition is instantiated because its existence
+  // affects the semantics -- here, a constant expression needs its value).
+  // On failure the parsed body is restored and the entry re-queued, so the
+  // drain converts (and diagnoses) it as if this attempt had not happened;
+  // the enclosing evaluation treats the call as non-constant.
+  const exprt saved_body = method_symbol->value;
+  bool converted = false;
   {
-    convert_function(*method_symbol);
+    cpp_saved_template_mapt saved_map(template_map);
+    template_map = entry->template_map;
+    instantiation_stack.swap(entry->instantiation_stack);
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    const unsigned saved_verbosity = get_message_handler().get_verbosity();
+    get_message_handler().set_verbosity(0);
+    try
+    {
+      prepare_deferred_method_body(*method_symbol);
+      if(method_symbol->value.is_not_nil())
+        convert_function(*method_symbol);
+      converted = method_symbol->value.type().id() == ID_code;
+    }
+    catch(...)
+    {
+    }
+    get_message_handler().set_verbosity(saved_verbosity);
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    instantiation_stack.swap(entry->instantiation_stack);
   }
-  catch(...)
+  if(!converted)
   {
-    method_symbol->value.make_nil();
+    method_symbol->value = saved_body;
+    method_bodies.push_back(std::move(*entry));
   }
-  get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
-  return method_symbol->value.is_not_nil();
+  return converted;
 }
 
 /// Move every held-back speculative body that some converted body (or
