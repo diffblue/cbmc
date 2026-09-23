@@ -64,6 +64,31 @@ symbolt &cpp_declarator_convertert::convert(
   final_type = declarator.merge_type(declaration_type);
   CHECK_RETURN(final_type.is_not_nil());
 
+  // N5008 [dcl.fct]/6-7: the cv-qualifier-seq after a parameter list is part
+  // of the FUNCTION type.  For a member function declarator it qualifies the
+  // implicit object parameter through add_this_to_method_type below; when
+  // the declarator declares something ELSE whose type contains a function
+  // type -- `typedef int (S::*TPMF)(int) const;`, a pointer-to-member
+  // variable or parameter -- rDeclarator has still reported the qualifier
+  // separately, and it must reach the pointed-to function type (as
+  // Parser::rTypeName does for a type-id, `using PMF = int (S::*)(int)
+  // const;`), where typecheck_type turns it into the cv of `this`.
+  if(
+    !declarator.method_qualifier().id().empty() && final_type.id() != ID_code &&
+    final_type.id() != ID_function_type)
+  {
+    irept *t = &final_type;
+    while(t->id() != ID_function_type && t->id() != ID_code &&
+          !t->get_sub().empty())
+      t = &t->get_sub().front();
+    if(
+      (t->id() == ID_function_type || t->id() == ID_code) &&
+      t->find(ID_method_qualifier).is_nil())
+    {
+      t->add(ID_method_qualifier) = declarator.method_qualifier();
+    }
+  }
+
   cpp_storage_spect final_storage_spec = storage_spec;
   final_storage_spec |= cpp_storage_spect(final_type);
 
