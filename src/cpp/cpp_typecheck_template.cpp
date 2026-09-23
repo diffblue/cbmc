@@ -3646,9 +3646,18 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         }
         else
         {
-          error().source_location = arg.source_location();
-          error() << "expected expression, but got type" << eom;
-          throw 0;
+          // [temp.arg]/2 + [temp.deduct]/8: a TYPE supplied for a non-type
+          // parameter -- `std::get<double>(v)` also considered against the
+          // by-index `get<size_t N>(variant<T...>&)` overload -- is a kind
+          // mismatch that removes just that candidate while matching (the
+          // mirror of the value-for-type case above); a hard error
+          // otherwise.
+          if(template_arg_candidate_matching == 0)
+          {
+            error().source_location = arg.source_location();
+            error() << "expected expression, but got type" << eom;
+          }
+          throw template_arg_kind_mismatch_exceptiont{};
         }
       }
       // Simplify comma expressions: (expr1, expr2) -> expr2
