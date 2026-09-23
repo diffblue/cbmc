@@ -444,3 +444,10 @@ Assessment:
    (identity keying) to small (condition 3).  They are deliberately not done in
    this round.  Rule for new code: never *parse* a suffix back into arguments;
    read the `#fn_template_*` records instead.
+4. Corollary, learned the same day (round 158 part 6): because identifiers
+   *are* parsed downstream (scope-prefix splitting, `tag-` insertion, the
+   signature suffix of function templates), anything appended to an
+   identifier must stay flat -- no `(`, `:`, `=` or `<` that the parsers
+   could mistake for structure.  The constraint-dependent part of a
+   specialization identifier is therefore a hash of the constraint's
+   canonical rendering, not the rendering itself.
