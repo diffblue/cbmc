@@ -5356,6 +5356,115 @@ skip_pack_removal_ft:
         }
       }
       bases_sub = expanded_bases;
+
+      // N5008 [temp.variadic]/5.4 + [namespace.udecl]/1: a using-declarator
+      // pack expansion in the class body (`using _Build_FUN<_Ind, _Tp,
+      // _Ti>::_S_fun...;`, libstdc++'s std::variant overload-set builder)
+      // expands to one using-declaration per element, every referenced pack
+      // substituted in lockstep -- exactly like the base-specifier
+      // expansion above.  Left unexpanded, the single declaration named the
+      // FIRST base's overload only.
+      irept::subt &body_sub = new_decl.type().add(ID_body).get_sub();
+      irept::subt expanded_body;
+      bool body_changed = false;
+      for(auto &item : body_sub)
+      {
+        if(item.id() != ID_cpp_using || !item.get_bool(ID_ellipsis))
+        {
+          expanded_body.push_back(item);
+          continue;
+        }
+        std::vector<std::string> used_pack_shorts;
+        std::function<bool(const irept &, const std::string &)> refs_name =
+          [&](const irept &n, const std::string &nm) -> bool
+        {
+          if(n.id() == ID_name && id2string(n.get(ID_identifier)) == nm)
+            return true;
+          for(const auto &c : n.get_sub())
+            if(refs_name(c, nm))
+              return true;
+          for(const auto &c : n.get_named_sub())
+            if(refs_name(c.second, nm))
+              return true;
+          return false;
+        };
+        for(const auto &pe : pack_type_elems)
+          if(refs_name(item.find(ID_name), pe.first))
+            used_pack_shorts.push_back(pe.first);
+        for(const auto &pe : pack_expr_elems)
+          if(refs_name(item.find(ID_name), pe.first))
+            used_pack_shorts.push_back(pe.first);
+        if(used_pack_shorts.empty())
+        {
+          expanded_body.push_back(item);
+          continue;
+        }
+        const std::size_t n_elems =
+          pack_type_elems.count(used_pack_shorts.front())
+            ? pack_type_elems[used_pack_shorts.front()].size()
+            : pack_expr_elems[used_pack_shorts.front()].size();
+        bool lockstep_ok = true;
+        for(const auto &ps : used_pack_shorts)
+        {
+          const std::size_t len = pack_type_elems.count(ps)
+                                    ? pack_type_elems[ps].size()
+                                    : pack_expr_elems[ps].size();
+          if(len != n_elems)
+            lockstep_ok = false;
+        }
+        if(!lockstep_ok)
+        {
+          expanded_body.push_back(item);
+          continue;
+        }
+        body_changed = true;
+        for(std::size_t elem_i = 0; elem_i < n_elems; ++elem_i)
+        {
+          irept new_item = item;
+          new_item.remove(ID_ellipsis);
+          std::function<void(irept &)> subst = [&](irept &n)
+          {
+            for(auto &c : n.get_sub())
+            {
+              if(c.id() == ID_cpp_name || c.id() == ID_ambiguous)
+              {
+                const irept &inner =
+                  c.id() == ID_ambiguous ? c.find(ID_type) : c;
+                if(
+                  inner.id() == ID_cpp_name && inner.get_sub().size() == 1 &&
+                  inner.get_sub().front().id() == ID_name)
+                {
+                  const std::string nm =
+                    id2string(inner.get_sub().front().get(ID_identifier));
+                  if(
+                    std::find(
+                      used_pack_shorts.begin(), used_pack_shorts.end(), nm) !=
+                    used_pack_shorts.end())
+                  {
+                    exprt elem_arg;
+                    if(pack_type_elems.count(nm))
+                    {
+                      elem_arg = exprt(ID_type);
+                      elem_arg.type() = pack_type_elems[nm][elem_i];
+                    }
+                    else
+                      elem_arg = pack_expr_elems[nm][elem_i];
+                    c = elem_arg;
+                    continue;
+                  }
+                }
+              }
+              subst(c);
+            }
+            for(auto &c : n.get_named_sub())
+              subst(c.second);
+          };
+          subst(new_item);
+          expanded_body.push_back(new_item);
+        }
+      }
+      if(body_changed)
+        body_sub = expanded_body;
     }
 
     // Also apply template map to declarator types (function parameters)

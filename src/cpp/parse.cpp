@@ -1238,9 +1238,14 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
   if(!rName(cpp_using.name()))
     return false;
 
-  // C++17: pack expansion in using-declarations
+  // N5008 [namespace.udecl]/1: `using B<I, T>::f...;` -- a pack expansion
+  // over a using-declarator; recorded for the class-template instantiation
+  // to expand ([temp.variadic]/5.4)
   if(lex.LookAhead(0) == TOK_ELLIPSIS)
+  {
     lex.get_token(tk);
+    cpp_using.set(ID_ellipsis, true);
+  }
 
   // We will eventually need to record this attribute as Clang's
   // __using_if_exists__ affects type checking.
