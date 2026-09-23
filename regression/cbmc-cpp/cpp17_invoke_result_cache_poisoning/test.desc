@@ -1,11 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp17
+--cpp17 --function adjust_float_expressions --unwind 2 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
 --
 found no match for symbol 'transform'
+^CONVERSION ERROR$
 --
+CORE since 2026-09-23: the interaction no longer reproduces (the second
+__invoke_result use resolves; the file has no main, so the translation unit is
+checked through --function adjust_float_expressions).
 libstdc++-13's __invoke_result/_S_test machinery instantiated TWICE:
 first through __umap_hashtable's default template argument
 (__cache_default -> __is_nothrow_invocable<hash,int>, at a global
