@@ -1538,41 +1538,66 @@ std::string cpp_typecheckt::class_template_identifier(
     identifier += '>';
   }
 
-  // C++20: include requires clause in the identifier so that
-  // constrained specializations with the same argument pattern
-  // get distinct symbols.
+  // N5008 [temp.spec.partial.general]/1 + [temp.constr.decl]: partial
+  // specializations with the same argument pattern but different
+  // requires-clauses are distinct (libstdc++'s three
+  // `__iter_concept_impl<_Iter>` specializations differ only in their
+  // constraints).  Render the whole constraint-expression -- including
+  // negations and the requirements' TYPE operands, which live in named
+  // sub-nodes -- into the identifier, so that no two constraints collide.
   {
     const auto &req_expr = template_type.find(ID_C_requires_clause);
     if(req_expr.is_not_nil() && req_expr.id() != ID_nil)
     {
-      std::string concepts;
-      std::function<void(const irept &)> visit = [&](const irept &node)
+      // The rendering must be stable across the constraint's life: its
+      // expression is type-checked in place when the constraint is
+      // evaluated (names become symbols and constants), and the identifier
+      // is recomputed at every redeclaration lookup.  Render the tree's
+      // node ids and identifiers only -- the structure, the operators and
+      // the names -- never types or values.
+      std::string rendering;
+      std::function<void(const irept &)> render = [&](const irept &node)
       {
-        // Collect type-predicate expression IDs (e.g., __is_pointer)
-        // which are stored as the node id, not as ID_name sub-nodes.
-        const std::string &nid = id2string(node.id());
-        if(nid.find("__is_") == 0 || nid.find("__has_") == 0)
-        {
-          if(!concepts.empty())
-            concepts += "&&";
-          concepts += nid;
-        }
-        if(node.id() == ID_name)
-        {
-          const irep_idt &nm = node.get(ID_identifier);
-          if(!nm.empty())
-          {
-            if(!concepts.empty())
-              concepts += "&&";
-            concepts += id2string(nm);
-          }
-        }
+        rendering += id2string(node.id());
+        const irep_idt &nm = node.get(ID_identifier);
+        if(!nm.empty())
+          rendering += "=" + id2string(nm);
+        rendering += '(';
         for(const auto &sub : node.get_sub())
-          visit(sub);
+        {
+          render(sub);
+          rendering += ',';
+        }
+        for(const auto &ns : node.get_named_sub())
+        {
+          const std::string key = id2string(ns.first);
+          if(key.empty() || key[0] == '#' || ns.first == ID_type)
+            continue;
+          rendering += key + ':';
+          render(ns.second);
+          rendering += ',';
+        }
+        rendering += ')';
       };
-      visit(req_expr);
-      if(!concepts.empty())
-        identifier += "#req_" + concepts;
+      render(req_expr);
+      // Identifiers are parsed downstream (scope prefixes, `tag-` insertion,
+      // signature suffixes); keep the structural rendering out of them and
+      // append its hash, prefixed by the constraint's leading names for
+      // readability.
+      std::string names;
+      std::function<void(const irept &)> leading_names = [&](const irept &n)
+      {
+        if(names.size() > 60)
+          return;
+        const irep_idt &nm = n.get(ID_identifier);
+        if(n.id() == ID_name && !nm.empty())
+          names += (names.empty() ? "" : "&&") + id2string(nm);
+        for(const auto &sub : n.get_sub())
+          leading_names(sub);
+      };
+      leading_names(req_expr);
+      identifier += "#req_" + names + "_" +
+                    std::to_string(std::hash<std::string>{}(rendering));
     }
     // Also check constraint count string for type-trait-based requires
     const irep_idt &req_str = template_type.get(ID_C_requires_clause);
