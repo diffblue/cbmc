@@ -54,10 +54,21 @@ public:
 
   virtual ~symbol_table_baset();
 
+protected:
+  /// Per-prefix "next search-start" hint consulted by
+  /// `next_unused_suffix(prefix)`.  Mutable so the hint can be updated
+  /// through the const read API.  See that function's docstring for
+  /// semantics.  Because this is mutated from a const method,
+  /// `symbol_table_baset` is not thread-safe: concurrent calls require
+  /// external synchronisation.
+  mutable std::unordered_map<std::string, std::size_t> suffix_hint_cache;
+
+public:
   /// Find smallest unused integer i so that prefix + std::to_string(i)
-  /// does not exist in the list \p symbols.
+  /// does not exist in the list \p symbols, starting the search at
+  /// \p start_number.
   /// \param prefix: A string denoting the prefix we want to find the
-  ///   smallest suffix of.
+  ///   smallest unused suffix of.
   /// \param start_number: The starting suffix number to search from.
   /// \return The small unused suffix size.
   std::size_t
@@ -70,9 +81,34 @@ public:
     return start_number;
   }
 
+  /// Find an unused integer i so that prefix + std::to_string(i) does
+  /// not exist in the list \p symbols.
+  ///
+  /// Uses a per-prefix hint cache so that repeated allocation of names
+  /// sharing the same prefix is amortised O(1) per call rather than
+  /// O(N) where N is the number of already-allocated symbols under
+  /// that prefix.  The object factory (see
+  /// `symbol_factoryt::gen_nondet_init` for a \c struct field expansion
+  /// of a deep kernel struct) can otherwise call this function
+  /// O(N) times with a linear scan each, producing O(N^2) behaviour
+  /// that manifests as a goto-instrument hang on large goto binaries.
+  ///
+  /// The returned suffix is guaranteed to be unused, but is no longer
+  /// guaranteed to be the strictly smallest such value: if a prior
+  /// symbol with a lower suffix has been erased from the table since
+  /// the hint was last updated, this function will not re-discover
+  /// that gap.  No caller in-tree today relies on the "smallest"
+  /// property (callers only need uniqueness); the derived
+  /// `symbol_table_builder` has already had this semantics since
+  /// its introduction and remains correct under this change.
   virtual std::size_t next_unused_suffix(const std::string &prefix) const
   {
-    return next_unused_suffix(prefix, 0);
+    // try_emplace only constructs the node (copying the key) when an insertion
+    // actually happens; on the common cache-hit path nothing is copied.
+    auto it = suffix_hint_cache.try_emplace(prefix, 0).first;
+    const std::size_t free_suffix = next_unused_suffix(prefix, it->second);
+    it->second = free_suffix + 1;
+    return free_suffix;
   }
 
   /// Permits implicit cast to const symbol_tablet &

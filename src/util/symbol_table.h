@@ -103,6 +103,7 @@ public:
     internal_symbols.clear();
     internal_symbol_base_map.clear();
     internal_symbol_module_map.clear();
+    suffix_hint_cache.clear();
   }
 
   virtual iteratort begin() override

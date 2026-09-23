@@ -8,13 +8,14 @@
 
 #include "symbol_table_base.h"
 
-/// Wrapper around a symbol table that keeps track of suffixes for faster
-/// calculation of the smallest unused suffix.
+/// Wrapper around a symbol table. The fast next-unused-suffix computation
+/// (a per-prefix hint cache) is inherited from \ref symbol_table_baset; this
+/// wrapper only forwards mutating operations to the wrapped table and resets
+/// that cache on clear().
 class symbol_table_buildert : public symbol_table_baset
 {
 private:
   symbol_table_baset &base_symbol_table;
-  mutable std::map<std::string, std::size_t> next_free_suffix_for_prefix;
 
 public:
   explicit symbol_table_buildert(symbol_table_baset &base_symbol_table)
@@ -57,7 +58,7 @@ public:
   void clear() override
   {
     base_symbol_table.clear();
-    next_free_suffix_for_prefix.clear();
+    suffix_hint_cache.clear();
   }
 
   bool move(symbolt &symbol, symbolt *&new_symbol) override
@@ -92,27 +93,6 @@ public:
     const validation_modet vm = validation_modet::INVARIANT) const override
   {
     base_symbol_table.validate(vm);
-  }
-
-  /// Try to find the next free identity for the passed-in prefix in
-  /// this symbol table.
-  /// \remark
-  ///     This method needs to generate names deterministically in regards
-  ///     to operations that generate the same prefix (and any other operation
-  ///     shouldn't affect this).
-  ///
-  ///     Due to this requirement we don't do anything fancy in regards to
-  ///     attempting to find the absolute earliest free suffix if one has been
-  ///     deleted, only the next free increment from our last stored value.
-  std::size_t next_unused_suffix(const std::string &prefix) const override
-  {
-    // Check if we have an entry for this particular suffix, if not,
-    // create baseline.
-    auto suffix_iter = next_free_suffix_for_prefix.insert({prefix, 0}).first;
-    std::size_t free_suffix =
-      base_symbol_table.next_unused_suffix(prefix, suffix_iter->second);
-    suffix_iter->second = free_suffix + 1;
-    return free_suffix;
   }
 };
 
