@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -16,17 +16,17 @@ requires-expressions ([expr.prim.req.general]/2).  Includes the negative case
 (a non-incrementable type is not an iterator).  See
 doc/architectural/cpp-requires-expression-support.md.
 
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.
-
-2026-09-23: the test source's `p <=> o.p` had been reformatted to `p <= >
-o.p` (rejected by g++ too; now guarded by clang-format off/on).
-input_or_output_iterator<It> holds since the requires-parameter binding
-fixes (a function template's parameters leaked into namespace std as a
-secondary lookup scope; `__i` resolved ambiguously).  Remaining layers:
-common_reference_with<int&, int&&> (see
-cpp20_common_reference_with_cv_differing_references) and
-__detail::__iter_concept<It> (the __iter_concept_impl partial
-specializations), so input_iterator<It> still fails: "static assertion
-failed: It input".
+Was KNOWNBUG since round 152 (main() partially type-checked).  Fixed
+2026-09-23 in layers: requirement-parameter binding (a function template's
+parameters leaked into namespace std as a secondary lookup scope);
+common_reference over differing references (conditional operator
+cv/value-category rules, a private member typedef as nested-name-specifier,
+[temp.deduct.type]/5.1 non-deduced contexts during partial-specialization
+matching, inherited-member lookup after on-demand completion);
+same-pattern constrained partial specializations kept distinct
+(__iter_concept_impl); is_base_of over indirect bases (the iterator tag
+hierarchy); and cv-unqualified pointer-arithmetic prvalues
+(`{ __j + __n } -> same_as<_Iter>`).  The source's `p <=> o.p` had been
+reformatted to `p <= > o.p`; it is guarded by clang-format off/on now.
+contiguous_iterator<int*> holds too once __is_base_of completes its Derived
+operand (ITER_TRAITS(int*) selected the wrong __iter_traits_impl before).
