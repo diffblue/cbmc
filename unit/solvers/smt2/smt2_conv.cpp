@@ -115,6 +115,70 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
   }
 }
 
+TEST_CASE("smt2_convt array index typecast", "[core][solvers][smt2]")
+{
+  // The array store/select index is only typecast to the array's declared
+  // index type when that index type is a fixed-width bitvector and differs
+  // from the index expression's type.  Mathematical-integer (and struct /
+  // map-key) index sorts are emitted unchanged; differing-width bitvector
+  // indices are coerced.
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u32{32};
+
+  SECTION("mathematical-integer index is emitted without a typecast")
+  {
+    array_typet array_type{u8, from_integer(10, size_type())};
+    array_type.index_type_nonconst() = integer_typet();
+    const symbol_exprt a{"a", array_type};
+    const symbol_exprt i{"i", integer_typet()};
+
+    // select
+    REQUIRE(
+      get_assert(equal_exprt{index_exprt{a, i}, from_integer(0, u8)}) ==
+      "(assert (= (select a i) (_ bv0 8)))");
+
+    // store
+    const with_exprt store{a, i, from_integer(0, u8)};
+    REQUIRE(
+      get_assert(equal_exprt{store, a}) ==
+      "(assert (= (store a i (_ bv0 8)) a))");
+  }
+
+  SECTION("matching-width bitvector index is emitted without a typecast")
+  {
+    array_typet array_type{u8, from_integer(10, u32)};
+    array_type.index_type_nonconst() = u32;
+    const symbol_exprt a{"a", array_type};
+    const symbol_exprt i{"i", u32};
+
+    REQUIRE(
+      get_assert(equal_exprt{index_exprt{a, i}, from_integer(0, u8)}) ==
+      "(assert (= (select a i) (_ bv0 8)))");
+  }
+
+  SECTION("differing-width bitvector index is coerced to the array index type")
+  {
+    array_typet array_type{u8, from_integer(10, u32)};
+    array_type.index_type_nonconst() = u32;
+    const symbol_exprt a{"a", array_type};
+    const symbol_exprt i{"i", u8}; // narrower than the u32 array index type
+
+    // select: i must be widened to 32 bits before indexing
+    const std::string select_assert =
+      get_assert(equal_exprt{index_exprt{a, i}, from_integer(0, u8)});
+    INFO("select: " << select_assert);
+    REQUIRE(select_assert.find("(select a i)") == std::string::npos);
+    REQUIRE(select_assert.find("(select a ((_ ") != std::string::npos);
+
+    // store: likewise
+    const with_exprt store{a, i, from_integer(0, u8)};
+    const std::string store_assert = get_assert(equal_exprt{store, a});
+    INFO("store: " << store_assert);
+    REQUIRE(store_assert.find("(store a i ") == std::string::npos);
+    REQUIRE(store_assert.find("(store a ((_ ") != std::string::npos);
+  }
+}
+
 TEST_CASE(
   "smt2_convt no unary concat for zero-width operand",
   "[core][solvers][smt2]")
