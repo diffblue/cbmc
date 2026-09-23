@@ -308,10 +308,14 @@ protected:
     const template_typet &template_type,
     const typet &function_type);
 
+  /// \param explicit_only: when true, type-check the given (explicit)
+  ///   arguments only; do not append the template's default arguments for
+  ///   the remaining parameters
   cpp_template_args_tct typecheck_template_args(
     const source_locationt &source_location,
     const symbolt &template_symbol,
-    const cpp_template_args_non_tct &template_args);
+    const cpp_template_args_non_tct &template_args,
+    bool explicit_only = false);
 
   // template instantiations
   class instantiationt
