@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
@@ -15,6 +15,9 @@ incomplete primary.  Fixed by trimming the empty deduced trailing pack before th
 pattern re-type-check.  Non-vacuous: the two-element assertion is the former
 failure point.
 
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: (no diagnostic before the drop)
+Was KNOWNBUG since round 152 (main() partially type-checked): the three-
+and four-element cases failed because the partial specialization matching
+in disambiguate_template_classes recorded a NON-type trailing pack as an
+EMPTY type pack (pack_elems collected ID_type arguments only), so
+`sum_t<1, 2, 3>` was instantiated with T = {} and had no `v`.  Fixed 2026-09-23:
+the values go to pack_expr_map ([temp.deduct.type]/9-10).
