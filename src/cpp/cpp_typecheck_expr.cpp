@@ -8000,6 +8000,22 @@ void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
   add_implicit_dereference(to_binary_expr(expr).op1());
 
   c_typecheck_baset::typecheck_expr_binary_arithmetic(expr);
+
+  // N5008 [expr.type]/2: a prvalue of a non-class, non-array type has a
+  // cv-unqualified type.  Pointer arithmetic takes its result type from the
+  // pointer operand; when that operand is a `const`-qualified glvalue
+  // (`declval<const I>() + n` with I = int*, the shape of the
+  // random_access_iterator requirement `{ __j + __n } -> same_as<_Iter>`)
+  // the qualifier leaked into the result (`int *const`).
+  if(
+    !expr.get_bool(ID_C_lvalue) && expr.type().id() != ID_struct_tag &&
+    expr.type().id() != ID_union_tag && expr.type().id() != ID_array &&
+    (expr.type().get_bool(ID_C_constant) ||
+     expr.type().get_bool(ID_C_volatile)))
+  {
+    expr.type().remove(ID_C_constant);
+    expr.type().remove(ID_C_volatile);
+  }
 }
 
 void cpp_typecheckt::typecheck_expr_index(exprt &expr)
