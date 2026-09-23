@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "goto_convert_class.h"
 
+#include <util/arith_tools.h>
 #include <util/config.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
@@ -21,10 +22,37 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/symbol.h>
 
 #include <analyses/natural_loops.h>
+#include <langapi/language_util.h>
 
 #include "destructor.h"
 
+#include <algorithm>
 #include <unordered_map>
+
+/// Returns true if \p expr reads memory (contains a symbol or dereference)
+/// and has a type for which equality comparison is meaningful, making it a
+/// candidate for evaluation-order-invariance snapshotting.
+static bool is_snapshot_candidate(const exprt &expr)
+{
+  if(expr.is_constant())
+    return false;
+  const typet &type = expr.type();
+  if(
+    type.id() != ID_signedbv && type.id() != ID_unsignedbv &&
+    type.id() != ID_bool && type.id() != ID_c_bool && type.id() != ID_pointer &&
+    type.id() != ID_floatbv && type.id() != ID_c_enum_tag)
+  {
+    return false;
+  }
+  bool has_read = false;
+  expr.visit_pre(
+    [&has_read](const exprt &node)
+    {
+      if(node.id() == ID_symbol || node.id() == ID_dereference)
+        has_read = true;
+    });
+  return has_read;
+}
 
 static symbol_exprt find_base_symbol(const exprt &expr)
 {
@@ -443,6 +471,19 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
   const irep_idt &mode,
   bool result_is_used)
 {
+  struct depth_guardt
+  {
+    unsigned &depth;
+    explicit depth_guardt(unsigned &_depth) : depth(_depth)
+    {
+      ++depth;
+    }
+    ~depth_guardt()
+    {
+      --depth;
+    }
+  } depth_guard{clean_expr_depth};
+
   // this cleans:
   //   && || ==> ?: comma (control-dependency)
   //   function calls
@@ -742,6 +783,30 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_expr(
     side_effects.add(
       clean_function_call_operands(call.function(), call.arguments(), mode));
   }
+  else if(config.ansi_c.evaluation_order_check && clean_expr_depth == 1)
+  {
+    // clean the operands individually so that evaluation-order dependence
+    // between them can be explored and refuted
+    std::vector<goto_programt> blocks;
+    exprt::operandst pure_reads;
+    std::list<irep_idt> temporaries;
+    Forall_operands(it, expr)
+    {
+      clean_expr_resultt operand_result = clean_expr(*it, mode);
+      temporaries.splice(temporaries.begin(), operand_result.temporaries);
+      if(!operand_result.side_effects.instructions.empty())
+        blocks.push_back(std::move(operand_result.side_effects));
+      else if(is_snapshot_candidate(*it))
+        pure_reads.push_back(*it);
+    }
+    if(!blocks.empty())
+    {
+      side_effects.add(emit_evaluation_order_checked_blocks(
+        std::move(blocks), pure_reads, expr.source_location(), mode));
+    }
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), temporaries);
+  }
   else
   {
     Forall_operands(it, expr)
@@ -872,10 +937,49 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_function_call_operands(
   exprt::operandst &arguments,
   const irep_idt &mode)
 {
+  struct depth_guardt
+  {
+    unsigned &depth;
+    explicit depth_guardt(unsigned &_depth) : depth(_depth)
+    {
+      ++depth;
+    }
+    ~depth_guardt()
+    {
+      --depth;
+    }
+  } depth_guard{clean_expr_depth};
+
   clean_expr_resultt side_effects;
 
   // The function operand is evaluated before the arguments either way.
   side_effects.add(clean_expr(function, mode));
+
+  if(config.ansi_c.evaluation_order_check && clean_expr_depth == 1)
+  {
+    // clean the arguments individually so that evaluation-order dependence
+    // between them can be explored and refuted
+    std::vector<goto_programt> blocks;
+    exprt::operandst pure_reads;
+    std::list<irep_idt> temporaries;
+    for(auto &argument : arguments)
+    {
+      clean_expr_resultt argument_result = clean_expr(argument, mode);
+      temporaries.splice(temporaries.begin(), argument_result.temporaries);
+      if(!argument_result.side_effects.instructions.empty())
+        blocks.push_back(std::move(argument_result.side_effects));
+      else if(is_snapshot_candidate(argument))
+        pure_reads.push_back(argument);
+    }
+    if(!blocks.empty())
+    {
+      side_effects.add(emit_evaluation_order_checked_blocks(
+        std::move(blocks), pure_reads, function.source_location(), mode));
+    }
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), temporaries);
+    return side_effects;
+  }
 
   // The C and C++ standards leave the order of evaluation of function call
   // arguments unspecified; model the fixed order that the configured
@@ -894,4 +998,148 @@ goto_convertt::clean_expr_resultt goto_convertt::clean_function_call_operands(
   }
 
   return side_effects;
+}
+
+goto_convertt::clean_expr_resultt
+goto_convertt::emit_evaluation_order_checked_blocks(
+  std::vector<goto_programt> &&blocks,
+  const exprt::operandst &pure_reads,
+  const source_locationt &source_location,
+  const irep_idt &mode)
+{
+  clean_expr_resultt result;
+
+  // hoist declarations out of the blocks so that the blocks can be emitted
+  // several times, in different orders, under disjoint branches
+  goto_programt declarations;
+  for(auto &block : blocks)
+  {
+    auto it = block.instructions.begin();
+    while(it != block.instructions.end())
+    {
+      if(it->is_decl())
+      {
+        auto next = std::next(it);
+        declarations.instructions.splice(
+          declarations.instructions.end(), block.instructions, it);
+        it = next;
+      }
+      else
+        ++it;
+    }
+  }
+  result.side_effects.destructive_append(declarations);
+
+  // snapshot the values of side-effect-free sibling operands before any of
+  // the side effects execute; the boundary assertions below establish that
+  // these values are invariant under the side effects, and hence that all
+  // placements of these reads that the C standard permits yield the same
+  // value. Note that evaluating the operands in the pre-state also applies
+  // all enabled undefined-behaviour checks (division by zero etc.) to the
+  // pre-state, covering evaluation orders in which the read happens before
+  // the side effects.
+  std::vector<std::pair<symbol_exprt, exprt>> snapshots;
+  for(const exprt &read : pure_reads)
+  {
+    const symbolt &snapshot_symbol = new_tmp_symbol(
+      read.type(), "eval_order", result.side_effects, source_location, mode);
+    result.add_temporary(snapshot_symbol.name);
+    result.side_effects.add(goto_programt::make_assignment(
+      snapshot_symbol.symbol_expr(), read, source_location));
+    snapshots.emplace_back(snapshot_symbol.symbol_expr(), read);
+  }
+
+  const auto make_boundary_assertions = [&](goto_programt &dest)
+  {
+    for(const auto &[snapshot, read] : snapshots)
+    {
+      source_locationt annotated_location = source_location;
+      annotated_location.set_property_class("evaluation-order");
+      annotated_location.set_comment(
+        "value of " + from_expr(ns, mode, read) +
+        " is independent of evaluation order");
+      dest.add(goto_programt::make_assertion(
+        equal_exprt{snapshot, read}, annotated_location));
+    }
+  };
+
+  if(blocks.size() <= 1)
+  {
+    for(auto &block : blocks)
+    {
+      result.side_effects.destructive_append(block);
+      make_boundary_assertions(result.side_effects);
+    }
+    return result;
+  }
+
+  // Execute the (mutually independent) blocks in a nondeterministically
+  // chosen order: k rounds, each of which executes one not-yet-executed
+  // block selected by a nondeterministic choice. This covers all k!
+  // orders while emitting only k copies of each block.
+  std::vector<symbol_exprt> done_flags;
+  for(std::size_t i = 0; i < blocks.size(); ++i)
+  {
+    const symbolt &done_symbol = new_tmp_symbol(
+      bool_typet{}, "eval_order", result.side_effects, source_location, mode);
+    result.add_temporary(done_symbol.name);
+    result.side_effects.add(goto_programt::make_assignment(
+      done_symbol.symbol_expr(), false_exprt{}, source_location));
+    done_flags.push_back(done_symbol.symbol_expr());
+  }
+
+  for(std::size_t round = 0; round < blocks.size(); ++round)
+  {
+    const symbolt &choice_symbol = new_tmp_symbol(
+      unsignedbv_typet{8},
+      "eval_order",
+      result.side_effects,
+      source_location,
+      mode);
+    result.add_temporary(choice_symbol.name);
+    result.side_effects.add(goto_programt::make_assignment(
+      choice_symbol.symbol_expr(),
+      side_effect_expr_nondett{unsignedbv_typet{8}, source_location},
+      source_location));
+
+    exprt::operandst valid_choices;
+    for(std::size_t i = 0; i < blocks.size(); ++i)
+    {
+      valid_choices.push_back(and_exprt{
+        equal_exprt{
+          choice_symbol.symbol_expr(), from_integer(i, unsignedbv_typet{8})},
+        not_exprt{done_flags[i]}});
+    }
+    result.side_effects.add(goto_programt::make_assumption(
+      disjunction(valid_choices), source_location));
+
+    goto_programt round_end;
+    goto_programt::targett round_end_target =
+      round_end.add(goto_programt::make_skip(source_location));
+
+    for(std::size_t i = 0; i < blocks.size(); ++i)
+    {
+      goto_programt arm_end;
+      goto_programt::targett arm_end_target =
+        arm_end.add(goto_programt::make_skip(source_location));
+      const and_exprt guard{
+        equal_exprt{
+          choice_symbol.symbol_expr(), from_integer(i, unsignedbv_typet{8})},
+        not_exprt{done_flags[i]}};
+      result.side_effects.add(goto_programt::make_goto(
+        arm_end_target, not_exprt{guard}, source_location));
+      goto_programt copy;
+      copy.copy_from(blocks[i]);
+      result.side_effects.destructive_append(copy);
+      result.side_effects.add(goto_programt::make_assignment(
+        done_flags[i], true_exprt{}, source_location));
+      result.side_effects.add(goto_programt::make_goto(
+        round_end_target, true_exprt{}, source_location));
+      result.side_effects.destructive_append(arm_end);
+    }
+    result.side_effects.destructive_append(round_end);
+    make_boundary_assertions(result.side_effects);
+  }
+
+  return result;
 }

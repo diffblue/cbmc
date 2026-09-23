@@ -1,0 +1,17 @@
+CORE
+division_after_call.c
+--div-by-zero-check --evaluation-order-check
+^\[main\.division-by-zero\.\d+\] line 12 division by zero in i / p: FAILURE$
+^\[main\.evaluation-order\.1\] line 12 value of i / p is independent of evaluation order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+The call f(i) sets p to 0, so evaluating i / p after the call divides by
+zero. The C standard leaves the evaluation order of the operands of +
+unspecified (the call is indeterminately sequenced), so both orders are
+possible; --evaluation-order-check reports that the value of i / p depends
+on the evaluation order, and the division-by-zero check applies to both the
+pre-call and the post-call evaluation.

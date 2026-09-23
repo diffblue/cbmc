@@ -1292,6 +1292,8 @@ bool configt::set(const cmdlinet &cmdline)
   if(cmdline.isset("malloc-fail-assert"))
     ansi_c.malloc_failure_mode = ansi_c.malloc_failure_mode_assert_then_assume;
 
+  ansi_c.evaluation_order_check = cmdline.isset("evaluation-order-check");
+
   if(cmdline.isset("malloc-may-fail"))
   {
     ansi_c.malloc_may_fail = true;
