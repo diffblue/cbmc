@@ -751,13 +751,54 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = false_exprt();
     else
     {
-      irep_idt base_name = follow_tag(to_struct_tag_type(base)).get(ID_name);
+      // N5008 [meta.rel]: Derived shall be a complete type when it is a
+      // non-union class type different from Base -- complete it (a class
+      // template specialization named here for the first time,
+      // `iterator_traits<int*>` in libstdc++'s __primary_traits_iter).
+      // Comparing the two classes by their (empty, for an incomplete
+      // class) ID_name made every pair of incomplete classes "the same
+      // class", so the concept held for every pointer.
+      const irep_idt base_id = to_struct_tag_type(base).get_identifier();
+      const irep_idt deriv_id = to_struct_tag_type(deriv).get_identifier();
+      if(base_id != deriv_id)
+      {
+        struct_tag_typet deriv_tag = to_struct_tag_type(deriv);
+        deriv_tag.add_source_location() = expr.source_location();
+        try
+        {
+          elaborate_class_template(deriv_tag);
+        }
+        catch(...)
+        {
+        }
+      }
       const struct_typet &struct_type = follow_tag(to_struct_tag_type(deriv));
-      irep_idt deriv_name = struct_type.get(ID_name);
 
       // Per N5008 [meta.rel] / Cpp17BaseOfRequirement: a type is
-      // a base of itself for the purposes of `is_base_of`.
-      if(base_name == deriv_name || struct_type.has_base(base_name))
+      // a base of itself for the purposes of `is_base_of`, and a base
+      // class may be INDIRECT ([class.derived.general]/2:
+      // random_access_iterator_tag -> bidirectional -> forward -> input;
+      // has_base() sees direct bases only, so derived_from<random_access_
+      // iterator_tag, input_iterator_tag> was false and no user iterator
+      // satisfied std::input_iterator).
+      std::set<irep_idt> all_bases;
+      std::function<void(const struct_typet &)> collect =
+        [&](const struct_typet &t)
+      {
+        for(const auto &b : t.bases())
+        {
+          if(b.type().id() != ID_struct_tag)
+            continue;
+          const irep_idt bid = to_struct_tag_type(b.type()).get_identifier();
+          if(!all_bases.insert(bid).second)
+            continue;
+          const symbolt *bs = symbol_table.lookup(bid);
+          if(bs != nullptr && bs->type.id() == ID_struct)
+            collect(to_struct_type(bs->type));
+        }
+      };
+      collect(struct_type);
+      if(base_id == deriv_id || all_bases.count(base_id) != 0)
         expr = true_exprt();
       else
         expr = false_exprt();
