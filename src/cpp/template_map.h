@@ -126,8 +126,9 @@ public:
   /// context, including nested trait instantiations.
   ///
   /// \param n: the node to rewrite in place.
-  /// \param only_nontype: when true, expand ONLY a NON-type parameter pack
-  ///   recorded in pack_expr_map (its element values); leave value /
+  /// \param only_nontype: when true, expand ONLY the deduced TEMPLATE
+  ///   parameter packs -- a NON-type pack recorded in pack_expr_map (its
+  ///   element values) or a type pack recorded in pack_args_map; leave value /
   ///   function-parameter pack expansions (driven by pack_size_map) untouched.
   ///   Used by the eager auto/decltype(auto) convert_function path, which may
   ///   run while an *enclosing* instantiation's template_map is still active:

@@ -486,19 +486,28 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
 
   const bool is_new =
     n.id() == ID_side_effect && n.get(ID_statement) == ID_cpp_new;
-  if(!(n.id() == ID_side_effect &&
-       (n.get(ID_statement) == ID_function_call || is_new)))
+  const bool is_init_list = n.id() == ID_initializer_list;
+  if(
+    !is_init_list && !(n.id() == ID_side_effect &&
+                       (n.get(ID_statement) == ID_function_call || is_new)))
+  {
     return;
+  }
 
   // N5008 [temp.variadic]/5 + [expr.new]: a new-initializer's
   // expression-list is a pack-expansion context exactly like a
   // function-call argument list -- e.g. std::construct_at's trailing return
-  // type `decltype(::new((void*)0) _Tp(declval<_Args>()...))`.  Expand its
+  // type `decltype(::new((void*)0) _Tp(declval<_Args>()...))`.  So is a
+  // braced-init-list ("in an initializer-list; the pattern is an
+  // initializer-clause"): `constexpr bool found[] = {__is_same(T, Ts)...}`,
+  // libstdc++'s __find_uniq_type_in_pack under std::variant.  Expand their
   // elements with the same per-argument logic; for a function call, expand
   // the ID_arguments operand.
   irept *child_ptr = nullptr;
   if(is_new)
     child_ptr = &n.add(ID_initializer);
+  else if(is_init_list)
+    child_ptr = &n;
   else
   {
     for(auto &c : n.get_sub())
