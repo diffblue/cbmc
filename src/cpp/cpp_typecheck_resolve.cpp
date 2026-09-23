@@ -5579,17 +5579,50 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   // specialization's template arguments bound in addition to its own
   // (libc++'s `__integer_sequence<_Tp, _Values...>::__to_tuple_indices
   // <_Sp> = __tuple_indices<(_Values + _Sp)...>` needs the instance's
-  // _Values pack).  instantiate_template builds only the alias's own
-  // parameter map, so pre-bind the enclosing instance's parameters --
-  // exactly as add_method_body does for member function bodies.
+  // _Values pack; libstdc++'s std::variant member alias `__to_type<_Np,
+  // enable_if_t<(_Np < sizeof...(_Types))>>` evaluates its default argument
+  // against the instance's _Types pack).  instantiate_template builds only
+  // the alias's own parameter map, so pre-bind the enclosing instance's
+  // parameters -- exactly as add_method_body does for member function
+  // bodies.
+  //
+  // The EXPLICIT arguments are expressions of the referencing context
+  // ([basic.lookup.unqual]/1) and must be type-checked BEFORE that pre-bind:
+  // the map resolves a bare parameter by SHORT name (conformance violation
+  // V1, template_mapt::apply), so with the enclosing `_Tp` of
+  // allocator_traits<__new_allocator<_Tp>> pre-bound, the argument `_Tp` of
+  // `allocator_traits<_Alloc>::template rebind_alloc<_Tp>` in
+  // __alloc_traits::rebind<_Tp> (a DIFFERENT `_Tp`, the live one) resolved to
+  // the pre-bound pair type and libstdc++ _Rb_tree's _Node_allocator became
+  // the pair allocator.  The DEFAULT arguments, by contrast, belong to the
+  // alias and need the enclosing bindings; they are appended in the second
+  // pass below, after the pre-bind.
+  cpp_template_args_non_tct explicit_args_tc;
+  {
+    cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+    cpp_typecheck.cpp_scopes.go_to(*original_scope);
+    cpp_template_args_tct explicit_tc = cpp_typecheck.typecheck_template_args(
+      source_location,
+      *template_sym,
+      full_template_args,
+      /*explicit_only=*/true);
+    static_cast<irept &>(explicit_args_tc) = static_cast<irept &>(explicit_tc);
+    // keep the type-checked types from being re-resolved in the second pass
+    // (a template template argument is already the resolved template's
+    // parameter-symbol type, which the second pass recognises as such)
+    for(auto &arg : explicit_args_tc.arguments())
+    {
+      if(
+        arg.id() == ID_type &&
+        arg.type().id() != ID_template_parameter_symbol_type)
+      {
+        already_typechecked_typet::make_already_typechecked(arg.type());
+      }
+    }
+  }
+
   cpp_saved_template_mapt saved_enclosing_map(cpp_typecheck.template_map);
-  // Gated to the CLANG preprocessor mode: the motivating member alias
-  // templates are libc++'s (__integer_sequence::__to_tuple_indices);
-  // libstdc++ resolution never needed the enclosing pre-bind, and even
-  // the non-overriding form perturbed some libstdc++ shapes.
-  if(
-    template_id_entry != nullptr &&
-    config.ansi_c.preprocessor == configt::ansi_ct::preprocessort::CLANG)
+  if(template_id_entry != nullptr)
   {
     const cpp_idt *scope_walk = template_id_entry->has_parent()
                                   ? &template_id_entry->get_parent()
@@ -5793,13 +5826,14 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
     }
   }
 
-  // typecheck template arguments
+  // second pass: the pre-typechecked explicit arguments plus the alias's
+  // default arguments, evaluated with the enclosing instance's bindings
   cpp_template_args_tct template_args_tc;
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
     cpp_typecheck.cpp_scopes.go_to(*original_scope);
     template_args_tc = cpp_typecheck.typecheck_template_args(
-      source_location, *template_sym, full_template_args);
+      source_location, *template_sym, explicit_args_tc);
   }
 
   const symbolt &instance = cpp_typecheck.instantiate_template(
