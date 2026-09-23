@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -17,3 +17,10 @@ value-category fix.  See doc/architectural/cpp-requires-expression-support.md.
 KNOWNBUG since round 152: main() was only partially type-checked and the
 run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
 an incomplete user function is an error now.  Underlying failure: static assertion failed: ++int is int&
+
+Was KNOWNBUG since round 152 (static assertion "++int is int&" failed): the
+type-constraint's explicit argument `T &` -- a compound type naming the
+enclosing parameter, not a bare cpp_name -- was passed to the synthetic
+concept-id unsubstituted and unresolved.  Fixed 2026-09-23: such an
+argument is substituted through the enclosing map and type-checked before
+the concept-id is evaluated.

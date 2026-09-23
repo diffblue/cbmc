@@ -1,11 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
+^CONVERSION ERROR$
 --
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: function must have return type
+N5008 [temp.pre]/1: a requires-clause `requires Integral<T>` followed
+directly by the declaration's type name (`T identity(T a)`).  Was KNOWNBUG
+since round 152 ("function must have return type"): the restricted
+constraint parser rejected an identifier followed by another identifier as
+the token after the clause -- a guard needed only for the general
+expression path.  Fixed 2026-09-23.
