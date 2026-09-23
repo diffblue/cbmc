@@ -3844,7 +3844,9 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               {
                 const irep_idt fid = to_symbol_expr(fn).get_identifier();
                 const symbolt *fsym = symbol_table.lookup(fid);
-                if(fsym != nullptr && fsym->value.is_nil())
+                // a queued definition still carries its PARSED body (no code
+                // type yet); a converted one is typed with its code type
+                if(fsym != nullptr && fsym->value.type().id() != ID_code)
                   convert_deferred_method_now(fid);
               }
             }

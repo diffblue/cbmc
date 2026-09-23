@@ -791,6 +791,85 @@ exprt try_evaluate_constexpr(
   std::function<std::optional<exprt>(const codet &, int)> execute;
   std::function<exprt(const exprt &)> eval;
 
+  // A tracked value: a scalar constant, or an aggregate of constants (the
+  // `constexpr bool found[] = {__is_same(T, Ts)...}` local of libstdc++'s
+  // __find_uniq_type_in_pack, read back through `found[i]`).
+  auto is_constant_value = [](const exprt &e) -> bool
+  {
+    if(e.is_constant())
+      return true;
+    if(e.id() == ID_array || e.id() == ID_struct)
+    {
+      for(const auto &op : e.operands())
+        if(!op.is_constant())
+          return false;
+      return true;
+    }
+    return false;
+  };
+
+  // Apply an assignment-like side effect (`=`, compound assignment,
+  // `++`/`--`) to a tracked variable.  Returns false when the effect cannot
+  // be tracked (the caller then gives up on the evaluation).
+  auto apply_side_effect = [&](const exprt &e) -> bool
+  {
+    if(e.id() != ID_side_effect)
+      return true; // no effect to apply (e.g. a plain expression)
+    const irep_idt &st = e.get(ID_statement);
+    if(e.operands().empty() || e.operands()[0].id() != ID_symbol)
+      return false;
+    const irep_idt var = to_symbol_expr(e.operands()[0]).get_identifier();
+    if(st == ID_assign)
+    {
+      if(e.operands().size() != 2)
+        return false;
+      exprt rhs = eval(e.operands()[1]);
+      if(!is_constant_value(rhs))
+        return false;
+      vars[var] = rhs;
+      return true;
+    }
+    const auto cur = vars.find(var);
+    if(cur == vars.end() || !cur->second.is_constant())
+      return false;
+    irep_idt op;
+    exprt rhs;
+    if(
+      st == ID_preincrement || st == ID_postincrement ||
+      st == ID_predecrement || st == ID_postdecrement)
+    {
+      op =
+        (st == ID_preincrement || st == ID_postincrement) ? ID_plus : ID_minus;
+      rhs = from_integer(1, cur->second.type());
+    }
+    else if(e.operands().size() == 2)
+    {
+      const std::string s = id2string(st);
+      if(s.size() < 7 || s.substr(0, 6) != "assign")
+        return false;
+      op = irep_idt{s.substr(6)}; // `assign+` -> `+`
+      if(
+        op != ID_plus && op != ID_minus && op != ID_mult && op != ID_div &&
+        op != ID_mod && op != ID_shl && op != ID_shr && op != ID_bitand &&
+        op != ID_bitor && op != ID_bitxor)
+      {
+        return false;
+      }
+      rhs = eval(e.operands()[1]);
+      if(!rhs.is_constant())
+        return false;
+      rhs = typecast_exprt::conditional_cast(rhs, cur->second.type());
+    }
+    else
+      return false;
+    exprt result = binary_exprt{cur->second, op, rhs, cur->second.type()};
+    simplify(result, ns);
+    if(!result.is_constant())
+      return false;
+    vars[var] = result;
+    return true;
+  };
+
   eval = [&](const exprt &e) -> exprt
   {
     if(e.id() == ID_symbol)
@@ -902,12 +981,63 @@ exprt try_evaluate_constexpr(
       }
       return std::nullopt; // too many iterations
     }
+    if(code.get_statement() == ID_for)
+    {
+      // N5008 [stmt.for]: init-statement once, then while the condition
+      // holds: body, then the iteration expression.  The C++ front end
+      // hoists a declared loop variable into an enclosing block, so the
+      // init slot is usually empty here.  The loop of libstdc++'s
+      // __find_uniq_type_in_pack (std::variant's __exactly_once) is the
+      // motivating shape; without it the evaluation gave up and the
+      // converting constructor's constraint silently failed.
+      const auto &for_code = to_code_for(code);
+      if(for_code.init().id() == ID_code)
+      {
+        auto r = execute(to_code(for_code.init()), depth + 1);
+        if(r.has_value())
+          return r;
+      }
+      for(int iter = 0; iter < 64; ++iter)
+      {
+        exprt cond = eval(for_code.cond());
+        if(cond.is_false())
+          return std::nullopt; // loop done, no return
+        if(!cond.is_true())
+          return std::nullopt; // can't evaluate condition
+        if(for_code.body().id() != ID_code)
+          return std::nullopt;
+        auto r = execute(to_code(for_code.body()), depth + 1);
+        if(r.has_value())
+          return r;
+        if(for_code.iter().id() == ID_code)
+        {
+          auto ri = execute(to_code(for_code.iter()), depth + 1);
+          if(ri.has_value())
+            return ri;
+        }
+        else if(!apply_side_effect(for_code.iter()))
+          return std::nullopt;
+      }
+      return std::nullopt; // too many iterations
+    }
     if(code.get_statement() == ID_assign)
     {
       const auto &lhs = code.op0();
       exprt rhs = eval(code.op1());
       if(lhs.id() == ID_symbol)
         vars[to_symbol_expr(lhs).get_identifier()] = rhs;
+      return std::nullopt;
+    }
+    if(code.get_statement() == ID_decl_block)
+    {
+      for(const auto &stmt : code.operands())
+      {
+        if(stmt.id() != ID_code)
+          continue;
+        auto r = execute(to_code(stmt), depth + 1);
+        if(r.has_value())
+          return r;
+      }
       return std::nullopt;
     }
     if(code.get_statement() == ID_decl)
@@ -923,10 +1053,12 @@ exprt try_evaluate_constexpr(
         if(code.operands().size() >= 2)
         {
           exprt init = eval(code.op1());
-          if(!init.is_constant())
+          if(!is_constant_value(init))
             return std::nullopt; // can't track this variable's value
           vars[sym.get_identifier()] = init;
         }
+        else if(sym.type().id() == ID_array || sym.type().id() == ID_struct_tag)
+          return std::nullopt; // an aggregate without initializer: untracked
         else
           vars[sym.get_identifier()] = from_integer(0, sym.type());
       }
@@ -936,22 +1068,12 @@ exprt try_evaluate_constexpr(
     {
       // An expression statement may BE an assignment
       // (`side_effect statement=assign`), e.g. the `__m = __n; __n = __rem;`
-      // steps of chrono duration's constexpr _S_gcd do-while body.  Apply
-      // it to the tracked variables; skipping it froze the loop variables,
-      // so the termination condition never changed and evaluation gave up.
-      if(!code.operands().empty())
-      {
-        const exprt &e = code.op0();
-        if(
-          e.id() == ID_side_effect && e.get(ID_statement) == ID_assign &&
-          e.operands().size() == 2 && e.operands()[0].id() == ID_symbol)
-        {
-          exprt rhs = eval(e.operands()[1]);
-          if(!rhs.is_constant())
-            return std::nullopt; // lost track of a variable's value
-          vars[to_symbol_expr(e.operands()[0]).get_identifier()] = rhs;
-        }
-      }
+      // steps of chrono duration's constexpr _S_gcd do-while body, or a
+      // compound assignment / increment (`__n = __i`, `++__i`).  Apply it to
+      // the tracked variables; skipping it froze the loop variables, so the
+      // termination condition never changed and evaluation gave up.
+      if(!code.operands().empty() && !apply_side_effect(code.op0()))
+        return std::nullopt; // lost track of a variable's value
       return std::nullopt;
     }
     if(code.get_statement() == ID_skip)
