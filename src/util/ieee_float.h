@@ -16,6 +16,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "format_spec.h"
 
 class constant_exprt;
+class exprt;
 class floatbv_typet;
 
 class ieee_float_spect
@@ -446,5 +447,27 @@ protected:
   void divide_and_round(mp_integer &dividend, const mp_integer &divisor);
   void align();
 };
+
+// IEEE-754 sign-aware expression builders.
+//
+// These centralise IEEE sign-bit semantics so callers do not re-derive
+// them (and get them subtly wrong). The crucial point is that the sign of
+// a floating-point value is its sign BIT, which is independent of ordering:
+// `-0.0` has the sign bit set yet `-0.0 < 0.0` is false. Building these on
+// `x < 0` therefore mishandles negative zero (copysign(1.0, -0.0) must be
+// -1.0, fabs(-0.0) must be +0.0). They build on `sign_exprt` (ID_sign),
+// whose float semantics are exactly the IEEE sign bit.
+
+/// IEEE-754 signbit as a boolean expression: true iff the sign bit of the
+/// floating-point expression `f` is set (true for `-0.0`, reflects NaN sign).
+exprt ieee_signbit(const exprt &f);
+
+/// IEEE-754 fabs: the magnitude of `f` with the sign bit cleared, so
+/// `fabs(-0.0) == +0.0` and `fabs(-x) == x`.
+exprt ieee_fabs(const exprt &f);
+
+/// IEEE-754 copysign: a value with the magnitude of `magnitude` and the
+/// sign (sign BIT) of `sign_source`, so `copysign(1.0, -0.0) == -1.0`.
+exprt ieee_copysign(const exprt &magnitude, const exprt &sign_source);
 
 #endif // CPROVER_UTIL_IEEE_FLOAT_H

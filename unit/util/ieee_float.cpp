@@ -7,6 +7,10 @@ Author: Daniel Kroening, dkr@amazon.com
 \*******************************************************************/
 
 #include <util/ieee_float.h>
+#include <util/namespace.h>
+#include <util/simplify_expr.h>
+#include <util/std_expr.h>
+#include <util/symbol_table.h>
 
 #include <testing-utils/use_catch.h>
 
@@ -128,6 +132,64 @@ TEST_CASE("round_to_integral", "[unit][util][ieee_float]")
   REQUIRE(round_to_integral(from_double(-10.1), away) == -10);
   REQUIRE(round_to_integral(from_double(0x1.0p+52), away) == 0x1.0p+52);
   REQUIRE(round_to_integral(from_double(dmax), away) == dmax);
+}
+
+TEST_CASE("ieee signbit / fabs / copysign", "[core][util][ieee_float]")
+{
+  const auto dp = ieee_float_spect::double_precision();
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+
+  // Build a double-precision floating-point constant expression.
+  auto fc = [&](double d) -> exprt
+  {
+    ieee_floatt v{dp, ieee_floatt::rounding_modet::ROUND_TO_EVEN};
+    v.from_double(d);
+    return v.to_expr();
+  };
+  // Evaluate a float-valued expression to a double via simplification.
+  auto eval = [&](const exprt &e) -> double
+  {
+    exprt s = simplify_expr(e, ns);
+    REQUIRE(s.is_constant());
+    ieee_float_valuet v{to_constant_expr(s)};
+    return v.to_double();
+  };
+  auto eval_bool = [&](const exprt &e) -> bool
+  { return simplify_expr(e, ns).is_true(); };
+
+  SECTION("signbit reflects the sign BIT, not ordering")
+  {
+    REQUIRE(eval_bool(ieee_signbit(fc(-0.0))));      // negative zero
+    REQUIRE_FALSE(eval_bool(ieee_signbit(fc(0.0)))); // positive zero
+    REQUIRE(eval_bool(ieee_signbit(fc(-3.5))));
+    REQUIRE_FALSE(eval_bool(ieee_signbit(fc(3.5))));
+  }
+
+  SECTION("fabs clears the sign bit, incl. negative zero")
+  {
+    REQUIRE(eval(ieee_fabs(fc(-3.5))) == 3.5);
+    REQUIRE(eval(ieee_fabs(fc(3.5))) == 3.5);
+    // fabs(-0.0) == +0.0: value compares equal to 0, and the sign bit
+    // of the result must be clear.
+    REQUIRE(eval(ieee_fabs(fc(-0.0))) == 0.0);
+    REQUIRE_FALSE(eval_bool(ieee_signbit(ieee_fabs(fc(-0.0)))));
+  }
+
+  SECTION("copysign takes the sign from the sign bit of the source")
+  {
+    // The negative-zero cases are the ones a `< 0` implementation gets
+    // wrong: -0.0 is not < 0, yet copysign must treat it as negative.
+    REQUIRE(eval(ieee_copysign(fc(1.0), fc(-0.0))) == -1.0);
+    REQUIRE(eval_bool(ieee_signbit(ieee_copysign(fc(1.0), fc(-0.0)))));
+    REQUIRE(eval(ieee_copysign(fc(1.0), fc(0.0))) == 1.0);
+    REQUIRE_FALSE(eval_bool(ieee_signbit(ieee_copysign(fc(1.0), fc(0.0)))));
+    REQUIRE(eval(ieee_copysign(fc(1.0), fc(-5.0))) == -1.0);
+    REQUIRE(eval(ieee_copysign(fc(-1.0), fc(5.0))) == 1.0);
+    REQUIRE(eval(ieee_copysign(fc(2.0), fc(-3.0))) == -2.0);
+    // Magnitude's own sign is irrelevant; only its absolute value is used.
+    REQUIRE(eval(ieee_copysign(fc(-2.0), fc(3.0))) == 2.0);
+  }
 }
 
 TEST_CASE(

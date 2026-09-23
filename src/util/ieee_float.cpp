@@ -1403,3 +1403,30 @@ ieee_floatt ieee_floatt::round_to_integral() const
     return result;
   }
 }
+
+exprt ieee_signbit(const exprt &f)
+{
+  PRECONDITION(f.type().id() == ID_floatbv);
+  // sign_exprt on a floating-point operand yields the IEEE sign bit
+  // (see simplify_sign / float_bvt::sign_bit): true for -0.0.
+  return sign_exprt{f};
+}
+
+exprt ieee_fabs(const exprt &f)
+{
+  PRECONDITION(f.type().id() == ID_floatbv);
+  // |f|: if the sign bit is set, negate; else keep. Negating clears the
+  // sign bit for -0.0 (so fabs(-0.0) == +0.0) and for finite negatives.
+  return if_exprt{sign_exprt{f}, unary_minus_exprt{f}, f};
+}
+
+exprt ieee_copysign(const exprt &magnitude, const exprt &sign_source)
+{
+  PRECONDITION(magnitude.type().id() == ID_floatbv);
+  PRECONDITION(sign_source.type().id() == ID_floatbv);
+  // Magnitude of `magnitude`, signed by the sign BIT of `sign_source`.
+  // Using the sign bit (not `sign_source < 0`) is what makes
+  // copysign(1.0, -0.0) == -1.0, matching IEEE-754 / C copysign.
+  const exprt mag = ieee_fabs(magnitude);
+  return if_exprt{sign_exprt{sign_source}, unary_minus_exprt{mag}, mag};
+}
