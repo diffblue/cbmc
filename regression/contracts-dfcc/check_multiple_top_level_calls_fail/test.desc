@@ -1,0 +1,11 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo
+^EXIT=10$
+^SIGNAL=0$
+^\[foo.precondition.\d+\] line \d+ Check requires clause of contract contract::foo for function foo: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Checks that the precondition of a contract is asserted for sequential
+top-level re-invocations that are summarised by contract replacement.
