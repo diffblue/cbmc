@@ -111,6 +111,7 @@ int main()
 
   // Sanity: matches the pointer result.
   static_assert(std::random_access_iterator<int *>, "ptr random_access");
+  static_assert(std::contiguous_iterator<int *>, "ptr contiguous");
 
   // Negative: NotIt is not even an input_or_output_iterator.
   static_assert(!std::input_or_output_iterator<NotIt>, "NotIt not an iterator");

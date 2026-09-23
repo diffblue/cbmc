@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [meta.rel] is_base_of, [class.derived.general]/2: a base class may be
+indirect.  __is_base_of(input_iterator_tag, random_access_iterator_tag) and
+std::is_base_of over a three-level chain were false (direct bases only), so
+derived_from<ITER_CONCEPT(I), input_iterator_tag> failed for every
+random-access iterator.
