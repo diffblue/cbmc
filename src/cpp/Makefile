@@ -1,4 +1,5 @@
-SRC = cpp_constructor.cpp \
+SRC = cpp_constexpr_eval.cpp \
+      cpp_constructor.cpp \
       cpp_convert_type.cpp \
       cpp_declaration.cpp \
       cpp_declarator.cpp \

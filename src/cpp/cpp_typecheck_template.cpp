@@ -15,14 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
-#include <functional>
-#include <set>
-
-extern exprt try_evaluate_constexpr(
-  const exprt &expr,
-  const symbol_table_baset &symbol_table,
-  const namespacet &ns);
-
+#include "cpp_constexpr_eval.h"
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_sfinae_context.h"
@@ -32,6 +25,9 @@ extern exprt try_evaluate_constexpr(
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_typecheck_resolve.h"
+
+#include <functional>
+#include <set>
 
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
