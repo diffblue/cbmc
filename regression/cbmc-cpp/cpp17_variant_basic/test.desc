@@ -1,15 +1,19 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
+^CONVERSION ERROR$
 --
-Invariant violation: lhs/rhs type mismatch in assignment from
-(void)-1 in numeric_traits.h. The (void) cast produces a void
-type that cannot be assigned to int.
-
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: found no match for symbol 'variant' (std::variant constructor).
+Was KNOWNBUG since round 152 (main() partially type-checked; the converting
+constructor found no match).  Fixed 2026-09-23 by the round-158 part-4
+series: pack expansion in braced-init-lists and folds over type packs,
+constant evaluation of __find_uniq_type_in_pack (loops, local arrays,
+queued definitions), static data member templates (__exactly_once,
+__accepted_index), using-declarator pack expansion (_Build_FUNs), the
+member alias __to_type's default argument, variable template-id arguments
+resolved at the point of use, and the type-for-non-type kind mismatch of
+std::get<T> vs std::get<N> as a candidate removal.

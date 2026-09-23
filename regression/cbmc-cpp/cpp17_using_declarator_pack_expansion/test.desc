@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [namespace.udecl]/1 + [temp.variadic]/5.4: `using B<I, T>::fun...;`
+in a class template body brings the member from EVERY expanded base into
+the derived class's overload set (libstdc++'s std::variant _Build_FUNs).
+Before, the parser dropped the `...` and only the first base's overload
+was named.

@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp14
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.pre]/1, [temp.spec]/4, [temp.mem]/1: a static data member
+template of a class (template).  Each specialization is a distinct
+variable (was: the second specialization was a "redeclaration" of the
+first, surfacing as "found no match"); its initializer may name the
+enclosing class template's parameters (`same<T, X>`) and be referenced
+from a member function template body or a constructor mem-initializer
+with the member template's own parameter; a repeated reference finds the
+existing specialization.  Also: the template arguments of a variable
+template-id are type-checked at the point of use
+(`std::in_place_index<idx<Tp>>` naming a class member, [basic.lookup.unqual]).
