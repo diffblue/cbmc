@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.cond]/4: operands of the same underlying type differing in
+cv-qualification or value category.  Two glvalues of the same category: the
+result has the cv-combined type and keeps the category (`b ? w : cw` is an
+lvalue `const W`; two xvalues give an xvalue, decltype T&&).  Different
+categories: a prvalue of the cv-combined type, cv-unqualified for non-class
+types ([expr.type]/2).  The shape of libstdc++'s COND-RES / common_reference.
+Before, the conditional converted one operand to the other's type and yielded
+a non-lvalue copy.
