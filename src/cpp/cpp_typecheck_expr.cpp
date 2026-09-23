@@ -547,9 +547,38 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == "type_requirement")
   {
+    // N5008 [expr.prim.req.type]/1 + [expr.prim.req.general]/5: the
+    // requirement is satisfied iff the named type is valid; a substitution
+    // failure in the immediate context (`typename T::value_type` with T =
+    // int) makes the requires-expression false, it is not ill-formed.  A
+    // thrown failure used to escape to the constraint evaluation, which
+    // took the unevaluated constraint as satisfied and selected the
+    // constrained partial specialization for int.
     typet &t = static_cast<typet &>(expr.add(ID_type_arg));
-    typecheck_type(t);
-    expr = typecast_exprt{true_exprt(), c_bool_type()};
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    bool valid = true;
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      template_map.apply(t);
+      typecheck_type(t);
+    }
+    catch(...)
+    {
+      valid = false;
+    }
+    if(
+      get_message_handler().get_message_count(messaget::M_ERROR) !=
+      errors_before)
+    {
+      valid = false;
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    }
+    expr = typecast_exprt{
+      valid ? static_cast<exprt>(true_exprt())
+            : static_cast<exprt>(false_exprt()),
+      c_bool_type()};
   }
   else if(expr.id() == "simple_requirement")
   {
