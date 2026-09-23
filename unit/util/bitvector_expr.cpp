@@ -4,6 +4,7 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/cout_message.h>
+#include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
 
@@ -145,6 +146,85 @@ TEST_CASE("onehot expression lowering", "[core][util][expr]")
     boolbv << onehot0_exprt{from_integer(0xfe, u8)}.lower();
 
     THEN("the lowering of onehot0 is false")
+    {
+      REQUIRE(boolbv() == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
+}
+
+TEST_CASE("reduction and replication expression lowering", "[core][util][expr]")
+{
+  console_message_handlert message_handler;
+  message_handler.set_verbosity(0);
+
+  // We prove full equivalence between an expression and its lowering by
+  // constraining a symbolic operand `x` such that the original expression
+  // and its lowering disagree, and then checking that this is unsatisfiable.
+  // boolbv handles the reduction/replication operators natively, so this
+  // compares the native encoding against the lowered form for every possible
+  // value of `x`.
+
+  GIVEN("A symbolic bit-vector operand and reduction_xor")
+  {
+    satcheckt satcheck{message_handler};
+    boolbvt boolbv{empty_namespace, satcheck, message_handler};
+    const symbol_exprt x{"x", unsignedbv_typet{8}};
+    const reduction_xor_exprt red{x};
+
+    // original != lowering is true exactly when they disagree
+    boolbv << notequal_exprt{red, red.lower()};
+
+    THEN("the lowering of reduction_xor is equivalent to the original")
+    {
+      REQUIRE(boolbv() == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
+
+  GIVEN("A symbolic bit-vector operand and reduction_xnor")
+  {
+    satcheckt satcheck{message_handler};
+    boolbvt boolbv{empty_namespace, satcheck, message_handler};
+    const symbol_exprt x{"x", unsignedbv_typet{8}};
+    const reduction_xnor_exprt red{x};
+
+    boolbv << notequal_exprt{red, red.lower()};
+
+    THEN("the lowering of reduction_xnor is equivalent to the original")
+    {
+      REQUIRE(boolbv() == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
+
+  GIVEN("A symbolic bit-vector operand and replication")
+  {
+    satcheckt satcheck{message_handler};
+    boolbvt boolbv{empty_namespace, satcheck, message_handler};
+    const unsignedbv_typet u4{4};
+    const symbol_exprt x{"x", u4};
+    const std::size_t times = 3;
+    const replication_exprt repl{
+      from_integer(times, integer_typet{}), x, unsignedbv_typet{4 * times}};
+
+    // original != lowering is true exactly when they disagree
+    boolbv << notequal_exprt{repl, repl.lower()};
+
+    THEN("the lowering of replication is equivalent to the original")
+    {
+      REQUIRE(boolbv() == decision_proceduret::resultt::D_UNSATISFIABLE);
+    }
+  }
+
+  GIVEN("A symbolic bit-vector operand and a single replication")
+  {
+    satcheckt satcheck{message_handler};
+    boolbvt boolbv{empty_namespace, satcheck, message_handler};
+    const unsignedbv_typet u8{8};
+    const symbol_exprt x{"x", u8};
+    const replication_exprt repl{from_integer(1, integer_typet{}), x, u8};
+
+    boolbv << notequal_exprt{repl, repl.lower()};
+
+    THEN("the lowering of a single replication is equivalent to the original")
     {
       REQUIRE(boolbv() == decision_proceduret::resultt::D_UNSATISFIABLE);
     }

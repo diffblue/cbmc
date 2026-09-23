@@ -344,3 +344,60 @@ exprt onehot0_exprt::lower() const
   // at most one bit is set
   return let_exprt{symbol, op(), not_exprt{more_than_one_seen}};
 }
+
+exprt reduction_and_exprt::lower() const
+{
+  auto &operand = op();
+  return equal_exprt{
+    operand, to_bitvector_type(operand.type()).all_ones_expr()};
+}
+
+exprt reduction_nand_exprt::lower() const
+{
+  auto &operand = op();
+  return notequal_exprt{
+    operand, to_bitvector_type(operand.type()).all_ones_expr()};
+}
+
+exprt reduction_or_exprt::lower() const
+{
+  auto &operand = op();
+  return notequal_exprt{
+    operand, to_bitvector_type(operand.type()).all_zeros_expr()};
+}
+
+exprt reduction_nor_exprt::lower() const
+{
+  auto &operand = op();
+  return equal_exprt{
+    operand, to_bitvector_type(operand.type()).all_zeros_expr()};
+}
+
+exprt reduction_xor_exprt::lower() const
+{
+  auto &operand = op();
+  auto width = to_bitvector_type(operand.type()).width();
+  PRECONDITION(width >= 1);
+  exprt::operandst bits;
+  bits.reserve(width);
+  for(std::size_t i = 0; i < width; i++)
+    bits.push_back(extractbit_exprt{operand, i});
+  return xor_exprt{std::move(bits)};
+}
+
+exprt reduction_xnor_exprt::lower() const
+{
+  return not_exprt{reduction_xor_exprt{op()}.lower()};
+}
+
+exprt replication_exprt::lower() const
+{
+  // zero-replications are allowed, and yield a concatenation
+  // with no operands.
+  auto count = numeric_cast_v<std::size_t>(times());
+  exprt::operandst ops;
+  ops.reserve(count);
+  for(std::size_t i = 0; i < count; i++)
+    ops.push_back(op());
+  return concatenation_exprt{std::move(ops), type()};
+}
