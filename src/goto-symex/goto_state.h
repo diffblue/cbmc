@@ -38,6 +38,12 @@ protected:
   symex_level2t level2;
 
 public:
+  // Unlike level2, level1 is public: besides being applied for renaming it is
+  // mutated directly from outside this class (insert/insert_or_replace for new
+  // L1 objects, and restore_from on scope exit, function return and thread
+  // switch), so a const-only accessor like get_level2() would not suffice.
+  symex_level1t level1;
+
   /// This is used for eliminating repeated complicated dereferences.
   /// \see goto_symext::dereference_rec
   sharing_mapt<exprt, symbol_exprt, false, irep_hash> dereference_cache;

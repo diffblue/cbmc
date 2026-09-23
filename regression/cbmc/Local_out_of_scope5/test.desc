@@ -1,0 +1,16 @@
+CORE
+main.c
+--unwind 2 --unwinding-assertions
+^\[main\.assertion\.\d+\] line 13 should pass: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This is the exact invocation from #8437 (cbmc --unwind 2 --unwinding-assertions).
+A goto crossing the scope of `canary` confused the level1/level2 renaming, so
+the assertion referenced a stale version of `canary` and failed spuriously.
+Without the fix (level1 merged in goto_statet) this reports VERIFICATION FAILED.
+Note: the issue's program does not terminate symbolic execution without an
+unwinding bound, hence the explicit --unwind.
