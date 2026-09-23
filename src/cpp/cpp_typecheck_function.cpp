@@ -212,9 +212,25 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // function-parameter pack against the enclosing map's unrelated pack size
   // would corrupt an already-expanded call (`add(a$0, a$1)` -> `add(a$0,
   // a$0)`).
-  if(has_auto(symbol.type) && !template_map.pack_expr_map.empty())
+  //
+  // The same applies to a `constexpr` function-template instance reached from
+  // a constant-expression context (is_macro), which cpp_declarator_convertert
+  // converts eagerly for the same reason, and to a TYPE parameter pack of two
+  // or more elements: `{__is_same(_Tp, _Types)...}` in libstdc++'s
+  // __find_uniq_type_in_pack (std::variant's __exactly_once) otherwise
+  // resolves the pack name to its first element only and the braced list
+  // collapses to one element.
+  bool has_multi_element_type_pack = false;
+  for(const auto &pa : template_map.pack_args_map)
+    if(pa.second.size() >= 2)
+      has_multi_element_type_pack = true;
+  if(
+    (has_auto(symbol.type) || symbol.is_macro) &&
+    (!template_map.pack_expr_map.empty() || has_multi_element_type_pack))
+  {
     template_map.expand_call_argument_packs(
       static_cast<irept &>(symbol.value), /*only_nontype=*/true);
+  }
 
   // enter appropriate scope
   cpp_save_scopet saved_scope(cpp_scopes);

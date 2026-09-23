@@ -1020,9 +1020,28 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // being present (pack_expr_map): a body with only type / function-parameter
   // packs is already handled by the expansion above, and re-running the
   // call-argument expander over it would double-expand a function parameter
-  // pack.
+  // pack.  A deduced TYPE pack of two or more elements is expanded here too
+  // ([temp.variadic]/5: `g(sizeof(Ts)...)`, `{__is_same(T, Ts)...}`): the
+  // pack's name otherwise resolves to its FIRST element only
+  // (template_mapt::type_map keeps the pack resolvable as a single type),
+  // silently collapsing the expansion to one copy.  In template-packs-only
+  // mode, so that a function-parameter pack expansion `g(a...)` -- driven by
+  // pack_size_map and expanded at instantiation -- is not expanded a second
+  // time.
   if(!template_map.pack_expr_map.empty())
     template_map.expand_call_argument_packs(static_cast<irept &>(body));
+  else
+  {
+    bool has_multi_element_type_pack = false;
+    for(const auto &pa : template_map.pack_args_map)
+      if(pa.second.size() >= 2)
+        has_multi_element_type_pack = true;
+    if(has_multi_element_type_pack)
+    {
+      template_map.expand_call_argument_packs(
+        static_cast<irept &>(body), /*only_nontype=*/true);
+    }
+  }
 
   // Per [temp.variadic]/7: substitute non-empty pack parameter
   // names in the body with their actual types.
