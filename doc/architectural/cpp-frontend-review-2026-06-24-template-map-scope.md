@@ -373,3 +373,74 @@ KNOWNBUG flipped to CORE.
 This is the isolation principle of the planned frame stack applied at one
 step, with a test driving it.  The full frame-stack rework remains the
 end state; each further step should likewise be driven by a failing test.
+
+### Increment 4 (2026-09-23): active template parameter scopes — DONE (commit `b0f2a76c1a`)
+
+The V1 exposure was re-measured on the `apply()` short-name site with a
+*value-distinct* criterion (two or more live bindings sharing the short name
+**and** holding different values -- the only case in which the pick matters):
+**709** substitutions across `regression/cbmc-cpp`, **377** of them decided by
+alphabetical key order.  (Increment 1's nearest-scope rule applies to
+`lookup_by_suffix` only; `apply()` had no rule at all.)
+
+Rather than the frame stack of the original plan (step 3 above), a smaller
+mechanism gives `apply()` the missing scope information without touching the
+four flat maps: `template_mapt::parameter_scopes`, the stack of the template
+parameter scopes whose declarations or bodies are currently being substituted
+([basic.scope.temp]/2, [temp.local]/1), innermost last.
+
+- `build()` / `build_unassigned()` push the template they bind; the
+  `#deduced_packs` replay in `resolve()` pushes the specialization being
+  instantiated; `apply()` pushes a nested member template's own (unbound)
+  parameters while substituting that member's declaration.
+- `innermost_parameter(short)` names the parameter a bare reference denotes;
+  `binds_reference(key, short)` is the single admissibility test used by every
+  short-name scan (`type_map`, `expr_map`, the pack maps in `apply()` and
+  `expand_call_argument_packs`): when an active scope declares the name, only
+  **that** parameter's binding may substitute.
+- The stack is saved/restored with the map (`swap`, `cpp_saved_template_mapt`).
+
+After the change all 709 ambiguous substitutions have an active scope declaring
+their name.  The `#tmpl_param_shadow` sentinel workaround is gone (a member
+template's unbound scope shadows by construction); `build()`'s shadow-removal
+loop and `deduction_parameters` are kept -- they govern which entries are
+*present* / which may be *deduced*, not lookup.  All suites green.
+
+**What remains of V1/V2.**  A bare reference that *no* active scope declares
+still falls back to the whole-map scan (an enclosing template's parameter bound
+by `set()` outside `build()`, e.g. `resolve_template_alias`'s pre-bind).  The
+frame stack (isolation of *presence*, not only of *lookup*) is still the end
+state; it is now a smaller step, since lookup already respects scopes.
+
+## Per-instantiation identity by string suffix (assessment, 2026-09-23)
+
+A second recurring pattern, distinct from the parameter *binding* question
+above: the identity of an *instantiated entity* is encoded by appending a
+string to a name and reconstructed later by parsing strings.
+
+| Site | Mechanism | Standard rule |
+|---|---|---|
+| `template_suffix()` (`cpp_instantiate_template.cpp`) | renders the argument list to `<...>` text; the scope's `suffix` is appended to class/function/variable instance names | [temp.type]/1: same template + same arguments = same specialization.  The rendering must be canonical (the function already strips a numeric scope prefix from template-template arguments, folds non-type arguments, and prints `const ` for cv). |
+| `#member_fn_template_instance` → `typecheck_compound_declarator` appends `current_scope().suffix` to the member's symbol name; `#unsuffixed_name` records the pre-suffix name for the condition-3 fallback | [temp.spec]/4: each specialization is a distinct entity; the suffix is how two specializations with equal signatures get distinct symbols.  Static data member templates now use the same suffix (round 158 part 4). |
+| `#fn_template_type` / `#fn_template_args` / `#fn_template_packs` / `#spec_template_packs` / `#deduced_packs` | the instance carries its template parameters and arguments so the map can be *rebuilt* at body conversion | [temp.point]/1: the body is instantiated in the specialization's context.  These are records, not string parsing. |
+| `requires_param::<name>#<n>` (round 158 part 4) | one symbol per requirement-parameter binding | [expr.prim.req.general]/2-3: the parameters are local to the requires-expression. |
+
+Assessment:
+
+1. The `#fn_template_*` records are the right shape (structured, per
+   instance).  The `template_suffix` text is the only *identity* carrier and it
+   is also a *lookup key* (`sub_scope_for_instantiation(scope, suffix)`,
+   `symbol_table.lookup(prefix + base + suffix)`).  Its canonicality is
+   load-bearing: a non-canonical rendering (two spellings of one argument)
+   silently produces two specializations.  Known non-canonical inputs are
+   handled case by case in `template_suffix`; a structural fix would key
+   instances by the *type-checked argument list* (an `irept` compared
+   structurally) with the text derived from it for symbol names only.
+2. The condition-3 fallback (`#unsuffixed_name`, `cpp_instantiate_template.cpp`
+   ~6870) reconstructs "is there a same-signature non-template overload" from
+   the unsuffixed string.  That is a [temp.spec]/4 question about *signatures*
+   and would be better answered from the class's component list.
+3. Nothing here has a driving failing test; both structural fixes are moderate
+   (identity keying) to small (condition 3).  They are deliberately not done in
+   this round.  Rule for new code: never *parse* a suffix back into arguments;
+   read the `#fn_template_*` records instead.
