@@ -6089,10 +6089,33 @@ skip_pack_removal_ft:
         flag = saved;
       }
     } imft_guard{instantiating_member_function_template, saved_imft};
+    symbolt &symb = symbol_table.get_writeable_ref(class_name);
+    // N5008 [temp.mem]/1 + [temp.inst]/2: a member template of a class
+    // template specialization is instantiated with BOTH the enclosing
+    // class's bindings and its own.  The map built above holds the member
+    // template's parameters only; add the class instance's (non-overriding,
+    // build() is additive), or a static data member template's initializer
+    // that names a class parameter -- `same<T, X>` in
+    // `template <class T> static constexpr bool is_x = same<T, X>;` --
+    // meets an unbound `X` when it is type-checked below.  Restricted to
+    // static data member templates: member FUNCTION templates rebuild the
+    // class map at body conversion (prepare_deferred_method_body), and a
+    // positional build of a PARTIAL specialization's map here perturbed
+    // their deduction (libc++'s __perfect_forward_impl constructor).
+    if(
+      new_decl.storage_spec().is_static() && !new_decl.declarators().empty() &&
+      new_decl.declarators()[0].type().id() != ID_function_type &&
+      symb.type.find(ID_C_template).is_not_nil() &&
+      symb.type.find(ID_C_template_arguments).is_not_nil())
+    {
+      template_map.build(
+        static_cast<const template_typet &>(symb.type.find(ID_C_template)),
+        static_cast<const cpp_template_args_tct &>(
+          symb.type.find(ID_C_template_arguments)));
+    }
     // Apply template_map to parameter types for SFINAE substitution
     for(auto &d : new_decl.declarators())
       template_map.apply(d.type());
-    symbolt &symb = symbol_table.get_writeable_ref(class_name);
 
     if(new_decl.declarators().size() != 1)
     {
@@ -6845,6 +6868,24 @@ skip_pack_removal_ft:
               m_strip(new_decl.declarators()[0].value());
           }
         }
+      }
+      // N5008 [temp.inst]/1: a static data member template specialization
+      // is instantiated once; a second reference (`idx<T>` in two member
+      // function bodies) finds the existing symbol -- its name carries the
+      // instantiation suffix (typecheck_compound_declarator).  The
+      // instance-cache lookup above covers scope-registered instances only;
+      // this member lives in the class scope under its base name.
+      if(
+        is_static && !new_decl.declarators().empty() &&
+        new_decl.declarators()[0].type().id() != ID_function_type)
+      {
+        const irep_idt static_member_id =
+          id2string(cpp_scopes.current_scope().prefix) +
+          id2string(new_decl.declarators()[0].name().get_base_name()) +
+          id2string(cpp_scopes.current_scope().suffix);
+        const symbolt *existing = symbol_table.lookup(static_member_id);
+        if(existing != nullptr && !existing->is_type)
+          return *existing;
       }
       try
       {
