@@ -9099,7 +9099,34 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     else
       return_type = func_type.return_type();
 
-    typecheck_code(body_code);
+    if(generic_closure_eligible)
+    {
+      // N5008 [expr.prim.lambda.closure]/6, [temp.inst]: the body of a
+      // generic lambda is a member function TEMPLATE's body -- it is only
+      // type-checked when operator() is instantiated with deduced argument
+      // types.  The function-pointer lowering built here uses `signed int`
+      // for every `auto` parameter; a body that is ill-formed for that
+      // placeholder (`[](const auto &pt) { return pt.x; }`) is no error of
+      // the program.  Try it silently; on failure the lowered function keeps
+      // no body (the closure's template operator() is the real one).
+      const std::size_t saved_errors =
+        get_message_handler().get_message_count(messaget::M_ERROR);
+      const unsigned saved_verbosity = get_message_handler().get_verbosity();
+      get_message_handler().set_verbosity(0);
+      try
+      {
+        typecheck_code(body_code);
+      }
+      catch(...)
+      {
+        body_code = codet(ID_nil);
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, saved_errors);
+      }
+      get_message_handler().set_verbosity(saved_verbosity);
+    }
+    else
+      typecheck_code(body_code);
 
     // Deduce return type from body if not explicitly specified
     if(deduce_return)
