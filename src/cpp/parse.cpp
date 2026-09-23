@@ -1460,6 +1460,16 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
       // handles multi-argument concept-ids (`requires same_as<T,
       // int>`) that the general expression parser reads as
       // less-than chains.
+      //
+      // N5008 [temp.pre]/1 + [temp.constr.decl]: a constraint-expression's
+      // primary expressions are id-expressions (a concept-id is complete
+      // at its closing `>'), literals, or parenthesised expressions; the
+      // restricted parser therefore stops exactly where the declaration
+      // begins, so ANY identifier may follow -- including the type name
+      // of `requires Integral<T> T identity(T a)', where the declared
+      // name follows the type name.  (The `identifier identifier'
+      // exclusion below guards the GENERAL expression path only, which
+      // may read `C<T> T' as a less-than chain.)
       {
         auto saved_pos = lex.Save();
         exprt requires_expr;
@@ -1476,7 +1486,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
             next == TOK_STATIC || next == TOK_INLINE || next == TOK_EXTERN ||
             next == TOK_FRIEND || next == TOK_VIRTUAL || next == TOK_TYPEDEF ||
             next == TOK_TYPENAME || next == TOK_CONST || next == TOK_VOLATILE ||
-            (is_identifier(next) && !is_identifier(lex.LookAhead(1))))
+            is_identifier(next))
           {
             template_type.add(ID_C_requires_clause).swap(requires_expr);
             goto requires_done;
