@@ -1,0 +1,7 @@
+CORE
+cstring10.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: REFUTED$
+--

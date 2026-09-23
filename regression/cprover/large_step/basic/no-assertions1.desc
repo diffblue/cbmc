@@ -1,0 +1,7 @@
+CORE
+basic1.c
+--no-assertions
+^EXIT=0$
+^SIGNAL=0$
+^There are no properties to show\.$
+--

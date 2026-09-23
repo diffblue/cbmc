@@ -1,0 +1,9 @@
+CORE
+use_precondition2.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[my_function\.pointer\.1\] line \d+ pointer p safe: SUCCESS$
+^\[my_function\.pointer\.2\] line \d+ pointer p safe: SUCCESS$
+^\[my_function\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

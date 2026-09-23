@@ -1,0 +1,8 @@
+CORE
+strlen2.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.strlen\.1\] line \d+ strlen argument must be C string: SUCCESS$
+^\[main\.strlen\.2\] line \d+ strlen argument must be C string: REFUTED$
+--

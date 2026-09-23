@@ -1,0 +1,10 @@
+CORE
+given_invariant9.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.invariant\.1\] line \d+ loop invariant: SUCCESS$
+^\[main\.invariant\.2\] line \d+ loop invariant: SUCCESS$
+^\[main\.pointer\.1\] line \d+ pointer .* safe: SUCCESS$
+--
+--

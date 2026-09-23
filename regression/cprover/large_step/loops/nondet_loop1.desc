@@ -1,0 +1,7 @@
+KNOWNBUG
+nondet_loop1.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 2: REFUTED$
+--

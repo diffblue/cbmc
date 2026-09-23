@@ -1,0 +1,7 @@
+CORE
+iterate_over_array2.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[find_zero\.pointer\.1\] line \d+ pointer .* safe: SUCCESS$
+--

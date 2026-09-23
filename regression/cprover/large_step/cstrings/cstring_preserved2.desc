@@ -1,0 +1,7 @@
+CORE
+cstring_preserved2.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[cstring_preserved\.assertion\.1\] line \d+ p is still a cstring: SUCCESS$
+--
