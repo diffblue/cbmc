@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^\[main\.assertion\.\d+\] .* holds for every struct-typed bound variable: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+This tests that a struct-typed quantifier bound variable does not trigger an
+invariant violation ("quantified variable shall be a symbol"). Field
+sensitivity must not decompose the bound-variable symbol of a quantifier.
