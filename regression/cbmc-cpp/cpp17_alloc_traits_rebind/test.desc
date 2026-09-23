@@ -7,5 +7,6 @@ main.cpp
 ^\[main\.assertion\.1\] line 74 rebind chain resolved: SUCCESS$
 --
 ^CONVERSION ERROR$
+--
 template scope 'rebind' is ambiguous
 template scope 'rebind' not found

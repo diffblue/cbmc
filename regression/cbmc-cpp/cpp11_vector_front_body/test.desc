@@ -5,5 +5,6 @@ main.cpp
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+--
 Tests that vector::front() works correctly through the iterator
 dereference chain (begin() -> operator*() -> reference).

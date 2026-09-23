@@ -7,5 +7,6 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*' is not accessible$
+--
 A friend of the type may default-initialize a local object whose default
 constructor is private (class.access): this must be accepted.

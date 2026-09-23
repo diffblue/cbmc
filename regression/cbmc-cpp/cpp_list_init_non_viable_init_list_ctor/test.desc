@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*invalid implicit conversion.*$
+--
 A non-viable initializer-list constructor must not be selected for a
 braced-init-list, per over.match.list: the const char* element does not
 convert to char, so the const char* constructor is selected; a list of

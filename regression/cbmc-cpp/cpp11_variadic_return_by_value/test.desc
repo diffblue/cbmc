@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+--
 no body for callee
 A variadic function template returning a variadic class template by value:
 the pack in the returned type is expanded per element rather than collapsing.
