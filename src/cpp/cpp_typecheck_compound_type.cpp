@@ -1463,6 +1463,18 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // Identifiers for methods include the scope prefix.
     // Identifiers for static members include the scope prefix.
     identifier = cpp_scopes.current_scope().prefix + id2string(base_name);
+    // N5008 [temp.pre]/1 + [temp.spec]/4: each specialization of a static
+    // data member template (`template <class T> static constexpr bool
+    // __exactly_once = ...;`, std::variant) is a distinct variable; encode
+    // the instantiation suffix as for member function templates, or the
+    // second specialization is a "redeclaration" of the first.
+    if(
+      is_static && !is_method &&
+      declarator.get_bool("#member_fn_template_instance"))
+    {
+      identifier =
+        id2string(identifier) + id2string(cpp_scopes.current_scope().suffix);
+    }
   }
   else
   {

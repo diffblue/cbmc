@@ -7036,9 +7036,17 @@ resolved_after_strip:
           {
             // This is a variable template (e.g., concept).
             // Instantiate with explicit template args.
+            // N5008 [basic.lookup.unqual]/1: the arguments are expressions
+            // at the point of use, not in the template's scope -- type-check
+            // them in the original scope, as for class and function
+            // templates (`std::in_place_index<__accepted_index<_Tp>>` in
+            // std::variant's converting constructor names a member of the
+            // class, invisible from namespace std).
             cpp_template_args_tct tc_args;
             try
             {
+              cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+              cpp_typecheck.cpp_scopes.go_to(*original_scope);
               tc_args = cpp_typecheck.typecheck_template_args(
                 source_location, s, template_args);
             }
