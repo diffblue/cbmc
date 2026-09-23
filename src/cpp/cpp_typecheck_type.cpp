@@ -883,6 +883,17 @@ void cpp_typecheckt::typecheck_type(typet &type)
           }
       }
     }
+    else if(e.id() == ID_if && e.get_bool(ID_C_xvalue))
+    {
+      // N5008 [dcl.type.decltype]/1.4: an xvalue E has decltype T&&; a
+      // conditional over two xvalues of one type is an xvalue
+      // ([expr.cond]/4.1).
+      // (the front end marks an rvalue reference with BOTH flags, see
+      // cpp_convert_type.cpp)
+      typet rr = ::reference_type(e.type());
+      rr.set(ID_C_rvalue_reference, true);
+      type = rr;
+    }
     else if(
       e.get_bool(ID_C_lvalue) && !is_reference(e.type()) &&
       e.type().id() != ID_code &&
