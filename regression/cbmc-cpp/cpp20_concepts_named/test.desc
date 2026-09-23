@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^EXIT=0$
@@ -9,6 +9,7 @@ main.cpp
 Named concept declarations (template<class T> concept X = ...).
 CBMC skips concept constraints (treats as always satisfied).
 
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: function must have return type
+Was KNOWNBUG since round 152 ("function must have return type"): a
+requires-clause followed directly by the declaration's type name
+(`requires SignedIntegral<T> T negate(T x)`) -- fixed 2026-09-23 in the
+restricted constraint parser, see cpp20_requires_unparenthesized.
