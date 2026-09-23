@@ -12,8 +12,41 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "slice.h"
 #include "symex_slice_class.h"
 
+#include <util/expr_iterator.h>
 #include <util/find_symbols.h>
+#include <util/mathematical_expr.h>
 #include <util/std_expr.h>
+
+/// True iff the expression contains a function application whose
+/// callee is a CPROVER string-refinement intrinsic. These functions
+/// (`cprover_string_*`, `cprover_char_*`, `cprover_associate_*`) have
+/// non-data side effects on the string-refinement solver: the
+/// `cprover_associate_array_to_pointer_func` call, for instance, is
+/// the only mechanism by which the solver learns that a given char
+/// pointer aliases a particular char-array. Slicing them based on
+/// data dependencies alone is unsound — the assignment's LHS (a
+/// dummy "return code" symbol) is unused, but the *call* must still
+/// reach the solver.
+static bool contains_string_refinement_intrinsic(const exprt &expr)
+{
+  for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); ++it)
+  {
+    if(it->id() != ID_function_application)
+      continue;
+    const auto &fn = to_function_application_expr(*it).function();
+    if(fn.id() != ID_symbol)
+      continue;
+    const std::string id = id2string(to_symbol_expr(fn).get_identifier());
+    // Match the three intrinsic families that the string-refinement
+    // solver consumes side-channel information from.
+    if(
+      id.rfind("cprover_string_", 0) == 0 ||
+      id.rfind("cprover_char_", 0) == 0 ||
+      id.rfind("cprover_associate_", 0) == 0)
+      return true;
+  }
+  return false;
+}
 
 void symex_slicet::get_symbols(const exprt &expr)
 {
@@ -109,6 +142,19 @@ void symex_slicet::slice_assignment(SSA_stept &SSA_step)
   auto entry = depends.find(id);
   if(entry == depends.end())
   {
+    // Even if this assignment's LHS is not transitively used by any
+    // assertion, the RHS may carry a side-effecting call to a
+    // string-refinement intrinsic (cprover_string_*,
+    // cprover_associate_*, ...). The string-refinement decision
+    // procedure scans these calls during dec_solve to populate its
+    // pointer↔array and length-of-array maps; dropping them yields
+    // unsound results for code that uses CBMC's string solver
+    // (e.g., Python's str(), f-strings, etc.).
+    if(contains_string_refinement_intrinsic(SSA_step.ssa_rhs))
+    {
+      get_symbols(SSA_step.ssa_rhs);
+      return;
+    }
     // we don't really need it
     SSA_step.ignore=true;
   }
