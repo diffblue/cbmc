@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
+--
 libc++ vector member access fails with "incomplete type on left hand
 side" due to deferred template elaboration not completing the vector
 class before member access.

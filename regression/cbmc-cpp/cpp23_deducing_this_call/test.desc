@@ -5,4 +5,5 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+--
 Deducing this: s.get() does not dispatch to get(this S self)

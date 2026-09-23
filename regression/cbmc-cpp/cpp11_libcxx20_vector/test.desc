@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
+--
 libc++-20 headers use SIMD intrinsics (__algorithm/simd_utils.h)
 that CBMC's parser cannot handle. This test documents the
 incompatibility with libc++-20 (LLVM 20, e.g., ubuntu 25.04).

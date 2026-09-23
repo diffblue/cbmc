@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+--
 C++11 auto deduction with pointer declarators.
 The declarator's pointer level is part of the deduction pattern, so
 `auto *p = <T*>` deduces auto=T (p has type T*), not auto=T*.

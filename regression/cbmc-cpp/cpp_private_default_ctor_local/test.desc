@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^VERIFICATION
+--
 Declaring a local variable of a type whose default constructor is
 private must be rejected at the point of declaration, per dcl.init and
 class.access.

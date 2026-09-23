@@ -6,6 +6,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+--
 Constructing and calling a std::function whose parameter is a reference
 or pointer to a class type must type-check: the converting constructor
 must be selected and operator must resolve. The instantiated operator

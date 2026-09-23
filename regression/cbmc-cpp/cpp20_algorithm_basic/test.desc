@@ -7,4 +7,5 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+--
 std::sort in C++17 mode. May report "no body" on some GCC versions.

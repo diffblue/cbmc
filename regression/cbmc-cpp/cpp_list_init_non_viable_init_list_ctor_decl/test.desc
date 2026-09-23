@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*invalid implicit conversion.*$
+--
 The variable-declaration form must also select the const char*
 constructor over a non-viable initializer-list constructor, per
 over.match.list.
