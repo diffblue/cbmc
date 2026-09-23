@@ -1136,21 +1136,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   catch(...)
                   {
                   }
-                  const irep_idt id = "requires_param::" + id2string(pname);
-                  if(!cpp_typecheck.symbol_table.has_symbol(id))
-                  {
-                    symbolt psym{id, ptype, ID_cpp};
-                    psym.base_name = pname;
-                    psym.is_lvalue = true;
-                    cpp_typecheck.symbol_table.add(psym);
-                  }
-                  else
-                    cpp_typecheck.symbol_table.get_writeable_ref(id).type =
-                      ptype;
-                  cpp_idt &sc =
-                    cpp_typecheck.cpp_scopes.current_scope().insert(pname);
-                  sc.identifier = id;
-                  sc.id_class = cpp_idt::id_classt::SYMBOL;
+                  cpp_typecheck.bind_requires_parameter(pname, ptype);
                 }
                 for(const auto &s : node.get_sub())
                   bind_req_params(s);

@@ -592,7 +592,8 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
         // current (class) scope so the second pass of
         // typecheck_compound_body can resolve the template
         // parameters (e.g. _Up) during constructor processing.
-        cpp_scopes.current_scope().add_secondary_scope(template_scope);
+        if(cpp_scopes.current_scope().is_class())
+          cpp_scopes.current_scope().add_secondary_scope(template_scope);
 
         return;
       }
@@ -682,7 +683,17 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     // class instantiation is abandoned, silently dropping the user's
     // statements ([temp.local] name visibility; the placeholder map in
     // the constructor pass then supplies the parameter's type).
-    cpp_scopes.current_scope().add_secondary_scope(template_scope);
+    //
+    // Class scopes only: for a NAMESPACE-scope declaration/definition
+    // pair (libstdc++'s iterator operations, `f(_Iter __i)`) the
+    // attachment made the template's FUNCTION PARAMETERS visible to every
+    // unqualified lookup in the namespace -- a requires-expression's
+    // parameter `__i` bound in an instantiation scope under std then
+    // resolved ambiguously against that stale `__i` and the requirement
+    // read as unsatisfied ([basic.scope.scope]: a function parameter's
+    // scope is its declaration, not the enclosing namespace).
+    if(cpp_scopes.current_scope().is_class())
+      cpp_scopes.current_scope().add_secondary_scope(template_scope);
 
     // todo: the old template scope now is useless,
     // and thus, we could delete it

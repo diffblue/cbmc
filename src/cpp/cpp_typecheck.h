@@ -928,6 +928,16 @@ protected:
   /// [expr.prim.req.general]/5.
   bool compound_requirement_is_satisfied(const exprt &expr);
 
+  /// N5008 [expr.prim.req.general]/2-3: bind a requirement-parameter of a
+  /// requires-expression (`requires(T a) { ... }`) as a local symbol of the
+  /// current (instantiation) scope, of the substituted type \p type.  Each
+  /// binding is a distinct symbol: the parameters are notation local to
+  /// their requires-expression, and a shared per-name symbol was overwritten
+  /// by a nested evaluation of another concept using the same parameter name
+  /// (libstdc++'s `__i` in weakly_incrementable and in every iterator
+  /// concept), so `++__i` was checked against the wrong type.
+  void bind_requires_parameter(const irep_idt &name, const typet &type);
+
   void typecheck_expr_member(exprt &) override;
   void typecheck_expr_ptrmember(exprt &) override;
   void typecheck_expr_throw(exprt &);
