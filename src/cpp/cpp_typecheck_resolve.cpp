@@ -3497,11 +3497,12 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
             // pointer;` bailed out here, the alias stayed
             // unregistered, and the field declaration `iterator end;`
             // resolved to the namespace-scope std::iterator template
-            // instead.
-            if(
-              sym == nullptr && id_ptr->is_member &&
-              config.ansi_c.preprocessor ==
-                configt::ansi_ct::preprocessort::CLANG)
+            // instead.  libstdc++ has the same shape: `typedef
+            // __cv_selector<...> __match; typedef typename __match::__type
+            // __type;` in __match_cv_qualifiers (behind __copy_cv and every
+            // common_reference), which failed whenever the class was first
+            // completed under suppress_elaborate.
+            if(sym == nullptr && id_ptr->is_member)
             {
               const cpp_idt &parent = id_ptr->get_parent();
               const auto *class_sym =
@@ -6717,9 +6718,13 @@ exprt cpp_typecheck_resolvet::resolve(
       {
       }
       cpp_typecheck.suppress_elaborate = old_suppress;
-      // Retry lookup after elaboration
+      // Retry lookup after elaboration.  N5008 [class.member.lookup]: the
+      // member may be INHERITED -- `is_convertible<...>::value`, declared
+      // by the integral_constant base that the elaboration has just
+      // attached -- so the retry must search the bases too (QUALIFIED),
+      // not the class's own entries only.
       id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
-        base_name, cpp_scopet::SCOPE_ONLY);
+        base_name, cpp_scopet::QUALIFIED);
     }
 
     // N5008 [basic.lookup.qual] + [class.static.data]: the member may
@@ -8020,6 +8025,29 @@ void cpp_typecheck_resolvet::guess_template_args(
     const cpp_namet &cpp_name = to_cpp_name(template_type);
 
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+
+    // N5008 [temp.deduct.type]/5.1: the nested-name-specifier of a type
+    // that was specified using a qualified-id is a non-deduced context --
+    // `typename enable_if<is_conv<X&&, ...>>::type` (the expansion of
+    // libstdc++'s _Require<> in __common_ref_impl's rvalue partial
+    // specialization) deduces nothing about X.  Resolving it here, with the
+    // specialization's parameters still unassigned, evaluated the
+    // constraint on unbound names as a hard error, aborting the matching
+    // of every sibling specialization.
+    const bool template_args_on_qualifier = [&]() -> bool
+    {
+      bool seen_args = false;
+      for(const auto &sub : cpp_name.get_sub())
+      {
+        if(sub.id() == ID_template_args)
+          seen_args = true;
+        else if(sub.id() == "::" && seen_args)
+          return true;
+      }
+      return false;
+    }();
+    if(template_args_on_qualifier)
+      return;
 
     if(cpp_name.has_template_args())
     {
