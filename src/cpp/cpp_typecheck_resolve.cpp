@@ -21,18 +21,14 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/simplify_expr.h>
-#include <util/symbol_table_base.h>
-
-extern exprt try_evaluate_constexpr(
-  const exprt &expr,
-  const symbol_table_baset &symbol_table,
-  const namespacet &ns);
 #include <util/std_expr.h>
 #include <util/string_constant.h>
+#include <util/symbol_table_base.h>
 
 #include <ansi-c/anonymous_member.h>
 #include <ansi-c/merged_type.h>
 
+#include "cpp_constexpr_eval.h"
 #include "cpp_convert_type.h"
 #include "cpp_sfinae_context.h"
 #include "cpp_template_parameter.h"
