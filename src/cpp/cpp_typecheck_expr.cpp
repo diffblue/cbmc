@@ -113,6 +113,37 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
   return valid;
 }
 
+void cpp_typecheckt::bind_requires_parameter(
+  const irep_idt &name,
+  const typet &type)
+{
+  static std::size_t binding_counter = 0;
+  const irep_idt id = "requires_param::" + id2string(name) + "#" +
+                      std::to_string(binding_counter++);
+  symbolt param_sym{id, type, ID_cpp};
+  param_sym.base_name = name;
+  param_sym.is_lvalue = true;
+  symbol_table.add(param_sym);
+  // A scope's entries form a multimap: a second `__i` next to the one bound
+  // by an earlier requires-expression evaluated in the same scope made the
+  // name ambiguous and the requirement silently unsatisfied.  Rebind the
+  // existing entry instead.
+  cpp_scopet &scope = cpp_scopes.current_scope();
+  for(cpp_idt *existing : scope.lookup(name, cpp_scopet::SCOPE_ONLY))
+  {
+    if(
+      existing->id_class == cpp_idt::id_classt::SYMBOL &&
+      has_prefix(id2string(existing->identifier), "requires_param::"))
+    {
+      existing->identifier = id;
+      return;
+    }
+  }
+  cpp_idt &scope_id = scope.insert(name);
+  scope_id.identifier = id;
+  scope_id.id_class = cpp_idt::id_classt::SYMBOL;
+}
+
 bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
 {
   const std::size_t errors_before =
