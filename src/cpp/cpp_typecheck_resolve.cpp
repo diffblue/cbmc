@@ -4891,16 +4891,39 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         }
         if(!pack_id.empty())
         {
+          // N5008 [temp.deduct.type]/9-10: the trailing pack binds the
+          // remaining arguments -- TYPES for a type parameter pack, VALUES
+          // for a non-type one (`template<int H, int... T> struct
+          // sum_t<H, T...>`).  A value pack is recorded in pack_expr_map
+          // (see the template-id deduction in guess_template_args); it used
+          // to be recorded as an EMPTY type pack, so `sum_t<1, 2, 3>`
+          // matched the specialization with T = {} and had no `v`.
           std::vector<typet> pack_elems;
+          exprt::operandst pack_exprs;
           for(std::size_t j = i; j < n_full; j++)
-            if(
-              full_template_args_tc.arguments()[j].id() == ID_type &&
-              full_template_args_tc.arguments()[j].type().id() != ID_empty)
-              pack_elems.push_back(full_template_args_tc.arguments()[j].type());
-          cpp_typecheck.template_map.set_pack_size(pack_id, pack_elems.size());
-          cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
-          if(!pack_elems.empty())
-            cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
+          {
+            const exprt &a = full_template_args_tc.arguments()[j];
+            if(a.id() == ID_type)
+            {
+              if(a.type().id() != ID_empty)
+                pack_elems.push_back(a.type());
+            }
+            else
+              pack_exprs.push_back(a);
+          }
+          cpp_typecheck.template_map.set_pack_size(
+            pack_id, pack_elems.size() + pack_exprs.size());
+          if(pack_exprs.empty())
+          {
+            cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
+            if(!pack_elems.empty())
+              cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
+          }
+          else
+          {
+            cpp_typecheck.template_map.pack_expr_map[pack_id] = pack_exprs;
+            cpp_typecheck.template_map.expr_map[pack_id] = pack_exprs.front();
+          }
         }
         break;
       }
