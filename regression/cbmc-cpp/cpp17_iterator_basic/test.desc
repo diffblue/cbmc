@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+--
 std::iterator utilities in C++17 mode.
 Invariant violation: std::less<std::_V2::error_category>::~less
 destructor symbol not found. Triggered by <system_error> header

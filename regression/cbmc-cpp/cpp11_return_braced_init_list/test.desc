@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+--
 Returning a braced-init-list from a function whose return type has a
 viable initializer-list constructor must list-initialize the returned
 object with the whole list as a single std::initializer_list argument.

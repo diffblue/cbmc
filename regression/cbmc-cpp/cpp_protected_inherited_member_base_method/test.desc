@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+--
 A member function of a class may access a protected member it declares
 on an object of any derived type ([class.access.base]/5.4), not only via
 `this`.  Access control must be anchored on the declaring class, not on

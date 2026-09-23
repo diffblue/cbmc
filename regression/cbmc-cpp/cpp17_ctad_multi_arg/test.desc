@@ -5,5 +5,6 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+--
 Test that CTAD works with multi-argument constructors where
 arguments share the same type or have different types.

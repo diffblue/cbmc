@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*' is not accessible$
+--
 Implicit destructor synthesis on a derived class must honour the
 namespace-aware struct_tag form when checking inherited-base
 accessibility (`<ns>::tag-<class>`, not `tag-<ns>::<class>`).

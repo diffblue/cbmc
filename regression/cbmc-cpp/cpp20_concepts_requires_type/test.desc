@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+--
 requires-expression with type requirements.
 The requires clause is skipped but SFINAE-like fallback to the
 primary template works.

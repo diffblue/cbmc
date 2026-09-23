@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^VERIFICATION
+--
 A derived class member function accessing a private base member through
 an implicit `this` must be rejected ([class.access.base]): the member is
 inaccessible as named in the derived class.

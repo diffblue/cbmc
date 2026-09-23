@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
+--
 libc++ CONVERSION ERROR: incomplete type, missing symbol, or
 implicit conversion failure.
 Round-11 (2026-08-04): moved CORE -> THOROUGH.  The concept-id

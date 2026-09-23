@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+--
 Concept-constrained specialization ordering with __is_pointer and
 __remove_pointer builtins in requires clauses produces incorrect
 results when CBMC uses Clang 20 as the preprocessor. The requires

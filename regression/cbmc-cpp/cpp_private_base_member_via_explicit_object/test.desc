@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^VERIFICATION
+--
 Naming a private base member through an explicit object from a derived
 class's member function must be rejected: access is judged from the
 point of use, not from the object's static type ([class.access]).

@@ -7,5 +7,6 @@ main.cpp
 ^\[main\.assertion\.1\].* member swap: x takes y's value: SUCCESS$
 ^\[main\.assertion\.2\].* member swap: y takes x's value: SUCCESS$
 --
+--
 could not fully type-check
 ^CONVERSION ERROR$

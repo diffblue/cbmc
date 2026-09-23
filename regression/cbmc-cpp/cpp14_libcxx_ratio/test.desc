@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
+--
 libc++ std::ratio fails because the self-referential typedef
 (typedef ratio<num, den> type) triggers recursive instantiation
 that overwrites constexpr static member values. See

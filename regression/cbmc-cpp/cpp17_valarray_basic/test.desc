@@ -6,4 +6,5 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+--
 std::valarray in C++17 mode. KNOWNBUG due to validation issues.
