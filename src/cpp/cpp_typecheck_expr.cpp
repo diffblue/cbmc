@@ -1736,16 +1736,84 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     return;
   }
 
-  if(expr.op1().type() == expr.op2().type())
+  // N5008 [expr.cond]/4: operands of the same underlying type that differ
+  // in cv-qualification (or value category).  Both glvalues of the same
+  // category: the target is the cv-combined type ([conv.qual]) and the
+  // result keeps that category -- `b ? w : cw` with `W &w, const W &cw` is
+  // an lvalue `const W` (4.1).  Different categories (an lvalue and an
+  // xvalue, `b ? declval<int&>() : declval<int&&>()`): 4.3 with /6 -- the
+  // result is a prvalue of the cv-combined type.  Both are what libstdc++'s
+  // COND-RES (common_reference, iterator concepts) is built on.
+  const auto value_category = [](const exprt &e) -> int
   {
-    c_qualifierst qual1, qual2;
-    qual1.read(expr.op1().type());
-    qual2.read(expr.op2().type());
+    // 0 = prvalue, 1 = lvalue, 2 = xvalue
+    if(!e.get_bool(ID_C_lvalue))
+      return 0;
+    if(
+      e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
+      e.operands().size() == 1 &&
+      is_rvalue_reference(to_dereference_expr(e).pointer().type()))
+    {
+      return 2;
+    }
+    return 1;
+  };
+  typet plain1 = expr.op1().type();
+  typet plain2 = expr.op2().type();
+  c_qualifierst qual1, qual2;
+  qual1.read(plain1);
+  qual2.read(plain2);
+  c_qualifierst{}.write(plain1);
+  c_qualifierst{}.write(plain2);
+  const bool same_underlying = plain1 == plain2;
 
-    if(qual1.is_subset_of(qual2))
-      expr.type() = expr.op1().type();
-    else
-      expr.type() = expr.op2().type();
+  if(same_underlying)
+  {
+    c_qualifierst combined = qual1;
+    combined += qual2;
+    typet result_type = plain1;
+    combined.write(result_type);
+    expr.type() = result_type;
+
+    const int cat1 = value_category(expr.op1());
+    const int cat2 = value_category(expr.op2());
+    if(cat1 == cat2 && cat1 != 0)
+    {
+      // 4.1: same value category; the operands are converted to the
+      // cv-combined type without changing their category
+      if(expr.op1().type() != result_type)
+        expr.op1() = typecast_exprt{expr.op1(), result_type};
+      if(expr.op2().type() != result_type)
+        expr.op2() = typecast_exprt{expr.op2(), result_type};
+      expr.set(ID_C_lvalue, true);
+      if(cat1 == 2)
+        expr.set(ID_C_xvalue, true);
+      return;
+    }
+    // 4.3 / 6: a prvalue; lvalue-to-rvalue conversion on glvalue operands.
+    // [expr.type]/2: a prvalue of a non-class, non-array type has a
+    // cv-unqualified type.
+    if(
+      result_type.id() != ID_struct_tag && result_type.id() != ID_union_tag &&
+      result_type.id() != ID_array)
+    {
+      result_type = plain1;
+      expr.type() = result_type;
+    }
+    for(exprt *op : {&expr.op1(), &expr.op2()})
+    {
+      if(op->get_bool(ID_C_lvalue))
+      {
+        exprt converted;
+        if(standard_conversion_lvalue_to_rvalue(*op, converted))
+          op->swap(converted);
+        else
+          op->remove(ID_C_lvalue);
+      }
+      if(op->type() != result_type)
+        *op = typecast_exprt{*op, result_type};
+    }
+    return;
   }
   else
   {
