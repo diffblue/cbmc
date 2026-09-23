@@ -558,11 +558,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         const auto p = nm.rfind("::");
         const std::string suf = p != std::string::npos ? nm.substr(p + 2) : nm;
         auto has_suffix = [&](const irep_idt &key_id) -> bool
-        {
-          const std::string key = id2string(key_id);
-          const auto q = key.rfind("::");
-          return (q != std::string::npos ? key.substr(q + 2) : key) == suf;
-        };
+        { return binds_reference(key_id, suf); };
         // Several packs may share the short name (different templates
         // reuse `_Args`; instantiations nest, so an enclosing template's
         // live pack sits in the map next to the current template's EMPTY
@@ -871,6 +867,59 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
   }
 }
 
+void template_mapt::push_parameter_scope(const template_typet &template_type)
+{
+  std::vector<irep_idt> ids;
+  for(const auto &param : template_type.template_parameters())
+  {
+    const irep_idt pid = param.id() == ID_type ? param.type().get(ID_identifier)
+                                               : param.get(ID_identifier);
+    if(!pid.empty())
+      ids.push_back(pid);
+  }
+  if(ids.empty())
+    return;
+  // the same template rebuilt (a deduction replayed, an alias re-resolved):
+  // keep the stack free of duplicates so the innermost scope stays
+  // meaningful
+  for(auto it = parameter_scopes.begin(); it != parameter_scopes.end();)
+  {
+    if(*it == ids)
+      it = parameter_scopes.erase(it);
+    else
+      ++it;
+  }
+  parameter_scopes.push_back(std::move(ids));
+}
+
+irep_idt template_mapt::innermost_parameter(const std::string &short_name) const
+{
+  for(auto scope = parameter_scopes.rbegin(); scope != parameter_scopes.rend();
+      ++scope)
+  {
+    for(const auto &pid : *scope)
+    {
+      const std::string key = id2string(pid);
+      const auto pos = key.rfind("::");
+      if((pos != std::string::npos ? key.substr(pos + 2) : key) == short_name)
+        return pid;
+    }
+  }
+  return irep_idt{};
+}
+
+bool template_mapt::binds_reference(
+  const irep_idt &key,
+  const std::string &short_name) const
+{
+  const std::string k = id2string(key);
+  const auto pos = k.rfind("::");
+  if((pos != std::string::npos ? k.substr(pos + 2) : k) != short_name)
+    return false;
+  const irep_idt own = innermost_parameter(short_name);
+  return own.empty() || own == key;
+}
+
 void template_mapt::apply(typet &type) const
 {
   // N5008 [temp.variadic]/5: a `decltype` operand may contain a function-call
@@ -1068,30 +1117,25 @@ void template_mapt::apply(typet &type) const
       {
         irept &decl_type = op.add(ID_type);
 
-        // [temp.local]/1 + [basic.scope.temp]: a member template's own
-        // parameters shadow same-named parameters of an enclosing
-        // template.  A member alias template's body stores parameter
-        // references as bare `cpp_name`s; for the canonical
-        // `template<class _Tp, ...> using type = _Tp;` form (libstdc++
-        // `__conditional`), `apply`'s short-name matching would bind the
-        // top-level body reference to an unrelated enclosing parameter
-        // of the same name that happens to be in scope (e.g.
-        // `std::decay<_Tp>`'s `_Tp` leaking into
-        // `std::__conditional<C>::type<_Tp,_>`), baking in the wrong
-        // type before the member alias is itself instantiated.
-        //
-        // Protect ONLY top-level bare references (direct children of the
-        // body), not references nested inside `decltype`/template
-        // arguments -- those are handled by existing machinery that
-        // other library code relies on.  Append a sentinel so the
-        // short-name match misses, substitute, then strip it so the
-        // member alias's own instantiation binds the reference by its
-        // own parameter identity ([temp.res] two-phase).
-        const bool is_member_alias = (op.get_bool(ID_is_template) ||
-                                      op.find(ID_template_type).is_not_nil()) &&
-                                     op.get_bool(ID_is_typedef);
+        // N5008 [temp.local]/1 + [basic.scope.temp]/2: a member template's
+        // own parameters shadow same-named parameters of an enclosing
+        // template throughout its declaration.  Its body stores parameter
+        // references as bare `cpp_name`s and its parameters are not yet
+        // bound (they bind at the member's own instantiation,
+        // [temp.alias]/2, [temp.inst]/2); without a scope of their own,
+        // apply()'s short-name scan bound e.g. the top-level `_Tp` of
+        // `template<class _Tp, ...> using type = _Tp;` (libstdc++
+        // `__conditional`) to an unrelated enclosing `_Tp`, baking the
+        // wrong type into the alias before it was instantiated.  Push the
+        // member template's parameters as an UNBOUND innermost scope while
+        // substituting its declaration: innermost_parameter() then names
+        // them and the scan finds no binding, leaving the reference for the
+        // member's own instantiation ([temp.res] two-phase).
+        const bool is_member_template =
+          op.get_bool(ID_is_template) || op.find(ID_template_type).is_not_nil();
         std::set<std::string> own_param_names;
-        if(is_member_alias)
+        std::vector<irep_idt> own_param_ids;
+        if(is_member_template)
         {
           const auto short_name = [](const irep_idt &id) -> std::string
           {
@@ -1107,103 +1151,38 @@ void template_mapt::apply(typet &type) const
               if(d.id() != ID_cpp_declarator)
                 continue;
               for(const auto &ns : d.find(ID_name).get_sub())
+              {
                 if(ns.id() == ID_name && !ns.get(ID_identifier).empty())
-                  own_param_names.insert(short_name(ns.get(ID_identifier)));
+                {
+                  const std::string sn = short_name(ns.get(ID_identifier));
+                  own_param_names.insert(sn);
+                  // the member's parameters have no scope-qualified id yet
+                  // (the template scope is created at its type-check); a
+                  // placeholder that no binding carries suffices for
+                  // shadowing
+                  own_param_ids.push_back("#unbound_member_template::" + sn);
+                }
+              }
             }
           }
         }
-        if(is_member_alias && !own_param_names.empty())
+        if(is_member_template && !own_param_ids.empty())
         {
-          const std::string marker = "#tmpl_param_shadow";
-          const auto mark = [&](irept &n, bool restore)
-          {
-            if(
-              n.id() != ID_cpp_name || n.get_sub().size() != 1 ||
-              n.get_sub().front().id() != ID_name)
-              return;
-            irept &nm = n.get_sub().front();
-            const std::string s = id2string(nm.get(ID_identifier));
-            if(!restore)
-            {
-              const auto p = s.rfind("::");
-              const std::string nn =
-                p != std::string::npos ? s.substr(p + 2) : s;
-              if(own_param_names.count(nn) != 0)
-                nm.set(ID_identifier, s + marker);
-            }
-            else if(
-              s.size() >= marker.size() &&
-              s.compare(s.size() - marker.size(), marker.size(), marker) == 0)
-              nm.set(ID_identifier, s.substr(0, s.size() - marker.size()));
-          };
-          // Descend through pure type-structure wrappers: a pointer /
-          // reference / array declarator around the reference does not
-          // change name binding ([temp.local]/1 -- within the member
-          // alias template's declaration its own parameter name refers
-          // to its own parameter; libc++ pointer_traits<_Tp*>'s
-          // `rebind = _Up*` stores the reference as the POINTEE).
-          // Deliberately do NOT descend into template arguments or
-          // decltype operands: those nested references are handled by
-          // (and other library code relies on) the existing machinery.
-          std::function<void(irept &, bool)> mark_rec =
-            [&](irept &n, bool restore)
-          {
-            if(n.id() == ID_cpp_name)
-            {
-              // A bare own-parameter reference (single name component).
-              mark(n, restore);
-              // A template-id whose ARGUMENTS reference an own
-              // parameter (libc++ allocator_traits' `rebind_alloc =
-              // __allocator_traits_rebind_t<allocator_type, _Other>`):
-              // [temp.local]/1 -- `_Other` names the alias's OWN
-              // parameter wherever it appears in the alias's
-              // declaration, so it must not be captured from an
-              // unrelated enclosing binding either.  mark() itself
-              // only ever touches names in own_param_names, so
-              // enclosing-parameter references inside the arguments
-              // (which the enclosing instantiation MUST substitute,
-              // e.g. `allocator_type`) are unaffected.
-              for(auto &ss : n.get_sub())
-                if(ss.id() == ID_template_args)
-                  for(auto &arg : ss.add(ID_arguments).get_sub())
-                    mark_rec(arg, restore);
-              return;
-            }
-            if(n.id() == ID_ambiguous)
-            {
-              irept &t = n.add(ID_type);
-              if(t.is_not_nil())
-                mark_rec(t, restore);
-              return;
-            }
-            if(
-              n.id() == ID_frontend_pointer || n.id() == ID_pointer ||
-              n.id() == ID_array || n.id() == ID_merged_type)
-            {
-              for(auto &ss : n.get_sub())
-                mark_rec(ss, restore);
-            }
-          };
-          const auto each = [&](bool restore)
-          {
-            for(auto &sub : decl_type.get_sub())
-              mark_rec(sub, restore);
-          };
-          each(false);
+          parameter_scopes.push_back(own_param_ids);
           // N5008 [temp.alias]/2 + [temp.variadic]/4-5: while substituting this
-          // member alias template's body during the enclosing class's
-          // instantiation, its OWN parameters are not yet bound.  Record their
-          // short names so the nested-pack expander defers any pack expansion
-          // whose pattern references one (rather than expanding it over the
-          // enclosing class pack alone and leaving the alias's own pack
-          // dangling).  Saved/restored to nest correctly.
+          // member template's declaration during the enclosing class's
+          // instantiation, its OWN parameter packs are not yet bound.  Record
+          // their short names so the nested-pack expander defers any pack
+          // expansion whose pattern references one (rather than expanding it
+          // over the enclosing class pack alone and leaving the member's own
+          // pack dangling).  Saved/restored to nest correctly.
           std::set<std::string> saved_deferred =
             std::move(deferred_own_pack_names);
           deferred_own_pack_names = own_param_names;
           for(auto &sub : decl_type.get_sub())
             apply(static_cast<typet &>(sub));
           deferred_own_pack_names = std::move(saved_deferred);
-          each(true);
+          parameter_scopes.pop_back();
         }
         else
         {
@@ -1316,16 +1295,16 @@ void template_mapt::apply(typet &type) const
 
       // Try to match against type_map entries
       //
-      // CONFORMANCE WARNING (Violation V1, see doc/architectural/
-      // cpp-frontend-review-2026-06-24-template-map-scope.md): this resolves a
-      // bare parameter reference by SHORT NAME (suffix after the last "::")
-      // across the whole flat map, violating N5008 [basic.scope.temp]/2
-      // (parameter identity is scope + name).  When an unrelated live
-      // instantiation has a same-named parameter, this can substitute the wrong
-      // binding -- the root of the recurring cross-template "pack bleed".  The
-      // `#tmpl_param_shadow` marker below and the shadow-removal loop in
-      // build() are patches around this; the structural fix is to resolve only
-      // by exact scope-qualified identifier.
+      // CONFORMANCE NOTE (Violation V1, see doc/architectural/
+      // cpp-frontend-review-2026-06-24-template-map-scope.md): a bare
+      // parameter reference carries only its SHORT NAME.  N5008
+      // [basic.scope.temp]/2 makes parameter identity scope + name; the
+      // active parameter scopes (parameter_scopes, innermost_parameter())
+      // supply the scope: when a template whose declaration or body is being
+      // substituted declares the name, only THAT parameter's binding may
+      // substitute.  The suffix scan across the flat map below is the
+      // fallback for references no active scope declares (an enclosing
+      // template's parameter bound by set() without build()).
       // N5008 [basic.scope.temp]/2 + [temp.deduct]/5: when a template is
       // being deduced and one of ITS OWN parameters has this short name,
       // only that parameter's binding may substitute the reference; an
@@ -1345,6 +1324,14 @@ void template_mapt::apply(typet &type) const
         }
       }
 
+      // N5008 [basic.scope.temp]/2 + [temp.local]/1: when an active
+      // template parameter scope declares this name, the reference denotes
+      // THAT parameter; only its own binding may substitute (see
+      // parameter_scopes).  The short-name scan below is then exact.
+      const irep_idt own_parameter = base_is_deduction_parameter
+                                       ? irep_idt{}
+                                       : innermost_parameter(id2string(base));
+
       for(const auto &entry : type_map)
       {
         const std::string &key = id2string(entry.first);
@@ -1357,6 +1344,8 @@ void template_mapt::apply(typet &type) const
         {
           continue;
         }
+        if(!own_parameter.empty() && entry.first != own_parameter)
+          continue;
         if(
           suffix == id2string(base) && entry.second.id() != ID_unassigned &&
           entry.second.id() != ID_nil)
@@ -1651,11 +1640,7 @@ void template_mapt::apply(typet &type) const
           {
             if(ps.second != 0)
               continue;
-            const std::string &key = id2string(ps.first);
-            auto p = key.rfind("::");
-            std::string suffix =
-              p != std::string::npos ? key.substr(p + 2) : key;
-            if(suffix == id2string(ident))
+            if(binds_reference(ps.first, id2string(ident)))
               return true;
           }
           return false;
@@ -1741,11 +1726,7 @@ void template_mapt::apply(typet &type) const
                   ident_is_deduction_param &&
                   deduction_parameters.count(pack_entry.first) == 0)
                   continue;
-                const std::string &key = id2string(pack_entry.first);
-                auto p = key.rfind("::");
-                std::string suffix =
-                  p != std::string::npos ? key.substr(p + 2) : key;
-                if(suffix == id2string(ident))
+                if(binds_reference(pack_entry.first, id2string(ident)))
                 {
                   for(const auto &pack_type : pack_entry.second)
                   {
@@ -1782,11 +1763,7 @@ void template_mapt::apply(typet &type) const
               irep_idt ident = csub.front().get(ID_identifier);
               for(const auto &pe : pack_expr_map)
               {
-                const std::string &key = id2string(pe.first);
-                auto p = key.rfind("::");
-                const std::string suffix =
-                  p != std::string::npos ? key.substr(p + 2) : key;
-                if(suffix == id2string(ident))
+                if(binds_reference(pe.first, id2string(ident)))
                 {
                   for(const auto &val : pe.second)
                     expanded_args.push_back(static_cast<const irept &>(val));
@@ -1821,20 +1798,12 @@ void template_mapt::apply(typet &type) const
               {
                 for(const auto &pe : pack_args_map)
                 {
-                  const std::string &key = id2string(pe.first);
-                  auto p = key.rfind("::");
-                  const std::string suffix =
-                    p != std::string::npos ? key.substr(p + 2) : key;
-                  if(suffix == id2string(id))
+                  if(binds_reference(pe.first, id2string(id)))
                     referenced_packs.insert(pe.first);
                 }
                 for(const auto &pe : pack_expr_map)
                 {
-                  const std::string &key = id2string(pe.first);
-                  auto p = key.rfind("::");
-                  const std::string suffix =
-                    p != std::string::npos ? key.substr(p + 2) : key;
-                  if(suffix == id2string(id))
+                  if(binds_reference(pe.first, id2string(id)))
                     referenced_packs.insert(pe.first);
                 }
                 // An EMPTY pack (deduced/explicit zero elements) has no
@@ -1846,11 +1815,7 @@ void template_mapt::apply(typet &type) const
                 // reference (N5008 [temp.variadic]/4,7).
                 for(const auto &ps : pack_size_map)
                 {
-                  const std::string &key = id2string(ps.first);
-                  auto p = key.rfind("::");
-                  const std::string suffix =
-                    p != std::string::npos ? key.substr(p + 2) : key;
-                  if(suffix == id2string(id))
+                  if(binds_reference(ps.first, id2string(id)))
                     referenced_packs.insert(ps.first);
                 }
               }
@@ -2239,9 +2204,14 @@ void template_mapt::apply(exprt &expr) const
         bool subst = false;
         if(!is_pack_name(target))
         {
+          // [basic.scope.temp]/2: an active scope declaring the name fixes
+          // the parameter (see parameter_scopes)
+          const irep_idt own_parameter = innermost_parameter(target);
           for(const auto &entry : expr_map)
           {
             const std::string &key = id2string(entry.first);
+            if(!own_parameter.empty() && entry.first != own_parameter)
+              continue;
             if(
               key == target ||
               (key.size() > target.size() + 2 &&
@@ -2488,6 +2458,8 @@ void template_mapt::build(
   {
     return; // mismatched template arguments — skip
   }
+
+  push_parameter_scope(template_type);
 
   // N5008 [temp.variadic]/5,8: with MULTIPLE parameter packs the flat
   // argument list cannot encode the split between packs -- positional
@@ -2902,6 +2874,9 @@ void template_mapt::set(
 void template_mapt::build_unassigned(
   const template_typet &template_type)
 {
+  // deduction substitutes into this template's declaration
+  // ([temp.deduct]/5): its parameters are the innermost scope
+  push_parameter_scope(template_type);
   for(const auto &t : template_type.template_parameters())
   {
     if(t.id()==ID_type)

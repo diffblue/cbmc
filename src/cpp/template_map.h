@@ -156,6 +156,34 @@ public:
   // cpp_typecheck_resolve.cpp.
   std::set<irep_idt> deduction_parameters;
 
+  /// N5008 [basic.scope.temp]/2 + [temp.local]/1: the template parameter
+  /// scopes whose declarations or bodies are currently being substituted,
+  /// innermost LAST; each entry holds the scope-qualified identifiers of one
+  /// template's parameters.  A bare parameter reference in a template's body
+  /// denotes the innermost such scope that declares its name -- the flat maps
+  /// below hold same-named parameters of several live instantiations, and a
+  /// reference must be resolved to ITS template's parameter, bound or not,
+  /// never to an unrelated template's same-named binding (conformance
+  /// violation V1, doc/architectural/cpp-frontend-review-2026-06-24-template-
+  /// map-scope.md).  build() pushes the template it binds; apply() pushes a
+  /// nested template declaration's own (unbound) parameters while
+  /// substituting it.  Saved and restored with the map.
+  /// `mutable`: apply() is const and pushes a nested member template's
+  /// unbound scope around the substitution of that member's declaration.
+  typedef std::vector<std::vector<irep_idt>> parameter_scopest;
+  mutable parameter_scopest parameter_scopes;
+  void push_parameter_scope(const template_typet &template_type);
+  /// The identifier of the innermost active template parameter named
+  /// \p short_name, or empty when no active scope declares it.
+  irep_idt innermost_parameter(const std::string &short_name) const;
+  /// Whether the binding under \p key may substitute a bare reference to
+  /// \p short_name: the key's short name matches and, when an active
+  /// parameter scope declares the name, the key IS that parameter
+  /// ([basic.scope.temp]/2).  The single admissibility test for the
+  /// short-name scans over the pack maps.
+  bool
+  binds_reference(const irep_idt &key, const std::string &short_name) const;
+
   // Keys of entries whose PARAMETER is a template template parameter
   // (N5008 [temp.param]/1 template-head form).  Only these entries may
   // substitute as the TEMPLATE-NAME of a template-id in apply()
@@ -171,6 +199,7 @@ public:
     pack_args_map.swap(template_map.pack_args_map);
     pack_expr_map.swap(template_map.pack_expr_map);
     generation_map.swap(template_map.generation_map);
+    parameter_scopes.swap(template_map.parameter_scopes);
     template_template_parameters.swap(
       template_map.template_template_parameters);
   }
@@ -206,6 +235,7 @@ public:
     pack_args_map.clear();
     pack_expr_map.clear();
     generation_map.clear();
+    parameter_scopes.clear();
     template_template_parameters.clear();
   }
 
