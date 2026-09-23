@@ -11135,3 +11135,47 @@ the ground the other next steps stand on.
   would be better answered from the component list.  No driving test.
 - Rebase note: the two new files were first committed into the V1 commit by
   a stale `git add src`; moved to the evaluator commit (tree unchanged).
+
+### Round 158, part 6 (2026-09-23): the iterator-concept chain
+
+cpp20_concept_iterator_chain (random_access_iterator over a class iterator,
+the whole C++20 concept chain) and
+cpp20_common_reference_with_cv_differing_references are CORE.  Layers, one
+commit each (70b03aef65..a2f6590911), probed bottom-up with header-free
+reproducers in /tmp/r157/kb (cr*.cpp, ic*.cpp, it*.cpp):
+
+1. [expr.cond]/4: `b ? w : cw' over two lvalues of one type differing in cv
+   is an lvalue of the cv-combined type; lvalue+xvalue is a prvalue
+   (cv-unqualified when non-class, [expr.type]/2); two xvalues an xvalue
+   (new `#xvalue' mark read by decltype -> T&&).  The conditional used to
+   convert one operand to the other's type and yield a non-lvalue copy, so
+   COND-RES was `W' instead of `const W&'.
+2. Three resolution gaps under common_reference: the member-typedef-as-
+   nested-name-specifier fast path was clang-only (libstdc++'s
+   __match_cv_qualifiers `__match::__type' needs it); guess_template_args
+   resolved a qualified-id's nested-name-specifier during partial-spec
+   matching -- a non-deduced context, [temp.deduct.type]/5.1 -- and the
+   enable_if of _Require<> evaluated on unbound X aborted matching; the
+   qualified-lookup retry after on-demand completion searched own entries
+   only, missing the inherited `value'.
+3. Same-pattern constrained partial specializations (`__iter_concept_impl<_Iter>'
+   x3) collided: the identifier rendered constraint NAMES from unnamed subs
+   only.  Now leading names + hash of a canonical id/identifier rendering.
+   First cut embedded the rendering itself -- its `(' `:' `=' broke the
+   downstream identifier parsers and std::expected's constrained converting
+   constructor vanished (cpp23_expected_basic caught it).  Lesson recorded
+   in the identity assessment: identifiers are parsed; keep them flat.
+4. __is_base_of: direct bases only (the tag hierarchy is 3 deep), and --
+   worse -- compared classes by struct ID_name, empty for incomplete
+   specializations, so two incomplete classes were "the same class":
+   __primary_traits_iter<int*> was true, ITER_TRAITS(int*) picked the
+   constrained __iter_traits_impl and became `int*'.  Order-dependent
+   (evaluating the concept at top level first fixed it), which is what
+   pointed at caching/completeness.  Derived is completed on demand
+   ([meta.rel] requires it complete) and walked by tag id.
+5. [expr.type]/2: pointer arithmetic on a const-qualified glvalue pointer
+   kept the qualifier (`int *const'), failing `{ __j + __n } ->
+   same_as<_Iter>'.
+Five new CORE tests, one per layer.  Everything else in cbmc-cpp green on
+bin29 (s28), plus cbmc, cpp, systemc, dfcc, ansi-c x2, unit-proofs,
+cbmc-library, goto-cc-cbmc; clang -Werror clean.
