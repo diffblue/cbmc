@@ -1452,9 +1452,62 @@ static smt_termt convert_expr_to_smt(
   const bswap_exprt &byte_swap,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for byte swap expression: " +
-    byte_swap.pretty());
+  const auto operand_term = converted.at(byte_swap.op());
+  const auto &operand_type = byte_swap.op().type();
+
+  // bswap is only converted for bit-vector operands whose width is a multiple
+  // of the byte size. validate_expr(const bswap_exprt &) does not enforce
+  // this, so the guards below remain as explicit "unsupported" cases,
+  // mirroring conversion_failed in the bit-vector flattening backend
+  // (boolbv_bswap). The C front-end does not produce such bswap expressions,
+  // which is why these branches are not covered by tests.
+  if(!can_cast_type<bitvector_typet>(operand_type))
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for byte swap of non-bitvector type: " +
+      byte_swap.pretty());
+  }
+
+  const auto &bv_type = to_bitvector_type(operand_type);
+  const std::size_t width = bv_type.get_width();
+  const std::size_t byte_bits = byte_swap.get_bits_per_byte();
+
+  // Guard against a zero byte size before using it as a divisor below.
+  if(byte_bits == 0)
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for byte swap with zero-width bytes: " +
+      byte_swap.pretty());
+  }
+
+  // Unsupported (see above): width is expected to be a multiple of byte_bits.
+  if(width % byte_bits != 0)
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for byte swap with width not multiple of byte "
+      "size: " +
+      byte_swap.pretty());
+  }
+
+  const std::size_t num_bytes = width / byte_bits;
+
+  // If only one byte, no swapping needed
+  if(num_bytes == 1)
+    return operand_term;
+
+  // Reverse the byte order: extract each byte and concatenate, placing byte 0
+  // (originally least significant) in the most significant position.
+  // SMT concat(a, b) puts 'a' in the high bits.
+  const auto extract_byte = [&](std::size_t byte_idx)
+  {
+    return smt_bit_vector_theoryt::extract(
+      (byte_idx + 1) * byte_bits - 1, byte_idx * byte_bits)(operand_term);
+  };
+  smt_termt result = extract_byte(0);
+  for(std::size_t byte_idx = 1; byte_idx < num_bytes; ++byte_idx)
+    result = smt_bit_vector_theoryt::concat(result, extract_byte(byte_idx));
+
+  return result;
 }
 
 static smt_termt convert_expr_to_smt(
