@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/5: a pack expansion in a braced-init-list
+(`{sizeof(Ts)...}`, `{__is_same(T, Ts)...}`) expands to one
+initializer-clause per element -- also in a function template body whose
+only pack is a TYPE pack (the shape of libstdc++'s
+__find_uniq_type_in_pack under std::variant).  Before, the pack name
+resolved to its first element and the list collapsed to one element; the
+same collapse hit call arguments `g(sizeof(Ts)...)`.
