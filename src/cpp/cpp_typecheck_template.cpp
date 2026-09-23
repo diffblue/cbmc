@@ -2181,7 +2181,8 @@ static void strip_function_type_parameter_names(typet &type)
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const source_locationt &source_location,
   const symbolt &template_symbol,
-  const cpp_template_args_non_tct &template_args)
+  const cpp_template_args_non_tct &template_args,
+  bool explicit_only)
 {
   // old stuff
   PRECONDITION(template_args.id() != ID_already_typechecked);
@@ -2891,6 +2892,10 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
     {
       // A variadic parameter pack can accept zero arguments.
       if(parameter.get_bool(ID_ellipsis))
+        break;
+
+      // the caller supplies the defaults itself (resolve_template_alias)
+      if(explicit_only)
         break;
 
       // Check for default argument for the parameter.
@@ -3999,7 +4004,7 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
 
   // now the numbers should match (or we have a variadic pack)
   DATA_INVARIANT(
-    args.size() >= parameters.size() ||
+    explicit_only || args.size() >= parameters.size() ||
       (!parameters.empty() && parameters.back().get_bool(ID_ellipsis)),
     "argument numbers must be at least parameter numbers");
 
