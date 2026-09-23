@@ -761,6 +761,27 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           a.get_bool(ID_C_volatile) != b.get_bool(ID_C_volatile) ||
           a.get_bool(ID_C_restricted) != b.get_bool(ID_C_restricted))
           return false;
+        if(a.id() == ID_code)
+        {
+          // [dcl.fct]/6-7, [basic.type.qualifier]: the parameter types
+          // (their nested cv-qualifiers, e.g. `void (*)(const int *)` vs
+          // `void (*)(int *)`) and, for a member function type, the
+          // cv-qualifier-seq -- modelled as the cv of the implicit object
+          // parameter's pointee -- are part of the type's identity.
+          const code_typet &ca = to_code_type(a);
+          const code_typet &cb = to_code_type(b);
+          if(!same_including_cv(ca.return_type(), cb.return_type()))
+            return false;
+          if(ca.parameters().size() != cb.parameters().size())
+            return false;
+          for(std::size_t i = 0; i < ca.parameters().size(); ++i)
+          {
+            if(!same_including_cv(
+                 ca.parameters()[i].type(), cb.parameters()[i].type()))
+              return false;
+          }
+          return true;
+        }
         if(a.has_subtype())
           return same_including_cv(
             to_type_with_subtype(a).subtype(),
