@@ -224,6 +224,25 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
                 break;
               }
             }
+            else if(arg_type.is_not_nil() && !arg_type.id().empty())
+            {
+              // A compound type naming the parameter -- `same_as<T &>` in
+              // `{ ++a } -> same_as<T &>` -- is substituted through the
+              // enclosing template's map and type-checked NOW, while that
+              // map is live (the concept-id below is evaluated with an
+              // empty map).  Left as written, `T &` reached the concept
+              // unresolved and the requirement read as unsatisfied.
+              try
+              {
+                template_map.apply(arg_type);
+                typecheck_type(arg_type);
+              }
+              catch(...)
+              {
+                args_ok = false;
+                break;
+              }
+            }
             exprt as_type{ID_type};
             as_type.type() = arg_type;
             args_sub.get_sub().push_back(as_type);
