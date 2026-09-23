@@ -126,6 +126,9 @@ $(document).ready(function(){initNavTree('classreduction__xor__exprt.html',''); 
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a742c074edeea7edf099e8189307bba9a" id="r_a742c074edeea7edf099e8189307bba9a"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__xor__exprt.html#a742c074edeea7edf099e8189307bba9a">reduction_xor_exprt</a> (<a class="el" href="classexprt.html">exprt</a> <a class="el" href="classait.html">_op</a>)</td></tr>
 <tr class="separator:a742c074edeea7edf099e8189307bba9a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af30b1ad2c069ea2159f9a9de59d2e0ad" id="r_af30b1ad2c069ea2159f9a9de59d2e0ad"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classexprt.html">exprt</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classreduction__xor__exprt.html#af30b1ad2c069ea2159f9a9de59d2e0ad">lower</a> () <a class="el" href="classait.html">const</a></td></tr>
+<tr class="memdesc:af30b1ad2c069ea2159f9a9de59d2e0ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">Lower to XOR of all individual bits.  <br /></td></tr>
+<tr class="separator:af30b1ad2c069ea2159f9a9de59d2e0ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classunary__predicate__exprt"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classunary__predicate__exprt')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classunary__predicate__exprt.html">unary_predicate_exprt</a></td></tr>
 <tr class="memitem:ae0ac5d2b88d94196181d8246f58bce0f inherit pub_methods_classunary__predicate__exprt" id="r_ae0ac5d2b88d94196181d8246f58bce0f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classunary__predicate__exprt.html#ae0ac5d2b88d94196181d8246f58bce0f">unary_predicate_exprt</a> (<a class="el" href="classait.html">const</a> <a class="el" href="verification__result_8h.html#a1ad4faefa9ca542d481e74be9cc01c2c">irep_idt</a> &amp;<a class="el" href="classait.html">_id</a>, <a class="el" href="classexprt.html">exprt</a> <a class="el" href="classait.html">_op</a>)</td></tr>
 <tr class="separator:ae0ac5d2b88d94196181d8246f58bce0f inherit pub_methods_classunary__predicate__exprt"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -474,7 +477,7 @@ Additional Inherited Members</h2></td></tr>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Boolean reduction: XOR (parity) of all bits in the operand. </p>
 
-<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02124">2124</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02147">2147</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a742c074edeea7edf099e8189307bba9a" name="a742c074edeea7edf099e8189307bba9a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a742c074edeea7edf099e8189307bba9a">&#9670;&#160;</a></span>reduction_xor_exprt()</h2>
@@ -500,12 +503,36 @@ Additional Inherited Members</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02127">2127</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8h_source.html#l02150">2150</a> of file <a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a>.</p>
 
 </div>
 </div>
-<hr/>The documentation for this class was generated from the following file:<ul>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="af30b1ad2c069ea2159f9a9de59d2e0ad" name="af30b1ad2c069ea2159f9a9de59d2e0ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af30b1ad2c069ea2159f9a9de59d2e0ad">&#9670;&#160;</a></span>lower()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classexprt.html">exprt</a> reduction_xor_exprt::lower </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Lower to XOR of all individual bits. </p>
+<p>reduction_xor(a) ≡ a[0] ^ a[1] ^ ... ^ a[n-1] </p>
+
+<p class="definition">Definition at line <a class="el" href="bitvector__expr_8cpp_source.html#l00376">376</a> of file <a class="el" href="bitvector__expr_8cpp_source.html">bitvector_expr.cpp</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following files:<ul>
 <li>/home/runner/work/cbmc/cbmc/src/util/<a class="el" href="bitvector__expr_8h_source.html">bitvector_expr.h</a></li>
+<li>/home/runner/work/cbmc/cbmc/src/util/<a class="el" href="bitvector__expr_8cpp_source.html">bitvector_expr.cpp</a></li>
 </ul>
 </div><!-- contents -->
 </div><!-- doc-content -->

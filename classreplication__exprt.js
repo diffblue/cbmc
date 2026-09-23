@@ -1,6 +1,7 @@
 var classreplication__exprt =
 [
     [ "replication_exprt", "classreplication__exprt.html#af7b233e7c592a3e935f38892cfa0436b", null ],
+    [ "lower", "classreplication__exprt.html#a4f34f8830434dae5fd51423ac5a1dbda", null ],
     [ "op", "classreplication__exprt.html#ad5edbcce37859064fd86423070ea0962", null ],
     [ "op", "classreplication__exprt.html#a1f482923b30aee45d35b7ec433abe0f5", null ],
     [ "times", "classreplication__exprt.html#a6aa6dffeb099233025e4df3798b8c043", null ],
