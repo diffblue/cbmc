@@ -11094,3 +11094,44 @@ second `--' record "Fixed 2026-09-23").
   constructor call into a struct constant + mangling), cpp20_ranges_basic,
   cpp20_concept_iterator_chain, cpp20_common_reference_with_cv_differing
   _references, cpp26_pack_indexing_expr, and the gcc16/libcxx-tagged ones.
+
+### Round 158, part 5 (2026-09-23): structural debt
+
+Three items from the part-4 report, taken before pushing because they change
+the ground the other next steps stand on.
+
+- V1 (short-name template parameter resolution), 30385f7c57.  Re-measured
+  with a value-distinct criterion (instrumented `apply()`, whole cbmc-cpp
+  suite, /tmp/r157/v1): 709 substitutions with >= 2 live same-short-name
+  bindings of DIFFERENT values, 377 decided by alphabetical key order.
+  Fix: `template_mapt::parameter_scopes`, the stack of active template
+  parameter scopes ([basic.scope.temp]/2, [temp.local]/1), pushed by
+  build()/build_unassigned()/the #deduced_packs replay, and by apply() for a
+  nested member template's own (unbound) parameters -- which replaces the
+  `#tmpl_param_shadow` sentinel.  `innermost_parameter()` /
+  `binds_reference()` gate every short-name scan (type_map scalar, expr_map,
+  six pack-map sites, expand_call_argument_packs).  After: all 709 have an
+  active scope declaring the name.  Two intermediate breakages taught the
+  scoping rules: a scope must be pushed at deduction (build_unassigned) and
+  at the #deduced_packs replay, or the deduced specialization's own `_Tf'
+  loses to the enclosing instance's (cpp20_tuple_nested_same_template,
+  cpp11_std_bind_to_std_function).  Snapshots bin24 (type_map only) and
+  bin25 (all sites) both fully green.
+- Constant evaluator merge, 69f07c2386.  The ~550-line statement-substitution
+  evaluator in typecheck_side_effect_function_call is gone; the interpreter
+  (now src/cpp/cpp_constexpr_eval.{h,cpp}) is the only one.  It gained:
+  `ensure_definition` callback (queued definitions converted on demand,
+  [temp.inst]/5), symbol-free arguments as the constant test (class-type
+  constexpr objects), constexpr-variable folding, short-circuit `?:`/`&&`/`||`
+  (evaluating both branches of `fib' was exponential -- first cut timed out
+  on fib(15)), argument pre-evaluation for nested calls, [implimits] depth
+  512, loop cap 4096.  Snapshot bin26 green on cbmc-cpp/cbmc/cpp/systemc/
+  dfcc/ansi-c-cpp (s24); ansi-c/unit-proofs/cbmc-library/goto-cc-cbmc + clang
+  -Werror in s25.
+- Instance identity by string suffix: assessed, not fixed (856ba33a60 in
+  the template-map review doc).  `template_suffix` text is both identity
+  carrier and lookup key; canonicality is load-bearing; the `#fn_template_*`
+  records are the right shape; the condition-3 `#unsuffixed_name' fallback
+  would be better answered from the component list.  No driving test.
+- Rebase note: the two new files were first committed into the V1 commit by
+  a stale `git add src`; moved to the evaluator commit (tree unchanged).
