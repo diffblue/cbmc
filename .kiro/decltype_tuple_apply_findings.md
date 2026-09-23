@@ -10989,3 +10989,108 @@ clean.  Pre-existing flex warnings (scanner.l 1065/1070/1073: the second
   (cpp20_common_reference_with_cv_differing_references, KNOWNBUG).
   Method: preprocess in the gcc16-test image (`g++-16 -E -D__CPROVER__'),
   run cbmc on the .ii on the host; each test verifies with gcc 13 headers.
+
+### Round 158, part 4 (2026-09-23): KNOWNBUG sweep, cpp11 -> cpp17
+
+Working through the minimal/diagnosed KNOWNBUG tests of regression/cbmc-cpp,
+oldest standard first.  Each fixed test is CORE now (the notes after the
+second `--' record "Fixed 2026-09-23").
+
+- cpp11_nontype_pack_recursive_two_elem (15ca1b5954): a partial
+  specialization's trailing non-type pack was matched but its elements never
+  recorded (`sum_t<1,2,3>' had no `v').
+- cpp11_type_identity_cv_in_parameter_types (deb2b2e61c): qualifiers_match /
+  `__is_same' descend into function types; a typedef `int (S::*T)(int) const'
+  lost the `const' because the declarator's method_qualifier was only
+  attached when the declarator itself was a function.
+- cpp14_generic_lambda_types (684a344610): the function-pointer lowering of
+  a closure-eligible generic lambda typechecked its body with `signed int'
+  for every `auto' parameter and reported `pt.x' on `const auto &pt' as an
+  error of the program.  Tried silently now ([temp.inst]: the template
+  operator()'s body is checked at instantiation).
+- cpp17_function_reference_param and cpp17_invoke_result_cache_poisoning:
+  pass since the round-158 std::function work; CORE (the second through
+  --function, the file has no main).
+- cpp17_variant_basic -- the big one, eight front-end defects behind
+  `std::variant<int, double> v = 42; get<int>(v)':
+  1. [temp.variadic]/5 braced-init-list pack expansion
+     (`{__is_same(_Tp, _Types)...}', __find_uniq_type_in_pack) and type-pack
+     call arguments in function bodies (082cbf381d).  Gate: the drain and
+     convert_function run expand_call_argument_packs in template-packs-only
+     mode when a type pack has >= 2 elements; the first attempt in
+     value-pack mode double-expanded `g3(a...)' (cpp11_variadic_pack_expansion
+     _works et al.).
+  2. Constant evaluation (643bd3da16): try_evaluate_constexpr learned `for',
+     decl_block, array initializers, compound assignment, ++/--; the
+     statement-substitution evaluator falls back to it; a queued NON-member
+     constexpr instance is converted under its recorded map
+     (convert_deferred_method_now -- which used to erase the entry and return
+     false whenever the symbol carried its parsed body).
+  3. Folds over a template type pack in variable templates and in function
+     templates without a function parameter pack (f8c3cc3f9b);
+     expand_folds_over_pack factored out of the class-body expander and made
+     to substitute named sub-nodes (sizeof / trait operands).
+  4. Static data member templates (44f96c2b22): suffixed instance names,
+     enclosing class map added (static data members only; a positional
+     build of a partial specialization's map for member FUNCTION templates
+     is left to prepare_deferred_method_body), existing instance reused,
+     variable template-id arguments typechecked at the point of use.
+  5. `using B<I, Ti>::fun...;' (6da55296f1): parser recorded the `...';
+     class instantiation expands per element like base-specifier packs.
+  6. Member alias template pre-bind of the enclosing instance ungated from
+     clang mode (613988aef9).  The libstdc++ regression that had motivated
+     the gate is an ORDER problem: the alias's explicit arguments were
+     typechecked after the pre-bind, so `_Tp' of
+     `allocator_traits<_Alloc>::template rebind_alloc<_Tp>' resolved to
+     the pre-bound enclosing `_Tp' (cpp20_map_piecewise_value_loss caught
+     it in the first suite run).  A short-name guard ("skip an enclosing
+     parameter whose short name is live") fixed that but broke libc++'s
+     __make_tuple_types_flat::__apply_quals (its `_Idx' pack skipped
+     because an unrelated outer `_Idx' was live; cpp20_ranges_pipe_invoke
+     _drop).  Final form: typecheck the explicit args first
+     (typecheck_template_args explicit_only mode, results wrapped as
+     already_typechecked), pre-bind, then a second pass appends the
+     defaults.
+  7. Type-for-non-type kind mismatch removes the candidate (b098921de5):
+     `std::get<double>(v)' vs `get<size_t N>'.
+  Tests: cpp11_pack_expansion_in_braced_init_list,
+  cpp14_constexpr_pack_init_list_constant_eval,
+  cpp17_fold_over_type_pack_no_function_pack,
+  cpp14_static_member_variable_template,
+  cpp17_using_declarator_pack_expansion,
+  cpp17_explicit_type_arg_for_nontype_overload,
+  cpp17_member_alias_template_default_arg_enclosing_pack.
+  test_libcxx.desc of cpp17_variant_basic stays KNOWNBUG libcxx (libc++'s
+  variant traits are a different shape).
+- Test infrastructure: 267 cbmc-cpp test.desc files had a single `--', so
+  their prose notes were "must not match" regexes (test.pl died on an
+  unbalanced parenthesis in one); a second `--' was inserted (99c8fa4bea).
+- C++20 concepts group (four src commits, 6fd1372638..fd49e1feb2):
+  * requires-clause followed directly by the declaration's type name
+    (`requires Integral<T> T identity(T a)`): the restricted constraint
+    parser's `identifier identifier' exclusion was a guard for the general
+    expression path only -- cpp20_requires_unparenthesized,
+    cpp20_concepts_named, cpp20_concepts_overload CORE.
+  * `{ ++a } -> SameAs<T &>': a COMPOUND type-constraint argument was
+    handed to the synthetic concept-id unsubstituted (only bare parameters
+    had the short-name lookup) -- cpp20_concept_compound_requirement CORE.
+  * type-requirement `typename T::value_type' threw for int and the
+    constraint evaluation took the exception as "satisfied" --
+    cpp20_concepts_requires_type CORE.
+  * requirement parameters: one shared `requires_param::__i' symbol per
+    name (type overwritten per binding, duplicate scope entries) replaced
+    by distinct symbols (bind_requires_parameter); and
+    typecheck_function_template attached a redeclared NAMESPACE-scope
+    function template's scope as a secondary scope of the namespace, so
+    its function parameters (`__i') were visible to every unqualified
+    lookup under std and the requires-parameter `__i' was ambiguous.
+    Limited to class scopes.  cpp20_concept_iterator_chain advances to
+    input_iterator (test source had `p <= > o.p', a clang-format
+    artefact); it stays KNOWNBUG on common_reference_with<int&, int&&>
+    and __iter_concept_impl.
+- Left as KNOWNBUG: cpp11_deduced_nontype_kind_mismatch (rejects-invalid,
+  needs value-type normalization), cpp20_class_nttp_brace /
+  cpp20_nttp_string (class-type NTTP: constant evaluation of a
+  constructor call into a struct constant + mangling), cpp20_ranges_basic,
+  cpp20_concept_iterator_chain, cpp20_common_reference_with_cv_differing
+  _references, cpp26_pack_indexing_expr, and the gcc16/libcxx-tagged ones.
