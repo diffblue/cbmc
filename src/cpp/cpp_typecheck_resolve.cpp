@@ -1675,6 +1675,11 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         shadow(cpp_typecheck.template_map.pack_args_map);
         shadow(cpp_typecheck.template_map.pack_expr_map);
         shadow(cpp_typecheck.template_map.pack_size_map);
+        // ... and make this specialization's parameters the innermost
+        // active scope for the substitution of its signature (the enclosing
+        // instantiation's same-named parameters stay on the stack below).
+        cpp_typecheck.template_map.parameter_scopes.emplace_back(
+          own_ids.begin(), own_ids.end());
       }
     }
 
