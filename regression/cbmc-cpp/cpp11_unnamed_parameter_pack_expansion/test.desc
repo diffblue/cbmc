@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+--
+An UNNAMED function parameter pack (`Args...`) was not expanded when the
+function template was instantiated (the expansion keyed on the declarator's
+name), so the instance had one parameter; a two-argument call never matched
+its type and constexpr evaluation of `count(1, 'c')` failed ("static_assert
+condition could not be evaluated").  Also covers a constexpr member template
+on a constexpr object and a constrained variadic overload.  Non-vacuous: the
+last assertion states a wrong value and must FAIL.
