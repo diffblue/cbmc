@@ -930,8 +930,15 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       // value so convert_initializer performs the reference binding (exactly
       // like `T &r = init`), and clear init_args so the declaration statement
       // does not later see leftover init_args.
+      // N5008 [dcl.type.auto.deduct]/2.2.3: for a variable with a placeholder
+      // type, a parenthesized expression-list initializer shall be a single
+      // assignment-expression, which is the initializer-clause E
+      // (`auto x2a(i);' -- Example 3 -- is `int'); deduce from it exactly as
+      // for `auto x = i'.
       if(
-        new_symbol->value.is_nil() && is_reference(new_symbol->type) &&
+        new_symbol->value.is_nil() &&
+        (is_reference(new_symbol->type) ||
+         cpp_typecheck.has_auto(new_symbol->type)) &&
         declarator.init_args().has_operands() &&
         declarator.init_args().operands().size() == 1)
       {

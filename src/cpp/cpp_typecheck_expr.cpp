@@ -7179,46 +7179,13 @@ void cpp_typecheckt::instantiate_generic_lambda(
     // trigger is currently known (corpus probe found none; every valid
     // lambda body tried type-checks), so this is hardening; see
     // regression/cbmc-cpp/cpp11_lambda_return_context.
-    struct return_type_guardt
-    {
-      typet &ref;
-      const typet saved;
-      ~return_type_guardt()
-      {
-        ref = saved;
-      }
-    } return_type_guard{return_type, return_type};
-    if(deduce_return)
-      return_type = typet(ID_auto);
-    else
-      return_type = func_type.return_type();
+    return_deduction_contextt return_context{*this, func_type, deduce_return};
 
     typecheck_code(body_code);
 
-    if(deduce_return)
-    {
-      std::function<const exprt *(const codet &)> find_return =
-        [&](const codet &code) -> const exprt *
-      {
-        if(code.get_statement() == ID_return && code.has_operands())
-          return &code.op0();
-        for(const auto &op : code.operands())
-          if(op.id() == ID_code)
-          {
-            const exprt *r = find_return(to_code(op));
-            if(r != nullptr)
-              return r;
-          }
-        return nullptr;
-      };
-      const exprt *ret = find_return(body_code);
-      if(ret != nullptr)
-        func_type.return_type() = ret->type();
-      else
-        func_type.return_type() = void_type();
-    }
+    return_context.finish();
 
-    // (return_type restored by return_type_guard at scope exit)
+    // (the enclosing return-type context is restored at scope exit)
 
     // Prepend capture initializations
     if(!capture_values.empty())
@@ -8669,32 +8636,11 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
       default_body = to_code(static_cast<exprt &>(expr.add("body")));
 
-      typet old_return_type = return_type;
-      return_type = typet(ID_auto);
-      typecheck_code(default_body);
-
-      // Deduce return type
-      std::function<const exprt *(const codet &)> find_return =
-        [&](const codet &code) -> const exprt *
       {
-        if(code.get_statement() == ID_return && code.has_operands())
-          return &code.op0();
-        for(const auto &op : code.operands())
-          if(op.id() == ID_code)
-          {
-            const exprt *r = find_return(to_code(op));
-            if(r != nullptr)
-              return r;
-          }
-        return nullptr;
-      };
-      const exprt *ret = find_return(default_body);
-      if(ret != nullptr)
-        func_type.return_type() = ret->type();
-      else
-        func_type.return_type() = void_type();
-
-      return_type = old_return_type;
+        return_deduction_contextt return_context{*this, func_type, true};
+        typecheck_code(default_body);
+        return_context.finish();
+      }
 
       // Prepend capture initializations
       if(!capture_values.empty())
@@ -8818,12 +8764,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
     body_code = to_code(static_cast<exprt &>(expr.add("body")));
 
-    // Save/restore return_type so the lambda body uses its own return type
-    typet old_return_type = return_type;
-    if(deduce_return)
-      return_type = typet(ID_auto);
-    else
-      return_type = func_type.return_type();
+    // the lambda body's own return type; the enclosing one is restored at
+    // scope exit
+    return_deduction_contextt return_context{*this, func_type, deduce_return};
 
     if(generic_closure_eligible)
     {
@@ -8854,31 +8797,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     else
       typecheck_code(body_code);
 
-    // Deduce return type from body if not explicitly specified
-    if(deduce_return)
-    {
-      std::function<const exprt *(const codet &)> find_return =
-        [&](const codet &code) -> const exprt *
-      {
-        if(code.get_statement() == ID_return && code.has_operands())
-          return &code.op0();
-        for(const auto &op : code.operands())
-          if(op.id() == ID_code)
-          {
-            const exprt *r = find_return(to_code(op));
-            if(r != nullptr)
-              return r;
-          }
-        return nullptr;
-      };
-      const exprt *ret = find_return(body_code);
-      if(ret != nullptr)
-        func_type.return_type() = ret->type();
-      else
-        func_type.return_type() = void_type();
-    }
-
-    return_type = old_return_type;
+    return_context.finish();
 
     // Prepend capture initializations to the body
     if(!capture_values.empty())

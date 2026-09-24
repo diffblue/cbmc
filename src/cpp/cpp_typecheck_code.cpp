@@ -145,78 +145,14 @@ std::optional<exprt> cpp_typecheckt::braced_return_aggregate_value(
 
 void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
 {
-  // Lambda / C++14 return type deduction: when the declared return type is a
-  // placeholder -- `auto` (ID_auto) or `decltype(auto)` (an ID_decltype marked
-  // `#auto`) -- typecheck the return expression WITHOUT an implicit conversion
-  // (there is no target type yet) and deduce the return type from it.  Without
-  // covering the decltype(auto) case a deferred deduction (convert_function set
-  // defer_auto_return because the return expression could not be typed in
-  // isolation, e.g. it mentions a body-local `using` alias) would fall through
-  // to the normal path below and try to convert the value to the still
-  // unresolved `<<type:decltype>>`, which is an error and aborts goto
-  // conversion.  N5008 [dcl.spec.auto]/2-3.
-  const bool deduced_decltype_auto =
-    return_type.id() == ID_decltype && return_type.get_bool("#auto");
-  if(return_type.id() == ID_auto || deduced_decltype_auto)
+  // N5008 [dcl.spec.auto.general]/4: in a function declared with a
+  // placeholder return type (`auto', `auto *', `const auto &',
+  // `decltype(auto)'; lambdas without a trailing return type) every
+  // non-discarded return statement takes part in the deduction, which also
+  // converts the operand ([dcl.type.auto.deduct]/2.1, deduce_return_type).
+  if(has_auto(declared_return_type))
   {
-    if(code.has_return_value())
-    {
-      typecheck_expr(code.return_value());
-      typet deduced = code.return_value().type();
-      // decltype(auto) of a parenthesized lvalue deduces a reference type
-      // ([dcl.type.decltype]); mirror the eager path in convert_function.
-      if(deduced_decltype_auto && code.return_value().get_bool(ID_C_lvalue))
-      {
-        deduced = reference_typet(deduced, config.ansi_c.pointer_width);
-        // the returned glvalue binds to that reference ([stmt.return]/2);
-        // left as a plain value, the return statement's type disagreed with
-        // the function's deduced `T &' and the body was dropped as
-        // inconsistent (libstdc++'s __get_n, an if-constexpr chain whose
-        // deduction reaches this path)
-        reference_initializer(code.return_value(), to_reference_type(deduced));
-      }
-      else if(!deduced_decltype_auto)
-      {
-        // N5008 [dcl.type.auto.deduct]/4: plain `auto` deduces as
-        // [temp.deduct.call] -- a reference is dropped, an array DECAYS
-        // to a pointer to its first element, top-level cv goes (see
-        // auto_return_type_from).  Deducing the array type itself made
-        // `template<class T, int N> auto ret(T (&t)[N]) { return t; }`
-        // return the array CONTENTS reinterpreted as a pointer instead
-        // of its address.  Convert the value accordingly.
-        const typet adjusted = auto_return_type_from(deduced);
-        if(adjusted != deduced)
-        {
-          deduced = adjusted;
-          implicit_typecast(code.return_value(), deduced);
-        }
-      }
-      return_type = deduced;
-    }
-    else
-      return_type = void_type();
-    return;
-  }
-
-  // N5008 [dcl.spec.auto.general]/2, [dcl.type.auto.deduct]/4: the
-  // placeholder may sit under a ptr-operator (`auto *f()`, `auto &f()`,
-  // `const auto &f()`); the return type is then deduced as for `auto *p =
-  // e` / `auto &r = e`.  This is reached when convert_function's early
-  // deduction could not type the return expression on its own (a
-  // body-local name) and deferred to the body typecheck.
-  if(has_auto(return_type) && code.has_return_value())
-  {
-    typecheck_expr(code.return_value());
-    typet deduced_return_type = return_type;
-    cpp_convert_auto(
-      deduced_return_type, code.return_value().type(), get_message_handler());
-    typecheck_type(deduced_return_type);
-    return_type = deduced_return_type;
-    if(is_reference(return_type))
-      reference_initializer(
-        code.return_value(), to_reference_type(return_type));
-    else
-      implicit_typecast(code.return_value(), return_type);
+    deduce_return_type(code);
     return;
   }
 

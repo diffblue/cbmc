@@ -253,50 +253,31 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
 
   if(is_reference(symbol.type))
   {
+    // read before type-checking rebuilds the node (see decltype_of)
+    const bool parenthesized = symbol.value.get_bool(ID_C_parenthesized);
     typecheck_expr(symbol.value);
 
     if(has_auto(symbol.type))
     {
-      // N5008 [dcl.type.auto.deduct]/4: deduction for `auto` uses the
-      // rules of [temp.deduct.call].  `auto&&` -- an rvalue reference
-      // to a cv-unqualified placeholder -- is a FORWARDING reference
-      // ([temp.deduct.call]/3): if the initializer is an lvalue,
-      // "lvalue reference to A" is used in place of A, and reference
-      // collapsing ([dcl.ref]/6) makes the declared type an lvalue
-      // reference.  Without this, `auto &&r = l;` with l a const
-      // lvalue deduced the non-reference type and failed to bind
-      // ("invalid implicit conversion ... to 'const listt &&'").
-      if(
-        is_rvalue_reference(symbol.type) &&
-        to_pointer_type(symbol.type).base_type().id() == ID_auto &&
-        !to_pointer_type(symbol.type).base_type().get_bool(ID_C_constant) &&
-        symbol.value.get_bool(ID_C_lvalue))
-      {
-        symbol.type.remove(ID_C_rvalue_reference);
-      }
-
-      // C++17: auto x{v} deduces to decltype(v)
-      typet deduced_type = symbol.value.type();
+      // N5008 [dcl.type.auto.deduct]/2.2, /3: `auto &r = e', `const auto &',
+      // `auto &&' (a forwarding reference, [temp.deduct.call]/3)
+      // C++17: auto x{v} deduces to decltype(v) ([dcl.type.auto.deduct]/2.2.2)
       if(
         symbol.value.id() == ID_initializer_list &&
         symbol.value.operands().size() == 1)
       {
-        deduced_type = symbol.value.operands().front().type();
         symbol.value = symbol.value.operands().front();
       }
-      cpp_convert_auto(symbol.type, deduced_type, get_message_handler());
-      // For auto& in const context: if the initializer is const,
-      // the reference must also be const (e.g., auto& x = d; in
-      // a const method where d is a const member).
-      if(
-        is_reference(symbol.type) &&
-        symbol.value.type().get_bool(ID_C_constant) &&
-        symbol.type.id() == ID_pointer)
+      symbol.type =
+        deduce_placeholder_type(symbol.type, symbol.value, parenthesized);
+      if(!is_reference(symbol.type) && !is_rvalue_reference(symbol.type))
       {
-        to_pointer_type(symbol.type).base_type().set(ID_C_constant, true);
+        // `decltype(auto)' declared through a reference is ill-formed
+        // ([dcl.type.auto.deduct]/4: T shall be the placeholder alone); a
+        // deduction that yields a non-reference cannot be bound
+        implicit_typecast(symbol.value, symbol.type);
+        return;
       }
-      typecheck_type(symbol.type);
-      implicit_typecast(symbol.value, symbol.type);
     }
 
     reference_initializer(symbol.value, to_reference_type(symbol.type));
@@ -328,32 +309,34 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       symbol.value = array_exprt(std::move(elems), to_array_type(symbol.type));
       return;
     }
+    // read before type-checking rebuilds the node (see decltype_of)
+    const bool parenthesized = symbol.value.get_bool(ID_C_parenthesized);
     typecheck_expr(symbol.value);
 
-    // decltype(auto): if initializer is a function call returning a
-    // reference, deduce the reference type
+    // C++17: auto x{v} deduces to decltype(v) ([dcl.type.auto.deduct]/2.2.2)
     if(
-      symbol.type.id() == ID_decltype && symbol.type.get_bool("#auto") &&
-      symbol.value.id() == ID_dereference &&
-      is_reference(to_dereference_expr(symbol.value).pointer().type()))
+      symbol.value.id() == ID_initializer_list &&
+      symbol.value.operands().size() == 1)
     {
-      const typet &ref_type =
-        to_dereference_expr(symbol.value).pointer().type();
-      cpp_convert_auto(symbol.type, ref_type, get_message_handler());
-      typecheck_type(symbol.type);
+      symbol.value = symbol.value.operands().front();
+    }
+
+    // N5008 [dcl.type.auto.deduct]/2.2, /3-4: `auto', `auto *',
+    // `const auto', `decltype(auto)' -- the latter may deduce a reference
+    // (`decltype(auto) x = (i)', `decltype(auto) x = f()' with f returning
+    // T&&), in which case the variable IS a reference and is bound as one.
+    symbol.type =
+      deduce_placeholder_type(symbol.type, symbol.value, parenthesized);
+    if(is_reference(symbol.type) || is_rvalue_reference(symbol.type))
+    {
       reference_initializer(symbol.value, to_reference_type(symbol.type));
       return;
     }
 
-    // N5008 [dcl.type.auto.deduct]/4 + [temp.deduct.call]/1: the type
-    // deduced for `auto' is that of the initializer EXPRESSION, which is
-    // never a reference type ([expr.type]/1) -- `auto c = static_cast<T
-    // &&>(a)' declares an object of type T, not a reference.  The front
-    // end represents a reference-typed expression as a marked pointer;
-    // read the referent.
+    // the type deduced for `auto' is never a reference ([expr.type]/1): the
+    // front end represents a reference-typed expression as a marked
+    // pointer; read the referent before initializing the object
     add_implicit_dereference(symbol.value);
-    cpp_convert_auto(symbol.type, symbol.value.type(), get_message_handler());
-    typecheck_type(symbol.type);
     if(symbol.type.id() != ID_struct_tag || cpp_is_pod(symbol.type))
       implicit_typecast(symbol.value, symbol.type);
 
