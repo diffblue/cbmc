@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
@@ -850,14 +851,7 @@ bvt bv_pointers_widet::add_addr(const exprt &expr)
 
   const pointer_typet type = pointer_type(expr.type());
   const std::size_t object_bits = get_object_width(type);
-  const std::size_t max_objects = std::size_t(1) << object_bits;
-
-  if(a == max_objects)
-    throw analysis_exceptiont(
-      "too many addressed objects: maximum number of objects is set to 2^n=" +
-      std::to_string(max_objects) + " (with n=" + std::to_string(object_bits) +
-      "); " +
-      "use the `--object-bits n` option to increase the maximum number");
+  check_object_bits_bound(a, object_bits);
 
   return encode(a, type);
 }

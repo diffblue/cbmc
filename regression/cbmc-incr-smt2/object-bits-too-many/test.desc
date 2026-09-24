@@ -1,0 +1,7 @@
+CORE
+test.c
+--object-bits 2 --unwind 25
+too many addressed objects: maximum number of objects is set to 2\^n=4 \(with n=2\)
+^EXIT=6$
+^SIGNAL=0$
+--
