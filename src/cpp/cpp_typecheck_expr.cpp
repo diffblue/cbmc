@@ -3886,6 +3886,21 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
 
   typecheck_type(expr.type());
 
+  // N5008 [dcl.init.general]/9: "A program that calls for
+  // default-initialization or value-initialization of an entity of reference
+  // type is ill-formed."  `T()` with T = `int(&)[5]` (owning_view's
+  // `_Range _M_r = _Range()` default member initializer once _Range is
+  // deduced as a reference) used to reach cpp_constructor and abort on its
+  // not-a-reference invariant; in a requires-expression / SFINAE context the
+  // error is what makes the requirement unsatisfied.
+  if(expr.operands().empty() && is_reference(expr.type()))
+  {
+    error().source_location = expr.find_source_location();
+    error() << "value-initialization of reference type '"
+            << to_string(expr.type()) << "'" << eom;
+    throw 0;
+  }
+
   // N5008 [dcl.init.general]/16.6.2.2 (C++20 parenthesized aggregate
   // initialization): `T(a1, ..., an)` with T an aggregate and no viable
   // constructor initializes the aggregate's elements from the
