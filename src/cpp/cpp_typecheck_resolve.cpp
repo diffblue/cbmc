@@ -1011,6 +1011,16 @@ void cpp_typecheck_resolvet::guess_function_template_args(
               // Full parameter identifiers, for the TEMPLATE MAP during
               // atom evaluation (see below).
               std::map<irep_idt, typet> id_to_type;
+              // N5008 [temp.variadic]/5: a trailing type parameter PACK
+              // binds all remaining deduced arguments; `Args...` in a
+              // concept-id of the clause expands to that many arguments
+              // (and `sizeof...(Args)` inside the concept counts them).
+              // Mapping the pack to its first element only made
+              // `__adaptor_partial_app_viable<_Take, int(&)[5], int>`
+              // (`sizeof...(_Args) == _S_arity - 1`) come out TRUE for two
+              // arguments, keeping _RangeAdaptor's partial-application
+              // operator() viable against _Take's own two-argument one.
+              std::map<irep_idt, std::vector<typet>> name_to_pack;
               for(std::size_t pi = 0; pi < params.size() && pi < targ_v.size();
                   ++pi)
               {
@@ -1021,6 +1031,20 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 const auto pos = pid.rfind("::");
                 const irep_idt sname =
                   pos != std::string::npos ? pid.substr(pos + 2) : pid;
+                if(params[pi].get_bool(ID_ellipsis) && pi + 1 == params.size())
+                {
+                  std::vector<typet> elems;
+                  for(std::size_t ai = pi; ai < targ_v.size(); ++ai)
+                  {
+                    if(
+                      targ_v[ai].id() == ID_type &&
+                      targ_v[ai].type().id() != ID_unassigned)
+                    {
+                      elems.push_back(targ_v[ai].type());
+                    }
+                  }
+                  name_to_pack[sname] = elems;
+                }
                 if(targ_v[pi].id() == ID_type)
                 {
                   name_to_type[sname] = targ_v[pi].type();
@@ -1102,8 +1126,55 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 }
               }
               exprt req_copy = req_clause;
+              // the pack expansion `Args...` as a template argument of a
+              // concept-id (an `ambiguous`/type argument whose cpp_name
+              // carries `ellipsis`): splice in one argument per element
+              const auto pack_of_arg =
+                [&](const irept &arg) -> const std::vector<typet> *
+              {
+                const irept &pat = arg.id() == ID_ambiguous ? arg.find(ID_type)
+                                   : arg.id() == ID_type    ? arg.find(ID_type)
+                                                            : arg;
+                if(
+                  pat.id() != ID_cpp_name || !pat.get_bool(ID_ellipsis) ||
+                  pat.get_sub().size() != 1 || pat.get_sub()[0].id() != ID_name)
+                {
+                  return nullptr;
+                }
+                const auto it =
+                  name_to_pack.find(pat.get_sub()[0].get(ID_identifier));
+                return it == name_to_pack.end() ? nullptr : &it->second;
+              };
               std::function<void(irept &)> subst = [&](irept &n)
               {
+                if(n.id() == ID_template_args)
+                {
+                  irept::subt &args = n.add(ID_arguments).get_sub();
+                  irept::subt expanded;
+                  bool changed = false;
+                  for(const auto &arg : args)
+                  {
+                    if(const auto *elems = pack_of_arg(arg))
+                    {
+                      for(const auto &t : *elems)
+                      {
+                        exprt type_arg(ID_type);
+                        type_arg.type() = t;
+                        expanded.push_back(type_arg);
+                      }
+                      changed = true;
+                    }
+                    else
+                      expanded.push_back(arg);
+                  }
+                  if(changed)
+                  {
+                    args.swap(expanded);
+                    for(auto &arg : args)
+                      subst(arg);
+                    return;
+                  }
+                }
                 if(n.id() == ID_cpp_name)
                 {
                   irep_idt only_name;
