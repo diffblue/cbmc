@@ -364,7 +364,18 @@ std::unique_ptr<solver_factoryt::solvert> solver_factoryt::get_default()
   if(options.get_option("arrays-uf") == "never")
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_NONE;
   else if(options.get_option("arrays-uf") == "always")
+  {
     bv_pointers->unbounded_array = bv_pointerst::unbounded_arrayt::U_ALL;
+    // Ackermann-style (U_ALL) array handling refines lazily, issuing many
+    // incremental SAT calls. MiniSat's simplifying back-end re-runs variable
+    // elimination before every solve, and outside incremental symex the
+    // literals are not frozen, so it may eliminate and re-introduce variables
+    // on each call. On some array-heavy formulas this churn makes a later
+    // incremental solve blow up (observed as a hang in 32-bit configurations);
+    // ask the back-end to simplify only on the first solve. This is a no-op for
+    // back-ends that do not simplify incrementally.
+    sat_solver->set_limit_incremental_simplification();
+  }
 
   set_decision_procedure_time_limit(*bv_pointers);
 
