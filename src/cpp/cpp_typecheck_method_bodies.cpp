@@ -1540,9 +1540,7 @@ void cpp_typecheckt::typecheck_method_bodies()
         // Only suppress for system headers (paths under /usr/include,
         // /usr/lib, etc.), not for all absolute paths.
         suppress = file.find("/include/") != std::string::npos ||
-                   file.find("\\include\\") != std::string::npos ||
-                   file.find("/usr/lib/") == 0 ||
-                   file.find("/Applications/") == 0;
+                   is_library_body_file(file);
       }
       if(suppress)
       {
@@ -1634,12 +1632,22 @@ void cpp_typecheckt::typecheck_method_bodies()
           // leniency below.
           if(pending_no_viable_call)
           {
-            error().source_location = pending_no_viable_location;
-            error() << "found no match for symbol '"
-                    << pending_no_viable_base_name << "'" << messaget::eom;
             pending_no_viable_call = false;
-            method_symbol.value.make_nil();
-            continue;
+            // ... in USER code.  A library body that fails this way (libc++'s
+            // ranges::iter_move `__fn::operator()`, whose ADL call has no
+            // viable candidate in CBMC's model) is tolerated like any other
+            // unsupported library construct below; it used to be dropped
+            // silently by its eager conversion and now reaches the drain
+            // through the [temp.inst]/4 re-queue.
+            if(!is_library_body_file(
+                 id2string(method_symbol.location.get_file())))
+            {
+              error().source_location = pending_no_viable_location;
+              error() << "found no match for symbol '"
+                      << pending_no_viable_base_name << "'" << messaget::eom;
+              method_symbol.value.make_nil();
+              continue;
+            }
           }
           // N5008: not standards-conformant, but a pragmatic tolerance for
           // constructs the C++ front-end cannot yet fully model (complex STL

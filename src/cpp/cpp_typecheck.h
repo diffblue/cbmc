@@ -1387,6 +1387,22 @@ private:
   std::vector<std::string> dropped_system_items;
   void report_dropped_system_item(const cpp_itemt &item);
 
+  /// Whether \p file is a standard-library / system header, whose
+  /// constructs the front end tolerates failing on (the diagnostics are
+  /// suppressed and the item or body is dropped rather than failing the
+  /// translation unit).  Covers the usual install roots and a compiler's
+  /// relative include root (`/usr/bin/../include/c++/v1` for libc++).
+  static bool is_system_header_file(const std::string &file);
+
+  /// is_system_header_file, plus a compiler's relative include root
+  /// (`/usr/bin/../include/c++/v1` for libc++).  Used where a failing
+  /// LIBRARY BODY is tolerated (dropped with a warning instead of failing
+  /// the translation unit); the narrower predicate stays in force for the
+  /// end-of-unit re-conversion sweep, whose candidates are stdlib instances
+  /// only and which must not touch bodies converted without the
+  /// #cpp_converted stamp (nested lambdas).
+  static bool is_library_body_file(const std::string &file);
+
   /// True while instantiating a template that was referenced from within a
   /// constant-expression context (so its definition may have to be folded
   /// now).  N5008 [temp.point]/1, [temp.inst]/5: a `constexpr` specialization
