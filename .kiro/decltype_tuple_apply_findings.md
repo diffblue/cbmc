@@ -11426,3 +11426,59 @@ cbmc-cpp 1409/1409 (20 skipped), cbmc, cpp, systemc, contracts-cpp-dfcc,
 goto-instrument, ansi-c x2, unit-proofs, cbmc-library, goto-cc-cbmc,
 linking-goto-binaries green; unit 614/614; clang -Werror clean.  Nothing
 pushed.
+
+### Round 158, part 9 (2026-09-24): static_assert folding + a second perf round (parallel worktrees)
+
+Two tracks, worktrees cbmc-wt-sa and cbmc-wt-perf2, integrated by cherry-pick;
+follow-up format/scope fixes folded per commit with `git commit --fixup=<sha>`
++ `rebase -i --autosquash` (GIT_SEQUENCE_EDITOR=: for non-interactive).
+
+S -- static_assert cases (the gap noted at the end of part 8 plus two wrong
+verdicts found around it).  Final commits: ce7b80609d, e8b70e4e1b,
+2cd389cabb (src), e72a62e703 (three CORE tests).
+1. Unnamed function parameter pack (`template<class... Args> int
+   count(Args...)`): the instantiation expander keyed on the declarator NAME,
+   so an unnamed pack stayed one parameter; a multi-arg call did not match the
+   instance and its constexpr evaluation (a static_assert operand) failed.
+   Detect the pack by the declarator ellipsis, name an unnamed one internally.
+2. `T()` for a class with default member initializers, no user ctor:
+   value-initialization = zero-init then a non-trivial default ctor
+   ([dcl.init.general]/9.1, [class.default.ctor]/3).  The functional-cast
+   path treated it as a POD and produced all-zero -- WRONG VERDICT
+   (`S c = S(); c.v` was 0 for `int v = 3;`).  Route through cpp_constructor
+   over a zero-initialized temporary.
+3. constexpr object of class type had no value (a fold-away macro): at
+   namespace scope never initialized (`constexpr S g;` read 0 -- WRONG
+   VERDICT), and no `g.v` / `g.n()` folded.  record_constexpr_object_value
+   computes the value; typecheck_expr_member folds a data-member read of the
+   macro to the value's component; propagate_constants substitutes it in a
+   static_assert; the evaluator gained a default-ctor temporary path and a
+   `this`-binding for a member call.
+
+   The important lesson: a FIRST attempt made the constexpr object a REAL
+   symex object (is_macro=false, ID_C_constant).  Per-track suites were green,
+   but the merged full cbmc-cpp run FAILED six libc++ tests
+   (span/vector/initializer_list) with a solver crash
+   (boolbv_widtht::get_entry -- an unmodelled bit-vector width on some libc++
+   internal constexpr type).  A change that gives an object a value/storage
+   can push a new construct into symex and hit a back-end gap that the
+   front-end tests do not.  Bisected across the session's commits, fixed by
+   keeping the object a macro and folding reads instead.  ==> run the FULL
+   suite on the MERGED result, never only the per-track subset.
+
+P2 -- second perf round (profiles on build-debug, `perf record
+--call-graph dwarf`).  ONE cost dominated the slow tests: link_to_library
+adds the C library one function at a time, each addition runs
+link_goto_model, which applies the (almost always empty) dest-side renaming
+to EVERY function of the program, and rename_symbolt::rename(exprt&) walked
+every tree regardless of empty maps.  Early-return when both maps are empty
+(rename(typet&) already did) -- 46% of cpp17_out_of_line_udc_conversion, 43%
+of cpp17_filesystem_basic.  Commit debce3b540.  Measured on the worktree:
+cpp17_filesystem_basic 49->23 s, cpp11_locale_ctype_facet 33->14 s.
+Remaining: the resolver's own overload machinery and allocator traffic;
+cpp11_regex_match is a THOROUGH test dominated by symex/solver at --unwind 5
+(unchanged, not a front-end cost).
+
+Cumulative front-end speedup this session on cpp20_span_basic_libcxx:
+103 s (round 7) -> ~43 s.  Integrated on bin38 (after the libc++ regression
+above was fixed); all suites green; clang -Werror clean.  Nothing pushed.
