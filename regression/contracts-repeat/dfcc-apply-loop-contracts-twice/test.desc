@@ -1,0 +1,14 @@
+CORE
+main.c
+--dfcc main --apply-loop-contracts _ --dfcc main --apply-loop-contracts
+^EXIT=6$
+^SIGNAL=0$
+^.*DFCC instrumentation has already been applied to this binary.*$
+^.*Only one DFCC pass per binary is supported.*$
+--
+^.*VERIFICATION SUCCESSFUL.*$
+This test applies loop contracts under the DFCC pipeline twice on the same
+goto binary. The second invocation must fail with the per-binary DFCC
+error: the per-binary guard is mode-independent and fires for
+--apply-loop-contracts as documented, not only for --enforce-contract /
+--replace-call-with-contract.

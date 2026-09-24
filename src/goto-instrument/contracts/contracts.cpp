@@ -1214,15 +1214,37 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
 
 void code_contractst::enforce_contract(const irep_idt &function)
 {
-  // Add statements to the source function
-  // to ensure assigns clause is respected.
-  check_frame_conditions_function(function);
-
-  // Rename source function
+  // Compute the mangled name we will rename the source function to.
   std::stringstream ss;
   ss << CPROVER_PREFIX << "contracts_original_" << function;
   const irep_idt mangled(ss.str());
   const irep_idt original(function);
+
+  // Check if contract enforcement has already been applied to this function
+  if(symbol_table.has_symbol(mangled))
+  {
+    throw invalid_input_exceptiont(
+      "Contract enforcement has already been applied to function '" +
+      id2string(function) +
+      "'.\nOnly one contract may be enforced at a time per function.");
+  }
+
+  // Reject enforcing a contract on a binary that the DFCC pipeline has already
+  // instrumented: the non-DFCC enforcement below assumes an uninstrumented
+  // function and otherwise trips a downstream invariant. This catches the
+  // cross-mode case `--dfcc ... --enforce-contract foo` followed by a plain
+  // `--enforce-contract foo`.
+  if(is_dfcc_instrumented(goto_model))
+  {
+    throw invalid_input_exceptiont(
+      "Contract enforcement cannot be applied to a binary that has already "
+      "been instrumented by the DFCC pipeline.\nOnly one DFCC pass per binary "
+      "is supported.");
+  }
+
+  // Add statements to the source function
+  // to ensure assigns clause is respected.
+  check_frame_conditions_function(function);
 
   auto old_function = goto_functions.function_map.find(original);
   INVARIANT(

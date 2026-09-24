@@ -23,10 +23,16 @@ Date: September 2021
 #include <util/symbol.h>
 
 #include <goto-programs/cfg.h>
+#include <goto-programs/goto_model.h>
 
 #include <analyses/natural_loops.h>
 #include <ansi-c/c_expr.h>
 #include <langapi/language_util.h>
+
+bool is_dfcc_instrumented(const goto_modelt &goto_model)
+{
+  return goto_model.symbol_table.has_symbol(INSTRUMENTED_FUNCTIONS_MAP_NAME);
+}
 
 static void append_safe_havoc_code_for_expr(
   const source_locationt location,
