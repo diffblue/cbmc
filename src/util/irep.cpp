@@ -450,6 +450,33 @@ std::size_t irept::hash() const
   return result;
 }
 
+std::size_t irept::string_hash() const
+{
+  const irept::subt &sub = get_sub();
+  const irept::named_subt &named_sub = get_named_sub();
+
+  std::size_t result = hash_string(id2string(id()));
+
+  for(const auto &irep : sub)
+    result = hash_combine(result, irep.string_hash());
+
+  std::size_t number_of_named_ireps = 0;
+
+  for(const auto &irep_entry : named_sub)
+  {
+    if(!is_comment(irep_entry.first)) // this variant ignores comments
+    {
+      result = hash_combine(result, hash_string(id2string(irep_entry.first)));
+      result = hash_combine(result, irep_entry.second.string_hash());
+      number_of_named_ireps++;
+    }
+  }
+
+  result = hash_finalize(result, sub.size() + number_of_named_ireps);
+
+  return result;
+}
+
 std::size_t irept::full_hash() const
 {
   const irept::subt &sub=get_sub();

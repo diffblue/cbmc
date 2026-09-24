@@ -298,6 +298,70 @@ SCENARIO("irept_memory", "[core][utils][irept]")
   }
 }
 
+SCENARIO("irept_string_hash", "[core][utils][irept]")
+{
+  GIVEN("Identical content built in different orders")
+  {
+    // built via the constructor, named subs given in one order
+    const irept a{
+      "root",
+      irept::named_subt{{"key_b", irept{"vb"}}, {"key_a", irept{"va"}}},
+      {irept{"op0"}, irept{"op1"}}};
+
+    // built incrementally, adding the named subs in the opposite order
+    irept b{"root"};
+    b.add("key_a", irept{"va"});
+    b.add("key_b", irept{"vb"});
+    irept op0{"op0"}, op1{"op1"};
+    b.move_to_sub(op0);
+    b.move_to_sub(op1);
+
+    THEN("string_hash() depends only on content, not construction order")
+    {
+      REQUIRE(a == b);
+      REQUIRE(a.string_hash() == b.string_hash());
+    }
+  }
+
+  GIVEN("Ireps with identical values but different named-sub keys")
+  {
+    const irept a{"root", irept::named_subt{{"k1", irept{"v"}}}, {}};
+    const irept b{"root", irept::named_subt{{"k2", irept{"v"}}}, {}};
+
+    THEN("string_hash() differs because the named-sub key is hashed")
+    {
+      REQUIRE(a.string_hash() != b.string_hash());
+    }
+  }
+
+  GIVEN("Ireps differing only in string content")
+  {
+    THEN("a differing id yields a differing string_hash()")
+    {
+      REQUIRE(irept{"id_a"}.string_hash() != irept{"id_b"}.string_hash());
+    }
+
+    THEN("differing sub content yields a differing string_hash()")
+    {
+      const irept a{"root", {}, {irept{"x"}}};
+      const irept b{"root", {}, {irept{"y"}}};
+      REQUIRE(a.string_hash() != b.string_hash());
+    }
+  }
+
+  GIVEN("An irep and a copy carrying an extra comment")
+  {
+    irept a{"root"};
+    irept b{"root"};
+    b.set("#a_comment", 42);
+
+    THEN("string_hash() ignores comments")
+    {
+      REQUIRE(a.string_hash() == b.string_hash());
+    }
+  }
+}
+
 // This test is expected to fail so that we can test the error printing of the
 // unit test framework for regressions. It is not included in the [core] or
 // default set of tests, so that the usual output is not polluted with

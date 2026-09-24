@@ -664,6 +664,7 @@ int goto_instrument_parse_optionst::doit()
 
     if(cmdline.isset("show-loops"))
     {
+      goto_model.goto_functions.compute_loop_hashes();
       show_loop_ids(ui_message_handler.get_ui(), goto_model);
       return CPROVER_EXIT_SUCCESS;
     }

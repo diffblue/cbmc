@@ -90,7 +90,57 @@ void unwindsett::parse_unwindset_one_loop(
 
       const goto_functiont &goto_function =
         goto_model.get_goto_function(function_id);
-      if(isdigit(loop_nr_label[0]))
+      if(loop_nr_label.substr(0, 5) == "hash_")
+      {
+        // Hash-based loop identifier: resolve to ordinal loop number
+        auto hash_str = loop_nr_label.substr(5);
+        auto hash_val = string2optional_size_t(hash_str);
+        if(!hash_val.has_value())
+        {
+          throw invalid_command_line_argument_exceptiont{
+            "invalid loop hash in " + id, "unwindset"};
+        }
+
+        // Find the loop whose hash matches. Structurally identical loops
+        // deliberately share a hash, so more than one backwards goto may
+        // match; for consistency with the label-based path below we scan all
+        // of them, warn if there is more than one match, and use the first.
+        // (compute_loop_hash is recomputed per lookup here; this is a single
+        // pass per --unwindset entry and has not been a measurable cost.)
+        std::optional<unsigned> nr;
+        for(auto it = goto_function.body.instructions.begin();
+            it != goto_function.body.instructions.end();
+            ++it)
+        {
+          if(
+            it->is_backwards_goto() &&
+            goto_function.body.compute_loop_hash(it) == *hash_val)
+          {
+            if(nr.has_value())
+            {
+              messaget log{message_handler};
+              log.warning()
+                << "loop identifier " << id
+                << " provided with unwindset is ambiguous" << messaget::eom;
+              break;
+            }
+            nr = it->loop_number;
+          }
+        }
+
+        if(!nr.has_value())
+        {
+          messaget log{message_handler};
+          log.warning() << "loop identifier " << id
+                        << " provided with unwindset does not match any loop"
+                        << messaget::eom;
+          return;
+        }
+
+        // Rewrite to ordinal form for the rest of the system
+        id = function_id + "." + std::to_string(*nr);
+      }
+      else if(isdigit(loop_nr_label[0]))
       {
         auto nr = string2optional_unsigned(loop_nr_label);
         if(!nr.has_value())

@@ -59,6 +59,7 @@ DIRS = cbmc-shadow-memory \
        validate-trace-xml-schema \
        cbmc-primitives \
        goto-interpreter \
+       goto-programs \
        cbmc-sequentialization \
        cpp-linter \
        catch-framework \

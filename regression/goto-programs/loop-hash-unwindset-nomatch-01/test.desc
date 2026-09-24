@@ -1,0 +1,13 @@
+CORE
+main.c
+--chain chain.sh
+^loop identifier main\.hash_123 provided with unwindset does not match any loop$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Reason: invalid
+--
+A well-formed but non-matching hash (no loop has this hash) is reported as not
+matching any loop and is then ignored, so verification still succeeds. The
+chain.sh passes --unwindset main.hash_123:6.
