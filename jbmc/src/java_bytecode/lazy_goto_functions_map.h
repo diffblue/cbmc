@@ -119,12 +119,22 @@ public:
   /// Determines if this lazy GOTO functions map can produce a body for the
   /// given function
   /// \param name: function ID to query
-  /// \return true if we can produce a function body, or false if we would leave
-  ///   it a bodyless stub.
+  /// \return true if we can produce a function body (via lazy loading or
+  ///   function body generation), or if the symbol table already contains a
+  ///   function definition with a body; false if we would leave it a bodyless
+  ///   stub.
   bool can_produce_function(const key_type &name) const
   {
-    return language_files.can_convert_lazy_method(name) ||
-           driver_program_can_generate_function_body(name);
+    if(
+      language_files.can_convert_lazy_method(name) ||
+      driver_program_can_generate_function_body(name))
+    {
+      return true;
+    }
+
+    const symbolt *sym_ptr = symbol_table.lookup(name);
+    return sym_ptr && sym_ptr->type.id() == ID_code &&
+           sym_ptr->value.is_not_nil();
   }
 
   /// Remove the function named \p name from the function map, if it exists.

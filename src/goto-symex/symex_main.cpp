@@ -399,15 +399,23 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 {
   const irep_idt entry_point_id = goto_functionst::entry_point();
 
-  const goto_functionst::goto_functiont *start_function;
+  // Entry point existence is a precondition: callers must validate it via
+  // validate_entry_point() before calling this function. We enforce it here so
+  // that a missed call surfaces as an actionable invariant violation rather
+  // than an unhandled std::out_of_range from get_goto_function.
+  const goto_functionst::goto_functiont *start_function_ptr = nullptr;
   try
   {
-    start_function = &get_goto_function(entry_point_id);
+    start_function_ptr = &get_goto_function(entry_point_id);
   }
   catch(const std::out_of_range &)
   {
-    throw unsupported_operation_exceptiont("the program has no entry point");
+    INVARIANT(
+      false,
+      "the entry point must exist in the model; callers must validate it via "
+      "validate_entry_point() before initialize_entry_point_state()");
   }
+  const goto_functionst::goto_functiont &start_function = *start_function_ptr;
 
   // Get our path_storage pointer because this state will live beyond
   // this instance of goto_symext, so we can't take the reference directly.
@@ -415,7 +423,7 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
 
   // create and prepare the state
   auto state = std::make_unique<statet>(
-    symex_targett::sourcet(entry_point_id, start_function->body),
+    symex_targett::sourcet(entry_point_id, start_function.body),
     symex_config.max_field_sensitivity_array_size,
     symex_config.simplify_opt,
     language_mode,
@@ -426,11 +434,11 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   CHECK_RETURN(!state->call_stack().empty());
 
   goto_programt::const_targett limit =
-    std::prev(start_function->body.instructions.end());
+    std::prev(start_function.body.instructions.end());
   state->call_stack().top().end_of_function = limit;
   state->call_stack().top().calling_location.pc =
     state->call_stack().top().end_of_function;
-  state->call_stack().top().hidden_function = start_function->is_hidden();
+  state->call_stack().top().hidden_function = start_function.is_hidden();
 
   state->symex_target = &target;
 
@@ -440,17 +448,17 @@ std::unique_ptr<goto_symext::statet> goto_symext::initialize_entry_point_state(
   auto emplace_safe_pointers_result =
     path_storage.safe_pointers.emplace(entry_point_id, local_safe_pointerst{});
   if(emplace_safe_pointers_result.second)
-    emplace_safe_pointers_result.first->second(start_function->body);
+    emplace_safe_pointers_result.first->second(start_function.body);
 
   path_storage.dirty.populate_dirty_for_function(
-    entry_point_id, *start_function);
+    entry_point_id, start_function);
   state->dirty = &path_storage.dirty;
 
   // Only enable loop analysis when complexity is enabled.
   if(symex_config.complexity_limits_active)
   {
     // Set initial loop analysis.
-    path_storage.add_function_loops(entry_point_id, start_function->body);
+    path_storage.add_function_loops(entry_point_id, start_function.body);
     state->call_stack().top().loops_info =
       path_storage.get_loop_analysis(entry_point_id);
   }
@@ -496,6 +504,13 @@ goto_symext::get_goto_function(abstract_goto_modelt &goto_model)
            const irep_idt &id) -> const goto_functionst::goto_functiont & {
     return goto_model.get_goto_function(id);
   };
+}
+
+void goto_symext::validate_entry_point(const abstract_goto_modelt &goto_model)
+{
+  const irep_idt entry_point_id = goto_functionst::entry_point();
+  if(!goto_model.can_produce_function(entry_point_id))
+    throw invalid_input_exceptiont("the program has no entry point");
 }
 
 messaget::mstreamt &
