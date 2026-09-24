@@ -11339,3 +11339,90 @@ cbmc-library, goto-cc-cbmc green; unit-proofs found #8.  Final run on bin35
 systemc, contracts-cpp-dfcc, unit-proofs, ansi-c (c++ front-end),
 goto-cc-cbmc all green; cbmc, cbmc-library, ansi-c (gcc) green on bin34
 (unchanged front-end paths since); clang -Werror clean.  Nothing pushed.
+
+### Round 158, part 8 (2026-09-24): four tracks in parallel (worktrees)
+
+Setup: one git worktree per code track (`/home/ubuntu/cbmc-wt-{auto,req,
+perf}`, branches r158-*), each with its own cmake build (ccache raised to
+20 GB; a fresh configure+build is ~10 min with the warm cache) and its own
+copy of regression/ so test.pl runs never collide; read-only tracks
+(profiling, audit) ran on the bin35 snapshot / build-debug.  Integration by
+cherry-pick onto the main branch (no conflicts: the tracks touched disjoint
+hunks).  Rules that held: -j6 per build, ulimit on every cbmc run, one
+test.pl per directory.  Gotcha: `scripts/profile_cbmc.py` sets its own
+RLIMIT_AS with an unlimited hard limit -- an outer `ulimit -v` makes that
+setrlimit fail ("Exception occurred in preexec_fn"); run it bare.  And the
+goto-instrument / linking-goto-binaries chain.sh scripts take an
+`is_windows` positional (`false`) before the test arguments.
+
+A. Placeholder type deduction, unified (ab2bd40026, test a8a993e7e6).
+   [dcl.type.auto.deduct]/3-4 in ONE routine deduce_placeholder_type
+   (decltype_of factored out of typecheck_type for /4); deduce_return_type
+   implements /2.1 + [dcl.spec.auto.general]/10-13 -- every return
+   statement deduces, first fixes the type (written into the function
+   type at once so a recursive call sees it, Example 4), a later
+   different deduction is an error (/10), void from `return;`/no return
+   for the bare placeholder, error for `auto *` (/11).  convert_function's
+   early pass and post-body pass are gone; typecheck_return dispatches on
+   the DECLARED return type; the three lambda lowerings share a
+   return_deduction_contextt.  The variable path uses the same routine.
+   Newly right: `decltype(auto) f() { return i; }` is `int` (was `int&`),
+   `decltype(auto) x = cs.m` is `int`, `auto &&r = f()` for f returning
+   `int&&` (the front end's lvalue mark on the xvalue used to collapse it
+   to an lvalue reference and the binding failed -- is_lvalue_expression,
+   already used by reference binding, decides), `auto x(i)`
+   ([dcl.type.auto.deduct]/2.2.3) accepted.  Matrix test from the
+   standard's examples: 11 failures on bin35, 0 now.  Full cbmc-cpp +
+   cbmc + cpp + systemc + dfcc + unit-proofs + ansi-c(c++) green on the
+   worktree.
+R. Requires-clause check under the template map (2deae17815, test
+   e2a713ec7c).  The by-name rewrite (type params only), its pack splice
+   (04f8c0d48a) and the atom evaluator's private map installation are
+   replaced by template_mapt::build of the class instance's bindings then
+   the member's own ([temp.local]), and a plain typecheck of the clause in
+   the template's scope.  Behaviour-preserving on the whole suite (the
+   guard test passes before and after -- the atom fallback covered those
+   shapes); the value is one mechanism instead of three.  Observation
+   while writing the test: `static_assert(f(1,'c') == 1)` with f a
+   constexpr variadic function template is NOT folded ("condition could
+   not be evaluated") though the runtime assertion holds -- the constexpr
+   evaluator does not reach overload-resolved template instances with
+   pack parameters from a static_assert.  Not fixed here.
+P. Profiling (build-debug RelWithDebInfo, perf; `--call-graph dwarf` was
+   needed for callers -- no frame pointers).  cpp20_span_basic_libcxx
+   103 s: 17% (anonymous)::concept_normal -> concept_constraint_body scans
+   the WHOLE symbol table per concept-id (constraint ordering on every
+   overload resolution); 7% builtin_factory: every unresolved name scans
+   the built-in header texts with getline/strip/find (SFINAE probing asks
+   for the same names thousands of times); 7% symbol_tablet::erase:
+   linear scan of the module multimap (a module = the whole TU) ->
+   quadratic remove_internal_symbols/clean_up; 13% (ranges_basic)
+   find_template_conversion_specialisation scans the symbol table per
+   conversion attempt.  Fixes: builtin_factory negative cache
+   (0b45bfd236), concept symbol index (57039f2c90), per-class conversion
+   template candidates (81ccacb2bf), symbol table name->multimap-entry
+   index with O(1) erase (b90368b988; util change, public types kept, unit
+   tests pass).  span 95 -> 55 s, ranges_basic 25 -> 16 s, locale 36 -> 32 s.
+   Remaining, not done: link_goto_model's rename_symbols_in_function walks
+   every function of the program with a non-empty rename map (4.4%); the
+   rest is the resolver's overload machinery itself (irept::find/get 17%
+   self, malloc 15%).
+D. Dropped-body audit (all 1360 CORE cbmc-cpp descs, bin35, --verbosity
+   9): only 8 tests emit a drop diagnostic; 7 of them verify FAILED by
+   design (iostream/any/libcxx pins, cpp11_dropped_library_body_warning);
+   the one SUCCESSFUL is cpp11_is_swappable_unevaluated, whose drop is the
+   [temp.inst]/5 tolerance the test exists to pin (CBMC instantiates the
+   definition an unevaluated probe must not).  So the "vacuous SUCCESS
+   through a dropped body" exposure in the CORE suite is nil today; the
+   part-7 regression (libcxx23_vector_pushback) would have shown up here
+   as a new entry -- worth re-running the audit after front-end changes
+   (script: /tmp/r158/audit/run.sh).  Note the message says
+   "system-header function" for any body dropped under an instantiation
+   stack, including user code; wording only.
+
+Integrated (cherry-picks ab2bd40026 a8a993e7e6 2deae17815 e2a713ec7c
+0b45bfd236 57039f2c90 81ccacb2bf b90368b988) and verified on bin36 (s36):
+cbmc-cpp 1409/1409 (20 skipped), cbmc, cpp, systemc, contracts-cpp-dfcc,
+goto-instrument, ansi-c x2, unit-proofs, cbmc-library, goto-cc-cbmc,
+linking-goto-binaries green; unit 614/614; clang -Werror clean.  Nothing
+pushed.
