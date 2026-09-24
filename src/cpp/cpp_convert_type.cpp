@@ -375,9 +375,15 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
   }
 }
 
-void cpp_convert_auto(
+/// \p nested: the placeholder is reached through a ptr-operator of the
+/// declared type (`auto &`, `auto *`), so the deduced type keeps the
+/// qualifiers of the referred type; at the top level (`auto x = e`) they are
+/// dropped ([temp.deduct.call]/2: "the top-level cv-qualifiers of A's type
+/// are ignored for type deduction").
+static void cpp_convert_auto_rec(
   typet &dest,
   const typet &src,
+  bool nested,
   message_handlert &message_handler)
 {
   // N5008 [class.bit] + [dcl.type.auto.deduct]: a bit-field has no distinct
@@ -389,8 +395,11 @@ void cpp_convert_auto(
   // expression" on the empty bit-field width).
   if(src.id() == ID_c_bit_field)
   {
-    cpp_convert_auto(
-      dest, to_c_bit_field_type(src).underlying_type(), message_handler);
+    cpp_convert_auto_rec(
+      dest,
+      to_c_bit_field_type(src).underlying_type(),
+      nested,
+      message_handler);
     return;
   }
 
@@ -409,15 +418,16 @@ void cpp_convert_auto(
       dest.id() == ID_pointer && !is_reference(dest) &&
       src.id() == ID_pointer && !is_reference(src))
     {
-      cpp_convert_auto(
+      cpp_convert_auto_rec(
         to_type_with_subtype(dest).subtype(),
         to_pointer_type(src).base_type(),
+        true,
         message_handler);
     }
     else
     {
-      cpp_convert_auto(
-        to_type_with_subtype(dest).subtype(), src, message_handler);
+      cpp_convert_auto_rec(
+        to_type_with_subtype(dest).subtype(), src, true, message_handler);
     }
     return;
   }
@@ -436,19 +446,31 @@ void cpp_convert_auto(
     {
       t = src;
       // N5008 [dcl.type.auto.deduct]/4 with [temp.deduct.call]: for
-      // `auto &` / `auto *` / `const auto` the placeholder is deduced from
-      // the referred type INCLUDING its qualifiers (`auto &r = ci` with
-      // `const int ci` gives `const int &`).  The qualifiers of a
-      // substituted type live as attributes on that type; write() rebuilds
-      // the type from c_qualifiers, so transfer them (as read_rec does for
-      // a substituted cpp_name) -- otherwise `auto &f() { return ci; }`
-      // deduced `int &` and the return could not bind.
-      if(src.get_bool(ID_C_constant))
-        cpp_convert_type.c_qualifiers.is_constant = true;
-      if(src.get_bool(ID_C_volatile))
-        cpp_convert_type.c_qualifiers.is_volatile = true;
+      // `auto &` / `auto *` the placeholder is deduced from the referred
+      // type INCLUDING its qualifiers (`auto &r = ci` with `const int ci`
+      // gives `const int &`), while a top-level `auto x = ci` drops them.
+      // The qualifiers of a substituted type live as attributes on that
+      // type; write() rebuilds the type from c_qualifiers, so transfer
+      // them in the nested case (as read_rec does for a substituted
+      // cpp_name) -- otherwise `auto &f() { return ci; }` deduced `int &`
+      // and the return could not bind.
+      if(nested)
+      {
+        if(src.get_bool(ID_C_constant))
+          cpp_convert_type.c_qualifiers.is_constant = true;
+        if(src.get_bool(ID_C_volatile))
+          cpp_convert_type.c_qualifiers.is_volatile = true;
+      }
     }
   }
 
   cpp_convert_type.write(dest);
+}
+
+void cpp_convert_auto(
+  typet &dest,
+  const typet &src,
+  message_handlert &message_handler)
+{
+  cpp_convert_auto_rec(dest, src, false, message_handler);
 }
