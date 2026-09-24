@@ -166,7 +166,15 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
       // decltype(auto) of a parenthesized lvalue deduces a reference type
       // ([dcl.type.decltype]); mirror the eager path in convert_function.
       if(deduced_decltype_auto && code.return_value().get_bool(ID_C_lvalue))
+      {
         deduced = reference_typet(deduced, config.ansi_c.pointer_width);
+        // the returned glvalue binds to that reference ([stmt.return]/2);
+        // left as a plain value, the return statement's type disagreed with
+        // the function's deduced `T &' and the body was dropped as
+        // inconsistent (libstdc++'s __get_n, an if-constexpr chain whose
+        // deduction reaches this path)
+        reference_initializer(code.return_value(), to_reference_type(deduced));
+      }
       else if(!deduced_decltype_auto)
       {
         // N5008 [dcl.type.auto.deduct]/4: plain `auto` deduces as
