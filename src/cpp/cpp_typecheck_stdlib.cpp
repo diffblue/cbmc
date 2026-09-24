@@ -1248,12 +1248,21 @@ void cpp_typecheckt::provide_stdlib_bodies()
     }
   }
 
-  for(auto it = symbol_table.begin(); it != symbol_table.end(); ++it)
+  // The models below add parameter symbols (ensure_parameter_symbols) while
+  // the functions are visited; an insertion may rehash the symbol table's
+  // unordered_map and invalidate the iteration (functions get skipped -- the
+  // locale default-constructor model went missing that way).  Visit a
+  // snapshot of the function names instead.
+  std::vector<irep_idt> function_names;
+  for(const auto &named_symbol : symbol_table.symbols)
   {
-    symbolt &symbol = it.get_writeable_symbol();
+    if(named_symbol.second.type.id() == ID_code)
+      function_names.push_back(named_symbol.first);
+  }
 
-    if(symbol.type.id() != ID_code)
-      continue;
+  for(const irep_idt &function_name : function_names)
+  {
+    symbolt &symbol = symbol_table.get_writeable_ref(function_name);
 
     const std::string base = id2string(symbol.base_name);
     const std::string name = id2string(symbol.name);
