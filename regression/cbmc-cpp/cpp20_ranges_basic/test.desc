@@ -1,12 +1,28 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
 --
+^warning: ignoring
 ^CONVERSION ERROR$
 --
 
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: conversion from 'signed int [5l]' to 'struct _Partial': implicit arithmetic conversion not permitted
+Was KNOWNBUG since round 152 ("conversion from 'signed int [5l]' to 'struct
+_Partial'").  Fixed 2026-09-24 by seven front-end fixes along the libstdc++
+range-adaptor chain: [dcl.init.aggr]/1 a constructor template disqualifies
+the aggregate (ref_view{arr}); [temp.spec.partial.order] variable-template
+partial specializations are ordered (extent_v<int[5]>); [temp.deduct.call]/3
+no forwarding reference in a constructor-derived deduction guide and
+[dcl.init.general]/9 value-initialising a reference is an error
+(owning_view{declval<int(&)[5]>()}); [temp.constr.decl]/1 a requires-clause
+is looked up from the template's scope (the hidden friend operator|);
+[temp.variadic]/5 `Args...` in a requires-clause concept-id expands to the
+deduced arity (__adaptor_partial_app_viable); [stmt.if]/2 no return type
+deduction from a discarded `if constexpr` branch (_All::operator());
+[temp.inst]/4 a body whose eager conversion fails while a class is being
+elaborated is re-queued instead of dropped (view_interface members and the
+ranges::begin(ref_view&) instance).  Exercised by the cpp20_ranges_* unit
+tests.

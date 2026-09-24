@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+--
+N5008 [temp.spec.partial.order]/1: libstdc++'s extent_v has both
+`extent_v<_Tp[_Size], 0>` and `extent_v<_Tp[_Size], _Uint>`; for
+`extent_v<int[5]>` both match and the former is more specialised.  The
+variable-template instantiation used to take the LAST match in scope order,
+yielding 0 (and ranges::size(array) returned 0).  Ordered by deduction as the
+class-template case already was.  Non-vacuous: the last assertion states a
+wrong value and must FAIL.

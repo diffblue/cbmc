@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 no match
@@ -8,8 +8,14 @@ no match
 --
 ^VERIFICATION SUCCESSFUL$
 --
-Rejects-invalid test: CBMC currently accepts the kind-mismatched
-deduction and verifies the program.  Round-44 attempt: enforcing
+Rejects-invalid test.  Fixed 2026-09-24: [temp.deduct.type]/20 is a
+comparison of the two DECLARED parameter types (the pattern's `long... _Uf`
+against `indices`' `unsigned long...`), not of the deduced values' types --
+which is why the earlier attempts below, working on recorded value types,
+could not be made to hold.  An explicitly specified argument is exempt
+(Example 13: `f<1>(a)` is OK) and cv-qualifiers are ignored.
+
+History.  Round-44 attempt: enforcing
 [temp.deduct.type]/17 at guess_function_template_args'
 build_template_args point broke the (valid) libc++ tuple kernels --
 CBMC's own machinery parks deduced values with normalized kinds (e.g.
