@@ -969,8 +969,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   //
   // User-code bodies use normal error propagation below.
   const std::string body_file = id2string(symbol.location.get_file());
-  const bool is_system_header_body =
-    body_file.find("/usr/include/") == 0 || body_file.find("/usr/lib/") == 0;
+  const bool is_system_header_body = is_library_body_file(body_file);
 
   std::optional<sfinae_contextt> syshdr_guard;
   if(is_system_header_body)
