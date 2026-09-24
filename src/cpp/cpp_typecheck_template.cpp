@@ -3870,6 +3870,22 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         std::function<void(exprt &)> eval_calls;
         eval_calls = [&](exprt &e)
         {
+          // N5008 [temp.arg.nontype]/1 + [temp.param]/7: a temporary of a
+          // structural class type built by a constexpr constructor
+          // (`Fixed(42)`) is the converted constant expression the
+          // parameter binds to -- fold it to a struct constant, so the
+          // instance's use of `F.value` folds too.
+          if(
+            e.id() == ID_side_effect &&
+            e.get(ID_statement) == ID_temporary_object)
+          {
+            exprt r = try_evaluate_constexpr(e, symbol_table, *this);
+            if(r.is_not_nil())
+            {
+              e = r;
+              return;
+            }
+          }
           for(auto &op : e.operands())
             eval_calls(op);
           if(

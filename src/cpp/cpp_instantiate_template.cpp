@@ -189,6 +189,54 @@ cpp_typecheckt::template_suffix(const cpp_template_args_tct &template_args)
         continue;
       }
 
+      // N5008 [temp.param]/7 + [temp.arg.nontype]/1: a class-type non-type
+      // template argument is a converted constant expression of the
+      // parameter's structural class type -- `Fixed{42}` / `Fixed(42)` with
+      // a constexpr constructor is a temporary whose constructor call the
+      // constant evaluator folds into a struct constant.
+      if(
+        e.id() == ID_side_effect &&
+        (e.get(ID_statement) == ID_temporary_object ||
+         e.get(ID_statement) == ID_function_call))
+      {
+        exprt folded = try_evaluate_constexpr(e, symbol_table, *this);
+        if(folded.is_not_nil())
+          e = folded;
+      }
+      if(e.id() == ID_struct || e.id() == ID_array)
+      {
+        // [temp.type]/1: two template-ids with template-argument-equivalent
+        // class-type arguments name the same specialization; render the
+        // value structurally -- and FLAT (digits, letters, `_`, `.`, `{}`
+        // only): instance identifiers are parsed downstream, where `(`, `:`
+        // and `=` would be taken for structure (see the review doc's
+        // identity assessment).
+        std::function<std::string(const exprt &)> render_flat =
+          [&](const exprt &v) -> std::string
+        {
+          if(v.id() == ID_struct || v.id() == ID_array)
+          {
+            std::string r = v.id() == ID_struct ? "s{" : "a{";
+            for(const auto &op : v.operands())
+              r += render_flat(op) + ".";
+            return r + "}";
+          }
+          if(v.is_constant())
+          {
+            std::string val = id2string(to_constant_expr(v).get_value());
+            for(auto &ch : val)
+              if(!isalnum(static_cast<unsigned char>(ch)) && ch != '.')
+                ch = '_';
+            return val;
+          }
+          return "_";
+        };
+        result += e.type().id() == ID_struct_tag
+                    ? id2string(to_struct_tag_type(e.type()).get_identifier())
+                    : cpp_type2name(e.type());
+        result += render_flat(e);
+        continue;
+      }
       make_constant(e);
 
       // this must be a constant, which includes true/false
