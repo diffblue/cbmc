@@ -118,6 +118,8 @@ public:
 
     void set_dirty_to_top(const dirtyt &dirty, const namespacet &ns);
 
+    void invalidate_floatbv_constants(const namespacet &ns);
+
     bool is_constant(const exprt &expr, const namespacet &ns) const;
 
     bool is_constant(const irep_idt &id, const namespacet &ns) const;
