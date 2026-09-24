@@ -294,6 +294,14 @@ of a synchronized block.
 `monitorexit` is converted to a call to
 `java::java.lang.Object.monitorexit:(Ljava/lang/Object;)V`.
 
+Before calling these monitor methods, a null check on the object reference is
+added during instrumentation, alongside the other Java null-dereference checks.
+As for those, its behaviour is governed by `--throw-runtime-exceptions`: by
+default a null monitor is reported as a `null-pointer-exception` assertion
+failure, while with `--throw-runtime-exceptions` a `NullPointerException` is
+thrown, matching the JVM specification where both `monitorenter` and
+`monitorexit` throw `NullPointerException` when their argument is null.
+
 \subsection converting-synchronized-methods Converting Synchronized Methods
 
 Synchronized methods make it impossible for two invocations of the same method
