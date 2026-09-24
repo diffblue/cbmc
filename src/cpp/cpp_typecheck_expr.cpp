@@ -1927,6 +1927,42 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 {
   typecheck_expr_member(expr, cpp_typecheck_fargst());
+
+  // N5008 [expr.const], [dcl.constexpr]/6: reading a non-static data member
+  // of a constexpr object of class type is a constant expression.  Such an
+  // object is a fold-away macro whose value is a struct constant (see
+  // record_constexpr_object_value); the resolver keeps it as a symbol
+  // expression so a member FUNCTION call can form `this'.  For a plain data
+  // member access, substitute the corresponding component of the value, so
+  // the read folds -- in a constant expression and (a macro has no run-time
+  // storage) at run time.
+  if(
+    expr.id() == ID_member && expr.operands().size() == 1 &&
+    expr.type().id() != ID_code &&
+    to_multi_ary_expr(expr).op0().id() == ID_symbol)
+  {
+    const symbolt *object = symbol_table.lookup(
+      to_symbol_expr(to_multi_ary_expr(expr).op0()).get_identifier());
+    if(
+      object != nullptr && object->is_macro && !object->is_type &&
+      object->value.id() == ID_struct &&
+      (object->type.id() == ID_struct_tag || object->type.id() == ID_union_tag))
+    {
+      const struct_union_typet &su =
+        follow_tag(to_struct_or_union_tag_type(object->type));
+      const irep_idt &component_name = expr.get(ID_component_name);
+      if(su.has_component(component_name))
+      {
+        const std::size_t index = su.component_number(component_name);
+        if(index < object->value.operands().size())
+        {
+          exprt component = object->value.operands()[index];
+          component.add_source_location() = expr.source_location();
+          expr.swap(component);
+        }
+      }
+    }
+  }
 }
 
 /// The type arguments of a builtin trait recorded by the parser in
