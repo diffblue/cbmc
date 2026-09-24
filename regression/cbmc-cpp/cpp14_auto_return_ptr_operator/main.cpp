@@ -65,10 +65,13 @@ int main()
 {
   const auto &r1 = ci;
   const auto x = ci;
+  auto y = ci; // [temp.deduct.call]/2: top-level const dropped
+  y = 4;
   auto &r2 = mi;
   auto *p = &ci;
   static_assert(__is_same(decltype(r1), const int &), "const auto& of const");
   static_assert(__is_same(decltype(x), const int), "const auto");
+  static_assert(__is_same(decltype(y), int), "auto drops top-level const");
   static_assert(__is_same(decltype(r2), int &), "auto& mutable");
   static_assert(__is_same(decltype(p), const int *), "auto* of const");
   static_assert(__is_same(decltype(href()), const int &), "auto& fn const");
