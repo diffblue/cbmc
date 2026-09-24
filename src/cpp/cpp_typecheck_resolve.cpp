@@ -1145,6 +1145,29 @@ void cpp_typecheck_resolvet::guess_function_template_args(
               // resolve and the (satisfied) constraint be wrongly rejected.
               // Scope-restored by req_save_scope below.
               cpp_save_scopet req_save_scope(cpp_typecheck.cpp_scopes);
+              // N5008 [temp.constr.decl]/1, [temp.res.general]/1: the
+              // requires-clause is part of the template's declaration, so
+              // the names in it are looked up from the template's own scope
+              // (its parent is the declaring class or namespace), not from
+              // the call site.  A hidden friend such as
+              // _RangeAdaptorClosure's `template<typename _Self, typename
+              // _Range> requires derived_from<remove_cvref_t<_Self>,
+              // _RangeAdaptorClosure> && ... operator|(_Range&&, _Self&&)`
+              // names its class unqualified; looked up from main() that
+              // failed and the candidate was mis-handled downstream
+              // (`arr | views::take(3)` died converting the array to the
+              // closure type).
+              {
+                const auto scope_it =
+                  cpp_typecheck.cpp_scopes.id_map.find(tsym->name);
+                if(
+                  scope_it != cpp_typecheck.cpp_scopes.id_map.end() &&
+                  scope_it->second != nullptr)
+                {
+                  cpp_typecheck.cpp_scopes.go_to(
+                    *static_cast<cpp_scopet *>(scope_it->second));
+                }
+              }
               std::function<void(const irept &)> bind_req_params =
                 [&](const irept &node)
               {
