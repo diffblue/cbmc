@@ -998,69 +998,26 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             sfinae_contextt sfinae_guard{cpp_typecheck};
             try
             {
-              // Map each (type) template parameter's short name to the
-              // deduced type.  The requires-clause is a raw parsed
-              // expression that still refers to the parameters by
-              // cpp_name (e.g. "T"); template_map.apply only rewrites
-              // typed parameter symbols, so substitute by name here.
-              const auto &params = tdecl.template_type().template_parameters();
+              // N5008 [temp.constr.decl]/3 + [temp.constr.atomic]/1: the
+              // associated constraints are checked with the PARAMETER
+              // MAPPING of the constrained declaration: the member
+              // template's own parameters bound to the deduced arguments
+              // and, for a constrained member of a class template
+              // specialization, the class's parameters bound to the
+              // instance's arguments (libstdc++ C++20 pair<T1,T2>'s
+              // converting constructor requires
+              // _S_constructible<...>() over T1/T2).  Install exactly
+              // that mapping in the template map (packs included, so
+              // `Args...` expands to the deduced arity and
+              // `sizeof...(Args)` counts it -- [temp.variadic]/5) and
+              // type-check the clause as written, in the template's own
+              // scope; the parameter names then resolve as in any
+              // instantiated body.  This replaced a by-name textual
+              // substitution that covered type parameters only.
               const cpp_template_args_tct &targs =
                 to_cpp_template_args_tc(e.type().find(ID_C_template_arguments));
-              const auto &targ_v = targs.arguments();
-              std::map<irep_idt, typet> name_to_type;
-              // Full parameter identifiers, for the TEMPLATE MAP during
-              // atom evaluation (see below).
-              std::map<irep_idt, typet> id_to_type;
-              // N5008 [temp.variadic]/5: a trailing type parameter PACK
-              // binds all remaining deduced arguments; `Args...` in a
-              // concept-id of the clause expands to that many arguments
-              // (and `sizeof...(Args)` inside the concept counts them).
-              // Mapping the pack to its first element only made
-              // `__adaptor_partial_app_viable<_Take, int(&)[5], int>`
-              // (`sizeof...(_Args) == _S_arity - 1`) come out TRUE for two
-              // arguments, keeping _RangeAdaptor's partial-application
-              // operator() viable against _Take's own two-argument one.
-              std::map<irep_idt, std::vector<typet>> name_to_pack;
-              for(std::size_t pi = 0; pi < params.size() && pi < targ_v.size();
-                  ++pi)
-              {
-                if(params[pi].id() != ID_type)
-                  continue;
-                const std::string pid =
-                  id2string(params[pi].type().get(ID_identifier));
-                const auto pos = pid.rfind("::");
-                const irep_idt sname =
-                  pos != std::string::npos ? pid.substr(pos + 2) : pid;
-                if(params[pi].get_bool(ID_ellipsis) && pi + 1 == params.size())
-                {
-                  std::vector<typet> elems;
-                  for(std::size_t ai = pi; ai < targ_v.size(); ++ai)
-                  {
-                    if(
-                      targ_v[ai].id() == ID_type &&
-                      targ_v[ai].type().id() != ID_unassigned)
-                    {
-                      elems.push_back(targ_v[ai].type());
-                    }
-                  }
-                  name_to_pack[sname] = elems;
-                }
-                if(targ_v[pi].id() == ID_type)
-                {
-                  name_to_type[sname] = targ_v[pi].type();
-                  id_to_type[pid] = targ_v[pi].type();
-                }
-              }
-              // N5008 [temp.constr.decl]/3: the associated constraints of
-              // a constrained member of a class template are formed from
-              // BOTH the member's and the enclosing class template's
-              // parameters; after the class is instantiated, atoms may
-              // still name the CLASS's parameters (libstdc++ C++20
-              // pair<T1,T2>'s converting constructor requires
-              // _S_constructible<...>() over T1/T2).  Map those names to
-              // the class instance's arguments as well (the instance
-              // symbol records them in ID_C_template /
-              // ID_C_template_arguments).
+              cpp_saved_template_mapt clause_saved_map{
+                cpp_typecheck.template_map};
               {
                 const irep_idt &member_id = e.type().get(ID_C_template);
                 const std::string member_str = id2string(member_id);
@@ -1093,119 +1050,18 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                     class_sym->type.find(ID_C_template).is_not_nil() &&
                     class_sym->type.find(ID_C_template_arguments).is_not_nil())
                   {
-                    const template_typet &class_tmpl =
+                    // the class's bindings first: the member's parameters
+                    // shadow them ([temp.local])
+                    cpp_typecheck.template_map.build(
                       static_cast<const template_typet &>(
-                        class_sym->type.find(ID_C_template));
-                    const cpp_template_args_tct &class_targs =
+                        class_sym->type.find(ID_C_template)),
                       to_cpp_template_args_tc(
-                        class_sym->type.find(ID_C_template_arguments));
-                    const auto &cparams = class_tmpl.template_parameters();
-                    const auto &cargs = class_targs.arguments();
-                    for(std::size_t pi = 0;
-                        pi < cparams.size() && pi < cargs.size();
-                        ++pi)
-                    {
-                      if(cparams[pi].id() != ID_type)
-                        continue;
-                      const std::string pid =
-                        id2string(cparams[pi].type().get(ID_identifier));
-                      const auto cpos = pid.rfind("::");
-                      const irep_idt sname =
-                        cpos != std::string::npos ? pid.substr(cpos + 2) : pid;
-                      // member parameters shadow class parameters
-                      // ([temp.local]); do not overwrite
-                      if(
-                        cargs[pi].id() == ID_type &&
-                        name_to_type.find(sname) == name_to_type.end())
-                      {
-                        name_to_type[sname] = cargs[pi].type();
-                        id_to_type[pid] = cargs[pi].type();
-                      }
-                    }
+                        class_sym->type.find(ID_C_template_arguments)));
                   }
                 }
               }
+              cpp_typecheck.template_map.build(tdecl.template_type(), targs);
               exprt req_copy = req_clause;
-              // the pack expansion `Args...` as a template argument of a
-              // concept-id (an `ambiguous`/type argument whose cpp_name
-              // carries `ellipsis`): splice in one argument per element
-              const auto pack_of_arg =
-                [&](const irept &arg) -> const std::vector<typet> *
-              {
-                const irept &pat = arg.id() == ID_ambiguous ? arg.find(ID_type)
-                                   : arg.id() == ID_type    ? arg.find(ID_type)
-                                                            : arg;
-                if(
-                  pat.id() != ID_cpp_name || !pat.get_bool(ID_ellipsis) ||
-                  pat.get_sub().size() != 1 || pat.get_sub()[0].id() != ID_name)
-                {
-                  return nullptr;
-                }
-                const auto it =
-                  name_to_pack.find(pat.get_sub()[0].get(ID_identifier));
-                return it == name_to_pack.end() ? nullptr : &it->second;
-              };
-              std::function<void(irept &)> subst = [&](irept &n)
-              {
-                if(n.id() == ID_template_args)
-                {
-                  irept::subt &args = n.add(ID_arguments).get_sub();
-                  irept::subt expanded;
-                  bool changed = false;
-                  for(const auto &arg : args)
-                  {
-                    if(const auto *elems = pack_of_arg(arg))
-                    {
-                      for(const auto &t : *elems)
-                      {
-                        exprt type_arg(ID_type);
-                        type_arg.type() = t;
-                        expanded.push_back(type_arg);
-                      }
-                      changed = true;
-                    }
-                    else
-                      expanded.push_back(arg);
-                  }
-                  if(changed)
-                  {
-                    args.swap(expanded);
-                    for(auto &arg : args)
-                      subst(arg);
-                    return;
-                  }
-                }
-                if(n.id() == ID_cpp_name)
-                {
-                  irep_idt only_name;
-                  bool single = true;
-                  for(const auto &s : n.get_sub())
-                  {
-                    if(s.id() == ID_name)
-                    {
-                      if(!only_name.empty())
-                        single = false;
-                      only_name = s.get(ID_identifier);
-                    }
-                    else
-                      single = false;
-                  }
-                  if(single)
-                  {
-                    auto it = name_to_type.find(only_name);
-                    if(it != name_to_type.end())
-                    {
-                      n = it->second;
-                      return;
-                    }
-                  }
-                }
-                for(auto &sub : n.get_sub())
-                  subst(sub);
-                for(auto &named : n.get_named_sub())
-                  subst(named.second);
-              };
-              subst(req_copy);
               // [expr.prim.req.general]/2: bind the requirement-parameters of
               // any requires-expression in the clause as local symbols, so
               // their uses (e.g. `a` in `requires(T a){ a + a; }`) resolve
@@ -1473,13 +1329,6 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                       // typecheck; a throw here previously read as
                       // "constraint unsatisfied" and silently removed
                       // the candidate.
-                      cpp_saved_template_mapt saved_map{
-                        cpp_typecheck.template_map};
-                      for(const auto &binding : id_to_type)
-                      {
-                        cpp_typecheck.template_map.type_map[binding.first] =
-                          binding.second;
-                      }
                       cpp_typecheck.typecheck_expr(atom);
                     }
                     const bool atom_clean =
