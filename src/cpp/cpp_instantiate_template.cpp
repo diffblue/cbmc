@@ -7167,6 +7167,28 @@ skip_pack_removal_ft:
                 continue;
             }
 
+            // N5008 [temp.spec.partial.order]/1 (variable templates:
+            // [temp.spec.partial.general]/1): of several matching partial
+            // specializations the MORE SPECIALISED one is selected, ordered
+            // by deduction as for the class-template case in
+            // disambiguate_template_classes -- `extent_v<_Tp[_Size], 0>`
+            // over `extent_v<_Tp[_Size], _Uint>` for `extent_v<int[5]>`.
+            // Previously the last match in scope order won, so the generic
+            // rank-recursion specialization gave `extent_v<int[5]> == 0`
+            // (and ranges::size(array) returned 0).
+            if(best_match != nullptr)
+            {
+              const cpp_declarationt &best_decl =
+                to_cpp_declaration(best_match->type);
+              const bool s_at_least =
+                partial_specialization_at_least_as_specialised(
+                  spec_decl, best_decl, best_match->name);
+              const bool best_at_least =
+                partial_specialization_at_least_as_specialised(
+                  best_decl, spec_decl, s.name);
+              if(!(s_at_least && !best_at_least))
+                continue;
+            }
             best_match = &s;
             best_spec_args = guessed;
           }
