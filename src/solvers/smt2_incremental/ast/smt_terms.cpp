@@ -125,6 +125,24 @@ const smt_bit_vector_sortt &smt_bit_vector_constant_termt::get_sort() const
   return static_cast<const smt_bit_vector_sortt &>(smt_termt::get_sort());
 }
 
+smt_int_constant_termt::smt_int_constant_termt(const mp_integer &value)
+  : smt_termt{ID_smt_int_constant_term, smt_int_sortt{}}
+{
+  set(ID_value, integer2string(value));
+}
+
+mp_integer smt_int_constant_termt::value() const
+{
+  return string2integer(get_string(ID_value));
+}
+
+const smt_int_sortt &smt_int_constant_termt::get_sort() const
+{
+  // The below cast is sound because the constructor only allows int
+  // sorts to be set.
+  return static_cast<const smt_int_sortt &>(smt_termt::get_sort());
+}
+
 smt_function_application_termt::smt_function_application_termt(
   smt_identifier_termt function_identifier,
   std::vector<smt_termt> arguments)

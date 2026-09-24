@@ -97,6 +97,12 @@ public:
   const smt_sortt &element_sort() const;
 };
 
+class smt_int_sortt final : public smt_sortt
+{
+public:
+  smt_int_sortt();
+};
+
 class smt_sort_const_downcast_visitort
 {
 public:

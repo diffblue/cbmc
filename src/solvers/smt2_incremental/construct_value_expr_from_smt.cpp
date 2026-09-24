@@ -2,6 +2,7 @@
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/mathematical_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/std_expr.h>
@@ -93,6 +94,21 @@ private:
     INVARIANT(
       false,
       "construct_value_expr_from_smt for bit vector should not be applied to "
+      "unsupported type " +
+        type_to_construct.pretty());
+  }
+
+  void visit(const smt_int_constant_termt &int_constant) override
+  {
+    if(can_cast_type<integer_typet>(type_to_construct))
+    {
+      result = from_integer(int_constant.value(), type_to_construct);
+      return;
+    }
+
+    INVARIANT(
+      false,
+      "construct_value_expr_from_smt for integer should not be applied to "
       "unsupported type " +
         type_to_construct.pretty());
   }
