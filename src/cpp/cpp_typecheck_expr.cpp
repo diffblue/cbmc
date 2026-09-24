@@ -424,6 +424,17 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
   if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
+  else if(
+    (expr.id() == ID_struct || expr.id() == ID_array) &&
+    expr.type().id() != ID_nil && !expr.type().id().empty())
+  {
+    // A CONSTANT of class or array type -- the folded value of a constexpr
+    // object substituted for its symbol, e.g. `constexpr Fixed f{42}` as
+    // the argument of a class-type non-type template parameter (N5008
+    // [temp.param]/7, [temp.arg.nontype]/1); it is already type-checked and
+    // has nothing to resolve.  (The C front-end's handler treats a struct
+    // or array node as unexpected.)
+  }
   else if(expr.id() == ID_string_constant)
   {
     // N5008 [lex.string]/6: an ordinary string literal has type "array of n
