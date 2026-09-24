@@ -1,6 +1,6 @@
-CORE
+CORE pthread
 main.c
---no-malloc-may-fail
+
 ^pointer handling for concurrency is unsound
 ^EXIT=6$
 ^SIGNAL=0$
