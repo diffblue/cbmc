@@ -104,6 +104,19 @@ void cpp_typecheckt::convert(cpp_itemt &item)
 /// of it fail to resolve or read as nondet.  The SFINAE guard around the
 /// attempt swallowed the diagnostics that would have explained what went
 /// wrong, so record the item; typecheck() reports them.
+bool cpp_typecheckt::is_system_header_file(const std::string &file)
+{
+  return file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0 ||
+         file.find("/Applications/") == 0 ||
+         file.find("\\include\\") != std::string::npos;
+}
+
+bool cpp_typecheckt::is_library_body_file(const std::string &file)
+{
+  return is_system_header_file(file) ||
+         file.find("/include/c++/") != std::string::npos;
+}
+
 void cpp_typecheckt::report_dropped_system_item(const cpp_itemt &item)
 {
   std::string what;
@@ -140,8 +153,7 @@ void cpp_typecheckt::typecheck()
   {
     const auto &loc = item.source_location();
     const std::string file = id2string(loc.get_file());
-    bool is_system =
-      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
+    const bool is_system = is_system_header_file(file);
 
     if(is_system)
     {
@@ -277,9 +289,7 @@ void cpp_typecheckt::typecheck()
       // converted through paths that do not stamp #cpp_converted
       // (e.g. nested lambdas) must not be re-converted.
       const std::string sym_file = id2string(sym.location.get_file());
-      const bool system_header = sym_file.find("/usr/include/") == 0 ||
-                                 sym_file.find("/usr/lib/") == 0 ||
-                                 sym_file.find("/Applications/") == 0;
+      const bool system_header = is_system_header_file(sym_file);
       if(
         system_header && sym.type.id() == ID_code &&
         sym.value.id() == ID_code && sym.mode == ID_cpp &&
@@ -375,9 +385,7 @@ void cpp_typecheckt::typecheck()
       sym.mode != ID_cpp || sym.is_type)
       continue;
     const std::string sym_file = id2string(sym.location.get_file());
-    if(
-      sym_file.find("/usr/include/") != 0 && sym_file.find("/usr/lib/") != 0 &&
-      sym_file.find("/Applications/") != 0)
+    if(!is_system_header_file(sym_file))
       continue;
     const typet &expect = to_code_type(sym.type).return_type();
     if(
