@@ -933,6 +933,9 @@ protected:
   void typecheck_try_catch(codet &);
   void typecheck_member_initializer(codet &);
   void typecheck_decl(codet &) override;
+  void record_constexpr_object_value(
+    const symbolt &symbol,
+    const cpp_declaratort &declarator);
   void typecheck_block(code_blockt &) override;
   void typecheck_ifthenelse(code_ifthenelset &) override;
   void typecheck_while(code_whilet &) override;

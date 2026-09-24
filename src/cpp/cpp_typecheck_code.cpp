@@ -22,8 +22,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
 
+#include <goto-programs/goto_instruction_code.h>
+
 #include <ansi-c/anonymous_member.h>
 
+#include "cpp_constexpr_eval.h"
 #include "cpp_convert_type.h"
 #include "cpp_declarator_converter.h"
 #include "cpp_exception_id.h"
@@ -3142,6 +3145,17 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       throw 0;
     }
 
+    // a constexpr object of class type is initialized from its constant
+    // value when that can be computed (see record_constexpr_object_value)
+    if(declaration.storage_spec().is_constexpr())
+    {
+      record_constexpr_object_value(symbol, declarator);
+      // the recorded constant is the initializer; the constructor arguments
+      // it was computed from are consumed
+      if(symbol.value.id() == ID_struct)
+        declarator.remove(ID_init_args);
+    }
+
     code_frontend_declt decl_statement(cpp_symbol_expr(symbol));
     decl_statement.add_source_location() = symbol.location;
 
@@ -3208,6 +3222,153 @@ void cpp_typecheckt::typecheck_decl(codet &code)
   }
 
   code.swap(new_code);
+}
+
+/// N5008 [dcl.constexpr]/6, [expr.const]: a constexpr object of class type
+/// is a constant; its members can be read in a constant expression (`constexpr
+/// S s; static_assert(s.n() == 5)`).  Constant evaluation reads a const
+/// object's symbol value, so that value must be the struct constant the
+/// initialization produces -- for an object whose initialization is a
+/// constructor call (`constexpr P p(42);`, the default constructor of
+/// `constexpr S s;` applying default member initializers) or a
+/// value-initialized temporary (`= S()`); a braced aggregate already yields
+/// the constant.  The constant evaluator runs the constructor over the
+/// zero-initialized object (as it does for a class-type template argument);
+/// the recorded constant then also serves as the object's initializer.  When
+/// evaluation fails the value stays as it was: the object is initialized at
+/// run time as before, and a static_assert over it reports "could not be
+/// evaluated".
+void cpp_typecheckt::record_constexpr_object_value(
+  const symbolt &symbol,
+  const cpp_declaratort &declarator)
+{
+  if(symbol.is_type || symbol.type.id() != ID_struct_tag)
+    return;
+
+  const typet &object_type = symbol.type;
+
+  exprt candidate;
+  if(symbol.value.is_not_nil() && symbol.value.id() != ID_code)
+  {
+    if(symbol.value.id() == ID_struct)
+      return; // already a constant
+    candidate = symbol.value;
+  }
+  else if(symbol.value.id() == ID_code)
+  {
+    // the initialization is a constructor call on the object (`constexpr P
+    // p = P();' copy-constructs from the temporary `P()'; `constexpr P
+    // p(42);' at namespace scope) -- a function-call statement, or an
+    // expression statement over a call side effect, possibly in a block:
+    // construct a temporary the same way and evaluate that; for a copy or
+    // move from a temporary of the same type, evaluate the temporary itself
+    const codet *call_code = &to_code(symbol.value);
+    if(
+      call_code->get_statement() == ID_block &&
+      call_code->operands().size() == 1)
+      call_code = &to_code(call_code->op0());
+    exprt::operandst ctor_arguments;
+    exprt ctor_function;
+    if(call_code->get_statement() == ID_function_call)
+    {
+      const code_function_callt &call = to_code_function_call(*call_code);
+      ctor_function = call.function();
+      ctor_arguments = call.arguments();
+    }
+    else if(
+      call_code->get_statement() == ID_expression &&
+      call_code->operands().size() == 1 &&
+      call_code->op0().id() == ID_side_effect &&
+      call_code->op0().get(ID_statement) == ID_function_call)
+    {
+      const auto &call = to_side_effect_expr_function_call(call_code->op0());
+      ctor_function = call.function();
+      ctor_arguments = call.arguments();
+    }
+    else
+      return;
+    if(
+      ctor_function.id() != ID_symbol || ctor_arguments.empty() ||
+      ctor_arguments.front().id() != ID_address_of)
+      return;
+    const symbolt *ctor =
+      symbol_table.lookup(to_symbol_expr(ctor_function).get_identifier());
+    if(
+      ctor == nullptr || ctor->type.id() != ID_code ||
+      to_code_type(ctor->type).return_type().id() != ID_constructor)
+      return;
+    if(
+      ctor_arguments.size() == 2 && ctor_arguments[1].id() == ID_address_of &&
+      to_address_of_expr(ctor_arguments[1]).object().id() == ID_side_effect &&
+      to_address_of_expr(ctor_arguments[1]).object().get(ID_statement) ==
+        ID_temporary_object &&
+      to_address_of_expr(ctor_arguments[1]).object().type() == object_type)
+    {
+      candidate = to_address_of_expr(ctor_arguments[1]).object();
+    }
+    else
+    {
+      exprt::operandst operands(
+        ctor_arguments.begin() + 1, ctor_arguments.end());
+      for(auto &operand : operands)
+        already_typechecked_exprt::make_already_typechecked(operand);
+      try
+      {
+        sfinae_contextt sfinae_guard{*this};
+        new_temporary(symbol.location, object_type, operands, candidate);
+      }
+      catch(...)
+      {
+        return;
+      }
+    }
+  }
+  else if(symbol.value.is_nil())
+  {
+    // the constructor call was emitted as code: evaluate the same
+    // construction on a temporary
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      new_temporary(
+        symbol.location,
+        object_type,
+        declarator.init_args().operands(),
+        candidate);
+    }
+    catch(...)
+    {
+      return;
+    }
+  }
+  else
+    return;
+
+  if(candidate.is_nil())
+    return;
+
+  const exprt folded = try_evaluate_constexpr(
+    candidate,
+    symbol_table,
+    *this,
+    [this](const irep_idt &callee) -> bool
+    {
+      const symbolt *csym = symbol_table.lookup(callee);
+      if(csym == nullptr)
+        return false;
+      if(csym->value.type().id() == ID_code)
+        return true; // already converted
+      if(
+        functions_being_typechecked.count(callee) != 0 ||
+        deferred_typechecking.count(callee) != 0)
+      {
+        return false;
+      }
+      return convert_deferred_method_now(callee);
+    });
+
+  if(folded.id() == ID_struct && folded.type() == object_type)
+    symbol_table.get_writeable_ref(symbol.name).value = folded;
 }
 
 void cpp_typecheckt::typecheck_block(code_blockt &code)

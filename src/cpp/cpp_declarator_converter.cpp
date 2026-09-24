@@ -775,6 +775,14 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   // resolve-side exemption keeps uses as symbol expressions); constant
   // folding of constant-indexed reads still happens through the
   // initializer downstream.
+  // Likewise a constexpr object of CLASS type ([dcl.constexpr]/1: constexpr
+  // declares the object const; it has static storage duration at namespace
+  // scope and is initialized like any other object).  As a fold-away macro
+  // it was never initialized at run time -- reads of `constexpr S g;' saw
+  // the zero-initialized storage, not the default member initializers -- and
+  // member function calls on it need an lvalue.  Its constant value for
+  // constant expressions is recorded separately
+  // (record_constexpr_object_value).
   if(storage_spec.is_constexpr() && !is_typedef && symbol.type.id() == ID_array)
   {
     symbol.is_macro = false;
@@ -985,6 +993,22 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       }
       else
         cpp_typecheck.convert_initializer(*new_symbol);
+
+      // N5008 [dcl.constexpr]/6: a constexpr object of class type is a
+      // constant whose members are readable in constant expressions.  The
+      // front end represents a constexpr variable as a fold-away macro, so
+      // the object's VALUE must be the struct constant its initialization
+      // produces -- `constexpr S g;' (default member initializers),
+      // `constexpr P p(42);' (a constexpr constructor), `constexpr S u =
+      // S();'.  Without it a namespace-scope object was never initialized
+      // at all (reads saw zero), and a block-scope one could not be folded.
+      if(
+        storage_spec.is_constexpr() && !is_code && !is_typedef &&
+        (new_symbol->type.id() == ID_struct_tag ||
+         new_symbol->type.id() == ID_union_tag))
+      {
+        cpp_typecheck.record_constexpr_object_value(*new_symbol, declarator);
+      }
     }
   }
 

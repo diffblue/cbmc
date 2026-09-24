@@ -22,6 +22,157 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <map>
 #include <optional>
 
+// N5008 [expr.const]/5, [class.temporary]: the value of a temporary of
+// literal class type -- for a class-type template argument
+// ([temp.arg.nontype]/1), a value-initialized `T()' or a constexpr object's
+// initializer.  Handles a single initializing operand (a struct constant or
+// a call yielding one) and an `initializer' constructing the object (a
+// constructor call, or the member assignments of a synthesized default
+// constructor with the value-initialization zero prefix).
+static exprt evaluate_temporary_object(
+  const exprt &expr,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns,
+  const std::function<bool(const irep_idt &)> &ensure_definition)
+{
+  // The temporary's value: a single operand is the initializing
+  // expression (a struct constant, or a call yielding one); otherwise the
+  // `initializer' code constructs the object -- a constructor call, or the
+  // statements of a synthesized default constructor (member assignments
+  // from default member initializers, [class.default.ctor]/4), optionally
+  // preceded by the zero-initialization of value-initialization
+  // ([dcl.init.general]/9.1).
+  if(expr.operands().size() == 1)
+  {
+    const exprt &value = expr.operands().front();
+    if(value.id() == ID_struct || value.is_constant())
+      return value;
+    return try_evaluate_constexpr(value, symbol_table, ns, ensure_definition);
+  }
+  const irept &init = expr.find(ID_initializer);
+  if(expr.type().id() != ID_struct_tag)
+    return nil_exprt();
+  const auto zero = zero_initializer(expr.type(), source_locationt{}, ns);
+  if(!zero.has_value() || zero->id() != ID_struct)
+    return nil_exprt();
+  exprt object = *zero;
+  // no initializer at all: a trivially default-constructed temporary (an
+  // empty class, a class without default member initializers)
+  if(init.is_nil())
+    return object;
+  if(init.id() != ID_code)
+    return nil_exprt();
+  const struct_typet &object_type =
+    ns.follow_tag(to_struct_tag_type(expr.type()));
+  std::function<bool(const exprt &, const exprt &)> assign;
+  std::function<bool(const codet &)> run = [&](const codet &code) -> bool
+  {
+    const irep_idt &statement = code.get_statement();
+    if(statement == ID_block)
+    {
+      for(const auto &op : code.operands())
+        if(!run(to_code(op)))
+          return false;
+      return true;
+    }
+    if(statement == ID_skip)
+      return true;
+    if(statement == ID_expression && code.operands().size() == 1)
+    {
+      const exprt &e = code.op0();
+      if(e.id() != ID_side_effect)
+        return false;
+      if(e.get(ID_statement) == ID_function_call)
+      {
+        // a constructor call on the temporary: it computes the whole
+        // object (over a zero-initialized one, as the evaluator does)
+        const exprt r =
+          try_evaluate_constexpr(e, symbol_table, ns, ensure_definition);
+        if(r.id() != ID_struct)
+          return false;
+        object = r;
+        return true;
+      }
+      // a default member initializer, lowered to `new_object.m = value'
+      if(e.get(ID_statement) == ID_assign && e.operands().size() == 2)
+        return assign(e.operands()[0], e.operands()[1]);
+      return false;
+    }
+    if(statement == ID_assign && code.operands().size() == 2)
+      return assign(code.op0(), code.op1());
+    return false;
+  };
+  assign = [&](const exprt &lhs, const exprt &rhs_in) -> bool
+  {
+    exprt rhs = rhs_in;
+    if(!(rhs.id() == ID_struct || rhs.is_constant()))
+    {
+      rhs = try_evaluate_constexpr(rhs, symbol_table, ns, ensure_definition);
+      if(!(rhs.id() == ID_struct || rhs.is_constant()))
+        return false;
+    }
+    if(lhs.id() == ID_new_object)
+    {
+      if(rhs.id() != ID_struct)
+        return false;
+      object = rhs;
+      return true;
+    }
+    if(
+      lhs.id() == ID_member &&
+      to_member_expr(lhs).compound().id() == ID_new_object &&
+      object_type.has_component(to_member_expr(lhs).get_component_name()))
+    {
+      const std::size_t index =
+        object_type.component_number(to_member_expr(lhs).get_component_name());
+      if(index >= object.operands().size())
+        return false;
+      object.operands()[index] =
+        typecast_exprt::conditional_cast(rhs, object.operands()[index].type());
+      simplify(object.operands()[index], ns);
+      return true;
+    }
+    return false;
+  };
+  if(!run(static_cast<const codet &>(init)))
+    return nil_exprt();
+  return object;
+}
+
+// N5008 [expr.const], [dcl.constexpr]/6: the value of the object a member
+// function is called on, when that is a constexpr object -- the address of a
+// struct constant, or of a const/constexpr symbol whose value is a struct
+// constant.  Returns nil when the call is not such a member function call.
+static exprt constexpr_this_object_value(
+  const code_typet &function_type,
+  const exprt::operandst &arguments,
+  const symbol_table_baset &symbol_table)
+{
+  const bool has_this_parameter = !function_type.parameters().empty() &&
+                                  function_type.parameters().front().get_this();
+  if(
+    !has_this_parameter || arguments.empty() ||
+    arguments.front().id() != ID_address_of)
+    return nil_exprt();
+  const exprt &object = to_address_of_expr(arguments.front()).object();
+  if(object.id() == ID_struct)
+    return object;
+  if(object.id() == ID_symbol)
+  {
+    const symbolt *object_symbol =
+      symbol_table.lookup(to_symbol_expr(object).get_identifier());
+    if(
+      object_symbol != nullptr && !object_symbol->is_type &&
+      (object_symbol->type.get_bool(ID_C_constant) ||
+       object_symbol->is_macro) &&
+      object_symbol->value.id() == ID_struct)
+    {
+      return object_symbol->value;
+    }
+  }
+  return nil_exprt();
+}
+
 exprt try_evaluate_constexpr(
   const exprt &expr,
   const symbol_table_baset &symbol_table,
@@ -36,19 +187,7 @@ exprt try_evaluate_constexpr(
   // the constructor call the temporary's initializer holds; its result is
   // the object's value.
   if(expr.get(ID_statement) == ID_temporary_object)
-  {
-    const irept &init = expr.find(ID_initializer);
-    if(init.id() == ID_code && init.get(ID_statement) == ID_expression)
-    {
-      const codet &init_code = static_cast<const codet &>(init);
-      if(init_code.operands().size() == 1)
-      {
-        return try_evaluate_constexpr(
-          init_code.op0(), symbol_table, ns, ensure_definition);
-      }
-    }
-    return nil_exprt();
-  }
+    return evaluate_temporary_object(expr, symbol_table, ns, ensure_definition);
   if(expr.get(ID_statement) != ID_function_call)
     return nil_exprt();
 
@@ -60,22 +199,15 @@ exprt try_evaluate_constexpr(
   // here, an expression tree without symbol references (a scalar constant,
   // an aggregate of constants such as a `constexpr` object of class type, or
   // the address of a temporary holding one, for a reference parameter).
-  for(const auto &arg : arguments)
-  {
-    bool has_symbol = false;
-    arg.visit_pre(
-      [&has_symbol](const exprt &e)
-      {
-        if(e.id() == ID_symbol)
-          has_symbol = true;
-      });
-    if(has_symbol)
-      return nil_exprt();
-  }
   // A constructor call's object operand is the address of the object under
   // construction (`&new_object` for a temporary); the constructor is
   // evaluated on a zero-initialised value of the class ([dcl.init.general]
-  // for the members not named by a mem-initializer, see below).
+  // for the members not named by a mem-initializer, see below).  A member
+  // function call's object operand may be the address of a constexpr object
+  // -- a const symbol whose value is a struct constant ([dcl.constexpr]/6,
+  // `constexpr S s; s.n()`) -- or of a struct constant; `this` is then bound
+  // to that value ([expr.const]: reading a member of such an object is a
+  // core constant expression).
   const auto &func_type_probe =
     function.id() == ID_symbol && function.type().id() == ID_code
       ? to_code_type(function.type())
@@ -83,6 +215,7 @@ exprt try_evaluate_constexpr(
   const bool is_constructor =
     func_type_probe.return_type().id() == ID_constructor;
   typet constructed_type;
+  exprt this_object_value = nil_exprt();
   if(is_constructor)
   {
     if(
@@ -93,6 +226,38 @@ exprt try_evaluate_constexpr(
     }
     constructed_type = to_address_of_expr(arguments.front()).object().type();
     if(constructed_type.id() != ID_struct_tag)
+      return nil_exprt();
+  }
+  else
+  {
+    // a member function call on a constexpr object: bind `this' to its value
+    this_object_value =
+      constexpr_this_object_value(func_type_probe, arguments, symbol_table);
+    if(this_object_value.is_not_nil())
+    {
+      constructed_type = this_object_value.type();
+      if(constructed_type.id() != ID_struct_tag)
+        return nil_exprt();
+    }
+  }
+
+  // N5008 [expr.const]: every argument must be a constant expression --
+  // here, an expression tree without symbol references (a scalar constant,
+  // an aggregate of constants such as a `constexpr` object of class type, or
+  // the address of a temporary holding one, for a reference parameter) --
+  // apart from the object operand handled above.
+  for(std::size_t i = 0; i < arguments.size(); ++i)
+  {
+    if(i == 0 && (is_constructor || this_object_value.is_not_nil()))
+      continue;
+    bool has_symbol = false;
+    arguments[i].visit_pre(
+      [&has_symbol](const exprt &e)
+      {
+        if(e.id() == ID_symbol)
+          has_symbol = true;
+      });
+    if(has_symbol)
       return nil_exprt();
   }
 
@@ -155,7 +320,15 @@ exprt try_evaluate_constexpr(
       return nil_exprt();
     vars[this_id] = *zero;
   }
-  for(std::size_t i = is_constructor ? 1 : 0; i < params.size(); ++i)
+  else if(this_object_value.is_not_nil())
+  {
+    // a member function on a constexpr object: `this' denotes that object
+    this_id = params.front().get_identifier();
+    vars[this_id] = this_object_value;
+  }
+  const bool skip_this_argument =
+    is_constructor || this_object_value.is_not_nil();
+  for(std::size_t i = skip_this_argument ? 1 : 0; i < params.size(); ++i)
   {
     if(arguments[i].id() == ID_address_of)
     {

@@ -25,7 +25,14 @@ void cpp_typecheckt::propagate_constants(
   {
     const symbolt *s =
       symbol_table.lookup(to_symbol_expr(expr).get_identifier());
-    if(s != nullptr && s->type.get_bool(ID_C_constant) && s->value.is_not_nil())
+    // A const object with a value, or a constexpr object (a macro, e.g. a
+    // constexpr object of class type, [dcl.constexpr]/6): substitute its
+    // value so a member read `g.v` or a member function call folds in a
+    // constant expression.
+    if(
+      s != nullptr && s->value.is_not_nil() &&
+      (s->type.get_bool(ID_C_constant) ||
+       (s->is_macro && !s->is_type && s->type.id() != ID_code)))
     {
       expr = s->value;
       return;
