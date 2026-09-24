@@ -254,6 +254,7 @@ protected:
 
   void convert_initializer(symbolt &symbol);
   void convert_function(symbolt &symbol);
+  typet auto_return_type_from(const typet &expr_type);
 
   void convert_pmop(exprt &expr);
 

@@ -91,6 +91,27 @@ void cpp_typecheckt::convert_parameters(
     convert_parameter(current_mode, *it);
 }
 
+/// N5008 [dcl.type.auto.deduct]/4: a plain `auto` return type is deduced as
+/// by [temp.deduct.call] from the return expression's type: a reference is
+/// dropped (deduction sees the referred type), an array decays to a pointer to
+/// its first element, and top-level cv-qualifiers are removed.  Keeping the
+/// reference made `auto f(T &&t) { return static_cast<T &&>(t); }` return
+/// `int *&` for a pointer lvalue; the array case made `auto ret(T (&t)[N])
+/// { return t; }` return the array CONTENTS reinterpreted as a pointer (the
+/// return statement is converted against the deduced type, so the decayed
+/// type also fixes the value).
+typet cpp_typecheckt::auto_return_type_from(const typet &expr_type)
+{
+  typet deduced = expr_type;
+  if(is_reference(deduced) || is_rvalue_reference(deduced))
+    deduced = to_pointer_type(deduced).base_type();
+  if(deduced.id() == ID_array)
+    deduced = pointer_type(to_array_type(deduced).element_type());
+  deduced.remove(ID_C_constant);
+  deduced.remove(ID_C_volatile);
+  return deduced;
+}
+
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
   // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of
@@ -371,6 +392,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     // If the body contains if constexpr, the return expression may be
     // in a discarded branch and fail to type-check. In that case,
     // defer deduction to after body type-checking.
+    // N5008 [stmt.if]/2: a return statement in a DISCARDED substatement of
+    // an `if constexpr` does not take part in return type deduction.  Which
+    // substatement is discarded is only known once the body is type-checked
+    // (the condition is evaluated then), so a return inside any `if
+    // constexpr` defers deduction rather than deducing from the first
+    // return in source order -- `_All::operator()`'s
+    // `if constexpr(view<decay_t<_Range>>) return forward<_Range>(__r);
+    // else ... return ref_view{...};` deduced `int*` for an array argument.
+    bool return_under_constexpr_if = false;
     std::function<const exprt *(const codet &)> find_return =
       [&](const codet &code) -> const exprt *
     {
@@ -379,6 +409,11 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         const auto &ret = to_code_frontend_return(code);
         if(ret.has_return_value())
           return &ret.return_value();
+      }
+      if(code.get_statement() == ID_ifthenelse && code.get_bool(ID_constexpr))
+      {
+        return_under_constexpr_if = true;
+        return nullptr;
       }
       for(const auto &op : code.operands())
       {
@@ -393,7 +428,9 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     };
 
     const exprt *ret_expr = find_return(to_code(symbol.value));
-    if(ret_expr != nullptr)
+    if(ret_expr == nullptr && return_under_constexpr_if)
+      defer_auto_return = true;
+    else if(ret_expr != nullptr)
     {
       const std::size_t saved_errors =
         get_message_handler().get_message_count(messaget::M_ERROR);
@@ -413,17 +450,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         {
           deduced = reference_typet(deduced, config.ansi_c.pointer_width);
         }
-        else if(return_type.id() == ID_auto && deduced.id() == ID_array)
-        {
-          // N5008 [dcl.type.auto.deduct]/4: plain `auto` deduces as
-          // [temp.deduct.call]/2 -- an array decays to a pointer to its
-          // first element.  Deducing the array type itself made
-          // `auto ret(T (&t)[N]) { return t; }` return the array
-          // CONTENTS reinterpreted as a pointer instead of its address
-          // (the return statement is later converted against this
-          // deduced type, so the decayed type also fixes the value).
-          deduced = pointer_type(to_array_type(deduced).element_type());
-        }
+        else if(return_type.id() == ID_auto)
+          deduced = auto_return_type_from(deduced);
         cpp_convert_auto(
           function_type.return_type(), deduced, get_message_handler());
         typecheck_type(function_type.return_type());
@@ -1111,8 +1139,19 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     const typet *deduced = find_return_type(to_code(symbol.value));
     if(deduced != nullptr)
     {
-      function_type.return_type() = *deduced;
-      return_type = *deduced;
+      // the same placeholder rules as for the early deduction above
+      typet deduced_type = *deduced;
+      if(return_type.id() == ID_auto)
+        deduced_type = auto_return_type_from(deduced_type);
+      if(has_auto(return_type))
+      {
+        cpp_convert_auto(
+          function_type.return_type(), deduced_type, get_message_handler());
+        typecheck_type(function_type.return_type());
+      }
+      else
+        function_type.return_type() = deduced_type;
+      return_type = function_type.return_type();
     }
     else
     {
