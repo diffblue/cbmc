@@ -254,7 +254,50 @@ protected:
 
   void convert_initializer(symbolt &symbol);
   void convert_function(symbolt &symbol);
-  typet auto_return_type_from(const typet &expr_type);
+
+  typet decltype_of(const exprt &e, bool parenthesized);
+  typet deduce_placeholder_type(
+    const typet &declared,
+    const exprt &initializer,
+    bool parenthesized);
+  void deduce_return_type(code_frontend_returnt &code);
+
+  /// The declared return type of the function being converted, when it
+  /// contains a placeholder ([dcl.type.auto.deduct]/2.1: the T of each
+  /// non-discarded return statement); c_typecheck_baset::return_type holds
+  /// the running deduction ([dcl.spec.auto.general]/13).
+  typet declared_return_type;
+  /// The function type of the function being converted, so that a deduced
+  /// return type is visible to the rest of the body (a recursive call after
+  /// the first return statement, [dcl.spec.auto.general]/13, Example 4).
+  code_typet *deducing_function_type = nullptr;
+
+  /// Return-type context for a function body type-checked outside
+  /// convert_function (the lambda lowerings): installs the declared return
+  /// type of \p function_type (a placeholder when \p deduce is set) for the
+  /// body's return statements and restores the enclosing function's context
+  /// on every exit -- if the body throws and an upstream recovery absorbs it
+  /// while the ENCLOSING body continues, its later return statements must
+  /// still convert against its own return type ([stmt.return]/3).  After the
+  /// body, finish() applies [dcl.spec.auto.general]/11 (no non-discarded
+  /// return statement: void).
+  class return_deduction_contextt
+  {
+  public:
+    return_deduction_contextt(
+      cpp_typecheckt &_typecheck,
+      code_typet &_function_type,
+      bool deduce);
+    ~return_deduction_contextt();
+    void finish();
+
+  private:
+    cpp_typecheckt &typecheck;
+    code_typet &function_type;
+    const typet saved_return_type;
+    const typet saved_declared_return_type;
+    code_typet *const saved_deducing_function_type;
+  };
 
   void convert_pmop(exprt &expr);
 

@@ -26,6 +26,110 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
+/// N5008 [dcl.type.decltype]/1: the type denoted by decltype(E) for an
+/// already type-checked expression E.  \p parenthesized records whether E
+/// was written as a parenthesized id-expression or member access -- the
+/// parser marks those two shapes, which [dcl.type.decltype]/1.3 treats
+/// differently from the unparenthesized form (declared type of the entity).
+/// Shared by the decltype type-specifier and `decltype(auto)` placeholder
+/// deduction ([dcl.type.auto.deduct]/4).
+typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
+{
+  typet type;
+
+  if(e.type().id() == ID_c_bit_field)
+    type = to_c_bit_field_type(e.type()).underlying_type();
+  else if(
+    e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
+    e.operands().size() == 1)
+  {
+    // The expression was implicitly dereferenced from a reference type.
+    // decltype preserves the reference: decltype(f()) is T& if f returns T&.
+    type = e.operands().front().type();
+  }
+  else if(
+    e.id() == ID_dereference && e.type().id() != ID_code &&
+    !e.type().get_bool(ID_C_reference))
+  {
+    // N5008 [dcl.type.decltype]/1.5: for any other expression E that is
+    // an lvalue, decltype(E) is T&.  Indirection is an lvalue
+    // ([expr.unary.op]/1), so decltype(*p) must be T&, not T (libc++'s
+    // iter_reference_t is exactly `decltype(*declval<_Tp&>())`).
+    type = ::reference_type(e.type());
+  }
+  else if(e.id() == ID_string_constant && e.type().id() == ID_array)
+  {
+    // N5008 [expr.prim.literal]/1: a string literal is an lvalue, so
+    // decltype("abc") is `const char (&)[4]' ([dcl.type.decltype]/1.5).
+    type = ::reference_type(e.type());
+  }
+  else if(
+    parenthesized && (e.id() == ID_symbol || e.id() == ID_member) &&
+    e.get_bool(ID_C_lvalue) && !is_reference(e.type()) &&
+    e.type().id() != ID_code)
+  {
+    // N5008 [dcl.type.decltype]/1.5: `decltype((x))' and `decltype((s.m))'
+    // are T& (`const S cs': `decltype((cs.m))' is `const int &').
+    type = ::reference_type(e.type());
+  }
+  else if(e.id() == ID_member)
+  {
+    // N5008 [dcl.type.decltype]/1.3: an unparenthesized class member
+    // access denotes the type of the MEMBER as declared -- `decltype(cs.m)'
+    // is `int' for `const S cs', not the access expression's `const int'.
+    type = e.type();
+    const exprt &compound = to_member_expr(e).compound();
+    typet compound_type = compound.type();
+    if(
+      compound_type.id() == ID_struct_tag || compound_type.id() == ID_union_tag)
+    {
+      const auto &components =
+        follow_tag(to_struct_or_union_tag_type(compound_type)).components();
+      const irep_idt &name = to_member_expr(e).get_component_name();
+      for(const auto &c : components)
+        if(c.get_name() == name)
+        {
+          type = c.type();
+          break;
+        }
+    }
+  }
+  else if(e.id() == ID_if && e.get_bool(ID_C_xvalue))
+  {
+    // N5008 [dcl.type.decltype]/1.4: an xvalue E has decltype T&&; a
+    // conditional over two xvalues of one type is an xvalue
+    // ([expr.cond]/4.1).
+    // (the front end marks an rvalue reference with BOTH flags, see
+    // cpp_convert_type.cpp)
+    typet rr = ::reference_type(e.type());
+    rr.set(ID_C_rvalue_reference, true);
+    type = rr;
+  }
+  else if(
+    e.get_bool(ID_C_lvalue) && !is_reference(e.type()) &&
+    e.type().id() != ID_code &&
+    (e.id() == ID_index || e.id() == ID_comma || e.id() == ID_if ||
+     (e.id() == ID_side_effect &&
+      (e.get(ID_statement) == ID_assign ||
+       e.get(ID_statement) == ID_preincrement ||
+       e.get(ID_statement) == ID_predecrement ||
+       has_prefix(id2string(e.get(ID_statement)), "assign")))))
+  {
+    // N5008 [dcl.type.decltype]/1.5: for any other lvalue E, decltype(E)
+    // is T&: a subscript, an assignment or compound assignment, a
+    // prefix increment, a comma or conditional expression yielding an
+    // lvalue.  An unparenthesized id-expression or member access keeps
+    // the declared type ([dcl.type.decltype]/1.3); the parenthesized form
+    // is handled above.  A compound literal is our representation of the
+    // prvalue `T()' / `T{}'.
+    type = ::reference_type(e.type());
+  }
+  else
+    type = e.type();
+
+  return type;
+}
+
 void cpp_typecheckt::typecheck_type(typet &type)
 {
   // GCC 16+ headers may produce types with empty IDs from
@@ -825,96 +929,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     typecheck_expr(e);
 
-    if(e.type().id() == ID_c_bit_field)
-      type = to_c_bit_field_type(e.type()).underlying_type();
-    else if(
-      e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
-      e.operands().size() == 1)
-    {
-      // The expression was implicitly dereferenced from a reference type.
-      // decltype preserves the reference: decltype(f()) is T& if f returns T&.
-      type = e.operands().front().type();
-    }
-    else if(
-      e.id() == ID_dereference && e.type().id() != ID_code &&
-      !e.type().get_bool(ID_C_reference))
-    {
-      // N5008 [dcl.type.decltype]/1.5: for any other expression E that is
-      // an lvalue, decltype(E) is T&.  Indirection is an lvalue
-      // ([expr.unary.op]/1), so decltype(*p) must be T&, not T (libc++'s
-      // iter_reference_t is exactly `decltype(*declval<_Tp&>())`).
-      type = ::reference_type(e.type());
-    }
-    else if(e.id() == ID_string_constant && e.type().id() == ID_array)
-    {
-      // N5008 [expr.prim.literal]/1: a string literal is an lvalue, so
-      // decltype("abc") is `const char (&)[4]' ([dcl.type.decltype]/1.5).
-      type = ::reference_type(e.type());
-    }
-    else if(
-      parenthesized && (e.id() == ID_symbol || e.id() == ID_member) &&
-      e.get_bool(ID_C_lvalue) && !is_reference(e.type()) &&
-      e.type().id() != ID_code)
-    {
-      // N5008 [dcl.type.decltype]/1.5: `decltype((x))' and `decltype((s.m))'
-      // are T& (`const S cs': `decltype((cs.m))' is `const int &').
-      type = ::reference_type(e.type());
-    }
-    else if(e.id() == ID_member)
-    {
-      // N5008 [dcl.type.decltype]/1.3: an unparenthesized class member
-      // access denotes the type of the MEMBER as declared -- `decltype(cs.m)'
-      // is `int' for `const S cs', not the access expression's `const int'.
-      type = e.type();
-      const exprt &compound = to_member_expr(e).compound();
-      typet compound_type = compound.type();
-      if(
-        compound_type.id() == ID_struct_tag ||
-        compound_type.id() == ID_union_tag)
-      {
-        const auto &components =
-          follow_tag(to_struct_or_union_tag_type(compound_type)).components();
-        const irep_idt &name = to_member_expr(e).get_component_name();
-        for(const auto &c : components)
-          if(c.get_name() == name)
-          {
-            type = c.type();
-            break;
-          }
-      }
-    }
-    else if(e.id() == ID_if && e.get_bool(ID_C_xvalue))
-    {
-      // N5008 [dcl.type.decltype]/1.4: an xvalue E has decltype T&&; a
-      // conditional over two xvalues of one type is an xvalue
-      // ([expr.cond]/4.1).
-      // (the front end marks an rvalue reference with BOTH flags, see
-      // cpp_convert_type.cpp)
-      typet rr = ::reference_type(e.type());
-      rr.set(ID_C_rvalue_reference, true);
-      type = rr;
-    }
-    else if(
-      e.get_bool(ID_C_lvalue) && !is_reference(e.type()) &&
-      e.type().id() != ID_code &&
-      (e.id() == ID_index || e.id() == ID_comma || e.id() == ID_if ||
-       (e.id() == ID_side_effect &&
-        (e.get(ID_statement) == ID_assign ||
-         e.get(ID_statement) == ID_preincrement ||
-         e.get(ID_statement) == ID_predecrement ||
-         has_prefix(id2string(e.get(ID_statement)), "assign")))))
-    {
-      // N5008 [dcl.type.decltype]/1.5: for any other lvalue E, decltype(E)
-      // is T&: a subscript, an assignment or compound assignment, a
-      // prefix increment, a comma or conditional expression yielding an
-      // lvalue.  An unparenthesized id-expression or member access keeps
-      // the declared type ([dcl.type.decltype]/1.3); the parser does not
-      // record parentheses, so `decltype((x))' still yields T.  A compound
-      // literal is our representation of the prvalue `T()' / `T{}'.
-      type = ::reference_type(e.type());
-    }
-    else
-      type = e.type();
+    type = decltype_of(e, parenthesized);
 
     // If the expression is a lambda (address_of a function symbol),
     // store the lambda address so that default-initialization of
