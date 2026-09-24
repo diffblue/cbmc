@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -6,6 +6,10 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: expected constant expression, but got '<<expr:side_effect>>'
+Was KNOWNBUG since round 152 ("expected constant expression, but got
+'<<expr:side_effect>>'").  Fixed 2026-09-24: the constant evaluator folds a
+constexpr constructor call on a temporary into a struct constant
+([expr.const]/5, [class.base.init]), the template argument list and the
+instance's template map carry that constant ([temp.arg.nontype]/1,
+[temp.param]/7), and the instance identifier renders it flat
+([temp.type]/1).

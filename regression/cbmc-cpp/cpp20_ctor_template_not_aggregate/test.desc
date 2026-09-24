@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.aggr]/1: a user-declared constructor template (not stored as a
+struct component; the type carries `has_template_constructor`) makes the class
+a non-aggregate, so `ref<int[5]> r{arr}` / `ref{arr}` call the forwarding
+constructor instead of aggregate-initialising the pointer member from the
+array (libstdc++ ranges::ref_view).  Three call sites checked: the local
+declaration path, the explicit-constructor-call path and the braced-temporary
+path.  Non-vacuous: the last assertion states a wrong value and must FAIL.

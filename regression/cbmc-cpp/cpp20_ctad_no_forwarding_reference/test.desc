@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+Invariant check failed
+--
+N5008 [temp.deduct.call]/3 (last sentence) + [dcl.init.general]/9: for
+libstdc++'s `__can_owning_view<int(&)[5]>` (`owning_view{declval<_Range>()}`)
+the constructor-derived guide `owning_view(_Range&&)` deduced `_Range =
+int(&)[5]` by the forwarding-reference rule, the class's `_Range _M_r =
+_Range()` then value-initialised a reference and cpp_constructor aborted on
+its not-a-reference invariant (the whole run dumped core).  Now `_Range =
+int[5]`, `movable<int[5]>` is false and the requirement is simply
+unsatisfied; a reference value-initialisation is an ordinary error.
+Non-vacuous: the last assertion states a wrong value and must FAIL.

@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.constr.decl]/1: libstdc++'s _RangeAdaptorClosure declares the
+hidden friend `template<typename _Self, typename _Range> requires
+derived_from<remove_cvref_t<_Self>, _RangeAdaptorClosure> && ...
+operator|(_Range&&, _Self&&)` naming its class unqualified.  The
+requires-clause was type-checked in the CALL SITE's scope, the name was not
+found, and the candidate was mis-handled downstream ("conversion from 'signed
+int [5l]' to 'struct _Partial'" for `arr | views::take(3)`).  The clause is
+now checked from the template's own scope.  Non-vacuous: the last assertion
+states a wrong value and must FAIL.

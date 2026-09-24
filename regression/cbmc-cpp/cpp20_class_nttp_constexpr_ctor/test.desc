@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+--
+N5008 [temp.param]/7 + [temp.arg.nontype]/1: class-type non-type template
+arguments built by constexpr constructors -- with several members, a
+constructor body (a conditional swap), the same argument spelled twice
+naming one specialization, distinct arguments naming distinct ones, use in
+a class template and in a constant expression (static_assert folds).
+Non-vacuous: the last assertion states a wrong value and must FAIL.

@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+dropped the body
+--
+N5008 [temp.inst]/4: view_interface<ref_view<int[3]>> is instantiated as a
+BASE of ref_view<int[3]>; its auto-returning members were converted eagerly
+at that point, `derived().begin()` named the not-yet-complete derived class,
+the conversion failed and the bodies -- including the begin_fn::operator()
+instance created on the way -- were dropped for good, so `rg::begin(rv)`
+returned `auto` (libstdc++ ranges: `arr | views::take(3)` had no usable
+begin()).  A body whose conversion fails while a class is being elaborated is
+now restored and re-queued for the end-of-unit drain (converted on demand
+earlier if a call needs its return type).  Non-vacuous: the last assertion
+states a wrong value and must FAIL.
