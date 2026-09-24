@@ -100,6 +100,7 @@ SRC += analyses/ai/ai.cpp \
        json-symtab-language/json_malformed_input.cpp \
        json/json_parser.cpp \
        json_symbol_table.cpp \
+       linking/function_priority_order.cpp \
        path_strategies.cpp \
        pointer-analysis/value_set.cpp \
        solvers/bdd/miniBDD/miniBDD.cpp \

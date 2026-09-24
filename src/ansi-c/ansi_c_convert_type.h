@@ -44,6 +44,7 @@ public:
   exprt vector_size, alignment, bv_width, fraction_width;
   exprt msc_based; // this is Visual Studio
   bool constructor, destructor;
+  exprt constructor_priority, destructor_priority;
 
   // contracts
   exprt::operandst c_assigns, c_frees, c_ensures, c_requires;
@@ -113,6 +114,8 @@ protected:
       msc_based(nil_exprt{}),
       constructor(false),
       destructor(false),
+      constructor_priority(nil_exprt{}),
+      destructor_priority(nil_exprt{}),
       message_handler(_message_handler)
   {
   }
