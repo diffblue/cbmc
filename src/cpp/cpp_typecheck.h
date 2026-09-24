@@ -751,8 +751,8 @@ protected:
   /// initializer): (member symbol, enclosing class symbol) pairs.
   std::vector<std::pair<irep_idt, irep_idt>> deferred_static_initializers;
 
-  /// Depth of typecheck_compound_body nesting, used to track
-  /// recursive template elaboration.
+  /// Depth of typecheck_compound_body nesting: while positive, some class is
+  /// being elaborated (and is incomplete); see convert_function.
   unsigned compound_body_depth = 0;
   bool suppress_elaborate = false;
 
@@ -1350,6 +1350,10 @@ private:
   bool skip_typechecking_elaborate = false;
   std::unordered_set<irep_idt> deferred_typechecking;
   std::unordered_set<irep_idt> functions_being_typechecked;
+
+  /// Function bodies whose first conversion failed and that were re-queued
+  /// for one retry at the end of the translation unit (see convert_function).
+  std::unordered_set<irep_idt> body_conversion_retried;
 
   // Guards the C++20 parenthesized-aggregate-initialization reroute in
   // typecheck_side_effect_function_call against re-entry: the

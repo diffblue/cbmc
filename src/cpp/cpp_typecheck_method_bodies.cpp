@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/message.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 /// Per N5008 [temp.variadic]/7: the instantiation of a pack expansion whose
@@ -2291,19 +2292,25 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       template_mapt old_map;
       old_map.swap(template_map);
       template_map = method_map;
+      // This conversion is speculative: it runs while the class (and, for a
+      // CRTP base such as view_interface<Derived>, the derived class the
+      // body names) may still be incomplete.  convert_function then
+      // restores the parsed body and re-queues it ([temp.inst]/4); the
+      // attempt's diagnostics are not the program's.
+      const exprt parsed_body = _method_symbol->value;
       try
       {
+        sfinae_contextt speculative_guard{*this};
         convert_function(*_method_symbol);
         deferred_typechecking.erase(_method_symbol->name);
       }
       catch(...)
       {
-        _method_symbol->value.make_nil();
-        warning().source_location = _method_symbol->location;
-        warning() << "C++ front-end dropped the body of '"
-                  << _method_symbol->base_name
-                  << "' (its return type could not be deduced); calls to "
-                  << "it return nondet" << messaget::eom;
+        // user code that failed outside any class elaboration: leave it
+        // to the drain, which reports the error
+        _method_symbol->value = parsed_body;
+        method_bodies.push_back(
+          method_bodyt(_method_symbol, method_map, instantiation_stack));
       }
       template_map.swap(old_map);
     }

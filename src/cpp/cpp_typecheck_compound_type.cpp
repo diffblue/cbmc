@@ -2863,7 +2863,21 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     const bool saved;
   } skip_elaborate_guard{skip_typechecking_elaborate};
 
-  ++compound_body_depth;
+  // exception-safe: convert_function reads the depth to tell a body
+  // conversion that failed while some class is incomplete from one that
+  // failed on its own ([temp.inst]/4 re-queueing)
+  struct depth_guardt
+  {
+    unsigned &depth;
+    explicit depth_guardt(unsigned &d) : depth(d)
+    {
+      ++depth;
+    }
+    ~depth_guardt()
+    {
+      --depth;
+    }
+  } depth_guard{compound_body_depth};
 
   cpp_save_scopet saved_scope(cpp_scopes);
 
@@ -4647,8 +4661,6 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       // placeholder for subsequent retries at use sites.
     }
   }
-
-  --compound_body_depth;
 }
 
 void cpp_typecheckt::move_member_initializers(

@@ -194,6 +194,10 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(symbol.value.is_nil())
     return;
 
+  // the parsed body as it arrived, for the retry below (irept is shared, so
+  // this copy is cheap)
+  const exprt original_body = symbol.value;
+
   if(symbol.value.id() != ID_code)
   {
     error().source_location = symbol.location;
@@ -1042,6 +1046,32 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       return;
     }
 
+    // N5008 [temp.inst]/4, [temp.point]/8: a member's definition is
+    // instantiated when it is odr-used, and its point of instantiation may
+    // be the END of the translation unit -- so a body converted EAGERLY (an
+    // auto-returning member of a class instance, converted during that
+    // class's elaboration; a callee instantiated on the way) may fail only
+    // because some class it uses is still incomplete right now:
+    // view_interface<ref_view<int[5]>> is elaborated as a BASE of
+    // ref_view<int[5]>, its members' `_M_derived().begin()` name the
+    // not-yet-complete derived class, and the ranges::begin(ref_view&)
+    // instance created on the way inherited the failure.  Dropping such
+    // bodies made `arr | views::take(3)`'s begin() return `auto`.  While a
+    // class is being elaborated, restore the parsed body and re-queue it
+    // for the end-of-unit drain, where every class is complete (a call site
+    // reached before then converts it on demand, as for any
+    // not-yet-converted auto member).  The speculative caller
+    // (add_method_body) suppresses the attempt's diagnostics.
+    if(compound_body_depth > 0)
+    {
+      symbol.value = original_body;
+      method_bodies.push_back(
+        method_bodyt(&symbol, template_map, instantiation_stack));
+      functions_being_typechecked.erase(symbol.name);
+      disable_access_control = saved_access_control;
+      return;
+    }
+
     // For system headers, clear the broken body and return.
     // For user code, re-throw.  The `syshdr_guard` destructor (if
     // engaged) runs on the way out and restores handler/error
@@ -1103,6 +1133,17 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
             // fall through to the no-body state below
           }
         }
+      }
+      // A system-header body that fails outside any class elaboration is
+      // retried once in the end-of-unit drain (see the [temp.inst]/4 note
+      // above); only a second failure leaves the function bodyless.
+      if(body_conversion_retried.insert(symbol.name).second)
+      {
+        symbol.value = original_body;
+        method_bodies.push_back(
+          method_bodyt(&symbol, template_map, instantiation_stack));
+        functions_being_typechecked.erase(symbol.name);
+        return;
       }
       symbol.value.make_nil();
       functions_being_typechecked.erase(symbol.name);
