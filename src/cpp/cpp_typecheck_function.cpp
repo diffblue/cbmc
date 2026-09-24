@@ -1156,7 +1156,20 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // (e.g., if constexpr with type-dependent discarded branch).
   // Now that the body is type-checked, find a return statement in the
   // surviving branches.
-  if(defer_auto_return)
+  if(defer_auto_return && !has_auto(return_type))
+  {
+    // typecheck_return already deduced the type from the first return
+    // statement it converted (`return_type` is the running deduction),
+    // applying the placeholder rules there -- in particular
+    // `decltype(auto)` of an lvalue is a REFERENCE ([dcl.type.auto.deduct]/5),
+    // which the return expression's own type does not show.  Re-deriving
+    // from the expression below lost that reference: libstdc++'s
+    // `__get_n` (decltype(auto), an if-constexpr chain) returned the
+    // alternative BY VALUE and std::get<0>(v) took the address of a
+    // temporary.
+    function_type.return_type() = return_type;
+  }
+  else if(defer_auto_return)
   {
     std::function<const typet *(const codet &)> find_return_type =
       [&](const codet &code) -> const typet *
