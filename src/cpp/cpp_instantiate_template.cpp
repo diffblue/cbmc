@@ -7688,6 +7688,15 @@ skip_pack_removal_ft:
       std::function<void(irept &)> reduce_folds;
       reduce_folds = [&reduce_folds](irept &node)
       {
+        // N5008 [expr.prim.pack.index]: over a one-element pack, `ts...[0]`
+        // is the sole parameter (which keeps its own name)
+        if(
+          node.id() == ID_index && node.get_bool(ID_ellipsis) &&
+          node.get_sub().size() == 2)
+        {
+          node = node.get_sub()[0];
+          return;
+        }
         if(
           (node.id() == irep_idt("cpp_right_fold") ||
            node.id() == irep_idt("cpp_left_fold")) &&
@@ -7977,7 +7986,8 @@ skip_pack_removal_ft:
               subst_type_pack(ns.second, elem);
           }
         };
-        expand_pack = [&expanded_names,
+        expand_pack = [this,
+                       &expanded_names,
                        &expand_pack,
                        &is_pack_name,
                        &contains_pack_name,
@@ -7987,6 +7997,52 @@ skip_pack_removal_ft:
                        &pack_elem_types,
                        &subst_type_pack](irept &node)
         {
+          // N5008 [expr.prim.pack.index]/1-2: `ts...[N]` (the parser marks
+          // the index node with `ellipsis`) denotes the N-th element of
+          // the function parameter pack, N a converted constant expression
+          // with 0 <= N < sizeof...(ts); otherwise the program is
+          // ill-formed.  Replace by the N-th expanded parameter's name.
+          if(
+            node.id() == ID_index && node.get_bool(ID_ellipsis) &&
+            node.get_sub().size() == 2 && is_pack_name(node.get_sub()[0]))
+          {
+            // the index may name the pack's size (`ts...[sizeof...(ts) - 1]`,
+            // [expr.sizeof]/5): substitute the arity, then fold
+            exprt index_expr = static_cast<const exprt &>(node.get_sub()[1]);
+            std::function<void(exprt &)> subst_sizeof = [&](exprt &e)
+            {
+              if(e.id() == ID_sizeof && e.get_bool("#sizeof_pack"))
+              {
+                e = from_integer(expanded_names.size(), size_type());
+                return;
+              }
+              for(auto &op : e.operands())
+                subst_sizeof(op);
+            };
+            subst_sizeof(index_expr);
+            // the parsed operator tree carries no types yet; type-check the
+            // (now closed) constant expression before folding it
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typecheck_expr(index_expr);
+              simplify(index_expr, *this);
+            }
+            catch(...)
+            {
+            }
+            mp_integer k;
+            if(
+              index_expr.is_constant() &&
+              !to_integer(to_constant_expr(index_expr), k) && k >= 0 &&
+              k < expanded_names.size())
+            {
+              node = make_name(
+                node.get_sub()[0],
+                expanded_names[numeric_cast_v<std::size_t>(k)]);
+              return;
+            }
+          }
           // Expand fold expressions
           if(
             (node.id() == irep_idt("cpp_right_fold") ||
