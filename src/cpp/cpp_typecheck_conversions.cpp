@@ -2998,6 +2998,10 @@ bool cpp_typecheckt::is_lvalue_expression(const exprt &expr) const
 {
   if(!expr.get_bool(ID_C_lvalue))
     return false;
+  // a conditional over two xvalues is an xvalue ([expr.cond]/4.1); the
+  // conditional's type check records it
+  if(expr.get_bool(ID_C_xvalue))
+    return false;
   if(
     expr.id() == ID_side_effect &&
     expr.get(ID_statement) == ID_temporary_object)

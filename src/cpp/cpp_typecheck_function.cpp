@@ -91,25 +91,204 @@ void cpp_typecheckt::convert_parameters(
     convert_parameter(current_mode, *it);
 }
 
-/// N5008 [dcl.type.auto.deduct]/4: a plain `auto` return type is deduced as
-/// by [temp.deduct.call] from the return expression's type: a reference is
-/// dropped (deduction sees the referred type), an array decays to a pointer to
-/// its first element, and top-level cv-qualifiers are removed.  Keeping the
-/// reference made `auto f(T &&t) { return static_cast<T &&>(t); }` return
-/// `int *&` for a pointer lvalue; the array case made `auto ret(T (&t)[N])
-/// { return t; }` return the array CONTENTS reinterpreted as a pointer (the
-/// return statement is converted against the deduced type, so the decayed
-/// type also fixes the value).
-typet cpp_typecheckt::auto_return_type_from(const typet &expr_type)
+/// N5008 [dcl.type.auto.deduct]: placeholder type deduction.  \p declared is
+/// the type T containing the placeholder, \p initializer the (type-checked)
+/// initializer-clause E, \p parenthesized whether E was written as a
+/// parenthesized id-expression or member access (see decltype_of).  Returns
+/// the type T' that replaces T.
+///
+/// * `decltype(auto)` ([dcl.type.auto.deduct]/4): T is the placeholder alone
+///   and T' is decltype(E).
+/// * `auto` ([dcl.type.auto.deduct]/3): T' is obtained as by template argument
+///   deduction from a function call with P = T (the placeholder standing for
+///   the invented parameter U) and argument E ([temp.deduct.call]/2-3): when P
+///   is not a reference, an array A decays to a pointer, a function A to a
+///   function pointer, and A's top-level cv-qualifiers are ignored; when P is
+///   a reference, the referred type of P is used and A keeps its qualifiers
+///   (`const auto &r = ci` is `const int &`); a forwarding reference (`auto
+///   &&`) with an lvalue E deduces an lvalue reference.  The placeholder is
+///   then substituted through P's ptr-operators (`auto *p = <T*>` gives
+///   U = T).
+typet cpp_typecheckt::deduce_placeholder_type(
+  const typet &declared,
+  const exprt &initializer,
+  bool parenthesized)
 {
-  typet deduced = expr_type;
-  if(is_reference(deduced) || is_rvalue_reference(deduced))
-    deduced = to_pointer_type(deduced).base_type();
-  if(deduced.id() == ID_array)
-    deduced = pointer_type(to_array_type(deduced).element_type());
-  deduced.remove(ID_C_constant);
-  deduced.remove(ID_C_volatile);
-  return deduced;
+  PRECONDITION(has_auto(declared));
+
+  if(declared.id() == ID_decltype && declared.get_bool("#auto"))
+  {
+    typet deduced = decltype_of(initializer, parenthesized);
+    typecheck_type(deduced);
+    return deduced;
+  }
+
+  typet pattern = declared;
+
+  // A is the type of E.  An expression never has reference type; the front
+  // end marks a glvalue produced through a reference with the reference type
+  // itself, so the referred type is the one deduction sees.
+  typet argument = initializer.type();
+  if(argument.id() == ID_c_bit_field)
+    argument = to_c_bit_field_type(argument).underlying_type();
+  if(is_reference(argument) || is_rvalue_reference(argument))
+    argument = to_pointer_type(argument).base_type();
+
+  const bool pattern_is_reference =
+    is_reference(pattern) || is_rvalue_reference(pattern);
+
+  if(!pattern_is_reference)
+  {
+    // [temp.deduct.call]/2
+    if(argument.id() == ID_array)
+      argument = pointer_type(to_array_type(argument).element_type());
+    else if(argument.id() == ID_code)
+      argument = pointer_type(argument);
+    argument.remove(ID_C_constant);
+    argument.remove(ID_C_volatile);
+  }
+  else if(
+    is_rvalue_reference(pattern) &&
+    to_pointer_type(pattern).base_type().id() == ID_auto &&
+    !to_pointer_type(pattern).base_type().get_bool(ID_C_constant) &&
+    !to_pointer_type(pattern).base_type().get_bool(ID_C_volatile) &&
+    is_lvalue_expression(initializer))
+  {
+    // [temp.deduct.call]/3: a forwarding reference bound to an lvalue
+    // deduces U as an lvalue reference; with reference collapsing
+    // ([dcl.ref]/6) the declared `auto &&` is then an lvalue reference.
+    pattern.remove(ID_C_rvalue_reference);
+  }
+
+  cpp_convert_auto(pattern, argument, get_message_handler());
+  typecheck_type(pattern);
+  return pattern;
+}
+
+/// N5008 [dcl.type.auto.deduct]/2.1 and [dcl.spec.auto.general]/10-13: the
+/// return type of a function declared with a placeholder is deduced from each
+/// non-discarded return statement.  The first deduction fixes the type (it is
+/// usable in the rest of the body, /13); every later return statement must
+/// deduce the same type (/10).  The operand is then converted to the deduced
+/// type as for any return statement ([stmt.return]/2).
+void cpp_typecheckt::deduce_return_type(code_frontend_returnt &code)
+{
+  const typet &declared = declared_return_type;
+  PRECONDITION(has_auto(declared));
+
+  const bool placeholder_alone =
+    declared.id() == ID_auto ||
+    (declared.id() == ID_decltype && declared.get_bool("#auto"));
+
+  typet deduced;
+
+  if(!code.has_return_value())
+  {
+    // [dcl.type.auto.deduct]/2.1.1: E is void(); T shall be the placeholder
+    // alone (`auto *g() { }` is ill-formed, [dcl.spec.auto.general]/11)
+    if(!placeholder_alone)
+    {
+      error().source_location = code.source_location();
+      error() << "cannot deduce '" << to_string(declared) << "' from void()"
+              << eom;
+      throw 0;
+    }
+    deduced = void_type();
+  }
+  else
+  {
+    // read before type-checking rebuilds the node
+    const bool parenthesized = code.return_value().get_bool(ID_C_parenthesized);
+
+    typecheck_expr(code.return_value());
+
+    if(code.return_value().id() == ID_initializer_list)
+    {
+      // [dcl.type.auto.deduct]/2.1.2
+      error().source_location = code.source_location();
+      error() << "cannot deduce a return type from a braced-init-list" << eom;
+      throw 0;
+    }
+
+    if(code.return_value().type().id() == ID_empty && !placeholder_alone)
+    {
+      error().source_location = code.source_location();
+      error() << "cannot deduce '" << to_string(declared) << "' from an "
+              << "expression of type void" << eom;
+      throw 0;
+    }
+
+    deduced =
+      deduce_placeholder_type(declared, code.return_value(), parenthesized);
+  }
+
+  if(!has_auto(return_type))
+  {
+    // a previous return statement deduced the type already
+    if(deduced != return_type)
+    {
+      error().source_location = code.source_location();
+      error() << "inconsistent deduction for the return type: '"
+              << to_string(return_type) << "' and '" << to_string(deduced)
+              << "'" << eom;
+      throw 0;
+    }
+  }
+  else
+  {
+    return_type = deduced;
+    if(deducing_function_type != nullptr)
+      deducing_function_type->return_type() = deduced;
+  }
+
+  if(code.has_return_value() && return_type.id() != ID_empty)
+  {
+    if(is_reference(return_type) || is_rvalue_reference(return_type))
+      reference_initializer(
+        code.return_value(), to_reference_type(return_type));
+    else
+      implicit_typecast(code.return_value(), return_type);
+  }
+}
+
+cpp_typecheckt::return_deduction_contextt::return_deduction_contextt(
+  cpp_typecheckt &_typecheck,
+  code_typet &_function_type,
+  bool deduce)
+  : typecheck(_typecheck),
+    function_type(_function_type),
+    saved_return_type(_typecheck.return_type),
+    saved_declared_return_type(_typecheck.declared_return_type),
+    saved_deducing_function_type(_typecheck.deducing_function_type)
+{
+  if(deduce)
+  {
+    typecheck.return_type = typet(ID_auto);
+    typecheck.deducing_function_type = &function_type;
+  }
+  else
+  {
+    typecheck.return_type = function_type.return_type();
+    typecheck.deducing_function_type = nullptr;
+  }
+  typecheck.declared_return_type = typecheck.return_type;
+}
+
+cpp_typecheckt::return_deduction_contextt::~return_deduction_contextt()
+{
+  typecheck.return_type = saved_return_type;
+  typecheck.declared_return_type = saved_declared_return_type;
+  typecheck.deducing_function_type = saved_deducing_function_type;
+}
+
+void cpp_typecheckt::return_deduction_contextt::finish()
+{
+  if(!has_auto(typecheck.declared_return_type))
+    return;
+  // [dcl.spec.auto.general]/11 -- a lambda's placeholder is `auto' alone
+  function_type.return_type() = has_auto(typecheck.return_type)
+                                  ? typet(void_type())
+                                  : typecheck.return_type;
 }
 
 void cpp_typecheckt::convert_function(symbolt &symbol)
@@ -356,26 +535,36 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   struct context_restoret
   {
     typet &return_type_ref;
+    typet &declared_return_type_ref;
+    code_typet *&deducing_function_type_ref;
     bool &break_ref;
     bool &continue_ref;
     bool &case_ref;
     const typet saved_return_type;
+    const typet saved_declared_return_type;
+    code_typet *const saved_deducing_function_type;
     const bool saved_break;
     const bool saved_continue;
     const bool saved_case;
     ~context_restoret()
     {
       return_type_ref = saved_return_type;
+      declared_return_type_ref = saved_declared_return_type;
+      deducing_function_type_ref = saved_deducing_function_type;
       break_ref = saved_break;
       continue_ref = saved_continue;
       case_ref = saved_case;
     }
   } context_restore{
     return_type,
+    declared_return_type,
+    deducing_function_type,
     break_is_allowed,
     continue_is_allowed,
     case_is_allowed,
     return_type,
+    declared_return_type,
+    deducing_function_type,
     break_is_allowed,
     continue_is_allowed,
     case_is_allowed};
@@ -388,97 +577,14 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   if(return_type.id() == ID_constructor || return_type.id() == ID_destructor)
     return_type = void_type();
 
-  // C++14: auto return type deduction
-  bool defer_auto_return = false;
-  if(has_auto(return_type))
-  {
-    // Find the first return statement and deduce the type.
-    // If the body contains if constexpr, the return expression may be
-    // in a discarded branch and fail to type-check. In that case,
-    // defer deduction to after body type-checking.
-    // N5008 [stmt.if]/2: a return statement in a DISCARDED substatement of
-    // an `if constexpr` does not take part in return type deduction.  Which
-    // substatement is discarded is only known once the body is type-checked
-    // (the condition is evaluated then), so a return inside any `if
-    // constexpr` defers deduction rather than deducing from the first
-    // return in source order -- `_All::operator()`'s
-    // `if constexpr(view<decay_t<_Range>>) return forward<_Range>(__r);
-    // else ... return ref_view{...};` deduced `int*` for an array argument.
-    bool return_under_constexpr_if = false;
-    std::function<const exprt *(const codet &)> find_return =
-      [&](const codet &code) -> const exprt *
-    {
-      if(code.get_statement() == ID_return)
-      {
-        const auto &ret = to_code_frontend_return(code);
-        if(ret.has_return_value())
-          return &ret.return_value();
-      }
-      if(code.get_statement() == ID_ifthenelse && code.get_bool(ID_constexpr))
-      {
-        return_under_constexpr_if = true;
-        return nullptr;
-      }
-      for(const auto &op : code.operands())
-      {
-        if(op.id() == ID_code)
-        {
-          const exprt *r = find_return(to_code(op));
-          if(r != nullptr)
-            return r;
-        }
-      }
-      return nullptr;
-    };
-
-    const exprt *ret_expr = find_return(to_code(symbol.value));
-    if(ret_expr == nullptr && return_under_constexpr_if)
-      defer_auto_return = true;
-    else if(ret_expr != nullptr)
-    {
-      const std::size_t saved_errors =
-        get_message_handler().get_message_count(messaget::M_ERROR);
-      const unsigned saved_verbosity = get_message_handler().get_verbosity();
-      get_message_handler().set_verbosity(0);
-
-      try
-      {
-        exprt tmp = *ret_expr;
-        typecheck_expr(tmp);
-        typet deduced = tmp.type();
-        // C++14 decltype(auto): if the return expression is a
-        // parenthesized lvalue, deduce a reference type
-        if(
-          return_type.id() == ID_decltype && return_type.get_bool("#auto") &&
-          tmp.get_bool(ID_C_lvalue))
-        {
-          deduced = reference_typet(deduced, config.ansi_c.pointer_width);
-        }
-        else if(return_type.id() == ID_auto)
-          deduced = auto_return_type_from(deduced);
-        cpp_convert_auto(
-          function_type.return_type(), deduced, get_message_handler());
-        typecheck_type(function_type.return_type());
-        return_type = function_type.return_type();
-      }
-      catch(...)
-      {
-        // Return expression failed to type-check (likely in a discarded
-        // if constexpr branch). Defer deduction to after body type-checking.
-        get_message_handler().set_message_count(
-          messaget::M_ERROR, saved_errors);
-        defer_auto_return = true;
-      }
-
-      get_message_handler().set_verbosity(saved_verbosity);
-    }
-    else
-    {
-      // No return statement — deduce void
-      function_type.return_type() = void_type();
-      return_type = void_type();
-    }
-  }
+  // N5008 [dcl.spec.auto.general]/4, /13: a placeholder return type is
+  // deduced from the non-discarded return statements as the body is
+  // type-checked (typecheck_return -> deduce_return_type); the first
+  // deduction is written into the function type at once so the rest of the
+  // body (a recursive call) sees it.  `return_type' is the running
+  // deduction, `declared_return_type' the T of [dcl.type.auto.deduct]/2.1.
+  declared_return_type = return_type;
+  deducing_function_type = has_auto(return_type) ? &function_type : nullptr;
 
   // C++20: generate body for defaulted operator<=>
   if(
@@ -1151,66 +1257,25 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     throw;
   }
 
-  // Deferred auto return type deduction: the initial attempt failed
-  // (e.g., if constexpr with type-dependent discarded branch).
-  // Now that the body is type-checked, find a return statement in the
-  // surviving branches.
-  if(defer_auto_return && !has_auto(return_type))
+  // N5008 [dcl.spec.auto.general]/11: no non-discarded return statement --
+  // the return type is deduced as from `return;' at the closing brace: void
+  // for `auto' / `decltype(auto)', ill-formed for `auto *' and the like.
+  if(has_auto(function_type.return_type()))
   {
-    // typecheck_return already deduced the type from the first return
-    // statement it converted (`return_type` is the running deduction),
-    // applying the placeholder rules there -- in particular
-    // `decltype(auto)` of an lvalue is a REFERENCE ([dcl.type.auto.deduct]/5),
-    // which the return expression's own type does not show.  Re-deriving
-    // from the expression below lost that reference: libstdc++'s
-    // `__get_n` (decltype(auto), an if-constexpr chain) returned the
-    // alternative BY VALUE and std::get<0>(v) took the address of a
-    // temporary.
-    function_type.return_type() = return_type;
-  }
-  else if(defer_auto_return)
-  {
-    std::function<const typet *(const codet &)> find_return_type =
-      [&](const codet &code) -> const typet *
+    if(has_auto(return_type))
     {
-      if(code.get_statement() == ID_return && code.operands().size() == 1)
+      if(
+        return_type.id() != ID_auto &&
+        !(return_type.id() == ID_decltype && return_type.get_bool("#auto")))
       {
-        return &code.op0().type();
+        error().source_location = symbol.location;
+        error() << "cannot deduce '" << to_string(return_type)
+                << "' from void()" << eom;
+        throw 0;
       }
-      for(const auto &op : code.operands())
-      {
-        if(op.id() == ID_code)
-        {
-          const typet *r = find_return_type(to_code(op));
-          if(r != nullptr)
-            return r;
-        }
-      }
-      return nullptr;
-    };
-
-    const typet *deduced = find_return_type(to_code(symbol.value));
-    if(deduced != nullptr)
-    {
-      // the same placeholder rules as for the early deduction above
-      typet deduced_type = *deduced;
-      if(return_type.id() == ID_auto)
-        deduced_type = auto_return_type_from(deduced_type);
-      if(has_auto(return_type))
-      {
-        cpp_convert_auto(
-          function_type.return_type(), deduced_type, get_message_handler());
-        typecheck_type(function_type.return_type());
-      }
-      else
-        function_type.return_type() = deduced_type;
-      return_type = function_type.return_type();
-    }
-    else
-    {
-      function_type.return_type() = void_type();
       return_type = void_type();
     }
+    function_type.return_type() = return_type;
   }
 
   symbol.value.type()=symbol.type;
