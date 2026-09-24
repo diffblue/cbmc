@@ -431,8 +431,24 @@ void cpp_convert_auto(
 
   cpp_convert_typet cpp_convert_type(message_handler, dest);
   for(auto &t : cpp_convert_type.other)
+  {
     if(t.id() == ID_auto)
+    {
       t = src;
+      // N5008 [dcl.type.auto.deduct]/4 with [temp.deduct.call]: for
+      // `auto &` / `auto *` / `const auto` the placeholder is deduced from
+      // the referred type INCLUDING its qualifiers (`auto &r = ci` with
+      // `const int ci` gives `const int &`).  The qualifiers of a
+      // substituted type live as attributes on that type; write() rebuilds
+      // the type from c_qualifiers, so transfer them (as read_rec does for
+      // a substituted cpp_name) -- otherwise `auto &f() { return ci; }`
+      // deduced `int &` and the return could not bind.
+      if(src.get_bool(ID_C_constant))
+        cpp_convert_type.c_qualifiers.is_constant = true;
+      if(src.get_bool(ID_C_volatile))
+        cpp_convert_type.c_qualifiers.is_volatile = true;
+    }
+  }
 
   cpp_convert_type.write(dest);
 }
