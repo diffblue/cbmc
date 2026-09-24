@@ -1,0 +1,12 @@
+CORE
+main.c
+--verify --vsd --three-way-merge --vsd-structs every-field
+^\[main.assertion.1\] line \d+ assertion global.x == 0: SUCCESS$
+^\[main.assertion.2\] line \d+ assertion global.y == 1: SUCCESS$
+^\[main.assertion.3\] line \d+ assertion alsoGlobal == 1: SUCCESS$
+^\[main.assertion.4\] line \d+ assertion global.x == 0: SUCCESS$
+^\[main.assertion.5\] line \d+ assertion global.y == 2: SUCCESS$
+^\[main.assertion.6\] line \d+ assertion alsoGlobal == 2: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
