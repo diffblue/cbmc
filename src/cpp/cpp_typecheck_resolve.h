@@ -116,6 +116,13 @@ protected:
   // bound nor conflict-checked.  Empty means "no active restriction".
   std::set<irep_idt> current_deduction_parameters;
 
+  /// N5008 [temp.deduct.type]/17: the DECLARED types of the non-type
+  /// parameters of the template currently being deduced (raw, as written),
+  /// keyed by parameter identifier.  A non-type argument `i` of a
+  /// template-id pattern P deduces only if its parameter's type is the type
+  /// of the corresponding parameter of the template P names.
+  std::map<irep_idt, typet> current_deduction_nontype_types;
+
   /// True while re-deducing against a base-class subobject inside the
   /// derived-to-base branch of guess_template_args, so the pack-matching code
   /// records the deduced pack(s) in \ref derived_to_base_deduced_packs.
