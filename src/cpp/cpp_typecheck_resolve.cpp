@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_resolve.h"
 
 #include <deque>
+#include <unordered_map>
 
 #ifdef DEBUG
 #  include <iostream>
@@ -250,25 +251,68 @@ irep_idt concept_reference_name(const exprt &e)
   return has_template_args ? name : irep_idt();
 }
 
+// A concept template symbol with a constraint-expression body.
+static bool is_concept_with_body(const symbolt &symbol, const irep_idt &name)
+{
+  if(
+    symbol.base_name != name || !symbol.type.get_bool(ID_is_template) ||
+    symbol.type.id() != ID_cpp_declaration)
+    return false;
+  const cpp_declarationt &decl = to_cpp_declaration(symbol.type);
+  return !decl.declarators().empty() &&
+         decl.declarators().front().value().is_not_nil();
+}
+
 // Look up a concept's constraint-expression body by its base name.
 exprt concept_constraint_body(
   const symbol_table_baset &symbol_table,
   const irep_idt &name)
 {
-  for(const auto &entry : symbol_table.symbols)
+  // Constraint ordering ([temp.constr.order]) normalises the concepts of
+  // every constrained candidate on every overload resolution, and each
+  // concept-id looked up here used to cost a scan of the whole symbol table
+  // (12% of the run for a libc++ <span> program).  Remember which symbol a
+  // base name resolved to; the entry is validated against the table before
+  // use, so a stale entry (another translation unit in the same process)
+  // just falls back to the scan.
+  // A name that is NOT a concept (a raw atomic constraint keyed by its text,
+  // a type trait) is remembered with the table's size at the time: as long
+  // as nothing was declared since, the scan would find nothing again.
+  struct cache_entryt
   {
-    if(
-      id2string(entry.second.base_name) == id2string(name) &&
-      entry.second.type.get_bool(ID_is_template) &&
-      entry.second.type.id() == ID_cpp_declaration)
+    irep_idt symbol_name;   // empty for a miss
+    std::size_t table_size; // for a miss
+  };
+  static std::unordered_map<irep_idt, cache_entryt> concept_symbol_by_name;
+
+  const auto cached = concept_symbol_by_name.find(name);
+  if(cached != concept_symbol_by_name.end())
+  {
+    if(cached->second.symbol_name.empty())
     {
-      const cpp_declarationt &decl = to_cpp_declaration(entry.second.type);
-      if(
-        !decl.declarators().empty() &&
-        decl.declarators().front().value().is_not_nil())
-        return decl.declarators().front().value();
+      if(cached->second.table_size == symbol_table.symbols.size())
+        return nil_exprt();
+    }
+    else
+    {
+      const symbolt *symbol = symbol_table.lookup(cached->second.symbol_name);
+      if(symbol != nullptr && is_concept_with_body(*symbol, name))
+        return to_cpp_declaration(symbol->type).declarators().front().value();
     }
   }
+
+  for(const auto &entry : symbol_table.symbols)
+  {
+    if(is_concept_with_body(entry.second, name))
+    {
+      concept_symbol_by_name[name] = {entry.first, 0};
+      return to_cpp_declaration(entry.second.type)
+        .declarators()
+        .front()
+        .value();
+    }
+  }
+  concept_symbol_by_name[name] = {irep_idt{}, symbol_table.symbols.size()};
   return nil_exprt();
 }
 
