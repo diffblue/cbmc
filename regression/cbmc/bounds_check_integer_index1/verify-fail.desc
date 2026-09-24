@@ -1,0 +1,14 @@
+CORE broken-cprover-smt-backend no-new-smt
+fail.c
+--bounds-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.array_bounds\.\d+\] line \d+ .*lower bound in arr\[.*i\]: FAILURE$
+^\[main\.array_bounds\.\d+\] line \d+ .*upper bound in arr\[.*i\]: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Negative case: an unconstrained mathematical-integer index into arr[3] must
+make both the generated lower- and upper-bound checks fail.  This confirms the
+non-byte-sized bounds checks are meaningful (catch out-of-bounds), not just
+that they are generated and pass when in-bounds.
