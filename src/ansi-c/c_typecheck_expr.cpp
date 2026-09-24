@@ -3241,10 +3241,11 @@ exprt c_typecheck_baset::do_special_functions(
             arguments[4],
             arguments[3])))); // subnormal
   }
-  else if(identifier==CPROVER_PREFIX "isnanf" ||
-          identifier==CPROVER_PREFIX "isnand" ||
-          identifier==CPROVER_PREFIX "isnanld" ||
-          identifier=="__builtin_isnan")
+  else if(
+    identifier == CPROVER_PREFIX "isnanf" ||
+    identifier == CPROVER_PREFIX "isnand" ||
+    identifier == CPROVER_PREFIX "isnanld" || identifier == "__builtin_isnan" ||
+    identifier == "__builtin_isnanf" || identifier == "__builtin_isnanl")
   {
     if(expr.arguments().size()!=1)
     {
@@ -3260,9 +3261,12 @@ exprt c_typecheck_baset::do_special_functions(
 
     return typecast_exprt::conditional_cast(isnan_expr, expr.type());
   }
-  else if(identifier==CPROVER_PREFIX "isfinitef" ||
-          identifier==CPROVER_PREFIX "isfinited" ||
-          identifier==CPROVER_PREFIX "isfiniteld")
+  else if(
+    identifier == CPROVER_PREFIX "isfinitef" ||
+    identifier == CPROVER_PREFIX "isfinited" ||
+    identifier == CPROVER_PREFIX "isfiniteld" ||
+    identifier == "__builtin_isfinite" || identifier == "__builtin_finite" ||
+    identifier == "__builtin_finitef" || identifier == "__builtin_finitel")
   {
     if(expr.arguments().size()!=1)
     {
@@ -3335,7 +3339,8 @@ exprt c_typecheck_baset::do_special_functions(
     identifier == CPROVER_PREFIX "imaxabs" ||
     identifier == CPROVER_PREFIX "fabs" ||
     identifier == CPROVER_PREFIX "fabsf" ||
-    identifier == CPROVER_PREFIX "fabsl")
+    identifier == CPROVER_PREFIX "fabsl" || identifier == "__builtin_fabs" ||
+    identifier == "__builtin_fabsf" || identifier == "__builtin_fabsl")
   {
     if(expr.arguments().size()!=1)
     {
@@ -3467,10 +3472,11 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(old_expr);
   }
-  else if(identifier==CPROVER_PREFIX "isinff" ||
-          identifier==CPROVER_PREFIX "isinfd" ||
-          identifier==CPROVER_PREFIX "isinfld" ||
-          identifier=="__builtin_isinf")
+  else if(
+    identifier == CPROVER_PREFIX "isinff" ||
+    identifier == CPROVER_PREFIX "isinfd" ||
+    identifier == CPROVER_PREFIX "isinfld" || identifier == "__builtin_isinf" ||
+    identifier == "__builtin_isinff" || identifier == "__builtin_isinfl")
   {
     if(expr.arguments().size()!=1)
     {

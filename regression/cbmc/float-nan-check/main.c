@@ -39,10 +39,13 @@ int main(void)
   // these operations should generate assertions
   // 0.0 / 0.0 = NaN
   f = myzero / myzero;
-  // n / Inf = NaN
-  f = n / (myinf);
+  // Inf / Inf = NaN (per IEEE 754-2019 Section 6.1)
+  f = myinf / myinf;
   // Inf * 0 = NaN
   f = (myinf)*myzero;
+  // 0 * Inf = NaN (this direction caught by the goto_check_c.cpp
+  // mult-branch fix accompanying this commit)
+  f = myzero * (myinf);
   // -Inf + Inf = NaN
   f = (-myinf) + (myinf);
   // Inf + (-Inf) = NaN
