@@ -130,6 +130,7 @@ The goto-instrument program supports these checks:
 | `--undefined-shift-check`    |  add range checks for shift distances                |
 | `--nan-check`                |  add floating-point NaN checks                       |
 | `--uninitialized-check`      |  add checks for uninitialized locals (experimental)  |
+| `--race-check`               |  add data race checks for concurrent programs        |
 | `--error-label label`        |  check that given label is unreachable               |
 
 As all of these checks apply across the entire input program, we may wish to

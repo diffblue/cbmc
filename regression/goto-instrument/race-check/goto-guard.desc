@@ -1,0 +1,9 @@
+CORE
+goto-guard.c
+--race-check
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.race-check\.\d+\] line \d+ R/W data race on shared: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring

@@ -1940,7 +1940,7 @@ void goto_instrument_parse_optionst::help()
     HELP_UNINITIALIZED_CHECK
     " {y--stack-depth} {un} \t add check that call stack size of non-inlined"
     " functions never exceeds {un}\n"
-    " {y--race-check} \t add floating-point data race checks\n"
+    " {y--race-check} \t add data race checks for concurrent programs\n"
     "\n"
     "Semantic transformations:\n"
     HELP_NONDET_VOLATILE
