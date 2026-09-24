@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_constexpr_eval.h"
 
 #include <util/arith_tools.h>
+#include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
@@ -29,6 +30,25 @@ exprt try_evaluate_constexpr(
 {
   if(expr.id() != ID_side_effect)
     return nil_exprt();
+  // N5008 [expr.const]/5, [class.temporary]: a temporary of literal class
+  // type initialised by a constexpr constructor (`Fixed(42)`, `Fixed{42}`
+  // as a class-type template argument, [temp.arg.nontype]/1) -- evaluate
+  // the constructor call the temporary's initializer holds; its result is
+  // the object's value.
+  if(expr.get(ID_statement) == ID_temporary_object)
+  {
+    const irept &init = expr.find(ID_initializer);
+    if(init.id() == ID_code && init.get(ID_statement) == ID_expression)
+    {
+      const codet &init_code = static_cast<const codet &>(init);
+      if(init_code.operands().size() == 1)
+      {
+        return try_evaluate_constexpr(
+          init_code.op0(), symbol_table, ns, ensure_definition);
+      }
+    }
+    return nil_exprt();
+  }
   if(expr.get(ID_statement) != ID_function_call)
     return nil_exprt();
 
@@ -50,6 +70,29 @@ exprt try_evaluate_constexpr(
           has_symbol = true;
       });
     if(has_symbol)
+      return nil_exprt();
+  }
+  // A constructor call's object operand is the address of the object under
+  // construction (`&new_object` for a temporary); the constructor is
+  // evaluated on a zero-initialised value of the class ([dcl.init.general]
+  // for the members not named by a mem-initializer, see below).
+  const auto &func_type_probe =
+    function.id() == ID_symbol && function.type().id() == ID_code
+      ? to_code_type(function.type())
+      : code_typet{{}, empty_typet{}};
+  const bool is_constructor =
+    func_type_probe.return_type().id() == ID_constructor;
+  typet constructed_type;
+  if(is_constructor)
+  {
+    if(
+      arguments.empty() || arguments.front().id() != ID_address_of ||
+      to_address_of_expr(arguments.front()).object().id() != ID_new_object)
+    {
+      return nil_exprt();
+    }
+    constructed_type = to_address_of_expr(arguments.front()).object().type();
+    if(constructed_type.id() != ID_struct_tag)
       return nil_exprt();
   }
 
@@ -99,7 +142,20 @@ exprt try_evaluate_constexpr(
   // Build a variable map: parameter → constant value
   // For reference parameters, unwrap address_of and temporaries.
   std::map<irep_idt, exprt> vars;
-  for(std::size_t i = 0; i < params.size(); ++i)
+  irep_idt this_id;
+  if(is_constructor)
+  {
+    // `this` denotes the object under construction; its VALUE (a struct
+    // constant) is tracked under the `this` parameter's identifier and
+    // updated by the mem-initializer / body assignments `this->m = ...`.
+    this_id = params.front().get_identifier();
+    const auto zero =
+      zero_initializer(constructed_type, source_locationt{}, ns);
+    if(!zero.has_value() || zero->id() != ID_struct)
+      return nil_exprt();
+    vars[this_id] = *zero;
+  }
+  for(std::size_t i = is_constructor ? 1 : 0; i < params.size(); ++i)
   {
     if(arguments[i].id() == ID_address_of)
     {
@@ -146,11 +202,53 @@ exprt try_evaluate_constexpr(
   // Apply an assignment-like side effect (`=`, compound assignment,
   // `++`/`--`) to a tracked variable.  Returns false when the effect cannot
   // be tracked (the caller then gives up on the evaluation).
+  // `this->m` -- the object under construction is tracked by value, so a
+  // member access through `this` reads the tracked struct's component.
+  auto this_member_index = [&](const exprt &e) -> std::optional<std::size_t>
+  {
+    if(this_id.empty() || e.id() != ID_member)
+      return std::nullopt;
+    const exprt &compound = to_member_expr(e).compound();
+    if(
+      compound.id() != ID_dereference || compound.operands().size() != 1 ||
+      compound.operands()[0].id() != ID_symbol ||
+      to_symbol_expr(compound.operands()[0]).get_identifier() != this_id)
+    {
+      return std::nullopt;
+    }
+    const auto it = vars.find(this_id);
+    if(it == vars.end() || it->second.id() != ID_struct)
+      return std::nullopt;
+    const struct_typet &st =
+      ns.follow_tag(to_struct_tag_type(constructed_type));
+    if(!st.has_component(to_member_expr(e).get_component_name()))
+      return std::nullopt;
+    return st.component_number(to_member_expr(e).get_component_name());
+  };
+
   auto apply_side_effect = [&](const exprt &e) -> bool
   {
     if(e.id() != ID_side_effect)
       return true; // no effect to apply (e.g. a plain expression)
     const irep_idt &st = e.get(ID_statement);
+    // `this->m = v` ([class.base.init]: a mem-initializer, lowered to an
+    // assignment through `this`; or an assignment in the constructor body)
+    if(st == ID_assign && e.operands().size() == 2)
+    {
+      if(const auto idx = this_member_index(e.operands()[0]))
+      {
+        exprt rhs = eval(e.operands()[1]);
+        if(!is_constant_value(rhs))
+          return false;
+        exprt &obj = vars.at(this_id);
+        if(*idx >= obj.operands().size())
+          return false;
+        obj.operands()[*idx] =
+          typecast_exprt::conditional_cast(rhs, obj.operands()[*idx].type());
+        simplify(obj.operands()[*idx], ns);
+        return true;
+      }
+    }
     if(e.operands().empty() || e.operands()[0].id() != ID_symbol)
       return false;
     const irep_idt var = to_symbol_expr(e.operands()[0]).get_identifier();
@@ -207,6 +305,13 @@ exprt try_evaluate_constexpr(
 
   eval = [&](const exprt &e) -> exprt
   {
+    if(const auto idx = this_member_index(e))
+    {
+      const exprt &obj = vars.at(this_id);
+      if(*idx < obj.operands().size())
+        return obj.operands()[*idx];
+      return e;
+    }
     if(e.id() == ID_symbol)
     {
       auto it = vars.find(to_symbol_expr(e).get_identifier());
@@ -412,6 +517,15 @@ exprt try_evaluate_constexpr(
     if(code.get_statement() == ID_assign)
     {
       const auto &lhs = code.op0();
+      if(this_member_index(lhs))
+      {
+        side_effect_exprt as_effect{
+          ID_assign, lhs.type(), code.source_location()};
+        as_effect.add_to_operands(exprt{lhs}, exprt{code.op1()});
+        if(!apply_side_effect(as_effect))
+          return std::nullopt;
+        return std::nullopt;
+      }
       exprt rhs = eval(code.op1());
       if(lhs.id() == ID_symbol)
         vars[to_symbol_expr(lhs).get_identifier()] = rhs;
@@ -472,6 +586,13 @@ exprt try_evaluate_constexpr(
   };
 
   auto result = execute(to_code(body), 0);
+  if(is_constructor)
+  {
+    // the constructor's result is the constructed object; a `return;` (or
+    // falling off the end) leaves the tracked value as it is
+    const exprt &obj = vars.at(this_id);
+    return is_constant_value(obj) ? obj : static_cast<exprt>(nil_exprt());
+  }
   if(result.has_value())
   {
     if(result->is_constant())
