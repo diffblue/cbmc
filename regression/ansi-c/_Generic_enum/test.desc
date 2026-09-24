@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+_Generic does not treat an enum as compatible with a plain int controlling
+expression (and vice versa), matching GCC and Clang; such controlling
+expressions fall through to default. The _Static_assert checks make a wrong
+selection a compile-time error under goto-cc.

@@ -130,9 +130,26 @@ bool c_typecheck_baset::gcc_types_compatible_p(
   else if(type1.id()==ID_array &&
           type2.id()==ID_array)
   {
-    return gcc_types_compatible_p(
-      to_array_type(type1).element_type(),
-      to_array_type(type2).element_type()); // ignore size
+    // For C11 6.2.7: array types are compatible if element types are
+    // compatible and both size specifiers are present and equal, OR
+    // one or both size specifiers are absent.
+    if(!gcc_types_compatible_p(
+         to_array_type(type1).element_type(),
+         to_array_type(type2).element_type()))
+      return false;
+
+    const array_typet &a_type1 = to_array_type(type1);
+    const array_typet &a_type2 = to_array_type(type2);
+
+    // If either size is absent (incomplete), arrays are compatible
+    if(!a_type1.is_complete() || !a_type2.is_complete())
+      return true;
+
+    // Both sizes are present - they must be equal. This is a syntactic
+    // comparison of the size ireps, so equal-but-not-identical constant size
+    // expressions (e.g. `[5]` vs `[2+3]`) are conservatively treated as
+    // incompatible.
+    return a_type1.size() == a_type2.size();
   }
   else if(type1.id()==ID_code &&
           type2.id()==ID_code)
@@ -473,13 +490,43 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
 
     const typet &op_type = op.type();
 
+    // C11 6.5.1.1p2: The controlling expression undergoes lvalue
+    // conversions (in type domain only): array-to-pointer decay,
+    // function-to-pointer conversion, and qualifier removal.
+    typet adjusted_op_type = op_type;
+    if(adjusted_op_type.id() == ID_array)
+      adjusted_op_type =
+        pointer_type(to_array_type(adjusted_op_type).element_type());
+    else if(adjusted_op_type.id() == ID_code)
+      adjusted_op_type = pointer_type(adjusted_op_type);
+    adjusted_op_type.remove(ID_C_constant);
+    adjusted_op_type.remove(ID_C_volatile);
+    adjusted_op_type.remove(ID_C_restricted);
+
     for(const auto &irep : generic_associations)
     {
       if(irep.get(ID_type_arg) == ID_default)
         default_match = static_cast<const exprt &>(irep.find(ID_value));
-      else if(op_type == static_cast<const typet &>(irep.find(ID_type_arg)))
+      else
       {
-        assoc_match = static_cast<const exprt &>(irep.find(ID_value));
+        const typet &assoc_type =
+          static_cast<const typet &>(irep.find(ID_type_arg));
+        // C11 6.5.1.1p3: Use type compatibility matching instead of
+        // exact equality, as required by the standard.
+        if(gcc_types_compatible_p(adjusted_op_type, assoc_type))
+        {
+          // C11 6.5.1.1p2: no two generic associations shall specify
+          // compatible types, so the controlling expression must match at
+          // most one association.
+          if(assoc_match.is_not_nil())
+          {
+            error().source_location = expr.source_location();
+            error() << "generic selection matches more than one association"
+                    << eom;
+            throw 0;
+          }
+          assoc_match = static_cast<const exprt &>(irep.find(ID_value));
+        }
       }
     }
 
@@ -490,8 +537,8 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
       else
       {
         error().source_location = expr.source_location();
-        error() << "unmatched generic selection: " << to_string(op.type())
-                << eom;
+        error() << "unmatched generic selection: "
+                << to_string(adjusted_op_type) << eom;
         throw 0;
       }
     }

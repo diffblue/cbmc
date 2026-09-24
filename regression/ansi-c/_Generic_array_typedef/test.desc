@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+_Generic with array typedef should match pointer type due to array decay
+(issue #8243). The selection is verified at compile time via _Static_assert,
+since regression/ansi-c runs under goto-cc and never executes main.

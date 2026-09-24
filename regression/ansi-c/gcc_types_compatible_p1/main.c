@@ -94,6 +94,8 @@ STATIC_ASSERT(!__builtin_types_compatible_p(char, int));
 STATIC_ASSERT(!__builtin_types_compatible_p(char *, char **));
 STATIC_ASSERT(!__builtin_types_compatible_p(typeof (hot), unsigned int));
 STATIC_ASSERT(!__builtin_types_compatible_p(int[], int *));
+// arrays with different, present sizes are incompatible (C11 6.2.7)
+STATIC_ASSERT(!__builtin_types_compatible_p(int[5], int[10]));
 STATIC_ASSERT(!__builtin_types_compatible_p(long int, int));
 STATIC_ASSERT(!__builtin_types_compatible_p(long long int, long int));
 STATIC_ASSERT(!__builtin_types_compatible_p(unsigned, signed));
