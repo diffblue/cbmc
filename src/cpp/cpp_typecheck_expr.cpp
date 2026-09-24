@@ -3909,9 +3909,17 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   if(expr.operands().size() >= 1 && expr.type().id() == ID_struct_tag)
   {
     const struct_typet &agg_type = follow_tag(to_struct_tag_type(expr.type()));
-    bool has_user_ctor = false;
+    // [dcl.init.aggr]/1: a user-declared constructor TEMPLATE or an
+    // inherited constructor also disqualifies the aggregate; neither is a
+    // component, the type carries flags (`ref_view{arr}` used to be
+    // aggregate-initialized from the array, skipping ref_view's
+    // forwarding constructor template).
+    bool has_user_ctor = agg_type.get_bool("has_template_constructor") ||
+                         agg_type.get_bool("has_inherited_constructor");
     for(const auto &c : agg_type.components())
     {
+      if(has_user_ctor)
+        break;
       if(
         c.type().id() == ID_code &&
         to_code_type(c.type()).return_type().id() == ID_constructor &&
@@ -4048,10 +4056,16 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       const struct_typet &struct_type =
         follow_tag(to_struct_tag_type(expr.type()));
 
-      // Check whether the struct has any non-copy constructor.
-      bool has_non_copy_ctor = false;
+      // Check whether the struct has any non-copy constructor.  A
+      // constructor TEMPLATE or an inherited constructor is not a component;
+      // the type carries flags for them ([dcl.init.aggr]/1 counts both).
+      bool has_non_copy_ctor =
+        struct_type.get_bool("has_template_constructor") ||
+        struct_type.get_bool("has_inherited_constructor");
       for(const auto &c : struct_type.components())
       {
+        if(has_non_copy_ctor)
+          break;
         if(c.type().id() != ID_code || c.get_bool(ID_from_base))
           continue;
         const code_typet &code_type = to_code_type(c.type());

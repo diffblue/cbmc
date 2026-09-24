@@ -580,7 +580,14 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       // Find initializer_list<T> constructor AND check for non-copy
       // constructors in ONE pass, before any operation that might
       // invalidate the struct reference through template elaboration.
-      bool has_non_copy_ctor = false;
+      // N5008 [dcl.init.aggr]/1: a user-declared constructor TEMPLATE (e.g.
+      // ref_view's `template<__different_from<ref_view> _Tp> ref_view(_Tp&&)`)
+      // or an inherited constructor also makes the class a non-aggregate;
+      // neither is a component of the struct, the type carries flags instead
+      // (as cpp_constructor's aggregate check reads them).
+      bool has_non_copy_ctor =
+        struct_type.get_bool("has_template_constructor") ||
+        struct_type.get_bool("has_inherited_constructor");
       irep_idt il_tag_id;
       for(const auto &c : struct_type.components())
       {
