@@ -1,0 +1,11 @@
+CORE
+test.c
+--json-ui
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"function": \{[^}]*"displayName": "hidden_helper",[^}]*"sourceLocation": \{[^}]*\}[^}]*\}[^}]*"hidden": false[^}]*"sourceLocation": \{[^}]*\}[^}]*"stepType": "function-call"
+"function": \{[^}]*"displayName": "hidden_helper",[^}]*"sourceLocation": \{[^}]*\}[^}]*\}[^}]*"hidden": false[^}]*"sourceLocation": \{[^}]*\}[^}]*"stepType": "function-return"
+"hidden": true,[^}]*"sourceLocation": \{[^}]*"function": "hidden_helper"[^}]*\}[^}]*"stepType": "assignment"
+--
+^warning: ignoring
