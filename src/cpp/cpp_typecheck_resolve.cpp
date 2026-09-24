@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include <ansi-c/anonymous_member.h>
+#include <ansi-c/c_qualifiers.h>
 #include <ansi-c/merged_type.h>
 
 #include "cpp_constexpr_eval.h"
@@ -156,6 +157,35 @@ struct deduction_parameters_guardt
     target.swap(saved);
   }
 };
+
+// Save/restore for cpp_typecheck_resolvet::current_deduction_nontype_types
+struct deduction_nontype_types_guardt
+{
+  std::map<irep_idt, typet> &target;
+  std::map<irep_idt, typet> saved;
+  explicit deduction_nontype_types_guardt(std::map<irep_idt, typet> &t)
+    : target(t), saved(t)
+  {
+  }
+  ~deduction_nontype_types_guardt()
+  {
+    target.swap(saved);
+  }
+};
+
+// The declared types of a template declaration's NON-type parameters
+// ([temp.deduct.type]/17), keyed by identifier.
+static std::map<irep_idt, typet>
+template_nontype_parameter_types(const template_typet &template_type)
+{
+  std::map<irep_idt, typet> types;
+  for(const auto &p : template_type.template_parameters())
+  {
+    if(p.id() != ID_type && !p.get(ID_identifier).empty())
+      types[p.get(ID_identifier)] = p.type();
+  }
+  return types;
+}
 
 // The identifiers of a template declaration's parameters, as registered in
 // the template map by build_unassigned.
@@ -4781,6 +4811,10 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
       current_deduction_parameters};
     current_deduction_parameters =
       template_parameter_ids(cpp_declaration.template_type());
+    deduction_nontype_types_guardt deduction_nontype_types_guard{
+      current_deduction_nontype_types};
+    current_deduction_nontype_types =
+      template_nontype_parameter_types(cpp_declaration.template_type());
     deduction_parameters_guardt map_deduction_parameters_guard{
       cpp_typecheck.template_map.deduction_parameters};
     cpp_typecheck.template_map.deduction_parameters =
@@ -8578,10 +8612,129 @@ void cpp_typecheck_resolvet::guess_template_args(
         }
       }
 
+      // N5008 [temp.deduct.type]/17: if P has a form that contains `<i>`
+      // where `i` names a non-type template parameter of the template being
+      // deduced, and the type of `i` differs from the type of the
+      // corresponding template parameter of the template named by P,
+      // deduction fails -- `template <long... U> impl(indices<U...>)`
+      // called with `indices<unsigned long...>` has no viable
+      // constructor (g++/clang: "deduced non-type template argument does
+      // not have the same type as the corresponding template parameter").
+      // Both sides are DECLARED parameter types, so the deduced values'
+      // representation plays no part.  Dependent or unresolvable types are
+      // not compared.
+      const irept &named_template_irep = desired_sym->type.find(ID_C_template);
+      const template_typet *named_template_type =
+        named_template_irep.is_nil()
+          ? nullptr
+          : static_cast<const template_typet *>(&named_template_irep);
+      auto nontype_kind_mismatch =
+        [&](const irept &pattern_arg, std::size_t named_index) -> bool
+      {
+        if(named_template_type == nullptr)
+          return false;
+        const irept &pa = pattern_arg.id() == ID_ambiguous
+                            ? pattern_arg.find(ID_type)
+                            : pattern_arg;
+        if(pa.id() != ID_cpp_name)
+          return false;
+        const cpp_namet &pn = to_cpp_name(static_cast<const typet &>(pa));
+        if(pn.is_qualified() || pn.has_template_args())
+          return false;
+        irep_idt pattern_param;
+        for(const auto *id_ptr :
+            cpp_typecheck.cpp_scopes.current_scope().lookup(
+              pn.get_base_name(), cpp_scopet::RECURSIVE))
+        {
+          if(
+            id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER &&
+            current_deduction_nontype_types.count(id_ptr->identifier) != 0)
+          {
+            pattern_param = id_ptr->identifier;
+          }
+        }
+        if(pattern_param.empty())
+          return false;
+        // [temp.deduct.type]/20 Example 13: `f<1>(a)` is OK -- an explicitly
+        // specified argument is not deduced, so its parameter's type does not
+        // take part.  It is already bound (not `unassigned`) here.
+        {
+          const auto eit =
+            cpp_typecheck.template_map.expr_map.find(pattern_param);
+          if(
+            eit != cpp_typecheck.template_map.expr_map.end() &&
+            eit->second.id() != ID_unassigned)
+          {
+            return false;
+          }
+          if(
+            eit == cpp_typecheck.template_map.expr_map.end() &&
+            cpp_typecheck.template_map.pack_expr_map.count(pattern_param) != 0)
+          {
+            return false;
+          }
+        }
+        const auto &named_params = named_template_type->template_parameters();
+        // the pattern parameter may be a pack matching the trailing run of
+        // the named template's parameters; compare against the parameter at
+        // named_index, or the named template's own trailing pack
+        const template_parametert *named_param = nullptr;
+        if(named_index < named_params.size())
+          named_param = &named_params[named_index];
+        else if(
+          !named_params.empty() && named_params.back().get_bool(ID_ellipsis))
+          named_param = &named_params.back();
+        if(named_param == nullptr || named_param->id() == ID_type)
+          return false;
+        typet t_pattern = current_deduction_nontype_types.at(pattern_param);
+        typet t_named = named_param->type();
+        // A type spelled with a template parameter is dependent: not compared
+        std::function<bool(const irept &)> names_cpp_name =
+          [&](const irept &n) -> bool
+        {
+          if(n.id() == ID_cpp_name)
+            return true;
+          for(const auto &sub : n.get_sub())
+            if(names_cpp_name(sub))
+              return true;
+          return false;
+        };
+        if(names_cpp_name(t_pattern) || names_cpp_name(t_named))
+          return false;
+        try
+        {
+          cpp_typecheck.typecheck_type(t_pattern);
+          cpp_typecheck.typecheck_type(t_named);
+        }
+        catch(...)
+        {
+          return false;
+        }
+        const auto strip = [](typet t) -> typet
+        {
+          c_qualifierst{}.write(t);
+          return t;
+        };
+        t_pattern = strip(t_pattern);
+        t_named = strip(t_named);
+        const auto is_arith = [](const typet &t)
+        {
+          return t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+                 t.id() == ID_bool || t.id() == ID_c_bool ||
+                 t.id() == ID_c_enum_tag;
+        };
+        return is_arith(t_pattern) && is_arith(t_named) && t_pattern != t_named;
+      };
+
       // Match each template arg from the cpp_name against the
       // corresponding instantiation arg
       for(std::size_t i = 0; i < targs.size(); i++)
       {
+        if(nontype_kind_mismatch(targs[i], i))
+        {
+          mark_targs_conflicting();
+          return;
+        }
         // [temp.deduct.type] / [temp.variadic]: a pack-expansion argument
         // (e.g. the `Types...` in `mytuple<Types...>`) matches the remaining
         // template arguments of the instantiation, deducing the parameter
@@ -9322,6 +9475,10 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     current_deduction_parameters};
   current_deduction_parameters =
     template_parameter_ids(cpp_declaration.template_type());
+  deduction_nontype_types_guardt deduction_nontype_types_guard{
+    current_deduction_nontype_types};
+  current_deduction_nontype_types =
+    template_nontype_parameter_types(cpp_declaration.template_type());
   deduction_parameters_guardt map_deduction_parameters_guard{
     cpp_typecheck.template_map.deduction_parameters};
   cpp_typecheck.template_map.deduction_parameters =
