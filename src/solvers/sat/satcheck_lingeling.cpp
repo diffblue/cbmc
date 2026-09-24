@@ -48,7 +48,7 @@ std::string satcheck_lingelingt::solver_text() const
   return "Lingeling";
 }
 
-void satcheck_lingelingt::lcnf(const bvt &bv)
+void satcheck_lingelingt::do_lcnf(const bvt &bv)
 {
   bvt new_bv;
 

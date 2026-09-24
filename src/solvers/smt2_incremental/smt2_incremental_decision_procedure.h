@@ -41,12 +41,12 @@ public:
     message_handlert &message_handler);
 
   // Implementation of public decision_proceduret member functions.
-  exprt handle(const exprt &expr) override;
+  exprt do_handle(const exprt &expr) override;
   exprt get(const exprt &expr) const override;
   void print_assignment(std::ostream &out) const override;
   std::string decision_procedure_text() const override;
   std::size_t get_number_of_solver_calls() const override;
-  void set_to(const exprt &expr, bool value) override;
+  void do_set_to(const exprt &expr, bool value) override;
 
   // Implementation of public stack_decision_proceduret member functions.
   void push(const std::vector<exprt> &assumptions) override;

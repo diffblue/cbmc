@@ -171,7 +171,7 @@ literalt qbf_bdd_coret::new_variable()
   return res;
 }
 
-void qbf_bdd_coret::lcnf(const bvt &bv)
+void qbf_bdd_coret::do_lcnf(const bvt &bv)
 {
   bvt new_bv;
 

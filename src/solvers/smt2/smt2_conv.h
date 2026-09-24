@@ -71,8 +71,8 @@ public:
   bool use_lambda_for_array = false;
   bool emit_set_logic = true;
 
-  exprt handle(const exprt &expr) override;
-  void set_to(const exprt &expr, bool value) override;
+  exprt do_handle(const exprt &expr) override;
+  void do_set_to(const exprt &expr, bool value) override;
   exprt get(const exprt &expr) const override;
   std::string decision_procedure_text() const override;
   void print_assignment(std::ostream &out) const override;

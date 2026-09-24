@@ -134,8 +134,8 @@ void satcheck_minisat2_baset<T>::add_variables()
     solver->newVar();
 }
 
-template<typename T>
-void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
+template <typename T>
+void satcheck_minisat2_baset<T>::do_lcnf(const bvt &bv)
 {
   try
   {
