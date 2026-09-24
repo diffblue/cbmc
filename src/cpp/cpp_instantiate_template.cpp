@@ -7811,27 +7811,42 @@ skip_pack_removal_ft:
     irept &func_params = func_decl.type().add(ID_parameters);
     irept::subt &fp_sub = func_params.get_sub();
 
-    // Find the pack parameter (last param with ellipsis on declarator)
+    // Find the pack parameter (last param with ellipsis on declarator).
+    // N5008 [dcl.fct]/15: the parameter may be UNNAMED (`Args...` in
+    // `constexpr int count(Args...) { return sizeof...(Args); }`); the
+    // parser then marks the declarator itself.  Such a pack expands like a
+    // named one -- it used to be skipped, leaving the instance with a single
+    // parameter, so a two-argument call never matched the instance's type
+    // and its constexpr evaluation (a static_assert operand) failed.  Give
+    // it an internal name so the per-element renaming below applies; the
+    // body cannot refer to it.
     int pack_idx = -1;
     irep_idt pack_var_name;
     for(int i = static_cast<int>(fp_sub.size()) - 1; i >= 0; --i)
     {
       if(fp_sub[i].id() == ID_cpp_declaration)
       {
-        const auto &d = to_cpp_declaration(fp_sub[i]);
+        auto &d = static_cast<cpp_declarationt &>(fp_sub[i]);
         if(
           !d.declarators().empty() &&
-          d.declarators().front().type().get_bool(ID_ellipsis))
+          (d.declarators().front().type().get_bool(ID_ellipsis) ||
+           d.declarators().front().get_bool(ID_ellipsis)))
         {
           pack_idx = i;
-          const auto &dname = d.declarators().front().name();
-          for(const auto &sub : dname.get_sub())
+          cpp_declaratort &pack_declarator = d.declarators().front();
+          for(const auto &sub : pack_declarator.name().get_sub())
           {
             if(sub.id() == ID_name)
             {
               pack_var_name = sub.get(ID_identifier);
               break;
             }
+          }
+          if(pack_var_name.empty())
+          {
+            pack_var_name = "#pack_arg";
+            pack_declarator.name() =
+              cpp_namet{pack_var_name, pack_declarator.source_location()};
           }
           break;
         }
@@ -7846,6 +7861,7 @@ skip_pack_removal_ft:
       {
         auto &d = static_cast<cpp_declarationt &>(pack_param_template);
         d.declarators().front().type().remove(ID_ellipsis);
+        d.declarators().front().remove(ID_ellipsis);
       }
 
       // N5008 [temp.variadic]/5, [dcl.ref]: the name of the type parameter
