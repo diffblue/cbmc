@@ -1,6 +1,6 @@
 KNOWNBUG libcxx
 main.cpp
---cpp20 --unwind 8 --unwinding-assertions
+--cpp20 --unwind 8 --unwinding-assertions --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
 ^EXIT=0$
 ^SIGNAL=0$
@@ -20,3 +20,14 @@ recovers instead but SILENTLY DROPS the range-for loop and the
 assertion from main() (wrong-code: goto-functions show arr/sum decls
 then straight SET RETURN VALUE 0), so verification succeeds vacuously.
 The desc requires the real assertion to be present and SUCCESS.
+
+2026-09-24: the desc never passed `--stdlib libc++`, so it exercised the
+libstdc++ headers -- where the same program (cpp20_ranges_basic) is CORE
+now; the flag is added so this test is the libc++ variant it is tagged as.
+Under libc++ 18 it still fails: `std::views::take(3)` is
+`__range_adaptor_closure_t(std::__bind_back(*this, ...))`, and
+`__bind_back`'s trailing `-> decltype(__bind_back_t<...>(...))` /
+`__perfect_forward` chain is not resolved (the closure's type stays `auto`,
+"function call expects function or function pointer as argument, but got
+'<<type:auto>>'"; reduced: `std::__bind_back(fn{}, 3)` alone fails with an
+enable_if_t<false> instantiation in <__compare/ordering.h>).

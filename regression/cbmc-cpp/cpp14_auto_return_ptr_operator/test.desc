@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+--
+Two defects.  The parser took the ptr-operator of `auto *f()` / `auto &f()`
+(stored, like a trailing return type, in the function type's subtype) for a
+trailing return type and moved it into the declaration type, losing the
+placeholder ("invalid implicit conversion ... to '<<type:nil>> &'"); a
+trailing return type is now marked as such.  cpp_convert_auto rebuilt the
+substituted type without its qualifiers, so `auto &f() { return ci; }` and
+`auto &r = ci` deduced `int &` for a `const int` (the variable path patched
+const back afterwards; the function path did not).  Also covers the deferred
+deduction when the return expression names a body-local variable, member
+functions, const `this`, volatile, pointer-to-pointer, and a range-for with
+`const auto &`.  Non-vacuous: the last assertion states a wrong value and
+must FAIL.
