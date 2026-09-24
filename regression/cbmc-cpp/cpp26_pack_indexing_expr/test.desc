@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
 ^VERIFICATION SUCCESSFUL$
@@ -6,6 +6,8 @@ main.cpp
 ^SIGNAL=0$
 --
 --
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: symbol 'ts' is unknown
+Was KNOWNBUG since round 152 ("symbol 'ts' is unknown").  Fixed 2026-09-24:
+N5008 [expr.prim.pack.index] -- at instantiation the pack-index-expression
+`ts...[N]` (the parser marks the index node with `ellipsis`) is replaced by
+the N-th expanded parameter, N a converted constant expression that may name
+`sizeof...(ts)`; over a one-element pack it is the sole parameter.
