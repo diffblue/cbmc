@@ -1,0 +1,11 @@
+CORE
+test.c
+--xml-ui --sarif-result sarif.out
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+<result property="main\.assertion\.1" status="FAILURE">
+<cprover-status>FAILURE</cprover-status>
+--
+--
+Checks that --sarif-result combined with --xml-ui produces XML UI on stdout.

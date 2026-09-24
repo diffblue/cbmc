@@ -1,0 +1,17 @@
+CORE
+unknown.c
+--stop-on-fail --sarif-result -
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"ruleId": "main\.assertion\.1"
+"kind": "open"
+"level": "warning"
+"ruleId": "main\.assertion\.2"
+"kind": "fail"
+"level": "error"
+--
+--
+Checks the UNKNOWN -> open/warning SARIF mapping: under --stop-on-fail an
+undecided property is reported with kind "open" and level "warning", while the
+failing property is reported with kind "fail" and level "error".

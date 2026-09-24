@@ -12,6 +12,7 @@ DIRS = cbmc-shadow-memory \
        cpp \
        cbmc-concurrency \
        cbmc-cover \
+       cbmc-sarif-ui \
        cbmc-incr-oneloop \
        cbmc-incr-smt2 \
        cbmc-incr \
