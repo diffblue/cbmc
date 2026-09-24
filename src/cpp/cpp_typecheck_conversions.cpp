@@ -1387,29 +1387,49 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
 
   // Collect candidate template-cast-operator symbols up front: the
   // symbol_table grows during instantiation, which would invalidate
-  // an in-place iterator.
+  // an in-place iterator.  The class is complete here (the flag above is
+  // set while its body is type-checked), so its set of conversion function
+  // templates is final: compute it once per class -- the scan of the whole
+  // symbol table on every implicit conversion attempt involving an object
+  // of such a class was 13% of a libstdc++ <ranges> run.
+  auto cached_candidates =
+    template_conversion_candidates.find(class_id_with_tag);
+  if(cached_candidates == template_conversion_candidates.end())
+  {
+    std::vector<irep_idt> found;
+    for(const auto &name_sym : symbol_table.symbols)
+    {
+      const symbolt &sym = name_sym.second;
+
+      const std::string &sym_name = id2string(sym.name);
+      if(sym_name.compare(0, class_prefix.size(), class_prefix) != 0)
+        continue;
+
+      if(sym.type.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &decl = to_cpp_declaration(sym.type);
+      if(!decl.is_template())
+        continue;
+      if(decl.type().id() != "cpp-cast-operator")
+        continue;
+      if(decl.declarators().empty())
+        continue;
+
+      found.push_back(sym.name);
+    }
+    cached_candidates =
+      template_conversion_candidates.emplace(class_id_with_tag, found).first;
+  }
+
   std::vector<const symbolt *> candidate_syms;
   std::vector<irep_idt> candidate_scope_ids;
-  for(const auto &name_sym : symbol_table.symbols)
+  for(const irep_idt &candidate : cached_candidates->second)
   {
-    const symbolt &sym = name_sym.second;
-
-    const std::string sym_name = id2string(sym.name);
-    if(sym_name.compare(0, class_prefix.size(), class_prefix) != 0)
+    const symbolt *sym = symbol_table.lookup(candidate);
+    if(sym == nullptr)
       continue;
-
-    if(sym.type.id() != ID_cpp_declaration)
-      continue;
-    const cpp_declarationt &decl = to_cpp_declaration(sym.type);
-    if(!decl.is_template())
-      continue;
-    if(decl.type().id() != "cpp-cast-operator")
-      continue;
-    if(decl.declarators().empty())
-      continue;
-
-    candidate_syms.push_back(&sym);
-    candidate_scope_ids.push_back(sym.name);
+    candidate_syms.push_back(sym);
+    candidate_scope_ids.push_back(candidate);
   }
 
   if(candidate_syms.empty())

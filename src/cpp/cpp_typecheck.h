@@ -1203,6 +1203,11 @@ public:
   /// ambiguity.  The caller is responsible for building the call
   /// expression and validating the post-instantiation conversion
   /// sequence appropriate to the calling context.
+  /// per class (tag identifier): the conversion function templates declared
+  /// in it, for find_template_conversion_specialisation
+  std::unordered_map<irep_idt, std::vector<irep_idt>>
+    template_conversion_candidates;
+
   const symbolt *
   find_template_conversion_specialisation(const exprt &expr, const typet &to);
 
