@@ -1,0 +1,12 @@
+CORE
+test.c
+--unreachable-functions
+test\.c uncalled_inline [0-9]+ [0-9]+$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Companion to reachable-functions-inline (#5173): an uncalled `inline` function
+must be reported as unreachable. Before the fix, inline functions were treated
+as reachable regardless of being called, so uncalled_inline was absent from
+--unreachable-functions and this test fails.

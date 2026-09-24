@@ -1,0 +1,14 @@
+CORE
+test.c
+--reachable-functions
+test\.c main [0-9]+ [0-9]+$
+^EXIT=0$
+^SIGNAL=0$
+--
+uncalled_inline
+--
+Portable regression for #5173: an uncalled `inline` function must NOT be
+reported as reachable. uncalled_inline is never called and its address is
+never taken, so it must be absent from --reachable-functions. Before the fix
+(which dropped the "inline implies reachable" special case) this test fails,
+as inline functions were reported reachable regardless of being called.
