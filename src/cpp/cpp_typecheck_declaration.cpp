@@ -327,10 +327,17 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         {
           for(std::size_t i = 0; i < patterns.size(); ++i)
           {
+            // N5008 [temp.deduct.call]/3: a forwarding reference is an
+            // rvalue reference to a cv-unqualified template parameter "that
+            // does not represent a template parameter of a class template
+            // (during class template argument deduction)" -- so for a
+            // constructor-derived guide, `C(_Range&&)` deduces `_Range =
+            // int[5]` (not `int(&)[5]`) from an array lvalue
+            // (`owning_view{declval<int(&)[5]>()}`; the class's
+            // `_Range _M_r = _Range();` is ill-formed for a reference).
             resolver.guess_template_args(
               patterns[i],
-              adjust_deduction_arg(
-                patterns[i], arg_types[i], arg_is_lvalue[i]));
+              adjust_deduction_arg(patterns[i], arg_types[i], false));
           }
         }
         catch(...)
