@@ -2769,17 +2769,26 @@ bool Parser::rIntegralDeclaration(
     if(!rDeclarators(declaration.declarators(), true))
       return false;
 
-    // handle trailing return type
+    // handle trailing return type: `auto f() -> T` declares T.  Only a
+    // subtype written after `->` qualifies -- for `auto *f()` / `auto &f()`
+    // ([dcl.spec.auto.general]/2: the placeholder may be followed by a
+    // ptr-operator) the function type's subtype is that ptr-operator with a
+    // nil pointee, and moving it into the declaration type lost the `auto`
+    // (the return type became `<<type:nil>> *`).
     if(
       declaration.type().id() == ID_auto &&
       declaration.declarators().size() == 1 &&
       declaration.declarators().front().type().id() == ID_function_type &&
+      declaration.declarators().front().type().get_bool(
+        ID_C_trailing_return_type) &&
       declaration.declarators().front().type().add_subtype().is_not_nil())
     {
       declaration.type() =
         to_type_with_subtype(declaration.declarators().front().type())
           .subtype();
       declaration.declarators().front().type().add_subtype().make_nil();
+      declaration.declarators().front().type().remove(
+        ID_C_trailing_return_type);
     }
 
 #ifdef DEBUG
@@ -5001,6 +5010,10 @@ bool Parser::rDeclarator(
           return false;
 
         d_outer.add_subtype().swap(return_type);
+        // distinguishes `auto f() -> T` from `auto *f()`, whose
+        // ptr-operator also sits in the function type's subtype (see the
+        // trailing-return handling in rIntegralDeclaration)
+        d_outer.set(ID_C_trailing_return_type, true);
       }
 
       // C++11 virt-specifier-seq: override, final
