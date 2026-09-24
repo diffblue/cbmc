@@ -8,111 +8,51 @@ Author: Peter Schrammel
 
 /// \file
 /// Basic blocks detection for Coverage Instrumentation
+/// This file adapts the generic basic block detection utility from
+/// src/analyses/basic_blocks.h for use in coverage instrumentation.
 
 #include "cover_basic_blocks.h"
 
 #include <util/message.h>
 
-std::optional<std::size_t> cover_basic_blockst::continuation_of_block(
-  const goto_programt::const_targett &instruction,
-  cover_basic_blockst::block_mapt &block_map)
+#include <analyses/basic_blocks.h>
+
+// ============================================================================
+// cover_basic_blockst implementation (default C/C++ behavior)
+// ============================================================================
+
+cover_basic_blockst::cover_basic_blockst(
+  const goto_programt &goto_program,
+  const basic_block_configt &config)
+  : blocks(goto_program, config)
 {
-  if(instruction->incoming_edges.size() != 1)
-    return {};
+  // Initialize extended information for each block (source lines)
+  block_infos.resize(blocks.size());
 
-  const goto_programt::targett in_t = *instruction->incoming_edges.cbegin();
-  if(in_t->is_goto() && !in_t->is_backwards_goto() && in_t->condition() == true)
-    return block_map[in_t];
-
-  return {};
-}
-
-static bool
-same_source_line(const source_locationt &a, const source_locationt &b)
-{
-  return a.get_file() == b.get_file() && a.get_line() == b.get_line();
-}
-
-cover_basic_blockst::cover_basic_blockst(const goto_programt &goto_program)
-{
-  bool next_is_target = true;
-  const goto_programt::instructiont *preceding_assume = nullptr;
-  std::size_t current_block = 0;
-
+  // Collect source lines for each instruction
   forall_goto_program_instructions(it, goto_program)
   {
-    // For the purposes of coverage blocks, multiple consecutive assume
-    // instructions with the same source location are considered to be part of
-    // the same block. Assumptions should terminate a block, as subsequent
-    // instructions may be unreachable. However check instrumentation passes
-    // may insert multiple assertions in the same program location. Therefore
-    // these are combined for reasons of readability of the coverage output.
-    bool end_of_assume_group =
-      preceding_assume &&
-      !(it->is_assume() &&
-        same_source_line(
-          preceding_assume->source_location(), it->source_location()));
-
-    // Is it a potential beginning of a block?
-    if(next_is_target || it->is_target() || end_of_assume_group)
-    {
-      if(auto block_number = continuation_of_block(it, block_map))
-      {
-        current_block = *block_number;
-      }
-      else
-      {
-        block_infos.emplace_back();
-        block_infos.back().representative_inst = it;
-        block_infos.back().source_location = source_locationt::nil();
-        current_block = block_infos.size() - 1;
-      }
-    }
-
-    INVARIANT(
-      current_block < block_infos.size(), "current block number out of range");
-    block_infot &block_info = block_infos.at(current_block);
-
-    block_map[it] = current_block;
-
-    add_block_lines(block_info, *it);
-
-    // set representative program location to instrument
-    if(
-      !it->source_location().is_nil() &&
-      !it->source_location().get_file().empty() &&
-      !it->source_location().get_line().empty() &&
-      !it->source_location().is_built_in() &&
-      block_info.source_location.is_nil())
-    {
-      block_info.representative_inst = it; // update
-      block_info.source_location = it->source_location();
-    }
-
-    next_is_target = it->is_goto() || it->is_function_call();
-    preceding_assume = it->is_assume() ? &*it : nullptr;
+    const std::size_t block_nr = blocks.block_of(it);
+    INVARIANT(block_nr < block_infos.size(), "block number out of range");
+    add_block_lines(block_infos[block_nr], *it);
   }
 }
 
 std::size_t cover_basic_blockst::block_of(goto_programt::const_targett t) const
 {
-  const auto it = block_map.find(t);
-  INVARIANT(it != block_map.end(), "instruction must be part of a block");
-  return it->second;
+  return blocks.block_of(t);
 }
 
 std::optional<goto_programt::const_targett>
 cover_basic_blockst::instruction_of(const std::size_t block_nr) const
 {
-  INVARIANT(block_nr < block_infos.size(), "block number out of range");
-  return block_infos[block_nr].representative_inst;
+  return blocks.instruction_of(block_nr);
 }
 
 const source_locationt &
 cover_basic_blockst::source_location_of(const std::size_t block_nr) const
 {
-  INVARIANT(block_nr < block_infos.size(), "block number out of range");
-  return block_infos[block_nr].source_location;
+  return blocks.source_location_of(block_nr);
 }
 
 const source_linest &
@@ -131,21 +71,20 @@ void cover_basic_blockst::report_block_anomalies(
   std::set<std::size_t> blocks_seen;
   forall_goto_program_instructions(it, goto_program)
   {
-    const std::size_t block_nr = block_of(it);
-    const block_infot &block_info = block_infos.at(block_nr);
+    const std::size_t block_nr = blocks.block_of(it);
+    const auto representative_inst = blocks.instruction_of(block_nr);
+    const auto &source_location = blocks.source_location_of(block_nr);
 
     if(
       blocks_seen.insert(block_nr).second &&
-      block_info.representative_inst == goto_program.instructions.end())
+      representative_inst == goto_program.instructions.end())
     {
       msg.warning() << "Ignoring block " << (block_nr + 1) << " location "
                     << it->location_number << " " << it->source_location()
                     << " (bytecode-index already instrumented)"
                     << messaget::eom;
     }
-    else if(
-      block_info.representative_inst == it &&
-      block_info.source_location.is_nil())
+    else if(representative_inst == it && source_location.is_nil())
     {
       msg.warning() << "Ignoring block " << (block_nr + 1) << " location "
                     << it->location_number << " " << function_id
@@ -158,7 +97,8 @@ void cover_basic_blockst::report_block_anomalies(
 
 void cover_basic_blockst::output(std::ostream &out) const
 {
-  for(const auto &block_pair : block_map)
+  // One line per instruction: its source location -> containing block number.
+  for(const auto &block_pair : blocks.instruction_blocks())
     out << block_pair.first->source_location() << " -> " << block_pair.second
         << '\n';
 }
@@ -182,59 +122,55 @@ void cover_basic_blockst::add_block_lines(
   });
 }
 
+// ============================================================================
+// cover_basic_blocks_javat implementation (Java-specific behavior)
+// ============================================================================
+
 cover_basic_blocks_javat::cover_basic_blocks_javat(
-  const goto_programt &_goto_program)
+  const goto_programt &goto_program)
+  : blocks(goto_program)
 {
-  forall_goto_program_instructions(it, _goto_program)
+  // Initialize source lines for each block
+  block_source_lines.resize(blocks.size());
+
+  // Collect source lines for each instruction
+  forall_goto_program_instructions(it, goto_program)
   {
+    const std::size_t block_nr = blocks.block_of(it);
+    INVARIANT(
+      block_nr < block_source_lines.size(), "block number out of range");
     const auto &location = it->source_location();
-    const auto &bytecode_index = location.get_java_bytecode_index();
-    auto entry = index_to_block.emplace(bytecode_index, block_infos.size());
-    if(entry.second)
-    {
-      block_infos.push_back(it);
-      block_locations.push_back(location);
-      block_source_lines.emplace_back(location);
-    }
-    else
-    {
-      block_source_lines[entry.first->second].insert(location);
-    }
+    block_source_lines[block_nr].insert(location);
   }
 }
 
 std::size_t
 cover_basic_blocks_javat::block_of(goto_programt::const_targett t) const
 {
-  const auto &bytecode_index = t->source_location().get_java_bytecode_index();
-  const auto it = index_to_block.find(bytecode_index);
-  INVARIANT(it != index_to_block.end(), "instruction must be part of a block");
-  return it->second;
+  return blocks.block_of(t);
 }
 
 std::optional<goto_programt::const_targett>
 cover_basic_blocks_javat::instruction_of(const std::size_t block_nr) const
 {
-  PRECONDITION(block_nr < block_infos.size());
-  return block_infos[block_nr];
+  return blocks.instruction_of(block_nr);
 }
 
 const source_locationt &
 cover_basic_blocks_javat::source_location_of(const std::size_t block_nr) const
 {
-  PRECONDITION(block_nr < block_locations.size());
-  return block_locations[block_nr];
+  return blocks.source_location_of(block_nr);
 }
 
 const source_linest &
 cover_basic_blocks_javat::source_lines_of(const std::size_t block_nr) const
 {
-  PRECONDITION(block_nr < block_locations.size());
+  PRECONDITION(block_nr < block_source_lines.size());
   return block_source_lines[block_nr];
 }
 
 void cover_basic_blocks_javat::output(std::ostream &out) const
 {
-  for(std::size_t i = 0; i < block_locations.size(); ++i)
-    out << block_locations[i] << " -> " << i << '\n';
+  for(std::size_t i = 0; i < blocks.size(); ++i)
+    out << blocks.source_location_of(i) << " -> " << i << '\n';
 }
