@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.10\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+does not uniquely resolve
+--
+N5008 [temp.constr.decl]/3 + [temp.constr.atomic]/1: the requires-clause of a
+function template (and of a member template of a class template
+specialization) is checked under the parameter mapping of the constrained
+declaration.  Guards the template-map based check: concept-ids over a
+parameter pack (`all_small<Args...>`, `first_is<T, Args...>`, a non-type
+argument with a pack `arity<3, Args...>`), a class parameter named from a
+member's clause through the class's own specialization
+(`typename box<T>::value_type`), each against an unconstrained twin so the
+constrained one must win exactly when satisfied.  Non-vacuous: the last
+assertion states a wrong value and must FAIL.
