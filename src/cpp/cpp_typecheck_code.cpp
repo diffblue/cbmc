@@ -190,6 +190,28 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     return;
   }
 
+  // N5008 [dcl.spec.auto.general]/2, [dcl.type.auto.deduct]/4: the
+  // placeholder may sit under a ptr-operator (`auto *f()`, `auto &f()`,
+  // `const auto &f()`); the return type is then deduced as for `auto *p =
+  // e` / `auto &r = e`.  This is reached when convert_function's early
+  // deduction could not type the return expression on its own (a
+  // body-local name) and deferred to the body typecheck.
+  if(has_auto(return_type) && code.has_return_value())
+  {
+    typecheck_expr(code.return_value());
+    typet deduced_return_type = return_type;
+    cpp_convert_auto(
+      deduced_return_type, code.return_value().type(), get_message_handler());
+    typecheck_type(deduced_return_type);
+    return_type = deduced_return_type;
+    if(is_reference(return_type))
+      reference_initializer(
+        code.return_value(), to_reference_type(return_type));
+    else
+      implicit_typecast(code.return_value(), return_type);
+    return;
+  }
+
   // [dcl.init.list] p3: For non-aggregate class types, brace-init
   // calls a constructor. Unwrap single-element initializer_lists
   // so the base class typecheck handles the conversion through
