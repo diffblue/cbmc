@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/options.h>
 #include <util/version.h>
 
+#include <goto-programs/adjust_float_expressions.h>
 #include <goto-programs/goto_check.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_skip.h>
@@ -35,10 +36,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <goto-analyzer/static_verifier.h>
 #include <goto-analyzer/taint_analysis.h>
 #include <goto-analyzer/unreachable_instructions.h>
+#include <java_bytecode/convert_java_nondet.h>
 #include <java_bytecode/java_bytecode_language.h>
+#include <java_bytecode/java_object_factory_parameters.h>
 #include <java_bytecode/lazy_goto_model.h>
 #include <java_bytecode/remove_exceptions.h>
 #include <java_bytecode/remove_instanceof.h>
+#include <java_bytecode/remove_java_new.h>
+#include <java_bytecode/replace_java_nondet.h>
 #include <langapi/language.h>
 #include <langapi/mode.h>
 #include <linking/static_lifetime_init.h>
@@ -76,6 +81,7 @@ void janalyzer_parse_optionst::get_command_line_options(optionst &options)
     options.set_option("function", cmdline.get_value("function"));
 
   parse_java_language_options(cmdline, options);
+  parse_java_object_factory_options(cmdline, options);
 
   // check assertions
   if(cmdline.isset("no-assertions"))
@@ -695,7 +701,28 @@ void janalyzer_parse_optionst::process_goto_function(
 
   remove_returns(function, function_is_stub);
 
-  transform_assertions_assumptions(options, function.get_goto_function().body);
+  // Java synthetic nondet calls (org.cprover.CProver.nondet*()) -> nondet
+  // side effects (may, in turn, introduce `new` statements below).
+  replace_java_nondet(function);
+
+  // convert Java nondet expressions
+  java_object_factory_parameterst object_factory_parameters;
+  object_factory_parameters.set(options);
+  convert_nondet(
+    function, ui_message_handler, object_factory_parameters, ID_java);
+
+  transform_assertions_assumptions(options, goto_function.body);
+
+  // remove Java new expressions (must be after convert_nondet, which may
+  // introduce them)
+  remove_java_new(
+    function.get_function_id(),
+    goto_function,
+    symbol_table,
+    ui_message_handler);
+
+  // checks don't know about adjusted float expressions
+  adjust_float_expressions(goto_function, ns);
 }
 
 bool janalyzer_parse_optionst::can_generate_function_body(const irep_idt &name)
