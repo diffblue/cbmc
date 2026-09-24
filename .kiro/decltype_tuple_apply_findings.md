@@ -11179,3 +11179,163 @@ reproducers in /tmp/r157/kb (cr*.cpp, ic*.cpp, it*.cpp):
 Five new CORE tests, one per layer.  Everything else in cbmc-cpp green on
 bin29 (s28), plus cbmc, cpp, systemc, dfcc, ansi-c x2, unit-proofs,
 cbmc-library, goto-cc-cbmc; clang -Werror clean.
+
+### Round 158, part 7 (2026-09-24): KNOWNBUG sweep, cpp11 -> cpp26, and the libstdc++ range-adaptor chain
+
+Survey method note: `test.pl -K` runs KNOWNBUG tests EXPECTING failure --
+`[OK]` means "still failing", `[FAILED]` means "passes now, convert".
+(The part-4/-6 surveys read the columns that way; re-checked here.)
+
+Turned CORE (five KNOWNBUGs) and the fixes behind them, in order:
+
+1. cpp11_deduced_nontype_kind_mismatch -- [temp.deduct.type]/20: the
+   declared type of a pattern's non-type parameter must equal the named
+   template's parameter type (`template<short s> void f(A<s>)` against
+   `A<1>` with `template<int i> class A`).  The deduction entry points now
+   record the function template's non-type parameter types, and the
+   template-id branch of guess_template_args marks the candidate
+   conflicting on a mismatch (arithmetic/enum only; dependent and
+   explicitly bound parameters skipped -- cpp11_tuple_get_write_reference
+   needed the explicit-argument exemption).
+2. cpp20_class_nttp_brace, cpp20_nttp_string -- class-type NTTPs built by a
+   constexpr constructor ([temp.param]/7, [temp.arg.nontype]/1).  The
+   constant evaluator learned constructor calls: `this` is tracked by
+   VALUE (zero-initialised struct), mem-initializers and body assignments
+   `this->m = v` update it, the result is the struct constant; a
+   temporary_object wrapping such a call evaluates to it.  Template
+   argument binding and template_suffix fold the temporary; the instance
+   identifier renders the value FLAT (`tag-P2s{9.4.}`) -- a first cut
+   with `cpp_expr2name` put `(`, `:` and `=` into the identifier
+   (identity assessment lesson, again).
+3. cpp26_pack_indexing_expr -- `ts...[N]` ([expr.prim.pack.index]): the
+   parser already marked the index node `ellipsis`; the pack expander now
+   substitutes the N-th expanded parameter (N may name `sizeof...(ts)`:
+   arity substituted, closed expression type-checked and folded); over a
+   one-element pack `ts...[0]` is the parameter itself.
+4. cpp20_ranges_basic (`arr | std::views::take(3)` with libstdc++ 13),
+   seven layers deep -- the summary of each with its reducer:
+   a. [dcl.init.aggr]/1: a constructor TEMPLATE is user-declared.  Three
+      brace-init paths scanned constructor components only; ref_view{arr}
+      was aggregate-initialised from the array.  Flag
+      `has_template_constructor` read at all three (rg9/rg15).
+   b. [temp.spec.partial.order]: variable-template partial specialization
+      matching kept the LAST match (`extent_v<T[N], I>` over
+      `extent_v<T[N], 0>`), so extent_v<int[5]> == 0 and
+      ranges::size(array) == 0.  Ordered by
+      partial_specialization_at_least_as_specialised like classes (ex2).
+   c. [temp.deduct.call]/3 last sentence: in CTAD an rvalue reference to
+      a CLASS template parameter is not a forwarding reference:
+      owning_view(_Range&&) deduces int[5], not int(&)[5].  The forwarding
+      deduction made `_Range _M_r = _Range()` value-initialise a
+      reference, and cpp_constructor's invariant aborted the whole run
+      inside `__can_owning_view<int(&)[5]>`.  Plus [dcl.init.general]/9:
+      reference value-initialisation is now an error (rg5).
+   d. [temp.constr.decl]/1: a requires-clause is looked up from the
+      template's scope.  _RangeAdaptorClosure's hidden-friend operator|
+      names its class unqualified; checked from main() the lookup failed
+      and the candidate was mis-handled ("conversion from int[5] to
+      _Partial").  Enter the template's scope before typechecking the
+      clause (rg25).
+   e. [temp.variadic]/5: `Args...` in a requires-clause concept-id mapped
+      to the FIRST deduced element, so `__adaptor_partial_app_viable<_Take,
+      int(&)[5], int>` (sizeof...(_Args) == _S_arity - 1) was TRUE for
+      two arguments -> "operator() does not uniquely resolve" (rg44).
+   f. [stmt.if]/2: return type deduction took the first `return` even in
+      a discarded `if constexpr` branch: views::all returned `int*` for an
+      array.  Deferred to after body typecheck when a return sits under
+      `if constexpr`; and [dcl.type.auto.deduct]/4 -- a plain `auto`
+      drops references/top-level cv on all three deduction paths (the
+      early one, the deferred one, typecheck_return's) via one helper
+      (rg37, ar3).
+   g. [temp.inst]/4: view_interface<ref_view<int[5]>> is instantiated as a
+      BASE of ref_view while ref_view is incomplete; its auto members
+      were converted EAGERLY, `_M_derived().begin()` failed (the member
+      lookup fell through to namespace-scope `__cust::begin`: "is not
+      static member of class"), and the bodies -- and the
+      `_Begin::operator()<ref_view&>` instance created on the way -- were
+      nil'd for good.  convert_function keeps the parsed body and, while
+      any class is being elaborated (compound_body_depth > 0), restores
+      and re-queues it for the drain; system-header bodies failing outside
+      class elaboration get one retry; add_method_body's eager attempt is
+      speculative (SFINAE guard, queue on failure).  compound_body_depth
+      was `++`/`--` without RAII -- an escaping exception left it raised,
+      every later failure re-queued forever: cpp11_list_pushback_libcxx and
+      the four cpp17_filesystem tests hung (bin31).  Guard object now.
+   Debugging note: `catch throw` misses `throw;` -- add `catch rethrow`;
+   and a conditional breakpoint whose condition errors STOPS gdb, so
+   a final unconditional `continue` in a -batch script ends the run
+   early.  Program stderr under gdb needs the loop `while 1 / continue`.
+5. provide_stdlib_bodies inserted parameter symbols while iterating the
+   symbol table (unordered_map rehash -> skipped entries).  Latent; my
+   extra symbols moved the locale default-constructor model out of the
+   walk (cpp11_locale_ctype_facet: "no body for callee
+   std::locale::locale(this)").  Snapshot of names first.
+
+Left KNOWNBUG (12, all tagged; no untagged KNOWNBUG remains in cbmc-cpp):
+libcxx x4 -- cpp20_ranges_basic_libcxx (desc never passed `--stdlib
+libc++`; fixed, and under libc++ 18 the `__bind_back` / `__perfect_forward`
+chain still leaves the closure `auto` -- reduced to `std::__bind_back(fn{},
+3)` alone: lx2.cpp), cpp17_libcxx_variant, cpp17_variant_basic/
+test_libcxx.desc, libcxx23_string_fill_ctor; gcc16 x8 (need gcc 16
+headers, all pass on the host's gcc 13 headers).  Survey note: grep for
+`^KNOWNBUG` on the FIRST line only -- many CORE descs keep a
+"KNOWNBUG: ..." history paragraph that a plain grep counts.  Pre-existing, noted, not touched: `auto
+&f() { return ci; }` (auto& return with a const lvalue) fails with
+"conversion from 'const signed int' to '<<type:nil>> &'" (ar3.cpp).
+
+Commits: ba47733f72 46042e38fb 1d66694080 89bbd5ed88 c338e7a20d 17bfc7a5c5
+30aab88579 04f8c0d48a d77ff7419a 8ae22d3d3e 31ca0a4323 (src), 32321fc02a
+(tests).  Suites on bin32 (s32): cbmc, cpp, systemc, contracts-cpp-dfcc,
+ansi-c x2, unit-proofs, cbmc-library, goto-cc-cbmc green; clang -Werror
+clean.  cbmc-cpp on bin32: two regressions, both from this batch --
+
+6. cpp17_variant_basic: the if-constexpr deferral (d77ff7419a) exposed a
+   discrepancy between the two deduction sites -- typecheck_return
+   deduces `decltype(auto)` of an lvalue as `T&` but left the return
+   VALUE as `T`, and the post-body pass re-derived `T` from it; the
+   consistency sweep dropped `__get_n`'s body and std::get<0>(v) took
+   the address of a temporary.  Now the glvalue is bound to the deduced
+   reference in typecheck_return and the post-body pass reuses that
+   deduction (ec20579aeb).  Bisected by checking out `src/cpp` at each
+   commit into build-work (2-3 min per step with ccache); the reduced
+   reproducers (va2/va4.cpp: `int &r = std::get<0>(v)`, a wrapper over
+   get_if) were only reproducible with the real header.
+7. libcxx23_vector_pushback: convert_function's "system header" test
+   (`/usr/include/`, `/usr/lib/` prefixes) did not match clang's
+   `/usr/bin/../include/c++/v1/...`, so a failing libc++ body was
+   treated as user code there; with the re-queue it reached the drain
+   and the "no viable function" rule (pending_no_viable_call) made it a
+   hard error.  Six ad-hoc copies of the prefix test -> two predicates:
+   is_system_header_file (the old set) and is_library_body_file (adds
+   `/include/c++/`), the latter wherever a failing library body is
+   TOLERATED (b1b8d0efe4).  First cut widened the single predicate --
+   and the end-of-unit half-converted sweep (restricted to system
+   headers on purpose) then re-converted libc++ lambda bodies that carry
+   no #cpp_converted stamp: `std::forward` in the lambda failed on
+   re-typecheck ("int & to int &&"), both `emplace_back` lambdas went
+   bodyless, and the test verified FALSE (the wrong-verdict pin).  Kept
+   the sweep on the narrow predicate.
+
+Follow-up found while checking `auto`-return deduction (73d8190428):
+`auto *f()` / `auto &f()` -- the parser stored the ptr-operator in the
+function type's subtype, the slot a trailing return type uses, and
+rIntegralDeclaration's trailing-return handling moved it into the
+declaration type (return type `<<type:nil>> *`).  Marked genuine
+trailing return types (#trailing_return_type, new irep id).  And
+cpp_convert_auto dropped the substituted type's cv (write() rebuilds
+from c_qualifiers) -- `auto &f() { return ci; }` deduced `int &`; the
+variable path had patched const back by hand.  typecheck_return also
+deduces a nested placeholder when the early pass deferred.  Test
+cpp14_auto_return_ptr_operator.
+
+8. And the cv transfer must be NESTED-only: a top-level `auto x = ci`
+   drops cv ([temp.deduct.call]/2) -- util/string_utils.cpp's `auto
+   it_line_begin = left;` (const parameter) became unassignable
+   (unit-proofs/trim_from_last_delimiter).  f961cf8191.
+
+Suites on bin34 (s34): cbmc, cpp, systemc, contracts-cpp-dfcc, ansi-c x2,
+cbmc-library, goto-cc-cbmc green; unit-proofs found #8.  Final run on bin35
+(s35, = HEAD f961cf8191 + notes): cbmc-cpp 1407/1407 (20 skipped), cpp,
+systemc, contracts-cpp-dfcc, unit-proofs, ansi-c (c++ front-end),
+goto-cc-cbmc all green; cbmc, cbmc-library, ansi-c (gcc) green on bin34
+(unchanged front-end paths since); clang -Werror clean.  Nothing pushed.
