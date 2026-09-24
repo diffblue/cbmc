@@ -3531,6 +3531,47 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
   {
     // Default value, e.g., int()
     typecheck_type(expr.type());
+
+    // N5008 [expr.type.conv]/2 + [dcl.init.general]/9.1: `T()' for a class
+    // type VALUE-INITIALIZES the temporary -- zero-initialized and then, if
+    // T's default constructor is non-trivial, default-initialized.  A
+    // default member initializer makes the implicit default constructor
+    // non-trivial ([class.default.ctor]/3), so `struct S { int v = 3; }; S()'
+    // has v == 3; the plain zero value below gave 0 (the class is a POD to
+    // the front end, and the constructor-call form was not taken).  Build
+    // the temporary through the constructor path, which runs the
+    // synthesized default constructor over the zero-initialized object.
+    if(
+      (expr.type().id() == ID_struct_tag || expr.type().id() == ID_union_tag) &&
+      has_default_member_initializer(expr.type()))
+    {
+      exprt::operandst no_operands;
+      exprt temporary;
+      new_temporary(
+        expr.source_location(), expr.type(), no_operands, temporary);
+      // the zero-initialization that precedes the default-initialization
+      // (members without a default member initializer are zero, not
+      // indeterminate: `struct R { int v = 3; int w; }; R().w == 0')
+      const auto zero =
+        ::zero_initializer(expr.type(), expr.find_source_location(), *this);
+      if(zero.has_value() && temporary.find(ID_initializer).is_not_nil())
+      {
+        exprt new_object(ID_new_object);
+        new_object.add_source_location() = expr.source_location();
+        new_object.set(ID_C_lvalue, true);
+        new_object.type() = expr.type();
+        code_frontend_assignt zero_assign{new_object, *zero};
+        zero_assign.add_source_location() = expr.source_location();
+        code_blockt initializer;
+        initializer.add(std::move(zero_assign));
+        initializer.add(
+          to_code(static_cast<const exprt &>(temporary.find(ID_initializer))));
+        temporary.add(ID_initializer) = initializer;
+      }
+      expr.swap(temporary);
+      return;
+    }
+
     auto new_expr =
       ::zero_initializer(expr.type(), expr.find_source_location(), *this);
     if(!new_expr.has_value())
