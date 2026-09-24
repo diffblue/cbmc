@@ -1,4 +1,4 @@
-CORE paths-lifo-expected-failure broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
+CORE broken-z3-smt-backend broken-cprover-smt-backend no-new-smt
 main.c
 --dimacs --outfile /xyz/out.dimacs
 ^EXIT=1$

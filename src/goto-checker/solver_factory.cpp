@@ -32,6 +32,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <solvers/strings/string_refinement.h>
 
 #include <iostream>
+#include <set>
 #include <vector>
 
 solver_factoryt::solver_factoryt(
@@ -161,6 +162,33 @@ smt2_dect::solvert solver_factoryt::get_smt2_solver_type() const
   return s;
 }
 
+/// The set of SAT solver names accepted on the command line. This is the
+/// single source of truth for known solver names: the dispatch chain in
+/// \ref get_sat_solver must handle exactly these names (enforced by an
+/// INVARIANT there), so keep the two in sync when adding or removing a solver.
+static const std::set<std::string> &known_sat_solver_names()
+{
+  static const std::set<std::string> names = {
+    "zchaff",
+    "booleforce",
+    "minisat1",
+    "minisat2",
+    "ipasir",
+    "picosat",
+    "lingeling",
+    "glucose",
+    "cadical"};
+  return names;
+}
+
+/// Check whether \p solver_name is a known SAT solver name. A solver may be
+/// known but not compiled in (in which case \ref get_sat_solver will fall back
+/// to the default solver with a warning).
+static bool is_known_sat_solver_name(const std::string &solver_name)
+{
+  return known_sat_solver_names().count(solver_name) != 0;
+}
+
 /// Emit a warning for non-existent solver \p solver via \p message_handler.
 static void emit_solver_warning(
   message_handlert &message_handler,
@@ -216,6 +244,8 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
   if(options.is_set("sat-solver"))
   {
     const std::string &solver_option = options.get_option("sat-solver");
+    // This dispatch must handle exactly the names in known_sat_solver_names();
+    // the INVARIANT in the trailing else-branch guards against drift.
     if(solver_option == "zchaff")
     {
 #if defined SATCHECK_ZCHAFF
@@ -311,6 +341,9 @@ get_sat_solver(message_handlert &message_handler, const optionst &options)
     }
     else
     {
+      INVARIANT(
+        !is_known_sat_solver_name(solver_option),
+        "known solver names should be handled above");
       messaget log(message_handler);
       log.error() << "unknown solver '" << solver_option << "'"
                   << messaget::eom;
@@ -622,7 +655,16 @@ static void parse_sat_options(const cmdlinet &cmdline, optionst &options)
     options.set_option("dimacs", true);
 
   if(cmdline.isset("sat-solver"))
-    options.set_option("sat-solver", cmdline.get_value("sat-solver"));
+  {
+    const std::string solver = cmdline.get_value("sat-solver");
+    options.set_option("sat-solver", solver);
+
+    if(!is_known_sat_solver_name(solver))
+    {
+      throw invalid_command_line_argument_exceptiont(
+        "unknown solver '" + solver + "'", "--sat-solver");
+    }
+  }
 }
 
 static void parse_smt2_options(const cmdlinet &cmdline, optionst &options)
