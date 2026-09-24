@@ -1,0 +1,14 @@
+CORE
+main.cpp
+
+^regression/cpp-linter/abort/main\.cpp:11:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:14:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:15:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:18:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:19:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:20:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:24:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^regression/cpp-linter/abort/main\.cpp:38:  abort\(\) should not be used. Normal termination should be via return from main. Abnormal termination should use invariant.h macros. If this use is justified, mark with NOLINT. See https://github.com/diffblue/cbmc/issues/1902  \[runtime/termination\] \[4\]
+^# Total errors found: 8$
+^EXIT=1$
+^SIGNAL=0$
