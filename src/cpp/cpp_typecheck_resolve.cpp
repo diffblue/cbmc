@@ -391,6 +391,48 @@ constraint_normalt concept_normal(
   return {{id2string(name)}};
 }
 
+/// Whether the concept \p name (or a concept it references, transitively)
+/// is defined with a requires-expression.  Our evaluation of a
+/// requires-expression can come out FALSE for constructs the front end does
+/// not model (a libc++ ranges customization-point object over an array,
+/// `ranges::iter_move'), where a trait-based concept
+/// (`is_integral_v<T>', `same_as') is decided reliably; a caller that
+/// removes an overload candidate on an unsatisfied constraint trusts a false
+/// only from the latter.
+bool concept_uses_requires_expression(
+  const symbol_table_baset &symbol_table,
+  const irep_idt &name,
+  int depth = 0)
+{
+  if(depth > 32)
+    return true;
+  const exprt body = concept_constraint_body(symbol_table, name);
+  if(body.is_nil())
+    return false;
+  bool found = false;
+  body.visit_pre(
+    [&](const exprt &e)
+    {
+      if(found)
+        return;
+      const irep_idt &id = e.id();
+      if(
+        id == "simple_requirement" || id == "compound_requirement" ||
+        id == "type_requirement" || id == "nested_requirement" ||
+        e.find("#requires_params").is_not_nil())
+      {
+        found = true;
+        return;
+      }
+      const irep_idt cref = concept_reference_name(e);
+      if(
+        !cref.empty() && cref != name &&
+        concept_uses_requires_expression(symbol_table, cref, depth + 1))
+        found = true;
+    });
+  return found;
+}
+
 // N5008 [temp.constr.order]/1: does the constraint named p_name subsume the
 // constraint named q_name?
 bool constraint_subsumes(
@@ -712,289 +754,22 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     {
       CHECK_RETURN(e.id() != ID_type);
 
-      // C++20: check concept constraint satisfaction
-      bool concept_ok = true;
-      {
-        irep_idt tmpl_id = old_id.get(ID_identifier);
-        if(tmpl_id.empty() && old_id.id() == ID_symbol)
-          tmpl_id = to_symbol_expr(old_id).get_identifier();
-        const auto *tmpl_sym = cpp_typecheck.symbol_table.lookup(tmpl_id);
-        if(tmpl_sym && tmpl_sym->type.get_bool(ID_is_template))
-        {
-          const cpp_declarationt &tdecl = to_cpp_declaration(tmpl_sym->type);
-          for(const auto &p : tdecl.template_type().template_parameters())
-          {
-            const irep_idt &cc = p.get("#C_concept_constraint");
-            if(cc.empty())
-              continue;
-            // Get the deduced type from fargs
-            // explicit nil: a default-constructed typet is not nil
-            typet actual_type(ID_nil);
-            if(!fargs.operands.empty())
-              actual_type = fargs.operands[0].type();
-            if(actual_type.is_nil())
-              break;
-            // Look up concept definition
-            for(const auto &entry : cpp_typecheck.symbol_table)
-            {
-              if(
-                id2string(entry.second.base_name) != id2string(cc) ||
-                !entry.second.type.get_bool(ID_is_template))
-                continue;
-              const cpp_declarationt &concept_decl =
-                to_cpp_declaration(entry.second.type);
-              if(concept_decl.declarators().empty())
-                break;
-              const exprt &cval = concept_decl.declarators()[0].value();
-              if(cval.is_nil())
-                break;
-              // Get concept parameter name
-              irep_idt cparam;
-              for(const auto &cp :
-                  concept_decl.template_type().template_parameters())
-              {
-                if(cp.id() == ID_type)
-                {
-                  const std::string cid =
-                    id2string(cp.type().get(ID_identifier));
-                  auto pos = cid.rfind("::");
-                  cparam = pos != std::string::npos
-                             ? irep_idt{cid.substr(pos + 2)}
-                             : irep_idt{cid};
-                  break;
-                }
-              }
-              if(cparam.empty())
-                break;
-              // Evaluate the concept definition with the actual type.
-              // Resolve a type from a cpp_name node.
-              auto resolve_type = [&](const irept &node) -> typet
-              {
-                if(node.id() == ID_cpp_name)
-                {
-                  for(const auto &s : node.get_sub())
-                    if(s.id() == ID_name && s.get(ID_identifier) == cparam)
-                      return actual_type;
-                }
-                return typet{};
-              };
-
-              // Evaluate an expression tree directly.
-              std::function<int(const irept &)> eval =
-                [&](const irept &node) -> int
-              {
-                // -1 = unknown, 0 = false, 1 = true
-                if(node.id() == ID_and)
-                {
-                  for(const auto &sub : node.get_sub())
-                  {
-                    int v = eval(sub);
-                    if(v == 0)
-                      return 0;
-                    if(v == -1)
-                      return -1;
-                  }
-                  return 1;
-                }
-                if(node.id() == ID_or)
-                {
-                  bool any_unknown = false;
-                  for(const auto &sub : node.get_sub())
-                  {
-                    int v = eval(sub);
-                    if(v == 1)
-                      return 1;
-                    if(v == -1)
-                      any_unknown = true;
-                  }
-                  return any_unknown ? -1 : 0;
-                }
-                if(node.id() == ID_not)
-                {
-                  if(node.get_sub().empty())
-                    return -1;
-                  int v = eval(node.get_sub()[0]);
-                  return v == -1 ? -1 : (v ? 0 : 1);
-                }
-                // sizeof(T) <= N
-                if(
-                  node.id() == ID_le || node.id() == ID_lt ||
-                  node.id() == ID_ge || node.id() == ID_gt)
-                {
-                  // Try to evaluate via typecheck+simplify
-                  exprt cmp = static_cast<const exprt &>(node);
-                  std::function<void(irept &)> subst_types = [&](irept &n)
-                  {
-                    if(n.id() == ID_cpp_name)
-                    {
-                      for(const auto &s : n.get_sub())
-                        if(s.id() == ID_name && s.get(ID_identifier) == cparam)
-                        {
-                          n = actual_type;
-                          return;
-                        }
-                    }
-                    for(auto &sub : n.get_sub())
-                      subst_types(sub);
-                    for(auto &named : n.get_named_sub())
-                      subst_types(named.second);
-                  };
-                  subst_types(cmp);
-                  try
-                  {
-                    cpp_typecheck.typecheck_expr(cmp);
-                    simplify(cmp, cpp_typecheck);
-                    if(cmp.is_true())
-                      return 1;
-                    if(cmp.is_false())
-                      return 0;
-                  }
-                  catch(...)
-                  {
-                  }
-                  return -1;
-                }
-                // Type trait: side_effect(function_call)
-                if(node.id() == ID_side_effect)
-                {
-                  const auto &subs = node.get_sub();
-                  if(subs.size() >= 2 && subs[0].id() == ID_cpp_name)
-                  {
-                    irep_idt fname;
-                    for(const auto &s : subs[0].get_sub())
-                      if(s.id() == ID_name)
-                        fname = s.get(ID_identifier);
-                    const auto &args = subs[1].get_sub();
-                    if(args.empty())
-                      return -1;
-                    typet arg_type = resolve_type(args[0]);
-                    if(arg_type.is_nil())
-                      return -1;
-                    if(fname == "__is_integral")
-                      return (arg_type.id() == ID_signedbv ||
-                              arg_type.id() == ID_unsignedbv ||
-                              arg_type.id() == ID_bool ||
-                              arg_type.id() == ID_c_bool)
-                               ? 1
-                               : 0;
-                    if(fname == "__is_floating_point")
-                      return (arg_type.id() == ID_floatbv ||
-                              arg_type.id() == ID_fixedbv)
-                               ? 1
-                               : 0;
-                    if(fname == "__is_pointer")
-                      return arg_type.id() == ID_pointer ? 1 : 0;
-                    if(fname == "__is_signed")
-                      return arg_type.id() == ID_signedbv ? 1 : 0;
-                    if(fname == "__is_same")
-                    {
-                      if(args.size() >= 2)
-                      {
-                        typet t2 = resolve_type(args[1]);
-                        if(!t2.is_nil())
-                          return arg_type == t2 ? 1 : 0;
-                      }
-                      return -1;
-                    }
-                  }
-                }
-                // compound requirement: check method return type
-                if(node.id() == irep_idt{"compound_requirement"})
-                {
-                  const irep_idt &method =
-                    static_cast<const exprt &>(node).get("#method");
-                  const auto &constraint = node.find("#constraint");
-                  if(method.empty() || constraint.is_nil())
-                    return -1;
-                  if(actual_type.id() != ID_struct_tag)
-                    return -1;
-                  const auto &struct_type = to_struct_type(
-                    cpp_typecheck.follow_tag(to_struct_tag_type(actual_type)));
-                  typet return_type(ID_nil);
-                  for(const auto &comp : struct_type.components())
-                  {
-                    if(
-                      comp.get_base_name() == method &&
-                      comp.type().id() == ID_code)
-                    {
-                      return_type = to_code_type(comp.type()).return_type();
-                      break;
-                    }
-                  }
-                  if(return_type.is_nil())
-                    return -1;
-                  // Extract expected type from constraint template args.
-                  // Structure: cpp_name(name, template_args(arguments=(...)))
-                  // The arguments named sub contains nodes with type subs.
-                  typet expected_type(ID_nil);
-                  for(const auto &sub : constraint.get_sub())
-                  {
-                    if(sub.id() == ID_template_args)
-                    {
-                      const auto &args = sub.find(ID_arguments);
-                      if(!args.is_nil())
-                      {
-                        for(const auto &arg : args.get_sub())
-                        {
-                          const auto &t = arg.find(ID_type);
-                          if(!t.is_nil())
-                          {
-                            expected_type = static_cast<const typet &>(t);
-                            break;
-                          }
-                        }
-                      }
-                      break;
-                    }
-                  }
-                  if(expected_type.is_nil())
-                    return -1;
-                  try
-                  {
-                    cpp_typecheck.typecheck_type(expected_type);
-                  }
-                  catch(...)
-                  {
-                    return -1;
-                  }
-                  return return_type == expected_type ? 1 : 0;
-                }
-                // typecast(true) — from requires-expression fallback
-                if(node.id() == ID_typecast)
-                {
-                  const auto &subs = node.get_sub();
-                  if(!subs.empty())
-                    return eval(subs[0]);
-                }
-                if(node.id() == ID_constant)
-                {
-                  const auto &val = static_cast<const exprt &>(node);
-                  if(val.is_true())
-                    return 1;
-                  if(val.is_false())
-                    return 0;
-                }
-                return -1;
-              };
-
-              int result = eval(cval);
-              if(result == 0)
-                concept_ok = false;
-              break;
-            }
-            break;
-          }
-        }
-      }
+      // N5008 [temp.param]/4: a type-constraint on a template parameter
+      // (`template<Integral T>') introduces the constraint-expression
+      // `Integral<T>' into the template's associated constraints; the
+      // typechecker conjoins it into the requires-clause
+      // (add_type_constraint), so the requires-clause evaluation below
+      // decides it.  A structural evaluator of the concept body over the
+      // first argument's type used to live here (a whole symbol-table scan
+      // per candidate); it understood only builtin traits and could not
+      // tell `Integral<double>' false -- `template<Integral T> g' and
+      // `template<Floating T> g' resolved to whichever was declared first.
 
       // [temp.deduct]/5 with [temp.constr.decl]/1: after deducing this
       // function-template specialization, its associated constraints (the
-      // requires-clause) must be satisfied by the deduced arguments;
-      // otherwise the candidate is removed.  The concept_ok check above
-      // only handles a concept written on a template *parameter*
-      // (#C_concept_constraint, e.g. template<integral T>); it does not
-      // cover a requires-clause (template<typename T> requires C<T>), which
-      // is stored on the template_type.  Without this, e.g. a constrained
+      // requires-clause, including the type-constraints folded into it) must
+      // be satisfied by the deduced arguments; otherwise the candidate is
+      // removed.  Without this, e.g. a constrained
       // templated constructor `C(T) requires integral<T>` would wrongly be
       // viable with T deduced as a class type, yielding a bogus by-value
       // `C(C)` whose argument materialisation re-invokes the same
@@ -1002,7 +777,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
       // __max_diff_type).
       bool requires_ok = true;
       if(
-        concept_ok && e.id() == ID_template_function_instance &&
+        e.id() == ID_template_function_instance &&
         e.type().find(ID_C_template_arguments).is_not_nil())
       {
         const symbolt *tsym =
@@ -1016,6 +791,36 @@ void cpp_typecheck_resolvet::guess_function_template_args(
           // ([dcl.decl.general]/4).
           exprt req_clause = static_cast<const exprt &>(
             tdecl.template_type().find(ID_C_requires_clause));
+          // N5008 [temp.param]/4 + [temp.constr.decl]/3: the type-constraints
+          // of the template parameters (`template<Integral T>' introduces
+          // `Integral<T>', recorded by add_type_constraint) are part of the
+          // associated constraints, conjoined with the requires-clause.
+          for(const auto &p : tdecl.template_type().template_parameters())
+          {
+            const irept &tc = p.find("#C_type_constraint");
+            if(tc.is_nil())
+              continue;
+            // A concept defined with a requires-expression may evaluate to
+            // false for want of modelling (concept_uses_requires_expression):
+            // only a trait-based concept's verdict removes a candidate.
+            const irep_idt cref =
+              concept_reference_name(static_cast<const exprt &>(tc));
+            if(
+              !cref.empty() && concept_uses_requires_expression(
+                                 cpp_typecheck.symbol_table, cref))
+            {
+              continue;
+            }
+            if(req_clause.is_nil() || req_clause.id() == ID_nil)
+              req_clause = static_cast<const exprt &>(tc);
+            else
+            {
+              exprt conj(ID_and);
+              conj.add_to_operands(
+                std::move(req_clause), exprt{static_cast<const exprt &>(tc)});
+              req_clause = std::move(conj);
+            }
+          }
           if(!tdecl.declarators().empty())
           {
             const exprt &trailing = static_cast<const exprt &>(
@@ -1423,7 +1228,7 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         }
       }
 
-      if(concept_ok && requires_ok)
+      if(requires_ok)
       {
         identifiers.push_back(e);
       }

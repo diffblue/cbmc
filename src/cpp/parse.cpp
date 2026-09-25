@@ -1970,23 +1970,32 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
           else
             break;
         }
-        // Skip template args if present
+        // N5008 [temp.param]/4: a type-constraint `C<A1, ..., An> T'
+        // introduces `C<T, A1, ..., An>'; keep the arguments
+        irept constraint_args(ID_nil);
         if(lex.LookAhead(0) == '<')
         {
-          cpp_tokent tmp;
-          lex.get_token(tmp);
-          int depth = 1;
-          while(depth > 0)
+          auto args_pos = lex.Save();
+          constraint_args = irept(ID_arguments);
+          if(!rTemplateArgs(constraint_args))
           {
-            int t = lex.get_token(tmp);
-            if(t == '<')
-              ++depth;
-            else if(t == '>')
-              --depth;
-            else if(t == TOK_SHIFTRIGHT && depth >= 2)
-              depth -= 2;
-            else if(t == 0)
-              break;
+            constraint_args = irept(ID_nil);
+            lex.Restore(args_pos);
+            cpp_tokent tmp;
+            lex.get_token(tmp);
+            int depth = 1;
+            while(depth > 0)
+            {
+              int t = lex.get_token(tmp);
+              if(t == '<')
+                ++depth;
+              else if(t == '>')
+                --depth;
+              else if(t == TOK_SHIFTRIGHT && depth >= 2)
+                depth -= 2;
+              else if(t == 0)
+                break;
+            }
           }
         }
         // Check if followed by identifier (parameter name)
@@ -2003,6 +2012,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
             while((p = sanitized.find("::")) != std::string::npos)
               sanitized.replace(p, 2, "__");
             declaration.set("#C_concept_constraint", sanitized);
+            // the concept's name as written, for the constraint-expression
+            // the type-constraint introduces ([temp.param]/4)
+            declaration.set("#C_concept_constraint_name", cname);
+            if(constraint_args.is_not_nil())
+              declaration.add("#C_concept_constraint_args") = constraint_args;
           }
           declaration.declarators().resize(1);
           auto &declarator = declaration.declarators().front();
@@ -2076,26 +2090,35 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       }
       else
       {
-        // Skip template arguments if present: Concept<Args...>
+        // N5008 [temp.param]/4: a type-constraint `C<A1, ..., An> T'
+        // introduces `C<T, A1, ..., An>'; keep the arguments
         bool skip_ok = true;
+        irept constraint_args(ID_nil);
         if(lex.LookAhead(0) == '<')
         {
-          cpp_tokent tmp_tk;
-          lex.get_token(tmp_tk); // consume <
-          int depth = 1;
-          while(depth > 0)
+          auto args_pos = lex.Save();
+          constraint_args = irept(ID_arguments);
+          if(!rTemplateArgs(constraint_args))
           {
-            int t = lex.get_token(tmp_tk);
-            if(t == '<')
-              ++depth;
-            else if(t == '>')
-              --depth;
-            else if(t == TOK_SHIFTRIGHT && depth >= 2)
-              depth -= 2;
-            else if(t == 0)
+            constraint_args = irept(ID_nil);
+            lex.Restore(args_pos);
+            cpp_tokent tmp_tk;
+            lex.get_token(tmp_tk); // consume <
+            int depth = 1;
+            while(depth > 0)
             {
-              skip_ok = false;
-              break;
+              int t = lex.get_token(tmp_tk);
+              if(t == '<')
+                ++depth;
+              else if(t == '>')
+                --depth;
+              else if(t == TOK_SHIFTRIGHT && depth >= 2)
+                depth -= 2;
+              else if(t == 0)
+              {
+                skip_ok = false;
+                break;
+              }
             }
           }
           if(!skip_ok)
@@ -2114,6 +2137,10 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
           // Store the concept constraint name for subsumption ordering
           declaration.set(
             "#C_concept_constraint", concept_tk.data.get(ID_C_base_name));
+          declaration.set(
+            "#C_concept_constraint_name", concept_tk.data.get(ID_C_base_name));
+          if(constraint_args.is_not_nil())
+            declaration.add("#C_concept_constraint_args") = constraint_args;
 
           declaration.declarators().resize(1);
           cpp_declaratort &declarator = declaration.declarators().front();

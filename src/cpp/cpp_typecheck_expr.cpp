@@ -798,9 +798,12 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       {
         for(const auto &b : t.bases())
         {
-          if(b.type().id() != ID_struct_tag)
+          // baset::type() asserts a struct_tag; a base of a class template
+          // member not yet elaborated may still be a dependent name
+          const typet &base_type = static_cast<const typet &>(b.find(ID_type));
+          if(base_type.id() != ID_struct_tag)
             continue;
-          const irep_idt bid = to_struct_tag_type(b.type()).get_identifier();
+          const irep_idt bid = to_struct_tag_type(base_type).get_identifier();
           if(!all_bases.insert(bid).second)
             continue;
           const symbolt *bs = symbol_table.lookup(bid);

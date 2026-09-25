@@ -843,6 +843,11 @@ protected:
   void typecheck_type(typet &) override;
 
   bool is_concept_name(const cpp_namet &name);
+  void add_type_constraint(
+    exprt &parameter,
+    const irep_idt &concept_name,
+    const cpp_namet &parameter_name,
+    const irept &constraint_args);
 
   cpp_scopet &typecheck_template_parameters(
     template_typet &type);
