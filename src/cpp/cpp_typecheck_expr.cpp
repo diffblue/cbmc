@@ -2128,7 +2128,7 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
 {
   PRECONDITION(expr.operands().size() == 3);
 
-  implicit_typecast(expr.op0(), bool_typet());
+  implicit_typecast_bool(expr.op0()); // [conv.general]/4, [expr.cond]/1
 
   if(expr.op1().type().id() == ID_empty || expr.op1().type().id() == ID_empty)
   {
@@ -6272,6 +6272,64 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       typecheck_expr_explicit_constructor_call(ctor_call);
       expr.swap(ctor_call);
       return;
+    }
+  }
+
+  // N5008 [expr.type.conv]/2 + [over.match.copy]/1.2: the functional cast
+  // `T(x)' -- T a class type, x of ANOTHER class type -- is a
+  // direct-initialization in which an EXPLICIT conversion function of x's
+  // class yielding T is a candidate for the temporary bound to the
+  // copy/move constructor's `T&' parameter (libstdc++ 16's
+  // `const_iterator(__loc)' with `explicit operator const_iterator()' and
+  // `explicit operator iterator()' on _Hashtable::__location_type).
+  // Implicit conversion sequences never use explicit conversion functions
+  // ([class.conv.fct]/2), so constructor resolution below either finds no
+  // candidate or -- taking every conversion function as implicit -- an
+  // ambiguity between the copy constructor and `const_iterator(const
+  // iterator&)'.  Convert x with that function; the copy/move is elided
+  // ([class.copy.elision]/1).
+  if(
+    expr.function().id() == ID_cpp_name && expr.arguments().size() == 1 &&
+    expr.arguments().front().type().is_not_nil())
+  {
+    const exprt &arg = expr.arguments().front();
+    typet arg_type = arg.type();
+    if(is_reference(arg_type) || is_rvalue_reference(arg_type))
+      arg_type = to_pointer_type(arg_type).base_type();
+    if(arg_type.id() == ID_struct_tag)
+    {
+      // does the name denote a class type?  (a function template such as
+      // `std::forward<Args>' is not one; its failure to resolve as a type
+      // is no error here)
+      cpp_typecheck_fargst no_fargs;
+      exprt type_expr = nil_exprt{};
+      {
+        // a probe: no diagnostics ([temp.deduct]/8-style soft failure)
+        sfinae_contextt probe{*this};
+        try
+        {
+          type_expr = resolve(
+            to_cpp_name(expr.function()),
+            cpp_typecheck_resolvet::wantt::TYPE,
+            no_fargs,
+            false);
+        }
+        catch(...)
+        {
+          type_expr = nil_exprt{};
+        }
+      }
+      exprt converted;
+      if(
+        type_expr.id() == ID_type && type_expr.type().id() == ID_struct_tag &&
+        to_struct_tag_type(type_expr.type()).get_identifier() !=
+          to_struct_tag_type(arg_type).get_identifier() &&
+        explicit_conversion_function_to(arg, type_expr.type(), converted))
+      {
+        converted.add_source_location() = expr.source_location();
+        expr.swap(converted);
+        return;
+      }
     }
   }
 

@@ -1315,6 +1315,11 @@ public:
   bool implicit_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr);
 
+  bool explicit_conversion_function_to(
+    const exprt &expr,
+    const typet &to,
+    exprt &new_expr);
+
   bool brace_init_to_array_reference(
     const exprt &init_list,
     const pointer_typet &reference_type,
@@ -1366,6 +1371,49 @@ public:
   void reference_initializer(exprt &expr, const reference_typet &type);
 
   void implicit_typecast(exprt &expr, const typet &type) override;
+
+  /// N5008 [conv.general]/4: the contextual conversion to bool (the
+  /// condition of if/while/for, the operand of !, &&, ||, ?:, static_assert,
+  /// noexcept) is the direct-initialization `bool t(e)', for which an
+  /// EXPLICIT `operator bool()' is a candidate ([class.conv.fct]/2).  All
+  /// callers of implicit_typecast_bool are such contexts.
+  void implicit_typecast_bool(exprt &expr) override
+  {
+    ++contextual_bool_conversion;
+    try
+    {
+      implicit_typecast(expr, bool_typet());
+    }
+    catch(...)
+    {
+      --contextual_bool_conversion;
+      throw;
+    }
+    --contextual_bool_conversion;
+  }
+  unsigned contextual_bool_conversion = 0;
+
+  /// N5008 [over.match.conv]/1: non-zero while converting the single
+  /// initializer of a DIRECT-initialization of a non-class object (`T t(e)',
+  /// `T(e)', `static_cast<T>(e)'), where explicit conversion functions are
+  /// candidates too.  RAII guard: direct_initialization_contextt.
+  unsigned direct_initialization = 0;
+  class direct_initialization_contextt
+  {
+  public:
+    explicit direct_initialization_contextt(cpp_typecheckt &_cpp_typecheck)
+      : cpp_typecheck(_cpp_typecheck)
+    {
+      ++cpp_typecheck.direct_initialization;
+    }
+    ~direct_initialization_contextt()
+    {
+      --cpp_typecheck.direct_initialization;
+    }
+
+  private:
+    cpp_typecheckt &cpp_typecheck;
+  };
 
   void implicit_typecast_arithmetic(exprt &expr1, exprt &expr2) override;
 

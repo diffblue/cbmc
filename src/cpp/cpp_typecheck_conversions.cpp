@@ -841,7 +841,13 @@ bool cpp_typecheckt::standard_conversion_sequence(
       else
         return false;
 
-      rank += 3;
+      // C++'s `bool' (c_bool) and the front end's internal boolean type
+      // are the same language type: an identity conversion.  Anything else
+      // is a boolean conversion ([conv.bool], Conversion rank), so that
+      // `explicit operator bool()' beats `explicit operator int()' for a
+      // contextual conversion to bool ([over.match.best]).
+      if(curr_expr.type().id() != ID_c_bool)
+        rank += 3;
     }
     else
       return false;
@@ -2696,7 +2702,16 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   // conversion operators
   if(from.id() == ID_struct_tag)
   {
+    // N5008 [over.match.conv]/1 + [over.match.best]: of several viable
+    // conversion functions the one whose second standard conversion
+    // sequence is better wins (`operator int()' is an exact match for a
+    // target of int, `operator bool()' needs an integral conversion); only
+    // a tie is ambiguous.  `found' is the best candidate so far, with its
+    // rank; `ambiguous' a tie at that rank.
     bool found = false;
+    bool ambiguous = false;
+    unsigned found_rank = 0;
+    exprt found_expr;
     for(const auto &component :
         follow_tag(to_struct_tag_type(from)).components())
     {
@@ -2716,6 +2731,28 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
       if(!component.get_bool(ID_is_cast_operator))
         continue;
+
+      // N5008 [class.conv.fct]/2: an EXPLICIT conversion function is only
+      // considered for direct-initialization ([over.match.copy]/1.2,
+      // [over.match.conv]/1, [over.match.ref]/1 with explicit casts); this
+      // is the implicit conversion sequence, so it is not a candidate here.
+      // (`explicit operator iterator()' and `explicit operator
+      // const_iterator()' on libstdc++ 16's _Hashtable::__location_type
+      // otherwise made BOTH const_iterator constructors viable for
+      // `const_iterator(__loc)' -- "does not uniquely resolve".)
+      // [conv.general]/4: a contextual conversion to bool is the
+      // direct-initialization `bool t(e)', so `explicit operator bool()' is
+      // a candidate there (implicit_typecast_bool sets the counter);
+      // likewise any explicit conversion function in a direct-initialization
+      // of a non-class object ([over.match.conv]/1, `static_cast<T>(e)',
+      // `T t(e)').
+      if(
+        component.get_bool(ID_is_explicit) && direct_initialization == 0 &&
+        !(contextual_bool_conversion > 0 &&
+          (to.id() == ID_bool || to.id() == ID_c_bool)))
+      {
+        continue;
+      }
 
       // Skip cast operators that originated from a template
       // specialisation: per [over.match.conv] the candidate set
@@ -2774,13 +2811,15 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
         if(standard_conversion_sequence(func_expr, to, tmp_expr, tmp_rank))
         {
-          // check if it's ambiguous
-          if(found)
-            return false;
-          found = true;
-
-          rank += tmp_rank;
-          new_expr.swap(tmp_expr);
+          if(!found || tmp_rank < found_rank)
+          {
+            found = true;
+            ambiguous = false;
+            found_rank = tmp_rank;
+            found_expr.swap(tmp_expr);
+          }
+          else if(tmp_rank == found_rank)
+            ambiguous = true;
         }
         else if(
           to.id() == ID_struct_tag && func_expr.type().id() == ID_struct_tag)
@@ -2805,21 +2844,31 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             dereference_exprt base_deref{casted_ptr};
             base_deref.add_source_location() = expr.source_location();
 
-            if(found)
-              return false;
-            found = true;
-
             // [over.ics.scs], [conv.qual]: a derived-to-base conversion is a
             // Conversion-rank standard conversion (worse than the exact match
             // a same-type operator yields).
-            rank += d2b_rank + 4;
-            new_expr.swap(base_deref);
+            const unsigned this_rank = d2b_rank + 4;
+            if(!found || this_rank < found_rank)
+            {
+              found = true;
+              ambiguous = false;
+              found_rank = this_rank;
+              found_expr.swap(base_deref);
+            }
+            else if(this_rank == found_rank)
+              ambiguous = true;
           }
         }
       }
     }
+    if(found && ambiguous)
+      return false;
     if(found)
+    {
+      rank += found_rank;
+      new_expr.swap(found_expr);
       return true;
+    }
 
     // No non-template cast operator matched.  If the source class
     // has template conversion operators, try [temp.deduct.conv]/1
@@ -4972,6 +5021,63 @@ bool cpp_typecheckt::reinterpret_typecast(
   return false;
 }
 
+/// N5008 [over.match.copy]/1.2 for direct-initialization: an EXPLICIT
+/// conversion function of \p expr's class whose return type is the class
+/// \p to (or a reference to it).  Sets \p new_expr to the call and returns
+/// true when exactly one such function exists (non-explicit ones are the
+/// implicit path's business).
+bool cpp_typecheckt::explicit_conversion_function_to(
+  const exprt &expr,
+  const typet &to,
+  exprt &new_expr)
+{
+  elaborate_class_template(expr.type());
+  const struct_typet &from_struct = follow_tag(to_struct_tag_type(expr.type()));
+  const irep_idt &to_id = to_struct_tag_type(to).get_identifier();
+  const struct_typet::componentt *found = nullptr;
+  for(const auto &component : from_struct.components())
+  {
+    if(
+      !component.get_bool(ID_is_cast_operator) ||
+      !component.get_bool(ID_is_explicit) || component.type().id() != ID_code)
+    {
+      continue;
+    }
+    typet return_type = to_code_type(component.type()).return_type();
+    if(is_reference(return_type) || is_rvalue_reference(return_type))
+      return_type = to_pointer_type(return_type).base_type();
+    if(
+      return_type.id() != ID_struct_tag ||
+      to_struct_tag_type(return_type).get_identifier() != to_id)
+    {
+      continue;
+    }
+    if(found != nullptr)
+      return false; // ambiguous: leave the diagnosis to the general path
+    found = &component;
+  }
+  if(found == nullptr)
+    return false;
+  // the object parameter must accept the expression (cv-qualification)
+  typet this_type = to_code_type(found->type()).parameters().front().type();
+  this_type.set(ID_C_reference, true);
+  this_type.set(ID_C_this, true);
+  exprt this_expr;
+  unsigned rank = 0;
+  if(!implicit_conversion_sequence(expr, this_type, this_expr, rank))
+    return false;
+  const cpp_namet cpp_func_name(found->get_base_name());
+  exprt member_func(ID_member);
+  member_func.add(ID_component_cpp_name) = cpp_func_name;
+  member_func.copy_to_operands(already_typechecked_exprt{expr});
+  side_effect_expr_function_callt func_expr(
+    std::move(member_func), {}, uninitialized_typet{}, expr.source_location());
+  typecheck_side_effect_function_call(func_expr);
+  new_expr = std::move(func_expr);
+  add_implicit_dereference(new_expr);
+  return true;
+}
+
 bool cpp_typecheckt::static_typecast(
   const exprt &expr, // source expression
   const typet &type, // destination type
@@ -5133,6 +5239,27 @@ bool cpp_typecheckt::static_typecast(
     new_expr.remove(ID_C_lvalue);
     return true;
   }
+
+  // N5008 [over.match.copy]/1.2: in the direct-initialization `T(e)' /
+  // `static_cast<T>(e)' ([expr.static.cast]/4: `T t(e);'), a conversion
+  // function of e's class yielding T is a candidate for the temporary bound
+  // to the copy/move constructor's `T&' parameter EVEN IF EXPLICIT.  Such a
+  // function converts e to T directly (the copy/move is elided,
+  // [class.copy.elision]).  Try it first: the implicit path below skips
+  // explicit conversion functions ([class.conv.fct]/2).
+  if(
+    type.id() == ID_struct_tag && e.type().id() == ID_struct_tag &&
+    explicit_conversion_function_to(e, type, new_expr))
+  {
+    return true;
+  }
+
+  // [over.match.conv]/1: `static_cast<T>(e)' / `T(e)' with T a non-class
+  // type is a direct-initialization, where explicit conversion functions of
+  // e's class are candidates
+  std::optional<direct_initialization_contextt> direct_init;
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    direct_init.emplace(*this);
 
   if(implicit_conversion_sequence(e, type, new_expr))
   {
