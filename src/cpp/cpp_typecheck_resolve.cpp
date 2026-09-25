@@ -8966,7 +8966,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       }
     }
   }
-}
+} // NOLINT(readability/fn_size)
 
 /// Recover a function parameter's full (merged) type.
 ///
@@ -9422,7 +9422,18 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   exprt::operandst::const_iterator it = fargs.operands.begin();
 
   // Skip the implicit 'this' object argument for member functions.
-  if(fargs.has_object && it != fargs.operands.end())
+  // N5008 [dcl.fct]/6, [over.match.funcs]/3, [temp.deduct.call]/1: an
+  // EXPLICIT object parameter (`this Self &&self', C++23) is an ordinary
+  // function parameter deduced from the object argument -- Self is the type
+  // of the object expression (a forwarding reference: `A &' for an lvalue
+  // A).  It was skipped together with the object argument, so Self was never
+  // deduced and `a.get()' had no viable candidate ("found no match for
+  // symbol 'get'"; libstdc++ 16's std::_Bind::operator()).
+  const bool explicit_object_parameter =
+    !parameters.empty() && parameters.front().get_bool("explicit_this");
+  if(
+    fargs.has_object && it != fargs.operands.end() &&
+    !explicit_object_parameter)
     ++it;
 
   // Track pack expansion size for non-empty packs
@@ -10940,7 +10951,11 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     // wrongly reject the candidate as not-convertible.
     const bool has_this = !params.empty() && params.front().get_this();
     std::size_t start = has_this ? 1 : 0;
-    if(fargs.has_object && arg_it != fargs.operands.end())
+    // an EXPLICIT object parameter ([dcl.fct]/6, `this Self &&self') is an
+    // ordinary parameter paired with the object argument: keep both
+    const bool explicit_object =
+      !has_this && function_type.get_bool("explicit_this");
+    if(fargs.has_object && !explicit_object && arg_it != fargs.operands.end())
       ++arg_it;
     for(std::size_t i = start;
         i < params.size() && arg_it != fargs.operands.end();
@@ -11061,7 +11076,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   return template_function_instance;
-}
+} // NOLINT(readability/fn_size)
 
 void cpp_typecheck_resolvet::apply_template_args(
   exprt &expr,
@@ -11415,7 +11430,13 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
     // If the function type already has a 'this' parameter (e.g., an
     // instantiated member function template), match directly — fargs
     // already includes the object and the type already includes 'this'.
-    if(!type.parameters().empty() && type.parameters().front().get_this())
+    // N5008 [dcl.fct]/6, [over.match.funcs]/3: an EXPLICIT object
+    // parameter (`this Self &&self') is likewise paired with the object
+    // argument -- it IS the first parameter, so match with the object in
+    // place (removing it left `Self &&' unmatched: no viable get()).
+    if(
+      !type.parameters().empty() &&
+      (type.parameters().front().get_this() || type.get_bool("explicit_this")))
     {
       return fargs.match(type, args_distance, cpp_typecheck, cv_distance);
     }
