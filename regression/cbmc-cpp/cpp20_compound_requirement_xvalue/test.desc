@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ overloads by value category: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static assertion failed
+static_assert condition could not be evaluated
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.prim.req.compound]/1 + [dcl.type.decltype]/1.4-1.6: the type
+tested by a return-type-requirement is decltype((E)).  Non-vacuous: the last
+assertion is deliberately wrong and must FAIL.  Before the fix: "static
+assertion failed: xvalue call: int&&" and the overload test FAILURE.
