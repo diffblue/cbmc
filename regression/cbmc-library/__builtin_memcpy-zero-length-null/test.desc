@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check --bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+A zero-length __builtin_memcpy/__builtin_memmove with a null source or
+destination is accepted (GCC/Clang builtin behaviour, C2y N3322).  Before the
+fix: "memcpy source region readable: FAILURE".
