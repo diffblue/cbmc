@@ -73,47 +73,57 @@ void smt2_solvert::define_constants()
 
 void smt2_solvert::expand_function_applications(exprt &expr)
 {
-  for(exprt &op : expr.operands())
-    expand_function_applications(op);
-
-  if(expr.id()==ID_function_application)
-  {
-    auto &app=to_function_application_expr(expr);
-
-    if(app.function().id() == ID_symbol)
+  // Replace every function application that has a definition by its
+  // (instantiated) body, bottom-up. exprt::visit_post applies the visitor to
+  // each sub-expression after its operands using an explicit stack rather than
+  // recursion, so this does not overflow the call stack on the deeply-nested
+  // expressions the parser can produce (e.g. chains of thousands of bvand /
+  // store operations in SMT-COMP QF_ABV benchmarks).
+  expr.visit_post(
+    [this](exprt &e)
     {
+      if(e.id() != ID_function_application)
+        return;
+
+      auto &app = to_function_application_expr(e);
+
+      if(app.function().id() != ID_symbol)
+        return;
+
       // look up the symbol
       auto identifier = to_symbol_expr(app.function()).identifier();
       auto f_it = id_map.find(identifier);
 
-      if(f_it != id_map.end())
-      {
-        const auto &f = f_it->second;
+      if(f_it == id_map.end())
+        return;
 
-        DATA_INVARIANT(
-          f.type.id() == ID_mathematical_function,
-          "type of function symbol must be mathematical_function_type");
+      const auto &f = f_it->second;
 
-        const auto &domain = to_mathematical_function_type(f.type).domain();
+      DATA_INVARIANT(
+        f.type.id() == ID_mathematical_function,
+        "type of function symbol must be mathematical_function_type");
 
-        DATA_INVARIANT(
-          domain.size() == app.arguments().size(),
-          "number of parameters must match number of arguments");
+      const auto &domain = to_mathematical_function_type(f.type).domain();
 
-        // Does it have a definition? It's otherwise uninterpreted.
-        if(!f.definition.is_nil())
-        {
-          exprt body = f.definition;
+      DATA_INVARIANT(
+        domain.size() == app.arguments().size(),
+        "number of parameters must match number of arguments");
 
-          if(body.id() == ID_lambda)
-            body = to_lambda_expr(body).application(app.arguments());
+      // Does it have a definition? It's otherwise uninterpreted.
+      if(f.definition.is_nil())
+        return;
 
-          expand_function_applications(body); // rec. call
-          expr = body;
-        }
-      }
-    }
-  }
+      exprt body = f.definition;
+
+      if(body.id() == ID_lambda)
+        body = to_lambda_expr(body).application(app.arguments());
+
+      // The freshly inlined body may itself contain function applications. It
+      // was not part of this traversal, so expand it here. Bodies are typically
+      // shallow -- this is the pre-existing behaviour.
+      expand_function_applications(body);
+      e = body;
+    });
 }
 
 void smt2_solvert::setup_commands()
