@@ -411,6 +411,11 @@ public:
     // number of bits to encode heap object addresses
     std::size_t object_bits = 8;
     bool is_object_bits_default = true;
+
+    /// When true, malloc may return the same address after free.
+    /// This prevents the simplifier from concluding that two
+    /// different dynamic objects have different addresses.
+    bool malloc_may_alias = false;
   } bv_encoding;
 
   // this is the function to start executing

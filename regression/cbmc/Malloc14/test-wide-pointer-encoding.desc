@@ -1,0 +1,13 @@
+CORE no-new-smt broken-smt-backend paths-lifo-expected-failure wide-pointer-encoding
+main.c
+--wide-pointer-encoding
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* same memory allocated twice: FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Wide pointer encoding: two mallocs can return the same address
+(address reuse after free). The assertion that they differ is
+unsound.

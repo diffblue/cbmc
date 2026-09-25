@@ -34,6 +34,13 @@ test-new-smt-backend:
 					  -X no-new-smt \
 					  -s new-smt-backend $(GCC_ONLY)
 
+test-wide-pointer-encoding:
+	@../test.pl -e -p -c "../../../src/cbmc/cbmc --wide-pointer-encoding" \
+					  -X smt-backend -X no-wide-pointer-encoding \
+					  -X thorough-paths -X thorough-smt-backend \
+					  -X thorough-cprover-smt-backend -X thorough-z3-smt-backend \
+					  -s wide-pointer-encoding $(GCC_ONLY)
+
 tests.log: ../test.pl test
 
 clean:
