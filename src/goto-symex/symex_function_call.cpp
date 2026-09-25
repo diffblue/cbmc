@@ -242,8 +242,32 @@ void goto_symext::symex_function_call_post_clean(
 {
   const irep_idt &identifier = function.identifier();
 
-  const goto_functionst::goto_functiont &goto_function =
-    get_goto_function(identifier);
+  const goto_functionst::goto_functiont *goto_function_ptr = nullptr;
+  try
+  {
+    goto_function_ptr = &get_goto_function(identifier);
+  }
+  catch(const std::out_of_range &)
+  {
+    // Function not in goto function map — treat it as a no-body function:
+    // havoc the return value and continue past the call.  This mirrors the
+    // handling of declared-but-undefined functions below.  Crucially, the
+    // program counter must be advanced (symex_transition): otherwise symex
+    // re-processes this very FUNCTION_CALL instruction indefinitely, never
+    // entering the (missing) callee and never returning to the caller, which
+    // manifests as non-termination (livelock) re-cleaning the call's
+    // arguments forever.
+    if(cleaned_lhs.is_not_nil())
+    {
+      const auto rhs = side_effect_expr_nondett(
+        cleaned_lhs.type(), state.source.pc->source_location());
+      symex_assign(state, cleaned_lhs, rhs);
+    }
+
+    symex_transition(state);
+    return;
+  }
+  const goto_functionst::goto_functiont &goto_function = *goto_function_ptr;
 
   path_storage.dirty.populate_dirty_for_function(identifier, goto_function);
 
@@ -294,8 +318,12 @@ void goto_symext::symex_function_call_post_clean(
 
   if(!goto_function.body_available())
   {
-    // create a fatal assertion
-    if(symex_config.unwinding_assertions)
+    // Create a fatal assertion.  With no_body_assertions this is
+    // emitted regardless of the unwinding-assertions setting: a
+    // bodyless call is otherwise modelled as "assign nondet to the lhs
+    // and change nothing else", which proves vacuously that state
+    // reachable through the callee is unchanged.
+    if(symex_config.unwinding_assertions || symex_config.no_body_assertions)
     {
       const auto &symbol = ns.lookup(identifier);
       const std::string property_id =

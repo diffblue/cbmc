@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ to_string size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ to_string digits: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+inconsistent return
+--
+FLIPPED KNOWNBUG->CORE 2026-08-12.  Two fixes: (1) [temp.inst]/11 --
+still-deferred, never odr-used members carry RAW parse trees; their
+values are now cleared before goto conversion instead of leaking
+un-type-checked bodies.  (2) type2name threw std::string on
+`constructor`/`destructor` return types (C++ struct components include
+member functions); the C++ front-end's recoveries only catch int, so
+the exception escaped mid-body and left half-type-checked bodies
+behind (the _Sp_counted_ptr_inplace::_M_get_deleter shape).  Now maps
+them to stable CTOR/DTOR spellings ([class.ctor], [class.dtor]: no
+return type -- any deterministic token).  The disallowed pattern pins
+zero demotions.

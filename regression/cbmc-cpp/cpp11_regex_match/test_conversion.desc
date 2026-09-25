@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11 --show-symbol-table
+^Symbol\.+: std::__detail::_Compiler<std::__cxx11::tag-regex_traits<char>>::_M_disjunction\(this\)::\$tmp::return_value__M_insert_alt$
+^Symbol\.+: std::__detail::__regex_algo_impl<ptr_const_char,.*>\(.*\)::\$tmp::return_value__M_sub_count$
+^Symbol\.+: std::__detail::_Executor<ptr_const_char,.*,0>::_M_main\(this,.*\)::\$tmp
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+could not fully type-check
+--
+Conversion-level gate for regex_match: the bodies of the _Compiler
+parser, of __regex_algo_impl (formerly dropped: "bad reference
+initializer" binding match_results' private vector base in a QUALIFIED
+friend, [namespace.memdef]/3) and of the _Executor (formerly never
+instantiated: iterator_traits<const char*>::value_type deduced as
+`const char` through the `_Tp*` partial specialisation,
+[temp.spec.partial.order]) must all be present.

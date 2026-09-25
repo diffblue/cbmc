@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp14
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+C++14 standard library headers type-check and verify successfully.

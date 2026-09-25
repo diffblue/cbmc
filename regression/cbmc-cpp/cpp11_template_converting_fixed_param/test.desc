@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ converting fixed param, template viable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [over.match.funcs]/[over.ics.user]: a function template with a fixed
+class-type parameter S is viable when the argument is convertible to S via a
+user-defined conversion (const char* -> S).  CBMC's post-deduction compatibility
+check dropped the candidate whenever the argument was not itself a class type;
+fixed to reject only when no implicit conversion sequence exists.  This is the
+util/invariant.h report_invariant_failure(const std::string&,...) shape.
+assertion.2 provides non-vacuity.

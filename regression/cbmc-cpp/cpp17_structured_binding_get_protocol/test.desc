@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ structured binding 0 uses get<0>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ structured binding 1 uses get<1>: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[dcl.struct.bind]/4: when std::tuple_size<E> is a complete type with a member
+`value`, a structured binding binds each name to get<i>(e) (typed
+std::tuple_element<i, E>::type), not to the i-th data member.  CBMC now detects
+std::tuple_size<E> and decomposes via get<i>(e); types without a tuple_size
+specialization keep the data-member decomposition.  (std::tuple itself is not
+yet detected -- its variadic tuple_size partial specialization does not resolve
+in the probe -- but std::pair and other tuple-like types with a resolvable
+tuple_size now decompose correctly.)
+

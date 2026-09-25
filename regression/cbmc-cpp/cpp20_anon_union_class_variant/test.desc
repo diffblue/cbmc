@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ variant member accessible: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Anonymous union with a class-type variant member (with a base):
+the class builds, the variant member is visible and assignable
+([class.union.anon]/1 -- POD-ness not required).

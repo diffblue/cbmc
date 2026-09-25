@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ deduction guide preserves array reference: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.deduct.call]/2-3: no decay against a reference parameter;
+for a forwarding reference an lvalue argument deduces `lvalue reference
+to A` -- here R = int(&)[3], preserved by the guide's alias.

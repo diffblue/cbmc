@@ -1,0 +1,16 @@
+KNOWNBUG
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 8 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Unit proof for escape over all printable strings up to length 3
+(length arithmetic; unescape round-trip).  KNOWNBUG: the propositional
+reduction runs out of memory (16 GiB) -- escape's incremental
+`result += c` performs data-dependent heap reallocation, and dynamic
+objects with symbolic size explode in bit-blasting (same class as
+bigint_arith; see the stage-profiling findings).  Flip to CORE when
+the encoding scales (SMT array backend or capacity-bounded string
+model).

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced default member initializer initializes class member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+found no match for symbol
+--
+N5008 [class.base.init]/9-10, [dcl.init.list]: a braced default member
+initializer of a class-typed non-static data member (`pair stored{-1, 7}`)
+initializes the member via its constructor.  CBMC previously also synthesised a
+default-construction member-initializer for such a member, failing for a class
+with no default constructor ("found no match for symbol 'pair'").

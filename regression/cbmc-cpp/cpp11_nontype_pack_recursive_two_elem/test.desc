@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.class.spec.match] + [temp.variadic].  A recursive class template over
+a NON-type parameter pack, selected via its `<H, T...>` partial specialization,
+folds at 0/1/2/3/4 elements.  Previously failed at exactly two elements: the
+nested `sum_t<3>` (empty deduced trailing pack) re-type-checked its pattern
+`<H, T...>` with the non-type `T...` still present and threw, falling back to the
+incomplete primary.  Fixed by trimming the empty deduced trailing pack before the
+pattern re-type-check.  Non-vacuous: the two-element assertion is the former
+failure point.
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: (no diagnostic before the drop)

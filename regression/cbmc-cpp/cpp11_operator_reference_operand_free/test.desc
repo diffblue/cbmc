@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ free template operator<< selected via reference operand and ADL: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+N5008 [over.match.oper]/3.3 (non-member candidate set ignores member functions)
++ [basic.lookup.argdep]/2 (a reference argument's associated types are those of
+the referenced type).  A free function-template operator<<(basic_ostream<C>&,
+const char*) hidden from ordinary lookup by an enclosing member operator<< must
+still be found via ADL on the reference-typed left operand and deduced/selected.
+The `const char *` half of the dog-food src/util (parse_options.cpp,
+typecheck.cpp) shl noise.  assertion.2 ("WRONG") must FAIL (non-vacuity).

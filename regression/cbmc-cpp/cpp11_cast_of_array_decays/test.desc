@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+UNKNOWN
+--
+N5008 [expr.reinterpret.cast]/1, [expr.const.cast]/1: casts of an array
+operand apply the array-to-pointer conversion; the libstdc++ node storage
+idiom (`reinterpret_cast<T *>(storage)') depends on it.
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

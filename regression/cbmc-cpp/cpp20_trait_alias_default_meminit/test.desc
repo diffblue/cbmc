@@ -1,0 +1,15 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ member typedef mem-init survives: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Resolution 2026-07-30: same mode-availability finding as
+cpp20_extern_template_copy_ctor_abort -- the clang builtin
+(__add_rvalue_reference) only lexes in CLANG mode; run with --stdlib
+libc++ the member-typedef mem-initializer converts and the program
+verifies.  The GCC-mode failure was an artifact of the reduction
+harness's flags, not the libc++ bug being chased.

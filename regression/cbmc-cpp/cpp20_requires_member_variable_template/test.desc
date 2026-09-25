@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ requires over variable template: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.constr.atomic]/1: a constructor template constrained by a
+requires-clause naming a MEMBER variable template whose default
+argument refers to the ENCLOSING class template's parameter
+(`template <typename, typename = _Tp> static constexpr bool ok`).
+Evaluating the atom must install the declaration's parameter mapping;
+without it the atom's typecheck threw and the candidate was silently
+removed (gcc-16 <optional>'s converting constructor,
+__not_constructing_bool_from_optional).  Runtime-verified g++ 13 /
+clang++ 18.

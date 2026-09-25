@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ unsatisfied constraint, not an error: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-28: the reference-type functional-cast fix
+([expr.type.conv]/1 pod-constructor synthesis for reference types)
+removes the failure inside the concept-machinery instantiation that
+previously poisoned the second resolution pass; the unconstrained
+overload wins and the program verifies non-vacuously.

@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ rethrown exception value preserved: SUCCESS$
+^\[main\.assertion\.2\] line \d+ outer handler reached after rethrow: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[except.throw]/8: `throw;` re-propagates the exception being handled to the next
+enclosing handler, preserving the exception object.  Non-vacuous.

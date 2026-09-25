@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+C++17 std::apply(add, make_tuple(1, 2)) over real libstdc++ <tuple>.  Now CORE.
+Greened by a chain of C++ front-end fixes for the machinery std::apply relies
+on: non-type parameter pack call arguments (explicit + deduced), auto /
+decltype(auto) return-type deduction over a pack call and nested decltype(auto)
+chains, parameter-pack deduction through (qualified) alias templates, the GCC
+__integer_pack builtin behind std::make_index_sequence (direct + cast forms),
+std::tuple_size_v (variable-template partial-specialization pack), a value in
+type position as a template-arg kind mismatch (the by-index vs by-type std::get
+overloads), and decltype(auto) return deduction with a body-local `using` alias
+(std::apply's `using _Indices = ...`).  See .kiro/decltype_tuple_apply_findings.md.

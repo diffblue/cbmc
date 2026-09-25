@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\*\* 0 of \d+ failed
+--
+^CONVERSION ERROR$
+^warning: ignoring
+--
+[temp.deduct.conv]/1: deducing template arguments for a
+conversion-function template by matching the template's return
+type (P) against the destination conversion-type-id (A).
+
+Phase 4B-2 of the target-type-threading refactor (commit
+introducing `deduce_conversion_template` in
+`cpp_typecheck_conversions.cpp`) implements this for the
+single-template-parameter form `template<class T> operator T()`.
+
+The class `any_t` has a `template <class T> operator T() const`
+template conversion operator.  Per [temp.deduct.conv]/1, T is
+deduced from the destination type at the point of conversion:
+
+  int  as_int  = a;  // deduces T = int
+  long as_long = a;  // deduces T = long
+
+Both `__CPROVER_assert(as_*  == 42, ...)` checks must succeed.

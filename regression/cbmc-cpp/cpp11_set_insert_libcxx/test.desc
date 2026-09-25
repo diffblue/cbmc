@@ -1,0 +1,26 @@
+CORE libcxx
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+History: "invalid initializer '__pair1_'" in __tree; bodyless-member
+family (__emplace_unique_key_args dropped); three cvise degeneracy
+classes (parked).  Round-25 root pair (2026-08-08): (a) fifth
+TT-instance consumer -- disambiguate_template_classes' instance
+fallback could not find a NAMESPACE-scope template (root-scope
+RECURSIVE lookup does not descend into namespaces; fixed by looking
+up in the instance scope's grandparent per [namespace.qual]);
+(b) member-alias own-parameter capture ([temp.local]/1) extended to
+references nested in pointer declarators and template-id arguments
+(pointer_traits<_Tp*>'s `rebind = _Up*`,
+allocator_traits' `rebind_alloc =
+__allocator_traits_rebind_t<allocator_type, _Other>`) -- previously
+only top-level bare references were protected, so `_Up`/`_Other`
+captured unrelated enclosing bindings (int), unique_ptr's deleter
+became __tree_node_destructor<allocator<int>>, get() returned int*,
+and __emplace_unique_key_args' conversion threw (swallowed by the
+system-header SFINAE guard), dropping insert semantics entirely.
+Needs --object-bits 12 past "too many addressed objects".

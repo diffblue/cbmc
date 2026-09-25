@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ template parameter following a parameter pack: value deduced/returned: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+N5008 [temp.param]/11: a function-template parameter pack may be followed by
+further (deducible or defaulted) template parameters, e.g.
+`template<class U, class... W, class X = void> int first(U, W...)`.  A call
+`first(5,6,7)` deduces U=int, W={int,int}, X=void (default) and returns the first
+argument.  Regression for a family of front-end bugs that assumed a parameter
+pack is the last template parameter: the deduction default-argument alignment,
+the free-function parameter-pack expander in instantiate_template, the guess-side
+per-element pack type assignment, and the pack-size recording for a trailing
+parameter's `sizeof...` default.  assertion.2 ("WRONG") must FAIL (non-vacuity).

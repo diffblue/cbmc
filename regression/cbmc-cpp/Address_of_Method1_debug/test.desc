@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+ASSERT.*address_of
+--
+Diagnostic test: shows the goto program for Address_of_Method1 to
+debug the macOS SSA validation crash. The --show-goto-functions
+output reveals the types of the comparison operands.

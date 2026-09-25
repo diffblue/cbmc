@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ transaction committed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free distillation of libc++ <vector>'s _ConstructTransaction.

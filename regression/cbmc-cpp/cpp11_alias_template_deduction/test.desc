@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ alias-template argument deduction yields I=true, C=false: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+found no match for symbol
+--
+N5008 [temp.alias]/2, [temp.deduct.type]: deducing against a member
+alias-template parameter whose underlying type has the same unqualified base
+name (libstdc++ regex's _BracketMatcher) sent guess_template_args into
+unbounded recursion (the qualified expansion was re-looked-up unqualified and
+re-expanded the alias).  Alias expansion is now restricted to unqualified
+template-ids so the deduction terminates and binds the arguments.

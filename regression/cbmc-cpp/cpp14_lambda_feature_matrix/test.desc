@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Invariant check failed
+--
+Lambda feature matrix: init-captures ([expr.prim.lambda.capture]/6), one
+closure per lambda-expression ([expr.prim.lambda.closure]/1), `auto...'
+packs with binary folds of either associativity ([expr.prim.fold]/2),
+sizeof of a reference ([expr.sizeof]/2), plus the shapes that already
+worked.

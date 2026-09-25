@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member operator== found by unqualified call: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: the resolver's operator member-stripping and ADL
+exemption now only apply while operator_is_overloaded gathers
+candidates for an operator expression (operator_expr_lookup_depth).

@@ -1,0 +1,53 @@
+diff --git a/src/cpp/cpp_typecheck_resolve.cpp b/src/cpp/cpp_typecheck_resolve.cpp
+index 48c618efd7..34052ac269 100644
+--- a/src/cpp/cpp_typecheck_resolve.cpp
++++ b/src/cpp/cpp_typecheck_resolve.cpp
+@@ -7374,10 +7374,44 @@ void cpp_typecheck_resolvet::guess_template_args(
+                 it != cpp_typecheck.template_map.type_map.end() &&
+                 it->second.id() == ID_unassigned)
+               {
+-                // Assign the template template parameter to the
+-                // template that the desired type was instantiated from.
+-                it->second = desired_type;
+-                is_tt_param = true;
++                // N5008 [temp.deduct.type]/8 (P = TT<T>): the
++                // template-template-parameter is deduced to the TEMPLATE
++                // the argument type was instantiated from -- not to the
++                // argument INSTANCE.  Binding the instance made every
++                // body use of the parameter (`_Alloc<_Up>`) resolve to
++                // that one instance regardless of its own arguments
++                // (allocator_traits' rebind chain: R<allocator<int>,
++                // char>::type came out allocator<int>).  Store the same
++                // representation typecheck_template_args uses for an
++                // explicitly-passed template name.
++                const symbolt *tt_tmpl = nullptr;
++                const auto tmpl_ids =
++                  cpp_typecheck.cpp_scopes.current_scope().lookup(
++                    desired_sym->base_name, cpp_scopet::RECURSIVE);
++                for(const auto *tid : tmpl_ids)
++                {
++                  if(tid->id_class != cpp_idt::id_classt::TEMPLATE)
++                    continue;
++                  const symbolt *cand =
++                    cpp_typecheck.symbol_table.lookup(tid->identifier);
++                  if(cand != nullptr && cand->type.get_bool(ID_is_template))
++                  {
++                    tt_tmpl = cand;
++                    break;
++                  }
++                }
++                if(tt_tmpl != nullptr)
++                {
++                  it->second =
++                    template_parameter_symbol_typet(tt_tmpl->name);
++                  is_tt_param = true;
++                }
++                else
++                {
++                  // fallback: previous behaviour
++                  it->second = desired_type;
++                  is_tt_param = true;
++                }
+               }
+             }
+           }

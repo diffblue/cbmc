@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/expr.h>
 #include <util/invariant.h>
 
+#include <functional>
+
 // A data structures for template arguments, i.e.,
 // a sequence of types/expressions of the form <E1, T2, ...>.
 // Not to be confused with the template parameters!
@@ -64,15 +66,51 @@ inline const cpp_template_args_non_tct &to_cpp_template_args_non_tc(
 class cpp_template_args_tct:public cpp_template_args_baset
 {
 public:
+  /// N5008 [temp.deduct]/2, [temp.arg]: an argument is usable only when every
+  /// template parameter in it has been deduced or specified; the undeduced
+  /// parameter may sit INSIDE the argument (`const _U2 &` in std::pair's
+  /// deprecated converting-constructor constraint `is_constructible<_T2,
+  /// const _U2&>` while `_U2` is still unassigned).  Checking only the top
+  /// level let `is_constructible<T, ? &>` be instantiated, which instantiated
+  /// T's forwarding constructor with a `?` argument; its body errors leaked
+  /// ("no match for symbol 'set'" in every TU with a std::map to such a
+  /// class) and members touched on the way were left bodiless.
   bool has_unassigned() const
   {
-    const argumentst &_arguments=arguments();
-    for(argumentst::const_iterator
-        it=_arguments.begin();
-        it!=_arguments.end();
-        it++)
-      if(it->id()==ID_unassigned ||
-         it->type().id()==ID_unassigned)
+    std::function<bool(const irept &)> nested = [&](const irept &n) -> bool
+    {
+      if(n.id() == ID_unassigned)
+        return true;
+      for(const auto &s : n.get_sub())
+        if(nested(s))
+          return true;
+      for(const auto &ns : n.get_named_sub())
+        if(ns.first != ID_C_source_location && nested(ns.second))
+          return true;
+      return false;
+    };
+    for(const auto &arg : arguments())
+      if(nested(arg))
+        return true;
+
+    return false;
+  }
+
+  /// N5008 [temp.deduct.type]/2: "If [deducing values] cannot be done
+  /// for any P/A pair, ..., or if any template argument remains
+  /// neither deduced nor explicitly specified, template argument
+  /// deduction fails."  A conflicting deduction is recorded as an
+  /// ID_nil binding (see mark_targs_conflicting in
+  /// cpp_typecheck_resolve.cpp); such a candidate must be discarded
+  /// without re-type-checking its pattern -- the re-typecheck throws
+  /// on the nil parameter and is caught as SFINAE, which is correct
+  /// but costs a full pattern conversion per doomed candidate
+  /// (~39,000 of them for std::tuple's constructor overload set,
+  /// dominated by tuple_size<pair<_T1,_T2>> vs tuple<int,int>).
+  bool has_conflict() const
+  {
+    for(const auto &arg : arguments())
+      if(arg.is_nil() || arg.type().is_nil())
         return true;
 
     return false;

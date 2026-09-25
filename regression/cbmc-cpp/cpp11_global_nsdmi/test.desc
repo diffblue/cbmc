@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ global NSDMI applied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ global NSDMI first member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ global NSDMI second member: SUCCESS$
+^\[main\.assertion\.4\] line \d+ global NSDMI with a non-NSDMI member: SUCCESS$
+^\[main\.assertion\.5\] line \d+ non-NSDMI member zero-initialized: SUCCESS$
+^\[main\.assertion\.6\] line \d+ file-static NSDMI applied: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [class.default.ctor]/3 + [basic.start.static]: a default member
+initializer (NSDMI) gives a class a non-trivial default constructor, so a
+value-less namespace-scope / file-static object must run that constructor and
+receive its declared member defaults.  CBMC previously treated such an object as
+a plain POD in cpp_typecheckt::static_and_dynamic_initialization and merely
+zero-initialized it (member left at 0 instead of its NSDMI value), because
+cpp_is_pod ignores NSDMIs.  Fixed by routing a value-less definition whose class
+has a direct NSDMI to the default-constructor path (which already applies NSDMIs,
+as local objects show).  Members without an NSDMI keep their static
+zero-initialization ([basic.start.static]/2), and objects with an explicit
+initializer are unaffected (the initializer overrides the NSDMI).  assertion.7
+provides non-vacuity.  Note: nested (member-subobject) NSDMIs and array-of-NSDMI
+globals remain separate open gaps.

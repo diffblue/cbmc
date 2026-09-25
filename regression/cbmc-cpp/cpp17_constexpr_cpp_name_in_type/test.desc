@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*invalid implicit conversion from '<<type:cpp_name>>' to 'signed int'.*$
+^CONVERSION ERROR$
+--
+Verifies that the constexpr-eager-convert path detects unresolved
+cpp_names appearing as the `type` field of a sub-expression in the
+constexpr function's body.
+
+Without the fix, `exprt::visit_pre` walks operands only — a
+`cpp_name` such as `int_type` used as the target type of
+`static_cast<int_type>(...)` is missed, so the eager-convert path
+is skipped, the body is inlined unresolved, and the substitution
+surfaces the spurious "invalid implicit conversion from
+'<<type:cpp_name>>' to 'signed int'" diagnostic in the caller's
+scope.

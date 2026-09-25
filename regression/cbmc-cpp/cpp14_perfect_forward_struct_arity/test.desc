@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ bind_back from member template resolves: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The perfect-forward CTAD chain (__bind_back(_Fn...) with a non-pack
+_Fn, the reduced libc++ ranges shape) called from a member function
+template.  History: first surfaced as a symex assign_from_struct arity
+CRASH (silent escape from the method-body drain, fixed round 117,
+b44419e7a9); the resolution itself was fixed by the [dcl.fct]/6
+non-pack `P...` normalization (round 118, df138b3e87).  The kernel's
+original sizeof-based assertion depended on sizeof(empty class) >= 1,
+which CBMC gets wrong (split to cpp11_sizeof_empty_class).
+Runtime-verified g++ 13 / clang++ 18.

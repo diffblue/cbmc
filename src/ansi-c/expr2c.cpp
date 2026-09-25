@@ -75,15 +75,51 @@ Precedences are as follows. Higher values mean higher precedence.
 irep_idt expr2ct::id_shorthand(const irep_idt &identifier) const
 {
   const symbolt *symbol;
+  bool found = !ns.lookup(identifier, symbol);
 
-  if(!ns.lookup(identifier, symbol) &&
-     !symbol->base_name.empty() &&
-      has_suffix(id2string(identifier), id2string(symbol->base_name)))
+  if(
+    found && !symbol->base_name.empty() &&
+    has_suffix(id2string(identifier), id2string(symbol->base_name)))
     return symbol->base_name;
 
   std::string sh=id2string(identifier);
 
-  std::string::size_type pos=sh.rfind("::");
+  // A C++ function's identifier is its base name followed by the mangled
+  // parameter list, `ns::f(ref_struct_tag(identifier=std::tag-X<...>))`;
+  // the `::` inside the parameter list would otherwise yield a confusing
+  // shorthand fragment, so prefer the base name.  Restrict this to that
+  // shape: a Java method identifier `java::A.m:()V` carries its descriptor
+  // after a colon, and JBMC's concurrency instrumentation matches the
+  // expr2java rendering `org.cprover.CProver.getCurrentThreadId:()I` that the
+  // `::` split below produces (java_bytecode_concurrency_instrumentation.cpp).
+  if(
+    found && !symbol->base_name.empty() &&
+    sh.find(id2string(symbol->base_name) + "(") != std::string::npos)
+  {
+    return symbol->base_name;
+  }
+
+  // Use depth-aware separator: don't pick `::` inside angle brackets.
+  // Without depth-awareness, identifiers containing template arg lists
+  // such as `ref_struct_tag(identifier=std::tag-X<std::tag-Y<...>>)`
+  // would yield malformed shorthands.
+  std::string::size_type pos = std::string::npos;
+  {
+    int depth = 0;
+    for(std::string::size_type i = 0; i + 1 < sh.size(); ++i)
+    {
+      const char c = sh[i];
+      if(c == '<')
+        ++depth;
+      else if(c == '>' && depth > 0)
+        --depth;
+      else if(depth == 0 && c == ':' && sh[i + 1] == ':')
+      {
+        pos = i;
+        ++i; // skip the second ':'
+      }
+    }
+  }
   if(pos!=std::string::npos)
     sh.erase(0, pos+2);
 
@@ -632,10 +668,11 @@ std::string expr2ct::convert_rec(
   }
 
   {
-    lispexprt lisp;
-    irep2lisp(src, lisp);
-    std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
-    dest+=d;
+    // Fallback for types that don't have a dedicated converter.
+    // Emit a compact placeholder rather than a full irep lisp
+    // dump — see convert_norep for the expression counterpart.
+    std::string dest = "<<type:" + id2string(src.id()) + ">>";
+    dest += d;
 
     return dest;
   }
@@ -1635,11 +1672,14 @@ std::string expr2ct::convert_norep(
   const exprt &src,
   unsigned &precedence)
 {
-  lispexprt lisp;
-  irep2lisp(src, lisp);
-  std::string dest="irep(\""+MetaString(lisp.expr2string())+"\")";
-  precedence=16;
-  return dest;
+  // Fallback for expressions that don't have a dedicated converter
+  // in expr2c.  Emit a compact placeholder rather than an
+  // `irep::pretty()` dump — the full lisp form of an expression
+  // can exceed a megabyte and makes error messages unreadable.
+  // The precise form is available via `--verbosity 10` for
+  // debugging.
+  precedence = 16;
+  return "<<expr:" + id2string(src.id()) + ">>";
 }
 
 std::string expr2ct::convert_symbol(const exprt &src)
@@ -2862,7 +2902,9 @@ expr2ct::convert_code_frontend_decl(const codet &src, unsigned indent)
   std::string dest=indent_str(indent);
 
   const symbolt *symbol=nullptr;
-  if(!ns.lookup(to_symbol_expr(src.op0()).identifier(), symbol))
+  if(
+    src.op0().id() == ID_symbol &&
+    !ns.lookup(to_symbol_expr(src.op0()).identifier(), symbol))
   {
     if(symbol->is_file_local &&
        (src.op0().type().id()==ID_code || symbol->is_static_lifetime))
@@ -3795,7 +3837,9 @@ std::string expr2ct::convert_with_precedence(
       return "&&" + object.get_string(ID_identifier);
     else if(object.id() == ID_index && to_index_expr(object).index() == 0)
       return convert(to_index_expr(object).array());
-    else if(to_pointer_type(src.type()).base_type().id() == ID_code)
+    else if(
+      src.type().id() == ID_pointer &&
+      to_pointer_type(src.type()).base_type().id() == ID_code)
       return convert_unary(to_unary_expr(src), "", precedence = 15);
     else
       return convert_unary(to_unary_expr(src), "&", precedence = 15);

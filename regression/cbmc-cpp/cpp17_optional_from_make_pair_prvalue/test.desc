@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^.*std::optional<std::tag-pair<signed_int,signed_int>>::optional\(this,(ref|rref).*$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+^.*invalid implicit conversion.*to 'struct optional'.*$
+^.*address_of error.*not an lvalue.*$
+--
+Regression for converting a function-template call's prvalue result
+(std::make_pair with a materialized-temporary argument) into a
+std::optional via its converting constructor.  See main.cpp for the
+[conv.rval]/[class.temporary] grounding: a materialized temporary is
+a glvalue whose address may be taken, so re-typechecking an
+already-typechecked call carrying `address_of(temporary_object(...))`
+must succeed.  Verified at the goto-program level (full
+std::optional<std::pair> BMC exceeds symex memory limits).

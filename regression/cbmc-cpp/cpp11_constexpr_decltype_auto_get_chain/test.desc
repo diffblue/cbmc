@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11
+^\[main\.assertion\.1\] line \d+ constexpr decltype\(auto\) get chain: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [dcl.spec.auto] + [temp.point]/1 + [temp.inst]/5: a constexpr function
+template with a deduced (decltype(auto)) return type forwarding to a constexpr
+function template with a derived-to-base pack parameter (the std::get ->
+__get_helper -> _Tuple_impl::_M_head shape).
+
+A constexpr specialization reached for a run-time call is deferred to the clean
+method-body drain so its derived-to-base pack call resolves -- but one whose
+return type must be deduced (auto/decltype(auto)) must still be converted
+eagerly so the return type is known before its call sites.  Deferring the
+auto-return wrapper would leave it unbindable; eagerly converting the non-auto
+inner function would drop its derived-to-base pack call.  Assertion 2 (a wrong
+value) FAILs, proving non-vacuity.

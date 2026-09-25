@@ -9,9 +9,10 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
-#include "cpp_typecheck.h"
-
+#include <util/c_types.h>
 #include <util/pointer_expr.h>
+
+#include "cpp_typecheck.h"
 
 bool cpp_typecheckt::find_dtor(const symbolt &symbol) const
 {
@@ -40,6 +41,9 @@ void cpp_typecheckt::default_dtor(
   decl.add(ID_cv).make_nil();
   decl.add(ID_throw_decl).make_nil();
 
+  // [class.dtor]/8: mark implicitly-declared destructor (trivial candidate).
+  decl.type().set("#is_implicit_dtor", true);
+
   dtor.add(ID_type).id(ID_destructor);
   dtor.add(ID_storage_spec).id(ID_cpp_storage_spec);
   dtor.add_to_operands(std::move(decl));
@@ -66,17 +70,10 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
   {
     if(c.get_bool(ID_is_vtptr))
     {
-      const cpp_namet cppname(c.get_base_name());
-
-      const symbolt &virtual_table_symbol_type =
-        lookup(to_pointer_type(c.type()).base_type().get(ID_identifier));
-
-      const symbolt &virtual_table_symbol_var = lookup(
-        id2string(virtual_table_symbol_type.name) + "@" +
-        id2string(symbol.name));
-
-      exprt var=virtual_table_symbol_var.symbol_expr();
-      address_of_exprt address(var);
+      // the vtable of the most derived class sharing this pointer
+      exprt address = vtable_pointer_value(symbol, c);
+      if(address.is_nil())
+        continue;
       DATA_INVARIANT(address.type() == c.type(), "type mismatch");
 
       already_typechecked_exprt::make_already_typechecked(address);
@@ -107,9 +104,39 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
        cpp_is_pod(type))
       continue;
 
+    // Anonymous components (padding, unnamed unions in some error-
+    // recovery paths) have no base_name; skip rather than
+    // synthesising a ptrmember with an empty component name, which
+    // would later fail as `'' is not static member` when the
+    // member-expression is type-checked.
+    if(cit->get_base_name().empty())
+      continue;
+
+    // Anonymous components (padding, unnamed unions in some error-
+    // recovery paths) have no base_name; skip rather than
+    // synthesising a ptrmember with an empty component name, which
+    // would later fail as `'' is not static member` when the
+    // member-expression is type-checked.
+    if(cit->get_base_name().empty())
+      continue;
+
+    // Per [class.dtor]/13 a destructor may be invoked on a const
+    // or volatile subobject, but CBMC's implicit_typecast path
+    // rejects the pointer conversion from `const T*` (the address
+    // of a const member) to `T*` (the destructor's `this`
+    // parameter).  Until the implicit cv-cast is implemented,
+    // skip synthesising the destructor call for const / volatile
+    // members.  The memory of the member is still reclaimed via
+    // the enclosing object's stack/heap lifetime; omitting the
+    // dtor side effect is conservative for assertion checking.
+    if(
+      cit->type().get_bool(ID_C_constant) ||
+      cit->type().get_bool(ID_C_volatile))
+      continue;
+
     const cpp_namet cppname(cit->get_base_name(), source_location);
 
-    exprt member(ID_ptrmember, type);
+    exprt member(ID_ptrmember, cit->type());
     member.set(ID_component_cpp_name, cppname);
     member.operands().push_back(this_expr);
     member.add_source_location() = source_location;
@@ -135,7 +162,29 @@ codet cpp_typecheckt::dtor(const symbolt &symbol, const symbol_exprt &this_expr)
   {
     DATA_INVARIANT(bit->id() == ID_base, "base class expression expected");
 
-    dereference_exprt object{this_expr, bit->type()};
+    // Cast `this_expr` to a `Base*` before dereferencing.  Without
+    // the explicit cast, `c_typecheck_baset::typecheck_expr_dereference`
+    // (called when `cpp_destructor` builds a member-call expression
+    // on `object`) overrides the dereference's type with the
+    // pointer's base-type — which is the DERIVED class, not this
+    // base subobject.  Subsequent unqualified lookup of `~Base`
+    // from the derived-class scope would then walk every base
+    // subobject's secondary scope and surface a spurious
+    // "symbol '~X' does not uniquely resolve" with siblings whose
+    // `base_name` matches but `tag` differs (e.g.,
+    // `_Hashtable_ebo_helper<0, _Hash>` vs
+    // `_Hashtable_ebo_helper<1, _Equal>` in libstdc++'s
+    // `_Hashtable_base`).
+    //
+    // The cast forces the dereference's type to remain the specific
+    // base subobject's class type, pinning member-access lookup to
+    // its own scope.  Mark the cast as already-type-checked so the
+    // operand walk doesn't undo it.
+    typecast_exprt cast_this{this_expr, pointer_type(bit->type())};
+    cast_this.add_source_location() = source_location;
+    already_typechecked_exprt::make_already_typechecked(cast_this);
+
+    dereference_exprt object{cast_this, bit->type()};
     object.add_source_location() = source_location;
 
     const bool disabled_access_control = disable_access_control;

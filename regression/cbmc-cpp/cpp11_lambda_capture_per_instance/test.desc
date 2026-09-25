@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20 --object-bits 12 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ first closure keeps its own capture: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second closure keeps its own capture: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.closure]/1 -- each closure is a distinct object with its own
+capture members.  Lambda rework Phase B gives each closure object its own
+by-copy capture data members, so a factory returning a fresh capturing lambda
+per call yields independent closures (make_adder(3) and make_adder(10) no longer
+share capture storage).

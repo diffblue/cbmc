@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ single element \+ value-init: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member-wise: SUCCESS$
+^\[main\.assertion\.3\] line \d+ same-type copy: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Braced mem-initializers of POD bases: aggregate member-wise form,
+value-initialized trailing members, and the same-type copy form
+([class.base.init]/7, [dcl.init.list]/3.2+3.4, [dcl.init.aggr]/5).

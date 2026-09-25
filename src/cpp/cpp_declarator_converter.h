@@ -31,6 +31,7 @@ public:
   bool is_template;
   bool is_template_parameter;
   bool is_friend;
+  class cpp_scopet *friend_class_scope;
   irep_idt linkage_spec;
 
   symbolt &convert(

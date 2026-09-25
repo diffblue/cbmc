@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+User-reported: GNU array designators `[idx] = val` in C++ (accepted
+by g++ and clang++), here in `static constexpr uint8_t sz[3] = {[0]
+= 1, [1] = 8, [2] = 1}`.  The parser only knew C++20 `.member`
+designators; the array form is built in the C front end's
+ID_index/ID_designator shape.  Also fixed alongside: a constexpr
+static ARRAY member is a definition (N5008 [class.static.data]/3),
+not an extern macro -- it was never statically initialised and every
+`A::sz[i]` read nondet (also without designators).

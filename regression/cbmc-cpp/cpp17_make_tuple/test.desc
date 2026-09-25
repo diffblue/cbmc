@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+C++17 std::make_tuple(1, 2.0) + std::get<0>.  Now CORE (non-vacuous): the run-
+time std::get chain (std::get -> __get_helper -> _Tuple_impl::_M_head ->
+_Head_base::_M_head) is instantiated and returns the correct value.  Previously
+this passed only vacuously (constant-folded) and then, after the parameter-pack-
+arity fix made std::get a genuine run-time call, failed because that chain was
+not instantiated; the chain of front-end fixes that greened std::apply (see
+.kiro/decltype_tuple_apply_findings.md) also greened this arity-2 make_tuple.
+Note: 3+-element make_tuple (cpp17_tuple_basic) is still a KNOWNBUG -- the arity
+>= 3 tuple forwarding constructor is not instantiated.

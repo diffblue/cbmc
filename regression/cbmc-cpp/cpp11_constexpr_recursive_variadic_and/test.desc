@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ And<true, true> folds to true: SUCCESS$
+^\[main\.assertion\.2\] line \d+ And<true, false> folds to false: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.deduct]/[temp.variadic]: a variadic class template partial
+specialization whose base-class non-type argument names the same template with
+its own pack -- libstdc++'s `__and_<B1, Bn...> : ... && __and_<Bn...>::value` --
+recurses by peeling one pack element per level.  When instantiated with >= 2
+arguments inside a function body (a nested instantiation, with an enclosing
+`And<...>` mid-instantiation), CBMC left the enclosing instance's pack binding
+(`Bn = [X]`) in the template map while deducing/building the recursive
+`And<Bn...>` step, so that step's own (empty) `Bn` inherited the stale binding,
+`And<Bn...>` re-expanded to the enclosing instance, recursed onto itself, and
+`::value` could not be resolved -- the constexpr call failed to fold.  Only the
+>= 2-argument case was affected (single-argument recursion bottoms out at the
+primary template; top-level uses have no enclosing pack), which is also the
+shape of std::tuple's constructor SFINAE.  Fixed by clearing a pack's recorded
+arguments when deduction resets the parameters and when the pack binds to zero
+elements.  Assertions 1-2 prove correct folding (true and false); assertion 3
+(a wrong value) must FAIL, proving non-vacuity.

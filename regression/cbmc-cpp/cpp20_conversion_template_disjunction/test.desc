@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ disjunction-constrained conversion operator: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+[temp.constr.op]/[temp.deduct]/5: a conversion-function template whose
+requires-clause is a disjunction (integral<T> or floating_point<T>) is removed
+from the candidate set when the whole constraint is unsatisfied with the deduced
+arguments -- for a class destination both disjuncts are false.
+
+The constraint check now evaluates the boolean structure, so the non-viable
+candidate for the mutually-recursive class destination is correctly rejected
+(no spurious operator-to-class instantiation).  Minimal model of libstdc++'s
+__max_size_type / __max_diff_type conversion operators.

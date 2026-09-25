@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ setw inserter converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+PARTIALLY fixed 2026-07-21: the inserter now resolves
+([temp.deduct.call]/4.3 transitive base walk) and the assertion
+passes; remaining failures are the iostream DESTRUCTOR chain
+(no body for std::ios_base::~ios_base; vtable-pointer bounds in
+~basic_ios).
+Fixed 2026-07-22 together with cpp11_stream_destructor_chain.

@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ ctor CTAD decays ref-array member: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Before the fix this crashed with an invariant violation (not merely a
+dropped main), so it also guards the simplify_rec postcondition.

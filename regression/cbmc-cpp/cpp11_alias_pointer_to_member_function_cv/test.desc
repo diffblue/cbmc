@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [dcl.fct]/6-7: `using PMF = int (S::*)(int) const;` -- the cv-qualifier-seq
+of a function declarator in a type-id belongs to the function type (it
+qualifies the implicit object parameter).  The parser merged it into the
+declared type as if it were a cv-qualifier of `int`, so the alias spelling
+denoted a pointer-to-member of const int with the return type lost, while the
+typedef spelling (which keeps its declarator) was fine.  Pointer-to-DATA-member
+access `s.*pmd` is a separate, still open gap.

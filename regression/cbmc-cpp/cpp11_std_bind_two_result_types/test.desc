@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+Two std::bind objects with different result types in one translation unit
+(void first, then int) plus a conversion to std::function.  The second used
+to inherit the first's result type through the shared declaration-only
+_S_test probe specialization ([temp.spec]/4).

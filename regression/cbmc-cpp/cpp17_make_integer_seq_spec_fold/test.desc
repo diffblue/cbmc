@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ 0\+1\+2 via __make_integer_seq: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The clang builtin __make_integer_seq materialises
+integer_sequence<unsigned long, 0, 1, 2>, which is matched by a
+partial specialization deducing the pack _Ip..., and a binary fold
+over _Ip in a STATIC member initializer must evaluate to 3
+(N5008 [temp.deduct.type], [expr.prim.fold]/2).  CBMC leaves the fold
+partially expanded ("in expression '<<expr:static_cast>> + 0'") and
+drops the enclosing body.  Found round 130 while kerneling the
+cpp20_ranges_basic_libcxx reduced3 artifact; suspected shared root
+with the __perfect_forward operator() trailing-decltype chain
+(`get<_Idx>(__bound_args_)...`, the artifact's remaining layer).
+Clang-only builtin: g++ does not accept this file.

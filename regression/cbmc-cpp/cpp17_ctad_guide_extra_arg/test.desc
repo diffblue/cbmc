@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ guide P<int,int>: first member from argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ guide P<int,int>: second member value-initialised: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+not enough template arguments
+^CONVERSION ERROR$

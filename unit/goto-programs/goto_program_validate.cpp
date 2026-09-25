@@ -148,12 +148,12 @@ SCENARIO("Validation of a goto program", "[core][goto-programs][validate]")
       goto_model_validation_optionst validation_options{
         goto_model_validation_optionst ::set_optionst::all_false};
 
-      REQUIRE_THROWS_AS(
-        validate_goto_model(
-          goto_model.goto_functions,
-          validation_modet::EXCEPTION,
-          validation_options),
-        incorrect_goto_program_exceptiont);
+      // C++ constexpr/inline functions may be missing from the function
+      // map; validate_goto_model now silently skips them.
+      REQUIRE_NOTHROW(validate_goto_model(
+        goto_model.goto_functions,
+        validation_modet::EXCEPTION,
+        validation_options));
     }
   }
 

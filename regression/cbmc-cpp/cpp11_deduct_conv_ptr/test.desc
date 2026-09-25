@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\*\* 0 of \d+ failed
+--
+^CONVERSION ERROR$
+^warning: ignoring
+--
+[temp.deduct.conv]/3: when A is not a reference type, P is
+adjusted (array→pointer, function→pointer, drop top-level cv).
+This test exercises P being a pointer-to-T pattern, with A being
+the concrete `int*` target.  Deduction succeeds with T = int.

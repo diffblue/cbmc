@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ SFINAE'd candidate dropped: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Update 2026-07-22 (late): the direct-init failure is now SILENT --
+`optionalish o(e);` and every following statement of main are dropped
+from the goto program (0 properties, vacuous VERIFICATION SUCCESSFUL)
+instead of reporting "found no match".  The desc's assertion-line
+pattern catches the vacuousness.  Statement-level error recovery
+swallowing a failing declaration without a diagnostic is itself a
+defect to fix alongside the resolution failure.
+Update 2026-07-30 (round 4): the empty-pack variable-template fix
+([temp.variadic]/7 normalization of `__and_v<>`) plus the nil-param
+artifact filter make the direct-initialization facet work in reduced
+form; the residual is the alias-with-defaulted-parameter expansion
+`__enable_if_t<_Bn::value>...` -- minimal pair isolated as
+cpp17_alias_default_pack_expansion.
+Fixed 2026-08-02 together with cpp17_alias_default_pack_expansion
+(the distilled root): empty-pack zero-length expansion of alias
+patterns in SFINAE'd constructor constraints.

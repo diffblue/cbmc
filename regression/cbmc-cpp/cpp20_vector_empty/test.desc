@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ empty vector has size 0: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*is unknown.*$
+^CONVERSION ERROR$
+--
+[temp.inst]/1-2 with [dcl.typedef]: a member typedef declares the member and
+forms the aliased type but does not require the aliased template's definition to
+be instantiated; a typedef-name may denote an incomplete type.
+
+Instantiating std::vector<int> elaborates the self-referential member typedefs
+`iterator`/`const_iterator` (= __normal_iterator<pointer/const_pointer,
+vector>), whose type names the still-incomplete enclosing `vector`.  They cannot
+be eagerly instantiated at that point; the self-reference branch of
+typecheck_compound_body now keeps them as lazy aliases (registered by name)
+rather than dropping them, so the sibling typedef
+`const_reverse_iterator = reverse_iterator<const_iterator>` and other uses
+resolve `const_iterator`, and the empty vector verifies genuinely (the assertion
+is present in --show-properties and checked).
+

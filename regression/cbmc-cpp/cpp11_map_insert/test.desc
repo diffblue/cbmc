@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp11 --unwind 5 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+std::map operator[] insertion, verifying in ~1.4s.  Fixed by a chain of
+front-end conformance fixes to the piecewise-construction machinery
+(see the sibling minimal tests):
+* [temp.deduct.type]/8 pack form mismatch rejects the candidate instead of
+  resurrecting an empty pack (cpp11_pack_mismatch_not_empty: the
+  swap<void> collateral);
+* [expr.ref]/6 reference-member access is an lvalue +
+  [over.best.ics.general]/2 non-viable candidates are not hard errors
+  (cpp11_rvalue_ref_member_lvalue: _Head_base<I, T&&>/_Tuple_impl);
+* [temp.variadic]/5 type-pack element substitution in declaration
+  initializers (cpp11_pack_expansion_decl_init: _M_emplace_hint_unique's
+  _Auto_node);
+* [temp.deduct.type] primary-relative arguments for full-specialization
+  instances (cpp11_pack_deduction_explicit_spec);
+* [temp.param]/14 two independent packs in std::pair's piecewise
+  constructor (cpp11_piecewise_ctor_two_packs);
+* allocator_traits::construct model body gated to the single
+  same-type-argument case, leaving piecewise construction to the real
+  header body.
+The earlier KNOWNBUG note attributed the failure to BMC scaling on the
+inlined machinery; with the mis-instantiated code gone, the formula is
+small.

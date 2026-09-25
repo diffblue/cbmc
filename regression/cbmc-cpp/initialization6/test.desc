@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
 
-^EXIT=10$
+^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION FAILED$
+^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring

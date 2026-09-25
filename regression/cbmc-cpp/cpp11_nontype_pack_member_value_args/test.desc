@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ non-type parameter pack: two true Trait<T>::value arguments fold to true: SUCCESS$
+^\[main\.assertion\.2\] line \d+ non-type parameter pack: false 2nd argument makes all_of false: SUCCESS$
+^\[main\.assertion\.3\] line \d+ non-type parameter pack: three true arguments fold to true: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.arg.nontype] + [temp.variadic]/4-5.  Arguments matched by a non-type
+parameter pack (`template <bool...>`) are non-type template arguments, not
+types.  CBMC's extra-pack-argument handling in typecheck_template_args treated
+every `ambiguous` argument as a type, so the 2nd+ arguments of the form
+`Trait<T>::value` were typechecked as type-names and failed with "found no match
+for symbol 'value'" (the 1st argument was handled by the main parameter loop).
+The fix routes a non-type parameter pack's extra arguments through the
+expression path.  Minimal trigger: a variadic non-type-pack template-id with two
+`Trait<T>::value` arguments -- no class template, alias, or member function
+needed.  This is the shape of libstdc++'s `__and_<is_X<...>...>` constraint packs.

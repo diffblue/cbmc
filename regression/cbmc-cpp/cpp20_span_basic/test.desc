@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ span size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ span element: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*is unknown.*$
+^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
+--
+Genuine (non-vacuous) verification of a populated std::span<int>.
+
+This previously passed vacuously (std::span construction failed to elaborate
+its iterator, truncating main and dropping the assertions), then -- once the
+iterator's inert C++20 `iterator_concept` alias was kept lazy
+([iterator.concepts.general], [temp.inst]/1-2) -- ran genuinely but FAILED:
+`span size` held but `span element` did not, because span(pointer, size_type)'s
+body sets `_M_ptr = std::to_address(__first)` and std::to_address's call to
+__to_address(_Tp*) tied with __to_address(const _Ptr&) for the pointer
+argument.
+
+It now verifies because overload resolution applies N5008 [temp.func.order]
+partial ordering (function_template_at_least_as_specialised): __to_address(_Tp*)
+is more specialized than __to_address(const _Ptr&), so to_address returns the
+supplied pointer and _M_ptr is exact.  Both size() and element access are
+checked.

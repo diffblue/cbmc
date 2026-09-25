@@ -211,7 +211,7 @@ identifier      (({letter}|"_"|"$"|{utf8letter}|{universal_character})({letter}|
 integer         {digit}+
 binary          {bindigit}+
 msiw_suffix     ([iI]("8"|"16"|"32"|"64"|"128"))
-int_suffix      [uUlLiIjJ]*|[uU]?{msiw_suffix}
+int_suffix      [uUlLiIjJzZ]*|[uU]?{msiw_suffix}
 bininteger      "0"[bB]({bindigit}|"'")+{int_suffix}
 decinteger      [1-9]({digit}|"'")*{int_suffix}
 octinteger      "0"({octdigit}|"'")*{int_suffix}
@@ -241,7 +241,7 @@ escape_sequence [\\][^\n]
 c_char [^'\\\n]|{escape_sequence}
 s_char [^"\\\n]|{escape_sequence}
 
-char_lit        ("L"|"u"|"U")?[']{c_char}+[']
+char_lit        ("L"|"u"|"U"|"u8")?[']{c_char}+[']
 string_lit      ("L"|"u"|"U"|"u8")?["]{s_char}*["]
 
 CPROVER_PREFIX  "__CPROVER_"
@@ -259,6 +259,8 @@ enable_or_disable ("enable"|"disable")
 %x COMMENT2
 %x STRING_LITERAL
 %x STRING_LITERAL_COMMENT
+%x RAW_STRING_DELIMITER
+%x RAW_STRING_CONTENT
 %x ASM_BLOCK
 %x MSC_ASM
 %x IGNORE_PARENS
@@ -313,8 +315,32 @@ enable_or_disable ("enable"|"disable")
 <GRAMMAR>{char_lit} {
                   loc();
                   source_locationt l=parser_stack(yyansi_clval).source_location();
-                  parser_stack(yyansi_clval)=convert_character_literal(yytext, true, l);
+                  // An ordinary character literal has type int in C but
+                  // type char in C++ ([lex.ccon]); wide/u/U literals carry
+                  // their own type regardless of language.
+                  parser_stack(yyansi_clval)=
+                    convert_character_literal(yytext, !PARSER.cpp98, l);
                   return TOK_CHARACTER;
+                }
+
+<GRAMMAR,GCC_ATTRIBUTE3>("L"|"u"|"U"|"u8")?"R\"" {
+                  // C++11 raw string literal: R"delimiter(content)delimiter"
+                  // Store the prefix for later
+                  std::string prefix(yytext);
+                  std::string encoding;
+                  for(std::size_t i = 0; i < prefix.size(); i++)
+                  {
+                    if(prefix[i] == 'R')
+                      break;
+                    encoding += prefix[i];
+                  }
+                  PARSER.string_literal.clear();
+                  PARSER.string_literal = encoding;
+                  // Store encoding in string_literal, delimiter in a temp
+                  PARSER.raw_string_delimiter.clear();
+                  loc();
+                  yy_push_state(RAW_STRING_DELIMITER);
+                  (void)yy_top_state();
                 }
 
 <GRAMMAR,GCC_ATTRIBUTE3>{string_lit} {
@@ -345,6 +371,97 @@ enable_or_disable ("enable"|"disable")
                   yy_pop_state(); // back to normal
                   yyless(0); // put back
                   return TOK_STRING;
+                }
+
+<RAW_STRING_DELIMITER>"(" {
+                  // End of delimiter, start reading content
+                  // string_literal has the encoding prefix so far
+                  PARSER.string_literal += "\"";
+                  yy_pop_state();
+                  yy_push_state(RAW_STRING_CONTENT);
+                }
+<RAW_STRING_DELIMITER>. {
+                  PARSER.raw_string_delimiter += yytext[0];
+                }
+
+<RAW_STRING_CONTENT>(.|\n) {
+                  char ch = yytext[0];
+                  // Check if we've hit )delimiter"
+                  if(ch == ')' || !PARSER.raw_string_pending_close.empty())
+                  {
+                    PARSER.raw_string_pending_close += ch;
+                    std::string end_seq =
+                      ")" + PARSER.raw_string_delimiter + "\"";
+                    if(PARSER.raw_string_pending_close == end_seq)
+                    {
+                      // End of raw string
+                      PARSER.raw_string_pending_close.clear();
+                      PARSER.string_literal += "\"";
+                      yy_pop_state();
+                      yy_push_state(STRING_LITERAL);
+                    }
+                    else if(end_seq.substr(
+                              0,
+                              PARSER.raw_string_pending_close.size()) !=
+                            PARSER.raw_string_pending_close)
+                    {
+                      // Not a prefix of end_seq.  Flush pending chars --
+                      // but a SUFFIX of them may begin the real
+                      // terminator (C++ [lex.string]: the literal ends at
+                      // the FIRST )delimiter"): e.g. for `))"` the first
+                      // `)` is content and the second starts the close;
+                      // for delimiter x, `)x)x"` similarly.  Keep the
+                      // longest suffix that is a prefix of end_seq and
+                      // flush only the rest.
+                      const std::string &pend =
+                        PARSER.raw_string_pending_close;
+                      std::size_t keep = 0;
+                      for(std::size_t k = pend.size() - 1; k >= 1; --k)
+                      {
+                        if(
+                          end_seq.compare(0, k, pend, pend.size() - k, k) ==
+                          0)
+                        {
+                          keep = k;
+                          break;
+                        }
+                      }
+                      const std::size_t flush_count = pend.size() - keep;
+                      for(std::size_t fi = 0; fi < flush_count; ++fi)
+                      {
+                        char pc = pend[fi];
+                        if(pc == '\\')
+                          PARSER.string_literal += "\\\\";
+                        else if(pc == '"')
+                          PARSER.string_literal += "\\\"";
+                        else if(pc == '\n')
+                          PARSER.string_literal += "\\n";
+                        else if(pc == '\r')
+                          PARSER.string_literal += "\\r";
+                        else if(pc == '\t')
+                          PARSER.string_literal += "\\t";
+                        else
+                          PARSER.string_literal += pc;
+                      }
+                      PARSER.raw_string_pending_close.erase(0, flush_count);
+                    }
+                    // else: still a prefix, keep accumulating
+                  }
+                  else
+                  {
+                    if(ch == '\\')
+                      PARSER.string_literal += "\\\\";
+                    else if(ch == '"')
+                      PARSER.string_literal += "\\\"";
+                    else if(ch == '\n')
+                      PARSER.string_literal += "\\n";
+                    else if(ch == '\r')
+                      PARSER.string_literal += "\\r";
+                    else if(ch == '\t')
+                      PARSER.string_literal += "\\t";
+                    else
+                      PARSER.string_literal += ch;
+                  }
                 }
 
 <GRAMMAR>{newline} { } /* skipped */
@@ -499,7 +616,12 @@ enable_or_disable ("enable"|"disable")
 "int"           { loc(); return TOK_INT; }
 "long"          { loc(); return TOK_LONG; }
 "register"      { loc(); return TOK_REGISTER; }
-"restrict"      { loc(); return TOK_RESTRICT; }
+"restrict"      { // C11 6.4.1 keyword; NOT reserved in C++ ([lex.key])
+                  // -- e.g. CBMC's own miniBDD declares
+                  // `mini_bddt restrict(const mini_bddt &, ...)`.
+                  // __restrict/__restrict__ below stay keywords in
+                  // both languages (GNU extension).
+                  return conditional_keyword(!PARSER.cpp98, TOK_RESTRICT); }
 "return"        { loc(); return TOK_RETURN; }
 "short"         { loc(); return TOK_SHORT; }
 "signed"        { loc(); return TOK_SIGNED; }
@@ -786,21 +908,27 @@ enable_or_disable ("enable"|"disable")
 "and_eq"            { return conditional_keyword(PARSER.cpp98, TOK_ANDASSIGN); }
 "bool"              { return conditional_keyword(PARSER.cpp98 || PARSER.c23, TOK_BOOL); }
 "catch"             { return conditional_keyword(PARSER.cpp98, TOK_CATCH); }
-"char16_t"          { // C++11, but Visual Studio uses typedefs
+"char16_t"          { // C++11 keyword (also in modern Visual Studio)
                       return conditional_keyword(
-                        PARSER.cpp11 &&
-                        PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        PARSER.cpp11,
                         TOK_CHAR16_T);
                     }
-"char32_t"          { // C++11, but Visual Studio uses typedefs
+"char32_t"          { // C++11 keyword (also in modern Visual Studio)
                       return conditional_keyword(
-                        PARSER.cpp11 &&
-                        PARSER.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                        PARSER.cpp11,
                         TOK_CHAR32_T);
                     }
+"char8_t"           { return conditional_keyword(PARSER.cpp20, TOK_CHAR8_T); }
 "class"             { return conditional_keyword(PARSER.cpp98, TOK_CLASS); }
 "compl"             { return conditional_keyword(PARSER.cpp98, '~'); }
+"concept"           { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_CONCEPT); }
+"requires"          { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_REQUIRES); }
 "constexpr"         { return conditional_keyword(PARSER.cpp11 || PARSER.c23, TOK_CONSTEXPR); }
+"consteval"         { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_CONSTEVAL); }
+"constinit"         { return conditional_keyword(PARSER.cpp20 || PARSER.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO, TOK_CONSTINIT); }
+"co_await"          { return conditional_keyword(PARSER.cpp20, TOK_CO_AWAIT); }
+"co_return"         { return conditional_keyword(PARSER.cpp20, TOK_CO_RETURN); }
+"co_yield"          { return conditional_keyword(PARSER.cpp20, TOK_CO_YIELD); }
 "delete"            { return conditional_keyword(PARSER.cpp98, TOK_DELETE); }
 "decltype"          { return conditional_keyword(PARSER.cpp11, TOK_DECLTYPE); } // C++11
 "explicit"          { return conditional_keyword(PARSER.cpp98, TOK_EXPLICIT); }
@@ -886,22 +1014,143 @@ enable_or_disable ("enable"|"disable")
 "__has_trivial_destructor" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__has_user_destructor" { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__has_virtual_destructor" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__has_unique_object_representations" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_abstract"     { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_aggregate"    { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_base_of"      { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_class"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_convertible_to" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+  /* libc++14 has `struct __is_convertible` as an internal type-trait
+     helper; libc++14's `struct __is_referenceable` is also a struct
+     name.  When these identifiers appear NOT followed by `(`, treat
+     them as plain identifiers so the C++ parser can accept the libc++
+     declarations.  When followed by `(` (with optional whitespace),
+     they are still recognised as the GCC type-predicate built-ins
+     used by `regression/cpp/is_convertible_builtin/` and friends. */
+"__is_convertible"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_convertible" { return make_identifier(); }
 "__is_delegate"     { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_empty"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_enum"         { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_final"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_interface_class" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__builtin_lt_synthesizes_from_spaceship"/[ \t\r\n]*\( { /* clang >= 22; used by libc++ 22's __utility/default_three_way_comparator.h */ return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__builtin_lt_synthesizes_from_spaceship" { return make_identifier(); }
+"__is_layout_compatible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_convertible" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
 "__is_pod"          { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer_interconvertible_base_of" { return conditional_keyword(PARSER.gcc13_type_traits, TOK_BINARY_TYPE_PREDICATE); }
 "__is_polymorphic"  { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_array"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_ref_class"    { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_sealed"       { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
 "__is_simple_value_class" { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_standard_layout" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_trivial"      { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_trivially_copyable" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_union"        { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
 "__is_value_class"  { return MSC_cpp_keyword(TOK_UNARY_TYPE_PREDICATE); }
+"__is_literal_type" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_integral"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+ /* Revertible builtin type traits: GCC and clang recognise these
+    as builtins ONLY when the identifier is directly followed by '('
+    (gcc calls them "revertible identifiers"; clang demotes the
+    keyword on a shadowing declaration, -Wkeyword-compat).  libstdc++
+    itself declares fallback structs with these very names (e.g.
+    `template <typename T> struct __make_unsigned` in gcc-14's
+    <type_traits>), so keywording them unconditionally makes standard
+    headers unparseable.  Mirror the compilers' rule with a trailing
+    context, falling back to a plain identifier otherwise -- the same
+    treatment __is_referenceable already receives below. */
+"__is_integral"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_integral" { return make_identifier(); }
+"__is_void"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_void" { return make_identifier(); }
+"__is_floating_point"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_floating_point"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_floating_point" { return make_identifier(); }
+"__is_arithmetic"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_arithmetic"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_arithmetic" { return make_identifier(); }
+"__is_null_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_null_pointer" { return make_identifier(); }
+"__is_pointer"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_pointer" { return make_identifier(); }
+"__is_reference"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_reference" { return make_identifier(); }
+"__is_lvalue_reference"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_lvalue_reference" { return make_identifier(); }
+"__is_rvalue_reference"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_rvalue_reference" { return make_identifier(); }
+"__is_function"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_function" { return make_identifier(); }
+"__is_array"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_array" { return make_identifier(); }
+"__is_member_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_member_pointer" { return make_identifier(); }
+"__is_member_function_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_member_function_pointer" { return make_identifier(); }
+"__is_member_object_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_member_object_pointer" { return make_identifier(); }
+"__is_signed"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_signed"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_signed" { return make_identifier(); }
+"__is_unsigned"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_unsigned"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_unsigned" { return make_identifier(); }
+"__is_const"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_const"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_const" { return make_identifier(); }
+"__is_volatile"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
+"__is_volatile"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_volatile" { return make_identifier(); }
+"__is_scoped_enum"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_scoped_enum" { return make_identifier(); }
+"__is_object"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_object" { return make_identifier(); }
+"__is_bounded_array"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_bounded_array" { return make_identifier(); }
+"__is_unbounded_array"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_UNARY_TYPE_PREDICATE); }
+"__is_unbounded_array" { return make_identifier(); }
+"__remove_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_POINTER); }
+"__remove_pointer" { return make_identifier(); }
+"__remove_extent"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_EXTENT); }
+"__remove_extent" { return make_identifier(); }
+"__remove_all_extents"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS); }
+"__remove_all_extents" { return make_identifier(); }
+"__add_lvalue_reference"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE); }
+"__add_lvalue_reference" { return make_identifier(); }
+"__add_rvalue_reference"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE); }
+"__add_rvalue_reference" { return make_identifier(); }
+"__make_unsigned"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_MAKE_UNSIGNED); }
+"__make_unsigned" { return make_identifier(); }
+"__make_signed"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_MAKE_SIGNED); }
+"__make_signed" { return make_identifier(); }
+"__add_pointer"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.gcc14_builtins), TOK_GCC_BUILTIN_ADD_POINTER); }
+"__add_pointer" { return make_identifier(); }
+"__is_referenceable"/[ \t\r\n]*\(  { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_referenceable"  { return make_identifier(); }
+"__is_trivially_destructible" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_destructible"       { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_nothrow_destructible" { return conditional_keyword(PARSER.cpp98, TOK_UNARY_TYPE_PREDICATE); }
+"__is_compound"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_compound" { return make_identifier(); }
+"__is_fundamental"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_fundamental" { return make_identifier(); }
+"__is_scalar"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_scalar" { return make_identifier(); }
+"__is_trivially_relocatable"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_trivially_relocatable" { return make_identifier(); }
+"__is_same"         { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_assignable"   { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_constructible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_assignable" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_nothrow_constructible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_trivially_assignable" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__is_trivially_constructible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__reference_constructs_from_temporary" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+"__reference_converts_from_temporary" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 
 "__if_exists"       { return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
 "__if_not_exists"   { return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
@@ -1026,8 +1275,8 @@ enable_or_disable ("enable"|"disable")
                     return make_identifier();
                 }
 
-"__aligned"     { /* ignore */ }
-"__aligned__"   { /* ignore */ }
+"__aligned"     { return make_identifier(); }
+"__aligned__"   { return make_identifier(); }
 
 "__extension__" { /* ignore */ }
 
@@ -1216,6 +1465,42 @@ enable_or_disable ("enable"|"disable")
 
 "__typeof__"    { loc(); return TOK_TYPEOF; }
 
+"__remove_cv"   { return conditional_keyword(
+                    PARSER.gcc13_type_traits,
+                    TOK_GCC_BUILTIN_REMOVE_CV);
+                }
+
+"__remove_const" { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_CONST);
+                }
+
+"__remove_volatile" { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_VOLATILE);
+                }
+
+"__remove_reference" { return conditional_keyword(
+                    PARSER.gcc13_type_traits,
+                    TOK_GCC_BUILTIN_REMOVE_REFERENCE);
+                }
+
+"__remove_reference_t" { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_REFERENCE);
+                }
+
+"__remove_cvref" { return conditional_keyword(
+                    PARSER.gcc13_type_traits,
+                    TOK_GCC_BUILTIN_REMOVE_CVREF);
+                }
+
+"__decay"/[ \t\r\n]*\( { return conditional_keyword(
+                    PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor),
+                    TOK_GCC_BUILTIN_REMOVE_CVREF);
+                }
+"__decay" { return make_identifier(); }
+
 "__forceinline" { return conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO ||
                     PARSER.mode==configt::ansi_ct::flavourt::ARM,
@@ -1272,6 +1557,11 @@ enable_or_disable ("enable"|"disable")
                          PARSER.mode==configt::ansi_ct::flavourt::CLANG,
                          TOK_BIT_CAST);
                      }
+
+"dynamic_cast"       { return conditional_keyword(PARSER.cpp98, TOK_DYNAMIC_CAST); }
+"static_cast"        { return conditional_keyword(PARSER.cpp98, TOK_STATIC_CAST); }
+"reinterpret_cast"   { return conditional_keyword(PARSER.cpp98, TOK_REINTERPRET_CAST); }
+"const_cast"         { return conditional_keyword(PARSER.cpp98, TOK_CONST_CAST); }
 
 {CPROVER_PREFIX}"atomic"       { loc(); return TOK_CPROVER_ATOMIC; }
 {CPROVER_PREFIX}"forall"       { loc(); return TOK_FORALL; }
@@ -1469,7 +1759,7 @@ enable_or_disable ("enable"|"disable")
 
   /* This is a clang extension */
 
-"_Nullable" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"_Nullable" { if(PARSER.cpp98 || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor)
                 { /* ignore */ }
               else
                 return make_identifier();
@@ -1477,7 +1767,7 @@ enable_or_disable ("enable"|"disable")
 
   /* This is a clang extension */
 
-"_Nonnull" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"_Nonnull" { if(PARSER.cpp98 || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor)
                 { /* ignore */ }
               else
                 return make_identifier();
@@ -1485,7 +1775,7 @@ enable_or_disable ("enable"|"disable")
 
   /* This is a clang extension */
 
-"_Null_unspecified" { if(PARSER.mode==configt::ansi_ct::flavourt::CLANG)
+"_Null_unspecified" { if(PARSER.cpp98 || PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor)
                 { /* ignore */ }
               else
                 return make_identifier();
@@ -1501,6 +1791,7 @@ enable_or_disable ("enable"|"disable")
 "--"            { loc(); return TOK_DECR; }
 "<<"            { loc(); return TOK_SHIFTLEFT; }
 ">>"            { loc(); return TOK_SHIFTRIGHT; }
+"<=>"           { loc(); return TOK_SPACESHIP; }
 "<="            { loc(); return TOK_LE; }
 ">="            { loc(); return TOK_GE; }
 "=="            { loc(); return TOK_EQ; }
@@ -1520,7 +1811,8 @@ enable_or_disable ("enable"|"disable")
 "^="            { loc(); return TOK_XORASSIGN; }
 "|="            { loc(); return TOK_ORASSIGN; }
 
-  /* digraphs */
+  /* digraphs — C++11 2.5/3: <:: is < :: when not followed by : or > */
+"<::"/[^:>]     { loc(); yyless(1); return '<'; }
 "<:"            { loc(); return '['; }
 ":>"            { loc(); return ']'; }
 "<%"            { loc(); return '{'; }

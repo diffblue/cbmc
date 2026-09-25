@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+does not uniquely resolve
+--
+N5008 [lex.string]/6: string literals are `const char[n]' lvalues, __func__ is
+`static const char[]' ([dcl.fct.def.general]/8), sizeof of a reference type is
+the size of the referenced type ([expr.sizeof]/2), and an array bound is
+normalised to the index type so equal array types compare equal whichever way
+the bound was spelled.  The legacy string-literal-to-`char *' conversion
+(C++03 [conv.array]/2) is still accepted, ranked below every standard
+conversion.

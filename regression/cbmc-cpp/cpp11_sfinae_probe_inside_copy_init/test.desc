@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+could not fully type-check
+--
+N5008 [over.best.ics.general]/4 only restricts the conversions for the
+constructor candidates of one copy-initialization; a SFINAE probe nested in
+that resolution (a constrained default template argument of a constructor
+template, [temp.deduct.general]/5 + [temp.deduct]/8) is a separate overload
+resolution and keeps the derived-to-base conversion
+([over.best.ics.general]/6).  This is the libstdc++ 11 basic_string /
+_RequireInputIter / is_convertible shape behind the Ubuntu 22.04 failures of
+cpp11_conversion_function_template_copy_init and cpp11_locale_ctype_facet.

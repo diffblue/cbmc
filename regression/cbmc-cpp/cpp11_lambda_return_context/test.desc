@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ enclosing return conversion intact: SUCCESS$
+^\[main\.assertion\.2\] line \d+ double arithmetic on result: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Guards the exception-safe return_type save/restore around lambda body
+type-checking (hardening; no reachable clobber trigger is known --
+corpus probe 2026-08-12 found zero throws escaping the lambda body
+type-check).  Runtime-verified with g++ and clang++.

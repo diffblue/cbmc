@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ two is_constructible queries on one type resolve independently: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+invalid implicit conversion
+--
+N5008 [dcl.init.ref]/5: a non-const lvalue reference does not bind an rvalue, so
+a converting constructor `T(X&)` is not viable for an rvalue argument.
+Regression test for two __is_constructible queries on one type (lvalue then
+rvalue) where the first instantiates `T(X&)` and the second reached it with an
+rvalue, aborting type-checking ("invalid implicit conversion") and dropping the
+function body.  Non-vacuous: assertion.2 must FAIL.

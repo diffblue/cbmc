@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+Scoped enums with a fixed underlying type (uint8_t) as bit-fields among
+uint8_t / bool bit-fields, with straddling: System V ABI storage-unit rule
+(a bit-field that does not fit in the rest of its type-sized unit starts
+at the next unit) -- 'A' is 3 bytes, not 2; packed structs pack densely.
+Values written and read back.

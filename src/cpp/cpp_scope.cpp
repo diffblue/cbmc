@@ -11,6 +11,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_scope.h"
 
+std::size_t cpp_scopet::scope_generation = 0;
+
 std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 {
   switch(kind)
@@ -29,55 +31,69 @@ void cpp_scopet::lookup_rec(
   lookup_kindt kind,
   id_sett &id_set)
 {
+  // All non-SCOPE_ONLY lookups go through the cache.
+  // This is the uncached entry point used only by lookup().
+  visited_sett visited;
+  lookup_rec(base_name_to_lookup, kind, id_set, visited);
+}
+
+void cpp_scopet::lookup_rec(
+  const irep_idt &base_name_to_lookup,
+  lookup_kindt kind,
+  id_sett &id_set,
+  visited_sett &visited)
+{
+  if(base_name_to_lookup.empty())
+    return;
+  if(!visited.insert(this).second)
+    return;
+
   cpp_id_mapt::iterator lower_it = sub.lower_bound(base_name_to_lookup);
 
-  if(lower_it!=sub.end())
+  if(lower_it != sub.end())
   {
     cpp_id_mapt::iterator upper_it = sub.upper_bound(base_name_to_lookup);
 
-    for(cpp_id_mapt::iterator n_it=lower_it;
-        n_it!=upper_it; n_it++)
+    for(cpp_id_mapt::iterator n_it = lower_it; n_it != upper_it; n_it++)
       id_set.insert(&n_it->second);
   }
 
   if(base_name == base_name_to_lookup)
     id_set.insert(this);
 
-  if(kind==SCOPE_ONLY)
-    return; // done
+  if(kind == SCOPE_ONLY)
+    return;
 
-  // using scopes
+  // Use cached lookups for using/secondary scopes.
   for(const auto &s_ptr : using_scopes)
   {
-    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
-
-    // Recursive call.
-    // Note the different kind!
-    other_scope.lookup_rec(base_name_to_lookup, QUALIFIED, id_set);
+    auto result =
+      static_cast<cpp_scopet &>(*s_ptr).lookup(base_name_to_lookup, QUALIFIED);
+    id_set.insert(result.begin(), result.end());
   }
 
-  if(!id_set.empty())
-    return; // done, upwards scopes are hidden
-
-  // secondary scopes
-  for(const auto &s_ptr : secondary_scopes)
+  if(id_set.empty())
   {
-    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
-
-    // Recursive call.
-    // Note the different kind!
-    other_scope.lookup_rec(base_name_to_lookup, QUALIFIED, id_set);
+    for(const auto &s_ptr : secondary_scopes)
+    {
+      auto result = static_cast<cpp_scopet &>(*s_ptr).lookup(
+        base_name_to_lookup, QUALIFIED);
+      id_set.insert(result.begin(), result.end());
+    }
   }
 
-  if(kind==QUALIFIED)
-    return; // done
+  if(kind == QUALIFIED)
+    return;
 
   if(!id_set.empty())
-    return; // done
+    return;
 
-  // ask parent, recursive call
+  // Ask parent — use cached RECURSIVE lookup.
   if(!is_root_scope())
-    get_parent().lookup_rec(base_name_to_lookup, kind, id_set);
+  {
+    auto result = get_parent().lookup(base_name_to_lookup, RECURSIVE);
+    id_set.insert(result.begin(), result.end());
+  }
 }
 
 void cpp_scopet::lookup_rec(
@@ -86,16 +102,23 @@ void cpp_scopet::lookup_rec(
   cpp_idt::id_classt identifier_class,
   id_sett &id_set)
 {
-  // we have a hack to do full search in case we
-  // are looking for templates!
+  visited_sett visited;
+  lookup_rec(base_name_to_lookup, kind, identifier_class, id_set, visited);
+}
 
-  #if 0
-  std::cout << "B: " << base_name_to_lookup << '\n';
-  std::cout << "K: " << kind << '\n';
-  std::cout << "I: " << identifier_class << '\n';
-  std::cout << "THIS: " << base_name << " " << identifier_class
-            << " " << this->identifier << '\n';
-  #endif
+void cpp_scopet::lookup_rec(
+  const irep_idt &base_name_to_lookup,
+  lookup_kindt kind,
+  cpp_idt::id_classt identifier_class,
+  id_sett &id_set,
+  visited_sett &visited)
+{
+  if(base_name_to_lookup.empty())
+    return;
+
+  bool already_visited = !visited.insert(this).second;
+  if(already_visited && kind == QUALIFIED)
+    return;
 
   cpp_id_mapt::iterator lower_it = sub.lower_bound(base_name_to_lookup);
 
@@ -117,29 +140,26 @@ void cpp_scopet::lookup_rec(
   if(kind==SCOPE_ONLY)
     return; // done
 
-  // using scopes
-  for(const auto &s_ptr : using_scopes)
+  if(!already_visited)
   {
-    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
+    // using scopes
+    for(const auto &s_ptr : using_scopes)
+    {
+      cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
+      other_scope.lookup_rec(
+        base_name_to_lookup, QUALIFIED, identifier_class, id_set, visited);
+    }
 
-    // Recursive call.
-    // Note the different kind!
-    other_scope.lookup_rec(
-      base_name_to_lookup, QUALIFIED, identifier_class, id_set);
-  }
+    if(!id_set.empty() && identifier_class != id_classt::TEMPLATE)
+      return; // done, upwards scopes are hidden
 
-  if(!id_set.empty() && identifier_class != id_classt::TEMPLATE)
-    return; // done, upwards scopes are hidden
-
-  // secondary scopes
-  for(const auto &s_ptr : secondary_scopes)
-  {
-    cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
-
-    // Recursive call.
-    // Note the different kind!
-    other_scope.lookup_rec(
-      base_name_to_lookup, QUALIFIED, identifier_class, id_set);
+    // secondary scopes
+    for(const auto &s_ptr : secondary_scopes)
+    {
+      cpp_scopet &other_scope = static_cast<cpp_scopet &>(*s_ptr);
+      other_scope.lookup_rec(
+        base_name_to_lookup, QUALIFIED, identifier_class, id_set, visited);
+    }
   }
 
   if(kind==QUALIFIED)
@@ -151,7 +171,7 @@ void cpp_scopet::lookup_rec(
   // ask parent, recursive call
   if(!is_root_scope())
     get_parent().lookup_rec(
-      base_name_to_lookup, kind, identifier_class, id_set);
+      base_name_to_lookup, kind, identifier_class, id_set, visited);
 }
 
 cpp_scopet::id_sett cpp_scopet::lookup_identifier(

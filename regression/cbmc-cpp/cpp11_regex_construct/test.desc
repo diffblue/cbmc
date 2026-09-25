@@ -1,0 +1,18 @@
+THOROUGH
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ regex constructed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Full symbolic execution of std::regex construction over libstdc++'s
+<regex>.  Historically this passed in ~25s ONLY in heap layouts where
+the _Compiler constructor body had been silently dropped (an
+order-dependent tie between the in-class friend declaration of
+make_shared and its namespace definition, whose unnamed parameter pack
+the parser had spelled differently); with the front end now
+deterministic and the body present, symex of the NFA compiler exceeds
+30 minutes at --unwind 5.  The CORE conversion gate is in
+test_conversion.desc.

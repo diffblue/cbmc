@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+could not fully type-check
+dropped
+--
+N5008 [temp.inst]/1: an alias declaration does not require a complete type,
+so `using str = basic_str<char>;' (an alias TEMPLATE naming a class template
+specialization whose argument is still incomplete) must not instantiate it.
+The typedef branch of convert_non_template_declaration cleared
+skip_typechecking_elaborate instead of restoring it when the alias template's
+own declaration was converted underneath, so the outer resolver elaborated
+the class (libstdc++ 11 pmr::string: "dropped 4 system-header declarations";
+here: `a' never constructed, assertion 1 failed).
+Fixing this needed two parts: restore skip_typechecking_elaborate after the
+nested alias-template conversion, and clear it while a class BODY is being
+type-checked (typecheck_compound_body) -- a body reached from within an alias
+(a qualified name looked into the class, [temp.inst]/2) has real uses in its
+bases and members; leaving the flag set left `__invoke_of<...>`'s base
+`enable_if<...>` unelaborated and `invoke_result_t<...>` unresolved
+(cpp20_ranges_pipe_invoke_drop).

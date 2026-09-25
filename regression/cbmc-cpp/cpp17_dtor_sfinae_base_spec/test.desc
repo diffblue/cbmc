@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ empty: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Was KNOWNBUG; fixed by two changes: (1) N5008 [expr.prim.id.dtor] +
+[class.dtor]/1,6 -- the explicit destructor call notation on a class
+whose destructor is implicitly declared and trivial (no synthesized
+destructor symbol under CBMC's POD gate) now uses the same no-op dummy
+as scalar pseudo-destructor calls, so the destructibility SFINAE probe
+`decltype(declval<T&>().~T())` resolves; (2) the ~_Tp destructor-name
+substitution now prefers the template-map binding that designates the
+CURRENT class scope ([expr.prim.id.dtor]/2) instead of an arbitrary
+same-short-name binding, and extracts the class's unqualified name
+ANGLE-AWARE (a naive rfind("::") landed inside a template instance's
+arguments, spelling e.g. `~allocator` for basic_string).  Header-free
+skeleton of libstdc++'s std::optional<std::string> (see
+cpp17_optional_string, fixed by the same changes).

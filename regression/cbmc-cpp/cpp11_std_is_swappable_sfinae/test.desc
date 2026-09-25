@@ -1,0 +1,35 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+unexpected expression: struct_tag
+found no match for symbol 'swap'
+\* identifier: std::tag-__not_<
+--
+Per [temp.deduct]/7-8 substitution failures during the deduction
+process (including default-template-argument substitution) are
+silently absorbed during overload resolution: no diagnostic is
+emitted and the failing candidate is simply discarded.
+
+This test was previously KNOWNBUG because CBMC leaked
+`unexpected expression: struct_tag` + `irep::pretty()` dump + a
+cascading `found no match for symbol 'swap'` when processing
+libstdc++'s `std::is_swappable<T>` via `swap(_Tp&, _Tp&)` whose
+return type is `_Require<__not_<__is_tuple_like<_Tp>>, ...>`.
+
+Fixed by two null-message-handler wraps per [temp.deduct]/7-8:
+ * Around `guess_function_template_args(old_id, fargs)` in
+   `cpp_typecheck_resolve.cpp` (per-candidate substitution).
+ * Around `typecheck_type(arg.type())` for default TYPE template
+   arguments in `cpp_typecheck_template.cpp` (i >= first_default).
+
+`static_assert(std::is_swappable<double>::value)` now evaluates to
+true with no user-visible diagnostic.  The minimum-reproducer
+distilled from a user harness that transitively includes <array>,
+which in turn instantiates
+`std::array<double, N>` -> `std::__array_traits<double, N>` ->
+`std::__is_swappable<double>` -> `std::__is_swappable_impl<double>`.

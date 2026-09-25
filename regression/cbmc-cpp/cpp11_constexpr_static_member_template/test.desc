@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Static constexpr member initializers referencing template
+metafunctions with non-type parameters: the parameter is not
+substituted when constexpr is used (works with plain const).
+Root cause of libc++ std::ratio and std::chrono::duration failures.

@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20 --unwind 4 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ \[=\] snapshots odr-used locals at capture: SUCCESS$
+^\[main\.assertion\.2\] line \d+ \[&\] captures odr-used locals by reference: SUCCESS$
+^\[main\.assertion\.3\] line \d+ capture-default with explicit override: SUCCESS$
+^\[main\.assertion\.4\] line \d+ explicit by-reference override modifies referent: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.capture]: a capture-default captures each odr-used automatic
+local entity -- by copy for `=` (a snapshot at capture time), by reference for
+`&` (the live entity) -- unless explicitly captured otherwise.  Lambda rework
+Phase E discovers the odr-used locals (simple identifiers in the body that
+resolve to automatic locals in the enclosing scope) and captures them per the
+default, with explicit captures overriding the default.  Lambdas in a
+member-function context (which would capture *this) stay on the function-pointer
+lowering for now.

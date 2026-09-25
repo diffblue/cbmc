@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ heterogeneous int,double pack size 2: SUCCESS$
+^\[main\.assertion\.2\] line \d+ heterogeneous S,R,int pack size 3: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG: must fail: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^found no match for symbol 'count'$
+--
+N5008 [temp.deduct.call]/1-4 + [temp.variadic]/4: a variadic function template
+with a forwarding-reference parameter pack `A&&...` deduces each pack element
+independently, and the elements may have distinct types; the instantiated
+function then has one parameter per element with its own type.  CBMC expanded
+the pack into pack_size copies of the FIRST element's parameter (correct only
+for a homogeneous pack), so for a forwarding-reference pack a later argument of
+a different type could not bind and the call was wrongly rejected as "found no
+match".  Fixed in cpp_typecheck_resolvet::guess_function_template_args by
+assigning each expanded parameter its corresponding deduced pack-element type.
+Reduced (via cvise, keeping real headers) from src/util/validate_expressions.cpp
+`call_on_expr<...>(ns, vm)`.  assertion.3 provides non-vacuity.

@@ -125,6 +125,7 @@ exprt goto_symext::address_arithmetic(
     if_expr.false_case() =
       address_arithmetic(if_expr.false_case(), state, keep_array);
 
+    if_expr.type() = if_expr.true_case().type();
     result=if_expr;
   }
   else if(expr.id()==ID_symbol ||
@@ -278,8 +279,12 @@ void goto_symext::dereference_rec(
         const dereference_exprt to_check =
           to_dereference_expr(get_original_name(expr));
 
-        expr_is_not_null = path_storage.safe_pointers.at(expr_function)
-                             .is_safe_dereference(to_check, state.source.pc);
+        auto sp_it = path_storage.safe_pointers.find(expr_function);
+        if(sp_it != path_storage.safe_pointers.end())
+        {
+          expr_is_not_null =
+            sp_it->second.is_safe_dereference(to_check, state.source.pc);
+        }
       }
     }
 
@@ -394,8 +399,25 @@ void goto_symext::dereference_rec(
 
     exprt &object=address_of_expr.object();
 
+    // Preserve pointer-to-member attribute: address_arithmetic may
+    // rebuild the address_of using address_of_exprt(object) which
+    // constructs a plain pointer_type without the to_member attribute.
+    // For pointer-to-member-function expressions (e.g., &x::f), the
+    // outer pointer type carries to_member; we must restore it on the
+    // rewritten expression so that downstream consumers (in particular,
+    // comparison with a null pointer-to-member constant) see matching
+    // types.
+    const auto original_to_member = expr.type().find(ID_to_member);
+
     expr = address_arithmetic(
       object, state, to_pointer_type(expr.type()).base_type().id() == ID_array);
+
+    if(
+      original_to_member.is_not_nil() && expr.type().id() == ID_pointer &&
+      expr.type().find(ID_to_member).is_nil())
+    {
+      expr.type().add(ID_to_member) = original_to_member;
+    }
   }
   else if(expr.id()==ID_typecast)
   {

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11 --unwind 5 --no-unwinding-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+main exercises std::set::insert, std::set::size and std::set::count.  The
+libstdc++ red-black-tree insertion (std::_Rb_tree_insert_and_rebalance) is
+defined in the compiled library, not the headers, so CBMC provides a model
+for it (cpp_typecheck_stdlib.cpp) that performs the binary-search-tree link
+and header (root/leftmost/rightmost) maintenance -- sufficient for the
+ordered-container find/count/size semantics.

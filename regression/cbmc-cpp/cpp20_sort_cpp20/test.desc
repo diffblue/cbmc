@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp20 --unwind 3 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+__numeric_traits_integer template scope lost in C++20 mode.
+Works with --cpp17.

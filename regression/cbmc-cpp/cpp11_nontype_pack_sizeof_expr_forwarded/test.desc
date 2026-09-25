@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.variadic]/4-5.  A pack expansion whose pattern is a `sizeof`
+unary-expression (`sizeof(Us)...`), forwarded from an enclosing function
+template, expands to the correct element count: `box<sizeof(Us)...>::n`
+(n = sizeof...(Vs)) matches the number of forwarded arguments for 0, 1, 2 and 3
+elements.  Previously the pack collapsed to a single element (a non-type pack was
+scalar-bound to its first argument in the template map).  Non-vacuous: under the
+collapse the count would be 1.

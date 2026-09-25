@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ deduced pack arity through partial-spec base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A class template partial specialization whose parameter pack follows fixed
+(non-deduced) template arguments, selected via the partial-specialization
+disambiguation path (as a dependent base class), must deduce the pack to all
+trailing arguments rather than collapsing it to one element.  This is the shape
+of libstdc++'s __result_of_impl<false,false,_Functor,_ArgTypes...> behind
+multi-argument std::function.  N5008 [temp.spec.partial.match], [temp.variadic]/5.
+
+Fixed in cpp_typecheck_resolvet::disambiguate_template_classes: after
+build_template_args (which emits a single scalar convenience binding for the
+pack), expand the deduced pack into one positional argument per element via
+pack_args_map, mirroring elaborate_class_template, so the specialization is
+instantiated with the pack bound to all trailing arguments and sizeof...(A) is
+correct.  Non-vacuous (assertion 2 must FAIL).

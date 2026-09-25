@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ explicit-targ \+ deduced trailing pack instantiates: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.arg.explicit]/3, [temp.deduct.call]/3: a function template called
+with an explicit leading template argument and a trailing parameter pack deduced
+from the call arguments instantiates with the pack bound to exactly the supplied
+trailing arguments.  Fixed in cpp_typecheck_resolvet::resolve: the post-
+instantiation function-parameter-pack expansion now counts the non-pack FUNCTION
+parameters (and the pack's function-parameter position) rather than the
+TEMPLATE-parameter count, which over-counted by the number of template
+parameters that are not function parameters (e.g. an explicit leading return-type
+parameter R), inserting one parameter too many.  This is the function-template
+analogue of cpp11_partial_spec_pack_after_fixed and the root of multi-argument
+std::function's _M_invoke/__invoke_r dispatch (now CORE in cpp11_function_basic /
+cpp17_functional_basic).  Non-vacuous (assertion 2 must FAIL).

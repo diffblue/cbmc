@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp23
+^\[main\.assertion\.1\] line \d+ builtin param type: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A function parameter declared with a type-yielding builtin AND a name,
+`int probe(__add_rvalue_reference(_Tp) v)`, is a PARSE error ("parse
+error before ') { return v'") -- the builtin-call form followed by a
+declarator name confuses the cast-vs-declaration disambiguation.  The
+unnamed form parses.  gcc-16 headers use the named form
+(is_trivially_move_assignable_v's helper).  VALIDITY: gcc-16-only
+builtin; certified by g++ 16.2 in the gcc16-gate docker image
+(tumbleweed); host g++ 13 does not know the builtin.
+Derived from the cvise-reduced gcc16_optional_transform artifact
+(round 106 manual backward delta, /tmp/k106 h1-h4).

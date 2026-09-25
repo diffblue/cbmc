@@ -1,0 +1,9 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+compressed_pair reference initialization error prevents
+iterator_traits elaboration for vector iterators.

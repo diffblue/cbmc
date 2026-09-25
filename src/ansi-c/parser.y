@@ -109,6 +109,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_SHIFTRIGHT ">>"
 %token TOK_LE        "<="
 %token TOK_GE        ">="
+%token TOK_SPACESHIP "<=>"
 %token TOK_EQ        "=="
 %token TOK_NE        "!="
 %token TOK_ANDAND    "&&"
@@ -149,6 +150,19 @@ int yyansi_cerror(const std::string &error);
 %token TOK_PTR64       "__ptr64"
 %token TOK_TYPEOF      "typeof"
 %token TOK_GCC_AUTO_TYPE "__auto_type"
+%token TOK_GCC_BUILTIN_REMOVE_CV "__remove_cv"
+%token TOK_GCC_BUILTIN_REMOVE_CONST "__remove_const"
+%token TOK_GCC_BUILTIN_REMOVE_VOLATILE "__remove_volatile"
+%token TOK_GCC_BUILTIN_REMOVE_REFERENCE "__remove_reference"
+%token TOK_GCC_BUILTIN_REMOVE_CVREF "__remove_cvref"
+%token TOK_GCC_BUILTIN_REMOVE_POINTER "__remove_pointer"
+%token TOK_GCC_BUILTIN_REMOVE_EXTENT "__remove_extent"
+%token TOK_GCC_BUILTIN_REMOVE_ALL_EXTENTS "__remove_all_extents"
+%token TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE "__add_lvalue_reference"
+%token TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE "__add_rvalue_reference"
+%token TOK_GCC_BUILTIN_MAKE_UNSIGNED "__make_unsigned"
+%token TOK_GCC_BUILTIN_MAKE_SIGNED "__make_signed"
+%token TOK_GCC_BUILTIN_ADD_POINTER "__add_pointer"
 %token TOK_GCC_FLOAT16 "_Float16"
 %token TOK_GCC_FLOAT32 "_Float32"
 %token TOK_GCC_FLOAT32X "_Float32x"
@@ -238,6 +252,8 @@ int yyansi_cerror(const std::string &error);
 %token TOK_THREAD_LOCAL "_Thread_local"
 %token TOK_NULLPTR     "nullptr"
 %token TOK_CONSTEXPR   "constexpr"
+%token TOK_CONSTEVAL   "consteval"
+%token TOK_CONSTINIT   "constinit"
 %token TOK_BIT_CAST    "__builtin_bit_cast"
 
 /*** special scanner reports ***/
@@ -250,13 +266,19 @@ int yyansi_cerror(const std::string &error);
 %token TOK_CATCH       "catch"
 %token TOK_CHAR16_T    "char16_t"
 %token TOK_CHAR32_T    "char32_t"
+%token TOK_CHAR8_T     "char8_t"
 %token TOK_CLASS       "class"
+%token TOK_CONCEPT     "concept"
+%token TOK_CO_AWAIT    "co_await"
+%token TOK_CO_RETURN   "co_return"
+%token TOK_CO_YIELD    "co_yield"
 %token TOK_DELETE      "delete"
 %token TOK_DECLTYPE    "decltype"
 %token TOK_EXPLICIT    "explicit"
 %token TOK_FRIEND      "friend"
 %token TOK_MUTABLE     "mutable"
 %token TOK_NAMESPACE   "namespace"
+%token TOK_REQUIRES    "requires"
 %token TOK_NEW         "new"
 %token TOK_NODISCARD   "nodiscard"
 %token TOK_NOEXCEPT    "noexcept"
@@ -281,6 +303,10 @@ int yyansi_cerror(const std::string &error);
 %token TOK_MSC_IF_EXISTS "__if_exists"
 %token TOK_MSC_IF_NOT_EXISTS "__if_not_exists"
 %token TOK_UNDERLYING_TYPE "__underlying_type"
+%token TOK_DYNAMIC_CAST "dynamic_cast"
+%token TOK_STATIC_CAST "static_cast"
+%token TOK_REINTERPRET_CAST "reinterpret_cast"
+%token TOK_CONST_CAST "const_cast"
 
 /*** priority, associativity, etc. definitions **************************/
 
@@ -1233,9 +1259,15 @@ alignas_specifier:
           parser_stack($$).set(ID_size, parser_stack($3));
         }
         | TOK_ALIGNAS '(' type_name ')'
-        { $$ = $1;
+        { // C11 6.7.5: _Alignas(type) is equivalent to
+          // _Alignas(_Alignof(type)); build the _Alignof expression.
+          // (The old action set ID_type_arg on the discarded $3 --
+          // the alignment was silently lost.)
+          $$ = $1;
           parser_stack($$).id(ID_aligned);
-          parser_stack($3).set(ID_type_arg, parser_stack($3));
+          exprt tmp(ID_alignof);
+          tmp.add(ID_type_arg).swap(parser_stack($3));
+          parser_stack($$).set(ID_size, std::move(tmp));
         }
         ;
 
@@ -1832,20 +1864,17 @@ member_declaring_list:
           type_specifier
           member_declarator
         {
-          if(parser_stack($2).id() != ID_struct &&
-             parser_stack($2).id() != ID_union &&
-             !PARSER.pragma_pack.empty() &&
+          if(!PARSER.pragma_pack.empty() &&
              PARSER.pragma_pack.back() != 0)
           {
-            // communicate #pragma pack(n) alignment constraints by
-            // by both setting packing AND alignment for individual struct/union
-            // members; see padding.cpp for more details
-            init($$);
-            set($$, ID_packed);
-            $2=merge($2, $$);
-
+            // communicate the #pragma pack(n) alignment CAP to the
+            // individual struct/union members as a pragma-marked `aligned'
+            // node: GCC lays a member out at min(n, max(natural, its own
+            // aligned(k))) -- see padding.cpp.  (A member's own attributes
+            // stay separate; the conversion keeps the two apart.)
             init($$);
             set($$, ID_aligned);
+            parser_stack($$).set(ID_C_pragma_pack, true);
             parser_stack($$).set(ID_size, PARSER.pragma_pack.back());
             $2=merge($2, $$);
           }

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The GCC `__integer_pack` builtin with a CAST argument, as libstdc++ writes
+std::make_integer_sequence (`integer_sequence<T, __integer_pack(T(N))...>`).
+With the `T(N)` cast the pack-expansion argument is stored as an `ambiguous`
+function type (vexing parse: `code` returning `__integer_pack`, parameter `T N`),
+so the plain-call __integer_pack expansion missed it.  Fixed by also recognising
+that shape (count = parameter name N, element type = parameter type T), greening
+deduction from the real std::make_index_sequence (this test uses both a
+hand-written cast alias and the real std::make_index_sequence).  GCC-only builtin
+(Clang uses __make_integer_seq).  Non-vacuous: each assertion is a concrete
+function of the generated pack.

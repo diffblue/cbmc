@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line 35 using-declared member of private TT base: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A class template privately inherits (class default access) from a
+template-template-parameter base and republishes a base member with a
+public using-declaration (N5008 [namespace.udecl]/16,19).  Calling the
+member on a derived lvalue must bind the implicit object argument to
+the private base ([over.match.funcs]/5) -- the libc++
+__split_buffer/__relocate shape whose rejection made vector's
+__emplace_back_slow_path bodiless.

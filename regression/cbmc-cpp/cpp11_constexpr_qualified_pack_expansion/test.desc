@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ reference-qualified pack expansion folds true: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reference-qualified pack expansion folds false: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.variadic]/4-5: a pack expansion's pattern may be a qualified type --
+reference/pointer/cv-qualified -- wrapping the pack, e.g. std::tuple's
+`__is_explicitly_constructible<const _Elements&...>()`.  CBMC expanded a
+pack-expansion template argument only when its pattern was a bare cpp_name, and
+template_mapt::apply substituted through `pointer` but not the front-end
+`frontend_pointer` (source-level pointer/reference).  So `const Ts&...`,
+`Ts&...`, `Ts*...` with two or more elements were left unexpanded (or the pack
+unsubstituted), and a surrounding constexpr trait could not fold; single-element
+packs worked via the single-element type_map convenience.  Fixed by gating the
+expansion on the argument being a top-level pack expansion (packs are found by
+walking the whole pattern) and by substituting through `frontend_pointer`.
+Assertions 1-2 verify both the expanded count and per-element cv-ref
+qualification (true/false); assertion 3 (a wrong value) must FAIL, proving
+non-vacuity.

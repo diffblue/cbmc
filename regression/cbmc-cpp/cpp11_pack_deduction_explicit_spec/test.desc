@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ pack deduced from explicit specialization: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.type]: pack deduction against a full-specialization
+instance must use the primary-template-relative argument list (the
+specialization's own list is empty).  The instance now records
+ID_full_template_args across elaboration and deduction prefers it.
+Distilled from std::pair's piecewise constructor probed with
+tuple<int&&> inside _Rb_tree emplace.  g++/clang++ runtime-verified.
+Note: sizeof...(A1) in the ctor also checks the deduced arity (1).

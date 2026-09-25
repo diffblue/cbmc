@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member operator<< found via a reference-typed operand: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+--
+N5008 [over.match.oper]/3.2: the member candidate set for `a @ b` is the
+qualified lookup of `T1::operator@`, where T1 is the type of the left operand.
+An lvalue of reference-to-class type -- e.g. `static_cast<std::ostream&>(x)`,
+which CBMC represents with a reference type rather than a bare struct_tag --
+is an lvalue of the referenced class type and so has that class's member
+operators as candidates.  Here `static_cast<ostream&>(base) << 42` inside a
+member operator<< template body must select ostream::operator<<(int).
+Regression for the dog-food src/util (parse_options.cpp, typecheck.cpp) shl
+noise.  assertion.2 ("WRONG") must FAIL (non-vacuity).

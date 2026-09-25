@@ -1,0 +1,163 @@
+CORE libcxx
+main.ii
+--cpp20 --stdlib libc++ --unwind 5 --no-unwinding-assertions --object-bits 12
+^\[main\.assertion\.1\] line \d+ size after one push_back: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value after one push_back: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: BOTH assertions FAIL -- a wrong verdict on a correct program
+(soundness-relevant, unlike the vacuous-drop KNOWNBUGs).  The source is
+ten lines; only the libc++-23 headers are needed to reproduce, hence
+the preprocessed carrier.
+ROUND-90 DIAGNOSIS (bisected):
+- An EMPTY vector is modelled correctly (size()==0, empty()).
+- `reserve(4)` has NO EFFECT: capacity() is still 0 afterwards
+  (asserting capacity()==0 SUCCEEDS), while size() stays correct.
+- Root: `__vector_layout<T,A>::__relocate`, which reserve calls, is
+  present in the symbol table with an EMPTY body and return type
+  `auto (...) -> void` although it is declared `void` -- the OUT-OF-LINE
+  definition (layout.h:290) was never matched to the in-class
+  declaration (layout.h:196), so the odr-used member has no body
+  ([temp.inst]/1 requires implicit instantiation when odr-used).
+- The call is NOT flagged and the wrong answer is SILENT.  Round-91
+  follow-up explains why twice over: goto-symex emits "no body for
+  callee" only when unwinding assertions are enabled
+  (symex_function_call.cpp), and this test needs
+  --no-unwinding-assertions; but even WITH them enabled no property
+  appears, because the callee has NO goto-function entry at all (only
+  the CALL instruction exists), so the missing-body path is never
+  reached.  A call to a function with no entry silently does nothing --
+  a separable soundness gap worth its own fix.
+- NEGATIVE KERNELS (round 90, both VERIFY clean): oo1 -- out-of-line
+  definition of a class-template member whose parameter type is a
+  MEMBER ALIAS; oo2 -- the same with `constexpr` plus libc++'s three
+  attributes (visibility / exclude_from_explicit_instantiation /
+  abi_tag) on the in-class declaration only.  So neither the member
+  alias nor the attribute asymmetry is the trigger.
+- FIVE negative kernels now (oo1-oo3 round 90; sk1, sk2 round 91): the
+  full skeleton recovered by cvise -- vector holding a
+  `__vector_layout` member, `reserve` defined OUT OF LINE calling
+  `layout_.relocate(v)`, the parameter type a member alias to a
+  forward-declared 3-parameter template whose third argument is a
+  template TEMPLATE parameter used CRTP-style, definitions supplied
+  after the declarations -- VERIFIES CLEAN when hand-written.  So the
+  trigger needs something still unidentified from the real headers.
+- ROUND-93 CAUSAL CHAIN, now complete (probes into the deferral,
+  odr-use, recovery and overload paths):
+    1. the out-of-line definition IS parsed (qualified, with body) and
+       the member IS deferred with that body attached;
+    2. converting the body FAILS: at layout.h:409 the inner call
+       `__buffer.__relocate(__begin_, __end_, __capacity_)` reports
+       "found no match for symbol '__relocate'", although the single
+       candidate `void __relocate(__split_buffer_pointer_layout *,
+       int *&, int *&, int *&)` matches in arity and the arguments are
+       the layout's own `int *` members;
+    3. the no-viable-call recovery then NILS the body (by design), so an
+       odr-used member is left bodyless;
+    4. a bodyless call is a NO-OP (KNOWNBUG bodyless_call_no_havoc), so
+       reserve() silently does nothing and capacity() stays 0.
+  The defect to fix is the failing overload resolution in step 2.
+  CORRECTION of an earlier note: `auto (...) -> void` in the symbol dump
+  is merely CBMC's printer for code types (a WORKING member prints
+  identically), not a deduced return type; and find_out_of_line_body is
+  not called because it is only a FALLBACK for bodies that fail to
+  convert after being attached by a different route.
+- EIGHT negative kernels (oo1-oo3, sk1, sk2, lv1-lv3): all verify clean,
+  including passing own members as pointer-REFERENCE arguments to a
+  member inherited through a TT-parameter CRTP base with PRIVATE
+  inheritance plus friendship.  Hence the machine reduction.
+- A reduction with a gate that pins the driver, requires the
+  out-of-line DEFINITION text to survive, and requires the member to
+  remain bodyless is running in /tmp/cv91.
+
+ROUND-118: cv117's artifact (19 lines) is DEGENERATE -- cvise split
+push_back into TWO overloads so the pinned definition text belongs to
+the overload NOT selected by `v.push_back(7)` (its const_reference
+also lost its const, flipping overload resolution).  GATE LESSON #4:
+called-but-undefined checks keyed on a NAME are defeated by overload
+sets; a robust pin needs the full signature or a uniquely-named
+function.  DO NOT re-reduce blindly: the original carrier has TWO
+VISIBLE front-end errors that are the actual lead --
+  * conditional.h:40: instantiating 'std::__1::vector' ...
+  * __split_buffer:721 function ~_ConstructTransaction: instantiating
+    'std::__1::vector' ...
+and three vector members (push_back/size/operator[]) end up bodyless.
+Next: probe the ~_ConstructTransaction error directly (RESOLVE-THROW /
+RTHROW kit) -- visible errors need no reduction.
+
+ROUND-119: FIRST visible error fixed (trailing zero-length-pack
+sentinel counted against packless vector<_Tp, _Allocator>; sentinels
+now stripped in typecheck_template_args when the target has no trailing
+pack).  Probe trail: TMA probe showed vector (2 params) receiving
+[cpp_name][struct_tag][ambiguous:empty]; the sentinel is CBMC's own
+[temp.variadic]/7 recording convention, and it arrives AMBIGUOUS-
+wrapped (first strip attempt matched only ID_type and missed).  The
+NEXT layer is now exposed: `found no match for symbol '_Bp'` (twice)
+resolving libc++'s `_If` alias -- `typename _IfImpl<_Cond>::template
+_Select<_IfRes, _ElseRes>` with bool NTTPs -- plus the residual
+__set_sentinel overload mismatch in ~_ConstructTransaction (implicit
+object argument `struct __split_buffer` vs candidates on
+`__split_buffer_pointer_layout*`: derived-to-base `this` conversion
+through the CRTP template-template base; hand kernels t1-t4 of the
+bare shapes all PASS, so the failing ingredient is narrower).
+
+ROUND-120: cv120/cv121 (visible-error gate on the _Bp + __set_sentinel
+pair, formatted-relaunch applied) delivered reduced.cpp: 24561 -> 61
+lines, still showing BOTH errors, clang-valid (docker cxx23-gate; the
+#pragma clang attribute lines need clang).  The two mechanisms as
+visible in the artifact:
+  * _Bp: `conditional<int _Bp, class _ElseRes>`'s member alias
+    `type = _If<_Bp, int, _ElseRes>` -- the class's OWN non-type
+    parameter as the NTTP argument of another alias -- resolved from
+    outside via __conditional_t with the instance map missing _Bp
+    (probe: scope=conditional<0,...>, map holds _If's params only).
+    The artifact's use site qualifies through the INJECTED-CLASS-NAME
+    (`integral_constant<...>::integral_constant::value`) and passes the
+    in-progress `vector` as an argument -- hand kernels without those
+    (ka) PASS, so one of them is load-bearing.
+  * __set_sentinel: the member comes into __split_buffer via a
+    USING-DECLARATION from the template-template-dependent base
+    (`using __base_type::__set_sentinel;`), called through the nested
+    class's parent pointer from ~_ConstructTransaction.  Hand kernel kb
+    (same shape, no in-progress enclosing instantiation) PASSES.
+Next: probe directly on reduced.cpp (61 lines, ~1s per run) -- BP-map
+probe at the failing resolve + the injected-class-name path.
+
+ROUND-121 (2026-09-12): THREE fixes landed off this carrier; every
+front-end diagnostic is now GONE from main.ii (--cpp20 --stdlib
+libc++):
+  * 400b2bbddd  _Bp: apply()'s short-name bridge no longer lets a
+    caller's TYPE parameter binding act as a template-name
+    ([temp.names]/2); template_template_parameters set added.
+  * 3a4e13b168  companion: nor wholesale-replace the template-id
+    (the argument-list-discarding fall-through); CORE tests
+    cpp11_alias_template_short_name_capture{,2}.
+  * 5face51cef  __set_sentinel: TT-param binding now resolves to
+    namespace-nested templates via cpp_scopes.id_map (root RECURSIVE
+    search cannot descend); the _Layout<...> base is no longer
+    dropped.  CORE test cpp11_tt_param_base_in_namespace.
+reduced.cpp deleted: cvise (cv120-cv122) converged on a degenerate
+no-base shape (clang -fsyntax-only never instantiates the template, so
+the using-declaration-from-non-base is unchecked) which stopped
+representing the real defect.
+REMAINING (why still KNOWNBUG, now VERIFICATION FAILED not a
+front-end error):
+  * emplace_back<int>'s internal lambda __lambda_2 body is dropped
+    (.no-body ...__lambda_2_cl...) -- next reduction/probe target.
+  * no model for __builtin_assume_aligned (separate, back-end-ish:
+    __add_alignment_assumption no-body FAILURE).
+
+ROUND-128 FLIP: the last semantic failure was reference_related
+rejecting the implicit-object derived-to-base binding for a member
+using-declared from a PRIVATE (class-default) TT base
+([namespace.udecl]/16,19, [over.match.funcs]/5) --
+__emplace_back_slow_path was bodiless and push_back left __end_
+nondet.  Fixed; both assertions verify with the flags above
+(--stdlib libc++ added: the preprocessed source uses libc++-23
+builtin semantics).  CORE test cpp11_using_decl_private_tt_base locks
+the kernel.  Note: WITHOUT the unwind bound symex does not terminate
+(the now-real relocation loop over a nondet-capacity buffer) -- the
+bound matches the single-push_back harness.

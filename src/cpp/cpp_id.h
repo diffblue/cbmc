@@ -24,6 +24,17 @@ class cpp_idt
 public:
   cpp_idt();
 
+  /// Deterministic creation ordinal.  Scope lookups collect candidate
+  /// sets of `cpp_idt *`; ordering those by POINTER made candidate
+  /// iteration -- and thus overload resolution and template
+  /// instantiation order -- depend on heap layout (observably varying
+  /// with argv/environment size, flipping cbmc-cpp regex tests between
+  /// 25s and timeout).  Order by construction instead.
+  std::size_t ordinal = next_ordinal();
+
+  /// Next value of \ref ordinal (a process-wide counter).
+  static std::size_t next_ordinal();
+
   enum class id_classt
   {
     UNKNOWN,
@@ -85,6 +96,11 @@ public:
     return *parent;
   }
 
+  bool has_parent() const
+  {
+    return parent != nullptr;
+  }
+
   void set_parent(cpp_idt &_parent)
   {
     PRECONDITION(_parent.is_scope);
@@ -98,6 +114,40 @@ public:
 
   void print(std::ostream &out, unsigned indent=0) const;
   void print_fields(std::ostream &out, unsigned indent=0) const;
+
+  /// Number of registered base/`using` scope links on this scope.
+  /// Used by the Category A-deep recovery in
+  /// `cpp_typecheckt::typecheck_compound_body` to roll back partial
+  /// additions if `typecheck_compound_bases` throws midway.
+  std::size_t secondary_scopes_size() const
+  {
+    return secondary_scopes.size();
+  }
+  std::size_t using_scopes_size() const
+  {
+    return using_scopes.size();
+  }
+  void remove_secondary_scope(const cpp_idt &other)
+  {
+    for(auto it = secondary_scopes.begin(); it != secondary_scopes.end();)
+    {
+      if(*it == &other)
+        it = secondary_scopes.erase(it);
+      else
+        ++it;
+    }
+  }
+
+  void truncate_secondary_scopes(std::size_t n)
+  {
+    PRECONDITION(n <= secondary_scopes.size());
+    secondary_scopes.resize(n);
+  }
+  void truncate_using_scopes(std::size_t n)
+  {
+    PRECONDITION(n <= using_scopes.size());
+    using_scopes.resize(n);
+  }
 
 protected:
   typedef std::multimap<irep_idt, cpp_idt> cpp_id_mapt;

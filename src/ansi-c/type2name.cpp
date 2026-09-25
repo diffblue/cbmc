@@ -250,6 +250,23 @@ static std::string type2name(
     const auto size_int = numeric_cast_v<mp_integer>(size);
     result += "VEC" + integer2string(size_int);
   }
+  else if(type.id() == ID_constructor)
+  {
+    // C++ constructors have no return type (C++ [class.ctor]); the
+    // front-end marks their code type with a `constructor` return.  Use a
+    // stable spelling rather than throwing: a C++ struct's components
+    // include its member functions, so a type2name over such a struct
+    // (e.g. the anonymous-struct naming in the flexible-array-member
+    // initializer path) would otherwise abort the whole conversion via a
+    // std::string exception that the C++ front-end's recoveries do not
+    // catch, leaving a half-type-checked body behind.
+    result += "CTOR";
+  }
+  else if(type.id() == ID_destructor)
+  {
+    // likewise for destructors (C++ [class.dtor])
+    result += "DTOR";
+  }
   else
     throw "unknown type '"+type.id_string()+"' encountered";
 

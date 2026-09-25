@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+C++20 compound-requirement `{ E } -> C` evaluation ([expr.prim.req.compound]/1):
+the return-type-requirement is checked as C<decltype((E))>.  Pre-increment of an
+arithmetic lvalue yields an lvalue ([expr.pre.incr]/1), so decltype((++a)) is an
+lvalue-reference and SameAs<decltype((++a)), int&> holds.  Guards both the
+compound-requirement return-type evaluation and the C++ pre-increment/decrement
+value-category fix.  See doc/architectural/cpp-requires-expression-support.md.
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: static assertion failed: ++int is int&

@@ -1,0 +1,30 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ MD->MS construction preserves value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+[temp.deduct]/5 with [temp.constr.decl]/1: a function-template specialisation
+whose associated constraints (its requires-clause) are not satisfied by the
+deduced arguments is removed from the candidate set.
+
+Mutually-convertible class types that each have a templated integral
+constructor `C(T) requires integral<T>` and an explicit converting constructor
+taking the other type (a minimal model of libstdc++'s
+std::ranges::__detail::__max_size_type / __max_diff_type).  Constructing MS from
+an MD -- as __to_unsigned_like does via __max_size_type(__t) -- previously
+recursed without bound and crashed (SIGSEGV): overload resolution considered the
+templated constructor with T deduced as the *other class type* (integral<MD> is
+false, but the requires-clause was not checked for a templated constructor),
+producing a bogus by-value constructor whose argument had to be materialised by
+constructing the same type again, ad infinitum.
+
+guess_function_template_args now evaluates a deduced candidate's requires-clause
+(in addition to the existing parameter-level #C_concept_constraint check) and
+discards the candidate when the constraint is unsatisfied, breaking the
+recursion.

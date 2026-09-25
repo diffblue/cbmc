@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 23 size\(\) == 3: SUCCESS$
+^\[main\.assertion\.2\] line 24 s\[0\] == 'x': SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Regression test for std::string fill construction std::string(n, c).
+
+The fill basic_string<char>::_M_construct(size_type, _CharT) out-of-line
+member used to be attached the wrong overload's body (the input-iterator
+_M_construct, which refers to `__beg`) by a base-name-only match, so its
+conversion failed and the constructor was a no-op.  convert_function now
+repairs the member by adopting the signature-matched out-of-line definition
+and its parameter names ([dcl.fct]/3), so both size() and the characters are
+correct.  Grounded in N5008 [over.match] + [dcl.fct]/3.  See
+doc/architectural/cpp-extern-template-member-instantiation.md.
+
+This test was previously KNOWNBUG; it became CORE once the fix landed.

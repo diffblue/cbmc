@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [basic.type.qualifier], [dcl.fct]/6-7: cv-qualifiers nested inside a
+function type's parameter types (`void(*)(const int*)` vs `void(*)(int*)`)
+and the cv-qualifier-seq of a member function type (`int (S::*)(int) const`
+vs `int (S::*)(int)`, modelled as a const implicit object parameter) do not
+make the types distinct for std::is_same / `<T, T>` deduction: type identity
+compares irep structure, and cv-qualifiers are `#`-attributes it ignores.
+Top-level cv (`const int*` vs `int*`) IS distinguished.  Pre-existing; found
+while fixing the alias-declaration spelling of cv-qualified pointer-to-member
+function types (cpp11_alias_pointer_to_member_function_cv).

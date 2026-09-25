@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion from 'char \[.*\]' to 'struct basic_string'.*$
+^.*is unknown.*$
+--
+std::string s("ab") -- construction from a string literal.
+
+With the member-typedef conformance fix ([temp.inst]/1-2, [dcl.typedef],
+[class.prop]) basic_string<char> is no longer truncated at its
+const_reverse_iterator member typedef, so it keeps its constructors, is not
+misclassified as a POD, and the (const char*) constructor is selected; BMC of
+the elaborated basic_string now completes with VERIFICATION SUCCESSFUL.
+See doc/architectural/cpp-class-template-instantiation-plan.md.

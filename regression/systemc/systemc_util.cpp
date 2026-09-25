@@ -7,6 +7,12 @@ void bitvector_assign_to(
   int length)
 {
   //TODO: we have to expose the bitvector_extract operator at the interface
+  // Shifts by MAX_SIZE-length, offset, or offset+length may equal or
+  // exceed the bit width when extracting full-width or zero-offset
+  // slices. This is technically undefined in C/C++ but intentionally
+  // used here to clear bits.
+#pragma CPROVER check push
+#pragma CPROVER check disable "undefined-shift"
   bv_type tmpsrc = src;
   tmpsrc <<= MAX_SIZE-length;
   tmpsrc >>= MAX_SIZE-length;
@@ -17,6 +23,7 @@ void bitvector_assign_to(
   bv_type tmpdst2 = dst;
   tmpdst2 <<= MAX_SIZE-offset;
   tmpdst2 >>= MAX_SIZE-offset;
+#pragma CPROVER check pop
   dst = tmpdst1 | tmpsrc | tmpdst2;
 }
 

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ head0 == a: SUCCESS$
+^\[main\.assertion\.2\] line \d+ head1 == b: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+A variadic constructor whose trailing parameter pack is empty in the recursion
+base expands the pack to zero parameters and initializes each subobject,
+mirroring the libstdc plus plus _Tuple_impl recursive constructor for a
+two-element tuple.  The recursion base TImpl with an empty Tail expands the
+constructor parameter pack to no parameters and collapses the empty-pack base
+initializer, so construction succeeds and the head subobjects are initialized.

@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced base-ctor arg selects the vec-taking overload: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+does not uniquely resolve
+--
+N5008 [over.match.list], [over.ics.list], [over.ics.rank]: list-initializing a
+class from a braced-init-list ranks its constructors by the element conversion
+sequences; a constructor taking the elements directly (vec(int) for {7}) uses a
+standard conversion, which per [over.ics.rank]/(3.1) is always better than the
+copy/move constructor's user-defined conversion from the list.  CBMC previously
+gave both an equal args_distance and reported "symbol 'vec' does not uniquely
+resolve".  Root cause: a failed implicit_conversion_sequence attempt leaked its
+user-defined-conversion rank penalty (+4) into the shared rank accumulator, so
+the value constructor's identity element conversion was mis-ranked as
+user-defined and tied with the copy constructor.  Same error class as the
+"symbol 'codet' does not uniquely resolve" dog-food noise (std_code.h,
+codet(ID_assume, {std::move(expr)})).

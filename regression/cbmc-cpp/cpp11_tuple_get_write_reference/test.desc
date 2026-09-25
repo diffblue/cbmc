@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ tuple get write/read: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+found no match for symbol
+no body for callee
+--
+N5008 [temp.deduct.call]/4.3 + [over.match.funcs]: header-free, cvise-reduced
+model of the libstdc++ std::get<0> write path (std::get -> std::__get_helper ->
+_Tuple_impl::_M_head, with _M_head inherited from _Head_base); returns 42 under
+a conforming compiler (verified with g++).
+
+get<0>'s constexpr body now converts: __get_helper<0> resolves the inherited
+static _M_head call by a derived-to-base conversion of the by-value argument
+even with the sibling SFINAE __get_helper overload present, so the write
+through std::get<0>'s reference takes effect.  Non-vacuous: assertion 1 (write
+took effect) SUCCEEDs and assertion 2 (a wrong value) FAILs.

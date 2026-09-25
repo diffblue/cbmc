@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
@@ -24,6 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_predicates.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
+#include <util/std_types.h>
 #include <util/string_constant.h>
 #include <util/suffix.h>
 #include <util/symbol_table_base.h>
@@ -52,7 +54,11 @@ void c_typecheck_baset::typecheck_expr(exprt &expr)
   }
 
   // first do sub-nodes
-  typecheck_expr_operands(expr);
+  // Skip operand type-checking for noexcept expressions.
+  // The noexcept handler in typecheck_expr_main handles the operand
+  // with proper error suppression (null message handler + catch).
+  if(expr.id() != ID_noexcept)
+    typecheck_expr_operands(expr);
 
   // now do case-split
   typecheck_expr_main(expr);
@@ -209,6 +215,27 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
           expr.id()==ID_gt  ||
           expr.id()==ID_ge)
     typecheck_expr_rel(to_binary_relation_expr(expr));
+  else if(expr.id() == ID_spaceship)
+  {
+    // C++20 <=>: lower to (a < b) ? -1 : ((a > b) ? 1 : 0)
+    auto &binary = to_binary_expr(expr);
+    typecheck_expr_main(binary.op0());
+    typecheck_expr_main(binary.op1());
+    typet result_type = signed_int_type();
+    exprt a = binary.op0();
+    exprt b = binary.op1();
+    binary_relation_exprt lt(a, ID_lt, b);
+    lt.type() = bool_typet();
+    binary_relation_exprt gt(a, ID_gt, b);
+    gt.type() = bool_typet();
+    if_exprt inner(
+      std::move(gt),
+      from_integer(1, result_type),
+      from_integer(0, result_type));
+    if_exprt outer(
+      std::move(lt), from_integer(-1, result_type), std::move(inner));
+    expr.swap(outer);
+  }
   else if(expr.id()==ID_index)
     typecheck_expr_index(expr);
   else if(expr.id()==ID_typecast)
@@ -511,6 +538,10 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
   {
     // already type checked
   }
+  else if(expr.id() == ID_extractbits)
+  {
+    // already type checked (SystemC extension)
+  }
   else if(
     expr.id() == ID_C_spec_assigns || expr.id() == ID_C_spec_frees ||
     expr.id() == ID_target_list)
@@ -534,6 +565,87 @@ void c_typecheck_baset::typecheck_expr_main(exprt &expr)
               << "' to '" << to_string(expr.type()) << "' not permitted" << eom;
       throw 0;
     }
+  }
+  else if(expr.id() == ID_noexcept)
+  {
+    // C++11 noexcept operator — evaluate as true (safe approximation).
+    expr = true_exprt();
+  }
+  else if(
+    expr.id() == "cpp_right_fold" || expr.id() == "cpp_left_fold" ||
+    expr.id() == "cpp_binary_fold")
+  {
+    // An unexpanded fold-expression ([expr.prim.fold]) only reaches the C
+    // type checker in a placeholder type check of a generic lambda's body
+    // (the parameter pack stands in as a single `int'); the real body is
+    // instantiated with the pack expanded.  A placeholder value keeps that
+    // check going.  The binary forms `(pack op ... op init)' were missing
+    // here and failed the lambda ("unexpected expression: cpp_binary_fold").
+    expr = true_exprt();
+  }
+  else if(expr.id() == ID_cpp_name)
+  {
+    // C++ name expression that the C type-checker can't resolve.
+    // This can happen during template instantiation when the
+    // initializer goes through the C type-checker path.
+    // For destructor names (~_Tp), treat as a no-op.
+    // For other names, throw.
+    const auto &subs = expr.get_sub();
+    if(!subs.empty() && subs.front().id() == "~")
+    {
+      // Destructor call — treat as void expression
+      expr = side_effect_exprt{
+        ID_function_call, typet{ID_empty}, expr.source_location()};
+    }
+    else
+    {
+      error().source_location = expr.source_location();
+      error() << "unresolved C++ name in C context" << eom;
+      throw 0;
+    }
+  }
+  else if(expr.id() == ID_struct_tag)
+  {
+    // A struct_tag expression can appear when a C++ qualified name
+    // like `__and_<T>::value` is partially resolved: the class part
+    // resolves to a struct_tag but the `::value` member access hasn't
+    // been applied yet.  Look up the static `value` member in the
+    // class and replace the expression with its constant value.
+    const irep_idt &tag_id = expr.get(ID_identifier);
+    if(!tag_id.empty())
+    {
+      // Try to find a static `value` member
+      std::string scope = id2string(tag_id);
+      if(scope.compare(0, 4, "tag-") == 0)
+        scope.erase(0, 4);
+      const auto *val_sym = symbol_table.lookup(scope + "::value");
+      if(val_sym && val_sym->value.is_not_nil() && val_sym->value.is_constant())
+      {
+        expr = val_sym->value;
+        return;
+      }
+      // Also check the struct's components for an inherited value
+      const auto *class_sym = symbol_table.lookup(tag_id);
+      if(class_sym && class_sym->type.id() == ID_struct)
+      {
+        for(const auto &comp : to_struct_type(class_sym->type).components())
+        {
+          if(comp.get_base_name() == "value" && comp.get_bool(ID_is_static))
+          {
+            const auto *vs = symbol_table.lookup(comp.get_name());
+            if(vs && vs->value.is_not_nil() && vs->value.is_constant())
+            {
+              expr = vs->value;
+              return;
+            }
+            break;
+          }
+        }
+      }
+    }
+    error().source_location = expr.source_location();
+    error() << "unexpected expression: " << expr.pretty() << eom;
+    throw 0;
   }
   else
   {
@@ -662,6 +774,41 @@ void c_typecheck_baset::typecheck_expr_builtin_offsetof(exprt &expr)
 
         const struct_union_typet &struct_union_type =
           follow_tag(to_struct_or_union_tag_type(type));
+
+        // The designator names the member as written.  In C the
+        // component's name IS that spelling; the C++ front end qualifies
+        // component names with the class (`S::d`) and keeps the spelling
+        // as the base name, so `offsetof(S, d)` found no component 'd'
+        // for ANY C++ class (user-reported on a typedef'd packed struct;
+        // N5008 [support.types.layout]/1 -- offsetof(type, member-
+        // designator) is the same as in C).  Map the spelling to the
+        // component's name by base name when the direct lookup fails.
+        // N5008 [class.member.lookup]: a member declared in the class
+        // hides the same-named member of a base class (flattened in
+        // first, marked ID_from_base), so prefer the class's own member.
+        if(!struct_union_type.has_component(component_name))
+        {
+          const struct_union_typet::componentt *from_base_match = nullptr;
+          for(const auto &c : struct_union_type.components())
+          {
+            if(
+              c.get_base_name() == component_name && !c.get_bool(ID_is_type) &&
+              !c.get_bool(ID_is_static) && c.type().id() != ID_code)
+            {
+              if(c.get_bool(ID_from_base))
+              {
+                if(from_base_match == nullptr)
+                  from_base_match = &c;
+                continue;
+              }
+              component_name = c.get_name();
+              from_base_match = nullptr;
+              break;
+            }
+          }
+          if(from_base_match != nullptr)
+            component_name = from_base_match->get_name();
+        }
 
         // direct member?
         if(struct_union_type.has_component(component_name))
@@ -937,6 +1084,12 @@ void c_typecheck_baset::typecheck_expr_symbol(exprt &expr)
     string_constantt s(source_location.get_function());
     s.add_source_location()=source_location;
     s.set(ID_C_lvalue, true);
+    // C11 6.4.2.2/1 and N5008 [dcl.fct.def.general]/8 declare it as
+    // `static const char __func__[] = "...";' -- the element type is const.
+    // In C++ this decides overload resolution: a `char[n]' argument for a
+    // `const std::string &' parameter (every INVARIANT macro) picks the
+    // string_view constructor template over `basic_string(const char *)'.
+    s.type().element_type().set(ID_C_constant, true);
     expr.swap(s);
   }
   else
@@ -1004,6 +1157,11 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
   {
     type.swap(static_cast<typet &>(expr.add(ID_type_arg)));
     typecheck_type(type);
+
+    // N5008 [expr.sizeof]/2: applied to a reference type, the result is the
+    // size of the referenced type (C++ only; C has no references).
+    if(is_reference(type) || is_rvalue_reference(type))
+      type = to_pointer_type(type).base_type();
   }
   else
   {
@@ -1015,6 +1173,11 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       type = signed_int_type();
     else
       type = op.type();
+
+    // N5008 [expr.sizeof]/2: applied to a reference, the result is the size
+    // of the referenced type (C++ only; C has no references)
+    if(is_reference(type) || is_rvalue_reference(type))
+      type = to_pointer_type(type).base_type();
   }
 
   exprt new_expr;
@@ -1091,6 +1254,21 @@ void c_typecheck_baset::typecheck_expr_sizeof(exprt &expr)
       error().source_location = expr.source_location();
       error() << "type has no size: " << to_string(type) << eom;
       throw 0;
+    }
+
+    // N5008 [class]/4 + [expr.sizeof]/2: a complete object of class
+    // type has nonzero size, so sizeof applied to a class is never 0.
+    // CBMC's layout keeps empty classes at object size 0 on purpose
+    // (adding a padding byte would change every empty-class
+    // struct_exprt's component count and the pointer reasoning that
+    // relies on the flattened layout); realise the nonzero-size
+    // guarantee at the SIZEOF evaluation instead, matching the
+    // gcc/clang value of 1.
+    if(
+      sizeof_yields_nonzero_for_class() && type.id() == ID_struct_tag &&
+      size_of_opt.value().is_zero())
+    {
+      size_of_opt = from_integer(1, size_type());
     }
 
     new_expr = size_of_opt.value();
@@ -1388,6 +1566,19 @@ void c_typecheck_baset::typecheck_expr_index(exprt &expr)
     expr.id(ID_dereference);
     expr.set(ID_C_lvalue, true);
     expr.type() = to_pointer_type(final_array_type).base_type();
+  }
+  else if(
+    final_array_type.id() == ID_unsignedbv ||
+    final_array_type.id() == ID_signedbv)
+  {
+    // SystemC extension: bit indexing on bitvector types
+    // a[i] extracts bit i as a single-bit value
+    extractbits_exprt eb(
+      array_expr,
+      typecast_exprt::conditional_cast(index_expr, unsignedbv_typet(32)),
+      unsignedbv_typet(1));
+    eb.add_source_location() = expr.source_location();
+    expr.swap(eb);
   }
   else
   {
@@ -2238,6 +2429,18 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         return;
       }
       else if(
+        identifier == "__builtin_reduce_and" ||
+        identifier == "__builtin_reduce_or" ||
+        identifier == "__builtin_reduce_xor" ||
+        identifier == "__builtin_reduce_add" ||
+        identifier == "__builtin_reduce_mul")
+      {
+        exprt result = typecheck_vector_reduce(expr);
+        expr.swap(result);
+
+        return;
+      }
+      else if(
         identifier == CPROVER_PREFIX "saturating_minus" ||
         identifier == CPROVER_PREFIX "saturating_plus" ||
         identifier == "__builtin_elementwise_add_sat" ||
@@ -2447,67 +2650,8 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
         auto gcc_polymorphic = typecheck_gcc_polymorphic_builtin(
           identifier, expr.arguments(), f_op.source_location()))
       {
-        irep_idt identifier_with_type = gcc_polymorphic->identifier();
-        auto &parameters = to_code_type(gcc_polymorphic->type()).parameters();
-        INVARIANT(
-          !parameters.empty(),
-          "GCC polymorphic built-ins should have at least one parameter");
-
-        // For all atomic/sync polymorphic built-ins (which are the ones handled
-        // by typecheck_gcc_polymorphic_builtin), looking at the first parameter
-        // suffices to distinguish different implementations.
-        if(parameters.front().type().id() == ID_pointer)
-        {
-          identifier_with_type =
-            id2string(identifier) + "_" +
-            type_to_partial_identifier(
-              to_pointer_type(parameters.front().type()).base_type(), *this);
-        }
-        else
-        {
-          identifier_with_type =
-            id2string(identifier) + "_" +
-            type_to_partial_identifier(parameters.front().type(), *this);
-        }
-        gcc_polymorphic->identifier(identifier_with_type);
-
-        if(!symbol_table.has_symbol(identifier_with_type))
-        {
-          for(std::size_t i = 0; i < parameters.size(); ++i)
-          {
-            const std::string base_name = "p_" + std::to_string(i);
-
-            parameter_symbolt new_symbol;
-
-            new_symbol.name =
-              id2string(identifier_with_type) + "::" + base_name;
-            new_symbol.base_name = base_name;
-            new_symbol.location = f_op.source_location();
-            new_symbol.type = parameters[i].type();
-            new_symbol.is_parameter = true;
-            new_symbol.is_lvalue = true;
-            new_symbol.mode = ID_C;
-
-            parameters[i].set_identifier(new_symbol.name);
-            parameters[i].set_base_name(new_symbol.base_name);
-
-            symbol_table.add(new_symbol);
-          }
-
-          symbolt new_symbol{
-            identifier_with_type, gcc_polymorphic->type(), ID_C};
-          new_symbol.base_name = identifier_with_type;
-          new_symbol.location = f_op.source_location();
-          code_blockt implementation =
-            instantiate_gcc_polymorphic_builtin(identifier, *gcc_polymorphic);
-          typet parent_return_type = return_type;
-          return_type = to_code_type(gcc_polymorphic->type()).return_type();
-          typecheck_code(implementation);
-          return_type = parent_return_type;
-          new_symbol.value = implementation;
-
-          symbol_table.add(new_symbol);
-        }
+        materialize_gcc_polymorphic_builtin(
+          identifier, *gcc_polymorphic, f_op.source_location());
 
         f_op = std::move(*gcc_polymorphic);
       }
@@ -2634,6 +2778,69 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
     expr.swap(tmp);
   else
     typecheck_function_call_arguments(expr);
+}
+
+void c_typecheck_baset::materialize_gcc_polymorphic_builtin(
+  const irep_idt &identifier,
+  symbol_exprt &gcc_polymorphic,
+  const source_locationt &source_location)
+{
+  irep_idt identifier_with_type = gcc_polymorphic.get_identifier();
+  auto &parameters = to_code_type(gcc_polymorphic.type()).parameters();
+  INVARIANT(
+    !parameters.empty(),
+    "GCC polymorphic built-ins should have at least one parameter");
+
+  if(parameters.front().type().id() == ID_pointer)
+  {
+    identifier_with_type =
+      id2string(identifier) + "_" +
+      type_to_partial_identifier(
+        to_pointer_type(parameters.front().type()).base_type(), *this);
+  }
+  else
+  {
+    identifier_with_type =
+      id2string(identifier) + "_" +
+      type_to_partial_identifier(parameters.front().type(), *this);
+  }
+  gcc_polymorphic.set_identifier(identifier_with_type);
+
+  if(!symbol_table.has_symbol(identifier_with_type))
+  {
+    for(std::size_t i = 0; i < parameters.size(); ++i)
+    {
+      const std::string base_name = "p_" + std::to_string(i);
+
+      parameter_symbolt new_symbol;
+
+      new_symbol.name = id2string(identifier_with_type) + "::" + base_name;
+      new_symbol.base_name = base_name;
+      new_symbol.location = source_location;
+      new_symbol.type = parameters[i].type();
+      new_symbol.is_parameter = true;
+      new_symbol.is_lvalue = true;
+      new_symbol.mode = ID_C;
+
+      parameters[i].set_identifier(new_symbol.name);
+      parameters[i].set_base_name(new_symbol.base_name);
+
+      symbol_table.add(new_symbol);
+    }
+
+    symbolt new_symbol{identifier_with_type, gcc_polymorphic.type(), ID_C};
+    new_symbol.base_name = identifier_with_type;
+    new_symbol.location = source_location;
+    code_blockt implementation =
+      instantiate_gcc_polymorphic_builtin(identifier, gcc_polymorphic);
+    typet parent_return_type = return_type;
+    return_type = to_code_type(gcc_polymorphic.type()).return_type();
+    c_typecheck_baset::typecheck_code(implementation);
+    return_type = parent_return_type;
+    new_symbol.value = implementation;
+
+    symbol_table.add(new_symbol);
+  }
 }
 
 exprt c_typecheck_baset::do_special_functions(
@@ -3655,6 +3862,31 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(ffs);
   }
+  else if(identifier == "__builtin_FILE")
+  {
+    // GCC built-in that returns the file name of the call site.
+    string_constantt s(source_location.get_file());
+    s.add_source_location() = source_location;
+    return typecast_exprt(
+      address_of_exprt(index_exprt(s, from_integer(0, c_index_type()))),
+      expr.type());
+  }
+  else if(identifier == "__builtin_FUNCTION")
+  {
+    // GCC built-in that returns the function name of the call site.
+    string_constantt s(source_location.get_function());
+    s.add_source_location() = source_location;
+    return typecast_exprt(
+      address_of_exprt(index_exprt(s, from_integer(0, c_index_type()))),
+      expr.type());
+  }
+  else if(identifier == "__builtin_LINE")
+  {
+    // GCC built-in that returns the line number of the call site.
+    const auto line_str = source_location.get_line();
+    const auto line_no = line_str.empty() ? 0 : std::stoi(id2string(line_str));
+    return from_integer(line_no, expr.type());
+  }
   else if(identifier=="__builtin_expect")
   {
     // This is a gcc extension to provide branch prediction.
@@ -3745,6 +3977,35 @@ exprt c_typecheck_baset::do_special_functions(
       return expr.arguments()[1];
     else
       return expr.arguments()[2];
+  }
+  else if(identifier == "__atomic_always_lock_free")
+  {
+    // GCC/clang builtin, a CONSTANT EXPRESSION when its arguments are
+    // ([expr.const]; libc++ <atomic> uses it as a template argument in
+    // __libcpp_is_always_lock_free).  The library model in
+    // src/ansi-c/library/gcc.c answers `size <= sizeof(size_t)` at
+    // RUNTIME, which cannot serve a constant-expression context; fold
+    // the same answer here when the size argument is a constant.
+    if(expr.arguments().size() == 2)
+    {
+      exprt size_arg = expr.arguments()[0];
+      typecheck_expr(size_arg);
+      simplify(size_arg, *this);
+      if(size_arg.is_constant())
+      {
+        const auto size_int =
+          numeric_cast<mp_integer>(to_constant_expr(size_arg));
+        if(size_int.has_value())
+        {
+          const bool lock_free =
+            *size_int <= config.ansi_c.pointer_width / config.ansi_c.char_width;
+          exprt result = from_integer(lock_free ? 1 : 0, expr.type());
+          result.add_source_location() = source_location;
+          return result;
+        }
+      }
+    }
+    return nil_exprt();
   }
   else if(identifier=="__builtin_constant_p")
   {
@@ -4522,6 +4783,40 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
 
     if(!op0.get_bool(ID_C_lvalue))
     {
+      // SystemC extension: assignment to extractbits (a.range(h,l) = v)
+      // is converted to a read-modify-write on the source variable.
+      if(op0.id() == ID_extractbits)
+      {
+        const auto &eb = to_extractbits_expr(op0);
+        const auto width = to_bitvector_type(eb.type()).get_width();
+        const auto src_width = to_bitvector_type(eb.src().type()).get_width();
+        const auto src_type = eb.src().type();
+        exprt rhs = typecast_exprt::conditional_cast(
+          expr.operands()[1], unsignedbv_typet(width));
+        // mask = (1 << width) - 1
+        mp_integer mask_val = power(2, width) - 1;
+        exprt mask = from_integer(mask_val, unsignedbv_typet(src_width));
+        // shifted_mask = mask << index
+        exprt shifted_mask = shl_exprt(
+          mask,
+          typecast_exprt::conditional_cast(
+            eb.index(), unsignedbv_typet(src_width)));
+        // cleared = src & ~shifted_mask
+        exprt cleared = bitand_exprt(eb.src(), bitnot_exprt(shifted_mask));
+        // shifted_rhs = (rhs cast to src_width) << index
+        exprt shifted_rhs = shl_exprt(
+          typecast_exprt::conditional_cast(rhs, unsignedbv_typet(src_width)),
+          typecast_exprt::conditional_cast(
+            eb.index(), unsignedbv_typet(src_width)));
+        // new_val = cleared | shifted_rhs
+        exprt new_val = bitor_exprt(cleared, shifted_rhs);
+        new_val.type() = src_type;
+        // Replace: lhs = rhs becomes src = new_val
+        expr.operands()[0] = eb.src();
+        expr.operands()[1] = new_val;
+        expr.type() = src_type;
+        return;
+      }
       error().source_location = expr.source_location();
       error() << "assignment error: '" << to_string(op0) << "' not an lvalue"
               << eom;
@@ -4833,7 +5128,93 @@ void c_typecheck_baset::make_constant(exprt &expr)
   adjust_float_expressions(expr, rounding_mode);
 
   simplify(expr, *this);
+
   expr.add_source_location() = location;
+
+  // Evaluate constexpr function calls that simplify couldn't handle
+  // (e.g., template static constexpr members after parameter substitution).
+  if(!is_compile_time_constantt(*this)(expr))
+  {
+    // The expression might be a function call or contain function calls.
+    // Try to evaluate them via the constexpr evaluator.
+    bool eval_changed = false;
+    expr.visit_post(std::function<void(exprt &)>(
+      [this, &eval_changed](exprt &node)
+      {
+        if(
+          node.id() == ID_side_effect &&
+          to_side_effect_expr(node).get_statement() == ID_function_call)
+        {
+          exprt before = node;
+          typecheck_side_effect_function_call(
+            to_side_effect_expr_function_call(node));
+          if(node != before)
+            eval_changed = true;
+        }
+      }));
+    if(eval_changed)
+    {
+      simplify(expr, *this);
+      expr.add_source_location() = location;
+    }
+  }
+
+  if(!is_compile_time_constantt(*this)(expr))
+  {
+    // Try harder: resolve constexpr/const symbol references to their
+    // values, then simplify again. Iterate since resolving one symbol
+    // may reveal further symbol references (e.g. recursive variable
+    // templates).
+    bool changed = true;
+    while(changed)
+    {
+      changed = false;
+      expr.visit_pre(
+        [&](exprt &e)
+        {
+          if(e.id() == ID_symbol)
+          {
+            // Don't replace function references with their bodies:
+            // the function field of a `side_effect_expr_function_call`
+            // is a `symbol_exprt` whose `type.id()` is `ID_code` and
+            // whose value is the function body.  Substituting that
+            // turns the call's function operand into a code block,
+            // and any unresolved cpp_names in the body then get
+            // re-typechecked in the caller's scope (where class-scope
+            // members are not visible), producing spurious
+            // "symbol '...' is unknown" errors that point back into
+            // the function body.
+            if(e.type().id() == ID_code)
+              return;
+            const symbolt *s = nullptr;
+            if(
+              !lookup(to_symbol_expr(e).get_identifier(), s) &&
+              (s->is_macro || s->type.get_bool(ID_C_constant)))
+            {
+              // Skip the replacement if the symbol has no
+              // initializer; replacing with nil would propagate up
+              // and later fail as "expected constant expression,
+              // but got '<<expr:nil>>'".  This happens for default
+              // template arguments referring to a static member
+              // that is not present on the template argument type
+              // (e.g. `template <class T, const T &empty = T::blank>`
+              // instantiated with T lacking ::blank).
+              if(s->value.is_nil())
+                return;
+              exprt val = s->value;
+              simplify(val, *this);
+              e = val;
+              changed = true;
+            }
+          }
+        });
+      if(changed)
+      {
+        simplify(expr, *this);
+        expr.add_source_location() = location;
+      }
+    }
+  }
 
   if(!is_compile_time_constantt(*this)(expr))
   {

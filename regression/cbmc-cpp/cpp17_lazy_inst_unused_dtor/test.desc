@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+must never appear
+--
+N5008 [temp.inst]/11: a non-virtual destructor of a class template shall not
+be implicitly instantiated unless odr-used.  No S<int> object is created here
+(only the static member sval() is used), so ~S() is never odr-used and under
+lazy instantiation its assertion "must never appear" does not enter the goto
+program; the forbidden pattern must be absent.
+
+This became CORE once the special members were deferred.  Destructor odr-use
+for automatic/temporary objects is recovered in typecheck_method_bodies() from
+the set of constructed classes ([class.dtor]/12): a destructor is instantiated
+exactly when its class is constructed, so this static-only case (no object,
+hence no constructor odr-used) correctly leaves ~S() uninstantiated.  See
+doc/architectural/cpp-extern-template-member-instantiation.md §13.

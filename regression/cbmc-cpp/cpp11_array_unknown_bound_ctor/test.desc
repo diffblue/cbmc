@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ array bound deduced from initializer count: SUCCESS$
+^\[main\.assertion\.2\] line \d+ each element initialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[dcl.array]/1, [dcl.init.aggr]/5: bound of an unknown-bound array `T a[]{...}`
+is deduced from the initializer count, including when T has a user-provided
+constructor.  Reduced from the src/util/simplify_utils.cpp dog-food failure.
+Non-vacuous.

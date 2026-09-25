@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Per [expr.type.conv]/2 and [dcl.init.list]/3.10: a braced-init-list
+with no elements for a scalar type performs value-initialization
+(yielding zero).

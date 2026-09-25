@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line 22 qualified template-name as TT-argument: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.arg.template]/1: the template-argument for a template
+template-parameter is a template-name, which may be a QUALIFIED id
+(`user<outer::box>`).  CBMC's TT-argument typecheck only accepts a
+single unqualified name: "found no match for symbol 'outer'" followed
+by "expected template name for template template parameter".
+Found round 122 while writing cpp11_tt_param_base_in_namespace (kb3
+had to move its driver inside the namespace to dodge this).  Accepted
+by g++ and clang++ -std=c++11 -fsyntax-only.  Header-free, minimal.
+Likely fix site: the TT-argument path in typecheck_template_args /
+resolve (the same family as the 5face51cef id_map fix, but on the
+ARGUMENT side rather than the parameter-use side).

@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unnamed-namespace class usable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second block shares the namespace: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: unnamed namespaces flow through the regular namespace
+machinery (fixed per-scope unique name "#anon_ns", implicit
+using-directive) so their bodies are converted.

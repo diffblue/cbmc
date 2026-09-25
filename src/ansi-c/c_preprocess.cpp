@@ -17,6 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/tempfile.h>
 #include <util/unicode.h>
 
+#include "gcc_version.h"
+
 #include <fstream>
 
 static void error_parse_line(
@@ -231,6 +233,34 @@ bool c_preprocess(
   return true;
 }
 
+std::vector<std::string> cprover_cxx_preprocessor_macro_flags()
+{
+  std::vector<std::string> flags;
+
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+  {
+    // CBMC doesn't support deduction guides ([over.match.class.deduct]);
+    // undefine the feature macro so standard library headers don't use
+    // them (the parser would otherwise misclassify a deduction guide as
+    // a constructor).
+    flags.push_back("-U__cpp_deduction_guides");
+    // Prevent PSTL (Parallel STL) execution policy headers from being
+    // included; they cause infinite template recursion in CBMC.
+    flags.push_back("-D_PSTL_GLUE_MEMORY_DEFS_H=1");
+    flags.push_back("-D_PSTL_GLUE_ALGORITHM_DEFS_H=1");
+    flags.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
+  }
+
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+  {
+    // CBMC treats char8_t as unsigned char, causing duplicate template
+    // specializations; undefine the feature macro to avoid this.
+    flags.push_back("-U__cpp_char8_t");
+  }
+
+  return flags;
+}
+
 /// ANSI-C preprocessing
 bool c_preprocess_visual_studio(
   const std::string &file,
@@ -262,6 +292,16 @@ bool c_preprocess_visual_studio(
     // opposed to 8-bit with some code page.
     // It only works on Visual Studio 2015 or newer.
     command_file << "/source-charset:utf-8" << '\n';
+
+    // Pass the C++ standard to cl.exe so that headers guarded by
+    // _HAS_CXX17 etc. are correctly included.
+    if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP23)
+      command_file << "/std:c++latest" << '\n';
+    else if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+      command_file << "/std:c++20" << '\n';
+    else if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17)
+      command_file << "/std:c++17" << '\n';
+    // C++14 is the default for MSVC, no flag needed
 
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
@@ -555,7 +595,79 @@ bool c_preprocess_gcc_clang(
 #endif
         argv.push_back("-std=gnu++17");
       break;
+
+    case configt::cppt::cpp_standardt::CPP20:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++20");
+      else // NOLINT(readability/braces)
+#endif
+      {
+        // Use -std=gnu++2a for GCC compatibility (GCC 9 doesn't accept
+        // -std=gnu++20, but all GCC versions accept -std=gnu++2a).
+        if(preprocessor == configt::ansi_ct::preprocessort::GCC)
+        {
+          argv.push_back("-std=gnu++2a");
+        }
+        else
+        {
+          argv.push_back("-std=gnu++20");
+        }
+      }
+      break;
+
+    case configt::cppt::cpp_standardt::CPP23:
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++23");
+      else // NOLINT(readability/braces)
+#endif
+      {
+        if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+          argv.push_back("-std=c++2b");
+        else
+        {
+          // GCC 11+ supports -std=gnu++2b; older GCC only has -std=gnu++2a.
+          gcc_versiont gcc_ver;
+          gcc_ver.get("gcc");
+          if(gcc_ver.is_at_least(11u))
+            argv.push_back("-std=gnu++2b");
+          else
+            argv.push_back("-std=gnu++2a");
+        }
+      }
+      break;
+
+    case configt::cppt::cpp_standardt::CPP26:
+      // C++26 is not yet widely supported by preprocessors; use C++23
+      // for preprocessing and rely on CBMC's own parser for C++26 features.
+#if defined(__OpenBSD__)
+      if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+        argv.push_back("-std=c++23");
+      else // NOLINT(readability/braces)
+#endif
+      {
+        if(preprocessor == configt::ansi_ct::preprocessort::CLANG)
+          argv.push_back("-std=c++2b");
+        else
+        {
+          gcc_versiont gcc_ver;
+          gcc_ver.get("gcc");
+          if(gcc_ver.is_at_least(11u))
+            argv.push_back("-std=gnu++2b");
+          else
+            argv.push_back("-std=gnu++2a");
+        }
+      }
+      break;
     }
+
+    // Append CBMC-specific C++ feature-macro flags (deduction guides,
+    // char8_t, PSTL).  Shared with goto-cc's preprocessing pass via
+    // `cprover_cxx_preprocessor_macro_flags` so both produce identical
+    // preprocessed translation units.
+    for(const auto &flag : cprover_cxx_preprocessor_macro_flags())
+      argv.push_back(flag);
   }
   else
   {

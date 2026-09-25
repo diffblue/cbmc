@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.variadic]/4-5 + [temp.deduct.call]/3.  A variadic constructor with a
+FORWARDING-REFERENCE parameter pack `tuple(_U&&... __e) :
+_Tuple_impl<0,_E...>(static_cast<_U&&>(__e)...)`, forwarding each element through
+a recursive base, stores the correct element values for a heterogeneously-typed
+pack (tuple<int,double>).  Previously the value pack `u` was replicated to
+`u$k` but the parallel type pack `_U` in `static_cast<_U&&>` was left
+unsubstituted, giving a static_cast type mismatch and an uninitialised member;
+now the type pack's k-th element is substituted in lock-step.  This is the
+forwarding-reference core of libstdc++ std::tuple's 3+-element constructor.
+Non-vacuous: both element reads would be nondeterministic under the old collapse.

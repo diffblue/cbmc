@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp17 --show-symbol-table
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*found no match for symbol 'vector'.*$
+^.*is initialized with constant.*$
+--
+Verifies two fixes that are both required for compiling typical
+libstdc++-using code with `std::vector<X>{...}` brace-init:
+
+  * `cpp_typecheck.cpp`'s `_S_use_relocate`/`_S_nothrow_relocate`
+    override wraps the constant in a `code_block { return; }`
+    rather than assigning a bare `true_exprt()`.  Without the
+    wrap, `convert_function`'s `symbol.value.id() == ID_code`
+    precondition fires.
+
+  * `typecheck_expr_explicit_constructor_call` keeps a
+    brace-init-list as a single operand when T has a non-explicit
+    `initializer_list<U>` constructor (phase 2.1 of
+    [over.match.list]/2), only expanding it for phase 2.2 when no
+    init-list ctor is present.
+
+`--show-symbol-table` exits cleanly after typechecking so we don't
+trip BMC-time "no body for callee" failures on libstdc++ internal
+methods (`_M_range_initialize`, `__uninit_default_n`,
+`operatorcpp_delete`) that are unrelated to typecheck-time
+correctness.  The negative patterns ensure none of the three
+critical typecheck-time error chains regress.

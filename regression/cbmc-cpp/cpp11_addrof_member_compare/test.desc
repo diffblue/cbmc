@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^Invariant check failed$
+--
+Regression test for the to_member fix in symex dereference_rec.
+
+Exercises [dcl.init.ref]/5 and [expr.eq]/3 in the specific pattern
+!(&x::f != 0) where the simplifier converts to &x::f == 0 and symex
+must preserve the pointer-to-member attribute on the address_of
+operand.  Without the fix in be467fbd92 this test fails the
+binary_relation_exprt::validate invariant because the two operands
+have pointer types that disagree on the to_member attribute.

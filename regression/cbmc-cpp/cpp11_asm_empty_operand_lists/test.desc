@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+User-reported: extended asm with empty input/clobber lists written as
+`::` (`asm("" : "=r"(t) :: );`) -- the lexer delivers `::` as one
+TOK_SCOPE token, which rGCCAsmStatement rejected.  Covers `::`, `:::`
+and trailing `::` before `)`.

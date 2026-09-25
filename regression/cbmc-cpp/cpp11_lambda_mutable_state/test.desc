@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ mutable lambda keeps per-object capture state: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.closure]: a mutable lambda's operator() is non-const and its
+by-copy captures are mutable non-static data members, so modifications persist
+in the closure object across calls.  Lambda rework Phase D lowers a mutable
+lambda to a closure whose operator() is non-const, so the captured counter
+persists per closure object.

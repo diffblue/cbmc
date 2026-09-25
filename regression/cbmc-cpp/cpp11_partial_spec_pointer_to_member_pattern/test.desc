@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.deduct.type]/8: the partial specialization pattern T C::*
+deduces both the member type and the class from a pointer-to-member argument
+(libstdc++ __result_of_memfun<_Res _Class::*, ...>), and does NOT match a
+plain pointer; pointer-to-member instances get distinct names (memptr_C_T)
+so memfun<int S::*> and memfun<int*> are different instantiations.

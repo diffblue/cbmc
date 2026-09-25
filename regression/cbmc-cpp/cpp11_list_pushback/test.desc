@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp11 --unwind 2 --no-unwinding-assertions --no-built-in-assertions --depth 200
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+std::list<int>::push_back runs BMC with --validate-goto-model.

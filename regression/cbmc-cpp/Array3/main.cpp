@@ -1,3 +1,4 @@
+#include <cassert>
 struct C
 {
   static const char *array[1];

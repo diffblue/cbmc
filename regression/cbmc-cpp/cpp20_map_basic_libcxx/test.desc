@@ -1,0 +1,23 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++ --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 7 map access: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::map<int,int> insert via operator[] and read-back.  Flipped
+KNOWNBUG->CORE 2026-08-10 after the final three layers:
+(1) [basic.lookup.qual]/1 qualified-lookup fix (round 31),
+(2) implied-object constness in member-template overload ranking
+    ([over.call.func]/3; __tree::find/__lower_bound, CORE
+    cpp11_member_template_const_overload),
+(3) member-of-temporary implied-object binding ([expr.ref]/8,
+    [over.match.funcs]/5.3; operator[]'s
+    __emplace_unique_key_args(...).first->__get_value(), CORE
+    cpp11_member_of_temporary_call).
+--object-bits 12: the full <map> conversion exceeds 2^8 objects.
+--unwind 5 --no-unwinding-assertions: __tree recursion; bounded
+harness.  0 of 6002 properties fail; runtime-verified natively with
+clang++ -stdlib=libc++.

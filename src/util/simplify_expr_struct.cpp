@@ -106,6 +106,13 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       }
     }
   }
+  else if(op.id() == ID_compound_literal)
+  {
+    // Look through compound_literal to the underlying struct
+    auto new_expr = expr;
+    new_expr.struct_op() = to_unary_expr(op).op();
+    return changed(simplify_member(new_expr));
+  }
   else if(op.id() == ID_struct)
   {
     // pull out the right member

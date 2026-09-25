@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11
+^\[main\.assertion\.1\] line \d+ by-index tuple get<0> selected over by-type pair get: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*expected type, but got expression.*$
+--
+N5008 [temp.arg]/2 + [temp.deduct]/8: a non-type template argument supplied for
+a type parameter is a substitution failure that, during overload resolution,
+removes only that candidate -- not a hard error.  This is the shape of
+std::get<0>(tuple<...>), where the by-type get<_Tp,_Up>(pair<_Tp,_Up>&&) is also
+visible and matching the literal `0` against its type parameter `_Tp` is
+ill-formed for that candidate.  CBMC reported a hard "expected type, but got
+expression" that aborted resolution of the whole overload set, so the viable
+by-index get<size_t,_Ts...>(tuple<_Ts...>&) was never selected and get<0>(t)
+(and the rest of main) was silently dropped (vacuous).  Fixed by catching the
+typed kind-mismatch in apply_template_args and skipping only that candidate.
+Assertion 1 (the by-index get returns 42) must SUCCEED; assertion 2 (a wrong
+value) must FAIL, proving non-vacuity.  The forbidden patterns ensure the
+mismatch is no longer leaked as a diagnostic.

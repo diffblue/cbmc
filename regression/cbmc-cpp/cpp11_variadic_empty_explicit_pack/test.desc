@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.arg.explicit]/4 + [temp.variadic]/4,7.  A trailing template parameter
+pack given an EMPTY explicit argument list (`make_box<>()`) whose return type is
+a non-bare pack-expansion (`box<typename identity<E>::type...>`) is deduced as an
+empty sequence, so arity(make_box<>()) == 0.  Previously the empty pack (only a
+pack_size_map size-0 entry, no pack_args_map/pack_expr_map entry) was not
+recognised in the non-bare pattern, so the argument stayed an unresolved bare
+pack reference and the candidate was dropped ("found no match").  Fixed by also
+collecting empty packs from pack_size_map when gathering a pattern's referenced
+packs.  Non-vacuous: arity is a genuine run-time sizeof...(E).

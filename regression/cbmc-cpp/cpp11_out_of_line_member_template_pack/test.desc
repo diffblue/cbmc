@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ out-of-line pack body runs: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member updated: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.mem.func] + [temp.inst]/2: an out-of-line-defined member function
+template of a class template is instantiated from its definition.  Fixed by
+attaching the definition's body (recorded as a template_methods entry of the
+enclosing class template, with the owning class matched to avoid same-name
+cross-template adoption) to the instantiated member-template declarator, and
+switching to the definition's parameter names ([dcl.fct]/3).  Runtime-verified
+against g++ and clang++.

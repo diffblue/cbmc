@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^.*std::optional<tag-S>::optional\(this,rref_struct_tag\(identifier=tag-S\)\).*$
+^.*std::optional<tag-S>::optional\(this,ref_struct_tag\(identifier=tag-S\)\).*$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+^.*invalid implicit conversion.*to 'struct optional'.*$
+^.*invalid implicit conversion.*to 'struct S &'.*$
+--
+Regression for per-call deduction and ranking of a forwarding-reference
+converting constructor (std::optional<S>'s optional(_Up&&)).  An lvalue
+construction (optional(S&)) followed by a prvalue construction must
+re-deduce optional(S&&) for the prvalue, not reuse the cached
+optional(S&).  Covers [over.match.viable] (non-viable candidate is
+excluded, not a hard error) and [over.best.ics]/[over.match.best]
+(ICS quality is ranked before the non-template tie-breaker; a copy
+constructor reachable only via a second user-defined conversion must
+not win).  Verified at the goto-program level.

@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.arg]/2 + [temp.deduct]/8.  A decltype(auto) function whose body
+expands a pack of REAL std::get calls (`return add(std::get<I>(t)...)`), the
+shape of libstdc++ std::apply's __apply_impl.  Previously, resolving
+`std::get<I>` also considered the by-TYPE `std::get<T>` overloads, and matching
+the substituted constant `I` against the TYPE parameter was a hard "unexpected
+cpp type: constant" error that aborted the whole overload resolution, so the
+return type was never deduced.  Fixed by treating a value (constant) in type
+position as a template-arg kind mismatch that silently removes just that
+candidate while matching.  Covers a literal index_sequence and a real
+make_index_sequence.  Non-vacuous: each result is a concrete function of the
+tuple elements selected by the deduced pack.

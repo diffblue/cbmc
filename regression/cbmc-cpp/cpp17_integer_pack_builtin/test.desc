@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The GCC `__integer_pack(N)` builtin, used by libstdc++'s std::make_index_sequence
+(`integer_sequence<T, __integer_pack(N)...>`).  Previously rejected ("symbol
+'__integer_pack' is unknown"); fixed by expanding a pack-expansion template
+argument `__integer_pack(N)...` to the non-type arguments 0..N-1 (of the
+argument's type) in typecheck_template_args.  Covers the direct and nested-alias
+forms.  GCC-only builtin (Clang uses __make_integer_seq); g++ runs these values.
+Non-vacuous: each assertion is a concrete function of the generated pack.

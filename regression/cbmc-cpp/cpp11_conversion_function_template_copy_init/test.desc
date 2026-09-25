@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+does not uniquely resolve
+--
+N5008 [over.match.copy], [over.best.ics.general]/4: a class initialised from a
+different class goes through the source's conversion function (template) when
+no constructor takes the source directly; g++ 13 and clang 18 do the same for
+direct-initialization (CWG 2327).

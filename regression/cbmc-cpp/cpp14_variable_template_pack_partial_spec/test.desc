@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.spec.partial] + [temp.variadic]/4-5.  A VARIABLE TEMPLATE partial
+specialization whose pattern deduces a parameter PACK
+(`tsize_v<tup<E...>> = sizeof...(E)`), exactly libstdc++'s
+std::tuple_size_v<tuple<_Types...>> used by std::apply to size its index
+sequence.  Previously the matcher instantiated the best match with
+build_template_args' single scalar placeholder per pack, collapsing the deduced
+pack to one element (tsize_v<tup<int,int>> == 1).  Fixed by expanding a deduced
+pack to one argument per element before instantiating, mirroring the class
+partial-spec expansion.  Covers the hand-written shape (sizes 2, 3) and the real
+std::tuple_size_v.  Non-vacuous: each assertion is a concrete function of the
+deduced pack arity.

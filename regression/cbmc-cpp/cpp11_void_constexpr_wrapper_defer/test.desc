@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ void constexpr wrapper deferred: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.inst]/5 + [expr.const]: a void-returning constexpr member
+function template never yields a constant, so it is deferred to the
+method-body drain (whose prepare_deferred_method_body pack-expander
+expands its std::construct_at-style new-initializer pack) rather than
+eagerly converted before that expansion runs.  The C++20
+allocator_traits::construct shape.  g++/clang++ runtime-verified.

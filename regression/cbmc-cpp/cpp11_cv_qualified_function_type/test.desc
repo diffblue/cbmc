@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ function type is a function: SUCCESS$
+^\[main\.assertion\.2\] line \d+ multi-arg function type is a function: SUCCESS$
+^\[main\.assertion\.3\] line \d+ object type is not a function: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [dcl.fct]/7: cv-qualifiers added on top of a function type are ignored
+(there are no cv-qualified function types).  A const-qualified template
+parameter substituted with a function type must drop the const, so
+is_const<const T> is false and the libstdc++ is_function<T> idiom
+(!is_const<const T>) is true for function types.  Underlies std::decay's
+function-to-pointer decay and constructing std::function from a function.

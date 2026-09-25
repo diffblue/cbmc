@@ -1,0 +1,14 @@
+CORE clang20
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+Concept-constrained specialization ordering with __is_pointer and
+__remove_pointer builtins in requires clauses produces incorrect
+results when CBMC uses Clang 20 as the preprocessor. The requires
+clause requires(__is_pointer(T)) incorrectly matches non-pointer
+types. The same test passes with Clang 18. The preprocessed C++
+code is identical; the issue is in CBMC's internal state when
+configured for Clang 20.

@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5.  Deducing a
+parameter pack THROUGH an alias template with a fixed leading argument
+(`template <SIZE... I> using idxseq = iseq<SIZE, I...>;` then
+`f(idxseq<J...>)`), the std::index_sequence shape used by std::apply's
+__apply_impl.  Previously the alias-parameter substitution matched on
+ID_C_base_name, which is empty for a non-type parameter (a symbol whose name is
+only the suffix of its scoped identifier), so the enclosing function's pack was
+never deduced ("found no match").  Fixed by deriving the alias parameter's base
+name robustly.  Covers a non-type and a type pack, each with a deducing-function
+pack name DIFFERENT from the alias's own parameter (a genuine substitution, not
+an accidental name match).  Non-vacuous: each assertion is a concrete function
+of the deduced pack.

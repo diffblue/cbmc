@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ packed bit-fields have 4-byte ABI size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ a holds its value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ b holds its value \(independent of a\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ c holds its value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
