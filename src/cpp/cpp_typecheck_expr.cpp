@@ -637,8 +637,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       return resolved;
     };
 
+    // [expr.spaceship]/8: two operands of pointer type (after the composite
+    // pointer type conversion) also yield std::strong_ordering.  Only the
+    // arithmetic case was lowered; `p <=> q' fell to the C int lowering, and
+    // `if(const auto cmp = x <=> y; cmp != 0) return cmp;' in a function
+    // returning strong_ordering (libstdc++ 16's _Bit_iterator_base) failed.
+    const bool is_ptr = t0.id() == ID_pointer && t1.id() == ID_pointer &&
+                        !is_reference(t0) && !is_reference(t1);
+
     bool lowered = false;
-    if(is_arith(t0) && is_arith(t1))
+    if((is_arith(t0) && is_arith(t1)) || is_ptr)
     {
       const char *category = is_fp ? "partial_ordering" : "strong_ordering";
       exprt less = resolve_category_member(category, "less");
