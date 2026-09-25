@@ -1,20 +1,19 @@
-KNOWNBUG gcc16 libstdcxx16
+CORE gcc-only gcc16 libstdcxx16
 main.cpp
 --cpp20 --unwind 5 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ find: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
-KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only; passes with gcc 11-15
-headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
-select the code paths) and running cbmc on the .ii file.
-Untriaged: the C++20 __find_if uses __invoke on the predicate with a
-forwarded const int &.
-2026-09-25: two layers peeled by the cvise reduction -- `p <=> q' on pointers
-(std::strong_ordering, _Bit_iterator_base::operator<=>; cpp20_spaceship_
-pointers) and GCC 14's `__builtin_clzg(x, digits)' (cpp17_gcc_builtin_clzg).
-Remaining: "found no match for symbol '_Comp_with_val_2nd'" in __equal_to
-(ranges __detail predicate wrappers).
+Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only: std::find's
+predicate (predefined_ops.h `_Comp_with_val') holds the functor by value or by
+reference according to `__by_ref_or_value_fn' = is_empty<equal_to<>>; with
+`__is_empty' unconditionally false the empty functor was held by reference to a
+temporary and every comparison read garbage.  Fixed in round 161
+(cpp11_class_property_type_traits).  Runs where the host gcc is >= 16 (tag
+libstdcxx16).
