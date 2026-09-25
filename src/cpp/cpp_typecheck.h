@@ -1309,6 +1309,11 @@ public:
   bool implicit_conversion_sequence(
     const exprt &expr, const typet &type, exprt &new_expr);
 
+  bool brace_init_to_array_reference(
+    const exprt &init_list,
+    const pointer_typet &reference_type,
+    exprt &result);
+
   /// Whether direct-list-initialization of \p type from the
   /// braced-init-list \p init_list (an ID_initializer_list expression)
   /// should use an initializer-list constructor with the list as a single
