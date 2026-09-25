@@ -11728,3 +11728,32 @@ Reduction lessons (gcc16, cvise, Docker oracle):
 * never `pkill -f`/kill by pattern from a shell whose own command line
   contains the pattern (killed my own reduction batch once); match on
   /proc/<pid>/cwd instead.
+
+### Round 160, closing: what the gcc16 reductions surfaced (and got fixed)
+
+The reductions (strict interestingness test) converged on root causes fast
+once they could not cheat; each turned out to be a small, standards-clear
+front-end gap, fixed the same day with a header-free CORE test:
+
+* `x.p <=> y.p' on POINTERS yields std::strong_ordering ([expr.spaceship]/8)
+  -- only arithmetic operands were lowered; libstdc++ 16's
+  _Bit_iterator_base::operator<=> (every vector<bool>) failed.
+* GCC 14 `__builtin_clzg(x [, value])' / `__builtin_ctzg' (type-generic,
+  optional zero-value) -- declared `int f(int)'; libstdc++ 14+'s
+  countl_zero / bit_width use them.  Fixed in C and C++.
+* templated EXPLICIT OBJECT PARAMETER (`this Self &&self', C++23 deducing
+  this): deduction skipped the object argument with the parameter, the
+  viability check dropped the object, and the instantiated specialization
+  was treated as a static member -- every std::bind call under libstdc++ 16.
+  gcc16_bind_deducing_this_call PASSES with gcc-16 headers now, as does
+  gcc16_common_reference_with_same_type (both kept KNOWNBUG only because
+  this host lacks gcc-16 headers; promote on a gcc-16 host).
+
+Still open in the gcc16 set (reductions running in /tmp/r160/red):
+string_from_literal (`this->#anon_member._M_local_buf[__len++]' not an
+lvalue -- an anonymous-union member array element), unordered_set_insert
+(`find' body dropped), set_of_class_completed_later (`_S_key' body
+dropped), vector_find (`_Comp_with_val_2nd'), map_subscript_lookup
+(<compare> `__make' operator()), stream_ctype (wchar_t facet virtuals).
+And libc++ variant: `__best_match_t' (overload set from a base pack with
+`using _Bases::operator()...').

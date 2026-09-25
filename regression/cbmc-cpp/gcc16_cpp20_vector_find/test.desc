@@ -13,3 +13,8 @@ headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
 select the code paths) and running cbmc on the .ii file.
 Untriaged: the C++20 __find_if uses __invoke on the predicate with a
 forwarded const int &.
+2026-09-25: two layers peeled by the cvise reduction -- `p <=> q' on pointers
+(std::strong_ordering, _Bit_iterator_base::operator<=>; cpp20_spaceship_
+pointers) and GCC 14's `__builtin_clzg(x, digits)' (cpp17_gcc_builtin_clzg).
+Remaining: "found no match for symbol '_Comp_with_val_2nd'" in __equal_to
+(ranges __detail predicate wrappers).
