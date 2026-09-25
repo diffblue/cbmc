@@ -3172,6 +3172,351 @@ void cpp_typecheckt::queue_deferred_methods_of_instance(
 /// \param specialization: optional explicit specialization type
 #define MAX_DEPTH 50
 
+/// The parameter-list \p params of a function template spelled with the
+/// template's own parameters (\p ttype) normalised to their POSITION (`#0',
+/// `#1', ...), parameter names erased ([dcl.fct]/3,5) -- so the same
+/// signature written with differently named template parameters compares
+/// equal.  The first \p skip_first template parameters (an enclosing class
+/// template's, for an out-of-line member template definition) are not part
+/// of the numbering.
+static std::string normalized_parameter_signature(
+  const irept &params,
+  const template_typet &ttype,
+  std::size_t skip_first)
+{
+  std::map<std::string, std::string> rename;
+  std::size_t idx = 0;
+  std::size_t skipped = 0;
+  for(const auto &tp : ttype.template_parameters())
+  {
+    if(skipped < skip_first)
+    {
+      ++skipped;
+      continue;
+    }
+    const irep_idt id =
+      tp.id() == ID_type ? tp.type().get(ID_identifier) : tp.get(ID_identifier);
+    const std::string ids = id2string(id);
+    const auto pos = ids.rfind("::");
+    const std::string short_name =
+      pos != std::string::npos ? ids.substr(pos + 2) : ids;
+    if(!short_name.empty())
+      rename[short_name] = "#" + std::to_string(idx);
+    ++idx;
+  }
+  irept copy = params;
+  // Erase the parameter NAMES first: the declaration may leave a
+  // parameter unnamed where the definition names it (`swap(_Tp&,
+  // _Tp&)` vs `swap(_Tp& __a, _Tp& __b)`, libstdc++ bits/move.h) --
+  // only the TYPES are signature ([dcl.fct]/5).
+  for(auto &pdecl : copy.get_sub())
+  {
+    if(pdecl.id() != ID_cpp_declaration)
+      continue;
+    for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
+    {
+      d.name() = cpp_namet{};
+      // N5008 [dcl.fct]/3 + [temp.variadic]/4: a function parameter
+      // pack is a parameter pack whether or not the declarator names
+      // it.  The parser records the `...` of an UNNAMED pack
+      // (`make_shared(_Args&&...)`, libstdc++'s in-class friend
+      // declaration) on the DECLARATOR, but that of a named one
+      // (`make_shared(_Args&&... __args)`, the definition) on the
+      // declarator's TYPE.  Same signature, two spellings: unify
+      // onto the type so the friend declaration redirects to its
+      // definition -- otherwise the tie between the two
+      // "different" templates broke by candidate ORDER, and when
+      // the bodiless friend won the whole regex compiler was a
+      // havoc stub (vacuous cpp11_regex_* verdicts).
+      if(d.get_bool(ID_ellipsis))
+      {
+        d.remove(ID_ellipsis);
+        d.type().set(ID_ellipsis, true);
+      }
+    }
+  }
+  std::function<void(irept &)> walk = [&](irept &n)
+  {
+    if(n.id() == ID_name)
+    {
+      const auto it = rename.find(id2string(n.get(ID_identifier)));
+      if(it != rename.end())
+        n.set(ID_identifier, it->second);
+    }
+    for(auto &sub : n.get_sub())
+      walk(sub);
+    for(auto &ns : n.get_named_sub())
+      walk(ns.second);
+  };
+  walk(copy);
+  return cpp_type2name(static_cast<const typet &>(copy));
+}
+
+/// N5008 [dcl.fct]/3,5, [temp.over.link]: does the out-of-line member
+/// template definition's parameter list \p def_params -- spelled with the
+/// definition's template parameters \p def_tt, the enclosing class
+/// template's first, then the member's own -- denote the same parameter
+/// types as the in-class declaration's \p decl_params, spelled with the class
+/// template's parameters \p class_tt and the member's own \p decl_tt?  The
+/// definition may name every template parameter differently; they are
+/// mapped positionally onto the declaration's names.  Both lists are in
+/// parsed form.
+bool cpp_typecheckt::member_template_parameters_match(
+  const irept &decl_params,
+  const template_typet &decl_tt,
+  const template_typet &class_tt,
+  const irept &def_params,
+  const template_typet &def_tt)
+{
+  // a template parameter is either type-checked (an `ID_type' / symbol
+  // carrying the qualified identifier) or, in a parsed out-of-line
+  // definition, still a cpp_declaration with a named declarator
+  const auto short_name = [](const template_parametert &tp) -> std::string
+  {
+    if(tp.id() == ID_cpp_declaration)
+    {
+      const auto &d =
+        static_cast<const cpp_declarationt &>(static_cast<const irept &>(tp));
+      if(d.declarators().empty())
+        return "";
+      return id2string(d.declarators().front().name().get_base_name());
+    }
+    const irep_idt id =
+      tp.id() == ID_type ? tp.type().get(ID_identifier) : tp.get(ID_identifier);
+    const std::string ids = id2string(id);
+    const auto pos = ids.rfind("::");
+    return pos != std::string::npos ? ids.substr(pos + 2) : ids;
+  };
+  const auto &def_tps = def_tt.template_parameters();
+  const auto &decl_tps = decl_tt.template_parameters();
+  const auto &class_tps = class_tt.template_parameters();
+  if(def_tps.size() != class_tps.size() + decl_tps.size())
+    return false;
+  std::map<std::string, std::string> rename;
+  for(std::size_t i = 0; i < class_tps.size(); ++i)
+    rename[short_name(def_tps[i])] = short_name(class_tps[i]);
+  for(std::size_t i = 0; i < decl_tps.size(); ++i)
+    rename[short_name(def_tps[class_tps.size() + i])] = short_name(decl_tps[i]);
+  irept def_copy = def_params;
+  std::function<void(irept &)> walk = [&](irept &n)
+  {
+    if(n.id() == ID_name)
+    {
+      const auto it = rename.find(id2string(n.get(ID_identifier)));
+      if(it != rename.end())
+        n.set(ID_identifier, it->second);
+    }
+    for(auto &sub : n.get_sub())
+      walk(sub);
+    for(auto &ns : n.get_named_sub())
+      walk(ns.second);
+  };
+  walk(def_copy);
+  // parameter names are not signature ([dcl.fct]/3)
+  const auto strip_names = [](irept &params)
+  {
+    for(auto &pdecl : params.get_sub())
+    {
+      if(pdecl.id() != ID_cpp_declaration)
+        continue;
+      for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
+        d.name() = cpp_namet{};
+    }
+  };
+  irept decl_copy = decl_params;
+  strip_names(decl_copy);
+  strip_names(def_copy);
+  return cpp_type2name(static_cast<const typet &>(decl_copy)) ==
+         cpp_type2name(static_cast<const typet &>(def_copy));
+}
+
+/// N5008 [dcl.fct]/3,5: does the out-of-line definition \p def (parsed form)
+/// have the signature of the instantiated member \p member?  The arity must
+/// agree; when \p class_args is given (a regular member of the class template
+/// instance, not a member template) the parameter types, with the class's
+/// arguments substituted and type-checked in the current scope, must equal
+/// the member's.  A parameter type that cannot be type-checked here is
+/// treated as matching (conservative: the pre-existing base-name match).
+bool cpp_typecheckt::out_of_line_definition_matches(
+  const symbolt &member,
+  const cpp_declarationt &def,
+  const cpp_template_args_tct *class_args)
+{
+  if(member.type.id() != ID_code || def.declarators().empty())
+    return true;
+  const typet &def_ftype = def.declarators()[0].type();
+  if(def_ftype.id() != ID_function_type)
+    return true;
+  const auto &mparams = to_code_type(member.type).parameters();
+  std::size_t member_arity = mparams.size();
+  std::size_t first = 0;
+  if(!mparams.empty() && mparams.front().get_this())
+  {
+    --member_arity;
+    first = 1;
+  }
+  const auto &dparams = def_ftype.find(ID_parameters).get_sub();
+  std::size_t def_arity = 0;
+  for(const auto &dp : dparams)
+    if(dp.id() == ID_cpp_declaration)
+      ++def_arity;
+  // `(void)' declares no parameters ([dcl.fct]/4)
+  if(
+    def_arity == 1 &&
+    static_cast<const cpp_declarationt &>(dparams.front()).type().id() ==
+      ID_void)
+  {
+    def_arity = 0;
+  }
+  if(def_arity != member_arity)
+    return false;
+  if(class_args == nullptr)
+    return true;
+  cpp_saved_template_mapt saved_map(template_map);
+  template_map.build(def.template_type(), *class_args);
+  std::size_t i = first;
+  for(const auto &dp : dparams)
+  {
+    if(dp.id() != ID_cpp_declaration)
+      continue;
+    const auto &dpd = static_cast<const cpp_declarationt &>(dp);
+    typet dtype = dpd.declarators().empty()
+                    ? dpd.type()
+                    : dpd.declarators().front().merge_type(dpd.type());
+    template_map.apply(dtype);
+    bool typechecked = true;
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      typecheck_type(dtype);
+    }
+    catch(...)
+    {
+      typechecked = false;
+    }
+    if(typechecked && i < mparams.size())
+    {
+      typet mtype = mparams[i].type();
+      // top-level cv-qualifiers are not part of the signature ([dcl.fct]/5)
+      dtype.remove(ID_C_constant);
+      dtype.remove(ID_C_volatile);
+      mtype.remove(ID_C_constant);
+      mtype.remove(ID_C_volatile);
+      if(cpp_type2name(dtype) != cpp_type2name(mtype))
+        return false;
+    }
+    ++i;
+  }
+  return true;
+}
+
+/// N5008 [dcl.fct]/3: parameter names are not part of the type; the body of
+/// the out-of-line definition \p def refers to the definition's names -- give
+/// the instantiated member \p member those names (the in-class declaration
+/// may name them differently, `_M_construct(const _CharT *__c, ...)' vs
+/// `(const _CharT *__str, ...)').
+void cpp_typecheckt::adopt_definition_parameter_names(
+  symbolt &member,
+  const cpp_declarationt &def)
+{
+  if(member.type.id() != ID_code || def.declarators().empty())
+    return;
+  const typet &def_ftype = def.declarators()[0].type();
+  if(def_ftype.id() != ID_function_type)
+    return;
+  auto &mparams = to_code_type(member.type).parameters();
+  std::size_t i = (!mparams.empty() && mparams.front().get_this()) ? 1 : 0;
+  for(const auto &dp : def_ftype.find(ID_parameters).get_sub())
+  {
+    if(dp.id() != ID_cpp_declaration)
+      continue;
+    const auto &dpd = static_cast<const cpp_declarationt &>(dp);
+    if(i >= mparams.size())
+      break;
+    if(!dpd.declarators().empty())
+    {
+      const irep_idt new_name =
+        dpd.declarators().front().name().get_base_name();
+      if(!new_name.empty() && mparams[i].get_base_name() != new_name)
+      {
+        // the parameter symbol keeps its identifier; only the base name by
+        // which the body refers to it changes
+        mparams[i].set_base_name(new_name);
+        const irep_idt &param_id = mparams[i].get_identifier();
+        symbolt *psym = symbol_table.get_writeable(param_id);
+        if(psym != nullptr)
+          psym->base_name = new_name;
+      }
+    }
+    ++i;
+  }
+}
+
+/// N5008 [temp.mem]: rename, in the parsed \p node of an out-of-line member
+/// template definition whose template parameters are \p def_tt (the
+/// enclosing class template's first, then the member's own), every reference
+/// to a template parameter to the name the declaration uses -- \p class_tt
+/// for the class's, \p decl_tt for the member's.
+void cpp_typecheckt::rename_template_parameters_to_declaration(
+  irept &node,
+  const template_typet &def_tt,
+  const template_typet &class_tt,
+  const template_typet &decl_tt)
+{
+  const auto short_name = [](const template_parametert &tp) -> std::string
+  {
+    if(tp.id() == ID_cpp_declaration)
+    {
+      const auto &d =
+        static_cast<const cpp_declarationt &>(static_cast<const irept &>(tp));
+      if(d.declarators().empty())
+        return "";
+      return id2string(d.declarators().front().name().get_base_name());
+    }
+    const irep_idt id =
+      tp.id() == ID_type ? tp.type().get(ID_identifier) : tp.get(ID_identifier);
+    const std::string ids = id2string(id);
+    const auto pos = ids.rfind("::");
+    return pos != std::string::npos ? ids.substr(pos + 2) : ids;
+  };
+  const auto &def_tps = def_tt.template_parameters();
+  const auto &decl_tps = decl_tt.template_parameters();
+  const auto &class_tps = class_tt.template_parameters();
+  if(def_tps.size() != class_tps.size() + decl_tps.size())
+    return;
+  std::map<std::string, std::string> rename;
+  for(std::size_t i = 0; i < class_tps.size(); ++i)
+  {
+    const std::string from = short_name(def_tps[i]),
+                      to = short_name(class_tps[i]);
+    if(!from.empty() && !to.empty() && from != to)
+      rename[from] = to;
+  }
+  for(std::size_t i = 0; i < decl_tps.size(); ++i)
+  {
+    const std::string from = short_name(def_tps[class_tps.size() + i]),
+                      to = short_name(decl_tps[i]);
+    if(!from.empty() && !to.empty() && from != to)
+      rename[from] = to;
+  }
+  if(rename.empty())
+    return;
+  std::function<void(irept &)> walk = [&](irept &n)
+  {
+    if(n.id() == ID_name)
+    {
+      const auto it = rename.find(id2string(n.get(ID_identifier)));
+      if(it != rename.end())
+        n.set(ID_identifier, it->second);
+    }
+    for(auto &sub : n.get_sub())
+      walk(sub);
+    for(auto &ns : n.get_named_sub())
+      walk(ns.second);
+  };
+  walk(node);
+}
+
 /// Decide whether two template declarations name the *same* template -- i.e.
 /// whether \p candidate could be the definition of a forward declaration
 /// \p forward.  A forward declaration and its definition necessarily share an
@@ -3274,68 +3619,7 @@ bool cpp_typecheckt::function_template_signatures_equivalent(
     // declaration stays bodyless, the pre-redirect behaviour).
     const auto normalized =
       [](const irept &params, const template_typet &ttype) -> std::string
-    {
-      std::map<std::string, std::string> rename;
-      std::size_t idx = 0;
-      for(const auto &tp : ttype.template_parameters())
-      {
-        const irep_idt id = tp.id() == ID_type ? tp.type().get(ID_identifier)
-                                               : tp.get(ID_identifier);
-        const std::string ids = id2string(id);
-        const auto pos = ids.rfind("::");
-        const std::string short_name =
-          pos != std::string::npos ? ids.substr(pos + 2) : ids;
-        if(!short_name.empty())
-          rename[short_name] = "#" + std::to_string(idx);
-        ++idx;
-      }
-      irept copy = params;
-      // Erase the parameter NAMES first: the declaration may leave a
-      // parameter unnamed where the definition names it (`swap(_Tp&,
-      // _Tp&)` vs `swap(_Tp& __a, _Tp& __b)`, libstdc++ bits/move.h) --
-      // only the TYPES are signature ([dcl.fct]/5).
-      for(auto &pdecl : copy.get_sub())
-      {
-        if(pdecl.id() != ID_cpp_declaration)
-          continue;
-        for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
-        {
-          d.name() = cpp_namet{};
-          // N5008 [dcl.fct]/3 + [temp.variadic]/4: a function parameter
-          // pack is a parameter pack whether or not the declarator names
-          // it.  The parser records the `...` of an UNNAMED pack
-          // (`make_shared(_Args&&...)`, libstdc++'s in-class friend
-          // declaration) on the DECLARATOR, but that of a named one
-          // (`make_shared(_Args&&... __args)`, the definition) on the
-          // declarator's TYPE.  Same signature, two spellings: unify
-          // onto the type so the friend declaration redirects to its
-          // definition -- otherwise the tie between the two
-          // "different" templates broke by candidate ORDER, and when
-          // the bodiless friend won the whole regex compiler was a
-          // havoc stub (vacuous cpp11_regex_* verdicts).
-          if(d.get_bool(ID_ellipsis))
-          {
-            d.remove(ID_ellipsis);
-            d.type().set(ID_ellipsis, true);
-          }
-        }
-      }
-      std::function<void(irept &)> walk = [&](irept &n)
-      {
-        if(n.id() == ID_name)
-        {
-          const auto it = rename.find(id2string(n.get(ID_identifier)));
-          if(it != rename.end())
-            n.set(ID_identifier, it->second);
-        }
-        for(auto &sub : n.get_sub())
-          walk(sub);
-        for(auto &ns : n.get_named_sub())
-          walk(ns.second);
-      };
-      walk(copy);
-      return cpp_type2name(static_cast<const typet &>(copy));
-    };
+    { return normalized_parameter_signature(params, ttype, 0); };
     if(
       normalized(f_params, forward.template_type()) !=
       normalized(c_params, candidate.template_type()))
@@ -5648,6 +5932,22 @@ skip_pack_removal_ft:
               std::size_t n_md = md_tt.template_parameters().size();
               std::size_t n_cls =
                 specialization_template_args.arguments().size();
+              // N5008 [dcl.fct]/3,5 + [class.mfct]/1: the definition that
+              // belongs to this member is the one whose SIGNATURE matches
+              // -- same-named overloads (libstdc++'s four `_M_construct'
+              // of basic_string) differ in arity or parameter types, and
+              // matching by base name alone attached the input-iterator
+              // range body to the `(const _CharT *, size_type)' member
+              // ("symbol '__str' is unknown", string from a literal read
+              // garbage).  Compare the arity, and for a regular member the
+              // parameter types after substituting the class's arguments.
+              if(!out_of_line_definition_matches(
+                   *sym,
+                   md,
+                   n_md <= n_cls ? &specialization_template_args : nullptr))
+              {
+                continue;
+              }
               if(n_md <= n_cls)
               {
                 // Regular method: substitute all params
@@ -5846,6 +6146,10 @@ skip_pack_removal_ft:
                 }
                 sym->value = body;
               }
+              // [dcl.fct]/3: the body refers to the DEFINITION's parameter
+              // names; the member's parameters were named by the in-class
+              // declaration.  Adopt the definition's names.
+              adopt_definition_parameter_names(*sym, md);
               goto body_found;
             }
           }
@@ -6013,12 +6317,55 @@ skip_pack_removal_ft:
                 d_ftype.find(ID_parameters).get_sub().size() !=
                   m_ftype.find(ID_parameters).get_sub().size())
                 continue;
+              // ... and the parameter TYPES: libstdc++'s two
+              // three-parameter `_M_construct(_It, _It, tag)' member
+              // templates differ only in the tag type, and the same-name
+              // same-arity match attached the input-iterator body to the
+              // forward-iterator member (basic_string from a literal read
+              // garbage).  new_decl is the INSTANTIATED declaration (class
+              // and member template arguments substituted, the active
+              // template map); the definition spells its parameters with
+              // its own template parameter names ([dcl.fct]/3 -- the
+              // definition may rename them), which are mapped positionally
+              // to the declaration's before the map is applied.
+              {
+                const cpp_declarationt &raw_decl =
+                  to_cpp_declaration(effective_template->type);
+                const typet &raw_ftype = raw_decl.declarators().empty()
+                                           ? d_ftype
+                                           : raw_decl.declarators()[0].type();
+                if(
+                  raw_ftype.id() == ID_function_type &&
+                  m_ftype.id() == ID_function_type &&
+                  !member_template_parameters_match(
+                    raw_ftype.find(ID_parameters),
+                    template_type,
+                    static_cast<const template_typet &>(
+                      sp.second.type.find(ID_template_type)),
+                    m_ftype.find(ID_parameters),
+                    md_tt))
+                {
+                  continue;
+                }
+              }
             }
             // Copy the body. The body is in parsed (not type-checked)
             // form. It will be type-checked by typecheck_method_bodies
             // with the proper template map.
             new_decl.declarators()[0].add(ID_value) =
               md.declarators()[0].find(ID_value);
+            // N5008 [temp.mem]/[temp.over.link]: the definition may name the
+            // template parameters -- the class's and the member's own --
+            // differently from the declaration (`template <class Ch>
+            // template <class It> void str<Ch>::construct(It, It, ...)');
+            // the body is converted under the declaration's map, so rename
+            // the definition's names to the declaration's.
+            rename_template_parameters_to_declaration(
+              new_decl.declarators()[0].add(ID_value),
+              md_tt,
+              static_cast<const template_typet &>(
+                sp.second.type.find(ID_template_type)),
+              template_type);
 
             // N5008 [class.base.init]/1: the ctor-initializer is part of
             // the constructor's DEFINITION.  An out-of-line delegating
