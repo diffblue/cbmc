@@ -11589,10 +11589,8 @@ audit in the main tree; integrated by cherry-pick; full sweep on bin39.
    (concept_uses_requires_expression); trait-based concepts are decided.  A
    first attempt marked error-recovered concept-ids "unknown" -- wrong:
    [temp.constr.atomic]/3 says a substitution failure IS unsatisfied, and
-   cpp20_constraint_substitution_failure relies on it.  Follow-up worth
-   doing: make function_template_identifier distinguish requires-clauses
-   by content (hash the clause), then the CPO overloads coexist and the
-   concession can go.
+   cpp20_constraint_substitution_failure relies on it.  (RESOLVED in round
+   160 below: the CPO problem was not an identifier collision at all.)
 
 5. KNOWNBUG audit (bin38, -K mode): NOTHING promotable on this host.  The 3
    libcxx KNOWNBUGs still fail for their recorded reasons (variant: `found no
@@ -11612,3 +11610,59 @@ audit in the main tree; integrated by cherry-pick; full sweep on bin39.
    THOROUGH).  Exit 1 on any discrepancy: usable as a gate.
 
 Nothing pushed.
+
+### Round 160 (2026-09-25): the "identifier collision" that wasn't; gcc16 reductions
+
+Task: a KNOWNBUG for the suspected requires-clause identifier collision, and
+header-free reductions of the gcc16_* KNOWNBUGs (g++-16 lives only in the
+gcc16-test Docker image; cvise on the host with the container as the
+validity oracle).  Also: start fixing already-minimal KNOWNBUGs.
+
+The KNOWNBUG could not be written: every header-free shape of "operator()
+overloads differing only by requires-clause" PASSED.  Chasing why libc++'s
+ranges::iter_move(int*) still resolved wrongly found THREE distinct defects,
+none of them an identifier collision (the `#req_count_1' suffix in the
+identifier was a SYMPTOM):
+
+1. PARSER: `requires C<T>' followed by `[[nodiscard]] __attribute__((...))'
+   -- libc++'s _LIBCPP_HIDE_FROM_ABI on every function -- was not accepted
+   as a requires-clause because the token after the clause had to be a
+   decl-specifier or a name; GNU `__attribute__' was not on the list.  The
+   clause fell back to an atom COUNT, which no constraint check can
+   evaluate, so all CPO operator() overloads stayed viable and the first
+   declared won.  Header-free repro: 20 lines (im9.cpp).  Fix:
+   starts_declaration_after_requires_clause (also explicit, consteval,
+   constinit, mutable, thread_local, alignas, decltype, fixed-width types,
+   `[[', `~').  [temp.pre]/1, [dcl.attr.grammar].
+
+2. __is_same(int &&, int &) was TRUE: both are pointer types with the
+   `#reference' comment; `#rvalue_reference' is a comment too and
+   irept::operator== ignores comments.  [dcl.ref].  std::is_same inherits
+   it.  (How many concept evaluations silently passed on this...)
+
+3. Compound requirement `{ E } -> C' tested `type of E' + `&' if lvalue,
+   not decltype((E)): an xvalue (a call returning T&&) read as a prvalue, so
+   `{ ranges::iter_move(__i) } -> same_as<iter_rvalue_reference_t<_In>>'
+   failed and no pointer was indirectly_readable under libc++.
+   [expr.prim.req.compound]/1 + [dcl.type.decltype]/1.4-1.6; use
+   decltype_of(op, true).
+
+With the three, contiguous_range<int(&)[N]>, ranges::data(arr) == int*,
+and std::span(_Range&&) all agree with the standard, and the round-159
+CONCESSION (type-constraints of requires-expression concepts don't remove
+candidates) is WITHDRAWN -- [over.match.viable]/3 applies to every
+type-constraint.  Lesson: when a heuristic is needed to keep a suite green,
+the thing it papers over is usually a small, separate bug; go find it
+before shipping the heuristic.  Tests: cpp20_requires_clause_before_
+attribute, cpp11_is_same_reference_kinds, cpp20_compound_requirement_xvalue.
+
+Method notes for the gcc16 reductions (/tmp/r160/red): `g++-16 -E -P
+-D__CPROVER__' in the image (-P: no #line markers, so the whole file is
+"user code" for cbmc consistently while lines vanish); the interestingness
+test compiles+RUNS the candidate with g++-16 in the container (harness:
+every __CPROVER_assert must hold at run time, so the reduced program keeps
+the WRONG-VERDICT property) and requires the recorded cbmc signature;
+`sg docker' instead of sudo (cvise kills its test's process tree with
+psutil and cannot signal a root-owned child); cvise --n 3 x 7 jobs.
+gcc16_common_reference_with_same_type PASSES with gcc-16 headers now (fixed
+by earlier rounds) -- to be promoted.
