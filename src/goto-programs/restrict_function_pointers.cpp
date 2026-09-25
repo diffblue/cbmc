@@ -98,7 +98,7 @@ std::string invalid_restriction_exceptiont::what() const
   std::string res;
 
   res += "Invalid restriction";
-  res += "\nReason: " + reason;
+  res += "\nReason: " + reason();
 
   if(!correct_format.empty())
   {
