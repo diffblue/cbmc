@@ -5037,7 +5037,32 @@ void cpp_typecheckt::typecheck_expr_member(
         const struct_typet::componentt &pcomp =
           type.get_component(to_symbol_expr(symbol_expr).identifier());
 
-        if(pcomp.is_nil())
+        // N5008 [expr.ref]/6.3, [class.member.lookup]: `this->f<T>(...)'
+        // naming a static member function TEMPLATE specialization of the
+        // class or of one of its bases (libc++ variant's
+        // `this->__construct_alt(__get_alt<_Ip>(*this), ...)' from
+        // `__assignment', three bases below `__ctor').  The specialization
+        // is a symbol of its class (#member_name) but not a component of
+        // the derived class the object has, so the component look-up
+        // cannot vouch for it; the class relationship does.
+        bool static_member_of_base = false;
+        if(pcomp.is_nil() && type.id() == ID_struct)
+        {
+          const irep_idt &owner = symbol_expr.type().get(ID_C_member_name);
+          const symbolt *owner_symbol =
+            owner.empty() ? nullptr : symbol_table.lookup(owner);
+          if(
+            owner_symbol != nullptr && owner_symbol->type.id() == ID_struct &&
+            symbol_expr.type().get_bool(ID_C_is_static))
+          {
+            static_member_of_base =
+              owner == to_struct_tag_type(op0.type()).get_identifier() ||
+              subtype_typecast(
+                to_struct_type(type), to_struct_type(owner_symbol->type));
+          }
+        }
+
+        if(pcomp.is_nil() && !static_member_of_base)
         {
           error().source_location = expr.find_source_location();
 
