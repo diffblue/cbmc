@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ run-time read: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+static assertion failed
+--
+N5008 [dcl.constexpr]/6 (a constexpr static member array is const),
+[dcl.init.ref] (a reference-to-array parameter denotes the whole array in the
+constexpr evaluator), [conv.integral] (a converted scalar argument is folded
+before it is bound).  The libc++ <tuple> __find_exactly_one_checked shape used
+by std::variant's holds_alternative/get<T>.
