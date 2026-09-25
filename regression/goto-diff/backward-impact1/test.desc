@@ -1,0 +1,16 @@
+CORE
+a.c
+b.c --backward-impact
+^EXIT=0$
+^SIGNAL=0$
+\*\* helper \*\*
+^-.*function helper
+^\+.*function helper
+--
+^warning: ignoring
+^D.*function helper
+//
+// --backward-impact propagates impact backward from the change. On these
+// inputs it emits the syntactic-diff markers (-/+) but, unlike
+// --forward-impact / --change-impact, no forward data-dependence (D) line --
+// asserted here as a disallowed pattern so the test distinguishes the modes.
