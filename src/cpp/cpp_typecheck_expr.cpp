@@ -854,6 +854,15 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     error() << "unexpected ID_code expression" << eom;
     throw 0;
   }
+  else if(expr.id() == ID_compound_literal && expr.type().is_not_nil())
+  {
+    // Produced by the explicit-typecast forms (`T{}', `T()' for a class,
+    // `(T){...}') from an already type-checked operand; reaching here means
+    // the expression is type-checked a second time -- as an element of a
+    // braced-init-list argument is when the call's arguments are converted
+    // (`test<S>({S{}})').  Nothing to do ("unexpected expression:
+    // compound_literal" otherwise).
+  }
   else if(expr.id() == ID_symbol)
   {
     // A symbol expression is normally already resolved.  The one exception
