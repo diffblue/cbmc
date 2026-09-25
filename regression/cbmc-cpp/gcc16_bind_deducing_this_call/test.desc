@@ -13,3 +13,8 @@ headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
 select the code paths) and running cbmc on the .ii file.
 Symptom: CONVERSION ERROR at <functional> line 654 (the __enable_if_t default
 argument evaluated FALSE), dropping main.
+2026-09-25: PASSES with gcc 16.0.1 headers (g++-16 -E in the gcc16-test
+image, cbmc on the .ii): the templated explicit object parameter is deduced
+from the object expression now (cpp23_deducing_this_template_object_
+parameter, header-free).  Kept KNOWNBUG only because this host has no gcc-16
+headers to run it under test.pl; promote to CORE gcc16 on a gcc-16 host.
