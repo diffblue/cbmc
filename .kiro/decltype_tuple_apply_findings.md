@@ -11482,3 +11482,133 @@ cpp11_regex_match is a THOROUGH test dominated by symex/solver at --unwind 5
 Cumulative front-end speedup this session on cpp20_span_basic_libcxx:
 103 s (round 7) -> ~43 s.  Integrated on bin38 (after the libc++ regression
 above was fixed); all suites green; clang -Werror clean.  Nothing pushed.
+
+### Round 159, part 10 (2026-09-25): the six follow-ups, all done in one round
+
+Two worktrees again (wt-a: items 1-3 and 2; wt-b: item 4), the script and
+audit in the main tree; integrated by cherry-pick; full sweep on bin39.
+
+1. THE boolbv_widtht::get_entry CRASH WAS NOT A SOLVER GAP.  Reproduced on
+   the object-ified build with libc++ <span> (bv2.cpp), it came from
+   `inline constexpr __fields __fields_bool{.__locale_specific_form_ = true,
+   ...}' in <__format/parser_std_format_spec.h>: a struct of bit-fields with
+   braced default member initializers, initialized by DESIGNATORS.  Two
+   defects in c_typecheck_baset::do_initializer_list's C++ hook:
+   (a) default member initializers were filled by COUNT ("the first N
+   members were given") -- wrong for a designated-initializer-list
+   ([dcl.init.aggr]/3.1: designators name the explicitly initialized
+   elements; /5.1 the others take their default member initializer), so
+   `G{.c = 7}' left a = 0 and dropped the 7 -- WRONG VERDICTS in plain
+   C++20 code, nothing to do with constexpr;
+   (b) a braced default member initializer was type-checked as a raw
+   initializer_list and CAST to the member type -- for a bit-field that put
+   an initializer_list of no type into the model, and THAT is what the
+   flattener choked on.  Fix: track the explicitly initialized elements
+   through the designator; new virtual default_member_initializer_value
+   (C: none; C++: type-check in class scope, list-initialize via
+   do_initializer_rec, re-apply the bit-field type).  Reproducers
+   /tmp/r159/bf*.cpp.  Test cpp20_designated_init_default_member_initializer.
+   Lesson: "Reached unimplemented boolbv_widtht::get_entry()" = a type-less
+   expression leaked from the front end; look at the `warning: ignoring'
+   irep printed just before it, it names the culprit.
+
+2. Constexpr class objects are now REAL const objects with storage
+   ([dcl.constexpr]/6, [basic.def.odr]): is_macro=false in the declarator
+   converter (as for constexpr arrays), type const, the struct constant from
+   record_constexpr_object_value is the initializer.  `&g', `const S &r =
+   g', passing to a function all work.  The typecheck-time fold of `g.v' to
+   the value's component became unnecessary AND was wrong -- it broke
+   `decltype((cs.m))' (must be `const int &', an lvalue; the fold made a
+   prvalue) in two existing tests.  Removed.  With item 1 fixed the libc++
+   crash is gone (bv2 verifies as on bin36).
+
+3. Namespace-scope static_assert now WARNS when unevaluable (user code only;
+   library headers and template instantiations stay quiet).  It paid for
+   itself within minutes: (a) `constexpr P gp(42); static_assert(gp.v ==
+   42)' was silently skipped -- in a test committed the day before that
+   believed it checked (convert_non_template_declaration replaced the
+   recorded value by the constructor call); (b) `constexpr int arr[] = {1,2,
+   3}; static_assert(arr[1] == 2)' -- a constexpr ARRAY lost its const
+   ([dcl.constexpr]/6), `int[3]' not `const int[3]'; (c) `constexpr int
+   len(const char *p) { while(*p++) ++n; }' -- `len("abc")' evaluated to 0 and
+   the static_assert FAILED: the evaluator could not move a pointer into a
+   string literal AND, worse, a statement it could not apply was skipped
+   while evaluation CONTINUED with stale values (`++p; return *p' returned
+   the char before the increment).  Now: string pointers tracked with their
+   index; a `failed' flag abandons the evaluation at the first untracked
+   effect.  The interpreter lambdas were extracted into class
+   constexpr_interpretert (try_evaluate_constexpr had passed the 500-line
+   lint cap).  Tests cpp14_constexpr_string_literal_pointer,
+   cpp11_constexpr_array_element_namespace.
+
+4. Perf round 3 (perf on build-debug, span test):
+   - template_mapt copied 220,000 times; pack_size_map and generation_map
+     (~150 entries each, never pruned) were copied node by node -- 8% of the
+     run.  New util/flat_map.h (sorted vector, std::map interface) for the
+     two: span 42.8 -> 30.5 s, map_basic_libcxx 43.6 -> 30.4 s.
+   - typecheck_template_parameters decided "is this name a concept?" by
+     scanning the WHOLE symbol table for a constexpr bool whose name
+     CONTAINED the text (2.5% self, 11% inclusive; and `Integral' matched
+     `is_integral_v<int>').  Replaced by a scope lookup for a concept
+     template (is_concept_name): -9%.
+   - `sub.id() == "::"' (dstring -> std::string -> compare) at 180 sites,
+     3.8% in resolve_scope alone.  New ID_scope_resolution.
+   - link_to_library is down to 2.6% after last round's rename fix: not
+     worth batching now.
+   Totals vs bin38: span 41.7 -> 30.7 s (-26%), map_basic_libcxx 43.6 ->
+   33.2 (-24%), iostream_basic_libcxx 32.9 -> 26.5 (-19%); libstdc++ tests
+   5-8%.  Remaining profile: overload resolution constructing candidate
+   temporaries (user_defined_conversion_sequence -> new_temporary ->
+   cpp_constructor, ~34% inclusive) and irept/malloc churn under it.
+
+   Found on the way (via the differential script, item 6) and fixed: two
+   function templates differing only in a TYPE-CONSTRAINT (`template<Integral
+   T> g(T)' / `template<Floating T> g(T)', also std::integral /
+   std::floating_point) resolved to whichever was declared FIRST -- the
+   type-constraint was decided by a structural evaluator over the concept
+   body that only knew a few builtin traits.  [temp.param]/4: `C<A> T'
+   introduces `C<T, A>'; now built by add_type_constraint, recorded on the
+   parameter, and evaluated with the requires-clause evaluator.  The
+   structural evaluator (another whole-table scan per candidate) is gone.
+   Class-template partial specializations keep ordering by concept name (a
+   first attempt that folded the constraint into the requires-clause for ALL
+   templates double-counted atoms in subsumption and broke iterator_traits
+   selection).  Test cpp20_type_constraint_overload.
+   SECOND integration surprise (caught by the merged full sweep, again):
+   three CORE libc++ span tests failed -- std::span's `template
+   <__span_compatible_range<element_type> _Range> span(_Range&&)' now HAD
+   its constraint decided, and our evaluation of contiguous_range<int(&)[3]>
+   is FALSE (libc++'s ranges::begin / ranges::iter_move CPOs: three
+   operator() overloads differing only by requires-clause collapse to ONE
+   function_template_identifier -- `#req_count_1' -- so iter_rvalue_
+   reference_t<int*> is nil; a real, separate gap, same family as the
+   ranges_basic KNOWNBUG).  Before, the constraint was never decided, so
+   the candidate was kept and span(arr, 5) resolved.  Concession: a
+   type-constraint whose concept is defined (transitively) with a
+   requires-expression does not REMOVE a candidate
+   (concept_uses_requires_expression); trait-based concepts are decided.  A
+   first attempt marked error-recovered concept-ids "unknown" -- wrong:
+   [temp.constr.atomic]/3 says a substitution failure IS unsatisfied, and
+   cpp20_constraint_substitution_failure relies on it.  Follow-up worth
+   doing: make function_template_identifier distinguish requires-clauses
+   by content (hash the clause), then the CPO overloads coexist and the
+   concession can go.
+
+5. KNOWNBUG audit (bin38, -K mode): NOTHING promotable on this host.  The 3
+   libcxx KNOWNBUGs still fail for their recorded reasons (variant: `found no
+   match for symbol 'variant''; ranges_basic: __bind_back chain; libcxx23
+   string_fill_ctor: FAILURE); the 8 gcc16_* need GCC-16 headers (not
+   installed here, no docker image).  THOROUGH: regex_construct and
+   abstract_environment_tu time out at 900 s; stay THOROUGH.  Note: test.pl
+   -K prints [OK] when a KNOWNBUG still FAILS -- read test.out, not the tag.
+
+6. scripts/cpp_differential_check.py: compiles+runs each source with g++ and
+   clang++ (harness records every __CPROVER_assert), runs cbmc, compares.
+   Classes: WRONG-FAIL, UNSOUND, SA-GAP, SA-WRONG, REJECTED, ACCEPTED.  On
+   this round's snippets against bin38 it reports every defect fixed here;
+   against the fixed build only the concept-overload bug (then fixed).  Over
+   all 572 cpp11_* tests with the wt-a build: 1 REJECTED (the decltype test,
+   = the fold defect of item 2, then fixed) + 1 TIMEOUT (regex_match,
+   THOROUGH).  Exit 1 on any discrepancy: usable as a gate.
+
+Nothing pushed.
