@@ -44,7 +44,6 @@ jobs:
 
     - name: Build
       run: |
-        make -C src minisat2-download
         make -C src       -j4
         make -C unit      -j4
         make -C jbmc/src  -j4
