@@ -1908,6 +1908,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
           try
           {
             sfinae_contextt sfinae_guard{*this};
+            // N5008 [expr.const]/2, [class.static.data]/4: the initializer
+            // of a constexpr (or const integral) static data member is a
+            // constant expression, manifestly constant-evaluated -- a call to
+            // a constexpr function in it (`static constexpr int t =
+            // twice(21)', libc++ variant's `__common_trait({...})') is
+            // folded only in a constant-expression context.
+            constant_expression_contextt constant_expression_guard{*this};
             // For constexpr/const members during template instantiation,
             // resolve cpp_names in the value expression using the C++
             // type-checker. The C do_initializer can't resolve cpp_name
@@ -1965,6 +1972,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
                   cpp_scopes.id_map.find(symbol.name) !=
                   cpp_scopes.id_map.end())
                   cpp_scopes.go_to(*cpp_scopes.id_map[symbol.name]);
+                // N5008 [temp.variadic]/5: a pack expansion in the
+                // initializer (`count({sizeof(Ts)...})', libc++ variant's
+                // `__common_trait({__trait<_Types, ...>...})') produces one
+                // element per pack element -- as convert_function does for a
+                // function body; left unexpanded, the braced list collapsed
+                // to its FIRST element (a wrong value).
+                template_map.expand_call_argument_packs(
+                  static_cast<irept &>(new_symbol->value));
                 typecheck_expr(new_symbol->value);
               }
               force_elaborate = saved_force;
