@@ -11666,3 +11666,65 @@ the WRONG-VERDICT property) and requires the recorded cbmc signature;
 psutil and cannot signal a root-owned child); cvise --n 3 x 7 jobs.
 gcc16_common_reference_with_same_type PASSES with gcc-16 headers now (fixed
 by earlier rounds) -- to be promoted.
+
+### Round 160, continued: "already-minimal" KNOWNBUGs -> the libc++ variant chain
+
+The only header-free-ish KNOWNBUGs in cbmc-cpp are all libc++/gcc16 shapes;
+the smallest (cpp17_libcxx_variant, 7 lines) was taken as the target and
+each layer peeled into a header-free test.  Found and fixed on the way,
+all pre-existing:
+
+* struct constants of C++ classes were indexed by component_number, which
+  counts member FUNCTIONS: any method declared before a data member shifted
+  the index (`constexpr S s' unevaluable; simplify_member could pick another
+  member's value).  New struct_union_typet::data_component_number, used by
+  the simplifier, struct_exprt::component, remove_const_function_pointers
+  and the evaluator.  A util-level fix.
+* constexpr evaluator: std::initializer_list arguments (array pointers into
+  any constant array -- generalising the round-159 string pointer --,
+  pointer arithmetic/compare, `this' as address-of the tracked value,
+  references as aliases).  `count({1,2,3})', range-for over the list.
+* class-template static data member initializers: pack expansion NOT
+  expanded (`count({sizeof(Ts)...})' collapsed to its first element -- wrong
+  at run time) and not a constant-expression context (no folding).
+* __is_trivially_copyable / __is_trivial were unconditionally FALSE;
+  __is_trivially_constructible(T, U) unconditionally TRUE.  Implemented per
+  [class.prop]/1-2.  Consequence: libc++'s vector relocation now takes its
+  memcpy path, which exposed `__builtin_memcpy(new, nullptr, 0)' tripping the
+  library model's r_ok precondition -> the builtin form now accepts a null
+  pointer with zero length (C2y N3322; the C17 memcpy keeps its precondition).
+  Caught by the merged sweep (libcxx23_vector_pushback), bisected in 4 builds.
+* GCC __atomic_*/__sync_* builtins were unusable in C++ (typeless symbols in
+  the synthesized body that only the C typecheck_expr_symbol resolved) --
+  behind libstdc++'s __gnu_cxx::__atomic_add (shared_ptr, locale), and the
+  first failure of the gcc16 stream KNOWNBUG.  Found by the reduction of that
+  test: cvise converged on `__atomic_fetch_add(&mem, val, 4)' in 6 lines.
+* a QUALIFIED template-name as template template argument (`std::is_
+  integral', `ns::is_ptr'), used as `Pred<T>::value' inside the template:
+  the resolver looked the bound template up by base name from the root
+  scope (namespaces not descended).  Also a spurious "found no match"
+  diagnostic from the speculative type-prefix attempt.
+* std::initializer_list's element type was found by MEMBER NAME (`_M_array',
+  `_begin') in three places -- libc++'s `__begin_' never matched, so no
+  call with a braced-init-list argument resolved under libc++.
+
+Result: libc++ variant's five `__traits' static members fold; what remains
+for the KNOWNBUG is `__best_match_t' (overload set from a base pack with
+`using _Bases::operator()...', [variant.ctor]/14) -- next.  Tests: 8 new
+CORE tests (see the commits).
+
+Reduction lessons (gcc16, cvise, Docker oracle):
+* cvise CHEATS if the interestingness test lets it: dropping a definition
+  that the real libstdc++.so supplies at link time keeps the program
+  linking and running while cbmc sees "no body" -> nondet -> the FAILURE
+  verdict survives.  Countermeasures: link with `-nostdlib++ -lsupc++' where
+  the program needs no out-of-line library code (stubs for the __throw_*
+  helpers in the harness), require the specific DIAGNOSTIC that constitutes
+  the bug (not just the verdict), and forbid NEW "no body for callee"
+  entries against a baseline.  Also -Werror=return-type (g++ accepts
+  `main() {}').
+* `-P' when preprocessing (no #line markers): cbmc's library/user-code
+  heuristics then treat the whole file uniformly as lines vanish.
+* never `pkill -f`/kill by pattern from a shell whose own command line
+  contains the pattern (killed my own reduction batch once); match on
+  /proc/<pid>/cwd instead.
