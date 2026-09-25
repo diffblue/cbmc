@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+^warning: ignoring
+--
+N5008 [meta.unary.prop] is_trivially_constructible, [class.copy.ctor]/11.
+Non-vacuous: the last assertion is deliberately wrong and must FAIL.  Before
+the fix: "static assertion failed: NT", "Wrap", "builtin copy NT" and the
+WRONG assertion held.
