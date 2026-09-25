@@ -1250,6 +1250,16 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         functions_being_typechecked.erase(symbol.name);
         return;
       }
+      // A bodyless function is a havoc stub downstream: every call returns
+      // nondet and assigns nothing.  Say so -- after releasing the
+      // system-header guard, which suppressed the failed conversion's
+      // diagnostics (and would suppress this one).
+      syshdr_guard.reset();
+      warning().source_location = symbol.location;
+      warning() << "C++ front-end dropped the body of system-header function '"
+                << symbol.base_name
+                << "' (unsupported construct); calls to it return nondet"
+                << messaget::eom;
       symbol.value.make_nil();
       functions_being_typechecked.erase(symbol.name);
       return;
