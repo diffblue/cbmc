@@ -3805,6 +3805,48 @@ exprt c_typecheck_baset::do_special_functions(
 
     return std::move(popcount_expr);
   }
+  else if(identifier == "__builtin_clzg" || identifier == "__builtin_ctzg")
+  {
+    // GCC 14 type-generic count of leading/trailing zeros (GCC reference,
+    // "Other Built-in Functions"): `int __builtin_clzg(T arg [, int value])'
+    // for any unsigned integer T; the optional second argument is the result
+    // for arg == 0 (otherwise undefined).  libstdc++ 14+ builds
+    // std::countl_zero / bit_width on it (`__builtin_clzg(__x,
+    // __int_traits<_Tp>::__digits)').
+    if(expr.arguments().empty() || expr.arguments().size() > 2)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects one or two operands" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    const exprt &arg = expr.arguments().front();
+    if(arg.type().id() != ID_unsignedbv && arg.type().id() != ID_c_bool)
+    {
+      error().source_location = f_op.source_location();
+      error() << identifier << " expects an unsigned integer operand" << eom;
+      throw 0;
+    }
+
+    exprt count;
+    if(identifier == "__builtin_clzg")
+      count = count_leading_zeros_exprt{arg, true, expr.type()};
+    else
+      count = count_trailing_zeros_exprt{arg, true, expr.type()};
+    count.add_source_location() = source_location;
+
+    if(expr.arguments().size() == 1)
+      return count;
+
+    exprt value =
+      typecast_exprt::conditional_cast(expr.arguments()[1], expr.type());
+    if_exprt result{
+      equal_exprt{arg, from_integer(0, arg.type())}, value, count};
+    result.add_source_location() = source_location;
+    return std::move(result);
+  }
   else if(
     identifier == "__builtin_clz" || identifier == "__builtin_clzl" ||
     identifier == "__builtin_clzll" || identifier == "__lzcnt16" ||

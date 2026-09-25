@@ -59,12 +59,14 @@ int __builtin_clrsbimax(intmax_t);
 int __builtin_clrsbl(long);
 int __builtin_clrsbll(long long);
 int __builtin_clz(unsigned);
-int __builtin_clzg(int);
+// GCC 14 type-generic: int __builtin_clzg(unsigned_type arg [, int value])
+int __builtin_clzg();
 int __builtin_clzimax(uintmax_t);
 int __builtin_clzl(unsigned long);
 int __builtin_clzll(unsigned long long);
 int __builtin_ctz(unsigned);
-int __builtin_ctzg(int);
+// GCC 14 type-generic: int __builtin_ctzg(unsigned_type arg [, int value])
+int __builtin_ctzg();
 int __builtin_ctzimax(uintmax_t);
 int __builtin_ctzl(unsigned long);
 int __builtin_ctzll(unsigned long long);
