@@ -5781,7 +5781,7 @@ bool Parser::rName(irept &name)
                 {
                   for(std::size_t i = components.size(); i >= 2; --i)
                   {
-                    if(components[i - 1].id() != "::")
+                    if(components[i - 1].id() != ID_scope_resolution)
                       continue;
 
                     // Qualifier is a template-id (e.g., Wrapper<T>::)
@@ -5921,7 +5921,7 @@ bool Parser::rName(irept &name)
       std::cout << std::string(__indent, ' ') << "Parser::rName 6\n";
 #endif
       lex.get_token(tk);
-      components.push_back(irept("::"));
+      components.push_back(irept(ID_scope_resolution));
       set_location(components.back(), tk);
       break;
 
@@ -6248,7 +6248,7 @@ bool Parser::rPtrToMember(irept &ptr_to_mem)
 
     case TOK_SCOPE:
       lex.get_token(tk);
-      components.push_back(irept("::"));
+      components.push_back(irept(ID_scope_resolution));
       set_location(components.back(), tk);
 
       // done if next token is '*'
@@ -6419,7 +6419,7 @@ bool Parser::rTemplateArgs(irept &template_args)
           {
             if(s.id() == ID_template_args)
                 has_template_args = true;
-            if(s.id() == "::")
+            if(s.id() == ID_scope_resolution)
                 has_scope = true;
           }
           // Template instantiation without :: is unambiguously a type.
@@ -11449,7 +11449,7 @@ bool Parser::rVarNameCore(exprt &name)
                 }
                 else if(
                   next == TOK_SCOPE && components.size() >= 2 &&
-                  components[components.size() - 2].id() == "::")
+                  components[components.size() - 2].id() == ID_scope_resolution)
                 {
                   // A speculative `<...>` immediately followed by `::` where
                   // the
@@ -11481,7 +11481,7 @@ bool Parser::rVarNameCore(exprt &name)
             {
                 for(std::size_t i = components.size(); i >= 2; --i)
                 {
-                  if(components[i - 1].id() != "::")
+                  if(components[i - 1].id() != ID_scope_resolution)
                     continue;
 
                   if(i >= 2 && components[i - 2].id() == ID_template_args)
@@ -11598,7 +11598,7 @@ bool Parser::rVarNameCore(exprt &name)
 #endif
 
       lex.get_token(tk);
-      components.push_back(irept("::"));
+      components.push_back(irept(ID_scope_resolution));
       set_location(components.back(), tk);
       break;
 
