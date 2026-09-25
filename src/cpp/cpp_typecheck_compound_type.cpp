@@ -5289,6 +5289,14 @@ bool cpp_typecheckt::get_component(
         component.type().id() == ID_union_tag ||
         component.type().id() == ID_struct_tag)
       {
+        // N5008 [class.union.anon]/1, [expr.ref]/6.2: the anonymous member
+        // subobject is an lvalue when the object is, so a member reached
+        // through it stays an lvalue when the expression is type-checked
+        // again (an array in an anonymous union indexed on the left of an
+        // assignment, libstdc++ 16's `_M_local_buf[__len++] = *__beg' in
+        // basic_string::_M_construct -- "not an lvalue").
+        if(object.get_bool(ID_C_lvalue))
+          tmp.set(ID_C_lvalue, true);
         // recursive call!
         if(get_component(source_location, tmp, component_name, member))
         {
