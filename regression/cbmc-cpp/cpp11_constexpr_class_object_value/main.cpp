@@ -48,11 +48,16 @@ int main()
   static_assert(p.v == 42 && p.w == 7, "block: P(42)");
   static_assert(q.v == 1 && q.w == 7, "block: P()");
   static_assert(r.v == 5 && r.w == 7, "block: P{5}");
-  // reads through the object also fold at run time (a macro has no
-  // storage, so the read must fold to the recorded value's component)
+  // the objects exist at run time with the same values
   __CPROVER_assert(g.v == 3 && gp.v == 42 && gq.w == 7, "namespace objects");
   __CPROVER_assert(s.v == 3 && p.v == 42 && q.v == 1, "local objects");
   __CPROVER_assert(g.n() == 5 && p.w == 7, "member call and member");
+  // N5008 [basic.def.odr], [dcl.constexpr]/6: a constexpr object is a const
+  // object -- its address can be taken and it binds to a reference
+  const S *ptr = &g;
+  const P &ref = gp;
+  __CPROVER_assert(ptr->twice() == 6 && ref.v == 42, "through pointer/ref");
+  __CPROVER_assert(&ref == &gp && ptr == &g, "address identity");
   __CPROVER_assert(gp.w == 8, "WRONG (must FAIL)");
   return 0;
 }
