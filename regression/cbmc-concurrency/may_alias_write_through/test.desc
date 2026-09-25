@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests write through a shared pointer: *shared_ptr = 42 should
+correctly update val when shared_ptr points to &val.

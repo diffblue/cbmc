@@ -187,7 +187,7 @@ void run_property_decider(
   "(unwind-min):"                                                              \
   "(unwind-max):"                                                              \
   "(ignore-properties-before-unwind-min)"                                      \
-  "(symex-cache-dereferences)" OPT_UNWINDSET
+  "(symex-cache-dereferences)" OPT_UNWINDSET "(refine-concurrency)"
 
 #define HELP_BMC                                                               \
   " {y--paths} [strategy] \t explore paths one at a time\n"                    \
@@ -233,6 +233,8 @@ void run_property_decider(
   " {y--graphml-witness} {ufilename} \t write the witness in GraphML format "  \
   "to {ufilename}\n"                                                           \
   " {y--symex-cache-dereferences} \t enable caching of repeated "              \
-  "dereferences\n"
+  "dereferences\n"                                                             \
+  " {y--refine-concurrency} \t add concurrency constraints in stages for"      \
+  " potentially faster solving\n"
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H

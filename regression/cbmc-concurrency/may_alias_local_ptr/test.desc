@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests that local pointers derived from shared sources are handled by
+the may-alias mechanism. Both *shared_ptr and *local_ptr should fail
+because the writer thread changes shared_ptr to point to val2 (=99).

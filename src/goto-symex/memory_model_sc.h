@@ -14,15 +14,17 @@ Author: Michael Tautschnig, michael.tautschnig@cs.ox.ac.uk
 
 #include "memory_model.h"
 
-class memory_model_sct:public memory_model_baset
+class memory_model_sct : public memory_model_baset
 {
 public:
-  explicit memory_model_sct(const namespacet &_ns):
-    memory_model_baset(_ns)
+  explicit memory_model_sct(const namespacet &_ns) : memory_model_baset(_ns)
   {
   }
 
   virtual void operator()(symex_target_equationt &equation, message_handlert &);
+
+  void
+  add_stage(refinement_staget stage, symex_target_equationt &equation) override;
 
 protected:
   virtual exprt before(event_it e1, event_it e2);

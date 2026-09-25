@@ -1,0 +1,14 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests that writes through shared pointers in concurrent context do
+not cause false positives. thread2 writes 42 after thread1 (via
+synchronization), and main reads after thread2. The assertion must
+succeed.
