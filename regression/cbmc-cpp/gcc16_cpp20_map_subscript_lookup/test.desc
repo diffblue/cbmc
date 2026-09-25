@@ -13,3 +13,7 @@ headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
 select the code paths) and running cbmc on the .ii file.
 Silent wrong result (assertions 2 and 3 FAILURE without any front-end
 diagnostic) -- a soundness gap, not a conversion error.
+2026-09-25: `__builtin_clzg' (the first failure) is supported now.
+Remaining: "dropped the body of system-header function 'operator()'" at
+<compare> line ~4076 (a comparison-category `__make' helper) and the
+CONVERSION ERROR that follows.
