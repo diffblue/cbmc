@@ -158,11 +158,14 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
       // [expr.prim.req.compound]/1: the return-type-requirement names a
       // type-constraint C; the requirement is satisfied only if
       // C<decltype((E))> is satisfied.  decltype((E)) uses the
-      // parenthesised form: an lvalue E yields an lvalue-reference type
-      // ([dcl.type.decltype]/1).
-      typet result_type = op.type();
-      if(op.get_bool(ID_C_lvalue))
-        result_type = reference_type(result_type);
+      // parenthesised form ([dcl.type.decltype]/1.4-1.6): an lvalue E
+      // yields T&, an xvalue T&&, a prvalue T -- the same rule decltype
+      // itself applies.  A call returning an rvalue reference
+      // (ranges::iter_move(i) -> int&&) is an xvalue; taking the
+      // implicitly dereferenced operand's type made it `int', and
+      // `-> same_as<iter_rvalue_reference_t<_In>>' failed, so no pointer
+      // was indirectly_readable under libc++.
+      const typet result_type = decltype_of(op, true);
 
       irep_idt concept_name;
       const irept *constraint_args = nullptr;
