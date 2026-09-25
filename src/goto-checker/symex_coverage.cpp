@@ -19,9 +19,9 @@ Date: March 2016
 #include <util/xml.h>
 
 #include <goto-programs/goto_functions.h>
+#include <goto-programs/initialize_function.h>
 
 #include <langapi/language_util.h>
-#include <linking/static_lifetime_init.h>
 
 #include <chrono> // IWYU pragma: keep
 #include <ctime>  // IWYU pragma: keep - For std::time_t

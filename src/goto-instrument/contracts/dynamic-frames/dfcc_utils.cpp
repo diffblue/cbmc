@@ -21,11 +21,11 @@ Date: August 2022
 
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
+#include <goto-programs/initialize_function.h>
 
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
 #include <goto-instrument/contracts/inlining_decorator.h>
 #include <goto-instrument/contracts/utils.h>
-#include <linking/static_lifetime_init.h>
 
 #include <set>
 

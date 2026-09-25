@@ -23,6 +23,7 @@ Date: June 2006
 #include <util/unicode.h>
 #include <util/version.h>
 
+#include <goto-programs/initialize_function.h>
 #include <goto-programs/name_mangler.h>
 #include <goto-programs/read_goto_binary.h>
 #include <goto-programs/write_goto_binary.h>
@@ -34,7 +35,6 @@ Date: June 2006
 #include <langapi/language_file.h>
 #include <langapi/mode.h>
 #include <linking/linking.h>
-#include <linking/static_lifetime_init.h>
 
 #include <cstring>
 #include <filesystem>
