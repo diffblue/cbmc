@@ -496,6 +496,70 @@ jobs:
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+  # C++ front end against the libstdc++ headers of GCC 16 (ppa:ubuntu-toolchain-r/
+  # test).  cbmc preprocesses with the host gcc, so `update-alternatives` makes
+  # gcc-16 the host compiler; regression/cbmc-cpp's CMakeLists.txt then keeps
+  # the tests tagged `libstdcxx16` (excluded elsewhere, where gcc < 16) and the
+  # whole C++ corpus is type-checked against the newest headers.  Sequenced
+  # after check-ubuntu-24_04-cmake-gcc-14 to share its ccache.
+  check-ubuntu-24_04-cmake-gcc-16-cbmc-cpp:
+    runs-on: ubuntu-24.04
+    needs: check-ubuntu-24_04-cmake-gcc-14
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq software-properties-common
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 g++-14 gcc-16 g++-16 flex bison libxml2-utils ccache clang libc++-dev libc++abi-dev cpanminus
+          cpanm Thread::Pool::Simple
+          # The build itself uses gcc-14 (the ccache key); gcc-16 becomes the
+          # HOST compiler cbmc preprocesses with, so `gcc -dumpversion` is 16
+          # and the libstdcxx16-tagged tests run.
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 110 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-16 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-16
+          sudo ln -sf cpp-16 /usr/bin/cpp
+          gcc --version
+      - name: Restore ccache
+        uses: actions/cache/restore@v6
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release-gcc-14
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure using CMake
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc-14 -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 -DCMAKE_CXX_FLAGS=-Wp,-D_GLIBCXX_ASSERTIONS -DWITH_JBMC=OFF
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with Ninja
+        run: ninja -C build -j${{env.linux-vcpus}} cbmc goto-cc goto-instrument
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run the C++ regression tests against the GCC 16 headers
+        run: |
+          cd regression/cbmc-cpp
+          ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -X libcxx -j${{env.linux-vcpus}}
+      - name: Run the libstdcxx16-tagged tests on their own
+        run: |
+          cd regression/cbmc-cpp
+          ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -I libstdcxx16
+
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc-14, which this job depends on.
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-24_04-arm-cmake-gcc:
     runs-on: ubuntu-24.04-arm
