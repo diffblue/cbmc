@@ -709,10 +709,16 @@ __CPROVER_HIDE:;
       ((const char *)src >= (const char *)dst + n) ||
       ((const char *)dst >= (const char *)src + n),
     "memcpy src/dst overlap");
+  // The compiler builtin (unlike C17's memcpy, 7.24.1/2) accepts a null
+  // pointer with a zero length: GCC and Clang document that behaviour for
+  // their builtins, C2y (N3322) makes zero-length operations on null
+  // pointers well-defined, and libc++'s vector relocation relies on it
+  // (`__builtin_memcpy(new, old_begin, 0)' with old_begin == nullptr for an
+  // empty vector).
   __CPROVER_precondition(
-    __CPROVER_r_ok(src, n), "memcpy source region readable");
+    n == 0 || __CPROVER_r_ok(src, n), "memcpy source region readable");
   __CPROVER_precondition(
-    __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+    n == 0 || __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
 
   if(n > 0)
   {
@@ -946,10 +952,11 @@ void *memmove(void *dest, const void *src, size_t n)
 void *__builtin_memmove(void *dest, const void *src, __CPROVER_size_t n)
 {
 __CPROVER_HIDE:;
+  // a null pointer with a zero length is accepted, as for __builtin_memcpy
   __CPROVER_precondition(
-    __CPROVER_r_ok(src, n), "memmove source region readable");
+    n == 0 || __CPROVER_r_ok(src, n), "memmove source region readable");
   __CPROVER_precondition(
-    __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+    n == 0 || __CPROVER_w_ok(dest, n), "memmove destination region writeable");
 
   if(n > 0)
   {
