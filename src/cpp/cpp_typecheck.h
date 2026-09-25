@@ -999,6 +999,27 @@ protected:
   /// trait \p trait (`__is_empty', `__is_polymorphic', ...) for type \p t
   bool class_property(const irep_idt &trait, const typet &t);
 
+  bool out_of_line_definition_matches(
+    const symbolt &member,
+    const cpp_declarationt &def,
+    const cpp_template_args_tct *class_args);
+  void adopt_definition_parameter_names(
+    symbolt &member,
+    const cpp_declarationt &def);
+
+  void rename_template_parameters_to_declaration(
+    irept &node,
+    const template_typet &def_tt,
+    const template_typet &class_tt,
+    const template_typet &decl_tt);
+
+  bool member_template_parameters_match(
+    const irept &decl_params,
+    const template_typet &decl_tt,
+    const template_typet &class_tt,
+    const irept &def_params,
+    const template_typet &def_tt);
+
   /// N5008 [expr.prim.req.general]/2-3: bind a requirement-parameter of a
   /// requires-expression (`requires(T a) { ... }`) as a local symbol of the
   /// current (instantiation) scope, of the substituted type \p type.  Each

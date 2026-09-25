@@ -1367,6 +1367,32 @@ void cpp_typecheckt::typecheck_class_template_member(
               !mcopy.declarators().empty() &&
               mcopy.declarators()[0].find(ID_value).is_not_nil())
             {
+              // N5008 [dcl.fct]/3,5 + [temp.over.link]: among same-named
+              // member templates (libstdc++ basic_string's two
+              // `_M_construct(_It, _It, tag)' and its `<bool>
+              // _M_construct(const _CharT *, size_type)') the definition
+              // belongs to the declaration with the same parameter types,
+              // the template parameters compared by position.
+              {
+                const template_typet &class_tt =
+                  static_cast<const template_typet &>(
+                    to_cpp_declaration(template_symbol.type)
+                      .find(ID_template_type));
+                const typet &td_ftype = td.declarators()[0].type();
+                const typet &def_ftype = decl_tmp.declarators()[0].type();
+                if(
+                  td_ftype.id() == ID_function_type &&
+                  def_ftype.id() == ID_function_type &&
+                  !member_template_parameters_match(
+                    td_ftype.find(ID_parameters),
+                    td.template_type(),
+                    class_tt,
+                    def_ftype.find(ID_parameters),
+                    decl_tmp.template_type()))
+                {
+                  continue;
+                }
+              }
               // Verify signature match: concrete type names in the
               // .tcc definition must appear in the template symbol
               // name to prevent swapping overload bodies.
@@ -1419,6 +1445,39 @@ void cpp_typecheckt::typecheck_class_template_member(
               }
               td.declarators()[0].add(ID_value) =
                 mcopy.declarators()[0].find(ID_value);
+              // [dcl.fct]/3: the body refers to the DEFINITION's parameter
+              // names (`__str'); the declaration's (`__c') are not part of
+              // the type -- adopt the definition's
+              {
+                typet &td_ftype = td.declarators()[0].type();
+                const typet &def_ftype = mcopy.declarators()[0].type();
+                if(
+                  td_ftype.id() == ID_function_type &&
+                  def_ftype.id() == ID_function_type)
+                {
+                  auto &tp = td_ftype.add(ID_parameters).get_sub();
+                  const auto &dp = def_ftype.find(ID_parameters).get_sub();
+                  std::size_t j = 0;
+                  for(auto &pi : tp)
+                  {
+                    if(pi.id() != ID_cpp_declaration)
+                      continue;
+                    while(j < dp.size() && dp[j].id() != ID_cpp_declaration)
+                      ++j;
+                    if(j >= dp.size())
+                      break;
+                    auto &ipd = static_cast<cpp_declarationt &>(pi);
+                    const auto &dpd =
+                      static_cast<const cpp_declarationt &>(dp[j]);
+                    ++j;
+                    if(!ipd.declarators().empty() && !dpd.declarators().empty())
+                    {
+                      ipd.declarators().front().name() =
+                        dpd.declarators().front().name();
+                    }
+                  }
+                }
+              }
               // N5008 [class.base.init]/1: the ctor-initializer is part of
               // the constructor's DEFINITION; an out-of-line delegating
               // constructor template (std::pair's piecewise constructor)
@@ -1449,11 +1508,13 @@ void cpp_typecheckt::typecheck_class_template_member(
                 if(
                   sp.second.base_name == mbase2 &&
                   sp.second.type.id() == ID_code && sp.second.value.is_nil() &&
-                  id2string(sp.first).find(cls_pfx) == 0)
+                  id2string(sp.first).find(cls_pfx) == 0 &&
+                  out_of_line_definition_matches(sp.second, mcopy, nullptr))
                 {
                   symbolt &csym = symbol_table.get_writeable_ref(sp.first);
                   csym.value = static_cast<const exprt &>(
                     mcopy.declarators()[0].find(ID_value));
+                  adopt_definition_parameter_names(csym, mcopy);
                   add_method_body(&csym);
                 }
               }
