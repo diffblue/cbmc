@@ -60,6 +60,27 @@ std::size_t struct_union_typet::component_number(
   UNREACHABLE;
 }
 
+std::size_t
+struct_union_typet::data_component_number(const irep_idt &component_name) const
+{
+  std::size_t number = 0;
+
+  for(const auto &c : components())
+  {
+    if(c.get_name() == component_name)
+      return number;
+
+    if(
+      c.type().id() != ID_code && !c.get_bool(ID_is_type) &&
+      !c.get_bool(ID_is_static))
+    {
+      number++;
+    }
+  }
+
+  UNREACHABLE;
+}
+
 /// Get the reference to a component with given name.
 const struct_union_typet::componentt &struct_union_typet::get_component(
   const irep_idt &component_name) const
