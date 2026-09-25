@@ -14,3 +14,7 @@ of the system and the surrounding infrastructure.
 * \subpage release-process
 * \subpage homebrew-tap-instructions
 * \subpage cpp-api-and-modularisation
+
+## C11 Undefined Behavior Coverage
+
+\subpage c11-ub-coverage-plan
