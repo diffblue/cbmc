@@ -1,0 +1,10 @@
+CORE smt-backend no-new-smt
+main.c
+--z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Division overflow under directed rounding modes (SMT path).
