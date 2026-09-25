@@ -14,63 +14,6 @@ Author: Romain Brenguier, romain.brenguier@diffblue.com
 
 #include <util/mathematical_expr.h>
 
-/// add axioms for the conversion of an integer representing a java
-/// code point to a utf-16 string
-/// \param res: array of characters corresponding to the result fo the function
-/// \param code_point: an expression representing a java code point
-/// \return integer expression equal to zero
-std::pair<exprt, string_constraintst>
-string_constraint_generatort::add_axioms_for_code_point(
-  const array_string_exprt &res,
-  const exprt &code_point)
-{
-  string_constraintst constraints;
-  const typet &char_type = to_type_with_subtype(res.content().type()).subtype();
-  const typet &type = code_point.type();
-  PRECONDITION(type.id() == ID_signedbv);
-
-  // We add axioms:
-  // a1 : code_point<0x010000 => |res|=1
-  // a2 : code_point>=0x010000 => |res|=2
-  // a3 : code_point<0x010000 => res[0]=code_point
-  // a4 : code_point>=0x010000 => res[0]=0xD800+(code_point-0x10000)/0x0400
-  // a5 : code_point>=0x010000 => res[1]=0xDC00+(code_point-0x10000)/0x0400
-  // For more explenations about this conversion, see:
-  //   https://en.wikipedia.org/wiki/UTF-16
-
-  exprt hex010000 = from_integer(0x010000, type);
-  exprt hexD800 = from_integer(0xD800, type);
-  exprt hexDC00 = from_integer(0xDC00, type);
-  exprt hex0400 = from_integer(0x0400, type);
-
-  binary_relation_exprt small(code_point, ID_lt, hex010000);
-  implies_exprt a1(small, equal_to(array_pool.get_or_create_length(res), 1));
-  constraints.existential.push_back(a1);
-
-  implies_exprt a2(
-    not_exprt(small), equal_to(array_pool.get_or_create_length(res), 2));
-  constraints.existential.push_back(a2);
-
-  typecast_exprt code_point_as_char(code_point, char_type);
-  implies_exprt a3(small, equal_exprt(res[0], code_point_as_char));
-  constraints.existential.push_back(a3);
-
-  plus_exprt first_char(
-    hexD800, div_exprt(minus_exprt(code_point, hex010000), hex0400));
-  implies_exprt a4(
-    not_exprt(small),
-    equal_exprt(res[0], typecast_exprt(first_char, char_type)));
-  constraints.existential.push_back(a4);
-
-  plus_exprt second_char(hexDC00, mod_exprt(code_point, hex0400));
-  implies_exprt a5(
-    not_exprt(small),
-    equal_exprt(res[1], typecast_exprt(second_char, char_type)));
-  constraints.existential.push_back(a5);
-
-  return {from_integer(0, get_return_code_type()), constraints};
-}
-
 /// the output is true when the character is a high surrogate for UTF-16
 /// encoding, see https://en.wikipedia.org/wiki/UTF-16 for more explenation
 /// about the encoding; this is true when the character is in the range
