@@ -1570,12 +1570,17 @@ void cpp_typecheckt::typecheck_method_bodies()
           // A bodyless function is a havoc stub downstream: every call
           // returns nondet and assigns nothing.  Silently dropping a
           // library body hid exactly that unsoundness; say it once.
-          warning().source_location = method_symbol.location;
-          warning() << "C++ front-end dropped the body of "
-                    << (is_library_body ? "system-header " : "") << "function '"
-                    << method_symbol.base_name
-                    << "' (unsupported construct); calls to it return "
-                    << "nondet" << messaget::eom;
+          // Not for a member whose trailing requires-clause may be
+          // unsatisfied for this specialization (see convert_function).
+          if(!method_symbol.type.get_bool("#constrained"))
+          {
+            warning().source_location = method_symbol.location;
+            warning() << "C++ front-end dropped the body of "
+                      << (is_library_body ? "system-header " : "")
+                      << "function '" << method_symbol.base_name
+                      << "' (unsupported construct); calls to it return "
+                      << "nondet" << messaget::eom;
+          }
         }
         get_message_handler().set_message_count(
           messaget::M_ERROR, errors_before);
