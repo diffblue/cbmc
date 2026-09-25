@@ -987,12 +987,96 @@ static smt_termt convert_to_smt_shift(
     return factory(first_operand, second_operand);
   }
 }
+/// \brief Convert a rotate_left or rotate_right expression to SMT.
+/// Implements rotation as `(x << n) | (x >> (width - n))` for left rotation
+/// (and the converse for right), after normalizing the distance to match
+/// the value's bit width.
+/// \param rotate: the rotation expression (rotate_left or rotate_right)
+/// \param converted: map of already-converted sub-expressions
+/// \param is_left: true for left rotation, false for right
+static smt_termt convert_rotation_to_smt(
+  const shift_exprt &rotate,
+  const sub_expression_mapt &converted,
+  bool is_left)
+{
+  const smt_termt &value = converted.at(rotate.op0());
+  const smt_termt &distance = converted.at(rotate.op1());
+
+  const auto value_sort = value.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(value_sort, "Rotation value must have bit-vector sort");
+
+  const auto bit_width = value_sort->bit_width();
+  INVARIANT(bit_width > 0, "Rotation value must have a positive bit width");
+
+  // Try to extract constant distance for optimized SMT2 rotate operations
+  if(
+    const auto constant_distance =
+      expr_try_dynamic_cast<constant_exprt>(rotate.op1()))
+  {
+    mp_integer distance_int;
+    if(!to_integer(*constant_distance, distance_int))
+    {
+      if(distance_int < 0)
+        distance_int = 0;
+      if(bit_width != 0)
+        distance_int %= mp_integer(bit_width);
+      const auto normalized = numeric_cast_v<std::size_t>(distance_int);
+      if(is_left)
+        return smt_bit_vector_theoryt::rotate_left(normalized)(value);
+      else
+        return smt_bit_vector_theoryt::rotate_right(normalized)(value);
+    }
+  }
+
+  // For dynamic rotation, implement using shifts and or
+  // rotate_left(x, n) = (x << n) | (x >> (width - n))
+  // rotate_right(x, n) = (x >> n) | (x << (width - n))
+
+  const auto distance_sort = distance.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(distance_sort, "Rotation distance must have bit-vector sort");
+
+  const std::size_t distance_width = distance_sort->bit_width();
+
+  // Normalize distance to bit_width to match value's width if needed
+  smt_termt normalized_distance = distance;
+  if(distance_width < bit_width)
+  {
+    normalized_distance =
+      smt_bit_vector_theoryt::zero_extend(bit_width - distance_width)(distance);
+  }
+  else if(distance_width > bit_width)
+  {
+    normalized_distance =
+      smt_bit_vector_theoryt::extract(bit_width - 1, 0)(distance);
+  }
+
+  // Reduce modulo bit_width so shifts by >= width work correctly
+  const auto width_constant =
+    smt_bit_vector_constant_termt{bit_width, bit_width};
+  normalized_distance = smt_bit_vector_theoryt::unsigned_remainder(
+    normalized_distance, width_constant);
+
+  // Calculate complementary distance: width - (n % width)
+  const auto complementary_distance =
+    smt_bit_vector_theoryt::subtract(width_constant, normalized_distance);
+
+  smt_termt shifted_left =
+    is_left ? smt_bit_vector_theoryt::shift_left(value, normalized_distance)
+            : smt_bit_vector_theoryt::shift_left(value, complementary_distance);
+  smt_termt shifted_right =
+    is_left
+      ? smt_bit_vector_theoryt::logical_shift_right(
+          value, complementary_distance)
+      : smt_bit_vector_theoryt::logical_shift_right(value, normalized_distance);
+
+  return smt_bit_vector_theoryt::make_or(shifted_left, shifted_right);
+}
 
 static smt_termt convert_expr_to_smt(
   const shift_exprt &shift,
   const sub_expression_mapt &converted)
 {
-  // TODO: Dispatch for rotation expressions. A `shift_exprt` can be a rotation.
+  // Handle rotation expressions
   if(const auto left_shift = expr_try_dynamic_cast<shl_exprt>(shift))
   {
     return convert_to_smt_shift(
@@ -1011,6 +1095,14 @@ static smt_termt convert_expr_to_smt(
       smt_bit_vector_theoryt::arithmetic_shift_right,
       *right_arith_shift,
       converted);
+  }
+  if(shift.id() == ID_rol)
+  {
+    return convert_rotation_to_smt(shift, converted, true);
+  }
+  if(shift.id() == ID_ror)
+  {
+    return convert_rotation_to_smt(shift, converted, false);
   }
   UNIMPLEMENTED_FEATURE(
     "Generation of SMT formula for shift expression: " + shift.pretty());
@@ -1448,40 +1540,237 @@ convert_expr_to_smt(const let_exprt &let, const sub_expression_mapt &converted)
     "Generation of SMT formula for let expression: " + let.pretty());
 }
 
+/// \brief Convert a byte-swap (bswap) expression to SMT.
 static smt_termt convert_expr_to_smt(
   const bswap_exprt &byte_swap,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for byte swap expression: " +
-    byte_swap.pretty());
+  const auto operand = converted.at(byte_swap.op());
+  const auto *operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "bswap operand must have bit-vector sort");
+
+  const auto bits_per_byte = byte_swap.get_bits_per_byte();
+  const auto bit_width = operand_sort->bit_width();
+  INVARIANT(
+    bit_width % bits_per_byte == 0,
+    "bswap width must be a multiple of bits_per_byte");
+
+  const std::size_t num_bytes = bit_width / bits_per_byte;
+
+  // Extract bytes and concatenate in reverse order
+  smt_termt result =
+    smt_bit_vector_theoryt::extract(bits_per_byte - 1, 0)(operand);
+
+  for(std::size_t i = 1; i < num_bytes; ++i)
+  {
+    const auto byte = smt_bit_vector_theoryt::extract(
+      (i + 1) * bits_per_byte - 1, i * bits_per_byte)(operand);
+    result = smt_bit_vector_theoryt::concat(result, byte);
+  }
+
+  return result;
 }
 
+/// \brief Convert a population-count (popcount) expression to SMT.
 static smt_termt convert_expr_to_smt(
   const popcount_exprt &population_count,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for population count expression: " +
-    population_count.pretty());
+  const auto operand = converted.at(population_count.op());
+  const auto operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "Population count operand must have bit-vector sort");
+
+  const auto bit_width = operand_sort->bit_width();
+  const auto result_width =
+    to_bitvector_type(population_count.type()).get_width();
+  INVARIANT(
+    result_width >= 1, "Population count result must have a positive width");
+
+  // Build a sum of each bit in the operand
+  smt_termt result = smt_bit_vector_constant_termt{0, result_width};
+
+  for(std::size_t i = 0; i < bit_width; ++i)
+  {
+    const auto bit = smt_bit_vector_theoryt::extract(i, i)(operand);
+    const auto extended_bit =
+      smt_bit_vector_theoryt::zero_extend(result_width - 1)(bit);
+    result = smt_bit_vector_theoryt::add(result, extended_bit);
+  }
+
+  return result;
 }
 
+enum class bit_iteration_directiont
+{
+  least_to_most_significant,
+  most_to_least_significant
+};
+
+/// \brief Build a nested if-then-else term selecting a per-bit value, used by
+/// the count-leading-zeros, count-trailing-zeros and find-first-set
+/// conversions.
+/// \param operand: the bit-vector term whose bits are inspected
+/// \param bit_width: width of \p operand
+/// \param result_width: width of the produced (result) constant terms
+/// \param direction: order in which bits are visited; the bit visited last
+///   becomes the outermost (highest priority) if-then-else condition
+/// \param match_value: value to select when the visited bit is set, as a
+///   function of the bit index
+/// \param default_value: value selected when none of the inspected bits is set
+static smt_termt nested_bit_match(
+  const smt_termt &operand,
+  std::size_t bit_width,
+  std::size_t result_width,
+  bit_iteration_directiont direction,
+  const std::function<std::size_t(std::size_t)> &match_value,
+  std::size_t default_value)
+{
+  INVARIANT(
+    result_width >= 1, "result width of a bit search must be at least one");
+  smt_termt result = smt_bit_vector_constant_termt{default_value, result_width};
+  const auto one_bit = smt_bit_vector_constant_termt{1, 1};
+  for(std::size_t step = 0; step < bit_width; ++step)
+  {
+    const std::size_t bit_index =
+      direction == bit_iteration_directiont::least_to_most_significant
+        ? step
+        : bit_width - 1 - step;
+    const auto bit =
+      smt_bit_vector_theoryt::extract(bit_index, bit_index)(operand);
+    const auto bit_is_one = smt_core_theoryt::equal(bit, one_bit);
+    const auto value =
+      smt_bit_vector_constant_termt{match_value(bit_index), result_width};
+    result = smt_core_theoryt::if_then_else(bit_is_one, value, result);
+  }
+  return result;
+}
+
+/// \brief Convert a count-leading-zeros expression to SMT.
 static smt_termt convert_expr_to_smt(
   const count_leading_zeros_exprt &count_leading_zeros,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for count leading zeros expression: " +
-    count_leading_zeros.pretty());
+  const auto operand = converted.at(count_leading_zeros.op());
+  const auto operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    operand_sort, "Count leading zeros operand must have bit-vector sort");
+
+  const auto bit_width = operand_sort->bit_width();
+  const auto result_width =
+    to_bitvector_type(count_leading_zeros.type()).get_width();
+
+  // The result is the number of zero bits above the most-significant set bit,
+  // or bit_width if no bit is set. Visiting bits from least- to most-
+  // significant makes the most-significant bit's condition the outermost one.
+  return nested_bit_match(
+    operand,
+    bit_width,
+    result_width,
+    bit_iteration_directiont::least_to_most_significant,
+    [&](std::size_t bit_index) { return bit_width - 1 - bit_index; },
+    bit_width);
 }
 
+/// \brief Convert a count-trailing-zeros expression to SMT.
 static smt_termt convert_expr_to_smt(
   const count_trailing_zeros_exprt &count_trailing_zeros,
   const sub_expression_mapt &converted)
 {
-  UNIMPLEMENTED_FEATURE(
-    "Generation of SMT formula for count trailing zeros expression: " +
-    count_trailing_zeros.pretty());
+  const auto operand = converted.at(count_trailing_zeros.op());
+  const auto operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(
+    operand_sort, "Count trailing zeros operand must have bit-vector sort");
+
+  const auto bit_width = operand_sort->bit_width();
+  const auto result_width =
+    to_bitvector_type(count_trailing_zeros.type()).get_width();
+
+  // The result is the number of zero bits below the least-significant set bit,
+  // or bit_width if no bit is set. Visiting bits from most- to least-
+  // significant makes the least-significant bit's condition the outermost one.
+  return nested_bit_match(
+    operand,
+    bit_width,
+    result_width,
+    bit_iteration_directiont::most_to_least_significant,
+    [](std::size_t bit_index) { return bit_index; },
+    bit_width);
+}
+
+/// \brief Convert a find-first-set expression to SMT.
+static smt_termt convert_expr_to_smt(
+  const find_first_set_exprt &find_first_set,
+  const sub_expression_mapt &converted)
+{
+  const auto operand = converted.at(find_first_set.op());
+  const auto *operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "Find first set operand must have bit-vector sort");
+
+  const auto bit_width = operand_sort->bit_width();
+  const auto result_width =
+    to_bitvector_type(find_first_set.type()).get_width();
+
+  // The result is the 1-based index of the least-significant set bit, or 0 if
+  // no bit is set. Visiting bits from most- to least-significant makes the
+  // least-significant bit's condition the outermost one.
+  return nested_bit_match(
+    operand,
+    bit_width,
+    result_width,
+    bit_iteration_directiont::most_to_least_significant,
+    [](std::size_t bit_index) { return bit_index + 1; },
+    0);
+}
+
+/// \brief Convert a bit-reverse expression to SMT.
+static smt_termt convert_expr_to_smt(
+  const bitreverse_exprt &bit_reverse,
+  const sub_expression_mapt &converted)
+{
+  const auto operand = converted.at(bit_reverse.op());
+  const auto *operand_sort = operand.get_sort().cast<smt_bit_vector_sortt>();
+  INVARIANT(operand_sort, "Bit reverse operand must have bit-vector sort");
+
+  const auto bit_width = operand_sort->bit_width();
+
+  // Reverse bits by extracting each bit and concatenating in reverse order
+  if(bit_width == 1)
+    return operand;
+
+  smt_termt result = smt_bit_vector_theoryt::extract(0, 0)(operand);
+
+  for(std::size_t i = 1; i < bit_width; ++i)
+  {
+    const auto bit = smt_bit_vector_theoryt::extract(i, i)(operand);
+    result = smt_bit_vector_theoryt::concat(result, bit);
+  }
+
+  return result;
+}
+
+/// \brief Convert a bitwise NAND expression to SMT.
+/// `bitnand_exprt` is unary (bit-wise NOT), binary (bit-wise NAND), or N-ary
+/// for N >= 3 (bit-wise NOT of the bit-wise AND), per its class documentation.
+static smt_termt convert_expr_to_smt(
+  const bitnand_exprt &bit_nand,
+  const sub_expression_mapt &converted)
+{
+  if(!operands_are_of_type<bitvector_typet>(bit_nand))
+  {
+    UNIMPLEMENTED_FEATURE(
+      "Generation of SMT formula for bitwise nand expression: " +
+      bit_nand.pretty());
+  }
+
+  const auto &operands = bit_nand.operands();
+  if(operands.size() == 1)
+    return smt_bit_vector_theoryt::make_not(converted.at(operands.front()));
+  if(operands.size() == 2)
+    return smt_bit_vector_theoryt::nand(
+      converted.at(operands[0]), converted.at(operands[1]));
+  // NAND of three or more operands is NOT(AND(...)).
+  return smt_bit_vector_theoryt::make_not(convert_multiary_operator_to_terms(
+    bit_nand, converted, smt_bit_vector_theoryt::make_and));
 }
 
 static smt_termt convert_expr_to_smt(
@@ -1855,6 +2144,20 @@ static smt_termt dispatch_expr_to_smt_conversion(
       expr_try_dynamic_cast<prophecy_pointer_in_range_exprt>(expr))
   {
     return convert_expr_to_smt(*prophecy_pointer_in_range, converted);
+  }
+  if(
+    const auto find_first_set =
+      expr_try_dynamic_cast<find_first_set_exprt>(expr))
+  {
+    return convert_expr_to_smt(*find_first_set, converted);
+  }
+  if(const auto bit_reverse = expr_try_dynamic_cast<bitreverse_exprt>(expr))
+  {
+    return convert_expr_to_smt(*bit_reverse, converted);
+  }
+  if(const auto bit_nand = expr_try_dynamic_cast<bitnand_exprt>(expr))
+  {
+    return convert_expr_to_smt(*bit_nand, converted);
   }
 
   UNIMPLEMENTED_FEATURE(

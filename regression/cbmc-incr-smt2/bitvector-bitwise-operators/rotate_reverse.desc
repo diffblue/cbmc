@@ -1,0 +1,10 @@
+CORE
+rotate_reverse.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Tests rotate_left, rotate_right (constant and dynamic),
+and bitreverse builtins via incremental SMT2.
