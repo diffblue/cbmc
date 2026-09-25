@@ -710,3 +710,127 @@ TEST_CASE("Simplify complementary pair in nested OR", "[core][util]")
   const or_exprt expr{a, inner};
   REQUIRE(simplify_expr(expr, empty_namespace) == true_exprt{});
 }
+
+TEST_CASE("Simplify bitand over concatenation and constant", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // (concat(a, b)) & 0x00FF -> concat(0x00, b & 0xFF)
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const constant_exprt mask = from_integer(0xFF, u16);
+  const bitand_exprt band{cat, mask};
+  const auto result = simplify_expr(band, ns);
+
+  // Expect concat(0x00, b) because a & 0x00 -> 0x00 and b & 0xFF -> b
+  const constant_exprt zero8 = from_integer(0, u8);
+  const concatenation_exprt expected{{zero8, b}, u16};
+  REQUIRE(result == expected);
+}
+
+TEST_CASE("Simplify bitor over concatenation and constant", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // concat(a, b) | 0xFF00 -> concat(0xFF, b)
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const bitor_exprt expr{cat, from_integer(0xFF00, u16)};
+  const auto result = simplify_expr(expr, ns);
+
+  // a | 0xFF -> 0xFF and b | 0x00 -> b
+  const concatenation_exprt expected{{from_integer(0xFF, u8), b}, u16};
+  REQUIRE(result == expected);
+}
+
+TEST_CASE("Simplify bitxor over concatenation and constant", "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // concat(a, b) ^ 0x00FF -> concat(a, b ^ 0xFF)
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const bitxor_exprt expr{cat, from_integer(0x00FF, u16)};
+  const auto result = simplify_expr(expr, ns);
+
+  // a ^ 0x00 -> a; b ^ 0xFF does not reduce further
+  const bitxor_exprt b_masked{b, from_integer(0xFF, u8)};
+  const concatenation_exprt expected{{a, b_masked}, u16};
+  REQUIRE(result == expected);
+}
+
+TEST_CASE(
+  "Simplify bitand over concatenation and constant (constant on the left)",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // 0x00FF & concat(a, b) -> concat(0x00, b), exercising the constant-on-LHS
+  // branch
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const bitand_exprt expr{from_integer(0x00FF, u16), cat};
+  const auto result = simplify_expr(expr, ns);
+
+  const concatenation_exprt expected{{from_integer(0, u8), b}, u16};
+  REQUIRE(result == expected);
+}
+
+TEST_CASE(
+  "Simplify bitand over a three-operand concatenation and constant",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // concat(a, b, c) & 0x00FF00 -> concat(0x00, b, 0x00)
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u24{24};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const symbol_exprt c{"c", u8};
+  const concatenation_exprt cat{{a, b, c}, u24};
+  const bitand_exprt expr{cat, from_integer(0x00FF00, u24)};
+  const auto result = simplify_expr(expr, ns);
+
+  const constant_exprt zero8 = from_integer(0, u8);
+  const concatenation_exprt expected{{zero8, b, zero8}, u24};
+  REQUIRE(result == expected);
+}
+
+TEST_CASE(
+  "Simplify bitand over concatenation leaves a neutral mask unchanged",
+  "[core][util]")
+{
+  const symbol_tablet symbol_table;
+  const namespacet ns{symbol_table};
+
+  // concat(a, b) & 0xABCD has no all-zero / all-one slice and no constant
+  // operand, so distributing it would only grow the expression: it is left
+  // unchanged.
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const symbol_exprt a{"a", u8};
+  const symbol_exprt b{"b", u8};
+  const concatenation_exprt cat{{a, b}, u16};
+  const bitand_exprt expr{cat, from_integer(0xABCD, u16)};
+  const auto result = simplify_expr(expr, ns);
+
+  REQUIRE(result == expr);
+}
