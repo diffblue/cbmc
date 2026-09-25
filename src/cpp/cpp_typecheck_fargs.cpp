@@ -353,24 +353,11 @@ static bool brace_init_to_init_list_is_viable(
   if(operand.operands().empty())
     return true;
 
-  // Locate the element type from the `_begin` / `_M_array` member.
-  const struct_typet &struct_type =
-    cpp_typecheck.follow_tag(to_struct_tag_type(target_type));
-  typet elem_type;
-  bool found = false;
-  for(const auto &c : struct_type.components())
-  {
-    if(
-      (c.get_base_name() == "_begin" || c.get_base_name() == "_M_array") &&
-      c.type().id() == ID_pointer)
-    {
-      elem_type = to_pointer_type(c.type()).base_type();
-      elem_type.remove(ID_C_constant);
-      found = true;
-      break;
-    }
-  }
-  if(!found)
+  // the element type, from the layout's pointer member (libstdc++ _M_array,
+  // libc++ __begin_, MSVC _begin -- by position, not name)
+  typet elem_type = cpp_typecheck.initializer_list_element_type(
+    to_struct_tag_type(target_type));
+  if(elem_type.is_nil())
     return false;
 
   // Each element must have an ICS to `elem_type` -- N5008
