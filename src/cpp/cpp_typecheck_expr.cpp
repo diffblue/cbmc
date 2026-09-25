@@ -896,6 +896,15 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           a.get_bool(ID_C_volatile) != b.get_bool(ID_C_volatile) ||
           a.get_bool(ID_C_restricted) != b.get_bool(ID_C_restricted))
           return false;
+        // [dcl.ref]: an lvalue reference and an rvalue reference to the same
+        // type are different types.  Both are pointer types with the
+        // `#reference' comment; the `#rvalue_reference' comment tells them
+        // apart, and irept::operator== ignores comments.
+        if(
+          a.get_bool(ID_C_reference) != b.get_bool(ID_C_reference) ||
+          a.get_bool(ID_C_rvalue_reference) !=
+            b.get_bool(ID_C_rvalue_reference))
+          return false;
         if(a.id() == ID_code)
         {
           // [dcl.fct]/6-7, [basic.type.qualifier]: the parameter types
@@ -4524,7 +4533,7 @@ void cpp_typecheckt::typecheck_expr_this(exprt &expr)
 {
   if(cpp_scopes.current_scope().class_identifier.empty())
   {
-    error().source_location=expr.find_source_location();
+    error().source_location = expr.find_source_location();
     error() << quote_begin << "this" << quote_end << " is not allowed here"
             << eom;
     throw 0;
