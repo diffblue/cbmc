@@ -67,6 +67,7 @@ bool valid_lhs_expr_high_level(const exprt &lhs)
 bool valid_rhs_expr_high_level(const exprt &rhs)
 {
   return can_cast_expr<struct_exprt>(rhs) || can_cast_expr<array_exprt>(rhs) ||
+         can_cast_expr<array_of_exprt>(rhs) ||
          can_cast_expr<constant_exprt>(rhs) ||
          can_cast_expr<annotated_pointer_constant_exprt>(rhs) ||
          can_cast_expr<address_of_exprt>(rhs) ||
@@ -245,7 +246,7 @@ static void check_rhs_assumptions(
       "Expecting all non-base class operands to be constants.");
   }
   // check array rhs structure
-  else if(can_cast_expr<array_exprt>(rhs))
+  else if(can_cast_expr<array_exprt>(rhs) || can_cast_expr<array_of_exprt>(rhs))
   {
     // seems no check is required.
   }
