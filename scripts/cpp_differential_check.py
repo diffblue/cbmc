@@ -5,9 +5,10 @@ For every C++ source given (files, or every main.cpp / *.cpp below a
 directory) the script
 
   1. compiles and runs it with each available reference compiler (g++,
-     clang++), linking a harness whose `__CPROVER_assert` records the
-     outcome of every assertion instead of aborting, and notes whether the
-     compiler accepted the program at all;
+     clang++; or one inside a Docker image, `docker:IMAGE:g++-16`, selected
+     by a test.desc tag such as `libstdcxx16`), linking a harness whose
+     `__CPROVER_assert` records the outcome of every assertion instead of
+     aborting, and notes whether the compiler accepted the program at all;
   2. runs cbmc on it and parses the per-assertion verdicts, the
      "static_assert condition could not be evaluated" warnings and
      "static assertion failed" errors;
@@ -42,6 +43,14 @@ Typical use, as a gate over a directory of snippets:
 
 Exit status is 0 when no discrepancy was found, 1 otherwise (2 on a usage
 error).  With --json the full per-file record is written for later diffing.
+
+A test.desc next to the source supplies the cbmc flags (and its `--cppNN`
+the language standard).  A test tagged `libstdcxx16` is compiled and run with
+the compiler given by --tagged-compilers (by default g++-16 inside the Docker
+image `gcc16-test`; the test is skipped when that is unavailable).  Note that
+cbmc itself still type-checks the source against the HOST's standard library
+headers, so a discrepancy that only the gcc-16 headers expose is not visible
+here; run cbmc on the g++-16 -E output for that.
 """
 
 import argparse
@@ -53,6 +62,14 @@ import subprocess
 import sys
 import tempfile
 from typing import Dict, List, Optional, Tuple
+
+# Declarations every test source sees (`-include`): the sources use
+# `__CPROVER_assert` without declaring it, as cbmc's own built-in
+# declarations provide it.
+PRELUDE = r"""
+extern "C" void __CPROVER_assert(bool c, const char *m);
+extern "C" void __CPROVER_assume(bool c);
+"""
 
 HARNESS = r"""
 #include <cstdio>
@@ -129,22 +146,86 @@ def desc_flags(path: str) -> Optional[List[str]]:
     return lines[2].split()
 
 
+def desc_tags(path: str) -> List[str]:
+    """The tags on the first line of a regression test.desc next to the
+    source (`CORE gcc-only libstdcxx16`), or []."""
+    desc = os.path.join(os.path.dirname(os.path.abspath(path)), "test.desc")
+    if not os.path.exists(desc):
+        return []
+    lines = open(desc).read().splitlines()
+    if len(lines) < 2 or os.path.basename(path) not in lines[1]:
+        return []
+    return lines[0].split()
+
+
+def compiler_flags(compiler: str, cbmc_flags: List[str]) -> List[str]:
+    """Reference-compiler flags implied by the cbmc flags of a test: the
+    library selected by `--stdlib libc++` (clang++ only; g++ has no libc++
+    switch here, so it is left to reject/skip such a test)."""
+    flags = []
+    if "libc++" in cbmc_flags and "clang" in os.path.basename(compiler):
+        flags.append("-stdlib=libc++")
+    return flags
+
+
+def split_docker_spec(compiler: str) -> Tuple[Optional[str], str]:
+    """A compiler spec `docker:IMAGE:COMPILER` runs COMPILER inside the
+    Docker image IMAGE (the source directory is mounted read-only, the
+    work directory read-write; the binary runs in the container too as it
+    links the container's libraries).  Anything else is a host compiler."""
+    if compiler.startswith("docker:"):
+        _, image, cc = compiler.split(":", 2)
+        return image, cc
+    return None, compiler
+
+
+def compiler_available(compiler: str) -> bool:
+    image, cc = split_docker_spec(compiler)
+    if image is None:
+        return which(cc) is not None
+    if which("docker") is None:
+        return False
+    rc, _ = run(["docker", "image", "inspect", image], 60)
+    return rc == 0
+
+
 def compile_and_run(compiler: str, std: str, source: str, workdir: str,
-                    timeout: int, include_dirs: List[str]) -> Dict:
+                    timeout: int, include_dirs: List[str],
+                    extra_flags: List[str] = []) -> Dict:
     """Compile source + harness with the reference compiler and run it."""
+    image, cc = split_docker_spec(compiler)
     exe = os.path.join(workdir, "a.out")
     harness = os.path.join(workdir, "harness.cpp")
+    prelude = os.path.join(workdir, "prelude.h")
     with open(harness, "w") as f:
         f.write(HARNESS)
-    cmd = [compiler, "-std=" + std, "-w", "-o", exe, source, harness]
-    for d in include_dirs:
-        cmd += ["-I", d]
-    rc, out = run(cmd, timeout, memory_kb=4 * 1024 * 1024)
+    with open(prelude, "w") as f:
+        f.write(PRELUDE)
+    source = os.path.abspath(source)
+    src_dir = os.path.dirname(source)
+    if image is not None:
+        # paths as seen inside the container
+        docker = ["docker", "run", "--rm", "-v", src_dir + ":/src:ro",
+                  "-v", workdir + ":/work", "-w", "/work", image]
+        exe_in, harness_in, prelude_in = "/work/a.out", "/work/harness.cpp", \
+            "/work/prelude.h"
+        source_in = "/src/" + os.path.basename(source)
+        includes = ["-I", "/src"]
+    else:
+        docker = []
+        exe_in, harness_in, prelude_in, source_in = exe, harness, prelude, source
+        includes = []
+        for d in include_dirs:
+            includes += ["-I", d]
+    cmd = docker + [cc, "-std=" + std, "-w", "-include", prelude_in,
+                    "-o", exe_in, source_in, harness_in] + includes + extra_flags
+    rc, out = run(cmd, timeout, memory_kb=None if docker else 4 * 1024 * 1024)
     result = {"compiler": compiler, "accepted": rc == 0, "compile_output": out,
               "asserts": {}, "ran": False}
     if rc != 0:
         return result
-    rc, out = run([exe], timeout, cwd=workdir, memory_kb=4 * 1024 * 1024)
+    rc, out = run(docker + [exe_in], timeout, cwd=workdir,
+                  memory_kb=None if docker else 4 * 1024 * 1024)
     result["ran"] = rc != -1
     for line in out.splitlines():
         m = RE_RUN_ASSERT.match(line)
@@ -247,7 +328,15 @@ def main() -> int:
     ap.add_argument("--ignore-desc", action="store_true",
                     help="do not take cbmc flags from a test.desc")
     ap.add_argument("--compilers", default="g++,clang++",
-                    help="comma-separated reference compilers")
+                    help="comma-separated reference compilers; "
+                         "`docker:IMAGE:g++-16` runs g++-16 inside the Docker "
+                         "image IMAGE")
+    ap.add_argument("--tagged-compilers", default="libstdcxx16="
+                    "docker:gcc16-test:g++-16",
+                    help="TAG=COMPILER[,TAG=COMPILER...]: for a source whose "
+                         "test.desc carries TAG, use COMPILER as the only "
+                         "reference (a test needing a newer standard "
+                         "library than the host's, e.g. tag libstdcxx16)")
     ap.add_argument("-I", dest="include_dirs", action="append", default=[])
     ap.add_argument("--timeout", type=int, default=300,
                     help="seconds per cbmc run (compilers: 60)")
@@ -262,11 +351,17 @@ def main() -> int:
     ap.add_argument("-v", "--verbose", action="store_true")
     args = ap.parse_args()
 
-    compilers = [c for c in args.compilers.split(",") if c and which(c)]
+    compilers = [c for c in args.compilers.split(",")
+                 if c and compiler_available(c)]
     if not compilers:
         print("no reference compiler found among: " + args.compilers,
               file=sys.stderr)
         return 2
+    tagged = {}  # tag -> (compiler spec, available?)
+    for item in args.tagged_compilers.split(","):
+        if "=" in item:
+            tag, cc = item.split("=", 1)
+            tagged[tag] = (cc, compiler_available(cc))
     if not which(args.cbmc) and not os.path.exists(args.cbmc):
         print("cbmc binary not found: " + args.cbmc, file=sys.stderr)
         return 2
@@ -279,9 +374,32 @@ def main() -> int:
         flags = None if args.ignore_desc else desc_flags(source)
         if flags is None:
             flags = [STD_FLAG.get(std, "--cpp17")] + args.cbmc_flags.split()
+        else:
+            # the test's own `--cppNN` names the standard
+            for f in flags:
+                m = re.fullmatch(r"--cpp(98|03|11|14|17|20|23|26)", f)
+                if m:
+                    std = "c++" + m.group(1)
+        tags = desc_tags(source)
+        refs = compilers
+        for tag in tags:
+            if tag in tagged:
+                cc, available = tagged[tag]
+                if not available:
+                    print("%-60s skipped (tag %s: reference compiler %s "
+                          "unavailable)" % (source, tag, cc))
+                    refs = []
+                else:
+                    refs = [cc]
+                break
+        if not refs:
+            continue
         with tempfile.TemporaryDirectory() as workdir:
-            runs = [compile_and_run(c, std, source, workdir, 60,
-                                    args.include_dirs) for c in compilers]
+            os.chmod(workdir, 0o755)
+            runs = [compile_and_run(c, std, source, workdir, 120,
+                                    args.include_dirs,
+                                    compiler_flags(c, flags))
+                    for c in refs]
         cbmc_result = run_cbmc(args.cbmc, flags, source, args.timeout,
                                args.memory_gb * 1024 * 1024)
         findings = compare(runs, cbmc_result, args.strict,
