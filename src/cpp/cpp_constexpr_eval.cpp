@@ -105,9 +105,20 @@ static exprt evaluate_temporary_object(
   assign = [&](const exprt &lhs, const exprt &rhs_in) -> bool
   {
     exprt rhs = rhs_in;
+    // a bit-field member is assigned its value cast to the bit-field type
+    // ([class.bit]); evaluate the underlying value, the member's type is
+    // re-applied below
+    while(rhs.id() == ID_typecast && rhs.type().id() == ID_c_bit_field)
+      rhs = to_typecast_expr(rhs).op();
     if(!(rhs.id() == ID_struct || rhs.is_constant()))
     {
-      rhs = try_evaluate_constexpr(rhs, symbol_table, ns, ensure_definition);
+      // a call (or temporary) is evaluated; anything else is an expression
+      // over constants (`(unsigned short)(bool)false' for a bit-field's
+      // `{false}') that the simplifier folds
+      if(rhs.id() == ID_side_effect)
+        rhs = try_evaluate_constexpr(rhs, symbol_table, ns, ensure_definition);
+      else
+        simplify(rhs, ns);
       if(!(rhs.id() == ID_struct || rhs.is_constant()))
         return false;
     }

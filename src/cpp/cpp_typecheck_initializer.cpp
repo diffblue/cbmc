@@ -162,6 +162,49 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
   }
 }
 
+std::optional<exprt> cpp_typecheckt::default_member_initializer_value(
+  const struct_tag_typet &struct_tag_type,
+  const struct_union_typet::componentt &component,
+  const source_locationt &source_location,
+  bool force_constant)
+{
+  const irept &default_value = component.find(ID_C_default_value);
+  if(default_value.is_nil())
+    return {};
+
+  // N5008 [class.mem.general]/6, [basic.scope.class]: the default member
+  // initializer is in the scope of the class -- resolve names there.
+  cpp_save_scopet save_scope(cpp_scopes);
+  cpp_scopes.set_scope(struct_tag_type.get_identifier());
+
+  exprt value = static_cast<const exprt &>(default_value);
+  if(value.id() == ID_initializer_list)
+  {
+    // A braced default member initializer (`int x{42}`, `uint16_t b : 1
+    // {false}`) list-initializes the member ([dcl.init.list]): let the
+    // initializer machinery build a value of the member's type instead of
+    // casting the raw list to it -- a raw initializer_list cast to a
+    // bit-field has no bit-vector width, which aborted the flattener when
+    // libc++'s `inline constexpr __fields ... {.__type_ = true}' reached it.
+    // [dcl.init.list]/3.11 (`{}`) value-initializes the member.
+    for(auto &op : value.operands())
+      typecheck_expr(op);
+    value = do_initializer_rec(value, component.type(), force_constant);
+  }
+  else
+  {
+    typecheck_expr(value);
+    implicit_typecast(value, component.type());
+  }
+
+  // a scalar converts to a bit-field's underlying type ([conv]); the struct
+  // constant's operand must have the member's (bit-field) type
+  if(value.type() != component.type())
+    value = typecast_exprt::conditional_cast(value, component.type());
+  value.add_source_location() = source_location;
+  return value;
+}
+
 /// Initialize an object with a value
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
