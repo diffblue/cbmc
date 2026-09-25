@@ -13,9 +13,15 @@ else()
 endif()
 
 
-add_test_pl_tests(
-    "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} true" ${gcc_only}
-)
+set(dfcc_cmd
+    "${CMAKE_CURRENT_SOURCE_DIR}/chain.sh $<TARGET_FILE:goto-cc> $<TARGET_FILE:goto-instrument> $<TARGET_FILE:cbmc> ${is_windows} true")
+set(dfcc_core_shards 4)
+
+# The CORE run of this suite is one of the slowest non-sharded CORE ctests;
+# shard it (and keep its 30-minute per-shard timeout) so it runs as several
+# parallel ctest entries on the macOS runners. See add_sharded_test_pl_tests.
+add_sharded_test_pl_tests(
+    "${dfcc_cmd}" "dfcc-core" ${dfcc_core_shards} 1800 ${gcc_only})
 
 add_test_pl_profile(
     "contracts-non-dfcc"
@@ -42,15 +48,16 @@ add_test_pl_profile(
 
 # solver appears on the PATH in Windows already
 if(NOT "${CMAKE_SYSTEM_NAME}" STREQUAL "Windows")
-  set_property(
-    TEST "contracts-dfcc-CORE"
-    PROPERTY ENVIRONMENT
-      "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
-  )
+  foreach(shard RANGE 1 ${dfcc_core_shards})
+    set_property(
+      TEST "contracts-dfcc-${shard}-CORE"
+      PROPERTY ENVIRONMENT
+        "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
+    )
+  endforeach()
   set_property(
     TEST "contracts-non-dfcc-CORE"
     PROPERTY ENVIRONMENT
       "PATH=$ENV{PATH}:$<TARGET_FILE_DIR:smt2_solver>"
   )
 endif()
-set_tests_properties("contracts-dfcc-CORE" PROPERTIES TIMEOUT 1800)
