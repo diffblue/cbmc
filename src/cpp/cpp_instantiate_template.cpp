@@ -1107,8 +1107,16 @@ bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
   // prefix.
   const std::string &cur_prefix = cpp_scopes.current_scope().prefix;
   const std::string &cls_prefix = cls_scope_it->second->prefix;
-  if(!cls_prefix.empty() && cur_prefix == cls_prefix)
-    return false;
+  // N5008 [temp.inst]/1: inside the class body the alias is at least
+  // NAMED without instantiating the aliased specialization -- enough for a
+  // member function's parameter or return type (`static const _Key
+  // &_S_key(const _Node &)' with `typedef _Rb_tree_node<_Val> _Node;'
+  // lazily kept because `_Val' is still incomplete, libstdc++ 16's
+  // _Rb_tree).  Left as the raw name, the member's parameter type never
+  // resolved and every call to it found no match.  The alias itself stays
+  // lazy so that the first use outside the body completes it.
+  const bool inside_class_body =
+    !cls_prefix.empty() && cur_prefix == cls_prefix;
 
   cpp_save_scopet save{cpp_scopes};
   cpp_scopes.go_to(*cls_scope_it->second);
@@ -1121,7 +1129,19 @@ bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
   try
   {
     sfinae_contextt sfinae_guard{*this};
-    typecheck_type(candidate);
+    const bool old_skip = skip_typechecking_elaborate;
+    if(inside_class_body)
+      skip_typechecking_elaborate = true;
+    try
+    {
+      typecheck_type(candidate);
+    }
+    catch(...)
+    {
+      skip_typechecking_elaborate = old_skip;
+      throw;
+    }
+    skip_typechecking_elaborate = old_skip;
   }
   catch(...)
   {
@@ -1130,6 +1150,21 @@ bool cpp_typecheckt::try_resolve_lazy_typedef_symbol(symbolt &sym)
 
   if(!ok)
     return false;
+
+  if(inside_class_body)
+  {
+    // the caller reads the resolved type from the symbol; keep the lazy
+    // marks for the later, elaborating, resolution
+    if(candidate.id() == ID_struct_tag || candidate.id() == ID_union_tag)
+    {
+      typet named = candidate;
+      named.set(ID_C_lazy_member_type, true);
+      named.set(ID_lazy_type_source, class_scope_id);
+      sym.type = std::move(named);
+      return true;
+    }
+    return false;
+  }
 
   sym.type = std::move(candidate);
   return true;

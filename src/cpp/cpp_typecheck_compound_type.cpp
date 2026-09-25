@@ -3671,6 +3671,41 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               }
               get_message_handler().set_message_count(
                 messaget::M_ERROR, errors_before);
+              // N5008 [temp.inst]/1 + [dcl.fct]/12: a member FUNCTION
+              // declaration needs neither its parameter nor its return
+              // types complete; the eager elaboration of a specialization
+              // named there (`static const _Key &_S_key(const _Node &)'
+              // with `_Node' = `_Rb_tree_node<late>' while `late' is only
+              // declared, libstdc++ 16's _Rb_tree) is what failed.
+              // Declare the member without elaborating: the body,
+              // converted later, elaborates on use.  Otherwise the member
+              // was left with an unresolved parameter type and every call
+              // to it found no match.
+              if(
+                !is_typedef && (declarator.type().id() == ID_code ||
+                                declarator.type().id() == ID_function_type))
+              {
+                const bool old_skip = skip_typechecking_elaborate;
+                skip_typechecking_elaborate = true;
+                try
+                {
+                  typecheck_compound_declarator(
+                    symbol,
+                    declaration,
+                    declarator,
+                    components,
+                    access,
+                    is_static,
+                    is_typedef,
+                    is_mutable);
+                }
+                catch(...)
+                {
+                  get_message_handler().set_message_count(
+                    messaget::M_ERROR, errors_before);
+                }
+                skip_typechecking_elaborate = old_skip;
+              }
               if(is_typedef)
               {
                 register_lazy_member(

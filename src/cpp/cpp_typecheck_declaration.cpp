@@ -977,14 +977,60 @@ void cpp_typecheckt::convert_non_template_declaration(
           }
         }
         if(!ctad_done)
-          typecheck_type(declaration_type);
+        {
+          // N5008 [dcl.fct]/12 + [temp.inst]/1: the return type of a
+          // FUNCTION DECLARATION (no definition here) may be incomplete, so
+          // naming a class template specialization there does not
+          // instantiate it -- `std::set<late> make();' with `late' only
+          // declared, whose eager instantiation failed on `sizeof(late)'
+          // and escaped the type checker ("Unknown exception type!"); the
+          // definition of make() after `late' is complete instantiates it.
+          bool only_function_declarations = !declaration.declarators().empty();
+          for(const auto &d : declaration.declarators())
+          {
+            if(
+              d.type().id() != ID_function_type || d.value().is_not_nil() ||
+              d.find(ID_member_initializers).is_not_nil())
+            {
+              only_function_declarations = false;
+            }
+          }
+          if(only_function_declarations)
+          {
+            const bool old_skip = skip_typechecking_elaborate;
+            skip_typechecking_elaborate = true;
+            try
+            {
+              typecheck_type(declaration_type);
+            }
+            catch(...)
+            {
+              skip_typechecking_elaborate = old_skip;
+              throw;
+            }
+            skip_typechecking_elaborate = old_skip;
+          }
+          else
+            typecheck_type(declaration_type);
+        }
       }
     } // !handled
   }
 
   // Elaborate any class template instance _unless_ we do a typedef.
-  // These are only elaborated on usage!
-  if(!is_typedef)
+  // These are only elaborated on usage!  A function declaration's return
+  // type is elaborated on use as well (above).
+  bool only_function_declarations = !declaration.declarators().empty();
+  for(const auto &d : declaration.declarators())
+  {
+    if(
+      d.type().id() != ID_function_type || d.value().is_not_nil() ||
+      d.find(ID_member_initializers).is_not_nil())
+    {
+      only_function_declarations = false;
+    }
+  }
+  if(!is_typedef && !only_function_declarations)
     elaborate_class_template(declaration_type);
 
   // mark as 'already typechecked'
