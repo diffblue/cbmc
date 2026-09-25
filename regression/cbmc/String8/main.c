@@ -1,6 +1,6 @@
 int main()
 {
-  _Bool branch;
+  _Bool branch = __VERIFIER_nondet__Bool();
   const char *str = 0;
 
   if(branch)

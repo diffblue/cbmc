@@ -23,7 +23,8 @@ int main()
   assert(!((fbvt)-2.0>=(fbvt)-1.0));
 
   // variables
-  fbvt a, b, _a=a, _b=b;
+  fbvt nondet_fbvt(void);
+  fbvt a = nondet_fbvt(), b = nondet_fbvt(), _a = a, _b = b;
   __CPROVER_assume(a==1 && b==2);
 
   assert(a!=b);

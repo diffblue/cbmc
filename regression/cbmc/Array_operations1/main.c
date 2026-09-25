@@ -2,7 +2,7 @@ void test_equal()
 {
   char array1[100], array2[100];
   _Bool cmp;
-  int index;
+  int index = __VERIFIER_nondet_int();
 
   cmp = __CPROVER_array_equal(array1, array2);
 

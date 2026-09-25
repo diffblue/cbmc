@@ -16,7 +16,7 @@ void f1(int *px)
 
 main()
 {
-  int flag;
+  int flag = __VERIFIER_nondet_int();
   int *ref = NULL;
   int x = 0;
   st1.x = 0;

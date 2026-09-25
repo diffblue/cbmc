@@ -7,7 +7,7 @@ struct empty
 int main()
 {
   struct empty e1, e2, e3;
-  _Bool b, c=b;
+  _Bool b = __VERIFIER_nondet__Bool(), c = b;
   e1=e2;
   if(b)
     e3=e2;

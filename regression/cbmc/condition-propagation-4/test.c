@@ -1,6 +1,6 @@
 int main(int argc, char **argv)
 {
-  int unknown;
+  int unknown = __VERIFIER_nondet_int();
 
   if(argc != 1)
   {

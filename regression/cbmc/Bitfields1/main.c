@@ -30,7 +30,8 @@ struct bft {
 };
 
 int main() {
-  struct bft bf;
+  struct bft nondet_bft(void);
+  struct bft bf = nondet_bft();
 
   assert(bf.a<=7);
   assert(bf.b<=1);

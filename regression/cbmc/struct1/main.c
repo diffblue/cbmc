@@ -16,7 +16,8 @@ struct y {
 
 int main()
 {
-  struct y Y;
+  struct y nondet_y(void);
+  struct y Y = nondet_y();
 
   {
     struct x tmp;

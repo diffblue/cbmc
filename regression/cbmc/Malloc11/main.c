@@ -2,10 +2,10 @@
 
 int main()
 {
-  int n;
+  int n = __VERIFIER_nondet_int();
   int x;
   int *a;
-  _Bool nondet;
+  _Bool nondet = __VERIFIER_nondet__Bool();
 
   __CPROVER_assume(n <= 10);
 

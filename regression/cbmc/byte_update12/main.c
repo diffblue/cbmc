@@ -8,7 +8,7 @@ struct S
 
 int main()
 {
-  unsigned x;
+  unsigned x = __VERIFIER_nondet_unsigned();
   char A[x];
   __CPROVER_assume(x == sizeof(int));
   A[0] = 42;

@@ -2,7 +2,7 @@
 
 int main()
 {
-  int x;
+  int x = __VERIFIER_nondet_int();
   switch(x)
   {
   case 0:

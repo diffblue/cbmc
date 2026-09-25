@@ -20,7 +20,7 @@ struct str pass_through_struct (int q)
 
 int main (void)
 {
-  int q;
+  int q = __VERIFIER_nondet_int();
 
   struct str s = pass_through_struct(q);
 

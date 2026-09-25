@@ -6,7 +6,7 @@ int main()
   // examples of constants that previously exhibited wrong behaviour
   union U
   {
-    double d;
+    double d = __VERIFIER_nondet_double();
     uint64_t b;
   };
   union U u = {
@@ -15,7 +15,7 @@ int main()
     .b = 0b0000000000000000000000000000001111111111111111111111111000000000};
   double d = u.d;
 #else
-  double d;
+  double d = __VERIFIER_nondet_double();
 #endif
   float f;
   if(d > 0.0 && d < 1.0)

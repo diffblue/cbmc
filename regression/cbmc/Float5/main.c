@@ -1,6 +1,6 @@
 int main()
 {
-  float a, b;
+  float a = __VERIFIER_nondet_float(), b;
 
   __CPROVER_assume(a==1 || a==0.5 || a==2 || a==3 || a==0.1);
   b=a;

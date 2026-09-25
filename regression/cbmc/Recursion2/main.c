@@ -5,7 +5,7 @@ void f(unsigned int counter) {
 }
 
 int main() {
-  unsigned int x;
+  unsigned int x = __VERIFIER_nondet_int();
   __CPROVER_assume(x<=10);
 
   f(x);

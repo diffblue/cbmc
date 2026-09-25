@@ -1,6 +1,6 @@
 void shift_distance_too_large()
 {
-  unsigned char x;
+  unsigned char x = __VERIFIER_nondet_char();
   unsigned r = x << ((sizeof(unsigned) - 1) * 8);  // ok
   r = x << ((sizeof(unsigned) - 1) * 8 - 1);       // ok
   r = (unsigned)x << ((sizeof(unsigned) - 1) * 8); // ok
@@ -9,7 +9,7 @@ void shift_distance_too_large()
 
 void shift_distance_negative()
 {
-  int dist;
+  int dist = __VERIFIER_nondet_int();
   if(dist >= 10)
     dist = 10;
   unsigned r = 1 << dist; // distance may be negative

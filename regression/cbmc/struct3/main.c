@@ -1,10 +1,15 @@
-int main() {
-  struct
-  {
-    int a, b;
-  } s, q;
+struct ab
+{
+  int a, b;
+};
 
-  s=q;
+struct ab nondet_ab(void);
 
-  assert(s.a==q.a);
+int main()
+{
+  struct ab s, q = nondet_ab();
+
+  s = q;
+
+  assert(s.a == q.a);
 }

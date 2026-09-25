@@ -21,7 +21,8 @@ int main()
   assert(!(-2.0>=-1.0));
 
   // variables
-  float a, b, _a=a, _b=b;
+  float a = __VERIFIER_nondet_float(), b = __VERIFIER_nondet_float(), _a = a,
+        _b = b;
   __CPROVER_assume(a==1 && b==2);
 
   assert(a!=b);

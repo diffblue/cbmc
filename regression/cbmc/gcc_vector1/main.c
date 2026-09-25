@@ -16,7 +16,8 @@ int main()
   assert(sizeof(int)==4);
   assert(sizeof(v4si)==16);
 
-  vector_u x, y, z;
+  vector_u nondet_vu(void);
+  vector_u x = nondet_vu(), y = nondet_vu(), z;
 
   // vector operator vector
   z.v=x.v+y.v;

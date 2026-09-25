@@ -15,7 +15,7 @@ int main()
   assert(str_array[0].b==0);
   assert(str_array[1].b==4);
 
-  int x;
+  int x = __VERIFIER_nondet_int();
 
   // this also exists (GCC)
   str_array[0] = (struct teststr){ .a=1, .c=x };

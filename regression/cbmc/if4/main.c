@@ -1,6 +1,6 @@
 int main()
 {
-  int x;
+  int x = __VERIFIER_nondet_int();
 
   __CPROVER_assume(x==1);
 
