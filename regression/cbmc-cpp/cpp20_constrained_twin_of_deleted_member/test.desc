@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ constrained operator= beats the deleted one: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constrained move assignment: SUCCESS$
+^\[main\.assertion\.3\] line \d+ const member pair: assignment not viable, not instantiated: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+not accessible
+dropped the body
+--
+N5008 [over.match.best]/2.6: the constrained same-signature member is
+selected over the deleted unconstrained one; [temp.pre]: `requires ( expr )'
+takes any expression; [temp.inst]/4: an unsatisfied constrained member's
+definition is not instantiated (no dropped-body report).  The C++20
+std::pair shape (`std::pair<int,int> r; r = q;' was a conversion error).
