@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp23
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ explicit object parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pack before explicit object parameter: SUCCESS$
+^\[main\.assertion\.3\] line \d+ with a defaulted parameter after: SUCCESS$
+^\[main\.assertion\.4\] line \d+ empty pack: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+found no match for symbol
+--
+N5008 [dcl.fct]/6, [over.match.funcs]/3, [temp.deduct.call]: a templated
+explicit object parameter deduced from the object expression, also with a
+function parameter pack declared before it.  Non-vacuous: the last assertion
+is deliberately wrong and must FAIL.  Before the fix: "found no match for
+symbol 'get'", CONVERSION ERROR.  Verified with clang++ 18 and g++ 16 (g++ 13
+predates deducing this).
