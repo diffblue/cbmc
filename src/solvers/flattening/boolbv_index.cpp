@@ -6,17 +6,18 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
-#include "boolbv.h"
-
-#include <algorithm>
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
+
+#include "boolbv.h"
+
+#include <algorithm>
 
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
@@ -33,32 +34,78 @@ bvt boolbvt::convert_index(const index_exprt &expr)
       to_array_type(array_op_type);
 
     // see if the array size is constant
+    // Member expressions with non-symbol struct operands (e.g.,
+    // member(index(outer_array, i), field)) cannot be properly
+    // constrained by the array theory, which treats them as opaque
+    // base arrays. Fall through to the bounded-array encoding when
+    // the array has a known finite size so that the bitvector solver
+    // directly connects the element to the struct field bits.
+    const bool member_with_non_symbol_struct =
+      array.id() == ID_member &&
+      to_member_expr(array).compound().id() != ID_symbol &&
+      to_member_expr(array).compound().id() != ID_nondet_symbol &&
+      array_type.size().is_constant();
 
-    if(is_unbounded_array(array_type))
+    if(is_unbounded_array(array_type) && !member_with_non_symbol_struct)
     {
       // use array decision procedure
 
+      // Typecast between array types with different element sizes
+      // (e.g., SIMD reinterpretation int32[4] <-> int64[2]) cannot be
+      // handled by the array theory's element-wise constraints.
+      // Lower to byte_extract which the bitvector solver handles.
+      if(
+        array.id() == ID_typecast &&
+        to_typecast_expr(array).op().type().id() == ID_array &&
+        to_array_type(array.type()).element_type() !=
+          to_array_type(to_typecast_expr(array).op().type()).element_type())
+      {
+        const auto &src = to_typecast_expr(array).op();
+        const auto elem_size = boolbv_width(array_type.element_type()) / 8;
+        return convert_bv(lower_byte_operators(
+          byte_extract_exprt(
+            ID_byte_extract_little_endian,
+            src,
+            mult_exprt(
+              typecast_exprt::conditional_cast(
+                index, signedbv_typet(config.ansi_c.pointer_width)),
+              from_integer(
+                elem_size, signedbv_typet(config.ansi_c.pointer_width))),
+            config.ansi_c.char_width,
+            array_type.element_type()),
+          ns));
+      }
+
       if(has_byte_operator(expr))
       {
-        const index_exprt final_expr =
-          to_index_expr(lower_byte_operators(expr, ns));
-        CHECK_RETURN(final_expr != expr);
-        bv = convert_bv(final_expr);
+        exprt lowered = simplify_expr(lower_byte_operators(expr, ns), ns);
+        CHECK_RETURN(lowered != expr);
 
-        // record type if array is a symbol
-        const exprt &final_array = final_expr.array();
-        if(
-          final_array.id() == ID_symbol || final_array.id() == ID_nondet_symbol)
+        if(lowered.id() == ID_index)
         {
-          const auto &array_width_opt = bv_width.get_width_opt(array_type);
-          (void)map.get_literals(
-            final_array.get(ID_identifier),
-            array_type,
-            array_width_opt.value_or(0));
-        }
+          const index_exprt &final_expr = to_index_expr(lowered);
+          bv = convert_bv(final_expr);
 
-        // make sure we have the index in the cache
-        convert_bv(final_expr.index());
+          // record type if array is a symbol
+          const exprt &final_array = final_expr.array();
+          if(
+            final_array.id() == ID_symbol ||
+            final_array.id() == ID_nondet_symbol)
+          {
+            const auto &array_width_opt = bv_width.get_width_opt(array_type);
+            (void)map.get_literals(
+              final_array.get(ID_identifier),
+              array_type,
+              array_width_opt.value_or(0));
+          }
+
+          // make sure we have the index in the cache
+          convert_bv(final_expr.index());
+        }
+        else
+        {
+          bv = convert_bv(lowered);
+        }
       }
       else
       {
