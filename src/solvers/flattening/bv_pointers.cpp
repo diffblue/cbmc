@@ -228,8 +228,8 @@ bv_pointerst::bv_pointerst(
   const namespacet &_ns,
   propt &_prop,
   message_handlert &message_handler,
-  bool get_array_constraints)
-  : boolbvt(_ns, _prop, message_handler, get_array_constraints),
+  bool collect_constraint_stats)
+  : boolbvt(_ns, _prop, message_handler, collect_constraint_stats),
     pointer_logic(_ns)
 {
 }
