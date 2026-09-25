@@ -990,6 +990,8 @@ protected:
   /// \c C is present, \c C is satisfied by `decltype((E))`.  Soft failure per
   /// [expr.prim.req.general]/5.
   bool compound_requirement_is_satisfied(const exprt &expr);
+  bool
+  is_trivially_copyable_type(const typet &type, bool want_trivial, int depth);
 
   /// N5008 [expr.prim.req.general]/2-3: bind a requirement-parameter of a
   /// requires-expression (`requires(T a) { ... }`) as a local symbol of the
