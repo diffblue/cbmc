@@ -993,6 +993,11 @@ protected:
   bool
   is_trivially_copyable_type(const typet &type, bool want_trivial, int depth);
 
+  /// N5008 [class.prop], [class.virtual]/1, [class.dtor]/9,
+  /// [dcl.init.aggr]/1: the class property named by the GCC/Clang type
+  /// trait \p trait (`__is_empty', `__is_polymorphic', ...) for type \p t
+  bool class_property(const irep_idt &trait, const typet &t);
+
   /// N5008 [expr.prim.req.general]/2-3: bind a requirement-parameter of a
   /// requires-expression (`requires(T a) { ... }`) as a local symbol of the
   /// current (instantiation) scope, of the substituted type \p type.  Each
