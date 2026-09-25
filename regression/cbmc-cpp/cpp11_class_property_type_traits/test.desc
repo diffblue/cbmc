@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17 --unwind 5 --no-unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ find through an empty functor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+static assertion failed
+--
+N5008 [meta.unary.prop]: __is_empty, __is_polymorphic, __has_virtual_destructor,
+__is_standard_layout, __is_aggregate, __is_literal_type and __is_pod evaluated
+from the class definition ([class.prop], [class.virtual]/1, [class.dtor]/9,
+[dcl.init.aggr]/1); the class is completed first ([meta.unary.prop]/3).
+libstdc++ 16's std::find (predefined_ops.h `__by_ref_or_value_fn') depends on
+is_empty<equal_to<>>.
