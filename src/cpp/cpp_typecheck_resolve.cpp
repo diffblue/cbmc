@@ -391,48 +391,6 @@ constraint_normalt concept_normal(
   return {{id2string(name)}};
 }
 
-/// Whether the concept \p name (or a concept it references, transitively)
-/// is defined with a requires-expression.  Our evaluation of a
-/// requires-expression can come out FALSE for constructs the front end does
-/// not model (a libc++ ranges customization-point object over an array,
-/// `ranges::iter_move'), where a trait-based concept
-/// (`is_integral_v<T>', `same_as') is decided reliably; a caller that
-/// removes an overload candidate on an unsatisfied constraint trusts a false
-/// only from the latter.
-bool concept_uses_requires_expression(
-  const symbol_table_baset &symbol_table,
-  const irep_idt &name,
-  int depth = 0)
-{
-  if(depth > 32)
-    return true;
-  const exprt body = concept_constraint_body(symbol_table, name);
-  if(body.is_nil())
-    return false;
-  bool found = false;
-  body.visit_pre(
-    [&](const exprt &e)
-    {
-      if(found)
-        return;
-      const irep_idt &id = e.id();
-      if(
-        id == "simple_requirement" || id == "compound_requirement" ||
-        id == "type_requirement" || id == "nested_requirement" ||
-        e.find("#requires_params").is_not_nil())
-      {
-        found = true;
-        return;
-      }
-      const irep_idt cref = concept_reference_name(e);
-      if(
-        !cref.empty() && cref != name &&
-        concept_uses_requires_expression(symbol_table, cref, depth + 1))
-        found = true;
-    });
-  return found;
-}
-
 // N5008 [temp.constr.order]/1: does the constraint named p_name subsume the
 // constraint named q_name?
 bool constraint_subsumes(
@@ -800,17 +758,6 @@ void cpp_typecheck_resolvet::guess_function_template_args(
             const irept &tc = p.find("#C_type_constraint");
             if(tc.is_nil())
               continue;
-            // A concept defined with a requires-expression may evaluate to
-            // false for want of modelling (concept_uses_requires_expression):
-            // only a trait-based concept's verdict removes a candidate.
-            const irep_idt cref =
-              concept_reference_name(static_cast<const exprt &>(tc));
-            if(
-              !cref.empty() && concept_uses_requires_expression(
-                                 cpp_typecheck.symbol_table, cref))
-            {
-              continue;
-            }
             if(req_clause.is_nil() || req_clause.id() == ID_nil)
               req_clause = static_cast<const exprt &>(tc);
             else
