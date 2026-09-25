@@ -599,6 +599,21 @@ public:
         const exprt referenced = referenced_value(it->second);
         if(referenced.is_not_nil())
           return referenced;
+        // N5008 [dcl.init.ref]: a REFERENCE TO ARRAY parameter
+        // (`const bool (&m)[N]', libc++'s `__find_idx') bound to a static
+        // constexpr array denotes the whole array -- its constant value --
+        // so `m[i]' below indexes the array constant ([expr.const]/5.9)
+        if(
+          e.type().id() == ID_array && it->second.id() == ID_address_of &&
+          is_constant_array_object(
+            to_address_of_expr(it->second).object(), symbol_table))
+        {
+          const exprt value = array_pointer_value(
+            array_pointert{to_address_of_expr(it->second).object(), 0},
+            symbol_table);
+          if(value.is_not_nil())
+            return value;
+        }
         if(const auto sp = array_pointer(it->second, symbol_table))
         {
           if(const auto c = array_pointer_deref(*sp, symbol_table, ns))
@@ -1130,7 +1145,15 @@ exprt try_evaluate_constexpr(
         vars[params[i].get_identifier()] = arguments[i];
     }
     else
-      vars[params[i].get_identifier()] = arguments[i];
+    {
+      // N5008 [conv.integral], [expr.const]: an argument converted to the
+      // parameter type (`id(7)' with `unsigned long' parameter arrives as
+      // `(unsigned long)7') is folded to the constant it denotes; unfolded,
+      // `return r' would not yield a constant.
+      exprt argument = arguments[i];
+      simplify(argument, ns);
+      vars[params[i].get_identifier()] = std::move(argument);
+    }
   }
 
   constexpr_interpretert interpreter{
