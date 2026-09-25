@@ -57,6 +57,7 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_UNINITIALIZED_CHECK \
   OPT_WMM \
   "(race-check)" \
+  "(mmio)(mmio-region):(mmio-ioremap)" \
   OPT_UNWINDSET \
   "(unwindset-file):" \
   "(unwinding-assertions)(partial-loops)(continue-as-loops)" \
@@ -66,6 +67,12 @@ Author: Daniel Kroening, kroening@kroening.com
   OPT_INSERT_FINAL_ASSERT_FALSE \
   OPT_SHOW_CLASS_HIERARCHY \
   "(isr):" \
+  "(mmio)" \
+  "(" MMIO_WEAK_OPT ")" \
+  "(" MMIO_WEAK_VARIABLE_OPT "):" \
+  "(" MMIO_WEAK_DEPTH_OPT "):" \
+  "(" MMIO_GATHER_OPT ")" \
+  "(" MMIO_EARLY_ACK_OPT ")" \
   "(stack-depth):(nondet-static)" \
   "(nondet-static-exclude):" \
   "(nondet-static-matching):" \
@@ -156,7 +163,7 @@ protected:
   void get_goto_program();
   void instrument_goto_program();
 
-  void do_indirect_call_and_rtti_removal(bool force=false);
+  void do_indirect_call_and_rtti_removal(bool force = false);
   void do_remove_const_function_pointers_only();
   void do_partial_inlining();
   void do_remove_returns();

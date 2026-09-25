@@ -1,0 +1,11 @@
+CORE
+test.c
+--nondet-volatile-write-model reg:bad
+^Invalid User Input$
+write model `bad` must return void$
+^EXIT=1$
+^SIGNAL=0$
+--
+--
+A volatile write model must be a void function taking the written value;
+goto-instrument rejects a model with a non-void return type.

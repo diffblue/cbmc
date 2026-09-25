@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+OUTPUT address_of\("volatile-write"
+--
+--
+Phase 1 of the MMIO device-environment model. A volatile read is
+non-deterministic (the device may change the register), so the read-back
+assertion fails; and a volatile write is preserved as an observable side
+effect, emitted as an OUTPUT instruction so it is not sliced away.

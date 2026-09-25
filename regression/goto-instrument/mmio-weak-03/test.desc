@@ -1,0 +1,12 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio-weak-variable data
+^EXIT=10$
+^SIGNAL=0$
+data committed before GO: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+Per-register memory-type tagging: only the data register is marked weakly
+ordered (--mmio-weak-variable data), so its write can be posted and observed
+after the command, and the ordering assertion fails.

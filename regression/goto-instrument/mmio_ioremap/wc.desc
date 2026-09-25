@@ -1,0 +1,14 @@
+CORE
+wc.c
+--mmio-ioremap _ --no-pointer-check --no-bounds-check
+^EXIT=10$
+^SIGNAL=0$
+Derived MMIO region from ioremap_wc: 0x1000 size 256
+value read back from weak region: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+ioremap_wc maps write-combining (weak) memory, so the region is auto-derived as
+weak: reads return a non-deterministic value and the read-back is not
+guaranteed. The device-memory type is recovered from the source (the ioremap
+variant) with no user configuration.
