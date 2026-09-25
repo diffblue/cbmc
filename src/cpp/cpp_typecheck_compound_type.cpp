@@ -1828,6 +1828,19 @@ void cpp_typecheckt::typecheck_compound_declarator(
         static_symbol.is_macro = true;
       if(!scalar_constant && value.is_not_nil())
         static_symbol.is_extern = false;
+      // N5008 [dcl.constexpr]/6: constexpr declares the object const.  As
+      // for namespace-scope objects (cpp_declarator_converter), give a
+      // constexpr static member ARRAY const elements, otherwise a constant
+      // expression over an element (`static_assert(S::arr[1])', libc++'s
+      // `__find_exactly_one_checked::__matches') does not see a constant
+      // object.
+      if(static_symbol.type.id() == ID_array)
+      {
+        to_array_type(static_symbol.type)
+          .element_type()
+          .set(ID_C_constant, true);
+        component.type() = static_symbol.type;
+      }
     }
     else if(declaration.member_spec().is_inline() && value.is_not_nil())
     {
