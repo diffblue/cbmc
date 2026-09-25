@@ -1533,15 +1533,15 @@ void cpp_typecheckt::typecheck_method_bodies()
       // unsupported standard library constructs) do not increment
       // the error count.
       bool suppress = !instantiation_stack.empty();
+      const std::string body_file =
+        id2string(method_symbol.location.get_file());
+      // Only suppress for system headers (paths under /usr/include,
+      // /usr/lib, etc.), not for all absolute paths.
+      const bool is_library_body =
+        body_file.find("/include/") != std::string::npos ||
+        is_library_body_file(body_file);
       if(!suppress)
-      {
-        const auto &loc = method_symbol.location;
-        const std::string file = id2string(loc.get_file());
-        // Only suppress for system headers (paths under /usr/include,
-        // /usr/lib, etc.), not for all absolute paths.
-        suppress = file.find("/include/") != std::string::npos ||
-                   is_library_body_file(file);
-      }
+        suppress = is_library_body;
       if(suppress)
       {
         // Save/restore error count instead of using null_handler.
@@ -1571,8 +1571,9 @@ void cpp_typecheckt::typecheck_method_bodies()
           // returns nondet and assigns nothing.  Silently dropping a
           // library body hid exactly that unsoundness; say it once.
           warning().source_location = method_symbol.location;
-          warning() << "C++ front-end dropped the body of system-header "
-                    << "function '" << method_symbol.base_name
+          warning() << "C++ front-end dropped the body of "
+                    << (is_library_body ? "system-header " : "") << "function '"
+                    << method_symbol.base_name
                     << "' (unsupported construct); calls to it return "
                     << "nondet" << messaget::eom;
         }
