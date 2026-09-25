@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+--pointer-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+Invariant check failed
+--
+Regression test for GitHub issue #8480: get_literals called with width=0
+for unbounded arrays of zero-width elements should not trigger an invariant
+violation.
