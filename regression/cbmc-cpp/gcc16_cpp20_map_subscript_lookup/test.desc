@@ -1,19 +1,20 @@
-KNOWNBUG gcc16 libstdcxx16
+CORE gcc-only gcc16 libstdcxx16
 main.cpp
 --cpp20 --unwind 5 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value found again: SUCCESS$
+^\[main\.assertion\.3\] line \d+ count: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
-KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only; passes with gcc 11-15
-headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
-select the code paths) and running cbmc on the .ii file.
-Silent wrong result (assertions 2 and 3 FAILURE without any front-end
-diagnostic) -- a soundness gap, not a conversion error.
-2026-09-25: `__builtin_clzg' (the first failure) is supported now.
-Remaining: "dropped the body of system-header function 'operator()'" at
-<compare> line ~4076 (a comparison-category `__make' helper) and the
-CONVERSION ERROR that follows.
+Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only (silent wrong
+result: assertions 2 and 3 FAILURE without any front-end diagnostic).  Fixed by
+round 160/161: `__builtin_clzg', `<=>' on pointers (strong_ordering), and the
+static-member-template-of-a-base / braced-init / constexpr-array fixes that
+made <compare>'s comparison-category helpers type-check.  Runs where the host
+gcc is >= 16 (tag libstdcxx16).
