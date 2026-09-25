@@ -687,12 +687,31 @@ int cbmc_parse_optionst::doit()
       stop_on_fail_verifiert<single_path_symex_checkert> verifier(
         options, ui_message_handler, goto_model);
       (void)verifier();
+      // Note: we do not emit the "empty formula" usability warning here.
+      // Under --paths the equation is rebuilt per path and the outfile is
+      // overwritten on each non-empty path, so a per-path notion of "the
+      // formula is empty" does not correspond to anything the user can
+      // observe in the final file.
     }
     else
     {
       stop_on_fail_verifiert<multi_path_symex_checkert> verifier(
         options, ui_message_handler, goto_model);
       (void)verifier();
+
+      // If symex generated VCCs but simplification reduced them all to true,
+      // the formula written via --outfile contains only the solver header
+      // and no assertions. Tell the user why the file is nearly empty.
+      const std::string outfile = options.get_option("outfile");
+      if(
+        !outfile.empty() && verifier.get_checker().get_total_vccs() > 0 &&
+        verifier.get_checker().get_remaining_vccs() == 0)
+      {
+        log.status() << "All properties were simplified to true before "
+                        "solving. The formula written to "
+                     << outfile << " will not contain any assertions."
+                     << messaget::eom;
+      }
     }
 
     return CPROVER_EXIT_SUCCESS;
