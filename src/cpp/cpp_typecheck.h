@@ -245,6 +245,11 @@ protected:
   /// argument makes EVERY constructor viable (C deduced as each
   /// parameter type) and resolution reports a bogus ambiguity.
   unsigned copy_init_ctor_exploration = 0;
+
+  /// (destination class, source type, value category, component count) for
+  /// which the constructor-template trial of user_defined_conversion_sequence
+  /// found no conversion; see there
+  std::unordered_set<std::string> failed_template_conversions;
   irep_idt pending_no_viable_base_name;
   source_locationt pending_no_viable_location;
 

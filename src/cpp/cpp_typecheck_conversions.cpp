@@ -25,6 +25,7 @@ Author:
 
 #include "cpp_convert_type.h"
 #include "cpp_sfinae_context.h"
+#include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
 
@@ -2345,13 +2346,26 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       // `size() < 2` bound additionally caps nesting depth: one nested level
       // suffices for the conforming std::optional / std::unique_ptr patterns.
       const irep_idt to_ctor_key = to_struct_tag_type(to).get_identifier();
+      // The trial below runs full constructor overload resolution over the
+      // class's constructor templates; the same (destination, source type,
+      // value category) question is asked again and again while resolving
+      // overloaded calls (9727 trials, 484 distinct, on one libc++ <span>
+      // test) and its answer depends only on those, as long as the class
+      // has the same constructors.  Remember the negative answers.
+      const std::string trial_key =
+        id2string(to_ctor_key) + "|" + cpp_type2name(expr.type()) +
+        (expr.get_bool(ID_C_lvalue) ? "|l" : "|r") +
+        (expr.type().get_bool(ID_C_constant) ? "c" : "") + "|" +
+        std::to_string(struct_type_to.components().size());
       if(
         template_conversions_in_progress.find(to_ctor_key) ==
           template_conversions_in_progress.end() &&
         (template_conversions_in_progress.empty() ||
          constant_expression_context > 0 || sfinae_context_depth > 0) &&
         template_conversions_in_progress.size() < 2 &&
-        struct_type_to.get_bool("has_template_constructor"))
+        struct_type_to.get_bool("has_template_constructor") &&
+        failed_template_conversions.find(trial_key) ==
+          failed_template_conversions.end())
       {
         template_conversions_in_progress.insert(to_ctor_key);
         // [over.ics.user] + [temp.deduct]/8: a user-defined
@@ -2544,6 +2558,9 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         {
           template_conversions_in_progress.erase(to_ctor_key);
         }
+        // no conversion through a constructor template: remember it (the
+        // successful path returned above)
+        failed_template_conversions.insert(trial_key);
       }
 
       // libstdc++ basic_string fallback: when both the regular and
