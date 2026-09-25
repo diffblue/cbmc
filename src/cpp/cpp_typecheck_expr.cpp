@@ -139,6 +139,118 @@ void cpp_typecheckt::bind_requires_parameter(
   scope_id.id_class = cpp_idt::id_classt::SYMBOL;
 }
 
+/// N5008 [class.prop]/1: a trivially copyable class has at least one eligible
+/// copy constructor, move constructor, copy assignment operator or move
+/// assignment operator, each of which is trivial (implicitly declared, not
+/// user-provided, [class.copy.ctor]/11, [class.copy.assign]/9), no
+/// non-trivial ones, and a trivial non-deleted destructor; and, transitively
+/// ([class.copy.ctor]/11), no virtual functions or virtual bases, and bases
+/// and non-static data members of trivially copyable type.  /2: a trivial
+/// class is trivially copyable and has a trivial default constructor
+/// ([class.default.ctor]/3: no user-provided one, no default member
+/// initializers, bases and members trivial).  [basic.types.general]/9
+/// extends both to scalars, arrays and cv-qualified versions.
+bool cpp_typecheckt::is_trivially_copyable_type(
+  const typet &type,
+  bool want_trivial,
+  int depth)
+{
+  if(depth <= 0)
+    return false;
+  if(type.id() == ID_array)
+    return is_trivially_copyable_type(
+      to_array_type(type).element_type(), want_trivial, depth - 1);
+  if(type.id() == ID_struct_tag)
+  {
+    const struct_typet &st = follow_tag(to_struct_tag_type(type));
+    if(st.get_bool(ID_incomplete))
+      return false;
+    for(const auto &base : st.bases())
+    {
+      if(base.get_bool(ID_virtual))
+        return false;
+      const typet &base_type = static_cast<const typet &>(base.find(ID_type));
+      if(!is_trivially_copyable_type(base_type, want_trivial, depth - 1))
+        return false;
+    }
+    for(const auto &comp : st.components())
+    {
+      if(comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type))
+        continue;
+      if(comp.get_bool(ID_is_vtptr))
+        return false; // a polymorphic class
+      if(comp.type().id() == ID_code)
+      {
+        const code_typet &code_type = to_code_type(comp.type());
+        if(comp.get_bool(ID_is_virtual))
+          return false;
+        const irep_idt &return_id = code_type.return_type().id();
+        // parameters: `this' and the rest
+        const std::size_t n_args = code_type.parameters().size();
+        if(return_id == ID_destructor)
+        {
+          if(!code_type.get_bool("#is_implicit_dtor"))
+            return false;
+        }
+        else if(return_id == ID_constructor)
+        {
+          // a copy or move constructor: one parameter of reference to the
+          // class; user-provided -> not trivial
+          const bool copy_or_move =
+            n_args == 2 && is_reference(code_type.parameters()[1].type()) &&
+            to_reference_type(code_type.parameters()[1].type())
+                .base_type()
+                .id() == ID_struct_tag &&
+            to_struct_tag_type(
+              to_reference_type(code_type.parameters()[1].type()).base_type())
+                .get_identifier() == to_struct_tag_type(type).get_identifier();
+          if(copy_or_move && !code_type.get_bool("#is_implicit_ctor"))
+            return false;
+          // [class.default.ctor]/3: a trivial class has no user-provided
+          // default constructor
+          if(
+            want_trivial && n_args == 1 &&
+            !code_type.get_bool("#is_implicit_ctor"))
+            return false;
+        }
+        else if(comp.get_base_name() == "operator=")
+        {
+          if(n_args == 2 && !code_type.get_bool("#is_implicit_assign"))
+            return false;
+        }
+        continue;
+      }
+      // [class.default.ctor]/3: a default member initializer makes the
+      // default constructor non-trivial
+      if(want_trivial && comp.find(ID_C_default_value).is_not_nil())
+        return false;
+      if(!is_trivially_copyable_type(comp.type(), want_trivial, depth - 1))
+        return false;
+    }
+    return true;
+  }
+  if(type.id() == ID_union_tag)
+  {
+    const union_typet &ut = follow_tag(to_union_tag_type(type));
+    for(const auto &comp : ut.components())
+    {
+      if(
+        comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type) ||
+        comp.type().id() == ID_code)
+        continue;
+      if(!is_trivially_copyable_type(comp.type(), want_trivial, depth - 1))
+        return false;
+    }
+    return true;
+  }
+  // scalars ([basic.types.general]/9); a reference is not an object type
+  return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+         type.id() == ID_c_bool || type.id() == ID_bool ||
+         type.id() == ID_floatbv || type.id() == ID_fixedbv ||
+         type.id() == ID_c_enum_tag || type.id() == ID_c_enum ||
+         (type.id() == ID_pointer && !is_reference(type));
+}
+
 bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
 {
   const std::size_t errors_before =
@@ -1649,6 +1761,20 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
                t.id() == ID_c_enum_tag ||
                (t.id() == ID_pointer && !is_reference(t));
       expr = r ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(
+      expr.id() == "__is_trivially_copyable" || expr.id() == "__is_trivial")
+    {
+      // N5008 [basic.types.general]/9: scalar types, trivially copyable
+      // class types, arrays of such, and cv-qualified versions are
+      // trivially copyable; the trivial types add trivially default
+      // constructible classes.  Used to be an unconditional false -- so
+      // libc++'s variant computed a non-trivial copy for variant<int,
+      // double>, and std::is_trivially_copyable<int> was false.
+      const bool want_trivial = expr.id() == "__is_trivial";
+      expr = is_trivially_copyable_type(t, want_trivial, 16)
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
     }
     else
       expr = false_exprt();

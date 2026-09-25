@@ -509,6 +509,10 @@ void cpp_typecheckt::default_assignop(
     .subtype()
     .add(ID_C_qualifier)
     .make_nil();
+  // N5008 [class.copy.assign]/2: implicitly declared, not user-provided --
+  // the mark __is_trivially_copyable reads ([class.prop]/1), mirroring
+  // #is_implicit_ctor / #is_implicit_dtor
+  declarator_type.set("#is_implicit_assign", true);
 
   exprt &args=static_cast<exprt&>(declarator.type().add(ID_parameters));
   args.add_source_location()=source_location;
