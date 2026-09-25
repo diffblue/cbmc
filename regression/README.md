@@ -15,6 +15,26 @@ This folder contains the CProver regression test-suite.
 - `thorough-smt-backend`:
   These tests are too slow to be run in CI with the SMT backend.
 
+### Standard library headers (`cbmc-cpp`)
+
+- `libcxx`:
+  These tests need the libc++ headers (`--stdlib libc++`); they are run only
+  where libc++ is installed.
+- `libstdcxx12`, `libstdcxx16`:
+  These tests need the libstdc++ headers of GCC 12 (resp. GCC 16) or later.
+  cbmc preprocesses with the host `gcc`, so `regression/cbmc-cpp`'s CMake and
+  Makefile exclude the tags whose version the host `gcc -dumpversion` does not
+  meet (`-X libstdcxx16`): with older headers the test would not exercise the
+  header shape it was written for.  A test for such a shape belongs here as
+  `CORE gcc-only libstdcxx16`, not as KNOWNBUG.
+- `gcc16`:
+  Tests motivated by the libstdc++ 16 header shapes; a grouping tag only (the
+  test may pass with older headers too).  Combine with `libstdcxx16` when the
+  newer headers are required.
+- `gcc-only`:
+  Tests that need `goto-cc` in gcc mode (excluded with MSVC or a non-GNU
+  build compiler).
+
 ### Solver
 
 - `broken-cprover-smt-backend`:

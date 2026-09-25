@@ -1,4 +1,4 @@
-KNOWNBUG gcc16
+KNOWNBUG gcc16 libstdcxx16
 main.cpp
 --cpp11 --object-bits 12
 ^EXIT=0$

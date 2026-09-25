@@ -1,4 +1,4 @@
-KNOWNBUG gcc16
+CORE gcc-only gcc16 libstdcxx16
 main.cpp
 --cpp17
 ^EXIT=0$
@@ -16,5 +16,5 @@ argument evaluated FALSE), dropping main.
 2026-09-25: PASSES with gcc 16.0.1 headers (g++-16 -E in the gcc16-test
 image, cbmc on the .ii): the templated explicit object parameter is deduced
 from the object expression now (cpp23_deducing_this_template_object_
-parameter, header-free).  Kept KNOWNBUG only because this host has no gcc-16
-headers to run it under test.pl; promote to CORE gcc16 on a gcc-16 host.
+parameter, header-free).  Tagged libstdcxx16: runs only where the host gcc
+is 16 or later (regression/README.md).
