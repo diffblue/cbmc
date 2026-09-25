@@ -112,6 +112,10 @@ void smt2_incremental_decision_proceduret::initialize_array_elements(
   identifier_table.emplace(array_identifier.identifier(), array_identifier);
   const std::vector<exprt> &elements = array.operands();
   const typet &index_type = array.type().index_type();
+  for(const auto &element : elements)
+  {
+    define_dependent_functions(element);
+  }
   for(std::size_t i = 0; i < elements.size(); ++i)
   {
     const smt_termt index = convert_expr_to_smt(from_integer(i, index_type));
@@ -126,6 +130,7 @@ void smt2_incremental_decision_proceduret::initialize_array_elements(
   const array_of_exprt &array,
   const smt_identifier_termt &array_identifier)
 {
+  define_dependent_functions(array.what());
   const smt_sortt index_type =
     convert_type_to_smt_sort(array.type().index_type());
   const smt_identifier_termt array_index_identifier{
@@ -171,6 +176,8 @@ void send_function_definition(
     &expression_identifiers,
   std::unordered_map<irep_idt, smt_identifier_termt> &identifier_table)
 {
+  if(identifier_table.count(symbol_identifier))
+    return;
   const smt_declare_function_commandt function{
     smt_identifier_termt(
       symbol_identifier, convert_type_to_smt_sort(expr.type())),
@@ -379,6 +386,8 @@ void smt2_incremental_decision_proceduret::define_index_identifiers(
       if(const auto with_expr = expr_try_dynamic_cast<with_exprt>(expr_node))
       {
         const auto index_expr = with_expr->where();
+        if(expression_identifiers.count(index_expr))
+          return;
         const auto index_term = convert_expr_to_smt(index_expr);
         const auto index_identifier =
           "index_" + std::to_string(index_sequence());
