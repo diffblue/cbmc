@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ tree of a class completed later: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+Unknown exception
+Invariant check failed
+dropped the body
+found no match
+--
+N5008 [temp.inst]/1 + [dcl.fct]/12: a function declaration's return type does
+not instantiate the specialization it names; a member function declaration's
+parameter types do not instantiate what they name either (the lazily kept
+typedef is resolved without elaboration inside the class body).  libstdc++ 16's
+std::set of a class defined after the set is first named.
