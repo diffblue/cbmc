@@ -1444,9 +1444,41 @@ void goto_program2codet::cleanup_code(
       code.op0().type() = bv_type;
       if(code.operands().size() == 2)
       {
-        exprt bit_mask =
-          from_integer(power(2, original_type.get_width()) - 1, bv_type);
-        code.op1() = bitand_exprt{code.op1(), bit_mask};
+        const std::size_t bf_width = original_type.get_width();
+        exprt bit_mask = from_integer(power(2, bf_width) - 1, bv_type);
+        // Sign-extension is only needed for a signed bit-field that is
+        // narrower than its underlying type. unsignedbv / c_bool / bv
+        // correctly keep the plain AND-mask below (no sign bit to extend).
+        // The bf_width >= 1 term guards the bf_width - 1 in the sign-bit
+        // computation against unsigned underflow; a zero-width bit-field is
+        // anonymous and not assignable, so this branch is not expected to see
+        // one, but we avoid crashing on it.
+        if(
+          bv_type.id() == ID_signedbv && bf_width >= 1 &&
+          bf_width < bv_type.get_width())
+        {
+          // For a signed bit-field that is narrower than its underlying type
+          // we need to sign-extend the stored value: writing to and reading
+          // back from such a bit-field yields a sign-extended value (per
+          // C11 6.5.16.1p3). Subsequent uses of this temporary - which we
+          // are about to give the underlying integer type - must therefore
+          // already observe the sign-extended value. We use the well-defined
+          // branchless sign-extension formula
+          //   ((v & mask) ^ sign_bit) - sign_bit
+          // where mask    = (1 << N) - 1
+          //       sign_bit = 1 << (N - 1)
+          // and N is the bit-field width. The intermediate result stays
+          // within the bit-field's value range, so this expression triggers
+          // neither signed overflow nor implementation-defined shifts.
+          const exprt sign_bit = from_integer(power(2, bf_width - 1), bv_type);
+          code.op1() = minus_exprt{
+            bitxor_exprt{bitand_exprt{code.op1(), bit_mask}, sign_bit},
+            sign_bit};
+        }
+        else
+        {
+          code.op1() = bitand_exprt{code.op1(), bit_mask};
+        }
       }
     }
 
