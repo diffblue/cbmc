@@ -251,6 +251,34 @@ int __builtin_isnanf(float f)
   return __CPROVER_isnanf(f);
 }
 
+/* FUNCTION: __builtin_isfinite */
+
+int __builtin_isfinite(double d)
+{
+  return __CPROVER_isfinited(d);
+}
+
+/* FUNCTION: __builtin_finite */
+
+int __builtin_finite(double d)
+{
+  return __CPROVER_isfinited(d);
+}
+
+/* FUNCTION: __builtin_finitef */
+
+int __builtin_finitef(float f)
+{
+  return __CPROVER_isfinitef(f);
+}
+
+/* FUNCTION: __builtin_finitel */
+
+int __builtin_finitel(long double ld)
+{
+  return __CPROVER_isfiniteld(ld);
+}
+
 /* FUNCTION: __builtin_huge_valf */
 
 float __builtin_huge_valf(void)
