@@ -187,7 +187,8 @@ void run_property_decider(
   "(unwind-min):"                                                              \
   "(unwind-max):"                                                              \
   "(ignore-properties-before-unwind-min)"                                      \
-  "(symex-cache-dereferences)" OPT_UNWINDSET
+  "(symex-cache-dereferences)"                                                 \
+  "(proof-explanation)" OPT_UNWINDSET
 
 #define HELP_BMC                                                               \
   " {y--paths} [strategy] \t explore paths one at a time\n"                    \
@@ -233,6 +234,8 @@ void run_property_decider(
   " {y--graphml-witness} {ufilename} \t write the witness in GraphML format "  \
   "to {ufilename}\n"                                                           \
   " {y--symex-cache-dereferences} \t enable caching of repeated "              \
-  "dereferences\n"
+  "dereferences\n"                                                             \
+  " {y--proof-explanation} \t "                                                \
+  "show word-level explanation for proved properties\n"
 
 #endif // CPROVER_GOTO_CHECKER_BMC_UTIL_H
