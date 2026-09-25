@@ -23,6 +23,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 #include "type2name.h"
 
+#include <set>
+
 bool c_typecheck_baset::empty_brace_value_initializes_scalar() const
 {
   // C [dcl.init]/11: empty braced-init-list `{}` for any object type
@@ -998,6 +1000,16 @@ c_typecheck_baset::make_designator(const typet &src_type, const exprt &src)
   return designator;
 }
 
+std::optional<exprt> c_typecheck_baset::default_member_initializer_value(
+  const struct_tag_typet &,
+  const struct_union_typet::componentt &,
+  const source_locationt &,
+  bool)
+{
+  // C has no default member initializers.
+  return {};
+}
+
 exprt c_typecheck_baset::do_initializer_list(
   const exprt &value,
   const typet &type,
@@ -1122,12 +1134,19 @@ exprt c_typecheck_baset::do_initializer_list(
 
   designator_enter(type, current_designator);
 
+  // The top-level elements (component indices) that an element of the
+  // initializer list initialized -- explicitly or through a designator.
+  std::set<std::size_t> explicitly_initialized;
+
   const exprt::operandst &operands = value.operands();
   for(exprt::operandst::const_iterator it = operands.begin();
       it != operands.end();) // no ++it
   {
     it = do_designated_initializer(
       result, current_designator, value, it, force_constant);
+
+    if(!current_designator.empty())
+      explicitly_initialized.insert(current_designator.front().index);
 
     // increase designator -- might go up
     increment_designator(current_designator);
@@ -1138,33 +1157,34 @@ exprt c_typecheck_baset::do_initializer_list(
     const struct_typet &full_struct_type = follow_tag(*struct_tag_type);
     const struct_typet::componentst &components = full_struct_type.components();
 
-    // C++ default member initializers: replace zero-initialized members
-    // with their default values for members not explicitly initialized.
+    // C++ N5008 [dcl.init.aggr]/5.1: an element that is not an explicitly
+    // initialized element is initialized from its default member
+    // initializer, if it has one (else it stays value-initialized, /5.2).
+    // "Explicitly initialized" is by designator or position, not by count:
+    // `{.c = 7}` initializes c and leaves a and b to their default member
+    // initializers, and brace elision may consume several list elements for
+    // one aggregate element.  (The C base has no default member
+    // initializers; the hook returns nothing.)
     std::size_t op_idx = 0;
-    std::size_t init_count = operands.size();
-    std::size_t data_idx = 0;
-    for(const auto &c : components)
+    for(std::size_t ci = 0; ci < components.size(); ++ci)
     {
+      const auto &c = components[ci];
       if(
         c.type().id() == ID_code || c.get_bool(ID_is_type) ||
         c.get_bool(ID_is_static))
       {
         continue;
       }
-      if(data_idx >= init_count && op_idx < result.operands().size())
+      if(
+        explicitly_initialized.find(ci) == explicitly_initialized.end() &&
+        op_idx < result.operands().size())
       {
-        const irept &default_val = c.find(ID_C_default_value);
-        if(default_val.is_not_nil())
-        {
-          exprt val = static_cast<const exprt &>(default_val);
-          typecheck_expr(val);
-          if(val.type() != c.type())
-            val = typecast_exprt(val, c.type());
-          result.operands()[op_idx] = val;
-        }
+        auto default_val = default_member_initializer_value(
+          *struct_tag_type, c, value.source_location(), force_constant);
+        if(default_val.has_value())
+          result.operands()[op_idx] = std::move(*default_val);
       }
       ++op_idx;
-      ++data_idx;
     }
 
     // make sure we didn't mess up index computation
