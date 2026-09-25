@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #define CPROVER_CPP_TEMPLATE_MAP_H
 
 #include <util/expr.h>
+#include <util/flat_map.h>
 
 #include "cpp_template_args.h"
 
@@ -45,7 +46,11 @@ public:
   // this maps template parameters to their instantiated value
   typedef std::map<irep_idt, typet> type_mapt;
   typedef std::map<irep_idt, exprt> expr_mapt;
-  typedef std::map<irep_idt, std::size_t> pack_size_mapt;
+  // A sorted vector rather than a std::map: the template map is copied on
+  // every save/restore around an instantiation (220k times for a libc++
+  // <span> program), and these two size maps hold ~150 entries each --
+  // node-by-node copies of them were 8% of the run.
+  typedef flat_mapt<irep_idt, std::size_t> pack_size_mapt;
   typedef std::map<irep_idt, std::vector<typet>> pack_args_mapt;
   type_mapt type_map;
   expr_mapt expr_map;
@@ -67,7 +72,7 @@ public:
   /// only be matched by its short name, the most recently bound candidate is
   /// the innermost declaration and, per N5008 [basic.scope.scope] (name
   /// hiding), the one the reference denotes.  Missing entries are oldest.
-  typedef std::map<irep_idt, std::size_t> generation_mapt;
+  typedef flat_mapt<irep_idt, std::size_t> generation_mapt;
   generation_mapt generation_map;
   static std::size_t next_generation();
   /// bind a pack's element count, recording the binding's generation
