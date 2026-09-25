@@ -2058,6 +2058,65 @@ bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
   return false;
 }
 
+/// N5008 [temp.param]/4: a type-constraint `C T' (or `ns::C T', or
+/// `C<A1, ..., An> T') on a type template parameter introduces the
+/// constraint-expression `C<T>' (`C<T, A1, ..., An>') into the
+/// template's associated constraints ([temp.constr.decl]/3, conjoined with
+/// a requires-clause).  Build that expression and record it on the
+/// parameter (`#C_type_constraint'), so that function overload resolution
+/// decides satisfaction with the same evaluator as a requires-clause --
+/// `template<Integral T> int g(T)' vs `template<Floating T> int g(T)' picked
+/// the first declared for every call.  (Class template partial
+/// specializations keep ordering by the recorded concept NAME.)
+void cpp_typecheckt::add_type_constraint(
+  exprt &parameter,
+  const irep_idt &concept_name,
+  const cpp_namet &parameter_name,
+  const irept &constraint_args)
+{
+  if(concept_name.empty() || parameter_name.is_nil())
+    return;
+  // `ns::C' -> name components
+  cpp_namet concept_id;
+  const std::string name_str = id2string(concept_name);
+  std::string::size_type start = 0;
+  for(;;)
+  {
+    const auto sep = name_str.find("::", start);
+    const std::string component = name_str.substr(
+      start, sep == std::string::npos ? std::string::npos : sep - start);
+    if(!component.empty())
+    {
+      irept name(ID_name);
+      name.set(ID_identifier, component);
+      concept_id.get_sub().push_back(name);
+    }
+    if(sep == std::string::npos)
+      break;
+    concept_id.get_sub().push_back(irept(ID_scope_resolution));
+    start = sep + 2;
+  }
+  // `<T, A1, ..., An>': the parameter first, then the type-constraint's
+  // own arguments, if any
+  exprt type_argument(ID_type);
+  type_argument.type() =
+    static_cast<const typet &>(static_cast<const irept &>(parameter_name));
+  irept template_args(ID_template_args);
+  irept &arguments = template_args.add(ID_arguments);
+  arguments.get_sub().push_back(type_argument);
+  if(constraint_args.is_not_nil())
+  {
+    for(const auto &arg : constraint_args.get_sub())
+      arguments.get_sub().push_back(arg);
+  }
+  concept_id.get_sub().push_back(template_args);
+  exprt constraint_expression =
+    static_cast<const exprt &>(static_cast<const irept &>(concept_id));
+  constraint_expression.add_source_location() =
+    parameter_name.source_location();
+  parameter.add("#C_type_constraint") = std::move(constraint_expression);
+}
+
 cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
 {
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
@@ -2131,7 +2190,14 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
       // Preserve concept constraint for C++20 concept subsumption
       const irep_idt &constraint = declaration.get("#C_concept_constraint");
       if(!constraint.empty())
+      {
         parameter.set("#C_concept_constraint", constraint);
+        add_type_constraint(
+          parameter,
+          declaration.get("#C_concept_constraint_name"),
+          declarator.name(),
+          declaration.find("#C_concept_constraint_args"));
+      }
     }
     else
     {
@@ -2164,6 +2230,8 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
           parameter = type_exprt(template_parameter_symbol_typet(identifier));
           parameter.type().add_source_location() =
             declaration.find_source_location();
+          add_type_constraint(
+            parameter, cname, declarator.name(), irept(ID_nil));
           // Sanitize :: for identifier generation
           std::string::size_type p;
           while((p = cname.find("::")) != std::string::npos)
