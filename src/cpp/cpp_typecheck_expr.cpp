@@ -848,11 +848,41 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   }
   else if(expr.id() == ID_symbol)
   {
-    // ignore here
-#ifdef DEBUG
-    std::cerr << "E: " << expr.pretty() << '\n';
-    std::cerr << "cpp_typecheckt::typecheck_expr_main got symbol\n";
-#endif
+    // A symbol expression is normally already resolved.  The one exception
+    // is a TYPELESS reference to a CPROVER primitive in the synthesized body
+    // of a GCC polymorphic builtin (`__CPROVER_atomic_begin' in
+    // __atomic_fetch_add's implementation, c_typecheck_gcc_polymorphic_
+    // builtins.cpp): the C front end resolves it in typecheck_expr_symbol,
+    // this one left it typeless, and the call then failed ("function call
+    // expects function or function pointer as argument") -- so every
+    // __atomic_* / __sync_* builtin was unusable in C++, and with it
+    // libstdc++'s __gnu_cxx::__atomic_add (shared_ptr, locale).
+    const irep_idt &identifier = to_symbol_expr(expr).get_identifier();
+    if(expr.type().is_nil() || expr.type().id().empty())
+    {
+      // a CPROVER primitive is declared on first use (builtin_factory), as
+      // the C front end does on a failed lookup
+      if(!symbol_table.has_symbol(identifier))
+        builtin_factory(identifier);
+      const symbolt *symbol = symbol_table.lookup(identifier);
+      if(symbol != nullptr && !symbol->is_type)
+        expr.type() = symbol->type;
+    }
+    // The same synthesized bodies name their C-mode locals (`result') by a
+    // typed symbol expression without the lvalue mark the C front end's
+    // typecheck_expr_symbol would add (`&result' then failed: "not an
+    // lvalue").  C++ symbols are resolved -- and marked -- by the resolver;
+    // C-mode ones are not, so mark those here.
+    if(!expr.get_bool(ID_C_lvalue))
+    {
+      const symbolt *symbol = symbol_table.lookup(identifier);
+      if(
+        symbol != nullptr && symbol->mode == ID_C && symbol->is_lvalue &&
+        !symbol->is_type && !symbol->is_macro)
+      {
+        expr.set(ID_C_lvalue, true);
+      }
+    }
   }
   else if(expr.id() == "__is_base_of")
   {
@@ -5555,6 +5585,25 @@ bool cpp_typecheckt::implicit_pod_assignment_call(
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
+  // A TYPELESS symbol as the callee is the synthesized body of a GCC
+  // polymorphic builtin calling another one (`__atomic_load_n' calls
+  // `__atomic_load', c_typecheck_gcc_polymorphic_builtins.cpp) or a CPROVER
+  // primitive (`__CPROVER_atomic_begin'); the C front end resolves it in
+  // typecheck_expr_symbol.  Hand it to the name path, which knows both
+  // (typecheck_gcc_polymorphic_builtin, builtin_factory).
+  if(
+    expr.function().id() == ID_symbol &&
+    (expr.function().type().is_nil() || expr.function().type().id().empty()))
+  {
+    const irep_idt &identifier =
+      to_symbol_expr(expr.function()).get_identifier();
+    if(!symbol_table.has_symbol(identifier))
+    {
+      cpp_namet name{identifier, expr.function().source_location()};
+      expr.function() = name.as_expr();
+    }
+  }
+
   // N5008 [expr.type.conv]: a functional cast `T(args...)` whose T came
   // from substituting a template parameter is left by template_map::
   // apply as a function-call node whose CALLEE slot holds the RAW TYPE
