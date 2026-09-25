@@ -1198,9 +1198,41 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         }
         expr = trivial ? exprt(true_exprt()) : exprt(false_exprt());
       }
+      else if(expr.id() == "__is_trivially_constructible")
+      {
+        // N5008 [meta.unary.prop]: is_trivially_constructible<T, Args...>
+        // -- is_constructible and the variable definition calls no
+        // non-trivial operation.  For the copy/move case (one argument of
+        // the same class type, [class.copy.ctor]/11) that is: the class
+        // has no user-provided copy/move constructor and its bases and
+        // members are trivially copyable -- is_trivially_copyable_type.
+        // Was an unconditional TRUE, so `NT(const NT &)' counted as
+        // trivially copy constructible (libc++ variant's trait).
+        typet u = t2;
+        if(is_reference(u))
+          u = to_reference_type(u).base_type();
+        u.remove(ID_C_constant);
+        u.remove(ID_C_volatile);
+        typet t1_plain = t1;
+        t1_plain.remove(ID_C_constant);
+        t1_plain.remove(ID_C_volatile);
+        const bool same_class = t1_plain.id() == ID_struct_tag &&
+                                u.id() == ID_struct_tag &&
+                                to_struct_tag_type(t1_plain).get_identifier() ==
+                                  to_struct_tag_type(u).get_identifier();
+        if(same_class)
+          expr = is_trivially_copyable_type(t1_plain, false, 16)
+                   ? exprt(true_exprt())
+                   : exprt(false_exprt());
+        else if(t1_plain.id() == ID_struct_tag || t1_plain.id() == ID_union_tag)
+          expr = false_exprt(); // converting construction: a call
+        else
+          expr = true_exprt(); // a scalar from a scalar
+      }
       else
       {
-        // __is_trivially_constructible(T, U) — copy/move constructible
+        // __is_nothrow_constructible(T, U): nothrow is about exceptions,
+        // which are not modelled
         expr = true_exprt();
       }
     }
