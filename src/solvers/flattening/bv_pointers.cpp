@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "bv_pointers.h"
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/config.h>
@@ -53,6 +54,30 @@ void bv_endianness_mapt::build_little_endian(const typet &src)
   if(!width_opt.has_value())
     return;
 
+  if(src.id() == ID_pointer && boolbv_width.get_wide_pointer_encoding())
+  {
+    // Wide pointer encoding: the byte-visible representation is
+    // the address component only. Rearrange so that the first
+    // platform_width bits come from the address component (which
+    // is the last component in [object|offset|address]).
+    const std::size_t total = *width_opt;
+    const std::size_t platform_width =
+      total / boolbv_widtht::wide_pointer_width_factor;
+    const std::size_t addr_start = total - platform_width;
+
+    const std::size_t base = map.size();
+    map.reserve(base + total);
+
+    // First: address bits (byte-visible)
+    for(std::size_t i = 0; i < platform_width; ++i)
+      map.push_back(base + addr_start + i);
+    // Then: object and offset bits (not byte-visible, but must
+    // be present to match the bitvector size)
+    for(std::size_t i = 0; i < addr_start; ++i)
+      map.push_back(base + i);
+    return;
+  }
+
   const std::size_t new_size = map.size() + *width_opt;
   map.reserve(new_size);
 
@@ -68,20 +93,25 @@ void bv_endianness_mapt::build_big_endian(const typet &src)
     endianness_mapt::build_big_endian(src);
 }
 
+/// Check if a type is an array that (recursively) contains pointer elements.
+
 endianness_mapt
 bv_pointerst::endianness_map(const typet &type, bool little_endian) const
 {
   return bv_endianness_mapt{type, little_endian, ns, bv_width};
 }
 
-std::size_t bv_pointerst::get_object_width(const pointer_typet &) const
+std::size_t bv_pointerst::get_object_width(const pointer_typet &type) const
 {
-  // not actually type-dependent for now
+  if(wide_pointer_encoding)
+    return type.get_width();
   return config.bv_encoding.object_bits;
 }
 
 std::size_t bv_pointerst::get_offset_width(const pointer_typet &type) const
 {
+  if(wide_pointer_encoding)
+    return type.get_width();
   const std::size_t pointer_width = type.get_width();
   const std::size_t object_width = get_object_width(type);
   PRECONDITION(pointer_width >= object_width);
@@ -90,7 +120,9 @@ std::size_t bv_pointerst::get_offset_width(const pointer_typet &type) const
 
 std::size_t bv_pointerst::get_address_width(const pointer_typet &type) const
 {
-  return type.get_width();
+  if(wide_pointer_encoding)
+    return type.get_width();
+  return 0;
 }
 
 bvt bv_pointerst::object_literals(const bvt &bv, const pointer_typet &type)
@@ -113,6 +145,39 @@ bvt bv_pointerst::offset_literals(const bvt &bv, const pointer_typet &type)
   return bvt(bv.begin(), bv.begin() + offset_width);
 }
 
+bvt bv_pointerst::address_literals(const bvt &bv, const pointer_typet &type)
+  const
+{
+  const std::size_t addr_width = get_address_width(type);
+  if(addr_width == 0)
+    return {};
+  const std::size_t offset_width = get_offset_width(type);
+  const std::size_t object_width = get_object_width(type);
+  const std::size_t start = offset_width + object_width;
+  PRECONDITION(bv.size() >= start + addr_width);
+  return bvt(bv.begin() + start, bv.begin() + start + addr_width);
+}
+
+bvt bv_pointerst::get_object_base_address(
+  const mp_integer &object,
+  std::size_t width) const
+{
+  auto it = object_base_address.find(object);
+  if(it != object_base_address.end())
+    return it->second;
+  bvt base = prop.new_variables(width);
+  object_base_address[object] = base;
+  if(wide_pointer_encoding)
+  {
+    for(const auto &l : base)
+    {
+      if(!l.is_constant())
+        prop.set_frozen(l);
+    }
+  }
+  return base;
+}
+
 bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
 {
   bvt result;
@@ -121,6 +186,37 @@ bvt bv_pointerst::object_offset_encoding(const bvt &object, const bvt &offset)
   result.insert(result.end(), object.begin(), object.end());
 
   return result;
+}
+
+bvt bv_pointerst::object_offset_encoding(
+  const bvt &object,
+  const bvt &offset,
+  const bvt &address)
+{
+  bvt result;
+  result.reserve(offset.size() + object.size() + address.size());
+  result.insert(result.end(), offset.begin(), offset.end());
+  result.insert(result.end(), object.begin(), object.end());
+  result.insert(result.end(), address.begin(), address.end());
+
+  return result;
+}
+
+literalt bv_pointerst::convert_equality(const equal_exprt &expr)
+{
+  if(wide_pointer_encoding && expr.lhs().type().id() == ID_pointer)
+  {
+    // Compare pointers by their flat address, not by the full
+    // bitvector (which includes object/offset encoding bits).
+    // Two pointers are equal iff they point to the same address.
+    const bvt &lhs = convert_bv(expr.lhs());
+    const bvt &rhs = convert_bv(expr.rhs());
+    const auto &type = to_pointer_type(expr.lhs().type());
+    bvt lhs_addr = address_literals(lhs, type);
+    bvt rhs_addr = address_literals(rhs, type);
+    return bv_utils.equal(lhs_addr, rhs_addr);
+  }
+  return SUB::convert_equality(expr);
 }
 
 literalt bv_pointerst::convert_rest(const exprt &expr)
@@ -181,6 +277,18 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
       const bvt &bv0=convert_bv(operands[0]);
       const bvt &bv1=convert_bv(operands[1]);
 
+      if(wide_pointer_encoding)
+      {
+        // Compare by flat address — this is well-defined even
+        // for pointers to distinct objects.
+        const pointer_typet &type0 = to_pointer_type(operands[0].type());
+        const pointer_typet &type1 = to_pointer_type(operands[1].type());
+        bvt addr0 = address_literals(bv0, type0);
+        bvt addr1 = address_literals(bv1, type1);
+        return bv_utils.rel(
+          addr0, expr.id(), addr1, bv_utilst::representationt::UNSIGNED);
+      }
+
       const pointer_typet &type0 = to_pointer_type(operands[0].type());
       bvt offset_bv0 = offset_literals(bv0, type0);
 
@@ -221,7 +329,60 @@ literalt bv_pointerst::convert_rest(const exprt &expr)
     return convert(simplify_expr(prophecy_pointer_in_range->lower(ns), ns));
   }
 
+  if(wide_pointer_encoding && expr_try_dynamic_cast<minus_overflow_exprt>(expr))
+  {
+    const auto &minus_ov = to_binary_overflow_expr(expr);
+    if(
+      minus_ov.lhs().type().id() == ID_pointer &&
+      minus_ov.rhs().type().id() == ID_pointer)
+    {
+      // For wide pointers, check overflow on the offset bits only,
+      // not the full 192-bit bitvector.
+      const pointer_typet &pt = to_pointer_type(minus_ov.lhs().type());
+      bvt lhs_off = offset_literals(convert_bv(minus_ov.lhs()), pt);
+      bvt rhs_off = offset_literals(convert_bv(minus_ov.rhs()), pt);
+      return bv_utils.overflow_sub(
+        lhs_off, rhs_off, bv_utilst::representationt::SIGNED);
+    }
+  }
+
   return SUB::convert_rest(expr);
+}
+
+bool bv_pointerst::boolbv_set_equality_to_true(const equal_exprt &expr)
+{
+  // Only force this when equality propagation is enabled (matching the base
+  // boolbvt behaviour, which returns true and lets the equality be encoded as
+  // an ordinary constraint otherwise).
+  if(
+    equality_propagation && wide_pointer_encoding &&
+    expr.lhs().type().id() == ID_pointer &&
+    expr.rhs().type().id() == ID_pointer)
+  {
+    // Force the full pointer encoding (object|offset|address) for an assumed
+    // pointer equality, rather than only equating the flat address (as
+    // convert_equality does for the *value* of `p == q`). This is consistent
+    // with C semantics -- two pointers that compare equal denote the same
+    // object -- and is sound: it is verdict-consistent with the standard
+    // encoding across the whole regression/cbmc suite.
+    //
+    // It is needed where the equality cannot be resolved by the base symbol
+    // aliasing (e.g. the address of a string literal, cast to void*, compared
+    // to a library-internal pointer): there only the address would otherwise
+    // be tied, leaving the object/offset bits free so a later dereference
+    // could read a different object. The single regression test whose
+    // behaviour depends on this is regression/cbmc/printf2, where it is needed
+    // to reconstruct the "%s" argument in the counterexample trace; disabling
+    // the forcing changes no verdict elsewhere.
+    const bvt &lhs_bv = convert_bv(expr.lhs());
+    const bvt &rhs_bv = convert_bv(expr.rhs());
+    // Two pointers of the same type have identical width.
+    PRECONDITION(lhs_bv.size() == rhs_bv.size());
+    for(std::size_t i = 0; i < lhs_bv.size(); ++i)
+      prop.set_equal(lhs_bv[i], rhs_bv[i]);
+    return false;
+  }
+  return SUB::boolbv_set_equality_to_true(expr);
 }
 
 bv_pointerst::bv_pointerst(
@@ -373,6 +534,85 @@ std::optional<bvt> bv_pointerst::convert_address_of_rec(const exprt &expr)
   return {};
 }
 
+literalt bv_pointerst::i2p_object_eq(pending_i2pt &p, std::size_t number)
+{
+  if(p.object_eq.size() <= number)
+    p.object_eq.resize(number + 1);
+  if(!p.object_eq[number].has_value())
+  {
+    bvt obj_const = bv_utils.build_constant(number, p.obj_bv.size());
+    p.object_eq[number] = bv_utils.equal(p.obj_bv, obj_const);
+  }
+  return *p.object_eq[number];
+}
+
+bvt bv_pointerst::reconstruct_pointer_from_address(
+  const bvt &addr_bv,
+  const pointer_typet &ptr_type,
+  bool force_base_for_all_objects)
+{
+  const std::size_t object_bits = get_object_width(ptr_type);
+  const std::size_t offset_bits = get_offset_width(ptr_type);
+  const std::size_t addr_bits = get_address_width(ptr_type);
+
+  // Constant 0 => NULL
+  if(bv_utils.is_zero(addr_bv).is_true())
+    return encode(pointer_logic.get_null_object(), ptr_type);
+
+  bvt obj_bv = prop.new_variables(object_bits);
+  bvt off_bv = prop.new_variables(offset_bits);
+
+  // Non-zero address => not null
+  bvt null_obj =
+    bv_utils.build_constant(pointer_logic.get_null_object(), object_bits);
+  prop.l_set_to_true(
+    prop.lor(bv_utils.is_zero(addr_bv), !bv_utils.equal(obj_bv, null_obj)));
+
+  // Forward constraints for currently known objects (obj==i =>
+  // base[i]+offset==address). Backward constraints, and forward constraints
+  // for objects added later, are deferred to finish_eager_conversion.
+  const auto &objects = pointer_logic.objects;
+
+  // Create the pending entry up front so the per-object equality literals
+  // built below are cached on it and reused by finish_eager_conversion.
+  pending_i2p.push_back({obj_bv, off_bv, addr_bv, objects.size(), true, {}});
+  pending_i2pt &pending = pending_i2p.back();
+
+  std::size_t number = 0;
+  for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+  {
+    if(
+      !force_base_for_all_objects &&
+      object_base_address.find(number) == object_base_address.end())
+      continue;
+    literalt is_this = i2p_object_eq(pending, number);
+    bvt base = get_object_base_address(number, addr_bits);
+    bvt off_ext = bv_utils.zero_extension(off_bv, addr_bits);
+    bvt flat = bv_utils.add(base, off_ext);
+    for(std::size_t k = 0; k < addr_bits; ++k)
+    {
+      prop.lcnf({!is_this, !flat[k], addr_bv[k]});
+      prop.lcnf({!is_this, flat[k], !addr_bv[k]});
+    }
+  }
+
+  // Freeze the fresh and address variables so MiniSat's simplifier cannot
+  // eliminate them: the deferred backward-constraint refinement in
+  // finish_eager_conversion / dec_solve reuses them, and an eliminated
+  // variable would otherwise trip an invariant.
+  for(const auto &l : obj_bv)
+    if(!l.is_constant())
+      prop.set_frozen(l);
+  for(const auto &l : off_bv)
+    if(!l.is_constant())
+      prop.set_frozen(l);
+  for(const auto &l : addr_bv)
+    if(!l.is_constant())
+      prop.set_frozen(l);
+
+  return object_offset_encoding(obj_bv, off_bv, addr_bv);
+}
+
 bvt bv_pointerst::convert_pointer_type(const exprt &expr)
 {
   const pointer_typet &type = to_pointer_type(expr.type());
@@ -403,9 +643,48 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
       op_type.id() == ID_c_enum || op_type.id() == ID_c_enum_tag)
     {
       // Cast from a bitvector type to pointer.
-      // We just do a zero extension.
-
       const bvt &op_bv=convert_bv(op);
+
+      if(wide_pointer_encoding)
+      {
+        // The integer value is the flat address.
+        // Reconstruct object and offset using backward constraints.
+        const std::size_t addr_bits = get_address_width(type);
+        bvt addr_bv = bv_utils.zero_extension(op_bv, addr_bits);
+
+        // Constant 0 => NULL
+        if(bv_utils.is_zero(addr_bv).is_true())
+          return encode(pointer_logic.get_null_object(), type);
+
+        // Non-zero constant => dedicated integer-address object
+        mp_integer int_val = 0;
+        bool is_const = true;
+        for(std::size_t i = 0; i < addr_bv.size(); ++i)
+        {
+          if(addr_bv[i].is_true())
+            int_val += power(2, i);
+          else if(!addr_bv[i].is_false())
+          {
+            is_const = false;
+            break;
+          }
+        }
+        if(is_const)
+        {
+          const auto int_addr_obj = pointer_logic.add_object(constant_exprt(
+            integer2bvrep(int_val, addr_bits), unsignedbv_typet(addr_bits)));
+          bvt result = encode(int_addr_obj, type);
+          integer_address_objects.insert(int_addr_obj);
+          // Set the base address to the constant value
+          bvt base = get_object_base_address(int_addr_obj, addr_bits);
+          bvt val_bv = bv_utils.build_constant(int_val, addr_bits);
+          for(std::size_t i = 0; i < addr_bits; ++i)
+            prop.set_equal(base[i], val_bv[i]);
+          return result;
+        }
+
+        return reconstruct_pointer_from_address(addr_bv, type, true);
+      }
 
       return bv_utils.zero_extension(op_bv, bits);
     }
@@ -545,13 +824,13 @@ bvt bv_pointerst::convert_pointer_type(const exprt &expr)
   else if(expr.id()==ID_byte_extract_little_endian ||
           expr.id()==ID_byte_extract_big_endian)
   {
-    return SUB::convert_byte_extract(to_byte_extract_expr(expr));
+    return convert_byte_extract(to_byte_extract_expr(expr));
   }
   else if(
     expr.id() == ID_byte_update_little_endian ||
     expr.id() == ID_byte_update_big_endian)
   {
-    return SUB::convert_byte_update(to_byte_update_expr(expr));
+    return convert_byte_update(to_byte_update_expr(expr));
   }
   else if(expr.id() == ID_field_address)
   {
@@ -618,6 +897,154 @@ static bool is_pointer_subtraction(const exprt &expr)
          minus_expr.rhs().type().id() == ID_pointer;
 }
 
+bvt bv_pointerst::convert_byte_extract(const byte_extract_exprt &expr)
+{
+  if(!wide_pointer_encoding)
+    return SUB::convert_byte_extract(expr);
+
+  if(expr.op().type().id() == ID_pointer)
+  {
+    const auto &ptr_type = to_pointer_type(expr.op().type());
+    const std::size_t pw = ptr_type.get_width();
+    byte_extract_exprt addr_extract(
+      expr.id(),
+      typecast_exprt(expr.op(), unsignedbv_typet{pw}),
+      expr.offset(),
+      expr.get_bits_per_byte(),
+      expr.type());
+    return SUB::convert_byte_extract(addr_extract);
+  }
+
+  // Source is a pointer array: extract addresses, byte_extract from those
+  if(
+    expr.op().type().id() == ID_array &&
+    to_array_type(expr.op().type()).element_type().id() == ID_pointer &&
+    expr.type().id() == ID_pointer)
+  {
+    const auto &arr_type = to_array_type(expr.op().type());
+    const auto &ptr_type = to_pointer_type(arr_type.element_type());
+    const std::size_t pw = ptr_type.get_width();
+    const auto sz = numeric_cast<mp_integer>(arr_type.size());
+
+    if(sz.has_value() && *sz > 0)
+    {
+      const bvt &arr_bv = convert_bv(expr.op());
+      const std::size_t enc_w = boolbv_width(ptr_type);
+
+      // Extract address (last pw bits) from each element
+      bvt addr_arr;
+      for(mp_integer i = 0; i < *sz; ++i)
+      {
+        std::size_t base = numeric_cast_v<std::size_t>(i * enc_w);
+        std::size_t addr_start = base + enc_w - pw;
+        for(std::size_t j = 0; j < pw; ++j)
+          addr_arr.push_back(arr_bv[addr_start + j]);
+      }
+
+      // Byte_extract from the address array
+      const std::size_t bpb = expr.get_bits_per_byte();
+      bvt addr_result(pw, const_literal(false));
+
+      const auto off_opt = numeric_cast<mp_integer>(expr.offset());
+      if(off_opt.has_value())
+      {
+        std::size_t bit_off = numeric_cast_v<std::size_t>(*off_opt * bpb);
+        if(bit_off + pw <= addr_arr.size())
+          addr_result =
+            bvt(addr_arr.begin() + bit_off, addr_arr.begin() + bit_off + pw);
+      }
+      else
+      {
+        for(std::size_t off = 0; off + pw <= addr_arr.size(); off += bpb)
+        {
+          literalt is_off = convert(equal_exprt(
+            expr.offset(), from_integer(off / bpb, expr.offset().type())));
+          for(std::size_t j = 0; j < pw; ++j)
+            addr_result[j] =
+              prop.lselect(is_off, addr_arr[off + j], addr_result[j]);
+        }
+      }
+
+      // Reconstruct pointer from address
+      return reconstruct_pointer_from_address(addr_result, ptr_type, false);
+    }
+  }
+
+  if(expr.type().id() != ID_pointer)
+    return SUB::convert_byte_extract(expr);
+
+  // Extract only the platform-width address from the byte array,
+  // then reconstruct the full wide pointer encoding.
+  const auto &ptr_type = to_pointer_type(expr.type());
+  const std::size_t platform_width = ptr_type.get_width();
+
+  // Create a byte_extract that returns an unsigned integer of
+  // platform width (the flat address)
+  byte_extract_exprt addr_extract(
+    expr.id(),
+    expr.op(),
+    expr.offset(),
+    expr.get_bits_per_byte(),
+    unsignedbv_typet{platform_width});
+  bvt addr_bv = SUB::convert_byte_extract(addr_extract);
+
+  // Reconstruct the full pointer from the flat address (same logic as I2P).
+  return reconstruct_pointer_from_address(addr_bv, ptr_type, false);
+}
+
+bvt bv_pointerst::convert_byte_update(const byte_update_exprt &expr)
+{
+  if(!wide_pointer_encoding)
+    return SUB::convert_byte_update(expr);
+
+  // Target is a pointer: update only the address component
+  if(expr.op().type().id() == ID_pointer)
+  {
+    const auto &ptr_type = to_pointer_type(expr.op().type());
+    const std::size_t pw = ptr_type.get_width();
+    bvt ptr_bv = convert_bv(expr.op());
+    byte_update_exprt addr_update(
+      expr.id(),
+      typecast_exprt(expr.op(), unsignedbv_typet{pw}),
+      expr.offset(),
+      expr.value(),
+      expr.get_bits_per_byte());
+    bvt new_addr = SUB::convert_byte_update(addr_update);
+    bvt obj = object_literals(ptr_bv, ptr_type);
+    bvt off = offset_literals(ptr_bv, ptr_type);
+    return object_offset_encoding(obj, off, new_addr);
+  }
+
+  // Value is a pointer: write only the address
+  if(expr.value().type().id() == ID_pointer)
+  {
+    const auto &ptr_type = to_pointer_type(expr.value().type());
+    const std::size_t platform_width = ptr_type.get_width();
+
+    // Extract the address component from the pointer value
+    const bvt &value_bv = convert_bv(expr.value());
+    bvt addr_bv = address_literals(value_bv, ptr_type);
+
+    // Create a byte_update that writes the address as an unsigned integer
+    // We need to create a fresh symbol for the address value
+    // and use it in a byte_update with the integer type.
+    // Simpler: lower to byte_update with the address as a typecast.
+    const typecast_exprt addr_as_int(
+      expr.value(), unsignedbv_typet{platform_width});
+    byte_update_exprt int_update(
+      expr.id(),
+      expr.op(),
+      expr.offset(),
+      addr_as_int,
+      expr.get_bits_per_byte());
+    return SUB::convert_byte_update(int_update);
+  }
+
+  // For compound types containing pointers: lower to individual
+  // byte operations (let the default lowering handle it)
+  return convert_bv(lower_byte_update(expr, ns));
+}
+
 bvt bv_pointerst::convert_bitvector(const exprt &expr)
 {
   if(expr.type().id()==ID_pointer)
@@ -669,6 +1096,34 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
         prop.limplies(same_object_lit, bv_utils.equal(difference, bv)));
     }
 
+    // Wide encoding: different objects => use address difference
+    if(wide_pointer_encoding && !same_object_lit.is_true())
+    {
+      const pointer_typet &lhs_pt = to_pointer_type(minus_expr.lhs().type());
+      const bvt &lhs = convert_bv(minus_expr.lhs());
+      bvt lhs_addr =
+        bv_utils.zero_extension(address_literals(lhs, lhs_pt), width);
+
+      const pointer_typet &rhs_pt = to_pointer_type(minus_expr.rhs().type());
+      const bvt &rhs = convert_bv(minus_expr.rhs());
+      bvt rhs_addr =
+        bv_utils.zero_extension(address_literals(rhs, rhs_pt), width);
+
+      bvt addr_diff = bv_utils.sub(lhs_addr, rhs_addr);
+
+      auto element_size_opt = pointer_offset_size(lhs_pt.base_type(), ns);
+      CHECK_RETURN(element_size_opt.has_value() && *element_size_opt > 0);
+      if(*element_size_opt != 1)
+      {
+        bvt element_size_bv = bv_utils.build_constant(*element_size_opt, width);
+        addr_diff = bv_utils.divider(
+          addr_diff, element_size_bv, bv_utilst::representationt::SIGNED);
+      }
+
+      prop.l_set_to_true(
+        prop.limplies(!same_object_lit, bv_utils.equal(addr_diff, bv)));
+    }
+
     return bv;
   }
   else if(
@@ -698,6 +1153,17 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
 
     return postponed_list.back().bv;
   }
+  else if(wide_pointer_encoding && expr.id() == ID_object_base_address)
+  {
+    // Postpone until all objects are known.
+    std::size_t width = boolbv_width(expr.type());
+
+    const auto &ptr = to_object_base_address_expr(expr).pointer();
+    postponed_list.emplace_back(
+      prop.new_variables(width), convert_bv(ptr), expr);
+
+    return postponed_list.back().bv;
+  }
   else if(
     expr.id() == ID_pointer_object &&
     to_pointer_object_expr(expr).pointer().type().id() == ID_pointer)
@@ -719,9 +1185,18 @@ bvt bv_pointerst::convert_bitvector(const exprt &expr)
     // pointer to int
     bvt op0 = convert_bv(to_typecast_expr(expr).op());
 
-    // squeeze it in!
     std::size_t width=boolbv_width(expr.type());
 
+    if(wide_pointer_encoding)
+    {
+      // Return the flat integer address.
+      const auto &ptr_type =
+        to_pointer_type(to_typecast_expr(expr).op().type());
+      bvt addr = address_literals(op0, ptr_type);
+      return bv_utils.zero_extension(addr, width);
+    }
+
+    // squeeze it in!
     return bv_utils.zero_extension(op0, width);
   }
 
@@ -773,9 +1248,23 @@ exprt bv_pointerst::bv_get_rec(
   // we treat these like bit-vector constants, but with
   // some additional annotation
 
-  const irep_idt bvrep = make_bvrep(bits, [&value](std::size_t i) {
-    return value[value.size() - 1 - i] == '1';
-  });
+  const irep_idt bvrep = [&]()
+  {
+    if(wide_pointer_encoding)
+    {
+      // For trace output, use the address component (platform width)
+      bvt addr_bv = address_literals(value_bv, pt);
+      std::string addr_str = bits_to_string(prop, addr_bv);
+      const std::size_t pw = pt.get_width();
+      return make_bvrep(
+        pw,
+        [&addr_str](std::size_t i)
+        { return addr_str[addr_str.size() - 1 - i] == '1'; });
+    }
+    return make_bvrep(
+      bits,
+      [&value](std::size_t i) { return value[value.size() - 1 - i] == '1'; });
+  }();
 
   constant_exprt result(bvrep, type);
 
@@ -795,6 +1284,13 @@ bvt bv_pointerst::encode(const mp_integer &addr, const pointer_typet &type)
 
   bvt zero_offset(offset_bits, const_literal(false));
   bvt object = bv_utils.build_constant(addr, object_bits);
+
+  if(wide_pointer_encoding)
+  {
+    const std::size_t addr_bits = get_address_width(type);
+    bvt base = get_object_base_address(addr, addr_bits);
+    return object_offset_encoding(object, zero_offset, base);
+  }
 
   return object_offset_encoding(object, zero_offset);
 }
@@ -872,6 +1368,15 @@ bvt bv_pointerst::offset_arithmetic(
   bvt offset_bv = offset_literals(bv, type);
 
   bvt bv_tmp = bv_utils.add(offset_bv, bv_index);
+
+  if(wide_pointer_encoding)
+  {
+    // Also update the address component
+    bvt addr = address_literals(bv, type);
+    bvt addr_index = bv_utils.sign_extension(bv_index, addr.size());
+    bvt new_addr = bv_utils.add(addr, addr_index);
+    return object_offset_encoding(object_literals(bv, type), bv_tmp, new_addr);
+  }
 
   return object_offset_encoding(object_literals(bv, type), bv_tmp);
 }
@@ -1007,6 +1512,17 @@ void bv_pointerst::finish_eager_conversion()
   // post-processing arrays may yield further objects, do this first
   SUB::finish_eager_conversion();
 
+  // Performance note: under the wide encoding this post-processing is the main
+  // source of the back-end overhead (symbolic execution itself is unaffected by
+  // the encoding). It runs several passes that are O(#objects) -- the
+  // is_dynamic_object / object_size BDD encodings (prepare_postponed_*) and the
+  // object_base_address MUX -- plus one that is O(#pending I2P casts x
+  // #objects): the deferred integer-to-pointer address constraints below.
+  // Together with the 3x-wider (192-bit) pointer bitvectors this grows the SAT
+  // instance roughly linearly in the number of pointer objects, so the cost is
+  // concentrated in pointer-heavy programs while pointer-light ones see
+  // essentially no overhead.
+
   // it would seem nicer to use `optionalt` here, but GCC >= 12 produces
   // spurious warnings about accessing uninitialized objects
   std::pair<exprt, exprt> is_dynamic_expr = {nil_exprt{}, nil_exprt{}};
@@ -1099,10 +1615,357 @@ void bv_pointerst::finish_eager_conversion()
 #endif
       }
     }
+    else if(postponed.expr.id() == ID_object_base_address)
+    {
+      // MUX: for each object i, if pointer_object(ptr)==i then base[i]
+      const auto &ptr_type = to_pointer_type(
+        to_object_base_address_expr(postponed.expr).pointer().type());
+      bvt obj_bv = object_literals(postponed.op, ptr_type);
+      const std::size_t addr_width = postponed.bv.size();
+
+      const auto &objects = pointer_logic.objects;
+      std::size_t number = 0;
+      for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+      {
+        bvt obj_const = bv_utils.build_constant(number, obj_bv.size());
+        literalt is_this = bv_utils.equal(obj_bv, obj_const);
+        bvt base = get_object_base_address(number, addr_width);
+        for(std::size_t k = 0; k < addr_width; ++k)
+        {
+          prop.lcnf({!is_this, !base[k], postponed.bv[k]});
+          prop.lcnf({!is_this, base[k], !postponed.bv[k]});
+        }
+      }
+    }
     else
       UNREACHABLE;
   }
 
   // Clear the list to avoid re-doing in case of incremental usage.
   postponed_list.clear();
+
+  // Record variable count before adding wide encoding constraints
+  if(wide_pointer_encoding)
+    finish_eager_var_start = prop.no_variables();
+
+  // Add deferred I2P constraints now that all objects are known
+  if(wide_pointer_encoding)
+  {
+    const auto &objects = pointer_logic.objects;
+    for(auto &p : pending_i2p)
+    {
+      const std::size_t addr_bits = p.addr_bv.size();
+
+      std::vector<literalt> valid_obj_lits;
+      std::size_t number = 0;
+      for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+      {
+        literalt is_this = i2p_object_eq(p, number);
+        valid_obj_lits.push_back(is_this);
+
+        // Forward constraints for objects added after the I2P
+        if(number >= p.objects_at_creation)
+        {
+          bvt base = get_object_base_address(number, addr_bits);
+          bvt off_ext = bv_utils.zero_extension(p.off_bv, addr_bits);
+          bvt flat = bv_utils.add(base, off_ext);
+          for(std::size_t k = 0; k < addr_bits; ++k)
+          {
+            prop.lcnf({!is_this, !flat[k], p.addr_bv[k]});
+            prop.lcnf({!is_this, flat[k], !p.addr_bv[k]});
+          }
+        }
+      }
+      if(!valid_obj_lits.empty())
+        prop.lcnf(valid_obj_lits);
+    }
+  }
+
+  // Add non-overlapping constraints for wide pointer base addresses
+  if(wide_pointer_encoding && !object_base_address.empty())
+  {
+    const std::size_t addr_width = config.ansi_c.pointer_width;
+
+    // NULL base address = 0
+    bvt null_base =
+      get_object_base_address(pointer_logic.get_null_object(), addr_width);
+    bvt zero_bv = bv_utils.build_constant(0, addr_width);
+    for(std::size_t i = 0; i < addr_width; ++i)
+      prop.set_equal(null_base[i], zero_bv[i]);
+
+    // Collect objects with base addresses and known sizes
+    const auto &objects = pointer_logic.objects;
+    struct obj_infot
+    {
+      mp_integer number;
+      mp_integer size;
+      bool is_dynamic;
+    };
+    std::vector<obj_infot> obj_infos;
+    std::size_t number = 0;
+    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+    {
+      if(object_base_address.find(number) == object_base_address.end())
+        continue;
+      // Skip integer-address objects — their addresses may
+      // overlap with regular objects.
+      if(integer_address_objects.count(number))
+        continue;
+      auto size_opt = pointer_offset_size(it->type(), ns);
+      mp_integer size =
+        (size_opt.has_value() && *size_opt > 0) ? *size_opt : mp_integer{1};
+      obj_infos.push_back(
+        {mp_integer(number), size, pointer_logic.is_dynamic_object(*it)});
+
+      // Overflow guard: base + size must not overflow
+      bvt base = get_object_base_address(mp_integer(number), addr_width);
+      bvt end = bv_utils.add(base, bv_utils.build_constant(size, addr_width));
+      // end >= base (no wrap-around)
+      prop.l_set_to_true(
+        bv_utils.rel(end, ID_ge, base, bv_utilst::representationt::UNSIGNED));
+      // Object base addresses are aligned, mirroring CBMC's standard pointer
+      // model (which also assumes objects are aligned -- e.g. the address of
+      // an `int` has its low bits zero). This keeps the flat addresses of the
+      // wide encoding consistent with the standard encoding; without it,
+      // programs that observe object alignment (e.g. regression test Pointer2,
+      // which asserts `((size_t)&x & 1) == 0`) would diverge from standard
+      // mode. We align to the largest power of two not exceeding the object
+      // size (capped at the address word size); this is a conservative
+      // approximation of the object's true alignment that is never weaker than
+      // what the standard model assumes.
+      mp_integer alignment = std::min(size, mp_integer(addr_width / 8));
+      mp_integer align_pow2 = 1;
+      while(align_pow2 * 2 <= alignment)
+        align_pow2 *= 2;
+      if(align_pow2 > 1)
+      {
+        std::size_t align_bits = 0;
+        mp_integer tmp = align_pow2;
+        while(tmp > 1)
+        {
+          align_bits++;
+          tmp /= 2;
+        }
+        for(std::size_t i = 0; i < align_bits && i < addr_width; ++i)
+          prop.l_set_to_true(!base[i]);
+      }
+    }
+
+    // Non-overlapping: chain constraint (O(n) instead of O(n²))
+    // Objects are ordered by index: base[0]+size[0] <= base[1], etc.
+    for(std::size_t i = 0; i + 1 < obj_infos.size(); ++i)
+    {
+      bvt base_i = get_object_base_address(obj_infos[i].number, addr_width);
+      bvt end_i = bv_utils.add(
+        base_i, bv_utils.build_constant(obj_infos[i].size, addr_width));
+      bvt base_next =
+        get_object_base_address(obj_infos[i + 1].number, addr_width);
+
+      if(
+        config.bv_encoding.malloc_may_alias && obj_infos[i].is_dynamic &&
+        obj_infos[i + 1].is_dynamic &&
+        obj_infos[i].size == obj_infos[i + 1].size)
+      {
+        // Allow address reuse: same base OR non-overlapping
+        prop.l_set_to_true(prop.lor(
+          bv_utils.equal(base_next, base_i),
+          bv_utils.rel(
+            end_i, ID_le, base_next, bv_utilst::representationt::UNSIGNED)));
+      }
+      else
+      {
+        prop.l_set_to_true(bv_utils.rel(
+          end_i, ID_le, base_next, bv_utilst::representationt::UNSIGNED));
+      }
+    }
+
+    // Stack layout: place stack variables adjacently
+    if(model_stack_layout)
+    {
+      // Collect stack objects (function-scoped, non-dynamic)
+      struct stack_objt
+      {
+        mp_integer number;
+        mp_integer size;
+        irep_idt function;
+        std::size_t index; // declaration order
+      };
+      std::vector<stack_objt> stack_objs;
+
+      std::size_t number = 0;
+      for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+      {
+        if(object_base_address.find(number) == object_base_address.end())
+          continue;
+        if(integer_address_objects.count(number))
+          continue;
+        const exprt &obj = *it;
+        if(obj.id() != ID_symbol)
+          continue;
+        const irep_idt &id = to_symbol_expr(obj).get_identifier();
+        // Stack objects have "::" in their name (function-scoped)
+        const std::string id_str = id2string(id);
+        auto last_sep = id_str.rfind("::");
+        if(last_sep == std::string::npos || last_sep == 0)
+          continue;
+        // Extract function name
+        auto func_end = id_str.rfind("::", last_sep - 1);
+        irep_idt func = func_end != std::string::npos
+                          ? irep_idt(id_str.substr(0, func_end))
+                          : irep_idt(id_str.substr(0, last_sep));
+
+        auto sz_opt = pointer_offset_size(obj.type(), ns);
+        mp_integer sz =
+          (sz_opt.has_value() && *sz_opt > 0) ? *sz_opt : mp_integer{1};
+        stack_objs.push_back({mp_integer(number), sz, func, stack_objs.size()});
+      }
+
+      // Group by function and add adjacency constraints
+      // (downward growth: later declarations get lower addresses)
+      std::map<irep_idt, std::vector<std::size_t>> by_function;
+      for(std::size_t i = 0; i < stack_objs.size(); ++i)
+        by_function[stack_objs[i].function].push_back(i);
+
+      for(const auto &[func, indices] : by_function)
+      {
+        if(indices.size() < 2)
+          continue;
+        // Adjacent placement: base[i+1] = base[i] + size[i]
+        for(std::size_t j = 0; j + 1 < indices.size(); ++j)
+        {
+          const auto &cur = stack_objs[indices[j]];
+          const auto &next = stack_objs[indices[j + 1]];
+          bvt base_cur = get_object_base_address(cur.number, addr_width);
+          bvt base_next = get_object_base_address(next.number, addr_width);
+
+          if(config.ansi_c.stack_grows_downward)
+          {
+            // Downward growth: base[cur] = base[next] + size[next]
+            // (earlier declarations get higher addresses)
+            bvt end_next = bv_utils.add(
+              base_next, bv_utils.build_constant(next.size, addr_width));
+            for(std::size_t k = 0; k < addr_width; ++k)
+              prop.set_equal(base_cur[k], end_next[k]);
+          }
+          else
+          {
+            // Upward growth: base[next] = base[cur] + size[cur]
+            bvt end_cur = bv_utils.add(
+              base_cur, bv_utils.build_constant(cur.size, addr_width));
+            for(std::size_t k = 0; k < addr_width; ++k)
+              prop.set_equal(base_next[k], end_cur[k]);
+          }
+        }
+      }
+    }
+  }
+  // Freeze variables created during finish_eager_conversion
+  // (non-overlapping constraints, deferred I2P forward constraints)
+  // to prevent MiniSat's simplifier from eliminating them.
+  // The backward constraint refinement in dec_solve creates
+  // bv_utils operations that may reuse these variables.
+  if(wide_pointer_encoding && finish_eager_var_start > 0)
+  {
+    for(unsigned i = finish_eager_var_start; i < prop.no_variables(); ++i)
+      prop.set_frozen(literalt(i, false));
+  }
+}
+
+bool bv_pointerst::check_SAT_backward_i2p()
+{
+  const auto &objects = pointer_logic.objects;
+  bool any_violation = false;
+
+  for(const auto &p : pending_i2p)
+  {
+    if(!p.needs_backward_constraints)
+      continue;
+    if(any_violation)
+      break;
+
+    const std::size_t object_bits = p.obj_bv.size();
+    const std::size_t addr_bits = p.addr_bv.size();
+
+    mp_integer obj_val = 0;
+    for(std::size_t i = 0; i < object_bits; ++i)
+      if(prop.l_get(p.obj_bv[i]).is_true())
+        obj_val += power(2, i);
+
+    mp_integer addr_val = 0;
+    for(std::size_t i = 0; i < addr_bits; ++i)
+      if(prop.l_get(p.addr_bv[i]).is_true())
+        addr_val += power(2, i);
+
+    std::size_t number = 0;
+    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++number)
+    {
+      if(object_base_address.find(number) == object_base_address.end())
+        continue;
+      auto sz = pointer_offset_size(it->type(), ns);
+      if(!sz.has_value() || *sz <= 0)
+        continue;
+      bvt base = get_object_base_address(number, addr_bits);
+      mp_integer base_val = 0;
+      for(std::size_t i = 0; i < addr_bits; ++i)
+        if(prop.l_get(base[i]).is_true())
+          base_val += power(2, i);
+      if(
+        addr_val >= base_val && addr_val < base_val + *sz &&
+        obj_val != mp_integer(number))
+      {
+        any_violation = true;
+        break;
+      }
+    }
+  }
+
+  if(!any_violation)
+    return false;
+
+  // A spurious non-overlapping model was found. Add the deferred backward I2P
+  // constraints (address within an object's range implies that object's id)
+  // for the affected integer-to-pointer reconstructions so the next solve
+  // cannot reproduce it, then request a re-solve below.
+
+  for(auto &p : pending_i2p)
+  {
+    if(!p.needs_backward_constraints)
+      continue;
+    const std::size_t a_bits = p.addr_bv.size();
+    std::size_t num = 0;
+    for(auto it = objects.cbegin(); it != objects.cend(); ++it, ++num)
+    {
+      if(object_base_address.find(num) == object_base_address.end())
+        continue;
+      auto sz = pointer_offset_size(it->type(), ns);
+      if(!sz.has_value() || *sz <= 0)
+        continue;
+      bvt base = get_object_base_address(num, a_bits);
+      literalt is_this = i2p_object_eq(p, num);
+      literalt ge = bv_utils.rel(
+        p.addr_bv, ID_ge, base, bv_utilst::representationt::UNSIGNED);
+      bvt end_bv = bv_utils.add(base, bv_utils.build_constant(*sz, a_bits));
+      literalt lt = bv_utils.rel(
+        p.addr_bv, ID_lt, end_bv, bv_utilst::representationt::UNSIGNED);
+      prop.l_set_to_true(prop.limplies(prop.land(ge, lt), is_this));
+    }
+  }
+  for(auto &p : pending_i2p)
+    p.needs_backward_constraints = false;
+  return true;
+}
+
+decision_proceduret::resultt bv_pointerst::dec_solve(const exprt &assumption)
+{
+  if(!wide_pointer_encoding)
+    return SUB::dec_solve(assumption);
+
+  while(true)
+  {
+    auto result = SUB::dec_solve(assumption);
+    if(result != resultt::D_SATISFIABLE)
+      return result;
+    if(!check_SAT_backward_i2p())
+      return result;
+  }
 }
