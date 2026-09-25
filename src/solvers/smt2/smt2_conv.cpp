@@ -37,7 +37,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/std_expr.h>
 #include <util/string2int.h>
 #include <util/string_constant.h>
-#include <util/threeval.h>
 
 #include <solvers/flattening/boolbv_width.h>
 #include <solvers/flattening/c_bit_field_replacement_type.h>
@@ -138,29 +137,6 @@ smt2_convt::smt2_convt(
 std::string smt2_convt::decision_procedure_text() const
 {
   return "SMT2";
-}
-
-void smt2_convt::print_assignment(std::ostream &os) const
-{
-  // Boolean stuff
-
-  for(std::size_t v=0; v<boolean_assignment.size(); v++)
-    os << "b" << v << "=" << boolean_assignment[v] << "\n";
-
-  // others
-}
-
-tvt smt2_convt::l_get(literalt l) const
-{
-  if(l.is_true())
-    return tvt(true);
-  if(l.is_false())
-    return tvt(false);
-
-  INVARIANT(
-    l.var_no() < boolean_assignment.size(),
-    "variable number shall be within bounds");
-  return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
 
 void smt2_convt::write_header()
@@ -298,65 +274,6 @@ decision_proceduret::resultt smt2_convt::dec_solve(const exprt &assumption)
 
   out.flush();
   return decision_proceduret::resultt::D_ERROR;
-}
-
-exprt smt2_convt::get(const exprt &expr) const
-{
-  if(expr.id()==ID_symbol)
-  {
-    const irep_idt &id = to_symbol_expr(expr).identifier();
-
-    identifier_mapt::const_iterator it=identifier_map.find(id);
-
-    if(it!=identifier_map.end())
-      return it->second.value;
-    return expr;
-  }
-  else if(expr.id()==ID_nondet_symbol)
-  {
-    const irep_idt &id=to_nondet_symbol_expr(expr).get_identifier();
-
-    identifier_mapt::const_iterator it=identifier_map.find(id);
-
-    if(it!=identifier_map.end())
-      return it->second.value;
-  }
-  else if(expr.id() == ID_literal)
-  {
-    auto l = to_literal_expr(expr).get_literal();
-    if(l_get(l).is_true())
-      return true_exprt();
-    else
-      return false_exprt();
-  }
-  else if(expr.id() == ID_not)
-  {
-    auto op = get(to_not_expr(expr).op());
-    if(op == true)
-      return false_exprt();
-    else if(op == false)
-      return true_exprt();
-  }
-  else if(
-    expr.is_constant() || expr.id() == ID_empty_union ||
-    (!expr.has_operands() && (expr.id() == ID_struct || expr.id() == ID_array)))
-  {
-    return expr;
-  }
-  else if(expr.has_operands())
-  {
-    exprt copy = expr;
-    for(auto &op : copy.operands())
-    {
-      exprt eval_op = get(op);
-      if(eval_op.is_nil())
-        return nil_exprt{};
-      op = std::move(eval_op);
-    }
-    return copy;
-  }
-
-  return nil_exprt();
 }
 
 constant_exprt smt2_convt::parse_literal(
@@ -1040,11 +957,6 @@ void smt2_convt::convert_literal(const literalt l)
 
     smt2_identifiers.insert(identifier);
   }
-}
-
-void smt2_convt::push()
-{
-  UNIMPLEMENTED;
 }
 
 void smt2_convt::push(const std::vector<exprt> &_assumptions)
