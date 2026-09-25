@@ -183,11 +183,11 @@ public:
     const exprt &input_int,
     size_t max_size);
   std::pair<exprt, string_constraintst>
+  add_axioms_for_string_of_long(const function_application_exprt &f);
+  std::pair<exprt, string_constraintst>
   add_axioms_from_int_hex(const array_string_exprt &res, const exprt &i);
   std::pair<exprt, string_constraintst>
   add_axioms_from_int_hex(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_long(const function_application_exprt &f);
   std::pair<exprt, string_constraintst>
   add_axioms_from_bool(const function_application_exprt &f);
   std::pair<exprt, string_constraintst>
