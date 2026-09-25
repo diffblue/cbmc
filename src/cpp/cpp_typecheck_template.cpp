@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_typecheck_resolve.h"
 
+#include <algorithm>
 #include <functional>
 #include <set>
 
@@ -2002,6 +2003,61 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
   }
 }
 
+/// Whether \p name names a concept ([temp.concept]) visible from the current
+/// scope: the parser records a concept as a template `constexpr bool C = ...'
+/// whose declarator carries `#concept'.  A qualified name is looked up from
+/// its scope.
+bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
+{
+  cpp_scopet *scope = &cpp_scopes.current_scope();
+  const auto &subs = name.get_sub();
+  for(std::size_t i = 0; i < subs.size(); ++i)
+  {
+    if(subs[i].id() != ID_name)
+      continue;
+    const irep_idt &base_name = subs[i].get(ID_identifier);
+    const bool last = i + 1 >= subs.size() ||
+                      std::none_of(
+                        subs.begin() + i + 1,
+                        subs.end(),
+                        [](const irept &s) { return s.id() == ID_name; });
+    const auto ids = scope->lookup(
+      base_name, i == 0 ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED);
+    if(last)
+    {
+      for(const auto *idp : ids)
+      {
+        const symbolt *sym = symbol_table.lookup(idp->identifier);
+        if(
+          sym != nullptr && sym->type.get_bool(ID_is_template) &&
+          sym->type.id() == ID_cpp_declaration)
+        {
+          const auto &decl = to_cpp_declaration(sym->type);
+          if(
+            !decl.declarators().empty() &&
+            decl.declarators()[0].get_bool("#concept"))
+            return true;
+        }
+      }
+      return false;
+    }
+    // a namespace (or class) qualifier: descend into it
+    cpp_scopet *next = nullptr;
+    for(auto *idp : ids)
+    {
+      if(idp->is_scope)
+      {
+        next = static_cast<cpp_scopet *>(idp);
+        break;
+      }
+    }
+    if(next == nullptr)
+      return false;
+    scope = next;
+  }
+  return false;
+}
+
 cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
 {
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
@@ -2085,8 +2141,13 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
       bool converted_to_concept = false;
       if(declaration.type().id() == ID_cpp_name)
       {
-        // Check if the name resolves to a concept (constexpr bool)
-        // by looking it up in the symbol table.
+        // N5008 [temp.param]/1, /4: a type-constraint `C T` (or `ns::C T`)
+        // names a concept.  Look the name up in the enclosing scopes and
+        // test for a concept template (the parser records one as a template
+        // `constexpr bool C = ...' whose declarator carries `#concept').
+        // This used to scan the WHOLE symbol table for a constexpr bool whose
+        // name contained the text -- 11% of a libc++ <span> run, and a
+        // substring match (`Integral' matched `is_integral_v<int>').
         std::string cname;
         for(const auto &s : declaration.type().get_sub())
         {
@@ -2097,29 +2158,18 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
             cname += id2string(s.get(ID_identifier));
           }
         }
-        // Search symbol table for a matching constexpr bool
-        for(const auto &sym : symbol_table)
+        if(is_concept_name(to_cpp_name(declaration.type())))
         {
-          if(
-            id2string(sym.first).find(cname) != std::string::npos &&
-            sym.second.type.id() == ID_bool &&
-            sym.second.type.get_bool(ID_C_constant))
-          {
-            // It's a concept — convert to type parameter
-            parameter = type_exprt(template_parameter_symbol_typet(identifier));
-            parameter.type().add_source_location() =
-              declaration.find_source_location();
-            // Sanitize :: for identifier generation
-            {
-              std::string s = cname;
-              std::string::size_type p;
-              while((p = s.find("::")) != std::string::npos)
-                s.replace(p, 2, "__");
-              parameter.set("#C_concept_constraint", s);
-            }
-            converted_to_concept = true;
-            break;
-          }
+          // It's a concept -- convert to type parameter
+          parameter = type_exprt(template_parameter_symbol_typet(identifier));
+          parameter.type().add_source_location() =
+            declaration.find_source_location();
+          // Sanitize :: for identifier generation
+          std::string::size_type p;
+          while((p = cname.find("::")) != std::string::npos)
+            cname.replace(p, 2, "__");
+          parameter.set("#C_concept_constraint", cname);
+          converted_to_concept = true;
         }
       }
       if(!converted_to_concept)
