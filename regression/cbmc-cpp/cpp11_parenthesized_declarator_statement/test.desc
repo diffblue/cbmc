@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ declarations: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested class declared later: SUCCESS$
+^\[main\.assertion\.3\] line \d+ template, nested class declared later: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+is unknown
+--
+N5008 [stmt.ambig]/1 and [dcl.decl.general]: `T(x);', `int (i) = k;',
+`int (*p) = &i;' are declarations.  For a type name the parser knows, rDeclarator
+accepts the parenthesised declarator; for a name it does not (a nested class
+declared later, [class.mem.general]/7) the type checker rewrites the
+call-shaped expression statement into the declaration.
