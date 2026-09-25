@@ -5927,6 +5927,13 @@ skip_pack_removal_ft:
                 continue;
               if(md.declarators()[0].find(ID_value).is_nil())
                 continue;
+              // N5008 [class.mfct]/1: the definition of a member function
+              // is a member of the class it is declared in -- a same-named
+              // definition of ANOTHER class template (basic_string_view's
+              // rfind for basic_string's) is not this member's, however
+              // well its parameter list matches.
+              if(tsp.second.base_name != template_symbol.base_name)
+                continue;
               // Found body. Apply class template substitution.
               const template_typet &md_tt = md.template_type();
               std::size_t n_md = md_tt.template_parameters().size();
