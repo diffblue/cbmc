@@ -10,11 +10,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_UTIL_IREP_H
 #define CPROVER_UTIL_IREP_H
 
-#include <string>
-#include <vector>
-
 #include "invariant.h"
 #include "irep_ids.h"
+
+#include <atomic>
+#include <string>
+#include <vector>
 
 #define SHARING
 #ifndef HASH_CODE
@@ -64,7 +65,17 @@ struct ref_count_ift
 template <>
 struct ref_count_ift<true>
 {
-  unsigned ref_count = 1;
+  mutable std::atomic<unsigned> ref_count{1};
+
+  ref_count_ift() = default;
+  ref_count_ift(const ref_count_ift &) : ref_count{1}
+  {
+  }
+  ref_count_ift &operator=(const ref_count_ift &)
+  {
+    // Don't copy ref_count — new copy starts at 1.
+    return *this;
+  }
 };
 
 /// A node with data in a tree, it contains:
@@ -557,8 +568,7 @@ void sharing_treet<derivedt, named_subtreest>::remove_ref(dt *old_data)
   std::cout << "R: " << old_data << " " << old_data->ref_count << '\n';
 #endif
 
-  old_data->ref_count--;
-  if(old_data->ref_count == 0)
+  if(old_data->ref_count.fetch_sub(1) == 1)
   {
 #ifdef IREP_DEBUG
     std::cout << "D: " << pretty() << '\n';
@@ -593,9 +603,8 @@ void sharing_treet<derivedt, named_subtreest>::nonrecursive_destructor(
       continue;
 
     INVARIANT(d->ref_count != 0, "All contents of the stack must be in use");
-    d->ref_count--;
 
-    if(d->ref_count == 0)
+    if(d->ref_count.fetch_sub(1) == 1)
     {
       stack.reserve(
         stack.size() + std::distance(d->named_sub.begin(), d->named_sub.end()) +

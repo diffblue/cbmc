@@ -1,0 +1,16 @@
+CORE
+main.c
+--no-standard-checks --incremental-check-interval 10 --unwinding-assertions --unwind 10
+^EXIT=10$
+^SIGNAL=0$
+\[main\.assertion\.1\] .* count >= 1: SUCCESS
+\[main\.assertion\.2\] .* sum >= count: SUCCESS
+\[main\.assertion\.3\] .* x >= 0: SUCCESS
+\[main\.assertion\.4\] .* count <= 8: SUCCESS
+\[main\.assertion\.5\] .* sum <= 36: SUCCESS
+\[main\.assertion\.6\] .* sum <= 10: FAILURE
+\[main\.assertion\.7\] .* x == 0: SUCCESS
+--
+^warning: ignoring
+--
+Verify incremental checking produces identical verdicts to non-incremental

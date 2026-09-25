@@ -27,7 +27,7 @@ OBJ += ../ansi-c/ansi-c$(LIBEXT) \
 
 INCLUDES= -I ..
 
-LIBS =
+LIBS = -lpthread
 
 include ../config.inc
 include ../common
