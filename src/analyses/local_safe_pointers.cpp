@@ -14,6 +14,8 @@ Author: Diffblue Ltd
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/format_expr.h>
+#include <util/pointer_expr.h>
+#include <util/std_expr.h>
 
 /// Return structure for `get_null_checked_expr` and
 /// `get_conditional_checked_expr`
@@ -74,6 +76,43 @@ static std::optional<goto_null_checkt> get_null_checked_expr(const exprt &expr)
   return {};
 }
 
+/// Collect dereferences that are guarded by a conditional null-check in
+/// `expr`, i.e. a dereference `*p` in the operand of `(p != null) ? ... : ...`
+/// (the true operand) or `(p == null) ? ... : ...` (the false operand) that is
+/// only evaluated when `p` is known to be non-null. Such conditional
+/// expressions are produced by if-conversion in place of `if(p != null) *p`.
+/// The collected dereferences are appended to `result`.
+static void
+collect_if_guarded_dereferences(const exprt &expr, std::vector<exprt> &result)
+{
+  if(const auto *if_expr = expr_try_dynamic_cast<if_exprt>(expr))
+  {
+    if(auto check = get_null_checked_expr(if_expr->cond()))
+    {
+      // The guarded operand is the one evaluated when the pointer is non-null.
+      const exprt &guarded_operand = check->checked_when_taken
+                                       ? if_expr->true_case()
+                                       : if_expr->false_case();
+      const exprt checked_pointer = skip_typecast(check->checked_expr);
+      for(auto it = guarded_operand.depth_begin(),
+               end = guarded_operand.depth_end();
+          it != end;
+          ++it)
+      {
+        if(
+          it->id() == ID_dereference &&
+          skip_typecast(to_dereference_expr(*it).pointer()) == checked_pointer)
+        {
+          result.push_back(*it);
+        }
+      }
+    }
+  }
+
+  for(const auto &op : expr.operands())
+    collect_if_guarded_dereferences(op, result);
+}
+
 /// Compute safe dereference expressions for a given GOTO program. This
 /// populates `non_null_expressions` mapping instruction location numbers
 /// onto a set of expressions that are known to be non-null BEFORE that
@@ -85,6 +124,22 @@ void local_safe_pointerst::operator()(const goto_programt &goto_program)
 
   for(const auto &instruction : goto_program.instructions)
   {
+    // Record dereferences guarded by a conditional null-check within this
+    // instruction (e.g. `(p != null) ? *p : x`, as produced by if-conversion).
+    // This is independent of the control-flow tracking below.
+    {
+      std::vector<exprt> guarded;
+      instruction.apply([&guarded](const exprt &e)
+                        { collect_if_guarded_dereferences(e, guarded); });
+      if(!guarded.empty())
+      {
+        auto &guarded_set =
+          if_guarded_dereferences[instruction.location_number];
+        for(auto &deref : guarded)
+          guarded_set.insert(std::move(deref));
+      }
+    }
+
     // Handle control-flow convergence pessimistically:
     if(instruction.incoming_edges.size() > 1)
       checked_expressions.clear();

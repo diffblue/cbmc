@@ -1,0 +1,16 @@
+CORE
+main.c
+--paths lifo
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+This test pins down the CPROVER-library `--paths`-friendliness of `free` and
+`__CPROVER_deallocate`: the bookkeeping in those two functions used to emit
+GOTO branches that, under `--paths lifo`, multiplied the symex state space
+exponentially with the number of `free` calls. With those branches replaced
+by conditional expressions, this test runs in a handful of paths instead of
+4^N. Without the fix it would time out at the harness limit, so reverting
+the optimisation is observable here.
