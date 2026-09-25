@@ -2550,6 +2550,61 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     symbol_expr = resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
   }
 
+  // N5008 [class.base.init]/7: a mem-initializer naming a POD BASE with an
+  // expression-list (`ebo(O &&f) : T(std::forward<O>(f))' in a constructor
+  // TEMPLATE, whose body is type-checked directly rather than through
+  // full_member_initialization) copy-initializes -- or aggregate-initializes
+  // -- the base subobject.  The resolver answers with a synthesized POD
+  // "constructor" (ID_pod_constructor, a code type whose first parameter is
+  // the value, not `this'); the constructor-call lowering below expects a
+  // real constructor and aborted on it.  Lower to the assignment through the
+  // sliced base lvalue, as full_member_initialization does.
+  if(
+    symbol_expr.id() == ID_pod_constructor &&
+    symbol_expr.type().id() == ID_code &&
+    to_code_type(symbol_expr.type()).return_type().id() == ID_struct_tag)
+  {
+    const typet &base_t = to_code_type(symbol_expr.type()).return_type();
+    const exprt &this_e = cpp_scopes.current_scope().this_expr;
+    bool is_base = false;
+    if(this_e.is_not_nil() && this_e.type().id() == ID_pointer)
+    {
+      const typet &class_tag = to_pointer_type(this_e.type()).base_type();
+      if(class_tag.id() == ID_struct_tag)
+      {
+        for(const auto &b : follow_tag(to_struct_tag_type(class_tag)).bases())
+        {
+          if(
+            b.type().id() == ID_struct_tag &&
+            to_struct_tag_type(b.type()).get_identifier() ==
+              to_struct_tag_type(base_t).get_identifier())
+          {
+            is_base = true;
+          }
+        }
+      }
+    }
+    if(is_base)
+    {
+      exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
+      lhs_ptr.copy_to_operands(exprt("cpp-this"));
+      lhs_ptr.add_source_location() = code.source_location();
+      dereference_exprt lhs(lhs_ptr);
+      exprt rhs("explicit-constructor-call", base_t);
+      rhs.add_source_location() = code.source_location();
+      exprt init_list(ID_initializer_list);
+      init_list.operands() = code.operands();
+      init_list.add_source_location() = code.source_location();
+      rhs.add_to_operands(std::move(init_list));
+      code_frontend_assignt assign_code(std::move(lhs), std::move(rhs));
+      assign_code.add_source_location() = code.source_location();
+      codet assign = std::move(assign_code);
+      typecheck_code(assign);
+      code.swap(assign);
+      return;
+    }
+  }
+
   if(symbol_expr.type().id() == ID_code)
   {
     const code_typet &code_type = to_code_type(symbol_expr.type());
