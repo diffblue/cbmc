@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "designator.h"
 
 #include <map>
+#include <optional>
 
 class ansi_c_declarationt;
 class bitvector_typet;
@@ -123,6 +124,16 @@ protected:
     designatort &designator,
     const exprt &initializer_list,
     exprt::operandst::const_iterator init_it,
+    bool force_constant);
+
+  /// The value a non-static data member \p component of aggregate
+  /// \p struct_tag_type takes when an initializer list does not explicitly
+  /// initialize it (C++ default member initializer, N5008 [dcl.init.aggr]/5.1).
+  /// Returns nothing when the member has no such initializer.
+  virtual std::optional<exprt> default_member_initializer_value(
+    const struct_tag_typet &struct_tag_type,
+    const struct_union_typet::componentt &component,
+    const source_locationt &source_location,
     bool force_constant);
 
   designatort make_designator(const typet &type, const exprt &src);

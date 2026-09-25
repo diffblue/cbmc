@@ -99,6 +99,15 @@ public:
   /// constructs as permissive extensions, so we always return true.
   bool empty_brace_value_initializes_scalar() const override;
 
+  /// N5008 [dcl.init.aggr]/5.1: the value of a member's default member
+  /// initializer, type-checked in the scope of its class, for an aggregate
+  /// element the initializer list left out.
+  std::optional<exprt> default_member_initializer_value(
+    const struct_tag_typet &struct_tag_type,
+    const struct_union_typet::componentt &component,
+    const source_locationt &source_location,
+    bool force_constant) override;
+
   /// N5008 [class]/4 + [expr.sizeof]/2: sizeof a class type is never 0.
   bool sizeof_yields_nonzero_for_class() const override
   {
