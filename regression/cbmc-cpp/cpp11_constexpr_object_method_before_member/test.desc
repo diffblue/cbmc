@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+^warning: ignoring
+Invariant check failed
+--
+Struct constants of C++ class types index by data member, not by component
+position (member functions, member types and static members occupy no
+operand).  Non-vacuous: the last assertion is deliberately wrong and must
+FAIL.  Before the fix: every static_assert "could not be evaluated".
