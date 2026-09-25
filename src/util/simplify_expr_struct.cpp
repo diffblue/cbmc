@@ -122,7 +122,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         : to_struct_type(op.type());
     if(struct_type.has_component(component_name))
     {
-      std::size_t number = struct_type.component_number(component_name);
+      std::size_t number = struct_type.data_component_number(component_name);
       DATA_INVARIANT(
         op.operands().size() > number,
         "struct expression must have sufficiently many operands");
