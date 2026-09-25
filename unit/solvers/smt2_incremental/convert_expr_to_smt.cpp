@@ -1337,11 +1337,91 @@ TEST_CASE(
   {
     INFO("Input expression - " + input.pretty(1, 0));
     CHECK(test.convert(input) == expected_result);
-    const cbmc_invariants_should_throwt invariants_throw;
-    CHECK_THROWS(test.convert(extractbits_exprt{
+  }
+  SECTION("Non-constant index, same width")
+  {
+    const auto non_const_input = extractbits_exprt{
       symbol_exprt{"foo", operand_type},
       symbol_exprt{"bar", operand_type},
-      unsignedbv_typet{3}}));
+      unsignedbv_typet{3}};
+    const smt_termt foo_term =
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{8}};
+    const smt_termt bar_term =
+      smt_identifier_termt{"bar", smt_bit_vector_sortt{8}};
+    const smt_termt expected = smt_bit_vector_theoryt::extract(2, 0)(
+      smt_bit_vector_theoryt::logical_shift_right(foo_term, bar_term));
+    CHECK(test.convert(non_const_input) == expected);
+  }
+  SECTION("Non-constant index, different width requires zero extension")
+  {
+    const typet wide_type = unsignedbv_typet{16};
+    const typet narrow_type = unsignedbv_typet{8};
+    const auto non_const_input = extractbits_exprt{
+      symbol_exprt{"foo", wide_type},
+      symbol_exprt{"bar", narrow_type},
+      unsignedbv_typet{4}};
+    const smt_termt foo_term =
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{16}};
+    const smt_termt bar_term =
+      smt_identifier_termt{"bar", smt_bit_vector_sortt{8}};
+    const smt_termt expected = smt_bit_vector_theoryt::extract(3, 0)(
+      smt_bit_vector_theoryt::logical_shift_right(
+        foo_term, smt_bit_vector_theoryt::zero_extend(8)(bar_term)));
+    CHECK(test.convert(non_const_input) == expected);
+  }
+  SECTION("Non-constant index, wider index requires truncation")
+  {
+    const typet narrow_type = unsignedbv_typet{16};
+    const typet wide_type = unsignedbv_typet{32};
+    const auto non_const_input = extractbits_exprt{
+      symbol_exprt{"foo", narrow_type},
+      symbol_exprt{"bar", wide_type},
+      unsignedbv_typet{4}};
+    const smt_termt foo_term =
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{16}};
+    const smt_termt bar_term =
+      smt_identifier_termt{"bar", smt_bit_vector_sortt{32}};
+    const smt_termt expected = smt_bit_vector_theoryt::extract(3, 0)(
+      smt_bit_vector_theoryt::logical_shift_right(
+        foo_term, smt_bit_vector_theoryt::extract(15, 0)(bar_term)));
+    CHECK(test.convert(non_const_input) == expected);
+  }
+  SECTION("Non-constant signed index uses zero_extend, not sign_extend")
+  {
+    // Indices are non-negative by extractbits' contract, so the sign bit
+    // is always 0. The encoding deliberately uses zero_extend; this
+    // SECTION locks that choice in even when the index has a signed type.
+    const typet wide_type = unsignedbv_typet{16};
+    const typet signed_narrow_type = signedbv_typet{8};
+    const auto non_const_input = extractbits_exprt{
+      symbol_exprt{"foo", wide_type},
+      symbol_exprt{"bar", signed_narrow_type},
+      unsignedbv_typet{4}};
+    const smt_termt foo_term =
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{16}};
+    const smt_termt bar_term =
+      smt_identifier_termt{"bar", smt_bit_vector_sortt{8}};
+    const smt_termt expected = smt_bit_vector_theoryt::extract(3, 0)(
+      smt_bit_vector_theoryt::logical_shift_right(
+        foo_term, smt_bit_vector_theoryt::zero_extend(8)(bar_term)));
+    CHECK(test.convert(non_const_input) == expected);
+  }
+  SECTION("Constant zero index hits the constant branch, not the shift path")
+  {
+    // numeric_cast<std::size_t>(...).has_value() is the predicate guarding
+    // the constant branch, and an optional<std::size_t> with value 0 is
+    // truthy. This SECTION pins that index 0 still folds to a plain
+    // (_ extract result_width-1 0) on the source rather than to the
+    // bvlshr-shaped path; an accidental switch to "if(*index_value)" or
+    // "if(index_value && *index_value)" would change the result.
+    const auto const_zero_input = extractbits_exprt{
+      symbol_exprt{"foo", operand_type},
+      from_integer(0, operand_type),
+      unsignedbv_typet{3}};
+    const smt_termt foo_term =
+      smt_identifier_termt{"foo", smt_bit_vector_sortt{8}};
+    const smt_termt expected = smt_bit_vector_theoryt::extract(2, 0)(foo_term);
+    CHECK(test.convert(const_zero_input) == expected);
   }
 }
 
