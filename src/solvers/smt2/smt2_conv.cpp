@@ -2781,6 +2781,10 @@ void smt2_convt::convert_expr(const exprt &expr)
       {ID_cprover_string_is_prefix_func, "str.prefixof"},
       {ID_cprover_string_is_suffix_func, "str.suffixof"},
       {ID_cprover_string_replace_func, "str.replace"},
+      {ID_cprover_string_replace_all_func, "str.replace_all"},
+      {ID_cprover_string_from_code_func, "str.from_code"},
+      {ID_cprover_string_to_code_func, "str.to_code"},
+      {ID_cprover_string_from_int_func, "str.from_int"},
       {ID_cprover_string_equal_func, "="},
       // regex operators
       {ID_cprover_string_to_regex_func, "str.to_re"},
