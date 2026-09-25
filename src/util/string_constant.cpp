@@ -10,6 +10,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "arith_tools.h"
 #include "c_types.h"
+#include "expr_util.h"
+#include "pointer_expr.h"
 #include "std_expr.h"
 
 static array_typet make_type(const irep_idt &value)
@@ -69,4 +71,36 @@ array_exprt string_constantt::to_array_expr() const
   }
 
   return std::move(dest).with_source_location(*this);
+}
+
+std::optional<mp_integer> string_literal_length(const exprt &expr)
+{
+  // Peel off the (implicit) typecasts inserted by array-to-pointer decay.
+  const exprt &current = skip_typecast(expr);
+
+  // We only fold the bare-literal shape `&literal[0]`.  Any pointer
+  // arithmetic (a non-zero index/offset) or a choice between literals must
+  // not fold to a constant: doing so would silently drop the offset or pick
+  // an arbitrary operand.  Such arguments fall back to the runtime model.
+  const auto address_of = expr_try_dynamic_cast<address_of_exprt>(current);
+  if(address_of == nullptr)
+    return {};
+
+  const auto index = expr_try_dynamic_cast<index_exprt>(address_of->object());
+  if(index == nullptr)
+    return {};
+
+  const auto string = expr_try_dynamic_cast<string_constantt>(index->array());
+  if(string == nullptr)
+    return {};
+
+  const auto offset = numeric_cast<mp_integer>(index->index());
+  if(offset != mp_integer{0})
+    return {};
+
+  // strlen counts the bytes up to (but not including) the first NUL, which
+  // need not be the end of the stored literal (e.g. "a\0b" has length 1).
+  const std::string value = id2string(string->value());
+  const std::size_t nul = value.find('\0');
+  return mp_integer{nul == std::string::npos ? value.size() : nul};
 }

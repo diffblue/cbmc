@@ -1,0 +1,11 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+__builtin_strlen of a string literal must constant-fold (used by the
+Linux kernel module_param _Static_asserts and as array sizes).

@@ -3787,6 +3787,36 @@ exprt c_typecheck_baset::do_special_functions(
 
     return tmp2;
   }
+  else if(identifier == "__builtin_strlen")
+  {
+    // GCC folds __builtin_strlen of a string literal to its length at
+    // compile time; the Linux kernel relies on this in module_param
+    // _Static_asserts (e.g. sizeof(name)-1 == __builtin_strlen(name)).
+    // Fold the literal case here; otherwise fall back to the library
+    // model (runtime strlen) by returning nil.
+    if(expr.arguments().size() != 1)
+    {
+      error().source_location = f_op.source_location();
+      error() << "__builtin_strlen expects one argument" << eom;
+      throw 0;
+    }
+
+    typecheck_function_call_arguments(expr);
+
+    exprt arg = expr.arguments()[0];
+    simplify(arg, *this);
+
+    // Fold only the offset-zero whole-literal shape; anything else (a
+    // non-zero offset, a conditional between literals, or a non-literal
+    // argument) falls back to the library model by returning nil.
+    if(const auto length = string_literal_length(arg))
+    {
+      return from_integer(*length, expr.type())
+        .with_source_location(source_location);
+    }
+    else
+      return nil_exprt{}; // not a literal: use the library model
+  }
   else if(identifier=="__builtin_classify_type")
   {
     // This is a gcc/clang extension that produces an integer
