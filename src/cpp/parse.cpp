@@ -304,6 +304,7 @@ protected:
 
   bool rName(irept &);
   bool rConstraintLogicalExpr(exprt &);
+  static bool starts_declaration_after_requires_clause(int token);
   bool rOperatorName(irept &);
   bool rCastOperatorName(irept &);
   bool rPtrToMember(irept &);
@@ -1475,18 +1476,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
         exprt requires_expr;
         if(rConstraintLogicalExpr(requires_expr))
         {
-          int next = lex.LookAhead(0);
-          if(
-            next == TOK_TEMPLATE || next == TOK_USING || next == TOK_STRUCT ||
-            next == TOK_CLASS || next == TOK_UNION || next == TOK_ENUM ||
-            next == TOK_VOID || next == TOK_INT || next == TOK_CHAR ||
-            next == TOK_SHORT || next == TOK_LONG || next == TOK_FLOAT ||
-            next == TOK_DOUBLE || next == TOK_BOOL || next == TOK_SIGNED ||
-            next == TOK_UNSIGNED || next == TOK_AUTO || next == TOK_CONSTEXPR ||
-            next == TOK_STATIC || next == TOK_INLINE || next == TOK_EXTERN ||
-            next == TOK_FRIEND || next == TOK_VIRTUAL || next == TOK_TYPEDEF ||
-            next == TOK_TYPENAME || next == TOK_CONST || next == TOK_VOLATILE ||
-            is_identifier(next))
+          if(starts_declaration_after_requires_clause(lex.LookAhead(0)))
           {
             template_type.add(ID_C_requires_clause).swap(requires_expr);
             goto requires_done;
@@ -1505,17 +1495,12 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
         {
           int next = lex.LookAhead(0);
           // Valid tokens after requires clause: type keywords,
-          // identifiers (type names), template, using, struct, etc.
+          // identifiers (type names), template, using, struct, etc.  An
+          // `identifier identifier' sequence is excluded: this general
+          // expression path may have read `C<T> T' as a less-than chain.
           if(
-            next == TOK_TEMPLATE || next == TOK_USING || next == TOK_STRUCT ||
-            next == TOK_CLASS || next == TOK_UNION || next == TOK_ENUM ||
-            next == TOK_VOID || next == TOK_INT || next == TOK_CHAR ||
-            next == TOK_SHORT || next == TOK_LONG || next == TOK_FLOAT ||
-            next == TOK_DOUBLE || next == TOK_BOOL || next == TOK_SIGNED ||
-            next == TOK_UNSIGNED || next == TOK_AUTO || next == TOK_CONSTEXPR ||
-            next == TOK_STATIC || next == TOK_INLINE || next == TOK_EXTERN ||
-            next == TOK_FRIEND || next == TOK_VIRTUAL || next == TOK_TYPEDEF ||
-            next == TOK_TYPENAME || next == TOK_CONST || next == TOK_VOLATILE ||
+            (starts_declaration_after_requires_clause(next) &&
+             !is_identifier(next)) ||
             (is_identifier(next) && !is_identifier(lex.LookAhead(1))))
           {
             template_type.add(ID_C_requires_clause).swap(requires_expr);
@@ -5659,6 +5644,77 @@ bool Parser::rMemberInit(exprt &init)
 /// less-than, [temp.names]/4 requires recognising the concept), so
 /// parse the restricted grammar directly with rName, which does
 /// consume template argument lists for known templates.
+/// N5008 [temp.pre]/1: after `template-head requires-clause' comes the
+/// declaration.  Whether \p token can begin it: a decl-specifier
+/// ([dcl.spec.general]), an attribute-specifier ([dcl.attr.grammar]: `[[' or
+/// a GNU `__attribute__'), a `template' / `using' / class-key, or a name.
+/// The requires-clause parse is accepted only when the next token is such a
+/// start, since the clause parser may have swallowed too much.  libc++ marks
+/// every function `[[nodiscard]] __attribute__((__visibility__("hidden")))
+/// ...' -- the GNU attribute was not on the list, so the requires-clauses of
+/// its customization-point objects (ranges::iter_move, ranges::begin) fell
+/// back to an atom count and all their `operator()' overloads were kept.
+bool Parser::starts_declaration_after_requires_clause(int token)
+{
+  switch(token)
+  {
+  case TOK_TEMPLATE:
+  case TOK_USING:
+  case TOK_STRUCT:
+  case TOK_CLASS:
+  case TOK_UNION:
+  case TOK_ENUM:
+  case TOK_VOID:
+  case TOK_INT:
+  case TOK_CHAR:
+  case TOK_SHORT:
+  case TOK_LONG:
+  case TOK_FLOAT:
+  case TOK_DOUBLE:
+  case TOK_BOOL:
+  case TOK_SIGNED:
+  case TOK_UNSIGNED:
+  case TOK_AUTO:
+  case TOK_CONSTEXPR:
+  case TOK_CONSTEVAL:
+  case TOK_CONSTINIT:
+  case TOK_STATIC:
+  case TOK_INLINE:
+  case TOK_EXTERN:
+  case TOK_FRIEND:
+  case TOK_VIRTUAL:
+  case TOK_EXPLICIT:
+  case TOK_TYPEDEF:
+  case TOK_TYPENAME:
+  case TOK_CONST:
+  case TOK_VOLATILE:
+  case TOK_MUTABLE:
+  case TOK_THREAD_LOCAL:
+  case TOK_REGISTER:
+  case TOK_DECLTYPE:
+  case TOK_WCHAR_T:
+  case TOK_CHAR8_T:
+  case TOK_CHAR16_T:
+  case TOK_CHAR32_T:
+  case TOK_INT8:
+  case TOK_INT16:
+  case TOK_INT32:
+  case TOK_INT64:
+  case TOK_GCC_INT128:
+  case TOK_GCC_FLOAT128:
+  case TOK_TYPEOF:
+  case TOK_ALIGNAS:
+  case TOK_GCC_ATTRIBUTE:
+  case TOK_MSC_DECLSPEC:
+  case TOK_OPERATOR:
+  case '[': // [[attribute]]
+  case '~': // destructor
+    return true;
+  default:
+    return is_identifier(token);
+  }
+}
+
 bool Parser::rConstraintLogicalExpr(exprt &expr)
 {
   // constraint-logical-and ('||' constraint-logical-and)*
