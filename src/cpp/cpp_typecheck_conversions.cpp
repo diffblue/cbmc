@@ -12,6 +12,7 @@ Author:
 #include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/config.h>
+#include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
@@ -2836,7 +2837,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
   }
 
   return new_expr.is_not_nil();
-}
+} // NOLINT(readability/fn_size)
 
 /// Reference-related
 /// \par parameters: A typechecked expression 'expr',
@@ -3587,6 +3588,61 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
 
+/// N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
+/// for a REFERENCE TO ARRAY parameter (`_Dest (&&)[1]', libc++ variant's
+/// narrowing check `__test_impl<_Dest>({std::declval<_Source>()})')
+/// aggregate-initializes a temporary array of the element type -- each
+/// element converted ([dcl.init.aggr]), the remaining ones value-initialized
+/// ([dcl.init.aggr]/5.2) -- and binds the reference to it.  The list must
+/// fit the bound ([dcl.init.aggr]/6).
+/// \return true and \p result set to the bound reference on success
+bool cpp_typecheckt::brace_init_to_array_reference(
+  const exprt &init_list,
+  const pointer_typet &reference_type,
+  exprt &result)
+{
+  const array_typet &array_type = to_array_type(reference_type.base_type());
+  const auto bound = numeric_cast<mp_integer>(array_type.size());
+  if(!bound.has_value() || mp_integer(init_list.operands().size()) > *bound)
+    return false;
+  typet elem_type = array_type.element_type();
+  exprt::operandst elements;
+  for(const auto &op : init_list.operands())
+  {
+    exprt element = op;
+    implicit_typecast(element, elem_type);
+    elements.push_back(std::move(element));
+  }
+  for(mp_integer i = elements.size(); i < *bound; ++i)
+  {
+    const auto zero =
+      ::zero_initializer(elem_type, init_list.source_location(), *this);
+    if(!zero.has_value())
+      return false;
+    elements.push_back(*zero);
+  }
+  array_typet temporary_type = array_type;
+  temporary_type.remove(ID_C_constant);
+  const auto arr_id = "__init_list_arr$" + std::to_string(anon_counter++);
+  auxiliary_symbolt arr_sym;
+  arr_sym.name = arr_id;
+  arr_sym.base_name = arr_id;
+  arr_sym.type = temporary_type;
+  arr_sym.mode = ID_cpp;
+  arr_sym.is_static_lifetime = true;
+  arr_sym.is_lvalue = true;
+  arr_sym.location = init_list.source_location();
+  arr_sym.value = array_exprt{std::move(elements), temporary_type};
+  symbol_table.add(arr_sym);
+  symbol_exprt arr_ref(arr_id, temporary_type);
+  arr_ref.set(ID_C_lvalue, true);
+  arr_ref.add_source_location() = init_list.source_location();
+  address_of_exprt bound_ref{arr_ref, reference_type};
+  bound_ref.add_source_location() = init_list.source_location();
+  result = std::move(bound_ref);
+  return true;
+}
+
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
   const exprt orig_expr = expr;
@@ -4254,6 +4310,18 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
         expr = std::move(bound);
         return;
       }
+    }
+
+    // N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
+    // for a REFERENCE TO ARRAY parameter aggregate-initializes a temporary
+    // array and binds the reference to it.
+    if(
+      orig_expr.id() == ID_initializer_list && type.id() == ID_pointer &&
+      is_reference(type) &&
+      to_pointer_type(type).base_type().id() == ID_array &&
+      brace_init_to_array_reference(orig_expr, to_pointer_type(type), expr))
+    {
+      return;
     }
 
     // Brace-init-list to std::initializer_list<T> conversion (C++11):

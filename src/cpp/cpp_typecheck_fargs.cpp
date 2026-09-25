@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck_fargs.h"
 
+#include <util/arith_tools.h>
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
 
@@ -335,6 +336,30 @@ static const typet &init_list_referent(const typet &type)
   return type;
 }
 
+/// N5008 [over.ics.list]/6, [dcl.init.aggr]/6: a braced-init-list
+/// initializes an array of known bound when it has at most that many
+/// elements and each converts to the element type.
+static bool brace_init_to_array_is_viable(
+  const exprt &operand,
+  const array_typet &array_type,
+  cpp_typecheckt &cpp_typecheck)
+{
+  const auto bound = numeric_cast<mp_integer>(array_type.size());
+  if(!bound.has_value() || mp_integer(operand.operands().size()) > *bound)
+    return false;
+  for(const auto &op : operand.operands())
+  {
+    if(op.id() == ID_initializer_list)
+      return false; // nested aggregate elements: not modelled here
+    exprt new_expr;
+    unsigned rank = 0;
+    if(!cpp_typecheck.implicit_conversion_sequence(
+         op, array_type.element_type(), new_expr, rank))
+      return false;
+  }
+  return true;
+}
+
 static bool brace_init_to_init_list_is_viable(
   const exprt &operand,
   const typet &target_type,
@@ -521,6 +546,21 @@ bool cpp_typecheck_fargst::match(
       // The shape of `wrapt w({this->member})` with
       // `explicit wrapt(const int &)`.
       distance += rank;
+    }
+    else if(
+      operand.id() == ID_initializer_list && is_reference(type) &&
+      to_pointer_type(type).base_type().id() == ID_array &&
+      brace_init_to_array_is_viable(
+        operand,
+        to_array_type(to_pointer_type(type).base_type()),
+        cpp_typecheck))
+    {
+      // N5008 [over.ics.list]/6 + [dcl.init.list]/3.4: a braced-init-list
+      // for a reference to an array aggregate-initializes a temporary array
+      // -- viable when the list fits the bound and every element converts
+      // to the element type (`_Dest (&&)[1]' with `{declval<_Source>()}',
+      // libc++ variant's narrowing check).
+      distance += 1;
     }
     else if(
       operand.id() == ID_initializer_list &&
