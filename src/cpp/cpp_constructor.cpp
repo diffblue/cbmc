@@ -407,6 +407,17 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       object_tc.type().set(ID_C_constant, false);
       object_tc.set(ID_C_lvalue, true);
       side_effect_expr_assignt assign(object_tc, rhs, typet(), source_location);
+      // N5008 [dcl.init.general]/16.9 + [over.match.conv]/1: this is the
+      // direct-initialization `T t(e)' of a non-class object; an explicit
+      // conversion function of e's class is a candidate (`bool b(loc)' with
+      // `explicit operator bool()')
+      std::optional<direct_initialization_contextt> direct_init;
+      if(
+        object_tc.type().id() != ID_struct_tag &&
+        object_tc.type().id() != ID_union_tag)
+      {
+        direct_init.emplace(*this);
+      }
       typecheck_side_effect_assignment(assign);
       return code_expressiont(std::move(assign));
     }
