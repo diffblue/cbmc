@@ -5061,6 +5061,28 @@ skip_pack_removal_ft:
           {
             for(auto &c : n.get_sub())
             {
+              // `using _Bases::operator()...;' (libc++'s __all_overloads,
+              // [variant.ctor]/14's overload-set builder): the pack IS the
+              // nested-name-specifier.  A type pack element that is a class
+              // is named by its tag identifier -- the form the scope walk
+              // resolves directly (template_mapt::apply does the same for
+              // `_Up::X').
+              if(
+                c.id() == ID_name &&
+                std::find(
+                  used_pack_shorts.begin(),
+                  used_pack_shorts.end(),
+                  id2string(c.get(ID_identifier))) != used_pack_shorts.end() &&
+                pack_type_elems.count(id2string(c.get(ID_identifier))))
+              {
+                const typet &elem =
+                  pack_type_elems[id2string(c.get(ID_identifier))][elem_i];
+                if(elem.id() == ID_struct_tag || elem.id() == ID_union_tag)
+                {
+                  c.set(ID_identifier, to_tag_type(elem).get_identifier());
+                  continue;
+                }
+              }
               if(c.id() == ID_cpp_name || c.id() == ID_ambiguous)
               {
                 const irept &inner =
