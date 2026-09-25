@@ -1165,12 +1165,14 @@ void cpp_typecheckt::convert_non_template_declaration(
     // is there a constructor to be called for the declarator?
     // N5008 [dcl.constexpr]/6: a constexpr object of class type whose
     // constructor call the declarator converter already evaluated has its
-    // value (a struct constant, record_constexpr_object_value); do not
-    // replace it by the constructor call -- that left `constexpr P gp(42);'
-    // at namespace scope without a value, so `static_assert(gp.v == 42)'
-    // could not be evaluated (and was skipped silently).
+    // value (a struct constant, record_constexpr_object_value) -- it is the
+    // object's static initializer; do not replace it by the constructor
+    // call, which left `constexpr P gp(42);' at namespace scope without a
+    // value, so `static_assert(gp.v == 42)' could not be evaluated (and was
+    // skipped silently).
     const bool has_constexpr_value =
-      symbol.is_macro && symbol.value.id() == ID_struct;
+      declaration.storage_spec().is_constexpr() &&
+      symbol.value.id() == ID_struct;
     if(
       symbol.is_lvalue && declarator.init_args().has_operands() &&
       !has_constexpr_value)
