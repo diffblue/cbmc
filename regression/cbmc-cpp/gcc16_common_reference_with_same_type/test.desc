@@ -1,4 +1,4 @@
-KNOWNBUG gcc16
+CORE gcc-only gcc16 libstdcxx16
 main.cpp
 --cpp20
 ^EXIT=0$
@@ -16,6 +16,6 @@ The cv-differing case common_reference_with<W &, const W &> fails with every
 libstdc++ (cpp20_common_reference_with_cv_differing_references).
 2026-09-25: PASSES with gcc 16.0.1 headers (g++-16 -E in the gcc16-test
 image, cbmc on the .ii): the same-type case was fixed by the round-159/160
-work (is_same on reference kinds, compound requirements).  Kept KNOWNBUG
-only because this host has no gcc-16 headers to run it under test.pl;
-promote to CORE gcc16 on a gcc-16 host.
+work (is_same on reference kinds, compound requirements).  Tagged
+libstdcxx16: runs only where the host gcc is 16 or later
+(regression/README.md).
