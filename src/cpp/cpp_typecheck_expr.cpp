@@ -150,6 +150,179 @@ void cpp_typecheckt::bind_requires_parameter(
 /// ([class.default.ctor]/3: no user-provided one, no default member
 /// initializers, bases and members trivial).  [basic.types.general]/9
 /// extends both to scalars, arrays and cv-qualified versions.
+/// N5008 [class.prop], [class.virtual]/1, [class.dtor]/9, [dcl.init.aggr]/1:
+/// the class properties behind the GCC/Clang type traits `__is_empty',
+/// `__is_polymorphic', `__has_virtual_destructor', `__is_standard_layout',
+/// `__is_pod', `__is_aggregate', `__is_literal_type' for the type \p t.
+bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
+{
+  const bool is_class = t.id() == ID_struct_tag;
+  const bool is_union = t.id() == ID_union_tag;
+  if(t.id() == ID_array)
+  {
+    // [dcl.init.aggr]/1: an array is an aggregate; for the properties
+    // defined over "possibly cv-qualified class type or array thereof" an
+    // array has the property of its element type
+    if(trait == "__is_aggregate")
+      return true;
+    if(
+      trait == "__is_standard_layout" || trait == "__is_pod" ||
+      trait == "__is_literal_type")
+    {
+      return class_property(trait, to_array_type(t).element_type());
+    }
+    return false;
+  }
+  if(!is_class && !is_union)
+  {
+    // scalars: standard-layout, POD, literal; not empty/polymorphic/aggregate
+    if(trait == "__is_empty" || trait == "__is_polymorphic")
+      return false;
+    if(trait == "__has_virtual_destructor" || trait == "__is_aggregate")
+      return false;
+    if(t.id() == ID_empty)
+      return trait == "__is_literal_type"; // void is a literal type
+    return t.id() != ID_code;              // a function type has none of them
+  }
+  // N5008 [meta.unary.prop]/3: the type must be complete -- a class
+  // template specialization named but not yet elaborated (`equal_to<void>'
+  // inside `__by_ref_or_value_fn<equal_to<>>' while instantiating
+  // std::find) is completed here, otherwise it reads as a class with no
+  // members and, e.g., NOT empty.
+  elaborate_class_template(t);
+  const struct_union_typet &su = is_class
+                                   ? static_cast<const struct_union_typet &>(
+                                       follow_tag(to_struct_tag_type(t)))
+                                   : static_cast<const struct_union_typet &>(
+                                       follow_tag(to_union_tag_type(t)));
+  if(su.get_bool(ID_incomplete))
+    return false;
+
+  bool has_vtptr = false, has_virtual_dtor = false, has_virtual_base = false,
+       has_data_member = false, has_reference_member = false,
+       has_user_ctor = false, has_nontrivial_dtor = false,
+       has_private_member = false, has_public_member = false,
+       has_default_member_init = false, all_members_ok = true;
+  if(is_class)
+  {
+    for(const auto &base : to_struct_type(su).bases())
+    {
+      if(base.get_bool(ID_virtual))
+        has_virtual_base = true;
+      const typet &base_type = static_cast<const typet &>(base.find(ID_type));
+      if(trait == "__is_polymorphic" && class_property(trait, base_type))
+        has_vtptr = true;
+      if(
+        (trait == "__is_standard_layout" || trait == "__is_pod" ||
+         trait == "__is_literal_type") &&
+        !class_property(trait, base_type))
+      {
+        all_members_ok = false;
+      }
+    }
+  }
+  for(const auto &comp : su.components())
+  {
+    if(comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type))
+      continue;
+    if(comp.get_bool(ID_is_vtptr))
+    {
+      has_vtptr = true;
+      continue;
+    }
+    if(comp.get_is_padding())
+      continue;
+    if(comp.type().id() == ID_code)
+    {
+      const code_typet &code_type = to_code_type(comp.type());
+      const irep_idt &return_id = code_type.return_type().id();
+      if(return_id == ID_destructor)
+      {
+        if(comp.get_bool(ID_is_virtual))
+          has_virtual_dtor = true;
+        if(!code_type.get_bool("#is_implicit_dtor"))
+          has_nontrivial_dtor = true;
+      }
+      else if(return_id == ID_constructor)
+      {
+        if(!code_type.get_bool("#is_implicit_ctor"))
+          has_user_ctor = true;
+      }
+      if(comp.get_bool(ID_is_virtual))
+        has_vtptr = true;
+      continue;
+    }
+    // a non-static data member (own or from a base)
+    has_data_member = true;
+    if(comp.find(ID_value).is_not_nil())
+      has_default_member_init = true;
+    if(is_reference(comp.type()) || is_rvalue_reference(comp.type()))
+      has_reference_member = true;
+    if(comp.get_access() == ID_private || comp.get_access() == ID_protected)
+      has_private_member = true;
+    else
+      has_public_member = true;
+    if(
+      (trait == "__is_standard_layout" || trait == "__is_pod" ||
+       trait == "__is_literal_type") &&
+      !class_property(trait, comp.type()))
+    {
+      all_members_ok = false;
+    }
+  }
+
+  if(trait == "__is_empty")
+  {
+    // [meta.unary.prop]: a class type, but not a union type, with no
+    // non-static data members other than subobjects of zero size, no
+    // virtual member functions, no virtual base classes, and no base class
+    // B for which is_empty_v<B> is false
+    return is_class && !has_data_member && !has_vtptr && !has_virtual_base;
+  }
+  if(trait == "__is_polymorphic")
+    return is_class && has_vtptr; // [class.virtual]/1
+  if(trait == "__has_virtual_destructor")
+    return has_virtual_dtor; // [class.dtor]/9
+  if(trait == "__is_standard_layout")
+  {
+    // [class.prop]/3 (simplified: no virtual functions or bases, uniform
+    // access control, standard-layout members and bases, no reference
+    // members)
+    return !has_vtptr && !has_virtual_base && !has_reference_member &&
+           !(has_private_member && has_public_member) && all_members_ok;
+  }
+  if(trait == "__is_pod")
+  {
+    // [depr.meta.types]: standard-layout and trivial
+    return class_property("__is_standard_layout", t) &&
+           is_trivially_copyable_type(t, true, 64);
+  }
+  if(trait == "__is_aggregate")
+  {
+    // [dcl.init.aggr]/1: no user-declared or inherited constructors, no
+    // private or protected direct non-static data members, no virtual
+    // functions, no virtual, private or protected base classes
+    bool private_base = false;
+    if(is_class)
+    {
+      for(const auto &base : to_struct_type(su).bases())
+        if(base.get(ID_access) != ID_public)
+          private_base = true;
+    }
+    return !has_user_ctor && !has_private_member && !has_vtptr &&
+           !has_virtual_base && !private_base;
+  }
+  if(trait == "__is_literal_type")
+  {
+    // [basic.types.general]/10: trivial destructor, every member of
+    // literal type, and an aggregate or at least one constexpr constructor
+    // (the latter not tracked: any constructor counts)
+    (void)has_default_member_init;
+    return !has_nontrivial_dtor && !has_virtual_dtor && all_members_ok;
+  }
+  return false;
+}
+
 bool cpp_typecheckt::is_trivially_copyable_type(
   const typet &type,
   bool want_trivial,
@@ -173,6 +346,12 @@ bool cpp_typecheckt::is_trivially_copyable_type(
       if(!is_trivially_copyable_type(base_type, want_trivial, depth - 1))
         return false;
     }
+    // [class.default.ctor]/3, [class.prop]/2: a trivial class HAS a
+    // trivial default constructor.  A class with a user-declared
+    // constructor of another signature (`S(int)') has no implicit default
+    // constructor at all ([class.default.ctor]/1), so the loop below finds
+    // no default constructor to reject: track whether one exists.
+    bool has_default_ctor = false, has_any_ctor = false;
     for(const auto &comp : st.components())
     {
       if(comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type))
@@ -194,6 +373,12 @@ bool cpp_typecheckt::is_trivially_copyable_type(
         }
         else if(return_id == ID_constructor)
         {
+          if(!comp.get_bool(ID_from_base))
+          {
+            has_any_ctor = true;
+            if(n_args == 1)
+              has_default_ctor = true;
+          }
           // a copy or move constructor: one parameter of reference to the
           // class; user-provided -> not trivial
           const bool copy_or_move =
@@ -227,7 +412,9 @@ bool cpp_typecheckt::is_trivially_copyable_type(
       if(!is_trivially_copyable_type(comp.type(), want_trivial, depth - 1))
         return false;
     }
-    return true;
+    // (a class without any constructor component -- a POD the front end
+    // synthesizes no special members for -- has the implicit one)
+    return !want_trivial || has_default_ctor || !has_any_ctor;
   }
   if(type.id() == ID_union_tag)
   {
@@ -1815,6 +2002,29 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           }
       }
       expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(
+      expr.id() == "__is_empty" || expr.id() == "__is_polymorphic" ||
+      expr.id() == "__has_virtual_destructor" ||
+      expr.id() == "__is_standard_layout" || expr.id() == "__is_pod" ||
+      expr.id() == "__is_aggregate" || expr.id() == "__is_literal_type")
+    {
+      // The class properties of N5008 [class.prop], [class.virtual]/1,
+      // [class.dtor]/9 and [dcl.init.aggr]/1, on the flattened struct
+      // (base members are components marked #from_base; a polymorphic class
+      // has a vtable-pointer component).  Every one of these was
+      // unconditionally false, so libstdc++'s is_empty (the empty-base /
+      // by-value-functor selections: `__by_ref_or_value_fn' in
+      // predefined_ops.h, compressed_pair) picked the wrong alternative.
+      expr = class_property(expr.id(), t) ? exprt(true_exprt())
+                                          : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_referenceable")
+    {
+      // [defns.referenceable]: an object type, a function type without
+      // cv/ref-qualifiers, or a reference type -- everything but void
+      // (and cv void)
+      expr = t.id() == ID_empty ? exprt(false_exprt()) : exprt(true_exprt());
     }
     else if(expr.id() == "__is_compound")
     {
