@@ -37,6 +37,17 @@ void cpp_typecheckt::propagate_constants(
       expr = s->value;
       return;
     }
+    // N5008 [dcl.constexpr]/6, [expr.const]: a constexpr (or const) ARRAY
+    // -- a static object whose elements are const and whose value is an
+    // array constant; `arr[1]` then folds through the simplifier.
+    if(
+      s != nullptr && !s->is_type && s->type.id() == ID_array &&
+      s->value.id() == ID_array &&
+      to_array_type(s->type).element_type().get_bool(ID_C_constant))
+    {
+      expr = s->value;
+      return;
+    }
   }
 
   for(auto &op : expr.operands())
