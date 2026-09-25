@@ -1526,7 +1526,8 @@ simplify_exprt::resultt<> simplify_exprt::simplify_with(const with_exprt &expr)
       if(!old_type_followed.has_component(component_name))
         return unchanged(expr);
 
-      std::size_t number = old_type_followed.component_number(component_name);
+      std::size_t number =
+        old_type_followed.data_component_number(component_name);
 
       if(number >= expr.old().operands().size())
         return unchanged(expr);

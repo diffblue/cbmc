@@ -802,8 +802,8 @@ exprt remove_const_function_pointerst::get_component_value(
 {
   const struct_typet &struct_type =
     ns.follow_tag(to_struct_tag_type(struct_expr.type()));
-  size_t component_number=
-    struct_type.component_number(member_expr.get_component_name());
+  size_t component_number =
+    struct_type.data_component_number(member_expr.get_component_name());
 
   return struct_expr.operands()[component_number];
 }
