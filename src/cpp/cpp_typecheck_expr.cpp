@@ -1328,20 +1328,20 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           expr = false_exprt();
       }
     }
-    else if(expr.id() == "__is_assignable")
+    else if(
+      expr.id() == "__is_assignable" ||
+      expr.id() == "__is_trivially_assignable" ||
+      expr.id() == "__is_nothrow_assignable")
     {
       // __is_assignable(T, U) is true if the expression
       // declval<T>() = declval<U>() is well-formed.
       // For references: T must be an lvalue reference for assignment.
+      bool assignable = false;
       if(is_reference(t1))
       {
         typet dest = to_reference_type(t1).base_type();
         // Cannot assign to const
-        if(dest.get_bool(ID_C_constant))
-        {
-          expr = false_exprt();
-        }
-        else
+        if(!dest.get_bool(ID_C_constant))
         {
           exprt tmp;
           // See the declval note in __is_convertible above.
@@ -1352,19 +1352,68 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           from.set(ID_C_temporary_avoided, true);
           if(is_reference(t2) && !is_rvalue_reference(t2))
             from.set(ID_C_lvalue, true);
-          if(implicit_conversion_sequence(from, dest, tmp))
-            expr = true_exprt();
-          else
-            expr = false_exprt();
+          assignable = implicit_conversion_sequence(from, dest, tmp);
+          // N5008 [meta.unary.prop]: `declval<T>() = declval<U>()' is also
+          // well-formed through a user-declared `operator=' of the class
+          // taking U ([over.match.oper]; `FromInt &operator=(int)'), which
+          // the conversion-to-T probe above does not see
+          if(!assignable && dest.id() == ID_struct_tag)
+          {
+            elaborate_class_template(dest);
+            for(const auto &c :
+                follow_tag(to_struct_tag_type(dest)).components())
+            {
+              if(c.get_base_name() != "operator=" || c.type().id() != ID_code)
+                continue;
+              const auto &params = to_code_type(c.type()).parameters();
+              if(params.size() != 2)
+                continue;
+              exprt converted;
+              if(implicit_conversion_sequence(
+                   from, params[1].type(), converted))
+              {
+                assignable = true;
+                break;
+              }
+            }
+          }
         }
       }
-      else
+      // else: non-reference T: assignment to an rvalue is not valid for
+      // scalar types, but may be valid for class types with operator=.
+      // Conservatively false.
+      if(expr.id() == "__is_trivially_assignable" && assignable)
       {
-        // Non-reference T: assignment to rvalue is not valid for
-        // scalar types, but may be valid for class types with
-        // operator=. Conservatively return false.
-        expr = false_exprt();
+        // N5008 [meta.unary.prop]: is_trivially_assignable<T, U> requires
+        // additionally that the assignment calls no operation that is not
+        // trivial ([class.copy.assign]/9: a trivial copy/move assignment
+        // operator is not user-provided, the class has no virtual functions
+        // or bases, and every subobject's is trivial).  For a scalar
+        // destination the built-in assignment is trivial; for a class
+        // destination the class's copy/move assignment must be trivial
+        // (is_trivially_copyable_type judges exactly that set of members)
+        // and the source must be the same class (anything else selects a
+        // user-provided converting assignment or conversion).  This was
+        // unconditionally true, like __is_trivially_constructible was.
+        typet dest = to_reference_type(t1).base_type();
+        typet src = t2;
+        if(is_reference(src) || is_rvalue_reference(src))
+          src = to_pointer_type(src).base_type();
+        dest.remove(ID_C_constant);
+        dest.remove(ID_C_volatile);
+        src.remove(ID_C_constant);
+        src.remove(ID_C_volatile);
+        if(dest.id() == ID_struct_tag || dest.id() == ID_union_tag)
+        {
+          assignable =
+            (src.id() == dest.id() && to_tag_type(src).get_identifier() ==
+                                        to_tag_type(dest).get_identifier()) &&
+            is_trivially_copyable_type(dest, false, 64);
+        }
       }
+      // __is_nothrow_assignable: nothrow is about exceptions, which the
+      // front end does not model; assignable suffices.
+      expr = assignable ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else if(
       expr.id() == "__is_trivially_constructible" ||
@@ -1439,13 +1488,6 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         // which are not modelled
         expr = true_exprt();
       }
-    }
-    else if(
-      expr.id() == "__is_trivially_assignable" ||
-      expr.id() == "__is_nothrow_assignable")
-    {
-      // Delegate to __is_assignable logic.
-      expr = true_exprt();
     }
     else if(expr.id() == "__is_nothrow_convertible")
     {
