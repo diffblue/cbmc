@@ -5389,7 +5389,12 @@ bool cpp_typecheckt::check_component_access(
 
       const struct_typet &scope_struct = to_struct_type(scope_symbol.type);
 
+      // N5008 [class.union.general]/3: a union has no base classes and is
+      // not a base class, so nothing derives from a union (libc++
+      // variant's `__union' storage accessed from `__variant_detail::
+      // __access::__union::__get_alt').
       const bool derived_from_object =
+        struct_union_type.id() == ID_struct &&
         subtype_typecast(scope_struct, to_struct_type(struct_union_type));
       const bool derived_from_declaring =
         declaring_type != nullptr &&
