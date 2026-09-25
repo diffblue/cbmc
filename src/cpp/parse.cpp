@@ -387,6 +387,9 @@ protected:
   /// set by rOtherDeclStatement for the declarators that follow: the
   /// decl-specifier is a name the parser knows as a type
   bool decl_specifier_is_known_type = false;
+  /// ... and that type is a class name (a tag), which a function or
+  /// variable of the same name may hide ([basic.scope.hiding]/2)
+  bool decl_specifier_is_class_name = false;
   void SkipTo(int token);
   bool moreVarName();
 
@@ -4839,10 +4842,17 @@ bool Parser::rDeclarator(
       // `find(__k);' as much as a nested class declared later in the class,
       // [class.mem.general]/7) stays an expression here; the type checker
       // turns the latter into a declaration (typecheck_code).
+      // A class name may be hidden by a function or variable of the same
+      // name declared in the same scope ([basic.scope.hiding]/2, `struct
+      // foo x; void foo(struct foo *); ... foo(&x);' in C code), which the
+      // parser's type-only scopes cannot see: for a CLASS name accept only
+      // a bare-name nested declarator (`T(x)'), leaving `T(&x)' / `T(*p)'
+      // an expression -- for such a name the type checker decides.
       const bool named_object_in_statement =
         is_statement && decl_specifier_is_known_type && !empty_nested &&
         declarator2.name().is_not_nil() &&
-        !nested_declarator_names_a_type(declarator2.name());
+        !nested_declarator_names_a_type(declarator2.name()) &&
+        (!decl_specifier_is_class_name || declarator2.type().is_nil());
       if(
         (kind == kDeclarator || kind == kCastDeclarator) &&
         (d_outer.is_nil() || empty_nested) && !named_object_in_statement)
@@ -13642,6 +13652,7 @@ std::optional<codet> Parser::rIntegralDeclStatement(
 
   // `int (i) = k;', `int (*p) = &i;': see rDeclarator's [stmt.ambig] rule
   decl_specifier_is_known_type = true;
+  decl_specifier_is_class_name = false;
 
   if(lex.LookAhead(0)==';')
   {
@@ -13753,6 +13764,8 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
     {
       const new_scopet *found = lookup_id(n.get(ID_identifier));
       decl_specifier_is_known_type = found != nullptr && found->is_type();
+      decl_specifier_is_class_name =
+        found != nullptr && found->kind == new_scopet::kindt::TAG;
     }
   }
 
