@@ -774,18 +774,23 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   // initialized object rather than a fold-away macro (the matching
   // resolve-side exemption keeps uses as symbol expressions); constant
   // folding of constant-indexed reads still happens through the
-  // initializer downstream.
-  // Likewise a constexpr object of CLASS type ([dcl.constexpr]/1: constexpr
-  // declares the object const; it has static storage duration at namespace
-  // scope and is initialized like any other object).  As a fold-away macro
-  // it was never initialized at run time -- reads of `constexpr S g;' saw
-  // the zero-initialized storage, not the default member initializers -- and
-  // member function calls on it need an lvalue.  Its constant value for
-  // constant expressions is recorded separately
-  // (record_constexpr_object_value).
+  // initializer downstream.  A constexpr object of CLASS type stays a
+  // macro; its value for constant expressions is recorded separately
+  // (record_constexpr_object_value) and member reads fold to it.
   if(storage_spec.is_constexpr() && !is_typedef && symbol.type.id() == ID_array)
   {
     symbol.is_macro = false;
+  }
+  // N5008 [dcl.constexpr]/6: "A constexpr specifier used in an object
+  // declaration declares the object as const."  The const of a constexpr
+  // ARRAY was lost (`constexpr int a[] = {1, 2, 3}' had type `int[3]', not
+  // `const int[3]' as `const int a[]' does), so a constant expression over
+  // an element (`static_assert(a[1] == 2)') did not see a constant object.
+  if(
+    storage_spec.is_constexpr() && !is_typedef && !is_code && !symbol.is_type &&
+    symbol.type.id() == ID_array)
+  {
+    to_array_type(symbol.type).element_type().set(ID_C_constant, true);
   }
   symbol.pretty_name = pretty_name;
 
