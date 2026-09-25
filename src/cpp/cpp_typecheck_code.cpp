@@ -3367,6 +3367,8 @@ void cpp_typecheckt::record_constexpr_object_value(
       return convert_deferred_method_now(callee);
     });
 
+  // the struct constant is both the object's value for constant expressions
+  // (member reads and calls fold to it) and its static initializer
   if(folded.id() == ID_struct && folded.type() == object_type)
     symbol_table.get_writeable_ref(symbol.name).value = folded;
 }
