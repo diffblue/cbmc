@@ -1,0 +1,12 @@
+CORE gcc-only
+main.c
+
+redeclaration of 'main::1::b' with no linkage$
+CONVERSION ERROR
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+Two genuine __auto_type declarations of the same local must be rejected as a
+redeclaration. The nested-__auto_type fix scopes the typeof operand's
+declarations so the (legitimate) double-typecheck of a single declaration is
+accepted, but real duplicates like this one are still errors.

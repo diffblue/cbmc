@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/c_types.h>
 #include <util/config.h>
 #include <util/cprover_prefix.h>
+#include <util/expr_iterator.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
@@ -1610,6 +1611,27 @@ void c_typecheck_baset::typecheck_c_bit_field_type(c_bit_field_typet &type)
   }
 }
 
+/// Collect the identifiers of the local variables declared anywhere within
+/// \p expr. After typechecking, a (non-static) local variable declaration is
+/// represented as a `code_frontend_declt` (a `codet` with statement `ID_decl`)
+/// whose declared symbol is its first operand.
+/// \return the set of declared local-variable identifiers
+static std::unordered_set<irep_idt> collect_declared_symbols(const exprt &expr)
+{
+  std::unordered_set<irep_idt> declared;
+
+  for(auto it = expr.depth_begin(), end = expr.depth_end(); it != end; ++it)
+  {
+    if(it->id() == ID_code && to_code(*it).get_statement() == ID_decl)
+    {
+      declared.insert(
+        to_code_frontend_decl(to_code(*it)).symbol().identifier());
+    }
+  }
+
+  return declared;
+}
+
 void c_typecheck_baset::typecheck_typeof_type(typet &type)
 {
   // save location
@@ -1631,6 +1653,19 @@ void c_typecheck_baset::typecheck_typeof_type(typet &type)
   {
     exprt expr = to_unary_expr(as_expr).op();
     typecheck_expr(expr);
+
+    // The operand of typeof is unevaluated; only its type is retained (the
+    // operand expression itself is discarded below). If the operand is a GCC
+    // statement expression it may declare local variables, which typechecking
+    // adds to the symbol table. These must not leak into the enclosing scope:
+    // for __auto_type the parser emits both `typeof(init)` (the type) and
+    // `init` (the declarator's value), so the same statement expression is
+    // typechecked twice, and the second typecheck would otherwise re-add the
+    // same declarations and be rejected as a 'redeclaration with no linkage'.
+    // Remove the local declarations introduced here so they can be recreated
+    // when the initializer copy is typechecked.
+    for(const auto &identifier : collect_declared_symbols(expr))
+      symbol_table.remove(identifier);
 
     // undo an implicit address-of
     if(expr.id()==ID_address_of &&
