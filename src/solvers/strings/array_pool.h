@@ -24,8 +24,7 @@ public:
   /// Generate a new symbol expression of the given \p type with some \p prefix
   /// \return a symbol of type \p type whose name starts with
   ///   "string_refinement#" followed by \p prefix
-  symbol_exprt
-  operator()(const irep_idt &prefix, const typet &type = bool_typet());
+  symbol_exprt operator()(irep_idt prefix, const typet &type = bool_typet());
 
 private:
   unsigned symbol_count = 0;

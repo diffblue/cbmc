@@ -24,7 +24,7 @@ Date: September 2011
 static void mmio(
   value_setst &value_sets,
   const symbol_tablet &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
 #ifdef LOCAL_MAY
   const goto_functionst::goto_functiont &goto_function,
 #endif

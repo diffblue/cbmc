@@ -34,10 +34,10 @@ Date: May 2016
 ///   asserted is expected to include the expression passed in, but may include
 ///   other additional conditions.
 static void instrument_cover_goals(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   const cover_instrumenterst &instrumenters,
-  const irep_idt &mode,
+  irep_idt mode,
   message_handlert &message_handler,
   const cover_instrumenter_baset::assertion_factoryt &make_assertion)
 {
@@ -246,7 +246,7 @@ cover_configt get_cover_config(
 /// \return a cover_configt on success, or null otherwise.
 cover_configt get_cover_config(
   const optionst &options,
-  const irep_idt &main_function_id,
+  irep_idt main_function_id,
   const symbol_tablet &symbol_table,
   message_handlert &message_handler)
 {

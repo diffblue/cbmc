@@ -202,7 +202,7 @@ protected:
 
   void parameter_assignments(
     const goto_programt::targett target,
-    const irep_idt &function_name,
+    irep_idt function_name,
     const goto_functiont::parameter_identifierst &parameter_identifiers,
     const exprt::operandst &arguments,
     goto_programt &dest);

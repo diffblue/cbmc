@@ -63,7 +63,7 @@ public:
   class_hierarchyt &operator=(const class_hierarchyt &) = delete;
 
   // transitively gets all children
-  idst get_children_trans(const irep_idt &id) const
+  idst get_children_trans(irep_idt id) const
   {
     idst result;
     get_children_trans_rec(id, result);
@@ -71,7 +71,7 @@ public:
   }
 
   // transitively gets all parents
-  idst get_parents_trans(const irep_idt &id) const
+  idst get_parents_trans(irep_idt id) const
   {
     idst result;
     get_parents_trans_rec(id, result);
@@ -83,8 +83,8 @@ public:
   void output(json_stream_arrayt &, bool children_only) const;
 
 protected:
-  void get_children_trans_rec(const irep_idt &, idst &) const;
-  void get_parents_trans_rec(const irep_idt &, idst &) const;
+  void get_children_trans_rec(irep_idt, idst &) const;
+  void get_parents_trans_rec(irep_idt, idst &) const;
 };
 
 /// Class hierarchy graph node: simply contains a class identifier.
@@ -114,11 +114,11 @@ public:
     return nodes_by_name;
   }
 
-  idst get_direct_children(const irep_idt &c) const;
+  idst get_direct_children(irep_idt c) const;
 
-  idst get_children_trans(const irep_idt &c) const;
+  idst get_children_trans(irep_idt c) const;
 
-  idst get_parents_trans(const irep_idt &c) const;
+  idst get_parents_trans(irep_idt c) const;
 
 private:
   /// Maps class identifiers onto node indices
@@ -126,7 +126,7 @@ private:
 
   idst ids_from_indices(const std::vector<node_indext> &nodes) const;
 
-  idst get_other_reachable_ids(const irep_idt &c, bool forwards) const;
+  idst get_other_reachable_ids(irep_idt c, bool forwards) const;
 };
 
 /// Output the class hierarchy

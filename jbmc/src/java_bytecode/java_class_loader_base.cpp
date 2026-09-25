@@ -92,8 +92,7 @@ std::string java_class_loader_baset::file_to_class_name(const std::string &file)
 /// file_to_class_name.
 /// \param class_name: the name of the class
 /// \return the class name converted to file name
-std::string
-java_class_loader_baset::class_name_to_jar_file(const irep_idt &class_name)
+std::string java_class_loader_baset::class_name_to_jar_file(irep_idt class_name)
 {
   std::string result = id2string(class_name);
 
@@ -111,8 +110,7 @@ java_class_loader_baset::class_name_to_jar_file(const irep_idt &class_name)
 /// Convert a class name to a file name, with OS-dependent syntax
 /// \param class_name: the name of the class
 /// \return the class name converted to file name
-std::string
-java_class_loader_baset::class_name_to_os_file(const irep_idt &class_name)
+std::string java_class_loader_baset::class_name_to_os_file(irep_idt class_name)
 {
   std::string result = id2string(class_name);
 
@@ -135,7 +133,7 @@ java_class_loader_baset::class_name_to_os_file(const irep_idt &class_name)
 
 /// attempt to load a class from a classpath_entry
 std::optional<java_bytecode_parse_treet> java_class_loader_baset::load_class(
-  const irep_idt &class_name,
+  irep_idt class_name,
   const classpath_entryt &cp_entry,
   message_handlert &message_handler)
 {
@@ -158,7 +156,7 @@ std::optional<java_bytecode_parse_treet> java_class_loader_baset::load_class(
 /// \return optional value of parse tree, empty if class cannot be loaded
 std::optional<java_bytecode_parse_treet>
 java_class_loader_baset::get_class_from_jar(
-  const irep_idt &class_name,
+  irep_idt class_name,
   const std::string &jar_file,
   message_handlert &message_handler)
 {
@@ -193,7 +191,7 @@ java_class_loader_baset::get_class_from_jar(
 /// \return optional value of parse tree, empty if class cannot be loaded
 std::optional<java_bytecode_parse_treet>
 java_class_loader_baset::get_class_from_directory(
-  const irep_idt &class_name,
+  irep_idt class_name,
   const std::string &path,
   message_handlert &message_handler)
 {

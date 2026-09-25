@@ -90,7 +90,7 @@ protected:
 
   unsigned sizeof_nesting;
 
-  irep_idt id_shorthand(const irep_idt &identifier) const;
+  irep_idt id_shorthand(irep_idt identifier) const;
 
   std::string convert_typecast(
     const typecast_exprt &src, unsigned &precedence);

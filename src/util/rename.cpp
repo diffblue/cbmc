@@ -12,8 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "namespace.h"
 
-irep_idt
-get_new_name(const irep_idt &name, const namespacet &ns, char delimiter)
+irep_idt get_new_name(irep_idt name, const namespacet &ns, char delimiter)
 {
   const symbolt *symbol;
   if(ns.lookup(name, symbol))

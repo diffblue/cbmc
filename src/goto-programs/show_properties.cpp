@@ -20,7 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_model.h"
 
 std::optional<source_locationt>
-find_property(const irep_idt &property, const goto_functionst &goto_functions)
+find_property(irep_idt property, const goto_functionst &goto_functions)
 {
   for(const auto &fct : goto_functions.function_map)
   {
@@ -42,7 +42,7 @@ find_property(const irep_idt &property, const goto_functionst &goto_functions)
 
 void show_properties(
   const namespacet &ns,
-  const irep_idt &identifier,
+  irep_idt identifier,
   message_handlert &message_handler,
   ui_message_handlert::uit ui,
   const goto_programt &goto_program)
@@ -126,7 +126,7 @@ void show_properties(
 void convert_properties_json(
   json_arrayt &json_properties,
   const namespacet &ns,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const goto_programt &goto_program)
 {
   for(const auto &ins : goto_program.instructions)

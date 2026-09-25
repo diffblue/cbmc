@@ -65,7 +65,7 @@ public:
     return base_symbol_table.move(symbol, new_symbol);
   }
 
-  symbolt *get_writeable(const irep_idt &identifier) override
+  symbolt *get_writeable(irep_idt identifier) override
   {
     return base_symbol_table.get_writeable(identifier);
   }

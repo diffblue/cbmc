@@ -312,7 +312,7 @@ SCENARIO(
 
       THEN("Object 'v' is of type Wrapper")
       {
-        const auto &tmp_object_declaration =
+        const auto tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
             tmp_object_name, entry_point_code);
 
@@ -362,7 +362,7 @@ SCENARIO(
 
       THEN("Object 'v' is of type Wrapper")
       {
-        const auto &tmp_object_declaration =
+        const auto tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
             tmp_object_name, entry_point_code);
 
@@ -412,7 +412,7 @@ SCENARIO(
 
       THEN("Object 'v' is of type Outer")
       {
-        const auto &tmp_object_declaration =
+        const auto tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
             tmp_object_name, entry_point_code);
 
@@ -477,7 +477,7 @@ SCENARIO(
 
       THEN("Object 'v' is of type A")
       {
-        const auto &tmp_object_declaration =
+        const auto tmp_object_declaration =
           require_goto_statements::require_declaration_of_name(
             tmp_object_name, entry_point_code);
 

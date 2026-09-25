@@ -27,7 +27,7 @@ Date: April 2017
 /// message_handler  Error/status output
 void remove_function(
   goto_modelt &goto_model,
-  const irep_idt &identifier,
+  irep_idt identifier,
   message_handlert &message_handler)
 {
   messaget message(message_handler);

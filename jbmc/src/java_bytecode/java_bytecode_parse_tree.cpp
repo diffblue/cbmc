@@ -94,7 +94,7 @@ void java_bytecode_parse_treet::annotationt::element_value_pairt::output(
 std::optional<java_bytecode_parse_treet::annotationt>
 java_bytecode_parse_treet::find_annotation(
   const annotationst &annotations,
-  const irep_idt &annotation_type_name)
+  irep_idt annotation_type_name)
 {
   const auto annotation_it = std::find_if(
     annotations.begin(),

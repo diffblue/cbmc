@@ -24,7 +24,7 @@ Author: Diffblue Ltd.
 void generate_function_bodiest::generate_function_body(
   goto_functiont &function,
   symbol_tablet &symbol_table,
-  const irep_idt &function_name) const
+  irep_idt function_name) const
 {
   PRECONDITION(!function.body_available());
   generate_parameter_names(function, symbol_table, function_name);
@@ -34,7 +34,7 @@ void generate_function_bodiest::generate_function_body(
 void generate_function_bodiest::generate_parameter_names(
   goto_functiont &function,
   symbol_tablet &symbol_table,
-  const irep_idt &function_name) const
+  irep_idt function_name) const
 {
   auto &function_symbol = symbol_table.get_writeable_ref(function_name);
   auto &parameters = to_code_type(function_symbol.type).parameters();
@@ -71,7 +71,7 @@ protected:
   void generate_function_body_impl(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const override
+    irep_idt function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
     source_locationt location = function_symbol.location;
@@ -88,7 +88,7 @@ protected:
   void generate_function_body_impl(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const override
+    irep_idt function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
 
@@ -112,7 +112,7 @@ protected:
   void generate_function_body_impl(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const override
+    irep_idt function_name) const override
   {
     auto const &function_symbol = symbol_table.lookup_ref(function_name);
 
@@ -164,7 +164,7 @@ private:
     const exprt &lhs,
     const std::size_t initial_depth,
     const source_locationt &source_location,
-    const irep_idt &function_id,
+    irep_idt function_id,
     symbol_tablet &symbol_table,
     goto_programt &dest) const
   {
@@ -218,7 +218,7 @@ protected:
   void generate_function_body_impl(
     goto_functiont &function,
     symbol_tablet &symbol_table,
-    const irep_idt &function_name) const override
+    irep_idt function_name) const override
   {
     const namespacet ns(symbol_table);
     // some user input checking

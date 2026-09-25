@@ -73,7 +73,7 @@ public:
   {
   }
 
-  virtual const symbol_tablet &get_symbol_table() const override
+  const symbol_tablet &get_symbol_table() const override
   {
     return base_symbol_table.get_symbol_table();
   }
@@ -83,7 +83,7 @@ public:
     return journalling_symbol_tablet(base_symbol_table);
   }
 
-  virtual bool move(symbolt &symbol, symbolt *&new_symbol) override
+  bool move(symbolt &symbol, symbolt *&new_symbol) override
   {
     bool ret = base_symbol_table.move(symbol, new_symbol);
     if(!ret)
@@ -93,7 +93,7 @@ public:
     return ret;
   }
 
-  virtual symbolt *get_writeable(const irep_idt &identifier) override
+  symbolt *get_writeable(irep_idt identifier) override
   {
     symbolt *result = base_symbol_table.get_writeable(identifier);
     if(result)
@@ -106,7 +106,7 @@ public:
     return base_symbol_table.next_unused_suffix(prefix);
   }
 
-  virtual std::pair<symbolt &, bool> insert(symbolt symbol) override
+  std::pair<symbolt &, bool> insert(symbolt symbol) override
   {
     std::pair<symbolt &, bool> result =
       base_symbol_table.insert(std::move(symbol));
@@ -115,30 +115,29 @@ public:
     return result;
   }
 
-  virtual void
-  erase(const symbol_table_baset::symbolst::const_iterator &entry) override
+  void erase(const symbol_table_baset::symbolst::const_iterator &entry) override
   {
     const irep_idt entry_name = entry->first;
     base_symbol_table.erase(entry);
     on_remove(entry_name);
   }
 
-  virtual void clear() override
+  void clear() override
   {
     for(const auto &named_symbol : base_symbol_table.symbols)
       on_remove(named_symbol.first);
     base_symbol_table.clear();
   }
 
-  virtual iteratort begin() override
+  iteratort begin() override
   {
     return iteratort(
-      base_symbol_table.begin(), [this](const irep_idt &id) { on_update(id); });
+      base_symbol_table.begin(), [this](irep_idt id) { on_update(id); });
   }
-  virtual iteratort end() override
+  iteratort end() override
   {
     return iteratort(
-      base_symbol_table.end(), [this](const irep_idt &id) { on_update(id); });
+      base_symbol_table.end(), [this](irep_idt id) { on_update(id); });
   }
 
   using symbol_table_baset::begin;
@@ -164,19 +163,19 @@ public:
   }
 
 private:
-  void on_insert(const irep_idt &id)
+  void on_insert(irep_idt id)
   {
     if(removed.erase(id) == 0)
       inserted.insert(id);
     updated.insert(id);
   }
 
-  void on_update(const irep_idt &id)
+  void on_update(irep_idt id)
   {
     updated.insert(id);
   }
 
-  void on_remove(const irep_idt &id)
+  void on_remove(irep_idt id)
   {
     if(inserted.erase(id) == 0)
       removed.insert(id);

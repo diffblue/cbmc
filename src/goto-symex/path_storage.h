@@ -101,12 +101,12 @@ public:
 
   /// Provide a unique L1 index for a given \p id, starting from
   /// \p minimum_index.
-  std::size_t get_unique_l1_index(const irep_idt &id, std::size_t minimum_index)
+  std::size_t get_unique_l1_index(irep_idt id, std::size_t minimum_index)
   {
     return get_unique_index(l1_indices, id, minimum_index);
   }
 
-  std::size_t get_unique_l2_index(const irep_idt &id)
+  std::size_t get_unique_l2_index(irep_idt id)
   {
     return get_unique_index(l2_indices, id, 1);
   }
@@ -117,7 +117,7 @@ public:
 
   /// Generates a loop analysis for the instructions in goto_programt and
   /// keys it against function ID.
-  void add_function_loops(const irep_idt &identifier, const goto_programt &body)
+  void add_function_loops(irep_idt identifier, const goto_programt &body)
   {
     auto loop_iter = loop_analysis_map.find(identifier);
     if(loop_iter == loop_analysis_map.end())
@@ -127,8 +127,7 @@ public:
     }
   }
 
-  inline std::shared_ptr<lexical_loopst>
-  get_loop_analysis(const irep_idt &function_id)
+  inline std::shared_ptr<lexical_loopst> get_loop_analysis(irep_idt function_id)
   {
     return loop_analysis_map.at(function_id);
   }
@@ -146,7 +145,7 @@ private:
 
   std::size_t get_unique_index(
     name_index_mapt &unique_index_map,
-    const irep_idt &id,
+    irep_idt id,
     std::size_t minimum_index)
   {
     auto entry = unique_index_map.emplace(id, minimum_index);

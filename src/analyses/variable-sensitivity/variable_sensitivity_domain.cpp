@@ -22,9 +22,9 @@ Date: April 2016
 #endif
 
 void variable_sensitivity_domaint::transform(
-  const irep_idt &function_from,
+  irep_idt function_from,
   trace_ptrt trace_from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
@@ -401,7 +401,7 @@ void variable_sensitivity_domaint::transform_function_call(
 }
 
 bool variable_sensitivity_domaint::ignore_function_call_transform(
-  const irep_idt &function_id) const
+  irep_idt function_id) const
 {
   static const std::set<irep_idt> ignored_internal_function = {
     CPROVER_PREFIX "set_must",
@@ -437,7 +437,7 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
     modified_symbol_names.begin(),
     modified_symbol_names.end(),
     std::back_inserter(modified_symbols),
-    [&ns](const irep_idt &id) { return ns.lookup(id).symbol_expr(); });
+    [&ns](irep_idt id) { return ns.lookup(id).symbol_expr(); });
 
   for(const auto &symbol : modified_symbols)
   {

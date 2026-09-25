@@ -33,7 +33,7 @@ public:
     return static_cast<const exprt &>(find(ID_value));
   }
 
-  void set_name(const irep_idt &name)
+  void set_name(irep_idt name)
   {
     return set(ID_name, name);
   }
@@ -48,7 +48,7 @@ public:
     return get(ID_base_name);
   }
 
-  void set_base_name(const irep_idt &base_name)
+  void set_base_name(irep_idt base_name)
   {
     return set(ID_base_name, base_name);
   }

@@ -51,7 +51,7 @@ class goto_program2codet
 
 public:
   goto_program2codet(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const goto_programt &_goto_program,
     symbol_tablet &_symbol_table,
     code_blockt &_dest,
@@ -81,7 +81,7 @@ public:
   void operator()();
 
 protected:
-  const irep_idt &func_name;
+  irep_idt func_name;
   const goto_programt &goto_program;
   symbol_tablet &symbol_table;
   const namespacet ns;

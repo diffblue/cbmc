@@ -34,8 +34,8 @@ resolve_inherited_componentt::resolve_inherited_componentt(
 /// \return The concrete component that has been resolved
 std::optional<resolve_inherited_componentt::inherited_componentt>
 resolve_inherited_componentt::operator()(
-  const irep_idt &class_id,
-  const irep_idt &component_name,
+  irep_idt class_id,
+  irep_idt component_name,
   bool include_interfaces,
   const std::function<bool(const symbolt &)> user_filter)
 {
@@ -92,7 +92,8 @@ resolve_inherited_componentt::operator()(
 /// \return A name for looking up in the symbol table for classes `class_name`'s
 ///   component `component_name`
 irep_idt resolve_inherited_componentt::build_full_component_identifier(
-  const irep_idt &class_name, const irep_idt &component_name)
+  irep_idt class_name,
+  irep_idt component_name)
 {
   // Verify the parameters are called in the correct order.
   PRECONDITION(id2string(class_name).find("::")!=std::string::npos);
@@ -124,8 +125,8 @@ irep_idt resolve_inherited_componentt::inherited_componentt::
 /// \return The concrete component that has been resolved
 std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_method_implementation(
-  const irep_idt &call_basename,
-  const irep_idt &classname,
+  irep_idt call_basename,
+  irep_idt classname,
   const symbol_table_baset &symbol_table)
 {
   resolve_inherited_componentt call_resolver{symbol_table};

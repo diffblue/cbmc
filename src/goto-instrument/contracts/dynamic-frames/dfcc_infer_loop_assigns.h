@@ -20,7 +20,7 @@ struct dfcc_loop_nesting_graph_nodet;
 
 /// Collect identifiers that are local to `loop`.
 std::unordered_set<irep_idt> gen_loop_locals_set(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   const dfcc_loop_nesting_graph_nodet &loop,
   message_handlert &message_handler,

@@ -41,7 +41,7 @@ dfcc_contract_clauses_codegent::dfcc_contract_clauses_codegent(
 }
 
 void dfcc_contract_clauses_codegent::gen_spec_assigns_instructions(
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const exprt::operandst &assigns_clause,
   goto_programt &dest)
 {
@@ -69,7 +69,7 @@ void dfcc_contract_clauses_codegent::gen_spec_assigns_instructions(
 }
 
 void dfcc_contract_clauses_codegent::gen_spec_frees_instructions(
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const exprt::operandst &frees_clause,
   goto_programt &dest)
 {
@@ -96,7 +96,7 @@ void dfcc_contract_clauses_codegent::gen_spec_frees_instructions(
 }
 
 void dfcc_contract_clauses_codegent::encode_assignable_target_group(
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const conditional_target_group_exprt &group,
   goto_programt &dest)
 {
@@ -123,7 +123,7 @@ void dfcc_contract_clauses_codegent::encode_assignable_target_group(
 }
 
 void dfcc_contract_clauses_codegent::encode_assignable_target(
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const exprt &target,
   goto_programt &dest)
 {
@@ -185,7 +185,7 @@ void dfcc_contract_clauses_codegent::encode_assignable_target(
 }
 
 void dfcc_contract_clauses_codegent::encode_freeable_target_group(
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const conditional_target_group_exprt &group,
   goto_programt &dest)
 {
@@ -212,7 +212,7 @@ void dfcc_contract_clauses_codegent::encode_freeable_target_group(
 }
 
 void dfcc_contract_clauses_codegent::encode_freeable_target(
-  const irep_idt &language_mode,
+  irep_idt language_mode,
   const exprt &target,
   goto_programt &dest)
 {

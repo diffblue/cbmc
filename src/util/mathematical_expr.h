@@ -21,7 +21,7 @@ class transt : public ternary_exprt
 {
 public:
   transt(
-    const irep_idt &_id,
+    irep_idt _id,
     const exprt &_op0,
     const exprt &_op1,
     const exprt &_op2,

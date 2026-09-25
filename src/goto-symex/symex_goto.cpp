@@ -454,7 +454,7 @@ void goto_symext::symex_unreachable_goto(statet &state)
   symex_transition(state);
 }
 
-bool goto_symext::check_break(const irep_idt &loop_id, unsigned unwind)
+bool goto_symext::check_break(irep_idt loop_id, unsigned unwind)
 {
   // dummy implementation
   return false;

@@ -41,9 +41,8 @@ protected:
   graphmlt graphml;
 
   void remove_l0_l1(exprt &expr);
-  std::string convert_assign_rec(
-    const irep_idt &identifier,
-    const code_assignt &assign);
+  std::string
+  convert_assign_rec(irep_idt identifier, const code_assignt &assign);
 
   template <typename T>
   static void hash_combine(std::size_t &seed, const T &v)

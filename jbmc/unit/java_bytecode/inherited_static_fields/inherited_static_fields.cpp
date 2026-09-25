@@ -19,7 +19,7 @@ Author: Diffblue Ltd.
 /// \param expr: expr to check
 /// \param id: symbol id to look for
 /// \return true if a suitable symbol_exprt is found
-static bool contains_symbol_reference(const exprt &expr, const irep_idt &id)
+static bool contains_symbol_reference(const exprt &expr, irep_idt id)
 {
   return std::any_of(
     expr.depth_begin(),

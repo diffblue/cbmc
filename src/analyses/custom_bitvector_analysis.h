@@ -24,9 +24,9 @@ class custom_bitvector_domaint:public ai_domain_baset
 {
 public:
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) final override;
@@ -98,9 +98,9 @@ public:
     const namespacet &);
 
   void assign_lhs(const exprt &, const vectorst &);
-  void assign_lhs(const irep_idt &, const vectorst &);
+  void assign_lhs(irep_idt, const vectorst &);
   vectorst get_rhs(const exprt &) const;
-  vectorst get_rhs(const irep_idt &) const;
+  vectorst get_rhs(irep_idt) const;
 
   tvt has_values;
 
@@ -117,7 +117,7 @@ private:
   enum class modet { SET_MUST, CLEAR_MUST, SET_MAY, CLEAR_MAY };
 
   void set_bit(const exprt &, unsigned bit_nr, modet);
-  void set_bit(const irep_idt &, unsigned bit_nr, modet);
+  void set_bit(irep_idt, unsigned bit_nr, modet);
 
   static inline void set_bit(bit_vectort &dest, unsigned bit_nr)
   {

@@ -12,19 +12,19 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_types.h"
 #include "std_expr.h"
 
-static array_typet make_type(const irep_idt &value)
+static array_typet make_type(irep_idt value)
 {
   exprt size_expr = from_integer(value.size() + 1, c_index_type());
   return array_typet(char_type(), size_expr);
 }
 
-string_constantt::string_constantt(const irep_idt &_value)
+string_constantt::string_constantt(irep_idt _value)
   : nullary_exprt(ID_string_constant, make_type(_value))
 {
   value(_value);
 }
 
-void string_constantt::value(const irep_idt &_value)
+void string_constantt::value(irep_idt _value)
 {
   exprt::type() = make_type(_value);
   set(ID_value, _value);

@@ -81,7 +81,7 @@ public:
   /// \copydoc symex_targett::function_call()
   virtual void function_call(
     const exprt &guard,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const std::vector<renamedt<exprt, L2>> &ssa_function_arguments,
     const sourcet &source,
     bool hidden);
@@ -89,7 +89,7 @@ public:
   /// \copydoc symex_targett::function_return()
   virtual void function_return(
     const exprt &guard,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const sourcet &source,
     bool hidden);
 
@@ -102,22 +102,22 @@ public:
   virtual void output(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &output_id,
+    irep_idt output_id,
     const std::list<renamedt<exprt, L2>> &args);
 
   /// \copydoc symex_targett::output_fmt()
   virtual void output_fmt(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &output_id,
-    const irep_idt &fmt,
+    irep_idt output_id,
+    irep_idt fmt,
     const std::list<exprt> &args);
 
   /// \copydoc symex_targett::input()
   virtual void input(
     const exprt &guard,
     const sourcet &source,
-    const irep_idt &input_id,
+    irep_idt input_id,
     const std::list<exprt> &args);
 
   /// \copydoc symex_targett::assumption()
@@ -130,7 +130,7 @@ public:
   virtual void assertion(
     const exprt &guard,
     const exprt &cond,
-    const irep_idt &property_id,
+    irep_idt property_id,
     const std::string &msg,
     const sourcet &source);
 

@@ -61,7 +61,7 @@ public:
     return expr_map.empty();
   }
 
-  std::size_t erase(const irep_idt &id)
+  std::size_t erase(irep_idt id)
   {
     return expr_map.erase(id);
   }
@@ -71,7 +71,7 @@ public:
     return expr_map.erase(it);
   }
 
-  bool replaces_symbol(const irep_idt &id) const
+  bool replaces_symbol(irep_idt id) const
   {
     return expr_map.find(id) != expr_map.end();
   }

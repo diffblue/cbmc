@@ -82,9 +82,7 @@ public:
 
   typedef goto_functionst::goto_functiont goto_functiont;
 
-  void goto_check(
-    const irep_idt &function_identifier,
-    goto_functiont &goto_function);
+  void goto_check(irep_idt function_identifier, goto_functiont &goto_function);
 
   /// Fill the list of allocations \ref allocationst with <address, size> for
   ///   every allocation instruction. Also check that each allocation is
@@ -189,7 +187,7 @@ protected:
   void undefined_shift_check(const shift_exprt &, const guardt &);
   void pointer_rel_check(const binary_exprt &, const guardt &);
   void pointer_overflow_check(const exprt &, const guardt &);
-  void memory_leak_check(const irep_idt &function_id);
+  void memory_leak_check(irep_idt function_id);
 
   /// Generates VCCs for the validity of the given dereferencing operation.
   /// \param expr the expression to be checked
@@ -339,7 +337,7 @@ protected:
   ///
   /// \returns a pair (name, status) if the match succeeds
   /// and the name is known, nothing otherwise.
-  named_check_statust match_named_check(const irep_idt &named_check) const;
+  named_check_statust match_named_check(irep_idt named_check) const;
 };
 
 /// Allows to:
@@ -362,7 +360,7 @@ public:
   ///
   /// - calling `set_flag` after `disable_flag` is a no-op
   /// - calling `set_flag` twice triggers an INVARIANT
-  void set_flag(bool &flag, bool new_value, const irep_idt &flag_name)
+  void set_flag(bool &flag, bool new_value, irep_idt flag_name)
   {
     // make this a no-op if the flag is disabled
     if(disabled_flags.find(&flag) != disabled_flags.end())
@@ -384,7 +382,7 @@ public:
   ///
   /// - calling `disable_flag` after `set_flag` overrides the set value
   /// - calling `disable_flag` twice triggers an INVARIANT
-  void disable_flag(bool &flag, const irep_idt &flag_name)
+  void disable_flag(bool &flag, irep_idt flag_name)
   {
     INVARIANT(
       disabled_flags.find(&flag) == disabled_flags.end(),
@@ -2076,7 +2074,7 @@ void goto_check_ct::check(const exprt &expr, bool is_assigned)
   check_rec(expr, identity, is_assigned);
 }
 
-void goto_check_ct::memory_leak_check(const irep_idt &function_id)
+void goto_check_ct::memory_leak_check(irep_idt function_id)
 {
   const symbolt &leak = ns.lookup(CPROVER_PREFIX "memory_leak");
   const symbol_exprt leak_expr = leak.symbol_expr();
@@ -2100,7 +2098,7 @@ void goto_check_ct::memory_leak_check(const irep_idt &function_id)
 }
 
 void goto_check_ct::goto_check(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functiont &goto_function)
 {
   const auto &function_symbol = ns.lookup(function_identifier);
@@ -2468,7 +2466,7 @@ exprt goto_check_ct::is_in_bounds_of_some_explicit_allocation(
 }
 
 void goto_check_c(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
   const optionst &options,
@@ -2519,7 +2517,7 @@ void goto_check_ct::add_all_checked_named_check_pragmas(
 }
 
 goto_check_ct::named_check_statust
-goto_check_ct::match_named_check(const irep_idt &named_check) const
+goto_check_ct::match_named_check(irep_idt named_check) const
 {
   auto s = id2string(named_check);
   auto col = s.find(":");

@@ -23,10 +23,10 @@ Date: August 2020
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 
 bool ai_three_way_merget::visit_edge_function_call(
-  const irep_idt &calling_function_id,
+  irep_idt calling_function_id,
   trace_ptrt p_call,
   locationt l_return,
-  const irep_idt &callee_function_id,
+  irep_idt callee_function_id,
   working_sett &working_set,
   const goto_programt &callee,
   const goto_functionst &goto_functions,

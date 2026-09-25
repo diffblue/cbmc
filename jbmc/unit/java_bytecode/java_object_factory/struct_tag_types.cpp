@@ -17,7 +17,7 @@ Author: Diffblue Ltd.
 
 #include <algorithm>
 
-static bool is_decl_with_struct_tag(const codet &code, const irep_idt &id)
+static bool is_decl_with_struct_tag(const codet &code, irep_idt id)
 {
   if(code.get_statement() != ID_decl)
     return false;
@@ -72,7 +72,7 @@ static bool contains_decl_of_type(const codet &code, const typet &type)
   });
 }
 
-static bool contains_decl_with_struct_tag(const codet &code, const irep_idt &id)
+static bool contains_decl_with_struct_tag(const codet &code, irep_idt id)
 {
   return contains(code, [&id](const codet &subcode) {
     return is_decl_with_struct_tag(subcode, id);

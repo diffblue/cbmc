@@ -45,10 +45,10 @@ protected:
   // Much of this is the same as ai_recursive_interproceduralt's handling but
   // on function return the three-way merge is used.
   bool visit_edge_function_call(
-    const irep_idt &calling_function_id,
+    irep_idt calling_function_id,
     trace_ptrt p_call,
     locationt l_return,
-    const irep_idt &callee_function_id,
+    irep_idt callee_function_id,
     working_sett &working_set,
     const goto_programt &callee,
     const goto_functionst &goto_functions,

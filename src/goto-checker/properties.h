@@ -84,15 +84,14 @@ void update_properties_from_goto_model(
   const abstract_goto_modelt &goto_model);
 
 std::string
-as_string(const irep_idt &property_id, const property_infot &property_info);
+as_string(irep_idt property_id, const property_infot &property_info);
 
-xmlt xml(const irep_idt &property_id, const property_infot &property_info);
+xmlt xml(irep_idt property_id, const property_infot &property_info);
 
-json_objectt
-json(const irep_idt &property_id, const property_infot &property_info);
+json_objectt json(irep_idt property_id, const property_infot &property_info);
 
 /// Write the property info into the given JSON stream object
-void json(json_stream_objectt &, const irep_idt &, const property_infot &);
+void json(json_stream_objectt &, irep_idt, const property_infot &);
 
 int result_to_exit_code(resultt result);
 

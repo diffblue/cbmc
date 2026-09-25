@@ -49,8 +49,8 @@ public:
 
   void swap_and_wrap_check(
     const loop_contract_configt &loop_contract_config,
-    const irep_idt &function_id,
-    const irep_idt &contract_id,
+    irep_idt function_id,
+    irep_idt contract_id,
     std::set<irep_idt> &function_pointer_contracts,
     bool allow_recursive_calls)
   {
@@ -64,8 +64,8 @@ public:
   }
 
   void swap_and_wrap_replace(
-    const irep_idt &function_id,
-    const irep_idt &contract_id,
+    irep_idt function_id,
+    irep_idt contract_id,
     std::set<irep_idt> &function_pointer_contracts)
   {
     swap_and_wrap(
@@ -99,8 +99,8 @@ protected:
   void swap_and_wrap(
     const dfcc_contract_modet contract_mode,
     const loop_contract_configt &loop_contract_config,
-    const irep_idt &function_id,
-    const irep_idt &contract_id,
+    irep_idt function_id,
+    irep_idt contract_id,
     std::set<irep_idt> &function_pointer_contracts,
     bool allow_recursive_calls);
 
@@ -108,16 +108,16 @@ protected:
   /// checks the given `contract_id`.
   void check_contract(
     const loop_contract_configt &loop_contract_config,
-    const irep_idt &function_id,
-    const irep_idt &contract_id,
+    irep_idt function_id,
+    irep_idt contract_id,
     std::set<irep_idt> &function_pointer_contracts,
     bool allow_recursive_calls);
 
   /// Swaps-and-wraps the given `function_id` in a wrapper function that
   /// models the abstract behaviour of contract `contract_id`.
   void replace_with_contract(
-    const irep_idt &function_id,
-    const irep_idt &contract_id,
+    irep_idt function_id,
+    irep_idt contract_id,
     std::set<irep_idt> &function_pointer_contracts);
 };
 #endif

@@ -123,8 +123,7 @@ goto_tracet multi_path_symex_checkert::build_shortest_trace() const
   return goto_trace;
 }
 
-goto_tracet
-multi_path_symex_checkert::build_trace(const irep_idt &property_id) const
+goto_tracet multi_path_symex_checkert::build_trace(irep_idt property_id) const
 {
   goto_tracet goto_trace;
   build_goto_trace(
@@ -154,7 +153,7 @@ void multi_path_symex_checkert::output_error_witness(
 }
 
 fault_location_infot
-multi_path_symex_checkert::localize_fault(const irep_idt &property_id) const
+multi_path_symex_checkert::localize_fault(irep_idt property_id) const
 {
   goto_symex_fault_localizert fault_localizer(
     options,

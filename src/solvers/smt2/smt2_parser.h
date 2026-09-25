@@ -150,9 +150,7 @@ protected:
   void setup_expressions();
   exprt expression();
   exprt function_application();
-  exprt function_application_ieee_float_op(
-    const irep_idt &,
-    const exprt::operandst &);
+  exprt function_application_ieee_float_op(irep_idt, const exprt::operandst &);
   exprt function_application_ieee_float_eq(const exprt::operandst &);
   exprt function_application_fp(const exprt::operandst &);
   exprt::operandst operands();

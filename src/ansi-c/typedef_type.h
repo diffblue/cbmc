@@ -15,12 +15,12 @@ Author: Daniel Kroening, kroening@kroening.com
 class typedef_typet : public typet
 {
 public:
-  explicit typedef_typet(const irep_idt &identifier) : typet(ID_typedef_type)
+  explicit typedef_typet(irep_idt identifier) : typet(ID_typedef_type)
   {
     set_identifier(identifier);
   }
 
-  void set_identifier(const irep_idt &identifier)
+  void set_identifier(irep_idt identifier)
   {
     set(ID_identifier, identifier);
   }

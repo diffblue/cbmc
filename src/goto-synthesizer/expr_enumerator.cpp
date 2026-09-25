@@ -285,7 +285,7 @@ std::list<partitiont> non_leaf_enumeratort::get_partitions(
   return result;
 }
 
-bool binary_functional_enumeratort::is_commutative(const irep_idt &op) const
+bool binary_functional_enumeratort::is_commutative(irep_idt op) const
 {
   return op_id == ID_equal || op_id == ID_plus || op_id == ID_notequal ||
          op_id == ID_or || op_id == ID_and || op_id == ID_xor ||

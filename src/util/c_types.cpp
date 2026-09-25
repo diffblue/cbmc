@@ -248,7 +248,7 @@ empty_typet void_type()
   return result;
 }
 
-std::string c_type_as_string(const irep_idt &c_type)
+std::string c_type_as_string(irep_idt c_type)
 {
   if(c_type==ID_signed_int)
     return "signed int";

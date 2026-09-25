@@ -47,8 +47,9 @@ void flow_insensitive_analysis_baset::operator()(
   fixedpoint(goto_functions);
 }
 
-void flow_insensitive_analysis_baset::
-operator()(const irep_idt &function_id, const goto_programt &goto_program)
+void flow_insensitive_analysis_baset::operator()(
+  irep_idt function_id,
+  const goto_programt &goto_program)
 {
   initialize(goto_program);
   goto_functionst goto_functions;
@@ -69,7 +70,7 @@ void flow_insensitive_analysis_baset::output(
 }
 
 void flow_insensitive_analysis_baset::output(
-  const irep_idt &,
+  irep_idt,
   const goto_programt &,
   std::ostream &out)
 {
@@ -94,7 +95,7 @@ flow_insensitive_analysis_baset::get_next(
 }
 
 bool flow_insensitive_analysis_baset::fixedpoint(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   const goto_functionst &goto_functions)
 {
@@ -123,7 +124,7 @@ bool flow_insensitive_analysis_baset::fixedpoint(
 }
 
 bool flow_insensitive_analysis_baset::visit(
-  const irep_idt &function_id,
+  irep_idt function_id,
   locationt l,
   working_sett &working_set,
   const goto_programt &goto_program,
@@ -188,7 +189,7 @@ bool flow_insensitive_analysis_baset::visit(
 }
 
 bool flow_insensitive_analysis_baset::do_function_call(
-  const irep_idt &calling_function,
+  irep_idt calling_function,
   locationt l_call,
   const goto_functionst &goto_functions,
   const goto_functionst::function_mapt::const_iterator f_it,
@@ -271,7 +272,7 @@ bool flow_insensitive_analysis_baset::do_function_call(
 }
 
 bool flow_insensitive_analysis_baset::do_function_call_rec(
-  const irep_idt &calling_function,
+  irep_idt calling_function,
   locationt l_call,
   const exprt &function,
   const exprt::operandst &arguments,

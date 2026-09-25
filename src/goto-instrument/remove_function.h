@@ -22,10 +22,7 @@ Date: April 2017
 class goto_modelt;
 class message_handlert;
 
-void remove_function(
-  goto_modelt &,
-  const irep_idt &identifier,
-  message_handlert &);
+void remove_function(goto_modelt &, irep_idt identifier, message_handlert &);
 
 void remove_functions(
   goto_modelt &,

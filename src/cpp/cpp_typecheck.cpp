@@ -375,7 +375,7 @@ void cpp_typecheckt::clean_up()
   }
 }
 
-bool cpp_typecheckt::builtin_factory(const irep_idt &identifier)
+bool cpp_typecheckt::builtin_factory(irep_idt identifier)
 {
   return ::builtin_factory(
     identifier, support_float16_type, symbol_table, get_message_handler());

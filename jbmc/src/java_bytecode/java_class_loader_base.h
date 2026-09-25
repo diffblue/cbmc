@@ -35,8 +35,8 @@ public:
   void add_classpath_entry(const std::string &, message_handlert &);
 
   static std::string file_to_class_name(const std::string &);
-  static std::string class_name_to_os_file(const irep_idt &);
-  static std::string class_name_to_jar_file(const irep_idt &);
+  static std::string class_name_to_os_file(irep_idt);
+  static std::string class_name_to_jar_file(irep_idt);
 
   /// a cache for jar_filet, by path name
   jar_poolt jar_pool;
@@ -59,20 +59,18 @@ protected:
   std::list<classpath_entryt> classpath_entries;
 
   /// attempt to load a class from a classpath_entry
-  std::optional<java_bytecode_parse_treet> load_class(
-    const irep_idt &class_name,
-    const classpath_entryt &,
-    message_handlert &);
+  std::optional<java_bytecode_parse_treet>
+  load_class(irep_idt class_name, const classpath_entryt &, message_handlert &);
 
   /// attempt to load a class from a given jar file
   std::optional<java_bytecode_parse_treet> get_class_from_jar(
-    const irep_idt &class_name,
+    irep_idt class_name,
     const std::string &jar_file,
     message_handlert &);
 
   /// attempt to load a class from a given directory
   std::optional<java_bytecode_parse_treet> get_class_from_directory(
-    const irep_idt &class_name,
+    irep_idt class_name,
     const std::string &path,
     message_handlert &);
 };

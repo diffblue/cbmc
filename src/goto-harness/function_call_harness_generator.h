@@ -25,8 +25,8 @@ public:
   explicit function_call_harness_generatort(
     ui_message_handlert &message_handler);
   ~function_call_harness_generatort() override;
-  void generate(goto_modelt &goto_model, const irep_idt &harness_function_name)
-    override;
+  void
+  generate(goto_modelt &goto_model, irep_idt harness_function_name) override;
 
 protected:
   void handle_option(

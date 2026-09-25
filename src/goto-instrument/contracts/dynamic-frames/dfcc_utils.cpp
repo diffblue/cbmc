@@ -32,7 +32,7 @@ Date: August 2022
 /// Returns true iff the given symbol exists and satisfies requirements.
 static bool symbol_exists(
   const goto_modelt &goto_model,
-  const irep_idt &name,
+  irep_idt name,
   const bool require_has_code_type,
   const bool require_body_available)
 {
@@ -57,21 +57,21 @@ static bool symbol_exists(
 
 bool dfcc_utilst::function_symbol_exists(
   const goto_modelt &goto_model,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   return symbol_exists(goto_model, function_id, true, false);
 }
 
 bool dfcc_utilst::function_symbol_with_body_exists(
   const goto_modelt &goto_model,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   return symbol_exists(goto_model, function_id, true, true);
 }
 
 symbolt &dfcc_utilst::get_function_symbol(
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   symbolt &function_symbol = symbol_table.get_writeable_ref(function_id);
   CHECK_RETURN(function_symbol.type.id() == ID_code);
@@ -81,11 +81,11 @@ symbolt &dfcc_utilst::get_function_symbol(
 symbol_exprt dfcc_utilst::create_symbol(
   symbol_table_baset &symbol_table,
   const typet &type,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::string &base_name,
   const source_locationt &source_location)
 {
-  const symbolt &function_symbol =
+  const symbolt function_symbol =
     get_function_symbol(symbol_table, function_id);
 
   symbolt &symbol = get_fresh_aux_symbol(
@@ -106,8 +106,8 @@ const symbolt &dfcc_utilst::create_static_symbol(
   const std::string &prefix,
   const std::string &base_name,
   const source_locationt &source_location,
-  const irep_idt &mode,
-  const irep_idt &module,
+  irep_idt mode,
+  irep_idt module,
   const exprt &initial_value,
   const bool no_nondet_initialization)
 {
@@ -123,11 +123,11 @@ const symbolt &dfcc_utilst::create_static_symbol(
 
 const symbolt &dfcc_utilst::create_new_parameter_symbol(
   symbol_table_baset &symbol_table,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::string &base_name,
   const typet &type)
 {
-  const symbolt &function_symbol =
+  const symbolt function_symbol =
     get_function_symbol(symbol_table, function_id);
 
   symbolt &symbol = get_fresh_aux_symbol(
@@ -156,7 +156,7 @@ static void add_parameter(const symbolt &symbol, code_typet &code_type)
 void dfcc_utilst::add_parameter(
   goto_modelt &goto_model,
   const symbolt &symbol,
-  const irep_idt &function_id)
+  irep_idt function_id)
 {
   auto &function_symbol =
     get_function_symbol(goto_model.symbol_table, function_id);
@@ -169,7 +169,7 @@ void dfcc_utilst::add_parameter(
 
 const symbolt &dfcc_utilst::add_parameter(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::string &base_name,
   const typet &type)
 {
@@ -184,11 +184,11 @@ const symbolt &dfcc_utilst::add_parameter(
 static void clone_parameters(
   symbol_table_baset &symbol_table,
   const code_typet::parameterst &old_params,
-  const irep_idt &mode,
-  const irep_idt &module,
+  irep_idt mode,
+  irep_idt module,
   const source_locationt &location,
-  std::function<const irep_idt(const irep_idt &)> &trans_param,
-  const irep_idt &new_function_id,
+  std::function<const irep_idt(irep_idt)> &trans_param,
+  irep_idt new_function_id,
   code_typet::parameterst &new_params)
 {
   // rename function parameters in the wrapper function's code_type
@@ -248,13 +248,13 @@ static void clone_parameters(
 /// \return the new function symbol
 static const symbolt &clone_and_rename_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
-  std::function<const irep_idt(const irep_idt &)> &trans_fun,
-  std::function<const irep_idt(const irep_idt &)> &trans_param,
+  irep_idt function_id,
+  std::function<const irep_idt(irep_idt)> &trans_fun,
+  std::function<const irep_idt(irep_idt)> &trans_param,
   std::function<const typet(const typet &)> &trans_ret_type,
   std::function<const source_locationt(const source_locationt &)> &trans_loc)
 {
-  const symbolt &old_function_symbol =
+  const symbolt old_function_symbol =
     dfcc_utilst::get_function_symbol(goto_model.symbol_table, function_id);
   code_typet old_code_type = to_code_type(old_function_symbol.type);
 
@@ -299,15 +299,15 @@ static const symbolt &clone_and_rename_function(
 
 const symbolt &dfcc_utilst::clone_and_rename_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
-  const irep_idt &new_function_id,
+  irep_idt function_id,
+  irep_idt new_function_id,
   std::optional<typet> new_return_type = {})
 {
-  std::function<const irep_idt(const irep_idt &)> trans_fun =
-    [&](const irep_idt &old_name) { return new_function_id; };
+  std::function<const irep_idt(irep_idt)> trans_fun = [&](irep_idt old_name)
+  { return new_function_id; };
 
-  std::function<const irep_idt(const irep_idt &)> trans_param =
-    [&](const irep_idt &old_name) { return old_name; };
+  std::function<const irep_idt(irep_idt)> trans_param = [&](irep_idt old_name)
+  { return old_name; };
 
   std::function<const typet(const typet &)> trans_ret_type =
     [&](const typet &old_type) {
@@ -323,8 +323,8 @@ const symbolt &dfcc_utilst::clone_and_rename_function(
 
 void dfcc_utilst::wrap_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
-  const irep_idt &wrapped_function_id)
+  irep_idt function_id,
+  irep_idt wrapped_function_id)
 {
   auto &goto_functions = goto_model.goto_functions;
   auto &symbol_table = goto_model.symbol_table;
@@ -360,10 +360,8 @@ void dfcc_utilst::wrap_function(
   // Re-insert a symbol for `function_id` which is now the wrapper function
   symbolt wrapper_sym = *old_sym;
 
-  std::function<const irep_idt(const irep_idt &)> trans_param =
-    [&](const irep_idt &old_param) {
-      return id2string(old_param) + "_wrapper";
-    };
+  std::function<const irep_idt(irep_idt)> trans_param = [&](irep_idt old_param)
+  { return id2string(old_param) + "_wrapper"; };
 
   // create new code_type with renamed parameters for the wrapper
   const auto &old_code_type = to_code_type(old_sym->type);
@@ -423,7 +421,7 @@ exprt dfcc_utilst::make_sizeof_expr(const exprt &expr, const namespacet &ns)
 
 static inlining_decoratort inline_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
+  irep_idt function_id,
   message_handlert &message_handler)
 {
   auto &goto_function = goto_model.goto_functions.function_map.at(function_id);
@@ -442,7 +440,7 @@ static inlining_decoratort inline_function(
 
 void dfcc_utilst::inline_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
+  irep_idt function_id,
   message_handlert &message_handler)
 {
   inlining_decoratort decorated =
@@ -459,7 +457,7 @@ void dfcc_utilst::inline_function(
 
 void dfcc_utilst::inline_function(
   goto_modelt &goto_model,
-  const irep_idt &function_id,
+  irep_idt function_id,
   std::set<irep_idt> &no_body,
   std::set<irep_idt> &recursive_call,
   std::set<irep_idt> &missing_function,

@@ -44,9 +44,9 @@ public:
   }
 
   void transform(
-    const irep_idt &,
+    irep_idt,
     trace_ptrt trace_from,
-    const irep_idt &,
+    irep_idt,
     trace_ptrt,
     ai_baset &,
     const namespacet &) override

@@ -101,17 +101,17 @@ public:
     return get_bool(ID_property_fatal);
   }
 
-  void set_file(const irep_idt &file)
+  void set_file(irep_idt file)
   {
     set(ID_file, file);
   }
 
-  void set_working_directory(const irep_idt &cwd)
+  void set_working_directory(irep_idt cwd)
   {
     set(ID_working_directory, cwd);
   }
 
-  void set_line(const irep_idt &line)
+  void set_line(irep_idt line)
   {
     set(ID_line, line);
   }
@@ -121,7 +121,7 @@ public:
     set(ID_line, line);
   }
 
-  void set_column(const irep_idt &column)
+  void set_column(irep_idt column)
   {
     set(ID_column, column);
   }
@@ -132,7 +132,7 @@ public:
   }
 
   DEPRECATED(SINCE(2022, 10, 13, "use identifier of containing function"))
-  void set_function(const irep_idt &function)
+  void set_function(irep_idt function)
   {
     PRECONDITION(!function.empty());
     set(ID_function, function);
@@ -143,28 +143,28 @@ public:
     remove(ID_function);
   }
 
-  void set_property_id(const irep_idt &property_id)
+  void set_property_id(irep_idt property_id)
   {
     set(ID_property_id, property_id);
   }
 
-  void set_property_class(const irep_idt &property_class)
+  void set_property_class(irep_idt property_class)
   {
     set(ID_property_class, property_class);
   }
 
-  void set_comment(const irep_idt &comment)
+  void set_comment(irep_idt comment)
   {
     set(ID_comment, comment);
   }
 
   // for switch case number
-  void set_case_number(const irep_idt &number)
+  void set_case_number(irep_idt number)
   {
     set(ID_switch_case_number, number);
   }
 
-  void set_java_bytecode_index(const irep_idt &index)
+  void set_java_bytecode_index(irep_idt index)
   {
     set(ID_java_bytecode_index, index);
   }
@@ -210,7 +210,7 @@ public:
 
   std::optional<std::string> full_path() const;
 
-  void add_pragma(const irep_idt &pragma)
+  void add_pragma(irep_idt pragma)
   {
     add(ID_pragma).add(pragma);
   }

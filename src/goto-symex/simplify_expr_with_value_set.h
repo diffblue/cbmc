@@ -18,7 +18,7 @@ class simplify_expr_with_value_sett : public simplify_exprt
 public:
   simplify_expr_with_value_sett(
     const value_sett &_vs,
-    const irep_idt &_mode,
+    irep_idt _mode,
     const namespacet &_ns)
     : simplify_exprt(_ns), value_set(_vs), language_mode(_mode)
   {

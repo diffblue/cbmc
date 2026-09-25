@@ -115,7 +115,7 @@ private:
     memory_scopet(
       const memory_addresst &begin,
       const mp_integer &byte_size,
-      const irep_idt &name);
+      irep_idt name);
 
     /// Check if \p point points somewhere in this memory scope
     /// \param point: memory address to be check for presence
@@ -153,7 +153,7 @@ private:
   /// Keep track of the memory location for the analyzed symbols
   std::map<irep_idt, pointer_valuet> memory_map;
 
-  bool has_known_memory_location(const irep_idt &id) const
+  bool has_known_memory_location(irep_idt id) const
   {
     return memory_map.count(id) != 0;
   }
@@ -197,7 +197,7 @@ private:
   ///   expression and then process outstanding assignments that this
   ///   extraction introduced.
   /// \param symbol_name: symbol table name to be analysed
-  void analyze_symbol(const irep_idt &symbol_name);
+  void analyze_symbol(irep_idt symbol_name);
 
   /// Create assignment \p lhs := \p value (see \ref analyze_symbol)
   /// \param lhs: the left-hand side of the assignment; expected to be a

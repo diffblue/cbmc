@@ -93,9 +93,9 @@ public:
   /// The history aware version is used by the abstract interpreter
   /// for backwards compatability it calls the older signature
   virtual void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt to,
     ai_baset &ai,
     const namespacet &ns) = 0;

@@ -128,16 +128,16 @@ void symex_level1t::restore_from(const symex_level1t &other)
   }
 }
 
-unsigned symex_level2t::latest_index(const irep_idt &identifier) const
+unsigned symex_level2t::latest_index(irep_idt identifier) const
 {
   const auto r_opt = current_names.find(identifier);
   return !r_opt ? 0 : r_opt->get().second;
 }
 
 std::size_t symex_level2t::increase_generation(
-  const irep_idt &l1_identifier,
+  irep_idt l1_identifier,
   const ssa_exprt &lhs,
-  std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider)
+  std::function<std::size_t(irep_idt)> fresh_l2_name_provider)
 {
   const std::size_t n = fresh_l2_name_provider(l1_identifier);
 

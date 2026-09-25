@@ -41,7 +41,7 @@ typedef dstring_hash irep_id_hash;
 [[gnu::no_dangling]]
 #endif
 inline const std::string &
-id2string(const irep_idt &d)
+id2string(irep_idt d)
 {
   return as_string(d);
 }
@@ -374,11 +374,11 @@ public:
     return id() != ID_nil;
   }
 
-  explicit irept(const irep_idt &_id) : baset(_id)
+  explicit irept(irep_idt _id) : baset(_id)
   {
   }
 
-  irept(const irep_idt &_id, const named_subt &_named_sub, const subt &_sub)
+  irept(irep_idt _id, const named_subt &_named_sub, const subt &_sub)
     : baset(_id, _named_sub, _sub)
   {
   }
@@ -391,38 +391,38 @@ public:
   const std::string &id_string() const
   { return id2string(read().data); }
 
-  void id(const irep_idt &_data)
+  void id(irep_idt _data)
   { write().data=_data; }
 
-  const irept &find(const irep_idt &name) const;
-  irept &add(const irep_idt &name);
-  irept &add(const irep_idt &name, irept irep);
+  const irept &find(irep_idt name) const;
+  irept &add(irep_idt name);
+  irept &add(irep_idt name, irept irep);
 
-  const std::string &get_string(const irep_idt &name) const
+  const std::string &get_string(irep_idt name) const
   {
     return id2string(get(name));
   }
 
-  const irep_idt &get(const irep_idt &name) const;
-  bool get_bool(const irep_idt &name) const;
-  signed int get_int(const irep_idt &name) const;
-  std::size_t get_size_t(const irep_idt &name) const;
-  long long get_long_long(const irep_idt &name) const;
+  const irep_idt &get(irep_idt name) const;
+  bool get_bool(irep_idt name) const;
+  signed int get_int(irep_idt name) const;
+  std::size_t get_size_t(irep_idt name) const;
+  long long get_long_long(irep_idt name) const;
 
-  void set(const irep_idt &name, const irep_idt &value)
+  void set(irep_idt name, irep_idt value)
   {
     add(name, irept(value));
   }
-  void set(const irep_idt &name, irept irep)
+  void set(irep_idt name, irept irep)
   {
     add(name, std::move(irep));
   }
-  void set(const irep_idt &name, const long long value);
-  void set_size_t(const irep_idt &name, const std::size_t value);
+  void set(irep_idt name, const long long value);
+  void set_size_t(irep_idt name, const std::size_t value);
 
-  void remove(const irep_idt &name);
+  void remove(irep_idt name);
   void move_to_sub(irept &irep);
-  void move_to_named_sub(const irep_idt &name, irept &irep);
+  void move_to_named_sub(irep_idt name, irept &irep);
 
   bool operator==(const irept &other) const;
 
@@ -457,7 +457,7 @@ public:
 
   std::string pretty(unsigned indent=0, unsigned max_indent=0) const;
 
-  static bool is_comment(const irep_idt &name)
+  static bool is_comment(irep_idt name)
   { return !name.empty() && name[0]=='#'; }
 
   /// count the number of named_sub elements that are not comments

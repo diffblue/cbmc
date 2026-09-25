@@ -131,15 +131,14 @@ public:
   const exprt &get_upper() const;
 
   /** SET OF ARITHMETIC OPERATORS */
-  constant_interval_exprt
-  handle_constant_unary_expression(const irep_idt &op) const;
+  constant_interval_exprt handle_constant_unary_expression(irep_idt op) const;
   constant_interval_exprt handle_constant_binary_expression(
     const constant_interval_exprt &other,
-    const irep_idt &) const;
+    irep_idt) const;
 
-  constant_interval_exprt eval(const irep_idt &unary_operator) const;
+  constant_interval_exprt eval(irep_idt unary_operator) const;
   constant_interval_exprt
-  eval(const irep_idt &binary_operator, const constant_interval_exprt &o) const;
+  eval(irep_idt binary_operator, const constant_interval_exprt &o) const;
 
   /* Unary arithmetic */
   constant_interval_exprt unary_plus() const;
@@ -366,7 +365,7 @@ public:
   static constant_interval_exprt get_extremes(
     const constant_interval_exprt &lhs,
     const constant_interval_exprt &rhs,
-    const irep_idt &operation);
+    irep_idt operation);
   static exprt get_extreme(std::vector<exprt> values, bool min = true);
   static exprt get_max(const exprt &a, const exprt &b);
   static exprt get_min(const exprt &a, const exprt &b);
@@ -437,7 +436,7 @@ private:
   static void generate_expression(
     const exprt &lhs,
     const exprt &rhs,
-    const irep_idt &operation,
+    irep_idt operation,
     std::vector<exprt> &collection);
   static void append_multiply_expression(
     const exprt &lower,
@@ -455,7 +454,7 @@ private:
   static exprt generate_shift_expression(
     const exprt &lhs,
     const exprt &rhs,
-    const irep_idt &operation);
+    irep_idt operation);
 };
 
 inline const constant_interval_exprt &

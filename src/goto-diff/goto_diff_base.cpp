@@ -82,7 +82,7 @@ void goto_difft::output_function_group(
 /// \param function_name: the function id
 /// \param goto_model: the goto model
 void goto_difft::output_function(
-  const irep_idt &function_name,
+  irep_idt function_name,
   const goto_modelt &goto_model) const
 {
   messaget msg(message_handler);
@@ -136,7 +136,7 @@ void goto_difft::convert_function_group_json(
 /// \param goto_model: the goto model
 void goto_difft::convert_function_json(
   json_objectt &result,
-  const irep_idt &function_name,
+  irep_idt function_name,
   const goto_modelt &goto_model) const
 {
   namespacet ns(goto_model.symbol_table);

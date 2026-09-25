@@ -86,7 +86,7 @@ bool cpp_typecheckt::has_auto(const typet &type)
 }
 
 cpp_scopet &cpp_typecheckt::tag_scope(
-  const irep_idt &base_name,
+  irep_idt base_name,
   bool has_body,
   bool tag_only_declaration)
 {
@@ -294,7 +294,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   const cpp_declarationt &declaration,
   cpp_declaratort &declarator,
   struct_typet::componentst &components,
-  const irep_idt &access,
+  irep_idt access,
   bool is_static,
   bool is_typedef,
   bool is_mutable)
@@ -1425,7 +1425,7 @@ void cpp_typecheckt::add_anonymous_members_to_scope(
 
 void cpp_typecheckt::convert_anon_struct_union_member(
   const cpp_declarationt &declaration,
-  const irep_idt &access,
+  irep_idt access,
   struct_typet::componentst &components)
 {
   const struct_union_typet &final_type =
@@ -1485,7 +1485,7 @@ void cpp_typecheckt::convert_anon_struct_union_member(
 bool cpp_typecheckt::get_component(
   const source_locationt &source_location,
   const exprt &object,
-  const irep_idt &component_name,
+  irep_idt component_name,
   exprt &member)
 {
   PRECONDITION(

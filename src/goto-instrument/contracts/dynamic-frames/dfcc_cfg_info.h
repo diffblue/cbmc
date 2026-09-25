@@ -244,7 +244,7 @@ class dfcc_cfg_infot
 public:
   dfcc_cfg_infot(
     goto_modelt &goto_model,
-    const irep_idt &function_id,
+    irep_idt function_id,
     goto_functiont &goto_function,
     const exprt &top_level_write_set,
     const loop_contract_configt &loop_contract_config,
@@ -315,7 +315,7 @@ public:
   }
 
 private:
-  const irep_idt &function_id;
+  irep_idt function_id;
   goto_functiont &goto_function;
   const exprt &top_level_write_set;
   const namespacet ns;

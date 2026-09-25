@@ -3,10 +3,8 @@
 #include <goto-checker/report_util.cpp>
 #include <testing-utils/use_catch.h>
 
-static goto_programt::instructiont instruction_for_location(
-  const irep_idt &file,
-  const irep_idt &function,
-  size_t line_no)
+static goto_programt::instructiont
+instruction_for_location(irep_idt file, irep_idt function, size_t line_no)
 {
   source_locationt location;
   location.set_file(file);
@@ -26,8 +24,7 @@ static property_infot test_info(const goto_programt::const_targett &target)
   return property_infot(target, "ignored", property_statust::UNKNOWN);
 }
 
-static propertyt
-property(const irep_idt &identifier, const property_infot &info)
+static propertyt property(irep_idt identifier, const property_infot &info)
 {
   return std::make_pair(identifier, info);
 }

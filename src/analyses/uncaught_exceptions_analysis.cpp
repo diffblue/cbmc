@@ -39,8 +39,7 @@ exprt uncaught_exceptions_domaint::get_exception_symbol(const exprt &expr)
 }
 
 /// The join operator for the uncaught exceptions domain
-void uncaught_exceptions_domaint::join(
-  const irep_idt &element)
+void uncaught_exceptions_domaint::join(irep_idt element)
 {
   thrown.insert(element);
 }

@@ -67,7 +67,7 @@ Author: Daniel Kroening, kroening@kroening.com
 /// It breaks into three categories:
 ///
 /// 1. Running an analysis, via \ref
-///    #operator()(const irep_idt&,const goto_programt&, const namespacet&),
+///    #operator()(irep_idt,const goto_programt&, const namespacet&),
 ///    \ref ai_baset#operator()(const goto_functionst&,const namespacet&)
 ///    and \ref ai_baset#operator()(const abstract_goto_modelt&)
 /// 2. Accessing the results of an analysis, by looking up the history objects
@@ -76,7 +76,7 @@ Author: Daniel Kroening, kroening@kroening.com
 ///    or the domains using
 ///    \ref ai_baset#abstract_state_before(locationt)const
 /// 3. Outputting the results of the analysis; see
-///    \ref ai_baset#output(const namespacet&, const irep_idt&,
+///    \ref ai_baset#output(const namespacet&, irep_idt,
 ///    const goto_programt&, std::ostream&)const et cetera.
 ///
 /// Where possible, uses should be agnostic of the particular configuration of
@@ -99,8 +99,8 @@ Author: Daniel Kroening, kroening@kroening.com
 ///    concurrency_aware_ait does this to compute a fixed point over threads.
 ///
 /// D. For pre-analysis initialization
-///    \ref ait#initialize(const irep_idt&, const goto_programt&),
-///    \ref ait#initialize(const irep_idt&,
+///    \ref ait#initialize(irep_idt, const goto_programt&),
+///    \ref ait#initialize(irep_idt,
 ///    const goto_functionst::goto_functiont&) and
 ///    \ref ait#initialize(const goto_functionst&),
 ///
@@ -141,7 +141,7 @@ public:
 
   /// Run abstract interpretation on a single function
   void operator()(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program,
     const namespacet &ns)
   {
@@ -178,7 +178,7 @@ public:
 
   /// Run abstract interpretation on a single function
   void operator()(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_functionst::goto_functiont &goto_function,
     const namespacet &ns)
   {
@@ -279,7 +279,7 @@ public:
   /// \param out: The ostream to direct output to
   virtual void output(
     const namespacet &ns,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program,
     std::ostream &out) const;
 
@@ -291,7 +291,7 @@ public:
   /// \return The JSON object
   virtual jsont output_json(
     const namespacet &ns,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program) const;
 
   /// Output the abstract states for a single function as XML
@@ -302,7 +302,7 @@ public:
   /// \return The XML object
   virtual xmlt output_xml(
     const namespacet &ns,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program) const;
 
   /// Output the abstract states for a whole program
@@ -391,11 +391,11 @@ protected:
   /// Initialize all the abstract states for a single function. Override this to
   /// do custom per-domain initialization.
   virtual void
-  initialize(const irep_idt &function_id, const goto_programt &goto_program);
+  initialize(irep_idt function_id, const goto_programt &goto_program);
 
   /// Initialize all the abstract states for a single function.
   virtual void initialize(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_functionst::goto_functiont &goto_function);
 
   /// Initialize all the abstract states for a whole program. Override this to
@@ -429,7 +429,7 @@ protected:
   /// \return True if we found something new
   virtual bool fixedpoint(
     trace_ptrt starting_trace,
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &goto_program,
     const goto_functionst &goto_functions,
     const namespacet &ns);
@@ -444,7 +444,7 @@ protected:
   /// or applications of the abstract transformer
   /// \return True if the state was changed
   virtual bool visit(
-    const irep_idt &function_id,
+    irep_idt function_id,
     trace_ptrt p,
     working_sett &working_set,
     const goto_programt &goto_program,
@@ -456,7 +456,7 @@ protected:
   // visit_function_call handles which function(s) to call,
   // while visit_edge_function_call handles a single call
   virtual bool visit_function_call(
-    const irep_idt &function_id,
+    irep_idt function_id,
     trace_ptrt p_call,
     working_sett &working_set,
     const goto_programt &goto_program,
@@ -464,7 +464,7 @@ protected:
     const namespacet &ns);
 
   virtual bool visit_end_function(
-    const irep_idt &function_id,
+    irep_idt function_id,
     trace_ptrt p,
     working_sett &working_set,
     const goto_programt &goto_program,
@@ -473,19 +473,19 @@ protected:
 
   // The most basic step, computing one edge / transformer application.
   bool visit_edge(
-    const irep_idt &function_id,
+    irep_idt function_id,
     trace_ptrt p,
-    const irep_idt &to_function_id,
+    irep_idt to_function_id,
     locationt to_l,
     trace_ptrt caller_history,
     const namespacet &ns,
     working_sett &working_set);
 
   virtual bool visit_edge_function_call(
-    const irep_idt &calling_function_id,
+    irep_idt calling_function_id,
     trace_ptrt p_call,
     locationt l_return,
-    const irep_idt &callee_function_id,
+    irep_idt callee_function_id,
     working_sett &working_set,
     const goto_programt &callee,
     const goto_functionst &goto_functions,
@@ -542,10 +542,10 @@ public:
 protected:
   // Override the function that handles a single function call edge
   bool visit_edge_function_call(
-    const irep_idt &calling_function_id,
+    irep_idt calling_function_id,
     trace_ptrt p_call,
     locationt l_return,
-    const irep_idt &callee_function_id,
+    irep_idt callee_function_id,
     working_sett &working_set,
     const goto_programt &callee,
     const goto_functionst &goto_functions,
@@ -701,7 +701,7 @@ protected:
     struct wl_entryt
     {
       wl_entryt(
-        const irep_idt &_function_id,
+        irep_idt _function_id,
         const goto_programt &_goto_program,
         locationt _location)
         : function_id(_function_id),

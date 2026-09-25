@@ -33,7 +33,7 @@ public:
   const goto_tracet &insert_all(goto_tracet &&);
 
   const std::list<goto_tracet> &all() const;
-  const goto_tracet &operator[](const irep_idt &property_id) const;
+  const goto_tracet &operator[](irep_idt property_id) const;
 
   const namespacet &get_namespace() const;
 

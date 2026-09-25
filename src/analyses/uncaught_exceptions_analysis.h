@@ -32,7 +32,7 @@ class uncaught_exceptions_domaint
                  uncaught_exceptions_analysist &,
                  const namespacet &);
 
-  void join(const irep_idt &);
+  void join(irep_idt);
   void join(const std::set<irep_idt> &);
   void join(const std::vector<irep_idt> &);
 

@@ -85,7 +85,7 @@ private:
   /// slicer, i.e., shortest path between two functions, or all direct paths.
   /// Inserts functions to preserve into the functions_to_keep set
   /// \param destination_function: name of destination function for slice
-  void note_functions_to_keep(const irep_idt &destination_function);
+  void note_functions_to_keep(irep_idt destination_function);
 
   /// \brief Finds all functions that contain a property,
   /// and adds them to the list of functions to keep. This

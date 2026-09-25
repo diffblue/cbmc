@@ -223,9 +223,8 @@ const boolbv_widtht::entryt &boolbv_widtht::get_entry(const typet &type) const
   return cache_entry;
 }
 
-const boolbv_widtht::membert &boolbv_widtht::get_member(
-  const struct_typet &type,
-  const irep_idt &member) const
+const boolbv_widtht::membert &
+boolbv_widtht::get_member(const struct_typet &type, irep_idt member) const
 {
   const auto &entry_opt = get_entry(type);
   CHECK_RETURN(entry_opt.has_value());

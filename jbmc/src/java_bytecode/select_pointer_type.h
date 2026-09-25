@@ -44,8 +44,8 @@ public:
   /// Derived classes can override this behaviour to provide more
   /// sophisticated alternative type identification.
   virtual std::set<struct_tag_typet> get_parameter_alternative_types(
-    const irep_idt &function_name,
-    const irep_idt &parameter_name,
+    irep_idt function_name,
+    irep_idt parameter_name,
     const namespacet &ns) const;
 
   /// Specialize generic parameters in a pointer type based on the current map

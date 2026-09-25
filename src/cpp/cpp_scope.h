@@ -29,7 +29,7 @@ public:
 
   enum lookup_kindt { SCOPE_ONLY, QUALIFIED, RECURSIVE };
 
-  id_sett lookup(const irep_idt &base_name_to_lookup, lookup_kindt kind)
+  id_sett lookup(irep_idt base_name_to_lookup, lookup_kindt kind)
   {
     id_sett result;
     lookup_rec(base_name_to_lookup, kind, result);
@@ -37,7 +37,7 @@ public:
   }
 
   id_sett lookup(
-    const irep_idt &base_name_to_lookup,
+    irep_idt base_name_to_lookup,
     lookup_kindt kind,
     cpp_idt::id_classt identifier_class)
   {
@@ -46,10 +46,9 @@ public:
     return result;
   }
 
-  id_sett
-  lookup_identifier(const irep_idt &id, cpp_idt::id_classt identifier_class);
+  id_sett lookup_identifier(irep_idt id, cpp_idt::id_classt identifier_class);
 
-  cpp_idt &insert(const irep_idt &_base_name)
+  cpp_idt &insert(irep_idt _base_name)
   {
     cpp_id_mapt::iterator it=
       sub.insert(std::pair<irep_idt, cpp_idt>
@@ -72,7 +71,7 @@ public:
     return it->second;
   }
 
-  bool contains(const irep_idt &base_name_to_lookup);
+  bool contains(irep_idt base_name_to_lookup);
 
   bool is_root_scope() const
   {
@@ -112,13 +111,13 @@ public:
     using_scopes.push_back(&other);
   }
 
-  class cpp_scopet &new_scope(const irep_idt &new_scope_name);
+  class cpp_scopet &new_scope(irep_idt new_scope_name);
 
 protected:
-  void lookup_rec(const irep_idt &base_name, lookup_kindt kind, id_sett &);
+  void lookup_rec(irep_idt base_name, lookup_kindt kind, id_sett &);
 
   void lookup_rec(
-    const irep_idt &base_name,
+    irep_idt base_name,
     lookup_kindt kind,
     cpp_idt::id_classt id_class,
     id_sett &);

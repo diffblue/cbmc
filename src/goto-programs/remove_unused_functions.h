@@ -29,7 +29,7 @@ void remove_unused_functions(
   message_handlert &);
 
 void find_used_functions(
-  const irep_idt &current,
+  irep_idt current,
   goto_functionst &functions,
   std::set<irep_idt> &seen);
 

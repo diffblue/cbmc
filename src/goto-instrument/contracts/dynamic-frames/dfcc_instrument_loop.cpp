@@ -43,7 +43,7 @@ dfcc_instrument_loopt::dfcc_instrument_loopt(
 
 void dfcc_instrument_loopt::operator()(
   const std::size_t loop_id,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   dfcc_cfg_infot &cfg_info,
   const std::set<symbol_exprt> &local_statics,
@@ -207,7 +207,7 @@ void dfcc_instrument_loopt::operator()(
 std::unordered_map<exprt, symbol_exprt, irep_hash>
 dfcc_instrument_loopt::add_prehead_instructions(
   const std::size_t loop_id,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functionst::goto_functiont &goto_function,
   symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
@@ -220,7 +220,7 @@ dfcc_instrument_loopt::add_prehead_instructions(
   const symbol_exprt &entered_loop,
   const symbol_exprt &initial_invariant,
   const symbol_exprt &in_base_case,
-  const irep_idt &language_mode)
+  irep_idt language_mode)
 {
   auto loop_head_location(loop_head->source_location());
   dfcc_remove_loop_tags(loop_head_location);
@@ -324,7 +324,7 @@ goto_programt::instructiont::targett
 dfcc_instrument_loopt::add_step_instructions(
   const std::size_t loop_id,
   const std::size_t cbmc_loop_id,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functionst::goto_functiont &goto_function,
   symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
@@ -473,7 +473,7 @@ dfcc_instrument_loopt::add_step_instructions(
 void dfcc_instrument_loopt::add_body_instructions(
   const std::size_t loop_id,
   const std::size_t cbmc_loop_id,
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functionst::goto_functiont &goto_function,
   symbol_table_baset &symbol_table,
   goto_programt::targett loop_head,
@@ -485,7 +485,7 @@ void dfcc_instrument_loopt::add_body_instructions(
   const std::vector<symbol_exprt> &old_decreases_vars,
   const std::vector<symbol_exprt> &new_decreases_vars,
   const goto_programt::instructiont::targett &step_case_target,
-  const irep_idt &language_mode)
+  irep_idt language_mode)
 {
   auto loop_head_location(loop_head->source_location());
   dfcc_remove_loop_tags(loop_head_location);

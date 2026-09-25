@@ -427,11 +427,7 @@ inline ieee_float_notequal_exprt &to_ieee_float_notequal_expr(exprt &expr)
 class ieee_float_op_exprt : public ternary_exprt
 {
 public:
-  ieee_float_op_exprt(
-    const exprt &_lhs,
-    const irep_idt &_id,
-    exprt _rhs,
-    exprt _rm)
+  ieee_float_op_exprt(const exprt &_lhs, irep_idt _id, exprt _rhs, exprt _rm)
     : ternary_exprt(_id, _lhs, std::move(_rhs), std::move(_rm), _lhs.type())
   {
   }

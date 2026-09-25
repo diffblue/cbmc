@@ -20,8 +20,8 @@ Author: Diffblue Ltd.
 
 void check_function_call(
   const equal_exprt &eq_expr,
-  const irep_idt &class_name,
-  const irep_idt &function_name,
+  irep_idt class_name,
+  irep_idt function_name,
   const goto_programt::targetst &targets)
 {
   REQUIRE(eq_expr.op0().is_constant());

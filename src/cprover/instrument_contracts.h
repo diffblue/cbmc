@@ -23,6 +23,6 @@ class namespacet;
 void instrument_contracts(goto_modelt &);
 
 std::optional<code_with_contract_typet>
-get_contract(const irep_idt &function_identifier, const namespacet &);
+get_contract(irep_idt function_identifier, const namespacet &);
 
 #endif // CPROVER_CPOVER_INSTRUMENT_CONTRACTS_H

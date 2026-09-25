@@ -36,9 +36,9 @@ bool scratch_programt::check_sat(bool do_slice, guard_managert &guard_manager)
 
   goto_functiont this_goto_function;
   this_goto_function.body.copy_from(*this);
-  auto get_goto_function =
-    [this, &this_goto_function](
-      const irep_idt &key) -> const goto_functionst::goto_functiont & {
+  auto get_goto_function = [this, &this_goto_function](irep_idt key)
+    -> const goto_functionst::goto_functiont &
+  {
     if(key == goto_functionst::entry_point())
       return this_goto_function;
     else

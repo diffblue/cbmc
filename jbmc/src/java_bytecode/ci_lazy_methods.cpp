@@ -38,7 +38,7 @@ Author: Diffblue Ltd.
 ///   Java bytecode.
 ci_lazy_methodst::ci_lazy_methodst(
   const symbol_table_baset &symbol_table,
-  const irep_idt &main_class,
+  irep_idt main_class,
   const std::vector<irep_idt> &main_jar_classes,
   const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points,
   java_class_loadert &java_class_loader,
@@ -331,7 +331,7 @@ ci_lazy_methodst::convert_and_analyze_method(
   const method_convertert &method_converter,
   std::unordered_set<irep_idt> &methods_already_populated,
   const bool class_initializer_already_seen,
-  const irep_idt &method_name,
+  irep_idt method_name,
   symbol_table_baset &symbol_table,
   std::unordered_set<irep_idt> &methods_to_convert_later,
   std::unordered_set<irep_idt> &instantiated_classes,
@@ -557,8 +557,8 @@ void ci_lazy_methodst::gather_needed_globals(
 ///   `instantiated_classes`, or irep_idt() otherwise.
 irep_idt ci_lazy_methodst::get_virtual_method_target(
   const std::unordered_set<irep_idt> &instantiated_classes,
-  const irep_idt &call_basename,
-  const irep_idt &classname,
+  irep_idt call_basename,
+  irep_idt classname,
   const symbol_table_baset &symbol_table)
 {
   // Program-wide, is this class ever instantiated?

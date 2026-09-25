@@ -66,9 +66,9 @@ void variable_sensitivity_dependence_domaint::eval_data_deps(
  * \param ns: the namespace
  */
 void variable_sensitivity_dependence_domaint::transform(
-  const irep_idt &function_from,
+  irep_idt function_from,
   trace_ptrt trace_from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
@@ -202,9 +202,9 @@ void variable_sensitivity_dependence_domaint::data_dependencies(
 }
 
 void variable_sensitivity_dependence_domaint::control_dependencies(
-  const irep_idt &from_function,
+  irep_idt from_function,
   goto_programt::const_targett from,
-  const irep_idt &to_function,
+  irep_idt to_function,
   goto_programt::const_targett to,
   variable_sensitivity_dependence_grapht &dep_graph)
 {

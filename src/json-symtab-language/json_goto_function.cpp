@@ -38,7 +38,7 @@ static goto_instruction_codet try_get_code(const json_objectt &json)
 /// \param code_id: The expected code type
 /// \return An expression, unless an exception was thrown before.
 static goto_instruction_codet
-try_get_code(const json_objectt &json, const irep_idt &code_id)
+try_get_code(const json_objectt &json, irep_idt code_id)
 {
   goto_instruction_codet code = try_get_code(json);
   if(code.get_statement() != code_id)

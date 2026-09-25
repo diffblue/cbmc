@@ -33,8 +33,7 @@ struct build_declaration_hops_inputst;
 class goto_convertt : public messaget
 {
 public:
-  void
-  goto_convert(const codet &code, goto_programt &dest, const irep_idt &mode);
+  void goto_convert(const codet &code, goto_programt &dest, irep_idt mode);
 
   goto_convertt(
     symbol_table_baset &_symbol_table,
@@ -81,16 +80,13 @@ protected:
       side_effects.destructive_append(other.side_effects);
     }
 
-    void add_temporary(const irep_idt &id)
+    void add_temporary(irep_idt id)
     {
       temporaries.push_front(id);
     }
   };
 
-  void goto_convert_rec(
-    const codet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+  void goto_convert_rec(const codet &code, goto_programt &dest, irep_idt mode);
 
   //
   // tools for symbols
@@ -100,12 +96,10 @@ protected:
     const std::string &suffix,
     goto_programt &dest,
     const source_locationt &,
-    const irep_idt &mode);
+    irep_idt mode);
 
-  symbol_exprt make_compound_literal(
-    const exprt &expr,
-    goto_programt &dest,
-    const irep_idt &mode);
+  symbol_exprt
+  make_compound_literal(const exprt &expr, goto_programt &dest, irep_idt mode);
 
   //
   // translation of C expressions (with side effects)
@@ -113,10 +107,10 @@ protected:
   //
 
   [[nodiscard]] clean_expr_resultt
-  clean_expr(exprt &expr, const irep_idt &mode, bool result_is_used = true);
+  clean_expr(exprt &expr, irep_idt mode, bool result_is_used = true);
 
   [[nodiscard]] clean_expr_resultt
-  clean_expr_address_of(exprt &expr, const irep_idt &mode);
+  clean_expr_address_of(exprt &expr, irep_idt mode);
 
   static bool needs_cleaning(const exprt &expr);
 
@@ -133,7 +127,7 @@ protected:
     exprt &expr,
     const std::string &suffix,
     goto_programt &,
-    const irep_idt &mode);
+    irep_idt mode);
 
   void rewrite_boolean(exprt &dest);
 
@@ -147,46 +141,42 @@ protected:
 
   [[nodiscard]] clean_expr_resultt remove_side_effect(
     side_effect_exprt &expr,
-    const irep_idt &mode,
+    irep_idt mode,
     bool result_is_used,
     bool address_taken);
   [[nodiscard]] clean_expr_resultt remove_assignment(
     side_effect_exprt &expr,
     bool result_is_used,
     bool address_taken,
-    const irep_idt &mode);
+    irep_idt mode);
   [[nodiscard]] clean_expr_resultt remove_pre(
     side_effect_exprt &expr,
     bool result_is_used,
     bool address_taken,
-    const irep_idt &mode);
-  [[nodiscard]] clean_expr_resultt remove_post(
-    side_effect_exprt &expr,
-    const irep_idt &mode,
-    bool result_is_used);
+    irep_idt mode);
+  [[nodiscard]] clean_expr_resultt
+  remove_post(side_effect_exprt &expr, irep_idt mode, bool result_is_used);
   [[nodiscard]] clean_expr_resultt remove_function_call(
     side_effect_expr_function_callt &expr,
-    const irep_idt &mode,
+    irep_idt mode,
     bool result_is_used);
   [[nodiscard]] clean_expr_resultt
   remove_cpp_new(side_effect_exprt &expr, bool result_is_used);
   [[nodiscard]] clean_expr_resultt remove_cpp_delete(side_effect_exprt &expr);
-  [[nodiscard]] clean_expr_resultt remove_malloc(
-    side_effect_exprt &expr,
-    const irep_idt &mode,
-    bool result_is_used);
+  [[nodiscard]] clean_expr_resultt
+  remove_malloc(side_effect_exprt &expr, irep_idt mode, bool result_is_used);
   [[nodiscard]] clean_expr_resultt
   remove_temporary_object(side_effect_exprt &expr);
   [[nodiscard]] clean_expr_resultt remove_statement_expression(
     side_effect_exprt &expr,
-    const irep_idt &mode,
+    irep_idt mode,
     bool result_is_used);
   [[nodiscard]] clean_expr_resultt
-  remove_gcc_conditional_expression(exprt &expr, const irep_idt &mode);
+  remove_gcc_conditional_expression(exprt &expr, irep_idt mode);
   [[nodiscard]] clean_expr_resultt remove_overflow(
     side_effect_expr_overflowt &expr,
     bool result_is_used,
-    const irep_idt &mode);
+    irep_idt mode);
 
   virtual void do_cpp_new(
     const exprt &lhs,
@@ -219,21 +209,21 @@ protected:
     const exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   virtual void do_function_call_if(
     const exprt &lhs,
     const if_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   virtual void do_function_call_symbol(
     const exprt &lhs,
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   virtual void do_function_call_symbol(const symbolt &)
   {
@@ -248,83 +238,66 @@ protected:
   //
   // conversion
   //
-  void convert_block(
-    const code_blockt &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+  void
+  convert_block(const code_blockt &code, goto_programt &dest, irep_idt mode);
   void convert_frontend_decl(
     const code_frontend_declt &,
     goto_programt &,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_decl_type(const codet &code, goto_programt &dest);
   void convert_expression(
     const code_expressiont &code,
     goto_programt &dest,
-    const irep_idt &mode);
-  void convert_assign(
-    const code_assignt &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
+  void
+  convert_assign(const code_assignt &code, goto_programt &dest, irep_idt mode);
   void convert_cpp_delete(const codet &code, goto_programt &dest);
   void convert_loop_contracts(const codet &code, goto_programt::targett loop);
+  void convert_for(const code_fort &code, goto_programt &dest, irep_idt mode);
   void
-  convert_for(const code_fort &code, goto_programt &dest, const irep_idt &mode);
-  void convert_while(
-    const code_whilet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+  convert_while(const code_whilet &code, goto_programt &dest, irep_idt mode);
   void convert_dowhile(
     const code_dowhilet &code,
     goto_programt &dest,
-    const irep_idt &mode);
-  void convert_assume(
-    const code_assumet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
-  void convert_assert(
-    const code_assertt &code,
-    goto_programt &dest,
-    const irep_idt &mode);
-  void convert_switch(
-    const code_switcht &code,
-    goto_programt &dest,
-    const irep_idt &mode);
-  void convert_break(
-    const code_breakt &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
+  void
+  convert_assume(const code_assumet &code, goto_programt &dest, irep_idt mode);
+  void
+  convert_assert(const code_assertt &code, goto_programt &dest, irep_idt mode);
+  void
+  convert_switch(const code_switcht &code, goto_programt &dest, irep_idt mode);
+  void
+  convert_break(const code_breakt &code, goto_programt &dest, irep_idt mode);
   void convert_return(
     const code_frontend_returnt &,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_continue(
     const code_continuet &code,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_ifthenelse(
     const code_ifthenelset &code,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_goto(const code_gotot &code, goto_programt &dest);
   void convert_gcc_computed_goto(const codet &code, goto_programt &dest);
   void convert_skip(const codet &code, goto_programt &dest);
-  void convert_label(
-    const code_labelt &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+  void
+  convert_label(const code_labelt &code, goto_programt &dest, irep_idt mode);
   void convert_gcc_local_label(const codet &code, goto_programt &dest);
   void convert_switch_case(
     const code_switch_caset &code,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_gcc_switch_case_range(
     const code_gcc_switch_case_ranget &,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_function_call(
     const code_function_callt &code,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_start_thread(const codet &code, goto_programt &dest);
   void convert_end_thread(const codet &code, goto_programt &dest);
   void convert_atomic_begin(const codet &code, goto_programt &dest);
@@ -332,34 +305,24 @@ protected:
   void convert_msc_try_finally(
     const codet &code,
     goto_programt &dest,
-    const irep_idt &mode);
-  void convert_msc_try_except(
-    const codet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
-  void convert_msc_leave(
-    const codet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
-  void convert_try_catch(
-    const codet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
+  void
+  convert_msc_try_except(const codet &code, goto_programt &dest, irep_idt mode);
+  void convert_msc_leave(const codet &code, goto_programt &dest, irep_idt mode);
+  void convert_try_catch(const codet &code, goto_programt &dest, irep_idt mode);
   void convert_CPROVER_try_catch(
     const codet &code,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void convert_CPROVER_try_finally(
     const codet &code,
     goto_programt &dest,
-    const irep_idt &mode);
-  void convert_CPROVER_throw(
-    const codet &code,
-    goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
+  void
+  convert_CPROVER_throw(const codet &code, goto_programt &dest, irep_idt mode);
   void convert_asm(const code_asmt &code, goto_programt &dest);
 
-  void convert(const codet &code, goto_programt &dest, const irep_idt &mode);
+  void convert(const codet &code, goto_programt &dest, irep_idt mode);
 
   void copy(
     const codet &code,
@@ -370,12 +333,12 @@ protected:
   // exceptions
   //
 
-  symbol_exprt exception_flag(const irep_idt &mode);
+  symbol_exprt exception_flag(irep_idt mode);
 
   void unwind_destructor_stack(
     const source_locationt &source_location,
     goto_programt &dest,
-    const irep_idt &mode,
+    irep_idt mode,
     std::optional<node_indext> destructor_end_point = {},
     std::optional<node_indext> destructor_start_point = {});
 
@@ -391,7 +354,7 @@ protected:
   // gotos
   //
 
-  void finish_gotos(goto_programt &dest, const irep_idt &mode);
+  void finish_gotos(goto_programt &dest, irep_idt mode);
   void finish_computed_gotos(goto_programt &dest);
   void optimize_guarded_gotos(goto_programt &dest);
 
@@ -599,7 +562,7 @@ protected:
     goto_programt &false_case,
     const source_locationt &,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   // if(guard) goto target_true; else goto target_false;
   void generate_conditional_branch(
@@ -608,7 +571,7 @@ protected:
     goto_programt::targett target_false,
     const source_locationt &,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   // if(guard) goto target;
   void generate_conditional_branch(
@@ -616,19 +579,17 @@ protected:
     goto_programt::targett target_true,
     const source_locationt &,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   // turn a OP b OP c into a list a, b, c
-  static void collect_operands(
-    const exprt &expr,
-    const irep_idt &id,
-    std::list<exprt> &dest);
+  static void
+  collect_operands(const exprt &expr, irep_idt id, std::list<exprt> &dest);
 
   // START_THREAD; ... END_THREAD;
   void generate_thread_block(
     const code_blockt &thread_body,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   //
   // misc
@@ -659,7 +620,7 @@ protected:
     const exprt::operandst &arguments,
     goto_programt &dest);
   void do_array_op(
-    const irep_idt &id,
+    irep_idt id,
     const exprt &lhs,
     const symbol_exprt &function,
     const exprt::operandst &arguments,
@@ -697,13 +658,13 @@ protected:
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
   void do_alloca(
     const exprt &lhs,
     const symbol_exprt &function,
     const exprt::operandst &arguments,
     goto_programt &dest,
-    const irep_idt &mode);
+    irep_idt mode);
 
   exprt get_array_argument(const exprt &src);
 };

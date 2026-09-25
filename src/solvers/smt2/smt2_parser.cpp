@@ -423,7 +423,7 @@ exprt smt2_parsert::function_application_ieee_float_eq(
 }
 
 exprt smt2_parsert::function_application_ieee_float_op(
-  const irep_idt &id,
+  irep_idt id,
   const exprt::operandst &op)
 {
   if(op.size() != 3)

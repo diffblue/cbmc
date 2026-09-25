@@ -76,7 +76,7 @@ using build_argumentst =
 /// \return true if error occurred on entry point search
 bool java_entry_point(
   class symbol_table_baset &symbol_table,
-  const irep_idt &main_class,
+  irep_idt main_class,
   class message_handlert &message_handler,
   bool assume_init_pointers_not_null,
   bool assert_uncaught_exceptions,
@@ -139,7 +139,7 @@ irep_idt get_java_class_literal_initializer_signature();
 /// Figures out the entry point of the code to verify
 main_function_resultt get_main_symbol(
   const symbol_table_baset &symbol_table,
-  const irep_idt &main_class,
+  irep_idt main_class,
   message_handlert &);
 
 /// Generate a _start function for a specific function. See

@@ -88,7 +88,7 @@ get_cover_config(const optionst &, const symbol_tablet &, message_handlert &);
 
 cover_configt get_cover_config(
   const optionst &,
-  const irep_idt &main_function_id,
+  irep_idt main_function_id,
   const symbol_tablet &,
   message_handlert &);
 

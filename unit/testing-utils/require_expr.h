@@ -23,19 +23,16 @@ namespace require_expr
   index_exprt require_index(const exprt &expr, int expected_index);
   index_exprt require_top_index(const exprt &expr);
 
-  member_exprt require_member(
-    const exprt &expr, const irep_idt &component_identifier);
+  member_exprt require_member(const exprt &expr, irep_idt component_identifier);
 
-  symbol_exprt require_symbol(
-    const exprt &expr, const irep_idt &symbol_name);
+  symbol_exprt require_symbol(const exprt &expr, irep_idt symbol_name);
 
   symbol_exprt require_symbol(const exprt &expr);
 
   typecast_exprt require_typecast(const exprt &expr);
 
-  side_effect_exprt require_side_effect_expr(
-    const exprt &expr,
-    const irep_idt &side_effect_statement);
+  side_effect_exprt
+  require_side_effect_expr(const exprt &expr, irep_idt side_effect_statement);
 }
 
 #endif // CPROVER_TESTING_UTILS_REQUIRE_EXPR_H

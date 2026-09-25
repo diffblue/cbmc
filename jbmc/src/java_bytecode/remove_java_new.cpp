@@ -36,13 +36,13 @@ public:
 
   // Lower java_new for a single function
   bool lower_java_new(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &,
     message_handlert &);
 
   // Lower java_new for a single instruction
   goto_programt::targett lower_java_new(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     goto_programt &,
     goto_programt::targett,
     message_handlert &);
@@ -52,14 +52,14 @@ protected:
   namespacet ns;
 
   goto_programt::targett lower_java_new(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     const exprt &lhs,
     const side_effect_exprt &rhs,
     goto_programt &,
     goto_programt::targett);
 
   goto_programt::targett lower_java_new_array(
-    const irep_idt &function_identifier,
+    irep_idt function_identifier,
     const exprt &lhs,
     const side_effect_exprt &rhs,
     goto_programt &,
@@ -80,7 +80,7 @@ protected:
 /// Note: we have to take a copy of `lhs` and `rhs` since they would suffer
 ///   destruction when replacing the instruction.
 goto_programt::targett remove_java_newt::lower_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   const exprt &lhs,
   const side_effect_exprt &rhs,
   goto_programt &dest,
@@ -130,7 +130,7 @@ goto_programt::targett remove_java_newt::lower_java_new(
 /// Note: we have to take a copy of `lhs` and `rhs` since they would suffer
 ///   destruction when replacing the instruction.
 goto_programt::targett remove_java_newt::lower_java_new_array(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   const exprt &lhs,
   const side_effect_exprt &rhs,
   goto_programt &dest,
@@ -360,7 +360,7 @@ goto_programt::targett remove_java_newt::lower_java_new_array(
 /// \param message_handler: message handler
 /// \return true if a replacement has been made
 goto_programt::targett remove_java_newt::lower_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   goto_programt::targett target,
   message_handlert &message_handler)
@@ -406,7 +406,7 @@ goto_programt::targett remove_java_newt::lower_java_new(
 /// \param message_handler: message handler
 /// \return true if one or more java_new expressions have been replaced
 bool remove_java_newt::lower_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt &goto_program,
   message_handlert &message_handler)
 {
@@ -436,7 +436,7 @@ bool remove_java_newt::lower_java_new(
 /// \param symbol_table: The symbol table to add symbols to.
 /// \param message_handler: a message handler
 void remove_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt::targett target,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
@@ -455,7 +455,7 @@ void remove_java_new(
 /// \param symbol_table: The symbol table to add symbols to.
 /// \param message_handler: a message handler
 void remove_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functionst::goto_functiont &function,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)

@@ -245,10 +245,10 @@ protected:
 
   goto_functions_change_impactt old_change_impact, new_change_impact;
 
-  void change_impact(const irep_idt &function_id);
+  void change_impact(irep_idt function_id);
 
   void change_impact(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_programt &old_goto_program,
     const goto_programt &new_goto_program,
     const unified_difft::goto_program_difft &diff,
@@ -256,25 +256,25 @@ protected:
     goto_program_change_impactt &new_impact);
 
   void propogate_dep_back(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const dependence_grapht::nodet &d_node,
     const dependence_grapht &dep_graph,
     goto_functions_change_impactt &change_impact,
     bool del);
   void propogate_dep_forward(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const dependence_grapht::nodet &d_node,
     const dependence_grapht &dep_graph,
     goto_functions_change_impactt &change_impact,
     bool del);
 
   void output_change_impact(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_program_change_impactt &c_i,
     const goto_functionst &goto_functions,
     const namespacet &ns) const;
   void output_change_impact(
-    const irep_idt &function_id,
+    irep_idt function_id,
     const goto_program_change_impactt &o_c_i,
     const goto_functionst &o_goto_functions,
     const namespacet &o_ns,
@@ -316,7 +316,7 @@ change_impactt::change_impactt(
   new_dep_graph(new_goto_functions, ns_new);
 }
 
-void change_impactt::change_impact(const irep_idt &function_id)
+void change_impactt::change_impact(irep_idt function_id)
 {
   unified_difft::goto_program_difft diff = unified_diff.get_diff(function_id);
 
@@ -349,7 +349,7 @@ void change_impactt::change_impact(const irep_idt &function_id)
 }
 
 void change_impactt::change_impact(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
   const unified_difft::goto_program_difft &diff,
@@ -421,7 +421,7 @@ void change_impactt::change_impact(
 }
 
 void change_impactt::propogate_dep_forward(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const dependence_grapht::nodet &d_node,
   const dependence_grapht &dep_graph,
   goto_functions_change_impactt &change_impact,
@@ -454,7 +454,7 @@ void change_impactt::propogate_dep_forward(
 }
 
 void change_impactt::propogate_dep_back(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const dependence_grapht::nodet &d_node,
   const dependence_grapht &dep_graph,
   goto_functions_change_impactt &change_impact,
@@ -568,7 +568,7 @@ void change_impactt::operator()()
 }
 
 void change_impactt::output_change_impact(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_program_change_impactt &c_i,
   const goto_functionst &goto_functions,
   const namespacet &ns) const
@@ -613,7 +613,7 @@ void change_impactt::output_change_impact(
 }
 
 void change_impactt::output_change_impact(
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_program_change_impactt &o_c_i,
   const goto_functionst &o_goto_functions,
   const namespacet &o_ns,

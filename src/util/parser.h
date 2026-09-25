@@ -81,7 +81,7 @@ public:
     line_no=_line_no;
   }
 
-  void set_file(const irep_idt &file)
+  void set_file(irep_idt file)
   {
     _source_location.set_file(file);
     _source_location.set_working_directory(
@@ -130,7 +130,7 @@ public:
     e.add_source_location() = source_location();
   }
 
-  void set_function(const irep_idt &function)
+  void set_function(irep_idt function)
   {
     _source_location.set_function(function);
   }

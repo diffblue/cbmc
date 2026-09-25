@@ -16,7 +16,7 @@ Author: Daniel Kroening
 #include "cover_util.h"
 
 void cover_condition_instrumentert::instrument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
   const cover_blocks_baset &,

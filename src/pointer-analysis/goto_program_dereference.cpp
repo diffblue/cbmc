@@ -245,7 +245,7 @@ void goto_program_dereferencet::dereference_instruction(
 
 /// Set the current target to `target` and remove derefence from expr.
 void goto_program_dereferencet::dereference_expression(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::const_targett target,
   exprt &expr)
 {
@@ -276,7 +276,7 @@ void remove_pointers(
 /// Remove dereferences in `expr` using `value_sets` to determine to what
 /// objects the pointers may be pointing to.
 void dereference(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt::const_targett target,
   exprt &expr,
   const namespacet &ns,

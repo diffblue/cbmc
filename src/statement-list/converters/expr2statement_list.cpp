@@ -288,7 +288,7 @@ void expr2stlt::convert_first_non_trivial_operand(std::vector<exprt> &operands)
   inside_bit_string = true;
 }
 
-irep_idt expr2stlt::id_shorthand(const irep_idt &identifier)
+irep_idt expr2stlt::id_shorthand(irep_idt identifier)
 {
   const symbolt *symbol;
   std::string shorthand = id2string(identifier);

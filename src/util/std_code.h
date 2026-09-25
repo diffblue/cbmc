@@ -840,12 +840,12 @@ inline code_fort &to_code_for(codet &code)
 class code_gotot:public codet
 {
 public:
-  explicit code_gotot(const irep_idt &label):codet(ID_goto)
+  explicit code_gotot(irep_idt label) : codet(ID_goto)
   {
     set_destination(label);
   }
 
-  void set_destination(const irep_idt &label)
+  void set_destination(irep_idt label)
   {
     set(ID_destination, label);
   }
@@ -958,7 +958,7 @@ inline code_frontend_returnt &to_code_frontend_return(codet &code)
 class code_labelt:public codet
 {
 public:
-  code_labelt(const irep_idt &_label, codet _code)
+  code_labelt(irep_idt _label, codet _code)
     : codet(ID_label, {std::move(_code)})
   {
     set_label(_label);
@@ -969,7 +969,7 @@ public:
     return get(ID_label);
   }
 
-  void set_label(const irep_idt &label)
+  void set_label(irep_idt label)
   {
     set(ID_label, label);
   }
@@ -1265,7 +1265,7 @@ public:
     return get(ID_flavor);
   }
 
-  void set_flavor(const irep_idt &f)
+  void set_flavor(irep_idt f)
   {
     set(ID_flavor, f);
   }
@@ -1450,7 +1450,7 @@ class side_effect_exprt : public exprt
 {
 public:
   side_effect_exprt(
-    const irep_idt &statement,
+    irep_idt statement,
     operandst _operands,
     typet _type,
     source_locationt loc)
@@ -1460,10 +1460,7 @@ public:
     operands() = std::move(_operands);
   }
 
-  side_effect_exprt(
-    const irep_idt &statement,
-    typet _type,
-    source_locationt loc)
+  side_effect_exprt(irep_idt statement, typet _type, source_locationt loc)
     : exprt(ID_side_effect, std::move(_type), std::move(loc))
   {
     set_statement(statement);
@@ -1474,7 +1471,7 @@ public:
     return get(ID_statement);
   }
 
-  void set_statement(const irep_idt &statement)
+  void set_statement(irep_idt statement)
   {
     return set(ID_statement, statement);
   }
@@ -1816,18 +1813,18 @@ public:
     {
     }
 
-    explicit exception_list_entryt(const irep_idt &tag)
+    explicit exception_list_entryt(irep_idt tag)
     {
       set(ID_tag, tag);
     }
 
-    exception_list_entryt(const irep_idt &tag, const irep_idt &label)
+    exception_list_entryt(irep_idt tag, irep_idt label)
     {
       set(ID_tag, tag);
       set(ID_label, label);
     }
 
-    void set_tag(const irep_idt &tag)
+    void set_tag(irep_idt tag)
     {
       set(ID_tag, tag);
     }
@@ -1836,7 +1833,7 @@ public:
       return get(ID_tag);
     }
 
-    void set_label(const irep_idt &label)
+    void set_label(irep_idt label)
     {
       set(ID_label, label);
     }
@@ -1848,10 +1845,7 @@ public:
 
   typedef std::vector<exception_list_entryt> exception_listt;
 
-  code_push_catcht(
-    const irep_idt &tag,
-    const irep_idt &label):
-    codet(ID_push_catch)
+  code_push_catcht(irep_idt tag, irep_idt label) : codet(ID_push_catch)
   {
     set(ID_exception_list, irept(ID_exception_list));
     exception_list().push_back(exception_list_entryt(tag, label));

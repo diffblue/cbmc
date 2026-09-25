@@ -30,7 +30,9 @@ class typet:public irept
 public:
   typet() { }
 
-  explicit typet(const irep_idt &_id):irept(_id) { }
+  explicit typet(irep_idt _id) : irept(_id)
+  {
+  }
 
   // the STL implementation shipped with GCC 5 is broken
 #if !defined(__GLIBCXX__) || __GLIBCXX__ >= 20181026
@@ -112,12 +114,12 @@ public:
     return *this;
   }
 
-  typet &add_type(const irep_idt &name)
+  typet &add_type(irep_idt name)
   {
     return static_cast<typet &>(add(name));
   }
 
-  const typet &find_type(const irep_idt &name) const
+  const typet &find_type(irep_idt name) const
   {
     return static_cast<const typet &>(find(name));
   }
@@ -223,13 +225,12 @@ class type_with_subtypest:public typet
 public:
   typedef std::vector<typet> subtypest;
 
-  type_with_subtypest(const irep_idt &_id, const subtypest &_subtypes)
-    : typet(_id)
+  type_with_subtypest(irep_idt _id, const subtypest &_subtypes) : typet(_id)
   {
     subtypes() = _subtypes;
   }
 
-  type_with_subtypest(const irep_idt &_id, subtypest &&_subtypes) : typet(_id)
+  type_with_subtypest(irep_idt _id, subtypest &&_subtypes) : typet(_id)
   {
     subtypes() = std::move(_subtypes);
   }

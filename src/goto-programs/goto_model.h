@@ -69,7 +69,7 @@ public:
   /// Remove the function named \p name from the function map, if it exists.
   /// \return Returns 0 when \p name was not present, and 1 when \p name was
   ///   removed.
-  std::size_t unload(const irep_idt &name)
+  std::size_t unload(irep_idt name)
   {
     return goto_functions.unload(name);
   }
@@ -86,13 +86,12 @@ public:
     return symbol_table;
   }
 
-  const goto_functionst::goto_functiont &get_goto_function(
-    const irep_idt &id) override
+  const goto_functionst::goto_functiont &get_goto_function(irep_idt id) override
   {
     return goto_functions.function_map.at(id);
   }
 
-  bool can_produce_function(const irep_idt &id) const override
+  bool can_produce_function(irep_idt id) const override
   {
     return goto_functions.function_map.find(id) !=
            goto_functions.function_map.end();
@@ -142,13 +141,12 @@ public:
     return symbol_table;
   }
 
-  const goto_functionst::goto_functiont &get_goto_function(
-    const irep_idt &id) override
+  const goto_functionst::goto_functiont &get_goto_function(irep_idt id) override
   {
     return goto_functions.function_map.at(id);
   }
 
-  bool can_produce_function(const irep_idt &id) const override
+  bool can_produce_function(irep_idt id) const override
   {
     return goto_functions.function_map.find(id) !=
            goto_functions.function_map.end();
@@ -201,12 +199,12 @@ public:
   goto_model_functiont(
     journalling_symbol_tablet &symbol_table,
     goto_functionst &goto_functions,
-    const irep_idt &function_id,
-    goto_functionst::goto_functiont &goto_function):
-  symbol_table(symbol_table),
-  goto_functions(goto_functions),
-  function_id(function_id),
-  goto_function(goto_function)
+    irep_idt function_id,
+    goto_functionst::goto_functiont &goto_function)
+    : symbol_table(symbol_table),
+      goto_functions(goto_functions),
+      function_id(function_id),
+      goto_function(goto_function)
   {
   }
 

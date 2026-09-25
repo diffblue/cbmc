@@ -41,9 +41,9 @@ public:
 
   bool transform(
     const namespacet &ns,
-    const irep_idt &function_from,
+    irep_idt function_from,
     locationt from_l,
-    const irep_idt &function_to,
+    irep_idt function_to,
     locationt to_l) override;
 
   void get_reference_set(

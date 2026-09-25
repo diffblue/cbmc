@@ -249,9 +249,7 @@ void smt2_convt::write_footer()
       << "\n";
 }
 
-void smt2_convt::define_object_size(
-  const irep_idt &id,
-  const object_size_exprt &expr)
+void smt2_convt::define_object_size(irep_idt id, const object_size_exprt &expr)
 {
   const exprt &ptr = expr.pointer();
   std::size_t pointer_width = boolbv_width(ptr.type());
@@ -1078,7 +1076,7 @@ static bool is_smt2_simple_identifier(const std::string &identifier)
   return true;
 }
 
-std::string smt2_convt::convert_identifier(const irep_idt &identifier)
+std::string smt2_convt::convert_identifier(irep_idt identifier)
 {
   // Is this a "simple identifier"?
   if(is_smt2_simple_identifier(id2string(identifier)))

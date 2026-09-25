@@ -70,7 +70,7 @@ reaching_definitions_analysist::~reaching_definitions_analysist()=default;
 ///
 /// This function is only used to fill in the cache `export_cache` for the
 /// `output` method.
-void rd_range_domaint::populate_cache(const irep_idt &identifier) const
+void rd_range_domaint::populate_cache(irep_idt identifier) const
 {
   PRECONDITION(bv_container);
 
@@ -91,9 +91,9 @@ void rd_range_domaint::populate_cache(const irep_idt &identifier) const
 }
 
 void rd_range_domaint::transform(
-  const irep_idt &function_from,
+  irep_idt function_from,
   trace_ptrt trace_from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   trace_ptrt trace_to,
   ai_baset &ai,
   const namespacet &ns)
@@ -177,9 +177,9 @@ void rd_range_domaint::transform_start_thread(
 
 void rd_range_domaint::transform_function_call(
   const namespacet &ns,
-  const irep_idt &function_from,
+  irep_idt function_from,
   locationt from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   reaching_definitions_analysist &rd)
 {
   // only if there is an actual call, i.e., we have a body
@@ -242,9 +242,9 @@ void rd_range_domaint::transform_function_call(
 
 void rd_range_domaint::transform_end_function(
   const namespacet &ns,
-  const irep_idt &function_from,
+  irep_idt function_from,
   locationt from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
@@ -305,7 +305,7 @@ void rd_range_domaint::transform_end_function(
 void rd_range_domaint::transform_assign(
   const namespacet &ns,
   locationt from,
-  const irep_idt &function_to,
+  irep_idt function_to,
   locationt to,
   reaching_definitions_analysist &rd)
 {
@@ -341,7 +341,7 @@ void rd_range_domaint::transform_assign(
 }
 
 void rd_range_domaint::kill(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const range_spect &range_start,
   const range_spect &range_end)
 {
@@ -440,9 +440,7 @@ void rd_range_domaint::kill(
   }
 }
 
-void rd_range_domaint::kill_inf(
-  const irep_idt &,
-  const range_spect &range_start)
+void rd_range_domaint::kill_inf(irep_idt, const range_spect &range_start)
 {
   PRECONDITION(range_start >= range_spect{0});
 
@@ -480,7 +478,7 @@ void rd_range_domaint::kill_inf(
 /// by `range_start` and `range_end`.
 bool rd_range_domaint::gen(
   locationt from,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const range_spect &range_start,
   const range_spect &range_end)
 {
@@ -718,8 +716,8 @@ bool rd_range_domaint::merge_shared(
   return changed;
 }
 
-const rd_range_domaint::ranges_at_loct &rd_range_domaint::get(
-  const irep_idt &identifier) const
+const rd_range_domaint::ranges_at_loct &
+rd_range_domaint::get(irep_idt identifier) const
 {
   populate_cache(identifier);
 

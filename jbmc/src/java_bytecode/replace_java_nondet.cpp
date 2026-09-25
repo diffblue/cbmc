@@ -105,7 +105,7 @@ get_nondet_instruction_info(const goto_programt::const_targett &instr)
 /// \param expr: The expression which may be a symbol.
 /// \param identifier: Some identifier.
 /// \return True if the expression is a symbol with the specified identifier.
-static bool is_symbol_with_id(const exprt &expr, const irep_idt &identifier)
+static bool is_symbol_with_id(const exprt &expr, irep_idt identifier)
 {
   return expr.id() == ID_symbol &&
          to_symbol_expr(expr).identifier() == identifier;
@@ -116,7 +116,7 @@ static bool is_symbol_with_id(const exprt &expr, const irep_idt &identifier)
 /// \param identifier: Some identifier.
 /// \return True if the expression is a typecast with one operand, and the
 ///   typecast's identifier matches the specified identifier.
-static bool is_typecast_with_id(const exprt &expr, const irep_idt &identifier)
+static bool is_typecast_with_id(const exprt &expr, irep_idt identifier)
 {
   if(!(expr.id() == ID_typecast && expr.operands().size() == 1))
   {
@@ -140,7 +140,7 @@ static bool is_typecast_with_id(const exprt &expr, const irep_idt &identifier)
 ///   typecast's identifier matches the specified identifier.
 static bool is_assignment_from(
   const goto_programt::instructiont &instr,
-  const irep_idt &identifier)
+  irep_idt identifier)
 {
   // If not an assignment, return false
   if(!instr.is_assign())
@@ -160,7 +160,7 @@ static bool is_assignment_from(
 ///   typecast's identifier matches the specified identifier.
 static bool is_return_with_variable(
   const goto_programt::instructiont &instr,
-  const irep_idt &identifier)
+  irep_idt identifier)
 {
   if(!instr.is_set_return_value())
   {

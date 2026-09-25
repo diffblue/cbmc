@@ -25,7 +25,7 @@ std::ostream &operator << (std::ostream &out, cpp_scopet::lookup_kindt kind)
 }
 
 void cpp_scopet::lookup_rec(
-  const irep_idt &base_name_to_lookup,
+  irep_idt base_name_to_lookup,
   lookup_kindt kind,
   id_sett &id_set)
 {
@@ -81,7 +81,7 @@ void cpp_scopet::lookup_rec(
 }
 
 void cpp_scopet::lookup_rec(
-  const irep_idt &base_name_to_lookup,
+  irep_idt base_name_to_lookup,
   lookup_kindt kind,
   cpp_idt::id_classt identifier_class,
   id_sett &id_set)
@@ -154,9 +154,8 @@ void cpp_scopet::lookup_rec(
       base_name_to_lookup, kind, identifier_class, id_set);
 }
 
-cpp_scopet::id_sett cpp_scopet::lookup_identifier(
-  const irep_idt &id,
-  cpp_idt::id_classt identifier_class)
+cpp_scopet::id_sett
+cpp_scopet::lookup_identifier(irep_idt id, cpp_idt::id_classt identifier_class)
 {
   id_sett id_set;
 
@@ -187,7 +186,7 @@ cpp_scopet::id_sett cpp_scopet::lookup_identifier(
   return id_set;
 }
 
-cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
+cpp_scopet &cpp_scopet::new_scope(irep_idt new_scope_name)
 {
   cpp_idt &id=insert(new_scope_name);
   id.identifier=prefix+id2string(new_scope_name);
@@ -198,7 +197,7 @@ cpp_scopet &cpp_scopet::new_scope(const irep_idt &new_scope_name)
   return (cpp_scopet &)id;
 }
 
-bool cpp_scopet::contains(const irep_idt &base_name_to_lookup)
+bool cpp_scopet::contains(irep_idt base_name_to_lookup)
 {
   return !lookup(base_name_to_lookup, SCOPE_ONLY).empty();
 }
