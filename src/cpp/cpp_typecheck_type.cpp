@@ -441,7 +441,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
       if(class_object.id()==ID_cpp_name)
       {
         DATA_INVARIANT(
-          class_object.get_sub().back().id() == "::", "scope suffix expected");
+          class_object.get_sub().back().id() == ID_scope_resolution,
+          "scope suffix expected");
         class_object.get_sub().pop_back();
       }
 

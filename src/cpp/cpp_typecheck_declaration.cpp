@@ -1057,7 +1057,7 @@ void cpp_typecheckt::convert_non_template_declaration(
       {
         bool name_is_qualified = false;
         for(const auto &sub : d.name().get_sub())
-          if(sub.id() == "::")
+          if(sub.id() == ID_scope_resolution)
             name_is_qualified = true;
         if(name_is_qualified)
         {

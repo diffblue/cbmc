@@ -8062,7 +8062,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       {
         if(sub.id() == ID_template_args)
           seen_args = true;
-        else if(sub.id() == "::" && seen_args)
+        else if(sub.id() == ID_scope_resolution && seen_args)
           return true;
       }
       return false;
@@ -8986,7 +8986,7 @@ void cpp_typecheck_resolvet::guess_template_args(
       static_cast<const typet &>(template_type.find(ID_to_member));
     if(
       pattern_class.id() == ID_cpp_name && !pattern_class.get_sub().empty() &&
-      pattern_class.get_sub().back().id() == "::")
+      pattern_class.get_sub().back().id() == ID_scope_resolution)
       pattern_class.get_sub().pop_back();
     guess_template_args(
       pattern_class,

@@ -20,7 +20,7 @@ irep_idt cpp_namet::get_base_name() const
 
   for(std::size_t i=0; i<sub.size(); i++)
   {
-    if(sub[i].id()=="::")
+    if(sub[i].id() == ID_scope_resolution)
       base=i+1;
   }
 
@@ -66,7 +66,7 @@ void cpp_namet::convert(
 
     identifier+=name_component;
 
-    if(id=="::")
+    if(id == ID_scope_resolution)
       base_name.clear();
     else
       base_name+=name_component;
@@ -80,7 +80,7 @@ std::string cpp_namet::to_string() const
 
   for(const auto &irep : get_sub())
   {
-    if(irep.id() == "::")
+    if(irep.id() == ID_scope_resolution)
       str += irep.id_string();
     else if(irep.id() == ID_template_args)
       str += "<...>";

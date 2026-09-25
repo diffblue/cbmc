@@ -495,10 +495,10 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       auto &sub = name.get_sub();
       sub.push_back(irept{ID_name});
       sub.back().set(ID_identifier, "std");
-      sub.push_back(irept{"::"});
+      sub.push_back(irept{ID_scope_resolution});
       sub.push_back(irept{ID_name});
       sub.back().set(ID_identifier, category);
-      sub.push_back(irept{"::"});
+      sub.push_back(irept{ID_scope_resolution});
       sub.push_back(irept{ID_name});
       sub.back().set(ID_identifier, member);
       name.add_source_location() = expr.source_location();
@@ -5341,7 +5341,8 @@ bool cpp_typecheckt::implicit_pod_assignment_call(
   const irept::subt &subs = to_cpp_name(expr.function()).get_sub();
   if(
     subs.size() < 4 || subs[subs.size() - 2].id() != ID_operator ||
-    subs.back().id() != "=" || subs[subs.size() - 3].id() != "::")
+    subs.back().id() != "=" ||
+    subs[subs.size() - 3].id() != ID_scope_resolution)
   {
     return false;
   }
