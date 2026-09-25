@@ -29,6 +29,13 @@ public:
   // integer bit.
   bool x86_extended;
 
+  // Storage size in bits, when different from the natural value width.
+  // x86 80-bit extended precision is stored in 12-byte (96-bit) or
+  // 16-byte (128-bit) memory locations on i386 and x86_64 respectively;
+  // the upper bits are padding.  A value of 0 means "no padding, storage
+  // size equals value_width()".
+  std::size_t storage_width_bits;
+
   mp_integer bias() const;
 
   explicit ieee_float_spect(const floatbv_typet &type)
@@ -38,20 +45,32 @@ public:
 
   void from_type(const floatbv_typet &type);
 
-  ieee_float_spect():f(0), e(0), x86_extended(false)
+  ieee_float_spect() : f(0), e(0), x86_extended(false), storage_width_bits(0)
   {
   }
 
-  ieee_float_spect(std::size_t _f, std::size_t _e):
-    f(_f), e(_e), x86_extended(false)
+  ieee_float_spect(std::size_t _f, std::size_t _e)
+    : f(_f), e(_e), x86_extended(false), storage_width_bits(0)
   {
   }
 
-  std::size_t width() const
+  /// Number of bits actually used to encode a value: sign + exponent +
+  /// fraction (+ explicit integer bit for x86 extended).
+  std::size_t value_width() const
   {
     // Add one for the sign bit.
     // Add one if x86 explicit integer bit is used.
-    return f+e+1+(x86_extended?1:0);
+    return f + e + 1 + (x86_extended ? 1 : 0);
+  }
+
+  /// Storage width in bits.  For most formats this equals value_width(),
+  /// but x86 80-bit extended precision is stored in larger containers
+  /// (96 bits on i386, 128 bits on x86_64) with the high bits as padding.
+  std::size_t width() const
+  {
+    if(storage_width_bits != 0)
+      return storage_width_bits;
+    return value_width();
   }
 
   mp_integer max_exponent() const;
@@ -87,23 +106,38 @@ public:
 
   static ieee_float_spect x86_80()
   {
-    // Intel, not IEEE
+    // Intel x87 80-bit extended precision, used as the value with no
+    // additional padding (e.g. for solver-internal arithmetic).
     ieee_float_spect result(63, 15);
-    result.x86_extended=true;
+    result.x86_extended = true;
     return result;
   }
 
   static ieee_float_spect x86_96()
   {
-    // Intel, not IEEE
+    // x86 80-bit extended precision stored in a 96-bit (12-byte)
+    // container, as used for `long double` on i386.
     ieee_float_spect result(63, 15);
-    result.x86_extended=true;
+    result.x86_extended = true;
+    result.storage_width_bits = 96;
+    return result;
+  }
+
+  static ieee_float_spect x86_128()
+  {
+    // x86 80-bit extended precision stored in a 128-bit (16-byte)
+    // container, as used for `long double` on x86_64 (Linux, macOS,
+    // FreeBSD, etc.).
+    ieee_float_spect result(63, 15);
+    result.x86_extended = true;
+    result.storage_width_bits = 128;
     return result;
   }
 
   bool operator==(const ieee_float_spect &other) const
   {
-    return f==other.f && e==other.e && x86_extended==other.x86_extended;
+    return f == other.f && e == other.e && x86_extended == other.x86_extended &&
+           storage_width_bits == other.storage_width_bits;
   }
 
   bool operator!=(const ieee_float_spect &other) const

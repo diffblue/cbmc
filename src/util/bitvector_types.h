@@ -409,6 +409,12 @@ public:
 
   std::size_t get_e() const
   {
+    // x86 80-bit extended precision has a hardware-fixed 15-bit
+    // exponent; the value-width formula below would otherwise compute
+    // get_width()-f-1, which over-counts because of the explicit
+    // integer bit (and any storage padding above the 80-bit value).
+    if(get_bool(ID_x86_extended))
+      return 15;
     // subtract one for sign bit
     return get_width() - get_f() - 1;
   }
