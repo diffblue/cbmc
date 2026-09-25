@@ -432,6 +432,11 @@ void cpp_typecheckt::typecheck_code(codet &code)
   }
   else if(statement == ID_expression)
   {
+    if(expression_statement_is_declaration(code))
+    {
+      typecheck_decl(code);
+      return;
+    }
     if(
       !code.has_operands() || code.op0().id() != ID_side_effect ||
       to_side_effect_expr(code.op0()).get_statement() != ID_assign)
@@ -3038,6 +3043,64 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       throw 0;
     }
   }
+}
+
+/// N5008 [stmt.ambig]/1: a statement `T(x);' that can be a declaration is a
+/// declaration.  The parser decides only for a name it KNOWS to be a type;
+/// a nested class declared later in the class body ([class.mem.general]/7:
+/// a member function body is a complete-class context -- libstdc++ 16's
+/// `__location_type (__trans_tmp_3);' in _Hashtable::find) is unknown to it
+/// and parsed as a call.  When the "function" is an unqualified name that
+/// resolves to a type and the single "argument" is an unqualified name that
+/// resolves to nothing, rewrite the statement into the declaration `T x;'.
+bool cpp_typecheckt::expression_statement_is_declaration(codet &code)
+{
+  if(
+    code.operands().size() != 1 || code.op0().id() != ID_side_effect ||
+    to_side_effect_expr(code.op0()).get_statement() != ID_function_call)
+  {
+    return false;
+  }
+  const auto &call = to_side_effect_expr_function_call(code.op0());
+  if(call.function().id() != ID_cpp_name || call.arguments().size() != 1)
+    return false;
+  const exprt &argument = call.arguments().front();
+  if(argument.id() != ID_cpp_name)
+    return false;
+  const cpp_namet &type_name = to_cpp_name(call.function());
+  const cpp_namet &object_name = to_cpp_name(argument);
+  if(
+    type_name.get_sub().size() != 1 ||
+    type_name.get_sub().front().id() != ID_name ||
+    object_name.get_sub().size() != 1 ||
+    object_name.get_sub().front().id() != ID_name)
+  {
+    return false;
+  }
+  // the argument must not name anything, the function must name a type
+  {
+    cpp_typecheck_fargst fargs;
+    const exprt object =
+      resolve(object_name, cpp_typecheck_resolvet::wantt::BOTH, fargs, false);
+    if(object.is_not_nil())
+      return false;
+    const exprt type =
+      resolve(type_name, cpp_typecheck_resolvet::wantt::TYPE, fargs, false);
+    if(type.is_nil() || type.id() != ID_type)
+      return false;
+  }
+  cpp_declarationt declaration;
+  declaration.type() =
+    static_cast<const typet &>(static_cast<const irept &>(type_name));
+  cpp_declaratort declarator;
+  declarator.name() = object_name;
+  declarator.type().make_nil();
+  declarator.value().make_nil();
+  declarator.add_source_location() = argument.source_location();
+  declaration.declarators().push_back(std::move(declarator));
+  declaration.add_source_location() = code.source_location();
+  code = codet{ID_decl, {std::move(declaration)}};
+  return true;
 }
 
 void cpp_typecheckt::typecheck_decl(codet &code)

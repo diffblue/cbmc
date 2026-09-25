@@ -949,6 +949,7 @@ protected:
   void typecheck_try_catch(codet &);
   void typecheck_member_initializer(codet &);
   void typecheck_decl(codet &) override;
+  bool expression_statement_is_declaration(codet &code);
   void record_constexpr_object_value(
     const symbolt &symbol,
     const cpp_declaratort &declarator);
