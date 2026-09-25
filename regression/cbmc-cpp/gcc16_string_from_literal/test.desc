@@ -1,15 +1,22 @@
-KNOWNBUG gcc16 libstdcxx16
+CORE gcc-only gcc16 libstdcxx16
 main.cpp
 --cpp17 --unwind 6 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ string from a literal: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body of system-header function '_M_construct'
 --
-KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only; passes with gcc 11-15
-headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
-select the code paths) and running cbmc on the .ii file.
-Symptom: `no body for callee basic_string<...>::_M_construct<1>(...)' at
-basic_string.tcc; the assertion is then FAILURE.
+Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only: basic_string's
+four same-named `_M_construct' members got each other's out-of-line bodies
+(matched by base name), `_M_local_buf[__len++] = *__beg' in an anonymous union
+was "not an lvalue", and a definition renaming a parameter (`__str') left the
+body with an unknown symbol.  Fixed in round 161
+(cpp11_out_of_line_member_template_overloads,
+cpp11_anonymous_union_array_member_lvalue).  Runs where the host gcc is >= 16
+(tag libstdcxx16).  The `basic_string(const _CharT *, const _Alloc &)'
+constructor body of the OTHER character types is still dropped (a
+template-map confusion between basic_string instances; the char one converts).
