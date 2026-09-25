@@ -146,6 +146,7 @@ public:
   std::pair<exprt, string_constraintst> add_axioms_for_is_suffix(
     const function_application_exprt &f,
     bool swap_arguments);
+
   std::pair<exprt, string_constraintst>
   add_axioms_for_length(const function_application_exprt &f);
   std::pair<exprt, string_constraintst>
