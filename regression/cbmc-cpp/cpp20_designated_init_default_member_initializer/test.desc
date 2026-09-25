@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ first designated: SUCCESS$
+^\[main\.assertion\.2\] line \d+ last designated: SUCCESS$
+^\[main\.assertion\.3\] line \d+ two designated: SUCCESS$
+^\[main\.assertion\.4\] line \d+ positional: SUCCESS$
+^\[main\.assertion\.5\] line \d+ no default member init: SUCCESS$
+^\[main\.assertion\.6\] line \d+ bit-fields: SUCCESS$
+^\[main\.assertion\.7\] line \d+ bit-fields positional: SUCCESS$
+^\[main\.assertion\.8\] line \d+ ns bits at run time: SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+ignoring initializer_list
+Invariant check failed
+^warning: ignoring
+--
+N5008 [dcl.init.aggr]/3.1 (designators name the explicitly initialized
+elements) and /5.1 (the others take their default member initializer), plus
+[class.bit] braced default member initializers of bit-fields.  Non-vacuous:
+the last assertion is deliberately wrong and must FAIL.  Before the fix:
+"last designated"/"two designated" FAILURE (a=0, 7 dropped), and the bit-field
+cases aborted the solver ("Reached unimplemented boolbv_widtht::get_entry()").
