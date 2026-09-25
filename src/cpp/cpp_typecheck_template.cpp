@@ -3262,17 +3262,16 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               cpp_namet scope_name;
               for(std::size_t si = 0; si + 2 < cn->get_sub().size(); si++)
                 scope_name.get_sub().push_back(cn->get_sub()[si]);
-              // Resolve the scope prefix as a type.  Restore the
-              // error count on failure: the prefix may be a NAMESPACE
-              // (`user<outer::box>`), for which the TYPE resolution
-              // EMITS "found no match" before throwing -- the count
-              // would otherwise abort the conversion even though the
-              // resolve_scope fallback below succeeds.
-              const std::size_t errors_before =
-                get_message_handler().get_message_count(messaget::M_ERROR);
+              // Resolve the scope prefix as a type.  The prefix may be a
+              // NAMESPACE (`user<outer::box>`, `Holds<int, ns::is_ptr>`),
+              // for which the TYPE resolution emits "found no match" and
+              // throws; that is a speculative attempt -- the resolve_scope
+              // fallback below handles a namespace -- so silence it
+              // (sfinae_contextt: no diagnostic, error count restored).
               cpp_typecheck_resolvet resolver{*this};
               try
               {
+                sfinae_contextt sfinae_guard{*this};
                 exprt scope_expr = resolver.resolve(
                   scope_name,
                   cpp_typecheck_resolvet::wantt::TYPE,
@@ -3296,8 +3295,6 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
               }
               catch(...)
               {
-                get_message_handler().set_message_count(
-                  messaget::M_ERROR, errors_before);
               }
             }
             // N5008 [temp.arg.template]/1: the template-argument names
