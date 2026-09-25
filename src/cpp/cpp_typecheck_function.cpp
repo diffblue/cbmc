@@ -1253,13 +1253,20 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       // A bodyless function is a havoc stub downstream: every call returns
       // nondet and assigns nothing.  Say so -- after releasing the
       // system-header guard, which suppressed the failed conversion's
-      // diagnostics (and would suppress this one).
+      // diagnostics (and would suppress this one).  Not for a member with
+      // a trailing requires-clause: its constraints may simply be
+      // unsatisfied for this specialization, in which case the definition
+      // is never instantiated ([temp.inst]/4) and the failure is expected.
       syshdr_guard.reset();
-      warning().source_location = symbol.location;
-      warning() << "C++ front-end dropped the body of system-header function '"
-                << symbol.base_name
-                << "' (unsupported construct); calls to it return nondet"
-                << messaget::eom;
+      if(!symbol.type.get_bool("#constrained"))
+      {
+        warning().source_location = symbol.location;
+        warning()
+          << "C++ front-end dropped the body of system-header function '"
+          << symbol.base_name
+          << "' (unsupported construct); calls to it return nondet"
+          << messaget::eom;
+      }
       symbol.value.make_nil();
       functions_being_typechecked.erase(symbol.name);
       return;

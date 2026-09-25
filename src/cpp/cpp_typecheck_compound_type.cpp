@@ -1499,6 +1499,23 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(declarator.get_bool("#member_fn_template_instance"))
     component.set("#member_fn_template_instance", true);
 
+  // a trailing requires-clause ([dcl.decl.general]/4); see the same-signature
+  // deleted-twin handling at the end of this function
+  if(
+    declarator.find(ID_C_requires_clause).is_not_nil() &&
+    declarator.find(ID_C_requires_clause).id() != ID_nil)
+  {
+    component.set("#constrained", true);
+    // ... recorded on the member's type too: N5008 [temp.constr.decl]/3,
+    // [over.match.viable]/3 -- a member whose associated constraints are
+    // not satisfied is not viable and its definition is never instantiated
+    // ([temp.inst]/4).  The front end converts every member's body; the
+    // failure of such a body (std::pair<const K, V>'s `operator=(pair &&)
+    // requires (_S_assignable<_T1, _T2>())': "'this->first' is constant")
+    // is expected and not reported as a dropped body.
+    component.type().set("#constrained", true);
+  }
+
   if(cpp_name.is_operator())
   {
     component.set(ID_is_operator, true);
@@ -2170,6 +2187,41 @@ void cpp_typecheckt::typecheck_compound_declarator(
       }
     }
     component.add(ID_C_default_value, default_value);
+  }
+
+  // N5008 [over.match.best]/2.6 with [temp.constr.order]: two member
+  // functions with the same signature, one deleted and unconstrained and the
+  // other with a (trailing) requires-clause (libstdc++'s C++20 std::pair:
+  // `pair &operator=(const pair &) = delete;' next to `constexpr pair
+  // &operator=(const pair &) requires(_S_assignable<...>())'), are both
+  // viable for a call; the constrained one is more constrained and wins
+  // whenever its constraints hold.  Should they not hold, the call selects
+  // the deleted one and the program is ill-formed ([dcl.fct.def.delete]/2)
+  // -- so for a well-formed program the deleted twin is never the choice.
+  // Two components of the same name cannot be told apart by look-up (the
+  // first, deleted one was found: "operator= is not accessible"), so keep
+  // the constrained one only.
+  if(is_method)
+  {
+    const bool this_deleted =
+      component.get(ID_access) == ID_noaccess && value.is_nil();
+    const bool this_constrained = component.get_bool("#constrained");
+    for(auto it = components.begin(); it != components.end(); ++it)
+    {
+      if(
+        it->get_name() != component.get_name() ||
+        it->type() != component.type())
+        continue;
+      const bool other_deleted =
+        it->get(ID_access) == ID_noaccess && !it->get_bool("#constrained");
+      if(this_constrained && other_deleted)
+      {
+        components.erase(it);
+        break;
+      }
+      if(this_deleted && it->get_bool("#constrained"))
+        return; // the constrained twin, declared first, stays
+    }
   }
 
   put_compound_into_scope(component);
@@ -4873,6 +4925,21 @@ void cpp_typecheckt::typecheck_member_function(
   {
     // there might have been an earlier friend declaration
     *new_symbol = std::move(symbol);
+  }
+  else if(
+    symbol_exists && new_symbol->value.is_nil() && symbol.value.is_not_nil() &&
+    new_symbol->type == symbol.type && component.get_bool("#constrained"))
+  {
+    // N5008 [over.match.best]/2.6: a constrained member with the same
+    // signature as an earlier DELETED one (libstdc++'s C++20 std::pair
+    // `operator=(const pair &) = delete;' beside the constrained definition)
+    // is the one a well-formed program calls; the deleted declaration made
+    // the bodyless symbol, give it the constrained definition.
+    new_symbol->value.swap(symbol.value);
+    new_symbol->location = symbol.location;
+    // ... with the definition's parameter names ([dcl.fct]/3: the deleted
+    // declaration left them unnamed)
+    new_symbol->type = symbol.type;
   }
   else if(symbol_exists)
   {
