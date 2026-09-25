@@ -4267,21 +4267,10 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
       const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
       const auto &components = struct_type.components();
 
-      // Find the element type from the pointer member (_begin or _M_array)
-      typet elem_type;
-      bool found = false;
-      for(const auto &c : components)
-      {
-        if(
-          (c.get_base_name() == "_begin" || c.get_base_name() == "_M_array") &&
-          c.type().id() == ID_pointer)
-        {
-          elem_type = to_pointer_type(c.type()).base_type();
-          elem_type.remove(ID_C_constant);
-          found = true;
-          break;
-        }
-      }
+      // the element type, from the layout's pointer member (libstdc++
+      // _M_array, libc++ __begin_, MSVC _begin -- by position, not name)
+      typet elem_type = initializer_list_element_type(to_struct_tag_type(type));
+      const bool found = elem_type.is_not_nil();
 
       if(found)
       {

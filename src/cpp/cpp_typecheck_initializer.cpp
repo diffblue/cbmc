@@ -77,6 +77,24 @@ std::optional<exprt> cpp_typecheckt::build_init_list_argument(
 /// elements and the initializer_list object is constructed to refer to it (its
 /// modelled `{begin pointer, size}` layout).  \p il_type must be a
 /// `std::initializer_list<E>` struct-tag type.
+typet cpp_typecheckt::initializer_list_element_type(
+  const struct_tag_typet &il_type)
+{
+  for(const auto &m : follow_tag(il_type).components())
+  {
+    if(
+      m.type().id() == ID_code || m.get_bool(ID_is_type) ||
+      m.get_bool(ID_is_static) || m.get_is_padding())
+      continue;
+    if(m.type().id() != ID_pointer)
+      return typet(ID_nil);
+    typet elem_type = to_pointer_type(m.type()).base_type();
+    elem_type.remove(ID_C_constant);
+    return elem_type;
+  }
+  return typet(ID_nil);
+}
+
 std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
   const struct_tag_typet &il_type,
   const exprt &init_list)

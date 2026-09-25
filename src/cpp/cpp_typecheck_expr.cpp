@@ -4043,20 +4043,8 @@ bool cpp_typecheckt::has_viable_init_list_constructor(
     // phase 1.2 applies (e.g. `std::string{p}` for `const char *p` must
     // select `string(const char *)`, not the non-viable
     // `string(initializer_list<char>)`).
-    typet elem_u;
-    bool got_u = false;
-    for(const auto &ic : follow_tag(to_struct_tag_type(p1)).components())
-    {
-      if(
-        (ic.get_base_name() == "_begin" || ic.get_base_name() == "_M_array") &&
-        ic.type().id() == ID_pointer)
-      {
-        elem_u = to_pointer_type(ic.type()).base_type();
-        elem_u.remove(ID_C_constant);
-        got_u = true;
-        break;
-      }
-    }
+    typet elem_u = initializer_list_element_type(to_struct_tag_type(p1));
+    const bool got_u = elem_u.is_not_nil();
     // If the element type cannot be determined, keep the prior behaviour
     // (treat the initializer-list constructor as applicable).
     if(!got_u)
