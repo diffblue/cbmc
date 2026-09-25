@@ -18,6 +18,27 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 
+void boolbvt::register_array_symbol(
+  const irep_idt &identifier,
+  const array_typet &array_type)
+{
+  const std::size_t array_width =
+    bv_width.get_width_opt(array_type).value_or(0);
+  // Register the array symbol's type, but skip when the symbol is already
+  // registered at a *different* width.  An incomplete extern array (e.g.
+  // `extern T arr[]`, width 0 here) may already be registered at a non-zero
+  // width via its element-typed access path (e.g. `T arr[i]` yields a T-width
+  // value), and re-registering at width 0 would trip get_literals'
+  // size-equals-width invariant.  We must *not* simply skip all unknown-width
+  // (width 0) registrations: a first-time width-0 registration is what makes
+  // unbounded-array counterexample traces and string-refinement arrays display
+  // their element values (see regression/cbmc/trace-values/unbounded_array),
+  // so only a genuine width mismatch is skipped.
+  const auto existing = map.get_map_entry(identifier);
+  if(!existing.has_value() || existing->get().literal_map.size() == array_width)
+    (void)map.get_literals(identifier, array_type, array_width);
+}
+
 bvt boolbvt::convert_index(const index_exprt &expr)
 {
   const exprt &array=expr.array();
@@ -50,11 +71,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
         if(
           final_array.id() == ID_symbol || final_array.id() == ID_nondet_symbol)
         {
-          const auto &array_width_opt = bv_width.get_width_opt(array_type);
-          (void)map.get_literals(
-            final_array.get(ID_identifier),
-            array_type,
-            array_width_opt.value_or(0));
+          register_array_symbol(final_array.get(ID_identifier), array_type);
         }
 
         // make sure we have the index in the cache
@@ -70,9 +87,7 @@ bvt boolbvt::convert_index(const index_exprt &expr)
         // record type if array is a symbol
         if(array.id() == ID_symbol || array.id() == ID_nondet_symbol)
         {
-          const auto &array_width_opt = bv_width.get_width_opt(array_type);
-          (void)map.get_literals(
-            array.get(ID_identifier), array_type, array_width_opt.value_or(0));
+          register_array_symbol(array.get(ID_identifier), array_type);
         }
 
         // make sure we have the index in the cache

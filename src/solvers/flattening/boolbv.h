@@ -157,6 +157,16 @@ protected:
 
   virtual bvt convert_index(const exprt &array, const mp_integer &index);
   virtual bvt convert_index(const index_exprt &expr);
+  /// Record the type of an array symbol in \ref map so that subsequent lookups
+  /// share a consistent bitvector encoding. The width is unknown (taken as 0)
+  /// for an incomplete array such as `extern T arr[]`; registration is skipped
+  /// only when the symbol is already registered at a different width, which
+  /// would otherwise trip the size-equals-width invariant in
+  /// \ref boolbv_mapt::get_literals against an entry created via the
+  /// element-typed access path.
+  void register_array_symbol(
+    const irep_idt &identifier,
+    const array_typet &array_type);
   virtual bvt convert_bswap(const bswap_exprt &expr);
   virtual bvt convert_byte_extract(const byte_extract_exprt &expr);
   virtual bvt convert_byte_update(const byte_update_exprt &expr);

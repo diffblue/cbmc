@@ -1,0 +1,9 @@
+CORE
+main.c
+--bounds-check
+^\[main\.assertion\.\d+\] .* same index yields the same value: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^Invariant check failed
