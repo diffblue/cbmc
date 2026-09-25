@@ -1,0 +1,17 @@
+CORE
+deep-let.smt2
+
+^EXIT=0$
+^SIGNAL=0$
+^unsat$
+--
+^\(error
+--
+Regression test for handling deeply nested input without unbounded recursion
+anywhere in the pipeline. A deeply-nested chain of `(let ((xN xN-1)) ...)` of
+depth 3500 is parsed and solved (unsat) without overflowing the call stack:
+the SMT2 parser, expand_function_applications, the boolbvt let conversion and
+irept destruction all avoid per-level recursion. A recursive implementation of
+any of these stages segfaults on this input, including on the small (~1 MiB)
+default stack used on some platforms (e.g. Visual Studio); the test is run as
+CORE so those small-stack configurations are exercised.

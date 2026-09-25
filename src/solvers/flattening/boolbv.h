@@ -138,6 +138,21 @@ protected:
   typedef std::unordered_map<const exprt, bvt, irep_hash> bv_cachet;
   bv_cachet bv_cache;
 
+  /// True while convert_bv is priming the cache bottom-up (see
+  /// prime_subexpression_cache); used to ensure the pre-pass runs only at the
+  /// outermost conversion entry, not for each nested convert_bv call.
+  bool in_conversion_prepass = false;
+
+  /// Populate bv_cache for the pure-bitwise sub-expressions of \p expr
+  /// bottom-up, using an explicit work stack, so that convert_bitwise does not
+  /// descend once per nesting level and overflow the call stack on deeply
+  /// nested bitwise-operator chains. Only operations whose conversion is a pure
+  /// function of the operand bit-vectors (see is_prepass_convertible) are
+  /// pre-converted, so eager out-of-order conversion cannot change the
+  /// generated constraints; everything else is left to the normal recursive
+  /// path.
+  void prime_subexpression_cache(const exprt &expr);
+
   bool type_conversion(
     const typet &src_type, const bvt &src,
     const typet &dest_type, bvt &dest);
@@ -169,6 +184,9 @@ protected:
   virtual bvt convert_complex_imag(const complex_imag_exprt &expr);
   virtual bvt convert_array_comprehension(const array_comprehension_exprt &);
   virtual bvt convert_let(const let_exprt &);
+  /// Iterative conversion of a deeply nested chain of let-expressions, avoiding
+  /// the per-level recursion and per-frame symbol substitution of convert_let.
+  bvt convert_let_iterative(const let_exprt &);
   virtual bvt convert_array_of(const array_of_exprt &expr);
   virtual bvt convert_union(const union_exprt &expr);
   virtual bvt convert_empty_union(const empty_union_exprt &expr);
