@@ -3488,14 +3488,22 @@ long double powl(long double x, long double y)
 
 double fma(double x, double y, double z)
 {
-  // IEEE 754: raise FE_INVALID for 0*inf or inf+(-inf)
+  // IEEE 754: raise FE_INVALID for 0*inf or inf*0 (regardless of z).
   if(
     (isinf(x) || isinf(y)) &&
     (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
   {
     feraiseexcept(FE_INVALID);
   }
-  else if(isinf(z)) // this is an over-approximation
+  // IEEE 754: raise FE_INVALID for the inf - inf subcase, i.e. when
+  // the product x*y is infinite (one factor is infinite and neither
+  // is zero -- the 0*inf case is handled above) and the addend z is
+  // infinite with the opposite sign.  Plain finite_nonzero*finite_nonzero
+  // + (+/-inf), or inf*finite_nonzero + same-signed-inf, is exact and
+  // raises no flag.
+  else if(
+    (isinf(x) || isinf(y)) && isinf(z) &&
+    ((signbit(x) != 0) != (signbit(y) != 0)) != (signbit(z) != 0))
   {
     feraiseexcept(FE_INVALID);
   }
@@ -3517,13 +3525,21 @@ double fma(double x, double y, double z)
 
 float fmaf(float x, float y, float z)
 {
+  // IEEE 754: raise FE_INVALID for 0*inf or inf*0 (regardless of z).
+  // Use the type-generic isinf() macro: some <math.h> headers (e.g.
+  // macOS-14 arm64) only expose the C99 generic form, not the typed
+  // isinff()/isinfl() variants.
   if(
-    (isinff(x) || isinff(y)) &&
+    (isinf(x) || isinf(y)) &&
     (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
   {
     feraiseexcept(FE_INVALID);
   }
-  else if(isinff(z)) // this is an over-approximation
+  // IEEE 754: raise FE_INVALID for the inf - inf subcase; see fma()
+  // above for the rationale.
+  else if(
+    (isinf(x) || isinf(y)) && isinf(z) &&
+    ((signbit(x) != 0) != (signbit(y) != 0)) != (signbit(z) != 0))
   {
     feraiseexcept(FE_INVALID);
   }
@@ -3545,13 +3561,20 @@ float fmaf(float x, float y, float z)
 
 long double fmal(long double x, long double y, long double z)
 {
+  // IEEE 754: raise FE_INVALID for 0*inf or inf*0 (regardless of z).
+  // Use the type-generic isinf() macro for portability; see fmaf()
+  // above.
   if(
-    (isinfl(x) || isinfl(y)) &&
+    (isinf(x) || isinf(y)) &&
     (fpclassify(x) == FP_ZERO || fpclassify(y) == FP_ZERO))
   {
     feraiseexcept(FE_INVALID);
   }
-  else if(isinfl(z)) // this is an over-approximation
+  // IEEE 754: raise FE_INVALID for the inf - inf subcase; see fma()
+  // above for the rationale.
+  else if(
+    (isinf(x) || isinf(y)) && isinf(z) &&
+    ((signbit(x) != 0) != (signbit(y) != 0)) != (signbit(z) != 0))
   {
     feraiseexcept(FE_INVALID);
   }
