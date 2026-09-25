@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ fetch_add: SUCCESS$
+^\[main\.assertion\.2\] line \d+ add_fetch: SUCCESS$
+^\[main\.assertion\.3\] line \d+ load_n: SUCCESS$
+^\[main\.assertion\.4\] line \d+ store_n: SUCCESS$
+^\[main\.assertion\.5\] line \d+ fetch_sub on long: SUCCESS$
+^\[main\.assertion\.6\] line \d+ compare_exchange_n: SUCCESS$
+^\[main\.assertion\.7\] line \d+ __sync_fetch_and_add: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+function call expects function
+not an lvalue
+--
+GCC __atomic_*/__sync_* builtins in C++ (GNU extension; GCC reference
+"__atomic Builtins").  Non-vacuous: the last assertion is deliberately wrong
+and must FAIL.  Before the fix: CONVERSION ERROR on the first call.
