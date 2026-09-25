@@ -7,6 +7,7 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/ieee_float.h>
 #include <util/invariant.h>
 #include <util/mathematical_expr.h>
@@ -14,11 +15,14 @@
 #include <util/message.h>
 #include <util/namespace.h>
 #include <util/std_expr.h>
+#include <util/std_types.h>
 #include <util/symbol_table.h>
 
 #include <solvers/smt2/smt2_conv.h>
 #include <solvers/smt2/smt2_dec.h>
 #include <testing-utils/use_catch.h>
+
+#include <utility>
 
 TEST_CASE(
   "smt2_convt::convert_identifier character escaping.",
@@ -32,6 +36,305 @@ TEST_CASE(
   CHECK(smt2_convt::convert_identifier("\\") == "|&92;|");
   CHECK(smt2_convt::convert_identifier("|") == "|&124;|");
   CHECK(smt2_convt::convert_identifier("&") == "&");
+}
+
+namespace
+{
+/// Own the converter and restore the architecture configuration after a test.
+struct smt2_type_discovery_testt
+{
+  const configt::ansi_ct saved_ansi_c = config.ansi_c;
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream output;
+  smt2_convt
+    converter{ns, "type discovery", "", "ALL", smt2_convt::solvert::Z3, output};
+
+  smt2_type_discovery_testt()
+  {
+    config.ansi_c.mode = configt::ansi_ct::flavourt::GCC;
+    config.ansi_c.set_arch_spec_x86_64();
+  }
+
+  ~smt2_type_discovery_testt()
+  {
+    config.ansi_c = saved_ansi_c;
+  }
+
+  /// Add types whose recursion is broken by a pointer edge.
+  void add_recursive_types()
+  {
+    // The pointer edge makes this legal without an infinitely sized value:
+    // Leaf.parent -> Internal*, Internal.data -> Leaf by value.
+    symbol_table.insert(type_symbolt{
+      "Leaf",
+      struct_typet{
+        {{"parent", pointer_typet{struct_tag_typet{"Internal"}, 64}}}},
+      ID_C});
+    symbol_table.insert(type_symbolt{
+      "Internal", struct_typet{{{"data", struct_tag_typet{"Leaf"}}}}, ID_C});
+  }
+};
+} // namespace
+
+TEST_CASE(
+  "SMT pointer discovery does not declare recursive pointee datatypes",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  test.add_recursive_types();
+  struct_tag_typet pointee{"Leaf"};
+  SECTION("Leaf first")
+  {
+    // R1: pointer-only use + Leaf-first recursion previously tried to declare
+    // Internal.data before Leaf's tag alias existed. The output only needs a
+    // pointer bitvector, and discovery must terminate without any datatype.
+  }
+  SECTION("Internal first")
+  {
+    // R2: reversing the entry order must have the same pointer-only effect.
+    pointee = struct_tag_typet{"Internal"};
+  }
+  const pointer_typet pointer{pointee, 64};
+  test.converter.handle(
+    equal_exprt{symbol_exprt{"p", pointer}, null_pointer_exprt{pointer}});
+  const auto output = test.output.str();
+  CHECK(output.find("(declare-fun p () (_ BitVec 64))") != std::string::npos);
+  CHECK(output.find("(declare-datatypes") == std::string::npos);
+}
+
+TEST_CASE(
+  "SMT discovery distinguishes pointer and value visits to a shared tag",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  test.add_recursive_types();
+  struct_typet::componentst components{
+    {"pointer", pointer_typet{struct_tag_typet{"Internal"}, 64}},
+    {"value", struct_tag_typet{"Internal"}}};
+  SECTION("Pointer before value")
+  {
+    // R3: the same traversal sees Internal indirectly before using it as a
+    // value. A pointer-only visited tag must not suppress datatype discovery.
+  }
+  SECTION("Value before pointer")
+  {
+    // R4: the reverse member order must preserve the same value dependencies.
+    std::swap(components[0], components[1]);
+  }
+  const struct_typet aggregate{components};
+  test.converter.handle(equal_exprt{
+    symbol_exprt{"aggregate", aggregate}, symbol_exprt{"other", aggregate}});
+  const auto output = test.output.str();
+  const auto leaf = output.find(".parent (_ BitVec 64)");
+  const auto internal = output.find(".data struct.");
+  const auto holder = output.find(".value struct.");
+  REQUIRE(leaf != std::string::npos);
+  REQUIRE(internal != std::string::npos);
+  REQUIRE(holder != std::string::npos);
+  CHECK(leaf < internal);
+  CHECK(internal < holder);
+  CHECK(output.find("(declare-fun aggregate () struct.") != std::string::npos);
+}
+
+TEST_CASE(
+  "SMT member values discover types after an earlier pointer-only use",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  test.add_recursive_types();
+  const pointer_typet leaf_pointer{struct_tag_typet{"Leaf"}, 64};
+  const pointer_typet internal_pointer{struct_tag_typet{"Internal"}, 64};
+  test.converter.handle(equal_exprt{
+    symbol_exprt{"p", leaf_pointer}, null_pointer_exprt{leaf_pointer}});
+  REQUIRE(test.output.str().find("(declare-datatypes") == std::string::npos);
+
+  // R5: a subsequent expression reads a member of a real Leaf value. Its
+  // operand must now declare Leaf and use its selector; the earlier indirect
+  // visit must not leave an empty alias/base entry that suppresses this work.
+  const member_exprt parent{
+    symbol_exprt{"leaf_value", struct_tag_typet{"Leaf"}},
+    "parent",
+    internal_pointer};
+  test.converter.handle(
+    equal_exprt{parent, null_pointer_exprt{internal_pointer}});
+  const auto output = test.output.str();
+  CHECK(output.find("(declare-fun leaf_value () struct.") != std::string::npos);
+  CHECK(output.find(".parent leaf_value)") != std::string::npos);
+  CHECK(output.find(".data struct.") == std::string::npos);
+}
+
+TEST_CASE(
+  "SMT pointer discovery retains implicit variable array-size dependencies",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  const unsignedbv_typet index_type{64};
+  const symbol_exprt size{"array_length", index_type};
+  const array_typet array{unsignedbv_typet{8}, size};
+  const pointer_typet pointer{array, 64};
+  const symbol_exprt base{"p", pointer};
+  const symbol_exprt index{"index", index_type};
+
+  // R6: the size symbol occurs only in the pointed-to array type. The
+  // element_address converter adds sizeof(element_type) implicitly after
+  // symbol discovery, so removing the entire pointer-type walk loses it.
+  const element_address_exprt address{base, index, pointer};
+  test.converter.handle(equal_exprt{address, base});
+  const auto output = test.output.str();
+  const auto size_declaration =
+    output.find("(declare-fun array_length () (_ BitVec 64))");
+  const auto address_use = output.find("(element-address-p64 p index ");
+  REQUIRE(size_declaration != std::string::npos);
+  REQUIRE(address_use != std::string::npos);
+  CHECK(size_declaration < address_use);
+  CHECK(output.find("array_length", address_use) != std::string::npos);
+}
+
+TEST_CASE(
+  "SMT function pointers retain parameter and return-type size expressions",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  const unsignedbv_typet index_type{64};
+  const array_typet parameter_array{
+    unsignedbv_typet{8}, symbol_exprt{"parameter_size", index_type}};
+  const array_typet return_array{
+    unsignedbv_typet{8}, symbol_exprt{"return_size", index_type}};
+  test.symbol_table.insert(
+    type_symbolt{"Parameter", struct_typet{{{"data", parameter_array}}}, ID_C});
+  test.symbol_table.insert(
+    type_symbolt{"Return", struct_typet{{{"data", return_array}}}, ID_C});
+  const code_typet function{
+    {code_typet::parametert{struct_tag_typet{"Parameter"}}},
+    struct_tag_typet{"Return"}};
+  const pointer_typet pointer{function, 64};
+
+  // R7: code-pointer signatures are indirect type uses, but their nested
+  // array sizes remain expression dependencies. Both sides of the signature
+  // must be visited without emitting either aggregate's unused datatype.
+  test.converter.handle(equal_exprt{
+    symbol_exprt{"function_pointer", pointer}, null_pointer_exprt{pointer}});
+  const auto output = test.output.str();
+  CHECK(
+    output.find("(declare-fun parameter_size () (_ BitVec 64))") !=
+    std::string::npos);
+  CHECK(
+    output.find("(declare-fun return_size () (_ BitVec 64))") !=
+    std::string::npos);
+  CHECK(output.find("(declare-datatypes") == std::string::npos);
+}
+
+TEST_CASE(
+  "SMT pointer-only discovery does not register complex or state sorts",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  typet pointee = complex_typet{signedbv_typet{32}};
+  std::string declaration = "(declare-datatypes";
+  SECTION("Complex")
+  {
+    // R8: complex values require a datatype; complex pointers do not.
+  }
+  SECTION("State")
+  {
+    // R9: the same distinction applies to state's uninterpreted sort.
+    pointee = typet{ID_state};
+    declaration = "(declare-sort state 0)";
+  }
+  const pointer_typet pointer{pointee, 64};
+  test.converter.handle(
+    equal_exprt{symbol_exprt{"p", pointer}, null_pointer_exprt{pointer}});
+  REQUIRE(test.output.str().find(declaration) == std::string::npos);
+  test.converter.handle(equal_exprt{
+    symbol_exprt{"value", pointee}, symbol_exprt{"other", pointee}});
+  CHECK(test.output.str().find(declaration) != std::string::npos);
+}
+
+TEST_CASE(
+  "SMT pointer discovery preserves bitvector pointer arithmetic",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  test.add_recursive_types();
+  test.converter.use_datatypes = false;
+  const pointer_typet pointer{struct_tag_typet{"Leaf"}, 64};
+  const symbol_exprt base{"p", pointer};
+  const plus_exprt next{base, from_integer(1, signedbv_typet{64})};
+
+  // R10: with datatypes disabled, a recursive pointee still has a concrete
+  // size (one 64-bit pointer). Existing pointer arithmetic must keep scaling
+  // its offset by eight bytes; this change must not alter pointer encoding.
+  test.converter.handle(equal_exprt{next, base});
+  const auto output = test.output.str();
+  CHECK(output.find("(declare-fun p () (_ BitVec 64))") != std::string::npos);
+  CHECK(output.find("(bvmul ") != std::string::npos);
+  CHECK(output.find("(_ bv8 ") != std::string::npos);
+  CHECK(output.find("(declare-datatypes") == std::string::npos);
+}
+
+TEST_CASE(
+  "SMT pointer array sizes discover datatypes needed by size expressions",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  const unsignedbv_typet index_type{64};
+  const struct_typet bounds_type{{{"length", index_type}}};
+  const member_exprt size{
+    symbol_exprt{"bounds", bounds_type}, "length", index_type};
+  const pointer_typet pointer{array_typet{unsignedbv_typet{8}, size}, 64};
+  const symbol_exprt base{"p", pointer};
+  const element_address_exprt address{
+    base, symbol_exprt{"index", index_type}, pointer};
+
+  // R11: a pointer's array size reads a member of a struct value. Although
+  // the pointee is an expressions-only dependency, the size expression's
+  // operands need full discovery: declare the struct before its symbol and
+  // selector use. Propagating expressions-only into the expression loses it.
+  test.converter.handle(equal_exprt{address, base});
+  const auto output = test.output.str();
+  const auto datatype = output.find(".length (_ BitVec 64)");
+  const auto symbol = output.find("(declare-fun bounds () struct.");
+  const auto address_use = output.find("(element-address-p64 p index ");
+  REQUIRE(datatype != std::string::npos);
+  REQUIRE(symbol != std::string::npos);
+  REQUIRE(address_use != std::string::npos);
+  CHECK(datatype < symbol);
+  CHECK(symbol < address_use);
+  CHECK(output.find(".length bounds)", address_use) != std::string::npos);
+}
+
+TEST_CASE(
+  "SMT union tags distinguish pointer and value discovery modes",
+  "[core][solvers][smt2]")
+{
+  smt2_type_discovery_testt test;
+  const union_tag_typet tag{"Payload"};
+  const pointer_typet pointer{tag, 64};
+  test.symbol_table.insert(type_symbolt{
+    "Member", struct_typet{{{"payload_value", unsignedbv_typet{64}}}}, ID_C});
+  test.symbol_table.insert(type_symbolt{
+    "Payload",
+    union_typet{{{"data", struct_tag_typet{"Member"}}, {"next", pointer}}},
+    ID_C});
+
+  // R12: a self-pointer terminates through a union tag without registering
+  // its member datatype. In the following aggregate, the same traversal
+  // visits that tag first through a pointer and then by value. The latter
+  // must still discover Member; a tag-only visited set suppresses this work.
+  test.converter.handle(
+    equal_exprt{symbol_exprt{"p", pointer}, null_pointer_exprt{pointer}});
+  REQUIRE(test.output.str().find("(declare-datatypes") == std::string::npos);
+  const struct_typet aggregate{{{"pointer", pointer}, {"value", tag}}};
+  test.converter.handle(equal_exprt{
+    symbol_exprt{"aggregate", aggregate}, symbol_exprt{"other", aggregate}});
+  const auto output = test.output.str();
+  const auto member = output.find(".payload_value (_ BitVec 64)");
+  const auto holder = output.find(".value (_ BitVec 64)");
+  REQUIRE(member != std::string::npos);
+  REQUIRE(holder != std::string::npos);
+  CHECK(member < holder);
+  CHECK(output.find("(declare-fun aggregate () struct.") != std::string::npos);
 }
 
 /// Helper: extract the "(assert ...)" line from SMT2 output of set_to
