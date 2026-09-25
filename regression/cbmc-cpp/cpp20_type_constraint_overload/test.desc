@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ type-constraint overloads: SUCCESS$
+^\[main\.assertion\.2\] line \d+ requires-clause overloads: SUCCESS$
+^\[main\.assertion\.3\] line \d+ qualified concept: SUCCESS$
+^\[main\.assertion\.4\] line \d+ standard concepts: SUCCESS$
+^\[main\.assertion\.5\] line \d+ type-constraint with arguments: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.param]/4 (a type-constraint introduces C<T>), [temp.constr.decl]/3,
+[over.match.viable].  Non-vacuous: the last assertion is deliberately wrong and
+must FAIL.  Before the fix: "type-constraint overloads", "qualified concept" and
+"standard concepts" FAILURE (g(1.0) returned 1: the first-declared overload).
