@@ -1,0 +1,21 @@
+CORE no-new-smt broken-cprover-smt-backend broken-z3-smt-backend
+main.c
+--smt2 --outfile -
+activate-multi-line-match
+\(declare-fun unflatten_base_\d+ \(\) \(Array \(_ BitVec \d+\) \(_ BitVec \d+\)\)\)(?s:.)*\(declare-fun unflatten_base_\d+ \(\) \(Array \(_ BitVec \d+\) \(Array \(_ BitVec \d+\) \(_ BitVec \d+\)\)\)\)(?s:.)*\(store unflatten_base_\d+
+^EXIT=0$
+^SIGNAL=0$
+--
+^Invariant check failed
+^warning: ignoring
+--
+Wider-coverage companion to ../smt2-outfile-array: exercises the
+non-as-const unflatten path on a multi-dimensional array. The C input
+has a `int data[2][2]` field, which forces find_symbols_rec to declare
+auxiliaries for both the inner array (Array bv64 bv32) and the outer
+array (Array bv64 (Array bv64 bv32)). The regex pins the presence of
+both top-level declarations and that at least one is used as a store
+base, ensuring that nested unflatten correctly threads the helper
+identifiers through both levels rather than relying on (as const).
+The `no-new-smt`, `broken-cprover-smt-backend` and `broken-z3-smt-backend`
+tags are set for the same reason as in ../smt2-outfile-array/test.desc.
