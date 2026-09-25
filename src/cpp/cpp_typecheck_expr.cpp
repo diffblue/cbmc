@@ -6482,14 +6482,11 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       bool args_are_constant_pre = true;
       for(const auto &arg : expr.arguments())
       {
-        arg.visit_pre(
-          [&args_are_constant_pre](const exprt &e)
-          {
-            if(e.id() == ID_symbol)
-              args_are_constant_pre = false;
-          });
-        if(!args_are_constant_pre)
+        if(!is_constexpr_call_argument(arg, symbol_table))
+        {
+          args_are_constant_pre = false;
           break;
+        }
       }
       // For constexpr methods of a template class whose body was
       // queued by `add_method_body` but not yet processed, the body's

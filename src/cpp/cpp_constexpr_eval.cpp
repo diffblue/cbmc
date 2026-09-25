@@ -135,8 +135,8 @@ static exprt evaluate_temporary_object(
       to_member_expr(lhs).compound().id() == ID_new_object &&
       object_type.has_component(to_member_expr(lhs).get_component_name()))
     {
-      const std::size_t index =
-        object_type.component_number(to_member_expr(lhs).get_component_name());
+      const std::size_t index = object_type.data_component_number(
+        to_member_expr(lhs).get_component_name());
       if(index >= object.operands().size())
         return false;
       object.operands()[index] =
@@ -185,26 +185,69 @@ static exprt constexpr_this_object_value(
   return nil_exprt();
 }
 
-// N5008 [expr.add]/4, [expr.unary.op]/1: a pointer INTO a string literal is
-// tracked as `&str[i]' (address_of an index of the string constant);
-// arithmetic moves the index, `*p' reads the character.
-struct string_pointert
+// N5008 [expr.add]/4, [expr.unary.op]/1, [expr.const]: a pointer INTO an
+// array whose elements are constants -- a string literal, an array constant,
+// or a static object with an array constant value (a constexpr array, the
+// backing array of a std::initializer_list, [dcl.init.list]/6) -- is tracked
+// as `&arr[i]' (address_of an index of the array expression); arithmetic
+// moves the index, `*p' reads the element, two pointers into the same array
+// compare by index.
+struct array_pointert
 {
-  exprt string;
+  exprt array; // string_constant, array constant, or a symbol
   mp_integer index;
 };
 
-/// The string constant and index a tracked string pointer denotes, or nothing
-static std::optional<string_pointert> string_pointer(const exprt &e)
+/// The constant array value a tracked array pointer's array denotes: the
+/// expression itself for a literal, the symbol's value for a static object.
+static exprt array_pointer_value(
+  const array_pointert &ap,
+  const symbol_table_baset &symbol_table)
+{
+  if(ap.array.id() == ID_string_constant || ap.array.id() == ID_array)
+    return ap.array;
+  if(ap.array.id() == ID_symbol)
+  {
+    const symbolt *symbol =
+      symbol_table.lookup(to_symbol_expr(ap.array).get_identifier());
+    if(
+      symbol != nullptr && symbol->is_static_lifetime &&
+      symbol->value.id() == ID_array)
+      return symbol->value;
+  }
+  return nil_exprt();
+}
+
+/// Is \p e an array whose elements a tracked pointer can read?
+static bool
+is_constant_array_object(const exprt &e, const symbol_table_baset &symbol_table)
+{
+  if(e.type().id() != ID_array)
+    return false;
+  if(e.id() == ID_string_constant || e.id() == ID_array)
+    return true;
+  if(e.id() == ID_symbol)
+  {
+    const symbolt *symbol =
+      symbol_table.lookup(to_symbol_expr(e).get_identifier());
+    return symbol != nullptr && symbol->is_static_lifetime &&
+           symbol->value.id() == ID_array;
+  }
+  return false;
+}
+
+/// The array and index a tracked array pointer denotes, or nothing
+static std::optional<array_pointert>
+array_pointer(const exprt &e, const symbol_table_baset &symbol_table)
 {
   if(e.id() != ID_address_of || e.operands().size() != 1)
     return std::nullopt;
   const exprt &object = to_address_of_expr(e).object();
-  if(object.id() == ID_string_constant)
-    return string_pointert{object, 0};
+  if(is_constant_array_object(object, symbol_table))
+    return array_pointert{object, 0};
   if(
     object.id() != ID_index ||
-    to_index_expr(object).array().id() != ID_string_constant ||
+    !is_constant_array_object(to_index_expr(object).array(), symbol_table) ||
     !to_index_expr(object).index().is_constant())
   {
     return std::nullopt;
@@ -213,37 +256,61 @@ static std::optional<string_pointert> string_pointer(const exprt &e)
     numeric_cast<mp_integer>(to_constant_expr(to_index_expr(object).index()));
   if(!index.has_value())
     return std::nullopt;
-  return string_pointert{to_index_expr(object).array(), *index};
+  return array_pointert{to_index_expr(object).array(), *index};
 }
 
 static exprt
-make_string_pointer(const string_pointert &sp, const typet &pointer_type)
+make_array_pointer(const array_pointert &ap, const typet &pointer_type)
 {
   return address_of_exprt{
     index_exprt{
-      sp.string,
-      from_integer(sp.index, c_index_type()),
-      to_array_type(sp.string.type()).element_type()},
+      ap.array,
+      from_integer(ap.index, c_index_type()),
+      to_array_type(ap.array.type()).element_type()},
     to_pointer_type(pointer_type)};
 }
 
-/// `*p' for a tracked string pointer: the character (0 at the terminating
-/// null, [lex.string]/9), or nothing when the index is out of range
-static std::optional<exprt>
-string_pointer_deref(const string_pointert &sp, const namespacet &ns)
+/// `*p' for a tracked array pointer: the element (a string literal's
+/// terminating null included, [lex.string]/9), or nothing when the index is
+/// out of range
+static std::optional<exprt> array_pointer_deref(
+  const array_pointert &ap,
+  const symbol_table_baset &symbol_table,
+  const namespacet &ns)
 {
+  const exprt value = array_pointer_value(ap, symbol_table);
+  if(value.is_nil() || value.type().id() != ID_array)
+    return std::nullopt;
   const auto size = numeric_cast<mp_integer>(
-    to_constant_expr(to_array_type(sp.string.type()).size()));
-  if(!size.has_value() || sp.index < 0 || sp.index >= *size)
+    to_constant_expr(to_array_type(value.type()).size()));
+  if(!size.has_value() || ap.index < 0 || ap.index >= *size)
     return std::nullopt;
   exprt c = index_exprt{
-    sp.string,
-    from_integer(sp.index, c_index_type()),
-    to_array_type(sp.string.type()).element_type()};
+    value,
+    from_integer(ap.index, c_index_type()),
+    to_array_type(value.type()).element_type()};
   simplify(c, ns);
   if(!c.is_constant())
     return std::nullopt;
   return c;
+}
+
+bool is_constexpr_call_argument(
+  const exprt &e,
+  const symbol_table_baset &symbol_table)
+{
+  if(e.id() == ID_symbol)
+    return false;
+  // [expr.const]/11: the address of (an element of) an object with static
+  // storage duration -- a constexpr array, the backing array of a
+  // std::initializer_list argument (`{ &arr[0], 3 }', [dcl.init.list]/6);
+  // such a pointer is tracked by array and index
+  if(e.id() == ID_address_of && array_pointer(e, symbol_table))
+    return true;
+  for(const auto &op : e.operands())
+    if(!is_constexpr_call_argument(op, symbol_table))
+      return false;
+  return true;
 }
 
 /// The state of one constexpr function evaluation: the tracked variables and
@@ -327,7 +394,7 @@ public:
       ns.follow_tag(to_struct_tag_type(constructed_type));
     if(!st.has_component(to_member_expr(e).get_component_name()))
       return std::nullopt;
-    return st.component_number(to_member_expr(e).get_component_name());
+    return st.data_component_number(to_member_expr(e).get_component_name());
   }
 
   bool apply_side_effect(const exprt &e)
@@ -369,7 +436,7 @@ public:
     const auto cur = vars.find(var);
     if(cur == vars.end())
       return false;
-    if(const auto sp = string_pointer(cur->second))
+    if(const auto sp = array_pointer(cur->second, symbol_table))
     {
       // pointer arithmetic on a pointer into a string literal
       mp_integer delta;
@@ -391,9 +458,9 @@ public:
       }
       else
         return false;
-      string_pointert moved = *sp;
+      array_pointert moved = *sp;
       moved.index += delta;
-      vars[var] = make_string_pointer(moved, cur->second.type());
+      vars[var] = make_array_pointer(moved, cur->second.type());
       return true;
     }
     if(!cur->second.is_constant())
@@ -436,6 +503,43 @@ public:
     return true;
   }
 
+  /// A tracked variable's value that is the address of ANOTHER tracked
+  /// variable (a reference bound to a local or parameter, `auto &&__range =
+  /// xs' of a range-for) denotes that variable: return its value, else nil
+  exprt referenced_value(const exprt &value) const
+  {
+    if(
+      value.id() != ID_address_of || value.operands().size() != 1 ||
+      to_address_of_expr(value).object().id() != ID_symbol)
+    {
+      return nil_exprt();
+    }
+    const auto it = vars.find(
+      to_symbol_expr(to_address_of_expr(value).object()).get_identifier());
+    return it == vars.end() ? static_cast<exprt>(nil_exprt()) : it->second;
+  }
+
+  /// Can \p value be tracked as a variable's value?  A constant, an aggregate
+  /// of constants, a pointer into a constant array, or a reference to a
+  /// tracked variable.
+  bool is_trackable(const exprt &value) const
+  {
+    return is_constant_value(value) ||
+           array_pointer(value, symbol_table).has_value() ||
+           referenced_value(value).is_not_nil();
+  }
+
+  /// The value to store for `lhs = rhs' / `T x = rhs': a reference bound to
+  /// a tracked variable ([dcl.init.ref]: `auto &&__range = xs' of a
+  /// range-for) is kept as the ALIAS `&xs', not evaluated to a copy, so
+  /// later reads through it see the variable; anything else is evaluated.
+  exprt eval_initializer(const exprt &rhs)
+  {
+    if(referenced_value(rhs).is_not_nil())
+      return rhs;
+    return eval(rhs);
+  }
+
   exprt eval(const exprt &e)
   {
     if(const auto idx = this_member_index(e))
@@ -449,7 +553,19 @@ public:
     {
       auto it = vars.find(to_symbol_expr(e).get_identifier());
       if(it != vars.end())
+      {
+        // `this' is tracked by the object's VALUE; the expression `this' is
+        // the object's address (`*this', `&*this', `this->m' read through
+        // this_member_index above)
+        if(it->first == this_id && e.type().id() == ID_pointer)
+          return address_of_exprt{it->second, to_pointer_type(e.type())};
+        // a reference to a tracked variable: the address of its value (so
+        // a member call through it binds `this' to that value)
+        const exprt referenced = referenced_value(it->second);
+        if(referenced.is_not_nil())
+          return address_of_exprt{referenced, to_pointer_type(e.type())};
         return it->second;
+      }
       // a `constexpr` variable (a static data member `value`, an
       // enumerator) is a macro whose initializer is its value
       const symbolt *var_sym =
@@ -476,9 +592,16 @@ public:
         return it->second;
       if(it != vars.end())
       {
-        if(const auto sp = string_pointer(it->second))
+        // `*this' is the tracked object's value
+        if(it->first == this_id)
+          return it->second;
+        // a reference to a tracked variable denotes that variable
+        const exprt referenced = referenced_value(it->second);
+        if(referenced.is_not_nil())
+          return referenced;
+        if(const auto sp = array_pointer(it->second, symbol_table))
         {
-          if(const auto c = string_pointer_deref(*sp, ns))
+          if(const auto c = array_pointer_deref(*sp, symbol_table, ns))
             return *c;
           failed = true;
           return e;
@@ -517,9 +640,9 @@ public:
     if(e.id() == ID_dereference && e.operands().size() == 1)
     {
       const exprt pointer = eval(e.operands()[0]);
-      if(const auto sp = string_pointer(pointer))
+      if(const auto sp = array_pointer(pointer, symbol_table))
       {
-        if(const auto c = string_pointer_deref(*sp, ns))
+        if(const auto c = array_pointer_deref(*sp, symbol_table, ns))
           return *c;
         failed = true;
         return e;
@@ -577,6 +700,54 @@ public:
     exprt result = e;
     for(auto &op : result.operands())
       op = eval(op);
+    // N5008 [expr.add]/4: pointer +/- integer on a tracked array pointer;
+    // [expr.eq]/3, [expr.rel]/4: two pointers into the same array compare
+    // by element index
+    if(
+      (result.id() == ID_plus || result.id() == ID_minus) &&
+      result.operands().size() == 2 && result.type().id() == ID_pointer)
+    {
+      const auto ap = array_pointer(result.operands()[0], symbol_table);
+      const exprt &offset = result.operands()[1];
+      if(ap && offset.is_constant())
+      {
+        if(const auto n = numeric_cast<mp_integer>(to_constant_expr(offset)))
+        {
+          array_pointert moved = *ap;
+          moved.index += result.id() == ID_plus ? *n : -*n;
+          return make_array_pointer(moved, result.type());
+        }
+      }
+    }
+    if(
+      (result.id() == ID_equal || result.id() == ID_notequal ||
+       result.id() == ID_lt || result.id() == ID_le || result.id() == ID_gt ||
+       result.id() == ID_ge) &&
+      result.operands().size() == 2)
+    {
+      const auto lhs = array_pointer(result.operands()[0], symbol_table);
+      const auto rhs = array_pointer(result.operands()[1], symbol_table);
+      if(lhs && rhs && lhs->array == rhs->array)
+      {
+        const mp_integer &l = lhs->index, &r = rhs->index;
+        const bool v = result.id() == ID_equal      ? l == r
+                       : result.id() == ID_notequal ? l != r
+                       : result.id() == ID_lt       ? l < r
+                       : result.id() == ID_le       ? l <= r
+                       : result.id() == ID_gt       ? l > r
+                                                    : l >= r;
+        return v ? static_cast<exprt>(true_exprt())
+                 : static_cast<exprt>(false_exprt());
+      }
+    }
+    if(result.id() == ID_minus && result.operands().size() == 2)
+    {
+      // pointer difference ([expr.add]/5)
+      const auto lhs = array_pointer(result.operands()[0], symbol_table);
+      const auto rhs = array_pointer(result.operands()[1], symbol_table);
+      if(lhs && rhs && lhs->array == rhs->array)
+        return from_integer(lhs->index - rhs->index, result.type());
+    }
     // Try to simplify
     simplify(result, ns);
     return result;
@@ -619,7 +790,7 @@ public:
         return execute(to_code(code.operands()[2]), depth + 1);
       if(cond.is_false())
         return std::nullopt;
-      failed = true; // can't evaluate condition
+      failed = true;
       return std::nullopt;
     }
     if(code.get_statement() == ID_while)
@@ -631,14 +802,14 @@ public:
           return std::nullopt; // loop done, no return
         if(!cond.is_true() || code.operands()[1].id() != ID_code)
         {
-          failed = true; // can't evaluate condition
+          failed = true;
           return std::nullopt;
         }
         auto r = execute(to_code(code.operands()[1]), depth + 1);
         if(r.has_value() || failed)
           return r;
       }
-      failed = true; // too many iterations
+      failed = true;
       return std::nullopt;
     }
     if(code.get_statement() == ID_dowhile)
@@ -664,11 +835,11 @@ public:
           return std::nullopt; // loop done, no return
         if(!cond.is_true())
         {
-          failed = true; // can't evaluate condition
+          failed = true;
           return std::nullopt;
         }
       }
-      failed = true; // too many iterations
+      failed = true;
       return std::nullopt;
     }
     if(code.get_statement() == ID_for)
@@ -694,7 +865,7 @@ public:
           return std::nullopt; // loop done, no return
         if(!cond.is_true() || for_code.body().id() != ID_code)
         {
-          failed = true; // can't evaluate condition
+          failed = true;
           return std::nullopt;
         }
         auto r = execute(to_code(for_code.body()), depth + 1);
@@ -712,7 +883,7 @@ public:
           return std::nullopt;
         }
       }
-      failed = true; // too many iterations
+      failed = true;
       return std::nullopt;
     }
     if(code.get_statement() == ID_assign)
@@ -727,10 +898,8 @@ public:
           failed = true;
         return std::nullopt;
       }
-      exprt rhs = eval(code.op1());
-      if(
-        lhs.id() == ID_symbol &&
-        (is_constant_value(rhs) || string_pointer(rhs)))
+      exprt rhs = eval_initializer(code.op1());
+      if(lhs.id() == ID_symbol && is_trackable(rhs))
         vars[to_symbol_expr(lhs).get_identifier()] = rhs;
       else
         failed = true;
@@ -760,17 +929,17 @@ public:
         const auto &sym = to_symbol_expr(code.op0());
         if(code.operands().size() >= 2)
         {
-          exprt init = eval(code.op1());
-          if(!is_constant_value(init) && !string_pointer(init))
+          exprt init = eval_initializer(code.op1());
+          if(!is_trackable(init))
           {
-            failed = true; // can't track this variable's value
+            failed = true;
             return std::nullopt;
           }
           vars[sym.get_identifier()] = init;
         }
         else if(sym.type().id() == ID_array || sym.type().id() == ID_struct_tag)
         {
-          failed = true; // an aggregate without initializer: untracked
+          failed = true;
           return std::nullopt;
         }
         else
@@ -787,13 +956,13 @@ public:
       // the tracked variables; skipping it froze the loop variables, so the
       // termination condition never changed and evaluation gave up.
       if(!code.operands().empty() && !apply_side_effect(code.op0()))
-        failed = true; // lost track of a variable's value
+        failed = true;
       return std::nullopt;
     }
     if(code.get_statement() == ID_skip)
       return std::nullopt;
 
-    failed = true; // unknown statement
+    failed = true;
     return std::nullopt;
   }
 };
@@ -875,14 +1044,7 @@ exprt try_evaluate_constexpr(
   {
     if(i == 0 && (is_constructor || this_object_value.is_not_nil()))
       continue;
-    bool has_symbol = false;
-    arguments[i].visit_pre(
-      [&has_symbol](const exprt &e)
-      {
-        if(e.id() == ID_symbol)
-          has_symbol = true;
-      });
-    if(has_symbol)
+    if(!is_constexpr_call_argument(arguments[i], symbol_table))
       return nil_exprt();
   }
 
@@ -991,6 +1153,10 @@ exprt try_evaluate_constexpr(
   if(result.has_value())
   {
     if(result->is_constant())
+      return *result;
+    // a pointer into a constant array ([expr.const]/11: the address of an
+    // element of a static object; initializer_list::begin())
+    if(array_pointer(*result, symbol_table))
       return *result;
     // Reference-returning functions (like std::max) return
     // address_of(constant).  Unwrap to the constant.
