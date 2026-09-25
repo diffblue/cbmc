@@ -118,8 +118,8 @@ protected:
   ///  * The object size definitions.
   ///  * The assertions based on the `assumptions` member variable.
   ///  * The `(check-sat)` or `check-sat-assuming` command.
-  ///  * A `(get-value |identifier|)` command for each of the identifiers in
-  ///    `smt2_convt::smt2_identifiers`.
+  ///  * A get-value request for every identifier in `smt2_identifiers`,
+  ///    grouped into one command for Z3 and omitted for Boolector.
   ///  * An `(exit)` command.
   void write_footer();
 

@@ -167,10 +167,19 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   while(in)
   {
+    const auto errors_before =
+      message_handler.get_message_count(messaget::M_ERROR);
     auto parsed_opt = smt2irep(in, message_handler);
 
     if(!parsed_opt.has_value())
+    {
+      // The parser returns no value for both clean EOF and a syntax error.
+      if(
+        solver == solvert::Z3 &&
+        message_handler.get_message_count(messaget::M_ERROR) != errors_before)
+        return resultt::D_ERROR;
       break;
+    }
 
     const auto &parsed = parsed_opt.value();
 
@@ -183,21 +192,6 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
       messaget log{message_handler};
       log.error() << "SMT2 solver returned \"unknown\"" << messaget::eom;
       return decision_proceduret::resultt::D_ERROR;
-    }
-    else if(
-      parsed.id().empty() && parsed.get_sub().size() == 1 &&
-      parsed.get_sub().front().get_sub().size() == 2)
-    {
-      const irept &s0=parsed.get_sub().front().get_sub()[0];
-      const irept &s1=parsed.get_sub().front().get_sub()[1];
-
-      // Examples:
-      // ( (B0 true) )
-      // ( (|__CPROVER_pipe_count#1| (_ bv0 32)) )
-      // ( (|some_integer| 0) )
-      // ( (|some_integer| (- 10)) )
-
-      parsed_values[s0.id()] = s1;
     }
     else if(
       parsed.id().empty() && parsed.get_sub().size() == 2 &&
@@ -215,6 +209,31 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
         return decision_proceduret::resultt::D_ERROR;
       }
     }
+    else if(
+      parsed.id().empty() && (solver == solvert::Z3 ||
+                              (parsed.get_sub().size() == 1 &&
+                               parsed.get_sub().front().get_sub().size() == 2)))
+    {
+      // A get-value response contains one or more (identifier value) pairs.
+      // Validate every Z3 pair so a malformed tail cannot become a partial
+      // model. Other solvers retain their existing singleton response handling.
+      if(parsed.get_sub().empty())
+        return resultt::D_ERROR;
+      for(const auto &pair : parsed.get_sub())
+      {
+        if(
+          solver == solvert::Z3 &&
+          (!pair.id().empty() || pair.get_sub().size() != 2 ||
+           !pair.get_sub()[0].get_sub().empty()))
+        {
+          messaget log{message_handler};
+          log.error() << "SMT2 solver returned malformed get-value response"
+                      << messaget::eom;
+          return resultt::D_ERROR;
+        }
+        parsed_values[pair.get_sub()[0].id()] = pair.get_sub()[1];
+      }
+    }
   }
 
   // If the result is not satisfiable don't bother updating the assignments and
@@ -224,9 +243,22 @@ decision_proceduret::resultt smt2_dect::read_result(std::istream &in)
 
   for(auto &assignment : identifier_map)
   {
-    std::string conv_id = drop_quotes(convert_identifier(assignment.first));
-    const irept &value = parsed_values[conv_id];
-    assignment.second.value = parse_rec(value, assignment.second.type);
+    const auto identifier = convert_identifier(assignment.first);
+    const auto conv_id = drop_quotes(identifier);
+    const auto value = parsed_values.find(conv_id);
+    if(
+      solver == solvert::Z3 && value == parsed_values.end() &&
+      smt2_identifiers.count(identifier) != 0)
+    {
+      messaget log{message_handler};
+      log.error() << "SMT2 solver omitted value for variable " << conv_id
+                  << messaget::eom;
+      return resultt::D_ERROR;
+    }
+    // Preserve existing handling for identifiers excluded from model queries.
+    assignment.second.value = parse_rec(
+      value == parsed_values.end() ? irept{} : value->second,
+      assignment.second.type);
   }
 
   // Booleans
