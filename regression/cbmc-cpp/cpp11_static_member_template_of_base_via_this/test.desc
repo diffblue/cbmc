@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ deduced static member template of base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ explicit template-id: SUCCESS$
+^\[main\.assertion\.3\] line \d+ non-template static member of base: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+no body for callee
+--
+N5008 [expr.ref]/6.3: a class member access naming a static member (here a
+member function template specialization of a base class) designates that
+member; the object's class only has to be the member's class or derived from
+it.

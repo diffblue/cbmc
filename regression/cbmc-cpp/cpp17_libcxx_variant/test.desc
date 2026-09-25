@@ -1,25 +1,25 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp17 --stdlib libc++
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+--cpp17 --stdlib libc++ --unwind 3
+^EXIT=10$
 ^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ index: SUCCESS$
+^\[main\.assertion\.2\] line \d+ holds int: SUCCESS$
+^\[main\.assertion\.3\] line \d+ get<int>: SUCCESS$
+^\[main\.assertion\.4\] line \d+ get<0>: SUCCESS$
+^\[main\.assertion\.5\] line \d+ assign double: SUCCESS$
+^\[main\.assertion\.6\] line \d+ in_place_index: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
 --
-^PARSING ERROR$
+^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
+no body for callee
+Invariant check failed
 --
-KNOWNBUG since round 152: main() was only partially type-checked and the
-run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
-an incomplete user function is an error now.  Underlying failure: found no match for symbol 'variant' (std::variant constructor).
-2026-09-25: the five `__traits' static members (`__common_trait({__trait<
-_Types, is_trivially_copy_constructible, ...>...})') type-check and fold
-now (constexpr over initializer_list, pack expansion in a static member
-initializer, qualified template template arguments, __is_trivially_
-copyable / __is_trivially_constructible, initializer_list under libc++).
-Remaining: `__best_match_t<_Arg, _Types...>' = invoke_result_t of an
-overload set built from a base pack (`struct __all_overloads : _Bases...
-{ using _Bases::operator()...; }', [namespace.udecl]/1 pack expansion in a
-using-declaration, and the imaginary-function overload resolution over it,
-[variant.ctor]/14); the converting constructor `variant(_Arg&&)' then has no
-match ("found no match for symbol 'variant'", line 1187).  Header-free
-model of the working part: /tmp/r160/var5.cpp.
+libc++ std::variant end to end: converting constructor (`__best_match_t' over a
+using-declaration pack of base operator()s and the array-reference narrowing
+check), index/holds_alternative/get (<tuple>'s constexpr __find_exactly_one),
+converting assignment (`__emplace' calling a static member template of a base
+through `this'; the union storage accessed from another class).
