@@ -34,6 +34,8 @@ struct symex_configt final
 
   bool unwinding_assertions;
 
+  bool depth_assertions;
+
   bool partial_loops;
 
   /// \brief Should the additional validation checks be run?

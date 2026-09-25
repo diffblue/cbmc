@@ -180,3 +180,10 @@ iterations. Note that CBMC uses the number of instructions in the
 control-flow graph as the criterion, not the number of instructions in
 the source code.
 
+When `--depth` is used, CBMC generates depth bounding assertions by
+default. These assertions will fail if any execution path actually
+reaches the depth limit, thus ensuring that the verification result is
+sound. Depth assertions can be disabled using `--no-depth-assertions`,
+but doing so may yield unsound verification results (analogous to using
+`--no-unwinding-assertions` with `--unwind`).
+
