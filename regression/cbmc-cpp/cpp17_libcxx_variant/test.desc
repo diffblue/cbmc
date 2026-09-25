@@ -11,3 +11,15 @@ main.cpp
 KNOWNBUG since round 152: main() was only partially type-checked and the
 run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
 an incomplete user function is an error now.  Underlying failure: found no match for symbol 'variant' (std::variant constructor).
+2026-09-25: the five `__traits' static members (`__common_trait({__trait<
+_Types, is_trivially_copy_constructible, ...>...})') type-check and fold
+now (constexpr over initializer_list, pack expansion in a static member
+initializer, qualified template template arguments, __is_trivially_
+copyable / __is_trivially_constructible, initializer_list under libc++).
+Remaining: `__best_match_t<_Arg, _Types...>' = invoke_result_t of an
+overload set built from a base pack (`struct __all_overloads : _Bases...
+{ using _Bases::operator()...; }', [namespace.udecl]/1 pack expansion in a
+using-declaration, and the imaginary-function overload resolution over it,
+[variant.ctor]/14); the converting constructor `variant(_Arg&&)' then has no
+match ("found no match for symbol 'variant'", line 1187).  Header-free
+model of the working part: /tmp/r160/var5.cpp.
