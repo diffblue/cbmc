@@ -231,6 +231,21 @@ public:
   const smt_termt &predicate() const;
 };
 
+/// A constant array term: an array in which every index maps to the same
+/// \p value. This is printed using the SMT-LIB constant-array form
+/// `((as const (Array I E)) value)`, which is supported by the solvers used by
+/// the incremental backend (e.g. Z3 and CVC5) and requires no quantifier.
+class smt_const_array_termt : public smt_termt
+{
+public:
+  /// \param sort: the (array) sort of the constructed term.
+  /// \param value: the value stored at every index of the array; its sort must
+  ///   equal the element sort of \p sort.
+  smt_const_array_termt(smt_array_sortt sort, smt_termt value);
+  /// The value stored at every index of the array.
+  const smt_termt &value() const;
+};
+
 class smt_term_const_downcast_visitort
 {
 public:

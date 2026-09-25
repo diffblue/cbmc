@@ -185,9 +185,9 @@ TEST_CASE(
       const smt_identifier_termt foo_term{"foo", smt_bool_sortt{}};
       test.procedure.set_to(foo.symbol_expr(), true);
       REQUIRE(
-        test.sent_commands ==
-        std::vector<smt_commandt>{smt_declare_function_commandt{foo_term, {}},
-                                  smt_assert_commandt{foo_term}});
+        test.sent_commands == std::vector<smt_commandt>{
+                                smt_declare_function_commandt{foo_term, {}},
+                                smt_assert_commandt{foo_term}});
     }
     SECTION("Set symbol to false.")
     {
@@ -205,18 +205,18 @@ TEST_CASE(
       const symbolt forty_two =
         make_test_symbol("forty_two", from_integer({42}, signedbv_typet{16}));
       test.symbol_table.insert(forty_two);
-      const smt_identifier_termt forty_two_term{"forty_two",
-                                                smt_bit_vector_sortt{16}};
+      const smt_identifier_termt forty_two_term{
+        "forty_two", smt_bit_vector_sortt{16}};
       const symbolt nondet_int_a =
         make_test_symbol("nondet_int_a", signedbv_typet{16});
       test.symbol_table.insert(nondet_int_a);
-      const smt_identifier_termt nondet_int_a_term{"nondet_int_a",
-                                                   smt_bit_vector_sortt{16}};
+      const smt_identifier_termt nondet_int_a_term{
+        "nondet_int_a", smt_bit_vector_sortt{16}};
       const symbolt nondet_int_b =
         make_test_symbol("nondet_int_b", signedbv_typet{16});
       test.symbol_table.insert(nondet_int_b);
-      const smt_identifier_termt nondet_int_b_term{"nondet_int_b",
-                                                   smt_bit_vector_sortt{16}};
+      const smt_identifier_termt nondet_int_b_term{
+        "nondet_int_b", smt_bit_vector_sortt{16}};
       const symbolt first_comparison = make_test_symbol(
         "first_comparison",
         equal_exprt{nondet_int_a.symbol_expr(), forty_two.symbol_expr()});
@@ -232,12 +232,13 @@ TEST_CASE(
       test.symbol_table.insert(third_comparison);
       const symbolt comparison_conjunction = make_test_symbol(
         "comparison_conjunction",
-        and_exprt{{first_comparison.symbol_expr(),
-                   second_comparison.symbol_expr(),
-                   third_comparison.symbol_expr()}});
+        and_exprt{
+          {first_comparison.symbol_expr(),
+           second_comparison.symbol_expr(),
+           third_comparison.symbol_expr()}});
       test.symbol_table.insert(comparison_conjunction);
-      smt_identifier_termt comparison_conjunction_term{"comparison_conjunction",
-                                                       smt_bool_sortt{}};
+      smt_identifier_termt comparison_conjunction_term{
+        "comparison_conjunction", smt_bool_sortt{}};
       test.procedure.set_to(comparison_conjunction.symbol_expr(), true);
       REQUIRE(
         test.sent_commands ==
@@ -398,15 +399,16 @@ TEST_CASE(
   auto test = decision_procedure_test_environmentt::make();
   SECTION("Expected success response.")
   {
-    test.mock_responses = {smt_success_responset{},
-                           smt_check_sat_responset{smt_sat_responset{}}};
+    test.mock_responses = {
+      smt_success_responset{}, smt_check_sat_responset{smt_sat_responset{}}};
     REQUIRE_NOTHROW(test.procedure());
   }
   SECTION("Duplicated success messages.")
   {
-    test.mock_responses = {smt_success_responset{},
-                           smt_success_responset{},
-                           smt_check_sat_responset{smt_sat_responset{}}};
+    test.mock_responses = {
+      smt_success_responset{},
+      smt_success_responset{},
+      smt_check_sat_responset{smt_sat_responset{}}};
     REQUIRE_THROWS_MATCHES(
       test.procedure(),
       analysis_exceptiont,
@@ -490,7 +492,8 @@ TEST_CASE(
        std::all_of(
          expected_commands.begin(),
          expected_commands.end(),
-         [&](const smt_commandt &command) -> bool {
+         [&](const smt_commandt &command) -> bool
+         {
            return std::find(
                     test.sent_commands.begin(),
                     test.sent_commands.end(),
@@ -666,20 +669,85 @@ TEST_CASE(
       smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}}};
     const auto index_term =
       smt_identifier_termt{"index", smt_bit_vector_sortt{32}};
-    const auto forall_term =
-      smt_identifier_termt{"array_0_index", smt_bit_vector_sortt{32}};
     const std::vector<smt_commandt> expected_commands{
       smt_declare_function_commandt{foo_term, {}},
       smt_declare_function_commandt{array_term, {}},
-      smt_assert_commandt{smt_forall_termt{
-        {forall_term},
-        smt_core_theoryt::equal(
-          smt_array_theoryt::select(array_term, forall_term),
-          smt_bit_vector_constant_termt{42, 8})}},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        array_term,
+        smt_const_array_termt{
+          smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}},
+          smt_bit_vector_constant_termt{42, 8}})},
       smt_declare_function_commandt{index_term, {}},
       smt_assert_commandt{smt_core_theoryt::equal(
         foo_term, smt_array_theoryt::select(array_term, index_term))}};
     REQUIRE(test.sent_commands == expected_commands);
+  }
+  SECTION("array_of_exprt - one definition shared across multiple indices")
+  {
+    const symbolt bar = make_test_symbol("bar", value_type);
+    test.symbol_table.insert(bar);
+    const array_of_exprt array_of_expr{from_integer(7, value_type), array_type};
+    const symbolt index_x = make_test_symbol("x", index_type);
+    const symbolt index_y = make_test_symbol("y", index_type);
+    test.symbol_table.insert(index_x);
+    test.symbol_table.insert(index_y);
+    test.sent_commands.clear();
+    test.procedure.set_to(
+      and_exprt{
+        equal_exprt{
+          foo.symbol_expr(), index_exprt{array_of_expr, index_x.symbol_expr()}},
+        equal_exprt{
+          bar.symbol_expr(),
+          index_exprt{array_of_expr, index_y.symbol_expr()}}},
+      true);
+    const auto array_term = smt_identifier_termt{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}}};
+    // The array_of is defined exactly once, as a constant array, regardless of
+    // how many distinct indices read it -- there is no per-index instantiation
+    // to order or deduplicate.
+    const smt_commandt const_array_definition{
+      smt_assert_commandt{smt_core_theoryt::equal(
+        array_term,
+        smt_const_array_termt{
+          smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}},
+          smt_bit_vector_constant_termt{7, 8}})}};
+    REQUIRE(
+      std::count(
+        test.sent_commands.begin(),
+        test.sent_commands.end(),
+        const_array_definition) == 1);
+  }
+  SECTION("array_of_exprt - bound to a symbol then indexed separately")
+  {
+    // Bind an array_of result to an array-typed symbol, then index that symbol
+    // in a *separate* set_to call. Because the constant-array definition fully
+    // defines the array when the symbol is defined, the read is still
+    // constrained -- a lazy per-index scheme would only fire when the array_of
+    // literal is indexed syntactically and would leave this read unconstrained.
+    const symbolt a = make_test_symbol("a", array_type);
+    test.symbol_table.insert(a);
+    const array_of_exprt array_of_expr{from_integer(9, value_type), array_type};
+    test.sent_commands.clear();
+    test.procedure.set_to(equal_exprt{a.symbol_expr(), array_of_expr}, true);
+    test.procedure.set_to(
+      equal_exprt{
+        foo.symbol_expr(), index_exprt{a.symbol_expr(), index.symbol_expr()}},
+      true);
+    const auto array_term = smt_identifier_termt{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}}};
+    const smt_commandt const_array_definition{
+      smt_assert_commandt{smt_core_theoryt::equal(
+        array_term,
+        smt_const_array_termt{
+          smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{8}},
+          smt_bit_vector_constant_termt{9, 8}})}};
+    REQUIRE(
+      std::count(
+        test.sent_commands.begin(),
+        test.sent_commands.end(),
+        const_array_definition) == 1);
   }
 }
 
