@@ -383,6 +383,10 @@ protected:
   std::optional<codet> rOtherDeclStatement(cpp_storage_spect &, typet &);
 
   bool MaybeTypeNameOrClassTemplate(cpp_tokent &);
+  bool nested_declarator_names_a_type(const irept &name);
+  /// set by rOtherDeclStatement for the declarators that follow: the
+  /// decl-specifier is a name the parser knows as a type
+  bool decl_specifier_is_known_type = false;
   void SkipTo(int token);
   bool moreVarName();
 
@@ -4824,9 +4828,24 @@ bool Parser::rDeclarator(
       // `int*(*p)()`) is a genuine grouping and is left alone.
       const bool empty_nested =
         declarator2.name().is_nil() && declarator2.type().is_nil();
+      // N5008 [stmt.ambig]/1: in a STATEMENT, `T(x);' where x is not a type
+      // name is a declaration of x with a parenthesised declarator
+      // ([dcl.decl.general]: `( ptr-declarator )'), not a function
+      // declaration or a call -- libstdc++ 16's `__location_type
+      // (__trans_tmp_3);' in _Hashtable::find.  A function declaration
+      // would need x to be a type ([dcl.fct]).  Likewise `int (*p) = &i;'.
+      // Only for a decl-specifier the parser KNOWS to be a type: the parser
+      // records type names only, so an unknown name (a member function
+      // `find(__k);' as much as a nested class declared later in the class,
+      // [class.mem.general]/7) stays an expression here; the type checker
+      // turns the latter into a declaration (typecheck_code).
+      const bool named_object_in_statement =
+        is_statement && decl_specifier_is_known_type && !empty_nested &&
+        declarator2.name().is_not_nil() &&
+        !nested_declarator_names_a_type(declarator2.name());
       if(
         (kind == kDeclarator || kind == kCastDeclarator) &&
-        (d_outer.is_nil() || empty_nested))
+        (d_outer.is_nil() || empty_nested) && !named_object_in_statement)
       {
         t=lex.LookAhead(0);
         if(t!='[' && t!='(')
@@ -5233,6 +5252,13 @@ bool Parser::rDeclarator(
   if(d_inner.is_not_nil() && d_outer.id() == ID_array)
   {
     make_subtype(d_outer, d_inner);
+    d_outer.swap(d_inner);
+    d_inner.make_nil();
+  }
+  // ... and with no postfix at all (`int (*p) = &i;', [dcl.decl.general]
+  // `( ptr-declarator )'), the parenthesised declarator IS the declarator
+  else if(d_inner.is_not_nil() && d_outer.is_nil())
+  {
     d_outer.swap(d_inner);
     d_inner.make_nil();
   }
@@ -13614,6 +13640,9 @@ std::optional<codet> Parser::rIntegralDeclStatement(
   declaration.type().swap(integral);
   declaration.storage_spec().swap(storage_spec);
 
+  // `int (i) = k;', `int (*p) = &i;': see rDeclarator's [stmt.ambig] rule
+  decl_specifier_is_known_type = true;
+
   if(lex.LookAhead(0)==';')
   {
     lex.get_token(tk);
@@ -13714,6 +13743,19 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
   if(!rName(type_name))
     return {};
 
+  // for the `T(x);' disambiguation in rDeclarator ([stmt.ambig]): is the
+  // decl-specifier a name the parser knows as a type?
+  decl_specifier_is_known_type = false;
+  if(type_name.id() == ID_cpp_name && type_name.get_sub().size() == 1)
+  {
+    const irept &n = type_name.get_sub().front();
+    if(n.id() == ID_name)
+    {
+      const new_scopet *found = lookup_id(n.get(ID_identifier));
+      decl_specifier_is_known_type = found != nullptr && found->is_type();
+    }
+  }
+
   // C++20 constrained auto: ConceptName auto
   if(lex.LookAhead(0) == TOK_AUTO)
   {
@@ -13754,6 +13796,20 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
     static_cast<symbol_exprt &>(static_cast<exprt &>(declaration)));
   set_location(statement, tk);
   return std::move(statement);
+}
+
+/// Whether the unqualified name a parenthesised nested declarator parsed
+/// (`(x)') is a known type or template name in the parser's scopes, in which
+/// case `T(x)' is a function declaration rather than an object `x' of type T.
+bool Parser::nested_declarator_names_a_type(const irept &name)
+{
+  if(name.id() != ID_cpp_name || name.get_sub().size() != 1)
+    return true; // qualified or templated: not a plain object name
+  const irept &n = name.get_sub().front();
+  if(n.id() != ID_name)
+    return true;
+  const new_scopet *found = lookup_id(n.get(ID_identifier));
+  return found != nullptr && (found->is_type() || found->is_template());
 }
 
 bool Parser::MaybeTypeNameOrClassTemplate(cpp_tokent &tk)
