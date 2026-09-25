@@ -1,255 +1,284 @@
-.TH GOTO-INSTRUMENT "1" "June 2022" "goto-instrument-5.59.0" "User Commands"
+.TH GOTO-INSTRUMENT "1" "March 1, 2026" "goto-instrument-6.10.0" "User Commands"
 .SH NAME
 goto\-instrument \- Perform analysis or instrumentation of goto binaries
 .SH SYNOPSIS
-.TP
-.B goto\-instrument [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B goto\-instrument \-\-version
-show version and exit
-.TP
-.B goto\-instrument [options] \fIin\fR [\fIout\fR]
-perform analysis or instrumentation
+.B goto\-instrument
+.RI [ options ]
+.I in
+.RI [ out ]
 .SH DESCRIPTION
-\fBgoto-instrument\fR reads a GOTO binary, performs a given program
-transformation, and then writes the resulting program as GOTO binary on
-disk.
+\fBgoto\-instrument\fR reads a GOTO binary (as produced by \fBgoto\-cc\fR(1)),
+performs program transformations or analyses, and optionally writes the
+resulting program as a new GOTO binary.  When no output file is given,
+the tool performs analysis only and prints results to standard output.
+.SH EXAMPLES
+Display the GOTO program instructions:
+.IP
+.B goto\-instrument \-\-show\-goto\-functions program.gb
+.PP
+Add bounds checks and write the result to a new binary:
+.IP
+.B goto\-instrument \-\-bounds\-check program.gb program\-checked.gb
+.PP
+Decompile a GOTO binary back to C source:
+.IP
+.B goto\-instrument \-\-dump\-c program.gb
+.PP
+Unwind all loops 10 times with unwinding assertions:
+.IP
+.B goto\-instrument \-\-unwind 10 \-\-unwinding\-assertions prog.gb prog\-unwound.gb
+.PP
+Full verification pipeline:
+.RS
+.nf
+goto\-cc \-o program.gb program.c
+goto\-instrument \-\-bounds\-check \-\-pointer\-check program.gb
+program\-instr.gb
+cbmc program\-instr.gb
+.fi
+.RE
 .SH OPTIONS
 .SS "Dump Source:"
 .TP
 \fB\-\-dump\-c\fR
-generate C source
+Decompile the GOTO binary back to C source code and print it to
+standard output.
 .TP
-\fB\-\-dump\-c\-type\-header\fR \fIm\fR
-generate a C header for types local in \fIm\fR
+\fB\-\-dump\-c\-type\-header\fR \fImodule\fR
+Generate a C header file containing type declarations local to
+\fImodule\fR.
 .TP
 \fB\-\-dump\-cpp\fR
-generate C++ source
+Decompile the GOTO binary back to C++ source code.
 .TP
 \fB\-\-no\-system\-headers\fR
-generate C source expanding libc includes
+When dumping C source, expand libc includes inline instead of
+emitting \fB#include\fR directives.
 .TP
 \fB\-\-use\-all\-headers\fR
-generate C source with all includes
+When dumping C source, emit \fB#include\fR directives for all headers.
 .TP
 \fB\-\-harness\fR
-include input generator in output
+Include an input generator (test harness) in the dumped source.
 .TP
 \fB\-\-horn\fR
-print program as constrained horn clauses
+Print the program as constrained Horn clauses.
 .SS "Diagnosis:"
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .TP
 \fB\-\-document\-properties\-html\fR
-generate HTML property documentation
+Generate HTML documentation of all properties.
 .TP
 \fB\-\-document\-properties\-latex\fR
-generate Latex property documentation
+Generate LaTeX documentation of all properties.
 .TP
 \fB\-\-show\-symbol\-table\fR
-show loaded symbol table
+Display the symbol table.
 .TP
 \fB\-\-list\-symbols\fR
-list symbols with type information
+List symbols with their type information.
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all functions.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all functions without showing their bodies.
 .TP
 \fB\-\-count\-eloc\fR
-count effective lines of code
+Count effective lines of code.
 .TP
 \fB\-\-list\-eloc\fR
-list full path names of lines containing code
+List full path names of lines containing code.
 .TP
 \fB\-\-print\-global\-state\-size\fR
-count the total number of bits of global objects
+Print the total number of bits of global objects.
 .TP
 \fB\-\-print\-path\-lengths\fR
-print statistics about control\-flow graph paths
+Print statistics about control-flow graph paths.
 .TP
 \fB\-\-show\-locations\fR
-show all source locations
+Display all source locations in the program.
 .TP
 \fB\-\-dot\fR
-generate CFG graph in DOT format
+Generate a control-flow graph in DOT format.
 .TP
 \fB\-\-print\-internal\-representation\fR
-show verbose internal representation of the program
+Display the verbose internal representation of the program.
 .TP
 \fB\-\-list\-undefined\-functions\fR
-list functions without body
+List functions that are declared but have no body.
 .TP
 \fB\-\-list\-calls\-args\fR
-list all function calls with their arguments
+List all function calls with their arguments.
 .TP
 \fB\-\-call\-graph\fR
-show graph of function calls
+Display the function call graph.
 .TP
 \fB\-\-reachable\-call\-graph\fR
-show graph of function calls potentially reachable from main function
+Display the function call graph restricted to functions potentially
+reachable from the entry point.
 .TP
 \fB\-\-show\-class\-hierarchy\fR
-show the class hierarchy
+Display the class inheritance hierarchy.
 .TP
 \fB\-\-validate\-goto\-model\fR
-enable additional well\-formedness checks on the
-goto program
+Run additional well-formedness checks on the GOTO program.
 .TP
 \fB\-\-validate\-ssa\-equation\fR
-enable additional well\-formedness checks on the
-SSA representation
+Run additional well-formedness checks on the SSA representation.
 .TP
 \fB\-\-validate\-goto\-binary\fR
-check the well\-formedness of the passed in GOTO
-binary and then exit
+Check the well-formedness of the input GOTO binary and exit.
 .TP
 \fB\-\-interpreter\fR
-do concrete execution
+Perform concrete execution of the program (interpreter mode).
 .SS "Data-flow analyses:"
 .TP
 \fB\-\-show\-struct\-alignment\fR
-show struct members that might be concurrently accessed
+Show struct members that might be concurrently accessed (useful for
+detecting potential data races).
 .TP
 \fB\-\-show\-threaded\fR
-show instructions that may be executed by more than one thread
+Show instructions that may be executed by more than one thread.
 .TP
 \fB\-\-show\-local\-safe\-pointers\fR
-show pointer expressions that are trivially dominated by a not\-null check
+Show pointer expressions that are trivially dominated by a not-null
+check (i.e., guaranteed non-null at that point).
 .TP
 \fB\-\-show\-safe\-dereferences\fR
-show pointer expressions that are trivially dominated by a not\-null check
-*and* used as a dereference operand
+Show pointer expressions that are both dominated by a not-null check
+and used as a dereference operand.
 .TP
 \fB\-\-show\-value\-sets\fR
-show points\-to information (using value sets)
+Show points-to information computed by value-set analysis.
 .TP
 \fB\-\-show\-global\-may\-alias\fR
-show may\-alias information over globals
+Show may-alias information for global variables.
 .TP
 \fB\-\-show\-local\-bitvector\-analysis\fR
-show procedure\-local pointer analysis
+Show results of procedure-local pointer analysis using bitvectors.
 .TP
 \fB\-\-escape\-analysis\fR
-perform escape analysis
+Perform escape analysis (determine which objects may outlive their
+creating scope).
 .TP
 \fB\-\-show\-escape\-analysis\fR
-show results of escape analysis
+Show results of escape analysis.
 .TP
 \fB\-\-custom\-bitvector\-analysis\fR
-perform configurable bitvector analysis
+Perform configurable bitvector analysis.
 .TP
 \fB\-\-show\-custom\-bitvector\-analysis\fR
-show results of configurable bitvector analysis
+Show results of configurable bitvector analysis.
 .TP
 \fB\-\-interval\-analysis\fR
-perform interval analysis
+Perform interval analysis (compute value ranges for variables).
 .TP
 \fB\-\-show\-intervals\fR
-show results of interval analysis
+Show results of interval analysis.
 .TP
 \fB\-\-show\-uninitialized\fR
-show maybe\-uninitialized variables
+Show variables that may be used before initialization.
 .TP
 \fB\-\-show\-points\-to\fR
-show points\-to information
+Show points-to information.
 .TP
 \fB\-\-show\-rw\-set\fR
-show read\-write sets
+Show read-write sets for each instruction.
 .TP
 \fB\-\-show\-call\-sequences\fR
-show function call sequences
+Show possible function call sequences.
 .TP
 \fB\-\-show\-reaching\-definitions\fR
-show reaching definitions
+Show reaching definitions (use-def chains) for each variable.
 .TP
 \fB\-\-show\-dependence\-graph\fR
-show program\-dependence graph
+Show the program-dependence graph (data and control dependencies).
 .TP
 \fB\-\-show\-sese\-regions\fR
-show single\-entry\-single\-exit regions
+Show single-entry-single-exit regions in the control-flow graph.
 .SS "Safety checks:"
 .TP
-\fB\-\-no\-assertions\fR
-ignore user assertions
-.TP
 \fB\-\-bounds\-check\fR
-enable array bounds checks
+Insert assertions that array and buffer accesses are within bounds.
 .TP
 \fB\-\-pointer\-check\fR
-enable pointer checks
+Insert assertions that pointers are valid when dereferenced.
 .TP
 \fB\-\-memory\-leak\-check\fR
-enable memory leak checks
+Insert assertions that all dynamically allocated memory is freed before
+program termination.
 .TP
 \fB\-\-memory\-cleanup\-check\fR
-Enable memory cleanup checks: assert that all dynamically allocated memory is
-explicitly freed before terminating the program.
+Insert assertions that all dynamically allocated memory is explicitly
+freed before program termination.
 .TP
 \fB\-\-div\-by\-zero\-check\fR
-enable division by zero checks for integer division
+Insert assertions that integer division and modulo do not divide by zero.
 .TP
 \fB\-\-float\-div\-by\-zero\-check\fR
-enable division by zero checks for floating-point division
+Insert assertions that floating-point division does not divide by zero.
 .TP
 \fB\-\-signed\-overflow\-check\fR
-enable signed arithmetic over\- and underflow checks
+Insert assertions that signed integer arithmetic does not overflow.
 .TP
 \fB\-\-unsigned\-overflow\-check\fR
-enable arithmetic over\- and underflow checks
+Insert assertions that unsigned integer arithmetic does not wrap around.
 .TP
 \fB\-\-pointer\-overflow\-check\fR
-enable pointer arithmetic over\- and underflow checks
+Insert assertions that pointer arithmetic does not overflow.
 .TP
 \fB\-\-conversion\-check\fR
-check whether values can be represented after type cast
+Insert assertions that values can be faithfully represented after a
+type cast.
 .TP
 \fB\-\-undefined\-shift\-check\fR
-check shift greater than bit\-width
+Insert assertions that shift amounts are non-negative and less than the
+bit-width of the shifted type.
 .TP
 \fB\-\-float\-overflow\-check\fR
-check floating\-point for +/\-Inf
+Insert assertions that floating-point operations do not produce infinity.
 .TP
 \fB\-\-nan\-check\fR
-check floating\-point for NaN
+Insert assertions that floating-point operations do not produce NaN.
 .TP
 \fB\-\-enum\-range\-check\fR
-checks that all enum type expressions have values in the enum range
+Insert assertions that enum-typed expressions hold values within the
+defined range.
 .TP
 \fB\-\-pointer\-primitive\-check\fR
-checks that all pointers in pointer primitives are valid or null
+Insert assertions that all pointers passed to pointer primitives are
+valid or null.
 .TP
 \fB\-\-retain\-trivial\-checks\fR
-include checks that are trivially true
+Keep checks that are trivially true.
 .TP
-\fB\-\-error\-label\fR label
-check that label is unreachable
+\fB\-\-error\-label\fR \fIlabel\fR
+Insert an assertion that the given \fIlabel\fR is unreachable.
 .TP
 \fB\-\-no\-built\-in\-assertions\fR
-ignore assertions in built\-in library
+Ignore assertions in the built-in C library models.
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
 \fB\-\-assert\-to\-assume\fR
-convert user assertions to assumptions
+Convert all user assertions to assumptions.
 .TP
 \fB\-\-uninitialized\-check\fR
-add checks for uninitialized locals (experimental)
+Insert checks for use of uninitialized local variables (experimental).
 .TP
-\fB\-\-stack\-depth\fR n
-add check that call stack size of non\-inlined functions never exceeds n
+\fB\-\-stack\-depth\fR \fIn\fR
+Insert an assertion that the call stack of non-inlined functions never
+exceeds \fIn\fR frames.
 .TP
 \fB\-\-race\-check\fR
-add floating\-point data race checks
+Insert data race checks for floating-point variables.
 .SS "Semantic transformations:"
 .TP
 \fB\-\-nondet\-volatile\fR
@@ -270,9 +299,9 @@ for function \fIget_celsius\fR and with harness \fItest_get_celsius\fR:
 
 .EX
 .in +4n
-\fB#include\fP \fC<assert.h>\fP
-\fB#include\fP \fC<limits.h>\fP
-\fB#include\fP \fC<stdint.h>\fP
+\fB#include\fP \fB<assert.h>\fP
+\fB#include\fP \fB<limits.h>\fP
+\fB#include\fP \fB<stdint.h>\fP
 
 \fB// hardware sensor for temperature in kelvin\fP
 \fBextern\fP \fBvolatile\fP uint16_t temperature;
@@ -320,8 +349,8 @@ and with harness \fItest_get_message\fR:
 
 .EX
 .in +4n
-\fB#include\fP \fC<assert.h>\fP
-\fB#include\fP \fC<stdint.h>\fP
+\fB#include\fP \fB<assert.h>\fP
+\fB#include\fP \fB<stdint.h>\fP
 
 \fBextern\fP \fBvolatile\fP uint32_t clock;
 
@@ -349,7 +378,8 @@ void \fBtest_get_message\fP() {
 
 The harness verifies that \fIget_message\fR assigns non-decreasing time stamps
 to the returned messages. However, simply treating \fIclock\fR as
-non-deterministic would not suffice to prove this property. Thus, we can supply a
+non-deterministic would not suffice to prove this property. Thus, we can supply
+a
 model for reads from \fIclock\fR:
 
 .EX
@@ -383,39 +413,42 @@ cbmc --function get_message_test get_message_test-mod.gb
 Now the final invocation of \fBcbmc\fR(1) reports verification success.
 .TP
 \fB\-\-isr\fR \fIfunction\fR
-instruments an interrupt service routine
+Instrument an interrupt service routine: insert calls to \fIfunction\fR
+at context-switch points.
 .TP
 \fB\-\-mmio\fR
-instruments memory\-mapped I/O
+Instrument memory-mapped I/O accesses as non-deterministic reads.
 .TP
 \fB\-\-nondet\-static\fR
-add nondeterministic initialization of variables with static lifetime
+Initialize all variables with static lifetime to non-deterministic
+values instead of their declared initializers.
 .TP
 \fB\-\-nondet\-static\-exclude\fR \fIe\fR
-same as nondet\-static except for the variable \fIe\fR
-(use multiple times if required)
+Same as \fB\-\-nondet\-static\fR except for the variable \fIe\fR.  May be
+given multiple times.
 .TP
 \fB\-\-nondet\-static\-matching\fR \fIr\fR
-add nondeterministic initialization of variables
-with static lifetime matching regex \fIr\fR
+Initialize variables with static lifetime matching the regular
+expression \fIr\fR to non-deterministic values.
 .TP
 \fB\-\-function\-enter\fR \fIf\fR
 .TQ
 \fB\-\-function\-exit\fR \fIf\fR
 .TQ
 \fB\-\-branch\fR \fIf\fR
-instruments a call to \fIf\fR at the beginning,
-the exit, or a branch point, respectively
+Insert a call to function \fIf\fR at the entry, exit, or branch points
+of every function, respectively.  Useful for instrumentation-based
+profiling or tracing.
 .TP
 \fB\-\-splice\-call\fR \fIcaller\fR,\fIcallee\fR
-prepends a call to \fIcallee\fR in the body of \fIcaller\fR
+Prepend a call to \fIcallee\fR at the beginning of \fIcaller\fR's body.
 .TP
 \fB\-\-check\-call\-sequence\fR \fIseq\fR
-instruments checks to assert that all call
-sequences match \fIseq\fR
+Insert assertions that all function call sequences match \fIseq\fR.
 .TP
 \fB\-\-undefined\-function\-is\-assume\-false\fR
-convert each call to an undefined function to assume(false)
+Replace each call to an undefined function with \fBassume(false)\fR,
+effectively making paths through undefined functions unreachable.
 .TP
 \fB\-\-insert\-final\-assert\-false\fR \fIfunction\fR
 generate assert(false) at end of \fIfunction\fR
@@ -492,9 +525,11 @@ associated with a non-pointer parameter. Requesting to havoc a parameter with a
 number higher than the number of parameters a given function takes will also
 results in an error report.
 .TP
-\fB\-\-generate\-havocing\-body\fR \fIoption\fR \fIfun_name\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..
+\fB\-\-generate\-havocing\-body\fR \fIoption\fR
+\fIfun_name\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..
 .TQ
-\fB\-\-generate\-havocing\-body\fR \fIoption\fR \fIfun_name\fR[,\fIcall\-site\-id\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..>]+
+\fB\-\-generate\-havocing\-body\fR \fIoption\fR
+\fIfun_name\fR[,\fIcall\-site\-id\fR,\fBparams:\fR\fIp_n1\fR;\fIp_n2\fR;..>]+
 Request a different implementation for a number of
 call-sites of a single function. The option \fB\-\-generate\-havocing\-body\fR
 inserts new functions for selected call-sites and replaces the calls to the
@@ -535,7 +570,8 @@ int \fBfunction_1\fP(int *first, int *second, int *third) {
   *third = \fBnondet_int\fP();
 }
 
-int \fBfunction_2\fP(int *first, int *second, int *third) { *second = \fBnondet_int\fP(); }
+int \fBfunction_2\fP(int *first, int *second, int *third) { *second =
+\fBnondet_int\fP(); }
 
 int \fBmain\fP() {
   int a = 10;
@@ -614,7 +650,8 @@ int \fBfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) {
   filesystem->\fBopen\fP(filesystem, file_name);
 }
 
-int \fBnullfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) { \fBreturn\fP -1; }
+int \fBnullfs_open\fP(filesystem_t *filesystem, \fBconst\fP char *file_name) {
+\fBreturn\fP -1; }
 
 filesystem_t nullfs_val = {.open = nullfs_open};
 filesystem *\fBconst\fP nullfs = &nullfs_val;
@@ -630,7 +667,7 @@ filesystem_t *\fBget_fs_impl\fP() {
 }
 int \fBmain\fP(void) {
   filesystem_t *fs = \fBget_fs_impl\fP();
-  \fBassert\fP(\fBfs_open\fP(fs, \fC"hello.txt"\fP) != -1);
+  \fBassert\fP(\fBfs_open\fP(fs, \fB"hello.txt"\fP) != -1);
 }
 .in
 .EE
@@ -681,37 +718,38 @@ have the correct type), the error message will refer to the command line option
 \fB\-\-restrict\-function\-pointer\fR regardless of whether the restriction in
 question came from the command line or a file.
 .TP
-\fB\-\-restrict\-function\-pointer\-by\-name\fR \fIsymbol_name\fR/\fItarget\fR[,\fItargets\fR]*
+\fB\-\-restrict\-function\-pointer\-by\-name\fR
+\fIsymbol_name\fR/\fItarget\fR[,\fItargets\fR]*
 Restrict a function pointer where \fIsymbol_name\fR is the unmangled name,
 before labeling function pointers.
 .TP
 \fB\-\-remove\-calls\-no\-body\fR
-remove calls to functions without a body
+Remove calls to functions that have no body (declaration only).
 .TP
 \fB\-\-add\-library\fR
-add models of C library functions
+Add models of C library functions to the GOTO binary.
 .TP
 \fB\-\-malloc\-may\-fail\fR
-allow malloc calls to return a null pointer
+Model \fBmalloc\fR as potentially returning a null pointer.
 .TP
 \fB\-\-malloc\-fail\-assert\fR
-set malloc failure mode to assert\-then\-assume
+When \fBmalloc\fR fails, assert false then assume false.
 .TP
 \fB\-\-malloc\-fail\-null\fR
-set malloc failure mode to return null
+When \fBmalloc\fR fails, return null.
 .TP
 \fB\-\-no\-malloc\-may\-fail\fR
-do not allow malloc calls to fail by default
+Do not allow \fBmalloc\fR calls to fail by default.
 .TP
 \fB\-\-string\-abstraction\fR
-track C string lengths and zero\-termination
+Track C string lengths and zero-termination (experimental).
 .TP
 \fB\-\-dfcc\-debug\-lib\fR
-enable debug assertions in the cprover contracts library
+Enable debug assertions in the CProver contracts library.
 .TP
 \fB\-\-dfcc\-simple\-invalid\-pointer\-model\fR
-use simplified invalid pointer model in the cprover contracts library
-(faster, unsound)
+Use a simplified invalid pointer model in the CProver contracts library.
+Faster but potentially unsound.
 .TP
 \fB\-\-model\-argc\-argv\fR \fIn\fR
 Create up to \fIn\fR non-deterministic C strings as entries to \fIargv\fR and
@@ -722,7 +760,7 @@ following example:
 .EX
 .in +4n
 \fB// needs_argv.c\fP
-\fB#include\fP \fC<assert.h>\fP
+\fB#include\fP \fB<assert.h>\fP
 
 int \fBmain\fP(int argc, char *argv[]) {
   \fBif\fP (argc >= 2)
@@ -764,32 +802,34 @@ NULL in a recursively nondet initialized struct
 .SS "Semantics-preserving transformations:"
 .TP
 \fB\-\-ensure\-one\-backedge\-per\-target\fR
-transform loop bodies such that there is a
-single edge back to the loop head
+Transform loop bodies so that there is a single back-edge to each loop
+head.
 .TP
 \fB\-\-drop\-unused\-functions\fR
-drop functions trivially unreachable from main function
+Remove functions that are trivially unreachable from the entry point.
 .TP
 \fB\-\-remove\-pointers\fR
-converts pointer arithmetic to base+offset expressions
+Convert pointer arithmetic to base+offset expressions.
 .TP
 \fB\-\-constant\-propagator\fR
-propagate constants and simplify expressions
+Propagate constants and simplify expressions.
 .TP
 \fB\-\-inline\fR
-perform full inlining
+Perform full inlining of all function calls.
 .TP
 \fB\-\-partial\-inline\fR
-perform partial inlining
+Perform partial inlining (inline small functions only).
 .TP
 \fB\-\-function\-inline\fR \fIfunction\fR
-transitively inline all calls \fIfunction\fR makes
+Transitively inline all calls that \fIfunction\fR makes.
 .TP
 \fB\-\-no\-caching\fR
-disable caching of intermediate results during transitive function inlining
+Disable caching of intermediate results during transitive function
+inlining.
 .TP
 \fB\-\-log\fR \fIfile\fR
-log in JSON format which code segments were inlined, use with \fB\-\-function\-inline\fR
+Log in JSON format which code segments were inlined.  Use with
+\fB\-\-function\-inline\fR.
 .TP
 \fB\-\-remove\-function\-pointers\fR
 Resolve calls via function pointers to direct function calls. Candidate
@@ -856,10 +896,10 @@ empty the function pointer is removed using the standard
 .SS "Loop information and transformations:"
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the program
+List all loops in the program with their identifiers.
 .TP
 \fB\-\-unwind\fR \fInr\fR
-unwind all loops \fInr\fR times
+Unwind all loops \fInr\fR times.
 .TP
 \fB\-\-unwindset\fR [\fIT\fR:]\fIL\fR:\fIB\fR,...
 unwind loop \fIL\fR with a bound of \fIB\fR
@@ -1027,32 +1067,42 @@ force aggressive slicer to preserve all direct paths
 .SS "Code contracts:"
 .TP
 \fB\-\-apply\-loop\-contracts\fR
+Apply user-annotated loop contracts (invariants, assigns clauses, and
+decreases clauses) to transform loops for modular verification.
 .TP
-\fB\-disable\-loop\-contracts\-side\-effect\-check\fR
-UNSOUND OPTION. Disable checking the absence of side effects in loop
-contract clauses. In absence of such checking, loop contracts clauses will
-accept more expressions, such as pure functions and statement expressions.
-But user have to make sure the loop contracts are side-effect free by them self
-to get a sound result.
+\fB\-\-disable\-loop\-contracts\-side\-effect\-check\fR
+UNSOUND OPTION.  Disable checking the absence of side effects in loop
+contract clauses.  Without this check, loop contract clauses will accept
+more expressions (such as pure functions and statement expressions), but
+the user must ensure the contracts are side-effect free for sound results.
 .TP
-\fB\-loop\-contracts\-no\-unwind\fR
-do not unwind transformed loops
+\fB\-\-loop\-contracts\-no\-unwind\fR
+Do not unwind transformed loops after applying loop contracts.
 .TP
-\fB\-loop\-contracts\-file\fR \fIfile\fR
-annotate loop contracts from the file to the goto program
+\fB\-\-loop\-contracts\-file\fR \fIfile\fR
+Read loop contract annotations from \fIfile\fR and apply them to the
+GOTO program.
 .TP
 \fB\-\-replace\-call\-with\-contract\fR \fIfun\fR
-replace calls to \fIfun\fR with \fIfun\fR's contract
+Replace calls to \fIfun\fR with its function contract (requires that
+\fIfun\fR has a contract annotation).
 .TP
 \fB\-\-enforce\-contract\fR \fIfun\fR
-wrap \fIfun\fR with an assertion of its contract
+Wrap \fIfun\fR with an assertion that checks its function contract.
 .TP
 \fB\-\-enforce\-contract\-rec\fR \fIfun\fR
-wrap \fIfun\fR with an assertion of its contract that can handle recursive calls
+Like \fB\-\-enforce\-contract\fR, but handles recursive calls to \fIfun\fR.
 .TP
 \fB\-\-dfcc\fR \fIfun\fR
-instrument dynamic frame condition checks method using \fIfun\fR as entry point
+Instrument dynamic frame condition checking using \fIfun\fR as the
+entry point.  This is the recommended method for contract verification.
 .SS "User-interface options:"
+.TP
+\fB\-?\fR, \fB\-h\fR, \fB\-\-help\fR
+Print usage information and exit.
+.TP
+\fB\-\-version\fR
+Print version information and exit.
 .TP
 \fB\-\-flush\fR
 flush every line of output
@@ -1073,13 +1123,27 @@ verbosity level
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
+.SH EXIT STATUS
+.TP
+.B 0
+Transformation or analysis completed successfully.
+.TP
+.B 1
+Usage error (invalid command line).
+.TP
+.B 6
+An internal error occurred.
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto-cc (1)
+.BR goto\-analyzer (1),
+.BR goto\-cc (1),
+.BR goto\-diff (1)
 .SH COPYRIGHT
-2008\-2013, Daniel Kroening
+2008\-2026, Daniel Kroening

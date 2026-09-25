@@ -1,106 +1,113 @@
-.TH GOTO-DIFF "1" "June 2022" "jdiff-5.59.0" "User Commands"
+.TH GOTO-DIFF "1" "March 1, 2026" "goto-diff-6.10.0" "User Commands"
 .SH NAME
 goto\-diff \- Syntactic diff of goto binaries
 .SH SYNOPSIS
-.TP
-.B goto\-diff [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B goto\-diff old new
-goto binaries to be compared
+.B goto\-diff
+.RI [ options ]
+.I old new
 .SH DESCRIPTION
+\fBgoto\-diff\fR compares two GOTO binaries (as produced by \fBgoto\-cc\fR(1))
+and reports syntactic differences in their GOTO program representations.
+It can produce unified diffs and dependency-based change-impact analyses.
 .SH OPTIONS
 .SS "Diff options:"
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all functions.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all functions without showing their bodies.
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the programs
+List all loops in both programs.
 .TP
 \fB\-u\fR | \fB\-\-unified\fR
 output unified diff
-.HP
-\fB\-\-change\-impact\fR |
-.HP
-\fB\-\-forward\-impact\fR |
+.TP
+\fB\-\-change\-impact\fR
+Output unified diff with both forward and backward dependencies.
+.TP
+\fB\-\-forward\-impact\fR
+Output unified diff with forward dependencies only.
 .TP
 \fB\-\-backward\-impact\fR
-output unified diff with forward&backward/forward/backward dependencies
+Output unified diff with backward dependencies only.
 .TP
 \fB\-\-compact\-output\fR
 output dependencies in compact mode
 .SS "Program instrumentation options:"
 .TP
 \fB\-\-bounds\-check\fR
-enable array bounds checks
+Insert assertions that array and buffer accesses are within bounds.
 .TP
 \fB\-\-pointer\-check\fR
-enable pointer checks
+Insert assertions that pointers are valid when dereferenced.
 .TP
 \fB\-\-memory\-leak\-check\fR
-enable memory leak checks
+Insert assertions that all dynamically allocated memory is freed before
+program termination.
 .TP
 \fB\-\-memory\-cleanup\-check\fR
-Enable memory cleanup checks: assert that all dynamically allocated memory is
-explicitly freed before terminating the program.
+Insert assertions that all dynamically allocated memory is explicitly
+freed before program termination.
 .TP
 \fB\-\-div\-by\-zero\-check\fR
-enable division by zero checks for integer division
+Insert assertions that integer division and modulo do not divide by zero.
 .TP
 \fB\-\-float\-div\-by\-zero\-check\fR
-enable division by zero checks for floating-point division
+Insert assertions that floating-point division does not divide by zero.
 .TP
 \fB\-\-signed\-overflow\-check\fR
-enable signed arithmetic over\- and underflow checks
+Insert assertions that signed integer arithmetic does not overflow.
 .TP
 \fB\-\-unsigned\-overflow\-check\fR
-enable arithmetic over\- and underflow checks
+Insert assertions that unsigned integer arithmetic does not wrap around.
 .TP
 \fB\-\-pointer\-overflow\-check\fR
-enable pointer arithmetic over\- and underflow checks
+Insert assertions that pointer arithmetic does not overflow.
 .TP
 \fB\-\-conversion\-check\fR
-check whether values can be represented after type cast
+Insert assertions that values can be faithfully represented after a
+type cast.
 .TP
 \fB\-\-undefined\-shift\-check\fR
-check shift greater than bit\-width
+Insert assertions that shift amounts are non-negative and less than the
+bit-width of the shifted type.
 .TP
 \fB\-\-float\-overflow\-check\fR
-check floating\-point for +/\-Inf
+Insert assertions that floating-point operations do not produce infinity.
 .TP
 \fB\-\-nan\-check\fR
-check floating\-point for NaN
+Insert assertions that floating-point operations do not produce NaN.
 .TP
 \fB\-\-enum\-range\-check\fR
-checks that all enum type expressions have values in the enum range
+Insert assertions that enum-typed expressions hold values within the
+defined range.
 .TP
 \fB\-\-pointer\-primitive\-check\fR
-checks that all pointers in pointer primitives are valid or null
+Insert assertions that all pointers passed to pointer primitives are
+valid or null.
 .TP
 \fB\-\-retain\-trivial\-checks\fR
-include checks that are trivially true
+Keep checks that are trivially true.
 .TP
-\fB\-\-error\-label\fR label
-check that label is unreachable
+\fB\-\-error\-label\fR \fIlabel\fR
+Insert an assertion that the given \fIlabel\fR is unreachable.
 .TP
 \fB\-\-no\-built\-in\-assertions\fR
-ignore assertions in built\-in library
+Ignore assertions in the built-in C library models.
 .TP
 \fB\-\-no\-assertions\fR
-ignore user assertions
+Ignore all user-written assertions.
 .TP
 \fB\-\-no\-assumptions\fR
-ignore user assumptions
+Ignore all assumptions.
 .TP
 \fB\-\-assert\-to\-assume\fR
-convert user assertions to assumptions
+Convert all user assertions to assumptions.
 .TP
 \fB\-\-cover\fR CC
 create test\-suite with coverage criterion CC,
@@ -131,14 +138,26 @@ verbosity level
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH EXAMPLES
+Compare two GOTO binaries and show a unified diff:
+.IP
+.B goto\-diff \-\-unified old.gb new.gb
+.PP
+Show change impact analysis:
+.IP
+.B goto\-diff \-\-change\-impact old.gb new.gb
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
 .BR cbmc (1),
-.BR goto-analyzer (1)
+.BR goto\-cc (1),
+.BR goto\-analyzer (1),
+.BR jdiff (1)
 .SH COPYRIGHT
-2016, Daniel Kroening, Peter Schrammel
+2016\-2026, Daniel Kroening, Peter Schrammel

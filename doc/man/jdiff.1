@@ -1,38 +1,41 @@
-.TH JDIFF "1" "June 2022" "jdiff-5.59.0" "User Commands"
+.TH JDIFF "1" "March 1, 2026" "jdiff-6.10.0" "User Commands"
 .SH NAME
 jdiff \- Syntactic diff of goto programs obtained from Java bytecode
 .SH SYNOPSIS
-.TP
-.B jdiff [\-?] [\-h] [\-\-help]
-show help
-.TP
-.B jdiff old new
-jars to be compared
+.B jdiff
+.RI [ options ]
+.I old new
 .SH DESCRIPTION
+\fBjdiff\fR compares two Java programs (given as JAR files, class files, or
+GOTO binaries) and reports syntactic differences in their GOTO program
+representations.  It can produce unified diffs and dependency-based
+change-impact analyses.
 .SH OPTIONS
 .SS "Diff options:"
 .TP
 \fB\-\-show\-goto\-functions\fR
-show loaded goto program
+Display the GOTO program instructions for all methods.
 .TP
 \fB\-\-list\-goto\-functions\fR
-list loaded goto functions
+List the names of all methods without showing their bodies.
 .TP
 \fB\-\-show\-properties\fR
-show the properties, but don't run analysis
+List all properties without running analysis.
 .TP
 \fB\-\-show\-loops\fR
-show the loops in the programs
+List all loops in both programs.
 .TP
 \fB\-u\fR | \fB\-\-unified\fR
 output unified diff
-.HP
-\fB\-\-change\-impact\fR |
-.HP
-\fB\-\-forward\-impact\fR |
+.TP
+\fB\-\-change\-impact\fR
+Output unified diff with both forward and backward dependencies.
+.TP
+\fB\-\-forward\-impact\fR
+Output unified diff with forward dependencies only.
 .TP
 \fB\-\-backward\-impact\fR
-output unified diff with forward&backward/forward/backward dependencies
+Output unified diff with backward dependencies only.
 .TP
 \fB\-\-compact\-output\fR
 output dependencies in compact mode
@@ -69,14 +72,25 @@ verbosity level
 \fB\-\-timestamp\fR [\fBmonotonic\fR|\fBwall\fR]
 Print microsecond\-precision timestamps.  \fBmonotonic\fR: stamps increase
 monotonically.  \fBwall\fR: ISO\-8601 wall clock timestamps.
+.SH EXAMPLES
+Compare two JAR files and show a unified diff:
+.IP
+.B jdiff \-\-unified old.jar new.jar
+.PP
+Show change impact analysis:
+.IP
+.B jdiff \-\-change\-impact old.jar new.jar
 .SH ENVIRONMENT
-All tools honor the TMPDIR environment variable when generating temporary
-files and directories.
+.TP
+.B TMPDIR
+All CProver tools honor this variable when creating temporary files and
+directories.
 .SH BUGS
 If you encounter a problem please create an issue at
 .B https://github.com/diffblue/cbmc/issues
 .SH SEE ALSO
+.BR goto\-diff (1),
 .BR jbmc (1),
-.BR goto-analyzer (1)
+.BR janalyzer (1)
 .SH COPYRIGHT
-2016\-2018, Daniel Kroening, Peter Schrammel
+2016\-2026, Daniel Kroening, Peter Schrammel
