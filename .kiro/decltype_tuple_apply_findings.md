@@ -11757,3 +11757,201 @@ dropped), vector_find (`_Comp_with_val_2nd'), map_subscript_lookup
 (<compare> `__make' operator()), stream_ctype (wchar_t facet virtuals).
 And libc++ variant: `__best_match_t' (overload set from a base pack with
 `using _Bases::operator()...').
+
+## Round 161 (2026-09-25): gcc-16 harvest, libc++ variant, class traits, CI job, perf 4
+
+All six "recommended next steps" done; 30 commits on
+cpp11-parser-rework-squashed after dc21f98a7c (nothing pushed).  Final sweep
+on bin49/bin50 all green (cbmc-cpp 1433 OK / 12 skipped, cbmc, cpp, systemc,
+contracts-cpp-dfcc, goto-instrument, ansi-c ×2, unit-proofs, cbmc-library,
+linking-goto-binaries, goto-cc-cbmc), clang -Werror build rc 0, unit 614/614.
+
+### libc++ std::variant (KNOWNBUG since round 152) -> CORE
+
+The remaining piece was `__best_match_t' and then everything behind it.
+Five separate gaps, each with a header-free CORE test:
+
+* [namespace.udecl]/1: `using _Bases::operator()...;' -- the pack expansion
+  substituted only the type element, the qualifying name stayed the pack
+  name, so only the first base's operator() was introduced
+  (cpp17_using_declaration_pack_base_operators).
+* [over.ics.list]/6 + [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a
+  braced-init-list argument for a REFERENCE-TO-ARRAY parameter (`_Dest
+  (&&)[1]', the narrowing check `__test_impl<_Dest>({declval<_Source>()})')
+  had no conversion at all: viability in cpp_typecheck_fargs, conversion via
+  brace_init_to_array_reference (static temporary array), and a compound
+  literal element type-checked twice is left alone
+  (cpp11_braced_init_to_array_reference_parameter).
+* constexpr evaluation of <tuple>'s `__find_exactly_one_checked'
+  (holds_alternative/get<T>): a constexpr static member ARRAY lost its const
+  ([dcl.constexpr]/6, cpp_typecheck_compound_type.cpp), a reference-to-array
+  parameter denoted the first element instead of the array
+  (cpp_constexpr_eval.cpp), and a converted scalar argument (`(unsigned
+  long)7') was bound unfolded so `return r' was not constant -- this last one
+  broke EVERY constexpr call with a non-int parameter and a literal argument
+  (cpp11_constexpr_array_reference_parameter).
+* [class.union.general]/3: check_component_access asked "does the enclosing
+  class derive from the UNION?" with to_struct_type on a union
+  (cpp11_union_member_access_from_class).
+* [expr.ref]/6.3: `this->f<T>(...)' naming a static member template of a
+  BASE (`__assignment::__emplace' -> `__ctor::__construct_alt') was "not a
+  static member" because the specialization is a symbol of the base, not a
+  component of the derived class
+  (cpp11_static_member_template_of_base_via_this).
+
+### gcc-16 reductions harvested: all six formerly-KNOWNBUG tests pass
+
+Verified on g++-16 -E output (/tmp/r161/pp/*.ii; cbmc on the .ii with the
+desc flags) and flipped to `CORE gcc-only gcc16 libstdcxx16'.  Root causes:
+
+* `__is_empty', `__is_polymorphic', `__has_virtual_destructor',
+  `__is_standard_layout', `__is_pod', `__is_aggregate', `__is_literal_type'
+  were unconditionally FALSE (they fell through the unary-trait chain).
+  libstdc++ 16's std::find builds its predicate with `__by_ref_or_value_fn'
+  = is_empty<equal_to<>> ? by value : by reference; with false the functor
+  was a dangling reference and std::find over {1,2,3} did not find 2
+  (gcc16_cpp20_vector_find).  cpp_typecheckt::class_property implements
+  [meta.unary.prop]/[class.prop]/[dcl.init.aggr]/1; the class is completed
+  first ([meta.unary.prop]/3) -- a specialization named for the first time
+  inside the asking instantiation read as memberless otherwise.  Also
+  is_trivially_copyable_type(want_trivial) now requires that a default
+  constructor exists (a class with only `S(int)' is not trivial)
+  (cpp11_class_property_type_traits).
+* [stmt.ambig]/1: `T(x);' is a declaration.  Parser: for a KNOWN type name
+  and a bare-name nested declarator (`Known(kn);', `int (i) = k;', `int (*p)
+  = &i;' -- the parenthesised declarator was also dropped when nothing
+  followed).  For an unknown name (a nested class declared LATER in the
+  class, [class.mem.general]/7: `__location_type (__trans_tmp_3);' in
+  _Hashtable::find) the type checker rewrites the call-shaped statement
+  (expression_statement_is_declaration).  For a CLASS name only the
+  bare-name form, because a same-named function may hide the class
+  ([basic.scope.hiding]/2, `foo(&x)' in regression/ansi-c C code)
+  (cpp11_parenthesized_declarator_statement).
+* explicit conversion functions ([class.conv.fct]/2): treated as implicit,
+  so `const_iterator(__loc)' with `explicit operator iterator()' AND
+  `explicit operator const_iterator()' on __location_type made both
+  const_iterator constructors viable.  Now: excluded from implicit
+  sequences; admitted for the contextual conversion to bool
+  ([conv.general]/4, implicit_typecast_bool marks the context; ?: uses it
+  too), for direct-init of a non-class object ([over.match.conv]/1,
+  static_typecast and cpp_constructor's single-operand POD init), and for
+  `T(x)' with T a class ([over.match.copy]/1.2,
+  explicit_conversion_function_to).  Several viable conversion functions
+  are ranked by the second standard conversion ([over.match.best]); C++
+  bool -> internal bool is the identity, not a boolean conversion
+  (cpp11_explicit_conversion_function).
+* [class.base.init]/7 in a constructor TEMPLATE: a POD base named by a
+  template parameter with an expression-list reached the constructor-call
+  lowering with the synthesized POD constructor and aborted
+  (to_pointer_type precondition) -- libstdc++'s _Hashtable_ebo_helper once
+  is_empty selected the EBO specialization
+  (cpp11_pod_base_mem_initializer_ctor_template).
+* class completed later (`std::set<late> make();' with `late' declared
+  only): the specialization was instantiated eagerly at the declaration,
+  `sizeof(late)' threw incomplete_dependency and NOTHING caught it ("Unknown
+  exception type!").  Fixes: a declaration whose declarators are all
+  function declarations does not elaborate its return type
+  ([dcl.fct]/12); try_resolve_lazy_typedef_symbol resolves a lazy alias
+  inside the class body WITHOUT elaboration (a member function's parameter
+  type needs only the name); a member function declarator that hit the
+  dependency is re-declared without elaboration
+  (cpp11_class_template_of_class_completed_later).
+* [class.union.anon]/1 + [expr.ref]/6.2: an array in an anonymous union
+  indexed on the left of `=' -- the intermediate anonymous subobject built
+  by get_component lacked the lvalue mark
+  (cpp11_anonymous_union_array_member_lvalue).
+* out-of-line member (template) definitions matched by base name only:
+  basic_string's four `_M_construct' got each other's bodies (the two
+  three-parameter iterator templates differ only in the tag type), and a
+  definition renaming a parameter (`__str' vs `__c') left the body with an
+  unknown symbol.  member_template_parameters_match compares parsed
+  parameter lists with template parameters mapped positionally;
+  out_of_line_definition_matches for instantiated members (arity + typed
+  parameter types); adopt_definition_parameter_names /
+  rename_template_parameters_to_declaration ([dcl.fct]/3).  Plus
+  [class.mfct]/1: the definition must belong to the member's OWN class
+  template -- basic_string::rfind had received basic_string_view's rfind
+  (unit-proofs get_base_name; `rfind("b")' was already reading nondet)
+  (cpp11_out_of_line_member_template_overloads).
+* C++20 std::pair assignment was a CONVERSION ERROR: `pair &operator=(const
+  pair &) = delete;' beside the constrained definition.  [over.match.best]
+  /2.6: the constrained twin wins; the deleted one is dropped from the
+  components and the shared symbol gets the definition's body and
+  parameter names.  The requires-clause parser now accepts `( expression )'
+  ([temp.pre] primary-expression: `requires (_S_assignable<...>())' was
+  skipped entirely).  A constrained member whose constraints do not hold
+  for the specialization (pair<const K,V>::operator=(pair&&)) is not
+  instantiated ([temp.inst]/4): its failing conversion is no longer a
+  dropped-body report (#constrained mark)
+  (cpp20_constrained_twin_of_deleted_member).
+* a system-header body that fails twice was silently nil'd
+  (cpp_typecheck_function.cpp): it now warns like the drain does.  This
+  exposed every remaining silent drop behind the gcc-16 tests.
+
+Left open (documented in the gcc16 C++20 descs' forbidden patterns):
+<bits/max_size_type.h>'s unsigned __int128 operators and conversion
+operators; lexicographical_compare_three_way (`auto __cmp = __comp(...)'
+with __comp's return type undeduced); basic_string(const _CharT*, const
+_Alloc&) for char16_t/char32_t (a basic_string<char> template-map confusion,
+only the char instance converts).
+
+### Small debts
+
+* `__is_trivially_assignable' / `__is_nothrow_assignable' were
+  unconditionally true; per [meta.unary.prop] + [class.copy.assign]/9 a
+  class destination needs the same class as source and a trivial copy/move
+  assignment (is_trivially_copyable_type).  `__is_assignable' also missed a
+  user-declared `operator=(U)' (cpp11_is_trivially_assignable).
+* a requires-expression's parameters were bound only while evaluating a
+  concept; typecheck_expr binds them (#requires_params) in a block scope
+  wherever the expression appears ([expr.prim.req.general]/3-4)
+  (cpp20_requires_expression_static_assert).
+
+### Tooling / CI
+
+* scripts/cpp_differential_check.py: `-include' prelude declaring
+  __CPROVER_assert/assume (444 corpus tests were "rejected by every
+  compiler" for the missing declaration); the desc's `--cppNN' names the
+  standard; `docker:IMAGE:COMPILER' specs and `--tagged-compilers
+  libstdcxx16=docker:gcc16-test:g++-16'; `--stdlib libc++' -> clang++
+  -stdlib=libc++.  Whole corpus on bin45: 1133 sources, 0 discrepancies
+  (3 = one THOROUGH timeout, two `_tu' tests with extra source files); the
+  13 gcc16_* tests: 0 discrepancies against g++-16 in Docker.  Caveat: cbmc
+  still type-checks against the HOST headers, so gcc-16-header-only bugs
+  need the .ii route.
+* New CI job check-ubuntu-24_04-cmake-gcc-16-cbmc-cpp
+  (pull-request-checks.yaml): gcc-16 from ppa:ubuntu-toolchain-r/test made
+  the host compiler via update-alternatives (cbmc preprocesses with the host
+  gcc, so `gcc -dumpversion' = 16 keeps the libstdcxx16-tagged tests), cbmc
+  built with gcc-14 (shares that job's ccache), whole cbmc-cpp suite minus
+  libcxx with validation, plus `-I libstdcxx16' alone.  Not runnable here.
+* regression/cbmc-library: the library check wants one directory per
+  function; the zero-length __builtin_memcpy test moved into
+  __builtin_memcpy/zero_length_null.desc (build-debug had been failing on
+  library-check.stamp because of the extra directory).
+
+### Perf round 4
+
+user_defined_conversion_sequence's constructor-template trial
+(new_temporary -> cpp_constructor -> resolve -> guess_function_template_args)
+was 19% of cpp20_span_basic_libcxx; 9727 trials, 484 distinct (destination,
+source type, value category) triples (`int -> allocator<char>' 432 times).
+A per-TU negative cache (failed_template_conversions, keyed also by the
+class's component count): span 28.4 -> 19.4 s, map_basic_libcxx 28.5 ->
+20.0 s, filesystem_basic 21.8 -> 16.5 s (RelWithDebInfo).  Next hotspot:
+resolve_template_alias -> instantiate_template (27% inclusive): alias
+template instantiation re-type-checks its arguments on every mention.
+
+### Method notes
+
+* A regression caught only by the full sweep again (twice): the
+  [stmt.ambig] parser rule broke regression/ansi-c Zero_Initialization1
+  (`foo(&x)' with `foo' both a struct and a function) and my first
+  functional-cast interception broke `std::forward<Args>(args)' in a
+  constexpr body because a probe resolution emitted an error into the
+  count -- probes must run under sfinae_contextt.
+* `Unknown exception type!' = an incomplete_dependency_exceptiont escaping
+  the type checker; grep for it.
+* The gcc16 .ii files preprocessed with -D__CPROVER__ keep #line markers
+  (unlike cvise's -P output), so cbmc's library/user heuristics apply as in
+  a real run -- verify fixes on those, not on the reduced files.
