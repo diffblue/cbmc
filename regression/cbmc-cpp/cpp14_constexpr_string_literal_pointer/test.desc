@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp14
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ folded value at run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+^warning: ignoring
+--
+N5008 [expr.const], [expr.add]/4, [expr.post.incr], [expr.pre.incr]:
+pointer arithmetic over a string literal in a constexpr function.
+Non-vacuous: the last assertion is deliberately wrong and must FAIL.  Before
+the fix: "static assertion failed: len" (len("abc") evaluated to 0) and
+`++p; return *p' gave 'a'.

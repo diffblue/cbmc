@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ run-time reads: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static_assert condition could not be evaluated
+static assertion failed
+^warning: ignoring
+--
+N5008 [dcl.constexpr]/6 (constexpr declares the object const) and
+[expr.const] (an element of a constexpr array, a member of a constexpr class
+object built by a constexpr constructor, are constant expressions).
+Non-vacuous: the last assertion is deliberately wrong and must FAIL.  Before
+the fix the namespace-scope static_asserts were skipped -- silently; the
+new "could not be evaluated" warning (forbidden above) is what exposed them.
