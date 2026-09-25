@@ -23,6 +23,11 @@ void object_factory_parameterst::set(const optionst &options)
     max_nondet_tree_depth =
       options.get_unsigned_int_option("max-nondet-tree-depth");
   }
+  if(options.is_set("max-dynamic-object-instances"))
+  {
+    max_dynamic_object_instances =
+      options.get_unsigned_int_option("max-dynamic-object-instances");
+  }
   if(options.is_set("min-null-tree-depth"))
   {
     min_null_tree_depth =
@@ -62,6 +67,12 @@ void parse_object_factory_options(const cmdlinet &cmdline, optionst &options)
   {
     options.set_option(
       "max-nondet-tree-depth", cmdline.get_value("max-nondet-tree-depth"));
+  }
+  if(cmdline.isset("max-dynamic-object-instances"))
+  {
+    options.set_option(
+      "max-dynamic-object-instances",
+      cmdline.get_value("max-dynamic-object-instances"));
   }
   if(cmdline.isset("min-null-tree-depth"))
   {
