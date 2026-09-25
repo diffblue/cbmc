@@ -110,10 +110,18 @@ void cegis_verifiert::preprocess_goto_model()
 cext::violation_typet
 cegis_verifiert::extract_violation_type(const std::string &description)
 {
-  // The violation is a pointer OOB check.
-  if((description.find(
-        "dereference failure: pointer outside object bounds in") !=
-      std::string::npos))
+  // The violation is a pointer OOB check. Match both the generic and the
+  // dynamic-object variants. goto_check_c emits the latter for pointers
+  // that local_bitvector_analysis has classified as dynamic-heap (e.g.,
+  // results of malloc/calloc/realloc); the underlying assertion expression
+  // is the same shape and is handled by the same range-predicate
+  // synthesizer below.
+  if(
+    description.find("dereference failure: pointer outside object bounds in") !=
+      std::string::npos ||
+    description.find(
+      "dereference failure: pointer outside dynamic object bounds in") !=
+      std::string::npos)
   {
     return cext::violation_typet::cex_out_of_boundary;
   }
