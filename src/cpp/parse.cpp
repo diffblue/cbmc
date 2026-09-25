@@ -5772,8 +5772,17 @@ bool Parser::rConstraintLogicalExpr(exprt &expr)
       cpp_tokent tk;
       lex.get_token(tk);
       exprt sub;
-      if(!rConstraintLogicalExpr(sub))
-        return false;
+      // N5008 [temp.pre]: a primary-expression -- `( expression )' holds ANY
+      // expression (`requires (_S_assignable<const _T1&, const _T2&>())',
+      // libstdc++'s C++20 std::pair assignment operators; `(sizeof(T) > 0)')
+      // -- not only the restricted constraint grammar.
+      const auto inner_saved = lex.Save();
+      if(!rConstraintLogicalExpr(sub) || lex.LookAhead(0) != ')')
+      {
+        lex.Restore(inner_saved);
+        if(!rCommaExpression(sub))
+          return false;
+      }
       if(lex.LookAhead(0) != ')')
         return false;
       lex.get_token(tk);
