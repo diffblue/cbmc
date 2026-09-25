@@ -8425,6 +8425,33 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
 
   bool override_constantness = expr.get_bool(ID_C_override_constantness);
 
+  // N5008 [expr.prim.req.general]/3-4: the parameters of a
+  // requires-expression (`requires(S s) { s.x; }') are in scope in its
+  // requirements.  The parser attaches them to the expression
+  // (#requires_params); the concept-evaluation path binds them itself,
+  // but a requires-expression elsewhere -- a namespace-scope
+  // `static_assert(requires(S s) { s.x; })' -- reached this point with the
+  // parameters unbound, so every requirement naming one was "invalid" and
+  // the assertion failed.  Bind them in a scope of their own.
+  if(expr.find("#requires_params").is_not_nil())
+  {
+    const irept params = expr.find("#requires_params");
+    expr.remove("#requires_params");
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.new_block_scope();
+    for(const auto &param : params.get_sub())
+    {
+      const irep_idt pname = param.get(ID_name);
+      if(pname.empty())
+        continue;
+      typet ptype = static_cast<const typet &>(param.find(ID_type));
+      typecheck_type(ptype);
+      bind_requires_parameter(pname, ptype);
+    }
+    typecheck_expr(expr);
+    return;
+  }
+
   // We take care of an ambiguity in the C++ grammar.
   // Needs to be done before the operands!
   explicit_typecast_ambiguity(expr);
