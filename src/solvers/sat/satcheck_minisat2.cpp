@@ -8,18 +8,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "satcheck_minisat2.h"
 
-#ifndef _WIN32
-#  include <signal.h>
-#  include <unistd.h>
-#endif
-
-#include <limits>
-
 #include <util/invariant.h>
 #include <util/threeval.h>
 
 #include <minisat/core/Solver.h>
 #include <minisat/simp/SimpSolver.h>
+
+#include <chrono>
+#include <condition_variable>
+#include <limits>
+#include <mutex>
+#include <thread>
 
 #ifndef l_False
 #  define l_False Minisat::l_False
@@ -191,18 +190,6 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
   }
 }
 
-#ifndef _WIN32
-
-static Minisat::Solver *solver_to_interrupt=nullptr;
-
-static void interrupt_solver(int signum)
-{
-  (void)signum; // unused parameter -- just removing the name trips up cpplint
-  solver_to_interrupt->interrupt();
-}
-
-#endif
-
 template <typename T>
 propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 {
@@ -240,40 +227,47 @@ propt::resultt satcheck_minisat2_baset<T>::do_prop_solve(const bvt &assumptions)
 
     using Minisat::lbool;
 
-#ifndef _WIN32
+    // Spawn a watchdog thread that will fire after time_limit_milliseconds
+    // and call interrupt() on the solver. The watchdog uses a condition
+    // variable so it exits cleanly when the solver finishes within the
+    // budget. This is portable across operating systems (no SIGALRM
+    // dependency) and supports sub-second granularity.
+    std::thread watchdog;
+    std::mutex watchdog_mutex;
+    std::condition_variable watchdog_cv;
+    bool solve_done = false;
 
-    void (*old_handler)(int) = SIG_ERR;
-
-    if(time_limit_seconds != 0)
+    if(time_limit_milliseconds != 0)
     {
-      solver_to_interrupt = solver.get();
-      old_handler = signal(SIGALRM, interrupt_solver);
-      if(old_handler == SIG_ERR)
-        log.warning() << "Failed to set solver time limit" << messaget::eom;
-      else
-        alarm(time_limit_seconds);
+      watchdog = std::thread(
+        [this, &watchdog_mutex, &watchdog_cv, &solve_done]
+        {
+          std::unique_lock<std::mutex> lk(watchdog_mutex);
+          const auto deadline =
+            std::chrono::milliseconds(time_limit_milliseconds);
+          if(!watchdog_cv.wait_for(lk, deadline, [&] { return solve_done; }))
+          {
+            // Timed out before solve completed: interrupt the solver.
+            // Minisat::Solver::interrupt() sets an internal flag that
+            // is polled in the solving loop and is safe to invoke from
+            // another thread.
+            solver->interrupt();
+          }
+        });
     }
 
     lbool solver_result = solver->solveLimited(solver_assumptions);
 
-    if(old_handler != SIG_ERR)
+    // Signal the watchdog to exit (if running) and join it.
+    if(watchdog.joinable())
     {
-      alarm(0);
-      signal(SIGALRM, old_handler);
-      solver_to_interrupt = solver.get();
+      {
+        std::lock_guard<std::mutex> lk(watchdog_mutex);
+        solve_done = true;
+      }
+      watchdog_cv.notify_one();
+      watchdog.join();
     }
-
-#else // _WIN32
-
-    if(time_limit_seconds != 0)
-    {
-      log.warning() << "Time limit ignored (not supported on Win32 yet)"
-                    << messaget::eom;
-    }
-
-    lbool solver_result = solver->solve(solver_assumptions) ? l_True : l_False;
-
-#endif
 
     if(solver_result == l_True)
     {
@@ -328,9 +322,7 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
 template <typename T>
 satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
   message_handlert &message_handler)
-  : cnf_solvert(message_handler),
-    solver(std::make_unique<T>()),
-    time_limit_seconds(0)
+  : cnf_solvert(message_handler), solver(std::make_unique<T>())
 {
 }
 

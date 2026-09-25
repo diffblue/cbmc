@@ -17,6 +17,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/path_storage.h>
 
 #include "incremental_goto_checker.h"
+#include "solver_factory.h"
 #include "symex_bmc.h"
 
 class multi_path_symex_only_checkert : public incremental_goto_checkert
@@ -38,6 +39,9 @@ protected:
   path_fifot path_storage; // should go away
   unwindsett unwindset;
   symex_bmct symex;
+
+  /// Solver used for pruning infeasible branches.
+  std::unique_ptr<solver_factoryt::solvert> branch_pruning_solver;
 
   /// Generates the equation by running goto-symex
   virtual void generate_equation();

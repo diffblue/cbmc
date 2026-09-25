@@ -1,0 +1,11 @@
+CORE
+prune_assume.c
+--paths lifo
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Branch pruning should prune the else-branch because __CPROVER_assume(x > 0)
+makes x <= 0 infeasible. Without pruning, the assert(0) would be reached.

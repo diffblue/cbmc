@@ -17,9 +17,11 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/path_storage.h>
 
 #include "incremental_goto_checker.h"
+#include "solver_factory.h"
 
 #include <chrono> // IWYU pragma: keep
 
+class stack_decision_proceduret;
 class symex_bmct;
 
 /// Uses goto-symex to generate a `symex_target_equationt` for each path.
@@ -48,10 +50,11 @@ protected:
     const symex_bmct &symex,
     const symex_target_equationt &equation);
 
-  virtual void setup_symex(symex_bmct &symex)
-  {
-    // deriving classes may do extra work here
-  }
+  virtual void setup_symex(symex_bmct &symex);
+
+  /// Solver used for pruning infeasible branches in --paths mode.
+  /// Created once and shared across all path explorations.
+  std::unique_ptr<solver_factoryt::solvert> branch_pruning_solver;
 
   /// Adds the initial goto-symex state as a path to the worklist
   virtual void initialize_worklist();

@@ -1,0 +1,12 @@
+CORE
+prune_chained.c
+--paths lifo
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The assume x < y should let branch pruning determine that the a < b
+branch in cmp() is always taken, and a == b is infeasible. This tests
+that assumes propagate through function calls and nested branches.

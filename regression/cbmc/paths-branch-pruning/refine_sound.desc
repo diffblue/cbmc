@@ -1,0 +1,12 @@
+CORE
+refine_sound.c
+--paths lifo --refine --arrays-uf-always --no-standard-checks
+^\[main\.assertion\.1\] .* a\[0\] is 42: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+With --refine, branch pruning must be disabled. Same test as
+refine_arrays_sound but using the --refine flag directly.

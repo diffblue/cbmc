@@ -17,7 +17,14 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "solver_hardness.h"
 #include "ssa_step.h"
 
+#include <atomic>
 #include <chrono> // IWYU pragma: keep
+
+std::size_t symex_target_equationt::next_equation_id()
+{
+  static std::atomic<std::size_t> counter{0};
+  return counter++;
+}
 
 static std::function<void(solver_hardnesst &)>
 hardness_register_ssa(std::size_t step_index, const SSA_stept &step)
@@ -634,7 +641,16 @@ void symex_target_equationt::convert_function_calls(
           step.converted_function_arguments.push_back(arg);
         else
         {
-          const irep_idt identifier="symex::args::"+std::to_string(argument_count++);
+          // Bake the equation_id into the identifier so that two
+          // equations sharing the same decision procedure (e.g. the
+          // branch-pruning solver) never claim the same name for
+          // different types. argument_count remains per-equation so
+          // identifiers from a single equation stay sequential and
+          // human-readable.
+          const irep_idt identifier =
+            "symex::args::" + std::to_string(equation_id) +
+            "::" + std::to_string(argument_count++);
+
           symbol_exprt symbol(identifier, arg.type());
 
           equal_exprt eq(arg, symbol);
