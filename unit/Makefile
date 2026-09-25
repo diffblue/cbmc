@@ -84,6 +84,7 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/apply_condition.cpp \
        goto-symex/complexity_limiter.cpp \
        goto-symex/expr_skeleton.cpp \
+       goto-symex/field_sensitivity.cpp \
        goto-symex/goto_symex_state.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
