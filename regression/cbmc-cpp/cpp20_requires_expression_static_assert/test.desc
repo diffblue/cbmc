@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ requires-expression as a value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+static assertion failed
+--
+N5008 [expr.prim.req.general]/3-4: a requires-expression's parameters are bound
+in a scope of their own before its requirements are evaluated, in every
+context.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ traits: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+static assertion failed
+--
+N5008 [meta.unary.prop], [class.copy.assign]/9: __is_trivially_assignable
+requires a trivial copy/move assignment of the same class (or a scalar
+destination); __is_nothrow_assignable follows __is_assignable.
