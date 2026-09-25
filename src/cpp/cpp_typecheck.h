@@ -1342,6 +1342,12 @@ public:
   /// Build a std::initializer_list<E> value from a braced-init-list per N5008
   /// [dcl.init.list]/5 (synthesise a backing const E[N] array and refer to it).
   /// \p il_type must be a std::initializer_list<E> struct-tag type.
+  /// The element type E of a std::initializer_list<E> specialization, read
+  /// off its layout: the first non-static data member is the pointer to the
+  /// first element ([support.initlist]; libstdc++ `_M_array`, libc++
+  /// `__begin_`, MSVC `_begin`).  Nil when \p il_type is not such a layout.
+  typet initializer_list_element_type(const struct_tag_typet &il_type);
+
   std::optional<exprt> build_initializer_list_value(
     const struct_tag_typet &il_type,
     const exprt &init_list);
