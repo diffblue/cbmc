@@ -13,3 +13,9 @@ headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
 select the code paths) and running cbmc on the .ii file.
 Also: no body for std::ctype<wchar_t>::do_widen/do_toupper/do_tolower and
 ctype<char>::_M_widen_init with gcc 16 (the wchar_t facet is reached).
+2026-09-25: the CONVERSION ERROR is gone -- it was __gnu_cxx::__atomic_add's
+__atomic_fetch_add (GCC atomic builtins were unusable in C++); the user
+assertion is SUCCESS.  Remaining: "no body for callee
+std::ctype<wchar_t>::do_widen/do_toupper/do_tolower" (the wchar_t facet's
+virtuals) -> VERIFICATION FAILED.  A header-free reduction of the
+remaining part is in progress (/tmp/r160/red).
