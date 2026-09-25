@@ -12,8 +12,10 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <string>
 
-// C++20 will have std::string::ends_with
-
+// C++20 will have std::string_view::ends_with.
+// The arguments of has_suffix should be a std::string_view,
+// but this triggers a false alarm in gcc when attempting to
+// map the comparison to __builtin_memcmp.
 inline bool has_suffix(const std::string &s, const std::string &suffix)
 {
   if(suffix.size()>s.size())
