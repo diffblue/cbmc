@@ -5005,10 +5005,15 @@ void cpp_typecheckt::typecheck_expr_member(
         // (non-static, with a 'this' parameter).  In that case, we
         // must not treat it as a static member — fall through to the
         // member-expression path so that 'this' is added.
+        // N5008 [dcl.fct]/6: an instantiated member function template with
+        // an EXPLICIT object parameter (`this Self &&self') is a non-static
+        // member too; the caller (typecheck_method_application) passes the
+        // object as its first argument.
         if(
           symbol_expr.type().id() == ID_code &&
           !to_code_type(symbol_expr.type()).parameters().empty() &&
-          to_code_type(symbol_expr.type()).parameters().front().get_this())
+          (to_code_type(symbol_expr.type()).parameters().front().get_this() ||
+           symbol_expr.type().get_bool("explicit_this")))
         {
           // Build a member expression so the caller adds 'this'.
           irep_idt component_name =
