@@ -1288,7 +1288,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
         auto &sub = ts_probe.get_sub();
         sub.push_back(irept{ID_name});
         sub.back().set(ID_identifier, "std");
-        sub.push_back(irept{"::"});
+        sub.push_back(irept{ID_scope_resolution});
         sub.push_back(irept{ID_name});
         sub.back().set(ID_identifier, "tuple_size");
         irept targs{ID_template_args};
@@ -1296,7 +1296,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
           .get_sub()
           .push_back(static_cast<const irept &>(type_exprt{init.type()}));
         sub.push_back(targs);
-        sub.push_back(irept{"::"});
+        sub.push_back(irept{ID_scope_resolution});
         sub.push_back(irept{ID_name});
         sub.back().set(ID_identifier, "value");
       }

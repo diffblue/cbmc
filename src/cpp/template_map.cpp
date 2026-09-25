@@ -354,7 +354,8 @@ void replace_type_pack_ref(irept &n, const std::string &base, const typet &elem)
   {
     if(
       t.id() != ID_cpp_name || t.get_sub().size() < 3 ||
-      t.get_sub().front().id() != ID_name || t.get_sub()[1].id() != "::")
+      t.get_sub().front().id() != ID_name ||
+      t.get_sub()[1].id() != ID_scope_resolution)
       return false;
     return id2string(t.get_sub().front().get(ID_identifier)) == base;
   };
@@ -1404,7 +1405,7 @@ void template_mapt::apply(typet &type) const
                     irept name_sub{ID_name};
                     name_sub.set(ID_identifier, part);
                     new_subs.push_back(std::move(name_sub));
-                    new_subs.push_back(irept{"::"});
+                    new_subs.push_back(irept{ID_scope_resolution});
                   }
                 }
                 irept base_sub{ID_name};
@@ -1447,7 +1448,7 @@ void template_mapt::apply(typet &type) const
             bool has_scope_separator = false;
             for(const auto &s : sub)
             {
-              if(s.id() == "::")
+              if(s.id() == ID_scope_resolution)
               {
                 has_scope_separator = true;
                 break;
@@ -1974,7 +1975,9 @@ void template_mapt::apply(typet &type) const
     // Substitute template parameters used as scope qualifiers
     // (e.g., _Next::value where _Next is mapped to a concrete type).
     // Replace the name component with the mapped type's identifier.
-    if(sub.size() >= 3 && sub[0].id() == ID_name && sub[1].id() == "::")
+    if(
+      sub.size() >= 3 && sub[0].id() == ID_name &&
+      sub[1].id() == ID_scope_resolution)
     {
       irep_idt scope_base = sub[0].get(ID_identifier);
       for(const auto &entry : type_map)
@@ -2005,7 +2008,7 @@ void template_mapt::apply(typet &type) const
 static bool is_type_side_node(const irept &n)
 {
   const irep_idt &id = n.id();
-  return id == ID_cpp_name || id == ID_name || id == "::" ||
+  return id == ID_cpp_name || id == ID_name || id == ID_scope_resolution ||
          id == ID_template_args || id == ID_operator || id == ID_decltype ||
          id == ID_array || id == ID_pointer || id == ID_frontend_pointer ||
          id == ID_struct || id == ID_union || id == ID_code ||

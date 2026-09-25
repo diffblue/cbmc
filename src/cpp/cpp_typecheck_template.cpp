@@ -855,26 +855,28 @@ void cpp_typecheckt::typecheck_class_template_member(
   if(
     cpp_name.get_sub().size() == 4 && cpp_name.get_sub()[0].id() == ID_name &&
     cpp_name.get_sub()[1].id() == ID_template_args &&
-    cpp_name.get_sub()[2].id() == "::" && cpp_name.get_sub()[3].id() == ID_name)
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == ID_name)
   {
   }
   else if(
     cpp_name.get_sub().size() == 5 && cpp_name.get_sub()[0].id() == ID_name &&
     cpp_name.get_sub()[1].id() == ID_template_args &&
-    cpp_name.get_sub()[2].id() == "::" &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
     cpp_name.get_sub()[3].id() == ID_operator)
   {
   }
   else if(
     cpp_name.get_sub().size() == 5 && cpp_name.get_sub()[0].id() == ID_name &&
     cpp_name.get_sub()[1].id() == ID_template_args &&
-    cpp_name.get_sub()[2].id() == "::" && cpp_name.get_sub()[3].id() == "~" &&
-    cpp_name.get_sub()[4].id() == ID_name)
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[3].id() == "~" && cpp_name.get_sub()[4].id() == ID_name)
   {
   }
   else if(
     cpp_name.get_sub().size() == 3 && cpp_name.get_sub()[0].id() == ID_name &&
-    cpp_name.get_sub()[1].id() == "::" && cpp_name.get_sub()[2].id() == ID_name)
+    cpp_name.get_sub()[1].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[2].id() == ID_name)
   {
     // Non-template class with a member function template defined
     // outside the class body: name1::name2
@@ -928,10 +930,11 @@ void cpp_typecheckt::typecheck_class_template_member(
   }
   else if(
     cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[0].id() == ID_name &&
-    cpp_name.get_sub()[1].id() == "::" &&
+    cpp_name.get_sub()[1].id() == ID_scope_resolution &&
     cpp_name.get_sub()[2].id() == ID_name &&
     cpp_name.get_sub()[3].id() == ID_template_args &&
-    cpp_name.get_sub()[4].id() == "::" && cpp_name.get_sub()[5].id() == ID_name)
+    cpp_name.get_sub()[4].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[5].id() == ID_name)
   {
     // Out-of-line definition of a member of a NESTED class template:
     //   Outer::Inner<args>::method
@@ -945,9 +948,10 @@ void cpp_typecheckt::typecheck_class_template_member(
   else if(
     cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[0].id() == ID_name &&
     cpp_name.get_sub()[1].id() == ID_template_args &&
-    cpp_name.get_sub()[2].id() == "::" &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
     cpp_name.get_sub()[3].id() == ID_name &&
-    cpp_name.get_sub()[4].id() == "::" && cpp_name.get_sub()[5].id() == ID_name)
+    cpp_name.get_sub()[4].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[5].id() == ID_name)
   {
     // Out-of-line definition of a member of a nested (non-template) class
     // of a class template:  Outer<args>::Nested::member
@@ -961,10 +965,11 @@ void cpp_typecheckt::typecheck_class_template_member(
   else if(
     cpp_name.get_sub().size() == 7 && cpp_name.get_sub()[0].id() == ID_name &&
     cpp_name.get_sub()[1].id() == ID_template_args &&
-    cpp_name.get_sub()[2].id() == "::" &&
+    cpp_name.get_sub()[2].id() == ID_scope_resolution &&
     cpp_name.get_sub()[3].id() == ID_name &&
     cpp_name.get_sub()[4].id() == ID_template_args &&
-    cpp_name.get_sub()[5].id() == "::" && cpp_name.get_sub()[6].id() == ID_name)
+    cpp_name.get_sub()[5].id() == ID_scope_resolution &&
+    cpp_name.get_sub()[6].id() == ID_name)
   {
     // N5008 [temp.mem]/1 + [class.nest]/1: out-of-line definition of a
     // member of a member CLASS TEMPLATE of a class template, written with
@@ -1089,7 +1094,8 @@ void cpp_typecheckt::typecheck_class_template_member(
   cpp_scopet *lookup_scope = &cpp_scopes.current_scope();
   irep_idt class_tmpl_base_name = cpp_name.get_sub().front().get(ID_identifier);
   if(
-    cpp_name.get_sub().size() == 6 && cpp_name.get_sub()[1].id() == "::" &&
+    cpp_name.get_sub().size() == 6 &&
+    cpp_name.get_sub()[1].id() == ID_scope_resolution &&
     cpp_name.get_sub()[3].id() == ID_template_args)
   {
     const irep_idt &outer_name = cpp_name.get_sub()[0].get(ID_identifier);
@@ -4142,8 +4148,8 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
           const irept::subt &tsub = tag_name.get_sub();
           if(
             tsub.size() != 4 || tsub[0].id() != ID_name ||
-            tsub[1].id() != ID_template_args || tsub[2].id() != "::" ||
-            tsub[3].id() != ID_name)
+            tsub[1].id() != ID_template_args ||
+            tsub[2].id() != ID_scope_resolution || tsub[3].id() != ID_name)
             break;
           const irep_idt outer_name = tsub[0].get(ID_identifier);
           const irep_idt member_name = tsub[3].get(ID_identifier);
