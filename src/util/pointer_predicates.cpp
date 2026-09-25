@@ -130,3 +130,49 @@ exprt object_lower_bound(
 
   return binary_relation_exprt(std::move(p_offset), ID_lt, std::move(zero));
 }
+
+exprt object_in_bounds(const exprt &pointer, const exprt &access_size)
+{
+  // Lower bound: POINTER_OFFSET(p) >= 0
+  exprt p_offset = pointer_offset(pointer);
+  exprt zero = from_integer(0, p_offset.type());
+
+  exprt lower_ok = binary_relation_exprt{p_offset, ID_ge, zero};
+
+  // Upper bound: OBJECT_SIZE(p) >= POINTER_OFFSET(p) + access_size
+  exprt object_size_expr = object_size(pointer);
+
+  std::size_t max_width = std::max(
+    to_bitvector_type(p_offset.type()).get_width(),
+    to_bitvector_type(object_size_expr.type()).get_width());
+
+  if(access_size.is_not_nil())
+  {
+    max_width =
+      std::max(max_width, to_bitvector_type(access_size.type()).get_width());
+
+    auto type = unsignedbv_typet(max_width + 1);
+
+    auto sum = plus_exprt{
+      typecast_exprt::conditional_cast(p_offset, type),
+      typecast_exprt::conditional_cast(access_size, type)};
+
+    exprt upper_ok = binary_relation_exprt{
+      typecast_exprt::conditional_cast(object_size_expr, type),
+      ID_ge,
+      std::move(sum)};
+
+    return and_exprt{std::move(lower_ok), std::move(upper_ok)};
+  }
+  else
+  {
+    auto type = unsignedbv_typet(max_width);
+
+    exprt upper_ok = binary_relation_exprt{
+      typecast_exprt::conditional_cast(object_size_expr, type),
+      ID_gt,
+      typecast_exprt::conditional_cast(p_offset, type)};
+
+    return and_exprt{std::move(lower_ok), std::move(upper_ok)};
+  }
+}

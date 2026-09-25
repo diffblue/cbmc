@@ -244,8 +244,11 @@ std::optional<exprt> member_offset_expr(
   const namespacet &ns)
 {
   PRECONDITION(size_type().get_width() != 0);
-  exprt result=from_integer(0, size_type());
-  std::size_t bit_field_bits=0;
+  // Accumulate a numeric constant for known-size components to avoid
+  // building a chain of plus_exprt that simplify_expr would fold.
+  mp_integer const_offset{0};
+  std::optional<exprt> dynamic_part;
+  std::size_t bit_field_bits = 0;
 
   for(const auto &c : type.components())
   {
@@ -258,16 +261,14 @@ std::optional<exprt> member_offset_expr(
       bit_field_bits += w;
       const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
       bit_field_bits %= config.ansi_c.char_width;
-      if(bytes > 0)
-        result = plus_exprt(result, from_integer(bytes, result.type()));
+      const_offset += bytes;
     }
     else if(c.is_boolean())
     {
       ++bit_field_bits;
       const std::size_t bytes = bit_field_bits / config.ansi_c.char_width;
       bit_field_bits %= config.ansi_c.char_width;
-      if(bytes > 0)
-        result = plus_exprt(result, from_integer(bytes, result.type()));
+      const_offset += bytes;
     }
     else
     {
@@ -276,12 +277,35 @@ std::optional<exprt> member_offset_expr(
       const typet &subtype = c.type();
       auto sub_size = size_of_expr(subtype, ns);
       if(!sub_size.has_value())
-        return {}; // give up
-      result = plus_exprt(result, sub_size.value());
+        return {};
+
+      // Try to extract a constant from the size expression
+      auto maybe_int = numeric_cast<mp_integer>(sub_size.value());
+      if(maybe_int.has_value())
+      {
+        const_offset += *maybe_int;
+      }
+      else
+      {
+        if(dynamic_part.has_value())
+          dynamic_part = plus_exprt{*dynamic_part, sub_size.value()};
+        else
+          dynamic_part = sub_size.value();
+      }
     }
   }
 
-  return simplify_expr(std::move(result), ns);
+  // If there is a dynamic part and the constant offset is zero, return the
+  // dynamic part directly rather than building `0 + dynamic_part`, which keeps
+  // the result in a form downstream structural matching expects.
+  if(dynamic_part.has_value())
+  {
+    if(const_offset == 0)
+      return *dynamic_part;
+    return plus_exprt{from_integer(const_offset, size_type()), *dynamic_part};
+  }
+
+  return from_integer(const_offset, size_type());
 }
 
 std::optional<exprt> size_of_expr(const typet &type, const namespacet &ns)

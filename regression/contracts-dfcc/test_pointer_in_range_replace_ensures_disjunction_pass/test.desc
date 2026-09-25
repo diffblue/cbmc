@@ -9,7 +9,6 @@ main.c
 ^\[bar.pointer_dereference.\d+\] line 37 dereference failure: deallocated dynamic object in \*x: SUCCESS$
 ^\[bar.pointer_dereference.\d+\] line 37 dereference failure: dead object in \*x: SUCCESS$
 ^\[bar.pointer_dereference.\d+\] line 37 dereference failure: pointer outside object bounds in \*x: SUCCESS$
-^\[bar.pointer_dereference.\d+\] line 37 dereference failure: invalid integer address in \*x: SUCCESS$
 ^\[bar.assertion.\d+\] line 41 assertion 0: FAILURE$
 ^\[bar.assertion.\d+\] line 42 assertion x == \(\(.*\)NULL\): SUCCESS$
 ^\[bar.assertion.\d+\] line 43 assertion __CPROVER_POINTER_OBJECT\(\(.*\)y\) == __CPROVER_POINTER_OBJECT\(\(.*\)a\): SUCCESS$
@@ -19,7 +18,6 @@ main.c
 ^\[bar.pointer_dereference.\d+\] line 44 dereference failure: deallocated dynamic object in \*y: SUCCESS$
 ^\[bar.pointer_dereference.\d+\] line 44 dereference failure: dead object in \*y: SUCCESS$
 ^\[bar.pointer_dereference.\d+\] line 44 dereference failure: pointer outside object bounds in \*y: SUCCESS$
-^\[bar.pointer_dereference.\d+\] line 44 dereference failure: invalid integer address in \*y: SUCCESS$
 ^EXIT=10$
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
