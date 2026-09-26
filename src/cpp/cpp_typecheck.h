@@ -772,6 +772,32 @@ protected:
   // reference to them appears in some converted body, and dropped
   // silently at the end if none does.
   std::set<irep_idt> speculative_instances;
+
+  /// N5008 [expr.context]/1, [basic.def.odr]/5, [temp.inst]/4: a function
+  /// named in an unevaluated operand (the operand of decltype, sizeof,
+  /// noexcept, a non-polymorphic typeid) is not odr-used, so a function
+  /// template specialization it names has its declaration instantiated but
+  /// not its definition.  Counts the nesting of unevaluated operands being
+  /// type-checked; a specialization instantiated while it is non-zero is
+  /// recorded in speculative_instances.
+  unsigned unevaluated_operand_depth = 0;
+
+  class unevaluated_operandt
+  {
+  public:
+    explicit unevaluated_operandt(cpp_typecheckt &_cpp_typecheck)
+      : cpp_typecheck(_cpp_typecheck)
+    {
+      ++cpp_typecheck.unevaluated_operand_depth;
+    }
+    ~unevaluated_operandt()
+    {
+      --cpp_typecheck.unevaluated_operand_depth;
+    }
+
+  private:
+    cpp_typecheckt &cpp_typecheck;
+  };
   method_bodiest held_back_bodies;
   bool release_referenced_held_back_bodies();
   void drop_unreferenced_held_back_bodies();

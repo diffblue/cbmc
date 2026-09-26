@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 __is_swappable-style SFINAE probe (two-overload __declval chain + decltype
 default template argument), read through a class-local typedef by an in-class

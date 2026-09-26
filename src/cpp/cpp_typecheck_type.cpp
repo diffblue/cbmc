@@ -965,7 +965,11 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // access; the type check may rebuild the node, so read it first
     const bool parenthesized = e.get_bool(ID_C_parenthesized);
 
-    typecheck_expr(e);
+    {
+      // [dcl.type.decltype]/1, [expr.context]/1: the operand is unevaluated
+      unevaluated_operandt unevaluated_guard{*this};
+      typecheck_expr(e);
+    }
 
     type = decltype_of(e, parenthesized);
 

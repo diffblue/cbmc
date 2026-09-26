@@ -1729,6 +1729,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     try
     {
       sfinae_contextt sfinae_guard{*this};
+      // [expr.unary.noexcept]/1: the operand is unevaluated
+      unevaluated_operandt unevaluated_guard{*this};
       typecheck_expr(op);
       // [expr.unary.noexcept]/3 + [except.spec]/6: the operand is
       // potentially-throwing if it contains, at any depth, a call to a
