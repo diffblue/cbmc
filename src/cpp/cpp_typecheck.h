@@ -348,6 +348,7 @@ protected:
   void typecheck_template_alias(cpp_declarationt &declaration);
 
   void typecheck_class_template_member(cpp_declarationt &declaration);
+  void define_member_template_of_class(cpp_declarationt &declaration);
 
   std::string class_template_identifier(
     const irep_idt &base_name,
