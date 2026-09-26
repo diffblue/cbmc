@@ -1,30 +1,48 @@
-// Regression: Clang __c11_atomic_* intrinsics must be declared so that
-// libc++'s <atomic> header processes without "symbol '__c11_atomic_X'
-// is unknown" errors.  Missing these declarations poisons <atomic>
-// and cascades into <string>, <thread>, <condition_variable>, and
-// <system_error> on macOS.
-//
-// The intrinsics themselves are stubs ("no body for callee").  This
-// test just takes their address to pin down that the symbols are
-// visible from user code — if CBMC fails to parse the declarations,
-// type-checking reports "symbol '__c11_atomic_thread_fence' is
-// unknown" and the whole translation unit aborts.
-
-typedef void (*fn_void_int)(int);
-typedef void (*fn_volatile_variadic)(volatile void *, ...);
-
-fn_void_int t_fence = &__c11_atomic_thread_fence;
-fn_void_int s_fence = &__c11_atomic_signal_fence;
-fn_volatile_variadic atomic_store = &__c11_atomic_store;
-fn_volatile_variadic atomic_exchange = &__c11_atomic_exchange;
-fn_volatile_variadic atomic_fetch_add = &__c11_atomic_fetch_add;
-
+extern "C" void __CPROVER_assert(bool, const char *);
+// Clang's __c11_atomic_* intrinsics, as libc++'s <atomic> uses them
+// (__cxx_atomic_load/store/exchange/fetch_add in
+// <__atomic/cxx_atomic_impl.h>).  Clang only allows them to be called
+// directly (not to have their address taken).
+template <class T>
+struct atomic_impl
+{
+  _Atomic(T) value;
+};
+template <class T>
+T atomic_load(const atomic_impl<T> *a, int order)
+{
+  using ptr_type = _Atomic(T) *;
+  return __c11_atomic_load(const_cast<ptr_type>(&a->value), order);
+}
+template <class T>
+void atomic_store(atomic_impl<T> *a, T v, int order)
+{
+  __c11_atomic_store(&a->value, v, order);
+}
+template <class T>
+T atomic_exchange(atomic_impl<T> *a, T v, int order)
+{
+  return __c11_atomic_exchange(&a->value, v, order);
+}
+template <class T>
+T atomic_fetch_add(atomic_impl<T> *a, T v, int order)
+{
+  return __c11_atomic_fetch_add(&a->value, v, order);
+}
 int main()
 {
-  __CPROVER_assert(t_fence != 0, "thread_fence declared");
-  __CPROVER_assert(s_fence != 0, "signal_fence declared");
-  __CPROVER_assert(atomic_store != 0, "store declared");
-  __CPROVER_assert(atomic_exchange != 0, "exchange declared");
-  __CPROVER_assert(atomic_fetch_add != 0, "fetch_add declared");
-  return 0;
+  __c11_atomic_thread_fence(5);
+  __c11_atomic_signal_fence(5);
+  atomic_impl<int> a;
+  atomic_store(&a, 5, 5);
+  __CPROVER_assert(atomic_load(&a, 5) == 5, "store then load");
+  __CPROVER_assert(
+    atomic_exchange(&a, 7, 5) == 5 && atomic_load(&a, 5) == 7,
+    "exchange returns the old value");
+  __CPROVER_assert(
+    atomic_fetch_add(&a, 3, 5) == 7 && atomic_load(&a, 5) == 10, "fetch_add");
+  atomic_impl<bool> b;
+  atomic_store(&b, true, 5);
+  __CPROVER_assert(atomic_load(&b, 5), "bool");
+  __CPROVER_assert(atomic_load(&a, 5) == 11, "WRONG (must FAIL)");
 }

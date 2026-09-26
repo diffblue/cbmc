@@ -2651,7 +2651,7 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
           identifier, expr.arguments(), f_op.source_location()))
       {
         materialize_gcc_polymorphic_builtin(
-          identifier, *gcc_polymorphic, f_op.source_location());
+          *gcc_polymorphic, f_op.source_location());
 
         f_op = std::move(*gcc_polymorphic);
       }
@@ -2781,11 +2781,13 @@ void c_typecheck_baset::typecheck_side_effect_function_call(
 }
 
 void c_typecheck_baset::materialize_gcc_polymorphic_builtin(
-  const irep_idt &identifier,
   symbol_exprt &gcc_polymorphic,
   const source_locationt &source_location)
 {
-  irep_idt identifier_with_type = gcc_polymorphic.get_identifier();
+  // the builtin the typing selected (a Clang __c11_atomic_* intrinsic is
+  // typed as its GCC counterpart, see typecheck_gcc_polymorphic_builtin)
+  const irep_idt identifier = gcc_polymorphic.get_identifier();
+  irep_idt identifier_with_type = identifier;
   auto &parameters = to_code_type(gcc_polymorphic.type()).parameters();
   INVARIANT(
     !parameters.empty(),
