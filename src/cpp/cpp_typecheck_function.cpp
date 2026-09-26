@@ -617,9 +617,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
 
       for(const auto &c : to_struct_type(class_sym.type).components())
       {
+        // N5008 [class.compare.default]/6, [class.eq]/2: the expanded list
+        // of subobjects is the base classes and the non-static data
+        // MEMBERS; padding inserted by the layout is neither and has no
+        // name (comparing it yielded "symbol '' is unknown" for every class
+        // whose members are not tightly packed, `char *ptr; errc ec;').
         if(
           c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          c.get_bool(ID_is_static) || c.get_is_padding() ||
+          c.type().id() == ID_code)
           continue;
 
         const irep_idt &mem = c.get_base_name();
@@ -658,21 +664,29 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     }
   }
 
-  // C++20: generate body for defaulted operator==
+  // N5008 [class.compare.default]/1: a defaulted `operator==' or
+  // `operator!=' is either a non-static const member with one parameter of
+  // type `const C &' or a friend with two such parameters.  [class.eq]/2:
+  // the defaulted == returns the conjunction of the memberwise comparisons
+  // of the expanded list of subobjects ([class.compare.default]/6, the
+  // non-static data members in declaration order); [class.compare.default]
+  // /1 + [over.match.oper]: a defaulted != is `!(x == y)`.  Both forms are
+  // elaborated here from the empty `= default' body.
   if(
-    symbol.base_name == "operator==" && symbol.value.id() == ID_code &&
+    (symbol.base_name == "operator==" || symbol.base_name == "operator!=") &&
+    symbol.value.id() == ID_code &&
     to_code(symbol.value).get_statement() == ID_block &&
     !to_code_block(to_code(symbol.value)).has_operands())
   {
     irep_idt class_id = symbol.type.get(ID_C_member_name);
-    // For friend operator==, use the friend class instead
+    // For the friend form, the befriending class
     if(class_id.empty())
       class_id = symbol.type.get(ID_C_class);
     if(!class_id.empty())
     {
       const symbolt &class_sym = lookup(class_id);
       const auto &fn_params = to_code_type(symbol.type).parameters();
-      bool is_friend_op = symbol.type.get(ID_C_member_name).empty();
+      const bool is_friend_op = symbol.type.get(ID_C_member_name).empty();
       irep_idt lhs_name, rhs_name;
       if(is_friend_op && fn_params.size() >= 2)
       {
@@ -694,9 +708,15 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       exprt result = true_exprt();
       for(const auto &c : to_struct_type(class_sym.type).components())
       {
+        // N5008 [class.compare.default]/6, [class.eq]/2: the expanded list
+        // of subobjects is the base classes and the non-static data
+        // MEMBERS; padding inserted by the layout is neither and has no
+        // name (comparing it yielded "symbol '' is unknown" for every class
+        // whose members are not tightly packed, `char *ptr; errc ec;').
         if(
           c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static) || c.type().id() == ID_code)
+          c.get_bool(ID_is_static) || c.get_is_padding() ||
+          c.type().id() == ID_code)
           continue;
 
         const irep_idt &mem = c.get_base_name();
@@ -730,70 +750,16 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
         }
       }
 
+      if(symbol.base_name == "operator!=")
+      {
+        not_exprt neg(std::move(result));
+        neg.add_source_location() = loc;
+        result = std::move(neg);
+      }
+
       code_blockt body;
       body.add_source_location() = loc;
       code_frontend_returnt ret(std::move(result));
-      ret.add_source_location() = loc;
-      body.add(std::move(ret));
-
-      symbol.value = std::move(body);
-    }
-  }
-
-  // C++20: generate body for defaulted operator!=
-  if(
-    symbol.base_name == "operator!=" && symbol.value.id() == ID_code &&
-    to_code(symbol.value).get_statement() == ID_block &&
-    !to_code_block(to_code(symbol.value)).has_operands())
-  {
-    const irep_idt &class_id = symbol.type.get(ID_C_member_name);
-    if(!class_id.empty())
-    {
-      const symbolt &class_sym = lookup(class_id);
-      const auto &fn_params = to_code_type(symbol.type).parameters();
-      irep_idt arg_name;
-      if(fn_params.size() >= 2)
-        arg_name = fn_params[1].get_base_name();
-      if(arg_name.empty())
-        arg_name = "#anon_arg0";
-
-      source_locationt loc = symbol.location;
-
-      // Build: !(m1==rhs.m1 && m2==rhs.m2 && ...)
-      exprt eq_result = true_exprt();
-      for(const auto &c : to_struct_type(class_sym.type).components())
-      {
-        if(
-          c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
-          c.get_bool(ID_is_static) || c.type().id() == ID_code)
-          continue;
-
-        const irep_idt &mem = c.get_base_name();
-        cpp_namet lhs(mem, loc);
-        exprt rhs(ID_member);
-        rhs.add(ID_component_cpp_name, cpp_namet(mem, loc));
-        rhs.copy_to_operands(cpp_namet(arg_name, loc).as_expr());
-        rhs.add_source_location() = loc;
-
-        equal_exprt eq(lhs.as_expr(), rhs);
-        eq.add_source_location() = loc;
-
-        if(eq_result.is_true())
-          eq_result = std::move(eq);
-        else
-        {
-          and_exprt conj(std::move(eq_result), std::move(eq));
-          conj.add_source_location() = loc;
-          eq_result = std::move(conj);
-        }
-      }
-
-      not_exprt neg(std::move(eq_result));
-      neg.add_source_location() = loc;
-
-      code_blockt body;
-      body.add_source_location() = loc;
-      code_frontend_returnt ret(std::move(neg));
       ret.add_source_location() = loc;
       body.add(std::move(ret));
 

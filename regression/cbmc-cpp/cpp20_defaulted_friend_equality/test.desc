@@ -1,10 +1,12 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ defaulted friend operator== compares the members: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ and != is rewritten from it: SUCCESS$
 ^\[main\.assertion\.3\] line \d+ defaulted member operator==: SUCCESS$
-^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.4\] line \d+ defaulted member == over padding: SUCCESS$
+^\[main\.assertion\.5\] line \d+ defaulted friend == and != over padding: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -17,9 +19,14 @@ dropped the body
 N5008 [class.compare.default]/1-2: a defaulted comparison operator may be a
 FRIEND of the class taking two `const C &' parameters; it is defined as the
 memberwise comparison ([class.eq]/2) exactly like the defaulted member form
-`bool operator==(const C &) const = default'.  The member form works; the
-friend form fails with "symbol '' is unknown" at the declaration and the
-translation unit is rejected.  This is libc++'s std::to_chars_result
+`bool operator==(const C &) const = default'.  The friend form failed with
+"symbol '' is unknown" at the declaration and the translation unit was
+rejected.  Round-163 diagnosis: not the friend form -- the synthesized
+memberwise comparison ([class.compare.default]/6: base classes and
+non-static data MEMBERS) also compared the anonymous padding component the
+layout inserts between `char *ptr' and `errc ec'; the member form failed
+the same way for any padded class (the original `point' has none).  Fixed
+in round 163 (padding skipped for defaulted ==, != and <=>).  This is libc++'s std::to_chars_result
 (`friend bool operator==(const to_chars_result &, const to_chars_result &) =
 default'), whose operator== body is dropped in every libc++ C++20 test
 (audit residue item 3, round 162).

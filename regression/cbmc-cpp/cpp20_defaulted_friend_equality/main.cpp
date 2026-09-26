@@ -16,6 +16,20 @@ struct point
   int x, y;
   bool operator==(const point &) const = default;
 };
+// the member form over a padded layout (8-byte pointer, 4-byte int)
+struct padded
+{
+  const char *name;
+  int n;
+  bool operator==(const padded &) const = default;
+};
+struct ordered
+{
+  long key;
+  int tag;
+  friend bool operator==(const ordered &, const ordered &) = default;
+  friend bool operator!=(const ordered &, const ordered &) = default;
+};
 int main()
 {
   char buf[4];
@@ -24,5 +38,9 @@ int main()
   __CPROVER_assert(a != c, "and != is rewritten from it");
   point p{1, 2}, q{1, 3};
   __CPROVER_assert(p != q && p == p, "defaulted member operator==");
+  padded r{"a", 1}, s{"a", 1}, t{"a", 2};
+  __CPROVER_assert(r == s && !(r == t), "defaulted member == over padding");
+  ordered u{5, 1}, v{5, 1}, w{5, 2};
+  __CPROVER_assert(u == v && u != w, "defaulted friend == and != over padding");
   __CPROVER_assert(p == q, "WRONG (must FAIL)");
 }
