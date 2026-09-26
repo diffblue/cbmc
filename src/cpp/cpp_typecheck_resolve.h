@@ -12,12 +12,15 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #ifndef CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 #define CPROVER_CPP_CPP_TYPECHECK_RESOLVE_H
 
-#include "cpp_template_args.h"
 #include "cpp_scopes.h"
+#include "cpp_template_args.h"
+
+#include <optional>
 
 class cpp_namet;
 class cpp_typecheck_fargst;
 class cpp_declarationt;
+class cpp_declaratort;
 class symbol_table_baset;
 
 // N5008 [temp.constr.order]/1 + [temp.func.order]: true iff declaration p is
@@ -59,6 +62,18 @@ public:
   void guess_template_args(
     const typet &template_parameter,
     const typet &desired_type);
+  bool guess_template_args_via_alias(
+    const cpp_namet &cpp_name,
+    const typet &desired_type);
+  void guess_template_args_template_id(
+    const cpp_namet &cpp_name,
+    const typet &desired_type);
+  void guess_template_args_simple_name(
+    const cpp_namet &cpp_name,
+    const typet &desired_type);
+  void guess_template_args_compound(
+    const typet &template_type,
+    const typet &desired_type);
 
   /// [temp.deduct.type]/8: in class-template partial-specialization
   /// matching ([temp.class.spec.match]/2), a pattern `const T` does NOT
@@ -85,6 +100,57 @@ public:
   /// \param pack_decl: pre-conversion cpp_declaration of the pack parameter
   /// \param desired_code_type: the desired (argument) code type
   /// \param start_index: index of the first desired parameter the pack covers
+  void deduce_from_call_arguments(
+    const irept::subt &parameters,
+    const cpp_typecheck_fargst &fargs,
+    exprt::operandst::const_iterator it,
+    std::size_t &pack_expansion_size,
+    bool &has_non_empty_pack,
+    std::vector<typet> &pack_deduced_types);
+
+  bool arguments_convertible_to_parameters(
+    const typet &function_type,
+    const irept::subt &parameters,
+    const cpp_typecheck_fargst &fargs);
+
+  void record_deduced_function_parameter_pack(
+    const cpp_declarationt &cpp_declaration,
+    bool has_non_empty_pack,
+    std::size_t pack_expansion_size,
+    const std::vector<typet> &pack_deduced_types);
+
+  std::optional<exprt> deduce_without_call_arguments(
+    const exprt &expr,
+    const cpp_declarationt &cpp_declaration,
+    const cpp_typecheck_fargst &fargs);
+
+  void expand_function_parameter_pack(
+    const cpp_declaratort &function_declarator,
+    const irept::subt &parameters,
+    bool variadic_pack_empty,
+    const irep_idt &pack_param_name,
+    bool has_non_empty_pack,
+    std::size_t pack_expansion_size,
+    const std::vector<typet> &pack_deduced_types,
+    typet &function_type);
+
+  bool substitute_function_type(
+    const cpp_declaratort &function_declarator,
+    const cpp_typecheck_fargst &fargs,
+    typet &function_type);
+
+  bool apply_default_template_arguments(
+    const cpp_declarationt &cpp_declaration,
+    const symbolt &template_symbol,
+    const irept::subt &parameters,
+    const irep_idt &member_class_tag,
+    bool has_non_empty_pack,
+    const std::vector<typet> &pack_deduced_types,
+    std::size_t pack_expansion_size,
+    cpp_template_args_tct &template_args,
+    irep_idt &pack_param_name,
+    bool &variadic_pack_empty);
+
   void deduce_function_parameter_pack(
     const cpp_declarationt &pack_decl,
     const typet &desired_code_type,
@@ -129,6 +195,11 @@ protected:
   bool deducing_against_base = false;
 
   typedef std::vector<exprt> resolve_identifierst;
+
+  void prefer_more_constrained_templates(resolve_identifierst &old_identifiers);
+  void instantiate_selected_function_template(
+    resolve_identifierst &identifiers,
+    const cpp_typecheck_fargst &fargs);
 
   void convert_identifiers(
     const cpp_scopest::id_sett &id_set,
