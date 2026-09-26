@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ below min cap: SUCCESS$
+^\[main\.assertion\.2\] line \d+ aligned up \(char\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ aligned up \(int\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ guess equals min cap: SUCCESS$
+^\[main\.assertion\.5\] line \d+ non-member template-id in a return statement: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+could not fully type-check
+--
+N5008 [temp.names]/3: within a template-argument-list the first non-nested
+`>' ends the list; a `<' inside an argument is the less-than operator.
+`align_it<1 < 8 ? 8 : 1>(n)' (libc++'s basic_string::__recommend, via
+`__align_it<sizeof(value_type) < __alignment ? ... : 1>(__s + 1)') defeats the
+parser's balanced-bracket pre-check, so the template-id is recognised by the
+postfix-expression retry -- which appended the bare argument list to the name
+instead of a `template_args' component.  The type checker could not read the
+id-less node and the function body was dropped (108 occurrences over the
+libc++ tests of the corpus).
