@@ -839,6 +839,95 @@ void cpp_typecheckt::typecheck_variable_template(cpp_declarationt &declaration)
 }
 
 /// typecheck class template members; these can be methods or static members
+/// N5008 [temp.mem]/1, [class.mfct]/1: an out-of-line definition of a member
+/// function template of a non-template class (`template <class E> auto
+/// path::_S_convert(const E *__f, const E *__l) { ... }') completes the
+/// in-class declaration with the same signature ([temp.over.link]/6, the
+/// template parameters compared by position).  The body uses the
+/// DEFINITION's parameter names ([dcl.fct]/3 -- names are not part of the
+/// type) and the definition's template parameter names; both are grafted
+/// onto the declaration.  Previously the body went to the first bodiless
+/// same-named template and kept the declaration's parameter names, so the
+/// instantiated body found `__f' unknown (or a wrong overload got the body).
+void cpp_typecheckt::define_member_template_of_class(
+  cpp_declarationt &declaration)
+{
+  PRECONDITION(declaration.declarators().size() == 1);
+  cpp_declaratort &declarator = declaration.declarators()[0];
+  const cpp_namet &cpp_name = declarator.name();
+  const auto &subs = cpp_name.get_sub();
+
+  // resolve the qualifying class scope, component by component
+  cpp_scopet *scope = &cpp_scopes.current_scope();
+  for(std::size_t i = 0; i + 2 < subs.size(); ++i)
+  {
+    if(subs[i].id() == ID_scope_resolution)
+      continue;
+    if(subs[i].id() != ID_name)
+      return;
+    const auto ids = scope->lookup(
+      subs[i].get(ID_identifier),
+      i == 0 ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
+      cpp_idt::id_classt::CLASS);
+    if(ids.size() != 1)
+      return;
+    scope = &cpp_scopes.get_scope((*ids.begin())->identifier);
+  }
+
+  const irep_idt method_name = subs.back().get(ID_identifier);
+  const auto tmpl_ids = scope->lookup(
+    method_name, cpp_scopet::QUALIFIED, cpp_idt::id_classt::TEMPLATE);
+
+  const typet &def_ftype = declarator.type();
+  if(def_ftype.id() != ID_function_type)
+    return;
+  const template_typet class_tt; // the class is not a template
+
+  for(const auto *tmpl_id : tmpl_ids)
+  {
+    symbolt *tmpl_sym = symbol_table.get_writeable(tmpl_id->identifier);
+    if(tmpl_sym == nullptr || tmpl_sym->type.id() != ID_cpp_declaration)
+      continue;
+    cpp_declarationt &tmpl_decl = to_cpp_declaration(tmpl_sym->type);
+    if(
+      tmpl_decl.declarators().size() != 1 ||
+      tmpl_decl.declarators()[0].find(ID_value).is_not_nil() ||
+      declarator.find(ID_value).is_nil())
+    {
+      continue;
+    }
+    cpp_declaratort &decl_dtor = tmpl_decl.declarators()[0];
+    if(decl_dtor.type().id() != ID_function_type)
+      continue;
+    if(!member_template_parameters_match(
+         decl_dtor.type().find(ID_parameters),
+         tmpl_decl.template_type(),
+         class_tt,
+         def_ftype.find(ID_parameters),
+         declaration.template_type()))
+    {
+      continue;
+    }
+
+    // the definition, spelled with the declaration's template parameter
+    // names
+    cpp_declaratort def_copy = declarator;
+    rename_template_parameters_to_declaration(
+      def_copy,
+      declaration.template_type(),
+      class_tt,
+      tmpl_decl.template_type());
+
+    // graft: parameter list (its names), body, mem-initializers
+    decl_dtor.type() = def_copy.type();
+    decl_dtor.add(ID_value) = def_copy.find(ID_value);
+    const irept &m_inits = def_copy.find(ID_member_initializers);
+    if(m_inits.is_not_nil())
+      decl_dtor.member_initializers() = m_inits;
+    return;
+  }
+}
+
 void cpp_typecheckt::typecheck_class_template_member(
   cpp_declarationt &declaration)
 {
@@ -875,58 +964,12 @@ void cpp_typecheckt::typecheck_class_template_member(
   {
   }
   else if(
-    cpp_name.get_sub().size() == 3 && cpp_name.get_sub()[0].id() == ID_name &&
-    cpp_name.get_sub()[1].id() == ID_scope_resolution &&
-    cpp_name.get_sub()[2].id() == ID_name)
+    cpp_name.get_sub().size() >= 3 &&
+    cpp_name.get_sub().back().id() == ID_name && !cpp_name.has_template_args())
   {
-    // Non-template class with a member function template defined
-    // outside the class body: name1::name2
-    const irep_idt &class_name = cpp_name.get_sub()[0].get(ID_identifier);
-    const irep_idt &method_name = cpp_name.get_sub()[2].get(ID_identifier);
-
-    // Look up the class scope
-    auto class_ids = cpp_scopes.current_scope().lookup(
-      class_name, cpp_scopet::QUALIFIED, cpp_scopet::id_classt::CLASS);
-
-    if(!class_ids.empty())
-    {
-      cpp_scopet &class_scope =
-        cpp_scopes.get_scope((*class_ids.begin())->identifier);
-
-      // Find the function template in the class scope
-      auto tmpl_ids = class_scope.lookup(
-        method_name, cpp_scopet::QUALIFIED, cpp_scopet::id_classt::TEMPLATE);
-
-      for(const auto *tmpl_id : tmpl_ids)
-      {
-        symbolt *tmpl_sym = symbol_table.get_writeable(tmpl_id->identifier);
-        if(tmpl_sym == nullptr)
-          continue;
-
-        // Update the template symbol with the body from the
-        // out-of-line definition.
-        cpp_declarationt &tmpl_decl = to_cpp_declaration(tmpl_sym->type);
-        if(
-          !tmpl_decl.declarators().empty() &&
-          tmpl_decl.declarators()[0].find(ID_value).is_nil() &&
-          declarator.find(ID_value).is_not_nil())
-        {
-          tmpl_decl.declarators()[0].add(ID_value) = declarator.find(ID_value);
-          // N5008 [class.base.init]/1: the ctor-initializer is part of the
-          // constructor's DEFINITION.  An out-of-line delegating constructor
-          // template (std::pair's piecewise constructor in <tuple>,
-          // `: pair(__first, __second, _Build_index_tuple<...>::__type(),
-          // ...)`) carries its mem-initializer-list on the definition's
-          // declarator; copying only the body converts the member with NO
-          // initializer (members default-initialized, the delegation never
-          // happens, the constructed pair keeps garbage).
-          const irept &m_inits = declarator.find(ID_member_initializers);
-          if(m_inits.is_not_nil())
-            tmpl_decl.declarators()[0].member_initializers() = m_inits;
-          return;
-        }
-      }
-    }
+    // A member function template of a NON-template class, defined outside
+    // the class body: `A::f', `ns::A::f' or `A::Nested::f'.
+    define_member_template_of_class(declaration);
     return;
   }
   else if(
