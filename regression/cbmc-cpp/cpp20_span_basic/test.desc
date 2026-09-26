@@ -10,6 +10,7 @@ main.cpp
 ^.*is unknown.*$
 ^CONVERSION ERROR$
 ^.*does not uniquely resolve.*$
+dropped the body
 --
 Genuine (non-vacuous) verification of a populated std::span<int>.
 
