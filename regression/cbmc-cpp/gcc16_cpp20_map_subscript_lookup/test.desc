@@ -10,7 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-dropped the body of (?!system-header function '(operator(\*|/|<<|>>)=|operator\(|lexicographical_compare_three_way))
+dropped the body
 --
 Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only (silent wrong
 result: assertions 2 and 3 FAILURE without any front-end diagnostic).  Fixed by
@@ -18,9 +18,7 @@ round 160/161: `__builtin_clzg', `<=>' on pointers (strong_ordering), and the
 static-member-template-of-a-base / braced-init / constexpr-array fixes that
 made <compare>'s comparison-category helpers type-check.  Runs where the host
 gcc is >= 16 (tag libstdcxx16).
-The compound-assignment and conversion operators of <bits/max_size_type.h>
-(unsigned __int128 arithmetic, named by the ranges machinery but not called
-here) and
-lexicographical_compare_three_way (map's operator<=>, `auto __cmp = __comp(...)'
-with __comp's return type not yet deduced) are still dropped; the forbidden
-pattern excludes exactly those.
+Round 162: no system-header body is dropped any more (rewritten comparison
+candidates from <=>, the constrained conversion function template of
+__max_size_type, and its constructor template's specializations no longer
+competing as converting constructors).
