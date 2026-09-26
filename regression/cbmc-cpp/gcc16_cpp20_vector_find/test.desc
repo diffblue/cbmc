@@ -8,7 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-dropped the body of (?!system-header function '(operator(\*|/|<<|>>)=|operator\())
+dropped the body
 --
 Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only: std::find's
 predicate (predefined_ops.h `_Comp_with_val') holds the functor by value or by
@@ -17,7 +17,7 @@ reference according to `__by_ref_or_value_fn' = is_empty<equal_to<>>; with
 temporary and every comparison read garbage.  Fixed in round 161
 (cpp11_class_property_type_traits).  Runs where the host gcc is >= 16 (tag
 libstdcxx16).
-The compound-assignment and conversion operators of <bits/max_size_type.h>
-(unsigned __int128 arithmetic, named by the ranges machinery but not called
-here) are still
-dropped; the forbidden pattern excludes exactly those.
+Round 162: no system-header body is dropped any more (rewritten comparison
+candidates from <=>, the constrained conversion function template of
+__max_size_type, and its constructor template's specializations no longer
+competing as converting constructors).
