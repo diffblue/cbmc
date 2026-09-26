@@ -555,9 +555,20 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(symbol.value.type().find(ID_to_member).is_not_nil())
       symbol.type.add(ID_to_member) = symbol.value.type().find(ID_to_member);
 
+    // N5008 [dcl.init.string]/1: an array of character type may be
+    // initialized by a string literal of the matching kind.  A narrow
+    // literal is a string_constant; a wide/UTF literal (`L"de"', u"...",
+    // U"...") is already an array expression flagged as a string constant,
+    // and needs the same array initialization (element type adjustment,
+    // bound from the literal for `const wchar_t w[] = L"de"') -- the
+    // generic conversion below rejected it ("invalid implicit conversion
+    // from 'int [3l]' to 'const int []'").
     if(
       symbol.value.id() == ID_initializer_list ||
-      symbol.value.id() == ID_string_constant)
+      symbol.value.id() == ID_string_constant ||
+      (symbol.value.id() == ID_array &&
+       symbol.value.get_bool(ID_C_string_constant) &&
+       symbol.type.id() == ID_array))
     {
       do_initializer(symbol.value, symbol.type, true);
 
