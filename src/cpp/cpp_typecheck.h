@@ -1104,6 +1104,7 @@ protected:
   void instantiate_generic_lambda(side_effect_expr_function_callt &);
 
   bool operator_is_overloaded(exprt &);
+  bool rewritten_comparison_candidate(exprt &expr);
   bool overloadable(const exprt &);
 
   void add_implicit_dereference(exprt &);

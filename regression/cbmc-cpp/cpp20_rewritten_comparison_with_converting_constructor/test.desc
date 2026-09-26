@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ rewritten <= with the right operand converted by a constrained constructor template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reversed and converted operands: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.oper]/3.4 + [over.ics.user]: the rewritten candidate
+`(x <=> y) <= 0' with `y' an integer converted to the class by a
+constrained converting constructor template (libstdc++'s
+__max_size_type, `__r <= _S_rep_bits' in its operator<<=), the reversed
+candidate for `5 < r', and `r != 0' through `!(r == 0)'.

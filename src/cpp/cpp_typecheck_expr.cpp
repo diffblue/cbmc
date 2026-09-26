@@ -37,6 +37,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "expr2cpp.h"
 
 #include <functional>
+#include <optional>
 
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,
@@ -1716,41 +1717,63 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     {
       sfinae_contextt sfinae_guard{*this};
       typecheck_expr(op);
-      if(op.id() == ID_side_effect && op.get(ID_statement) == ID_function_call)
+      // [expr.unary.noexcept]/3 + [except.spec]/6: the operand is
+      // potentially-throwing if it contains, at any depth, a call to a
+      // function that is not non-throwing, a throw-expression, or a
+      // dynamic_cast / typeid that can throw.  A destructor is
+      // non-throwing unless declared otherwise ([except.spec]/8).
+      // Previously only a top-level call was examined, so `noexcept(p < q)'
+      // rewritten to `(p <=> q) < 0' read only the category's noexcept
+      // operator< and ignored the potentially-throwing operator<=> inside.
+      std::function<bool(const exprt &)> potentially_throwing =
+        [&](const exprt &e) -> bool
       {
-        const auto &fn = to_side_effect_expr_function_call(op).function();
-        if(fn.id() == ID_symbol)
+        if(e.id() == ID_side_effect)
         {
-          const auto *sym =
-            symbol_table.lookup(to_symbol_expr(fn).get_identifier());
-          if(sym != nullptr && sym->type.id() == ID_code)
+          const irep_idt &statement = e.get(ID_statement);
+          if(statement == ID_throw)
+            return true;
+          if(statement == ID_function_call)
           {
-            const auto &code_type = to_code_type(sym->type);
-            if(
-              code_type.get_bool("#C_noexcept") ||
-              code_type.get_bool(ID_noexcept))
+            const auto &fn = to_side_effect_expr_function_call(e).function();
+            bool non_throwing = false;
+            if(fn.id() == ID_symbol)
             {
-              result = true;
+              const auto *sym =
+                symbol_table.lookup(to_symbol_expr(fn).get_identifier());
+              if(sym != nullptr && sym->type.id() == ID_code)
+              {
+                const auto &code_type = to_code_type(sym->type);
+                non_throwing = code_type.get_bool("#C_noexcept") ||
+                               code_type.get_bool(ID_noexcept) ||
+                               code_type.return_type().id() == ID_destructor;
+              }
             }
-            // Destructors are implicitly noexcept since C++11
-            if(code_type.return_type().id() == ID_destructor)
-              result = true;
+            else if(
+              fn.id() == ID_member &&
+              fn.find(ID_component_cpp_name).is_not_nil())
+            {
+              // a destructor call spelled `x.~T()'
+              const auto &name = to_cpp_name(fn.find(ID_component_cpp_name));
+              const irep_idt &bn = name.get_base_name();
+              non_throwing = !bn.empty() && id2string(bn)[0] == '~';
+            }
+            else if(fn.type().id() == ID_code)
+            {
+              const auto &code_type = to_code_type(fn.type());
+              non_throwing = code_type.get_bool("#C_noexcept") ||
+                             code_type.get_bool(ID_noexcept);
+            }
+            if(!non_throwing)
+              return true;
           }
         }
-        // Destructor calls via .~T() syntax
-        if(fn.id() == ID_member && fn.find(ID_component_cpp_name).is_not_nil())
-        {
-          const auto &name = to_cpp_name(fn.find(ID_component_cpp_name));
-          const irep_idt &bn = name.get_base_name();
-          if(!bn.empty() && id2string(bn)[0] == '~')
-            result = true;
-        }
-      }
-      // If the expression type-checked without throwing,
-      // and it's not a function call, it's likely noexcept
-      // (e.g., built-in operations, trivial destructors).
-      if(!result && op.id() != ID_side_effect)
-        result = true;
+        for(const auto &sub : e.operands())
+          if(potentially_throwing(sub))
+            return true;
+        return false;
+      };
+      result = !potentially_throwing(op);
     }
     catch(...)
     {
@@ -2908,6 +2931,140 @@ struct operator_entryt
   {ID_shl, "<<"},        {ID_shr, ">>"},        {ID_notequal, "!="},
   {ID_dereference, "*"}, {ID_ptrmember, "->"},  {irep_idt(), nullptr}};
 
+/// N5008 [over.match.oper]/3.4 (C++20): the rewritten and reversed
+/// candidates of a comparison `x @ y' -- `(x <=> y) @ 0', `0 @ (y <=> x)',
+/// `!(x == y)', `y == x'.  Rewrites \p expr into the selected candidate and
+/// returns true; leaves it alone and returns false when there is none.
+bool cpp_typecheckt::rewritten_comparison_candidate(exprt &expr)
+{
+  // N5008 [over.match.oper]/3.4 (C++20): for a relational operator `x @ y'
+  // the candidate set includes the REWRITTEN candidates `(x <=> y) @ 0' and
+  // the reversed `0 @ (y <=> x)'; for `x != y' the rewritten `!(x == y)' and
+  // the reversed `!(y == x)'; for `x == y' the reversed `y == x'.  The
+  // operator<=> / operator== may be a member or a non-member (friend or
+  // namespace-scope, found by ADL) -- libstdc++'s std::pair declares both as
+  // namespace-scope templates, and the requires-expressions of
+  // three_way_comparable_with (`__t < __u') test exactly these rewrites.
+  // Previously only a member operator<=> was tried and the synthesized
+  // comparison against 0 was left un-type-checked ("warning: ignoring <").
+  const auto is_class_type = [](const typet &t)
+  {
+    const typet &u = is_reference(t) ? to_reference_type(t).base_type() : t;
+    return u.id() == ID_struct_tag || u.id() == ID_struct;
+  };
+  // [over.match.oper]/3.3: with no operand of class type only candidates
+  // taking the operands' enumeration types remain -- the rewrite below
+  // does not model that restriction, so it is limited to class operands.
+  if(
+    (expr.id() == ID_lt || expr.id() == ID_gt || expr.id() == ID_le ||
+     expr.id() == ID_ge || expr.id() == ID_equal || expr.id() == ID_notequal) &&
+    expr.operands().size() == 2 &&
+    (is_class_type(to_binary_expr(expr).op0().type()) ||
+     is_class_type(to_binary_expr(expr).op1().type())))
+  {
+    const source_locationt loc = expr.source_location();
+    const exprt &x = to_binary_expr(expr).op0();
+    const exprt &y = to_binary_expr(expr).op1();
+
+    // the call `a OP b' to a user-declared operator OP (member, then
+    // non-member with ADL), or nothing when there is none
+    auto rewritten_call = [&](
+                            const std::string &op_name,
+                            const exprt &a,
+                            const exprt &b) -> std::optional<exprt>
+    {
+      const cpp_namet name(op_name, loc);
+      const typet a_type = is_reference(a.type())
+                             ? to_reference_type(a.type()).base_type()
+                             : a.type();
+      if(a_type.id() == ID_struct_tag || a_type.id() == ID_struct)
+      {
+        exprt member(ID_member);
+        member.add(ID_component_cpp_name) = name;
+        member.copy_to_operands(already_typechecked_exprt{a});
+        side_effect_expr_function_callt call(
+          std::move(member), {}, uninitialized_typet{}, loc);
+        call.arguments().push_back(b);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          typecheck_side_effect_function_call(call);
+          return std::move(call);
+        }
+        catch(...)
+        {
+        }
+      }
+      side_effect_expr_function_callt call(
+        name.as_expr(), {}, uninitialized_typet{}, loc);
+      call.arguments().push_back(a);
+      call.arguments().push_back(b);
+      try
+      {
+        sfinae_contextt sfinae_guard{*this};
+        typecheck_side_effect_function_call(call);
+        return std::move(call);
+      }
+      catch(...)
+      {
+      }
+      return {};
+    };
+
+    if(expr.id() == ID_equal || expr.id() == ID_notequal)
+    {
+      // `x == y' has been tried by the lookup above; `x != y' is rewritten
+      // to `!(x == y)', and both are tried reversed
+      std::optional<exprt> eq;
+      if(expr.id() == ID_notequal)
+        eq = rewritten_call("operator==", x, y);
+      if(!eq.has_value())
+        eq = rewritten_call("operator==", y, x);
+      if(eq.has_value())
+      {
+        exprt result = typecast_exprt::conditional_cast(*eq, bool_typet());
+        if(expr.id() == ID_notequal)
+          result = not_exprt(result);
+        result.add_source_location() = loc;
+        expr.swap(result);
+        return true;
+      }
+    }
+    else
+    {
+      std::optional<exprt> cmp = rewritten_call("operator<=>", x, y);
+      irep_idt relation = expr.id();
+      if(!cmp.has_value())
+      {
+        cmp = rewritten_call("operator<=>", y, x);
+        // `0 @ (y <=> x)' is `(y <=> x) @' 0' with the converse relation
+        if(relation == ID_lt)
+          relation = ID_gt;
+        else if(relation == ID_gt)
+          relation = ID_lt;
+        else if(relation == ID_le)
+          relation = ID_ge;
+        else if(relation == ID_ge)
+          relation = ID_le;
+      }
+      if(cmp.has_value())
+      {
+        // `(x <=> y) @ 0': the comparison-category type's own operator@
+        // against a literal 0 ([cmp.categories.pre]/3)
+        exprt rel(relation, typet{});
+        rel.add_to_operands(
+          already_typechecked_exprt{*cmp}, from_integer(0, signed_int_type()));
+        rel.add_source_location() = loc;
+        typecheck_expr(rel);
+        expr.swap(rel);
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 {
   // Check argument types first.
@@ -3586,80 +3743,8 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     }
   }
 
-  // C++20: synthesize relational operators from <=>
-  if(
-    (expr.id() == ID_lt || expr.id() == ID_gt || expr.id() == ID_le ||
-     expr.id() == ID_ge) &&
-    expr.operands().size() == 2 &&
-    to_binary_expr(expr).op0().type().id() == ID_struct_tag)
-  {
-    const irep_idt &struct_id =
-      to_binary_expr(expr).op0().type().get(ID_identifier);
-    cpp_save_scopet save_scope(cpp_scopes);
-    cpp_scopes.set_scope(struct_id);
-
-    const cpp_namet spaceship_name("operator<=>", expr.source_location());
-    cpp_typecheck_fargst fargs;
-    fargs.operands = expr.operands();
-    fargs.has_object = true;
-    fargs.in_use = true;
-
-    exprt spaceship_result =
-      resolve(spaceship_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
-
-    if(spaceship_result.is_not_nil())
-    {
-      // Rewrite a < b  as  (a <=> b) < 0  (and similarly for >, <=, >=)
-      exprt member(ID_member);
-      member.add(ID_component_cpp_name) = spaceship_name;
-      member.copy_to_operands(
-        already_typechecked_exprt{to_binary_expr(expr).op0()});
-
-      side_effect_expr_function_callt spaceship_call(
-        std::move(member), {}, uninitialized_typet{}, expr.source_location());
-      spaceship_call.arguments().push_back(to_binary_expr(expr).op1());
-      typecheck_side_effect_function_call(spaceship_call);
-
-      exprt zero = from_integer(0, signed_int_type());
-      binary_relation_exprt cmp(
-        std::move(spaceship_call), expr.id(), std::move(zero));
-      cmp.add_source_location() = expr.source_location();
-      expr.swap(cmp);
-      return true;
-    }
-  }
-
-  // C++20: synthesize operator!= from operator==
-  if(
-    expr.id() == ID_notequal && expr.operands().size() == 2 &&
-    (to_binary_expr(expr).op0().type().id() == ID_struct_tag ||
-     to_binary_expr(expr).op0().type().id() == ID_struct))
-  {
-    const cpp_namet eq_name("operator==", expr.source_location());
-    cpp_typecheck_fargst fargs;
-    fargs.operands = expr.operands();
-    fargs.has_object = false;
-    fargs.in_use = true;
-
-    exprt eq_result =
-      resolve(eq_name, cpp_typecheck_resolvet::wantt::VAR, fargs, false);
-
-    if(eq_result.is_not_nil())
-    {
-      // Rewrite a != b  as  !(a == b)
-      side_effect_expr_function_callt eq_call(
-        eq_name.as_expr(), {}, uninitialized_typet{}, expr.source_location());
-      for(const auto &op : as_const(expr).operands())
-        eq_call.arguments().push_back(op);
-      typecheck_side_effect_function_call(eq_call);
-
-      not_exprt neg(
-        typecast_exprt::conditional_cast(std::move(eq_call), bool_typet()));
-      neg.add_source_location() = expr.source_location();
-      expr.swap(neg);
-      return true;
-    }
-  }
+  if(rewritten_comparison_candidate(expr))
+    return true;
 
   return false;
 }
