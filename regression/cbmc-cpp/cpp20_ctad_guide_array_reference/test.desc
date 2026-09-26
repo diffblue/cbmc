@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.deduct.call]/2-3: no decay against a reference parameter;
 for a forwarding reference an lvalue argument deduces `lvalue reference

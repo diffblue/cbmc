@@ -9,6 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.deduct]/5 + [basic.scope.temp]/2: deduction binds only the
 deduced template's own parameters.  An enclosing function template's

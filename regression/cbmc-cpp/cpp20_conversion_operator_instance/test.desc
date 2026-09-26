@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*is unknown.*$
+dropped the body
 --
 [over.match.conv] with [temp.deduct]/8: an instantiated template conversion
 function is not a viable *non-template* conversion-operator candidate; failing

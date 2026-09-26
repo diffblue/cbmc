@@ -10,6 +10,7 @@ main.cpp
 static_assert condition could not be evaluated
 static assertion failed
 ^warning: ignoring
+dropped the body
 --
 N5008 [dcl.constexpr]/6 (constexpr declares the object const) and
 [expr.const] (an element of a constexpr array, a member of a constexpr class

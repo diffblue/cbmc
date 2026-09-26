@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The real cpp11_set_insert_libcxx retains one further layer (nested
 own-param capture in allocator_traits::rebind_alloc's body).

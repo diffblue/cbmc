@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed 2026-07-19: cpp typecheck_expr_alignof disambiguates the GNU
 expression operand like sizeof does.

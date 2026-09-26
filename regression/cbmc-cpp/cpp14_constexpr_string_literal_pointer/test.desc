@@ -10,6 +10,7 @@ main.cpp
 static_assert condition could not be evaluated
 static assertion failed
 ^warning: ignoring
+dropped the body
 --
 N5008 [expr.const], [expr.add]/4, [expr.post.incr], [expr.pre.incr]:
 pointer arithmetic over a string literal in a constexpr function.

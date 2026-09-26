@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Passes in gcc mode on gcc<=13 hosts; fails in CLANG mode anywhere and
 in gcc mode on gcc>=14 hosts (libstdc++-14 <type_traits> unparseable:

@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 [except.ctor]/1-3 call-site unwinding details: an object whose constructor
 throws is not destroyed while the enclosing fully-constructed object is, and

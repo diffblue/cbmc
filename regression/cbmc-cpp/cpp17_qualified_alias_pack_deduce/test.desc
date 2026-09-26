@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.alias]/2 + [temp.deduct.type] + [temp.variadic]/4-5.  Deducing a
 parameter pack through a QUALIFIED alias template (`N::idxseq<J...>`), the

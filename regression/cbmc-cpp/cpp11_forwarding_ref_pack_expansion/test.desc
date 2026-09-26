@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Expanding a forwarding-reference parameter pack `A&&... a` in a call-argument
 pattern `f(static_cast<A&&>(a)...)` now substitutes the type pack A in lockstep

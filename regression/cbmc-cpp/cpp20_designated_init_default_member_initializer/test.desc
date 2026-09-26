@@ -19,6 +19,7 @@ static assertion failed
 ignoring initializer_list
 Invariant check failed
 ^warning: ignoring
+dropped the body
 --
 N5008 [dcl.init.aggr]/3.1 (designators name the explicitly initialized
 elements) and /5.1 (the others take their default member initializer), plus

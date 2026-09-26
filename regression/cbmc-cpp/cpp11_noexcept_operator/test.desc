@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies [expr.unary.noexcept]/3: the noexcept operator correctly
 returns true for non-throwing expressions (builtins, literals, noexcept

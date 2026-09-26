@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.arg.explicit]/3, [temp.deduct.call]/3: a function template called
 with an explicit leading template argument and a trailing parameter pack deduced

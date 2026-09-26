@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 found no match
+dropped the body
 --
 Tests that a caller alias template's ordinary TYPE parameter which
 shares its short name with a namespace-scope alias template used

@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 symbol 'value_type' is unknown
+dropped the body
 --
 The underlying member-conversion throw that per-member recovery
 masks: the qualified-typedef-typed member is dropped from the

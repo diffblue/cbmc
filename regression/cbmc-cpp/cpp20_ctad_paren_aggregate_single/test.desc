@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Runtime-verified with g++ and clang++.  13-line cvise kernel of the
 libc++ ranges views::take pipe (te4).

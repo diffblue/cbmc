@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 replace_type_pack_ref (template_map.cpp) substitutes a pack used as a
 nested-name-specifier (`_Bn::value') per element; the header-free shape is

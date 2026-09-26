@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Multi-argument std::function construction and call (C++17).  Now fully works:
 construction resolves and wires up the handler pointers, operator() forwards all

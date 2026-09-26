@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 does not uniquely resolve
+dropped the body
 --
 N5008 [temp.variadic]/5: when a function template's requires-clause was
 checked, a trailing type parameter PACK was mapped to its FIRST deduced

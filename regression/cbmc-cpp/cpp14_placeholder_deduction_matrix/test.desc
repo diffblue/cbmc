@@ -10,6 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 inconsistent deduction
+dropped the body
 --
 N5008 [dcl.type.auto.deduct] Example 3 and Example 2, [dcl.spec.auto.general]
 Examples 1, 3 and 4: placeholder type deduction for variables (`auto`,

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A member function template with an `auto` return type is converted
 EAGERLY at the call site (typecheck_method_application) so the return

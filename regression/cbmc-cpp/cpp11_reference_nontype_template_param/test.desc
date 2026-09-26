@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 N5008 [temp.param]/4, [temp.arg.nontype]/1-2: a non-type template parameter may
 have reference type, its argument designating a static-storage object (an

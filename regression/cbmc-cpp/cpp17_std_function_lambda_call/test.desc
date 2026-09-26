@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 PARTIAL 2026-07-21: the forward<int&> no-body class is fixed
 (cpp_type2name canonicalizes frontend references so instantiation

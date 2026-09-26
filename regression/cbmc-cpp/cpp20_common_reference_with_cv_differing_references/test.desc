@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Was KNOWNBUG (2026-09-22, found while reducing the gcc 16 failure of
 cpp20_concept_conjunction_requires_params): "static assertion failed:

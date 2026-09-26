@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed in round 45 (trailing-function-pack recording clobbered the LAST
 type pack's deduction).  Kernel runtime-verified with clang++ (g++

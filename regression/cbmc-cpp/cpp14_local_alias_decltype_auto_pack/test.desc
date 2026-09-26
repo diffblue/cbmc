@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [dcl.spec.auto]/2-3 + [temp.variadic]/5.  A decltype(auto) function whose
 body declares a LOCAL type alias and uses it to construct the argument of a

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 cvise reduction of cpp20_map_basic's last layer: the piecewise pair
 construction chain (delegating ctor + _Index_tuple pack-expansion

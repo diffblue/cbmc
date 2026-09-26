@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.arg]/2 + [temp.deduct]/8.  A decltype(auto) function whose body
 expands a pack of REAL std::get calls (`return add(std::get<I>(t)...)`), the

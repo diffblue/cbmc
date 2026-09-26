@@ -7,6 +7,7 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+dropped the body
 --
 Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
 libc++ <tuple>: member typedef _BaseT unknown during tuple_element

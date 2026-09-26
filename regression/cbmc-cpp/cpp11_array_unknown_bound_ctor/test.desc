@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [dcl.array]/1, [dcl.init.aggr]/5: bound of an unknown-bound array `T a[]{...}`
 is deduced from the initializer count, including when T has a user-provided

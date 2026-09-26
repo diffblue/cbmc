@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^expecting code as argument$
+dropped the body
 --
 A call whose callee is a reference (static_cast<F&&>(f) / std::forward<F>(f))
 must invoke the referand object's operator() ([expr.call], [over.call.object]),

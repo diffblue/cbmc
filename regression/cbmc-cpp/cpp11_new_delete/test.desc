@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies [expr.new] and [expr.delete]: non-array new runs the
 constructor and returns a valid pointer; delete runs the destructor

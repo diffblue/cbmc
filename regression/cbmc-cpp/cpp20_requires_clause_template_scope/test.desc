@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.constr.decl]/1: libstdc++'s _RangeAdaptorClosure declares the
 hidden friend `template<typename _Self, typename _Range> requires

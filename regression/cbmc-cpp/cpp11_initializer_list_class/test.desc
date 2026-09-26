@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.init.list]/5: `std::initializer_list<int> il = {1,2,3}` synthesises a
 backing `const int[3]` array and makes `il` refer to it.  Fixed by

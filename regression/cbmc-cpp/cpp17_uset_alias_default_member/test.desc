@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-20: the arity-limited std::__and_/__or_ replacements
 injected by cpp_internal_additions conflicted with the real definition

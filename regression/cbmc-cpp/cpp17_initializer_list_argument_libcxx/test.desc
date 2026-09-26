@@ -13,6 +13,7 @@ static_assert condition could not be evaluated
 found no match for symbol
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.init.list]/5, [support.initlist]: a braced-init-list argument for a
 std::initializer_list<E> parameter, with libc++'s layout.  Non-vacuous: the

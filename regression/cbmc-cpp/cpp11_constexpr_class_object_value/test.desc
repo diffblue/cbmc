@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 Two defects.  A constexpr object of class type was a fold-away macro without
 a value: at namespace scope it was never initialized (`constexpr S g;` with a

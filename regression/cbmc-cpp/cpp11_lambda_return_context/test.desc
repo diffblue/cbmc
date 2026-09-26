@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Guards the exception-safe return_type save/restore around lambda body
 type-checking (hardening; no reachable clobber trigger is known --

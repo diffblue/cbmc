@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 `static' in a lambda-specifier-seq was a parse error; the MSVC 14.51 (Visual
 Studio 2026) STL uses static lambdas unconditionally, so every test including

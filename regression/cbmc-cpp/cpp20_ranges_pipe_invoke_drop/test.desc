@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The ranges pipe's invoke_result_t chain drops main (vacuous SUCCESS
 otherwise; this desc requires the assertion line).  Header-free

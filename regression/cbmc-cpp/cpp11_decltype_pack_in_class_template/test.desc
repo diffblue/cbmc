@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.deduct.call]/1 + [temp.variadic]/5: a class template member typedef
 computed as decltype(declval<F>()(declval<A>()...)) -- a decltype whose call

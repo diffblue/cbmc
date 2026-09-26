@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-22: the char-pointer -> basic_string conversion
 fallback fired for basic_string<wchar_t> too and leaked diagnostics

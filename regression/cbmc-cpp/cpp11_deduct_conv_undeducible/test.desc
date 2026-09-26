@@ -7,6 +7,7 @@ main.cpp
 --
 ^VERIFICATION SUCCESSFUL$
 ^warning: ignoring
+dropped the body
 --
 [temp.deduct]/8 + [temp.deduct.conv]: when the conversion-function
 template's return type does not mention the template parameter,

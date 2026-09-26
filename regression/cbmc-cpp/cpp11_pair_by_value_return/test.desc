@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Returning a class (here std::pair) by value move-constructs the result via the
 defaulted move constructor.  CBMC must generate the memberwise body for the

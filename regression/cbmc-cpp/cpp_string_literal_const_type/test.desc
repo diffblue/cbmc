@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 does not uniquely resolve
+dropped the body
 --
 N5008 [lex.string]/6: string literals are `const char[n]' lvalues, __func__ is
 `static const char[]' ([dcl.fct.def.general]/8), sizeof of a reference type is

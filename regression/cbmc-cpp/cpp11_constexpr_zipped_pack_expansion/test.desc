@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic]/5 + [expr.const]: a constexpr member function template of a
 class template instantiation may expand the enclosing class's parameter pack

@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*found no match.*$
+dropped the body
 --
 N5008 [temp.variadic]/5: pack expansion of a class template parameter pack in
 the type of a data member (the parameter list of a member function-pointer type

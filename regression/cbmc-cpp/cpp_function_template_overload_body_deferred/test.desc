@@ -8,6 +8,7 @@ main.cpp
 ^.*found no match for symbol 'operator\(\)'.*$
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 Regression for function-template overload resolution: the body of a
 named template specialization must not be instantiated while forming a

@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.deduct]/8: the sole function template `f`'s non-deduced defaulted
 template parameter substitutes to `enable_if<true,int>::type` == int (a valid

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [expr.prim.fold] in a trailing-return-type decltype with a
 pack instantiated at size >= 2.  Reducing the fold in typecheck_type

@@ -8,6 +8,7 @@ main.cpp
 --
 ^.*no body for callee.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic] + [temp.mem]: a member function template of a class template
 partial-specialized on a function type R(Args...) whose body uses the enclosing

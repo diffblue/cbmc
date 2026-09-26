@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: "member 'goto_statet::propagation' is not accessible
 (private)" followed by "default constructor of 'struct goto_statet' is

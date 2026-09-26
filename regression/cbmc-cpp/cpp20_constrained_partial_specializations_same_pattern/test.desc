@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.spec.partial.general]/1 + [temp.constr.decl]: partial
 specializations with the same argument pattern `impl<I>` that differ only in

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Namespace-scope T*& with parenthesized initializer loses the pointer
 level in parsing ([dcl.init.general]/16.2 direct-init): "invalid

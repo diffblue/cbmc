@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.capture]: a capture-default captures each odr-used automatic
 local entity -- by copy for `=` (a snapshot at capture time), by reference for

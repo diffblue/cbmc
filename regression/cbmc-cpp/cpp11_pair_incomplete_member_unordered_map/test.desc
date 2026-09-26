@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^(ERROR|error): found no match for symbol 'pair'
+dropped the body
 --
 N5008 [temp.inst]/2: a class template specialization named where a
 completely-defined type is required must be implicitly instantiated.  A member

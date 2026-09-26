@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 template_mapt::apply(exprt &) substitutes operand sub-nodes as expressions
 (their own type and operands are visited); only type nodes and cpp_name

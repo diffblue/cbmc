@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [dcl.fct.def.default]/5: `goto_symex_statet() = default;` with a
 base whose member lacks a default constructor is DELETED, not an error

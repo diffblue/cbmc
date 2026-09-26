@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 C++17 std::make_tuple(1, 2.0) + std::get<0>.  Now CORE (non-vacuous): the run-
 time std::get chain (std::get -> __get_helper -> _Tuple_impl::_M_head ->

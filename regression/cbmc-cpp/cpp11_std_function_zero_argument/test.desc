@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 std::function<int()> (empty _ArgTypes pack) from a functor, a function
 pointer and a lambda; a one-argument lambda for contrast.  The zero-argument

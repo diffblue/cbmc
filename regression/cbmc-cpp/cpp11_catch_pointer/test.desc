@@ -10,6 +10,7 @@ main.cpp
 Invariant check failed
 to_reference_type
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [except.handle]: a `catch(T *)` handler must type-check.  Regression test
 for the invariant violation in cpp_exception_list_rec, which used

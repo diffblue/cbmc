@@ -10,6 +10,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^(ERROR|error): member operator requires
+dropped the body
 --
 N5008 [expr.prim.lambda.general]/4: a lambda parameter written with a concrete
 class name is not a generic (auto) parameter.  CBMC replaced any cpp_name lambda

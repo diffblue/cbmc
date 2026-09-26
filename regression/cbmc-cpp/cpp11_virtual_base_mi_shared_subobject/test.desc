@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [class.mi]/4-6: `D : B1, B2' with `B1 : virtual V' and `B2 : virtual V'
 has ONE V subobject, and a member of V reached through a B2* is that one.

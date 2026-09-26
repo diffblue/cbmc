@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The GCC `__integer_pack` builtin with a CAST argument, as libstdc++ writes
 std::make_integer_sequence (`integer_sequence<T, __integer_pack(T(N))...>`).

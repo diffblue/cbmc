@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-20: copy_parent and the POD-base branch of default_cpctor
 build the slicing casts from the resolved base type (b.type()) instead

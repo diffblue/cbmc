@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 [over.ics.ref]/3: a non-const lvalue reference parameter is not viable for a
 prvalue argument.  The front end marks a materialised temporary (and, via

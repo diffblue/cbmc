@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 GNU attributes after a class-template body: packed, aligned(16) on the
 template, alignas, attribute before the body, nested aligned instances, a

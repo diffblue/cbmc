@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [dcl.fct]/6-7: `using PMF = int (S::*)(int) const;` -- the cv-qualifier-seq
 of a function declarator in a type-id belongs to the function type (it

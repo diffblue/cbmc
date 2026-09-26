@@ -11,6 +11,7 @@ static assertion failed
 static_assert condition could not be evaluated
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.prim.req.compound]/1 + [dcl.type.decltype]/1.4-1.6: the type
 tested by a return-type-requirement is decltype((E)).  Non-vacuous: the last

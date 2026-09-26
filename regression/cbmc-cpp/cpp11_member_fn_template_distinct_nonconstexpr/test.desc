@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.spec]/4 + [temp.inst]/2: each specialization of a member function
 template is a distinct entity, including non-constexpr ones.  When the template

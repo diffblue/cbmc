@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies [temp.inst]/1: a class template specialization is implicitly
 instantiated on demand when a complete class type is required.

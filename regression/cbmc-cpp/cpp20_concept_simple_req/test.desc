@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Simple requirements in requires-expressions are not evaluated.
 The parser skips them and returns true.

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently VACUOUSLY successful: main's conversion throws (the
 __to_address resolution cascade) and the body is truncated at the

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 30-line kernel of gcc-16 <optional>'s silent _M_apply body drop.
 Validity: g++ 13 and clang++ 18 accept (the placement-new declaration

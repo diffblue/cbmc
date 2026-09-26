@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 By-reference variadic constructor parameter-pack expansion for an empty
 recursion-base pack, mirroring the libstdc plus plus _Tuple_impl recursive

@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Wrong verdict: `S()` for a class with default member initializers but no
 user-provided constructor produced the all-zero value (the class is a POD to

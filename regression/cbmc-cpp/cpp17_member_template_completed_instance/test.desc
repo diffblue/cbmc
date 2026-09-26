@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 template scope 'rebind' is ambiguous
+dropped the body
 --
 KNOWNBUG: N5008 [basic.lookup.qual]/[temp.names]/3 -- `T::template
 rebind<int>` lookup fails ("template scope 'rebind' is ambiguous",

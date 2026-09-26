@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: "found no match for symbol 'clear'".  Round-84 diagnosis
 CORRECTION: the candidate IS the element's clear(enum); what fails is

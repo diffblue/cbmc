@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 __builtin_operator_new reached through a variadic forwarding template
 must allocate ([new.delete.single]); it used to fail resolution and

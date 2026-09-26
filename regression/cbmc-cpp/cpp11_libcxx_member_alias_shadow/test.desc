@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 found no match for symbol 'iterator'
+dropped the body
 --
 Member alias `iterator` unresolvable in libc++ mode when a same-named
 class template is forward-declared at namespace scope; emitted

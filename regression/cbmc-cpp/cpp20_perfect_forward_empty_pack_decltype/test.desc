@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Pre-fix: main silently dropped (no diagnostic), then symex invariant
 violation on the malformed global initializer.

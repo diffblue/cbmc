@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.spec.partial.match] / [temp.class.spec] / [expr.sizeof]/5: a class
 template partial specialization whose pattern is a template-id with a pack

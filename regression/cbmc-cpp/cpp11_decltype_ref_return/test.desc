@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 decltype should preserve reference types in return type positions.
 decltype(f()) where f returns T& should yield T&, not T.

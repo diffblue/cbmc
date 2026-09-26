@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [except.handle]/3 base-class matching + value binding, via the goto-level C++
 exception lowering (remove_cpp_exceptions).  Non-vacuous.

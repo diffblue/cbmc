@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 C++17 std::optional copy-initialization from a value
 (`std::optional<int> o = 42;`).

@@ -7,6 +7,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*continue not allowed here.*$
 ^.*break not allowed here.*$
+dropped the body
 --
 Verifies that `break` and `continue` are permitted inside the
 body of a range-based `for` loop, per [stmt.ranged].  Without the

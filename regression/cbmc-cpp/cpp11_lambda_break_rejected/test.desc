@@ -7,6 +7,7 @@ break not allowed here
 ^SIGNAL=0$
 --
 ^VERIFICATION SUCCESSFUL$
+dropped the body
 --
 Rejects-invalid test: break inside a lambda inside a loop must be
 diagnosed ([stmt.break]/1); accepting it would mis-bind the break to

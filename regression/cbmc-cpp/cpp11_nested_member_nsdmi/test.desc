@@ -14,6 +14,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [class.base.init]/9-10 + [class.default.ctor]/3: a class-type member not
 named by a mem-initializer is default-constructed by the enclosing class's

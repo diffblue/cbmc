@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*lvalue-reference specialization selected.*FAILURE.*$
 ^.*rvalue-reference specialization selected.*FAILURE.*$
+dropped the body
 --
 Class-template partial specialization keyed on the argument's reference
 qualifier (`S<T&>` vs `S<T&&>`), N5008 [temp.spec.partial.match] /

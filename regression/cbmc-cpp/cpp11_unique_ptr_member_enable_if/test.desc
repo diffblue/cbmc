@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 instantiating 'std::__enable_if_t' with <FALSE
+dropped the body
 --
 The original hard error (concretizing unique_ptr's =delete'd deleter
 constructor template into enable_if_t<false>::type, [temp.inst]/2) is fixed;

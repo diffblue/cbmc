@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Virtual dispatch with multiple inheritance: qualified call into a
 non-primary base's method which calls a pure virtual on 'this'.

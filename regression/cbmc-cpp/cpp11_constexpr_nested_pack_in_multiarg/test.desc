@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic]/5 + [temp.deduct] + [expr.const]: a constexpr member function
 template body that forms an outer template-id with multiple arguments, one of

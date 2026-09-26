@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A braced argument's conversion to a class type skips the address-of
 insertion when binding a reference constructor parameter that is not

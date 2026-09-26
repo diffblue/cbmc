@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 found no match
+dropped the body
 --
 N5008 [dcl.fct]/8, [temp.inst]: each specialization's trailing decltype is
 evaluated against its own parameter types; the shared synthetic parameter

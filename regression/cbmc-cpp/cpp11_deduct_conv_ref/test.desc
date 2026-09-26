@@ -10,6 +10,7 @@ main.cpp
 ^bad reference initializer$
 ^warning: ignoring
 ^.*FAILURE$
+dropped the body
 --
 [temp.deduct.conv]/2 + /4 + [over.match.ref]: template
 conversion-operator deduction for reference targets.  When the

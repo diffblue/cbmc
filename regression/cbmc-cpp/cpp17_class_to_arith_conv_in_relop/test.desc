@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^.*implicit arithmetic conversion not permitted.*$
+dropped the body
 --
 Verifies that a class operand with a single arithmetic-typed
 user-defined conversion operator is converted via that operator

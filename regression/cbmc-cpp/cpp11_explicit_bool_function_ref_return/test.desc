@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^(ERROR|error): invalid implicit conversion
+dropped the body
 --
 N5008 [dcl.decl]/4, [conv.bool]: a class template partial specialization matched
 on a function type with a reference return and no parameters (fn<int&()>, the

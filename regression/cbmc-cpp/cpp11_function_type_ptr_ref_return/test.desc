@@ -12,6 +12,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.decl]/4, [dcl.ambig.res]: an empty () after a ptr/ref-qualified
 declarator is a function parameter-list, so int*(), int&(), int&&() are function

@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*expected expression, but got type.*$
 ^.*member designator index.*out of bounds.*$
+dropped the body
 --
 C++20 qualified concept name as a template type-constraint
 ([temp.param]/4, [temp.names]).  A constrained parameter

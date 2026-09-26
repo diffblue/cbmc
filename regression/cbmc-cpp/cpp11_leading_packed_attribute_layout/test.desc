@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 `struct __attribute__((packed)) P { ... }` (attribute between class-key
 and name): the parser folded the attribute onto the struct but recorded

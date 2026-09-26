@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 N5008 [temp.variadic]/5,7: a class template's member operator()(A... args)
 whose body expands the class pack (forward<A>(args)...) for an EMPTY pack

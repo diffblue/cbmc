@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 decltype of an indirection must be T& ([dcl.type.decltype]/1.5,
 [expr.unary.op]/1); it used to collapse to T, breaking assignment

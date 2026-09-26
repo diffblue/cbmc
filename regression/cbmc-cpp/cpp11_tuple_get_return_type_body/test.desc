@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 get's instance loses its body when the return type goes through the
 recursive tuple_element machinery; banked 2026-08-05 (round 15) from

@@ -11,6 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 not an lvalue
+dropped the body
 --
 N5008 [class.union.anon]/1, [expr.ref]/6.2: the anonymous union subobject
 reached through `this' is an lvalue, so its array member's elements are

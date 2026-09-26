@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.init]/15-16: a block-scope `S x = "s";` copy-initialization in
 a variadic function-template body.  The pack expander used to CREATE an

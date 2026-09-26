@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 C++17 std::apply(add, make_tuple(1, 2)) over real libstdc++ <tuple>.  Now CORE.
 Greened by a chain of C++ front-end fixes for the machinery std::apply relies

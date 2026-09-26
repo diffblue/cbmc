@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^VERIFICATION
+dropped the body
 --
 A new-expression of a type whose default constructor is private must be
 rejected, per expr.new and class.access.

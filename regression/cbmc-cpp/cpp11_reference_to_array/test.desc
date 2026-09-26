@@ -10,6 +10,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The wrong-code shape (assertion 3) is the important one: before the
 fix the "reference" copied the array and the write did not alias.

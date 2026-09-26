@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 FAILURE
+dropped the body
 --
 N5008 [class.access.base]/4-5: derived-to-private-base conversion is
 accessible in a FRIEND of the derived class.  Was judged only from the

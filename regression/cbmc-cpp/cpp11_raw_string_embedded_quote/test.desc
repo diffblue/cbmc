@@ -8,6 +8,7 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-21: the RAW_STRING_CONTENT pending-close flush keeps
 the longest suffix that can still start the )delimiter" terminator;

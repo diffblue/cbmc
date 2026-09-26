@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^warning: ignoring
 ^.*FAILURE$
+dropped the body
 --
 [temp.deduct.partial]/3.2 + [over.match.best]/2: partial ordering
 across conversion-function template specialisations resolves the

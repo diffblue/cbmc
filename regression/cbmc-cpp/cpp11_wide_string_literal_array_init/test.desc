@@ -12,6 +12,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.init.string]/1: `const wchar_t w[] = L"de";' -- an array of
 character type initialized from a string literal of the matching kind takes

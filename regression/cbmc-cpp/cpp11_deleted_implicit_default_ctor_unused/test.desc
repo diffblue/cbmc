@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [class.default.ctor]/2: a defaulted default constructor whose
 member or base has no default constructor is defined as DELETED;

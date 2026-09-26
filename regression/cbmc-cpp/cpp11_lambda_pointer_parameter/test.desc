@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 User-reported Issue 11: a lambda parameter's declarator (pointer, array,
 function, reference to array) is part of its type ([dcl.fct]/5).

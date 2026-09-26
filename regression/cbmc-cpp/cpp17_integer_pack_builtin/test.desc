@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The GCC `__integer_pack(N)` builtin, used by libstdc++'s std::make_index_sequence
 (`integer_sequence<T, __integer_pack(N)...>`).  Previously rejected ("symbol

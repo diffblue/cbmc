@@ -8,6 +8,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: assertions 2 and 3 FAIL -- the return-type-requirement of a
 compound requirement is never satisfied.

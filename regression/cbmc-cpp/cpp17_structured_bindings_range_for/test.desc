@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Structured bindings as the for-range-declaration (N5008
 [stmt.ranged]/1, [dcl.struct.bind]) over an iterator range, by value

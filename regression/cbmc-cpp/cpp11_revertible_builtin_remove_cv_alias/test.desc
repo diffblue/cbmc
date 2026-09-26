@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 Alias templates named __remove_cv / __remove_reference (libstdc++ <= 12) are
 ordinary identifiers: the builtin reading needs a following '('.  Reference

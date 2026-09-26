@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 GCC alignment semantics in C++: aligned(n) increase-only on members and
 class definitions, exact in a typedef, ignored on a class type in an

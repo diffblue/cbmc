@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [namespace.udecl]/2 + [class.inhctor.init]: an inheriting constructor
 declaration (`using Base::Base;`) inherits the base's constructor *templates*

@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.deduct]/5: deduced template parameter values are available to subsequent
 default template arguments.  A constructor template constrained by a SFINAE

@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [over.match.funcs]/[over.ics.user]: a function template with a fixed
 class-type parameter S is viable when the argument is convertible to S via a

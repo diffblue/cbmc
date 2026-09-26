@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 elaborate_class_template refuses to re-enter the elaboration of a
 specialization whose partial specializations are being matched

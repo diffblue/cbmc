@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [expr.mptr.oper]/3: (ref().*pmf)(args) where ref() returns S& -- the
 bound object is a plain S*, not a reference-typed pointer (libstdc++'s

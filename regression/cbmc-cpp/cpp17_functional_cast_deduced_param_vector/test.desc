@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The bounded reproducer sums a 3-element static range through a
 ranges-style `template <class C> operator C()`, requiring

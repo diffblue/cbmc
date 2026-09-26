@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 alignas / __attribute__((aligned)) before a typedef-name in a member
 declaration; the stronger of the specifier and the typedef alignment wins.

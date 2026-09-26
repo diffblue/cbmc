@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Anonymous union with a class-type variant member (with a base):
 the class builds, the variant member is visible and assignable

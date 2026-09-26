@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.variadic]/7 + [expr.const]: a pack expansion whose pack expands to
 zero elements produces an empty list.  When a (member) function template is

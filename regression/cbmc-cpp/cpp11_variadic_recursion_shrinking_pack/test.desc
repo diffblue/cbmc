@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^could not fully type-check
+dropped the body
 --
 elaborate_class_template's same-template recursion limit (two nested
 instantiations of one template) now admits an instance with strictly fewer

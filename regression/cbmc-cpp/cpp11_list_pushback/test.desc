@@ -6,5 +6,6 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 std::list<int>::push_back runs BMC with --validate-goto-model.

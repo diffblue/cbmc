@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed in round 53 (the V1/V2 arc's first correctness increment): while a
 specialization is instantiated, a sibling/enclosing instantiation's

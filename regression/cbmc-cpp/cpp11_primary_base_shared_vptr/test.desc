@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 could not fully type-check
+dropped the body
 --
 Itanium C++ ABI 2.4 II.1 (g++/clang; N5008 leaves the layout of a dynamic
 class to the implementation): a class shares its primary base's virtual

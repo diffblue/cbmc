@@ -7,6 +7,7 @@ main.cpp
 --
 ^.*invalid implicit conversion from '<<type:cpp_name>>' to 'signed int'.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies that the constexpr-eager-convert path detects unresolved
 cpp_names appearing as the `type` field of a sub-expression in the

@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.prim.fold]/1-2: a fold over the parameter pack of a variable
 template or of a function template WITHOUT a function parameter pack

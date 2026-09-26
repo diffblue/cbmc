@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 invalid implicit conversion
+dropped the body
 --
 N5008 [dcl.init.ref]/5: a non-const lvalue reference does not bind an rvalue, so
 a converting constructor `T(X&)` is not viable for an rvalue argument.

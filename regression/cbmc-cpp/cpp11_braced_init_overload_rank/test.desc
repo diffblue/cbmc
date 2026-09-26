@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 does not uniquely resolve
+dropped the body
 --
 N5008 [over.match.list], [over.ics.list], [over.ics.rank]: list-initializing a
 class from a braced-init-list ranks its constructors by the element conversion

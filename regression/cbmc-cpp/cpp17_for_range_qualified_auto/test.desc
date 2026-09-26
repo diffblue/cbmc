@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*member operator requires.*<<type:auto>>.*$
+dropped the body
 --
 Verifies that range-based-for `auto` deduction handles qualified
 forms (`const auto&`, `auto&`, `auto*`).  Without the fix, only

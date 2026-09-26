@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed 2026-07-19: post-throw retry of requires-clause evaluation
 (call atoms only; concept-id folds stay untrusted).

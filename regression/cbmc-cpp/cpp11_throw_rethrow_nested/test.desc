@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [except.throw]/8 -- a bare `throw;` re-propagates the exception the handler it
 appears in is handling.  Fixed by keying the exception being handled per handler

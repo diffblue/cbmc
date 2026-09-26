@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*operator '-' not defined.*$
+dropped the body
 --
 A constructor template whose requires-clause is unsatisfied for the deduced
 arguments must be removed from overload resolution ([temp.constr.decl]/1).

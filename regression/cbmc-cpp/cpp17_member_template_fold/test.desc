@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.prim.fold] + [temp.variadic]/5: a fold expression over a
 function parameter pack in a MEMBER function template's body is now

@@ -8,6 +8,7 @@ main.cpp
 --
 ^.*found no match for symbol.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 A user-defined conversion (iterator -> const_iterator) via a converting
 constructor template whose parameter is a class-template-id (Iter<Q, C>) is

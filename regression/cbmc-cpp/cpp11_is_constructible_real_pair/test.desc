@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [meta.unary.prop], [meta.rel]/2: is_constructible<pair<const int,int>,
 pair<int,int>&&> is true (g++/clang++ agree).  Was a KNOWNBUG: libstdc++'s

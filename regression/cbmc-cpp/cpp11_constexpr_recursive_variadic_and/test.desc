@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.deduct]/[temp.variadic]: a variadic class template partial
 specialization whose base-class non-type argument names the same template with

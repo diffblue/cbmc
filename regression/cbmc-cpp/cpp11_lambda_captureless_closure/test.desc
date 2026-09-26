@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^.*CONVERSION ERROR.*$
+dropped the body
 --
 [expr.prim.lambda.closure]/1 + §7.5.6.2: a captureless, non-generic lambda is
 lowered to a closure class (struct) with operator() (the body) and a

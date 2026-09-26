@@ -13,6 +13,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 found no match for symbol
+dropped the body
 --
 N5008 [over.ics.list]/6 + [dcl.init.list]/3.4: a braced-init-list converts to a
 reference to an array of known bound when it fits and every element converts;

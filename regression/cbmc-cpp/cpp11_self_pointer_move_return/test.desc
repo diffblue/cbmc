@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [class.copy.elis]/[stmt.return]/2 -- returning a local by value
 used to relocate the object BITWISE through the return-value mechanism

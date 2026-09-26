@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.param]/6, [temp.arg.nontype]/2: a pointer non-type template
 parameter's argument is the address of a static-storage object.  Verifies the

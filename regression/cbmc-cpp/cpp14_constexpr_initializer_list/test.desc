@@ -11,6 +11,7 @@ static_assert condition could not be evaluated
 static assertion failed
 ^warning: ignoring
 Invariant check failed
+dropped the body
 --
 N5008 [dcl.init.list]/5-6, [expr.const]/11, [expr.add], [expr.eq]: a
 constexpr function over a std::initializer_list argument.  Non-vacuous: the

@@ -9,6 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Was KNOWNBUG: mixed-period duration operator+ (minutes + seconds)
 returned nondet ([time.duration.nonmember]).  Three stacked front-end

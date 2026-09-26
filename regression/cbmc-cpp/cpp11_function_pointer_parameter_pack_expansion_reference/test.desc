@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 A member function parameter that is a POINTER TO FUNCTION whose parameter
 list expands the class's pack (`fn(R (*g)(A...))' of fn<R(A...)>) kept a

@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*is unknown.*$
+dropped the body
 --
 [temp.deduct]/5 with [temp.constr.decl]/1: a function-template specialisation
 whose associated constraints (its requires-clause) are not satisfied by the

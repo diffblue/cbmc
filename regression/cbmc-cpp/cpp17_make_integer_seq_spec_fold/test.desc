@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The clang builtin __make_integer_seq materialises
 integer_sequence<unsigned long, 0, 1, 2>, which is matched by a

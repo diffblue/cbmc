@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 std::is_invocable / invoke_result over a _Bind object evaluated BEFORE any
 direct call of it.  The result_of partial specialization used to pick up a

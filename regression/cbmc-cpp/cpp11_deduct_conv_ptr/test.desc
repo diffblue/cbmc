@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 [temp.deduct.conv]/3: when A is not a reference type, P is
 adjusted (array→pointer, function→pointer, drop top-level cv).

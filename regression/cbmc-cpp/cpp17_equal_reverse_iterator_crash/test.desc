@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: invariant violation (namespace lookup,
 vector<...>::reverse_iterator not found) -- a CRASH, not a drop.

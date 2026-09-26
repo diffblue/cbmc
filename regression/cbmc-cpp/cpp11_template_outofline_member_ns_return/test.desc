@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.inst]/2, [basic.lookup.unqual]: a class template's (out-of-line) member is
 instantiated in the context of the instantiated class, so a namespace-scope

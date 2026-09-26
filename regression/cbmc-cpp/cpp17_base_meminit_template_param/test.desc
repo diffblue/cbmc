@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-21: full_member_initialization lowers explicit POD-base
 mem-initializers to slicing assignments ([class.base.init]/7),

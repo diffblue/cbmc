@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 [temp.deduct.conv]/4: top-level cv-qualifiers on A are ignored
 during deduction.  This test verifies that conversion to a

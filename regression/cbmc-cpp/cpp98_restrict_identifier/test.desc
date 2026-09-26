@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 Fixed 2026-07-21: `restrict` is only a keyword in C mode
 (scanner.l conditional_keyword); C++ treats it as an identifier

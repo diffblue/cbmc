@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 __numeric_traits_integer template scope lost in C++20 mode.
 Works with --cpp17.

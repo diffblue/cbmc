@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [expr.prim.fold] + [dcl.fct]/8: a fold-expression in a
 function's trailing-return-type decltype.  Fold reduction previously

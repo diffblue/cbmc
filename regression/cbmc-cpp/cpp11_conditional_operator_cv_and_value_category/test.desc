@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.cond]/4: operands of the same underlying type differing in
 cv-qualification or value category.  Two glvalues of the same category: the

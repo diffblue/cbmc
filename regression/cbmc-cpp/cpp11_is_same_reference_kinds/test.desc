@@ -10,6 +10,7 @@ main.cpp
 static assertion failed
 static_assert condition could not be evaluated
 ^warning: ignoring
+dropped the body
 --
 N5008 [dcl.ref], [meta.rel] (is_same).  Non-vacuous: the last assertion is
 deliberately wrong and must FAIL.  Before the fix: "static assertion failed:

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [class]/4 + [expr.sizeof]/2: a complete object of class type has
 NONZERO size; g++/clang give sizeof(empty) == 1.  CBMC lays empty

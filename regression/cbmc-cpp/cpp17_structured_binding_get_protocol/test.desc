@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [dcl.struct.bind]/4: when std::tuple_size<E> is a complete type with a member
 `value`, a structured binding binds each name to get<i>(e) (typed

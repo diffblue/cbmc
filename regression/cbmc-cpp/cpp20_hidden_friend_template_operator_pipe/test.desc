@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A hidden friend function TEMPLATE of a class template uses the
 injected-class-name as a parameter type and a constrained forwarding

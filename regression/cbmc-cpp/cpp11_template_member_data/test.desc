@@ -8,6 +8,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Defense-in-depth coverage for the MSVC atomic_flag::_Storage pattern
 (in isolation): a non-template class has a data member of an

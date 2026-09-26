@@ -11,6 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 static assertion failed
+dropped the body
 --
 N5008 [meta.unary.prop]: __is_empty, __is_polymorphic, __has_virtual_destructor,
 __is_standard_layout, __is_aggregate, __is_literal_type and __is_pod evaluated

@@ -13,6 +13,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [meta.rel]/2: is_same<T,U> is true iff T and U are the same type
 including cv-qualifiers.  CBMC's __is_same compared types with

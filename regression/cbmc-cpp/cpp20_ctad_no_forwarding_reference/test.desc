@@ -10,6 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 Invariant check failed
+dropped the body
 --
 N5008 [temp.deduct.call]/3 (last sentence) + [dcl.init.general]/9: for
 libstdc++'s `__can_owning_view<int(&)[5]>` (`owning_view{declval<_Range>()}`)

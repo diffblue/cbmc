@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 is not accessible
+dropped the body
 --
 N5008 [class.friend]/3: a friend declaration naming a class via a
 simple-type-specifier (`friend B;`, no class/struct keyword) befriends that

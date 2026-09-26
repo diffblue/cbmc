@@ -11,6 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 static assertion failed
+dropped the body
 --
 N5008 [dcl.constexpr]/6 (a constexpr static member array is const),
 [dcl.init.ref] (a reference-to-array parameter denotes the whole array in the

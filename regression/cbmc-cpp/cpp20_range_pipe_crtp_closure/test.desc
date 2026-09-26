@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 End-to-end range-pipe shape mirroring libc++ views::take: a CRTP
 __range_adaptor_closure base with a hidden friend template operator|

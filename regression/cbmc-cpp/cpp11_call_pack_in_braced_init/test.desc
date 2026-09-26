@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.variadic]/5 + [dcl.init.aggr].  A variadic function template whose
 body expands a pack of CALLS inside a BRACED (aggregate) initializer

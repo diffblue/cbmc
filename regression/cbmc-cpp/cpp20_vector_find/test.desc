@@ -10,6 +10,7 @@ main.cpp
 ^.*is unknown.*$
 ^CONVERSION ERROR$
 ^.*no body for callee.*$
+dropped the body
 --
 std::find over a populated std::vector verifies genuinely once the iterator
 instance's member functions are instantiated on demand ([iterator.concepts.general]

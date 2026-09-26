@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.names]/5.  The `template` keyword before a member template-id is
 only required for a dependent nested-name-specifier; for a non-dependent

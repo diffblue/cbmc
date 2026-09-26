@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 GCC alignment semantics in C++: packed + aligned(n) is exactly n (alignof);
 a struct containing an aligned class-template instance (directly, as an

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Minimal guard for the basic_string conversion-fallback misfire on
 wide-char instantiations (name-keyed fallback + leaked speculative

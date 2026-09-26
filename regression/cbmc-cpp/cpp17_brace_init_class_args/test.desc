@@ -9,6 +9,7 @@ main.cpp
 found no match for symbol 'ireptish'
 unexpected expression: struct
 invalid implicit conversion
+dropped the body
 --
 Regression for [over.match.list]-conforming brace-init in
 class-typed constructor arguments.

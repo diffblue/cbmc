@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Was KNOWNBUG since round 152 (main() partially type-checked; the converting
 constructor found no match).  Fixed 2026-09-23 by the round-158 part-4

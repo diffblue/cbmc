@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Body-side sibling of cpp20_requires_empty_pack_expansion: the
 new-initializer pack expansion over an EMPTY pack during function

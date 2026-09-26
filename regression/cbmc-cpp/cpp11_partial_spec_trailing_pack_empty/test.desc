@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Pre-fix: symex invariant violation (assign_from_struct operand count).
 Runtime-verified with clang++.

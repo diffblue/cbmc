@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 A partial specialization over a function type must be matched when a
 parameter of the argument is a reference or pointer; the deduced

@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 A class with a user-provided constructor is not an aggregate, so a
 braced-init-list invokes a constructor rather than member-wise aggregate

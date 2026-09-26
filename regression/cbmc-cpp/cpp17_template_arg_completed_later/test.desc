@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 An instance created at a declaration-only point (incomplete argument
 type) is cached and served stale after the type is completed and the

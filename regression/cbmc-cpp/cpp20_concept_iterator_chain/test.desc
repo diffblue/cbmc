@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 C++20 iterator concepts evaluated over a user-defined *class* iterator: the deep
 concept chain random_access_iterator -> bidirectional -> forward -> input ->

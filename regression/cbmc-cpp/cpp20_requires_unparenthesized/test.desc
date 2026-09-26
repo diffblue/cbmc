@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.pre]/1: a requires-clause `requires Integral<T>` followed
 directly by the declaration's type name (`T identity(T a)`).  Was KNOWNBUG

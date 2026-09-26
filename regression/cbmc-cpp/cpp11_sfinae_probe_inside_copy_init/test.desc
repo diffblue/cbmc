@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 could not fully type-check
+dropped the body
 --
 N5008 [over.best.ics.general]/4 only restricts the conversions for the
 constructor candidates of one copy-initialization; a SFINAE probe nested in

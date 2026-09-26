@@ -11,6 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 static assertion failed
+dropped the body
 --
 N5008 [expr.prim.req.general]/3-4: a requires-expression's parameters are bound
 in a scope of their own before its requirements are evaluated, in every

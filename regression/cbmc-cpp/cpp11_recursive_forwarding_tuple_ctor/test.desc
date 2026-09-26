@@ -9,6 +9,7 @@ main.cpp
 ^EXIT=10$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [class.base.init] + [temp.variadic] + [temp.param]/11: a recursive variadic
 forwarding constructor (the std::_Tuple_impl shape) whose member-initializer

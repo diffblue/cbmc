@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: "symbol 'Tp' is unknown" resolving the friend's
 requires-clause at namespace scope; the candidate is dropped and main

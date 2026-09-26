@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*operand of unary \* '\*move.*not a pointer.*$
+dropped the body
 --
 Verifies that `add_implicit_dereference` doesn't fire twice on a
 function-call result whose return type is an rvalue reference

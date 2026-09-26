@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.* does not uniquely resolve:
+dropped the body
 --
 Verifies that an unqualified call to a static member function from
 inside a derived class resolves to the derived-class member when the

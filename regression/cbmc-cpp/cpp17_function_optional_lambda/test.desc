@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=(0|10)$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A capturing lambda converts to std::function<std::optional<T>(T)> and
 is invoked through a member (the instructiont::transform shape from

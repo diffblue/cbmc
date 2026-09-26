@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 User-reported: `offsetof(CMD, in_dtype)` on an alias of a typedef'd
 anonymous packed struct -- "offset-of of member failed to find

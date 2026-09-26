@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 A class template partial specialization whose parameter pack follows fixed
 (non-deduced) template arguments, selected via the partial-specialization

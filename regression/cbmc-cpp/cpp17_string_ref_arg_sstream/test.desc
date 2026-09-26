@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 found no match for symbol 'take'
 invalid implicit conversion from 'char \[6l\]' to 'struct basic_string'
+dropped the body
 --
 Regression for `char[N]` -> `const std::string&` implicit
 conversion in argument position, when `<sstream>` (or any header

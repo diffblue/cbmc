@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Runtime-verified with clang++ (g++ rejects the alias-template pack
 deduction shape).

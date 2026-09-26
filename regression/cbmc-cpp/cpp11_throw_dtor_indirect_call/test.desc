@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [except.ctor]/1-3 across indirect calls: function-pointer and virtual-function
 removal carry the call-site unwind-cleanup association onto the concrete calls

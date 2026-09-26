@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 main exercises std::set::insert, std::set::size and std::set::count.  The
 libstdc++ red-black-tree insertion (std::_Rb_tree_insert_and_rebalance) is

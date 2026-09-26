@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^warning: ignoring
+dropped the body
 --
 Header-free iostream-shaped diamond destructor chain; guards the flat
 pointer convention agreement between make_ptr_typecast and

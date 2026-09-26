@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.inst]/11 + [temp.explicit]: an extern template (explicit
 instantiation declaration) must not force instantiation of an unused,

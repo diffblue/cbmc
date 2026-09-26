@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 C++17 aggregate initialization with a base-class element (N5008
 [dcl.init.aggr]/2.2): `derived{{}, 7}` in a RETURN expression, where

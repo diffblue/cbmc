@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.spec.partial] + [temp.variadic]/4-5.  A VARIABLE TEMPLATE partial
 specialization whose pattern deduces a parameter PACK

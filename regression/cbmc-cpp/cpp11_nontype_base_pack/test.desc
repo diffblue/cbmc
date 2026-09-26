@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Base-specifier pack expansion over a partial specialization's LEADING
 NON-TYPE pack ([temp.variadic]/5.2): the __tuple_leaf<_Indx>... bases

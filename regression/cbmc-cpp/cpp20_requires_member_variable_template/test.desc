@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.constr.atomic]/1: a constructor template constrained by a
 requires-clause naming a MEMBER variable template whose default

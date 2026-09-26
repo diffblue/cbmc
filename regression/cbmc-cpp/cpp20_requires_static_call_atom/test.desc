@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed: the satisfaction check now type-checks call atoms in a
 manifestly-constant-evaluated context ([temp.constr.atomic]/1 +

@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*is unknown.*$
+dropped the body
 --
 [temp.constr.op]/[temp.deduct]/5: a conversion-function template whose
 requires-clause is a disjunction (integral<T> or floating_point<T>) is removed

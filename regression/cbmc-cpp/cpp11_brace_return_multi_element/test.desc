@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^invalid implicit conversion from$
+dropped the body
 --
 Regression for the MSVC `<map>` _Try_emplace multi-element braced
 return failure.  Per [stmt.return]/3, `return { a, b };` in a

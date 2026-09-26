@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 does not uniquely resolve
+dropped the body
 --
 Regression for [class.conv.ctor] / [over.match.copy] in the
 template-constructor fallback of

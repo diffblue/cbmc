@@ -17,6 +17,7 @@ main.cpp
 ^CONVERSION ERROR$
 function call expects function
 not an lvalue
+dropped the body
 --
 GCC __atomic_*/__sync_* builtins in C++ (GNU extension; GCC reference
 "__atomic Builtins").  Non-vacuous: the last assertion is deliberately wrong

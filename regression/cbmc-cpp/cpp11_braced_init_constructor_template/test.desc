@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 found no match for symbol
+dropped the body
 --
 N5008 [over.match.list]/2.2, [over.match.ctor], [temp.deduct]: constructor
 templates participate in list-initialization of a class from a braced-init-list.

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Passes trivially where the system preprocessor lacks the builtin
 (clang <= 21, gcc); FAILS with a parse error in an archlinux/clang-22

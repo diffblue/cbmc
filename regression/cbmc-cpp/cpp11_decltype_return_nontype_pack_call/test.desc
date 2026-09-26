@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.deduct]/2,5 + [temp.variadic]/4-5.  A function template whose
 trailing return type is a `decltype` of a CALL containing a pack expansion,

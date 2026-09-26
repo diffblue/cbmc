@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [except.ctor]/1-3, [except.throw]/4 -- an automatic object in an outer scope
 that is exited because the exception does not match an inner handler must be

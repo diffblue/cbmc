@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 found no match for symbol 'look'
+dropped the body
 --
 N5008 [namespace.udecl]/16, [class.member.lookup]/4: a base-class member
 introduced by a using-declaration joins the derived class's same-named members

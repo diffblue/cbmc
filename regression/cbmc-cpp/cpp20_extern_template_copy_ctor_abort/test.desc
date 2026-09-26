@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Resolution 2026-07-30: the reproducer is a clang-builtin shape
 (__remove_reference_t in a default argument); under --cpp20 alone the

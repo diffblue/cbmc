@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^no body for callee$
+dropped the body
 --
 std::set erase uses std::_Rb_tree_rebalance_for_erase (a libstdc++
 compiled-library helper); CBMC models it as the binary-search-tree erase plus

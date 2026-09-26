@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.inst]/11 with an out-of-line member definition: the unused,
 ill-formed-when-instantiated bad() must not be instantiated or cause an error.

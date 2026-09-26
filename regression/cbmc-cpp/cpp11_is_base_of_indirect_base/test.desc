@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [meta.rel] is_base_of, [class.derived.general]/2: a base class may be
 indirect.  __is_base_of(input_iterator_tag, random_access_iterator_tag) and

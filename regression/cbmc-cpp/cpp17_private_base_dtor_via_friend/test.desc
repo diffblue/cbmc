@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*' is not accessible$
+dropped the body
 --
 Implicit destructor synthesis on a derived class must honour the
 namespace-aware struct_tag form when checking inherited-base

@@ -6,6 +6,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Type-checking succeeds but --validate-goto-model fails due to
 constexpr (is_macro) functions not being in the goto function map.

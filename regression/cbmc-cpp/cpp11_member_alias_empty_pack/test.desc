@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The --stdlib libc++ flag engages the CLANG-preprocessor-gated
 member-alias enclosing pre-bind (the file itself is header-free).

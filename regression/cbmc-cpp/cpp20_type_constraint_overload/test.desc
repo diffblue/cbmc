@@ -14,6 +14,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.param]/4 (a type-constraint introduces C<T>), [temp.constr.decl]/3,
 [over.match.viable].  Non-vacuous: the last assertion is deliberately wrong and

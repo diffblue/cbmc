@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Verified to FAIL (wrong-code) with the fix reverted.  Runtime-verified
 with g++ and clang++.

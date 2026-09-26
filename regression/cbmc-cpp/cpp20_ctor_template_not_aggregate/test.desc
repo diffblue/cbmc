@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.init.aggr]/1: a user-declared constructor template (not stored as a
 struct component; the type carries `has_template_constructor`) makes the class

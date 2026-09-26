@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^found no match
+dropped the body
 --
 A constructor template's constraint evaluates an is_convertible probe whose
 parameter copy-initialization needs another class's converting constructor

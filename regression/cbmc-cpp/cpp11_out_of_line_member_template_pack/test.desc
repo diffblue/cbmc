@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.mem.func] + [temp.inst]/2: an out-of-line-defined member function
 template of a class template is instantiated from its definition.  Fixed by

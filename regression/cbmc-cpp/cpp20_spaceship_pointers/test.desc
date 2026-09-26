@@ -12,6 +12,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 found no match for symbol
+dropped the body
 --
 N5008 [expr.spaceship]/8: three-way comparison of pointers.  Non-vacuous: the
 last assertion is deliberately wrong and must FAIL.  Before the fix:
