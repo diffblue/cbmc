@@ -1864,12 +1864,14 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
       actual_decl = to_code(actual_decl.op0());
     }
 
-    // Use the declared variable, contextually converted to bool, as
-    // the condition.
+    // Use the declared variable as the condition; typecheck_ifthenelse
+    // below converts it to bool ([stmt.select.general]/4, [conv.bool]).
+    // Converting here as well made the C typechecker re-visit an already
+    // converted node, which for a floating-point object is an
+    // `ieee_float_notequal' it does not accept ("unexpected expression";
+    // libstdc++'s `if (_Tp __a = ...)' in the three-argument std::hypot).
     const auto &decl_symbol = to_code_frontend_decl(actual_decl).symbol();
-    exprt cond_expr = decl_symbol;
-    implicit_typecast_bool(cond_expr);
-    code.cond() = cond_expr;
+    code.cond() = decl_symbol;
 
     // Type-check the condition and both branches as usual (still inside
     // the condition's scope, [stmt.pre]/6: the name is visible in both
@@ -1971,12 +1973,15 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
     // Extract the declared variable from the declaration
     const auto &decl_symbol = to_code_frontend_decl(actual_decl).symbol();
 
-    // Build: if(!var) break;
-    exprt cond_expr = decl_symbol;
-    implicit_typecast_bool(cond_expr);
+    // Build: if(!var) break;  -- the `!' is type-checked with the new body
+    // and converts its operand to bool itself ([expr.unary.op]/9), so the
+    // variable is left unconverted here (see typecheck_ifthenelse).
     code_breakt break_stmt;
     break_stmt.add_source_location() = code.source_location();
-    code_ifthenelset if_break(not_exprt(cond_expr), std::move(break_stmt));
+    exprt negated{ID_not, typet{}};
+    negated.add_to_operands(exprt{decl_symbol});
+    negated.add_source_location() = code.source_location();
+    code_ifthenelset if_break(std::move(negated), std::move(break_stmt));
 
     // Build the new body: { decl; if(!var) break; old_body; }
     code_blockt new_body({std::move(decl), std::move(if_break), code.body()});
