@@ -8,7 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-dropped the body of system-header function '_M_construct'
+dropped the body
 --
 Was KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only: basic_string's
 four same-named `_M_construct' members got each other's out-of-line bodies
@@ -17,6 +17,8 @@ was "not an lvalue", and a definition renaming a parameter (`__str') left the
 body with an unknown symbol.  Fixed in round 161
 (cpp11_out_of_line_member_template_overloads,
 cpp11_anonymous_union_array_member_lvalue).  Runs where the host gcc is >= 16
-(tag libstdcxx16).  The `basic_string(const _CharT *, const _Alloc &)'
-constructor body of the OTHER character types is still dropped (a
-template-map confusion between basic_string instances; the char one converts).
+(tag libstdcxx16).  Round 162: no system-header body is dropped any more
+(the `basic_string(const _CharT *, const _Alloc &)' constructors of the other
+character types converted once out-of-line member templates of a class were
+matched by signature and speculative constructor-template instances stopped
+being converted).
