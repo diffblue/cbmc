@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ default argument constructs the class being defined: SUCCESS$
+^\[main\.assertion\.2\] line \d+ default argument names a later static member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ default arguments naming the class template's parameter: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown$
+dropped the body
+--
+N5008 [class.mem.general]/7-8: a default argument in a class's
+member-specification is a complete-class context.  Checking it while the class
+was still being defined failed on `= path()` (the class's own constructor) and
+on `= _S_default` (a static member declared further down), which aborted the
+rest of the class body: every later member -- data members included -- was
+unknown, and each method referring to one was dropped.  This is libstdc++'s
+std::filesystem::path (`replace_extension(const path & = path())').

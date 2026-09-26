@@ -1098,6 +1098,7 @@ protected:
 
   void
   typecheck_function_call_arguments(side_effect_expr_function_callt &) override;
+  exprt typecheck_deferred_default_argument(const exprt &deferred);
 
   void instantiate_generic_lambda(side_effect_expr_function_callt &);
 
