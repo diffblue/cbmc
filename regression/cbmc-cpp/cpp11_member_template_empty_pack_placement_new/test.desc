@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ value-initialization through an empty pack: new\(\(void\*\)p\) int\(\): SUCCESS$
@@ -21,7 +21,9 @@ U(forward<Args>(args)...)' is `::new((void *)p) U()' (value-initialization,
 (std::construct_at) this works since round 162
 (cpp20_construct_at_empty_pack_placement_new); for a MEMBER function
 template of a class template -- libc++'s `allocator<T>::construct(U *,
-Args &&...)' -- the instance with no arguments is dropped silently (no
-diagnostic), so every libc++ C++11 vector/list push_back reads the new
-element as nondet (audit residue item 5, round 162).  The call with
-arguments converts.
+Args &&...)' -- the instance with no arguments was dropped silently (no
+diagnostic), so every libc++ C++11 vector/list push_back read the new
+element as nondet (audit residue item 5, round 162).  The member-template
+instantiation path removed the empty pack from call arguments only; it
+now shares the function-template path's strip, which also covers
+new-initializers (round 163).
