@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^PARSING ERROR$
+dropped the body
 --
 libc++ container member access fails with incomplete type due to
 deferred template elaboration.

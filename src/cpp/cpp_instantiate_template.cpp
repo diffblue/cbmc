@@ -3705,6 +3705,78 @@ irep_idt cpp_typecheckt::existing_function_template_instance(
   return cpp_id.identifier;
 }
 
+/// N5008 [temp.variadic]/5,7: with an EMPTY function parameter pack
+/// \p pack_var_name, every pack expansion over it yields no arguments.
+/// Remove, in the parsed \p node, the pack's call-argument references
+/// (`f(a...)', `f(static_cast<A &&>(a)...)') and new-initializer references
+/// (`::new(p) T(forward<A>(a)...)').
+static void
+strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
+{
+  // N5008 [temp.variadic]/5: an empty pack expansion yields zero
+  // arguments.  Drop both a bare value-pack argument (`a`) and a
+  // pattern argument that is a pack expansion referencing the pack
+  // (e.g. `static_cast<A&&>(a)...`, marked with ID_ellipsis), so
+  // `f(static_cast<A&&>(a)...)` with an empty pack becomes `f()`.
+  auto is_empty_expansion = [&pack_var_name](const irept &a) -> bool
+  {
+    std::function<bool(const irept &)> refs_pack = [&](const irept &n) -> bool
+    {
+      if(n.id() == ID_cpp_name)
+        for(const auto &s : n.get_sub())
+          if(s.id() == ID_name && s.get(ID_identifier) == pack_var_name)
+            return true;
+      for(const auto &s : n.get_sub())
+        if(refs_pack(s))
+          return true;
+      for(const auto &ns : n.get_named_sub())
+        if(refs_pack(ns.second))
+          return true;
+      return false;
+    };
+    const bool bare = a.id() == ID_cpp_name && refs_pack(a);
+    return bare || (a.get_bool(ID_ellipsis) && refs_pack(a));
+  };
+  // If this is a function_call side_effect, strip pack var from args
+  if(node.id() == ID_side_effect && node.get(ID_statement) == ID_function_call)
+  {
+    // Arguments are stored as a positional sub-node with id=arguments
+    for(auto &sub : node.get_sub())
+    {
+      if(sub.id() == ID_arguments)
+      {
+        irept::subt &arg_sub = sub.get_sub();
+        arg_sub.erase(
+          std::remove_if(arg_sub.begin(), arg_sub.end(), is_empty_expansion),
+          arg_sub.end());
+        break;
+      }
+    }
+  }
+  // N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's
+  // expression-list is a pack-expansion context exactly like a call
+  // argument list -- `::new(p) _Tp(static_cast<_Args&&>(__args)...)`
+  // (std::construct_at) with an EMPTY _Args must become
+  // `::new(p) _Tp()`.  The parser stores that list as an id-less
+  // node under ID_initializer, so it was missed here and the
+  // instantiated body failed with "symbol '__args' is unknown".
+  if(
+    node.id() == ID_side_effect && node.get(ID_statement) == ID_cpp_new &&
+    node.find(ID_initializer).is_not_nil())
+  {
+    irept::subt &init_sub = node.add(ID_initializer).get_sub();
+    init_sub.erase(
+      std::remove_if(init_sub.begin(), init_sub.end(), is_empty_expansion),
+      init_sub.end());
+  }
+  // Recurse into sub-nodes
+  for(auto &sub : node.get_sub())
+    strip_empty_pack_references(pack_var_name, sub);
+  // Also recurse into named sub-nodes
+  for(auto &named : node.get_named_sub())
+    strip_empty_pack_references(pack_var_name, named.second);
+}
+
 const symbolt &cpp_typecheckt::instantiate_template(
   const source_locationt &source_location,
   const symbolt &template_symbol,
@@ -6996,54 +7068,17 @@ skip_pack_removal_ft:
           }
           if(!m_pack_var.empty())
           {
-            std::function<bool(const irept &)> m_refs =
-              [&](const irept &n) -> bool
-            {
-              if(n.id() == ID_cpp_name)
-                for(const auto &sn : n.get_sub())
-                  if(sn.id() == ID_name && sn.get(ID_identifier) == m_pack_var)
-                    return true;
-              for(const auto &sn : n.get_sub())
-                if(m_refs(sn))
-                  return true;
-              for(const auto &ns : n.get_named_sub())
-                if(m_refs(ns.second))
-                  return true;
-              return false;
-            };
-            std::function<void(irept &)> m_strip = [&](irept &node)
-            {
-              if(
-                node.id() == ID_side_effect &&
-                node.get(ID_statement) == ID_function_call)
-              {
-                for(auto &sub : node.get_sub())
-                  if(sub.id() == ID_arguments)
-                  {
-                    auto &asub = sub.get_sub();
-                    asub.erase(
-                      std::remove_if(
-                        asub.begin(),
-                        asub.end(),
-                        [&](const irept &a) {
-                          return (a.id() == ID_cpp_name ||
-                                  a.get_bool(ID_ellipsis)) &&
-                                 m_refs(a);
-                        }),
-                      asub.end());
-                  }
-              }
-              for(auto &sub : node.get_sub())
-                m_strip(sub);
-              for(auto &ns : node.get_named_sub())
-                m_strip(ns.second);
-            };
-            m_strip(new_decl.declarators()[0].type());
+            // [temp.variadic]/5,7: the empty pack's expansions (call
+            // arguments, new-initializers) yield nothing -- the same strip
+            // the namespace-scope function template path applies
+            strip_empty_pack_references(
+              m_pack_var, new_decl.declarators()[0].type());
             // the trailing-return decltype may live in the DECLARATION's
             // type (the decl-specifier seq), not the declarator's
-            m_strip(new_decl.type());
+            strip_empty_pack_references(m_pack_var, new_decl.type());
             if(new_decl.declarators()[0].value().is_not_nil())
-              m_strip(new_decl.declarators()[0].value());
+              strip_empty_pack_references(
+                m_pack_var, new_decl.declarators()[0].value());
           }
         }
       }
@@ -7946,81 +7981,9 @@ skip_pack_removal_ft:
     // an unknown symbol and the member is dropped).
     if(!pack_var_name.empty())
     {
-      // Recursively remove pack variable from function call arguments
-      std::function<void(irept &)> strip_pack_var;
-      strip_pack_var = [&pack_var_name, &strip_pack_var](irept &node)
-      {
-        // N5008 [temp.variadic]/5: an empty pack expansion yields zero
-        // arguments.  Drop both a bare value-pack argument (`a`) and a
-        // pattern argument that is a pack expansion referencing the pack
-        // (e.g. `static_cast<A&&>(a)...`, marked with ID_ellipsis), so
-        // `f(static_cast<A&&>(a)...)` with an empty pack becomes `f()`.
-        auto is_empty_expansion = [&pack_var_name](const irept &a) -> bool
-        {
-          std::function<bool(const irept &)> refs_pack =
-            [&](const irept &n) -> bool
-          {
-            if(n.id() == ID_cpp_name)
-              for(const auto &s : n.get_sub())
-                if(s.id() == ID_name && s.get(ID_identifier) == pack_var_name)
-                  return true;
-            for(const auto &s : n.get_sub())
-              if(refs_pack(s))
-                return true;
-            for(const auto &ns : n.get_named_sub())
-              if(refs_pack(ns.second))
-                return true;
-            return false;
-          };
-          const bool bare = a.id() == ID_cpp_name && refs_pack(a);
-          return bare || (a.get_bool(ID_ellipsis) && refs_pack(a));
-        };
-        // If this is a function_call side_effect, strip pack var from args
-        if(
-          node.id() == ID_side_effect &&
-          node.get(ID_statement) == ID_function_call)
-        {
-          // Arguments are stored as a positional sub-node with id=arguments
-          for(auto &sub : node.get_sub())
-          {
-            if(sub.id() == ID_arguments)
-            {
-              irept::subt &arg_sub = sub.get_sub();
-              arg_sub.erase(
-                std::remove_if(
-                  arg_sub.begin(), arg_sub.end(), is_empty_expansion),
-                arg_sub.end());
-              break;
-            }
-          }
-        }
-        // N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's
-        // expression-list is a pack-expansion context exactly like a call
-        // argument list -- `::new(p) _Tp(static_cast<_Args&&>(__args)...)`
-        // (std::construct_at) with an EMPTY _Args must become
-        // `::new(p) _Tp()`.  The parser stores that list as an id-less
-        // node under ID_initializer, so it was missed here and the
-        // instantiated body failed with "symbol '__args' is unknown".
-        if(
-          node.id() == ID_side_effect && node.get(ID_statement) == ID_cpp_new &&
-          node.find(ID_initializer).is_not_nil())
-        {
-          irept::subt &init_sub = node.add(ID_initializer).get_sub();
-          init_sub.erase(
-            std::remove_if(
-              init_sub.begin(), init_sub.end(), is_empty_expansion),
-            init_sub.end());
-        }
-        // Recurse into sub-nodes
-        for(auto &sub : node.get_sub())
-          strip_pack_var(sub);
-        // Also recurse into named sub-nodes
-        for(auto &named : node.get_named_sub())
-          strip_pack_var(named.second);
-      };
       if(func_decl.value().is_not_nil())
-        strip_pack_var(func_decl.value());
-      strip_pack_var(func_decl.type());
+        strip_empty_pack_references(pack_var_name, func_decl.value());
+      strip_empty_pack_references(pack_var_name, func_decl.type());
     }
   }
 
