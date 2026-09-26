@@ -459,6 +459,13 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   }
 
   // genuine function definition -- do the parameter declarations
+  // N5008 [dcl.fct.def.general]/2: the type of a parameter or the return
+  // type of a function DEFINITION shall not be an incomplete class type;
+  // [temp.inst]/2 instantiates the class template specializations named
+  // there (naming them in a declaration did not, [temp.inst]/1).
+  for(auto &parameter : function_type.parameters())
+    elaborate_class_template(parameter.type());
+  elaborate_class_template(function_type.return_type());
   convert_parameters(symbol.mode, function_type);
 
   // create "this" if it's a non-static method

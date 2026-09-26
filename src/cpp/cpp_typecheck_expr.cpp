@@ -4386,6 +4386,10 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   }
 
   typecheck_type(expr.type());
+  // N5008 [expr.type.conv]/2 + [temp.inst]/2: `T(...)' / `T{...}' creates an
+  // object of T, which must be complete (its constructors and, for an
+  // aggregate, its elements decide the initialization)
+  elaborate_class_template(expr.type());
 
   // N5008 [dcl.init.general]/9: "A program that calls for
   // default-initialization or value-initialization of an entity of reference

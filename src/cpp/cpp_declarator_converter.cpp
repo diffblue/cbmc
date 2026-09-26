@@ -733,6 +733,25 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
 {
   irep_idt pretty_name = get_pretty_name();
 
+  // N5008 [basic.def.odr], [dcl.type.general]/... : the DEFINITION of an
+  // object requires a complete type; an array's element type must be
+  // complete ([dcl.array]/1).  [temp.inst]/2: a class template
+  // specialization that is only NAMED by the type (a pointer or reference
+  // to it, an extern declaration, a typedef, a function declaration) is not
+  // instantiated by that.
+  if(
+    !is_typedef && !is_code && !storage_spec.is_extern() &&
+    !declarator.get_is_parameter())
+  {
+    const typet *object_type = &final_type;
+    while(object_type->id() == ID_array)
+      object_type = &to_array_type(*object_type).element_type();
+    if(object_type->id() == ID_struct_tag || object_type->id() == ID_union_tag)
+    {
+      cpp_typecheck.elaborate_class_template(*object_type);
+    }
+  }
+
   symbolt symbol{
     final_identifier,
     final_type,
