@@ -1229,7 +1229,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__is_nothrow_convertible" ||
     expr.id() == "__is_pointer_interconvertible_base_of" ||
     expr.id() == "__reference_constructs_from_temporary" ||
-    expr.id() == "__reference_converts_from_temporary")
+    expr.id() == "__reference_converts_from_temporary" ||
+    expr.id() == "__reference_binds_to_temporary")
   {
     // GCC/Clang built-in type traits
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
@@ -1706,6 +1707,83 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
                 follow_tag(to_struct_tag_type(b)),
                 follow_tag(to_struct_tag_type(a)));
           }
+        }
+      }
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__reference_binds_to_temporary")
+    {
+      // Clang's `__reference_binds_to_temporary(T, U)': true iff the
+      // initialization `T t(VAL<U>);' ([meta.rqmts]/5: VAL<U> has the type
+      // and value category of declval<U>(), a prvalue for a non-reference
+      // U) is well-formed and binds t to a temporary that the initializer
+      // was CONVERTED to -- N5008 [dcl.init.ref]/5.3.2 with a conversion
+      // function to a prvalue, /5.4.1 (user-defined conversion) or /5.4.2
+      // (standard conversion to a prvalue of T1).  A prvalue of the
+      // referenced type or of a class derived from it (/5.3.1) is
+      // materialized ([conv.rval]) but not converted, and yields false, as
+      // does a direct lvalue binding (/5.1) and a conversion function
+      // returning a reference (/5.1.2, /5.3.2 lvalue).  Distinct from
+      // [meta.unary.prop] reference_constructs_from_temporary, which is
+      // true for the materialized prvalue as well.
+      bool result = false;
+      if(
+        is_reference(t1) && t2.is_not_nil() && t2.id() != ID_empty &&
+        t2.id() != ID_code)
+      {
+        typet from_type = t2;
+        if(is_reference(from_type))
+          from_type = to_reference_type(from_type).base_type();
+        symbol_exprt probe{irep_idt{}, from_type};
+        probe.set(ID_C_temporary_avoided, true);
+        probe.set("#reference_binds_probe", true);
+        if(is_reference(t2) && !is_rvalue_reference(t2))
+          probe.set(ID_C_lvalue, true);
+        exprt bound;
+        unsigned rank = 0;
+        bool ok = false;
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          unevaluated_operandt unevaluated_guard{*this};
+          ok = reference_binding(probe, to_reference_type(t1), bound, rank);
+        }
+        catch(...)
+        {
+        }
+        if(ok)
+        {
+          // walk to the object the reference is bound to: through the
+          // address (and a derived-to-base cast of the address), the
+          // materialization of a prvalue and an implicit dereference; a
+          // cast of the OBJECT is a standard conversion ([dcl.init.ref]
+          // /5.4.2) and stops the walk
+          const exprt *object = &bound;
+          while(true)
+          {
+            if(object->id() == ID_typecast && is_reference(object->type()))
+              object = &to_typecast_expr(*object).op();
+            else if(
+              object->id() == ID_address_of || object->id() == ID_dereference)
+            {
+              object = &to_unary_expr(*object).op();
+            }
+            else if(
+              object->id() == ID_side_effect &&
+              object->get(ID_statement) == ID_temporary_object &&
+              object->operands().size() == 1)
+            {
+              object = &to_unary_expr(*object).op();
+            }
+            else
+              break;
+          }
+          // the initializer itself (or its base class subobject), or the
+          // glvalue result of a conversion function returning a reference:
+          // bound directly
+          const bool direct = object->get_bool("#reference_binds_probe") ||
+                              is_reference(object->type());
+          result = !direct;
         }
       }
       expr = result ? exprt(true_exprt()) : exprt(false_exprt());

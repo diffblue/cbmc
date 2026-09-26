@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ int& binds to const int& without a temporary: SUCCESS$
@@ -16,10 +16,14 @@ dropped the body
 --
 Clang's type trait `__reference_binds_to_temporary(T, U)' (true when a
 reference of type T initialized from an expression of type U binds to a
-materialized temporary, [dcl.init.ref]/5.4) is not known to the front end
+materialized temporary, [dcl.init.ref]/5.4) was not known to the front end
 ("symbol '__reference_binds_to_temporary' is unknown").  libc++'s <tuple>
 uses it in `__tuple_leaf::__can_bind_reference' (a static_assert guard in
 the leaf's converting constructor), so tuple and map construction under
 libc++ drop that member (audit residue item 10, round 162).  The trait is
 a type predicate over two types and belongs with the other Clang/GCC type
-traits (`__is_convertible' & co.).
+traits (`__is_convertible' & co.).  Fixed in round 163: the trait performs
+the reference binding of a VAL<U> probe and reports true iff the bound
+object is a converted temporary ([dcl.init.ref]/5.3.2 prvalue conversion
+function, /5.4.1, /5.4.2), matching Clang (a materialized prvalue of the
+referenced or a derived type, /5.3.1, is not "a temporary" here).

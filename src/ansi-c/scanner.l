@@ -1153,6 +1153,9 @@ enable_or_disable ("enable"|"disable")
 "__array_rank"/[[:space:]]*"(" { return conditional_keyword(PARSER.cpp98 && PARSER.gcc14_builtins, TOK_UNARY_TYPE_PREDICATE); }
 "__array_rank" { return make_identifier(); }
 "__reference_converts_from_temporary" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
+ /* Clang's pre-C++23 spelling of the same query, used by libc++'s
+    <tuple> (`__tuple_leaf::__can_bind_reference') */
+"__reference_binds_to_temporary" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 
 "__if_exists"       { return MSC_cpp_keyword(TOK_MSC_IF_EXISTS); }
 "__if_not_exists"   { return MSC_cpp_keyword(TOK_MSC_IF_NOT_EXISTS); }
