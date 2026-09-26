@@ -12134,3 +12134,135 @@ is the expected state) once ANY test failed -- read the `Running ...
 shows [FAILED] under -K on a gcc-13 host because the bug needs the gcc-16
 headers (tag libstdcxx16 excludes it in CI).
 
+
+## Round 163 (2026-09-26): the round-162 KNOWNBUGs, oldest standard first
+
+Nine src+test commits on top of 93cf85e283 (434c42eb2b .. d31c881679);
+eight of the eleven round-162 KNOWNBUG tests are CORE now, one KNOWNBUG
+keeps a refined diagnosis, two libc++-only ones were not reached.  Each
+fix cites N5008 in code and commit message; each promoted test fails on
+the bin51 snapshot and passes on bin52 (`/tmp/r157/bin52`).
+
+### Fixes
+
+1. `e = {}' on a scalar (434c42eb2b).  implicit_typecast: an empty
+   initializer_list to an integral / bool / enum / float type is
+   `zero_initializer' ([expr.ass]/8.1, [dcl.init.list]/3.11).  <charconv>'s
+   `__to_chars*' drops gone (cpp17_from_chars_unsigned tightened).
+2. `if(float a = x)' / `while(T *p = f())' (4795424611).  The C++
+   condition-declaration path no longer converts the declared object with
+   implicit_typecast_bool itself (which produced ieee_float_notequal, an
+   id the code path did not expect); it hands the symbol to the C
+   typecheck of if/while, which applies [conv.bool] like for any
+   condition.
+3. static_cast to a reference-to-array (a34fd84764).  cast_away_constness
+   pushes array-level qualifiers down to the element ([basic.type.qualifier]
+   /3: an array is cv-qualified iff its elements are) and
+   reference_compatible reads the element's qualifiers, so
+   `std::forward<const char (&)[4]>("abc")' binds.  Descs of three tests
+   that stopped dropping tightened.
+4. Empty pack in a member template's new-initializer (9dc9bebe9e).  The
+   helper strip_empty_pack_references (function_call arguments and
+   cpp_new initializer) replaces the two ad-hoc lambdas; the member-method
+   instantiation path (allocator::construct<T>(p) with an empty `Args...')
+   now uses it as well.  Nine libc++ vector descs tightened.
+5. A specialization named only in an unevaluated operand (c027971aa7).
+   `unevaluated_operand_depth' + RAII guard around the decltype operand
+   (cpp_typecheck_type.cpp) and the noexcept operand; a specialization
+   whose declarator is converted while the depth is non-zero and the
+   instantiation stack is non-empty joins `speculative_instances' (held
+   back like a conversion probe, converted only on a later odr-use,
+   [temp.inst]/4, [basic.def.odr]/5).  Deduced return types are still
+   converted eagerly ([dcl.spec.auto.general]/13).  Finding from the gdb
+   session of round 162: the instance's body really was converted as a
+   top-level item -- `add_method_body' from convert_new_symbol queues it
+   for the drain; the drain is what reports the drop.
+6. Parameter type naming an earlier parameter in a decltype (60ca425b94).
+   typecheck_type of a function type: when a parameter type contains a
+   decltype, the earlier parameters are bound with bind_requires_parameter
+   in a fresh block scope before that type is checked
+   ([basic.scope.param]/1).  libc++ `__rewrap_range' (44 drops in the
+   audit) is gone; the eleven libc++ C++20 tests it appeared in still
+   drop other bodies (`__estimated_width' & co.), so their descs are
+   unchanged.
+7. `__reference_binds_to_temporary(T, U)' (ee288b52c3).  Scanner keyword
+   (TOK_BINARY_TYPE_PREDICATE) + evaluation next to the other two-type
+   traits: a VAL<U> probe (`#reference_binds_probe') is bound with
+   reference_binding under sfinae + unevaluated guards; the bound object
+   is found by walking address_of / reference typecast / temporary_object
+   / dereference; true iff that object is neither the probe nor a
+   reference-returning conversion result.  A cast of the OBJECT (not of
+   the address) is a [dcl.init.ref]/5.4.2 standard conversion and stops
+   the walk.  Sixteen cases checked against clang++-18 in the second test
+   file (`clang_cases.cpp'); Clang answers false for a prvalue of the
+   referenced type or a derived class (materialized, not converted) --
+   the difference to reference_constructs_from_temporary.  libc++'s
+   `__tuple_leaf' still drops for another reason: "reference
+   'this->__value_' expects one initializer" at tuple:320 (the leaf's
+   converting constructor initializes a reference member from a forwarded
+   argument) -- open.
+8. Defaulted comparison over a padded class (5b050cf1af).  The round-162
+   diagnosis ("friend form") was wrong: the synthesized memberwise
+   comparison included the anonymous padding component
+   (`get_is_padding()'), so any class with alignment padding failed
+   ("symbol '' is unknown"), member form or friend form.  Padding is
+   skipped for ==, != and <=>; the == and != elaborations are merged and
+   the friend form of a defaulted != is elaborated too.  libc++'s
+   to_chars_result operator== no longer drops (11 tests, 5 -> 4 drops).
+9. Deduced parameter of type void / reference to void (d31c881679).
+   substitute_function_type reports a deduction failure when a
+   substituted parameter is `void' or `void &' ([temp.deduct.general]/8).
+   libstdc++ poison pills `void begin(auto &) = delete' had made
+   `__adl_begin''s `__decay_copy(begin(__t))' instantiate
+   `_Decay_copy::operator()<void>'.  New CORE test
+   cpp20_reference_to_void_deduction_fails; cpp20_span(_basic) tightened.
+
+### Not fixed, diagnosed
+
+- cpp20_ranges_upper_bound_array (KNOWNBUG, desc updated): the remaining
+  `declval<auto()>' drops come from `iterator_t<const uint32_t *>'
+  being formed although `_Begin::operator()' is constrained by
+  `is_array_v || __member_begin || __adl_begin'.  Cause: parse.cpp's
+  single-compound-requirement fast path ("Try compound requirement: { {
+  expr } -> concept<type>; }") builds a `compound_requirement' with only
+  `#method' and NO operand, and typecheck_expr_main treats an
+  operand-less compound_requirement as satisfied.  Deleting the fast
+  path (the generic loop below it parses the same text correctly, with
+  the operand) fixes upper_bound completely (0 drops) but breaks
+  cpp20_ranges_basic: with `__member_begin<take_view &>' really
+  evaluated, `__t.begin()' is resolved while take_view / ref_view are
+  still being elaborated (view_interface's CRTP members convert eagerly
+  in the base) and unqualified `begin' finds the namespace-scope CPO
+  ("'std::ranges::__cust::begin' is not static member of class 'struct
+  take_view'"); the whole `arr | views::take(3)' is rejected.  Header-free
+  attempts to reproduce the second failure (a CRTP view_interface with a
+  constrained empty() calling derived().begin(), CPO named `begin' in the
+  same namespace) pass, so the incomplete-class ordering of the real
+  <ranges> is needed.  Both must be fixed together; the fast-path
+  deletion is a two-line change once constraint evaluation on a class
+  being elaborated is deferred.
+- libcxx_string_move_ctor_lambda, cpp20_compare_three_way_pointers_libcxx
+  (libcxx-tagged KNOWNBUGs): not reached this round.
+- cpp11_libcxx20_map / cpp11_map_insert_libcxx still drop `__tuple_leaf'
+  (see 7).
+
+### Verification
+
+- Per fix: test.pl on the promoted test + neighbours; bin51 fails the
+  promoted/new tests (`grep -c "^Failed test"' = 1 or 2).
+- Intermediate cbmc-cpp suites: t9 (through 4), t10 (through 5), t11
+  (through 8) all green.
+- clang -Werror build (cbmc, goto-cc): clean.  unit: 19459 assertions in
+  614 test cases pass.  git-clang-format per commit: empty.
+  run_diff.sh CPPLINT vs merge-base: exit 0.
+- Full sweep with bin52 (`/tmp/r157/s52/sweep.sh' groups 1-3, then
+  cbmc-cpp with cbmc-val): see below.
+  Result: all twelve groups green (cbmc, cbmc-library, unit-proofs, cpp,
+  systemc, contracts-cpp-dfcc, goto-instrument, linking-goto-binaries,
+  goto-cc-cbmc, ansi-c, ansi-c-cpp, cbmc-cpp with --validate-goto-model
+  --validate-ssa-equation); 0 "Failed test:" lines in every log.
+- `test.pl -K' with bin52: the five remaining round-162 KNOWNBUGs
+  (cpp20_ranges_upper_bound_array, cpp20_ranges_basic_libcxx,
+  libcxx23_string_fill_ctor, libcxx_string_move_ctor_lambda,
+  cpp20_compare_three_way_pointers_libcxx) still fail as expected.
+- bin51 fails all 10 promoted/new descs of this round; bin52 passes them.
