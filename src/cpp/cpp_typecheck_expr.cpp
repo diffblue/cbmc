@@ -5528,8 +5528,7 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
       // call came first, so the other call's result was of the wrong type
       // (--validate-goto-model: "function returns expression of wrong
       // type") and there was no body to execute.
-      materialize_gcc_polymorphic_builtin(
-        identifier, *gcc_polymorphic, source_location);
+      materialize_gcc_polymorphic_builtin(*gcc_polymorphic, source_location);
       expr = std::move(*gcc_polymorphic);
       return;
     }

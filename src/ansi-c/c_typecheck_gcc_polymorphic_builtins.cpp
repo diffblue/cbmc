@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "c_typecheck_base.h"
 
 #include <atomic>
+#include <map>
 
 static symbol_exprt typecheck_sync_with_pointer_parameter(
   const irep_idt &identifier,
@@ -490,14 +491,39 @@ static symbol_exprt typecheck_atomic_fetch_op(
   return result;
 }
 
+/// Clang's `__c11_atomic_*' intrinsics (used by libc++'s <atomic> and by
+/// <stdatomic.h>) take the same arguments as the GCC `__atomic_*_n' /
+/// `__atomic_fetch_*' builtins -- `T __c11_atomic_load(_Atomic(T) *, int
+/// order)' is `__atomic_load_n' -- so they share the typing and the
+/// implementation.  Returns \p identifier itself when it is not one of them.
+static irep_idt gcc_builtin_for_c11_atomic(const irep_idt &identifier)
+{
+  static const std::map<irep_idt, irep_idt> c11_to_gcc = {
+    {"__c11_atomic_load", ID___atomic_load_n},
+    {"__c11_atomic_store", ID___atomic_store_n},
+    {"__c11_atomic_exchange", ID___atomic_exchange_n},
+    {"__c11_atomic_fetch_add", ID___atomic_fetch_add},
+    {"__c11_atomic_fetch_sub", ID___atomic_fetch_sub},
+    {"__c11_atomic_fetch_and", ID___atomic_fetch_and},
+    {"__c11_atomic_fetch_or", ID___atomic_fetch_or},
+    {"__c11_atomic_fetch_xor", ID___atomic_fetch_xor},
+    {"__c11_atomic_fetch_nand", ID___atomic_fetch_nand}};
+  const auto it = c11_to_gcc.find(identifier);
+  return it == c11_to_gcc.end() ? identifier : it->second;
+}
+
 std::optional<symbol_exprt>
 c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
-  const irep_idt &identifier,
+  const irep_idt &identifier_as_written,
   const exprt::operandst &arguments,
   const source_locationt &source_location)
 {
   // the arguments need not be type checked just yet, thus do not make
   // assumptions that would require type checking
+
+  // a Clang __c11_atomic_* intrinsic is typed and implemented as the GCC
+  // builtin it corresponds to (the returned symbol names that builtin)
+  const irep_idt identifier = gcc_builtin_for_c11_atomic(identifier_as_written);
 
   if(
     identifier == ID___sync_fetch_and_add ||
