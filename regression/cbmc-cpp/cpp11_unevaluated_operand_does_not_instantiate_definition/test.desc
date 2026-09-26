@@ -1,0 +1,25 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ trait is true: the expression is valid: SUCCESS$
+^\[main\.assertion\.2\] line \d+ trait for a copyable type: SUCCESS$
+^\[main\.assertion\.3\] line \d+ swap really called: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.inst]/4 + [basic.def.odr]/5: naming `swap(declval<T &>(),
+declval<T &>())' in an unevaluated operand (the decltype of a SFINAE
+default template argument) instantiates the DECLARATION of swap<NoCopy>
+only; the specialization is never odr-used, so its definition -- ill-formed
+for a type with a deleted copy -- is not instantiated (g++/clang++ accept
+the program).  The front end instantiates the definition anyway, fails on
+the deleted copy and reports "dropped the body of function
+'swap<tag-NoCopy>'" for a body no program can call.  The verification
+result is right; the warning is spurious (audit residue item 12, round 162:
+cpp11_is_swappable_unevaluated).

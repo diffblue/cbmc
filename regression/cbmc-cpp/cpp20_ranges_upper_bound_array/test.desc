@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ ranges::upper_bound on a built-in array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ before first: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [upper.bound] + [range.access]: `std::ranges::upper_bound(array,
+value)' -- the range overload of the niebloid on a built-in array, as
+libc++'s <format> tables use it (`__estimated_width', `__get_property').
+With libstdc++ 13 the result is right but two bodies are dropped: the
+range-access CPO `_Decay_copy::operator()' (bits/iterator_concepts.h:971,
+`noexcept(is_nothrow_convertible_v<_Tp, decay_t<_Tp>>)') and
+`declval<auto()>' & co. (type_traits:2386, the placeholder-returning
+lambdas of the CPOs instantiated with an undeduced type).  With libc++ 18
+(`--stdlib libc++') the call itself fails ("found no match for symbol
+'operator()'" at __algorithm/ranges_upper_bound.h:54) and the unit is
+rejected.  Audit residue items 4 and 10 (round 162); the `__estimated_width'
+/ `__get_property' drops of every libc++ C++20 test are this shape.
