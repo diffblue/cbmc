@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ forward<const int &> through a partial specialization over a function type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+type mismatch
+--
+N5008 [temp.class.spec.match] + [dcl.ref]/6: `function<R(ArgTypes...)>'
+matched against `int(const int &)' deduces ArgTypes = {const int &}; the
+element was bound in its parsed form (a frontend_pointer), so a template
+parameter resolving to it (`T' of forward<const int &>) stayed unconverted
+and `static_cast<T &&>(t)' saw `frontend_pointer &&' -- no reference
+collapsing, "type mismatch on static_cast", and std::forward's body was
+dropped for every std::function with a reference parameter (libstdc++
+_Function_handler::_M_invoke).
