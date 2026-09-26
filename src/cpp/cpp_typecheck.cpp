@@ -290,12 +290,19 @@ void cpp_typecheckt::typecheck()
       // (e.g. nested lambdas) must not be re-converted.
       const std::string sym_file = id2string(sym.location.get_file());
       const bool system_header = is_system_header_file(sym_file);
+      // A speculatively instantiated candidate (speculative_instances) is
+      // not half-converted: its body is held back until something refers
+      // to it, and is otherwise never instantiated ([temp.inst]/11).
+      // Converting it here defeated that and reported every unselected
+      // candidate as dropped (`__shared_count(_Ptr)' probed for each
+      // `operator==' operand type in a TU using <memory>).
       if(
         system_header && sym.type.id() == ID_code &&
         sym.value.id() == ID_code && sym.mode == ID_cpp &&
         !sym.value.get_bool("#cpp_converted") && !sym.is_type &&
         functions_being_typechecked.count(sym.name) == 0 &&
-        deferred_method_bodies.find(sym.name) == deferred_method_bodies.end())
+        deferred_method_bodies.find(sym.name) == deferred_method_bodies.end() &&
+        speculative_instances.count(sym.name) == 0)
       {
         to_finish.push_back(entry.first);
       }

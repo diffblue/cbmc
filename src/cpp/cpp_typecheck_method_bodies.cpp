@@ -1893,6 +1893,15 @@ void cpp_typecheckt::typecheck_method_bodies()
       method_bodyt &method_body = *method_bodies.begin();
       symbolt &method_symbol = *method_body.method_symbol;
 
+      // as in the main drain: a speculatively instantiated candidate is
+      // converted only once something converted refers to it
+      if(speculative_instances.count(method_symbol.name) != 0)
+      {
+        held_back_bodies.push_back(method_body);
+        method_bodies.erase(method_bodies.begin());
+        continue;
+      }
+
       template_map.swap(method_body.template_map);
       instantiation_stack.swap(method_body.instantiation_stack);
 
