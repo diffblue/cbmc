@@ -11955,3 +11955,152 @@ template instantiation re-type-checks its arguments on every mention.
 * The gcc16 .ii files preprocessed with -D__CPROVER__ keep #line markers
   (unlike cvise's -P output), so cbmc's library/user heuristics apply as in
   a real run -- verify fixes on those, not on the reduced files.
+
+## Round 162 (2026-09-26): silent-drop audit, gcc-16 gaps closed, deduction split
+
+Recommended next steps #5, #3, #2 of round 161, in that order.  Everything
+is standards-grounded (N5008 clauses in the code comments and commit
+messages); nothing pushed.
+
+### #5a: class template specializations instantiate in their own context
+
+* `elaborate_class_template` now runs under a fresh template map
+  ([temp.point]/1: the point of instantiation is not the naming context).
+  All cbmc-cpp tests pass, and the libc++ span/map tests got 21% faster
+  (18.8 -> 14.8 s, 19.9 -> 15.4 s) because fewer stray bindings leak into
+  the instantiation.
+* New completeness-requiring elaboration sites: object definitions
+  (cpp_declarator_converter convert_new_symbol), a function definition's
+  parameter and return types (convert_function), the derived-to-base step
+  of guess_template_args, and typecheck_expr_explicit_constructor_call.
+* `bind_class_instance_parameters(const symbolt &, template_mapt &)`
+  factored out of add_method_body; used for member template instantiation
+  (no longer primary-only) and re-established before a member template's
+  default template argument is type-checked.
+* The two naming-time elaborations in the resolver stay ON by default
+  (`elaborate_on_naming`, `CBMC_ELAB_ON_NAMING=0` turns them off for
+  experiments).  In on-use mode 7 tests still fail; diagnosed for
+  cpp11_function_basic: `std::function<int(int,int)>` is reached under two
+  symbol names (the template instance and `std::tag-function<...>`),
+  `elaborations_in_progress` (keyed by name) does not dedupe them,
+  resolve_scope's force-elaborate path re-instantiates nested, and the
+  `_Callable<F>` default argument then sees a pack of size 1 instead of 2.
+  Flipping the default needs that fixed first.
+
+### #5b: guess_template_args / guess_function_template_args split
+
+Both were behind `NOLINT(readability/fn_size)`.  Each step is a member
+function named after its rule, code moved verbatim:
+guess_template_args_{via_alias,template_id,simple_name,compound};
+deduce_without_call_arguments, deduce_from_call_arguments,
+apply_default_template_arguments, expand_function_parameter_pack,
+record_deduced_function_parameter_pack, substitute_function_type,
+arguments_convertible_to_parameters; prefer_more_constrained_templates,
+instantiate_selected_function_template.  Lesson: when an `if(cond) {...}`
+block is hoisted into a helper, keep the `cond` at the call site -- the
+first cut dropped `if(template_args.has_unassigned())` around the default
+arguments step and 24 tests (std::get, std::bind, unique_ptr) lost bodies.
+Remaining NOLINTs in cpp_typecheck_resolve.cpp: resolve_scope,
+disambiguate_template_classes, resolve.
+
+### #3: silent-drop audit (the corpus, gcc-13 libstdc++ and libc++ 18)
+
+/tmp/r162/audit/run.sh runs every CORE/FUTURE non-libstdcxx16 cbmc-cpp test
+and collects `dropped the body` / `could not fully type-check` / `no body
+for callee` lines.  bin50: 1332 lines in 107 tests.  Final build (bin51): 264 lines in 63
+tests -- 230 `dropped the body' (44 of them libc++'s `__rewrap_range',
+11 `__get_property') plus 34 known libc++ locale/ctype `no body for
+callee' stubs (virtuals defined in the shared library).  Root causes fixed, each with a CORE test:
+
+* Default arguments in a class member-specification are complete-class
+  contexts ([class.mem.general]/7-8): `replace_extension(const path & =
+  path())' type-checked mid-class failed and abandoned the rest of
+  std::filesystem::path's body (every later member unknown; ~60 drops).
+  Kept as `cpp_deferred_default_argument' (declaring scope recorded) and
+  checked at the first call (typecheck_deferred_default_argument, which
+  re-binds a specialization's template parameters).
+* Out-of-line member template of a NON-template class: matched by
+  signature (member_template_parameters_match), parameter list and
+  template parameter names adopted (define_member_template_of_class;
+  path::_S_convert's `__f` unknown).
+* Wide/UTF string literal initializing a character array
+  ([dcl.init.string]).
+* A static member function template with a deduced return type named
+  directly (`_M_pathname(_S_convert(...))` in a ctor template) is converted
+  at the call so the placeholder is deduced.
+* Speculative constructor template instances (user-defined conversion
+  probes) were converted by two end-of-unit sweeps and reported as drops
+  (`__shared_count(_Ptr)`, `delete __p' on every operator== operand type;
+  37 drops).  Both sweeps skip speculative_instances.
+* Parser: the template-id retries in rPostfixExpr / rRelationalExpr /
+  `.template operator()<>' pushed a bare argument list instead of a
+  `template_args{arguments}' component; libc++'s
+  `__align_it<sizeof(value_type) < __alignment ? ... : 1>(n)' (108 drops).
+* `restrict' ignored in qualification conversions ([conv.qual] is about
+  cv): glibc's `strtod(const char *__restrict, char **__restrict)' &c.
+  (280 libc++ locale drops).
+* Clang's `__c11_atomic_*' intrinsics typed and implemented as the GCC
+  `__atomic_*' builtins (they were varargs returning void; 144 drops, and
+  unusable in C).  Regression tests in cbmc-cpp and cbmc.
+* construct_at with an empty pack: a new-initializer is a pack-expansion
+  context for contains_call_argument_pack, and the instantiation-time
+  empty-pack strip finds a NON-trailing pack ([temp.param]/14).
+* A template parameter's binding still in parsed form (frontend_pointer
+  from `function<R(ArgTypes...)>' matched against `int(const int &)') is
+  converted when resolved; std::forward<const int &> had "type mismatch on
+  static_cast".  normalize_code_args converts both sides so partial
+  specialization matching still agrees.
+
+Residue (documented, not fixed): libc++ basic_string(basic_string&&)'s
+lambda (`__compressed_pair_elem' does not uniquely resolve -- needs the
+full libc++ context, header-free shapes pass), error_category::operator<=>
+(compare_three_way on pointers), to_chars_result's defaulted operator==,
+__estimated_width, allocator::construct, __rewrap_range /
+__get_property (the ranges unwrap machinery);
+gcc charconv `__to_chars*', `__hypot3', iterator_concepts operator,
+`__tuple_leaf'; libc++ locale/ctype virtuals defined in the shared
+library (`no body for callee').
+
+### #2: the three documented gcc-16 gaps -- all closed
+
+Verified on the preprocessed sources /tmp/r161/pp/*.ii (host cbmc,
+gcc-16 headers); the three descs forbid every `dropped the body' now.
+
+* basic_string(const _CharT *, const _Alloc &) for char16_t/char32_t:
+  gone with the out-of-line member template matching and the speculative
+  instance fix above (no dedicated change).
+* lexicographical_compare_three_way: `(a == b) <=> true' compared a
+  comparison result (internal bool) with a C++ bool without the usual
+  arithmetic conversions ([expr.spaceship]/4); and _Synth3way's `if
+  constexpr (three_way_comparable_with<...>)' was false because the
+  REWRITTEN comparison candidates ([over.match.oper]/3.4: `(x <=> y) @ 0',
+  reversed `0 @ (y <=> x)', `!(x == y)', `y == x') existed only for a
+  member operator<=>.  rewritten_comparison_candidate builds them for
+  member, friend and namespace-scope operators; noexcept looks at every
+  call in its operand ([except.spec]/6).  An n-ary `and' (a
+  requires-expression's satisfaction) reaching typecheck_expr is accepted.
+* <bits/max_size_type.h>: two overload-resolution defects.  A constructor
+  template's earlier instantiations (int, unsigned __int128) competed as
+  converting constructors and made a size_t argument ambiguous
+  ([over.match.funcs]/8); and the constrained conversion function
+  template `requires integral<_Tp> || __is_int128<_Tp>' was instantiated
+  for every probed class type because `or(false,false)' was not folded
+  before is_false() ([temp.constr.atomic]/3; 315 drops), and lost to
+  `explicit operator bool()' + integral conversion for
+  `static_cast<int>(b)' ([over.match.best]/2: compare the conversion
+  sequences; non-template wins only on a tie).
+
+### Method notes
+
+* `CBMC_DBG_NOSUPPRESS' patch on cpp_sfinae_context.cpp + a
+  `TEMPORARY DEBUG BEGIN convert_function <name>' / `DROP <name>' pair in
+  convert_function gives, per dropped body, exactly the diagnostics
+  emitted during its conversion -- the fastest way from an audit line to
+  a root cause.  Several drops are SILENT (a `throw 0' with no message,
+  e.g. a `template_args'-less template-id); gdb `catch throw if
+  cbmc_dbg_in_target > 0' with a per-function counter finds the site.
+* Speculative instances hide behind ordinary drops: a `dropped the body'
+  whose instantiation stack ends in a conversion probe is not a bug in
+  that body.
+* clang-format-15 splits `<=>' into `<= >' unless run with
+  `--style="{BasedOnStyle: InheritParentConfig, Standard: c++20}"'.
