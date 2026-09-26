@@ -26,6 +26,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 
+#include <functional>
+#include <optional>
+
 /// N5008 [dcl.type.decltype]/1: the type denoted by decltype(E) for an
 /// already type-checked expression E.  \p parenthesized records whether E
 /// was written as a parenthesized id-expression or member access -- the
@@ -546,8 +549,56 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     code_typet::parameterst &parameters=code_type.parameters();
 
-    for(auto &param : parameters)
+    // N5008 [basic.scope.param]/1: a parameter's scope begins at its
+    // declaration and includes the rest of the parameter-declaration-clause,
+    // so a later parameter's type may name an earlier parameter in an
+    // unevaluated operand -- `__rewrap(_Iter __orig_iter,
+    // decltype(std::__unwrap_iter(__orig_iter)) __iter)' (libc++).  The
+    // parameter symbols proper are created when the definition is
+    // converted; here, when a parameter type contains a decltype, the
+    // earlier parameters are bound as local symbols of a block scope
+    // ([basic.scope.param] note 1: usable for their type only).
+    std::optional<cpp_save_scopet> parameter_scope;
+    const auto contains_decltype = [](const typet &t)
     {
+      std::function<bool(const irept &)> walk = [&](const irept &n)
+      {
+        if(n.id() == ID_decltype)
+          return true;
+        for(const auto &sub : n.get_sub())
+          if(walk(sub))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(walk(ns.second))
+            return true;
+        return false;
+      };
+      return walk(t);
+    };
+    for(std::size_t i = 0; i < parameters.size(); ++i)
+    {
+      auto &param = parameters[i];
+      if(i > 0 && contains_decltype(param.type()))
+      {
+        if(!parameter_scope.has_value())
+        {
+          parameter_scope.emplace(cpp_scopes);
+          cpp_scopes.new_block_scope();
+        }
+        for(std::size_t j = 0; j < i; ++j)
+        {
+          const irep_idt &name = parameters[j].get_base_name();
+          if(
+            !name.empty() && parameters[j].type().is_not_nil() &&
+            parameters[j].type().id() != ID_cpp_name &&
+            cpp_scopes.current_scope()
+              .lookup(name, cpp_scopet::SCOPE_ONLY)
+              .empty())
+          {
+            bind_requires_parameter(name, parameters[j].type());
+          }
+        }
+      }
       typecheck_type(param.type());
 
       // A code type formed by template substitution from a parsed
