@@ -1,0 +1,18 @@
+CORE
+main.c
+
+^\[main\.assertion\.1\] line \d+ store then load: SUCCESS$
+^\[main\.assertion\.2\] line \d+ fetch_add: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Clang's __c11_atomic_load/store/fetch_add intrinsics (what <stdatomic.h>
+expands to under Clang) are polymorphic in the atomic object's type, like
+GCC's __atomic_load_n & co.; they are typed and implemented as those.
+Previously a varargs declaration returning void took precedence and the
+result could not be used ("conversion from 'void' to 'signed int'").

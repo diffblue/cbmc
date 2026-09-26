@@ -266,10 +266,10 @@ protected:
     const irep_idt &identifier,
     const symbol_exprt &function_symbol);
   /// Give the polymorphic built-in \p gcc_polymorphic (as returned by
-  /// typecheck_gcc_polymorphic_builtin) its per-type identifier and, if not
-  /// present yet, a symbol with parameters and an implementation body.
+  /// typecheck_gcc_polymorphic_builtin, naming the builtin selected) its
+  /// per-type identifier and, if not present yet, a symbol with parameters
+  /// and an implementation body.
   void materialize_gcc_polymorphic_builtin(
-    const irep_idt &identifier,
     symbol_exprt &gcc_polymorphic,
     const source_locationt &source_location);
   virtual std::optional<symbol_exprt>
