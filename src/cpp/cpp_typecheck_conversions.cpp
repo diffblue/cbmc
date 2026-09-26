@@ -140,10 +140,21 @@ bool cpp_typecheckt::standard_conversion_qualification(
   typet sub_to = to_pointer_type(type).base_type();
   bool const_to = true;
 
+  // N5008 [conv.qual]/1-3 is about cv-qualifiers (const, volatile);
+  // `restrict' is a GNU extension ([basic.type.qualifier] has no such
+  // qualifier) that GCC and Clang do not weigh in a qualification
+  // conversion: `char **' converts to `char *__restrict *' (glibc's
+  // `strtod(const char *__restrict, char **__restrict)', `mbsrtowcs' --
+  // every libc++ locale body calling them failed "found no match").
+  const auto ignore_restrict = [](c_qualifierst &q)
+  { q.is_restricted = false; };
+
   while(sub_from.id() == ID_pointer)
   {
     c_qualifierst qual_from(sub_from);
     c_qualifierst qual_to(sub_to);
+    ignore_restrict(qual_from);
+    ignore_restrict(qual_to);
 
     if(!qual_to.is_constant)
       const_to = false;
@@ -163,6 +174,8 @@ bool cpp_typecheckt::standard_conversion_qualification(
 
   c_qualifierst qual_from(sub_from);
   c_qualifierst qual_to(sub_to);
+  ignore_restrict(qual_from);
+  ignore_restrict(qual_to);
 
   if(qual_from.is_subset_of(qual_to))
   {
