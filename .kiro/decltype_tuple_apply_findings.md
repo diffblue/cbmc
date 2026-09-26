@@ -12104,3 +12104,33 @@ gcc-16 headers); the three descs forbid every `dropped the body' now.
   that body.
 * clang-format-15 splits `<=>' into `<= >' unless run with
   `--style="{BasedOnStyle: InheritParentConfig, Standard: c++20}"'.
+
+### Round 162b: every open issue has a KNOWNBUG test
+
+`test.pl -K -c bin51/cbmc' over cbmc-cpp: 11 new KNOWNBUG tests fail as
+expected (header-free reductions where the shape reduces): defaulted
+FRIEND operator== (`symbol '' is unknown'); a member template's empty
+pack in a placement-new initializer (silent drop; libc++
+allocator::construct); a parameter type `decltype(f(earlier_param))'
+(libc++ __rewrap_range, the largest residue); `e = {}' on a scoped enum
+(<charconv>); `if(float a = x)' (`unexpected expression:
+ieee_float_notequal'; __hypot3); static_cast to an array-reference type
+(std::forward of a string literal); Clang's __reference_binds_to_temporary
+(libc++ __tuple_leaf); a specialization named only in an unevaluated
+operand gets its definition instantiated (spurious drop warning);
+libc++-only: basic_string(basic_string &&)'s lambda (moved string is
+nondet), compare_three_way on pointers (unit rejected); and
+ranges::upper_bound on an array (libstdc++ drops the _Decay_copy CPO and
+declval<auto()>; libc++ rejects the unit).  The libc++ string move-ctor
+one does not reduce header-free (the __compressed_pair_elem ambiguity
+alone is harmless).
+cpp17_variant_basic/test_libcxx.desc had been passing since round 161
+(promoted to CORE).  1333 drop-free CORE/FUTURE descs now forbid `dropped
+the body'; the 63 tests that still drop keep their old patterns and are
+covered by the KNOWNBUGs above.  Note: `test.pl -K -p' prints a "Failed
+test:" dump for every KNOWNBUG whose expected lines did not match (that
+is the expected state) once ANY test failed -- read the `Running ...
+[OK]/[FAILED]' lines, not the dumps.  gcc16_stream_ctype_facet_vtable
+shows [FAILED] under -K on a gcc-13 host because the bug needs the gcc-16
+headers (tag libstdcxx16 excludes it in CI).
+
