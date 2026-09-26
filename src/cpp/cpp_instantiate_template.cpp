@@ -2438,8 +2438,13 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
           // merging each cpp_declaration parameter's declarator into its
           // type, so structurally-equivalent function types (e.g. the
           // requested `R(const T&)` and the deduced one) compare equal.
+          // The merged parameter type is then converted (a parsed
+          // `frontend_pointer' reference becomes a `pointer'), so the two
+          // forms compare equal whether a deduced element was already
+          // converted -- as a template parameter's binding is when it is
+          // resolved -- or is still in parsed form.
           auto normalize_code_args =
-            [](cpp_template_args_tct args) -> cpp_template_args_tct
+            [this](cpp_template_args_tct args) -> cpp_template_args_tct
           {
             for(auto &arg : args.arguments())
             {
@@ -2454,6 +2459,15 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                   continue;
                 typet merged =
                   decl.declarators().front().merge_type(decl.type());
+                try
+                {
+                  sfinae_contextt sfinae_guard{*this};
+                  typecheck_type(merged);
+                }
+                catch(...)
+                {
+                  merged = decl.declarators().front().merge_type(decl.type());
+                }
                 decl.type() = merged;
                 decl.declarators().front().type().make_nil();
               }
