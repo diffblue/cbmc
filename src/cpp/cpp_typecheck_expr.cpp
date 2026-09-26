@@ -850,10 +850,19 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         const typet cat_type = less.type();
         const source_locationt loc = expr.source_location();
 
-        binary_relation_exprt lt{op0, ID_lt, op1};
+        // [expr.spaceship]/4: the usual arithmetic conversions are applied
+        // to arithmetic operands (so a comparison result, of the internal
+        // `bool' type, and a `true' of C++ bool type compare in a common
+        // type; `(a == b) <=> true' -- libstdc++'s
+        // lexicographical_compare_three_way -- evaluated wrongly otherwise)
+        exprt a = op0, b = op1;
+        if(!is_ptr)
+          implicit_typecast_arithmetic(a, b);
+
+        binary_relation_exprt lt{a, ID_lt, b};
         lt.type() = bool_typet();
         lt.add_source_location() = loc;
-        binary_relation_exprt gt{op0, ID_gt, op1};
+        binary_relation_exprt gt{a, ID_gt, b};
         gt.type() = bool_typet();
         gt.add_source_location() = loc;
 
@@ -869,7 +878,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         {
           // a < b ? less : (a > b ? greater : (a == b ? equivalent :
           // unordered))
-          binary_relation_exprt eq{op0, ID_equal, op1};
+          binary_relation_exprt eq{a, ID_equal, b};
           eq.type() = bool_typet();
           eq.add_source_location() = loc;
           if_exprt i3{eq, equalish, unordered, cat_type};
