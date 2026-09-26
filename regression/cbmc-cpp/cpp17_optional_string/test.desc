@@ -9,6 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Was KNOWNBUG (crash, then nondet values).  Full fix history: (1) crash:
 per-base recovery + graceful make_ptr_typecast; (2) nondet has_value():
