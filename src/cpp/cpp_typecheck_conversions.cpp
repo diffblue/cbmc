@@ -1651,7 +1651,17 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
           exprt req_copy = req_clause;
           template_map.apply(req_copy);
           typecheck_expr(req_copy);
-          if(req_copy.is_false())
+          // N5008 [temp.constr.atomic]/3: unsatisfied when the value is
+          // false.  A disjunction of concept-ids (`integral<_Tp> ||
+          // __is_int128<_Tp>', libstdc++'s __max_size_type::operator _Tp)
+          // is left as `or(false, false)' by the type checker; fold it,
+          // and accept a numeric zero as false (as the class-template
+          // partial specialization matching does).  Otherwise the explicit
+          // conversion function template was instantiated for every
+          // probed class type and its body (`return _M_val;' to that
+          // type) dropped.
+          simplify(req_copy, *this);
+          if(req_copy.is_false() || req_copy.is_zero())
             constraint_ok = false;
         }
         deduction_ok = constraint_ok;
@@ -2914,25 +2924,35 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     }
     if(found && ambiguous)
       return false;
-    if(found)
-    {
-      rank += found_rank;
-      new_expr.swap(found_expr);
-      return true;
-    }
 
-    // No non-template cast operator matched.  If the source class
-    // has template conversion operators, try [temp.deduct.conv]/1
-    // deduction against the destination type.
+    // N5008 [over.match.best]/2: a conversion function template's
+    // specialization deduced for the destination ([temp.deduct.conv]) is
+    // a candidate alongside the non-template conversion functions and is
+    // compared by the conversion sequence from its return type; only on a
+    // tie is the non-template preferred (/2.4).  `static_cast<int>(x)' on
+    // a class with `explicit operator bool()' and `template <class T>
+    // explicit operator T()' selects the template's `operator int()'
+    // (identity), not operator bool plus an integral conversion (which
+    // used to be taken whenever any non-template matched, giving 1 for a
+    // value of 5).
+    if(!found || found_rank > 0)
     {
       unsigned tmpl_rank = 0;
       exprt tmpl_expr;
-      if(deduce_conversion_template(expr, to, tmpl_expr, tmpl_rank))
+      if(
+        deduce_conversion_template(expr, to, tmpl_expr, tmpl_rank) &&
+        (!found || tmpl_rank < found_rank))
       {
         rank += tmpl_rank;
         new_expr.swap(tmpl_expr);
         return true;
       }
+    }
+    if(found)
+    {
+      rank += found_rank;
+      new_expr.swap(found_expr);
+      return true;
     }
   }
 
