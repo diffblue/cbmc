@@ -1,9 +1,8 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp11
-^\[main\.assertion\.1\] line \d+ float declaration as if condition: SUCCESS$
-^\[main\.assertion\.2\] line \d+ zero is false: SUCCESS$
-^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+--cpp11 --unwind 5
+^\[main\.assertion\.1\] line \d+ conditions that are declarations of class, pointer, float and int type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -11,12 +10,16 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 N5008 [stmt.select.general]/4 + [conv.bool]: a condition that is a
-declaration `if(float a = x)' tests the declared object converted to bool,
-i.e. `a != 0'.  For a floating-point object the front end builds an
-`ieee_float_notequal' node that the statement type checker does not accept
-("unexpected expression: ieee_float_notequal") and the enclosing function
-is rejected -- as a plain `if(x)' on a float works, the fault is in the
-declaration form.  libstdc++'s three-argument std::hypot (`__hypot3', `if
-(_Tp __a = ...)') is dropped by it (audit residue item 8, round 162).
+declaration `if(T a = x)' / `while(T a = x)' tests the declared object
+contextually converted to bool.  The C++ front end converted the object to
+bool itself and then handed the statement to the C type checker, which
+converts the condition again; for a floating-point object the first
+conversion is an `ieee_float_notequal' the second pass does not accept
+("unexpected expression: ieee_float_notequal") and the function was
+rejected (libstdc++'s three-argument std::hypot, `if (_Tp __a = ...)',
+round-162 audit).  Fixed in round 163: the declared variable is left to the
+statement's own conversion.  Covers class (explicit operator bool), pointer,
+float and int conditions in if and while.
