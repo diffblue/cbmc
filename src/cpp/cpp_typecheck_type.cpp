@@ -276,6 +276,21 @@ void cpp_typecheckt::typecheck_type(typet &type)
     type=symbol_expr.type();
     PRECONDITION(type.is_not_nil());
 
+    // A template parameter bound to a type deduced from a parsed function
+    // type (`function<R(ArgTypes...)>' matched against `int(const int &)':
+    // the parameter list is still a cpp_declaration, its element a
+    // frontend_pointer) resolves to that unconverted type.  Convert it
+    // here, as it would be were it spelled directly: otherwise
+    // `static_cast<T &&>(t)' in forward<const int &> saw `frontend_pointer
+    // &&', no reference collapsing ([dcl.ref]/6) happened and the body was
+    // dropped ("type mismatch on static_cast").
+    if(
+      type.id() == ID_frontend_pointer || type.id() == ID_merged_type ||
+      type.id() == ID_cpp_name || type.id() == ID_function_type)
+    {
+      typecheck_type(type);
+    }
+
     // Phase 2 audit per N5008 [temp.inst]/3.1: when a lazy typedef
     // symbol's alias type just propagated through here, drive
     // on-demand resolution.  The type itself carries the lazy
