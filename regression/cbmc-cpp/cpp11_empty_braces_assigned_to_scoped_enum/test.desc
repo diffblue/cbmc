@@ -1,20 +1,26 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ assignment of \{\} value-initializes a scoped enum: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ assignment of \{\} to an int: SUCCESS$
-^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.3\] line \d+ assignment of \{\} to a double: SUCCESS$
+^\[main\.assertion\.4\] line \d+ assignment of \{\} to a bool: SUCCESS$
+^\[main\.assertion\.5\] line \d+ assignment of \{\} to an unscoped enum: SUCCESS$
+^\[main\.assertion\.6\] line \d+ return \{\} of a scoped enum: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
-N5008 [expr.ass]/9: `x = {}' with a braced-init-list means `x = T{}', i.e.
-the operand is value-initialized ([dcl.init.list]/3.11) -- for a scoped
-enumeration the enumerator with value zero.  The C++ front end rejects the
-assignment ("invalid implicit conversion from '<<type:>>' to 'enum errc'").
-libstdc++'s <charconv> writes `__res.ec = {};' in __to_chars_10/16/8/2 and
-__to_chars, so std::to_chars for every integer type is dropped (audit
-residue item 7, round 162; cpp17_from_chars_unsigned, cpp20_format_header).
+N5008 [expr.ass]/8.1: `x = B' with a braced-init-list B and a scalar x means
+`x = t' where `T t = B'; [dcl.init.list]/3.11: an empty list
+value-initializes, i.e. zero-initializes a scalar ([dcl.init.general]/9).
+The C++ front end rejected the assignment for an enumeration type ("invalid
+implicit conversion from '<<type:>>' to 'enum errc'"); libstdc++'s <charconv>
+writes `__res.ec = {};' in __to_chars_10/16/8/2 and __to_chars, so
+std::to_chars for every integer type was dropped (round 162 audit).  Fixed in
+round 163: implicit_typecast value-initializes a scalar target from `{}'.

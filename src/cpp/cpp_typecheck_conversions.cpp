@@ -3768,6 +3768,28 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
   const exprt orig_expr = expr;
   exprt e = expr;
 
+  // N5008 [dcl.init.list]/3.11: an empty braced-init-list value-initializes
+  // the object -- for a scalar ([dcl.init.general]/9) that is
+  // zero-initialization: `e = {}' on a scoped enumeration, an integer or a
+  // floating-point type ([expr.ass]/8.1: `x = B' means `x = t' with `T t =
+  // B').  Class types (default constructor), pointers and references are
+  // handled by their own rules below.
+  if(
+    e.id() == ID_initializer_list && e.operands().empty() &&
+    (type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+     type.id() == ID_bool || type.id() == ID_c_bool ||
+     type.id() == ID_c_enum_tag || type.id() == ID_c_enum ||
+     type.id() == ID_floatbv || type.id() == ID_fixedbv))
+  {
+    const auto zero = ::zero_initializer(type, e.source_location(), *this);
+    if(zero.has_value())
+    {
+      expr = *zero;
+      expr.add_source_location() = orig_expr.source_location();
+      return;
+    }
+  }
+
   if(
     e.id() == ID_initializer_list && (cpp_is_pod(type) || is_reference(type)) &&
     e.operands().size() == 1)
