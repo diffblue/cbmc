@@ -32,6 +32,10 @@ struct holder
 };
 int main()
 {
+  const char text[4] = "abc";
+  const char(&r)[4] = static_cast<const char(&)[4]>(text);
+  __CPROVER_assert(
+    r[2] == 'c', "direct static_cast to a reference-to-array type");
   holder h("abc");
   __CPROVER_assert(
     h.name[0] == 'a' && h.name[2] == 'c' && h.name[3] == 0,

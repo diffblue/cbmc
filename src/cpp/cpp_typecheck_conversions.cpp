@@ -3053,11 +3053,25 @@ bool cpp_typecheckt::reference_compatible(
   c_qualifierst{}.write(to_unqualified);
   const bool genuine_type_difference = from_unqualified != to_unqualified;
 
+  // N5008 [basic.type.qualifier]/3: cv-qualifiers applied to an array type
+  // attach to its element type -- an array type has no qualification of its
+  // own.  The front end sometimes carries a `const' on the array node
+  // (the operand of `static_cast<const char (&)[4]>(t)' with T deduced
+  // from a string literal, std::forward) and sometimes on the element
+  // only (the written reference type); compare the element qualification.
+  const auto array_element = [](const typet &t) -> const typet &
+  {
+    const typet *e = &t;
+    while(e->id() == ID_array)
+      e = &to_array_type(*e).element_type();
+    return *e;
+  };
+
   c_qualifierst qual_from;
-  qual_from.read(expr.type());
+  qual_from.read(array_element(expr.type()));
 
   c_qualifierst qual_to;
-  qual_to.read(reference_type.base_type());
+  qual_to.read(array_element(reference_type.base_type()));
 
   const bool cv_difference = qual_from != qual_to;
 
@@ -4768,6 +4782,35 @@ bool cpp_typecheckt::cast_away_constness(const typet &t1, const typet &t2) const
   if(is_reference(nt2))
     nt2.remove(ID_C_reference);
   nt2.remove(ID_to_member);
+
+  // N5008 [basic.type.qualifier]/3: cv-qualifiers applied to an array type
+  // attach to its element type, so an array level of the type chain below
+  // ([expr.const.cast]/8) carries no qualification of its own.  The front
+  // end represents `const char[4]' both with the const on the array node
+  // (`remove_reference<const char (&)[4]>::type', std::forward of a string
+  // literal) and on the element (the written type); move it down before
+  // comparing, otherwise the two spellings read as casting const away.
+  const auto push_array_qualifiers_to_element = [](typet &t)
+  {
+    typet *p = &t;
+    while(p->id() == ID_pointer || p->id() == ID_array)
+    {
+      if(p->id() == ID_array)
+      {
+        c_qualifierst q;
+        q.read(*p);
+        c_qualifierst{}.write(*p);
+        typet &element = to_array_type(*p).element_type();
+        c_qualifierst eq;
+        eq.read(element);
+        eq += q;
+        eq.write(element);
+      }
+      p = &to_type_with_subtype(*p).subtype();
+    }
+  };
+  push_array_qualifiers_to_element(nt1);
+  push_array_qualifiers_to_element(nt2);
 
   // substitute final subtypes
   std::vector<typet> snt1;
