@@ -760,6 +760,19 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.id() == ID_new_object)
   {
   }
+  else if(
+    (expr.id() == ID_and || expr.id() == ID_or) && expr.operands().size() > 2)
+  {
+    // An n-ary conjunction/disjunction: the satisfaction of a
+    // requires-expression is built as one `and' over all its requirements
+    // ([expr.prim.req.general]/5) and reaches this point when the
+    // enclosing `if constexpr' condition is checked.  The C front end's
+    // handler is for the binary source form and asserts two operands;
+    // and_exprt/or_exprt are n-ary, so convert each operand to bool.
+    for(auto &op : expr.operands())
+      implicit_typecast_bool(op);
+    expr.type() = bool_typet();
+  }
   else if(operator_is_overloaded(expr))
   {
   }
