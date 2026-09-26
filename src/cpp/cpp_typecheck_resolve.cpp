@@ -9864,6 +9864,31 @@ bool cpp_typecheck_resolvet::substitute_function_type(
     old_handler.set_message_count(messaget::M_ERROR, sfinae_errors);
     return false;
   }
+
+  // N5008 [temp.deduct.general]/8: type deduction fails if substituting
+  // the deduced arguments forms an invalid type -- among the listed
+  // examples "attempting to create a reference to void" and "attempting
+  // to create a function type in which a parameter has a type of void".
+  // `T &&' deduced from a void expression (libstdc++'s poison pill
+  // `void begin(auto &) = delete', called in the requires-expression of
+  // the `__adl_begin' concept) is such a case; the instance
+  // `operator()<void>' would otherwise be created with no parameter for
+  // `__t' and its body fail to convert.
+  if(function_type.id() == ID_code)
+  {
+    for(const auto &parameter : to_code_type(function_type).parameters())
+    {
+      const typet &parameter_type = parameter.type();
+      if(parameter_type.id() == ID_empty)
+        return false;
+      if(
+        is_reference(parameter_type) &&
+        to_reference_type(parameter_type).base_type().id() == ID_empty)
+      {
+        return false;
+      }
+    }
+  }
   return true;
 }
 
