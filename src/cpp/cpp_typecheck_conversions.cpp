@@ -2062,6 +2062,27 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         if(to_code_type(comp_type).return_type().id() != ID_constructor)
           continue;
 
+        // N5008 [over.match.funcs]/8 + [temp.deduct.call]: a constructor
+        // TEMPLATE contributes the one specialization deduced from the
+        // argument, not its earlier instantiations.  Those are members of
+        // the class too (`__max_size_type(_Tp)' instantiated for int and
+        // for unsigned __int128, libstdc++ 16's ranges size type), and
+        // treated as ordinary converting constructors they made a `size_t'
+        // argument ambiguous between them.  They are the template trial's
+        // business, below.
+        {
+          const symbolt *comp_symbol =
+            symbol_table.lookup(component.get_name());
+          if(
+            comp_type.find(ID_C_template).is_not_nil() ||
+            (comp_symbol != nullptr &&
+             comp_symbol->type.find(irep_idt{"#fn_template_args"})
+               .is_not_nil()))
+          {
+            continue;
+          }
+        }
+
         // TODO: ellipsis
 
         const auto &parameters = to_code_type(comp_type).parameters();
