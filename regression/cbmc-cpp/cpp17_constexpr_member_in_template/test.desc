@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^symbol 'value' is unknown$
+dropped the body
 --
 constexpr method body must resolve unqualified class-scope members
 in the class's own scope, not at the call site, when the call result

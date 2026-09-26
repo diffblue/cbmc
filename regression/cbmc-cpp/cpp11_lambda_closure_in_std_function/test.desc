@@ -8,6 +8,7 @@ main.cpp
 --
 ^.*CONVERSION ERROR.*$
 ^.*address_arithmetic.*$
+dropped the body
 --
 [expr.prim.lambda.closure]/1: a lambda has a unique closure class type; a
 captureless, non-generic lambda is now lowered to a closure struct with an

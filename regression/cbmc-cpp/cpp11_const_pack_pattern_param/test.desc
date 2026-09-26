@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.variadic]/8: pack expansion substitutes each element INTO the
 pattern, cv-qualifiers included.  The in-class parameter-pack replication

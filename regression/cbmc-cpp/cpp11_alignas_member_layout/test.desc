@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 CBMC ignores alignas in struct layout (sizeof 1 instead of 4); the
 libstdc++ __aligned_membuf pattern under std::map/std::unordered_set

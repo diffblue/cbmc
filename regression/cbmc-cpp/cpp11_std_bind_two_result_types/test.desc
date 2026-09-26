@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 Two std::bind objects with different result types in one translation unit
 (void first, then int) plus a conversion to std::function.  The second used

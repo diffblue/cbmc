@@ -11,6 +11,7 @@ main.cpp
 --
 not found
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [class.virtual]/2: a virtual function newly introduced by a derived class
 must be dispatched correctly.  Regression test for the vtable dispatch bug that

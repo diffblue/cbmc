@@ -10,6 +10,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^(ERROR|error): (invalid implicit conversion|operator 'shl' not defined)
+dropped the body
 --
 N5008 [over.match.oper]/3, [over.match.best]/2: a member operator that is a
 function template participates in operator overload resolution; it wins over a

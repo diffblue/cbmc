@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 must never appear
+dropped the body
 --
 N5008 [temp.inst]/11: a non-virtual destructor of a class template shall not
 be implicitly instantiated unless odr-used.  No S<int> object is created here

@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [expr.prim.req.general]/2 + [temp.constr].  A requires-expression with a
 requirement-parameter-list used directly as a function template's requires-clause

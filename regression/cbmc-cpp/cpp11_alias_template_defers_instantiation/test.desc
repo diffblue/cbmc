@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 could not fully type-check
 dropped
+dropped the body
 --
 N5008 [temp.inst]/1: an alias declaration does not require a complete type,
 so `using str = basic_str<char>;' (an alias TEMPLATE naming a class template

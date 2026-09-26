@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed 2026-07-22: auto&& from an lvalue now deduces an lvalue
 reference ([dcl.type.auto.deduct]/4, [temp.deduct.call]/3,

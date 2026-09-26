@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=10$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [over.match.oper]/3.2: the member candidate set for `a @ b` is the
 qualified lookup of `T1::operator@`, where T1 is the type of the left operand.

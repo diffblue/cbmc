@@ -7,6 +7,7 @@ main.cpp
 --
 ^.*symbol 'value' is unknown.*$
 ^.*symbol 'message_handler' is unknown.*$
+dropped the body
 --
 Verifies that a sibling member-declaration following an inline
 class/struct/union/enum definition whose elaboration throws is

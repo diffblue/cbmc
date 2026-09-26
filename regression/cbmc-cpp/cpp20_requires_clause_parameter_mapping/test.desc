@@ -10,6 +10,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 does not uniquely resolve
+dropped the body
 --
 N5008 [temp.constr.decl]/3 + [temp.constr.atomic]/1: the requires-clause of a
 function template (and of a member template of a class template

@@ -10,6 +10,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^found no match for symbol 'count'$
+dropped the body
 --
 N5008 [temp.deduct.call]/1-4 + [temp.variadic]/4: a variadic function template
 with a forwarding-reference parameter pack `A&&...` deduces each pack element

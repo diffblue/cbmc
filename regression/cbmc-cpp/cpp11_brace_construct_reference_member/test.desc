@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^(ERROR|error): operand of unary
+dropped the body
 --
 N5008 [dcl.init.aggr]/1, [dcl.init.list]/3: a class with a user-declared
 converting constructor is not an aggregate, so It{ref_member} calls the

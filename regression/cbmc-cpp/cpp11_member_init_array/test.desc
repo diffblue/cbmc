@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*direct assignments to arrays not permitted$
+dropped the body
 --
 Regression for the "direct assignments to arrays not permitted"
 bug hit by MSVC's <xstring> SSO buffer (`union _Bxty { char _Buf[N];

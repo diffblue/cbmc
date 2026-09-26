@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^PARSING ERROR$
 ^no body for callee$
+dropped the body
 --
 An explicit/pseudo destructor call written with a template-id
 (`p->~Foo<T>()`) names Foo<T>'s destructor; the template arguments are not a

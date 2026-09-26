@@ -9,6 +9,7 @@ main.cpp
 --
 ^PARSING ERROR$
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [class.base.init]/3, [dcl.init.list]: a mem-initializer argument list may
 have a braced-init-list element.  CBMC's parser rejected a leading braced-init-

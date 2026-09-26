@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.ref]/1 + [expr.unary.op]/1: a reference denotes the object it binds
 to, and the built-in unary * applied to a reference operand yields that object.

@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 UNKNOWN
+dropped the body
 --
 N5008 [expr.reinterpret.cast]/1, [expr.const.cast]/1: casts of an array
 operand apply the array-to-pointer conversion; the libstdc++ node storage

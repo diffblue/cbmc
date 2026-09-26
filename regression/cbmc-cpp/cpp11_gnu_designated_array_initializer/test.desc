@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 User-reported: GNU array designators `[idx] = val` in C++ (accepted
 by g++ and clang++), here in `static constexpr uint8_t sz[3] = {[0]

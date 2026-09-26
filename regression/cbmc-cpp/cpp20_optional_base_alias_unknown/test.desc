@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 libc++ <optional> enable-if ctor-pair shape: same-signature member ctor
 templates collide on their symbol identifier; the collision branches of

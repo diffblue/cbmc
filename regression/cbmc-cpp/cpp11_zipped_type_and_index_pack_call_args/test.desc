@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.variadic]/5,7: a call-argument pack expansion referencing a
 TYPE pack and a NON-TYPE index pack in lockstep, mu<B>(get<I>(t))..., must

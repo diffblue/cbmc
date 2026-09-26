@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 C++20 std::iterator_traits<vector<int>::iterator>::iterator_category, end
 to end via the constrained __iterator_traits machinery.

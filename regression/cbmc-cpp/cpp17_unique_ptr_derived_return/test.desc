@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: "invalid implicit conversion from 'struct unique_ptr' to
 'struct unique_ptr'" on the derived-typed return.

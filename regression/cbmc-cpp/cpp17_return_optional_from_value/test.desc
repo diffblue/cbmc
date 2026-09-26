@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^PARSING ERROR$
 ^.*invalid implicit conversion.*to 'struct optional'.*$
+dropped the body
 --
 Regression for member-converting-constructor template deduction in
 an instantiated namespaced class template (`std::optional<int>`).

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A function parameter declared with a type-yielding builtin AND a name,
 `int probe(__add_rvalue_reference(_Tp) v)`, is a PARSE error ("parse

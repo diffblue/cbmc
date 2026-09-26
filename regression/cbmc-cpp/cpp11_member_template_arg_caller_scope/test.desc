@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [basic.lookup.unqual]/1 + [expr.ref]/1: the explicit template
 arguments of a member template-id (`r.is_derived<I>()`,

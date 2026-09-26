@@ -6,5 +6,6 @@ main.cpp
 ^SIGNAL=0$
 --
 ^Invariant check failed$
+dropped the body
 --
 Catch clause with unknown type name should produce a type-checking error.

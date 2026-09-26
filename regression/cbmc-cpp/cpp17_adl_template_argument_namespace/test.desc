@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 symbol 'transform' is unknown
+dropped the body
 --
 Fixed 2026-07-21: resolve_with_arguments recurses over the recorded
 template arguments of associated class specializations

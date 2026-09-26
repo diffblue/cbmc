@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.fold]/3: folds over an empty pack yield the operator's identity
 (unary && / ||) or the init operand (binary); previously the empty-pack

@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=10$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.param]/11: a function-template parameter pack may be followed by
 further (deducible or defaulted) template parameters, e.g.

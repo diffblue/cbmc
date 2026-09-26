@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*invalid implicit conversion from 'char \[.*\]' to 'struct basic_string'.*$
 ^.*is unknown.*$
+dropped the body
 --
 std::string s("ab") -- construction from a string literal.
 

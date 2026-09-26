@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Locks in the [temp.variadic] pack-expansion contexts CBMC already handles:
 value-pack expansion in a function-call argument list (1/3 elements, forwarded

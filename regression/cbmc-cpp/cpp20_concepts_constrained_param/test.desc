@@ -5,6 +5,7 @@ main.cpp
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+dropped the body
 --
 Abbreviated function templates with concept-constrained auto.
 CBMC skips concept constraints (treats as always satisfied).

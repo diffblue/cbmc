@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.deduct.call]/4.3 + [dcl.constexpr] + [temp.point]/1 + [temp.inst]/5:
 a constexpr function template with a derived-to-base pack parameter, called with

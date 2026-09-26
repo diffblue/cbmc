@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.variadic]/5: a pack expansion whose pattern is a function
 type naming the pack inside a parameter position, F(decay<Bs>::type...),

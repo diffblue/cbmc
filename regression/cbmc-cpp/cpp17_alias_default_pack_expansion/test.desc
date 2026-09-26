@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Minimal pair vs the now-working direct spelling: expanding
 `__enable_if_t<_Bn::value>...` (an alias template with a defaulted

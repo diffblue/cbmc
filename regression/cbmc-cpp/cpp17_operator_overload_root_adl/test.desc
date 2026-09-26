@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*implicit arithmetic conversion not permitted.*$
 ^.*invalid explicit cast.*$
+dropped the body
 --
 Verifies four operator-overload-resolution fixes:
   * ADL on a class declared at global scope walks the root namespace.

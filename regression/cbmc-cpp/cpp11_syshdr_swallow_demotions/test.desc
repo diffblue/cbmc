@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 inconsistent return
+dropped the body
 --
 FLIPPED KNOWNBUG->CORE 2026-08-12.  Two fixes: (1) [temp.inst]/11 --
 still-deferred, never odr-used members carry RAW parse trees; their

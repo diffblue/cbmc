@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A `[&]` lambda inside a member function template calls a sibling
 member function TEMPLATE of the enclosing class unqualified, expanding

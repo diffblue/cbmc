@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*' is not accessible$
+dropped the body
 --
 A member function may access the private members of another object of
 the same class named through an explicit object ([class.access]/2): this

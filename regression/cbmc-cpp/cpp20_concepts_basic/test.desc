@@ -5,6 +5,7 @@ main.cpp
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
 --
+dropped the body
 --
 Basic requires clauses on functions and partial specializations.
 CBMC skips requires clauses (treats as always satisfied).

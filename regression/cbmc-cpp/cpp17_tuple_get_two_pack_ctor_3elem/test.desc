@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 CORE (was KNOWNBUG; header-free, cvise-reduced-then-repaired isolation of
 cpp17_tuple_basic).  Mirrors libstdc++ std::tuple: a variadic converting

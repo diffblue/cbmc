@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed in round 70: a pack expansion whose pattern IS the bare pack
 reference is now substituted element-wise in apply()'s template-argument

@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-21: the synthetic @most_derived flag is a byte-wide
 c_bool instead of a 1-bit boolean, so member byte-offsets in

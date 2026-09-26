@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 User-reported: a scoped enum with fixed underlying type uint8_t used as a
 1-bit bit-field among uint8_t bit-fields must pack into 2 bytes, with

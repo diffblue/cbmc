@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Was KNOWNBUG: std::make_tuple at arity >= 3 returned a nondeterministic
 tuple (make_tuple's body conversion failed and was swallowed as a

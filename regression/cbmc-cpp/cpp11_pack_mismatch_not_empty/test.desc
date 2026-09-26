@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^void-typed symbol not permitted$
+dropped the body
 --
 N5008 [temp.deduct.type]/8: a form mismatch (P=tuple<_Elements...>& vs
 A=int*) fails the ENTIRE deduction; the pack must not be resurrected as

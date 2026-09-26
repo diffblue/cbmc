@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.const] + [temp.inst]/5: a constexpr function template whose
 body initialises a local array from a pack expansion and reads it back in a

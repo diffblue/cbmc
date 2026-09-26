@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 does not uniquely resolve
+dropped the body
 --
 N5008 [over.match.copy], [over.best.ics.general]/4: a class initialised from a
 different class goes through the source's conversion function (template) when

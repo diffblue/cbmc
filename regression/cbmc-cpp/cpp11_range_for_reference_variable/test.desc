@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 Invariant check failed
+dropped the body
 --
 Reference-typed range-for variables (auto &, const auto &, T &) over arrays,
 std::vector and std::list elements bind to the element instead of copying it.

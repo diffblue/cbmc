@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.fct]/7: cv-qualifiers added on top of a function type are ignored
 (there are no cv-qualified function types).  A const-qualified template

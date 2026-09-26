@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.capture] / [expr.prim.lambda.closure]: `[this]` and a
 capture-default that odr-uses members capture the enclosing object by reference

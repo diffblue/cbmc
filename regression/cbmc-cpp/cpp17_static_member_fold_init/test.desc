@@ -10,6 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.variadic]/5 + [expr.prim.fold]: a fold pattern that is a
 QUALIFIED reference to a member of each pack element (`Ts::v`) keeps its

@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Classic void_t partial-specialization SFINAE (member-type probe and
 expression-decltype probe), including as members of a class template.  N5008

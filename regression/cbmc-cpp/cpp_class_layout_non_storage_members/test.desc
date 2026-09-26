@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Member typedefs, static data members and member functions occupy no storage;
 the layout used to treat them as data (user Issues 5 and 7).

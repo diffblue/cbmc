@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [over.match.class.deduct]: `C(args)` naming a class template without
 template arguments is class template argument deduction (the std::optional(x)

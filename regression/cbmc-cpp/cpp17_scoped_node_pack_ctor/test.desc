@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 g++/clang++ accept and hold natively.  Trace evidence (real umap):
 the rvalue _Scoped_node ctor instance assigns only __h/__n (the

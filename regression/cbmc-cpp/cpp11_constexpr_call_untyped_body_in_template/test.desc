@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^not permitted
+dropped the body
 --
 typecheck_side_effect_function_call's constexpr evaluator converts the
 callee's body eagerly (in the callee's own scope) not only when it still

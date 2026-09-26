@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^expected constant expression, but got 'operator\(bool\)\(\(const struct integral_constant \*\)&.*'$
+dropped the body
 --
 Companion to `cpp17_constexpr_member_in_template`.  That earlier
 test covers constexpr methods of GLOBAL class templates whose

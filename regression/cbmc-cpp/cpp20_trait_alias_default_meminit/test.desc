@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Resolution 2026-07-30: same mode-availability finding as
 cpp20_extern_template_copy_ctor_abort -- the clang builtin

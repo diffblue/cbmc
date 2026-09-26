@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*is unknown.*$
+dropped the body
 --
 C++20 constrained partial specialization selection ([temp.class.spec.match]/1-2,
 [temp.constr.order]): when several class-template partial specializations share

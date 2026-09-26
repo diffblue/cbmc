@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies [class.copy.ctor]/1,7,8: implicitly-declared copy constructor
 copies each subobject; user-defined copy constructor actually runs on

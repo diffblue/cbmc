@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A class template privately inherits (class default access) from a
 template-template-parameter base and republishes a base member with a

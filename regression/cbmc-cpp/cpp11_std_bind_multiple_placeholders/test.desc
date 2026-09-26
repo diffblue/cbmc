@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 std::bind with two or more placeholders.  _Bind::operator()'s defaulted
 _Result parameter expands the call's own _Args pack (tuple<_Args...>,

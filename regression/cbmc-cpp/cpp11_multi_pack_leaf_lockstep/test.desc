@@ -8,6 +8,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Header-free distillation of libc++ <tuple>'s __tuple_impl; the
 heterogeneous element types (int, double, char) make a collapsed

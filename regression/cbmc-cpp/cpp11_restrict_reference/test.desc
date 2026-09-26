@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 parse error
+dropped the body
 --
 N5008 [dcl.ref]/1: references cannot be cv-qualified, but GCC/Clang accept a
 `__restrict`-qualified reference (`T & __restrict`) as an extension.  Regression

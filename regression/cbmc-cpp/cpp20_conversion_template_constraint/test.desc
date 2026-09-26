@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*is unknown.*$
+dropped the body
 --
 [temp.deduct]/5, [temp.deduct.conv], [temp.constr.decl]: a conversion-function
 template whose associated constraints (requires-clause) are not satisfied by the

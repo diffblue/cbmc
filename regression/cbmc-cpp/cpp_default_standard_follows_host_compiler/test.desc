@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 apply_host_default_cxx_standard (ansi-c/gcc_version.cpp) queries the host
 compiler's __cplusplus, mirroring goto-cc.  gcc-only: Visual Studio mode sets

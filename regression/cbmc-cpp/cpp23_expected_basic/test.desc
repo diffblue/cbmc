@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 C++23 std::expected<int, int> basic usage (construction, has_value,
 operator*), real libstdc++ <expected>.

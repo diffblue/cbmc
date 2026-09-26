@@ -7,6 +7,7 @@ main.cpp
 --
 ^.*operator 'shl' not defined.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies that for an overloaded operator (`<<`) with both a member
 function-template specialization and a non-template free

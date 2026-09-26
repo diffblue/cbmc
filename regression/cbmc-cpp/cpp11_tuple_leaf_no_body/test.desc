@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Header-free mimic of libc++ std::tuple, cvise-reduced: the constructor
 chain routes through __make_integer_seq / __type_pack_element

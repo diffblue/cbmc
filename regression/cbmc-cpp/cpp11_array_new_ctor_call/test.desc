@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Per [expr.new]/24 and [expr.delete]/6: `new T[N]` runs T's default
 constructor N times, and `delete[] ptr` runs T's destructor N times.

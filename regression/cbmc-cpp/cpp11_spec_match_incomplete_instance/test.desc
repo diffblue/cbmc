@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed 2026-08-06: the deduction gate accepts instances that record
 full_template_args (or C_template_arguments) without ID_C_template.

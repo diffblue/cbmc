@@ -10,6 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.pre]/1, [dcl.attr.grammar], [temp.constr.decl]: a requires-clause
 followed by `[[nodiscard]] __attribute__((visibility("hidden")))'.

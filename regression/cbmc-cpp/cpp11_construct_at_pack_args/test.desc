@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.variadic]/5 + [expr.new]: a pack expansion in a
 new-initializer's expression-list inside a FREE function template --

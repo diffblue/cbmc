@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Trailing-return decltype referencing a parameter must be deduced per
 instantiation following the argument's cv-qualification. A const and a

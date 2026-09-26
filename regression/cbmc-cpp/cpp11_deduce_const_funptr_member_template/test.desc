@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*no body for callee.*$
+dropped the body
 --
 N5008 [temp.deduct.call]/3: for a forwarding reference Fn&& and an lvalue
 argument of type `const FP` (a const function pointer), Fn is deduced as

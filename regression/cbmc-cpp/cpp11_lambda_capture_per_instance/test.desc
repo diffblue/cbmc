@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.closure]/1 -- each closure is a distinct object with its own
 capture members.  Lambda rework Phase B gives each closure object its own

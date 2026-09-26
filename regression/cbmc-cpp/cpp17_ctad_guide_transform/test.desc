@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 `--64': the expected values are those of the LP64 data model (the 32-bit CI
 build otherwise computes ILP32 layouts/types).

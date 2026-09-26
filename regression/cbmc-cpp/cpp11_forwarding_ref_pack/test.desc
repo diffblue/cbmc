@@ -11,6 +11,7 @@ main.cpp
 --
 ^.*dereference failure.*: FAILURE$
 ^CONVERSION ERROR$
+dropped the body
 --
 C++ [temp.deduct.call]/3 forwarding-reference deduction applied element-wise to
 a forwarding-reference parameter pack (Args&&... args).  The deduction code

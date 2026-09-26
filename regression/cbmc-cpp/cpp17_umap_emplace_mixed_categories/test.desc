@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A second DISTINCT unordered_map::emplace instantiation fails "found
 no match for symbol 'emplace'" -- diagnosis 2026-07-22: while

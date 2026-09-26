@@ -12,6 +12,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static assertion failed
+dropped the body
 --
 N5008 [over.match.oper]/3.4: for `x @ y' with @ relational the candidate
 set includes the rewritten `(x <=> y) @ 0' and reversed `0 @ (y <=> x)';

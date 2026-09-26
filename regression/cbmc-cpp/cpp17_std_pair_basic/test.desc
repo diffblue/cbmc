@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies that libstdc++'s std::pair<int, int> instantiates fully
 and a user `std::pair<int, int> p;` produces a tag-pair symbol AND

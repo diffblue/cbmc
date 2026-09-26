@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^found no match for symbol 'make_range'$
+dropped the body
 --
 N5008 [temp.deduct]/[expr.type]: resolving a function template whose trailing
 return type contains a decltype naming a parameter (`-> ranget<decltype(c.begin())>`)

@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 template_parameter_symbol_type
+dropped the body
 --
 Pins [temp.type]/1 canonical naming of template TEMPLATE arguments: the
 instantiated name must not embed an internal parameter placeholder.

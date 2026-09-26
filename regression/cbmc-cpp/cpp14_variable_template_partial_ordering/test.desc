@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 N5008 [temp.spec.partial.order]/1: libstdc++'s extent_v has both
 `extent_v<_Tp[_Size], 0>` and `extent_v<_Tp[_Size], _Uint>`; for

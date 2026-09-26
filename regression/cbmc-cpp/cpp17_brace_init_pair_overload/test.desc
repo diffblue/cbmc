@@ -10,6 +10,7 @@ main.cpp
 ^.*invalid implicit conversion from .* to 'struct initializer_list'.*$
 ^.*invalid implicit conversion from .* to 'struct _Node_handle.*$
 ^.*does not uniquely resolve.*$
+dropped the body
 --
 Verifies brace-init-list overload resolution for `std::pair`-typed
 parameters: by-value, by-const-lvalue-reference, and by-rvalue-

@@ -9,6 +9,7 @@ main.cpp
 ^.*invariant violation.*$
 ^.*found no match for symbol.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 End-to-end: std::erase_if over a populated std::vector (real libstdc++) removes
 the single element equal to 2 from {1,2,3}, leaving size() == 2.

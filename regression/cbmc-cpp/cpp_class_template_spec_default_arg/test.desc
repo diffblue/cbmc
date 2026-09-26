@@ -8,6 +8,7 @@ main.cpp
 ^.*symbol 'operator\(\)' is unknown.*$
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 Regression for selecting an explicit class-template specialization
 whose primary template has a defaulted template parameter

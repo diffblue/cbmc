@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.dep.type]/1 + [temp.mem]: members of a member class
 template of a class template may use the ENCLOSING template's

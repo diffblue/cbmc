@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [dcl.spec.auto]/3-4,11 + [temp.variadic]/4-5.  A function template with a
 DEDUCED return type (`decltype(auto)`) whose body calls ANOTHER deduced-return

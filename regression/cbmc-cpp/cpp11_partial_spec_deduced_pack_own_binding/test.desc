@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.deduct]/5 + [basic.scope.temp]/2: a partial specialization
 impl<false, F, A...> used twice with different arities; its member typedef

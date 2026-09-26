@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.deduct.call]/4 (derived-to-base deduction).  Deducing a
 class-template base `impl<I, H, T...>` from an argument of a class derived from a

@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 does not uniquely resolve
+dropped the body
 --
 N5008 [over.match.ctor]/1, [namespace.udecl]/3: base-class constructors are not
 candidates for initializing a derived object unless inherited via a

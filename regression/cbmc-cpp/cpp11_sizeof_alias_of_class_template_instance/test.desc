@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 N5008 [expr.sizeof]/1, [expr.alignof]/1 + [temp.inst]/2: sizeof/alignof
 require a complete type, which implicitly instantiates the class template

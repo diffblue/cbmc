@@ -9,6 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 FAILURE
+dropped the body
 --
 N5008 [stmt.return]/2 + [dcl.init.list]/3.5: `return {};` for a class
 return type value-initializes the result object.  Previously the empty

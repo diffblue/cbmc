@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Recursive member alias template as base-specifier resolves to empty
 and the base is dropped (bases()=0); qualified member use in template

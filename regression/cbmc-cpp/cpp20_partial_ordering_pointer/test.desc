@@ -8,6 +8,7 @@ main.cpp
 --
 ^.*does not uniquely resolve.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.func.order] partial ordering as a tie-breaker in overload
 resolution.  For an lvalue `int*` argument, f(T*) and f(const U&) have

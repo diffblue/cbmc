@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [except.ctor]/1-3, [except.throw]/4: automatic objects constructed in the try
 are destroyed in reverse order during unwinding, before the handler; an object

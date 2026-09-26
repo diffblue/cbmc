@@ -9,6 +9,7 @@ main.cpp
 ^CONVERSION ERROR$
 could not fully type-check
 no body for callee
+dropped the body
 --
 Scoped enums with a fixed underlying type (uint8_t) as bit-fields among
 uint8_t / bool bit-fields, with straddling: System V ABI storage-unit rule

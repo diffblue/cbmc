@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.variadic]/5: a pack expansion in a braced-init-list
 (`{sizeof(Ts)...}`, `{__is_same(T, Ts)...}`) expands to one

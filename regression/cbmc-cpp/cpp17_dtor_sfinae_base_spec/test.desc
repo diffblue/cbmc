@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 Was KNOWNBUG; fixed by two changes: (1) N5008 [expr.prim.id.dtor] +
 [class.dtor]/1,6 -- the explicit destructor call notation on a class

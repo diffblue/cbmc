@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*does not uniquely resolve.*$
+dropped the body
 --
 N5008 [basic.lookup.argdep]/3.1: when ordinary unqualified lookup of a name
 finds the declaration of a class member, the associated namespaces/classes are

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A mem-initializer naming an anonymous-union variant member
 (`: __null_state_()`, [class.base.init]/2) is silently dropped from

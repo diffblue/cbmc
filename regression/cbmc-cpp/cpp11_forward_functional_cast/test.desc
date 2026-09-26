@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 A functional/explicit type conversion from a reference-typed operand
 (`T(static_cast<A&&>(a))`, the std::forward construction form) must apply the

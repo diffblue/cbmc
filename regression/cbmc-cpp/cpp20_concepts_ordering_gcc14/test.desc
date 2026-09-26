@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Concept-constrained specialization ordering with __is_pointer and
 __remove_pointer builtins in requires clauses produces incorrect

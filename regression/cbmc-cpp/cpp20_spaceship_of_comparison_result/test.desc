@@ -11,6 +11,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.spaceship]/4: the usual arithmetic conversions are applied to
 arithmetic operands of <=>.  The lowering to the comparison-category

@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.closure]: a mutable lambda's operator() is non-const and its
 by-copy captures are mutable non-static data members, so modifications persist

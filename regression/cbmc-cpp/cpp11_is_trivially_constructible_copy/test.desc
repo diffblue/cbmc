@@ -10,6 +10,7 @@ main.cpp
 static_assert condition could not be evaluated
 static assertion failed
 ^warning: ignoring
+dropped the body
 --
 N5008 [meta.unary.prop] is_trivially_constructible, [class.copy.ctor]/11.
 Non-vacuous: the last assertion is deliberately wrong and must FAIL.  Before

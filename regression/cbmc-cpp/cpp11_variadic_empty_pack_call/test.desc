@@ -8,6 +8,7 @@ main.cpp
 --
 ^.*found no match for symbol.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic]/5 -- expanding an empty parameter pack in a function-call
 argument list yields an empty argument list, so `base(a...)` with zero pack

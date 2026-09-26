@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [meta.unary.prop]: is_constructible<T, Args...> uses declval<Args>(),
 whose value category is an lvalue iff Arg is an lvalue reference.  Regression

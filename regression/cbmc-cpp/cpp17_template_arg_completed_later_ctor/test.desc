@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Constructor variant of cpp17_template_arg_completed_later: the stale
 incomplete-base instance reaches symex and aborts an invariant in

@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.deduct.type]/8: the partial specialization pattern T C::*
 deduces both the member type and the class from a pointer-to-member argument

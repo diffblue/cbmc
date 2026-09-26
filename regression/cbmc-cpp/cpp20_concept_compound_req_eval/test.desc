@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Compound requirements ({ expr } -> concept<type>;) in requires-expressions
 are not evaluated. The parser skips them and returns true.

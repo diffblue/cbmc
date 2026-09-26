@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 symbol 'read' is unknown
+dropped the body
 --
 N5008 [temp.inst]/1, [temp.point]: a class template specialization is completed
 only from a *definition* of the template.  CBMC used to eagerly elaborate a

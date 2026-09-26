@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 std::function with a reference-typed parameter must select the
 function-type partial specialization, so its operator bool / operator()
