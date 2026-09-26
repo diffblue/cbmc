@@ -798,6 +798,8 @@ protected:
   std::set<irep_idt> odr_used_by_member_initializer;
 
   void add_method_body(symbolt *_method_symbol);
+  void
+  bind_class_instance_parameters(const symbolt &class_sym, template_mapt &map);
 
   /// Static member symbols whose initializers are deferred until
   /// after the class body is fully declared.
@@ -1508,6 +1510,21 @@ private:
   /// conversion (hence the trait) as false.
   std::set<irep_idt> template_conversions_in_progress;
   bool skip_typechecking_elaborate = false;
+
+  /// N5008 [temp.inst]/1: naming a class template specialization does NOT
+  /// instantiate it; only a context requiring completeness ([temp.inst]/2)
+  /// does.  The front end still instantiates on naming (resolve's TYPE
+  /// branch) -- switching this off is the structural change towards the
+  /// standard's rule; the completeness-requiring sites already elaborate on
+  /// their own (object definitions, function-definition parameter and
+  /// return types, derived-to-base deduction, functional casts, member
+  /// access, sizeof, bases, conversions).  The environment variable
+  /// CBMC_ELAB_ON_NAMING=0 exercises the on-use mode; see the round-162
+  /// notes for the remaining failures (7 of ~1400 cbmc-cpp tests, all in the
+  /// instantiation-context handling of member templates of partial
+  /// specializations).
+  bool elaborate_on_naming = getenv("CBMC_ELAB_ON_NAMING") == nullptr ||
+                             std::string(getenv("CBMC_ELAB_ON_NAMING")) != "0";
   std::unordered_set<irep_idt> deferred_typechecking;
   std::unordered_set<irep_idt> functions_being_typechecked;
 
