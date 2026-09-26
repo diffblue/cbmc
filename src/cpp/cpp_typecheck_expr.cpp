@@ -6942,6 +6942,56 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   }
   else
   {
+    // N5008 [dcl.spec.auto.general]/11-13: a call to a function with a
+    // placeholder return type needs the type deduced from the function's
+    // definition here.  A namespace-scope function's definition is converted
+    // eagerly for that reason (cpp_declarator_converter), a non-static
+    // member's when called through the member syntax
+    // (typecheck_method_application); a STATIC member function template
+    // specialization named directly (`_S_convert(source)' in
+    // std::filesystem::path's constructor template) reached this point
+    // with the placeholder still in its type, and its result could not
+    // initialize anything ("found no match for symbol 'str'").
+    if(
+      expr.function().id() == ID_symbol &&
+      expr.function().type().id() == ID_code &&
+      has_auto(to_code_type(expr.function().type()).return_type()))
+    {
+      symbolt *callee_symbol = symbol_table.get_writeable(
+        to_symbol_expr(expr.function()).get_identifier());
+      if(
+        callee_symbol != nullptr && callee_symbol->value.is_not_nil() &&
+        callee_symbol->value.id() != ID_cpp_not_typechecked &&
+        callee_symbol->value.type().id() != ID_code &&
+        functions_being_typechecked.count(callee_symbol->name) == 0)
+      {
+        cpp_saved_template_mapt saved_map(template_map);
+        prepare_deferred_method_body(*callee_symbol);
+        try
+        {
+          convert_function(*callee_symbol);
+        }
+        catch(...)
+        {
+          // the body's conversion reports its own failure; the call keeps
+          // the placeholder type
+        }
+        deferred_typechecking.erase(callee_symbol->name);
+        for(auto it = method_bodies.begin(); it != method_bodies.end(); ++it)
+        {
+          if(
+            it->method_symbol != nullptr &&
+            it->method_symbol->name == callee_symbol->name)
+          {
+            method_bodies.erase(it);
+            break;
+          }
+        }
+        expr.function().type() = callee_symbol->type;
+        expr.type() = to_code_type(callee_symbol->type).return_type();
+      }
+    }
+
     // for the object of a method call,
     // we are willing to add an "address_of"
     // for the sake of operator overloading
