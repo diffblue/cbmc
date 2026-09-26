@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ forward of an array lvalue keeps the array reference type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+type mismatch
+dropped the body
+--
+N5008 [expr.static.cast]/3 + [dcl.ref]/6: with T deduced as `const char
+(&)[4]' from a string literal argument, `static_cast<T &&>(t)' in
+std::forward is a cast to `const char (&)[4]' (reference collapsing) whose
+operand is the array lvalue -- an identity conversion.  static_typecast
+does not accept a cast to a reference-to-array type from an array lvalue
+("type mismatch on static_cast: operand type 'const char [4l]', cast type
+'const char [4l] &'") and forward's body is dropped; every perfect-forwarded
+string literal then reads as nondet (audit residue item 9, round 162: the
+remaining `forward' drops of the corpus, e.g. std::string constructed
+through emplace).
