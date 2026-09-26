@@ -8506,7 +8506,11 @@ bool Parser::rRelationalExpr(exprt &exp, bool template_args)
              next == TOK_OROR || next == TOK_ANDAND || next == '}' ||
              next == '(' || next == '['))
           {
-            name_expr->get_sub().push_back(args);
+            // the same shape as rName/rVarNameCore build: a template_args
+            // component holding the arguments
+            irept component{ID_template_args};
+            component.add(ID_arguments).swap(args);
+            name_expr->get_sub().push_back(std::move(component));
             continue;
           }
         }
@@ -10052,7 +10056,17 @@ bool Parser::rPostfixExpr(exprt &exp)
             int next = lex.LookAhead(0);
             if(next == '(' || next == '[' || next == '.' || next == ';')
             {
-                name_expr->get_sub().push_back(args);
+                // The component must have the shape rName/rVarNameCore
+                // build (`template_args' holding `arguments'); the bare
+                // argument list pushed here before was an id-less node the
+                // type checker could not read, so libc++'s
+                // `__align_it<sizeof(value_type) < __alignment ? ... : 1>(n)'
+                // (basic_string::__recommend, reached through this retry
+                // because the nested `<' defeats maybeTemplateArgs) lost its
+                // body.
+                irept component{ID_template_args};
+                component.add(ID_arguments).swap(args);
+                name_expr->get_sub().push_back(std::move(component));
                 continue;
             }
           }
@@ -11769,7 +11783,10 @@ bool Parser::rVarNameCore(exprt &name)
         irept args;
         cpp_token_buffert::post pos = lex.Save();
         if(rTemplateArgs(args))
-          components.push_back(args);
+        {
+          components.push_back(irept(ID_template_args));
+          components.back().add(ID_arguments).swap(args);
+        }
         else
           lex.Restore(pos);
       }
