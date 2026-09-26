@@ -9074,6 +9074,22 @@ static bool contains_call_argument_pack(const irept &n)
           if(a.get_bool(ID_ellipsis))
             return true;
   }
+  // N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's
+  // expression-list is a pack-expansion context like a call's argument
+  // list -- `decltype(::new(declval<void *>()) _Tp(declval<_Args>()...))',
+  // the constraint of libc++'s std::construct_at.  An EMPTY _Args (the
+  // `std::construct_at(p)' of basic_string::__begin_lifetime) must be
+  // expanded to no initializer before the operand is type-checked; missed
+  // here, the bare pack reference was rejected and the call found no
+  // viable candidate.
+  if(
+    n.id() == ID_side_effect && n.get(ID_statement) == ID_cpp_new &&
+    n.find(ID_initializer).is_not_nil())
+  {
+    for(const auto &a : n.find(ID_initializer).get_sub())
+      if(a.get_bool(ID_ellipsis))
+        return true;
+  }
   for(const auto &s : n.get_sub())
     if(contains_call_argument_pack(s))
       return true;

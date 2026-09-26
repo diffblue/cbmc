@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ value-initialization of a char is allowed by the default argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructor arguments forwarded: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+dropped the body
+is unknown$
+--
+N5008 [expr.new]/1 + [temp.variadic]/5: a new-initializer's expression-list
+is a pack-expansion context, and [temp.param]/14: a function template's
+parameter pack need not be its last template parameter.  libc++'s
+`template <class T, class... Args, class = decltype(::new(declval<void *>())
+T(declval<Args>()...))> construct_at(T *, Args &&...)' called with NO
+arguments (basic_string::__begin_lifetime) failed twice: the empty pack in
+the constraint's new-initializer was not expanded before type-checking (no
+viable candidate), and the instantiation-time empty-pack strip only looked
+at a TRAILING pack, leaving `static_cast<Args &&>(args)...' in the body
+("symbol 'args' is unknown").

@@ -7774,23 +7774,31 @@ skip_pack_removal_ft:
   // point; see template_map.cpp's single-pack binding), remove
   // pack-expanded parameters from the function declaration and its nested
   // types.  N5008 [temp.variadic]/7.
-  const bool trailing_pack_is_empty_sentinel =
-    !template_type.template_parameters().empty() &&
-    template_type.template_parameters().back().get_bool(ID_ellipsis) &&
-    full_template_args.arguments().size() ==
-      template_type.template_parameters().size() &&
-    !full_template_args.arguments().empty() &&
-    full_template_args.arguments().back().id() == ID_type &&
-    full_template_args.arguments().back().type().id() == ID_empty;
+  // N5008 [temp.param]/14: a function template's parameter pack need not
+  // be the last parameter -- `template <class T, class... Args, class =
+  // decltype(...)> construct_at(T *, Args &&...)' (libc++) has a defaulted
+  // parameter after it, and an empty pack then shows as the sentinel at
+  // the pack's own position.  Find the pack wherever it is.
+  std::size_t pack_index = template_type.template_parameters().size();
+  for(std::size_t i = 0; i < template_type.template_parameters().size(); ++i)
+  {
+    if(template_type.template_parameters()[i].get_bool(ID_ellipsis))
+    {
+      pack_index = i;
+      break;
+    }
+  }
+  const bool pack_is_empty_sentinel =
+    pack_index < full_template_args.arguments().size() &&
+    full_template_args.arguments()[pack_index].id() == ID_type &&
+    full_template_args.arguments()[pack_index].type().id() == ID_empty;
   if(
-    (full_template_args.arguments().size() <
-       template_type.template_parameters().size() ||
-     trailing_pack_is_empty_sentinel) &&
-    !template_type.template_parameters().empty() &&
-    template_type.template_parameters().back().get_bool(ID_ellipsis))
+    pack_index < template_type.template_parameters().size() &&
+    (full_template_args.arguments().size() <= pack_index ||
+     pack_is_empty_sentinel))
   {
     // Get the pack parameter's short name
-    const auto &pack_param = template_type.template_parameters().back();
+    const auto &pack_param = template_type.template_parameters()[pack_index];
     const std::string full_id = id2string(pack_param.type().get(ID_identifier));
     auto pos = full_id.rfind("::");
     const std::string pack_name =
