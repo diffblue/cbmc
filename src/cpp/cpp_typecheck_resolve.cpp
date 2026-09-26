@@ -1335,25 +1335,19 @@ void cpp_typecheck_resolvet::guess_function_template_args(
     {
       const symbolt *class_sym =
         cpp_typecheck.symbol_table.lookup(inst_class_tag);
-      // Primary-template instances only: for a PARTIAL SPECIALIZATION
-      // instance, ID_C_template holds the specialization's own
-      // parameter list while ID_C_template_arguments holds the
-      // PRIMARY template's argument list ([temp.spec.partial]) --
-      // pairing them positionally binds garbage (e.g. _Types :=
-      // tuple<int> instead of {int} for
-      // tuple_element<__i, tuple<_Types...>>).
-      if(
-        class_sym != nullptr &&
-        class_sym->type.find(ID_C_template).is_not_nil() &&
-        class_sym->type.find(ID_C_template_arguments).is_not_nil() &&
-        class_sym->type.get(ID_specialization_of).empty())
-      {
-        cpp_typecheck.template_map.build(
-          static_cast<const template_typet &>(
-            class_sym->type.find(ID_C_template)),
-          static_cast<const cpp_template_args_tct &>(
-            class_sym->type.find(ID_C_template_arguments)));
-      }
+      // N5008 [temp.inst]/1: the member template is instantiated in the
+      // context of its class instance -- the class's parameters bound to
+      // the instance's arguments, including a partial specialization's
+      // packs (`_ArgTypes...' of function<int(int, int)>, named by the
+      // constructor template's default argument `__invoke_result<_DFunc&,
+      // _ArgTypes...>'; unbound, the pack expanded to one element and
+      // std::function's converting constructor found no match).
+      // bind_class_instance_parameters replays the deduction-time pack
+      // bindings recorded on the instance, so a partial specialization's
+      // packs are not paired positionally with the primary's arguments.
+      if(class_sym != nullptr)
+        cpp_typecheck.bind_class_instance_parameters(
+          *class_sym, cpp_typecheck.template_map);
     }
 
     // N5008 [temp.variadic]/5,8: replay the deduction-time pack bindings
@@ -6818,7 +6812,8 @@ resolved_after_strip:
         // object is never initialised).
         if(
           result.id() == ID_struct_tag &&
-          !cpp_typecheck.skip_typechecking_elaborate)
+          !cpp_typecheck.skip_typechecking_elaborate &&
+          cpp_typecheck.elaborate_on_naming)
         {
           struct_tag_typet instance = to_struct_tag_type(result);
           instance.add_source_location() = source_location;
@@ -6838,7 +6833,9 @@ resolved_after_strip:
       typet instance = disambiguate_template_classes(
         base_name, id_set, template_args, qualified);
 
-      if(!cpp_typecheck.skip_typechecking_elaborate)
+      if(
+        !cpp_typecheck.skip_typechecking_elaborate &&
+        cpp_typecheck.elaborate_on_naming)
         cpp_typecheck.elaborate_class_template(instance);
 
       identifiers.push_back(exprt(ID_type, instance));
@@ -8104,6 +8101,11 @@ void cpp_typecheck_resolvet::guess_template_args(
         return;
       }
 
+      // N5008 [temp.deduct.call]/4.3 with [temp.inst]/2: deducing from A's
+      // BASE CLASSES needs A complete; the argument's class template
+      // specialization is instantiated here if it has only been named so far
+      // (`Derived<int> &__d' as a parameter, then `get_head(__d)').
+      cpp_typecheck.elaborate_class_template(desired_type);
       const symbolt *desired_sym =
         cpp_typecheck.symbol_table.lookup(desired_id);
       if(desired_sym == nullptr)
@@ -10196,6 +10198,43 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
               cpp_typecheck.cpp_scopes.id_map[template_symbol.name];
             if(tscope != nullptr)
               cpp_typecheck.cpp_scopes.go_to(*tscope);
+            // N5008 [temp.inst]/1, [temp.dep.type]: a member template's
+            // default template argument is evaluated in the context of the
+            // class instance -- its parameters bound, including a partial
+            // specialization's packs (`_ArgTypes...' in std::function's
+            // `_Callable<_Functor>' constraint).  The bindings made when
+            // this deduction started may have been swapped out by an
+            // intervening alias or argument type-check; re-establish them
+            // (non-overriding for the member's own deduced parameters).
+            if(!member_class_tag.empty())
+            {
+              const symbolt *enclosing_sym =
+                cpp_typecheck.symbol_table.lookup(member_class_tag);
+              if(enclosing_sym != nullptr)
+              {
+                template_mapt with_class;
+                cpp_typecheck.bind_class_instance_parameters(
+                  *enclosing_sym, with_class);
+                for(const auto &tm : with_class.type_map)
+                  cpp_typecheck.template_map.type_map.emplace(
+                    tm.first, tm.second);
+                for(const auto &em : with_class.expr_map)
+                  cpp_typecheck.template_map.expr_map.emplace(
+                    em.first, em.second);
+                for(const auto &ps : with_class.pack_size_map)
+                  if(
+                    cpp_typecheck.template_map.pack_size_map.find(ps.first) ==
+                    cpp_typecheck.template_map.pack_size_map.end())
+                    cpp_typecheck.template_map.set_pack_size(
+                      ps.first, ps.second);
+                for(const auto &pa : with_class.pack_args_map)
+                  cpp_typecheck.template_map.pack_args_map.emplace(
+                    pa.first, pa.second);
+                for(const auto &pe : with_class.pack_expr_map)
+                  cpp_typecheck.template_map.pack_expr_map.emplace(
+                    pe.first, pe.second);
+              }
+            }
             // N5008 [temp.variadic]/5: if the default argument's operand
             // contains a function-call argument pack expansion over the
             // enclosing class parameter pack (e.g. a constructor's

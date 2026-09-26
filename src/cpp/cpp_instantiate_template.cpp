@@ -1359,6 +1359,15 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     }
   } in_progress_guard{elaborations_in_progress, symbol.name};
 
+  // N5008 [temp.point]/1, [temp.inst]/2: the specialization is instantiated
+  // in its own context, from its recorded template arguments -- not in the
+  // union of the bindings of whatever instantiation happens to REQUIRE it
+  // (the outer bindings leaked into pack sizes: `_ArgTypes...' of
+  // function<int(int, int)> read as one element when function's own
+  // constructor constraint completed _Callable<F>).
+  cpp_saved_template_mapt fresh_map_guard(template_map);
+  template_map.clear();
+
   // Make a copy, as instantiate will destroy the symbol type!
   const typet t_type = symbol.type;
 

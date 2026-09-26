@@ -2101,6 +2101,96 @@ void cpp_typecheckt::drop_unreferenced_held_back_bodies()
   held_back_bodies.clear();
 }
 
+/// N5008 [temp.inst]/1, [temp.spec.partial.match]: bind the template
+/// parameters of the class template instance \p class_sym in \p map -- the
+/// recorded arguments positionally, then the deduction-time pack bindings
+/// persisted on the instance (#spec_template_packs; a partial
+/// specialization's non-trailing or multiple packs cannot be recovered from
+/// the flat argument list), non-overriding.  Used wherever a member of the
+/// instance is type-checked outside the instance's own instantiation: the
+/// deferred method-body drain, and the deduction of a member function
+/// template's arguments at a call (`function<int(int, int)> f = add' with
+/// the constructor template's default argument naming `_ArgTypes...').
+void cpp_typecheckt::bind_class_instance_parameters(
+  const symbolt &class_sym,
+  template_mapt &map)
+{
+  if(
+    class_sym.type.find(ID_C_template).is_nil() ||
+    class_sym.type.find(ID_C_template_arguments).is_nil())
+  {
+    return;
+  }
+  map.build(
+    static_cast<const template_typet &>(class_sym.type.find(ID_C_template)),
+    static_cast<const cpp_template_args_tct &>(
+      class_sym.type.find(ID_C_template_arguments)));
+  // N5008 [temp.spec.partial.match]: for an instance of a PARTIAL
+  // specialization the parameters were bound by deduction against
+  // the argument pattern; the positional build above cannot
+  // reconstruct pack bindings (`pf<Op, index_sequence<Idx...>>`'s
+  // non-type `Idx`).  Replay the deduction-time bindings persisted
+  // on the class symbol (#spec_template_packs), non-overriding --
+  // mirroring resolve()'s scope-walk replay.
+  const irept &bindings = class_sym.type.find(irep_idt{"#spec_template_packs"});
+  for(const auto &entry : bindings.get_sub())
+  {
+    const irep_idt pid = entry.get(ID_identifier);
+    if(pid.empty())
+      continue;
+    if(entry.id() == irep_idt{"pack_types"})
+    {
+      if(map.pack_size_map.find(pid) != map.pack_size_map.end())
+        continue;
+      std::vector<typet> elems;
+      for(const auto &t : entry.get_sub())
+        elems.push_back(static_cast<const typet &>(t));
+      map.set_pack_size(pid, elems.size());
+      if(!elems.empty())
+      {
+        if(elems.size() == 1)
+          map.type_map.emplace(pid, elems.front());
+        map.pack_args_map[pid] = std::move(elems);
+      }
+    }
+    else if(entry.id() == irep_idt{"pack_exprs"})
+    {
+      if(map.pack_size_map.find(pid) != map.pack_size_map.end())
+        continue;
+      std::vector<exprt> vals;
+      for(const auto &v : entry.get_sub())
+        vals.push_back(static_cast<const exprt &>(v));
+      map.set_pack_size(pid, vals.size());
+      if(!vals.empty())
+      {
+        if(vals.size() == 1)
+          map.expr_map.emplace(pid, vals.front());
+        map.pack_expr_map[pid] = std::move(vals);
+      }
+    }
+    else if(entry.id() == irep_idt{"scalar_type"})
+    {
+      if(
+        !entry.get_sub().empty() &&
+        map.type_map.find(pid) == map.type_map.end())
+      {
+        map.type_map.emplace(
+          pid, static_cast<const typet &>(entry.get_sub().front()));
+      }
+    }
+    else if(entry.id() == irep_idt{"scalar_expr"})
+    {
+      if(
+        !entry.get_sub().empty() &&
+        map.expr_map.find(pid) == map.expr_map.end())
+      {
+        map.expr_map.emplace(
+          pid, static_cast<const exprt &>(entry.get_sub().front()));
+      }
+    }
+  }
+}
+
 void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
 {
 #ifdef DEBUG
@@ -2127,80 +2217,7 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           class_sym->type.find(ID_C_template).is_not_nil() &&
           class_sym->type.find(ID_C_template_arguments).is_not_nil())
         {
-          method_map.build(
-            static_cast<const template_typet &>(
-              class_sym->type.find(ID_C_template)),
-            static_cast<const cpp_template_args_tct &>(
-              class_sym->type.find(ID_C_template_arguments)));
-          // N5008 [temp.spec.partial.match]: for an instance of a PARTIAL
-          // specialization the parameters were bound by deduction against
-          // the argument pattern; the positional build above cannot
-          // reconstruct pack bindings (`pf<Op, index_sequence<Idx...>>`'s
-          // non-type `Idx`).  Replay the deduction-time bindings persisted
-          // on the class symbol (#spec_template_packs), non-overriding --
-          // mirroring resolve()'s scope-walk replay.
-          const irept &bindings =
-            class_sym->type.find(irep_idt{"#spec_template_packs"});
-          for(const auto &entry : bindings.get_sub())
-          {
-            const irep_idt pid = entry.get(ID_identifier);
-            if(pid.empty())
-              continue;
-            if(entry.id() == irep_idt{"pack_types"})
-            {
-              if(
-                method_map.pack_size_map.find(pid) !=
-                method_map.pack_size_map.end())
-                continue;
-              std::vector<typet> elems;
-              for(const auto &t : entry.get_sub())
-                elems.push_back(static_cast<const typet &>(t));
-              method_map.set_pack_size(pid, elems.size());
-              if(!elems.empty())
-              {
-                if(elems.size() == 1)
-                  method_map.type_map.emplace(pid, elems.front());
-                method_map.pack_args_map[pid] = std::move(elems);
-              }
-            }
-            else if(entry.id() == irep_idt{"pack_exprs"})
-            {
-              if(
-                method_map.pack_size_map.find(pid) !=
-                method_map.pack_size_map.end())
-                continue;
-              std::vector<exprt> vals;
-              for(const auto &v : entry.get_sub())
-                vals.push_back(static_cast<const exprt &>(v));
-              method_map.set_pack_size(pid, vals.size());
-              if(!vals.empty())
-              {
-                if(vals.size() == 1)
-                  method_map.expr_map.emplace(pid, vals.front());
-                method_map.pack_expr_map[pid] = std::move(vals);
-              }
-            }
-            else if(entry.id() == irep_idt{"scalar_type"})
-            {
-              if(
-                !entry.get_sub().empty() &&
-                method_map.type_map.find(pid) == method_map.type_map.end())
-              {
-                method_map.type_map.emplace(
-                  pid, static_cast<const typet &>(entry.get_sub().front()));
-              }
-            }
-            else if(entry.id() == irep_idt{"scalar_expr"})
-            {
-              if(
-                !entry.get_sub().empty() &&
-                method_map.expr_map.find(pid) == method_map.expr_map.end())
-              {
-                method_map.expr_map.emplace(
-                  pid, static_cast<const exprt &>(entry.get_sub().front()));
-              }
-            }
-          }
+          bind_class_instance_parameters(*class_sym, method_map);
         }
         // N5008 [temp.dep.type]/1 + [temp.mem]: a member of a member class
         // template of a class template is in the scope of BOTH templates;
