@@ -952,11 +952,29 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
       else if(declarator.type().id() != ID_template)
       {
         // If the function has auto return type, type-check immediately
-        // so the return type is deduced before any call sites.
+        // so the return type is deduced before any call sites
+        // ([dcl.spec.auto.general]/13 -- needed even when the function is
+        // only named in an unevaluated operand).
         if(cpp_typecheck.has_auto(new_symbol->type))
           cpp_typecheck.convert_function(*new_symbol);
         else
+        {
+          // N5008 [temp.inst]/4 + [basic.def.odr]/5: a specialization
+          // named only in an unevaluated operand (`decltype(swap(declval<T
+          // &>(), declval<T &>()))' of a SFINAE trait) is not odr-used;
+          // its definition -- possibly ill-formed for these arguments,
+          // `swap' of a non-copyable type -- is instantiated only if an
+          // odr-use appears later.  The body is held back like a
+          // conversion probe's (speculative_instances) and released when
+          // a converted body refers to it.
+          if(
+            cpp_typecheck.unevaluated_operand_depth > 0 &&
+            !cpp_typecheck.instantiation_stack.empty())
+          {
+            cpp_typecheck.speculative_instances.insert(new_symbol->name);
+          }
           cpp_typecheck.add_method_body(new_symbol);
+        }
       }
     }
     else

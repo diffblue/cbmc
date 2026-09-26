@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ trait is true: the expression is valid: SUCCESS$
@@ -18,8 +18,10 @@ declval<T &>())' in an unevaluated operand (the decltype of a SFINAE
 default template argument) instantiates the DECLARATION of swap<NoCopy>
 only; the specialization is never odr-used, so its definition -- ill-formed
 for a type with a deleted copy -- is not instantiated (g++/clang++ accept
-the program).  The front end instantiates the definition anyway, fails on
-the deleted copy and reports "dropped the body of function
-'swap<tag-NoCopy>'" for a body no program can call.  The verification
-result is right; the warning is spurious (audit residue item 12, round 162:
-cpp11_is_swappable_unevaluated).
+the program).  The front end instantiated the definition anyway, failed on
+the deleted copy and reported "dropped the body of function
+'swap<tag-NoCopy>'" for a body no program can call (audit residue item 12,
+round 162: cpp11_is_swappable_unevaluated).  Fixed in round 163: a
+specialization instantiated while a decltype/noexcept operand is being
+type-checked is held back like a conversion probe's (speculative_instances)
+and its definition is converted only once a converted body refers to it.
