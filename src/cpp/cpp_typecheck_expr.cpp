@@ -7246,6 +7246,44 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 } // NOLINT(readability/fn_size)
 
 /// \param expr: function call whose arguments need to be checked
+/// N5008 [class.mem.general]/7-8, [dcl.fct.default]: a default argument
+/// declared in a class member-specification is a complete-class context.
+/// typecheck_type kept it unchecked (wrapped with the declaring scope); this
+/// checks it in that scope -- with the class's template parameters bound
+/// when the class is a template specialization ([temp.inst]/4 names in the
+/// default argument refer to the specialization's arguments) -- and converts
+/// it to the parameter type ([dcl.init]).
+exprt cpp_typecheckt::typecheck_deferred_default_argument(const exprt &deferred)
+{
+  PRECONDITION(deferred.id() == ID_cpp_deferred_default_argument);
+  PRECONDITION(deferred.operands().size() == 1);
+
+  exprt value = to_unary_expr(deferred).op();
+  const irep_idt scope_id = deferred.get(ID_C_identifier);
+
+  cpp_save_scopet saved_scope(cpp_scopes);
+  cpp_saved_template_mapt saved_map(template_map);
+
+  const auto scope_it = cpp_scopes.id_map.find(scope_id);
+  if(scope_it != cpp_scopes.id_map.end() && scope_it->second->is_scope)
+  {
+    cpp_scopes.set_scope(scope_id);
+    // the class scope of a specialization: its identifier is the class
+    // symbol's name
+    const symbolt *class_symbol = symbol_table.lookup(scope_id);
+    if(
+      class_symbol != nullptr && class_symbol->is_type &&
+      class_symbol->type.find(ID_C_template_arguments).is_not_nil())
+    {
+      bind_class_instance_parameters(*class_symbol, template_map);
+    }
+  }
+
+  typecheck_expr(value);
+  implicit_typecast(value, deferred.type());
+  return value;
+}
+
 void cpp_typecheckt::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {
@@ -7264,8 +7302,10 @@ void cpp_typecheckt::typecheck_function_call_arguments(
       if(!parameters[i].has_default_value())
         break;
 
-      const exprt &value = parameters[i].default_value();
-      expr.arguments().push_back(value);
+      exprt value = parameters[i].default_value();
+      if(value.id() == ID_cpp_deferred_default_argument)
+        value = typecheck_deferred_default_argument(value);
+      expr.arguments().push_back(std::move(value));
     }
   }
 

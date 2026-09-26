@@ -588,8 +588,34 @@ void cpp_typecheckt::typecheck_type(typet &type)
       // see if there is a default value
       if(param.has_default_value())
       {
-        typecheck_expr(param.default_value());
-        implicit_typecast(param.default_value(), param.type());
+        if(
+          compound_body_depth > 0 &&
+          param.default_value().id() != ID_cpp_deferred_default_argument)
+        {
+          // N5008 [class.mem.general]/7-8: a default argument within the
+          // member-specification is a complete-class context -- it is
+          // looked up and checked as if the class were complete, so
+          // `path &replace_extension(const path &r = path())' may name
+          // the class's own (not yet declared) default constructor, and
+          // `void f(int n = _S_max)' a static member declared further
+          // down.  Checking it here, while the class is still being
+          // defined, failed and abandoned the rest of the class body
+          // (every later member unknown).  Keep the parsed expression
+          // together with the declaring scope; it is checked on first
+          // use at a call site (typecheck_function_call_arguments), by
+          // which time the class is complete.
+          exprt deferred{ID_cpp_deferred_default_argument, param.type()};
+          deferred.add_source_location() =
+            param.default_value().source_location();
+          deferred.set(ID_C_identifier, cpp_scopes.current_scope().identifier);
+          deferred.add_to_operands(std::move(param.default_value()));
+          param.default_value() = std::move(deferred);
+        }
+        else if(param.default_value().id() != ID_cpp_deferred_default_argument)
+        {
+          typecheck_expr(param.default_value());
+          implicit_typecast(param.default_value(), param.type());
+        }
       }
     }
   }
