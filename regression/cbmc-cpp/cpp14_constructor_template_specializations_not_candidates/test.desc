@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ argument converted by the deduced specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.funcs]/8 + [temp.deduct.call]: a constructor template
+contributes to a user-defined conversion the one specialization deduced
+from the argument, not its earlier instantiations.  `big(T)' already
+instantiated for int and for unsigned __int128 made a `unsigned long'
+argument ambiguous between those two (both need an integral conversion),
+so `b < limit' had no viable candidate (libstdc++ 16's __max_size_type in
+the C++20 ranges iterators).
