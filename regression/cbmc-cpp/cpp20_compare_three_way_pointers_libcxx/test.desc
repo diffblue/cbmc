@@ -1,0 +1,26 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp20 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ identity comparison: SUCCESS$
+^\[main\.assertion\.2\] line \d+ compare_three_way on pointers: equal: SUCCESS$
+^\[main\.assertion\.3\] line \d+ compare_three_way on pointers: distinct: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+found no match for symbol
+--
+N5008 [comparisons.three.way]: `std::compare_three_way()(p, q)' on two
+pointers to the same class is the built-in `p <=> q' (strong_ordering);
+libc++ 18 constrains the call operator with `three_way_comparable_with<_Tp,
+_Up>' and defines it in <__compare/compare_three_way.h>.  With libc++ the
+call fails ("found no match for symbol 'operator()'" at line 28) and the
+translation unit is rejected; this is libc++'s error_category::operator<=>
+(`compare_three_way()(this, std::addressof(__rhs))'), dropped in every
+libc++ C++20 test (audit residue item 2, round 162).  With libstdc++ the
+same program passes (--object-bits 12 is for the locale machinery pulled
+in by <memory>).
