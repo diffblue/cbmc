@@ -7,6 +7,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*found no match for symbol 'vector'.*$
 ^.*is initialized with constant.*$
+dropped the body
 --
 Verifies two fixes that are both required for compiling typical
 libstdc++-using code with `std::vector<X>{...}` brace-init:

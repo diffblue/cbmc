@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^symbol '_Args' is unknown$
+dropped the body
 --
 Regression for the MSVC _Construct_in_place / _Emplace_back pack
 short-name collision bug.  Per [basic.scope.temp] and

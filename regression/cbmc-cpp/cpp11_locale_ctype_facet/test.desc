@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 FAILURE
+dropped the body
 --
 N5008 [locale.general]/8 (startup global locale is the "C" locale) + C99
 7.4 (the "C"-locale character classes).  libstdc++ initialises the locale

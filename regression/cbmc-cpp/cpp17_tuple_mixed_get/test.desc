@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 std::get on a directly-constructed two-element std::tuple<int,double>.  The
 second element's _Head_base is a non-first base whose byte offset depends on

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Header-free distillation of libc++ <tuple>'s __tuple_impl constructor
 (std::tuple's __base_ mem-init).  The remaining tuple KNOWNBUG layer

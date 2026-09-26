@@ -8,6 +8,7 @@ main.cpp
 --
 ^.*is unknown.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.inst]/1-2 with [dcl.typedef]: a member typedef declares the member and
 forms the aliased type but does not require the aliased template's definition to

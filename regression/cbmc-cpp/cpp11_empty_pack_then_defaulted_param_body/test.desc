@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [temp.param]/14 + [temp.variadic]/7: a member function template
 <class... Args, class Result = ...> called with zero arguments deduces Args

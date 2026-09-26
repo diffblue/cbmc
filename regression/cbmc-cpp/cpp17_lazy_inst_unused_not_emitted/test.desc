@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 must never appear
+dropped the body
 --
 N5008 [temp.inst]/11: an unused non-virtual member function shall not be
 implicitly instantiated.  Under Option B (on-odr-use instantiation) unused()

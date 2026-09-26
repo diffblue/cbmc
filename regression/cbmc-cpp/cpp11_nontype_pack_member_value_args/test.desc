@@ -8,6 +8,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.arg.nontype] + [temp.variadic]/4-5.  Arguments matched by a non-type
 parameter pack (`template <bool...>`) are non-type template arguments, not

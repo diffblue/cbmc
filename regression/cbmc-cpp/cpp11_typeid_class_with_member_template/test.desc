@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [expr.typeid]/1: the type_info key for a class type is its own
 identity (tag), not a structural spelling of its components: a class with

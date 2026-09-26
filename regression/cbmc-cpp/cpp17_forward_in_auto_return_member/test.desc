@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 An auto-returning member function template forwards its parameter to
 an rvalue-reference callee (N5008 [dcl.spec.auto], [forward]/4,

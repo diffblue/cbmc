@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [class.union]/2: a union may have a user-declared constructor and is then
 constructed via that constructor (not by conversion); its implicit copy

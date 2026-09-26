@@ -13,6 +13,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [class.default.ctor]/3 + [basic.start.static]: a default member
 initializer (NSDMI) gives a class a non-trivial default constructor, so a

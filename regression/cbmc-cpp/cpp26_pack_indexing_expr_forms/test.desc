@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 N5008 [expr.prim.pack.index]/1-2: pack-index-expressions over a function
 parameter pack -- the first of three, the sole element of a one-element pack,

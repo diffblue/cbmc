@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.fct]/[expr.type]: a function template whose trailing return type
 nests a decltype inside a template-id (`-> R<decltype(c.begin())>`) must resolve

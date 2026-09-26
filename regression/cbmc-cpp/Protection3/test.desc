@@ -6,6 +6,7 @@ main.cpp
 ^CONVERSION ERROR$
 --
 ^warning: ignoring
+dropped the body
 --
 In C++98, nested classes do not have access to the enclosing class's
 private members. C++11 DR 45 changed this.

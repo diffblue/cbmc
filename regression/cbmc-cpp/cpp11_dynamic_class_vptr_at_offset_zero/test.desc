@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+dropped the body
 --
 Itanium C++ ABI 2.4 II.1: vptr at offset 0 of a dynamic class whose bases
 are not dynamic; base subobject offsets computed from the layout (not assumed

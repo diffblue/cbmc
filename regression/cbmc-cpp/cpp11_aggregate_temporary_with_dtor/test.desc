@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 A user-declared destructor must not disable aggregate initialization
 of a braced temporary ([dcl.init.aggr]/1, [expr.type.conv]/2); CBMC

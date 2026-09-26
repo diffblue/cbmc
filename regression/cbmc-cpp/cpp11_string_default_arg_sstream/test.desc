@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 invalid implicit conversion from 'char \[1l\]' to 'struct basic_string'
+dropped the body
 --
 Regression for `char[N]` -> `std::string` implicit conversion on
 constructor default arguments.  Previously the conversion failed

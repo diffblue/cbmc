@@ -9,6 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 FAILURE
+dropped the body
 --
 N5008 [stmt.pre]/6: the condition declaration's name is scoped to the
 substatements; redeclaring it after the if-statement is well-formed.

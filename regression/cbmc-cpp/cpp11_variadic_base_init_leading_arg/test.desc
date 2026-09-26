@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic] / [class.base.init]: a constructor may forward a function
 parameter pack to a base-class initializer that has a non-pack argument before

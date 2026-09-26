@@ -8,6 +8,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^found no match for symbol$
+dropped the body
 --
 Regression for [temp.deduct.call]/4.3 derived-to-base template
 argument deduction.  A function template taking

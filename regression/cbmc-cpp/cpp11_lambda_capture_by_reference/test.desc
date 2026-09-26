@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.capture]: an entity captured by reference is captured as a
 reference member of the closure that denotes the entity.  Lambda rework Phase C

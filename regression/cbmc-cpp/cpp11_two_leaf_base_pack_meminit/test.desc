@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Parallel expansion of a base pack and its mem-initializer pack over
 TWO heterogeneous elements ([temp.variadic]/5): the mem-initializer

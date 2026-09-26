@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 [namespace.udecl]/2 + [class.inhctor.init]: inherited constructor templates
 forward their arguments to the base constructor (plain classes and class

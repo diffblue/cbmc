@@ -13,6 +13,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 found no match for symbol
+dropped the body
 --
 N5008 [dcl.fct]/6, [over.match.funcs]/3, [temp.deduct.call]: a templated
 explicit object parameter deduced from the object expression, also with a

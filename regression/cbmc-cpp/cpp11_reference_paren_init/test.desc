@@ -12,6 +12,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^(ERROR|error): .*declared as reference but is not initialized
+dropped the body
 --
 N5008 [dcl.init.ref], [dcl.init]/16: reference direct-initialization with
 parentheses (T &r(init)) binds the reference like T &r = init.  CBMC previously

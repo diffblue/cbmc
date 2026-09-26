@@ -8,6 +8,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [stmt.label]/1: label scope is the function; the same label name in
 two functions was a spurious "duplicate label" (the defined-labels map

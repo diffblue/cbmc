@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 Conversion of a libstdc++ _Bind object to std::function: the converting
 constructor's _Callable constraint evaluates __invoke_result<_Bind&, Args...>

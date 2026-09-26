@@ -10,6 +10,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [over.match.oper]/3.4 + [over.ics.user]: the rewritten candidate
 `(x <=> y) <= 0' with `y' an integer converted to the class by a

@@ -9,6 +9,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [over.match.funcs]/8 + [temp.deduct.call]: a constructor template
 contributes to a user-defined conversion the one specialization deduced

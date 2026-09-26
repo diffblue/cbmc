@@ -10,6 +10,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 N5008 [temp.arg.template], [temp.class.spec.match], [temp.deduct]: the detection
 idiom's partial specialization has<Op, Arg, void_t<Op<Arg>>> must be selected

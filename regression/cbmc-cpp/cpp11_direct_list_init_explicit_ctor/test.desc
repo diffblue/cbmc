@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 found no match
+dropped the body
 --
 N5008 [dcl.init.list]/1 + [over.match.list]/1: explicit initializer-list
 constructors are candidates in direct-list-initialization (`T x{...}',

@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [dcl.init.aggr]: array of an aggregate element type initialized element-wise
 from brace-clauses (incl. a nested array member).  Mirrors the simplify_utils

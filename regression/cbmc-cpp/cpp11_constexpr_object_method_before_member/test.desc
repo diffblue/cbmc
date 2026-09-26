@@ -11,6 +11,7 @@ static_assert condition could not be evaluated
 static assertion failed
 ^warning: ignoring
 Invariant check failed
+dropped the body
 --
 Struct constants of C++ class types index by data member, not by component
 position (member functions, member types and static members occupy no

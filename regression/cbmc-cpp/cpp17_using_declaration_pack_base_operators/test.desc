@@ -12,6 +12,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 N5008 [namespace.udecl]/1: `using Bases::operator()...;' names each base's
 operator(); the pack expansion's name element must denote the base class type,

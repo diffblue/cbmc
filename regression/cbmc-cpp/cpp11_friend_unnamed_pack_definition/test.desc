@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.over.link]/6 + [dcl.fct]/3: an in-class friend declaration
 of a function template with an UNNAMED parameter pack (`make(Args

@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The clang builtin __make_integer_seq invoked through libc++'s impl
 alias, whose first argument is a TEMPLATE-TEMPLATE parameter (N5008

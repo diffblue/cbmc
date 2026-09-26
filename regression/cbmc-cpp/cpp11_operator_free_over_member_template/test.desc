@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [over.match.oper]/3, [over.match.best]/2, [temp.inst]/2: a non-member
 non-template operator<< that perfectly matches is preferred over a member

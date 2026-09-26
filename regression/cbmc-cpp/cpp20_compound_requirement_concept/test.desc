@@ -8,6 +8,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Distilled from the std::__to_address(reverse_iterator) cascade (the
 cpp20 vector-family blocker); _HasArrow detection over

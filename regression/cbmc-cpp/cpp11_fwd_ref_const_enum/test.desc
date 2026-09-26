@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^found no match for symbol 'pass'$
+dropped the body
 --
 N5008 [temp.deduct.call]/3 + [dcl.enum]/[basic.type.qualifier]: a forwarding
 reference `T&&` deduces T as "lvalue reference to A" from an lvalue argument of

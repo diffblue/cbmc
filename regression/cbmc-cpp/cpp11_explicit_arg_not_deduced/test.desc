@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Explicit template arguments must survive the deduction pass
 ([temp.arg.explicit]/2); deduction from convertible call arguments

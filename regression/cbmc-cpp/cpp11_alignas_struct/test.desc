@@ -5,5 +5,6 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Test that alignas specifier on struct/class/union declarations works.

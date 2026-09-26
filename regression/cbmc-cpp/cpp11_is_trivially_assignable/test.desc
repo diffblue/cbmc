@@ -11,6 +11,7 @@ main.cpp
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
 static assertion failed
+dropped the body
 --
 N5008 [meta.unary.prop], [class.copy.assign]/9: __is_trivially_assignable
 requires a trivial copy/move assignment of the same class (or a scalar

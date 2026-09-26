@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 found no match for symbol
+dropped the body
 --
 N5008 [class.base.init]/9-10, [dcl.init.list]: a braced default member
 initializer of a class-typed non-static data member (`pair stored{-1, 7}`)

@@ -6,6 +6,7 @@ main.cpp
 ^VERIFICATION SUCCESSFUL$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies [temp.point] p1: CBMC picks the definition of a function
 template over a preceding forward declaration with no body.

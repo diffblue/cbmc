@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 A variadic forwarding helper whose trailing-return decltype contains a pack
 expansion f(a...), deduced with an EMPTY pack, collapses to f() and resolves.

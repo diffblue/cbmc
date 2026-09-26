@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 Scanner: revertible identifiers (a builtin only when followed by `(').
 Parser: rTypePredicate keeps every argument in "type_args".  Typecheck:

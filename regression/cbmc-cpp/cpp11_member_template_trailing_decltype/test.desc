@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: "found no match for symbol 'map'" resolving the member
 template against the lambda argument.

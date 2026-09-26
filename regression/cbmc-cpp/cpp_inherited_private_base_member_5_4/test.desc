@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 A base class member function may name a private member it declares on an
 object of a derived type, even though that member is inaccessible as

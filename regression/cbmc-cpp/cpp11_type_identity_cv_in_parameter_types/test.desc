@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 N5008 [basic.type.qualifier], [dcl.fct]/6-7: cv-qualifiers nested inside a
 function type's parameter types (`void(*)(const int*)` vs `void(*)(int*)`)

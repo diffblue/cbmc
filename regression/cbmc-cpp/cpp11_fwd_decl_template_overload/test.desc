@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 same_template_signature (the pure-declaration -> definition redirect in
 instantiate_template) ignored template-parameter PACK-ness, non-type

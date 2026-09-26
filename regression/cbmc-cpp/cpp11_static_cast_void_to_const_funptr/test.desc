@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.static.cast]/13, [conv.qual]: static_cast from a (cv) void* to a
 pointer-to-T is valid when the target is at least as cv-qualified.  This must

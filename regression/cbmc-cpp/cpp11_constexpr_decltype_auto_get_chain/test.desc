@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [dcl.spec.auto] + [temp.point]/1 + [temp.inst]/5: a constexpr function
 template with a deduced (decltype(auto)) return type forwarding to a constexpr

@@ -8,6 +8,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^.*symbol .*X.* is unknown.*$
 ^.*member designator index.*out of bounds.*$
+dropped the body
 --
 Class-template partial specialization keyed on a nested class-template-id
 (`base<holder<T>>`, the libstdc++ `allocator_traits<allocator<T>>` shape),

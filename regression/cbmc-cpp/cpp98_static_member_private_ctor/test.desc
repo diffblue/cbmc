@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [class.access.general]/7 -- an out-of-class static data member
 definition has MEMBER access and may call the class's private

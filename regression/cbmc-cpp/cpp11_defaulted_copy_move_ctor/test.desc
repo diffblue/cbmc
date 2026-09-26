@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 An explicitly-defaulted (`= default`) copy/move constructor must memberwise
 copy/move the base subobjects and non-static data members, exactly like the

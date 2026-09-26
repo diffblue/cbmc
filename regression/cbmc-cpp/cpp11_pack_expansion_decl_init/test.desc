@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.variadic]/5: expanding `node z(id, forward<A>(a)...)` in a
 member function template must substitute the k-th element of the TYPE pack

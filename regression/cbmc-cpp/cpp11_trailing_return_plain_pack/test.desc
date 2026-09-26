@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 A variadic function template whose trailing-return decltype contains a plain
 by-value value-pack expansion f(a...) -- with no type parameter pack reference

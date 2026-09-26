@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 The perfect-forward CTAD chain (__bind_back(_Fn...) with a non-pack
 _Fn, the reduced libc++ ranges shape) called from a member function

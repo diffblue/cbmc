@@ -9,6 +9,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [expr.sizeof]/5 + [temp.variadic]/8.  `sizeof...(P)` counts the pack's
 elements regardless of whether P is a type or a NON-type parameter pack.  CBMC's

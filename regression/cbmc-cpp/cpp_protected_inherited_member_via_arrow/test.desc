@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^warning: ignoring
+dropped the body
 --
 Resolving an overloaded operator-> enters the operand's class scope; the
 member access on its result must be access-checked at the point of use,

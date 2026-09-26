@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [dcl.fct]/6: `_Fn __f...` (equivalently `_Fn...` unnamed) with a
 non-pack _Fn is `_Fn, ...`; normalized at function-template

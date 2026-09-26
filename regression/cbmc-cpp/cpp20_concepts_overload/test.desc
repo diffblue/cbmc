@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Was KNOWNBUG since round 152 ("function must have return type"): a
 requires-clause followed directly by the declaration's type name

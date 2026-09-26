@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [expr.ref]/6 (member access naming a reference member is an lvalue of
 the referenced type) and [over.best.ics.general]/2 (a candidate with no

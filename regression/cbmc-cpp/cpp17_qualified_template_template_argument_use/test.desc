@@ -12,6 +12,7 @@ static assertion failed
 found no match for symbol
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.arg.template]/1, [temp.names]/2, [temp.param]/1: a qualified
 template-name bound to a template template parameter, used with arguments

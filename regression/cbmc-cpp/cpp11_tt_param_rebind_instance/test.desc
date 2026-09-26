@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 g++/clang++ accept and the assertion holds natively.  See main.cpp
 header for the candidate fix and its regressions.

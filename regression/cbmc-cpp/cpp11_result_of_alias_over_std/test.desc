@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 could not fully type-check
+dropped the body
 --
 std::result_of<Fn&(int&, int&)>::type reached through a class template
 member typedef with Fn a template parameter (the _Bind::_Res_type shape).

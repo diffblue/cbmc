@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Runtime-verified with g++ and clang++ (-std=c++20): the assertion
 holds natively (primary selected, value=false).  CBMC selects the

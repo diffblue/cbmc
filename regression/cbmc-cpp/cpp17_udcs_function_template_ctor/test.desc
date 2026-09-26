@@ -7,6 +7,7 @@ main.cpp
 --
 ^.*invalid implicit conversion.*to 'struct myopt'.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies that a user-defined conversion sequence may select a
 function-template converting constructor.

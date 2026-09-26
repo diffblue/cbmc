@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Auto-returning static member of a class template must have its return
 type deduced eagerly at instantiation ([dcl.spec.auto.general]/13);

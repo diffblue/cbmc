@@ -7,6 +7,7 @@ main.cpp
 --
 ^.*symbol 'first' is unknown.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 Verifies that two range-based fors in the same function with
 different element types both correctly deduce the loop variable

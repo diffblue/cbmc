@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic]/4-5 + [expr.const]: a constexpr function body that expands a
 class parameter pack into a trait -- `__and_<is_default_constructible<_Types>

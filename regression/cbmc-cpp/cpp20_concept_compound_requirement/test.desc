@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 C++20 compound-requirement `{ E } -> C` evaluation ([expr.prim.req.compound]/1):
 the return-type-requirement is checked as C<decltype((E))>.  Pre-increment of an

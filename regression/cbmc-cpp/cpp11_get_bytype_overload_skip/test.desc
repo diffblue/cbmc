@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^.*expected type, but got expression.*$
+dropped the body
 --
 N5008 [temp.arg]/2 + [temp.deduct]/8: a non-type template argument supplied for
 a type parameter is a substitution failure that, during overload resolution,

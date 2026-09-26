@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 N5008 [stmt.if]/2: return type deduction took the FIRST return statement in
 source order even when it sat in an `if constexpr` branch that is discarded

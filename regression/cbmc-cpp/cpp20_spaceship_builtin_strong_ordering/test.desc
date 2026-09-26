@@ -10,6 +10,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 invalid implicit conversion
+dropped the body
 --
 N5008 [expr.spaceship]/8: a built-in three-way comparison of integral operands
 yields std::strong_ordering (not int).  Previously CBMC lowered builtin a<=>b to

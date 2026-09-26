@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Currently: "expected constant expression, but got
 '__atomic_always_lock_free(...)'" followed by "symbol 'pick' is

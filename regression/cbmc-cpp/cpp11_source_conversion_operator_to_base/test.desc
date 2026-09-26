@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [over.match.copy]/1: a source conversion function yielding a class derived
 from the target type is a candidate when converting to that class type (then

@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.inst]/5 + [expr.const]: a void-returning constexpr member
 function template never yields a constant, so it is deferred to the

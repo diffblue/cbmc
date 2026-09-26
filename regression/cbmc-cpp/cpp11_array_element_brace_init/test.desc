@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [dcl.init.aggr]/2, [dcl.init.list]/3: per-element brace-initialization of a class
 array whose element type has a user-provided constructor; each element is

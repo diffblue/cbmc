@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Named rvalue references are lvalues. std::forward and std::move must
 correctly disambiguate overloads and deduce template arguments when

@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.closure]: a generic lambda's operator() is a member function
 template (each `auto` parameter is an invented template type parameter,

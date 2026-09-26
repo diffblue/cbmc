@@ -6,6 +6,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Returning a braced-init-list from a function whose return type has a
 viable initializer-list constructor must list-initialize the returned

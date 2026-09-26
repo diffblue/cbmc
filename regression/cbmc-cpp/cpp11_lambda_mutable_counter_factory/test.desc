@@ -10,6 +10,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.closure]/1 + [expr.prim.lambda.closure]: each closure is a
 distinct object with its own (mutable) by-copy capture members.  Lambda rework

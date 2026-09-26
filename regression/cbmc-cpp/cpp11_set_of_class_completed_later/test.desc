@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 ^incomplete type
+dropped the body
 --
 Deferred instantiation ([temp.inst]/1): class-body declarations whose
 declarators are all pointers/functions are typechecked without elaborating

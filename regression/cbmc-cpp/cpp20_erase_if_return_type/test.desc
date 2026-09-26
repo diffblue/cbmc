@@ -8,6 +8,7 @@ main.cpp
 ^.*invariant violation.*$
 ^.*lhs\.type\(\) == rhs\.type\(\).*$
 ^CONVERSION ERROR$
+dropped the body
 --
 Regression for a convert_function return-type exception-safety crash.
 Discarding the std::erase_if(...) result (vector::size_type) used to leave the

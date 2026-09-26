@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 N5008 [class.bit]/[dcl.type.auto.deduct]: `auto` deduced from a bit-field read
 yields the underlying type, not a bit-field type.  Previously CBMC deduced the

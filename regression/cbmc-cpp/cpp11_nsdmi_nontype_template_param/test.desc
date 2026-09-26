@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [class.mem]/[temp.inst]: a default member initializer (NSDMI) that
 references the enclosing class template's non-type parameter must be substituted

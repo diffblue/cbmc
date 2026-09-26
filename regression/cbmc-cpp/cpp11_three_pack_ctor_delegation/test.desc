@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Three template packs in a member constructor template with
 interleaved empty-specialization parameters, deduced through a

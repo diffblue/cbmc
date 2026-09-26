@@ -9,6 +9,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [over.match.copy]/1: converting to class type T from class type S
 considers both T's converting constructors AND S's conversion functions.  The

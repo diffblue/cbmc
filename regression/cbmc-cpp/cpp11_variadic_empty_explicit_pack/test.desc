@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.arg.explicit]/4 + [temp.variadic]/4,7.  A trailing template parameter
 pack given an EMPTY explicit argument list (`make_box<>()`) whose return type is

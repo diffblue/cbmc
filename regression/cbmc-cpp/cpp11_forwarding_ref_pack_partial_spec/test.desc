@@ -10,6 +10,7 @@ main.cpp
 ^.*no body for callee.*$
 ^.*invalid implicit conversion.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic]/5 + [dcl.ref]: a forwarding-reference parameter pack `A&&...`
 expands, for each element E, to the reference E&&/E& (reference collapsing), not

@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 implicit_pod_assignment_call (cpp_typecheck_expr.cpp) rewrites
 `C::operator=(x)' on a POD base without a declared operator= into the

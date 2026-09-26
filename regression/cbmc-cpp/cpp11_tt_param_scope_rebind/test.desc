@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Header-free distillation; the real cpp11_set_insert_libcxx still has
 a further __node_allocator layer (full-fidelity models nx8/nx9 pass;

@@ -12,6 +12,7 @@ main.cpp
 --
 ^.*unreachable: &storage is never null.*: FAILURE$
 ^CONVERSION ERROR$
+dropped the body
 --
 C++ [stmt.select]/1-2, [stmt.if]: an if-statement condition may be a
 declaration; the value tested is the declared variable contextually converted

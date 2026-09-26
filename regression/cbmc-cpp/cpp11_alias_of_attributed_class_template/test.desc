@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 User-reported as "invalid application of 'sizeof' to an incomplete
 type" on `using lreg_t = G<uint16_t> __attribute__((aligned(16)));` --

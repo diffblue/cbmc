@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Header-free distillation of libc++'s <__tuple/tuple_size.h>; found
 while diagnosing the bodiless std::tuple constructor (the tuple_size

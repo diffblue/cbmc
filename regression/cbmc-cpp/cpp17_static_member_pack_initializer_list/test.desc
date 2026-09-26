@@ -12,6 +12,7 @@ static_assert condition could not be evaluated
 static assertion failed
 ^warning: ignoring
 Invariant check failed
+dropped the body
 --
 N5008 [temp.variadic]/5, [class.static.data]/4, [expr.const].  (`static
 inline' needs --cpp17.)  Non-vacuous: the last assertion is deliberately

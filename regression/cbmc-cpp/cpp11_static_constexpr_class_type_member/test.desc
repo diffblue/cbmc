@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 Invariant check failed
+dropped the body
 --
 N5008 [class.static.data]/3 + [dcl.constexpr]/1: constexpr static data members
 of class type (aggregates, std::array, constructor-initialised, in class

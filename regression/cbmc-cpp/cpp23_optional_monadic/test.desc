@@ -7,6 +7,7 @@ main.cpp
 ^CONVERSION ERROR$
 ^PARSING ERROR$
 ^could not fully type-check
+dropped the body
 --
 C++23 std::optional monadic operation `transform`
 (`o.transform([](int x){ return x * 2; })`).

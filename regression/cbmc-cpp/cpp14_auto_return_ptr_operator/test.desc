@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 Two defects.  The parser took the ptr-operator of `auto *f()` / `auto &f()`
 (stored, like a trailing return type, in the function type's subtype) for a

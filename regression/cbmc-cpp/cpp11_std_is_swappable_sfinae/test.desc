@@ -9,6 +9,7 @@ main.cpp
 unexpected expression: struct_tag
 found no match for symbol 'swap'
 \* identifier: std::tag-__not_<
+dropped the body
 --
 Per [temp.deduct]/7-8 substitution failures during the deduction
 process (including default-template-argument substitution) are

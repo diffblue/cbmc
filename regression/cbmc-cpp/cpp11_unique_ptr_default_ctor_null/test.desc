@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [unique.ptr.single.ctor]/1 -- a default-constructed unique_ptr is null.  Fixed
 by modelling C++17 inheriting constructors ([class.inhctor.init]): a base

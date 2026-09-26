@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 Fixed across rounds 56-57: [temp.variadic]/5 bare pack-expansion
 mem-initializer arguments resolve against the materialised parameters,

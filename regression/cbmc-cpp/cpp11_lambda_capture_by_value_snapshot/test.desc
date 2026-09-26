@@ -7,6 +7,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 [expr.prim.lambda.capture]: a by-copy capture is an unnamed non-static data
 member of the closure object, direct-initialised from the entity at capture

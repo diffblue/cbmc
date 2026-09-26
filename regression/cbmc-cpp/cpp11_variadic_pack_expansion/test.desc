@@ -11,6 +11,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 A variadic constructor with a pack expansion in a function-call-expression
 initializer and with two-or-more-element packs.  Exercises two contexts now

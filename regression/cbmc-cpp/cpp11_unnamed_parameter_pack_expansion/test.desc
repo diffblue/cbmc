@@ -9,6 +9,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 static_assert condition could not be evaluated
+dropped the body
 --
 An UNNAMED function parameter pack (`Args...`) was not expanded when the
 function template was instantiated (the expansion keyed on the declarator's

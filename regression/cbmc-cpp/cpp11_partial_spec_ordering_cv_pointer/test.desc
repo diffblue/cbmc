@@ -7,6 +7,7 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.spec.partial.order]/1 + [temp.func.order]: `traits<const
 T*>` is more specialised than `traits<T*>` (the latter deduces from the

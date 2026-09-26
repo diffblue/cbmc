@@ -7,6 +7,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^Invariant check failed$
+dropped the body
 --
 Regression test for the to_member fix in symex dereference_rec.
 

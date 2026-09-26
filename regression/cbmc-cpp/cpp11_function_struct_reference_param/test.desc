@@ -6,6 +6,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
+dropped the body
 --
 Constructing and calling a std::function whose parameter is a reference
 or pointer to a class type must type-check: the converting constructor

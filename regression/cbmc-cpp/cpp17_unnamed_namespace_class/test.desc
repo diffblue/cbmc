@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 Fixed 2026-07-20: unnamed namespaces flow through the regular namespace
 machinery (fixed per-scope unique name "#anon_ns", implicit

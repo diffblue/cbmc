@@ -5,6 +5,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 N5008 [temp.class.spec.match] + [temp.variadic].  A recursive class template over
 a NON-type parameter pack, selected via its `<H, T...>` partial specialization,

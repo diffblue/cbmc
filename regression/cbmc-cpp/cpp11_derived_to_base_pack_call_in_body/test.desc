@@ -8,6 +8,7 @@ main.cpp
 ^SIGNAL=0$
 --
 ^CONVERSION ERROR$
+dropped the body
 --
 N5008 [temp.deduct.call]/4.3: a function parameter that is a class template-id
 (`Base<_Head, _Tail...>&`) is deduced from the base class of a derived-class

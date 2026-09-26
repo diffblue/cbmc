@@ -7,6 +7,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 KNOWNBUG: C++20 libstdc++ pair's requires-clause + explicit(bool)
 converting constructor pair(U1&&, U2&&) is instantiated WITHOUT a body

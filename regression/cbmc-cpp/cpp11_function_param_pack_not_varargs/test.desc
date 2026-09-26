@@ -10,6 +10,7 @@ main.cpp
 ^.*invariant violation.*$
 ^.*symbol type must match.*$
 ^CONVERSION ERROR$
+dropped the body
 --
 [temp.variadic]/3 + [dcl.fct]: a `...` immediately following a parameter
 declaration with no separating comma (`f(Args...)`) introduces a function

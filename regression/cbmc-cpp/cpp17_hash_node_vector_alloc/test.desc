@@ -6,6 +6,7 @@ main.cpp
 ^EXIT=0$
 ^SIGNAL=0$
 --
+dropped the body
 --
 KNOWNBUG: instantiating unordered_set<K>::insert first (materializing
 allocator<_Hash_node<K,..>> rebinds) makes the LATER vector<K>

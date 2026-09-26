@@ -9,6 +9,7 @@ main.cpp
 --
 ^CONVERSION ERROR$
 ^Reason:
+dropped the body
 --
 N5008 [dcl.init.list]/3.9: list-initializing a scalar from a single-element
 braced-init-list initializes it from that element, so `int x{42};` as a default

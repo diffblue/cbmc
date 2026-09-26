@@ -8,6 +8,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 unexpected expression
+dropped the body
 --
 User-reported: `template <class T> struct G { ... } __attribute__((packed,
 aligned(16)));` -- "class templates must not be anonymous", then `G`
