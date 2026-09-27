@@ -5724,10 +5724,9 @@ skip_pack_removal_ft:
       }
     }
 
-    convert_non_template_declaration(new_decl);
-
     // Propagate template info to the class symbol so that member
     // function template bodies can find the class template parameters.
+    const auto propagate_template_info = [&]()
     {
       std::string inst_suffix = template_suffix(full_template_args);
       irep_idt class_sym_id = id2string(sub_scope.prefix) + "tag-" +
@@ -5749,7 +5748,26 @@ skip_pack_removal_ft:
           cs->type.set(irep_idt{"#spec_template_packs"}, spec_bindings);
         }
       }
-    }
+    };
+
+    // N5008 [temp.inst]/3, [temp.mem]: a member class template of a class
+    // template specialization is itself instantiated in the context of the
+    // enclosing specialization, with the enclosing class's template
+    // parameters bound to its arguments.  Those bindings are read from the
+    // enclosing class symbol (see the outer-scope walk above), so record
+    // them on the (still incomplete) instance symbol BEFORE the body is
+    // converted: a static data member's in-class initializer may already
+    // instantiate a member class template -- libc++'s
+    // `__libcpp_datasizeof<_Tp>::value = offsetof(_FirstPaddingByte<>,
+    // __first_padding_byte_)' -- and the member instance
+    // `_FirstPaddingByte<char>' found no binding for `_Tp', so its body
+    // failed silently and the instance stayed an empty struct: offsetof
+    // gave 0, every std::string copy under libc++ was one byte short.
+    propagate_template_info();
+
+    convert_non_template_declaration(new_decl);
+
+    propagate_template_info();
 
     // Restore the template scope for template method processing.
     saved_scope.restore();

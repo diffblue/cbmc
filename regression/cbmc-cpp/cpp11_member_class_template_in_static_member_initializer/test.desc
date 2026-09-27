@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ members of the member instance: SUCCESS$
+^\[main\.assertion\.2\] line \d+ short: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+is unknown$
+dropped the body
+--
+N5008 [temp.inst]/3, [temp.mem]: a member class template of a class template
+specialization is instantiated in the context of that specialization, with
+the enclosing class's template parameters bound to its arguments.  The
+front end reads those bindings from the enclosing instance's class symbol,
+but recorded them there only AFTER the instance's body had been converted;
+a static data member's in-class initializer that instantiates the member
+template (`offsetof(first_padding_byte<>, byte)') therefore found no
+binding for `T', the member instance's body failed silently and stayed an
+empty struct: offsetof gave 0 and, with libc++, every std::string copy
+(`__constexpr_memmove', sized by `__libcpp_datasizeof<char>::value') was
+one byte short -- the KNOWNBUG libcxx_string_move_ctor_lambda's second
+half.  Fixed in round 163b.
