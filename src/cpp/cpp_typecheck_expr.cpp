@@ -9593,6 +9593,14 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     // Restore verbosity
     get_message_handler().set_verbosity(saved_verbosity);
 
+    // N5008 [expr.prim.lambda.closure]/4: the closure type's function call
+    // operator has the lambda's compound-statement as its body, defined
+    // once -- here, in place.  Mark it converted like convert_function
+    // does; the end-of-unit sweep that completes half-converted
+    // system-header bodies would otherwise convert it a second time (see
+    // the non-generic path below).
+    if(body_ok)
+      default_body.set("#cpp_converted", true);
     symbolt func_sym;
     func_sym.name = func_sym_name;
     func_sym.base_name = lambda_id;
@@ -9738,6 +9746,21 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       body_code = std::move(block);
     }
   }
+
+  // N5008 [expr.prim.lambda.closure]/4: the body was type-checked in place
+  // above; mark it converted like convert_function does.  Without the mark
+  // the end-of-unit sweep that completes half-converted system-header
+  // bodies (cpp_typecheckt::typecheck) converted the already-converted
+  // body a second time, which fails on constructs that are not idempotent
+  // under re-conversion -- libc++'s basic_string(basic_string &&)
+  // initializes `__r_' through the lambda `[](basic_string &__s) ->
+  // decltype(__r_) && { return std::move(__s.__r_); }(__str)': the
+  // re-checked `return std::move(...)' saw the call's xvalue result as an
+  // lvalue ("invalid implicit conversion from '__compressed_pair &' to
+  // '__compressed_pair &&'") and the lambda's body was dropped, leaving a
+  // moved-from std::string nondet.
+  if(body_code.id() != ID_nil)
+    body_code.set("#cpp_converted", true);
 
   // Create the function symbol
   symbolt func_sym;
