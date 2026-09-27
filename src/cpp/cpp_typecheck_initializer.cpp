@@ -822,7 +822,22 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // std::initializer_list argument (C++11 [over.match.list]).
     // If that fails, fall back to unpacking the elements as
     // individual constructor arguments.
-    if(symbol.value.id() == ID_initializer_list)
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      symbol.value.operands().empty() &&
+      (symbol.type.id() == ID_struct_tag || symbol.type.id() == ID_union_tag) &&
+      !cpp_is_pod(symbol.type))
+    {
+      // N5008 [dcl.init.list]/3.5, [over.match.list]/1: an EMPTY
+      // braced-init-list for a class with a default constructor
+      // value-initializes the object (no initializer-list constructor is
+      // considered).  Hand the empty list to cpp_constructor as such: it
+      // zero-initializes before running a default constructor that is not
+      // user-provided ([dcl.init.general]/9.1), which unpacking the list
+      // into zero arguments -- plain default-initialization -- did not.
+      ops.push_back(symbol.value);
+    }
+    else if(symbol.value.id() == ID_initializer_list)
     {
       // Per [over.match.list]/1: use an initializer-list constructor with
       // the braced-init-list as a single argument (phase 1.1) only if one

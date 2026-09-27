@@ -35,6 +35,44 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
   CHECK_RETURN(!is_reference(object_tc.type()));
 
+  // N5008 [dcl.init.list]/3.5: an empty braced-init-list for a class type
+  // with a default constructor value-initializes the object;
+  // [dcl.init.general]/9.1: when that constructor is not user-provided the
+  // object is zero-initialized first, then default-initialized.  Construct
+  // by the default constructor (as for default-initialization) and prepend
+  // the zero-initialization.  A POD class has no constructor to run and is
+  // handled by the POD path below.
+  if(
+    operands.size() == 1 && operands.front().id() == ID_initializer_list &&
+    operands.front().operands().empty() &&
+    (object_tc.type().id() == ID_struct_tag ||
+     object_tc.type().id() == ID_union_tag) &&
+    !cpp_is_pod(object_tc.type()))
+  {
+    auto code = cpp_constructor(source_location, object, {});
+    if(value_initialization_zero_initializes(object_tc.type()))
+    {
+      const auto zero =
+        ::zero_initializer(object_tc.type(), source_location, *this);
+      if(zero.has_value())
+      {
+        exprt zero_target = object_tc;
+        zero_target.type().set(ID_C_constant, false);
+        zero_target.set(ID_C_lvalue, true);
+        code_blockt value_init;
+        value_init.add(code_expressiont{side_effect_expr_assignt{
+          std::move(zero_target),
+          zero.value(),
+          object_tc.type(),
+          source_location}});
+        if(code.has_value())
+          value_init.add(std::move(*code));
+        return std::move(value_init);
+      }
+    }
+    return code;
+  }
+
   if(object_tc.type().id() == ID_array)
   {
     // Deduce the bound of an array of unknown bound from its initializer
@@ -581,6 +619,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       operands_tc,
       uninitialized_typet(),
       source_location);
+    // this call constructs the object the caller initializes; the caller
+    // decides between default- and value-initialization ([dcl.init.general]
+    // /9, /12), so the call itself must not zero-initialize
+    function_call.set(ID_C_default_initialization, true);
 
     typecheck_side_effect_function_call(function_call);
 
@@ -1056,6 +1098,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       operands_tc,
       uninitialized_typet(),
       source_location);
+    // this call constructs the object the caller initializes; the caller
+    // decides between default- and value-initialization ([dcl.init.general]
+    // /9, /12), so the call itself must not zero-initialize
+    function_call.set(ID_C_default_initialization, true);
 
     typecheck_side_effect_function_call(function_call);
 
@@ -1150,6 +1196,33 @@ void cpp_typecheckt::new_temporary(
 
   auto new_code = cpp_constructor(source_location, new_object, ops);
 
+  // N5008 [expr.type.conv]/2 + [dcl.init.general]/16.4: `T()' and `T{}'
+  // value-initialize the result object; [dcl.init.general]/9.1: a class
+  // whose default constructor is not user-provided is zero-initialized
+  // before that constructor runs.  cpp_constructor only calls the
+  // constructor, which is right for default-initialization (`T t;') but
+  // left the members of `T()' indeterminate -- libc++ 23's basic_string
+  // resets its representation with `__rep_ = __rep()', a union whose
+  // variant member has a defaulted default constructor.
+  if(
+    ops.empty() && new_code.has_value() &&
+    new_code->get_statement() != ID_assign &&
+    (type.id() == ID_struct_tag || type.id() == ID_union_tag) &&
+    !cpp_is_pod(type) && value_initialization_zero_initializes(type))
+  {
+    const auto zero = ::zero_initializer(type, source_location, *this);
+    if(zero.has_value())
+    {
+      exprt zero_target(ID_new_object, type);
+      zero_target.set(ID_C_lvalue, true);
+      code_blockt value_init;
+      value_init.add(code_expressiont{side_effect_expr_assignt{
+        std::move(zero_target), zero.value(), type, source_location}});
+      value_init.add(std::move(*new_code));
+      new_code = std::move(value_init);
+    }
+  }
+
   if(new_code.has_value())
   {
     if(new_code->get_statement() == ID_assign)
@@ -1159,6 +1232,39 @@ void cpp_typecheckt::new_temporary(
   }
 
   temporary.swap(tmp_object_expr);
+}
+
+bool cpp_typecheckt::value_initialization_zero_initializes(const typet &type)
+{
+  if(type.id() == ID_array)
+  {
+    // [dcl.init.general]/9.2: each element is value-initialized
+    return value_initialization_zero_initializes(
+      to_array_type(type).element_type());
+  }
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    return true; // [dcl.init.general]/9.3
+  if(cpp_is_pod(type))
+    return true; // no user-declared constructor at all
+  // [dcl.init.general]/9.1: the constructor selected to default-initialize
+  // the object is the class's default constructor; it is user-provided
+  // unless implicitly declared or explicitly defaulted on its first
+  // declaration ([dcl.fct.def.default]/5).
+  const struct_union_typet &class_type =
+    follow_tag(to_struct_or_union_tag_type(type));
+  for(const auto &c : class_type.components())
+  {
+    if(c.get_bool(ID_from_base) || c.type().id() != ID_code)
+      continue;
+    const code_typet &code_type = to_code_type(c.type());
+    if(
+      code_type.return_type().id() != ID_constructor ||
+      code_type.parameters().size() != 1)
+      continue;
+    return code_type.get_bool("#is_implicit_ctor") ||
+           code_type.get_bool("#explicitly_defaulted");
+  }
+  return false;
 }
 
 void cpp_typecheckt::new_temporary(

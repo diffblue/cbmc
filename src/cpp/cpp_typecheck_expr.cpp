@@ -4167,11 +4167,15 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   // unchanged.  Emit the zero-initialization here, ahead of whatever
   // cpp_constructor produced (default member initializers, which
   // [dcl.init.general]/9.2 applies after zero-initialization).
+  // The same for a class whose default constructor is not user-provided
+  // ([dcl.init.general]/9.1: zero-initialized, then default-initialized).
+  // `new T{}' value-initializes as well ([dcl.init.list]/3.5).
   const typet &new_object_type = to_pointer_type(expr.type()).base_type();
   if(
-    initializer.get_bool(ID_C_value_initialization) &&
+    (initializer.get_bool(ID_C_value_initialization) ||
+     initializer.id() == ID_initializer_list) &&
     initializer.operands().empty() && expr.get(ID_statement) == ID_cpp_new &&
-    cpp_is_pod(new_object_type))
+    value_initialization_zero_initializes(new_object_type))
   {
     const auto zero =
       ::zero_initializer(new_object_type, expr.find_source_location(), *this);
@@ -7072,6 +7076,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 
     expr.function().swap(member);
 
+    // `T()' / `T{}': no argument before the implicit object argument is
+    // added below -- value-initialization ([expr.type.conv]/2,
+    // [dcl.init.general]/16.4).  Not for the constructor call
+    // cpp_constructor synthesizes to initialize an object: there the
+    // caller distinguishes default- from value-initialization.
+    const bool value_initialization =
+      expr.arguments().empty() && !expr.get_bool(ID_C_default_initialization);
+
     typecheck_method_application(expr);
     typecheck_function_call_arguments(expr);
 
@@ -7166,6 +7178,35 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
 
     const code_expressiont new_code(expr);
+    // N5008 [dcl.init.general]/9.1: value-initialization of a class whose
+    // default constructor is not user-provided (implicitly declared or
+    // defaulted on its first declaration) zero-initializes the object
+    // before the constructor runs; cpp_constructor / new_temporary do the
+    // same for the functional-cast form that is not resolved through a
+    // constructor symbol.  Previously `T()' left such members
+    // indeterminate.
+    if(
+      value_initialization &&
+      value_initialization_zero_initializes(tmp_object_expr.type()))
+    {
+      const auto zero = ::zero_initializer(
+        tmp_object_expr.type(), expr.source_location(), *this);
+      if(zero.has_value())
+      {
+        exprt zero_target(ID_new_object, tmp_object_expr.type());
+        zero_target.set(ID_C_lvalue, true);
+        code_blockt value_init;
+        value_init.add(code_expressiont{side_effect_expr_assignt{
+          std::move(zero_target),
+          zero.value(),
+          tmp_object_expr.type(),
+          expr.source_location()}});
+        value_init.add(new_code);
+        tmp_object_expr.add(ID_initializer) = value_init;
+        expr.swap(tmp_object_expr);
+        return;
+      }
+    }
     tmp_object_expr.add(ID_initializer) = new_code;
     expr.swap(tmp_object_expr);
     return;

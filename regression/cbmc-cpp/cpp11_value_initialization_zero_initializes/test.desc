@@ -1,0 +1,32 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ S\(\): zero-initialized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ S\{\}: zero-initialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ S c\{\}: zero-initialized: SUCCESS$
+^\[main\.assertion\.4\] line \d+ S d = \{\}: zero-initialized: SUCCESS$
+^\[main\.assertion\.5\] line \d+ new S\(\): zero-initialized: SUCCESS$
+^\[main\.assertion\.6\] line \d+ new S\{\}: zero-initialized: SUCCESS$
+^\[main\.assertion\.7\] line \d+ defaulted default constructor: zero-initialized: SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [dcl.init.general]/9.1: to value-initialize an object of class type,
+if the constructor selected to default-initialize it is not user-provided
+(implicitly declared, or explicitly defaulted on its first declaration,
+[dcl.fct.def.default]/5), the object is first zero-initialized and then
+default-initialized.  Value-initialization is what `T()' / `T{}'
+([expr.type.conv]/2, [dcl.init.general]/16.4), an empty braced-init-list
+initializer ([dcl.init.list]/3.5) and `new T()' / `new T{}' ([expr.new])
+perform.  The front end only ran the default constructor for a non-POD
+class, so the members of `S()' were indeterminate; POD classes were already
+zeroed.  libc++ 23's basic_string resets its representation with `__rep_ =
+__rep()', a union whose variant member has a defaulted default constructor
+(see cpp11_union_value_initialization_defaulted_member).  Fixed in round
+163b.
