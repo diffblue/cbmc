@@ -2884,10 +2884,20 @@ void cpp_typecheck_resolvet::make_constructors(
       exprt pod_constructor(ID_pod_constructor, t);
       new_identifiers.push_back(pod_constructor);
     }
-    else if(identifier.type().id() == ID_struct_tag)
+    else if(
+      identifier.type().id() == ID_struct_tag ||
+      identifier.type().id() == ID_union_tag)
     {
-      const struct_typet &struct_type =
-        cpp_typecheck.follow_tag(to_struct_tag_type(identifier.type()));
+      // N5008 [class.union.general]/1-2: a union is a class; it has
+      // constructors like any other class, and a non-POD union
+      // ([class.default.ctor]/1: with an implicitly-declared default
+      // constructor when none is user-declared) is constructed by calling
+      // one -- `__rep()' in libc++ 23's basic_string, whose variant member
+      // `__long' has a defaulted default constructor.  Only struct types
+      // contributed their constructors here, so the functional cast of a
+      // non-POD union found no candidate at all.
+      const struct_union_typet &struct_type = cpp_typecheck.follow_tag(
+        to_struct_or_union_tag_type(identifier.type()));
 
       // Collect identifiers already present to avoid duplicates
       std::set<irep_idt> existing_ids;
