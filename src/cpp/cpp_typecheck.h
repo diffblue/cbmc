@@ -638,6 +638,11 @@ protected:
                      const exprt &op,
                      exprt &temporary);
 
+  /// N5008 [dcl.init.general]/9.1: whether value-initializing an object of
+  /// this type zero-initializes it first -- a class whose selected default
+  /// constructor is not user-provided, or a non-class type.
+  bool value_initialization_zero_initializes(const typet &type);
+
   void static_and_dynamic_initialization();
   void do_not_typechecked();
   /// Clear the placeholders of implicitly-defined special members that
