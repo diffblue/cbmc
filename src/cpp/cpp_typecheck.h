@@ -778,6 +778,11 @@ protected:
   // silently at the end if none does.
   std::set<irep_idt> speculative_instances;
 
+  /// constexpr objects of array or class type: the declarator converter
+  /// keeps them real objects (not macros), but their initializers are still
+  /// manifestly constant-evaluated (N5008 [dcl.constexpr]/6, [expr.const]).
+  std::set<irep_idt> constexpr_objects;
+
   /// N5008 [expr.context]/1, [basic.def.odr]/5, [temp.inst]/4: a function
   /// named in an unevaluated operand (the operand of decltype, sizeof,
   /// noexcept, a non-polymorphic typeid) is not odr-used, so a function
