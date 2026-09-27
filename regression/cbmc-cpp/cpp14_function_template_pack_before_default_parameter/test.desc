@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ at run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ empty pack, default: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+found no match
+--
+N5008 [temp.param]/18: a template parameter pack of a FUNCTION template may be
+followed by further template parameters that have a default argument (or
+are deducible); [temp.variadic]/1: the pack accepts zero or more template
+arguments, so every explicitly specified argument from the pack's position
+on belongs to the pack ([temp.arg.explicit]/9) and the following
+parameters take their defaults.  The explicit-argument check assumed a pack
+is the last parameter and matched `char' in `get<int, char>()' against the
+non-type parameter F ("found no match for symbol 'get'").  libc++'s
+`__get_comp_type<_Ts...>()' (template <class... _Ts, bool _False = false>)
+behind common_comparison_category_t (KNOWNBUG
+cpp20_compare_three_way_pointers_libcxx).  Fixed in round 163b.
+Out of scope: extending such a pack by deduction after explicit arguments
+(`sum<int>(1, 2)' with `template <class... Ts, int N = 7> int sum(Ts...)')
+still fails, as it did before.
