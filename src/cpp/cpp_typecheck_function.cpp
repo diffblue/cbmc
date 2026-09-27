@@ -424,13 +424,22 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   // __find_uniq_type_in_pack (std::variant's __exactly_once) otherwise
   // resolves the pack name to its first element only and the braced list
   // collapses to one element.
+  //
+  // Likewise an EMPTY pack ([temp.variadic]/7): libc++'s `constexpr auto
+  // __get_comp_type()' builds `{_StrongOrd, __type_to_enum<_Ts>()...}' and
+  // is constant-evaluated for common_comparison_category_t<>.
   bool has_multi_element_type_pack = false;
   for(const auto &pa : template_map.pack_args_map)
     if(pa.second.size() >= 2)
       has_multi_element_type_pack = true;
+  bool has_empty_pack = false;
+  for(const auto &ps : template_map.pack_size_map)
+    if(ps.second == 0)
+      has_empty_pack = true;
   if(
     (has_auto(symbol.type) || symbol.is_macro) &&
-    (!template_map.pack_expr_map.empty() || has_multi_element_type_pack))
+    (!template_map.pack_expr_map.empty() || has_multi_element_type_pack ||
+     has_empty_pack))
   {
     template_map.expand_call_argument_packs(
       static_cast<irept &>(symbol.value), /*only_nontype=*/true);
