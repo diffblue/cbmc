@@ -1029,7 +1029,19 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // mode, so that a function-parameter pack expansion `g(a...)` -- driven by
   // pack_size_map and expanded at instantiation -- is not expanded a second
   // time.
-  if(!template_map.pack_expr_map.empty())
+  // N5008 [temp.variadic]/7: the instantiation of a pack expansion over an
+  // EMPTY pack produces an empty list -- `{_StrongOrd,
+  // __type_to_enum<_Ts>()...}' with no `_Ts' is `{_StrongOrd}' (libc++'s
+  // __get_comp_type for common_comparison_category_t<>).  An empty type
+  // pack is recorded in pack_size_map only, and the pattern was otherwise
+  // left in place, instantiated once with the empty pack's placeholder
+  // type (`__type_to_enum<void>()'): an array of two elements instead of
+  // one, and a constant evaluation that read the wrong element.
+  bool has_empty_pack = false;
+  for(const auto &ps : template_map.pack_size_map)
+    if(ps.second == 0)
+      has_empty_pack = true;
+  if(!template_map.pack_expr_map.empty() || has_empty_pack)
     template_map.expand_call_argument_packs(static_cast<irept &>(body));
   else
   {

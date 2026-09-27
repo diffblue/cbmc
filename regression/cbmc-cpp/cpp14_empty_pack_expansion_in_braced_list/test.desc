@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ empty pack: one element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ two: three elements: SUCCESS$
+^\[main\.assertion\.3\] line \d+ sizeof pattern, empty pack: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+dropped the body
+--
+N5008 [temp.variadic]/7: the instantiation of a pack expansion over an EMPTY
+pack produces an empty list.  An empty type pack is recorded in the
+template map's pack sizes only, and the drain that expands pack expansions
+in function bodies ran only for value packs or type packs of two or more
+elements, so `{1, f<Ts>()...}' with no Ts kept its pattern, instantiated
+once with the empty pack's placeholder type (`f<void>()'): an array of two
+elements instead of one.  The eager conversion of a constexpr / deduced-
+return-type function (convert_function) had the same gap -- libc++'s
+`constexpr _CCC __type_kinds[] = {_StrongOrd, __type_to_enum<_Ts>()...}'
+in __get_comp_type for common_comparison_category_t<> (KNOWNBUG
+cpp20_compare_three_way_pointers_libcxx).  Fixed in round 163b.

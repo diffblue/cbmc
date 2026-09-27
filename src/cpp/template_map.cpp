@@ -712,11 +712,12 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
 
       if(empty_pack)
       {
-        if(only_nontype)
-        {
-          new_args.push_back(arg);
-          continue;
-        }
+        // N5008 [temp.variadic]/7: an expansion over an empty pack
+        // instantiates to an empty list, in either mode -- the pattern is
+        // not re-expanded, only removed, so the concern of only_nontype
+        // (re-expanding an already expanded function-parameter pack against
+        // an unrelated pack size) does not arise; the innermost binding of
+        // the pack name wins (generation_of).
         changed = true;
         continue; // zero-length expansion: drop the argument
       }
