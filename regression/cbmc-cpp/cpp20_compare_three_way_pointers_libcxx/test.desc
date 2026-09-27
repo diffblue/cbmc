@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp20 --stdlib libc++ --object-bits 12
 ^\[main\.assertion\.1\] line \d+ identity comparison: SUCCESS$
@@ -24,3 +24,15 @@ translation unit is rejected; this is libc++'s error_category::operator<=>
 libc++ C++20 test (audit residue item 2, round 162).  With libstdc++ the
 same program passes (--object-bits 12 is for the locale machinery pulled
 in by <memory>).
+Round 163b (cvise reduction, /tmp/r163/red): libc++'s
+`__get_comp_type<_Ts...>()' (common_comparison_category_t behind
+three_way_comparable_with) exercised six front-end gaps, each fixed with a
+header-free test: an empty pack expansion in a braced list
+(cpp14_empty_pack_expansion_in_braced_list); a function template pack
+followed by a defaulted parameter
+(cpp14_function_template_pack_before_default_parameter); a constexpr local
+array in constant expressions (cpp14_constexpr_local_array_in_constant_
+expression); `if constexpr' over such an array element
+(cpp17_if_constexpr_constexpr_array_element); `void()'
+(cpp14_void_functional_cast); and the built-in pointer `<=>' result
+(cpp20_spaceship_builtin_pointers_prvalue).  The test is CORE.
