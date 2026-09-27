@@ -201,6 +201,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_GCC_BUILTIN_HAS_ATTRIBUTE "__builtin_has_attribute"%token TOK_CLANG_BUILTIN_CONVERTVECTOR "__builtin_convertvector"
 %token TOK_OFFSETOF    "__offsetof"
 %token TOK_ALIGNOF     "__alignof__"
+%token TOK_DATASIZEOF  "__datasizeof"
 %token TOK_MSC_TRY     "__try"
 %token TOK_MSC_FINALLY "__finally"
 %token TOK_MSC_EXCEPT  "__except"

@@ -9262,6 +9262,23 @@ bool Parser::rUnaryExpr(exprt &exp)
     return rSizeofExpr(exp);
   else if(t==TOK_ALIGNOF)
     return rAlignofExpr(exp);
+  else if(t == TOK_DATASIZEOF)
+  {
+    // Clang's __datasizeof ( type-id ): the Itanium C++ ABI's dsize
+    cpp_tokent tk, op, cp;
+    lex.get_token(tk);
+    if(lex.get_token(op) != '(')
+      return false;
+    typet tname;
+    if(!rTypeName(tname))
+      return false;
+    if(lex.get_token(cp) != ')')
+      return false;
+    exp = exprt(ID_cpp_datasizeof);
+    exp.add(ID_type_arg).swap(tname);
+    set_location(exp, tk);
+    return true;
+  }
   else if(t == TOK_OFFSETOF)
   {
     // __builtin_offsetof(type, member)
