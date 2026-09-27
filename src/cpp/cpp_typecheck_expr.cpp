@@ -4250,6 +4250,20 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     // Default value, e.g., int()
     typecheck_type(expr.type());
 
+    // N5008 [expr.type.conv]/2: "if the type is cv void and the initializer
+    // is () or {} (after pack expansion, if any), the expression is a prvalue
+    // of type void that performs no initialization" -- `return void();' in
+    // libc++'s __get_comp_type.  There is nothing to zero-initialize (the
+    // attempt failed with "cannot zero-initialize 'void'").
+    if(expr.type().id() == ID_empty)
+    {
+      exprt result =
+        typecast_exprt{from_integer(0, signed_int_type()), empty_typet{}};
+      result.add_source_location() = expr.source_location();
+      expr.swap(result);
+      return;
+    }
+
     // N5008 [expr.type.conv]/2 + [dcl.init.general]/9.1: `T()' for a class
     // type VALUE-INITIALIZES the temporary -- zero-initialized and then, if
     // T's default constructor is non-trivial, default-initialized.  A
@@ -4636,6 +4650,22 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
   // object of T, which must be complete (its constructors and, for an
   // aggregate, its elements decide the initialization)
   elaborate_class_template(expr.type());
+
+  // N5008 [expr.type.conv]/2: `void()' and `void{}' are prvalues of type
+  // void that perform no initialization.
+  if(
+    expr.type().id() == ID_empty &&
+    (expr.operands().empty() ||
+     (expr.operands().size() == 1 &&
+      expr.operands().front().id() == ID_initializer_list &&
+      expr.operands().front().operands().empty())))
+  {
+    exprt result =
+      typecast_exprt{from_integer(0, signed_int_type()), empty_typet{}};
+    result.add_source_location() = expr.source_location();
+    expr.swap(result);
+    return;
+  }
 
   // N5008 [dcl.init.general]/9: "A program that calls for
   // default-initialization or value-initialization of an entity of reference
