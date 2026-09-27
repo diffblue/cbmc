@@ -1584,6 +1584,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
         component.type().id() == ID_code &&
         to_code_type(component.type()).return_type().id() == ID_destructor)
         component.type().set("#is_implicit_dtor", true);
+
+      // N5008 [dcl.fct.def.default]/5: a function explicitly defaulted on
+      // its first declaration is not user-provided.  Recorded on the
+      // function type (like #is_implicit_ctor) for [dcl.init.general]/9.1:
+      // value-initialization zero-initializes the object first when the
+      // default constructor is not user-provided.
+      if(component.type().id() == ID_code)
+        component.type().set("#explicitly_defaulted", true);
     }
 
     component.set(ID_is_inline, declaration.member_spec().is_inline());
