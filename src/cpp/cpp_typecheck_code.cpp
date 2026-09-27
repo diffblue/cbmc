@@ -1902,6 +1902,27 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     implicit_typecast_bool(code.cond());
     simplify(code.cond(), *this);
 
+    // N5008 [stmt.if]/2: the condition is a contextually converted constant
+    // expression of type bool; [expr.const]/4-5: an lvalue-to-rvalue
+    // conversion of an object usable in constant expressions -- an element
+    // of a constexpr local array (`constexpr _CCC __cat =
+    // __compute_comp_type(__type_kinds)' with `constexpr _CCC
+    // __type_kinds[] = {...}', libc++'s __get_comp_type) -- is a constant.
+    // A constexpr variable's reference is replaced by its initializer, but
+    // an array stays a symbol (it must remain an lvalue, see
+    // cpp_typecheck_resolvet::convert_identifier), so `__type_kinds[0]' did
+    // not fold and both branches were kept, failing return type deduction
+    // ("inconsistent deduction for the return type").  Fold through the
+    // const objects' initializers as static_assert does.
+    if(!code.cond().is_constant())
+    {
+      exprt folded = code.cond();
+      propagate_constants(folded, symbol_table);
+      simplify(folded, *this);
+      if(folded.is_constant())
+        code.cond() = folded;
+    }
+
     if(code.cond().is_true())
     {
       typecheck_code(code.then_case());
