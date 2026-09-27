@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11 --pointer-check
+^\[main\.assertion\.1\] line \d+ returned through a variadic call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ returned through a variadic template call: SUCCESS$
+^\[main\.assertion\.3\] line \d+ no variadic arguments: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [class.copy.elis], [stmt.return]/2: a by-value return of a class that
+is not trivially copyable is lowered (elide_cpp_returned_temporaries) to
+construction in the caller's storage through a hidden result parameter,
+appended after the declared parameters.  For a variadic function
+([dcl.fct]/6: a parameter-declaration-clause ending in an ellipsis, also
+`F first...' with a non-pack F -- libc++'s `__bind_back(_Fn...)') the call
+site appended the result address after ALL arguments, so it was bound to
+the first variadic argument's position and the first variadic argument
+became the result pointer: the callee wrote through `3' ("pointer invalid
+in *#result").  The address now precedes the variadic arguments.  Fixed in
+round 163b (surfaced by cpp14_perfect_forward_struct_arity once
+value-initialization writes the zeroed object through the result pointer).

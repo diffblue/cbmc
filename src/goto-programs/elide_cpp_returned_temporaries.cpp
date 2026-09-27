@@ -512,7 +512,23 @@ void elide_cpp_returned_temporaries(goto_modelt &goto_model)
         result_slot = slot;
       }
 
-      i_it->call_arguments().push_back(address_of_exprt{result_slot});
+      // The hidden result parameter is the last DECLARED parameter.  For a
+      // variadic function (N5008 [dcl.fct]/6: a parameter-declaration-clause
+      // ending in an ellipsis, e.g. `auto f(_Fn...)' with a non-pack _Fn) the
+      // arguments beyond the declared parameters follow it, so the result
+      // address goes in front of them, not after them -- appended last it
+      // was bound to the wrong parameter and the first variadic argument
+      // became the result pointer.
+      const std::size_t declared_parameters = callee_type.parameters().size();
+      auto &arguments = i_it->call_arguments();
+      if(callee_type.has_ellipsis() && arguments.size() >= declared_parameters)
+      {
+        arguments.insert(
+          arguments.begin() + (declared_parameters - 1),
+          address_of_exprt{result_slot});
+      }
+      else
+        arguments.push_back(address_of_exprt{result_slot});
       i_it->call_function().type() = callee_type;
     }
   }
