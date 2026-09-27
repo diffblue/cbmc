@@ -803,6 +803,12 @@ enable_or_disable ("enable"|"disable")
                     TOK_ALIGNOF);
                 }
 
+"__datasizeof"  { // Clang: the size of an object without its tail
+                  // padding (Itanium C++ ABI dsize); libc++ 18's
+                  // __libcpp_datasizeof
+                  return conditional_keyword(PARSER.cpp98, TOK_DATASIZEOF);
+                }
+
 "__alignof"     { // MS supports __alignof:
                   // http://msdn.microsoft.com/en-us/library/45t0s5f4%28v=vs.71%29.aspx
                   return conditional_keyword(

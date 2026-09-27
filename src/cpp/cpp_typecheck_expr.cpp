@@ -1792,6 +1792,61 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // conservatively return false for traits we cannot evaluate
       expr = false_exprt();
   }
+  else if(expr.id() == ID_cpp_datasizeof)
+  {
+    // Clang's `__datasizeof(T)': the Itanium C++ ABI's dsize(T), "the size
+    // of an object of type T without tail padding" (ABI 2.2).  ABI 2.4-II:
+    // for a class that is a POD for the purpose of layout (a C++03 POD:
+    // N5008 [class.prop] trivial + standard-layout as of C++03 -- no
+    // user-declared special members, bases, virtual members or non-public
+    // non-static data members) dsize is sizeof; otherwise it is the end of
+    // the last non-static data member, 0 for an empty class, since a
+    // derived class may place its own members in the tail padding.  For a
+    // non-class type dsize is sizeof ([expr.sizeof]/1-2).  libc++ 18
+    // preprocessed by clang selects `__libcpp_datasizeof<_Tp>::value =
+    // __datasizeof(_Tp)' and sizes every basic_string copy with it.
+    complete_type_operand(expr);
+    throw_if_incomplete_dependency(expr);
+    typet &type = static_cast<typet &>(expr.add(ID_type_arg));
+    typecheck_type(type); // unwraps the already_typechecked marker
+    std::optional<exprt> result;
+    if(type.id() == ID_struct_tag && !cpp_is_pod(type))
+    {
+      // the end of the last non-static data member: the layout's trailing
+      // padding component(s) are exactly the tail padding
+      const struct_typet &struct_type = follow_tag(to_struct_tag_type(type));
+      result = from_integer(0, size_type());
+      const auto &components = struct_type.components();
+      for(auto it = components.rbegin(); it != components.rend(); ++it)
+      {
+        if(it->get_is_padding() || it->type().id() == ID_code)
+          continue;
+        auto offset = member_offset_expr(struct_type, it->get_name(), *this);
+        auto size = size_of_expr(it->type(), *this);
+        if(offset.has_value() && size.has_value())
+        {
+          result = plus_exprt{
+            typecast_exprt::conditional_cast(*offset, size_type()),
+            typecast_exprt::conditional_cast(*size, size_type())};
+        }
+        else
+          result.reset();
+        break;
+      }
+    }
+    else
+      result = size_of_expr(type, *this); // a union has no tail padding
+    if(!result.has_value())
+    {
+      error().source_location = expr.source_location();
+      error() << "__datasizeof of type '" << to_string(type)
+              << "' has no known size" << eom;
+      throw 0;
+    }
+    result->add_source_location() = expr.source_location();
+    simplify(*result, *this);
+    expr.swap(*result);
+  }
   else if(expr.id() == ID_noexcept)
   {
     // C++11 noexcept operator per [expr.unary.noexcept]/3: "The
