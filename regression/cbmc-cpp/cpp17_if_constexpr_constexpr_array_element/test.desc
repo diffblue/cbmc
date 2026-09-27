@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ local constexpr array element in if constexpr: SUCCESS$
+^\[main\.assertion\.2\] line \d+ in a template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ the other branch: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+inconsistent deduction
+dropped the body
+--
+N5008 [stmt.if]/2: the condition of `if constexpr' is a contextually
+converted constant expression of type bool; the discarded substatement does
+not contribute to return type deduction ([dcl.spec.auto.general]/10).
+[expr.const]/4: an element of a constexpr array is usable in constant
+expressions.  A constexpr variable's reference is replaced by its
+initializer, but a constexpr array stays an object (it must remain an
+lvalue), so `kinds[1]' did not fold, both branches were type-checked and
+deduction failed ("inconsistent deduction for the return type").  The
+condition now folds through const objects' initializers as static_assert
+does -- libc++'s `if constexpr (__cat == _None) return void(); else if
+constexpr ...' in __get_comp_type.  Fixed in round 163b.
