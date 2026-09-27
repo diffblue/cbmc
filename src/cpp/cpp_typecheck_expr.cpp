@@ -861,7 +861,17 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         less.is_not_nil() && greater.is_not_nil() && equalish.is_not_nil() &&
         (!is_fp || unordered.is_not_nil()))
       {
-        const typet cat_type = less.type();
+        // N5008 [expr.spaceship]/2, /4.2, /6: `p <=> q' is a PRVALUE of type
+        // std::strong_ordering (resp. partial_ordering) -- not of the type
+        // of the `static constexpr' member it yields, which is const: a
+        // `const strong_ordering' made libc++'s
+        // __compares_as<decltype((a <=> b)), partial_ordering> evaluate
+        // __type_to_enum<const strong_ordering>() as _None, so
+        // three_way_comparable_with<T *, T *> was false and
+        // std::compare_three_way()(p, q) had no viable operator().
+        typet cat_type = less.type();
+        cat_type.remove(ID_C_constant);
+        cat_type.remove(ID_C_volatile);
         const source_locationt loc = expr.source_location();
 
         // [expr.spaceship]/4: the usual arithmetic conversions are applied
@@ -880,7 +890,23 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
         gt.type() = bool_typet();
         gt.add_source_location() = loc;
 
-        if(!is_fp)
+        if(is_ptr)
+        {
+          // N5008 [expr.spaceship]/6: p <=> q yields equal if p and q compare
+          // equal ([expr.eq]); otherwise less if q compares greater than p,
+          // else greater.  Equality is decided first: for pointers to
+          // different complete objects the order is unspecified
+          // ([expr.rel]/4 -- cbmc's `<' / `>' are then unconstrained), but
+          // the pointers never compare equal, so the result is never equal.
+          binary_relation_exprt eq{a, ID_equal, b};
+          eq.type() = bool_typet();
+          eq.add_source_location() = loc;
+          if_exprt inner{lt, less, greater, cat_type};
+          if_exprt outer{eq, equalish, inner, cat_type};
+          outer.add_source_location() = loc;
+          expr.swap(outer);
+        }
+        else if(!is_fp)
         {
           // a < b ? less : (a > b ? greater : equal)
           if_exprt inner{gt, greater, equalish, cat_type};
