@@ -198,6 +198,32 @@ struct array_pointert
   mp_integer index;
 };
 
+/// Whether \p symbol is an array object whose value a constant evaluation
+/// may read: one with static storage duration initialized by an array
+/// constant, or -- N5008 [expr.const]/4, /7 -- a constexpr variable of any
+/// storage duration, which is usable in constant expressions (constexpr
+/// declares the object const, [dcl.constexpr]/6, and its initializer is a
+/// constant expression).  The latter is libc++'s `constexpr _CCC
+/// __type_kinds[] = {...}' local passed by reference to the constexpr
+/// __compute_comp_type in __get_comp_type.
+static bool constant_array_symbol(const symbolt &symbol)
+{
+  if(symbol.is_type || symbol.value.id() != ID_array)
+    return false;
+  if(symbol.is_static_lifetime)
+    return true;
+  if(
+    symbol.type.id() != ID_array ||
+    !to_array_type(symbol.type).element_type().get_bool(ID_C_constant))
+  {
+    return false;
+  }
+  for(const auto &element : symbol.value.operands())
+    if(!element.is_constant())
+      return false;
+  return true;
+}
+
 /// The constant array value a tracked array pointer's array denotes: the
 /// expression itself for a literal, the symbol's value for a static object.
 static exprt array_pointer_value(
@@ -210,9 +236,7 @@ static exprt array_pointer_value(
   {
     const symbolt *symbol =
       symbol_table.lookup(to_symbol_expr(ap.array).get_identifier());
-    if(
-      symbol != nullptr && symbol->is_static_lifetime &&
-      symbol->value.id() == ID_array)
+    if(symbol != nullptr && constant_array_symbol(*symbol))
       return symbol->value;
   }
   return nil_exprt();
@@ -230,8 +254,7 @@ is_constant_array_object(const exprt &e, const symbol_table_baset &symbol_table)
   {
     const symbolt *symbol =
       symbol_table.lookup(to_symbol_expr(e).get_identifier());
-    return symbol != nullptr && symbol->is_static_lifetime &&
-           symbol->value.id() == ID_array;
+    return symbol != nullptr && constant_array_symbol(*symbol);
   }
   return false;
 }
@@ -419,6 +442,42 @@ public:
         simplify(obj.operands()[*idx], ns);
         return true;
       }
+    }
+    // N5008 [expr.const]/5 (C++14 relaxed constexpr): an assignment or
+    // increment of an ELEMENT of a local array object whose lifetime began
+    // within the evaluation -- `int __seen[_CCC_Size] = {}; ... ++__seen[t]'
+    // in libc++'s __compute_comp_type.  Apply the effect to the element
+    // through a scratch variable and store the result back.
+    if(!e.operands().empty() && e.operands()[0].id() == ID_index)
+    {
+      const index_exprt &element = to_index_expr(e.operands()[0]);
+      if(element.array().id() != ID_symbol)
+        return false;
+      const auto array_it =
+        vars.find(to_symbol_expr(element.array()).get_identifier());
+      if(array_it == vars.end() || array_it->second.id() != ID_array)
+        return false;
+      const exprt index = eval(element.index());
+      const auto i = index.is_constant()
+                       ? numeric_cast<mp_integer>(to_constant_expr(index))
+                       : std::nullopt;
+      if(
+        !i.has_value() || *i < 0 ||
+        *i >= mp_integer{array_it->second.operands().size()})
+      {
+        return false; // [expr.const]/5.8: undefined behaviour is not constant
+      }
+      const std::size_t position = numeric_cast_v<std::size_t>(*i);
+      const irep_idt scratch{"#constexpr_array_element"};
+      const exprt &old_value = array_it->second.operands()[position];
+      vars[scratch] = old_value;
+      exprt on_scratch = e;
+      on_scratch.operands()[0] = symbol_exprt{scratch, old_value.type()};
+      const bool applied = apply_side_effect(on_scratch);
+      if(applied)
+        array_it->second.operands()[position] = vars.at(scratch);
+      vars.erase(scratch);
+      return applied;
     }
     if(e.operands().empty() || e.operands()[0].id() != ID_symbol)
       return false;

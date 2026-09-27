@@ -804,6 +804,7 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
      symbol.type.id() == ID_union_tag))
   {
     symbol.is_macro = false;
+    cpp_typecheck.constexpr_objects.insert(symbol.name);
   }
   // N5008 [dcl.constexpr]/6: "A constexpr specifier used in an object
   // declaration declares the object as const."  The const of a constexpr

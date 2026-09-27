@@ -296,9 +296,18 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   // ([meta.const.eval]/1).  Such variables are flagged is_macro by the
   // declarator converter (constexpr storage); mark the context accordingly
   // while the initializer is type-checked.
+  // A constexpr ARRAY or class object is not a macro but its initializer is
+  // manifestly constant-evaluated all the same ([dcl.constexpr]/6): `constexpr
+  // _CCC __type_kinds[] = {_StrongOrd, __type_to_enum<_Ts>()...}' (libc++'s
+  // __get_comp_type) must fold the constexpr calls to constants, so the array
+  // is usable in constant expressions ([expr.const]/4).
   std::optional<constant_expression_contextt> constexpr_init_guard;
-  if(symbol.is_macro && !symbol.is_type)
+  if(
+    (symbol.is_macro || constexpr_objects.count(symbol.name) != 0) &&
+    !symbol.is_type)
+  {
     constexpr_init_guard.emplace(*this);
+  }
 
   // Ensure a class type is fully elaborated before we decide how to
   // initialize it.  In particular cpp_is_pod (used just below to choose
