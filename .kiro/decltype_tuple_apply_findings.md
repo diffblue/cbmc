@@ -12355,3 +12355,25 @@ context, [temp.res.general]/4.1); clang 18 and clang 23 reject it, and
 CBMC fails ("no match for symbol").  That is its own CBMC gap, but no
 test can build with both reference compilers.  D2 now runs as kb_D2b,
 which must keep `::template rebind_alloc<'.
+
+### Test rule change (2026-09-28, user decision)
+
+The front end must accept the UNION of what GCC, Clang and MSVC accept, not
+the intersection.  New and revised tests therefore need at least one
+reference compiler that accepts the program (and, if it links, runs it
+failing only its WRONG assertion); the desc notes say which compilers
+accept it, and why the others reject it (standard clause, P-paper not yet
+implemented, or extension).  /tmp/r163/kb/gen/check.sh now reports
+acceptance per compiler instead of requiring both.  Constraints:
+- Where compilers accept the same code with DIFFERENT meaning (e.g. MSVC
+  permissive lookup), the verdict follows the dialect the front end is
+  configured for (config.ansi_c.mode), and the test passes the
+  matching mode flag.
+- cvise interestingness tests keep gating on the compiler(s) that accept
+  the SEED, so that a reduction cannot drift into code that only some
+  other compiler accepts.
+- No MSVC is available on this host; MSVC-only acceptance cannot be
+  checked here yet.
+First test under the rule:
+cpp11_typename_specifier_member_template_without_template_keyword
+(GCC accepts per [temp.names]/3.4, Clang 18/23 reject).
