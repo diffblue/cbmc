@@ -90,8 +90,34 @@ void cpp_typecheck_resolvet::apply_template_args(
   resolve_identifierst old_identifiers;
   old_identifiers.swap(identifiers);
 
-  for(const auto &old_id : old_identifiers)
+  // N5008 [temp.over.link]/6-7, [over.match.funcs.general]/7: function
+  // templates whose template-heads differ (for instance only in the
+  // enable_if condition of a defaulted constant template parameter) are
+  // distinct overloads.  The second such template is kept as the
+  // `#sfinae_alt' of the first (typecheck_function_template); when the
+  // explicit arguments fail to substitute into the first, the alternative
+  // is a candidate of its own.
+  const auto sfinae_alternative =
+    [this](const exprt &primary) -> std::optional<exprt>
   {
+    if(primary.id() != ID_symbol)
+      return {};
+    const irep_idt &name = to_symbol_expr(primary).get_identifier();
+    const auto alt_it = cpp_typecheck.sfinae_alternatives.find(name);
+    if(alt_it == cpp_typecheck.sfinae_alternatives.end())
+      return {};
+    const irep_idt alt_name = id2string(name) + "#sfinae_alt";
+    if(!cpp_typecheck.symbol_table.has_symbol(alt_name))
+      cpp_typecheck.symbol_table.insert(alt_it->second);
+    exprt alt = primary;
+    alt.type() = alt_it->second.type;
+    to_symbol_expr(alt).set_identifier(alt_name);
+    return alt;
+  };
+
+  for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+  {
+    const exprt old_id = old_identifiers[i];
     exprt e = old_id;
 
     // [temp.arg]/2 + [temp.deduct]/8: applying the explicit template
@@ -113,10 +139,14 @@ void cpp_typecheck_resolvet::apply_template_args(
     }
     catch(const template_arg_kind_mismatch_exceptiont &)
     {
+      if(auto alt = sfinae_alternative(old_id))
+        old_identifiers.push_back(*alt);
       continue;
     }
     catch(int)
     {
+      if(auto alt = sfinae_alternative(old_id))
+        old_identifiers.push_back(*alt);
       // N5008 [temp.deduct.general]/5 + [temp.deduct]/8: substituting the
       // explicit template arguments -- and the DEFAULT arguments of the
       // parameters they leave out -- into this candidate failed (a silent
@@ -138,6 +168,8 @@ void cpp_typecheck_resolvet::apply_template_args(
 
       identifiers.push_back(e);
     }
+    else if(auto alt = sfinae_alternative(old_id))
+      old_identifiers.push_back(*alt);
   }
 }
 
