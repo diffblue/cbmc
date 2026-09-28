@@ -1,0 +1,28 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ a second target: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructed from a function pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copied: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.mem]/1 + [temp.over.link]: each out-of-class member definition
+belongs to the member with the same signature -- `function<R(A...)>::
+function(const function &)' to the copy constructor, `template <class F>
+function<R(A...)>::function(F)' to the converting constructor template.
+The front end attaches the copy constructor's out-of-line definition to
+the constructor template as well (its `other.f' is then checked with
+`other' a function pointer: "member operator requires struct/union type
+on left hand side"), drops the template's body and the constructed object
+is nondet.  This is libc++'s std::function (function.h:852 declares
+`template <class _Fp, class> function(_Fp)'; the copy constructor's
+definition at line 919 precedes the template's at 938), dropped in
+cpp11_function_basic_libcxx and cpp17_functional_basic_libcxx (round-163
+audit).  Header-free.  Pre-existing (round-162 snapshot bin51).

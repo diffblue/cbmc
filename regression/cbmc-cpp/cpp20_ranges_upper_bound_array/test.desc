@@ -36,7 +36,12 @@ evaluated while the class is still being elaborated (view_interface CRTP
 base members convert eagerly) and finds the namespace-scope CPO `begin'
 instead ("'std::ranges::__cust::begin' is not static member of class
 'struct take_view'"), so the whole adaptor pipeline is rejected.  The two
-have to be fixed together.  With libc++ 18
+have to be fixed together.  The second half cannot be a KNOWNBUG of its
+own against the current parser, which masks it; its reduction (the
+interestingness test requires the current front end to verify
+`arr | views::take(3)' and a front end built without the fast path to
+fail with the take_view / ref_view member lookup error) runs in
+/tmp/r163/red/constraint_incomplete_class (round 163c).  With libc++ 18
 (`--stdlib libc++') the call itself fails ("found no match for symbol
 'operator()'" at __algorithm/ranges_upper_bound.h:54) and the unit is
 rejected.  Audit residue items 4 and 10 (round 162); the `__estimated_width'
