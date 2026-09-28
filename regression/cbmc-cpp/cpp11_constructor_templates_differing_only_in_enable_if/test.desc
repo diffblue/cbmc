@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ first constructor template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second constructor template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.mem]/1, [over.match.funcs.general]/7: a constructor template
+is a template; its specializations are overload candidates, and
+[temp.deduct.general]/8 removes those whose (default) template arguments
+fail to substitute.  The class-body pass that type-checks constructors
+also turned each constructor template into an ordinary constructor; for
+one with no function parameters that is a non-template default
+constructor, preferred over every template ([over.match.best]/2.4),
+built from whichever same-signature template came last.  So S<int>
+used the second template's body although its enable_if fails for int.
+libstdc++ pair has exactly these two default constructors (implicit and
+explicit, constrained on __is_implicitly_default_constructible).  Fails
+on the round-163 build bin52.
