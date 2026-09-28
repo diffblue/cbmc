@@ -11871,9 +11871,13 @@ void cpp_typecheck_resolvet::filter_for_named_scopes(
           if(chosen != nullptr)
           {
             const typet &t = chosen->type();
-            if(t.id() == ID_struct_tag)
+            // N5008 [basic.lookup.qual.general]/1, [dcl.enum]/11: a
+            // nested-name-specifier may denote an enumeration, also through
+            // a member typedef (`typedef imp::action action;' ...
+            // `action::copy', libstdc++'s std::function manager)
+            if(t.id() == ID_struct_tag || t.id() == ID_c_enum_tag)
             {
-              const irep_idt &tag_id = to_struct_tag_type(t).get_identifier();
+              const irep_idt &tag_id = to_tag_type(t).get_identifier();
               auto it = cpp_typecheck.cpp_scopes.id_map.find(tag_id);
               if(it != cpp_typecheck.cpp_scopes.id_map.end())
               {
