@@ -713,9 +713,14 @@ bool cpp_typecheckt::standard_conversion_sequence(
     curr_expr = typecast_exprt(
       curr_expr, to_c_bit_field_type(curr_expr.type()).underlying_type());
 
+  // N5008 [conv.general]/1.1: the first conversion of a standard
+  // conversion sequence may be array-to-pointer whatever the target type;
+  // a later step then converts the pointer, e.g. the boolean conversion of
+  // `!"literal"' ([expr.unary.op]/9, [conv.bool]).  Only an array target
+  // keeps the array.
   if(curr_expr.type().id() == ID_array)
   {
-    if(type.id() == ID_pointer)
+    if(type.id() != ID_array)
     {
       if(!standard_conversion_array_to_pointer(curr_expr, new_expr))
         return false;
@@ -725,7 +730,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
       // GCC and clang still accept `char *p = "...";' with a warning, so
       // we do too -- ranked below every standard conversion (a `const
       // char *' candidate must always beat it).
-      if(expr.id() == ID_string_constant)
+      if(expr.id() == ID_string_constant && type.id() == ID_pointer)
       {
         typet from_base = to_pointer_type(new_expr.type()).base_type();
         from_base.remove(ID_C_constant);
