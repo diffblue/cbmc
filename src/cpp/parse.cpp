@@ -3789,7 +3789,12 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
 #endif // DEBUG
 
   // This makes no sense, but is used in Visual Studio header files.
-  if(lex.LookAhead(0)==TOK_TYPENAME)
+  // A `typename' that starts a typename-specifier (`typename A::B', a name
+  // follows) is left to rName, which records it: the terminal name is then
+  // in a type-only context (N5008 [temp.res.general]/4.1).
+  if(
+    lex.LookAhead(0) == TOK_TYPENAME && !is_identifier(lex.LookAhead(1)) &&
+    lex.LookAhead(1) != TOK_SCOPE)
   {
     cpp_tokent tk;
     lex.get_token(tk);
@@ -5888,7 +5893,13 @@ bool Parser::rName(irept &name)
         // For dependent qualified names (e.g., T::member where T is
         // a template parameter), the 'template' keyword is required
         // to treat '<' as a template bracket.
-        if(!template_keyword_seen && !components.empty())
+        // N5008 [temp.names]/3.4 with [temp.res.general]/4.1: the terminal
+        // name of a typename-specifier is in a type-only context, so a `<'
+        // after it starts a template-argument-list without the `template'
+        // keyword (`typename traits<A>::rebind<int>', P1787, accepted by
+        // GCC).
+        const bool type_only_context = name.get_bool(ID_typename);
+        if(!template_keyword_seen && !type_only_context && !components.empty())
         {
           const irept &last = components.back();
           if(last.id() == ID_name)
