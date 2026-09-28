@@ -5827,8 +5827,19 @@ skip_pack_removal_ft:
       // Also skip methods with fewer template parameters — these belong
       // to a partial specialization (e.g., vector<bool, _Alloc> has 1
       // parameter vs the primary vector<T, _Alloc> with 2).
+      // N5008 [temp.mem]/1, [temp.variadic]/1: the definition's template
+      // head repeats the class template's template-parameter-list, so
+      // compare with the number of PARAMETERS -- a parameter pack is one
+      // parameter however many arguments it was instantiated with (for
+      // `template <class R, class... A> function<R, A...>::function(const
+      // function &)' and function<int, int, int>: two parameters, three
+      // arguments; the definition was taken for a member template and
+      // skipped, so the copy constructor had no body).
       const std::size_t n_class_params =
-        specialization_template_args.arguments().size();
+        to_cpp_declaration(template_symbol.type)
+          .template_type()
+          .template_parameters()
+          .size();
       const std::size_t n_method_params =
         method_type.template_parameters().size();
 
