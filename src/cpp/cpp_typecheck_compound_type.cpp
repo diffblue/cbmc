@@ -4025,11 +4025,29 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                   inherited_default_ctor = true;
                   continue;
                 }
+                // N5008 [over.match.funcs.general]/9: an inherited
+                // constructor whose first parameter is `reference to cv P'
+                // is excluded for a single argument when C (the base) is
+                // reference-related to P and P to the derived class D -- the
+                // base's copy/move constructors.  A constructor from a
+                // reference to an unrelated class (`tb(const traits &)',
+                // libstdc++'s _RegexTranslator) is inherited.
                 if(
                   ctor_type.parameters().size() == 2 &&
                   ctor_type.parameters()[1].type().id() == ID_pointer &&
                   is_reference(ctor_type.parameters()[1].type()))
-                  continue;
+                {
+                  typet p = to_reference_type(ctor_type.parameters()[1].type())
+                              .base_type();
+                  p.remove(ID_C_constant);
+                  p.remove(ID_C_volatile);
+                  if(
+                    p.id() == ID_struct_tag &&
+                    to_struct_tag_type(p).get_identifier() == base_sym.name)
+                  {
+                    continue;
+                  }
+                }
                 // Create a derived-class constructor component that
                 // mirrors the base constructor
                 struct_typet::componentt new_comp = comp;
