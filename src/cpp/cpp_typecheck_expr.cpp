@@ -4213,8 +4213,35 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     }
   }
 
-  auto code =
-    cpp_constructor(expr.find_source_location(), object_expr, new_args);
+  // N5008 [expr.new]/24 + [dcl.init.list]/3.4: `new T{e...}' with T an
+  // aggregate aggregate-initializes the object ([dcl.init.aggr]) -- also for
+  // a single element, which cpp_constructor would take as a conversion of
+  // that element to T (`new node{3}')
+  std::optional<codet> code;
+  if(
+    initializer.id() == ID_initializer_list && new_args.size() == 1 &&
+    new_args.front().id() != ID_initializer_list &&
+    expr.get(ID_statement) == ID_cpp_new &&
+    to_pointer_type(expr.type()).base_type().id() == ID_struct_tag)
+  {
+    exprt list = initializer;
+    auto aggregate_value = braced_return_aggregate_value(
+      to_pointer_type(expr.type()).base_type(), list);
+    if(aggregate_value.has_value())
+    {
+      if(aggregate_value->id() == ID_already_typechecked)
+        aggregate_value = to_unary_expr(*aggregate_value).op();
+      exprt target(ID_new_object, to_pointer_type(expr.type()).base_type());
+      target.set(ID_C_lvalue, true);
+      code = code_expressiont{side_effect_expr_assignt{
+        std::move(target),
+        *aggregate_value,
+        to_pointer_type(expr.type()).base_type(),
+        expr.find_source_location()}};
+    }
+  }
+  if(!code.has_value())
+    code = cpp_constructor(expr.find_source_location(), object_expr, new_args);
 
   // N5008 [expr.new]/17: a new-initializer that is an EMPTY pair of
   // parentheses value-initializes the object ([dcl.init.general]/9); for
