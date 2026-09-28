@@ -1587,7 +1587,42 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // keyword, not a cpp_name) is left to the construction check below.
       const bool empty_pack_second_arg =
         t2.id() == ID_empty && expr.find("type_arg2").id() == ID_cpp_name;
-      if(t2.is_nil())
+      typet class_t1 = t1;
+      class_t1.remove(ID_C_constant);
+      class_t1.remove(ID_C_volatile);
+      if(
+        (t2.is_nil() || empty_pack_second_arg) &&
+        class_t1.id() == ID_struct_tag)
+      {
+        // N5008 [meta.unary.prop]/9: is_constructible<T> holds iff the
+        // definition `T t;' would be well-formed, considering only the
+        // immediate context.  For a class this is overload resolution among
+        // its constructors for an empty argument list, including constructor
+        // templates whose default template arguments fail to substitute
+        // ([temp.deduct.general]/8) -- libstdc++'s pair default constructor
+        // is constrained on is_default_constructible of its element type.
+        // Attempt that construction as a substitution context.
+        elaborate_class_template(class_t1);
+        bool constructible = true;
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          symbol_exprt object{irep_idt{}, t1};
+          object.set(ID_C_lvalue, true);
+          cpp_constructor(expr.source_location(), object, {});
+        }
+        catch(...)
+        {
+          constructible = false;
+        }
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
+        expr = constructible ? static_cast<exprt>(true_exprt())
+                             : static_cast<exprt>(false_exprt());
+      }
+      else if(t2.is_nil())
       {
         // Default constructible — scalars are always default constructible
         expr = true_exprt();
