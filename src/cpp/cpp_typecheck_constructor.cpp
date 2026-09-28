@@ -1701,6 +1701,26 @@ void cpp_typecheckt::full_member_initialization(
     final_initializers.move_to_sub(vptrs);
   }
 
+  // N5008 [class.base.init]/9.1.1: in a union's constructor, a variant
+  // member with a default member initializer is initialized from it only
+  // when no other variant member is designated by a mem-initializer-id
+  bool union_member_designated = false;
+  if(struct_union_type.id() == ID_union)
+  {
+    for(const auto &initializer : initializers.get_sub())
+    {
+      if(initializer.get(ID_member) != ID_cpp_name)
+        continue;
+      const irep_idt designated =
+        to_cpp_name(initializer.find(ID_member)).get_base_name();
+      for(const auto &c : components)
+      {
+        if(c.get_base_name() == designated && c.type().id() != ID_code)
+          union_member_designated = true;
+      }
+    }
+  }
+
   // Then, we add the member initializers
   for(const auto &c : components)
   {
@@ -1850,6 +1870,26 @@ void cpp_typecheckt::full_member_initialization(
     // member initializer but no default constructor (e.g. `pair stored{-1, 7}`
     // where `pair` has only `pair(int, int)`) would additionally get a
     // default-construction member-initializer and fail with "found no match".
+    // N5008 [class.base.init]/9.2: a variant member -- a member of this
+    // union -- that is not designated and has no (applicable) default
+    // member initializer is not initialized at all, so a union constructor
+    // naming one member does not default-construct the others (libstdc++'s
+    // vector::_Temporary_value::_Storage and optional's _Storage, whose
+    // class-type member may have no default constructor).
+    if(!found && struct_union_type.id() == ID_union)
+    {
+      if(!union_member_designated && c.find(ID_C_default_value).is_not_nil())
+      {
+        cpp_namet cppname(mem_name);
+        codet mem_init(ID_member_initializer);
+        mem_init.set(ID_member, cppname);
+        mem_init.add_to_operands(
+          static_cast<const exprt &>(c.find(ID_C_default_value)));
+        final_initializers.move_to_sub(mem_init);
+      }
+      continue;
+    }
+
     if(
       !found && (!cpp_is_pod(c.type()) || member_type_has_nsdmi) &&
       c.find(ID_C_default_value).is_nil())
