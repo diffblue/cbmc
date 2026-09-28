@@ -5499,11 +5499,7 @@ bool cpp_typecheckt::check_component_access(
       if(
         scope_symbol.type.id() != ID_struct ||
         to_struct_type(scope_symbol.type).is_incomplete())
-      {
-        if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
-          continue;
-        break;
-      }
+        continue;
 
       const struct_typet &scope_struct = to_struct_type(scope_symbol.type);
 
@@ -5532,16 +5528,12 @@ bool cpp_typecheckt::check_component_access(
         id2string(component.get_name()).find('@') != std::string::npos)
         return false; // ok
 
-      // private members are not accessible from derived classes
-
-      // C++11 (DR 45): nested classes have access to the enclosing
-      // class's private and protected members.
-      if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
-      {
-        continue;
-      }
-
-      break;
+      // Private members are not accessible from derived classes, but
+      // N5008 [class.access.nest]/1: a nested class is a member and has
+      // the same access rights as any other member, so move on to the
+      // enclosing scope.  This is CWG 45, a defect report against C++98;
+      // GCC and Clang apply it in every language mode.
+      continue;
     }
   }
 
@@ -5594,14 +5586,11 @@ bool cpp_typecheckt::check_component_access(
           return false; // ok — instantiation of friend template
         }
 
-        // C++11 (DR 45): nested classes have access to the enclosing
-        // class's friends.
-        if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
-        {
-          continue;
-        }
-
-        break;
+        // N5008 [class.friend]/2: the friend's member declarations may name
+        // the granting class's private members, and by
+        // [class.access.nest]/1 (CWG 45, applied in every language mode)
+        // that includes the members of a class nested in the friend.
+        continue;
       }
     }
   }
