@@ -202,6 +202,23 @@ void cpp_typecheckt::deduce_return_type(code_frontend_returnt &code)
 
     typecheck_expr(code.return_value());
 
+    // N5008 [dcl.spec.auto.general]/11: an expression naming a function
+    // whose placeholder return type is still undeduced is ill-formed; here
+    // that happens when the callee's body could not be type-checked (and
+    // was dropped), so no type can be deduced from the operand either.
+    // Fail this function's deduction rather than leave the placeholder in
+    // the operand's type.
+    if(
+      code.return_value().type().id() == ID_decltype ||
+      has_auto(code.return_value().type()))
+    {
+      error().source_location = code.source_location();
+      error() << "cannot deduce the return type from an operand of undeduced "
+              << "type '" << to_string(code.return_value().type()) << "'"
+              << eom;
+      throw 0;
+    }
+
     if(code.return_value().id() == ID_initializer_list)
     {
       // [dcl.type.auto.deduct]/2.1.2

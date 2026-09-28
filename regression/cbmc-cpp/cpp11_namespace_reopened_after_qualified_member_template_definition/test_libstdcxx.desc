@@ -1,6 +1,6 @@
 KNOWNBUG
 libstdcxx.cpp
---cpp20
+--cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
