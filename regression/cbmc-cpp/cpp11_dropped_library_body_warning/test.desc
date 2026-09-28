@@ -13,3 +13,7 @@ no body for callee bad_fn\(signed int\): FAILURE$
 A dropped library body was a silent havoc stub at type-check time; the drop is
 now diagnosed with the function name and location, and the call site keeps its
 "no body for callee" property.
+bad_fn's body is ill-formed on purpose, so this test is exempt from the rule
+that a reference compiler must accept the program: it checks the recovery
+path for library bodies the front end cannot type-check, not the accepted
+language.  (It used __builtin_shuffle until the C++ front end supported it.)
