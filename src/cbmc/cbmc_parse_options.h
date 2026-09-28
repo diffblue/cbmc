@@ -35,6 +35,7 @@ class optionst;
 #define CBMC_OPTIONS \
   OPT_BMC \
   "(no-standard-checks)" \
+  "(wide-pointer-encoding)" \
   "(preprocess)(slice-by-trace):" \
   OPT_FUNCTIONS \
   "(no-simplify)(full-slice)" \

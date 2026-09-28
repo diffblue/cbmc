@@ -42,15 +42,14 @@ symex_configt::symex_configt(const optionst &options)
     show_symex_steps(options.get_bool_option("show-goto-symex-steps")),
     show_points_to_sets(options.get_bool_option("show-points-to-sets")),
     max_field_sensitivity_array_size(
-      options.is_set("no-array-field-sensitivity")
-        ? 0
-        : options.is_set("max-field-sensitivity-array-size")
-            ? options.get_unsigned_int_option(
-                "max-field-sensitivity-array-size")
-            : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
+      options.is_set("no-array-field-sensitivity") ? 0
+      : options.is_set("max-field-sensitivity-array-size")
+        ? options.get_unsigned_int_option("max-field-sensitivity-array-size")
+        : DEFAULT_MAX_FIELD_SENSITIVITY_ARRAY_SIZE),
     complexity_limits_active(
       options.get_signed_int_option("symex-complexity-limit") > 0),
-    cache_dereferences{options.get_bool_option("symex-cache-dereferences")}
+    cache_dereferences{options.get_bool_option("symex-cache-dereferences")},
+    wide_pointer_encoding{options.get_bool_option("wide-pointer-encoding")}
 {
 }
 

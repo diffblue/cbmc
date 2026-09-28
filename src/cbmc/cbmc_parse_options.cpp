@@ -1070,6 +1070,8 @@ void cbmc_parse_optionst::help()
     "\n"
     "BMC options:\n"
     HELP_BMC
+    " {y--wide-pointer-encoding} \t use flat addresses for pointer "
+    "comparison and integer-to-pointer casts\n"
     "\n"
     "Backend options:\n"
     HELP_CONFIG_BACKEND

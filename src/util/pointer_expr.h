@@ -1451,6 +1451,53 @@ inline void validate_expr(const object_size_exprt &value)
     "Object size expression must have pointer typed operand.");
 }
 
+/// \brief Expression to retrieve the base address of the object a pointer
+/// points to. Returns an unsigned integer of pointer width.
+/// Used by the wide pointer encoding for address-based dereference dispatch.
+class object_base_address_exprt : public unary_exprt
+{
+public:
+  explicit object_base_address_exprt(exprt pointer)
+    : unary_exprt(
+        ID_object_base_address,
+        pointer,
+        unsignedbv_typet{to_pointer_type(pointer.type()).get_width()})
+  {
+  }
+
+  exprt &pointer()
+  {
+    return op();
+  }
+
+  const exprt &pointer() const
+  {
+    return op();
+  }
+};
+
+inline const object_base_address_exprt &
+to_object_base_address_expr(const exprt &expr)
+{
+  PRECONDITION(expr.id() == ID_object_base_address);
+  return static_cast<const object_base_address_exprt &>(expr);
+}
+
+template <>
+inline bool can_cast_expr<object_base_address_exprt>(const exprt &base)
+{
+  return base.id() == ID_object_base_address;
+}
+
+inline void validate_expr(const object_base_address_exprt &value)
+{
+  validate_operands(
+    value, 1, "Object base address expression must have one operand.");
+  DATA_INVARIANT(
+    can_cast_type<pointer_typet>(value.pointer().type()),
+    "Object base address expression must have pointer typed operand.");
+}
+
 /// A predicate that indicates that a zero-terminated string
 /// starts at the given address.
 /// This is an experimental feature for CHC encodings -- do not use.

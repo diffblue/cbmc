@@ -1,4 +1,4 @@
-CORE
+CORE no-wide-pointer-encoding
 main.c
 --arch none --little-endian --verbosity 8
 (Starting CEGAR Loop|^Generated 1 VCC\(s\), 1 remaining after simplification$)
