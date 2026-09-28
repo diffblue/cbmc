@@ -12306,7 +12306,7 @@ into A-T; every group now has a KNOWNBUG (0f245e5de3, bad4a79a17):
 | P | cpp11_out_of_line_constructor_template_definition_matched_by_signature | [temp.mem]/1 | header-free, wrong verdict |
 | Q | cpp17_builtin_launder | [ptr.launder] | header-free |
 | R | cpp11_pack_deduced_from_declval_arguments_in_partial_specialization | [temp.deduct.call]/1 | header-free |
-| S | cpp11_list_push_back_libcxx_node_members | [list.modifiers] | libc++, wrong verdict |
+| S | cpp11_alias_template_pointer_does_not_instantiate_pointee | [temp.inst]/2 | header-free (cvise) + libc++ desc |
 | T | cpp11_member_typedef_used_before_its_declaration_in_body | [class.mem.general]/7 | header-free |
 | - | cpp11_new_single_element_aggregate | [expr.new]/24 | header-free |
 | - | cpp17_pack_extended_by_deduction_after_explicit_arguments | [temp.arg.explicit]/9 | header-free |
@@ -12343,3 +12343,15 @@ CPO `begin`) passes on both.
 Still reducing at commit time: kb_H (TU), kb_S (libc++ list), kb_D2,
 constraint_incomplete_class.  Replace the non-minimal tests by their
 reductions when those finish.
+
+Round 163c follow-up (27f2d35a16): S reduced.  An alias template yielding
+`node<void> *' instantiates node<void> while node_base<int> is still being
+defined, so node<void>'s inherited typedef lookup fails.  The D2 reduction
+dropped libstdc++'s `template' keyword from `::template rebind_alloc<',
+and the drop it kept came from that edit alone.  GCC accepts
+`typename T::rebind<int>' without the keyword, as N5008 [temp.names]/3.4
+allows (the terminal name of a typename-specifier is in a type-only
+context, [temp.res.general]/4.1); clang 18 and clang 23 reject it, and
+CBMC fails ("no match for symbol").  That is its own CBMC gap, but no
+test can build with both reference compilers.  D2 now runs as kb_D2b,
+which must keep `::template rebind_alloc<'.
