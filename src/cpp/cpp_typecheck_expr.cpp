@@ -9071,6 +9071,7 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
 
   // We take care of an ambiguity in the C++ grammar.
   // Needs to be done before the operands!
+  unary_operand_typecast_ambiguity(expr);
   explicit_typecast_ambiguity(expr);
 
   // cpp_name uses get_sub, which can get confused with expressions.
@@ -9197,9 +9198,43 @@ void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)
 
       new_binary_expr.add_source_location() =
         to_unary_expr(expr).op().source_location();
+      new_binary_expr.set(ID_C_explicit_typecast_rewrite, true);
       expr.swap(new_binary_expr);
     }
   }
+}
+
+/// N5008 [expr.cast]/2, [dcl.ambig.res]: `(x) & m' is a cast only if x
+/// names a type.  The parser took `*(wp) & m' as `*' applied to the cast
+/// `(wp) &m'; when explicit_typecast_ambiguity turns that operand into the
+/// binary `wp & m', the prefix operator -- which binds tighter than any of
+/// the binary operators involved ([expr.unary.op]) -- applies to `(wp)'
+/// only: `(*wp) & m'.  Rotate it into the left operand.  libstdc++'s
+/// bitset::reference `(*(_M_wp) & _Base::_S_maskbit(_M_bpos))'.
+void cpp_typecheckt::unary_operand_typecast_ambiguity(exprt &expr)
+{
+  static const std::set<irep_idt> prefix_operators{
+    ID_dereference,
+    ID_unary_minus,
+    ID_unary_plus,
+    ID_not,
+    ID_bitnot,
+    ID_address_of};
+  if(expr.operands().size() != 1 || prefix_operators.count(expr.id()) == 0)
+    return;
+  exprt &op = to_unary_expr(expr).op();
+  unary_operand_typecast_ambiguity(op);
+  explicit_typecast_ambiguity(op);
+  if(!op.get_bool(ID_C_explicit_typecast_rewrite) || op.operands().size() != 2)
+  {
+    return;
+  }
+  // unary(lhs OP rhs) -> unary(lhs) OP rhs
+  exprt binary = op;
+  exprt unary = expr;
+  to_unary_expr(unary).op() = to_binary_expr(binary).op0();
+  to_binary_expr(binary).op0() = std::move(unary);
+  expr.swap(binary);
 }
 
 void cpp_typecheckt::typecheck_expr_binary_arithmetic(exprt &expr)
