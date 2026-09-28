@@ -3092,8 +3092,16 @@ bool cpp_typecheckt::reference_compatible(
     // (non-template) copy/move special member.
     if(genuine_type_difference)
       rank += 3;
+    // [over.ics.rank]/3.2.6: the binding to the LESS cv-qualified referenced
+    // type is better, so `const T &' beats `const volatile T &' (also for a
+    // derived-to-base binding, where both types differ from the argument's);
+    // count the qualifiers the binding adds.  Incomparable qualifications
+    // (`const' vs `volatile') add as many and stay a tie.
     if(cv_difference)
-      *cv_distance += 1;
+    {
+      *cv_distance += (qual_to.is_constant && !qual_from.is_constant ? 1 : 0) +
+                      (qual_to.is_volatile && !qual_from.is_volatile ? 1 : 0);
+    }
   }
   else
   {
