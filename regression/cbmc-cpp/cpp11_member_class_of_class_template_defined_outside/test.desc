@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ sentry constructed and tested: SUCCESS$
@@ -17,12 +17,15 @@ defined outside the class template definition (`template <class C> class
 stream<C>::sentry { ... };').  Declared in the class (`class sentry;') and
 used in a member function defined after that definition, `sentry
 cerb(*this)' must find the out-of-class definition's explicit constructor
-`sentry(stream<C> &)'.  The front end instead sees an incomplete or
-constructor-less `sentry' ("invalid implicit conversion from 'struct
-stream' to 'struct sentry'"), drops the member function and verifies a
-wrong result.  This is the stream `sentry' of both standard libraries:
+`sentry(stream<C> &)'.  The front end instead saw an incomplete
+`sentry' ("invalid implicit conversion from 'struct stream' to 'struct
+sentry'"), dropped the member function and verified a wrong result: an
+out-of-line definition `template <...> class Outer<...>::Inner' was only
+grafted onto a member class TEMPLATE; a plain member class was skipped.
+Its body is now grafted onto the member's declaration in the class
+template, so each instantiation defines it.  This is the stream `sentry' of both standard libraries:
 libstdc++'s basic_ostream::sentry / basic_istream::sentry (ostream,
 istream: tellp, put, flush, read, __ostream_insert -- 3 descs in the
 round-163 audit, e.g. `in.read(buf, 3)' yields a wrong gcount()) and
 libc++'s basic_ostream::sentry (ostream:259-287, 3 descs).  Header-free.
-Pre-existing (round-162 snapshot bin51 fails the same way).
+Fails on the round-163 build bin52.
