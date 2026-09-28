@@ -26,4 +26,5 @@ behind common_comparison_category_t (KNOWNBUG
 cpp20_compare_three_way_pointers_libcxx).  Fixed in round 163b.
 Out of scope: extending such a pack by deduction after explicit arguments
 (`sum<int>(1, 2)' with `template <class... Ts, int N = 7> int sum(Ts...)')
-still fails, as it did before.
+still fails, as it did before -- KNOWNBUG
+cpp17_pack_extended_by_deduction_after_explicit_arguments.
