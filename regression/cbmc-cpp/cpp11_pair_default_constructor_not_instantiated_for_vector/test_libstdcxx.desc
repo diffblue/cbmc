@@ -1,0 +1,27 @@
+KNOWNBUG
+libstdcxx.cpp
+--cpp11 --object-bits 12 --unwind 3 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ its value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [pairs.pair]/5 + [temp.inst]/3-4: pair's default constructor is a
+constrained template (`template<class U1 = T1, class U2 = T2,
+enable_if_t<is_default_constructible<U1> && ...>> pair()'); for
+pair<symbolish, unsigned long> the constraint is false and the constructor
+is neither viable nor used, so its definition is never instantiated.  The
+front end instantiates it anyway when std::vector<pair<...>> is
+instantiated, fails on `first()' ("found no match for symbol
+'symbolish'") and reports a dropped body (stl_pair.h:543, 8 cbmc-cpp descs
+in the round-163 audit).  The verdict is right; the spurious drop hides
+real drops in these tests.  This is the libstdc++ shape of main.cpp
+(see test.desc): vector's nested _Temporary_value::_Storage has a member of
+the element type.
+Pre-existing (round-162 snapshot bin51).
