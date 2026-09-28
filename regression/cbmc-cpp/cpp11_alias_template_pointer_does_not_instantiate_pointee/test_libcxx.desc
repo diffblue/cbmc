@@ -1,5 +1,5 @@
 KNOWNBUG libcxx
-main.cpp
+libcxx.cpp
 --cpp11 --stdlib libc++ --object-bits 12 --unwind 3 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ its value: SUCCESS$
@@ -22,6 +22,7 @@ __prev_/__next_, __list_node's __as_link) are not found, which points at
 the node base class template, whose link-pointer member types are
 __conditional_t / __rebind_pointer_t aliases over the node traits
 (list:273-300), failing to complete.  A header-free imitation of that
-typedef chain passes; cvise reduction queued in /tmp/r163/red.
+typedef chain passes; test.desc is the header-free reduction
+(alias-template substitution instantiates the pointee).
 Round-163 audit: cpp11_list_pushback_libcxx.  Pre-existing (round-162
 snapshot bin51).
