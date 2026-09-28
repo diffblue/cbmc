@@ -1,0 +1,34 @@
+KNOWNBUG
+main.cpp
+--cpp11 --object-bits 12 --unwind 3 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ move-only mapped type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+std::map with a move-only mapped type ([container.reqmts], [associative.
+reqmts]: emplace needs only EmplaceConstructible; [temp.inst]/3-4: unused
+members of pair<const int, move_only> and of the map are not
+instantiated).  With libstdc++ 13 the verdict is wrong: `m.at(1).v' is not
+5 after `m.emplace(1, move_only(5))'.  Three spurious body drops go with
+it: pair's constrained default constructor (stl_pair.h:543, "found no
+match for symbol 'move_only'", see
+cpp11_pair_default_constructor_not_instantiated_for_vector), pair's
+explicit `pair(const T1 &, const T2 &)' (stl_pair.h:568, "member
+'move_only::move_only(const move_only &)' is not accessible" -- the
+deleted copy constructor) and pair's operator< (stl_pair.h:835, move_only
+has no operator<), the last reached through _Rb_tree's hidden friend
+operator< which nothing uses (see
+cpp11_hidden_friend_instantiated_only_when_used).  This is
+goto_functiont in the goto-programs TUs of the round-163 audit
+(cpp17_restrict_function_pointers_tu).  Not reduced: the header-free
+pieces pass, and a first cvise run (/tmp/r163/red/kb_D2) degenerated --
+with normal linking it removed the node insertion so that nothing is ever
+stored; a reduction needs strict linking (std::map's out-of-line
+_Rb_tree_insert_and_rebalance supplied by the program).
+Pre-existing (round-162 snapshot bin51).

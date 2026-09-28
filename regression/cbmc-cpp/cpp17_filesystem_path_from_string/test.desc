@@ -1,0 +1,34 @@
+KNOWNBUG
+main.cpp
+--cpp17 --object-bits 12 --unwind 8 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ path from a std::string is not empty: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [fs.path.construct]/5: path(const Source &) with a std::string source
+stores the string, so the path is not empty.  With libstdc++ 13 the
+verdict is wrong: path's converting constructor (fs_path.h:330) and
+path::_S_convert (fs_path.h:618) are dropped.  _S_convert is a static
+member template with a deduced return type whose noexcept-specifier and
+`if constexpr' use `is_same_v<typename _Tp::value_type, value_type>';
+under libstdc++ the call fails with "found no match for symbol
+'is_same_v'" after the constructor's `_S_convert(__detail::__effective_
+range(__source))' deduces `<<type:auto>>' for its argument.  A header-free
+imitation of _S_convert passes, so the chain through __effective_range /
+basic_string_view is needed.  The cvise reduction
+(/tmp/r163/red/kb_I, 90 lines) keeps the fs_path.h:330 drop and the
+"found no match for symbol 'basic_string'" lookup failure from inside
+basic_string's string_view constructor template (_If_sv over a class
+derived from decltype(integral_constant<true>)), but degenerated to a
+program whose dropped body has no valid specialization ([temp.res.general]/6),
+so it is not used as the test; a header-free rewrite of its shape
+(/tmp/r163/kb/I7.cpp) shows the lookup failure but neither the drop nor the
+wrong verdict.
+Round-163 audit: cpp17_out_of_line_udc_conversion.  Pre-existing
+(round-162 snapshot bin51).

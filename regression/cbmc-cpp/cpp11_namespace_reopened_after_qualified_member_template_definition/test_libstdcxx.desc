@@ -1,0 +1,22 @@
+KNOWNBUG
+libstdcxx.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+libstdc++ 13's <format>: the four inline std::vformat overloads
+(format:3784/3793/3802/3811) are dropped with "scope '__format' is
+ambiguous" -- the class template __format::_Arg_store is declared in
+namespace std::__format, defined outside it by a qualified name, and the
+namespace is reopened afterwards; see test.desc (header-free, from the
+cvise reduction in /tmp/r163/red/kb_K).  Calling std::vformat from user
+code additionally fails in basic_format_args<nil> ("symbol '_CharT' is
+unknown"), to be split out when this is fixed.  Round-163 audit:
+cpp20_format_header.  Pre-existing (round-162 snapshot bin51).
