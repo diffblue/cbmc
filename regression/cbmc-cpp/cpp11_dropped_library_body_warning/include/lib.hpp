@@ -7,8 +7,8 @@ inline int good_fn(int x)
 }
 inline int bad_fn(int x)
 {
-  typedef int v4 __attribute__((vector_size(16)));
-  v4 a = {x, x, x, x};
-  v4 b = __builtin_shuffle(a, (v4){3, 2, 1, 0}); // not modelled by CBMC
-  return b[0];
+  // ill-formed on purpose ([expr.ref]/2: the object expression of `.' must
+  // have class type): every compiler rejects this body, and the front end
+  // must drop it with a diagnostic rather than fail the translation
+  return x.value;
 }
