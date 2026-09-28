@@ -12411,3 +12411,40 @@ Positive-drop descs: only cpp11_dropped_library_body_warning, whose
 and the C front end models it; the C++ front end does not.  KNOWNBUG
 cpp_builtin_shuffle added.  The drop-diagnostic test has to switch to a
 different construct when that is fixed.
+
+## Round 163d (2026-09-28): fixing mode, steps 1-3 of the plan
+
+Commits (on 14975c134f / cc9031b10b / 7e874007a6):
+- ceea8e2c1a nested classes have member access rights in every mode
+  ([class.access.nest]/1, CWG 45); Protection3 flipped to a positive test.
+- 205b378253 __builtin_launder / __builtin_popcountg / __builtin_shuffle(vector)
+  in C++; libc++ 23 numeric_limits drops gone.
+- 1cb634d05e array-to-pointer for every non-array target
+  ([conv.general]/1.1): `!"literal"', `if("x")'; regex scanner drops gone.
+- f87869ac7b __is_constructible(T) of a class attempts `T t;'
+  ([meta.unary.prop]/9) -- was always true.
+- 8ab6161529 `#sfinae_alt' twin also tried for explicit template args.
+- cf9e7f00b7 a constructor template without function parameters is no
+  longer also turned into an ordinary (non-template) default constructor.
+
+Step 3 (S, alias template instantiating the pointee) is NOT fixed.  Two
+attempts, both reverted:
+- skip elaboration for every type template argument
+  (typecheck_template_args): fixes S, breaks libc++ tuple_size
+  (cpp17_apply_basic/test_libcxx.desc).  13-line reduction:
+  /tmp/r163/red/reg_ts/main.ii -- `tuple_size<tuple<int,int>>' loses the
+  base of the `tuple_size<tuple<_Tp...>>' specialization when the
+  partial-specialization pattern `__enable_if_tuple_size_imp<const volatile
+  _Tp, integral_constant<long, sizeof(tuple_size<_Tp>)>>' is matched with
+  elaboration skipped.  Neither the drop-incomplete-base nor the
+  base-resolution catch fires; not understood yet.
+- skip it for alias-template arguments only (resolve_template_alias, first
+  pass): same tuple_size failure, since libc++'s pattern is itself an alias.
+Next: find why the specialization is completed without its base in that
+reduction (probably the in-progress instance reached through the sizeof
+while matching).
+
+Found on the way: nested braced argument to constructor templates
+(cpp11_braced_argument_to_constructor_template_with_defaulted_parameters,
+KNOWNBUG).  The D1 libstdc++ desc now only shows vector::_Storage
+(group A).

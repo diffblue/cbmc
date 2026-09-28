@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ nested braced argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [over.match.ctor], [temp.deduct.call]/1: a braced-init-list
+argument makes the corresponding parameter a non-deduced context, so
+`template <class U1, class U2> P(U1 &&, U2 &&)' is not viable for
+`P<int, P<unsigned, L>> a(1, {2u, L{3}})'; the constructor
+`template <class U1 = A, class U2 = B> P(const A &, const B &)' is, its
+second parameter copy-list-initialized from {2u, L{3}} ([dcl.init.list]).
+The front end finds no viable constructor ("found no match for symbol
+'P'").  libstdc++ pair's `pair(const _T1 &, const _T2 &)' is such a
+template; it works there only because the class-body pass also keeps an
+ordinary copy of each constructor template that has parameters (see
+cpp11_constructor_templates_differing_only_in_enable_if).  Found while
+fixing that.  g++ 13 and clang++ 18 accept the program.  Pre-existing
+(fails the same way before round 163c).
