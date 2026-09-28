@@ -12266,3 +12266,80 @@ the bin51 snapshot and passes on bin52 (`/tmp/r157/bin52`).
   libcxx23_string_fill_ctor, libcxx_string_move_ctor_lambda,
   cpp20_compare_three_way_pointers_libcxx) still fail as expected.
 - bin51 fails all 10 promoted/new descs of this round; bin52 passes them.
+
+## Round 163b/163c (2026-09-28): audit fixes, KNOWNBUG coverage of the drop audit
+
+### 163b fixes (6a77650ba1..04d022f546)
+
+Lambda body converted once; member class template sees the enclosing
+arguments early; `__datasizeof`; value-initialization zero-initializes
+([dcl.init.general]/9); union constructors are overload candidates;
+the elision result address precedes variadic arguments; constexpr local
+arrays; `if constexpr` folds constexpr array elements; empty pack
+expansion; a pack before a defaulted parameter; `void()`; the built-in
+pointer `<=>` result.  Promoted to CORE: libcxx_string_move_ctor_lambda,
+libcxx23_string_fill_ctor, cpp20_compare_three_way_pointers_libcxx.
+cbmc-cpp suite green (11 skipped), `cpp` suite green, lint 0.
+
+### audit5 (drops over the whole cbmc-cpp suite)
+
+205 "dropped the body" lines from 48 descs, 59 distinct sites
+(/tmp/r163/audit5/{drops,sites}.txt).  Grouped by underlying defect
+into A-T; every group now has a KNOWNBUG (0f245e5de3, bad4a79a17):
+
+| group | test | clause | form |
+|---|---|---|---|
+| A (+F) | cpp11_union_constructor_leaves_other_variant_member_uninitialized | [class.base.init]/9.2 | header-free |
+| B | cpp11_inherited_constructor_from_dependent_base | [namespace.udecl]/3 | header-free, wrong verdict |
+| B | cpp11_logical_not_of_string_literal | [expr.unary.op]/9 | header-free |
+| C | cpp11_parenthesized_member_dereference_in_member_function | [expr.cast]/2, [dcl.ambig.res] | header-free |
+| D | cpp11_pair_default_constructor_not_instantiated_for_vector | [temp.inst]/3 | header-free (cvise) + libstdc++ desc |
+| D | cpp11_map_of_move_only_mapped_type | [temp.inst]/3 | libstdc++, wrong verdict |
+| D (+G) | cpp11_hidden_friend_instantiated_only_when_used | [temp.inst]/4, [class.friend]/6 | header-free + libstdc++ desc |
+| E (+O) | cpp11_member_class_of_class_template_defined_outside | [temp.mem.class]/1 | header-free, wrong verdict |
+| H | cpp17_shared_count_constructor_template_not_instantiated_tu | [temp.inst]/4 | CBMC TU, ~330 s |
+| I | cpp17_filesystem_path_from_string | [fs.path.construct]/5 | libstdc++, wrong verdict |
+| J | cpp11_cv_qualified_member_overload_through_base | [over.ics.rank]/3.2.6 | header-free |
+| K | cpp11_namespace_reopened_after_qualified_member_template_definition | [namespace.memdef]/2 | header-free (cvise) + <format> desc |
+| M | cpp14_empty_pack_expansion_in_mem_initializer_list | [temp.variadic]/7 | header-free; symex invariant too |
+| N | cpp11_builtin_popcountg | clang builtin | header-free (cvise); ref. clang 23 |
+| P | cpp11_out_of_line_constructor_template_definition_matched_by_signature | [temp.mem]/1 | header-free, wrong verdict |
+| Q | cpp17_builtin_launder | [ptr.launder] | header-free |
+| R | cpp11_pack_deduced_from_declval_arguments_in_partial_specialization | [temp.deduct.call]/1 | header-free |
+| S | cpp11_list_push_back_libcxx_node_members | [list.modifiers] | libc++, wrong verdict |
+| T | cpp11_member_typedef_used_before_its_declaration_in_body | [class.mem.general]/7 | header-free |
+| - | cpp11_new_single_element_aggregate | [expr.new]/24 | header-free |
+| - | cpp17_pack_extended_by_deduction_after_explicit_arguments | [temp.arg.explicit]/9 | header-free |
+
+Findings from the cvise reductions:
+
+- D: the drop needs a nested member class of vector with a data member
+  of the element type (libstdc++'s _Temporary_value::_Storage); a plain
+  member of that type does not trigger it.  Completing the member class
+  instantiates pair's non-viable default constructor template body.
+- K: "scope is ambiguous" needs both a qualified out-of-namespace class
+  template definition (`class ns::X {}`) and a later reopening of `ns`.
+- N: libc++ 23 limits:121 computes `digits` with `__builtin_popcountg`
+  (clang 19+), unknown to the front end, so `__max` and `max()` are
+  dropped.  `__make_unsigned(T)` itself works.
+- I: the reduction degenerated to a dropped body that is ill-formed for
+  every specialization ([temp.res.general]/6); not used.  The lookup
+  failure it keeps ("no match for symbol 'basic_string'" inside the
+  string_view constructor template's _If_sv) is visible header-free in
+  /tmp/r163/kb/I7.cpp, without the drop.
+- D2 (map, move-only): the first run with normal linking degenerated
+  (reads uninitialized node storage); restarted with KEEP on the
+  `emplace(1, move_only(5))` / `at(1).v == 5` lines.
+
+Constraint interplay (parser compound-requirement fast path masking the
+member-vs-CPO `begin` lookup on a class under elaboration): not a
+KNOWNBUG of its own, since HEAD passes.  Reduction: interestingness =
+HEAD verifies `arr | views::take(3)` and a build without the fast path
+(/tmp/r163/binNF, diagnostics via /tmp/r163/binDBGNF) fails with the
+take_view/ref_view lookup error; /tmp/r163/red/constraint_incomplete_class.
+A hand-written CRTP imitation (view_interface::empty() requires range<D>,
+CPO `begin`) passes on both.
+
+Still reducing at commit time: kb_H (TU), kb_S (libc++ list), kb_D2,
+constraint_incomplete_class.  Replace the non-minimal tests by their
+reductions when those finish.
