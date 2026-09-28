@@ -4242,6 +4242,31 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       if(!declaration.is_constructor())
         continue;
 
+      // N5008 [temp.mem]/1, [over.match.funcs.general]/7: a constructor
+      // TEMPLATE is a template, registered by the first pass
+      // (convert_template_declaration); its specializations are the
+      // candidates.  This pass also turns it into an ordinary constructor
+      // (see below).  For a template with no function parameters that
+      // copy is a non-template DEFAULT constructor, which is preferred over
+      // every template ([over.match.best]/2.4) and bypasses the template's
+      // SFINAE constraints -- libstdc++ pair's `enable_if'-constrained
+      // default constructors, one of which became `pair()' built from the
+      // last of the same-signature templates, and whose body then failed
+      // for an element type without a default constructor.  Such a
+      // template stays a template only.
+      if(declaration.is_template())
+      {
+        bool no_function_parameters = true;
+        for(const auto &declarator : declaration.declarators())
+        {
+          const irept &params = declarator.type().find(ID_parameters);
+          if(!params.get_sub().empty())
+            no_function_parameters = false;
+        }
+        if(no_function_parameters)
+          continue;
+      }
+
       // For constructor TEMPLATES, the signature may reference the
       // function template's own parameters (e.g. libstdc++'s
       // `pair(const pair<_U1, _U2>& __p)` in stl_pair.h, where _U1
