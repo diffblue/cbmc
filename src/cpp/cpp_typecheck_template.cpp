@@ -61,6 +61,15 @@ void cpp_typecheckt::salvage_default_arguments(
 /// and explicit specializations per [temp.expl.spec].
 void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
 {
+  // N5008 [namespace.memdef]/2, [class.pre]/3: a class template defined
+  // by a qualified name (`template <...> class ns::X { ... };') is
+  // defined in the nominated namespace, which is entered below to declare
+  // it; the declaration does not move the enclosing scope.  Without
+  // restoring it, the next `namespace ns { }' at namespace scope was
+  // processed inside ns and created ns::ns, so `ns::' became ambiguous
+  // (libstdc++'s <format>: `__format::_Arg_store').
+  cpp_save_scopet saved_scope(cpp_scopes);
+
   typet &type = declaration.type();
 
   // N5008 [dcl.attr.grammar]/5 + [dcl.type.class.deduct]: GNU attributes
