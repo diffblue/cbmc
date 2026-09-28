@@ -1,12 +1,22 @@
 CORE
 main.cpp
 --cpp98
-^EXIT=6$
+^\[main\.assertion\.1\] line \d+ nested class reads a private member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ class nested in a friend reads it: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^CONVERSION ERROR$
 --
+^CONVERSION ERROR$
 ^warning: ignoring
 dropped the body
 --
-In C++98, nested classes do not have access to the enclosing class's
-private members. C++11 DR 45 changed this.
+N5008 [class.access.nest]/1: a nested class is a member and has the same
+access rights as any other member; [class.friend]/2 extends a friend's
+access to its member declarations, including a nested class's.  C++98
+said the opposite; CWG 45 (a defect report against C++98, adopted in
+C++11) changed it, and g++ and clang++ apply it in -std=c++98
+-pedantic-errors too.  Following the rule that the front end accepts
+what GCC, Clang or MSVC accept, the check no longer depends on the
+language mode.  This test used to require the C++98 rejection.
