@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ single-element aggregate: SUCCESS$
@@ -14,9 +14,10 @@ dropped the body
 --
 N5008 [expr.new]/24: the new-initializer `{3}' direct-list-initializes the
 object; [dcl.init.list]/3.4: node is an aggregate, so its member v is
-initialized from 3.  The front end treats the one-element list as a
+initialized from 3.  The front end treated the one-element list as a
 conversion of 3 to node ("invalid implicit conversion from 'signed int' to
-'struct node'") and rejects the unit; two elements (`new point{1, 2}') and
+'struct node'") and rejected the unit; typecheck_expr_new now
+aggregate-initializes the new object for a one-element list; two elements (`new point{1, 2}') and
 `node n{3}' work.  Found while reproducing the shared_ptr group of the
-round-163 audit (`p.reset(new node{3})').  Header-free.  Pre-existing
-(round-162 snapshot bin51 and older snapshots fail the same way).
+round-163 audit (`p.reset(new node{3})').  Header-free.  Fails on the
+round-163 build bin52.
