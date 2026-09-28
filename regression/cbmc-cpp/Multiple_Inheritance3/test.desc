@@ -8,3 +8,8 @@ main.cpp
 ^warning: ignoring
 dropped the body
 --
+g++ and clang++ accept this program: a class may have the same
+non-virtual base more than once (N5008 [class.mi]/3).  The rejection this
+test pins is a front-end limitation, tracked by the KNOWNBUG
+cpp_repeated_non_virtual_base_subobjects; delete this test when that is
+fixed.

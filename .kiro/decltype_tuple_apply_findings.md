@@ -12377,3 +12377,37 @@ acceptance per compiler instead of requiring both.  Constraints:
 First test under the rule:
 cpp11_typename_specifier_member_template_without_template_keyword
 (GCC accepts per [temp.names]/3.4, Clang 18/23 reject).
+
+### Audit: tests that expect a rejection (2026-09-28)
+
+Scanned every cbmc-cpp and cpp desc whose required lines include
+CONVERSION ERROR, PARSING ERROR, EXIT=1/6 or an error message: 54 descs,
+all CORE.  Each source was compiled with g++ 13 and clang++ 18 in the
+desc's language mode (gnu++NN), with CBMC's __CPROVER_* builtins declared
+(/tmp/r163/kb/{acc.sh,reject_acc.txt,reject2.txt}).
+- 51: both compilers reject the program with a genuine error (access
+  control, invalid conversions, bad casts, redeclarations, ...), so the
+  expected rejection is right.  Six of them (Conversion7/8/11,
+  Implicit_Conversion5, Pointer_Conversion1, Constant3) are accepted by
+  g++ under -fpermissive, a non-default mode; left as they are.  MSVC is
+  known to accept some of the others as extensions (for example binding
+  a non-const lvalue reference to a temporary, Conversion3), which only
+  matters for Visual Studio mode; not checkable here.
+- Reference4: accepted by both, and CBMC accepts it too.  EXIT=6 only
+  comes from "the program has no entry point", so the test checks
+  nothing about reference members.
+- Multiple_Inheritance3: accepted by both; CBMC rejects a class with the
+  same non-virtual base twice.  Front-end limitation: KNOWNBUG
+  cpp_repeated_non_virtual_base_subobjects added, and the CORE desc
+  notes to delete it once that is fixed.
+- Protection3 (--cpp98): nested-class access to the enclosing class's
+  private members.  C++98 forbids it; CWG 45 allowed it, and C++11 adopted
+  that.  g++ and clang++ apply CWG 45 in -std=c++98 -pedantic-errors too.
+  cpp_typecheck_compound_type.cpp gates the CWG 45 rule on
+  cpp_standard >= CPP11 (two places).  Under the union rule, that gate and
+  this test should go; waiting for a decision.
+Positive-drop descs: only cpp11_dropped_library_body_warning, whose
+"unsupported construct" is __builtin_shuffle.  GCC accepts that builtin,
+and the C front end models it; the C++ front end does not.  KNOWNBUG
+cpp_builtin_shuffle added.  The drop-diagnostic test has to switch to a
+different construct when that is fixed.
