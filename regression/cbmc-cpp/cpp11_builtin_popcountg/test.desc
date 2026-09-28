@@ -1,0 +1,27 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ char: SUCCESS$
+^\[main\.assertion\.2\] line \d+ short: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Clang's `__builtin_popcountg(x)' (clang 19+; the type-generic GCC 14
+builtin): the number of 1 bits of an unsigned integer of any width.
+libc++ 23's numeric_limits computes `digits' with it
+(`__builtin_popcountg(static_cast<__make_unsigned_t<type>>(~__make_unsigned_t
+<type>()))', limits:121ff).  The front end does not know the builtin: the
+call stays an unresolved name, `digits' has no value and __min / __max /
+max() (limits:202) are dropped, so every numeric_limits<>::max() is nondet
+-- the libc++-23 group N of the round-163 audit (libcxx23_string_fill_ctor,
+libcxx23_vector_pushback: max_size()).  clang++ 18 does not have the
+builtin: the reference compiler for this test is the clang 23 of the
+cxx23-gate Docker image (static_asserts and run-time assertions checked
+there).  Header-free (from the cvise reduction in /tmp/r163/red/kb_N).
+Pre-existing (round-162 snapshot bin51).

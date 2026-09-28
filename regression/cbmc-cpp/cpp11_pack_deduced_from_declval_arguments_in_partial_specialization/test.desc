@@ -1,0 +1,30 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ constructed from two paths: SUCCESS$
+^\[main\.assertion\.2\] line \d+ construct\(storage \*, path, path\) is valid: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.deduct.call]/1, [temp.variadic]/5: in libc++'s __has_construct
+partial specialization, `declval<A>().construct(declval<Args>()...)'
+calls `template <class U, class... Args> construct(U *, Args &&...)' with
+the arguments storage *, path, path, so U = storage and the member
+template's pack is {path, path}.  The front end deduces the pack as EMPTY
+and instantiates `construct<storage>()' ("instantiating
+'alloc<storage>::construct' with <struct storage>"), whose body
+`::new(p) U()' is ill-formed (storage has no default constructor) and is
+reported dropped.  The trait's value and the real call are right; the
+spurious drop hides real drops.  A direct call with explicit U and
+deduced pack works, so the trigger is the pack of declval call arguments
+in a decltype of a partial specialization.  libc++'s
+allocator<filesystem_error::_Storage>::construct (allocator.h:172),
+reached from make_shared<_Storage>(path, path) in <filesystem>:
+cpp17_filesystem_basic_libcxx and cpp17_filesystem_path_ops_libcxx
+(round-163 audit).  Header-free.  Pre-existing (round-162 snapshot bin51).

@@ -1,0 +1,27 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++ --object-bits 12 --unwind 3 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ its value: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+std::list<int>::push_back under libc++ 18 ([list.modifiers]).  The verdict
+is wrong: after `l.push_back(42)' size() and back() are nondet.
+push_back (list:807, "symbol '__as_link' is unknown"), back (list:796,
+"symbol '__prev_' is unknown") and clear (list:526, "symbol '__next_' is
+unknown") are dropped, and one system-header declaration is dropped
+before them: the members of the node types (__list_node_base's
+__prev_/__next_, __list_node's __as_link) are not found, which points at
+the node base class template, whose link-pointer member types are
+__conditional_t / __rebind_pointer_t aliases over the node traits
+(list:273-300), failing to complete.  A header-free imitation of that
+typedef chain passes; cvise reduction queued in /tmp/r163/red.
+Round-163 audit: cpp11_list_pushback_libcxx.  Pre-existing (round-162
+snapshot bin51).
