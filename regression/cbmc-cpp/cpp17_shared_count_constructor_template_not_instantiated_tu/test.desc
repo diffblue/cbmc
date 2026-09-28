@@ -1,0 +1,31 @@
+KNOWNBUG
+main.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 --property main.assertion.2 ../../../src/goto-programs/restrict_function_pointers.cpp
+^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+shared_ptr_base\.h line (913|423|427): C\+\+ front-end dropped the body
+--
+N5008 [temp.inst]/4 + [temp.deduct.general]/8: std::__shared_count's
+converting constructor template `template<typename _Ptr> explicit
+__shared_count(_Ptr __p) : _M_pi(0) { ... new _Sp_counted_ptr<_Ptr,
+_Lp>(__p); ... }' (shared_ptr_base.h:913) is instantiated with _Ptr =
+std::nullptr_t in this translation unit, and with it
+_Sp_counted_ptr<nullptr_t>'s constructor and _M_dispose (423/427, `delete
+_M_ptr' on a nullptr_t) -- all three bodies dropped.  No shared_ptr is
+constructed from nullptr here: the instances come from overload-resolution
+probes (the trace passes through fs_path.h:772's __shared_ptr<const
+_Impl> and __shared_count's operator==), the shape round 162 fixed for
+conversion probes (cpp11_unselected_converting_constructor_template_not_
+instantiated) reached by another path.  A small shared_ptr program
+(construction from nullptr, reset, assignment of nullptr) does not
+reproduce it, so this test names the real TU and forbids only these three
+drops (the other drops of the TU are tracked by their own KNOWNBUGs);
+cvise reduction queued in /tmp/r163/red.  Round-163 audit group H.
+Pre-existing (round-162 snapshot bin51 shows the same drops).  Runtime
+about 330 s (the whole goto-programs TU).  Replace by the cvise reduction
+once it is available.

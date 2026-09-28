@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ bit 2 is set: SUCCESS$
+^\[main\.assertion\.2\] line \d+ its complement is clear: SUCCESS$
+^\[main\.assertion\.3\] line \d+ bit 1 is clear: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.cast]/2 + [dcl.ambig.res]: `(wp)' can only start a cast if `wp'
+names a type; here it names a data member, so `*(wp) & m' is
+`(*wp) & m' -- the parenthesized name is a primary expression.  The front
+end parses it as the dereference of `(wp) & m' ("operator 'bitand' not
+defined for types 'unsigned long int *' and 'unsigned long int'") when the
+parenthesized name is a MEMBER used inside a member function -- the same
+expression on a local pointer in a free function is fine.  This is
+libstdc++'s bitset::reference::operator~ and operator bool (bitset:908 and
+913, 6 cbmc-cpp descs in the round-163 audit): every `b[i]' read of a
+std::bitset is nondet.  Header-free.  Pre-existing (round-162 snapshot
+bin51 fails the same way).
