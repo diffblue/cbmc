@@ -6376,6 +6376,87 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       expr.swap(void_expr);
       return;
     }
+    // GCC/Clang __builtin_launder(p), the built-in behind std::launder:
+    // N5008 [ptr.launder]/1-3, the result is a pointer to the object that p
+    // points to, i.e. it has p's value and type; the program is ill-formed
+    // if the pointee is a function type or cv void.  Type-generic, so it has
+    // no declaration the resolver could find.
+    if(bn == "__builtin_launder")
+    {
+      if(expr.arguments().size() != 1)
+      {
+        error().source_location = expr.source_location();
+        error() << "__builtin_launder expects one argument" << eom;
+        throw 0;
+      }
+      exprt arg = expr.arguments().front();
+      typecheck_expr(arg);
+      // [conv.array], [conv.func]: the argument is a prvalue pointer
+      add_implicit_dereference(arg);
+      if(arg.type().id() == ID_array)
+        implicit_typecast(
+          arg, pointer_type(to_array_type(arg.type()).element_type()));
+      if(
+        arg.type().id() != ID_pointer ||
+        to_pointer_type(arg.type()).base_type().id() == ID_code ||
+        to_pointer_type(arg.type()).base_type().id() == ID_empty)
+      {
+        error().source_location = expr.source_location();
+        error() << "__builtin_launder expects a pointer to an object type"
+                << eom;
+        throw 0;
+      }
+      arg.remove(ID_C_lvalue);
+      arg.add_source_location() = expr.source_location();
+      expr.swap(arg);
+      return;
+    }
+    // Clang's __builtin_popcountg(x) (clang 19+, and GCC 14): the number of
+    // 1 bits of an unsigned integer of any width, as an int (Clang "Language
+    // Extensions"); usable in constant expressions, where libc++ 23's
+    // numeric_limits computes `digits' with it.
+    if(bn == "__builtin_popcountg")
+    {
+      if(expr.arguments().size() != 1)
+      {
+        error().source_location = expr.source_location();
+        error() << "__builtin_popcountg expects one argument" << eom;
+        throw 0;
+      }
+      exprt arg = expr.arguments().front();
+      typecheck_expr(arg);
+      add_implicit_dereference(arg);
+      if(arg.type().id() != ID_unsignedbv)
+      {
+        error().source_location = expr.source_location();
+        error() << "__builtin_popcountg expects an unsigned integer argument"
+                << eom;
+        throw 0;
+      }
+      popcount_exprt result{arg, signed_int_type()};
+      result.add_source_location() = expr.source_location();
+      expr.swap(result);
+      return;
+    }
+    // GCC's __builtin_shuffle and Clang's __builtin_shufflevector (vector
+    // extensions, no N5008 counterpart): type-generic, so there is no
+    // declaration to resolve; the arguments are type-checked here and the
+    // C front end's implementation builds the shuffle
+    if(bn == "__builtin_shuffle" || bn == "__builtin_shufflevector")
+    {
+      side_effect_expr_function_callt call = expr;
+      for(auto &arg : call.arguments())
+      {
+        typecheck_expr(arg);
+        add_implicit_dereference(arg);
+      }
+      call.function() = symbol_exprt{bn, typet{}};
+      call.function().add_source_location() = expr.source_location();
+      exprt result = typecheck_shuffle_vector(call);
+      result.add_source_location() = expr.source_location();
+      expr.swap(result);
+      return;
+    }
     // GCC built-in floating-point classification
     if(
       (bn == "__builtin_isfinite" || bn == "__builtin_isinf" ||

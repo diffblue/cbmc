@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ reversed: SUCCESS$
@@ -13,10 +13,12 @@ dropped the body
 --
 GCC's __builtin_shuffle (a vector-extension builtin, no N5008 clause):
 element i of __builtin_shuffle(v, mask) is v[mask[i] % N].  The C front
-end models it (the same program as C verifies); the C++ front end reports
-"symbol '__builtin_shuffle' is unknown".  cpp11_dropped_library_body_warning
-uses exactly this call as its "unsupported construct" in a system header,
-so it has to switch to a different construct when this is fixed.
+end models it (the same program as C verifies); the C++ front end reported
+"symbol '__builtin_shuffle' is unknown"; it now type-checks the arguments
+and reuses the C front end's implementation (so does
+__builtin_shufflevector).  cpp11_dropped_library_body_warning
+used exactly this call as its "unsupported construct" in a system header
+and now uses a different one.
 Reference compilers: g++ 13 accepts it (clang has __builtin_shufflevector
 instead and rejects it).  Found by the round-163c audit of descs that
-expect a rejection or a drop.  Pre-existing (round-162 snapshot bin51).
+expect a rejection or a drop.  Fails on the round-162 snapshot bin51.
