@@ -1,0 +1,23 @@
+KNOWNBUG
+pattern_pack.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ specialization selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/2, [temp.variadic]/5: matching
+probe<count_of<int, int>, int, int, int> against the partial
+specialization `probe<decltype(declval<f>().call(declval<Args>()...)),
+Args...>' deduces Args = {int, int, int} from the trailing arguments; the
+non-deduced first argument is then `decltype(f().call(int, int, int))' =
+count_of<int, int>, so the specialization matches.  The front end expands
+the pack in the decltype to fewer elements (the construct instantiation
+in test.desc sees an empty member pack), and the
+selection falls back to the primary template.  The narrower reproducer of
+test.desc's remaining drop (round 163d; test.desc's assertions already
+hold).  g++ 13 and clang++ 18 accept the program.  Pre-existing.
