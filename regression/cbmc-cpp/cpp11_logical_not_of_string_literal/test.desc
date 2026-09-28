@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ not of a literal is false: SUCCESS$
@@ -15,9 +15,12 @@ dropped the body
 N5008 [expr.unary.op]/9: "The operand of the logical negation operator ! is
 contextually converted to bool"; [conv.array] + [conv.bool]: a string
 literal converts to a non-null pointer and so to true.  The front end
-rejects `!"literal"' ("invalid implicit conversion from 'const char [17l]'
+rejected `!"literal"' ("invalid implicit conversion from 'const char [17l]'
 to '__CPROVER_bool'").  libstdc++'s regex scanner uses exactly this in
 `__glibcxx_assert(!"unexpected state while processing regex")'
 (regex_scanner.tcc:86), dropping _Scanner::_M_advance / _M_scan_normal
 (regex_scanner.h:222/239) in the regex descs of the round-163 audit.
-Header-free.  Pre-existing (round-162 snapshot bin51 fails the same way).
+Header-free.  The standard conversion sequence did array-to-pointer only for a pointer
+target; by [conv.general]/1.1 it is the first step for every non-array
+target, and the boolean conversion follows.  Fails on the round-162
+snapshot bin51.
