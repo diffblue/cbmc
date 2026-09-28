@@ -1015,6 +1015,7 @@ protected:
 
   // expressions
   void explicit_typecast_ambiguity(exprt &);
+  void unary_operand_typecast_ambiguity(exprt &);
   void typecheck_expr_main(exprt &) override;
   /// Phase 1B target-typet overload of \ref typecheck_expr_main; the
   /// target is currently discarded.  See

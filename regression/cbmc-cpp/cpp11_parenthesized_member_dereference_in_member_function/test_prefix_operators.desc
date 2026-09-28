@@ -1,0 +1,19 @@
+CORE
+prefix_operators.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ prefix operator binds to the parenthesized name: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.cast]/2, [dcl.ambig.res], [expr.unary.op]: for each prefix
+operator (-, *, !, ~) followed by a parenthesized non-type name and a
+binary operator that can also be read as a prefix operator, the prefix
+operator applies to the parenthesized name only; `-(T) - 1' with T a
+type stays a cast of -1.  g++ 13 and clang++ 18 accept the program.
+Fails on the round-163 build bin52.
