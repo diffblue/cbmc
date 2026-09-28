@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ partial specialization: SUCCESS$
@@ -16,11 +16,14 @@ N5008 [namespace.udecl]/3, [class.inhctor.init]/1: `using base::base;' in a
 class template names the constructors of its dependent base class (here
 through a member typedef, as libstdc++ writes it); they are inherited, and
 `translator<T, I, C>(t)' is initialized by base's constructor.  The front
-end finds no constructor ("found no match for symbol 'translator'"), drops
-the constructor of the enclosing matcher and verifies a wrong result.  The
-same happens with the base named directly (`using translator_base<T, I,
-C>::translator_base;') and for direct construction.  This is libstdc++'s
+end found no constructor ("found no match for symbol 'translator'"),
+dropped the constructor of the enclosing matcher and verified a wrong
+result.  The dependent base was not the cause: every inherited
+constructor with a single reference parameter was skipped as if it were
+the base's copy or move constructor.  [over.match.funcs.general]/9
+excludes only a first parameter `reference to cv P' with P related to
+the base, so `translator_base(const T &)' with T = traits is inherited.  This is libstdc++'s
 regex `_RegexTranslator' (`using _Base::_Base;'), used by _AnyMatcher,
 _CharMatcher and _BracketMatcher (regex_compiler.h:352/373/410/434, 5
 cbmc-cpp regex descs in the round-163 audit).  Header-free reduction.
-Pre-existing (round-162 snapshot bin51 fails the same way).
+Fails on the round-163 build bin52.
