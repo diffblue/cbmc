@@ -4470,14 +4470,41 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
             if(member.id() != ID_cpp_declaration)
               continue;
             cpp_declarationt &mdecl = static_cast<cpp_declarationt &>(member);
-            if(!mdecl.get_bool(ID_is_template) || !mdecl.is_class_template())
+            // N5008 [temp.mem.class]/1: a member CLASS (not a template) of a
+            // class template may be declared in the class template and
+            // defined outside it (`template <class C> class
+            // basic_ostream<C>::sentry { ... };', libstdc++ and libc++
+            // iostreams); its template-head is exactly the outer one.
+            const bool plain_member_class =
+              !mdecl.get_bool(ID_is_template) &&
+              (mdecl.type().id() == ID_struct ||
+               mdecl.type().id() == ID_union) &&
+              mdecl.declarators().empty() &&
+              declaration.template_type().template_parameters().size() ==
+                n_outer_params;
+            if(
+              !plain_member_class &&
+              (!mdecl.get_bool(ID_is_template) || !mdecl.is_class_template()))
+            {
               continue;
+            }
             const cpp_namet &mtag =
               static_cast<const cpp_namet &>(mdecl.type().find(ID_tag));
             if(mtag.get_base_name() != member_name)
               continue;
             if(mdecl.type().find(ID_body).is_not_nil())
               continue; // already defined
+            if(plain_member_class)
+            {
+              // graft the body (and the class-key, base-clause) under the
+              // member's own tag; the outer template's parameters are in
+              // scope when the outer class is instantiated
+              typet new_type = declaration.type();
+              new_type.add(ID_tag) = mtag;
+              new_type.remove(ID_C_tag_only_declaration);
+              mdecl.type() = new_type;
+              return;
+            }
             // graft: the out-of-line struct body under the member's tag
             typet new_type = declaration.type();
             irept new_tag(ID_cpp_name);
