@@ -1,0 +1,29 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ linked node: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.inst]/2: a class template specialization is implicitly
+instantiated only when a completely-defined object type is required;
+[temp.alias]/2: `rebind<node<void>>' is `node<void> *', which does not
+require node<void> to be complete; [class.member.lookup]: node<void>'s
+non-dependent base node_base<int> supplies `link_pointer'.  The front end
+instantiates node<void> while substituting it into the alias template,
+which happens inside node_traits<int>, which is instantiated while
+node_base<int> is being defined; node<void> then sees an incomplete base
+and reports "symbol 'link_pointer' is unknown" (and later "symbol
+'as_link' is unknown").  Writing `node<void> *' directly works.  This is
+libc++'s list: __list_node_pointer_traits rebinds through
+pointer_traits<void *>::rebind to __list_node / __list_node_base, and
+__list_node::__as_link (list:271ff) and list::push_back are dropped, so
+push_back gives a wrong verdict (test_libcxx.desc, the std::list
+program).  Header-free (cvise, /tmp/r163/red/kb_S and kb_S6).
+Pre-existing (round-162 snapshot bin51).
