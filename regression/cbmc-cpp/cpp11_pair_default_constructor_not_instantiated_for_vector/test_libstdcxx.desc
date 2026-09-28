@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 libstdcxx.cpp
 --cpp11 --object-bits 12 --unwind 3 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
@@ -13,9 +13,10 @@ libstdcxx.cpp
 dropped the body
 --
 Round 163c: the stl_pair.h:543 drop is fixed (__is_constructible for
-classes, same-signature constructor templates); what remains is
-stl_vector.h:1852 `_Storage' (vector::_Temporary_value's union
-constructor, group A: cpp11_union_constructor_leaves_other_variant_member_uninitialized).
+classes, same-signature constructor templates); the remaining
+stl_vector.h:1852 `_Storage' drop (vector::_Temporary_value's union
+constructor) is fixed by the union-constructor change
+(cpp11_union_constructor_leaves_other_variant_member_uninitialized).
 N5008 [pairs.pair]/5 + [temp.inst]/3-4: pair's default constructor is a
 constrained template (`template<class U1 = T1, class U2 = T2,
 enable_if_t<is_default_constructible<U1> && ...>> pair()'); for

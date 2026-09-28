@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ the byte member is value-initialized: SUCCESS$
@@ -16,12 +16,15 @@ N5008 [class.base.init]/9.2: in a union's constructor, a variant member that
 is not designated by a mem-initializer-id is not initialized at all
 ("otherwise, if the entity is an anonymous union or a variant member,
 no initialization is performed"); only `byte' is initialized here.  The
-front end nevertheless default-constructs the other variant member `val',
-fails because item has no default constructor ("found no match for symbol
-'item'") and drops the union constructor, so the byte reads nondet.  This
+front end used to default-construct the other variant member `val' too,
+failed because item has no default constructor ("found no match for
+symbol 'item'") and dropped the union constructor, so the byte read
+nondet.  full_member_initialization now leaves variant members that are
+not designated uninitialized, and applies a default member initializer
+only when no other member is designated ([class.base.init]/9.1.1).  This
 is libstdc++'s vector::_Temporary_value::_Storage (stl_vector.h:1852, 8
 cbmc-cpp descs in the round-163 audit, e.g. vector::insert of a
 non-trivial element) and optional::_Storage (optional:209, when the value
 type has no default constructor).  Header-free reduction; the libstdc++
 shape is `std::vector<item> v; v.reserve(4); v.insert(v.begin(), item(2))'.
-Pre-existing (round-162 snapshot bin51 shows the same drop).
+Fails on the round-163 build bin52.
