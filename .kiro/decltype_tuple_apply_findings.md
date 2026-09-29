@@ -12544,3 +12544,49 @@ elaboration) is guarded by the CORE regression test
 cpp17_tuple_size_selected_despite_cv_partial_specializations (fails with
 that change re-applied).  Known issues WITHOUT a test: the
 CBMC_ELAB_ON_NAMING=0 failures (round-162 notes).
+
+## Round 163h
+
+Commits (local, unpushed):
+- a1d18ffd81 `__is_trivially_copyable` of a class with a bit-field
+  ([class.prop]/1, [class.bit]/1): judge c_bit_field by its underlying type.
+- 2a709ccd85 `__is_nothrow_constructible(T)` for implicit/defaulted default
+  constructors ([meta.unary.prop], [except.spec]/8):
+  `default_construction_is_nothrow` walks bases and members; NSDMIs are
+  assumed non-throwing.
+- a97b1e519b address of a constexpr/const static data member
+  ([expr.unary.op]/3, [basic.def.odr]/4): the substituted value carries
+  `#constexpr_object`; address-of uses the symbol and clears is_macro so
+  static init gives it its value.  New test_read_through.desc.
+- 5ea486ea32 static_cast of a reference to an array to an element pointer
+  ([expr.static.cast]/1, [conv.array]): the cast-away-constness check compared
+  `E (*)[N]` with `E *`.  First version also rewrote targets that are
+  references/pointers to arrays and broke 10 tests (std::forward of arrays);
+  restricted to non-array, non-reference targets.  Guard
+  test_casts_away_const.desc.
+- af8d82bb0a out-of-line `= default` ([dcl.fct.def.default]/5): lowered in
+  handle_initializer to the in-class representation (empty block,
+  `#defaulted_function`).  Three libstdc++ stream descs moved to --unwind 10
+  (at 5 the WRONG assertion was vacuous).
+- 3d70796cf2 drop bodies that keep member_initializer / default / cpp-using /
+  cpp-pure-virtual statements (symex "Unreachable").  Found in suite:
+  never-odr-used constructor-template instances with raw mem-initializers
+  (cpp20_ranges_pipe_invoke_drop) -- dropped silently when never converted.
+- 09f7c6ed54 tests: two libc++ descs lacked the libcxx tag; the shared_count TU
+  test (350 s, 475 s validated) is THOROUGH.
+
+Docker sweeps at 81c536b185 (gcc16, arch, tumbleweed): identical nine
+failures.  Rerun alone in gcc16-test (outputs kept, /tmp/r163/dk/rep) at HEAD
+and at 81c536b185: only the three above fail; the other six
+(cpp11_namespace_reopened_..._converts, cpp11_regex_match/test_conversion,
+cpp11_stream_destructor_chain, cpp11_stream_setw,
+cpp20_common_reference_int_lvalue_rvalue, cpp20_ranges_basic) pass --
+unexplained, sweep outputs were not kept.  run_image.sh should keep outputs.
+s53 host sweep (cbmc-val, -t 300): only the shared_count TU timed out.
+
+cvise: kb_U6 degenerated to 27 lines with an unusable partial specialization
+(both g++ and clang reject; the gate used -Wno-everything).  interesting.sh
+now adds -Werror=unusable-partial-specialization; kb_U6 restarted from the
+seed (degenerate result kept as main.ii.degenerate27).
+
+Suites at HEAD: cbmc-cpp all green (31 skipped), cpp green, lint 0.
