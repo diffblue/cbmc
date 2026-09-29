@@ -8150,6 +8150,16 @@ bool Parser::rLogicalOrExpr(exprt &exp, bool template_args)
       fold.set("fold_op", ID_or);
       fold.add_to_operands(std::move(exp));
       set_location(fold, tk);
+      // N5008 [expr.prim.fold]/1: binary fold `(init || ... || pack)'
+      if(lex.LookAhead(0) == TOK_OROR)
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rLogicalAndExpr(pack, template_args))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
       exp.swap(fold);
       break;
     }
@@ -8203,6 +8213,16 @@ bool Parser::rLogicalAndExpr(exprt &exp, bool template_args)
       fold.set("fold_op", ID_and);
       fold.add_to_operands(std::move(exp));
       set_location(fold, tk);
+      // N5008 [expr.prim.fold]/1: binary fold `(init && ... && pack)'
+      if(lex.LookAhead(0) == TOK_ANDAND)
+      {
+        lex.get_token(tk);
+        exprt pack;
+        if(!rInclusiveOrExpr(pack, template_args))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(pack));
+      }
       exp.swap(fold);
       break;
     }

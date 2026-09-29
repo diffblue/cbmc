@@ -8467,6 +8467,56 @@ skip_pack_removal_ft:
               subst_type_pack(ns.second, elem);
           }
         };
+        // N5008 [expr.prim.fold]/2, [temp.variadic]/5: a fold's pattern may
+        // name the TYPE parameter pack only (`(0 + ... + sizeof(Ts))'); its
+        // k-th element substitutes both packs in lockstep
+        std::function<bool(const irept &)> contains_type_pack;
+        contains_type_pack = [&type_pack_name,
+                              &contains_type_pack](const irept &n) -> bool
+        {
+          if(type_pack_name.empty())
+            return false;
+          if(
+            n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+            n.get_sub().front().id() == ID_name)
+          {
+            const std::string nm =
+              id2string(n.get_sub().front().get(ID_identifier));
+            const auto p = nm.rfind("::");
+            if(
+              (p != std::string::npos ? nm.substr(p + 2) : nm) ==
+              id2string(type_pack_name))
+            {
+              return true;
+            }
+          }
+          for(const auto &sub : n.get_sub())
+            if(contains_type_pack(sub))
+              return true;
+          for(const auto &named_sub : n.get_named_sub())
+            if(contains_type_pack(named_sub.second))
+              return true;
+          return false;
+        };
+        const auto in_fold_pattern =
+          [&contains_pack_name, &contains_type_pack](const irept &pattern)
+        { return contains_pack_name(pattern) || contains_type_pack(pattern); };
+        const auto fold_element =
+          [&substitute_pack,
+           &subst_type_pack,
+           &expanded_names,
+           &type_pack_name,
+           &pack_elem_types](const irept &pattern, std::size_t k)
+        {
+          irept element = substitute_pack(pattern, expanded_names[k]);
+          if(
+            !type_pack_name.empty() && k < pack_elem_types.size() &&
+            pack_elem_types[k].is_not_nil())
+          {
+            subst_type_pack(element, pack_elem_types[k]);
+          }
+          return element;
+        };
         expand_pack = [this,
                        &expanded_names,
                        &expand_pack,
@@ -8476,7 +8526,9 @@ skip_pack_removal_ft:
                        &make_name,
                        &type_pack_name,
                        &pack_elem_types,
-                       &subst_type_pack](irept &node)
+                       &subst_type_pack,
+                       &in_fold_pattern,
+                       &fold_element](irept &node)
         {
           // N5008 [expr.prim.pack.index]/1-2: `ts...[N]` (the parser marks
           // the index node with `ellipsis`) denotes the N-th element of
@@ -8528,8 +8580,7 @@ skip_pack_removal_ft:
           if(
             (node.id() == irep_idt("cpp_right_fold") ||
              node.id() == irep_idt("cpp_left_fold")) &&
-            !node.get_sub().empty() &&
-            contains_pack_name(node.get_sub().front()))
+            !node.get_sub().empty() && in_fold_pattern(node.get_sub().front()))
           {
             const irep_idt fold_op = node.get(irep_idt("fold_op"));
             const irept &pack_expr = node.get_sub().front();
@@ -8554,7 +8605,7 @@ skip_pack_removal_ft:
 
             if(expanded_names.size() == 1)
             {
-              node = substitute_pack(pack_expr, expanded_names[0]);
+              node = fold_element(pack_expr, 0);
               return;
             }
 
@@ -8562,13 +8613,12 @@ skip_pack_removal_ft:
             if(is_left)
             {
               // Left fold: ((a op b) op c)
-              irept result = substitute_pack(pack_expr, expanded_names[0]);
+              irept result = fold_element(pack_expr, 0);
               for(std::size_t i = 1; i < expanded_names.size(); ++i)
               {
                 irept bin(fold_op);
                 bin.get_sub().push_back(result);
-                bin.get_sub().push_back(
-                  substitute_pack(pack_expr, expanded_names[i]));
+                bin.get_sub().push_back(fold_element(pack_expr, i));
                 result = bin;
               }
               node = result;
@@ -8576,14 +8626,12 @@ skip_pack_removal_ft:
             else
             {
               // Right fold: (a op (b op c))
-              irept result = substitute_pack(
-                pack_expr, expanded_names[expanded_names.size() - 1]);
+              irept result = fold_element(pack_expr, expanded_names.size() - 1);
               for(int i = static_cast<int>(expanded_names.size()) - 2; i >= 0;
                   --i)
               {
                 irept bin(fold_op);
-                bin.get_sub().push_back(
-                  substitute_pack(pack_expr, expanded_names[i]));
+                bin.get_sub().push_back(fold_element(pack_expr, i));
                 bin.get_sub().push_back(result);
                 result = bin;
               }
@@ -8595,7 +8643,7 @@ skip_pack_removal_ft:
           // Expand binary fold expressions: (init op ... op pack)
           if(
             node.id() == irep_idt("cpp_binary_fold") &&
-            node.get_sub().size() >= 2 && contains_pack_name(node.get_sub()[1]))
+            node.get_sub().size() >= 2 && in_fold_pattern(node.get_sub()[1]))
           {
             const irep_idt fold_op = node.get(irep_idt("fold_op"));
             const irept &init_expr = node.get_sub()[0];
@@ -8607,8 +8655,7 @@ skip_pack_removal_ft:
             {
               irept bin(fold_op);
               bin.get_sub().push_back(result);
-              bin.get_sub().push_back(
-                substitute_pack(pack_expr, expanded_names[i]));
+              bin.get_sub().push_back(fold_element(pack_expr, i));
               result = bin;
             }
             node = result;
@@ -8625,7 +8672,7 @@ skip_pack_removal_ft:
           // cpp_binary_fold") and dropped the body.
           if(
             node.id() == irep_idt("cpp_binary_fold") &&
-            node.get_sub().size() >= 2 && contains_pack_name(node.get_sub()[0]))
+            node.get_sub().size() >= 2 && in_fold_pattern(node.get_sub()[0]))
           {
             const irep_idt fold_op = node.get(irep_idt("fold_op"));
             const irept &pack_expr = node.get_sub()[0];
@@ -8636,8 +8683,8 @@ skip_pack_removal_ft:
                 --i)
             {
               irept bin(fold_op);
-              bin.get_sub().push_back(substitute_pack(
-                pack_expr, expanded_names[static_cast<std::size_t>(i)]));
+              bin.get_sub().push_back(
+                fold_element(pack_expr, static_cast<std::size_t>(i)));
               bin.get_sub().push_back(result);
               result = bin;
             }
