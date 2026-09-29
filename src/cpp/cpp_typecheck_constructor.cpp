@@ -1227,6 +1227,12 @@ void cpp_typecheckt::full_member_initialization(
         if(user_initializer.has_value())
         {
           codet mem_init = static_cast<const codet &>(*user_initializer);
+          // #base_type makes typecheck_member_initializer resolve the name
+          // in the base's own scope, where a typedef-name of the derived
+          // class (`: __ios_type()', libstdc++'s basic_ostream,
+          // [class.base.init]/2) is unknown: name the base itself
+          const cpp_namet base_name{symb.base_name};
+          mem_init.set(ID_member, base_name);
           mem_init.add("#base_type") = struct_tag_typet(vbase_id);
           block.move_to_sub(mem_init);
         }
