@@ -115,31 +115,9 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       // user-provided constructor exactly as the base-class-aggregate code does
       // (a constructor component that is neither the default nor a copy/move
       // constructor, or a constructor template).
-      bool element_has_user_ctor = false;
-      if(element_type.id() == ID_struct_tag)
-      {
-        const struct_typet &element_struct =
-          follow_tag(to_struct_tag_type(element_type));
-        element_has_user_ctor =
-          element_struct.get_bool("has_template_constructor");
-        for(const auto &c : element_struct.components())
-        {
-          if(element_has_user_ctor)
-            break;
-          if(c.type().id() != ID_code || c.get_bool(ID_from_base))
-            continue;
-          const code_typet &ct = to_code_type(c.type());
-          if(ct.return_type().id() != ID_constructor)
-            continue;
-          if(ct.parameters().size() <= 1) // default constructor
-            continue;
-          if(
-            ct.parameters().size() == 2 &&
-            is_reference(ct.parameters()[1].type())) // copy/move constructor
-            continue;
-          element_has_user_ctor = true;
-        }
-      }
+      const bool element_has_user_ctor =
+        element_type.id() == ID_struct_tag &&
+        array_elements_have_user_constructor(array_type);
 
       if(element_has_user_ctor)
       {
@@ -187,12 +165,22 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       }
 
       // C++11 brace-enclosed initialization of an aggregate/scalar element
-      // type: build an array expression from the individual operands and
-      // assign it.
-      array_exprt array_val(operands, array_type);
-      array_val.add_source_location() = source_location;
-      array_val.set(ID_C_array_ini, true);
-      return cpp_constructor(source_location, object, {std::move(array_val)});
+      // type ([dcl.init.aggr]/4): build the array value with the shared
+      // do_initializer, as for a block-scope declaration -- it resolves
+      // nested braced lists (an array of arrays or of aggregates,
+      // `int m[2][2] = {{1, 2}, {3, 4}}'), brace elision
+      // ([dcl.init.aggr]/16), string literals, and value-initializes the
+      // elements without a clause (`int part[3] = {9};',
+      // [dcl.init.aggr]/5.2) -- then copy it.  Building an array_exprt from
+      // the clauses kept raw nested lists and left missing elements
+      // indeterminate.
+      exprt list{ID_initializer_list};
+      list.operands() = operands;
+      list.add_source_location() = source_location;
+      typecheck_expr(list);
+      do_initializer(list, array_type, false);
+      list.set(ID_C_array_ini, true);
+      return cpp_constructor(source_location, object, {std::move(list)});
     }
 
     DATA_INVARIANT(
@@ -257,6 +245,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         {
           index_exprt operand(operands.front(), constant);
           operand.add_source_location() = source_location;
+          // an element of an array of arrays is itself an array value
+          // initializing the element array ([dcl.init.aggr]/4)
+          if(operand.type().id() == ID_array)
+            operand.set(ID_C_array_ini, true);
           tmp_operands.push_back(operand);
         }
 
@@ -1276,4 +1268,36 @@ void cpp_typecheckt::new_temporary(
   exprt::operandst ops;
   ops.push_back(op);
   new_temporary(source_location, type, ops, temporary);
+}
+
+bool cpp_typecheckt::array_elements_have_user_constructor(
+  const typet &array_type)
+{
+  const typet *element_type = &array_type;
+  while(element_type->id() == ID_array)
+    element_type = &to_array_type(*element_type).element_type();
+  if(element_type->id() != ID_struct_tag)
+    return false;
+  const struct_typet &element_struct =
+    follow_tag(to_struct_tag_type(*element_type));
+  if(element_struct.get_bool("has_template_constructor"))
+    return true;
+  for(const auto &c : element_struct.components())
+  {
+    if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+      continue;
+    const code_typet &ct = to_code_type(c.type());
+    if(ct.return_type().id() != ID_constructor)
+      continue;
+    if(ct.parameters().size() <= 1) // default constructor
+      continue;
+    if(
+      ct.parameters().size() == 2 &&
+      is_reference(ct.parameters()[1].type())) // copy/move constructor
+    {
+      continue;
+    }
+    return true;
+  }
+  return false;
 }

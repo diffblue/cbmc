@@ -154,6 +154,12 @@ public:
   /// governs braced *aggregate* initialization -- permitted for aggregates
   /// with NSDMIs since C++14 ([dcl.init.aggr]).
   bool has_default_member_initializer(const typet &type) const;
+  /// Whether the (innermost) element type of \p array_type is a class with
+  /// a user-provided constructor other than a default or copy/move one, so
+  /// that each element is constructed from its own initializer-clause
+  /// rather than aggregate-initialized ([dcl.init.aggr]/1,
+  /// [dcl.init.list]/3).
+  bool array_elements_have_user_constructor(const typet &array_type);
 
   std::optional<codet> cpp_constructor(
     const source_locationt &source_location,

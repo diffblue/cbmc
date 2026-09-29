@@ -2900,7 +2900,21 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             symbol_expr.id() == ID_already_typechecked
               ? to_already_typechecked_expr(symbol_expr).get_expr()
               : symbol_expr;
+          // N5008 [dcl.init.list]/3.4, [dcl.init.aggr]/4: an ARRAY
+          // member list-initialized from a braced list -- a default member
+          // initializer `pr tbl[2] = {{'^', t}, {'$', u}};' (libstdc++'s
+          // regex _ScannerBase::_M_token_tbl) -- is aggregate-initialized
+          // from the list's clauses, the representation a braced
+          // mem-initializer `tbl{...}' already arrives in
           if(
+            code.operands().size() == 1 &&
+            code.op0().id() == ID_initializer_list &&
+            inner_se.type().id() == ID_array)
+          {
+            exprt::operandst elements = code.op0().operands();
+            code.operands() = std::move(elements);
+          }
+          else if(
             code.operands().size() == 1 &&
             code.op0().id() == ID_initializer_list &&
             inner_se.type().id() == ID_struct_tag &&
