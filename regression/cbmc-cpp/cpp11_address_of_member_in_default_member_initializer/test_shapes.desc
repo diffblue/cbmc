@@ -1,0 +1,19 @@
+CORE
+shapes.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member names in default member initializers: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.prim.id.general]/4, [expr.unary.op]/4: in a default member
+initializer, of a class with or without a user-provided constructor, `x'
+is `(*this).x', so `&x' and the parenthesized `&(s::x)' are `int *'; the
+qualified `&s::y' forms a pointer to member, also in a member function
+where `this' exists (on bin53 that was `int *': "invalid implicit
+conversion from 'signed int *' to 'signed int (struct s:: *)'").  g++ 13
+and clang++ 18 accept the program.
