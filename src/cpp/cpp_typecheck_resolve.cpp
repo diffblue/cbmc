@@ -5040,6 +5040,30 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
               }
             }
           }
+          // N5008 [temp.deduct.partial]/7-9: of two patterns differing in
+          // cv-qualification, the more qualified one is more specialized
+          // (`const volatile T' over `const T').  Deduction-based ordering
+          // below decides that for plain patterns; for patterns written
+          // through an alias template (`ident<const volatile T, int>',
+          // libc++'s __enable_if_tuple_size_imp) it leaves the candidates
+          // unordered, and these sort keys decide -- so count each
+          // qualifier.
+          std::function<std::size_t(const irept &)> count_qualifiers =
+            [&count_qualifiers](const irept &n) -> std::size_t
+          {
+            std::size_t count =
+              (n.id() == ID_const || n.id() == ID_volatile) ? 1 : 0;
+            for(const auto &sub : n.get_sub())
+              count += count_qualifiers(sub);
+            for(const auto &named_sub : n.get_named_sub())
+            {
+              if(named_sub.first != ID_C_source_location)
+                count += count_qualifiers(named_sub.second);
+            }
+            return count;
+          };
+          for(const auto &arg : partial_specialization_args.arguments())
+            constrained += count_qualifiers(arg);
           // Add weight from requires clause constraints.
           // Count the number of atomic constraints (type predicates,
           // function calls) in the expression for proper ordering
@@ -8783,7 +8807,23 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
     // contains them, so that e.g. const T matched against const char
     // deduces T=char rather than T=const char.
     typet desired = desired_type;
-    for(const auto &t : to_merged_type(template_type).subtypes())
+    // `const volatile T' parses as merged_type(merged_type(volatile, const),
+    // T): flatten nested merged types so each qualifier is checked
+    // ([temp.deduct.type]/8) -- otherwise `const volatile T' deduced from
+    // any argument, and partial ordering could not rank it above `const T'
+    std::vector<typet> subtypes;
+    std::function<void(const typet &)> flatten = [&](const typet &t)
+    {
+      if(t.id() == ID_merged_type)
+      {
+        for(const auto &sub : to_merged_type(t).subtypes())
+          flatten(sub);
+      }
+      else
+        subtypes.push_back(t);
+    };
+    flatten(template_type);
+    for(const auto &t : subtypes)
     {
       if(t.id() == ID_const)
       {

@@ -300,8 +300,17 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(type.get_bool(ID_C_lazy_member_type))
       try_resolve_lazy_type(type);
 
+    // N5008 [dcl.type.cv]/1, [temp.alias]/2: a type-name denoting a
+    // cv-qualified type (an alias template specialization
+    // `ident<volatile T>', a typedef of `volatile int', a template
+    // parameter bound to one) keeps its qualifiers, joined with any
+    // written on the name.  Only `const' was kept, so `volatile' vanished
+    // and libc++'s `__enable_if_tuple_size_imp<volatile _Tp, ...>'
+    // specializations never matched.
     if(type.get_bool(ID_C_constant))
       qualifiers.is_constant = true;
+    if(type.get_bool(ID_C_volatile))
+      qualifiers.is_volatile = true;
 
     // CPROVER extensions
     irep_idt typedef_identifier = type.get(ID_C_typedef);
