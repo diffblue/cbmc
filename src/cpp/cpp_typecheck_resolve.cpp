@@ -10453,6 +10453,12 @@ bool cpp_typecheck_resolvet::arguments_convertible_to_parameters(
         i < params.size() && arg_it != fargs.operands.end();
         ++i, ++arg_it)
     {
+      // N5008 [over.ics.list]: a braced-init-list argument has no type;
+      // its conversion (list-initialization of the parameter) is checked
+      // with the viability of the whole candidate
+      // (disambiguate_functions), not by this quick filter
+      if(arg_it->id() == ID_initializer_list)
+        continue;
       const typet &param_type = params[i].type();
       typet arg_type = arg_it->type();
       typet target = param_type;
