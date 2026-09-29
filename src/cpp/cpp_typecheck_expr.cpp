@@ -9203,6 +9203,31 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
   // cpp_name uses get_sub, which can get confused with expressions.
   if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
+  else if(is_qualified_member_address(expr))
+  {
+    // N5008 [expr.unary.op]/4: `&C::m' with a qualified-id naming a
+    // non-static member forms a pointer to member even where `this' is
+    // available (a member function, a default member initializer); only
+    // `&m' and the parenthesized `&(C::m)' denote the object's member.  The
+    // resolver turns a member name into `this->m' whenever the scope has a
+    // `this', so resolve the operand without it: it then yields the
+    // pointer-to-member form (the `cpp-this' placeholder, see
+    // typecheck_expr_address_of).
+    exprt &scope_this = cpp_scopes.current_scope().this_expr;
+    exprt saved_this = scope_this;
+    scope_this.make_nil();
+    try
+    {
+      typecheck_expr(to_unary_expr(expr).op());
+    }
+    catch(...)
+    {
+      scope_this = saved_this;
+      throw;
+    }
+    scope_this = saved_this;
+    typecheck_expr_main(expr);
+  }
   else if(expr.id() == "lambda")
     typecheck_expr_lambda(expr);
   else if(expr.id() == ID_arguments)
@@ -9271,6 +9296,19 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
 
   if(override_constantness)
     expr.type().set(ID_C_constant, false);
+}
+
+bool cpp_typecheckt::is_qualified_member_address(const exprt &expr)
+{
+  if(
+    expr.id() != ID_address_of || expr.operands().size() != 1 ||
+    to_unary_expr(expr).op().id() != ID_cpp_name ||
+    to_unary_expr(expr).op().get_bool(ID_C_parenthesized) ||
+    !to_cpp_name(to_unary_expr(expr).op()).is_qualified())
+  {
+    return false;
+  }
+  return cpp_scopes.current_scope().this_expr.is_not_nil();
 }
 
 void cpp_typecheckt::explicit_typecast_ambiguity(exprt &expr)

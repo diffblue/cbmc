@@ -1020,6 +1020,9 @@ protected:
     bool base_subobject = false);
 
   // expressions
+  /// Whether \p expr is `&C::m' (an unparenthesized qualified-id) in a
+  /// scope that has a `this' ([expr.unary.op]/4).
+  bool is_qualified_member_address(const exprt &expr);
   void explicit_typecast_ambiguity(exprt &);
   void unary_operand_typecast_ambiguity(exprt &);
   void typecheck_expr_main(exprt &) override;

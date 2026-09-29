@@ -295,6 +295,25 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             member_exprt member(object_tc, comp.get_name(), comp.type());
             member.set(ID_C_lvalue, true);
 
+            // N5008 [expr.prim.id.general]/4, [class.mem.general]/11: in a
+            // default member initializer an unqualified member name `x' is
+            // `(*this).x', `this' being the object under initialization;
+            // without it `&x' formed a pointer to member.  Bind the class
+            // scope's `this' to this object while the initializer is
+            // type-checked.
+            struct this_bindingt
+            {
+              exprt &slot;
+              exprt saved;
+              ~this_bindingt()
+              {
+                slot = std::move(saved);
+              }
+            } this_binding{
+              cpp_scopes.current_scope().this_expr,
+              cpp_scopes.current_scope().this_expr};
+            this_binding.slot = address_of_exprt{object_tc};
+
             // An empty brace initializer ({}) value-initializes the member
             // ([dcl.init]).  Type-checking the bare empty initializer_list
             // would otherwise yield a value with no determinate
