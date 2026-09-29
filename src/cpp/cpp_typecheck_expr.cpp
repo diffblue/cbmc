@@ -431,6 +431,13 @@ bool cpp_typecheckt::is_trivially_copyable_type(
     }
     return true;
   }
+  // [class.bit]/1: a bit-field member has the (scalar) type of its
+  // declaration; the width does not affect triviality
+  if(type.id() == ID_c_bit_field)
+  {
+    return is_trivially_copyable_type(
+      to_c_bit_field_type(type).underlying_type(), want_trivial, depth - 1);
+  }
   // scalars ([basic.types.general]/9); a reference is not an object type
   return type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
          type.id() == ID_c_bool || type.id() == ID_bool ||
