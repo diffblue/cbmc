@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 --property main.assertion.2 ../../../src/goto-programs/restrict_function_pointers.cpp
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
@@ -29,3 +29,7 @@ cvise reduction queued in /tmp/r163/red.  Round-163 audit group H.
 Pre-existing (round-162 snapshot bin51 shows the same drops).  Runtime
 about 330 s (the whole goto-programs TU).  Replace by the cvise reduction
 once it is available.
+Round 163e: passes; the shared_ptr_base.h 913/423/427 drops are gone
+after the constructor-template changes of round 163d/e (no ordinary copy
+of a constructor template; __is_constructible of classes).  Fails on the
+round-163 build bin52.

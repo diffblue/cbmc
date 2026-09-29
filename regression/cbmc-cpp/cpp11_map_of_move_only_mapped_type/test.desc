@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11 --object-bits 12 --unwind 3 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ move-only mapped type: SUCCESS$
@@ -32,3 +32,8 @@ with normal linking it removed the node insertion so that nothing is ever
 stored; a reduction needs strict linking (std::map's out-of-line
 _Rb_tree_insert_and_rebalance supplied by the program).
 Pre-existing (round-162 snapshot bin51).
+Round 163e: passes.  The three drops were removed by the pair
+default-constructor fixes (__is_constructible, same-signature
+constructor templates), by constructor templates no longer being copied
+as ordinary constructors, and by deferring the hidden friend; together
+they also fixed the verdict.  Fails on the round-163 build bin52.
