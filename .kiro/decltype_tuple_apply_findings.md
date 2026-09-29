@@ -12497,3 +12497,27 @@ Remaining header-free KNOWNBUGs: repeated non-virtual base subobjects,
 braced argument to a constructor template, hidden friend instantiated
 eagerly, the three above, P partial specialization, S (alias template
 instantiates pointee; tuple_size interaction).
+
+## Round 163f (2026-09-29)
+
+- f4b7b6ce52 braced-list argument skips the post-deduction quick
+  convertibility filter (arguments_convertible_to_parameters) -- the
+  braced constructor-template KNOWNBUG.
+- c2b4066549 hidden friends of class template specializations are
+  deferred (deferred_method_bodies) and instantiated only when used
+  ([temp.inst]/4) -- the _Rb_tree operator< drops.
+- c1a5c3b1ce constructor templates are never also ordinary constructors
+  (completes cf9e7f00b7; possible after f4b7b6ce52).
+- f101bf78ca D2 (map of move-only) and H (shared_count TU) pass as a
+  consequence; both CORE now.
+- c9121756d6 fold over sizeof(xs): substitute_pack walks type_arg.
+  Remaining: fold over the TYPE pack `sizeof(Ts)' (test_type_pack.desc).
+Checked: removing the parser's single-compound-requirement fast path
+still breaks cpp20_ranges_basic; the constraint_incomplete_class
+reduction finished (152 lines, /tmp/r163/red/constraint_incomplete_class).
+NSDMI `int *p = &x;': the aggregate path of cpp_constructor type-checks
+NSDMIs at class scope without `this' (cpp_constructor.cpp, "apply default
+member initializers for POD types"); needs a this-binding there.
+Open header-free KNOWNBUGs: repeated non-virtual bases (flattened
+component naming), P partial specialization, R pattern pack, S, NSDMI
+&member, fold over a type pack; constraint interplay.
