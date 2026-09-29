@@ -446,6 +446,75 @@ bool cpp_typecheckt::is_trivially_copyable_type(
          (type.id() == ID_pointer && !is_reference(type));
 }
 
+/// N5008 [except.spec]/8: an implicitly-declared default constructor, or one
+/// defaulted on its first declaration, is non-throwing unless the
+/// initialization of a subobject (a base or member default-initialized by
+/// it) is potentially-throwing; a user-provided one is non-throwing only when
+/// declared so ([except.spec]/2, `noexcept').  Default member initializers
+/// are taken to be non-throwing (their expressions are not type-checked
+/// here).
+bool cpp_typecheckt::default_construction_is_nothrow(
+  const typet &type,
+  int depth)
+{
+  if(depth <= 0)
+    return false;
+  if(type.id() == ID_array)
+  {
+    return default_construction_is_nothrow(
+      to_array_type(type).element_type(), depth - 1);
+  }
+  if(type.id() != ID_struct_tag)
+    return true; // scalars, unions of trivial members, pointers
+  elaborate_class_template(type);
+  const struct_typet &st = follow_tag(to_struct_tag_type(type));
+  const struct_typet::componentt *ctor = nullptr;
+  for(const auto &c : st.components())
+  {
+    if(c.type().id() != ID_code || c.get_bool(ID_from_base))
+      continue;
+    const code_typet &ct = to_code_type(c.type());
+    if(ct.return_type().id() == ID_constructor && ct.parameters().size() == 1)
+    {
+      ctor = &c;
+      break;
+    }
+  }
+  if(ctor != nullptr)
+  {
+    const code_typet &ct = to_code_type(ctor->type());
+    if(ct.get_bool("#C_noexcept") || ct.get_bool(ID_noexcept))
+      return true;
+    const symbolt *ctor_symbol = symbol_table.lookup(ctor->get_name());
+    const bool implicit_or_defaulted =
+      ct.get_bool("#is_implicit_ctor") ||
+      (ctor_symbol != nullptr &&
+       ctor_symbol->value.get_bool("#defaulted_function"));
+    if(!implicit_or_defaulted)
+      return false;
+  }
+  for(const auto &base : st.bases())
+  {
+    if(!default_construction_is_nothrow(base.type(), depth - 1))
+      return false;
+  }
+  for(const auto &c : st.components())
+  {
+    if(
+      c.type().id() == ID_code || c.get_bool(ID_is_static) ||
+      c.get_bool(ID_is_type) || c.get_bool(ID_from_base) ||
+      c.get_bool(ID_is_vtptr) || c.get_is_padding())
+    {
+      continue;
+    }
+    if(c.find(ID_C_default_value).is_not_nil())
+      continue; // initialized from its default member initializer
+    if(!default_construction_is_nothrow(c.type(), depth - 1))
+      return false;
+  }
+  return true;
+}
+
 bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
 {
   const std::size_t errors_before =
@@ -1479,7 +1548,39 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // Delegate to __is_constructible logic: trivially/nothrow
       // qualifiers are about optimization, not correctness.
       // For POD/scalar types with matching args, return true.
-      if(t2.is_nil())
+      typet class_t1 = t1;
+      class_t1.remove(ID_C_constant);
+      class_t1.remove(ID_C_volatile);
+      if(
+        t2.is_nil() && expr.id() == "__is_nothrow_constructible" &&
+        class_t1.id() == ID_struct_tag)
+      {
+        // N5008 [meta.unary.prop]: is_nothrow_constructible<T> is
+        // is_constructible<T> and the definition `T t;' is known not to
+        // throw ([except.spec]/8 for the implicit or defaulted default
+        // constructor)
+        elaborate_class_template(class_t1);
+        bool constructible = true;
+        const std::size_t errors_before =
+          get_message_handler().get_message_count(messaget::M_ERROR);
+        try
+        {
+          sfinae_contextt sfinae_guard{*this};
+          symbol_exprt object{irep_idt{}, t1};
+          object.set(ID_C_lvalue, true);
+          cpp_constructor(expr.source_location(), object, {});
+        }
+        catch(...)
+        {
+          constructible = false;
+        }
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
+        expr = constructible && default_construction_is_nothrow(class_t1, 16)
+                 ? exprt(true_exprt())
+                 : exprt(false_exprt());
+      }
+      else if(t2.is_nil())
       {
         // __is_trivially_constructible(T) — default constructible
         // A type is trivially default constructible if it has no

@@ -1039,6 +1039,11 @@ protected:
   bool
   is_trivially_copyable_type(const typet &type, bool want_trivial, int depth);
 
+  /// N5008 [except.spec]/8: whether default-initializing an object of
+  /// \p type calls only non-throwing functions (the construction itself
+  /// is assumed to be valid).
+  bool default_construction_is_nothrow(const typet &type, int depth);
+
   /// N5008 [class.prop], [class.virtual]/1, [class.dtor]/9,
   /// [dcl.init.aggr]/1: the class property named by the GCC/Clang type
   /// trait \p trait (`__is_empty', `__is_polymorphic', ...) for type \p t
