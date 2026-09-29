@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 libstdcxx.cpp
 --cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream constructed: SUCCESS$
