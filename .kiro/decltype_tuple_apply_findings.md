@@ -12590,3 +12590,42 @@ now adds -Werror=unusable-partial-specialization; kb_U6 restarted from the
 seed (degenerate result kept as main.ii.degenerate27).
 
 Suites at HEAD: cbmc-cpp all green (31 skipped), cpp green, lint 0.
+
+## Round 163i (step 3, medium fixes)
+
+Commits (local, unpushed):
+- d780478698 virtual base named through a member typedef in a mem-initializer
+  ([class.base.init]/2): the matched initializer now names the base itself
+  (it was resolved in the base's scope via #base_type).
+- ee82cb5efd array NSDMIs from braced lists ([dcl.init.aggr]/4,5,16): the NSDMI
+  passes the list's clauses; cpp_constructor builds scalar/aggregate array
+  values with do_initializer (nested lists, brace elision, value-initialized
+  tail -- `int part[3] = {9}` left part[2] indeterminate before, also on
+  bin53); helper array_elements_have_user_constructor.  The regex libstdc++
+  desc is conversion-only now (verification > 900 s once the constructor
+  converts).
+- e282e2fd65 NSDMI `&x` ([expr.prim.id.general]/4): POD path binds the class
+  scope's this; `&C::m` ([expr.unary.op]/4) resolved without `this`
+  (is_qualified_member_address).  New KNOWNBUG cpp_pointer_to_data_member_read:
+  `v.*pm` for data members reads `pm` itself; a pointer-to-member NSDMI makes
+  the object's DECL vanish silently.  No test covered data-member pointers.
+- e5a867f142 folds over a type pack ([expr.prim.fold]/2, [temp.variadic]/5):
+  contains_type_pack / fold_element; parser gained binary `&&`/`||` folds.
+- ad37dd4104 volatile through alias templates ([dcl.type.cv]/1): typecheck_type
+  merged only const; nested merged_type of `const volatile T` flattened in
+  deduction; qualifier count as sort key for alias patterns (deduction
+  ordering leaves them unordered).
+
+Mistake: rebuilt build-work/bin/cbmc while suite t41 ran on it; killed t41 and
+reran.  A container process (timeout 300 cbmc on main.ii, 35 h, 0 CPU, pid
+674383) is lingering from an old cvise docker case.
+
+cvise: kb_U6's second result (40 lines) did not define the constructor that
+CBMC drops (clang never instantiates it); added DEFKEEP (IR must define a
+matching function) and restarted.  kb_U8's result (117 lines) needs GCC
+extensions (pointer-to-function arithmetic) and clang rejects it; added
+-Werror=pointer-arith to the g++ gate and restarted (CLANG_GATE impossible:
+clang rejects libstdc++ 13's seed).
+
+Suites at ad37dd4104: cbmc-cpp green (25 skipped), cpp green, lint 0.
+KNOWNBUG descs: 28 directories.
