@@ -614,6 +614,25 @@ void cpp_declarator_convertert::handle_initializer(
 {
   exprt &value = declarator.value();
 
+  // N5008 [dcl.fct.def.default]/1,5: a function explicitly defaulted on a
+  // declaration after its first one -- an out-of-line `X::X(const X &) =
+  // default;', also of a class template member (libstdc++'s
+  // basic_streambuf) -- is user-provided and has the implicit definition.
+  // Represent it like the in-class form: an empty body marked
+  // #defaulted_function, from which convert_function generates the
+  // memberwise copy/move (construction or assignment); the bare `default'
+  // statement otherwise reached the C type-checker ("unexpected statement:
+  // default") and symbolic execution.
+  if(
+    symbol.type.id() == ID_code && value.id() == ID_code &&
+    to_code(value).get_statement() == ID_default)
+  {
+    source_locationt location = value.source_location();
+    value = code_blockt{};
+    value.add_source_location() = location;
+    value.set("#defaulted_function", true);
+  }
+
   // moves member initializers into 'value' - only methods have these
   if(symbol.type.id() == ID_code && value.is_not_nil())
     cpp_typecheck.move_member_initializers(
