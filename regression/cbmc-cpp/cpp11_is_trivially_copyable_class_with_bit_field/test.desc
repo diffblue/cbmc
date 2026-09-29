@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ trivially copyable at run time: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [class.prop]/1, [basic.types.general]/9: a class is trivially
+copyable when its copy/move constructors, assignment operators and
+destructor are all trivial (or deleted, with one non-deleted); a
+bit-field member does not affect that.  The built-in
+__is_trivially_copyable(T) is false for any class with a bit-field
+(`struct bits { int a : 3; };').  libc++'s <format> asserts
+`is_trivially_copyable_v<__parsed_specifications<char>>'
+(parser_std_format_spec.h:324/327; the struct has a bit-field in an
+anonymous union); the failing static_asserts are dropped as
+system-header declarations in 11 libc++ C++20 tests ("dropped 3
+system-header declarations").  test_libcxx.desc is such a program and
+forbids only those two drops.  g++ 13 and clang++ 18 accept both
+programs.  Pre-existing (fails on bin52).

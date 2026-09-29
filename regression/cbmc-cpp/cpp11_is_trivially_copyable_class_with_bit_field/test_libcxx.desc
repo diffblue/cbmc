@@ -1,0 +1,17 @@
+KNOWNBUG libcxx
+libcxx.cpp
+--cpp20 --stdlib libc++ --verbosity 10
+^\[main\.assertion\.1\] line \d+ span of an array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped system-header item at file .*parser_std_format_spec\.h line 32[47]
+--
+libc++'s <format> static_assert(is_trivially_copyable_v<
+__parsed_specifications<CharT>>) (parser_std_format_spec.h:324/327),
+dropped because __is_trivially_copyable is false for a class with a
+bit-field (test.desc).  --verbosity 10 lists the dropped declarations.
+clang++ 18 with libc++ accepts the program.

@@ -1,0 +1,19 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ views::take\(3\) converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+take_view\.h line 348: C\+\+ front-end dropped the body
+--
+libc++'s views::take(n) (take_view.h:348) returns
+`__range_adaptor_closure_t(std::__bind_back(*this, std::forward<_Np>(__n)))';
+in __bind_back_op::operator()'s noexcept and trailing return types
+(bind_back.h:60) the front end reports "template 'forward' not found" and
+drops take's call operator (cpp20_views_take_call_crash).  cvise
+reduction running in /tmp/r163/red/kb_U6.  clang++ 18 with libc++ accepts
+the program.  Pre-existing (fails on bin52).
