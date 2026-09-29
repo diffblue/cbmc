@@ -1,0 +1,20 @@
+CORE
+shapes.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ volatile through an alias: SUCCESS$
+^\[main\.assertion\.2\] line \d+ more qualified is more specialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ through an alias as well: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.type.cv]/1, [temp.alias]/2: an alias template specialization
+of a volatile type is volatile (on bin53 only const survived the alias).
+[temp.deduct.type]/8, [temp.deduct.partial]: `const volatile T' requires
+both qualifiers and is more specialized than `const T' or `volatile T',
+also when written through an alias template.  g++ 13 and clang++ 18
+accept the program.
