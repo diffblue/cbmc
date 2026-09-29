@@ -89,6 +89,15 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
     return is_expansion && refers_empty_pack(a);
   };
 
+  // [temp.variadic]/7 with [class.base.init]/1: a mem-initializer that is
+  // itself a pack expansion over empty packs (`leaf<Ul, Tl>()...' with Ul,
+  // Tl empty, libc++'s __tuple_impl) expands to no mem-initializer at all
+  const auto is_empty_mem_initializer_expansion = [&](const irept &a) -> bool
+  {
+    return a.id() == ID_code && a.get(ID_statement) == ID_member_initializer &&
+           a.get_bool(ID_ellipsis) && refers_empty_pack(a);
+  };
+
   std::function<void(irept &)> strip = [&](irept &node)
   {
     if(node.id() == ID_template_args)
@@ -97,6 +106,15 @@ void cpp_typecheckt::remove_empty_pack_expansion_args(exprt &body)
       args.erase(
         std::remove_if(args.begin(), args.end(), is_empty_pack_expansion),
         args.end());
+    }
+    // in the member-initializer list, or already moved into the
+    // constructor's body block
+    {
+      auto &subs = node.get_sub();
+      subs.erase(
+        std::remove_if(
+          subs.begin(), subs.end(), is_empty_mem_initializer_expansion),
+        subs.end());
     }
     for(auto &s : node.get_sub())
       strip(s);
