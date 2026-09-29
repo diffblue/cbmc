@@ -12539,7 +12539,8 @@ reduced), bind_back `forward' (take_view.h:348, not reduced), declval
 of iterator_t<char *> (type_traits:2386, not reduced).  Plus the
 parser fast path: cpp20_single_compound_requirement_with_type_constraint.
 Reductions running: /tmp/r163/red/kb_U5, kb_U6, kb_U8.
-Known issues WITHOUT a test (not observable at HEAD): the libc++
-tuple_size base loss when alias-template arguments skip elaboration (13
-lines, /tmp/r163/red/reg_ts); the CBMC_ELAB_ON_NAMING=0 failures (round-162
-notes).
+The libc++ tuple_size base loss (when alias-template arguments skip
+elaboration) is guarded by the CORE regression test
+cpp17_tuple_size_selected_despite_cv_partial_specializations (fails with
+that change re-applied).  Known issues WITHOUT a test: the
+CBMC_ELAB_ON_NAMING=0 failures (round-162 notes).
