@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ unqualified, const: SUCCESS$
@@ -16,11 +16,14 @@ dropped the body
 N5008 [temp.alias]/2, [temp.spec.partial.match]/1, [temp.deduct.type]/8:
 the partial specialization pattern `A<ident<volatile T, int>>' is
 `A<volatile T>' and matches A<volatile tup> with T = tup; likewise for
-`const volatile T'.  Through the alias the front end matches the const
-pattern only; a volatile or const volatile argument selects the primary
-template (the same patterns written without the alias work).  libc++'s
-cv-qualified tuple_size specializations are written exactly this way
+`const volatile T'. Through the alias the front end matched the const
+pattern only; a volatile or const volatile argument selected the primary
+template. Three causes: a type-name resolving to a volatile type lost the
+volatile (only const was merged back); the nested merged type of `const
+volatile T' skipped the qualifier check in deduction; and ranking did not
+prefer the more qualified alias pattern. libc++'s cv-qualified tuple_size
+specializations are written exactly this way
 (__enable_if_tuple_size_imp<volatile _Tp, ...>), so tuple_size<volatile
-tuple<...>> has no value.  Found while writing
-cpp17_tuple_size_selected_despite_cv_partial_specializations.  g++ 13 and
-clang++ 18 accept the program.  Pre-existing (fails on bin52).
+tuple<...>> has no value. Found while writing
+cpp17_tuple_size_selected_despite_cv_partial_specializations. g++ 13 and
+clang++ 18 accept the program. Fails on bin53.
