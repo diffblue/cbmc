@@ -1,0 +1,17 @@
+KNOWNBUG
+type_pack.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ sizeof of each type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.prim.fold]/2, [temp.variadic]/5: in `(0 + ... + sizeof(Ts))'
+the pack is the template's TYPE parameter pack, not a function parameter
+pack; each element is sizeof of one type.  The function-body fold
+expansion only expands function parameter packs, so the value is wrong.
+g++ 13 and clang++ 18 accept the program.  Pre-existing.
