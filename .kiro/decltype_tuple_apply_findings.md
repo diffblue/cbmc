@@ -12521,3 +12521,25 @@ member initializers for POD types"); needs a this-binding there.
 Open header-free KNOWNBUGs: repeated non-virtual bases (flattened
 component naming), P partial specialization, R pattern pack, S, NSDMI
 &member, fold over a type pack; constraint interplay.
+
+## Round 163g (2026-09-29): KNOWNBUG coverage of every known issue
+
+Audit of the drop lines in the last full run's CORE .out files (106 lines,
+54 descs).  Already covered: libc++ __estimated_width/__get_property
+(cpp20_ranges_upper_bound_array), allocator.h:172 (R), list 526/807 (S),
+fs_path 330/618 (I), <format> (test_libstdcxx.desc).  New (77f8bb178a):
+nothrow default construction (mutex.h:47), trivially copyable with a
+bit-field (parser_std_format_spec.h:324/327), NSDMI array from nested
+braces (regex_scanner.h:91), address of a constexpr static member
+(any:175), out-of-line `= default' (streambuf:812; also the symex
+Unreachable abort), virtual base through a member typedef in a
+mem-initializer (ostream:440, istream:576/703), static_cast of an array
+parameter (span:189), empty braced arguments (atomic_futex.h:155, not
+reduced), bind_back `forward' (take_view.h:348, not reduced), declval
+of iterator_t<char *> (type_traits:2386, not reduced).  Plus the
+parser fast path: cpp20_single_compound_requirement_with_type_constraint.
+Reductions running: /tmp/r163/red/kb_U5, kb_U6, kb_U8.
+Known issues WITHOUT a test (not observable at HEAD): the libc++
+tuple_size base loss when alias-template arguments skip elaboration (13
+lines, /tmp/r163/red/reg_ts); the CBMC_ELAB_ON_NAMING=0 failures (round-162
+notes).
