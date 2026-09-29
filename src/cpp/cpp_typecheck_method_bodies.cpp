@@ -2344,6 +2344,15 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       }
     }
 
+    // a hidden friend of a class template specialization, [temp.inst]/4
+    if(
+      defining_friend_of_template_instance &&
+      _method_symbol->type.get(ID_C_member_name).empty() &&
+      !has_auto(_method_symbol->type))
+    {
+      defer = true;
+    }
+
     if(defer)
     {
       deferred_method_bodies.emplace(

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ the used friend: SUCCESS$
@@ -17,13 +17,15 @@ class template (a "hidden friend") is a templated entity; its definition
 is implicitly instantiated only when it is odr-used.  Nothing here
 compares two tree<value> objects with `<'; value has no operator<, so
 instantiating that friend's body would be ill-formed.  The front end
-instantiates every friend defined in the class together with the class,
-fails ("implicit arithmetic conversion not permitted") and reports the
-body as dropped.  This is libstdc++'s _Rb_tree (`friend bool operator<(const
+instantiated every friend defined in the class together with the class,
+failed ("implicit arithmetic conversion not permitted") and reported the
+body as dropped.  A friend defined in a class template specialization is
+now deferred like a member function of the specialization and
+instantiated only when a converted body refers to it.  This is libstdc++'s _Rb_tree (`friend bool operator<(const
 _Rb_tree &, const _Rb_tree &) { return std::lexicographical_compare(...); }',
 stl_tree.h:1621), instantiated with every std::map / std::set: for a
 non-comparable element it drops std::pair's operator< (stl_pair.h:835) and
 __gnu_cxx::__ops::_Iter_less_iter::operator() (predefined_ops.h:44) -- 7
 cbmc-cpp descs in the round-163 audit.  test_libstdcxx.desc is the
 libstdc++ shape (map<string, value>, set<list::iterator, cmp>).
-Header-free.  Pre-existing (round-162 snapshot bin51 shows the same drop).
+Header-free.  Fails on the round-163 build bin52.

@@ -1550,6 +1550,10 @@ private:
   /// conversion (hence the trait) as false.
   std::set<irep_idt> template_conversions_in_progress;
   bool skip_typechecking_elaborate = false;
+  /// N5008 [temp.inst]/4, [class.friend]/6-7: set while a friend function
+  /// defined in a class template specialization is declared; its definition
+  /// is instantiated only when it is odr-used, like a member's.
+  bool defining_friend_of_template_instance = false;
 
   /// N5008 [temp.inst]/1: naming a class template specialization does NOT
   /// instantiate it; only a context requiring completeness ([temp.inst]/2)
