@@ -1,6 +1,6 @@
-KNOWNBUG
+CORE
 libstdcxx.cpp
---cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+--cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream constructed: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
@@ -12,3 +12,6 @@ streambuf line 812: C\+\+ front-end dropped the body
 --
 libstdc++ iostreams (streambuf line 812), the shape of test.desc; g++ 13 accepts
 the program.
+--unwind 10: with the copy constructor no longer dropped, --unwind 5 cut
+every path of the stream set-up short and the WRONG assertion passed
+vacuously.

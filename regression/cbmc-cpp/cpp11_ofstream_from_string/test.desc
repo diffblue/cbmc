@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+--cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
@@ -12,3 +12,7 @@ Flipped KNOWNBUG->CORE 2026-08-11: converts and verifies after the
 rounds 32-35 template-pack/overload fixes (0 of 15085 properties,
 non-vacuous, ~23s).  --unwind 5 --no-unwinding-assertions: bounded
 harness over the locale/facet machinery.
+Round 163h: --unwind 10 (was 5).  With basic_streambuf's out-of-line
+defaulted copy constructor no longer dropped, the stream set-up runs
+further, and --unwind 5 cut every path short (a WRONG assertion added to
+the same program passed vacuously).

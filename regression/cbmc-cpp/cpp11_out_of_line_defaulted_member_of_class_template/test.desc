@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ defaulted copy: SUCCESS$
@@ -12,16 +12,19 @@ main.cpp
 dropped the body
 --
 N5008 [dcl.fct.def.default]/5: a special member function may be declared
-in the class and explicitly defaulted on its first declaration outside
-it (`template <class C> buf<C>::buf(const buf &) = default;'); it is then
-user-provided but behaves as the implicit one.  The front end reports
-"unexpected statement: default" and drops the copy constructor and the
-copy assignment; the leftover `default' statement then reaches symbolic
-execution, which aborts ("symex_other.cpp: Unreachable") -- the same
+in the class and explicitly defaulted on its first declaration outside it
+(`template <class C> buf<C>::buf(const buf &) = default;'); it is then
+user-provided but behaves as the implicit one. The front end reported
+"unexpected statement: default" and dropped the copy constructor and the
+copy assignment; the leftover `default' statement then reached symbolic
+execution, which aborted ("symex_other.cpp: Unreachable") -- the same
 abort as a leftover member_initializer (round 163e): an unconverted
-statement is not rejected before symex.  libstdc++'s basic_streambuf defines its copy
-constructor and copy assignment this way (streambuf:835/840, the
-constructor declared at streambuf:812), dropped in
-cpp11_ofstream_from_string and the goto-programs TUs; test_libstdcxx.desc
-is that program and forbids only the streambuf:812 drop.  g++ 13 and
-clang++ 18 accept both programs.  Pre-existing (fails on bin52).
+statement was not rejected before symex. The out-of-line `= default' is
+now represented like the in-class one (an empty body marked
+#defaulted_function, which convert_function turns into the memberwise
+copy). libstdc++'s basic_streambuf defines its copy constructor and copy
+assignment this way (streambuf:835/840, the constructor declared at
+streambuf:812), dropped in cpp11_ofstream_from_string and the goto-
+programs TUs; test_libstdcxx.desc is that program and forbids only the
+streambuf:812 drop. g++ 13 and clang++ 18 accept both programs. Fails on
+bin53.
