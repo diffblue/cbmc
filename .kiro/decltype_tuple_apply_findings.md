@@ -12448,3 +12448,52 @@ Found on the way: nested braced argument to constructor templates
 (cpp11_braced_argument_to_constructor_template_with_defaulted_parameters,
 KNOWNBUG).  The D1 libstdc++ desc now only shows vector::_Storage
 (group A).
+
+## Round 163e (2026-09-28): fixing mode, header-free KNOWNBUGs
+
+Commits since 3df4aff9cb (each CORE test fails on bin52; suites green after
+each step, lint 0):
+- 282db5cf03 union ctor leaves undesignated variant members alone
+  ([class.base.init]/9) -- group A; D1's libstdc++ desc now CORE.
+- cef3f93293 qualified class template definition restores the scope
+  ([namespace.memdef]/2) -- K.
+- 1e2db1d71a no return type deduction from an undeduced operand
+  ([dcl.spec.auto.general]/13) -- the <format> goto-conversion crash;
+  <format> converts (new CORE desc test_libstdcxx_converts).
+- 69b69fb871 `new T{e}' aggregate-initializes ([dcl.init.list]/3.4).
+- f45fd1f751 reference bindings ranked by added cv-qualifiers
+  ([over.ics.rank]/3.2.6) -- J.
+- d79407157d member typedef naming an enumeration as qualifier
+  ([basic.lookup.qual.general]/1) -- T; the old "declaration order"
+  diagnosis was wrong, test renamed.
+- 3837e29cc4 prefix operator before `(name) OP e' ([expr.cast]/2) -- C.
+- 4c357dd593 out-of-line member of a variadic class template (pack
+  counts once, [temp.mem]/1) -- P's primary-template shape; P's partial
+  specialization shape (libc++ std::function) still KNOWNBUG: the
+  member-template body matcher (instantiate_template, the attach near
+  "Only adopt from an entry that carries its own template-parameter
+  list") matches by name and parameter count only and the owning
+  template's head is the PRIMARY's (1 param) -- tried and reverted.
+- 2e8ebd147a inherit constructors taking a reference to an unrelated
+  class ([over.match.funcs.general]/9) -- B1 (every one-reference-param
+  ctor was skipped as copy/move).
+- b1ad0c3a22 member class of a class template defined outside it
+  ([temp.mem.class]/1) -- E/O, the stream sentry of both libraries; four
+  iostream tests needed --unwind 3 / --depth 400 (real sentry code now
+  executes).
+- 008362f823 typename-specifier terminal name opens template arguments
+  ([temp.names]/3.4) -- the GCC-only `typename T::rebind<int>'.
+- 52ff4fa4b1 mem-initializer expansion over empty packs vanishes
+  ([temp.variadic]/7) -- M, and the libc++ tuple:320 drops.
+- 3c95918315 deduction extends a pack beyond explicit arguments
+  ([temp.arg.explicit]/9).
+New KNOWNBUGs found on the way: cpp11_address_of_member_in_default_member_initializer
+(NSDMI `int *p = &x;' typed as pointer to member -- NSDMIs are checked at
+class scope without `this'), cpp17_fold_over_sizeof_of_pack_elements,
+cpp11_pack_deduced_from_declval_arguments_in_partial_specialization/test_pattern_pack.desc
+(R: pack in a partial specialization's decltype pattern; a trailing-pack
+absorb change did not help).
+Remaining header-free KNOWNBUGs: repeated non-virtual base subobjects,
+braced argument to a constructor template, hidden friend instantiated
+eagerly, the three above, P partial specialization, S (alias template
+instantiates pointee; tuple_size interaction).
