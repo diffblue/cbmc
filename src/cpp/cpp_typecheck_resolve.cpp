@@ -11394,6 +11394,62 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   return template_function_instance;
 }
 
+/// N5008 [temp.arg.explicit]/9: template argument deduction can extend the
+/// sequence of template arguments of a pack beyond the explicitly specified
+/// ones (`count<int>(1, 2, 3)' deduces Ts = {int, int, int}).  True when the
+/// last explicit argument falls into a type template parameter pack that is
+/// the pattern of a function parameter pack, and the call has more
+/// arguments than the explicit ones account for -- the explicit arguments
+/// are then only a prefix, and deduction must see the call.
+static bool explicit_pack_extended_by_deduction(
+  const cpp_declarationt &declaration,
+  const cpp_template_args_non_tct &explicit_args,
+  const cpp_typecheck_fargst &fargs)
+{
+  const auto &params = declaration.template_type().template_parameters();
+  const std::size_t n_explicit = explicit_args.arguments().size();
+  if(n_explicit == 0)
+    return false;
+  // the parameter that receives the last explicit argument
+  std::size_t pack_index = params.size();
+  for(std::size_t i = 0; i < params.size() && i < n_explicit; ++i)
+  {
+    if(params[i].get_bool(ID_ellipsis))
+    {
+      pack_index = i;
+      break;
+    }
+  }
+  if(pack_index == params.size() || params[pack_index].id() != ID_type)
+    return false;
+  // the function's parameters: a pack expansion among them
+  const typet &ftype = declaration.declarators().front().type();
+  std::size_t n_fixed = 0;
+  bool has_pack = false;
+  for(const auto &p : ftype.find(ID_parameters).get_sub())
+  {
+    if(p.id() != ID_cpp_declaration)
+      continue;
+    const auto &pd = static_cast<const cpp_declarationt &>(p);
+    const bool is_pack =
+      !pd.declarators().empty() &&
+      (pd.declarators().front().get_bool(ID_ellipsis) ||
+       pd.declarators().front().type().get_bool(ID_ellipsis) ||
+       pd.type().get_bool(ID_ellipsis));
+    if(is_pack)
+      has_pack = true;
+    else
+      ++n_fixed;
+  }
+  if(!has_pack)
+    return false;
+  std::size_t n_call = fargs.operands.size();
+  if(fargs.has_object && n_call > 0)
+    --n_call;
+  const std::size_t n_in_pack = n_explicit - pack_index;
+  return n_call > n_fixed + n_in_pack;
+}
+
 void cpp_typecheck_resolvet::apply_template_args(
   exprt &expr,
   const cpp_template_args_non_tct &template_args_non_tc,
@@ -11487,7 +11543,9 @@ void cpp_typecheck_resolvet::apply_template_args(
   else if(
     fargs.in_use && cpp_declaration.declarators().size() == 1 &&
     cpp_declaration.declarators().front().type().id() == ID_function_type &&
-    !has_variadic_template_parameter(cpp_declaration.template_type()))
+    (!has_variadic_template_parameter(cpp_declaration.template_type()) ||
+     explicit_pack_extended_by_deduction(
+       cpp_declaration, template_args_non_tc, fargs)))
   {
     // [temp.inst]/2 and [over.match]: in a function-call context,
     // overload resolution uses only the signature of each candidate;
