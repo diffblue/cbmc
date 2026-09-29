@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 libstdcxx.cpp
 --cpp11 --object-bits 12 --unwind 3 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ map with a non-comparable mapped type: SUCCESS$
