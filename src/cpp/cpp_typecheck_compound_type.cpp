@@ -2825,6 +2825,26 @@ void cpp_typecheckt::typecheck_friend_declaration(
 
     cpp_declarator_convertert cpp_declarator_converter(*this);
     cpp_declarator_converter.is_friend = true;
+    // N5008 [temp.inst]/4: the definition of a friend function defined in a
+    // class template specialization (a "hidden friend") is instantiated only
+    // if it is odr-used -- libstdc++'s _Rb_tree `operator<' compares the
+    // elements, which may have no operator< at all
+    struct friend_flag_guardt
+    {
+      bool &flag;
+      const bool saved;
+      friend_flag_guardt(bool &_flag, bool value) : flag(_flag), saved(_flag)
+      {
+        flag = value;
+      }
+      ~friend_flag_guardt()
+      {
+        flag = saved;
+      }
+    } friend_flag_guard{
+      defining_friend_of_template_instance,
+      sub_it.value().is_not_nil() &&
+        symbol.type.find(ID_C_template_arguments).is_not_nil()};
     const symbolt &conv_symb = cpp_declarator_converter.convert(
       declaration.type(),
       declaration.storage_spec(),
