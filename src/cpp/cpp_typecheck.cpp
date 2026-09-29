@@ -428,6 +428,58 @@ void cpp_typecheckt::typecheck()
     }
   }
 
+  // A body that still holds a statement only the C++ type-checker consumes
+  // (a mem-initializer, `= default', a using-declaration or `= 0' left in
+  // parse form) was not fully converted.  Goto conversion would copy it
+  // as an OTHER instruction, on which symbolic execution aborts
+  // (symex_other.cpp "Unreachable").  Such a body is not the function's
+  // semantics ([class.base.init], [dcl.fct.def.default]); drop it, like
+  // any other unconvertible body, so that calls havoc soundly.
+  for(const auto &entry : symbol_table)
+  {
+    const symbolt &sym = entry.second;
+    if(
+      sym.type.id() != ID_code || sym.value.id() != ID_code ||
+      sym.mode != ID_cpp || sym.is_type)
+    {
+      continue;
+    }
+    std::function<bool(const irept &)> has_parse_only_statement =
+      [&](const irept &n) -> bool
+    {
+      if(n.id() == ID_code)
+      {
+        const irep_idt &statement = n.get(ID_statement);
+        if(
+          statement == ID_member_initializer || statement == ID_default ||
+          statement == "cpp-using" || statement == "cpp-pure-virtual")
+        {
+          return true;
+        }
+      }
+      for(const auto &sub : n.get_sub())
+        if(has_parse_only_statement(sub))
+          return true;
+      for(const auto &named_sub : n.get_named_sub())
+        if(has_parse_only_statement(named_sub.second))
+          return true;
+      return false;
+    };
+    if(!has_parse_only_statement(sym.value))
+      continue;
+    // A body never converted belongs to a member that was never odr-used,
+    // which is not instantiated at all ([temp.inst]/11): nothing is lost.
+    // A converted body that kept such a statement is a front-end gap.
+    if(sym.value.get_bool("#cpp_converted"))
+    {
+      warning().source_location = sym.location;
+      warning() << "C++ front-end dropped the body of '" << sym.base_name
+                << "' (unconverted statement); calls to it return nondet"
+                << eom;
+    }
+    symbol_table.get_writeable_ref(entry.first).value.make_nil();
+  }
+
   provide_stdlib_bodies();
 
   clean_up();
