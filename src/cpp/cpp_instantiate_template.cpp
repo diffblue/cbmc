@@ -8416,6 +8416,15 @@ skip_pack_removal_ft:
           irept result = n;
           for(auto &s : result.get_sub())
             s = substitute_pack(s, name);
+          // [expr.sizeof]/1 + [temp.variadic]/5: the operand of
+          // `sizeof(xs)' is kept in the named `type_arg' (it parses as a
+          // type-id until resolved), so each fold element must substitute
+          // there as well
+          for(auto &ns : result.get_named_sub())
+          {
+            if(ns.first == ID_type_arg)
+              ns.second = substitute_pack(ns.second, name);
+          }
           return result;
         };
 
