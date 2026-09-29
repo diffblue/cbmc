@@ -5253,7 +5253,21 @@ bool cpp_typecheckt::static_typecast(
     if(e.id() == ID_dereference && e.get_bool(ID_C_implicit))
       e = to_dereference_expr(expr).pointer();
 
-    if(e.type().id() == ID_pointer && cast_away_constness(e.type(), type))
+    // N5008 [expr.static.cast]/1 with [conv.array]: a reference to an
+    // array converts through its array-to-pointer conversion, so the
+    // qualification check compares the ELEMENT pointer type
+    // (`char (&)[N]' -> `char *', libstdc++'s span constructor), not the
+    // pointer to the whole array that the implicit dereference hid
+    typet from = e.type();
+    if(
+      !is_reference(type) && from.id() == ID_pointer &&
+      to_pointer_type(from).base_type().id() == ID_array &&
+      to_pointer_type(type).base_type().id() != ID_array)
+    {
+      from = pointer_type(
+        to_array_type(to_pointer_type(from).base_type()).element_type());
+    }
+    if(from.id() == ID_pointer && cast_away_constness(from, type))
       return false;
   }
 
