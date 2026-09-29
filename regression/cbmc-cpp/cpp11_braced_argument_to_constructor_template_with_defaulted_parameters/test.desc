@@ -23,8 +23,8 @@ deduction (arguments_convertible_to_parameters) asked for an implicit
 conversion of the braced list, which has no type, and rejected the
 candidate; braced-list arguments are now left to the full viability
 check.  libstdc++ pair's `pair(const _T1 &, const _T2 &)' is such a
-template; it works there only because the class-body pass also keeps an
-ordinary copy of each constructor template that has parameters (see
-cpp11_constructor_templates_differing_only_in_enable_if).  Found while
-fixing that.  g++ 13 and clang++ 18 accept the program.  Fails on the
+template; it used to work there only because the class-body pass also
+kept an ordinary copy of each constructor template, which is no longer
+the case.  Found while fixing
+cpp11_constructor_templates_differing_only_in_enable_if.  g++ 13 and clang++ 18 accept the program.  Fails on the
 round-163 build bin52.
