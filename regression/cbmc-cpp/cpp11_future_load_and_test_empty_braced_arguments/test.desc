@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ future header converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+atomic_futex\.h line 155: C\+\+ front-end dropped the body
+--
+N5008 [dcl.init.list]/3.5, [over.ics.list]: libstdc++'s
+__atomic_futex_unsigned::_M_load_and_test (atomic_futex.h:155) calls
+`_M_load_and_test_until(..., false, {}, {})', two empty braced lists for
+the chrono::seconds / chrono::nanoseconds parameters (value-initialized).
+The front end finds no match ("found no match for symbol
+'_M_load_and_test_until'") and drops the member, which cpp11_future_header
+reaches.  A header-free imitation passes; cvise reduction running in
+/tmp/r163/red/kb_U5.  g++ 13 accepts the program.  Pre-existing (fails on
+bin52).

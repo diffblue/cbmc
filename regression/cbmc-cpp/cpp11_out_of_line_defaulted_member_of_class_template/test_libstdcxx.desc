@@ -1,0 +1,14 @@
+KNOWNBUG
+libstdcxx.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ ofstream constructed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+streambuf line 812: C\+\+ front-end dropped the body
+--
+libstdc++ iostreams (streambuf line 812), the shape of test.desc; g++ 13 accepts
+the program.

@@ -1,0 +1,15 @@
+KNOWNBUG
+libstdcxx.cpp
+--cpp11 --unwind 1 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ regex constructed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+regex_scanner\.h line 91: C\+\+ front-end dropped the body
+--
+libstdc++'s regex _ScannerBase constructor (regex_scanner.h:91), dropped
+because its NSDMI array of std::pair from nested braces does not convert
+(test.desc).  g++ 13 accepts the program.
