@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 libcxx.cpp
 --cpp11 --stdlib libc++ --unwind 2 --no-unwinding-assertions --verbosity 10
 ^\[main\.assertion\.1\] line \d+ mutex used: SUCCESS$
@@ -11,6 +11,7 @@ libcxx.cpp
 dropped system-header item at file .*__mutex/mutex\.h line 47
 --
 libc++'s <mutex> static_assert(is_nothrow_default_constructible<mutex>::value)
-(mutex.h:47), dropped because __is_nothrow_constructible is false for the
+(mutex.h:47), dropped (fails on bin53) while __is_nothrow_constructible was
+false for the
 defaulted default constructor (test.desc).  --verbosity 10 lists the dropped
 declaration.  clang++ 18 with libc++ accepts the program.

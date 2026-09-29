@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ nothrow default construction: SUCCESS$
@@ -15,12 +15,13 @@ N5008 [meta.unary.prop] is_nothrow_constructible, with [except.spec]/8:
 an implicitly-declared or defaulted default constructor is non-throwing
 unless the initialization of a subobject (default member initializers,
 bases and members' default constructors) is potentially-throwing.  The
-built-in __is_nothrow_constructible(T) gives false for mutex_like (a
+built-in __is_nothrow_constructible(T) gave false for mutex_like (a
 defaulted default constructor, a default member initializer) and true for
 a class whose default constructor is noexcept(false).  libc++'s <mutex>
 asserts `is_nothrow_default_constructible<mutex>::value' (mutex.h:47);
-the failing static_assert is dropped as a system-header declaration in
+the failing static_assert was dropped as a system-header declaration in
 about 30 libc++ tests ("dropped 1 system-header declaration").
 test_libcxx.desc is that program; it forbids only the mutex.h:47 drop.
-g++ 13 and clang++ 18 accept both programs.  Pre-existing (fails on
-bin52).
+g++ 13 and clang++ 18 accept both programs.  The built-in now attempts
+`T t;' and walks the implicit/defaulted constructors' subobjects.  Fails
+on bin53.
