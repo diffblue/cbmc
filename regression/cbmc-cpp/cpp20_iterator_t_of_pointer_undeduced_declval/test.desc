@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+type_traits line 2386: C\+\+ front-end dropped the body
+--
+N5008 [range.access.begin], [iterator.concept.readable]: for `int *'
+(through ranges::iterator_t of the array's views), libstdc++'s concept
+checks name declval<...>() of types such as iterator_t<char *>.  The front
+end instantiates declval's body (type_traits:2386, whose static_assert
+must fire only if it is odr-used) with a return type it cannot deduce
+("cannot deduce the return type from an operand of undeduced type
+'std::ranges::iterator_t<ptr_char>'", preceded by "operand of unary *
+... is not a pointer" in iterator_concepts.h:635 and a dropped
+ranges::__cust_access::__begin<char *>) and drops it.  The same drops
+appear in cpp20_ranges_basic and the <format> descs.  cvise reduction
+running in /tmp/r163/red/kb_U8.  g++ 13 accepts the program.
+Pre-existing (fails on bin52).

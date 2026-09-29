@@ -1,0 +1,25 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ table initialized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [class.mem.general]/11, [dcl.init.aggr]/4, [dcl.init.list]/3.7: a
+default member initializer `pr tbl[2] = {{'^', t_begin}, {'$', t_end}};'
+initializes each array element by list-initialization from its braced
+list, calling pr(char, token).  The front end finds no constructor for
+the elements ("found no match for symbol 'pr'", or with std::pair
+"invalid implicit conversion from '<<type:>>' to 'struct pair &&'") and
+drops the class's constructor.  This is libstdc++'s regex
+_ScannerBase::_M_token_tbl (a const array of std::pair<char, _TokenT>),
+so _ScannerBase's constructor (regex_scanner.h:91) is dropped in 3 regex
+descs; test_libstdcxx.desc is that program and forbids only that drop.
+g++ 13 and clang++ 18 accept both programs.  Pre-existing (fails on
+bin52).
