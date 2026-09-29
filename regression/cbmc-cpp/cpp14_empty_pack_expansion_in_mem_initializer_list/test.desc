@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp14
 ^\[main\.assertion\.1\] line \d+ the reference element refers to i: SUCCESS$
@@ -18,13 +18,15 @@ mem-initializers at all.  libc++'s __tuple_impl constructor initializes
 the elements given an argument with `__tuple_leaf<_Uf, _Tf>(std::forward<
 _Up>(__u))...' and the rest with `__tuple_leaf<_Ul, _Tl>()...'; when every
 element has an argument the second list is empty.  The front end still
-instantiates one `leaf<?, int &&>()' default-constructing the reference
-element ("reference 'this->value' expects one initializer"), drops the
-leaf's default constructor, and symbolic execution then aborts with an
+instantiated one `leaf<?, int &&>()' default-constructing the reference
+element ("reference 'this->value' expects one initializer"), dropped the
+leaf's default constructor, and symbolic execution then aborted with an
 invariant violation ("symex_other.cpp: Unreachable").  In libc++ this is
 tuple<int &&> from std::forward_as_tuple in map::operator[]
 (`piecewise_construct, forward_as_tuple(key), tuple<>()'): __tuple_leaf
 (tuple:320) is dropped in cpp11_libcxx20_map, cpp11_map_insert_libcxx and
 cpp20_map_basic_libcxx (round-163 audit).  The empty-pack fix of round
-163b covered braced lists and call arguments, not mem-initializers.
-Header-free.  Pre-existing (round-162 snapshot bin51 fails the same way).
+163b covered braced lists and call arguments, not mem-initializers;
+remove_empty_pack_expansion_args now also removes a mem-initializer that
+is itself an expansion over empty packs.
+Header-free.  Fails on the round-163 build bin52.
