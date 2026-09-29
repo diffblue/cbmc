@@ -2232,6 +2232,14 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         e = symbol.value;
         if(e.is_nil())
           e = cpp_symbol_expr(symbol);
+        else
+        {
+          // N5008 [class.static.data]/4, [expr.unary.op]/3: a constexpr
+          // variable is still an object; remember it, so that taking its
+          // address (libc++ any's `&__unique_typeinfo<T>::__id') uses the
+          // object rather than the substituted value
+          e.set(ID_C_constexpr_object, symbol.name);
+        }
       }
     }
     else

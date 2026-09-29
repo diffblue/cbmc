@@ -4100,6 +4100,24 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
   exprt &op = to_address_of_expr(expr).op();
 
+  // N5008 [expr.unary.op]/3 with [class.static.data]/4: the address of a
+  // constexpr variable is the address of the object, not of its value
+  // (which the resolver substitutes for a constexpr scalar)
+  if(op.is_constant() && !op.get(ID_C_constexpr_object).empty())
+  {
+    symbolt *object = symbol_table.get_writeable(op.get(ID_C_constexpr_object));
+    if(object != nullptr)
+    {
+      // [basic.def.odr]/4: taking the address odr-uses the variable, so it
+      // is an object with static storage duration, initialized with its
+      // value ([basic.start.static]/2) -- no longer a mere named constant
+      object->is_macro = false;
+      exprt symbol = cpp_symbol_expr(*object);
+      symbol.add_source_location() = op.source_location();
+      op = std::move(symbol);
+    }
+  }
+
   // Per [expr.unary.op]/3: if the operand is a reference, &E produces
   // the address of the referred object.  Implicitly dereference the
   // reference first so the subsequent lvalue check passes.
