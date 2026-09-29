@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 main.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 --property main.assertion.2 ../../../src/goto-programs/restrict_function_pointers.cpp
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
@@ -33,3 +33,6 @@ Round 163e: passes; the shared_ptr_base.h 913/423/427 drops are gone
 after the constructor-template changes of round 163d/e (no ordinary copy
 of a constructor template; __is_constructible of classes).  Fails on the
 round-163 build bin52.
+Round 163h: THOROUGH instead of CORE.  Type-checking the TU takes about
+290 s of the 350 s run (475 s with --validate-goto-model
+--validate-ssa-equation, beyond the 300 s limit of the Docker sweeps).
