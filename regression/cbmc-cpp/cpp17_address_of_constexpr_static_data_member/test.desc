@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ distinct identities: SUCCESS$
@@ -15,9 +15,11 @@ dropped the body
 N5008 [class.static.data]/4, [expr.unary.op]/3: `&unique_typeinfo<T>::id'
 is the address of the static data member (an object, even though it is
 constexpr and usable in constant expressions); each specialization's
-member is a distinct object ([basic.compound]/3).  The front end replaces
-the constexpr member by its value and reports "address_of error: '0' not
-an lvalue", dropping the function.  libc++'s std::any identifies types
-this way (`__get_fallback_typeid', any:175), dropped in cpp17_libcxx_any;
-test_libcxx.desc is that program and forbids only that drop.  g++ 13 and
-clang++ 18 accept both programs.  Pre-existing (fails on bin52).
+member is a distinct object ([basic.compound]/3). The front end replaced
+the constexpr member by its value and reported "address_of error: '0' not
+an lvalue", dropping the function. The substituted value now remembers its
+variable, and taking the address uses (and odr-uses) the object;
+test_read_through.desc reads through such a pointer. libc++'s std::any
+identifies types this way (`__get_fallback_typeid', any:175), dropped in
+cpp17_libcxx_any; test_libcxx.desc is that program and forbids only that
+drop. g++ 13 and clang++ 18 accept both programs. Fails on bin53.

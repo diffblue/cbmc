@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 libcxx.cpp
 --cpp17 --stdlib libc++ --object-bits 10
 ^\[main\.assertion\.1\] line \d+ has_value: SUCCESS$
