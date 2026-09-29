@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 type_pack.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ sizeof of each type: SUCCESS$
@@ -13,5 +13,7 @@ type_pack.cpp
 N5008 [expr.prim.fold]/2, [temp.variadic]/5: in `(0 + ... + sizeof(Ts))'
 the pack is the template's TYPE parameter pack, not a function parameter
 pack; each element is sizeof of one type.  The function-body fold
-expansion only expands function parameter packs, so the value is wrong.
-g++ 13 and clang++ 18 accept the program.  Pre-existing.
+expansion only expanded patterns naming the function parameter pack, so
+the value was wrong (3); it now also expands a type-pack pattern and
+substitutes both packs in lockstep.  g++ 13 and clang++ 18 accept the
+program.  Fails on bin53.
