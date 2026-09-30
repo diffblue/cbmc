@@ -246,6 +246,11 @@ protected:
 
   static bool alias_leaves_arguments_incomplete(const cpp_declarationt &);
 
+  exprt object_of_naming_class(
+    const exprt &object,
+    const cpp_idt &identifier,
+    const source_locationt &source_location);
+
   typet resolve_template_alias(
     const irep_idt &base_name,
     const cpp_scopest::id_sett &id_set,

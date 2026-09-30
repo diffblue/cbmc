@@ -660,18 +660,14 @@ protected:
   /// Lay out the class's virtual bases after its non-virtual part (Itanium
   /// C++ ABI 2.4 II.3); their components are marked ID_C_virtual_base with
   /// the virtual base's class identifier.
-  void append_virtual_bases(
-    struct_typet &type,
-    std::set<irep_idt> &bases,
-    std::set<irep_idt> &vbases);
+  void append_virtual_bases(struct_typet &type, std::set<irep_idt> &vbases);
 
   void add_base_components(
-        const struct_typet &from,
-        const irep_idt &access,
-        struct_typet &to,
-        std::set<irep_idt> &bases,
-        std::set<irep_idt> &vbases,
-        bool is_virtual);
+    const struct_typet &from,
+    const irep_idt &access,
+    struct_typet &to,
+    std::set<irep_idt> &vbases,
+    bool is_virtual);
 
   bool cast_away_constness(const typet &t1,
                            const typet &t2) const;
@@ -1024,6 +1020,8 @@ protected:
   /// scope that has a `this' ([expr.unary.op]/4).
   bool is_qualified_member_address(const exprt &expr);
 
+  std::optional<irep_idt> naming_class_of(const cpp_namet &name);
+
   /// Whether the (substituted) constraint \p constraint is satisfied
   /// ([temp.constr.op], [temp.constr.atomic]); empty when the front end
   /// cannot evaluate it.
@@ -1255,6 +1253,23 @@ public:
 
   bool standard_conversion_pointer(
     const exprt &expr, const typet &type, exprt &new_expr);
+
+  /// A base class subobject within a flattened class layout: the path of
+  /// base classes that leads to it (from a direct base of the derived class,
+  /// or from the virtual base containing it), its offset, and the virtual
+  /// base it lies in (empty for the non-virtual part).
+  struct base_subobjectt
+  {
+    std::vector<irep_idt> path;
+    mp_integer offset;
+    irep_idt virtual_base;
+  };
+
+  /// The subobjects of class \p base in an object of class \p derived
+  /// ([class.mi]/4), in layout order; a base class without storage (an empty
+  /// base) has none.
+  std::vector<base_subobjectt>
+  base_subobjects(const struct_typet &derived, const irep_idt &base);
 
   std::optional<mp_integer>
   base_subobject_offset(const typet &derived, const typet &base);
@@ -1525,11 +1540,15 @@ public:
   /// type \p dest_type, adjusting it by the base subobject's offset.  A base
   /// reached through a VIRTUAL base is located through the vtable at run
   /// time unless \p static_virtual_base_offset asks for this class's own
-  /// layout (the complete object's constructor/destructor).
+  /// layout (the complete object's constructor/destructor).  With
+  /// \p direct_base, \p dest_type's class is a direct (or virtual) base of
+  /// \p expr's class, and a base class that also occurs as an indirect base
+  /// ([class.mi]/3) designates the direct base subobject.
   void make_ptr_typecast(
     exprt &expr,
     const pointer_typet &dest_type,
-    bool static_virtual_base_offset = false);
+    bool static_virtual_base_offset = false,
+    bool direct_base = false);
 
   // the C++ typecasts
 

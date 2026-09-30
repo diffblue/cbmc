@@ -85,7 +85,6 @@ void cpp_typecheckt::drop_empty_pack_template_args(irept &name)
 
 void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 {
-  std::set<irep_idt> bases;
   std::set<irep_idt> vbases;
 
   irep_idt default_class_access = type.default_access();
@@ -301,6 +300,20 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       continue;
     }
 
+    // N5008 [class.mi]/3: "A class shall not be specified as a direct base
+    // class of a derived class more than once" (it can be an indirect base
+    // more than once, and a direct and an indirect base)
+    for(const auto &resolved : resolved_bases)
+    {
+      if(resolved.symbol->name == base_symbol.name)
+      {
+        error().source_location = name.source_location();
+        error() << "duplicate direct base class '" << base_symbol.pretty_name
+                << "'" << eom;
+        throw 0;
+      }
+    }
+
     bool virtual_base = base.get_bool(ID_virtual);
     irep_idt class_access = base.get(ID_protection);
 
@@ -366,7 +379,7 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       // may start in it (dsize(B) < sizeof(B)).  A POD base keeps sizeof(B).
       const std::size_t first_new = to_struct_type(type).components().size();
       add_base_components(
-        base_struct_type, class_access, type, bases, vbases, virtual_base);
+        base_struct_type, class_access, type, vbases, virtual_base);
       auto &components = to_struct_type(type).components();
       // the marker goes on the first component that occupies storage (the
       // layout ignores member functions, static members and member types)
@@ -438,12 +451,11 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
   // overriders of their virtual functions see them while the class's own
   // members are processed; typecheck_compound_body moves them behind the
   // own members afterwards, where the layout places them.
-  append_virtual_bases(type, bases, vbases);
+  append_virtual_bases(type, vbases);
 }
 
 void cpp_typecheckt::append_virtual_bases(
   struct_typet &type,
-  std::set<irep_idt> &bases,
   std::set<irep_idt> &vbases)
 {
   // Itanium C++ ABI 2.4 II.3: after the non-virtual part (bases and own
@@ -484,13 +496,11 @@ void cpp_typecheckt::append_virtual_bases(
       access_it != direct_access.end() ? access_it->second : ID_public;
 
     // add_base_components copies the non-virtual part of the base (it does
-    // not descend into virtual bases and skips their components).  The
-    // duplicate tracking is shared with the non-virtual part: a class
-    // occurring twice as a non-virtual base (also through two distinct
-    // virtual bases) would give two components of the same name, which the
-    // flattened layout cannot represent -- rejected as before.
+    // not descend into virtual bases and skips their components); a class
+    // that is a non-virtual base of it and of another base is a separate
+    // subobject in each ([class.mi]/4)
     const std::size_t first_new = components.size();
-    add_base_components(vbase_struct, access, type, bases, vbases, true);
+    add_base_components(vbase_struct, access, type, vbases, true);
 
     for(std::size_t i = first_new; i < components.size(); ++i)
       components[i].set(ID_C_virtual_base, vbase_id);
@@ -534,98 +544,21 @@ void cpp_typecheckt::add_base_components(
   const struct_typet &from,
   const irep_idt &access,
   struct_typet &to,
-  std::set<irep_idt> &bases,
   std::set<irep_idt> &vbases,
   bool is_virtual)
 {
   const irep_idt &from_name = from.get(ID_name);
 
-  if(is_virtual && vbases.find(from_name)!=vbases.end())
+  // N5008 [class.mi]/4: a virtual base class is ONE subobject of the most
+  // derived object, however often it is named
+  if(is_virtual && vbases.find(from_name) != vbases.end())
     return;
 
-  if(bases.find(from_name)!=bases.end())
-  {
-    error().source_location=to.source_location();
-    error() << "non-virtual base class " << from_name
-            << " inherited multiple times" << eom;
-    throw 0;
-  }
-
-  bases.insert(from_name);
-
+  // ... whereas each distinct occurrence of a non-virtual base class in the
+  // class lattice is a distinct subobject ([class.mi]/4-5): `struct D : B,
+  // C' with `B : A' and `C : A' has two A subobjects, one in B and one in C.
   if(is_virtual)
     vbases.insert(from_name);
-
-  // where this base subobject starts in `to' (see the copy loop below)
-  const std::size_t first_of_from = to.components().size();
-
-  // look at the the parents of the base type
-  for(const auto &b : from.bases())
-  {
-    // Skip bases with invalid types from failed template instantiations.
-    if(static_cast<const exprt &>(b).type().id() != ID_struct_tag)
-      continue;
-
-    irep_idt sub_access = b.get(ID_access);
-
-    if(access==ID_private)
-      sub_access=ID_private;
-    else if(access==ID_protected && sub_access!=ID_private)
-      sub_access=ID_protected;
-
-    const symbolt &symb = lookup(b.type());
-
-    if(symb.type.id() != ID_struct)
-      continue;
-
-    const bool is_virtual_base = b.get_bool(ID_virtual);
-
-    // a virtual base is part of the most derived object, not of this
-    // subobject's non-virtual part (Itanium C++ ABI 2.4 II.3); it is laid
-    // out by append_virtual_bases
-    if(is_virtual_base)
-      continue;
-
-    // recursive call
-    const std::size_t before = to.components().size();
-    add_base_components(
-      to_struct_type(symb.type),
-      sub_access,
-      to,
-      bases,
-      vbases,
-      is_virtual_base);
-
-    // As for a direct base (typecheck_compound_bases): an indirect base that
-    // is not a POD for the purpose of layout does not keep its tail padding
-    // -- `from' laid its own members and further bases out in it (Itanium
-    // C++ ABI 2.4: dsize(B) < sizeof(B)), and `from's copy of that padding
-    // has already been dropped.  Keeping it here shifted every later
-    // component of `from' (`U : T', `T : P, Q': P's tail padding survived in
-    // U next to T's own alignment padding, putting Q's virtual pointer on a
-    // misaligned offset and every later member 4 bytes off).
-    if(!cpp_is_pod(symb.type))
-    {
-      auto &dest = to.components();
-      while(dest.size() > before && dest.back().get_is_padding() &&
-            dest.back().type().id() != ID_c_bit_field)
-      {
-        dest.pop_back();
-      }
-    }
-  }
-
-  // add the components
-  struct_typet::componentst &dest_c=to.components();
-  // The recursion above appended the components of `from's own bases; the
-  // components `from' adds itself are inserted at their position within
-  // `from's layout (`from' has been laid out: its padding sits between and
-  // after its base subobjects, e.g. after an empty-typed member of its first
-  // base and before its second base -- appending it at the end put the
-  // padding after the second base's pointer, so a byte-offset access hit
-  // the wrong bytes).  `cursor' walks `from.components()' and `dest_c' in
-  // step.
-  std::size_t cursor = first_of_from;
 
   // Access of a base member, as inherited through an edge with the
   // given protection ([class.access.base]/1), preserving inaccessible
@@ -660,58 +593,31 @@ void cpp_typecheckt::add_base_components(
     }
   }
 
+  // component names must be unique within a struct type
+  std::set<irep_idt> names;
+  for(const auto &c : to.components())
+    names.insert(c.get_name());
+
+  // The base subobject is `from's non-virtual part as `from' laid it out
+  // (Itanium C++ ABI 2.4): its own members and, flattened already, its
+  // non-virtual bases, with its padding between them.  Copy it, recording
+  // for each component the path of base classes through which it is
+  // reached from `to' (subobject_path: the subobject it belongs to).
+  struct_typet::componentst &dest_c = to.components();
   for(const auto &c : from.components())
   {
     if(base_is_empty && c.get_is_padding())
       continue;
 
     // `from's own virtual bases (and the padding in front of them) are not
-    // in its non-virtual part
+    // in its non-virtual part; they are laid out once, by the most derived
+    // class (append_virtual_bases)
     if(!c.get(ID_C_virtual_base).empty())
       continue;
 
-    const irep_idt new_access = inherited_access(access, c.get_access());
-
-    if(c.get_bool(ID_from_base))
-    {
-      // The member is already flattened into `to` from its declaring
-      // class via the recursion above.  Propagate its access as seen in
-      // the immediate base `from` instead of keeping the declaring
-      // class's access: an intermediate base may have changed it with a
-      // using-declaration ([namespace.udecl]/19), e.g. binary_exprt's
-      // public `using exprt::op0;` republishing the protected op0.
-      for(std::size_t i = 0; i < dest_c.size(); ++i)
-      {
-        auto &d = dest_c[i];
-        if(d.get_bool(ID_from_base) && d.get_name() == c.get_name())
-        {
-          d.set_access(new_access);
-          // `from' marked the first component of each of its direct base
-          // subobjects with the base's alignment (typecheck_compound_bases);
-          // the recursion above copied the component from the base's own
-          // type, which carries no such mark: propagate it, or the subobject
-          // is not aligned in `to'.
-          if(
-            c.find(ID_C_base_alignment).is_not_nil() &&
-            d.find(ID_C_base_alignment).is_nil())
-          {
-            d.set(ID_C_base_alignment, c.get(ID_C_base_alignment));
-          }
-          if(i >= first_of_from)
-            cursor = i + 1;
-        }
-      }
-      continue;
-    }
-
-    // copy the component, at its position within `from's layout
-    auto inserted = dest_c.insert(dest_c.begin() + cursor, c);
-    ++cursor;
-
-    // now twiddle the copy
-    struct_typet::componentt &component = *inserted;
+    struct_typet::componentt component = c;
     component.set(ID_from_base, true);
-    component.set_access(new_access);
+    component.set_access(inherited_access(access, c.get_access()));
 
     // a member of a PACKED base keeps the base's packed layout in the
     // derived class (padding.cpp reads the mark; `struct P { char c; long
@@ -719,17 +625,48 @@ void cpp_typecheckt::add_base_components(
     if(from.get_bool(ID_C_packed))
       component.set(ID_C_packed, true);
 
+    irept::subt path;
+    path.push_back(irept{from_name});
+    for(const auto &step : c.find(ID_C_subobject_path).get_sub())
+      path.push_back(step);
+    component.add(ID_C_subobject_path).get_sub() = std::move(path);
+
     // A padding component of the base's layout is named by its index in
     // the base (`$pad2'); two bases contribute clashing names, and the
-    // derived class's own padding may want the same index.  Component
-    // names must be unique within a struct type.
+    // derived class's own padding may want the same index.
     if(component.get_is_padding())
     {
       component.set_name(
-        id2string(component.get_name()) + "$b" +
-        std::to_string(dest_c.size() - 1));
+        id2string(component.get_name()) + "$b" + std::to_string(dest_c.size()));
     }
-
-    // put into scope
+    // A member function, static data member or member type names one
+    // entity however many subobjects of its class there are ([class.static],
+    // [class.member.lookup]/5.3: the same declaration set); an entry already
+    // present is that entity (reached through another base, or an
+    // inherited constructor), and it is not duplicated.
+    else if(
+      names.count(component.get_name()) != 0 &&
+      (component.type().id() == ID_code || component.get_bool(ID_is_static) ||
+       component.get_bool(ID_is_type)))
+    {
+      continue;
+    }
+    // A non-static data member of a base class that occurs more than once
+    // in the lattice (the second A in `D : B, C') is storage of a distinct
+    // subobject: it keeps its declared name for lookup (#base_name), and
+    // its component name is made unique from the subobject path.  The first
+    // occurrence keeps its name.
+    else if(names.count(component.get_name()) != 0)
+    {
+      std::string unique = id2string(component.get_name()) + "@";
+      for(const auto &step : component.find(ID_C_subobject_path).get_sub())
+        unique += "/" + id2string(step.id());
+      std::string candidate = unique;
+      for(std::size_t n = 1; names.count(candidate) != 0; ++n)
+        candidate = unique + "#" + std::to_string(n);
+      component.set_name(candidate);
+    }
+    names.insert(component.get_name());
+    dest_c.push_back(std::move(component));
   }
 }

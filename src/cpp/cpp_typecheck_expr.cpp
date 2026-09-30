@@ -4868,6 +4868,43 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
     if(is_reference(op.type()))
       add_implicit_dereference(op);
 
+    // A cast the front end generates to a DIRECT base class of the operand's
+    // class (the implicit copy/move constructors and assignment operators,
+    // [class.copy.ctor]/14, [class.copy.assign]/12; base initializers,
+    // [class.base.init]/2): it designates the direct base subobject, also
+    // when the class occurs as an indirect base as well ([class.mi]/3).
+    if(
+      expr.get_bool(ID_C_direct_base_cast) && expr.type().id() == ID_pointer &&
+      (op.type().id() == ID_pointer || op.type().id() == ID_struct_tag))
+    {
+      const bool to_reference =
+        is_reference(expr.type()) || is_rvalue_reference(expr.type());
+      exprt address = op;
+      if(to_reference && op.id() == ID_dereference)
+        address = to_dereference_expr(op).pointer();
+      else if(to_reference)
+        address = address_of_exprt{op};
+      const typet &from_class = address.type().id() == ID_pointer
+                                  ? to_pointer_type(address.type()).base_type()
+                                  : address.type();
+      const typet &to_class = to_pointer_type(expr.type()).base_type();
+      if(
+        address.type().id() == ID_pointer && from_class.id() == ID_struct_tag &&
+        to_class.id() == ID_struct_tag &&
+        to_struct_tag_type(from_class).get_identifier() !=
+          to_struct_tag_type(to_class).get_identifier())
+      {
+        make_ptr_typecast(
+          address,
+          to_pointer_type(expr.type()),
+          /*static_virtual_base_offset=*/false,
+          /*direct_base=*/true);
+        expr.swap(address);
+        add_implicit_dereference(expr);
+        return;
+      }
+    }
+
     exprt new_expr;
 
     if(
@@ -5725,6 +5762,36 @@ void cpp_typecheckt::typecheck_expr_typecast(exprt &)
 #endif
 }
 
+/// The class denoted by the nested-name-specifier of the qualified name
+/// \p name (`N' in `N::m'), if it names a class.
+std::optional<irep_idt> cpp_typecheckt::naming_class_of(const cpp_namet &name)
+{
+  cpp_namet qualifier;
+  const auto &subs = name.get_sub();
+  std::size_t last = subs.size();
+  while(last > 0 && subs[last - 1].id() != ID_scope_resolution)
+    --last;
+  if(last <= 1)
+    return {}; // `::m' or unqualified
+  for(std::size_t i = 0; i + 1 < last; ++i)
+    qualifier.get_sub().push_back(subs[i]);
+  qualifier.set(ID_C_source_location, name.source_location());
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    const exprt resolved = resolve(
+      qualifier, cpp_typecheck_resolvet::wantt::TYPE, cpp_typecheck_fargst{});
+    if(resolved.id() == ID_type && resolved.type().id() == ID_struct_tag)
+    {
+      return to_struct_tag_type(resolved.type()).get_identifier();
+    }
+  }
+  catch(...)
+  {
+  }
+  return {};
+}
+
 void cpp_typecheckt::typecheck_expr_member(
   exprt &expr,
   const cpp_typecheck_fargst &fargs)
@@ -5838,6 +5905,39 @@ void cpp_typecheckt::typecheck_expr_member(
       error() << "member operator on unnamed/incomplete struct "
               << "(typically from a failed template instantiation)" << eom;
       throw 0;
+    }
+
+    // N5008 [class.access.base]/5-6: in `E1.N::m' the naming class is N, and
+    // E1 must be implicitly convertible to (a pointer to) N; the member is
+    // that of E1's N subobject.  It matters when a base class occurs more
+    // than once in the lattice ([class.mi]/5: `d.B::i' and `d.C::i' are the
+    // i of different A subobjects).  Convert E1 first, so that lookup and
+    // the implicit object argument of a member function refer to it.
+    if(
+      component_cpp_name.is_qualified() && op0.type().id() == ID_struct_tag &&
+      type.id() == ID_struct)
+    {
+      const auto naming_class = naming_class_of(component_cpp_name);
+      if(
+        naming_class.has_value() && *naming_class != struct_identifier &&
+        subtype_typecast(
+          to_struct_type(type), follow_tag(struct_tag_typet{*naming_class})))
+      {
+        exprt address = op0.id() == ID_dereference
+                          ? to_dereference_expr(op0).pointer()
+                          : exprt{address_of_exprt{op0}};
+        pointer_typet naming_pointer =
+          pointer_type(struct_tag_typet{*naming_class});
+        if(op0.type().get_bool(ID_C_constant))
+          naming_pointer.base_type().set(ID_C_constant, true);
+        make_ptr_typecast(address, naming_pointer);
+        dereference_exprt subobject{address, naming_pointer.base_type()};
+        subobject.set(ID_C_lvalue, op0.get_bool(ID_C_lvalue));
+        subobject.add_source_location() = op0.source_location();
+        op0 = std::move(subobject);
+        typecheck_expr_member(expr, fargs);
+        return;
+      }
     }
 
     // go to the scope of the struct/union
