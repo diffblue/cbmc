@@ -4223,7 +4223,10 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   // set up virtual tables before doing the constructors
   if(symbol.type.id() == ID_struct)
+  {
     do_virtual_table(symbol);
+    do_repeated_subobject_virtual_tables(symbol);
+  }
 
   // [class.default.ctor]/1: an implicit default constructor exists when the
   // class has no user-declared constructor.  In addition, a base default
@@ -4679,6 +4682,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   if(symbol.type.id() == ID_struct)
   {
     finalize_virtual_thunks(symbol);
+    do_repeated_subobject_virtual_tables(symbol);
     set_virtual_base_offsets(symbol);
   }
 

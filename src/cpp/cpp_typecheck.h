@@ -718,6 +718,26 @@ protected:
     const irep_idt &base_class,
     const struct_typet &derived);
 
+  /// The body of the thunk \p thunk: subtract \p base_off (the offset of
+  /// the base subobject the thunk is called on) from `this' and call
+  /// \p target directly.
+  void build_this_adjusting_thunk_body(
+    symbolt &thunk,
+    const irep_idt &target,
+    const typet &target_type,
+    const std::optional<mp_integer> &base_off);
+
+  /// N5008 [class.mi]/4, [class.virtual]/2: a virtual table object for each
+  /// base class subobject occurring more than once in the lattice (see
+  /// add_base_components), with the final overriders of that subobject.
+  void do_repeated_subobject_virtual_tables(const symbolt &symbol);
+
+  /// The name of the virtual table object of \p most_derived for the
+  /// repeated base class subobject whose virtual pointer is \p vtptr.
+  static irep_idt repeated_subobject_vtable_name(
+    const irep_idt &most_derived,
+    const struct_typet::componentt &vtptr);
+
   /// Itanium C++ ABI 2.4: the primary base class of a dynamic class is its
   /// first non-virtual dynamic base class in declaration order; the class
   /// shares the primary base's virtual pointer (and vtable) instead of adding
