@@ -12629,3 +12629,44 @@ clang rejects libstdc++ 13's seed).
 
 Suites at ad37dd4104: cbmc-cpp green (25 skipped), cpp green, lint 0.
 KNOWNBUG descs: 28 directories.
+
+## Round 163j (step 4, structural)
+
+Commits (local, unpushed):
+- c1f207984c S: alias-template arguments are not elaborated on naming when the
+  alias denotes a pointer/reference to a parameter or forwards to a qualified
+  member template-id (libc++ __rebind_pointer_t).  Skipping for every alias
+  broke tuple_size (alias denoting its parameter) and std::function
+  (cpp11_function_basic + 2).  std::list libc++ desc now CORE.
+- 0385115fba P: member-template instantiation prefers the out-of-line
+  definition with the most template parameters; class-instance member
+  completion tries ordinary-member definitions first (goto retry, keeps the
+  diff unindented) and compares with the class template's PARAMETER count;
+  partial-specialization member definitions get their mem-initializers.
+  libc++ function tests still drop function.h:394/350/272 (other causes).
+- de7d94fa12 R: call arguments `declval<Args>()...' over a type pack are
+  expanded outside function bodies (expand_type_pack_arguments).  A name is
+  substituted only where a type is held (first version replaced operands and
+  broke cpp17_pack_cast_fn_type_spec / function_handler_dispatch).  Open: an
+  empty trailing pack against such a pattern.
+- c869ef765d KNOWNBUG cpp20_auto_member_of_base_instantiated_before_derived_is_
+  complete: what the compound-requirement fast path hid (cvise nf_mb, 39
+  lines).  view_interface<ref_view<int>>::front() (auto, unused) is
+  instantiated while ref_view's base is instantiated; __member_begin<ref_view&>
+  is evaluated false against the memberless ref_view and cached.  Tried: not
+  caching concept values whose argument is in elaborations_in_progress --
+  "already in scope" and an ambiguous `begin'; reverted.  Fast-path removal
+  (/tmp/r163/kb/no_fast_path.patch) waits for this.
+- 8c8244953f `{}' viable for std::chrono / std::ratio / std::__detail classes
+  (removed a name-based guard in brace_init_is_viable).  kb_U5c reduction;
+  future KNOWNBUG promoted.
+
+Reductions: kb_U5/U6/U8 had chased SFINAE-suppressed messages (binDBG with
+NOSUPPRESS) and old seeds that no longer reproduced.  Restarted as kb_U5c
+(done), kb_U6c, kb_U8c from fresh preprocessed seeds without line markers,
+with a copy of the HEAD binary and the real drop as signature.
+
+Not started: repeated non-virtual bases (add_base_components rejects the
+second A; needs per-path base subobjects in the layout).
+
+Suites at 8c8244953f: cbmc-cpp green (20 skipped), cpp green, lint 0.
