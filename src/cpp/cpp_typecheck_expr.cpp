@@ -7728,6 +7728,14 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     {
       symbolt *callee_symbol = symbol_table.get_writeable(
         to_symbol_expr(expr.function()).get_identifier());
+      // a deferred member (see add_method_body) converts under its own map
+      if(
+        callee_symbol != nullptr &&
+        deferred_method_bodies.count(callee_symbol->name) != 0 &&
+        convert_deferred_method_now(callee_symbol->name))
+      {
+        expr.function().type() = callee_symbol->type;
+      }
       if(
         callee_symbol != nullptr && callee_symbol->value.is_not_nil() &&
         callee_symbol->value.id() != ID_cpp_not_typechecked &&
@@ -8774,6 +8782,18 @@ void cpp_typecheckt::typecheck_method_application(
   }
   else
     add_method_body(&method_symbol);
+
+  // N5008 [dcl.spec.auto.general]/15: a member of a class template
+  // specialization with a deduced return type is instantiated when used;
+  // this call needs its type.  Its body waits in the deferred queue with
+  // its template map.
+  if(
+    method_symbol.type.id() == ID_code &&
+    has_auto(to_code_type(method_symbol.type).return_type()) &&
+    deferred_method_bodies.count(method_symbol.name) != 0)
+  {
+    convert_deferred_method_now(method_symbol.name);
+  }
 
   // If the method has an auto return type, force immediate type-checking
   // of the body so the return type is deduced before the call site uses it.
