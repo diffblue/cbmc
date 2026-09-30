@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 libcxx.cpp
 --cpp11 --stdlib libc++ --object-bits 12 --unwind 3 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ one element: SUCCESS$

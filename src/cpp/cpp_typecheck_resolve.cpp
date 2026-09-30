@@ -5278,6 +5278,80 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 #endif
 } // NOLINT(readability/fn_size)
 
+/// Whether naming the alias template \p alias leaves the completeness of its
+/// arguments to the aliased type ([temp.inst]/2): the alias denotes a pointer
+/// or reference to one of its parameters (`template <class U> using rebind =
+/// U *;', pointer_traits<T *>::rebind), or forwards to a member template-id
+/// of another class (`typename pointer_traits<From>::template rebind<To>',
+/// libc++'s __rebind_pointer_t), whose own alias then decides.
+bool cpp_typecheck_resolvet::alias_leaves_arguments_incomplete(
+  const cpp_declarationt &alias)
+{
+  // `using A = X;' is parsed as `typedef X A;': the declaration type is
+  // merged_type(..., X, typedef) and the declarator carries no type
+  if(
+    alias.declarators().size() != 1 ||
+    alias.declarators().front().type().is_not_nil() ||
+    alias.type().id() != ID_merged_type)
+  {
+    return false;
+  }
+  const typet *aliased = nullptr;
+  for(const auto &sub : to_merged_type(alias.type()).subtypes())
+  {
+    if(sub.id() == ID_typedef || sub.id() == ID_typename)
+      continue;
+    if(aliased != nullptr)
+      return false;
+    aliased = &sub;
+  }
+  if(aliased == nullptr)
+    return false;
+
+  if(aliased->id() == ID_frontend_pointer)
+  {
+    // a pointer (or reference) to a bare name that is one of the parameters
+    if(aliased->get_sub().size() != 1)
+      return false;
+    const irept &base = aliased->get_sub().front();
+    if(
+      base.id() != ID_cpp_name || base.get_sub().size() != 1 ||
+      base.get_sub().front().id() != ID_name)
+    {
+      return false;
+    }
+    const irep_idt &name = base.get_sub().front().get(ID_identifier);
+    for(const auto &parameter : alias.template_type().template_parameters())
+    {
+      const irep_idt &identifier = parameter.id() == ID_type
+                                     ? parameter.type().get(ID_identifier)
+                                     : parameter.get(ID_identifier);
+      const std::string id = id2string(identifier);
+      const auto separator = id.rfind("::");
+      if(
+        (separator == std::string::npos ? id : id.substr(separator + 2)) ==
+        id2string(name))
+      {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // a qualified name ending in a template-id: `X::template rebind<To>'
+  if(aliased->id() != ID_cpp_name)
+    return false;
+  const auto &subs = aliased->get_sub();
+  if(subs.empty() || subs.back().id() != ID_template_args)
+    return false;
+  for(const auto &sub : subs)
+  {
+    if(sub.id() == "::")
+      return true;
+  }
+  return false;
+}
+
 typet cpp_typecheck_resolvet::resolve_template_alias(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
@@ -5489,11 +5563,34 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
   {
     cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
     cpp_typecheck.cpp_scopes.go_to(*original_scope);
-    cpp_template_args_tct explicit_tc = cpp_typecheck.typecheck_template_args(
-      source_location,
-      *template_sym,
-      full_template_args,
-      /*explicit_only=*/true);
+    // N5008 [temp.inst]/2, [temp.alias]/2: naming a specialization in an
+    // alias template's argument list does not by itself require it to be
+    // complete -- `rebind<node<void>>' is `node<void> *', and node<void> may
+    // be the class whose instantiation is in progress (libc++'s list node
+    // rebinding to itself through pointer_traits).  Instantiating it here
+    // saw an incomplete base.  Only for the alias shapes that certainly
+    // leave the completeness to the aliased type; the contexts that need a
+    // complete type elaborate on their own.
+    const bool skip_argument_elaboration =
+      alias_leaves_arguments_incomplete(to_cpp_declaration(template_sym->type));
+    const bool old_skip = cpp_typecheck.skip_typechecking_elaborate;
+    if(skip_argument_elaboration)
+      cpp_typecheck.skip_typechecking_elaborate = true;
+    cpp_template_args_tct explicit_tc;
+    try
+    {
+      explicit_tc = cpp_typecheck.typecheck_template_args(
+        source_location,
+        *template_sym,
+        full_template_args,
+        /*explicit_only=*/true);
+    }
+    catch(...)
+    {
+      cpp_typecheck.skip_typechecking_elaborate = old_skip;
+      throw;
+    }
+    cpp_typecheck.skip_typechecking_elaborate = old_skip;
     static_cast<irept &>(explicit_args_tc) = static_cast<irept &>(explicit_tc);
     // keep the type-checked types from being re-resolved in the second pass
     // (a template template argument is already the resolved template's
