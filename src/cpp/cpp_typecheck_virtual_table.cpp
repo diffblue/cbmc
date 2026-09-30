@@ -20,7 +20,19 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 #include <functional>
+#include <map>
 #include <set>
+
+/// Whether \p vtptr is the virtual pointer of a base class subobject, in the
+/// non-virtual part, of a class occurring more than once in the lattice:
+/// add_base_components renames every such occurrence but the first
+/// (`name@/<path>').
+static bool
+is_repeated_subobject_vtable_pointer(const struct_typet::componentt &vtptr)
+{
+  return vtptr.get(ID_C_virtual_base).empty() &&
+         id2string(vtptr.get_name()).find("@/") != std::string::npos;
+}
 
 void cpp_typecheckt::build_virtual_thunk_body(
   symbolt &thunk,
@@ -28,6 +40,26 @@ void cpp_typecheckt::build_virtual_thunk_body(
   const typet &target_type,
   const irep_idt &base_class,
   const struct_typet &derived)
+{
+  // A base subobject that shares the derived class's virtual pointer (the
+  // primary-base chain, Itanium C++ ABI 2.4 II.1) is at offset 0 and needs
+  // no adjustment; any other dynamic base subobject starts at the offset of
+  // its own virtual pointer in the derived class's layout.
+  const irep_idt base_vtptr = vtable_pointer_component(base_class);
+  const bool is_primary_base =
+    !base_vtptr.empty() &&
+    base_vtptr == vtable_pointer_component(derived.get(ID_name));
+  std::optional<mp_integer> base_off;
+  if(!is_primary_base && !base_vtptr.empty())
+    base_off = member_offset(derived, base_vtptr, *this);
+  build_this_adjusting_thunk_body(thunk, target, target_type, base_off);
+}
+
+void cpp_typecheckt::build_this_adjusting_thunk_body(
+  symbolt &thunk,
+  const irep_idt &target,
+  const typet &target_type,
+  const std::optional<mp_integer> &base_off)
 {
   const code_typet &code_type = to_code_type(thunk.type);
   const code_typet::parameterst &args = code_type.parameters();
@@ -37,19 +69,7 @@ void cpp_typecheckt::build_virtual_thunk_body(
   const typet &this_target_type =
     to_code_type(target_type).parameters()[0].type();
 
-  // A base subobject that shares the derived class's virtual pointer (the
-  // primary-base chain, Itanium C++ ABI 2.4 II.1) is at offset 0 and needs
-  // no adjustment; any other dynamic base subobject starts at the offset of
-  // its own virtual pointer in the derived class's layout.
-  const irep_idt base_vtptr = vtable_pointer_component(base_class);
-  const bool is_primary_base =
-    !base_vtptr.empty() &&
-    base_vtptr == vtable_pointer_component(derived.get(ID_name));
-
   exprt late_cast;
-  std::optional<mp_integer> base_off;
-  if(!is_primary_base && !base_vtptr.empty())
-    base_off = member_offset(derived, base_vtptr, *this);
   if(base_off.has_value() && *base_off > 0)
   {
     auto char_ptr =
@@ -253,6 +273,26 @@ void cpp_typecheckt::do_virtual_table(const symbolt &symbol)
 
       const irep_idt &class_id =
         parameter_pointer_type.base_type().get(ID_identifier);
+
+      // N5008 [class.mi]/4, [class.virtual]/2: when class_id occurs as more
+      // than one base class subobject, the class's table for it serves its
+      // FIRST occurrence (whose virtual pointer keeps its name, see
+      // add_base_components); an overrider inherited through another path
+      // belongs to another subobject (do_repeated_subobject_virtual_tables)
+      if(pass == 0)
+      {
+        const auto &path = compo.find(ID_C_subobject_path).get_sub();
+        if(!path.empty())
+        {
+          const auto subobjects = base_subobjects(struct_type, class_id);
+          if(
+            subobjects.size() > 1 && !subobjects.front().path.empty() &&
+            path.front().id() != subobjects.front().path.front())
+          {
+            continue;
+          }
+        }
+      }
 
       std::map<irep_idt, exprt> &value_map = vt_value_maps[class_id];
 
@@ -574,6 +614,45 @@ exprt cpp_typecheckt::vtable_pointer_value(
     return nil_exprt{};
   const irep_idt target_vt = to_struct_tag_type(vt_tag).get_identifier();
 
+  // N5008 [class.mi]/4, [class.virtual]/2: the virtual pointer of a base
+  // class subobject that occurs more than once in the lattice (a renamed
+  // component, see add_base_components) points to the table of the final
+  // overriders in THAT subobject.  When the most derived class declares no
+  // overrider of them, those are the final overriders the direct base on the
+  // subobject's path has for it: use the table that base's own complete
+  // object installs.
+  const auto &path = vtptr.find(ID_C_subobject_path).get_sub();
+  const irep_idt shared_name = vtable_pointer_component(most_derived.name);
+  if(
+    !path.empty() && vtptr.get_name() != shared_name &&
+    is_repeated_subobject_vtable_pointer(vtptr))
+  {
+    // the most derived class's own table for the subobject, when it declares
+    // overriders (do_repeated_subobject_virtual_tables)
+    const symbolt *own = symbol_table.lookup(
+      repeated_subobject_vtable_name(most_derived.name, vtptr));
+    if(own != nullptr)
+      return address_of_exprt(
+        own->symbol_expr(), to_pointer_type(vtptr.type()));
+    const symbolt *direct_base = symbol_table.lookup(path.front().id());
+    if(direct_base == nullptr || direct_base->type.id() != ID_struct)
+      return nil_exprt{};
+    for(const auto &c : to_struct_type(direct_base->type).components())
+    {
+      if(!c.get_bool(ID_is_vtptr))
+        continue;
+      const auto &base_path = c.find(ID_C_subobject_path).get_sub();
+      if(
+        base_path.size() + 1 != path.size() ||
+        !std::equal(base_path.begin(), base_path.end(), path.begin() + 1))
+      {
+        continue;
+      }
+      return vtable_pointer_value(*direct_base, c);
+    }
+    return nil_exprt{};
+  }
+
   // every class of the hierarchy: the class itself and its (transitive) bases
   std::vector<irep_idt> classes;
   std::set<irep_idt> seen;
@@ -630,4 +709,183 @@ exprt cpp_typecheckt::vtable_pointer_value(
   }
 
   return address_of_exprt(value, to_pointer_type(vtptr.type()));
+}
+
+irep_idt cpp_typecheckt::repeated_subobject_vtable_name(
+  const irep_idt &most_derived,
+  const struct_typet::componentt &vtptr)
+{
+  const typet &vt_tag = to_pointer_type(vtptr.type()).base_type();
+  std::string name = id2string(to_struct_tag_type(vt_tag).get_identifier()) +
+                     "@" + id2string(most_derived) + "@";
+  for(const auto &step : vtptr.find(ID_C_subobject_path).get_sub())
+    name += "/" + id2string(step.id());
+  return name;
+}
+
+void cpp_typecheckt::do_repeated_subobject_virtual_tables(const symbolt &symbol)
+{
+  PRECONDITION(symbol.type.id() == ID_struct);
+  const struct_typet &struct_type = to_struct_type(symbol.type);
+  const namespacet ns(symbol_table);
+
+  // the class's own overriders, by virtual name ([class.virtual]/2: a
+  // virtual member function declared in the most derived class is the final
+  // overrider in every base class subobject whose function it overrides)
+  std::map<irep_idt, const struct_typet::componentt *> overriders;
+  for(const auto &c : struct_type.components())
+  {
+    if(
+      c.type().id() == ID_code && !c.get_bool(ID_from_base) &&
+      c.get_bool(ID_is_virtual) && c.type().get("#thunk_target").empty())
+    {
+      overriders[c.get(ID_virtual_name)] = &c;
+    }
+  }
+  if(overriders.empty())
+    return;
+
+  for(const auto &vtptr : struct_type.components())
+  {
+    // a renamed virtual pointer: one of a base class occurring more than
+    // once (add_base_components), in the non-virtual part
+    if(
+      !vtptr.get_bool(ID_is_vtptr) ||
+      !is_repeated_subobject_vtable_pointer(vtptr))
+    {
+      continue;
+    }
+    const irep_idt vt_name = repeated_subobject_vtable_name(symbol.name, vtptr);
+    const auto subobject_offset =
+      member_offset(struct_type, vtptr.get_name(), ns);
+    if(symbol_table.has_symbol(vt_name))
+    {
+      // created before the layout was final: the thunks' `this'
+      // adjustments are rebuilt with the final subobject offset
+      for(const auto &overrider : overriders)
+      {
+        symbolt *thunk = symbol_table.get_writeable(
+          id2string(vt_name) +
+          "::" + id2string(overrider.second->get_base_name()));
+        if(thunk != nullptr)
+        {
+          build_this_adjusting_thunk_body(
+            *thunk,
+            overrider.second->get_name(),
+            lookup(overrider.second->get_name()).type,
+            subobject_offset);
+        }
+      }
+      continue;
+    }
+
+    // start from the table the direct base on the path installs
+    const auto &path = vtptr.find(ID_C_subobject_path).get_sub();
+    const symbolt *direct_base = symbol_table.lookup(path.front().id());
+    if(direct_base == nullptr || direct_base->type.id() != ID_struct)
+      continue;
+    exprt base_address = nil_exprt{};
+    for(const auto &c : to_struct_type(direct_base->type).components())
+    {
+      const auto &base_path = c.find(ID_C_subobject_path).get_sub();
+      if(
+        c.get_bool(ID_is_vtptr) && base_path.size() + 1 == path.size() &&
+        std::equal(base_path.begin(), base_path.end(), path.begin() + 1))
+      {
+        base_address = vtable_pointer_value(*direct_base, c);
+        break;
+      }
+    }
+    if(base_address.id() != ID_address_of)
+      continue;
+    // the value of that (possibly embedded) table
+    std::vector<irep_idt> members;
+    exprt object = to_address_of_expr(base_address).object();
+    while(object.id() == ID_member)
+    {
+      members.push_back(to_member_expr(object).get_component_name());
+      object = to_member_expr(object).compound();
+    }
+    if(object.id() != ID_symbol)
+      continue;
+    const symbolt *base_table =
+      symbol_table.lookup(to_symbol_expr(object).get_identifier());
+    if(base_table == nullptr || base_table->value.id() != ID_struct)
+      continue;
+    exprt value = base_table->value;
+    for(auto it = members.rbegin(); it != members.rend(); ++it)
+    {
+      const struct_typet &t = ns.follow_tag(to_struct_tag_type(value.type()));
+      const auto index = t.component_number(*it);
+      exprt next = value.operands()[index];
+      value = std::move(next);
+    }
+
+    // replace the slots the class overrides by thunks that adjust `this'
+    // from this subobject to the class
+    const struct_typet &vt_type =
+      ns.follow_tag(to_struct_tag_type(value.type()));
+    std::function<void(exprt &, const struct_typet &)> patch =
+      [&](exprt &table, const struct_typet &table_type)
+    {
+      const auto &comps = table_type.components();
+      for(std::size_t i = 0; i < comps.size() && i < table.operands().size();
+          ++i)
+      {
+        if(comps[i].get_base_name() == "@base")
+        {
+          patch(
+            table.operands()[i],
+            ns.follow_tag(to_struct_tag_type(comps[i].type())));
+          continue;
+        }
+        const auto it = overriders.find(comps[i].get_base_name());
+        if(it == overriders.end())
+          continue;
+        const struct_typet::componentt &overrider = *it->second;
+        const typet &slot_type = to_pointer_type(comps[i].type()).base_type();
+        symbolt thunk{
+          id2string(vt_name) + "::" + id2string(overrider.get_base_name()),
+          slot_type,
+          symbol.mode};
+        thunk.base_name = overrider.get_base_name();
+        thunk.pretty_name = overrider.get_base_name();
+        thunk.module = module;
+        thunk.location = overrider.source_location();
+        code_typet &thunk_type = to_code_type(thunk.type);
+        std::size_t n = 0;
+        for(auto &parameter : thunk_type.parameters())
+        {
+          symbolt parameter_symbol{
+            id2string(thunk.name) + "::arg" + std::to_string(n++),
+            parameter.type(),
+            symbol.mode};
+          parameter_symbol.base_name = "arg" + std::to_string(n - 1);
+          parameter.set_identifier(parameter_symbol.name);
+          parameter.set_base_name(parameter_symbol.base_name);
+          symbol_table.insert(std::move(parameter_symbol));
+        }
+        build_this_adjusting_thunk_body(
+          thunk,
+          overrider.get_name(),
+          lookup(overrider.get_name()).type,
+          subobject_offset);
+        const irep_idt thunk_name = thunk.name;
+        symbol_table.insert(std::move(thunk));
+        table.operands()[i] = address_of_exprt{
+          symbol_exprt{thunk_name, slot_type},
+          to_pointer_type(comps[i].type())};
+      }
+    };
+    patch(value, vt_type);
+
+    symbolt vt_object{vt_name, value.type(), symbol.mode};
+    vt_object.base_name = vt_name;
+    vt_object.module = module;
+    vt_object.location = symbol.location;
+    vt_object.is_lvalue = true;
+    vt_object.is_static_lifetime = true;
+    vt_object.value = std::move(value);
+    symbol_table.insert(std::move(vt_object));
+  }
 }

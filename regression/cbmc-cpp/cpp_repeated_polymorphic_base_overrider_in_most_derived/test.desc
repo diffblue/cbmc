@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ B path: SUCCESS$
+^\[main\.assertion\.2\] line \d+ C path: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.virtual]/2: D::f overrides A::f in both of D's A subobjects;
+a call through the A of C enters D::f with `this' adjusted from that
+subobject to D (Itanium C++ ABI 2.5: a thunk in the secondary virtual
+table), so D::f reads both A::i.  The front end rejected the class.  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.
