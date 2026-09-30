@@ -1125,6 +1125,7 @@ protected:
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
+  void expand_type_pack_arguments(exprt &arguments);
   std::vector<typet> builtin_trait_type_args(const exprt &expr);
   void throw_if_incomplete_dependency(const exprt &expr);
   void complete_type_operand(exprt &expr);

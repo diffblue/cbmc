@@ -2750,6 +2750,108 @@ void cpp_typecheckt::typecheck_expr_member(exprt &expr)
   typecheck_expr_member(expr, cpp_typecheck_fargst());
 }
 
+/// N5008 [temp.variadic]/5: a pack-expansion function-call argument whose
+/// pattern names a TYPE template parameter pack (`declval<Args>()...' in
+/// `decltype(g(declval<Args>()...))') expands to one argument per element of
+/// the pack, the k-th substituting the pack's k-th type.  Function bodies are
+/// expanded before type-checking (see cpp_typecheck_method_bodies.cpp); this
+/// covers the other contexts -- member declarations of a class template
+/// instance and partial-specialization patterns -- where the argument kept
+/// its `...' and was type-checked as one argument with the pack's first
+/// type.
+void cpp_typecheckt::expand_type_pack_arguments(exprt &arguments)
+{
+  static const std::vector<typet> no_types;
+  const auto pack_of = [this](const irept &n) -> const std::vector<typet> *
+  {
+    if(
+      n.id() != ID_cpp_name || n.get_sub().size() != 1 ||
+      n.get_sub().front().id() != ID_name)
+    {
+      return nullptr;
+    }
+    const irep_idt &base_name = n.get_sub().front().get(ID_identifier);
+    for(const auto *id_ptr : cpp_scopes.current_scope().lookup(
+          base_name,
+          cpp_scopet::RECURSIVE,
+          cpp_idt::id_classt::TEMPLATE_PARAMETER))
+    {
+      const auto it = template_map.pack_args_map.find(id_ptr->identifier);
+      if(it != template_map.pack_args_map.end())
+        return &it->second;
+      // an empty pack is recorded by its size only
+      const auto size = template_map.pack_size_map.find(id_ptr->identifier);
+      if(size != template_map.pack_size_map.end() && size->second == 0)
+        return &no_types;
+    }
+    return nullptr;
+  };
+  // the pack a pattern names, and its name
+  std::function<const std::vector<typet> *(const irept &, irep_idt &)>
+    find_pack =
+      [&](const irept &n, irep_idt &name) -> const std::vector<typet> *
+  {
+    if(const auto *pack = pack_of(n))
+    {
+      name = n.get_sub().front().get(ID_identifier);
+      return pack;
+    }
+    for(const auto &sub : n.get_sub())
+      if(const auto *pack = find_pack(sub, name))
+        return pack;
+    for(const auto &named_sub : n.get_named_sub())
+      if(const auto *pack = find_pack(named_sub.second, name))
+        return pack;
+    return nullptr;
+  };
+  std::function<void(irept &, const irep_idt &, const typet &)> substitute =
+    [&](irept &n, const irep_idt &name, const typet &element)
+  {
+    // a type-name is never an operand: replace it only where a type is
+    // held (`type' of a cast, of a template argument, ...)
+    for(auto &sub : n.get_sub())
+      substitute(sub, name, element);
+    for(auto &named_sub : n.get_named_sub())
+    {
+      if(
+        named_sub.second.id() == ID_cpp_name &&
+        named_sub.second.get_sub().size() == 1 &&
+        named_sub.second.get_sub().front().id() == ID_name &&
+        named_sub.second.get_sub().front().get(ID_identifier) == name)
+      {
+        named_sub.second = element;
+      }
+      else
+        substitute(named_sub.second, name, element);
+    }
+  };
+
+  bool changed = false;
+  exprt::operandst expanded;
+  for(auto &argument : arguments.operands())
+  {
+    irep_idt name;
+    const std::vector<typet> *pack = nullptr;
+    if(argument.get_bool(ID_ellipsis))
+      pack = find_pack(argument, name);
+    if(pack == nullptr)
+    {
+      expanded.push_back(argument);
+      continue;
+    }
+    changed = true;
+    for(const auto &element : *pack)
+    {
+      exprt copy = argument;
+      copy.remove(ID_ellipsis);
+      substitute(copy, name, element);
+      expanded.push_back(std::move(copy));
+    }
+  }
+  if(changed)
+    arguments.operands() = std::move(expanded);
+}
+
 /// The type arguments of a builtin trait recorded by the parser in
 /// "type_args" (see Parser::rTypePredicate), typechecked, with a pack
 /// expansion `Args...' replaced by the elements of the pack (N5008
@@ -9232,6 +9334,7 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
     typecheck_expr_lambda(expr);
   else if(expr.id() == ID_arguments)
   {
+    expand_type_pack_arguments(expr);
     // Arguments list for a function call.  Typecheck each argument
     // individually, catching and deferring failures: an argument
     // of the form `&f` or `f` where `f` names a function template

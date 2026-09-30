@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 pattern_pack.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ specialization selected: SUCCESS$
@@ -15,9 +15,10 @@ probe<count_of<int, int>, int, int, int> against the partial
 specialization `probe<decltype(declval<f>().call(declval<Args>()...)),
 Args...>' deduces Args = {int, int, int} from the trailing arguments; the
 non-deduced first argument is then `decltype(f().call(int, int, int))' =
-count_of<int, int>, so the specialization matches.  The front end expands
+count_of<int, int>, so the specialization matches.  The front end expanded
 the pack in the decltype to fewer elements (the construct instantiation
 in test.desc sees an empty member pack), and the
-selection falls back to the primary template.  The narrower reproducer of
+selection fell back to the primary template: a call argument over a
+type pack stayed one argument outside function bodies.  The narrower reproducer of
 test.desc's remaining drop (round 163d; test.desc's assertions already
-hold).  g++ 13 and clang++ 18 accept the program.  Pre-existing.
+hold).  g++ 13 and clang++ 18 accept the program.  Fails on bin53.
