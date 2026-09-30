@@ -1347,31 +1347,12 @@ void cpp_typecheckt::full_member_initialization(
           }
           if(!named)
           {
-            // members of this base are the flattened components whose
-            // qualified name starts with the base's member prefix: the
-            // class symbol name with the "tag-" of its FINAL path
-            // component removed ("ns::tag-B<tag-A>" -> "ns::B<tag-A>::").
-            // The final component boundary is the last "::" OUTSIDE angle
-            // brackets -- a naive rfind("tag-") would strip a template
-            // ARGUMENT's tag instead (e.g. the tag-S in tag-base_<tag-S>),
-            // mismatching every component.
-            std::string prefix = id2string(ctorsymb.name);
-            {
-              std::size_t depth = 0;
-              std::size_t final_component = 0;
-              for(std::size_t i = 0; i + 1 < prefix.size(); ++i)
-              {
-                if(prefix[i] == '<')
-                  ++depth;
-                else if(prefix[i] == '>' && depth > 0)
-                  --depth;
-                else if(depth == 0 && prefix[i] == ':' && prefix[i + 1] == ':')
-                  final_component = i + 2;
-              }
-              if(prefix.compare(final_component, 4, "tag-") == 0)
-                prefix.erase(final_component, 4);
-            }
-            prefix += "::";
+            // members of this base: the flattened components declared in
+            // the base itself -- reached through exactly this direct base
+            // ([class.mi]/4: when the base class occurs more than once, its
+            // other subobjects are initialized by their own classes)
+            const irep_idt base_id =
+              to_struct_tag_type(b.type()).get_identifier();
             for(const auto &c : components)
             {
               if(
@@ -1381,13 +1362,18 @@ void cpp_typecheckt::full_member_initialization(
               {
                 continue;
               }
-              if(id2string(c.get_name()).compare(0, prefix.size(), prefix) != 0)
+              const auto &path = c.find(ID_C_subobject_path).get_sub();
+              if(path.size() != 1 || path.front().id() != base_id)
                 continue;
+              // the component itself (#component_name): its name may be
+              // hidden by a member of this class or be that of another
+              // subobject's member as well
               const irept &default_val = c.find(ID_C_default_value);
               if(default_val.is_not_nil())
               {
                 codet mem_init(ID_member_initializer);
                 mem_init.set(ID_member, cpp_namet(c.get_base_name()));
+                mem_init.set("#component_name", c.get_name());
                 mem_init.copy_to_operands(
                   static_cast<const exprt &>(default_val));
                 final_initializers.move_to_sub(mem_init);
@@ -1396,6 +1382,7 @@ void cpp_typecheckt::full_member_initialization(
               {
                 codet mem_init(ID_member_initializer);
                 mem_init.set(ID_member, cpp_namet(c.get_base_name()));
+                mem_init.set("#component_name", c.get_name());
                 final_initializers.move_to_sub(mem_init);
               }
             }
