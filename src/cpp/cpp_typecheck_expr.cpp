@@ -35,6 +35,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 #include <functional>
 #include <optional>
@@ -3176,7 +3177,7 @@ std::optional<struct_exprt> cpp_typecheckt::zero_struct_value(
   const source_locationt &loc)
 {
   const namespacet ns(symbol_table);
-  const auto zero = ::zero_initializer(type, loc, ns);
+  const auto zero = itanium_abi_cpp_zero_initializer(type, loc, ns);
   if(!zero.has_value() || zero->id() != ID_struct)
     return {};
   return to_struct_expr(*zero);
@@ -4319,13 +4320,11 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     // N5008 [expr.unary.op]/3.1: `&C::m' for a non-static data member m has
     // type "pointer to member of C of type T" and designates C::m.
     // [basic.compound]/3: a pointer to data member identifies the member
-    // within any object of its class; following the Itanium C++ ABI
-    // (section 2.3) that is the member's offset in C, a ptrdiff_t-sized
-    // value.  It is represented as the offset PLUS ONE, cast to the
-    // pointer-to-member type, so that the null member pointer value
-    // ([conv.mem]/1) is the null pointer -- zero-initialization and the
-    // conversion of nullptr then need no special case -- and differs from
-    // a pointer to a member at offset 0.  convert_pmop undoes the bias.
+    // within any object of its class; the Itanium C++ ABI (section 2.3)
+    // represents it by the member's offset in C, a ptrdiff_t-sized value,
+    // and the null member pointer value ([conv.mem]/1) by -1.  By default the
+    // front end adds data_member_pointer_bias() (a back-end workaround, see
+    // itanium_abi_cpp_zero_initializer.h).
     const struct_tag_typet class_tag = to_struct_tag_type(
       to_pointer_type(to_unary_expr(op).op().type()).base_type());
     pointer_typet result_type = pointer_type(op.type());
@@ -4349,7 +4348,8 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
       throw 0;
     }
     exprt value = typecast_exprt{
-      from_integer(*offset + 1, signed_size_type()), result_type};
+      from_integer(*offset + data_member_pointer_bias(), signed_size_type()),
+      result_type};
     value.add_source_location() = expr.source_location();
     expr.swap(value);
     return;
@@ -4526,8 +4526,8 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
     initializer.operands().empty() && expr.get(ID_statement) == ID_cpp_new &&
     value_initialization_zero_initializes(new_object_type))
   {
-    const auto zero =
-      ::zero_initializer(new_object_type, expr.find_source_location(), *this);
+    const auto zero = itanium_abi_cpp_zero_initializer(
+      new_object_type, expr.find_source_location(), *this);
     if(zero.has_value())
     {
       exprt zero_target(ID_new_object, new_object_type);
@@ -4633,8 +4633,8 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       // the zero-initialization that precedes the default-initialization
       // (members without a default member initializer are zero, not
       // indeterminate: `struct R { int v = 3; int w; }; R().w == 0')
-      const auto zero =
-        ::zero_initializer(expr.type(), expr.find_source_location(), *this);
+      const auto zero = itanium_abi_cpp_zero_initializer(
+        expr.type(), expr.find_source_location(), *this);
       if(zero.has_value() && temporary.find(ID_initializer).is_not_nil())
       {
         exprt new_object(ID_new_object);
@@ -4653,8 +4653,8 @@ void cpp_typecheckt::typecheck_expr_explicit_typecast(exprt &expr)
       return;
     }
 
-    auto new_expr =
-      ::zero_initializer(expr.type(), expr.find_source_location(), *this);
+    auto new_expr = itanium_abi_cpp_zero_initializer(
+      expr.type(), expr.find_source_location(), *this);
     if(!new_expr.has_value())
     {
       error().source_location = expr.find_source_location();
@@ -5575,7 +5575,8 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
       }
       else
       {
-        auto zero = ::zero_initializer(comp.type(), source_location, *this);
+        auto zero =
+          itanium_abi_cpp_zero_initializer(comp.type(), source_location, *this);
         CHECK_RETURN(zero.has_value());
         field_values.push_back(std::move(*zero));
       }
@@ -7649,7 +7650,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       value_initialization &&
       value_initialization_zero_initializes(tmp_object_expr.type()))
     {
-      const auto zero = ::zero_initializer(
+      const auto zero = itanium_abi_cpp_zero_initializer(
         tmp_object_expr.type(), expr.source_location(), *this);
       if(zero.has_value())
       {
@@ -9224,7 +9225,7 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
       member_type.set(ID_C_constant, true);
     const exprt offset = minus_exprt{
       typecast_exprt{op1, signed_size_type()},
-      from_integer(1, signed_size_type())};
+      from_integer(data_member_pointer_bias(), signed_size_type())};
     const exprt address = typecast_exprt{
       plus_exprt{
         typecast_exprt{object_pointer, pointer_type(char_type())}, offset},
