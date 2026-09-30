@@ -1,0 +1,18 @@
+CORE
+partial_specialization.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ copy constructors defined out of line: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.class.spec.mfunc]/1, [class.base.init]/1: the copy
+constructors of two partial specializations (with and without a pack)
+are defined out of line with a ctor-initializer.  On bin53 the
+definition was attached without its mem-initializers, so the copies
+were indeterminate.  g++ 13 and clang++ 18 accept the program.

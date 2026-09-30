@@ -1,0 +1,20 @@
+CORE
+template_first.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ a second target: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructed from a function pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ copied: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.mem]/1, [class.mfct]/1: test.desc with the two out-of-line
+definitions in the other order (the converting constructor template's
+first).  The copy constructor must get its own definition, not the
+template's.  On bin53 the copy was wrong.  g++ 13 and clang++ 18 accept
+the program.
