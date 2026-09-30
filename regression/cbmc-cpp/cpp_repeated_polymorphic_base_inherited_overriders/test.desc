@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ B path: SUCCESS$
+^\[main\.assertion\.2\] line \d+ C path: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.virtual]/2: each of D's two A subobjects has its own final
+overrider of A::f -- B::f in the one of B, A::f in the one of C -- so each
+needs its own virtual table (Itanium C++ ABI 2.5: a secondary virtual table
+per base subobject).  The front end rejected the class.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.
