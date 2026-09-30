@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
@@ -22,3 +22,7 @@ ranges::__cust_access::__begin<char *>) and drops it.  The same drops
 appear in cpp20_ranges_basic and the <format> descs.  cvise reduction
 running in /tmp/r163/red/kb_U8.  g++ 13 accepts the program.
 Pre-existing (fails on bin52).
+Round 163m: passes since 1064342dec (deduced-return members of class
+template specializations are instantiated on use) and 0a0018a810 (no
+compound-requirement fast path); the type_traits:2386 drop is gone.
+Fails on bin53.
