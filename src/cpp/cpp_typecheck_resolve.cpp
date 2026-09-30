@@ -7109,10 +7109,29 @@ resolved_after_strip:
             }
             const symbolt &inst_sym = cpp_typecheck.instantiate_template(
               source_location, s, tc_args, tc_args);
+            // N5008 [temp.pre]/1, [basic.pre]/7: an instance of a
+            // variable template of class or array type names an object --
+            // `__v<_ArrayExtent>' (libstdc++ 16's span constructor) is an
+            // lvalue of type integral_constant<...> whose conversion
+            // function is called on it.  Keep the symbol, as
+            // convert_identifier does for such constexpr variables;
+            // substituting the initializer value left no object to call
+            // the member function on and the constructor was dropped.
+            const typet &inst_type = inst_sym.type;
+            if(
+              inst_sym.value.is_not_nil() &&
+              (inst_type.id() == ID_struct_tag ||
+               inst_type.id() == ID_union_tag || inst_type.id() == ID_array))
+            {
+              exprt object = cpp_symbol_expr(inst_sym);
+              object.add_source_location() = source_location;
+              identifiers.push_back(object);
+              handled_variable_template = true;
+            }
             // The instantiated symbol is a constexpr variable.
             // Return its value, evaluating any remaining constexpr
             // function calls.
-            if(inst_sym.value.is_not_nil())
+            else if(inst_sym.value.is_not_nil())
             {
               exprt val = inst_sym.value;
               if(!val.is_constant())
