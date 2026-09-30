@@ -29,6 +29,7 @@ Author:
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_util.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 #include <functional>
 #include <set>
@@ -482,6 +483,13 @@ bool cpp_typecheckt::standard_conversion_pointer(
   // integer 0 to NULL pointer conversion?
   if(simplify_expr(expr, *this) == 0 && expr.type().id() != ID_pointer)
   {
+    // N5008 [conv.mem]/1: to the null member pointer value for a pointer to
+    // data member (see null_pointer_to_data_member)
+    if(is_pointer_to_data_member_type(type))
+    {
+      new_expr = null_pointer_to_data_member(type);
+      return true;
+    }
     new_expr = expr;
     new_expr.set(ID_value, ID_NULL);
     new_expr.type() = type;
@@ -621,7 +629,9 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 
   if(expr.is_constant() && to_constant_expr(expr).is_null_pointer())
   {
-    new_expr = typecast_exprt::conditional_cast(expr, type);
+    new_expr = is_pointer_to_data_member_type(type)
+                 ? null_pointer_to_data_member(type)
+                 : typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
@@ -634,7 +644,7 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
   if(subtype_typecast(to_struct, from_struct))
   {
     // N5008 [conv.mem]/2: the result refers to the member in D's instance
-    // of B.  A pointer to DATA member is B's member offset plus one (see
+    // of B.  A pointer to DATA member is the member's offset in B (see
     // typecheck_expr_address_of); in D it is offset by the B subobject's
     // offset, the null member pointer value staying null.
     if(to_pointer_type(type).base_type().id() != ID_code)
@@ -649,9 +659,10 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
         const exprt value = typecast_exprt{expr, signed_size_type()};
         const exprt shifted =
           plus_exprt{value, from_integer(*base_offset, signed_size_type())};
-        const exprt zero = from_integer(0, signed_size_type());
+        const exprt null = typecast_exprt{
+          null_pointer_to_data_member(expr.type()), signed_size_type()};
         new_expr = typecast_exprt{
-          if_exprt{equal_exprt{value, zero}, zero, shifted}, type};
+          if_exprt{equal_exprt{value, null}, null, shifted}, type};
         return true;
       }
     }
@@ -744,6 +755,16 @@ bool cpp_typecheckt::standard_conversion_boolean(
 
   typet Bool = c_bool_type();
   qual_from.write(Bool);
+
+  // N5008 [conv.bool]/1: the null member pointer value converts to false;
+  // for a pointer to data member that is null_pointer_to_data_member, -1
+  // in the exact Itanium C++ ABI encoding
+  if(is_pointer_to_data_member_type(expr.type()))
+  {
+    new_expr = typecast_exprt{
+      notequal_exprt{expr, null_pointer_to_data_member(expr.type())}, Bool};
+    return true;
+  }
 
   new_expr = typecast_exprt::conditional_cast(expr, Bool);
   return true;
@@ -902,8 +923,12 @@ bool cpp_typecheckt::standard_conversion_sequence(
         expr.type().id() == ID_pointer &&
         to_pointer_type(expr.type()).base_type().id() == ID_nullptr)
       {
-        // std::nullptr_t to _any_ pointer type is ok
-        new_expr = typecast_exprt::conditional_cast(new_expr, type);
+        // std::nullptr_t to _any_ pointer type is ok; [conv.mem]/1 for a
+        // pointer to data member: the null member pointer value
+        if(is_pointer_to_data_member_type(type))
+          new_expr = null_pointer_to_data_member(type);
+        else
+          new_expr = typecast_exprt::conditional_cast(new_expr, type);
       }
       else if(!standard_conversion_pointer(curr_expr, type, new_expr))
       {
@@ -931,7 +956,15 @@ bool cpp_typecheckt::standard_conversion_sequence(
         curr_expr.type().id() == ID_c_bool ||
         curr_expr.type().id() == ID_c_enum_tag)
       {
-        new_expr = is_not_zero(curr_expr, *this);
+        // N5008 [conv.bool]/1: the null member pointer value converts to
+        // false -- null_pointer_to_data_member for a pointer to data member
+        if(is_pointer_to_data_member_type(curr_expr.type()))
+        {
+          new_expr = notequal_exprt{
+            curr_expr, null_pointer_to_data_member(curr_expr.type())};
+        }
+        else
+          new_expr = is_not_zero(curr_expr, *this);
       }
       else
         return false;
@@ -3838,8 +3871,8 @@ bool cpp_typecheckt::brace_init_to_array_reference(
   }
   for(mp_integer i = elements.size(); i < *bound; ++i)
   {
-    const auto zero =
-      ::zero_initializer(elem_type, init_list.source_location(), *this);
+    const auto zero = itanium_abi_cpp_zero_initializer(
+      elem_type, init_list.source_location(), *this);
     if(!zero.has_value())
       return false;
     elements.push_back(*zero);
@@ -3884,7 +3917,8 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
      type.id() == ID_c_enum_tag || type.id() == ID_c_enum ||
      type.id() == ID_floatbv || type.id() == ID_fixedbv))
   {
-    const auto zero = ::zero_initializer(type, e.source_location(), *this);
+    const auto zero =
+      itanium_abi_cpp_zero_initializer(type, e.source_location(), *this);
     if(zero.has_value())
     {
       expr = *zero;

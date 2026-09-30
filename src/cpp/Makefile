@@ -48,6 +48,7 @@ SRC = cpp_constexpr_eval.cpp \
       cpp_util.cpp \
       cprover_library.cpp \
       expr2cpp.cpp \
+      itanium_abi_cpp_zero_initializer.cpp \
       parse.cpp \
       template_map.cpp \
       # Empty last line

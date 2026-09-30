@@ -34,6 +34,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "cpp_util.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 /// N5008 [stmt.return]/2 + [dcl.init.list]/3.4 + [dcl.init.aggr]: decide
 /// whether a braced-init-list return operand aggregate-initializes the
@@ -2497,7 +2498,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             // default-initialization entries, which leave the member
             // indeterminate ([dcl.init.general]/7) and rightly become a
             // skip below.
-            const auto zero = ::zero_initializer(
+            const auto zero = itanium_abi_cpp_zero_initializer(
               real_target.type(), code.source_location(), *this);
             if(zero.has_value())
             {
@@ -3062,8 +3063,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           exprt &inner = symbol_expr.id() == ID_already_typechecked
                            ? to_already_typechecked_expr(symbol_expr).get_expr()
                            : symbol_expr;
-          auto zero =
-            ::zero_initializer(inner.type(), code.source_location(), *this);
+          auto zero = itanium_abi_cpp_zero_initializer(
+            inner.type(), code.source_location(), *this);
           if(zero.has_value())
           {
             inner.type().set(ID_C_constant, false);
@@ -3082,7 +3083,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
               if(!to_integer(to_constant_expr(tmp_size), s))
               {
                 code_blockt block;
-                auto elem_zero = ::zero_initializer(
+                auto elem_zero = itanium_abi_cpp_zero_initializer(
                   array_type.element_type(), code.source_location(), *this);
                 if(elem_zero.has_value())
                 {

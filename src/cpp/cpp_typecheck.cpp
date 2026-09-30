@@ -28,6 +28,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_sfinae_context.h"
 #include "cpp_util.h"
 #include "expr2cpp.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 cpp_typecheckt::cpp_typecheckt(
   cpp_parse_treet &_cpp_parse_tree,
@@ -478,6 +479,36 @@ void cpp_typecheckt::typecheck()
                 << eom;
     }
     symbol_table.get_writeable_ref(entry.first).value.make_nil();
+  }
+
+  // N5008 [basic.start.static]/2, [dcl.init.general]/6: a variable with
+  // static storage duration is zero-initialized.  Without a value, linking
+  // fills it with zero bits (static_lifetime_init), but the null member
+  // pointer value of a pointer to data member is -1 in the Itanium C++ ABI;
+  // give such variables their C++ zero value.
+  {
+    const namespacet ns{symbol_table};
+    std::vector<irep_idt> to_initialize;
+    for(const auto &entry : symbol_table)
+    {
+      const symbolt &sym = entry.second;
+      if(
+        sym.is_type || sym.is_macro || sym.is_extern ||
+        !sym.is_static_lifetime || sym.value.is_not_nil() ||
+        sym.type.id() == ID_code || sym.mode != ID_cpp)
+      {
+        continue;
+      }
+      if(contains_pointer_to_data_member(sym.type, ns))
+        to_initialize.push_back(entry.first);
+    }
+    for(const auto &id : to_initialize)
+    {
+      symbolt &sym = symbol_table.get_writeable_ref(id);
+      auto zero = itanium_abi_cpp_zero_initializer(sym.type, sym.location, ns);
+      if(zero.has_value())
+        sym.value = std::move(*zero);
+    }
   }
 
   provide_stdlib_bodies();

@@ -19,6 +19,7 @@
 #include <util/symbol_table_base.h>
 
 #include "cpp_typecheck.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 /// Synthesize a body for _List_node_base::_M_hook.
 /// Inserts `this` before `__position` in a doubly-linked list.
@@ -378,7 +379,8 @@ static exprt provide_classic_ctype_char_model(
   // ctype<char>::is reads only _M_table, and no virtual dispatch happens
   // on this object.
   const struct_tag_typet facet_type{ctype_char->name};
-  auto facet_zero = zero_initializer(facet_type, ctype_char->location, ns);
+  auto facet_zero =
+    itanium_abi_cpp_zero_initializer(facet_type, ctype_char->location, ns);
   if(!facet_zero.has_value())
     return nil_exprt{};
 
@@ -1135,7 +1137,7 @@ make_prime_need_rehash_body(const symbolt &symbol, const namespacet &ns)
   auto make_pair_value =
     [&](const exprt &first_value, const exprt &second_value) -> exprt
   {
-    auto zero = zero_initializer(ret_type, symbol.location, ns);
+    auto zero = itanium_abi_cpp_zero_initializer(ret_type, symbol.location, ns);
     if(!zero.has_value() || zero->id() != ID_struct)
       return nil_exprt();
     struct_exprt pair_value = to_struct_expr(*zero);
@@ -1242,7 +1244,8 @@ void cpp_typecheckt::provide_stdlib_bodies()
       symbol.value.operands().empty())
     {
       // Replace {} with zero_initializer
-      auto zero = ::zero_initializer(symbol.type, symbol.location, ns);
+      auto zero =
+        itanium_abi_cpp_zero_initializer(symbol.type, symbol.location, ns);
       if(zero.has_value())
         symbol.value = *zero;
     }

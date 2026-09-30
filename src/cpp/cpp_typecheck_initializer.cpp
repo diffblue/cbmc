@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_convert_type.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 #include <optional>
 
@@ -1023,7 +1024,8 @@ void cpp_typecheckt::zero_initializer(
   }
   else
   {
-    const auto value = ::zero_initializer(type, source_location, *this);
+    const auto value =
+      itanium_abi_cpp_zero_initializer(type, source_location, *this);
     if(!value.has_value())
     {
       error().source_location = source_location;

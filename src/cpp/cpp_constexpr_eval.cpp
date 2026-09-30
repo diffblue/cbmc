@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
+#include "itanium_abi_cpp_zero_initializer.h"
+
 #include <map>
 #include <optional>
 
@@ -53,7 +55,8 @@ static exprt evaluate_temporary_object(
   const irept &init = expr.find(ID_initializer);
   if(expr.type().id() != ID_struct_tag)
     return nil_exprt();
-  const auto zero = zero_initializer(expr.type(), source_locationt{}, ns);
+  const auto zero =
+    itanium_abi_cpp_zero_initializer(expr.type(), source_locationt{}, ns);
   if(!zero.has_value() || zero->id() != ID_struct)
     return nil_exprt();
   exprt object = *zero;
@@ -1175,8 +1178,8 @@ exprt try_evaluate_constexpr(
     // constant) is tracked under the `this` parameter's identifier and
     // updated by the mem-initializer / body assignments `this->m = ...`.
     this_id = params.front().get_identifier();
-    const auto zero =
-      zero_initializer(constructed_type, source_locationt{}, ns);
+    const auto zero = itanium_abi_cpp_zero_initializer(
+      constructed_type, source_locationt{}, ns);
     if(!zero.has_value() || zero->id() != ID_struct)
       return nil_exprt();
     vars[this_id] = *zero;
