@@ -1,0 +1,25 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ class template argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ variable template argument: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/1, [temp.constr.decl], [temp.arg.type]:
+impl<int, long> selects the constrained partial specialization, whose
+`type' is long; that type is a valid template argument of any template.
+As an argument of a class template it works; as an argument of the
+variable template is_long the front end fails to type-check it and
+reports "found no match for symbol 'is_long'" (with no candidates: the
+argument list's failure is swallowed in resolve's variable-template
+path).  Without the requires-clause it works.  cvise reduction
+(/tmp/r163/red/kb_L16cr) of libstdc++ 16's
+`is_same_v<common_reference_t<int &, long &>, long>'
+(cpp20_common_reference_int_lvalue_rvalue with GCC 16's headers).  g++ 13
+and clang++ 18 accept the program.  Pre-existing (fails on bin53).
