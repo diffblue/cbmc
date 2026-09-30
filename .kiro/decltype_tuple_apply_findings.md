@@ -12733,3 +12733,26 @@ libstdc++ 16 failures (Arch 16.2.1 / Tumbleweed 16.2.0, same 8), triage using
   (cpp_typecheck_stdlib.cpp) is keyed on libstdc++ 13 shapes; needs model
   work per version.
 - gcc16-test snapshot build: -Werror=array-bounds in develop's json.h:269.
+
+## Round 163m: auto members on use, fast path removed
+
+- 1064342dec [dcl.spec.auto.general]/15 + [temp.inst]/11: deduced-return
+  members of class template specializations are deferred like any member;
+  calls convert them via convert_deferred_method_now (method application and
+  named-member calls).  The eager speculative conversion is gone.  The
+  earlier segfaulting attempt (CBMC_EXP_DEFER_AUTO) had no call-site
+  conversion.
+- 0a0018a810 compound-requirement fast path removed, with the member-access
+  QUALIFIED lookup patch.  cpp20_single_compound_requirement_with_type_
+  constraint and cpp20_ranges_upper_bound_array CORE.
+- 594c6670fd cpp20_iterator_t_of_pointer_undeduced_declval CORE (fixed by the
+  two above; the kb_U8c reduction was stopped).
+- ecd10acb04 [temp.pre]/1, [basic.pre]/7: a variable template instance of
+  class/array type keeps its symbol (libstdc++ 16 span:201; kb_L16span, 14
+  lines).
+- e56e1600b3 header-free KNOWNBUG for the libc++ views::take drop (kb_U6c).
+
+libstdc++ 16 status: namespace_reopened converts, regex_match, span fixed;
+common_reference: KNOWNBUG (variable template argument); ranges_basic: to be
+rechecked with GCC 16 headers; three stream tests: locale model work.
+Suites at e56e1600b3: cbmc-cpp green (17 skipped), cpp green, lint 0.
