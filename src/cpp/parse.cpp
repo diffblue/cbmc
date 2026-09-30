@@ -8014,6 +8014,57 @@ bool Parser::rExpression(exprt &exp, bool template_args)
   {
     lex.get_token(tk);
 
+    irep_idt statement;
+    if(t == '=')
+      statement = ID_assign;
+    else if(t == TOK_PLUSASSIGN)
+      statement = ID_assign_plus;
+    else if(t == TOK_MINUSASSIGN)
+      statement = ID_assign_minus;
+    else if(t == TOK_MULTASSIGN)
+      statement = ID_assign_mult;
+    else if(t == TOK_DIVASSIGN)
+      statement = ID_assign_div;
+    else if(t == TOK_MODASSIGN)
+      statement = ID_assign_mod;
+    else if(t == TOK_SHLASSIGN)
+      statement = ID_assign_shl;
+    else if(t == TOK_SHRASSIGN)
+      statement = ID_assign_shr;
+    else if(t == TOK_ANDASSIGN)
+      statement = ID_assign_bitand;
+    else if(t == TOK_XORASSIGN)
+      statement = ID_assign_bitxor;
+    else
+      statement = ID_assign_bitor;
+
+    // N5008 [expr.prim.fold]/1: the assignment operators are fold-operators
+    // -- `(e = ...)', `(e = ... = pack)' (libstdc++ 16 <format>'s
+    // `(__u._M_bool = ... = __value)').  The fold's operator is the
+    // assignment's statement; typecheck_expr turns each expanded
+    // `statement(lhs, rhs)' node into the assignment.
+    if(lex.LookAhead(0) == TOK_ELLIPSIS)
+    {
+      cpp_tokent ellipsis_tk;
+      lex.get_token(ellipsis_tk);
+      exprt fold("cpp_right_fold");
+      fold.set("fold_op", statement);
+      fold.add_to_operands(std::move(exp));
+      set_location(fold, tk);
+      if(lex.LookAhead(0) == t)
+      {
+        cpp_tokent op_tk;
+        lex.get_token(op_tk);
+        exprt init;
+        if(!rCastExpr(init))
+          return false;
+        fold.id("cpp_binary_fold");
+        fold.add_to_operands(std::move(init));
+      }
+      exp.swap(fold);
+      return true;
+    }
+
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rExpression 2\n";
 #endif
