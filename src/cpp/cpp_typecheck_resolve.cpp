@@ -6314,8 +6314,15 @@ exprt cpp_typecheck_resolvet::resolve(
   // member is absent, the pattern must fail softly, but the fallback
   // found std::to_address and the void-returning specialization was
   // selected (the cpp20 vector-family __to_address chain).
-  cpp_scopet::lookup_kindt lookup_kind =
-    qualified ? cpp_scopet::QUALIFIED : cpp_scopet::RECURSIVE;
+  // The same holds for a member-qualified name ([basic.lookup.qual.general]/2,
+  // the name after `.' or `->'): while its class is still being defined, a
+  // member declared later must not be replaced by a same-named entity of an
+  // enclosing namespace (libstdc++'s ref_view::begin() named from a
+  // constraint evaluated during the class's instantiation found the
+  // customization point object ranges::begin).
+  cpp_scopet::lookup_kindt lookup_kind = qualified || fargs.member_access
+                                           ? cpp_scopet::QUALIFIED
+                                           : cpp_scopet::RECURSIVE;
 
   if(template_args.is_nil())
   {
