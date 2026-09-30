@@ -244,6 +244,8 @@ protected:
     const cpp_template_args_non_tct &template_args,
     bool qualified = false);
 
+  static bool alias_leaves_arguments_incomplete(const cpp_declarationt &);
+
   typet resolve_template_alias(
     const irep_idt &base_name,
     const cpp_scopest::id_sett &id_set,
