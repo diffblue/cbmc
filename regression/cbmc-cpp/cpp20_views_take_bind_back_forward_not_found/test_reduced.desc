@@ -1,0 +1,23 @@
+KNOWNBUG
+reduced.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ the closure converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Header-free cvise reduction (/tmp/r163/red/kb_U6c, from a fresh libc++ 18
+preprocessing, signature: the drop of take's operator()) of test.desc.
+N5008 [temp.variadic]/5, [class.base.init]/7: __bind_back constructs
+__bind_back_t through its inherited __perfect_forward_impl constructor,
+whose mem-initializer builds tuple<_BoundArgs...> from the pack; the
+tuple constructor's __base_ mem-initializer names four class types
+computed from the packs.  The front end drops take's operator() and
+reports CONVERSION ERROR.  clang++ 18 with libc++ accepts the program
+(it uses clang's __make_integer_seq and __type_pack_element builtins,
+which g++ does not have).  Pre-existing (fails on bin53).
