@@ -37,6 +37,11 @@ public:
   /// to the scope active at resolution time.
   cpp_scopet *naming_scope = nullptr;
 
+  /// N5008 [basic.lookup.qual.general]/2-3: the name after `.' or `->' is a
+  /// member-qualified name, looked up in the class of the object expression
+  /// (and its bases) only -- never in enclosing scopes.
+  bool member_access = false;
+
   /// Optional target type for the enclosing context, propagated to
   /// the resolver so that template-argument deduction has access to
   /// the call site's context-driven type ([temp.deduct.funcaddr]/1,
