@@ -12670,3 +12670,30 @@ Not started: repeated non-virtual bases (add_base_components rejects the
 second A; needs per-path base subobjects in the layout).
 
 Suites at 8c8244953f: cbmc-cpp green (20 skipped), cpp green, lint 0.
+
+## Round 163k: pointers to data members (prioritized: hid other problems)
+
+- 59d4e1d642: `&C::m` (data member) = offset(C, m) + 1 cast to the
+  pointer-to-member type ([expr.unary.op]/3.1; Itanium ABI 2.3 uses the offset
+  with null = -1 -- the +1 bias keeps null == the null pointer, so zero- and
+  value-initialization and nullptr conversion need nothing; observable only via
+  the object representation).  `.*`/`->*` ([expr.mptr.oper]/2-6): convert the
+  object to the member's class, add offset-1, dereference; cv from the object.
+  [conv.mem]/2: base-to-derived adds base_subobject_offset (null stays null).
+  Declared `int B::*` no longer takes the initializer's class.  Bit-field
+  rejected ([class.bit]/3).
+- What it hid on bin53: `v.*pm` read `pm`; a pointer-to-member NSDMI dropped
+  the object's DECL; std::invoke/mem_fn on data members dropped
+  (__invoke_impl, invoke.h:79/84) and assertions of main vanished; template
+  deduction through `T C::*` lost an assertion.
+
+Docker sweeps at 4aac7b403e (outputs kept in /tmp/r163/dk/out_<tag>):
+- gcc16-test with g++-16 snapshot r16-8100: build fails,
+  -Werror=array-bounds false positive in src/util/json.h:269 via json_irep.cpp
+  (ranget::map + shared_ptr<function>); code is from develop (29051b46b2).
+  The previous "gcc16" sweeps built with g++ 13 (c++ is g++-13 in that image),
+  so they never tested GCC 16.
+- arch (GCC 16.2.1): 8 cbmc-cpp failures, all libstdc++ 16 header shapes:
+  <format>:4210 parse error (`... = __value )`), span:201 drop, stream/locale
+  tests, common_reference, ranges_basic.  These are the "unexplained six" of
+  round 163h: my gcc16 re-run used g++ 13 headers, hence they passed.
