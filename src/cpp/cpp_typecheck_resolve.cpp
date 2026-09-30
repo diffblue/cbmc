@@ -1978,6 +1978,76 @@ exprt cpp_typecheck_resolvet::convert_template_parameter(
   return e;
 }
 
+exprt cpp_typecheck_resolvet::object_of_naming_class(
+  const exprt &object,
+  const cpp_idt &identifier,
+  const source_locationt &source_location)
+{
+  // N5008 [class.access.base]/6: a class member access (also an implicit
+  // `this->') to a non-static member requires the object expression to be
+  // implicitly convertible to (a pointer to) the NAMING class -- the class
+  // in whose scope the search found the member ([class.access.base]/5; the
+  // nested-name-specifier's class for `E1.N::m', the object's class
+  // otherwise) -- and the member is that of the naming class subobject.
+  // [expr.ref]/8: it is ill-formed if the class of which the member is
+  // directly a member is an ambiguous base of the naming class.  Both matter
+  // only when a base class occurs more than once in the lattice
+  // ([class.mi]/4-5: `d.B::i' and `d.C::i' name the i of different A
+  // subobjects, `d.i' is ill-formed).
+  if(object.type().id() != ID_struct_tag)
+    return object;
+  const irep_idt object_class =
+    to_struct_tag_type(object.type()).get_identifier();
+  const cpp_scopet &search_scope = cpp_typecheck.cpp_scopes.current_scope();
+  const irep_idt naming_class =
+    search_scope.is_class() ? search_scope.identifier : object_class;
+  const symbolt *naming_symbol =
+    cpp_typecheck.symbol_table.lookup(naming_class);
+  const symbolt *object_symbol =
+    cpp_typecheck.symbol_table.lookup(object_class);
+  if(
+    naming_symbol == nullptr || naming_symbol->type.id() != ID_struct ||
+    object_symbol == nullptr || object_symbol->type.id() != ID_struct)
+  {
+    return object;
+  }
+  const struct_typet &naming_struct = to_struct_type(naming_symbol->type);
+
+  if(
+    identifier.class_identifier != naming_class &&
+    cpp_typecheck.base_subobjects(naming_struct, identifier.class_identifier)
+        .size() > 1)
+  {
+    cpp_typecheck.error().source_location = source_location;
+    cpp_typecheck.error()
+      << "member '" << identifier.base_name << "' of the ambiguous base class '"
+      << cpp_typecheck.lookup(identifier.class_identifier).pretty_name
+      << "' of '" << naming_symbol->pretty_name << "'" << messaget::eom;
+    throw 0;
+  }
+
+  if(
+    naming_class == object_class ||
+    !cpp_typecheck.subtype_typecast(
+      to_struct_type(object_symbol->type), naming_struct))
+  {
+    return object;
+  }
+
+  // the naming class subobject of the object
+  exprt address = object.id() == ID_dereference
+                    ? to_dereference_expr(object).pointer()
+                    : exprt{address_of_exprt{object}};
+  pointer_typet naming_pointer = pointer_type(struct_tag_typet{naming_class});
+  if(object.type().get_bool(ID_C_constant))
+    naming_pointer.base_type().set(ID_C_constant, true);
+  cpp_typecheck.make_ptr_typecast(address, naming_pointer);
+  dereference_exprt subobject{address, naming_pointer.base_type()};
+  subobject.set(ID_C_lvalue, object.get_bool(ID_C_lvalue));
+  subobject.add_source_location() = source_location;
+  return std::move(subobject);
+}
+
 exprt cpp_typecheck_resolvet::convert_identifier(
   const cpp_idt &identifier,
   const cpp_typecheck_fargst &fargs)
@@ -2073,6 +2143,9 @@ exprt cpp_typecheck_resolvet::convert_identifier(
         // failed
         object.make_nil();
       }
+
+      if(object.is_not_nil())
+        object = object_of_naming_class(object, identifier, source_location);
 
       if(object.is_not_nil())
       {

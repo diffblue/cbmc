@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+member 'i' of the ambiguous base class 'A' of 'D'$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [expr.ref]/8: `d.i' is ill-formed, A (the class of which i is a
+member) being an ambiguous base of D, the naming class
+([class.access.base]/5, [class.mi]/5).  g++ 13 ("request for member 'i' is
+ambiguous") and clang++ 18 ("non-static member 'i' found in multiple
+base-class subobjects") reject this program.

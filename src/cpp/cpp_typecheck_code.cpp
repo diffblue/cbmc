@@ -2414,6 +2414,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             typet base_t = b.type();
             base_t.remove(ID_C_base_name);
             exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
+            lhs_ptr.set(ID_C_direct_base_cast, true);
             lhs_ptr.copy_to_operands(exprt("cpp-this"));
             lhs_ptr.add_source_location() = code.source_location();
             dereference_exprt lhs(lhs_ptr);
@@ -2614,6 +2615,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     if(is_base)
     {
       exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
+      lhs_ptr.set(ID_C_direct_base_cast, true);
       lhs_ptr.copy_to_operands(exprt("cpp-this"));
       lhs_ptr.add_source_location() = code.source_location();
       dereference_exprt lhs(lhs_ptr);
@@ -2664,7 +2666,8 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
     make_ptr_typecast(
       this_expr,
       to_pointer_type(code_type.parameters().front().type()),
-      /*static_virtual_base_offset=*/true);
+      /*static_virtual_base_offset=*/true,
+      /*direct_base=*/true);
 
     function_call.arguments().push_back(this_expr);
 

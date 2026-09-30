@@ -76,10 +76,12 @@ static void copy_parent(
   typet base_t = parent_type;
   base_t.remove(ID_C_base_name);
   exprt op0("explicit-typecast", pointer_type(base_t));
+  op0.set(ID_C_direct_base_cast, true);
   op0.copy_to_operands(exprt("cpp-this"));
   op0.add_source_location()=source_location;
 
   exprt op1("explicit-typecast", pointer_type(base_t));
+  op1.set(ID_C_direct_base_cast, true);
   op1.type().set(ID_C_reference, true);
   if(is_move)
     op1.type().set(ID_C_rvalue_reference, true);
@@ -319,10 +321,12 @@ void cpp_typecheckt::default_cpctor(
       typet pod_base_t = b.type();
       pod_base_t.remove(ID_C_base_name);
       exprt op0("explicit-typecast", pointer_type(pod_base_t));
+      op0.set(ID_C_direct_base_cast, true);
       op0.copy_to_operands(exprt("cpp-this"));
       op0.add_source_location() = source_location;
 
       exprt op1("explicit-typecast", pointer_type(pod_base_t));
+      op1.set(ID_C_direct_base_cast, true);
       op1.type().set(ID_C_reference, true);
       to_pointer_type(op1.type()).base_type().set(ID_C_constant, true);
       op1.get_sub().push_back(cpp_namet(param_identifier, source_location));
@@ -361,6 +365,7 @@ void cpp_typecheckt::default_cpctor(
       typet base_t = b.type();
       base_t.remove(ID_C_base_name);
       exprt base_ref("explicit-typecast", pointer_type(base_t));
+      base_ref.set(ID_C_direct_base_cast, true);
       base_ref.type().set(ID_C_reference, true);
       if(is_move)
         base_ref.type().set(ID_C_rvalue_reference, true);
@@ -1490,6 +1495,7 @@ void cpp_typecheckt::full_member_initialization(
           typet base_t = b.type();
           base_t.remove(ID_C_base_name);
           exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
+          lhs_ptr.set(ID_C_direct_base_cast, true);
           lhs_ptr.copy_to_operands(exprt("cpp-this"));
           lhs_ptr.add_source_location() = source_location_of(initializer);
           dereference_exprt lhs(lhs_ptr);

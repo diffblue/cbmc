@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ separate A subobjects: SUCCESS$
@@ -16,11 +16,10 @@ N5008 [class.mi]/3-4: a class can be an indirect non-virtual base more than
 once; each occurrence is a distinct subobject ("struct D : virtual B,
 virtual C", with B and C both derived non-virtually from A, has two A
 subobjects).  Only an ambiguous name or conversion is ill-formed
-([class.member.lookup]/6, [conv.ptr]/3), not the class itself; `d.B::i'
-and `d.C::i' name one each.  The front end rejects the class definition
-("non-virtual base class tag-A inherited multiple times").
-Multiple_Inheritance3 (CORE, from the 2012 CVS tests, "we do not allow
-this") pins that rejection; g++ 13 and clang++ 18 accept its program.
-Found by the round-163c audit of descs that expect a rejection.
+([expr.ref]/8, [conv.ptr]/3), not the class itself; `d.B::i' and `d.C::i'
+name one each.  The front end rejected the class definition ("non-virtual
+base class tag-A inherited multiple times"); Multiple_Inheritance3 (from
+the 2012 CVS tests, "we do not allow this") pinned that rejection and is
+removed.  Found by the round-163c audit of descs that expect a rejection.
 Reference compilers: g++ 13 and clang++ 18 accept this program, and it
-fails only its WRONG assertion.  Pre-existing (round-162 snapshot bin51).
+fails only its WRONG assertion.
