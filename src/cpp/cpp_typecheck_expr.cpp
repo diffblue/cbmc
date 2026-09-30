@@ -802,6 +802,32 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
 /// Called after the operands are done
 void cpp_typecheckt::typecheck_expr_main(exprt &expr)
 {
+  // N5008 [expr.prim.fold]/1: an expanded fold over an assignment operator
+  // (see Parser::rExpression) arrives as a two-operand node whose id is the
+  // assignment's statement; it is that assignment
+  {
+    static const std::set<irep_idt> assignments{
+      ID_assign,
+      ID_assign_plus,
+      ID_assign_minus,
+      ID_assign_mult,
+      ID_assign_div,
+      ID_assign_mod,
+      ID_assign_shl,
+      ID_assign_shr,
+      ID_assign_bitand,
+      ID_assign_bitxor,
+      ID_assign_bitor};
+    if(expr.operands().size() == 2 && assignments.count(expr.id()) != 0)
+    {
+      exprt assignment{ID_side_effect};
+      assignment.set(ID_statement, expr.id());
+      assignment.operands() = std::move(expr.operands());
+      assignment.add_source_location() = expr.source_location();
+      expr.swap(assignment);
+    }
+  }
+
   if(expr.id() == ID_cpp_name)
     typecheck_expr_cpp_name(expr, cpp_typecheck_fargst());
   else if(
