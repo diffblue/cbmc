@@ -5129,16 +5129,12 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
                 id2string(req_copy.id()).find("__is_") == 0 ||
                 id2string(req_copy.id()).find("__has_") == 0)
               {
-                try
+                // [temp.constr.op]: short-circuiting evaluation
+                const auto r = cpp_typecheck.evaluate_constraint(req_copy);
+                if(r.has_value())
                 {
-                  cpp_typecheck.typecheck_expr(req_copy);
-                  simplify(req_copy, cpp_typecheck);
-                  if(req_copy.is_false())
-                    satisfied = false;
                   evaluated = true;
-                }
-                catch(...)
-                {
+                  satisfied = *r;
                 }
               }
               cpp_typecheck.get_message_handler().set_message_count(
