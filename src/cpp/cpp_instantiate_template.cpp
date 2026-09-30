@@ -6032,6 +6032,13 @@ skip_pack_removal_ft:
         // Search ALL template symbols, not just the current one.
         if(sym->value.is_nil() && sym->type.id() == ID_code)
         {
+          // N5008 [temp.mem]/1, [class.mfct]/1: prefer a definition of an
+          // ordinary member (pass 0) over that of a member template with the
+          // same name and arity (pass 1) -- libc++'s std::function defines
+          // both its copy constructor and its converting constructor
+          // template out of line, in either order.
+          int pass = 0;
+        next_pass:
           for(const auto &tsp : symbol_table)
           {
             if(!tsp.second.type.get_bool(ID_is_template))
@@ -6063,6 +6070,23 @@ skip_pack_removal_ft:
               std::size_t n_md = md_tt.template_parameters().size();
               std::size_t n_cls =
                 specialization_template_args.arguments().size();
+              // N5008 [temp.mem]/1: a definition with more template
+              // parameters than the class template has defines a member
+              // TEMPLATE.  Count the class template's PARAMETERS: with a pack
+              // (`template <class R, class... A> struct function<R(A...)>')
+              // the arguments are expanded (R, int, int), and the converting
+              // constructor template's definition (R, A, F) passed for the
+              // copy constructor's.
+              if(template_symbol.type.id() == ID_cpp_declaration)
+              {
+                const std::size_t class_parameters =
+                  to_cpp_declaration(template_symbol.type)
+                    .template_type()
+                    .template_parameters()
+                    .size();
+                if(n_md > class_parameters)
+                  n_cls = std::min(n_cls, class_parameters);
+              }
               // N5008 [dcl.fct]/3,5 + [class.mfct]/1: the definition that
               // belongs to this member is the one whose SIGNATURE matches
               // -- same-named overloads (libstdc++'s four `_M_construct'
@@ -6072,6 +6096,8 @@ skip_pack_removal_ft:
               // ("symbol '__str' is unknown", string from a literal read
               // garbage).  Compare the arity, and for a regular member the
               // parameter types after substituting the class's arguments.
+              if((pass == 0) != (n_md <= n_cls))
+                continue;
               if(!out_of_line_definition_matches(
                    *sym,
                    md,
@@ -6084,6 +6110,35 @@ skip_pack_removal_ft:
                 // Regular method: substitute all params
                 exprt body = static_cast<const exprt &>(
                   md.declarators()[0].find(ID_value));
+                // N5008 [class.base.init]/1: the ctor-initializer belongs to
+                // the constructor's definition.  The out-of-line definition
+                // of a member of a PARTIAL specialization reaches only this
+                // path, with its mem-initializers still on the declarator
+                // (`G<R()>::G(const G &o) : x(o.x) {}' lost `x(o.x)', so the
+                // copy constructor left x indeterminate); put them in front
+                // of the body as move_member_initializers does.
+                {
+                  irept initializers =
+                    md.declarators()[0].find(ID_member_initializers);
+                  bool already_there = false;
+                  for(const auto &op : body.operands())
+                  {
+                    if(
+                      op.id() == ID_code &&
+                      to_code(op).get_statement() == ID_member_initializer)
+                    {
+                      already_there = true;
+                    }
+                  }
+                  if(
+                    !already_there && initializers.is_not_nil() &&
+                    !initializers.get_sub().empty() &&
+                    sym->type.id() == ID_code)
+                  {
+                    move_member_initializers(
+                      initializers, to_code_type(sym->type), body);
+                  }
+                }
                 cpp_saved_template_mapt sm(template_map);
                 template_map.build(md_tt, specialization_template_args);
                 template_map.apply(body);
@@ -6284,6 +6339,8 @@ skip_pack_removal_ft:
               goto body_found;
             }
           }
+          if(++pass < 2)
+            goto next_pass;
         body_found:
         {
         }
@@ -6817,6 +6874,41 @@ skip_pack_removal_ft:
     {
       const irep_idt member_base_name =
         new_decl.declarators()[0].name().get_base_name();
+      // N5008 [temp.mem]/1: the out-of-class definition of a member
+      // TEMPLATE is introduced by the class template's parameter list and
+      // then the member template's own (the parser flattens both), so it has
+      // more template parameters than the definition of an ordinary member
+      // of the same class with the same name and arity -- libc++'s
+      // std::function copy constructor, `function(const function &)', whose
+      // definition precedes that of the converting constructor template
+      // `template <class F> function(F)'.  Among the candidate definitions
+      // prefer the one with the most template parameters.
+      std::size_t most_template_parameters = 0;
+      for(const auto &tsp : symbol_table)
+      {
+        if(
+          !tsp.second.type.get_bool(ID_is_template) ||
+          tsp.second.value.is_nil())
+          continue;
+        const exprt &tms = static_cast<const exprt &>(
+          tsp.second.value.find(ID_template_methods));
+        for(const auto &tm : tms.operands())
+        {
+          const cpp_declarationt &md = static_cast<const cpp_declarationt &>(
+            static_cast<const irept &>(tm));
+          if(
+            md.declarators().empty() ||
+            md.declarators()[0].name().get_base_name() != member_base_name ||
+            md.declarators()[0].find(ID_value).is_nil() ||
+            md.find(ID_template_type).is_nil())
+          {
+            continue;
+          }
+          most_template_parameters = std::max(
+            most_template_parameters,
+            md.template_type().template_parameters().size());
+        }
+      }
       bool attached = false;
       for(const auto &tsp : symbol_table)
       {
@@ -6884,6 +6976,12 @@ skip_pack_removal_ft:
               owner.resize(owner_args);
             if(class_part.empty() || owner != class_part)
               continue;
+          }
+          if(
+            md.template_type().template_parameters().size() <
+            most_template_parameters)
+          {
+            continue;
           }
           new_decl.declarators()[0].value() =
             static_cast<const exprt &>(md.declarators()[0].find(ID_value));
