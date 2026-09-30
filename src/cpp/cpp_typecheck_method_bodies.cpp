@@ -2299,7 +2299,6 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       }
     }
     bool defer = false;
-    bool auto_member_of_instance = false;
     {
       const irep_idt &class_id = _method_symbol->type.get(ID_C_member_name);
       if(!class_id.empty())
@@ -2323,23 +2322,18 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
           bool is_virtual = _method_symbol->type.get_bool(ID_C_is_virtual);
           if(!is_virtual)
             defer = true;
-          // ... except members with an undeduced auto return type: per
-          // N5008 [dcl.spec.auto.general]/13 the deduced return type is
-          // obtained from the definition, and any use of the member in a
-          // context that needs its type requires that deduction to have
-          // happened.  A deferred instance would keep the placeholder in
-          // its symbol type, so a later call site typechecks against
-          // `auto` and mis-converts (the non-member/declarator path
-          // already converts such functions eagerly for the same
-          // reason).  Members of NON-template classes keep the normal
-          // queue: their auto returns are deduced on demand at the call
-          // site, and an eager conversion here would run while the
-          // class is still being elaborated.
-          if(has_auto(_method_symbol->type))
-          {
-            defer = false;
-            auto_member_of_instance = true;
-          }
+          // That includes members with an undeduced auto return type.
+          // N5008 [dcl.spec.auto.general]/15 with [temp.inst]/11: return
+          // type deduction happens when the definition is instantiated, and
+          // that is only when the member is used; the call that needs the
+          // type converts it then (convert_deferred_method_now, from
+          // typecheck_method_application / typecheck_side_effect_function_
+          // call).  Converting it eagerly here evaluated its body while the
+          // class -- or, for a CRTP base such as view_interface<Derived>,
+          // the derived class being instantiated -- was still incomplete,
+          // and constraint values computed against it were kept
+          // (cpp20_auto_member_of_base_instantiated_before_derived_is_
+          // complete).
         }
       }
     }
@@ -2358,40 +2352,6 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       deferred_method_bodies.emplace(
         _method_symbol->name,
         method_bodyt(_method_symbol, method_map, instantiation_stack));
-    }
-    else if(auto_member_of_instance && _method_symbol->value.is_not_nil())
-    {
-      // Undeduced auto return type: per N5008 [dcl.spec.auto.general]/13
-      // the deduced type comes from the definition, and the call site
-      // being typechecked right now needs it -- convert eagerly under
-      // the method's template map instead of queueing (the queue drains
-      // only after the whole translation unit, far too late for the
-      // pending conversion at the call).  Mirrors the eager conversion
-      // in cpp_declarator_convertert for non-member auto functions.
-      template_mapt old_map;
-      old_map.swap(template_map);
-      template_map = method_map;
-      // This conversion is speculative: it runs while the class (and, for a
-      // CRTP base such as view_interface<Derived>, the derived class the
-      // body names) may still be incomplete.  convert_function then
-      // restores the parsed body and re-queues it ([temp.inst]/4); the
-      // attempt's diagnostics are not the program's.
-      const exprt parsed_body = _method_symbol->value;
-      try
-      {
-        sfinae_contextt speculative_guard{*this};
-        convert_function(*_method_symbol);
-        deferred_typechecking.erase(_method_symbol->name);
-      }
-      catch(...)
-      {
-        // user code that failed outside any class elaboration: leave it
-        // to the drain, which reports the error
-        _method_symbol->value = parsed_body;
-        method_bodies.push_back(
-          method_bodyt(_method_symbol, method_map, instantiation_stack));
-      }
-      template_map.swap(old_map);
     }
     else
     {

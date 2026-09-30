@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ member begin found: SUCCESS$
@@ -14,16 +14,15 @@ N5008 [temp.inst]/11, [dcl.spec.auto.general]/12, [class.mem.general]/8:
 view_interface<ref_view<int>>::front() has a deduced return type and is
 never used, so its definition is not instantiated; ref_view<int> is
 complete where __member_begin<ref_view<int> &> is evaluated, and its
-member `begin' satisfies the requirement.  The front end instantiates
-front()'s body while view_interface<ref_view<int>> -- ref_view's base -- is
-being instantiated, i.e. before ref_view<int> has its members; the body
-evaluates the constraint of ranges::begin, __member_begin<ref_view<int> &>
-comes out false and is kept, so the later use is false as well.  cvise
-reduction (/tmp/r163/red/nf_mb) of libstdc++'s <ranges>, where the parser's
-compound-requirement fast path (parse.cpp "Try compound requirement")
-happened to hide it: without the fast path cpp20_ranges_basic drops
-ranges_util.h:84 and operator| (round 163i).  The fix needs member bodies
-with a deduced return type to be instantiated on use only (a first attempt
-crashed on cpp20_ranges_basic), or constraint values computed against an
-incomplete class not to be cached.  g++ 13 and clang++ 18 accept the
-program.  Pre-existing (fails on bin53).
+member `begin' satisfies the requirement. The front end instantiated
+front()'s body while view_interface<ref_view<int>> -- ref_view's base --
+is being instantiated, i.e. before ref_view<int> has its members; the body
+evaluated the constraint of ranges::begin, __member_begin<ref_view<int> &>
+came out false and was kept, so the later use was false as well. Members
+with a deduced return type of class template specializations are now
+deferred like any other member and converted when a call needs their type.
+cvise reduction (/tmp/r163/red/nf_mb) of libstdc++'s <ranges>, where the
+parser's compound-requirement fast path (parse.cpp "Try compound
+requirement") happened to hide it: without the fast path
+cpp20_ranges_basic drops ranges_util.h:84 and operator| (round 163i). g++
+13 and clang++ 18 accept the program. Fails on bin53.
