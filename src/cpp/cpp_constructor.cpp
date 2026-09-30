@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 /// \param source_location: source location for generated code
 /// \param object: non-typechecked object
@@ -52,8 +53,8 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     auto code = cpp_constructor(source_location, object, {});
     if(value_initialization_zero_initializes(object_tc.type()))
     {
-      const auto zero =
-        ::zero_initializer(object_tc.type(), source_location, *this);
+      const auto zero = itanium_abi_cpp_zero_initializer(
+        object_tc.type(), source_location, *this);
       if(zero.has_value())
       {
         exprt zero_target = object_tc;
@@ -324,8 +325,8 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               default_val.id() == ID_initializer_list &&
               default_val.get_sub().empty())
             {
-              auto zero =
-                ::zero_initializer(comp.type(), source_location, *this);
+              auto zero = itanium_abi_cpp_zero_initializer(
+                comp.type(), source_location, *this);
               if(zero.has_value())
                 block.add(
                   code_frontend_assignt(std::move(member), std::move(*zero)));
@@ -559,7 +560,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             // with zero initialization.  Trailing members were
             // previously left uninitialized (`aggt x(1, 2)` with three
             // members read garbage from the third).
-            const auto zero = ::zero_initializer(
+            const auto zero = itanium_abi_cpp_zero_initializer(
               comp.type(), source_location, namespacet{symbol_table});
             if(!zero.has_value())
             {
@@ -1001,7 +1002,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             // initialization.  Previously trailing members were left
             // uninitialized, so `aggt x(1, 2)` with three members read
             // garbage from the third.
-            const auto zero = ::zero_initializer(
+            const auto zero = itanium_abi_cpp_zero_initializer(
               comp.type(), source_location, namespacet{symbol_table});
             if(!zero.has_value())
               continue;
@@ -1221,7 +1222,8 @@ void cpp_typecheckt::new_temporary(
     (type.id() == ID_struct_tag || type.id() == ID_union_tag) &&
     !cpp_is_pod(type) && value_initialization_zero_initializes(type))
   {
-    const auto zero = ::zero_initializer(type, source_location, *this);
+    const auto zero =
+      itanium_abi_cpp_zero_initializer(type, source_location, *this);
     if(zero.has_value())
     {
       exprt zero_target(ID_new_object, type);
