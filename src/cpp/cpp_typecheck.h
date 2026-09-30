@@ -1023,6 +1023,11 @@ protected:
   /// Whether \p expr is `&C::m' (an unparenthesized qualified-id) in a
   /// scope that has a `this' ([expr.unary.op]/4).
   bool is_qualified_member_address(const exprt &expr);
+
+  /// Whether the (substituted) constraint \p constraint is satisfied
+  /// ([temp.constr.op], [temp.constr.atomic]); empty when the front end
+  /// cannot evaluate it.
+  std::optional<bool> evaluate_constraint(const exprt &constraint);
   void explicit_typecast_ambiguity(exprt &);
   void unary_operand_typecast_ambiguity(exprt &);
   void typecheck_expr_main(exprt &) override;

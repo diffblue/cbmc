@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ first satisfied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first not satisfied: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.constr.op]/2: a conjunction checks its first operand and is not
+satisfied if that is not, without substituting into the second.  The
+partial specialization pick<T, 1> requires `requires { typename
+ref_of_t<T>; } && conv_v<ref_of_t<T>, T>'; for T = int the first operand
+is false and the second is ill-formed.  The front end type-checked the
+whole conjunction, the second operand failed, and the clause was taken as
+satisfied, so pick<int> selected pick<int, 1>.  The shape of libstdc++
+16's __common_reference_impl<_Tp1, _Tp2, 1> (common_reference_t<int &,
+long &>, cpp20_common_reference_int_lvalue_rvalue with GCC 16).  Fails on
+bin53.  g++ 13 and clang++ 18 accept the program.

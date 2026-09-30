@@ -2054,31 +2054,10 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             {
               exprt req_copy = req_clause;
               template_map.apply(req_copy);
-              // [temp.constr.atomic]/3: an unsatisfied atomic
-              // constraint is a soft failure, not an ill-formed
-              // program — treat typecheck errors here as SFINAE.
-              bool satisfied = true;
-              try
-              {
-                sfinae_contextt sfinae_guard{*this};
-                typecheck_expr(req_copy);
-                simplify(req_copy, *this);
-                // N5008 [temp.constr.atomic]/3: the constraint is
-                // unsatisfied when its (converted) value is false.  The
-                // substituted clause may simplify to a NUMERIC zero
-                // constant (a c-bool/int 0, e.g. libstdc++ <expected>'s
-                // `requires is_void_v<_Tp>` with _Tp = int) rather than a
-                // proper Boolean `false`; is_false() alone misses that,
-                // wrongly selecting the void partial specialization for
-                // every expected<_Tp, _Er>.
-                if(req_copy.is_false() || req_copy.is_zero())
-                  satisfied = false;
-              }
-              catch(...)
-              {
-                // Can't evaluate — treat as satisfied (backward compat)
-              }
-              if(!satisfied)
+              // A clause that cannot be evaluated is treated as satisfied
+              // (backward compatibility), see evaluate_constraint.
+              const auto satisfied = evaluate_constraint(req_copy);
+              if(satisfied.has_value() && !*satisfied)
                 continue;
             }
 
@@ -9306,4 +9285,58 @@ skip_pack_removal_ft:
   const symbolt &symb = lookup(new_decl.declarators()[0].get(ID_identifier));
 
   return symb;
+}
+
+std::optional<bool> cpp_typecheckt::evaluate_constraint(const exprt &constraint)
+{
+  // N5008 [temp.constr.op]/2: a conjunction checks its first operand and is
+  // not satisfied if that is not -- without substituting into the second;
+  // /3: a disjunction is satisfied by a satisfied first operand.  libstdc++
+  // 16's __common_reference_impl<_Tp1, _Tp2, 1> relies on it: `requires {
+  // typename __common_ref<_Tp1, _Tp2>; } && is_convertible_v<...,
+  // add_pointer_t<__common_ref<_Tp1, _Tp2>>>'.
+  if(
+    (constraint.id() == ID_and || constraint.id() == ID_or) &&
+    constraint.operands().size() >= 2)
+  {
+    const bool is_and = constraint.id() == ID_and;
+    bool open = false;
+    for(const auto &operand : constraint.operands())
+    {
+      const auto value = evaluate_constraint(operand);
+      if(value.has_value() && *value != is_and)
+        return !is_and; // decided by this operand
+      if(!value.has_value())
+      {
+        if(is_and)
+          return {}; // the remaining operands must not be substituted into
+        open = true;
+      }
+    }
+    if(open)
+      return {};
+    return is_and;
+  }
+  // [temp.constr.atomic]/3: an atomic constraint is satisfied if its value
+  // is true; a substitution failure makes it unsatisfied, but the front end
+  // cannot yet tell such a failure from an expression it does not support,
+  // so that result stays open.
+  exprt value = constraint;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_expr(value);
+    simplify(value, *this);
+  }
+  catch(...)
+  {
+    return {};
+  }
+  // the substituted clause may simplify to a NUMERIC zero (a c-bool/int 0,
+  // libstdc++ <expected>'s `requires is_void_v<_Tp>' with _Tp = int)
+  if(value.is_false() || value.is_zero())
+    return false;
+  if(value.is_constant())
+    return true;
+  return {};
 }
