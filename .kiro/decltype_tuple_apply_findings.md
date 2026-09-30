@@ -12756,3 +12756,21 @@ libstdc++ 16 status: namespace_reopened converts, regex_match, span fixed;
 common_reference: KNOWNBUG (variable template argument); ranges_basic: to be
 rechecked with GCC 16 headers; three stream tests: locale model work.
 Suites at e56e1600b3: cbmc-cpp green (17 skipped), cpp green, lint 0.
+
+## Round 163n: libstdc++ 16 locale model, ranges pipe reduction
+
+- daa1ffaa2a classic "C" ctype<char> facet model fills _M_widen/_M_narrow with
+  the identity and sets the _ok flags ([facet.ctype.char.virtuals]/1,
+  [facet.ctype.virtuals]/11).  With GCC 16 headers the three stream tests
+  verify; gcc16_stream_ctype_facet_vtable CORE (libstdcxx16 tag kept; WRONG
+  assertion added; other FAILUREs forbidden via a Perl lookahead line).
+- 374a486e2f KNOWNBUG cpp20_libstdcxx16_ranges_take_pipe_reduced: 540-line
+  header-free reduction (GCC 16 builtins; only g++ 16 accepts) --
+  operator|(_Range &&, _Self &&) rejected, built-in | tried.  Suppressed
+  errors include `ref_view{declval<_Range>()}' CTAD failing inside
+  __can_ref_view, `_M_count' unknown, `__can_reference' unknown; a
+  header-free CTAD imitation passes.  Not reduced further.
+
+libstdc++ 16 tally (8 sweep failures): 6 fixed (format fold, regex pattern,
+span, 3 stream tests), common_reference and ranges_basic are KNOWNBUGs with
+header-free reductions.
