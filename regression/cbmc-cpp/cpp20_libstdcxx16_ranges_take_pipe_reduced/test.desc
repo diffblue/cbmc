@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ the pipe converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [range.adaptor.object], [over.match.oper]/3: `arr | views::take(3)'
+selects the constrained operator|(_Range &&, _Self &&) of libstdc++ 16's
+range adaptors.  The front end rejects that candidate and falls back to
+the built-in `|', converting `arr' to `_Partial' through its variadic
+converting constructor ("conversion from 'signed int [5]' to 'struct
+_Partial': implicit arithmetic conversion not permitted").  With
+libstdc++ 13 (cpp20_ranges_basic) the same program verifies.  cvise
+reduction (/tmp/r163/red/kb_L16rng, kb_L16rng2) of cpp20_ranges_basic
+preprocessed with GCC 16.2.1's headers; not reduced further yet (540
+lines; the reduced loop no longer computes the sum, so the test only asks
+that the unit converts).  The file uses GCC 16's built-in type traits (__decay,
+__remove_cvref, ...): g++ 16 accepts it (with -O1 it links and runs, printing only
+the WRONG failure; the reduction left std::forward undefined); g++ 13 and clang++ 18 reject
+it for those built-ins.  Pre-existing (fails on bin53).
