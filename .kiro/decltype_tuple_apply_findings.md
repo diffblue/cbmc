@@ -12774,3 +12774,51 @@ Suites at e56e1600b3: cbmc-cpp green (17 skipped), cpp green, lint 0.
 libstdc++ 16 tally (8 sweep failures): 6 fixed (format fold, regex pattern,
 span, 3 stream tests), common_reference and ranges_basic are KNOWNBUGs with
 header-free reductions.
+
+## Round 163o: repeated non-virtual base subobjects ([class.mi]/4)
+
+- 5e2f0a1ce4 layout, conversions, member access.  add_base_components copies
+  the base's own flattened layout; every component records #subobject_path
+  (from a direct base or the containing virtual base).  A repeated data
+  member is renamed `name@/<path>' (first occurrence keeps its name);
+  functions, static members and types are one entity.  base_subobjects()
+  (new cpp_base_subobjects.cpp) replaces the name-based offset search in
+  make_ptr_typecast and base_subobject_offset: ambiguous conversions are
+  errors ([conv.ptr]/3, [conv.mem]/2).  Front-end casts to a direct base
+  (copy/move ctor/assign, base init, base dtor) carry #direct_base_cast.
+  object_of_naming_class: [class.access.base]/5-6, [expr.ref]/8.  Duplicate
+  DIRECT base is diagnosed as such ([class.mi]/3).  Multiple_Inheritance3
+  removed (pinned the rejection); cpp_repeated_non_virtual_base_subobjects
+  CORE; 8 new tests (3 positive, 5 negative; + cpp_duplicate_direct_base_class).
+- 8a098a6385 a virtual table per repeated subobject ([class.virtual]/2):
+  renamed vtable pointer gets the direct base's table, or its own
+  `virtual_table::X@D@/<path>' with this-adjusting thunks when D overrides.
+  do_virtual_table takes inherited entries only from the first occurrence.
+  5 polymorphic tests.
+- 369f2e6bfc NSDMIs of a POD-treated base's members by component
+  (#component_name), selected by #subobject_path.  Also fixed a pre-existing
+  bug: a derived member hiding the base member's name took both initializers
+  (cpp11_default_member_initializer_of_hidden_base_member; bin53 fails it).
+
+Pitfall hit: the direct-base-cast shortcut first also caught same-class and
+union casts (to_struct_tag_type invariant in 5 tests: union copy ctor,
+format header, libc++ string); now only a proper struct_tag base.
+
+Remaining name-based subobject logic (refactor candidates, not needed for
+the tests): cpp_constructor / default_assignop_value member matching,
+check_member_initializers, construction_vtable_* and set_virtual_base_offsets
+(virtual bases only, unaffected), the prefix-based `key.rfind("::")' matches
+in cpp_typecheck_constructor.cpp.
+
+Not fixed, pre-existing: `template <class T> struct S : S<T> {}' and a
+self-inheriting partial specialization crash (stack overflow) on bin53 too.
+
+Docker sweep at 169c24ad03: arch and tumbleweed (GCC 16 headers) 3 failures
+each, all libstdc++ 16: cpp20_common_reference_int_lvalue_rvalue and
+cpp20_ranges_basic (known, KNOWNBUG reductions exist) and
+cpp20_iterator_t_of_pointer_undeduced_declval (promoted in 594c6670fd; same
+`_Partial' conversion failure as ranges_basic).  gcc16 image: build fails,
+-Werror=array-bounds in develop's src/util/json.h:269 (as expected).
+
+Suites at 369f2e6bfc: cbmc-cpp green (t66, 16 skipped), KNOWNBUGs [OK] under
+-K, cpp green, lint 0.
