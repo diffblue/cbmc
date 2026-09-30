@@ -2571,11 +2571,38 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       }
     }
 
-    // We should only really resolve in qualified mode,
-    // no need to look into the parent.
-    // Plus, this should happen in class scope, not the scope of
-    // the constructor because of the constructor arguments.
-    symbol_expr = resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
+    const irep_idt component_name = code.get("#component_name");
+    const exprt &this_e = cpp_scopes.current_scope().this_expr;
+    if(
+      !component_name.empty() && this_e.is_not_nil() &&
+      this_e.type().id() == ID_pointer)
+    {
+      // an initializer full_member_initialization made for a member of a
+      // base class: that very component, not the result of looking up its
+      // name in this class ([class.member.lookup]: it may find a member of
+      // this class hiding it, or be ambiguous between subobjects)
+      exprt object{ID_dereference, to_pointer_type(this_e.type()).base_type()};
+      object.copy_to_operands(this_e);
+      object.set(ID_C_lvalue, true);
+      object.add_source_location() = code.source_location();
+      exprt member_expr{ID_member};
+      member_expr.set(ID_component_name, component_name);
+      member_expr.add_to_operands(std::move(object));
+      member_expr.add_source_location() = code.source_location();
+      const bool old_value = disable_access_control;
+      disable_access_control = true;
+      typecheck_expr_member(member_expr);
+      disable_access_control = old_value;
+      symbol_expr = std::move(member_expr);
+    }
+    else
+    {
+      // We should only really resolve in qualified mode,
+      // no need to look into the parent.
+      // Plus, this should happen in class scope, not the scope of
+      // the constructor because of the constructor arguments.
+      symbol_expr = resolve(member, cpp_typecheck_resolvet::wantt::VAR, fargs);
+    }
   }
 
   // N5008 [class.base.init]/7: a mem-initializer naming a POD BASE with an
