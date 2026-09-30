@@ -561,8 +561,15 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       symbol.value = std::move(val);
     }
 
-    if(symbol.value.type().find(ID_to_member).is_not_nil())
+    // the class of a pointer-to-member initializer completes a declared type
+    // without one (`auto'); a declared `int B::*' keeps its class, the value
+    // is converted to it ([conv.mem]/2)
+    if(
+      symbol.value.type().find(ID_to_member).is_not_nil() &&
+      symbol.type.find(ID_to_member).is_nil())
+    {
       symbol.type.add(ID_to_member) = symbol.value.type().find(ID_to_member);
+    }
 
     // N5008 [dcl.init.string]/1: an array of character type may be
     // initialized by a string literal of the matching kind.  A narrow
