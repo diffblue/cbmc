@@ -4316,9 +4316,42 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
   }
   else if(op.id() == ID_ptrmember && to_unary_expr(op).op().id() == "cpp-this")
   {
-    expr.type() = pointer_type(op.type());
-    expr.type().add(ID_to_member) = to_struct_tag_type(
+    // N5008 [expr.unary.op]/3.1: `&C::m' for a non-static data member m has
+    // type "pointer to member of C of type T" and designates C::m.
+    // [basic.compound]/3: a pointer to data member identifies the member
+    // within any object of its class; following the Itanium C++ ABI
+    // (section 2.3) that is the member's offset in C, a ptrdiff_t-sized
+    // value.  It is represented as the offset PLUS ONE, cast to the
+    // pointer-to-member type, so that the null member pointer value
+    // ([conv.mem]/1) is the null pointer -- zero-initialization and the
+    // conversion of nullptr then need no special case -- and differs from
+    // a pointer to a member at offset 0.  convert_pmop undoes the bias.
+    const struct_tag_typet class_tag = to_struct_tag_type(
       to_pointer_type(to_unary_expr(op).op().type()).base_type());
+    pointer_typet result_type = pointer_type(op.type());
+    result_type.add(ID_to_member) = class_tag;
+    if(op.type().id() == ID_c_bit_field)
+    {
+      // [class.bit]/3: `&' shall not be applied to a bit-field
+      error().source_location = expr.source_location();
+      error() << "cannot form a pointer to the bit-field member '"
+              << op.get(ID_component_name) << "'" << eom;
+      throw 0;
+    }
+    const auto offset =
+      member_offset(follow_tag(class_tag), op.get(ID_component_name), *this);
+    if(!offset.has_value())
+    {
+      error().source_location = expr.source_location();
+      error() << "cannot determine the offset of member '"
+              << op.get(ID_component_name) << "' of '" << to_string(class_tag)
+              << "'" << eom;
+      throw 0;
+    }
+    exprt value = typecast_exprt{
+      from_integer(*offset + 1, signed_size_type()), result_type};
+    value.add_source_location() = expr.source_location();
+    expr.swap(value);
     return;
   }
 
@@ -9163,6 +9196,44 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
         "pointer-to-member must have lvalue operand");
       op0 = address_of_exprt(op0);
     }
+  }
+
+  // N5008 [expr.mptr.oper]/2: for a pointer to DATA member, E1.*E2 is the
+  // member of E1 that E2 designates -- at E2's offset (see
+  // typecheck_expr_address_of) within E1's subobject of E2's class;
+  // /3: E1->*E2 is (*(E1)).*E2; /5: the cv-qualifiers combine as for E1.E2;
+  // /6: the result is an lvalue (an xvalue for an rvalue E1, which the
+  // front end does not distinguish).
+  if(to_pointer_type(op1.type()).base_type().id() != ID_code)
+  {
+    const struct_tag_typet &member_class = to_struct_tag_type(t1);
+    exprt object_pointer = op0;
+    const typet &object_class =
+      to_pointer_type(object_pointer.type()).base_type();
+    const bool object_const = object_class.get_bool(ID_C_constant);
+    if(
+      object_class.id() == ID_struct_tag &&
+      to_struct_tag_type(object_class).get_identifier() !=
+        member_class.get_identifier())
+    {
+      // [expr.mptr.oper]/2: the member class is a base of the object's
+      make_ptr_typecast(object_pointer, pointer_type(member_class));
+    }
+    typet member_type = to_pointer_type(op1.type()).base_type();
+    if(object_const)
+      member_type.set(ID_C_constant, true);
+    const exprt offset = minus_exprt{
+      typecast_exprt{op1, signed_size_type()},
+      from_integer(1, signed_size_type())};
+    const exprt address = typecast_exprt{
+      plus_exprt{
+        typecast_exprt{object_pointer, pointer_type(char_type())}, offset},
+      pointer_type(member_type)};
+    dereference_exprt member{address, member_type};
+    member.set(ID_C_lvalue, true);
+    member.add_source_location() = expr.source_location();
+    expr.swap(member);
+    return;
   }
 
   exprt tmp(op1);

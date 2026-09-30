@@ -15,6 +15,7 @@ Author:
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
 #include <util/pointer_expr.h>
+#include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
 #include <util/string_constant.h>
@@ -632,11 +633,86 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 
   if(subtype_typecast(to_struct, from_struct))
   {
+    // N5008 [conv.mem]/2: the result refers to the member in D's instance
+    // of B.  A pointer to DATA member is B's member offset plus one (see
+    // typecheck_expr_address_of); in D it is offset by the B subobject's
+    // offset, the null member pointer value staying null.
+    if(to_pointer_type(type).base_type().id() != ID_code)
+    {
+      const auto base_offset = base_subobject_offset(
+        static_cast<const typet &>(type.find(ID_to_member)),
+        static_cast<const typet &>(expr.type().find(ID_to_member)));
+      if(!base_offset.has_value())
+        return false;
+      if(*base_offset != 0)
+      {
+        const exprt value = typecast_exprt{expr, signed_size_type()};
+        const exprt shifted =
+          plus_exprt{value, from_integer(*base_offset, signed_size_type())};
+        const exprt zero = from_integer(0, signed_size_type());
+        new_expr = typecast_exprt{
+          if_exprt{equal_exprt{value, zero}, zero, shifted}, type};
+        return true;
+      }
+    }
     new_expr = typecast_exprt::conditional_cast(expr, type);
     return true;
   }
 
   return false;
+}
+
+/// The offset of the (non-virtual) \p base subobject within an object of
+/// class \p derived, the offset of its first data member in the flattened
+/// layout ([class.derived.general]/3, Itanium C++ ABI section 2.4); empty if
+/// it cannot be determined.
+std::optional<mp_integer>
+cpp_typecheckt::base_subobject_offset(const typet &derived, const typet &base)
+{
+  if(derived.id() != ID_struct_tag || base.id() != ID_struct_tag)
+    return {};
+  const struct_typet &derived_struct = follow_tag(to_struct_tag_type(derived));
+  const struct_typet &base_struct = follow_tag(to_struct_tag_type(base));
+  if(
+    to_struct_tag_type(derived).get_identifier() ==
+    to_struct_tag_type(base).get_identifier())
+  {
+    return mp_integer{0};
+  }
+  std::set<irep_idt> base_members;
+  for(const auto &c : base_struct.components())
+  {
+    if(
+      c.type().id() == ID_code || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.get_is_padding() ||
+      !c.get(ID_C_virtual_base).empty())
+    {
+      continue;
+    }
+    base_members.insert(c.get_name());
+  }
+  if(base_members.empty())
+    return mp_integer{0}; // an empty base shares its address
+  const namespacet ns{symbol_table};
+  std::optional<mp_integer> offset;
+  for(const auto &c : derived_struct.components())
+  {
+    if(base_members.count(c.get_name()) == 0)
+      continue;
+    if(!c.get(ID_C_virtual_base).empty())
+      return {}; // [conv.mem]/2: ill-formed through a virtual base
+    const auto member = member_offset(derived_struct, c.get_name(), ns);
+    if(!member.has_value())
+      return {};
+    // the base's own offset of that member
+    const auto in_base = member_offset(base_struct, c.get_name(), ns);
+    if(!in_base.has_value())
+      return {};
+    const mp_integer candidate = *member - *in_base;
+    if(!offset.has_value() || candidate < *offset)
+      offset = candidate;
+  }
+  return offset;
 }
 
 /// Boolean conversion

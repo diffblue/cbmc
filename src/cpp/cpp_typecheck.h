@@ -1251,6 +1251,8 @@ public:
   bool standard_conversion_pointer(
     const exprt &expr, const typet &type, exprt &new_expr);
 
+  std::optional<mp_integer>
+  base_subobject_offset(const typet &derived, const typet &base);
   bool standard_conversion_pointer_to_member(
     const exprt &expr, const typet &type, exprt &new_expr);
 
