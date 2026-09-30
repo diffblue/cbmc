@@ -62,15 +62,12 @@ void cpp_typecheck_fargst::build(
 /// of conversion (default-init / init_list-ctor / aggregate-init),
 /// the actual conversion is the typecheck step's job.
 ///
-/// To prevent the empty-`{}` case from selecting candidates whose
-/// elaboration triggers pathological depth in standard-library
-/// constexpr machinery, the empty path is restricted to class
-/// types whose tag identifier does not lie under `std::chrono::`,
-/// `std::tag-ratio<`, or `std::__detail::`.  This is not a
-/// principled name-based filter on overload resolution per se but
-/// a defensive narrowing to keep `<future>` etc. compiling while
-/// the underlying recursive-elaboration depth bug is tracked
-/// separately.
+/// N5008 [over.ics.list]/7: the empty `{}' is viable for a class with a
+/// default constructor whatever its name; the former exclusion of
+/// std::chrono, std::ratio and std::__detail classes (a guard against an
+/// elaboration-depth problem in <chrono> / <future> that the chrono, future
+/// and thread regression tests no longer show) dropped libstdc++'s
+/// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})').
 static bool brace_init_is_viable(
   const exprt &operand,
   const typet &target_type,
@@ -96,26 +93,6 @@ static bool brace_init_is_viable(
       id2string(to_struct_tag_type(base).get_identifier());
     if(id_str.find("tag-initializer_list<") != std::string::npos)
       return false;
-
-    // Defensive narrowing for the empty-`{}` case (see helper
-    // doc comment): if the destination is a chrono/ratio/__detail
-    // type, do not declare empty-`{}` viable here.  Non-empty
-    // brace-init is unaffected because it would not reach this
-    // path (no `initializer_list<U>` ctor on those types).
-    //
-    // CBMC's stored struct-tag identifiers have the format
-    // `<namespace-qualified-name>::tag-<class-name><...args>`;
-    // the `tag-` prefix is on the unqualified class name, not on
-    // the namespace.  So we look for the substring rather than
-    // anchoring at position 0.
-    if(operand.operands().empty())
-    {
-      if(
-        id_str.find("std::chrono::tag-") != std::string::npos ||
-        id_str.find("std::tag-ratio<") != std::string::npos ||
-        id_str.find("std::__detail::tag-") != std::string::npos)
-        return false;
-    }
   }
 
   const struct_typet &class_type =
