@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ not satisfied for int: SUCCESS$
@@ -24,3 +24,8 @@ begin() are resolved while their class is being defined and find the
 customization-point object `begin' (see cpp20_ranges_upper_bound_array,
 and the 152-line reduction in /tmp/r163/red/constraint_incomplete_class).
 g++ 13 and clang++ 18 accept the program.  Pre-existing (fails on bin52).
+Round 163m: passes.  The parser's compound-requirement fast path is removed
+(a single `{ expr } -> concept;' requirement is parsed like any other
+requirement body), member-qualified names are looked up in the object's
+class only ([basic.lookup.qual.general]/2), and deduced-return members of
+class template specializations are instantiated on use.  Fails on bin53.

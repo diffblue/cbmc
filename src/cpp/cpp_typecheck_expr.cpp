@@ -5853,6 +5853,7 @@ void cpp_typecheckt::typecheck_expr_member(
     cpp_typecheck_fargst new_fargs(fargs);
     new_fargs.add_object(op0);
     new_fargs.naming_scope = &naming_scope;
+    new_fargs.member_access = true;
 
     // N5008 [basic.lookup.qual]/6: for a ~type-name after . or ->, the
     // type-name is looked up both in the context of the entire

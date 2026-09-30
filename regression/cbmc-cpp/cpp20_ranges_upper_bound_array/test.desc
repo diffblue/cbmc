@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges::upper_bound on a built-in array: SUCCESS$
@@ -46,3 +46,8 @@ fail with the take_view / ref_view member lookup error) runs in
 'operator()'" at __algorithm/ranges_upper_bound.h:54) and the unit is
 rejected.  Audit residue items 4 and 10 (round 162); the `__estimated_width'
 / `__get_property' drops of every libc++ C++20 test are this shape.
+Round 163m: passes.  The parser's compound-requirement fast path is removed
+(a single `{ expr } -> concept;' requirement is parsed like any other
+requirement body), member-qualified names are looked up in the object's
+class only ([basic.lookup.qual.general]/2), and deduced-return members of
+class template specializations are instantiated on use.  Fails on bin53.
