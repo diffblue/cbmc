@@ -375,9 +375,9 @@ static exprt provide_classic_ctype_char_model(
   symbol_table.move(table_symbol, table_ptr);
 
   // The facet object: zero-initialised ctype<char> with _M_table pointing
-  // at the classification table.  The zeroed remainder is never used:
-  // ctype<char>::is reads only _M_table, and no virtual dispatch happens
-  // on this object.
+  // at the classification table and the widen/narrow caches filled (below);
+  // ctype<char>::is, widen and narrow read only those, and no virtual
+  // dispatch happens on this object.
   const struct_tag_typet facet_type{ctype_char->name};
   auto facet_zero =
     itanium_abi_cpp_zero_initializer(facet_type, ctype_char->location, ns);
@@ -387,10 +387,15 @@ static exprt provide_classic_ctype_char_model(
   const address_of_exprt table_address{
     index_exprt{table_ptr->symbol_expr(), from_integer(0, c_index_type())}};
 
-  // Set the _M_table component (wherever it sits, including inside a base
-  // class component) to the table's address.
-  std::function<bool(exprt &, const typet &)> set_m_table =
-    [&](exprt &value, const typet &type) -> bool
+  // Set the component named \p name (wherever it sits, including inside a
+  // base class component) to \p new_value.
+  std::function<bool(
+    exprt &, const typet &, const std::string &, const exprt &)>
+    set_component = [&](
+                      exprt &value,
+                      const typet &type,
+                      const std::string &name,
+                      const exprt &new_value) -> bool
   {
     const typet &followed =
       type.id() == ID_struct_tag
@@ -414,23 +419,51 @@ static exprt provide_classic_ctype_char_model(
       if(op_index >= value.operands().size())
         return false;
       const std::string cname = id2string(component.get_name());
+      const std::string suffix = "::" + name;
       if(
-        cname == "_M_table" ||
-        (cname.size() > 10 &&
-         cname.compare(cname.size() - 10, 10, "::_M_table") == 0))
+        cname == name ||
+        (cname.size() > suffix.size() &&
+         cname.compare(cname.size() - suffix.size(), suffix.size(), suffix) ==
+           0))
       {
         value.operands()[op_index] =
-          typecast_exprt::conditional_cast(table_address, component.type());
+          typecast_exprt::conditional_cast(new_value, component.type());
         return true;
       }
-      if(set_m_table(value.operands()[op_index], component.type()))
+      if(set_component(
+           value.operands()[op_index], component.type(), name, new_value))
+      {
         return true;
+      }
       ++op_index;
     }
     return false;
   };
-  if(!set_m_table(*facet_zero, facet_type))
+  if(!set_component(*facet_zero, facet_type, "_M_table", table_address))
     return nil_exprt{};
+
+  // N5008 [facet.ctype.char.virtuals]/1, [facet.ctype.virtuals]/11: in the
+  // "C" locale do_widen and do_narrow apply the simplest reasonable
+  // transformation, the identity on char.  libstdc++'s ctype<char>::widen /
+  // narrow read the caches _M_widen / _M_narrow when _M_widen_ok /
+  // _M_narrow_ok are set (the library fills them from the virtuals in
+  // _M_widen_init, whose body is in libstdc++.so); fill them here, so that
+  // no virtual call on the modelled object is needed.  libstdc++ 16's
+  // stream insertion reaches ctype<char>::widen (basic_ios::widen).
+  {
+    const typet char_type = ::char_type();
+    exprt::operandst identity;
+    for(int c = 0; c < 256; ++c)
+      identity.push_back(from_integer(c < 128 ? c : c - 256, char_type));
+    const array_typet cache_type{char_type, from_integer(256, size_type())};
+    const array_exprt cache{identity, cache_type};
+    const exprt one = from_integer(1, char_type);
+    // older libstdc++ versions without these members keep the facet as is
+    set_component(*facet_zero, facet_type, "_M_widen", cache);
+    set_component(*facet_zero, facet_type, "_M_widen_ok", one);
+    set_component(*facet_zero, facet_type, "_M_narrow", cache);
+    set_component(*facet_zero, facet_type, "_M_narrow_ok", one);
+  }
 
   symbolt facet_symbol{facet_symbol_name, facet_type, ID_cpp};
   facet_symbol.base_name = CPROVER_PREFIX "classic_ctype_char";

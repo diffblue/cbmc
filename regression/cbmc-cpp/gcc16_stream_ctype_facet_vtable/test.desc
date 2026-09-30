@@ -1,12 +1,15 @@
-KNOWNBUG gcc16 libstdcxx16
+CORE gcc16 libstdcxx16
 main.cpp
 --cpp11 --object-bits 12
-^EXIT=0$
+^\[main\.assertion\.1\] line \d+ setw inserter converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+^\[(?!main\.assertion\.2\]).*: FAILURE$
 --
 KNOWNBUG with the headers of libstdc++ 16 (gcc 16) only; passes with gcc 11-15
 headers.  Reproduce by preprocessing with g++-16 -E (the predefined macros
@@ -19,3 +22,10 @@ assertion is SUCCESS.  Remaining: "no body for callee
 std::ctype<wchar_t>::do_widen/do_toupper/do_tolower" (the wchar_t facet's
 virtuals) -> VERIFICATION FAILED.  A header-free reduction of the
 remaining part is in progress (/tmp/r160/red).
+2026-09-30 (round 163m): passes.  The modelled "C" locale ctype<char> facet
+(cpp_typecheck_stdlib.cpp) now also fills the _M_widen / _M_narrow caches
+with the identity and sets _M_widen_ok / _M_narrow_ok
+([facet.ctype.char.virtuals]/1, [facet.ctype.virtuals]/11), so
+ctype<char>::widen needs no virtual call on the modelled object.  Checked
+by preprocessing in archlinux (GCC 16.2.1); a WRONG assertion was added, and any other failed property (the facet's
+pointer checks and missing bodies on bin53) is forbidden.

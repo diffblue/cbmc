@@ -14,5 +14,6 @@ int main()
   ss << std::setw(4) << 7;
   int reached = 1;
   __CPROVER_assert(reached == 1, "setw inserter converts");
+  __CPROVER_assert(reached == 2, "WRONG (must FAIL)");
   return 0;
 }
