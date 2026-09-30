@@ -211,7 +211,8 @@ codet cpp_typecheckt::dtor(
     make_ptr_typecast(
       cast_this,
       pointer_type(base_type),
-      /*static_virtual_base_offset=*/true);
+      /*static_virtual_base_offset=*/true,
+      /*direct_base=*/true);
     cast_this.add_source_location() = source_location;
     already_typechecked_exprt::make_already_typechecked(cast_this);
 

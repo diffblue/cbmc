@@ -5789,7 +5789,8 @@ bool cpp_typecheckt::base_publicly_accessible(
 void cpp_typecheckt::make_ptr_typecast(
   exprt &expr,
   const pointer_typet &dest_type,
-  bool static_virtual_base_offset)
+  bool static_virtual_base_offset,
+  bool direct_base)
 {
   typet src_type = expr.type();
 
@@ -5840,38 +5841,40 @@ void cpp_typecheckt::make_ptr_typecast(
 
   {
     // Where does the base subobject start in the derived class's layout?
-    // Its non-virtual part's first storage component, found by name among
-    // the derived class's components (flattened bases keep their component
-    // names); components of the derived class's virtual bases carry
-    // ID_C_virtual_base -- the base is then reached through a virtual base.
+    // N5008 [conv.ptr]/3, [expr.static.cast]/11: the result designates the
+    // base class subobject; a program that needs the conversion to an
+    // AMBIGUOUS base (a non-virtual base occurring more than once in the
+    // lattice, [class.mi]/4) is ill-formed.  Components of the derived
+    // class's virtual bases carry ID_C_virtual_base -- the base is then
+    // reached through a virtual base.
     const namespacet ns(symbol_table);
-    std::set<irep_idt> base_member_names;
-    for(const auto &c : base->components())
+    auto subobjects = base_subobjects(*derived, base->get(ID_name));
+    if(direct_base && subobjects.size() > 1)
     {
-      if(
-        c.type().id() == ID_code || c.get_bool(ID_is_type) ||
-        c.get_bool(ID_is_static) || c.get_is_padding() ||
-        !c.get(ID_C_virtual_base).empty())
-      {
-        continue;
-      }
-      base_member_names.insert(c.get_name());
+      // [class.base.init]/2, [class.dtor]/13: the direct (or virtual) base
+      // subobject, the one reached through no other base class
+      subobjects.erase(
+        std::remove_if(
+          subobjects.begin(),
+          subobjects.end(),
+          [](const base_subobjectt &subobject)
+          { return subobject.path.size() != 1; }),
+        subobjects.end());
     }
-
+    if(subobjects.size() > 1)
+    {
+      error().source_location = expr.find_source_location();
+      error() << "conversion between '" << to_string(src_type) << "' and '"
+              << to_string(dest_type) << "' through the ambiguous base class '"
+              << lookup(base->get(ID_name)).pretty_name << "'" << eom;
+      throw 0;
+    }
     std::optional<mp_integer> base_offset;
     irep_idt through_virtual_base;
-    for(const auto &comp : derived->components())
+    if(!subobjects.empty())
     {
-      if(base_member_names.find(comp.get_name()) == base_member_names.end())
-        continue;
-      const auto off = member_offset(*derived, comp.get_name(), ns);
-      if(!off.has_value())
-        break;
-      if(!base_offset.has_value() || *off < *base_offset)
-      {
-        base_offset = off;
-        through_virtual_base = comp.get(ID_C_virtual_base);
-      }
+      base_offset = subobjects.front().offset;
+      through_virtual_base = subobjects.front().virtual_base;
     }
 
     if(base_offset.has_value())

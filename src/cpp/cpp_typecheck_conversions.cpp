@@ -674,56 +674,21 @@ bool cpp_typecheckt::standard_conversion_pointer_to_member(
 }
 
 /// The offset of the (non-virtual) \p base subobject within an object of
-/// class \p derived, the offset of its first data member in the flattened
-/// layout ([class.derived.general]/3, Itanium C++ ABI section 2.4); empty if
-/// it cannot be determined.
+/// class \p derived; empty if it cannot be determined, or if \p base is an
+/// ambiguous or virtual base ([conv.mem]/2 forbids both).
 std::optional<mp_integer>
 cpp_typecheckt::base_subobject_offset(const typet &derived, const typet &base)
 {
   if(derived.id() != ID_struct_tag || base.id() != ID_struct_tag)
     return {};
-  const struct_typet &derived_struct = follow_tag(to_struct_tag_type(derived));
-  const struct_typet &base_struct = follow_tag(to_struct_tag_type(base));
-  if(
-    to_struct_tag_type(derived).get_identifier() ==
-    to_struct_tag_type(base).get_identifier())
-  {
-    return mp_integer{0};
-  }
-  std::set<irep_idt> base_members;
-  for(const auto &c : base_struct.components())
-  {
-    if(
-      c.type().id() == ID_code || c.get_bool(ID_is_type) ||
-      c.get_bool(ID_is_static) || c.get_is_padding() ||
-      !c.get(ID_C_virtual_base).empty())
-    {
-      continue;
-    }
-    base_members.insert(c.get_name());
-  }
-  if(base_members.empty())
+  const auto subobjects = base_subobjects(
+    follow_tag(to_struct_tag_type(derived)),
+    to_struct_tag_type(base).get_identifier());
+  if(subobjects.empty())
     return mp_integer{0}; // an empty base shares its address
-  const namespacet ns{symbol_table};
-  std::optional<mp_integer> offset;
-  for(const auto &c : derived_struct.components())
-  {
-    if(base_members.count(c.get_name()) == 0)
-      continue;
-    if(!c.get(ID_C_virtual_base).empty())
-      return {}; // [conv.mem]/2: ill-formed through a virtual base
-    const auto member = member_offset(derived_struct, c.get_name(), ns);
-    if(!member.has_value())
-      return {};
-    // the base's own offset of that member
-    const auto in_base = member_offset(base_struct, c.get_name(), ns);
-    if(!in_base.has_value())
-      return {};
-    const mp_integer candidate = *member - *in_base;
-    if(!offset.has_value() || candidate < *offset)
-      offset = candidate;
-  }
-  return offset;
+  if(subobjects.size() > 1 || !subobjects.front().virtual_base.empty())
+    return {};
+  return subobjects.front().offset;
 }
 
 /// Boolean conversion
