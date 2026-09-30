@@ -12697,3 +12697,39 @@ Docker sweeps at 4aac7b403e (outputs kept in /tmp/r163/dk/out_<tag>):
   <format>:4210 parse error (`... = __value )`), span:201 drop, stream/locale
   tests, common_reference, ranges_basic.  These are the "unexplained six" of
   round 163h: my gcc16 re-run used g++ 13 headers, hence they passed.
+
+## Round 163l: Itanium #ifdef, libstdc++ 16 triage
+
+- 77dc76f41b itanium_abi_cpp_zero_initializer (src/cpp/) + helpers; exact
+  Itanium encoding behind CPROVER_CPP_ITANIUM_DATA_MEMBER_POINTER_NULL, default
+  workaround (offset + 1, null = null pointer) because of the back-end pointer
+  encoding limitation ((int *)-1 two ways unequal in plain C; integer-derived
+  pointer added to an object address fails the bounds check; solver
+  "inconsistent").  Exact mode compiles; its suites not run.
+- 9679babe88 [temp.constr.op]/2-3: evaluate_constraint short-circuits && / ||
+  (both partial-specialization requires-clause checks).
+- 7f96ca5b3b [expr.prim.fold]/1: folds over = and compound assignments (parser
+  + typecheck_expr_main maps `statement(lhs, rhs)' to the side effect).
+  Nested compound assignment `(x += a) += b' aborts symex
+  ("address_arithmetic does not handle side_effect"), also bin53 -- not fixed.
+- c4bd703143 regex_match conversion gate: _Executor lost `bool __dfs_mode'.
+- 31316c2346 KNOWNBUG cpp20_constrained_partial_specialization_member_as_
+  variable_template_argument (kb_L16cr reduction).
+
+libstdc++ 16 failures (Arch 16.2.1 / Tumbleweed 16.2.0, same 8), triage using
+.ii preprocessed in the arch image (/tmp/r163/dk/l16) and the host cbmc:
+- namespace_reopened..._converts: <format>:4210 fold over `=' -- FIXED.
+- regex_match/test_conversion: pattern -- FIXED (desc).
+- common_reference_int_lvalue_rvalue: conjunction FIXED; the remaining failure
+  is the new KNOWNBUG above.
+- static_cast..._libstdcxx: span:201 `_M_extent(__v<_ArrayExtent>)' finds no
+  __extent_storage constructor; header-free imitation passes; cvise
+  kb_L16span running (docker-gcc16 gate).
+- ranges_basic: declval drops (type_traits:2720) -- the auto-member /
+  deduced-return family (cpp20_auto_member_of_base_instantiated_before_...).
+- ofstream_from_string, stream_destructor_chain, stream_setw: libstdc++ 16
+  locale/ctype internals: "no body for callee ctype<...>::do_widen /
+  _M_widen_init", vtable pointer NULL in ctype::widen.  The stdlib body model
+  (cpp_typecheck_stdlib.cpp) is keyed on libstdc++ 13 shapes; needs model
+  work per version.
+- gcc16-test snapshot build: -Werror=array-bounds in develop's json.h:269.
