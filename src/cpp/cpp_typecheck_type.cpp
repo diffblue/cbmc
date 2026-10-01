@@ -346,6 +346,19 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
     qualifiers.write(type);
 
+    // N5008 [basic.type.qualifier]/3 and Note 2: cv-qualifiers applied to an
+    // array type attach to its element type.  `const T' with T = char[3]
+    // (or a typedef of char[3]) is the array of const char, the same type
+    // as `const char[3]'; qualify the elements, not only the array.
+    for(typet *element = &type; element->id() == ID_array;)
+    {
+      element = &to_array_type(*element).element_type();
+      if(qualifiers.is_constant)
+        element->set(ID_C_constant, true);
+      if(qualifiers.is_volatile)
+        element->set(ID_C_volatile, true);
+    }
+
     const bool class_type = type.id() == ID_struct_tag ||
                             type.id() == ID_union_tag ||
                             type.id() == ID_struct || type.id() == ID_union;
