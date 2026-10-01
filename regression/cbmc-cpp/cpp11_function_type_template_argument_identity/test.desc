@@ -13,9 +13,13 @@ main.cpp
 N5008 [temp.type]/1, [dcl.fct]/5: two template-ids are the same when their
 type arguments are the same type; decltype(cb) and void(int) are.  A
 written function type template argument keeps its parameters in parsed
-form (cpp_declaration) while decltype(cb) is a converted code type, so the
-instances differ (tag-W<ptr_(parameter(...))->(void)> vs
-tag-W<(cpp_declaration(...))->(void)>) and the primary template is
-selected.  `same<void(int), void(int)>' and pointers to functions work.
-Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program, and it
-fails only its WRONG assertion.
+form (cpp_declaration, with the declarator part such as `&' or `*'
+separate from the base type) while decltype(cb) is a converted code type
+(parameters as `parameter'), so the instances differ
+(tag-W<(parameter(...))->(void)> vs tag-W<(cpp_declaration(...))->(void)>)
+and the primary template is selected.  Normalizing either form changes what
+the partial-specialization matcher compares, which relies on the parsed
+form.  (decltype(cb) itself used to be a pointer type; see
+cpp11_decltype_of_function_name.)  `same<void(int), void(int)>' and
+pointers to functions work.  Pre-existing (bin53).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
