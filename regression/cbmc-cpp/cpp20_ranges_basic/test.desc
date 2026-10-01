@@ -1,4 +1,4 @@
-CORE
+CORE broken-libstdcxx16
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
@@ -26,3 +26,7 @@ deduction from a discarded `if constexpr` branch (_All::operator());
 elaborated is re-queued instead of dropped (view_interface members and the
 ranges::begin(ref_view&) instance).  Exercised by the cpp20_ranges_* unit
 tests.
+Tagged broken-libstdcxx16 (temporary): with the libstdc++ 16 headers
+`arr | views::take(3)' is rejected; root cause
+cpp20_concept_disjunction_first_operand_substitution_failure (KNOWNBUG).
+Remove the tag when that is fixed.
