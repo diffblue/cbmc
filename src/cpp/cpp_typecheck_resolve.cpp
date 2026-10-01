@@ -9239,6 +9239,25 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
       {
         if(tp.id() == ID_ellipsis)
           break;
+
+        // N5008 [temp.deduct.type]/10: a function parameter pack `A...'
+        // (the last parameter, [temp.param]/11) is deduced from each of
+        // the remaining parameter types, as in the code-type branch below.
+        // Only its first element was deduced and the pack never recorded,
+        // so `R (&)(A...)' matched `int (&)(int, int)' as `int (&)(int)'
+        // and lost to `T &' ([temp.spec.partial.match]).
+        if(
+          tp.id() == ID_cpp_declaration &&
+          !to_cpp_declaration(tp).declarators().empty() &&
+          to_cpp_declaration(tp).declarators().front().get_has_ellipsis())
+        {
+          deduce_function_parameter_pack(
+            to_cpp_declaration(tp),
+            desired_type,
+            static_cast<std::size_t>(d_it - desired_params.begin()));
+          break;
+        }
+
         if(d_it == desired_params.end())
           break;
 
@@ -10621,6 +10640,28 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
       // temporary or a dereference of an unnamed rvalue reference (the
       // result of std::move) is not an lvalue (is_lvalue_expression);
       // named rvalue reference variables are.
+      // N5008 [temp.deduct.call]/2-3: the function-to-pointer conversion
+      // of the argument applies only when P is not a reference type; for
+      // a reference P (`T &', `T &&') a function lvalue's type A is the
+      // function type itself (T = void(int) for `cb'; a forwarding
+      // reference deduces T = void (&)(int)).
+      if(
+        is_reference(arg_type) && it->id() == ID_address_of &&
+        it->get_bool(ID_C_implicit) &&
+        to_address_of_expr(*it).object().type().id() == ID_code)
+      {
+        const typet &function_type = to_address_of_expr(*it).object().type();
+        if(is_forwarding_ref)
+        {
+          guess_template_args(
+            arg_declaration.type(), ::reference_type(function_type));
+        }
+        else
+          guess_template_args(arg_type, function_type);
+        ++it;
+        continue;
+      }
+
       const bool is_lvalue = cpp_typecheck.is_lvalue_expression(*it);
       if(is_forwarding_ref && is_lvalue)
       {
