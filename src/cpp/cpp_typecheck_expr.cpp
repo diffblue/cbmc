@@ -5935,6 +5935,21 @@ void cpp_typecheckt::typecheck_expr_member(
         subobject.set(ID_C_lvalue, op0.get_bool(ID_C_lvalue));
         subobject.add_source_location() = op0.source_location();
         op0 = std::move(subobject);
+        // The member is now looked up in N itself: drop the
+        // nested-name-specifier, which need not be visible from N's scope
+        // (`x.eh::m' with `eh' a member typedef of x's class).  The call
+        // stays non-virtual: typecheck_side_effect_function_call decided
+        // that from the qualified name before getting here.
+        cpp_namet terminal;
+        const auto &subs = component_cpp_name.get_sub();
+        std::size_t first = subs.size();
+        while(first > 0 && subs[first - 1].id() != ID_scope_resolution)
+          --first;
+        for(std::size_t i = first; i < subs.size(); ++i)
+          terminal.get_sub().push_back(subs[i]);
+        terminal.set(
+          ID_C_source_location, component_cpp_name.source_location());
+        expr.set(ID_component_cpp_name, terminal);
         typecheck_expr_member(expr, fargs);
         return;
       }
