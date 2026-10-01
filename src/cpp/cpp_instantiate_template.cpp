@@ -3364,7 +3364,9 @@ bool cpp_typecheckt::member_template_parameters_match(
       walk(ns.second);
   };
   walk(def_copy);
-  // parameter names are not signature ([dcl.fct]/3)
+  // parameter names are not signature ([dcl.fct]/3), and neither are
+  // default arguments ([dcl.fct]/5: the parameter-type-list; only the
+  // declaration carries them, [dcl.fct.default]/4)
   const auto strip_names = [](irept &params)
   {
     for(auto &pdecl : params.get_sub())
@@ -3372,7 +3374,10 @@ bool cpp_typecheckt::member_template_parameters_match(
       if(pdecl.id() != ID_cpp_declaration)
         continue;
       for(auto &d : static_cast<cpp_declarationt &>(pdecl).declarators())
+      {
         d.name() = cpp_namet{};
+        d.value().make_nil();
+      }
     }
   };
   irept decl_copy = decl_params;
