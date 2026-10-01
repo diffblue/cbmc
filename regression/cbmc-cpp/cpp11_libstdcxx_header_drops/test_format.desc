@@ -1,6 +1,6 @@
 KNOWNBUG
 format.cpp
---cpp20
+--cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ format: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
@@ -12,13 +12,11 @@ format.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-libstdc++ 13 <format>: std::format("{}", 42) makes the front end crash
-(SIGSEGV, unbounded recursion in primary_base / vtable_pointer_component),
-the root cause being cpp11_partial_specialization_const_T_matching_const_array
-(incrementable_traits<const char[1]>).  Including <format> alone drops
-format:1422 'format', 2456 _M_write, 3759/3765 vformat_to and
-bits/ranges_algobase.h:311 operator() (also seen in cpp20_format_header).
-3759/3765 and 2456 are
-cpp_function_template_default_argument_on_earlier_declaration; 1422 and 311
-are being reduced.  g++ 13 accepts this program, and it fails only its WRONG
-assertion.
+libstdc++ 13 <format>: std::format("{}", 42) returns a nondeterministic
+string, so the first assertion fails.  It used to crash (SIGSEGV;
+cpp11_partial_specialization_const_T_matching_const_array) and then failed
+to convert (cpp11_brace_elision_in_return_and_argument).  Remaining drops:
+format:1422 'format' (__formatter_fp::format), 2456 _M_write and
+bits/ranges_algobase.h:311 operator() (std::ranges::copy, see
+test_ranges_copy.desc).  g++ 13 accepts this program, and it fails only its
+WRONG assertion.

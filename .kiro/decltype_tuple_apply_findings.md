@@ -12950,3 +12950,39 @@ Left as KNOWNBUGs after suite regressions:
 
 Suites at 9176e8979a (binary S4): cbmc-cpp green (48 skipped), -K all
 [OK], cpp green, lint 0.
+
+## Round 163r: the two held-back fixes, decltype(f), __typeof__(a[0])
+
+- 929d38a631 [temp.deduct.type]/10: a function parameter pack in a
+  pre-conversion function_type pattern (`R (&)(A...)') was deduced only for
+  its first element and never recorded; and the pack was not expanded when
+  a pointer/reference-to-function pattern was substituted
+  (typecheck_template_args).  [dcl.ref]/1: qualifiers_match_recursively now
+  distinguishes pointer / & / &&.  Re-enabled [temp.deduct.call]/2-3 for
+  function lvalues (T& deduces the function type).
+- 93139becce [basic.lookup.unqual]/1: deduction for a partial specialization
+  selected while resolving a qualifier reused the resolver and overwrote
+  original_scope (resolve_scope); `at<al<int>>::rebind_alloc<vt>' looked vt
+  up in the specialization's template scope.  resolve_pattern_scope keeps
+  the point of use (3 deduction helpers).  Found with a hardware watchpoint
+  on this->original_scope.
+- 4a5a7c744a [expr.unary.op]/3.1 + [conv.mem]/2: &D::in with in from B is
+  B::*; the declared-pointer-to-member initializer path (over.over target
+  type) took the target's class and demanded identity.
+- e451d67e5a [dcl.fct]/5: default args ignored in
+  member_template_parameters_match, kept on graft.  Needed the two above
+  for libstdc++'s path::generic_string / __str_codecvt_in.
+- 83de4ff82c [dcl.type.decltype]/1.3: decltype(f) was the pointer type.
+- 038f95b99a GCC typeof: `__typeof__(a[0])' parsed as array type-id; resolve
+  like sizeof.
+
+Not fixed: cpp11_function_type_template_argument_identity (parsed vs
+converted function type template arguments; canonicalizing either side
+changes what the partial-specialization matcher compares: a design change).
+
+<format>: std::format("{}", 42) now converts (no crash, no conversion
+error) but returns nondet; remaining drops format:1422, 2456, and
+ranges_algobase.h:311 (test_format.desc updated, --object-bits 12).
+
+Suites on S7 (= HEAD source): cbmc-cpp green (47 skipped), -K all [OK],
+cpp green, lint 0.
