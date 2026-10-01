@@ -1,0 +1,25 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ pointer to integer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pointer to unrelated pointer: SUCCESS$
+^\[main\.assertion\.3\] line \d+ cast away const: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.type.conv]/1.1: with a single expression, T(e) is equivalent to
+the cast expression (T)e, which [expr.cast]/4 may interpret as a
+reinterpret_cast or a const_cast.  When T is a typedef-name, the front end
+resolves T(e) as constructor overload resolution and rejects these
+conversions ("found no match for symbol 'U', candidates are: constructor U
+(), constructor U (U)").  `(U)e' and `long(e)' work.  libstdc++'s
+__waiter_pool_base::_S_for computes `uintptr_t(__addr)', so its body is
+dropped (bits/atomic_wait.h:252 with GCC 13) for <atomic>, <thread>,
+<stop_token>, <future>, <condition_variable> and <memory>.  Pre-existing
+(bin53).  g++ 13 and clang++ 18 accept this program (-std=c++98), and it
+fails only its WRONG assertion.

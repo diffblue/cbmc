@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ inherited conversion: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.lookup.unqual]/5, [namespace.udecl]/1: a name in the
+conversion-type-id of `using B::operator I;' is looked up in B and then by
+unqualified lookup from the using-declaration, which finds the member
+typedef A::I.  The front end reports "symbol 'I' is unknown".  libstdc++'s
+atomic<int> (and the other integral explicit specializations) declare
+`using __base_type::operator __integral_type;', so std::atomic<int> is a
+conversion error (cpp11_libstdcxx_header_drops/test_atomic.desc).  A
+namespace-scope typedef and `operator int' work.  Pre-existing (bin53).
+g++ 13 and clang++ 18 accept this program (-std=c++98), and it fails only
+its WRONG assertion.

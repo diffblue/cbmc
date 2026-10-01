@@ -1,0 +1,12 @@
+KNOWNBUG
+class_template.cpp
+
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+See test.desc: `template <class T> struct S : S<T> {}' instantiated as
+S<int>.  The front end crashes (SIGSEGV).  g++ 13 and clang++ 18 reject
+this program.

@@ -1,0 +1,31 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ differing element types: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second argument of g is not const: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.prim.req.general]/4, [temp.variadic]/5: in `requires(A &&...a)'
+the pack declares one parameter per element of A, the k-th of type A_k &&.
+With A = {const int &, int &} the front end gives the parameters one and the
+same type ("type mismatch on static_cast: operand type 'const signed int',
+cast type 'signed int &'", suppressed), so the requirement is unsatisfied;
+with equal element types it works.  Root cause of the libc++ (LLVM 18)
+drops of __format's __get_property and __estimated_width in every C++20
+program including <vector> or <span> (cpp20_vector_basic_libcxx and 11
+other passing libcxx tests): libc++'s std::invocable is `requires(_Fn
+&&__fn, _Args &&...__args)', and ranges::upper_bound's
+indirect_strict_weak_order needs invocable<less &, const uint32_t &,
+uint32_t &>.  `std::ranges::upper_bound(array, v)' is then a conversion
+error.  Replacing std::invocable by is_invocable_v in a header overlay
+removes both drops, and also libc++'s std::function drops at
+__functional/function.h:272 and 350 (the remaining one, 394
+~__value_func, is cpp11_static_member_of_recursive_partial_specialization's
+aligned_storage).  Pre-existing (bin53).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.
