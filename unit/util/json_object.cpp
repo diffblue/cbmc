@@ -131,9 +131,8 @@ SCENARIO(
 
       std::sort(pragma_values.begin(), pragma_values.end());
       REQUIRE(
-        pragma_values ==
-        std::vector<std::string>{
-          "disable:bounds-check", "disable:pointer-check"});
+        pragma_values == std::vector<std::string>{
+                           "disable:bounds-check", "disable:pointer-check"});
     }
   }
 }
