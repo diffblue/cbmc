@@ -1,0 +1,12 @@
+CORE
+too_many.cpp
+--cpp11
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION
+--
+N5008 [dcl.init.aggr]/16: the fourth clause appertains to no element of IA,
+so the program is ill-formed.  g++ 13 and clang++ 18 reject it.

@@ -144,6 +144,14 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
+  /// Whether the braced-init-list \p list can aggregate-initialize an
+  /// object of the aggregate type \p type (an array, or a class the front
+  /// end treats as POD), with brace elision ([dcl.init.aggr]/16).
+  /// N5008 [over.ics.list]/8: such a list argument converts to an
+  /// aggregate parameter by a user-defined conversion sequence.
+  bool
+  aggregate_list_initialization_is_viable(const exprt &list, const typet &type);
+
   /// True if default-constructing an object of \p type must run at least one
   /// default member initializer (NSDMI), directly or in a subobject (a member
   /// of class type, or an element of an array of class type).  Per N5008

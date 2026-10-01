@@ -525,6 +525,16 @@ bool cpp_typecheck_fargst::match(
       distance += rank;
     }
     else if(
+      !is_reference(type) &&
+      cpp_typecheck.aggregate_list_initialization_is_viable(operand, type))
+    {
+      // N5008 [over.ics.list]/8: a braced-init-list that can
+      // aggregate-initialize the (non-reference) aggregate parameter type,
+      // with brace elision ([dcl.init.aggr]/16), converts by a user-defined
+      // conversion sequence (rank 4, as for brace_init_is_viable below).
+      distance += 4;
+    }
+    else if(
       operand.id() == ID_initializer_list && is_reference(type) &&
       to_pointer_type(type).base_type().id() == ID_array &&
       brace_init_to_array_is_viable(

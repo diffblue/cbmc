@@ -3864,6 +3864,37 @@ bool cpp_typecheckt::brace_init_to_array_reference(
   return true;
 }
 
+bool cpp_typecheckt::aggregate_list_initialization_is_viable(
+  const exprt &list,
+  const typet &type)
+{
+  if(
+    list.id() != ID_initializer_list || list.operands().empty() ||
+    !(type.id() == ID_array ||
+      (type.id() == ID_struct_tag && cpp_is_pod(type))))
+  {
+    return false;
+  }
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    // [dcl.init.aggr]/16: an initializer-clause left over after all
+    // elements and subaggregates are initialized makes the program
+    // ill-formed; do_initializer only warns about it ("member designator
+    // index ... out of bounds"), so any warning means not viable.
+    const auto warnings_before =
+      get_message_handler().get_message_count(messaget::M_WARNING);
+    exprt value = list;
+    do_initializer(value, type, false);
+    return get_message_handler().get_message_count(messaget::M_WARNING) ==
+           warnings_before;
+  }
+  catch(...)
+  {
+    return false;
+  }
+}
+
 void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
 {
   const exprt orig_expr = expr;
@@ -3888,6 +3919,45 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
     {
       expr = *zero;
       expr.add_source_location() = orig_expr.source_location();
+      return;
+    }
+  }
+
+  // N5008 [dcl.init.list]/3.2-3.4: copy-list-initialization of an
+  // aggregate -- an array, or a class that the front end treats as POD --
+  // is aggregate initialization ([dcl.init.aggr]), including brace elision
+  // ([dcl.init.aggr]/16: `return {2};' for `struct A { int v[1]; }', the
+  // `return {_S_to_enum<_Args>()...};' of libstdc++'s
+  // basic_format_args::_S_types_to_pack into std::array).  Only a single
+  // element whose type is T or a class derived from T initializes the object
+  // from that element ([dcl.init.list]/3.2); [dcl.init.list]/3.9 comes after
+  // 3.4.  Use the aggregate initialization of variables (do_initializer).
+  if(
+    e.id() == ID_initializer_list && !e.operands().empty() &&
+    (type.id() == ID_array ||
+     (type.id() == ID_struct_tag && cpp_is_pod(type))) &&
+    std::none_of(
+      e.operands().begin(),
+      e.operands().end(),
+      [](const exprt &op) { return op.id() == ID_designated_initializer; }))
+  {
+    bool from_element = false;
+    if(e.operands().size() == 1 && type.id() == ID_struct_tag)
+    {
+      const typet &element_type = e.operands().front().type();
+      from_element = element_type.id() == ID_struct_tag &&
+                     (to_struct_tag_type(element_type).get_identifier() ==
+                        to_struct_tag_type(type).get_identifier() ||
+                      subtype_typecast(
+                        follow_tag(to_struct_tag_type(element_type)),
+                        follow_tag(to_struct_tag_type(type))));
+    }
+    if(
+      !from_element && aggregate_list_initialization_is_viable(orig_expr, type))
+    {
+      exprt value = orig_expr;
+      do_initializer(value, type, false);
+      expr = std::move(value);
       return;
     }
   }
