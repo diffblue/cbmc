@@ -12822,3 +12822,82 @@ cpp20_iterator_t_of_pointer_undeduced_declval (promoted in 594c6670fd; same
 
 Suites at 369f2e6bfc: cbmc-cpp green (t66, 16 skipped), KNOWNBUGs [OK] under
 -K, cpp green, lint 0.
+
+## Round 163p: a KNOWNBUG per known issue; GCC 16 tag; json.h -Werror
+
+Tag `broken-libstdcxx16` (README, CMake, Makefile; excluded when host
+`gcc -dumpversion` >= 16): temporary, on cpp20_common_reference_int_lvalue_rvalue,
+cpp20_iterator_t_of_pointer_undeduced_declval, cpp20_ranges_basic; each desc
+names its root-cause KNOWNBUG (concept disjunction first-operand SFINAE;
+constrained partial specialization reached through a base chain).  Remove the
+tag when those are fixed.
+
+Method: sweep `#include <H>` for 68 standard headers x {libstdc++ 13, libc++
+18} (and libstdc++ 16.2 in archlinux) with drops listed, NOSUPPRESS for the
+suppressed error, header-free probes, header overlays to confirm a root cause
+(drop disappears), cvise when probes pass.  Also compared the sweep against
+bin53 to catch regressions.
+
+Regression found and fixed (mine, 5e2f0a1ce4): `x.eh::m' with eh a member
+typedef, inside a member function: after converting x to the naming class
+the qualified name was re-resolved in N's scope where eh is invisible.  Now
+the terminal name is looked up in N.  It dropped libstdc++'s
+_Hash_code_base::_M_swap (unordered_map::swap).  CORE test
+cpp_member_qualified_name_member_typedef_in_member_function.
+
+Root causes reduced to header-free KNOWNBUGs (all pre-existing, bin53):
+- recursive partial specialization, 3+ levels, instantiated outermost
+  first: static member initializer stays unresolved (nondet); enumerator /
+  base-class forms are conversion errors.  libc++ aligned_storage default
+  alignment (__find_max_align) -> std::function ~__value_func drop.
+- `const T' partial spec matched by `const char[N]' deduces T = const char[N]
+  -> self-base -> SIGSEGV.  std::format("{}", 42) and (GCC 16) path{"a"}.
+- default argument on an earlier declaration of a function template is lost
+  (libstdc++ 13 __do_vformat_to -> vformat_to drops; overlay confirms).
+- CTAD from a constructor taking `W<T> &' / `const W<T> &'
+  (_Formatting_scanner).
+- functional cast `U(ptr)' with U a typedef-name (uintptr_t(addr) in _S_for).
+- `using B::operator I;' with I a member typedef (std::atomic<int>).
+- __complex__ member mem-initializer `v{r, i}' (std::complex<float> ctor).
+- auto return: `return true;' + `return a == b;' deduce bool vs
+  __CPROVER_bool (libc++ __add_callback).
+- `using F = void(int); F *p = &cb;' invariant (libc++ __stop_callback_base).
+- references to functions not supported at all (`void (&r)(int) = cb;').
+- `int f(int N) { return N::b; }': lookup before :: must ignore variables
+  (libc++ __validate_* `__flags __flags').
+- requires(A &&...a) gives every pack parameter the same type (libc++
+  __get_property/__estimated_width and function.h:272/350; overlay confirms).
+- also: (x += a) += b through a reference; self-inheriting class (crash);
+  partial spec pattern over empty type pack.
+
+Header-based KNOWNBUGs (not yet reduced or several causes):
+cpp11_libstdcxx_header_drops (atomic, chrono, filesystem, format, istream,
+memory_resource, ranges_copy, stop_token) and cpp20_libcxx_header_drops
+(chrono, functional, stop_token).  Reductions running/pending: kb_MR
+(memory_resource __normal_iterator over incomplete _BigBlock), kb_FS
+(__shared_count / _M_dispose with non-pointer _Ptr), kb_RD (istream::read
+sentry), kb_RC (ranges::copy(first, last, out) "no match for operator()").
+cvise pitfall: a SIG-only interestingness test gives degenerate programs
+whenever g++ never instantiates the body that cbmc type-checks: kb_F1422,
+kb_RA311 (incomplete types, `return 00;'), kb_MR (`__normal_iterator();' in
+an unused operator++(int)), kb_RD (body after `extern template class').  The
+reference compiler cannot gate such bodies; the SIG must name the suppressed
+error instead (kb_RD2 restarted with NOSUPPRESS and the sentry message).
+Stopped: kb_F3759 (root cause found), kb_F1422, kb_RA311, kb_MR, kb_HS (was
+the regression), and the stale kb_U8 / kb_U8c from earlier rounds.
+
+json.h:269 -Werror=array-bounds with g++-16 (gcc16-test image, trunk
+snapshot 16.0.1 20260315): GCC PR 122197, a false positive after speculative
+devirtualization (r16-4000) in json_stringt::~json_stringt inlined through
+_Sp_counted_ptr_inplace::_M_dispose from make_shared<std::function<...>> in
+src/util/range.h:424.  libstdc++ silences it with pragmas (r16-7106, and for
+_M_dispose r17-2781 / r16-9434, in GCC 16.2).  Arch's 16.2.1 headers are
+clean with either compiler; the snapshot's headers warn with 16.2.1 too.
+Not a CBMC bug: update the image to GCC >= 16.2, or -Wno-error=array-bounds
+for GCC 16.0/16.1.
+
+Commits: d325a405e2 (fix + CORE test), a61a860fa2 (header-free KNOWNBUGs),
+b1422dcfa0 (header-based KNOWNBUGs).  Suites at b1422dcfa0 (binary built
+from d325a405e2's source): cbmc-cpp green (53 skipped), -K: 44 [OK], none
+failing; cpp green; lint 0.  The libstdc++ header-based descs also pass -K
+with Arch's GCC 16.2.1 headers.
