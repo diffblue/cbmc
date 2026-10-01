@@ -1,0 +1,21 @@
+KNOWNBUG
+istream.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ header: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+--
+libstdc++ 13 <istream>: the body of basic_istream::read (istream:576,
+defined in bits/istream.tcc:702) is dropped ("invalid implicit conversion
+from 'struct sentry' to '__CPROVER_bool'" for `if (__cerb)', sentry having
+an explicit operator bool); the other members using a sentry the same way
+convert.  Seen in cpp17_shared_count_constructor_template_not_instantiated_tu.
+Being reduced; a header-free imitation passes.  g++ 13 accepts this program,
+and it fails only its WRONG assertion.
