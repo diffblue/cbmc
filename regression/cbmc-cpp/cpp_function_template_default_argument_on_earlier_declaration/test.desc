@@ -20,7 +20,7 @@ declaration and lost it ("found no match for symbol 'f'"; inside the
 template g the body was dropped).  A namespace member defined
 by a qualified name (`n::h', [dcl.meaning.general]/3.1) was never merged
 with its declaration at all, default or not.  test_member.desc
-(KNOWNBUG) covers a member function template defined outside its class.  libstdc++ 13's vformat_to
+covers a member function template defined outside its class.  libstdc++ 13's vformat_to
 calls __format::__do_vformat_to with three arguments, so its bodies
 (format:3759/3765) were dropped in every program including <format>.
 bin53: CONVERSION ERROR.  g++ 13 and clang++ 18 accept this program

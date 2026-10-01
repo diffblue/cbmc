@@ -1001,7 +1001,11 @@ void cpp_typecheckt::define_member_template_of_class(
       class_tt,
       tmpl_decl.template_type());
 
-    // graft: parameter list (its names), body, mem-initializers
+    // graft: parameter list (its names), body, mem-initializers; the
+    // default arguments stay those of the declaration
+    // ([dcl.fct.default]/4)
+    carry_over_default_arguments(
+      decl_dtor.type().find(ID_parameters), def_copy.type().add(ID_parameters));
     decl_dtor.type() = def_copy.type();
     decl_dtor.add(ID_value) = def_copy.find(ID_value);
     const irept &m_inits = def_copy.find(ID_member_initializers);
