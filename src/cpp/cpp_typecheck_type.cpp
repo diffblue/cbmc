@@ -43,6 +43,17 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
   if(e.type().id() == ID_c_bit_field)
     type = to_c_bit_field_type(e.type()).underlying_type();
   else if(
+    !parenthesized && e.id() == ID_address_of && e.get_bool(ID_C_implicit) &&
+    to_address_of_expr(e).object().id() == ID_symbol &&
+    to_address_of_expr(e).object().type().id() == ID_code)
+  {
+    // N5008 [dcl.type.decltype]/1.3: `decltype(f)' for a function f is the
+    // type of the entity, the function type -- the front end has already
+    // applied the function-to-pointer conversion ([conv.func]) to the
+    // id-expression, which decltype does not perform.
+    type = to_address_of_expr(e).object().type();
+  }
+  else if(
     e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
     e.operands().size() == 1)
   {
