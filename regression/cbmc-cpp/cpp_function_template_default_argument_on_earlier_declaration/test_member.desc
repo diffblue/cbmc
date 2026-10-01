@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 member.cpp
 
 ^\[main\.assertion\.1\] line \d+ member function template: SUCCESS$
@@ -14,15 +14,6 @@ no body for callee
 N5008 [dcl.fct.default]/4, [temp.mem]/1, [dcl.fct]/5 (default arguments are
 not part of the parameter-type-list): the default on the in-class
 declaration of S::m made the declaration's and the definition's parameter
-lists compare unequal (cpp_typecheckt::member_template_parameters_match),
-so the definition's body was never attached ("no body for callee").
-Ignoring the default arguments there, and carrying them to the grafted
-definition, fixes this test but attaches libstdc++'s
-path::generic_string(const _Allocator & = _Allocator()) body, whose
-`allocator_traits<_Allocator>::template rebind_alloc<value_type>' then
-fails ("symbol 'value_type' is unknown"; the shape with std::allocator_traits
-and a member typedef value_type, not reproduced header-free yet) and
-cpp17_filesystem_basic / cpp17_filesystem_path_ops lose
-generic_string and __str_codecvt_in.  Pre-existing (bin53).  g++ 13 and
-clang++ 18 accept this program (-std=c++98), and it fails only its WRONG
-assertion.
+lists compare unequal, so the definition's body was never attached ("no
+body for callee", bin53).  g++ 13 and clang++ 18 accept this program
+(-std=c++98), and it fails only its WRONG assertion.
