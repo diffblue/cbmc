@@ -1,0 +1,21 @@
+KNOWNBUG
+atomic.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ atomic: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+--
+libstdc++ 13 <atomic>: std::atomic<int> is a conversion error, the root cause
+being cpp11_using_declaration_conversion_function_member_typedef (`using
+__base_type::operator __integral_type;').  The body of
+__waiter_pool_base::_S_for (bits/atomic_wait.h:252) is dropped, the root
+cause being cpp_functional_cast_through_typedef_reinterprets
+(`uintptr_t(__addr)').  g++ 13 accepts this program, and it fails only its
+WRONG assertion.

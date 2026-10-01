@@ -1,0 +1,24 @@
+KNOWNBUG
+filesystem.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ path: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+--
+libstdc++ 13 <filesystem>: the bodies of _Sp_counted_ptr::_M_dispose
+(bits/shared_ptr_base.h:427) and the __shared_count(_Ptr) constructor (913)
+are dropped: they are instantiated with a non-pointer _Ptr ("delete takes
+a pointer type operand, but got 'signed int'", also strong_ordering and
+partial_ordering) while overload resolution for path's constructors
+considers __shared_count(_Ptr).  Being reduced.  With the libstdc++ 16
+headers the front end crashes instead (SIGSEGV), the root cause being
+cpp11_partial_specialization_const_T_matching_const_array
+(incrementable_traits<const char[2]>).  g++ 13 accepts this
+program, and it fails only its WRONG assertion.

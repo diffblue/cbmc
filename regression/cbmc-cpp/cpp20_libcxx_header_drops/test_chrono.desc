@@ -1,0 +1,26 @@
+KNOWNBUG libcxx
+chrono.cpp
+--cpp20 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ duration: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+system-header declaration
+--
+libc++ (LLVM 18) <chrono>: drops __chrono/parser_std_format_spec.h:73-133
+__validate_* (cpp_nested_name_specifier_ignores_hiding_variable: `__flags
+__flags' then `__flags::__second'), __chrono/year_month_day.h:200-203
+year_month_day_last's operator+= / operator-= ("symbol 'operator=' is
+unknown" for `*this = *this + __dm;'; a header-free imitation passes), 212
+operator local_days, 271/276/280 operator/ and 309 operator+ ("invalid
+implicit conversion from 'struct year_month_day_last' to 'struct
+std::__1::chrono::year'"), the __format drops (see test_functional.desc),
+and one system-header declaration (listed without a location at
+--verbosity 10).  clang++ 18 -stdlib=libc++ accepts this program, and it
+fails only its WRONG assertion.
