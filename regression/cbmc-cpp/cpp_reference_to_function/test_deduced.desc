@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 deduced.cpp
 
 ^\[main\.assertion\.1\] line \d+ deduced parameter: SUCCESS$
@@ -11,13 +11,7 @@ deduced.cpp
 ^CONVERSION ERROR$
 --
 N5008 [temp.deduct.call]/2-3: for P = T & the argument type is the
-function type, so T = void(int).  The front end deduces from the decayed
-pointer and finds no match for call_deduced.  Deducing from the function
-type (in deduce_from_call_arguments) fixes this test but then a
-forwarding reference deduces F = int (&)(int, int), and
-cpp11_function_type_arg_pack_pattern's decay<F> selects the partial
-specialization decay<T &> instead of the more specialized
-decay<R (&)(A...)>: the front end orders `T &' against a pattern with a
-function parameter pack wrongly (with `R (&)(A1, A2)' it is right).
-Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program
-(-std=c++98), and it fails only its WRONG assertion.
+function type, without the function-to-pointer conversion, so
+T = void(int).  The front end deduced from the decayed pointer and found
+no match for call_deduced (bin53).  g++ 13 and clang++ 18 accept this
+program (-std=c++98), and it fails only its WRONG assertion.

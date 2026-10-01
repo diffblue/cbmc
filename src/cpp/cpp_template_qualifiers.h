@@ -44,6 +44,18 @@ inline bool qualifiers_match_recursively(const typet &a, const typet &b)
     return false;
   }
 
+  // N5008 [dcl.ref]/1, [dcl.ptr]/1: a pointer, an lvalue reference and an
+  // rvalue reference to the same type are distinct types.  References are
+  // pointers carrying #reference / #rvalue_reference here, attributes that
+  // irept::operator== also ignores.
+  if(
+    a.id() == ID_pointer && b.id() == ID_pointer &&
+    (a.get_bool(ID_C_reference) != b.get_bool(ID_C_reference) ||
+     a.get_bool(ID_C_rvalue_reference) != b.get_bool(ID_C_rvalue_reference)))
+  {
+    return false;
+  }
+
   if(a.id() == ID_code && b.id() == ID_code)
   {
     const code_typet &ca = to_code_type(a);

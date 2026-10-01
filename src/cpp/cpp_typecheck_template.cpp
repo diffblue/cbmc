@@ -3651,6 +3651,19 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
         // (The argument arrives as `code' or, straight from the parser, as
         // `function_type'; both carry the parameters as cpp_declarations.)
         strip_function_type_parameter_names(arg.type());
+        // N5008 [temp.variadic]/5: likewise for a pointer or reference to
+        // a function type whose parameter list is a pack expansion (the
+        // pattern `R (&)(A...)' of a partial specialization): expand the
+        // pack in the pointee's parameter list first, or the deduced pack
+        // collapses to a single parameter when the pattern is substituted
+        // and the specialization never matches.
+        if(
+          arg.type().id() == ID_frontend_pointer &&
+          to_type_with_subtype(arg.type()).subtype().id() == ID_function_type)
+        {
+          template_map.expand_parameter_packs(
+            to_type_with_subtype(arg.type()).subtype());
+        }
         // [temp.variadic]/5: if a function-type template argument
         // contains a function parameter pack (e.g. `_Res(_ArgTypes...)`
         // in a partial specialization pattern), expand the pack using
