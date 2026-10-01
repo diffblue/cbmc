@@ -17,6 +17,26 @@
 /// cv-qualifier-seq is the cv of the implicit object parameter's pointee).
 inline bool qualifiers_match_recursively(const typet &a, const typet &b)
 {
+  // N5008 [basic.type.qualifier]/3: an array type whose elements are
+  // cv-qualified has the cv-qualification of its elements, and cv-qualifiers
+  // applied to an array type attach to its element type.  The front end
+  // records them on the array node, on the element type, or both (`const T'
+  // with T = char[3] marks the array, `const char[3]' both), so compare the
+  // element types with the array's qualifiers pushed down to them.
+  if(a.id() == ID_array && b.id() == ID_array)
+  {
+    const auto pushed_down = [](const typet &array)
+    {
+      typet element = to_array_type(array).element_type();
+      if(array.get_bool(ID_C_constant))
+        element.set(ID_C_constant, true);
+      if(array.get_bool(ID_C_volatile))
+        element.set(ID_C_volatile, true);
+      return element;
+    };
+    return qualifiers_match_recursively(pushed_down(a), pushed_down(b));
+  }
+
   if(
     a.get_bool(ID_C_constant) != b.get_bool(ID_C_constant) ||
     a.get_bool(ID_C_volatile) != b.get_bool(ID_C_volatile))
