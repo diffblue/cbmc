@@ -503,11 +503,40 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       }
       else if(resolved_expr.id() == ID_member)
       {
-        symbol.value = address_of_exprt(
-          lookup(resolved_expr.get(ID_component_name)).symbol_expr());
+        const symbolt &function_symbol =
+          lookup(resolved_expr.get(ID_component_name));
+        symbol.value = address_of_exprt(function_symbol.symbol_expr());
 
-        symbol.value.type().add(ID_to_member) =
-          to_member_expr(resolved_expr).compound().type();
+        // N5008 [expr.unary.op]/3.1: the pointer to member is one of the
+        // class m is a member of -- the class declaring the function, whose
+        // object its `this' points to -- which for a function inherited
+        // from a base B is B, not the class of the target type
+        // (libstdc++'s __str_codecvt_in: `_ConvFn __fn =
+        // &codecvt<_CharT, char, _State>::in;' with `in' a member of
+        // __codecvt_abstract_base).  [conv.mem]/2 then converts it.
+        typet member_class = to_member_expr(resolved_expr).compound().type();
+        const auto &parameters =
+          to_code_type(function_symbol.type).parameters();
+        if(
+          !parameters.empty() && parameters.front().get_this() &&
+          parameters.front().type().id() == ID_pointer &&
+          to_pointer_type(parameters.front().type()).base_type().id() ==
+            ID_struct_tag)
+        {
+          member_class = to_pointer_type(parameters.front().type()).base_type();
+        }
+        member_class.remove(ID_C_constant);
+        member_class.remove(ID_C_volatile);
+        symbol.value.type().add(ID_to_member) = member_class;
+
+        exprt converted;
+        if(
+          symbol.type != symbol.value.type() &&
+          standard_conversion_pointer_to_member(
+            symbol.value, symbol.type, converted))
+        {
+          symbol.value = converted;
+        }
       }
       else
         UNREACHABLE;
