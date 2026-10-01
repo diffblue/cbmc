@@ -1,0 +1,24 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ converted to the derived class: SUCCESS$
+^\[main\.assertion\.2\] line \d+ pointer to member of the base: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.unary.op]/3.1, [conv.mem]/2: &D::in has type
+int (B::*)(int) const because in is a member of B; it converts to
+int (D::*)(int) const.  Initializing a pointer to member function from the
+address of a function took the class of the target type and required the
+types to be identical ("conversion from 'signed int (const struct D::
+*)(const struct B *, signed int)' to ...", bin53).  libstdc++'s
+__str_codecvt_in initializes `_ConvFn __fn = &codecvt<_CharT, char,
+_State>::in;' with in a member of __codecvt_abstract_base, so its body was
+dropped (cpp17_filesystem_basic once path::generic_string's body was
+attached).  g++ 13 and clang++ 18 accept this program (-std=c++98), and it
+fails only its WRONG assertion.
