@@ -3286,6 +3286,35 @@ exprt cpp_typecheck_resolvet::do_builtin(
 /// \par parameters: a cpp_name
 /// \return a base_name, and potentially template arguments for the base name;
 ///   as side-effect, we got to the right scope
+cpp_scopet &cpp_typecheck_resolvet::resolve_pattern_scope(
+  const cpp_namet &cpp_name,
+  irep_idt &base_name,
+  cpp_template_args_non_tct &template_args)
+{
+  // Matching the partial specialization `at<al<T>>' while `at<al<int>>::
+  // rb<vt>' is being resolved reached resolve_scope for the pattern's names
+  // and left original_scope at the specialization's template scope; `vt'
+  // was then looked up there ("symbol 'vt' is unknown", libstdc++'s
+  // `allocator_traits<_Alloc>::template rebind_alloc<value_type>' in
+  // path::generic_string).
+  struct point_of_use_guardt
+  {
+    cpp_typecheck_resolvet &resolver;
+    cpp_scopet *const scope;
+    const source_locationt location;
+    explicit point_of_use_guardt(cpp_typecheck_resolvet &r)
+      : resolver(r), scope(r.original_scope), location(r.source_location)
+    {
+    }
+    ~point_of_use_guardt()
+    {
+      resolver.original_scope = scope;
+      resolver.source_location = location;
+    }
+  } point_of_use_guard{*this};
+  return resolve_scope(cpp_name, base_name, template_args);
+}
+
 cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
   const cpp_namet &cpp_name,
   irep_idt &base_name,
@@ -8010,7 +8039,7 @@ void cpp_typecheck_resolvet::guess_template_args(
 
       cpp_template_args_non_tct template_args;
       irep_idt base_name;
-      resolve_scope(cpp_name, base_name, template_args);
+      resolve_pattern_scope(cpp_name, base_name, template_args);
 
       const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
         base_name, cpp_scopet::RECURSIVE);
@@ -8212,7 +8241,7 @@ bool cpp_typecheck_resolvet::guess_template_args_via_alias(
       irep_idt qual_base_name;
       cpp_template_args_non_tct qual_template_args;
       cpp_scopet &alias_scope =
-        resolve_scope(cpp_name, qual_base_name, qual_template_args);
+        resolve_pattern_scope(cpp_name, qual_base_name, qual_template_args);
       id_set = alias_scope.lookup(qual_base_name, cpp_scopet::QUALIFIED);
     }
     catch(...)
@@ -8933,7 +8962,7 @@ void cpp_typecheck_resolvet::guess_template_args_simple_name(
   {
     irep_idt base_name;
     cpp_template_args_non_tct template_args;
-    resolve_scope(cpp_name, base_name, template_args);
+    resolve_pattern_scope(cpp_name, base_name, template_args);
 
     const auto id_set = cpp_typecheck.cpp_scopes.current_scope().lookup(
       base_name, cpp_scopet::RECURSIVE);

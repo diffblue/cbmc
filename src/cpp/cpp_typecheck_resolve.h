@@ -54,6 +54,16 @@ public:
     irep_idt &base_name,
     cpp_template_args_non_tct &template_args);
 
+  /// resolve_scope for a name that is part of a template argument
+  /// deduction pattern ([temp.deduct.type]): unlike resolve_scope it keeps
+  /// the point of use (original_scope, source_location) of a resolution
+  /// that may be in progress on this resolver, whose remaining names are
+  /// still looked up from there ([basic.lookup.unqual]/1).
+  cpp_scopet &resolve_pattern_scope(
+    const cpp_namet &cpp_name,
+    irep_idt &base_name,
+    cpp_template_args_non_tct &template_args);
+
   cpp_scopet &resolve_namespace(const cpp_namet &cpp_name);
 
   /// Clear the static resolve_scope cache. Must be called between
