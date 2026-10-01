@@ -1,0 +1,22 @@
+CORE
+alias.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ alias: SUCCESS$
+^\[main\.assertion\.2\] line \d+ typedef element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ reference to array of const char: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.type.qualifier]/3 and Note 2: `const T' with T = char[3] (an
+alias template's `const T &') and `const A3' with A3 a typedef of char[3]
+are arrays of const char.  The front end qualified only the array node, so
+`cref<char[3]>' was not `const char (&)[3]' and could not bind to a string
+literal ("bad reference initializer", bin53); libstdc++'s
+basic_format_string(const _Tp &) was then not viable for std::format's
+format string.  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

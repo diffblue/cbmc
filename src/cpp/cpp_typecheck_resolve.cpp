@@ -9015,6 +9015,30 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
         subtypes.push_back(t);
     };
     flatten(template_type);
+    // N5008 [basic.type.qualifier]/3: an array type whose elements are
+    // cv-qualified has the cv-qualification of its elements, and "cv T"
+    // with T an array type is the array of cv-qualified elements.  So
+    // `const T' matched by `const char[3]' deduces T = char[3]: the
+    // qualifier is checked on, and removed from, the innermost element
+    // type (and the array nodes, which may carry a copy of it).
+    const auto innermost_element = [](typet &t) -> typet &
+    {
+      typet *e = &t;
+      while(e->id() == ID_array)
+        e = &to_array_type(*e).element_type();
+      return *e;
+    };
+    const auto has_qualifier = [&](const irep_idt &q)
+    { return desired.get_bool(q) || innermost_element(desired).get_bool(q); };
+    const auto remove_qualifier = [&](const irep_idt &q)
+    {
+      for(typet *e = &desired;; e = &to_array_type(*e).element_type())
+      {
+        e->remove(q);
+        if(e->id() != ID_array)
+          break;
+      }
+    };
     for(const auto &t : subtypes)
     {
       if(t.id() == ID_const)
@@ -9024,15 +9048,15 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
         // correspondingly qualified argument; `const T` does not match
         // a non-const type, so deduction fails (T stays unassigned and
         // the candidate is discarded by the has_unassigned() check).
-        if(strict_cv_deduction && !desired.get_bool(ID_C_constant))
+        if(strict_cv_deduction && !has_qualifier(ID_C_constant))
           return;
-        desired.remove(ID_C_constant);
+        remove_qualifier(ID_C_constant);
       }
       else if(t.id() == ID_volatile)
       {
-        if(strict_cv_deduction && !desired.get_bool(ID_C_volatile))
+        if(strict_cv_deduction && !has_qualifier(ID_C_volatile))
           return;
-        desired.remove(ID_C_volatile);
+        remove_qualifier(ID_C_volatile);
       }
       else
         guess_template_args(t, desired);

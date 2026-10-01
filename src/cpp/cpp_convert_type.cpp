@@ -44,9 +44,28 @@ public:
 
 protected:
   void read_rec(const typet &type) override;
+  void set_attributes(typet &type) const override;
   void read_function_type(const typet &type);
   void read_template(const typet &type);
 };
+
+/// N5008 [basic.type.qualifier]/3 and Note 2: cv-qualifiers applied to an
+/// array type attach to its element type, so `const T' with T = char[3] (a
+/// substituted template parameter, an alias template's `const T &') is the
+/// array of const char, the same type as `const char[3]'.  Qualify the
+/// elements as well as the array.
+void cpp_convert_typet::set_attributes(typet &type) const
+{
+  ansi_c_convert_typet::set_attributes(type);
+  for(typet *element = &type; element->id() == ID_array;)
+  {
+    element = &to_array_type(*element).element_type();
+    if(c_qualifiers.is_constant)
+      element->set(ID_C_constant, true);
+    if(c_qualifiers.is_volatile)
+      element->set(ID_C_volatile, true);
+  }
+}
 
 void cpp_convert_typet::read_rec(const typet &type)
 {
