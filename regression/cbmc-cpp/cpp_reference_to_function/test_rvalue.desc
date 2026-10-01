@@ -1,8 +1,8 @@
-KNOWNBUG
+CORE
 rvalue.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ rvalue reference: SUCCESS$
-^\[main\.assertion\.2\] line \d+ reference through alias: SUCCESS$
+^\[main\.assertion\.2\] line \d+ forwarding reference: SUCCESS$
 ^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
@@ -11,5 +11,5 @@ rvalue.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.init.ref]/5.3.1; see test.desc.  g++ 13 and clang++ 18 accept this
-program, and it fails only its WRONG assertion.
+N5008 [dcl.init.ref]/5.3.1, [temp.deduct.call]/3; see test.desc.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

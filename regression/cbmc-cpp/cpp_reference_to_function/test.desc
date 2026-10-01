@@ -1,11 +1,10 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ local: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ parameter: SUCCESS$
-^\[main\.assertion\.3\] line \d+ deduced parameter: SUCCESS$
-^\[main\.assertion\.4\] line \d+ global: SUCCESS$
-^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.3\] line \d+ global: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -14,9 +13,11 @@ main.cpp
 ^CONVERSION ERROR$
 --
 N5008 [dcl.init.ref]/5.1.1: a function lvalue binds directly to an lvalue
-reference to function.  Every form is rejected: `void (&r)(int) = cb;' is a
-"bad reference initializer", as is the global g, and the calls binding a
-`void (&)(int)' or deduced `T &' parameter are conversion errors.
-test_rvalue.desc covers `void (&&)(int)' and a reference through a function
-alias.  Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program
-(-std=c++98), and it fails only its WRONG assertion.
+reference to function.  The front end had decayed the function designator
+to a pointer before binding and rejected every form (`void (&r)(int) =
+cb;' and the global: "bad reference initializer"; the call: a conversion
+error).  test_rvalue.desc covers `void (&&)(int)' and a forwarding
+reference, test_address.desc that `&cb' does not bind, test_deduced.desc
+(KNOWNBUG) a deduced `T &' parameter.  bin53: bad reference initializer.
+g++ 13 and clang++ 18 accept this program (-std=c++98), and it fails only
+its WRONG assertion.
