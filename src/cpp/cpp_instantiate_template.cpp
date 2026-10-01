@@ -1544,6 +1544,56 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
           has_converging_int_args = true;
       }
 
+      // N5008 [temp.inst]/16 bounds only the TOTAL depth of recursive
+      // instantiations; a recursion that converges must not be cut short.
+      // A type argument that is a proper part of the corresponding
+      // argument of every enclosing instance of the same template (the
+      // partial specialization `F<W<T>>' instantiating `F<T>', libc++'s
+      // __find_max_align<__type_list<_Hp, _Tp>> recursing on _Tp)
+      // converges: its spelling is a proper substring of the enclosing
+      // one's, so the spellings get strictly shorter along the stack.
+      // Skipping the instance silently left `F<T>::value' unresolved and
+      // the enclosing member nondeterministic.
+      for(std::size_t i = 0;
+          i < full_args.arguments().size() && !has_converging_int_args;
+          ++i)
+      {
+        const exprt &arg = full_args.arguments()[i];
+        if(arg.id() != ID_type)
+          continue;
+        // a class (template instance) is spelled by its tag identifier,
+        // which spells its own template arguments
+        const auto spell = [](const typet &t) -> std::string
+        {
+          return t.id() == ID_struct_tag || t.id() == ID_union_tag
+                   ? id2string(to_tag_type(t).get_identifier())
+                   : cpp_type2name(t);
+        };
+        const std::string spelling = spell(arg.type());
+        bool all_parents_contain = true;
+        for(const auto &entry : instantiation_stack)
+        {
+          if(entry.identifier != primary_template.name)
+            continue;
+          const auto &parent_args = entry.full_template_args.arguments();
+          if(i >= parent_args.size() || parent_args[i].id() != ID_type)
+          {
+            all_parents_contain = false;
+            break;
+          }
+          const std::string parent_spelling = spell(parent_args[i].type());
+          if(
+            parent_spelling.size() <= spelling.size() ||
+            parent_spelling.find(spelling) == std::string::npos)
+          {
+            all_parents_contain = false;
+            break;
+          }
+        }
+        if(all_parents_contain)
+          has_converging_int_args = true;
+      }
+
       // Check if current args have a non-type integer constant that
       // is strictly less than the corresponding arg in every parent.
       for(const auto &arg : full_args.arguments())
