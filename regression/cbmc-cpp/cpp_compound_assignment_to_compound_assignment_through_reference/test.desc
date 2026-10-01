@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ both assignments: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.assign]/1: a compound assignment is an lvalue referring to its
+left operand, so `(x += 2) += 3' with x a reference to b adds 5 to b.  The
+goto program contains only `*x = *x + 2': the outer compound assignment is
+dropped without a diagnostic (b == 3).  With x an object rather than a
+reference it works.  test_parameter.desc: the same through a reference
+parameter aborts symbolic execution ("goto_symext::address_arithmetic does
+not handle side_effect").  Pre-existing (bin53).  g++ 13 and clang++ 18
+accept both programs, and they fail only their WRONG assertion.
