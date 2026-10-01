@@ -3275,6 +3275,47 @@ bool cpp_typecheckt::reference_binding(
 
   unsigned backup_rank = rank;
 
+  // N5008 [dcl.init.ref]/5.1.1 and 5.3.1: a reference to function type
+  // binds directly to a function lvalue whose type is reference-compatible
+  // ([dcl.init.ref]/4: the same function type, or a noexcept function type
+  // converted by a function pointer conversion, [conv.fctptr]).  A
+  // function designator arrives here either still of code type or already
+  // decayed to an implicit address_of ([conv.func]); an explicit `&f' is a
+  // prvalue pointer and does not bind.  References are pointers here, so
+  // the bound reference is the function's address.
+  if(reference_type.base_type().id() == ID_code)
+  {
+    exprt function = nil_exprt{};
+    if(expr.type().id() == ID_code)
+      function = expr;
+    else if(
+      expr.id() == ID_address_of && expr.get_bool(ID_C_implicit) &&
+      to_address_of_expr(expr).object().type().id() == ID_code)
+    {
+      function = to_address_of_expr(expr).object();
+    }
+    if(function.is_nil())
+      return false;
+    code_typet from = to_code_type(function.type());
+    code_typet to = to_code_type(reference_type.base_type());
+    // [conv.fctptr]: only noexcept may be dropped
+    const auto is_noexcept = [](const typet &t)
+    { return t.get_bool("#C_noexcept") || t.get_bool(ID_noexcept); };
+    if(is_noexcept(to) && !is_noexcept(from))
+      return false;
+    for(code_typet *t : {&from, &to})
+    {
+      t->remove("#C_noexcept");
+      t->remove(ID_noexcept);
+    }
+    if(from != to)
+      return false;
+    address_of_exprt address{function, reference_type};
+    address.add_source_location() = expr.source_location();
+    new_expr = std::move(address);
+    return true;
+  }
+
   if(reference_type.get_bool(ID_C_this) && !expr.get_bool(ID_C_lvalue))
   {
     // `this' has to be an lvalue
