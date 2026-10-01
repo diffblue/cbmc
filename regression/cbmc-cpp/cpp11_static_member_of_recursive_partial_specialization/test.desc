@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ three levels: SUCCESS$
@@ -11,18 +11,18 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.spec.partial.match]/1, [class.static.data]/4: F<W<W<W<int>>>>
-matches the partial specialization F<W<T>>, whose constant member is
-F<T>::value + 1, so its value is 3.  When the instances are not
-instantiated innermost first, the front end leaves the inner instances'
-initializers unresolved (F<W<W<int>>>::value is `<<expr:cpp_name>> + 1' in
-the symbol table) and the members are nondeterministic: both assertions
-fail, silently.  Instantiating F<W<W<int>>> first makes it work; two levels
-work.  test_enumerator.desc (an enumerator) and test_base_class.desc (the
-value inherited from a base class) are conversion errors ("instantiating
-'F' with <struct nil>").  The base-class form is libc++'s __find_max_align,
-the default argument of std::aligned_storage: `aligned_storage<24>::type'
-fails, so std::function's __value_func::__buf_ is missing and libc++'s
-~__value_func (function.h:394) is dropped (cpp11_function_basic_libcxx).
-Pre-existing (bin53).  g++ 13 and clang++ 18 accept these programs, and they
-fail only their WRONG assertion.
+N5008 [temp.spec.partial.match]/1, [class.static.data]/4, [temp.inst]/16:
+F<W<W<W<int>>>> matches the partial specialization F<W<T>>, whose constant
+member is F<T>::value + 1, so its value is 3.  The front end skipped any
+third nested instantiation of the same template with type arguments (a
+recursion guard), so F<W<int>> was never instantiated, the inner
+initializers stayed unresolved, and both assertions failed silently.  A
+type argument that is a proper part of the enclosing instances' arguments
+converges and is now instantiated.  test_enumerator.desc (an enumerator)
+and test_base_class.desc (the value inherited from a base class) were
+conversion errors ("instantiating 'F' with <struct nil>").  The base-class
+form is libc++'s __find_max_align, the default argument of
+std::aligned_storage: `aligned_storage<24>::type' failed, so std::function's
+__value_func::__buf_ was missing and libc++'s ~__value_func
+(function.h:394) was dropped.  bin53 fails all three.  g++ 13 and clang++ 18
+accept these programs, and they fail only their WRONG assertion.
