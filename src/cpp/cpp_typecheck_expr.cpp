@@ -4328,9 +4328,25 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
     code_typet::parameterst &args = code_type.parameters();
     if(!args.empty() && args.front().get_this())
     {
-      // it's a pointer to member function
-      const struct_tag_typet symbol(code_type.get(ID_C_member_name));
-      op.type().add(ID_to_member) = symbol;
+      // it's a pointer to member function.  N5008 [expr.unary.op]/3.1:
+      // `&C::m' has type "pointer to member of class C' of type T" where C'
+      // is the class m is a member of -- the class declaring it, whose
+      // object `this' points to; for a function inherited from a base B
+      // that is B, not the class named in the qualified-id (`&D::in' is
+      // `int (B::*)(int) const', which converts to `int (D::*)(int)
+      // const' by [conv.mem]/2).  The member name records the class the
+      // component was copied into.
+      typet member_class = struct_tag_typet{code_type.get(ID_C_member_name)};
+      const typet &this_type = args.front().type();
+      if(
+        this_type.id() == ID_pointer &&
+        to_pointer_type(this_type).base_type().id() == ID_struct_tag)
+      {
+        member_class = to_pointer_type(this_type).base_type();
+        member_class.remove(ID_C_constant);
+        member_class.remove(ID_C_volatile);
+      }
+      op.type().add(ID_to_member) = member_class;
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
