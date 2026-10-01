@@ -20,54 +20,74 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
+// Forward declaration: the alignment used to lay out a component within an
+// aggregate, which depends on whether the aggregate is packed.
+static mp_integer member_layout_alignment(
+  const typet &comp_type,
+  bool container_is_packed,
+  const namespacet &ns);
+
 mp_integer alignment(const typet &type, const namespacet &ns)
 {
-  // we need to consider a number of different cases:
-  // - alignment specified in the source, which will be recorded in
-  // ID_C_alignment
-  // - alignment induced by packing ("The alignment of a member will
-  // be on a boundary that is either a multiple of n or a multiple of
-  // the size of the member, whichever is smaller."); both
-  // ID_C_alignment and ID_C_packed will be set
-  // - natural alignment, when neither ID_C_alignment nor ID_C_packed
-  // are set
-  // - dense packing with only ID_C_packed set.
+  // The alignment of a type derives from:
+  // - an explicit alignment attribute in the source (ID_C_alignment),
+  // - alignment induced by packing (ID_C_packed), which reduces it,
+  // - or the natural alignment of the type.
+  // For an aggregate the alignment is the maximum of its members' alignments
+  // (computed in the aggregate's own packing context), which an explicit
+  // attribute can only raise. For a non-aggregate an explicit attribute is
+  // taken verbatim, matching GCC/Clang where e.g. a typedef may request an
+  // alignment smaller than the natural one -- unless the type is also packed,
+  // in which case packing caps it at the smaller of the requested and the
+  // natural value.
 
-  // is the alignment given?
-  const exprt &given_alignment=
+  // follow tags to the underlying definition
+  if(type.id() == ID_struct_tag)
+    return alignment(ns.follow_tag(to_struct_tag_type(type)), ns);
+  else if(type.id() == ID_union_tag)
+    return alignment(ns.follow_tag(to_union_tag_type(type)), ns);
+  else if(type.id() == ID_c_enum_tag)
+    return alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
+
+  const exprt &given_alignment =
     static_cast<const exprt &>(type.find(ID_C_alignment));
 
   mp_integer a_int = 0;
-
-  // we trust it blindly, no matter how nonsensical
-  if(given_alignment.is_not_nil())
+  if(given_alignment.is_not_nil() && given_alignment.id() != ID_default)
   {
     const auto a = numeric_cast<mp_integer>(given_alignment);
     if(a.has_value())
       a_int = *a;
   }
 
-  // alignment but no packing
-  if(a_int>0 && !type.get_bool(ID_C_packed))
-    return a_int;
-  // no alignment, packing
-  else if(a_int==0 && type.get_bool(ID_C_packed))
+  const bool packed = type.get_bool(ID_C_packed);
+
+  // Aggregates: the alignment is the maximum of the members' layout alignments
+  // (padding members do not contribute), which an explicit attribute can only
+  // raise.
+  if(type.id() == ID_struct || type.id() == ID_union)
+  {
+    mp_integer result = 1;
+    for(const auto &c : to_struct_union_type(type).components())
+    {
+      if(c.get_is_padding())
+        continue;
+      result = std::max(result, member_layout_alignment(c.type(), packed, ns));
+    }
+    if(a_int > result)
+      result = a_int;
+    return result;
+  }
+
+  // no explicit alignment, but packing: dense packing, i.e. alignment 1
+  if(a_int == 0 && packed)
     return 1;
 
-  // compute default
+  // compute the natural alignment
   mp_integer result;
 
   if(type.id()==ID_array)
     result = alignment(to_array_type(type).element_type(), ns);
-  else if(type.id()==ID_struct || type.id()==ID_union)
-  {
-    result=1;
-
-    // get the max
-    // (should really be the smallest common denominator)
-    for(const auto &c : to_struct_union_type(type).components())
-      result = std::max(result, alignment(c.type(), ns));
-  }
   else if(type.id()==ID_unsignedbv ||
           type.id()==ID_signedbv ||
           type.id()==ID_fixedbv ||
@@ -79,12 +99,6 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   }
   else if(type.id()==ID_c_enum)
     result = alignment(to_c_enum_type(type).underlying_type(), ns);
-  else if(type.id()==ID_c_enum_tag)
-    result=alignment(ns.follow_tag(to_c_enum_tag_type(type)), ns);
-  else if(type.id() == ID_struct_tag)
-    result = alignment(ns.follow_tag(to_struct_tag_type(type)), ns);
-  else if(type.id() == ID_union_tag)
-    result = alignment(ns.follow_tag(to_union_tag_type(type)), ns);
   else if(type.id()==ID_c_bit_field)
   {
     // we align these according to the 'underlying type'
@@ -93,12 +107,75 @@ mp_integer alignment(const typet &type, const namespacet &ns)
   else
     result=1;
 
-  // if an alignment had been provided and packing was requested, take
-  // the smallest alignment
-  if(a_int>0 && a_int<result)
-    result=a_int;
+  // Apply an explicit alignment to the natural one:
+  // - packed: capped at the smaller of the two ("#pragma pack(n)": a multiple
+  //   of n or of the member's size, whichever is smaller);
+  // - increase-only (an alignment attribute on an object, field or tag): used
+  //   only if it raises the alignment, matching GCC/Clang;
+  // - otherwise (a type-level alignment, e.g. from a typedef): taken verbatim,
+  //   so it may legitimately reduce the alignment.
+  if(a_int > 0)
+  {
+    if(packed)
+      result = std::min(a_int, result);
+    else if(type.get_bool(ID_C_alignment_increase_only))
+      result = std::max(a_int, result);
+    else
+      result = a_int;
+  }
 
   return result;
+}
+
+static mp_integer member_layout_alignment(
+  const typet &comp_type,
+  bool container_is_packed,
+  const namespacet &ns)
+{
+  const exprt &given =
+    static_cast<const exprt &>(comp_type.find(ID_C_alignment));
+  mp_integer given_int = 0;
+  if(given.is_not_nil() && given.id() != ID_default)
+  {
+    const auto a = numeric_cast<mp_integer>(given);
+    if(a.has_value())
+      given_int = *a;
+  }
+
+  // the natural alignment of the component, ignoring any explicit attribute
+  // or packing flag (both of which we are about to interpret here)
+  typet natural_type = comp_type;
+  natural_type.remove(ID_C_alignment);
+  natural_type.remove(ID_C_packed);
+  const mp_integer natural = alignment(natural_type, ns);
+
+  // A component-level packing attribute models #pragma pack(n): the parser
+  // attaches both a packing flag and the alignment n to each member, and the
+  // resulting alignment is the cap min(n, natural) ("a multiple of n or of the
+  // member's size, whichever is smaller"). A bare packed component (no
+  // alignment) is densely packed to a single byte.
+  if(comp_type.get_bool(ID_C_packed))
+  {
+    if(given_int > 0)
+      return std::min(given_int, natural);
+    return 1;
+  }
+
+  // The enclosing aggregate is packed (e.g. struct __attribute__((packed))):
+  // members are densely packed to a single byte, but an explicit aligned() on
+  // the member is honoured verbatim and may raise or lower the alignment.
+  if(container_is_packed)
+    return given_int > 0 ? given_int : mp_integer{1};
+
+  // Without any packing: an alignment attribute on the member's declarator
+  // (increase-only) can only raise the natural alignment, but a type-level
+  // alignment -- e.g. that of a reduced-alignment typedef used as the member's
+  // type -- is honoured verbatim and may lower it, matching GCC/Clang.
+  if(given_int == 0)
+    return natural;
+  if(comp_type.get_bool(ID_C_alignment_increase_only))
+    return std::max(given_int, natural);
+  return given_int;
 }
 
 static std::optional<std::size_t>
@@ -379,7 +456,7 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
       continue;
     }
     else
-      a=alignment(it_type, ns);
+      a = member_layout_alignment(it_type, struct_is_packed, ns);
 
     DATA_INVARIANT(
       bit_field_bits == 0, "padding ensures offset at byte boundaries");
@@ -434,8 +511,11 @@ static void add_padding_gcc(struct_typet &type, const namespacet &ns)
         max_alignment = *tmp_i;
     }
   }
-  // Is the struct packed, without any alignment specification?
-  else if(struct_is_packed)
+  // Is the struct packed, without any alignment specification, and with no
+  // member forcing a larger alignment? Then there is no end-of-struct padding.
+  // (If a member carries an explicit alignment attribute, max_alignment is
+  // greater than one and the struct is still padded up to it, as GCC/Clang do.)
+  else if(struct_is_packed && max_alignment <= 1)
     return; // done
 
   // There may be a need for 'end of struct' padding.
@@ -467,9 +547,13 @@ void add_padding(struct_typet &type, const namespacet &ns)
 
 void add_padding(union_typet &type, const namespacet &ns)
 {
+  // The union's size must be a multiple of its alignment. alignment() already
+  // accounts for packing and for an explicit aligned() attribute (which raises
+  // the alignment even when the union is packed), so the size is padded up to
+  // that alignment, matching GCC and Clang.
   mp_integer max_alignment_bits =
     alignment(type, ns) * config.ansi_c.char_width;
-  mp_integer size_bits=0;
+  mp_integer size_bits = 0;
 
   // check per component, and ignore those without fixed size
   for(const auto &c : type.components())
@@ -477,13 +561,6 @@ void add_padding(union_typet &type, const namespacet &ns)
     auto s = pointer_offset_bits(c.type(), ns);
     if(s.has_value())
       size_bits = std::max(size_bits, *s);
-  }
-
-  // Is the union packed?
-  if(type.get_bool(ID_C_packed))
-  {
-    // The size needs to be a multiple of 1 char only.
-    max_alignment_bits = config.ansi_c.char_width;
   }
 
   if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)

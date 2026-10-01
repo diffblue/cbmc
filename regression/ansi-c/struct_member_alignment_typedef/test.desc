@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A reduced-alignment typedef used as a struct member keeps its alignment (as
+GCC/Clang/icx do), while a reducing alignment attribute on the member
+declarator is ignored. The two are distinguished by the
+C_alignment_increase_only provenance flag.
