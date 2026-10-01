@@ -21,6 +21,9 @@ else
 endif
 ifneq ($(shell test -n "$(host_gcc_major)" && test $(host_gcc_major) -ge 16 && echo yes),yes)
   excluded_libstdcxx += -X libstdcxx16
+else
+  # known to fail with the libstdc++ 16 headers (temporary, see README)
+  excluded_libstdcxx += -X broken-libstdcxx16
 endif
 
 # Exclude libc++ tests when libc++ headers are not installed

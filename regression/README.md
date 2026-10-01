@@ -27,6 +27,12 @@ This folder contains the CProver regression test-suite.
   meet (`-X libstdcxx16`): with older headers the test would not exercise the
   header shape it was written for.  A test for such a shape belongs here as
   `CORE gcc-only libstdcxx16`, not as KNOWNBUG.
+- `broken-libstdcxx16`:
+  A CORE test known to fail with the libstdc++ 16 headers; excluded (like
+  `libstdcxx16`, by the host `gcc -dumpversion`) when the host gcc is 16 or
+  later.  This is temporary: each such test has a KNOWNBUG, reduced to its
+  root cause and named in the test's desc, and the tag is removed when that
+  KNOWNBUG is fixed.
 - `gcc16`:
   Tests motivated by the libstdc++ 16 header shapes; a grouping tag only (the
   test may pass with older headers too).  Combine with `libstdcxx16` when the
