@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ return: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested class member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ pack expansion: SUCCESS$
+^\[main\.assertion\.4\] line \d+ argument: SUCCESS$
+^\[main\.assertion\.5\] line \d+ same class: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [stmt.return]/2, [dcl.init.list]/3.4, [dcl.init.aggr]/16: `return
+{1, 2, 3};' for `struct IA { int v[2]; int w; }' aggregate-initializes the
+result with brace elision; [over.ics.list]/8 makes `h({1, 2, 3})' viable.
+The front end paired the clauses with IA's members one by one ("invalid
+implicit conversion from 'signed int' to 'signed int [2l]'", bin53) and
+found no match for h.  Variables (`IA a = {1, 2, 3};') already worked.
+libstdc++'s basic_format_args::_S_types_to_pack (`return
+{_S_to_enum<_Args>()...};' into std::array) was dropped.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.
