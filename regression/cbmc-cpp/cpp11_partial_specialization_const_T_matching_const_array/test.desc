@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ const array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.type.qualifier]/3, [temp.deduct.type]/1: an array of const char
+is "const T" with T = char[3].  The front end deduces T = const char[3],
+so I<const char[3]> derives from itself and the type checker recurses
+without bound in primary_base / vtable_pointer_component (SIGSEGV).
+libstdc++'s incrementable_traits<const _Tp> : incrementable_traits<_Tp> takes
+this path for the type of a string literal: the last base resolved before
+the crash of cpp11_libstdcxx_header_drops/test_format.desc
+(std::format("{}", 42)) is incrementable_traits<const char[1]> :
+incrementable_traits<const char[1]>.  Pre-existing (bin53).  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

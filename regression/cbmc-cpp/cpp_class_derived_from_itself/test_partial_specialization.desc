@@ -1,0 +1,14 @@
+KNOWNBUG
+partial_specialization.cpp
+
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+See test.desc: the partial specialization `P<T &> : P<T &>' instantiated
+as P<int &> (the shape a wrong partial-specialization match produced in
+libstdc++'s __common_ref_impl, see doc/architectural/
+cpp-requires-expression-support.md).  The front end crashes (SIGSEGV).
+g++ 13 and clang++ 18 reject this program.
