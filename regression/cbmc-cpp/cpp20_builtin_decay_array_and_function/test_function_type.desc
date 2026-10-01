@@ -1,0 +1,16 @@
+KNOWNBUG
+function_type.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ function type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^PARSING ERROR$
+--
+See test.desc: `__decay(int(long))' is a parse error ("parse error before
+') ) , int'"), the builtin's argument being parsed as for __remove_cvref.
+g++ 16 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

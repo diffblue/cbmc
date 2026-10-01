@@ -1,4 +1,4 @@
-CORE
+CORE broken-libstdcxx16
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
@@ -26,3 +26,7 @@ Round 163m: passes since 1064342dec (deduced-return members of class
 template specializations are instantiated on use) and 0a0018a810 (no
 compound-requirement fast path); the type_traits:2386 drop is gone.
 Fails on bin53.
+Tagged broken-libstdcxx16 (temporary): with the libstdc++ 16 headers
+`arr | views::take(3)' is rejected; root cause
+cpp20_concept_disjunction_first_operand_substitution_failure (KNOWNBUG).
+Remove the tag when that is fixed.

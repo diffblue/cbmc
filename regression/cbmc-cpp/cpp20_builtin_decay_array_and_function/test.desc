@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ cv-qualified: SUCCESS$
+^\[main\.assertion\.2\] line \d+ top-level const: SUCCESS$
+^\[main\.assertion\.3\] line \d+ array: SUCCESS$
+^\[main\.assertion\.4\] line \d+ reference to array: SUCCESS$
+^\[main\.assertion\.5\] line \d+ unknown bound: SUCCESS$
+^\[main\.assertion\.6\] line \d+ function: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [meta.trans.other] decay: libstdc++ 16 implements std::decay with
+GCC's __decay(T) builtin.  The front end parses __decay as __remove_cvref
+(parse.cpp), so an array or function type does not decay to a pointer
+(std::__decay_t<int[5]> is int[5]); a function type written without a
+reference, `__decay(int(long))', is also a parse error.  Found while
+reducing the libstdc++ 16 ranges failure (iterator_t of an array inside
+ranges::__access::__member_begin); not the root cause of a CORE failure.
+g++ 16 and clang++ 18 accept this program, and it fails only its WRONG
+assertion (g++ 13 has no __decay).
