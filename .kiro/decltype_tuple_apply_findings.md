@@ -12901,3 +12901,52 @@ b1422dcfa0 (header-based KNOWNBUGs).  Suites at b1422dcfa0 (binary built
 from d325a405e2's source): cbmc-cpp green (53 skipped), -K: 44 [OK], none
 failing; cpp green; lint 0.  The libstdc++ header-based descs also pass -K
 with Arch's GCC 16.2.1 headers.
+
+## Round 163q: GCC 16 pragmas; root-cause fixes
+
+- 3b64911174: GCC >= 16 diagnostic pragmas around class json_stringt
+  (src/util/json.h) and unit test top_expression() (PR 122197 false
+  positives; PR 9024 rewrites the code instead).  Full gcc16-test build clean.
+- PID 674383: a cvise-spawned cbmc deadlocked in futex for 3 days, signals
+  blocked; SIGKILL.
+
+Fixes (each with CORE tests; bin53 fails the positive ones):
+- [basic.type.qualifier]/3: `const T' matched by `const char[3]' deduces
+  T = char[3] (guess_template_args_compound checks/removes the qualifier on
+  the innermost element too); cv applied to an array type through a
+  typedef-name or a substituted template parameter qualifies the elements
+  (cpp_typecheck_type cpp_name branch, cpp_convert_typet::set_attributes);
+  qualifiers_match_recursively pushes array-node cv down.  Fixes the
+  incrementable_traits<const char[N]> self-base SIGSEGV (std::format("{}",
+  42), and with GCC 16 headers filesystem::path{"a"}).
+- [dcl.init.list]/3.4, [dcl.init.aggr]/16, [over.ics.list]/8: brace elision
+  in copy-list-initialization outside variable declarations (return
+  statements, arguments) via do_initializer; aggregate_list_initialization_
+  is_viable (warnings from do_initializer = leftover clauses = not viable).
+  Found behind the std::format fix (_S_types_to_pack).
+- [dcl.fct.default]/4: a definition superseding a function template
+  declaration keeps the declaration's default arguments; a namespace member
+  template defined by a qualified name (`n::h') is now merged with its
+  declaration ([dcl.meaning.general]/3.1).  vformat_to drops gone.
+- [temp.inst]/16: the depth-2 same-template guard now lets a converging
+  type-argument recursion through (argument spelling a proper substring of
+  every enclosing instance's).  F<W<W<W<int>>>>::value, libc++
+  __find_max_align / aligned_storage<24>.
+- [dcl.init.ref]/5.1.1, 5.3.1: references to functions bind to function
+  lvalues (implicit address_of = function designator; explicit &f rejected).
+
+Left as KNOWNBUGs after suite regressions:
+- member template default arg (S::m defined outside): ignoring defaults in
+  member_template_parameters_match attaches libstdc++ path::generic_string,
+  whose `allocator_traits<_Allocator>::template rebind_alloc<value_type>'
+  then fails (value_type unknown); filesystem tests regressed.
+- deduced `T &' from a function lvalue ([temp.deduct.call]/2-3): correct
+  deduction exposes wrong partial ordering of `T &' vs `R (&)(A...)' (pack)
+  in cpp11_function_type_arg_pack_pattern.
+- New: `__typeof__(a[0])' fails ("no match for symbol 'a'"); `same<decltype
+  (f), void(int)>' false (template argument `void(int)' stays in parsed
+  cpp_declaration form).  KNOWNBUGs cpp_gcc_typeof_of_subscript,
+  cpp11_function_type_template_argument_identity.
+
+Suites at 9176e8979a (binary S4): cbmc-cpp green (48 skipped), -K all
+[OK], cpp green, lint 0.
