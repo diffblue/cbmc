@@ -408,6 +408,39 @@ void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
 /// Implements [temp.fct.general]: "A function template defines an unbounded
 /// set of related functions."  Also handles function template overloading
 /// per [temp.over.link].
+/// N5008 [dcl.fct.default]/4: a function template's default arguments are
+/// given on one declaration and apply to all later uses; a definition that
+/// follows a declaration does not repeat them.  Copy each default argument
+/// of \p declared_parameters (the earlier declaration's parameter list) to
+/// the corresponding parameter of \p defined_parameters that has none.
+static void carry_over_default_arguments(
+  const irept &declared_parameters,
+  irept &defined_parameters)
+{
+  const auto &old_params = declared_parameters.get_sub();
+  auto &new_params = defined_parameters.get_sub();
+  for(std::size_t i = 0; i < old_params.size() && i < new_params.size(); ++i)
+  {
+    if(
+      old_params[i].id() != ID_cpp_declaration ||
+      new_params[i].id() != ID_cpp_declaration)
+    {
+      continue;
+    }
+    const auto &old_param =
+      static_cast<const cpp_declarationt &>(old_params[i]);
+    auto &new_param = static_cast<cpp_declarationt &>(new_params[i]);
+    if(
+      old_param.declarators().size() == 1 &&
+      new_param.declarators().size() == 1 &&
+      old_param.declarators()[0].value().is_not_nil() &&
+      new_param.declarators()[0].value().is_nil())
+    {
+      new_param.declarators()[0].value() = old_param.declarators()[0].value();
+    }
+  }
+}
+
 void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 {
   PRECONDITION(declaration.declarators().size() == 1);
@@ -660,6 +693,21 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
         }
       }
 
+      // N5008 [dcl.fct.default]/4: a default argument of a function
+      // template is given on one declaration and applies to every later
+      // use; the definition must not repeat it.  It lives on the
+      // parameter declarators of the declaration being superseded, so
+      // carry it over to the definition's parameters (libstdc++ 13's
+      // __format::__do_vformat_to(..., const locale * = nullptr), defined
+      // later without the default and called with three arguments).
+      cpp_declarationt definition = declaration;
+      carry_over_default_arguments(
+        to_cpp_declaration(previous_symbol->type)
+          .declarators()[0]
+          .type()
+          .find(ID_parameters),
+        definition.declarators()[0].type().add(ID_parameters));
+
       // COPY rather than swap: `declaration` may live in a
       // class-template INSTANCE's stored body, which later member
       // instantiations re-read ([temp.mem]); swapping gutted the
@@ -667,7 +715,7 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
       // `_Args&&...` parameter and every call failed "found no
       // match").  irep sharing makes the copy cheap.
       static_cast<irept &>(previous_symbol->type) =
-        static_cast<const irept &>(declaration);
+        static_cast<const irept &>(definition);
       cpp_scopes.id_map[symbol_name] = &template_scope;
     }
 
@@ -868,19 +916,45 @@ void cpp_typecheckt::define_member_template_of_class(
 
   // resolve the qualifying class scope, component by component
   cpp_scopet *scope = &cpp_scopes.current_scope();
+  bool only_namespaces = true;
   for(std::size_t i = 0; i + 2 < subs.size(); ++i)
   {
     if(subs[i].id() == ID_scope_resolution)
       continue;
     if(subs[i].id() != ID_name)
       return;
-    const auto ids = scope->lookup(
-      subs[i].get(ID_identifier),
-      i == 0 ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED,
-      cpp_idt::id_classt::CLASS);
+    const auto lookup_kind =
+      i == 0 ? cpp_scopet::RECURSIVE : cpp_scopet::QUALIFIED;
+    auto ids = scope->lookup(
+      subs[i].get(ID_identifier), lookup_kind, cpp_idt::id_classt::CLASS);
+    if(ids.empty() && only_namespaces)
+    {
+      ids = scope->lookup(
+        subs[i].get(ID_identifier), lookup_kind, cpp_idt::id_classt::NAMESPACE);
+    }
+    else
+      only_namespaces = false;
     if(ids.size() != 1)
       return;
     scope = &cpp_scopes.get_scope((*ids.begin())->identifier);
+  }
+
+  // N5008 [dcl.meaning.general]/3.1: `template <class T> int n::f(T) {...}'
+  // with n a namespace defines the function template f of n declared there
+  // ([namespace.memdef]); its target scope is n.  Type-check it as a
+  // declaration of f in n, which merges it with the earlier declaration
+  // (body, parameter names and default arguments).
+  if(only_namespaces)
+  {
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_scopes.go_to(*scope);
+    cpp_declarationt in_namespace = declaration;
+    cpp_namet terminal;
+    terminal.get_sub().push_back(subs.back());
+    terminal.set(ID_C_source_location, cpp_name.source_location());
+    in_namespace.declarators()[0].name() = terminal;
+    typecheck_function_template(in_namespace);
+    return;
   }
 
   const irep_idt method_name = subs.back().get(ID_identifier);

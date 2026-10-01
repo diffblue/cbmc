@@ -15,9 +15,22 @@ int g(U u)
 {
   return f(u);
 }
+// the same for a namespace member defined by a qualified name
+// ([dcl.meaning.general]/3.1)
+namespace n
+{
+template <class T>
+int h(T, int = 7);
+}
+template <class T>
+int n::h(T, int k)
+{
+  return k;
+}
 int main()
 {
   __CPROVER_assert(f(1) == 1, "direct call");
   __CPROVER_assert(g(1) == 1, "call from a template");
+  __CPROVER_assert(n::h(1) == 7 && n::h(1, 8) == 8, "namespace member");
   __CPROVER_assert(f(1) != 1, "WRONG (must FAIL)");
 }
