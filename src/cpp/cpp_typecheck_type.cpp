@@ -774,6 +774,36 @@ void cpp_typecheckt::typecheck_type(typet &type)
 
         type=symbol_expr.type();
       }
+      else if(
+        tmp_type.id() == ID_array &&
+        to_array_type(tmp_type).element_type().id() == ID_cpp_name)
+      {
+        // GCC's typeof (gcc.gnu.org/onlinedocs/gcc/Typeof.html) takes an
+        // expression or a type-id; `__typeof__(a[0])' parses as the type-id
+        // "array of 0 a".  As for sizeof ([dcl.ambig.res]/2 resolves such
+        // an operand of sizeof by what the name denotes), when `a' does not
+        // name a type it is the expression a[0].
+        cpp_typecheck_fargst fargs;
+        exprt symbol_expr = resolve(
+          to_cpp_name(
+            static_cast<const irept &>(to_array_type(tmp_type).element_type())),
+          cpp_typecheck_resolvet::wantt::BOTH,
+          fargs);
+        if(symbol_expr.id() != ID_type)
+        {
+          exprt index{ID_index};
+          index.add_to_operands(
+            std::move(symbol_expr), exprt{to_array_type(tmp_type).size()});
+          index.add_source_location() = type.source_location();
+          typecheck_expr(index);
+          type = index.type();
+        }
+        else
+        {
+          typecheck_type(tmp_type);
+          type = tmp_type;
+        }
+      }
       else
       {
         typecheck_type(tmp_type);
