@@ -13019,3 +13019,93 @@ tuple:469 __tuple_impl, function.h:272 (pre-existing since S1).
 
 Suites on S12 (= HEAD): cbmc-cpp green (47 skipped), -K 38 [OK], cpp green,
 lint 0.
+
+## Round 163t: minimal KNOWNBUGs fixed, oldest standard first
+
+Audit commit 57d151888a added the round-163s KNOWNBUGs without notes; they
+are covered here.  Fixes (one commit each, test promoted to CORE, fails on
+bin53):
+- 79d2559517 [expr.type.conv]/1.1: `U(p)' with U a typedef of a scalar is
+  `(U)p'.  libstdc++ _S_for (atomic_wait.h:252).
+- 1f9b633b05 [basic.lookup.qual.general]/1: lookup before `::' skips scopes
+  that declare only variables/functions.  libc++ chrono __validate_*.
+- b0ea36237e [expr.assign]/1: `(x += 2) += 3' etc. through `*&(e)';
+  clean_expr_address_of cleans the operands of an lvalue side effect first
+  (shared goto conversion; C suites run).
+- 6cbf8a27bb [class.derived.general]/2: `struct X : X' diagnosed, no
+  SIGSEGV.  Checking elaborations_in_progress as well broke libc++
+  <ostream> (sentry::sentry: `__os.good()' unknown) -- only the class
+  itself is checked.  Class-template variants stay KNOWNBUG (tolerated).
+- 0ed292619a [over.match.viable]/2: @most_derived is not matched against
+  user arguments; cpp_destructor marks its own flag
+  (#most_derived_argument).  libc++ ostringstream ctor/dtor no longer drop.
+- ef2a71f448 [over.match.copy]/1.1: `E e = 1;' with only explicit E(int)
+  rejected; converting E(long) chosen over explicit E(int).  Only for a
+  non-class initializer: probing a class initializer instantiated
+  conversion function templates (cpp11_conversion_function_template_
+  copy_init dropped `collect').  First version (no explicit-ctor gate)
+  broke std::string s = "ab" -- the fast path is gated on a viable
+  explicit constructor.
+- 6fe87da27d [temp.deduct.type]/1: non-dependent built-in type arguments of
+  P (`os<wchar_t, T>') must equal A's.  libc++ xsputn/xsgetn drops.
+- 3ffc4621ca [temp.mem.class]/1, [temp.inst]/3: an out-of-class member
+  class definition is also instantiated for earlier specializations
+  (scope walk: instance scope -> template scope(s) -> namespace).
+  istream::read.  `struct ns::S<C>::N {}' (qualified) is never grafted.
+- 7cd6646e42 [basic.lookup.unqual]/1: template-name lookup also stops at a
+  namespace scope; class scopes still collect.  The tuple/get/optional set
+  (118 tests) passes.
+- 95d30ba3a3 [dcl.typedef]/2: convert_parsed_parameters for typedef/alias
+  function types (also noexcept -> #C_noexcept); member aliases too.
+  libc++ __stop_callback_base::__invoke.
+- fddbb10a67 [temp.type]/1: canonical_function_type in partial-spec matching
+  and repeated-deduction consistency (decltype(cb) vs void(int)).
+- 2353f8e5fe [basic.lookup.unqual]/5: conversion-type-id looked up in the
+  qualifier's class, then from the point of use.  std::atomic<int>.  A
+  private base's using-declared conversion is still "not accessible".
+- 67ea09e240 GCC __complex__ mem-initializer `v{r, i}'.  std::complex<float>.
+- 4a6d1059cc [temp.deduct.type]/9: unmatched trailing type pack recorded as
+  size 0 in elaborate_class_template's matcher.
+- 8d5de7cac8 [expr.rel]/2: cpp_bool_type for auto, decltype and deduced T.
+  libc++ <stop_token> has no drops.
+- be27e4c754 [temp.deduct.call]/3: CTAD guide from `S(W<T> &)' deduces from
+  the referred type.  `P d(W<short>{})' with P(W<T> &&) still fails.
+- 97fc54bc9f __decay(T): #decay flag on remove_cvref; operand parsed with
+  rTypeNameOrFunctionType.
+- 5fd08d9dfd [temp.deduct.type]/9.2: in partial ordering a pack expansion
+  A_i does not deduce a non-pack P_i (R<int, T> beats R<int, T...>).
+  Needed first: with the concept fix alone, GCC 13's cpp20_ranges_basic
+  failed (the correct concept value selected _Partial's pack specialization
+  over the single-argument one).  Still open: S<int, const int &, const int
+  &> (Example 4 #2, two elements) and a constrained pack specialization with
+  two elements select the primary.
+- 89d2974ed1 [temp.constr.op]: concept && / || per operand
+  (convert_concept_initializer); a requires-expression (parsed as an &&
+  chain of *_requirement nodes) is one atomic constraint -- splitting it
+  made weakly_incrementable<int> false.  With GCC 16.2.1 (archlinux docker)
+  cpp20_ranges_basic and cpp20_iterator_t_of_pointer_undeduced_declval pass;
+  tags removed.  cpp20_common_reference_int_lvalue_rvalue still fails there.
+- 53f2d01cb8 new KNOWNBUG cpp14_generic_lambda_body_checked_with_
+  placeholder_type: the speculative int check of a generic lambda body
+  (cpp_typecheck_expr.cpp "try type-checking with int parameters")
+  instantiates templates; root cause of <format> format:1422.
+
+Not fixed: cpp20_requires_expression_parameter_pack_of_differing_types
+(requires-parameter `A &&...a' is bound as ONE symbol with the first
+element's type, cpp_instantiate_template.cpp bind_requires_params; needs
+per-element parameters like replicated function parameter packs);
+cpp17_filesystem_path_from_string (fs_path.h:618 `is_same_v' not found
+inside _S_convert's noexcept/if-constexpr, plus __effective_range
+`allocator' lookup); the cpp20 constrained-partial-specialization pair,
+views_take_bind_back, ranges_basic_libcxx, libc++/libstdc++ header drops
+(chrono, functional, sort, sstream_insert __format, memory_resource,
+ostream_int).
+
+Tooling: /tmp/r163/kb/stage_lines.py FILE N[:a-b] stages whole -U0 hunks or
+a line range of a pure-insertion hunk (index = index + selection), for
+splitting shared files into per-fix commits.
+
+Suites on binT6 (= HEAD 53f2d01cb8): cbmc-cpp green (1661 tests, 30
+skipped), -K 21 [OK] (23 skipped), cpp green, regression/cbmc green (85
+skipped), cbmc-library green, lint 0.  All 38 new/promoted CORE descs fail
+on bin53.  GCC 16.2.1: the concept, ordering and both ranges tests pass.
