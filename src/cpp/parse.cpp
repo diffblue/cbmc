@@ -4089,13 +4089,21 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     else
       p = typet(ID_remove_cvref); // __remove_cvref or __decay
 
+    // GCC's and Clang's __decay(T) is std::decay_t<T> ([meta.trans.other]):
+    // remove_cvref, plus the array-to-pointer and function-to-pointer
+    // adjustments (cpp_typecheckt::typecheck_type); its operand may be a
+    // function type, `__decay(int(long))'.
+    const bool is_decay = tk.text == "__decay";
+    if(is_decay)
+      p.set(ID_C_decay, true);
+
     set_location(p, tk);
 
     if(lex.get_token(tk) != '(')
       return false;
 
     typet tname;
-    if(!rTypeName(tname))
+    if(is_decay ? !rTypeNameOrFunctionType(tname) : !rTypeName(tname))
       return false;
 
     if(lex.get_token(tk) != ')')

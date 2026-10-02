@@ -1152,6 +1152,20 @@ void cpp_typecheckt::typecheck_type(typet &type)
       tmp_type.remove(ID_C_volatile);
     }
 
+    // N5008 [meta.trans.other] decay<T>: with U = remove_reference_t<T>, an
+    // array of U is a pointer to its element type, a function type a pointer
+    // to it, any other type remove_cv_t<U> (GCC's and Clang's __decay)
+    if(type.id() == ID_remove_cvref && type.get_bool(ID_C_decay))
+    {
+      if(tmp_type.id() == ID_array)
+        tmp_type = pointer_type(to_array_type(tmp_type).element_type());
+      else if(tmp_type.id() == ID_code)
+      {
+        convert_parsed_parameters(to_code_type(tmp_type));
+        tmp_type = pointer_type(tmp_type);
+      }
+    }
+
     // N5008 [meta.trans.cv]/2-3: remove_const removes only the
     // top-level const, remove_volatile only the top-level volatile
     // (clang's __remove_const/__remove_volatile builtins, used by
