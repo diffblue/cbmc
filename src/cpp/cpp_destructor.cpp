@@ -129,7 +129,11 @@ std::optional<codet> cpp_typecheckt::cpp_destructor(
     // parameter `@most_derived' false: it leaves the virtual bases to the
     // most derived class's destructor (N5008 [class.dtor]/14)
     if(base_subobject && has_most_derived_parameter)
-      function_call.arguments().push_back(false_exprt());
+    {
+      exprt flag = false_exprt{};
+      flag.set(ID_C_most_derived_argument, true);
+      function_call.arguments().push_back(std::move(flag));
+    }
 
     typecheck_side_effect_function_call(function_call);
 
