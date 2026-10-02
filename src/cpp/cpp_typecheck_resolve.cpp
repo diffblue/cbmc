@@ -423,48 +423,6 @@ constraint_normalt concept_normal(
   return {{id2string(name)}};
 }
 
-// N5008 [temp.constr.order]/1: does the constraint named p_name subsume the
-// constraint named q_name?
-bool constraint_subsumes(
-  const symbol_table_baset &symbol_table,
-  const irep_idt &p_name,
-  const irep_idt &q_name)
-{
-  if(p_name == q_name)
-    return true; // every constraint subsumes itself
-  const constraint_normalt dnf_p =
-    concept_normal(symbol_table, p_name, /*dnf=*/true, 0);
-  const constraint_normalt cnf_q =
-    concept_normal(symbol_table, q_name, /*dnf=*/false, 0);
-  for(const auto &pi : dnf_p)
-    for(const auto &qj : cnf_q)
-    {
-      bool shares_atomic = false;
-      for(const auto &atom : pi)
-        if(qj.count(atom) != 0)
-        {
-          shares_atomic = true;
-          break;
-        }
-      if(!shares_atomic)
-        return false;
-    }
-  return true;
-}
-
-// True iff p_name is STRICTLY more constrained than q_name: p subsumes q but
-// not vice versa.  Used to drop the less-constrained overload.
-bool constraint_strictly_subsumes(
-  const symbol_table_baset &symbol_table,
-  const irep_idt &p_name,
-  const irep_idt &q_name)
-{
-  if(p_name.empty() || q_name.empty() || p_name == q_name)
-    return false;
-  return constraint_subsumes(symbol_table, p_name, q_name) &&
-         !constraint_subsumes(symbol_table, q_name, p_name);
-}
-
 // Associated-constraint normal form of a (function) template declaration: the
 // conjunction of its per-parameter concept constraints (abbreviated
 // `template <Concept T>`) and its requires-clause.  An empty result denotes an
@@ -592,89 +550,6 @@ std::string constraint_name_string(const cpp_declarationt &decl)
   return {};
 }
 } // namespace
-
-/// N5008 [temp.constr.order], [over.match.best]/2.6: among the function
-/// template candidates \p old_identifiers keep, of those whose constraints
-/// are satisfied, the most constrained ones -- a candidate subsumed by
-/// another's constraints is removed before deduction.
-void cpp_typecheck_resolvet::prefer_more_constrained_templates(
-  resolve_identifierst &old_identifiers)
-{
-  if(old_identifiers.size() > 1)
-  {
-    // Extract concept constraint from template parameters
-    auto get_constraint = [&](const exprt &id) -> irep_idt
-    {
-      const typet &t =
-        id.type().id() == ID_struct_tag
-          ? static_cast<const typet &>(
-              cpp_typecheck.follow_tag(to_struct_tag_type(id.type())))
-        : id.type().id() == ID_union_tag
-          ? static_cast<const typet &>(
-              cpp_typecheck.follow_tag(to_union_tag_type(id.type())))
-          : id.type();
-      if(!t.get_bool(ID_is_template))
-        return irep_idt();
-      const cpp_declarationt &decl = to_cpp_declaration(t);
-      for(const auto &p : decl.template_type().template_parameters())
-      {
-        const irep_idt &c = p.get("#C_concept_constraint");
-        if(!c.empty())
-          return c;
-      }
-      return irep_idt();
-    };
-
-    std::vector<bool> subsumed(old_identifiers.size(), false);
-    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
-    {
-      irep_idt ci = get_constraint(old_identifiers[i]);
-      if(ci.empty())
-        continue;
-      for(std::size_t j = 0; j < old_identifiers.size(); ++j)
-      {
-        if(i == j)
-          continue;
-        irep_idt cj = get_constraint(old_identifiers[j]);
-        if(cj.empty())
-          continue;
-        // N5008 [temp.constr.order]/1: candidate i is the less-constrained one
-        // (and is removed) when some other candidate j is strictly more
-        // constrained.  Subsumption is computed on the normal forms of the
-        // constraints (constraint_subsumes).  When the normal-form comparison
-        // is inconclusive (e.g. a constraint we cannot fully decompose, such as
-        // some library ranges concepts), fall back to the historical
-        // name-substring heuristic -- but only when the correct comparison has
-        // NOT shown i to be the strictly more-constrained one, so we never drop
-        // the better candidate (the bug this fixes).
-        if(constraint_strictly_subsumes(cpp_typecheck.symbol_table, cj, ci))
-        {
-          subsumed[i] = true;
-        }
-        else if(
-          !constraint_strictly_subsumes(cpp_typecheck.symbol_table, ci, cj) &&
-          ci != cj && id2string(cj).find(id2string(ci)) != std::string::npos)
-        {
-          subsumed[i] = true;
-        }
-      }
-    }
-
-    bool any_subsumed = false;
-    for(bool s : subsumed)
-      if(s)
-        any_subsumed = true;
-
-    if(any_subsumed)
-    {
-      resolve_identifierst filtered;
-      for(std::size_t i = 0; i < old_identifiers.size(); ++i)
-        if(!subsumed[i])
-          filtered.push_back(old_identifiers[i]);
-      old_identifiers.swap(filtered);
-    }
-  }
-}
 
 /// The instantiation step of function template overload resolution
 /// ([temp.deduct]/1, [temp.inst]/4): when a single candidate remains and it
@@ -1074,10 +949,15 @@ void cpp_typecheck_resolvet::guess_function_template_args(
 
   resolve_identifierst non_templates;
 
-  // C++20 concept subsumption: when multiple templates with concept
-  // constraints match, prefer the more constrained one. Filter before
-  // instantiation so only the best candidate is instantiated.
-  prefer_more_constrained_templates(old_identifiers);
+  // N5008 [over.match.best]/2.5, [temp.func.order]/8.4: constraints order
+  // only VIABLE candidates (after deduction and the constraint check) with
+  // equivalent function parameter lists; that is done by the
+  // same-signature subsumption filter after deduction.  Dropping a
+  // less-constrained candidate here, before deduction, removed
+  // `template <C1 T> f(T)' when the more constrained `template <CC T>
+  // f(T)' turned out not viable (f(1.0) with CC = C1 && is_same<T, int>),
+  // and removed `template <C1 I> f(I)' in favour of an unrelated
+  // `template <CC R> f()' (libstdc++'s ranges::copy iterator overload).
 
   // Index-based: a requires-clause rejection of a primary overload may
   // APPEND its #sfinae_alt twin for consideration (same-signature
@@ -1733,6 +1613,101 @@ void cpp_typecheck_resolvet::guess_function_template_args(
         continue;
       identifiers.push_back(std::move(nt));
     }
+  }
+
+  // N5008 [over.match.best]/2.5 + [temp.func.order]/8.4: of two VIABLE
+  // function template specializations whose templates have equivalent
+  // function parameter lists, the one whose template is more
+  // constrained ([temp.constr.order]/1, on the normal forms --
+  // template_constraint_strictly_subsumes; `Cheap' is preferred over
+  // `Cheap || Rare') is better.  Applied after deduction and the
+  // constraint check: before them, `template <C1 T> f(T)' was dropped
+  // for `template <CC T> f(T)' (CC = C1 && is_same<T, int>) even when
+  // the latter was not viable, as for f(1.0).
+  if(identifiers.size() > 1)
+  {
+    auto candidate_decl = [&](const exprt &id) -> const cpp_declarationt *
+    {
+      // after deduction: the instance records its function template
+      const irep_idt sym_id = id.type().get(ID_C_template);
+      if(sym_id.empty())
+        return nullptr;
+      const auto *sym = cpp_typecheck.symbol_table.lookup(sym_id);
+      if(
+        sym == nullptr || !sym->type.get_bool(ID_is_template) ||
+        sym->type.id() != ID_cpp_declaration)
+        return nullptr;
+      return &to_cpp_declaration(sym->type);
+    };
+
+    std::vector<const cpp_declarationt *> decls;
+    std::vector<std::string> cstr;
+    decls.reserve(identifiers.size());
+    cstr.reserve(identifiers.size());
+    for(const auto &id : identifiers)
+    {
+      const cpp_declarationt *d = candidate_decl(id);
+      // Only consider constrained templates, so an unconstrained or
+      // non-template candidate is never dropped here (it is ordered by the
+      // normal best-match/partial-ordering rules instead).
+      const bool constrained = d != nullptr && template_is_constrained(*d);
+      decls.push_back(constrained ? d : nullptr);
+      cstr.push_back(constrained ? constraint_name_string(*d) : std::string{});
+    }
+
+    std::vector<bool> subsumed(identifiers.size(), false);
+    for(std::size_t i = 0; i < decls.size(); ++i)
+    {
+      if(decls[i] == nullptr || decls[i]->declarators().empty())
+        continue;
+      for(std::size_t j = 0; j < decls.size(); ++j)
+      {
+        if(i == j || decls[j] == nullptr || decls[j]->declarators().empty())
+          continue;
+        // Constraint subsumption only breaks ties between viable
+        // candidates that are otherwise equivalent ([over.match.best]/2.5,
+        // [temp.func.order]/8.2.2, 8.4).  Restrict the
+        // drop to candidates with the SAME function signature (same
+        // parameter pattern and return type) -- precisely the same-signature
+        // overloads that would otherwise collide -- so we never eliminate a
+        // distinct-signature overload (e.g. a different std::span
+        // constructor) on constraints alone, before argument matching.
+        if(
+          decls[i]->declarators().front().type() !=
+            decls[j]->declarators().front().type() ||
+          decls[i]->type() != decls[j]->type())
+          continue;
+        // Primary: normal-form subsumption ([temp.constr.order]/1) -- drop i
+        // if j is strictly more constrained.
+        if(template_constraint_strictly_subsumes(
+             cpp_typecheck.symbol_table, *decls[j], *decls[i]))
+        {
+          subsumed[i] = true;
+        }
+        // Fallback: when normal-form subsumption is inconclusive (a
+        // constraint we cannot fully decompose, e.g. some library ranges
+        // concepts), use the historical name-substring heuristic -- but only
+        // when the correct comparison has NOT shown i to be the strictly
+        // more-constrained candidate, so the better overload is never
+        // dropped (the bug this fixes, e.g. Cheap vs Cheap||Rare).
+        else if(
+          !template_constraint_strictly_subsumes(
+            cpp_typecheck.symbol_table, *decls[i], *decls[j]) &&
+          !cstr[i].empty() && !cstr[j].empty() && cstr[i] != cstr[j] &&
+          cstr[j].find(cstr[i]) != std::string::npos)
+        {
+          subsumed[i] = true;
+        }
+      }
+    }
+
+    resolve_identifierst filtered;
+    auto it = identifiers.begin();
+    for(std::size_t i = 0; i < identifiers.size(); ++i, ++it)
+      if(!subsumed[i])
+        filtered.push_back(*it);
+    if(!filtered.empty() && filtered.size() < identifiers.size())
+      identifiers = filtered;
   }
 
   disambiguate_functions(identifiers, fargs);
@@ -7444,98 +7419,6 @@ resolved_after_strip:
   if(new_identifiers.empty())
   {
     new_identifiers = identifiers;
-
-    // C++20 concept subsumption: before instantiation, filter out
-    // function-template candidates that are strictly less constrained than a
-    // sibling candidate (N5008 [temp.constr.order]/1 + [over.match.best]/2.6).
-    // Subsumption is computed on the normal forms of the associated constraints
-    // (template_constraint_strictly_subsumes), not by a textual comparison of
-    // constraint names; e.g. `Cheap` is preferred over `Cheap || Rare` because
-    // Cheap subsumes Cheap||Rare, even though the latter's name is longer.
-    if(new_identifiers.size() > 1)
-    {
-      auto candidate_decl = [&](const exprt &id) -> const cpp_declarationt *
-      {
-        const irep_idt sym_id = id.get(ID_identifier);
-        if(sym_id.empty())
-          return nullptr;
-        const auto *sym = cpp_typecheck.symbol_table.lookup(sym_id);
-        if(
-          sym == nullptr || !sym->type.get_bool(ID_is_template) ||
-          sym->type.id() != ID_cpp_declaration)
-          return nullptr;
-        return &to_cpp_declaration(sym->type);
-      };
-
-      std::vector<const cpp_declarationt *> decls;
-      std::vector<std::string> cstr;
-      decls.reserve(new_identifiers.size());
-      cstr.reserve(new_identifiers.size());
-      for(const auto &id : new_identifiers)
-      {
-        const cpp_declarationt *d = candidate_decl(id);
-        // Only consider constrained templates, so an unconstrained or
-        // non-template candidate is never dropped here (it is ordered by the
-        // normal best-match/partial-ordering rules instead).
-        const bool constrained = d != nullptr && template_is_constrained(*d);
-        decls.push_back(constrained ? d : nullptr);
-        cstr.push_back(
-          constrained ? constraint_name_string(*d) : std::string{});
-      }
-
-      std::vector<bool> subsumed(new_identifiers.size(), false);
-      for(std::size_t i = 0; i < decls.size(); ++i)
-      {
-        if(decls[i] == nullptr || decls[i]->declarators().empty())
-          continue;
-        for(std::size_t j = 0; j < decls.size(); ++j)
-        {
-          if(i == j || decls[j] == nullptr || decls[j]->declarators().empty())
-            continue;
-          // Constraint subsumption only breaks ties between candidates that
-          // are otherwise equivalent ([over.match.best]/2.6).  Restrict the
-          // drop to candidates with the SAME function signature (same
-          // parameter pattern and return type) -- precisely the same-signature
-          // overloads that would otherwise collide -- so we never eliminate a
-          // distinct-signature overload (e.g. a different std::span
-          // constructor) on constraints alone, before argument matching.
-          if(
-            decls[i]->declarators().front().type() !=
-              decls[j]->declarators().front().type() ||
-            decls[i]->type() != decls[j]->type())
-            continue;
-          // Primary: normal-form subsumption ([temp.constr.order]/1) -- drop i
-          // if j is strictly more constrained.
-          if(template_constraint_strictly_subsumes(
-               cpp_typecheck.symbol_table, *decls[j], *decls[i]))
-          {
-            subsumed[i] = true;
-          }
-          // Fallback: when normal-form subsumption is inconclusive (a
-          // constraint we cannot fully decompose, e.g. some library ranges
-          // concepts), use the historical name-substring heuristic -- but only
-          // when the correct comparison has NOT shown i to be the strictly
-          // more-constrained candidate, so the better overload is never
-          // dropped (the bug this fixes, e.g. Cheap vs Cheap||Rare).
-          else if(
-            !template_constraint_strictly_subsumes(
-              cpp_typecheck.symbol_table, *decls[i], *decls[j]) &&
-            !cstr[i].empty() && !cstr[j].empty() && cstr[i] != cstr[j] &&
-            cstr[j].find(cstr[i]) != std::string::npos)
-          {
-            subsumed[i] = true;
-          }
-        }
-      }
-
-      resolve_identifierst filtered;
-      auto it = new_identifiers.begin();
-      for(std::size_t i = 0; i < new_identifiers.size(); ++i, ++it)
-        if(!subsumed[i])
-          filtered.push_back(*it);
-      if(!filtered.empty() && filtered.size() < new_identifiers.size())
-        new_identifiers = filtered;
-    }
 
     {
       guess_function_template_args(new_identifiers, fargs);
