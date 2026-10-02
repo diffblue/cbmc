@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ qualified member class definition: SUCCESS$
@@ -13,10 +13,11 @@ main.cpp
 N5008 [temp.mem.class]/1, [class.nest]/3: a member class of a class template
 may be defined outside the class template by a qualified name, here from
 outside its namespace (`template <class C> struct ns::S<C>::N { ... };').
-The front end grafts an out-of-class member class definition into the class
-template only for the form `S<C>::N' (cpp_typecheck_template.cpp, "single-
-level qualification only"); the namespace-qualified form is ignored, S<char>::N
-stays incomplete and f's body is left without N.  Defining it inside the
-namespace works (cpp_member_class_defined_after_instantiation/
-test_namespace.desc).  Pre-existing (bin53).  g++ 13 and clang++ 18 accept
-this program, and it fails only its WRONG assertion.
+The front end grafted an out-of-class member class definition into the
+class template only for the form `S<C>::N'; the namespace-qualified form was
+ignored and S<char>::N stayed incomplete (bin53).  The graft now accepts a
+namespace prefix.  test_nested_namespaces.desc: two namespace levels, also
+for an out-of-class member function `a::b::S<C>::f', whose definition was
+lost (typecheck_class_template_member, "no body for callee"), and a
+specialization instantiated before the member class definition.  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.
