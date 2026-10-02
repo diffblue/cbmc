@@ -10626,29 +10626,17 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
     if(generic_closure_eligible)
     {
-      // N5008 [expr.prim.lambda.closure]/6, [temp.inst]: the body of a
-      // generic lambda is a member function TEMPLATE's body -- it is only
-      // type-checked when operator() is instantiated with deduced argument
-      // types.  The function-pointer lowering built here uses `signed int`
-      // for every `auto` parameter; a body that is ill-formed for that
-      // placeholder (`[](const auto &pt) { return pt.x; }`) is no error of
-      // the program.  Try it silently; on failure the lowered function keeps
-      // no body (the closure's template operator() is the real one).
-      const std::size_t saved_errors =
-        get_message_handler().get_message_count(messaget::M_ERROR);
-      const unsigned saved_verbosity = get_message_handler().get_verbosity();
-      get_message_handler().set_verbosity(0);
-      try
-      {
-        typecheck_code(body_code);
-      }
-      catch(...)
-      {
-        body_code = codet(ID_nil);
-        get_message_handler().set_message_count(
-          messaget::M_ERROR, saved_errors);
-      }
-      get_message_handler().set_verbosity(saved_verbosity);
+      // N5008 [expr.prim.lambda.closure]/4, [temp.inst]/11: the call
+      // operator of a generic lambda is a member function TEMPLATE; its body
+      // is instantiated only for the argument types it is called with (the
+      // closure's template operator(), below).  Type-checking it here with
+      // `signed int' for every `auto' -- as the function-pointer lowering
+      // did -- instantiated the function templates named in it for int,
+      // which no conforming implementation does, and dropped their bodies
+      // when ill-formed for int (libstdc++ 13 <format>: __formatter_fp::
+      // format for _M_format_arg's visitor).  The lowered function keeps no
+      // body, as when that trial failed.
+      body_code = codet(ID_nil);
     }
     else
       typecheck_code(body_code);
