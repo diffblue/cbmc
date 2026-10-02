@@ -67,6 +67,10 @@ class incomplete_dependency_exceptiont
 {
 };
 
+/// The C++ type bool for the front end's internal ID_bool (the type of a
+/// comparison or logical expression); any other type unchanged.
+typet cpp_bool_type(const typet &type);
+
 class cpp_typecheckt:public c_typecheck_baset
 {
 public:

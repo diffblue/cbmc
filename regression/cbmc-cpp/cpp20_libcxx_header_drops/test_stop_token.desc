@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 stop_token.cpp
 --cpp20 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ header: SUCCESS$
@@ -13,9 +13,9 @@ dropped the body of system-header function
 could not fully type-check
 system-header declaration
 --
-libc++ (LLVM 18) <stop_token>: drops __stop_token/stop_state.h:33
-__stop_callback_base::__invoke (cpp11_alias_declaration_of_function_type:
-`using __callback_fn_t = void(__stop_callback_base*) noexcept;') and 140
-__stop_state::__add_callback
-(cpp14_deduced_return_type_bool_literal_and_comparison).  clang++ 18
--stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
+libc++ (LLVM 18) <stop_token>: __stop_token/stop_state.h:33
+__stop_callback_base::__invoke (cpp11_alias_declaration_of_function_type)
+and 140 __stop_state::__add_callback
+(cpp14_deduced_return_type_bool_literal_and_comparison) were dropped
+(bin53); both are fixed.  clang++ 18 -stdlib=libc++ accepts this program,
+and it fails only its WRONG assertion.

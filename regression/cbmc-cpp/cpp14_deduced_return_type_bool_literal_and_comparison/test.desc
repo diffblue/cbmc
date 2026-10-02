@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp14
 ^\[main\.assertion\.1\] line \d+ function: SUCCESS$
@@ -12,10 +12,12 @@ main.cpp
 ^CONVERSION ERROR$
 --
 N5008 [dcl.spec.auto.general]/10, [expr.rel]/2, [expr.eq]/1: `return true;'
-and `return st == 0;' both deduce bool.  The front end deduces the
-comparison as __CPROVER_bool and rejects the function ("inconsistent
-deduction for the return type: 'bool' and '__CPROVER_bool'").  libc++'s
-__stop_state::__add_callback has such a lambda, so its body is dropped
-(__stop_token/stop_state.h:140, for <stop_token>, <thread>, <future> and
-<condition_variable>).  Pre-existing (bin53).  g++ 13 and clang++ 18 accept
+and `return st == 0;' both deduce bool.  The front end deduced the
+comparison as its internal __CPROVER_bool and rejected the function
+("inconsistent deduction for the return type: 'bool' and '__CPROVER_bool'",
+bin53); placeholder deduction, decltype and template argument deduction now
+see bool (cpp_bool_type).  libc++'s __stop_state::__add_callback has such a
+lambda, so its body was dropped (__stop_token/stop_state.h:140, for
+<stop_token>, <thread>, <future> and <condition_variable>).
+test_deduced_bool.desc: auto, decltype, deduced T and overloads.  g++ 13 and clang++ 18 accept
 this program (-std=c++14), and it fails only its WRONG assertion.
