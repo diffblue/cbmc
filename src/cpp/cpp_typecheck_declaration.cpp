@@ -108,8 +108,25 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   for(const auto &a : args)
   {
     exprt arg = a;
-    if(arg.type().is_nil() || arg.type().id().empty())
+    // (a functional cast `W<short>{3}' or `static_cast<W<char> &&>(w)'
+    // carries its type in parsed form -- a cpp_name, possibly under a
+    // frontend reference -- before it is type-checked)
+    const auto parsed_type = [](const typet &t)
+    {
+      const typet *u = &t;
+      while(u->id() == ID_frontend_pointer || u->id() == ID_pointer)
+      {
+        if(u->id() == ID_frontend_pointer)
+          return true;
+        u = &to_type_with_subtype(*u).subtype();
+      }
+      return u->id() == ID_cpp_name;
+    };
+    if(
+      arg.type().is_nil() || arg.type().id().empty() || parsed_type(arg.type()))
+    {
       typecheck_expr(arg);
+    }
     arg_types.push_back(arg.type());
     arg_is_lvalue.push_back(arg.get_bool(ID_C_lvalue));
   }
