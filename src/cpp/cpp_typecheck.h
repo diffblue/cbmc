@@ -1202,6 +1202,10 @@ protected:
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
   bool bind_requires_parameter_pack(const irep_idt &name, const typet &type);
   void expand_requires_parameter_packs(exprt &expr);
+  void expand_requires_parameter_packs_in_type(irept &type);
+  exprt requires_parameter_pack_element(
+    const irep_idt &name,
+    const typet &element_type);
   /// The element symbols of each requires-expression parameter pack bound by
   /// bind_requires_parameter_pack, by the parameter's name.
   std::map<irep_idt, std::vector<exprt>> requires_parameter_packs;

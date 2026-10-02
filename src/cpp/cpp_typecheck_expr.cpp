@@ -129,6 +129,47 @@ void cpp_typecheckt::expand_requires_parameter_packs(exprt &expr)
   }
 }
 
+/// A fresh symbol for an element of the parameter pack \p name, of type
+/// \p element_type, as an lvalue expression (implicitly dereferenced for a
+/// reference type: a reference names the object it refers to,
+/// [expr.type]/1).
+exprt cpp_typecheckt::requires_parameter_pack_element(
+  const irep_idt &name,
+  const typet &element_type)
+{
+  static std::size_t pack_counter = 0;
+  symbolt element{
+    "requires_param::" + id2string(name) + "#pack" +
+      std::to_string(pack_counter++),
+    element_type,
+    ID_cpp};
+  element.base_name = name;
+  element.is_lvalue = true;
+  symbol_table.add(element);
+  exprt element_expr = element.symbol_expr();
+  element_expr.set(ID_C_lvalue, true);
+  add_implicit_dereference(element_expr);
+  return element_expr;
+}
+
+/// expand_requires_parameter_packs in the decltype operands of \p type
+/// (a trailing return type naming a function parameter pack).
+void cpp_typecheckt::expand_requires_parameter_packs_in_type(irept &type)
+{
+  if(requires_parameter_packs.empty())
+    return;
+  if(type.id() == ID_decltype)
+  {
+    expand_requires_parameter_packs(
+      static_cast<exprt &>(type.add(ID_expr_arg)));
+    return;
+  }
+  for(auto &sub : type.get_sub())
+    expand_requires_parameter_packs_in_type(sub);
+  for(auto &named : type.get_named_sub())
+    expand_requires_parameter_packs_in_type(named.second);
+}
+
 /// N5008 [expr.prim.req.general]/4, [temp.variadic]/5: a parameter of a
 /// requires-expression may be a function parameter pack, `A &&...a'; it
 /// declares one parameter per element of the template parameter pack A, the
@@ -200,21 +241,7 @@ bool cpp_typecheckt::bind_requires_parameter_pack(
     {
       return false;
     }
-    static std::size_t pack_counter = 0;
-    symbolt element{
-      "requires_param::" + id2string(name) + "#pack" +
-        std::to_string(pack_counter++),
-      element_type,
-      ID_cpp};
-    element.base_name = name;
-    element.is_lvalue = true;
-    symbol_table.add(element);
-    exprt element_expr = element.symbol_expr();
-    element_expr.set(ID_C_lvalue, true);
-    // a reference names the object it refers to, as resolution of a
-    // reference-typed name does ([expr.type]/1)
-    add_implicit_dereference(element_expr);
-    elements.push_back(std::move(element_expr));
+    elements.push_back(requires_parameter_pack_element(name, element_type));
   }
   requires_parameter_packs[name] = std::move(elements);
   return true;
@@ -2902,7 +2929,8 @@ void cpp_typecheckt::expand_type_pack_arguments(
   bool with_requires_parameters)
 {
   static const std::vector<typet> no_types;
-  const auto pack_of = [this](const irept &n) -> const std::vector<typet> *
+  const auto pack_of = [this, with_requires_parameters](
+                         const irept &n) -> const std::vector<typet> *
   {
     if(
       n.id() != ID_cpp_name || n.get_sub().size() != 1 ||
@@ -2923,6 +2951,33 @@ void cpp_typecheckt::expand_type_pack_arguments(
       const auto size = template_map.pack_size_map.find(id_ptr->identifier);
       if(size != template_map.pack_size_map.end() && size->second == 0)
         return &no_types;
+    }
+    // Outside the template's scope (substituting a function template's
+    // trailing return type during deduction), the pack is the most
+    // recently bound one of that name ([basic.scope.temp]/2), as for
+    // template_mapt::expand_call_argument_packs.
+    if(with_requires_parameters)
+    {
+      const std::vector<typet> *newest = nullptr;
+      std::size_t newest_generation = 0;
+      for(const auto &entry : template_map.pack_args_map)
+      {
+        const std::string key = id2string(entry.first);
+        const auto sep = key.rfind("::");
+        if(
+          (sep == std::string::npos ? key : key.substr(sep + 2)) !=
+          id2string(base_name))
+        {
+          continue;
+        }
+        const std::size_t g = template_map.generation_of(entry.first);
+        if(newest == nullptr || g > newest_generation)
+        {
+          newest = &entry.second;
+          newest_generation = g;
+        }
+      }
+      return newest;
     }
     return nullptr;
   };
