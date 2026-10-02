@@ -2040,6 +2040,20 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                  guessed_args.arguments()[i].type().id() == ID_unassigned))
               {
                 guessed_args.arguments()[i] = exprt(ID_type, empty_typet());
+                // N5008 [temp.deduct.type]/9, [temp.variadic]/5: record the
+                // pack as deduced EMPTY, so that the pattern check below
+                // expands `declval<Args>()...' to no arguments
+                // (`decltype(g(declval<Args>()...))' is `decltype(g())')
+                const irep_idt pid = tparams[i].id() == ID_type
+                                       ? tparams[i].type().get(ID_identifier)
+                                       : tparams[i].get(ID_identifier);
+                if(
+                  tparams[i].id() == ID_type && !pid.empty() &&
+                  template_map.pack_size_map.find(pid) ==
+                    template_map.pack_size_map.end())
+                {
+                  template_map.set_pack_size(pid, 0);
+                }
               }
             }
           }

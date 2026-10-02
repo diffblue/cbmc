@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
@@ -16,10 +16,13 @@ N5008 [temp.spec.partial.match]/2, [temp.variadic]/5: matching
 probe<count_of<>> against `probe<decltype(g(declval<Args>()...)), Args...>'
 deduces Args = {} from the (absent) trailing arguments; the non-deduced
 first argument is then decltype(g()) = count_of<>, so the specialization
-matches.  The front end selects the primary template (n == -1).  With one
-element it matches (cpp11_pack_deduced_from_declval_arguments_in_partial_
-specialization/test_type_pack_arguments.desc, the case
-expand_type_pack_arguments fixed); not yet diagnosed for the empty pack.
-Pre-existing (bin53).
+matches.  The front end selected the primary template (n == -1, bin53):
+elaborate_class_template's matcher set the unmatched trailing pack to an
+empty argument but did not record it as an empty pack in the template map,
+so expand_type_pack_arguments left `declval<Args>()...' unexpanded and the
+pattern check failed.  With one element it matched
+(cpp11_pack_deduced_from_declval_arguments_in_partial_specialization/
+test_type_pack_arguments.desc).  test_empty_pack_forms.desc: other pattern
+forms over an empty pack.
 g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
 assertion.
