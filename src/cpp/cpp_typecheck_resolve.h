@@ -21,6 +21,7 @@ class cpp_namet;
 class cpp_typecheck_fargst;
 class cpp_declarationt;
 class cpp_declaratort;
+class template_typet;
 class symbol_table_baset;
 
 // N5008 [temp.constr.order]/1 + [temp.func.order]: true iff declaration p is
@@ -69,6 +70,11 @@ public:
   /// Clear the static resolve_scope cache. Must be called between
   /// type-checking different translation units.
 
+  void deduce_trailing_type_pack_pattern(
+    const typet &pattern_with_ellipsis,
+    const template_typet &template_type,
+    const cpp_template_args_tct &arguments,
+    std::size_t first);
   typet canonical_function_type(const typet &code);
 
   void guess_template_args(
