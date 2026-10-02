@@ -19,5 +19,7 @@ drops: __format's __get_property and __estimated_width
 (cpp20_requires_expression_parameter_pack_of_differing_types), and with
 --cpp11 also __functional/function.h:272 and 350 (same root cause) and 394
 ~__value_func (cpp11_static_member_of_recursive_partial_specialization,
-through aligned_storage's default alignment).  clang++ 18 -stdlib=libc++
+through aligned_storage's default alignment, fixed); with --cpp20 also
+tuple:469 __tuple_impl's constructor and function.h:272, and verification
+then ends in ERROR.  clang++ 18 -stdlib=libc++
 accepts this program, and it fails only its WRONG assertion.
