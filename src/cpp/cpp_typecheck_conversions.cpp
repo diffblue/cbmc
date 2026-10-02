@@ -2875,8 +2875,17 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     bool ambiguous = false;
     unsigned found_rank = 0;
     exprt found_expr;
-    for(const auto &component :
-        follow_tag(to_struct_tag_type(from)).components())
+    // N5008 [class.access.general]/5: "The interpretation of a given
+    // construct is established without regard to access control" -- access
+    // is checked for the conversion function selected.  An inaccessible one
+    // (of a private base, not named by a using-declaration) is still a
+    // candidate; only selecting it is an error.  `found_call' is the
+    // selected candidate's call, re-checked with access control at the end.
+    bool found_inaccessible = false;
+    side_effect_expr_function_callt found_call{
+      nil_exprt{}, {}, uninitialized_typet{}, source_locationt{}};
+    const struct_typet &from_struct = follow_tag(to_struct_tag_type(from));
+    for(const auto &component : from_struct.components())
     {
       // Per [class.conv.fct]/1 + [class.member.lookup]/4: the set
       // of viable conversion operators in `from`'s class scope
@@ -2970,7 +2979,24 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           {},
           uninitialized_typet{},
           expr.source_location());
-        typecheck_side_effect_function_call(func_expr);
+        const side_effect_expr_function_callt unchecked_call = func_expr;
+        const bool inaccessible =
+          check_component_access(component, from_struct);
+        {
+          const bool saved_disable = disable_access_control;
+          if(inaccessible)
+            disable_access_control = true;
+          try
+          {
+            typecheck_side_effect_function_call(func_expr);
+          }
+          catch(...)
+          {
+            disable_access_control = saved_disable;
+            throw;
+          }
+          disable_access_control = saved_disable;
+        }
 
         if(standard_conversion_sequence(func_expr, to, tmp_expr, tmp_rank))
         {
@@ -2980,6 +3006,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             ambiguous = false;
             found_rank = tmp_rank;
             found_expr.swap(tmp_expr);
+            found_inaccessible = inaccessible;
+            found_call = unchecked_call;
           }
           else if(tmp_rank == found_rank)
             ambiguous = true;
@@ -3017,6 +3045,8 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
               ambiguous = false;
               found_rank = this_rank;
               found_expr.swap(base_deref);
+              found_inaccessible = inaccessible;
+              found_call = unchecked_call;
             }
             else if(this_rank == found_rank)
               ambiguous = true;
@@ -3052,6 +3082,9 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
     }
     if(found)
     {
+      // the selected conversion function: diagnose its access now
+      if(found_inaccessible)
+        typecheck_side_effect_function_call(found_call);
       rank += found_rank;
       new_expr.swap(found_expr);
       return true;
