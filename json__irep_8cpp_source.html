@@ -276,15 +276,14 @@ $(document).ready(function(){initNavTree('json__irep_8cpp_source.html',''); init
 <div class="line"><a id="l00185" name="l00185"></a><span class="lineno">  185</span>  <span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">pragmas</a> = location.<a class="code hl_function" href="classsource__locationt.html#ab6896fa6de381382807fa08378fad3b9">get_pragmas</a>();</div>
 <div class="line"><a id="l00186" name="l00186"></a><span class="lineno">  186</span>  <span class="keywordflow">if</span>(!<a class="code hl_class" href="classait.html">pragmas</a>.empty())</div>
 <div class="line"><a id="l00187" name="l00187"></a><span class="lineno">  187</span>  {</div>
-<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <span class="keyword">auto</span> <a class="code hl_class" href="classait.html">json_pragma_range</a> = <a class="code hl_function" href="range_8h.html#a062aef510f1b8bd8ba235bc5b2316e5e">make_range</a>(<a class="code hl_class" href="classait.html">pragmas</a>.begin(), <a class="code hl_class" href="classait.html">pragmas</a>.end())</div>
-<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>                               .map([](<span class="keyword">const</span> std::pair&lt;irep_idt, irept&gt; &amp;entry)</div>
-<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>                                    { <span class="keywordflow">return</span> <a class="code hl_class" href="classjson__stringt.html">json_stringt</a>{entry.first}; });</div>
-<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    result[<span class="stringliteral">&quot;pragma&quot;</span>] =</div>
-<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>      <a class="code hl_class" href="classjson__arrayt.html">json_arrayt</a>{<a class="code hl_class" href="classait.html">json_pragma_range</a>.begin(), <a class="code hl_class" href="classait.html">json_pragma_range</a>.end()};</div>
-<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span>  }</div>
-<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span> </div>
-<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>  <span class="keywordflow">return</span> result;</div>
-<div class="line"><a id="l00196" name="l00196"></a><span class="lineno">  196</span>}</div>
+<div class="line"><a id="l00188" name="l00188"></a><span class="lineno">  188</span>    <a class="code hl_class" href="classjson__arrayt.html">json_arrayt</a> <a class="code hl_class" href="classait.html">json_pragmas</a>;</div>
+<div class="line"><a id="l00189" name="l00189"></a><span class="lineno">  189</span>    <span class="keywordflow">for</span>(<span class="keyword">const</span> <span class="keyword">auto</span> &amp;<a class="code hl_class" href="classait.html">pragma</a> : <a class="code hl_class" href="classait.html">pragmas</a>)</div>
+<div class="line"><a id="l00190" name="l00190"></a><span class="lineno">  190</span>      <a class="code hl_class" href="classait.html">json_pragmas</a>.push_back(<a class="code hl_class" href="classjson__stringt.html">json_stringt</a>{<a class="code hl_class" href="classait.html">pragma</a>.first});</div>
+<div class="line"><a id="l00191" name="l00191"></a><span class="lineno">  191</span>    result[<span class="stringliteral">&quot;pragma&quot;</span>] = std::move(<a class="code hl_class" href="classait.html">json_pragmas</a>);</div>
+<div class="line"><a id="l00192" name="l00192"></a><span class="lineno">  192</span>  }</div>
+<div class="line"><a id="l00193" name="l00193"></a><span class="lineno">  193</span> </div>
+<div class="line"><a id="l00194" name="l00194"></a><span class="lineno">  194</span>  <span class="keywordflow">return</span> result;</div>
+<div class="line"><a id="l00195" name="l00195"></a><span class="lineno">  195</span>}</div>
 </div>
 <div class="ttc" id="aclassait_html"><div class="ttname"><a href="classait.html">ait</a></div><div class="ttdoc">ait supplies three of the four components needed: an abstract interpreter (in this case handling func...</div><div class="ttdef"><b>Definition</b> <a href="ai_8h_source.html#l00565">ai.h:566</a></div></div>
 <div class="ttc" id="aclassdeserialization__exceptiont_html"><div class="ttname"><a href="classdeserialization__exceptiont.html">deserialization_exceptiont</a></div><div class="ttdoc">Thrown when failing to deserialize a value from some low level format, like JSON or raw bytes.</div><div class="ttdef"><b>Definition</b> <a href="exception__utils_8h_source.html#l00079">exception_utils.h:80</a></div></div>
@@ -333,7 +332,6 @@ $(document).ready(function(){initNavTree('json__irep_8cpp_source.html',''); init
 <div class="ttc" id="ajson_8h_html_ac4ee93473255692bf6065527c01b3899"><div class="ttname"><a href="json_8h.html#ac4ee93473255692bf6065527c01b3899">to_json_array</a></div><div class="ttdeci">json_arrayt &amp; to_json_array(jsont &amp;json)</div><div class="ttdef"><b>Definition</b> <a href="json_8h_source.html#l00424">json.h:424</a></div></div>
 <div class="ttc" id="ajson__irep_8cpp_html_a3fafe0663330dec4872adac7ffa43bf7"><div class="ttname"><a href="json__irep_8cpp.html#a3fafe0663330dec4872adac7ffa43bf7">json</a></div><div class="ttdeci">json_objectt json(const source_locationt &amp;location)</div><div class="ttdef"><b>Definition</b> <a href="json__irep_8cpp_source.html#l00139">json_irep.cpp:139</a></div></div>
 <div class="ttc" id="ajson__irep_8h_html"><div class="ttname"><a href="json__irep_8h.html">json_irep.h</a></div><div class="ttdoc">Util.</div></div>
-<div class="ttc" id="arange_8h_html_a062aef510f1b8bd8ba235bc5b2316e5e"><div class="ttname"><a href="range_8h.html#a062aef510f1b8bd8ba235bc5b2316e5e">make_range</a></div><div class="ttdeci">ranget&lt; iteratort &gt; make_range(iteratort begin, iteratort end)</div><div class="ttdef"><b>Definition</b> <a href="range_8h_source.html#l00522">range.h:522</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
