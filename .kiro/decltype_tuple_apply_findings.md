@@ -12986,3 +12986,36 @@ ranges_algobase.h:311 (test_format.desc updated, --object-bits 12).
 
 Suites on S7 (= HEAD source): cbmc-cpp green (47 skipped), -K all [OK],
 cpp green, lint 0.
+
+## Round 163s: remaining header drops
+
+- 2dcf567f1b [over.match.best]/2.5, [temp.func.order]/8: constraint ordering
+  only among VIABLE candidates with equivalent parameter lists.  Removed
+  prefer_more_constrained_templates (pre-deduction, name-based); moved the
+  same-signature subsumption filter into guess_function_template_args after
+  deduction + constraint check.  Fixes ranges::copy(first, last, out).
+- a861439977 [basic.lookup.unqual]/1: template-name lookup stops at a block
+  scope that declares the name (using d::is_mi;).  The full rule (stop at
+  every scope) broke 9 tests (libc++ tuple, std::get, optional): constructor
+  templates registered under the class name in base scopes, and other
+  reliance on cross-scope template collection.  Partial attempt kept out.
+- 182f45ae01 [over.match.class.deduct]/5: CTAD for `T x = e;'.  Fixes
+  _Sink::_M_write (format:2456).
+- a80a8dc7f9 [over.ics.rank]/3.3: UDC rank no longer includes the argument's
+  conversion to the constructor parameter.  Fixes wrong overload in
+  `partial_ordering != 0' -> __shared_count drops; path{"a"} has no drops.
+- KNOWNBUGs: cpp_member_class_defined_after_instantiation (istream::read
+  root cause), cpp_copy_initialization_explicit_constructor.
+
+Reductions: line-delta in python (bad() = g++ accepts && cbmc prints the
+signature) worked better than cvise for these; cvise kept producing
+degenerate programs (incomplete classes) because g++ never instantiates the
+bodies cbmc checks.
+
+<format>: remaining drops format:1422 (__formatter_fp::format instantiated
+for int: `__format::to_chars' ambiguous; why the fp formatter is reached for
+int is open), _M_visit, visit_format_arg.  libc++ <functional> --cpp20:
+tuple:469 __tuple_impl, function.h:272 (pre-existing since S1).
+
+Suites on S12 (= HEAD): cbmc-cpp green (47 skipped), -K 38 [OK], cpp green,
+lint 0.
