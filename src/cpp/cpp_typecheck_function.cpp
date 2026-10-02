@@ -128,7 +128,7 @@ typet cpp_typecheckt::deduce_placeholder_type(
   // A is the type of E.  An expression never has reference type; the front
   // end marks a glvalue produced through a reference with the reference type
   // itself, so the referred type is the one deduction sees.
-  typet argument = initializer.type();
+  typet argument = cpp_bool_type(initializer.type());
   if(argument.id() == ID_c_bit_field)
     argument = to_c_bit_field_type(argument).underlying_type();
   if(is_reference(argument) || is_rvalue_reference(argument))

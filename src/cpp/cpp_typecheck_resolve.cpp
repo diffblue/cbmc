@@ -9066,7 +9066,8 @@ void cpp_typecheck_resolvet::guess_template_args_simple_name(
         typet &t = cpp_typecheck.template_map.type_map[id.identifier];
         if(t.id() == ID_unassigned)
         {
-          t = desired_type;
+          // [expr.rel]/2: `T' deduced from `a == b' is bool
+          t = cpp_bool_type(desired_type);
         }
         else
         {
