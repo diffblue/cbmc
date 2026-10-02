@@ -3915,6 +3915,66 @@ bool cpp_typecheckt::brace_init_to_array_reference(
   return true;
 }
 
+cpp_typecheckt::explicit_constructorst
+cpp_typecheckt::viable_one_argument_constructors(
+  const struct_tag_typet &class_type,
+  const exprt &value)
+{
+  const struct_typet &st = follow_tag(class_type);
+  bool explicit_viable = false;
+  bool converting_viable = false;
+  for(const auto &c : st.components())
+  {
+    if(
+      c.get_bool(ID_from_base) || c.type().id() != ID_code ||
+      to_code_type(c.type()).return_type().id() != ID_constructor)
+    {
+      continue;
+    }
+    const auto &params = to_code_type(c.type()).parameters();
+    // this + one argument (the rest defaulted, the @most_derived flag too)
+    if(params.size() < 2)
+      continue;
+    bool rest_defaulted = true;
+    for(std::size_t i = 2; i < params.size(); ++i)
+      if(params[i].default_value().is_nil())
+        rest_defaulted = false;
+    if(!rest_defaulted)
+      continue;
+    exprt converted;
+    unsigned rank = 0;
+    bool ok = false;
+    {
+      sfinae_contextt probe{*this};
+      try
+      {
+        typet param_type = params[1].type();
+        if(is_reference(param_type))
+        {
+          ok = reference_binding(
+            value, to_reference_type(param_type), converted, rank);
+        }
+        else
+          ok = standard_conversion_sequence(value, param_type, converted, rank);
+      }
+      catch(...)
+      {
+        ok = false;
+      }
+    }
+    if(!ok)
+      continue;
+    if(c.get_bool(ID_is_explicit))
+      explicit_viable = true;
+    else
+      converting_viable = true;
+  }
+  if(!explicit_viable)
+    return explicit_constructorst::NONE_VIABLE;
+  return converting_viable ? explicit_constructorst::ALSO_CONVERTING
+                           : explicit_constructorst::ONLY_EXPLICIT;
+}
+
 bool cpp_typecheckt::aggregate_list_initialization_is_viable(
   const exprt &list,
   const typet &type)

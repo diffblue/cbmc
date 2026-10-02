@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/symbol_table_base.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
 #include "itanium_abi_cpp_zero_initializer.h"
@@ -915,7 +916,90 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         ops = symbol.value.operands();
     }
     else
+    {
+      // N5008 [dcl.init.general]/16.6.2: copy-initialization `T x = e' with
+      // e of another type converts e to T by a user-defined conversion
+      // sequence; [over.match.copy]/1.1: only the CONVERTING (non-explicit)
+      // constructors of T are candidates ([class.conv.ctor]/2).  Constructor
+      // overload resolution below would also consider explicit ones: reject
+      // the initialization when only an explicit constructor accepts e, and
+      // use the converting constructor otherwise.
+      bool has_explicit_constructor = false;
+      if(symbol.type.id() == ID_struct_tag)
+      {
+        for(const auto &c :
+            follow_tag(to_struct_tag_type(symbol.type)).components())
+        {
+          if(
+            c.get_bool(ID_is_explicit) && c.type().id() == ID_code &&
+            to_code_type(c.type()).return_type().id() == ID_constructor)
+          {
+            has_explicit_constructor = true;
+          }
+        }
+      }
+      exprt value = symbol.value;
+      if(has_explicit_constructor)
+        typecheck_expr(value);
+      typet value_type =
+        has_explicit_constructor ? value.type() : typet{ID_nil};
+      if(is_reference(value_type))
+        value_type = to_reference_type(value_type).base_type();
+      // Only for a NON-CLASS e: probing the explicit constructors with a
+      // class-type e would consider e's conversion functions, and so
+      // instantiate conversion function templates for their parameter
+      // types, which [over.match.copy]/1.1 never does (`std::vector<int> x =
+      // r;' with `template <class C> operator C()' and the explicit
+      // vector(const allocator_type &)).
+      if(
+        has_explicit_constructor && value_type.id() != ID_empty &&
+        value_type.is_not_nil() && value_type.id() != ID_struct_tag &&
+        value_type.id() != ID_union_tag)
+      {
+        const auto explicit_ctors = viable_one_argument_constructors(
+          to_struct_tag_type(symbol.type), value);
+        if(explicit_ctors != explicit_constructorst::NONE_VIABLE)
+        {
+          exprt converted;
+          unsigned rank = 0;
+          bool convertible = false;
+          {
+            sfinae_contextt probe{*this};
+            try
+            {
+              convertible = implicit_conversion_sequence(
+                value, symbol.type, converted, rank);
+            }
+            catch(...)
+            {
+              convertible = false;
+            }
+          }
+          if(
+            !convertible &&
+            explicit_ctors == explicit_constructorst::ONLY_EXPLICIT)
+          {
+            error().source_location = symbol.value.source_location();
+            error() << "copy-initialization of '" << to_string(symbol.type)
+                    << "' from '" << to_string(value.type())
+                    << "' requires an explicit constructor" << eom;
+            throw 0;
+          }
+          // the converting constructor chosen by [over.match.copy] then
+          // initializes the object (the copy/move of the temporary being
+          // elided, [dcl.init.general]/16.6.1); constructor resolution below
+          // would prefer an explicit E(int) over a converting E(long)
+          if(
+            convertible && converted.id() == ID_side_effect &&
+            converted.get(ID_statement) == ID_temporary_object)
+          {
+            symbol.value = converted;
+            return;
+          }
+        }
+      }
       ops.push_back(symbol.value);
+    }
 
     auto constructor =
       cpp_constructor(symbol.value.source_location(), expr_symbol, ops);

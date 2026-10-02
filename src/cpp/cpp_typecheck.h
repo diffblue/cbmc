@@ -144,6 +144,21 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
+  /// Which one-argument constructors of \p class_type accept \p value by a
+  /// standard conversion or reference binding: no explicit one, only
+  /// explicit ones (then copy-initialization from \p value is ill-formed,
+  /// [over.match.copy]/1.1, [class.conv.ctor]/2), or explicit and converting
+  /// ones.
+  enum class explicit_constructorst
+  {
+    NONE_VIABLE,
+    ONLY_EXPLICIT,
+    ALSO_CONVERTING
+  };
+  explicit_constructorst viable_one_argument_constructors(
+    const struct_tag_typet &class_type,
+    const exprt &value);
+
   /// Whether the braced-init-list \p list can aggregate-initialize an
   /// object of the aggregate type \p type (an array, or a class the front
   /// end treats as POD), with brace elision ([dcl.init.aggr]/16).
