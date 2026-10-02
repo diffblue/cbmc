@@ -1349,6 +1349,19 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
       const bool g_is_type = ga.id() == ID_type || ga.id() == ID_ambiguous;
       if(f_is_type != g_is_type)
         return false;
+      // N5008 [temp.deduct.type]/9.2: during partial ordering, if A_i was
+      // originally a pack expansion and P_i is not, deduction fails --
+      // `S<T1, const Z &...>' is not at least as specialized as `S<T1,
+      // const T2 &>' (Example 4).  Without this both were, and the sorted
+      // keys preferred the pack (libstdc++ 13's views::__adaptor::_Partial,
+      // whose single-argument specialization was never chosen).
+      const auto is_pack_expansion = [](const exprt &arg)
+      {
+        return arg.get_bool(ID_ellipsis) || arg.type().get_bool(ID_ellipsis) ||
+               arg.find(ID_type).get_bool(ID_ellipsis);
+      };
+      if(is_pack_expansion(fa) && !is_pack_expansion(ga))
+        return false;
       if(g_is_type)
       {
         typet A = fa.id() == ID_ambiguous
