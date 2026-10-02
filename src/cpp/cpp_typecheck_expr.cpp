@@ -7185,6 +7185,58 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     }
   }
 
+  // N5008 [expr.type.conv]/1.1: with a single parenthesized expression the
+  // functional cast `T(e)' is equivalent to the cast expression `(T)e'
+  // ([expr.cast]/4: a static_cast, reinterpret_cast or const_cast).  A
+  // simple-type-specifier (`long(p)') is parsed as a cast already; a
+  // typedef-name or template parameter naming a non-class type (`U(p)',
+  // libstdc++'s `uintptr_t(__addr)') reaches here as a call, and the
+  // pseudo-constructor of the resolver would only admit implicit
+  // conversions.
+  if(
+    expr.function().id() == ID_cpp_name && expr.arguments().size() == 1 &&
+    expr.arguments().front().id() != ID_initializer_list &&
+    expr.arguments().front().type().is_not_nil())
+  {
+    cpp_typecheck_fargst no_fargs;
+    exprt type_expr = nil_exprt{};
+    {
+      sfinae_contextt probe{*this};
+      try
+      {
+        type_expr = resolve(
+          to_cpp_name(expr.function()),
+          cpp_typecheck_resolvet::wantt::TYPE,
+          no_fargs,
+          false);
+      }
+      catch(...)
+      {
+        type_expr = nil_exprt{};
+      }
+    }
+    if(type_expr.id() == ID_type)
+    {
+      const typet &target = type_expr.type();
+      const irep_idt &tid = target.id();
+      const bool scalar = tid == ID_signedbv || tid == ID_unsignedbv ||
+                          tid == ID_bool || tid == ID_c_bool ||
+                          tid == ID_floatbv || tid == ID_c_enum_tag ||
+                          (tid == ID_pointer && !is_reference(target) &&
+                           !is_rvalue_reference(target));
+      if(scalar)
+      {
+        exprt typecast("explicit-typecast");
+        typecast.type() = target;
+        typecast.add_source_location() = expr.source_location();
+        typecast.copy_to_operands(expr.arguments().front());
+        typecheck_expr_explicit_typecast(typecast);
+        expr.swap(typecast);
+        return;
+      }
+    }
+  }
+
   // N5008 [expr.type.conv]/2 + [over.match.copy]/1.2: the functional cast
   // `T(x)' -- T a class type, x of ANOTHER class type -- is a
   // direct-initialization in which an EXPLICIT conversion function of x's
