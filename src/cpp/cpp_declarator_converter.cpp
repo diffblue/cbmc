@@ -209,6 +209,11 @@ symbolt &cpp_declarator_convertert::convert(
       scope = friend_scope;
   }
 
+  // N5008 [dcl.typedef]/2: the function type of an alias-declaration
+  // `using F = void(int);' (see convert_parsed_parameters)
+  if(is_typedef && final_type.id() == ID_code)
+    cpp_typecheck.convert_parsed_parameters(to_code_type(final_type));
+
   is_code = is_code_type(final_type);
 
   // global-scope arrays must have fixed size

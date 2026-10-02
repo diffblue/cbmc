@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ pointer variable: SUCCESS$
@@ -13,13 +13,15 @@ main.cpp
 ^Invariant check failed$
 --
 N5008 [dcl.typedef]/2: `using F = void(int);' declares the same type as
-`typedef void F(int);'.  With the alias, `F *p = &cb;' violates the
+`typedef void F(int);'.  With the alias, `F *p = &cb;' violated the
 invariant "symbol type must match" (cpp_typecheck_initializer.cpp), and
-assigning &cb to a member of type F * is a conversion error ("invalid
-implicit conversion from 'auto (*)(signed int) -> void' to 'auto
-(*)(signed int) -> void'"); with the typedef both work.  libc++'s
+assigning &cb to a member of type F * was a conversion error (bin53): the
+parser keeps the type-id's parameters in parsed form (cpp_declaration) and
+records its noexcept as `noexcept' rather than `#C_noexcept'.  The typedef
+symbol's function type is now converted like a declarator's.
+test_member.desc: member alias-declarations (libc++'s
 __stop_callback_base declares `using __callback_fn_t =
-void(__stop_callback_base*) noexcept;', so the body of
-__stop_callback_base::__invoke is dropped (__stop_token/stop_state.h:33).
-Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program, and it
-fails only its WRONG assertion.
+void(__stop_callback_base*) noexcept;', and the body of
+__stop_callback_base::__invoke was dropped, __stop_token/stop_state.h:33).
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
