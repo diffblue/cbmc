@@ -16,13 +16,13 @@ guide formed from the constructor S(W<T> &) deduces T = int from the lvalue
 w of type W<int>.  The front end found no deduction for a constructor
 parameter that is a reference to a template-id ("found no match for symbol
 'S', candidates are: ...", bin53): it matched the reference pattern itself
-against the argument instead of the referred type ([temp.deduct.call]/3). by value, `T &' and `T *' work.  libstdc++ 13's
+against the argument instead of the referred type ([temp.deduct.call]/3).
+By value, `T &' and `T *' worked.  libstdc++ 13's
 __do_vformat_to declares `_Formatting_scanner __scanner(__ctx, __fmt);'
 with the constructor _Formatting_scanner(basic_format_context<_Out, _CharT>
 &, basic_string_view<_CharT>), so its body was dropped (seen with
 --verbosity 9 in the <format> reductions, after
 cpp_function_template_default_argument_on_earlier_declaration).
-test_shapes.desc: other reference and pointer parameters.  An rvalue
-argument for `P(W<T> &&)' still fails (`P d(W<short>{});': "missing type in
-template argument").  g++ 13 and clang++ 18 accept this program, and it
-fails only its WRONG assertion.
+test_shapes.desc: other reference and pointer parameters.  Rvalue
+arguments: cpp17_ctad_constructor_rvalue_reference_to_template_id.  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.
