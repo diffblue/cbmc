@@ -1646,6 +1646,12 @@ private:
   typedef std::list<irep_idt> dynamic_initializationst;
   dynamic_initializationst dynamic_initializations;
   bool disable_access_control;           // Disable protect and private
+  /// Set when a class template instance is derived from itself
+  /// ([class.derived.general]/2): that error is not recovered from, and the
+  /// flag stays set -- an error in the instantiation of a class is not in the
+  /// immediate context of a deduction ([temp.deduct.general]/9), so the
+  /// program is ill-formed whatever context caused the instantiation.
+  bool class_derived_from_itself = false;
   /// Destination type identifiers whose converting *template* constructor is
   /// currently being tried by `user_defined_conversion_sequence`'s
   /// template-constructor fallback.  Prevents unbounded recursion when a
