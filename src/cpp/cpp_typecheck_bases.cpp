@@ -281,6 +281,9 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       error() << "base class '" << to_string(base_symbol_expr.type())
               << "' is incomplete: a class cannot be derived from itself"
               << eom;
+      // ill-formed in every instantiation: not subject to the recovery of
+      // typecheck_compound_body
+      class_derived_from_itself = true;
       throw 0;
     }
 

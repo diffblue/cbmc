@@ -3083,7 +3083,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
     catch(...)
     {
-      if(!allow_recovery)
+      if(!allow_recovery || class_derived_from_itself)
         throw;
       get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
       // Roll back partial scope linkage.

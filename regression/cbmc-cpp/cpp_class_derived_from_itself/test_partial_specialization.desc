@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 partial_specialization.cpp
 
 ^CONVERSION ERROR$
@@ -7,8 +7,8 @@ partial_specialization.cpp
 --
 ^warning: ignoring
 --
-See test.desc.  No longer a crash: the diagnostic "base class ... is
-incomplete" is issued, but ill-formed implicit instantiations of user class
-templates are tolerated in general ([temp.inst]: the front end keeps going
-with a degenerate instance), so the program is accepted.  g++ 13 and
+See test.desc.  The diagnostic "base class ... is incomplete" was issued
+but recovered from (typecheck_compound_body tolerates base errors inside an
+instantiation, for system headers), so the program was accepted; bin53
+crashed.  The self-derivation error is no longer recovered from.  g++ 13 and
 clang++ 18 reject it.
