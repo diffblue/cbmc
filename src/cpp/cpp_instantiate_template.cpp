@@ -1494,23 +1494,36 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         }
       }
     }
+    // The recursion bound below counts enclosing instantiations of the
+    // template that is instantiated here.  A constrained partial
+    // specialization is re-matched from the primary (primary_template), but
+    // it is the specialization that is instantiated (the instance is
+    // empty, below): N5008 [temp.spec.partial.general]/1 -- each partial
+    // specialization is a distinct template, so the primary recursing into
+    // its specialization (`impl<T, B> : impl<T, B + 1>' ending in a
+    // constrained `impl<T, 4>', libstdc++ 16's __common_reference_impl
+    // bullets) is not a recursion of the same template, as for an
+    // unconstrained one.  (The bound itself is an implementation limit,
+    // [temp.inst]/16.)
+    const irep_idt &recursion_template =
+      has_concept_constraint ? initial_template.name : primary_template.name;
     unsigned same_template_depth = 0;
     bool has_converging_int_args = false;
     for(const auto &entry : instantiation_stack)
     {
-      if(entry.identifier == primary_template.name)
+      if(
+        entry.identifier == primary_template.name &&
+        entry.full_template_args == full_args)
       {
-        if(entry.full_template_args == full_args)
-        {
-          // Allow re-elaboration if the instance is empty
-          // (primary template was used, specialization matching
-          // hasn't happened yet).
-          if(to_struct_union_type(symbol.type).components().empty())
-            break; // proceed with specialization matching
-          return;
-        }
-        ++same_template_depth;
+        // Allow re-elaboration if the instance is empty
+        // (primary template was used, specialization matching
+        // hasn't happened yet).
+        if(to_struct_union_type(symbol.type).components().empty())
+          break; // proceed with specialization matching
+        return;
       }
+      if(entry.identifier == recursion_template)
+        ++same_template_depth;
     }
 
     // For templates with non-type integer arguments that are strictly
@@ -1532,7 +1545,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         for(const auto &entry : instantiation_stack)
         {
           if(
-            entry.identifier == primary_template.name &&
+            entry.identifier == recursion_template &&
             entry.full_template_args.arguments().size() <=
               full_args.arguments().size())
           {
@@ -1573,7 +1586,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         bool all_parents_contain = true;
         for(const auto &entry : instantiation_stack)
         {
-          if(entry.identifier != primary_template.name)
+          if(entry.identifier != recursion_template)
             continue;
           const auto &parent_args = entry.full_template_args.arguments();
           if(i >= parent_args.size() || parent_args[i].id() != ID_type)
@@ -1608,7 +1621,7 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
         bool all_parents_larger = true;
         for(const auto &entry : instantiation_stack)
         {
-          if(entry.identifier != primary_template.name)
+          if(entry.identifier != recursion_template)
             continue;
           bool found_larger = false;
           for(const auto &parg : entry.full_template_args.arguments())
@@ -1791,7 +1804,15 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // the symbol was created with the primary template (not already
     // matched to a partial specialization).
     const symbolt *best_match = &primary_template;
-    cpp_template_args_tct best_spec_args = specialization_args;
+    // The arguments of the template instantiated: for the primary template
+    // its full argument list.  When a constrained partial specialization is
+    // re-matched from the primary (has_concept_constraint), the recorded
+    // specialization_args are the specialization's (`<int>' of `impl<T, 2>'
+    // for impl<int, 2>); if no specialization's constraints are satisfied
+    // ([temp.spec.partial.match]/1) the primary is instantiated with them,
+    // leaving B unbound -- impl<int, B + 1> then named impl<int, 2> itself.
+    cpp_template_args_tct best_spec_args =
+      has_concept_constraint ? full_args : specialization_args;
 
     if(primary_template.type.get(ID_specialization_of).empty())
     {
