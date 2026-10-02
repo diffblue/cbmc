@@ -15,6 +15,7 @@ could not fully type-check
 libstdc++ 13 <stop_token>: drops stop_token:149 _M_run,
 bits/semaphore_base.h:118 _M_try_acquire_until_impl ("template
 'time_point_cast' not found", "type 'struct timespec' is still
-incomplete"), bits/chrono.h:710 operator- and 822 operator<, and
-bits/atomic_wait.h:252 _S_for (see test_atomic.desc).  g++ 13 accepts this
+incomplete"), and bits/chrono.h:710 operator- and 822 operator<.  The drop
+of bits/atomic_wait.h:252 _S_for is fixed
+(cpp_functional_cast_through_typedef_reinterprets).  g++ 13 accepts this
 program, and it fails only its WRONG assertion.
