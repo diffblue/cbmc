@@ -4070,6 +4070,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
 
   // produce new declaration
   cpp_declarationt new_decl = to_cpp_declaration(effective_template->type);
+  typet unsubstituted_trailing_return_type{ID_nil};
 
   // The new one is not a template any longer, but we remember the
   // template type that was used.
@@ -5134,6 +5135,11 @@ skip_pack_removal_ft:
       }
     }
 
+    // a trailing return type before substitution: a pack expansion in it
+    // naming the function parameter pack is expanded together with the
+    // parameters below
+    if(declaration_type.id() == ID_decltype)
+      unsubstituted_trailing_return_type = declaration_type;
     template_map.apply(declaration_type);
     new_decl.type().swap(declaration_type);
 
@@ -8567,8 +8573,12 @@ skip_pack_removal_ft:
         expanded_params.begin(),
         expanded_params.end());
 
-      // Expand pack references in the function body
-      if(func_decl.value().is_not_nil())
+      // Expand pack references in the function body, and in the
+      // declarator's type: N5008 [temp.variadic]/5, [dcl.fct]/8 -- a
+      // trailing return type may name the function parameter pack in an
+      // unevaluated operand (`-> decltype(forward_as_tuple(__args...))',
+      // libc++'s __bind_back), which is expanded as in the body.
+      if(func_decl.value().is_not_nil() || new_decl.type().id() == ID_decltype)
       {
         // Helper: check if an irept is a cpp_name referencing pack_var
         auto is_pack_name = [&pack_var_name](const irept &n) -> bool
@@ -8583,10 +8593,12 @@ skip_pack_removal_ft:
           return false;
         };
 
-        // Helper: make a cpp_name for an expanded parameter
+        // Helper: make a cpp_name for an expanded parameter (an element of
+        // the expansion, no longer a pack expansion itself)
         auto make_name = [](const irept &orig, const irep_idt &name)
         {
           irept copy = orig;
+          copy.remove(ID_ellipsis);
           for(auto &s : copy.get_sub())
           {
             if(s.id() == ID_name)
@@ -9270,7 +9282,26 @@ skip_pack_removal_ft:
           for(auto &named : node.get_named_sub())
             expand_pack(named.second);
         };
-        expand_pack(func_decl.value());
+        if(func_decl.value().is_not_nil())
+          expand_pack(func_decl.value());
+        // the return type: a trailing return type is the declaration's
+        // type by now (the parameter list was replicated above)
+        // N5008 [temp.variadic]/5: the expansion `static_cast<A &&>(a)...'
+        // substitutes A_k and a$k in lockstep; the substitution above had
+        // already expanded A alone (each element naming `a'), so expand the
+        // unsubstituted trailing return type, then substitute
+        if(new_decl.type().id() == ID_decltype)
+        {
+          if(unsubstituted_trailing_return_type.id() == ID_decltype)
+          {
+            typet trailing = unsubstituted_trailing_return_type;
+            expand_pack(trailing);
+            template_map.apply(trailing);
+            new_decl.type() = trailing;
+          }
+          else
+            expand_pack(new_decl.type());
+        }
       }
     }
     else if(pack_idx < 0 && pack_sz >= 2 && func_decl.value().is_not_nil())

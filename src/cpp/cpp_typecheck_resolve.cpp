@@ -10102,8 +10102,66 @@ bool cpp_typecheck_resolvet::substitute_function_type(
   message_handlert &old_handler = cpp_typecheck.get_message_handler();
   const std::size_t sfinae_errors =
     old_handler.get_message_count(messaget::M_ERROR);
+  // function parameter packs bound for the trailing return type
+  std::vector<irep_idt> bound_parameter_packs;
   try
   {
+    // N5008 [temp.variadic]/5: a function parameter pack (`A &&...a')
+    // declares one parameter per element of A, the k-th of type A_k &&, and
+    // a pack expansion naming it in a decltype operand of the trailing
+    // return type (`decltype(f(static_cast<A &&>(a)...))') is expanded
+    // element-wise, A_k and the k-th parameter in lockstep -- before the
+    // element-wise substitution below replaces A by its first element.
+    // The parameters are bound as for a requires-expression's parameter
+    // pack (bind_requires_parameter_pack).
+    if(function_type.has_subtype())
+    {
+      // The deduction replicated the pack's declaration once per element,
+      // with the element types substituted and the same name `a' -- a name
+      // a parameter-declaration-clause cannot otherwise declare twice
+      // ([dcl.fct]/13); bind one symbol per such declaration.
+      std::map<irep_idt, std::vector<typet>> replicated;
+      std::vector<irep_idt> order;
+      for(const auto &p : function_type.find(ID_parameters).get_sub())
+      {
+        if(p.id() != ID_cpp_declaration)
+          continue;
+        const auto &pdecl = static_cast<const cpp_declarationt &>(p);
+        if(pdecl.declarators().empty())
+          continue;
+        const auto &pdtor = pdecl.declarators().front();
+        const auto &pn = pdtor.name().get_sub();
+        if(pn.empty() || pn.front().id() != ID_name)
+          continue;
+        const irep_idt &pname = pn.front().get(ID_identifier);
+        if(replicated.find(pname) == replicated.end())
+          order.push_back(pname);
+        typet element_type = pdtor.merge_type(pdecl.type());
+        element_type.remove(ID_ellipsis);
+        replicated[pname].push_back(element_type);
+      }
+      for(const auto &pname : order)
+      {
+        const auto &types = replicated[pname];
+        if(types.size() < 2)
+          continue;
+        std::vector<exprt> elements;
+        for(const auto &t : types)
+        {
+          typet element_type = t;
+          cpp_typecheck.typecheck_type(element_type);
+          elements.push_back(
+            cpp_typecheck.requires_parameter_pack_element(pname, element_type));
+        }
+        cpp_typecheck.requires_parameter_packs[pname] = std::move(elements);
+        bound_parameter_packs.push_back(pname);
+      }
+      if(!bound_parameter_packs.empty())
+      {
+        cpp_typecheck.expand_requires_parameter_packs_in_type(
+          to_type_with_subtype(function_type).subtype());
+      }
+    }
     // Apply template map to the function type before typechecking.
     // This handles template template parameters where C<T> in the
     // function type needs to be replaced with the actual instantiated type.
@@ -10350,6 +10408,19 @@ bool cpp_typecheck_resolvet::substitute_function_type(
           const auto &pdecl = static_cast<const cpp_declarationt &>(p);
           if(pdecl.declarators().empty())
             continue;
+          // (an element of a bound function parameter pack: above)
+          {
+            const auto &pn = pdecl.declarators().front().name().get_sub();
+            if(
+              !pn.empty() && pn.front().id() == ID_name &&
+              std::find(
+                bound_parameter_packs.begin(),
+                bound_parameter_packs.end(),
+                pn.front().get(ID_identifier)) != bound_parameter_packs.end())
+            {
+              continue;
+            }
+          }
           typet ptype = pdecl.type();
           cpp_typecheck.typecheck_type(ptype);
           const auto &pname_sub = pdecl.declarators().front().name().get_sub();
@@ -10389,7 +10460,21 @@ bool cpp_typecheck_resolvet::substitute_function_type(
         }
       }
     }
-    cpp_typecheck.typecheck_type(function_type);
+    const auto unbind = [&]()
+    {
+      for(const auto &name : bound_parameter_packs)
+        cpp_typecheck.requires_parameter_packs.erase(name);
+    };
+    try
+    {
+      cpp_typecheck.typecheck_type(function_type);
+    }
+    catch(...)
+    {
+      unbind();
+      throw;
+    }
+    unbind();
     old_handler.set_message_count(messaget::M_ERROR, sfinae_errors);
   }
   catch(...)
