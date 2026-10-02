@@ -1,0 +1,21 @@
+KNOWNBUG libcxx
+sstream_insert.cpp
+--cpp20 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ converted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+--
+libc++ (LLVM 18) <sstream>: converting `o << "ab"' drops
+basic_streambuf<wchar_t, char_traits<char>>::xsgetn / xsputn
+(streambuf:268/276), a bogus instance created while deducing the deleted
+`operator<<(basic_ostream<wchar_t, _Traits> &, char16_t)'
+(cpp_deduction_failure_does_not_instantiate_pattern), plus the __format
+drops (cpp20_requires_expression_parameter_pack_of_differing_types).
+clang++ 18 -stdlib=libc++ accepts this program, and it fails only its WRONG
+assertion.

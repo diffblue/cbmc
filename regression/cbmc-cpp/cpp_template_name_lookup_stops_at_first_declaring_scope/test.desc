@@ -1,0 +1,23 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ namespace member hides global: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: unqualified
+lookup stops at the first scope in which a declaration of the name is found.
+For template names cpp_scopet::lookup_rec keeps collecting the templates of
+the enclosing class and namespace scopes (it stops only at a block scope,
+cpp_block_scope_using_declaration_hides_outer_template), so f<int>(0) in n
+also sees the class template ::f and is a conversion error.
+test_hidden_only_match.desc: accepts-invalid when the hidden template is
+the only match.  Applying the rule everywhere broke libc++ <tuple>,
+std::get and std::optional tests (round 163s notes).  Pre-existing (bin53).
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

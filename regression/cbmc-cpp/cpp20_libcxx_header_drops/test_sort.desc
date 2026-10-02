@@ -1,0 +1,23 @@
+KNOWNBUG libcxx
+sort.cpp
+--cpp17 --stdlib libc++ --unwind 8 --object-bits 12
+^\[main\.assertion\.1\] line \d+ sorted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+libc++ (LLVM 18) <algorithm>: std::sort on int has no body for
+std::__sort<__less<int, int> &, int *>.  libc++ declares that specialization
+`extern template' (sort.h:905, [temp.explicit]/12: an explicit instantiation
+declaration suppresses implicit instantiation; the definition is in
+libc++.so).  The definition is visible in the header, so the front end
+could instantiate it for verification, as it does for user code (a
+header-free `extern template' works).  Existing tests such as
+cpp20_algorithm_basic_libcxx accept either verdict and hide this.
+clang++ 18 -stdlib=libc++ accepts this program, and it fails only its
+WRONG assertion.
