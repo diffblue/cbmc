@@ -1,0 +1,24 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ block-scope using-declaration: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: unqualified name
+lookup stops at the first scope in which a declaration of the name is
+found.  For template names the front end kept searching the enclosing
+scopes (cpp_scopet::lookup_rec) even past a block scope, and also found the
+class template s::is_mi,
+so `is_mi<int>(p)' named the class template ("found no match for symbol
+'is_mi'", bin53).  libstdc++ 13's ranges::__copy_or_move uses `using
+__detail::__is_move_iterator;' (a variable template) while the class
+template std::__is_move_iterator is visible, so its body was dropped
+(ranges_algobase.h:213) and std::ranges::copy was nondeterministic.  g++ 13
+and clang++ 18 accept this program (-std=c++98), and it fails only its
+WRONG assertion.

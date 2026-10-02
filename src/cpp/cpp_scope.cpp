@@ -165,8 +165,20 @@ void cpp_scopet::lookup_rec(
   if(kind==QUALIFIED)
     return; // done
 
-  if(!id_set.empty() && identifier_class != id_classt::TEMPLATE)
+  // N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: the search
+  // stops at the first scope in which a declaration of the name is found.
+  // For template names the front end keeps collecting the templates of all
+  // enclosing class and namespace scopes, but a declaration in a block scope
+  // -- e.g. a using-declaration ([namespace.udecl]/1) -- hides every
+  // enclosing one: libstdc++'s ranges::__copy_or_move declares `using
+  // __detail::__is_move_iterator;' while the class template
+  // std::__is_move_iterator is visible.
+  if(
+    !id_set.empty() && (identifier_class != id_classt::TEMPLATE ||
+                        id_class == id_classt::BLOCK_SCOPE))
+  {
     return; // done, upwards scopes are hidden
+  }
 
   // ask parent, recursive call
   if(!is_root_scope())

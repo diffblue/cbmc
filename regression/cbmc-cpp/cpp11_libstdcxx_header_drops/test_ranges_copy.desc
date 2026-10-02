@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 ranges_copy.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges::copy: SUCCESS$
@@ -12,11 +12,12 @@ ranges_copy.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-libstdc++ 13 <algorithm>: std::ranges::copy(first, last, out) is a
-conversion error ("file bits/ranges_algobase.h line 311: found no match for
-symbol 'operator()'"); with a range argument the body of __copy_fn's range
-overload (ranges_algobase.h:311) is dropped instead, and the copy is
-nondeterministic.  The same drop shows when <format> or <chrono> is
-included.  Being reduced; a header-free imitation of __copy_fn passes.
-Pre-existing (bin53).  g++ 13 accepts this program, and it fails only its
-WRONG assertion.
+libstdc++ 13 <algorithm>: std::ranges::copy(first, last, out).  The
+iterator overload of __copy_fn was removed before deduction for the
+unrelated, more constrained range overload
+(cpp20_constraint_ordering_among_viable_candidates), and the body of
+__copy_or_move was dropped because `using __detail::__is_move_iterator;'
+did not hide std::__is_move_iterator
+(cpp_block_scope_using_declaration_hides_outer_template).  bin53:
+CONVERSION ERROR.  g++ 13 accepts this program, and it fails only its WRONG
+assertion.
