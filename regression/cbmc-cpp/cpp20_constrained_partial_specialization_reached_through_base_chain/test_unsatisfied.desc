@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 unsatisfied.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ bullet 3: SUCCESS$
@@ -13,7 +13,5 @@ unsatisfied.cpp
 See test.desc.  With unsatisfied constrained partial specializations for
 B = 1 and 2 ([temp.spec.partial.match]/1: they do not match), impl<int>
 must derive from impl<int, 2> and that from the partial specialization
-impl<int, 3>.  The front end crashes (SIGSEGV, unbounded recursion between
-primary_base and vtable_pointer_component: the class ends up its own
-base).  g++ 13 and clang++ 18 accept this program, and it fails only its
-WRONG assertion.
+impl<int, 3>.  Crashed on bin53 (the class ended up its own base).  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.

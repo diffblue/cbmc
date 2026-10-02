@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ two steps: SUCCESS$
@@ -12,16 +12,19 @@ main.cpp
 ^CONVERSION ERROR$
 --
 N5008 [temp.spec.partial.match]/1, [temp.constr.decl]/1: impl<int, 2>
-derives from impl<int, 3>, which derives from impl<int, 4>, the constrained
-partial specialization.  The front end fails silently ("could not fully
-type-check 'main'", no other diagnostic) when the chain needs two steps and
-impl<int, 3> was not instantiated before; with one step, an unconstrained
-partial specialization, or impl<int, 3> instantiated first, it works.
-Root cause of cpp20_common_reference_int_lvalue_rvalue failing with the
-libstdc++ 16 headers: common_reference<int &, long &> walks
-__common_reference_impl's bullets 1-4 this way (instantiating
-__common_reference_impl<int &, long &, 4>, 3 and 2 first makes that test
-pass).  test_unsatisfied.desc is the libstdc++ shape with unsatisfied
-constrained partial specializations on the way; it crashes (unbounded
-recursion in primary_base / vtable_pointer_component).  g++ 13 and
-clang++ 18 accept both programs, and they fail only their WRONG assertion.
+derives from impl<int, 3>, which derives from impl<int, 4>, an instance of
+the constrained partial specialization.  The front end failed silently
+("could not fully type-check 'main'", bin53): elaborate_class_template cut
+off recursion of a template after two enclosing instances unless the
+arguments converge, and for a constrained partial specialization (re-matched
+from the primary) it counted the primary's instances, so impl<int, 4> was
+never instantiated and impl<int, 3> lost its base.  Each partial
+specialization is a template of its own ([temp.spec.partial.general]/1);
+the bound now counts the specialization's instances.  test_unsatisfied.desc:
+unsatisfied constrained specializations for B = 1 and 2; when none matched,
+the primary was instantiated with the specialization's arguments, B unbound,
+and impl<int, B + 1> named impl<int, 2> itself (crash on bin53, "a class
+cannot be derived from itself" since round 163t).  This was the root cause
+of cpp20_common_reference_int_lvalue_rvalue failing with the libstdc++ 16
+headers.  g++ 13 and clang++ 18 accept both programs, and they fail only
+their WRONG assertion.
