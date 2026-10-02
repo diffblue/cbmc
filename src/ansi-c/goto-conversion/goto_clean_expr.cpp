@@ -827,6 +827,26 @@ goto_convertt::clean_expr_address_of(exprt &expr, const irep_idt &mode)
   }
   else if(expr.id() == ID_side_effect)
   {
+    // C++ ([expr.assign]/1, [expr.pre.incr]/1): an assignment or prefix
+    // increment/decrement is an lvalue designating its (first) operand, whose
+    // address may be taken (`&(x += 1)', a reference bound to `(x += a) +=
+    // c').  As in clean_expr, the operands' side effects come first: the
+    // first operand is itself used as an lvalue, the others as values.
+    // Without this an assignment nested in the first operand was both
+    // converted and left in the resulting lvalue expression.
+    const irep_idt &statement = to_side_effect_expr(expr).get_statement();
+    if(
+      statement != ID_function_call && statement != ID_temporary_object &&
+      statement != ID_statement_expression && !expr.operands().empty())
+    {
+      side_effects.add(clean_expr_address_of(expr.operands().front(), mode));
+      for(auto it = std::next(expr.operands().begin());
+          it != expr.operands().end();
+          ++it)
+      {
+        side_effects.add(clean_expr(*it, mode));
+      }
+    }
     side_effects.add(
       remove_side_effect(to_side_effect_expr(expr), mode, true, true));
   }
