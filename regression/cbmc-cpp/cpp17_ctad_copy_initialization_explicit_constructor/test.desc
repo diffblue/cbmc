@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION
+could not fully type-check
+--
+N5008 [over.match.class.deduct]/1, [over.match.copy]/1.1: in
+copy-initialization the guide formed from an explicit constructor is not a
+candidate, so `E e = 1;' has no viable deduction guide and the program is
+ill-formed.  The front end does reject it, but only after deducing E<int>
+(the error is "copy-initialization of 'struct E' from 'signed int' requires
+an explicit constructor"), and the rejection is a dropped body of main
+("could not fully type-check 'main'") rather than a plain diagnostic.  bin53
+rejected it plainly ("found no match for symbol 'E'") and passes this test;
+the dropped body comes from the copy-initialization check of ef2a71f448
+running after deduction.  g++ 13 and clang++ 18 reject this program.

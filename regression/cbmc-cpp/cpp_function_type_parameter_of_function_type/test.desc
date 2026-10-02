@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ function-typed parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.fct]/5: a parameter of function type is adjusted to a pointer to
+function, so `typedef int F(int());' declares F as int(int (*)()), the type
+of cb.  The front end takes the parameter `int()' as int: `F *p = cb;' is a
+conversion error ("invalid implicit conversion from 'auto (*)(auto (*)() ->
+signed int) -> signed int' to 'auto (*)(signed int) -> signed int'").  Not
+yet diagnosed.
+Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

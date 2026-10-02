@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ alias of a function type with a pack: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.typedef]/2, [temp.variadic]/5: for X<int, char>, `using F =
+void(T...);' is void(int, char).  cpp_typecheckt::convert_parsed_parameters
+leaves a function type with a pack expansion in parsed form, and assigning
+cb to the F * member is a conversion error ("invalid implicit conversion
+from 'auto (*)(signed int, char) -> void' to 'auto (*)(signed int) ->
+void'").  `typedef void F(T...);' and non-pack aliases work
+(cpp11_alias_declaration_of_function_type).  Pre-existing (bin53).  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.
