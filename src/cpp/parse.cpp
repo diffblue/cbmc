@@ -250,7 +250,7 @@ protected:
   std::optional<codet> rTypedefStatement();
   bool rForRangeBindings(cpp_declarationt &);
   bool rTypeSpecifier(typet &, bool);
-  bool isTypeSpecifier();
+  bool isTypeSpecifier(unsigned offset = 0);
   bool rLinkageSpec(cpp_linkage_spect &);
   bool rNamespaceSpec(cpp_namespace_spect &);
   bool rUsing(cpp_usingt &);
@@ -1026,9 +1026,9 @@ bool Parser::rTypeSpecifier(typet &tspec, bool check)
 
 // isTypeSpecifier() returns true if the next is probably a type specifier.
 
-bool Parser::isTypeSpecifier()
+bool Parser::isTypeSpecifier(unsigned offset)
 {
-  int t=lex.LookAhead(0);
+  int t = lex.LookAhead(offset);
 
   return is_identifier(t) || t == TOK_SCOPE || t == TOK_CONST ||
          t == TOK_VOLATILE || t == TOK_RESTRICT || t == TOK_CHAR ||
@@ -1056,8 +1056,8 @@ bool Parser::isTypeSpecifier()
          t == TOK_GCC_BUILTIN_ADD_LVALUE_REFERENCE ||
          t == TOK_GCC_BUILTIN_ADD_RVALUE_REFERENCE ||
          t == TOK_GCC_BUILTIN_ADD_POINTER || t == TOK_ATOMIC_TYPE_SPECIFIER ||
-         (is_identifier(t) && lex.LookAhead(1) == '(' &&
-          is_identifier_with_text(0, "__decay"));
+         (is_identifier(t) && lex.LookAhead(offset + 1) == '(' &&
+          is_identifier_with_text(offset, "__decay"));
 }
 
 /*
@@ -4808,7 +4808,32 @@ bool Parser::rDeclarator(
 
   t=lex.LookAhead(0);
 
-  if(t=='(')
+  // N5008 [dcl.ambig.res]/3: in a parameter-declaration-clause, a type-name
+  // nested in parentheses is a simple-type-specifier, not a parenthesized
+  // declarator-id -- `void f(int(C));' declares a parameter of type pointer
+  // to function int(C).  So does an empty `()' or `(...)' in an abstract
+  // declarator ([dcl.fct]/1: `typedef int F(int());').  The `(' then starts
+  // the parameter list of a function declarator, parsed in the loop below.
+  const auto parameter_list_follows = [&]()
+  {
+    if(kind != kArgDeclarator || d_outer.is_not_nil())
+      return false;
+    const int t1 = lex.LookAhead(1);
+    if(t1 == ')' || t1 == TOK_ELLIPSIS)
+      return true;
+    if(!is_identifier(t1))
+      return t1 != TOK_SCOPE && isTypeSpecifier(1);
+    // a ptr-operator `(T::*p)' (pointer to member) and a qualified name are
+    // a nested declarator as before
+    if(lex.LookAhead(2) == TOK_SCOPE || isPtrToMember(1))
+      return false;
+    cpp_tokent tk;
+    lex.LookAhead(1, tk);
+    const new_scopet *found = lookup_id(tk.data.get(ID_C_base_name));
+    return found != nullptr && (found->is_type() || found->is_template());
+  };
+
+  if(t == '(' && !parameter_list_follows())
   {
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ') << "Parser::rDeclarator2 3\n";
