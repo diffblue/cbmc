@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ namespace member hides global: SUCCESS$
@@ -12,12 +12,15 @@ main.cpp
 --
 N5008 [basic.lookup.general]/1, [basic.lookup.unqual]/1-2: unqualified
 lookup stops at the first scope in which a declaration of the name is found.
-For template names cpp_scopet::lookup_rec keeps collecting the templates of
-the enclosing class and namespace scopes (it stops only at a block scope,
+For template names cpp_scopet::lookup_rec kept collecting the templates of
+the enclosing class and namespace scopes (it stopped only at a block scope,
 cpp_block_scope_using_declaration_hides_outer_template), so f<int>(0) in n
-also sees the class template ::f and is a conversion error.
+also saw the class template ::f and was a conversion error (bin53).  It now
+stops at a namespace scope too.  Class scopes still collect: constructor
+templates and member templates found through base classes rely on it, and
+stopping there broke libc++ <tuple>, std::get and std::optional tests
+(round 163s notes).
 test_hidden_only_match.desc: accepts-invalid when the hidden template is
-the only match.  Applying the rule everywhere broke libc++ <tuple>,
-std::get and std::optional tests (round 163s notes).  Pre-existing (bin53).
+the only match.
 g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
 assertion.
