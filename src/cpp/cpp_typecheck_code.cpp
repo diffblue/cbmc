@@ -3260,6 +3260,7 @@ void cpp_typecheckt::typecheck_decl(codet &code)
       const exprt &value =
         static_cast<const exprt &>(declarator.find(ID_value));
       std::vector<exprt> ctad_args;
+      bool copy_initialization = false;
       if(init_args.get_sub().size() > 0)
       {
         for(const auto &a : init_args.get_sub())
@@ -3280,12 +3281,15 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         // span<char> from `span __to = _M_unused();' (libstdc++'s
         // _Sink::_M_write)
         ctad_args.push_back(value);
+        copy_initialization = true;
       }
       if(!ctad_args.empty())
       {
         if(
           auto deduced = deduce_class_template_arguments(
-            to_cpp_name(static_cast<const irept &>(type)), ctad_args))
+            to_cpp_name(static_cast<const irept &>(type)),
+            ctad_args,
+            copy_initialization))
         {
           type = *deduced;
           ctad_done = true;

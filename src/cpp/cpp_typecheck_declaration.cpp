@@ -21,7 +21,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   const cpp_namet &class_template_name,
-  const std::vector<exprt> &args)
+  const std::vector<exprt> &args,
+  bool copy_initialization)
 {
   // [dcl.type.class.deduct]: deduction only applies to a class-template-id
   // written *without* a template-argument-list.
@@ -296,6 +297,7 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   // `int *` argument, where the positional fallback would wrongly pick
   // `Wrap<int *>`.
   std::vector<typet> deduced_types;
+  bool skipped_explicit_constructor = false;
   {
     const symbolt *csym = symbol_table.lookup(template_id->identifier);
     auto scope_it = cpp_scopes.id_map.find(template_id->identifier);
@@ -315,9 +317,19 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
           to_cpp_declaration(static_cast<const exprt &>(mem));
         if(mdecl.type().id() != ID_constructor || mdecl.declarators().empty())
           continue;
+        // N5008 [over.match.class.deduct]/5: the notional constructor keeps
+        // the explicit-specifier; [over.match.copy]/1.1: in
+        // copy-initialization only converting constructors are candidates
+        if(copy_initialization && mdecl.member_spec().is_explicit())
+        {
+          skipped_explicit_constructor = true;
+          continue;
+        }
 
         // Constructor parameter patterns (in terms of the class parameters).
         std::vector<typet> patterns;
+        // parameters from the first one with a default argument on
+        std::size_t first_defaulted = 0;
         for(const auto &p :
             mdecl.declarators().front().type().find(ID_parameters).get_sub())
         {
@@ -329,9 +341,22 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
             pdecl.declarators().empty()
               ? pdecl.type()
               : pdecl.declarators().front().merge_type(pdecl.type()));
+          const bool defaulted =
+            !pdecl.declarators().empty() &&
+            pdecl.declarators().front().value().is_not_nil();
+          if(!defaulted)
+            first_defaulted = patterns.size();
         }
-        if(patterns.empty() || patterns.size() != arg_types.size())
+        // N5008 [over.match.viable]/2.3: a candidate with more parameters
+        // than arguments is viable if each further parameter has a default
+        // argument; those parameters take no part in deduction
+        if(
+          patterns.empty() || patterns.size() < arg_types.size() ||
+          first_defaulted > arg_types.size())
+        {
           continue;
+        }
+        patterns.resize(arg_types.size());
 
         cpp_save_scopet save_scope(cpp_scopes);
         cpp_saved_template_mapt saved_map(template_map);
@@ -525,6 +550,12 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   //    (`Pair<A, B>{a, b}` -> `Pair<decltype(a), decltype(b)>`); a single
   //    parameter shared by several aggregate members (`Agg<T>{x, y}`) is fixed
   //    by the first argument, the rest being members of that same type.
+  // No viable notional constructor: only explicit ones would have deduced
+  // ([over.match.class.deduct]/1: the deduction fails; the positional
+  // fallback below would stand in for the excluded explicit constructor)
+  if(deduced_types.empty() && skipped_explicit_constructor)
+    return {};
+
   if(deduced_types.empty())
   {
     if(has_pack)
