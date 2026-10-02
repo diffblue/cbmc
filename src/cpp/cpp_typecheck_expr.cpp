@@ -9116,8 +9116,43 @@ void cpp_typecheckt::typecheck_method_application(
   }
 }
 
+/// N5008 [expr.assign]/1, [expr.pre.incr]/1: in C++ a built-in assignment,
+/// compound assignment or prefix increment/decrement is an lvalue referring
+/// to its left operand.  Goto conversion follows C, where the result is the
+/// assigned VALUE (held in a temporary when the left operand is not a plain
+/// variable, e.g. `*x' for a reference x); it keeps the left operand only when
+/// the address of the side effect is taken.  When such a side effect is
+/// itself the operand that is modified, `(x += 2) += 3' or `++(++x)', make
+/// that explicit as `*&(x += 2)'.
+static void use_side_effect_as_lvalue(exprt &operand)
+{
+  if(operand.id() != ID_side_effect || !operand.get_bool(ID_C_lvalue))
+    return;
+  const irep_idt &statement = operand.get(ID_statement);
+  if(
+    statement != ID_assign && statement != ID_assign_plus &&
+    statement != ID_assign_minus && statement != ID_assign_mult &&
+    statement != ID_assign_div && statement != ID_assign_mod &&
+    statement != ID_assign_shl && statement != ID_assign_ashr &&
+    statement != ID_assign_lshr && statement != ID_assign_bitand &&
+    statement != ID_assign_bitxor && statement != ID_assign_bitor &&
+    statement != ID_preincrement && statement != ID_predecrement)
+  {
+    return;
+  }
+  const typet type = operand.type();
+  const source_locationt location = operand.source_location();
+  address_of_exprt address{operand, pointer_type(type)};
+  dereference_exprt object{std::move(address), type};
+  object.set(ID_C_lvalue, true);
+  object.add_source_location() = location;
+  operand = std::move(object);
+}
+
 void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
 {
+  if(expr.operands().size() == 2)
+    use_side_effect_as_lvalue(to_binary_expr(expr).op0());
   if(expr.operands().size() != 2)
   {
     error().source_location = expr.find_source_location();
@@ -9272,6 +9307,7 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(side_effect_exprt &expr)
 
   if(is_number(tmp_type) || tmp_type.id() == ID_pointer)
   {
+    use_side_effect_as_lvalue(op);
     // standard stuff
     c_typecheck_baset::typecheck_expr_side_effect(expr);
     // [expr.pre.incr]/1, [expr.pre.decr]/1: in C++ a pre-increment or
