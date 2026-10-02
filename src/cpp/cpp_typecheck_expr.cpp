@@ -10522,17 +10522,20 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   }
 
   // A generic lambda is lowered to a closure with a member function template
-  // operator() (Phase F) unless it is in a member-function context, has an
-  // explicit object parameter, captures anything by reference, or its body
-  // contains a nested lambda -- those keep the call-site instantiation
-  // (function-pointer) lowering below.  (A template operator() needs a deduced
-  // `auto` return type, which mishandles a reference-member access, so a
-  // by-reference capture stays on the -- for the live/immediate case sound --
-  // function-pointer lowering.)
+  // operator() (Phase F) unless it has an explicit object parameter, uses
+  // `this' explicitly or odr-uses a member function (member_context_
+  // unsupported), or its body contains a nested lambda -- those keep the
+  // call-site instantiation (function-pointer) lowering below.  N5008
+  // [expr.prim.lambda.closure]/4: the call operator is a template,
+  // instantiated for the argument types of each call; the function-pointer
+  // lowering fixes every `auto' to `signed int', so a generic lambda passed
+  // to a function template (`visit([this](auto &a) {...})') was called through
+  // an `int (*)(int &)'.  By-reference captures, including the data members
+  // a member-function lambda captures through `this' (Phase E), are reference
+  // members of the closure and work in the template operator().
   const bool generic_closure_eligible =
     is_generic_lambda && !lambda_has_explicit_this &&
-    !member_context_unsupported && !lambda_body_has_nested_lambda &&
-    !lambda_in_member_context && by_ref_captures.empty();
+    !member_context_unsupported && !lambda_body_has_nested_lambda;
 
   // Collect parameters
   const irept &params_irep = expr.find(ID_parameters);
@@ -10967,12 +10970,10 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // expression an object of that class.  This lets the lambda be used as an
   // object (e.g. stored by value in std::function) as well as a function
   // pointer (via the conversion).  A generic lambda's operator() is a member
-  // function template (Phase F); generic lambdas in a member-function context
-  // keep the function-pointer (call-site instantiation) lowering for now.
+  // function template (Phase F).
   if(
     !lambda_has_explicit_this && !member_context_unsupported &&
-    !lambda_body_has_nested_lambda &&
-    !(is_generic_lambda && lambda_in_member_context))
+    !lambda_body_has_nested_lambda)
   {
     // The closure type must be identical across repeated type-checks of the
     // same lambda-expression (e.g. during auto return type deduction, which
