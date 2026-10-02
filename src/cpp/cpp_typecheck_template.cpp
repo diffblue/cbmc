@@ -1094,6 +1094,39 @@ void cpp_typecheckt::typecheck_class_template_member(
   PRECONDITION(declaration.declarators().size() == 1);
 
   cpp_declaratort &declarator = declaration.declarators()[0];
+
+  // N5008 [dcl.meaning.general]/2.3: a declarator-id qualified by a
+  // nested-name-specifier that nominates a namespace declares a member of
+  // that namespace, and the definition may appear outside it (`template
+  // <class C> int a::b::S<C>::f() {...}').  Strip the leading namespace
+  // components and look the class template up in the namespace they
+  // nominate.
+  cpp_scopet *qualifier_namespace = nullptr;
+  {
+    irept::subt &sub = declarator.name().get_sub();
+    std::size_t first = 0;
+    cpp_scopet *scope = &cpp_scopes.current_scope();
+    cpp_scopet::lookup_kindt kind = cpp_scopet::RECURSIVE;
+    while(sub.size() >= first + 6 && sub[first].id() == ID_name &&
+          sub[first + 1].id() == ID_scope_resolution)
+    {
+      const auto ns_ids = scope->lookup(
+        sub[first].get(ID_identifier), kind, cpp_idt::id_classt::NAMESPACE);
+      if(ns_ids.size() != 1)
+        break;
+      scope = static_cast<cpp_scopet *>(*ns_ids.begin());
+      kind = cpp_scopet::QUALIFIED;
+      first += 2;
+    }
+    // only in front of a class template's template-id
+    if(
+      first > 0 && sub[first].id() == ID_name &&
+      sub[first + 1].id() == ID_template_args)
+    {
+      sub.erase(sub.begin(), sub.begin() + first);
+      qualifier_namespace = scope;
+    }
+  }
   const cpp_namet &cpp_name = declarator.name();
 
   PRECONDITION(cpp_name.is_qualified() || cpp_name.has_template_args());
@@ -1295,7 +1328,9 @@ void cpp_typecheckt::typecheck_class_template_member(
   // class template is the NESTED `Inner`, looked up in `Outer`'s scope; for
   // the single-qualification forms it is the leading name in the current
   // scope.
-  cpp_scopet *lookup_scope = &cpp_scopes.current_scope();
+  cpp_scopet *lookup_scope = qualifier_namespace != nullptr
+                               ? qualifier_namespace
+                               : &cpp_scopes.current_scope();
   irep_idt class_tmpl_base_name = cpp_name.get_sub().front().get(ID_identifier);
   if(
     cpp_name.get_sub().size() == 6 &&
@@ -4604,8 +4639,40 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
         // the trailing ones after the outer template's.
         do
         {
-          // form: name <args> :: name  (single-level qualification only)
-          const irept::subt &tsub = tag_name.get_sub();
+          // form: [::] {namespace ::} name <args> :: name.  N5008
+          // [class.nest]/3, [namespace.memdef]/2: the definition may be
+          // outside the namespace, naming it by a qualified name
+          // (`template <class C> struct ns::S<C>::N { ... };').
+          const irept::subt &all_sub = tag_name.get_sub();
+          std::size_t first = 0;
+          cpp_scopet *lookup_scope = &cpp_scopes.current_scope();
+          cpp_scopet::lookup_kindt lookup_kind = cpp_scopet::RECURSIVE;
+          if(!all_sub.empty() && all_sub[0].id() == ID_scope_resolution)
+          {
+            lookup_scope = &cpp_scopes.get_root_scope();
+            lookup_kind = cpp_scopet::QUALIFIED;
+            first = 1;
+          }
+          bool namespace_prefix_ok = true;
+          while(all_sub.size() >= first + 6 && all_sub[first].id() == ID_name &&
+                all_sub[first + 1].id() == ID_scope_resolution)
+          {
+            const auto ns_ids = lookup_scope->lookup(
+              all_sub[first].get(ID_identifier),
+              lookup_kind,
+              cpp_idt::id_classt::NAMESPACE);
+            if(ns_ids.size() != 1)
+            {
+              namespace_prefix_ok = false;
+              break;
+            }
+            lookup_scope = static_cast<cpp_scopet *>(*ns_ids.begin());
+            lookup_kind = cpp_scopet::QUALIFIED;
+            first += 2;
+          }
+          if(!namespace_prefix_ok)
+            break;
+          const irept::subt tsub(all_sub.begin() + first, all_sub.end());
           if(
             tsub.size() != 4 || tsub[0].id() != ID_name ||
             tsub[1].id() != ID_template_args ||
@@ -4613,8 +4680,8 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
             break;
           const irep_idt outer_name = tsub[0].get(ID_identifier);
           const irep_idt member_name = tsub[3].get(ID_identifier);
-          const auto outer_ids = cpp_scopes.current_scope().lookup(
-            outer_name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::TEMPLATE);
+          const auto outer_ids = lookup_scope->lookup(
+            outer_name, lookup_kind, cpp_idt::id_classt::TEMPLATE);
           if(outer_ids.empty())
             break;
           symbolt *outer_sym =
