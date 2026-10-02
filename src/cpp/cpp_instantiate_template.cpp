@@ -1832,8 +1832,37 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             continue;
 
           const cpp_declarationt &cpp_declaration = to_cpp_declaration(s.type);
-          const cpp_template_args_non_tct &partial_specialization_args =
+          // A specialization's written argument list is completed with the
+          // primary template's default arguments (`impl<T1, T2>' of
+          // `template <class, class, int = 1> struct impl' is impl<T1, T2,
+          // 1>), as in cpp_typecheck_resolvet::disambiguate_template_classes;
+          // the comparison with the full argument list below decides.
+          cpp_template_args_non_tct partial_specialization_args =
             cpp_declaration.partial_specialization_args();
+          {
+            const auto &primary_params =
+              to_cpp_declaration(primary_template.type)
+                .template_type()
+                .template_parameters();
+            const bool trailing_pack =
+              !partial_specialization_args.arguments().empty() &&
+              (partial_specialization_args.arguments().back().get_bool(
+                 ID_ellipsis) ||
+               partial_specialization_args.arguments().back().type().get_bool(
+                 ID_ellipsis));
+            for(std::size_t i = partial_specialization_args.arguments().size();
+                !trailing_pack && i < full_args_tc.arguments().size() &&
+                i < primary_params.size();
+                ++i)
+            {
+              const template_parametert &p =
+                static_cast<const template_parametert &>(primary_params[i]);
+              if(!p.has_default_argument())
+                break;
+              partial_specialization_args.arguments().push_back(
+                p.default_argument());
+            }
+          }
 
           if(
             partial_specialization_args.arguments().size() !=
