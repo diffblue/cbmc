@@ -1,0 +1,26 @@
+KNOWNBUG
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ generic lambda: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.lambda.closure]/4, [temp.inst]/11: the function call
+operator of a generic lambda is a member function template, instantiated
+only for the argument types it is called with (auto = double here).  The
+front end also type-checks the body with `signed int' for auto: it
+instantiates fmt<int>, whose call h(int) is ambiguous, and drops that body
+("C++ front-end dropped the body of function 'fmt<signed_int>'").  The
+verdict is unaffected here.  In libstdc++ 13's <format> the same happens to
+_Formatting_scanner::_M_format_arg's visitor (`using _Type =
+remove_reference_t<decltype(__arg)>;'): __formatter_fp::format is
+instantiated with an unresolved _Type and dropped (format:1422;
+cpp11_namespace_reopened_after_qualified_member_template_definition/
+test_libstdcxx.desc).  Pre-existing (bin53).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.
