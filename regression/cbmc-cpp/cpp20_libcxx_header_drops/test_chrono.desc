@@ -13,6 +13,12 @@ dropped the body of system-header function
 could not fully type-check
 system-header declaration
 --
+libc++ (LLVM 18) <chrono>: the year_month_day_last members
+(year_month_day.h:200-309) were dropped, root cause
+cpp_member_function_named_like_earlier_used_class (fixed).  Remaining:
+year_month_day.h:212, operator local_days(): `local_days{year() / month() /
+day()}' -- "constructor call did not resolve to temporary object" (not yet
+reduced).  Earlier notes:
 libc++ (LLVM 18) <chrono>: drops __chrono/parser_std_format_spec.h:73-133
 __validate_* (cpp_nested_name_specifier_ignores_hiding_variable: `__flags
 __flags' then `__flags::__second'), __chrono/year_month_day.h:200-203

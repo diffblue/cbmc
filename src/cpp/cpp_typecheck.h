@@ -153,6 +153,8 @@ public:
   /// them is a pack expansion or dependent.
   void convert_parsed_parameters(code_typet &code_type);
 
+  void pin_constructor_parameter_class_names(cpp_declaratort &declarator);
+
   /// Instantiate the out-of-class definition \p member_type of the member
   /// class \p member_name for the existing specializations of the class
   /// template \p outer_template ([temp.mem.class]/1, [temp.inst]/3).

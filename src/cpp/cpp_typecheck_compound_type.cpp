@@ -2953,6 +2953,65 @@ bool cpp_typecheckt::register_lazy_member(
   return true;
 }
 
+/// N5008 [class.member.lookup]/3: outside a complete-class context, a name
+/// is searched for from its point of use.  Constructors are type-checked
+/// after all other members of the class (typecheck_compound_body), so an
+/// unqualified class name in a constructor parameter type would also find a
+/// member declared after the constructor -- libc++'s
+/// chrono::year_month_day_last has `year_month_day_last(const
+/// month_day_last &)' and later a member function `month_day_last()'.  (If
+/// the two searches differ, the program is ill-formed, no diagnostic
+/// required, [class.member.lookup]/6; Clang and GCC accept it.)  Replace
+/// such a parameter type, at the constructor's position, by the class it
+/// names there: a class found before any member of that name is declared.
+void cpp_typecheckt::pin_constructor_parameter_class_names(
+  cpp_declaratort &declarator)
+{
+  for(auto &p : declarator.type().add(ID_parameters).get_sub())
+  {
+    if(p.id() != ID_cpp_declaration)
+      continue;
+    typet &ptype = static_cast<cpp_declarationt &>(p).type();
+    // the base type of the parameter (cv-qualifiers in a merged_type)
+    typet *name_type = &ptype;
+    if(ptype.id() == ID_merged_type)
+    {
+      for(auto &sub : to_type_with_subtypes(ptype).subtypes())
+        if(sub.id() == ID_cpp_name)
+          name_type = &sub;
+    }
+    if(
+      name_type->id() != ID_cpp_name || name_type->get_sub().size() != 1 ||
+      name_type->get_sub().front().id() != ID_name)
+    {
+      continue;
+    }
+    const irep_idt &name = name_type->get_sub().front().get(ID_identifier);
+    // a member of that name declared so far: the ordinary lookup is right
+    if(!cpp_scopes.current_scope().lookup(name, cpp_scopet::SCOPE_ONLY).empty())
+      continue;
+    const auto ids = cpp_scopes.current_scope().get_parent().lookup(
+      name, cpp_scopet::RECURSIVE, cpp_idt::id_classt::CLASS);
+    if(ids.size() != 1)
+      continue;
+    const symbolt *class_symbol =
+      symbol_table.lookup((*ids.begin())->identifier);
+    if(
+      class_symbol == nullptr || !class_symbol->is_type ||
+      (class_symbol->type.id() != ID_struct &&
+       class_symbol->type.id() != ID_union))
+    {
+      continue;
+    }
+    // the class as a struct/union tag, keeping the cpp_name's qualifiers
+    typet tag = class_symbol->type.id() == ID_union
+                  ? static_cast<typet>(union_tag_typet{class_symbol->name})
+                  : static_cast<typet>(struct_tag_typet{class_symbol->name});
+    tag.add_source_location() = name_type->source_location();
+    *name_type = tag;
+  }
+}
+
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
   // A typedef/alias declaration defers the elaboration of the class template
@@ -3708,6 +3767,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
             }
             if(all_defaulted)
               found_own_default_ctor = true;
+            pin_constructor_parameter_class_names(declarator);
             continue;
           }
 
