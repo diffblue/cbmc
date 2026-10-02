@@ -3272,6 +3272,15 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         for(const auto &a : value.operands())
           ctad_args.push_back(a);
       }
+      else if(value.is_not_nil() && value.id() != ID_initializer_list)
+      {
+        // N5008 [over.match.class.deduct]/5, [dcl.init.general]/16: for
+        // `S s = e;' the initializer is the single expression e
+        // (copy-initialization), e.g. the copy deduction candidate deduces
+        // span<char> from `span __to = _M_unused();' (libstdc++'s
+        // _Sink::_M_write)
+        ctad_args.push_back(value);
+      }
       if(!ctad_args.empty())
       {
         if(
