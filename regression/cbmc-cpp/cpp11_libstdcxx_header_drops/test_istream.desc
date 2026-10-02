@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 istream.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ header: SUCCESS$
@@ -13,11 +13,11 @@ dropped the body of system-header function
 could not fully type-check
 --
 libstdc++ 13 <istream>: the body of basic_istream::read (istream:576,
-defined in bits/istream.tcc:702) is dropped ("invalid implicit conversion
+defined in bits/istream.tcc:702) was dropped (bin53) ("invalid implicit conversion
 from 'struct sentry' to '__CPROVER_bool'" for `if (__cerb)', sentry having
 an explicit operator bool); the other members using a sentry the same way
 convert.  Seen in cpp17_shared_count_constructor_template_not_instantiated_tu.
 Root cause: cpp_member_class_defined_after_instantiation (basic_istream<char>
 is instantiated by the explicit instantiation of ignore before
-basic_istream::sentry is defined).  g++ 13 accepts this program,
+basic_istream::sentry is defined), now fixed.  g++ 13 accepts this program,
 and it fails only its WRONG assertion.

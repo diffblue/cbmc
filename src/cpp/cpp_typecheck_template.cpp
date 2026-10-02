@@ -59,6 +59,79 @@ void cpp_typecheckt::salvage_default_arguments(
 ///
 /// Also handles partial specializations per [temp.spec.partial.general]
 /// and explicit specializations per [temp.expl.spec].
+/// N5008 [temp.mem.class]/1, [temp.inst]/3: a member class of a class
+/// template defined outside it, `template <class C> struct S<C>::N { ... };',
+/// is instantiated for a specialization S<X> when the completeness of
+/// S<X>::N is required, from the definition reachable at that point.  The
+/// definition is grafted into the class template's parse tree, which covers
+/// the specializations instantiated later; an S<X> instantiated BEFORE the
+/// definition (libstdc++ <istream> explicitly instantiates
+/// basic_istream<char>::ignore before istream.tcc defines
+/// basic_istream::sentry) still has S<X>::N incomplete.  Instantiate the
+/// definition, \p member_type, for each such S<X> of \p outer_template now:
+/// its uses are type-checked later than this point (method bodies are
+/// deferred).
+void cpp_typecheckt::complete_member_class_of_instances(
+  const cpp_idt &outer_template,
+  const irep_idt &member_name,
+  const typet &member_type)
+{
+  const irep_idt &template_parent = outer_template.get_parent().identifier;
+  std::vector<irep_idt> instances;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    const symbolt &instance = entry.second;
+    if(
+      !instance.is_type || instance.base_name != outer_template.base_name ||
+      !instance.type.get_bool(ID_template_class_instance) ||
+      instance.type.get_bool(ID_incomplete))
+    {
+      continue;
+    }
+    const auto scope_it = cpp_scopes.id_map.find(entry.first);
+    if(scope_it == cpp_scopes.id_map.end() || !scope_it->second->is_scope)
+      continue;
+    // the instance's scope is nested in its template-parameter scope
+    const cpp_idt *parent = &scope_it->second->get_parent();
+    while(parent->is_template_scope())
+      parent = &parent->get_parent();
+    if(parent->identifier != template_parent)
+      continue;
+    // the instance's own member class, if it has been created: skip it once
+    // complete
+    bool complete = false;
+    for(const auto *id :
+        static_cast<cpp_scopet &>(*scope_it->second)
+          .lookup(
+            member_name, cpp_scopet::QUALIFIED, cpp_idt::id_classt::CLASS))
+    {
+      const symbolt *member = symbol_table.lookup(id->identifier);
+      if(member != nullptr && !member->type.get_bool(ID_incomplete))
+        complete = true;
+    }
+    if(!complete)
+      instances.push_back(entry.first);
+  }
+  for(const auto &instance_id : instances)
+  {
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_saved_template_mapt saved_map(template_map);
+    cpp_scopes.go_to(*cpp_scopes.id_map[instance_id]);
+    bind_class_instance_parameters(
+      *symbol_table.lookup(instance_id), template_map);
+    typet type = member_type;
+    try
+    {
+      typecheck_type(type);
+    }
+    catch(...)
+    {
+      // an ill-formed member class: S<X>::N stays incomplete, as when the
+      // definition is not reachable
+    }
+  }
+}
+
 void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
 {
   // N5008 [namespace.memdef]/2, [class.pre]/3: a class template defined
@@ -4594,6 +4667,8 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
               new_type.add(ID_tag) = mtag;
               new_type.remove(ID_C_tag_only_declaration);
               mdecl.type() = new_type;
+              complete_member_class_of_instances(
+                **outer_ids.begin(), member_name, new_type);
               return;
             }
             // graft: the out-of-line struct body under the member's tag
