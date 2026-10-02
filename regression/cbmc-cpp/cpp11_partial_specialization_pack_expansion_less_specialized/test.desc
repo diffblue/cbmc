@@ -19,6 +19,6 @@ partial_specialization_at_least_as_specialised deduced T from `T...', both
 specializations were at least as specialized as the other, and the sorted
 keys picked the pack (bin53).  libstdc++ 13's views::__adaptor::_Partial has
 this shape (the pack and the single-argument constrained specializations).
-S<int, const int &, const int &> (Example 4, #2, with two elements) still
-selects the primary template.  g++ 13 and clang++ 18 accept this program,
-and it fails only its WRONG assertion.
+S<int, const int &, const int &> (Example 4, #2, with two elements):
+cpp11_partial_specialization_reference_pack_two_elements.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.
