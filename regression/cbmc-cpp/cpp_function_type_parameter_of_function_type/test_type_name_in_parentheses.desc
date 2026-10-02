@@ -1,0 +1,14 @@
+CORE
+type_name_in_parentheses.cpp
+
+^\[main\.assertion\.1\] line \d+ pointer to function parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.ambig.res]/3, Example 3; see test.desc.  Failed on bin53.  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.
