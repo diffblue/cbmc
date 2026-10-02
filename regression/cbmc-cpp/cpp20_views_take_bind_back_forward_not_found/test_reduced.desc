@@ -18,6 +18,9 @@ __bind_back_t through its inherited __perfect_forward_impl constructor,
 whose mem-initializer builds tuple<_BoundArgs...> from the pack; the
 tuple constructor's __base_ mem-initializer names four class types
 computed from the packs.  The front end drops take's operator() and
-reports CONVERSION ERROR.  clang++ 18 with libc++ accepts the program
+reports CONVERSION ERROR.  Diagnosed (round 163u): the suppressed error is
+"found no match for symbol 'forward_as_tuple'" for
+`decltype(forward_as_tuple(__args...))' in __bind_back's trailing return
+type, a function parameter pack expansion with one element.  clang++ 18 with libc++ accepts the program
 (it uses clang's __make_integer_seq and __type_pack_element builtins,
 which g++ does not have).  Pre-existing (fails on bin53).
