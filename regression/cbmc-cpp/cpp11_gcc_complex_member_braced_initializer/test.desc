@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ member: SUCCESS$
@@ -13,10 +13,10 @@ main.cpp
 --
 GCC's __complex__ extension (gcc.gnu.org/onlinedocs/gcc/Complex.html; Clang
 accepts it as well): a braced list of two scalars initializes the real and
-the imaginary part.  A local variable works, a mem-initializer `v{r, i}' of
-a __complex__ float member is rejected ("initialization of POD requires one
-argument, but got 2").  Root cause of the drops of libstdc++'s
-complex<float>, complex<double> and complex<long double> constructors
-(complex:1352/1509/1666 with GCC 13), so std::complex<float>(1, 2) is
-nondeterministic.  Pre-existing (bin53).  g++ 13 and clang++ 18 accept this
+the imaginary part.  A local variable worked, a mem-initializer `v{r, i}' of
+a __complex__ float member was rejected ("initialization of POD requires one
+argument, but got 2", bin53; cpp_constructor now handles it).  This was the
+root cause of the drops of libstdc++'s complex<float>, complex<double> and
+complex<long double> constructors (complex:1352/1509/1666 with GCC 13), so
+std::complex<float>(1, 2) was nondeterministic (test_std_complex.desc).  g++ 13 and clang++ 18 accept this
 program, and it fails only its WRONG assertion.
