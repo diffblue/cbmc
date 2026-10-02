@@ -1,6 +1,7 @@
 CORE libcxx
 sstream.cpp
 --cpp11 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ constructed: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
@@ -9,13 +10,14 @@ sstream.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 dropped the body of system-header function
+no body for callee
 --
 libc++ (LLVM 18) <sstream>: basic_ostringstream's constructors and
 destructor converted with no dropped body after
 cpp_constructor_overload_resolution_with_virtual_base (they were dropped:
 `basic_ostream<_CharT, _Traits>(&__sb_)' "did not uniquely resolve", and the
 destructor passed the internal @most_derived flag against a real
-parameter).  The value of o.good() is not checked: ios_base::init and
-locale's constructor are defined in libc++.so, have no model ("no body for
-callee"), and leave the stream state nondeterministic.  clang++ 18
--stdlib=libc++ accepts this program.
+parameter).  o.good() is checked since ios_base::init and locale's
+constructor (defined in libc++.so) are modelled
+(cpp17_libcxx_ostringstream_state).  clang++ 18 -stdlib=libc++ accepts this
+program.
