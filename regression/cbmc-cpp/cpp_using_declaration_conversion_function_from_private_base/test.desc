@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ using-declared conversion: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [namespace.udecl]/19: `using B::operator int;' in the public part of A
+makes the conversion function a public member of A, although B is a private
+base.  The front end reports "member 'B::operator(signed_int)($constthis)' is
+not accessible (private)".  Pre-existing (bin53).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ two elements: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/2-3: P<int, char, char> matches the
+constrained partial specialization `P<A, Args...>' with Args = {char, char}.
+The front end selects the primary template (n == 0); with one element the
+more specialized `P<A, Arg>' is chosen.  The same shape as libstdc++'s
+views::__adaptor::_Partial.  Not yet diagnosed.  Pre-existing (bin53).  g++
+13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

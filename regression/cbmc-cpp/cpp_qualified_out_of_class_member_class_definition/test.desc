@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ qualified member class definition: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.mem.class]/1, [class.nest]/3: a member class of a class template
+may be defined outside the class template by a qualified name, here from
+outside its namespace (`template <class C> struct ns::S<C>::N { ... };').
+The front end grafts an out-of-class member class definition into the class
+template only for the form `S<C>::N' (cpp_typecheck_template.cpp, "single-
+level qualification only"); the namespace-qualified form is ignored, S<char>::N
+stays incomplete and f's body is left without N.  Defining it inside the
+namespace works (cpp_member_class_defined_after_instantiation/
+test_namespace.desc).  Pre-existing (bin53).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

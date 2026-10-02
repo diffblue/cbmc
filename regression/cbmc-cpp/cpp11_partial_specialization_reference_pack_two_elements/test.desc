@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ #2: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.type]/9, Example 4: S<int, const int &, const int &>
+matches `S<T1, const Z &...>' with Z = {int, int}.  The front end selects
+the primary template; with one element the specializations are matched and
+ordered correctly (cpp11_partial_specialization_pack_expansion_less_
+specialized).  Not yet diagnosed.  Pre-existing (bin53).  g++ 13 and clang++
+18 accept this program, and it fails only its WRONG assertion.

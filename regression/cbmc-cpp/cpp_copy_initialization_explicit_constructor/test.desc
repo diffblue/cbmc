@@ -13,8 +13,8 @@ N5008 [over.match.copy]/1.1, [class.conv.ctor]/2: in copy-initialization
 the program is ill-formed.  The front end accepted it (bin53): it ran
 constructor overload resolution over all constructors.  It now rejects a
 copy-initialization from another type whose only viable one-argument
-constructors are explicit.  Through class template argument deduction
-(`template <class T> struct E { explicit E(T); }; E e = 1;') it is still
-accepted.  test_converting.desc: the converting constructors are still
-selected.  g++ 13 and clang++ 18 reject this
-program.
+constructors are explicit.  After class template argument deduction the
+same check rejects it, but by dropping the body
+(cpp17_ctad_copy_initialization_explicit_constructor, KNOWNBUG).
+test_converting.desc: the converting constructors are still selected.  g++
+13 and clang++ 18 reject this program.
