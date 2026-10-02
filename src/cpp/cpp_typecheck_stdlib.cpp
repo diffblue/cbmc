@@ -5,6 +5,7 @@
 /// Author: Michael Tautschnig
 
 #include <util/arith_tools.h>
+#include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
@@ -1570,6 +1571,216 @@ void cpp_typecheckt::provide_stdlib_bodies()
       // assertion failures in the standard library).
       ensure_parameter_symbols(symbol, symbol_table);
       symbol.value = code_blockt();
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+
+    // libc++ (LLVM) defines these in libc++.so (src/ios.cpp,
+    // src/locale.cpp), so CBMC sees no body and every stream's state is
+    // nondeterministic.  Model them by their specified effects:
+    //   ios_base::init(void *sb): N5008 [basic.ios.cons] Table 128 --
+    //     rdbuf() == sb, tie() == 0 (basic_ios::init's own part),
+    //     rdstate() == goodbit if sb is not null, else badbit,
+    //     exceptions() == goodbit, flags() == skipws | dec, width() == 0,
+    //     precision() == 6; no callbacks or iword/pword storage
+    //     ([ios.base.callback], [ios.base.storage]) yet.  The locale
+    //     storage __loc_ is left null, denoting the global "C" locale as in
+    //     the libstdc++ model below.
+    //   ios_base::~ios_base(): [ios.base.cons]/2 -- the erase_event
+    //     callbacks (none registered by these models), then the storage is
+    //     released: no observable effect.
+    //   locale::locale(), locale(const locale &), ~locale(): the __imp *
+    //     __locale_ is null (the global "C" locale, [locale.cons]/2) or the
+    //     other's ([locale.cons]/7); the destructor releases a reference
+    //     ([locale.cons]/9): no-op.
+    if(
+      symbol.value.is_nil() &&
+      (name == "std::__1::ios_base::init(this,ptr_void)" ||
+       name == "std::__1::ios_base::~ios_base(this)" ||
+       name == "std::__1::ios_base::clear(this,unsigned_int)" ||
+       name == "std::__1::ios_base::getloc($constthis)" ||
+       name.find("std::__1::locale::locale(this") == 0 ||
+       name == "std::__1::locale::~locale(this)"))
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      const auto &params = to_code_type(symbol.type).parameters();
+      code_blockt block;
+      const auto assign_members =
+        [&](const std::map<std::string, std::function<exprt(const typet &)>>
+              &values)
+      {
+        if(params.empty() || params[0].type().id() != ID_pointer)
+          return;
+        const symbol_exprt this_expr{
+          params[0].get_identifier(), params[0].type()};
+        const typet &base_t = to_pointer_type(params[0].type()).base_type();
+        if(base_t.id() != ID_struct_tag)
+          return;
+        const struct_typet &st = ns.follow_tag(to_struct_tag_type(base_t));
+        for(const auto &comp : st.components())
+        {
+          const auto v_it = values.find(id2string(comp.get_base_name()));
+          if(v_it == values.end())
+            continue;
+          block.add(code_frontend_assignt{
+            member_exprt{
+              dereference_exprt{this_expr}, comp.get_name(), comp.type()},
+            v_it->second(comp.type())});
+        }
+      };
+      const auto zero = [](const typet &t) -> exprt
+      {
+        if(t.id() == ID_pointer)
+          return null_pointer_exprt{to_pointer_type(t)};
+        return from_integer(0, t);
+      };
+      if(
+        name == "std::__1::ios_base::init(this,ptr_void)" && params.size() == 2)
+      {
+        const symbol_exprt sb{params[1].get_identifier(), params[1].type()};
+        const auto state = [&](const typet &t) -> exprt
+        {
+          // goodbit = 0, badbit = 0x1 (libc++ <ios>)
+          return if_exprt{
+            equal_exprt{sb, null_pointer_exprt{to_pointer_type(sb.type())}},
+            from_integer(1, t),
+            from_integer(0, t)};
+        };
+        assign_members(
+          {{"__rdbuf_",
+            [&](const typet &t) -> exprt
+            { return typecast_exprt::conditional_cast(sb, t); }},
+           {"__rdstate_", state},
+           {"__exceptions_", zero},
+           // skipws = 0x1000, dec = 0x0002 (libc++ <ios>)
+           {"__fmtflags_",
+            [](const typet &t) -> exprt { return from_integer(0x1002, t); }},
+           {"__width_", zero},
+           {"__precision_",
+            [](const typet &t) -> exprt { return from_integer(6, t); }},
+           {"__loc_", zero},
+           {"__fn_", zero},
+           {"__index_", zero},
+           {"__event_size_", zero},
+           {"__event_cap_", zero},
+           {"__iarray_", zero},
+           {"__iarray_size_", zero},
+           {"__iarray_cap_", zero},
+           {"__parray_", zero},
+           {"__parray_size_", zero},
+           {"__parray_cap_", zero}});
+      }
+      else if(
+        name == "std::__1::ios_base::clear(this,unsigned_int)" &&
+        params.size() == 2)
+      {
+        // [iostate.flags]/4: rdstate() == state if rdbuf() is not null,
+        // otherwise state | badbit.  (If then rdstate() & exceptions() is
+        // not zero, basic_ios::failure is thrown; with the exceptions() ==
+        // goodbit of Table 128 and no model of exceptions(iostate) that is
+        // not reached here.)
+        const symbol_exprt state{params[1].get_identifier(), params[1].type()};
+        const symbol_exprt this_expr{
+          params[0].get_identifier(), params[0].type()};
+        const typet &base_t = to_pointer_type(params[0].type()).base_type();
+        exprt rdbuf = nil_exprt{};
+        if(base_t.id() == ID_struct_tag)
+        {
+          for(const auto &comp :
+              ns.follow_tag(to_struct_tag_type(base_t)).components())
+          {
+            if(id2string(comp.get_base_name()) == "__rdbuf_")
+              rdbuf = member_exprt{
+                dereference_exprt{this_expr}, comp.get_name(), comp.type()};
+          }
+        }
+        if(rdbuf.is_nil())
+          continue;
+        assign_members(
+          {{"__rdstate_",
+            [&](const typet &t) -> exprt
+            {
+              const exprt s = typecast_exprt::conditional_cast(state, t);
+              return if_exprt{
+                equal_exprt{
+                  rdbuf, null_pointer_exprt{to_pointer_type(rdbuf.type())}},
+                bitor_exprt{s, from_integer(1, t)},
+                s};
+            }}});
+      }
+      else if(name == "std::__1::ios_base::getloc($constthis)")
+      {
+        // [ios.base.locales]/4: the imbued locale -- the global "C" locale
+        // (a null __locale_, see init above) as no imbue is modelled
+        const typet &ret = to_code_type(symbol.type).return_type();
+        if(ret.id() != ID_struct_tag)
+          continue;
+        const auto value = ::zero_initializer(ret, symbol.location, ns);
+        if(!value.has_value())
+          continue;
+        // returned through a local object: a class prvalue is returned by
+        // copy-initializing the result object from an lvalue
+        const irep_idt local_id = id2string(symbol.name) + "::__cbmc_locale";
+        if(!symbol_table.has_symbol(local_id))
+        {
+          symbolt local;
+          local.name = local_id;
+          local.base_name = "__cbmc_locale";
+          local.type = ret;
+          local.mode = symbol.mode;
+          local.is_lvalue = true;
+          local.is_thread_local = true;
+          local.is_file_local = true;
+          local.location = symbol.location;
+          symbol_table.insert(std::move(local));
+        }
+        const symbol_exprt local_expr{local_id, ret};
+        block.add(code_frontend_declt{local_expr});
+        block.add(code_frontend_assignt{local_expr, *value});
+        block.add(code_frontend_returnt{local_expr});
+      }
+      else if(name == "std::__1::locale::locale(this)")
+        assign_members({{"__locale_", zero}});
+      else if(
+        name.find("std::__1::locale::locale(this,") == 0 &&
+        params.size() == 2 && is_reference(params[1].type()))
+      {
+        // the copy constructor: the other locale's implementation
+        const symbol_exprt other{params[1].get_identifier(), params[1].type()};
+        const typet &locale_t = to_reference_type(other.type()).base_type();
+        const typet &this_t = to_pointer_type(params[0].type()).base_type();
+        // only the copy constructor (a reference to locale itself)
+        if(
+          locale_t.id() != ID_struct_tag || this_t.id() != ID_struct_tag ||
+          to_struct_tag_type(locale_t).get_identifier() !=
+            to_struct_tag_type(this_t).get_identifier())
+        {
+          continue;
+        }
+        {
+          const struct_typet &st = ns.follow_tag(to_struct_tag_type(locale_t));
+          for(const auto &comp : st.components())
+          {
+            if(id2string(comp.get_base_name()) != "__locale_")
+              continue;
+            assign_members(
+              {{"__locale_",
+                [&](const typet &) -> exprt
+                {
+                  return member_exprt{
+                    dereference_exprt{other}, comp.get_name(), comp.type()};
+                }}});
+          }
+        }
+      }
+      else if(name.find("std::__1::locale::locale(this,") == 0)
+      {
+        // other constructors (named locales, facet combination): not
+        // modelled -- keep no body
+        continue;
+      }
+      symbol.value = block;
       symbol.value.type() = symbol.type;
       deferred_typechecking.erase(symbol.name);
       continue;
