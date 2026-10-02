@@ -11,7 +11,7 @@ member.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [dcl.typedef]/2, [except.spec]; see test.desc.  A pack expansion in
-the alias (`using F = void(T...);') is still left in parsed form.  g++ 13
+N5008 [dcl.typedef]/2, [except.spec]; see test.desc.  Pack expansions:
+cpp11_alias_declaration_of_function_type_pack.  g++ 13
 and clang++ 18 accept this program (-std=c++17), and it fails only its
 WRONG assertion.
