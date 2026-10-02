@@ -144,6 +144,14 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
+  /// Instantiate the out-of-class definition \p member_type of the member
+  /// class \p member_name for the existing specializations of the class
+  /// template \p outer_template ([temp.mem.class]/1, [temp.inst]/3).
+  void complete_member_class_of_instances(
+    const cpp_idt &outer_template,
+    const irep_idt &member_name,
+    const typet &member_type);
+
   /// Which one-argument constructors of \p class_type accept \p value by a
   /// standard conversion or reference binding: no explicit one, only
   /// explicit ones (then copy-initialization from \p value is ill-formed,
