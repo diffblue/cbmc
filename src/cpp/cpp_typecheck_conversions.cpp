@@ -2432,8 +2432,18 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         return false;
       if(found)
       {
+        // N5008 [over.ics.rank]/3.3: two user-defined conversion sequences
+        // are distinguished only when they use the same converting
+        // constructor, by their SECOND standard conversion sequence (the
+        // identity here, the result being the class type itself).  The
+        // first standard conversion -- that of the argument to the
+        // constructor's parameter -- decided which constructor is used
+        // (best_rank, [over.match.ctor]) but does not rank the sequence:
+        // `0 -> unspec' through unspec(unspec *) is no worse than `0 ->
+        // count' through count(int) (libstdc++'s `partial_ordering == 0'
+        // against a candidate taking a class with a converting constructor
+        // template).
         new_expr.swap(best_expr);
-        rank += best_rank;
         return true;
       }
 

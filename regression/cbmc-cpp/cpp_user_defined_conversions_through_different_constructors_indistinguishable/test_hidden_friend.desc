@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ equal: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [over.match.best]/2.1, [over.ics.rank]/3.3, [temp.inst]/11; see
+main.cpp and test.desc.  The libstdc++ <filesystem> shape: the bodies of
+_Sp_counted_ptr::_M_dispose and __shared_count(_Ptr) were dropped for a
+non-pointer _Ptr (cpp11_libstdcxx_header_drops/test_filesystem.desc).
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
