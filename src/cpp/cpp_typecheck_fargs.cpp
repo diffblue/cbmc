@@ -410,7 +410,23 @@ bool cpp_typecheck_fargst::match(
     *cv_distance = 0;
 
   exprt::operandst ops = operands;
-  const code_typet::parameterst &parameters = code_type.parameters();
+  // The trailing `@most_derived' flag of a constructor or destructor of a
+  // class with virtual bases (Itanium C++ ABI 5.1.4: complete- vs
+  // base-object constructor) is not a parameter of the C++ function
+  // ([over.match.viable]/2 counts the parameters of the declaration); the
+  // front end supplies it after overload resolution.  Matching user
+  // arguments against it made `os()' viable for `os(&s)' (pointer to
+  // bool).  Only an argument the front end supplies itself (marked
+  // #most_derived_argument, cpp_destructor) binds to it.
+  code_typet::parameterst parameters = code_type.parameters();
+  if(
+    !parameters.empty() &&
+    parameters.back().get_base_name() == "@most_derived" &&
+    (ops.size() < parameters.size() ||
+     !ops[parameters.size() - 1].get_bool(ID_C_most_derived_argument)))
+  {
+    parameters.pop_back();
+  }
 
   if(parameters.size() > ops.size())
   {
