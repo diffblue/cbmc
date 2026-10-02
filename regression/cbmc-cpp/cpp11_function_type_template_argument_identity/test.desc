@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ function type: SUCCESS$
@@ -15,11 +15,14 @@ type arguments are the same type; decltype(cb) and void(int) are.  A
 written function type template argument keeps its parameters in parsed
 form (cpp_declaration, with the declarator part such as `&' or `*'
 separate from the base type) while decltype(cb) is a converted code type
-(parameters as `parameter'), so the instances differ
-(tag-W<(parameter(...))->(void)> vs tag-W<(cpp_declaration(...))->(void)>)
-and the primary template is selected.  Normalizing either form changes what
-the partial-specialization matcher compares, which relies on the parsed
-form.  (decltype(cb) itself used to be a pointer type; see
-cpp11_decltype_of_function_name.)  `same<void(int), void(int)>' and
-pointers to functions work.  Pre-existing (bin53).  g++ 13 and clang++ 18
-accept this program, and it fails only its WRONG assertion.
+(parameters as `parameter').  The deduction of A from both arguments
+conflicted, and the primary template was selected (bin53).  Partial
+specialization matching and the consistency check of repeated deductions
+now compare function types in converted form
+(cpp_typecheck_resolvet::canonical_function_type).  The parsed form itself
+is kept: the matcher deduces from it.  (decltype(cb) itself used to be a
+pointer type; see cpp11_decltype_of_function_name.)
+test_partial_specialization.desc, test_deduced.desc: tr<R(A)> and
+tr<R(int &, A...)> for decltype, deduced and typedef function types.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

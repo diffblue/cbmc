@@ -69,6 +69,8 @@ public:
   /// Clear the static resolve_scope cache. Must be called between
   /// type-checking different translation units.
 
+  typet canonical_function_type(const typet &code);
+
   void guess_template_args(
     const typet &template_parameter,
     const typet &desired_type);
