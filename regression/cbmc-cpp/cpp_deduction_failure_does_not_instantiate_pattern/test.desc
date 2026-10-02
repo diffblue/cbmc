@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ char inserter: SUCCESS$
@@ -13,12 +13,12 @@ dropped the body
 --
 N5008 [temp.deduct.call]/4-5, [temp.inst]/2: deducing os<wchar_t, T> from an
 os<char, tr<char>> fails at wchar_t vs char, and nothing requires
-os<wchar_t, tr<char>> to be complete.  The front end instantiates the
-pattern with the deduced T = tr<char> anyway; sb<wchar_t, tr<char>>::put is
-ill-formed and dropped ("C++ front-end dropped the body of function
-'put'").  The verdict is right here, but the bogus instance is a hard error
-risk; in libc++ <sstream> it drops basic_streambuf<wchar_t,
-char_traits<char>>::xsputn / xsgetn (streambuf:268/276;
-cpp20_libcxx_header_drops/test_sstream_insert.desc).  Pre-existing (bin53).
+os<wchar_t, tr<char>> to be complete.  The front end deduced T = tr<char>
+from the other argument, ignored the mismatch of the non-dependent argument
+wchar_t, and instantiated the substituted parameter type; sb<wchar_t,
+tr<char>>::put is ill-formed and was dropped (bin53).  A non-dependent
+built-in type argument of the pattern must now equal A's.  In libc++
+<sstream> this dropped basic_streambuf<wchar_t, char_traits<char>>::xsputn /
+xsgetn (streambuf:268/276; cpp20_libcxx_header_drops/test_sstream_insert.desc).
 g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
 assertion.

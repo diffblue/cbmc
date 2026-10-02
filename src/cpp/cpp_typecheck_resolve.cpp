@@ -8633,6 +8633,104 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
     }
   }
 
+  // N5008 [temp.deduct.type]/1, [temp.deduct.call]/4-5: a TYPE argument of P
+  // that does not involve the template parameters being deduced (`wchar_t'
+  // in `os<wchar_t, T>') is not deduced but must be identical to A's
+  // corresponding argument; otherwise A is not a specialization matching P
+  // (only a base of A may be, [temp.deduct.call]/4.3), and deduction fails.
+  // Deducing T from the other arguments regardless made the substituted
+  // parameter type os<wchar_t, tr<char>> & and instantiated that class
+  // (libc++'s deleted `operator<<(basic_ostream<wchar_t, _Traits> &,
+  // char16_t)' considered for an ostringstream).
+  {
+    const auto mentions_template_parameter = [&](const irept &arg)
+    {
+      std::function<bool(const irept &)> walk = [&](const irept &n) -> bool
+      {
+        if(n.id() == ID_name && !n.get(ID_identifier).empty())
+        {
+          for(const auto *p : cpp_typecheck.cpp_scopes.current_scope().lookup(
+                n.get(ID_identifier), cpp_scopet::RECURSIVE))
+          {
+            if(p->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+              return true;
+          }
+        }
+        if(n.id() == ID_template_parameter_symbol_type)
+          return true;
+        for(const auto &sub : n.get_sub())
+          if(walk(sub))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(ns.first != ID_C_source_location && walk(ns.second))
+            return true;
+        return false;
+      };
+      return walk(arg);
+    };
+    bool fixed_type_mismatch = false;
+    for(std::size_t i = 0; i < targs.size() && i < inst_arguments.size(); ++i)
+    {
+      const irept &tn = targs[i];
+      if(tn.get_bool(ID_ellipsis) || tn.find(ID_type).get_bool(ID_ellipsis))
+        break;
+      if(tn.id() != ID_type || inst_arguments[i].id() != ID_type)
+        continue;
+      if(mentions_template_parameter(tn.find(ID_type)))
+        continue;
+      // the pattern is in parsed form (`wchar_t'); convert it
+      typet pattern_arg = static_cast<const typet &>(tn.find(ID_type));
+      try
+      {
+        cpp_convert_plain_type(
+          pattern_arg, cpp_typecheck.get_message_handler());
+      }
+      catch(...)
+      {
+        continue;
+      }
+      // only plain built-in types: their identity is unambiguous here
+      const irep_idt &pid = pattern_arg.id();
+      if(
+        pid != ID_signedbv && pid != ID_unsignedbv && pid != ID_bool &&
+        pid != ID_c_bool && pid != ID_floatbv && pid != ID_empty)
+      {
+        continue;
+      }
+      const typet &a = inst_arguments[i].type();
+      if(
+        a.id() != pid || a.get(ID_width) != pattern_arg.get(ID_width) ||
+        a.get(ID_C_c_type) != pattern_arg.get(ID_C_c_type) ||
+        a.get_bool(ID_C_constant) != pattern_arg.get_bool(ID_C_constant) ||
+        a.get_bool(ID_C_volatile) != pattern_arg.get_bool(ID_C_volatile))
+      {
+        fixed_type_mismatch = true;
+        break;
+      }
+    }
+    if(fixed_type_mismatch)
+    {
+      const irep_idt tmpl_bn = cpp_name.get_base_name();
+      for(const auto &base : desired_sym->type.find(ID_bases).get_sub())
+      {
+        const typet &base_type = static_cast<const typet &>(base.find(ID_type));
+        if(base_type.id() != ID_struct_tag)
+          continue;
+        const symbolt *base_sym = cpp_typecheck.symbol_table.lookup(
+          to_struct_tag_type(base_type).get_identifier());
+        if(base_sym == nullptr || base_sym->base_name != tmpl_bn)
+          continue;
+        const bool saved_dab = deducing_against_base;
+        deducing_against_base = true;
+        guess_template_args(pattern, base_type);
+        deducing_against_base = saved_dab;
+        return;
+      }
+      mark_targs_conflicting();
+      return;
+    }
+  }
+
   // N5008 [temp.deduct.type]/17: if P has a form that contains `<i>`
   // where `i` names a non-type template parameter of the template being
   // deduced, and the type of `i` differs from the type of the
