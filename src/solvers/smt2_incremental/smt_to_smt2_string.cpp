@@ -190,7 +190,7 @@ smt_term_to_string_convertert::make_output_function(const smt_sortt &output)
 smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(const smt_termt &output)
 {
-  return [=](std::ostream &os) { output.accept(*this); };
+  return [=, this](std::ostream &os) { output.accept(*this); };
 }
 
 template <typename elementt>
@@ -198,7 +198,8 @@ smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(
   const std::vector<std::reference_wrapper<const elementt>> &outputs)
 {
-  return [=](std::ostream &os) {
+  return [=, this](std::ostream &os)
+  {
     for(const auto &output : make_range(outputs.rbegin(), outputs.rend()))
     {
       push_outputs(" ", output.get());
@@ -210,7 +211,8 @@ smt_term_to_string_convertert::output_functiont
 smt_term_to_string_convertert::make_output_function(
   const sorted_variablest &output)
 {
-  return [=](std::ostream &os) {
+  return [=, this](std::ostream &os)
+  {
     const auto push_sorted_variable =
       [&](const smt_identifier_termt &identifier) {
         push_outputs("(", identifier, " ", identifier.get_sort(), ")");

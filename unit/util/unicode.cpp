@@ -65,31 +65,31 @@ static bool compare_utf8_to_utf16(const std::string &in)
 
 TEST_CASE("unicode0", "[core][util][unicode]")
 {
-  const std::string s = u8"abc";
+  const std::string s = "abc";
   REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode1", "[core][util][unicode]")
 {
-  const std::string s = u8"\u0070\u00DF\u00E0\u00EF\u00F0\u00F7\u00F8";
+  const std::string s = "\u0070\u00DF\u00E0\u00EF\u00F0\u00F7\u00F8";
   REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode2", "[core][util][unicode]")
 {
-  const std::string s = u8"$¢€𐍈";
+  const std::string s = "$¢€𐍈";
   REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode3", "[core][util][unicode]")
 {
-  const std::string s = u8"𐐏𤭢";
+  const std::string s = "𐐏𤭢";
   REQUIRE(compare_utf8_to_utf16(s));
 }
 
 TEST_CASE("unicode4", "[core][util][unicode]")
 {
-  const std::string s = u8"дȚȨɌṡʒʸͼἨѶݔݺ→⅒⅀▤▞╢◍⛳⻥龍ンㄗㄸ";
+  const std::string s = "дȚȨɌṡʒʸͼἨѶݔݺ→⅒⅀▤▞╢◍⛳⻥龍ンㄗㄸ";
   REQUIRE(compare_utf8_to_utf16(s));
 }
 

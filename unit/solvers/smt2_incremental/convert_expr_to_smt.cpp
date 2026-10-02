@@ -86,7 +86,13 @@ expr_to_smt_conversion_test_environmentt::make(test_archt arch)
   default:
     UNREACHABLE;
   }
-  return {initial_smt_object_map(), smt_object_sizet{}};
+
+  expr_to_smt_conversion_test_environmentt result;
+
+  result.object_map = initial_smt_object_map();
+  result.object_size_function = smt_object_sizet{};
+
+  return result;
 }
 
 smt_termt
