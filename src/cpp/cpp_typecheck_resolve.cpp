@@ -5074,7 +5074,31 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         continue;
       }
 
-      if(partial_specialization_args_tc == full_template_args_tc)
+      // N5008 [temp.type]/1, [dcl.fct]/5: a function type argument may be
+      // in parsed form (a written `void(int)': parameters as
+      // cpp_declaration) or converted (`decltype(cb)', a deduced F:
+      // parameters as `parameter'); both denote the same type.  Compare
+      // them in converted form.
+      const auto canonical_function_types = [&](cpp_template_args_tct args)
+      {
+        for(auto &arg : args.arguments())
+        {
+          if(arg.id() == ID_type && arg.type().id() == ID_code)
+            arg.type() = canonical_function_type(arg.type());
+        }
+        return args;
+      };
+      const bool function_type_argument = std::any_of(
+        full_template_args_tc.arguments().begin(),
+        full_template_args_tc.arguments().end(),
+        [](const exprt &a)
+        { return a.id() == ID_type && a.type().id() == ID_code; });
+
+      if(
+        partial_specialization_args_tc == full_template_args_tc ||
+        (function_type_argument &&
+         canonical_function_types(partial_specialization_args_tc) ==
+           canonical_function_types(full_template_args_tc)))
       {
         // Also check that cv-qualifiers and #c_type match, since
         // operator== ignores #-prefixed attributes like C_constant,
@@ -7932,6 +7956,18 @@ resolved_after_strip:
   return result;
 } // NOLINT(readability/fn_size)
 
+/// N5008 [temp.type]/1, [dcl.fct]/5: the function type \p code with its
+/// parameters in converted form: a written `void(int)' keeps them as
+/// cpp_declaration, `decltype(cb)' and deduced types have `parameter's.
+/// (Parameter names and default arguments are #-attributes, which
+/// comparison ignores.)
+typet cpp_typecheck_resolvet::canonical_function_type(const typet &code)
+{
+  typet result = code;
+  cpp_typecheck.convert_parsed_parameters(to_code_type(result));
+  return result;
+}
+
 void cpp_typecheck_resolvet::guess_template_args(
   const exprt &template_expr,
   const exprt &desired_expr)
@@ -9019,8 +9055,16 @@ void cpp_typecheck_resolvet::guess_template_args_simple_name(
           existing.remove(ID_C_volatile);
           incoming.remove(ID_C_constant);
           incoming.remove(ID_C_volatile);
-          if(existing != incoming)
+          // [temp.type]/1: a function type in parsed and in converted form
+          // (`same<decltype(cb), void(int)>' against `same<A, A>')
+          if(
+            existing != incoming &&
+            (existing.id() != ID_code || incoming.id() != ID_code ||
+             canonical_function_type(existing) !=
+               canonical_function_type(incoming)))
+          {
             t.id(ID_unassigned); // mark as conflicting
+          }
         }
       }
     }
