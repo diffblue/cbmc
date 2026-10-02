@@ -335,6 +335,31 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
             // int[5]` (not `int(&)[5]`) from an array lvalue
             // (`owning_view{declval<int(&)[5]>()}`; the class's
             // `_Range _M_r = _Range();` is ill-formed for a reference).
+            // [temp.deduct.call]/3: "If P is a reference type, the type
+            // referred to by P is used for type deduction" -- `S(W<T> &)'
+            // deduces T from an lvalue W<int>.  (A reference to a bare
+            // template parameter, `T &' / `T &&', is matched as written.)
+            const typet &pattern = patterns[i];
+            const auto is_plain_name = [](const typet &t)
+            {
+              return t.id() == ID_cpp_name &&
+                     !to_cpp_name(t).has_template_args() &&
+                     !to_cpp_name(t).is_qualified();
+            };
+            const bool reference_to_template_id =
+              pattern.id() == ID_frontend_pointer &&
+              (pattern.get_bool(ID_C_reference) ||
+               pattern.get_bool(ID_C_rvalue_reference)) &&
+              !is_plain_name(to_type_with_subtype(pattern).subtype());
+            if(reference_to_template_id)
+            {
+              typet argument = arg_types[i];
+              if(is_reference(argument) || is_rvalue_reference(argument))
+                argument = to_reference_type(argument).base_type();
+              resolver.guess_template_args(
+                to_type_with_subtype(pattern).subtype(), argument);
+              continue;
+            }
             resolver.guess_template_args(
               patterns[i],
               adjust_deduction_arg(patterns[i], arg_types[i], false));
