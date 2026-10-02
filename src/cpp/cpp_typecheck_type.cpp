@@ -142,7 +142,25 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
   else
     type = e.type();
 
-  return type;
+  return cpp_bool_type(type);
+}
+
+/// N5008 [expr.rel]/2, [expr.eq]/1, [expr.log.and]/1, [expr.unary.op]/9: a
+/// comparison or logical operator yields a prvalue of type bool.  The front
+/// end represents it with the internal `__CPROVER_bool' (ID_bool); where the
+/// type of an expression becomes a C++ type -- a deduced placeholder, decltype,
+/// a deduced template argument -- it is the C++ type bool (ID_c_bool), with
+/// the cv-qualifiers kept.
+typet cpp_bool_type(const typet &type)
+{
+  if(type.id() != ID_bool)
+    return type;
+  typet result = c_bool_type();
+  if(type.get_bool(ID_C_constant))
+    result.set(ID_C_constant, true);
+  if(type.get_bool(ID_C_volatile))
+    result.set(ID_C_volatile, true);
+  return result;
 }
 
 void cpp_typecheckt::typecheck_type(typet &type)
