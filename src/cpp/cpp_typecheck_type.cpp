@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/cprover_prefix.h>
 #include <util/mathematical_types.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
@@ -1316,4 +1317,76 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
 
   CHECK_RETURN(type.is_not_nil());
+}
+
+/// N5008 [dcl.typedef]/2: an alias-declaration `using F = void(int);' has
+/// the same semantics as `typedef void F(int);'.  The type-id's function
+/// type comes from the parser with its parameters still in parsed form
+/// (cpp_declaration), which typecheck_type keeps (the partial-specialization
+/// matcher compares that form); the typedef form's declarator is converted to
+/// `parameter's, and its noexcept to #C_noexcept.  Convert them, so that F is
+/// the type of a function declared `void cb(int)' (`F *p = &cb;').
+void cpp_typecheckt::convert_parsed_parameters(code_typet &code_type)
+{
+  code_typet::parameterst converted;
+  for(const auto &parameter : code_type.parameters())
+  {
+    if(parameter.id() != ID_cpp_declaration)
+    {
+      converted.push_back(parameter);
+      continue;
+    }
+    const cpp_declarationt &declaration = static_cast<const cpp_declarationt &>(
+      static_cast<const exprt &>(parameter));
+    if(declaration.declarators().size() != 1)
+      return;
+    const cpp_declaratort &declarator = declaration.declarators().front();
+    // a pack expansion `Ts...' is expanded by substitution, from this form
+    if(declarator.get_has_ellipsis())
+      return;
+    typet type = declarator.merge_type(declaration.type());
+    try
+    {
+      typecheck_type(type);
+    }
+    catch(...)
+    {
+      return;
+    }
+    if(
+      type.id() == ID_cpp_name ||
+      type.id() == ID_template_parameter_symbol_type)
+      return; // dependent
+    // [dcl.fct]/5: parameters of array or function type are adjusted
+    if(type.id() == ID_array)
+      type = pointer_type(to_array_type(type).element_type());
+    else if(type.id() == ID_code)
+      type = pointer_type(type);
+    // [dcl.fct]/5: top-level cv-qualifiers are dropped from the function type
+    if(type.id() != ID_pointer || !is_reference(type))
+    {
+      type.remove(ID_C_constant);
+      type.remove(ID_C_volatile);
+    }
+    code_typet::parametert new_parameter{type};
+    const cpp_namet &name = declarator.name();
+    if(name.is_not_nil() && name.is_simple_name())
+    {
+      new_parameter.set_identifier(name.get_base_name());
+      new_parameter.set_base_name(name.get_base_name());
+    }
+    if(declarator.value().is_not_nil())
+      new_parameter.default_value() = declarator.value();
+    converted.push_back(std::move(new_parameter));
+  }
+  // `void(void)'
+  if(converted.size() == 1 && converted.front().type().id() == ID_empty)
+    converted.clear();
+  code_type.parameters() = std::move(converted);
+  // the declarator form records noexcept as #C_noexcept (rDeclarator)
+  if(code_type.get_bool(ID_noexcept))
+  {
+    code_type.remove(ID_noexcept);
+    code_type.set("#C_noexcept", true);
+  }
 }

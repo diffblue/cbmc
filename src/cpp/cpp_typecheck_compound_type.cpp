@@ -1261,6 +1261,12 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
     suppress_elaborate = old_suppress;
 
+    // N5008 [dcl.typedef]/2: a member alias-declaration of function type
+    // (libc++'s `using __callback_fn_t = void(__stop_callback_base *)
+    // noexcept;')
+    if(is_typedef && final_type.id() == ID_code)
+      convert_parsed_parameters(to_code_type(final_type));
+
     // N5008 [class.mem.general]/14: a non-static data member shall have a
     // complete type, and [temp.inst]/2: the specialization is implicitly
     // instantiated when completeness affects the semantics.  An instance

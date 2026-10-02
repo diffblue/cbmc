@@ -144,6 +144,11 @@ public:
 
   bool cpp_is_pod(const typet &type) const;
 
+  /// Convert the parameters of \p code_type that are still in parsed form
+  /// (cpp_declaration) to `parameter's; leave the type unchanged if one of
+  /// them is a pack expansion or dependent.
+  void convert_parsed_parameters(code_typet &code_type);
+
   /// Instantiate the out-of-class definition \p member_type of the member
   /// class \p member_name for the existing specializations of the class
   /// template \p outer_template ([temp.mem.class]/1, [temp.inst]/3).
