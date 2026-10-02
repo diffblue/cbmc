@@ -9356,6 +9356,112 @@ skip_pack_removal_ft:
   return symb;
 }
 
+/// N5008 [temp.constr.atomic]/3: if substituting the template arguments into
+/// an atomic constraint of a concept's constraint-expression (the concept
+/// variable's initializer) results in an invalid type or expression, the
+/// constraint is not satisfied -- it is not an error (libc++ evaluates
+/// `common_reference_with<_Tp, _Up>' for types with no
+/// common_reference<...>::type).  [temp.constr.normal]/1, [temp.constr.op]:
+/// the top-level `&&' and `||' combine separately satisfied constraints --
+/// `A::simple || A::template simple<Args...>' is satisfied by its second
+/// operand when substitution into the first fails (libstdc++ 16's
+/// views::__adaptor::__adaptor_has_simple_extra_args).
+void cpp_typecheckt::convert_concept_initializer(symbolt &symbol)
+{
+  if(
+    (symbol.value.id() == ID_or || symbol.value.id() == ID_and) &&
+    symbol.value.operands().size() >= 2)
+  {
+    const source_locationt location = symbol.value.source_location();
+    symbol.value = constraint_satisfaction(symbol.value);
+    implicit_typecast(symbol.value, symbol.type);
+    symbol.value.add_source_location() = location;
+    return;
+  }
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    convert_initializer(symbol);
+  }
+  catch(...)
+  {
+    symbol.value = false_exprt{};
+  }
+}
+
+/// N5008 [temp.constr.normal]/1, [temp.constr.op]/2-3, [temp.constr.atomic]/3:
+/// the value of the (substituted, not yet type-checked) constraint-expression
+/// \p constraint of a concept: a conjunction is satisfied if both operands
+/// are -- the second is not substituted into if the first is not satisfied;
+/// a disjunction if either is -- likewise; an atomic constraint whose
+/// substitution fails is not satisfied.  The result is a bool expression,
+/// constant where every operand evaluated to a constant.
+exprt cpp_typecheckt::constraint_satisfaction(const exprt &constraint)
+{
+  // The parser represents a requires-expression ([expr.prim.req]) as a
+  // left-nested `&&' chain of its requirements; it is one atomic constraint
+  // ([temp.constr.normal]/1.4), not a conjunction to split.
+  const auto is_requires_expression = [](const exprt &e)
+  {
+    for(const exprt *node = &e;
+        node->id() == ID_and && node->operands().size() == 2;
+        node = &to_binary_expr(*node).op0())
+    {
+      const irep_idt &requirement = to_binary_expr(*node).op1().id();
+      if(
+        requirement == "simple_requirement" ||
+        requirement == "compound_requirement" ||
+        requirement == "type_requirement")
+      {
+        return true;
+      }
+    }
+    return false;
+  };
+  if(
+    (constraint.id() == ID_and || constraint.id() == ID_or) &&
+    constraint.operands().size() >= 2 && !is_requires_expression(constraint))
+  {
+    const bool is_and = constraint.id() == ID_and;
+    exprt::operandst open;
+    for(const auto &operand : constraint.operands())
+    {
+      exprt value = constraint_satisfaction(operand);
+      if(value.is_constant())
+      {
+        if(value.is_true() != is_and)
+          return value; // decided by this operand
+        continue;
+      }
+      open.push_back(std::move(value));
+    }
+    if(open.empty())
+      return is_and ? exprt{true_exprt{}} : exprt{false_exprt{}};
+    if(open.size() == 1)
+      return open.front();
+    if(is_and)
+      return and_exprt{std::move(open)};
+    return or_exprt{std::move(open)};
+  }
+  exprt value = constraint;
+  try
+  {
+    sfinae_contextt sfinae_guard{*this};
+    typecheck_expr(value);
+    implicit_typecast_bool(value);
+    simplify(value, *this);
+  }
+  catch(...)
+  {
+    return false_exprt{};
+  }
+  if(value.is_false() || value.is_zero())
+    return false_exprt{};
+  if(value.is_constant())
+    return true_exprt{};
+  return value;
+}
+
 std::optional<bool> cpp_typecheckt::evaluate_constraint(const exprt &constraint)
 {
   // N5008 [temp.constr.op]/2: a conjunction checks its first operand and is

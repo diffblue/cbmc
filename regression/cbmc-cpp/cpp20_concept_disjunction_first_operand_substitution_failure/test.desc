@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ first operand: SUCCESS$
@@ -15,16 +15,19 @@ main.cpp
 --
 N5008 [temp.constr.op]/3: a disjunction is satisfied if either operand is;
 [temp.constr.atomic]/3: an atomic constraint whose substitution fails is not
-satisfied (not an error).  The front end type-checks a concept's body as a
+satisfied (not an error).  The front end type-checked a concept's body as a
 whole expression, so a substitution failure in the FIRST operand of `||'
-makes the whole concept-id false (typecheck_expr_cpp_name folds the throw to
-false) and the second operand is never considered.  Root cause of
+made the whole concept-id false and the second operand was never considered
+(bin53).  The top-level `&&' and `||' are now evaluated operand by operand
+([temp.constr.normal]/1; cpp_typecheckt::convert_concept_initializer).  Root
+cause of
 cpp20_ranges_basic and cpp20_iterator_t_of_pointer_undeduced_declval failing
 with the libstdc++ 16 headers: views::__adaptor::__adaptor_has_simple_extra_args
 is `_Adaptor::_S_has_simple_extra_args || _Adaptor::template
 _S_has_simple_extra_args<_Args...>', and views::_Take's member is a variable
-template, so the first operand fails; _Partial<_Take, int> then uses the
+template, so the first operand fails; _Partial<_Take, int> then used the
 primary template (a C++23 explicit object parameter operator()) and
-`arr | views::take(3)' is rejected.  Removing the first disjunct from the
+`arr | views::take(3)' was rejected; with GCC 16.2.1 cpp20_ranges_basic now
+passes.  Removing the first disjunct from the
 preprocessed header makes cpp20_ranges_basic verify.  g++ 13 and clang++ 18
 accept this program, and it fails only its WRONG assertion.
