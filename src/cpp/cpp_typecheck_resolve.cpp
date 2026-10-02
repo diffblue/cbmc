@@ -4090,7 +4090,30 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
         irept next_ir = *next;
         typet op_name;
         op_name.swap(next_ir);
-        cpp_typecheck.typecheck_type(op_name);
+        // N5008 [basic.lookup.unqual]/5: a name in the conversion-type-id
+        // is looked up in the same fashion as the conversion-function-id --
+        // for `B::operator I', a search in the class B -- and, if that finds
+        // nothing, by unqualified lookup from where it appears: `using
+        // B::operator I;' in A finds the member typedef A::I (libstdc++'s
+        // atomic<int>, `using __base_type::operator __integral_type;').
+        const irept *first_name = op_name.id() == ID_cpp_name &&
+                                      !op_name.get_sub().empty() &&
+                                      op_name.get_sub().front().id() == ID_name
+                                    ? &op_name.get_sub().front()
+                                    : nullptr;
+        if(
+          first_name != nullptr && original_scope != nullptr &&
+          original_scope != &cpp_typecheck.cpp_scopes.current_scope() &&
+          cpp_typecheck.cpp_scopes.current_scope()
+            .lookup(first_name->get(ID_identifier), cpp_scopet::QUALIFIED)
+            .empty())
+        {
+          cpp_save_scopet saved_scope(cpp_typecheck.cpp_scopes);
+          cpp_typecheck.cpp_scopes.go_to(*original_scope);
+          cpp_typecheck.typecheck_type(op_name);
+        }
+        else
+          cpp_typecheck.typecheck_type(op_name);
         final_base_name += "(" + cpp_type2name(op_name) + ")";
         pos++;
       }
