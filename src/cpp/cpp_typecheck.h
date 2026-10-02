@@ -1085,6 +1085,12 @@ protected:
   /// Whether the (substituted) constraint \p constraint is satisfied
   /// ([temp.constr.op], [temp.constr.atomic]); empty when the front end
   /// cannot evaluate it.
+  /// The satisfaction of a concept's constraint-expression \p constraint
+  /// ([temp.constr.normal], [temp.constr.op]), as a bool expression.
+  exprt constraint_satisfaction(const exprt &constraint);
+  /// Convert the initializer of the concept variable \p symbol, its
+  /// constraint-expression ([temp.constr.atomic]/3, [temp.constr.op]).
+  void convert_concept_initializer(symbolt &symbol);
   std::optional<bool> evaluate_constraint(const exprt &constraint);
   void explicit_typecast_ambiguity(exprt &);
   void unary_operand_typecast_ambiguity(exprt &);
