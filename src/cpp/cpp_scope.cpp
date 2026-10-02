@@ -173,9 +173,14 @@ void cpp_scopet::lookup_rec(
   // enclosing one: libstdc++'s ranges::__copy_or_move declares `using
   // __detail::__is_move_iterator;' while the class template
   // std::__is_move_iterator is visible.
+  // The same holds for a namespace scope ([basic.lookup.unqual]/2: a
+  // function template n::f hides the class template ::f).  Class scopes
+  // still collect: member templates and constructor templates are found
+  // through the base classes there.
   if(
-    !id_set.empty() && (identifier_class != id_classt::TEMPLATE ||
-                        id_class == id_classt::BLOCK_SCOPE))
+    !id_set.empty() &&
+    (identifier_class != id_classt::TEMPLATE ||
+     id_class == id_classt::BLOCK_SCOPE || id_class == id_classt::NAMESPACE))
   {
     return; // done, upwards scopes are hidden
   }
