@@ -3904,6 +3904,28 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           try
           {
             convert(cpp_using);
+            // [namespace.udecl]/19: the named member is accessible with the
+            // access of the using-declaration (`using B::operator int;' in
+            // the public part of a class with a private base B), as for
+            // the other members below.  Its base name is the one the
+            // resolver forms for the conversion-function-id.
+            irep_idt operator_base_name;
+            {
+              cpp_save_scopet saved_scope(cpp_scopes);
+              cpp_typecheck_resolvet resolver(*this);
+              cpp_template_args_non_tct template_args;
+              resolver.resolve_scope(
+                cpp_using.name(), operator_base_name, template_args);
+            }
+            for(auto &comp : components)
+            {
+              if(
+                comp.get_bool(ID_from_base) &&
+                comp.get_base_name() == operator_base_name)
+              {
+                comp.set_access(access);
+              }
+            }
           }
           catch(...)
           {

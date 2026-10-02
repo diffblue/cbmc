@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ using-declared conversion: SUCCESS$
@@ -12,6 +12,10 @@ main.cpp
 --
 N5008 [namespace.udecl]/19: `using B::operator int;' in the public part of A
 makes the conversion function a public member of A, although B is a private
-base.  The front end reports "member 'B::operator(signed_int)($constthis)' is
-not accessible (private)".  Pre-existing (bin53).  g++ 13 and clang++ 18
+base.  The front end reported "member 'B::operator(signed_int)($constthis)'
+is not accessible (private)" (bin53): the using-declaration did not adjust
+the conversion function's access as it does for other members.
+test_overloads.desc: [class.access.general]/5, access is checked after
+overload resolution -- the private B::operator char is a candidate that
+was diagnosed although operator int is selected.  g++ 13 and clang++ 18
 accept this program, and it fails only its WRONG assertion.
