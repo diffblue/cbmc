@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ alias of a function type with a pack: SUCCESS$
@@ -11,10 +11,13 @@ main.cpp
 ^CONVERSION ERROR$
 --
 N5008 [dcl.typedef]/2, [temp.variadic]/5: for X<int, char>, `using F =
-void(T...);' is void(int, char).  cpp_typecheckt::convert_parsed_parameters
-leaves a function type with a pack expansion in parsed form, and assigning
-cb to the F * member is a conversion error ("invalid implicit conversion
-from 'auto (*)(signed int, char) -> void' to 'auto (*)(signed int) ->
-void'").  `typedef void F(T...);' and non-pack aliases work
-(cpp11_alias_declaration_of_function_type).  Pre-existing (bin53).  g++ 13
+void(T...);' is void(int, char).  Assigning cb to the F * member was a
+conversion error ("invalid implicit conversion from 'auto (*)(signed int,
+char) -> void' to 'auto (*)(signed int) -> void'", bin53): when the class
+body is substituted (template_mapt::apply), class packs are expanded in the
+function types of member declarators, but an alias-declaration carries its
+function type in the declaration's type (merged with the typedef
+specifier), so the pack was substituted by its first element.
+`typedef void F(T...);' worked.  test_shapes.desc: other packs and
+patterns.  g++ 13
 and clang++ 18 accept this program, and it fails only its WRONG assertion.

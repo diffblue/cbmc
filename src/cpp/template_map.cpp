@@ -1119,6 +1119,41 @@ void template_mapt::apply(typet &type) const
       {
         irept &decl_type = op.add(ID_type);
 
+        // N5008 [dcl.typedef]/2, [temp.variadic]/5: a member
+        // alias-declaration of function type, `using F = void(T...);',
+        // carries the function type in the declaration's type (not in a
+        // declarator, see below); expand the class pack in its parameters
+        // before the element-wise substitution collapses it.
+        // (The parser merges the type-id with the `typedef' specifier.)
+        if(op.id() == ID_cpp_declaration && op.get_bool(ID_is_typedef))
+        {
+          std::vector<irept *> function_types;
+          if(decl_type.id() == ID_code || decl_type.id() == ID_function_type)
+            function_types.push_back(&decl_type);
+          else if(decl_type.id() == ID_merged_type)
+          {
+            for(auto &sub : decl_type.get_sub())
+              if(sub.id() == ID_code || sub.id() == ID_function_type)
+                function_types.push_back(&sub);
+          }
+          for(irept *function_type : function_types)
+          {
+            bool has_class_pack = false;
+            for(const auto &p : function_type->find(ID_parameters).get_sub())
+            {
+              if(
+                (p.id() == ID_cpp_declaration || p.id() == ID_parameter) &&
+                function_parameter_pack(
+                  static_cast<const typet &>(p.find(ID_type))) != nullptr)
+              {
+                has_class_pack = true;
+              }
+            }
+            if(has_class_pack)
+              expand_parameter_packs(static_cast<typet &>(*function_type));
+          }
+        }
+
         // N5008 [temp.local]/1 + [basic.scope.temp]/2: a member template's
         // own parameters shadow same-named parameters of an enclosing
         // template throughout its declaration.  Its body stores parameter
