@@ -1884,7 +1884,11 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                   cpp_declaration.template_type().template_parameters())
                 if(tp.get_bool(ID_ellipsis))
                   ++n_packs;
-              size_ok = n_packs >= 2;
+              // A single pack too: constrained specializations are
+              // re-matched here from the primary template (see
+              // has_concept_constraint), so `P<A, Args...>' must match
+              // P<int, char, char>.  The pack absorbs the remainder below.
+              size_ok = n_packs >= 1;
             }
             if(!size_ok)
               continue;
@@ -1924,8 +1928,14 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
             // pack absorbs the remainder as ONE pack -- per-argument
             // guessing against the pack pattern would overwrite the
             // binding with each element.
+            // A single pack absorbs only a LONGER argument list: with equal
+            // lengths the per-position guess below is kept (binding it twice
+            // regressed cpp11_variadic_ctor_pack_multi).
             const bool multi_pack_absorb =
-              sel_trailing_pack && sel_n_packs >= 2 &&
+              sel_trailing_pack &&
+              (sel_n_packs >= 2 ||
+               (sel_n_packs == 1 &&
+                sel_npat < full_args_tc.arguments().size())) &&
               sel_npat <= full_args_tc.arguments().size();
             const std::size_t n_positional =
               multi_pack_absorb

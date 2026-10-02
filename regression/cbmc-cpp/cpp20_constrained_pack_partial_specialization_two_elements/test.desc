@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
@@ -13,8 +13,10 @@ main.cpp
 --
 N5008 [temp.spec.partial.match]/2-3: P<int, char, char> matches the
 constrained partial specialization `P<A, Args...>' with Args = {char, char}.
-The front end selects the primary template (n == 0); with one element the
-more specialized `P<A, Arg>' is chosen.  The same shape as libstdc++'s
-views::__adaptor::_Partial.  Not yet diagnosed.  Pre-existing (bin53).  g++
+The front end selected the primary template (n == 0, bin53): a
+constrained specialization is re-matched in elaborate_class_template, whose
+matcher let a trailing pack absorb a longer argument list only for two or
+more packs.  A single pack now does too.  The same shape as libstdc++'s
+views::__adaptor::_Partial.  g++
 13 and clang++ 18 accept this program, and it fails only its WRONG
 assertion.
