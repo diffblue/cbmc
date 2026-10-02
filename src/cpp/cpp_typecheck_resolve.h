@@ -206,7 +206,6 @@ protected:
 
   typedef std::vector<exprt> resolve_identifierst;
 
-  void prefer_more_constrained_templates(resolve_identifierst &old_identifiers);
   void instantiate_selected_function_template(
     resolve_identifierst &identifiers,
     const cpp_typecheck_fargst &fargs);
