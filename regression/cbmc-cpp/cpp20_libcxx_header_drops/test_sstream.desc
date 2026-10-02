@@ -1,0 +1,18 @@
+KNOWNBUG libcxx
+sstream.cpp
+--cpp11 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ constructed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+--
+libc++ (LLVM 18) <sstream>: basic_ostringstream's constructors are dropped
+(sstream:901, `basic_ostream<_CharT, _Traits>(&__sb_)' "does not uniquely
+resolve"), so a default-constructed std::ostringstream is not good().  Root
+cause: cpp_constructor_overload_resolution_with_virtual_base.  clang++ 18
+-stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
