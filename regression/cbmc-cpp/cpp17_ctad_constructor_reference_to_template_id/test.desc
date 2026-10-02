@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ reference: SUCCESS$
@@ -13,13 +13,16 @@ main.cpp
 --
 N5008 [over.match.class.deduct]/1.1, [temp.deduct.call]/3: the deduction
 guide formed from the constructor S(W<T> &) deduces T = int from the lvalue
-w of type W<int>.  The front end finds no deduction for a constructor
+w of type W<int>.  The front end found no deduction for a constructor
 parameter that is a reference to a template-id ("found no match for symbol
-'S', candidates are: ..."); by value, `T &' and `T *' work.  libstdc++ 13's
+'S', candidates are: ...", bin53): it matched the reference pattern itself
+against the argument instead of the referred type ([temp.deduct.call]/3). by value, `T &' and `T *' work.  libstdc++ 13's
 __do_vformat_to declares `_Formatting_scanner __scanner(__ctx, __fmt);'
 with the constructor _Formatting_scanner(basic_format_context<_Out, _CharT>
-&, basic_string_view<_CharT>), so its body is dropped (seen with
+&, basic_string_view<_CharT>), so its body was dropped (seen with
 --verbosity 9 in the <format> reductions, after
 cpp_function_template_default_argument_on_earlier_declaration).
-Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program, and it
+test_shapes.desc: other reference and pointer parameters.  An rvalue
+argument for `P(W<T> &&)' still fails (`P d(W<short>{});': "missing type in
+template argument").  g++ 13 and clang++ 18 accept this program, and it
 fails only its WRONG assertion.
