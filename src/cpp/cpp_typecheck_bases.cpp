@@ -264,6 +264,26 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
       throw 0;
     }
 
+    // N5008 [class.derived.general]/2: "The class-or-decltype shall denote
+    // a (possibly cv-qualified) class type that is not an incompletely
+    // defined class" -- a class is incomplete in its own base-specifier-list
+    // (`struct X : X').  Accepting it
+    // made the type checker recurse without bound (SIGSEGV).
+    // Only the class itself is checked: treating every base whose
+    // elaboration is in progress as incomplete also rejected well-formed
+    // libc++ <ostream> code (the body of basic_ostream::sentry::sentry).
+    if(
+      base_symbol_expr.type().id() == ID_struct_tag &&
+      to_struct_tag_type(base_symbol_expr.type()).get_identifier() ==
+        type.get(ID_name))
+    {
+      error().source_location = name.source_location();
+      error() << "base class '" << to_string(base_symbol_expr.type())
+              << "' is incomplete: a class cannot be derived from itself"
+              << eom;
+      throw 0;
+    }
+
     // elaborate any class template instances given as bases
     elaborate_class_template(base_symbol_expr.type());
 
