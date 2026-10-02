@@ -1176,9 +1176,13 @@ protected:
   /// a class template, deduce the template arguments from the (not necessarily
   /// type-checked) initializer expressions \p args and return the resulting
   /// type-checked class type (e.g. `Box<int>`); otherwise return {}.
+  /// \p copy_initialization: `C x = e' ([over.match.copy]/1.1), where the
+  /// notional constructors formed from explicit constructors are not
+  /// candidates ([over.match.class.deduct]/5).
   std::optional<typet> deduce_class_template_arguments(
     const cpp_namet &class_template_name,
-    const std::vector<exprt> &args);
+    const std::vector<exprt> &args,
+    bool copy_initialization = false);
   void typecheck_expr_address_of(exprt &) override;
   /// Phase 1B target-typet overload of \ref typecheck_expr_address_of;
   /// the target is currently discarded.  Phase 2 of the target-type-
