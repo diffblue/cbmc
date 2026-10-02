@@ -1198,7 +1198,17 @@ protected:
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
-  void expand_type_pack_arguments(exprt &arguments);
+  bool bind_requires_parameter_pack(const irep_idt &name, const typet &type);
+  void expand_requires_parameter_packs(exprt &expr);
+  /// The element symbols of each requires-expression parameter pack bound by
+  /// bind_requires_parameter_pack, by the parameter's name.
+  std::map<irep_idt, std::vector<exprt>> requires_parameter_packs;
+  /// \p with_requires_parameters: also expand requires-expression
+  /// parameter packs (requires_parameter_packs), while a requirement is
+  /// checked.
+  void expand_type_pack_arguments(
+    exprt &arguments,
+    bool with_requires_parameters = false);
   std::vector<typet> builtin_trait_type_args(const exprt &expr);
   void throw_if_incomplete_dependency(const exprt &expr);
   void complete_type_operand(exprt &expr);
