@@ -10891,8 +10891,12 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
           if(is_forwarding_ref)
           {
             const bool elem_is_lvalue = cpp_typecheck.is_lvalue_expression(*it);
+            // [expr.type]/1: an xvalue typed `T &&' has type T
+            typet element_type = it->type();
+            if(!elem_is_lvalue && is_rvalue_reference(element_type))
+              element_type = to_reference_type(element_type).base_type();
             typet deduced_type =
-              elem_is_lvalue ? ::reference_type(it->type()) : it->type();
+              elem_is_lvalue ? ::reference_type(it->type()) : element_type;
             pack_deduced_types.push_back(deduced_type);
             guess_template_args(arg_declaration.type(), deduced_type);
             continue;
@@ -11000,8 +11004,16 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
               pointer_type(to_array_type(arg_actual_type).element_type());
         }
         if(is_forwarding_ref && is_rvalue_reference(arg_type))
+        {
+          // N5008 [expr.type]/1: an expression of type `reference to T'
+          // (an xvalue such as `static_cast<char &&>(c)', which the front
+          // end types as char &&) has type T; [temp.deduct.call]/3: a
+          // non-lvalue argument deduces T as A
+          if(is_rvalue_reference(arg_actual_type))
+            arg_actual_type = to_reference_type(arg_actual_type).base_type();
           guess_template_args(
             to_pointer_type(arg_type).base_type(), arg_actual_type);
+        }
         else
           guess_template_args(arg_type, arg_actual_type);
       }
