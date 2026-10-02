@@ -4921,6 +4921,11 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
             cpp_typecheck.template_map.expr_map[pack_id] = pack_exprs.front();
           }
         }
+        else
+        {
+          deduce_trailing_type_pack_pattern(
+            parg_t, cpp_declaration.template_type(), full_template_args_tc, i);
+        }
         break;
       }
       if(i >= n_full)
@@ -7989,6 +7994,78 @@ typet cpp_typecheck_resolvet::canonical_function_type(const typet &code)
   typet result = code;
   cpp_typecheck.convert_parsed_parameters(to_code_type(result));
   return result;
+}
+
+/// N5008 [temp.deduct.type]/9: a trailing pack expansion P_i of a partial
+/// specialization's argument list whose pattern is not a bare pack (`const Z
+/// &...') is compared with each remaining argument of A; each comparison
+/// deduces the next element of every template parameter pack that occurs in
+/// the pattern (`S<T1, const Z &...>' against `S<int, const int &, const int
+/// &>' deduces Z = {int, int}).  Records the packs in the template map; a
+/// failed comparison leaves the pack unassigned.
+void cpp_typecheck_resolvet::deduce_trailing_type_pack_pattern(
+  const typet &pattern_with_ellipsis,
+  const template_typet &template_type,
+  const cpp_template_args_tct &arguments,
+  std::size_t first)
+{
+  typet pattern = pattern_with_ellipsis;
+  pattern.remove(ID_ellipsis);
+  // the type parameter packs of the specialization that occur in the pattern
+  std::vector<irep_idt> packs;
+  for(const auto &parameter : template_type.template_parameters())
+  {
+    if(!parameter.get_bool(ID_ellipsis) || parameter.id() != ID_type)
+      continue;
+    const irep_idt &id = parameter.type().get(ID_identifier);
+    std::string short_name = id2string(id);
+    const auto sep = short_name.rfind("::");
+    if(sep != std::string::npos)
+      short_name = short_name.substr(sep + 2);
+    bool occurs = false;
+    std::function<void(const irept &)> walk = [&](const irept &n)
+    {
+      if(n.id() == ID_name && n.get(ID_identifier) == short_name)
+        occurs = true;
+      for(const auto &sub : n.get_sub())
+        walk(sub);
+      for(const auto &named : n.get_named_sub())
+        walk(named.second);
+    };
+    walk(pattern);
+    if(occurs)
+      packs.push_back(id);
+  }
+  if(packs.empty())
+    return;
+  auto &map = cpp_typecheck.template_map;
+  std::map<irep_idt, std::vector<typet>> elements;
+  for(std::size_t j = first; j < arguments.arguments().size(); ++j)
+  {
+    const exprt &argument = arguments.arguments()[j];
+    if(argument.id() != ID_type)
+      return; // a value cannot match a type pattern
+    for(const auto &pack : packs)
+      map.type_map[pack] = typet{ID_unassigned};
+    guess_template_args(pattern, argument.type());
+    for(const auto &pack : packs)
+    {
+      const typet &deduced = map.type_map[pack];
+      if(deduced.id() == ID_unassigned || deduced.is_nil())
+        return;
+      elements[pack].push_back(deduced);
+    }
+  }
+  for(const auto &pack : packs)
+  {
+    std::vector<typet> &elems = elements[pack];
+    // as for a bare pack: the front element is the scalar convenience
+    // binding build_template_args reads
+    map.set_pack_size(pack, elems.size());
+    if(!elems.empty())
+      map.type_map[pack] = elems.front();
+    map.pack_args_map[pack] = std::move(elems);
+  }
 }
 
 void cpp_typecheck_resolvet::guess_template_args(
