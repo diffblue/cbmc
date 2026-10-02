@@ -10138,10 +10138,29 @@ bool cpp_typecheck_resolvet::substitute_function_type(
           const auto pos = f.rfind("::");
           return pos != std::string::npos ? f.substr(pos + 2) : f;
         };
+        // N5008 [basic.scope.temp]/2, [basic.scope.scope] (hiding): a
+        // short name denotes the innermost declaration -- the most recently
+        // bound pack of that name (template_mapt::generation_of).  An older
+        // empty pack of another template with the same name (`_Args' of a
+        // __perfect_forward_impl constructor template) does not make this
+        // function's own one-element `_Args' empty (libc++'s __bind_back,
+        // `-> decltype(... forward_as_tuple(__args...))').
         std::set<std::string> empty_pack_short_names;
-        for(const auto &ps : cpp_typecheck.template_map.pack_size_map)
-          if(ps.second == 0)
-            empty_pack_short_names.insert(short_of(ps.first));
+        {
+          std::map<std::string, std::pair<std::size_t, bool>> newest;
+          const auto &map = cpp_typecheck.template_map;
+          for(const auto &ps : map.pack_size_map)
+          {
+            const std::string sn = short_of(ps.first);
+            const std::size_t g = map.generation_of(ps.first);
+            auto it = newest.find(sn);
+            if(it == newest.end() || g >= it->second.first)
+              newest[sn] = {g, ps.second == 0};
+          }
+          for(const auto &n : newest)
+            if(n.second.second)
+              empty_pack_short_names.insert(n.first);
+        }
         if(!empty_pack_short_names.empty())
         {
           std::vector<irep_idt> removed_param_names;
