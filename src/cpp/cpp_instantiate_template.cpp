@@ -7930,6 +7930,8 @@ skip_pack_removal_ft:
           if(pname.empty())
             continue;
           typet ptype = static_cast<const typet &>(param.find(ID_type));
+          if(bind_requires_parameter_pack(pname, ptype))
+            continue;
           template_map.apply(ptype);
           try
           {

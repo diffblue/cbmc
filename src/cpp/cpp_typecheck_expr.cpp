@@ -96,6 +96,7 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
     // pack parameter, and the whole candidate was removed: the CALLER's
     // body then failed to convert and was silently dropped
     // (gcc-16 <optional>'s _M_apply, reduced to a 30-line kernel).
+    expand_requires_parameter_packs(op);
     template_map.expand_call_argument_packs(op);
     typecheck_expr(op);
   }
@@ -108,6 +109,115 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
     valid = false;
   get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
   return valid;
+}
+
+/// Expand the call-argument pack expansions in \p expr that name a
+/// requires-expression parameter pack (bind_requires_parameter_pack),
+/// before the template packs alone are expanded (expand_call_argument_packs,
+/// which would leave the parameter pack's name in each element).
+void cpp_typecheckt::expand_requires_parameter_packs(exprt &expr)
+{
+  if(requires_parameter_packs.empty())
+    return;
+  for(auto &op : expr.operands())
+    expand_requires_parameter_packs(op);
+  if(expr.id() == ID_side_effect && expr.get(ID_statement) == ID_function_call)
+  {
+    for(auto &op : expr.operands())
+      if(op.id() == ID_arguments)
+        expand_type_pack_arguments(op, /*with_requires_parameters=*/true);
+  }
+}
+
+/// N5008 [expr.prim.req.general]/4, [temp.variadic]/5: a parameter of a
+/// requires-expression may be a function parameter pack, `A &&...a'; it
+/// declares one parameter per element of the template parameter pack A, the
+/// k-th of type A_k &&.  If \p type (in parsed form, with the template map of
+/// the enclosing instantiation) is such a pack expansion, bind one symbol per
+/// element, record them for the expansion of `...' patterns naming \p name
+/// (expand_type_pack_arguments) and return true; otherwise return false.
+bool cpp_typecheckt::bind_requires_parameter_pack(
+  const irep_idt &name,
+  const typet &type)
+{
+  if(!type.get_bool(ID_ellipsis))
+  {
+    requires_parameter_packs.erase(name);
+    return false;
+  }
+  // the class/function template packs the pattern names
+  std::set<irep_idt> packs;
+  std::function<void(const irept &)> collect = [&](const irept &n)
+  {
+    if(n.id() == ID_name)
+    {
+      const std::string id = id2string(n.get(ID_identifier));
+      for(const auto &entry : template_map.pack_size_map)
+      {
+        const std::string key = id2string(entry.first);
+        const auto sep = key.rfind("::");
+        if((sep == std::string::npos ? key : key.substr(sep + 2)) == id)
+          packs.insert(entry.first);
+      }
+    }
+    for(const auto &sub : n.get_sub())
+      collect(sub);
+    for(const auto &named : n.get_named_sub())
+      collect(named.second);
+  };
+  collect(type);
+  if(packs.empty())
+    return false;
+  const std::size_t size =
+    template_map.pack_size_map.find(*packs.begin())->second;
+  for(const auto &pack : packs)
+    if(template_map.pack_size_map.find(pack)->second != size)
+      return false;
+  std::vector<exprt> elements;
+  for(std::size_t k = 0; k < size; ++k)
+  {
+    template_mapt element_map = template_map;
+    for(const auto &pack : packs)
+    {
+      const auto it = template_map.pack_args_map.find(pack);
+      if(it == template_map.pack_args_map.end() || it->second.size() != size)
+        return false;
+      // the k-th element, as a scalar binding (a pack name is otherwise
+      // never substituted outside an expansion)
+      element_map.type_map[pack] = it->second[k];
+      element_map.pack_args_map.erase(pack);
+      element_map.pack_size_map.erase(pack);
+    }
+    typet element_type = type;
+    element_type.remove(ID_ellipsis);
+    element_map.apply(element_type);
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      typecheck_type(element_type);
+    }
+    catch(...)
+    {
+      return false;
+    }
+    static std::size_t pack_counter = 0;
+    symbolt element{
+      "requires_param::" + id2string(name) + "#pack" +
+        std::to_string(pack_counter++),
+      element_type,
+      ID_cpp};
+    element.base_name = name;
+    element.is_lvalue = true;
+    symbol_table.add(element);
+    exprt element_expr = element.symbol_expr();
+    element_expr.set(ID_C_lvalue, true);
+    // a reference names the object it refers to, as resolution of a
+    // reference-typed name does ([expr.type]/1)
+    add_implicit_dereference(element_expr);
+    elements.push_back(std::move(element_expr));
+  }
+  requires_parameter_packs[name] = std::move(elements);
+  return true;
 }
 
 void cpp_typecheckt::bind_requires_parameter(
@@ -526,6 +636,7 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
     sfinae_contextt sfinae_guard{*this};
     exprt op = to_unary_expr(expr).op();
     // see requirement_expression_is_valid: empty packs must be expanded
+    expand_requires_parameter_packs(op);
     template_map.expand_call_argument_packs(op);
     typecheck_expr(op);
 
@@ -2786,7 +2897,9 @@ void cpp_typecheckt::typecheck_expr_member(exprt &expr)
 /// instance and partial-specialization patterns -- where the argument kept
 /// its `...' and was type-checked as one argument with the pack's first
 /// type.
-void cpp_typecheckt::expand_type_pack_arguments(exprt &arguments)
+void cpp_typecheckt::expand_type_pack_arguments(
+  exprt &arguments,
+  bool with_requires_parameters)
 {
   static const std::vector<typet> no_types;
   const auto pack_of = [this](const irept &n) -> const std::vector<typet> *
@@ -2835,9 +2948,23 @@ void cpp_typecheckt::expand_type_pack_arguments(exprt &arguments)
     [&](irept &n, const irep_idt &name, const typet &element)
   {
     // a type-name is never an operand: replace it only where a type is
-    // held (`type' of a cast, of a template argument, ...)
+    // held (`type' of a cast, of a template argument, ...), including the
+    // referenced type of a reference or pointer (`static_cast<A &&>(a)')
+    const bool type_node = n.id() == ID_frontend_pointer ||
+                           n.id() == ID_pointer || n.id() == ID_merged_type ||
+                           n.id() == ID_array;
     for(auto &sub : n.get_sub())
-      substitute(sub, name, element);
+    {
+      if(
+        type_node && sub.id() == ID_cpp_name && sub.get_sub().size() == 1 &&
+        sub.get_sub().front().id() == ID_name &&
+        sub.get_sub().front().get(ID_identifier) == name)
+      {
+        sub = element;
+      }
+      else
+        substitute(sub, name, element);
+    }
     for(auto &named_sub : n.get_named_sub())
     {
       if(
@@ -2853,25 +2980,99 @@ void cpp_typecheckt::expand_type_pack_arguments(exprt &arguments)
     }
   };
 
+  // a requires-expression parameter pack named in the pattern
+  // (bind_requires_parameter_pack): its k-th element replaces the name
+  std::function<const std::vector<exprt> *(const irept &, irep_idt &)>
+    find_parameter_pack =
+      [&](const irept &n, irep_idt &param) -> const std::vector<exprt> *
+  {
+    if(
+      n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+      n.get_sub().front().id() == ID_name)
+    {
+      const irep_idt &id = n.get_sub().front().get(ID_identifier);
+      const auto it = requires_parameter_packs.find(id);
+      // only while a requirement is checked, and only if the name is not
+      // bound otherwise (a pack parameter has no symbol of its own name)
+      if(
+        with_requires_parameters && it != requires_parameter_packs.end() &&
+        cpp_scopes.current_scope().lookup(id, cpp_scopet::RECURSIVE).empty())
+      {
+        param = it->first;
+        return &it->second;
+      }
+    }
+    for(const auto &sub : n.get_sub())
+      if(const auto *found = find_parameter_pack(sub, param))
+        return found;
+    return nullptr;
+  };
+  std::function<void(irept &, const irep_idt &, const exprt &)>
+    substitute_parameter =
+      [&](irept &n, const irep_idt &param, const exprt &element)
+  {
+    for(auto &sub : n.get_sub())
+    {
+      if(
+        sub.id() == ID_cpp_name && sub.get_sub().size() == 1 &&
+        sub.get_sub().front().id() == ID_name &&
+        sub.get_sub().front().get(ID_identifier) == param)
+      {
+        sub = already_typechecked_exprt{element};
+      }
+      else
+        substitute_parameter(sub, param, element);
+    }
+  };
+
   bool changed = false;
   exprt::operandst expanded;
   for(auto &argument : arguments.operands())
   {
     irep_idt name;
     const std::vector<typet> *pack = nullptr;
+    irep_idt param;
+    const std::vector<exprt> *parameter_pack = nullptr;
     if(argument.get_bool(ID_ellipsis))
+    {
       pack = find_pack(argument, name);
-    if(pack == nullptr)
+      if(with_requires_parameters)
+        parameter_pack = find_parameter_pack(argument, param);
+    }
+    if(
+      parameter_pack != nullptr &&
+      (pack == nullptr || pack->size() != parameter_pack->size()))
+    {
+      if(pack != nullptr)
+        parameter_pack = nullptr; // inconsistent: leave it as before
+    }
+    if(pack == nullptr && parameter_pack == nullptr)
     {
       expanded.push_back(argument);
       continue;
     }
     changed = true;
-    for(const auto &element : *pack)
+    const std::size_t n =
+      pack != nullptr ? pack->size() : parameter_pack->size();
+    for(std::size_t k = 0; k < n; ++k)
     {
       exprt copy = argument;
       copy.remove(ID_ellipsis);
-      substitute(copy, name, element);
+      if(pack != nullptr)
+        substitute(copy, name, (*pack)[k]);
+      if(parameter_pack != nullptr)
+      {
+        // the argument may be the parameter itself (`h(a...)')
+        if(
+          copy.id() == ID_cpp_name && copy.get_sub().size() == 1 &&
+          copy.get_sub().front().id() == ID_name &&
+          copy.get_sub().front().get(ID_identifier) == param)
+        {
+          copy = already_typechecked_exprt{(*parameter_pack)[k]};
+        }
+        else
+          substitute_parameter(copy, param, (*parameter_pack)[k]);
+      }
       expanded.push_back(std::move(copy));
     }
   }
@@ -9628,6 +9829,8 @@ void cpp_typecheckt::typecheck_expr(exprt &expr)
       if(pname.empty())
         continue;
       typet ptype = static_cast<const typet &>(param.find(ID_type));
+      if(bind_requires_parameter_pack(pname, ptype))
+        continue;
       typecheck_type(ptype);
       bind_requires_parameter(pname, ptype);
     }
