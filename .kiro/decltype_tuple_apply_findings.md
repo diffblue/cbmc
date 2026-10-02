@@ -13109,3 +13109,58 @@ Suites on binT6 (= HEAD 53f2d01cb8): cbmc-cpp green (1661 tests, 30
 skipped), -K 21 [OK] (23 skipped), cpp green, regression/cbmc green (85
 skipped), cbmc-library green, lint 0.  All 38 new/promoted CORE descs fail
 on bin53.  GCC 16.2.1: the concept, ordering and both ranges tests pass.
+
+## Round 163u: KNOWNBUGs from the round-163t gaps, oldest standard first
+
+Fixes (one commit each, CORE, fail on bin53 unless noted):
+- 11dc5f97a1 [dcl.ambig.res]/3: `(' + `)' / `...' / type-specifier in a
+  parameter declarator starts a parameter list (Parser::rDeclarator).
+  First version broke `_Ret (_Tp::*__pf)()' (stl_function.h): ptr-to-member
+  and qualified names excluded (isPtrToMember).
+- 184439918a [dcl.meaning.general]/2.3: namespace-qualified out-of-class
+  member class graft and member function definitions (`a::b::S<C>::f').
+- 1199e1a3c9 [namespace.udecl]/19 for `using B::operator int;';
+  [class.access.general]/5: conversion search probes inaccessible
+  candidates without access control, checks the selected one.
+- 8fac5e30be self-derived class template: class_derived_from_itself flag
+  stops typecheck_compound_body's base-error recovery.
+- 65c7298b42 alias `using F = void(T...);': template_mapt::apply expands
+  class packs in the merged_type of a member typedef declaration.
+- 2dc8a56bc5 [temp.deduct.type]/9: deduce_trailing_type_pack_pattern for
+  `const Z &...', `Z *...', `L<Z>...'; scalar front element kept for
+  build_template_args.
+- 8f1fdc4b0f single trailing pack absorbs a longer list in
+  elaborate_class_template's matcher (constrained specs are re-matched
+  there).
+- ed913433ac that matcher completes the written list with the primary's
+  default arguments (as disambiguate_template_classes does).
+- 3767e28d7e no int trial body for closure-lowered generic lambdas.
+  format:1422 remains: _M_format_arg's visitor captures `this' in a member
+  function (not closure-lowered).
+- 56a9f483a9 CTAD type-checks args whose type is still parsed (cpp_name,
+  frontend_pointer).
+- 12d4b484b0 CTAD `C x = e' skips explicit constructors
+  ([over.match.class.deduct]/5); constructor guides viable with defaulted
+  trailing parameters ([over.match.viable]/2.3).  test.desc passes on bin53
+  (bin53 rejected plainly; the dropped body came from ef2a71f448).
+- bf64c6748e requires-expression parameter packs:
+  bind_requires_parameter_pack + expand_requires_parameter_packs (only in
+  requirement checks, only if the name is not otherwise in scope);
+  expand_type_pack_arguments substitutes a type pack under a reference.
+  libc++ <sstream> __format drops gone.
+
+Still KNOWNBUG:
+- cpp20_constrained_partial_specialization_reached_through_base_chain:
+  impl<int,2>::type not found through impl<int,3> -> impl<int,4>;
+  re-entrant elaboration (impl<int,3> elaborated again at stack depth 2
+  while in progress) -- not diagnosed further.
+- cpp20_views_take_bind_back_forward_not_found: "found no match for symbol
+  'forward_as_tuple'" for `decltype(forward_as_tuple(__args...))' in a
+  trailing return type, one-element function parameter pack.
+- cpp17_filesystem_path_from_string, cpp20_ranges_basic_libcxx, header
+  drops (libstdc++ chrono, format, memory_resource, ostream_int; libc++
+  chrono, functional, sort), cpp17_libcxx_ostringstream_state (models).
+
+Suites on binU4 (HEAD content): cbmc-cpp green (1680 descs, 25 skipped),
+-K 16 [OK] (23 skipped), cpp green, lint 0.  GCC 16.2.1: ranges and concept
+tests pass; cpp20_common_reference_int_lvalue_rvalue still fails (tagged).
