@@ -3920,6 +3920,38 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           }
         }
 
+        // N5008 [basic.lookup.qual.general]/1: the lookup of a name followed
+        // by `::' considers only namespaces, types and templates whose
+        // specializations are types.  An ordinary RECURSIVE lookup stops at
+        // the first scope declaring the name; when everything found there is
+        // a variable or function (`int f(int N) { return N::b; }', libc++'s
+        // `__validate_second(__flags __flags)' using `__flags::__second'),
+        // those declarations are not considered and the search continues in
+        // the enclosing scopes.
+        if(recursive)
+        {
+          const auto is_object_or_function = [](const cpp_idt *id)
+          {
+            return id->id_class == cpp_idt::id_classt::SYMBOL ||
+                   id->id_class == cpp_idt::id_classt::UNKNOWN;
+          };
+          while(
+            !id_set.empty() &&
+            std::all_of(id_set.begin(), id_set.end(), is_object_or_function))
+          {
+            // continue above the scope that declares the names found
+            cpp_scopet &declaring =
+              static_cast<cpp_scopet &>((*id_set.begin())->get_parent());
+            if(declaring.is_root_scope())
+            {
+              id_set.clear();
+              break;
+            }
+            id_set = declaring.get_parent().lookup(
+              final_base_name, cpp_scopet::RECURSIVE);
+          }
+        }
+
         filter_for_named_scopes(id_set);
 
         // If no named scope found, check for typedefs resolving to a
