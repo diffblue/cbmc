@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ pointer to integer: SUCCESS$
@@ -14,12 +14,9 @@ main.cpp
 --
 N5008 [expr.type.conv]/1.1: with a single expression, T(e) is equivalent to
 the cast expression (T)e, which [expr.cast]/4 may interpret as a
-reinterpret_cast or a const_cast.  When T is a typedef-name, the front end
-resolves T(e) as constructor overload resolution and rejects these
-conversions ("found no match for symbol 'U', candidates are: constructor U
-(), constructor U (U)").  `(U)e' and `long(e)' work.  libstdc++'s
-__waiter_pool_base::_S_for computes `uintptr_t(__addr)', so its body is
-dropped (bits/atomic_wait.h:252 with GCC 13) for <atomic>, <thread>,
-<stop_token>, <future>, <condition_variable> and <memory>.  Pre-existing
-(bin53).  g++ 13 and clang++ 18 accept this program (-std=c++98), and it
-fails only its WRONG assertion.
+reinterpret_cast or a const_cast.  When T was a typedef-name the front end
+resolved T(e) as constructor overload resolution of a pseudo-constructor
+that admits only implicit conversions ("found no match for symbol 'U'",
+bin53).  libstdc++'s __waiter_pool_base::_S_for computes `uintptr_t(__addr)'
+(bits/atomic_wait.h:252).  g++ 13 and clang++ 18 accept this program
+(-std=c++98), and it fails only its WRONG assertion.
