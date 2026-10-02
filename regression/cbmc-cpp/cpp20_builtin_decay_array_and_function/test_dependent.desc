@@ -1,0 +1,14 @@
+CORE
+dependent.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ dependent: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [meta.trans.other]; see test.desc.  clang++ 18 accepts this program,
+and it fails only its WRONG assertion (g++ 13 has no __decay).
