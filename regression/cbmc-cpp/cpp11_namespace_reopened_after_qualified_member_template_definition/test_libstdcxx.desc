@@ -12,11 +12,13 @@ libstdcxx.cpp
 dropped the body
 --
 libstdc++ 13's <format>: the four inline std::vformat overloads
-(format:3784/3793/3802/3811) are dropped with "scope '__format' is
+(format:3784/3793/3802/3811) were dropped with "scope '__format' is
 ambiguous" -- the class template __format::_Arg_store is declared in
 namespace std::__format, defined outside it by a qualified name, and the
-namespace is reopened afterwards; see test.desc (header-free, from the
-cvise reduction in /tmp/r163/red/kb_K).  Calling std::vformat from user
-code additionally fails in basic_format_args<nil> ("symbol '_CharT' is
-unknown"), to be split out when this is fixed.  Round-163 audit:
-cpp20_format_header.  Pre-existing (round-162 snapshot bin51).
+namespace is reopened afterwards; see test.desc (header-free, CORE).  That
+is fixed.  Now __formatter_fp::format (format:1422) is dropped: the visitor
+lambda of _Formatting_scanner::_M_format_arg is generic, and its body is
+also type-checked speculatively with `int' for auto, which instantiates
+format with an unresolved `_Type' (cpp14_generic_lambda_body_checked_with_
+placeholder_type).  Round-163 audit: cpp20_format_header.  Pre-existing
+(round-162 snapshot bin51).
