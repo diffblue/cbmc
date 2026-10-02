@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=6$
@@ -10,7 +10,11 @@ main.cpp
 --
 N5008 [over.match.copy]/1.1, [class.conv.ctor]/2: in copy-initialization
 `E e = 1;' only converting (non-explicit) constructors are candidates, so
-the program is ill-formed.  The front end accepts it (also through class
-template argument deduction, `template <class T> struct E { explicit E(T);
-}; E e = 1;').  Pre-existing (bin53).  g++ 13 and clang++ 18 reject this
+the program is ill-formed.  The front end accepted it (bin53): it ran
+constructor overload resolution over all constructors.  It now rejects a
+copy-initialization from another type whose only viable one-argument
+constructors are explicit.  Through class template argument deduction
+(`template <class T> struct E { explicit E(T); }; E e = 1;') it is still
+accepted.  test_converting.desc: the converting constructors are still
+selected.  g++ 13 and clang++ 18 reject this
 program.
