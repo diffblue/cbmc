@@ -1,4 +1,4 @@
-CORE broken-libstdcxx16
+CORE
 main.cpp
 --cpp20
 ^VERIFICATION SUCCESSFUL$
@@ -18,7 +18,7 @@ libstdc++ machinery end to end: __match_cv_qualifiers' private member
 typedef used as a nested-name-specifier, __common_ref_impl's constrained
 rvalue partial specializations (_Require<is_convertible<...>>), and an
 inherited `value' looked up right after the class is completed.
-Tagged broken-libstdcxx16 (temporary): with the libstdc++ 16 headers
-common_reference_t<int &, long &> fails; root cause
-cpp20_constrained_partial_specialization_reached_through_base_chain
-(KNOWNBUG).  Remove the tag when that is fixed.
+With the libstdc++ 16 headers common_reference_t<int &, long &> failed
+(tagged broken-libstdcxx16); the root cause,
+cpp20_constrained_partial_specialization_reached_through_base_chain, is
+fixed, and the test passes with GCC 16.2.1.
