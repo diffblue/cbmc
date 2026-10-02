@@ -577,6 +577,30 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         }
         return std::move(block);
       }
+      // GCC's __complex__ extension (also accepted by Clang): two scalar
+      // initializers give the real and the imaginary part -- as for a
+      // variable, `__complex__ float w{r, i}', also for a mem-initializer
+      // `v{r, i}' (libstdc++'s complex<float>, `_M_value{ __r, __i }').
+      if(object_tc.type().id() == ID_complex && operands_tc.size() == 2)
+      {
+        const typet &part_type = to_complex_type(object_tc.type()).subtype();
+        exprt real = operands_tc[0];
+        exprt imag = operands_tc[1];
+        implicit_typecast(real, part_type);
+        implicit_typecast(imag, part_type);
+        object_tc.type().set(ID_C_constant, false);
+        object_tc.set(ID_C_lvalue, true);
+        side_effect_expr_assignt assign(
+          object_tc,
+          complex_exprt{
+            std::move(real),
+            std::move(imag),
+            to_complex_type(object_tc.type())},
+          typet(),
+          source_location);
+        typecheck_side_effect_assignment(assign);
+        return code_expressiont{std::move(assign)};
+      }
       error().source_location = source_location;
       error() << "initialization of POD requires one argument, "
                  "but got "
