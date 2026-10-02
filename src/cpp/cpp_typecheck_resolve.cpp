@@ -1211,6 +1211,8 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   if(pname.empty())
                     continue;
                   typet ptype = static_cast<const typet &>(param.find(ID_type));
+                  if(cpp_typecheck.bind_requires_parameter_pack(pname, ptype))
+                    continue;
                   try
                   {
                     cpp_typecheck.typecheck_type(ptype);
