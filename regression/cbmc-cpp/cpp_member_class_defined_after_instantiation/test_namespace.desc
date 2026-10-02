@@ -1,0 +1,19 @@
+CORE
+namespace.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ sizes: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.mem.class]/1, [temp.inst]/3; see test.desc.  A member class of
+a class template in a namespace, depending on the template parameter, for
+two instances created before its definition and one after it.  The
+definition is written inside the namespace: the qualified form `struct
+ns::S<C>::N { ... };' is not grafted at all yet (also for instances created
+later).  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.
