@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ function-typed parameter: SUCCESS$
@@ -12,9 +12,10 @@ main.cpp
 --
 N5008 [dcl.fct]/5: a parameter of function type is adjusted to a pointer to
 function, so `typedef int F(int());' declares F as int(int (*)()), the type
-of cb.  The front end takes the parameter `int()' as int: `F *p = cb;' is a
-conversion error ("invalid implicit conversion from 'auto (*)(auto (*)() ->
-signed int) -> signed int' to 'auto (*)(signed int) -> signed int'").  Not
-yet diagnosed.
-Pre-existing (bin53).  g++ 13 and clang++ 18 accept this program, and it
-fails only its WRONG assertion.
+of cb.  The front end took the parameter `int()' as int: the parser read
+`()' as a parenthesized empty declarator.  N5008 [dcl.ambig.res]/3: in a
+parameter declarator, `(' followed by `)', `...' or a type-specifier starts
+a parameter list (Parser::rDeclarator).  test_type_name_in_parentheses.desc:
+the standard's Example 3 (`int(C)' with C a class).  Failed on bin53.  g++
+13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
