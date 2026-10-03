@@ -185,7 +185,9 @@ public:
   // Copy from rvalue reference.
   // Note that this does avoid a branch compared to the
   // standard copy constructor above.
-  sharing_treet(sharing_treet &&irep) : data(irep.data)
+  // Marked noexcept so that std::vector (and other containers) move
+  // elements instead of copying them when reallocating.
+  sharing_treet(sharing_treet &&irep) noexcept : data(irep.data)
   {
 #ifdef IREP_DEBUG
     std::cout << "COPY MOVE\n";
@@ -213,7 +215,7 @@ public:
 
   // Note that the move assignment operator does avoid
   // three branches compared to standard operator above.
-  sharing_treet &operator=(sharing_treet &&irep)
+  sharing_treet &operator=(sharing_treet &&irep) noexcept
   {
 #ifdef IREP_DEBUG
     std::cout << "ASSIGN MOVE\n";

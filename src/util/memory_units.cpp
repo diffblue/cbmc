@@ -19,7 +19,7 @@ memory_sizet::memory_sizet(std::size_t bytes) : bytes(bytes)
 memory_sizet::memory_sizet(const memory_sizet &other) : bytes(other.bytes)
 {
 }
-memory_sizet::memory_sizet(memory_sizet &&other) : bytes(other.bytes)
+memory_sizet::memory_sizet(memory_sizet &&other) noexcept : bytes(other.bytes)
 {
 }
 
