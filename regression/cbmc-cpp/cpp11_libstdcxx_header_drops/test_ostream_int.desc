@@ -12,7 +12,15 @@ ostream_int.cpp
 dropped the body of system-header function
 no body for callee
 --
-libstdc++ 13 <sstream>: `o << 4' leaves o.str() with a wrong size, without a
-dropped body or a missing callee (strings and put() work).  Not reduced yet;
-num_put::_M_insert_int is the candidate.  g++ 13 accepts this program, and
-it fails only its WRONG assertion.
+libstdc++ 13 <sstream>: `o << 4' leaves o.str() empty, without a dropped
+body or a missing callee (strings and put() work).  Diagnosed (round 163v):
+basic_ostream<char>::_M_insert<long> is declared `extern template' in
+<ostream> (an explicit instantiation declaration, [temp.explicit]/12; the
+definition, in bits/ostream.tcc, is visible), so the front end does not
+instantiate its body, and provide_stdlib_bodies replaces the bodyless
+instance by a model that only returns *this -- no output is inserted
+([ostream.inserters.arithmetic]/1).  Without that model the call has no
+body.  The same policy question as libc++'s std::sort
+(cpp20_libcxx_header_drops/test_sort.desc): instantiate definitions that
+are visible despite an extern template declaration.  g++ 13 accepts this
+program, and it fails only its WRONG assertion.

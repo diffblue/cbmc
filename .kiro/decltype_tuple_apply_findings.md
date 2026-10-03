@@ -13164,3 +13164,48 @@ Still KNOWNBUG:
 Suites on binU4 (HEAD content): cbmc-cpp green (1680 descs, 25 skipped),
 -K 16 [OK] (23 skipped), cpp green, lint 0.  GCC 16.2.1: ranges and concept
 tests pass; cpp20_common_reference_int_lvalue_rvalue still fails (tagged).
+
+## Round 163v: diagnosed KNOWNBUGs, libc++.so models, header-drop reductions
+
+Commits (on 4451be6540):
+- 3ffe13f97a libc++.so models: ios_base::init (Table 128), ~ios_base,
+  clear ([iostate.flags]/4), getloc, locale(), locale(const locale &),
+  ~locale.  cpp17_libcxx_ostringstream_state CORE (+ postconditions).
+- bd1ea85f3f class-template recursion bound counts the selected
+  constrained partial specialization ([temp.spec.partial.general]/1);
+  unsatisfied case instantiates the primary with full args.  Base-chain
+  tests CORE; broken-libstdcxx16 tag gone (GCC 16.2.1 Docker passes).
+- b7e8a7d34f pin_constructor_parameter_class_names
+  ([class.member.lookup]/3): constructors are type-checked last, so
+  `year_month_day_last(const month_day_last &)' found the later member
+  function.  From the kb_V_chrono_c reduction (8 lines).  libc++ chrono
+  now drops only year_month_day.h:212 (`local_days{...}': "constructor
+  call did not resolve to temporary object").
+- 27393e69dd empty_pack_short_names uses the newest generation per short
+  name ([basic.scope.temp]/2).  views_take test.desc CORE; test_reduced
+  still KNOWNBUG (drops `tuple' at reduced.cpp:105; tuple:469/488/713).
+- d568a30139 function parameter packs in trailing return types: bound per
+  element in substitute_function_type (requires_parameter_pack_element),
+  unsubstituted trailing type expanded with the body in
+  instantiate_template.  Regression on the way: cpp11_trailing_return_plain_
+  pack -- make_name kept ID_ellipsis on the expanded elements, so the
+  elements were expanded again (4 args instead of 2).
+- 09a1ca7f63 xvalue forwarding deduction ([temp.deduct.call]/3,
+  [expr.type]/1): strip only rvalue references (stripping lvalue refs
+  broke static_cast<int&>).
+- 090b81791c generic lambdas in member functions / with by-ref captures
+  get closures.  format:1422 remains (visitor uses `this' and members).
+
+Reductions (cvise on cbmc_V0):
+- kb_V_chrono_c: done, fixed (above).
+- kb_V_ostream: done (68 lines), diagnosed without a new test:
+  basic_ostream<char>::_M_insert<long> is `extern template'; the stdlib
+  model returns *this without inserting.  Same policy question as libc++
+  std::sort (instantiate visible definitions despite extern template).
+  Note in cpp11_libstdcxx_header_drops/test_ostream_int.desc.
+- kb_V_chrono_s, kb_V_func_c, kb_V_memres: still running (30-68%); no
+  result yet.
+
+Suites (binV5 = HEAD): cbmc-cpp, cpp (-e -p) pass; -K on the 19 KNOWNBUG
+directories passes; lint exit 0.  All new/promoted CORE tests fail on
+bin53.
