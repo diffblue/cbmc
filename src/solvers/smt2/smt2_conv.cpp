@@ -231,7 +231,25 @@ void smt2_convt::write_footer()
 
   out << "\n";
 
-  if(solver!=solvert::BOOLECTOR)
+  if(solver == solvert::Z3)
+  {
+    // Request the same identifiers in their existing deterministic order,
+    // using one command instead of a separate command for each identifier.
+    if(!smt2_identifiers.empty())
+    {
+      out << "(get-value (";
+      bool first = true;
+      for(const auto &id : smt2_identifiers)
+      {
+        if(!first)
+          out << ' ';
+        first = false;
+        out << id;
+      }
+      out << "))\n";
+    }
+  }
+  else if(solver != solvert::BOOLECTOR)
   {
     // Output get-value commands for all identifiers
     // Note: smt2_identifiers is std::set, so iteration is deterministic
