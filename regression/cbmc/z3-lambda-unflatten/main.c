@@ -3,8 +3,8 @@
 //
 // Z3 rejects `(get-value ...)` on symbols whose `define-fun` body
 // contains a lambda, so smt2_convt::set_to switches to
-// `(declare-fun X () T) (assert (= X body))` whenever
-// use_lambda_for_array is set (currently only Z3).  This test
+// `(declare-fun X () T) (assert (= X body))` when the prepared body contains
+// a binder.  This test
 // exercises the path -- the variable-length unsigned-char array
 // `src` ends up encoded with an `array_comprehension` that produces a
 // lambda body, and the new gate keeps the assignment to the

@@ -12,8 +12,8 @@ Pins the SMT2 emitted under `--z3` to a `(declare-fun ...) (assert (= ...
 (lambda ...)))` form rather than `(define-fun ... (lambda ...))` -- which Z3
 rejects on `(get-value ...)`.  The lambda comes from CBMC's array
 comprehension lowering for the variable-length `src` array; without the
-`set_to` re-routing introduced when `use_lambda_for_array` is true (gated on
-`use_lambda_for_array`, currently only Z3) the SMT2 would emit a
+`set_to` re-routing for binder-containing prepared expressions, the SMT2
+would emit a
 `define-fun` body that prevents Z3 from returning a model.
 
 The regex tolerates the two ways the memcpy SSA symbol is named:
