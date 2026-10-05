@@ -1251,6 +1251,45 @@ void cpp_typecheckt::full_member_initialization(
           mem_init.add("#base_type") = struct_tag_typet(vbase_id);
           block.move_to_sub(mem_init);
         }
+        else if(has_default_member_initializer(struct_tag_typet{vbase_id}))
+        {
+          // N5008 [class.base.init]/9.1, [class.default.ctor]/4: a virtual
+          // base not named in the mem-initializer-list is
+          // default-initialized by its (implicit, non-trivial) default
+          // constructor, which applies its default member initializers
+          // (libstdc++'s basic_ios, a virtual base of basic_ostream:
+          // `const __num_put_type *_M_num_put = nullptr').  cpp_is_pod
+          // ignores NSDMIs, so no constructor exists to call: apply them
+          // to the virtual base's (flattened) members, as for a
+          // non-virtual base below.
+          for(const auto &c : components)
+          {
+            if(
+              !c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+              c.get_bool(ID_is_static) || c.type().id() == ID_code ||
+              c.get_is_padding() || c.get(ID_C_virtual_base) != vbase_id)
+            {
+              continue;
+            }
+            const irept &default_val = c.find(ID_C_default_value);
+            if(default_val.is_not_nil())
+            {
+              codet mem_init(ID_member_initializer);
+              mem_init.set(ID_member, cpp_namet(c.get_base_name()));
+              mem_init.set("#component_name", c.get_name());
+              mem_init.copy_to_operands(
+                static_cast<const exprt &>(default_val));
+              block.move_to_sub(mem_init);
+            }
+            else if(has_default_member_initializer(c.type()))
+            {
+              codet mem_init(ID_member_initializer);
+              mem_init.set(ID_member, cpp_namet(c.get_base_name()));
+              mem_init.set("#component_name", c.get_name());
+              block.move_to_sub(mem_init);
+            }
+          }
+        }
       }
 
       code_ifthenelset cond(

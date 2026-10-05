@@ -2860,11 +2860,21 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
       }
     }
 
+    // A member of a virtual base is reached through the object's
+    // virtual-base offset ([class.mi]/4, Itanium C++ ABI 2.4): `*(B *)((char
+    // *)this + offset)'.  Such initializers name the component directly
+    // (#component_name, the default member initializers of a virtual base
+    // applied by its most derived class, full_member_initialization).
+    const bool virtual_base_member =
+      symbol_expr.id() == ID_member &&
+      to_member_expr(symbol_expr).op().id() == ID_dereference &&
+      !code.get("#component_name").empty();
     if(
       symbol_expr.id() == ID_member &&
       to_member_expr(symbol_expr).op().id() == ID_dereference &&
-      to_dereference_expr(to_member_expr(symbol_expr).op()).pointer() ==
-        cpp_scopes.current_scope().this_expr)
+      (to_dereference_expr(to_member_expr(symbol_expr).op()).pointer() ==
+         cpp_scopes.current_scope().this_expr ||
+       virtual_base_member))
     {
       if(is_reference(symbol_expr.type()))
       {
