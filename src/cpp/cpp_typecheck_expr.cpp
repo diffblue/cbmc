@@ -6944,9 +6944,103 @@ bool cpp_typecheckt::implicit_pod_assignment_call(
   return true;
 }
 
+/// N5008 [lex.ext]/2-4: a user-defined-integer-literal (floating-point
+/// literal) `nX' is a call of the literal operator `operator ""X' found by
+/// unqualified lookup, in one of three forms: `operator ""X(n ULL)' if one
+/// of them has a parameter of type unsigned long long (long double), else
+/// `operator ""X("n")' for a raw literal operator (parameter `const char *')
+/// or `operator ""X<'c1', ..., 'ck'>()' for a numeric literal operator
+/// template ([over.literal]/5) -- libstdc++'s `12h' (chrono_literals).
+/// The parser builds `operator ""X(n)' and records the literal's kind and
+/// spelling; rewrite \p expr into the form the declarations found select.
+/// Nothing is changed when none of the forms applies (the call then fails
+/// to resolve, as [lex.ext]/3 requires a diagnostic).
+void cpp_typecheckt::user_defined_numeric_literal(
+  side_effect_expr_function_callt &expr)
+{
+  const irep_idt kind = expr.get("#user_defined_literal");
+  if(kind.empty())
+    return;
+  const std::string spelling = expr.get_string("#literal_spelling");
+  expr.remove("#user_defined_literal");
+  expr.remove("#literal_spelling");
+  if(
+    expr.function().id() != ID_cpp_name || expr.arguments().size() != 1 ||
+    spelling.empty())
+  {
+    return;
+  }
+  cpp_namet &name = to_cpp_name(expr.function());
+  if(name.get_sub().size() != 2)
+    return;
+  const irep_idt base_name = "operator" + id2string(name.get_sub().back().id());
+
+  const bool is_integer = kind == ID_integer;
+  const typet cooked_type = is_integer ? typet{unsigned_long_long_int_type()}
+                                       : typet{long_double_type()};
+  bool has_cooked = false, has_raw = false, has_template = false;
+  for(const auto &id :
+      cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE))
+  {
+    if(id->id_class == cpp_idt::id_classt::TEMPLATE)
+    {
+      has_template = true;
+      continue;
+    }
+    const symbolt *symbol = symbol_table.lookup(id->identifier);
+    if(symbol == nullptr || symbol->type.id() != ID_code)
+      continue;
+    const auto &parameters = to_code_type(symbol->type).parameters();
+    if(parameters.size() != 1)
+      continue;
+    const typet &ptype = parameters.front().type();
+    if(ptype == cooked_type)
+      has_cooked = true;
+    else if(
+      ptype.id() == ID_pointer &&
+      to_pointer_type(ptype).base_type().get_bool(ID_C_constant) &&
+      to_pointer_type(ptype).base_type().id() == char_type().id() &&
+      to_bitvector_type(to_pointer_type(ptype).base_type()).get_width() ==
+        config.ansi_c.char_width)
+    {
+      has_raw = true;
+    }
+  }
+
+  exprt &argument = expr.arguments().front();
+  if(has_cooked)
+  {
+    // [lex.ext]/3-4: `n ULL', `f L' -- the literal itself, of that type
+    exprt literal = argument;
+    argument = typecast_exprt{literal, cooked_type};
+    argument.add_source_location() = literal.source_location();
+  }
+  else if(has_raw && !has_template)
+  {
+    string_constantt raw{spelling};
+    raw.add_source_location() = argument.source_location();
+    argument = std::move(raw);
+  }
+  else if(has_template && !has_raw)
+  {
+    irept template_args{ID_template_args};
+    irept &arguments = template_args.add(ID_arguments);
+    for(const char c : spelling)
+    {
+      exprt character = from_integer(c, char_type());
+      character.add_source_location() = argument.source_location();
+      arguments.get_sub().push_back(std::move(character));
+    }
+    name.get_sub().push_back(std::move(template_args));
+    expr.arguments().clear();
+  }
+}
+
 void cpp_typecheckt::typecheck_side_effect_function_call(
   side_effect_expr_function_callt &expr)
 {
+  user_defined_numeric_literal(expr);
+
   // A TYPELESS symbol as the callee is the synthesized body of a GCC
   // polymorphic builtin calling another one (`__atomic_load_n' calls
   // `__atomic_load', c_typecheck_gcc_polymorphic_builtins.cpp) or a CPROVER
