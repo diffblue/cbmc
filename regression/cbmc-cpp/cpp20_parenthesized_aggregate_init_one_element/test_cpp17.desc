@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=(1|6)$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+--
+N5008 [dcl.init.general]/16.6.2.2 is a C++20 rule; in C++17 `point a(4)'
+needs a constructor (g++ 13 -std=c++17 rejects the program).
+This rejects-invalid companion of test.desc also passes on bin53.

@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/expr_initializer.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
@@ -417,6 +418,23 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       // [class.base.init]/7) reached the assignment below with the raw list,
       // and the element-to-class implicit conversion was rejected
       // ("invalid implicit conversion from 'signed int' to 'struct Base'").
+      // N5008 [dcl.init.general]/16.6.2.2 (C++20): `T x(e)' with T an
+      // aggregate class -- no constructor is viable when e does not convert
+      // to T (the implicit copy and move constructors are the only ones) --
+      // initializes the first element from e and value-initializes the
+      // rest, as `T x{e}' would without narrowing checks (P0960).
+      if(
+        config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20 &&
+        rhs.id() != ID_initializer_list &&
+        object_tc.type().id() == ID_struct_tag &&
+        !follow_tag(to_struct_tag_type(object_tc.type())).is_incomplete())
+      {
+        exprt probe = rhs;
+        unsigned rank = 0;
+        if(!implicit_conversion_sequence(probe, object_tc.type(), rank))
+          goto aggregate_initialization;
+      }
+
       if(
         rhs.id() == ID_initializer_list &&
         object_tc.type().id() == ID_struct_tag)
