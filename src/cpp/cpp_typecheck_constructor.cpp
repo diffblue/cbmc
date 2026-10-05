@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
+#include "itanium_abi_cpp_zero_initializer.h"
 
 #include <algorithm>
 #include <functional>
@@ -1445,8 +1446,14 @@ void cpp_typecheckt::full_member_initialization(
             continue;
           const cpp_namet &init_name = to_cpp_name(initializer.find(ID_member));
           const exprt &init_expr = static_cast<const exprt &>(initializer);
-          if(init_expr.operands().empty())
+          // an empty initializer of a base with default member initializers
+          // is handled above
+          if(
+            init_expr.operands().empty() &&
+            has_default_member_initializer(b.type()))
+          {
             continue;
+          }
           bool names_this_base =
             !init_name.has_template_args() &&
             init_name.get_base_name() == ctorsymb.base_name;
@@ -1537,6 +1544,23 @@ void cpp_typecheckt::full_member_initialization(
           // through an explicit-constructor-call expression instead: its
           // typecheck performs copy-initialization for the same-type form
           // and aggregate initialization otherwise.
+          if(init_expr.operands().empty())
+          {
+            // N5008 [dcl.init.general]/9.1-9.2, [class.base.init]/7: an
+            // empty mem-initializer `B()' / `B{}' value-initializes the
+            // base; a POD base (no user-provided constructor) is
+            // zero-initialized.  It was left uninitialized.
+            const auto zero = itanium_abi_cpp_zero_initializer(
+              base_t, source_location_of(initializer), *this);
+            if(zero.has_value())
+            {
+              code_frontend_assignt assign_code(std::move(lhs), *zero);
+              assign_code.add_source_location() =
+                source_location_of(initializer);
+              final_initializers.move_to_sub(assign_code);
+            }
+            break;
+          }
           exprt rhs("explicit-constructor-call", base_t);
           rhs.add_source_location() = source_location_of(initializer);
           exprt init_list(ID_initializer_list);

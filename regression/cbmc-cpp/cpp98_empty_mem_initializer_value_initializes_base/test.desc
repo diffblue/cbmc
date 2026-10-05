@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ base and member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.base.init]/7, [dcl.init.general]/9.1-9.2: an empty
+mem-initializer `B()' value-initializes the base, and a class without a
+user-provided default constructor is zero-initialized.
+full_member_initialization skipped empty initializers of POD bases, so
+the base stayed nondeterministic (bin53).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.
