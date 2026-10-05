@@ -1,0 +1,35 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ more specialized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ copy-initialization: SUCCESS$
+^\[main\.assertion\.3\] line \d+ only the generic one: SUCCESS$
+^\[main\.assertion\.4\] line \d+ by reference to const: SUCCESS$
+^\[main\.assertion\.5\] line \d+ non-deduced constant: SUCCESS$
+^\[main\.assertion\.6\] line \d+ deduced constant: SUCCESS$
+^\[main\.assertion\.7\] line \d+ rvalue reference: SUCCESS$
+^\[main\.assertion\.8\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.best]/2.5, [temp.func.order]: between two function
+template specializations with equally good conversion sequences the more
+specialized template is selected.  disambiguate_functions ranked
+specializations by their number of template arguments before partial
+ordering ran, so `f(const S &)' (one argument) beat `f(const
+basic_string<C, T, A> &)' (three; "member operator requires struct/union
+type", bin53).  The template penalty is now binary, as its comment said,
+and the argument count is only a last resort after partial ordering.  For
+that: the reference-binding tie-breakers apply only between two reference
+bindings ([over.ics.rank]/3.2.3, /3.2.6; they preferred `wrap(From, To)'
+to `wrap(const I &, I)'), and a non-deduced constant template argument of
+a pattern matches only the same constant ([temp.deduct.type]/1;
+`pick(idx<N>, ...)' was as specialized as `pick(idx<0>, ...)').  Found
+from libstdc++'s filesystem::path(const std::string &)
+(cpp17_filesystem_path_from_string), __niter_wrap, _Variadic_union and
+pair's constructors.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

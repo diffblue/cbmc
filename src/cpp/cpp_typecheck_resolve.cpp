@@ -2484,6 +2484,18 @@ void cpp_typecheck_resolvet::disambiguate_functions(
 
   // sort according to distance
   std::multimap<std::size_t, exprt> distance_map;
+  // per candidate, in the order of distance_map's entries (a multimap
+  // keeps equal keys in insertion order): the reference-binding
+  // tie-breaker and the number of template arguments, a last resort when
+  // partial ordering leaves specializations unordered.  (Not keyed by the
+  // expression: candidates differing only in comments, ID_C_template
+  // among them, compare equal.)
+  struct rankt
+  {
+    unsigned cv_distance;
+    std::size_t template_argument_count;
+  };
+  std::multimap<std::size_t, rankt> rank_map;
 
   for(const auto &old_id : old_identifiers)
   {
@@ -2509,12 +2521,16 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       // the count-key wrongly selected the generic one, leaving its
       // undeduced-auto return in the initializer:
       // "conversion from '<<type:auto>>'").
+      std::size_t template_argument_count = 0;
       if(!old_id.type().get(ID_C_template).empty())
-        template_distance = old_id.type()
-                              .find(ID_C_template_arguments)
-                              .find(ID_arguments)
-                              .get_sub()
-                              .size();
+      {
+        template_distance = 1;
+        template_argument_count = old_id.type()
+                                    .find(ID_C_template_arguments)
+                                    .find(ID_arguments)
+                                    .get_sub()
+                                    .size();
+      }
       // An ALREADY-INSTANTIATED function template specialization enters
       // the candidate set as a plain symbol without ID_C_template; it
       // carries #fn_template_type instead.  It is still a specialization
@@ -2536,7 +2552,8 @@ void cpp_typecheck_resolvet::disambiguate_functions(
           cand_sym != nullptr &&
           cand_sym->type.find(irep_idt{"#fn_template_type"}).is_not_nil())
         {
-          template_distance = std::max<std::size_t>(
+          template_distance = 1;
+          template_argument_count = std::max<std::size_t>(
             1,
             cand_sym->type.find(irep_idt{"#fn_template_args"})
               .find(ID_arguments)
@@ -2604,20 +2621,84 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       std::size_t total_distance =
         // NOLINTNEXTLINE(whitespace/operators)
         1000000000ULL * args_distance + 100000000ULL * undeduced_auto_penalty +
-        1000 * template_distance + cv_distance;
+        1000 * template_distance;
 
       distance_map.insert({total_distance, old_id});
+      rank_map.insert({total_distance, {cv_distance, template_argument_count}});
     }
   }
 
   old_identifiers.clear();
 
   // put in the top ones
+  std::vector<rankt> ranks;
   if(!distance_map.empty())
   {
     auto range = distance_map.equal_range(distance_map.begin()->first);
     for(auto it = range.first; it != range.second; ++it)
       old_identifiers.push_back(it->second);
+    auto rank_range = rank_map.equal_range(distance_map.begin()->first);
+    for(auto it = rank_range.first; it != rank_range.second; ++it)
+      ranks.push_back(it->second);
+  }
+
+  // N5008 [over.ics.rank]/3.2.3, /3.2.6: of two REFERENCE bindings, one
+  // binding an rvalue reference to an rvalue (rather than an lvalue
+  // reference), or one to a less cv-qualified type, is better; the rules
+  // compare reference bindings only.  `cv_distance' sums them per
+  // candidate, so it decides between two candidates only when their
+  // parameters are references at the same positions -- a by-value
+  // `wrap(From, To)' and a `wrap(const I &, I)' are indistinguishable
+  // here, and partial ordering below selects the latter (libstdc++'s
+  // __niter_wrap).
+  if(old_identifiers.size() > 1)
+  {
+    const auto reference_shape = [](const exprt &candidate)
+    {
+      std::vector<bool> shape;
+      if(candidate.type().id() == ID_code)
+      {
+        for(const auto &p : to_code_type(candidate.type()).parameters())
+          shape.push_back(
+            is_reference(p.type()) || is_rvalue_reference(p.type()));
+      }
+      return shape;
+    };
+    std::vector<bool> dominated(old_identifiers.size(), false);
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+    {
+      for(std::size_t j = 0; j < old_identifiers.size(); ++j)
+      {
+        if(
+          i != j && ranks[j].cv_distance < ranks[i].cv_distance &&
+          reference_shape(old_identifiers[i]) ==
+            reference_shape(old_identifiers[j]))
+        {
+          dominated[i] = true;
+          break;
+        }
+      }
+    }
+    resolve_identifierst kept;
+    std::vector<rankt> kept_ranks;
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+    {
+      if(!dominated[i])
+      {
+        kept.push_back(old_identifiers[i]);
+        kept_ranks.push_back(ranks[i]);
+      }
+    }
+    old_identifiers.swap(kept);
+    ranks.swap(kept_ranks);
+  }
+  // the template argument counts of the group, for the last-resort
+  // ordering below (looked up by expression AND template)
+  std::vector<std::pair<exprt, std::size_t>> template_argument_counts;
+  for(std::size_t i = 0; i < old_identifiers.size() && i < ranks.size(); ++i)
+  {
+    template_argument_counts.emplace_back(
+      old_identifiers[i], ranks[i].template_argument_count);
   }
 
   if(old_identifiers.size() > 1 && fargs.in_use)
@@ -2884,6 +2965,47 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       }
       if(!resolved.empty() && resolved.size() < identifiers.size())
         identifiers = resolved;
+    }
+
+    // [over.match.best]/2.5 orders function template specializations by
+    // partial ordering ([temp.func.order]) only; two that remain unordered
+    // make the call ambiguous.  function_template_at_least_as_specialised
+    // does not implement all of [temp.deduct.partial] (packs, non-type
+    // patterns), so as a last resort prefer the specialization with fewer
+    // template arguments -- the former ranking heuristic, now applied only
+    // after partial ordering, which it used to pre-empt (`f(const S &)'
+    // was preferred to the more specialized `f(const basic_string<C, T, A>
+    // &)').
+    if(identifiers.size() > 1)
+    {
+      const auto count_of = [&](const exprt &id) -> std::optional<std::size_t>
+      {
+        for(const auto &entry : template_argument_counts)
+        {
+          if(
+            entry.first == id && entry.first.type().get(ID_C_template) ==
+                                   id.type().get(ID_C_template))
+          {
+            return entry.second;
+          }
+        }
+        return {};
+      };
+      std::size_t fewest = std::numeric_limits<std::size_t>::max();
+      for(const auto &id : identifiers)
+      {
+        if(const auto count = count_of(id))
+          fewest = std::min(fewest, *count);
+      }
+      resolve_identifierst fewer;
+      for(const auto &id : identifiers)
+      {
+        const auto count = count_of(id);
+        if(!count.has_value() || *count == fewest)
+          fewer.push_back(id);
+      }
+      if(!fewer.empty())
+        identifiers.swap(fewer);
     }
   }
   else

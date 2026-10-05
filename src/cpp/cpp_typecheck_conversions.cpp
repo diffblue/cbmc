@@ -1183,6 +1183,22 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
   };
   auto drop_top_cv = [](typet &t)
   {
+    // a declaration-level `const T' is still a merged_type of the
+    // qualifier and the name ([temp.deduct.partial]/7 drops it as well)
+    if(t.id() == ID_merged_type)
+    {
+      std::vector<typet> rest;
+      for(const auto &sub : to_type_with_subtypes(t).subtypes())
+      {
+        if(sub.id() != ID_const && sub.id() != ID_volatile)
+          rest.push_back(sub);
+      }
+      if(rest.size() == 1)
+      {
+        typet only = rest.front();
+        t = std::move(only);
+      }
+    }
     c_qualifierst q;
     q.read(t);
     if(q.is_constant || q.is_volatile || q.is_restricted || q.is_atomic)
@@ -1245,6 +1261,33 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
                           A.get_sub().front().get(ID_identifier))
         {
           return false;
+        }
+        // [temp.deduct.type]/1: the deduced A must be identical to the
+        // pattern with the parameters substituted.  A non-dependent constant
+        // argument of P (`in_place_index_t<0>') therefore matches only the
+        // same constant in A, not a (transformed) template parameter of F
+        // (`in_place_index_t<_Np>'); otherwise both templates were at least
+        // as specialized as each other (libstdc++'s _Variadic_union).
+        const auto args_of = [](const typet &t) -> const irept *
+        {
+          for(const auto &sub : t.get_sub())
+            if(sub.id() == ID_template_args)
+              return &sub.find(ID_arguments);
+          return nullptr;
+        };
+        const irept *p_args = args_of(P);
+        const irept *a_args = args_of(A);
+        if(
+          p_args != nullptr && a_args != nullptr &&
+          p_args->get_sub().size() == a_args->get_sub().size())
+        {
+          for(std::size_t k = 0; k < p_args->get_sub().size(); ++k)
+          {
+            const exprt &pa = static_cast<const exprt &>(p_args->get_sub()[k]);
+            const exprt &aa = static_cast<const exprt &>(a_args->get_sub()[k]);
+            if(pa.is_constant() && !(aa.is_constant() && aa == pa))
+              return false;
+          }
         }
       }
 
