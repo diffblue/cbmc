@@ -12,15 +12,18 @@ ostream_int.cpp
 dropped the body of system-header function
 no body for callee
 --
-libstdc++ 13 <sstream>: `o << 4' leaves o.str() empty, without a dropped
-body or a missing callee (strings and put() work).  Diagnosed (round 163v):
-basic_ostream<char>::_M_insert<long> is declared `extern template' in
-<ostream> (an explicit instantiation declaration, [temp.explicit]/12; the
-definition, in bits/ostream.tcc, is visible), so the front end does not
-instantiate its body, and provide_stdlib_bodies replaces the bodyless
-instance by a model that only returns *this -- no output is inserted
-([ostream.inserters.arithmetic]/1).  Without that model the call has no
-body.  The same policy question as libc++'s std::sort
-(cpp20_libcxx_header_drops/test_sort.desc): instantiate definitions that
-are visible despite an extern template declaration.  g++ 13 accepts this
+libstdc++ 13 <sstream>: `o << 4' leaves o.str() empty.  Diagnosed (rounds
+163v-w): basic_ostream<char>::_M_insert<long> is declared `extern
+template' in bits/ostream.tcc ([temp.explicit]/12), so its body is not
+instantiated, and provide_stdlib_bodies replaces the bodyless instance by
+a model that only returns *this ([ostream.inserters.arithmetic]/1 requires
+the insertion).  Instantiating it instead (an experiment, not kept) fails
+next on `this->_M_num_put': basic_ostream<char> is instantiated eagerly
+from within basic_ios<char> (basic_ios.h:88 names ostreambuf_iterator,
+whose typedef names basic_ostream, [temp.inst]/2 requires neither), while
+basic_ios<char>, its virtual base, has only its ios_base members, and
+basic_ostream<char> keeps that partial member list.  Re-elaborating the
+derived class once the base is complete crashed on its stale scope.  The
+virtual base's default member initializers are fixed
+(cpp11_virtual_base_default_member_initializer).  g++ 13 accepts this
 program, and it fails only its WRONG assertion.

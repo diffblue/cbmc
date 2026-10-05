@@ -15,12 +15,15 @@ system-header declaration
 --
 libc++ (LLVM 18) <functional>: std::function<int(int)> holding a lambda
 returns a nondeterministic value, so the first assertion fails.  The
-drops: __format's __get_property and __estimated_width
-(cpp20_requires_expression_parameter_pack_of_differing_types), and with
---cpp11 also __functional/function.h:272 and 350 (same root cause) and 394
-~__value_func (cpp11_static_member_of_recursive_partial_specialization,
-through aligned_storage's default alignment, fixed); with --cpp20 also
-tuple:469 __tuple_impl's constructor and function.h:272.  Type checking
-takes about 2 minutes and the SAT solver needs more than 16 GB (with
-`ulimit -v 16000000' it runs out of memory and the result is ERROR).  clang++ 18 -stdlib=libc++
-accepts this program, and it fails only its WRONG assertion.
+remaining drops are tuple:469 __tuple_impl's constructor and
+function.h:272: in `__tuple_leaf<_Uf, _Tf>(std::forward<_Up>(__u))...'
+the call std::forward<_Up>(__u) does not resolve ("template 'forward' not
+found"), so no __tuple_leaf constructor matches (being reduced:
+/tmp/r163/red/kb_W_func_fwd; the earlier reduction kb_V_func_c lost
+__tuple_leaf's constructors and showed a C++20 parenthesized aggregate
+initialization gap instead, fixed: cpp20_parenthesized_aggregate_init_one_
+element, cpp20_aggregate_element_of_class_type_constructed).  Type
+checking takes about 2 minutes and the SAT solver needs more than 16 GB
+(with `ulimit -v 16000000' the result is ERROR).  clang++ 18
+-stdlib=libc++ accepts this program, and it fails only its WRONG
+assertion.
