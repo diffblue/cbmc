@@ -133,8 +133,19 @@ cpp_scopet &cpp_typecheckt::tag_scope(
     cpp_scopes.current_scope().lookup(base_name, cpp_scopet::RECURSIVE);
 
   for(const auto &id : id_set)
-    if(id->is_class())
-      return static_cast<cpp_scopet &>(id->get_parent());
+  {
+    if(!id->is_class())
+      continue;
+    // N5008 [basic.lookup.elab]/1, [namespace.udecl]/1: the class found
+    // may have been introduced by a using-declaration (`namespace std {
+    // using ::timespec; }' in <ctime>); `struct timespec' then names that
+    // class, declared in its own scope, not a new class of the scope of
+    // the using-declaration
+    const auto declared = cpp_scopes.id_map.find(id->identifier);
+    if(declared != cpp_scopes.id_map.end() && declared->second != nullptr)
+      return static_cast<cpp_scopet &>(declared->second->get_parent());
+    return static_cast<cpp_scopet &>(id->get_parent());
+  }
 
   // Tags without body that we don't have already
   // and that are not a tag-only declaration go into

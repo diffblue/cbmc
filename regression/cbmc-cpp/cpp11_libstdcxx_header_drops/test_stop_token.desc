@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 stop_token.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ stop_source: SUCCESS$
@@ -12,10 +12,12 @@ stop_token.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-libstdc++ 13 <stop_token>: drops stop_token:149 _M_run,
-bits/semaphore_base.h:118 _M_try_acquire_until_impl ("template
-'time_point_cast' not found", "type 'struct timespec' is still
-incomplete"), and bits/chrono.h:710 operator- and 822 operator<.  The drop
-of bits/atomic_wait.h:252 _S_for is fixed
-(cpp_functional_cast_through_typedef_reinterprets).  g++ 13 accepts this
-program, and it fails only its WRONG assertion.
+libstdc++ 13 <stop_token> converts without dropped bodies.  Fixed (round
+163w): bits/semaphore_base.h:118 _M_try_acquire_until_impl (`struct
+timespec' through <ctime>'s `using ::timespec',
+cpp98_elaborated_type_specifier_finds_using_declaration) and the
+__check_overflow instances of bits/atomic_timed_wait.h's `64us' and `4us'
+(cpp11_user_defined_literal_call_forms).  Earlier fixed: the drop of
+bits/atomic_wait.h:252 _S_for (cpp_functional_cast_through_typedef_
+reinterprets).  g++ 13 accepts this program, and it fails only its WRONG
+assertion.
