@@ -1141,6 +1141,26 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     typecheck_side_effect_function_call(function_call);
 
+    // N5008 [over.match.copy]/1.2: in the direct-initialization `T{s}' /
+    // `T(s)' the copy constructor's `const T &' parameter may bind to the
+    // result of an EXPLICIT conversion function `S::operator T()' (libc++'s
+    // `local_days{year() / month() / day()}', year_month_day's `explicit
+    // operator local_days()').  Overload resolution then yields the call
+    // of that conversion function, a prvalue of type T; it initializes the
+    // object ([dcl.init.general]/16.6.1, the copy being elided as GCC and
+    // Clang do, CWG 2327).
+    if(
+      function_call.get(ID_statement) == ID_function_call &&
+      function_call.type() == object_tc.type())
+    {
+      code_frontend_assignt init{object_tc, function_call};
+      init.add_source_location() = source_location;
+      if(block.statements().empty())
+        return std::move(init);
+      block.add(std::move(init));
+      return std::move(block);
+    }
+
     if(function_call.get(ID_statement) != ID_temporary_object)
     {
       error().source_location = source_location;

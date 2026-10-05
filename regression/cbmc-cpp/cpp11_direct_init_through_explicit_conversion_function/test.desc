@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ direct-initialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ implicit conversion function: SUCCESS$
+^\[main\.assertion\.3\] line \d+ inside a conversion function: SUCCESS$
+^\[main\.assertion\.4\] line \d+ not for copy-initialization: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [over.match.copy]/1.2: `local_days{m}' may bind the copy
+constructor's parameter to the result of m's explicit `operator
+local_days()'.  Overload resolution selected that conversion function,
+but cpp_constructor expected a constructor call ("constructor call did not
+resolve to temporary object", bin53); the conversion's prvalue now
+initializes the object ([dcl.init.general]/16.6.1, the copy elided as GCC
+and Clang do, CWG 2327).  Found from libc++'s
+chrono::year_month_day_last::operator local_days (year_month_day.h:212,
+cpp20_libcxx_header_drops/test_chrono.desc).  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.
