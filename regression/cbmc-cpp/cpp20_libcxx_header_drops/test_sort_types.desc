@@ -1,0 +1,22 @@
+CORE libcxx
+sort_types.cpp
+--cpp20 --stdlib libc++ --unwind 8 --object-bits 12
+^\[main\.assertion\.1\] line \d+ double: SUCCESS$
+^\[main\.assertion\.2\] line \d+ unsigned, less: SUCCESS$
+^\[main\.assertion\.3\] line \d+ one element and empty ranges: SUCCESS$
+^\[main\.assertion\.4\] line \d+ char: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+N5008 [alg.sort]/1: libc++ 18 declares std::__sort<__less<T> &, T *> for
+the arithmetic types `extern template' and defines the template only in
+libc++.so (src/algorithm.cpp), so these calls had no body (bin53).
+provide_stdlib_bodies models it as an insertion sort with `<'.  clang++
+18 -stdlib=libc++ accepts this program, and it fails only its WRONG
+assertion.

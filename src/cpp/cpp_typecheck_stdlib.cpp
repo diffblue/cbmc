@@ -1786,6 +1786,85 @@ void cpp_typecheckt::provide_stdlib_bodies()
       continue;
     }
 
+    // libc++ declares std::__sort<__less<T> &, T *> for the arithmetic types
+    // T `extern template' (__algorithm/sort.h) and DEFINES the template only
+    // in libc++.so (src/algorithm.cpp), so std::sort on such a range calls a
+    // function without a body.  N5008 [alg.sort]/1-3: sort permutes [first,
+    // last) into non-decreasing order with respect to comp; __less<T> is
+    // `a < b' on the arithmetic T.  Model it as an insertion sort (the
+    // complexity bound of /3 is not observable).
+    if(
+      symbol.value.is_nil() && name.find("std::__1::__sort<") == 0 &&
+      to_code_type(symbol.type).parameters().size() == 3)
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      const auto &params = to_code_type(symbol.type).parameters();
+      const typet &ptr_type = params[0].type();
+      if(
+        ptr_type.id() == ID_pointer && params[1].type() == ptr_type &&
+        (to_pointer_type(ptr_type).base_type().id() == ID_signedbv ||
+         to_pointer_type(ptr_type).base_type().id() == ID_unsignedbv ||
+         to_pointer_type(ptr_type).base_type().id() == ID_floatbv))
+      {
+        const typet &value_type = to_pointer_type(ptr_type).base_type();
+        const auto local = [&](const std::string &base, const typet &type)
+        {
+          const irep_idt id = id2string(symbol.name) + "::" + base;
+          if(!symbol_table.has_symbol(id))
+          {
+            symbolt local_symbol;
+            local_symbol.name = id;
+            local_symbol.base_name = base;
+            local_symbol.type = type;
+            local_symbol.mode = symbol.mode;
+            local_symbol.is_lvalue = true;
+            local_symbol.is_thread_local = true;
+            local_symbol.is_file_local = true;
+            local_symbol.location = symbol.location;
+            symbol_table.insert(std::move(local_symbol));
+          }
+          return symbol_exprt{id, type};
+        };
+        const symbol_exprt first{params[0].get_identifier(), ptr_type};
+        const symbol_exprt last{params[1].get_identifier(), ptr_type};
+        const symbol_exprt i = local("__cbmc_i", ptr_type);
+        const symbol_exprt j = local("__cbmc_j", ptr_type);
+        const symbol_exprt t = local("__cbmc_t", value_type);
+        const exprt one = from_integer(1, signed_size_type());
+        const exprt prev = dereference_exprt{minus_exprt{j, one}};
+
+        // while(j != first && *j < *(j - 1)) { swap; --j; }
+        code_blockt swap_block;
+        swap_block.add(code_frontend_assignt{t, dereference_exprt{j}});
+        swap_block.add(code_frontend_assignt{dereference_exprt{j}, prev});
+        swap_block.add(code_frontend_assignt{prev, t});
+        swap_block.add(code_frontend_assignt{j, minus_exprt{j, one}});
+        code_blockt outer_body;
+        outer_body.add(code_frontend_assignt{j, i});
+        outer_body.add(code_whilet{
+          and_exprt{
+            notequal_exprt{j, first},
+            binary_relation_exprt{dereference_exprt{j}, ID_lt, prev}},
+          std::move(swap_block)});
+        outer_body.add(code_frontend_assignt{i, plus_exprt{i, one}});
+
+        code_blockt sorted;
+        sorted.add(code_frontend_assignt{i, plus_exprt{first, one}});
+        sorted.add(code_whilet{notequal_exprt{i, last}, std::move(outer_body)});
+
+        code_blockt block;
+        block.add(code_frontend_declt{i});
+        block.add(code_frontend_declt{j});
+        block.add(code_frontend_declt{t});
+        block.add(
+          code_ifthenelset{notequal_exprt{first, last}, std::move(sorted)});
+        symbol.value = std::move(block);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+        continue;
+      }
+    }
+
     // N5008 [locale.general]/8: the program-startup global locale is the
     // "C" locale, and libstdc++ initialises it inside the shared library
     // where CBMC cannot see it.  Give the default constructor, the
