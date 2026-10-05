@@ -1,0 +1,26 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ unused members not instantiated: SUCCESS$
+^\[main\.assertion\.2\] line \d+ used member instantiated: SUCCESS$
+^\[main\.assertion\.3\] line \d+ and its callee: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [temp.inst]/3.1, /4: implicitly instantiating vec<block> instantiates
+the declarations, not the definitions, of the members of its member class
+`temporary'; a definition is instantiated when used.  The front end
+deferred the member functions of a class template specialization but not
+those of its member classes, so temporary::get and release were converted
+for vec<block> with block still incomplete and dropped ("dropped the body
+of function 'get'", bin53).  They are now deferred alike.  Found from
+libstdc++'s vector<_Tp>::_Temporary_value for the incomplete
+__pool_resource::_BigBlock (cpp11_libstdcxx_header_drops/
+test_memory_resource.desc).  g++ 13 and clang++ 18 accept this program,
+and it fails only its WRONG assertion.

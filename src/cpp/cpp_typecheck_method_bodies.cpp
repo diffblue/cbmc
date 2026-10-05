@@ -1875,6 +1875,10 @@ void cpp_typecheckt::typecheck_method_bodies()
   // converted body references are left uninstantiated, as the standard
   // requires; this is exactly what lets an unused, ill-formed member of a
   // specialization remain harmless ([temp.inst]/8, /11).
+  // the classes of the objects named in converted bodies: an object
+  // created by aggregate initialization (`transt tx{p, this}') calls no
+  // constructor, yet its destructor is potentially invoked ([class.dtor]/12)
+  std::set<irep_idt> objects_of_class;
   std::function<void(const irept &, std::set<irep_idt> &)> gather_referenced =
     [&](const irept &n, std::set<irep_idt> &referenced)
   {
@@ -1883,6 +1887,10 @@ void cpp_typecheckt::typecheck_method_bodies()
       const irep_idt id = n.get(ID_identifier);
       if(!id.empty())
         referenced.insert(id);
+      const typet &object_type = static_cast<const exprt &>(n).type();
+      if(object_type.id() == ID_struct_tag)
+        objects_of_class.insert(
+          to_struct_tag_type(object_type).get_identifier());
     }
     for(const auto &s : n.get_sub())
       gather_referenced(s, referenced);
@@ -1915,7 +1923,7 @@ void cpp_typecheckt::typecheck_method_bodies()
     // odr-use from the type system: a class's destructor is required exactly
     // when the class is constructed, i.e. when one of its constructors is
     // odr-used.  Collect the classes whose constructors are referenced.
-    std::set<irep_idt> constructed_classes;
+    std::set<irep_idt> constructed_classes = objects_of_class;
     for(const irep_idt &r : referenced)
     {
       const symbolt *rs = symbol_table.lookup(r);
@@ -2396,6 +2404,33 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
         bool is_template_instance =
           class_sym != nullptr &&
           class_sym->type.find(ID_C_template_arguments).is_not_nil();
+        // N5008 [temp.inst]/3.1: instantiating a class template
+        // specialization instantiates the DECLARATIONS of its member
+        // classes' members, not their definitions -- the members of a member
+        // class of an instance (libstdc++'s vector<_Tp>::_Temporary_value)
+        // are deferred alike; instantiating their bodies with the class's
+        // arguments still incomplete dropped them (memory_resource's
+        // vector<_BigBlock>)
+        if(class_sym != nullptr && !is_template_instance)
+        {
+          const auto scope_it = cpp_scopes.id_map.find(class_id);
+          const cpp_scopet *scope =
+            scope_it == cpp_scopes.id_map.end() || !scope_it->second->is_scope
+              ? nullptr
+              : static_cast<const cpp_scopet *>(scope_it->second);
+          while(scope != nullptr && !is_template_instance &&
+                !scope->is_root_scope())
+          {
+            const cpp_scopet &parent = scope->get_parent();
+            if(!parent.is_class())
+              break;
+            const symbolt *enclosing = symbol_table.lookup(parent.identifier);
+            is_template_instance =
+              enclosing != nullptr &&
+              enclosing->type.find(ID_C_template_arguments).is_not_nil();
+            scope = &parent;
+          }
+        }
         if(is_template_instance)
         {
           // N5008 [temp.inst]/11: "an implementation shall not implicitly
