@@ -10267,6 +10267,73 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
   }
 }
 
+/// N5008 [expr.prim.this]/2, [class.mfct.non.static]/2: in the body \p body
+/// of a lambda that captures `this', an explicit `this' and an unqualified
+/// call of a member function of the enclosing class (one of
+/// \p member_functions) refer to the enclosing object.  The closure holds
+/// that pointer in its member lambda_this_capture; rewrite `this' to that
+/// member and `f(...)' to `lambda_this_capture->f(...)'.  Nested lambdas
+/// are not rewritten (they are type-checked on their own), nor are names
+/// after `.' or `->' (component names).
+void cpp_typecheckt::rewrite_lambda_this_uses(
+  irept &body,
+  const std::set<irep_idt> &member_functions)
+{
+  const auto this_member = [](const source_locationt &location)
+  {
+    exprt name{ID_cpp_name};
+    irept component{ID_name};
+    component.set(ID_identifier, lambda_this_capture);
+    component.add(ID_C_source_location) = location;
+    name.get_sub().push_back(std::move(component));
+    name.add_source_location() = location;
+    return name;
+  };
+  std::function<void(irept &)> rewrite = [&](irept &node)
+  {
+    if(node.id() == ID_lambda)
+      return;
+    if(node.id() == "cpp-this")
+    {
+      const source_locationt location =
+        static_cast<const exprt &>(node).source_location();
+      node = this_member(location);
+      return;
+    }
+    if(
+      node.id() == ID_side_effect &&
+      node.get(ID_statement) == ID_function_call && !node.get_sub().empty())
+    {
+      irept &callee = node.get_sub().front();
+      if(
+        callee.id() == ID_cpp_name && !callee.get_sub().empty() &&
+        callee.get_sub().front().id() == ID_name &&
+        member_functions.count(callee.get_sub().front().get(ID_identifier)) !=
+          0 &&
+        (callee.get_sub().size() == 1 ||
+         (callee.get_sub().size() == 2 &&
+          callee.get_sub()[1].id() == ID_template_args)))
+      {
+        const source_locationt location =
+          static_cast<const exprt &>(callee).source_location();
+        exprt member{ID_ptrmember};
+        member.add_to_operands(this_member(location));
+        member.add(ID_component_cpp_name) = callee;
+        member.add_source_location() = location;
+        callee = std::move(member);
+      }
+    }
+    for(auto &sub : node.get_sub())
+      rewrite(sub);
+    for(auto &named : node.get_named_sub())
+    {
+      if(named.first != ID_component_cpp_name)
+        rewrite(named.second);
+    }
+  };
+  rewrite(body);
+}
+
 void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 {
   // Lower C++11 lambda by creating a function where captured variables
@@ -10512,6 +10579,15 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // function cannot be modelled this way; such lambdas stay on the
   // function-pointer lowering.
   bool member_context_unsupported = false;
+  // N5008 [expr.prim.this]/2, [expr.prim.lambda.capture]/8, /10: in the body
+  // of a lambda that captures `this' by reference ([this], or a
+  // capture-default that odr-uses it), `this' and the implicit object of an
+  // unqualified member function call ([class.mfct.non.static]/2) are the
+  // enclosing object.  The closure keeps the captured pointer in a member
+  // named lambda_this_capture; the body's explicit `this' and those calls
+  // are rewritten to use it (rewrite_lambda_this_uses).
+  bool lambda_needs_this_pointer = false;
+  std::set<irep_idt> lambda_member_function_names;
   if(lambda_in_member_context)
   {
     if(
@@ -10537,7 +10613,12 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       scan(saved_lambda_body);
 
       if(uses_explicit_this)
-        member_context_unsupported = true;
+      {
+        if(lambda_has_star_this)
+          member_context_unsupported = true;
+        else
+          lambda_needs_this_pointer = true;
+      }
 
       const struct_typet &enclosing_struct = this_struct_type();
       std::vector<irep_idt> member_captures;
@@ -10577,15 +10658,29 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
                 .lookup(
                   name, cpp_scopet::QUALIFIED, cpp_idt::id_classt::TEMPLATE);
             if(!tmpl_hits.empty())
-              member_context_unsupported = true;
+            {
+              if(lambda_has_star_this)
+                member_context_unsupported = true;
+              else
+              {
+                lambda_needs_this_pointer = true;
+                lambda_member_function_names.insert(name);
+              }
+            }
           }
           continue;
         }
         if(comp->type().id() == ID_code)
         {
-          // odr-use of a member function -- not modellable as a data-member
-          // capture.
-          member_context_unsupported = true;
+          // odr-use of a member function: called through the captured
+          // `this' (not modellable as a data-member capture of a copy)
+          if(lambda_has_star_this)
+            member_context_unsupported = true;
+          else
+          {
+            lambda_needs_this_pointer = true;
+            lambda_member_function_names.insert(name);
+          }
           continue;
         }
         member_captures.push_back(name);
@@ -10609,6 +10704,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           if(member_by_ref)
             by_ref_captures.insert(name);
         }
+        // the captured `this' itself, a pointer copied into the closure
+        if(lambda_needs_this_pointer)
+          capture_values[lambda_this_capture] = lambda_enclosing_this;
       }
     }
     else
@@ -11265,6 +11363,25 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         if(!lambda_is_mutable)
           op_dtor.method_qualifier() = typet(ID_const);
         op_dtor.value() = static_cast<const exprt &>(saved_lambda_body);
+        if(lambda_needs_this_pointer)
+        {
+          std::set<irep_idt> parameter_names;
+          for(const auto &p : saved_lambda_parameters.get_sub())
+          {
+            const cpp_declarationt &pdecl =
+              static_cast<const cpp_declarationt &>(p);
+            if(!pdecl.declarators().empty())
+            {
+              const auto &n = pdecl.declarators().front().name().get_sub();
+              if(n.size() == 1 && n.front().id() == ID_name)
+                parameter_names.insert(n.front().get(ID_identifier));
+            }
+          }
+          for(const auto &n : parameter_names)
+            lambda_member_function_names.erase(n);
+          rewrite_lambda_this_uses(
+            op_dtor.value(), lambda_member_function_names);
+        }
         op_decl.declarators().push_back(op_dtor);
         body.push_back(op_decl);
       }
