@@ -13267,3 +13267,40 @@ Remaining KNOWNBUGs:
 Suites (binW5 = HEAD minus notes): cbmc-cpp and cpp (-e -p) pass; -K on
 the four KNOWNBUG directories passes; lint exit 0; every new/promoted CORE
 test fails on bin53 (test_cpp17.desc, rejects-invalid, excepted).
+
+## Round 163x
+
+Commits (on ae5a1908de):
+- f6f9c4c6a8 `B()' mem-initializer zero-initializes a POD base
+  ([dcl.init.general]/9); it stayed nondet (also bin53).
+- eeda3f986f constructor template specializations get the complete
+  member-initialization list (complete_constructor_template_initializers,
+  after prepare_deferred_method_body's pack expansion): base default
+  ctors, NSDMIs and vtable pointers were all missing (tv.cpp: virtual call
+  through a template-constructed object hit the base).  Needed:
+  template-id mem-initializers matched by specialization, not by name
+  (except still-unexpanded `leaf<T>(u)...'); `sizeof...(P)' operands kept
+  by the empty-pack cleanup.  W6 caught 6 regressions from the first
+  cut (two_leaf_base_pack_meminit, multi_pack_ctor, piecewise, map
+  insert), fixed before commit.  KNOWNBUG
+  cpp11_constructor_template_default_constructs_base is CORE.
+
+Investigated, not fixed:
+- libc++ functional / ranges: the failing call constructs
+  tuple<Closure &&> from a tuple (__compressed_pair's by-value
+  `tuple<_Args...>' parameters), selecting the converting template
+  `tuple(_Up &&...)' with _Up = tuple, so `std::forward<_Up>(__u)'
+  ... has no __tuple_leaf constructor.  Header-based probes
+  (lt*.cpp: forward_as_tuple of closures, by-value tuple parameters,
+  move construction) all pass; kb_W_func_fwd's reduction lost the
+  forward definition, restarted as kb_X_func with KEEPs for
+  __tuple_leaf(_Tp &&) and a forward definition.
+- libstdc++ format: _M_parse_format_spec<remove_cvref_t<int>> makes
+  formatter<remove_cvref_t<int>, char> (alias left as template argument)
+  without parse ("symbol 'parse' is unknown"), dropping _M_visit.
+  Header-based imitations (al*.cpp, with type_identity_t and
+  remove_cvref_t packs, virtual _M_format_arg) pass; kb_W_fmt_visit
+  continues.
+- memory_resource: kb_V_memres restarted on the current binary.
+
+Suites (binW8 = HEAD's code): cbmc-cpp and cpp pass.
