@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ non-template constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ constructor template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.base.init]/9.3, /13: a constructor default-initializes the
+bases its mem-initializer-list does not name.  typecheck_compound_body
+completes the list of non-template constructors
+(full_member_initialization); a constructor template's specialization
+never gets it, so leaf's user-provided default constructor is not called
+and t.value is nondeterministic (also bin53).  Calling
+full_member_initialization in instantiate_template was tried (round 163w)
+and double-initialized: mem-initializer pack expansions (`leaf<I, T>(u)...')
+are expanded later, when the method body is converted.  Found while
+reducing libc++'s __tuple_impl.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.
