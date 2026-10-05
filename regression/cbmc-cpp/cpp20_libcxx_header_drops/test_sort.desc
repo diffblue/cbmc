@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 sort.cpp
 --cpp17 --stdlib libc++ --unwind 8 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ sorted: SUCCESS$
@@ -11,13 +11,10 @@ sort.cpp
 ^CONVERSION ERROR$
 no body for callee
 --
-libc++ (LLVM 18) <algorithm>: std::sort on int has no body for
-std::__sort<__less<int, int> &, int *>.  libc++ declares that specialization
-`extern template' (sort.h:905, [temp.explicit]/12: an explicit instantiation
-declaration suppresses implicit instantiation; the definition is in
-libc++.so).  The definition is visible in the header, so the front end
-could instantiate it for verification, as it does for user code (a
-header-free `extern template' works).  Existing tests such as
-cpp20_algorithm_basic_libcxx accept either verdict and hide this.
+libc++ (LLVM 18) <algorithm>: std::sort on int called
+std::__sort<__less<int, int> &, int *>, which libc++ declares `extern
+template' (sort.h:905) and defines only in libc++.so (src/algorithm.cpp;
+the header has only the declaration, sort.h:892), so it had no body.
+Fixed (round 163w): provide_stdlib_bodies models it (test_sort_types.desc).
 clang++ 18 -stdlib=libc++ accepts this program, and it fails only its
 WRONG assertion.
