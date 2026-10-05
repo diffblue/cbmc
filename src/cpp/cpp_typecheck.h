@@ -1200,6 +1200,7 @@ protected:
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
+  void user_defined_numeric_literal(side_effect_expr_function_callt &expr);
   bool bind_requires_parameter_pack(const irep_idt &name, const typet &type);
   void expand_requires_parameter_packs(exprt &expr);
   void expand_requires_parameter_packs_in_type(irept &type);
