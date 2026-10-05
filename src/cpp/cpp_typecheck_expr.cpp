@@ -11192,7 +11192,34 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
               irept nm(ID_name);
               nm.set(ID_identifier, tpname);
               cn.get_sub().push_back(nm);
-              pdecl.type() = cn;
+              // N5008 [dcl.spec.auto.general]/3: the placeholder is replaced
+              // by the invented parameter -- only the `auto' itself, so a
+              // `const auto &' parameter stays a reference to const (an
+              // rvalue argument binds to it, [dcl.init.ref]/5.3)
+              std::function<bool(irept &)> replace_auto = [&](irept &t)
+              {
+                if(t.id() == ID_auto)
+                {
+                  // keep the ellipsis marking of an `auto...' pack
+                  const bool ellipsis = t.get_bool(ID_ellipsis);
+                  t = cn;
+                  if(ellipsis)
+                    t.set(ID_ellipsis, true);
+                  return true;
+                }
+                bool replaced = false;
+                // merged_type / frontend_pointer subtypes (has_auto)
+                if(
+                  t.id() == ID_merged_type || t.id() == ID_frontend_pointer ||
+                  t.id() == ID_pointer)
+                {
+                  for(auto &sub : t.get_sub())
+                    replaced = replace_auto(sub) || replaced;
+                }
+                return replaced;
+              };
+              if(!replace_auto(pdecl.type()))
+                pdecl.type() = cn;
             }
             else if(
               pdecl.type().id() == ID_cpp_name &&
