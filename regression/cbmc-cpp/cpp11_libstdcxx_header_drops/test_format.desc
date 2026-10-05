@@ -12,11 +12,13 @@ format.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-libstdc++ 13 <format>: std::format("{}", 42) returns a nondeterministic
-string, so the first assertion fails.  It used to crash (SIGSEGV;
-cpp11_partial_specialization_const_T_matching_const_array) and then failed
-to convert (cpp11_brace_elision_in_return_and_argument).  Remaining drops:
-format:1422 'format' (__formatter_fp::format), 2456 _M_write and
-bits/ranges_algobase.h:311 operator() (std::ranges::copy, see
-test_ranges_copy.desc).  g++ 13 accepts this program, and it fails only its
-WRONG assertion.
+libstdc++ 13 <format>: std::format("{}", 42) is empty.  Fixed (round
+163w): format:1422 __formatter_fp::format was instantiated for int, because
+formatter<int, char> selected the floating-point partial specialization
+(cpp20_partial_specialization_type_constraint), and _M_format_arg's
+visitor lambda, which uses `this', got a closure
+(cpp14_lambda_this_capture_member_calls).  Now dropped: format:3124
+basic_format_arg::_M_visit (twice), format:3353 _Arg_store::_S_make_elt,
+format:3698 _M_parse_format_spec and three closure `operator()'s (being
+reduced: /tmp/r163/red/kb_W_fmt_visit).  g++ 13 accepts this program, and
+it fails only its WRONG assertion.

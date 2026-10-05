@@ -13209,3 +13209,61 @@ Reductions (cvise on cbmc_V0):
 Suites (binV5 = HEAD): cbmc-cpp, cpp (-e -p) pass; -K on the 19 KNOWNBUG
 directories passes; lint exit 0.  All new/promoted CORE tests fail on
 bin53.
+
+## Round 163w: KNOWNBUGs, oldest standard first
+
+Commits (on 4810cde624):
+- 2cc880c1eb [lex.ext]/3-4 user-defined numeric literals (cooked / raw /
+  template forms, literal operator template instances named with their
+  arguments, `64us' = 64 + ud-suffix `us').  libstdc++ chrono `12h'.
+- d08f02218a type-constraints of class and variable partial
+  specializations evaluated via #C_type_constraint + evaluate_constraint
+  ([temp.spec.partial.match]/2): formatter<int> got the fp spec.
+- 3f694b1c43 generic-lambda closure kept `const' of `const auto &'.
+- 34514cda5d lambdas using `this' / member calls get closures
+  (lambda_this_capture member, rewrite_lambda_this_uses).  format:1422 gone.
+- cdfa355a3e NSDMIs of POD virtual bases applied by the most derived class.
+- d9a71d1a44 tag_scope: `struct timespec' through `using ::timespec'.
+  stop_token CORE.
+- 79bb750259 ranking: template penalty binary; cv/rvalue tie-breakers only
+  between reference bindings (ranks per candidate, not keyed by exprt --
+  #-comments make candidates compare equal); non-deduced constant pattern
+  arguments in partial ordering; arg count = last resort.  filesystem
+  CORE.  Regressions found and fixed on the way: __niter_wrap (erase_if,
+  sort), _Variadic_union (variant get), pair(const&, const&) vs (U&&, V&&)
+  (map of move-only).
+- de9d43f7db libc++.so std::__sort model (insertion sort).  test_sort CORE.
+- ac7db28c74 [over.match.copy]/1.2 explicit conversion function in
+  direct-init.  libc++ chrono CORE.
+- fe0b911c1c, b670bb9db9 C++20 paren-aggregate: single expression for POD;
+  class-type elements constructed, not assigned.
+- 6bb344612a member template specializations in unevaluated operands held
+  back (speculative_instances).  views_take test_reduced CORE.
+
+Tried and reverted:
+- instantiating `extern template' member function specializations
+  (_M_insert<long>): exposes eager instantiation of basic_ostream<char>
+  from inside basic_ios<char> (typedef chain through ostreambuf_iterator),
+  so basic_ostream keeps basic_ios's partial member list.  Re-elaborating
+  via #dropped_incomplete_base when the base is in elaborations_in_progress
+  crashed (stale instance scope: convert_identifier type-nil invariant).
+- full_member_initialization for ctor template instances in
+  instantiate_template: mem-initializer packs are expanded later (method
+  bodies), so it double-initialized.  The base-default-ctor gap of
+  constructor templates (mi4.cpp: `template <class... U> impl(U...) {}'
+  never calls leaf's user default ctor, also bin53) remains open.
+- has_conflict() in function_template_at_least_as_specialised: packs
+  report nil, broke _Variadic_union.
+
+Remaining KNOWNBUGs:
+- libstdc++ format/chrono/namespace_reopened: format:3124 _M_visit
+  (+ _S_make_elt, _M_parse_format_spec); reducing kb_W_fmt_visit.
+- libstdc++ ostream_int: see above.
+- libstdc++ memory_resource: kb_V_memres still reducing.
+- libc++ functional, ranges_basic_libcxx: tuple:469/473
+  `std::forward<_Up>(__u)...' "template 'forward' not found"; reducing
+  kb_W_func_fwd (a header-free imitation, inv/tf.cpp, passes).
+
+Suites (binW5 = HEAD minus notes): cbmc-cpp and cpp (-e -p) pass; -K on
+the four KNOWNBUG directories passes; lint exit 0; every new/promoted CORE
+test fails on bin53 (test_cpp17.desc, rejects-invalid, excepted).
