@@ -1485,7 +1485,96 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
   // template-argument lists in the body (e.g. `Tr<U...>` -> `Tr<>` for an
   // empty `U`).
   remove_empty_pack_expansion_args(body);
+
+  complete_constructor_template_initializers(method_symbol);
 } // NOLINT(readability/fn_size)
+
+/// N5008 [class.base.init]/9, /13, [class.default.ctor]: a constructor
+/// initializes, in order, the virtual bases (in the most derived class),
+/// the direct bases and the non-static data members its
+/// mem-initializer-list does not name -- by default-initialization or from
+/// their default member initializers -- and installs the virtual pointers
+/// (Itanium C++ ABI 2.6).  typecheck_compound_body completes the list of
+/// each non-template constructor (full_member_initialization) before
+/// typecheck_member_function moves it into the body.  A constructor
+/// TEMPLATE's specialization was never completed: its bases' default
+/// constructors, the members' default member initializers and the vtable
+/// pointer were missing.  Its mem-initializers are complete only after the
+/// pack expansions of prepare_deferred_method_body (`leaf<I, T>(u)...'),
+/// so complete the list here, from the leading member-initializer
+/// statements of the body, once.
+void cpp_typecheckt::complete_constructor_template_initializers(
+  symbolt &method_symbol)
+{
+  if(
+    method_symbol.type.id() != ID_code ||
+    to_code_type(method_symbol.type).return_type().id() != ID_constructor ||
+    method_symbol.type.find(irep_idt{"#fn_template_type"}).is_nil() ||
+    method_symbol.value.get_bool("#member_initialization_complete"))
+  {
+    return;
+  }
+  exprt &value = method_symbol.value.id() == ID_cpp_not_typechecked &&
+                     method_symbol.value.has_operands()
+                   ? to_multi_ary_expr(method_symbol.value).op0()
+                   : method_symbol.value;
+  if(value.id() != ID_code || to_code(value).get_statement() != ID_block)
+    return;
+  const auto &parameters = to_code_type(method_symbol.type).parameters();
+  if(
+    parameters.empty() || parameters.front().type().id() != ID_pointer ||
+    to_pointer_type(parameters.front().type()).base_type().id() !=
+      ID_struct_tag)
+  {
+    return;
+  }
+  const struct_tag_typet &class_tag =
+    to_struct_tag_type(to_pointer_type(parameters.front().type()).base_type());
+  const symbolt *class_symbol = symbol_table.lookup(class_tag.get_identifier());
+  if(class_symbol == nullptr || class_symbol->type.id() != ID_struct)
+    return;
+  const struct_typet &class_type = to_struct_type(class_symbol->type);
+
+  // the leading statements are the mem-initializers (move_member_initializers)
+  auto &statements = to_code_block(to_code(value)).statements();
+  irept initializers(ID_member_initializers);
+  std::size_t count = 0;
+  while(count < statements.size() &&
+        statements[count].get_statement() == ID_member_initializer)
+  {
+    initializers.get_sub().push_back(statements[count]);
+    ++count;
+  }
+
+  cpp_save_scopet save_scope(cpp_scopes);
+  cpp_scopes.set_scope(class_symbol->name);
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    check_member_initializers(
+      class_type.bases(),
+      class_type.components(),
+      initializers,
+      class_type.get(ID_name),
+      class_type.get_bool(ID_template_class_instance));
+    full_member_initialization(class_type, initializers);
+  }
+  catch(...)
+  {
+    // leave the body as it is (the previous behaviour)
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return;
+  }
+
+  code_blockt::operandst completed;
+  for(const auto &initializer : initializers.get_sub())
+    completed.push_back(static_cast<const exprt &>(initializer));
+  for(std::size_t i = count; i < statements.size(); ++i)
+    completed.push_back(statements[i]);
+  value.operands().swap(completed);
+  method_symbol.value.set("#member_initialization_complete", true);
+}
 
 void cpp_typecheckt::typecheck_method_bodies()
 {

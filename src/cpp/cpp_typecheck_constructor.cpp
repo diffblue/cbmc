@@ -1024,6 +1024,10 @@ void cpp_typecheckt::full_member_initialization(
       std::function<bool(const irept &)> refs_empty_pack =
         [&](const irept &n) -> bool
       {
+        // N5008 [expr.sizeof]/5: `sizeof...(P)' of an empty pack is 0, a
+        // valid operand -- not an expansion to drop
+        if(n.id() == ID_sizeof)
+          return false;
         if(n.id() == ID_template_parameter_symbol_type)
         {
           const std::string f = id2string(n.get(ID_identifier));
@@ -1672,6 +1676,51 @@ void cpp_typecheckt::full_member_initialization(
         {
           irep_idt init_base_name =
             to_cpp_name(initializer.find(ID_member)).get_base_name();
+          // [class.base.init]/2: `leaf<0, int>' and `leaf<1, long>' share
+          // the name `leaf' but denote different bases (the pack-expanded
+          // mem-initializers of libc++'s __tuple_impl); a template-id is
+          // matched by the type it denotes when that resolves
+          // (not for a still unexpanded pack expansion `leaf<T>(u)...',
+          // whose pattern names every element)
+          std::function<bool(const irept &)> has_ellipsis =
+            [&has_ellipsis](const irept &node)
+          {
+            if(node.get_bool(ID_ellipsis))
+              return true;
+            for(const auto &sub : node.get_sub())
+              if(has_ellipsis(sub))
+                return true;
+            for(const auto &named : node.get_named_sub())
+              if(has_ellipsis(named.second))
+                return true;
+            return false;
+          };
+          bool other_specialization = false;
+          if(
+            has_template_args && ctorsymb.base_name == init_base_name &&
+            !has_ellipsis(initializer))
+          {
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              typet resolved = member_type;
+              drop_empty_pack_template_args(resolved);
+              typecheck_type(resolved);
+              other_specialization =
+                resolved.id() == ID_struct_tag &&
+                to_struct_tag_type(resolved).get_identifier() !=
+                  to_struct_tag_type(b.type()).get_identifier();
+            }
+            catch(...)
+            {
+            }
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+          }
+          if(other_specialization)
+            continue;
           if(ctorsymb.base_name == init_base_name)
           {
             final_initializers.move_to_sub(initializer);
