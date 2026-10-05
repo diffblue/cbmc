@@ -7618,7 +7618,18 @@ skip_pack_removal_ft:
           add_method_body(&ws);
       }
       else
+      {
+        // N5008 [temp.inst]/4 + [basic.def.odr]/5: a member function
+        // template specialization named only in an unevaluated operand (a
+        // constructor template selected in `decltype(T(args))', libc++'s
+        // __bind_back trailing return type) is not odr-used, so its
+        // definition is not instantiated unless an odr-use follows.  Hold
+        // the body back, as the declarator converter does for function
+        // templates (speculative_instances).
+        if(unevaluated_operand_depth > 0 && !instantiation_stack.empty())
+          speculative_instances.insert(ws.name);
         add_method_body(&ws);
+      }
     }
 
     // [temp.spec]/4 condition-3 fallback: a member function template
