@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/arith_tools.h>
 #include <util/base_exceptions.h> // IWYU pragma: keep
 #include <util/c_types.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
@@ -8050,13 +8051,23 @@ skip_pack_removal_ft:
   // different symbols.
   {
     cpp_namet &declarator_name = new_decl.declarators()[0].name();
-    for(auto &sub : declarator_name.get_sub())
+    auto &subs = declarator_name.get_sub();
+    for(auto &sub : subs)
     {
       if(sub.id() == ID_name)
       {
         sub.set(ID_identifier, id2string(sub.get(ID_identifier)) + suffix);
         break;
       }
+    }
+    // A literal operator template (`operator ""X', [over.literal]/5) has no
+    // function parameters: its specializations differ only in their
+    // template arguments ([lex.ext]/3, `operator ""X<'1', '2'>()').
+    if(
+      subs.size() == 2 && subs[0].id() == ID_operator &&
+      subs[1].get_sub().empty() && has_prefix(id2string(subs[1].id()), "\"\""))
+    {
+      subs[1].id(id2string(subs[1].id()) + suffix);
     }
   }
 

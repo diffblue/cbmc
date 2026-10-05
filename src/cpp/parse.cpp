@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/std_code.h>
 
 #include <ansi-c/ansi_c_y.tab.h>
+#include <ansi-c/literals/convert_integer_literal.h>
 #include <ansi-c/merged_type.h>
 
 #include "cpp_enum_type.h"
@@ -22,6 +23,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_parser.h"
 #include "cpp_token_buffer.h"
 
+#include <cctype>
+#include <cstring>
 #include <map>
 #include <set>
 
@@ -10936,24 +10939,55 @@ bool Parser::rPrimaryExpr(exprt &exp)
     {
       cpp_tokent suffix_tk;
       lex.LookAhead(0, suffix_tk);
-      bool is_udl = !suffix_tk.text.empty() && suffix_tk.text[0] == '_';
+      // N5008 [lex.ext]/1, [lex.pptoken]/3.3: `64us' is one
+      // pp-number, the user-defined-integer-literal `64' with ud-suffix
+      // `us' (a user-defined-integer-literal has no integer-suffix).  The
+      // shared C scanner takes `64u' as an integer literal with suffix
+      // `u' and `s' as the next token; move such trailing suffix letters
+      // back into the ud-suffix (libstdc++'s `__elapsed > 64us').
+      std::string number_text = tk.text;
+      std::string suffix_text = suffix_tk.text;
+      if(tk.kind == TOK_INTEGER)
+      {
+        const bool is_hex = number_text.size() > 1 && number_text[0] == '0' &&
+                            (number_text[1] == 'x' || number_text[1] == 'X');
+        std::size_t end = number_text.size();
+        while(end > 0 && std::strchr("uUlLzZ", number_text[end - 1]) &&
+              !(is_hex && std::isxdigit(number_text[end - 1])))
+        {
+          --end;
+        }
+        if(end > 0 && end < number_text.size())
+        {
+          suffix_text = number_text.substr(end) + suffix_text;
+          number_text.resize(end);
+        }
+      }
+      bool is_udl = !suffix_text.empty() && suffix_text[0] == '_';
       if(
-        !is_udl && (suffix_tk.text == "s" || suffix_tk.text == "h" ||
-                    suffix_tk.text == "min" || suffix_tk.text == "ms" ||
-                    suffix_tk.text == "us" || suffix_tk.text == "ns" ||
-                    suffix_tk.text == "d" || suffix_tk.text == "y" ||
-                    suffix_tk.text == "i" || suffix_tk.text == "il" ||
-                    suffix_tk.text == "if"))
+        !is_udl &&
+        (suffix_text == "s" || suffix_text == "h" || suffix_text == "min" ||
+         suffix_text == "ms" || suffix_text == "us" || suffix_text == "ns" ||
+         suffix_text == "d" || suffix_text == "y" || suffix_text == "i" ||
+         suffix_text == "il" || suffix_text == "if"))
       {
         is_udl = true;
       }
       if(is_udl)
       {
         lex.get_token(suffix_tk);
+        if(number_text.size() != tk.text.size())
+        {
+          // the literal without the letters moved into the ud-suffix
+          tk.text = number_text;
+          source_locationt location = exp.source_location();
+          exp = convert_integer_literal(number_text);
+          exp.add_source_location() = location;
+        }
         // Build cpp_name: operator + ""_suffix
         irept op_node(ID_operator);
         set_location(op_node, tk);
-        irept suffix_node("\"\"" + suffix_tk.text);
+        irept suffix_node("\"\"" + suffix_text);
         set_location(suffix_node, tk);
 
         exprt name_expr(ID_cpp_name);
@@ -10961,9 +10995,20 @@ bool Parser::rPrimaryExpr(exprt &exp)
         name_expr.get_sub().push_back(suffix_node);
         set_location(name_expr, tk);
 
+        // N5008 [lex.ext]/3-4: the form of the call (cooked, raw or
+        // template) depends on the literal operators found; keep the
+        // literal's spelling for cpp_typecheckt::user_defined_numeric_literal
+        const bool is_numeric = tk.kind != TOK_CHARACTER;
         side_effect_expr_function_callt fc(
           std::move(name_expr), {std::move(exp)}, typet{}, source_locationt{});
         set_location(fc, tk);
+        if(is_numeric)
+        {
+          fc.set(
+            "#user_defined_literal",
+            tk.kind == TOK_INTEGER ? ID_integer : ID_floatbv);
+          fc.set("#literal_spelling", tk.text);
+        }
         exp.swap(fc);
       }
     }
