@@ -13,14 +13,8 @@ dropped the body
 --
 libstdc++ 13's <format>: the four inline std::vformat overloads
 (format:3784/3793/3802/3811) were dropped with "scope '__format' is
-ambiguous" -- the class template __format::_Arg_store is declared in
-namespace std::__format, defined outside it by a qualified name, and the
-namespace is reopened afterwards; see test.desc (header-free, CORE).  That
-is fixed.  Now __formatter_fp::format (format:1422) is dropped: the visitor
-lambda of _Formatting_scanner::_M_format_arg is generic, captures `this' in
-a member function, so it is not closure-lowered, and its body is
-type-checked with `int' for auto, which instantiates format with an
-unresolved `_Type' (the closure-lowered case is fixed:
-cpp14_generic_lambda_body_checked_with_placeholder_type).  Round-163
-audit: cpp20_format_header.  Pre-existing
-(round-162 snapshot bin51).
+ambiguous" -- see test.desc (header-free, CORE).  That is fixed, and so is
+the later format:1422 drop (cpp11_libstdcxx_header_drops/
+test_format.desc).  Remaining: format:3124 basic_format_arg::_M_visit, the
+same drop as test_format.desc.  g++ 13 accepts this program, and it fails
+only its WRONG assertion.

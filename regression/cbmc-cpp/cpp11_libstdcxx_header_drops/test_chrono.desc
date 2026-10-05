@@ -12,9 +12,10 @@ chrono.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-libstdc++ 13 <chrono>: drops chrono.h:193/233 from_utc, 2515 make12, 2525
-make24, 3220 __get_leap_second_info, bits/chrono.h:822 operator<,
-bits/unique_ptr.h:93, bits/shared_ptr_base.h:427 _M_dispose and 913
-__shared_count (see test_filesystem.desc) and the <format> drops (see
-test_format.desc).  g++ 13 accepts this program, and it fails only its WRONG
-assertion.
+libstdc++ 13 <chrono>: `12h' (chrono_literals) is fixed
+(cpp11_user_defined_literal_call_forms), as is format:1422 (see
+test_format.desc).  Remaining: <format>'s basic_format_arg::_M_visit
+(format:3124), the same drop as test_format.desc.  (bits/unique_ptr.h:93,
+default_delete::operator() for an incomplete type, is not reported as a
+system-header function and is not odr-used.)  g++ 13 accepts this
+program, and it fails only its WRONG assertion.
