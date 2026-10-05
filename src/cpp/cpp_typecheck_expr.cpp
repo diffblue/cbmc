@@ -98,6 +98,9 @@ bool cpp_typecheckt::requirement_expression_is_valid(exprt op)
     // (gcc-16 <optional>'s _M_apply, reduced to a 30-line kernel).
     expand_requires_parameter_packs(op);
     template_map.expand_call_argument_packs(op);
+    // [expr.prim.req.general]/2: the expressions of a requires-expression
+    // are unevaluated operands -- nothing they name is odr-used
+    unevaluated_operandt unevaluated_guard{*this};
     typecheck_expr(op);
   }
   catch(...)
@@ -6719,7 +6722,9 @@ void cpp_typecheckt::typecheck_expr_cpp_name(
   else if(expr.id() == ID_member)
   {
     const irep_idt &component = expr.get(ID_component_name);
-    if(!component.empty())
+    // [basic.def.odr]/5: a member named in an unevaluated operand is not
+    // odr-used, so its definition is not instantiated ([temp.inst]/4)
+    if(!component.empty() && unevaluated_operand_depth == 0)
     {
       auto it = deferred_method_bodies.find(component);
       if(it != deferred_method_bodies.end())
@@ -8350,7 +8355,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // instantiation) -- e.g. std::string::rfind, whose out-of-line .tcc
   // body reached the extern-instantiated basic_string<char> only
   // through the deferred queue.
-  if(expr.function().id() == ID_member)
+  if(expr.function().id() == ID_member && unevaluated_operand_depth == 0)
   {
     const irep_idt &component = expr.function().get(ID_component_name);
     auto it = deferred_method_bodies.find(component);
@@ -8360,7 +8365,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       deferred_method_bodies.erase(it);
     }
   }
-  if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function()))
+  const auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(expr.function());
+  if(sym_expr != nullptr && unevaluated_operand_depth == 0)
   {
     auto it = deferred_method_bodies.find(sym_expr->get_identifier());
     if(it != deferred_method_bodies.end())
@@ -9861,7 +9867,11 @@ void cpp_typecheckt::convert_pmop(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_function_identifier(exprt &expr)
 {
-  if(expr.id() == ID_symbol)
+  // [basic.def.odr]/5, [temp.inst]/4: a function named only in an
+  // unevaluated operand is not odr-used; its definition is instantiated
+  // only if an odr-use follows (release_referenced_held_back_bodies and the
+  // deferred-body drain find that use)
+  if(expr.id() == ID_symbol && unevaluated_operand_depth == 0)
   {
     // Check if the function body has to be typechecked
     symbolt &function_symbol =
