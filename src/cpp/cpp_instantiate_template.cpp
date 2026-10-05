@@ -2199,6 +2199,34 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                   spec_params[pi].get("#C_concept_constraint");
                 if(cc.empty())
                   continue;
+                // N5008 [temp.param]/4: the type-constraint `C T' (`C<A...>
+                // T') introduces the constraint-expression `C<T>' (`C<T,
+                // A...>', add_type_constraint); [temp.spec.partial.match]/2:
+                // the specialization matches only if it is satisfied by the
+                // deduced arguments.  Evaluate that concept-id like any other
+                // ([temp.constr.atomic]/3: a substitution failure makes it
+                // unsatisfied); only an undecided result falls back to the
+                // structural check below.
+                {
+                  const irept &type_constraint =
+                    spec_params[pi].find("#C_type_constraint");
+                  if(type_constraint.is_not_nil())
+                  {
+                    exprt constraint_copy =
+                      static_cast<const exprt &>(type_constraint);
+                    template_map.apply(constraint_copy);
+                    const auto satisfied = evaluate_constraint(constraint_copy);
+                    if(satisfied.has_value())
+                    {
+                      if(!*satisfied)
+                      {
+                        params_ok = false;
+                        break;
+                      }
+                      continue;
+                    }
+                  }
+                }
                 const auto concept_ids =
                   cpp_scopes.current_scope().lookup(cc, cpp_scopet::RECURSIVE);
                 if(concept_ids.empty())
@@ -7817,6 +7845,41 @@ skip_pack_removal_ft:
             if(!c_type_match)
               continue;
 
+            // N5008 [temp.spec.partial.match]/2 ([temp.spec.partial.general]/1
+            // makes it apply to variable templates): the specialization
+            // matches only if its associated constraints -- the
+            // requires-clause and the type-constraints of its parameters,
+            // [temp.constr.decl]/3, [temp.param]/4 -- are satisfied by the
+            // deduced arguments, bound in template_map.
+            // A type-constraint decided here is not checked again below.
+            std::vector<bool> type_constraint_decided;
+            {
+              const auto evaluate = [this](const irept &constraint)
+              {
+                if(constraint.is_nil() || constraint.id() == ID_nil)
+                  return std::optional<bool>{};
+                exprt copy = static_cast<const exprt &>(constraint);
+                template_map.apply(copy);
+                return evaluate_constraint(copy);
+              };
+              const auto requires_clause =
+                evaluate(spec_decl.template_type().find(ID_C_requires_clause));
+              bool unsatisfied =
+                requires_clause.has_value() && !*requires_clause;
+              for(const auto &p :
+                  spec_decl.template_type().template_parameters())
+              {
+                const auto satisfied =
+                  unsatisfied ? std::optional<bool>{}
+                              : evaluate(p.find("#C_type_constraint"));
+                if(satisfied.has_value() && !*satisfied)
+                  unsatisfied = true;
+                type_constraint_decided.push_back(satisfied.has_value());
+              }
+              if(unsatisfied)
+                continue;
+            }
+
             // Evaluate concept constraints on template parameters.
             // Skip specializations whose concept is not satisfied.
             {
@@ -7830,8 +7893,12 @@ skip_pack_removal_ft:
               {
                 const irep_idt &cc =
                   spec_params[pi].get("#C_concept_constraint");
-                if(cc.empty())
+                if(
+                  cc.empty() || (pi < type_constraint_decided.size() &&
+                                 type_constraint_decided[pi]))
+                {
                   continue;
+                }
                 const auto concept_ids =
                   cpp_scopes.current_scope().lookup(cc, cpp_scopet::RECURSIVE);
                 if(concept_ids.empty())

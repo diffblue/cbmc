@@ -1,0 +1,32 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ floating-point specialization: SUCCESS$
+^\[main\.assertion\.2\] line \d+ its member template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ integral specialization: SUCCESS$
+^\[main\.assertion\.4\] line \d+ its member template too: SUCCESS$
+^\[main\.assertion\.5\] line \d+ satisfied: SUCCESS$
+^\[main\.assertion\.6\] line \d+ unsatisfied: primary: SUCCESS$
+^\[main\.assertion\.7\] line \d+ variable template: SUCCESS$
+^\[main\.assertion\.8\] line \d+ requires-clause: SUCCESS$
+^\[main\.assertion\.9\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.spec.partial.match]/2, [temp.param]/4: a partial
+specialization `template <C T> struct S<T>' matches only if C<T> is
+satisfied by the deduced T.  The class-template search evaluated the
+concept's body structurally and failed when it named a variable or class
+template (`is_integral_v<T>', so fmt<double, char> got std::integral's
+specialization), and the variable-template search checked neither the
+type-constraints nor the requires-clause.  Both now evaluate the
+type-constraint's concept-id (#C_type_constraint) and the requires-clause
+with evaluate_constraint.  Found from libstdc++ <format>: formatter<int,
+char> was the floating-point specialization, so __formatter_fp::format
+(format:1422) was instantiated for int
+(cpp11_libstdcxx_header_drops/test_format.desc).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
