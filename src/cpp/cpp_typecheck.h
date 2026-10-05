@@ -1201,6 +1201,11 @@ protected:
   void typecheck_expr_is_invocable(exprt &expr);
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
   void user_defined_numeric_literal(side_effect_expr_function_callt &expr);
+  /// The closure member holding a lambda's captured `this'
+  static constexpr const char *lambda_this_capture = "__cbmc_lambda_this";
+  void rewrite_lambda_this_uses(
+    irept &body,
+    const std::set<irep_idt> &member_functions);
   bool bind_requires_parameter_pack(const irep_idt &name, const typet &type);
   void expand_requires_parameter_packs(exprt &expr);
   void expand_requires_parameter_packs_in_type(irept &type);
