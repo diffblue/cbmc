@@ -1,9 +1,12 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ non-template constructor: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ constructor template: SUCCESS$
-^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.3\] line \d+ vtable pointer and NSDMI: SUCCESS$
+^\[main\.assertion\.4\] line \d+ pack-expanded bases: SUCCESS$
+^\[main\.assertion\.5\] line \d+ value-initialized base: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -11,14 +14,18 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [class.base.init]/9.3, /13: a constructor default-initializes the
-bases its mem-initializer-list does not name.  typecheck_compound_body
-completes the list of non-template constructors
-(full_member_initialization); a constructor template's specialization
-never gets it, so leaf's user-provided default constructor is not called
-and t.value is nondeterministic (also bin53).  Calling
-full_member_initialization in instantiate_template was tried (round 163w)
-and double-initialized: mem-initializer pack expansions (`leaf<I, T>(u)...')
-are expanded later, when the method body is converted.  Found while
-reducing libc++'s __tuple_impl.  g++ 13 and clang++ 18 accept this
-program, and it fails only its WRONG assertion.
+N5008 [class.base.init]/9, /13: a constructor default-initializes the
+bases and members its mem-initializer-list does not name and installs the
+virtual pointers.  typecheck_compound_body completes the list of
+non-template constructors (full_member_initialization); a constructor
+template's specializations never got it, so a base's default constructor,
+the members' default member initializers and the vtable pointer were
+missing (bin53).  complete_constructor_template_initializers now
+completes the list after prepare_deferred_method_body has expanded the
+mem-initializer packs.  That needed two more fixes:
+full_member_initialization matched `element<0, int>(a)' and `element<1,
+long>(a)' to the same base by the name `element' ([class.base.init]/2:
+a template-id denotes its specialization), and an empty mem-initializer
+`B()' of a POD base did not value-initialize it ([dcl.init.general]/9).
+Found while reducing libc++'s __tuple_impl.  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

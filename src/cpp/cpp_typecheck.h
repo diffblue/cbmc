@@ -1008,6 +1008,7 @@ protected:
   /// ([temp.inst]/1, [temp.variadic]/5,7); used by both drains in
   /// typecheck_method_bodies.
   void prepare_deferred_method_body(symbolt &method_symbol);
+  void complete_constructor_template_initializers(symbolt &method_symbol);
   /// Collapse zero-length pack expansions (N5008 [temp.variadic]/7) in
   /// template-argument lists within an instantiated function-template body,
   /// using the empty packs recorded in the current `template_map`.
