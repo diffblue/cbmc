@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ parenthesized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one element: SUCCESS$
+^\[main\.assertion\.3\] line \d+ braced: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6.2.2 (C++20): the
+elements of `agg a(3, 4)' are copy-initialized; the element of class type
+`conv' is constructed from 3.  The parenthesized aggregate initialization
+assigned to the member instead (operator= of a converted temporary,
+"member 'conv::operator=' is not accessible" for the deleted one, bin53).
+Found from libc++'s __tuple_leaf (tuple:469).  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

@@ -1030,6 +1030,27 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 ++idx;
                 continue;
               }
+              // [dcl.init.aggr]/4.2: an element of class type is
+              // copy-initialized from its initializer -- by a constructor,
+              // not by assignment to the (not yet constructed) member
+              // (libc++'s `__tuple_leaf<tuple<int>>(__u)', whose member
+              // tuple<int> is constructed from an int, P0960)
+              if(
+                comp.type().id() == ID_struct_tag && !cpp_is_pod(comp.type()) &&
+                op_probe.id() != ID_initializer_list)
+              {
+                exprt class_member = member;
+                already_typechecked_exprt::make_already_typechecked(
+                  class_member);
+                auto member_init = cpp_constructor(
+                  source_location,
+                  class_member,
+                  {already_typechecked_exprt{operands_tc[idx]}});
+                if(member_init.has_value())
+                  block.add(std::move(*member_init));
+                ++idx;
+                continue;
+              }
               val =
                 typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
             }
