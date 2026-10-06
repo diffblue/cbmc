@@ -4737,15 +4737,40 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   // not yet typechecked-stuff
   exprt &initializer = static_cast<exprt &>(expr.add(ID_initializer));
 
-  // arrays must not have an initializer
+  // N5008 [expr.new]/24, [dcl.init.aggr]/4-5: `new T[n]{e1, ..., ek}'
+  // aggregate-initializes the array: element i is copy-initialized from
+  // e_i, the remaining elements are value-initialized (as for `new
+  // T[n]{}').  Keep one initializer per listed element (#element_
+  // initializers, applied by goto conversion before the per-element loop
+  // over the others).  A non-empty parenthesized expression-list for an
+  // array (C++20, [dcl.init.general]/16.5) is not supported.
   if(
     !initializer.operands().empty() &&
     expr.get(ID_statement) == ID_cpp_new_array)
   {
-    error().source_location =
-      to_multi_ary_expr(expr).op0().find_source_location();
-    error() << "new with array type must not use initializer" << eom;
-    throw 0;
+    if(initializer.id() != ID_initializer_list)
+    {
+      error().source_location = expr.find_source_location();
+      error() << "new with array type and parenthesized initializer is not "
+                 "supported"
+              << eom;
+      throw 0;
+    }
+    irept &element_initializers = expr.add("#element_initializers");
+    for(const auto &element : initializer.operands())
+    {
+      exprt element_object(
+        ID_new_object, to_pointer_type(expr.type()).base_type());
+      element_object.set(ID_C_lvalue, true);
+      already_typechecked_exprt::make_already_typechecked(element_object);
+      auto element_code = cpp_constructor(
+        element.find_source_location(), element_object, {element});
+      element_initializers.get_sub().push_back(
+        element_code.has_value() ? static_cast<const irept &>(*element_code)
+                                 : static_cast<const irept &>(code_skipt{}));
+    }
+    // the others are value-initialized
+    initializer.operands().clear();
   }
 
   // For a default-initialized new-expression (no initializer arguments),
@@ -4823,12 +4848,15 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   // [dcl.init.general]/9.2 applies after zero-initialization).
   // The same for a class whose default constructor is not user-provided
   // ([dcl.init.general]/9.1: zero-initialized, then default-initialized).
-  // `new T{}' value-initializes as well ([dcl.init.list]/3.5).
+  // `new T{}' value-initializes as well ([dcl.init.list]/3.5).  For
+  // `new T[n]()' / `new T[n]{}' each element is value-initialized
+  // ([dcl.init.general]/9.3, [dcl.init.aggr]/5); the initializer built
+  // here is applied to each element (cpp_new_initializer).
   const typet &new_object_type = to_pointer_type(expr.type()).base_type();
   if(
     (initializer.get_bool(ID_C_value_initialization) ||
      initializer.id() == ID_initializer_list) &&
-    initializer.operands().empty() && expr.get(ID_statement) == ID_cpp_new &&
+    initializer.operands().empty() &&
     value_initialization_zero_initializes(new_object_type))
   {
     const auto zero = itanium_abi_cpp_zero_initializer(
