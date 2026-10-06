@@ -1537,6 +1537,46 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       std::function<bool(const typet &, const typet &)> same_including_cv =
         [&](const typet &a, const typet &b) -> bool
       {
+        // [dcl.array]/1: the bound of an array type is a value; the front
+        // end's constants for it may differ in their integer type (a
+        // string literal's `c_index_type' bound, a declared `size_t' one)
+        if(a.id() == ID_array && b.id() == ID_array)
+        {
+          const auto bound_a =
+            numeric_cast<mp_integer>(to_array_type(a).size());
+          const auto bound_b =
+            numeric_cast<mp_integer>(to_array_type(b).size());
+          // [basic.type.qualifier]/3: cv-qualifiers of an array type are
+          // those of its elements; the front end records them on either
+          if(bound_a.has_value() && bound_b.has_value())
+          {
+            const auto element = [](const typet &array)
+            {
+              typet e = to_array_type(array).element_type();
+              if(array.get_bool(ID_C_constant))
+                e.set(ID_C_constant, true);
+              if(array.get_bool(ID_C_volatile))
+                e.set(ID_C_volatile, true);
+              return e;
+            };
+            return *bound_a == *bound_b &&
+                   same_including_cv(element(a), element(b));
+          }
+        }
+        if(
+          a.id() == ID_pointer && b.id() == ID_pointer &&
+          to_pointer_type(a).base_type().id() == ID_array &&
+          to_pointer_type(b).base_type().id() == ID_array)
+        {
+          return a.get_bool(ID_C_constant) == b.get_bool(ID_C_constant) &&
+                 a.get_bool(ID_C_volatile) == b.get_bool(ID_C_volatile) &&
+                 a.get_bool(ID_C_reference) == b.get_bool(ID_C_reference) &&
+                 a.get_bool(ID_C_rvalue_reference) ==
+                   b.get_bool(ID_C_rvalue_reference) &&
+                 same_including_cv(
+                   to_pointer_type(a).base_type(),
+                   to_pointer_type(b).base_type());
+        }
         // [basic.fundamental]: wchar_t and int, char and signed char, long
         // and long long are distinct types (same_fundamental_type_name)
         if(a != b || !same_fundamental_type_name(a, b))
