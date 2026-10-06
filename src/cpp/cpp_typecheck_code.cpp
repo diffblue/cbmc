@@ -3239,6 +3239,38 @@ bool cpp_typecheckt::expression_statement_is_declaration(codet &code)
   return true;
 }
 
+/// N5008 [stmt.dcl]/3: the dynamic initialization of a block-scope
+/// variable with static storage duration is performed the first time control
+/// passes through its declaration; if it exits by an exception, it is not
+/// complete and is tried again the next time.  Guard \p initialization by a
+/// flag of static storage duration (zero-initialized, [basic.start.static]/2)
+/// set once it completes.
+codet cpp_typecheckt::static_local_initialization(
+  const symbolt &symbol,
+  const codet &initialization)
+{
+  symbolt guard_symbol;
+  guard_symbol.name = id2string(symbol.name) + "$initialized";
+  guard_symbol.base_name = id2string(symbol.base_name) + "$initialized";
+  guard_symbol.type = bool_typet{};
+  guard_symbol.value = false_exprt{};
+  guard_symbol.mode = symbol.mode;
+  guard_symbol.module = symbol.module;
+  guard_symbol.location = symbol.location;
+  guard_symbol.is_static_lifetime = true;
+  guard_symbol.is_lvalue = true;
+  guard_symbol.is_file_local = true;
+  const symbol_exprt guard = guard_symbol.symbol_expr();
+  symbol_table.insert(std::move(guard_symbol));
+
+  code_blockt first_pass;
+  first_pass.add(initialization);
+  first_pass.add(code_frontend_assignt{guard, true_exprt{}});
+  code_ifthenelset guarded{not_exprt{guard}, std::move(first_pass)};
+  guarded.add_source_location() = symbol.location;
+  return std::move(guarded);
+}
+
 void cpp_typecheckt::typecheck_decl(codet &code)
 {
   if(code.operands().size() != 1)
@@ -3396,16 +3428,19 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         "declarator should not have init_args");
       if(symbol.value.id() == ID_code)
       {
-        new_code.copy_to_operands(symbol.value);
+        new_code.copy_to_operands(
+          symbol.is_static_lifetime
+            ? static_local_initialization(symbol, to_code(symbol.value))
+            : to_code(symbol.value));
         // N5008 [stmt.dcl]/3: a block-scope object with static storage
         // duration is initialized the first time control passes through
-        // its declaration -- the constructor call just emitted (executed at
-        // every pass, an approximation).  The symbol itself keeps zero
-        // initialization ([basic.start.static]/2); leaving the constructor
-        // CODE as its value made __CPROVER_initialize assign a code block
-        // to the object (`static const pair<...> __classnames[] = {...}' in
-        // libstdc++'s regex_traits::lookup_classname; --validate-goto-model
-        // rejects the assignment).
+        // its declaration (static_local_initialization).  The symbol
+        // itself keeps zero initialization ([basic.start.static]/2);
+        // leaving the constructor CODE as its value made
+        // __CPROVER_initialize assign a code block to the object (`static
+        // const pair<...> __classnames[] = {...}' in libstdc++'s
+        // regex_traits::lookup_classname; --validate-goto-model rejects the
+        // assignment).
         if(symbol.is_static_lifetime)
           symbol_table.get_writeable_ref(symbol.name).value.make_nil();
       }
@@ -3429,7 +3464,12 @@ void cpp_typecheckt::typecheck_decl(codet &code)
         symbol.location, object_expr, declarator.init_args().operands());
 
       if(constructor_call.has_value())
-        new_code.add_to_operands(std::move(constructor_call.value()));
+      {
+        new_code.add_to_operands(
+          symbol.is_static_lifetime
+            ? static_local_initialization(symbol, constructor_call.value())
+            : std::move(constructor_call.value()));
+      }
     }
   }
 

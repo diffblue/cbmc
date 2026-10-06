@@ -1009,6 +1009,9 @@ protected:
   /// typecheck_method_bodies.
   void prepare_deferred_method_body(symbolt &method_symbol);
   void complete_constructor_template_initializers(symbolt &method_symbol);
+  codet static_local_initialization(
+    const symbolt &symbol,
+    const codet &initialization);
   /// Collapse zero-length pack expansions (N5008 [temp.variadic]/7) in
   /// template-argument lists within an instantiated function-template body,
   /// using the empty packs recorded in the current `template_map`.
