@@ -1,20 +1,25 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ member through the base path: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.2\] line \d+ nested list, constructor: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+double delete: FAILURE$
+dynamic object.*: FAILURE$
 --
-N5008 [dcl.init.aggr]/4-5: in `B b{{}, {owner(7), 3}}' with `struct B :
-E { A a; }' the member a (an aggregate with a non-POD member owner) is
-aggregate-initialized from {owner(7), 3}.  The aggregate-with-base path
-in cpp_constructor builds an initializer_list value for a, and symex
-stops with an invariant violation ("Reached unimplemented
-boolbv_widtht::get_entry()").  bin53 fails as well.  g++ 13 (with
--fsanitize=address) and clang++ 18 accept this program, and it fails only
-its WRONG assertion.
+N5008 [dcl.init.aggr]/4-5, [dcl.init.list]/3.7: in `B b{{}, {owner(7), 3,
+{4, 5}}, {1, 2}}' with `struct B : E { A a; C c; }' the member a, an
+aggregate with a non-POD member, is aggregate-initialized from its list,
+and c is initialized by C(int, int).  The aggregate-with-base path in
+cpp_constructor assigned the braced list to the member, leaving an
+initializer_list value that stopped symex with an invariant violation
+(bin53).  An aggregate member is now aggregate-initialized member-wise
+(aggregate_member_initialization) and other classes are list-initialized
+by a constructor.  g++ 13 (with -fsanitize=address) and clang++ 18 accept
+this program, and it fails only its WRONG assertion.
