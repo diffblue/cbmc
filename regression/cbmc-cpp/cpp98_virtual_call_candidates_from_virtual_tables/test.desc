@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp98 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+must be one of \[derived::do_f
+--
+must be one of .*unrelated::do_g
+^warning: ignoring
+--
+N5008 [class.virtual]/2, /7: the virtual call do_f() in numpunct::f
+invokes the final overrider in the dynamic type, numpunct or a class
+derived from it.  The front end lowers it to a call through the virtual
+table entry `vptr->do_f', and remove_function_pointers took as candidates
+every address-taken function of a compatible type, unrelated::do_g
+included (bin53).  For an entry of a virtual-table struct type
+(#virtual_table) the candidates are now the values of that entry in the
+program's virtual tables; the assertion for a pointer matching none of
+them keeps this sound.  With libstdc++'s locale facets, a facet's virtual
+call had dozens of unrelated candidates (moneypunct's string accessors for
+numpunct::do_grouping).  test_verify.desc checks the program's
+behaviour.  g++ 13 and clang++ 18 accept this program.

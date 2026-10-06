@@ -566,6 +566,10 @@ irep_idt cpp_typecheckt::ensure_virtual_table(
     vt_symb_type.type.set(ID_name, vt_symb_type.name);
     // the tag expr2c prints for `struct <tag>' (nil otherwise)
     vt_symb_type.type.set(ID_tag, vt_symb_type.base_name);
+    // a pointer to this type only ever points into one of the program's
+    // virtual-table objects (remove_function_pointers resolves a virtual
+    // call to the entries of those objects)
+    vt_symb_type.type.set(ID_C_virtual_table, true);
 
     const bool failed = !symbol_table.insert(std::move(vt_symb_type)).second;
     CHECK_RETURN(!failed);
