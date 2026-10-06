@@ -13416,3 +13416,61 @@ C++ support):
   (__tuple_impl forward).
 - Not C++: regression/ansi-c/character_literals1 unsupported{,-wide}
   (CORE) fail on this branch and on bin53: the expected exit code 70 is 6.
+
+## Round 163z: minimal KNOWNBUGs to CORE, oldest standard first
+
+Fixed (KNOWNBUG -> CORE unless noted):
+- Explicit instantiation of member function templates (`template int
+  box<char>::put(long);', [temp.explicit]/2, /10).
+- One closure type per template specialization (lambda_closure_map key
+  includes the scope, [expr.prim.lambda.closure]/1); libstdc++ <format>'s
+  _M_visit and visitor operator() no longer dropped.
+- Merged default template arguments renamed to the new declaration's
+  parameter names ([temp.param]/17).
+- Alias template expansions substitute nested pack references
+  ([temp.alias]/2, [temp.variadic]/5).
+- Member typedefs and member function declarations do not instantiate
+  the classes they name ([temp.inst]/1-3; the function-declaration
+  exemption tested ID_code but the declarator is a function_type).  Uses
+  that need the class instantiate it ([temp.inst]/2): derived-to-base
+  pointer conversion, initializer_list element viability
+  (require_complete_type).  Fixed the basic_ios/basic_ostream order
+  problem (cpp11_class_instantiated_while_its_base_is_instantiated).
+- Empty base-specifier pack expansions produce no base
+  ([temp.variadic]/7; libc++ __tuple_impl<__tuple_indices<>>).
+- Braced non-POD members of aggregates with bases ([dcl.init.aggr]/4.2).
+- `new T[n](args)' in C++20 ([dcl.init.general]/16.5).
+- Calls with by-value parameters of incomplete class type are ill-formed
+  ([expr.call]/7) -- requirement unsatisfied.
+- char8_t distinct, u8 literals typed char8_t in C++20, __cpp_char8_t no
+  longer undefined.
+- New: decltype of wide string literals, __is_same of array types,
+  object_size of array constants (wide string literals; C too).
+- remove_function_pointers takes the candidates of a call through a
+  virtual-table entry (struct type marked #virtual_table) from the
+  program's virtual tables, not every type-compatible function.
+
+Withdrawn: cpp98_discarded_reference_expression_does_not_access ((void)r
+after the storage is released is outside [basic.life]/8).
+
+Reverted twice: discarding `extern template' declarations of member
+functions.  It converts libstdc++'s _M_insert without drops, but the
+faithful num_put over the unmodelled "C"-locale facets (facet data comes
+from libstdc++.so; only ctype<char> is modelled) makes cpp11_stream_setw
+and gcc16_stream_ctype_facet_vtable exceed their limits (SAT > 8 GB,
+strlen over nondet numpunct data).  test_cpp11 of
+cpp98_explicit_instantiation_of_member_function_template is KNOWNBUG
+until those facets are modelled -- a library-data model, not a
+substitute for C++ support.
+
+New KNOWNBUG: cpp17_dynamic_cross_cast (cross-casts return the unadjusted
+pointer, [expr.dynamic.cast]/9.2; the precise virtual-call candidates now
+expose the wrong call the old test tolerated).
+
+Still open: libstdc++ <format> format:1899 (kb_Z_fmt1899 reduction,
+first-match wrapper), libc++ <functional> tuple<Closure &&> from a tuple,
+C++17 guaranteed copy elision, SMT backend address_of(array constant).
+
+Reduction tooling: /tmp/r163/red/cbmc_first_match.sh stops CBMC at the
+first matching diagnostic (with timeout inside); start_one.sh scopes use
+OOMPolicy=continue so an OOM-killed candidate does not end the reduction.
