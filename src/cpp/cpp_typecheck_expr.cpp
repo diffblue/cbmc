@@ -5622,6 +5622,32 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
         break;
       }
 
+      // N5008 [dcl.init.aggr]/4.2 with [class.temporary]/2: as for a
+      // declared aggregate (aggregate_member_initialization), elements of a
+      // non-POD class type are constructed in the temporary rather than
+      // copied bitwise from temporaries that are then destroyed
+      // (`return A{owner(6), 2};').
+      if(
+        !has_non_copy_ctor && struct_type.bases().empty() &&
+        has_non_pod_class_member(struct_type))
+      {
+        const exprt::operandst ops_copy = expr.operands().front().operands();
+        const struct_typet struct_copy = struct_type;
+        exprt new_object{ID_new_object, expr.type()};
+        new_object.set(ID_C_lvalue, true);
+        new_object.add_source_location() = expr.source_location();
+        code_blockt block;
+        aggregate_member_initialization(
+          new_object, struct_copy, ops_copy, expr.source_location(), block);
+        side_effect_exprt temporary{
+          ID_temporary_object, expr.type(), expr.source_location()};
+        temporary.set(ID_mode, ID_cpp);
+        temporary.set(ID_C_lvalue, true);
+        temporary.add(ID_initializer) = std::move(block);
+        expr = std::move(temporary);
+        return;
+      }
+
       if(!has_non_copy_ctor)
       {
         const auto &ops = expr.operands().front().operands();

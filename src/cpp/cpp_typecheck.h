@@ -315,6 +315,14 @@ protected:
   propagate_constants(exprt &expr, const symbol_table_baset &symbol_table);
 
   void convert_initializer(symbolt &symbol);
+  bool has_non_pod_class_member(const struct_union_typet &type);
+  bool has_user_declared_constructor(const struct_typet &type);
+  void aggregate_member_initialization(
+    const exprt &object,
+    const struct_typet &struct_type,
+    const exprt::operandst &ops,
+    const source_locationt &source_location,
+    code_blockt &block);
   void convert_function(symbolt &symbol);
 
   typet decltype_of(const exprt &e, bool parenthesized);

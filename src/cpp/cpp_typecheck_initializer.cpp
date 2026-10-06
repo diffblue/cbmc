@@ -226,6 +226,142 @@ std::optional<exprt> cpp_typecheckt::default_member_initializer_value(
 }
 
 /// Initialize an object with a value
+/// \return whether a non-static data member of \p struct_type (not of a
+///   base) is of a non-POD class type
+bool cpp_typecheckt::has_non_pod_class_member(const struct_union_typet &type)
+{
+  for(const auto &c : type.components())
+  {
+    if(
+      !c.get_bool(ID_from_base) && !c.get_bool(ID_is_type) &&
+      !c.get_bool(ID_is_static) && c.type().id() == ID_struct_tag &&
+      !cpp_is_pod(c.type()))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
+/// N5008 [dcl.init.aggr]/4-5: aggregate-initialize \p object, a class
+/// without base classes or user-declared constructors, from the
+/// initializer-clauses \p ops, member by member: an element of class type
+/// that is not POD by its constructor (recursively, member-wise, for a
+/// braced list initializing an aggregate class), any other element by an
+/// assignment of its converted initializer; elements without an
+/// initializer-clause from their default member initializer or
+/// value-initialized.
+void cpp_typecheckt::aggregate_member_initialization(
+  const exprt &object,
+  const struct_typet &struct_type,
+  const exprt::operandst &ops,
+  const source_locationt &source_location,
+  code_blockt &block)
+{
+  std::size_t idx = 0;
+  for(const auto &c : struct_type.components())
+  {
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.get_is_padding() ||
+      c.type().id() == ID_code)
+    {
+      continue;
+    }
+    member_exprt member{object, c.get_name(), c.type()};
+    member.set(ID_C_lvalue, true);
+    exprt checked_member = member;
+    already_typechecked_exprt::make_already_typechecked(checked_member);
+
+    std::optional<exprt> initializer;
+    if(idx < ops.size())
+      initializer = ops[idx++];
+    else if(c.find(ID_C_default_value).is_not_nil())
+      initializer = static_cast<const exprt &>(c.find(ID_C_default_value));
+
+    if(c.type().id() == ID_struct_tag && !cpp_is_pod(c.type()))
+    {
+      exprt::operandst arguments;
+      if(initializer.has_value())
+      {
+        const struct_typet &member_struct =
+          follow_tag(to_struct_tag_type(c.type()));
+        if(
+          initializer->id() == ID_initializer_list &&
+          member_struct.bases().empty() &&
+          !has_user_declared_constructor(member_struct))
+        {
+          aggregate_member_initialization(
+            member,
+            member_struct,
+            initializer->operands(),
+            source_location,
+            block);
+          continue;
+        }
+        arguments.push_back(*initializer);
+      }
+      else
+      {
+        // value-initialization of the element ([dcl.init.aggr]/5.3)
+        arguments.push_back(exprt{ID_initializer_list});
+      }
+      auto code = cpp_constructor(source_location, checked_member, arguments);
+      if(code.has_value())
+        block.add(std::move(*code));
+      continue;
+    }
+
+    exprt value;
+    if(initializer.has_value())
+    {
+      value = *initializer;
+      if(value.id() == ID_initializer_list)
+      {
+        typecheck_expr(value);
+        do_initializer(value, c.type(), true);
+      }
+      else
+      {
+        typecheck_expr(value);
+        if(is_reference(c.type()))
+          reference_initializer(value, to_reference_type(c.type()));
+        else
+          implicit_typecast(value, c.type());
+      }
+    }
+    else
+    {
+      const auto zero = itanium_abi_cpp_zero_initializer(
+        c.type(), source_location, namespacet{symbol_table});
+      if(!zero.has_value())
+        continue;
+      value = *zero;
+    }
+    code_frontend_assignt assignment{member, value};
+    assignment.add_source_location() = source_location;
+    block.add(std::move(assignment));
+  }
+}
+
+/// \return whether \p type has a constructor other than the implicitly
+///   declared ones
+bool cpp_typecheckt::has_user_declared_constructor(const struct_typet &type)
+{
+  for(const auto &c : type.components())
+  {
+    if(
+      !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+      to_code_type(c.type()).return_type().id() == ID_constructor &&
+      !c.type().get_bool("#is_implicit_ctor"))
+    {
+      return true;
+    }
+  }
+  return type.get_bool("has_template_constructor") ||
+         type.get_bool("has_inherited_constructor");
+}
+
 void cpp_typecheckt::convert_initializer(symbolt &symbol)
 {
   const irep_idt sym_id = symbol.name;
@@ -783,6 +919,27 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
         // C++17: check if we have base class initializers
         bool has_base_init = struct_type.id() == ID_struct &&
                              !to_struct_type(struct_type).bases().empty();
+
+        // N5008 [dcl.init.aggr]/4.2: each element is copy-initialized
+        // from its initializer-clause -- an element of a class type with a
+        // non-trivial copy constructor or destructor by that class's
+        // constructor ([dcl.init.general]/16.6), not by copying the bits
+        // of a temporary that is then destroyed (`P p{"ab", 1}' with a
+        // std::string member freed the buffer p.name kept pointing to).
+        if(!has_base_init && has_non_pod_class_member(struct_type))
+        {
+          symbol_exprt object{symbol.name, symbol.type};
+          object.set(ID_C_lvalue, true);
+          // copies: initializing may modify the symbol table
+          const exprt::operandst ops_copy = symbol.value.operands();
+          const struct_typet struct_copy = to_struct_type(struct_type);
+          const source_locationt location = symbol.value.source_location();
+          code_blockt block;
+          aggregate_member_initialization(
+            object, struct_copy, ops_copy, location, block);
+          symbol_table.get_writeable_ref(sym_id).value = std::move(block);
+          return;
+        }
 
         if(has_base_init)
         {
