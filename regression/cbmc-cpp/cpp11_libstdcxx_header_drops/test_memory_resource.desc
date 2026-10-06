@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 memory_resource.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ pool_options: SUCCESS$
@@ -13,11 +13,11 @@ dropped the body of system-header function
 could not fully type-check
 --
 libstdc++ 13 <memory_resource>: the bodies of __normal_iterator's operator++,
-operator--, operator+ and operator- (bits/stl_iterator.h:1117-1342) are
-dropped for __normal_iterator<__pool_resource::_BigBlock *, ...> ("pointer
-arithmetic with unknown object size": vector<_BigBlock> is a member of
-__pool_resource while _BigBlock is incomplete, [vector.overview]/4), and
-polymorphic_allocator::destroy (bits/memory_resource.h:502, "member
-operator got incomplete type on left hand side").  Being reduced; a
-header-free imitation passes.  g++ 13 accepts this program, and it fails
-only its WRONG assertion.
+operator--, operator+ and operator- (bits/stl_iterator.h:1117-1342) and
+polymorphic_allocator::destroy (bits/memory_resource.h:502) were dropped
+(bin53): the requirements of the iterator concepts checked for
+__normal_iterator<__pool_resource::_BigBlock *, ...>, while _BigBlock is
+incomplete, instantiated them.  Requirements are now unevaluated operands
+(cpp20_requires_expression_does_not_odr_use), also for constexpr functions
+(cpp20_constexpr_function_in_requirement_not_instantiated).  g++ 13 accepts
+this program, and it fails only its WRONG assertion.
