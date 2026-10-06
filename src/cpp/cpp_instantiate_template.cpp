@@ -5290,6 +5290,7 @@ skip_pack_removal_ft:
       // pack of the partial specialization, [temp.variadic]/5.2).
       std::map<std::string, std::vector<typet>> pack_type_elems;
       std::map<std::string, std::vector<exprt>> pack_expr_elems;
+      std::set<std::string> empty_pack_shorts;
       {
         auto shorten = [](const irep_idt &full_id) -> std::string
         {
@@ -5312,6 +5313,15 @@ skip_pack_removal_ft:
           auto pe = template_map.pack_expr_map.find(pid);
           if(pe != template_map.pack_expr_map.end())
             pack_expr_elems[short_name] = pe->second;
+          // an empty pack has only its size recorded
+          auto ps = template_map.pack_size_map.find(pid);
+          if(
+            ps != template_map.pack_size_map.end() && ps->second == 0 &&
+            pa == template_map.pack_args_map.end() &&
+            pe == template_map.pack_expr_map.end())
+          {
+            empty_pack_shorts.insert(short_name);
+          }
         }
         for(const auto &entry : spec_bindings.get_sub())
         {
@@ -5385,6 +5395,30 @@ skip_pack_removal_ft:
           for(const auto &pe : pack_expr_elems)
             if(refs_name(base.find(ID_name), pe.first))
               used_pack_shorts.push_back(pe.first);
+        }
+        // N5008 [temp.variadic]/7: a base-specifier pack expansion over an
+        // empty pack (`leaf<T>...' with T = <>) produces no base at all;
+        // kept, the unexpanded `leaf<T>' was default-initialized by every
+        // constructor ("found no match for symbol 'leaf'"), dropping them.
+        if(base.get_bool(ID_ellipsis) && used_pack_shorts.empty())
+        {
+          std::function<bool(const irept &)> refs_empty_pack =
+            [&](const irept &n) -> bool
+          {
+            if(
+              n.id() == ID_name &&
+              empty_pack_shorts.count(id2string(n.get(ID_identifier))) != 0)
+              return true;
+            for(const auto &c : n.get_sub())
+              if(refs_empty_pack(c))
+                return true;
+            for(const auto &c : n.get_named_sub())
+              if(refs_empty_pack(c.second))
+                return true;
+            return false;
+          };
+          if(refs_empty_pack(base.find(ID_name)))
+            continue;
         }
         const std::string used_pack_short =
           used_pack_shorts.empty() ? std::string{} : used_pack_shorts.front();
