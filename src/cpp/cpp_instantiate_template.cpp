@@ -5734,6 +5734,20 @@ skip_pack_removal_ft:
           spec_args_tc = typecheck_template_args(
             source_location, template_symbol, spec_args);
           match = (spec_args_tc.arguments() == full_template_args.arguments());
+          // N5008 [temp.type]/1: the arguments must be the SAME types --
+          // cv-qualifiers and the fundamental type (wchar_t is not int,
+          // char not signed char), which operator== does not compare
+          for(std::size_t i = 0; match && i < spec_args_tc.arguments().size();
+              ++i)
+          {
+            const exprt &spec_arg = spec_args_tc.arguments()[i];
+            const exprt &full_arg = full_template_args.arguments()[i];
+            if(spec_arg.id() == ID_type)
+            {
+              match =
+                qualifiers_match_recursively(spec_arg.type(), full_arg.type());
+            }
+          }
         }
         catch(...)
         {
