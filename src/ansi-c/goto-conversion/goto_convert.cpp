@@ -30,6 +30,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
+#include <set>
+
 static bool is_empty(const goto_programt &goto_program)
 {
   forall_goto_program_instructions(it, goto_program)
@@ -891,8 +893,30 @@ void goto_convertt::convert_frontend_decl(
     // temporaries created during initialization should live as long as
     // the reference (C++ temporary lifetime extension). Defer their
     // destruction to the scope stack instead of killing them here.
+    //
+    // N5008 [class.temporary]/6: only the temporary the reference is bound
+    // to (or whose subobject it is bound to) persists; the others -- e.g.
+    // those bound to a function call's reference parameters (/6.10) -- are
+    // destroyed at the end of the full-expression as usual.
     if(is_reference(symbol.type))
-      ref_bound_temporaries = std::move(side_effects.temporaries);
+    {
+      std::set<irep_idt> bound;
+      initializer.visit_pre(
+        [&bound](const exprt &e)
+        {
+          if(e.id() == ID_symbol)
+            bound.insert(to_symbol_expr(e).get_identifier());
+        });
+      std::list<irep_idt> others;
+      for(const auto &id : side_effects.temporaries)
+      {
+        if(bound.count(id) != 0)
+          ref_bound_temporaries.push_back(id);
+        else
+          others.push_back(id);
+      }
+      destruct_locals(others, dest, ns);
+    }
     else
       destruct_locals(side_effects.temporaries, dest, ns);
 
@@ -912,11 +936,21 @@ void goto_convertt::convert_frontend_decl(
 
   // Add 'dead' instructions for temporaries bound to references,
   // deferred to the scope stack so they live as long as the reference.
+  // N5008 [class.temporary]/8: such a temporary is destroyed at the end of
+  // the reference's lifetime, by its destructor.
   for(const auto &id : ref_bound_temporaries)
   {
     const symbolt &tmp_sym = ns.lookup(id);
     targets.scope_stack.add(
       code_deadt(tmp_sym.symbol_expr()), {declaration_iterator});
+    code_function_callt tmp_destructor = get_destructor(ns, tmp_sym.type);
+    if(tmp_destructor.is_not_nil())
+    {
+      tmp_destructor.arguments().insert(
+        tmp_destructor.arguments().begin(),
+        address_of_exprt{tmp_sym.symbol_expr()});
+      targets.scope_stack.add(tmp_destructor, {});
+    }
   }
 
   {
