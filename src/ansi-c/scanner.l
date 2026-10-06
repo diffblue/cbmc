@@ -319,7 +319,8 @@ enable_or_disable ("enable"|"disable")
                   // type char in C++ ([lex.ccon]); wide/u/U literals carry
                   // their own type regardless of language.
                   parser_stack(yyansi_clval)=
-                    convert_character_literal(yytext, !PARSER.cpp98, l);
+                    convert_character_literal(
+                      yytext, !PARSER.cpp98, l, PARSER.cpp20);
                   return TOK_CHARACTER;
                 }
 
@@ -366,7 +367,8 @@ enable_or_disable ("enable"|"disable")
 <STRING_LITERAL>"//".*\n { /* C++ comment, ignore */ }
 <STRING_LITERAL>. { // anything else: back to normal
                   source_locationt l=parser_stack(yyansi_clval).source_location();
-                  parser_stack(yyansi_clval)=convert_string_literal(PARSER.string_literal);
+                  parser_stack(yyansi_clval)=convert_string_literal(
+                    PARSER.string_literal, PARSER.cpp20);
                   parser_stack(yyansi_clval).add_source_location().swap(l);
                   yy_pop_state(); // back to normal
                   yyless(0); // put back

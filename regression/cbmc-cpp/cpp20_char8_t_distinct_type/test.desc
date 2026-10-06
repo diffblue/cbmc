@@ -1,10 +1,12 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ specialization: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ __is_same: SUCCESS$
 ^\[main\.assertion\.3\] line \d+ u8 string literal: SUCCESS$
-^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.4\] line \d+ u8 character literal: SUCCESS$
+^\[main\.assertion\.5\] line \d+ underlying: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -12,11 +14,13 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [basic.fundamental]/9, [lex.string]/6: char8_t is a distinct type
-with underlying type unsigned char, and u8"a" has type const char8_t[2].
-The front end treats char8_t as unsigned char (parse.cpp), and
-c_preprocess.cpp undefines __cpp_char8_t so that the library does not
-declare duplicate specializations; kind<unsigned char> then selects
-kind<char8_t>.  cpp11_specialization_distinguishes_fundamental_types
-covers the other character types.  g++ 13 and clang++ 18 accept this
-program, and it fails only its WRONG assertion.
+N5008 [basic.fundamental]/9: char8_t is a distinct type with underlying
+type unsigned char; [lex.ccon]/3, [lex.string]/6: u8'a' has type char8_t
+and u8"a" type const char8_t[2].  The parser turned char8_t into
+unsigned char, and c_preprocess.cpp undefined __cpp_char8_t so that the
+library would not declare duplicate specializations; kind<unsigned char>
+selected kind<char8_t> (bin53).  char8_t is now its own bit-vector type
+(#c_type char8_t, cpp11_specialization_distinguishes_fundamental_types),
+u8 literals have it in C++20, and __cpp_char8_t is defined as the
+compiler defines it.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
