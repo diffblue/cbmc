@@ -527,6 +527,13 @@ bool cpp_typecheckt::standard_conversion_pointer(
   // struct * to struct *
   if(sub_from.id() == ID_struct_tag && sub_to.id() == ID_struct_tag)
   {
+    // N5008 [temp.inst]/2 (Note 2): a conversion between pointers to class
+    // types depends on the inheritance relationship, so it implicitly
+    // instantiates the class template specializations involved -- which a
+    // member typedef `typedef node<V> *link_type;' did not do
+    // ([temp.inst]/1: forming the pointer type does not require it).
+    elaborate_class_template(sub_from);
+    elaborate_class_template(sub_to);
     const struct_typet &from_struct = follow_tag(to_struct_tag_type(sub_from));
     const struct_typet &to_struct = follow_tag(to_struct_tag_type(sub_to));
     if(

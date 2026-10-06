@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 nonvirtual.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ member of the virtual base: SUCCESS$
@@ -13,6 +13,6 @@ dropped the body of function
 --
 As test.desc with ostream<C, T> deriving from ios<...> non-virtually (the
 assertion keeps its name).  `o.np' in main is then an "unresolved member
-expression" and main is not type-checked; bin53 dropped insert instead.
+expression" and main was not type-checked (bin53 dropped insert).
 g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
 assertion.
