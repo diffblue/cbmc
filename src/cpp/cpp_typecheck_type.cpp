@@ -72,11 +72,18 @@ typet cpp_typecheckt::decltype_of(const exprt &e, bool parenthesized)
     // iter_reference_t is exactly `decltype(*declval<_Tp&>())`).
     type = ::reference_type(e.type());
   }
-  else if(e.id() == ID_string_constant && e.type().id() == ID_array)
+  else if(
+    (e.id() == ID_string_constant ||
+     (e.id() == ID_array && e.get_bool(ID_C_string_constant))) &&
+    e.type().id() == ID_array)
   {
+    // (a wide or UTF string literal is an array constant)
     // N5008 [expr.prim.literal]/1: a string literal is an lvalue, so
-    // decltype("abc") is `const char (&)[4]' ([dcl.type.decltype]/1.5).
-    type = ::reference_type(e.type());
+    // decltype("abc") is `const char (&)[4]' ([dcl.type.decltype]/1.5);
+    // [lex.string]/6: the elements are const
+    array_typet array = to_array_type(e.type());
+    array.element_type().set(ID_C_constant, true);
+    type = ::reference_type(array);
   }
   else if(
     parenthesized && (e.id() == ID_symbol || e.id() == ID_member) &&
