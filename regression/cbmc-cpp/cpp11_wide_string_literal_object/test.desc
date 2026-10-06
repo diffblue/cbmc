@@ -1,0 +1,24 @@
+CORE broken-smt-backend
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ char16_t: SUCCESS$
+^\[main\.assertion\.2\] line \d+ wchar_t: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+pointer outside object bounds.*: FAILURE$
+--
+N5008 [lex.string]/9 (C11 6.4.5/6 likewise): a string literal object has
+static storage duration, so `const char16_t *p = u"ab"' points to its
+first element and p[0..2] are within it.  A wide string literal is an
+array constant, and the bit-vector encoding of object_size gave no size
+to objects other than symbols and narrow string constants: every access
+failed "pointer outside object bounds" (bin53, also in C).  Array
+constants now have the size of their type.  The SMT backend fails an
+invariant on the address of an array constant (smt2_conv.cpp,
+convert_address_of_rec, bin53 too).  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.
