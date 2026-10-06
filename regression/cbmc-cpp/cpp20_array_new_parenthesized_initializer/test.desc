@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ parenthesized: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.new]/24, [dcl.init.general]/16.5 (P0960): `new int[3](1, 2)'
+initializes the elements from the parenthesized expression-list as from
+a braced list: 1, 2, 0.  The front end reports "new with array type and
+parenthesized initializer is not supported" (bin53 crashed on it).
+cpp11_array_new_value_and_list_initialization covers the braced form.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

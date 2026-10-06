@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ no access: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dereference failure.*: FAILURE$
+--
+N5008 [expr.context]/2, [conv.lval]/1: `(void)r' is a discarded-value
+expression; for a non-volatile object no lvalue-to-rvalue conversion is
+applied, so the object r refers to is not accessed.  The front end
+dereferences r and reports "dereference failure: deallocated dynamic
+object in *r" after `delete p'.  Also fails on bin53.  g++ 13 (with
+-fsanitize=address) and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

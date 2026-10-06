@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ parameter of incomplete type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ complete type: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.prim.req.general]/5, [dcl.fct]/13: substituting
+wrapper<incomplete> into the parameter-declarations `I a, I b' of the
+requires-expression yields parameters of an incomplete class type, which
+makes the requires-expression false.  The front end evaluates only the
+requirement `a - b', which a declared operator- satisfies.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

@@ -1,0 +1,22 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ no copies: SUCCESS$
+^\[main\.assertion\.2\] line \d+ each object destroyed once: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.general]/16.6.1, [class.temporary]/2, [stmt.return]/2: in
+C++17 a prvalue of the class type initializes the result object directly
+(`D x = D(4)', `D y = make(5)', `A a{make(6)}', array elements), so the
+copy constructor is not called and no temporary is destroyed.  The front
+end materializes a temporary, copies it and destroys it: the state is
+right for a faithful copy constructor, but side effects of copy
+constructors and destructors are counted wrongly.  Also fails on bin53.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
