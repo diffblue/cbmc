@@ -251,13 +251,6 @@ std::vector<std::string> cprover_cxx_preprocessor_macro_flags()
     flags.push_back("-D_PSTL_GLUE_NUMERIC_DEFS_H=1");
   }
 
-  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
-  {
-    // CBMC treats char8_t as unsigned char, causing duplicate template
-    // specializations; undefine the feature macro to avoid this.
-    flags.push_back("-U__cpp_char8_t");
-  }
-
   return flags;
 }
 

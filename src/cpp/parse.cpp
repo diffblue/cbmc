@@ -3825,19 +3825,8 @@ bool Parser::optIntegralTypeOrClassSpec(typet &p)
     case TOK_CHAR16_T: type_id=ID_char16_t; break;
     case TOK_CHAR32_T: type_id=ID_char32_t; break;
     case TOK_CHAR8_T:
-    {
-        // char8_t is unsigned char in C++20
-        cpp_tokent tk;
-        lex.get_token(tk);
-        typet unsigned_kw(ID_unsigned);
-        set_location(unsigned_kw, tk);
-        merge_types(unsigned_kw, p);
-        typet char_kw(ID_char);
-        set_location(char_kw, tk);
-        merge_types(char_kw, p);
-        is_integral = true;
-        continue;
-    }
+        type_id = ID_char8_t;
+        break;
     case TOK_INT: type_id=ID_int; break;
     case TOK_SHORT: type_id=ID_short; break;
     case TOK_LONG: type_id=ID_long; break;

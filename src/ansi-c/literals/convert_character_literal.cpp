@@ -21,7 +21,8 @@ Author: Daniel Kroening, kroening@kroening.com
 exprt convert_character_literal(
   const std::string &src,
   bool force_integer_type,
-  const source_locationt &source_location)
+  const source_locationt &source_location,
+  bool char8)
 {
   PRECONDITION(src.size() >= 2);
 
@@ -29,7 +30,8 @@ exprt convert_character_literal(
 
   if(src[0]=='L' || src[0]=='u' || src[0]=='U')
   {
-    // u8 prefix: char8_t (unsigned char) in C++20
+    // u8 prefix: char8_t in C++20 ([lex.ccon]/3), char in C++17, unsigned
+    // char in C23
     if(src[0] == 'u' && src.size() >= 3 && src[1] == '8')
     {
       PRECONDITION(src[2] == '\'');
@@ -39,7 +41,11 @@ exprt convert_character_literal(
         unescape_wide_string(std::string(src, 3, src.size() - 4));
       CHECK_RETURN(!value.empty());
 
-      result = from_integer(value[0], unsigned_char_type());
+      result = from_integer(
+        value[0],
+        char8                 ? typet{char8_t_type()}
+        : !force_integer_type ? typet{char_type()}
+                              : typet{unsigned_char_type()});
       result.add_source_location() = source_location;
       return result;
     }
