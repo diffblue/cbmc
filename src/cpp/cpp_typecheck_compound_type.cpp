@@ -3475,19 +3475,26 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           bool saved;
         } skip_elaborate_for_indirection{
           skip_typechecking_elaborate,
-          // ... nor does a member FUNCTION declaration for its return type
-          // ([temp.inst]/1; typecheck_compound_declarator instantiates the
-          // type of a data member, which does need it)
-          !declaration.declarators().empty() &&
-            std::all_of(
-              declaration.declarators().begin(),
-              declaration.declarators().end(),
-              [](const cpp_declaratort &d)
-              {
-                return d.type().id() == ID_pointer ||
-                       d.type().id() == ID_frontend_pointer ||
-                       d.type().id() == ID_code;
-              })};
+          // ... nor does a member typedef: a typedef-name is a synonym
+          // ([dcl.typedef]/1) and declaring it requires no complete type.
+          // Instantiating it here could instantiate a class within the
+          // instantiation of one of its own bases, which then kept that
+          // base's partial member list (libstdc++'s basic_ios<char> naming
+          // basic_ostream<char> through ostreambuf_iterator's typedef).
+          is_typedef ||
+            // ... nor does a member FUNCTION declaration for its return type
+            // ([temp.inst]/1; typecheck_compound_declarator instantiates the
+            // type of a data member, which does need it)
+            (!declaration.declarators().empty() &&
+             std::all_of(
+               declaration.declarators().begin(),
+               declaration.declarators().end(),
+               [](const cpp_declaratort &d)
+               {
+                 return d.type().id() == ID_pointer ||
+                        d.type().id() == ID_frontend_pointer ||
+                        d.type().id() == ID_code;
+               }))};
 
         // is it tag-only?
         if(

@@ -93,6 +93,11 @@ static bool brace_init_is_viable(
       id2string(to_struct_tag_type(base).get_identifier());
     if(id_str.find("tag-initializer_list<") != std::string::npos)
       return false;
+    // N5008 [temp.inst]/2: list-initialization of the class depends on its
+    // constructors and members, so the specialization is instantiated --
+    // it may be named only through a member typedef so far (map's
+    // `typedef pair<const K, V> value_type;', [temp.inst]/1)
+    cpp_typecheck.require_complete_type(base);
   }
 
   const struct_typet &class_type =

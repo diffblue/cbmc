@@ -87,6 +87,15 @@ public:
     const std::string &_module,
     message_handlert &message_handler);
 
+  /// N5008 [temp.inst]/2: implicitly instantiate the class template
+  /// specialization \p type names, in a context where the completeness of
+  /// the class affects the semantics (overload viability of a conversion
+  /// to it, for instance).  Does nothing for other types.
+  void require_complete_type(const typet &type)
+  {
+    elaborate_class_template(type);
+  }
+
   ~cpp_typecheckt() override
   {
   }
