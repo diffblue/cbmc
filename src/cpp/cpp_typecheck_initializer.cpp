@@ -790,6 +790,13 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
           // base subobjects and members individually.
           // Copy operands since cpp_constructor may modify symbol.value.
           exprt::operandst ops_copy = symbol.value.operands();
+          // N5008 [dcl.init.aggr]/5: with an empty list every element is
+          // initialized from its default member initializer or
+          // value-initialized -- the value-initialization of the empty list
+          // (zero, then the implicit default constructor's NSDMIs), not the
+          // default-initialization of no operands
+          if(ops_copy.empty())
+            ops_copy.push_back(symbol.value);
           symbol_exprt sym_expr(symbol.name, symbol.type);
           sym_expr.set(ID_C_lvalue, true);
           already_typechecked_exprt::make_already_typechecked(sym_expr);
@@ -872,8 +879,7 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     if(
       symbol.value.id() == ID_initializer_list &&
       symbol.value.operands().empty() &&
-      (symbol.type.id() == ID_struct_tag || symbol.type.id() == ID_union_tag) &&
-      !cpp_is_pod(symbol.type))
+      (symbol.type.id() == ID_struct_tag || symbol.type.id() == ID_union_tag))
     {
       // N5008 [dcl.init.list]/3.5, [over.match.list]/1: an EMPTY
       // braced-init-list for a class with a default constructor
