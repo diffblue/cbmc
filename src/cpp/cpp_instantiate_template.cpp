@@ -2342,6 +2342,8 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                       try
                       {
                         sfinae_contextt sfinae_guard{*this};
+                        // [expr.prim.req.general]/2: unevaluated operand
+                        unevaluated_operandt unevaluated_guard{*this};
                         typecheck_expr(expr_copy);
                         e = typecast_exprt{true_exprt(), c_bool_type()};
                       }
@@ -2366,7 +2368,11 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
                       try
                       {
                         sfinae_contextt sfinae_guard{*this};
-                        typecheck_expr(expr_copy);
+                        {
+                          // [expr.prim.req.general]/2: unevaluated operand
+                          unevaluated_operandt unevaluated_guard{*this};
+                          typecheck_expr(expr_copy);
+                        }
                         // Check return type constraint if present
                         const irept &constraint = e.find("#constraint");
                         if(constraint.is_not_nil())
