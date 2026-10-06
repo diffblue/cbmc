@@ -3491,8 +3491,11 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                declaration.declarators().end(),
                [](const cpp_declaratort &d)
                {
+                 // (a member function's declarator is a function_type until
+                 // it is converted)
                  return d.type().id() == ID_pointer ||
                         d.type().id() == ID_frontend_pointer ||
+                        d.type().id() == ID_function_type ||
                         d.type().id() == ID_code;
                }))};
 
