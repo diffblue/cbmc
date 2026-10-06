@@ -48,9 +48,11 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
     operands.size() == 1 && operands.front().id() == ID_initializer_list &&
     operands.front().operands().empty() &&
     (object_tc.type().id() == ID_struct_tag ||
-     object_tc.type().id() == ID_union_tag) &&
-    !cpp_is_pod(object_tc.type()))
+     object_tc.type().id() == ID_union_tag))
   {
+    // (also for a POD class: `E f{}' with E an aggregate whose base has a
+    // default member initializer zero-initializes the other members,
+    // [dcl.init.aggr]/5 -- default-initialization left them indeterminate)
     auto code = cpp_constructor(source_location, object, {});
     if(value_initialization_zero_initializes(object_tc.type()))
     {
@@ -886,8 +888,10 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         // corresponding operand initializes the from_base data members.
         for(std::size_t b = 0; b < struct_type.bases().size(); ++b)
         {
-          if(idx >= operands_tc.size())
-            break;
+          // N5008 [dcl.init.aggr]/5: a base without an initializer is
+          // initialized from an empty initializer list -- member-wise, as
+          // below, with no elements
+          const bool has_element = idx < operands_tc.size();
           // N5008 [dcl.init.aggr]/4.1: when the element is a BASE and
           // the initializer is of the base's own type (or derived),
           // the base SUBOBJECT is copy-initialized from it -- a sliced
@@ -895,6 +899,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
           // treated the whole takeish value as the first member's
           // initializer, leaving the base nondet: the closure CTAD
           // wrong-code shape).
+          if(has_element)
           {
             typet op_t = operands_tc[idx].type();
             if(is_reference(op_t))
@@ -927,28 +932,56 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
           // Collect from_base data members belonging to this base
           exprt::operandst base_ops;
-          if(operands_tc[idx].id() == ID_initializer_list)
+          if(has_element && operands_tc[idx].id() == ID_initializer_list)
             base_ops = operands_tc[idx].operands();
-          else
+          else if(has_element)
             base_ops.push_back(operands_tc[idx]);
+          // N5008 [dcl.init.aggr]/4-5: the base is itself
+          // aggregate-initialized from its element: its members in order
+          // (only THIS base's subobject -- #subobject_path), those without
+          // an initializer from their default member initializer or, if
+          // none, value-initialized
+          const irep_idt base_id =
+            struct_type.bases()[b].type().id() == ID_struct_tag
+              ? to_struct_tag_type(struct_type.bases()[b].type())
+                  .get_identifier()
+              : irep_idt{};
           std::size_t bidx = 0;
           for(const auto &comp : struct_type.components())
           {
             if(
               !comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
-              comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
+              comp.get_bool(ID_is_static) || comp.type().id() == ID_code ||
+              comp.get_is_padding())
               continue;
-            if(bidx >= base_ops.size())
-              break;
+            const auto &path = comp.find(ID_C_subobject_path).get_sub();
+            if(!path.empty() && path.front().id() != base_id)
+              continue;
             member_exprt member(object_tc, comp.get_name(), comp.type());
             member.set(ID_C_lvalue, true);
-            exprt val =
-              typecast_exprt::conditional_cast(base_ops[bidx], comp.type());
+            exprt val;
+            if(bidx < base_ops.size())
+            {
+              val =
+                typecast_exprt::conditional_cast(base_ops[bidx], comp.type());
+              ++bidx;
+            }
+            else if(comp.find(ID_C_default_value).is_not_nil())
+            {
+              val = static_cast<const exprt &>(comp.find(ID_C_default_value));
+            }
+            else
+            {
+              const auto zero = itanium_abi_cpp_zero_initializer(
+                comp.type(), source_location, namespacet{symbol_table});
+              if(!zero.has_value())
+                continue;
+              val = *zero;
+            }
             side_effect_expr_assignt assign(
               std::move(member), std::move(val), typet(), source_location);
             typecheck_side_effect_assignment(assign);
             block.add(code_expressiont(std::move(assign)));
-            ++bidx;
           }
           ++idx;
         }
@@ -1360,7 +1393,21 @@ bool cpp_typecheckt::value_initialization_zero_initializes(const typet &type)
     return code_type.get_bool("#is_implicit_ctor") ||
            code_type.get_bool("#explicitly_defaulted");
   }
-  return false;
+  // [class.default.ctor]/1: without any user-declared constructor (and
+  // none synthesized yet) the default constructor is implicitly declared,
+  // so not user-provided
+  bool any_constructor = class_type.get_bool("has_template_constructor") ||
+                         class_type.get_bool("has_inherited_constructor");
+  for(const auto &c : class_type.components())
+  {
+    if(
+      !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+      to_code_type(c.type()).return_type().id() == ID_constructor)
+    {
+      any_constructor = true;
+    }
+  }
+  return !any_constructor;
 }
 
 void cpp_typecheckt::new_temporary(
