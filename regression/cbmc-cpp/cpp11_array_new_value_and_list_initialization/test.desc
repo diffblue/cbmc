@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ parentheses: SUCCESS$
+^\[main\.assertion\.2\] line \d+ empty braces: SUCCESS$
+^\[main\.assertion\.3\] line \d+ aggregate elements: SUCCESS$
+^\[main\.assertion\.4\] line \d+ list: SUCCESS$
+^\[main\.assertion\.5\] line \d+ class: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.new]/17, /24, [dcl.init.general]/9.3, [dcl.init.aggr]/4-5:
+`new int[3]()' and `new int[2]{}' value-initialize (zero) each element,
+and `new int[4]{1, 2}' initializes the first two from the list and
+value-initializes the others.  The front end value-initialized only
+single objects, and a braced list for an array new-expression crashed it
+(an invariant violation in typecheck_expr_new, bin53).  The listed
+elements are now initialized before the per-element loop
+(cpp_new_initializer), which value-initializes the rest.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.
