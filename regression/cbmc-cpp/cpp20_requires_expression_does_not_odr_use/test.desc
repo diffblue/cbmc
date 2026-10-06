@@ -2,8 +2,9 @@ CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ concept satisfied: SUCCESS$
-^\[main\.assertion\.2\] line \d+ instantiated when odr-used: SUCCESS$
-^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.2\] line \d+ compound requirement satisfied: SUCCESS$
+^\[main\.assertion\.3\] line \d+ instantiated when odr-used: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -19,7 +20,8 @@ odr-used and its definition -- ill-formed for the incomplete opaque -- is
 not instantiated.  The front end queued the body of every member named
 while type-checking an expression, also in unevaluated operands, and
 dropped this one ("dropped the body of function 'operator++'", bin53).
-Requirements are now type-checked as unevaluated operands, and members
+Requirements -- simple and compound ({ E } -> C), in both concept
+evaluators -- are now type-checked as unevaluated operands, and members
 named there are not queued.  Reduced (cvise) from libstdc++'s
 __normal_iterator<__pool_resource::_BigBlock *>
 (cpp11_libstdcxx_header_drops/test_memory_resource.desc).  g++ 13 and

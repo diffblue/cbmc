@@ -3,16 +3,30 @@
 // and of decltype are unevaluated, so the member functions they name are
 // not odr-used and their definitions are not instantiated there
 extern "C" void __CPROVER_assert(bool, const char *);
-template <class T> struct wrap {
+template <class T>
+struct wrap
+{
   typedef int reference;
 };
 template <class It>
 concept cpp17_iterator =
-    requires(It it) { typename wrap<decltype(it++)>::reference; };
+  requires(It it) { typename wrap<decltype(it++)>::reference; };
+// libstdc++'s __cpp17_iterator: a compound requirement
+template <class T>
+concept can_reference = requires { typename wrap<T>; };
+template <class It>
+concept compound_iterator = requires(It it) {
+                              {
+                                it++
+                                } -> can_reference;
+                            };
 // libstdc++'s __normal_iterator over a pointer to an incomplete class
-template <class P> struct normal_iterator {
+template <class P>
+struct normal_iterator
+{
   P current;
-  normal_iterator operator++(int) {
+  normal_iterator operator++(int)
+  {
     normal_iterator old = *this;
     current++;
     return old;
@@ -23,11 +37,16 @@ template <class P> struct normal_iterator {
 // opaque is never defined, so that body would be ill-formed
 struct opaque;
 constexpr bool checked = cpp17_iterator<normal_iterator<opaque *>>;
-struct block {
+struct other;
+constexpr bool compound = compound_iterator<normal_iterator<other *>>;
+struct block
+{
   int n;
 };
-int main() {
+int main()
+{
   __CPROVER_assert(checked, "concept satisfied");
+  __CPROVER_assert(compound, "compound requirement satisfied");
   block b[2] = {{1}, {2}};
   normal_iterator<block *> it{b};
   it++;
