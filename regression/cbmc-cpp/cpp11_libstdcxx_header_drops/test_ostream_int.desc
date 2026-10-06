@@ -12,19 +12,16 @@ ostream_int.cpp
 dropped the body of system-header function
 no body for callee
 --
-libstdc++ 13 <sstream>: `o << 4' leaves o.str() empty.  basic_ostream<char>
-::_M_insert<long> (ostream:462) is instantiated despite its `extern
-template' declaration in bits/ostream.tcc (CBMC links no library, so the
-definition is needed), but its body is dropped: `this->_M_num_put' is an
-"unresolved member expression" because basic_ostream<char> was
-instantiated from within its base basic_ios<char> (basic_ios.h names
-ostreambuf_iterator, whose typedef names basic_ostream; [temp.inst]/2
-requires neither) and kept basic_ios's partial member list.  Reduced to
-cpp11_class_instantiated_while_its_base_is_instantiated.  An earlier
-experiment deferring member typedefs (skip-elaborate) avoided the drop but
-broke cpp11_set_iterate and made verification run for over 54 minutes; a
-fix must keep cpp11_set_iterate.  Related:
-cpp98_explicit_instantiation_of_member_function_template (ostream.tcc's
-explicit instantiation definitions) and
-cpp11_virtual_base_default_member_initializer (fixed).  g++ 13 accepts
-this program, and it fails only its WRONG assertion.
+libstdc++ 13 <sstream>: `o << 4' leaves o.str() empty.  The bodies of
+basic_ostream<char>::_M_insert are no longer dropped
+(cpp11_class_instantiated_while_its_base_is_instantiated), but the
+specializations are declared `extern template' in bits/ostream.tcc, so
+they are not instantiated and provide_stdlib_bodies' model returns *this
+without inserting ([ostream.inserters.arithmetic]/1).  Discarding those
+declarations ([temp.explicit]/12,
+cpp98_explicit_instantiation_of_member_function_template/test_cpp11.desc)
+instantiates the real num_put, which runs over the "C"-locale facets that
+libstdc++.so provides and CBMC does not model (only ctype<char> is): the
+SAT problem of cpp11_stream_setw exceeded 8 GB.  A model of the classic
+numpunct<char> and num_put<char> facets is needed.  g++ 13 accepts this
+program, and it fails only its WRONG assertion.
