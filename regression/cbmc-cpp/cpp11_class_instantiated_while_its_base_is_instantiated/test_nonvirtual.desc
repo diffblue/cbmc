@@ -1,0 +1,18 @@
+KNOWNBUG
+nonvirtual.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member of the virtual base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of function
+--
+As test.desc with ostream<C, T> deriving from ios<...> non-virtually (the
+assertion keeps its name).  `o.np' in main is then an "unresolved member
+expression" and main is not type-checked; bin53 dropped insert instead.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
