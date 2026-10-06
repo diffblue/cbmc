@@ -2418,18 +2418,11 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
   // we discard extern template declarations for FUNCTIONS so that the
   // template will be implicitly instantiated when needed. Class extern
   // templates are kept because they affect struct layout.
-  // Only skip function extern templates, free functions (unqualified
-  // names) and member functions (`extern template int box<char>::put(long);',
-  // a function declarator): N5008 [temp.explicit]/12 makes such a
-  // declaration suppress only the implicit instantiation, and the program
-  // must contain the explicit instantiation definition, which defines the
-  // same specialization the implicit instantiation does.  Kept, it declared
-  // a bodiless member hiding the member template.  Class extern templates
-  // are kept (they affect struct layout).
+  // Only skip free function extern templates (not class or member
+  // function extern templates, which affect struct layout).
+  // Free functions have unqualified names in their declarators.
   if(
-    !decl.declarators().empty() &&
-    (!decl.declarators()[0].name().is_qualified() ||
-     decl.declarators()[0].type().id() == ID_function_type))
+    !decl.declarators().empty() && !decl.declarators()[0].name().is_qualified())
   {
     cpp_declarationt empty;
     empty.type().make_nil();
