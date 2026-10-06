@@ -668,7 +668,11 @@ bool cpp_typecheckt::compound_requirement_is_satisfied(const exprt &expr)
     // see requirement_expression_is_valid: empty packs must be expanded
     expand_requires_parameter_packs(op);
     template_map.expand_call_argument_packs(op);
-    typecheck_expr(op);
+    {
+      // [expr.prim.req.general]/2: the expression is an unevaluated operand
+      unevaluated_operandt unevaluated_guard{*this};
+      typecheck_expr(op);
+    }
 
     const irept &constraint = expr.find("#constraint");
     if(constraint.is_not_nil())
