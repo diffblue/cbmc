@@ -13304,3 +13304,90 @@ Investigated, not fixed:
 - memory_resource: kb_V_memres restarted on the current binary.
 
 Suites (binW8 = HEAD's code): cbmc-cpp and cpp pass.
+
+## Round 163y: memory_resource, format root cause, header-free probes
+
+Memory procedure (after a host OOM caused by reductions): every reduction
+runs in a systemd user scope (start_one.sh: MemoryMax=10G,
+MemorySwapMax=0) with CBMC under `ulimit -v 6000000`; suites run under
+`ulimit -v 8000000` (cbmc-cpp -j 4, cpp -j 2); at most 2 reductions x 2
+jobs.  Orphaned reduction processes (ppid 1) are killed by PID.
+
+Commits:
+- Members of member classes of instances are deferred ([temp.inst]/3.1);
+  requirements and unevaluated operands do not odr-use.
+- Compound requirements are unevaluated operands (concept evaluator and
+  compound_requirement_is_satisfied).
+- Constexpr functions named in requirements are not instantiated
+  ([expr.const]/22, [temp.inst]/8): the declarator converter's eager
+  constexpr conversion also ran in unevaluated operands.  With the
+  previous fix, libstdc++ <memory_resource> converts without drops and is
+  CORE.  Found by the kb_Y_memit2 reduction (29 lines:
+  sized_sentinel_for over an incomplete __normal_iterator).
+- Array new value-initialization and `new T[n]{e...}' (#element_
+  initializers applied by cpp_new_initializer); the latter crashed before.
+- Aggregate base elements: each member of the base from the list, its
+  NSDMI or zero; `E y{}' zero-initializes POD aggregates too.
+- Block-scope statics are initialized once ([stmt.dcl]/3), guarded by a
+  static `$initialized' flag.
+- Inherited constructors initialize the derived class
+  ([class.inhctor.init]/1): one synthesized D constructor per inherited
+  non-template constructor, forwarding to B's; hidden by D's own
+  ([namespace.udecl]/11); B's default arguments kept (deferred ones
+  stay deferred).
+- goto-conversion destroys temporaries bound to references at the end of
+  the reference's lifetime ([class.temporary]/6, /8); other temporaries
+  of the initializer die at the end of the full-expression.
+- KNOWNBUG cpp11_alias_template_pack_expansion_shadowed_parameter_name:
+  `typename id<A>::type...' in an alias whose pack shares the using
+  function template's pack name repeats the first element (the alias's
+  own pack is lost in the expansion; the arguments arrive without their
+  ellipsis).  Renaming a pack or going through another alias avoids it.
+
+- Fundamental type identity: wchar_t/int, char/signed char, long/long
+  long, char16_t/unsigned short were one type for explicit-specialization
+  matching (instantiate_template's full-specialization redirect compared
+  arguments with operator==) and for __is_same.  Root cause of the
+  libstdc++ <format> `_M_parse_format_spec' drop: `!__is_one_of<int, char,
+  wchar_t, ...>' was false, so formatter<int, char> was the primary
+  without parse().  qualifiers_match_recursively now also compares
+  #c_type (same_fundamental_type_name).  [conv.prom]/2 promotion of
+  wchar_t/char32_t had to follow: c_typecast left `(char32_t << 11) |
+  0x7ffu' typed char32_t, which broke libc++'s __get_property and
+  __estimated_width once char32_t was distinct (W17 failures in
+  cpp20_libcxx_header_drops chrono/sstream_insert).  char8_t is still
+  unsigned char (c_preprocess undefines __cpp_char8_t).
+- Aggregate elements of non-POD class type are constructed, not copied
+  bitwise from a destroyed temporary (aggregate_member_initialization,
+  also for `A{...}' temporaries): `P p{"ab", 1}' with a std::string
+  member reported a double free.
+
+Suites (binW18 = HEAD's code): cbmc-cpp "All tests were successful, 16
+tests skipped", cpp suite exit 0, lint exit 0; every KNOWNBUG [OK] under
+-K (test_format by timeout at 1800 s).
+
+libstdc++ <format> after the fundamental-type fix: _M_parse_format_spec
+converts; _M_visit (format:3124), `format' and two closure operator()s
+are still dropped, and conversion plus verification take about 25
+minutes (34 s before, when most of it was dropped).  The kb_W_fmt_visit
+reduction was abandoned: each test of the 6000-line state took over
+300 s.  The cause was found with instrumented runs on the original
+program (requires-clause and type-constraint evaluation per
+partial specialization of formatter).
+
+Probe findings not fixed:
+- C++17 guaranteed copy elision is not modelled: `D x = D(4);' and
+  aggregate elements from prvalues copy-construct and destroy a
+  temporary (side-effect counts differ; state is correct for correct
+  copy constructors).
+- `B3 b{{}, {owner(7), 3}}' (aggregate with a base, nested braced list
+  for a non-POD aggregate member) hits an invariant (pre-existing).
+- A requirement `a - b' with by-value parameters of an incomplete class
+  type is satisfied (g++ rejects the copy-initialization).
+- `new T[n](args)' (C++20 parenthesized aggregate init of an array) is
+  reported as unsupported.
+- `(void)r' on a dangling reference reports a dereference failure.
+
+#4 (ostream_int) not started: options to be discussed (faithful
+instantiation of the extern-template members, slow, needs the typedef
+deferral reworked; or a `_M_insert' model writing decimal digits).
