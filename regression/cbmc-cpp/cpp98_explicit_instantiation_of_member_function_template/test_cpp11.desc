@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ explicitly instantiated: SUCCESS$
@@ -15,12 +15,7 @@ no body for callee
 N5008 [temp.explicit]/12: `extern template int box<int>::put(short);'
 suppresses only the implicit instantiation; the program's explicit
 instantiation definition defines the same specialization.  The parser
-keeps such a declaration of a member function, which becomes a bodiless
-member hiding the template ("no body for callee box<int>::put").
-Discarding it, as for a free function, fixes this, but with libstdc++
-<fstream> it then dropped basic_ofstream's move constructor ("member
-basic_ios<char>::set_rdbuf ... not found",
-cpp11_mem_initializer_names_virtual_base_through_member_typedef timed
-out), likely the shape of
-cpp11_class_instantiated_while_its_base_is_instantiated.  g++ 13 and
-clang++ 18 accept this program, and it fails only its WRONG assertion.
+kept such a declaration of a member function, which became a bodiless
+member hiding the template ("no body for callee box<int>::put", bin53);
+like a free function's, it is now discarded.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
