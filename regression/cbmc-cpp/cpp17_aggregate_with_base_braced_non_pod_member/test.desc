@@ -1,0 +1,20 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member through the base path: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.aggr]/4-5: in `B b{{}, {owner(7), 3}}' with `struct B :
+E { A a; }' the member a (an aggregate with a non-POD member owner) is
+aggregate-initialized from {owner(7), 3}.  The aggregate-with-base path
+in cpp_constructor builds an initializer_list value for a, and symex
+stops with an invariant violation ("Reached unimplemented
+boolbv_widtht::get_entry()").  bin53 fails as well.  g++ 13 (with
+-fsanitize=address) and clang++ 18 accept this program, and it fails only
+its WRONG assertion.
