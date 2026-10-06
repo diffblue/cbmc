@@ -28,7 +28,42 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <algorithm>
 #include <functional>
+#include <map>
 #include <set>
+
+/// \return the name of template parameter \p parameter (`C' of
+///   `template::3::C', or `anon#1' for an unnamed one)
+static irep_idt template_parameter_base_name(const template_parametert &p)
+{
+  const irep_idt &identifier =
+    p.id() == ID_type ? p.type().get(ID_identifier) : p.get(ID_identifier);
+  const std::string &id = id2string(identifier);
+  const auto pos = id.rfind("::");
+  return pos == std::string::npos ? identifier : irep_idt{id.substr(pos + 2)};
+}
+
+/// Rename, in the not yet type-checked default argument \p n, each name
+/// that is the first component of a name (`C', `C::type', `X<C>') and a key
+/// of \p renaming.
+static void rename_template_parameters(
+  irept &n,
+  const std::map<irep_idt, irep_idt> &renaming)
+{
+  if(n.id() == ID_cpp_name && !n.get_sub().empty())
+  {
+    irept &first = n.get_sub().front();
+    if(first.id() == ID_name)
+    {
+      const auto it = renaming.find(first.get(ID_identifier));
+      if(it != renaming.end())
+        first.set(ID_identifier, it->second);
+    }
+  }
+  for(auto &sub : n.get_sub())
+    rename_template_parameters(sub, renaming);
+  for(auto &named : n.get_named_sub())
+    rename_template_parameters(named.second, renaming);
+}
 
 void cpp_typecheckt::salvage_default_arguments(
   const template_typet &old_type,
@@ -39,15 +74,34 @@ void cpp_typecheckt::salvage_default_arguments(
   template_typet::template_parameterst &new_parameters =
     new_type.template_parameters();
 
+  // N5008 [temp.param]/17: the default arguments of all declarations are
+  // merged.  A default argument may name earlier parameters (`template
+  // <class C, class = C> struct S;'); taken over by a declaration whose
+  // parameters are named differently or not at all (`template <class,
+  // class> struct S {...}'), it must name that declaration's parameters.
+  std::map<irep_idt, irep_idt> renaming;
+  for(std::size_t i = 0; i < new_parameters.size() && i < old_parameters.size();
+      i++)
+  {
+    const irep_idt old_name = template_parameter_base_name(old_parameters[i]);
+    const irep_idt new_name = template_parameter_base_name(new_parameters[i]);
+    if(!old_name.empty() && !new_name.empty() && old_name != new_name)
+      renaming[old_name] = new_name;
+  }
+
   for(std::size_t i = 0; i < new_parameters.size(); i++)
   {
     if(
       i < old_parameters.size() && old_parameters[i].has_default_argument() &&
       !new_parameters[i].has_default_argument())
     {
-      // TODO The default may depend on previous parameters!!
       new_parameters[i].default_argument() =
         old_parameters[i].default_argument();
+      if(!renaming.empty())
+      {
+        rename_template_parameters(
+          new_parameters[i].default_argument(), renaming);
+      }
     }
   }
 }

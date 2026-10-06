@@ -1,8 +1,10 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ unnamed parameters in the definition: SUCCESS$
-^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.2\] line \d+ swapped parameter names: SUCCESS$
+^\[main\.assertion\.3\] line \d+ renamed parameter in a compound type: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
@@ -10,12 +12,11 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [temp.param]/15, [temp.local]/7: `template <class C, class = C>
-struct S;' followed by the definition `template <class, class> struct S'
-gives S<char> the second argument char.  The default argument is
-evaluated where the definition's parameters have no names: "symbol 'C' is
-unknown", and main is not type-checked (bin53 too).  libstdc++ declares
-`template<typename _CharT, typename _Traits = char_traits<_CharT>> class
-basic_ostream;' in <iosfwd> and defines it with named parameters, so
-this is not the <sstream> drop.  g++ 13 and clang++ 18 accept this
+N5008 [temp.param]/17: `template <class C, class = C> struct S;' followed
+by the definition `template <class, class> struct S' gives S<char> the
+second argument char.  salvage_default_arguments copied the default
+argument `C' into the definition, where no parameter has that name:
+"symbol 'C' is unknown", and main was not type-checked (bin53).  The
+copied default argument now names the definition's parameters, also when
+they are swapped (P) or renamed (Q).  g++ 13 and clang++ 18 accept this
 program, and it fails only its WRONG assertion.
