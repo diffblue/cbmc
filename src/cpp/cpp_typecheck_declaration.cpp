@@ -733,8 +733,13 @@ bool cpp_typecheckt::convert_explicit_instantiation(
       id_set.erase(it);
     it = next;
   }
+  // `template int box<char>::put(long);' -- a member function template of
+  // a class template specialization, its own template arguments deduced
+  // from the function type ([temp.explicit]/2, [temp.deduct.decl]): as
+  // above, the specialization is instantiated on use.  Declared as written,
+  // a bodiless non-template `put(long)' hid the member template.
   if(template_args_non_tc.is_nil())
-    return false;
+    return !id_set.empty();
 
   // Several member templates of that name (overloads, e.g. rename(exprt,
   // ns) and rename(typet &, id, ns)): N5008 [temp.explicit]/4 selects the
