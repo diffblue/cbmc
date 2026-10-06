@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ function template: SUCCESS$
@@ -13,12 +13,11 @@ main.cpp
 --
 N5008 [expr.prim.lambda.closure]/1, [temp.spec.general]/1: the lambda in
 size_of<C> has a distinct closure type, with its own call operator, in
-size_of<char> and size_of<long>.  The front end creates the closure once,
-for the first specialization, and uses it in every later one: both calls
-return sizeof(char) (bin53 too).  In libstdc++'s <format>
-(cpp11_libstdcxx_header_drops/test_format) the wchar_t specialization of
-_Formatting_scanner::_M_format_arg uses the char specialization's visitor
-closure, and the bodies dropped there are its operator()<int> and
-basic_format_arg<wchar_t context>::_M_visit; that this is the only cause
-is not yet confirmed.  g++ 13 and clang++
-18 accept this program, and it fails only its WRONG assertion.
+size_of<char> and size_of<long>.  The closure cache (lambda_closure_map)
+was keyed on the parser's lambda number alone, which the specializations
+share, so size_of<long> reused size_of<char>'s closure and both calls
+returned sizeof(char) (bin53).  The key now includes the enclosing scope.
+In libstdc++'s <format> the wchar_t _Formatting_scanner used the char
+scanner's visitor closure, and basic_format_arg::_M_visit and the
+visitor's operator() were dropped.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.
