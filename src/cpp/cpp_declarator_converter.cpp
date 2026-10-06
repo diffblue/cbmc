@@ -950,12 +950,26 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
         // [temp.deduct.call]/4.3 derived-to-base call whose callee has a
         // trailing parameter pack fails to build (and poisons the callee's
         // sub-instantiations), even though the deferred drain resolves it.
+        // N5008 [expr.const]/22, [temp.inst]/8: a constexpr function named
+        // in an unevaluated operand -- a requirement `__s - __i' of
+        // libstdc++'s sized_sentinel_for checked for an incomplete
+        // __normal_iterator -- is neither odr-used nor needed for constant
+        // evaluation (the operand is not potentially constant evaluated);
+        // its body is held back as for a non-constexpr function below.
+        const bool unevaluated = cpp_typecheck.unevaluated_operand_depth > 0 &&
+                                 !cpp_typecheck.instantiation_stack.empty();
         if(
-          cpp_typecheck.instantiating_for_constant_eval ||
+          (cpp_typecheck.instantiating_for_constant_eval && !unevaluated) ||
           cpp_typecheck.has_auto(new_symbol->type))
+        {
           cpp_typecheck.convert_function(*new_symbol);
+        }
         else
+        {
+          if(unevaluated)
+            cpp_typecheck.speculative_instances.insert(new_symbol->name);
           cpp_typecheck.add_method_body(new_symbol);
+        }
       }
       else if(declarator.type().id() != ID_template)
       {
