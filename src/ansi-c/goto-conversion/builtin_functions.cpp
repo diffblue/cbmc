@@ -547,9 +547,27 @@ void goto_convertt::cpp_new_initializer(
         symbol_table);
       const symbol_exprt index_expr = index_symbol.symbol_expr();
 
+      // N5008 [expr.new]/24, [dcl.init.aggr]/4: the elements given by a
+      // braced-init-list (`new T[n]{e1, ..., ek}') are initialized from
+      // them; the loop below initializes the remaining ones
+      const irept &element_initializers = rhs.find("#element_initializers");
+      std::size_t listed = 0;
+      for(const auto &element_initializer : element_initializers.get_sub())
+      {
+        const plus_exprt element_address{
+          typecast_exprt::conditional_cast(lhs, pointer_type(element_type)),
+          from_integer(listed, count_type)};
+        exprt code = static_cast<const exprt &>(element_initializer);
+        replace_new_object(
+          dereference_exprt{element_address, element_type}, code);
+        if(code.id() == ID_code)
+          convert(to_code(code), dest, ID_cpp);
+        ++listed;
+      }
+
       dest.add(goto_programt::make_decl(index_expr, rhs.source_location()));
       dest.add(goto_programt::make_assignment(
-        index_expr, from_integer(0, count_type), rhs.source_location()));
+        index_expr, from_integer(listed, count_type), rhs.source_location()));
 
       // Pre-create the targets of the loop
       goto_programt loop;
