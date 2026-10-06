@@ -4745,17 +4745,20 @@ void cpp_typecheckt::typecheck_expr_new(exprt &expr)
   // e_i, the remaining elements are value-initialized (as for `new
   // T[n]{}').  Keep one initializer per listed element (#element_
   // initializers, applied by goto conversion before the per-element loop
-  // over the others).  A non-empty parenthesized expression-list for an
-  // array (C++20, [dcl.init.general]/16.5) is not supported.
+  // over the others).  [dcl.init.general]/16.5 (C++20): a parenthesized
+  // expression-list `new T[n](e1, ..., ek)' initializes the elements in the
+  // same way; before C++20 it is ill-formed ([expr.new]/24).
   if(
     !initializer.operands().empty() &&
     expr.get(ID_statement) == ID_cpp_new_array)
   {
-    if(initializer.id() != ID_initializer_list)
+    if(
+      initializer.id() != ID_initializer_list &&
+      config.cpp.cpp_standard < configt::cppt::cpp_standardt::CPP20)
     {
       error().source_location = expr.find_source_location();
-      error() << "new with array type and parenthesized initializer is not "
-                 "supported"
+      error() << "new with array type and parenthesized initializer requires "
+                 "C++20"
               << eom;
       throw 0;
     }
