@@ -467,6 +467,20 @@ void c_typecastt::implicit_typecast_arithmetic(
 
   if(new_type != expr.type())
     do_typecast(expr, new_type);
+  else
+  {
+    // C++ [conv.prom]/2: wchar_t, char16_t and char32_t are distinct types
+    // promoted to their underlying type even when it has the same
+    // representation (char32_t to unsigned int); operator== ignores the
+    // #c_type comment that tells them apart.
+    const irep_idt &c_type_name = expr.type().get(ID_C_c_type);
+    if(
+      c_type_name == ID_wchar_t || c_type_name == ID_char16_t ||
+      c_type_name == ID_char32_t)
+    {
+      expr = typecast_exprt{expr, new_type};
+    }
+  }
 }
 
 c_typecastt::c_typet c_typecastt::minimum_promotion(

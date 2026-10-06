@@ -30,6 +30,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_constexpr_eval.h"
 #include "cpp_exception_id.h"
 #include "cpp_sfinae_context.h"
+#include "cpp_template_qualifiers.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"
@@ -1536,7 +1537,9 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       std::function<bool(const typet &, const typet &)> same_including_cv =
         [&](const typet &a, const typet &b) -> bool
       {
-        if(a != b)
+        // [basic.fundamental]: wchar_t and int, char and signed char, long
+        // and long long are distinct types (same_fundamental_type_name)
+        if(a != b || !same_fundamental_type_name(a, b))
           return false;
         if(
           a.get_bool(ID_C_constant) != b.get_bool(ID_C_constant) ||
