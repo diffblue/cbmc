@@ -11244,11 +11244,18 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     // the parser's per-lambda number and create it only once.  (The source
     // location is the fallback for a lambda built without the parser; it has
     // no column, so two lambdas on one line would share a closure.)
-    const std::string loc_key = expr.find("#lambda_uid").is_not_nil()
-                                  ? "uid:" + id2string(expr.get("#lambda_uid"))
-                                  : id2string(loc.get_file()) + ":" +
-                                      id2string(loc.get_line()) + ":" +
-                                      id2string(loc.get_column());
+    // N5008 [expr.prim.lambda.closure]/1, [temp.spec.general]/1: in a
+    // template each specialization's lambda-expression is a distinct
+    // expression with its own closure type -- the lambda in size_of<long>
+    // must not reuse size_of<char>'s, whose operator() was checked with
+    // C = char.  The parser's number is shared by the specializations, so
+    // the key also names the enclosing scope (the function specialization).
+    const std::string loc_key =
+      id2string(cpp_scopes.current_scope().prefix) + "#" +
+      (expr.find("#lambda_uid").is_not_nil()
+         ? "uid:" + id2string(expr.get("#lambda_uid"))
+         : id2string(loc.get_file()) + ":" + id2string(loc.get_line()) + ":" +
+             id2string(loc.get_column()));
     irep_idt closure_sym_name = lambda_closure_map[loc_key];
 
     // Collect the by-copy captures in a fixed (sorted) order shared between the
