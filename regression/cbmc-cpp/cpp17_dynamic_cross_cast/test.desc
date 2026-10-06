@@ -1,14 +1,24 @@
-CORE
+KNOWNBUG
 main.cpp
 --cpp17
-^\[main\.assertion\.1\] line \d+ cross-cast outcomes: SUCCESS$
-^VERIFICATION SUCCESSFUL$
-^EXIT=0$
+^\[main\.assertion\.1\] line \d+ cross-cast to the sibling subobject: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
 ^SIGNAL=0$
 --
+^warning: ignoring
 ^CONVERSION ERROR$
-dropped the body
+dereferenced function pointer must be.*: FAILURE$
 --
-Fixed 2026-07-20: dynamic_typecast accepts [expr.dynamic.cast]/5-6
-cross-casts (operand polymorphic, target a complete class) and models
-the runtime check as nondet(null, reinterpreted pointer).
+N5008 [expr.dynamic.cast]/9.2: dynamic_cast<iface_b *>(p) with p pointing
+to the iface_a subobject of an impl object yields a pointer to its iface_b
+subobject.  The front end models the run-time check as a nondeterministic
+choice between null and the unadjusted, reinterpreted pointer.  The test
+used to accept the value 1 that the call through that pointer could
+produce (calling iface_a::a through iface_b's slot); since virtual calls
+take their candidates from the virtual tables (remove_function_pointers),
+that call fails "dereferenced function pointer must be impl::b..."
+instead.  The cross-cast must adjust to the target subobject of the
+most-derived object.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
