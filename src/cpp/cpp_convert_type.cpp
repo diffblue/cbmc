@@ -28,13 +28,14 @@ public:
   // The following types exist in C11 and later, but are implemented as
   // typedefs. In C++, they are keywords and thus required explicit handling in
   // here.
-  std::size_t wchar_t_count, char16_t_count, char32_t_count;
+  std::size_t wchar_t_count, char8_t_count, char16_t_count, char32_t_count;
 
   void write(typet &type) override;
 
   cpp_convert_typet(message_handlert &message_handler, const typet &type)
     : ansi_c_convert_typet(message_handler),
       wchar_t_count(0),
+      char8_t_count(0),
       char16_t_count(0),
       char32_t_count(0)
   {
@@ -78,6 +79,8 @@ void cpp_convert_typet::read_rec(const typet &type)
     ++gcc_float64x_cnt;
   else if(type.id()==ID_wchar_t)
     ++wchar_t_count;
+  else if(type.id() == ID_char8_t)
+    ++char8_t_count;
   else if(type.id()==ID_char16_t)
     ++char16_t_count;
   else if(type.id()==ID_char32_t)
@@ -287,7 +290,7 @@ void cpp_convert_typet::write(typet &type)
 {
   if(!other.empty())
   {
-    if(wchar_t_count || char16_t_count || char32_t_count)
+    if(wchar_t_count || char8_t_count || char16_t_count || char32_t_count)
     {
       messaget log{message_handler};
       log.error().source_location = source_location;
@@ -324,6 +327,22 @@ void cpp_convert_typet::write(typet &type)
     }
 
     type=wchar_t_type();
+    ansi_c_convert_typet::build_type_with_subtype(type);
+    ansi_c_convert_typet::set_attributes(type);
+  }
+  else if(char8_t_count)
+  {
+    // [basic.fundamental]/9: a distinct type, not to be made signed or
+    // unsigned
+    if(
+      int_cnt || short_cnt || char_cnt || long_cnt || char16_t_count ||
+      char32_t_count || int8_cnt || int16_cnt || int32_cnt || int64_cnt ||
+      ptr32_cnt || ptr64_cnt || signed_cnt || unsigned_cnt)
+    {
+      throw "illegal type modifier for char8_t";
+    }
+
+    type = char8_t_type();
     ansi_c_convert_typet::build_type_with_subtype(type);
     ansi_c_convert_typet::set_attributes(type);
   }
