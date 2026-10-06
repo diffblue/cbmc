@@ -1084,6 +1084,42 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 ++idx;
                 continue;
               }
+              // ... and from a braced list: an aggregate member is itself
+              // aggregate-initialized ([dcl.init.aggr]/4.2), its non-POD
+              // elements constructed; any other class is list-initialized
+              // by a constructor ([dcl.init.list]/3.7).  Assigning the
+              // list itself left an initializer_list value for symex.
+              if(
+                comp.type().id() == ID_struct_tag && !cpp_is_pod(comp.type()) &&
+                op_probe.id() == ID_initializer_list)
+              {
+                const struct_typet member_struct =
+                  follow_tag(to_struct_tag_type(comp.type()));
+                if(
+                  member_struct.bases().empty() &&
+                  !has_user_declared_constructor(member_struct))
+                {
+                  exprt::operandst element_ops;
+                  for(const auto &el : op_probe.operands())
+                    element_ops.push_back(already_typechecked_exprt{el});
+                  aggregate_member_initialization(
+                    member, member_struct, element_ops, source_location, block);
+                }
+                else
+                {
+                  exprt class_member = member;
+                  already_typechecked_exprt::make_already_typechecked(
+                    class_member);
+                  auto member_init = cpp_constructor(
+                    source_location,
+                    class_member,
+                    {already_typechecked_exprt{op_probe}});
+                  if(member_init.has_value())
+                    block.add(std::move(*member_init));
+                }
+                ++idx;
+                continue;
+              }
               val =
                 typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
             }
