@@ -1972,6 +1972,13 @@ void template_mapt::apply(typet &type) const
                       element.type() = a2->second[i];
                       break;
                     }
+                    // ... and a reference nested in the pattern (`A' in
+                    // `typename id<A>::type...'): apply() leaves a bare
+                    // name, which was later looked up from the point of
+                    // use, where it could name the using template's own
+                    // same-named pack (its first element, scalar).
+                    replace_type_pack_ref(
+                      element.type(), short2, a2->second[i]);
                   }
                   element_map.apply(element.type());
                   expanded_args.push_back(static_cast<const irept &>(element));
