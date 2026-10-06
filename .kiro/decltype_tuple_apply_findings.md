@@ -13388,6 +13388,31 @@ Probe findings not fixed:
   reported as unsupported.
 - `(void)r' on a dangling reference reports a dereference failure.
 
-#4 (ostream_int) not started: options to be discussed (faithful
-instantiation of the extern-template members, slow, needs the typedef
-deferral reworked; or a `_M_insert' model writing decimal digits).
+KNOWNBUG inventory (user request: a test for every known issue; modelling
+ostream::_M_insert may come later for performance, not to cover missing
+C++ support):
+- The probe findings above are now KNOWNBUGs:
+  cpp98_explicit_instantiation_of_member_function_template,
+  cpp98_discarded_reference_expression_does_not_access,
+  cpp17_guaranteed_copy_elision,
+  cpp17_aggregate_with_base_braced_non_pod_member,
+  cpp20_requires_parameter_of_incomplete_type,
+  cpp20_array_new_parenthesized_initializer, cpp20_char8_t_distinct_type.
+- ostream_int: on the current build _M_insert<long> is instantiated
+  despite the `extern template' declarations, and its body is dropped.
+  kb_Z_osins (NOSUPPRESS wrapper, seed with every `extern template'
+  removed, MUST "unresolved member expression") reduced it to 49 lines;
+  header-free: cpp11_class_instantiated_while_its_base_is_instantiated
+  (basic_ostream<char> instantiated from within basic_ios<char> via
+  ostreambuf_iterator's typedef keeps basic_ios's partial member list;
+  test_nonvirtual.desc: without the virtual base main fails instead).
+  The earlier typedef-deferral experiment must be reworked so that
+  cpp11_set_iterate keeps passing.
+- Found while reducing: cpp11_template_parameters_unnamed_in_definition
+  (`template <class C, class = C> struct S;' then `template <class,
+  class> struct S {...}': "symbol 'C' is unknown").
+- Covered by existing (non-minimal) KNOWNBUGs: libstdc++ format/chrono
+  (_M_visit, `format', closure operator()s) and libc++ functional/ranges
+  (__tuple_impl forward).
+- Not C++: regression/ansi-c/character_literals1 unsupported{,-wide}
+  (CORE) fail on this branch and on bin53: the expected exit code 70 is 6.
