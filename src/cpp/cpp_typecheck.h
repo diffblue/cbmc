@@ -1009,6 +1009,15 @@ protected:
   /// typecheck_method_bodies.
   void prepare_deferred_method_body(symbolt &method_symbol);
   void complete_constructor_template_initializers(symbolt &method_symbol);
+  cpp_declarationt inherited_constructor_declaration(
+    const symbolt &symbol,
+    const exprt &base,
+    const symbolt &base_symbol,
+    const code_typet &constructor_type) const;
+  static bool inherited_constructor_is_hidden(
+    const cpp_declaratort &declarator,
+    const irep_idt &class_tag,
+    const struct_typet::componentst &components);
   codet static_local_initialization(
     const symbolt &symbol,
     const codet &initialization);

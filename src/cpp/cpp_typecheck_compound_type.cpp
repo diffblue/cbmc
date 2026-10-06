@@ -3023,6 +3023,135 @@ void cpp_typecheckt::pin_constructor_parameter_class_names(
   }
 }
 
+/// N5008 [class.inhctor.init]/1: initializing an object of class D by a
+/// constructor inherited from base B initializes the B subobject by that
+/// constructor (the arguments forwarded, /1 second sentence) and every other
+/// base and member as by a defaulted default constructor of D -- including
+/// D's default member initializers and its virtual table pointers.  Build
+/// the declaration of that constructor of D, `D(P1 a1, ..., Pn an) :
+/// B(static_cast<P1 &&>(a1), ...) {}' (an lvalue reference parameter is
+/// passed as is); full_member_initialization adds the rest.
+/// \param symbol: the class D
+/// \param base: D's base B
+/// \param base_symbol: the symbol of B
+/// \param constructor_type: the type of the inherited constructor of B
+/// \return the constructor declaration
+cpp_declarationt cpp_typecheckt::inherited_constructor_declaration(
+  const symbolt &symbol,
+  const exprt &base,
+  const symbolt &base_symbol,
+  const code_typet &constructor_type) const
+{
+  const source_locationt &source_location = symbol.type.source_location();
+  cpp_declarationt ctor;
+  default_ctor(source_location, symbol.base_name, ctor);
+  ctor.set("#inherited_constructor", true);
+  cpp_declaratort &decl = ctor.declarators().front();
+  decl.type().remove("#is_implicit_ctor");
+  irept &parameters = decl.type().add(ID_parameters);
+
+  codet base_init{ID_member_initializer};
+  base_init.add_source_location() = source_location;
+  base_init.set(ID_member, cpp_namet{base_symbol.base_name, source_location});
+  base_init.add("#base_type") = base.type();
+
+  const auto &base_parameters = constructor_type.parameters();
+  for(std::size_t i = 1; i < base_parameters.size(); ++i)
+  {
+    const typet &parameter_type = base_parameters[i].type();
+    const irep_idt name = "__inherited_argument" + std::to_string(i);
+
+    cpp_declaratort parameter_declarator;
+    parameter_declarator.set(ID_name, cpp_namet{name, source_location});
+    parameter_declarator.type().make_nil();
+    parameter_declarator.add_source_location() = source_location;
+    if(base_parameters[i].has_default_value())
+    {
+      // the base's default argument (perhaps still deferred, checked in
+      // B's scope at a call)
+      exprt default_value = base_parameters[i].default_value();
+      if(default_value.id() != ID_cpp_deferred_default_argument)
+        already_typechecked_exprt::make_already_typechecked(default_value);
+      parameter_declarator.value() = std::move(default_value);
+    }
+    else
+      parameter_declarator.add(ID_value).make_nil();
+
+    cpp_declarationt parameter_declaration;
+    parameter_declaration.type() = parameter_type;
+    parameter_declaration.add_to_operands(std::move(parameter_declarator));
+    parameter_declaration.add_source_location() = source_location;
+    parameters.get_sub().push_back(std::move(parameter_declaration));
+
+    if(is_reference(parameter_type))
+    {
+      base_init.add_to_operands(cpp_namet{name, source_location}.as_expr());
+      continue;
+    }
+    // an object or rvalue reference parameter is forwarded as an xvalue
+    const typet &referee = is_rvalue_reference(parameter_type)
+                             ? to_pointer_type(parameter_type).base_type()
+                             : parameter_type;
+    exprt forward{"explicit-typecast", pointer_type(referee)};
+    forward.type().set(ID_C_reference, true);
+    forward.type().set(ID_C_rvalue_reference, true);
+    forward.get_sub().push_back(cpp_namet{name, source_location});
+    forward.add_source_location() = source_location;
+    base_init.add_to_operands(std::move(forward));
+  }
+
+  irept &initializers = decl.add(ID_member_initializers);
+  initializers.id(ID_member_initializers);
+  initializers.move_to_sub(base_init);
+  return ctor;
+}
+
+/// N5008 [namespace.udecl]/11: a constructor inherited by a
+/// using-declaration is hidden by a constructor of the class with the same
+/// parameter-type-list.
+/// \param declarator: the inherited constructor's declarator
+/// \param class_tag: the class's identifier
+/// \param components: the class's components converted so far, including
+///   its own constructors
+/// \return whether a constructor among \p components hides it
+bool cpp_typecheckt::inherited_constructor_is_hidden(
+  const cpp_declaratort &declarator,
+  const irep_idt &class_tag,
+  const struct_typet::componentst &components)
+{
+  std::vector<typet> parameter_types;
+  for(const auto &parameter : declarator.type().find(ID_parameters).get_sub())
+  {
+    parameter_types.push_back(
+      static_cast<const cpp_declarationt &>(parameter).type());
+  }
+  for(const auto &component : components)
+  {
+    if(
+      component.type().id() != ID_code ||
+      to_code_type(component.type()).return_type().id() != ID_constructor)
+    {
+      continue;
+    }
+    // the class's own constructors, not the base's (copied as members)
+    const auto &parameters = to_code_type(component.type()).parameters();
+    if(
+      parameters.size() != parameter_types.size() + 1 ||
+      parameters.front().type().id() != ID_pointer ||
+      to_pointer_type(parameters.front().type()).base_type() !=
+        struct_tag_typet{class_tag})
+    {
+      continue;
+    }
+    bool same = true;
+    for(std::size_t i = 0; same && i < parameter_types.size(); ++i)
+      same = parameters[i + 1].type() == parameter_types[i];
+    if(same)
+      return true;
+  }
+  return false;
+}
+
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
   // A typedef/alias declaration defers the elaboration of the class template
@@ -3189,6 +3318,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // a using-declaration inherits the base's default constructor
   // ([class.inhctor.init])
   bool inherited_default_ctor = false;
+  // N5008 [class.inhctor.init]/1: the constructors a using-declaration
+  // inherits, as constructors of this class (inherited_constructor_declaration)
+  std::vector<std::pair<irep_idt, cpp_declarationt>> inherited_ctors;
 
   // we first do everything _but_ the constructors
 
@@ -4167,6 +4299,14 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
                     continue;
                   }
                 }
+                if(!ctor_type.has_ellipsis())
+                {
+                  inherited_ctors.emplace_back(
+                    access,
+                    inherited_constructor_declaration(
+                      symbol, base, base_sym, ctor_type));
+                  continue;
+                }
                 // Create a derived-class constructor component that
                 // mirrors the base constructor
                 struct_typet::componentt new_comp = comp;
@@ -4368,6 +4508,12 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
   }
 
+  for(auto &inherited : inherited_ctors)
+  {
+    body.add_to_operands(exprt{"cpp-" + id2string(inherited.first)});
+    body.add_to_operands(std::move(inherited.second));
+  }
+
   // Reset the access type
   access = type.default_access();
 
@@ -4423,6 +4569,15 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
 
           full_member_initialization(type, declarator.member_initializers());
+        }
+
+        // N5008 [namespace.udecl]/11: a constructor of this class with the
+        // parameter-type-list of an inherited one hides it
+        if(
+          declaration.get_bool("#inherited_constructor") &&
+          inherited_constructor_is_hidden(declarator, symbol.name, components))
+        {
+          continue;
         }
 
         // Finally, we typecheck the constructor with the
