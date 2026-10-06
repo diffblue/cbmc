@@ -7,9 +7,31 @@
 
 #include <util/std_types.h>
 
+/// N5008 [basic.fundamental]/1, /8-9: char, signed char and unsigned char,
+/// wchar_t, char16_t and char32_t, and long and long long are distinct types
+/// even where they have the same representation (wchar_t and int, char16_t
+/// and unsigned short).  The front end represents them by the same bit-vector
+/// type with a different `#c_type' comment, which irept::operator== ignores.
+/// \return false if \p a and \p b are integer or floating-point types naming
+///   different fundamental types
+inline bool same_fundamental_type_name(const typet &a, const typet &b)
+{
+  if(
+    a.id() != b.id() ||
+    (a.id() != ID_signedbv && a.id() != ID_unsignedbv && a.id() != ID_floatbv))
+  {
+    return true;
+  }
+  const irep_idt &a_name = a.get(ID_C_c_type);
+  const irep_idt &b_name = b.get(ID_C_c_type);
+  return a_name.empty() || b_name.empty() || a_name == b_name;
+}
+
 /// Check that cv-qualifiers (C_constant, C_volatile) match recursively
 /// throughout the type tree. irept::operator== ignores #-prefixed
 /// attributes, so types like `const int*` and `int*` compare equal.
+/// It also distinguishes the fundamental types same_fundamental_type_name
+/// tells apart.
 /// This function catches such differences in nested subtypes -- including
 /// the return and parameter types of a function type (N5008 [dcl.fct]/6-7:
 /// `void (*)(const int *)` and `void (*)(int *)` are distinct types, and so
@@ -43,6 +65,9 @@ inline bool qualifiers_match_recursively(const typet &a, const typet &b)
   {
     return false;
   }
+
+  if(!same_fundamental_type_name(a, b))
+    return false;
 
   // N5008 [dcl.ref]/1, [dcl.ptr]/1: a pointer, an lvalue reference and an
   // rvalue reference to the same type are distinct types.  References are
