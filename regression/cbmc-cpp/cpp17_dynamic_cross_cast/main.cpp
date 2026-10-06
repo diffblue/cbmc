@@ -8,11 +8,8 @@
 //   dynamic_cast<hardness_collectort *>(&prop)
 // (prop_conv_solver.h), which blocked 56 dog-food files.
 //
-// CBMC models the runtime check as a nondeterministic choice between
-// null and the reinterpreted pointer (a sound over-approximation; the
-// non-null branch does not adjust to the subobject, so r == 1 -- the
-// value the model can produce by dispatching through the unadjusted
-// pointer -- is accepted alongside the real outcomes 0 and 2).
+// The result points to the iface_b subobject of the impl object
+// ([expr.dynamic.cast]/9.2), so q->b() returns 2.
 // g++/clang++ accept and verify at runtime.
 extern "C" void __CPROVER_assert(bool, const char *);
 
@@ -56,6 +53,7 @@ int main()
 {
   impl obj;
   int r = probe(&obj);
-  __CPROVER_assert(r == 0 || r == 1 || r == 2, "cross-cast outcomes");
+  __CPROVER_assert(r == 2, "cross-cast to the sibling subobject");
+  __CPROVER_assert(r == 0, "WRONG (must FAIL)");
   return 0;
 }
