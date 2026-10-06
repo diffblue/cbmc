@@ -1,0 +1,28 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested: SUCCESS$
+^\[main\.assertion\.3\] line \d+ returned: SUCCESS$
+^\[main\.assertion\.4\] line \d+ temporary: SUCCESS$
+^\[main\.assertion\.5\] line \d+ new-expression: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+double delete: FAILURE$
+dynamic object.*: FAILURE$
+--
+N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6: in `A a{owner(5), 1}'
+the element a.o is copy-initialized from the temporary owner(5) by owner's
+constructor.  The front end built a struct value from the temporary's
+bits and then destroyed the temporary, so a.o pointed to freed memory:
+spurious use-after-free and double-free failures (bin53; the same for
+`P p{"ab", 1}' with a std::string member).  Elements of a non-POD class
+type of an aggregate without bases are now constructed in the object, or
+in the temporary for `A{...}' (aggregate_member_initialization), the
+others assigned.  g++ 13 (with -fsanitize=address) and clang++ 18 accept
+this program, and it fails only its WRONG assertion.
