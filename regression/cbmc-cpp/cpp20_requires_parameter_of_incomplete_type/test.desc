@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ parameter of incomplete type: SUCCESS$
@@ -11,9 +11,12 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-N5008 [expr.prim.req.general]/5, [dcl.fct]/13: substituting
-wrapper<incomplete> into the parameter-declarations `I a, I b' of the
-requires-expression yields parameters of an incomplete class type, which
-makes the requires-expression false.  The front end evaluates only the
-requirement `a - b', which a declared operator- satisfies.  g++ 13 and
+N5008 [expr.call]/7: "When a function is called, the type of any
+parameter shall not be a class type that is either incomplete or
+abstract."  The requirement `a - b' of subtractable<wrapper<incomplete>>
+calls operator-(wrapper<T>, wrapper<T>), whose by-value parameters have
+the incomplete type wrapper<incomplete>, so it is ill-formed and the
+concept is not satisfied ([expr.prim.req.general]/5).  The front end
+accepted the call (bin53); typecheck_function_call_arguments now rejects
+it after trying to instantiate the class ([temp.inst]/2).  g++ 13 and
 clang++ 18 accept this program, and it fails only its WRONG assertion.

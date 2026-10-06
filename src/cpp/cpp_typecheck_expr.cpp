@@ -8722,6 +8722,32 @@ void cpp_typecheckt::typecheck_function_call_arguments(
   const code_typet &code_type = to_code_type(f_op.type());
   const code_typet::parameterst &parameters = code_type.parameters();
 
+  // N5008 [expr.call]/7: when a function is called, the type of a parameter
+  // shall not be an incomplete class type (a parameter passed by value);
+  // the call requires the class to be complete ([temp.inst]/2).  In a
+  // requirement this makes the requirement unsatisfied
+  // ([expr.prim.req.general]/5): `requires(I a, I b) { a - b; }' with I an
+  // incomplete wrapper<incomplete>.
+  for(const auto &parameter : parameters)
+  {
+    const typet &parameter_type = parameter.type();
+    if(parameter_type.id() != ID_struct_tag || parameter.get_this())
+      continue;
+    elaborate_class_template(parameter_type);
+    const symbolt *class_symbol =
+      symbol_table.lookup(to_struct_tag_type(parameter_type).get_identifier());
+    if(
+      class_symbol != nullptr && class_symbol->type.id() == ID_struct &&
+      to_struct_type(class_symbol->type).is_incomplete())
+    {
+      error().source_location = expr.source_location();
+      error() << "call of '" << to_string(f_op)
+              << "' with a parameter of incomplete type '"
+              << to_string(parameter_type) << "'" << eom;
+      throw 0;
+    }
+  }
+
   // do default arguments
 
   if(parameters.size() > expr.arguments().size())

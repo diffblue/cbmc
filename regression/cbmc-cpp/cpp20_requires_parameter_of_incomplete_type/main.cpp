@@ -1,6 +1,6 @@
-// N5008 [expr.prim.req.general]/5, [dcl.fct]/13: a requires-expression
-// whose parameter has an incomplete class type by value is not satisfied
-// (substituting the type into the parameter-declaration fails)
+// N5008 [expr.call]/7, [expr.prim.req.general]/5: a requirement calling a
+// function with a by-value parameter of an incomplete class type is
+// ill-formed, so the requirement is not satisfied
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class I>
 concept subtractable = requires(I a, I b) { a - b; };
