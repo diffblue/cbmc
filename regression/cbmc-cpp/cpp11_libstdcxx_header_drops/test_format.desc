@@ -20,7 +20,9 @@ visitor lambda, which uses `this', got a closure
 (cpp14_lambda_this_capture_member_calls).  _M_parse_format_spec was
 dropped because formatter<int, char> was the primary template (int and
 wchar_t were one type, cpp11_specialization_distinguishes_fundamental_
-types).  Still dropped: format:3124 basic_format_arg::_M_visit, `format'
-and two closure `operator()'s; conversion and verification now take more
-than 25 minutes.  g++ 13 accepts this program, and it fails only its
+types), and _M_visit and the visitor's operator() because one lambda
+closure served all specializations (cpp11_lambda_closure_per_template_
+specialization).  Still dropped: formatter<const char *, char>::format
+(format:1899), without a diagnostic; conversion and verification take
+more than 50 minutes.  g++ 13 accepts this program, and it fails only its
 WRONG assertion.
