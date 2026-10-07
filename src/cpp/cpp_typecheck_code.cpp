@@ -683,9 +683,10 @@ void cpp_typecheckt::typecheck_code(codet &code)
         // for prvalues (approximating the lifetime-extended
         // temporary, which no aliasing can observe).
         const bool range_is_lvalue =
-          range_op.get_bool(ID_C_lvalue) || range_op.id() == ID_symbol ||
-          range_op.id() == ID_member || range_op.id() == ID_index ||
-          range_op.id() == ID_dereference;
+          (range_op.get_bool(ID_C_lvalue) &&
+           !is_class_prvalue_temporary(range_op)) ||
+          range_op.id() == ID_symbol || range_op.id() == ID_member ||
+          range_op.id() == ID_index || range_op.id() == ID_dereference;
         typet range_sym_type = range_type;
         if(range_is_lvalue)
         {
@@ -712,13 +713,42 @@ void cpp_typecheckt::typecheck_code(codet &code)
         }
         symbol_exprt range_sym_expr(range_id, range_sym_type);
 
-        codet range_init(ID_assign);
-        range_init.copy_to_operands(range_sym_expr);
-        if(range_is_lvalue)
-          range_init.copy_to_operands(address_of_exprt(range_op));
+        // a declaration ([stmt.ranged]/1), so that goto conversion destroys
+        // a range object initialized from a prvalue at the end of the loop
+        // ([class.temporary]/6: the temporary bound to __range lives as
+        // long as the reference)
+        // (declared first, then assigned: a call result initializes the
+        // object directly)
+        code_frontend_declt range_decl{range_sym_expr};
+        range_decl.add_source_location() = loc;
+        code_blockt range_init;
+        range_init.add(std::move(range_decl));
+        std::optional<codet> range_construction;
+        if(!range_is_lvalue && range_sym_type.id() == ID_struct_tag)
+        {
+          // the range object is initialized from the prvalue by the
+          // class's constructor (C++17: the prvalue initializes it
+          // directly, [dcl.init.general]/16.6.1), not by a bitwise copy of
+          // a temporary that is then destroyed
+          exprt object = range_sym_expr;
+          object.set(ID_C_lvalue, true);
+          already_typechecked_exprt::make_already_typechecked(object);
+          range_construction =
+            cpp_constructor(loc, object, {already_typechecked_exprt{range_op}});
+        }
+        if(range_construction.has_value())
+          range_init.add(std::move(*range_construction));
         else
-          range_init.copy_to_operands(range_op);
-        range_init.add_source_location() = loc;
+        {
+          codet range_assign(ID_assign);
+          range_assign.copy_to_operands(range_sym_expr);
+          if(range_is_lvalue)
+            range_assign.copy_to_operands(address_of_exprt(range_op));
+          else
+            range_assign.copy_to_operands(range_op);
+          range_assign.add_source_location() = loc;
+          range_init.add(std::move(range_assign));
+        }
 
         // Build __range.begin() and __range.end() calls.  The
         // overload resolution + member lookup happens in
@@ -882,7 +912,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
           for_code.add_source_location() = loc;
 
           code_blockt outer;
-          outer.add(std::move(range_init));
+          outer.append(range_init);
           outer.add(std::move(begin_init));
           outer.add(std::move(end_init));
           outer.add(std::move(for_code));
@@ -997,7 +1027,7 @@ void cpp_typecheckt::typecheck_code(codet &code)
         for_code.add_source_location() = loc;
 
         code_blockt outer;
-        outer.add(std::move(range_init));
+        outer.append(range_init);
         outer.add(std::move(begin_init));
         outer.add(std::move(end_init));
         outer.add(std::move(for_code));
