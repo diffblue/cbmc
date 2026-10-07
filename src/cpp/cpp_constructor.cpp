@@ -1149,6 +1149,75 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
       }
     }
 
+    // N5008 [dcl.init.general]/16.6.1 (C++17 guaranteed copy elision): if
+    // the initializer is a prvalue of the same class, cv-unqualified, it
+    // initializes the object directly -- no temporary is materialized,
+    // copied and destroyed.  For a constructor-built prvalue `T(args)' the
+    // object is constructed by that constructor in place; for a call
+    // returning T by value, the call's result is the object (goto
+    // conversion passes the destination as the return slot).
+    if(
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17 &&
+      operands_tc.size() == 1)
+    {
+      exprt prvalue = operands_tc.front();
+      if(prvalue.id() == ID_already_typechecked)
+        prvalue = to_unary_expr(prvalue).op();
+      typet prvalue_type = prvalue.type();
+      prvalue_type.remove(ID_C_constant);
+      prvalue_type.remove(ID_C_volatile);
+      typet object_type = object_tc.type();
+      object_type.remove(ID_C_constant);
+      object_type.remove(ID_C_volatile);
+      if(
+        prvalue_type == object_type && prvalue.id() == ID_side_effect &&
+        prvalue.get(ID_statement) == ID_temporary_object &&
+        prvalue.operands().empty() &&
+        prvalue.find(ID_initializer).id() == ID_code)
+      {
+        // the temporary's constructor call names it as `new_object'; the
+        // object takes its place (as goto conversion's replace_new_object
+        // does for the temporary)
+        exprt initializer =
+          static_cast<const exprt &>(prvalue.find(ID_initializer));
+        bool replaced = false;
+        std::function<void(exprt &)> rebind = [&](exprt &e)
+        {
+          if(e.id() == ID_new_object && e.type() == prvalue.type())
+          {
+            e = object_tc;
+            replaced = true;
+            return;
+          }
+          // a nested temporary keeps its own new_object
+          if(
+            e.id() == ID_side_effect &&
+            e.get(ID_statement) == ID_temporary_object)
+          {
+            return;
+          }
+          for(auto &op : e.operands())
+            rebind(op);
+        };
+        rebind(initializer);
+        if(replaced)
+          return to_code(initializer);
+      }
+      // (not for the new_object of a temporary being materialized: goto
+      // conversion gives the call its own result object, which would be
+      // copied bitwise into the temporary and both destroyed -- the
+      // temporary's initialization is the call itself there)
+      if(
+        prvalue_type == object_type && prvalue.id() == ID_side_effect &&
+        prvalue.get(ID_statement) == ID_function_call &&
+        !is_reference(prvalue.type()) && object_tc.id() != ID_new_object)
+      {
+        code_frontend_assignt init{object_tc, prvalue};
+        init.add_source_location() = source_location;
+        return std::move(init);
+      }
+    }
+
     code_blockt block;
 
     // enter struct scope
