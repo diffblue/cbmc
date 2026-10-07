@@ -308,6 +308,322 @@ void cpp_typecheckt::return_deduction_contextt::finish()
                                   : typecheck.return_type;
 }
 
+/// N5008 [class.spaceship]/2-4, [class.compare.default]/6: the body of a
+/// defaulted three-way comparison: the elements of the expanded lists of
+/// subobjects (direct bases, then non-static data members, arrays element by
+/// element) are compared in order, and the first result that is not equal is
+/// returned, converted to the return type R; otherwise R(equal).  For a
+/// declared `auto', R is the common comparison type of the element results.
+/// \return the body (and \p function_type's return type set to R), or
+///   nothing if a comparison cannot be formed this way (the caller then uses
+///   its simpler lowering)
+/// [cmp.categories]: a comparison category converts to a weaker one by its
+/// conversion function (strong_ordering to weak_ordering / partial_ordering,
+/// weak_ordering to partial_ordering).  \return whether \p value (of a
+/// comparison category type) was converted to \p category into \p result
+bool cpp_typecheckt::convert_to_comparison_category(
+  const exprt &value,
+  const typet &category,
+  exprt &result)
+{
+  typet value_type = value.type();
+  value_type.remove(ID_C_constant);
+  typet target = category;
+  target.remove(ID_C_constant);
+  if(value_type == target)
+  {
+    result = value;
+    return true;
+  }
+  if(value_type.id() != ID_struct_tag || target.id() != ID_struct_tag)
+    return false;
+  // the conversion function `operator R() const' of the value's class
+  const struct_typet &value_class = follow_tag(to_struct_tag_type(value_type));
+  for(const auto &c : value_class.components())
+  {
+    if(c.type().id() != ID_code || c.get_bool(ID_is_static))
+      continue;
+    const code_typet &code_type = to_code_type(c.type());
+    typet return_type = code_type.return_type();
+    return_type.remove(ID_C_constant);
+    if(
+      return_type != target || code_type.parameters().size() != 1 ||
+      id2string(c.get_base_name()).rfind("operator", 0) != 0)
+    {
+      continue;
+    }
+    const symbolt *function = symbol_table.lookup(c.get_name());
+    if(function == nullptr)
+      continue;
+    exprt object = value;
+    if(!object.get_bool(ID_C_lvalue))
+    {
+      // a temporary holding the prvalue, for the `this' argument
+      side_effect_exprt temporary{
+        ID_temporary_object, value_type, value.source_location()};
+      temporary.set(ID_mode, ID_cpp);
+      temporary.add_to_operands(value);
+      object = std::move(temporary);
+    }
+    side_effect_expr_function_callt call{
+      function->symbol_expr(),
+      {typecast_exprt::conditional_cast(
+        address_of_exprt{object}, code_type.parameters().front().type())},
+      code_type.return_type(),
+      value.source_location()};
+    result = std::move(call);
+    return true;
+  }
+  return false;
+}
+
+/// N5008 [class.compare.default]/6: the expanded list of subobjects of the
+/// operands of the defaulted comparison \p symbol: its direct base class
+/// subobjects, then its non-static data members, an array element by
+/// element, as pairs of lvalues of the two operands.
+/// \return false if the list cannot be formed (a virtual base, a reference
+///   member)
+bool cpp_typecheckt::defaulted_comparison_elements(
+  const symbolt &symbol,
+  code_typet &function_type,
+  const exprt &this_expr,
+  std::vector<std::pair<exprt, exprt>> &elements)
+{
+  const auto &parameters = function_type.parameters();
+  irep_idt class_id = symbol.type.get(ID_C_member_name);
+  const bool is_friend = class_id.empty();
+  if(is_friend)
+    class_id = symbol.type.get(ID_C_class);
+  if(class_id.empty())
+    return false;
+  // a member has the parameters (this, y), a friend (x, y)
+  if(parameters.size() != 2)
+    return false;
+  const symbolt &class_symbol = lookup(class_id);
+  if(class_symbol.type.id() != ID_struct)
+    return false;
+  const struct_typet &class_type = to_struct_type(class_symbol.type);
+
+  // the operands x and y, as lvalues of the class type
+  const auto parameter_object = [&](const code_typet::parametert &p) -> exprt
+  {
+    const symbol_exprt param{p.get_identifier(), p.type()};
+    exprt object;
+    if(p.type().id() == ID_pointer)
+      object = dereference_exprt{param, to_pointer_type(p.type()).base_type()};
+    else
+      object = param;
+    object.set(ID_C_lvalue, true);
+    return object;
+  };
+  exprt x, y;
+  if(is_friend)
+  {
+    x = parameter_object(parameters[0]);
+    y = parameter_object(parameters[1]);
+  }
+  else
+  {
+    if(this_expr.is_nil())
+      return false;
+    x = dereference_exprt{
+      this_expr, to_pointer_type(this_expr.type()).base_type()};
+    x.set(ID_C_lvalue, true);
+    y = parameter_object(parameters[1]);
+  }
+
+  // the expanded lists of subobjects ([class.compare.default]/6)
+  for(const auto &base : class_type.bases())
+  {
+    if(base.get_bool(ID_virtual))
+      return false;
+    exprt bx = address_of_exprt{x};
+    exprt by = address_of_exprt{y};
+    typet base_type = base.type();
+    pointer_typet bx_type = pointer_type(base_type);
+    bx_type.base_type().set(ID_C_constant, x.type().get_bool(ID_C_constant));
+    pointer_typet by_type = pointer_type(base_type);
+    by_type.base_type().set(ID_C_constant, true);
+    make_ptr_typecast(bx, bx_type, false, true);
+    make_ptr_typecast(by, by_type, false, true);
+    exprt ex = dereference_exprt{bx, bx_type.base_type()};
+    exprt ey = dereference_exprt{by, by_type.base_type()};
+    ex.set(ID_C_lvalue, true);
+    ey.set(ID_C_lvalue, true);
+    elements.emplace_back(ex, ey);
+  }
+  std::function<void(const exprt &, const exprt &)> add_element =
+    [&](const exprt &ex, const exprt &ey)
+  {
+    if(ex.type().id() == ID_array)
+    {
+      const auto size =
+        numeric_cast<mp_integer>(to_array_type(ex.type()).size());
+      for(mp_integer i = 0; size.has_value() && i < *size; ++i)
+      {
+        const exprt index = from_integer(i, c_index_type());
+        exprt ix = index_exprt{ex, index};
+        exprt iy = index_exprt{ey, index};
+        ix.set(ID_C_lvalue, true);
+        iy.set(ID_C_lvalue, true);
+        add_element(ix, iy);
+      }
+      return;
+    }
+    elements.emplace_back(ex, ey);
+  };
+  for(const auto &c : class_type.components())
+  {
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.get_is_padding() ||
+      c.type().id() == ID_code || c.get_bool(ID_is_vtptr))
+    {
+      continue;
+    }
+    if(is_reference(c.type()))
+      return false; // [class.compare.default]/2: deleted
+    exprt mx = member_exprt{x, c.get_name(), c.type()};
+    exprt my = member_exprt{y, c.get_name(), c.type()};
+    mx.set(ID_C_lvalue, true);
+    my.set(ID_C_lvalue, true);
+    add_element(mx, my);
+  }
+
+  return true;
+}
+
+std::optional<code_blockt> cpp_typecheckt::defaulted_three_way_comparison(
+  const symbolt &symbol,
+  code_typet &function_type,
+  const exprt &this_expr)
+{
+  std::vector<std::pair<exprt, exprt>> elements;
+  if(!defaulted_comparison_elements(symbol, function_type, this_expr, elements))
+    return {};
+  const source_locationt &location = symbol.location;
+
+  // the element comparisons xi <=> yi
+  std::vector<exprt> comparisons;
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  try
+  {
+    for(const auto &element : elements)
+    {
+      exprt comparison{ID_spaceship};
+      comparison.add_to_operands(
+        already_typechecked_exprt{element.first},
+        already_typechecked_exprt{element.second});
+      comparison.add_source_location() = location;
+      typecheck_expr(comparison);
+      comparisons.push_back(std::move(comparison));
+    }
+  }
+  catch(...)
+  {
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return {};
+  }
+
+  // R: declared, or the common comparison type ([class.spaceship]/4)
+  const auto category_of = [](const typet &t) -> int
+  {
+    if(t.id() != ID_struct_tag)
+      return -1;
+    const std::string id = id2string(to_struct_tag_type(t).get_identifier());
+    if(id.find("tag-partial_ordering") != std::string::npos)
+      return 0;
+    if(id.find("tag-weak_ordering") != std::string::npos)
+      return 1;
+    if(id.find("tag-strong_ordering") != std::string::npos)
+      return 2;
+    return -1;
+  };
+  typet result_type = function_type.return_type();
+  if(has_auto(result_type))
+  {
+    int common = 2;
+    std::optional<typet> chosen;
+    for(const auto &comparison : comparisons)
+    {
+      typet t = comparison.type();
+      t.remove(ID_C_constant);
+      const int category = category_of(t);
+      if(category < 0)
+        return {};
+      if(category <= common || !chosen.has_value())
+      {
+        if(!chosen.has_value() || category < common)
+          chosen = t;
+        common = std::min(common, category);
+      }
+    }
+    if(!chosen.has_value())
+    {
+      // no elements: strong_ordering, the type of a strong comparison
+      exprt zero_cmp{ID_spaceship};
+      zero_cmp.add_to_operands(
+        from_integer(0, signed_int_type()), from_integer(0, signed_int_type()));
+      zero_cmp.add_source_location() = location;
+      typecheck_expr(zero_cmp);
+      chosen = zero_cmp.type();
+      chosen->remove(ID_C_constant);
+      if(category_of(*chosen) != 2)
+        return {};
+    }
+    result_type = *chosen;
+    function_type.return_type() = result_type;
+  }
+  if(category_of(result_type) < 0)
+    return {};
+
+  code_blockt body;
+  body.add_source_location() = location;
+  try
+  {
+    for(auto &comparison : comparisons)
+    {
+      // [class.spaceship]/1.1: static_cast<R>(xi <=> yi)
+      exprt value;
+      if(!convert_to_comparison_category(comparison, result_type, value))
+        throw 0;
+      // `value != 0' ([cmp.categories.pre]/3: compared with a literal 0)
+      exprt test{ID_notequal};
+      test.add_to_operands(
+        already_typechecked_exprt{value}, from_integer(0, signed_int_type()));
+      test.add_source_location() = location;
+      typecheck_expr(test);
+      code_frontend_returnt ret{already_typechecked_exprt{value}};
+      ret.add_source_location() = location;
+      code_ifthenelset branch{
+        already_typechecked_exprt{std::move(test)}, std::move(ret)};
+      branch.add_source_location() = location;
+      body.add(std::move(branch));
+    }
+    // static_cast<R>(std::strong_ordering::equal), i.e. R's equal value:
+    // the result of `0 <=> 0' converted to R
+    exprt equal{ID_spaceship};
+    equal.add_to_operands(
+      from_integer(0, signed_int_type()), from_integer(0, signed_int_type()));
+    equal.add_source_location() = location;
+    typecheck_expr(equal);
+    exprt equal_value;
+    if(!convert_to_comparison_category(equal, result_type, equal_value))
+      throw 0;
+    equal = std::move(equal_value);
+    code_frontend_returnt ret{already_typechecked_exprt{equal}};
+    ret.add_source_location() = location;
+    body.add(std::move(ret));
+  }
+  catch(...)
+  {
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return {};
+  }
+  return body;
+}
+
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
   // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of
@@ -625,6 +941,21 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     to_code(symbol.value).get_statement() == ID_block &&
     !to_code_block(to_code(symbol.value)).has_operands())
   {
+    auto body = defaulted_three_way_comparison(
+      symbol, function_type, function_scope.this_expr);
+    if(body.has_value())
+    {
+      symbol.value = std::move(*body);
+      return_type = function_type.return_type();
+      declared_return_type = return_type;
+      deducing_function_type = nullptr;
+    }
+  }
+  if(
+    symbol.base_name == "operator<=>" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
     const irep_idt &class_id = symbol.type.get(ID_C_member_name);
     if(!class_id.empty())
     {
@@ -687,6 +1018,49 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       body.add(std::move(ret0));
 
       symbol.value = std::move(body);
+    }
+  }
+
+  // N5008 [class.eq]/2-3: a defaulted operator== compares the elements of
+  // the expanded lists of subobjects -- bases, members, array elements --
+  // with ==, in order, and yields false at the first that is not equal
+  if(
+    symbol.base_name == "operator==" && symbol.value.id() == ID_code &&
+    to_code(symbol.value).get_statement() == ID_block &&
+    !to_code_block(to_code(symbol.value)).has_operands())
+  {
+    std::vector<std::pair<exprt, exprt>> elements;
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    if(defaulted_comparison_elements(
+         symbol, function_type, function_scope.this_expr, elements))
+    {
+      try
+      {
+        exprt result = true_exprt{};
+        for(const auto &element : elements)
+        {
+          exprt eq{ID_equal};
+          eq.add_to_operands(
+            already_typechecked_exprt{element.first},
+            already_typechecked_exprt{element.second});
+          eq.add_source_location() = symbol.location;
+          typecheck_expr(eq);
+          implicit_typecast_bool(eq);
+          result = result.is_true() ? eq : and_exprt{result, eq};
+        }
+        code_blockt body;
+        body.add_source_location() = symbol.location;
+        code_frontend_returnt ret{already_typechecked_exprt{result}};
+        ret.add_source_location() = symbol.location;
+        body.add(std::move(ret));
+        symbol.value = std::move(body);
+      }
+      catch(...)
+      {
+        get_message_handler().set_message_count(
+          messaget::M_ERROR, errors_before);
+      }
     }
   }
 

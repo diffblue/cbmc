@@ -1579,13 +1579,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     if(value.id() == ID_code && to_code(value).get_statement() == ID_default)
     {
-      if(base_name == "operator<=>")
-      {
-        // C++20: fix return type from auto to signed int.
-        // Body will be generated in do_not_typechecked.
-        code_typet &fn_type = to_code_type(component.type());
-        fn_type.return_type() = signed_int_type();
-      }
+      // C++20 [class.spaceship]/2.1: a defaulted operator<=> declared
+      // `auto' returns the common comparison type of its elements' results;
+      // it is deduced when the body is generated
+      // (defaulted_three_way_comparison), as for any deduced return type
 
       // C++11 [dcl.fct.def.default]: treat = default as having an
       // empty body so that member initialization is generated
