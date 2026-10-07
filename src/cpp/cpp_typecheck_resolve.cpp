@@ -8588,6 +8588,17 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
         bname, cpp_scopet::RECURSIVE);
       for(const auto &id_ptr : ids)
       {
+        // N5008 [temp.deduct]/5, [temp.arg.explicit]/7: only the parameters
+        // of the template being deduced are poisoned; a parameter of the
+        // enclosing class (C of `sv<C>' in a member template of fstr<C>) is
+        // bound already and does not participate -- the argument is then
+        // converted to the parameter type
+        if(
+          !current_deduction_parameters.empty() &&
+          current_deduction_parameters.count(id_ptr->identifier) == 0)
+        {
+          continue;
+        }
         if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
         {
           auto it =
