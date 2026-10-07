@@ -962,6 +962,15 @@ void goto_convertt::convert_frontend_decl(
   // do destructor
   code_function_callt destructor = get_destructor(ns, symbol.type);
 
+  // C++ [class.dtor]/13: the elements of an array of class type are
+  // destroyed at the end of its lifetime, in reverse order
+  if(destructor.is_nil() && symbol.type.id() == ID_array)
+  {
+    codet element_destructors = array_destructor(ns, symbol_expr);
+    if(element_destructors.is_not_nil())
+      targets.scope_stack.add(element_destructors, {});
+  }
+
   if(destructor.is_not_nil())
   {
     // add "this" (in front of any hidden flag argument, see get_destructor)
