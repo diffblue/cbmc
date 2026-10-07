@@ -22,8 +22,11 @@ dropped because formatter<int, char> was the primary template (int and
 wchar_t were one type, cpp11_specialization_distinguishes_fundamental_
 types), and _M_visit and the visitor's operator() because one lambda
 closure served all specializations (cpp11_lambda_closure_per_template_
-specialization).  Still dropped: formatter<const char *, char>::format
-(format:1899, reduced to cpp11_member_template_argument_converted_to_
-non_deduced_parameter); conversion and verification take
-more than 50 minutes.  g++ 13 accepts this program, and it fails only its
-WRONG assertion.
+specialization).  formatter<const char *, char>::format (format:1899) is no
+longer dropped, and --show-goto-functions takes 38 s instead of over 50
+minutes (most of it went into printing an enumeration bit-field constant,
+cpp11_enum_bit_field_constant_output).  Remaining: symbolic execution does not
+terminate: it unwinds the recursion of _Iter_sink<char, _Sink_iter<char>>::
+_M_overflow (format:2564) beyond 300 levels (cause not yet analysed).  With
+--unwind 4 both assertions hold vacuously.  g++ 13 accepts this program, and
+it fails only its WRONG assertion.
