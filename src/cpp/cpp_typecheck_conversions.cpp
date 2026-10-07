@@ -5343,6 +5343,37 @@ bool cpp_typecheckt::dynamic_typecast(
   else
     return false;
 
+  // N5008 [expr.dynamic.cast]/5: a cast to a base class is the static
+  // derived-to-base conversion.  [expr.dynamic.cast]/6-9: otherwise, for a
+  // polymorphic operand, the result depends on the most derived object --
+  // a run-time check, resolved once every class of the translation unit
+  // is known (resolve_runtime_dynamic_casts).
+  if(
+    type.id() == ID_pointer && !is_reference(type) &&
+    to_pointer_type(type).base_type().id() == ID_struct_tag &&
+    e.type().id() == ID_pointer &&
+    to_pointer_type(e.type()).base_type().id() == ID_struct_tag &&
+    !has_subexpr(e, ID_side_effect))
+  {
+    const struct_typet &op_struct =
+      follow_tag(to_struct_tag_type(to_pointer_type(e.type()).base_type()));
+    const struct_typet &target_struct =
+      follow_tag(to_struct_tag_type(to_pointer_type(type).base_type()));
+    bool polymorphic = false;
+    for(const auto &c : op_struct.components())
+      polymorphic = polymorphic || c.get_bool(ID_is_vtptr);
+    if(
+      polymorphic && !target_struct.is_incomplete() &&
+      !subtype_typecast(op_struct, target_struct))
+    {
+      exprt check{ID_cpp_runtime_dynamic_cast, type};
+      check.add_to_operands(e);
+      check.add_source_location() = e.source_location();
+      new_expr = std::move(check);
+      return true;
+    }
+  }
+
   if(static_typecast(e, type, new_expr))
     return true;
 

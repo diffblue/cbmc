@@ -352,6 +352,9 @@ void cpp_typecheckt::typecheck()
     typecheck_method_bodies();
   drop_unreferenced_held_back_bodies();
 
+  // every class of the translation unit is known now
+  resolve_runtime_dynamic_casts();
+
   // N5008 [class.copy.ctor]/14, [class.default.ctor]/4: an implicitly-defined
   // special member that is never odr-used is not defined at all; clear the
   // remaining placeholders once every body has been elaborated.
