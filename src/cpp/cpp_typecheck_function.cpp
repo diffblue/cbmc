@@ -1092,6 +1092,12 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   try
   {
     typecheck_code(to_code(symbol.value));
+    if(
+      symbol.type.id() == ID_code &&
+      to_code_type(symbol.type).return_type().id() == ID_constructor)
+    {
+      add_constructor_unwinding(to_code(symbol.value));
+    }
   }
   catch(int)
   {
