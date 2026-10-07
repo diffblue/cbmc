@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ derived and base pointers: SUCCESS$
+^\[main\.assertion\.2\] line \d+ with qualification: SUCCESS$
+^\[main\.assertion\.3\] line \d+ first base: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.eq]/3, [expr.type]/4: in `pr == &m' (R * and M *, M derived
+from R) both operands are converted to the composite pointer type R *, so
+&m is adjusted to its R subobject and the comparison is true.  The C rule
+used for the comparison cast the M * to R * without adjustment, so it was
+false for a base at a non-zero offset (bin53).  typecheck_expr_rel now
+applies the derived-to-base conversion first.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
