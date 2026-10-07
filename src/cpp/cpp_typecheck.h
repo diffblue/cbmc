@@ -1687,6 +1687,8 @@ public:
   /// (cpp_typecheck_dynamic_cast.cpp), resolved once every class is known
   exprt runtime_dynamic_cast(const exprt &check);
   static bool is_class_prvalue_temporary(const exprt &expr);
+  std::optional<codet> subobject_unwind_destructor(const codet &code);
+  void add_constructor_unwinding(codet &body);
   void resolve_runtime_dynamic_casts(exprt &expr);
   void resolve_runtime_dynamic_casts();
 
