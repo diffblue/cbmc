@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ designated base element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ two designators: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init.aggr]/3.1, /5: in `D d{{.a = 2}, 4}' the base element A
+is initialized from a designated-initializer-list: a from 2, b from its
+default member initializer, c value-initialized.  The aggregate-with-base
+path assigned the designated initializers positionally (bin53: an
+invariant violation in symex).  They are now matched to the members by
+name.  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.
