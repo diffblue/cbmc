@@ -10391,6 +10391,44 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
+  // N5008 [expr.eq]/3, [expr.rel]/3, [expr.type]/4: pointers to classes C1
+  // and C2, C1 derived from C2, are compared after converting both to the
+  // composite pointer type, pointer to (cv-combined) C2 -- the
+  // derived-to-base conversion adjusts the pointer to the base subobject;
+  // the C rule below casts the representation unchanged
+  for(int k = 0; k < 2; ++k)
+  {
+    exprt &from = k == 0 ? expr.op0() : expr.op1();
+    const exprt &to = k == 0 ? expr.op1() : expr.op0();
+    if(
+      from.type().id() != ID_pointer || to.type().id() != ID_pointer ||
+      is_reference(from.type()) || is_reference(to.type()))
+    {
+      continue;
+    }
+    const typet &from_base = to_pointer_type(from.type()).base_type();
+    const typet &to_base = to_pointer_type(to.type()).base_type();
+    if(
+      from_base.id() != ID_struct_tag || to_base.id() != ID_struct_tag ||
+      to_struct_tag_type(from_base).get_identifier() ==
+        to_struct_tag_type(to_base).get_identifier())
+    {
+      continue;
+    }
+    const struct_typet &from_struct = follow_tag(to_struct_tag_type(from_base));
+    const struct_typet &to_struct = follow_tag(to_struct_tag_type(to_base));
+    if(!subtype_typecast(from_struct, to_struct))
+      continue;
+    // the composite type's pointee keeps the qualifiers of both
+    pointer_typet composite = to_pointer_type(to.type());
+    if(from_base.get_bool(ID_C_constant))
+      composite.base_type().set(ID_C_constant, true);
+    if(from_base.get_bool(ID_C_volatile))
+      composite.base_type().set(ID_C_volatile, true);
+    make_ptr_typecast(from, composite);
+    break;
+  }
+
   c_typecheck_baset::typecheck_expr_rel(expr);
 
   // Ensure both operands of pointer comparisons have exactly the same
