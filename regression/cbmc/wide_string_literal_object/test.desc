@@ -1,0 +1,12 @@
+CORE
+main.c
+--pointer-check
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A wide string literal is an array constant; object_size gave it no size
+(propositional backend) and the SMT backend failed an invariant on its
+address, so every access failed "pointer outside object bounds".
