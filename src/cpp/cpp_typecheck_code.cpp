@@ -369,8 +369,23 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
             !operand_symbol.is_static_lifetime && operand_symbol.is_lvalue &&
             operand.type().get_bool(ID_C_volatile) == false)
           {
-            // treated as an rvalue for constructor selection
-            operand.remove(ID_C_lvalue);
+            // treated as an rvalue -- an xvalue denoting the object itself,
+            // `*static_cast<T &&>(&x)' ([expr.type]/1): the constructor's
+            // reference parameter binds to x.  (Dropping the lvalue mark
+            // instead made the binding materialize a bitwise copy of x as
+            // a temporary, which was then destroyed without having been
+            // constructed.)
+            pointer_typet rvalue_reference = pointer_type(operand.type());
+            rvalue_reference.set(ID_C_reference, true);
+            rvalue_reference.set(ID_C_rvalue_reference, true);
+            exprt address = address_of_exprt{operand};
+            address.type() = rvalue_reference;
+            dereference_exprt xvalue{address, operand.type()};
+            xvalue.set(ID_C_implicit, true);
+            // a glvalue ([basic.lval]/1); the rvalue-reference pointer
+            // makes it an xvalue
+            xvalue.set(ID_C_lvalue, true);
+            operand = std::move(xvalue);
           }
         }
 
