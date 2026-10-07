@@ -966,9 +966,9 @@ void goto_convertt::convert_frontend_decl(
   // destroyed at the end of its lifetime, in reverse order
   if(destructor.is_nil() && symbol.type.id() == ID_array)
   {
-    codet element_destructors = array_destructor(ns, symbol_expr);
-    if(element_destructors.is_not_nil())
-      targets.scope_stack.add(element_destructors, {});
+    const auto element_destructors = array_destructor(ns, symbol_expr);
+    if(element_destructors.has_value())
+      targets.scope_stack.add(*element_destructors, {});
   }
 
   if(destructor.is_not_nil())
