@@ -1,4 +1,4 @@
-CORE broken-smt-backend
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ char16_t: SUCCESS$
@@ -18,7 +18,6 @@ first element and p[0..2] are within it.  A wide string literal is an
 array constant, and the bit-vector encoding of object_size gave no size
 to objects other than symbols and narrow string constants: every access
 failed "pointer outside object bounds" (bin53, also in C).  Array
-constants now have the size of their type.  The SMT backend fails an
-invariant on the address of an array constant (smt2_conv.cpp,
-convert_address_of_rec, bin53 too).  g++ 13 and clang++ 18 accept this
-program, and it fails only its WRONG assertion.
+constants now have the size of their type, also in the SMT backend, which
+failed an invariant on the address of an array constant (bin53).  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.

@@ -266,7 +266,8 @@ void smt2_convt::define_object_size(
     auto size_expr = size_of_expr(type, ns);
 
     if(
-      (o.id() != ID_symbol && o.id() != ID_string_constant) ||
+      (o.id() != ID_symbol && o.id() != ID_string_constant &&
+       o.id() != ID_array) ||
       !size_expr.has_value())
     {
       ++number;
@@ -848,7 +849,8 @@ void smt2_convt::convert_address_of_rec(
 {
   if(
     expr.id() == ID_symbol || expr.is_constant() ||
-    expr.id() == ID_string_constant || expr.id() == ID_label)
+    expr.id() == ID_string_constant || expr.id() == ID_label ||
+    expr.id() == ID_array)
   {
     const std::size_t object_bits = config.bv_encoding.object_bits;
     const std::size_t max_objects = std::size_t(1) << object_bits;
