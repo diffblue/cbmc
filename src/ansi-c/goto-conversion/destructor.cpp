@@ -11,9 +11,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol.h>
 #include <util/symbol_table_base.h>
@@ -74,6 +76,39 @@ code_function_callt get_destructor(const namespacet &ns, const typet &type)
   }
 
   return static_cast<const code_function_callt &>(get_nil_irep());
+}
+
+codet array_destructor(const namespacet &ns, const exprt &array)
+{
+  const typet &type = array.type();
+  if(type.id() != ID_array)
+    return codet{ID_nil};
+  const auto size = numeric_cast<mp_integer>(to_array_type(type).size());
+  if(!size.has_value() || *size <= 0)
+    return codet{ID_nil};
+  const typet &element_type = to_array_type(type).element_type();
+  code_blockt block;
+  for(mp_integer i = *size; i > 0; --i)
+  {
+    const index_exprt element{
+      array, from_integer(i - 1, to_array_type(type).index_type())};
+    if(element_type.id() == ID_array)
+    {
+      codet nested = array_destructor(ns, element);
+      if(nested.is_nil())
+        return codet{ID_nil};
+      block.add(std::move(nested));
+      continue;
+    }
+    code_function_callt destructor = get_destructor(ns, element_type);
+    if(destructor.is_nil())
+      return codet{ID_nil};
+    destructor.arguments().insert(
+      destructor.arguments().begin(),
+      address_of_exprt{element, pointer_type(element_type)});
+    block.add(std::move(destructor));
+  }
+  return std::move(block);
 }
 
 void destruct_locals(
