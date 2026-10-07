@@ -29,6 +29,7 @@ SRC = cpp_base_subobjects.cpp \
       cpp_typecheck_compound_type.cpp \
       cpp_typecheck_constructor.cpp \
       cpp_typecheck_conversions.cpp \
+      cpp_typecheck_dynamic_cast.cpp \
       cpp_typecheck_declaration.cpp \
       cpp_typecheck_destructor.cpp \
       cpp_typecheck_enum_type.cpp \

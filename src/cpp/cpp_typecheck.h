@@ -1683,6 +1683,11 @@ public:
     const exprt &expr,
     const typet &type,
     exprt &new_expr);
+  /// N5008 [expr.dynamic.cast]/9: the run-time check of a dynamic_cast
+  /// (cpp_typecheck_dynamic_cast.cpp), resolved once every class is known
+  exprt runtime_dynamic_cast(const exprt &check);
+  void resolve_runtime_dynamic_casts(exprt &expr);
+  void resolve_runtime_dynamic_casts();
 
   bool reinterpret_typecast(
     const exprt &expr,
