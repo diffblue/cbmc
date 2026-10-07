@@ -1689,6 +1689,19 @@ public:
   static bool is_class_prvalue_temporary(const exprt &expr);
   std::optional<codet> subobject_unwind_destructor(const codet &code);
   void add_constructor_unwinding(codet &body);
+  bool defaulted_comparison_elements(
+    const symbolt &symbol,
+    code_typet &function_type,
+    const exprt &this_expr,
+    std::vector<std::pair<exprt, exprt>> &elements);
+  bool convert_to_comparison_category(
+    const exprt &value,
+    const typet &category,
+    exprt &result);
+  std::optional<code_blockt> defaulted_three_way_comparison(
+    const symbolt &symbol,
+    code_typet &function_type,
+    const exprt &this_expr);
   void resolve_runtime_dynamic_casts(exprt &expr);
   void resolve_runtime_dynamic_casts();
 
