@@ -25,6 +25,7 @@ Author:
 #include <ansi-c/c_qualifiers.h>
 
 #include "cpp_convert_type.h"
+#include "cpp_exception_id.h"
 #include "cpp_sfinae_context.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
@@ -5315,6 +5316,49 @@ bool cpp_typecheckt::dynamic_typecast(
   {
     if(to_reference_type(type).base_type().id() != ID_struct_tag)
       return false;
+    // N5008 [expr.dynamic.cast]/10: for a reference, the run-time check of
+    // the corresponding pointer cast ([expr.dynamic.cast]/9) applies, and a
+    // failed check throws an exception matching a std::bad_cast handler
+    if(
+      e.type().id() == ID_struct_tag && e.get_bool(ID_C_lvalue) &&
+      !has_subexpr(e, ID_side_effect))
+    {
+      const pointer_typet target_pointer =
+        pointer_type(to_reference_type(type).base_type());
+      exprt pointer_result;
+      if(
+        dynamic_typecast(address_of_exprt{e}, target_pointer, pointer_result) &&
+        has_subexpr(pointer_result, ID_cpp_runtime_dynamic_cast))
+      {
+        const symbolt *bad_cast = symbol_table.lookup("std::tag-bad_cast");
+        if(bad_cast != nullptr && bad_cast->type.id() == ID_struct)
+        {
+          const source_locationt &location = e.source_location();
+          exprt exception;
+          new_temporary(
+            location,
+            struct_tag_typet{bad_cast->name},
+            exprt::operandst{},
+            exception);
+          side_effect_exprt throw_expr{ID_throw, empty_typet{}, location};
+          throw_expr.add_to_operands(std::move(exception));
+          throw_expr.set(
+            ID_exception_list,
+            cpp_exception_list(struct_tag_typet{bad_cast->name}, *this));
+          exprt reference = typecast_exprt{pointer_result, type};
+          exprt failure{ID_comma, type};
+          failure.add_to_operands(
+            std::move(throw_expr), null_pointer_exprt{to_pointer_type(type)});
+          new_expr = if_exprt{
+            notequal_exprt{pointer_result, null_pointer_exprt{target_pointer}},
+            std::move(reference),
+            std::move(failure),
+            type};
+          new_expr.add_source_location() = location;
+          return true;
+        }
+      }
+    }
   }
   else if(type.id() == ID_pointer)
   {
