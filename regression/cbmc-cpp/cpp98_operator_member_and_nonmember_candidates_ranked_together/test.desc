@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main.assertion.1\] .* non-member exact match chosen: SUCCESS$
+^\[main.assertion.2\] .* member chosen: SUCCESS$
+^\[main.assertion.3\] .* non-member template exact match chosen: SUCCESS$
+^\[main.assertion.4\] .* WRONG \(must FAIL\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [over.match.oper]/3, [over.match.best]/2.1: member and non-member
+operator candidates are ranked together.  The member operator<<(int) was
+selected without considering the non-member with an exact match for char.
