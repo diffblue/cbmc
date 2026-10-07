@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ non-template member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.arg.explicit]/7: "Implicit conversions will be performed on
+a function argument to convert it to the type of the corresponding
+function parameter if the parameter type contains no template parameters
+that participate in template argument deduction."  In the member template
+fstr<char>::format<O>(sv<char>, O) only O is deduced, so "a" converts to
+sv<char> by its constructor.  The front end finds no match for
+f.format("a", 1) (bin53 too).  This is the drop of libstdc++'s
+formatter<const char *, char>::format (format:1899, `_M_f.format(__u,
+__fc)' with __formatter_str<char>::format(basic_string_view<char>, ...)),
+reduced from cpp11_libstdcxx_header_drops/test_format.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.
