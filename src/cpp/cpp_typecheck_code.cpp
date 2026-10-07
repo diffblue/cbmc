@@ -419,7 +419,13 @@ void cpp_typecheckt::typecheck_code(codet &code)
   else if(statement == ID_member_initializer)
   {
     code.type() = empty_typet();
+    // add_constructor_unwinding builds the destructor call from the
+    // initializer as written, and only if a later initialization or the
+    // body follows: building it type-checks (and instantiates) the
+    // destructor, which [class.base.init]/13 makes potentially invoked
+    const codet original = code;
     typecheck_member_initializer(code);
+    code.add(ID_C_unwind_destructor) = original;
   }
   else if(statement == ID_msc_if_exists || statement == ID_msc_if_not_exists)
   {
@@ -2167,6 +2173,176 @@ void cpp_typecheckt::check_default_constructor_access(
     }
 
     return;
+  }
+}
+
+/// N5008 [except.ctor]/3: if the initialization of a subobject of a class
+/// object is terminated by an exception, the destructors of the subobjects
+/// already initialized are invoked in reverse order.  \return the destructor
+/// call for the base or member that mem-initializer \p code initializes, if
+/// it has one; nothing for a virtual base (constructed only for the complete
+/// object) or a delegating constructor's target (the class itself).
+std::optional<codet>
+cpp_typecheckt::subobject_unwind_destructor(const codet &code)
+{
+  const exprt &this_expr = cpp_scopes.current_scope().this_expr;
+  if(
+    this_expr.is_nil() || this_expr.type().id() != ID_pointer ||
+    to_pointer_type(this_expr.type()).base_type().id() != ID_struct_tag)
+  {
+    return {};
+  }
+  const struct_typet &class_type = follow_tag(
+    to_struct_tag_type(to_pointer_type(this_expr.type()).base_type()));
+  const irept &member = code.find(ID_member);
+  if(member.id() != ID_cpp_name)
+    return {};
+  const irep_idt base_name = to_cpp_name(member).get_base_name();
+  const source_locationt &location = code.source_location();
+
+  // a non-static data member
+  if(code.find("#base_type").is_nil())
+  {
+    for(const auto &c : class_type.components())
+    {
+      if(
+        c.get_base_name() != base_name || c.get_bool(ID_from_base) ||
+        c.get_bool(ID_is_static) || c.get_bool(ID_is_type) ||
+        c.type().id() == ID_code)
+      {
+        continue;
+      }
+      if(is_reference(c.type()) || cpp_is_pod(c.type()))
+        return {};
+      // [class.dtor]/5: a destructor can be invoked for a const object;
+      // name the member through a non-const pointer
+      typet object_type = c.type();
+      for(typet *t = &object_type;; t = &to_array_type(*t).element_type())
+      {
+        t->remove(ID_C_constant);
+        t->remove(ID_C_volatile);
+        if(t->id() != ID_array)
+          break;
+      }
+      const member_exprt member_expr{
+        dereference_exprt{
+          this_expr, to_pointer_type(this_expr.type()).base_type()},
+        c.get_name(),
+        c.type()};
+      // (an unconditional cast: qualifiers are comments, ignored by ==)
+      exprt object_address = typecast_exprt{
+        address_of_exprt{member_expr}, pointer_type(object_type)};
+      already_typechecked_exprt::make_already_typechecked(object_address);
+      dereference_exprt object{object_address, object_type};
+      object.add_source_location() = location;
+      const bool disabled_access_control = disable_access_control;
+      disable_access_control = true;
+      auto destructor = cpp_destructor(location, object);
+      disable_access_control = disabled_access_control;
+      return destructor;
+    }
+  }
+
+  // a direct non-virtual base
+  for(const auto &base : class_type.bases())
+  {
+    if(base.get_bool(ID_virtual) || base.type().id() != ID_struct_tag)
+      continue;
+    const irept &base_type_hint = code.find("#base_type");
+    const irep_idt base_id = to_struct_tag_type(base.type()).get_identifier();
+    if(base_type_hint.is_not_nil())
+    {
+      if(
+        base_type_hint.id() != ID_struct_tag ||
+        to_struct_tag_type(static_cast<const typet &>(base_type_hint))
+            .get_identifier() != base_id)
+      {
+        continue;
+      }
+    }
+    else if(lookup(base_id).base_name != base_name)
+      continue;
+    if(cpp_is_pod(base.type()))
+      return {};
+    exprt cast_this = this_expr;
+    make_ptr_typecast(
+      cast_this,
+      pointer_type(base.type()),
+      /*static_virtual_base_offset=*/true,
+      /*direct_base=*/true);
+    cast_this.add_source_location() = location;
+    already_typechecked_exprt::make_already_typechecked(cast_this);
+    dereference_exprt object{cast_this, base.type()};
+    object.add_source_location() = location;
+    const bool disabled_access_control = disable_access_control;
+    disable_access_control = true;
+    auto destructor = cpp_destructor(
+      location, object, /*force_direct=*/true, /*base_subobject=*/true);
+    disable_access_control = disabled_access_control;
+    return destructor;
+  }
+  return {};
+}
+
+/// N5008 [except.ctor]/3: wrap the statements of the converted constructor
+/// body \p body that follow each subobject initialization carrying an
+/// ID_C_unwind_destructor in `try { ... } catch(...) { destroy; throw; }',
+/// so an exception leaving a later initializer or the compound-statement
+/// destroys that subobject -- the subobjects in reverse order.
+void cpp_typecheckt::add_constructor_unwinding(codet &body)
+{
+  // initializations not at the top level of the body (those of virtual
+  // bases, guarded by the most-derived flag) are not unwound here; drop
+  // their unconverted copies
+  std::function<void(irept &, bool)> remove_nested = [&](irept &node, bool top)
+  {
+    if(!top)
+      node.remove(ID_C_unwind_destructor);
+    for(auto &sub : node.get_sub())
+      remove_nested(sub, false);
+  };
+  if(body.get_statement() != ID_block)
+  {
+    remove_nested(body, false);
+    return;
+  }
+  for(auto &statement : to_code_block(body).statements())
+  {
+    for(auto &sub : statement.get_sub())
+      remove_nested(sub, false);
+  }
+  auto &statements = to_code_block(body).statements();
+  for(std::size_t i = statements.size(); i > 0; --i)
+  {
+    codet &initialization = statements[i - 1];
+    const irept &unwind = initialization.find(ID_C_unwind_destructor);
+    if(unwind.is_nil())
+      continue;
+    const codet original = static_cast<const codet &>(unwind);
+    initialization.remove(ID_C_unwind_destructor);
+    if(i == statements.size())
+      continue; // nothing can throw after it
+    std::optional<codet> unwind_destructor =
+      subobject_unwind_destructor(original);
+    if(!unwind_destructor.has_value())
+      continue;
+    codet destructor = std::move(*unwind_destructor);
+    typecheck_code(destructor);
+    code_blockt rest;
+    for(std::size_t j = i; j < statements.size(); ++j)
+      rest.add(std::move(statements[j]));
+    statements.erase(statements.begin() + i, statements.end());
+    const source_locationt &location = initialization.source_location();
+    // `throw;' -- rethrows the exception being handled
+    side_effect_exprt rethrow{ID_throw, empty_typet{}, location};
+    code_blockt handler;
+    handler.add(destructor);
+    handler.add(code_expressiont{std::move(rethrow)});
+    handler.add_source_location() = location;
+    codet try_catch{ID_try_catch};
+    try_catch.add_to_operands(std::move(rest), std::move(handler));
+    try_catch.add_source_location() = location;
+    statements.push_back(std::move(try_catch));
   }
 }
 
