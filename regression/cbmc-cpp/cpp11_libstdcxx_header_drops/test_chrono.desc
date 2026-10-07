@@ -9,13 +9,13 @@ chrono.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
-dropped the body of system-header function
+dropped the body
 could not fully type-check
 --
 libstdc++ 13 <chrono>: `12h' (chrono_literals) is fixed
-(cpp11_user_defined_literal_call_forms), as is format:1422 (see
-test_format.desc).  Remaining: <format>'s basic_format_arg::_M_visit
-(format:3124), the same drop as test_format.desc.  (bits/unique_ptr.h:93,
-default_delete::operator() for an incomplete type, is not reported as a
-system-header function and is not odr-used.)  g++ 13 accepts this
+(cpp11_user_defined_literal_call_forms), as is __check_overflow (the
+_Number_help recursion, cpp11_alias_template_in_recursive_class_template).
+Remaining: default_delete<time_zone::_Impl>::operator() (bits/unique_ptr.h:93)
+is instantiated for the incomplete _Impl although no member of time_zone that
+destroys its unique_ptr is odr-used ([temp.inst]/3).  g++ 13 accepts this
 program, and it fails only its WRONG assertion.
