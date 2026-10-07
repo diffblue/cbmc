@@ -13474,3 +13474,37 @@ C++17 guaranteed copy elision, SMT backend address_of(array constant).
 Reduction tooling: /tmp/r163/red/cbmc_first_match.sh stops CBMC at the
 first matching diagnostic (with timeout inside); start_one.sh scopes use
 OOMPolicy=continue so an OOM-killed candidate does not end the reduction.
+
+## Round 164: minimal KNOWNBUGs to CORE
+
+Fixed (KNOWNBUG -> CORE):
+- Non-deduced class parameters are not poisoned in deduction
+  (guess_template_args_template_id marked the enclosing class's C of
+  `sv<C>' as failed when the argument was not a class; [temp.deduct]/5,
+  [temp.arg.explicit]/7).  Was libstdc++ <format> format:1899.
+- dynamic_cast run-time check ([expr.dynamic.cast]/4, /9-10): a
+  cpp_runtime_dynamic_cast placeholder, resolved after all bodies
+  (cpp_typecheck_dynamic_cast.cpp) by comparing the A subobject's vtable
+  pointer with the value each class D installs; result D's unique public
+  C subobject or null.  Virtual bases / repeated subobjects / unknown
+  classes keep the nondet model.  cpp17_dynamic_cross_cast CORE; new
+  cpp98_dynamic_cast_runtime_check.
+- C++17 guaranteed copy elision ([dcl.init.general]/16.6.1) in
+  cpp_constructor: a constructor-built prvalue is constructed in place;
+  a by-value call result initializes the object, except a new_object
+  (that broke cpp17_functional_cast_deduced_param_vector: double delete).
+- New: block-scope arrays of class type destroy their elements
+  ([class.dtor]/13, array_destructor in goto-conversion; first cut
+  registered a nil statement for arrays of non-class types).
+- cpp11_namespace_reopened_after_qualified_member_template_definition/
+  test_libstdcxx promoted (<format> vformat converts without drops).
+
+Suites: W28 (HEAD's code) cbmc-cpp exit 0, cpp exit 0, regression/cbmc
+exit 0, lint 0.
+
+Still KNOWNBUG: test_format (conversion alone > 50 minutes now that
+nothing is dropped; no verdict within an hour), test_ostream_int and
+test_cpp11 of cpp98_explicit_instantiation (locale facet data model),
+libc++ functional/ranges (tuple<Closure &&> from a tuple; kb_Z_func2
+restarted on W28 after the first run lost the drop), the older large
+libstdc++/libc++ header KNOWNBUGs.
