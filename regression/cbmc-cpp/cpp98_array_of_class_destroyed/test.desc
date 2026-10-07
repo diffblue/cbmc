@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ default-initialized array: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reverse order: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.dtor]/13: the elements of an array object of class type are
+destroyed at the end of its lifetime, in the reverse order of
+construction.  Goto conversion registered destructors only for objects
+of class type, so a block-scope array's elements were never destroyed
+(bin53; array members and delete[] were).  convert_decl now registers
+the element destructors (array_destructor), also for multidimensional
+arrays.  g++ 13 and clang++ 18 accept this program, and it fails only its
+WRONG assertion.
