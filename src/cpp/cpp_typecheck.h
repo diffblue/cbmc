@@ -1281,6 +1281,10 @@ protected:
   void instantiate_generic_lambda(side_effect_expr_function_callt &);
 
   bool operator_is_overloaded(exprt &);
+  bool nonmember_operator_is_better(
+    const exprt::operandst &operands,
+    const irep_idt &member,
+    const irep_idt &nonmember);
   bool rewritten_comparison_candidate(exprt &expr);
   bool overloadable(const exprt &);
 

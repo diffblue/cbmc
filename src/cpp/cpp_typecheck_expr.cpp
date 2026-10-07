@@ -3866,6 +3866,74 @@ bool cpp_typecheckt::rewritten_comparison_candidate(exprt &expr)
   return false;
 }
 
+/// N5008 [over.match.best]/2.1, [over.match.oper]/3: whether the non-member
+/// operator function \p nonmember is a better candidate for the operands
+/// \p operands than the member operator function \p member, whose implicit
+/// object parameter takes the first operand ([over.match.funcs]/4): each
+/// conversion sequence of \p nonmember is not worse ([over.ics.rank]) and
+/// one is better.  Ranks come from implicit_conversion_sequence.
+bool cpp_typecheckt::nonmember_operator_is_better(
+  const exprt::operandst &operands,
+  const irep_idt &member,
+  const irep_idt &nonmember)
+{
+  const symbolt *member_symbol = symbol_table.lookup(member);
+  const symbolt *nonmember_symbol = symbol_table.lookup(nonmember);
+  if(
+    member_symbol == nullptr || nonmember_symbol == nullptr ||
+    member_symbol->type.id() != ID_code ||
+    nonmember_symbol->type.id() != ID_code)
+  {
+    return false;
+  }
+  const auto &member_parameters =
+    to_code_type(member_symbol->type).parameters();
+  const auto &nonmember_parameters =
+    to_code_type(nonmember_symbol->type).parameters();
+  if(
+    member_parameters.size() != operands.size() ||
+    nonmember_parameters.size() != operands.size() ||
+    member_parameters.front().get_this() == false ||
+    member_parameters.front().type().id() != ID_pointer)
+  {
+    return false;
+  }
+  sfinae_contextt sfinae_guard{*this};
+  bool better = false;
+  bool worse = false;
+  for(std::size_t i = 0; i < operands.size() && !worse; ++i)
+  {
+    // the implicit object parameter: reference to the class
+    // ([over.match.funcs]/4)
+    const typet member_type =
+      i == 0 ? typet{reference_type(
+                 to_pointer_type(member_parameters[0].type()).base_type())}
+             : member_parameters[i].type();
+    unsigned member_rank = 0;
+    unsigned nonmember_rank = 0;
+    bool member_ok = false;
+    bool nonmember_ok = false;
+    try
+    {
+      member_ok =
+        implicit_conversion_sequence(operands[i], member_type, member_rank);
+      nonmember_ok = implicit_conversion_sequence(
+        operands[i], nonmember_parameters[i].type(), nonmember_rank);
+    }
+    catch(...)
+    {
+      member_ok = false;
+    }
+    if(!member_ok || !nonmember_ok)
+      worse = true;
+    else if(nonmember_rank > member_rank)
+      worse = true;
+    else if(nonmember_rank < member_rank)
+      better = true;
+  }
+  return better && !worse;
+}
+
 bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
 {
   // Check argument types first.
@@ -4369,6 +4437,64 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
               }
               // Fall back: re-enter struct scope so the member
               // call below uses the right scope.
+              cpp_scopes.set_scope(struct_identifier);
+            }
+
+            // N5008 [over.match.oper]/3, [over.match.best]/2.1: the member
+            // and the non-member candidates are ranked together; a
+            // non-member whose conversion sequences are all at least as
+            // good, one of them better, wins over the member.
+            // resolve returns the member function as `member' of the object
+            const exprt &member_function =
+              resolve_result.id() == ID_member
+                ? static_cast<const exprt &>(resolve_result)
+                : resolve_result;
+            const irep_idt member_identifier =
+              member_function.id() == ID_member
+                ? member_function.get(ID_component_name)
+                : member_function.get(ID_identifier);
+            if(
+              expr.id() != ID_ptrmember && !member_identifier.empty() &&
+              !member_is_template_specialization)
+            {
+              save_scope.restore();
+              cpp_typecheck_fargst free_fargs;
+              free_fargs.operands = expr.operands();
+              free_fargs.has_object = false;
+              free_fargs.in_use = true;
+              exprt free_resolve = nil_exprt{};
+              try
+              {
+                sfinae_contextt sfinae_guard{*this};
+                free_resolve = resolve(
+                  cpp_name,
+                  cpp_typecheck_resolvet::wantt::VAR,
+                  free_fargs,
+                  false);
+              }
+              catch(...)
+              {
+                free_resolve = nil_exprt{};
+              }
+              if(
+                free_resolve.id() == ID_symbol &&
+                nonmember_operator_is_better(
+                  expr.operands(),
+                  member_identifier,
+                  to_symbol_expr(free_resolve).get_identifier()))
+              {
+                side_effect_expr_function_callt function_call(
+                  cpp_name.as_expr(),
+                  {},
+                  uninitialized_typet{},
+                  expr.source_location());
+                function_call.arguments().reserve(expr.operands().size());
+                for(const auto &op : as_const(expr).operands())
+                  function_call.arguments().push_back(op);
+                typecheck_side_effect_function_call(function_call);
+                expr = function_call;
+                return true;
+              }
               cpp_scopes.set_scope(struct_identifier);
             }
 
