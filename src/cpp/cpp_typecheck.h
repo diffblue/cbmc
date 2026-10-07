@@ -1686,6 +1686,7 @@ public:
   /// N5008 [expr.dynamic.cast]/9: the run-time check of a dynamic_cast
   /// (cpp_typecheck_dynamic_cast.cpp), resolved once every class is known
   exprt runtime_dynamic_cast(const exprt &check);
+  static bool is_class_prvalue_temporary(const exprt &expr);
   void resolve_runtime_dynamic_casts(exprt &expr);
   void resolve_runtime_dynamic_casts();
 

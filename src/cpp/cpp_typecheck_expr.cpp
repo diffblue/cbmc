@@ -2835,7 +2835,9 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
   const auto value_category = [](const exprt &e) -> int
   {
     // 0 = prvalue, 1 = lvalue, 2 = xvalue
-    if(!e.get_bool(ID_C_lvalue))
+    // (a materialized class prvalue carries the lvalue mark that lets
+    // references bind to it, [class.temporary]/2, but is a prvalue)
+    if(!e.get_bool(ID_C_lvalue) || is_class_prvalue_temporary(e))
       return 0;
     if(
       e.id() == ID_dereference && e.get_bool(ID_C_implicit) &&
@@ -2878,6 +2880,42 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
         expr.set(ID_C_xvalue, true);
       return;
     }
+    // N5008 [expr.cond]/1, /7: for operands of class type of which one is a
+    // prvalue, the result is a prvalue initialized from the selected operand
+    // only -- one object is created and the other operand is not evaluated.
+    // The front end materializes each prvalue as its own temporary; built as
+    // `b ? tmp1 : tmp2', both were constructed (and destroyed) and the result
+    // was treated as an lvalue.  Build a single temporary whose initializer
+    // initializes it from the selected operand.
+    if(expr.type().id() == ID_struct_tag && (cat1 == 0 || cat2 == 0))
+    {
+      const typet &type = expr.type();
+      const source_locationt location = expr.source_location();
+      const auto initializer_from = [&](const exprt &operand) -> codet
+      {
+        if(is_class_prvalue_temporary(operand))
+          return to_code(
+            static_cast<const exprt &>(operand.find(ID_initializer)));
+        exprt object{ID_new_object, type};
+        object.set(ID_C_lvalue, true);
+        already_typechecked_exprt::make_already_typechecked(object);
+        auto code = cpp_constructor(
+          location, object, {already_typechecked_exprt{operand}});
+        return code.has_value() ? *code : codet{ID_skip};
+      };
+      code_ifthenelset initialization{
+        expr.cond(),
+        initializer_from(expr.op1()),
+        initializer_from(expr.op2())};
+      initialization.add_source_location() = location;
+      side_effect_exprt temporary{ID_temporary_object, type, location};
+      temporary.set(ID_mode, ID_cpp);
+      temporary.set(ID_C_lvalue, true);
+      temporary.add(ID_initializer) = std::move(initialization);
+      expr.swap(temporary);
+      return;
+    }
+
     // 4.3 / 6: a prvalue; lvalue-to-rvalue conversion on glvalue operands.
     // [expr.type]/2: a prvalue of a non-class, non-array type has a
     // cv-unqualified type.
@@ -2958,6 +2996,17 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
     expr.set(ID_C_lvalue, true);
 
   return;
+}
+
+/// A temporary object of class type built by the front end for a prvalue
+/// (`T(args)', a call result materialized with its constructor call): a
+/// temporary_object side effect with an initializer and no operands.
+bool cpp_typecheckt::is_class_prvalue_temporary(const exprt &expr)
+{
+  return expr.id() == ID_side_effect &&
+         expr.get(ID_statement) == ID_temporary_object &&
+         expr.type().id() == ID_struct_tag && expr.operands().empty() &&
+         expr.find(ID_initializer).id() == ID_code;
 }
 
 void cpp_typecheckt::typecheck_expr_member(exprt &expr)
