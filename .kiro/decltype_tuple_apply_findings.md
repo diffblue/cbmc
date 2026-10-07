@@ -13508,3 +13508,69 @@ test_cpp11 of cpp98_explicit_instantiation (locale facet data model),
 libc++ functional/ranges (tuple<Closure &&> from a tuple; kb_Z_func2
 restarted on W28 after the first run lost the drop), the older large
 libstdc++/libc++ header KNOWNBUGs.
+
+## Round 165: dynamic_cast, temporaries, operator candidates, <format> output
+
+Fixed (new CORE tests, each failing on bin53 unless noted):
+- dynamic_cast to a reference throws std::bad_cast ([expr.dynamic.cast]/9-10).
+- dynamic_cast through virtual bases and repeated A subobjects
+  ([expr.dynamic.cast]/9): each A subobject is a case identified by the vtable
+  D installs; shared vtables fall back to the nondet model.
+- Composite pointer type for == and relational comparisons of derived and
+  base pointers ([expr.eq]/3, [expr.type]/4).
+- SMT2: address_of an array constant (wide string literal); new
+  regression/cbmc/wide_string_literal_object; cpp11_wide_string_literal_object
+  loses broken-smt-backend.
+- `return x;' binds the constructor to the local: xvalue
+  `*(T &&)&x' ([class.copy.elision]/3).
+- A conditional with class prvalue operands builds one temporary
+  ([expr.cond]/1, /7).
+- Range-for range variable is declared, so a class prvalue range is
+  destroyed ([stmt.ranged]/1).
+- Constructor exception unwinding ([except.ctor]/3).  The destructor call is
+  built in add_constructor_unwinding, only when a later statement follows:
+  building it instantiates the destructor, and eager building dropped
+  default_delete<incomplete>::operator() via never-used implicit
+  constructors (test_unused.desc).  Const members and arrays of const
+  elements are destroyed through an unqualified pointer ([class.dtor]/5).
+  Nested (virtual-base) initializers lose the stored copy, otherwise the
+  "parse-only statement" check dropped basic_ostream's constructor.
+- Designated initializer list for a base element ([dcl.init.aggr]/3.1, /5).
+- Defaulted operator<=>: subobject list, `auto' deduces the common
+  comparison type ([class.spaceship]/2-4).
+- Member and non-member operator candidates ranked together
+  ([over.match.oper]/3): `ostringstream << 'c'' chose the member
+  operator<<(int).  nonmember_operator_is_better compares per-argument
+  implicit_conversion_sequence ranks (derived-to-base distance is not
+  ranked, [over.ics.rank]/4.4).
+- Alias cycle keys: `#map_fingerprint'/`#instantiation_ctx' were comments,
+  ignored by irept::compare, so the third nested level of
+  __parse_int::_Number_help resolved to empty (chrono __check_overflow).
+- format_expr dereferenced an empty optional for a c_bit_field constant with
+  c_enum_tag underlying type (a 250000-digit number per zero);
+  --show-goto-functions on <format> went from > 50 minutes to 38 s.
+
+Probes that are not bugs: consteval, class-type and auto NTTPs, basic
+defaulted ==/<=>.
+
+Suites on W34 (built from ee633765e1, whose src is identical to
+633f79e9f3): cbmc-cpp 1748 tests exit 0, cpp 246 exit 0, regression/cbmc
+1201 exit 0, lint 0, -K: all 6 KNOWNBUGs [OK] (test_chrono's negative
+pattern widened from "dropped the body of system-header function" to
+"dropped the body": the unique_ptr.h drop is not always labelled
+system-header).  Every commit compiles on its own.
+
+Still KNOWNBUG:
+- test_chrono: default_delete<time_zone::_Impl>::operator()
+  (unique_ptr.h:93) instantiated for an incomplete type (reproduced with
+  <memory>: a struct with a unique_ptr<incomplete> member and a defaulted
+  move constructor; pre-existing on W28).
+- test_format: conversion 38 s, no drops; symex unwinds
+  _Iter_sink::_M_overflow recursion beyond 300 levels (not analysed).
+- #3 locale model (/tmp/r165/locale_model3.patch: classic num_put object
+  with vtable, __numpunct_cache "C" values, member extern template discard
+  re-applied): ostringstream << 7 verifies in 9 s, but `setw(3) << 7'
+  exhausts 8 GB in the SAT solver (1821 VCCs after 4.6 s symex) and
+  cpp11_stream_setw / gcc16_stream_ctype_facet_vtable time out.  Not
+  committed.
+- kb_Z_func2 (libc++ __tuple_impl) reduction still running.
