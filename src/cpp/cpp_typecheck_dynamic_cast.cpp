@@ -10,14 +10,16 @@ Author: Kiro
 /// C++ Language Type Checking: the run-time check of dynamic_cast
 
 #include <util/arith_tools.h>
-#include <util/expr_util.h>
 #include <util/c_types.h>
+#include <util/expr_util.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_typecheck.h"
+
+#include <algorithm>
 
 /// The vtable pointer component of class \p cls at byte offset \p offset,
 /// or nullptr.
@@ -40,15 +42,17 @@ static const struct_typet::componentt *vtable_pointer_at(
 /// N5008 [expr.dynamic.cast]/9: `dynamic_cast<C *>(v)' for a pointer v to a
 /// polymorphic class A, C not a base of A.  The result depends on the most
 /// derived object v points into.  For each class D of the translation unit
-/// with a unique A subobject, the most derived object is a D object iff the
-/// virtual table pointer of *v holds the value a complete D object installs
-/// for its A subobject ([class.virtual]); the result is then a pointer to
-/// D's unique public C subobject, or null if D has none (/9.3, /10).  A
+/// and each of its A subobjects (also within virtual bases: their offsets in
+/// a complete D object are fixed), v points to that subobject of a D object
+/// iff its vtable pointer holds the value a complete D installs there
+/// ([class.virtual]); the result is then the C object derived from that
+/// subobject (/9.1), else D's unique public C base (/9.2), else null (/9.3,
+/// /10).  A
 /// null v yields null (/4).  For a vtable pointer matching no class of the
 /// translation unit (an object of a class defined elsewhere), the result is
 /// a nondeterministic choice between the unadjusted pointer and null.
-/// \return the expression replacing \p check, or nil if a class involved has
-///   a layout this does not handle (virtual bases, repeated subobjects)
+/// \return the expression replacing \p check, or nil if subobjects cannot be
+///   told apart by their vtable pointers
 exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
 {
   const exprt &v = to_unary_expr(check).op();
@@ -99,49 +103,73 @@ exprt cpp_typecheckt::runtime_dynamic_cast(const exprt &check)
     const auto a_subobjects = base_subobjects(d_struct, a_tag);
     if(a_subobjects.empty())
       continue;
-    // (a class with several A subobjects, or one in a virtual base, is not
-    // handled: give up on the cast)
-    if(a_subobjects.size() != 1 || !a_subobjects.front().virtual_base.empty())
-      return nil_exprt{};
     // [expr.dynamic.cast]/9: v must point to a public base subobject
     if(!base_publicly_accessible(d_struct, a_struct))
       continue;
-    const mp_integer a_offset = a_subobjects.front().offset;
-    const auto *d_vptr =
-      vtable_pointer_at(d_struct, a_offset + a_vptr_offset, ns);
-    if(d_vptr == nullptr)
-      return nil_exprt{};
-    const exprt vptr_value = vtable_pointer_value(d_symbol, *d_vptr);
-    if(vptr_value.is_nil())
-      return nil_exprt{};
-    const exprt is_d = equal_exprt{
-      v_vptr, typecast_exprt::conditional_cast(vptr_value, v_vptr.type())};
-
-    exprt result = null_pointer_exprt{result_type};
     const auto c_subobjects = base_subobjects(d_struct, c_tag);
     const symbolt &c_symbol = lookup(c_tag);
-    // several C subobjects (/9.1 then depends on which one contains *v) or
-    // one in a virtual base: not handled
-    if(
-      c_subobjects.size() > 1 ||
-      (c_subobjects.size() == 1 && !c_subobjects.front().virtual_base.empty()))
+    const bool c_public =
+      base_publicly_accessible(d_struct, to_struct_type(c_symbol.type));
+    // In a complete D object every subobject, also one within a virtual
+    // base, is at a fixed offset (base_subobjects gives the offsets in D's
+    // complete layout), so each A subobject is a case of its own,
+    // recognized by the value D installs in its vtable pointer.
+    std::vector<exprt> values_seen;
+    for(const auto &a_subobject : a_subobjects)
     {
-      return nil_exprt{};
+      const mp_integer a_offset = a_subobject.offset;
+      const auto *d_vptr =
+        vtable_pointer_at(d_struct, a_offset + a_vptr_offset, ns);
+      if(d_vptr == nullptr)
+        return nil_exprt{};
+      const exprt vptr_value = vtable_pointer_value(d_symbol, *d_vptr);
+      if(vptr_value.is_nil())
+        return nil_exprt{};
+      // two A subobjects sharing a table cannot be told apart
+      for(const auto &seen : values_seen)
+      {
+        if(seen == vptr_value)
+          return nil_exprt{};
+      }
+      values_seen.push_back(vptr_value);
+      const exprt is_d = equal_exprt{
+        v_vptr, typecast_exprt::conditional_cast(vptr_value, v_vptr.type())};
+
+      // /9.1: the C objects derived from this A subobject -- C is the most
+      // derived class itself, or a C subobject whose base path leads to
+      // this A subobject; /9.2: otherwise D's unique public C base
+      std::vector<mp_integer> derived_from_a;
+      for(const auto &c_subobject : c_subobjects)
+      {
+        const bool contains =
+          c_subobject.path.empty() ||
+          (c_subobject.virtual_base == a_subobject.virtual_base &&
+           c_subobject.path.size() <= a_subobject.path.size() &&
+           std::equal(
+             c_subobject.path.begin(),
+             c_subobject.path.end(),
+             a_subobject.path.begin()));
+        if(contains)
+          derived_from_a.push_back(c_subobject.offset);
+      }
+      std::optional<mp_integer> c_offset;
+      if(derived_from_a.size() == 1 && c_public)
+        c_offset = derived_from_a.front();
+      else if(derived_from_a.empty() && c_subobjects.size() == 1 && c_public)
+        c_offset = c_subobjects.front().offset;
+
+      exprt result = null_pointer_exprt{result_type};
+      if(c_offset.has_value())
+      {
+        const pointer_typet byte_pointer = pointer_type(unsigned_char_type());
+        result = typecast_exprt{
+          plus_exprt{
+            typecast_exprt{v, byte_pointer},
+            from_integer(*c_offset - a_offset, signed_size_type())},
+          result_type};
+      }
+      cases.emplace_back(is_d, result);
     }
-    if(
-      c_subobjects.size() == 1 &&
-      base_publicly_accessible(d_struct, to_struct_type(c_symbol.type)))
-    {
-      // the C subobject of the D object
-      const mp_integer delta = c_subobjects.front().offset - a_offset;
-      const pointer_typet byte_pointer = pointer_type(unsigned_char_type());
-      result = typecast_exprt{
-        plus_exprt{
-          typecast_exprt{v, byte_pointer},
-          from_integer(delta, signed_size_type())},
-        result_type};
-    }
-    cases.emplace_back(is_d, result);
   }
 
   // an object of a class the translation unit does not define
