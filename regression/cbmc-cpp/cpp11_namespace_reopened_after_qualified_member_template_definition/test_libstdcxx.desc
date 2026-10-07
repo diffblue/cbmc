@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 libstdcxx.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
@@ -13,8 +13,10 @@ dropped the body
 --
 libstdc++ 13's <format>: the four inline std::vformat overloads
 (format:3784/3793/3802/3811) were dropped with "scope '__format' is
-ambiguous" -- see test.desc (header-free, CORE).  That is fixed, and so is
-the later format:1422 drop (cpp11_libstdcxx_header_drops/
-test_format.desc).  Remaining: format:3124 basic_format_arg::_M_visit, the
-same drop as test_format.desc.  g++ 13 accepts this program, and it fails
+ambiguous" -- see test.desc (header-free, CORE).  The later drops are
+fixed too: format:1422 and format:3124 _M_visit
+(cpp11_lambda_closure_per_template_specialization), _M_parse_format_spec
+(cpp11_specialization_distinguishes_fundamental_types) and format:1899
+(cpp11_member_template_argument_converted_to_non_deduced_parameter); bin53
+dropped more than ten bodies.  g++ 13 accepts this program, and it fails
 only its WRONG assertion.
