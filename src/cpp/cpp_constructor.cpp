@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 #include "itanium_abi_cpp_zero_initializer.h"
 
+#include <map>
+
 /// \param source_location: source location for generated code
 /// \param object: non-typechecked object
 /// \param operands: non-typechecked operands
@@ -946,6 +948,25 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               ? to_struct_tag_type(struct_type.bases()[b].type())
                   .get_identifier()
               : irep_idt{};
+          // [dcl.init.aggr]/3.1: a designated-initializer-list names the
+          // elements it initializes (`{.a = 2}'); the others are initialized
+          // as without an initializer (/5)
+          std::map<irep_idt, exprt> designated;
+          for(const auto &op : base_ops)
+          {
+            const exprt &designated_op =
+              op.id() == ID_already_typechecked ? to_unary_expr(op).op() : op;
+            if(designated_op.id() != ID_designated_initializer)
+              continue;
+            const irept &designator = designated_op.find(ID_designator);
+            if(
+              designator.get_sub().size() == 1 &&
+              designated_op.operands().size() == 1)
+            {
+              designated[designator.get_sub().front().get(ID_component_name)] =
+                designated_op.operands().front();
+            }
+          }
           std::size_t bidx = 0;
           for(const auto &comp : struct_type.components())
           {
@@ -960,7 +981,29 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
             member_exprt member(object_tc, comp.get_name(), comp.type());
             member.set(ID_C_lvalue, true);
             exprt val;
-            if(bidx < base_ops.size())
+            const auto designated_it = designated.find(comp.get_base_name());
+            if(designated_it != designated.end())
+            {
+              exprt value = designated_it->second;
+              typecheck_expr(value);
+              implicit_typecast(value, comp.type());
+              val = std::move(value);
+            }
+            else if(!designated.empty())
+            {
+              // not designated: default member initializer or zero, below
+              if(comp.find(ID_C_default_value).is_not_nil())
+                val = static_cast<const exprt &>(comp.find(ID_C_default_value));
+              else
+              {
+                const auto zero = itanium_abi_cpp_zero_initializer(
+                  comp.type(), source_location, namespacet{symbol_table});
+                if(!zero.has_value())
+                  continue;
+                val = *zero;
+              }
+            }
+            else if(bidx < base_ops.size())
             {
               val =
                 typecast_exprt::conditional_cast(base_ops[bidx], comp.type());
