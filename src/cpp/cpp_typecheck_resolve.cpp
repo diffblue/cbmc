@@ -5733,7 +5733,7 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
       fingerprint.get_sub().push_back(scope_id);
     }
     if(!fingerprint.get_sub().empty())
-      args_irep.add("#map_fingerprint") = fingerprint;
+      args_irep.add("map_fingerprint") = fingerprint;
   }
   // Distinguish legitimate NESTED resolutions of the same alias
   // spelling from genuine cycles: the return type of a function
@@ -5756,7 +5756,7 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
       ctx.set_size_t(
         irep_idt{"depth"}, cpp_typecheck.instantiation_stack.size());
     }
-    args_irep.add("#instantiation_ctx") = ctx;
+    args_irep.add("instantiation_ctx") = ctx;
   }
   static thread_local std::map<irep_idt, unsigned> spelling_depth;
   unsigned &sdepth = spelling_depth[base_name];
@@ -5774,6 +5774,11 @@ typet cpp_typecheck_resolvet::resolve_template_alias(
       --d;
     }
   } sdepth_guard{sdepth};
+  // (map_fingerprint and instantiation_ctx are regular named sub-trees:
+  // irept::compare ignores comments, `#'-prefixed names, which then left
+  // every level of a recursion like libstdc++'s __parse_int::_Number_help
+  // with `__ull_constant<_Pow * __digit::value + __next::type::value>' with
+  // the same key, and the third nested level was cut off.)
   std::pair<irep_idt, irept> key{base_name, args_irep};
   // Re-entry with an identical key is NOT necessarily a cycle: the
   // legitimate resolution of a member alias delegates to
