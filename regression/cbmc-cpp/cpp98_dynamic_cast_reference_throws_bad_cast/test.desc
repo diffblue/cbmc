@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ reference cast succeeds: SUCCESS$
+^\[main\.assertion\.2\] line \d+ bad_cast thrown: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.dynamic.cast]/10: a failed cast to reference type throws an
+exception matching a std::bad_cast handler.  The front end converted the
+reference statically, so dynamic_cast<B &>(rc) on a C object returned a
+reference to it as a B (bin53).  The run-time check of the pointer cast is
+now applied to &v, and a null result throws a std::bad_cast temporary (if
+<typeinfo> declared it; otherwise the static conversion remains).  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
