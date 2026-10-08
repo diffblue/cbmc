@@ -3009,6 +3009,31 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
     return;
   }
 
+  // Array types that differ only in how their (equal, constant) size is
+  // spelt, e.g. with a signed or an unsigned index type of the same width,
+  // have the same SMT sort: the typecast is the identity (the SAT back end
+  // copies the bits, boolbvt::type_conversion).
+  if(dest_type.id() == ID_array && src.type().id() == ID_array)
+  {
+    const array_typet &dest_array = to_array_type(dest_type);
+    const array_typet &src_array = to_array_type(src.type());
+    const auto dest_size = numeric_cast<mp_integer>(dest_array.size());
+    const auto src_size = numeric_cast<mp_integer>(src_array.size());
+    const typet &dest_index = dest_array.index_type();
+    const typet &src_index = src_array.index_type();
+    if(
+      dest_array.element_type() == src_array.element_type() &&
+      dest_size.has_value() && dest_size == src_size &&
+      can_cast_type<bitvector_typet>(dest_index) &&
+      can_cast_type<bitvector_typet>(src_index) &&
+      to_bitvector_type(dest_index).get_width() ==
+        to_bitvector_type(src_index).get_width())
+    {
+      convert_expr(src);
+      return;
+    }
+  }
+
   if(dest_type.id()==ID_c_enum_tag)
     dest_type=ns.follow_tag(to_c_enum_tag_type(dest_type));
 

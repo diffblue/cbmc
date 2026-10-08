@@ -618,12 +618,12 @@ TEST_CASE(
 
 TEST_CASE(
   "smt2_convt converts a typecast between array types of equal length",
-  "[core][solvers][smt2]" XFAIL)
+  "[core][solvers][smt2]")
 {
   // An array constant whose size is spelt with one integer type converted
   // to the same array type with the size spelt with another, as front ends
   // produce when an initializer's array type was built independently of
-  // the target's.  convert_typecast fails with "TODO typecast8 array ->
+  // the target's.  convert_typecast failed with "TODO typecast8 array ->
   // array"; the SAT back end accepts such a typecast.
   const cbmc_invariants_should_throwt invariants_throw;
 
