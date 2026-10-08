@@ -489,8 +489,13 @@ void elide_cpp_returned_temporaries(goto_modelt &goto_model)
         slot_symbol.is_state_var = true;
 
         const symbol_exprt slot = slot_symbol.symbol_expr();
-        body.insert_before(
-          i_it, goto_programt::make_decl(slot, i_it->source_location()));
+        // insert_before_swap: a jump to the call (a loop whose body begins
+        // with it) must reach the declaration of the slot too, which the
+        // DEAD below ends after each call
+        goto_programt::instructiont decl =
+          goto_programt::make_decl(slot, i_it->source_location());
+        body.insert_before_swap(i_it, decl);
+        ++i_it; // the call
 
         auto after = std::next(i_it);
         if(const auto destructor = find_destructor(slot_type, symbol_table))
