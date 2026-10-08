@@ -839,7 +839,15 @@ void goto_convertt::convert_expression(
       copy(tmp, OTHER, dest);
     }
 
-    destruct_locals(side_effects.temporaries, dest, ns);
+    // the initialization of a temporary object is part of the enclosing
+    // full-expression, which destroys its temporaries ([class.temporary]/4)
+    if(nested_call_temporaries != nullptr)
+    {
+      nested_call_temporaries->splice(
+        nested_call_temporaries->begin(), side_effects.temporaries);
+    }
+    else
+      destruct_locals(side_effects.temporaries, dest, ns);
   }
 }
 

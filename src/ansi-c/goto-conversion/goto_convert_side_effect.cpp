@@ -403,11 +403,18 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
     goto_programt::make_decl(new_symbol.symbol_expr(), new_symbol.location));
 
   {
-    goto_programt tmp_program2;
     code_function_callt call(
       new_symbol.symbol_expr(), expr.function(), expr.arguments());
     call.add_source_location() = new_symbol.location;
+    // the operands' temporaries belong to the enclosing full-expression
+    // ([class.temporary]/4)
+    std::list<irep_idt> operand_temporaries;
+    std::list<irep_idt> *const saved = nested_call_temporaries;
+    nested_call_temporaries = &operand_temporaries;
     convert_function_call(call, side_effects.side_effects, mode);
+    nested_call_temporaries = saved;
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), operand_temporaries);
   }
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();
@@ -547,7 +554,16 @@ goto_convertt::remove_temporary_object(side_effect_exprt &expr)
     exprt initializer = static_cast<const exprt &>(expr.find(ID_initializer));
     replace_new_object(new_symbol.symbol_expr(), initializer);
 
+    // the temporaries of the initialization (a constructor call's
+    // operands) belong to the enclosing full-expression
+    // ([class.temporary]/4)
+    std::list<irep_idt> initializer_temporaries;
+    std::list<irep_idt> *const saved = nested_call_temporaries;
+    nested_call_temporaries = &initializer_temporaries;
     convert(to_code(initializer), side_effects.side_effects, mode);
+    nested_call_temporaries = saved;
+    side_effects.temporaries.splice(
+      side_effects.temporaries.begin(), initializer_temporaries);
   }
 
   static_cast<exprt &>(expr) = new_symbol.symbol_expr();

@@ -61,6 +61,13 @@ protected:
   std::string tmp_symbol_prefix;
   lifetimet lifetime = lifetimet::STATIC_GLOBAL;
 
+  /// While a function call that is a subexpression of a larger expression is
+  /// converted (remove_function_call, the initializer of a temporary object),
+  /// the temporaries of its operands are collected here rather than destroyed
+  /// after the call: C++ [class.temporary]/4 destroys temporary objects at the
+  /// end of the full-expression that contains the point of their creation.
+  std::list<irep_idt> *nested_call_temporaries = nullptr;
+
   struct clean_expr_resultt
   {
     /// Identifiers of temporaries introduced while cleaning an expression. The
