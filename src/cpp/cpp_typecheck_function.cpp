@@ -1508,6 +1508,21 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       // deleting one changes which constructor overload later calls
       // select -- semantically visible (Constructor13).
 
+      // A member deferred until odr-used ([dcl.fct.def.default]/5) is
+      // converted because it is odr-used: it is defined as deleted, and
+      // the program that refers to it is ill-formed
+      // ([dcl.fct.def.delete]/2).
+      if(odr_use_defined_defaulted_members.count(symbol.name) != 0)
+      {
+        error().source_location = symbol.location;
+        error() << "the implicitly-defined default constructor of '"
+                << symbol.base_name << "' is defined as deleted and is used"
+                << eom;
+        disable_access_control = saved_access_control;
+        functions_being_typechecked.erase(symbol.name);
+        throw 0;
+      }
+
       // The diagnostics of the failed implicit definition are not
       // errors -- the member is merely deleted; restore the count.
       get_message_handler().set_message_count(

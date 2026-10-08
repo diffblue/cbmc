@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ no zone: SUCCESS$
@@ -10,9 +10,10 @@ main.cpp
 ^warning: ignoring
 dropped the body
 --
-N5008 [class.default.ctor]/4, [temp.inst]/3: the front end defines zone's
-implicit default constructor although it is not odr-used, which instantiates
-holder<int>::holder() and then deleter<impl>::operator() for the incomplete
-impl: its body is dropped.  Reduced from libstdc++ 13 <chrono>
-(cpp11_libstdcxx_header_drops/test_chrono.desc).  g++ 13 and clang++ 18
-accept this program, and it fails only its WRONG assertion.
+N5008 [class.default.ctor]/4, [dcl.fct.def.default]/5, [temp.inst]/3: the
+front end defined zone's implicit default constructor although it is not
+odr-used, which instantiated holder<int>::holder() and then
+deleter<impl>::operator() for the incomplete impl, whose body was dropped.
+Reduced from libstdc++ 13 <chrono> (cpp11_libstdcxx_header_drops/
+test_chrono.desc).  g++ 13 and clang++ 18 accept this program, and it fails
+only its WRONG assertion.
