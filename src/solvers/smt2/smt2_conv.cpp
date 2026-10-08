@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
 #include <util/fixedbv.h>
 #include <util/floatbv_expr.h>
 #include <util/format_expr.h>
@@ -5451,9 +5452,15 @@ void smt2_convt::set_to(const exprt &expr, bool value)
       const irep_idt &identifier =
         to_symbol_expr(equal_expr.lhs()).identifier();
 
+      // A symbol that is not yet declared and that is equated to an
+      // expression is defined by that expression. This is not possible
+      // when the expression refers to the symbol itself, e.g.,
+      // x == (x & y) | z: such an equality is a constraint on x, and is
+      // asserted below.
       if(
         identifier_map.find(identifier) == identifier_map.end() &&
-        equal_expr.lhs() != equal_expr.rhs())
+        equal_expr.lhs() != equal_expr.rhs() &&
+        !has_symbol_expr(equal_expr.rhs(), identifier, true))
       {
         auto id_entry = identifier_map.insert(
           {identifier, identifiert{equal_expr.lhs().type(), false}});
