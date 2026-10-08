@@ -13591,3 +13591,40 @@ Still KNOWNBUG:
 - W35 (the uncommitted equivalent): cbmc-cpp 1748 exit 0, cpp 246 exit 0,
   regression/cbmc 1201 exit 0, goto-instrument exit 0, contracts exit 0,
   ansi-c only clang_target (fails on W28 too).  Lint 0, -K 4 KNOWNBUGs OK.
+
+## Round 166: minimal KNOWNBUGs to CORE
+
+- 9a0cb5036f: a constructor explicitly defaulted on its first declaration
+  may initialize private members ([dcl.fct.def.default]/5); the access
+  check knew only implicitly-declared members (failed on bin53 and W36
+  too; surfaced by deferral through <format>'s formatter<const void *>).
+- 2a77456b0d: non-user-provided defaulted members (implicit or `= default'
+  in class) are deferred until odr-used ([dcl.fct.def.default]/5), like
+  template-instance members; virtual ones and destructors stay eager.  An
+  odr-used deferred default constructor whose definition fails is an error
+  ([dcl.fct.def.delete]/2; regression/cpp/Protection1).  test_chrono and
+  cpp98_implicit_default_constructor_defined_only_when_odr_used CORE.
+- 6d87f34a54: nonmember_operator_is_better compares derived-to-base targets
+  on equal ranks ([over.ics.rank]/4.4.2, /4.4.4).
+- c16de7b2d2: --unwindset / --unwindset-file join comma-split pieces up to
+  the one ending in `:<limit>' (C++ loop identifiers contain commas).
+- 8a9f7166bf: SMT2 typecast between array types of equal length and index
+  width is the identity (XFAIL unit test now passes).
+- Not a bug: regression/cbmc/complex2 with --z3 only fails under a 6 GB cap
+  (z3 solves it with 16 GB; cvc5 passes).
+
+Suites W38/W39/W40: cbmc-cpp 1754 exit 0, cpp 246 exit 0, regression/cbmc
+1203 exit 0, goto-instrument 0, contracts 0; lint 0; -K: test_format,
+test_functional, cpp20_ranges_basic_libcxx OK (the only KNOWNBUGs left).
+
+Leads for the remaining KNOWNBUGs:
+- test_format: no-argument std::format / format_to verify; any argument
+  (int, bool, const char *, char; vformat or format_to(back_inserter))
+  does not terminate; to_chars, _Str_sink/_Iter_sink writes and the
+  basic_format_args bit-field packing work header-free.
+- test_functional / ranges (kb_Z_func2, 123 lines, reducer stopped): the
+  __tuple_impl drop happens only when the code is in a system header (line
+  marker kept); as user code the same file converts.  Under the system-
+  header SFINAE guard, tuple<int &&>'s converting constructor template is
+  instantiated with <struct tuple> (a copy) and fails with "invalid implicit
+  conversion from 'struct tuple' to 'signed int'".
