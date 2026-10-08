@@ -267,6 +267,24 @@ static void fold_numeric_traits_integer(symbol_table_baset &symbol_table)
   }
 }
 
+/// \p new_value as a value of \p type: an array constant of the same
+/// length gets \p type itself (its size may be spelt with another integer
+/// type), anything else a conversion
+static exprt component_value(const exprt &new_value, const typet &type)
+{
+  if(
+    new_value.id() == ID_array && type.id() == ID_array &&
+    to_array_type(type).size().is_constant() &&
+    numeric_cast<mp_integer>(to_array_type(type).size()) ==
+      mp_integer{new_value.operands().size()})
+  {
+    exprt result = new_value;
+    result.type() = type;
+    return result;
+  }
+  return typecast_exprt::conditional_cast(new_value, type);
+}
+
 /// Create a no-op body for an I/O function that returns a reference
 /// to its first parameter (e.g., std::endl returns its ostream& argument,
 /// ostream::_M_insert returns *this).
@@ -428,7 +446,7 @@ static exprt provide_classic_ctype_char_model(
            0))
       {
         value.operands()[op_index] =
-          typecast_exprt::conditional_cast(new_value, component.type());
+          component_value(new_value, component.type());
         return true;
       }
       if(set_component(
@@ -475,6 +493,169 @@ static exprt provide_classic_ctype_char_model(
   symbolt *facet_ptr = nullptr;
   symbol_table.move(facet_symbol, facet_ptr);
   return facet_ptr->symbol_expr();
+}
+
+/// Set the component of \p value (of type \p type) whose name is or ends in
+/// `::<name>', looking into base class components too.  \return whether
+/// such a component was found.
+static bool set_struct_component(
+  exprt &value,
+  const typet &type,
+  const std::string &name,
+  const exprt &new_value,
+  const namespacet &ns)
+{
+  const typet &followed =
+    type.id() == ID_struct_tag
+      ? static_cast<const typet &>(ns.follow_tag(to_struct_tag_type(type)))
+      : type;
+  if(followed.id() != ID_struct || value.id() != ID_struct)
+    return false;
+  std::size_t op_index = 0;
+  for(const auto &component : to_struct_type(followed).components())
+  {
+    if(
+      component.type().id() == ID_code || component.get_bool(ID_is_type) ||
+      component.get_bool(ID_is_static))
+    {
+      continue;
+    }
+    if(op_index >= value.operands().size())
+      return false;
+    const std::string cname = id2string(component.get_name());
+    const std::string suffix = "::" + name;
+    if(
+      cname == name ||
+      (cname.size() > suffix.size() &&
+       cname.compare(cname.size() - suffix.size(), suffix.size(), suffix) == 0))
+    {
+      value.operands()[op_index] = component_value(new_value, component.type());
+      return true;
+    }
+    if(set_struct_component(
+         value.operands()[op_index], component.type(), name, new_value, ns))
+    {
+      return true;
+    }
+    ++op_index;
+  }
+  return false;
+}
+
+/// A static array of \p element_type holding \p text and a terminating
+/// zero; \return the address of its first element
+static exprt static_character_array(
+  symbol_table_baset &symbol_table,
+  const std::string &name,
+  const typet &element_type,
+  const std::string &text)
+{
+  const irep_idt symbol_name = "std::" CPROVER_PREFIX + name;
+  const symbolt *existing = symbol_table.lookup(symbol_name);
+  if(existing == nullptr)
+  {
+    exprt::operandst elements;
+    for(char c : text)
+      elements.push_back(from_integer(c, element_type));
+    elements.push_back(from_integer(0, element_type));
+    const array_typet array_type{
+      element_type, from_integer(elements.size(), size_type())};
+    symbolt array_symbol{symbol_name, array_type, ID_cpp};
+    array_symbol.base_name = CPROVER_PREFIX + name;
+    array_symbol.pretty_name = array_symbol.base_name;
+    array_symbol.value = array_exprt{std::move(elements), array_type};
+    array_symbol.is_static_lifetime = true;
+    array_symbol.is_lvalue = true;
+    symbolt *inserted = nullptr;
+    symbol_table.move(array_symbol, inserted);
+    existing = inserted;
+  }
+  return address_of_exprt{
+    index_exprt{existing->symbol_expr(), from_integer(0, c_index_type())}};
+}
+
+/// N5008 [locale.general]/8: the global locale at program startup is the
+/// "C" locale, whose facets libstdc++.so creates (invisible to CBMC).
+/// [facet.numpunct.virtuals]/1-6: in it numpunct<C> has the decimal point
+/// '.', the thousands separator ',', no grouping, and the names "true" and
+/// "false".  libstdc++ reads them through its __numpunct_cache<C>, filled
+/// from the facet by __use_cache<__numpunct_cache<C>>; model that cache as
+/// a static object holding the "C"-locale values, with libstdc++'s digit
+/// atoms (__num_base::_S_atoms_out / _S_atoms_in, the characters of
+/// [facet.num.put.virtuals] stage 1 in the "C" locale).
+/// \return the cache object, or nil if \p cache_tag is not complete
+static exprt classic_numpunct_cache(
+  symbol_table_baset &symbol_table,
+  const namespacet &ns,
+  const irep_idt &cache_tag)
+{
+  const irep_idt name = id2string(cache_tag) + "::" CPROVER_PREFIX "classic";
+  if(const symbolt *existing = symbol_table.lookup(name))
+    return existing->symbol_expr();
+  const symbolt *cache_class = symbol_table.lookup(cache_tag);
+  if(
+    cache_class == nullptr || cache_class->type.id() != ID_struct ||
+    to_struct_type(cache_class->type).is_incomplete())
+  {
+    return nil_exprt{};
+  }
+  const struct_tag_typet cache_type{cache_tag};
+  auto value =
+    itanium_abi_cpp_zero_initializer(cache_type, cache_class->location, ns);
+  if(!value.has_value())
+    return nil_exprt{};
+  // the character type: that of _M_decimal_point
+  typet char_type;
+  for(const auto &c : to_struct_type(cache_class->type).components())
+  {
+    if(c.get_base_name() == "_M_decimal_point")
+      char_type = c.type();
+  }
+  if(char_type.is_nil() || char_type.id().empty())
+    return nil_exprt{};
+  const std::string suffix =
+    char_type.get(ID_C_c_type) == ID_char ? "char" : "wchar_t";
+  const auto string_of = [&](const std::string &tag, const std::string &text)
+  {
+    return static_character_array(
+      symbol_table, "classic_" + tag + "_" + suffix, char_type, text);
+  };
+  bool ok = true;
+  const auto set = [&](const char *component, const exprt &v)
+  { ok = set_struct_component(*value, cache_type, component, v, ns) && ok; };
+  set(
+    "_M_grouping",
+    static_character_array(
+      symbol_table, "classic_grouping", ::char_type(), ""));
+  set("_M_grouping_size", from_integer(0, size_type()));
+  set("_M_use_grouping", false_exprt{});
+  set("_M_truename", string_of("truename", "true"));
+  set("_M_truename_size", from_integer(4, size_type()));
+  set("_M_falsename", string_of("falsename", "false"));
+  set("_M_falsename_size", from_integer(5, size_type()));
+  set("_M_decimal_point", from_integer('.', char_type));
+  set("_M_thousands_sep", from_integer(',', char_type));
+  const auto atoms = [&](const std::string &text)
+  {
+    exprt::operandst elements;
+    for(char c : text)
+      elements.push_back(from_integer(c, char_type));
+    const array_typet type{char_type, from_integer(text.size(), size_type())};
+    return array_exprt{std::move(elements), type};
+  };
+  set("_M_atoms_out", atoms("-+xX0123456789abcdef0123456789ABCDEF"));
+  set("_M_atoms_in", atoms("-+xX0123456789abcdefABCDEF"));
+  if(!ok)
+    return nil_exprt{};
+  symbolt cache_symbol{name, cache_type, ID_cpp};
+  cache_symbol.base_name = CPROVER_PREFIX "classic";
+  cache_symbol.pretty_name = cache_symbol.base_name;
+  cache_symbol.value = std::move(*value);
+  cache_symbol.is_static_lifetime = true;
+  cache_symbol.is_lvalue = true;
+  symbolt *inserted = nullptr;
+  symbol_table.move(cache_symbol, inserted);
+  return inserted->symbol_expr();
 }
 
 static code_blockt make_return_first_param_body(const symbolt &symbol)
@@ -1224,6 +1405,63 @@ make_prime_need_rehash_body(const symbolt &symbol, const namespacet &ns)
   return body;
 }
 
+/// N5008 [locale.general]/8: the num_put<C, ...> facet of the "C" locale,
+/// which libstdc++.so creates: a static object of the facet class \p
+/// accessor returns a pointer to, zero-initialized (reference count, as
+/// locale::classic() does not count) with the vtable pointer of a complete
+/// object of the class, so that put() dispatches to its do_put.
+/// \return the object, or nil if the class or its vtable is unavailable
+exprt cpp_typecheckt::classic_num_put(const symbolt &accessor)
+{
+  const typet &ret_type = to_code_type(accessor.type).return_type();
+  const typet &facet = to_pointer_type(ret_type).base_type();
+  if(facet.id() != ID_struct_tag)
+    return nil_exprt{};
+  const irep_idt facet_tag = to_struct_tag_type(facet).get_identifier();
+  const irep_idt name = id2string(facet_tag) + "::" CPROVER_PREFIX "classic";
+  if(const symbolt *existing = symbol_table.lookup(name))
+    return existing->symbol_expr();
+  const symbolt *facet_class = symbol_table.lookup(facet_tag);
+  if(
+    facet_class == nullptr || facet_class->type.id() != ID_struct ||
+    to_struct_type(facet_class->type).is_incomplete())
+  {
+    return nil_exprt{};
+  }
+  const namespacet ns{symbol_table};
+  const struct_tag_typet facet_type{facet_tag};
+  auto value =
+    itanium_abi_cpp_zero_initializer(facet_type, facet_class->location, ns);
+  if(!value.has_value())
+    return nil_exprt{};
+  bool vptr_set = false;
+  for(const auto &c : to_struct_type(facet_class->type).components())
+  {
+    if(!c.get_bool(ID_is_vtptr))
+      continue;
+    const exprt address = vtable_pointer_value(*facet_class, c);
+    if(address.is_nil())
+      return nil_exprt{};
+    if(!set_struct_component(
+         *value, facet_type, id2string(c.get_name()), address, ns))
+    {
+      return nil_exprt{};
+    }
+    vptr_set = true;
+  }
+  if(!vptr_set)
+    return nil_exprt{};
+  symbolt facet_symbol{name, facet_type, ID_cpp};
+  facet_symbol.base_name = CPROVER_PREFIX "classic";
+  facet_symbol.pretty_name = facet_symbol.base_name;
+  facet_symbol.value = std::move(*value);
+  facet_symbol.is_static_lifetime = true;
+  facet_symbol.is_lvalue = true;
+  symbolt *inserted = nullptr;
+  symbol_table.move(facet_symbol, inserted);
+  return inserted->symbol_expr();
+}
+
 void cpp_typecheckt::provide_stdlib_bodies()
 {
   namespacet ns(symbol_table);
@@ -1333,6 +1571,51 @@ void cpp_typecheckt::provide_stdlib_bodies()
           code_blockt block;
           block.add(code_frontend_returnt(typecast_exprt::conditional_cast(
             address_of_exprt{facet}, ret_type)));
+          symbol.value = std::move(block);
+          symbol.value.type() = symbol.type;
+          deferred_typechecking.erase(symbol.name);
+        }
+      }
+      else if(
+        base.find("__try_use_facet") == 0 &&
+        name.find("<std::tag-num_put<") != std::string::npos &&
+        to_code_type(symbol.type).return_type().id() == ID_pointer &&
+        classic_num_put(symbol).is_not_nil())
+      {
+        // N5008 [locale.general]/8: the "C" locale has a num_put<C, ...>
+        // facet; return such an object (classic_num_put), so that stream
+        // insertion of arithmetic values ([ostream.inserters.arithmetic])
+        // calls num_put's own do_put
+        const typet &ret_type = to_code_type(symbol.type).return_type();
+        ensure_parameter_symbols(symbol, symbol_table);
+        code_blockt block;
+        block.add(code_frontend_returnt{typecast_exprt::conditional_cast(
+          address_of_exprt{classic_num_put(symbol)}, ret_type)});
+        symbol.value = std::move(block);
+        symbol.value.type() = symbol.type;
+        deferred_typechecking.erase(symbol.name);
+      }
+      else if(
+        base == "operator()" &&
+        name.find("__use_cache<std::tag-__numpunct_cache<") !=
+          std::string::npos &&
+        to_code_type(symbol.type).return_type().id() == ID_pointer)
+      {
+        // the "C"-locale numpunct data (classic_numpunct_cache)
+        const typet &ret_type = to_code_type(symbol.type).return_type();
+        const typet &cache_type = to_pointer_type(ret_type).base_type();
+        exprt cache = cache_type.id() == ID_struct_tag
+                        ? classic_numpunct_cache(
+                            symbol_table,
+                            ns,
+                            to_struct_tag_type(cache_type).get_identifier())
+                        : nil_exprt{};
+        if(cache.is_not_nil())
+        {
+          ensure_parameter_symbols(symbol, symbol_table);
+          code_blockt block;
+          block.add(code_frontend_returnt{typecast_exprt::conditional_cast(
+            address_of_exprt{cache}, ret_type)});
           symbol.value = std::move(block);
           symbol.value.type() = symbol.type;
           deferred_typechecking.erase(symbol.name);

@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 ostream_int.cpp
 --cpp17 --unwind 8 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ int inserted: SUCCESS$
@@ -12,16 +12,12 @@ ostream_int.cpp
 dropped the body of system-header function
 no body for callee
 --
-libstdc++ 13 <sstream>: `o << 4' leaves o.str() empty.  The bodies of
-basic_ostream<char>::_M_insert are no longer dropped
-(cpp11_class_instantiated_while_its_base_is_instantiated), but the
-specializations are declared `extern template' in bits/ostream.tcc, so
-they are not instantiated and provide_stdlib_bodies' model returns *this
-without inserting ([ostream.inserters.arithmetic]/1).  Discarding those
-declarations ([temp.explicit]/12,
-cpp98_explicit_instantiation_of_member_function_template/test_cpp11.desc)
-instantiates the real num_put, which runs over the "C"-locale facets that
-libstdc++.so provides and CBMC does not model (only ctype<char> is): the
-SAT problem of cpp11_stream_setw exceeded 8 GB.  A model of the classic
-numpunct<char> and num_put<char> facets is needed.  g++ 13 accepts this
+libstdc++ 13 <sstream>: `o << 4' left o.str() empty: the specializations of
+basic_ostream<char>::_M_insert are declared `extern template' in
+bits/ostream.tcc and were not instantiated.  Such member declarations are
+now discarded ([temp.explicit]/12,
+cpp98_explicit_instantiation_of_member_function_template/test_cpp11.desc),
+and the num_put and numpunct facets of the "C" locale, which libstdc++.so
+provides, are modelled ([locale.general]/8,
+cpp11_ostream_integer_insertion_classic_locale).  g++ 13 accepts this
 program, and it fails only its WRONG assertion.
