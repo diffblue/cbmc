@@ -1,0 +1,11 @@
+CORE
+main.c
+--program-only
+nondet_symbol<char \[
+^EXIT=0$
+^SIGNAL=0$
+--
+nondet_symbol<signed long int \[
+byte_update
+--
+The allocated object must have type char[40], not long[5].
