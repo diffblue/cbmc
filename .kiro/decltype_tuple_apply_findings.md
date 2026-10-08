@@ -13628,3 +13628,39 @@ Leads for the remaining KNOWNBUGs:
   header SFINAE guard, tuple<int &&>'s converting constructor template is
   instantiated with <struct tuple> (a copy) and fails with "invalid implicit
   conversion from 'struct tuple' to 'signed int'".
+
+## Round 167: test_format CORE; libc++ std::function call
+
+- 04b26cb099: simplify_typecast folds constants of enumeration-typed
+  bit-fields ([class.bit]/4); `(int)s.type == 7' stayed symbolic.
+  cpp11_enum_bit_field_constant_comparison_simplified.
+- d397fbeb57: goto conversion keeps the temporaries of a call nested in a
+  larger expression (remove_function_call; a temporary object's
+  initializer) until the end of the full-expression ([class.temporary]/4);
+  `use(view(make(42)))' read a dead store.  This is what made
+  std::vformat read a nondet argument from the dead _Arg_store.
+  cpp98_temporary_lives_until_end_of_full_expression.  test_format CORE
+  (about 70 s).
+- 600d73814b: elide_cpp_returned_temporaries inserts the ignored-result
+  slot's DECL with insert_before_swap (a do-while back edge to the call
+  skipped it; surfaced by d397fbeb57 in cpp11_map_braced_pairs_at).
+  cpp98_ignored_class_result_at_loop_head (fails on bin53 too).
+- 0be90d49d1: this-adjusting thunks pass rvalue-reference parameters as
+  static_cast<T &&>(a) ([class.virtual]/14); in a system header the thunk
+  was dropped (libc++ function.h:272).  test_functional's first assertion
+  now holds.  cpp11_virtual_override_with_rvalue_reference_parameter.
+- Item 4 (deferral review): the 9 THOROUGH tests fail identically on W36
+  (before the deferral) and W41: 7 failures predate it; none regressed
+  (same errors; cpp11_function_basic_libcxx now times out instead of
+  failing fast with 9 errors).
+
+Suites W42/W43: cbmc-cpp 1758 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 0, contracts 0, ansi-c only clang_target (pre-existing);
+lint 0; each commit compiles; -K: test_functional, ranges_basic_libcxx OK.
+
+Remaining KNOWNBUGs (libc++): tuple:469 __tuple_impl constructor bodies
+dropped -- tuple<X &&>::tuple(_Up &&...) is instantiated with _Up = tuple<X
+&&> (CBMC_DBG_NOSUPPRESS chain: __alloc_func -> tuple<...>::tuple with
+<struct tuple, 0>), which _Not<_IsThisTuple<_Up...>> excludes; the traits
+evaluate correctly in isolation (lt5/lt6); only in system-header mode
+(kb_Z_func2 reduction, user-mode copy converts).
