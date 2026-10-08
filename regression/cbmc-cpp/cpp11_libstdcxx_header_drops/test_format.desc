@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 format.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ format: SUCCESS$
@@ -12,21 +12,15 @@ format.cpp
 dropped the body of system-header function
 could not fully type-check
 --
-libstdc++ 13 <format>: std::format("{}", 42) is empty.  Fixed (round
-163w): format:1422 __formatter_fp::format was instantiated for int, because
-formatter<int, char> selected the floating-point partial specialization
-(cpp20_partial_specialization_type_constraint), and _M_format_arg's
-visitor lambda, which uses `this', got a closure
-(cpp14_lambda_this_capture_member_calls).  _M_parse_format_spec was
-dropped because formatter<int, char> was the primary template (int and
-wchar_t were one type, cpp11_specialization_distinguishes_fundamental_
-types), and _M_visit and the visitor's operator() because one lambda
-closure served all specializations (cpp11_lambda_closure_per_template_
-specialization).  formatter<const char *, char>::format (format:1899) is no
-longer dropped, and --show-goto-functions takes 38 s instead of over 50
-minutes (most of it went into printing an enumeration bit-field constant,
-cpp11_enum_bit_field_constant_output).  Remaining: symbolic execution does not
-terminate: it unwinds the recursion of _Iter_sink<char, _Sink_iter<char>>::
-_M_overflow (format:2564) beyond 300 levels (cause not yet analysed).  With
---unwind 4 both assertions hold vacuously.  g++ 13 accepts this program, and
-it fails only its WRONG assertion.
+libstdc++ 13 <format>: std::format("{}", 42).  Fixed in earlier rounds: the
+floating-point formatter selected for int, the visitor's `this' capture, the
+primary formatter template, the per-specialization lambda closures,
+formatter<const char *, char>::format, and the output of enumeration
+bit-field constants (cpp11_enum_bit_field_constant_output).  Symbolic
+execution did not terminate because the _Arg_store temporary of
+make_format_args was destroyed before vformat read the argument through
+basic_format_args (cpp98_temporary_lives_until_end_of_full_expression), and
+comparisons of the _Spec bit-fields of enumeration type stayed symbolic
+(cpp11_enum_bit_field_constant_comparison_simplified).  It now verifies in
+about 70 s.  g++ 13 accepts this program, and it fails only its WRONG
+assertion.
