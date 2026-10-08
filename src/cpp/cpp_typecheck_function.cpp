@@ -627,9 +627,10 @@ std::optional<code_blockt> cpp_typecheckt::defaulted_three_way_comparison(
 void cpp_typecheckt::convert_function(symbolt &symbol)
 {
   // N5008 [class.access.general]/4 + [class.default.ctor]/4: the body of
-  // an implicitly-defined constructor/destructor is a member of its
-  // class, so its member initializations may name that class's own
-  // private members.  Record the class for the access check; an
+  // an implicitly-defined constructor/destructor, or one explicitly
+  // defaulted on its first declaration ([dcl.fct.def.default]/5), is a
+  // member of its class, so its member initializations may name that
+  // class's own private members.  Record the class for the access check; an
   // EXACT-match context is used deliberately, because a base class's
   // private members remain inaccessible there (regression/cpp/
   // Protection1: `class B : A {}` with A's private default constructor
@@ -651,7 +652,8 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   } implicit_definition_guard{
     implicit_definition_class,
     (symbol.type.get_bool("#is_implicit_ctor") ||
-     symbol.type.get_bool("#is_implicit_dtor"))
+     symbol.type.get_bool("#is_implicit_dtor") ||
+     symbol.type.get_bool("#explicitly_defaulted"))
       ? symbol.type.get(ID_C_member_name)
       : irep_idt{}};
   // Guard against recursive type-checking (e.g., constexpr functions
