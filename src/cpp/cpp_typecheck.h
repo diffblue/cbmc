@@ -903,6 +903,10 @@ protected:
 
   // Deferred method bodies for lazy template elaboration.
   std::map<irep_idt, method_bodyt> deferred_method_bodies;
+  /// The non-user-provided defaulted members deferred until odr-used
+  /// ([dcl.fct.def.default]/5); a conversion of one of them happens because
+  /// it is odr-used, so a failure is an error ([dcl.fct.def.delete]/2)
+  std::set<irep_idt> odr_use_defined_defaulted_members;
 
   /// Constructors (and other member functions) that are odr-used as the target
   /// of a constructor member-initializer.  A synthesized constructor's base- or

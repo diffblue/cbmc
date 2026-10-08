@@ -2462,6 +2462,29 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       }
     }
 
+    // N5008 [dcl.fct.def.default]/5: a non-user-provided defaulted function
+    // (implicitly declared, or explicitly defaulted on its first
+    // declaration) is implicitly defined only when it is odr-used; a
+    // virtual one is odr-used if it is not pure ([basic.def.odr]/8) and is
+    // converted eagerly.  Defining an unused one instantiates what its
+    // definition uses: an unused implicit default constructor of a class
+    // with a unique_ptr<incomplete> member (libstdc++'s chrono::time_zone)
+    // instantiated the deleter for the incomplete type.  Destructors stay
+    // eager: their implicit invocations ([class.dtor]/14) are added by goto
+    // conversion, after the drain that finds odr-uses.
+    {
+      const typet &method_type = _method_symbol->type;
+      if(
+        !method_type.get_bool(ID_C_is_virtual) &&
+        to_code_type(method_type).return_type().id() != ID_destructor &&
+        (method_type.get_bool("#is_implicit_ctor") ||
+         method_type.get_bool("#explicitly_defaulted")))
+      {
+        defer = true;
+        odr_use_defined_defaulted_members.insert(_method_symbol->name);
+      }
+    }
+
     // a hidden friend of a class template specialization, [temp.inst]/4
     if(
       defining_friend_of_template_instance &&
