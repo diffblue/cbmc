@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--unwindset 'fill<signed_int,3>(ptr_signed_int).0:1' --unwinding-assertions
+^\[fill\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+--unwindset splits its argument at every comma
+(cmdline.get_comma_separated_values), so this entry becomes
+`fill<signed_int' and `3>(ptr_signed_int).0:1'; neither matches a loop, and
+the bound 1 is silently not applied: the loop is unwound completely and its
+unwinding assertion holds.

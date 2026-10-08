@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+--unwindset 'ns::fill(ptr_signed_int,struct_tag(identifier=ns::tag-it)).0:1' --unwinding-assertions
+^\[fill\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+invalid loop identifier
+--
+--unwindset splits its argument at every comma
+(cmdline.get_comma_separated_values), so this entry becomes
+`ns::fill(ptr_signed_int' and `struct_tag(identifier=ns::tag-it)).0:1'; the
+first is rejected with "invalid loop identifier ns:".
