@@ -1,0 +1,12 @@
+CORE
+main.c
+
+^\[main\.assertion\.1\] line \d+ stored: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The verification counterpart of test.desc; it also passes on bin53, where
+the stores are byte_updates of a long[5] object.
