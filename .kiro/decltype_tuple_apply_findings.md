@@ -13567,10 +13567,27 @@ Still KNOWNBUG:
   move constructor; pre-existing on W28).
 - test_format: conversion 38 s, no drops; symex unwinds
   _Iter_sink::_M_overflow recursion beyond 300 levels (not analysed).
-- #3 locale model (/tmp/r165/locale_model3.patch: classic num_put object
-  with vtable, __numpunct_cache "C" values, member extern template discard
-  re-applied): ostringstream << 7 verifies in 9 s, but `setw(3) << 7'
-  exhausts 8 GB in the SAT solver (1821 VCCs after 4.6 s symex) and
-  cpp11_stream_setw / gcc16_stream_ctype_facet_vtable time out.  Not
-  committed.
 - kb_Z_func2 (libc++ __tuple_impl) reduction still running.
+
+### Round 165b: the locale model
+
+- The SAT blow-up of the locale model (`ostringstream << 42': 50k steps,
+  over 8 GB) was not array constraints but symbolic digits:
+  num_put::_M_insert_int allocates `__builtin_alloca(sizeof(_CharT) *
+  __ilen)' with `__ilen = 5 * sizeof(_ValueT)'; simplify_mult dropped the
+  factor sizeof(char) == 1 and kept __ilen's sizeof(long) annotation, so
+  symex_allocate made a long[5] object and every char store a byte_update
+  that constant propagation does not see through.  simplify_mult keeps a
+  one that carries a sizeof annotation (c92a4b2114; new
+  regression/cbmc/alloca_sizeof_char_times_sizeof_constant).  Now 5.7k
+  steps, 8 s.  --z3/--cvc5 had first hit "TODO typecast8 array -> array"
+  (an atoms array constant typed with another size type; the model now
+  gives such constants the component's type), then took 140 s.
+- 5079a3cb52: classic num_put object (vtable of the complete class) and
+  __numpunct_cache "C" values, plus the member `extern template' discard.
+  test_ostream_int and cpp98 explicit instantiation test_cpp11 promoted;
+  new cpp11_ostream_integer_insertion_classic_locale (-42, setw(3) << 7).
+  cpp11_stream_setw / gcc16_stream_ctype_facet_vtable stay at 11 s.
+- W35 (the uncommitted equivalent): cbmc-cpp 1748 exit 0, cpp 246 exit 0,
+  regression/cbmc 1201 exit 0, goto-instrument exit 0, contracts exit 0,
+  ansi-c only clang_target (fails on W28 too).  Lint 0, -K 4 KNOWNBUGs OK.
