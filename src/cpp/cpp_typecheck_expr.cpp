@@ -3930,6 +3930,37 @@ bool cpp_typecheckt::nonmember_operator_is_better(
       worse = true;
     else if(nonmember_rank < member_rank)
       better = true;
+    else
+    {
+      // [over.ics.rank]/4.4.2, /4.4.4: of two derived-to-base conversions
+      // of the same argument (of pointers, or reference bindings), the one
+      // to the more derived base is better; implicit_conversion_sequence
+      // ranks every derived-to-base conversion alike
+      const auto target_class = [](const typet &type) -> irep_idt
+      {
+        const typet &target =
+          type.id() == ID_pointer ? to_pointer_type(type).base_type() : type;
+        return target.id() == ID_struct_tag
+                 ? to_struct_tag_type(target).get_identifier()
+                 : irep_idt{};
+      };
+      const irep_idt member_class = target_class(member_type);
+      const irep_idt nonmember_class =
+        target_class(nonmember_parameters[i].type());
+      if(
+        !member_class.empty() && !nonmember_class.empty() &&
+        member_class != nonmember_class &&
+        is_reference(member_type) ==
+          is_reference(nonmember_parameters[i].type()))
+      {
+        const struct_typet &m = follow_tag(struct_tag_typet{member_class});
+        const struct_typet &n = follow_tag(struct_tag_typet{nonmember_class});
+        if(subtype_typecast(n, m))
+          better = true;
+        else if(subtype_typecast(m, n))
+          worse = true;
+      }
+    }
   }
   return better && !worse;
 }
