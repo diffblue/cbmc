@@ -14,16 +14,13 @@ could not fully type-check
 system-header declaration
 --
 libc++ (LLVM 18) <functional>: std::function<int(int)> holding a lambda
-returns a nondeterministic value, so the first assertion fails.  The
-remaining drops are tuple:469 __tuple_impl's constructor and
-function.h:272: in `__tuple_leaf<_Uf, _Tf>(std::forward<_Up>(__u))...'
-the call std::forward<_Up>(__u) does not resolve ("template 'forward' not
-found"), so no __tuple_leaf constructor matches (being reduced:
-/tmp/r163/red/kb_W_func_fwd; the earlier reduction kb_V_func_c lost
-__tuple_leaf's constructors and showed a C++20 parenthesized aggregate
-initialization gap instead, fixed: cpp20_parenthesized_aggregate_init_one_
-element, cpp20_aggregate_element_of_class_type_constructed).  Type
-checking takes about 2 minutes and the SAT solver needs more than 16 GB
-(with `ulimit -v 16000000' the result is ERROR).  clang++ 18
--stdlib=libc++ accepts this program, and it fails only its WRONG
-assertion.
+returned a nondeterministic value.  The function.h:272 drop
+(__func::operator(), called virtually through __base<R(Args...)>) is fixed
+(cpp11_virtual_override_with_rvalue_reference_parameter); the first
+assertion now holds.  Remaining: the bodies of tuple:469 __tuple_impl
+constructor instances are dropped.  They are instantiated for
+tuple<X &&>::tuple(_Up &&...) with _Up = tuple<X &&>, which the constraint
+_Not<_IsThisTuple<_Up...>> excludes ([temp.deduct]/8); the traits evaluate
+correctly in isolation, so the candidate is presumably instantiated before
+its constraint is checked.  clang++ 18 -stdlib=libc++ accepts this program,
+and it fails only its WRONG assertion.
