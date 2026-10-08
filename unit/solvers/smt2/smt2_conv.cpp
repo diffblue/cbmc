@@ -613,3 +613,36 @@ TEST_CASE(
   REQUIRE(operands_map.size() == 1);
   REQUIRE(operands_map.count(-1) == 1);
 }
+
+TEST_CASE(
+  "smt2_convt::set_to of a self-referential equality",
+  "[core][solvers][smt2]")
+{
+  // x == (x & y): a constraint on x, not a definition of x
+  unsignedbv_typet u2(2);
+  symbol_exprt x("x", u2), y("y", u2);
+
+  symbol_tablet symbol_table;
+  namespacet ns(symbol_table);
+  std::ostringstream out;
+  smt2_convt conv(ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out);
+  conv.set_to(equal_exprt{x, bitand_exprt{x, y}}, true);
+  std::string result = out.str();
+
+  // x must be declared, not defined in terms of itself
+  REQUIRE(result.find("(define-fun x ") == std::string::npos);
+  REQUIRE(result.find("(declare-fun x () (_ BitVec 2))") != std::string::npos);
+  REQUIRE(result.find("(assert (= x (bvand x y)))") != std::string::npos);
+
+  SECTION("an equality without self-reference is still a definition")
+  {
+    std::ostringstream out2;
+    smt2_convt conv2(
+      ns, "test", "", "QF_BV", smt2_convt::solvert::GENERIC, out2);
+    symbol_exprt z("z", u2);
+    conv2.set_to(equal_exprt{z, bitand_exprt{x, y}}, true);
+    REQUIRE(
+      out2.str().find("(define-fun z () (_ BitVec 2) (bvand x y))") !=
+      std::string::npos);
+  }
+}
