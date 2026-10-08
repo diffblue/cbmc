@@ -1152,7 +1152,25 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       mp_integer int_value;
 
       if(to_integer(to_constant_expr(operand), int_value))
-        return unchanged(expr);
+      {
+        // a bit-field of enumeration type (C++ [class.bit]/4): to_integer
+        // cannot read it without the namespace; the signedness is that of
+        // the enumeration's underlying type
+        if(
+          op_type_id != ID_c_bit_field ||
+          to_c_bit_field_type(op_type).underlying_type().id() != ID_c_enum_tag)
+        {
+          return unchanged(expr);
+        }
+        const c_enum_typet &enum_type = ns.follow_tag(
+          to_c_enum_tag_type(to_c_bit_field_type(op_type).underlying_type()));
+        if(enum_type.is_incomplete())
+          return unchanged(expr);
+        int_value = bvrep2integer(
+          value,
+          to_c_bit_field_type(op_type).get_width(),
+          enum_type.underlying_type().id() == ID_signedbv);
+      }
 
       if(expr_type_id==ID_bool)
       {
