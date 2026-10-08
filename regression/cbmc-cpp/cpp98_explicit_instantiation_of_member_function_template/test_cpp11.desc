@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ explicitly instantiated: SUCCESS$
@@ -14,13 +14,11 @@ no body for callee
 --
 N5008 [temp.explicit]/12: `extern template int box<int>::put(short);'
 suppresses only the implicit instantiation; the program's explicit
-instantiation definition defines the same specialization.  The parser
-keeps such a declaration of a member function, which becomes a bodiless
-member hiding the template ("no body for callee box<int>::put").
-Discarding it, as for a free function, fixes this and converts
-libstdc++'s basic_ostream::_M_insert without drops, but the faithful
-num_put over the unmodelled "C"-locale facets (whose data libstdc++.so
-provides) makes cpp11_stream_setw and gcc16_stream_ctype_facet_vtable
-time out (the SAT problem exceeds 8 GB).  Pending a model of those
-facets.  g++ 13 and clang++ 18 accept this program, and it fails only its
-WRONG assertion.
+instantiation definition defines the same specialization.  The parser kept
+such a declaration of a member function, which became a bodiless member
+hiding the template ("no body for callee box<int>::put"); it is now
+discarded, as for a free function.  This makes libstdc++'s
+basic_ostream::_M_insert instantiate the real num_put, which runs over the
+modelled "C"-locale facets (cpp11_ostream_integer_insertion_classic_locale).
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

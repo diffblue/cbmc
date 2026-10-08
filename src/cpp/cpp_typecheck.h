@@ -715,6 +715,7 @@ protected:
   void clear_not_typechecked();
   void clean_up();
   void provide_stdlib_bodies();
+  exprt classic_num_put(const symbolt &accessor);
 
   /// Lay out the class's virtual bases after its non-virtual part (Itanium
   /// C++ ABI 2.4 II.3); their components are marked ID_C_virtual_base with
