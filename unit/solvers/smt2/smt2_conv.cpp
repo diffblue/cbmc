@@ -763,6 +763,34 @@ TEST_CASE(
 }
 
 TEST_CASE(
+  "smt2_convt converts a typecast between array types of equal length",
+  "[core][solvers][smt2]" XFAIL)
+{
+  // An array constant whose size is spelt with one integer type converted
+  // to the same array type with the size spelt with another, as front ends
+  // produce when an initializer's array type was built independently of
+  // the target's.  convert_typecast fails with "TODO typecast8 array ->
+  // array"; the SAT back end accepts such a typecast.
+  const cbmc_invariants_should_throwt invariants_throw;
+
+  const signedbv_typet char_type{8};
+  const array_typet source_type{char_type, from_integer(2, signedbv_typet{64})};
+  const array_typet target_type{
+    char_type, from_integer(2, unsignedbv_typet{64})};
+  const array_exprt value{
+    {from_integer(1, char_type), from_integer(2, char_type)}, source_type};
+  const symbol_exprt target{"a", target_type};
+
+  symbol_tablet symbol_table;
+  namespacet ns{symbol_table};
+  std::ostringstream out;
+  smt2_convt conv{
+    ns, "test", "", "QF_AUFBV", smt2_convt::solvert::GENERIC, out};
+  REQUIRE_NOTHROW(
+    conv.set_to(equal_exprt{target, typecast_exprt{value, target_type}}, true));
+}
+
+TEST_CASE(
   "smt2_convt::set_to of a self-referential equality",
   "[core][solvers][smt2]")
 {
