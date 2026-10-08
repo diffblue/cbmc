@@ -37,6 +37,20 @@ void goto_convertt::do_function_call(
   goto_programt &dest,
   const irep_idt &mode)
 {
+  // this call is the one nested_call_temporaries was set up for; calls
+  // converted while cleaning its operands manage their own temporaries
+  std::list<irep_idt> *const enclosing_temporaries = nested_call_temporaries;
+  nested_call_temporaries = nullptr;
+  struct restoret
+  {
+    std::list<irep_idt> *&slot;
+    std::list<irep_idt> *const saved;
+    ~restoret()
+    {
+      slot = saved;
+    }
+  } restore{nested_call_temporaries, enclosing_temporaries};
+
   // make it all side effect free
 
   exprt new_lhs = lhs, new_function = function;
@@ -89,7 +103,13 @@ void goto_convertt::do_function_call(
   // destroyed before a handler runs ([except.ctor]); emit a guarded cleanup
   emit_cpp_call_unwind_cleanup(dest, mode);
 
-  destruct_locals(side_effects.temporaries, dest, ns);
+  // [class.temporary]/4: the operands' temporaries of a call nested in a
+  // larger expression live until the end of that full-expression
+  if(enclosing_temporaries != nullptr)
+    enclosing_temporaries->splice(
+      enclosing_temporaries->begin(), side_effects.temporaries);
+  else
+    destruct_locals(side_effects.temporaries, dest, ns);
 }
 
 void goto_convertt::do_function_call_if(
