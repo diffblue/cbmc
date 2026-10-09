@@ -13784,3 +13784,33 @@ Suites W46/W47: cbmc-cpp 1761 exit 0, cpp 246, regression/cbmc 1203; lint
 Suites W51: cbmc-cpp 1767 exit 0, cpp 246, regression/cbmc 1203,
 goto-instrument 298, contracts 178; lint 0; each commit compiles; -K: the
 new KNOWNBUG and ranges_basic_libcxx OK.
+
+## Round 171: the views::take chain, continued
+
+- 5ec0fa5058: template_mapt::build with two or more packs bound nothing
+  positionally, so an explicit template template argument before the packs
+  (`two<same>(types<L...>, types<R...>)') stayed unbound -- the
+  __tuple_sfinae_base::__do_test KNOWNBUG is CORE.  With it, tuple<int>'s
+  converting constructor from tuple<int &&> / tuple<long> works
+  (std::tuple<int> c(std::move(t)) value correct).
+- d3f30c1ddc: folds over a partial specialization's EARLIER pack
+  (`S<seq<I...>, B...>') were never expanded.
+- 4307b0f269: `cpp-this->m' (member named where the use site has no
+  `this', e.g. a trailing return type) is an lvalue; gated on
+  original_scope so Qualifier1 (`A::a = 1' in unrelated B::f) still fails.
+- 77f428527c: member function templates' trailing return types kept the
+  unexpanded function parameter pack (`decltype(f(3, a...))');
+  expand_trailing_return_packs expands the call arguments and replaces the
+  replicated a$k by lvalue placeholders (the parameters are not declared
+  while the type is checked).  Split out of typecheck_compound_declarator
+  for the 500-line lint limit.
+- Remaining for `arr | take(3)': inside the hidden-friend operator|'s
+  constraint, is_invocable_v<__bind_back_op<1>, _Fn &, tuple<int> &,
+  int (&)[5]> is false although a direct static_assert of the same trait
+  holds; __invokable_r reports "invalid implicit conversion from
+  invoke_result_t<...> to void" (__is_core_convertible<_Result, void>
+  instantiated although is_void<_Ret> selects true_type).  Not reduced yet.
+
+Suites W53/W54: cbmc-cpp 1771 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 298, contracts 178; lint 0; each commit compiles; -K:
+cpp20_ranges_basic_libcxx OK.
