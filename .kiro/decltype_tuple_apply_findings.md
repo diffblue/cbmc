@@ -13664,3 +13664,36 @@ dropped -- tuple<X &&>::tuple(_Up &&...) is instantiated with _Up = tuple<X
 <struct tuple, 0>), which _Not<_IsThisTuple<_Up...>> excludes; the traits
 evaluate correctly in isolation (lt5/lt6); only in system-header mode
 (kb_Z_func2 reduction, user-mode copy converts).
+
+## Round 168: libc++ tuple drops, diagnostics
+
+- fd8c38fd27: report_dropped_body gives every dropped-body warning the same
+  wording, labelled "system-header function" by the body's file (two of
+  four sites never labelled; the unique_ptr.h drop changed wording with the
+  phase that found it).
+- 6e7addc322: a member of aggregate class type in a mem-initializer
+  `m{...}' is initialized from the aggregate value, not assigned through
+  operator= ([class.base.init]/7, [dcl.init.aggr]/4); a reference member
+  (libc++ __tuple_leaf<I, X &&>) was left unbound.  Fails on bin53 too.
+  cpp11_aggregate_member_with_reference_member_initialized.
+- Duplicate unwinding property ids (`fill.unwind.0' for two functions):
+  set_properties prefixes with source_location().get_function(), the
+  unqualified name; qualifying it would rename properties of every C++
+  test, not done.
+- libc++ __tuple_impl drops (test_functional, ranges_basic_libcxx): the
+  dropped instances (tuple<X &&>::tuple<tuple> and the __tuple_impl
+  constructor it instantiates) are never called; the verdicts are right.
+  Reductions: kb_Z_tup (C-Vise, 278 lines, killed at the end) and a
+  line-deletion pass to 163 lines (/tmp/r163/red/kb_Z_tup/e3_reduced.cpp,
+  needs --stdlib libc++ for __make_integer_seq/__type_pack_element and the
+  system-header line marker; clang-only builtins, g++ rejects it, so not a
+  regression test).  In it the constructor template is unconstrained
+  (`constexpr tuple(_Up... __u)'), and removing the unrelated concept chain
+  __same_as_impl / same_as / common_reference_with makes the instantiation
+  disappear -- an order or caching effect rather than a constraint
+  evaluation bug.  Header-free attempts (by-value template constructor,
+  explicit, constexpr, reference elements, by-value move) all convert
+  correctly.
+
+Suites W44/W45: cbmc-cpp 1759 exit 0, cpp 246, regression/cbmc 1203; lint
+0; each commit compiles; -K: the two libc++ KNOWNBUGs OK.
