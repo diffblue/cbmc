@@ -5319,6 +5319,56 @@ skip_pack_removal_ft:
       }
     }
 
+    // N5008 [temp.variadic]/5, [temp.spec.partial.match]: a partial
+    // specialization may have several packs (`template <int... I,
+    // class... B> struct S<seq<I...>, B...>'); the block above expands
+    // folds over the last one only.  Expand folds over each earlier pack
+    // whose elements partial-specialization matching deduced.
+    if(new_decl.type().id() == ID_struct || new_decl.type().id() == ID_union)
+    {
+      const auto &params = template_type.template_parameters();
+      for(std::size_t k = 0; k + 1 < params.size(); ++k)
+      {
+        if(!params[k].get_bool(ID_ellipsis))
+          continue;
+        const irep_idt pack_id = params[k].id() == ID_type
+                                   ? params[k].type().get(ID_identifier)
+                                   : params[k].get(ID_identifier);
+        std::vector<exprt> pack_args;
+        const auto deduced_exprs = template_map.pack_expr_map.find(pack_id);
+        const auto deduced_types = template_map.pack_args_map.find(pack_id);
+        const auto deduced_size = template_map.pack_size_map.find(pack_id);
+        if(deduced_exprs != template_map.pack_expr_map.end())
+          pack_args = deduced_exprs->second;
+        else if(deduced_types != template_map.pack_args_map.end())
+        {
+          for(const auto &t : deduced_types->second)
+          {
+            exprt te{ID_type};
+            te.type() = t;
+            pack_args.push_back(te);
+          }
+        }
+        else if(
+          deduced_size == template_map.pack_size_map.end() ||
+          deduced_size->second != 0)
+        {
+          continue; // the elements are not known
+        }
+        const std::string pstr = id2string(pack_id);
+        const auto pos = pstr.rfind("::");
+        const std::string short_name =
+          pos != std::string::npos ? pstr.substr(pos + 2) : pstr;
+        expand_folds_over_pack(
+          new_decl.type().add(ID_body), short_name, pack_args);
+        if(new_decl.type().find(ID_bases).is_not_nil())
+        {
+          expand_folds_over_pack(
+            new_decl.type().add(ID_bases), short_name, pack_args);
+        }
+      }
+    }
+
     // Expand variadic base classes: Bases... → Base0, Base1, ...
     if(
       new_decl.type().id() == ID_struct &&
