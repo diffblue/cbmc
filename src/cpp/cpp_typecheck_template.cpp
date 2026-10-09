@@ -674,8 +674,19 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
     function_type = declarator.merge_type(declaration.type());
   }
 
-  irep_idt symbol_name =
+  // N5008 [defns.signature.member.templ]: a member function template's
+  // signature includes its cv-qualifiers.  They are not part of
+  // function_type (the method qualifier stays on the declarator), so
+  // `template <class A> int f(A)' and `template <class A> int f(A) const'
+  // got the same identifier; the second was kept only as a SFINAE
+  // alternative of the first, and a call on a const object found no match.
+  std::string template_identifier =
     function_template_identifier(base_name, template_type, function_type);
+  if(has_const(static_cast<const typet &>(declarator.method_qualifier())))
+    template_identifier += "$const";
+  if(has_volatile(static_cast<const typet &>(declarator.method_qualifier())))
+    template_identifier += "$volatile";
+  irep_idt symbol_name = template_identifier;
 
   bool has_value = declarator.find(ID_value).is_not_nil();
 

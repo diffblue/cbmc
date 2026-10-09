@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ f: SUCCESS$
+^\[main\.assertion\.2\] line \d+ h: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+convert_function_template gave both templates the same identifier (the
+method qualifier is not part of the function type), so the const one became
+a SFINAE alternative of the non-const one and `cw.f(0)' found no match.
+Found in libc++'s std::views::take closure (__perfect_forward_impl's
+operator() overloads).  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
