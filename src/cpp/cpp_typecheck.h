@@ -1813,6 +1813,7 @@ private:
   /// translation unit).  Covers the usual install roots and a compiler's
   /// relative include root (`/usr/bin/../include/c++/v1` for libc++).
   static bool is_system_header_file(const std::string &file);
+  void report_dropped_body(const symbolt &symbol, const char *reason);
 
   /// is_system_header_file, plus a compiler's relative include root
   /// (`/usr/bin/../include/c++/v1` for libc++).  Used where a failing

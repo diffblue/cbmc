@@ -1656,12 +1656,7 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
       syshdr_guard.reset();
       if(!symbol.type.get_bool("#constrained"))
       {
-        warning().source_location = symbol.location;
-        warning()
-          << "C++ front-end dropped the body of system-header function '"
-          << symbol.base_name
-          << "' (unsupported construct); calls to it return nondet"
-          << messaget::eom;
+        report_dropped_body(symbol, "unsupported construct");
       }
       symbol.value.make_nil();
       functions_being_typechecked.erase(symbol.name);

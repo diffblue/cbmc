@@ -1693,12 +1693,7 @@ void cpp_typecheckt::typecheck_method_bodies()
           // unsatisfied for this specialization (see convert_function).
           if(!method_symbol.type.get_bool("#constrained"))
           {
-            warning().source_location = method_symbol.location;
-            warning() << "C++ front-end dropped the body of "
-                      << (is_library_body ? "system-header " : "")
-                      << "function '" << method_symbol.base_name
-                      << "' (unsupported construct); calls to it return "
-                      << "nondet" << messaget::eom;
+            report_dropped_body(method_symbol, "unsupported construct");
           }
         }
         get_message_handler().set_message_count(

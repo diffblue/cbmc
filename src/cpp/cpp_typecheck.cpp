@@ -112,6 +112,24 @@ bool cpp_typecheckt::is_system_header_file(const std::string &file)
          file.find("\\include\\") != std::string::npos;
 }
 
+/// Warn that the body of \p symbol was dropped for \p reason: every call
+/// to it returns a nondeterministic value.  The function is labelled a
+/// system-header function when its body lies in a library header
+/// (is_library_body_file), wherever the drop is detected.
+void cpp_typecheckt::report_dropped_body(
+  const symbolt &symbol,
+  const char *reason)
+{
+  const std::string file = id2string(symbol.location.get_file());
+  const bool library_body =
+    file.find("/include/") != std::string::npos || is_library_body_file(file);
+  warning().source_location = symbol.location;
+  warning() << "C++ front-end dropped the body of "
+            << (library_body ? "system-header " : "") << "function '"
+            << symbol.base_name << "' (" << reason
+            << "); calls to it return nondet" << eom;
+}
+
 bool cpp_typecheckt::is_library_body_file(const std::string &file)
 {
   return is_system_header_file(file) ||
@@ -340,10 +358,7 @@ void cpp_typecheckt::typecheck()
       continue;
     // The function stays bodyless, a havoc stub for every caller -- goto
     // conversion does not diagnose that.
-    warning().source_location = sym->location;
-    warning() << "C++ front-end dropped the body of '" << sym->base_name
-              << "' (unsupported construct); calls to it return nondet"
-              << messaget::eom;
+    report_dropped_body(*sym, "unsupported construct");
   }
 
   // N5008 [temp.inst]/11: candidate instances that a converted body does
@@ -476,10 +491,7 @@ void cpp_typecheckt::typecheck()
     // A converted body that kept such a statement is a front-end gap.
     if(sym.value.get_bool("#cpp_converted"))
     {
-      warning().source_location = sym.location;
-      warning() << "C++ front-end dropped the body of '" << sym.base_name
-                << "' (unconverted statement); calls to it return nondet"
-                << eom;
+      report_dropped_body(sym, "unconverted statement");
     }
     symbol_table.get_writeable_ref(entry.first).value.make_nil();
   }
