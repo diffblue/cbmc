@@ -13722,3 +13722,28 @@ Suites W44/W45: cbmc-cpp 1759 exit 0, cpp 246, regression/cbmc 1203; lint
   correctly, also in clang mode; the remaining ingredient is libc++'s
   __make_integer_seq/__type_pack_element machinery.  Not pursued further:
   the dropped bodies are of unused instances, verdicts are correct.
+
+## Round 170: deduction fixes found while chasing the libc++ tuple drop
+
+- Template-map dump at the tuple<> -> tuple<int &&> conversion trial: it
+  happens while matching __compressed_pair's constructor template (scope
+  __compressed_pair<int, allocator<int>>::__compressed_pair(...)), with
+  _Args1/_Args2 recorded as empty packs -- the trial runs on an argument /
+  parameter pairing before the packs are deduced.  Plain pack deduction
+  from tup<int &&> is right (pk.cpp).  Not resolved further.
+- While probing, two unrelated bugs (both fail on bin53):
+  - 7874b4c7ba: [temp.deduct.type]/9 -- P = tup<A> (non-pack A, tup's
+    parameter a pack) vs A = tup<char, char>: deduction must fail; surplus
+    arguments were ignored.  [temp.over]/1 -- a member template's earlier
+    specialization (#fn_template_type) is no longer offered as a candidate
+    of its own when the call needs deduction (also in the two fallbacks
+    that reset the candidate list).  New helpers
+    pack_argument_count_differs / deducible_instance_arguments (keeps
+    guess_template_args_template_id under the 500-line lint limit).
+    cpp11_deduction_fails_for_mismatched_template_argument_count.
+  - 0fc18d9a31: typecheck_method_application took the single argument of
+    `S(...)' (as many arguments as parameters, `this' counted) for the
+    object argument.  cpp98_constructor_with_only_an_ellipsis_parameter.
+
+Suites W46/W47: cbmc-cpp 1761 exit 0, cpp 246, regression/cbmc 1203; lint
+0; each commit compiles; -K: test_functional, ranges_basic_libcxx OK.
