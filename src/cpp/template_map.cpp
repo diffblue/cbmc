@@ -2552,6 +2552,17 @@ void template_mapt::build(
           expr_map.erase(pid);
         }
       }
+      // N5008 [temp.arg.general]/1: the parameters before the first pack
+      // correspond to the leading arguments one to one; only the split
+      // between the packs is ambiguous.  Bind those (a template template
+      // parameter specified explicitly, `two<same>(...)', was otherwise
+      // left unbound).
+      for(std::size_t k = 0;
+          k < static_cast<std::size_t>(pack_idx) && k < instance.size();
+          ++k)
+      {
+        set(template_parameters[k], instance[k]);
+      }
       return;
     }
   }
