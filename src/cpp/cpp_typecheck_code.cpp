@@ -3298,12 +3298,26 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
                 exprt member_lval = inner_a;
                 member_lval.type().set(ID_C_constant, false);
                 member_lval.set(ID_C_lvalue, true);
-                side_effect_expr_assignt assign(
-                  member_lval, *agg, typet(), code.source_location());
-                typecheck_side_effect_assignment(assign);
-                code_expressiont expr_code(assign);
-                expr_code.add_source_location() = code.source_location();
-                agg_call = expr_code;
+                // N5008 [class.base.init]/7, [dcl.init.aggr]/4: the member
+                // is INITIALIZED from the aggregate value, which is not an
+                // assignment -- the class's operator= (deleted for a class
+                // with a reference member, [class.copy.assign]/7) does not
+                // take part, and a reference member binds
+                exprt value = *agg;
+                value.visit_post(
+                  [](exprt &e)
+                  {
+                    if(e.id() == ID_already_typechecked)
+                    {
+                      exprt inner = to_already_typechecked_expr(e).get_expr();
+                      e.swap(inner);
+                    }
+                  });
+                code_assignt initialization{
+                  member_lval,
+                  typecast_exprt::conditional_cast(value, member_lval.type())};
+                initialization.add_source_location() = code.source_location();
+                agg_call = initialization;
               }
             }
           }
