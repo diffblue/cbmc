@@ -129,6 +129,7 @@ public:
 
   friend class cpp_typecheck_resolvet;
   friend class cpp_declarator_convertert;
+  friend class cpp_typecheck_fargst;
 
   exprt resolve(
     const cpp_namet &cpp_name,

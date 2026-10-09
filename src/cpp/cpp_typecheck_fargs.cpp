@@ -501,6 +501,30 @@ bool cpp_typecheck_fargst::match(
     {
       type.set(ID_C_reference, true);
       type.set(ID_C_this, true);
+
+      // N5008 [over.match.funcs.general]/4: with a ref-qualifier, the
+      // implicit object parameter is an lvalue reference (`&') or an
+      // rvalue reference (`&&') to cv X, bound by the usual rules; /5's
+      // licence to bind an rvalue object applies only without one.
+      const irep_idt &ref_qualifier = code_type.get(ID_C_ref_qualifier);
+      if(!ref_qualifier.empty())
+      {
+        const bool object_is_lvalue =
+          cpp_typecheck.is_lvalue_expression(operand);
+        const bool object_parameter_is_const =
+          to_pointer_type(parameter.type()).base_type().get_bool(ID_C_constant);
+        if(ref_qualifier == "&&" && object_is_lvalue)
+          return false;
+        if(ref_qualifier == "&" && !object_is_lvalue)
+        {
+          if(!object_parameter_is_const)
+            return false;
+          // [over.ics.rank]/3.2.3: binding the rvalue object to an rvalue
+          // reference (an `&&' overload) is better
+          if(cv_distance != nullptr)
+            ++*cv_distance;
+        }
+      }
     }
 
     unsigned rank = 0;

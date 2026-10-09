@@ -1,0 +1,21 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ f: SUCCESS$
+^\[main\.assertion\.2\] line \d+ const f: SUCCESS$
+^\[main\.assertion\.3\] line \d+ g: SUCCESS$
+^\[main\.assertion\.4\] line \d+ h: SUCCESS$
+^\[main\.assertion\.5\] line \d+ W::f: SUCCESS$
+^\[main\.assertion\.6\] line \d+ W::k: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The ref-qualifier was neither in function_identifier (`k() &' and `k() &&'
+shared one symbol) nor in function_template_signatures_equivalent (the `&&'
+template was unified with the `&' one), and fargs.match /
+member_template_object_viable never checked it.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

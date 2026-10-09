@@ -2373,8 +2373,6 @@ bool cpp_typecheck_resolvet::member_template_object_viable(
     return true;
   if(!fargs.has_object || fargs.operands.empty())
     return true;
-  if(!fargs.operands.front().type().get_bool(ID_C_constant))
-    return true;
   const irep_idt tmpl = cand.type().get(ID_C_template);
   if(tmpl.empty())
     return true;
@@ -2389,7 +2387,24 @@ bool cpp_typecheck_resolvet::member_template_object_viable(
     return true;
   const typet &mq = static_cast<const typet &>(
     decl.declarators().front().find(ID_method_qualifier));
-  return cpp_typecheck.has_const(mq);
+  const bool member_const = cpp_typecheck.has_const(mq);
+  // N5008 [over.match.funcs.general]/4: with a ref-qualifier, the implicit
+  // object parameter is an lvalue (`&') or rvalue (`&&') reference, bound
+  // by the usual rules (/5's licence for an rvalue object applies only
+  // without one)
+  const irep_idt ref_qualifier = member_template_ref_qualifier(decl);
+  if(!ref_qualifier.empty())
+  {
+    const bool object_is_lvalue =
+      cpp_typecheck.is_lvalue_expression(fargs.operands.front());
+    if(ref_qualifier == "&&" && object_is_lvalue)
+      return false;
+    if(ref_qualifier == "&" && !object_is_lvalue && !member_const)
+      return false;
+  }
+  if(!fargs.operands.front().type().get_bool(ID_C_constant))
+    return true;
+  return member_const;
 }
 
 unsigned cpp_typecheck_resolvet::member_template_const_penalty(
@@ -2440,7 +2455,26 @@ unsigned cpp_typecheck_resolvet::member_template_const_penalty(
   const typet &mq = static_cast<const typet &>(
     decl.declarators().front().find(ID_method_qualifier));
   const bool member_const = cpp_typecheck.has_const(mq);
-  return (member_const && !object_const) ? 1 : 0;
+  unsigned penalty = (member_const && !object_const) ? 1 : 0;
+  // [over.ics.rank]/3.2.3: binding an rvalue object to an rvalue reference
+  // (an `&&' overload) is better than to the `const &' of an `&' overload
+  if(
+    fargs.has_object && !fargs.operands.empty() &&
+    member_template_ref_qualifier(decl) == "&" &&
+    !cpp_typecheck.is_lvalue_expression(fargs.operands.front()))
+  {
+    ++penalty;
+  }
+  return penalty;
+}
+
+irep_idt cpp_typecheck_resolvet::member_template_ref_qualifier(
+  const cpp_declarationt &decl)
+{
+  return decl.declarators()
+    .front()
+    .merge_type(decl.type())
+    .get(ID_C_ref_qualifier);
 }
 
 void cpp_typecheck_resolvet::exact_match_functions(
