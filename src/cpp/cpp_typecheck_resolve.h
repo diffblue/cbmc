@@ -250,6 +250,8 @@ protected:
   unsigned member_template_const_penalty(
     const exprt &cand,
     const cpp_typecheck_fargst &fargs);
+  /// The ref-qualifier (`&', `&&' or empty) of member template \p decl.
+  static irep_idt member_template_ref_qualifier(const cpp_declarationt &decl);
 
   void filter(
     resolve_identifierst &identifiers,

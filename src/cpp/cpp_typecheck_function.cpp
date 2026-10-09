@@ -1729,6 +1729,14 @@ irep_idt cpp_typecheckt::function_identifier(const typet &type)
       result += "$const";
     if(symbol.get_bool(ID_C_volatile))
       result += "$volatile";
+    // N5008 [defns.signature.member]: the ref-qualifier is part of a member
+    // function's signature; `f() &' and `f() &&' are distinct overloads
+    // ([over.match.funcs.general]/4)
+    const irep_idt &ref_qualifier = function_type.get(ID_C_ref_qualifier);
+    if(ref_qualifier == "&")
+      result += "$lref";
+    else if(ref_qualifier == "&&")
+      result += "$rref";
     result += id2string(ID_this);
     first=false;
     it++;
