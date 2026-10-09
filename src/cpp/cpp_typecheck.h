@@ -994,6 +994,9 @@ protected:
     bool has_body,
     bool tag_only_declaration);
 
+  void expand_trailing_return_packs(
+    typet &final_type,
+    const std::map<irep_idt, std::size_t> &pack_counts);
   void typecheck_compound_declarator(
     const symbolt &symbol,
     const cpp_declarationt &declaration,

@@ -619,6 +619,159 @@ irep_idt cpp_typecheckt::ensure_virtual_table(
   return vt_name;
 }
 
+/// N5008 [temp.variadic]/5, [dcl.fct]/2: expand the pack expansions among
+/// the call arguments of the trailing-return-type of member function type
+/// \p final_type to its replicated parameters `base$k', as the body and the
+/// mem-initializers are; then turn those names, not yet declared while the
+/// type is checked, into lvalue placeholders of the parameters' types
+/// ([expr.prim.id.unqual]/3: a named parameter is an lvalue, also when its
+/// type is an rvalue reference).
+/// \param final_type: the member's function type
+/// \param pack_counts: the replicated function parameter packs' base names
+///   and element counts
+void cpp_typecheckt::expand_trailing_return_packs(
+  typet &final_type,
+  const std::map<irep_idt, std::size_t> &pack_counts)
+{
+  std::function<irep_idt(const irept &)> mi_ref_base =
+    [&](const irept &n) -> irep_idt
+  {
+    if(n.id() == ID_name && pack_counts.count(n.get(ID_identifier)))
+      return n.get(ID_identifier);
+    for(const auto &s : n.get_sub())
+      if(irep_idt r = mi_ref_base(s); !r.empty())
+        return r;
+    for(const auto &ns : n.get_named_sub())
+      if(irep_idt r = mi_ref_base(ns.second); !r.empty())
+        return r;
+    return irep_idt{};
+  };
+  std::function<void(irept &, const irep_idt &, const irep_idt &)> mi_rename =
+    [&](irept &n, const irep_idt &base, const irep_idt &repl)
+  {
+    if(n.id() == ID_name && n.get(ID_identifier) == base)
+      n.set(ID_identifier, repl);
+    for(auto &s : n.get_sub())
+      mi_rename(s, base, repl);
+    for(auto &ns : n.get_named_sub())
+      mi_rename(ns.second, base, repl);
+  };
+  std::function<void(irept &)> expand_trailing_calls = [&](irept &n)
+  {
+    for(auto &sub : n.get_sub())
+      expand_trailing_calls(sub);
+    for(auto &named : n.get_named_sub())
+    {
+      if(named.first != ID_parameters)
+        expand_trailing_calls(named.second);
+    }
+    if(
+      n.id() != ID_side_effect || n.get(ID_statement) != ID_function_call ||
+      n.get_sub().size() < 2)
+    {
+      return;
+    }
+    irept::subt &args = n.get_sub()[1].get_sub();
+    irept::subt new_args;
+    bool changed = false;
+    // The template map's type-pack expansion may have run first,
+    // leaving one copy of the pattern per element, each still naming
+    // the parameter pack: rename the k-th copy to `base$k'.
+    std::map<irep_idt, std::size_t> copies_seen;
+    for(const auto &arg : args)
+    {
+      const irep_idt base = mi_ref_base(arg);
+      if(base.empty())
+      {
+        new_args.push_back(arg);
+        continue;
+      }
+      if(!arg.get_bool(ID_ellipsis))
+      {
+        changed = true;
+        irept copy = arg;
+        const std::size_t k = copies_seen[base]++ % pack_counts.at(base);
+        mi_rename(copy, base, id2string(base) + "$" + std::to_string(k));
+        new_args.push_back(copy);
+        continue;
+      }
+      changed = true;
+      for(std::size_t k = 0; k < pack_counts.at(base); ++k)
+      {
+        irept copy = arg;
+        copy.remove(ID_ellipsis);
+        mi_rename(copy, base, id2string(base) + "$" + std::to_string(k));
+        for(const auto &pa : template_map.pack_args_map)
+        {
+          if(pa.second.size() == pack_counts.at(base))
+          {
+            const std::string full = id2string(pa.first);
+            const auto pp = full.rfind("::");
+            replace_type_pack_ref(
+              copy,
+              pp != std::string::npos ? full.substr(pp + 2) : full,
+              pa.second[k]);
+          }
+        }
+        new_args.push_back(copy);
+      }
+    }
+    if(changed)
+      args.swap(new_args);
+  };
+  expand_trailing_calls(final_type);
+
+  // The trailing-return-type is typechecked before the replicated
+  // parameters are declared, but a decltype operand needs only their
+  // types: each `base$k' becomes an lvalue placeholder of that
+  // parameter's type ([expr.prim.id.unqual]/3: a named parameter is
+  // an lvalue, also when its type is an rvalue reference).
+  std::map<irep_idt, typet> replicated_types;
+  for(const auto &param : final_type.find(ID_parameters).get_sub())
+  {
+    if(param.id() != ID_cpp_declaration)
+      continue;
+    const auto &d = to_cpp_declaration(param);
+    if(d.declarators().empty())
+      continue;
+    const irep_idt name = d.declarators().front().name().get_base_name();
+    if(id2string(name).find('$') != std::string::npos)
+      replicated_types[name] = d.declarators().front().merge_type(d.type());
+  }
+  std::function<void(irept &)> placeholders = [&](irept &n)
+  {
+    if(
+      n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+      n.get_sub().front().id() == ID_name)
+    {
+      const auto it =
+        replicated_types.find(n.get_sub().front().get(ID_identifier));
+      if(it != replicated_types.end())
+      {
+        typet t = it->second;
+        typecheck_type(t);
+        if(is_reference(t) || is_rvalue_reference(t))
+          t = to_reference_type(t).base_type();
+        symbol_exprt placeholder{irep_idt{}, t};
+        placeholder.set(ID_C_lvalue, true);
+        exprt wrapped = placeholder;
+        already_typechecked_exprt::make_already_typechecked(wrapped);
+        n = wrapped;
+        return;
+      }
+    }
+    for(auto &sub : n.get_sub())
+      placeholders(sub);
+    for(auto &named : n.get_named_sub())
+    {
+      if(named.first != ID_parameters)
+        placeholders(named.second);
+    }
+  };
+  if(!replicated_types.empty())
+    placeholders(final_type);
+}
+
 void cpp_typecheckt::typecheck_compound_declarator(
   const symbolt &symbol,
   const cpp_declarationt &declaration,
@@ -942,6 +1095,8 @@ void cpp_typecheckt::typecheck_compound_declarator(
         for(auto &ns : n.get_named_sub())
           mi_rename(ns.second, base, repl);
       };
+
+      expand_trailing_return_packs(final_type, pack_counts);
 
       irept &inits = declarator.member_initializers();
       // N5008 [temp.variadic]/5: a mem-initializer that is ITSELF a pack
