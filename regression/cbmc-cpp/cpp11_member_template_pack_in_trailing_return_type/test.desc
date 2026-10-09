@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ one element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ by value, two: SUCCESS$
+^\[main\.assertion\.3\] line \d+ static, two: SUCCESS$
+^\[main\.assertion\.4\] line \d+ class template, forwarding: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+typecheck_compound_declarator replicated the parameters (a$0, a$1) but not
+the pack expansions of the trailing-return-type; those are now expanded,
+and the replicated names, not yet declared there, become lvalue
+placeholders of the parameters' types.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.
