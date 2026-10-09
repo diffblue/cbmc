@@ -1,6 +1,6 @@
 # What architecture?
 
-CPROVER now needs a C++17 compliant compiler and is known to work in the
+CPROVER now needs a C++20 compliant compiler and is known to work in the
 following environments:
 
 - Linux

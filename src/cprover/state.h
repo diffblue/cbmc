@@ -27,7 +27,7 @@ static inline mathematical_function_typet state_predicate_type()
 
 static inline symbol_exprt state_expr()
 {
-  return symbol_exprt(u8"\u03c2", state_typet());
+  return symbol_exprt{"\u03c2", state_typet()};
 }
 
 class initial_state_exprt : public unary_predicate_exprt
