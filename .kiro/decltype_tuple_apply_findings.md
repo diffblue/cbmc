@@ -13747,3 +13747,40 @@ Suites W44/W45: cbmc-cpp 1759 exit 0, cpp 246, regression/cbmc 1203; lint
 
 Suites W46/W47: cbmc-cpp 1761 exit 0, cpp 246, regression/cbmc 1203; lint
 0; each commit compiles; -K: test_functional, ranges_basic_libcxx OK.
+
+## Round 170 (continued): libc++ __alloc_func, views::take
+
+- ac99d9d265: the [temp.over]/1 filter of earlier specializations now also
+  runs before the exact-match phase: checking the stale
+  __compressed_pair(int, tuple<>, tuple<>) against tuple<int &&> made the
+  conversion trial instantiate tuple<>'s constructor template with
+  U = tuple<int &&> ([temp.inst]/5) and drop its __tuple_impl body.
+  cvise (kb_W48, interesting = W47 drops / W48 clean) gave the 57-line
+  shape; header-free test
+  cpp11_earlier_specialization_not_a_candidate_for_exact_match.
+  test_functional promoted to CORE.
+- views::take (`arr | take(3)') chain, each found by bisecting libc++:
+  - 346974659f: `template<class A> f(A)' and `... f(A) const' got one
+    identifier ([defns.signature.member.templ]); the const one became a
+    SFINAE alternative, const objects found no match.
+  - 0f066284ba: ref-qualifiers were in neither function_identifier nor
+    function_template_signatures_equivalent, nor checked by fargs.match /
+    member_template_object_viable ([over.match.funcs.general]/4,5;
+    [over.ics.rank]/3.2.3 as a cv_distance tie-breaker).
+  - 5eb4d8d2e0: an inherited constructor template's default template
+    arguments were evaluated with the derived class's parameters bound.
+  - 34a7675821: __is_constructible ignored all but the first argument.
+  - e7fb77eb72: folds in base-specifiers were never expanded (C fallback
+    made them `true'), and over a one-element pack not recognized in bases
+    and alias members.
+  - 6e7688f19b: viable_one_argument_constructors iterated components by
+    reference while probes instantiated members (cpp17_variant_basic
+    segfault on W50).
+- Remaining (KNOWNBUG 4a1083a112): `Tr<L, R>::value...' with Tr a template
+  template parameter -- "template scope 'Tr' not found"; one pack or a
+  concrete template works.  This is __tuple_sfinae_base::__do_test, so
+  tuple<int>(tuple<int &&>&&)'s __base_ init still drops.
+
+Suites W51: cbmc-cpp 1767 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 298, contracts 178; lint 0; each commit compiles; -K: the
+new KNOWNBUG and ranges_basic_libcxx OK.
