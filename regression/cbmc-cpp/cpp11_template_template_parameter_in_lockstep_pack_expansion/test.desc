@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ lockstep: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+CBMC reports "template scope 'Tr' not found" (disambiguate_template_classes):
+with two packs the pattern's copies are built without Tr's binding, also for
+a one-element call.  One pack (`Tr<L>::value...') and a concrete template
+(`same<L, R>::value...') work.  The remaining cause of the dropped
+__tuple_impl / tuple bodies of cpp20_ranges_basic_libcxx.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.
