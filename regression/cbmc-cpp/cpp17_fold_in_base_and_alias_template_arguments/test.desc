@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ all_of: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+Class template instantiation expanded folds only in the class body.  A
+fold left in a base-specifier reached the C type checker's placeholder and
+became `true'; over a one-element pack, a fold in a base or an alias member
+was left in place too.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
