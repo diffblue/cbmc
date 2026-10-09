@@ -9744,7 +9744,30 @@ void cpp_typecheckt::typecheck_method_application(
       this_type.set(ID_C_reference, true);
       this_type.set(ID_C_this, true);
 
-      if(expr.arguments().size() == func_type.parameters().size())
+      // The object argument is already present when the call was set up
+      // for base-class initialisation: as many arguments as parameters
+      // (`this' included).  With an ellipsis ([dcl.fct]/4) the count does
+      // not tell: `S(...)' called as `S c(1)' also has one argument, which
+      // is not the object; there, the first argument is the object only if
+      // it points to the member's class or a class derived from it.
+      bool has_object_argument =
+        expr.arguments().size() == func_type.parameters().size();
+      if(has_object_argument && func_type.has_ellipsis())
+      {
+        const typet &first = expr.arguments().front().type();
+        const typet &this_base = to_pointer_type(this_type).base_type();
+        has_object_argument =
+          first.id() == ID_pointer && !is_reference(first) &&
+          to_pointer_type(first).base_type().id() == ID_struct_tag &&
+          this_base.id() == ID_struct_tag &&
+          (to_struct_tag_type(to_pointer_type(first).base_type())
+               .get_identifier() ==
+             to_struct_tag_type(this_base).get_identifier() ||
+           subtype_typecast(
+             follow_tag(to_struct_tag_type(to_pointer_type(first).base_type())),
+             follow_tag(to_struct_tag_type(this_base))));
+      }
+      if(has_object_argument)
       {
         // this might be set up for base-class initialisation
         if(
