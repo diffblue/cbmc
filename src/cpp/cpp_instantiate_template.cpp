@@ -542,6 +542,31 @@ void expand_member_initializer_packs_in_body(
 /// N5008 [expr.prim.fold]/1-3: expand the fold expressions in \p node that
 /// fold over the template parameter pack \p short_name, whose elements
 /// (types as `ID_type` expressions, or non-type values) are \p pack_args.
+/// N5008 [expr.prim.fold]/2: a fold over a one-element pack is its single
+/// pattern instance -- `(e op ...)' and `(... op e)' are `e', a binary fold
+/// applies op once with the init operand on its side.  Rewrites every fold
+/// node in \p node whose pack has already been substituted.
+static void reduce_single_element_folds(irept &node)
+{
+  for(auto &sub : node.get_sub())
+    reduce_single_element_folds(sub);
+  for(auto &named : node.get_named_sub())
+    reduce_single_element_folds(named.second);
+  if(
+    (node.id() == "cpp_right_fold" || node.id() == "cpp_left_fold") &&
+    node.get_sub().size() == 1)
+  {
+    irept pattern = node.get_sub().front();
+    node.swap(pattern);
+  }
+  else if(node.id() == "cpp_binary_fold" && node.get_sub().size() == 2)
+  {
+    irept bin{node.get("fold_op")};
+    bin.get_sub() = node.get_sub();
+    node.swap(bin);
+  }
+}
+
 /// A unary right fold `(pat op ...)` over N elements becomes the
 /// right-associated tree `pat0 op (pat1 op ... op patN-1)`, a unary left fold
 /// `(... op pat)` the left-associated tree; a binary fold is seeded by its
@@ -5263,6 +5288,35 @@ skip_pack_removal_ft:
 
       expand_folds_over_pack(
         new_decl.type().add(ID_body), short_name, pack_args);
+      // Alias and typedef members name the element in place of a one-element
+      // pack already, as the bases do (below).
+      if(pack_args.size() == 1)
+      {
+        for(auto &member : new_decl.type().add(ID_body).get_sub())
+        {
+          if(
+            member.id() == ID_cpp_declaration &&
+            to_cpp_declaration(member).is_typedef())
+          {
+            reduce_single_element_folds(member);
+          }
+        }
+      }
+      // N5008 [class.derived.general]/1, [temp.variadic]/5: a base-specifier's
+      // template arguments may hold a fold over the pack as well
+      // (`struct and_ : bool_constant<(P::value && ...)>'); left
+      // unexpanded, the C type checker's placeholder made it `true'.
+      if(new_decl.type().find(ID_bases).is_not_nil())
+      {
+        irept &bases = new_decl.type().add(ID_bases);
+        expand_folds_over_pack(bases, short_name, pack_args);
+        // Over a one-element pack the bases already name the element in
+        // place of the pack, so the expander no longer recognizes the fold;
+        // [expr.prim.fold]/2 makes it the pattern (with the init operand
+        // for a binary fold).
+        if(pack_args.size() == 1)
+          reduce_single_element_folds(bases);
+      }
     }
 
     // Expand variadic base classes: Bases... → Base0, Base1, ...
