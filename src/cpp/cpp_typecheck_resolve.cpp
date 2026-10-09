@@ -7608,10 +7608,51 @@ resolved_after_strip:
 
   exprt result;
 
+  // N5008 [temp.over]/1: a function template contributes the
+  // specialization that template argument deduction synthesizes for THIS
+  // call, or nothing if deduction fails.  A specialization instantiated
+  // for an earlier call (a member template's specialization is recorded
+  // among the class's components, marked #fn_template_type) is not a
+  // candidate of its own: offered here, it made `S(tup<int>)' viable for
+  // a `tup<char, char>' argument through tup's converting constructor
+  // template, although deduction of `S(tup<A>)' fails.  When it is
+  // viable, deduction from its template synthesizes it again.  Removed
+  // before the exact-match phase too: checking it there tried conversions
+  // of the arguments to its parameter types, which instantiated (and
+  // dropped) unrelated constructor templates (libc++'s tuple<X &&> from
+  // tuple<>).  Only when a template is among the candidates.
+  bool has_template_candidate = false;
+  for(const auto &id : identifiers)
+  {
+    if(id.type().get_bool(ID_is_template))
+      has_template_candidate = true;
+  }
+  const auto remove_earlier_specializations =
+    [this, has_template_candidate](resolve_identifierst &candidates)
+  {
+    if(!has_template_candidate)
+      return;
+    candidates.erase(
+      std::remove_if(
+        candidates.begin(),
+        candidates.end(),
+        [this](const exprt &e)
+        {
+          if(e.id() != ID_symbol)
+            return false;
+          const symbolt *sym = cpp_typecheck.symbol_table.lookup(
+            to_symbol_expr(e).get_identifier());
+          return sym != nullptr &&
+                 sym->type.find(irep_idt{"#fn_template_type"}).is_not_nil();
+        }),
+      candidates.end());
+  };
+
   // We disambiguate functions
   resolve_identifierst new_identifiers = identifiers;
 
   remove_templates(new_identifiers);
+  remove_earlier_specializations(new_identifiers);
 
 #ifdef DEBUG
   std::cout << "P1 " << base_name << " " << new_identifiers.size() << '\n';
@@ -7632,34 +7673,6 @@ resolved_after_strip:
   if(new_identifiers.empty())
   {
     new_identifiers = identifiers;
-
-    // N5008 [temp.over]/1: a function template contributes the
-    // specialization that template argument deduction synthesizes for THIS
-    // call, or nothing if deduction fails.  A specialization instantiated
-    // for an earlier call (a member template's specialization is recorded
-    // among the class's components, marked #fn_template_type) is not a
-    // candidate of its own: offered here, it made `S(tup<int>)' viable for
-    // a `tup<char, char>' argument through tup's converting constructor
-    // template, although deduction of `S(tup<A>)' fails.  When it is
-    // viable, deduction from its template synthesizes it again.
-    const auto remove_earlier_specializations =
-      [this](resolve_identifierst &candidates)
-    {
-      candidates.erase(
-        std::remove_if(
-          candidates.begin(),
-          candidates.end(),
-          [this](const exprt &e)
-          {
-            if(e.id() != ID_symbol)
-              return false;
-            const symbolt *sym = cpp_typecheck.symbol_table.lookup(
-              to_symbol_expr(e).get_identifier());
-            return sym != nullptr &&
-                   sym->type.find(irep_idt{"#fn_template_type"}).is_not_nil();
-          }),
-        candidates.end());
-    };
     remove_earlier_specializations(new_identifiers);
 
     {
