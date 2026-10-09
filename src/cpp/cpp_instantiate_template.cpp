@@ -3807,6 +3807,10 @@ bool cpp_typecheckt::function_template_signatures_equivalent(
       forward.declarators().front().method_qualifier() !=
       candidate.declarators().front().method_qualifier())
       return false;
+    // [defns.signature.member.templ]: so does the ref-qualifier
+    // (`f(A) &' and `f(A) &&' are different templates)
+    if(f_type.get(ID_C_ref_qualifier) != c_type.get(ID_C_ref_qualifier))
+      return false;
   }
   return true;
 }
