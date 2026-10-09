@@ -46,3 +46,12 @@ base-specifiers.  Still a CONVERSION ERROR: tuple<int>'s converting
 constructor from tuple<int &&> drops its body because
 __tuple_sfinae_base::__do_test's `_Trait<_LArgs, _RArgs>::value...'
 fails (cpp11_template_template_parameter_in_lockstep_pack_expansion).
+
+2026-10-09 (round 171): __tuple_sfinae_base::__do_test resolves
+(cpp11_template_template_parameter_in_lockstep_pack_expansion, CORE), as do
+folds over __perfect_forward_impl's _Idx pack and its operator()'s
+trailing return types.  std::__bind_back(f, 2)(arr) now computes the right
+value, but `arr | take(3)' is still a CONVERSION ERROR: in the
+operator| constraint, is_invocable_v<__bind_back_op<1>, _Fn &,
+tuple<int> &, int (&)[5]> is false (it is true when asserted directly),
+and two tuple:488 __tuple_impl bodies are dropped.
