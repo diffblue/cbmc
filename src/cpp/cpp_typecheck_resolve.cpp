@@ -2174,6 +2174,8 @@ exprt cpp_typecheck_resolvet::convert_identifier(
           tag_typet class_tag_type{ID_union_tag, identifier.class_identifier};
           e.copy_to_operands(exprt("cpp-this", pointer_type(class_tag_type)));
           e.type() = type;
+          if(original_scope->this_expr.is_nil())
+            e.set(ID_C_lvalue, true);
         }
       }
       else
@@ -2201,6 +2203,14 @@ exprt cpp_typecheck_resolvet::convert_identifier(
             identifier.class_identifier};
           e.copy_to_operands(exprt("cpp-this", pointer_type(class_tag_type)));
           e.type() = type;
+          // N5008 [expr.prim.id.unqual]/3: an id-expression naming a data
+          // member is an lvalue.  Where `this' is not available yet (a
+          // trailing-return-type, [expr.prim.this]/4) the member stands
+          // for (*this).m ([expr.prim.id.general]/2) all the same, and
+          // `hr(m)' with `int hr(int &)' must bind to it.  In a function
+          // body the member access through the real `this' decides.
+          if(original_scope->this_expr.is_nil())
+            e.set(ID_C_lvalue, true);
         }
       }
     }

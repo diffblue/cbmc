@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ member as lvalue: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The resolver built `cpp-this->m' for the member without marking it an
+lvalue.  libc++'s __perfect_forward_impl::operator() names its tuple member
+in its trailing return type this way.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.
