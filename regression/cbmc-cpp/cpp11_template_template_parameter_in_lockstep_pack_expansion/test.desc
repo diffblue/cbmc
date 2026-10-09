@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ lockstep: SUCCESS$
@@ -9,9 +9,10 @@ main.cpp
 --
 ^warning: ignoring
 --
-CBMC reports "template scope 'Tr' not found" (disambiguate_template_classes):
-with two packs the pattern's copies are built without Tr's binding, also for
-a one-element call.  One pack (`Tr<L>::value...') and a concrete template
-(`same<L, R>::value...') work.  The remaining cause of the dropped
-__tuple_impl / tuple bodies of cpp20_ranges_basic_libcxx.  g++ 13 and
-clang++ 18 accept this program, and it fails only its WRONG assertion.
+CBMC reported "template scope 'Tr' not found": with two or more packs,
+template_mapt::build kept the deduction-time pack bindings and bound
+nothing positionally, so the explicitly specified Tr was never bound,
+although the parameters before the first pack correspond to the leading
+arguments one to one ([temp.arg.general]/1).  libc++'s
+__tuple_sfinae_base::__do_test has this shape.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
