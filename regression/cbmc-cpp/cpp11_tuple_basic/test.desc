@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ assertion std::get<0>\(t\) == 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion std::get<1>\(t\) == 2: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+std::tuple basic operations in C++11 mode: std::get<0> and std::get<1> on a
+two-element tuple of the same type.
+
+The run-time std::get chain (std::get -> std::__get_helper ->
+std::_Tuple_impl::_M_head -> std::_Head_base::_M_head) now reads each element
+from the correct subobject: the base-subobject byte offset is computed over the
+data-only layout, so the non-first _Head_base of the recursive _Tuple_impl is
+placed at its true offset and the constructor stores / get reads it there.  The
+desc requires both per-element assertions to be reported SUCCESS so the pass is
+non-vacuous.

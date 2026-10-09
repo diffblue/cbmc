@@ -1,0 +1,19 @@
+CORE
+main.cpp
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*symbol .*X.* is unknown.*$
+^.*member designator index.*out of bounds.*$
+--
+Class-template partial specialization keyed on a nested class-template-id
+(`base<holder<T>>`, the libstdc++ `allocator_traits<allocator<T>>` shape),
+N5008 [temp.spec.partial.match]/2.  When the member is named through a
+namespace-scope qualified-id (`base<holder<int>>::cp`), the nested template-id
+argument `holder<int>` must be elaborated so the partial specialization is
+selected (and instantiated to completion) rather than falling back to the
+body-less primary template.  [temp.inst]/2, [temp.spec.general]/7.
+See doc/architectural/cpp-requires-expression-support.md.

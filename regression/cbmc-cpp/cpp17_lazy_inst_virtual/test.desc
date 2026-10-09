@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\].*virtual dispatch returns argument: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.inst]/11: a virtual member of a class template may be instantiated
+eagerly and must work through dynamic dispatch.  Guards the permitted-eager
+carve-out so the Option B pivot keeps reachable virtuals instantiated.  See
+doc/architectural/cpp-extern-template-member-instantiation.md.

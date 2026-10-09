@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ closure object operator\(\) call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ closure passed by value to template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ closure copy then call: SUCCESS$
+^\[main\.assertion\.4\] line \d+ closure converts to function pointer: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*CONVERSION ERROR.*$
+--
+[expr.prim.lambda.closure]/1 + §7.5.6.2: a captureless, non-generic lambda is
+lowered to a closure class (struct) with operator() (the body) and a
+non-explicit conversion to pointer-to-function.  The lambda is usable both as an
+object (operator() call, by-value pass/copy, closure-type deduction) and as a
+function pointer (via the conversion).  Phase A of
+doc/architectural/cpp-lambda-closure-support.md.

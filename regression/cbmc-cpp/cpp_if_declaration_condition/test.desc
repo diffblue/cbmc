@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.\d+\] line \d+ if\(int x=3\): branch taken, x==3: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ if\(int y=0\): else taken, y==0: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ if\(int \*p=&storage\): p non-null, \*p==42: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ if\(int z=make\(5\)\): z==5: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ condition initializer runs once: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*unreachable: &storage is never null.*: FAILURE$
+^CONVERSION ERROR$
+--
+C++ [stmt.select]/1-2, [stmt.if]: an if-statement condition may be a
+declaration; the value tested is the declared variable contextually converted
+to bool.  The C++ frontend (cpp_typecheck_code.cpp typecheck_ifthenelse) used
+to type-check the declaration but leave the condition as the declaration code,
+so the "then" branch was never taken.  The fix rewrites `if(T v = e) S1 [else
+S2]` into `{ T v = e; if(v) S1 [else S2] }`, mirroring the existing handling in
+typecheck_while / typecheck_switch.  This also fixed libstdc++
+vector::_M_erase_at_end's `if (size_type __n = _M_finish - __pos)` (used by
+clear()/resize()/erase(first, last)), which had silently been a no-op.

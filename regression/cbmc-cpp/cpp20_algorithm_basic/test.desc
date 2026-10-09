@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp17 --unwind 3 --no-unwinding-assertions --depth 200
+^EXIT=(0|10)$
+^SIGNAL=0$
+^VERIFICATION
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+std::sort in C++17 mode. May report "no body" on some GCC versions.

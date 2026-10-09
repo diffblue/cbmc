@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ forwarding-reference pack forwards correctly: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Expanding a forwarding-reference parameter pack `A&&... a` in a call-argument
+pattern `f(static_cast<A&&>(a)...)` now substitutes the type pack A in lockstep
+with the value pack a (the k-th deduced element type), so perfect forwarding of
+a pack -- the body of the variadic std::__invoke -- forwards correctly.

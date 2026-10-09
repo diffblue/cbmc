@@ -1,0 +1,11 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++ --object-bits 10
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+libc++ span member access fails with "incomplete type on left hand
+side" due to deferred template elaboration not completing the span
+class before member access.

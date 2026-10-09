@@ -55,6 +55,16 @@ public:
     set(ID_is_parameter, is_parameter);
   }
 
+  bool get_has_ellipsis() const
+  {
+    return get_bool(ID_ellipsis);
+  }
+
+  void set_has_ellipsis()
+  {
+    set(ID_ellipsis, true);
+  }
+
   // initializers for function arguments
   exprt &init_args()
   {

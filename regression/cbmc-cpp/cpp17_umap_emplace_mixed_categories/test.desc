@@ -1,0 +1,45 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12 --unwind 4 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ emplace with mixed value categories: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A second DISTINCT unordered_map::emplace instantiation fails "found
+no match for symbol 'emplace'" -- diagnosis 2026-07-22: while
+re-instantiating __detail::_Select1st::operator()<_Tp> (via
+_Hash_code_base) the partial specializations of its member template
+__1st_type fail to rebind their parameters (convert_template_parameter
+finds _Tp unbound in an active-deduction map).  Any second argument
+shape triggers it, even on a DIFFERENT map type (global, not per-map
+state); each call converts fine alone.  A header-free replica of the
+_Select1st shape passes -- the full hashtable context is required.
+From restrict_function_pointers.cpp's
+merge_function_pointer_restrictions; blocks that dog-food TU.
+See also cpp17_vector_emplace_nondefault_pair: a SINGLE emplace_back
+already fails when the pair has a non-default-constructible member
+(constrained-pair-constructor family, [temp.deduct]/8).
+More minimal same-root sibling: cpp17_vector_emplace_nondefault_pair
+(deduced heterogeneous parameter pack homogenized to its first
+element in the member-template instance signature).
+Minimal header-free reproducer: cpp17_hashtable_alias_default_arg.
+Update 2026-07-28: the alias-elaboration fix
+(cpp17_hashtable_alias_default_arg is CORE) removes the front-end
+layer isolated there; this test still fails on the deeper hashtable
+modeling semantics.
+Round-7 re-scoping (2026-08-03): the front-end no-match layer is GONE
+(both emplace calls now convert; 8 emplace CALL sites in the goto
+program).  The residual is SEMANTIC: size()==1 requires the model to
+reject the duplicate key, i.e. working _Hashtable find/equal
+semantics.  A cvise reduction chasing the assertion drifted to an
+unrelated (and g++-only-spelled) shape and was discarded; this test
+now belongs to the semantic-hashtable class (cf. abstract_environment
+notes), not the minimal-front-end queue.
+Round-24 fix (2026-08-08): the residual was NOT hashtable semantics --
+_Scoped_node's variadic ctor instance lost its body ([temp.variadic]/5
+front-element stamping of N>=2 packs in mem-init patterns), the node
+stayed uninitialized, and duplicate detection compared garbage.  Fixed
+by guarding the /7 name-substitution blocks to single-element packs;
+see cpp17_scoped_node_pack_ctor for the minimal reproducer.

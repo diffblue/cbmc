@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ decayed pointer: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Distilled from the cw2 cvise harvest of the preprocessed libc++
+<vector> seed (anonymous-struct niebloid + auto member operator()).

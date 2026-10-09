@@ -1,0 +1,34 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ factory returns derived through base unique_ptr: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: "invalid implicit conversion from 'struct unique_ptr' to
+'struct unique_ptr'" on the derived-typed return.
+Round-87 diagnosis (56-line header-free kernel reproduces; committed
+here as the libc++ carrier): the switch is IRRELEVANT -- a single
+`return uptr<const Derived>(...)` from a `uptr<const Base>` function
+fails identically, while the same conversion in DIRECT-INITIALIZATION
+works.  Root: cpp_typecheckt::typecheck_return materialises the result
+object through a constructor call only when the return type has a
+DESTRUCTOR, and skips operands that are already temporaries; a
+converting temporary of a different class type therefore falls through
+to implicit_typecast, which knows no user-defined conversion
+([stmt.return]/2 + [dcl.init.general]/16.6.1 require considering the
+CONVERTING constructors, [unique.ptr.single.ctor]/26).
+ROUND-88 UPDATE: the front-end defect IS FIXED (see CORE
+cpp17_converting_return_move_ctor, a header-free carrier of exactly
+this shape, and the commit "converting constructors for class-typed
+return operands").  What remains in THIS test is a DEEPER layer inside
+libstdc++'s unique_ptr: with the conversion now performed, symbolic
+execution aborts on symex_assign's invariant (lhs.type() == rhs.type())
+assigning a raw `pointer` to a
+`unique_ptr<const timestampert, default_delete<...>>` -- i.e. the
+converting constructor's own instantiation (the __uniq_ptr_data /
+tuple-of-pointer internals) produces a mistyped member assignment.
+That internals layer is the remaining work; the test is kept as its
+carrier.

@@ -1,0 +1,9 @@
+CORE gcc-only
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+std::any construction and any_cast, verified functionally with typeid/RTTI support.

@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp23 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^.*std::optional<signed_int>::transform.*$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+--
+C++23 std::optional monadic operation `transform`
+(`o.transform([](int x){ return x * 2; })`).
+
+This verifies the frontend instantiates and invokes
+`std::optional<int>::transform` with the lambda.
+
+Verified at the goto-program level rather than via full BMC: a
+correctly-elaborated `std::optional<int>` plus its monadic
+`transform` pulls in the entire `_Optional_base`/`_Optional_payload`
+instantiation graph, which exceeds symbolic-execution memory limits
+(this is why cpp17_optional_basic / cpp20_optional_basic are also
+checked at the goto level).  The goto-level check confirms
+`transform` is actually instantiated and called.

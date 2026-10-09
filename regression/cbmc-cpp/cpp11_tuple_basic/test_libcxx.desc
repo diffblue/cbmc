@@ -1,0 +1,50 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+--
+Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
+libc++ <tuple>: member typedef _BaseT unknown during tuple_element
+instantiation, cascading to 'no match for get'; a direct
+friend-get replica passes, needs the real header machinery.
+Update 2026-07-24: the _BaseT chain is FIXED (__make_integer_seq +
+__type_pack_element clang builtin alias templates; member alias
+templates now bind the enclosing specialization's arguments).  The
+residual is std::get<I>(tuple&): all four overloads are rejected --
+the return type `typename tuple_element<_Ip, tuple<_Tp...>>::type&`
+(a pack template-id inside a qualified name) fails to substitute
+during deduction; a header-free replica of that shape passes, and
+pair's get works.
+Residual isolated as minimal KNOWNBUG cpp11_type_pack_element_return
+(__type_pack_element builtin unevaluable in return-type substitution).
+Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
+Round-10 update: the non-type base-pack root is FIXED
+(cpp11_nontype_base_pack CORE); the library test now surfaces a
+VISIBLE next layer (tuple_element/get resolution: "found no match for
+symbol 'get'") instead of silent wrong-code.  Re-reduce next.
+Round-11 third batch (2026-08-04): the get redirect now compares
+parameter TYPES position-normalized ([dcl.fct]/5, [temp.over.link]/6);
+the whole family RUNS BMC end-to-end.  Remaining layer visible as
+no-body FAILUREs: std::__1::get<0,...>'s DEFINITION body is not
+instantiated for the call (apply_basic reaches VERIFICATION SUCCESSFUL
+but main is still dropped -- props=0, caught by this desc).
+Round-16 (2026-08-06): the get layer is FIXED (multi-pack spec
+absorption + lockstep value substitution; CORE
+cpp11_tuple_get_return_type_body).  Remaining layer: the tuple
+CONSTRUCTOR itself has no body
+(tuple(this, rref_signed_int, rref_signed_int) -- the _EnableUTypesCtor
+enable-if ctor machinery); get assertions still fail through the
+unconstructed object.
+Round-19 (2026-08-07): FIXED end-to-end -- the constructor layer fell
+in three stages: has_conflict candidate gates ([temp.deduct.type]/2),
+multi-pack function templates ([temp.variadic]/5,7,8, the five-pack
+__tuple_impl ctor), and multi-pack lockstep in mem-inits and base
+specifiers (heterogeneous leaf types).  CORE with non-vacuous
+assertions; g++/clang++ replicas verified along the way
+(cpp11_multi_pack_ctor, cpp11_tuple_size_alias_spec,
+cpp11_member_alias_empty_pack).

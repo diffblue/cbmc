@@ -30,9 +30,9 @@ public:
     // We use the ANSI-C scanner
     ansi_c_parser.cpp98 = true;
     ansi_c_parser.cpp11 =
-      config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP11 ||
-      config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP14 ||
-      config.cpp.cpp_standard == configt::cppt::cpp_standardt::CPP17;
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11;
+    ansi_c_parser.cpp20 =
+      config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20;
     ansi_c_parser.ts_18661_3_Floatn_types = false;
     ansi_c_parser.mode = config.ansi_c.mode;
     ansi_c_scanner_init(ansi_c_parser);

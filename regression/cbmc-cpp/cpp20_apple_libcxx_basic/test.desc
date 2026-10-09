@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+Basic STL headers (<optional>, <string>, <vector>) with system libc++.
+
+History: passed vacuously pre-conformance (truncated containers, havoc'd
+operations); reclassified KNOWNBUG when the member-typedef conformance fix
+([temp.inst]/1-2, [dcl.typedef]) made symex execute the real containers,
+which then did not complete within resources.  Re-flipped to CORE by the
+[class.mem.general]/7 complete-class static-member-initializer fix: in-class
+initializers reading class-local typedefs/siblings now resolve instead of
+degrading to nondet, and verification completes in ~16s.
+See doc/architectural/cpp-class-template-instantiation-plan.md.

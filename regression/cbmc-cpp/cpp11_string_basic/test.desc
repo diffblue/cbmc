@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp11 --unwind 5 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+The string size assertion passes. String size assertion and verification both pass.

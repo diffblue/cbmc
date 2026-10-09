@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ default-constructed unique_ptr is null: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[unique.ptr.single.ctor]/1 -- a default-constructed unique_ptr is null.  Fixed
+by modelling C++17 inheriting constructors ([class.inhctor.init]): a base
+default constructor inherited via using Base::Base makes the derived class
+(here libstdc++'s __uniq_ptr_data, which only declares defaulted move members)
+default-constructible, synthesized as the defaulted default constructor it is
+exactly equivalent to.  Previously the constructor chain silently failed and
+the stored pointer stayed nondet.

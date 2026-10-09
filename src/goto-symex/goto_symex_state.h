@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "shadow_memory_state.h"
 
 #include <functional>
+#include <unordered_map>
 
 class incremental_dirtyt;
 class symex_target_equationt;
@@ -176,7 +177,7 @@ public:
   void print_backtrace(std::ostream &) const;
 
   // threads
-  typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
+  typedef std::pair<unsigned, std::list<guardt>> a_s_r_entryt;
   typedef std::list<guardt> a_s_w_entryt;
   std::unordered_map<ssa_exprt, a_s_r_entryt, irep_hash> read_in_atomic_section;
   std::unordered_map<ssa_exprt, a_s_w_entryt, irep_hash>
@@ -261,6 +262,21 @@ public:
 private:
   const irep_idt language_mode;
   std::function<std::size_t(const irep_idt &)> fresh_l2_name_provider;
+
+  /// Cache for level-1 renaming of plain symbol expressions.  On
+  /// dereference-heavy code the same symbol (e.g. an allocator argument) is
+  /// renamed to L1 a great many times while the frame mapping and thread are
+  /// unchanged; the renamed result is a pure function of the symbol, the L1
+  /// generation (see symex_level1t::get_generation) and the thread number, so
+  /// it can be memoised.  Entries become stale -- and are recomputed -- when
+  /// either changes.
+  struct l1_rename_cache_entryt
+  {
+    std::size_t generation;
+    std::size_t thread_nr;
+    exprt result;
+  };
+  std::unordered_map<exprt, l1_rename_cache_entryt, irep_hash> l1_rename_cache;
 
   /// \brief Dangerous, do not use
   ///

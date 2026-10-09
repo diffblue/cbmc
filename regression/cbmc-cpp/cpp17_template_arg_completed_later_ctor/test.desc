@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ stale instance re-elaborated: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Constructor variant of cpp17_template_arg_completed_later: the stale
+incomplete-base instance reaches symex and aborts an invariant in
+symex_assign (SIGABRT) rather than erroring in the front end.
+Investigated 2026-07-28: a staleness-remark mechanism
+(#had_incomplete_arg on the instance, re-elaboration at the later
+point of instantiation) re-runs the instantiation but the re-run
+never rebuilds the BASE list (bases()=0 across all elaborations): the
+template's stored declaration loses the base-clause information after
+the first instantiation, so re-elaboration needs the body/base-clause
+preserved first.  Deeper than the cache policy.
+Round-6 note (2026-08-02): see the companion test's parked findings;
+additionally this variant's get() body (return *this) needs the
+derived-to-private-base conversion once the layout root is fixed.
+Round-9 update: the layout root is FIXED (companion test CORE); this
+variant is now non-vacuous and no longer aborts symex, but the
+explicit constructor still converts to an EMPTY body at the rebuild
+(the mem-initializer via the template parameter is dropped even with
+the map-first matching) -- one residual conversion-ordering layer.
+Fixed 2026-08-04 (round 10): the re-instantiation reset now really
+erases the stale members (angle-aware "tag-" strip; the drain queue is
+purged before the removal), so the rebuilt constructor converts with
+its base mem-initializer intact.

@@ -1,0 +1,133 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+C++20 <map>: operator[] insert + access.
+
+Reclassified CORE -> KNOWNBUG by the member-typedef conformance fix
+([temp.inst]/1-2, [dcl.typedef]).  Previously this passed only because the
+non-conformant *truncated* std::map had its operations havoc'd (symex executed
+none of the real container; the property was vacuous).  The fix makes the front
+end conformant and symex now executes the REAL std::map / _Rb_tree machinery.
+
+Current layer (2026-07-15 evening): this exact program verifies fully
+UNBOUNDED under --cpp11 after the delegating-piecewise-constructor chain
+was fixed (cpp11_piecewise_delegating_ctor, cpp11_static_cast_base_rref,
+and the earlier cpp11_* piecewise tests are all CORE, and
+'m[1]=42; assert(m[1]==42)' verifies in ~1.6s bounded).  Under --cpp20
+the headers construct the node through a DIFFERENT chain
+(std::construct_at / _S_construct, C++20 constexpr allocator_traits):
+the stored key byte is again malloc garbage (trace: storage[0]=64), so
+the read-back re-inserts and the unbounded tree walk diverges in the
+_Rb_tree_decrement model.  NEXT: peel the C++20 construct_at chain the
+same way.  The FRONT-END chain is now complete: the free-function-template
+new-initializer pack expansion (cpp11_construct_at_pack_args), the void
+constexpr wrapper deferral (cpp11_void_constexpr_wrapper_defer), and the
+trailing-return decltype-over-pack-new deduction
+(cpp11_construct_at_decltype_return) are all fixed and CORE.  With them,
+--cpp20 instantiates std::construct_at and runs std::map's piecewise node
+construction (the key is stored correctly).  The REMAINING reason this
+test does not pass is a bounded-model-checking SOLVER-SCALING limit on the
+fully-inlined C++20 container: without an unwind bound the _Rb_tree
+machinery builds a formula the SAT backend cannot discharge in the time
+budget (at --unwind 5 the equation is built in ~6.5min and the solver
+then runs out of resources).  This is not a front-end conformance issue:
+the identical program verifies unbounded under --cpp11 (the C++11 headers
+inline less).  Reclassify to CORE if/when the container machinery is
+made tractable (a lighter model, or bounded --unwind with a coarser
+property).
+
+Second-tier verification-PERFORMANCE item, not a conformance one; the previous
+"pass" was unsound.  Reclassify back to CORE once symex is tractable on the real
+container.
+See doc/architectural/cpp-class-template-instantiation-plan.md.
+
+--paths lifo 2026-07-17: path-wise symex NEUTRALIZES the one-shot
+blow-up completely -- a verdict in ~42-60s at --unwind 5/6/7 (vs. >15
+min without a verdict one-shot).  BUT the verdict is VERIFICATION
+FAILED, and the counterexample REFRAMES this test: the failing
+dereferences are inside std::_Rb_tree_insert_and_rebalance, which is
+defined in libstdc++'s COMPILED tree.cc (not the headers), so CBMC has
+no body for it and havocs the call: the tree linkage after insert is
+nondet garbage.  m[1] == 42 can therefore never verify, at ANY unwind,
+with ANY solver.  The real blocker is a missing model for the tree.cc
+entry points (_Rb_tree_insert_and_rebalance, _Rb_tree_increment,
+_Rb_tree_decrement, _Rb_tree_rebalance_for_erase) -- e.g. in
+src/cpp/library/ next to new.c.  A model may do plain BST linking +
+header (leftmost/rightmost) maintenance and skip the rebalancing
+rotations: recoloring affects only balance, not the container's
+functional semantics.  Once modelled, --paths lifo (or one-shot at
+--unwind 5) is expected to be tractable.
+
+CORRECTION 2026-07-17 (follow-up): the tree.cc entry points ARE already
+modelled (cpp_typecheck_stdlib.cpp: make_rb_insert_and_rebalance_body,
+_Rb_tree_increment/_Rb_tree_decrement successor/predecessor walks,
+make_rb_rebalance_for_erase_body) and the model bodies ARE present in
+the goto program -- the earlier "havoc'd" reading misread the model's
+own parameter ASSUMEs.  The real remaining blocker, isolated from the
+--paths lifo counterexample down to a 6-line reproducer
+(cpp20_pair_converting_ctor): C++20 libstdc++ pair's requires-clause +
+explicit(bool) converting constructor pair(U1&&, U2&&) is instantiated
+WITHOUT a body (constexpr/macro-flagged, nil value, never queued for
+deferred conversion), so _M_get_insert_unique_pos's `_Res(__y, 0)`
+returns garbage and insert misbehaves.  Fix that defect first; then
+retest one-shot and --paths lifo.
+
+UPDATE 2026-07-17 night: the pair converting-constructor layer is FIXED
+(cpp20_pair_converting_ctor and both requires-atom tests are CORE).
+NEW FRONTIER exposed one level up: _M_get_insert_hint_unique_pos's
+`__res` (a C++20 pair<_Base_ptr,_Base_ptr>, which now has constrained
+constructors and derives from the empty __pair_base) receives GARBAGE
+through the sret-lowered tail call `return _M_get_insert_unique_pos(k)`
+-- the inner call's result {NULL, &header} is correct in ITS __res, but
+the value is lost in the hidden-result handoff (trace: first=NULL+
+177253069).  Suspect the elide_cpp_returned_temporaries substitution
+interacting with the derived-to-__pair_base "ignoring typecast" shape
+in the returned-temporary construction.  Then the garbage position
+flows into _Rb_tree_insert_and_rebalance (__p->_M_left dereference
+failures).
+
+UPDATE 2026-07-18: the "pair sret handoff" suspicion was wrong.  cvise
+reduction (valgrind/UBSan-clean interestingness) isolated the false
+positive to cpp11_map_value_loss_reduced: PRIMARY root cause is
+cpp11_alignas_member_layout -- CBMC ignores alignas in struct layout,
+so __aligned_membuf (_Rb_tree_node storage) has sizeof 1 instead of 4
+and every node value store/load is out of bounds; SECONDARY, the
+synthesized copy assignment of empty-base-only classes (less :
+binary_function, __pair_base) emits a struct-to-base typecast the SAT
+encoder drops ("warning: ignoring typecast").  Fix alignas layout
+first, then re-triage.
+
+UPDATE 2026-07-19: three more layers fixed (GNU __alignof__(expr) in
+C++ -- the __aligned_membuf alignment silently degraded to 1; c_bool
+constants unrecognized by the requires-satisfaction evaluator; a
+throwing constraint evaluation keeping libstdc++ pair's unsatisfiable
+converting constructor alive, which forwarded the literal 0 into
+_M_get_insert_*_pos's pointer pair).  ALL pointer checks now pass at
+--unwind 6 --paths lifo; theremaining failure is a pure value loss in the
+piecewise pair construction chain -- reduced to
+cpp20_map_piecewise_value_loss (171 header-free lines).
+
+UPDATE 2026-07-19 late: the piecewise construction chain is FIXED
+(P0960 paren-aggregate-init + deleted-implicit-default-ctor;
+cpp20_map_piecewise_value_loss is CORE) -- forward_as_tuple now has a
+real body and the key reaches the node.  The remaining failure at
+--unwind 2 is the next layer: the SECOND operator[] lookup's
+_M_get_insert_hint_unique_pos takes the equivalent-keys path with
+__pos._M_node == NULL (iterator equality/decrement layer), so the
+returned reference is derived from a null hint.
+
+FIXED 2026-07-20 (final layer): pack-expansion mem-initializers of
+instantiated constructors are now expanded per element with type AND
+non-type packs substituted in lockstep ([temp.variadic]/5), and
+substitution failures while matching overloaded candidates are
+deduction failures ([temp.deduct]/8) instead of hard errors --
+std::pair's piecewise delegation target converts, so the map's key
+reaches the node.  The full layer history is in this desc's earlier
+updates; every layer has its own CORE test.

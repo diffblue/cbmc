@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\].*: SUCCESS$
+^\[main\.assertion\.2\].*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+[temp.deduct.funcaddr]: template argument deduction from the target
+type of a function-address context.  The plain function-pointer case:
+
+  template <class T> int id_sum(T a, T b);
+  int apply(int (*)(int, int), int, int);
+  apply(&id_sum, 3, 4);  // T deduced as int from int (*)(int, int)
+
+CBMC's implementation resolves the outer call's function
+(`apply`) without fargs in a probe pass, reads back the target
+parameter types, synthesises fargs matching the target
+function-pointer's parameter list, and re-resolves the function-
+template name with those synthetic fargs.  The resolved
+instantiation then flows back as the argument to the outer call.

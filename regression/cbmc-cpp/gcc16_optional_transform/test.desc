@@ -1,0 +1,19 @@
+CORE
+main.ii
+--cpp23
+^\[main\.assertion\.1\] line \d+ has value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ transformed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Full gcc-16 <optional> transform through a preprocessed carrier
+(tumbleweed g++ 16.2).  Fixed in three layers: the host-keyed builtin
+token gate + the missing #reference flag on __add_rvalue_reference
+(round 107), requires-clause atoms evaluated under the declaration's
+parameter mapping (round 108), and empty argument-pack expansion in
+requires-expression requirements (round 112, the silent _M_apply body
+drop).  History of the diagnosis, including the symptom-gate drift
+post-mortem, is in .kiro/decltype_tuple_apply_findings.md rounds
+104-112.

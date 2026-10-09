@@ -8,16 +8,15 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "cpp_internal_additions.h"
 
-#include <ostream>
-
 #include <util/c_types.h>
 #include <util/config.h>
 
-#include <ansi-c/ansi_c_internal_additions.h>
+#include <goto-programs/adjust_float_expressions.h>
 
+#include <ansi-c/ansi_c_internal_additions.h>
 #include <linking/static_lifetime_init.h>
 
-#include <goto-programs/adjust_float_expressions.h>
+#include <ostream>
 
 std::string c2cpp(const std::string &s)
 {
@@ -25,18 +24,18 @@ std::string c2cpp(const std::string &s)
 
   result.reserve(s.size());
 
-  for(std::size_t i=0; i<s.size(); i++)
+  for(std::size_t i = 0; i < s.size(); i++)
   {
-    char ch=s[i];
+    char ch = s[i];
 
-    if(ch=='_' && std::string(s, i, 5)=="_Bool")
+    if(ch == '_' && std::string(s, i, 5) == "_Bool")
     {
       result.append("bool");
-      i+=4;
+      i += 4;
       continue;
     }
 
-    result+=ch;
+    result += ch;
   }
 
   return result;
@@ -52,8 +51,7 @@ void cpp_internal_additions(std::ostream &out)
   // types
   out << "typedef __typeof__(sizeof(int)) __CPROVER::size_t;" << '\n';
   out << "typedef __CPROVER::size_t " CPROVER_PREFIX "size_t;" << '\n';
-  out << "typedef "
-      << c_type_as_string(signed_size_type().get(ID_C_c_type))
+  out << "typedef " << c_type_as_string(signed_size_type().get(ID_C_c_type))
       << " __CPROVER::ssize_t;" << '\n';
   out << "typedef __CPROVER::ssize_t " CPROVER_PREFIX "ssize_t;" << '\n';
 
@@ -67,6 +65,10 @@ void cpp_internal_additions(std::ostream &out)
   out << "const unsigned __CPROVER::constant_infinity_uint;" << '\n';
   out << "typedef void " CPROVER_PREFIX "integer;" << '\n';
   out << "typedef void " CPROVER_PREFIX "rational;" << '\n';
+
+  // memory model
+  out << "extern unsigned char " CPROVER_PREFIX
+      << "memory[__CPROVER::constant_infinity_uint];" << '\n';
 
   // malloc
   out << "const void *" CPROVER_PREFIX "deallocated = 0;" << '\n';
@@ -175,7 +177,7 @@ void cpp_internal_additions(std::ostream &out)
   }
 
   // this is Visual C/C++ only
-  if(config.ansi_c.os==configt::ansi_ct::ost::OS_WIN)
+  if(config.ansi_c.os == configt::ansi_ct::ost::OS_WIN)
   {
     out << "int __noop(...);" << '\n';
     out << "int __assume(int);" << '\n';
@@ -196,9 +198,20 @@ void cpp_internal_additions(std::ostream &out)
 
   out << '}' << '\n'; // end extern "C"
 
+  // GCC __builtin_addressof
+  out << "template<typename _Tp> _Tp* __builtin_addressof(_Tp& __r)"
+         " { return &__r; }\n";
+
   // Microsoft stuff
-  if(config.ansi_c.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO)
+  if(config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
   {
+    // MSVC headers use GCC-style builtins like __builtin_strlen and
+    // __builtin_memcmp in their STL implementations.
+    out << "extern \"C\" " CPROVER_PREFIX
+        << "size_t __builtin_strlen(const char *s)\n"
+        << "{ " CPROVER_PREFIX "size_t i=0; while(s[i]!=0) i++; return i; }\n";
+    out << "extern \"C\" int __builtin_memcmp"
+           "(const void*, const void*, " CPROVER_PREFIX "size_t);\n";
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace
     out << "class type_info;" << '\n';
@@ -211,6 +224,74 @@ void cpp_internal_additions(std::ostream &out)
     out << "namespace ATL; " << '\n';
     out << "void ATL::AtlThrowImpl(long);" << '\n';
     out << "void __stdcall ATL::AtlThrowLastWin32();" << '\n';
+  }
+
+  // C++20 coroutine builtins (stubs for type-checking)
+  out << "void *__builtin_coro_promise(void *, int, bool);\n";
+  out << "bool __builtin_coro_done(void *);\n";
+  out << "void __builtin_coro_resume(void *);\n";
+  out << "void __builtin_coro_destroy(void *);\n";
+  out << "void *__builtin_coro_noop();\n";
+
+  // Clang SIMD vector reduction builtins (polymorphic stubs).
+  // The actual lowering to element-wise operations is done by
+  // typecheck_vector_reduce in c_typecheck_gcc_polymorphic_builtins.cpp.
+  out << "template<typename _Tp> _Tp __builtin_reduce_and(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_or(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_xor(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_add(_Tp);\n";
+  out << "template<typename _Tp> _Tp __builtin_reduce_mul(_Tp);\n";
+
+  // __builtin_is_constant_evaluated(): provide a run-time definition returning
+  // false ([meta.const.eval]/1: false outside constant evaluation).  Calls in
+  // a manifestly constant-evaluated context are folded to true in
+  // typecheck_side_effect_function_call before this body would be used, so this
+  // body is only reached at run time.
+  out << "inline bool __builtin_is_constant_evaluated() { return false; }\n";
+
+  // GCC/Clang checked arithmetic builtins
+  out << "bool __builtin_add_overflow(...);\n";
+  out << "bool __builtin_sub_overflow(...);\n";
+  out << "bool __builtin_mul_overflow(...);\n";
+  out << "bool __builtin_add_overflow_p(...);\n";
+  out << "bool __builtin_sub_overflow_p(...);\n";
+  out << "bool __builtin_mul_overflow_p(...);\n";
+
+  // NOTE: earlier versions injected fixed-arity std::__and_/__or_
+  // replacements here because CBMC could not evaluate GCC 13's real
+  // definitions (decltype + SFINAE over pack expansions).  The front
+  // end handles those now, and the injected primary declaration
+  // conflicted with the real (and any user) definition of the same
+  // name ([basic.def.odr]): template-id resolution could pick the
+  // injected arity-limited declaration and silently fail.  Only the
+  // __to_address helper remains.
+  if(
+    config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO &&
+    config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP11)
+  {
+    // clang-format off
+    out <<
+      "namespace std {\n"
+      "  template<typename _Tp> constexpr _Tp*\n"
+      "    __to_address(_Tp* __ptr) { return __ptr; }\n"
+      "}\n";
+    // clang-format on
+  }
+
+  // C++20 std::dynamic_extent — provide as built-in so that
+  // <span> can use it as a default template argument without
+  // needing to evaluate numeric_limits<size_t>::max().
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+  {
+    out << "namespace std {\n";
+    out << "  inline constexpr __CPROVER::size_t dynamic_extent = "
+           "(__CPROVER::size_t)-1;\n";
+    // Also in inline namespace __1 for libc++
+    out << "  inline namespace __1 {\n";
+    out << "    inline constexpr __CPROVER::size_t dynamic_extent = "
+           "(__CPROVER::size_t)-1;\n";
+    out << "  }\n";
+    out << "}\n";
   }
 
   out << std::flush;

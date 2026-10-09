@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*' is not accessible$
+A member function may access the private members of another object of
+the same class named through an explicit object ([class.access]/2): this
+must be accepted, not rejected as if access depended on the object.

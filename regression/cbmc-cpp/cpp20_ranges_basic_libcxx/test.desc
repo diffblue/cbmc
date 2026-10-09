@@ -1,0 +1,22 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp20 --unwind 8 --unwinding-assertions
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Range-pipe over an array with std::views::take.  Two eras of failure:
+originally a hard "conversion from 'signed int [5l]' to
+'<<type:auto>>'" CONVERSION ERROR (silent all-templates deduction
+failure, resolve with nargs=0, at forward@bind_back.h) -- that root
+cause was the `= default` copy-constructor skeleton demanding a
+DELETED default constructor of a base/member, fixed per N5008
+[class.copy.ctor]/14 with the goto-symex family.  NOW the front end
+recovers instead but SILENTLY DROPS the range-for loop and the
+assertion from main() (wrong-code: goto-functions show arr/sum decls
+then straight SET RETURN VALUE 0), so verification succeeds vacuously.
+The desc requires the real assertion to be present and SUCCESS.

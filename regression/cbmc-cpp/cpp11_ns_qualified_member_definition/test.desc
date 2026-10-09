@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Both the inside-namespace (this file) and outside-namespace spellings
+were broken; the fix resolves the leading component as a namespace
+when class lookup fails.

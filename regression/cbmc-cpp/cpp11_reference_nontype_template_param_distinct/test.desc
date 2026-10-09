@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ distinct ref NTTPs bind distinctly: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.arg.nontype]/2: a reference non-type template argument designates
+an object; distinct static objects must produce distinct specializations that
+bind distinctly.  Verifies the reference argument's object identity is preserved
+(the instance-name suffix comes from the object, not a valuified copy).
+assertion.2 FAILURE proves non-vacuity.

@@ -63,8 +63,6 @@ void cpp_convert_typet::read_rec(const typet &type)
     ++char16_t_count;
   else if(type.id()==ID_char32_t)
     ++char32_t_count;
-  else if(type.id()==ID_constexpr)
-    c_qualifiers.is_constant = true;
   else if(type.id()==ID_function_type)
   {
     read_function_type(type);
@@ -101,15 +99,39 @@ void cpp_convert_typet::read_rec(const typet &type)
     const irep_idt typedef_identifier = type.get(ID_C_typedef);
     if(!typedef_identifier.empty())
       tmp.set(ID_C_typedef, typedef_identifier);
+    // Preserve pointer-to-member attribute
+    if(type.find(ID_to_member).is_not_nil())
+      tmp.add(ID_to_member, type.find(ID_to_member));
     other.push_back(tmp);
   }
   else if(type.id()==ID_pointer)
   {
-    // ignore, we unfortunately convert multiple times
+    // We unfortunately convert multiple times: an already-converted pointer
+    // type is re-read here.  Its own top-level cv-qualifiers (e.g. a const
+    // pointer `T* const`, as produced when a cv-qualified template parameter
+    // `const T` is substituted with a pointer type -- N5008 [dcl.ptr],
+    // [basic.type.qualifier]) live as attributes on the pointer node, not in
+    // `c_qualifiers`.  Recover them, otherwise the final `c_qualifiers.write`
+    // (with `is_constant`/`is_volatile` still false) would strip the const off
+    // the re-converted pointer -- which made a deduced `const _Functor&`
+    // parameter become a non-const reference, so a const-pointer argument
+    // could no longer bind it.
+    if(type.get_bool(ID_C_constant))
+      c_qualifiers.is_constant = true;
+    if(type.get_bool(ID_C_volatile))
+      c_qualifiers.is_volatile = true;
+    if(type.get_bool(ID_C_restricted))
+      c_qualifiers.is_restricted = true;
     other.push_back(type);
   }
   else if(type.id() == ID_frontend_vector)
     vector_size = static_cast<const exprt &>(type.find(ID_size));
+  else if(type.id() == ID_auto)
+  {
+    // In C++11, auto is a type specifier (not a storage class).
+    // Add to other so that cpp_convert_auto can find and replace it.
+    other.push_back(type);
+  }
   else
   {
     ansi_c_convert_typet::read_rec(type);
@@ -330,8 +352,17 @@ void cpp_convert_plain_type(typet &type, message_handlert &message_handler)
     type.id() == ID_unsignedbv || type.id() == ID_signedbv ||
     type.id() == ID_bool || type.id() == ID_floatbv || type.id() == ID_empty ||
     type.id() == ID_constructor || type.id() == ID_destructor ||
-    type.id() == ID_c_enum)
+    type.id() == ID_c_enum || type.id() == ID_c_enum_tag ||
+    type.id() == ID_struct_tag || type.id() == ID_union_tag ||
+    type.id() == ID_complex)
   {
+    // N5008 [dcl.enum]/[basic.type.qualifier]: a `c_enum_tag` is a tag
+    // reference like `struct_tag`/`union_tag` and must be left untouched here,
+    // so a cv-qualifier carried on it (e.g. a `const E` deduced as the
+    // referent of a forwarding-reference parameter `T&&`) is preserved.
+    // Routing it through the general conversion path below would rebuild the
+    // type and drop the qualifier, so a `const E` lvalue could no longer bind
+    // to the deduced `const E&` parameter.
   }
   else if(type.id() == ID_c_bool)
   {
@@ -349,10 +380,52 @@ void cpp_convert_auto(
   const typet &src,
   message_handlert &message_handler)
 {
-  if(dest.id() != ID_merged_type && dest.has_subtype())
+  // N5008 [class.bit] + [dcl.type.auto.deduct]: a bit-field has no distinct
+  // type of its own -- reading one yields a prvalue of its underlying type, and
+  // no object (hence no `auto`/`decltype(auto)` variable) can have bit-field
+  // type.  Deduce from the underlying type rather than the c_bit_field_typet,
+  // whose width is meaningless on a stand-alone object and is dropped when the
+  // deduced type is later re-typechecked (which otherwise trips "unexpected
+  // expression" on the empty bit-field width).
+  if(src.id() == ID_c_bit_field)
   {
     cpp_convert_auto(
-      to_type_with_subtype(dest).subtype(), src, message_handler);
+      dest, to_c_bit_field_type(src).underlying_type(), message_handler);
+    return;
+  }
+
+  if(dest.id() != ID_merged_type && dest.has_subtype())
+  {
+    // [temp.deduct]: the declared type is the deduction pattern P and
+    // \p src is the argument type A.  When the declarator contributes a
+    // pointer level (e.g. `auto *p`), the matching pointer must be
+    // peeled from A as well, so `auto *p = <T*>` deduces auto=T (giving
+    // p the type T*) rather than auto=T* (which would make p a T**).
+    // References are represented as pointers carrying #reference; they
+    // are deliberately NOT peeled, because for `auto &r = e` the
+    // placeholder must absorb the full type of e (e.g. `auto &r = p`
+    // with p of type T* deduces auto=T*).
+    if(
+      dest.id() == ID_pointer && !is_reference(dest) &&
+      src.id() == ID_pointer && !is_reference(src))
+    {
+      cpp_convert_auto(
+        to_type_with_subtype(dest).subtype(),
+        to_pointer_type(src).base_type(),
+        message_handler);
+    }
+    else
+    {
+      cpp_convert_auto(
+        to_type_with_subtype(dest).subtype(), src, message_handler);
+    }
+    return;
+  }
+
+  // C++14: decltype(auto) — replace the entire type with src
+  if(dest.id() == ID_decltype && dest.get_bool("#auto"))
+  {
+    dest = src;
     return;
   }
 

@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ braced reference binding: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-21: reference_initializer unwraps a single-element
+braced-init-list ([dcl.init.list]/3.10); statement_list_typecheck.cpp
+converts clean.

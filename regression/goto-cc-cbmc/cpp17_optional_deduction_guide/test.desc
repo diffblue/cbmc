@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*invalid implicit conversion.*to 'struct optional'.*$
+^.*function must have return type.*$
+--
+goto-cc must preprocess/compile a std::optional<T> construction the
+same way cbmc does.  Regression for the goto-cc-vs-cbmc divergence
+caused by goto-cc's preprocessing pass not suppressing
+__cpp_deduction_guides (which cbmc does), leaking the CTAD deduction
+guide into the .ii where CBMC's parser mis-handled it.

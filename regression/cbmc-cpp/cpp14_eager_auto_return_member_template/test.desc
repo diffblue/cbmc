@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ eager auto-return under instance map: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+A member function template with an `auto` return type is converted
+EAGERLY at the call site (typecheck_method_application) so the return
+type is available; that conversion must install the instance's template
+map first ([temp.inst]/1) -- the body names the method's own template
+parameter (`_Np(21)`).  Kernel of the libc++ ranges pipe reproducer's
+first layer.  Runtime-verified g++ 13 / clang++ 18.

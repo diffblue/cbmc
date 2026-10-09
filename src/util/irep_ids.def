@@ -371,6 +371,7 @@ IREP_ID_ONE(designator)
 IREP_ID_ONE(member_designator)
 IREP_ID_ONE(index_designator)
 IREP_ID_TWO(C_constant, #constant)
+IREP_ID_TWO(C_value_initialization, #value_initialization)
 IREP_ID_TWO(C_volatile, #volatile)
 IREP_ID_TWO(C_restricted, #restricted)
 IREP_ID_TWO(C_identifier, #identifier)
@@ -438,6 +439,28 @@ IREP_ID_ONE(template_parameters)
 IREP_ID_TWO(C_template, #template)
 IREP_ID_TWO(C_template_arguments, #template_arguments)
 IREP_ID_TWO(C_template_case, #template_case)
+// Lazy class-body elaboration per N5008 [temp.inst]/3 — see
+// doc/architectural/cpp-frontend-plan-lazy-elaboration.md.
+// `#lazy_member_type` flags a struct/union component whose type
+// has not yet been resolved; `lazy_type_source` carries the original
+// `cpp_declaration` / `cpp_declarator` pair for on-demand resolution
+// by `cpp_typecheckt::ensure_member_complete`.
+IREP_ID_TWO(C_lazy_member_type, #lazy_member_type)
+IREP_ID_ONE(lazy_type_source)
+// Marker on a struct type whose base-class elaboration threw
+// during `typecheck_compound_body`.  Per the architectural plan
+// in `doc/architectural/cpp-frontend-review-2026-05-17.md`
+// (Category A-deep recovery), the throw is caught and the body
+// processed regardless, so the class still registers its own
+// members; consumers that depend on inherited members
+// (constructor synthesis, vtable walk, member-name resolution
+// via inheritance) check this flag and either skip the
+// inherited-member work or emit a focused diagnostic.  N5008
+// [class.derived]/2: a class-or-decltype shall denote a class
+// type that is not an incompletely defined class; recovery
+// preserves the [basic.scope.class] declarative region for the
+// derived class itself even when the base couldn't elaborate.
+IREP_ID_TWO(C_unresolved_base, #unresolved_base)
 IREP_ID_ONE(typename)
 IREP_ID_ONE(C)
 IREP_ID_ONE(cpp)
@@ -493,6 +516,15 @@ IREP_ID_ONE(transparent_union)
 IREP_ID_TWO(C_transparent_union, #transparent_union)
 IREP_ID_ONE(aligned)
 IREP_ID_TWO(C_alignment, #alignment)
+IREP_ID_TWO(C_pragma_pack, #pragma_pack)
+IREP_ID_TWO(C_typedef_alignment, #typedef_alignment)
+IREP_ID_TWO(C_base_alignment, #base_alignment)
+IREP_ID_TWO(C_non_pod, #non_pod)
+IREP_ID_TWO(C_member_alignment, #member_alignment)
+IREP_ID_TWO(C_packed_cancelled, #packed_cancelled)
+IREP_ID_TWO(C_direct_list_init, #direct_list_init)
+IREP_ID_TWO(C_parenthesized, #parenthesized)
+IREP_ID_TWO(C_type_alignment, #type_alignment)
 IREP_ID_ONE(frontend_vector)
 IREP_ID_ONE(vector)
 IREP_ID_ONE(abstract)
@@ -597,6 +629,7 @@ IREP_ID_ONE(is_used)
 IREP_ID_TWO(C_spec_loop_invariant, #spec_loop_invariant)
 IREP_ID_TWO(C_spec_decreases, #spec_decreases)
 IREP_ID_TWO(C_spec_requires, #spec_requires)
+IREP_ID_TWO(C_requires_clause, #requires_clause)
 IREP_ID_TWO(C_spec_ensures, #spec_ensures)
 IREP_ID_TWO(C_spec_assigns, #spec_assigns)
 IREP_ID_TWO(C_spec_frees, #spec_frees)
@@ -759,7 +792,6 @@ IREP_ID_ONE(is_vtptr)
 IREP_ID_ONE(prefix)
 IREP_ID_ONE(cv)
 IREP_ID_ONE(cpp_dummy_destructor)
-IREP_ID_ONE(cast_expression)
 IREP_ID_ONE(pod_constructor)
 IREP_ID_ONE(template_decls)
 IREP_ID_ONE(throw_decl)
@@ -946,6 +978,22 @@ IREP_ID_ONE(prophecy_w_ok)
 IREP_ID_ONE(prophecy_pointer_in_range)
 IREP_ID_ONE(bit_cast)
 
+IREP_ID_ONE(spaceship)
+IREP_ID_ONE(remove_cv)
+IREP_ID_ONE(remove_const)
+IREP_ID_ONE(remove_volatile)
+IREP_ID_ONE(remove_reference)
+IREP_ID_ONE(remove_cvref)
+IREP_ID_ONE(remove_pointer)
+IREP_ID_ONE(remove_extent)
+IREP_ID_ONE(remove_all_extents)
+IREP_ID_ONE(add_lvalue_reference)
+IREP_ID_ONE(add_rvalue_reference)
+IREP_ID_ONE(add_pointer)
+IREP_ID_ONE(make_unsigned)
+IREP_ID_ONE(make_signed)
+
+IREP_ID_TWO(C_ref_qualifier, #ref_qualifier)
 // Projects depending on this code base that wish to extend the list of
 // available ids should provide a file local_irep_ids.def in their source tree
 // and add -D'LOCAL_IREP_IDS=<project/local_irep_ids.def>' to their compiler

@@ -1,0 +1,39 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The ranges pipe's invoke_result_t chain drops main (vacuous SUCCESS
+otherwise; this desc requires the assertion line).  Header-free
+236-line reduction of cpp20_ranges_basic_libcxx's remaining layer;
+every line load-bearing.  clang builtins => CLANG mode.
+Round-13 (2026-08-05): the invoke-chain residual is scoped further.
+The silent throw is implicit_typecast on a NIL argument to
+index_sequence while materializing the defaulted parameter
+`make_index_sequence<_NBound>` with _NBound = tuple_size_v<_BoundArgs>
+(cvise: .kiro/reductions/ranges_pipe_itc_cvr1_1382b.cpp, 1382B).
+Direct shapes (constexpr tuple_size_v, plain contexts) PASS; the
+faithful shape with the INHERITING CONSTRUCTOR
+(`using __perfect_forward<...>::__perfect_forward;`) moves past the
+front end and CRASHES SYMEX (lhs.type() == rhs.type()) -- banked as
+cpp20_inherited_ctor_symex_crash, which is this test's actual next
+layer.
+Round-15 (2026-08-05): re-reduced with a fatal-outcome criterion: 218
+of 236 lines are load-bearing (13% reduction only).  Diagnosis: the
+index_sequence nil-arg throws during spec SELECTION are recoverable
+([temp.deduct]/8 candidate filtering, _Ip legitimately unassigned);
+the FATAL throw is deeper (guess_function_template_args ->
+resolve_template_alias -> instantiate -> silent resolve failure),
+interleaved with a dozen recoverable throws.  Needs a dedicated
+session with a throw-index-based bisection harness.
+Round-53 status: blocked on the V2 same-template isolation at
+SYNTHESIZED members -- `__tuple_leaf does not uniquely resolve` while
+converting __tuple_impl's implicit copy constructor (no #deduced_packs
+to replay there, so the round-53 shadow hook does not cover it).  Not
+standalone-reproducible by hand (a same-template-nested synthesized
+copy without the tuple machinery verifies correctly), so this test is
+the coverage for that layer.

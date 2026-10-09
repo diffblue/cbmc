@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ empty-pack call expands to base\(\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*found no match for symbol.*$
+^CONVERSION ERROR$
+--
+[temp.variadic]/5 -- expanding an empty parameter pack in a function-call
+argument list yields an empty argument list, so `base(a...)` with zero pack
+elements is the call `base()`.  Fixed by the unified pack-expansion rework
+(Phase 1): the empty-pack body call-argument stripping in instantiate_template
+now recovers the function parameter pack's name from the original template when
+the (empty) pack parameter has already been removed from the instantiated
+declaration, so its call-argument references are stripped.

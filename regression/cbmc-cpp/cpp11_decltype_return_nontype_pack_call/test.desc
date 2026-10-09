@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.deduct]/2,5 + [temp.variadic]/4-5.  A function template whose
+trailing return type is a `decltype` of a CALL containing a pack expansion,
+`-> decltype(add(I...))`, with the pack DEDUCED from a class-template-id
+argument (`seq<1,2>`).  Previously unresolved ("found no match for symbol
+'impl'"); fixed by recording the deduced non-type pack's element values in
+pack_expr_map (without an empty pack_args_map entry shadowing them), expanding
+the pack to full arity in the guessed template arguments, and expanding the
+non-type call-argument pack in both the decltype return type and the body.  This
+is the core of cpp17_apply_basic -- libstdc++ std::apply's `__apply_impl`
+returns `decltype(__invoke(f, get<_Idx>(t)...))`.  Non-vacuous: the returned
+value is a concrete function of the deduced pack.

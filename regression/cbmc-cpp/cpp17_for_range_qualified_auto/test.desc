@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*member operator requires.*<<type:auto>>.*$
+--
+Verifies that range-based-for `auto` deduction handles qualified
+forms (`const auto&`, `auto&`, `auto*`).  Without the fix, only
+bare `auto` was deduced; qualified forms stayed as
+`merged_type(const, auto)` and any member access on the loop
+variable failed with
+  member operator requires struct/union type on left hand side
+  but got '<<type:auto>>'
+breaking iteration over class-typed containers using the canonical
+`for(const auto& x : container)` idiom.

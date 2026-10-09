@@ -15,6 +15,12 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/invariant.h>
 
+std::size_t cpp_idt::next_ordinal()
+{
+  static std::size_t counter = 0;
+  return counter++;
+}
+
 cpp_idt::cpp_idt():
   is_member(false),
   is_method(false),

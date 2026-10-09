@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::ofstream{std::string} construction over libstdc++ <fstream>.
+Flipped KNOWNBUG->CORE 2026-08-11: converts and verifies after the
+rounds 32-35 template-pack/overload fixes (0 of 15085 properties,
+non-vacuous, ~23s).  --unwind 5 --no-unwinding-assertions: bounded
+harness over the locale/facet machinery.

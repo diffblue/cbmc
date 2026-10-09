@@ -1,3 +1,4 @@
+#include <cassert>
 class B
 {
 public:

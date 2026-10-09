@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+User-reported Issues 9/10: designated initializers in a braced return and
+`return {}' for a union return type go through do_initializer
+([dcl.init.aggr]/3, [dcl.init.list]/3.5).

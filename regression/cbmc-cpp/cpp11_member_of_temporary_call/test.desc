@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ member of call result callable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [expr.ref]/8 + [over.match.funcs]/5.3: calling a member function
+on a member of a function-call result (an xvalue).  Distilled from
+libc++ std::map::operator[]'s
+__emplace_unique_key_args(...).first->__get_value().
+Runtime-verified with g++ and clang++.

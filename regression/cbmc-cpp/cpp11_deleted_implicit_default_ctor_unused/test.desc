@@ -1,0 +1,23 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unused deleted implicit ctors are not an error: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [class.default.ctor]/2: a defaulted default constructor whose
+member or base has no default constructor is defined as DELETED;
+/4 + [dcl.fct.def.delete]/2: that is an error only when the deleted
+definition is odr-USED.  Nothing here odr-uses them.  g++ 13 and
+clang++ 18 accept silently.  The deleted-implicit-member recovery in
+convert_function (round 98) already handles this shape on the current
+tree -- the cvise fleet's frozen reference binary predated it, so the
+artifact arrived as a would-be KNOWNBUG and was flipped to CORE on
+harvest after test.pl passed (1 assertion, non-vacuous).  Kept as the
+minimal regression test for that recovery; the residual cosmetic issue
+(the recovered errors' TEXT still leaks to stderr) is tracked in the
+findings notes.
+Reduced by cvise (fleet /tmp/cv98, 99,167-line goto-symex dog-food
+carrier from src/goto-symex/goto_state.h) to 11 lines.

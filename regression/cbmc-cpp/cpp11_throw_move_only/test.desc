@@ -1,0 +1,25 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ reachable state before try: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+found no match for symbol 'Ex'
+--
+N5008 [except.handle]/1-3: a `catch(T &e)` / `catch(T e)` handler declares the
+exception variable without synthesising a spurious constructor.  CBMC
+initialized the catch variable with an int 0 placeholder, which for a
+class-typed catch variable made the type-checker construct the class from an
+int ("found no match for symbol 'Ex' ... argument types: signed int") and drop
+it with a CONVERSION ERROR -- failing for every class type without a matching
+int constructor, including move-only classes.  Fixed by nondet-initializing the
+catch variable of any type (cpp_typecheck_code.cpp / cpp_typecheck_initializer).
+
+Root cause of the goto-cc compilation failure of CBMC's own parse_options.cpp.
+Non-vacuous via the reachable assertions before the try; CBMC does not yet
+propagate the thrown value into the handler, so the caught value itself is not
+asserted here.

@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17 --object-bits 12
+^\[main\.assertion\.1\] line \d+ conversion op to vector resolves: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+The bounded reproducer sums a 3-element static range through a
+ranges-style `template <class C> operator C()`, requiring
+[over.match.copy] two-step copy-initialization and the
+[over.best.ics]/4 exclusion of user-defined conversions for
+constructor-candidate parameters.  Runtime-verified with g++ 13 and
+clang++ (both compile silently and the trap-prelude binary exits 0).

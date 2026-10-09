@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-22: mem-initializer checks are deferred for template
+instances per [temp.inst]/2 (they belong to the constructor's
+DEFINITION and are re-checked when its body is converted).  The
+completed-later companion case remains KNOWNBUG
+cpp17_template_arg_completed_later.

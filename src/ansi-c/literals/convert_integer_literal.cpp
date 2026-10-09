@@ -12,7 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "convert_integer_literal.h"
 
 #include <util/arith_tools.h>
-#include <util/c_types.h> // IWYU pragma: keep
+#include <util/c_types.h>
 #include <util/config.h>
 #include <util/std_expr.h>
 #include <util/string2int.h>
@@ -21,26 +21,41 @@ Author: Daniel Kroening, kroening@kroening.com
 
 exprt convert_integer_literal(const std::string &src)
 {
+  // C++14 digit separators: strip apostrophes
+  std::string stripped;
+  stripped.reserve(src.size());
+  for(char ch : src)
+  {
+    if(ch != '\'')
+      stripped += ch;
+  }
+
   bool is_unsigned=false, is_imaginary=false;
   unsigned long_cnt=0;
   unsigned width_suffix=0;
+  bool is_size_t = false;
   unsigned base=10;
 
-  for(unsigned i=0; i<src.size(); i++)
+  for(unsigned i = 0; i < stripped.size(); i++)
   {
-    char ch=src[i];
+    char ch = stripped[i];
 
     if(ch=='u' || ch=='U')
       is_unsigned=true;
     else if(ch=='l' || ch=='L')
       long_cnt++;
+    else if(ch == 'z' || ch == 'Z')
+    {
+      is_size_t = true;
+      is_unsigned = true;
+    }
     else if(ch=='i' || ch=='I')
     {
       // This can be "1i128" in MS mode,
       // and "10i" (imaginary) for GCC.
       // If it's followed by a number, we do MS mode.
-      if((i+1)<src.size() && isdigit(src[i+1]))
-        width_suffix=unsafe_string2unsigned(src.substr(i+1));
+      if((i + 1) < stripped.size() && isdigit(stripped[i + 1]))
+        width_suffix = unsafe_string2unsigned(stripped.substr(i + 1));
       else
         is_imaginary=true;
     }
@@ -50,31 +65,32 @@ exprt convert_integer_literal(const std::string &src)
 
   mp_integer value;
 
-  if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='x')
+  if(stripped.size() >= 2 && stripped[0] == '0' && tolower(stripped[1]) == 'x')
   {
     // hex; strip "0x"
     base=16;
-    std::string without_prefix(src, 2, std::string::npos);
+    std::string without_prefix(stripped, 2, std::string::npos);
     value=string2integer(without_prefix, 16);
   }
-  else if(src.size()>=2 && src[0]=='0' && tolower(src[1])=='b')
+  else if(
+    stripped.size() >= 2 && stripped[0] == '0' && tolower(stripped[1]) == 'b')
   {
     // binary; strip "0x"
     // see http://gcc.gnu.org/onlinedocs/gcc/Binary-constants.html
     base=2;
-    std::string without_prefix(src, 2, std::string::npos);
+    std::string without_prefix(stripped, 2, std::string::npos);
     value=string2integer(without_prefix, 2);
   }
-  else if(src.size()>=2 && src[0]=='0' && isdigit(src[1]))
+  else if(stripped.size() >= 2 && stripped[0] == '0' && isdigit(stripped[1]))
   {
     // octal
     base=8;
-    value=string2integer(src, 8);
+    value = string2integer(stripped, 8);
   }
   else
   {
     // The default is base 10.
-    value=string2integer(src, 10);
+    value = string2integer(stripped, 10);
   }
 
   if(width_suffix!=0)
@@ -95,6 +111,14 @@ exprt convert_integer_literal(const std::string &src)
 
     exprt result=from_integer(value, type);
 
+    return result;
+  }
+
+  // C++23 size_t literal suffix (uz/UZ)
+  if(is_size_t)
+  {
+    typet type = size_type();
+    exprt result = from_integer(value, type);
     return result;
   }
 

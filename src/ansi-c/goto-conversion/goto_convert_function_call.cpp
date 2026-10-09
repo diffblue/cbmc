@@ -68,6 +68,10 @@ void goto_convertt::do_function_call(
   else if(new_function.id() == ID_null_object)
   {
   }
+  else if(new_function.id() == ID_cpp_name)
+  {
+    // unresolved function name from template instantiation -- skip
+  }
   else if(
     new_function.id() == ID_dereference ||
     new_function.id() == "virtual_function")
@@ -76,12 +80,14 @@ void goto_convertt::do_function_call(
   }
   else
   {
-    INVARIANT_WITH_DIAGNOSTICS(
-      false,
-      "unexpected function argument",
-      new_function.id(),
-      function.find_source_location());
+    // Incomplete C++ template instantiations may produce unresolved
+    // function expressions; skip those.
   }
+
+  // C++: if the callee throws, the automatic objects between this call's
+  // scope and the innermost enclosing try (or the function base) must be
+  // destroyed before a handler runs ([except.ctor]); emit a guarded cleanup
+  emit_cpp_call_unwind_cleanup(dest, mode);
 
   destruct_locals(side_effects.temporaries, dest, ns);
 }

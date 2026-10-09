@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.\d+\] line \d+ fwd-ref pack forwards lvalue value: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ fwd-ref pack forwards rvalue value: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ fwd-ref pack preserves lvalue category: SUCCESS$
+^\[main\.assertion\.\d+\] line \d+ fwd-ref pack preserves rvalue category: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*dereference failure.*: FAILURE$
+^CONVERSION ERROR$
+--
+C++ [temp.deduct.call]/3 forwarding-reference deduction applied element-wise to
+a forwarding-reference parameter pack (Args&&... args).  The deduction code
+(cpp_typecheck_resolve.cpp guess_function_template_args) applied the rule only
+to a single forwarding reference; for a pack it deduced each element as a plain
+rvalue reference, so an lvalue argument bound through a garbage reference and
+the wrong value was forwarded (a *a-dereference failure plus a corrupted value).
+The fix detects forwarding-reference packs and, per element, deduces "lvalue
+reference to A" for lvalue arguments and "A" for rvalue arguments.  This is a
+prerequisite for std::__invoke / std::reference_wrapper::operator() (and hence
+std::ref'd predicates) to forward correctly.

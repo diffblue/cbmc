@@ -1,0 +1,10 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ defaulted seq param: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-08-04 (round 11, third fix batch).

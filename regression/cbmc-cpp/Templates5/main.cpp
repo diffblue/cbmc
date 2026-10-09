@@ -1,3 +1,4 @@
+#include <cassert>
 template <class T>
 class Y
 {

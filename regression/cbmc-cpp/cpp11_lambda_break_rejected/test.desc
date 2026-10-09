@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+break not allowed here
+^CONVERSION ERROR$
+^EXIT=(6|64)$
+^SIGNAL=0$
+--
+^VERIFICATION SUCCESSFUL$
+--
+Rejects-invalid test: break inside a lambda inside a loop must be
+diagnosed ([stmt.break]/1); accepting it would mis-bind the break to
+the enclosing loop.  g++ and clang++ both reject.

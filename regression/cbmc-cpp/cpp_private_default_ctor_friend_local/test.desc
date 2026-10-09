@@ -1,0 +1,11 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*' is not accessible$
+A friend of the type may default-initialize a local object whose default
+constructor is private (class.access): this must be accepted.

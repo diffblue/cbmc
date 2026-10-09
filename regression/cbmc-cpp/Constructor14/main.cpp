@@ -1,3 +1,4 @@
+#include <cassert>
 struct A
 {
   A(int i) : i(i)

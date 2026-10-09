@@ -1,0 +1,47 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 9 two-element fold in trailing decltype: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [expr.prim.fold] in a trailing-return-type decltype with a
+pack instantiated at size >= 2.  Reducing the fold in typecheck_type
+would need the replicated `<base>$k` value parameters, which are only
+created during the called specialization's own body instantiation and
+are not in scope while the trailing return type is checked.  CBMC
+drops the whole declaration ("found no match for symbol 'sum'").  The
+size-0/1 cases are fixed (see cpp17_fold_in_trailing_decltype);
+accepted by g++/clang -std=c++17.
+
+ROUND-126: root-cause chain of the SHARED ranges/__bind_back failure
+fully mapped (see b79138d38c):
+ 1. declaration+definition of the same function template each get a
+    template scope; typecheck_function_template seeds
+    pack_size_map[<scope>::<pack>]=0 per scope;
+ 2. after the [temp.over.link]/6 merge the superseded scope's zero is
+    read as "genuinely empty pack" and the empty-pack strip removes
+    `std::forward<_Args>(__args)...` from the stored trailing-return
+    decltype -> "<<type:auto>>" at every call (FIXED: seeds purged +
+    scope detached on merge);
+ 3. REMAINING: the deduction-time speculative instantiation registers
+    the skeleton's parameters in the ENCLOSING NAMESPACE
+    (convert_non_template_declaration under
+    guess_function_template_args creates scope entry `std::__args`),
+    so after the merge `__args` resolves ambiguously ("does not
+    uniquely resolve").  The leak exists in the single-declaration
+    case too, where it is masked.  redecl.cpp is the 50-line
+    header-free reproducer (declaration+definition pair).
+NEXT: quarantine the deduction skeleton's parameter registration (a
+guessed-conversion under guess_function_template_args must not
+register ids in the enclosing namespace scope, or must remove them
+when the speculation completes).
+
+ROUND-126 (later): N>=2 landed (placeholder expansion in
+typecheck_type + pack-on-left binary fold in the body expander);
+main.cpp passes and the test is CORE.  redecl.cpp (the
+declaration+definition pair) remains a reproducer for the
+deduction-skeleton parameter leak (layer 2) -- it is NOT part of this
+test's run.

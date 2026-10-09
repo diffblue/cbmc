@@ -1,0 +1,19 @@
+THOROUGH
+main.cpp
+--cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 8 regex match: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+std::regex construction + regex_match over libstdc++ <regex>.  Front-end
+conversion is complete and deterministic (scope lookups are ordered by
+cpp_idt::ordinal, not by pointer): the qualified friend
+`__detail::__regex_algo_impl` is recorded for match_results so its
+`_Unchecked& __res = __m` binding to the private vector base is
+accessible, and iterator_traits<const char*> selects the `const _Tp*`
+partial specialisation (value_type `char`, not `const char`), so the
+_Executor is built over basic_regex<char, ...>.  Remaining cost is
+symbolic execution of the NFA compiler and executor (> 30 min at
+--unwind 5).  The CORE conversion gate is in test_conversion.desc.

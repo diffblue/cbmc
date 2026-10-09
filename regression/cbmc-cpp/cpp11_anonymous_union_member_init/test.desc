@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ anon-union member init-list takes effect: SUCCESS$
+^\[main\.assertion\.2\] line \d+ engaged flag initialised: SUCCESS$
+^\[main\.assertion\.3\] line \d+ starts disengaged: SUCCESS$
+^\[main\.assertion\.4\] line \d+ engaged after assignment: SUCCESS$
+^\[main\.assertion\.5\] line \d+ payload holds assigned value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[class.union.anon]: members of an anonymous union are members of the enclosing
+class and may be named directly in a constructor's member-initializer list.
+CBMC previously raised a CONVERSION ERROR ("found no match for symbol") for such
+an initializer, and even once accepted dropped it during member-initializer
+reordering.  This is the storage shape of std::optional (union payload + engaged
+flag).

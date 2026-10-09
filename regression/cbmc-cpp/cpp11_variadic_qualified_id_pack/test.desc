@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp20 --unwind 4 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ first_type<A\.\.\.>::type resolves to long long \(8 bytes\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.variadic] + [expr.sizeof]/5: a deduced function-template parameter pack A
+used as a class-template argument (first_type<A...>) names the correct member
+via the dependent qualified-id first_type<A...>::type.  The qualified-id
+resolution already expanded the pack; the failure was that
+sizeof(first_type<A...>::type) was mis-evaluated as a sizeof...(pack) pack-size
+query (returning the pack count) because the parser did not distinguish
+`sizeof...` from `sizeof`.  Fixed by marking `sizeof...` in the parser and only
+counting pack elements for that genuine form.
+
+A decltype-valued variant of the trait is exercised by
+cpp11_decltype_pack_in_class_template.  Part of the unified pack-expansion
+rework documented in doc/architectural/cpp-variadic-pack-expansion-rework.md.

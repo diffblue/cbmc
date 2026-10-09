@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+C++20 concept evaluation via requires-expressions ([expr.prim.req],
+[temp.names]/9).  A concept whose constraint-expression is a requires-expression
+(simple-requirement and type-requirement) is evaluated to a constexpr bool, and
+a concept-id is used as a non-type bool template argument.  Guards the
+front-end concept-evaluation support; see
+doc/architectural/cpp-requires-expression-support.md.
+
+Not yet covered (tracked separately): compound-requirements with a
+return-type-requirement ({E} -> C) -- blocked on value-category (lvalue)
+tracking for decltype((E)); member-call requirements; uniform soft-failure for
+requirement forms the parser routes outside the requirement-node handlers.

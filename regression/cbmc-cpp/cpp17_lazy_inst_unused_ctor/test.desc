@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+must never appear
+--
+N5008 [temp.inst]/11: a non-virtual constructor of a class template shall not
+be implicitly instantiated unless odr-used.  The two-argument constructor here
+is never used, so under lazy instantiation its assertion "must never appear"
+does not enter the goto program and the forbidden pattern must be absent.  The
+default constructor IS odr-used and is still instantiated (s.v is read).
+
+This became CORE once the special members (constructors/destructors) were
+deferred together with ordinary members and operators.  The destructor of a
+*constructed* class is recovered from the type system ([class.dtor]/12) so
+needed special members are still instantiated; see
+doc/architectural/cpp-extern-template-member-instantiation.md §13.

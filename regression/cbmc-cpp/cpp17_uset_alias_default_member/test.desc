@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member insert resolved: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-20: the arity-limited std::__and_/__or_ replacements
+injected by cpp_internal_additions conflicted with the real definition
+of the same name ([basic.def.odr]) -- resolution picked the injected
+primary declaration and the alias default silently failed.  The front
+end evaluates GCC 13's real decltype+SFINAE definitions now, so the
+injection was retired.  remove_const_function_pointers.cpp converts
+clean.

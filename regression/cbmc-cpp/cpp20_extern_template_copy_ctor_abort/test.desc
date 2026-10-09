@@ -1,0 +1,16 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ copy ctor typechecks: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Resolution 2026-07-30: the reproducer is a clang-builtin shape
+(__remove_reference_t in a default argument); under --cpp20 alone the
+GCC-mode scanner lexes the builtin as a plain identifier, which is a
+different (mode-availability) failure -- and the abort it led to is
+now a recoverable diagnostic (get_component result checked in the
+constructor-temporary path).  Run in CLANG mode (--stdlib libc++),
+where the original bug lived, the program verifies.

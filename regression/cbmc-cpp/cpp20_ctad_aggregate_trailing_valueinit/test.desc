@@ -1,0 +1,10 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ aggr padding value-init: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Runtime-verified with g++ and clang++.

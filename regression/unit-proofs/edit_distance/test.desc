@@ -1,0 +1,17 @@
+KNOWNBUG
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 6 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof for levenshtein_automatont (reflexivity, matches/distance
+consistency, error bound) over all pairs of strings up to length 2 on
+a two-letter alphabet.  KNOWNBUG: symbolic execution does not finish
+(>20min) -- the NFA's std::set<state>/std::vector state blows up under
+symex, the same scaling class as unit-proofs/escape.  g++/clang++
+accept the harness and it verifies at runtime.

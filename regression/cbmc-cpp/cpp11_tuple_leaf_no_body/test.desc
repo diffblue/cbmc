@@ -1,0 +1,47 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ leaf value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free mimic of libc++ std::tuple, cvise-reduced: the constructor
+chain routes through __make_integer_seq / __type_pack_element
+metafunctions and the instantiated member bodies are dropped ("no body
+for callee tuple / get") even though the source defines them.  Gates
+cpp11_libcxx_tuple and the test_libcxx variants of cpp11_tuple_basic,
+cpp17_tuple_basic and cpp17_apply_basic.  clang++ accepts and runs
+clean (clang-only builtins; g++ n/a).
+Update 2026-07-28 (partial): four layers fixed (partial-spec pack
+bindings persisted/replayed as #spec_template_packs; scalar _Idx and
+empty-pack expansion in template-argument lists).  Remaining layer:
+the member ctor template's pack-parameter deduction fails against the
+pattern concretized by cross-scope short-name substitution
+("found no match for symbol '__tuple_impl'"), the
+cpp17_vector_emplace_nondefault_pair family.
+Remaining-layer minimal reproducer: cpp11_two_pack_ctor_delegation.
+Update 2026-07-30: the constructor-deduction layer is fixed
+(cpp11_two_pack_ctor_delegation is CORE); the residual is again the
+nil static_cast target in get -- the enclosing pre-bind that feeds
+the __type_pack_element chain is CLANG-gated and this reproducer runs
+in GCC mode (ungating regressed libstdc++ suites twice).
+Update 2026-07-30 (round 4): in CLANG mode (--stdlib libc++) the
+__tuple_impl ctor resolution regresses to the no-match layer even
+though the pack-arity fixup computes correctly (probe: npacks=3
+lead=2 size=1); the rebuilt instance is rejected by the second
+disambiguation.  Mode-dependent resolution divergence; needs its own
+session.
+Update 2026-08-02: the three-pack ctor deduction layer is FIXED
+(cpp11_three_pack_ctor_delegation is CORE).  The residual here is the
+partial-specialization base PACK (`__tuple_impl<indices<I...>, T...>
+: leaf<T>...`): the instance's inherited leaf bases are dropped, so
+the static_cast-to-base in get() reads outside the object.
+Fixed 2026-08-03: the parser now records the base-specifier pack
+expansion ellipsis ([class.derived.general] grammar; it was consumed
+and DISCARDED -- a literal TODO), and instantiate_template expands
+template-id base patterns per pack element ([temp.variadic]/5.2),
+recovering a partial specialization's trailing pack from the
+re-deduced spec bindings.  Flags corrected to CLANG mode: the
+__make_integer_seq/__type_pack_element builtins only lex there.

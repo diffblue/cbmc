@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ first component: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second component: SUCCESS$
+^\[main\.assertion\.3\] line \d+ auto-form first component: SUCCESS$
+^\[main\.assertion\.4\] line \d+ auto-form second component \(char\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+not enough template arguments
+^CONVERSION ERROR$

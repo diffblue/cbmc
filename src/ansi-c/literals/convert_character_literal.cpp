@@ -29,6 +29,21 @@ exprt convert_character_literal(
 
   if(src[0]=='L' || src[0]=='u' || src[0]=='U')
   {
+    // u8 prefix: char8_t (unsigned char) in C++20
+    if(src[0] == 'u' && src.size() >= 3 && src[1] == '8')
+    {
+      PRECONDITION(src[2] == '\'');
+      PRECONDITION(src[src.size() - 1] == '\'');
+
+      std::basic_string<char32_t> value =
+        unescape_wide_string(std::string(src, 3, src.size() - 4));
+      CHECK_RETURN(!value.empty());
+
+      result = from_integer(value[0], unsigned_char_type());
+      result.add_source_location() = source_location;
+      return result;
+    }
+
     PRECONDITION(src[1] == '\'');
     PRECONDITION(src[src.size() - 1] == '\'');
 
@@ -37,8 +52,17 @@ exprt convert_character_literal(
     // the parser rejects empty character constants
     CHECK_RETURN(!value.empty());
 
-    // L is wchar_t, u is char16_t, U is char32_t
-    typet type=wchar_t_type();
+    // L is wchar_t, u is char16_t, U is char32_t ([lex.ccon]).
+    typet type;
+    if(src[0] == 'L')
+      type = wchar_t_type();
+    else if(src[0] == 'u')
+      type = char16_t_type();
+    else
+    {
+      PRECONDITION(src[0] == 'U');
+      type = char32_t_type();
+    }
 
     if(value.size() == 1)
     {
@@ -57,7 +81,8 @@ exprt convert_character_literal(
         x+=z;
       }
 
-      // always wchar_t
+      // use the prefix-selected wide type (L: wchar_t, u: char16_t,
+      // U: char32_t)
       result=from_integer(x, type);
     }
     else

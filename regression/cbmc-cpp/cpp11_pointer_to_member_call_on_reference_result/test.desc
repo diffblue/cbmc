@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [expr.mptr.oper]/3: (ref().*pmf)(args) where ref() returns S& -- the
+bound object is a plain S*, not a reference-typed pointer (libstdc++'s
+__invoke_memfun_deref).

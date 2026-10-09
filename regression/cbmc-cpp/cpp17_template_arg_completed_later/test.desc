@@ -1,0 +1,43 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ instance re-elaborated when completed: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+An instance created at a declaration-only point (incomplete argument
+type) is cached and served stale after the type is completed and the
+specialization is used ([temp.point]: the use is a new point of
+instantiation).  The mem-initializer variant SEGFAULTS in
+symex_assign.  Split from cpp17_incomplete_template_arg_decl.
+Investigated 2026-07-28: a staleness-remark mechanism
+(#had_incomplete_arg on the instance, re-elaboration at the later
+point of instantiation) re-runs the instantiation but the re-run
+never rebuilds the BASE list (bases()=0 across all elaborations): the
+template's stored declaration loses the base-clause information after
+the first instantiation, so re-elaboration needs the body/base-clause
+preserved first.  Deeper than the cache policy.
+Round-6 findings (2026-08-02): three re-elaboration strategies fail
+the same way -- at any later point of instantiation the base-specifier
+`T` no longer RESOLVES (resolve of the template parameter throws even
+with the template map built and parameter ids copied into the class
+scope), so the rebuild drops the base again or produces an empty
+class.  The fix needs the base-specifier resolution context of the
+ORIGINAL instantiation to be reconstructible; parked.
+Round-7 addendum: resolving the bare-parameter base via the template
+map (instead of scope lookup) works for every rebuild that instantiate
+_template drives (the map binds T), but the FINAL completion after the
+argument type completes arrives through a context WITHOUT the map (the
+declaration conversion path), where the resolve-throw recovery nils
+the base without re-setting the marker -- the instance then completes
+base-less and unmarked, closing all retry gates.  A durable fix must
+route every completion of a template instance through
+instantiate_template with its argument bindings, or persist the
+bindings on the instance for the compound-completion path to use.
+Fixed 2026-08-03 (round 9): marked instances are re-instantiated once
+the dropped base's type completes ([temp.point]); the completion swap
+rebuilds the template map from the instance's recorded arguments, and
+bare-template-parameter base/mem-initializer ids resolve through the
+map ([temp.names]/8).

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+[over.ics.ref]/3: a non-const lvalue reference parameter is not viable for a
+prvalue argument.  The front end marks a materialised temporary (and, via
+the shared C representation, a braced aggregate literal) with #lvalue, and
+reference binding took that for an lvalue: f(S&) vs f(S) called with S{1,2}
+was reported 'does not uniquely resolve'.

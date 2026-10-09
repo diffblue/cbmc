@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+C++20 std::vector iterator namespace-qualified typedef elaboration.
+
+The iterator member typedefs and the __normal_iterator C++20 iterator-concept
+member now elaborate without a CONVERSION ERROR or unresolved name, and BMC of
+the construct completes with VERIFICATION SUCCESSFUL.

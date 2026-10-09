@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ emplace with mixed value categories: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-28: resolve()'s alias branch now elaborates class
+specializations named through alias templates
+([class.mem.general]/26 + [temp.inst]/2), so the enclosing class is
+correctly non-POD, gets its implicit default constructor, and the
+alias-instantiated class's constructors convert.

@@ -1,0 +1,13 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ views::take call typechecks: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed 2026-07-28: operator_is_overloaded's conversion-operator
+branch now applies only to single-operand functional casts
+([expr.type.conv]/2); the transient multi-operand/nil casts produced
+during template-argument deduction no longer abort.

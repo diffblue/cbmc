@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [dcl.init.list]/3.4: list-initialisation of a class with a
+user-declared constructor selects a constructor; the memberwise
+fast path is only for aggregates.  Taking it for std::pair copied a
+temporary before its constructor had run (nested {"a", {"first", 1}}
+into pair<const string, pair<const string, int>> lost the inner string).

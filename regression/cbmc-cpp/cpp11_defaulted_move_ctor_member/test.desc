@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ move-constructed member holds moved value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+is not accessible
+^CONVERSION ERROR$
+--
+N5008 [class.copy.ctor]/14-15: a defaulted move constructor direct-initializes
+each base and non-static data member from the corresponding subobject of the
+argument cast to an xvalue (static_cast<M&&>(other.m)); overload resolution on
+that xvalue selects the member's move constructor.  A member whose copy
+constructor is deleted but whose move constructor is usable must therefore be
+moved, not copied.
+
+Regression test for the fix that makes default_cpctor emit a move initializer
+(static_cast<T&&>(ref.member)) for the move constructor, so the member's own
+move constructor is selected.  assertion.1 checks the moved value is preserved
+(non-vacuous: only holds if the move constructor body is actually elaborated
+and the move runs); assertion.2 is a deliberately-wrong assertion that must
+FAIL.  Before the fix this produced "member 'M::M(this, ...M&...)' is not
+accessible" (the deleted copy constructor was selected) followed by a
+CONVERSION ERROR that dropped the constructor body.

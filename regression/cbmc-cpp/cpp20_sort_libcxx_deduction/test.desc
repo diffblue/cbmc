@@ -1,0 +1,9 @@
+CORE libcxx
+main.cpp
+--cpp20 --unwind 3 --no-unwinding-assertions --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$

@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ has value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Was KNOWNBUG (crash, then nondet values).  Full fix history: (1) crash:
+per-base recovery + graceful make_ptr_typecast; (2) nondet has_value():
+base NSDMIs applied in synthesized derived constructors
+(cpp11_base_nsdmi_implicit_ctor); (3) dropped _Optional_base: the
+destructibility probe `decltype(declval<T&>().~T())` now resolves in
+nested instantiation contexts -- trivial implicit destructors use the
+no-op dummy ([class.dtor]/1,6), the ~_Tp substitution prefers the
+current class scope's binding ([expr.prim.id.dtor]/2), and the
+destructor name extraction is angle-aware (was spelling `~allocator`
+for basic_string, see cpp17_dtor_sfinae_base_spec).

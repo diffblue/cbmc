@@ -15,11 +15,13 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 #include <util/options.h>
 
 #include <goto-programs/adjust_float_expressions.h>
+#include <goto-programs/elide_cpp_returned_temporaries.h>
 #include <goto-programs/goto_inline.h>
 #include <goto-programs/goto_model.h>
 #include <goto-programs/instrument_preconditions.h>
 #include <goto-programs/mm_io.h>
 #include <goto-programs/remove_complex.h>
+#include <goto-programs/remove_cpp_exceptions.h>
 #include <goto-programs/remove_function_pointers.h>
 #include <goto-programs/remove_returns.h>
 #include <goto-programs/remove_unused_functions.h>
@@ -45,6 +47,14 @@ bool process_goto_program(
   log.status() << "Removal of function pointers and virtual functions"
                << messaget::eom;
   remove_function_pointers(log.get_message_handler(), goto_model, false);
+
+  // lower C++ exceptions (CATCH-PUSH/CATCH-POP/THROW) to gotos/assignments so
+  // that goto-symex need not model exceptions; no-op if there are none
+  remove_cpp_exceptions(goto_model, log.get_message_handler());
+
+  // Construct C++ returned temporaries directly into caller storage
+  // (N5008 [class.copy.elis]); must follow function pointer removal.
+  elide_cpp_returned_temporaries(goto_model);
 
   mm_io(goto_model, log.get_message_handler());
 

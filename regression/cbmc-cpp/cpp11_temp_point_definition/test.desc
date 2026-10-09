@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [temp.point] p1: CBMC picks the definition of a function
+template over a preceding forward declaration with no body.
+Regression for 32110f7217 ("[temp.point] Prefer template definition
+over forward declaration").

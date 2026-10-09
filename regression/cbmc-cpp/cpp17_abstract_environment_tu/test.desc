@@ -1,0 +1,15 @@
+THOROUGH
+main.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 ../../../src/analyses/variable-sensitivity/abstract_environment.cpp
+^\[main\.assertion\.1\] line \d+ abstract_environment converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Dog-food: CBMC's own abstract_environment.cpp converts and the
+harness assertion verifies.  Flipped KNOWNBUG->THOROUGH 2026-08-11:
+conversion + property-restricted BMC take ~7m45s, beyond the CORE
+-t 300 budget, hence THOROUGH.  Previously parked as "solver timeout
+>1h" on the FULL property set; --property restricts to the harness
+assertion (the rest is sound havoc of out-of-TU functions).

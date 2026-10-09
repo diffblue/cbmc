@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp17 --unwind 5 --no-unwinding-assertions --no-built-in-assertions
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+std::deque basic operations in C++17 mode.

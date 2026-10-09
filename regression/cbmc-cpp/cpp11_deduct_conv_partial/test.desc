@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+^\*\* 0 of \d+ failed
+--
+^CONVERSION ERROR$
+^warning: ignoring
+^.*FAILURE$
+--
+[temp.deduct.partial]/3.2 + [over.match.best]/2: partial ordering
+across conversion-function template specialisations resolves the
+otherwise-ambiguous case where two templates both deduce a viable
+conversion to the same destination type.

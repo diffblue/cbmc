@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+N5008 [locale.general]/8 (startup global locale is the "C" locale) + C99
+7.4 (the "C"-locale character classes).  libstdc++ initialises the locale
+facet table inside libstdc++.so, invisible to CBMC, so every
+use_facet/ctype access used to dereference nondet pointers.  CBMC now
+models the classic ctype<char> facet (static classification table in the
+glibc _ISbit encoding that the parsed headers give to
+std::ctype_base::digit etc., plus a facet object returned by
+__try_use_facet<ctype<char>>).  Positive AND negative membership checks
+for digit/alpha/xdigit/space/upper/punct; runtime-verified against
+g++/clang++.

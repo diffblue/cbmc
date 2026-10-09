@@ -1,0 +1,12 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ ctad parens: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+C++20 parenthesized aggregate initialization + CTAD
+([dcl.init.general]/16.6.2.2, [over.match.class.deduct]): the
+make_pair spelling `return pair(a, b)`.

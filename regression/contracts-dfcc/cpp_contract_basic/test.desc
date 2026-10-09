@@ -1,0 +1,10 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract add
+^\[add.postcondition.\d+\].*Check ensures clause of contract.*: SUCCESS$
+^EXIT=0$
+^SIGNAL=0$
+--
+Function contract verification via DFCC (C syntax).
+C++ parser does not yet support __CPROVER_requires/__CPROVER_ensures;
+use C files or C++26 pre/post syntax (not yet integrated with DFCC).

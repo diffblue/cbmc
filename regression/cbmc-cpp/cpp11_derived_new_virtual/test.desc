@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ override dispatches through base pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ newly-introduced derived virtual dispatches: SUCCESS$
+^\[main\.assertion\.3\] line \d+ override dispatches through derived pointer: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+not found
+^CONVERSION ERROR$
+--
+N5008 [class.virtual]/2: a virtual function newly introduced by a derived class
+must be dispatched correctly.  Regression test for the vtable dispatch bug that
+selected the first vtable pointer (a base's) instead of the one whose vtable
+contains the called function, failing with "member 'virtual_table::...' not
+found".  Blocked CBMC's own messaget/typecheckt hierarchy (ui_message.cpp,
+cout_message.cpp).

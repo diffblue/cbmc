@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*invalid implicit conversion.*to 'struct myopt'.*$
+^CONVERSION ERROR$
+--
+Verifies that a user-defined conversion sequence may select a
+function-template converting constructor.
+
+Per [over.match.copy]/1 + [over.ics.user] + [temp.deduct]: a
+converting constructor that is a function template participates in
+copy-initialization once its template arguments are deduced.
+
+Without the fix, CBMC's template-constructor fallback in
+`user_defined_conversion_sequence` accepted the instantiated
+constructor only if it carried `ID_specialization_of` (the CLASS
+template-specialization tag).  A member converting-constructor
+function template's instantiation instead carries
+`#fn_template_args`, so the valid instantiation was rejected and
+the conversion failed with "invalid implicit conversion from 'T'
+to 'struct myopt'".
+
+This mirrors `std::optional<T>`'s `optional(_Up&&)` converting
+constructor, which CBMC's own source relies on when returning a
+`T` into a `std::optional<T>`.

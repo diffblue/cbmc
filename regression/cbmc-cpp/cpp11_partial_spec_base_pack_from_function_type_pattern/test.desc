@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+N5008 [temp.variadic]/5: a base-specifier impl<F, A...> of a partial
+specialization RO<F(A...)> must expand A... to every element deduced from
+the function-type pattern; substituting the base template-id per argument
+collapsed the pack to its first element (impl<F, A0>, so libstdc++'s
+result_of<F(A...)> : __invoke_result<F, A...> had no ::type).

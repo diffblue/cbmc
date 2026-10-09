@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unique_ptr member holds its value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+instantiating 'std::__enable_if_t' with <FALSE
+--
+The original hard error (concretizing unique_ptr's =delete'd deleter
+constructor template into enable_if_t<false>::type, [temp.inst]/2) is fixed;
+the disallowed pattern guards against regression.  The subsequent value bugs
+are fixed by a chain of standards fixes: inherited base default constructors
+([class.inhctor.init]), defaulted move constructors initializing bases from an
+xvalue ([class.copy.ctor]/15) with the base subobject type recorded to
+disambiguate EBO hierarchies like std::tuple's, and defaulted copy/move
+assignment operators elaborated memberwise with base move-assignment going
+through the base's operator= ([class.copy.assign]/12).  assertion.2 is a
+deliberate WRONG-must-FAIL non-vacuity check.

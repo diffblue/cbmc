@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [temp.variadic]/4-5.  Forwarding a non-type parameter pack `T...` into
+another template-argument list (`cnt<T...>::n`) preserves its arity for 0, 1, 2
+and 4 elements.  Previously the pack collapsed to a single element for two or
+more elements (a non-type pack was scalar-bound to its first argument in the
+template map).  Non-vacuous: under the collapse each `n` would be 1.

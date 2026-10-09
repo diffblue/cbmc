@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ restrict-qualified reference params work: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+parse error
+--
+N5008 [dcl.ref]/1: references cannot be cv-qualified, but GCC/Clang accept a
+`__restrict`-qualified reference (`T & __restrict`) as an extension.  Regression
+test for the parse error that blocked any translation unit including <typeinfo>
+(libstdc++ <cxxabi.h> declares __class_type_info::__do_upcast with a
+`__upcast_result& __restrict` parameter).  const/volatile on a reference remain
+ill-formed and are still rejected.

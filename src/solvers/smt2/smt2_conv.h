@@ -201,6 +201,9 @@ protected:
 
   // we use this to build a bit-vector encoding of the FPA theory
   void convert_floatbv(const exprt &expr);
+  std::string datatype_selector_name(
+    const std::string &smt_typename,
+    const irep_idt &component_name);
   std::string type2id(const typet &) const;
   std::string floatbv_suffix(const exprt &) const;
   std::set<irep_idt> bvfp_set; // already converted

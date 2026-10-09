@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+symbol 'tag-allocator<char>>' is unknown
+symbol 'std::__cxx11::tag-basic_string<.*' is unknown

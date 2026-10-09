@@ -34,6 +34,14 @@ struct symex_configt final
 
   bool unwinding_assertions;
 
+  /// \brief Generate a FALSE assertion when a called function has no
+  /// body, regardless of the unwinding-assertions setting.  Without it
+  /// (the default) a bodyless call assigns a nondet return value and
+  /// leaves all other state untouched, so "nothing changed" can be
+  /// proved vacuously; the no-body property is then only emitted when
+  /// unwinding assertions are enabled.
+  bool no_body_assertions;
+
   bool partial_loops;
 
   /// \brief Should the additional validation checks be run?

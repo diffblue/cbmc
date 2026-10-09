@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17 --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^.*implicit arithmetic conversion not permitted.*$
+^.*invalid explicit cast.*$
+--
+Verifies four operator-overload-resolution fixes:
+  * ADL on a class declared at global scope walks the root namespace.
+  * `operator_is_overloaded`'s 1st-option (member) path is skipped
+    when T1 has no member operator.
+  * `operators[]` includes `ID_mod` (`%`).
+  * [over.match.oper]/3.4 restriction excludes free operators on
+    unrelated class types when no operand has class type.

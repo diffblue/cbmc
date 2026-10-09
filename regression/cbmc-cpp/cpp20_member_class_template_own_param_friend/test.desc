@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ friend default arg names member's own parameter: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [class.friend]/1 + [temp.local]/1 + [namespace.memdef]/3: the
+friend's name is a namespace member, but its declaration is looked up in
+the class -- here the enclosing member class template's own parameter
+(as a default template argument) and the class's member alias.

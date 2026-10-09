@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ first through delegation: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second through delegation: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [class.base.init]/1,/6 + [temp.variadic]/5,8: std::pair's
+out-of-line DELEGATING piecewise constructor, whose delegation target has
+four zipped packs (two type, two non-type index packs).  Was KNOWNBUG;
+fixed by a chain of five front-end changes: (1) non-type pack values
+recorded/replayed in the multi-pack #deduced_packs machinery; (2) the
+out-of-line definition attach/merge sites copy the ctor-initializer along
+with the body ([class.base.init]/1: the ctor-initializer is part of the
+definition); (3) same-named overloaded member-template definitions are
+discriminated by parameter count ([over.load]); (4) empty-pack
+mem-initializer argument removal keeps sizeof... mentions
+([temp.variadic]/8) while dropping genuine expansions ([temp.variadic]/4);
+(5) the drain replays persisted #fn_template_packs so multi-pack members
+convert with the correct pack split.  g++/clang++ runtime-verified.

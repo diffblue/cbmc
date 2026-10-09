@@ -25,17 +25,24 @@ void cpp_exception_list_rec(
 {
   if(src.id() == ID_pointer)
   {
+    // A C++ reference is represented as a pointer carrying ID_C_reference.
+    // The pointee/referent type is the pointer's base type in both cases, so
+    // extract it with to_pointer_type -- which is valid for a reference too,
+    // whereas to_reference_type asserts ID_C_reference and would fail its
+    // precondition on a genuine (non-reference) pointer such as the exception
+    // type of `catch(T *)`.  Only the exception-id marker differs: a genuine
+    // pointer type appends "_ptr" (matching how a thrown `T *` is catalogued),
+    // a reference does not.
+    const typet &base = to_pointer_type(src).base_type();
     if(src.get_bool(ID_C_reference))
     {
       // do not change
-      cpp_exception_list_rec(
-        to_reference_type(src).base_type(), ns, suffix, dest);
+      cpp_exception_list_rec(base, ns, suffix, dest);
     }
     else
     {
       // append suffix _ptr
-      cpp_exception_list_rec(
-        to_reference_type(src).base_type(), ns, "_ptr" + suffix, dest);
+      cpp_exception_list_rec(base, ns, "_ptr" + suffix, dest);
     }
   }
   else if(src.id() == ID_union_tag)

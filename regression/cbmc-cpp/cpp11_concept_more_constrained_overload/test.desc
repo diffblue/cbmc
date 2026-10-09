@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ more-constrained overload must win: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.constr.order]/1 + [over.match.best]/2.6: of two otherwise
+indistinguishable function-template overloads, the more-constrained is chosen.
+Cheap subsumes Cheap||Rare, so f<Cheap> wins for an int argument (returns 1,
+matching g++); assertion 2 (a wrong value) must FAIL, proving non-vacuity.
+
+CORE (was KNOWNBUG): the pre-instantiation concept-subsumption filter in
+cpp_typecheck_resolvet::resolve now orders candidates by the normal forms of
+their associated constraints ([temp.constr.order]/1, DNF/CNF over atomic
+constraints) rather than by a textual comparison of constraint names, so the
+more-constrained f<Cheap> is selected.  Filtering before instantiation also
+avoids the colliding instance symbols of the two same-signature overloads.

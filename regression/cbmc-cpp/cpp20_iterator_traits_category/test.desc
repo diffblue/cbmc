@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ vector iterator category is random_access: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+C++20 std::iterator_traits<vector<int>::iterator>::iterator_category, end
+to end via the constrained __iterator_traits machinery.
+
+Was KNOWNBUG, then FLAKY (run-to-run): libstdc++'s __iterator_traits
+member alias __cat has three partial specializations with the SAME
+argument pattern differing only by requires-clauses that form a
+subsumption chain (__cpp17_input_iterator < __cpp17_fwd_iterator <
+__cpp17_randacc_iterator conjunctions); for a random-access iterator all
+three are satisfied and N5008 [temp.class.spec.match]/2 +
+[temp.constr.order] mandate the most-constrained one.  The tie-break used
+a counting heuristic that fell through to first-seen in the
+pointer-ordered id_set (std::set<cpp_idt*>), so the selected category was
+ASLR-dependent (bidirectional on unlucky runs; deterministic FAILURE
+under `setarch -R`).  Fixed by constraint-subsumption ordering
+(template_constraint_strictly_subsumes) with a deterministic symbol-name
+fallback for incomparable constraints.

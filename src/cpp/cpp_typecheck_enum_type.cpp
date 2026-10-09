@@ -19,7 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "cpp_enum_type.h"
 #include "cpp_typecheck.h"
 
-void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
+void cpp_typecheckt::typecheck_enum_body(
+  symbolt &enum_symbol,
+  bool underlying_defaulted)
 {
   c_enum_typet &c_enum_type=to_c_enum_type(enum_symbol.type);
 
@@ -30,6 +32,11 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
 
   mp_integer i=0;
 
+  // Range of enumerator values and the created enumerator symbols,
+  // for the GCC packed-enum extension below.
+  mp_integer min_value = 0, max_value = 0;
+  std::vector<std::pair<irep_idt, mp_integer>> made_enumerators;
+
   for(auto &component : components)
   {
     const irep_idt &name = component.get(ID_name);
@@ -37,6 +44,8 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
     if(component.find(ID_value).is_not_nil())
     {
       exprt &value = static_cast<exprt &>(component.add(ID_value));
+      // [dcl.enum]: an enumerator value is a constant expression.
+      constant_expression_contextt constant_expression_guard{*this};
       typecheck_expr(value);
       implicit_typecast(value, c_enum_type.underlying_type());
       make_constant(value);
@@ -47,6 +56,11 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
         throw 0;
       }
     }
+
+    if(i < min_value)
+      min_value = i;
+    if(i > max_value)
+      max_value = i;
 
     exprt value_expr = from_integer(i, c_enum_type.underlying_type());
     value_expr.type()=enum_tag_type; // override type
@@ -73,12 +87,60 @@ void cpp_typecheckt::typecheck_enum_body(symbolt &enum_symbol)
       throw 0;
     }
 
+    made_enumerators.emplace_back(new_symbol->name, i);
+
     cpp_idt &scope_identifier=
       cpp_scopes.put_into_scope(*new_symbol);
 
     scope_identifier.id_class=cpp_idt::id_classt::SYMBOL;
 
+    // N5008 [dcl.enum]/12: an UNSCOPED enumeration's enumerators can
+    // also be referred to with the scope-resolution syntax
+    // (`kindt::CALL`, C++11).  The current scope here is the ENCLOSING
+    // scope for an unscoped enum (only `enum class` switches to the
+    // enum's own scope before this function), so additionally register
+    // the enumerator in the enum's scope; without this,
+    // `resolve_scope` correctly entered `kindt::` but the qualified
+    // lookup of the enumerator found nothing and the whole expression
+    // failed ("found no match" with a nil-typed argument when it was a
+    // member-call argument).
+    if(!enum_symbol.type.get_bool(ID_C_class))
+    {
+      auto scope_it = cpp_scopes.id_map.find(enum_symbol.name);
+      if(
+        scope_it != cpp_scopes.id_map.end() && scope_it->second->is_scope &&
+        &*scope_it->second != &cpp_scopes.current_scope())
+      {
+        cpp_idt &in_enum_scope = cpp_scopes.put_into_scope(
+          *new_symbol, static_cast<cpp_scopet &>(*scope_it->second));
+        in_enum_scope.id_class = cpp_idt::id_classt::SYMBOL;
+      }
+    }
+
     ++i;
+  }
+
+  // GCC's `enum __attribute__((__packed__))` extension, honoured by
+  // the C front end (c_typecheck_type.cpp): with no enumeration-base
+  // written, the underlying type is the SMALLEST sufficient integer
+  // type.  N5008 [dcl.enum]/8 leaves the underlying type
+  // implementation-defined in that case, and matching the platform
+  // compiler is what makes sizeof agree (user-reported: 1-byte
+  // instruction fields via packed enums in packed structs).  The
+  // enumerator symbols were created against the provisional `int` so
+  // that later enumerators can reference earlier ones ([dcl.enum]/5);
+  // re-type their stored values to the final width.
+  if(underlying_defaulted && c_enum_type.get_bool(ID_C_packed))
+  {
+    to_type_with_subtype(c_enum_type).subtype() =
+      enum_underlying_type(min_value, max_value, true);
+    for(const auto &e : made_enumerators)
+    {
+      symbolt &esym = symbol_table.get_writeable_ref(e.first);
+      exprt v = from_integer(e.second, c_enum_type.underlying_type());
+      v.type() = enum_tag_type;
+      esym.value = std::move(v);
+    }
   }
 }
 
@@ -132,15 +194,58 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
 
     if(has_body)
     {
-      error().source_location=type.source_location();
-      error() << "enum symbol '" << base_name << "' declared previously\n"
-              << "location of previous definition: " << symbol.location << eom;
-      throw 0;
+      // Allow defining an enum that was previously forward-declared
+      if(
+        symbol.type.id() == ID_c_enum_tag ||
+        symbol.type.get(ID_C_incomplete) == "1" ||
+        !symbol.type.find(ID_body).is_not_nil())
+      {
+        // Replace the forward declaration with the full definition.
+        symbolt &writable = symbol_table.get_writeable_ref(symbol_name);
+        writable.type = enum_type;
+
+        if(writable.type.add_subtype().is_nil())
+          writable.type.add_subtype() = signed_int_type();
+        else
+          typecheck_type(to_type_with_subtype(writable.type).subtype());
+
+        // Find the existing scope entry for this enum
+        cpp_scopet::id_sett id_set =
+          cpp_scopes.current_scope().lookup(base_name, cpp_scopet::SCOPE_ONLY);
+        cpp_idt *scope_id = nullptr;
+        for(auto *id : id_set)
+        {
+          if(id->identifier == symbol_name)
+          {
+            scope_id = &*id;
+            break;
+          }
+        }
+
+        if(scope_id)
+        {
+          cpp_save_scopet save2(cpp_scopes);
+          if(writable.type.get_bool(ID_C_class))
+            cpp_scopes.go_to(*scope_id);
+          typecheck_enum_body(writable, false);
+        }
+      }
+      else
+      {
+        error().source_location = type.source_location();
+        error() << "enum symbol '" << base_name << "' declared previously\n"
+                << "location of previous definition: " << symbol.location
+                << eom;
+        throw 0;
+      }
     }
   }
   else if(
     has_body ||
-    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO)
+    config.ansi_c.mode == configt::ansi_ct::flavourt::VISUAL_STUDIO ||
+    type.add_subtype()
+      .is_not_nil() ||         // forward-declared enum with underlying type
+    type.get_bool(ID_C_class)) // C++11: forward-declared `enum class`
   {
     std::string pretty_name=
       cpp_scopes.current_scope().prefix+id2string(base_name);
@@ -148,8 +253,17 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
     // C++11 enumerations have an underlying type,
     // which defaults to int.
     // enums without underlying type may be 'packed'.
+    // Whether the program wrote no enumeration-base; only then may
+    // GCC's packed-enum extension shrink the underlying type (see
+    // typecheck_enum_body).  Scoped enums always have a FIXED
+    // underlying type (int if unspecified, N5008 [dcl.enum]/5), which
+    // the packed attribute does not affect.
+    bool underlying_defaulted = false;
     if(type.add_subtype().is_nil())
+    {
       type.add_subtype() = signed_int_type();
+      underlying_defaulted = !type.get_bool(ID_C_class);
+    }
     else
     {
       typecheck_type(to_type_with_subtype(type).subtype());
@@ -194,7 +308,7 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       cpp_scopes.go_to(scope_identifier);
 
     if(has_body)
-      typecheck_enum_body(*new_symbol);
+      typecheck_enum_body(*new_symbol, underlying_defaulted);
   }
   else
   {

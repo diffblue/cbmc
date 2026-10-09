@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ same-named function hides the struct type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+does not uniquely resolve
+^CONVERSION ERROR$
+--
+N5008 [basic.scope.hiding]/2: a function hides a same-named class/struct in
+ordinary (value) lookup, so `box()` calls the function rather than being
+ambiguous with the type's constructor.  Regression test for the "does not
+uniquely resolve" bug on the C-library struct-tag/function pattern (glibc
+`struct mallinfo`/`mallinfo()` in memory_info.cpp).

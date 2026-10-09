@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ call through forwarding-reference callee: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^expecting code as argument$
+--
+A call whose callee is a reference (static_cast<F&&>(f) / std::forward<F>(f))
+must invoke the referand object's operator() ([expr.call], [over.call.object]),
+not be mistaken for a function pointer.  The reference-typed callee is now
+implicitly dereferenced before the call type-dispatch.

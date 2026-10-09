@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ value written via non-first base C reads back: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first base A unaffected: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$

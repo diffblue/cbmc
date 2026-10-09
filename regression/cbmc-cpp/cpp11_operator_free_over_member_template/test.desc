@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ free non-template operator<< chosen; member template not instantiated: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[over.match.oper]/3, [over.match.best]/2, [temp.inst]/2: a non-member
+non-template operator<< that perfectly matches is preferred over a member
+operator<< template, and forming that member-template candidate must not
+instantiate its (here ill-formed) body.  Reduced from the message.h dog-food
+"operator 'shl' not defined" noise.  Non-vacuous.

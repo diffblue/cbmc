@@ -1,0 +1,61 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ absent operator- => false: SUCCESS$
+^\[main\.assertion\.2\] line \d+ present operator- => true: SUCCESS$
+^\[main\.assertion\.3\] line \d+ int => true: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Currently: assertions 2 and 3 FAIL -- the return-type-requirement of a
+compound requirement is never satisfied.
+Round-90 diagnosis (TWO stacked defects, both located):
+1. [temp.constr.atomic]/1: the concept's normalised body must be
+   CONTEXTUALLY CONVERTED to bool.  A concept over a trait member
+   (`static const bool value`) folds to a c_bool constant, which
+   exprt::is_true() does not recognise, so every SATISFIED
+   return-type-requirement read as unsatisfied.  Converting the
+   constant (as cpp_typecheck_resolve.cpp's tri-state evaluator already
+   does for requires-clauses) fixes assertion 3.
+2. With that applied, assertion 2 (class with a MEMBER operator-) still
+   fails.  ROUND-90 ROOT (sharper than "specialization selection"): the
+   STORED concept body's template argument is an `ambiguous` node with an
+   EMPTY type -- the reference to the concept's own parameter is not
+   recoverable from the body at all, so neither template_mapt::apply nor
+   a by-name walk can substitute it (an added walk over `template_args`
+   arguments changes nothing: there is no name to match).  The dumped
+   pre-typecheck body is BYTE-IDENTICAL for the satisfied and the
+   unsatisfied case; the verdict therefore comes from ambient
+   template_map/scope state when `is_int_<...>` is resolved, which is why
+   the same body yields different answers for different Es (plain `int`
+   -> primary/false, `const int` -> specialization/true, both wrong for
+   the wrong reason).  The fix must make the concept's parameter
+   RECOVERABLE in the stored body (or evaluate the concept through the
+   normal instantiation path with explicit arguments) rather than patch
+   the substitution.
+   Verified separately: `is_int_<int>`, `is_int_<decltype(a-b)>` and
+   `is_int_<decltype((a-b))>` all resolve CORRECTLY outside a
+   requires-expression, so ordinary specialization matching is fine.
+ROUND-99 ATTEMPT (reverted, recorded): evaluate the return-type
+requirement as the CONCEPT-ID `C<decltype((E))>` -- the form a user
+writes, which goes through the normal concept instantiation path instead
+of the manual substitution that cannot work (the stored body's argument
+is an `ambiguous` node with an empty type).  That makes ALL THREE
+assertions of this test pass, but regresses the negative case of CORE
+cpp20_compound_requirement_concept (`{ __t + __t } -> same_as_<_Tp>`
+must be FALSE for a type whose operator+ returns int): the EXPLICIT
+type-constraint argument `_Tp` arrives as an `ambiguous` node wrapping an
+unresolved cpp_name, and type-checking that type in the requirement's
+context does NOT yield the enclosing parameter's binding, so the
+concept-id evaluates satisfied.  Resolving that explicit argument
+correctly is the remaining obstacle -- fix it first, then this route
+should close both layers at once.
+
+DO NOT land fix 1 alone: it makes previously-(wrongly)-unsatisfied
+requirements satisfied and regressed 18 cbmc-cpp tests
+(cpp20_vector_*, cpp20_span*, cpp20_ranges_basic, cpp20_erase_if*,
+iterator_traits/concept chains) -- the surrounding C++20 library
+machinery currently depends on the wrong answer.  Both layers must land
+together, ideally with fix 2 first.

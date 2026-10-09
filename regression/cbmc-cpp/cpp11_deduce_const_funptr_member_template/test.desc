@@ -1,0 +1,33 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member-template deduction from const funptr arg: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*no body for callee.*$
+--
+N5008 [temp.deduct.call]/3: for a forwarding reference Fn&& and an lvalue
+argument of type `const FP` (a const function pointer), Fn is deduced as
+`const FP&`, so the deduced parameter `const FP&` binds a const function-pointer
+lvalue.  The front end dropped the const while *re-converting* the deduced
+reference's pointer base: cpp_convert_typet::read_rec's ID_pointer branch pushed
+an already-converted (const) pointer to `other` without recording its top-level
+cv-qualifiers, so the trailing c_qualifiers.write (is_constant=false) stripped
+the const ([dcl.ptr], [basic.type.qualifier]).  The const-less parameter `FP&`
+no longer bound the const argument, the sole template candidate was discarded
+during overload resolution, and -- during instantiated-member-body elaboration
+-- the call resolution silently failed (the "all candidates are templates"
+SFINAE-tolerance path in cpp_typecheck_resolvet::resolve), leaving the enclosing
+member with no body.
+
+Fixed by recovering the pointer's own cv-qualifiers in read_rec's ID_pointer
+branch.  This is the shape of libstdc++ std::function's
+_Function_base::_Base_manager<F>::_M_manager __clone_functor case calling
+_M_init_functor(__dest, *const_cast<const _Functor*>(...)); the fix makes a
+single `std::function<int(int)> f = &fn;` no longer report _M_manager as
+no-body.  Non-vacuous (the deliberately-wrong assertion must FAIL).
+

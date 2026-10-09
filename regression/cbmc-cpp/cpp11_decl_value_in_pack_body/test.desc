@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ copy-init decl in pack body: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [dcl.init]/15-16: a block-scope `S x = "s";` copy-initialization in
+a variadic function-template body.  The pack expander used to CREATE an
+empty ID_init_args entry on every declarator it visited (irept::add
+creates-on-absence); typecheck_decl then crashed on "declarator should
+not have init_args".  Found by dog-fooding CBMC's own util/invariant.h
+(std::string backtrace = ... in the variadic report_invariant_failure
+chain); reduced with cvise + manual bisection.  Header-free; g++/clang++
+runtime-verified.

@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ converting return in switch: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--

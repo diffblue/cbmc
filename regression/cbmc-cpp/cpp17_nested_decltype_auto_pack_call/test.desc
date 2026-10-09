@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [dcl.spec.auto]/3-4,11 + [temp.variadic]/4-5.  A function template with a
+DEDUCED return type (`decltype(auto)`) whose body calls ANOTHER deduced-return
+function template, passing a MULTI-element non-type parameter pack as the
+arguments (`decltype(auto) apply_impl(seq<V...>){ return invoke(V...); }`), the
+core shape of libstdc++ std::apply's `__apply_impl` -> `std::__invoke`.
+Previously the caller's return type was left an unresolved `<<type:decltype>>`
+("invalid implicit conversion from '<<type:decltype>>' to 'signed int'").
+Fixed by expanding ONLY the non-type call-argument pack in the eager
+auto/decltype(auto) convert_function path, so a nested callee's already-expanded
+function-parameter pack is not re-expanded against the enclosing instantiation's
+unrelated pack size (which corrupted `add(a$0, a$1)` into `add(a$0, a$0)`).
+Non-vacuous: the returned value is a concrete function of the deduced pack.

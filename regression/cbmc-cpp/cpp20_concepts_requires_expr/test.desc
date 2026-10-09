@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [expr.prim.req.general]/2 + [temp.constr].  A requires-expression with a
+requirement-parameter-list used directly as a function template's requires-clause
+(`requires requires(T a, U b){ a + b; }`).  Previously the requirement-parameters
+(a, b) were not bound while the constraint was checked, so the requirement failed
+to resolve and the candidate was dropped ("found no match").  Fixed by binding a
+requires-expression's #requires_params as scope-local symbols before evaluating a
+direct function-template requires-clause.  Non-vacuous: both assertions exercise
+the constrained overload.

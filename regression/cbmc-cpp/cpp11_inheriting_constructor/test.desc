@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ inheriting constructor sets the flag: SUCCESS$
+^\[main\.assertion\.2\] line \d+ inheriting constructor forwards the value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[namespace.udecl]/2 + [class.inhctor.init]: an inheriting constructor
+declaration (`using Base::Base;`) inherits the base's constructor *templates*
+as well.  Fixed by registering the base's constructor-template ids in the
+derived class's scope under the derived name (so overload resolution finds and
+instantiates them, initializing the base subobject) and by recording that the
+class has inherited constructors so it is not treated as an aggregate
+([dcl.init.aggr]/1, C++17).  Cross-checked against g++ and clang++.

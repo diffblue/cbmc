@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ outer handler reached after rethrow: SUCCESS$
+^\[main\.assertion\.2\] line \d+ outer rethrow re-propagates the outer exception E\(1\): SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[except.throw]/8 -- a bare `throw;` re-propagates the exception the handler it
+appears in is handling.  Fixed by keying the exception being handled per handler
+(a rethrow lexically inside a handler is tagged with that handler's catch-var id,
+and remove_cpp_exceptions gives each handler its own current-exception slot),
+so a completed inner try/catch no longer clobbers the outer handler's exception.

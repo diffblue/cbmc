@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+unexpected expression
+--
+`struct __attribute__((packed)) P { ... }` (attribute between class-key
+and name): the parser folded the attribute onto the struct but recorded
+an EMPTY alignment (a default-constructed irept is not nil), so every
+such class got a phantom explicit alignment -- "unexpected expression: "
+during layout and, for structs with bit-fields or a trailing wider
+member, a wrong size (4 for the 3-byte packed P).  The user's
+`enum class : uint8_t` bit-field struct (Issue 7) was declared this
+way.  Covers attribute before the name, after the body, and with
+bit-fields.

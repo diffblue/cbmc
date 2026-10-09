@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+std::function<int()> (empty _ArgTypes pack) from a functor, a function
+pointer and a lambda; a one-argument lambda for contrast.  The zero-argument
+call operator's body was dropped ('args' unknown after the empty pack
+parameter had been removed).

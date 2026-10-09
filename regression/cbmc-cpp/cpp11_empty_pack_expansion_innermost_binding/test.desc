@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+Same-named packs of nested instantiations: the most recently bound one wins
+(template_mapt::generation_map); std::function/std::pair braced arguments.

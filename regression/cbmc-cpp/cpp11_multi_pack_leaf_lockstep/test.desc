@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ leaf0: SUCCESS$
+^\[main\.assertion\.2\] line \d+ leaf1: SUCCESS$
+^\[main\.assertion\.3\] line \d+ leaf2: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Header-free distillation of libc++ <tuple>'s __tuple_impl; the
+heterogeneous element types (int, double, char) make a collapsed
+expansion visibly wrong where tuple<int,int> was coincidentally
+correct.

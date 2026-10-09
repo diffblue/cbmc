@@ -1,0 +1,12 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+A base class member function may name a private member it declares on an
+object of a derived type, even though that member is inaccessible as
+named through the derived type ([class.access.base]/5.4).

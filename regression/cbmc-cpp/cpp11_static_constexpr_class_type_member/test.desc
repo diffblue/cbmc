@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+Invariant check failed
+--
+N5008 [class.static.data]/3 + [dcl.constexpr]/1: constexpr static data members
+of class type (aggregates, std::array, constructor-initialised, in class
+templates) are statically initialised objects, readable by member access,
+subscript and address.  Found while fixing user-reported Issue 3.

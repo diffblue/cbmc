@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+no body for callee
+--
+N5008 [basic.lookup.argdep]/3.1: when ordinary unqualified lookup finds a
+class member, ADL is not performed.  A member function TEMPLATE's scope entry
+has no class_identifier, so the suppression missed it and the same-named
+member of the ARGUMENT's class instance (ranget<J>::zip for a ranget<J>
+argument) joined the candidate set: util/range.h's zip(containert &) calling
+zip<same_size>(ranget<...>{...}) was ambiguous.

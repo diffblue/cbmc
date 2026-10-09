@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ base mem-init via template parameter: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-21: full_member_initialization lowers explicit POD-base
+mem-initializers to slicing assignments ([class.base.init]/7),
+matching the base by name or by resolved type ([class.base.init]/2,
+covering the template-parameter naming); the plain-named POD-base
+initializer was dropped too.

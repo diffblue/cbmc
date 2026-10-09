@@ -1,0 +1,14 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ converting elem: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed in round 53 (the V1/V2 arc's first correctness increment): while a
+specialization is instantiated, a sibling/enclosing instantiation's
+same-spelled parameter bindings are hidden ([temp.point]/1 +
+[basic.scope.temp]/2), so apply()'s short-name bridge cannot pick the
+wrong instance's binding.  Kernel runtime-verified with clang++.

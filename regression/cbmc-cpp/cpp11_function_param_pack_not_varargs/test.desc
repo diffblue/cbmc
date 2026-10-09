@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20 --object-bits 10
+^\[main\.assertion\.1\] line \d+ address of pack static member has non-varargs type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ the pack-parameter function is callable: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*invariant violation.*$
+^.*symbol type must match.*$
+^CONVERSION ERROR$
+--
+[temp.variadic]/3 + [dcl.fct]: a `...` immediately following a parameter
+declaration with no separating comma (`f(Args...)`) introduces a function
+parameter pack, not a C-style variadic ellipsis.  CBMC parsed an end-of-list
+`Args...` as the parameter `Args` plus a separate C-style ellipsis, giving the
+instantiated function type a spurious variadic `...`; taking the address of
+such a member produced a type that mismatched a concrete function pointer and
+triggered an invariant violation.  This is the shape of libstdc++'s
+_Function_handler<R(Args...), F>::_M_invoke used by std::function.

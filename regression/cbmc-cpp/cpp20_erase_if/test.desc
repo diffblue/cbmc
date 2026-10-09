@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+C++20 std::erase_if on std::vector<int>.
+
+With the member-typedef conformance fix ([temp.inst]/1-2, [dcl.typedef]) symex
+executes the REAL std::vector / erase_if machinery (no truncation), and the
+resulting size assertion is verified soundly within resources.
+See doc/architectural/cpp-class-template-instantiation-plan.md.

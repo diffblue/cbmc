@@ -1,0 +1,26 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ base bool NSDMI applied: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nested int NSDMI applied: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Was KNOWNBUG: N5008 [class.base.init]/9.1 + [class.default.ctor]/3 --
+the implicitly defined default constructor of a derived class dropped a
+base's default member initializers when the base counted as POD (CBMC's
+cpp_is_pod does not model NSDMIs, so no constructor is synthesized for
+such a base and the base-initializer loop skipped it).  The synthesized
+derived constructor now applies the base's NSDMIs through the flattened
+from_base components: a component with its own #default_value is
+initialized from it, one whose type transitively carries NSDMIs is
+default-constructed; an explicit base initializer WITH arguments
+supersedes them, while an empty one (value-initialization, [dcl.init]/8)
+still applies them.  Reduced with cvise on cbmc-preprocessed source from
+std::optional<std::string> (whose remaining KNOWNBUG is the independent
+base-specifier resolution failure).  Header-free; g++/clang++
+runtime-verified.

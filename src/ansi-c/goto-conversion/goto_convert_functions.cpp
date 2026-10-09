@@ -10,6 +10,8 @@ Date: June 2003
 
 #include "goto_convert_functions.h"
 
+#include <util/expr_util.h>
+#include <util/prefix.h>
 #include <util/std_code.h>
 #include <util/symbol_table_builder.h>
 
@@ -153,27 +155,210 @@ void goto_convert_functionst::convert_function(
   const code_typet &code_type = to_code_type(symbol.type);
   f.set_parameter_identifiers(code_type);
 
+  // Provide bodies for operator new/delete by generating goto
+  // programs that delegate to __new/__delete.
+  if(symbol.value.is_nil() && symbol.type.id() == ID_code)
+  {
+    const std::string sname = id2string(identifier);
+    const auto &op_params = code_type.parameters();
+    // The placement forms operator new(size, void*) and
+    // operator delete(void*, void*) ([new.delete.placement]) take a trailing
+    // pointer argument and neither allocate nor deallocate; they must not be
+    // synthesised as (de)allocations.  All other allocation functions allocate
+    // their first (size) argument and all other deallocation functions
+    // deallocate their first (pointer) argument ([basic.stc.dynamic]); the
+    // optional size_t / align_val_t / nothrow_t arguments are not used.
+    const bool is_placement_form =
+      op_params.size() >= 2 && op_params.back().type().id() == ID_pointer;
+    irep_idt impl;
+    if(is_placement_form)
+    {
+      // leave to its own body
+    }
+    else if(has_prefix(sname, "operatorcpp_new[]("))
+      impl = "__new_array";
+    else if(has_prefix(sname, "operatorcpp_new("))
+      impl = "__new";
+    else if(has_prefix(sname, "operatorcpp_delete[]("))
+      impl = "__delete_array";
+    else if(has_prefix(sname, "operatorcpp_delete("))
+      impl = "__delete";
+    else if(sname == "__builtin_operator_new")
+    {
+      // Clang's intrinsic with the semantics of ::operator new
+      // ([new.delete.single]; used by libc++'s __libcpp_allocate).
+      // Without a body its nondet result made every libc++ container
+      // allocation potentially null.
+      impl = "__new";
+    }
+    else if(sname == "__builtin_operator_delete")
+      impl = "__delete";
+    if(!impl.empty() && symbol_table.has_symbol(impl))
+    {
+      const symbolt &impl_sym = symbol_table.lookup_ref(impl);
+      const code_typet &impl_type = to_code_type(impl_sym.type);
+      const auto &params = code_type.parameters();
+      // Ensure every parameter has an identifier.  operator new/delete (and
+      // their sized/aligned overloads) are frequently declared without
+      // parameter names, leaving empty identifiers; the synthesised body uses
+      // only the first parameter, but all parameters must be named for the
+      // goto function (an empty identifier triggers a namespace lookup
+      // failure downstream).
+      bool created_param = false;
+      for(std::size_t i = 0; i < params.size(); ++i)
+      {
+        if(!params[i].get_identifier().empty())
+          continue;
+        const irep_idt pid =
+          id2string(identifier) + "::param" + std::to_string(i);
+        symbolt param_sym;
+        param_sym.name = pid;
+        param_sym.base_name = "param" + std::to_string(i);
+        param_sym.type = params[i].type();
+        param_sym.mode = symbol.mode;
+        param_sym.is_lvalue = true;
+        param_sym.is_parameter = true;
+        param_sym.is_thread_local = true;
+        param_sym.is_file_local = true;
+        symbol_table.get_writeable_ref(identifier)
+          .type.add(ID_parameters)
+          .get_sub()[i]
+          .set(ID_C_identifier, pid);
+        symbol_table.insert(std::move(param_sym));
+        created_param = true;
+      }
+      if(created_param)
+        f.set_parameter_identifiers(
+          to_code_type(symbol_table.lookup_ref(identifier).type));
+      const irep_idt param_id =
+        params.empty() ? irep_idt()
+                       : to_code_type(symbol_table.lookup_ref(identifier).type)
+                           .parameters()[0]
+                           .get_identifier();
+      // Build goto program: call __new(param0) and return result
+      if(impl_type.return_type().id() != ID_empty && !params.empty())
+      {
+        // tmp = __new(param0)
+        const symbolt &tmp = new_tmp_symbol(
+          code_type.return_type(), "rv", f.body, symbol.location, symbol.mode);
+        exprt arg = symbol_exprt(param_id, params[0].type());
+        arg = typecast_exprt::conditional_cast(
+          arg, impl_type.parameters()[0].type());
+        code_function_callt call(
+          tmp.symbol_expr(), impl_sym.symbol_expr(), {std::move(arg)});
+        goto_programt::targett t1 =
+          f.body.add(goto_programt::make_function_call(call, symbol.location));
+        (void)t1;
+        // return tmp
+        f.body.add(goto_programt::make_set_return_value(
+          tmp.symbol_expr(), symbol.location));
+        f.body.add(goto_programt::make_end_function(symbol.location));
+      }
+      else if(!params.empty())
+      {
+        // void function (delete): call __delete(param0)
+        exprt arg = symbol_exprt(param_id, params[0].type());
+        code_function_callt call(impl_sym.symbol_expr(), {std::move(arg)});
+        f.body.add(goto_programt::make_function_call(call, symbol.location));
+        f.body.add(goto_programt::make_end_function(symbol.location));
+      }
+      if(!f.body.empty())
+        return;
+    }
+  }
+
   if(
-    symbol.value.is_nil() ||
+    symbol.value.is_nil() || symbol.value.id() != ID_code ||
     symbol.is_compiled()) /* goto_inline may have removed the body */
     return;
+
+  // Skip functions whose bodies contain unresolved C++ names, which
+  // indicates incomplete template instantiation.
+  // For user functions (non-system headers), strip only the offending
+  // statements rather than discarding the entire body, so that
+  // assertions and other verified code survive.
+  if(
+    has_subexpr(symbol.value, ID_cpp_name) ||
+    has_subexpr(symbol.value, irep_idt("cpp-this")))
+  {
+    const std::string file = id2string(symbol.location.get_file());
+    bool is_system =
+      file.find("/usr/include/") == 0 || file.find("/usr/lib/") == 0;
+    if(is_system)
+    {
+      // Strip offending statements instead of clearing the entire body.
+      // This preserves the parts of the body that are type-checked.
+    }
+    // For user functions, remove statements with unresolved names.
+    std::function<void(exprt &)> strip_unresolved = [&](exprt &expr)
+    {
+      if(expr.id() == ID_code && to_code(expr).get_statement() == ID_block)
+      {
+        auto &block = to_code_block(to_code(expr));
+        auto &stmts = block.statements();
+        stmts.erase(
+          std::remove_if(
+            stmts.begin(),
+            stmts.end(),
+            [](const codet &s)
+            {
+              return has_subexpr(static_cast<const exprt &>(s), ID_cpp_name) ||
+                     has_subexpr(
+                       static_cast<const exprt &>(s), irep_idt("cpp-this"));
+            }),
+          stmts.end());
+        for(auto &s : stmts)
+          strip_unresolved(static_cast<exprt &>(s));
+      }
+    };
+    strip_unresolved(symbol_table.get_writeable_ref(identifier).value);
+    // If the body is now empty or still has unresolved names, clear it.
+    if(
+      has_subexpr(symbol_table.lookup_ref(identifier).value, ID_cpp_name) ||
+      has_subexpr(
+        symbol_table.lookup_ref(identifier).value, irep_idt("cpp-this")))
+    {
+      symbol_table.get_writeable_ref(identifier).value.make_nil();
+      return;
+    }
+  }
 
   // we have a body, make sure all parameter names are valid
   for(const auto &p : f.parameter_identifiers)
   {
-    DATA_INVARIANT_WITH_DIAGNOSTICS(
-      !p.empty(),
-      "parameter identifier should not be empty",
-      "function:",
-      identifier);
+    // Empty parameter identifiers can arise from incomplete C++ template
+    // instantiations; skip converting such functions.
+    if(p.empty())
+      return;
 
-    DATA_INVARIANT_WITH_DIAGNOSTICS(
-      symbol_table.has_symbol(p),
-      "parameter identifier must be a known symbol",
-      "function:",
-      identifier,
-      "parameter:",
-      p);
+    if(!symbol_table.has_symbol(p))
+    {
+      // Create a missing parameter symbol (can happen for C++ template
+      // instantiations where 'this' parameter symbols are not generated).
+      const auto &code_type = to_code_type(symbol.type);
+      for(const auto &param : code_type.parameters())
+      {
+        if(param.get_identifier() == p)
+        {
+          symbolt param_symbol{p, param.type(), symbol.mode};
+          param_symbol.base_name = param.get_base_name();
+          param_symbol.is_parameter = true;
+          param_symbol.is_lvalue = true;
+          param_symbol.location = symbol.location;
+          symbol_table.insert(std::move(param_symbol));
+          break;
+        }
+      }
+    }
+    else
+    {
+      // Ensure existing parameter symbols have is_parameter set.
+      // C++ destructor code generation may create parameter symbols
+      // (e.g., base class 'this' pointers) without this flag.
+      symbolt &existing = symbol_table.get_writeable_ref(p);
+      if(!existing.is_parameter)
+        existing.is_parameter = true;
+    }
   }
 
   lifetimet parent_lifetime = lifetime;

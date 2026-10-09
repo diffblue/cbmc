@@ -1,0 +1,17 @@
+THOROUGH
+main.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 ../../../src/goto-programs/restrict_function_pointers.cpp
+^\[main\.assertion\.1\] line \d+ restrict_function_pointers converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Dog-food: CBMC's own restrict_function_pointers.cpp converts and the
+harness assertion verifies.  Flipped KNOWNBUG->THOROUGH 2026-08-11:
+the emplace no-match and ofstream conversion failures are fixed
+(rounds 32-35); conversion alone takes ~5m40s, beyond the CORE -t 300
+budget, hence THOROUGH.  --property restricts BMC to the harness
+assertion: the TU's other properties fire only on CBMC-internal
+bookkeeping havocked for out-of-TU functions (get_nil_irep etc. have
+no body in this TU), which is sound behaviour, not a defect.

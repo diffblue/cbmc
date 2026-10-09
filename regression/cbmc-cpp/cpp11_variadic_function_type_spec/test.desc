@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^PARSING ERROR$
+Deduction and expansion of a function parameter pack when matching a class
+template partial specialization over a function type, e.g. the
+std::function<R(A...)> pattern.  Covers zero, one, two and three element
+packs and a reference-parameter element, and checks that the specialization
+is elaborated so its operator bool is available.

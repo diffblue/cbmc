@@ -1,0 +1,8 @@
+CORE
+main.cpp
+--cpp14
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+C++14 decltype(auto) return type deduction

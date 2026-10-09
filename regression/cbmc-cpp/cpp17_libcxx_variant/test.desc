@@ -1,0 +1,13 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+
+KNOWNBUG since round 152: main() was only partially type-checked and the
+run reported SUCCESSFUL over the truncated body (user-reported Issue 13);
+an incomplete user function is an error now.  Underlying failure: found no match for symbol 'variant' (std::variant constructor).

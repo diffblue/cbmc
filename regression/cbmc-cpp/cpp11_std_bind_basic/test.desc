@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+std::bind (libstdc++ _Bind / _Bind_helper machinery): free function with
+bound arguments, free function with a placeholder, and a member function
+pointer with an object pointer and a placeholder.  Exercises the
+function-type pack-expansion pattern of _Bind_helper, the base-specifier
+pack expansion of result_of<F(A...)>, the empty-pack-then-defaulted
+_Result parameter of _Bind::operator(), the zipped type/index pack
+expansion of _Bind::__call, pointer-to-member deduction through
+__result_of_memfun<_Res _Class::*, ...> and (*p).*pmf on a reference
+result.  Conversion of a _Bind to std::function is a separate, still open
+layer (the goto-symex shadow_memoryt dog-food carrier).

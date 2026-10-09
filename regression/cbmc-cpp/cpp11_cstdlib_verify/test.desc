@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+On macOS, libc++ cstdlib may reference at_quick_exit which is
+unavailable. Verbose output helps diagnose platform differences.

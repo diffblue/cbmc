@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+unexpected expression
+--
+User-reported: a scoped enum with fixed underlying type uint8_t used as a
+1-bit bit-field among uint8_t bit-fields must pack into 2 bytes, with
+and without `__attribute__((packed))` before the struct name (N5008
+[class.bit]/1, [dcl.enum]/5: the bit-field's allocation unit follows
+the fixed underlying type).

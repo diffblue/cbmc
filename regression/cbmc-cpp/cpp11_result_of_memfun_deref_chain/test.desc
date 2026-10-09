@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not fully type-check
+--
+The libstdc++ __result_of_memfun chain shape: a private-base _S_test
+overload set found through a partial specialization on _Res _Class::* and a
+decltype over ((*declval<_Tp1>()).*declval<_Fp>())(declval<_Args1>()...).

@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.2\] line 26 s\[0\] == 'a': SUCCESS$
+^\[main\.assertion\.3\] line 27 s\[1\] == 'b': SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Regression test for character access on a literally-constructed std::string.
+
+libstdc++ provides std::__cxx11::basic_string<char> as an explicit
+instantiation declaration (extern template).  CBMC realises that class via
+the incomplete-to-complete swap in typecheck_compound_type rather than via
+instantiate_template, so its inline character-copy helpers
+_S_copy_chars/_S_copy used to keep an un-converted body that clean_up()
+discarded, making the copy a no-op (size() was correct but the characters
+were non-deterministic).
+
+queue_deferred_methods_of_instance() now instantiates those inline member
+bodies at the instance-completion site, per N5008 [temp.inst]/4 and Note 4.
+This test was previously KNOWNBUG; it became CORE once the fix landed.

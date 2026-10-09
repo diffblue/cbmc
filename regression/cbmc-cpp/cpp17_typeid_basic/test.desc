@@ -1,0 +1,9 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+typeid / RTTI: type_info is unique per type and compares equal iff same type.

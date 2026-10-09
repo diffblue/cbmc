@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp20 --unwind 5 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*is unknown.*$
+--
+C++20 std::vector<int> push_back then size.
+
+The member-typedef conformance fix keeps std::vector untruncated, so symex
+executes the real container and the size assertion is verified soundly.

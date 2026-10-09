@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Constexpr static member initializers referencing template
+metafunctions are not evaluated to compile-time constants.
+The template parameter is substituted (Abs<N> → Abs<1>) but
+Abs<1>::value is not eagerly instantiated and folded.
+Root cause of libc++ std::ratio and std::chrono::duration failures.

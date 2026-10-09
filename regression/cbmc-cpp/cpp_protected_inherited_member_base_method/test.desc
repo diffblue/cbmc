@@ -1,0 +1,13 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+^warning: ignoring
+A member function of a class may access a protected member it declares
+on an object of any derived type ([class.access.base]/5.4), not only via
+`this`.  Access control must be anchored on the declaring class, not on
+the (more-derived) type of the object through which the member is named.

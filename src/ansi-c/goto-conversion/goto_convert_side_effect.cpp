@@ -381,11 +381,13 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_function_call(
   if(expr.function().id() == ID_symbol)
   {
     const irep_idt &identifier = to_symbol_expr(expr.function()).identifier();
-    const symbolt &symbol = ns.lookup(identifier);
-
-    new_base_name += '_';
-    new_base_name += id2string(symbol.base_name);
-    new_symbol_mode = symbol.mode;
+    const symbolt *symbol_ptr;
+    if(!ns.lookup(identifier, symbol_ptr))
+    {
+      new_base_name += '_';
+      new_base_name += id2string(symbol_ptr->base_name);
+      new_symbol_mode = symbol_ptr->mode;
+    }
   }
 
   const symbolt &new_symbol = get_fresh_aux_symbol(
@@ -776,6 +778,10 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_side_effect(
     codet code = code_expressiont(side_effect_expr_throwt(
       expr.find(ID_exception_list), expr.type(), expr.source_location()));
     code.op0().operands().swap(expr.operands());
+    // preserve the enclosing-handler tag on a rethrow (`throw;`) so that
+    // remove_cpp_exceptions can re-propagate that handler's exception
+    if(!expr.get("#rethrow_handler").empty())
+      code.op0().set("#rethrow_handler", expr.get("#rethrow_handler"));
     code.add_source_location() = expr.source_location();
     side_effects.side_effects.add(goto_programt::instructiont(
       std::move(code), expr.source_location(), THROW, nil_exprt(), {}));

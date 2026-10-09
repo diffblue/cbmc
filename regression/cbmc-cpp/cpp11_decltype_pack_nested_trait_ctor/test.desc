@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ nested-trait two-arg-pack constructor selected: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+A converting constructor SFINAE-constrained through a nested trait whose member
+is a decltype expanding a two-or-more-element call-argument pack
+(declval<A>()...) -- the libstdc++ __invoke_result shape -- is selected: the
+pack is expanded during the trait's instantiation by template_mapt::apply.

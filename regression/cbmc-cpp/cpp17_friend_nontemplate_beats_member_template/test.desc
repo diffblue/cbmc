@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*operator 'shl' not defined.*$
+^CONVERSION ERROR$
+--
+Verifies that for an overloaded operator (`<<`) with both a member
+function-template specialization and a non-template free
+function (a `friend` in the enclosing class) viable, the
+non-template wins per [over.match.best]/2 (paragraph 5/6).
+
+Without the fix, `operator_is_overloaded` returned the first
+viable member candidate (the template member instantiation)
+without consulting the non-member candidate set; the body of
+the template member then failed to typecheck against the
+specific argument type that the friend was designed to handle.
+
+This pattern occurs widely on CBMC's own `messaget`/`mstreamt`/
+`eomt` triple in `src/util/message.h`: the friend `operator<<
+(mstreamt &, eomt)` should win, but the member template
+`operator<<(const T &)` was selected instead, with its
+`static_cast<std::ostream &>(*this) << x` body then failing on
+`x: eomt`.

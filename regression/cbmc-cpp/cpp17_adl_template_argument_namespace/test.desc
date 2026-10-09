@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ ADL via template argument: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+symbol 'transform' is unknown
+--
+Fixed 2026-07-21: resolve_with_arguments recurses over the recorded
+template arguments of associated class specializations
+([basic.lookup.argdep]/2); goto_cc_main.cpp and ms_link_cmdline.cpp
+convert clean.

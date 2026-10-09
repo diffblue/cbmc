@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [dcl.spec.auto]/2-3 + [temp.variadic]/5.  A decltype(auto) function whose
+body declares a LOCAL type alias and uses it to construct the argument of a
+nested deduced-return call (`using Ind = seq<0,1>; return inner(Ind{});`) -- the
+shape of std::apply's `using _Indices = ...; return __apply_impl(..., _Indices{});`.
+Previously the return type could not be typed from the return expression in
+isolation (the body-local alias was not yet in scope), so deduction was
+deferred, and typecheck_return then tried to convert the return value to the
+still-unresolved `<<type:decltype>>` and aborted.  Fixed by deducing a
+decltype(auto) return type in typecheck_return without a conversion (as for
+plain auto).  Covers a fixed and a dependent local alias.  Non-vacuous: each
+result is a concrete function of the pack carried by the local alias.

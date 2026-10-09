@@ -1,0 +1,31 @@
+CORE
+main.cpp
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+unexpected expression: struct_tag
+found no match for symbol 'swap'
+\* identifier: std::tag-__not_<
+--
+End-to-end `goto-cc` regression for the SFINAE-leak fix landed
+alongside cbmc-cpp/cpp11_std_is_swappable_sfinae.
+
+User-reported bug (prior to fix): running
+  goto-cc harness.cpp
+on source that `#include <array>`s `std::array<double, N>` emitted
+spurious type-checker errors
+  error: unexpected expression: struct_tag
+  error: found no match for symbol 'swap'
+with an `irep::pretty()` dump leaked into the error text, and
+failed to produce a goto binary despite exit code 0.
+
+Fixed by wrapping per-candidate function-template substitution
+and default TYPE template argument substitution with a
+null-message-handler per [temp.deduct]/7-8, so SFINAE failures no
+longer leak diagnostics.
+
+`std::array<double, 3> a{}` now compiles cleanly through the
+goto-cc + cbmc chain.

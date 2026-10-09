@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ pair<const int,int> is_constructible from pair<int,int>&&: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [meta.unary.prop], [meta.rel]/2: is_constructible<pair<const int,int>,
+pair<int,int>&&> is true (g++/clang++ agree).  Was a KNOWNBUG: libstdc++'s
+converting move constructor is constrained via
+_PCCFP = conditional<!is_same<_T1,_U1> || ..., _PCC<true,...>, _PCC<false,...>>,
+and CBMC's __is_same ignored cv-qualifiers, so is_same<const int,int> was wrongly
+true, _PCCFP selected _PCC<false,...>, the enable_if was ill-formed, and the
+constructor was dropped.  Fixed by making __is_same cv-aware (see
+cpp11_is_same_cv_qualifiers).  Root of std::map/std::unordered_map insert(_Pair&&)
+selection for a convertible pair.  Non-vacuous: assertion 2 must FAIL.

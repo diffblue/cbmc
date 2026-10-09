@@ -1,0 +1,16 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 ../../../src/util/threeval.cpp
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof: Kleene three-valued logic laws (De Morgan, double negation,
+commutativity, idempotence, known/unknown consistency) proven over ALL
+pairs of truth values via nondeterministic inputs -- the unit-test
+methodology upgraded to exhaustive bounded proof, applied to CBMC's own
+src/util/threeval.

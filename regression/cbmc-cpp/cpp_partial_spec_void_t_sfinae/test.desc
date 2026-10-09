@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Classic void_t partial-specialization SFINAE (member-type probe and
+expression-decltype probe), including as members of a class template.  N5008
+[temp.spec.partial.match]/2, [temp.deduct]/8.  CBMC is correct here, which pins
+the cpp20_partial_spec_conditional_sfinae_member divergence to the
+conditional-operator decltype specifically rather than void_t SFINAE in general.

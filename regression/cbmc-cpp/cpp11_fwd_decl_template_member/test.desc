@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ member from later definition resolves: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+symbol 'read' is unknown
+--
+N5008 [temp.inst]/1, [temp.point]: a class template specialization is completed
+only from a *definition* of the template.  CBMC used to eagerly elaborate a
+specialization referenced while the template was only forward-declared (as a
+by-value function parameter in a declaration, which does not require a complete
+type), fabricating an empty-but-complete class that masked the members added by
+the later definition ("symbol 'read' is unknown").  This is the reduced (cvise,
+from preprocessed <istream>) form of the lispexpr.cpp / parser.cpp dog-food
+failures (<iosfwd> forward-declares std::basic_istream before <istream> defines
+it).  Fixed by definition-seen tracking (ID_C_template_defined): elaboration is
+deferred until the selected template has been defined.

@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ three-arg forwarding ctor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one-arg forwarding ctor: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Was KNOWNBUG; fixed by two changes: (1) N5008 [temp.arg.explicit]/3 +
+[temp.deduct]/2 -- an explicit template-argument list that is too long
+for an overloaded candidate's parameter list is now a silent deduction
+failure during candidate matching (candidate removed) instead of a hard
+"too many template arguments" error that aborted the whole resolution;
+(2) [temp.variadic]/5 -- the member-body fold reducer now recognises a
+SINGLE-element function parameter pack by its (un-replicated) plain
+parameter name even when other packs (the enclosing class template's)
+are bound in the map, instead of degrading the fold.  This is libstdc++
+<tuple>'s `bool _Valid = __valid_args<_UElements...>()`
+forwarding-constructor shape.  Header-free; g++/clang++
+runtime-verified.

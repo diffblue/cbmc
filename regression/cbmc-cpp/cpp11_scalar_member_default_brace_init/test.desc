@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ braced default member initializer of scalar: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^Reason:
+--
+N5008 [dcl.init.list]/3.9: list-initializing a scalar from a single-element
+braced-init-list initializes it from that element, so `int x{42};` as a default
+member initializer sets the member to 42.  CBMC previously left the
+braced-init-list unconverted for a scalar member's default member initializer;
+the raw initializer_list reached GOTO conversion and aborted the bit-vector
+flattener (boolbv_widtht::get_entry).
+

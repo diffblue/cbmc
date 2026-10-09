@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 5 int binds const int& via temporary: SUCCESS$
+^\[main\.assertion\.2\] line 7 no lvalue-ref binding from temporary: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+P2255R2 __reference_converts_from_temporary (N5008 [meta.rel],
+[dcl.init.ref]/5.4): binding `const int&` to an int prvalue
+materializes a temporary (true); a non-const lvalue reference cannot
+bind a temporary (false).  Previously both evaluated false
+(conservative default), skewing libstdc++-13's dangling-reference
+SFINAE (__is_invocable_impl / _Callable chains).

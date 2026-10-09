@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ size: SUCCESS$
+^\[main\.assertion\.2\] line \d+ first: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^.*is unknown.*$
+^CONVERSION ERROR$
+^.*does not uniquely resolve.*$
+--
+Genuine (non-vacuous) verification of a populated std::span<int> (size and
+first element).
+
+Previously KNOWNBUG: std::span(pointer, size_type)'s body sets
+`_M_ptr = std::to_address(__first)`, and std::to_address's call to
+__to_address(_Tp*) tied with __to_address(const _Ptr&) for the lvalue pointer
+argument ("does not uniquely resolve"), so the body was discarded and _M_ptr
+was nondeterministic.  Overload resolution now applies N5008 [temp.func.order]
+partial ordering (function_template_at_least_as_specialised), under which
+__to_address(_Tp*) is more specialized; to_address returns the pointer and the
+span verifies genuinely.

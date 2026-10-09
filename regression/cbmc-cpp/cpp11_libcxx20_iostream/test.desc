@@ -1,0 +1,9 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++ --object-bits 10
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$

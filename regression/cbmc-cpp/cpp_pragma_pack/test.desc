@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+#pragma pack was ignored by the C++ parser (the scanner tracks it; the token
+now carries the state and the class-member parser applies it).
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

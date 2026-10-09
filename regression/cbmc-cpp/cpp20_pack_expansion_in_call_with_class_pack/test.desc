@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ base-held bound args expansion: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed across rounds 56-57: [temp.variadic]/5 bare pack-expansion
+mem-initializer arguments resolve against the materialised parameters,
+and [dcl.init.general]/16.6.2.2 parenthesized aggregate initialization
+now covers a MEMBER of aggregate class type (previously only functional
+casts after CTAD and aggregate bases).  Runtime-verified with g++ and
+clang++.

@@ -1,0 +1,14 @@
+CORE libcxx
+main.cpp
+--cpp14 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+^CONVERSION ERROR$
+Tagged KNOWNBUG 2026-07-23 (first full libc++ suite run):
+libc++ <memory>/unique_ptr: symbolic execution aborts with
+'goto_symext::address_arithmetic does not handle struct'
+(__compressed_pair-shaped address arithmetic reaches symex).
+Fixed 2026-07-23 (libc++ fix round; see the five src commits).

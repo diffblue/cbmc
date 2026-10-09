@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11
+^\[main\.assertion\.1\] line \d+ nested template helper body: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+no body for callee
+--
+N5008 [temp.inst]/4, [temp.point]/1: a cvise-reduced, header-free model of the
+libstdc++ std::get<0> chain (std::get -> std::__get_helper ->
+_Tuple_impl::_M_head); returns 42 under a conforming compiler (verified g++).
+
+The deferred __get_helper<0> body now resolves: its non-deduced trailing
+parameter pack _Tail is correctly empty, so the body qualifier
+_Tuple_impl<__i, int, _Tail...> collapses to _Tuple_impl<__i, int> and the
+inherited _M_head is found.  Non-vacuous: assertion 1 SUCCEEDs and assertion 2
+(a wrong value) FAILs.

@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp11 --unwind 6 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^no body for callee$
+--
+std::set reverse iteration uses std::_Rb_tree_decrement (a libstdc++
+compiled-library helper); CBMC models it as the in-order predecessor over the
+BST, with the header special case.  The insert model colours ordinary nodes
+black so the header (red) is correctly recognised.

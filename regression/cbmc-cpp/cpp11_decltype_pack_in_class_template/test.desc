@@ -1,0 +1,31 @@
+CORE
+main.cpp
+--cpp20 --unwind 6 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ invoke via pack-expansion decltype trait counts 1: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.deduct.call]/1 + [temp.variadic]/5: a class template member typedef
+computed as decltype(declval<F>()(declval<A>()...)) -- a decltype whose call
+expression contains a pack expansion -- is used as the return type of the
+function template `invoke`, which is itself called with a *deduced* parameter
+pack A from inside another template (count_matches).
+
+Root cause (pack-expansion rework phase 3 / phase 5 mechanism): when
+guess_function_template_args deduced `invoke`'s parameter pack A, it recorded A
+only as a scalar binding in template_map.type_map and left pack_args_map /
+pack_size_map empty.  Elaborating the dependent return type
+invoke_result<F, A...>::type then substituted the single deduced type for `A`
+but left a dangling `...` expansion marker on it; the subsequent attempt to
+pack-expand a non-pack type failed, the failure was swallowed by the deduction's
+SFINAE guard, and the caller's body was silently discarded (returning nondet).
+
+Fixed by recording the deduced function parameter pack in pack_args_map /
+pack_size_map (in addition to type_map) before the return type is elaborated, so
+the pack-expansion machinery (gated on pack_args_map) expands declval<A>()... and
+Trait<F, A...> per element and drops the `...` marker.  Part of the unified
+pack-expansion rework documented in
+doc/architectural/cpp-variadic-pack-expansion-rework.md.

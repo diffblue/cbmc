@@ -1,0 +1,42 @@
+CORE
+main.cpp
+--cpp20 --object-bits 12
+^\[main\.assertion\.1\] line \d+ first is y: SUCCESS$
+^\[main\.assertion\.2\] line \d+ second is null: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+KNOWNBUG: C++20 libstdc++ pair's requires-clause + explicit(bool)
+converting constructor pair(U1&&, U2&&) is instantiated WITHOUT a body
+(constexpr/macro-flagged symbol, nil value, never queued deferred);
+symex havocs the call, so both members are garbage.  --cpp17 works
+(enable_if-based pair).  Root blocker for cpp20_map_basic
+(_M_get_insert_unique_pos's _Res(__y, 0)).  Flip to CORE when fixed.
+
+PROGRESS 2026-07-17: the constraint side is fixed -- requires-clause
+call atoms (_S_constructible<...>()) are now constant-folded during
+candidate filtering, so overload resolution no longer keeps unviable
+candidates whose bodies then hard-fail ("invalid implicit conversion
+from 'signed int' to 'struct nodet *'").  RESIDUAL: the correctly
+selected converting constructor's body STILL fails its system-header-
+lenient conversion (silently; symbol left nil) and the pair members
+remain nondet.  Next step: surface that conversion error (disable the
+syshdr guard for this symbol under a debugger) and fix the body-side
+defect -- likely in the explicit(bool) handling or the mem-initializer
+forwarding (first(std::forward<_U1>(__x))).
+
+UPDATE 2026-07-17 late: direct class-parameter atoms are fixed
+(cpp20_requires_class_param_atom is CORE), but libstdc++'s pair guards
+its converting constructor with `requires(_S_constructible<_U1,_U2>())`
+-- a CALL to a consteval static member whose BODY references the class
+parameters.  The call-atom constant-fold still returns "unknown" for it
+(the static member's body needs the class template map when type-checked
+from the satisfaction context), so the unviable candidate survives.
+Remaining lead: make the call-atom fold instantiate/evaluate
+_S_constructible with both the member's and the class's arguments.
+
+FIXED 2026-07-17 night: with the consteval call-atom fold
+(cpp20_requires_static_call_atom) the unviable converting constructor
+is removed and both members verify.

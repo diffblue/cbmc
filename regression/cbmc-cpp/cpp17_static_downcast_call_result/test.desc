@@ -1,0 +1,13 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ reference downcast of operator\* result: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Fixed 2026-07-21: the reference-downcast lvalue test judges the
+implicitly dereferenced operand ([expr.call]/14), and the cv-gate
+direction matches [expr.static.cast]/2 (target may ADD qualifiers).

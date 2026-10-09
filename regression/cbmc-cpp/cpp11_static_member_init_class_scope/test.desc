@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ unqualified typedef read: SUCCESS$
+^\[main\.assertion\.2\] line \d+ qualified typedef read: SUCCESS$
+^\[main\.assertion\.3\] line \d+ decltype typedef read: SUCCESS$
+^\[main\.assertion\.4\] line \d+ member template decltype typedef read: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+In-class static data member initializers reading class-local typedefs
+(unqualified, qualified, and via decltype over declared-only member
+functions/member function templates) -- N5008 [basic.scope.class].  Distilled from the __is_swappable probe shape
+(cpp11_is_swappable_unevaluated): cbmc used to swallow the mid-elaboration
+resolution failure and leave the member's value as a raw cpp_name that read
+as nondet.  Fixed by queueing cpp_name-bearing initializers and
+re-type-checking them in the class scope at the end of the class.
+g++/clang++ runtime-verified.

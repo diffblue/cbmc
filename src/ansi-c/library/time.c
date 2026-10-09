@@ -312,6 +312,9 @@ __CPROVER_HIDE:;
   // Some systems have C headers where `tp` is annotated to be nonnull
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wnonnull-compare"
+#ifdef __clang__
+#  pragma GCC diagnostic ignored "-Wpointer-bool-conversion"
+#endif
   if(!tp)
   {
     errno = EFAULT;

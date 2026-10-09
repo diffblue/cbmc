@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ operator D\(\) then D->B slicing works: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [over.match.copy]/1: a source conversion function yielding a class derived
+from the target type is a candidate when converting to that class type (then
+derived-to-base initialization).  CBMC previously rejected S::operator D() when
+converting to base B (CONVERSION ERROR) because user_defined_conversion_sequence
+required standard_conversion_sequence(operator-result, T), which does not model
+the derived-to-base initialization of a class prvalue.  Fixed by converting the
+operator result to the target base via address-of + pointer derived-to-base +
+dereference.  Non-vacuous: assertion 2 must FAIL.

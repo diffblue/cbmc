@@ -1,0 +1,9 @@
+CORE
+main.cpp
+-std=c++11
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+Trailing return type with out-of-class template member definition.
+Currently fails: 'iterator' is unknown during template instantiation.

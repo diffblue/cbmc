@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ null pointer constant selected: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Fixed: the satisfaction check now type-checks call atoms in a
+manifestly-constant-evaluated context ([temp.constr.atomic]/1 +
+[expr.const]), gives the eagerly-converted callee its member template
+map ([temp.inst]/1) on top of the class map, folds any non-structural
+atom form under the SFINAE guard, and recognizes c_bool constants.
+The unviable constrained constructor is removed and pr(const T2&)
+converts the literal 0 as a null pointer constant ([conv.ptr]/1).
+Header-free.

@@ -1,0 +1,11 @@
+CORE
+main.cpp
+
+^.*default constructor of '.*X.*' is not accessible$
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^VERIFICATION
+A new-expression of a type whose default constructor is private must be
+rejected, per expr.new and class.access.

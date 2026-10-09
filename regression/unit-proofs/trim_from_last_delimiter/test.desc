@@ -1,0 +1,19 @@
+CORE
+harness.cpp
+--cpp17 -I ../../../src --object-bits 12 --unwind 10 --no-unwinding-assertions
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+FAILURE
+--
+Unit proof: trim_from_last_delimiter's contract (empty when the
+delimiter is absent; otherwise the exact prefix up to the LAST
+delimiter) proven over ALL printable strings up to length 4.
+Was KNOWNBUG until 2026-07-20: a derived-to-base struct VALUE typecast
+(libstdc++'s EBO allocator base) reached the solver and was havocked;
+value_set_dereference now lowers the offset-0 prefix dereference to the
+base subobject.  g++/clang++ accept the harness and it verifies at
+runtime.

@@ -1,3 +1,4 @@
+#include <cassert>
 namespace N
 {
 template <class T>

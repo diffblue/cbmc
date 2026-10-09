@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+C\+\+ front-end dropped the body of system-header function 'bad_fn' \(unsupported construct\); calls to it return nondet$
+no body for callee bad_fn\(signed int\): FAILURE$
+^\[main.assertion.1\] line 8 good: SUCCESS$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+A dropped library body was a silent havoc stub at type-check time; the drop is
+now diagnosed with the function name and location, and the call site keeps its
+"no body for callee" property.

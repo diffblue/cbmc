@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ empty-pack member fn body folds to Tr<>::value: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one-element pack folds: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+N5008 [temp.variadic]/7 + [expr.const]: a pack expansion whose pack expands to
+zero elements produces an empty list.  When a (member) function template is
+instantiated with an empty type pack, a pack expansion used as a template
+argument in its body -- `Tr<U...>` for an empty `U` -- must collapse to `Tr<>`
+and the constexpr body must fold to `Tr<>::value`.  This is the shape of
+std::tuple's constructor SFINAE constraints
+(`_TupleConstraints::__is_implicitly_constructible<>()` /
+`__is_explicitly_constructible<>()`).  CBMC instantiated the body without
+collapsing the zero-length expansion, leaving the unbound pack reference inside
+the argument; the surrounding `cpp_name` then failed to resolve and was left
+un-type-checked, so the constexpr call folded to a wrong value (0) instead of
+`Tr<>::value`.  Fixed by removing zero-length pack-expansion arguments from the
+template-argument lists of an instantiated function-template body before its
+eager conversion.  Assertions 1-2 cover the empty- and one-element-pack cases;
+assertion 3 (a wrong value) must FAIL, proving non-vacuity.

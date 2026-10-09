@@ -1,0 +1,13 @@
+CORE gcc-only
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^CONVERSION ERROR$
+--
+Verifies [temp.deduct.call]/3 forwarding reference deduction rules:
+lvalue -> T=A&, const lvalue -> T=const A&, rvalue -> T=A.  Uses
+std::is_same from <type_traits>, hence gcc-only until libc++ support
+catches up.

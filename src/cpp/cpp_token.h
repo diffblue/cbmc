@@ -24,6 +24,10 @@ public:
   std::string text;
   unsigned line_no;
   irep_idt filename;
+  /// the `\#pragma pack(n)' in effect where this token was read (0: none);
+  /// the scanner maintains the pack stack, the C++ parser reads it per
+  /// declaration through the token it starts with
+  int pragma_pack = 0;
 
   void clear()
   {
@@ -32,11 +36,13 @@ public:
     text.clear();
     line_no=0;
     filename.clear();
+    pragma_pack = 0;
   }
 
   void swap(cpp_tokent &token)
   {
     std::swap(kind, token.kind);
+    std::swap(pragma_pack, token.pragma_pack);
     data.swap(token.data);
     text.swap(token.text);
     std::swap(line_no, token.line_no);

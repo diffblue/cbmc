@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line 16 single-element fold in trailing decltype: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+N5008 [expr.prim.fold] + [dcl.fct]/8: a fold-expression in a
+function's trailing-return-type decltype.  Fold reduction previously
+ran only in the method-body pass, which does not process a trailing
+return type, so the declaration was dropped with "found no match for
+symbol 'sum'".  Now reduced in typecheck_type when the pack is bound;
+the single-element instantiation keeps the plain parameter name
+([temp.variadic]/5).  A pack of size >= 2 needs the replicated
+`$k` value parameters (absent while the return type is checked) and
+remains a KNOWNBUG (cpp17_fold_in_trailing_decltype_variadic).

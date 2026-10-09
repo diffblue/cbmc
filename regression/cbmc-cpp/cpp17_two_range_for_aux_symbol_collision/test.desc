@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^.*symbol 'first' is unknown.*$
+^CONVERSION ERROR$
+--
+Verifies that two range-based fors in the same function with
+different element types both correctly deduce the loop variable
+type from their respective iterators.
+
+Per [stmt.ranged]: each range-based for has its own
+`__range`/`__begin`/`__end` auxiliaries.  CBMC's lowering
+materialises these as named auxiliary symbols; if multiple
+range-fors share the same name, the second loop reuses the
+first's symbol via lookup, mis-deducing its loop variable.
+
+Without the fix, the second loop's `entry` was auto-deduced as
+`elem_t` (the first loop's element type) instead of `pair_t`,
+so `entry.first` failed name lookup with the spurious
+"symbol 'first' is unknown" diagnostic.
+
+Three files in CBMC's own source — `irep.cpp`, `lispirep.cpp`,
+`merge_irep.cpp` — hit this pattern.

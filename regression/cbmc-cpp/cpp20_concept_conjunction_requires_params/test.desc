@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+^.*error.*$
+--
+C++20 requires-expression parameter binding when the requires-expression is a
+conjunct of a larger constraint-expression ([expr.prim.req.general]/2).  A
+concept of the shape `<concept-id> && requires(params){...}` -- the shape of
+std::assignable_from, std::movable and std::copyable -- must bind the
+requires-expression's parameters even though its #requires_params node is not at
+the top of the constraint-expression.  Guards the recursive
+requirement-parameter materialisation in instantiate_template.  See
+doc/architectural/cpp-requires-expression-support.md.

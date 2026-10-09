@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ arity 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ arity 3: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.deduct]/5: deduced template parameter values are available to subsequent
+default template arguments.  A constructor template constrained by a SFINAE
+default argument whose constexpr callee (a member of another class template)
+uses the constructor's own deduced parameter pack now resolves: the deduced
+pack ELEMENT TYPES are recorded before default template arguments are
+evaluated, so the constraint folds over the real arguments instead of an empty
+list.  The shape of std::tuple's constrained constructors under
+std::make_tuple.  Cross-checked against g++ and clang++.

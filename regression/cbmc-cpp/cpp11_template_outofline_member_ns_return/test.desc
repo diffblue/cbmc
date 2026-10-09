@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ out-of-line template member return type resolved; body correct: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG must FAIL: FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[temp.inst]/2, [basic.lookup.unqual]: a class template's (out-of-line) member is
+instantiated in the context of the instantiated class, so a namespace-scope
+typedef in the member's return type resolves correctly regardless of where the
+instantiation is triggered.  Reduced from the interval_union.cpp dog-food
+failure ("symbol '_StateIdT' is unknown").  Non-vacuous.

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ default-constructed through empty pack: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Body-side sibling of cpp20_requires_empty_pack_expansion: the
+new-initializer pack expansion over an EMPTY pack during function
+template instantiation.  The target is a class with a user-provided
+default constructor so the assertion observes the constructor call
+itself; a scalar target (`::new(p) int()`) additionally needs
+placement-new VALUE-initialization, which is a separate gap
+(cpp11_placement_new_value_init).  Runtime-verified g++ 13 / clang++ 18
+(placement-new definition supplied in the harness).

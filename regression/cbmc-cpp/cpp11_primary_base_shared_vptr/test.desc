@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+could not fully type-check
+--
+Itanium C++ ABI 2.4 II.1 (g++/clang; N5008 leaves the layout of a dynamic
+class to the implementation): a class shares its primary base's virtual
+pointer -- its vtable struct embeds the primary base's as `@base' -- and the
+primary base subobject is laid out first.  Before: `X : P' with new virtuals
+was 24 bytes (own `@vtable_pointer'), and `S : R, P' kept declaration order.
+The expected sizes and offsets are those of the LP64 x86_64 data model
+(`--64'); the test is not meaningful in a 32-bit configuration.

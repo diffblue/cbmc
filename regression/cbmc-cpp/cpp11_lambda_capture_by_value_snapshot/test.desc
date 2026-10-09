@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20 --object-bits 11 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ by-copy capture snapshots the value at capture time: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+[expr.prim.lambda.capture]: a by-copy capture is an unnamed non-static data
+member of the closure object, direct-initialised from the entity at capture
+time (a snapshot).  Lambda rework Phase B lowers an explicit-by-copy,
+non-mutable, implicit-object lambda to a closure struct whose capture members
+are initialised from the captured entities' values when the closure object is
+created, so later modifications to the original variable are not observed.
