@@ -37,3 +37,12 @@ enable_if_t<false> instantiation in <__compare/ordering.h>).
 drops tuple:469/488 __tuple_impl and tuple:713 constructors, the
 std::forward<_Up>(__u) pack-expansion failure of
 cpp20_libcxx_header_drops/test_functional.desc.
+
+2026-10-09 (round 170): fixed on the way -- const/ref-qualified member
+templates (cpp11_const_and_non_const_member_function_templates,
+cpp11_ref_qualified_member_functions), inherited constructor templates'
+default arguments, __is_constructible with several arguments, folds in
+base-specifiers.  Still a CONVERSION ERROR: tuple<int>'s converting
+constructor from tuple<int &&> drops its body because
+__tuple_sfinae_base::__do_test's `_Trait<_LArgs, _RArgs>::value...'
+fails (cpp11_template_template_parameter_in_lockstep_pack_expansion).
