@@ -13688,12 +13688,37 @@ evaluate correctly in isolation (lt5/lt6); only in system-header mode
   needs --stdlib libc++ for __make_integer_seq/__type_pack_element and the
   system-header line marker; clang-only builtins, g++ rejects it, so not a
   regression test).  In it the constructor template is unconstrained
-  (`constexpr tuple(_Up... __u)'), and removing the unrelated concept chain
-  __same_as_impl / same_as / common_reference_with makes the instantiation
-  disappear -- an order or caching effect rather than a constraint
-  evaluation bug.  Header-free attempts (by-value template constructor,
+  (`constexpr tuple(_Up... __u)').  (Correction, round 169: removing the
+  concept chain __same_as_impl / same_as / common_reference_with does NOT
+  remove the instantiation; the earlier check failed for an unrelated
+  reason.)  Header-free attempts (by-value template constructor,
   explicit, constexpr, reference elements, by-value move) all convert
   correctly.
 
 Suites W44/W45: cbmc-cpp 1759 exit 0, cpp 246, regression/cbmc 1203; lint
 0; each commit compiles; -K: the two libc++ KNOWNBUGs OK.
+
+## Round 169: the libc++ tuple<tuple> instantiation (investigation)
+
+- Reduced further to 139 lines (/tmp/r163/red/kb_Z_tup/e5_reduced.cpp,
+  main constructs __func<int, allocator<int>, int()> directly; needs
+  --stdlib libc++ and the system-header marker).  Making __func::__clone
+  non-virtual removes the bad instantiation.
+- Backtrace of the instantiation tuple<int &&>::tuple<tuple<>> (execinfo +
+  addr2line): typecheck_member_initializer -> cpp_constructor ->
+  resolve (constructor overloads) -> fargs.match -> implicit_conversion_
+  sequence -> user_defined_conversion_sequence (from the prvalue
+  tuple<> to the parameter tuple<int &&>) -> new_temporary ->
+  cpp_constructor -> guess_function_template_args ->
+  instantiate_template.  So it is the viability check of a candidate
+  (__compressed_pair_elem<_T2>'s constructor with the `tuple<>' argument of
+  the OTHER base's initializer) whose user-defined conversion trial
+  instantiates tuple<int &&>'s constructor template with U = tuple<>: a
+  conversion from tuple<> to tuple<int &&>, which [over.best.ics]/4 would
+  not even consider for that argument, explored by instantiating the
+  candidate's definition rather than only its declaration ([temp.over]/1:
+  deduction synthesizes a declaration).  Header-free shapes of this
+  (sv/sw/sx.cpp: two bases, deduced tup<A...> parameters) convert
+  correctly, also in clang mode; the remaining ingredient is libc++'s
+  __make_integer_seq/__type_pack_element machinery.  Not pursued further:
+  the dropped bodies are of unused instances, verdicts are correct.
