@@ -7633,6 +7633,35 @@ resolved_after_strip:
   {
     new_identifiers = identifiers;
 
+    // N5008 [temp.over]/1: a function template contributes the
+    // specialization that template argument deduction synthesizes for THIS
+    // call, or nothing if deduction fails.  A specialization instantiated
+    // for an earlier call (a member template's specialization is recorded
+    // among the class's components, marked #fn_template_type) is not a
+    // candidate of its own: offered here, it made `S(tup<int>)' viable for
+    // a `tup<char, char>' argument through tup's converting constructor
+    // template, although deduction of `S(tup<A>)' fails.  When it is
+    // viable, deduction from its template synthesizes it again.
+    const auto remove_earlier_specializations =
+      [this](resolve_identifierst &candidates)
+    {
+      candidates.erase(
+        std::remove_if(
+          candidates.begin(),
+          candidates.end(),
+          [this](const exprt &e)
+          {
+            if(e.id() != ID_symbol)
+              return false;
+            const symbolt *sym = cpp_typecheck.symbol_table.lookup(
+              to_symbol_expr(e).get_identifier());
+            return sym != nullptr &&
+                   sym->type.find(irep_idt{"#fn_template_type"}).is_not_nil();
+          }),
+        candidates.end());
+    };
+    remove_earlier_specializations(new_identifiers);
+
     {
       guess_function_template_args(new_identifiers, fargs);
 
@@ -7651,6 +7680,7 @@ resolved_after_strip:
         // to prevent raw template declarations from entering
         // disambiguate_functions.
         remove_templates(new_identifiers);
+        remove_earlier_specializations(new_identifiers);
       }
     }
 
@@ -7662,6 +7692,7 @@ resolved_after_strip:
     {
       new_identifiers = identifiers;
       remove_templates(new_identifiers);
+      remove_earlier_specializations(new_identifiers);
       disambiguate_functions(new_identifiers, fargs);
     }
 
@@ -8552,6 +8583,71 @@ bool cpp_typecheck_resolvet::guess_template_args_via_alias(
   return false;
 }
 
+/// N5008 [temp.deduct.type]/9: each argument Pi of P is compared with the
+/// corresponding argument Ai of A.  When the class template's last
+/// parameter is a pack and P contains no pack expansion, P's arguments
+/// correspond to A's one to one: `tup<A>' does not match `tup<char, char>'
+/// or `tup<>' (the deduced A would not be identical to A,
+/// [temp.deduct.call]/4).  Without this check the remaining arguments were
+/// ignored and the candidate was made viable by a converting constructor.
+/// \param instance_type: the type of A's class symbol
+/// \param targs: P's template arguments
+/// \param inst_arguments: A's template arguments
+/// \return whether deduction fails for that reason
+static bool pack_argument_count_differs(
+  const typet &instance_type,
+  const irept::subt &targs,
+  const exprt::operandst &inst_arguments)
+{
+  const irept &class_template = instance_type.find(ID_C_template);
+  const irept::subt &class_parameters =
+    class_template.find(ID_template_parameters).get_sub();
+  for(const auto &targ : targs)
+  {
+    const irept &t = targ.id() == ID_ambiguous ? targ.find(ID_type) : targ;
+    if(targ.get_bool(ID_ellipsis) || t.get_bool(ID_ellipsis))
+      return false;
+  }
+  if(
+    class_parameters.empty() ||
+    !class_parameters.back().get_bool(ID_ellipsis) ||
+    targs.size() + 1 < class_parameters.size())
+  {
+    return false;
+  }
+  // the zero-length-pack sentinel (an empty type) is not an argument
+  std::size_t a_count = 0;
+  for(const auto &a : inst_arguments)
+  {
+    if(!(a.id() == ID_type && a.type().id() == ID_empty))
+      ++a_count;
+  }
+  return a_count != targs.size();
+}
+
+/// The template arguments of the class template specialization of type
+/// \p instance_type that P's arguments \p targs are deduced from: the
+/// primary-relative ID_full_template_args recorded when the instance was
+/// created, else ID_C_template_arguments.
+/// \return nullptr if there are none, or if deduction fails by
+///   pack_argument_count_differs
+static const exprt::operandst *deducible_instance_arguments(
+  const typet &instance_type,
+  const irept::subt &targs)
+{
+  const irept &full_inst_args = instance_type.find(ID_full_template_args);
+  const irept &inst_args = full_inst_args.is_not_nil()
+                             ? full_inst_args
+                             : instance_type.find(ID_C_template_arguments);
+  if(inst_args.is_nil())
+    return nullptr;
+  const exprt::operandst &arguments =
+    static_cast<const cpp_template_args_tct &>(inst_args).arguments();
+  if(pack_argument_count_differs(instance_type, targs, arguments))
+    return nullptr;
+  return &arguments;
+}
+
 /// guess_template_args for a template-id pattern `C<args...>' against a
 /// class template specialization ([temp.deduct.type]/8-9, with the
 /// derived-to-base step of [temp.deduct.call]/4.3): each argument of the
@@ -8812,18 +8908,14 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
   // specialization -- deducing packs from it collapses them to zero
   // elements); prefer the primary-relative ID_full_template_args
   // recorded when the instance was created.
-  const irept &full_inst_args = desired_sym->type.find(ID_full_template_args);
-  const irept &inst_args = full_inst_args.is_not_nil()
-                             ? full_inst_args
-                             : desired_sym->type.find(ID_C_template_arguments);
-  if(inst_args.is_nil())
+  const exprt::operandst *const inst_arguments_ptr =
+    deducible_instance_arguments(desired_sym->type, targs);
+  if(inst_arguments_ptr == nullptr)
   {
     mark_targs_conflicting();
     return;
   }
-
-  const auto &inst_arguments =
-    static_cast<const cpp_template_args_tct &>(inst_args).arguments();
+  const auto &inst_arguments = *inst_arguments_ptr;
 
   // N5008 [temp.deduct.call]/4.3 (same template family): P (template_type)
   // and A (desired_type) may name the same class template, yet a non-type
