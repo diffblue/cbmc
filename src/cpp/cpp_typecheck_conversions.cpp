@@ -4017,10 +4017,13 @@ cpp_typecheckt::viable_one_argument_constructors(
   const struct_tag_typet &class_type,
   const exprt &value)
 {
-  const struct_typet &st = follow_tag(class_type);
+  // A copy: probing a conversion may instantiate templates that add
+  // components to this class, reallocating its component vector.
+  const struct_typet::componentst components =
+    follow_tag(class_type).components();
   bool explicit_viable = false;
   bool converting_viable = false;
-  for(const auto &c : st.components())
+  for(const auto &c : components)
   {
     if(
       c.get_bool(ID_from_base) || c.type().id() != ID_code ||
