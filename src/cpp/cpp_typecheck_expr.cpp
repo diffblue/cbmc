@@ -1913,7 +1913,55 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       typet class_t1 = t1;
       class_t1.remove(ID_C_constant);
       class_t1.remove(ID_C_volatile);
-      if(
+      // N5008 [meta.unary.prop]/9: is_constructible<T, Args...> holds iff
+      // `T t(declval<Args>()...);' is well-formed.  With two or more Args
+      // that is direct-initialization by a constructor
+      // ([dcl.init.general]/16.6.2): attempt it as a substitution context,
+      // each argument an lvalue for an lvalue-reference Arg and an xvalue
+      // otherwise.  A non-class T cannot be initialized from a list of
+      // several expressions ([dcl.init.general]/16.9).
+      const std::vector<typet> constructor_args =
+        t2.is_nil() ? std::vector<typet>{} : builtin_trait_type_args(expr);
+      if(constructor_args.size() > 2)
+      {
+        bool constructible = false;
+        if(class_t1.id() == ID_struct_tag)
+        {
+          elaborate_class_template(class_t1);
+          exprt::operandst operands;
+          for(std::size_t i = 1; i < constructor_args.size(); ++i)
+          {
+            const typet &arg_type = constructor_args[i];
+            symbol_exprt arg{
+              irep_idt{},
+              is_reference(arg_type) ? to_reference_type(arg_type).base_type()
+                                     : arg_type};
+            arg.set(ID_C_temporary_avoided, true);
+            if(is_reference(arg_type) && !is_rvalue_reference(arg_type))
+              arg.set(ID_C_lvalue, true);
+            operands.push_back(std::move(arg));
+          }
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          constructible = true;
+          try
+          {
+            sfinae_contextt sfinae_guard{*this};
+            symbol_exprt object{irep_idt{}, t1};
+            object.set(ID_C_lvalue, true);
+            cpp_constructor(expr.source_location(), object, operands);
+          }
+          catch(...)
+          {
+            constructible = false;
+          }
+          get_message_handler().set_message_count(
+            messaget::M_ERROR, errors_before);
+        }
+        expr = constructible ? static_cast<exprt>(true_exprt())
+                             : static_cast<exprt>(false_exprt());
+      }
+      else if(
         (t2.is_nil() || empty_pack_second_arg) &&
         class_t1.id() == ID_struct_tag)
       {
