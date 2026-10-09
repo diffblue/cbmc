@@ -11592,7 +11592,12 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     // rejected).  The member's own parameters are independent and are set up
     // separately by build_unassigned above, so binding the (differently
     // named) class parameters does not disturb them.
-    if(class_tag.empty())
+    // N5008 [namespace.udecl]/1, [class.inhctor.init]/1: a constructor
+    // template inherited by `using B::B' is a member of B; its signature and
+    // default template arguments depend on B's template parameters, not on
+    // those of the derived class named by ID_C_class.  The template's
+    // identifier names its own class; prefer that one when it differs.
+    const irep_idt id_class_tag = class_tag;
     {
       const std::string &tid = id2string(template_identifier);
       auto pos = tid.find("::template.");
@@ -11640,8 +11645,15 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
           else if(depth == 0 && c == ':' && class_name[i + 1] == ':')
             insert_pos = i + 2;
         }
-        class_tag = class_name.substr(0, insert_pos) + "tag-" +
-                    class_name.substr(insert_pos);
+        const irep_idt owner_tag = class_name.substr(0, insert_pos) + "tag-" +
+                                   class_name.substr(insert_pos);
+        if(
+          id_class_tag.empty() ||
+          (owner_tag != id_class_tag &&
+           cpp_typecheck.symbol_table.has_symbol(owner_tag)))
+        {
+          class_tag = owner_tag;
+        }
       }
     }
 
