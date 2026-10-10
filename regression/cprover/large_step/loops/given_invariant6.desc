@@ -1,0 +1,9 @@
+CORE
+given_invariant6.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: REFUTED$
+^\[main\.invariant\.1\] line \d+ loop invariant: REFUTED$
+--
+--

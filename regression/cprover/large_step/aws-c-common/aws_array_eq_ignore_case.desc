@@ -1,0 +1,6 @@
+KNOWNBUG
+aws_array_eq_ignore_case_contract.c
+--safety aws-c-common/source/byte_buf.c -I aws-c-common/include
+^EXIT=0$
+^SIGNAL=0$
+--

@@ -1,0 +1,6 @@
+CORE
+s_get_next_element_contract.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--

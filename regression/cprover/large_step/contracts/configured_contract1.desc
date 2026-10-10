@@ -1,0 +1,8 @@
+KNOWNBUG
+configured_contract1.yaml
+
+^EXIT=0$
+^SIGNAL=0$
+^program is safe / function my_function1 is safe / postcondition: SUCCESS$
+^program is safe / function my_function2 is safe / postcondition: REFUTED$
+--

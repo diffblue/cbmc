@@ -1,0 +1,9 @@
+CORE
+use_postcondition1.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[callee\.assigns\.1\] line \d+ assigns clause: SUCCESS$
+^\[callee\.postcondition\.1\] line \d+ postcondition: SUCCESS$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--

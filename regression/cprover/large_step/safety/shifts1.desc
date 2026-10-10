@@ -1,0 +1,9 @@
+KNOWNBUG
+shifts1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.undefined-shift\.3\] line \d+ shift distance is negative in 1 << -1: REFUTED$
+^\[main\.undefined-shift\.6\] line \d+ shift distance is negative in 1 >> -1: REFUTED$
+^\[main\.undefined-shift\.8\] line \d+ shift distance too large in 1 << sizeof.*: REFUTED$
+--

@@ -1,0 +1,14 @@
+CORE
+do_while1.c
+--text --solve --inline
+^EXIT=0$
+^SIGNAL=0$
+^\(\d+\) ∀ ς : state \. S10\(ς\) ⇒ S11\(ς\[❝x❞:=10\]\)$
+^\(\d+\) ∀ ς : state \. S13T\(ς\) ⇒ S12in\(ς\)$
+^\(\d+\) ∀ ς : state \. S11\(ς\) ⇒ S12in\(ς\)$
+^\(\d+\) ∀ ς : state \. S12in\(ς\) ⇒ S12\(ς\[❝x❞:=20\]\)$
+^\(\d+\) ∀ ς : state . \(S12\(ς\) ∧ ς\(❝x❞\) ≠ 20\) ⇒ S13T\(ς\)$
+^\(\d+\) ∀ ς : state . \(S12\(ς\) ∧ ¬\(ς\(❝x❞\) ≠ 20\)\) ⇒ S13\(ς\)$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--
+--

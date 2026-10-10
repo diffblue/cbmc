@@ -1,0 +1,6 @@
+CORE
+s_find_entry1_contract.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+--

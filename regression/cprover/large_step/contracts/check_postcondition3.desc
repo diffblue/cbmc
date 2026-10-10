@@ -1,0 +1,10 @@
+CORE
+check_postcondition3.c
+
+^EXIT=10$
+^SIGNAL=0$
+^\[my_function1\.assigns\.1\] line \d+ assigns clause: SUCCESS$
+^\[my_function1\.postcondition\.1\] line \d+ postcondition: SUCCESS$
+^\[my_function2\.assigns\.1\] line \d+ assigns clause: SUCCESS$
+^\[my_function2\.postcondition\.1\] line \d+ postcondition: REFUTED$
+--

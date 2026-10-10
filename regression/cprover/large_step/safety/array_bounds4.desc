@@ -1,0 +1,7 @@
+CORE
+array_bounds4.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.array_bounds\.1\] line \d+ array bounds in array\[.*index\]: SUCCESS$
+--

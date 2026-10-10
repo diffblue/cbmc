@@ -1,0 +1,7 @@
+CORE
+iterate_over_string3.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[compare\.invariant\.1\] line \d+ loop invariant: SUCCESS$
+--

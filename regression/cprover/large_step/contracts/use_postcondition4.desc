@@ -1,0 +1,8 @@
+CORE
+use_postcondition4.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[callee\.postcondition\.1\] line \d+ postcondition: SUCCESS$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+--
