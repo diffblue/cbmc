@@ -1555,8 +1555,14 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
     // For templates with non-type integer arguments that are strictly
     // smaller than all parent instances of the same template, allow
     // deeper recursion (convergent recursion like Fibonacci).
-    // For type-only arguments, keep the conservative limit.
-    if(same_template_depth >= 2)
+    // For type-only arguments, keep a conservative limit.  N5008
+    // [temp.inst]/16 bounds only the total depth; this limit is a guard
+    // against runaway recursion.  Three different specializations of one
+    // trait nest legitimately (invokable_r<forward_impl, ...> needing
+    // invokable_r<back_op, ...> needing invokable_r<at, ...>, libc++'s
+    // views::take closure), so stop at the third enclosing instance; four
+    // made elaboration of <ranges>-heavy code ten times slower.
+    if(same_template_depth >= 3)
     {
       // N5008 [temp.variadic]: a variadic template recursing on its pack
       // (`__and_<B1, B2, Bn...> : ... __and_<B2, Bn...>`, libstdc++ 11's
