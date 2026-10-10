@@ -55,3 +55,10 @@ value, but `arr | take(3)' is still a CONVERSION ERROR: in the
 operator| constraint, is_invocable_v<__bind_back_op<1>, _Fn &,
 tuple<int> &, int (&)[5]> is false (it is true when asserted directly),
 and two tuple:488 __tuple_impl bodies are dropped.
+
+2026-10-10 (round 172): with the nested-instantiation bound raised
+(cpp11_nested_instantiations_of_one_class_template), checking
+is_invocable on a __bind_back closure no longer breaks the later call,
+and `arr | c' through a user-written closure base works.  The real
+`arr | std::views::take(3)' is still a CONVERSION ERROR, as is
+`invoke_result_t<__bind_back_t<...> &, int (&)[5]>' alone.

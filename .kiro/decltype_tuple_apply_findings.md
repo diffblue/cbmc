@@ -13814,3 +13814,27 @@ new KNOWNBUG and ranges_basic_libcxx OK.
 Suites W53/W54: cbmc-cpp 1771 exit 0, cpp 246, regression/cbmc 1203,
 goto-instrument 298, contracts 178; lint 0; each commit compiles; -K:
 cpp20_ranges_basic_libcxx OK.
+
+## Round 172: is_invocable before the call
+
+- `static_assert(is_invocable_v<decltype(c) &, int (&)[5]>); c(arr);' with
+  c = std::__bind_back(f, 2) failed, without the assert it worked.  cvise
+  (kb_iv, two-run interestingness: with assert fails, without passes)
+  reduced it to 88 lines; hand-reduced to the 40-line header-free
+  cpp11_nested_instantiations_of_one_class_template.
+- Cause: elaborate_class_template's runaway-recursion guard stopped at the
+  second enclosing instance of the same template; is_invocable_v<forward_impl>
+  nests invokable_r<forward_impl> -> invokable_r<back_op> -> invokable_r<at>.
+  The skipped third left invoke_of<at, ...> incomplete, and the cached
+  incomplete instance broke the later call.  [temp.inst]/16 bounds only the
+  total depth.  1b8449414c: bound 2 -> 3.  Measured: 4 makes cpp17_headers1
+  take 56 s instead of 5 s, 8 times it out (exponential in the bound); 3
+  takes 10 s; whole cbmc-cpp suite 1437 s vs 1375 s.
+- The bound is a heuristic; a better guard would detect true recursion
+  (same arguments, or arguments growing) instead of counting instances.
+- Remaining: `invoke_result_t<__bind_back_t<at, tuple<int>> &, int (&)[5]>'
+  alone and `arr | std::views::take(3)' (p7) still fail.  Probes in
+  /tmp/r165/rg (i1.cpp, p7.cpp, h7.cpp).
+
+Suites W58: cbmc-cpp 1772 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 298, contracts 178; lint 0; -K: ranges_basic_libcxx OK.
