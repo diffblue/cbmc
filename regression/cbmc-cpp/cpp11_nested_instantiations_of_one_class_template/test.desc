@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ call after the trait: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+elaborate_class_template stopped at the second enclosing instantiation of
+the same template (same_template_depth >= 2) unless the arguments converge;
+the bound is now 3.  It is a heuristic against runaway recursion: 4 made
+cpp17_headers1 ten times slower, 8 made it time out.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
