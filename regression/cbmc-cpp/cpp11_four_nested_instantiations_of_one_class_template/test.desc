@@ -1,0 +1,16 @@
+KNOWNBUG
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ four levels: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The bound (same_template_depth >= 3) is a heuristic: raising it to 4 makes
+this pass but cpp17_headers1 ten times slower.  A guard that detects actual
+recursion (repeated or growing template arguments) instead of counting
+instances would fix both.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
