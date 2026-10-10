@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ function template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ lvalue parameters: SUCCESS$
+^\[main\.assertion\.3\] line \d+ member function template: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Found while probing the comment in cpp_typecheck_type.cpp that the
+placeholders of a pack_n >= 2 trailing-return fold are prvalues (sum_ref);
+the other two cases regressed with d568a30139 (git bisect between 81c536b185
+and 4810cde624), which made instantiate_template expand the unsubstituted
+trailing return type together with the body; why the fold fails after that
+is not analysed yet.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
