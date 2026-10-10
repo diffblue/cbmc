@@ -1,0 +1,23 @@
+KNOWNBUG libcxx
+tuple_convert.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ converted: SUCCESS$
+^\[main\.assertion\.2\] line \d+ from forward_as_tuple: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+--
+libc++ (LLVM 18) <tuple>: `std::tuple<int> c(std::forward_as_tuple(3))'
+verifies, but CBMC also tries tuple<int>'s element-wise constructor
+tuple(_Up &&...) with _Up = tuple<int &&> &, whose
+_EnableUTypesCtor<_Up...> constraint (is_constructible<int, tuple<int &&>
+&>) should remove it; __tuple_impl's body for it (tuple:469) is dropped.
+Not reduced yet; header-free analogues of the deduction and the
+constructor's forwarding reference behave (CBMC deduces _Up correctly for
+a user-written class).  clang++ 18 -stdlib=libc++ accepts this program, and
+it fails only its WRONG assertion.
