@@ -866,9 +866,34 @@ void cpp_typecheckt::typecheck_type(typet &type)
     // ([expr.prim.fold]/3).  N>=2 (which requires replicated `$k`
     // parameters not yet present at this point) is left to the body
     // pass.
-    if(template_map.pack_size_map.size() == 1)
+    // The pack is the one of the template whose declaration is being
+    // checked (the current template scope); a function template
+    // declaration seeds an empty-pack entry for its own pack
+    // (typecheck_function_template), so entries of other templates may be
+    // present too and must not block the reduction.
+    std::optional<std::size_t> scope_pack_n;
     {
-      const std::size_t pack_n = template_map.pack_size_map.begin()->second;
+      const std::string prefix = id2string(cpp_scopes.current_scope().prefix);
+      std::size_t matches = 0;
+      for(const auto &ps : template_map.pack_size_map)
+      {
+        const std::string id = id2string(ps.first);
+        if(
+          !prefix.empty() && id.compare(0, prefix.size(), prefix) == 0 &&
+          id.find("::", prefix.size()) == std::string::npos)
+        {
+          ++matches;
+          scope_pack_n = ps.second;
+        }
+      }
+      if(matches != 1)
+        scope_pack_n.reset();
+      if(!scope_pack_n.has_value() && template_map.pack_size_map.size() == 1)
+        scope_pack_n = template_map.pack_size_map.begin()->second;
+    }
+    if(scope_pack_n.has_value())
+    {
+      const std::size_t pack_n = *scope_pack_n;
       const irep_idt fold_id_binary{"cpp_binary_fold"};
       const irep_idt fold_id_left{"cpp_left_fold"};
       const irep_idt fold_id_right{"cpp_right_fold"};
@@ -979,11 +1004,8 @@ void cpp_typecheckt::typecheck_type(typet &type)
           // replaced by an already-typechecked nondet of the k-th
           // element type, so the operator tree typechecks to the
           // fold's result type and the placeholder values are
-          // discarded with the decltype expression.  (Value-category
-          // caveat: the placeholders are prvalues; a pattern whose
-          // decltype hinges on the parameter's lvalueness would get T
-          // rather than T& -- acceptable for the arithmetic fold
-          // shapes of libc++'s __bind_back/ranges chain.)
+          // discarded with the decltype expression.  They are lvalues,
+          // like the named parameters they stand for.
           const auto pack_args_it = [&]()
           {
             for(auto it = template_map.pack_args_map.begin();
@@ -1003,10 +1025,20 @@ void cpp_typecheckt::typecheck_type(typet &type)
           {
             if(!base.empty())
               return;
+            // the function parameter pack: a simple name in the pattern
+            // that names nothing in scope -- the parameters are not
+            // declared while the trailing-return-type is checked, whereas
+            // a callee (`g' in `(g(a) + ...)') is found
             if(
               n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
-              n.get_sub().front().id() == ID_name)
+              n.get_sub().front().id() == ID_name &&
+              cpp_scopes.current_scope()
+                .lookup(
+                  n.get_sub().front().get(ID_identifier), cpp_scopet::RECURSIVE)
+                .empty())
+            {
               base = n.get_sub().front().get(ID_identifier);
+            }
             for(const auto &sn : n.get_sub())
               find_base(sn);
             for(const auto &ns : n.get_named_sub())
@@ -1025,8 +1057,14 @@ void cpp_typecheckt::typecheck_type(typet &type)
             {
               typet elem_t = t;
               typecheck_type(elem_t);
-              exprt placeholder =
-                side_effect_expr_nondett{elem_t, source_locationt{}};
+              // N5008 [expr.prim.id.unqual]/3: a named function parameter
+              // is an lvalue of its (referenced) type, also when declared
+              // as a forwarding or rvalue reference
+              if(is_reference(elem_t) || is_rvalue_reference(elem_t))
+                elem_t = to_reference_type(elem_t).base_type();
+              symbol_exprt lvalue_placeholder{irep_idt{}, elem_t};
+              lvalue_placeholder.set(ID_C_lvalue, true);
+              exprt placeholder = lvalue_placeholder;
               already_typechecked_exprt::make_already_typechecked(placeholder);
               n = placeholder;
               return;
