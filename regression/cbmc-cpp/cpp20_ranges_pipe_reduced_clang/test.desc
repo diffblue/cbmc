@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+clang++ 18 accepts this program (it has no assertion: only type-checking
+matters).  Not proven to share the cause of
+cpp20_invoke_result_bind_back_libcxx, but it ends in the same operator| /
+invoke_result_t chain.
