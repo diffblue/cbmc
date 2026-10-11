@@ -1139,6 +1139,14 @@ void cpp_typecheckt::typecheck_type(typet &type)
       reduce(e);
     }
 
+    // N5008 [temp.variadic]/5: a call-argument pack expansion over a pack
+    // of the enclosing class template (`-> decltype(g(I...))' in a member
+    // of `template <unsigned long... I> struct S'): the member's type is
+    // checked here directly, with only the pack's first element bound to
+    // its name, so expand the template packs (not function parameter
+    // packs, expanded with the parameters) first
+    template_map.expand_call_argument_packs(e, /*only_nontype=*/true);
+
     // recorded by the parser on a parenthesized id-expression / member
     // access; the type check may rebuild the node, so read it first
     const bool parenthesized = e.get_bool(ID_C_parenthesized);
