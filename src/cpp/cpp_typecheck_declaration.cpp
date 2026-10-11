@@ -931,7 +931,9 @@ void cpp_typecheckt::convert_non_template_declaration(
               static_cast<const cpp_declarationt &>(p);
             if(pdecl.declarators().empty())
               continue;
-            typet ptype = pdecl.type();
+            // N5008 [dcl.meaning.general]/1: the decl-specifier type
+            // modified by the declarator (`X *p' declares a pointer)
+            typet ptype = pdecl.declarators().front().merge_type(pdecl.type());
             typecheck_type(ptype);
             // Guard against malformed parameter declarators that
             // reach this path through template instantiation
