@@ -13838,3 +13838,34 @@ cpp20_ranges_basic_libcxx OK.
 
 Suites W58: cbmc-cpp 1772 exit 0, cpp 246, regression/cbmc 1203,
 goto-instrument 298, contracts 178; lint 0; -K: ranges_basic_libcxx OK.
+
+## Round 173: KNOWNBUG inventory, then fixes
+
+- Inventory: only cpp20_ranges_basic_libcxx was a KNOWNBUG; added 10
+  (c21ed404f4..a43c7e92ec).  Probing the noted limitations found a
+  regression (trailing-return fold, bisected to d568a30139 in a worktree
+  build at /tmp/r165/bis) and the inheriting-constructor bug (from a cvise
+  reduction of invoke_result_t that drifted).
+- 9bd185b314: [class.default.ctor]/2.3 deletion decided at declaration
+  (has_subobject_without_default_constructor); exposed because 2a77456b0d
+  defers implicit definitions, visible once the next fix landed.
+- 524031fe69: `using B::B' no longer sets found_ctor; POD-like classes with
+  inherited constructors get the implicit default ctor ([dcl.init.aggr]/1.1).
+- 5a58648c7a: trailing-return fold reduction picks the pack of the current
+  template scope (stale empty-pack entries of other templates blocked it);
+  lvalue placeholders; callee names not taken for the pack.
+- ef8def0b20: scanner token for using_if_exists (C grammar ignores it).
+  ansi-c suite unchanged (clang_target only, as on W43).
+- 68b4280ee8: per-argument cv_distance (cv_per_argument) so the
+  [over.ics.rank]/3.2.3 vs 3.2.6 conflict is ambiguous
+  ([over.match.best.general]/2.1).
+- cvise of cpp20_ranges_basic_libcxx (kb_rng, 6 h, 2 jobs): 129 lines,
+  clang-only builtins -> cpp20_ranges_pipe_reduced_clang.  Lesson: a
+  "interesting" substring check matched "not interesting" in my dd script.
+- Remaining KNOWNBUGs: four nested instantiations (heuristic bound), the
+  invoke_result_t / range-pipe chain (3 tests), the two libc++ dropped
+  bodies, duplicate unwinding property ids.
+
+Suites W62: cbmc-cpp 1783 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 298, contracts 178; W61 ansi-c as before; lint 0; each
+commit compiles; -K: 7 KNOWNBUGs OK.
