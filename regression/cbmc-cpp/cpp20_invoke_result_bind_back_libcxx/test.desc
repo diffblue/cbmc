@@ -1,6 +1,6 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
---cpp20 --stdlib libc++
+--cpp20 --stdlib libc++ --object-bits 12
 ^\[main\.assertion\.1\] line \d+ invoke_result_t: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
@@ -10,11 +10,9 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-libc++ (LLVM 18): std::invoke_result_t of a std::__bind_back closure
-(N5008 [meta.trans.other], [func.require]) -- "symbol 'R' is unknown",
-although calling the closure works (cpp20_libcxx_header_drops/bind_back.cpp).
-The smallest known part of cpp20_ranges_basic_libcxx.  A cvise reduction
-drifted to cpp11_inheriting_constructors_keep_implicit_default_constructor
-(the reduced __perfect_forward_impl lost its constructors), so this one is
-not reduced yet.  clang++ 18 -stdlib=libc++ accepts this program, and it
-fails only its WRONG assertion.
+libc++ (LLVM 18): std::invoke_result_t of a std::__bind_back closure (N5008
+[meta.trans.other], [func.require]).  Fixed by
+cpp11_class_pack_expanded_in_member_trailing_return and
+cpp11_namespace_scope_decltype_deduces_full_pack (found by cvise
+reductions).  clang++ 18 -stdlib=libc++ accepts this program, and it fails
+only its WRONG assertion.
