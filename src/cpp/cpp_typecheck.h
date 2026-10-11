@@ -994,6 +994,7 @@ protected:
     bool has_body,
     bool tag_only_declaration);
 
+  bool has_subobject_without_default_constructor(const struct_typet &type);
   void expand_trailing_return_packs(
     typet &final_type,
     const std::map<irep_idt, std::size_t> &pack_counts);
