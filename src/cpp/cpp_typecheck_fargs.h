@@ -75,11 +75,16 @@ public:
     build(function_call);
   }
 
+  /// \param cv_per_argument: if given, receives each argument's share of
+  ///   \p cv_distance (the reference-binding tie-breakers of
+  ///   [over.ics.rank]/3.2.3 and /3.2.6), for the per-argument comparison of
+  ///   [over.match.best.general]/2.1
   bool match(
     const code_typet &code_type,
     unsigned &distance,
     cpp_typecheckt &cpp_typecheck,
-    unsigned *cv_distance = nullptr) const;
+    unsigned *cv_distance = nullptr,
+    std::vector<unsigned> *cv_per_argument = nullptr) const;
 
   void add_object(const exprt &expr)
   {
