@@ -1,7 +1,7 @@
 CORE
 main.cpp
 --unwindset 'ns::fill(ptr_signed_int,struct_tag(identifier=ns::tag-it)).0:1' --unwinding-assertions --partial-loops
-^\[fill\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
+^\[ns::fill\(ptr_signed_int,struct_tag\(identifier=ns::tag-it\)\)\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
