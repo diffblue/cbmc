@@ -192,6 +192,7 @@ int yyansi_cerror(const std::string &error);
 %token TOK_GCC_ATTRIBUTE_DESTRUCTOR "destructor"
 %token TOK_GCC_ATTRIBUTE_FALLTHROUGH "fallthrough"
 %token TOK_GCC_ATTRIBUTE_USED "used"
+%token TOK_GCC_ATTRIBUTE_USING_IF_EXISTS "using_if_exists"
 %token TOK_GCC_LABEL   "__label__"
 %token TOK_MSC_ASM     "__asm"
 %token TOK_MSC_BASED   "__based"
@@ -1769,6 +1770,11 @@ gcc_attribute:
         | TOK_GCC_ATTRIBUTE_FALLTHROUGH
         {
           // attribute ignored
+          init($$);
+        }
+        | TOK_GCC_ATTRIBUTE_USING_IF_EXISTS
+        {
+          // clang's using_if_exists applies to C++ using-declarations only
           init($$);
         }
         | gcc_type_attribute
