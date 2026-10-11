@@ -1,14 +1,13 @@
-KNOWNBUG
+CORE
 main.cpp
---cpp20
+--cpp20 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-clang++ 18 accepts this program (it has no assertion: only type-checking
-matters).  Not proven to share the cause of
-cpp20_invoke_result_bind_back_libcxx, but it ends in the same operator| /
-invoke_result_t chain.
+Reduced code: only type-checking matters (its loop does not terminate), so
+the goto program is shown, not verified.  The hidden-friend range | closure
+operator is selected since cpp20_constrained_hidden_friend_per_specialization
+was fixed.  clang++ 18 accepts this program.

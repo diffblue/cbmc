@@ -1939,6 +1939,21 @@ std::string cpp_typecheckt::class_template_identifier(
         for(const auto &ns : node.get_named_sub())
         {
           const std::string key = id2string(ns.first);
+          // N5008 [temp.friend]/9: a friend template whose constraint
+          // depends on an enclosing template's parameter is a distinct
+          // template in each specialization of the enclosing class.  The
+          // enclosing argument is substituted into the clause as a tag type
+          // (cpp_typecheck_compound_type) in a template argument's `type';
+          // render it, it is stable.
+          if(
+            ns.first == ID_type &&
+            (ns.second.id() == ID_struct_tag ||
+             ns.second.id() == ID_union_tag || ns.second.id() == ID_c_enum_tag))
+          {
+            rendering += "type:" + id2string(ns.second.id()) + "=" +
+                         id2string(ns.second.get(ID_identifier)) + ",";
+            continue;
+          }
           if(key.empty() || key[0] == '#' || ns.first == ID_type)
             continue;
           rendering += key + ':';

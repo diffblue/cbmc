@@ -4,7 +4,7 @@
 // operator|(_View &&, _Closure) must be selected; its body's invoke(...)
 // computes its return type through invoke_result_t on a __bind_back
 // closure (compare cpp20_invoke_result_bind_back_libcxx).  CBMC instead
-// takes the closure | closure overload and converts arr to a closure.
+// took the closure | closure overload and converted arr to a closure.
 // Reduced code: only its well-formedness matters, not its meaning.  Uses
 // clang's __make_integer_seq builtin (and is not accepted by g++).
 template <class _Tp, _Tp __v> struct integral_constant {
