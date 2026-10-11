@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ base without constructors: SUCCESS$
@@ -10,6 +10,8 @@ main.cpp
 --
 ^warning: ignoring
 --
-Fails on bin53 too.  The reduced libc++ case reports the same error for
-__bind_back_t() inside a decltype.  g++ 13 and clang++ 18 accept this
-program, and it fails only its WRONG assertion.
+The inheriting using-declaration set found_ctor, which suppressed the
+implicit default constructor, and a POD-like class got none at all; now
+neither does ([dcl.init.aggr]/1.1: such a class is not an aggregate).  g++
+13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
