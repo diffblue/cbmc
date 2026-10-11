@@ -13869,3 +13869,27 @@ goto-instrument 298, contracts 178; lint 0; -K: ranges_basic_libcxx OK.
 Suites W62: cbmc-cpp 1783 exit 0, cpp 246, regression/cbmc 1203,
 goto-instrument 298, contracts 178; W61 ansi-c as before; lint 0; each
 commit compiles; -K: 7 KNOWNBUGs OK.
+
+## Round 174: the views::take chain, layer by layer
+
+- b13c374c53: unwinding property ids use the goto function identifier
+  (`a::fill(signed_int).unwind.0'); C ids unchanged; 2 cbmc-cpp descs that
+  matched `fill.unwind.0' updated.  contracts-dfcc's 2 failures
+  (array_struct_smt*) are identical on W62 and W63.
+- fd3a278f0d: class template packs in a member's trailing-return
+  `decltype(g(I...))' (typecheck_type: expand_call_argument_packs,
+  only_nontype).  From a cvise of the invoke_result_t KNOWNBUG.
+- 901f847735: a directly deduced pack's placeholder is expanded outside
+  every function body too (namespace-scope `decltype(get<0>(tup<int,
+  char>()))').  invoke_result_t KNOWNBUG -> CORE.  (A first guess --
+  removing typecheck_function_template's seeded empty-pack entries -- had
+  no effect and was reverted.)
+- 8c7facf5a7: [temp.friend]/9, constrained hidden friends of different
+  specializations had one identifier (requires-clause rendering skipped
+  `type' sub-nodes).  cpp20_ranges_pipe_reduced_clang -> CORE.
+- Next: take_view::end() const types as __sentinel (unsized branch) once
+  the view was made through operator|; begin() const is int *.  Direct
+  checks of sized_range etc. pass.  cvise kb_end running.
+
+Suites W66: cbmc-cpp 1786 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 298, contracts 178; lint 0.
