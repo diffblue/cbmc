@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ X \*: SUCCESS$
+^\[main\.assertion\.2\] line \d+ const X \*: SUCCESS$
+^\[main\.assertion\.3\] line \d+ deduced X: SUCCESS$
+^\[main\.assertion\.4\] line \d+ value: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+guess_function_template_args decayed an array argument only when P was a
+bare template parameter.  g++ 13 and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

@@ -11321,6 +11321,22 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
             arg_actual_type =
               pointer_type(to_array_type(arg_actual_type).element_type());
         }
+        else if(!is_reference(arg_type) && !is_rvalue_reference(arg_type))
+        {
+          // N5008 [temp.deduct.call]/2.1: for any non-reference P (`X *',
+          // `const X *', `box<X> *'), an array argument A is replaced by
+          // the pointer from the array-to-pointer conversion; `f(arr)'
+          // with `template <class X> int f(X *)' deduces X = int
+          typet adjusted = arg_actual_type;
+          if(is_reference(adjusted))
+            adjusted = to_reference_type(adjusted).base_type();
+          adjusted.remove(ID_C_reference);
+          if(adjusted.id() == ID_array)
+          {
+            arg_actual_type =
+              pointer_type(to_array_type(adjusted).element_type());
+          }
+        }
         if(is_forwarding_ref && is_rvalue_reference(arg_type))
         {
           // N5008 [expr.type]/1: an expression of type `reference to T'
