@@ -306,7 +306,8 @@ protected:
     const exprt &expr,
     unsigned &args_distance,
     const cpp_typecheck_fargst &fargs,
-    unsigned *cv_distance = nullptr);
+    unsigned *cv_distance = nullptr,
+    std::vector<unsigned> *cv_per_argument = nullptr);
 
   void resolve_argument(
     exprt &argument,

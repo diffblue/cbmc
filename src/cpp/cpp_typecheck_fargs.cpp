@@ -408,11 +408,17 @@ bool cpp_typecheck_fargst::match(
   const code_typet &code_type,
   unsigned &distance,
   cpp_typecheckt &cpp_typecheck,
-  unsigned *cv_distance) const
+  unsigned *cv_distance,
+  std::vector<unsigned> *cv_per_argument) const
 {
   distance = 0;
+  unsigned local_cv_distance = 0;
+  if(cv_distance == nullptr && cv_per_argument != nullptr)
+    cv_distance = &local_cv_distance;
   if(cv_distance != nullptr)
     *cv_distance = 0;
+  if(cv_per_argument != nullptr)
+    cv_per_argument->clear();
 
   exprt::operandst ops = operands;
   // The trailing `@most_derived' flag of a constructor or destructor of a
@@ -486,6 +492,19 @@ bool cpp_typecheck_fargst::match(
 
     const exprt &operand = *it;
     typet type = parameter.type();
+    const unsigned cv_before = cv_distance != nullptr ? *cv_distance : 0;
+    // record this argument's tie-breaker share however the loop body ends
+    struct cv_recordert
+    {
+      std::vector<unsigned> *out;
+      const unsigned *cv;
+      unsigned before;
+      ~cv_recordert()
+      {
+        if(out != nullptr && cv != nullptr)
+          out->push_back(*cv - before);
+      }
+    } cv_recorder{cv_per_argument, cv_distance, cv_before};
 
 #if 0
     // unclear, todo

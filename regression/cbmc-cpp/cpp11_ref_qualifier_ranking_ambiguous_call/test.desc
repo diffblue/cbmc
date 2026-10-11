@@ -1,11 +1,14 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=6$
 ^SIGNAL=0$
 ^CONVERSION ERROR$
+does not uniquely resolve
 --
 ^warning: ignoring
 --
-g++ 13 ("call of overloaded 'f(int&)' is ambiguous") and clang++ 18 reject
-this program; a correct front end reports the ambiguity.
+The cv_distance tie-breaker summed over the arguments; now one candidate
+dominates another only if it is not worse for any argument (cv_per_argument
+from fargs.match).  g++ 13 ("call of overloaded 'f(int&)' is ambiguous") and
+clang++ 18 reject this program.

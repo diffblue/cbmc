@@ -2,8 +2,8 @@
 // `S().f(x)', f() && binds the rvalue object better (3.2.3) and
 // f(int &) binds x better (3.2.6, less cv-qualified); neither candidate is
 // better for every argument, so the call is ambiguous and the program is
-// ill-formed.  CBMC ranks 3.2.3 as a cv tie-breaker summed over the
-// arguments (fargs.match's cv_distance) and silently picks one.
+// ill-formed.  CBMC ranked 3.2.3 as a cv tie-breaker summed over the
+// arguments (fargs.match's cv_distance) and silently picked one.
 struct S
 {
   int f(int &) const &
