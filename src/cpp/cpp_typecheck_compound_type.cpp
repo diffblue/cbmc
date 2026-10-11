@@ -4480,8 +4480,11 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           }
           else
           {
-            // Import base class constructors as derived class constructors
-            found_ctor = true;
+            // Import base class constructors as derived class constructors.
+            // N5008 [class.default.ctor]/1, [namespace.udecl]/2: they are
+            // inherited, not user-declared constructors of this class, so
+            // they do not suppress its implicit default constructor
+            // (found_ctor stays as it is).
             // [dcl.init.aggr]/1 (C++17): a class with inherited constructors is
             // not an aggregate; record this so cpp_constructor does not fall
             // back to aggregate initialization (which would drop the
@@ -4677,7 +4680,10 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // (we have to do the destructor before building the virtual tables,
   //  as the destructor may be virtual!)
 
-  if((found_ctor || !cpp_is_pod(symbol.type)) && !found_dtor)
+  if(
+    (found_ctor || !cpp_is_pod(symbol.type) ||
+     symbol.type.get_bool("has_inherited_constructor")) &&
+    !found_dtor)
   {
     // build declaration
     cpp_declarationt dtor;
@@ -4710,9 +4716,14 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   // inherited constructor, everything else default-initializes), so
   // synthesizing the defaulted default constructor models it precisely.  The
   // class's own default constructor, if any, takes precedence.
+  // [dcl.init.aggr]/1.1: a class with inherited constructors is not an
+  // aggregate, so even a POD-like one is initialized by its constructors
+  // and needs the implicitly declared default constructor
+  // ([namespace.udecl]/2: `using B::B;' declares none of its own).
   if(
     (!found_ctor || (inherited_default_ctor && !found_own_default_ctor)) &&
-    !cpp_is_pod(symbol.type))
+    (!cpp_is_pod(symbol.type) ||
+     symbol.type.get_bool("has_inherited_constructor")))
   {
     // C++11: the default constructor is implicitly deleted if any
     // non-static data member is a reference type.
