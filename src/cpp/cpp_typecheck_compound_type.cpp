@@ -3308,6 +3308,74 @@ bool cpp_typecheckt::inherited_constructor_is_hidden(
   return false;
 }
 
+/// N5008 [class.default.ctor]/2.3: whether a default constructor of class
+/// type \p type would find no usable candidate.  A class whose
+/// constructors were all removed (none is left, but it declares some) has
+/// none; one with a constructor template, or with no constructor at all
+/// (implicitly declared, or an aggregate), is assumed to have one.
+static bool class_lacks_default_constructor(const struct_typet &type)
+{
+  if(type.get_bool("has_template_constructor"))
+    return false;
+  bool any_ctor = false;
+  for(const auto &c : type.components())
+  {
+    if(c.get_bool(ID_from_base) || c.type().id() != ID_code)
+      continue;
+    const code_typet &ct = to_code_type(c.type());
+    if(ct.return_type().id() != ID_constructor)
+      continue;
+    any_ctor = true;
+    if(c.get(ID_access) == ID_noaccess)
+      continue;
+    bool all_defaulted = true;
+    for(std::size_t i = 1; i < ct.parameters().size(); ++i)
+    {
+      const auto &p = ct.parameters()[i];
+      if(p.default_value().is_nil() && p.get_base_name() != "@most_derived")
+        all_defaulted = false;
+    }
+    if(all_defaulted)
+      return false;
+  }
+  return any_ctor;
+}
+
+bool cpp_typecheckt::has_subobject_without_default_constructor(
+  const struct_typet &type)
+{
+  for(const auto &b : type.bases())
+  {
+    if(b.type().id() != ID_struct_tag)
+      continue;
+    const symbolt &base_sym = lookup(to_struct_tag_type(b.type()));
+    if(
+      base_sym.type.id() == ID_struct &&
+      class_lacks_default_constructor(to_struct_type(base_sym.type)))
+    {
+      return true;
+    }
+  }
+  for(const auto &c : type.components())
+  {
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.type().id() != ID_struct_tag ||
+      c.find(ID_C_default_value).is_not_nil() || c.get_bool(ID_C_is_padding))
+    {
+      continue;
+    }
+    const symbolt &m_sym = lookup(to_struct_tag_type(c.type()));
+    if(
+      m_sym.type.id() == ID_struct &&
+      class_lacks_default_constructor(to_struct_type(m_sym.type)))
+    {
+      return true;
+    }
+  }
+  return false;
+}
+
 void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 {
   // A typedef/alias declaration defers the elaboration of the class template
@@ -4661,7 +4729,19 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       }
     }
 
-    if(!has_reference_member)
+    // [class.default.ctor]/2.3: it is also defined as deleted when a
+    // direct base, or a non-static data member of class type without a
+    // default member initializer, has no usable default constructor.
+    // Deletion is a property of the declaration; the definition is only
+    // made when odr-used ([dcl.fct.def.default]/5), so decide it here
+    // (`struct D2 : B {}' with only `B(int)': __is_constructible(D2) is
+    // false).  Not declaring the constructor is how the deletion is
+    // represented, as for a reference member above.
+    const bool subobject_without_default_ctor =
+      !has_reference_member && symbol.type.id() == ID_struct &&
+      has_subobject_without_default_constructor(to_struct_type(symbol.type));
+
+    if(!has_reference_member && !subobject_without_default_ctor)
     {
       // it's public!
       exprt cpp_public("cpp-public");
