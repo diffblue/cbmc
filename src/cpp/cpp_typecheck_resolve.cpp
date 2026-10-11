@@ -10739,7 +10739,10 @@ bool cpp_typecheck_resolvet::substitute_function_type(
               continue;
             }
           }
-          typet ptype = pdecl.type();
+          // N5008 [dcl.meaning.general]/1: the parameter's type is the
+          // decl-specifier type modified by its declarator (`X *p' is a
+          // pointer); the decl-specifier type alone made `p' an `X'
+          typet ptype = pdecl.declarators().front().merge_type(pdecl.type());
           cpp_typecheck.typecheck_type(ptype);
           const auto &pname_sub = pdecl.declarators().front().name().get_sub();
           if(pname_sub.empty())
