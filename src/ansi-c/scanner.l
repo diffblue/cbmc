@@ -2031,6 +2031,9 @@ enable_or_disable ("enable"|"disable")
 "used" |
 "__used__"          { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_USED; }
 
+"using_if_exists" |
+"__using_if_exists__" { BEGIN(GCC_ATTRIBUTE3); loc(); return TOK_GCC_ATTRIBUTE_USING_IF_EXISTS; }
+
 {ws}                { /* ignore */ }
 {newline}           { /* ignore */ }
 {identifier}        { BEGIN(GCC_ATTRIBUTE4); }

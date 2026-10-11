@@ -25,6 +25,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <cctype>
 #include <cstring>
+#include <functional>
 #include <map>
 #include <set>
 
@@ -1258,11 +1259,27 @@ bool Parser::rUsing(cpp_usingt &cpp_using)
     cpp_using.set(ID_ellipsis, true);
   }
 
-  // We will eventually need to record this attribute as Clang's
-  // __using_if_exists__ affects type checking.
-  typet discard;
-  if(!optAttribute(discard))
+  // Clang's __attribute__((using_if_exists)): a using-declaration naming
+  // an entity that does not exist is ignored (libc++'s C library
+  // wrappers); record it for the type checker
+  typet attributes;
+  if(!optAttribute(attributes))
     return false;
+  std::function<bool(const typet &)> has_using_if_exists =
+    [&has_using_if_exists](const typet &a)
+  {
+    if(a.id() == "using_if_exists")
+      return true;
+    if(a.id() == ID_merged_type)
+    {
+      for(const auto &sub : to_type_with_subtypes(a).subtypes())
+        if(has_using_if_exists(sub))
+          return true;
+    }
+    return false;
+  };
+  if(has_using_if_exists(attributes))
+    cpp_using.set("using_if_exists", true);
 
   if(lex.get_token(tk)!=';')
     return false;
@@ -3658,6 +3675,14 @@ bool Parser::rGCCAttribute(typet &t)
   case TOK_GCC_ATTRIBUTE_DESTRUCTOR:
     {
       typet attr(ID_destructor);
+      set_location(attr, tk);
+      merge_types(attr, t);
+      break;
+    }
+
+    case TOK_GCC_ATTRIBUTE_USING_IF_EXISTS:
+    {
+      typet attr(irep_idt{"using_if_exists"});
       set_location(attr, tk);
       merge_types(attr, t);
       break;

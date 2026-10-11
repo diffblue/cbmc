@@ -133,6 +133,10 @@ void cpp_typecheckt::convert(cpp_usingt &cpp_using)
     const std::string file = id2string(loc.get_file());
     if(is_system_header_file(file))
       return;
+    // clang's __attribute__((using_if_exists)): the declaration is ignored
+    // when the name does not exist; only a later use is an error
+    if(cpp_using.get_bool("using_if_exists"))
+      return;
     error().source_location = loc;
     error() << "using " << (using_directive ? "namespace" : "identifier")
             << " '" << base_name << "' not found" << eom;
