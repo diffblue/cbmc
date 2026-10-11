@@ -1,7 +1,7 @@
 CORE
 main.cpp
 --unwindset 'fill<signed_int,3>(ptr_signed_int).0:1' --unwinding-assertions --partial-loops
-^\[fill\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
+^\[fill<signed_int,3>\(ptr_signed_int\)\.unwind\.0\] line \d+ unwinding assertion loop 0: FAILURE$
 ^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
