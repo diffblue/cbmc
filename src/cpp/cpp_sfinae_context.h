@@ -90,6 +90,14 @@ class cpp_typecheckt;
 class sfinae_contextt
 {
 public:
+  /// Whether diagnostics inside SFINAE contexts and failed system-header
+  /// items are shown instead of being discarded: set the environment
+  /// variable CBMC_CPP_SHOW_SUPPRESSED (to anything but "" or "0").  A
+  /// debugging aid for the C++ front end; it does not change results, as
+  /// the error count is rolled back as usual.  Expect many messages:
+  /// substitution failures are routine in library code.
+  static bool show_suppressed_diagnostics();
+
   explicit sfinae_contextt(cpp_typecheckt &_typecheck);
   ~sfinae_contextt();
 
