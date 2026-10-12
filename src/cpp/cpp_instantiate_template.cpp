@@ -567,6 +567,55 @@ static void reduce_single_element_folds(irept &node)
   }
 }
 
+/// N5008 [expr.prim.fold]/1-3, [temp.variadic]/5: with SEVERAL template
+/// parameter packs, a fold in a function template's \p body may be over any
+/// of them -- `(100 + ... + Is)' in `template <class F, class... Vs,
+/// size_t... Is> f(seq<Is...>)'.  The function-parameter-pack expansion
+/// sees only the first pack (or the function parameter pack); expand the
+/// folds over every pack of \p template_type whose elements the deduction
+/// recorded in the template map, so that none reaches the C type-checker's
+/// residual-fold fallback (which makes it `true').
+void cpp_typecheckt::expand_folds_over_template_packs(
+  irept &body,
+  const template_typet &template_type)
+{
+  if(body.is_nil())
+    return;
+  const auto &params = template_type.template_parameters();
+  std::size_t n_packs = 0;
+  for(const auto &tp : params)
+    if(tp.get_bool(ID_ellipsis))
+      ++n_packs;
+  if(n_packs < 2)
+    return;
+  for(const auto &tp : params)
+  {
+    if(!tp.get_bool(ID_ellipsis))
+      continue;
+    const irep_idt pid =
+      tp.id() == ID_type ? tp.type().get(ID_identifier) : tp.get(ID_identifier);
+    std::vector<exprt> elements;
+    const auto pa_it = template_map.pack_args_map.find(pid);
+    const auto pe_it = template_map.pack_expr_map.find(pid);
+    const auto ps_it = template_map.pack_size_map.find(pid);
+    if(pa_it != template_map.pack_args_map.end())
+    {
+      for(const auto &t : pa_it->second)
+        elements.push_back(exprt(ID_type, t));
+    }
+    else if(pe_it != template_map.pack_expr_map.end())
+      elements = pe_it->second;
+    else if(ps_it == template_map.pack_size_map.end() || ps_it->second != 0)
+      continue; // elements unknown
+    const std::string pack_str = id2string(pid);
+    const auto pos = pack_str.rfind("::");
+    expand_folds_over_pack(
+      body,
+      pos != std::string::npos ? pack_str.substr(pos + 2) : pack_str,
+      elements);
+  }
+}
+
 /// A unary right fold `(pat op ...)` over N elements becomes the
 /// right-associated tree `pat0 op (pat1 op ... op patN-1)`, a unary left fold
 /// `(... op pat)` the left-associated tree; a binary fold is seeded by its
@@ -7898,6 +7947,7 @@ skip_pack_removal_ft:
           // the constant eagerly while deferring the runtime (GOTO) definition
           // to
           // the queue; on failure we already fall back to `add_method_body`.
+          expand_folds_over_template_packs(ws.value, template_type);
           try
           {
             convert_function(ws);
@@ -9831,6 +9881,12 @@ skip_pack_removal_ft:
         pos != std::string::npos ? pack_str.substr(pos + 2) : pack_str,
         pack_arguments);
     }
+  }
+
+  if(has_template_pack && !new_decl.declarators().empty())
+  {
+    expand_folds_over_template_packs(
+      new_decl.declarators()[0].value(), template_type);
   }
 
   // Per [temp.variadic]/7: remove empty pack expansions
