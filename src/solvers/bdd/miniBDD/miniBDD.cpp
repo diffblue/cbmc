@@ -475,7 +475,11 @@ operator==(const mini_bdd_mgrt::reverse_keyt &y) const
 std::size_t mini_bdd_mgrt::reverse_key_hasht::
 operator()(const mini_bdd_mgrt::reverse_keyt &key) const
 {
-  // mix var, low and high into a single hash
+  // Mix var, low and high into a single hash. The multiplier
+  // 0x9e3779b1 is the 32-bit approximation of 2^32 / phi (the golden
+  // ratio); multiplying by it spreads the bits of the operands, the same
+  // constant and scheme used by Boost's hash_combine and Knuth's
+  // multiplicative hashing.
   std::size_t h = key.var;
   h = h * 0x9e3779b1 + key.low;
   h = h * 0x9e3779b1 + key.high;
