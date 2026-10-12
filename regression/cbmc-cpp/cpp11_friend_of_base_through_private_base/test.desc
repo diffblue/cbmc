@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^EXIT=6$
@@ -8,5 +8,5 @@ main.cpp
 ^warning: ignoring
 --
 N5008 [class.access.base]/4, /5.4: the base through which a friend of B
-names B's member must be accessible at the point of use.  The check of
-/5.4 (base_publicly_accessible) accepts the private base here.
+names B's member must be accessible at the point of use.  A friend body no
+longer runs with access checking disabled.
