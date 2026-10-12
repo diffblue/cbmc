@@ -339,3 +339,50 @@ SCENARIO("miniBDD", "[core][solver][miniBDD]")
     }
   }
 }
+
+SCENARIO("miniBDD restrict", "[core][solver][miniBDD]")
+{
+  GIVEN("A BDD for (x & y) | z")
+  {
+    mini_bdd_mgrt mgr;
+    mini_bddt x = mgr.Var("x");
+    mini_bddt y = mgr.Var("y");
+    mini_bddt z = mgr.Var("z");
+    mini_bddt f = (x & y) | z;
+
+    // BDDs are canonical, hence node-number equality is semantic equality
+    REQUIRE(restrict(f, x.var(), true).node_number() == (y | z).node_number());
+    REQUIRE(restrict(f, x.var(), false).node_number() == z.node_number());
+    REQUIRE(restrict(f, z.var(), true).is_true());
+    REQUIRE(restrict(f, z.var(), false).node_number() == (x & y).node_number());
+    REQUIRE(exists(f, y.var()).node_number() == (x | z).node_number());
+    REQUIRE(substitute(f, z.var(), !x).node_number() == (y | !x).node_number());
+  }
+
+  GIVEN("A parity BDD, which has linear size but exponentially many paths")
+  {
+    mini_bdd_mgrt mgr;
+    const std::size_t n = 64;
+    std::vector<mini_bddt> vars;
+    for(std::size_t i = 0; i < n; ++i)
+      vars.push_back(mgr.Var("x" + std::to_string(i)));
+
+    mini_bddt parity = mgr.False();
+    mini_bddt parity_prefix = mgr.False();
+    for(std::size_t i = 0; i < n; ++i)
+    {
+      parity = parity ^ vars[i];
+      if(i + 1 < n)
+        parity_prefix = parity;
+    }
+
+    // Without a computed table this would visit 2^63 paths.
+    REQUIRE(
+      restrict(parity, vars.back().var(), false).node_number() ==
+      parity_prefix.node_number());
+    REQUIRE(
+      restrict(parity, vars.back().var(), true).node_number() ==
+      (!parity_prefix).node_number());
+    REQUIRE(exists(parity, vars.back().var()).is_true());
+  }
+}

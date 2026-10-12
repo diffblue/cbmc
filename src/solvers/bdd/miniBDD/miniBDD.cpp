@@ -525,6 +525,18 @@ protected:
   const bool value;
 
   mini_bddt RES(const mini_bddt &u);
+
+  // Memoisation (a.k.a. computed table): a BDD is a DAG whose sub-graphs
+  // are shared, so a plain recursion revisits shared sub-graphs
+  // repeatedly, which is exponential in the worst case. We cache results
+  // keyed on the node number. 'var' and 'value' are fixed for a given
+  // restrictt instance, hence need not be part of the key. Node numbers
+  // are stable keys for as long as the root passed to operator() stays
+  // referenced: every key is a node reachable from that root, so none of
+  // them can be freed and recycled by remove_reference(). Hence, use a
+  // restrictt instance for a single root only (as restrict() does).
+  typedef std::map<unsigned, mini_bddt> Gt;
+  Gt G;
 };
 
 mini_bddt restrictt::RES(const mini_bddt &u)
@@ -536,6 +548,12 @@ mini_bddt restrictt::RES(const mini_bddt &u)
     "restricting variables can only be done in initialized BDDs");
   mini_bdd_mgrt *mgr = u.node->mgr;
 
+  // dynamic programming
+  const unsigned key = u.node_number();
+  Gt::const_iterator G_it = G.find(key);
+  if(G_it != G.end())
+    return G_it->second;
+
   mini_bddt t;
 
   if(u.var() > var)
@@ -544,6 +562,8 @@ mini_bddt restrictt::RES(const mini_bddt &u)
     t = mgr->mk(u.var(), RES(u.low()), RES(u.high()));
   else // u.var()==var
     t = RES(value ? u.high() : u.low());
+
+  G[key] = t;
 
   return t;
 }
