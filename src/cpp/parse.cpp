@@ -12234,19 +12234,22 @@ bool Parser::rFunctionBody(cpp_declaratort &declarator)
   }
   else
   {
-    // this is for the benefit of set_location
+    // this is for the benefit of set_location; a function body may be
+    // nested in another one (a member function of a local class), whose
+    // remaining statements are again in the enclosing function
     const cpp_namet &cpp_name=declarator.name();
+    const irep_idt enclosing_function = current_function;
     current_function=cpp_name.get_base_name();
 
     if(auto body = rCompoundStatement())
       declarator.value() = std::move(*body);
     else
     {
-      current_function.clear();
+      current_function = enclosing_function;
       return false;
     }
 
-    current_function.clear();
+    current_function = enclosing_function;
 
     return true;
   }
