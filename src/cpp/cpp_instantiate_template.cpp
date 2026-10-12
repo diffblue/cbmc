@@ -575,7 +575,7 @@ static void reduce_single_element_folds(irept &node)
 /// a single element the sole substituted pattern.  Every bare reference to
 /// the pack inside the pattern (a type position such as `sizeof(Ts)` or
 /// `__is_same(T, Ts)`, or a value position) is replaced by the element.
-static void expand_folds_over_pack(
+void cpp_typecheckt::expand_folds_over_pack(
   irept &node,
   const std::string &short_name,
   const std::vector<exprt> &pack_args)

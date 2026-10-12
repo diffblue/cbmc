@@ -994,6 +994,12 @@ protected:
     bool has_body,
     bool tag_only_declaration);
 
+  /// Expand the fold-expressions over the pack named \p short_name in
+  /// \p node, for the elements \p pack_args ([expr.prim.fold]/2-3).
+  static void expand_folds_over_pack(
+    irept &node,
+    const std::string &short_name,
+    const std::vector<exprt> &pack_args);
   bool has_subobject_without_default_constructor(const struct_typet &type);
   void expand_trailing_return_packs(
     typet &final_type,
