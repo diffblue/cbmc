@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 visit.cpp
 --cpp20 --stdlib libc++ --object-bits 12
 ^\[main\.assertion\.1\] line \d+ visit: SUCCESS$
@@ -11,13 +11,18 @@ visit.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::visit(F, variant<int, char>): the body of std::visit is
-dropped.  Layers fixed so far: the declaration's default template argument
+libc++ (LLVM 18) std::visit(F, variant<int, char>).  The layers that dropped
+its body: the declaration's default template argument
 (cpp11_default_template_argument_from_earlier_declaration), a friend of a
 base class (cpp11_friend_of_base_accesses_member_through_derived), nested
 pack expansions (cpp11_function_parameter_pack_in_nested_expansion),
-explicit pack arguments before a deduced pack
-(cpp11_explicit_pack_arguments_before_deduced_pack).  Remaining: the bodies
-of __make_dispatch, __dispatch, __make_fmatrix_impl and
-__value_visitor::operator() are still dropped.  clang++ 18 -stdlib=libc++
-accepts this program, and it fails only its WRONG assertion.
+explicit pack arguments (cpp11_explicit_pack_arguments_before_deduced_pack),
+a class template pack in a function parameter pack expansion
+(cpp11_class_pack_and_function_parameter_pack_in_one_expansion), the size
+of a function parameter pack (cpp17_function_parameter_pack_after_non_type_
+pack), folds over a later pack (cpp17_fold_over_later_pack_in_constexpr_
+member), an empty function parameter pack
+(cpp17_empty_function_parameter_pack_with_several_template_packs) and the
+properties' function name (cpp11_statement_after_local_class_member_
+function).  clang++ 18 -stdlib=libc++ accepts this program, and it fails
+only its WRONG assertion.
