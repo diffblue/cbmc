@@ -2987,6 +2987,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
     std::cout << "  scope: " << cpp_scopes.current_scope().prefix << '\n';
 #endif
 
+    bool defaulted_friend = false;
     if(sub_it.value().is_not_nil())
     {
       // Handle = default on friend functions (e.g., friend operator==)
@@ -2994,6 +2995,7 @@ void cpp_typecheckt::typecheck_friend_declaration(
         sub_it.value().id() == ID_code &&
         to_code(sub_it.value()).get_statement() == ID_default)
       {
+        defaulted_friend = true;
         sub_it.value() = codet(ID_block);
         sub_it.value().add_source_location() = declaration.source_location();
       }
@@ -3046,6 +3048,13 @@ void cpp_typecheckt::typecheck_friend_declaration(
       declaration.storage_spec(),
       declaration.member_spec(),
       sub_it);
+    // [dcl.fct.def.default]/5: explicitly defaulted on its first declaration,
+    // recorded as for members (#explicitly_defaulted)
+    if(defaulted_friend)
+    {
+      symbol_table.get_writeable_ref(conv_symb.name)
+        .type.set("#explicitly_defaulted", true);
+    }
     exprt symb_expr = cpp_symbol_expr(conv_symb);
     symbol.type.add(ID_C_friends).move_to_sub(symb_expr);
   }

@@ -1217,6 +1217,7 @@ protected:
     int depth,
     bool implicit_suffices = false);
   bool has_unique_object_representations(const typet &type, int depth);
+  bool is_trivially_equality_comparable(const typet &type, int depth);
 
   bool out_of_line_definition_matches(
     const symbolt &member,
