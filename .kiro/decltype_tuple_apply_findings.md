@@ -13986,3 +13986,41 @@ bad_array_new_length models (library, not front end).
 Open: std::visit (both libraries), views::transform, views::iota,
 views::filter/drop (__tuple_impl layer).  cvise runs for iota and
 transform: /tmp/r163/red/kb_iota, /tmp/r163/red/kb_transform.
+
+## Round 177
+
+Requests: implement the missing library models; find bugs and missing
+features without KNOWNBUG tests.
+
+Commits (825af53126..HEAD):
+- 78a488e0cb strstr, strpbrk models (+ cbmc-library tests).
+- 8e8b91b2cf __builtin_X without a model gets X's model under its own name
+  (get_cprover_library_text; renames X as a whole word outside #include).
+  Covers __builtin_ceilf/sqrt/... used by libc++ <cmath>.
+- bece116c1f provide_library_source_models: C++-source bodies for libc++
+  functions defined only in libc++.so (__release_weak, lock, __get_deleter,
+  __shared_count/__shared_weak_count dtors, __next_prime, exception /
+  bad_alloc / bad_array_new_length members).  Parsed with cpp_parsert as a
+  function body, converted with convert_function; constructors get
+  full_member_initialization first (vtable pointers).
+- 9fb47def9b unary type-trait sweep against clang 18 (/tmp/r165/tr):
+  ~330 wrong answers fixed.  Intentional deviations from clang/gcc
+  (N5008 [class.prop]): deleted-destructor classes are not trivially
+  copyable; a reference member makes a class non-trivial.
+- 140751e7e1 function types as trait arguments (rTypeNameOrFunctionType).
+- bd057882ec partial-spec identifiers include `...'; partial ordering
+  strips the ellipsis of a pack pattern, folds A's merged qualifiers into
+  flags (only A: folding P broke `const T *' vs `T *'), renames F's
+  parameters.  Before, Example-4-like pairs were ordered by identifier.
+- 1bea6d1928 out-of-class member template definition with an empty pack.
+- eae658662b const/non-const member template overloads: implied (*this)
+  is const in a const member function (only for members of this class or
+  its bases, not constructors); out-of-class definitions matched by
+  cv-qualifier too.  unordered_set now verifies (test_unordered_set).
+- 76904cb783 KNOWNBUG cpp17_guaranteed_copy_elision_functional_cast.
+- e6147669b9 subtype_typecast: incomplete classes are never the same class.
+
+Sweep: shared_ptr/weak_ptr, unordered_map/unordered_set, bad_array_new_length
+now verify without "no body".  Still KNOWNBUG: visit, views_transform (its
+cvise reduction degenerated), views_iota (one layer fixed), views_filter and
+bind_back (__tuple_impl, [temp.inst]/11), pack index in sizeof.
