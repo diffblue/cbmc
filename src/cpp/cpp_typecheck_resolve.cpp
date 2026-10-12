@@ -6451,6 +6451,27 @@ exprt cpp_typecheck_resolvet::resolve(
   // this changes the scope
   resolve_scope(cpp_name, base_name, template_args);
 
+  // N5008 [class.access.general]/6, [class.access.base]/4: access -- e.g.
+  // of the base class an argument is converted to while a qualified name
+  // `_Base::_M_head(__t)' is resolved -- is judged at the point of use,
+  // not in the scope the qualification moved to.  Record the point of use
+  // unless an enclosing resolution already did.  RAII-restored.
+  struct access_judgment_guardt
+  {
+    cpp_typecheckt &tc;
+    cpp_scopet *saved;
+    access_judgment_guardt(cpp_typecheckt &t, cpp_scopet *use_scope)
+      : tc(t), saved(t.access_judgment_scope)
+    {
+      if(tc.access_judgment_scope == nullptr)
+        tc.access_judgment_scope = use_scope;
+    }
+    ~access_judgment_guardt()
+    {
+      tc.access_judgment_scope = saved;
+    }
+  } access_judgment_guard{cpp_typecheck, original_scope};
+
   // A pseudo/explicit destructor written with a template-id, e.g.
   // `p->~Foo<T>()` (as in libstdc++'s `__node->~_Rb_tree_node<_Val>()`),
   // names the destructor of the class Foo<T>.  The template arguments only
