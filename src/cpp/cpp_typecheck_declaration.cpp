@@ -1267,6 +1267,7 @@ void cpp_typecheckt::convert_non_template_declaration(
     symbolt &symbol=cpp_declarator_converter.convert(
       declaration_type, declaration.storage_spec(),
       declaration.member_spec(), declarator);
+    note_source_order(symbol.name, declaration, d.value().id() == ID_code);
 
     if(!symbol.is_type && !symbol.is_extern && symbol.type.id() == ID_empty)
     {

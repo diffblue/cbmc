@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_resolve.h"
 #include "template_map.h"
 
+#include <limits>
 #include <list>
 #include <set>
 #include <unordered_set>
@@ -849,7 +850,36 @@ protected:
     symbolt *method_symbol;
     template_mapt template_map;
     instantiation_stackt instantiation_stack;
+    /// see lookup_source_limit
+    bool limit_lookup_to_source_order = false;
   };
+
+  /// N5008 [basic.lookup.unqual]/4, [basic.lookup.argdep]/4,
+  /// [class.mem.general]/7: a name is visible only after its declaration;
+  /// the body of a member function defined in its (non-template) class is
+  /// looked up as if it followed the class definition.  The front end
+  /// converts function bodies at the end of the translation unit; while it
+  /// converts the body of a function whose declaration has the source order
+  /// (ID_C_source_order, assigned by the parser) L, namespace-scope
+  /// functions declared with a larger source order are excluded from
+  /// unqualified (and argument-dependent) function lookup.
+  std::size_t lookup_source_limit = std::numeric_limits<std::size_t>::max();
+  /// the source order of the first declaration of each function
+  std::unordered_map<irep_idt, std::size_t> source_order;
+  /// the source order of the definition of each function
+  std::unordered_map<irep_idt, std::size_t> definition_source_order;
+  void note_source_order(
+    const irep_idt &identifier,
+    const irept &declaration,
+    bool is_definition)
+  {
+    const std::size_t order = declaration.get_size_t(ID_C_source_order);
+    if(order == 0)
+      return;
+    source_order.emplace(identifier, order);
+    if(is_definition)
+      definition_source_order[identifier] = order;
+  }
 
   typedef std::list<method_bodyt> method_bodiest;
   std::set<irep_idt> methods_seen;

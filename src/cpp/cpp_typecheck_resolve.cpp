@@ -6986,12 +6986,52 @@ exprt cpp_typecheck_resolvet::resolve(
     }
   }
 
+  // N5008 [basic.lookup.unqual]/4, [class.mem.general]/7: a namespace-scope
+  // function declared after the class whose member function body is being
+  // converted is not visible there (cpp_typecheckt::lookup_source_limit)
+  const auto declared_too_late = [this](const cpp_idt *id)
+  {
+    if(
+      cpp_typecheck.lookup_source_limit ==
+        std::numeric_limits<std::size_t>::max() ||
+      !id->has_parent() ||
+      (!id->get_parent().is_namespace() &&
+       id->get_parent().id_class != cpp_idt::id_classt::ROOT_SCOPE))
+    {
+      return false;
+    }
+    const auto order = cpp_typecheck.source_order.find(id->identifier);
+    return order != cpp_typecheck.source_order.end() &&
+           order->second > cpp_typecheck.lookup_source_limit;
+  };
+  if(!qualified && fargs.in_use)
+  {
+    for(auto it = id_set.begin(); it != id_set.end();)
+    {
+      if(declared_too_late(*it))
+        it = id_set.erase(it);
+      else
+        ++it;
+    }
+  }
+
   const cpp_scopest::id_sett ordinary_lookup_id_set = id_set;
 
   if(
     !qualified && !fargs.has_object &&
     !(ordinary_lookup_found_member && !is_operator_name))
+  {
     resolve_with_arguments(id_set, base_name, fargs);
+    // [basic.lookup.argdep]/4: the associated namespaces are searched at the
+    // point of the call, too
+    for(auto it = id_set.begin(); it != id_set.end();)
+    {
+      if(declared_too_late(*it))
+        it = id_set.erase(it);
+      else
+        ++it;
+    }
+  }
 
   // Apply the [class.member.lookup]/4 hiding rule to the combined
   // candidate set: if the set contains members declared in distinct
