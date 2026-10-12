@@ -1,12 +1,10 @@
 // N5008 [temp.arg.explicit]/4, /9, [temp.deduct.call]/1: explicitly
 // specified template arguments for a template parameter pack that is
 // followed by another (deduced) pack: in `g<char>(seq<4>{})' Vs = {char}
-// and Is = {4} is deduced from the argument.  CBMC loses the explicitly
-// specified pack elements (it instantiates g<4>, Vs empty), and a member
-// template with several packs is not found at all.  libc++'s variant
-// visitation calls __make_fmatrix_impl<_Fp, _Vs...>(index_sequence<>{},
-// ...) with this shape, so std::visit's body is dropped
-// (cpp20_libcxx_header_drops/test_visit).
+// and Is = {4} is deduced from the argument ([temp.arg.explicit]/6: from the
+// first pack on, every explicit argument belongs to that pack).  libc++'s
+// variant visitation calls __make_fmatrix_impl<_Fp, _Vs...>(
+// index_sequence<>{}, ...) with this shape.
 extern "C" void __CPROVER_assert(bool, const char *);
 
 template <unsigned long... I>
