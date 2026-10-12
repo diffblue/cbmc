@@ -15,6 +15,19 @@ Author: Kiro
 
 #include "cpp_typecheck.h"
 
+#include <cstdlib>
+#include <string>
+
+bool sfinae_contextt::show_suppressed_diagnostics()
+{
+  static const bool show = []
+  {
+    const char *value = std::getenv("CBMC_CPP_SHOW_SUPPRESSED");
+    return value != nullptr && *value != '\0' && std::string{value} != "0";
+  }();
+  return show;
+}
+
 sfinae_contextt::sfinae_contextt(cpp_typecheckt &_typecheck)
   : typecheck(_typecheck),
     saved_handler(&_typecheck.get_message_handler()),
@@ -25,8 +38,12 @@ sfinae_contextt::sfinae_contextt(cpp_typecheckt &_typecheck)
 {
   // [temp.deduct]/8: a substitution failure inside the immediate
   // context must not produce a user-visible diagnostic; redirect to
-  // a null handler for the duration of the guard.
-  typecheck.set_message_handler(null_handler);
+  // a null handler for the duration of the guard -- unless the user asked
+  // to see these diagnostics for debugging the front end
+  // (show_suppressed_diagnostics).  Either way the error count is rolled
+  // back on exit, so results do not change.
+  if(!show_suppressed_diagnostics())
+    typecheck.set_message_handler(null_handler);
   // Substitution during deduction / overload resolution is a soft
   // constraint check, not a context that requires a constant
   // ([expr.const]).  Suspend any enclosing constant-expression
