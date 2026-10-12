@@ -1690,6 +1690,15 @@ void cpp_typecheckt::typecheck_compound_declarator(
     // requires (_S_assignable<_T1, _T2>())': "'this->first' is constant")
     // is expected and not reported as a dropped body.
     component.type().set("#constrained", true);
+    // N5008 [over.match.viable]/3, [temp.inst]/17: the requires-clause of
+    // a non-template member of a class template specialization (the only
+    // kind of non-template function a trailing requires-clause may
+    // constrain, [dcl.decl.general]/4) is not instantiated with the class;
+    // its satisfaction is determined when the member is a candidate
+    // (member_constraints_satisfied), with the class's arguments bound.
+    if(!declaration.is_template() && !is_typedef)
+      component.type().add("#member_requires") =
+        declarator.find(ID_C_requires_clause);
   }
 
   if(cpp_name.is_operator())
@@ -5482,6 +5491,7 @@ void cpp_typecheckt::typecheck_member_function(
     // there might have been an earlier friend declaration
     *new_symbol = std::move(symbol);
   }
+
   else if(
     symbol_exists && new_symbol->value.is_nil() && symbol.value.is_not_nil() &&
     new_symbol->type == symbol.type && component.get_bool("#constrained"))
@@ -6232,6 +6242,50 @@ bool cpp_typecheckt::subtype_typecast(
   get_bases(from, bases);
 
   return bases.find(to.get(ID_name)) != bases.end();
+}
+
+/// N5008 [over.match.viable]/3, [temp.inst]/17, [temp.constr.decl]/3: the
+/// associated constraints of a non-template member of a class template
+/// specialization are its trailing requires-clause (recorded as
+/// #member_requires by typecheck_compound_declarator), checked with the
+/// parameter mapping of the class: its template parameters bound to the
+/// specialization's arguments, in the class's scope.  The result depends
+/// on the member alone and is cached.  An `it(it<!Const> i) requires Const'
+/// converting constructor of iterator<false> is thus not viable for a copy
+/// of an iterator<false> -- considering it recursed through iterator<true>'s
+/// constructor without bound.
+bool cpp_typecheckt::member_constraints_satisfied(const exprt &candidate)
+{
+  const irept &requires_clause = candidate.type().find("#member_requires");
+  if(requires_clause.is_nil() || requires_clause.id() == ID_nil)
+    return true;
+  const irep_idt &name = candidate.id() == ID_member
+                           ? candidate.get(ID_component_name)
+                           : candidate.get(ID_identifier);
+  if(!name.empty())
+  {
+    const auto cached = member_constraint_cache.find(name);
+    if(cached != member_constraint_cache.end())
+      return cached->second;
+  }
+  const irep_idt &class_id = candidate.type().get(ID_C_member_name);
+  const symbolt *class_symbol = symbol_table.lookup(class_id);
+  const auto scope_it = cpp_scopes.id_map.find(class_id);
+  if(class_symbol == nullptr || scope_it == cpp_scopes.id_map.end())
+    return true;
+  bool satisfied = true;
+  {
+    cpp_saved_template_mapt saved_map{template_map};
+    cpp_save_scopet saved_scope{cpp_scopes};
+    bind_class_instance_parameters(*class_symbol, template_map);
+    cpp_scopes.go_to(*scope_it->second);
+    const auto value =
+      evaluate_constraint(static_cast<const exprt &>(requires_clause));
+    satisfied = !value.has_value() || *value;
+  }
+  if(!name.empty())
+    member_constraint_cache[name] = satisfied;
+  return satisfied;
 }
 
 bool cpp_typecheckt::base_publicly_accessible(

@@ -11,7 +11,12 @@ views_transform.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::views::transform: transform_view's end and its
-iterator's operator++ lose their bodies, and main cannot be fully
-type-checked. clang++ 18 -stdlib=libc++ accepts this program, and it fails
-only its WRONG assertion.
+libc++ (LLVM 18) std::views::transform.  Fixed layers: the out-of-class
+member class template __iterator of the constrained transform_view
+(cpp20_member_class_template_of_constrained_class_template) and its
+constrained converting constructor
+(cpp20_constrained_converting_constructor_of_class_template).  Remaining:
+transform_view's two end() overloads differ only in their requires-clauses
+(cpp20_same_signature_members_differing_in_constraints), so the range-for
+compares an __iterator with a __sentinel.  clang++ 18 -stdlib=libc++
+accepts this program, and it fails only its WRONG assertion.

@@ -12949,6 +12949,12 @@ bool cpp_typecheck_resolvet::disambiguate_functions(
   if(expr.type().id() != ID_code)
     return true;
 
+  // N5008 [over.match.viable]/3: a candidate whose associated constraints
+  // are not satisfied is not viable -- decided before its argument
+  // conversions are formed.
+  if(!cpp_typecheck.member_constraints_satisfied(expr))
+    return false;
+
   const code_typet &type = to_code_type(expr.type());
 
   // N5008 [over.match.funcs]/1: the candidate set is built from
