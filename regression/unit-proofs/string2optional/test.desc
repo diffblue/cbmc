@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 harness.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
@@ -10,9 +10,6 @@ harness.cpp
 FAILURE
 --
 Unit proof for string2optional_int: round trip, stoll PREFIX semantics
-(trailing junk ignored) and nullopt for digit-less input.  KNOWNBUG:
-the wrap_string_conversion layer (lambda + catch of the strings'
-__throw_invalid_argument path) returns nondeterministic values under
-CBMC -- std::stoll called directly verifies fine, so the gap is in the
-exception-based wrapper modeling.  g++/clang++ accept the harness and
-it verifies at runtime.
+(trailing junk ignored) and nullopt for digit-less input, through the
+wrap_string_conversion layer (lambda + catch of std::invalid_argument).
+g++/clang++ accept the harness and it verifies at runtime.
