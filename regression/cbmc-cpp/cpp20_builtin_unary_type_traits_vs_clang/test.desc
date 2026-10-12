@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+The expected values are clang 18's (several traits are clang-only, so gcc
+does not compile this program; --stdlib libc++ selects the clang keywords).
+N5008 [basic.fundamental], [basic.compound], [class.prop], [class.dtor],
+[meta.unary.prop]; GCC manual "Type Traits" for __has_trivial_* and
+__has_nothrow_*.
