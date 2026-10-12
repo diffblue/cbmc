@@ -11,7 +11,11 @@ visit.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::visit(F, variant<int, char>): main cannot be fully
-type-checked, without any error outside a substitution context; with
-libstdc++ 13 the body of std::visit is dropped.  Not reduced yet.  clang++ 18
+libc++ (LLVM 18) std::visit(F, variant<int, char>): the body of std::visit is
+dropped.  Layers fixed so far: the declaration's default template argument
+(cpp11_default_template_argument_from_earlier_declaration), a friend of a
+base class (cpp11_friend_of_base_accesses_member_through_derived), nested
+pack expansions (cpp11_function_parameter_pack_in_nested_expansion).
+Remaining: __make_fmatrix_impl<_Fp, _Vs...>(index_sequence<>{}, ...)
+(cpp11_explicit_pack_arguments_before_deduced_pack).  clang++ 18
 -stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
