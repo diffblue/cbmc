@@ -8673,18 +8673,28 @@ skip_pack_removal_ft:
     if(n_template_packs >= 2 && !new_decl.declarators().empty())
     {
       // the function parameter pack's TYPE names its template pack
-      // (e.g. `Up` in `Up&&... u`); walk to the innermost cpp_name
+      // (e.g. `Up` in `Up&&... u`); walk to the innermost cpp_name.  Read
+      // the template's own declaration: in new_decl a one-element pack's
+      // name may already be substituted by its element.
+      const cpp_declarationt &template_decl =
+        to_cpp_declaration(template_symbol.type);
       const irept &fparams0 =
-        new_decl.declarators()[0].type().find(ID_parameters);
+        template_decl.declarators().empty()
+          ? new_decl.declarators()[0].type().find(ID_parameters)
+          : template_decl.declarators()[0].type().find(ID_parameters);
       irep_idt fn_pack_short;
       for(const auto &fp : fparams0.get_sub())
       {
         if(fp.id() != ID_cpp_declaration)
           continue;
         const auto &d = static_cast<const cpp_declarationt &>(fp);
+        // the declarator or its type carries the `...' (as in the
+        // function-parameter-pack test of instantiate_selected_function_
+        // template)
         if(
           d.declarators().empty() ||
-          !d.declarators().front().type().get_bool(ID_ellipsis))
+          (!d.declarators().front().type().get_bool(ID_ellipsis) &&
+           !d.declarators().front().get_bool(ID_ellipsis)))
           continue;
         const typet merged = d.declarators().front().merge_type(d.type());
         const irept *t = &merged;
