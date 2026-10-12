@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 tuple_convert.cpp
 --cpp20 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ converted: SUCCESS$
@@ -12,12 +12,9 @@ tuple_convert.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) <tuple>: `std::tuple<int> c(std::forward_as_tuple(3))'
-verifies, but CBMC also tries tuple<int>'s element-wise constructor
-tuple(_Up &&...) with _Up = tuple<int &&> &, whose
-_EnableUTypesCtor<_Up...> constraint (is_constructible<int, tuple<int &&>
-&>) should remove it; __tuple_impl's body for it (tuple:469) is dropped.
-Not reduced yet; header-free analogues of the deduction and the
-constructor's forwarding reference behave (CBMC deduces _Up correctly for
-a user-written class).  clang++ 18 -stdlib=libc++ accepts this program, and
-it fails only its WRONG assertion.
+libc++ (LLVM 18) <tuple>: `std::tuple<int> c(std::forward_as_tuple(3))'.
+tuple<int>'s element-wise constructor tuple(_Up &&...) is removed by its
+_EnableUTypesCtor<_Up...> constraint (N5008 [temp.variadic]/8: with one
+deduced element, _Up... in the default's template-argument list used to
+expand to no argument, so the constraint held and __tuple_impl's body for
+it, tuple:469, was dropped).
