@@ -2381,7 +2381,20 @@ bool cpp_typecheck_resolvet::member_template_object_viable(
 {
   if(cand.id() != ID_template_function_instance)
     return true;
-  if(!fargs.has_object || fargs.operands.empty())
+  // N5008 [over.call.func]/3: in an unqualified call from a member function
+  // the implied object argument is (*this), const in a const member function
+  bool implied_object_const = false;
+  if(!fargs.has_object)
+  {
+    const exprt &this_expr = cpp_typecheck.cpp_scopes.current_scope().this_expr;
+    if(this_expr.is_nil() || this_expr.type().id() != ID_pointer)
+      return true;
+    implied_object_const =
+      to_pointer_type(this_expr.type()).base_type().get_bool(ID_C_constant);
+    if(!implied_object_const)
+      return true;
+  }
+  else if(fargs.operands.empty())
     return true;
   const irep_idt tmpl = cand.type().get(ID_C_template);
   if(tmpl.empty())
@@ -2398,6 +2411,54 @@ bool cpp_typecheck_resolvet::member_template_object_viable(
   const typet &mq = static_cast<const typet &>(
     decl.declarators().front().find(ID_method_qualifier));
   const bool member_const = cpp_typecheck.has_const(mq);
+  if(!fargs.has_object)
+  {
+    // only a member function template has an implicit object parameter:
+    // one declared in a class scope (the template's scope entry, or one of
+    // its enclosing template scopes, has a class as parent)
+    const auto id_it = cpp_typecheck.cpp_scopes.id_map.find(tmpl);
+    if(id_it == cpp_typecheck.cpp_scopes.id_map.end())
+      return true;
+    const cpp_idt *scope = id_it->second;
+    while(scope->has_parent() && !scope->get_parent().is_class() &&
+          scope->get_parent().is_template_scope())
+    {
+      scope = &scope->get_parent();
+    }
+    if(!scope->has_parent() || !scope->get_parent().is_class())
+      return true;
+    // a constructor has no implicit object parameter; a member of a class
+    // other than that of *this (or one of its bases) is not called on (*this)
+    if(decl.is_constructor())
+      return true;
+    const exprt &this_expr = cpp_typecheck.cpp_scopes.current_scope().this_expr;
+    const typet &this_class = to_pointer_type(this_expr.type()).base_type();
+    if(this_class.id() != ID_struct_tag)
+      return true;
+    const irep_idt member_class = scope->get_parent().identifier;
+    std::function<bool(const irep_idt &, int)> is_this_or_base =
+      [&](const irep_idt &class_id, int depth)
+    {
+      if(class_id == member_class)
+        return true;
+      const symbolt *class_symbol = cpp_typecheck.symbol_table.lookup(class_id);
+      if(
+        depth <= 0 || class_symbol == nullptr ||
+        class_symbol->type.id() != ID_struct)
+      {
+        return false;
+      }
+      for(const auto &base : to_struct_type(class_symbol->type).bases())
+      {
+        if(is_this_or_base(base.type().get_identifier(), depth - 1))
+          return true;
+      }
+      return false;
+    };
+    if(!is_this_or_base(to_struct_tag_type(this_class).get_identifier(), 32))
+      return true;
+    return member_const || !implied_object_const;
+  }
   // N5008 [over.match.funcs.general]/4: with a ref-qualifier, the implicit
   // object parameter is an lvalue (`&') or rvalue (`&&') reference, bound
   // by the usual rules (/5's licence for an rvalue object applies only
