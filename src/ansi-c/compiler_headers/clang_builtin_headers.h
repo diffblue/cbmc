@@ -105,6 +105,9 @@ _Bool __builtin_cpu_supports(const char *);
 void *__builtin_operator_new(__CPROVER_size_t);
 void __builtin_operator_delete(void *);
 
+// memchr for char objects, returning `char *'
+char* __builtin_char_memchr(const char*, int, __CPROVER_size_t);
+
 // Clang provides __c11_atomic_* intrinsics that libc++'s <atomic> and
 // <stdatomic.h> use to implement the C11/C++11 atomic primitives.  They
 // take a pointer to a _Atomic qualified object plus memory order
