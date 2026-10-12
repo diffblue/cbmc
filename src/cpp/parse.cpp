@@ -1655,6 +1655,45 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
       // template<...> requires ... template<...> class X::Y { ... };
       if(!rTemplateDecl(body))
         return false;
+      // Merge the nested template parameters into this template-head, as
+      // rTemplateDecl2 does for `template<T> template<U>' without a
+      // requires-clause (otherwise the outer head replaces the inner one
+      // below and its parameters, e.g. `Const' of an out-of-class member
+      // class template of a constrained class template, are unknown).
+      // N5008 [temp.constr.decl]/3: the associated constraints are the
+      // conjunction of both requires-clauses.
+      if(body.get_bool(ID_is_template))
+      {
+        typet inner_type =
+          static_cast<const typet &>(body.find(ID_template_type));
+        body.remove(ID_template_type);
+        body.remove(ID_is_template);
+        auto &params = template_type.add(ID_template_parameters).get_sub();
+        for(const auto &p : inner_type.find(ID_template_parameters).get_sub())
+          params.push_back(p);
+        const irept &inner_req = inner_type.find(ID_C_requires_clause);
+        if(inner_req.is_not_nil())
+        {
+          const irept &outer_req = template_type.find(ID_C_requires_clause);
+          // the fallback representation is a constraint count
+          const auto is_count = [](const irept &r)
+          {
+            const std::string &id = id2string(r.id());
+            return !id.empty() &&
+                   id.find_first_not_of("0123456789") == std::string::npos;
+          };
+          if(outer_req.is_nil())
+            template_type.add(ID_C_requires_clause) = inner_req;
+          else if(!is_count(outer_req) && !is_count(inner_req))
+          {
+            exprt conjunction{ID_and};
+            conjunction.add_to_operands(
+              exprt{static_cast<const exprt &>(outer_req)},
+              exprt{static_cast<const exprt &>(inner_req)});
+            template_type.add(ID_C_requires_clause) = conjunction;
+          }
+        }
+      }
     }
     else if(!rDeclaration(body))
       return false;
