@@ -283,6 +283,314 @@ void cpp_typecheckt::bind_requires_parameter(
   scope_id.id_class = cpp_idt::id_classt::SYMBOL;
 }
 
+/// Whether \p t is std::nullptr_t (a pointer to the nullptr type here).
+static bool is_nullptr_type(const typet &t)
+{
+  return t.id() == ID_pointer &&
+         to_pointer_type(t).base_type().id() == ID_nullptr;
+}
+
+/// N5008 [class.dtor]/8: whether the destructor of \p type is trivial --
+/// for a class, not user-provided (implicit, or defaulted or deleted on its
+/// first declaration), not virtual, and trivial for every base and
+/// non-static data member; scalars, references and arrays thereof have
+/// trivial destructors.  libstdc++'s is_trivially_destructible uses
+/// __has_trivial_destructor.
+bool cpp_typecheckt::has_trivial_destructor(const typet &type, int depth)
+{
+  if(depth <= 0)
+    return true;
+  if(type.id() == ID_array)
+    return has_trivial_destructor(
+      to_array_type(type).element_type(), depth - 1);
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    return true;
+  const struct_union_typet &su = type.id() == ID_struct_tag
+                                   ? static_cast<const struct_union_typet &>(
+                                       follow_tag(to_struct_tag_type(type)))
+                                   : static_cast<const struct_union_typet &>(
+                                       follow_tag(to_union_tag_type(type)));
+  if(su.get_bool(ID_incomplete))
+    return true;
+  for(const auto &comp : su.components())
+  {
+    if(
+      comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type) ||
+      comp.get_bool(ID_is_vtptr))
+    {
+      continue;
+    }
+    if(comp.type().id() == ID_code)
+    {
+      const code_typet &code_type = to_code_type(comp.type());
+      if(code_type.return_type().id() != ID_destructor)
+        continue;
+      if(comp.get_bool(ID_is_virtual))
+        return false;
+      const bool deleted =
+        comp.get(ID_access) == ID_noaccess && comp.find(ID_value).is_nil();
+      if(
+        !code_type.get_bool("#is_implicit_dtor") &&
+        !code_type.get_bool("#explicitly_defaulted") && !deleted)
+      {
+        return false;
+      }
+      continue;
+    }
+    // [class.dtor]/8: a variant member's destructor does not matter
+    if(type.id() == ID_union_tag)
+      continue;
+    if(!has_trivial_destructor(comp.type(), depth - 1))
+      return false;
+  }
+  return true;
+}
+
+/// N5008 [meta.unary.prop] is_destructible: \p type is a reference type, or
+/// a complete object type whose destructor (that of its innermost element
+/// type for an array of known bound) is not deleted and is accessible; void,
+/// function types and arrays of unknown bound are not destructible.  A class
+/// whose implicit destructor would destroy an indestructible base or
+/// non-variant member has a deleted destructor ([class.dtor]/5).
+bool cpp_typecheckt::is_destructible_type(const typet &type, int depth)
+{
+  if(depth <= 0)
+    return true;
+  if(is_reference(type) || is_rvalue_reference(type))
+    return true;
+  if(type.id() == ID_empty || type.id() == ID_code)
+    return false;
+  if(type.id() == ID_array)
+  {
+    return to_array_type(type).size().is_not_nil() &&
+           is_destructible_type(to_array_type(type).element_type(), depth - 1);
+  }
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    return true;
+  const struct_union_typet &su = type.id() == ID_struct_tag
+                                   ? static_cast<const struct_union_typet &>(
+                                       follow_tag(to_struct_tag_type(type)))
+                                   : static_cast<const struct_union_typet &>(
+                                       follow_tag(to_union_tag_type(type)));
+  if(su.get_bool(ID_incomplete))
+    return false;
+  bool implicit_dtor = true;
+  for(const auto &comp : su.components())
+  {
+    if(
+      comp.type().id() != ID_code ||
+      to_code_type(comp.type()).return_type().id() != ID_destructor)
+    {
+      continue;
+    }
+    const irep_idt &access = comp.get(ID_access);
+    if(access == ID_noaccess || access == ID_private || access == ID_protected)
+    {
+      return false;
+    }
+    if(!comp.type().get_bool("#is_implicit_dtor"))
+      implicit_dtor = false;
+  }
+  if(!implicit_dtor || type.id() == ID_union_tag)
+    return true;
+  for(const auto &comp : su.components())
+  {
+    if(
+      comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type) ||
+      comp.get_bool(ID_is_vtptr) || comp.type().id() == ID_code)
+    {
+      continue;
+    }
+    if(!is_destructible_type(comp.type(), depth - 1))
+      return false;
+  }
+  return true;
+}
+
+/// Whether the special member \p kind ("default": the default constructor,
+/// "copy" or ID_constructor: the copy constructor, "assign": the copy
+/// assignment operator) of \p type is trivial -- not user-provided, the
+/// class not polymorphic and without virtual bases, no default member
+/// initializers for "default", and the same holds for every base and
+/// non-static data member of non-reference type ([class.default.ctor]/3,
+/// [class.copy.ctor]/11, [class.copy.assign]/9).  With \p implicit_suffices
+/// (the nothrow traits), not user-provided members suffice: polymorphism and
+/// default member initializers are allowed.
+bool cpp_typecheckt::has_trivial_special_member(
+  const typet &type,
+  const irep_idt &kind,
+  int depth,
+  bool implicit_suffices)
+{
+  if(depth <= 0)
+    return true;
+  if(type.id() == ID_array)
+  {
+    return has_trivial_special_member(
+      to_array_type(type).element_type(), kind, depth - 1, implicit_suffices);
+  }
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    return true;
+  const bool want_default = kind == "default";
+  const bool want_assign = kind == "assign";
+  const struct_union_typet &su = type.id() == ID_struct_tag
+                                   ? static_cast<const struct_union_typet &>(
+                                       follow_tag(to_struct_tag_type(type)))
+                                   : static_cast<const struct_union_typet &>(
+                                       follow_tag(to_union_tag_type(type)));
+  if(su.get_bool(ID_incomplete))
+    return false;
+  const irep_idt &class_id = type.get(ID_identifier);
+  const auto same_class_reference = [&class_id](const typet &param)
+  {
+    return (is_reference(param) || is_rvalue_reference(param)) &&
+           to_reference_type(param).base_type().get(ID_identifier) == class_id;
+  };
+  bool user_provided = false, polymorphic = false, has_default_ctor = false,
+       has_ctor = false;
+  for(const auto &comp : su.components())
+  {
+    if(comp.get_bool(ID_is_vtptr) || comp.get_bool(ID_is_virtual))
+      polymorphic = true;
+    if(comp.type().id() != ID_code || comp.get_bool(ID_from_base))
+      continue;
+    const code_typet &code_type = to_code_type(comp.type());
+    const auto &params = code_type.parameters();
+    bool selected;
+    if(want_assign)
+    {
+      selected = comp.get_base_name() == "operator=" && params.size() == 2 &&
+                 same_class_reference(params[1].type());
+    }
+    else if(code_type.return_type().id() != ID_constructor)
+      selected = false;
+    else if(want_default)
+    {
+      has_ctor |= !code_type.get_bool("#is_implicit_ctor");
+      selected = params.size() == 1;
+      has_default_ctor |= selected;
+    }
+    else
+      selected = params.size() == 2 && same_class_reference(params[1].type());
+    // [dcl.fct.def.default]/5: user-provided means user-declared and not
+    // defaulted or deleted on its first declaration
+    if(
+      selected && !code_type.get_bool("#is_implicit_ctor") &&
+      !code_type.get_bool("#is_implicit_assign") &&
+      !code_type.get_bool("#explicitly_defaulted") &&
+      comp.get(ID_access) != ID_noaccess)
+    {
+      user_provided = true;
+    }
+  }
+  // [class.default.ctor]/1: a user-declared constructor suppresses the
+  // implicit default constructor
+  if(user_provided || (want_default && has_ctor && !has_default_ctor))
+    return false;
+  if(polymorphic && !implicit_suffices)
+    return false;
+  if(type.id() == ID_struct_tag)
+  {
+    for(const auto &base : to_struct_type(su).bases())
+    {
+      if(base.get_bool(ID_virtual))
+        return false;
+      if(!has_trivial_special_member(
+           static_cast<const typet &>(base.find(ID_type)),
+           kind,
+           depth - 1,
+           implicit_suffices))
+      {
+        return false;
+      }
+    }
+  }
+  for(const auto &comp : su.components())
+  {
+    if(
+      comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type) ||
+      comp.get_bool(ID_from_base) || comp.type().id() == ID_code ||
+      comp.get_is_padding())
+    {
+      continue;
+    }
+    if(
+      want_default && !implicit_suffices &&
+      comp.find(ID_C_default_value).is_not_nil())
+    {
+      return false;
+    }
+    if(is_reference(comp.type()) || is_rvalue_reference(comp.type()))
+      continue;
+    if(!has_trivial_special_member(
+         comp.type(), kind, depth - 1, implicit_suffices))
+      return false;
+  }
+  return true;
+}
+
+/// N5008 [meta.unary.prop] has_unique_object_representations: \p type is
+/// trivially copyable and two objects of it with the same value have the
+/// same object representation -- integral (including bool), enumeration,
+/// pointer and pointer-to-member types and arrays of such; a class without
+/// padding, virtual functions or virtual bases whose bases and non-static
+/// data members all qualify; a union whose members all qualify and fill it.
+/// Floating-point types, std::nullptr_t, references and empty classes do
+/// not.
+bool cpp_typecheckt::has_unique_object_representations(
+  const typet &type,
+  int depth)
+{
+  if(depth <= 0)
+    return false;
+  if(type.id() == ID_array)
+  {
+    return has_unique_object_representations(
+      to_array_type(type).element_type(), depth - 1);
+  }
+  if(
+    type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+    type.id() == ID_c_bool || type.id() == ID_bool ||
+    type.id() == ID_c_enum_tag)
+  {
+    return true;
+  }
+  if(type.id() == ID_pointer)
+    return !is_reference(type) && !is_rvalue_reference(type) &&
+           !is_nullptr_type(type);
+  if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
+    return false;
+  if(!is_trivially_copyable_type(type, false, 16))
+    return false;
+  const struct_union_typet &su = type.id() == ID_struct_tag
+                                   ? static_cast<const struct_union_typet &>(
+                                       follow_tag(to_struct_tag_type(type)))
+                                   : static_cast<const struct_union_typet &>(
+                                       follow_tag(to_union_tag_type(type)));
+  const namespacet ns{symbol_table};
+  const auto union_size = pointer_offset_bits(type, ns);
+  bool has_member = false;
+  for(const auto &comp : su.components())
+  {
+    if(comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type))
+      continue;
+    if(comp.get_is_padding() || comp.get_bool(ID_is_vtptr))
+      return false;
+    if(comp.type().id() == ID_code)
+      continue;
+    has_member = true;
+    if(!has_unique_object_representations(comp.type(), depth - 1))
+      return false;
+    if(type.id() == ID_union_tag)
+    {
+      const auto member_size = pointer_offset_bits(comp.type(), ns);
+      if(!member_size.has_value() || member_size != union_size)
+        return false;
+    }
+  }
+  return has_member;
+}
+
 /// N5008 [class.prop]/1: a trivially copyable class has at least one eligible
 /// copy constructor, move constructor, copy assignment operator or move
 /// assignment operator, each of which is trivial (implicitly declared, not
@@ -326,7 +634,11 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
       return false;
     if(t.id() == ID_empty)
       return trait == "__is_literal_type"; // void is a literal type
-    return t.id() != ID_code;              // a function type has none of them
+    // [basic.types.general]/9-10: the standard-layout and POD types are
+    // object types; a reference type is a literal type only
+    if(is_reference(t) || is_rvalue_reference(t))
+      return trait == "__is_literal_type";
+    return t.id() != ID_code; // a function type has none of them
   }
   // N5008 [meta.unary.prop]/3: the type must be complete -- a class
   // template specialization named but not yet elaborated (`equal_to<void>'
@@ -346,7 +658,9 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
        has_data_member = false, has_reference_member = false,
        has_user_ctor = false, has_nontrivial_dtor = false,
        has_private_member = false, has_public_member = false,
-       has_default_member_init = false, all_members_ok = true;
+       has_default_member_init = false, all_members_ok = true,
+       has_constexpr_ctor = false, has_base_data_member = false,
+       has_own_data_member = false;
   if(is_class)
   {
     for(const auto &base : to_struct_type(su).bases())
@@ -391,6 +705,25 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
       {
         if(!code_type.get_bool("#is_implicit_ctor"))
           has_user_ctor = true;
+        // [basic.types.general]/10.5.2: a constexpr constructor that is not
+        // a copy or move constructor (an implicit default constructor is
+        // constexpr when it can be, [class.default.ctor]/4; a constexpr
+        // member function is a macro symbol here)
+        const auto &params = code_type.parameters();
+        const bool copy_or_move =
+          params.size() == 2 &&
+          (is_reference(params[1].type()) ||
+           is_rvalue_reference(params[1].type())) &&
+          to_reference_type(params[1].type()).base_type().get(ID_identifier) ==
+            t.get(ID_identifier);
+        const symbolt *ctor_symbol = symbol_table.lookup(comp.get_name());
+        if(
+          !copy_or_move && (code_type.get_bool("#is_implicit_ctor") ||
+                            code_type.get_bool("#explicitly_defaulted") ||
+                            (ctor_symbol != nullptr && ctor_symbol->is_macro)))
+        {
+          has_constexpr_ctor = true;
+        }
       }
       if(comp.get_bool(ID_is_virtual))
         has_vtptr = true;
@@ -398,6 +731,10 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
     }
     // a non-static data member (own or from a base)
     has_data_member = true;
+    if(comp.get_bool(ID_from_base))
+      has_base_data_member = true;
+    else
+      has_own_data_member = true;
     if(comp.find(ID_value).is_not_nil())
       has_default_member_init = true;
     if(is_reference(comp.type()) || is_rvalue_reference(comp.type()))
@@ -432,8 +769,11 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
     // [class.prop]/3 (simplified: no virtual functions or bases, uniform
     // access control, standard-layout members and bases, no reference
     // members)
+    // /3.6: all non-static data members and bit-fields declared in the same
+    // class
     return !has_vtptr && !has_virtual_base && !has_reference_member &&
-           !(has_private_member && has_public_member) && all_members_ok;
+           !(has_private_member && has_public_member) && all_members_ok &&
+           !(has_base_data_member && has_own_data_member);
   }
   if(trait == "__is_pod")
   {
@@ -458,11 +798,13 @@ bool cpp_typecheckt::class_property(const irep_idt &trait, const typet &t)
   }
   if(trait == "__is_literal_type")
   {
-    // [basic.types.general]/10: trivial destructor, every member of
-    // literal type, and an aggregate or at least one constexpr constructor
-    // (the latter not tracked: any constructor counts)
+    // [basic.types.general]/10: a constexpr (here: trivial) destructor,
+    // every member of literal type, and an aggregate or at least one
+    // constexpr constructor that is not a copy or move constructor
     (void)has_default_member_init;
-    return !has_nontrivial_dtor && !has_virtual_dtor && all_members_ok;
+    return !has_nontrivial_dtor && !has_virtual_dtor && all_members_ok &&
+           (class_property("__is_aggregate", t) || has_constexpr_ctor ||
+            is_union);
   }
   return false;
 }
@@ -533,19 +875,25 @@ bool cpp_typecheckt::is_trivially_copyable_type(
             to_struct_tag_type(
               to_reference_type(code_type.parameters()[1].type()).base_type())
                 .get_identifier() == to_struct_tag_type(type).get_identifier();
-          if(copy_or_move && !code_type.get_bool("#is_implicit_ctor"))
+          // [dcl.fct.def.default]/5: defaulted on its first declaration,
+          // it is not user-provided
+          const bool provided = !code_type.get_bool("#is_implicit_ctor") &&
+                                !code_type.get_bool("#explicitly_defaulted");
+          if(copy_or_move && provided)
             return false;
           // [class.default.ctor]/3: a trivial class has no user-provided
           // default constructor
-          if(
-            want_trivial && n_args == 1 &&
-            !code_type.get_bool("#is_implicit_ctor"))
+          if(want_trivial && n_args == 1 && provided)
             return false;
         }
         else if(comp.get_base_name() == "operator=")
         {
-          if(n_args == 2 && !code_type.get_bool("#is_implicit_assign"))
+          if(
+            n_args == 2 && !code_type.get_bool("#is_implicit_assign") &&
+            !code_type.get_bool("#explicitly_defaulted"))
+          {
             return false;
+          }
         }
         continue;
       }
@@ -553,6 +901,16 @@ bool cpp_typecheckt::is_trivially_copyable_type(
       // default constructor non-trivial
       if(want_trivial && comp.find(ID_C_default_value).is_not_nil())
         return false;
+      // a reference member is copied as it is ([class.copy.ctor]/14) and
+      // leaves the copy constructor trivial; it deletes the default
+      // constructor ([class.default.ctor]/2.2), so the class is not trivial
+      // ([class.prop]/2: no eligible default constructor)
+      if(is_reference(comp.type()) || is_rvalue_reference(comp.type()))
+      {
+        if(want_trivial)
+          return false;
+        continue;
+      }
       if(!is_trivially_copyable_type(comp.type(), want_trivial, depth - 1))
         return false;
     }
@@ -2471,11 +2829,12 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(expr.id() == "__is_integral")
     {
-      expr =
-        (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
-         t.id() == ID_c_bool || t.id() == ID_bool || t.id() == ID_c_enum_tag)
-          ? exprt(true_exprt())
-          : exprt(false_exprt());
+      // N5008 [basic.fundamental]/11: bool, the character types and the
+      // signed and unsigned integer types; enumerations are not integral
+      expr = (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+              t.id() == ID_c_bool || t.id() == ID_bool)
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
     }
     else if(expr.id() == "__is_floating_point")
     {
@@ -2486,9 +2845,10 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     else if(expr.id() == "__is_arithmetic")
     {
       expr =
+        // [basic.fundamental]/12: integral and floating-point types
         (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
          t.id() == ID_c_bool || t.id() == ID_bool || t.id() == ID_floatbv ||
-         t.id() == ID_fixedbv || t.id() == ID_c_enum_tag)
+         t.id() == ID_fixedbv)
           ? exprt(true_exprt())
           : exprt(false_exprt());
     }
@@ -2498,8 +2858,13 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(expr.id() == "__is_pointer")
     {
-      expr = (t.id() == ID_pointer && !is_reference(t)) ? exprt(true_exprt())
-                                                        : exprt(false_exprt());
+      // [basic.compound]/1.3: pointers to void, objects and functions --
+      // neither pointers to members nor std::nullptr_t
+      // ([basic.fundamental]/15)
+      expr = (t.id() == ID_pointer && !is_reference(t) &&
+              t.find(ID_to_member).is_nil() && !is_nullptr_type(t))
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
     }
     else if(expr.id() == "__is_reference")
     {
@@ -2556,9 +2921,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(expr.id() == "__is_null_pointer")
     {
-      expr = (t.id() == ID_pointer && t == pointer_type(empty_typet()))
-               ? exprt(true_exprt())
-               : exprt(false_exprt());
+      expr = is_nullptr_type(t) ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else if(expr.id() == "__is_signed")
     {
@@ -2614,66 +2977,17 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(
       expr.id() == "__has_trivial_destructor" ||
-      expr.id() == "__is_trivially_destructible")
-    {
-      // [class.prop]/1 + [class.dtor]/8: trivially destructible iff scalar,
-      // array thereof, or a class whose destructor is trivial (not virtual,
-      // not user-provided) and whose bases/members are all trivially
-      // destructible.  libstdc++ is_trivially_destructible uses
-      // __has_trivial_destructor, so an unconditional false was unsound.
-      std::function<bool(const typet &, int)> trivially_destructible =
-        [&](const typet &type, int depth) -> bool
-      {
-        if(depth <= 0)
-          return true;
-        if(type.id() == ID_array)
-          return trivially_destructible(
-            to_array_type(type).element_type(), depth - 1);
-        if(type.id() != ID_struct_tag)
-          return true;
-        const auto &st = follow_tag(to_struct_tag_type(type));
-        if(st.get_bool(ID_incomplete))
-          return true;
-        for(const auto &comp : to_struct_type(st).components())
-        {
-          if(comp.get_bool(ID_is_static) || comp.get_bool(ID_is_type))
-            continue;
-          if(comp.get_bool(ID_is_vtptr))
-            continue;
-          if(comp.type().id() == ID_code)
-          {
-            if(to_code_type(comp.type()).return_type().id() == ID_destructor)
-            {
-              if(comp.get_bool(ID_is_virtual))
-                return false;
-              if(!comp.type().get_bool("#is_implicit_dtor"))
-                return false;
-            }
-            continue;
-          }
-          if(!trivially_destructible(comp.type(), depth - 1))
-            return false;
-        }
-        return true;
-      };
-      expr = trivially_destructible(t, 64) ? exprt(true_exprt())
-                                           : exprt(false_exprt());
-    }
-    else if(
+      expr.id() == "__is_trivially_destructible" ||
       expr.id() == "__is_nothrow_destructible" ||
       expr.id() == "__is_destructible")
     {
-      bool result = true;
-      if(t.id() == ID_struct_tag)
-      {
-        const auto &st = follow_tag(to_struct_tag_type(t));
-        for(const auto &comp : to_struct_type(st).components())
-          if(comp.get_bool(ID_destructor))
-          {
-            result = false;
-            break;
-          }
-      }
+      const bool result =
+        expr.id() == "__has_trivial_destructor"
+          ? t.id() != ID_empty && t.id() != ID_code &&
+              has_trivial_destructor(t, 64)
+        : expr.id() == "__is_trivially_destructible"
+          ? is_destructible_type(t, 64) && has_trivial_destructor(t, 64)
+          : is_destructible_type(t, 64);
       expr = result ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else if(
@@ -2699,21 +3013,18 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       // (and cv void)
       expr = t.id() == ID_empty ? exprt(false_exprt()) : exprt(true_exprt());
     }
-    else if(expr.id() == "__is_compound")
+    else if(expr.id() == "__is_compound" || expr.id() == "__is_fundamental")
     {
-      bool f = t.id() == ID_empty || t.id() == ID_signedbv ||
-               t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
-               t.id() == ID_bool || t.id() == ID_floatbv ||
-               t.id() == ID_fixedbv;
-      expr = !f ? exprt(true_exprt()) : exprt(false_exprt());
-    }
-    else if(expr.id() == "__is_fundamental")
-    {
-      bool r = t.id() == ID_empty || t.id() == ID_signedbv ||
-               t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
-               t.id() == ID_bool || t.id() == ID_floatbv ||
-               t.id() == ID_fixedbv;
-      expr = r ? exprt(true_exprt()) : exprt(false_exprt());
+      // [basic.fundamental]/15: the arithmetic types, void and
+      // std::nullptr_t are the fundamental types; every other type is
+      // compound ([basic.compound]/1)
+      const bool fundamental = t.id() == ID_empty || t.id() == ID_signedbv ||
+                               t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
+                               t.id() == ID_bool || t.id() == ID_floatbv ||
+                               t.id() == ID_fixedbv || is_nullptr_type(t);
+      expr = fundamental == (expr.id() == "__is_fundamental")
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
     }
     else if(expr.id() == "__is_scalar")
     {
@@ -2737,6 +3048,60 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = is_trivially_copyable_type(t, want_trivial, 16)
                ? exprt(true_exprt())
                : exprt(false_exprt());
+    }
+    else if(expr.id() == "__has_unique_object_representations")
+    {
+      expr = has_unique_object_representations(t, 64) ? exprt(true_exprt())
+                                                      : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_trivially_relocatable")
+    {
+      // Clang's trait: an object can be moved by copying its bytes -- a
+      // trivially copyable type, or one with a trivial copy constructor and
+      // a trivial destructor (arrays of such, too)
+      const bool object = t.id() != ID_empty && t.id() != ID_code &&
+                          !is_reference(t) && !is_rvalue_reference(t) &&
+                          !t.get_bool(ID_C_volatile);
+      expr = object && (is_trivially_copyable_type(t, false, 16) ||
+                        (has_trivial_special_member(t, "copy", 64) &&
+                         has_trivial_destructor(t, 64)))
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
+    }
+    else if(
+      expr.id() == "__has_trivial_constructor" ||
+      expr.id() == "__has_trivial_copy" ||
+      expr.id() == "__has_trivial_assign" ||
+      expr.id() == "__has_nothrow_constructor" ||
+      expr.id() == "__has_nothrow_copy" || expr.id() == "__has_nothrow_assign")
+    {
+      // The GCC traits (GCC manual, "Type Traits"): false for void and
+      // function types; the assignment traits are false for const-qualified
+      // and reference types, the copy traits true for references.  Otherwise
+      // a scalar (or array thereof) qualifies, and a class if its default
+      // constructor / copy constructor / copy assignment operator is trivial
+      // ([class.default.ctor]/3, [class.copy.ctor]/11,
+      // [class.copy.assign]/9); the nothrow traits accept an implicit or
+      // defaulted one as well (exception specifications are not tracked: a
+      // user-provided one counts as potentially throwing).
+      const std::string trait = id2string(expr.id());
+      const bool nothrow = trait.find("nothrow") != std::string::npos;
+      const irep_idt kind =
+        trait.find("constructor") != std::string::npos ? irep_idt{"default"}
+        : trait.find("copy") != std::string::npos      ? irep_idt{"copy"}
+                                                       : irep_idt{"assign"};
+      const bool reference = is_reference(t) || is_rvalue_reference(t);
+      bool result;
+      if(t.id() == ID_empty || t.id() == ID_code)
+        result = false;
+      else if(kind == "assign")
+        result = !reference && !t.get_bool(ID_C_constant) &&
+                 has_trivial_special_member(t, kind, 64, nothrow);
+      else if(kind == "copy" && reference)
+        result = true;
+      else
+        result = !reference && has_trivial_special_member(t, kind, 64, nothrow);
+      expr = result ? exprt(true_exprt()) : exprt(false_exprt());
     }
     else
       expr = false_exprt();

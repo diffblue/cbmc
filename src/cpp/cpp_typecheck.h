@@ -1178,6 +1178,14 @@ protected:
   /// [dcl.init.aggr]/1: the class property named by the GCC/Clang type
   /// trait \p trait (`__is_empty', `__is_polymorphic', ...) for type \p t
   bool class_property(const irep_idt &trait, const typet &t);
+  bool has_trivial_destructor(const typet &type, int depth);
+  bool is_destructible_type(const typet &type, int depth);
+  bool has_trivial_special_member(
+    const typet &type,
+    const irep_idt &kind,
+    int depth,
+    bool implicit_suffices = false);
+  bool has_unique_object_representations(const typet &type, int depth);
 
   bool out_of_line_definition_matches(
     const symbolt &member,
