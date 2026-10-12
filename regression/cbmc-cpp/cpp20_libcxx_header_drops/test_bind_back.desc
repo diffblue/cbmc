@@ -14,5 +14,10 @@ dropped the body of system-header function
 --
 libc++ (LLVM 18) std::__bind_back (the core of std::views::take): the calls
 compute the right values, but two __tuple_impl(_Tuple &&) bodies
-(tuple:488) are dropped.  Not reduced yet.  clang++ 18 -stdlib=libc++
-accepts this program, and it fails only its WRONG assertion.
+(tuple:488) are dropped.  Smaller: with `struct at {};', even
+`std::is_constructible_v<std::tuple<at, std::tuple<int>>,
+const std::tuple<at, std::tuple<int>> &, std::tuple<int> &&>' is false as
+it should be but drops both bodies, reached through is_convertible<const
+tuple &, tuple> (tuple:680) and a tuple<int> constructor template.
+clang++ 18 -stdlib=libc++ accepts this program, and it fails only its
+WRONG assertion.
