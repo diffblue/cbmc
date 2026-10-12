@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 views_filter.cpp
 --cpp20 --stdlib libc++ --object-bits 12 --unwind 8
 ^\[main\.assertion\.1\] line \d+ filter: SUCCESS$
@@ -11,6 +11,5 @@ views_filter.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::views::filter (like views::drop): two __tuple_impl
-bodies (tuple:488) are dropped, the same layer as test_bind_back. clang++ 18
--stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
+libc++ (LLVM 18) std::views::filter: the same __tuple_impl layer as
+test_bind_back (cpp11_tuple_converting_constructor_spurious_instantiation).

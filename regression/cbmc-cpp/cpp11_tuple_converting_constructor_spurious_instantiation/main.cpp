@@ -7,7 +7,8 @@
 // body of __tuple_impl's converting constructor: N5008 [temp.inst]/11 forbids
 // instantiating a function body that is not needed, and clang never does
 // (the initializer __tuple_leaf<_Tp>(forward) would be ill-formed).  CBMC
-// instantiates it and drops it.
+// converted the constexpr constructor template tuple(tuple<> &&) eagerly while
+// evaluating the trait, and with it that body, which it then dropped.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <bool, class _Tp = void>
 using __enable_if_t = _Tp;
