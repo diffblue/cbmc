@@ -9468,21 +9468,25 @@ void cpp_typecheck_resolvet::guess_template_args_simple_name(
         }
         else
         {
-          // Already assigned — check for conflict.
-          // Strip cv-qualifiers for comparison.
-          typet existing = t;
-          typet incoming = desired_type;
-          existing.remove(ID_C_constant);
-          existing.remove(ID_C_volatile);
-          incoming.remove(ID_C_constant);
-          incoming.remove(ID_C_volatile);
+          // Already assigned: N5008 [temp.deduct.type]/2 requires every
+          // deduction of a parameter to yield the same type, cv-qualifiers
+          // included (`T' from `T *' with `const char *' is `const char',
+          // from `T' with `char' is `char').  The qualifiers are comments
+          // of the irep, which operator== ignores, so compare them too.
+          const typet &existing = t;
+          const typet &incoming = desired_type;
+          const bool same_cv = existing.get_bool(ID_C_constant) ==
+                                 incoming.get_bool(ID_C_constant) &&
+                               existing.get_bool(ID_C_volatile) ==
+                                 incoming.get_bool(ID_C_volatile);
           // [temp.type]/1: a function type in parsed and in converted form
           // (`same<decltype(cb), void(int)>' against `same<A, A>')
           if(
-            existing != incoming &&
-            (existing.id() != ID_code || incoming.id() != ID_code ||
-             canonical_function_type(existing) !=
-               canonical_function_type(incoming)))
+            !same_cv ||
+            (existing != incoming &&
+             (existing.id() != ID_code || incoming.id() != ID_code ||
+              canonical_function_type(existing) !=
+                canonical_function_type(incoming))))
           {
             t.id(ID_unassigned); // mark as conflicting
           }
