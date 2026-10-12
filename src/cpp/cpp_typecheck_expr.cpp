@@ -591,6 +591,116 @@ bool cpp_typecheckt::has_unique_object_representations(
   return has_member;
 }
 
+/// Clang's trait __is_trivially_equality_comparable(T): `a == b' for two
+/// objects of type T is equivalent to comparing their object
+/// representations.  That holds for the integral types and the object,
+/// function and member pointer types (whose values each have unique object
+/// representations), not for floating-point types, enumerations (operator==
+/// may be overloaded), std::nullptr_t, arrays or references.  A class
+/// (not a union) qualifies when its operator== is defaulted -- a member
+/// `bool operator==(const T &) const = default', the friend form, or the
+/// one a defaulted operator<=> declares -- so that it compares the
+/// subobjects in order ([class.eq]/3), when every base and non-static data
+/// member qualifies itself, and when equal values have equal object
+/// representations (no padding: has_unique_object_representations).
+bool cpp_typecheckt::is_trivially_equality_comparable(
+  const typet &type,
+  int depth)
+{
+  if(depth <= 0)
+    return false;
+  if(
+    type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+    type.id() == ID_c_bool || type.id() == ID_bool)
+  {
+    return true;
+  }
+  if(type.id() == ID_pointer)
+  {
+    return !is_reference(type) && !is_rvalue_reference(type) &&
+           to_pointer_type(type).base_type().id() != ID_nullptr;
+  }
+  if(type.id() != ID_struct_tag)
+    return false;
+  elaborate_class_template(type);
+  const struct_typet &st = follow_tag(to_struct_tag_type(type));
+  if(st.is_incomplete())
+    return false;
+  const irep_idt &class_id = to_struct_tag_type(type).get_identifier();
+  // [class.compare.default]/1.3: two parameters of type const C & or of
+  // type C (the implicit object parameter counting as the first)
+  const auto is_class_parameter = [&class_id](const typet &param)
+  {
+    const typet &t = is_reference(param) || is_rvalue_reference(param)
+                       ? to_reference_type(param).base_type()
+                       : param;
+    return t.id() == ID_struct_tag && t.get(ID_identifier) == class_id;
+  };
+  // A defaulted operator== -- or, when the class declares no operator==, a
+  // defaulted operator<=>, which implicitly declares a defaulted operator==
+  // ([class.compare.default]/4).
+  bool declares_equality = false;
+  bool defaulted_equality = false;
+  bool defaulted_three_way = false;
+  const auto consider =
+    [&](const irep_idt &base_name, const typet &fn_type, bool is_member)
+  {
+    if(fn_type.id() != ID_code)
+      return;
+    if(base_name == "operator==")
+      declares_equality = true;
+    if(
+      (base_name != "operator==" && base_name != "operator<=>") ||
+      !fn_type.get_bool("#explicitly_defaulted"))
+    {
+      return;
+    }
+    const auto &params = to_code_type(fn_type).parameters();
+    if(
+      params.size() != 2 ||
+      (!is_member && !is_class_parameter(params[0].type())) ||
+      !is_class_parameter(params[1].type()))
+    {
+      return;
+    }
+    (base_name == "operator==" ? defaulted_equality : defaulted_three_way) =
+      true;
+  };
+  for(const auto &c : st.components())
+  {
+    if(!c.get_bool(ID_from_base))
+      consider(c.get_base_name(), c.type(), true);
+  }
+  for(const auto &f : st.find(ID_C_friends).get_sub())
+  {
+    const symbolt *fs = symbol_table.lookup(f.get(ID_identifier));
+    if(fs != nullptr)
+      consider(fs->base_name, fs->type, false);
+  }
+  if(!declares_equality && defaulted_three_way)
+    defaulted_equality = true;
+  if(!defaulted_equality || !has_unique_object_representations(type, 16))
+    return false;
+  for(const auto &base : st.bases())
+  {
+    if(!is_trivially_equality_comparable(base.type(), depth - 1))
+      return false;
+  }
+  for(const auto &c : st.components())
+  {
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_type) ||
+      c.get_bool(ID_is_static) || c.type().id() == ID_code ||
+      c.get_is_padding() || c.get_bool(ID_is_vtptr))
+    {
+      continue;
+    }
+    if(!is_trivially_equality_comparable(c.type(), depth - 1))
+      return false;
+  }
+  return true;
+}
+
 /// N5008 [class.prop]/1: a trivially copyable class has at least one eligible
 /// copy constructor, move constructor, copy assignment operator or move
 /// assignment operator, each of which is trivial (implicitly declared, not
@@ -2890,20 +3000,8 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     }
     else if(expr.id() == "__is_trivially_equality_comparable")
     {
-      // Clang's trait: `a == b' for two objects of type T is equivalent to
-      // comparing their object representations.  That holds for the
-      // integral types and the object, function and member pointer types
-      // (whose values each have unique object representations), not for
-      // floating-point types, enumerations (operator== may be overloaded),
-      // std::nullptr_t, arrays or references.  A class qualifies only with a
-      // defaulted operator== and no padding, which is not checked: classes
-      // are conservatively false.
-      expr = ((t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
-               t.id() == ID_c_bool || t.id() == ID_bool ||
-               (t.id() == ID_pointer && !is_reference(t) &&
-                to_pointer_type(t).base_type().id() != ID_nullptr)))
-               ? exprt(true_exprt())
-               : exprt(false_exprt());
+      expr = is_trivially_equality_comparable(t, 16) ? exprt(true_exprt())
+                                                     : exprt(false_exprt());
     }
     else if(expr.id() == "__is_array")
     {
