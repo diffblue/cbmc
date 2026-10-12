@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] .* WRONG \(must FAIL\): FAILURE$
@@ -9,7 +9,7 @@ main.cpp
 ^warning: ignoring
 dropped the body of function
 --
-A constructor body is instantiated while only the constructor's constraints
-are checked (N5008 [temp.inst]/11).  Reduced from the libc++ tuple chain in
-which is_convertible<const tuple<at, tuple<int>> &, tuple<int>> instantiates
-a tuple<int> constructor that clang does not.
+N5008 [temp.inst]/11, [meta.unary.prop]/9: checking is_constructible
+selects tuple<int>'s constructor template without instantiating its
+definition (which is ill-formed for these arguments).  Reduced (cvise) from
+libc++'s tuple, the layer behind test_bind_back and test_views_filter.

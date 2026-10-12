@@ -7793,8 +7793,15 @@ skip_pack_removal_ft:
       const bool eager_returns_void =
         ws.type.id() == ID_code &&
         to_code_type(ws.type).return_type().id() == ID_empty;
+      // N5008 [expr.context]/1, [temp.inst]/11: a specialization named in an
+      // unevaluated operand (or a type trait's hypothetical declaration,
+      // [meta.unary.prop]/9) is neither evaluated nor odr-used; its body is
+      // held back (the else branch), as the declarator converter does
+      const bool unevaluated =
+        unevaluated_operand_depth > 0 && !instantiation_stack.empty();
       if(
-        (new_decl.storage_spec().is_constexpr() && !eager_returns_void) ||
+        (new_decl.storage_spec().is_constexpr() && !eager_returns_void &&
+         !unevaluated) ||
         is_cond3)
       {
         const std::size_t errors_before =
