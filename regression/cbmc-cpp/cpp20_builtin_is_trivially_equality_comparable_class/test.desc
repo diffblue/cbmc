@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+The front end answers __is_trivially_equality_comparable conservatively
+false for classes (cpp11_builtin_is_trivially_equality_comparable covers the
+non-class types).  clang++ 18 accepts this program (the built-in is
+clang-only), and it fails only its WRONG assertion.
