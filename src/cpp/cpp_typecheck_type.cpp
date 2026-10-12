@@ -170,6 +170,47 @@ typet cpp_bool_type(const typet &type)
   return result;
 }
 
+/// N5008 [dcl.type.pack.index]/1-2: replace the pack-index-specifier
+/// \p type, `T...[N]' (parsed as an array of T with bound N, marked
+/// ID_C_pack_index), by the N-th element of the type parameter pack T, once
+/// the pack's elements are known.  The index is a converted constant
+/// expression of type size_t that shall be less than the pack size.
+/// \return true if the element was selected
+bool cpp_typecheckt::select_pack_element(typet &type)
+{
+  const cpp_namet &name =
+    to_cpp_name(static_cast<const irept &>(to_array_type(type).element_type()));
+  if(name.is_qualified() || name.has_template_args())
+    return false;
+  const auto ids = cpp_scopes.current_scope().lookup(
+    name.get_base_name(), cpp_scopet::RECURSIVE);
+  for(const auto &id_ptr : ids)
+  {
+    if(id_ptr->id_class != cpp_idt::id_classt::TEMPLATE_PARAMETER)
+      continue;
+    const auto pack = template_map.pack_args_map.find(id_ptr->identifier);
+    if(pack == template_map.pack_args_map.end())
+      continue;
+    exprt index = to_array_type(type).size();
+    {
+      constant_expression_contextt constant_expression_guard{*this};
+      typecheck_expr(index);
+      simplify(index, *this);
+    }
+    const auto value = numeric_cast<mp_integer>(index);
+    if(!value.has_value() || *value < 0 || *value >= pack->second.size())
+    {
+      error().source_location = type.source_location();
+      error() << "pack index out of range" << eom;
+      throw 0;
+    }
+    type = pack->second[numeric_cast_v<std::size_t>(*value)];
+    typecheck_type(type);
+    return true;
+  }
+  return false;
+}
+
 void cpp_typecheckt::typecheck_type(typet &type)
 {
   // GCC 16+ headers may produce types with empty IDs from
@@ -558,6 +599,14 @@ void cpp_typecheckt::typecheck_type(typet &type)
       qualifiers.is_constant = true;
 
     qualifiers.write(type);
+  }
+  else if(
+    type.id() == ID_array && type.get_bool(ID_C_pack_index) &&
+    to_array_type(type).element_type().id() == ID_cpp_name &&
+    to_array_type(type).size().is_not_nil() && select_pack_element(type))
+  {
+    // N5008 [dcl.type.pack.index]/1: `T...[N]' denotes the N-th element of
+    // the pack T (select_pack_element replaced it)
   }
   else if(type.id()==ID_array)
   {
