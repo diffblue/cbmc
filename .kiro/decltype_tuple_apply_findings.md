@@ -14070,3 +14070,17 @@ drop; reductions degenerate), test_views_transform (out-of-class member
 class template of a constrained class template: `_Const'/`_Base'
 unknown; cvise in /tmp/r163/red/kb_tr3), unit-proofs escape /
 edit_distance / bigint_arith (scaling: OOM / time).
+
+## Round 179: tests for every known issue
+
+New KNOWNBUGs: cpp11_friend_of_base_through_private_base (accept-invalid,
+[class.access.base]/4, /5.4), cpp17_visit_libstdcxx, cpp20_builtin_is_
+trivially_equality_comparable_class.  New CORE pin:
+cpp11_trivial_class_properties_per_n5008 (N5008 answers where g++/clang
+differ; natively four assertions fail, documented).
+CBMC_ELAB_ON_NAMING=0 (instantiating class template specializations only
+where completeness is required, [temp.inst]/1-2) is an experiment switch;
+its 7 failures are visible only with the environment variable, which
+test.pl cannot set per test.  A probe for an observable difference in the
+default mode (naming X<int> * with an ill-formed X<int>) verifies, so no
+regression test captures it.
