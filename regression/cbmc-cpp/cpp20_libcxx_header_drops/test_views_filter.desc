@@ -1,0 +1,16 @@
+KNOWNBUG libcxx
+views_filter.cpp
+--cpp20 --stdlib libc++ --object-bits 12 --unwind 8
+^\[main\.assertion\.1\] line \d+ filter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+--
+libc++ (LLVM 18) std::views::filter (like views::drop): two __tuple_impl
+bodies (tuple:488) are dropped, the same layer as test_bind_back. clang++ 18
+-stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
