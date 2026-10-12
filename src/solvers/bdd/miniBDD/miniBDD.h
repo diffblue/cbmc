@@ -128,6 +128,7 @@ protected:
     unsigned var, low, high;
     reverse_keyt(unsigned _var, const mini_bddt &_low, const mini_bddt &_high);
 
+    // Once we move to C++20 this can become `= default`.
     bool operator==(const reverse_keyt &) const;
   };
 
