@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* pack, then default: SUCCESS$
+^\[main\.assertion\.2\] .* non-empty pack: SUCCESS$
+^\[main\.assertion\.3\] .* default declared once: SUCCESS$
+^\[main\.assertion\.4\] .* renamed parameter: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.param]/17: default template arguments carry over from a
+function template's declaration to its definition.
