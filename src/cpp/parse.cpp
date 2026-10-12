@@ -5292,6 +5292,16 @@ bool Parser::rDeclarator(
       if(lex.get_token(cb)!=']')
         return false;
 
+      // N5008 [dcl.type.pack.index]/1: `T...[N]' (a typedef-name naming a
+      // pack, `...', then a subscript) is a pack-index-specifier, not an
+      // array declarator; mark it so the N-th element can be selected once
+      // the pack is known
+      const bool pack_index = d_outer.id() == ID_nil && name.is_nil() &&
+                              d_outer.get_bool(ID_ellipsis) &&
+                              expr.is_not_nil();
+      if(pack_index)
+        d_outer.remove(ID_ellipsis);
+
       std::list<typet> tl;
       tl.push_back(d_outer);
       while(tl.back().id() == ID_array)
@@ -5300,6 +5310,8 @@ bool Parser::rDeclarator(
       }
 
       array_typet array_type(tl.back(), expr);
+      if(pack_index)
+        array_type.set(ID_C_pack_index, true);
       tl.pop_back();
       d_outer.swap(array_type);
       while(!tl.empty())
