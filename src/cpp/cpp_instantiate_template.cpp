@@ -3637,6 +3637,18 @@ bool cpp_typecheckt::out_of_line_definition_matches(
   }
   if(def_arity != member_arity)
     return false;
+  // [over.load]/2.3: `f(const K &)' and `f(const K &) const' are different
+  // members; the definition's cv-qualifier must be the member's
+  if(first == 1 && mparams.front().type().id() == ID_pointer)
+  {
+    const bool member_const = to_pointer_type(mparams.front().type())
+                                .base_type()
+                                .get_bool(ID_C_constant);
+    const bool def_const = has_const(static_cast<const typet &>(
+      def.declarators()[0].find(ID_method_qualifier)));
+    if(member_const != def_const)
+      return false;
+  }
   if(class_args == nullptr)
     return true;
   cpp_saved_template_mapt saved_map(template_map);
@@ -6886,6 +6898,16 @@ skip_pack_removal_ft:
                 d_ftype.find(ID_parameters).get_sub().size() !=
                   m_ftype.find(ID_parameters).get_sub().size())
                 continue;
+              // ... and the cv-qualifier ([over.load]/2.3: `find(const K &)'
+              // and `find(const K &) const' are different members) ...
+              if(
+                has_const(static_cast<const typet &>(
+                  new_decl.declarators()[0].find(ID_method_qualifier))) !=
+                has_const(static_cast<const typet &>(
+                  md.declarators()[0].find(ID_method_qualifier))))
+              {
+                continue;
+              }
               // ... and the parameter TYPES: libstdc++'s two
               // three-parameter `_M_construct(_It, _It, tag)' member
               // templates differ only in the tag type, and the same-name
@@ -7351,6 +7373,16 @@ skip_pack_removal_ft:
               {
                 continue;
               }
+            }
+            // [over.load]/2.3, [class.mfct.non.static]: `find(const K &)' and
+            // `find(const K &) const' are different members
+            if(
+              has_const(static_cast<const typet &>(
+                new_decl.declarators()[0].find(ID_method_qualifier))) !=
+              has_const(static_cast<const typet &>(
+                md.declarators()[0].find(ID_method_qualifier))))
+            {
+              continue;
             }
           }
           // Only adopt from an entry that carries its own template-parameter
