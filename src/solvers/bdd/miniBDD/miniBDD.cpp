@@ -466,14 +466,14 @@ mini_bdd_mgrt::mk(unsigned var, const mini_bddt &low, const mini_bddt &high)
   }
 }
 
-bool mini_bdd_mgrt::reverse_keyt::
-operator==(const mini_bdd_mgrt::reverse_keyt &y) const
+bool mini_bdd_mgrt::reverse_keyt::operator==(
+  const mini_bdd_mgrt::reverse_keyt &y) const
 {
   return var == y.var && low == y.low && high == y.high;
 }
 
-std::size_t mini_bdd_mgrt::reverse_key_hasht::
-operator()(const mini_bdd_mgrt::reverse_keyt &key) const
+std::size_t mini_bdd_mgrt::reverse_key_hasht::operator()(
+  const mini_bdd_mgrt::reverse_keyt &key) const
 {
   // Mix var, low and high into a single hash. The multiplier
   // 0x9e3779b1 is the 32-bit approximation of 2^32 / phi (the golden
