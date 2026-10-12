@@ -6077,61 +6077,80 @@ bool cpp_typecheckt::check_component_access(
   }
 
   // check friendship
-  const irept::subt &friends = struct_union_type.find(ID_C_friends).get_sub();
-
-  for(const auto &friend_symb : friends)
+  const auto befriended_here = [this](const irept &granting_type)
   {
-    const cpp_scopet &friend_scope =
-      cpp_scopes.get_scope(friend_symb.get(ID_identifier));
+    const irept::subt &friends = granting_type.find(ID_C_friends).get_sub();
 
-    for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
-        !(pscope->is_root_scope());
-        pscope = &(pscope->get_parent()))
+    for(const auto &friend_symb : friends)
     {
-      if(friend_scope.identifier == pscope->identifier)
-        return false; // ok
+      const cpp_scopet &friend_scope =
+        cpp_scopes.get_scope(friend_symb.get(ID_identifier));
 
-      // N5008 [temp.friend]/1: a friend FUNCTION TEMPLATE's
-      // specializations are friends, too.  The converting body's
-      // function scope names the SPECIALIZATION; its symbol links back
-      // to the template through ID_C_template (set by
-      // instantiate_template).  Compare that link against the recorded
-      // friend template.
+      for(cpp_scopet *pscope = &(cpp_scopes.current_scope());
+          !(pscope->is_root_scope());
+          pscope = &(pscope->get_parent()))
       {
-        const symbolt *fn_sym = symbol_table.lookup(pscope->identifier);
-        if(
-          fn_sym != nullptr && fn_sym->type.id() == ID_code &&
-          fn_sym->type.get(ID_C_template) == friend_symb.get(ID_identifier) &&
-          !fn_sym->type.get(ID_C_template).empty())
-        {
-          return false; // ok: specialization of a friend template
-        }
-      }
+        if(friend_scope.identifier == pscope->identifier)
+          return true; // ok
 
-      // Check if this scope is an instantiation of the friend template.
-      if(pscope->is_class())
-      {
-        // For template friend declarations, the friend scope points to
-        // the template class (e.g., "tag-B"), while the current scope
-        // is an instantiation (e.g., "tag-B<int>"). Check if the scope
-        // identifier starts with the friend identifier followed by '<'.
-        const std::string &friend_id = id2string(friend_scope.identifier);
-        const std::string &scope_id = id2string(pscope->identifier);
-        if(
-          scope_id.size() > friend_id.size() &&
-          scope_id.compare(0, friend_id.size(), friend_id) == 0 &&
-          scope_id[friend_id.size()] == '<')
+        // N5008 [temp.friend]/1: a friend FUNCTION TEMPLATE's
+        // specializations are friends, too.  The converting body's
+        // function scope names the SPECIALIZATION; its symbol links back
+        // to the template through ID_C_template (set by
+        // instantiate_template).  Compare that link against the recorded
+        // friend template.
         {
-          return false; // ok — instantiation of friend template
+          const symbolt *fn_sym = symbol_table.lookup(pscope->identifier);
+          if(
+            fn_sym != nullptr && fn_sym->type.id() == ID_code &&
+            fn_sym->type.get(ID_C_template) == friend_symb.get(ID_identifier) &&
+            !fn_sym->type.get(ID_C_template).empty())
+          {
+            return true; // ok: specialization of a friend template
+          }
         }
 
-        // N5008 [class.friend]/2: the friend's member declarations may name
-        // the granting class's private members, and by
-        // [class.access.nest]/1 (CWG 45, applied in every language mode)
-        // that includes the members of a class nested in the friend.
-        continue;
+        // Check if this scope is an instantiation of the friend template.
+        if(pscope->is_class())
+        {
+          // For template friend declarations, the friend scope points to
+          // the template class (e.g., "tag-B"), while the current scope
+          // is an instantiation (e.g., "tag-B<int>"). Check if the scope
+          // identifier starts with the friend identifier followed by '<'.
+          const std::string &friend_id = id2string(friend_scope.identifier);
+          const std::string &scope_id = id2string(pscope->identifier);
+          if(
+            scope_id.size() > friend_id.size() &&
+            scope_id.compare(0, friend_id.size(), friend_id) == 0 &&
+            scope_id[friend_id.size()] == '<')
+          {
+            return true; // ok — instantiation of friend template
+          }
+
+          // N5008 [class.friend]/2: the friend's member declarations may name
+          // the granting class's private members, and by
+          // [class.access.nest]/1 (CWG 45, applied in every language mode)
+          // that includes the members of a class nested in the friend.
+          continue;
+        }
       }
     }
+    return false;
+  };
+  if(befriended_here(struct_union_type))
+    return false; // ok
+  // N5008 [class.access.base]/5.4: a member of a base class B of the naming
+  // class N is accessible if B is accessible and the member is accessible
+  // as named in B -- for a friend of B, also B's protected and private
+  // members (a friend of __ctor naming `__impl().__as_base()', libc++'s
+  // variant)
+  if(
+    declaring_type != nullptr && struct_union_type.id() == ID_struct &&
+    base_publicly_accessible(
+      to_struct_type(struct_union_type), *declaring_type) &&
+    befriended_here(*declaring_type))
+  {
+    return false; // ok
   }
 
   return true; // not ok
