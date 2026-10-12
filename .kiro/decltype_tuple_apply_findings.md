@@ -13914,3 +13914,16 @@ goto-instrument 298, contracts 178; lint 0.
 
 Suites W67: cbmc-cpp 1788 exit 0, cpp 246, regression/cbmc 1203,
 goto-instrument 298, contracts 178; lint 0.
+- kb_size (cvise, ~4 h) reached 187 lines; hand reduction to 237 lines of
+  user code at /tmp/r163/red/kb_size/hand_user_237.cpp (system-header line
+  markers removed so diagnostics are not suppressed; --stdlib libc++ still
+  needed for the clang builtin traits such as __is_void).
+- Cause narrowed: take_view::size() = ranges::min(__n, ...) has its body
+  dropped on the pipe path; removing min's constrained defaulted template
+  parameter (`indirect_strict_weak_order<...> = less') makes it pass, and
+  `projected'/_Proj are irrelevant.  A header-free model (hm1.cpp: min with
+  `predicate<T, T> P = less', hidden-friend operator|) does NOT reproduce --
+  the libc++ concept chain (strict_weak_order -> relation -> predicate ->
+  __boolean_testable<invoke_result_t<...>>) or iter_common_reference_t is
+  probably needed.  Next: substitute those concepts one at a time in the
+  237-line file.
