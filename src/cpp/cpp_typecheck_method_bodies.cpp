@@ -912,19 +912,26 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
     {
       // The recorded pack base (if any) that a pack-expansion pattern node
       // mentions.
-      std::function<irep_idt(const irept &)> ref_base =
-        [&](const irept &n) -> irep_idt
+      // [temp.variadic]/5: a pack name is expanded by the innermost pack
+      // expansion that contains it -- a nested pattern with its own `...'
+      // (the `ls...' in `one(seq<Js>{}, ls...)...') is not searched
+      std::function<irep_idt(const irept &, bool)> ref_base_rec =
+        [&](const irept &n, bool root) -> irep_idt
       {
+        if(!root && n.get_bool(ID_ellipsis))
+          return irep_idt{};
         if(n.id() == ID_name && pack_counts.count(n.get(ID_identifier)))
           return n.get(ID_identifier);
         for(const auto &s : n.get_sub())
-          if(irep_idt r = ref_base(s); !r.empty())
+          if(irep_idt r = ref_base_rec(s, false); !r.empty())
             return r;
         for(const auto &ns : n.get_named_sub())
-          if(irep_idt r = ref_base(ns.second); !r.empty())
+          if(irep_idt r = ref_base_rec(ns.second, false); !r.empty())
             return r;
         return irep_idt{};
       };
+      const auto ref_base = [&](const irept &n)
+      { return ref_base_rec(n, true); };
 
       std::function<void(irept &, const irep_idt &, const irep_idt &)> rename =
         [&](irept &n, const irep_idt &base, const irep_idt &repl)
@@ -1297,9 +1304,13 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
 
       // The pack stem a pattern references: the first short name (matching
       // an exact or replicated parameter) found anywhere in the argument.
-      std::function<std::string(const irept &)> referenced_stem =
-        [&](const irept &n) -> std::string
+      // [temp.variadic]/5: a pack is expanded by the innermost expansion
+      // that contains it; a nested pattern with its own `...' is skipped
+      std::function<std::string(const irept &, bool)> referenced_stem_rec =
+        [&](const irept &n, bool root) -> std::string
       {
+        if(!root && n.get_bool(ID_ellipsis))
+          return std::string{};
         if(n.id() == ID_name)
         {
           const std::string s = short_name(n.get(ID_identifier));
@@ -1307,13 +1318,15 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
             return s;
         }
         for(const auto &s : n.get_sub())
-          if(std::string r = referenced_stem(s); !r.empty())
+          if(std::string r = referenced_stem_rec(s, false); !r.empty())
             return r;
         for(const auto &ns : n.get_named_sub())
-          if(std::string r = referenced_stem(ns.second); !r.empty())
+          if(std::string r = referenced_stem_rec(ns.second, false); !r.empty())
             return r;
         return std::string{};
       };
+      const auto referenced_stem = [&](const irept &n)
+      { return referenced_stem_rec(n, true); };
 
       std::function<void(irept &)> expand_own = [&](irept &node)
       {
@@ -1340,6 +1353,34 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               continue;
             }
             const std::string stem = referenced_stem(arg);
+            // [temp.variadic]/5: an expansion whose pattern names no
+            // parameter outside its nested expansions (`one(seq<Js>{},
+            // ls...)...', over the template pack Js) is left to the
+            // template-pack expansion; only its nested expansions are this
+            // pass's business
+            std::function<bool(const irept &)> has_nested_expansion =
+              [&](const irept &n)
+            {
+              for(const auto &sn : n.get_sub())
+                if(sn.get_bool(ID_ellipsis) || has_nested_expansion(sn))
+                  return true;
+              for(const auto &ns : n.get_named_sub())
+              {
+                if(
+                  ns.second.get_bool(ID_ellipsis) ||
+                  has_nested_expansion(ns.second))
+                {
+                  return true;
+                }
+              }
+              return false;
+            };
+            if(stem.empty() && has_nested_expansion(arg))
+            {
+              expand_own(arg);
+              out.push_back(arg);
+              continue;
+            }
             if(stem.empty())
             {
               // No stem matches this instance's parameters.  Drop the

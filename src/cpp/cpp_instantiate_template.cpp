@@ -8707,6 +8707,16 @@ skip_pack_removal_ft:
             id2string(fn_pack_short))
             continue;
           const auto pa_it = template_map.pack_args_map.find(pid);
+          // [temp.variadic]/7: a pack deduced EMPTY is recorded by its size
+          // only
+          const auto ps_it = template_map.pack_size_map.find(pid);
+          if(
+            pa_it == template_map.pack_args_map.end() &&
+            ps_it != template_map.pack_size_map.end() && ps_it->second == 0)
+          {
+            pack_arguments_from_map = true;
+            break;
+          }
           if(pa_it != template_map.pack_args_map.end())
           {
             for(const auto &t : pa_it->second)
@@ -8845,6 +8855,78 @@ skip_pack_removal_ft:
             empty_folds(named.second);
         };
         empty_folds(func_decl0.value());
+
+        // [temp.variadic]/7: an expansion of the (now removed) empty
+        // function parameter pack is an empty list -- also where it is
+        // nested in an expansion over another pack (`one(seq<Js>{},
+        // ls...)...'), which the positional passes do not reach
+        irep_idt empty_pack_name;
+        if(template_symbol.type.id() == ID_cpp_declaration)
+        {
+          const auto &tdecl = to_cpp_declaration(template_symbol.type);
+          if(!tdecl.declarators().empty())
+          {
+            for(const auto &fp :
+                tdecl.declarators()[0].type().find(ID_parameters).get_sub())
+            {
+              if(fp.id() != ID_cpp_declaration)
+                continue;
+              const auto &d = static_cast<const cpp_declarationt &>(fp);
+              if(
+                d.declarators().empty() ||
+                !(d.declarators().front().type().get_bool(ID_ellipsis) ||
+                  d.declarators().front().get_bool(ID_ellipsis)))
+              {
+                continue;
+              }
+              for(const auto &sub : d.declarators().front().name().get_sub())
+                if(sub.id() == ID_name)
+                  empty_pack_name = sub.get(ID_identifier);
+            }
+          }
+        }
+        const auto names_empty_pack = [&empty_pack_name](const irept &n)
+        {
+          if(n.id() != ID_cpp_name || n.get_sub().size() != 1)
+            return false;
+          return n.get_sub().front().id() == ID_name &&
+                 n.get_sub().front().get(ID_identifier) == empty_pack_name;
+        };
+        std::function<bool(const irept &, bool)> expands_empty_pack =
+          [&](const irept &n, bool root)
+        {
+          if(!root && n.get_bool(ID_ellipsis))
+            return false;
+          if(names_empty_pack(n))
+            return true;
+          for(const auto &sub : n.get_sub())
+            if(expands_empty_pack(sub, false))
+              return true;
+          for(const auto &named : n.get_named_sub())
+            if(expands_empty_pack(named.second, false))
+              return true;
+          return false;
+        };
+        std::function<void(irept &)> drop_empty_expansions = [&](irept &node)
+        {
+          if(node.id() == ID_arguments || node.id() == ID_initializer_list)
+          {
+            irept::subt kept;
+            for(auto &a : node.get_sub())
+            {
+              if(a.get_bool(ID_ellipsis) && expands_empty_pack(a, true))
+                continue;
+              kept.push_back(a);
+            }
+            node.get_sub().swap(kept);
+          }
+          for(auto &sub : node.get_sub())
+            drop_empty_expansions(sub);
+          for(auto &named : node.get_named_sub())
+            drop_empty_expansions(named.second);
+        };
+        if(!empty_pack_name.empty())
+          drop_empty_expansions(func_decl0.value());
       }
     }
 
@@ -9018,6 +9100,26 @@ skip_pack_removal_ft:
               return true;
           return false;
         };
+        // N5008 [temp.variadic]/5: a pack name is expanded by the innermost
+        // pack expansion that contains it -- whether the pattern \p n of an
+        // expansion names the pack outside any nested expansion (the `ls...'
+        // of `one(seq<Js>{}, ls...)...' belongs to the inner call)
+        std::function<bool(const irept &, bool)> expands_pack_name;
+        expands_pack_name =
+          [&is_pack_name, &expands_pack_name](const irept &n, bool root) -> bool
+        {
+          if(!root && n.get_bool(ID_ellipsis))
+            return false;
+          if(is_pack_name(n))
+            return true;
+          for(const auto &s : n.get_sub())
+            if(expands_pack_name(s, false))
+              return true;
+          for(const auto &ns : n.get_named_sub())
+            if(expands_pack_name(ns.second, false))
+              return true;
+          return false;
+        };
 
         // Helper: substitute pack_name within an expression
         std::function<irept(const irept &, const irep_idt &)> substitute_pack;
@@ -9135,6 +9237,7 @@ skip_pack_removal_ft:
                        &expand_pack,
                        &is_pack_name,
                        &contains_pack_name,
+                       &expands_pack_name,
                        &substitute_pack,
                        &make_name,
                        &type_pack_name,
@@ -9324,7 +9427,7 @@ skip_pack_removal_ft:
                   for(const auto &ename : expanded_names)
                     new_args.push_back(make_name(a, ename));
                 }
-                else if(a.get_bool(ID_ellipsis) && contains_pack_name(a))
+                else if(a.get_bool(ID_ellipsis) && expands_pack_name(a, true))
                 {
                   // N5008 [temp.variadic]/5: a pack-expansion call argument
                   // whose pattern CONTAINS (but is not exactly) the value pack
@@ -9376,7 +9479,7 @@ skip_pack_removal_ft:
                 for(const auto &ename : expanded_names)
                   new_elems.push_back(make_name(a, ename));
               }
-              else if(a.get_bool(ID_ellipsis) && contains_pack_name(a))
+              else if(a.get_bool(ID_ellipsis) && expands_pack_name(a, true))
               {
                 for(std::size_t k = 0; k < expanded_names.size(); ++k)
                 {
