@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.17\] .* function template body kept: SUCCESS$
+^\[main\.assertion\.18\] .* WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of 24 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+--
+Clang's __is_trivially_equality_comparable: true for integral and pointer
+types, false for floating-point, enumeration, array, reference, void and
+std::nullptr_t.  A class with a defaulted operator== and no padding also
+qualifies in clang; CBMC conservatively answers false for every class.

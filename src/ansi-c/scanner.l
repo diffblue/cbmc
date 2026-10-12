@@ -1142,6 +1142,8 @@ enable_or_disable ("enable"|"disable")
 "__is_scalar" { return make_identifier(); }
 "__is_trivially_relocatable"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
 "__is_trivially_relocatable" { return make_identifier(); }
+"__is_trivially_equality_comparable"/[ \t\r\n]*\( { return conditional_keyword(PARSER.cpp98 && (PARSER.mode==configt::ansi_ct::flavourt::CLANG || PARSER.clang_preprocessor), TOK_UNARY_TYPE_PREDICATE); }
+"__is_trivially_equality_comparable" { return make_identifier(); }
 "__is_same"         { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_assignable"   { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
 "__is_constructible" { return conditional_keyword(PARSER.cpp98, TOK_BINARY_TYPE_PREDICATE); }
