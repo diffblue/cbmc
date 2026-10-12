@@ -4027,24 +4027,30 @@ strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
   // pattern argument that is a pack expansion referencing the pack
   // (e.g. `static_cast<A&&>(a)...`, marked with ID_ellipsis), so
   // `f(static_cast<A&&>(a)...)` with an empty pack becomes `f()`.
+  // A pack is expanded by the innermost expansion containing it
+  // ([temp.variadic]/5): `f(g(x, a...)...)' over another pack x keeps its
+  // elements, only the nested `a...' goes (when the strip recurses there).
   auto is_empty_expansion = [&pack_var_name](const irept &a) -> bool
   {
-    std::function<bool(const irept &)> refs_pack = [&](const irept &n) -> bool
+    std::function<bool(const irept &, bool)> refs_pack =
+      [&](const irept &n, bool root) -> bool
     {
+      if(!root && n.get_bool(ID_ellipsis))
+        return false;
       if(n.id() == ID_cpp_name)
         for(const auto &s : n.get_sub())
           if(s.id() == ID_name && s.get(ID_identifier) == pack_var_name)
             return true;
       for(const auto &s : n.get_sub())
-        if(refs_pack(s))
+        if(refs_pack(s, false))
           return true;
       for(const auto &ns : n.get_named_sub())
-        if(refs_pack(ns.second))
+        if(refs_pack(ns.second, false))
           return true;
       return false;
     };
-    const bool bare = a.id() == ID_cpp_name && refs_pack(a);
-    return bare || (a.get_bool(ID_ellipsis) && refs_pack(a));
+    const bool bare = a.id() == ID_cpp_name && refs_pack(a, true);
+    return bare || (a.get_bool(ID_ellipsis) && refs_pack(a, true));
   };
   // If this is a function_call side_effect, strip pack var from args
   if(node.id() == ID_side_effect && node.get(ID_statement) == ID_function_call)
@@ -4084,6 +4090,100 @@ strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
   // Also recurse into named sub-nodes
   for(auto &named : node.get_named_sub())
     strip_empty_pack_references(pack_var_name, named.second);
+}
+
+/// N5008 [temp.variadic]/7: in the instance \p new_decl of the function
+/// template \p template_symbol with two or more template parameter packs,
+/// remove the function parameter pack whose own template pack is bound to
+/// zero elements, together with the expansions of its name in the
+/// signature and the body.  The pack is identified through the template's
+/// declaration, as a one-element pack's name may already be substituted in
+/// \p new_decl.
+void cpp_typecheckt::remove_empty_function_parameter_pack(
+  const symbolt &template_symbol,
+  cpp_declarationt &new_decl)
+{
+  if(template_symbol.type.id() != ID_cpp_declaration)
+    return;
+  const cpp_declarationt &orig = to_cpp_declaration(template_symbol.type);
+  const auto &tparams = orig.template_type().template_parameters();
+  std::size_t n_packs = 0;
+  for(const auto &tp : tparams)
+    if(tp.get_bool(ID_ellipsis))
+      ++n_packs;
+  if(n_packs < 2 || orig.declarators().empty())
+    return;
+  const typet &orig_type = orig.declarators().front().type();
+  if(orig_type.id() != ID_function_type)
+    return;
+  // the function parameter pack: its name and its template pack's name
+  irep_idt pack_var;
+  std::string pack_short;
+  for(const auto &p : orig_type.find(ID_parameters).get_sub())
+  {
+    if(p.id() != ID_cpp_declaration)
+      continue;
+    const auto &pd = static_cast<const cpp_declarationt &>(p);
+    if(
+      pd.declarators().empty() ||
+      (!pd.declarators().front().get_bool(ID_ellipsis) &&
+       !pd.declarators().front().type().get_bool(ID_ellipsis)))
+    {
+      continue;
+    }
+    const typet merged = pd.declarators().front().merge_type(pd.type());
+    const irept *t = &merged;
+    while(t->id() != ID_cpp_name && !t->get_sub().empty())
+      t = &t->get_sub().front();
+    if(t->id() != ID_cpp_name || t->get_sub().empty())
+      return;
+    pack_short = id2string(t->get_sub().front().get(ID_identifier));
+    for(const auto &nsub : pd.declarators().front().name().get_sub())
+      if(nsub.id() == ID_name)
+        pack_var = nsub.get(ID_identifier);
+  }
+  if(pack_var.empty() || pack_short.empty())
+    return;
+  // ... is its template pack bound to zero elements?
+  bool empty = false;
+  for(const auto &tp : tparams)
+  {
+    if(!tp.get_bool(ID_ellipsis) || tp.id() != ID_type)
+      continue;
+    const std::string pid = id2string(tp.type().get(ID_identifier));
+    const auto pos = pid.rfind("::");
+    if((pos != std::string::npos ? pid.substr(pos + 2) : pid) != pack_short)
+      continue;
+    const auto ps_it =
+      template_map.pack_size_map.find(tp.type().get(ID_identifier));
+    empty = ps_it != template_map.pack_size_map.end() && ps_it->second == 0;
+    break;
+  }
+  if(!empty)
+    return;
+  irept &params = new_decl.declarators()[0].type().add(ID_parameters);
+  auto &sub = params.get_sub();
+  for(auto it = sub.begin(); it != sub.end(); ++it)
+  {
+    if(it->id() != ID_cpp_declaration)
+      continue;
+    const auto &pd = static_cast<const cpp_declarationt &>(*it);
+    if(pd.declarators().empty())
+      continue;
+    bool named = false;
+    for(const auto &nsub : pd.declarators().front().name().get_sub())
+      if(nsub.id() == ID_name && nsub.get(ID_identifier) == pack_var)
+        named = true;
+    if(named)
+    {
+      sub.erase(it);
+      break;
+    }
+  }
+  strip_empty_pack_references(pack_var, new_decl.declarators()[0].type());
+  strip_empty_pack_references(pack_var, new_decl.type());
+  if(new_decl.declarators()[0].value().is_not_nil())
+    strip_empty_pack_references(pack_var, new_decl.declarators()[0].value());
 }
 
 const symbolt &cpp_typecheckt::instantiate_template(
@@ -7697,6 +7797,19 @@ skip_pack_removal_ft:
                 m_pack_var, new_decl.declarators()[0].value());
           }
         }
+      }
+      // The same with SEVERAL template packs (libc++'s __make_fmatrix_impl
+      // `<class _Fp, class... _Vs, size_t... _Is, size_t... _Js, class...
+      // _Ls>(..., _Ls... __ls)' with _Ls empty): the function parameter
+      // pack's own template pack is found through the template's
+      // declaration, and when that pack is bound to zero elements
+      // ([temp.variadic]/7) the parameter and the expansions of its name
+      // go.
+      if(
+        !new_decl.declarators().empty() &&
+        new_decl.declarators()[0].type().id() == ID_function_type)
+      {
+        remove_empty_function_parameter_pack(template_symbol, new_decl);
       }
       // N5008 [temp.inst]/1: a static data member template specialization
       // is instantiated once; a second reference (`idx<T>` in two member
