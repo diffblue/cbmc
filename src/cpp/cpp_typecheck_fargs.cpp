@@ -566,6 +566,20 @@ bool cpp_typecheck_fargst::match(
 #endif
     }
     else if(
+      operand.id() == ID_initializer_list && operand.operands().empty() &&
+      (type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
+       type.id() == ID_bool || type.id() == ID_c_bool ||
+       type.id() == ID_c_enum_tag || type.id() == ID_floatbv ||
+       type.id() == ID_fixedbv ||
+       (type.id() == ID_pointer && !is_reference(type) &&
+        !is_rvalue_reference(type))))
+    {
+      // N5008 [over.ics.list]/10.2: for a parameter of non-class type, an
+      // empty initializer list is the identity conversion (the parameter
+      // is value-initialized, [dcl.init.list]/3.11; implicit_typecast
+      // converts it).
+    }
+    else if(
       operand.id() == ID_initializer_list && cpp_typecheck.cpp_is_pod(type) &&
       operand.operands().size() == 1 &&
       cpp_typecheck.implicit_conversion_sequence(
