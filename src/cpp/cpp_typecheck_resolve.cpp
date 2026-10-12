@@ -10357,13 +10357,54 @@ bool cpp_typecheck_resolvet::apply_default_template_arguments(
           // Try the historical order first (some constraints only resolve
           // against the enclosing map); on failure, retry with the pack's
           // deduced element types bound.
+          // N5008 [expr.prim.fold]/2, [temp.deduct.general]/5: a fold over this
+          // template's own pack in the default (`enable_if_t<(is_same_v<int,
+          // U> && ...)>') expands over the deduced elements before the
+          // default is checked; otherwise the C type checker's placeholder
+          // made it `true'
+          const auto expand_own_pack_folds = [&](irept &node)
+          {
+            if(pack_param_index >= params.size())
+              return;
+            const irep_idt pack_id =
+              params[pack_param_index].type().get(ID_identifier);
+            const auto deduced =
+              cpp_typecheck.template_map.pack_args_map.find(pack_id);
+            const auto size =
+              cpp_typecheck.template_map.pack_size_map.find(pack_id);
+            std::vector<exprt> elements;
+            if(deduced != cpp_typecheck.template_map.pack_args_map.end())
+            {
+              for(const auto &t : deduced->second)
+                elements.push_back(exprt{ID_type, t});
+            }
+            else if(!pack_deduced_types.empty())
+            {
+              for(const auto &t : pack_deduced_types)
+                elements.push_back(exprt{ID_type, t});
+            }
+            if(
+              !elements.empty() ||
+              (size != cpp_typecheck.template_map.pack_size_map.end() &&
+               size->second == 0))
+            {
+              const std::string pack_str = id2string(pack_id);
+              const auto pos = pack_str.rfind("::");
+              cpp_typecheckt::expand_folds_over_pack(
+                node,
+                pos != std::string::npos ? pack_str.substr(pos + 2) : pack_str,
+                elements);
+            }
+          };
           auto eval_default = [&]() -> exprt
           {
             typet param_type = param.type();
+            expand_own_pack_folds(param_type);
             cpp_typecheck.template_map.apply(param_type);
             cpp_typecheck.typecheck_type(param_type);
             // Use the default value
             exprt default_val = param.default_argument();
+            expand_own_pack_folds(default_val);
             cpp_typecheck.template_map.apply(default_val);
             cpp_typecheck.typecheck_expr(default_val);
             return default_val;

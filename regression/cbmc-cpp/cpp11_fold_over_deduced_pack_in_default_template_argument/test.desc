@@ -1,0 +1,20 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* unary fold removes the candidate: SUCCESS$
+^\[main\.assertion\.2\] .* unary fold keeps the candidate: SUCCESS$
+^\[main\.assertion\.3\] .* binary fold removes the candidate: SUCCESS$
+^\[main\.assertion\.4\] .* binary fold keeps the candidate: SUCCESS$
+^\[main\.assertion\.5\] .* constructor kept: SUCCESS$
+^\[main\.assertion\.6\] .* WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of 18 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+N5008 [expr.prim.fold]/2, [temp.deduct.general]/5: folds over a function
+template's own deduced pack in a following parameter's type expand over the
+deduced elements before the default is substituted.
