@@ -2271,10 +2271,20 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
               exprt req_copy = req_clause;
               template_map.apply(req_copy);
               // A clause that cannot be evaluated is treated as satisfied
-              // (backward compatibility), see evaluate_constraint.
+              // (backward compatibility), see evaluate_constraint -- except
+              // that N5008 [temp.constr.atomic]/3, [temp.spec.partial.match]/2:
+              // an atomic constraint whose substitution fails is not
+              // satisfied, and the specialization does not match
+              // (`requires(T::is_special)' with T = int *).
               const auto satisfied = evaluate_constraint(req_copy);
               if(satisfied.has_value() && !*satisfied)
                 continue;
+              if(
+                !satisfied.has_value() &&
+                constraint_satisfaction(req_copy).is_false())
+              {
+                continue;
+              }
             }
 
             // Check concept constraints on individual parameters.
