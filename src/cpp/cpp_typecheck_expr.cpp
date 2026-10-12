@@ -8439,6 +8439,31 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
           type_expr = nil_exprt{};
         }
       }
+      // N5008 [expr.type.conv]/2, [expr.cast]/4, [expr.static.cast]/4: with a
+      // single expression `T(e)' is `static_cast<T>(e)', the
+      // direct-initialization `T t(e);', and for a prvalue e of class type
+      // T (cv-unqualified) [dcl.init.general]/16.6.1 initializes the
+      // object from e itself -- no copy or move constructor is called
+      // (C++17 guaranteed copy elision)
+      const bool prvalue = !is_reference(arg.type()) &&
+                           !is_rvalue_reference(arg.type()) &&
+                           arg.id() == ID_side_effect &&
+                           (arg.get(ID_statement) == ID_temporary_object ||
+                            arg.get(ID_statement) == ID_function_call);
+      // (the front end's own constructor calls, made by cpp_constructor for
+      // an object it initializes, elide there)
+      if(
+        config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP17 &&
+        !expr.get_bool(ID_C_default_initialization) && prvalue &&
+        type_expr.id() == ID_type && type_expr.type().id() == ID_struct_tag &&
+        to_struct_tag_type(type_expr.type()).get_identifier() ==
+          to_struct_tag_type(arg_type).get_identifier())
+      {
+        exprt result = arg;
+        result.add_source_location() = expr.source_location();
+        expr.swap(result);
+        return;
+      }
       exprt converted;
       if(
         type_expr.id() == ID_type && type_expr.type().id() == ID_struct_tag &&
