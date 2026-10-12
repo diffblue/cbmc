@@ -131,6 +131,13 @@ codet cpp_typecheckt::dtor(
        cpp_is_pod(type))
       continue;
 
+    // N5008 [class.dtor]/13: a destructor destroys the direct non-variant
+    // non-static data members; every member of a union is a variant member
+    // ([class.union.general]/1), so a union's destructor -- and with it an
+    // anonymous union's ([class.union.anon]/1) -- destroys none of them.
+    if(symbol.type.id() == ID_union)
+      continue;
+
     // Anonymous components (padding, unnamed unions in some error-
     // recovery paths) have no base_name; skip rather than
     // synthesising a ptrmember with an empty component name, which
