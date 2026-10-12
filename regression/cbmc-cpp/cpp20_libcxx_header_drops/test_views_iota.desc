@@ -11,6 +11,8 @@ views_iota.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::views::iota: the body of iota_view's __iterator
-constructor is dropped. clang++ 18 -stdlib=libc++ accepts this program, and
-it fails only its WRONG assertion.
+libc++ (LLVM 18) std::views::iota: the bodies of iota_view's __iterator
+constructor, __sentinel and operator- are dropped.  A cvise reduction found
+one layer (iterator_concept from derived_from on incomplete classes,
+cpp11_conversion_between_incomplete_classes, fixed); more remain.  clang++ 18
+-stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
