@@ -6268,12 +6268,9 @@ bool cpp_typecheckt::base_publicly_accessible(
         {
           if(scope->identifier == from_name)
             return true;
-          // Also allow if from derives from the scope class (e.g., when
-          // resolving a qualified name like ::Base::method() from within
-          // a derived class member function).
-          if(subtype_typecast(
-               from, to_struct_type(lookup(scope->identifier).type)))
-            return true;
+          // A member of a class derived from N is handled by
+          // [class.access.base]/4.3 below; a member of a base of N (B
+          // itself) gets no access to a private base of N.
         }
       }
     }
@@ -6330,7 +6327,43 @@ bool cpp_typecheckt::base_publicly_accessible(
     }
   }
 
-  // Walk the inheritance chain checking that all bases are public.
+  // [class.access.base]/4.3: if R occurs in a member of a class P derived
+  // from N, a protected base of N is accessible as well (an invented public
+  // member of B is then a protected member of N, hence a member of P); a
+  // private one is not (its invented member has no access in P).
+  bool in_member_of_derived = false;
+  {
+    cpp_scopet *chains[2] = {
+      cpp_scopes.current_scope_ptr, access_judgment_scope};
+    for(cpp_scopet *chain_start : chains)
+    {
+      if(chain_start == nullptr || in_member_of_derived)
+        continue;
+      for(cpp_scopet *scope = chain_start; !scope->is_root_scope();
+          scope = &scope->get_parent())
+      {
+        if(!scope->is_class())
+          continue;
+        const symbolt *scope_symbol = symbol_table.lookup(scope->identifier);
+        if(
+          scope_symbol != nullptr && scope_symbol->type.id() == ID_struct &&
+          subtype_typecast(to_struct_type(scope_symbol->type), from))
+        {
+          in_member_of_derived = true;
+          break;
+        }
+      }
+    }
+  }
+  const auto edge_accessible = [in_member_of_derived](const irept &base)
+  {
+    const irep_idt &access = base.get(ID_access);
+    return access == ID_public ||
+           (in_member_of_derived && access == ID_protected);
+  };
+
+  // [class.access.base]/4.1, /4.4: walk the inheritance chain; every edge
+  // must be public (or protected, per /4.3).
   for(const auto &b : from.bases())
   {
     if(b.type().id() != ID_struct_tag)
@@ -6339,10 +6372,10 @@ bool cpp_typecheckt::base_publicly_accessible(
     const struct_typet &base_struct = follow_tag(to_struct_tag_type(b.type()));
 
     if(base_struct.get(ID_name) == to.get(ID_name))
-      return b.get(ID_access) == ID_public;
+      return edge_accessible(b);
 
     if(base_publicly_accessible(base_struct, to))
-      return b.get(ID_access) == ID_public;
+      return edge_accessible(b);
   }
 
   return false;

@@ -788,9 +788,11 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
   function_scope.prefix=id2string(symbol.name)+"::";
 
   // For friend functions defined inside a class, add the class scope
-  // as a secondary scope so that class-scope names are visible.
-  // Also disable access control since friend functions can access
-  // private/protected members of the befriending class.
+  // as a secondary scope so that class-scope names are visible.  Access
+  // is NOT disabled: N5008 [class.friend]/1 lets a friend name the
+  // befriending class's private and protected members, which
+  // check_component_access grants; a friend of B gets no access to a
+  // class D that merely derives from B privately ([class.access.base]/4).
   const irep_idt &friend_class = symbol.type.get(ID_C_class);
   bool saved_access_control = disable_access_control;
   if(!friend_class.empty())
@@ -799,7 +801,6 @@ void cpp_typecheckt::convert_function(symbolt &symbol)
     if(it != cpp_scopes.id_map.end())
       function_scope.add_secondary_scope(
         static_cast<cpp_scopet &>(*it->second));
-    disable_access_control = true;
   }
 
   // genuine function definition -- do the parameter declarations
