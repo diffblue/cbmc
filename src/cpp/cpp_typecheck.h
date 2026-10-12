@@ -1031,6 +1031,9 @@ protected:
   void expand_folds_over_template_packs(
     irept &body,
     const template_typet &template_type);
+  void remove_empty_function_parameter_pack(
+    const symbolt &template_symbol,
+    cpp_declarationt &new_decl);
   /// Whether the trailing requires-clause of the non-template member
   /// function \p candidate of a class template specialization is satisfied
   /// (true when there is none or it cannot be decided).
