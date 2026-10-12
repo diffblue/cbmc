@@ -2805,6 +2805,62 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const template_typet &template_type =
     to_cpp_declaration(template_symbol.type).template_type();
 
+  // N5008 [temp.arg.explicit]/6, [temp.param]/18: explicitly specified
+  // template arguments are matched to the parameters in declaration order,
+  // and from the FIRST template parameter pack on every remaining argument
+  // belongs to that pack.  A function template's pack may be followed by
+  // further packs, deduced from the call ([temp.deduct.call]/1;
+  // `template <class... Vs, unsigned long... Is> g(seq<Is...>)' called as
+  // `g<char>(seq<4>{})', libc++'s __make_fmatrix_impl).  The flat argument
+  // list cannot tell the packs apart, so check the arguments against the
+  // parameters up to and including the first pack, record how many fell
+  // into it (#explicit_pack_size, read by guess_function_template_args),
+  // and leave the later parameters unassigned for deduction.
+  {
+    const auto &params = template_type.template_parameters();
+    const cpp_declarationt &declaration =
+      to_cpp_declaration(template_symbol.type);
+    std::size_t pack_index = params.size();
+    for(std::size_t i = 0; i < params.size(); ++i)
+    {
+      if(params[i].get_bool(ID_ellipsis))
+      {
+        pack_index = i;
+        break;
+      }
+    }
+    bool later_pack = false;
+    for(std::size_t i = pack_index + 1; i < params.size(); ++i)
+    {
+      if(params[i].get_bool(ID_ellipsis))
+        later_pack = true;
+    }
+    if(
+      later_pack && !declaration.is_class_template() &&
+      !declaration.is_template_alias() &&
+      template_args.arguments().size() > pack_index)
+    {
+      symbolt leading = template_symbol;
+      auto &leading_params =
+        to_cpp_declaration(leading.type).template_type().template_parameters();
+      leading_params.resize(pack_index + 1);
+      cpp_template_args_tct result = typecheck_template_args(
+        source_location, leading, template_args, explicit_only);
+      auto &args = result.arguments();
+      const std::size_t n_in_pack =
+        args.size() > pack_index ? args.size() - pack_index : 0;
+      for(std::size_t i = pack_index + 1; i < params.size(); ++i)
+      {
+        if(params[i].id() == ID_type)
+          args.push_back(exprt(ID_type, typet(ID_unassigned)));
+        else
+          args.push_back(exprt(ID_unassigned));
+      }
+      result.set("#explicit_pack_size", n_in_pack);
+      return result;
+    }
+  }
+
   // N5008 [temp.param]/18: a template parameter pack of a FUNCTION template
   // may be followed by further template parameters that have a default
   // argument (or are deducible) -- libc++'s `template <class... _Ts, bool

@@ -278,6 +278,10 @@ protected:
   void make_constructors(
     resolve_identifierst &identifiers);
 
+  void bind_explicit_template_arguments(
+    const cpp_declarationt &declaration,
+    const irept &stored_args);
+
   void apply_template_args(
     resolve_identifierst &identifiers,
     const cpp_template_args_non_tct &template_args,

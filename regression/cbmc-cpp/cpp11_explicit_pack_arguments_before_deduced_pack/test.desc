@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] .* leading pack: SUCCESS$
@@ -12,7 +12,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-A template argument list with explicitly specified elements of one pack and
-deduced elements of a following pack is not represented: instantiation
-splits the flat argument list positionally.  g++ 13 and clang++ 18 accept
-this program, and it fails only its WRONG assertion.
+The explicit arguments were bound positionally, one per parameter, so the
+elements of the first pack spilled into the following (deduced) packs.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
