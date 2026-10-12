@@ -1,0 +1,17 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* no copy: SUCCESS$
+^\[main\.assertion\.2\] .* non-movable prvalue: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A functional cast `T(prvalue of T)' copies or moves instead of initializing
+the object from the prvalue (N5008 [dcl.init.general]/16.6.1).  `T x =
+f();' and `T x = T(4);' are fine.  g++ 13 and clang++ 18 accept this program,
+and it fails only its WRONG assertion.
