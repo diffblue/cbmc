@@ -7319,12 +7319,39 @@ skip_pack_removal_ft:
           {
             const typet &d_ftype = new_decl.declarators()[0].type();
             const typet &m_ftype = md.declarators()[0].type();
+            // [temp.variadic]/5: a function parameter pack of the definition
+            // stands for any number of parameters of the declaration -- none
+            // for an empty pack (`construct<>()' against `construct(R
+            // &&...)')
+            std::function<bool(const irept &)> has_ellipsis =
+              [&has_ellipsis](const irept &node)
+            {
+              if(node.get_bool(ID_ellipsis))
+                return true;
+              for(const auto &sub : node.get_sub())
+                if(has_ellipsis(sub))
+                  return true;
+              for(const auto &named : node.get_named_sub())
+                if(has_ellipsis(named.second))
+                  return true;
+              return false;
+            };
             if(
               d_ftype.id() == ID_function_type &&
-              m_ftype.id() == ID_function_type &&
-              d_ftype.find(ID_parameters).get_sub().size() !=
-                m_ftype.find(ID_parameters).get_sub().size())
-              continue;
+              m_ftype.id() == ID_function_type)
+            {
+              const auto &m_params = m_ftype.find(ID_parameters).get_sub();
+              const std::size_t d_count =
+                d_ftype.find(ID_parameters).get_sub().size();
+              const bool m_pack =
+                !m_params.empty() && has_ellipsis(m_params.back());
+              if(
+                m_pack ? d_count + 1 < m_params.size()
+                       : d_count != m_params.size())
+              {
+                continue;
+              }
+            }
           }
           // Only adopt from an entry that carries its own template-parameter
           // list (an out-of-line member function template definition always
