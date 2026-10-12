@@ -1875,6 +1875,9 @@ std::string cpp_typecheckt::class_template_identifier(
       identifier += "Type" + std::to_string(counter);
     else
       identifier += "Non_Type" + std::to_string(counter);
+    // a template parameter pack ([temp.param]/17) differs from a parameter
+    if(it->get_bool(ID_ellipsis))
+      identifier += "...";
 
     counter++;
   }
@@ -1901,6 +1904,16 @@ std::string cpp_typecheckt::class_template_identifier(
         identifier += cpp_type2name(it->type());
       else
         identifier += cpp_expr2name(*it);
+      // N5008 [temp.variadic]/5: `const U &...' (a pack expansion) and
+      // `const U &' are different arguments; without the marker the
+      // partial specializations S<T, const U &...> and S<T, const U &> got
+      // one identifier, and the later one replaced the earlier
+      if(
+        it->get_bool(ID_ellipsis) || it->type().get_bool(ID_ellipsis) ||
+        it->find(ID_type).get_bool(ID_ellipsis))
+      {
+        identifier += "...";
+      }
     }
 
     identifier += '>';
