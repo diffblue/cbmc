@@ -716,6 +716,10 @@ protected:
   void clear_not_typechecked();
   void clean_up();
   void provide_stdlib_bodies();
+  /// Give bodies, written in C++ and type-checked like any other, to
+  /// functions that libc++ declares in its headers but defines only in its
+  /// compiled library.
+  void provide_library_source_models();
   exprt classic_num_put(const symbolt &accessor);
 
   /// Lay out the class's virtual bases after its non-virtual part (Itanium
