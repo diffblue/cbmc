@@ -10031,10 +10031,25 @@ bool cpp_typecheck_resolvet::apply_default_template_arguments(
       break;
     }
   }
+  // A pack deduced from inside a parameter type (`const tup<U...> &') has
+  // its elements in pack_args_map, and build_template_args may already
+  // have spread them over the argument slots: count those, too
+  // ([temp.deduct.type]/9).
+  std::size_t deduced_pack_size = pack_expansion_size;
+  if(!has_non_empty_pack && pack_param_index < params.size())
+  {
+    const auto deduced = cpp_typecheck.template_map.pack_args_map.find(
+      params[pack_param_index].type().get(ID_identifier));
+    if(
+      deduced != cpp_typecheck.template_map.pack_args_map.end() &&
+      args.size() == params.size() - 1 + deduced->second.size())
+    {
+      deduced_pack_size = deduced->second.size();
+    }
+  }
   const std::size_t pack_extra =
-    (has_non_empty_pack && pack_expansion_size > 0 &&
-     pack_param_index < params.size())
-      ? pack_expansion_size - 1
+    (deduced_pack_size > 0 && pack_param_index < params.size())
+      ? deduced_pack_size - 1
       : 0;
 
   // N5008 [temp.variadic]/8 + [basic.scope.temp]/2: `sizeof...(pack)` counts
@@ -10057,7 +10072,22 @@ bool cpp_typecheck_resolvet::apply_default_template_arguments(
     const irep_idt pack_id = params[pack_param_index].type().get(ID_identifier);
     if(!pack_id.empty())
     {
-      cpp_typecheck.template_map.set_pack_size(pack_id, pack_expansion_size);
+      // N5008 [temp.deduct.type]/9, [temp.variadic]/8: a pack deduced from
+      // inside a parameter type (`const tup<U...> &') is not a function
+      // parameter pack -- pack_expansion_size counts only the latter --
+      // and its elements are recorded in pack_args_map; sizeof...(U) in a
+      // default template argument is their count
+      // (`enable_if<sizeof...(U) == sizeof...(T), int> = 0', libc++'s
+      // tuple(const tuple<_Up...> &)).
+      std::size_t size = pack_expansion_size;
+      if(!has_non_empty_pack)
+      {
+        const auto deduced =
+          cpp_typecheck.template_map.pack_args_map.find(pack_id);
+        if(deduced != cpp_typecheck.template_map.pack_args_map.end())
+          size = deduced->second.size();
+      }
+      cpp_typecheck.template_map.set_pack_size(pack_id, size);
       // N5008 [temp.variadic]/5 + [temp.param]/14: a defaulted parameter
       // following the pack may also EXPAND it -- libstdc++'s
       // `_Bind::operator()<class... _Args, class _Result =
