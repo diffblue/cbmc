@@ -1,11 +1,10 @@
 // N5008 [temp.inst]/16: only the total depth of recursive instantiation is
 // bounded.  Checking is_invocable_v<outer<forward_impl<...>>, int *> nests
 // four different specializations of invokable_r (outer -> forward_impl ->
-// back_op -> at); CBMC's guard against runaway recursion stops at the third
-// enclosing instance of one template (elaborate_class_template), so the
-// fourth is skipped and the static_assert's evaluation leaves the call
-// unusable.  Same mechanism as
-// cpp11_nested_instantiations_of_one_class_template, one level deeper.
+// back_op -> at); CBMC's guard against runaway recursion stopped at the
+// third enclosing instance of one template (elaborate_class_template), so
+// the fourth was skipped and the static_assert's evaluation left the call
+// unusable.  libc++'s ranges::min constraint under views::take nests four.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <bool B, class If, class>
 struct cond
