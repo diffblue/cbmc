@@ -260,6 +260,8 @@ void cpp_typecheckt::typecheck()
     }
   }
 
+  provide_library_source_models();
+
   typecheck_method_bodies();
 
   typecheck_contracts();

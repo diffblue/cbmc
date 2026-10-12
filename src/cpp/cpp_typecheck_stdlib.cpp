@@ -8,6 +8,7 @@
 #include <util/bitvector_expr.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/cprover_prefix.h>
 #include <util/expr_initializer.h>
 #include <util/expr_util.h>
@@ -19,8 +20,12 @@
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_parser.h"
+#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 #include "itanium_abi_cpp_zero_initializer.h"
+
+#include <sstream>
 
 /// Synthesize a body for _List_node_base::_M_hook.
 /// Inserts `this` before `__position` in a doubly-linked list.
@@ -1460,6 +1465,136 @@ exprt cpp_typecheckt::classic_num_put(const symbolt &accessor)
   symbolt *inserted = nullptr;
   symbol_table.move(facet_symbol, inserted);
   return inserted->symbol_expr();
+}
+
+/// Bodies, in C++, of functions that libc++ (LLVM 18) declares in its
+/// headers and defines in its compiled library (src/*.cpp there), keyed by
+/// the function's name without its parameter list.  The std::bad_alloc
+/// members are out of line in libstdc++, too.  Each body is the one
+/// libc++ uses, simplified where only concurrent executions could tell the
+/// difference.
+static const std::map<std::string, std::string> &library_source_models()
+{
+  static const std::map<std::string, std::string> models = {
+    // libc++ src/memory.cpp; the acquire-load shortcut only avoids the
+    // decrement when no weak owner is left, with the same outcome
+    {"std::__1::__shared_weak_count::__release_weak",
+     "{ if(__libcpp_atomic_refcount_decrement(__shared_weak_owners_) == -1)"
+     " __on_zero_shared_weak(); }"},
+    {"std::__1::__shared_weak_count::lock",
+     "{ if(__shared_owners_ == -1) return nullptr;"
+     " __libcpp_atomic_refcount_increment(__shared_owners_); return this; }"},
+    {"std::__1::__shared_weak_count::__get_deleter", "{ return nullptr; }"},
+    {"std::__1::__shared_weak_count::~__shared_weak_count", "{ }"},
+    {"std::__1::__shared_count::~__shared_count", "{ }"},
+    // libc++ src/hash.cpp: the smallest prime not less than __n (libc++
+    // throws overflow_error past the largest size_t prime)
+    {"std::__1::__next_prime",
+     "{ if(__n <= 2) return 2;"
+     " for(size_t __p = __n | 1;; __p += 2) {"
+     " bool __prime = true;"
+     " for(size_t __d = 3; __d <= __p / __d; __d += 2)"
+     " if(__p % __d == 0) { __prime = false; break; }"
+     " if(__prime) return __p; } }"},
+    // libc++ src/support/runtime/exception_fallback.ipp, N5008
+    // [exception]
+    {"std::exception::~exception", "{ }"},
+    {"std::exception::what", "{ return \"std::exception\"; }"},
+    // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
+    {"std::bad_alloc::bad_alloc", "{ }"},
+    {"std::bad_alloc::~bad_alloc", "{ }"},
+    {"std::bad_alloc::what", "{ return \"std::bad_alloc\"; }"},
+    {"std::bad_array_new_length::bad_array_new_length", "{ }"},
+    {"std::bad_array_new_length::~bad_array_new_length", "{ }"},
+    {"std::bad_array_new_length::what", "{ return \"bad_array_new_length\"; }"},
+  };
+  return models;
+}
+
+void cpp_typecheckt::provide_library_source_models()
+{
+  std::vector<std::pair<irep_idt, const std::string *>> to_define;
+  for(const auto &entry : symbol_table.symbols)
+  {
+    const symbolt &symbol = entry.second;
+    if(
+      symbol.type.id() != ID_code || symbol.value.is_not_nil() ||
+      symbol.is_type || symbol.mode != ID_cpp)
+    {
+      continue;
+    }
+    const std::string name = id2string(symbol.name);
+    const auto model =
+      library_source_models().find(name.substr(0, name.find('(')));
+    if(model != library_source_models().end())
+      to_define.emplace_back(entry.first, &model->second);
+  }
+
+  for(const auto &item : to_define)
+  {
+    // the body, parsed as that of a function definition
+    std::istringstream in{
+      "void " CPROVER_PREFIX "library_model() " + *item.second};
+    cpp_parsert parser{get_message_handler()};
+    parser.set_file(ID_built_in);
+    parser.in = &in;
+    parser.mode = config.ansi_c.mode;
+    if(
+      parser.parse() || parser.parse_tree.items.size() != 1 ||
+      !parser.parse_tree.items.front().is_declaration())
+    {
+      continue;
+    }
+    cpp_declarationt &declaration =
+      parser.parse_tree.items.front().get_declaration();
+    if(declaration.declarators().size() != 1)
+      continue;
+    exprt body = declaration.declarators().front().value();
+
+    symbolt &symbol = symbol_table.get_writeable_ref(item.first);
+    symbol.value = body;
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      // a constructor initializes its bases and members and installs the
+      // virtual pointers before its body ([class.base.init]/13, Itanium C++
+      // ABI 2.6), as for a constructor defined in the program
+      const code_typet &code_type = to_code_type(symbol.type);
+      if(
+        code_type.return_type().id() == ID_constructor &&
+        !code_type.parameters().empty() &&
+        code_type.parameters().front().type().id() == ID_pointer)
+      {
+        const typet &class_tag =
+          to_pointer_type(code_type.parameters().front().type()).base_type();
+        const symbolt *class_symbol =
+          class_tag.id() == ID_struct_tag
+            ? symbol_table.lookup(
+                to_struct_tag_type(class_tag).get_identifier())
+            : nullptr;
+        if(class_symbol == nullptr || class_symbol->type.id() != ID_struct)
+          continue;
+        const struct_typet &class_type = to_struct_type(class_symbol->type);
+        irept initializers{ID_member_initializers};
+        cpp_save_scopet save_scope{cpp_scopes};
+        cpp_scopes.set_scope(class_symbol->name);
+        check_member_initializers(
+          class_type.bases(),
+          class_type.components(),
+          initializers,
+          class_symbol->name);
+        full_member_initialization(class_type, initializers);
+        move_member_initializers(initializers, code_type, symbol.value);
+      }
+      convert_function(symbol);
+    }
+    catch(...)
+    {
+      symbol.value.make_nil();
+    }
+    if(!symbol.value.get_bool("#cpp_converted"))
+      symbol.value.make_nil();
+  }
 }
 
 void cpp_typecheckt::provide_stdlib_bodies()
