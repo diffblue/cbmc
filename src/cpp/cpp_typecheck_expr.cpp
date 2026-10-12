@@ -40,6 +40,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <functional>
 #include <optional>
+#include <set>
 
 bool cpp_typecheckt::find_parent(
   const symbolt &symb,
@@ -3318,6 +3319,60 @@ std::vector<typet> cpp_typecheckt::builtin_trait_type_args(const exprt &expr)
           expanded = true; // an empty pack contributes nothing
           break;
         }
+      }
+      if(expanded)
+        continue;
+    }
+    // N5008 [temp.variadic]/5: a pattern other than the bare pack name
+    // (`Y &&...', `const Y &...') expands to one argument per element of
+    // the pack it names, each with the element substituted for the pack
+    if(raw.get_bool(ID_ellipsis) && raw.id() != ID_cpp_name)
+    {
+      std::set<irep_idt> names;
+      std::function<void(const irept &)> collect = [&](const irept &n)
+      {
+        if(
+          n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+          n.get_sub().front().id() == ID_name)
+        {
+          names.insert(n.get_sub().front().get(ID_identifier));
+        }
+        for(const auto &sub : n.get_sub())
+          collect(sub);
+        for(const auto &named : n.get_named_sub())
+          collect(named.second);
+      };
+      collect(raw);
+      bool expanded = false;
+      for(const auto &base_name : names)
+      {
+        for(const auto *id_ptr : cpp_scopes.current_scope().lookup(
+              base_name,
+              cpp_scopet::RECURSIVE,
+              cpp_idt::id_classt::TEMPLATE_PARAMETER))
+        {
+          const auto pa = template_map.pack_args_map.find(id_ptr->identifier);
+          const auto ps = template_map.pack_size_map.find(id_ptr->identifier);
+          if(pa != template_map.pack_args_map.end())
+          {
+            for(const auto &element : pa->second)
+            {
+              irept copy = raw;
+              copy.remove(ID_ellipsis);
+              replace_type_pack_ref(copy, id2string(base_name), element);
+              typet t = static_cast<const typet &>(copy);
+              typecheck_type(t);
+              result.push_back(t);
+            }
+            expanded = true;
+          }
+          else if(ps != template_map.pack_size_map.end() && ps->second == 0)
+            expanded = true; // an empty pack contributes nothing
+          if(expanded)
+            break;
+        }
+        if(expanded)
+          break;
       }
       if(expanded)
         continue;

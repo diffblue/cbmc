@@ -1,0 +1,15 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ rvalue pattern: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion failed
+--
+builtin_trait_type_args expanded only a bare pack name; any pattern naming
+a bound pack is now expanded element by element.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.
