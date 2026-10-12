@@ -224,6 +224,9 @@ protected:
   cpp_parse_treet &parse_tree;
   message_handlert &message_handler;
 
+  /// see rDeclaration
+  std::size_t declaration_counter = 0;
+
   // scopes
   new_scopet root_scope;
   new_scopet *current_scope;
@@ -268,6 +271,7 @@ protected:
   bool rExternTemplateDecl(cpp_declarationt &);
 
   bool rDeclaration(cpp_declarationt &);
+  bool rDeclarationBody(cpp_declarationt &);
   bool rIntegralDeclaration(
     cpp_declarationt &,
     cpp_storage_spect &,
@@ -2482,7 +2486,20 @@ bool Parser::rExternTemplateDecl(cpp_declarationt &decl)
   C++11 [dcl.dcl], [dcl.fct.def] (A.6, A.7)
 */
 
+/// A declaration, numbered in the order its parsing completes
+/// (ID_C_source_order): N5008 [basic.lookup.unqual]/4 makes a name visible
+/// only after its declaration, and the front end converts some bodies (of
+/// member functions, [class.mem.general]/7) only at the end of the
+/// translation unit.
 bool Parser::rDeclaration(cpp_declarationt &declaration)
+{
+  if(!rDeclarationBody(declaration))
+    return false;
+  declaration.set(ID_C_source_order, ++declaration_counter);
+  return true;
+}
+
+bool Parser::rDeclarationBody(cpp_declarationt &declaration)
 {
 #ifdef DEBUG
   indenter _i;
