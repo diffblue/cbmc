@@ -467,20 +467,19 @@ mini_bdd_mgrt::mk(unsigned var, const mini_bddt &low, const mini_bddt &high)
 }
 
 bool mini_bdd_mgrt::reverse_keyt::
-operator<(const mini_bdd_mgrt::reverse_keyt &y) const
+operator==(const mini_bdd_mgrt::reverse_keyt &y) const
 {
-  const reverse_keyt &x = *this;
+  return var == y.var && low == y.low && high == y.high;
+}
 
-  if(x.var < y.var)
-    return true;
-  else if(x.var > y.var)
-    return false;
-  else if(x.low < y.low)
-    return true;
-  else if(x.low > y.low)
-    return false;
-  else
-    return x.high < y.high;
+std::size_t mini_bdd_mgrt::reverse_key_hasht::
+operator()(const mini_bdd_mgrt::reverse_keyt &key) const
+{
+  // mix var, low and high into a single hash
+  std::size_t h = key.var;
+  h = h * 0x9e3779b1 + key.low;
+  h = h * 0x9e3779b1 + key.high;
+  return h;
 }
 
 void mini_bdd_mgrt::DumpTable(std::ostream &out) const
