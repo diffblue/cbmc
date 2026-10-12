@@ -1,5 +1,7 @@
 var NAVTREEINDEX65 =
 {
+"classstring__abstractiont.html#ac4984278693dd190156f60170a1ced13":[7,0,1220,11],
+"classstring__abstractiont.html#ac62a6e05134f3d1f3410ad1fac62b4ea":[7,0,1220,14],
 "classstring__abstractiont.html#ad7155e1a97a1a0627cec909e3ce28ed5":[7,0,1220,22],
 "classstring__abstractiont.html#ad835afbcde2793ab35e1f9417a2b9e2d":[7,0,1220,8],
 "classstring__abstractiont.html#ada46c58cc6e2eb0b9ea456e3a9c04dfc":[7,0,1220,50],
@@ -247,7 +249,5 @@ var NAVTREEINDEX65 =
 "classstring__instrumentationt.html#a946e326cf6707e3ac7fb4bbf810799d9":[7,0,1237,9],
 "classstring__instrumentationt.html#a9e8905bf9e38b914843789706f6c4a0a":[7,0,1237,2],
 "classstring__instrumentationt.html#aa1bdd340a443a060215beeb4d4d30bd7":[7,0,1237,3],
-"classstring__instrumentationt.html#aa84a9f17dfbce6acb63914518d9bfcf1":[7,0,1237,14],
-"classstring__instrumentationt.html#ad1244cc0bcf30a5e628a736fff07ce49":[7,0,1237,7],
-"classstring__instrumentationt.html#aeca907ebfaab097b4379f91232fd535e":[7,0,1237,11]
+"classstring__instrumentationt.html#aa84a9f17dfbce6acb63914518d9bfcf1":[7,0,1237,14]
 };

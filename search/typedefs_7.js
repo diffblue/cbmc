@@ -15,7 +15,7 @@ var searchData=
   ['goto_5fprogram_5fdifft_12',['goto_program_difft',['../classunified__difft.html#a5f6b753099b5aea69a237162cead03b8',1,'unified_difft']]],
   ['goto_5fstate_5flistt_13',['goto_state_listt',['../classframet.html#a218286a29b4c57b199e7bb9c1098ba46',1,'framet']]],
   ['gotost_14',['gotost',['../classgoto__convertt.html#ad0959be9a1eeeb3eb201e112cdd3f8a3',1,'goto_convertt']]],
-  ['gt_15',['Gt',['../classmini__bdd__applyt.html#a654ed951a75a010a33a172993f1baa67',1,'mini_bdd_applyt']]],
+  ['gt_15',['gt',['../classmini__bdd__applyt.html#a654ed951a75a010a33a172993f1baa67',1,'mini_bdd_applyt::Gt'],['../classrestrictt.html#a6b0ab52ca776453981b736f45cdfb9cb',1,'restrictt::Gt']]],
   ['guard_5fmanagert_16',['guard_managert',['../guard_8h.html#a47ee86316f61f488227b7267002c2ea8',1,'guard.h']]],
   ['guardt_17',['guardt',['../classgoto__check__ct.html#a225dc1a80a70337760033fc17c1185a2',1,'goto_check_ct::guardt'],['../guard_8h.html#ae1df4d0a7d15b30ab25108d8d9996ee5',1,'guardt:&#160;guard.h']]],
   ['gvs_5frecursion_5fsett_18',['gvs_recursion_sett',['../classvalue__set__fit.html#ad76fce18b27962024c7403e4f7f2c61e',1,'value_set_fit']]]

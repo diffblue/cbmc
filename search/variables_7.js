@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['g_0',['G',['../classmini__bdd__applyt.html#a71bab0a627fd7d656392329be4ed44c2',1,'mini_bdd_applyt']]],
+  ['g_0',['g',['../classrestrictt.html#a92fa2abf350a5fd844f6cab173619d3b',1,'restrictt::G'],['../classmini__bdd__applyt.html#a71bab0a627fd7d656392329be4ed44c2',1,'mini_bdd_applyt::G']]],
   ['gcc_5f_5ffloat128_5ftype_1',['gcc__float128_type',['../structconfigt_1_1ansi__ct.html#a59ea1814570eace6717a235013349097',1,'configt::ansi_ct']]],
   ['gcc_5fattribute_5fmode_2',['gcc_attribute_mode',['../classansi__c__convert__typet.html#a7299dab489d758ee62d246ffcfd58632',1,'ansi_c_convert_typet']]],
   ['gcc_5fbuiltin_5fheaders_5falpha_3',['gcc_builtin_headers_alpha',['../ansi__c__internal__additions_8cpp.html#ac6eb792b40894b375dd0a0883540103f',1,'gcc_builtin_headers_alpha:&#160;ansi_c_internal_additions.cpp'],['../ansi__c__internal__additions_8h.html#ac6eb792b40894b375dd0a0883540103f',1,'gcc_builtin_headers_alpha:&#160;ansi_c_internal_additions.cpp']]],
