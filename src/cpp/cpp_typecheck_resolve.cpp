@@ -11976,27 +11976,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // pre-populate the template map with them before deduction.
   const irept &stored_args = expr.find(ID_C_template_arguments);
   if(stored_args.is_not_nil())
-  {
-    const cpp_template_args_tct &explicit_args =
-      to_cpp_template_args_tc(stored_args);
-    const auto &params = cpp_declaration.template_type().template_parameters();
-    for(std::size_t i = 0;
-        i < explicit_args.arguments().size() && i < params.size();
-        i++)
-    {
-      if(
-        explicit_args.arguments()[i].id() != ID_unassigned &&
-        explicit_args.arguments()[i].type().id() != ID_unassigned)
-      {
-        // Per [temp.arg]/2: resolve template parameter references
-        // in explicit args using the enclosing template_map.
-        exprt resolved_arg = explicit_args.arguments()[i];
-        if(resolved_arg.id() == ID_type)
-          cpp_typecheck.template_map.apply(resolved_arg.type());
-        cpp_typecheck.template_map.set(params[i], resolved_arg);
-      }
-    }
-  }
+    bind_explicit_template_arguments(cpp_declaration, stored_args);
 
   // there should be exactly one declarator
   PRECONDITION(cpp_declaration.declarators().size() == 1);
@@ -12076,25 +12056,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // argument being convertible to W).  Re-assert the explicit
   // bindings after the deduction pass so they always win.
   if(stored_args.is_not_nil())
-  {
-    const cpp_template_args_tct &explicit_args =
-      to_cpp_template_args_tc(stored_args);
-    const auto &params = cpp_declaration.template_type().template_parameters();
-    for(std::size_t i = 0;
-        i < explicit_args.arguments().size() && i < params.size();
-        i++)
-    {
-      if(
-        explicit_args.arguments()[i].id() != ID_unassigned &&
-        explicit_args.arguments()[i].type().id() != ID_unassigned)
-      {
-        exprt resolved_arg = explicit_args.arguments()[i];
-        if(resolved_arg.id() == ID_type)
-          cpp_typecheck.template_map.apply(resolved_arg.type());
-        cpp_typecheck.template_map.set(params[i], resolved_arg);
-      }
-    }
-  }
+    bind_explicit_template_arguments(cpp_declaration, stored_args);
 
   // see if that has worked out
 
@@ -12598,6 +12560,91 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   }
 
   return template_function_instance;
+}
+
+/// N5008 [temp.arg.explicit]/2, [temp.deduct.general]/2: bind the explicitly
+/// specified template arguments \p stored_args of \p declaration in the
+/// template map before (and again after) deduction.  The arguments
+/// correspond to the parameters in declaration order; when
+/// typecheck_template_args grouped them for a pack followed by further packs
+/// ([temp.arg.explicit]/6: every argument from the first pack on belongs to
+/// it), #explicit_pack_size gives the number of pack elements, which are
+/// bound as the pack's argument sequence.
+void cpp_typecheck_resolvet::bind_explicit_template_arguments(
+  const cpp_declarationt &declaration,
+  const irept &stored_args)
+{
+  const cpp_template_args_tct &explicit_args =
+    to_cpp_template_args_tc(stored_args);
+  const auto &args = explicit_args.arguments();
+  const auto &params = declaration.template_type().template_parameters();
+  const auto assigned = [](const exprt &arg)
+  { return arg.id() != ID_unassigned && arg.type().id() != ID_unassigned; };
+  const auto resolved = [this](exprt arg)
+  {
+    // Per [temp.arg]/2: resolve template parameter references
+    // in explicit args using the enclosing template_map.
+    if(arg.id() == ID_type)
+      cpp_typecheck.template_map.apply(arg.type());
+    return arg;
+  };
+
+  const irept &pack_size_irep = stored_args.find("#explicit_pack_size");
+  if(pack_size_irep.is_nil())
+  {
+    for(std::size_t i = 0; i < args.size() && i < params.size(); i++)
+    {
+      if(assigned(args[i]))
+        cpp_typecheck.template_map.set(params[i], resolved(args[i]));
+    }
+    return;
+  }
+
+  const std::size_t n_in_pack = stored_args.get_size_t("#explicit_pack_size");
+  std::size_t arg_index = 0;
+  bool first_pack_done = false;
+  for(const auto &param : params)
+  {
+    if(!param.get_bool(ID_ellipsis) || first_pack_done)
+    {
+      if(arg_index < args.size() && assigned(args[arg_index]))
+        cpp_typecheck.template_map.set(param, resolved(args[arg_index]));
+      ++arg_index;
+      continue;
+    }
+    // the first pack: its explicitly specified elements
+    const bool type_pack = param.id() == ID_type;
+    const irep_idt pack_id =
+      type_pack ? param.type().get(ID_identifier) : param.get(ID_identifier);
+    std::vector<typet> types;
+    std::vector<exprt> values;
+    for(std::size_t k = 0; k < n_in_pack && arg_index < args.size();
+        ++k, ++arg_index)
+    {
+      const exprt arg = resolved(args[arg_index]);
+      if(type_pack)
+        types.push_back(arg.type());
+      else
+        values.push_back(arg);
+    }
+    auto &map = cpp_typecheck.template_map;
+    if(type_pack)
+    {
+      if(types.size() == 1)
+        map.type_map[pack_id] = types.front();
+      map.pack_args_map[pack_id] = std::move(types);
+    }
+    else
+    {
+      if(values.size() == 1)
+        map.expr_map[pack_id] = values.front();
+      map.pack_expr_map[pack_id] = std::move(values);
+    }
+    map.set_pack_size(pack_id, n_in_pack);
+    // the later parameters, packs included, follow positionally
+    // (typecheck_template_args padded them with unassigned markers)
+    first_pack_done = true;
+  }
 }
 
 /// N5008 [temp.arg.explicit]/9: template argument deduction can extend the
