@@ -2,7 +2,7 @@ var classmemory__sizet =
 [
     [ "memory_sizet", "classmemory__sizet.html#a7cc1bf0babd21bd667009e3ebed738bc", null ],
     [ "memory_sizet", "classmemory__sizet.html#a14932b892622d582851d6f0f4586be49", null ],
-    [ "memory_sizet", "classmemory__sizet.html#adfd74700abd4884167fbef27e2c569d9", null ],
+    [ "memory_sizet", "classmemory__sizet.html#aadccc114d2119f2882db117c9f303c35", null ],
     [ "memory_sizet", "classmemory__sizet.html#a00b5060f49285d535407d74033929e62", null ],
     [ "from_bytes", "classmemory__sizet.html#a8901cb6dce83272ca28539d8d0b0a670", null ],
     [ "get_bytes", "classmemory__sizet.html#a0bea8c79b4426584dfd8f1660aa17f3b", null ],
