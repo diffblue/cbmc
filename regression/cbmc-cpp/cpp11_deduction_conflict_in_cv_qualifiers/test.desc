@@ -1,0 +1,22 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* const char vs char conflicts: SUCCESS$
+^\[main\.assertion\.2\] .* int vs long conflicts: SUCCESS$
+^\[main\.assertion\.3\] .* consistent: SUCCESS$
+^\[main\.assertion\.4\] .* top-level const ignored: SUCCESS$
+^\[main\.assertion\.5\] .* top-level volatile ignored: SUCCESS$
+^\[main\.assertion\.6\] .* const T & and T: SUCCESS$
+^\[main\.assertion\.7\] .* const int \* and int \* conflict: SUCCESS$
+^\[main\.assertion\.8\] .* const int \* twice: SUCCESS$
+^\[main\.assertion\.9\] .* class template argument and const: SUCCESS$
+^\[main\.assertion\.10\] .* WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of 10 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [temp.deduct.type]/2: deductions of one template parameter that differ
+only in cv-qualifiers conflict.
