@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp20 --unwind 8 --unwinding-assertions --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
@@ -69,3 +69,10 @@ specialization) and invoke_result_t of the closure resolves.  The range-for
 now fails comparing take_view's begin() (int *) with its end(), which CBMC
 types as a __sentinel: end() const takes the unsized branch after the view
 was built through operator| (reduction in progress).
+
+2026-10-12 (round 176): CORE.  The last layer was take_view::size()'s
+ranges::min call: its constraint's invoke_result_t needed a fourth nested
+instance of __invokable_r, which the recursion guard skipped
+(cpp11_four_nested_instantiations_of_one_class_template).  Two __tuple_impl
+bodies are still dropped (cpp20_libcxx_header_drops/test_bind_back), on
+code the verification does not reach.

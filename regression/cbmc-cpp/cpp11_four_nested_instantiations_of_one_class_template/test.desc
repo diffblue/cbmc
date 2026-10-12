@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] line \d+ four levels: SUCCESS$
@@ -9,8 +9,9 @@ main.cpp
 --
 ^warning: ignoring
 --
-The bound (same_template_depth >= 3) is a heuristic: raising it to 4 makes
-this pass but cpp17_headers1 ten times slower.  A guard that detects actual
-recursion (repeated or growing template arguments) instead of counting
-instances would fix both.  g++ 13 and clang++ 18 accept this program, and it
-fails only its WRONG assertion.
+The runaway-recursion guard in elaborate_class_template counted every
+enclosing instance of the same template; it now counts only those whose
+arguments the new ones grow from (template_args_may_recurse: an argument
+contains the enclosing one, or one argument list is a prefix or suffix of
+the other).  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.
