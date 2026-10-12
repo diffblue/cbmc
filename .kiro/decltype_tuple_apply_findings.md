@@ -13893,3 +13893,24 @@ commit compiles; -K: 7 KNOWNBUGs OK.
 
 Suites W66: cbmc-cpp 1786 exit 0, cpp 246, regression/cbmc 1203,
 goto-instrument 298, contracts 178; lint 0.
+
+## Round 175: take_view::end() through operator|
+
+- Killed the stale Oct-9 cvise (PID 2931361) on request.
+- With the real headers, `arr | views::take(3)` has the right type
+  (take_view<ref_view<int[5]>>), and begin() is int *; v.size() and so
+  end() are wrong ONLY on the operator| path, and only when the direct
+  `take(arr, 3).end()' was not instantiated first (an instance made in the
+  wrong context, then cached).
+- The cvise reduction kb_end2 (two-run: pipe fails, direct-first passes)
+  drifted into a by-value `views::all' (array decays legitimately) and
+  thereby into two genuine, unrelated bugs:
+  - 6a5cbcc710: [temp.deduct.call]/2.1 array->pointer only applied for
+    P = T; `template <class X> int f(X *); f(arr);' failed.
+  - 0d2c5e3426: parameter placeholders for trailing return types took
+    pdecl.type() without the declarator (`X *p' became `X p').
+- New reduction kb_size requires both variants to be accepted by clang and
+  `int arr[5]' to survive; signal: decltype(v.size()) wrong on the pipe path.
+
+Suites W67: cbmc-cpp 1788 exit 0, cpp 246, regression/cbmc 1203,
+goto-instrument 298, contracts 178; lint 0.
