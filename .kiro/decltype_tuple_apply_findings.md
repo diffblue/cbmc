@@ -13927,3 +13927,62 @@ goto-instrument 298, contracts 178; lint 0.
   __boolean_testable<invoke_result_t<...>>) or iter_common_reference_t is
   probably needed.  Next: substitute those concepts one at a time in the
   237-line file.
+
+## Round 176
+
+Requests: tooling for suppressed diagnostics; check the cvise result;
+KNOWNBUGs for uncovered issues; the dropped libc++ __tuple_impl bodies;
+a libc++ header sweep.
+
+Commits (460f58d5b1..HEAD):
+- 3b1574ae10 CBMC_CPP_SHOW_SUPPRESSED=1 keeps SFINAE/system-header
+  diagnostics visible (error count still rolled back).  Replaces mk_ns.sh.
+- 6f0943186e recursion guard counts only instantiations whose arguments
+  grow from an enclosing one (template_args_may_recurse).  Root cause of
+  the views::take failure found via kb_size: ranges::min's constraint
+  nests four __invokable_r instances; the fourth was skipped.
+  cpp20_ranges_basic_libcxx and four_nested are CORE.
+- b9e73e9566 pack size of a pack deduced from a parameter type
+  (`const tup<U...> &') for the following defaults.
+- 27b7d88634 pack patterns (`Y &&...') in builtin trait arguments.
+- a8890ece65 KNOWNBUG cpp26_pack_index_in_sizeof (variable template
+  initializer converts without pack-index substitution).
+- f14856f0e9 folds over a function template's own deduced pack in a
+  following default (expand_folds_over_pack now a static member).
+- 95f91cb86e single deduced pack element expanded in a default's
+  template-argument list (`enable_u<U...>::value'); test_tuple_convert
+  CORE.  The `<void, 0>' seen in instantiation traces is the empty-pack
+  sentinel, not a wrong deduction (an early cvise run chased it).
+- 29102a44bf union (and anonymous union) destructors do not destroy
+  variant members ([class.dtor]/13); fixed unordered_map's call of the
+  deleted ~__hash_value_type.
+- 4336d12e1a regression/cbmc-library/wmemcpy-01 moved to
+  regression/cbmc/wchar_functions_no_model: library_check.sh fails on a
+  cbmc-library directory without a library function (latent since
+  57d151888a, exposed when string.c changed).
+- ccffcd3161 __is_trivially_equality_comparable (clang trait; classes
+  conservatively false).
+- 55333265d7 __builtin_char_memchr declaration + library model;
+  test_string_view_find CORE.  Note: builtin_factory matches
+  " name(", so header declarations must read `char* name(' not
+  `char *name('.
+- 31e755804e conflicting deductions that differ only in cv-qualifiers
+  ([temp.deduct.type]/2); irept operator== ignores #constant.
+- 15ac1eaa1c sweep KNOWNBUGs (visit, views_transform, views_iota,
+  views_filter) and cvise-reduced
+  cpp11_tuple_converting_constructor_spurious_instantiation (the
+  remaining bind_back/filter/drop layer: a __tuple_impl constructor body
+  is instantiated while only constraints are checked, [temp.inst]/11).
+- "unsubstitutable requires-clauses reject partial specs" (the commit after
+  these notes): a partial-specialization requires-clause whose substitution
+  fails no longer matches ([temp.constr.atomic]/3); ranges::find CORE.
+
+Sweep (libc++ 18, small programs): optional, span, algorithm, map, array,
+vector, memory (unique_ptr; shared_ptr only lacks the out-of-line
+__release_weak), functional, numeric, set, utility, tuple, any, bitset,
+string, charconv, compare verify.  unordered_map is fixed apart from
+out-of-line __next_prime and missing __builtin_ceilf /
+bad_array_new_length models (library, not front end).
+Open: std::visit (both libraries), views::transform, views::iota,
+views::filter/drop (__tuple_impl layer).  cvise runs for iota and
+transform: /tmp/r163/red/kb_iota, /tmp/r163/red/kb_transform.
