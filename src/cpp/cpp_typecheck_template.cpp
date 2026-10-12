@@ -530,6 +530,71 @@ void cpp_typecheckt::typecheck_template_alias(cpp_declarationt &declaration)
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
+/// N5008 [temp.param]/17: the default template arguments available for a
+/// template are obtained by merging those of all its declarations -- a
+/// definition that follows a declaration with `typename = ...' does not
+/// repeat it.  Copy each default of \p declared (the earlier declaration's
+/// template parameters) to the corresponding parameter of \p defined that
+/// has none, renaming the earlier declaration's parameter names to the
+/// definition's (a redeclaration may name them differently).
+static void carry_over_default_template_arguments(
+  const template_typet &declared,
+  template_typet &defined)
+{
+  const auto &old_params = declared.template_parameters();
+  auto &new_params = defined.template_parameters();
+  if(old_params.size() != new_params.size())
+    return;
+  const auto short_name = [](const template_parametert &param)
+  {
+    const irep_idt id = param.id() == ID_type ? param.type().get(ID_identifier)
+                                              : param.get(ID_identifier);
+    std::string name = id2string(id);
+    const auto sep = name.rfind("::");
+    return sep == std::string::npos ? name : name.substr(sep + 2);
+  };
+  std::map<irep_idt, irep_idt> renaming;
+  for(std::size_t i = 0; i < old_params.size(); ++i)
+  {
+    const std::string from = short_name(old_params[i]);
+    const std::string to = short_name(new_params[i]);
+    if(!from.empty() && !to.empty() && from != to)
+      renaming[from] = to;
+  }
+  std::function<void(irept &)> rename = [&](irept &node)
+  {
+    if(node.id() == ID_cpp_name)
+    {
+      auto &subs = node.get_sub();
+      for(std::size_t k = 0; k < subs.size(); ++k)
+      {
+        if(subs[k].id() != ID_name || (k != 0 && subs[k - 1].id() == "::"))
+          continue;
+        const auto it = renaming.find(subs[k].get(ID_identifier));
+        if(it != renaming.end())
+          subs[k].set(ID_identifier, it->second);
+      }
+    }
+    for(auto &sub : node.get_sub())
+      rename(sub);
+    for(auto &named : node.get_named_sub())
+      rename(named.second);
+  };
+  for(std::size_t i = 0; i < old_params.size(); ++i)
+  {
+    if(
+      old_params[i].has_default_argument() &&
+      !new_params[i].has_default_argument() &&
+      old_params[i].get_bool(ID_ellipsis) ==
+        new_params[i].get_bool(ID_ellipsis))
+    {
+      exprt value = old_params[i].default_argument();
+      rename(value);
+      new_params[i].default_argument() = value;
+    }
+  }
+}
+
 /// Typecheck a function template declaration.
 ///
 /// Implements [temp.fct.general]: "A function template defines an unbounded
@@ -845,6 +910,9 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
           .type()
           .find(ID_parameters),
         definition.declarators()[0].type().add(ID_parameters));
+      carry_over_default_template_arguments(
+        to_cpp_declaration(previous_symbol->type).template_type(),
+        definition.template_type());
 
       // COPY rather than swap: `declaration` may live in a
       // class-template INSTANCE's stored body, which later member
