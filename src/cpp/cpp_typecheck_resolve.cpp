@@ -10133,10 +10133,50 @@ bool cpp_typecheck_resolvet::apply_default_template_arguments(
           params[j].has_default_argument() &&
           names_pack(params[j].default_argument()))
           default_names_pack = true;
+      // a pack expansion of the pack in a template-argument list of a
+      // following parameter's type or default (`enable_if<C<U...>::value,
+      // int> = 0')
+      std::function<bool(const irept &)> expands_in_targs = [&](const irept &n)
+      {
+        if(n.id() == ID_template_args)
+        {
+          for(const auto &a : n.find(ID_arguments).get_sub())
+          {
+            const irept &t = a.id() == ID_ambiguous ? a.find(ID_type) : a;
+            if(
+              (a.get_bool(ID_ellipsis) || t.get_bool(ID_ellipsis)) &&
+              names_pack(t))
+              return true;
+          }
+        }
+        for(const auto &c : n.get_sub())
+          if(expands_in_targs(c))
+            return true;
+        for(const auto &c : n.get_named_sub())
+          if(expands_in_targs(c.second))
+            return true;
+        return false;
+      };
+      bool default_expands_pack_in_template_args = false;
+      for(std::size_t j = pack_param_index + 1; j < params.size(); ++j)
+      {
+        if(
+          params[j].has_default_argument() &&
+          (expands_in_targs(params[j].type()) ||
+           expands_in_targs(params[j].default_argument())))
+        {
+          default_names_pack = true;
+          default_expands_pack_in_template_args = true;
+        }
+      }
+      // A single element is recorded too when a default names the pack in a
+      // template-argument list (`enable_u<U...>::value'): the scalar binding
+      // does not expand `U...', which then named no argument at all.
       if(
         default_names_pack &&
         pack_deduced_types.size() == pack_expansion_size &&
-        pack_expansion_size >= 2 &&
+        (pack_expansion_size >= 2 ||
+         (pack_expansion_size == 1 && default_expands_pack_in_template_args)) &&
         cpp_typecheck.template_map.pack_args_map.find(pack_id) ==
           cpp_typecheck.template_map.pack_args_map.end())
       {
