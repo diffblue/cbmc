@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body of function
+--
+A constructor body is instantiated while only the constructor's constraints
+are checked (N5008 [temp.inst]/11).  Reduced from the libc++ tuple chain in
+which is_convertible<const tuple<at, tuple<int>> &, tuple<int>> instantiates
+a tuple<int> constructor that clang does not.
