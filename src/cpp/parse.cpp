@@ -10562,10 +10562,12 @@ bool Parser::rTypePredicate(exprt &expr)
 
   switch(tk.kind)
   {
+  // N5008 [dcl.name]/1: each argument is a type-id, which may name a function
+  // type (`__is_function(void())')
   case TOK_UNARY_TYPE_PREDICATE:
     if(lex.get_token(tk)!='(')
       return false;
-    if(!rTypeName(tname1))
+    if(!rTypeNameOrFunctionType(tname1))
       return false;
     if(lex.get_token(tk)!=')')
       return false;
@@ -10588,7 +10590,7 @@ bool Parser::rTypePredicate(exprt &expr)
         arg.type().set(ID_ellipsis, true);
       type_args.get_sub().push_back(std::move(arg));
     };
-    if(!rTypeName(tname1))
+    if(!rTypeNameOrFunctionType(tname1))
       return false;
     bool ellipsis1 = false;
     if(lex.LookAhead(0) == TOK_ELLIPSIS)
@@ -10600,7 +10602,7 @@ bool Parser::rTypePredicate(exprt &expr)
     if(lex.LookAhead(0) == ',')
     {
       lex.get_token(tk);
-      if(!rTypeName(tname2))
+      if(!rTypeNameOrFunctionType(tname2))
         return false;
       bool ellipsis2 = false;
       if(lex.LookAhead(0) == TOK_ELLIPSIS)
@@ -10614,7 +10616,7 @@ bool Parser::rTypePredicate(exprt &expr)
       {
         lex.get_token(tk);
         typet extra;
-        if(!rTypeName(extra))
+        if(!rTypeNameOrFunctionType(extra))
           return false;
         bool ellipsis = false;
         if(lex.LookAhead(0) == TOK_ELLIPSIS)
