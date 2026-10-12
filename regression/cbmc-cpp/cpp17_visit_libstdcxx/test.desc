@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] .* visit: SUCCESS$
@@ -11,6 +11,8 @@ main.cpp
 ^CONVERSION ERROR$
 dropped the body
 --
-libstdc++ 13 std::visit (variant line 1851): the body is dropped; the cause is
-not yet reduced.  g++ 13 and clang++ 18 accept this program, and it fails
-only its WRONG assertion.
+libstdc++ 13 std::visit (variant line 1851) lost its body:
+__gen_vtable_impl's partial specialization for _Multi_array<_Result_type
+(*)(_Visitor, _Variants...)> was not matched
+(cpp98_partial_specialization_compound_type_in_template_argument).  g++ 13
+and clang++ 18 accept this program, and it fails only its WRONG assertion.

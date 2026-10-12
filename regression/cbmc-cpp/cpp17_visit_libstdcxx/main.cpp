@@ -1,6 +1,5 @@
 // N5008 [variant.visit]: std::visit(F, variant<int, char>) invokes F with the
-// active alternative.  With libstdc++ 13 the body of std::visit is dropped
-// (calls return nondet).  The libc++ shape is
+// active alternative (libstdc++ 13).  The libc++ shape is
 // cpp20_libcxx_header_drops/test_visit.
 #include <variant>
 extern "C" void __CPROVER_assert(bool, const char *);
