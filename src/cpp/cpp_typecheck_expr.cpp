@@ -1866,7 +1866,14 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__reference_converts_from_temporary" ||
     expr.id() == "__reference_binds_to_temporary")
   {
-    // GCC/Clang built-in type traits
+    // GCC/Clang built-in type traits.  N5008 [meta.unary.prop]/9,
+    // [meta.rel]/5: these decide whether a declaration or conversion would
+    // be well-formed, considering only its immediate context; the functions
+    // it would call are not odr-used, so their definitions are not
+    // instantiated ([temp.inst]/11) -- a constructor template selected for
+    // is_constructible<tuple<int>, tuple<>> (libc++) keeps its body, which
+    // may be ill-formed for these arguments, uninstantiated.
+    unevaluated_operandt unevaluated_guard{*this};
     typet t1 = static_cast<const typet &>(expr.find("type_arg1"));
     typet t2 = static_cast<const typet &>(expr.find("type_arg2"));
     if(t1.is_nil() && !expr.find(ID_type_arg).is_nil())

@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 bind_back.cpp
 --cpp20 --stdlib libc++ --object-bits 12
 ^\[main\.assertion\.1\] line \d+ lvalue: SUCCESS$
@@ -12,12 +12,8 @@ bind_back.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::__bind_back (the core of std::views::take): the calls
-compute the right values, but two __tuple_impl(_Tuple &&) bodies
-(tuple:488) are dropped.  Smaller: with `struct at {};', even
-`std::is_constructible_v<std::tuple<at, std::tuple<int>>,
-const std::tuple<at, std::tuple<int>> &, std::tuple<int> &&>' is false as
-it should be but drops both bodies, reached through is_convertible<const
-tuple &, tuple> (tuple:680) and a tuple<int> constructor template.
-clang++ 18 -stdlib=libc++ accepts this program, and it fails only its
-WRONG assertion.
+libc++ (LLVM 18) std::__bind_back (the core of std::views::take).  Checking
+tuple's constructor constraints used to instantiate the definition of a
+constexpr constructor template, and through it two __tuple_impl bodies
+(tuple:488) that are ill-formed for those arguments and were dropped
+(cpp11_tuple_converting_constructor_spurious_instantiation).
