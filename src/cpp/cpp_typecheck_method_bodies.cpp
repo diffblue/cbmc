@@ -1019,6 +1019,60 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
                   subst_type_pack(ns.second);
               };
               subst_type_pack(copy);
+              // ... and a NON-type template pack of the same length, e.g.
+              // the enclosing class template's `Is' in `get<Is>(vs)...'
+              // (libc++'s __dispatcher<_Is...>::__dispatch): its k-th
+              // value, not the scalar convenience binding (the first).  A
+              // nested pattern with its own `...' expands its packs itself.
+              for(const auto &pe : template_map.pack_expr_map)
+              {
+                if(pe.second.size() != n || n < 2)
+                  continue;
+                const std::string key = id2string(pe.first);
+                const auto q = key.rfind("::");
+                const std::string short_name =
+                  q != std::string::npos ? key.substr(q + 2) : key;
+                const auto is_ref = [&short_name](const irept &t)
+                {
+                  if(
+                    t.id() != ID_cpp_name || t.get_sub().size() != 1 ||
+                    t.get_sub().front().id() != ID_name)
+                  {
+                    return false;
+                  }
+                  const std::string nm =
+                    id2string(t.get_sub().front().get(ID_identifier));
+                  const auto p = nm.rfind("::");
+                  return (p != std::string::npos ? nm.substr(p + 2) : nm) ==
+                         short_name;
+                };
+                // replace_value_pack_ref's shapes: a bare name, or a
+                // template argument the parser left `ambiguous'
+                std::function<void(irept &)> subst_value_pack = [&](irept &t)
+                {
+                  for(auto &c : t.get_sub())
+                  {
+                    if(c.get_bool(ID_ellipsis))
+                      continue;
+                    if(
+                      is_ref(c) ||
+                      (c.id() == ID_ambiguous && is_ref(c.find(ID_type))))
+                    {
+                      c = pe.second[k];
+                    }
+                    else
+                      subst_value_pack(c);
+                  }
+                  for(auto &ns : t.get_named_sub())
+                  {
+                    if(is_ref(ns.second))
+                      ns.second = pe.second[k];
+                    else if(!ns.second.get_bool(ID_ellipsis))
+                      subst_value_pack(ns.second);
+                  }
+                };
+                subst_value_pack(copy);
+              }
               expand(copy);
               newsub.push_back(copy);
             }
