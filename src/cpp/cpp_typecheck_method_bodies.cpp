@@ -1616,6 +1616,23 @@ void cpp_typecheckt::typecheck_method_bodies()
 
     template_map.swap(method_body.template_map);
     instantiation_stack.swap(method_body.instantiation_stack);
+    // restored at the end of this iteration (any exit)
+    struct lookup_limit_guardt
+    {
+      std::size_t &slot;
+      const std::size_t saved;
+      ~lookup_limit_guardt()
+      {
+        slot = saved;
+      }
+    } lookup_limit_guard{lookup_source_limit, lookup_source_limit};
+    lookup_source_limit = std::numeric_limits<std::size_t>::max();
+    if(method_body.limit_lookup_to_source_order)
+    {
+      const auto order = definition_source_order.find(method_symbol.name);
+      if(order != definition_source_order.end())
+        lookup_source_limit = order->second;
+    }
 
     method_bodies.erase(method_bodies.begin());
 
@@ -2489,17 +2506,24 @@ void cpp_typecheckt::add_method_body(symbolt *_method_symbol)
       defer = true;
     }
 
+    method_bodyt body{_method_symbol, method_map, instantiation_stack};
+    // N5008 [class.mem.general]/7, [basic.lookup.unqual]/4: the body of a
+    // member function defined in a class that is not a template
+    // (specialization) sees the namespace-scope declarations that precede
+    // the class, not later ones (see lookup_source_limit); templates bind
+    // their dependent names at the point of instantiation
+    // ([temp.dep.candidate]), so they are left alone
+    if(
+      instantiation_stack.empty() && method_map.type_map.empty() &&
+      method_map.expr_map.empty() && !_method_symbol->is_macro &&
+      _method_symbol->type.find("#fn_template_type").is_nil())
+    {
+      body.limit_lookup_to_source_order = true;
+    }
     if(defer)
-    {
-      deferred_method_bodies.emplace(
-        _method_symbol->name,
-        method_bodyt(_method_symbol, method_map, instantiation_stack));
-    }
+      deferred_method_bodies.emplace(_method_symbol->name, std::move(body));
     else
-    {
-      method_bodies.push_back(
-        method_bodyt(_method_symbol, method_map, instantiation_stack));
-    }
+      method_bodies.push_back(std::move(body));
   }
 #ifdef DEBUG
   else

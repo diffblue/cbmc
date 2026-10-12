@@ -1806,8 +1806,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
 
     if(!is_virtual)
     {
+      const bool is_definition = value.is_not_nil();
       typecheck_member_function(
         symbol, component, initializers, method_qualifier, value);
+      note_source_order(component.get_name(), declaration, is_definition);
 
       // C++11 [dcl.constexpr]: a `constexpr` member function is
       // implicitly inline and may be evaluated at compile time.
@@ -1862,8 +1864,10 @@ void cpp_typecheckt::typecheck_compound_declarator(
         value.make_nil();
       }
 
+      const bool is_definition = value.is_not_nil();
       typecheck_member_function(
         symbol, component, initializers, method_qualifier, value);
+      note_source_order(component.get_name(), declaration, is_definition);
 
       // get the virtual-table symbol type (created, with the class's own
       // virtual pointer or the embedding of the primary base's table, on
