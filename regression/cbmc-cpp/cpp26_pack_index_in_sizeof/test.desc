@@ -1,15 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp26
-^\[main\.assertion\.1\] line \d+ first: SUCCESS$
-^\[main\.assertion\.2\] line \d+ second: SUCCESS$
-^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.1\] .* first: SUCCESS$
+^\[main\.assertion\.2\] .* second: SUCCESS$
+^\[main\.assertion\.3\] .* last: SUCCESS$
+^\[main\.assertion\.4\] .* an array is no pack: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 --
-C++26 pack indexing.  clang++ 20 -std=c++26 accepts this program, and it
-fails only its WRONG assertion (g++ 13 and clang++ 18 do not implement pack
-indexing).
+N5008 [dcl.type.pack.index]/1: the parser marks `T...[N]' as a pack index
+(ID_C_pack_index); type-checking selects the N-th element of the pack.
