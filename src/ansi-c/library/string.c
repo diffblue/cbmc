@@ -1140,6 +1140,29 @@ __CPROVER_HIDE:;
   return 0;
 }
 
+/* FUNCTION: __builtin_char_memchr */
+
+// Clang's __builtin_char_memchr is memchr for char objects, returning
+// `char *' (libc++'s __constexpr_memchr uses it).
+char *__builtin_char_memchr(const char *s, int c, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(s) >= n, "memchr buffer overflow");
+#else
+  __CPROVER_precondition(__CPROVER_r_ok(s, n), "memchr region readable");
+#endif
+
+  // see memchr above (C23 7.26.5.2)
+  for(; n != 0; n--, s++)
+  {
+    if(*(const unsigned char *)s == (unsigned char)c)
+      return (char *)s;
+  }
+  return 0;
+}
+
 /* FUNCTION: strchr */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
