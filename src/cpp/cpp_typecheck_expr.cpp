@@ -2437,6 +2437,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     expr.id() == "__has_virtual_destructor" ||
     expr.id() == "__has_unique_object_representations" ||
     expr.id() == "__is_trivially_relocatable" ||
+    expr.id() == "__is_trivially_equality_comparable" ||
     expr.id() == "__is_trivially_destructible" ||
     expr.id() == "__is_destructible" ||
     expr.id() == "__is_nothrow_destructible" || expr.id() == "__is_compound" ||
@@ -2514,6 +2515,23 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
     {
       expr =
         is_rvalue_reference(t) ? exprt(true_exprt()) : exprt(false_exprt());
+    }
+    else if(expr.id() == "__is_trivially_equality_comparable")
+    {
+      // Clang's trait: `a == b' for two objects of type T is equivalent to
+      // comparing their object representations.  That holds for the
+      // integral types and the object, function and member pointer types
+      // (whose values each have unique object representations), not for
+      // floating-point types, enumerations (operator== may be overloaded),
+      // std::nullptr_t, arrays or references.  A class qualifies only with a
+      // defaulted operator== and no padding, which is not checked: classes
+      // are conservatively false.
+      expr = ((t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+               t.id() == ID_c_bool || t.id() == ID_bool ||
+               (t.id() == ID_pointer && !is_reference(t) &&
+                to_pointer_type(t).base_type().id() != ID_nullptr)))
+               ? exprt(true_exprt())
+               : exprt(false_exprt());
     }
     else if(expr.id() == "__is_array")
     {
