@@ -1,0 +1,21 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] .* non-const object: SUCCESS$
+^\[main\.assertion\.2\] .* const object: SUCCESS$
+^\[main\.assertion\.3\] .* from a const member function: SUCCESS$
+^\[main\.assertion\.4\] .* from a non-const one: SUCCESS$
+^\[main\.assertion\.5\] .* class, implicit object: SUCCESS$
+^\[main\.assertion\.6\] .* class, this->: SUCCESS$
+^\[main\.assertion\.7\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+dropped the body
+^CONVERSION ERROR$
+--
+N5008 [over.load]/2.3, [over.call.func]/3: const and non-const member
+templates are distinct; the implied object of a const member function is
+const.
