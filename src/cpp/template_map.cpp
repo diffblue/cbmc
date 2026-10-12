@@ -412,9 +412,15 @@ void replace_value_pack_ref(
     return (p != std::string::npos ? nm.substr(p + 2) : nm) == base;
   };
 
+  // a template argument the parser could not classify (`seq<Is..., Js>')
+  // is an `ambiguous' node holding the name as a type; naming the value
+  // pack, it is that value ([temp.arg.general]/2)
+  const auto is_ambiguous_pack_ref = [&is_pack_ref](const irept &t)
+  { return t.id() == ID_ambiguous && is_pack_ref(t.find(ID_type)); };
+
   for(auto &s : n.get_sub())
   {
-    if(is_pack_ref(s))
+    if(is_pack_ref(s) || is_ambiguous_pack_ref(s))
       s = elem;
     else
       replace_value_pack_ref(s, base, elem);
@@ -526,13 +532,62 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
 
     bool changed = false;
     irept::subt new_args;
-    for(auto &arg : child.get_sub())
+    // N5008 [temp.variadic]/5: a pack name is expanded by the innermost pack
+    // expansion containing it.  While an argument's own expansion is
+    // processed, its nested expansions (the `Is...' and `ls...' of
+    // `f(seq<Is..., Js>{}, ls...)...', over Js) are set aside, so they
+    // neither select the governing pack nor take part in the lockstep
+    // substitution; they are put back into every resulting element.
+    const irep_idt placeholder_id{"#nested_pack_expansion"};
+    std::vector<irept> hidden;
+    std::size_t pending_from = 0;
+    std::function<void(irept &, bool)> hide = [&](irept &m, bool root)
     {
-      if(!arg.get_bool(ID_ellipsis))
+      if(!root && m.get_bool(ID_ellipsis))
       {
-        new_args.push_back(arg);
+        irept placeholder{placeholder_id};
+        placeholder.set(ID_index, hidden.size());
+        hidden.push_back(m);
+        m = placeholder;
+        return;
+      }
+      for(auto &s : m.get_sub())
+        hide(s, false);
+      for(auto &ns : m.get_named_sub())
+        hide(ns.second, false);
+    };
+    std::function<void(irept &)> unhide = [&](irept &m)
+    {
+      if(m.id() == placeholder_id)
+      {
+        m = hidden[m.get_size_t(ID_index)];
+        return;
+      }
+      for(auto &s : m.get_sub())
+        unhide(s);
+      for(auto &ns : m.get_named_sub())
+        unhide(ns.second);
+    };
+    const auto restore_pending = [&]()
+    {
+      if(!hidden.empty())
+      {
+        for(std::size_t i = pending_from; i < new_args.size(); ++i)
+          unhide(new_args[i]);
+      }
+      hidden.clear();
+      pending_from = new_args.size();
+    };
+    for(const auto &original_arg : child.get_sub())
+    {
+      restore_pending();
+      if(!original_arg.get_bool(ID_ellipsis))
+      {
+        new_args.push_back(original_arg);
         continue;
       }
+      irept arg = original_arg;
+      hide(arg, true);
 
       // Locate the type parameter pack referenced inside this argument: a
       // type template argument that is a bare cpp_name whose short name
@@ -647,6 +702,22 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
           copy.remove(ID_ellipsis);
           std::function<void(irept &)> repl = [&](irept &m)
           {
+            // an `ambiguous' template argument naming the pack is its value
+            if(m.id() == ID_ambiguous && m.find(ID_type).id() == ID_cpp_name)
+            {
+              const irept &t = m.find(ID_type);
+              if(t.get_sub().size() == 1 && t.get_sub().front().id() == ID_name)
+              {
+                const std::string nm =
+                  id2string(t.get_sub().front().get(ID_identifier));
+                const auto p = nm.rfind("::");
+                if((p != std::string::npos ? nm.substr(p + 2) : nm) == base)
+                {
+                  m = ve;
+                  return;
+                }
+              }
+            }
             if(
               m.id() == ID_cpp_name && m.get_sub().size() == 1 &&
               m.get_sub().front().id() == ID_name)
@@ -864,6 +935,7 @@ void template_mapt::expand_call_argument_packs(irept &n, bool only_nontype)
         new_args.push_back(copy);
       }
     }
+    restore_pending();
     if(changed)
       child.get_sub() = new_args;
   }
