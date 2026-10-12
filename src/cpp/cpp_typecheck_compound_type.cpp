@@ -6168,6 +6168,11 @@ bool cpp_typecheckt::subtype_typecast(
   const struct_typet &from,
   const struct_typet &to) const
 {
+  // N5008 [conv.ptr]/3, [class.derived.general]/2: an incomplete class has
+  // no (known) bases; two incomplete classes carry no name to compare, and
+  // `struct A; struct B;' were taken for the same class
+  if(from.get(ID_name).empty() || to.get(ID_name).empty())
+    return false;
   if(from.get(ID_name) == to.get(ID_name))
     return true;
 
