@@ -4346,7 +4346,27 @@ bool Parser::rConstructorDecl(
       break;
   }
 
-  // C++20 trailing requires clause: skip
+  // C++20 trailing requires clause ([dcl.decl.general]/4): recorded on the
+  // constructor's declarator, as for other declarators (rDeclarator), so
+  // that the constraint takes part in overload resolution
+  // ([over.match.viable]/3); on parse failure fall back to skipping it.
+  if(lex.LookAhead(0) == TOK_REQUIRES)
+  {
+    auto tr_saved = lex.Save();
+    cpp_tokent tr_tk;
+    lex.get_token(tr_tk);
+    exprt tr_clause;
+    if(rConstraintLogicalExpr(tr_clause))
+    {
+      const int nxt = lex.LookAhead(0);
+      if(nxt == '{' || nxt == ';' || nxt == ':' || nxt == '=')
+        constructor.add(ID_C_requires_clause).swap(tr_clause);
+      else
+        lex.Restore(tr_saved);
+    }
+    else
+      lex.Restore(tr_saved);
+  }
   if(lex.LookAhead(0) == TOK_REQUIRES)
   {
     cpp_tokent req_tk;

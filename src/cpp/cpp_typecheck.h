@@ -1031,6 +1031,11 @@ protected:
   void expand_folds_over_template_packs(
     irept &body,
     const template_typet &template_type);
+  /// Whether the trailing requires-clause of the non-template member
+  /// function \p candidate of a class template specialization is satisfied
+  /// (true when there is none or it cannot be decided).
+  bool member_constraints_satisfied(const exprt &candidate);
+  std::unordered_map<irep_idt, bool> member_constraint_cache;
   /// Expand the fold-expressions over the pack named \p short_name in
   /// \p node, for the elements \p pack_args ([expr.prim.fold]/2-3).
   static void expand_folds_over_pack(
