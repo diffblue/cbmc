@@ -1392,6 +1392,48 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
     // of `const T*` must NOT deduce from an A of `T*`, or `T*` and
     // `const T*` would each be at least as specialised as the other.
     resolver.strict_cv_deduction = true;
+
+    // N5008 [temp.spec.partial.order]/1, [temp.func.order]/3: A is F's
+    // argument with each of F's template parameters replaced by a unique
+    // type.  Its names are looked up in G's scope here, so an F parameter
+    // whose name G also uses (`U' a pack in F, a type in G) stood for G's
+    // parameter; rename F's to names G cannot declare.
+    std::set<irep_idt> f_parameter_names;
+    for(const auto &param : F.template_type().template_parameters())
+    {
+      const irep_idt pid = param.id() == ID_type
+                             ? param.type().get(ID_identifier)
+                             : param.get(ID_identifier);
+      std::string short_name = id2string(pid);
+      const auto sep = short_name.rfind("::");
+      if(sep != std::string::npos)
+        short_name = short_name.substr(sep + 2);
+      if(!short_name.empty())
+        f_parameter_names.insert(short_name);
+    }
+    std::function<void(irept &)> rename_f_parameters = [&](irept &node)
+    {
+      if(node.id() == ID_cpp_name)
+      {
+        auto &subs = node.get_sub();
+        for(std::size_t k = 0; k < subs.size(); ++k)
+        {
+          if(
+            subs[k].id() == ID_name && (k == 0 || subs[k - 1].id() != "::") &&
+            f_parameter_names.count(subs[k].get(ID_identifier)) != 0)
+          {
+            subs[k].set(
+              ID_identifier,
+              "#partial_order_F::" + id2string(subs[k].get(ID_identifier)));
+          }
+        }
+      }
+      for(auto &sub : node.get_sub())
+        rename_f_parameters(sub);
+      for(auto &named : node.get_named_sub())
+        rename_f_parameters(named.second);
+    };
+
     for(std::size_t i = 0; i < G_args.size(); ++i)
     {
       const exprt &fa = F_args[i];
@@ -1421,7 +1463,46 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
         typet P = ga.id() == ID_ambiguous
                     ? static_cast<const typet &>(ga.find(ID_type))
                     : ga.type();
+        rename_f_parameters(A);
         cpp_convert_plain_type(A, get_message_handler());
+        // [temp.deduct.type]/9.1: a pack expansion P_i's pattern is compared
+        // with the remaining argument (the argument lists have equal length
+        // here, so with A_i alone)
+        P.remove(ID_ellipsis);
+        cpp_convert_plain_type(P, get_message_handler());
+        // `const X' is a merged type here; deduction matches a qualified
+        // pattern (P) against an argument (A) whose qualifiers are flags of
+        // its type, so write A's that way
+        std::function<void(typet &)> fold_qualifiers = [&](typet &type)
+        {
+          for(auto &sub : type.get_sub())
+            fold_qualifiers(static_cast<typet &>(sub));
+          if(type.id() != ID_merged_type)
+            return;
+          bool is_const = false, is_volatile = false;
+          typet rest{ID_nil};
+          std::size_t others = 0;
+          for(const auto &sub : type.get_sub())
+          {
+            if(sub.id() == ID_const)
+              is_const = true;
+            else if(sub.id() == ID_volatile)
+              is_volatile = true;
+            else
+            {
+              rest = static_cast<const typet &>(sub);
+              ++others;
+            }
+          }
+          if(others != 1)
+            return;
+          if(is_const)
+            rest.set(ID_C_constant, true);
+          if(is_volatile)
+            rest.set(ID_C_volatile, true);
+          type = rest;
+        };
+        fold_qualifiers(A);
         // [temp.deduct.type]/3: a template-id pattern only matches a
         // specialisation of the SAME template.
         if(

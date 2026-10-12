@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* pack: SUCCESS$
+^\[main\.assertion\.2\] .* single: SUCCESS$
+^\[main\.assertion\.3\] .* primary: SUCCESS$
+^\[main\.assertion\.4\] .* pointer pack: SUCCESS$
+^\[main\.assertion\.5\] .* pointer: SUCCESS$
+^\[main\.assertion\.6\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [temp.variadic]/5: partial specializations that differ only in a pack
+expansion are distinct.
