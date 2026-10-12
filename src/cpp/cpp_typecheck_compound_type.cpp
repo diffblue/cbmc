@@ -3018,10 +3018,29 @@ void cpp_typecheckt::typecheck_friend_declaration(
       {
         flag = saved;
       }
-    } friend_flag_guard{
+    };
+    // ... also in a member class of such a specialization ([temp.inst]/3:
+    // its members are templated entities, too) -- libc++'s
+    // iota_view<int, unreachable_sentinel_t>::__sentinel's `operator-'
+    bool in_template_instance =
+      symbol.type.find(ID_C_template_arguments).is_not_nil();
+    {
+      const auto scope_it = cpp_scopes.id_map.find(symbol.name);
+      const cpp_idt *scope =
+        scope_it == cpp_scopes.id_map.end() ? nullptr : scope_it->second;
+      while(scope != nullptr && !in_template_instance && scope->has_parent() &&
+            scope->get_parent().is_class())
+      {
+        scope = &scope->get_parent();
+        const symbolt *enclosing = symbol_table.lookup(scope->identifier);
+        in_template_instance =
+          enclosing != nullptr &&
+          enclosing->type.find(ID_C_template_arguments).is_not_nil();
+      }
+    }
+    friend_flag_guardt friend_flag_guard{
       defining_friend_of_template_instance,
-      sub_it.value().is_not_nil() &&
-        symbol.type.find(ID_C_template_arguments).is_not_nil()};
+      sub_it.value().is_not_nil() && in_template_instance};
     const symbolt &conv_symb = cpp_declarator_converter.convert(
       declaration.type(),
       declaration.storage_spec(),
