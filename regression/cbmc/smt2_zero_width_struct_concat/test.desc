@@ -1,0 +1,17 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2
+^\[main\.assertion\.1\] line \d+ assertion object\.value == value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+expected at least 2 arguments to 'concat'
+^VERIFICATION ERROR$
+--
+The two unnamed zero-width bit-fields are retained as zero-width struct
+components.  Without the fix, the SMT2 struct encoders count the original
+components when constructing concat and emit a unary (concat value).  Storing
+the struct in a union forces it into a bit-vector: non-datatype backends pass
+through convert_struct, while datatype backends use flatten2bv.  The fixed
+encoders emit value directly.
