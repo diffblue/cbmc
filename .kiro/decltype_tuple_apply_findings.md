@@ -14024,3 +14024,49 @@ Sweep: shared_ptr/weak_ptr, unordered_map/unordered_set, bad_array_new_length
 now verify without "no body".  Still KNOWNBUG: visit, views_transform (its
 cvise reduction degenerated), views_iota (one layer fixed), views_filter and
 bind_back (__tuple_impl, [temp.inst]/11), pack index in sizeof.
+
+## Round 178: KNOWNBUGs to CORE
+
+KNOWNBUGs at the start: cpp11_tuple_converting_constructor_spurious_
+instantiation, cpp17_guaranteed_copy_elision_functional_cast,
+cpp26_pack_index_in_sizeof, libcxx test_bind_back / test_views_filter /
+test_views_iota / test_views_transform / test_visit, unit-proofs
+string2optional / escape / edit_distance / bigint_arith.
+
+Promoted to CORE:
+- 3ec105249d binary type traits as unevaluated operands; a constexpr
+  member function template specialization named there is not converted
+  eagerly ([meta.unary.prop]/9, [temp.inst]/11): tuple spurious
+  instantiation, test_bind_back, test_views_filter.
+- 72d06572ac `T(prvalue of T)' elides ([dcl.init.general]/16.6.1); the
+  front end's own constructor calls (ID_C_default_initialization) keep
+  cpp_constructor's elision -- intercepting them crashed cpp_constructor's
+  initializer invariant (views_transform).
+- f6a1466183 parser marks `T...[N]' (ID_C_pack_index); typecheck_type
+  selects the element (select_pack_element).
+- 46c43cd893 unit-proofs/string2optional (was already passing).
+New fixes found on the way (all with CORE tests):
+- b00c4f845f point-of-definition lookup for deferred non-template bodies
+  (ID_C_source_order from the parser; source_order /
+  definition_source_order maps; first declaration vs definition).  The
+  first attempt with cpp_idt ordinals failed: declarations are put into
+  scope lazily (invariant_violated_string at ordinal 16174 > limit).
+  unit-proofs/escape gets past conversion again and OOMs as its note says.
+- 3b2254e992 hidden friends of member classes of specializations deferred.
+- 524f0cd86c default template arguments merged into a function template
+  definition ([temp.param]/17).
+- e05840f832 friends of a base access its members via a derived object
+  ([class.access.base]/5.4).  (Accept-invalid noticed, not fixed: a
+  friend of B naming a protected member through a PRIVATE base D is
+  accepted; it was before, too.)
+- e9fa073c89 nested pack expansions (function parameter pack inside an
+  expansion over a template pack; `Is...' inside template args).
+New KNOWNBUG: 8fcd64bea2 explicit pack arguments followed by a deduced
+pack (remaining test_visit layer; needs a pack-grouped template argument
+representation).
+
+Still KNOWNBUG: test_visit (layer above), test_views_iota (iterator ctor
+drop; reductions degenerate), test_views_transform (out-of-class member
+class template of a constrained class template: `_Const'/`_Base'
+unknown; cvise in /tmp/r163/red/kb_tr3), unit-proofs escape /
+edit_distance / bigint_arith (scaling: OOM / time).
