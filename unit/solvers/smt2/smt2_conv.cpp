@@ -115,6 +115,60 @@ TEST_CASE("smt2_convt reduction operators", "[core][solvers][smt2]")
   }
 }
 
+TEST_CASE("smt2_convt shift distance width handling", "[core][solvers][smt2]")
+{
+  // SMT-LIB bvshl/bvlshr/bvashr require the shift distance to have the same
+  // width as the shifted operand. smt2_convt must bring the distance to that
+  // width soundly.
+  const unsignedbv_typet u8{8};
+  const unsignedbv_typet u16{16};
+  const signedbv_typet s8{8};
+  const symbol_exprt x8{"x", u8};
+  const symbol_exprt y8{"y", u8};
+  const symbol_exprt d8{"d8", u8};
+  const symbol_exprt d16{"d16", u16};
+  const symbol_exprt sx8{"sx", s8};
+
+  SECTION("equal widths: distance passed through")
+  {
+    REQUIRE(
+      get_assert(equal_exprt{lshr_exprt{x8, d8}, y8}) ==
+      "(assert (= (bvlshr x d8) y))");
+  }
+
+  SECTION("distance narrower than operand: zero-extend the distance")
+  {
+    const unsignedbv_typet u4{4};
+    const symbol_exprt d4{"d4", u4};
+    REQUIRE(
+      get_assert(equal_exprt{lshr_exprt{x8, d4}, y8}) ==
+      "(assert (= (bvlshr x ((_ zero_extend 4) d4)) y))");
+  }
+
+  SECTION("distance wider than operand (lshr): shift in wider width")
+  {
+    // Must NOT truncate the 16-bit distance to 8 bits; instead zero-extend
+    // the operand to 16 bits, shift, and extract the low 8 bits.
+    REQUIRE(
+      get_assert(equal_exprt{lshr_exprt{x8, d16}, y8}) ==
+      "(assert (= ((_ extract 7 0) (bvlshr ((_ zero_extend 8) x) d16)) y))");
+  }
+
+  SECTION("distance wider than operand (shl): shift in wider width")
+  {
+    REQUIRE(
+      get_assert(equal_exprt{shl_exprt{x8, d16}, y8}) ==
+      "(assert (= ((_ extract 7 0) (bvshl ((_ zero_extend 8) x) d16)) y))");
+  }
+
+  SECTION("distance wider than operand (ashr): sign-extend the operand")
+  {
+    REQUIRE(
+      get_assert(equal_exprt{ashr_exprt{sx8, d16}, sx8}) ==
+      "(assert (= ((_ extract 7 0) (bvashr ((_ sign_extend 8) sx) d16)) sx))");
+  }
+}
+
 TEST_CASE(
   "smt2_convt no unary concat for zero-width operand",
   "[core][solvers][smt2]")
