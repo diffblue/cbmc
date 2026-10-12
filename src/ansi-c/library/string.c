@@ -1221,6 +1221,73 @@ char *strrchr(const char *src, int c)
   #endif
 }
 
+/* FUNCTION: strstr */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef strstr
+
+char *strstr(const char *haystack, const char *needle)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(haystack),
+    "strstr zero-termination of first argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(needle),
+    "strstr zero-termination of second argument");
+#endif
+  // C23 7.26.5.8: the first occurrence of the sequence of characters of
+  // needle (without its terminating null character) in haystack; haystack
+  // itself if needle is empty
+  for(__CPROVER_size_t i = 0;; i++)
+  {
+    __CPROVER_size_t j = 0;
+    while(needle[j] != 0 && haystack[i + j] == needle[j])
+      j++;
+    if(needle[j] == 0)
+      return ((char *)haystack) + i; // cast away const-ness
+    if(haystack[i] == 0)
+      break;
+  }
+  return 0;
+}
+
+/* FUNCTION: strpbrk */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef strpbrk
+
+char *strpbrk(const char *s1, const char *s2)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(s1), "strpbrk zero-termination of first argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(s2),
+    "strpbrk zero-termination of second argument");
+#endif
+  // C23 7.26.5.5: the first character in s1 that is any character of s2
+  for(__CPROVER_size_t i = 0; s1[i] != 0; i++)
+  {
+    for(__CPROVER_size_t j = 0; s2[j] != 0; j++)
+    {
+      if(s1[i] == s2[j])
+        return ((char *)s1) + i; // cast away const-ness
+    }
+  }
+  return 0;
+}
+
 /* FUNCTION: strerror */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
