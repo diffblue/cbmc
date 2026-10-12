@@ -9526,9 +9526,11 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
 
     if(inst_arguments[i].id() == ID_type)
     {
-      // The targ might be an "ambiguous" node with a type sub
+      // The targ might be an "ambiguous" node with a type sub, or a type
+      // argument (`box<R *>', `box<const R>': an ID_type node holding the
+      // type) -- [temp.deduct.type]/9 compares the TYPES
       const typet &targ_type =
-        targs[i].id() == ID_ambiguous
+        targs[i].id() == ID_ambiguous || targs[i].id() == ID_type
           ? static_cast<const typet &>(targs[i].find(ID_type))
           : static_cast<const typet &>(static_cast<const irept &>(targs[i]));
       guess_template_args(targ_type, inst_arguments[i].type());
