@@ -14084,3 +14084,54 @@ its 7 failures are visible only with the environment variable, which
 test.pl cannot set per test.  A probe for an observable difference in the
 default mode (naming X<int> * with an ill-formed X<int>) verifies, so no
 regression test captures it.
+
+## Round 180: KNOWNBUGs to CORE, oldest standard first
+
+KNOWNBUG -> CORE: cpp11_friend_of_base_through_private_base,
+cpp20_builtin_is_trivially_equality_comparable_class,
+cpp11_explicit_pack_arguments_before_deduced_pack, cpp17_visit_libstdcxx,
+cpp20_libcxx_header_drops/test_visit.
+
+Fixes (one commit each, each with its test):
+- 0558c5277b base-class access per [class.access.base]/4: friend bodies no
+  longer run with access control off; /4.3 (protected base edge in members
+  of a derived class) replaces "from derives from the scope class"; resolve()
+  records the point of use for qualified calls (`_Base::_M_head(__t)').
+- b0ca12c065 __is_trivially_equality_comparable for classes (defaulted ==,
+  friend/by-value, from defaulted <=>, no padding).
+- 6d16ee0482 explicit arguments of a pack followed by deduced packs
+  (#explicit_pack_size, bind_explicit_template_arguments).
+- 467db90906 class template non-type pack in a function parameter pack
+  expansion (`get<Is>(vs)...').
+- b0c319ef51 function parameter pack sized by its own template pack (read
+  the template's declaration: a one-element pack is already substituted).
+- 2207896743 folds over any template pack (expand_folds_over_template_packs,
+  also on the eager constexpr-member path).
+- 7f75bf43b0 parser: restore the enclosing function's name after a nested
+  (local class member) body -- properties were `assertion.N'.
+- d6194dcc20 `{}' for a scalar parameter ([over.ics.list]/10.2).
+- ff58341054 template-id deduction compared the argument NODE, not its type:
+  `K<box<R *>>' never matched (libstdc++ __gen_vtable_impl; std::visit).
+- 91bc556683 parser: nested template-heads after a requires-clause merged
+  (libc++ transform_view::__iterator's `_Const').
+- 8f10aebf2c trailing requires-clauses of non-template members: recorded for
+  constructors too, checked lazily at overload resolution
+  (member_constraints_satisfied, [temp.inst]/17).  Evaluating at class
+  instantiation broke CRTP (view_interface<D>, D incomplete).
+- 2e705864f4 empty function parameter pack with several template packs;
+  strip_empty_pack_references respects nested expansions.
+
+New KNOWNBUGs: cpp98_partial_specialization_ordering_pointer_to_function
+([temp.spec.partial.order]), cpp20_same_signature_members_differing_in_
+constraints (one symbol per signature; blocks test_views_transform's two
+end() overloads).
+
+Lesson: never `rm */*.out' while a suite runs in the same tree -- the
+"flaky" FAILED results of W90-W92 (chrono, test_format, nested_braces,
+invoke_result) were .out files deleted under test.pl.
+
+Still KNOWNBUG: test_views_iota, test_views_transform (above), the two new
+ones, unit-proofs escape / edit_distance / bigint_arith (scaling).
+Suites W93 (HEAD): cbmc-cpp 1838 exit 0, cpp 246, regression/cbmc 1205,
+goto-instrument 298, contracts 178, unit-proofs 13; lint 0; each commit
+compiles; -K all KNOWNBUGs OK.
