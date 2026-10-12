@@ -1028,6 +1028,9 @@ protected:
     bool has_body,
     bool tag_only_declaration);
 
+  void expand_folds_over_template_packs(
+    irept &body,
+    const template_typet &template_type);
   /// Expand the fold-expressions over the pack named \p short_name in
   /// \p node, for the elements \p pack_args ([expr.prim.fold]/2-3).
   static void expand_folds_over_pack(
