@@ -1324,6 +1324,53 @@ void cpp_typecheckt::erase_instance_members(const symbolt &symbol)
   }
 }
 
+/// Whether instantiating a template with \p inner while an instance with
+/// \p outer is being instantiated may be a runaway recursion: some argument
+/// of \p inner spells a type that contains, or equals, the corresponding
+/// argument of \p outer (the arguments grow), or one argument list is a
+/// prefix or suffix of the other (a variadic template recursing on its
+/// pack).  Unrelated argument lists are not.
+static bool template_args_may_recurse(
+  const cpp_template_args_tct &outer,
+  const cpp_template_args_tct &inner)
+{
+  const auto &o = outer.arguments();
+  const auto &i = inner.arguments();
+  const auto spell = [](const exprt &arg) -> std::string
+  {
+    if(arg.id() != ID_type)
+      return arg.pretty();
+    const typet &t = arg.type();
+    return t.id() == ID_struct_tag || t.id() == ID_union_tag
+             ? id2string(to_tag_type(t).get_identifier())
+             : cpp_type2name(t);
+  };
+  if(o.size() != i.size())
+  {
+    // a variadic template recursing on its pack peels (or adds) elements
+    // at one end: one list is a suffix or a prefix of the other
+    const auto &shorter = o.size() < i.size() ? o : i;
+    const auto &longer = o.size() < i.size() ? i : o;
+    bool prefix = true, suffix = true;
+    for(std::size_t k = 0; k < shorter.size(); ++k)
+    {
+      if(spell(shorter[k]) != spell(longer[k]))
+        prefix = false;
+      if(spell(shorter[k]) != spell(longer[longer.size() - shorter.size() + k]))
+        suffix = false;
+    }
+    return prefix || suffix;
+  }
+  for(std::size_t k = 0; k < o.size(); ++k)
+  {
+    const std::string os = spell(o[k]);
+    const std::string is = spell(i[k]);
+    if(!os.empty() && is.find(os) != std::string::npos)
+      return true;
+  }
+  return false;
+}
+
 void cpp_typecheckt::elaborate_class_template(const typet &type)
 {
   if(type.id() != ID_struct_tag && type.id() != ID_union_tag)
@@ -1548,8 +1595,21 @@ void cpp_typecheckt::elaborate_class_template(const typet &type)
           break; // proceed with specialization matching
         return;
       }
-      if(entry.identifier == recursion_template)
+      // N5008 [temp.inst]/16 bounds only the total depth of recursive
+      // instantiation.  The guard below is against runaway recursion, which
+      // re-instantiates a template with arguments that grow from (contain)
+      // the enclosing instance's: count only such enclosing instances.
+      // Specializations of one trait with unrelated arguments nest
+      // legitimately -- invokable_r<forward_impl, ...> needing
+      // invokable_r<back_op, ...> needing invokable_r<at, ...> needing
+      // invokable_r<less, projected<...>, ...> (libc++'s views::take,
+      // ranges::min's constraint): they are not counted.
+      if(
+        entry.identifier == recursion_template &&
+        template_args_may_recurse(entry.full_template_args, full_args))
+      {
         ++same_template_depth;
+      }
     }
 
     // For templates with non-type integer arguments that are strictly
