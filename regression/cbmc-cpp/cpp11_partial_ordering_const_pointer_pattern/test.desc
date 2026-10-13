@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* non-const pointer: SUCCESS$
+^\[main\.assertion\.2\] .* const pointer picks const T \*: SUCCESS$
+^\[main\.assertion\.3\] .* const T deduces T without const: SUCCESS$
+^\[main\.assertion\.4\] .* reference patterns: SUCCESS$
+^\[main\.assertion\.5\] .* char pointer: SUCCESS$
+^\[main\.assertion\.6\] .* lvalue reference over forwarding: SUCCESS$
+^\[main\.assertion\.7\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

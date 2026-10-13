@@ -1233,10 +1233,63 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
       cpp_scopes.go_to(static_cast<cpp_scopet &>(*scope_it->second));
 
     cpp_typecheck_resolvet resolver{*this};
+    // N5008 [temp.deduct.partial]/5-7 remove only the TOP-LEVEL reference
+    // and cv-qualifiers (done below); beneath them the types must match
+    // exactly ([temp.deduct.type]/1), so `const T *' is not deduced from
+    // `U *': without this, f(T *) and f(const T *) were each at least as
+    // specialized as the other and the call `f(&const_int)' selected
+    // f(T *) (T = const int) instead of the more specialized f(const T *).
+    resolver.strict_cv_deduction = true;
+    const auto is_frontend_reference = [](const typet &t)
+    {
+      return (t.id() == ID_pointer || t.id() == ID_frontend_pointer) &&
+             t.get_bool(ID_C_reference);
+    };
+    // the cv-qualification of a (possibly merged) type, as a bit set:
+    // const = 1, volatile = 2
+    const auto cv_of = [](const typet &t) -> unsigned
+    {
+      unsigned cv = 0;
+      if(t.id() == ID_merged_type)
+      {
+        for(const auto &sub : to_type_with_subtypes(t).subtypes())
+        {
+          if(sub.id() == ID_const)
+            cv |= 1;
+          else if(sub.id() == ID_volatile)
+            cv |= 2;
+        }
+      }
+      if(t.get_bool(ID_C_constant))
+        cv |= 1;
+      if(t.get_bool(ID_C_volatile))
+        cv |= 2;
+      return cv;
+    };
     for(std::size_t i = 0; i < G_params.size(); ++i)
     {
       typet A = F_params[i].type();
       typet P = G_params[i].type();
+      // N5008 [temp.deduct.partial]/9: when both types were reference
+      // types and are identical after the transformations (the deduction
+      // in the other direction, P from F's type and A from G's, succeeds),
+      // the type from that deduction's PARAMETER template -- F's -- is not
+      // at least as specialized as the one from its argument template --
+      // G's -- if G's was an lvalue reference and F's is not (/9.1), or
+      // if G's is more cv-qualified than F's (/9.2).  Here P is G's type
+      // and A is F's: h(const T &) is more specialized than h(T &) (both
+      // deduce from each other), and h(T &) than h(T &&).
+      if(is_frontend_reference(P) && is_frontend_reference(A))
+      {
+        const bool p_lvalue_ref = !P.get_bool(ID_C_rvalue_reference);
+        const bool a_lvalue_ref = !A.get_bool(ID_C_rvalue_reference);
+        if(p_lvalue_ref && !a_lvalue_ref)
+          return false;
+        const unsigned p_cv = cv_of(to_type_with_subtype(P).subtype());
+        const unsigned a_cv = cv_of(to_type_with_subtype(A).subtype());
+        if((p_cv & ~a_cv) != 0)
+          return false;
+      }
       strip_top_reference(P);
       strip_top_reference(A);
       drop_top_cv(P);
