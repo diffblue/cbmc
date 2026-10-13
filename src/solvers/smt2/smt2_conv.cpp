@@ -115,6 +115,7 @@ smt2_convt::smt2_convt(
     use_FPA_theory = true;
     use_array_of_bool = true;
     use_as_const = true;
+    as_const_requires_value = true;
     use_check_sat_assuming = true;
     use_datatypes = true;
     break;
@@ -183,6 +184,51 @@ void smt2_convt::flush_deferred_output()
   }
   final_out << deferred_output.str();
   deferred_output.str(std::string{});
+}
+
+bool smt2_convt::as_const_admits(const exprt &what) const
+{
+  if(!as_const_requires_value)
+    return true;
+  // a literal converts to a value; a pointer constant (an object/offset
+  // encoding) or a compound term does not
+  return what.is_constant() &&
+         (what.type().id() == ID_bool || what.type().id() == ID_signedbv ||
+          what.type().id() == ID_unsignedbv || what.type().id() == ID_bv ||
+          what.type().id() == ID_c_bool || what.type().id() == ID_c_enum_tag ||
+          what.type().id() == ID_floatbv);
+}
+
+void smt2_convt::convert_zero_value(const typet &type)
+{
+  if(type.id() == ID_bool)
+    out << "false";
+  else if(type.id() == ID_array)
+  {
+    out << "((as const ";
+    convert_type(type);
+    out << ") ";
+    convert_zero_value(to_array_type(type).element_type());
+    out << ")";
+  }
+  else if(
+    (type.id() == ID_struct || type.id() == ID_struct_tag) && use_datatypes)
+  {
+    out << "(mk-" << datatype_map.at(type);
+    const struct_typet &struct_type =
+      type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+    for(const auto &component : struct_type.components())
+    {
+      if(is_zero_width(component.type(), ns))
+        continue;
+      out << ' ';
+      convert_zero_value(component.type());
+    }
+    out << ")";
+  }
+  else
+    out << "(_ bv0 " << boolbv_width(type) << ")";
 }
 
 void smt2_convt::write_header()
@@ -1798,7 +1844,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       array_of_expr.type().id() == ID_array,
       "array of expression shall have array type");
 
-    if(use_as_const)
+    if(use_as_const && as_const_admits(array_of_expr.what()))
     {
       out << "((as const ";
       convert_type(array_of_expr.type());
@@ -5385,6 +5431,32 @@ void smt2_convt::unflatten(
       mp_integer size =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
 
+      // A solver that takes only a VALUE under `as const' (cvc5) gets an
+      // all-zero base array, and every element 0..N-1 is stored.
+      if(use_as_const && as_const_requires_value)
+      {
+        for(mp_integer i = 0; i < size; ++i)
+          out << "(store ";
+        out << "((as const ";
+        convert_type(array_type);
+        out << ") ";
+        convert_zero_value(array_type.element_type());
+        out << ") ";
+        std::size_t offset = 0;
+        for(mp_integer i = 0; i < size; ++i, offset += subtype_width)
+        {
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << ' ';
+          unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+          out << "((_ extract " << offset + subtype_width - 1 << " " << offset
+              << ") ?ufop" << nesting << ")";
+          unflatten(wheret::END, array_type.element_type(), nesting + 1);
+          out << ")"; // store
+        }
+        out << ")"; // let
+        return;
+      }
+
       for(mp_integer i = 1; i < size; ++i)
         out << "(store ";
 
@@ -5863,7 +5935,7 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
   else if(expr.id() == ID_array_of)
   {
-    if(!use_as_const)
+    if(!use_as_const || !as_const_admits(to_array_of_expr(expr).what()))
     {
       if(defined_expressions.find(expr) == defined_expressions.end())
       {
