@@ -1228,6 +1228,52 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                   bind_req_params(ns.second);
               };
               bind_req_params(req_copy);
+              // N5008 [basic.scope.param]/1, [dcl.decl.general]/4: a
+              // trailing requires-clause is in the scope of the function's
+              // parameters (libc++'s `operator!=(const reverse_iterator<_I1>
+              // &__x, ...) requires requires { { __x.base() != __y.base() }
+              // -> __boolean_testable; }'): bind them like requirement
+              // parameters, with their substituted types.
+              if(!tdecl.declarators().empty())
+              {
+                const cpp_declaratort &fdecl = tdecl.declarators().front();
+                const exprt &trailing_clause =
+                  static_cast<const exprt &>(fdecl.find(ID_C_requires_clause));
+                if(
+                  trailing_clause.is_not_nil() &&
+                  trailing_clause.id() != ID_nil)
+                {
+                  for(const auto &fp :
+                      fdecl.type().find(ID_parameters).get_sub())
+                  {
+                    if(fp.id() != ID_cpp_declaration)
+                      continue;
+                    const cpp_declarationt &pd = to_cpp_declaration(fp);
+                    if(
+                      pd.declarators().empty() ||
+                      pd.declarators().front().get_has_ellipsis())
+                    {
+                      continue;
+                    }
+                    const irep_idt pname =
+                      pd.declarators().front().name().get_base_name();
+                    if(pname.empty())
+                      continue;
+                    typet ptype =
+                      pd.declarators().front().merge_type(pd.type());
+                    try
+                    {
+                      sfinae_contextt param_guard{cpp_typecheck};
+                      cpp_typecheck.typecheck_type(ptype);
+                    }
+                    catch(...)
+                    {
+                      continue;
+                    }
+                    cpp_typecheck.bind_requires_parameter(pname, ptype);
+                  }
+                }
+              }
               // Keep a substituted-but-untypechecked copy: if the
               // whole-clause type-check throws, the tri-state evaluator
               // below can still decide the clause per atom (its call-atom
