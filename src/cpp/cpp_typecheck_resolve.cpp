@@ -482,6 +482,71 @@ bool normal_subsumes(
 
 } // namespace
 
+namespace
+{
+// The normal form of the trailing requires-clause of a non-template member
+// (#member_requires); empty -- the "true" constraint -- when there is none.
+constraint_normalt member_constraint_normal(
+  const symbol_table_baset &symbol_table,
+  const typet &member_type,
+  bool dnf)
+{
+  const irept &req = member_type.find("#member_requires");
+  if(req.is_nil() || req.id() == ID_nil)
+    return {};
+  return concept_normal_expr(
+    symbol_table, static_cast<const exprt &>(req), dnf, 0);
+}
+} // namespace
+
+/// N5008 [over.match.best]/2.6: of two viable non-template functions with
+/// the same parameter-type-list, the more constrained one
+/// ([temp.constr.order]) is better.  Such twins are members of a class
+/// template specialization that differ only in their trailing
+/// requires-clauses ([basic.scope.scope]/4.4; e.g. libc++'s
+/// transform_view::end() and `end() requires common_range<_View>').
+/// Remove from \p identifiers each candidate a same-signature twin is
+/// strictly more constrained than.
+void cpp_typecheck_resolvet::prefer_more_constrained_members(
+  resolve_identifierst &identifiers)
+{
+  if(identifiers.size() < 2)
+    return;
+  const auto requires_of = [](const exprt &e) -> const irept &
+  { return e.type().find("#member_requires"); };
+  std::vector<bool> dominated(identifiers.size(), false);
+  for(std::size_t i = 0; i < identifiers.size(); ++i)
+  {
+    for(std::size_t j = 0; j < identifiers.size(); ++j)
+    {
+      const exprt &a = identifiers[i];
+      const exprt &b = identifiers[j];
+      if(
+        i == j || a.type().id() != ID_code || b.type().id() != ID_code ||
+        to_code_type(a.type()).parameters() !=
+          to_code_type(b.type()).parameters() ||
+        requires_of(a) == requires_of(b))
+      {
+        continue;
+      }
+      const auto &symtab = cpp_typecheck.symbol_table;
+      const bool a_subsumes_b = normal_subsumes(
+        member_constraint_normal(symtab, a.type(), true),
+        member_constraint_normal(symtab, b.type(), false));
+      const bool b_subsumes_a = normal_subsumes(
+        member_constraint_normal(symtab, b.type(), true),
+        member_constraint_normal(symtab, a.type(), false));
+      if(a_subsumes_b && !b_subsumes_a)
+        dominated[j] = true;
+    }
+  }
+  resolve_identifierst kept;
+  for(std::size_t i = 0; i < identifiers.size(); ++i)
+    if(!dominated[i])
+      kept.push_back(identifiers[i]);
+  identifiers.swap(kept);
+}
+
 // True iff declaration p is STRICTLY more constrained than q ([temp.func.order]
 // + [temp.constr.order]): p's associated constraints subsume q's but not the
 // other way round.  External linkage: also used by the class-template
@@ -3195,6 +3260,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     identifiers.swap(old_identifiers);
   }
 
+  prefer_more_constrained_members(identifiers);
   remove_duplicates(identifiers);
 }
 
@@ -7905,6 +7971,7 @@ resolved_after_strip:
 
   // we only want _exact_ matches, without templates!
   exact_match_functions(new_identifiers, fargs);
+  prefer_more_constrained_members(new_identifiers);
 
 #ifdef DEBUG
   std::cout << "P2 " << base_name << " " << new_identifiers.size() << '\n';

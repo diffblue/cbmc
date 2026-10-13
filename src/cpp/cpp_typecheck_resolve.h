@@ -278,6 +278,8 @@ protected:
   void make_constructors(
     resolve_identifierst &identifiers);
 
+  void prefer_more_constrained_members(resolve_identifierst &identifiers);
+
   void bind_explicit_template_arguments(
     const cpp_declarationt &declaration,
     const irept &stored_args);
