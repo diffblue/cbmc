@@ -3480,6 +3480,44 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
   }
   else
   {
+    // N5008 [expr.cond]/7.2: operands of arithmetic or (unscoped)
+    // enumeration type undergo the usual arithmetic conversions to bring
+    // them to a common type -- `b ? c : s' with `char c; short s' is an
+    // int prvalue (it was converted to the other operand's type, short).
+    const auto arithmetic_or_unscoped_enum = [this](const exprt &e)
+    {
+      const typet &t = e.type();
+      if(
+        t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+        t.id() == ID_floatbv || t.id() == ID_fixedbv || t.id() == ID_bool ||
+        t.id() == ID_c_bool || t.id() == ID_c_bit_field)
+      {
+        return true;
+      }
+      if(t.id() == ID_c_enum_tag)
+        return !follow_tag(to_c_enum_tag_type(t)).get_bool(ID_C_class);
+      return false;
+    };
+    if(
+      arithmetic_or_unscoped_enum(expr.op1()) &&
+      arithmetic_or_unscoped_enum(expr.op2()))
+    {
+      for(exprt *op : {&expr.op1(), &expr.op2()})
+      {
+        if(op->get_bool(ID_C_lvalue))
+        {
+          exprt converted;
+          if(standard_conversion_lvalue_to_rvalue(*op, converted))
+            op->swap(converted);
+          else
+            op->remove(ID_C_lvalue);
+        }
+      }
+      implicit_typecast_arithmetic(expr.op1(), expr.op2());
+      expr.type() = expr.op1().type();
+      return;
+    }
+
     exprt e1 = expr.op1();
     exprt e2 = expr.op2();
 
