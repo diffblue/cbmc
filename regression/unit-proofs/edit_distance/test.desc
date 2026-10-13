@@ -15,3 +15,5 @@ a two-letter alphabet.  KNOWNBUG: symbolic execution does not finish
 (>20min) -- the NFA's std::set<state>/std::vector state blows up under
 symex, the same scaling class as unit-proofs/escape.  g++/clang++
 accept the harness and it verifies at runtime.
+The profiling findings (2026-10-13) are documented at the top of
+harness.cpp.

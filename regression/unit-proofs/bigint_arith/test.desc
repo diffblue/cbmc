@@ -22,3 +22,5 @@ z3 idle-loops >30 min, cvc5 >20 min (QF_AUFBV resp. ALL+FPA).  The
 symbolic-size heap-array blow-up shifts from encoding memory (SAT) to
 solve time (SMT); the harness-side fix (concrete digit capacities)
 remains the promising route.
+The profiling findings (2026-10-13) are documented at the top of
+harness.cpp.

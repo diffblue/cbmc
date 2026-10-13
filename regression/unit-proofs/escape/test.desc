@@ -14,3 +14,5 @@ objects with symbolic size explode in bit-blasting (same class as
 bigint_arith; see the stage-profiling findings).  Flip to CORE when
 the encoding scales (SMT array backend or capacity-bounded string
 model).
+The profiling findings (2026-10-13) are documented at the top of
+harness.cpp.
