@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* constant: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion
+static_assert condition could not be evaluated
+--
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
