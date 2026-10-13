@@ -3641,15 +3641,27 @@ bool cpp_typecheckt::reference_binding(
     // through /5.3: a temporary W is copy-initialised from p (converting
     // constructor or conversion function) and the rvalue reference binds
     // to it -- handled below.
+    // [expr.sub]/1: `E1[E2]' is an lvalue if E1 is an lvalue and an xvalue
+    // otherwise -- the subscript of an array prvalue (`arr3{1, 2, 3}[i]',
+    // [class.temporary]/6.3) binds to an rvalue reference.
+    const bool subscript_of_rvalue_array =
+      expr.id() == ID_index &&
+      (to_index_expr(expr).array().id() == ID_array ||
+       (to_index_expr(expr).array().id() == ID_side_effect &&
+        to_index_expr(expr).array().get(ID_statement) == ID_temporary_object) ||
+       to_index_expr(expr).array().id() == ID_compound_literal);
     const bool genuine_lvalue_form =
       expr.id() == ID_symbol || expr.id() == ID_dereference ||
-      expr.id() == ID_member || expr.id() == ID_index ||
+      expr.id() == ID_member ||
+      (expr.id() == ID_index && !subscript_of_rvalue_array) ||
       expr.id() == ID_string_constant; // [expr.prim.literal]: an lvalue
     const bool unrelated_lvalue_to_class =
       genuine_lvalue_form && reference_type.base_type().id() == ID_struct_tag &&
       (expr.type().id() != ID_struct_tag ||
        !reference_related(expr, reference_type));
-    if(!unrelated_lvalue_to_class)
+    // an xvalue subscript is bound like a glvalue below (its array
+    // temporary is materialized by goto conversion, [class.temporary]/6.3)
+    if(!unrelated_lvalue_to_class && !subscript_of_rvalue_array)
     {
       if(genuine_lvalue_form)
         return false;
