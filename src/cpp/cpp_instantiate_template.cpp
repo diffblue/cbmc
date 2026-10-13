@@ -4167,27 +4167,59 @@ void cpp_typecheckt::remove_empty_function_parameter_pack(
     const irept *t = &merged;
     while(t->id() != ID_cpp_name && !t->get_sub().empty())
       t = &t->get_sub().front();
-    if(t->id() != ID_cpp_name || t->get_sub().empty())
-      return;
-    pack_short = id2string(t->get_sub().front().get(ID_identifier));
+    // (no type name: the pattern may expand a non-type pack, below)
+    if(t->id() == ID_cpp_name && !t->get_sub().empty())
+      pack_short = id2string(t->get_sub().front().get(ID_identifier));
     for(const auto &nsub : pd.declarators().front().name().get_sub())
       if(nsub.id() == ID_name)
         pack_var = nsub.get(ID_identifier);
   }
-  if(pack_var.empty() || pack_short.empty())
+  if(pack_var.empty())
     return;
-  // ... is its template pack bound to zero elements?
+  // ... is its template pack bound to zero elements?  A pattern may expand a
+  // NON-type pack (`const char (&...s)[N]', [temp.variadic]/5) instead
+  std::set<std::string> pattern_names;
+  for(const auto &p : orig_type.find(ID_parameters).get_sub())
+  {
+    if(p.id() != ID_cpp_declaration)
+      continue;
+    const auto &pd = static_cast<const cpp_declarationt &>(p);
+    if(
+      pd.declarators().empty() ||
+      (!pd.declarators().front().get_bool(ID_ellipsis) &&
+       !pd.declarators().front().type().get_bool(ID_ellipsis)))
+    {
+      continue;
+    }
+    std::function<void(const irept &)> collect = [&](const irept &n)
+    {
+      if(n.id() == ID_name)
+        pattern_names.insert(id2string(n.get(ID_identifier)));
+      for(const auto &sub : n.get_sub())
+        collect(sub);
+      for(const auto &ns : n.get_named_sub())
+        collect(ns.second);
+    };
+    collect(pd.declarators().front().type());
+  }
   bool empty = false;
   for(const auto &tp : tparams)
   {
-    if(!tp.get_bool(ID_ellipsis) || tp.id() != ID_type)
+    if(!tp.get_bool(ID_ellipsis))
       continue;
-    const std::string pid = id2string(tp.type().get(ID_identifier));
+    const irep_idt id =
+      tp.id() == ID_type ? tp.type().get(ID_identifier) : tp.get(ID_identifier);
+    const std::string pid = id2string(id);
     const auto pos = pid.rfind("::");
-    if((pos != std::string::npos ? pid.substr(pos + 2) : pid) != pack_short)
+    const std::string short_name =
+      pos != std::string::npos ? pid.substr(pos + 2) : pid;
+    if(
+      tp.id() == ID_type ? short_name != pack_short
+                         : pattern_names.count(short_name) == 0)
+    {
       continue;
-    const auto ps_it =
-      template_map.pack_size_map.find(tp.type().get(ID_identifier));
+    }
+    const auto ps_it = template_map.pack_size_map.find(id);
     empty = ps_it != template_map.pack_size_map.end() && ps_it->second == 0;
     break;
   }
@@ -8902,6 +8934,7 @@ skip_pack_removal_ft:
           ? new_decl.declarators()[0].type().find(ID_parameters)
           : template_decl.declarators()[0].type().find(ID_parameters);
       irep_idt fn_pack_short;
+      std::set<irep_idt> fn_pack_names; // every name in the pack's pattern
       for(const auto &fp : fparams0.get_sub())
       {
         if(fp.id() != ID_cpp_declaration)
@@ -8921,6 +8954,43 @@ skip_pack_removal_ft:
           t = &t->get_sub().front();
         if(t->id() == ID_cpp_name && !t->get_sub().empty())
           fn_pack_short = t->get_sub().front().get(ID_identifier);
+        std::function<void(const irept &)> collect = [&](const irept &n)
+        {
+          if(n.id() == ID_name)
+            fn_pack_names.insert(n.get(ID_identifier));
+          for(const auto &sub : n.get_sub())
+            collect(sub);
+          for(const auto &ns : n.get_named_sub())
+            collect(ns.second);
+        };
+        collect(merged);
+      }
+      // N5008 [temp.variadic]/5: a pattern without a type pack may expand a
+      // NON-type pack (`const char (&...s)[N]'): its recorded elements
+      if(fn_pack_short.empty())
+      {
+        for(const auto &tp : all_template_params)
+        {
+          if(!tp.get_bool(ID_ellipsis) || tp.id() == ID_type)
+            continue;
+          const std::string pid = id2string(tp.get(ID_identifier));
+          const auto sep = pid.rfind("::");
+          if(!fn_pack_names.count(
+               sep == std::string::npos ? pid : pid.substr(sep + 2)))
+          {
+            continue;
+          }
+          const auto ps =
+            template_map.pack_size_map.find(tp.get(ID_identifier));
+          const auto pe =
+            template_map.pack_expr_map.find(tp.get(ID_identifier));
+          if(ps == template_map.pack_size_map.end())
+            continue;
+          if(pe != template_map.pack_expr_map.end())
+            pack_arguments = pe->second;
+          pack_arguments_from_map = true;
+          break;
+        }
       }
       if(!fn_pack_short.empty())
       {
@@ -9251,6 +9321,27 @@ skip_pack_removal_ft:
         {
           auto &d = static_cast<cpp_declarationt &>(param_copy);
           d.type() = pack_arg.type();
+        }
+        // N5008 [temp.variadic]/5: a pattern naming a NON-type pack
+        // (`const char (&...s)[N]') gets that pack's k-th value
+        for(const auto &tp : all_template_params)
+        {
+          if(!tp.get_bool(ID_ellipsis) || tp.id() == ID_type)
+            continue;
+          const auto pe =
+            template_map.pack_expr_map.find(tp.get(ID_identifier));
+          if(
+            pe == template_map.pack_expr_map.end() ||
+            pe->second.size() != pack_sz)
+          {
+            continue;
+          }
+          const std::string pid = id2string(tp.get(ID_identifier));
+          const auto sep = pid.rfind("::");
+          replace_value_pack_ref(
+            param_copy,
+            sep == std::string::npos ? pid : pid.substr(sep + 2),
+            pe->second[k]);
         }
 
         // Rename the parameter
