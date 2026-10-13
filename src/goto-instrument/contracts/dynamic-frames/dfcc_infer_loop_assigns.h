@@ -18,13 +18,11 @@ class namespacet;
 class message_handlert;
 struct dfcc_loop_nesting_graph_nodet;
 
-/// Collect identifiers that are local to `loop`.
+/// Collect identifiers that are local to `loop`, i.e., those of variables
+/// declared inside `loop`.
 std::unordered_set<irep_idt> gen_loop_locals_set(
-  const irep_idt &function_id,
   goto_functiont &goto_function,
-  const dfcc_loop_nesting_graph_nodet &loop,
-  message_handlert &message_handler,
-  const namespacet &ns);
+  const dfcc_loop_nesting_graph_nodet &loop);
 
 /// \brief Infer assigns clause targets for loops in `goto_function` from their
 /// instructions and an alias analysis at the function level (with inlining),

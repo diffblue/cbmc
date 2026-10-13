@@ -403,12 +403,8 @@ static dfcc_loop_infot gen_dfcc_loop_info(
   symbol_table_baset &symbol_table)
 {
   const namespacet ns(symbol_table);
-  std::unordered_set<irep_idt> loop_locals = gen_loop_locals_set(
-    function_id,
-    goto_function,
-    loop_nesting_graph[loop_id],
-    message_handler,
-    ns);
+  std::unordered_set<irep_idt> loop_locals =
+    gen_loop_locals_set(goto_function, loop_nesting_graph[loop_id]);
 
   // Exclude locals of inner nested loops that are abstracted by a contract.
   // Locals of skipped (contract-less) inner loops are kept, because such loops
