@@ -65,9 +65,16 @@ smt2_convt::smt2_convt(
   const std::string &_notes,
   const std::string &_logic,
   solvert _solver,
-  std::ostream &_out)
+  std::ostream &_out,
+  bool _complete_problem)
   : ns(_ns),
-    out(_out),
+    final_out(_out),
+    // only solvers whose header declares the (quantifier-free) logic
+    defer_output(
+      _complete_problem && _solver != solvert::BITWUZLA &&
+      _solver != solvert::CPROVER_SMT2 && _solver != solvert::Z3 &&
+      _solver != solvert::CVC5 && _logic.rfind("QF_", 0) == 0),
+    out(defer_output ? deferred_output : _out),
     benchmark(_benchmark),
     notes(_notes),
     logic(_logic),
@@ -133,7 +140,8 @@ smt2_convt::smt2_convt(
     break;
   }
 
-  write_header();
+  if(!defer_output)
+    write_header();
 }
 
 std::string smt2_convt::decision_procedure_text() const
@@ -164,8 +172,24 @@ tvt smt2_convt::l_get(literalt l) const
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
 
+void smt2_convt::flush_deferred_output()
+{
+  if(!defer_output)
+    return;
+  if(!header_written)
+  {
+    if(quantifier_emitted && logic.rfind("QF_", 0) == 0)
+      logic = logic.substr(3);
+    write_header();
+  }
+  final_out << deferred_output.str();
+  deferred_output.str(std::string{});
+}
+
 void smt2_convt::write_header()
 {
+  header_written = true;
+  std::ostream &out = final_out;
   out << "; SMT 2" << "\n";
 
   switch(solver)
@@ -298,7 +322,8 @@ decision_proceduret::resultt smt2_convt::dec_solve(const exprt &assumption)
     assumptions.pop_back();
   }
 
-  out.flush();
+  flush_deferred_output();
+  final_out.flush();
   return decision_proceduret::resultt::D_ERROR;
 }
 
@@ -2607,6 +2632,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       // NOLINTNEXTLINE(readability/throw)
       throw "MathSAT does not support quantifiers";
 
+    quantifier_emitted = true;
     if(quantifier_expr.id() == ID_forall)
       out << "(forall ";
     else if(quantifier_expr.id() == ID_exists)
@@ -5882,6 +5908,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         if(!is_zero_width(array_type.element_type(), ns))
         {
           // use a quantifier-based initialization instead of lambda
+          quantifier_emitted = true;
           out << "(assert (forall ((i ";
           convert_type(array_type.index_type());
           out << ")) (= (select " << id << " i) ";
@@ -5920,6 +5947,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 
         out << "; the following is a substitute for lambda i . x(i)\n";
         out << "; universally quantified initialization of the array\n";
+        quantifier_emitted = true;
         out << "(assert (forall ((";
         convert_expr(array_comprehension.arg());
         out << " ";
