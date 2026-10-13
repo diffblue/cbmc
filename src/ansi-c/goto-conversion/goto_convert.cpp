@@ -904,9 +904,17 @@ void goto_convertt::convert_frontend_decl(
     //
     // N5008 [class.temporary]/6: only the temporary the reference is bound
     // to (or whose subobject it is bound to) persists; the others -- e.g.
-    // those bound to a function call's reference parameters (/6.10) -- are
+    // those bound to a function call's reference parameters (/6.9) -- are
     // destroyed at the end of the full-expression as usual.
-    if(is_reference(symbol.type))
+    //
+    // The same holds for a reference MEMBER of an aggregate initialized
+    // from a braced-init-list (`struct R { const int &m; }; R r{5};',
+    // /6 Note 5 and Example 5: the temporary lives as long as the
+    // reference member, i.e. as long as the object); the initializer of
+    // the object then holds the temporary's address.  A temporary passed to
+    // a function was hoisted into side_effects by clean_expr and is not
+    // part of the initializer any more.
+    if(is_reference(symbol.type) || symbol.type.id() == ID_struct_tag)
     {
       std::set<irep_idt> bound;
       initializer.visit_pre(
@@ -915,10 +923,11 @@ void goto_convertt::convert_frontend_decl(
           if(e.id() == ID_symbol)
             bound.insert(to_symbol_expr(e).get_identifier());
         });
+      const std::set<irep_idt> extended = side_effects.extended_by(bound);
       std::list<irep_idt> others;
       for(const auto &id : side_effects.temporaries)
       {
-        if(bound.count(id) != 0)
+        if(extended.count(id) != 0)
           ref_bound_temporaries.push_back(id);
         else
           others.push_back(id);
