@@ -14190,3 +14190,32 @@ No KNOWNBUG left in regression/cbmc-cpp (unit-proofs escape/edit_distance/
 bigint_arith remain: scaling).  Suites W99: cbmc-cpp 1847, cpp 246,
 regression/cbmc 1205, goto-instrument 298, contracts 178, unit-proofs 13,
 all exit 0; lint 0; each commit compiles.
+
+## Round 183: why the three unit proofs are hard (no code change)
+
+Data in /tmp/r183 (logs, perf data, SMT2 files).  16 GB address-space cap,
+30 min per run.
+- bigint_arith: symex 0.9 s (9665 steps); the SAT back-end runs out of
+  memory while BUILDING the CNF (--dimacs: 60M vars / 184M clauses at 16 GB,
+  ~70 s).  perf: all in bv_pointerst::finish_eager_conversion ->
+  arrayst::add_array_constraints.  Instrumented: 1.22M ARRAY_IF constraints
+  (36M vars), 56k ARRAY_COMPREHENSION (19M vars), 260k ARRAY_WITH.  The
+  digit buffers are dynamic objects of symbolic size (adjust_size's
+  arithmetic), 1596 arrays in 100 classes of ~114 SSA versions each.
+  --arrays-uf-always, --refine-arrays, CaDiCaL: same OOM.  The SMT2 text is
+  6.9 MB (2.9 s); z3 and cvc5 (cbmc --z3/--cvc5) time out at 30 min with
+  small memory.  `--smt2 --outfile' declares QF_AUFBV but contains
+  quantifiers (array comprehensions): z3/cvc5 reject the file.
+- escape: symex 1.5 s (25.7k steps); SAT OOM the same way (2M ARRAY_IF,
+  612k ARRAY_WITH, 126k comprehension; std::string buffers of symbolic
+  size).  MAX_LEN 1 costs the same as 3: --unwind 8 drives the size, not the
+  input length; --unwind 4 (the minimum for MAX_LEN 3) still needs 13 GB.
+  z3 times out at 30 min; cvc5 rejects CBMC's SMT2:
+  `((as const (Array ..)) ((_ extract 7 0) x))' -- `as const' with a
+  non-constant element (CBMC SMT2 back-end bug).
+- edit_distance: never reaches the solver.  --unwind 2: symex 0.2 s;
+  --unwind 3+: >15 min.  perf: value_sett (points-to sets) and irep
+  sharing/copying; a dereference of a _Hash_node pointer splits over up to 85
+  dynamic objects (expressions up to 44 KB) -- the unordered_set nodes the
+  NFA copies (_Hashtable::_M_assign) all alias.
+128 orphaned, sleeping cbmc processes from earlier cvise runs hold ~10 GB.
