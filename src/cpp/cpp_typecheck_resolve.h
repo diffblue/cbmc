@@ -92,6 +92,9 @@ public:
   void guess_template_args_compound(
     const typet &template_type,
     const typet &desired_type);
+  std::vector<typet> type_arguments_with_packs_expanded(
+    const cpp_template_args_non_tct &template_args,
+    std::size_t first);
 
   /// [temp.deduct.type]/8: in class-template partial-specialization
   /// matching ([temp.class.spec.match]/2), a pattern `const T` does NOT

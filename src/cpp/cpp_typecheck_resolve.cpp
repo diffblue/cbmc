@@ -6653,64 +6653,8 @@ exprt cpp_typecheck_resolvet::resolve(
     // the expansion node itself and its type-check rejects the whole
     // candidate (the libc++ std::get<I>(tuple&) return type,
     // KNOWNBUG cpp11_type_pack_element_return).
-    std::vector<typet> element_types;
-    for(std::size_t ai = 1; ai < template_args.arguments().size(); ++ai)
-    {
-      const exprt &arg = template_args.arguments()[ai];
-      const irept &arg_irep = static_cast<const irept &>(arg);
-      const bool is_expansion =
-        arg.get_bool(ID_ellipsis) || arg.type().get_bool(ID_ellipsis);
-      irep_idt pack_name;
-      if(is_expansion)
-      {
-        const irept *t = &arg.type();
-        if(arg_irep.id() == ID_cpp_name)
-          t = &arg_irep;
-        if(t->id() == ID_cpp_name)
-        {
-          const auto &sub = t->get_sub();
-          if(sub.size() == 1 && sub.front().id() == ID_name)
-            pack_name = sub.front().get(ID_identifier);
-        }
-      }
-      if(!pack_name.empty())
-      {
-        // find the pack binding by short name
-        const std::vector<typet> *pack = nullptr;
-        for(const auto &entry : cpp_typecheck.template_map.pack_args_map)
-        {
-          const std::string key = id2string(entry.first);
-          const auto pos = key.rfind("::");
-          if(
-            (pos != std::string::npos ? key.substr(pos + 2) : key) ==
-            id2string(pack_name))
-          {
-            pack = &entry.second;
-            break;
-          }
-        }
-        if(pack == nullptr)
-        {
-          // unexpandable here: dependent context
-          throw 0;
-        }
-        for(const auto &pt : *pack)
-          element_types.push_back(pt);
-      }
-      else if(arg.id() == ID_type || arg.id() == ID_ambiguous)
-      {
-        element_types.push_back(arg.type());
-      }
-      else if(arg_irep.id() == ID_cpp_name || arg_irep.id() == ID_merged_type)
-      {
-        element_types.push_back(static_cast<const typet &>(arg_irep));
-      }
-      else
-      {
-        // not a type argument shape we can evaluate here
-        throw 0;
-      }
-    }
+    const std::vector<typet> element_types =
+      type_arguments_with_packs_expanded(template_args, 1);
 
     if(n.has_value() && *n >= 0 && *n < mp_integer(element_types.size()))
     {
@@ -6728,6 +6672,74 @@ exprt cpp_typecheck_resolvet::resolve(
     }
     // Dependent or out-of-range: substitution failure.
     throw 0;
+  }
+
+  // Clang's builtin alias template `__builtin_common_type<BaseTemplate,
+  // HasTypeMember, HasNoTypeMember, Ts...>' (libc++ 21's std::common_type
+  // derives from `__builtin_common_type<__common_type_t, __type_identity,
+  // __empty, _Args...>'): HasTypeMember<C> for the common type C of the
+  // Ts ([meta.trans.other]/3, see builtin_common_type), HasNoTypeMember
+  // when there is none.
+  if(
+    base_name == "__builtin_common_type" && template_args.is_not_nil() &&
+    template_args.arguments().size() >= 3)
+  {
+    const auto &args = template_args.arguments();
+    const auto template_name_of = [&](const exprt &arg) -> irep_idt
+    {
+      const irept *node = &arg;
+      if(arg.id() == ID_ambiguous || arg.id() == ID_type)
+      {
+        if(arg.type().id() == ID_cpp_name)
+          node = &arg.type();
+        else if(arg.type().id() == ID_template_parameter_symbol_type)
+        {
+          // a template template parameter bound to a template: take the
+          // bound template's base name (as for __make_integer_seq)
+          const std::string bound = id2string(
+            to_template_parameter_symbol_type(arg.type()).get_identifier());
+          auto q = bound.rfind("::");
+          std::string base =
+            q != std::string::npos ? bound.substr(q + 2) : bound;
+          if(base.compare(0, 9, "template.") == 0)
+            base = base.substr(9);
+          auto angle = base.find('<');
+          if(angle != std::string::npos)
+            base = base.substr(0, angle);
+          return base;
+        }
+      }
+      if(node->id() == ID_cpp_name)
+        return to_cpp_name(*node).get_base_name();
+      return irep_idt{};
+    };
+    const irep_idt base_template = template_name_of(args[0]);
+    const irep_idt has_type_member = template_name_of(args[1]);
+    if(base_template.empty() || has_type_member.empty())
+      throw 0;
+    std::vector<typet> types =
+      type_arguments_with_packs_expanded(template_args, 3);
+    for(auto &t : types)
+      cpp_typecheck.typecheck_type(t);
+    const auto common =
+      cpp_typecheck.builtin_common_type(base_template, types, source_location);
+    if(!common.has_value())
+    {
+      typet result =
+        args[2].id() == ID_type || args[2].id() == ID_ambiguous
+          ? args[2].type()
+          : static_cast<const typet &>(static_cast<const irept &>(args[2]));
+      cpp_typecheck.typecheck_type(result);
+      exprt result_expr{ID_type};
+      result_expr.type() = result;
+      return result_expr;
+    }
+    cpp_template_args_non_tct expanded_args;
+    exprt type_arg{ID_type};
+    type_arg.type() = *common;
+    expanded_args.arguments().push_back(std::move(type_arg));
+    base_name = has_type_member;
+    template_args = std::move(expanded_args);
   }
 
   // Clang's builtin alias template `__make_integer_seq<Tpl, T, N>`
@@ -9684,6 +9696,75 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
         static_cast<const exprt &>(targs[i]), inst_arguments[i]);
     }
   }
+}
+
+/// The type arguments of \p template_args from index \p first on, with a
+/// pack expansion `Ts...' replaced by the elements the pack is bound to
+/// (N5008 [temp.variadic]/5).  Throws 0 (substitution failure) for an
+/// unbound pack or an argument that is not a type.
+std::vector<typet> cpp_typecheck_resolvet::type_arguments_with_packs_expanded(
+  const cpp_template_args_non_tct &template_args,
+  std::size_t first)
+{
+  std::vector<typet> element_types;
+  for(std::size_t ai = first; ai < template_args.arguments().size(); ++ai)
+  {
+    const exprt &arg = template_args.arguments()[ai];
+    const irept &arg_irep = static_cast<const irept &>(arg);
+    const bool is_expansion =
+      arg.get_bool(ID_ellipsis) || arg.type().get_bool(ID_ellipsis);
+    irep_idt pack_name;
+    if(is_expansion)
+    {
+      const irept *t = &arg.type();
+      if(arg_irep.id() == ID_cpp_name)
+        t = &arg_irep;
+      if(t->id() == ID_cpp_name)
+      {
+        const auto &sub = t->get_sub();
+        if(sub.size() == 1 && sub.front().id() == ID_name)
+          pack_name = sub.front().get(ID_identifier);
+      }
+    }
+    if(!pack_name.empty())
+    {
+      // find the pack binding by short name
+      const std::vector<typet> *pack = nullptr;
+      for(const auto &entry : cpp_typecheck.template_map.pack_args_map)
+      {
+        const std::string key = id2string(entry.first);
+        const auto pos = key.rfind("::");
+        if(
+          (pos != std::string::npos ? key.substr(pos + 2) : key) ==
+          id2string(pack_name))
+        {
+          pack = &entry.second;
+          break;
+        }
+      }
+      if(pack == nullptr)
+      {
+        // unexpandable here: dependent context
+        throw 0;
+      }
+      for(const auto &pt : *pack)
+        element_types.push_back(pt);
+    }
+    else if(arg.id() == ID_type || arg.id() == ID_ambiguous)
+    {
+      element_types.push_back(arg.type());
+    }
+    else if(arg_irep.id() == ID_cpp_name || arg_irep.id() == ID_merged_type)
+    {
+      element_types.push_back(static_cast<const typet &>(arg_irep));
+    }
+    else
+    {
+      // not a type argument shape we can evaluate here
+      throw 0;
+    }
+  }
+  return element_types;
 }
 
 /// guess_template_args for a plain name pattern: a template parameter is

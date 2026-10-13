@@ -1305,6 +1305,10 @@ protected:
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
+  std::optional<typet> builtin_common_type(
+    const irep_idt &base_template,
+    const std::vector<typet> &types,
+    const source_locationt &source_location);
   bool implicit_pod_assignment_call(side_effect_expr_function_callt &expr);
   void user_defined_numeric_literal(side_effect_expr_function_callt &expr);
   /// The closure member holding a lambda's captured `this'
