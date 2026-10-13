@@ -2700,6 +2700,30 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           // already-typechecked wrapper below carries a nil type
           const exprt real_target = target;
 
+          // a reference member of the anonymous struct (libc++ 21's
+          // _LIBCPP_COMPRESSED_PAIR holding an `Alloc &'): bind it as a
+          // reference member of the class itself is bound below
+          if(is_reference(target.type()))
+          {
+            if(code.operands().size() != 1)
+            {
+              error().source_location = code.find_source_location();
+              error() << " reference '" << to_string(target)
+                      << "' expects one initializer" << eom;
+              throw 0;
+            }
+            typecheck_expr(code.op0());
+            reference_initializer(code.op0(), to_reference_type(target.type()));
+            target.type().remove(ID_C_reference);
+            code.op0().type().remove(ID_C_reference);
+            side_effect_exprt assign(
+              ID_assign, {target, code.op0()}, typet(), code.source_location());
+            typecheck_side_effect_assignment(assign);
+            code_expressiont new_code(assign);
+            code.swap(new_code);
+            return;
+          }
+
           exprt::operandst wrapped_ops;
           wrapped_ops.reserve(code.operands().size());
           for(const auto &op : code.operands())

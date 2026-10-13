@@ -1894,7 +1894,10 @@ void cpp_typecheckt::full_member_initialization(
       // [class.union.anon]: an initializer naming a member of this anonymous
       // union/struct component initializes that subobject; route it to the
       // body (typecheck_member_initializer builds the access through the
-      // unnamed subobject).
+      // unnamed subobject).  An anonymous STRUCT may have several of its
+      // members named (`cap(nullptr), alloc(a)' for libc++ 21's
+      // _LIBCPP_COMPRESSED_PAIR); route every one of them, not just the
+      // first.
       if(
         c.get_anonymous() &&
         (c.type().id() == ID_union_tag || c.type().id() == ID_struct_tag))
@@ -1904,7 +1907,8 @@ void cpp_typecheckt::full_member_initialization(
         {
           final_initializers.move_to_sub(initializer);
           found = true;
-          break;
+          if(c.type().id() == ID_union_tag)
+            break;
         }
       }
     }
