@@ -1,9 +1,8 @@
 // N5008 [temp.variadic]/5, /7: with several template packs, the function
 // parameter pack `const char (&...s)[N]' belongs to the NON-type pack N.
-// For an empty N it has no parameters (the removal of an empty function
-// parameter pack, remove_empty_function_parameter_pack, handles type packs
-// only), and for a non-empty one it has one per element
-// (cpp17_function_parameter_pack_of_array_references).
+// For an empty N it has no parameters, and for a non-empty one it has one
+// per element (cpp17_function_parameter_pack_of_array_references); with
+// several packs the pack was looked for among the TYPE packs only.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class... T>
 struct tl

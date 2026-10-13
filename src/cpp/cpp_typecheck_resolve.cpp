@@ -11451,6 +11451,104 @@ void cpp_typecheck_resolvet::expand_function_parameter_pack(
   }
 }
 
+/// N5008 [temp.variadic]/5, [temp.deduct.call]/1: a function parameter pack
+/// whose pattern names a NON-type template parameter pack (`const char
+/// (&...s)[N]') expands to one parameter per element of that pack, the
+/// element's value substituted for the pack's name.  The element values
+/// are those deduce_from_call_arguments recorded in pack_expr_map.
+void cpp_typecheck_resolvet::expand_value_function_parameter_pack(
+  const template_typet &template_type,
+  typet &function_type)
+{
+  if(function_type.id() != ID_function_type)
+    return;
+  // the non-type packs with recorded elements, by short name
+  std::vector<std::pair<std::string, const std::vector<exprt> *>> packs;
+  for(const auto &tp : template_type.template_parameters())
+  {
+    if(!tp.get_bool(ID_ellipsis) || tp.id() == ID_type)
+      continue;
+    static const std::vector<exprt> no_elements;
+    const auto pe =
+      cpp_typecheck.template_map.pack_expr_map.find(tp.get(ID_identifier));
+    const auto ps =
+      cpp_typecheck.template_map.pack_size_map.find(tp.get(ID_identifier));
+    if(ps == cpp_typecheck.template_map.pack_size_map.end())
+      continue;
+    const std::vector<exprt> *elements =
+      ps->second == 0 ? &no_elements
+      : pe != cpp_typecheck.template_map.pack_expr_map.end() &&
+          pe->second.size() == ps->second
+        ? &pe->second
+        : nullptr;
+    if(elements == nullptr)
+      continue;
+    const std::string pid = id2string(tp.get(ID_identifier));
+    const auto sep = pid.rfind("::");
+    packs.push_back(
+      {sep == std::string::npos ? pid : pid.substr(sep + 2), elements});
+  }
+  if(packs.empty())
+    return;
+  const auto mentions = [](const irept &node, const std::string &name)
+  {
+    std::function<bool(const irept &)> rec = [&](const irept &n)
+    {
+      if(
+        n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+        n.get_sub().front().id() == ID_name &&
+        id2string(n.get_sub().front().get(ID_identifier)) == name)
+      {
+        return true;
+      }
+      for(const auto &sub : n.get_sub())
+        if(rec(sub))
+          return true;
+      for(const auto &ns : n.get_named_sub())
+        if(rec(ns.second))
+          return true;
+      return false;
+    };
+    return rec(node);
+  };
+  irept::subt &fparams = function_type.add(ID_parameters).get_sub();
+  irept::subt expanded;
+  for(const auto &p : fparams)
+  {
+    const cpp_declarationt *decl =
+      p.id() == ID_cpp_declaration ? &to_cpp_declaration(p) : nullptr;
+    const bool is_pack =
+      decl != nullptr && !decl->declarators().empty() &&
+      (decl->declarators().front().get_bool(ID_ellipsis) ||
+       decl->declarators().front().type().get_bool(ID_ellipsis));
+    const std::pair<std::string, const std::vector<exprt> *> *own = nullptr;
+    for(const auto &pack : packs)
+    {
+      if(is_pack && mentions(p, pack.first))
+        own = &pack;
+    }
+    if(own == nullptr)
+    {
+      expanded.push_back(p);
+      continue;
+    }
+    for(std::size_t k = 0; k < own->second->size(); ++k)
+    {
+      irept copy = p;
+      auto &d = static_cast<cpp_declarationt &>(copy).declarators().front();
+      d.remove(ID_ellipsis);
+      d.type().remove(ID_ellipsis);
+      for(const auto &pack : packs)
+      {
+        if(k < pack.second->size())
+          replace_value_pack_ref(copy, pack.first, (*pack.second)[k]);
+      }
+      expanded.push_back(std::move(copy));
+    }
+  }
+  fparams = std::move(expanded);
+}
+
 /// N5008 [temp.deduct.call]: deduce the template arguments from the call
 /// arguments \p fargs (from \p it on), one function parameter of
 /// \p parameters at a time -- P/A pairs, forwarding references, a trailing
@@ -11462,12 +11560,52 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
   exprt::operandst::const_iterator it,
   std::size_t &pack_expansion_size,
   bool &has_non_empty_pack,
-  std::vector<typet> &pack_deduced_types)
+  std::vector<typet> &pack_deduced_types,
+  const template_typet *template_type)
 {
   for(const auto &parameter : parameters)
   {
     if(it == fargs.operands.end())
+    {
+      // N5008 [temp.arg.explicit]/4 note 1, [temp.variadic]/7: a trailing
+      // function parameter pack without arguments deduces the packs its
+      // pattern expands as empty -- record that for a NON-type pack
+      // (`const char (&...s)[N]'), whose emptiness the type-pack path
+      // below never sees
+      if(template_type != nullptr && parameter.id() == ID_cpp_declaration)
+      {
+        const cpp_declarationt &pd = to_cpp_declaration(parameter);
+        if(
+          !pd.declarators().empty() &&
+          (pd.declarators().front().get_bool(ID_ellipsis) ||
+           pd.declarators().front().type().get_bool(ID_ellipsis)))
+        {
+          std::set<irep_idt> names;
+          std::function<void(const irept &)> collect = [&](const irept &n)
+          {
+            if(n.id() == ID_name)
+              names.insert(n.get(ID_identifier));
+            for(const auto &sub : n.get_sub())
+              collect(sub);
+            for(const auto &ns : n.get_named_sub())
+              collect(ns.second);
+          };
+          collect(pd.declarators().front().type());
+          for(const auto &tp : template_type->template_parameters())
+          {
+            if(!tp.get_bool(ID_ellipsis) || tp.id() == ID_type)
+              continue;
+            const std::string pid = id2string(tp.get(ID_identifier));
+            const auto sep = pid.rfind("::");
+            if(names.count(
+                 sep == std::string::npos ? pid : pid.substr(sep + 2)))
+              cpp_typecheck.template_map.set_pack_size(
+                tp.get(ID_identifier), 0);
+          }
+        }
+      }
       break;
+    }
 
     if(parameter.id() == ID_cpp_declaration)
     {
@@ -11549,6 +11687,69 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
         pack_expansion_size =
           static_cast<std::size_t>(fargs.operands.end() - it);
         has_non_empty_pack = pack_expansion_size > 0;
+        // N5008 [temp.deduct.call]/1: "Each deduction deduces template
+        // arguments for subsequent positions in the template parameter
+        // packs expanded by the function parameter pack" -- also NON-type
+        // packs the pattern names (`const char (&...s)[N]').  Collect each
+        // argument's value of such a pack.
+        std::vector<std::pair<irep_idt, std::vector<exprt>>> value_packs;
+        if(template_type != nullptr)
+        {
+          std::set<irep_idt> names;
+          std::function<void(const irept &)> collect = [&](const irept &n)
+          {
+            if(
+              n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+              n.get_sub().front().id() == ID_name)
+            {
+              names.insert(n.get_sub().front().get(ID_identifier));
+            }
+            for(const auto &sub : n.get_sub())
+              collect(sub);
+            for(const auto &ns : n.get_named_sub())
+              collect(ns.second);
+          };
+          collect(arg_type);
+          for(const auto &tp : template_type->template_parameters())
+          {
+            if(!tp.get_bool(ID_ellipsis) || tp.id() == ID_type)
+              continue;
+            const std::string pid = id2string(tp.get(ID_identifier));
+            const auto sep = pid.rfind("::");
+            if(names.count(
+                 sep == std::string::npos ? pid : pid.substr(sep + 2)))
+              value_packs.push_back({tp.get(ID_identifier), {}});
+          }
+        }
+        if(!value_packs.empty())
+        {
+          // the function parameter pack expands these value packs, not a
+          // type pack: no type elements are recorded for it
+          pack_expansion_size = 0;
+          has_non_empty_pack = false;
+          for(; it != fargs.operands.end(); ++it)
+          {
+            for(auto &vp : value_packs)
+            {
+              exprt &slot = cpp_typecheck.template_map.expr_map[vp.first];
+              slot = exprt(ID_unassigned, slot.type());
+              slot.set(ID_identifier, vp.first);
+            }
+            guess_template_args(arg_type, it->type());
+            for(auto &vp : value_packs)
+              vp.second.push_back(
+                cpp_typecheck.template_map.expr_map[vp.first]);
+          }
+          for(auto &vp : value_packs)
+          {
+            auto &map = cpp_typecheck.template_map;
+            map.set_pack_size(vp.first, vp.second.size());
+            if(!vp.second.empty())
+              map.expr_map[vp.first] = vp.second.front();
+            map.pack_expr_map[vp.first] = std::move(vp.second);
+          }
+          continue;
+        }
         // Collect each argument's type for heterogeneous packs
         for(; it != fargs.operands.end(); ++it)
         {
@@ -12159,7 +12360,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     it,
     pack_expansion_size,
     has_non_empty_pack,
-    pack_deduced_types);
+    pack_deduced_types,
+    &cpp_declaration.template_type());
 
   // N5008 [temp.arg.explicit]/2 + [temp.deduct.general]/2: explicitly
   // specified template arguments are substituted BEFORE deduction and
@@ -12548,6 +12750,9 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
     has_non_empty_pack,
     pack_expansion_size,
     pack_deduced_types);
+
+  expand_value_function_parameter_pack(
+    cpp_declaration.template_type(), function_type);
 
   if(!substitute_function_type(function_declarator, fargs, function_type))
     return nil_exprt();
