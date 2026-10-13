@@ -6280,6 +6280,15 @@ bool cpp_typecheckt::member_constraints_satisfied(const exprt &candidate)
     cpp_save_scopet saved_scope{cpp_scopes};
     bind_class_instance_parameters(*class_symbol, template_map);
     cpp_scopes.go_to(*scope_it->second);
+    // [basic.scope.param]/1: the clause is in the scope of the parameters
+    if(candidate.type().id() == ID_code)
+    {
+      for(const auto &parameter : to_code_type(candidate.type()).parameters())
+      {
+        if(!parameter.get_this() && !parameter.get_base_name().empty())
+          bind_requires_parameter(parameter.get_base_name(), parameter.type());
+      }
+    }
     const auto value =
       evaluate_constraint(static_cast<const exprt &>(requires_clause));
     satisfied = !value.has_value() || *value;

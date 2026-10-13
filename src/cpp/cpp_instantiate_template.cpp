@@ -10249,9 +10249,14 @@ std::optional<bool> cpp_typecheckt::evaluate_constraint(const exprt &constraint)
   // 16's __common_reference_impl<_Tp1, _Tp2, 1> relies on it: `requires {
   // typename __common_ref<_Tp1, _Tp2>; } && is_convertible_v<...,
   // add_pointer_t<__common_ref<_Tp1, _Tp2>>>'.
+  // A requires-expression with parameters is parsed as the conjunction of
+  // its requirements carrying the parameters (#requires_params); it is one
+  // atomic constraint ([temp.constr.normal]/1.6) whose requirements need
+  // the parameters in scope, so it is not split.
   if(
     (constraint.id() == ID_and || constraint.id() == ID_or) &&
-    constraint.operands().size() >= 2)
+    constraint.operands().size() >= 2 &&
+    constraint.find("#requires_params").is_nil())
   {
     const bool is_and = constraint.id() == ID_and;
     bool open = false;
