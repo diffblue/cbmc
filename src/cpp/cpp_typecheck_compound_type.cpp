@@ -5785,10 +5785,15 @@ void cpp_typecheckt::convert_anon_struct_union_member(
               << eom;
       throw 0;
     }
-    if(is_reference(c.type()))
+    // [class.union.general]/3 is a rule for UNIONS; an anonymous struct
+    // (a GNU/MSVC extension that g++ and clang++ accept) may hold a
+    // reference member: libc++ 21's _LIBCPP_COMPRESSED_PAIR is an anonymous
+    // struct, and __split_buffer<T, Alloc &> keeps its `allocator_type
+    // __alloc_' -- a reference -- in it.
+    if(is_reference(c.type()) && struct_union_symbol.type.id() == ID_union)
     {
       error().source_location = struct_union_symbol.type.source_location();
-      error() << "anonymous struct/union member of reference type" << eom;
+      error() << "anonymous union member of reference type" << eom;
       throw 0;
     }
   }
