@@ -14162,3 +14162,31 @@ compiles; -K all KNOWNBUGs OK.
 Suites W95: cbmc-cpp 1846, cpp 246, regression/cbmc 1205, goto-instrument
 298, contracts 178, unit-proofs 13, all exit 0; lint 0; each commit
 compiles; -K all 7 cbmc-cpp KNOWNBUGs OK.
+
+## Round 182: all cbmc-cpp KNOWNBUGs to CORE
+
+- 6c23a26b31 partial ordering of partial specializations compares
+  template-ids argument-wise ([temp.spec.partial.order]/1, [temp.deduct.
+  type]/8): cpp98_partial_specialization_ordering_pointer_to_function CORE.
+- d0f3029126 members differing only in trailing requires-clauses get their
+  own symbol (#requires_twin<k>, parameter-type-list decides, return types
+  may differ); prefer_more_constrained_members ([over.match.best]/2.6) after
+  exact_match_functions and in disambiguate_functions.  cpp20_same_
+  signature_members_differing_in_constraints and test_views_transform CORE.
+- 07c4cc0646 out-of-class definitions of constrained member templates are
+  matched by requires-clause (out_of_class_definition_constraints_match,
+  renaming-aware).  Removing the `break' in the member-template scope
+  registration was tried and found unnecessary (reverted).
+- 214bc8fdf3 function parameter packs over non-type packs (`const char
+  (&...s)[N]'): deduction per argument into pack_expr_map, signature
+  expansion (expand_value_function_parameter_pack), instantiation from the
+  pack's elements, empty-pack removal.  Both array-reference KNOWNBUGs CORE.
+- 3fb6cc7609 __make_signed/__make_unsigned return C types with #c_type
+  (Table 59).  Found by cvise of test_views_iota (/tmp/r163/red/iota, then
+  hand reduction h2.cpp): `type_identity_t<__make_signed(S)>' in a nested
+  class made the instance of move<int> carry a parameter type that an int
+  lvalue did not bind to.  test_views_iota CORE.
+No KNOWNBUG left in regression/cbmc-cpp (unit-proofs escape/edit_distance/
+bigint_arith remain: scaling).  Suites W99: cbmc-cpp 1847, cpp 246,
+regression/cbmc 1205, goto-instrument 298, contracts 178, unit-proofs 13,
+all exit 0; lint 0; each commit compiles.
