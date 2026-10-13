@@ -1030,7 +1030,8 @@ protected:
 
   void expand_folds_over_template_packs(
     irept &body,
-    const template_typet &template_type);
+    const template_typet &template_type,
+    bool single_pack_too = false);
   void remove_empty_function_parameter_pack(
     const symbolt &template_symbol,
     cpp_declarationt &new_decl);

@@ -574,10 +574,13 @@ static void reduce_single_element_folds(irept &node)
 /// sees only the first pack (or the function parameter pack); expand the
 /// folds over every pack of \p template_type whose elements the deduction
 /// recorded in the template map, so that none reaches the C type-checker's
-/// residual-fold fallback (which makes it `true').
+/// residual-fold fallback (which makes it `true').  \p single_pack_too: also
+/// for a single pack -- the eager conversion of a constexpr member function
+/// template has no other fold expansion ahead of it.
 void cpp_typecheckt::expand_folds_over_template_packs(
   irept &body,
-  const template_typet &template_type)
+  const template_typet &template_type,
+  bool single_pack_too)
 {
   if(body.is_nil())
     return;
@@ -586,7 +589,7 @@ void cpp_typecheckt::expand_folds_over_template_packs(
   for(const auto &tp : params)
     if(tp.get_bool(ID_ellipsis))
       ++n_packs;
-  if(n_packs < 2)
+  if(n_packs < (single_pack_too ? 1 : 2))
     return;
   for(const auto &tp : params)
   {
@@ -8022,12 +8025,20 @@ skip_pack_removal_ft:
           {
             if(!p.get_bool(ID_ellipsis))
               continue;
-            const irep_idt pid = p.type().get(ID_identifier);
-            if(
-              !pid.empty() &&
-              template_map.type_map.find(pid) == template_map.type_map.end() &&
-              template_map.pack_args_map.find(pid) ==
-                template_map.pack_args_map.end())
+            // a non-type pack's identifier is on the parameter itself
+            const bool type_pack = p.id() == ID_type;
+            const irep_idt pid =
+              type_pack ? p.type().get(ID_identifier) : p.get(ID_identifier);
+            const bool bound = type_pack
+                                 ? template_map.type_map.find(pid) !=
+                                       template_map.type_map.end() ||
+                                     template_map.pack_args_map.find(pid) !=
+                                       template_map.pack_args_map.end()
+                                 : template_map.expr_map.find(pid) !=
+                                       template_map.expr_map.end() ||
+                                     template_map.pack_expr_map.find(pid) !=
+                                       template_map.pack_expr_map.end();
+            if(!pid.empty() && !bound)
               template_map.set_pack_size(pid, 0);
           }
           if(ws.value.is_not_nil())
@@ -8060,7 +8071,7 @@ skip_pack_removal_ft:
           // the constant eagerly while deferring the runtime (GOTO) definition
           // to
           // the queue; on failure we already fall back to `add_method_body`.
-          expand_folds_over_template_packs(ws.value, template_type);
+          expand_folds_over_template_packs(ws.value, template_type, true);
           try
           {
             convert_function(ws);
