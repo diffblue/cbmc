@@ -1,8 +1,10 @@
 // N5008 [temp.over.link]/6, [temp.mem]/1: the two member function
 // templates f differ only in their requires-clauses; each out-of-class
 // definition defines the declaration with the equivalent template-head.
-// CBMC attaches both definitions to one function (s.f(1.0) returns 1).
-// Defined in the class, the overloads work.
+// The second definition renames the template parameters ([temp.over.link]/6:
+// equivalent up to renaming).  The definitions were attached by name,
+// parameter count and cv-qualification alone, so s.f(1.0) ran the first
+// definition.
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
 concept small = sizeof(T) <= 4;
@@ -27,11 +29,11 @@ int S<T>::f(U)
 {
   return 1;
 }
-template <class T>
-  requires small<T>
-template <class U>
-  requires big<U>
-int S<T>::f(U)
+template <class Q>
+  requires small<Q>
+template <class V>
+  requires big<V>
+int S<Q>::f(V)
 {
   return 2;
 }

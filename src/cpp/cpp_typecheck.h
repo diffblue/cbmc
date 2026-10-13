@@ -1032,6 +1032,10 @@ protected:
     irept &body,
     const template_typet &template_type,
     bool single_pack_too = false);
+  bool out_of_class_definition_constraints_match(
+    const template_typet &decl_tt,
+    const template_typet &class_tt,
+    const cpp_declarationt &md);
   void remove_empty_function_parameter_pack(
     const symbolt &template_symbol,
     cpp_declarationt &new_decl);
