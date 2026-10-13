@@ -1,13 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] .* unconstrained copy constructor: SUCCESS$
-^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.2\] .* more constrained, other return type: SUCCESS$
+^\[main\.assertion\.3\] .* unsatisfied twin: SUCCESS$
+^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 --
-Same-signature members share one symbol.  g++ 13 and clang++ 18 accept
-this program, and it fails only its WRONG assertion.
+The later twin gets its own symbol (#requires_twin); overload resolution
+drops the less constrained one.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

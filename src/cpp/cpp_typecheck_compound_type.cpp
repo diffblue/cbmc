@@ -5467,9 +5467,41 @@ void cpp_typecheckt::typecheck_member_function(
     component.set("#unsuffixed_name", unsuffixed_id);
   const irep_idt instance_suffix =
     suffix_instance ? cpp_scopes.current_scope().suffix : irep_idt();
-  const irep_idt identifier = cpp_scopes.current_scope().prefix +
-                              id2string(component.get_base_name()) +
-                              id2string(instance_suffix) + id2string(f_id);
+  irep_idt identifier = cpp_scopes.current_scope().prefix +
+                        id2string(component.get_base_name()) +
+                        id2string(instance_suffix) + id2string(f_id);
+
+  // N5008 [basic.scope.scope]/4.4: two member declarations with the same
+  // parameter-type-list whose trailing requires-clauses are not equivalent
+  // declare different functions; both are candidates, and
+  // [over.match.viable]/3 and [over.match.best]/2.6 choose between them
+  // (cpp_typecheck_resolvet::prefer_more_constrained_members).  The symbol
+  // name encodes the signature only, so give the later one its own name.
+  // A deleted declaration beside a constrained one keeps the historical
+  // merge below (libstdc++'s std::pair assignment operators).
+  if(component.get(ID_access) == ID_noaccess)
+    type.set("#deleted_member", true);
+  for(unsigned twin = 1;; ++twin)
+  {
+    const symbolt *existing = symbol_table.lookup(identifier);
+    // the parameter-type-list decides; the return types may differ
+    // (`__sentinel<false> end()' beside `__iterator<false> end() requires
+    // common_range<_View>')
+    if(
+      existing == nullptr || existing->type.id() != ID_code ||
+      to_code_type(existing->type).parameters() != type.parameters() ||
+      existing->type.find("#member_requires") ==
+        type.find("#member_requires") ||
+      existing->type.get_bool("#deleted_member") ||
+      type.get_bool("#deleted_member"))
+    {
+      break;
+    }
+    identifier = cpp_scopes.current_scope().prefix +
+                 id2string(component.get_base_name()) +
+                 id2string(instance_suffix) + id2string(f_id) +
+                 "#requires_twin" + std::to_string(twin);
+  }
 
   component.set_name(identifier);
   component.set(ID_prefix, id2string(identifier) + "::");
