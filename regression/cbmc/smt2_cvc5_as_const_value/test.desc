@@ -1,0 +1,15 @@
+CORE broken-smt-backend no-new-smt
+main.c
+--cvc5 --outfile -
+\(\(as const \(Array \(_ BitVec 64\) \(_ BitVec 8\)\)\) \(_ bv0 8\)\)
+^EXIT=0$
+^SIGNAL=0$
+--
+\(\(as const \(Array \(_ BitVec 64\) \(_ BitVec 8\)\)\) \(\(_ extract
+--
+cvc5 accepts `((as const (Array I E)) v)' only for a VALUE v ("invalid
+argument ... expected a value").  Turning the bit-vector of the union s.u
+back into an array (unflatten) used the array's element 0 -- an extract of
+a term -- as the default value; for cvc5 the default is now zero and all
+elements are stored.  `cbmc --cvc5' on this program verifies (it reported a
+parse error).  broken-smt-backend: the test inspects the output only.
