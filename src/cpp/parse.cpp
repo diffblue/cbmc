@@ -5904,14 +5904,17 @@ bool Parser::starts_declaration_after_requires_clause(int token)
 bool Parser::rConstraintLogicalExpr(exprt &expr)
 {
   // constraint-logical-and ('||' constraint-logical-and)*
-  auto parse_atom = [this](exprt &atom) -> bool
+  std::function<bool(exprt &)> parse_atom = [this, &parse_atom](exprt &atom)
   {
+    // `!' (not part of the [temp.pre] grammar, accepted leniently) binds to
+    // the next primary expression only: `!requires { ... } && C<T>' is
+    // `(!requires { ... }) && C<T>'
     if(lex.LookAhead(0) == '!')
     {
       cpp_tokent tk;
       lex.get_token(tk);
       exprt sub;
-      if(!rConstraintLogicalExpr(sub))
+      if(!parse_atom(sub))
         return false;
       atom = exprt(ID_not);
       atom.add_to_operands(std::move(sub));
@@ -5947,6 +5950,11 @@ bool Parser::rConstraintLogicalExpr(exprt &expr)
                                  : static_cast<exprt>(false_exprt());
       return true;
     }
+    // N5008 [temp.pre]/1, [expr.prim.req]: a requires-expression is a
+    // primary-expression (`requires requires(const T &x) { x.ok(); }',
+    // libc++'s view_interface::operator bool)
+    if(lex.LookAhead(0) == TOK_REQUIRES)
+      return rPrimaryExpr(atom);
     irept name;
     if(!rName(name))
       return false;
