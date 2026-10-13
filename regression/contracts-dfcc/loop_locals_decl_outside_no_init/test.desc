@@ -1,0 +1,12 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main\.assertion\.\d+\] line 13 assertion t == 0: FAILURE
+--
+--
+Checks that a variable declared before a loop without an initializer and only
+used inside the loop is not classified as a loop local and is havoced.
+See GitHub issue #9175.

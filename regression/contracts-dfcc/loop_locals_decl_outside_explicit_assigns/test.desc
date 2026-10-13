@@ -1,0 +1,13 @@
+CORE dfcc-only
+main.c
+--dfcc main --apply-loop-contracts
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+\[main\.assigns\.\d+\] line \d+ Check that t is assignable: FAILURE
+--
+--
+Checks that a variable declared before a loop without an initializer is not
+classified as a loop local when an explicit assigns clause is used, so that
+writing to t (which is missing from the assigns clause) is flagged.
+See GitHub issue #9175.

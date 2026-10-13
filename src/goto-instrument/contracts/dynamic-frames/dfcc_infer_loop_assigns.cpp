@@ -12,7 +12,6 @@ Author: Remi Delmas, delmasrd@amazon.com
 
 #include <goto-programs/goto_inline.h>
 
-#include <analyses/goto_rw.h>
 #include <analyses/local_may_alias.h>
 #include <goto-instrument/contracts/utils.h>
 
@@ -48,107 +47,29 @@ depends_on(const exprt &expr, std::unordered_set<irep_idt> identifiers)
 }
 
 /// Collect identifiers that are local to this loop.
-/// A identifier is or is equivalent to a loop local if
-/// 1. it is declared inside the loop, or
-/// 2. there is no write or read of it outside the loop.
-/// 3. it is not used in loop contracts.
+/// A variable is a loop local if and only if it is declared inside the loop
+/// (i.e., there is a DECL instruction for it in the loop body).  Variables
+/// declared outside the loop are never considered loop locals, even when they
+/// are only read or written inside the loop, because their storage persists
+/// across iterations and they must be havoced to ensure soundness.
 std::unordered_set<irep_idt> gen_loop_locals_set(
-  const irep_idt &function_id,
+  const irep_idt &,
   goto_functiont &goto_function,
   const dfcc_loop_nesting_graph_nodet &loop_node,
-  message_handlert &message_handler,
-  const namespacet &ns)
+  message_handlert &,
+  const namespacet &)
 {
   std::unordered_set<irep_idt> loop_locals;
-  std::unordered_set<irep_idt> non_loop_locals;
 
   const auto &loop = loop_node.instructions;
 
-  // All identifiers declared outside the loop.
-  std::unordered_set<irep_idt> non_loop_decls;
-  // Ranges of all read/write outside the loop.
-  rw_range_sett non_loop_rw_range_set(ns, message_handler);
-
   Forall_goto_program_instructions(i_it, goto_function.body)
   {
-    // All variables declared in loops are loop locals.
+    // Only variables declared inside the loop are loop locals.
     if(i_it->is_decl() && loop.contains(i_it))
     {
       loop_locals.insert(i_it->decl_symbol().identifier());
     }
-    // Record all other declared variables and their ranges.
-    else if(i_it->is_decl())
-    {
-      non_loop_decls.insert(i_it->decl_symbol().identifier());
-    }
-    // Record all writing/reading outside the loop.
-    else if(
-      (i_it->is_assign() || i_it->is_function_call()) && !loop.contains(i_it))
-    {
-      goto_rw(function_id, i_it, non_loop_rw_range_set);
-    }
-  }
-
-  // Check if declared variables are loop locals.
-  for(const auto &decl_id : non_loop_decls)
-  {
-    bool is_loop_local = true;
-    // No write to the declared variable.
-    for(const auto &writing_rw : non_loop_rw_range_set.get_w_set())
-    {
-      if(decl_id == writing_rw.first)
-      {
-        is_loop_local = false;
-        break;
-      }
-    }
-
-    // No read to the declared variable.
-    for(const auto &writing_rw : non_loop_rw_range_set.get_r_set())
-    {
-      if(decl_id == writing_rw.first)
-      {
-        is_loop_local = false;
-        break;
-      }
-    }
-
-    const auto latch_target = loop_node.latch;
-
-    // Loop locals are not used in loop contracts.
-    for(const auto &id :
-        find_symbol_identifiers(get_loop_assigns(latch_target)))
-    {
-      if(decl_id == id)
-      {
-        is_loop_local = false;
-        break;
-      }
-    }
-
-    for(const auto &id :
-        find_symbol_identifiers(get_loop_invariants(latch_target, false)))
-    {
-      if(decl_id == id)
-      {
-        is_loop_local = false;
-        break;
-      }
-    }
-
-    for(const auto &id :
-        find_symbol_identifiers(get_loop_decreases(latch_target, false)))
-    {
-      if(decl_id == id)
-      {
-        is_loop_local = false;
-        break;
-      }
-    }
-
-    // Collect all loop locals.
-    if(is_loop_local)
-      loop_locals.insert(decl_id);
   }
 
   return loop_locals;
