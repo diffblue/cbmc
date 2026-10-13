@@ -8707,7 +8707,37 @@ void cpp_typecheck_resolvet::guess_template_args(
     if(template_args_on_qualifier)
       return;
 
-    if(cpp_name.has_template_args())
+    // N5008 [temp.deduct.type]/8: for a P of the form `const T' (the
+    // qualifier folded into the name by cpp_convert_plain_type) T is
+    // deduced from A with the qualifier removed; in partial ordering
+    // ([temp.deduct.partial], strict_cv_deduction) A must carry it, or
+    // `f(T *)' and `f(const T *)' were each at least as specialized as the
+    // other and `f(&const_int)' selected f(T *).
+    const bool pattern_const = cpp_name.get_bool(ID_C_constant);
+    const bool pattern_volatile = cpp_name.get_bool(ID_C_volatile);
+    if(pattern_const || pattern_volatile)
+    {
+      if(
+        strict_cv_deduction &&
+        ((pattern_const && !desired_type.get_bool(ID_C_constant)) ||
+         (pattern_volatile && !desired_type.get_bool(ID_C_volatile))))
+      {
+        return;
+      }
+      typet stripped = desired_type;
+      if(pattern_const)
+        stripped.remove(ID_C_constant);
+      if(pattern_volatile)
+        stripped.remove(ID_C_volatile);
+      if(cpp_name.has_template_args())
+      {
+        if(!guess_template_args_via_alias(cpp_name, stripped))
+          guess_template_args_template_id(cpp_name, stripped);
+      }
+      else
+        guess_template_args_simple_name(cpp_name, stripped);
+    }
+    else if(cpp_name.has_template_args())
     {
       if(!guess_template_args_via_alias(cpp_name, desired_type))
         guess_template_args_template_id(cpp_name, desired_type);
