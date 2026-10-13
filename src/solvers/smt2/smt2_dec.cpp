@@ -45,10 +45,12 @@ decision_proceduret::resultt smt2_dect::dec_solve(const exprt &assumption)
     if(assumption.is_not_nil())
       assumptions.push_back(convert(assumption));
 
+    flush_deferred_output();
     cached_output << stringstream.str();
     stringstream.str(std::string{});
 
     write_footer();
+    flush_deferred_output();
 
     if(assumption.is_not_nil())
       assumptions.pop_back();

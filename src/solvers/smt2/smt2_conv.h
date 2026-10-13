@@ -53,15 +53,26 @@ public:
     Z3
   };
 
+  /// \param _complete_problem: the output is a complete problem, written
+  ///   in one go when solving (and on destruction): a quantifier-free
+  ///   logic declared in the header (`QF_...`) is then replaced by its
+  ///   quantified form if the encoding emits a quantifier.  Otherwise the
+  ///   output is streamed as it is produced.
   smt2_convt(
     const namespacet &_ns,
     const std::string &_benchmark,
     const std::string &_notes,
     const std::string &_logic,
     solvert _solver,
-    std::ostream &_out);
+    std::ostream &_out,
+    bool _complete_problem = false);
 
-  ~smt2_convt() override = default;
+  ~smt2_convt() override
+  {
+    // output held back but never solved (e.g. every property simplified
+    // away) is still written
+    flush_deferred_output();
+  }
 
   bool use_FPA_theory = false;
   bool use_array_of_bool = false;
@@ -97,6 +108,17 @@ public:
 
 protected:
   const namespacet &ns;
+  /// The stream given to the constructor.  When the declared logic is
+  /// quantifier-free (`QF_...`) the output is held back in
+  /// `deferred_output` until it is complete enough to know whether a
+  /// quantifier was emitted (see `flush_deferred_output`).
+  std::ostream &final_out;
+  std::stringstream deferred_output;
+  const bool defer_output;
+  bool header_written = false;
+  /// A `forall` or `exists` was emitted (also as the substitute for
+  /// `array_of` / `array_comprehension` without `as const` or lambdas).
+  bool quantifier_emitted = false;
   std::ostream &out;
   std::string benchmark, notes, logic;
   solvert solver;
@@ -112,6 +134,10 @@ protected:
   resultt dec_solve(const exprt &) override;
 
   void write_header();
+  /// Write the header -- with the logic made quantified if a quantifier was
+  /// emitted (an SMT-LIB logic named `QF_...` admits no quantifiers) -- and
+  /// the output held back so far to `final_out`.
+  void flush_deferred_output();
   /// Writes the end of the SMT file to the `smt_convt::out` stream. These parts
   /// of the output may be changed when using multiple rounds of solving. They
   /// include the following parts of the output file -
