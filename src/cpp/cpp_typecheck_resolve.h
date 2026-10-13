@@ -124,7 +124,8 @@ public:
     exprt::operandst::const_iterator it,
     std::size_t &pack_expansion_size,
     bool &has_non_empty_pack,
-    std::vector<typet> &pack_deduced_types);
+    std::vector<typet> &pack_deduced_types,
+    const template_typet *template_type = nullptr);
 
   bool arguments_convertible_to_parameters(
     const typet &function_type,
@@ -278,6 +279,9 @@ protected:
   void make_constructors(
     resolve_identifierst &identifiers);
 
+  void expand_value_function_parameter_pack(
+    const template_typet &template_type,
+    typet &function_type);
   void prefer_more_constrained_members(resolve_identifierst &identifiers);
 
   void bind_explicit_template_arguments(
