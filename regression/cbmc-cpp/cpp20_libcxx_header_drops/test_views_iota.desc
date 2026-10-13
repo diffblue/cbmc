@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 views_iota.cpp
 --cpp20 --stdlib libc++ --object-bits 12 --unwind 8
 ^\[main\.assertion\.1\] line \d+ iota: SUCCESS$
@@ -11,8 +11,9 @@ views_iota.cpp
 ^CONVERSION ERROR$
 dropped the body of system-header function
 --
-libc++ (LLVM 18) std::views::iota: the bodies of iota_view's __iterator
-constructor, __sentinel and operator- are dropped.  A cvise reduction found
-one layer (iterator_concept from derived_from on incomplete classes,
-cpp11_conversion_between_incomplete_classes, fixed); more remain.  clang++ 18
--stdlib=libc++ accepts this program, and it fails only its WRONG assertion.
+libc++ (LLVM 18) std::views::iota.  The layers that broke it: iterator_concept
+from derived_from on incomplete classes
+(cpp11_conversion_between_incomplete_classes) and __make_signed's result
+type (cpp20_builtin_make_signed_corresponding_type), which made the
+__iterator constructor lose its body.  clang++ 18 -stdlib=libc++ accepts this
+program, and it fails only its WRONG assertion.

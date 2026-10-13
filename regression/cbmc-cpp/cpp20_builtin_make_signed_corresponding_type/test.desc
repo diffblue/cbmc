@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp20 --stdlib libc++
+^\[main\.assertion\.1\] .* iterator constructor: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+static assertion
+dropped the body
+--
+The builtins are clang's; clang++ 18 accepts this program, and it fails
+only its WRONG assertion.
