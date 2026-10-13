@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <functional>
 #include <memory>
+#include <optional>
 
 #ifdef DEBUG
 #  include <iostream>
@@ -6347,8 +6348,10 @@ bool cpp_typecheckt::base_publicly_accessible(
   // _Insert_base mixins, whose members convert __hashtable& to
   // _Hashtable_alloc& when constructing an _AllocNode; without this rule
   // the conversion is rejected and the mixin member's body is dropped.
+  // Whether R occurs in a friend of \p cls.
+  const auto in_friend_of = [this](const struct_typet &cls)
   {
-    const irept::subt &friends = from.find(ID_C_friends).get_sub();
+    const irept::subt &friends = cls.find(ID_C_friends).get_sub();
     for(const auto &friend_symb : friends)
     {
       const auto friend_scope_it =
@@ -6388,12 +6391,15 @@ bool cpp_typecheckt::base_publicly_accessible(
         }
       }
     }
-  }
+    return false;
+  };
+  if(in_friend_of(from))
+    return true;
 
-  // [class.access.base]/4.3: if R occurs in a member of a class P derived
-  // from N, a protected base of N is accessible as well (an invented public
-  // member of B is then a protected member of N, hence a member of P); a
-  // private one is not (its invented member has no access in P).
+  // [class.access.base]/4.3: if R occurs in a member or friend of a class P
+  // derived from N, a protected base of N is accessible as well (an invented
+  // public member of B is then a protected member of N, hence a member of
+  // P); a private one is not (its invented member has no access in P).
   bool in_member_of_derived = false;
   {
     cpp_scopet *chains[2] = {
@@ -6418,11 +6424,41 @@ bool cpp_typecheckt::base_publicly_accessible(
       }
     }
   }
-  const auto edge_accessible = [in_member_of_derived](const irept &base)
+  // ... or in a FRIEND of such a class P (only looked for when a protected
+  // edge needs it: it scans the classes derived from N)
+  std::optional<bool> in_friend_of_derived;
+  const auto in_member_or_friend_of_derived = [&]()
+  {
+    if(in_member_of_derived)
+      return true;
+    if(!in_friend_of_derived.has_value())
+    {
+      in_friend_of_derived = false;
+      for(const auto &entry : symbol_table.symbols)
+      {
+        const symbolt &cls = entry.second;
+        if(
+          !cls.is_type || cls.type.id() != ID_struct ||
+          cls.type.get(ID_name) == from.get(ID_name) ||
+          cls.type.find(ID_C_friends).get_sub().empty())
+        {
+          continue;
+        }
+        const struct_typet &p_type = to_struct_type(cls.type);
+        if(subtype_typecast(p_type, from) && in_friend_of(p_type))
+        {
+          in_friend_of_derived = true;
+          break;
+        }
+      }
+    }
+    return *in_friend_of_derived;
+  };
+  const auto edge_accessible = [&](const irept &base)
   {
     const irep_idt &access = base.get(ID_access);
     return access == ID_public ||
-           (in_member_of_derived && access == ID_protected);
+           (access == ID_protected && in_member_or_friend_of_derived());
   };
 
   // [class.access.base]/4.1, /4.4: walk the inheritance chain; every edge
