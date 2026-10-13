@@ -4013,6 +4013,143 @@ void cpp_typecheckt::typecheck_expr_is_invocable(exprt &expr)
   expr = invocable ? exprt(true_exprt()) : exprt(false_exprt());
 }
 
+/// N5008 [meta.trans.other]/3-5 (common_type), as computed by Clang's
+/// builtin alias template `__builtin_common_type<BaseTemplate,
+/// HasTypeMember, HasNoTypeMember, Ts...>' (libc++ 21's std::common_type):
+/// the common type C of \p types if there is one.  \p base_template is the
+/// name of `BaseTemplate', an alias template that names the (user
+/// specializable) common_type_t<D1, D2>; it is used for arguments that are
+/// not their own decayed types (/3.3.1) and for the pairwise fold of three
+/// or more arguments (/3.4).  For two decayed types the type of the
+/// conditional operator `b ? declval<D1>() : declval<D2>()' is decayed
+/// (/3.3.3), or, since C++20, that of `b ? declval<const D1 &>() :
+/// declval<const D2 &>()' with its reference and cv-qualifiers removed
+/// (/3.3.4).
+std::optional<typet> cpp_typecheckt::builtin_common_type(
+  const irep_idt &base_template,
+  const std::vector<typet> &types,
+  const source_locationt &source_location)
+{
+  const auto decayed = [this](const typet &t)
+  {
+    typet d{ID_remove_cvref};
+    d.set(ID_C_decay, true);
+    d.add(ID_type_arg) = t;
+    typecheck_type(d);
+    return d;
+  };
+  // operator== ignores the qualifiers (comments)
+  const auto same_type = [](const typet &a, const typet &b)
+  {
+    return a == b && a.get_bool(ID_C_constant) == b.get_bool(ID_C_constant) &&
+           a.get_bool(ID_C_volatile) == b.get_bool(ID_C_volatile);
+  };
+  // `BaseTemplate<a, b>', or nothing when that is ill-formed
+  const auto via_base_template =
+    [&](const typet &a, const typet &b) -> std::optional<typet>
+  {
+    irept name{ID_name};
+    name.set(ID_identifier, base_template);
+    static_cast<exprt &>(name).add_source_location() = source_location;
+    cpp_template_args_non_tct args;
+    for(const typet &t : {a, b})
+    {
+      exprt type_arg{ID_type};
+      type_arg.type() = t;
+      args.arguments().push_back(std::move(type_arg));
+    }
+    cpp_namet cpp_name;
+    cpp_name.get_sub().push_back(std::move(name));
+    cpp_name.get_sub().push_back(std::move(args));
+    typet result = static_cast<const typet &>(static_cast<irept &>(cpp_name));
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      typecheck_type(result);
+    }
+    catch(...)
+    {
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+      return {};
+    }
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return result;
+  };
+
+  if(types.empty())
+    return {};
+  if(types.size() == 1)
+    return builtin_common_type(
+      base_template, {types[0], types[0]}, source_location);
+  if(types.size() > 2)
+  {
+    typet result = types[0];
+    for(std::size_t i = 1; i < types.size(); ++i)
+    {
+      auto next = via_base_template(result, types[i]);
+      if(!next.has_value())
+        return {};
+      result = std::move(*next);
+    }
+    return result;
+  }
+
+  const typet d1 = decayed(types[0]);
+  const typet d2 = decayed(types[1]);
+  if(!same_type(types[0], d1) || !same_type(types[1], d2))
+    return via_base_template(d1, d2);
+
+  // declval<D>() (an xvalue) resp. declval<const D &>() (an lvalue)
+  const auto operand = [&](const typet &t, bool const_lvalue)
+  {
+    exprt e{ID_nondet_symbol, t};
+    if(const_lvalue)
+    {
+      e.type().set(ID_C_constant, true);
+      e.set(ID_C_lvalue, true);
+    }
+    e.set(ID_C_temporary_avoided, true);
+    e.add_source_location() = source_location;
+    return already_typechecked_exprt{std::move(e)};
+  };
+  const auto conditional_type = [&](bool const_lvalue) -> std::optional<typet>
+  {
+    if_exprt probe{
+      true_exprt{}, operand(d1, const_lvalue), operand(d2, const_lvalue)};
+    probe.add_source_location() = source_location;
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    std::optional<typet> result;
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      exprt e = probe;
+      typecheck_expr(e);
+      result = e.type();
+    }
+    catch(...)
+    {
+    }
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    return result;
+  };
+
+  if(auto t = conditional_type(false))
+    return decayed(*t);
+  if(config.cpp.cpp_standard >= configt::cppt::cpp_standardt::CPP20)
+  {
+    if(auto t = conditional_type(true))
+    {
+      typet r{ID_remove_cvref};
+      r.add(ID_type_arg) = *t;
+      typecheck_type(r);
+      return r;
+    }
+  }
+  return {};
+}
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 {
   // We need to overload, "sizeof-expression" can be mis-parsed
