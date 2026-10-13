@@ -14135,3 +14135,30 @@ ones, unit-proofs escape / edit_distance / bigint_arith (scaling).
 Suites W93 (HEAD): cbmc-cpp 1838 exit 0, cpp 246, regression/cbmc 1205,
 goto-instrument 298, contracts 178, unit-proofs 13; lint 0; each commit
 compiles; -K all KNOWNBUGs OK.
+
+## Round 181: tests for the untested issues
+
+- (2) 9a38839336: eager constexpr member path expands folds over a single
+  pack and records empty NON-type packs (pid read from the type).
+  Test cpp17_fold_over_non_type_pack_in_constexpr_member_template.
+- (3) 979ab55629: [class.access.base]/4.3 friends of a derived class.
+  Tests cpp11_friend_of_derived_class_converts_to_{protected,private}_base;
+  clang rejects the protected one (deviation from /4.3), g++ accepts.
+- (5) 9b8ec69dce: requires-expression as a constraint primary; requires-
+  expressions with parameters are atomic in evaluate_constraint; `!' binds
+  to one primary; function parameters in scope of trailing clauses.  The
+  parser change first broke cpp20_constrained_partial_specializations_
+  same_pattern (`!' precedence) and cpp20_libcxx20_vector (reverse_iterator
+  operator!= clause naming __x/__y) -- both fixed in the same commit.
+  Test cpp20_requires_expression_in_trailing_requires_clause.
+- (4)/(5) fallbacks: instrumented, never reached on the header-drop tests
+  nor on probes of every [temp.pre] primary form; guard test
+  cpp20_member_class_template_with_two_constrained_template_heads (clang
+  rejects it, g++ accepts).
+- (6) and found on the way, KNOWNBUGs:
+  cpp17_function_parameter_pack_of_array_references{,_several_packs}
+  (`const char (&...s)[N]' never deduced), cpp20_out_of_class_constrained_
+  member_function_template_overloads.
+Suites W95: cbmc-cpp 1846, cpp 246, regression/cbmc 1205, goto-instrument
+298, contracts 178, unit-proofs 13, all exit 0; lint 0; each commit
+compiles; -K all 7 cbmc-cpp KNOWNBUGs OK.
