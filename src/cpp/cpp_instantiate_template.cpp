@@ -3783,6 +3783,35 @@ void cpp_typecheckt::adopt_definition_parameter_names(
   }
 }
 
+/// N5008 [temp.over.link]/6, [basic.scope.scope]/4.5: member function
+/// templates that differ only in their requires-clauses are different
+/// templates; an out-of-line definition \p md belongs to the declaration
+/// (template-head \p decl_tt, of a member of the class template with head
+/// \p class_tt) whose requires-clause is equivalent to its own.  The
+/// definition's head is the class template's merged with the member's, so
+/// its clause may be the conjunction of the class's and the member's
+/// ([temp.constr.decl]/3); its parameter names may differ ([temp.over.link]/6:
+/// equivalent up to renaming).
+bool cpp_typecheckt::out_of_class_definition_constraints_match(
+  const template_typet &decl_tt,
+  const template_typet &class_tt,
+  const cpp_declarationt &md)
+{
+  const auto present = [](const irept &r)
+  { return r.is_not_nil() && r.id() != ID_nil; };
+  const irept &d_req = decl_tt.find(ID_C_requires_clause);
+  irept m_req = md.template_type().find(ID_C_requires_clause);
+  if(!present(d_req) && !present(m_req))
+    return true;
+  if(!present(d_req) || !present(m_req))
+    return false;
+  rename_template_parameters_to_declaration(
+    m_req, md.template_type(), class_tt, decl_tt);
+  return m_req == d_req ||
+         (m_req.id() == ID_and && m_req.get_sub().size() == 2 &&
+          m_req.get_sub().back() == d_req);
+}
+
 /// N5008 [temp.mem]: rename, in the parsed \p node of an out-of-line member
 /// template definition whose template parameters are \p def_tt (the
 /// enclosing class template's first, then the member's own), every reference
@@ -7092,6 +7121,14 @@ skip_pack_removal_ft:
                 }
               }
             }
+            if(!out_of_class_definition_constraints_match(
+                 template_type,
+                 static_cast<const template_typet &>(
+                   sp.second.type.find(ID_template_type)),
+                 md))
+            {
+              continue;
+            }
             // Copy the body. The body is in parsed (not type-checked)
             // form. It will be type-checked by typecheck_method_bodies
             // with the proper template map.
@@ -7572,6 +7609,14 @@ skip_pack_removal_ft:
           if(
             md.template_type().template_parameters().size() <
             most_template_parameters)
+          {
+            continue;
+          }
+          if(!out_of_class_definition_constraints_match(
+               to_cpp_declaration(template_symbol.type).template_type(),
+               static_cast<const template_typet &>(
+                 tsp.second.type.find(ID_template_type)),
+               md))
           {
             continue;
           }
