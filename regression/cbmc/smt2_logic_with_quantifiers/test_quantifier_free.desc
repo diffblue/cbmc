@@ -1,0 +1,10 @@
+CORE broken-smt-backend no-new-smt
+quantifier_free.c
+--smt2 --outfile -
+^\(set-logic QF_AUFBV\)$
+^EXIT=0$
+^SIGNAL=0$
+--
+forall
+--
+Without a quantifier the declared logic stays quantifier-free.
