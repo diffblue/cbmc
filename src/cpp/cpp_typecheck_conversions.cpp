@@ -1503,24 +1503,69 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
           type = rest;
         };
         fold_qualifiers(A);
-        // [temp.deduct.type]/3: a template-id pattern only matches a
-        // specialisation of the SAME template.
-        if(
-          P.id() == ID_cpp_name && A.id() == ID_cpp_name &&
-          !P.get_sub().empty() && !A.get_sub().empty())
+        // N5008 [temp.deduct.type]/3, /8: a template-id pattern only matches
+        // a specialisation of the SAME template, and then its template
+        // arguments are deduced from the corresponding arguments.  A is
+        // not an instantiated specialisation here (F's parameters are
+        // unique, never-declared types), so compare the two template-ids
+        // argument by argument: `box<R *>' deduces R = X(char) from
+        // `box<X (*)(char)>', but `box<R (*)(char)>' nothing from `box<X *>'.
+        const auto template_id_args = [](const typet &type) -> const irept *
         {
-          bool p_has_args = false;
-          for(const auto &sub : P.get_sub())
+          if(type.id() != ID_cpp_name || type.get_sub().size() < 2)
+            return nullptr;
+          for(const auto &sub : type.get_sub())
             if(sub.id() == ID_template_args)
-              p_has_args = true;
+              return &sub.find(ID_arguments);
+          return nullptr;
+        };
+        std::function<bool(const typet &, const typet &)> deduce_from =
+          [&](const typet &pattern, const typet &argument)
+        {
+          const irept *p_args = template_id_args(pattern);
+          if(p_args == nullptr)
+          {
+            resolver.guess_template_args(pattern, argument);
+            return true;
+          }
+          const irept *a_args = template_id_args(argument);
           if(
-            p_has_args && P.get_sub().front().get(ID_identifier) !=
-                            A.get_sub().front().get(ID_identifier))
+            a_args == nullptr ||
+            pattern.get_sub().front().get(ID_identifier) !=
+              argument.get_sub().front().get(ID_identifier) ||
+            p_args->get_sub().size() != a_args->get_sub().size())
           {
             return false;
           }
-        }
-        resolver.guess_template_args(P, A);
+          for(std::size_t k = 0; k < p_args->get_sub().size(); ++k)
+          {
+            const exprt &pk = static_cast<const exprt &>(p_args->get_sub()[k]);
+            const exprt &ak = static_cast<const exprt &>(a_args->get_sub()[k]);
+            const bool pk_type = pk.id() == ID_type || pk.id() == ID_ambiguous;
+            const bool ak_type = ak.id() == ID_type || ak.id() == ID_ambiguous;
+            if(!pk_type || !ak_type)
+            {
+              // a non-type argument: a bare parameter deduces from
+              // anything, otherwise the expressions agree structurally
+              if(!pk_type && pk.id() == ID_cpp_name && pk.get_sub().size() == 1)
+                continue;
+              if(pk != ak)
+                return false;
+              continue;
+            }
+            typet pt = static_cast<const typet &>(pk.find(ID_type));
+            typet at = static_cast<const typet &>(ak.find(ID_type));
+            pt.remove(ID_ellipsis);
+            cpp_convert_plain_type(pt, get_message_handler());
+            cpp_convert_plain_type(at, get_message_handler());
+            fold_qualifiers(at);
+            if(!deduce_from(pt, at))
+              return false;
+          }
+          return true;
+        };
+        if(!deduce_from(P, A))
+          return false;
       }
       else
       {

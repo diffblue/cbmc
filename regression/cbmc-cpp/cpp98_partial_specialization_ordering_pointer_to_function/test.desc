@@ -1,15 +1,16 @@
-KNOWNBUG
+CORE
 main.cpp
 
 ^\[main\.assertion\.1\] .* pointer: SUCCESS$
 ^\[main\.assertion\.2\] .* more specialized: SUCCESS$
-^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^\[main\.assertion\.3\] .* pointer, reversed: SUCCESS$
+^\[main\.assertion\.4\] .* nested template-id: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
 --
 ^warning: ignoring
 --
-Partial ordering of the two partial specializations is not decided by
-deduction ([temp.spec.partial.order]/1).  g++ 13 and clang++ 18 accept this
-program (-std=c++11), and it fails only its WRONG assertion.
+g++ 13 and clang++ 18 accept this program (-std=c++11), and it fails only its
+WRONG assertion.
