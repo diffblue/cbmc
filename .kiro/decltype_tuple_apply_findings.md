@@ -14219,3 +14219,29 @@ Data in /tmp/r183 (logs, perf data, SMT2 files).  16 GB address-space cap,
   dynamic objects (expressions up to 44 KB) -- the unordered_set nodes the
   NFA copies (_Hashtable::_M_assign) all alias.
 128 orphaned, sleeping cbmc processes from earlier cvise runs hold ~10 GB.
+
+## Round 184: SMT2 output bugs fixed, unit proofs annotated
+
+- 6ea4f16b8a: `--smt2 --outfile' / smt2_dect declared QF_AUFBV but emitted
+  forall (array_of / array_comprehension substitutes, quantifier exprs).
+  smt2_convt(.., complete_problem=true) defers its output and writes the
+  header at solve time (or destruction) with the QF_ prefix dropped when a
+  quantifier was emitted; streaming users (unit tests, cprover state
+  encoding, horn encoding) unchanged.  Test cbmc/smt2_logic_with_quantifiers.
+- de3d6643c9: cvc5 takes only a VALUE under `as const'.  unflatten (union
+  bits -> array) now stores every element over an all-zero base for cvc5
+  (as_const_requires_value, convert_zero_value); array_of with a non-literal
+  element uses the quantified form (as_const_admits).  Test
+  cbmc/smt2_cvc5_as_const_value.  With it, cbmc --cvc5 on unit-proofs/escape
+  parses but does not answer in 30 min.
+- 3a658def4b: the three unit-proof harnesses carry the round-183 findings
+  as comments (for the array-theory work).
+Pre-existing, not mine (same on W99): regression/cbmc --z3 complex2
+(VERIFICATION ERROR), --cprover-smt2 gcc_builtin_library_functions
+(flatten2bv invariant: non-constant FPA float).
+Suites W100: regression/cbmc 1208 (default, exit 0; --z3 and --cprover-smt2
+only the two pre-existing failures), cbmc-output-file 9, smt2_solver 45,
+cbmc-cpp 1847, cpp 246, goto-instrument 298, unit [smt2] 40 cases; lint 0;
+each commit compiles.  Killed (SIGKILL by PID; SIGTERM was blocked in a
+futex wait of the abort handler) 128 orphaned cbmc processes from old cvise
+runs, ~10 GB.
