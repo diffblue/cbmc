@@ -1367,11 +1367,79 @@ void cpp_typecheckt::typecheck_type(typet &type)
       typet result;
       if(stripped.id() == ID_unsignedbv || stripped.id() == ID_signedbv)
       {
+        // [tab:meta.trans.sign]: a signed (unsigned) integer type is kept,
+        // an unsigned (signed) one becomes its corresponding type
+        // ([basic.fundamental]/2-3: same rank); otherwise -- plain char,
+        // wchar_t, char8_t ... -- the type of the smallest rank with the
+        // same size.  Return the C types with their #c_type, so that a
+        // template-id naming the result (`type_identity<__make_signed(S)>')
+        // is the same specialization as one spelled with the type itself.
         const std::size_t width = to_bitvector_type(stripped).get_width();
-        if(make_uns)
-          result = unsignedbv_typet{width};
+        const irep_idt &c_type = stripped.get(ID_C_c_type);
+        const bool keep =
+          make_uns ? stripped.id() == ID_unsignedbv && c_type != ID_char &&
+                       c_type != ID_wchar_t && c_type != ID_char16_t &&
+                       c_type != ID_char32_t && c_type != "char8_t"
+                   : stripped.id() == ID_signedbv && c_type != ID_char &&
+                       c_type != ID_wchar_t;
+        if(keep)
+          result = stripped;
+        else if(c_type == ID_signed_char || c_type == ID_unsigned_char)
+          result =
+            make_uns ? typet{unsigned_char_type()} : typet{signed_char_type()};
+        else if(
+          c_type == ID_signed_short_int || c_type == ID_unsigned_short_int)
+          result = make_uns ? typet{unsigned_short_int_type()}
+                            : typet{signed_short_int_type()};
+        else if(c_type == ID_signed_int || c_type == ID_unsigned_int)
+          result =
+            make_uns ? typet{unsigned_int_type()} : typet{signed_int_type()};
+        else if(c_type == ID_signed_long_int || c_type == ID_unsigned_long_int)
+          result = make_uns ? typet{unsigned_long_int_type()}
+                            : typet{signed_long_int_type()};
+        else if(
+          c_type == ID_signed_long_long_int ||
+          c_type == ID_unsigned_long_long_int)
+          result = make_uns ? typet{unsigned_long_long_int_type()}
+                            : typet{signed_long_long_int_type()};
         else
-          result = signedbv_typet{width};
+        {
+          // the smallest rank with the same width
+          std::vector<typet> candidates;
+          if(make_uns)
+          {
+            candidates = {
+              unsigned_char_type(),
+              unsigned_short_int_type(),
+              unsigned_int_type(),
+              unsigned_long_int_type(),
+              unsigned_long_long_int_type()};
+          }
+          else
+          {
+            candidates = {
+              signed_char_type(),
+              signed_short_int_type(),
+              signed_int_type(),
+              signed_long_int_type(),
+              signed_long_long_int_type()};
+          }
+          for(const auto &candidate : candidates)
+          {
+            if(to_bitvector_type(candidate).get_width() == width)
+            {
+              result = candidate;
+              break;
+            }
+          }
+          if(result.is_nil())
+          {
+            if(make_uns)
+              result = unsignedbv_typet{width};
+            else
+              result = signedbv_typet{width};
+          }
+        }
       }
       else if(stripped.id() == ID_c_bool || stripped.id() == ID_bool)
       {
