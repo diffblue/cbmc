@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "scope_tree.h"
 
 #include <list>
+#include <map>
+#include <set>
 #include <unordered_set>
 #include <vector>
 
@@ -74,6 +76,10 @@ protected:
     /// caller needs to add destructors for these (via `destruct_locals`) on all
     /// control-flow paths as soon as the temporaries are no longer needed.
     std::list<irep_idt> temporaries;
+    /// Temporaries whose address a temporary of `temporaries` holds (a
+    /// reference member initialized by another temporary, N5008
+    /// [class.temporary]/6 Note 5): they live as long as that temporary.
+    std::map<irep_idt, std::list<irep_idt>> dependents;
     /// Statements implementing side effects of the expression that was subject
     /// to cleaning. The caller needs to merge (typically via
     /// `destructive_append`) these statements into the destination GOTO
@@ -85,7 +91,32 @@ protected:
     void add(clean_expr_resultt &&other)
     {
       temporaries.splice(temporaries.begin(), other.temporaries);
+      for(auto &d : other.dependents)
+        dependents[d.first].splice(dependents[d.first].begin(), d.second);
       side_effects.destructive_append(other.side_effects);
+    }
+
+    /// The temporaries of `temporaries` that \p bound names, together with
+    /// the temporaries that live as long as those (`dependents`),
+    /// transitively.
+    std::set<irep_idt> extended_by(const std::set<irep_idt> &bound) const
+    {
+      std::set<irep_idt> result;
+      std::list<irep_idt> work;
+      for(const auto &id : temporaries)
+        if(bound.count(id) != 0)
+          work.push_back(id);
+      while(!work.empty())
+      {
+        const irep_idt id = work.front();
+        work.pop_front();
+        if(!result.insert(id).second)
+          continue;
+        const auto d = dependents.find(id);
+        if(d != dependents.end())
+          work.insert(work.end(), d->second.begin(), d->second.end());
+      }
+      return result;
     }
 
     void add_temporary(const irep_idt &id)

@@ -24,6 +24,8 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "destructor.h"
 
+#include <functional>
+
 goto_convertt::clean_expr_resultt goto_convertt::remove_assignment(
   side_effect_exprt &expr,
   bool result_is_used,
@@ -537,12 +539,66 @@ goto_convertt::remove_temporary_object(side_effect_exprt &expr)
     expr.find_source_location(),
     mode);
 
-  if(expr.operands().size() == 1)
+  const bool aggregate_value = expr.operands().size() == 1 &&
+                               (to_unary_expr(expr).op().id() == ID_struct ||
+                                to_unary_expr(expr).op().id() == ID_array ||
+                                to_unary_expr(expr).op().id() == ID_union);
+  if(expr.operands().size() == 1 && !aggregate_value)
   {
     const code_assignt assignment(
       new_symbol.symbol_expr(), to_unary_expr(expr).op());
 
     convert(assignment, side_effects.side_effects, mode);
+  }
+  else if(aggregate_value)
+  {
+    // N5008 [class.temporary]/6 (Note 5, Example 4): a temporary whose
+    // reference member is initialized by another temporary extends that
+    // temporary's lifetime with its own -- `const S &s = S{1}' with
+    // `struct S { const int &m; }'.  The aggregate value of this temporary
+    // then holds the inner temporary's address as a member; such inner
+    // temporaries become this temporary's own (destroyed with it), the
+    // others end with the full-expression as usual ([class.temporary]/4).
+    exprt value = to_unary_expr(expr).op();
+    clean_expr_resultt value_effects = clean_expr(value, mode);
+    side_effects.side_effects.destructive_append(value_effects.side_effects);
+    std::set<irep_idt> addressed;
+    std::function<void(const exprt &)> collect_addressed = [&](const exprt &e)
+    {
+      if(e.id() == ID_struct || e.id() == ID_array || e.id() == ID_union)
+      {
+        for(const auto &op : e.operands())
+          collect_addressed(op);
+      }
+      else if(e.id() == ID_typecast)
+        collect_addressed(to_typecast_expr(e).op());
+      else if(e.id() == ID_address_of)
+      {
+        const exprt &object = to_address_of_expr(e).object();
+        if(object.id() == ID_symbol)
+          addressed.insert(to_symbol_expr(object).get_identifier());
+      }
+    };
+    collect_addressed(value);
+    std::list<irep_idt> others;
+    for(const auto &id : value_effects.temporaries)
+    {
+      if(addressed.count(id) != 0)
+      {
+        side_effects.add_temporary(id);
+        side_effects.dependents[new_symbol.name].push_back(id);
+      }
+      else
+        others.push_back(id);
+    }
+    for(auto &d : value_effects.dependents)
+    {
+      side_effects.dependents[d.first].splice(
+        side_effects.dependents[d.first].begin(), d.second);
+    }
+    const code_assignt assignment(new_symbol.symbol_expr(), value);
+    copy(assignment, ASSIGN, side_effects.side_effects);
+    destruct_locals(others, side_effects.side_effects, ns);
   }
 
   if(expr.find(ID_initializer).is_not_nil())
