@@ -900,8 +900,13 @@ void cpp_typecheckt::do_not_typechecked()
         {
           cpp_declaratort declarator;
           declarator.add_source_location() = symbol.location;
+          // the implicit MOVE assignment operator ([class.copy.assign]/12)
+          // takes `X &&'
+          const auto &parameters = to_code_type(symbol.type).parameters();
+          const bool is_move =
+            parameters.size() == 2 && is_rvalue_reference(parameters[1].type());
           default_assignop_value(
-            lookup(symbol.type.get(ID_C_member_name)), declarator);
+            lookup(symbol.type.get(ID_C_member_name)), declarator, is_move);
           value.swap(declarator.value());
           cont = true;
         }
@@ -915,7 +920,37 @@ void cpp_typecheckt::do_not_typechecked()
 
         symbolt &writable_symbol = it.get_writeable_symbol();
         writable_symbol.value.swap(value);
-        convert_function(writable_symbol);
+        // N5008 [class.copy.ctor]/10, [class.copy.assign]/7: an implicitly
+        // declared copy/move constructor or assignment operator is defined
+        // as DELETED when a subobject's corresponding operation is deleted
+        // or inaccessible -- e.g. the copy assignment of a class holding a
+        // move-only member.  Such a member is marked used as soon as it is
+        // a candidate of an overload resolution that selects the move
+        // operation; generating its memberwise body then failed
+        // ("member 'prog::operator=(...)' is not accessible").  An implicit
+        // special member whose definition fails is left without a body.
+        const bool implicit_special =
+          writable_symbol.type.get_bool("#is_implicit_assign") ||
+          writable_symbol.type.get_bool("#is_implicit_ctor");
+        if(implicit_special)
+        {
+          const std::size_t errors_before =
+            get_message_handler().get_message_count(messaget::M_ERROR);
+          try
+          {
+            sfinae_contextt sfinae_guard{*this};
+            convert_function(writable_symbol);
+          }
+          catch(...)
+          {
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+            symbol_table.get_writeable_ref(writable_symbol.name)
+              .value.make_nil();
+          }
+        }
+        else
+          convert_function(writable_symbol);
       }
     }
   } while(cont);
