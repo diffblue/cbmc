@@ -14023,6 +14023,17 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
   if(!rName(type_name))
     return {};
 
+  // N5008 [dcl.type.simple], [over.oper.general]/1: an operator-function-id
+  // or conversion-function-id does not name a type, so it cannot begin a
+  // declaration statement; `operator[](to)(f);' in a member function is an
+  // expression statement calling the result of `operator[](to)' (CBMC's own
+  // event_grapht::copy_segment, dog-fooding).
+  for(const auto &component : type_name.get_sub())
+  {
+    if(component.id() == ID_operator)
+      return {};
+  }
+
   // for the `T(x);' disambiguation in rDeclarator ([stmt.ambig]): is the
   // decl-specifier a name the parser knows as a type?
   decl_specifier_is_known_type = false;
