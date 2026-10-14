@@ -1,7 +1,7 @@
 CORE
 main.c
 
-^EXIT=(6|1)$
+^EXIT=(64|1)$
 ^SIGNAL=0$
 'x' is constant
 ^CONVERSION ERROR$
