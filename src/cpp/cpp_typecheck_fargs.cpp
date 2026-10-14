@@ -186,8 +186,17 @@ static bool brace_init_is_viable(
   // FEWER initializers than the aggregate has elements -- the remaining
   // elements are value-initialized (the shape of `cache[{this, name}]`
   // with a trailing defaulted field).
-  if(has_init_list_ctor)
+  // N5008 [over.match.list]/1.1, [over.ics.list]/7: the initializer-list
+  // constructor takes the list only when every element converts to the
+  // element type -- `pick({e})' for overloads taking std::vector<E> and
+  // std::vector<S> (S not constructible from an E) is not ambiguous
+  // (CBMC's own propagate.cpp, lambda_exprt::instantiate, dog-fooding)
+  if(
+    has_init_list_ctor && base.id() == ID_struct_tag &&
+    cpp_typecheck.has_viable_init_list_constructor(base, operand))
+  {
     return true;
+  }
   if(!has_user_ctor && data_field_count >= operand.operands().size())
     return true;
   // [over.match.list]/2.2 fallback: when no initializer-list ctor
@@ -289,7 +298,19 @@ static bool brace_init_is_viable(
   // constructor is a template) from `{a, b}` -- as in `map.insert({k, v})`
   // -- is wrongly rejected with "found no match for symbol '...'".
   if(class_type.get_bool("has_template_constructor"))
-    return true;
+  {
+    // A single element can be the argument of a constructor template only
+    // through a template with ONE required parameter; when a template of
+    // the class has none such (the iterator-pair constructors of
+    // std::vector), do not accept: `pick({e})' with overloads for
+    // std::vector<E> and std::vector<S> was ambiguous because the vector<S>
+    // candidate was declared viable here (CBMC's own propagate.cpp,
+    // dog-fooding).  Several elements keep the deferred check.
+    if(operand.operands().size() != 1 || base.id() != ID_struct_tag)
+      return true;
+    return cpp_typecheck.has_unary_constructor_template(
+      to_struct_tag_type(base));
+  }
   return false;
 }
 
