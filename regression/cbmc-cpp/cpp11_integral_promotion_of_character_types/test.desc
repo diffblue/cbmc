@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* char32_t through a converting constructor: SUCCESS$
+^\[main\.assertion\.2\] .* char16_t and wchar_t: SUCCESS$
+^\[main\.assertion\.3\] .* char32_t promotes to unsigned int: SUCCESS$
+^\[main\.assertion\.4\] .* char16_t, wchar_t promote to int: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Assumes the x86-64 Linux data model (32-bit signed wchar_t).  g++ 13
+(-fsanitize=address,undefined) and clang++ 18 accept this program, and it
+fails only its WRONG assertion.
