@@ -1912,8 +1912,20 @@ void cpp_typecheckt::typecheck_ifthenelse(code_ifthenelset &code)
     codet actual_decl = decl;
     if(actual_decl.get_statement() == ID_decl_block)
     {
-      PRECONDITION(actual_decl.operands().size() == 1);
-      actual_decl = to_code(actual_decl.op0());
+      // for an object of class type the block also holds the constructor
+      // call (`if(auto r = get())' with an optional<S> r): take the
+      // declaration itself
+      bool found = false;
+      for(const auto &op : actual_decl.operands())
+      {
+        if(to_code(op).get_statement() == ID_decl)
+        {
+          actual_decl = to_code(op);
+          found = true;
+          break;
+        }
+      }
+      DATA_INVARIANT(found, "condition declaration declares an object");
     }
 
     // Use the declared variable as the condition; typecheck_ifthenelse
@@ -2039,8 +2051,20 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
     codet actual_decl = decl;
     if(actual_decl.get_statement() == ID_decl_block)
     {
-      PRECONDITION(actual_decl.operands().size() == 1);
-      actual_decl = to_code(actual_decl.op0());
+      // for an object of class type the block also holds the constructor
+      // call (`if(auto r = get())' with an optional<S> r): take the
+      // declaration itself
+      bool found = false;
+      for(const auto &op : actual_decl.operands())
+      {
+        if(to_code(op).get_statement() == ID_decl)
+        {
+          actual_decl = to_code(op);
+          found = true;
+          break;
+        }
+      }
+      DATA_INVARIANT(found, "condition declaration declares an object");
     }
 
     // Extract the declared variable from the declaration
