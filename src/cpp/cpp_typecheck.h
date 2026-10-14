@@ -682,6 +682,8 @@ protected:
 
   bool find_cpctor(const symbolt &symbol)const;
   bool find_assignop(const symbolt &symbol)const;
+  bool find_mvctor(const symbolt &symbol) const;
+  static void make_move_parameter(cpp_declaratort &declarator);
   bool find_dtor(const symbolt &symbol)const;
 
   bool find_parent(

@@ -4994,6 +4994,81 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
 
   if(!cpp_is_pod(symbol.type))
   {
+    // N5008 [class.copy.ctor]/8, [class.copy.assign]/4: a move constructor
+    // and a move assignment operator are implicitly declared iff the class
+    // has no user-declared copy constructor, copy assignment operator, move
+    // constructor, move assignment operator or destructor.  Without them a
+    // class holding a move-only member (std::unique_ptr, a type with a
+    // deleted copy constructor) could not be returned or assigned from an
+    // rvalue: the implicit COPY was selected and its member copy was
+    // deleted ("member 'goto_programt::goto_programt(...)' is not
+    // accessible"; CBMC's own clean_expr_resultt, dog-fooding).
+    // Declared here only for a class with a MOVE-ONLY base or member -- a
+    // class with a move constructor and a deleted copy constructor
+    // (std::unique_ptr, goto_programt): for all other classes the implicit
+    // copy constructor performs the memberwise copy that the memberwise
+    // move would (or a copy where a member's move would steal), and the
+    // existing overload resolution, constant evaluation and library
+    // constraints rely on that.
+    bool subobject_is_move_only = false;
+    if(symbol.type.id() == ID_struct)
+    {
+      const auto move_only = [this](const typet &t)
+      {
+        typet element = t;
+        while(element.id() == ID_array)
+          element = to_array_type(element).element_type();
+        if(element.id() != ID_struct_tag)
+          return false;
+        const symbolt *s =
+          symbol_table.lookup(to_struct_tag_type(element).get_identifier());
+        if(
+          s == nullptr || s->type.id() != ID_struct ||
+          to_struct_type(s->type).is_incomplete() || !find_mvctor(*s))
+        {
+          return false;
+        }
+        // a deleted copy constructor is a component without access
+        for(const auto &c : to_struct_type(s->type).components())
+        {
+          if(
+            c.type().id() != ID_code || c.get_bool(ID_from_base) ||
+            to_code_type(c.type()).return_type().id() != ID_constructor)
+          {
+            continue;
+          }
+          const auto &parameters = to_code_type(c.type()).parameters();
+          if(
+            parameters.size() == 2 && is_reference(parameters[1].type()) &&
+            !is_rvalue_reference(parameters[1].type()) &&
+            to_reference_type(parameters[1].type())
+                .base_type()
+                .get(ID_identifier) == s->name &&
+            c.get(ID_access) == ID_noaccess)
+          {
+            return true;
+          }
+        }
+        return false;
+      };
+      for(const auto &b : to_struct_type(symbol.type).bases())
+        if(move_only(b.type()))
+          subobject_is_move_only = true;
+      for(const auto &c : to_struct_type(symbol.type).components())
+      {
+        if(
+          !c.get_bool(ID_from_base) && !c.get_bool(ID_is_static) &&
+          !c.get_bool(ID_is_type) && c.type().id() != ID_code &&
+          move_only(c.type()))
+        {
+          subobject_is_move_only = true;
+        }
+      }
+    }
+    const bool declare_implicit_move =
+      subobject_is_move_only && !find_cpctor(symbol) &&
+      !find_assignop(symbol) && !find_mvctor(symbol) && !found_dtor;
+
     // Add the default copy constructor
     struct_typet::componentt component;
 
@@ -5037,6 +5112,46 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         symbol,
         assignop,
         assignop.declarators()[0],
+        components,
+        ID_public,
+        false,
+        false,
+        false);
+    }
+
+    if(declare_implicit_move)
+    {
+      // the move constructor: memberwise moves ([class.copy.ctor]/15),
+      // defined only if used
+      cpp_declarationt mvctor;
+      default_cpctor(symbol, mvctor, "ref", true);
+      CHECK_RETURN(mvctor.declarators().size() == 1);
+      make_move_parameter(mvctor.declarators()[0]);
+      exprt value(ID_cpp_not_typechecked);
+      value.copy_to_operands(mvctor.declarators()[0].value());
+      mvctor.declarators()[0].value() = value;
+      typecheck_compound_declarator(
+        symbol,
+        mvctor,
+        mvctor.declarators()[0],
+        components,
+        ID_public,
+        false,
+        false,
+        false);
+
+      // the move assignment operator ([class.copy.assign]/12)
+      cpp_declarationt mvassign;
+      default_assignop(symbol, mvassign);
+      CHECK_RETURN(mvassign.declarators().size() == 1);
+      make_move_parameter(mvassign.declarators()[0]);
+      cpp_declaratort declarator;
+      mvassign.declarators().push_back(declarator);
+      mvassign.declarators()[0].value() = exprt(ID_cpp_not_typechecked);
+      typecheck_compound_declarator(
+        symbol,
+        mvassign,
+        mvassign.declarators()[0],
         components,
         ID_public,
         false,
