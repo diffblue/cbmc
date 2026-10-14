@@ -14350,3 +14350,59 @@ every commit compiles (cc_check 3729283994..HEAD).  Open: the libc++ 19+
 layer (13 preprocessed tests in /tmp/r185/docker/ii19 and ii21 still
 CONVERSION ERROR; cvise of the variant test in /tmp/r185/cvise2), the
 gcc 16 <format> test now type-checks but BMC runs long (gcc16_format.log).
+
+### Round 185, second addendum: dog-food driven fixes
+
+Each fix below has a cbmc-cpp CORE test that fails on W100 and passes now;
+the commit messages cite the N5008 clauses.
+
+- a55be08208 parser: `T *const *p' (pointer to const pointer).
+- 256855e0f0 `for(auto *n : r)' deduces auto from the pointee.
+- ddbd2587d1 __is_constructible(T, U) is direct-initialization.
+- bd0349bff2, 8b8bd313f0, 3f1e45db2a: braced-list arguments and braced
+  return clauses are not type-checked twice (resolved calls among the
+  elements bound their xvalue arguments again as lvalues).
+- e31199d499 `using B::B' inherits only B's own constructors.
+- ad89280b7d integral promotion of char8/16/32_t and wchar_t.
+- cf0b33bcad lambdas do not capture member typedefs or static members.
+- c26a24a22c implicit move constructor / assignment, declared only for a
+  class with a move-only subobject (regression guard
+  cpp17_optional_of_aggregate_with_movable_member).
+- 659a72525e parser: a speculative template-argument parse undoes its `>>'
+  split.
+- f020318cd0 braced-list viability against initializer_list element types.
+- b06fc60856 [expr.cond]/4.1 on base/derived lvalues.
+- 2932144178 functional cast of a reference-typed operand.
+- 312d6c7371 [over.ics.rank]/4.1, /4.4.2: pointer conversion to base beats
+  `void *', which beats bool (`out << in.rdbuf()').
+- 86f177915d ADL instantiates an associated class template specialization
+  ([temp.inst]/2).
+- bd588ccd9b an explicit constructor template does not convert.
+- 2f82a27a9a `auto &f = fn' deduces a reference to function; `&f'.
+- d7daa27f0d [basic.scope.class]/1: base-specifiers are not looked up in
+  the earlier bases (string_refinementt::infot's two `configt' bases).
+- 0447474681 a base's default constructor does not make `{}' viable.
+- 3c681841f4, 37142ff634 nested constructor-template conversions in
+  constraints: the in-progress bound is now 5 (std::function from a lambda
+  returning unique_ptr<D>, inside a std::pair, inside a map's list).
+- ff598f4110 parser: `operator[](a)(b);' is an expression statement.
+- df4b00b238 __uninitialized_copy_a's array_replace model only for
+  pointers: copying a std::deque failed a symex invariant.
+- 6b9c927feb, cb809092e0 `m({x})' and `T x({})': a parenthesized
+  braced-init-list stays one argument (ID_C_paren_init).
+- 2d644d92e0 deduction through `fn<void(T *)>' / `fn<void(T &)>'
+  (exprt::visit_pre's visit_pre_template).
+- b8a109d1ad, a785115bfb ADL finds no class members
+  ([basic.lookup.argdep]/4.2) and is suppressed by a block-scope object
+  ([basic.lookup.argdep]/1.3).
+- 9b55d68d33 `(obj)(arg)' with a class-type argument is a call.
+- 16ffe70efc unary + on a pointer ([expr.unary.op]/7; C's rule was used).
+- 74d53f4318 a qualified member call in a lambda uses the captured this.
+
+Verification: W120 (through cb809092e0's predecessor) and W121 suites,
+lint exit 0 (after a fixup of d7daa27f0d's address-of-cast), cc_check over
+3729283994..HEAD (log /tmp/r185/cc_check.log).  Remaining dog-food noise:
+contracts/utils.cpp compiles but prints a recovered
+`_Maybe_unary_or_binary_function' error; goto_instrument_parse_options.cpp
+needs about 975 s with goto-cc (sweep TIMEOUT 900).  A fresh sweep with
+the HEAD goto-cc runs in /tmp/dogfood-snapshots/74d53f4318-*.
