@@ -11701,6 +11701,45 @@ void cpp_typecheckt::typecheck_expr_index(exprt &expr)
   c_typecheck_baset::typecheck_expr_index(expr);
 }
 
+/// N5008 [expr.unary.op]/7: the operand of the unary + operator may also be a
+/// prvalue of pointer type -- after the array-to-pointer conversion of a
+/// string literal (`s + +"__"', CBMC's own contracts.cpp and
+/// dfcc_instrument_loop.cpp, dog-fooding) or the function-to-pointer
+/// conversion of a function; the result is the pointer.  C (C11 6.5.3.3/1)
+/// allows arithmetic operands only, which c_typecheck_baset implements.
+void cpp_typecheckt::typecheck_expr_unary_arithmetic(exprt &expr)
+{
+  exprt &operand = to_unary_expr(expr).op();
+  if(expr.id() == ID_unary_plus)
+  {
+    add_implicit_dereference(operand);
+    if(operand.type().id() == ID_array)
+    {
+      const typet element_type = to_array_type(operand.type()).element_type();
+      exprt converted = address_of_exprt{
+        index_exprt{operand, from_integer(0, c_index_type())},
+        pointer_type(element_type)};
+      converted.add_source_location() = operand.source_location();
+      operand.swap(converted);
+    }
+    else if(operand.type().id() == ID_code)
+    {
+      exprt converted = address_of_exprt{operand};
+      converted.add_source_location() = operand.source_location();
+      operand.swap(converted);
+    }
+    if(operand.type().id() == ID_pointer && !is_reference(operand.type()))
+    {
+      exprt result = operand;
+      result.remove(ID_C_lvalue);
+      result.add_source_location() = expr.source_location();
+      expr.swap(result);
+      return;
+    }
+  }
+  c_typecheck_baset::typecheck_expr_unary_arithmetic(expr);
+}
+
 void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 {
   if(expr.operands().size() != 2)

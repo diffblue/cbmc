@@ -1357,6 +1357,7 @@ protected:
   void typecheck_expr_index(exprt &) override;
   void typecheck_expr_rel(binary_relation_exprt &) override;
   void typecheck_expr_comma(exprt &) override;
+  void typecheck_expr_unary_arithmetic(exprt &) override;
 
   void
   typecheck_function_call_arguments(side_effect_expr_function_callt &) override;
