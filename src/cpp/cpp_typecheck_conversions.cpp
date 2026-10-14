@@ -2780,12 +2780,14 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
       // nesting; letting them re-enter the (expensive) per-candidate
       // `new_temporary` trial below roughly doubled compile time on
       // numeric-heavy translation units (e.g. expr.cpp, mp_arith.cpp).  The
-      // `size() < 3` bound additionally caps nesting depth: two nested levels
-      // are needed by std::function<unique_ptr<B>()> from a callable returning
-      // unique_ptr<D> -- the function constructor's constraint converts
-      // unique_ptr<D> to unique_ptr<B>, whose constraint converts
-      // default_delete<D> to default_delete<B> (CBMC's own goto-harness
-      // generator factory, dog-fooding); one nested level suffices for plain
+      // `size() < 5` bound additionally caps nesting depth.  Four levels
+      // are needed for a braced {k, lambda} argument of a
+      // std::pair<K, std::function<unique_ptr<B>()>> parameter: pair's
+      // constructor template, whose constraint constructs the
+      // std::function, whose constraint converts unique_ptr<D> to
+      // unique_ptr<B>, whose constraint converts default_delete<D> to
+      // default_delete<B> (std::map's initializer list in CBMC's own
+      // path_storage.cpp, dog-fooding); one nested level suffices for plain
       // std::optional / std::unique_ptr conversions.
       const irep_idt to_ctor_key = to_struct_tag_type(to).get_identifier();
       // The trial below runs full constructor overload resolution over the
@@ -2804,7 +2806,7 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
           template_conversions_in_progress.end() &&
         (template_conversions_in_progress.empty() ||
          constant_expression_context > 0 || sfinae_context_depth > 0) &&
-        template_conversions_in_progress.size() < 3 &&
+        template_conversions_in_progress.size() < 5 &&
         struct_type_to.get_bool("has_template_constructor") &&
         failed_template_conversions.find(trial_key) ==
           failed_template_conversions.end())
