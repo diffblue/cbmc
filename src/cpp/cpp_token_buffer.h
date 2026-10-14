@@ -20,6 +20,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_token.h"
 
 #include <list>
+#include <utility>
+#include <vector>
 
 class cpp_token_buffert
 {
@@ -50,6 +52,13 @@ public:
   void Replace(const cpp_tokent &token);
   void Insert(const cpp_tokent &token);
 
+  /// Split the `>>' token at the current position into two `>' tokens (the
+  /// closing of two template-argument lists, [temp.names]/4).  A later
+  /// Restore to a position before the split undoes it, so that a
+  /// speculative template-argument parse leaves the `>>' of a shift
+  /// expression intact.
+  void split_shift_right();
+
   void clear()
   {
     tokens.clear();
@@ -73,6 +82,10 @@ protected:
   std::vector<tokenst::iterator> token_vector;
 
   post current_pos;
+
+  /// The positions at which split_shift_right split a `>>', with the
+  /// original token, in the order of the splits
+  std::vector<std::pair<post, cpp_tokent>> shift_right_splits;
 
   void *ansi_c_scanner_state;
 
