@@ -2012,6 +2012,28 @@ std::string cpp_typecheckt::class_template_identifier(
         if(!nm.empty())
           rendering += "=" + id2string(nm);
         rendering += '(';
+        // N5008 [temp.over.link]/5, [basic.lookup]: a name denotes the
+        // same entity however it is qualified; a redeclaration may spell
+        // the concept `__char' and the definition `__format::__char'
+        // (libstdc++ 16's <format>, `__formatter_ptr').  Render a
+        // qualified name by its last component and template arguments.
+        if(node.id() == ID_cpp_name)
+        {
+          const auto &subs = node.get_sub();
+          std::size_t last_name = subs.size();
+          for(std::size_t i = 0; i < subs.size(); ++i)
+            if(subs[i].id() == ID_name)
+              last_name = i;
+          for(std::size_t i = 0; i < subs.size(); ++i)
+          {
+            if(i < last_name && subs[i].id() != ID_template_args)
+              continue;
+            render(subs[i]);
+            rendering += ',';
+          }
+          rendering += ')';
+          return;
+        }
         for(const auto &sub : node.get_sub())
         {
           render(sub);
@@ -2076,7 +2098,17 @@ std::string cpp_typecheckt::class_template_identifier(
     {
       const irep_idt &cc = p.get("#C_concept_constraint");
       if(!cc.empty())
-        identifier += "#concept_" + id2string(cc);
+      {
+        // by the concept's unqualified name (see the rendering above);
+        // #C_concept_constraint_name is the name as written
+        std::string short_name = id2string(p.get("#C_concept_constraint_name"));
+        if(short_name.empty())
+          short_name = id2string(cc);
+        const auto sep = short_name.rfind("::");
+        if(sep != std::string::npos)
+          short_name = short_name.substr(sep + 2);
+        identifier += "#concept_" + short_name;
+      }
     }
   }
 
@@ -2652,6 +2684,9 @@ cpp_scopet &cpp_typecheckt::typecheck_template_parameters(template_typet &type)
       if(!constraint.empty())
       {
         parameter.set("#C_concept_constraint", constraint);
+        parameter.set(
+          "#C_concept_constraint_name",
+          declaration.get("#C_concept_constraint_name"));
         add_type_constraint(
           parameter,
           declaration.get("#C_concept_constraint_name"),
