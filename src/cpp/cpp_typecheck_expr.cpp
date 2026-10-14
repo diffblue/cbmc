@@ -3554,6 +3554,78 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
       return;
     }
 
+    // N5008 [expr.cond]/4.1: for glvalue operands of class types of which
+    // one is a base of the other, the derived operand is converted to an
+    // lvalue (resp. xvalue) of the base type, by binding a reference to
+    // its base subobject; the result is that glvalue.  `b ? std::cout :
+    // file' (an ofstream) is an ostream lvalue (CBMC's own
+    // goto_analyzer_parse_options.cpp, dog-fooding); the operands were
+    // converted to a copy of the base instead, so `base &r = b ? x : d;'
+    // bound r to a temporary.
+    {
+      const auto class_lvalue = [this](const exprt &e) -> const typet *
+      {
+        if(!is_lvalue_expression(e))
+          return nullptr;
+        if(e.type().id() != ID_struct_tag)
+          return nullptr;
+        return &e.type();
+      };
+      const typet *t1 = class_lvalue(expr.op1());
+      const typet *t2 = class_lvalue(expr.op2());
+      if(t1 != nullptr && t2 != nullptr)
+      {
+        typet u1 = *t1, u2 = *t2;
+        c_qualifierst q1, q2;
+        q1.read(u1);
+        q2.read(u2);
+        c_qualifierst{}.write(u1);
+        c_qualifierst{}.write(u2);
+        const struct_typet &s1 = follow_tag(to_struct_tag_type(u1));
+        const struct_typet &s2 = follow_tag(to_struct_tag_type(u2));
+        exprt *derived_op = nullptr;
+        typet base_type;
+        if(subtype_typecast(s2, s1))
+        {
+          derived_op = &expr.op2();
+          base_type = u1;
+        }
+        else if(subtype_typecast(s1, s2))
+        {
+          derived_op = &expr.op1();
+          base_type = u2;
+        }
+        if(derived_op != nullptr)
+        {
+          c_qualifierst combined = q1;
+          combined += q2;
+          combined.write(base_type);
+          // the base subobject: `*(B *)&derived'
+          exprt address = address_of_exprt{*derived_op};
+          make_ptr_typecast(address, pointer_type(base_type));
+          dereference_exprt base_object{address, base_type};
+          base_object.set(ID_C_lvalue, true);
+          base_object.add_source_location() = derived_op->source_location();
+          *derived_op = std::move(base_object);
+          for(exprt *op : {&expr.op1(), &expr.op2()})
+          {
+            if(op->type() != base_type)
+            {
+              // the other operand differs in cv-qualification only
+              exprt a = address_of_exprt{*op};
+              a = typecast_exprt{a, pointer_type(base_type)};
+              dereference_exprt d{a, base_type};
+              d.set(ID_C_lvalue, true);
+              *op = std::move(d);
+            }
+          }
+          expr.type() = base_type;
+          expr.set(ID_C_lvalue, true);
+          return;
+        }
+      }
+    }
+
     exprt e1 = expr.op1();
     exprt e2 = expr.op2();
 
