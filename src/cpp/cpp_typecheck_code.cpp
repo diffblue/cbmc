@@ -216,7 +216,8 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     if(aggregate_value.has_value())
       code.return_value() = std::move(*aggregate_value);
   }
-  else if(
+  // (not `else': the aggregate helper may have declined)
+  if(
     code.has_return_value() &&
     code.return_value().id() == ID_initializer_list &&
     code.return_value().operands().size() == 1 &&
@@ -224,6 +225,22 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     !cpp_is_pod(return_type))
   {
     code.return_value() = code.return_value().operands().front();
+    // N5008 [dcl.init.list]/3.7, [over.match.list]: a single element that
+    // is itself a braced-init-list (`return {{b, e}}' for an optional<chk>)
+    // is the argument of the selected constructor, list-initializing its
+    // parameter ([over.ics.list]); construct the result object by that
+    // constructor here, as the multi-element case does -- the base
+    // type-checker's implicit_typecast knows no conversion from a list.
+    if(code.return_value().id() == ID_initializer_list)
+    {
+      exprt temporary;
+      new_temporary(
+        code.return_value().source_location(),
+        return_type,
+        exprt::operandst{code.return_value()},
+        temporary);
+      code.return_value() = std::move(temporary);
+    }
   }
 
   // Per [stmt.return]/3 (C++11): `return { a, b, ... };` in a function
