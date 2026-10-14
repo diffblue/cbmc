@@ -10138,11 +10138,25 @@ void cpp_typecheckt::typecheck_function_call_arguments(
           // reference ([over.best.ics.general]/4 forbids that user
           // conversion for constructor candidates): `take({2, a})`
           // with itemt(int, const valt&) mispaired 2 -> const valt&.
+          // The elements were type-checked in place by the operand walk
+          // over the list; a resolved call among them (typed, its callee no
+          // longer a name) has converted arguments -- an rvalue bound to
+          // `E &&' is an xvalue now -- and type-checking it again re-binds
+          // them (`take({2, make_pair(E(), 3)})': "invalid implicit
+          // conversion from 'struct E &' to 'struct E &&'"; CBMC's own
+          // goto_clean_expr.cpp, dog-fooding).
           exprt::operandst element_ops;
           element_ops.reserve(arg_it->operands().size());
           for(auto &element : arg_it->operands())
           {
-            typecheck_expr(element);
+            const bool resolved_call =
+              element.id() == ID_side_effect &&
+              element.get(ID_statement) == ID_function_call &&
+              to_side_effect_expr_function_call(element).function().id() !=
+                ID_cpp_name &&
+              element.type().is_not_nil() && !element.type().id().empty();
+            if(!resolved_call)
+              typecheck_expr(element);
             element_ops.push_back(already_typechecked_exprt{element});
           }
           new_temporary(
@@ -11258,6 +11272,26 @@ void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
 
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
+  // A braced-init-list is type-checked again when a call's arguments are
+  // converted, after the generic operand walk type-checked its elements in
+  // place: leave a resolved call among them alone (see
+  // typecheck_function_call_arguments, the braced by-value argument)
+  if(expr.id() == ID_initializer_list)
+  {
+    for(auto &op : expr.operands())
+    {
+      if(
+        op.id() == ID_side_effect && op.get(ID_statement) == ID_function_call &&
+        to_side_effect_expr_function_call(op).function().id() != ID_cpp_name &&
+        op.type().is_not_nil() && !op.type().id().empty())
+      {
+        typet element_type = op.type();
+        already_typechecked_exprt::make_already_typechecked(op);
+        op.type() = std::move(element_type);
+      }
+    }
+  }
+
   // Re-type-check guard for an already-elaborated implicit dereference of a
   // reference ([dcl.ref]/1, [expr.unary.op]/1: the built-in unary `*` applied
   // to a reference operand denotes the object the reference is bound to).  A
