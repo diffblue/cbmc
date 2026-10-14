@@ -1,0 +1,70 @@
+name: Run mutation fuzzing
+
+on:
+  pull_request:
+    branches: [ develop ]
+
+jobs:
+  # This job takes approximately 20 minutes
+  fuzz-sanitizer-build:
+    runs-on: ubuntu-24.04
+    env:
+      # Abort on the first report so that the exit status marks the finding, and
+      # print a stack trace for undefined behaviour. Leak detection is off as it
+      # would report on every exit via an exception.
+      ASAN_OPTIONS: "abort_on_error=1:detect_leaks=0"
+      UBSAN_OPTIONS: "print_stacktrace=1:halt_on_error=1"
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y build-essential flex bison ccache clang-19 clang++-19
+          make -C src minisat2-download
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-make-clang-${{ github.ref }}-${{ github.sha }}-FUZZ
+          restore-keys: |
+            ${{ runner.os }}-24.04-make-clang-${{ github.ref }}
+            ${{ runner.os }}-24.04-make-clang
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with make and sanitizers enabled
+        run: |
+          export SANITIZER_FLAGS="-fsanitize=address -fsanitize=undefined -fno-sanitize-recover=all -g -O1"
+          make -C src CXX="ccache /usr/bin/clang++-19" \
+            CXXFLAGS="$SANITIZER_FLAGS" \
+            LINKFLAGS="$SANITIZER_FLAGS" \
+            cbmc.dir symtab2gb.dir -j4
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Fuzz 100 mutants per input surface with a fresh random seed
+        run: |
+          export PATH=$PWD/src/cbmc:$PWD/src/symtab2gb:$PATH
+          scripts/fuzz.sh 100
+      - name: Save the inputs of any crash found
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: fuzz-crashes
+          path: fuzz-crash-*
+          if-no-files-found: ignore
+      - name: Save ccache
+        if: always()
+        uses: actions/cache/save@v6
+        with:
+          path: .ccache
+          key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
