@@ -124,6 +124,14 @@ static bool brace_init_is_viable(
     {
       if(to_code_type(c.type()).return_type().id() != ID_constructor)
         continue;
+      // a base's constructors (copied into the class as from_base
+      // components) are not constructors of the class ([class.ctor],
+      // [namespace.udecl]/13 for inherited ones); counting a base's
+      // default constructor made `{}' viable for `sym &&' when sym has none
+      // (std::optional<symbol_exprt>'s `o = {}', CBMC's own interpreter.cpp,
+      // dog-fooding)
+      if(c.get_bool(ID_from_base))
+        continue;
       // N5008 [dcl.init.aggr]/1: only USER-declared constructors
       // disqualify the aggregate; the compiler-synthesized ones (a
       // non-POD member triggers their synthesis, e.g. cache keys with a
