@@ -636,7 +636,16 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       {
         const symbolt &function_symbol =
           lookup(resolved_expr.get(ID_component_name));
-        symbol.value = address_of_exprt(function_symbol.symbol_expr());
+        // a pointer to a VIRTUAL member function designates the thunk that
+        // dispatches through the virtual table ([expr.mptr.oper]/4, as in
+        // typecheck_expr_address_of)
+        if(function_symbol.type.get_bool(ID_C_is_virtual))
+        {
+          symbol.value = address_of_exprt(
+            virtual_dispatch_thunk(function_symbol.name).symbol_expr());
+        }
+        else
+          symbol.value = address_of_exprt(function_symbol.symbol_expr());
 
         // N5008 [expr.unary.op]/3.1: the pointer to member is one of the
         // class m is a member of -- the class declaring the function, whose

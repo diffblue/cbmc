@@ -1305,6 +1305,7 @@ protected:
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
+  const symbolt &virtual_dispatch_thunk(const irep_idt &function_identifier);
   void typecheck_braced_argument_elements(exprt &init_list);
   std::optional<typet> builtin_common_type(
     const irep_idt &base_template,
