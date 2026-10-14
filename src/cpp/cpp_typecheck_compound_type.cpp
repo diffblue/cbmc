@@ -2989,6 +2989,81 @@ void cpp_typecheckt::typecheck_friend_declaration(
   std::cout << "friend declaration: " << declaration.pretty() << '\n';
 #endif
 
+  // N5008 [temp.friend]/1: a friend declaration whose declarator-id is a
+  // template-id naming a specialization of a function template declared in
+  // another scope (`friend constexpr partial_ordering
+  // __cmp_cat::__make<partial_ordering>(__cmp_cat::_Ord) noexcept;' in
+  // libstdc++ 16's <compare>) befriends that specialization and declares
+  // nothing.  The declarator converter would create an unrelated weak
+  // function symbol named after the template-id; the specialization that
+  // instantiate_template later creates was then not a friend (its body,
+  // calling the private constructor, was dropped).  Record the TEMPLATE
+  // (the specialization-of-a-friend-template check below grants access to
+  // its specializations).
+  if(
+    declaration.declarators().size() == 1 &&
+    declaration.declarators().front().name().has_template_args())
+  {
+    const cpp_namet &friend_name = declaration.declarators().front().name();
+    cpp_save_scopet saved_scope(cpp_scopes);
+    cpp_typecheck_resolvet cpp_typecheck_resolve(*this);
+    irep_idt fbase;
+    cpp_template_args_non_tct fargs_unused;
+    cpp_scopet *target_scope = nullptr;
+    try
+    {
+      target_scope =
+        &cpp_typecheck_resolve.resolve_scope(friend_name, fbase, fargs_unused);
+    }
+    catch(int)
+    {
+      target_scope = nullptr;
+    }
+    if(target_scope != nullptr)
+    {
+      const std::size_t friend_params = declaration.declarators()
+                                          .front()
+                                          .type()
+                                          .find(ID_parameters)
+                                          .get_sub()
+                                          .size();
+      std::vector<const symbolt *> matches;
+      const cpp_scopet::lookup_kindt kind = friend_name.is_qualified()
+                                              ? cpp_scopet::SCOPE_ONLY
+                                              : cpp_scopet::RECURSIVE;
+      for(const auto *id_ptr : target_scope->lookup(fbase, kind))
+      {
+        const symbolt *cand = symbol_table.lookup(id_ptr->identifier);
+        if(
+          cand == nullptr || !cand->type.get_bool(ID_is_template) ||
+          cand->type.id() != ID_cpp_declaration)
+        {
+          continue;
+        }
+        const cpp_declarationt &cand_decl = to_cpp_declaration(cand->type);
+        if(
+          cand_decl.declarators().size() != 1 || cand_decl.declarators()
+                                                     .front()
+                                                     .type()
+                                                     .find(ID_parameters)
+                                                     .get_sub()
+                                                     .size() != friend_params)
+        {
+          continue;
+        }
+        matches.push_back(cand);
+      }
+      for(const symbolt *befriended : matches)
+      {
+        irept friend_entry;
+        friend_entry.set(ID_identifier, befriended->name);
+        symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
+      }
+      if(!matches.empty())
+        return;
+    }
+  }
+
   for(auto &sub_it : declaration.declarators())
   {
 #ifdef DEBUG
