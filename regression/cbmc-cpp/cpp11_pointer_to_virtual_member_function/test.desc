@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* dispatch through S::\*: SUCCESS$
+^\[main\.assertion\.2\] .* void virtual through member pointer: SUCCESS$
+^\[main\.assertion\.3\] .* D::\* dispatch: SUCCESS$
+^\[main\.assertion\.4\] .* through function parameter: SUCCESS$
+^\[main\.assertion\.5\] .* equality of pointers to the same virtual function: SUCCESS$
+^\[main\.assertion\.6\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.
