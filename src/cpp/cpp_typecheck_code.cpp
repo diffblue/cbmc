@@ -3274,7 +3274,7 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           else if(
             code.operands().size() == 1 &&
             code.op0().id() == ID_initializer_list &&
-            !code.get_bool("#paren_init") &&
+            !code.get_bool(ID_C_paren_init) &&
             inner_se.type().id() == ID_struct_tag &&
             !cpp_is_pod(inner_se.type()) &&
             !has_viable_init_list_constructor(inner_se.type(), code.op0()))
@@ -3792,7 +3792,9 @@ void cpp_typecheckt::typecheck_decl(codet &code)
           symbol.type, symbol.location, &cpp_scopes.current_scope());
 
       auto constructor_call = cpp_constructor(
-        symbol.location, object_expr, declarator.init_args().operands());
+        symbol.location,
+        object_expr,
+        paren_init_arguments(declarator.init_args().operands()));
 
       if(constructor_call.has_value())
       {

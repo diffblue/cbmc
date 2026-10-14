@@ -49,6 +49,7 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
   if(
     operands.size() == 1 && operands.front().id() == ID_initializer_list &&
     operands.front().operands().empty() &&
+    !operands.front().get_bool(ID_C_paren_init) &&
     (object_tc.type().id() == ID_struct_tag ||
      object_tc.type().id() == ID_union_tag))
   {
@@ -1604,4 +1605,17 @@ bool cpp_typecheckt::array_elements_have_user_constructor(
     return true;
   }
   return false;
+}
+
+exprt::operandst
+cpp_typecheckt::paren_init_arguments(const exprt::operandst &arguments)
+{
+  exprt::operandst result = arguments;
+  if(
+    result.size() == 1 && result.front().id() == ID_initializer_list &&
+    result.front().operands().empty())
+  {
+    result.front().set(ID_C_paren_init, true);
+  }
+  return result;
 }

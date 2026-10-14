@@ -214,6 +214,17 @@ public:
   /// [dcl.init.list]/3).
   bool array_elements_have_user_constructor(const typet &array_type);
 
+  /// The arguments of a parenthesized initializer `T x(args)'.  N5008
+  /// [dcl.init.general]/16.6.2: `T x({})' passes ONE argument, the empty
+  /// braced-init-list, to a constructor of T; it is not the value-
+  /// initialization `T x{}' ([dcl.init.list]/3.5).  The empty list is marked
+  /// (ID_C_paren_init) so that cpp_constructor does not take it as the
+  /// latter: `function_cfg_infot cfg_info({})' found no constructor of a
+  /// class without a default constructor (CBMC's own contracts.cpp,
+  /// dog-fooding).
+  static exprt::operandst
+  paren_init_arguments(const exprt::operandst &arguments);
+
   std::optional<codet> cpp_constructor(
     const source_locationt &source_location,
     const exprt &object,

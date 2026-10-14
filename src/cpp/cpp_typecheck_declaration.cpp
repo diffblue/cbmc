@@ -1307,7 +1307,7 @@ void cpp_typecheckt::convert_non_template_declaration(
       auto constructor = cpp_constructor(
         symbol.location,
         cpp_symbol_expr(symbol),
-        declarator.init_args().operands());
+        paren_init_arguments(declarator.init_args().operands()));
 
       if(constructor.has_value())
         symbol.value = constructor.value();
