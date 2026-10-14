@@ -3186,6 +3186,27 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             symbol_expr.id() == ID_already_typechecked
               ? to_already_typechecked_expr(symbol_expr).get_expr()
               : symbol_expr;
+          // The parser delivers the clauses of a braced mem-initializer
+          // `ops{a, b}' as separate operands (#braced_init); for a
+          // class with a viable initializer-list constructor they form
+          // one braced-init-list argument (phase 1): `std::vector<E>
+          // ops{a, b}' with class-type elements selected no constructor
+          // (the iterator-pair template was tried with E, E).
+          if(
+            code.get_bool(ID_C_braced_init) &&
+            inner_se.type().id() == ID_struct_tag &&
+            !cpp_is_pod(inner_se.type()))
+          {
+            exprt init_list{ID_initializer_list};
+            init_list.operands() = code.operands();
+            init_list.add_source_location() = code.source_location();
+            init_list.set(ID_C_direct_list_init, true);
+            if(has_viable_init_list_constructor(inner_se.type(), init_list))
+            {
+              code.operands().clear();
+              code.add_to_operands(std::move(init_list));
+            }
+          }
           // N5008 [dcl.init.list]/3.4, [dcl.init.aggr]/4: an ARRAY
           // member list-initialized from a braced list -- a default member
           // initializer `pr tbl[2] = {{'^', t}, {'$', u}};' (libstdc++'s
