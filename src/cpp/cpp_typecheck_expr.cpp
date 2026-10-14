@@ -2577,10 +2577,39 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           // selected the deleted overload).
           if(is_reference(t2) && !is_rvalue_reference(t2))
             from.set(ID_C_lvalue, true);
-          if(implicit_conversion_sequence(from, t1, tmp))
-            expr = true_exprt();
-          else
-            expr = false_exprt();
+          bool constructible = implicit_conversion_sequence(from, t1, tmp);
+          // N5008 [meta.unary.prop]/9: `T t(declval<U>());' is
+          // DIRECT-initialization, so an explicit constructor counts
+          // ([dcl.init.general]/16.6.2) -- the conversion sequence above
+          // is copy-initialization and skips it: is_constructible<saver,
+          // scopes &> with `explicit saver(scopes &)' was false, and
+          // std::optional<saver>::emplace(sc) had no viable overload
+          // (CBMC's own optional<cpp_save_scopet>, dog-fooding).
+          if(!constructible && class_t1.id() == ID_struct_tag)
+          {
+            elaborate_class_template(class_t1);
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
+            {
+              sfinae_contextt sfinae_guard{*this};
+              symbol_exprt object{irep_idt{}, t1};
+              object.set(ID_C_lvalue, true);
+              exprt arg = from;
+              already_typechecked_exprt::make_already_typechecked(arg);
+              constructible =
+                cpp_constructor(expr.source_location(), object, {arg})
+                  .has_value();
+            }
+            catch(...)
+            {
+              constructible = false;
+            }
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
+          }
+          expr = constructible ? static_cast<exprt>(true_exprt())
+                               : static_cast<exprt>(false_exprt());
         }
       }
     }
