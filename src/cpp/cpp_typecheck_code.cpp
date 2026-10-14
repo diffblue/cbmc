@@ -3267,9 +3267,14 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             exprt::operandst elements = code.op0().operands();
             code.operands() = std::move(elements);
           }
+          // (not for `h({true})': N5008 [dcl.init.general]/16.6.2, the
+          // parenthesized expression-list has one argument, the
+          // braced-init-list -- std::stack<bool>'s `record_events({true})',
+          // CBMC's own goto_symex_statet, dog-fooding)
           else if(
             code.operands().size() == 1 &&
             code.op0().id() == ID_initializer_list &&
+            !code.get_bool("#paren_init") &&
             inner_se.type().id() == ID_struct_tag &&
             !cpp_is_pod(inner_se.type()) &&
             !has_viable_init_list_constructor(inner_se.type(), code.op0()))

@@ -5767,6 +5767,8 @@ bool Parser::rMemberInit(exprt &init)
       return false;
 
     init.operands().swap(args.operands());
+    // each braced-init-list here is ONE argument ([dcl.init.general]/16.6.2)
+    init.set("#paren_init", true);
 
     if(lex.get_token(tk2) != ')')
       return false;
