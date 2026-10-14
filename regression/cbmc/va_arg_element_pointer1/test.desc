@@ -1,6 +1,6 @@
-CORE
+CORE gcc-only
 main.c
---no-standard-checks
+--no-standard-checks --arch x86_64 --os linux
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -9,4 +9,6 @@ main.c
 When __builtin_va_list is modelled as void** (x86_64), a pointer to
 the element type (va_tag*) passed to a function must be dereferenced
 to obtain the va_list position, not used directly as a va_list.
+The test pins --arch x86_64 --os linux because the va_list representation,
+and hence the va_tag construction, is architecture specific.
 Fixes: diffblue/cbmc#9176
