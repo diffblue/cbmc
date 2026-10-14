@@ -4150,6 +4150,7 @@ std::optional<typet> cpp_typecheckt::builtin_common_type(
   }
   return {};
 }
+
 /// N5008 [class.access.general]/5: access control for a name is judged in
 /// the context in which the name APPEARS.  The elements of a braced-init-list
 /// argument (`wrapt w({this->member})') are expressions of the call site;
@@ -4188,6 +4189,98 @@ void cpp_typecheckt::typecheck_braced_argument_elements(exprt &init_list)
     }
   }
 }
+
+/// The thunk a pointer to the virtual member function \p function
+/// designates ([expr.mptr.oper]/4): `R C::vf@virtual(C *this, Ps... ps)
+/// { return this->vf(ps...); }' -- the call in the body dispatches through
+/// the object's virtual table, so the final overrider of the object's
+/// dynamic type runs.  Created on first use, in the function's class.
+const symbolt &
+cpp_typecheckt::virtual_dispatch_thunk(const irep_idt &function_identifier)
+{
+  const irep_idt thunk_name = id2string(function_identifier) + "@virtual";
+  if(const symbolt *existing = symbol_table.lookup(thunk_name))
+    return *existing;
+
+  const symbolt &function = lookup(function_identifier);
+  symbolt thunk{thunk_name, function.type, function.mode};
+  thunk.base_name = id2string(function.base_name) + "@virtual";
+  thunk.pretty_name = thunk.base_name;
+  thunk.module = module;
+  thunk.location = function.location;
+  thunk.type.remove(ID_C_is_virtual);
+  thunk.type.remove(ID_C_virtual_name);
+
+  code_typet &code_type = to_code_type(thunk.type);
+  std::size_t i = 0;
+  for(auto &parameter : code_type.parameters())
+  {
+    irep_idt base_name = parameter.get_base_name();
+    if(base_name.empty())
+      base_name = "arg" + std::to_string(i);
+    ++i;
+    parameter_symbolt parameter_symbol;
+    parameter_symbol.name = id2string(thunk.name) + "::" + id2string(base_name);
+    parameter_symbol.base_name = base_name;
+    parameter_symbol.pretty_name = base_name;
+    parameter_symbol.location = thunk.location;
+    parameter_symbol.mode = thunk.mode;
+    parameter_symbol.module = module;
+    parameter_symbol.type = parameter.type();
+    parameter_symbol.is_lvalue = !is_reference(parameter.type());
+    parameter.set_identifier(parameter_symbol.name);
+    symbol_table.insert(std::move(parameter_symbol));
+  }
+
+  // `this->vf(ps...)': the object operand is the dereferenced `this'
+  // parameter; the member access and the call are type-checked as in a
+  // member function of the class, which emits the virtual-table dispatch
+  const code_typet::parameterst &parameters = code_type.parameters();
+  PRECONDITION(!parameters.empty());
+  exprt this_symbol = lookup(parameters.front().get_identifier()).symbol_expr();
+  dereference_exprt object{this_symbol};
+  object.set(ID_C_lvalue, true);
+  already_typechecked_exprt::make_already_typechecked(object);
+  exprt member{ID_member};
+  member.add_to_operands(std::move(object));
+  member.set(ID_component_name, function_identifier);
+  member.add_source_location() = thunk.location;
+
+  side_effect_expr_function_callt call{
+    std::move(member), {}, uninitialized_typet{}, thunk.location};
+  for(std::size_t j = 1; j < parameters.size(); ++j)
+  {
+    exprt argument = lookup(parameters[j].get_identifier()).symbol_expr();
+    // a named rvalue reference parameter is an lvalue; forward it as an
+    // xvalue (as build_this_adjusting_thunk_body does)
+    if(is_rvalue_reference(argument.type()))
+      argument = typecast_exprt{argument, argument.type()};
+    already_typechecked_exprt::make_already_typechecked(argument);
+    call.arguments().push_back(std::move(argument));
+  }
+
+  {
+    cpp_save_scopet save_scope{cpp_scopes};
+    const irep_idt class_name = function.type.get(ID_C_member_name);
+    if(!class_name.empty())
+      cpp_scopes.set_scope(class_name);
+    const exprt saved_this = cpp_scopes.current_scope().this_expr;
+    cpp_scopes.current_scope().this_expr = this_symbol;
+    exprt call_expr = call;
+    typecheck_expr(call_expr);
+    cpp_scopes.current_scope().this_expr = saved_this;
+    if(code_type.return_type().id() == ID_empty)
+      thunk.value = code_blockt{{code_expressiont{std::move(call_expr)}}};
+    else
+      thunk.value = code_blockt{{code_frontend_returnt{std::move(call_expr)}}};
+  }
+  thunk.value.set("#cpp_converted", true);
+
+  const auto inserted = symbol_table.insert(std::move(thunk));
+  CHECK_RETURN(inserted.second);
+  return inserted.first;
+}
+
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 {
   // We need to overload, "sizeof-expression" can be mis-parsed
@@ -5666,10 +5759,21 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
 
       if(code_type.get_bool(ID_C_is_virtual))
       {
-        error().source_location = expr.source_location();
-        error() << "pointers to virtual methods"
-                << " are currently not implemented" << eom;
-        throw 0;
+        // N5008 [expr.mptr.oper]/4, [class.virtual]/1: a call through a
+        // pointer to a virtual member function is a virtual call -- the
+        // final overrider in the dynamic type of the object is called.
+        // The pointer designates a thunk dispatching through the
+        // object's virtual table instead of the function itself.
+        const symbol_exprt &function =
+          to_symbol_expr(to_address_of_expr(op).object());
+        const symbolt &thunk =
+          virtual_dispatch_thunk(function.get_identifier());
+        exprt thunk_symbol = cpp_symbol_expr(thunk);
+        thunk_symbol.add_source_location() = expr.source_location();
+        address_of_exprt address(thunk_symbol, pointer_type(thunk.type));
+        address.set(ID_C_implicit, true);
+        address.type().add(ID_to_member) = member_class;
+        op.swap(address);
       }
     }
   }
@@ -7933,6 +8037,15 @@ exprt cpp_typecheckt::deduce_funcaddr_against_target(
       /*fail_with_exception=*/false);
     if(resolved.is_not_nil() && resolved.type().id() == ID_code)
     {
+      // a pointer to a non-static MEMBER function ([expr.unary.op]/3.1)
+      // is formed by typecheck_expr_address_of (the member class, the
+      // virtual-dispatch thunk), not here
+      const auto &resolved_parameters =
+        to_code_type(resolved.type()).parameters();
+      if(!resolved_parameters.empty() && resolved_parameters.front().get_this())
+      {
+        return nil_exprt{};
+      }
       // [conv.func]/1: function-to-pointer conversion is implicit
       // when the target context requires it; keep the `C_implicit`
       // marker iff the source wasn't an explicit `&`.
