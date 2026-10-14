@@ -10005,7 +10005,21 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
   }
   else if(template_type.id() == ID_frontend_pointer)
   {
-    if(desired_type.id() == ID_pointer)
+    // the parameter of a function type that is a template argument may be
+    // in front-end form on both sides (`fn<void(T *)>' against
+    // `fn<void(ex *)>'): the same pointer or reference declarator
+    if(
+      desired_type.id() == ID_frontend_pointer &&
+      template_type.get_bool(ID_C_reference) ==
+        desired_type.get_bool(ID_C_reference) &&
+      template_type.get_bool(ID_C_rvalue_reference) ==
+        desired_type.get_bool(ID_C_rvalue_reference))
+    {
+      guess_template_args(
+        to_type_with_subtype(template_type).subtype(),
+        to_type_with_subtype(desired_type).subtype());
+    }
+    else if(desired_type.id() == ID_pointer)
     {
       // Reference-qualifier match, as in the reference branch above.
       // Before type-checking, a reference pattern (`_Xp&` / `_Yp&&`) is a
@@ -10188,8 +10202,14 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
 
         if(d_index >= desired_params.size())
           break;
+        // N5008 [temp.deduct.type]/8 (`T(T)' forms): the template's
+        // parameter needs its full type as well -- deducing from `T' alone
+        // gave T = ex * for `fn<void(T *)>' against `fn<void(ex *)>' and
+        // the substituted type mismatched (CBMC's own exprt::visit_pre's
+        // `visit_pre_template(std::function<void(T &)>, T *)', dog-fooding)
         guess_template_args(
-          tp.type(), full_function_parameter_type(desired_params[d_index]));
+          full_function_parameter_type(tp),
+          full_function_parameter_type(desired_params[d_index]));
         ++d_index;
       }
     }
