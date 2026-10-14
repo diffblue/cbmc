@@ -6620,15 +6620,8 @@ bool Parser::rTemplateArgs(irept &template_args)
   // C++11: Foo<> where >> is scanned as shift-right
   if(lex.LookAhead(0) == TOK_SHIFTRIGHT)
   {
-    cpp_token_buffert::post pos = lex.Save();
-    cpp_tokent tk2;
-    lex.get_token(tk2);
-    // split >> into > >
-    lex.Restore(pos);
-    tk2.kind = '>';
-    tk2.text = '>';
-    lex.Replace(tk2);
-    lex.Insert(tk2);
+    // split >> into > > (undone by a Restore before this point)
+    lex.split_shift_right();
     lex.get_token();
     DATA_INVARIANT(lex.LookAhead(0) == '>', "should be >");
     return true;
@@ -6800,10 +6793,7 @@ bool Parser::rTemplateArgs(irept &template_args)
 
     case TOK_SHIFTRIGHT: // turn >> into > >
       lex.Restore(pos);
-      tk2.kind='>';
-      tk2.text='>';
-      lex.Replace(tk2);
-      lex.Insert(tk2);
+      lex.split_shift_right();
       lex.get_token();
       DATA_INVARIANT(lex.LookAhead(0) == '>', "should be >");
       return true;
