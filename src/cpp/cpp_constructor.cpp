@@ -716,6 +716,11 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
 
     for(auto &op : operands_tc)
     {
+      // the elements of a braced-init-list argument belong to the
+      // initialization's context, not the constructor's class scope the
+      // overload resolution below runs in ([class.access.general]/5)
+      if(op.id() == ID_initializer_list)
+        typecheck_braced_argument_elements(op);
       typecheck_expr(op);
       add_implicit_dereference(op);
     }

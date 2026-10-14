@@ -1,0 +1,24 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* size: SUCCESS$
+^\[main\.assertion\.2\] .* no element destroyed yet: SUCCESS$
+^\[main\.assertion\.3\] .* element value: SUCCESS$
+^\[main\.assertion\.4\] .* destroyed with the variable: SUCCESS$
+^\[main\.assertion\.5\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The backing array (initializer_list_backing_array, cpp_typecheck_
+conversions.cpp) is a static-lifetime symbol; its class-type elements are
+copied into it by its static initializer and never destroyed ("destroyed
+with the variable" fails).  Giving the array the lifetime of the list
+object -- a block-scope temporary whose elements are copy-constructed and
+destroyed -- needs the lifetime machinery of [class.temporary]/6 for the
+array, as for a temporary bound to a reference.  g++ 13
+(-fsanitize=address,undefined) and clang++ 18 accept this program, and it
+fails only its WRONG assertion.

@@ -145,27 +145,20 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
 
     const std::size_t n = typed_elems.size();
     auto arr_type = array_typet{elem_type, from_integer(n, size_type())};
-    const std::string arr_id =
-      "__init_list_arr$" + std::to_string(anon_counter++);
-    auxiliary_symbolt arr_sym;
-    arr_sym.name = arr_id;
-    arr_sym.base_name = arr_id;
-    arr_sym.type = arr_type;
-    arr_sym.type.set(ID_C_constant, true);
-    arr_sym.mode = ID_cpp;
-    arr_sym.is_static_lifetime = true;
-    arr_sym.is_lvalue = true;
-    arr_sym.location = init_list.source_location();
-    arr_sym.value = array_exprt{std::move(typed_elems), arr_type};
-    symbol_table.insert(std::move(arr_sym));
+    std::optional<exprt> prefix;
+    symbol_exprt arr_ref = initializer_list_backing_array(
+      std::move(typed_elems),
+      arr_type,
+      init_list.source_location(),
+      true,
+      prefix);
+    arr_ref.type() = arr_type;
 
     // all-zero start so that the layout's padding components are present
     auto il_val_opt = zero_struct_value(il_type, init_list.source_location());
     if(!il_val_opt.has_value())
       return {};
     struct_exprt &il_val = *il_val_opt;
-    symbol_exprt arr_ref{arr_id, arr_type};
-    arr_ref.set(ID_C_lvalue, true);
     index_exprt first{arr_ref, from_integer(0, c_index_type()), elem_type};
     address_of_exprt addr{first};
     addr.type() = ptr_comp->type();
@@ -173,7 +166,8 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
     set_struct_member_value(
       il_val, il_struct, *size_comp, from_integer(n, size_comp->type()));
     il_val.add_source_location() = init_list.source_location();
-    return std::move(il_val);
+    return sequence_before(
+      std::move(prefix), std::move(il_val), init_list.source_location());
   }
   catch(...)
   {
