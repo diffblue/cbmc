@@ -14245,3 +14245,89 @@ cbmc-cpp 1847, cpp 246, goto-instrument 298, unit [smt2] 40 cases; lint 0;
 each commit compiles.  Killed (SIGKILL by PID; SIGTERM was blocked in a
 futex wait of the abort handler) 128 orphaned cbmc processes from old cvise
 runs, ~10 GB.
+
+## Round 185: bug-finding round (Docker matrix, dog-food sweep, audit)
+
+Four approaches run in parallel; everything found got a CORE test (no
+KNOWNBUG was needed -- every finding was fixed).  Commits, each with its
+test (all "failed before" on W100):
+- 2b8616cd36 [class.temporary]/6 Note 5: a temporary bound to a reference
+  MEMBER of a temporary/object lives as long as that object
+  (clean_expr_resultt::dependents, extended_by; remove_temporary_object
+  for aggregate values).  Guard test cpp11_temporary_destruction_points.
+- 7868a7a3f1 [expr.sub]/1 + [class.temporary]/6.3: `int &&a = arr3{1,2,3}
+  [i]' (reference_binding: subscript of an array prvalue is an xvalue).
+- bcc46d2de2 [temp.deduct.partial]/5-9: strict cv below the top level in
+  partial ordering (f(T *) vs f(const T *)), reference patterns /9.1-9.2.
+- 154ecd1f0b [expr.cond]/7.2 usual arithmetic conversions.
+- 6b144f2d8a clang 20's __builtin_common_type (libc++ 21's common_type):
+  builtin_common_type evaluates [meta.trans.other]/3-5; fixed 29 of the
+  58 ubuntu:26.04 (clang 21) cbmc-cpp failures.
+- a6d7edbb26 anonymous struct with a reference member (libc++ 21's
+  _LIBCPP_COMPRESSED_PAIR in __split_buffer<T, Alloc &>): the
+  [class.union.general]/3 check is for unions only; several
+  mem-initializers naming members of one anonymous struct; reference
+  member of the anonymous struct bound by name.
+- dc7dcdeec2 braced-init-list argument elements typechecked at the call
+  site also for constructor calls ([class.access.general]/5), and the
+  initializer_list backing array is assigned where the list is evaluated
+  when its elements are not constants ([dcl.init.list]/5; a static
+  initializer read a local before it existed).  Found by dog-fooding
+  guard_exprt::add (`and_exprt a({this->expr})').
+- 0be8aa839b parser marks braced mem-initializers (#braced_init);
+  [over.match.list] phase 1 for `ops{a, b}' with class-type elements.
+- 5c499aeeea [stmt.pre]/4-6 condition declarations of class type (the
+  decl_block holds the constructor call too; if and while).
+- a764ccc413 out-of-class constructor mem-initializers resolved in the
+  class scope ([class.base.init]/2 through a member typedef).
+- 30514ae682 implicit_conversion_sequence elaborates the source
+  expression's class ([temp.inst]/2; `auto n = later_member()' then
+  `if(n)' read "struct nil").
+- b3e2908b6c pointers to virtual member functions ([expr.mptr.oper]/4):
+  `&C::vf' designates a thunk `C::vf@virtual' whose body is the virtual
+  call (virtual_dispatch_thunk); formerly rejected outright.
+- d24dbe95b7 [temp.friend]/1 friend declaration naming a specialization
+  of a function template of another namespace (gcc 16's <compare>:
+  __cmp_cat::__make<partial_ordering>) -- records the template as friend.
+- 77b348f089 parser: a class template name without arguments is not a
+  type for the [stmt.ambig] disambiguation (`set(o);' calls the member).
+- 2eb4ec2019 [temp.deduct.call]/1 braced-init-list argument is a
+  non-deduced context -> default template argument ([temp.deduct]/5);
+  `return {{b, e}}' into optional<chk> reaches the constructor path.
+- 4e86f1a897 [dcl.init.ref]/5.4.1: `E &&' does not bind to a `const E'
+  prvalue (was ambiguous with `const E &'); `E{2}' (compound literal)
+  binds `E &&' by the identity conversion ([over.ics.rank]/3.2.3).
+- 660eecfab8 the hidden @most_derived parameter made the DEFAULT
+  constructor of std::istringstream a converting constructor from bool
+  (`std::istringstream in("text")' ambiguous).
+- dogfood_snapshot.sh: quote DOGFOOD_DIRS (a multi-directory sweep only
+  covered the first directory).
+
+Docker matrix (host W100 binary, cbmc-cpp CORE, logs /tmp/r185/docker):
+ubuntu:26.04 (gcc 15.2, clang/libc++ 21.1) 58 failed, ubuntu:25.04
+(gcc 14.2, clang/libc++ 20.1) 55, fedora:41 (gcc 14.3, clang/libc++ 19.1)
+35, opensuse/tumbleweed (gcc 16.2, clang/libc++ 23.1) 38, archlinux (gcc
+16.2, clang 23.1) 145 of which 140 are the container's own breakage
+(partial upgrade: `clang: GLIBC_2.44 not found') -- not CBMC.  Roots:
+__builtin_common_type and the compressed-pair anonymous struct (libc++
+21+), gcc 16 <compare> friend template-id (all gcc-16 images), gcc 16
+<format> `__formatter_ptr' redeclaration (open, see below), and the
+pre-existing libc++ 19/20 layer (`__declval' not found, synth_three_way
+`_Tp' unknown, `__and_helper').  The preprocessed failing tests of
+ubuntu:26.04 / fedora:41 are in /tmp/r185/docker/ii21, ii19 (run.sh
+replays them with any host binary).
+
+Dog-food sweep (fixed script, whole src/ except libcprover-rust, miniz):
+the W102 pass found local_safe_pointers.cpp, ansi_c_language.cpp,
+c_nondet_symbol_factory.cpp, c_preprocess.cpp, expr2c.cpp,
+format_strings.cpp, goto_check_c.cpp, builtin_factory.cpp (all fixed
+above); a W104 sweep is running in /tmp/dogfood-snapshots (DONE marker).
+Known non-bugs in a snapshot: generated .inc files are absent from the
+worktree (ansi_c_internal_additions.cpp, cprover_library.cpp).
+
+Audit probes (/tmp/r185/audit): [class.temporary] (ct*), aggregates/
+designated initializers (ag1: clean), [class.copy.elision] (ce2: clean),
+[class.conv.fct]/[expr.cond] (cv1: clean), [class.base.init] order and
+virtual bases (bi1: clean), [temp.dep.candidate]/[temp.friend]/
+[temp.spec.partial] (tp1: clean), partial ordering (tp2-5: fixed),
+pointers to members (ptm*: fixed).

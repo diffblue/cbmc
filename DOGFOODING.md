@@ -1953,3 +1953,61 @@ where threadt holds `std::vector<framet>` and framet holds
 constructible, exercised only through emplace_back/push_back -- is
 ACCEPTED by the front end (no signature).  So the trigger is not the
 plain nested-container shape.
+
+## Sweep 2026-10-13/14 (round 185; whole src/ except libcprover-rust, miniz)
+
+`scripts/dogfood_snapshot.sh` with several DIRS swept only the first one
+(unquoted `export DOGFOOD_DIRS=a b c'); fixed.  Two snapshot artifacts are
+not bugs: the generated `.inc' files are absent from the worktree
+(ansi_c_internal_additions.cpp, cprover_library.cpp).
+
+FAILs found and fixed (each with a cbmc-cpp CORE test):
+- guard_expr.cpp: `and_exprt a({this->expr})' -- the braced-list element
+  was typechecked in the callee's scope ("member 'expr' is not accessible
+  (private)"), and the initializer_list backing array was a static
+  initializer reading the local (dc7dcdeec2).  The same file's
+  `and_exprt(std::vector<exprt>)' shape: a braced mem-initializer with
+  class-type elements must select the initializer-list constructor
+  (0be8aa839b).
+- local_safe_pointers.cpp: `if(auto r = get_null_checked_expr(...))' -- a
+  condition declaration of class type (5c499aeeea); its
+  `return {{checked_when_taken, op1}}' into std::optional
+  (template <class U = T> optional(U &&) with a braced-list argument,
+  2eb4ec2019).
+- full_array_abstract_object.cpp: out-of-class constructor naming its base
+  through a member typedef (a764ccc413).
+- invariant_set.cpp: `if(const auto number = map.get_number(s))' with the
+  member declared later and returning std::optional (30514ae682).
+- object_factory_parameters.h (ansi_c_language.cpp,
+  c_nondet_symbol_factory.cpp): `set(options);' parsed as a declaration
+  because std::set is a class template (77b348f089).
+- goto_check_c.cpp, expr2c.cpp, format_strings.cpp: `push_back(c ? f(op) :
+  op)' / `dest = integer2string(v)' ambiguous between the const-reference
+  and rvalue-reference overloads -- a `const E' prvalue must not bind to
+  `E &&' (4e86f1a897).
+- c_preprocess.cpp, builtin_factory.cpp: `std::istringstream in(text)' --
+  the hidden @most_derived parameter made the default constructor a
+  converting constructor from bool (660eecfab8).
+
+## Docker matrix 2026-10-13 (host W100 binary, cbmc-cpp CORE)
+
+| image | toolchain | result (W100) | after round-185 fixes |
+|---|---|---|---|
+| ubuntu:26.04 | gcc 15.2, clang/libc++ 21.1 | 58 fail | 13 (libc++ 19+ layer, below) |
+| ubuntu:25.04 | gcc 14.2, clang/libc++ 20.1 | 55 fail | not re-run |
+| fedora:41 | gcc 14.3, clang/libc++ 19.1 | 35 fail | 13 (same layer) |
+| opensuse/tumbleweed | gcc 16.2, clang/libc++ 23.1 | 38 fail | <compare>/<format> fixed; libc++ layer open |
+| archlinux | gcc 16.2, clang 23.1 | 145 fail | 140 are the container's own breakage (`clang: GLIBC_2.44 not found') |
+
+Roots fixed: clang 20's `__builtin_common_type' (libc++ 21's common_type,
+6b144f2d8a); libc++ 21's _LIBCPP_COMPRESSED_PAIR anonymous struct holding
+an `Alloc &' (a6d7edbb26); gcc 16 <compare>'s friend template-id
+`__cmp_cat::__make<partial_ordering>' (d24dbe95b7); gcc 16 <format>'s
+`__formatter_ptr' redeclared with a differently qualified concept
+(9d6ec5ef00).  Open: the libc++ 19/20/21 layer shared by variant, apply /
+tuple_size, bind_back / functional, ranges views and optional monadic
+(`__declval' / `__and_helper' / `__try_call' not found inside SFINAE
+probes; variant's `__best_match_t' yields nil) -- a cvise reduction of the
+fedora:41 variant test runs in /tmp/r185/cvise2.  The preprocessed failing
+tests are kept in /tmp/r185/docker/ii21 (ubuntu:26.04) and ii19
+(fedora:41); `run.sh CBMC OUT' replays them with any host binary.
