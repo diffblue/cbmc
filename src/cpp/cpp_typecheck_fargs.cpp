@@ -15,6 +15,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/pointer_expr.h>
 #include <util/std_types.h>
 
+#include <ansi-c/c_qualifiers.h>
+
 #include "cpp_typecheck.h"
 
 bool cpp_typecheck_fargst::has_class_type() const
@@ -582,6 +584,38 @@ bool cpp_typecheck_fargst::match(
     {
       // ok
       distance += rank;
+      // N5008 [over.ics.rank]/4.1: a conversion that does not convert a
+      // pointer to bool is better than one that does; /4.4.2: converting
+      // a pointer to a class to a pointer to its base is better than to
+      // `void *'.  These tie-break conversions of the same rank, in the
+      // lowest-order key: `out << sb' with operator<<(bool), (const void
+      // *) and (basic_streambuf *) for a basic_stringbuf * argument
+      // (CBMC's own goto-cc compile.cpp, `out << in.rdbuf()', dog-fooding)
+      // was ambiguous.
+      if(
+        cv_distance != nullptr && operand.type().id() == ID_pointer &&
+        !is_reference(operand.type()) &&
+        to_pointer_type(operand.type()).base_type().id() != ID_code)
+      {
+        const typet &target =
+          is_reference(type) ? to_reference_type(type).base_type() : type;
+        // (the keys: to a base pointer 0, to `void *' 1 -- plus 1 for
+        // added qualification, [over.ics.rank]/3.2.5 -- to bool 3)
+        if(target.id() == ID_bool || target.id() == ID_c_bool)
+          *cv_distance += 3;
+        else if(
+          target.id() == ID_pointer && !is_reference(target) &&
+          to_pointer_type(target).base_type().id() == ID_empty &&
+          to_pointer_type(operand.type()).base_type().id() != ID_empty)
+        {
+          *cv_distance += 1;
+          c_qualifierst q_from, q_to;
+          q_from.read(to_pointer_type(operand.type()).base_type());
+          q_to.read(to_pointer_type(target).base_type());
+          if(q_from != q_to)
+            *cv_distance += 1;
+        }
+      }
 #if 0
       std::cout << "OK " << rank << '\n';
 #endif

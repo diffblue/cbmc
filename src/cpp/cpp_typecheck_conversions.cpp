@@ -808,6 +808,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
   exprt &new_expr,
   unsigned &rank)
 {
+  // whether a pointer conversion ([conv.ptr]) is part of the sequence
+  bool pointer_converted = false;
+
   PRECONDITION(!is_reference(expr.type()) && !is_reference(type));
 
   exprt curr_expr = expr;
@@ -949,6 +952,7 @@ bool cpp_typecheckt::standard_conversion_sequence(
       }
 
       rank += 3;
+      pointer_converted = true;
     }
     else if(type.id() == ID_c_bool)
     {
@@ -1017,7 +1021,15 @@ bool cpp_typecheckt::standard_conversion_sequence(
 
       if(qual_from != qual_to)
       {
-        rank += 1;
+        // N5008 [over.ics.scs]/3: a qualification adjustment following a
+        // pointer conversion is part of that Conversion.  The extra rank step
+        // orders `Derived * -> Base *' before `-> const Base *'
+        // ([over.ics.rank]/3.2.5) and is kept for that; for a conversion to
+        // `cv void *' it made `int * -> const void *' worse than the boolean
+        // conversion, which [over.ics.rank]/4.1 makes worse -- there the
+        // qualification is a tie-breaker of cpp_typecheck_fargst::match.
+        if(!pointer_converted || sub_to.id() != ID_empty)
+          rank += 1;
         break;
       }
     } while(sub_from.id() == ID_pointer);
