@@ -1330,7 +1330,8 @@ protected:
   static constexpr const char *lambda_this_capture = "__cbmc_lambda_this";
   void rewrite_lambda_this_uses(
     irept &body,
-    const std::set<irep_idt> &member_functions);
+    const std::set<irep_idt> &member_functions,
+    const std::set<irep_idt> &class_names = {});
   bool bind_requires_parameter_pack(const irep_idt &name, const typet &type);
   void expand_requires_parameter_packs(exprt &expr);
   void expand_requires_parameter_packs_in_type(irept &type);
