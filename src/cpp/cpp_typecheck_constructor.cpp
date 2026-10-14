@@ -2101,6 +2101,52 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
   return false;
 }
 
+/// Whether a constructor template of \p class_type can be called with a
+/// single argument: it has at most one parameter without a default argument,
+/// or a parameter pack.  (Unknown shapes count as callable.)
+bool cpp_typecheckt::has_unary_constructor_template(
+  const struct_tag_typet &class_type)
+{
+  const irep_idt &class_id = class_type.get_identifier();
+  const auto scope_it = cpp_scopes.id_map.find(class_id);
+  if(scope_it == cpp_scopes.id_map.end())
+    return true;
+  const symbolt &class_symbol = lookup(class_id);
+  const auto templates = static_cast<cpp_scopet &>(*scope_it->second)
+                           .lookup(
+                             class_symbol.base_name,
+                             cpp_scopet::SCOPE_ONLY,
+                             cpp_idt::id_classt::TEMPLATE);
+  for(const auto *id_ptr : templates)
+  {
+    const symbolt *tmpl = symbol_table.lookup(id_ptr->identifier);
+    if(tmpl == nullptr || tmpl->type.id() != ID_cpp_declaration)
+      return true;
+    const cpp_declarationt &decl = to_cpp_declaration(tmpl->type);
+    if(decl.declarators().empty())
+      return true;
+    const irept &params = decl.declarators().front().type().find(ID_parameters);
+    std::size_t required = 0;
+    bool variadic = false;
+    for(const auto &p : params.get_sub())
+    {
+      if(p.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &pd = to_cpp_declaration(p);
+      if(pd.declarators().empty())
+        continue;
+      const cpp_declaratort &pdecl = pd.declarators().front();
+      if(pdecl.get_bool(ID_ellipsis) || pdecl.type().get_bool(ID_ellipsis))
+        variadic = true;
+      else if(pdecl.value().is_nil())
+        ++required;
+    }
+    if(variadic || required <= 1)
+      return true;
+  }
+  return false;
+}
+
 /// Whether \p symbol has a (user-declared) move constructor: a constructor
 /// whose first parameter is `X &&' (possibly cv-qualified) and whose other
 /// parameters have default arguments ([class.copy.ctor]/3)
@@ -2134,6 +2180,7 @@ bool cpp_typecheckt::find_mvctor(const symbolt &symbol) const
   }
   return false;
 }
+
 /// Turn the `const X &' parameter of an implicit copy constructor or copy
 /// assignment operator declarator (default_cpctor, default_assignop) into
 /// the `X &&' of the corresponding move operation
@@ -2154,6 +2201,7 @@ void cpp_typecheckt::make_move_parameter(cpp_declaratort &declarator)
   parameter.declarators().front().type().set(ID_C_rvalue_reference, true);
   declarator.type().set("#is_implicit_move", true);
 }
+
 bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
 {
   const struct_union_typet &struct_type = to_struct_union_type(symbol.type);
