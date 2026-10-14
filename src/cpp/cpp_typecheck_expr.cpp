@@ -12071,6 +12071,14 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           }
           continue;
         }
+        // N5008 [expr.prim.lambda.capture]/8: only non-static DATA members
+        // are captured through `this'; a member typedef or a static member
+        // named in the body (`for(node_indext i = 0; ...)', util/graph.h's
+        // output_dot, dog-fooding) is not -- it was type-checked as a
+        // capture expression and failed ("symbol 'node_indext' does not
+        // uniquely resolve").
+        if(comp->get_bool(ID_is_type) || comp->get_bool(ID_is_static))
+          continue;
         if(comp->type().id() == ID_code)
         {
           // odr-use of a member function: called through the captured
