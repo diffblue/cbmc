@@ -13879,6 +13879,15 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
     if(arg_type.id() != ID_struct_tag && arg_type.id() != ID_union_tag)
       return;
 
+    // N5008 [temp.inst]/2: the associated classes and namespaces of a class
+    // template specialization depend on its definition (friends, bases),
+    // so it is instantiated here.  Without it, a specialization used only
+    // in the return type of a declared function -- `transform(s.begin(),
+    // ...)' over __gnu_cxx::__normal_iterator<char *, std::string> -- had
+    // no scope, and no namespace was searched (CBMC's own
+    // ms_link_cmdline.cpp, dog-fooding).
+    cpp_typecheck.elaborate_class_template(arg_type);
+
     const struct_union_typet &final_type =
       arg_type.id() == ID_struct_tag
         ? static_cast<const struct_union_typet &>(
