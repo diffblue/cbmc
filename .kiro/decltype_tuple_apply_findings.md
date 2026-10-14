@@ -14300,8 +14300,19 @@ test (all "failed before" on W100):
 - 660eecfab8 the hidden @most_derived parameter made the DEFAULT
   constructor of std::istringstream a converting constructor from bool
   (`std::istringstream in("text")' ambiguous).
+- 9d6ec5ef00/e400e883fa [temp.over.link]: a class template redeclared
+  with its concept qualified differently (gcc 16 <format>'s
+  __formatter_ptr) is the same template.
+- 574d5c1a0a [temp.deduct.general]/8.1: a reference to void in the RETURN
+  type of a specialization is a deduction failure (libc++'s declval<void>).
+- 603c544224 [over.match.oper]/3: overloaded operator->*.
+- KNOWNBUG cpp11_initializer_list_elements_destroyed_with_the_array: the
+  class-type elements of an initializer_list's backing array (a static
+  symbol) are never destroyed ([dcl.init.list]/6).
 - dogfood_snapshot.sh: quote DOGFOOD_DIRS (a multi-directory sweep only
   covered the first directory).
+(Commit ids before the fixup rebase of the backing-array commit; `git log'
+has the final ones.)
 
 Docker matrix (host W100 binary, cbmc-cpp CORE, logs /tmp/r185/docker):
 ubuntu:26.04 (gcc 15.2, clang/libc++ 21.1) 58 failed, ubuntu:25.04
@@ -14321,7 +14332,9 @@ Dog-food sweep (fixed script, whole src/ except libcprover-rust, miniz):
 the W102 pass found local_safe_pointers.cpp, ansi_c_language.cpp,
 c_nondet_symbol_factory.cpp, c_preprocess.cpp, expr2c.cpp,
 format_strings.cpp, goto_check_c.cpp, builtin_factory.cpp (all fixed
-above); a W104 sweep is running in /tmp/dogfood-snapshots (DONE marker).
+above); the final sweep with the HEAD goto-cc runs in
+/tmp/dogfood-snapshots/574d5c1a0a-* (DONE marker; 0 FAIL after 46 files
+at the time of writing).
 Known non-bugs in a snapshot: generated .inc files are absent from the
 worktree (ansi_c_internal_additions.cpp, cprover_library.cpp).
 
@@ -14331,3 +14344,9 @@ designated initializers (ag1: clean), [class.copy.elision] (ce2: clean),
 virtual bases (bi1: clean), [temp.dep.candidate]/[temp.friend]/
 [temp.spec.partial] (tp1: clean), partial ordering (tp2-5: fixed),
 pointers to members (ptm*: fixed).
+Suites W107 (HEAD): cbmc-cpp 1869, cpp 246, goto-instrument 298, all exit
+0; regression/cbmc 1208 (W105; only C++ files changed after); lint 0;
+every commit compiles (cc_check 3729283994..HEAD).  Open: the libc++ 19+
+layer (13 preprocessed tests in /tmp/r185/docker/ii19 and ii21 still
+CONVERSION ERROR; cvise of the variant test in /tmp/r185/cvise2), the
+gcc 16 <format> test now type-checks but BMC runs long (gcc16_format.log).
