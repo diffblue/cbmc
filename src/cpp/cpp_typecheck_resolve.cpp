@@ -11290,6 +11290,16 @@ bool cpp_typecheck_resolvet::substitute_function_type(
         return false;
       }
     }
+    // the same for the return type: `T &&f(int)' with T = void (libc++'s
+    // `__declval<_Tp>(int)' for declval<void>(), whose second overload
+    // `_Tp __declval(long)' is then the one selected)
+    const typet &return_type = to_code_type(function_type).return_type();
+    if(
+      is_reference(return_type) &&
+      to_reference_type(return_type).base_type().id() == ID_empty)
+    {
+      return false;
+    }
   }
   return true;
 }
