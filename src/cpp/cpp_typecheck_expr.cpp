@@ -1474,7 +1474,14 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
   else if(expr.id() == "cpp-this")
     typecheck_expr_this(expr);
   else if(expr.id() == ID_pointer_to_member)
-    convert_pmop(expr);
+  {
+    // N5008 [over.match.oper]/3: `a->*b' with a left operand of class type
+    // considers the overloaded `operator->*' (member and non-member
+    // candidates) -- the smart-pointer idiom; only `.*' is not
+    // overloadable ([over.oper.general]/3)
+    if(!operator_is_overloaded(expr))
+      convert_pmop(expr);
+  }
   else if(expr.id() == ID_new_object)
   {
   }
@@ -4627,7 +4634,8 @@ struct operator_entryt
   {ID_equal, "=="},      {ID_lt, "<"},          {ID_le, "<="},
   {ID_gt, ">"},          {ID_ge, ">="},         {ID_spaceship, "<=>"},
   {ID_shl, "<<"},        {ID_shr, ">>"},        {ID_notequal, "!="},
-  {ID_dereference, "*"}, {ID_ptrmember, "->"},  {irep_idt(), nullptr}};
+  {ID_dereference, "*"}, {ID_ptrmember, "->"},  {ID_pointer_to_member, "->*"},
+  {irep_idt(), nullptr}};
 
 /// N5008 [over.match.oper]/3.4 (C++20): the rewritten and reversed
 /// candidates of a comparison `x @ y' -- `(x <=> y) @ 0', `0 @ (y <=> x)',
