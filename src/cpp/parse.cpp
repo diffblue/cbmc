@@ -14036,7 +14036,14 @@ Parser::rOtherDeclStatement(cpp_storage_spect &storage_spec, typet &cv_q)
     if(n.id() == ID_name)
     {
       const new_scopet *found = lookup_id(n.get(ID_identifier));
-      decl_specifier_is_known_type = found != nullptr && found->is_type();
+      // a class TEMPLATE name without template arguments is not a type
+      // ([temp.names], [dcl.type.simple]): `set(o);' in a constructor body
+      // calls the member function `set' declared later in the class
+      // ([class.mem.general]/7), even with std::set in scope -- it is not a
+      // declaration of o (CBMC's own object_factory_parameterst)
+      decl_specifier_is_known_type =
+        found != nullptr && found->is_type() &&
+        found->kind != new_scopet::kindt::CLASS_TEMPLATE;
       decl_specifier_is_class_name =
         found != nullptr && found->kind == new_scopet::kindt::TAG;
     }
