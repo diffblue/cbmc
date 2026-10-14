@@ -369,6 +369,14 @@ symbolt &cpp_declarator_convertert::convert(
       if(declarator.find(ID_member_initializers).is_nil())
         declarator.set(ID_member_initializers, ID_member_initializers);
 
+      // N5008 [class.base.init]/2, [class.mfct]/1: the mem-initializer-ids
+      // of an out-of-class constructor definition are looked up in the
+      // class's scope -- a base named by a member typedef (`derived::
+      // derived(int x) : my_base(x)' with `typedef base<...> my_base' in the
+      // class) resolved in the enclosing namespace scope was "unknown".
+      cpp_save_scopet save_scope(cpp_typecheck.cpp_scopes);
+      cpp_typecheck.cpp_scopes.set_scope(symb.name);
+
       cpp_typecheck.check_member_initializers(
         type.bases(),
         type.components(),
