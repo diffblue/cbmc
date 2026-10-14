@@ -2011,3 +2011,32 @@ probes; variant's `__best_match_t' yields nil) -- a cvise reduction of the
 fedora:41 variant test runs in /tmp/r185/cvise2.  The preprocessed failing
 tests are kept in /tmp/r185/docker/ii21 (ubuntu:26.04) and ii19
 (fedora:41); `run.sh CBMC OUT' replays them with any host binary.
+
+## Sweep 2026-10-14 (round 185, after the second batch of fixes)
+
+The W115 sweep (/tmp/dogfood-snapshots/076836390d-*) was stopped after 361
+files once its failures were triaged; all of the following compile with
+the HEAD goto-cc (each fix has a cbmc-cpp CORE test, see
+.kiro/decltype_tuple_apply_findings.md, round 185 second addendum):
+compile.cpp, ld_mode.cpp (`out << in.rdbuf()' ranking), ms_link_cmdline.cpp
+(ADL instantiation), acceleration_utils.cpp (explicit constructor
+template), function_call_harness_generator.cpp and
+memory_snapshot_harness_generator.cpp (`auto &f = fn'),
+goto_harness_parse_options.cpp and path_storage.cpp (nested constraint
+conversions), solver_factory.cpp (base-specifier lookup),
+interpreter.cpp (`{}' viability), event_graph.cpp (`operator[](a)(b);'),
+goto_symex_state.cpp (`m({true})'; copying a std::deque crashed symex),
+expr.cpp (visit_pre_template deduction), xml_goto_trace.cpp (ADL found a
+data member), shared_buffers.cpp (`(obj)(arg)'), contracts.cpp and
+dfcc_instrument_loop.cpp (unary + on a string literal, `T x({})'),
+contracts/utils.cpp (qualified member call in a lambda),
+goto_instrument_parse_options.cpp (a block-scope object suppresses ADL;
+it needs ~975 s, above the sweep's 900 s TIMEOUT).
+
+A fresh sweep with the HEAD goto-cc runs in
+/tmp/dogfood-snapshots/74d53f4318-* (DONE marker when finished).
+Another snapshot artifact: dogfood_goto_cc.sh passes only the -I flags of
+util/irep_hash.cpp, no -D flags, so files that need SATCHECK_* (satcheckt
+in bv_minimize.h: counterexample_found.cpp, inductiveness.cpp,
+counterexample_beautification.cpp, ...) fail in the sweep and compile with
+their real compile_commands flags (/tmp/r185/df.sh).
