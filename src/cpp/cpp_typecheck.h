@@ -1305,6 +1305,7 @@ protected:
   void typecheck_expr_new(exprt &);
   void typecheck_expr_sizeof(exprt &) override;
   void typecheck_expr_is_invocable(exprt &expr);
+  void typecheck_braced_argument_elements(exprt &init_list);
   std::optional<typet> builtin_common_type(
     const irep_idt &base_template,
     const std::vector<typet> &types,
@@ -1631,6 +1632,16 @@ public:
     const typet &to,
     exprt &new_expr);
 
+  symbol_exprt initializer_list_backing_array(
+    exprt::operandst elements,
+    const array_typet &array_type,
+    const source_locationt &source_location,
+    bool constant,
+    std::optional<exprt> &prefix);
+  static exprt sequence_before(
+    std::optional<exprt> prefix,
+    exprt result,
+    const source_locationt &source_location);
   bool brace_init_to_array_reference(
     const exprt &init_list,
     const pointer_typet &reference_type,
