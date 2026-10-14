@@ -4148,6 +4148,102 @@ bool cpp_typecheckt::implicit_conversion_sequence(
   return implicit_conversion_sequence(expr, type, new_expr, rank);
 }
 
+/// N5008 [dcl.init.list]/5-6: the backing array of a braced-init-list (the
+/// `const E[N]' an initializer_list<E> refers to, or the temporary array a
+/// reference to array binds to) with \p elements, each already converted to
+/// the element type.  The array is a static-lifetime symbol; its elements
+/// are its static initializer when they are constants, and are otherwise
+/// assigned where the list is evaluated: \p prefix then receives that
+/// assignment, which the caller must sequence before its result (a comma
+/// expression) -- a static initializer naming a local (`{e}' with `E e')
+/// read the local before it existed.
+/// \return the array symbol, an lvalue
+symbol_exprt cpp_typecheckt::initializer_list_backing_array(
+  exprt::operandst elements,
+  const array_typet &array_type,
+  const source_locationt &source_location,
+  bool constant,
+  std::optional<exprt> &prefix)
+{
+  const std::function<bool(const exprt &)> is_constant_initializer =
+    [&](const exprt &e)
+  {
+    if(e.is_constant() || e.id() == ID_string_constant || e.is_nil())
+      return true;
+    if(
+      e.id() == ID_struct || e.id() == ID_array || e.id() == ID_union ||
+      e.id() == ID_typecast || e.id() == ID_address_of)
+    {
+      for(const auto &op : e.operands())
+        if(!is_constant_initializer(op))
+          return false;
+      return true;
+    }
+    return false;
+  };
+  bool all_constant = true;
+  for(const auto &e : elements)
+    if(!is_constant_initializer(e))
+      all_constant = false;
+  // Elements of a class type with a destructor are OBJECTS of the array
+  // ([dcl.init.list]/5), to be destroyed with it ([dcl.init.list]/6); the
+  // assignment below would destroy the constructor temporaries at the end
+  // of the full-expression and never the elements.  Keep such elements
+  // in the static initializer (the previous behaviour, which destroys
+  // nothing) until the array gets a lifetime of its own.
+  typet element_type = array_type.element_type();
+  while(element_type.id() == ID_array)
+    element_type = to_array_type(element_type).element_type();
+  if(element_type.id() == ID_struct_tag && !cpp_is_pod(element_type))
+    all_constant = true;
+
+  const auto arr_id = "__init_list_arr$" + std::to_string(anon_counter++);
+  auxiliary_symbolt arr_sym;
+  arr_sym.name = arr_id;
+  arr_sym.base_name = arr_id;
+  arr_sym.type = array_type;
+  if(constant)
+    arr_sym.type.set(ID_C_constant, true);
+  arr_sym.mode = ID_cpp;
+  arr_sym.is_static_lifetime = true;
+  arr_sym.is_lvalue = true;
+  arr_sym.location = source_location;
+  symbol_exprt arr_ref{arr_id, arr_sym.type};
+  arr_ref.set(ID_C_lvalue, true);
+  arr_ref.add_source_location() = source_location;
+  if(all_constant)
+    arr_sym.value = array_exprt{std::move(elements), array_type};
+  else
+  {
+    // the elements are evaluated where the list is ([dcl.init.list]/5:
+    // the array's elements are copy-initialized from the list's)
+    symbol_exprt lhs = arr_ref;
+    lhs.type() = array_type; // assignable
+    side_effect_exprt assign{
+      ID_assign,
+      {std::move(lhs), array_exprt{std::move(elements), array_type}},
+      array_type,
+      source_location};
+    prefix = std::move(assign);
+  }
+  symbol_table.add(arr_sym);
+  return arr_ref;
+}
+
+/// \p prefix (see initializer_list_backing_array) sequenced before \p result
+exprt cpp_typecheckt::sequence_before(
+  std::optional<exprt> prefix,
+  exprt result,
+  const source_locationt &source_location)
+{
+  if(!prefix.has_value())
+    return result;
+  exprt comma{ID_comma, result.type()};
+  comma.add_to_operands(std::move(*prefix), std::move(result));
+  comma.add_source_location() = source_location;
+  return comma;
+}
+
 /// N5008 [dcl.init.list]/3.4 + [dcl.init.ref]/5.4.2: a braced-init-list
 /// for a REFERENCE TO ARRAY parameter (`_Dest (&&)[1]', libc++ variant's
 /// narrowing check `__test_impl<_Dest>({std::declval<_Source>()})')
@@ -4183,23 +4279,17 @@ bool cpp_typecheckt::brace_init_to_array_reference(
   }
   array_typet temporary_type = array_type;
   temporary_type.remove(ID_C_constant);
-  const auto arr_id = "__init_list_arr$" + std::to_string(anon_counter++);
-  auxiliary_symbolt arr_sym;
-  arr_sym.name = arr_id;
-  arr_sym.base_name = arr_id;
-  arr_sym.type = temporary_type;
-  arr_sym.mode = ID_cpp;
-  arr_sym.is_static_lifetime = true;
-  arr_sym.is_lvalue = true;
-  arr_sym.location = init_list.source_location();
-  arr_sym.value = array_exprt{std::move(elements), temporary_type};
-  symbol_table.add(arr_sym);
-  symbol_exprt arr_ref(arr_id, temporary_type);
-  arr_ref.set(ID_C_lvalue, true);
-  arr_ref.add_source_location() = init_list.source_location();
+  std::optional<exprt> prefix;
+  symbol_exprt arr_ref = initializer_list_backing_array(
+    std::move(elements),
+    temporary_type,
+    init_list.source_location(),
+    false,
+    prefix);
   address_of_exprt bound_ref{arr_ref, reference_type};
   bound_ref.add_source_location() = init_list.source_location();
-  result = std::move(bound_ref);
+  result = sequence_before(
+    std::move(prefix), std::move(bound_ref), init_list.source_location());
   return true;
 }
 
@@ -5085,31 +5175,16 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
           const auto arr_type =
             array_typet(elem_type, from_integer(n, size_type()));
 
-          // Create a symbol for the backing array
-          const auto arr_id =
-            "__init_list_arr$" + std::to_string(anon_counter++);
-          auxiliary_symbolt arr_sym;
-          arr_sym.name = arr_id;
-          arr_sym.base_name = arr_id;
-          arr_sym.type = arr_type;
-          arr_sym.type.set(ID_C_constant, true);
-          arr_sym.mode = ID_cpp;
-          arr_sym.is_static_lifetime = true;
-          arr_sym.is_lvalue = true;
-          arr_sym.location = orig_expr.source_location();
-          arr_sym.value = array_exprt(std::move(typed_elems), arr_type);
-          symbol_table.add(arr_sym);
-
-          symbol_exprt arr_ref(arr_id, arr_type);
-          arr_ref.add_source_location() = orig_expr.source_location();
-          // The backing array symbol is created with
-          // `is_lvalue = true`; carry that through the symbol_exprt
-          // so callers (in particular the `address_of_exprt &arr[0]`
-          // built below) see a proper lvalue and downstream uses
-          // such as recursive `implicit_typecast` from the brace-
-          // init-to-class-with-init_list-ctor handler don't trip
-          // the "address_of: not an lvalue" path.
-          arr_ref.set(ID_C_lvalue, true);
+          // Create a symbol for the backing array (an lvalue, so that the
+          // `&arr[0]' built below is one)
+          std::optional<exprt> prefix;
+          symbol_exprt arr_ref = initializer_list_backing_array(
+            std::move(typed_elems),
+            arr_type,
+            orig_expr.source_location(),
+            true,
+            prefix);
+          arr_ref.type() = arr_type;
 
           // Build struct { &arr[0], n }
           // Find the two data members (pointer and size)
@@ -5145,7 +5220,10 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
               *size_comp,
               from_integer(n, size_comp->type()));
             result.add_source_location() = orig_expr.source_location();
-            expr = std::move(result);
+            expr = sequence_before(
+              std::move(prefix),
+              std::move(result),
+              orig_expr.source_location());
             return;
           }
         }

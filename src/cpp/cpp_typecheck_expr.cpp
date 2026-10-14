@@ -4150,6 +4150,44 @@ std::optional<typet> cpp_typecheckt::builtin_common_type(
   }
   return {};
 }
+/// N5008 [class.access.general]/5: access control for a name is judged in
+/// the context in which the name APPEARS.  The elements of a braced-init-list
+/// argument (`wrapt w({this->member})') are expressions of the call site;
+/// typecheck them in the calling member's scope and mark them done.  Deferred
+/// to the conversion machinery (which runs during overload resolution, in the
+/// callee class's scope), the enclosing class's own private members were
+/// judged inaccessible.  Nested lists and elements already typechecked keep
+/// their target-dependent handling.
+void cpp_typecheckt::typecheck_braced_argument_elements(exprt &init_list)
+{
+  for(auto &element : init_list.operands())
+  {
+    if(
+      element.id() == ID_initializer_list ||
+      element.id() == ID_already_typechecked ||
+      (!element.type().id().empty() && !element.type().is_nil()))
+    {
+      continue;
+    }
+    try
+    {
+      exprt tmp = element;
+      typecheck_expr(tmp);
+      tmp.set(ID_C_braced_element_typechecked, true);
+      // Expose the element's type on the wrapper so candidate matching
+      // (brace_init_is_viable, fargs) sees it; the later unwrap in
+      // typecheck_expr is unaffected.
+      typet element_type = tmp.type();
+      already_typechecked_exprt::make_already_typechecked(tmp);
+      tmp.type() = std::move(element_type);
+      element.swap(tmp);
+    }
+    catch(...)
+    {
+      // leave the element for the conversion machinery
+    }
+  }
+}
 void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 {
   // We need to overload, "sizeof-expression" can be mis-parsed
@@ -6330,7 +6368,13 @@ bool cpp_typecheckt::has_viable_init_list_constructor(
       unsigned rank = 0;
       try
       {
-        typecheck_expr(tc);
+        // an element typechecked at the call site (a member access
+        // `this->m' judged accessible there, [class.access.general]/5) is
+        // not resolved again here, in the callee class's scope; it is
+        // marked by typecheck_braced_argument_elements (a parsed element
+        // may carry a type without being typechecked, `E{2}')
+        if(!tc.get_bool(ID_C_braced_element_typechecked))
+          typecheck_expr(tc);
       }
       catch(...)
       {
@@ -8431,32 +8475,7 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // private members as inaccessible.
     if(arg.id() == ID_initializer_list)
     {
-      for(auto &element : arg.operands())
-      {
-        if(
-          element.id() == ID_initializer_list ||
-          element.id() == ID_already_typechecked ||
-          (!element.type().id().empty() && !element.type().is_nil()))
-        {
-          continue; // nested lists keep their target-dependent handling
-        }
-        try
-        {
-          exprt tmp = element;
-          typecheck_expr(tmp);
-          // Expose the element's type on the wrapper so candidate
-          // matching (brace_init_is_viable, fargs) sees it; the later
-          // unwrap in typecheck_expr is unaffected.
-          typet element_type = tmp.type();
-          already_typechecked_exprt::make_already_typechecked(tmp);
-          tmp.type() = std::move(element_type);
-          element.swap(tmp);
-        }
-        catch(...)
-        {
-          // leave the element for the conversion machinery
-        }
-      }
+      typecheck_braced_argument_elements(arg);
       continue;
     }
     if(arg.type().id().empty() || arg.type().is_nil())
