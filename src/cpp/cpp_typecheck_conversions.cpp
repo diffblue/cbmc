@@ -2954,8 +2954,22 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
             ctor_sym != nullptr &&
             (ctor_sym->type.find(ID_specialization_of).is_not_nil() ||
              ctor_sym->type.find(irep_idt{"#fn_template_args"}).is_not_nil());
-          const bool ctor_is_explicit =
+          // `explicit' is recorded on the class component
+          // (typecheck_compound_declarator), not on the symbol's type:
+          // reading only the type let an explicit constructor template
+          // (analyses' loop_templatet(InstructionSet &&)) convert a
+          // function argument, contrary to [over.match.copy]/1.1
+          bool ctor_is_explicit =
             ctor_sym != nullptr && ctor_sym->type.get_bool(ID_is_explicit);
+          if(ctor_sym != nullptr && !ctor_is_explicit)
+          {
+            const auto &to_struct = follow_tag(to_struct_tag_type(to));
+            for(const auto &c : to_struct.components())
+            {
+              if(c.get_name() == ctor_sym->name && c.get_bool(ID_is_explicit))
+                ctor_is_explicit = true;
+            }
+          }
           // N5008 [temp.inst]/4, /11: this constructor template was
           // instantiated to test a candidate conversion; its body is
           // needed only if the candidate is selected (see
