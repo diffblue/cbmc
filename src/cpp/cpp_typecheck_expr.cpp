@@ -5023,6 +5023,23 @@ bool cpp_typecheckt::operator_is_overloaded(exprt &expr)
     if(expr.operands().size() != 1 || expr.type().is_nil())
       return false;
 
+    // N5008 [expr.cast]/2, [expr.call]/1: `(x)(e)' is a cast only if x
+    // names a type; for an object x it is a call (operator() of x's class,
+    // resolved by typecheck_expr_explicit_typecast).  typecheck_type on the
+    // object's name failed: "found no match for symbol 'shared_buffers'"
+    // (CBMC's own shared_buffers.cpp, dog-fooding).
+    if(expr.type().id() == ID_cpp_name)
+    {
+      cpp_typecheck_fargst no_fargs;
+      const exprt type_expr = resolve(
+        to_cpp_name(static_cast<const irept &>(expr.type())),
+        cpp_typecheck_resolvet::wantt::TYPE,
+        no_fargs,
+        false);
+      if(type_expr.id() != ID_type)
+        return false;
+    }
+
     // the cast operator can be overloaded
 
     typet t = expr.type();
