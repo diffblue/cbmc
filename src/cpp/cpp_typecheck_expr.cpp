@@ -5828,6 +5828,16 @@ void cpp_typecheckt::typecheck_expr_address_of(exprt &expr)
       address.set(ID_C_implicit, true);
       op.swap(address);
     }
+    else if(op.id() == ID_dereference)
+    {
+      // N5008 [expr.unary.op]/3: the address of a function designated
+      // through a reference to function (`auto &f = fn; &f') or `*p' is
+      // the pointer the lvalue was formed from
+      exprt pointer = to_dereference_expr(op).pointer();
+      expr.swap(pointer);
+      expr.type().remove(ID_C_reference);
+      return;
+    }
     else
     {
       error().source_location = expr.source_location();
