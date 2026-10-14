@@ -1,0 +1,11 @@
+CORE
+bit_field.c
+--c17
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Apply the usual arithmetic conversions before storing the result of a
+compound assignment to a bit-field. Issue #9181.

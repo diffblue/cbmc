@@ -4544,8 +4544,11 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
     }
   }
 
-  // Add a cast to the underlying type for bit fields.
-  if(op0.type() != op1.type() && op0.type().id() == ID_c_bit_field)
+  // Add a cast to the underlying type for plain assignments to bit fields.
+  // Compound assignments need the usual arithmetic conversions first.
+  if(
+    statement == ID_assign && op0.type() != op1.type() &&
+    op0.type().id() == ID_c_bit_field)
   {
     op1 =
       typecast_exprt{op1, to_c_bit_field_type(op0.type()).underlying_type()};
@@ -4555,6 +4558,10 @@ void c_typecheck_baset::typecheck_side_effect_assignment(
   const typet o_type1=op1.type();
 
   expr.type()=o_type0;
+
+  // Promote the bit-field before converting it to the arithmetic result type.
+  if(statement != ID_assign && o_type0.id() == ID_c_bit_field)
+    implicit_typecast_arithmetic(op0);
 
   if(statement==ID_assign)
   {

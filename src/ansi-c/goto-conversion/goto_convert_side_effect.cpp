@@ -115,6 +115,12 @@ goto_convertt::clean_expr_resultt goto_convertt::remove_assignment(
     exprt rhs = binary_exprt{binary_expr.op0(), new_id, binary_expr.op1()};
     rhs.add_source_location() = expr.source_location();
 
+    if(new_lhs.type().id() == ID_c_bit_field)
+    {
+      rhs = typecast_exprt::conditional_cast(
+        rhs, to_c_bit_field_type(new_lhs.type()).underlying_type());
+    }
+
     if(
       result_is_used && !address_taken &&
       assignment_lhs_needs_temporary(binary_expr.op0()))
