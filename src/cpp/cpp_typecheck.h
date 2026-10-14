@@ -1661,6 +1661,7 @@ public:
   /// elements of the list as the arguments).
   bool
   has_viable_init_list_constructor(const typet &type, const exprt &init_list);
+  bool has_unary_constructor_template(const struct_tag_typet &class_type);
 
   /// Build the std::initializer_list<U> argument value for list-
   /// initialization of \p target_type from the braced-init-list
