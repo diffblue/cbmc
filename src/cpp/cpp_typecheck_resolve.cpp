@@ -13945,7 +13945,16 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
       return;
     cpp_scopet &scope = static_cast<cpp_scopet &>(*scope_it->second);
     auto tmp_set = scope.lookup(base_name, cpp_scopet::SCOPE_ONLY);
-    id_set.insert(tmp_set.begin(), tmp_set.end());
+    // N5008 [basic.lookup.argdep]/4.2: only the class's friend functions are
+    // visible this way, not its members -- the data member `value' of an
+    // argument's class made `value(step, 1)' ambiguous with the namespace
+    // function value (CBMC's own xml_goto_trace.cpp: goto_trace_stept's
+    // member full_lhs_value vs the function full_lhs_value, dog-fooding)
+    for(cpp_idt *id : tmp_set)
+    {
+      if(!id->is_member && !id->is_method)
+        id_set.insert(id);
+    }
 
     // Search all enclosing namespaces (proper ADL, including
     // inline namespaces like std::__cxx11) AND the root namespace.
