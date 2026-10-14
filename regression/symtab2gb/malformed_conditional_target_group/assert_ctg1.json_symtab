@@ -1,0 +1,93 @@
+{
+  "symbolTable": {
+    "assert": {
+      "type": {
+        "id": "code",
+        "sub": [],
+        "namedSub": {
+          "parameters": {
+            "id": "parameters",
+            "sub": [
+              {
+                "id": "",
+                "namedSub": {
+                  "type": {"id": "signedbv", "sub": [], "namedSub": {"width": {"id": "32"}, "#c_type": {"id": "signed_int"}}},
+                  "#identifier": {"id": "assert::cond"}
+                }
+              }
+            ],
+            "namedSub": {}
+          },
+          "return_type": {"id": "signedbv", "sub": [], "namedSub": {"width": {"id": "32"}, "#c_type": {"id": "signed_int"}}}
+        }
+      },
+      "value": {"id": "nil", "sub": [], "namedSub": {}},
+      "location": {"id": "nil", "sub": [], "namedSub": {}},
+      "name": "assert",
+      "module": "", "baseName": "assert", "mode": "C",
+      "prettyName": "assert",
+      "isType": false, "isMacro": false, "isExported": false,
+      "isInput": false, "isOutput": false, "isStateVar": false,
+      "isProperty": false, "isStaticLifetime": false, "isThreadLocal": false,
+      "isLvalue": false, "isFileLocal": false, "isExtern": false,
+      "isVolatile": false, "isParameter": false, "isAuxiliary": false,
+      "isWeak": false
+    },
+    "__CPROVER__start": {
+      "type": {
+        "id": "code",
+        "sub": [],
+        "namedSub": {
+          "parameters": {"id": "parameters", "sub": [], "namedSub": {}},
+          "return_type": {"id": "empty", "sub": [], "namedSub": {}}
+        }
+      },
+      "value": {
+        "id": "code",
+        "sub": [
+          {
+            "id": "code",
+            "sub": [
+              {"id": "nil", "sub": [], "namedSub": {}},
+              {"id": "symbol", "sub": [], "namedSub": {
+                "type": {"id": "code", "sub": [], "namedSub": {
+                  "parameters": {"id": "parameters", "sub": [{"id": "", "namedSub": {"type": {"id": "signedbv", "sub": [], "namedSub": {"width": {"id": "32"}, "#c_type": {"id": "signed_int"}}}, "#identifier": {"id": "assert::cond"}}}], "namedSub": {}},
+                  "return_type": {"id": "signedbv", "sub": [], "namedSub": {"width": {"id": "32"}, "#c_type": {"id": "signed_int"}}}
+                }},
+                "identifier": {"id": "assert"}
+              }},
+              {"id": "arguments", "sub": [
+                {"id": "conditional_target_group", "sub": [
+                  {"id": "constant", "sub": [], "namedSub": {
+                    "type": {"id": "signedbv", "sub": [], "namedSub": {"width": {"id": "32"}, "#c_type": {"id": "signed_int"}}},
+                    "value": {"id": "1"}
+                  }}
+                ], "namedSub": {
+                  "type": {"id": "signedbv", "sub": [], "namedSub": {"width": {"id": "32"}, "#c_type": {"id": "signed_int"}}}
+                }}
+              ], "namedSub": {}}
+            ],
+            "namedSub": {
+              "statement": {"id": "function_call"},
+              "type": {"id": "nil", "sub": [], "namedSub": {}}
+            }
+          }
+        ],
+        "namedSub": {
+          "statement": {"id": "block"},
+          "type": {"id": "nil", "sub": [], "namedSub": {}}
+        }
+      },
+      "location": {"id": "nil", "sub": [], "namedSub": {}},
+      "name": "__CPROVER__start",
+      "module": "", "baseName": "__CPROVER__start", "mode": "C",
+      "prettyName": "__CPROVER__start",
+      "isType": false, "isMacro": false, "isExported": false,
+      "isInput": false, "isOutput": false, "isStateVar": false,
+      "isProperty": false, "isStaticLifetime": false, "isThreadLocal": false,
+      "isLvalue": false, "isFileLocal": false, "isExtern": false,
+      "isVolatile": false, "isParameter": false, "isAuxiliary": false,
+      "isWeak": false
+    }
+  }
+}

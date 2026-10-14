@@ -1,0 +1,10 @@
+CORE
+let_member.json_symtab
+
+^EXIT=6$
+^SIGNAL=0$
+malformed symbol table entry
+let binding must have at least two operands
+--
+Rejects a symbol table with a malformed let expression whose binding operand has
+only a single sub-expression, which would cause a heap out-of-bounds read.

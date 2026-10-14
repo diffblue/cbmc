@@ -3360,7 +3360,20 @@ public:
     return binding().where();
   }
 
-  static void validate(const exprt &, validation_modet);
+  static void check(
+    const exprt &expr,
+    const validation_modet vm = validation_modet::INVARIANT)
+  {
+    binary_exprt::check(expr, vm);
+    DATA_CHECK(
+      vm,
+      expr.operands().front().operands().size() >= 2,
+      "let binding must have at least two operands");
+  }
+  static void validate(
+    const exprt &expr,
+    const namespacet &,
+    const validation_modet vm = validation_modet::INVARIANT);
 };
 
 template <>
