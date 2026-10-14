@@ -1,9 +1,11 @@
 #include <assert.h>
 
-// On x86_64 (glibc), __builtin_va_list is void**.
-// va_tag extracts the element type of __builtin_va_list, so a
-// va_tag* parameter behaves identically to a va_list parameter
-// when passed by pointer.
+#if defined(__x86_64__)
+// On x86-64, __builtin_va_list is void**, so the element type can be named and
+// a pointer to an element passed to another function. va_tag extracts that
+// element type, and a va_tag* parameter then has to behave like a va_list.
+// Other architectures model va_list as a struct, where this does not type
+// check, so the test body only applies to x86-64.
 typedef typeof(((__builtin_va_list *)0)[0][0]) va_tag;
 
 void read_arg(va_tag *args)
@@ -23,3 +25,8 @@ int main(void)
 {
   foo(0, 5);
 }
+#else
+int main(void)
+{
+}
+#endif
