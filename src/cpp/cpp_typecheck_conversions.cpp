@@ -2431,6 +2431,16 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
         // std::string.
         if(parameters.size() < 2)
           continue;
+        // the hidden `@most_derived' parameter of a constructor of a class
+        // with virtual bases (add_this_to_method_type) is not a parameter
+        // of the program: the DEFAULT constructor of std::istringstream
+        // (`this, @most_derived = true') looked like a converting
+        // constructor from bool, and `std::istringstream in("text")' was
+        // ambiguous between istringstream(const string &) and
+        // istringstream(istringstream &&) -- the latter "converting" the
+        // char array to bool
+        if(parameters[1].get_base_name() == "@most_derived")
+          continue;
         bool all_extras_have_default = true;
         for(std::size_t pi = 2; pi < parameters.size(); ++pi)
         {
