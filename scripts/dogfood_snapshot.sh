@@ -96,8 +96,8 @@ ulimit -v $MEM_KIB
 export GOTO_CC="$snap/goto-cc"
 export COMPILE_COMMANDS="$snap/compile_commands.json"
 export TIMEOUT="$TIMEOUT"
-${dirs:+export DOGFOOD_DIRS="$dirs"}
-${files_list:+export DOGFOOD_FILES="$files_list"}
+${dirs:+export DOGFOOD_DIRS=\"$dirs\"}
+${files_list:+export DOGFOOD_FILES=\"$files_list\"}
 export DOGFOOD_OUTDIR="$snap/out"
 echo "snapshot: $commit  goto-cc: $goto_cc  started: \$(date -u +%FT%TZ)"
 nice -n 19 ionice -c 3 scripts/dogfood_goto_cc.sh --expand
