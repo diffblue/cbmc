@@ -4056,6 +4056,16 @@ bool cpp_typecheckt::implicit_conversion_sequence(
 
   add_implicit_dereference(e);
 
+  // N5008 [temp.inst]/2, [over.best.ics]: an expression of class type
+  // converts through the class's conversion functions, so its class must
+  // be complete here.  A class template specialization is instantiated
+  // lazily; the type of an `auto' variable deduced from a call to a
+  // member function declared LATER in the class (`auto n = lookup(s); if(n)'
+  // with `opt<unsigned> lookup(int)') was a still-unelaborated struct tag
+  // ("invalid implicit conversion from 'struct nil' to bool").
+  if(e.type().id() == ID_struct_tag)
+    elaborate_class_template(e.type());
+
   if(is_reference(type))
   {
     if(!reference_binding(
