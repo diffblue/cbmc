@@ -1,0 +1,17 @@
+CORE smt-backend no-new-smt
+main.c
+--smt2
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+TODO typecast8
+^VERIFICATION ERROR$
+--
+Reading a one-byte struct through a byte-level access used to make the
+width==1 fast path of lower_byte_extract emit a typecast(bit-vector ->
+struct_tag).  smt2_convt::convert_typecast has no case for a struct/union
+destination, so it aborted with the invariant "TODO typecast8 bv ->
+struct_tag".  With the fix the byte is converted via bv_to_expr, building
+the struct directly, and the (valid) assertion is proved.  Only the SMT2
+back-end was affected; the SAT back-end already flattened this correctly.
