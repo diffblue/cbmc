@@ -16,6 +16,7 @@ Author: Daniel Poetzl
 #include "bitvector_expr.h" // IWYU pragma: keep
 #include "pointer_expr.h"   // IWYU pragma: keep
 #include "ssa_expr.h"
+#include "std_expr.h"
 
 #define CALL_ON_EXPR(expr_type)                                                \
   C<exprt, expr_type>()(expr, std::forward<Args>(args)...)
@@ -63,11 +64,15 @@ void call_on_expr(const exprt &expr, Args &&... args)
   {
     CALL_ON_EXPR(count_leading_zeros_exprt);
   }
+  else if(expr.id() == ID_let)
+  {
+    CALL_ON_EXPR(let_exprt);
+  }
   else
   {
 #ifdef REPORT_UNIMPLEMENTED_EXPRESSION_CHECKS
     std::cerr << "Unimplemented well-formedness check for expression with id: "
-              << expr.id_string() std::endl;
+              << expr.id_string() << std::endl;
 #endif
 
     CALL_ON_EXPR(exprt);
