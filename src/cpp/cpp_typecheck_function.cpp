@@ -137,6 +137,20 @@ typet cpp_typecheckt::deduce_placeholder_type(
   const bool pattern_is_reference =
     is_reference(pattern) || is_rvalue_reference(pattern);
 
+  // A function designator arrives already converted to its address (an
+  // implicit address_of).  For a reference pattern [temp.deduct.call]/2.2
+  // does not apply: A is the function type, so `auto &f = fn' deduces a
+  // reference to function -- deducing a pointer made the binding fail ("bad
+  // reference initializer"; CBMC's own goto-harness, `auto &f =
+  // harness_options_parser::require_exactly_one_value', dog-fooding).
+  if(
+    pattern_is_reference && initializer.id() == ID_address_of &&
+    initializer.get_bool(ID_C_implicit) &&
+    to_address_of_expr(initializer).object().type().id() == ID_code)
+  {
+    argument = to_address_of_expr(initializer).object().type();
+  }
+
   if(!pattern_is_reference)
   {
     // [temp.deduct.call]/2
