@@ -141,7 +141,9 @@ static void copy_member(
   // each member from the corresponding member of the source cast to an
   // xvalue, selecting the member's move-assignment operator (for scalars the
   // xvalue simply yields the value, coinciding with a copy).
-  if(is_move && member_type.is_not_nil() && member_type.id() != ID_empty)
+  if(
+    is_move &&
+    (member_type.id() == ID_struct_tag || member_type.id() == ID_union_tag))
   {
     reference_typet rref = reference_type(member_type);
     rref.set(ID_C_rvalue_reference, true);
@@ -450,8 +452,13 @@ void cpp_typecheckt::default_cpctor(
       memberexpr.set(ID_C_array_ini, true);
       mem_init.add_to_operands(std::move(memberexpr));
     }
-    else if(is_move)
+    else if(
+      is_move &&
+      (mem_c.type().id() == ID_struct_tag || mem_c.type().id() == ID_union_tag))
     {
+      // (for a scalar or bit-field member the xvalue is its value: the
+      // member is copied -- casting a bit-field to an rvalue reference of
+      // its type is not even expressible)
       // [class.copy.ctor]/15: a defaulted move constructor initializes each
       // non-static data member from the corresponding member of the argument
       // cast to an xvalue.  Wrap the source access in static_cast<T&&> so that
@@ -2094,6 +2101,59 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
   return false;
 }
 
+/// Whether \p symbol has a (user-declared) move constructor: a constructor
+/// whose first parameter is `X &&' (possibly cv-qualified) and whose other
+/// parameters have default arguments ([class.copy.ctor]/3)
+bool cpp_typecheckt::find_mvctor(const symbolt &symbol) const
+{
+  for(const auto &component : to_struct_union_type(symbol.type).components())
+  {
+    if(
+      component.type().id() != ID_code ||
+      to_code_type(component.type()).return_type().id() != ID_constructor ||
+      component.get_bool(ID_from_base))
+    {
+      continue;
+    }
+    const code_typet::parameterst &parameters =
+      to_code_type(component.type()).parameters();
+    if(parameters.size() < 2 || !is_rvalue_reference(parameters[1].type()))
+      continue;
+    if(
+      to_reference_type(parameters[1].type()).base_type().get(ID_identifier) !=
+      symbol.name)
+    {
+      continue;
+    }
+    bool defargs = true;
+    for(std::size_t i = 2; i < parameters.size(); i++)
+      if(parameters[i].default_value().is_nil())
+        defargs = false;
+    if(defargs)
+      return true;
+  }
+  return false;
+}
+/// Turn the `const X &' parameter of an implicit copy constructor or copy
+/// assignment operator declarator (default_cpctor, default_assignop) into
+/// the `X &&' of the corresponding move operation
+void cpp_typecheckt::make_move_parameter(cpp_declaratort &declarator)
+{
+  irept &parameters = declarator.type().add(ID_parameters);
+  PRECONDITION(!parameters.get_sub().empty());
+  cpp_declarationt &parameter =
+    static_cast<cpp_declarationt &>(parameters.get_sub().back());
+  auto &sub = to_type_with_subtypes(parameter.type()).subtypes();
+  sub.erase(
+    std::remove_if(
+      sub.begin(),
+      sub.end(),
+      [](const typet &t) { return t.id() == ID_const; }),
+    sub.end());
+  PRECONDITION(!parameter.declarators().empty());
+  parameter.declarators().front().type().set(ID_C_rvalue_reference, true);
+  declarator.type().set("#is_implicit_move", true);
+}
 bool cpp_typecheckt::find_assignop(const symbolt &symbol) const
 {
   const struct_union_typet &struct_type = to_struct_union_type(symbol.type);
