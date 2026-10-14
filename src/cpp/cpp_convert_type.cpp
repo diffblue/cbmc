@@ -452,9 +452,13 @@ static void cpp_convert_auto_rec(
     // are deliberately NOT peeled, because for `auto &r = e` the
     // placeholder must absorb the full type of e (e.g. `auto &r = p`
     // with p of type T* deduces auto=T*).
-    if(
-      dest.id() == ID_pointer && !is_reference(dest) &&
-      src.id() == ID_pointer && !is_reference(src))
+    // (The declarator may still be in its parsed form, a frontend_pointer
+    // -- the for-range-declaration `for(auto *n : range)' -- whose
+    // reference bit is the same attribute.)
+    const bool dest_is_plain_pointer =
+      (dest.id() == ID_pointer || dest.id() == ID_frontend_pointer) &&
+      !dest.get_bool(ID_C_reference);
+    if(dest_is_plain_pointer && src.id() == ID_pointer && !is_reference(src))
     {
       cpp_convert_auto_rec(
         to_type_with_subtype(dest).subtype(),
