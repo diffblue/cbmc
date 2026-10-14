@@ -192,7 +192,7 @@ static array_exprt bv_to_array_expr(
   }
   DATA_INVARIANT(
     !num_elements.has_value() || !subtype_bits.has_value() ||
-      *subtype_bits * *num_elements == total_bits,
+      *num_elements == 0 || *subtype_bits * *num_elements == total_bits,
     "subtype width times array size should be total bitvector width");
 
   exprt::operandst operands;
