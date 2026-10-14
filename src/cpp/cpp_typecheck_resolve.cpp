@@ -11916,6 +11916,31 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
         continue;
       }
 
+      // N5008 [temp.deduct.call]/1: an initializer list argument makes P a
+      // non-deduced context unless P is initializer_list<P'> or an array
+      // (deduced element-wise); the parameter then takes its default
+      // template argument, if any ([temp.deduct]/5) -- `template <class U
+      // = T> opt(U &&)' called with `{b, e}' (libstdc++'s optional, CBMC's
+      // own `return {{checked_when_taken, op1}}').  Deducing from the
+      // list's placeholder type bound U to it and no constructor matched.
+      if(it->id() == ID_initializer_list)
+      {
+        const typet &p_type = arg_type;
+        const typet &p_base =
+          is_reference(p_type) || is_rvalue_reference(p_type)
+            ? to_pointer_type(p_type).base_type()
+            : p_type;
+        const bool deduced_from_elements =
+          p_base.id() == ID_array ||
+          (p_base.id() == ID_cpp_name &&
+           to_cpp_name(p_base).get_base_name() == "initializer_list");
+        if(!deduced_from_elements)
+        {
+          ++it;
+          continue;
+        }
+      }
+
       // [temp.deduct.call]/3: forwarding reference — if the parameter is
       // T&& where T is a template parameter, and the argument is an
       // lvalue, deduce T as "lvalue reference to A".  A materialised
