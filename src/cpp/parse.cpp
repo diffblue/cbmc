@@ -5493,6 +5493,12 @@ bool Parser::optPtrOperator(typet &ptrs)
   std::cout << std::string(__indent, ' ') << "Parser::optPtrOperator 1\n";
 #endif // DEBUG
 
+  // N5008 [dcl.ptr]/1: in `T * cv1 * cv2 D' the first `*' (with cv1) is
+  // the innermost pointer -- `int *const *q' declares q as a pointer to a
+  // const pointer to int.  The list is folded from its back (innermost) to
+  // its front, so a ptr-operator read later goes in front; with push_back
+  // the qualifiers ended up on the wrong pointer and `++q' was rejected
+  // ("'q' is constant").
   std::list<typet> t_list;
 
   for(;;)
@@ -5517,7 +5523,7 @@ bool Parser::optPtrOperator(typet &ptrs)
       if(cv.is_not_nil())
         merge_types(cv, op);
 
-      t_list.push_back(op);
+      t_list.push_front(op);
     }
     else if(t=='^')
     {
@@ -5533,7 +5539,7 @@ bool Parser::optPtrOperator(typet &ptrs)
       if(cv.is_not_nil())
         merge_types(cv, op);
 
-      t_list.push_back(op);
+      t_list.push_front(op);
     }
     else if(isPtrToMember(0))
     {
@@ -5547,10 +5553,10 @@ bool Parser::optPtrOperator(typet &ptrs)
       if(cv.is_not_nil())
       {
         merge_types(op, cv);
-        t_list.push_back(cv);
+        t_list.push_front(cv);
       }
       else
-        t_list.push_back(op);
+        t_list.push_front(op);
     }
     else
       break;
