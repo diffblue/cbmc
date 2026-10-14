@@ -5709,6 +5709,11 @@ bool Parser::rMemberInit(exprt &init)
     }
     if(lex.LookAhead(0) != '}')
     {
+      // N5008 [class.base.init]/7: a braced-init-list list-initializes the
+      // member ([over.match.list]); the typechecker needs to know the
+      // clauses were braced (an initializer-list constructor takes them as
+      // one list)
+      init.set(ID_C_braced_init, true);
       for(;;)
       {
         exprt exp;
