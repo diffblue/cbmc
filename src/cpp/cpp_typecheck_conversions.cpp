@@ -5964,10 +5964,17 @@ bool cpp_typecheckt::reinterpret_typecast(
 /// true when exactly one such function exists (non-explicit ones are the
 /// implicit path's business).
 bool cpp_typecheckt::explicit_conversion_function_to(
-  const exprt &expr,
+  const exprt &expr_in,
   const typet &to,
   exprt &new_expr)
 {
+  // an expression of reference type denotes the referred object
+  // ([expr.type]/1): `T(r)' with `S &r' (CBMC's own parse.cpp, dog-fooding;
+  // the to_struct_tag_type below failed its precondition)
+  exprt expr = expr_in;
+  add_implicit_dereference(expr);
+  if(expr.type().id() != ID_struct_tag || to.id() != ID_struct_tag)
+    return false;
   elaborate_class_template(expr.type());
   const struct_typet &from_struct = follow_tag(to_struct_tag_type(expr.type()));
   const irep_idt &to_id = to_struct_tag_type(to).get_identifier();
