@@ -11823,9 +11823,32 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 /// member and `f(...)' to `lambda_this_capture->f(...)'.  Nested lambdas
 /// are not rewritten (they are type-checked on their own), nor are names
 /// after `.' or `->' (component names).
+/// Whether \p callee is a qualified name `Q::f' (f possibly with template
+/// arguments) where Q is one of \p class_names and f one of \p
+/// member_functions.
+static bool is_qualified_member_call(
+  const irept &callee,
+  const std::set<irep_idt> &member_functions,
+  const std::set<irep_idt> &class_names)
+{
+  if(callee.id() != ID_cpp_name)
+    return false;
+  const auto &sub = callee.get_sub();
+  if(
+    sub.size() < 3 || sub.size() > 4 || sub[0].id() != ID_name ||
+    sub[1].id() != ID_scope_resolution || sub[2].id() != ID_name ||
+    (sub.size() == 4 && sub[3].id() != ID_template_args))
+  {
+    return false;
+  }
+  return class_names.count(sub[0].get(ID_identifier)) != 0 &&
+         member_functions.count(sub[2].get(ID_identifier)) != 0;
+}
+
 void cpp_typecheckt::rewrite_lambda_this_uses(
   irept &body,
-  const std::set<irep_idt> &member_functions)
+  const std::set<irep_idt> &member_functions,
+  const std::set<irep_idt> &class_names)
 {
   const auto this_member = [](const source_locationt &location)
   {
@@ -11854,13 +11877,14 @@ void cpp_typecheckt::rewrite_lambda_this_uses(
     {
       irept &callee = node.get_sub().front();
       if(
-        callee.id() == ID_cpp_name && !callee.get_sub().empty() &&
-        callee.get_sub().front().id() == ID_name &&
-        member_functions.count(callee.get_sub().front().get(ID_identifier)) !=
-          0 &&
-        (callee.get_sub().size() == 1 ||
-         (callee.get_sub().size() == 2 &&
-          callee.get_sub()[1].id() == ID_template_args)))
+        (callee.id() == ID_cpp_name && !callee.get_sub().empty() &&
+         callee.get_sub().front().id() == ID_name &&
+         member_functions.count(callee.get_sub().front().get(ID_identifier)) !=
+           0 &&
+         (callee.get_sub().size() == 1 ||
+          (callee.get_sub().size() == 2 &&
+           callee.get_sub()[1].id() == ID_template_args))) ||
+        is_qualified_member_call(callee, member_functions, class_names))
       {
         const source_locationt location =
           static_cast<const exprt &>(callee).source_location();
@@ -12136,6 +12160,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   // are rewritten to use it (rewrite_lambda_this_uses).
   bool lambda_needs_this_pointer = false;
   std::set<irep_idt> lambda_member_function_names;
+  // the enclosing class and its bases, by base name, for qualified calls
+  std::set<irep_idt> lambda_qualifying_classes;
   if(lambda_in_member_context)
   {
     if(
@@ -12145,6 +12171,13 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     {
       std::set<irep_idt> candidates;
       bool uses_explicit_this = false;
+      // N5008 [class.mfct.non.static]/2: a qualified call `B::f(x)' of a
+      // member function of the enclosing class or of its base B is
+      // `(*this).B::f(x)' as well -- it used the closure's own `this'
+      // ("invalid implicit conversion from '...__lambda_0_closure' to 'const
+      // struct base &'"; CBMC's own havoc_if_validt, contracts/utils.cpp,
+      // dog-fooding)
+      std::set<irep_idt> qualified_candidates;
       std::function<void(const irept &)> scan = [&](const irept &node)
       {
         if(node.id() == "cpp-this")
@@ -12153,6 +12186,14 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           node.id() == ID_cpp_name && node.get_sub().size() == 1 &&
           node.get_sub().front().id() == ID_name)
           candidates.insert(node.get_sub().front().get(ID_identifier));
+        if(
+          node.id() == ID_cpp_name && node.get_sub().size() >= 3 &&
+          node.get_sub()[0].id() == ID_name &&
+          node.get_sub()[1].id() == ID_scope_resolution &&
+          node.get_sub()[2].id() == ID_name)
+        {
+          qualified_candidates.insert(node.get_sub()[2].get(ID_identifier));
+        }
         for(const auto &s : node.get_sub())
           scan(s);
         for(const auto &n : node.get_named_sub())
@@ -12170,6 +12211,40 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
       const struct_typet &enclosing_struct = this_struct_type();
       std::vector<irep_idt> member_captures;
+      {
+        std::function<void(const struct_typet &)> add_class =
+          [&](const struct_typet &cls)
+        {
+          const symbolt *cls_symbol = symbol_table.lookup(cls.get(ID_name));
+          if(cls_symbol != nullptr)
+            lambda_qualifying_classes.insert(cls_symbol->base_name);
+          for(const auto &b : cls.bases())
+          {
+            if(b.type().id() == ID_struct_tag)
+              add_class(follow_tag(b.type()));
+          }
+        };
+        add_class(enclosing_struct);
+      }
+      for(const irep_idt &name : qualified_candidates)
+      {
+        for(const auto &c : enclosing_struct.components())
+        {
+          if(
+            c.get_base_name() == name && c.type().id() == ID_code &&
+            !c.get_bool(ID_is_static))
+          {
+            if(lambda_has_star_this)
+              member_context_unsupported = true;
+            else
+            {
+              lambda_needs_this_pointer = true;
+              lambda_member_function_names.insert(name);
+            }
+            break;
+          }
+        }
+      }
       for(const irep_idt &name : candidates)
       {
         if(name.empty() || capture_values.count(name))
@@ -12943,7 +13018,9 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           for(const auto &n : parameter_names)
             lambda_member_function_names.erase(n);
           rewrite_lambda_this_uses(
-            op_dtor.value(), lambda_member_function_names);
+            op_dtor.value(),
+            lambda_member_function_names,
+            lambda_qualifying_classes);
         }
         op_decl.declarators().push_back(op_dtor);
         body.push_back(op_decl);
