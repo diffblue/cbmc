@@ -260,12 +260,17 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     (return_type.id() == ID_struct_tag || return_type.id() == ID_union_tag) &&
     !cpp_is_pod(return_type))
   {
+    // the elements are type-checked here; mark them so: cpp_constructor
+    // would type-check a resolved call again and re-bind its converted
+    // arguments (`return {link(m, std::move(lib)), true};' into a
+    // std::pair: "invalid implicit conversion from 'struct model &' to
+    // 'struct model &&'"; CBMC's own link_to_library.cpp, dog-fooding)
     exprt::operandst ctor_args;
     for(auto &op : code.return_value().operands())
     {
       exprt arg = op;
       typecheck_expr(arg);
-      ctor_args.push_back(std::move(arg));
+      ctor_args.push_back(already_typechecked_exprt{std::move(arg)});
     }
     exprt temporary;
     new_temporary(
