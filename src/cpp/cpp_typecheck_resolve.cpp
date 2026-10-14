@@ -7064,6 +7064,27 @@ exprt cpp_typecheck_resolvet::resolve(
       break;
     }
   }
+  // [basic.lookup.argdep]/1.3: nor when it finds a declaration that is not
+  // of a function or function template -- a block-scope object `ai
+  // interval_analysis; interval_analysis(goto_model);' calls the object's
+  // operator(); ADL also collected the namespace function
+  // interval_analysis(goto_modelt &) and the call was ambiguous (CBMC's own
+  // goto_instrument_parse_options.cpp, dog-fooding).
+  bool ordinary_lookup_found_object = false;
+  for(const auto *id : id_set)
+  {
+    if(id->id_class != cpp_idt::id_classt::SYMBOL || id->is_member)
+      continue;
+    const symbolt *symbol = cpp_typecheck.symbol_table.lookup(id->identifier);
+    if(
+      symbol != nullptr && !symbol->is_type && symbol->type.id() != ID_code &&
+      !symbol->type.get_bool(ID_is_template) &&
+      symbol->type.id() != ID_template)
+    {
+      ordinary_lookup_found_object = true;
+      break;
+    }
+  }
   const bool is_operator_name =
     id2string(base_name).compare(0, 8, "operator") == 0 &&
     cpp_typecheck.operator_expr_lookup_depth > 0;
@@ -7164,7 +7185,8 @@ exprt cpp_typecheck_resolvet::resolve(
 
   if(
     !qualified && !fargs.has_object &&
-    !(ordinary_lookup_found_member && !is_operator_name))
+    !(ordinary_lookup_found_member && !is_operator_name) &&
+    !(ordinary_lookup_found_object && !is_operator_name))
   {
     resolve_with_arguments(id_set, base_name, fargs);
     // [basic.lookup.argdep]/4: the associated namespaces are searched at the
