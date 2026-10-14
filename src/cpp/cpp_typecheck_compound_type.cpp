@@ -4616,6 +4616,15 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               {
                 if(comp.type().id() != ID_code)
                   continue;
+                // N5008 [namespace.udecl]/3, [class.inhctor.init]: `using
+                // B::B' names the constructors OF B; the base's components
+                // also hold the constructors of B's own bases (copied in
+                // from_base), which are not inherited -- `propt(const propt
+                // &)' became a `derived(const propt &) : B(p)' that matched
+                // no constructor of B ("found no match for symbol 'B'";
+                // CBMC's own satcheck_minisat_no_simplifiert, dog-fooding)
+                if(comp.get_bool(ID_from_base))
+                  continue;
                 const code_typet &ctor_type = to_code_type(comp.type());
                 if(ctor_type.return_type().id() != ID_constructor)
                   continue;
