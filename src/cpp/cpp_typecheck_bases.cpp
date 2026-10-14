@@ -98,6 +98,13 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     bool is_virtual;
   };
   std::vector<resolved_baset> resolved_bases;
+  // N5008 [basic.scope.class]/1: the class scope includes the
+  // member-specification, not the base-clause, so the names of a
+  // base-specifier are not looked up in the earlier bases: in `struct infot
+  // : outer_a::infot, configt' the `configt' is the enclosing scope's, not
+  // the injected-class-name of outer_a::infot's base outer_a::configt
+  // (CBMC's own string_refinementt::infot, dog-fooding).
+  std::vector<cpp_scopet *> base_scopes;
 
   for(auto &base : bases_irep)
   {
@@ -351,9 +358,11 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
 
     base.swap(base_symbol_expr);
 
-    // Add base scopes as parents to the current scope
-    cpp_scopes.current_scope().add_secondary_scope(
-      static_cast<cpp_scopet &>(*cpp_scopes.id_map[base_symbol.name]));
+    // the base's scope becomes a parent of the class scope once every
+    // base-specifier is resolved (below)
+    cpp_scopet &base_scope =
+      static_cast<cpp_scopet &>(*cpp_scopes.id_map[base_symbol.name]);
+    base_scopes.push_back(&base_scope);
 
     // the base subobject is laid out below, once every base is resolved:
     // Itanium C++ ABI 2.4 II.1 puts the PRIMARY base (the first non-virtual
@@ -361,6 +370,9 @@ void cpp_typecheckt::typecheck_compound_bases(struct_typet &type)
     // whatever its position in the base-specifier-list
     resolved_bases.push_back({&base_symbol, class_access, virtual_base});
   }
+
+  for(cpp_scopet *base_scope : base_scopes)
+    cpp_scopes.current_scope().add_secondary_scope(*base_scope);
 
   // lay out the base subobjects: primary base first, then the others in
   // declaration order.  The bases() of the type keep declaration order (the
