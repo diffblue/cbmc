@@ -6586,7 +6586,16 @@ bool cpp_typecheckt::has_viable_init_list_constructor(
         // not resolved again here, in the callee class's scope; it is
         // marked by typecheck_braced_argument_elements (a parsed element
         // may carry a type without being typechecked, `E{2}')
-        if(!tc.get_bool(ID_C_braced_element_typechecked))
+        // nor is a call that is already resolved (typed, its callee no
+        // longer a name): its converted arguments would be bound again
+        // (`run("cl", {"cl", "@" + name()})', CBMC's own c_preprocess.cpp)
+        const bool resolved_call =
+          tc.id() == ID_side_effect &&
+          tc.get(ID_statement) == ID_function_call &&
+          to_side_effect_expr_function_call(tc).function().id() !=
+            ID_cpp_name &&
+          tc.type().is_not_nil() && !tc.type().id().empty();
+        if(!tc.get_bool(ID_C_braced_element_typechecked) && !resolved_call)
           typecheck_expr(tc);
       }
       catch(...)
