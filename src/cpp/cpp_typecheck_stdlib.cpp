@@ -1883,23 +1883,32 @@ void cpp_typecheckt::provide_stdlib_bodies()
           };
           exprt first_ptr = get_ptr(first);
           exprt last_ptr = get_ptr(last);
+          // the model copies between pointers; other iterators (std::deque's
+          // _Deque_iterator, whose position is _M_cur) keep the library's own
+          // element-wise body -- an array_replace of the iterator objects
+          // violated symex's pointer precondition (`std::deque<bool> e(d)')
+          if(
+            first_ptr.type().id() == ID_pointer &&
+            last_ptr.type().id() == ID_pointer &&
+            result.type().id() == ID_pointer && !is_reference(result.type()))
+          {
+            minus_exprt count{last_ptr, first_ptr};
+            count.type() = pointer_diff_type();
+            plus_exprt ret_val{result, count};
+            ret_val.type() = ret_type;
 
-          minus_exprt count{last_ptr, first_ptr};
-          count.type() = pointer_diff_type();
-          plus_exprt ret_val{result, count};
-          ret_val.type() = ret_type;
+            code_blockt copy_block;
+            copy_block.add(codet{ID_array_replace, {result, first_ptr}});
+            copy_block.add(code_frontend_returnt{ret_val});
 
-          code_blockt copy_block;
-          copy_block.add(codet{ID_array_replace, {result, first_ptr}});
-          copy_block.add(code_frontend_returnt{ret_val});
-
-          code_blockt block;
-          block.add(code_ifthenelset{
-            notequal_exprt{first_ptr, last_ptr},
-            std::move(copy_block),
-            code_frontend_returnt{result}});
-          symbol.value = std::move(block);
-          symbol.value.type() = symbol.type;
+            code_blockt block;
+            block.add(code_ifthenelset{
+              notequal_exprt{first_ptr, last_ptr},
+              std::move(copy_block),
+              code_frontend_returnt{result}});
+            symbol.value = std::move(block);
+            symbol.value.type() = symbol.type;
+          }
         }
       }
       else if(
