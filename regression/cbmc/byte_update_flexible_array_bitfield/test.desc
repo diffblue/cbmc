@@ -1,0 +1,15 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+subtype width times array size should be total bitvector width
+^SIGNAL=6$
+--
+A struct with a bit-field followed by a flexible array member, hit by
+memset, used to abort in bv_to_array_expr because the zero-length
+flexible array member (int[0]) was handed the full struct bit-vector.
+With the fix a zero-length array is allowed and reconstructed as an
+empty array, so verification completes.
