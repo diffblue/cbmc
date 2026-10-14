@@ -228,6 +228,45 @@ bool cpp_typecheckt::standard_conversion_integral_promotion(
   typet int_type = signed_int_type();
   qual_from.write(int_type);
 
+  // N5008 [conv.prom]/2: a prvalue of type char8_t, char16_t, char32_t or
+  // wchar_t converts to the first of int, unsigned int, long, unsigned
+  // long, long long, unsigned long long that can represent all the values
+  // of its underlying type -- also when that is as wide as int: a char32_t
+  // (32-bit unsigned) promotes to unsigned int, a 32-bit wchar_t to int.
+  // These were not promoted at all, so `f(c)' for a char32_t c against
+  // f(int) / f(unsigned) / f(long) ... overloads (mp_integer's
+  // constructors) found no best candidate (CBMC's own
+  // convert_character_literal.cpp, dog-fooding).
+  {
+    const irep_idt &c_type = expr.type().get(ID_C_c_type);
+    if(
+      (c_type == ID_char8_t || c_type == ID_char16_t || c_type == ID_char32_t ||
+       c_type == ID_wchar_t) &&
+      (expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv))
+    {
+      const std::size_t width = to_bitvector_type(expr.type()).get_width();
+      const bool is_unsigned = expr.type().id() == ID_unsignedbv;
+      typet target;
+      if(
+        width < config.ansi_c.int_width ||
+        (!is_unsigned && width == config.ansi_c.int_width))
+        target = signed_int_type();
+      else if(width == config.ansi_c.int_width)
+        target = unsigned_int_type();
+      else if(
+        width < config.ansi_c.long_int_width ||
+        (!is_unsigned && width == config.ansi_c.long_int_width))
+        target = signed_long_int_type();
+      else if(width == config.ansi_c.long_int_width)
+        target = unsigned_long_int_type();
+      else
+        return false;
+      qual_from.write(target);
+      new_expr = typecast_exprt(expr, target);
+      return true;
+    }
+  }
+
   if(expr.type().id() == ID_signedbv)
   {
     std::size_t width = to_signedbv_type(expr.type()).get_width();
