@@ -3719,23 +3719,35 @@ bool cpp_typecheckt::reference_binding(
       if(genuine_lvalue_form)
         return false;
 
-      typet base = reference_type.base_type();
-      base.remove(ID_C_constant);
-      typet expr_base = expr.type();
-      expr_base.remove(ID_C_constant);
-      if(base == expr_base)
+      // N5008 [expr.type.conv]/2: `E{2}' (a compound literal here, lvalue
+      // marked for address-taking) is a prvalue of class type; binding
+      // `E &&' to it is the identity conversion ([over.ics.ref]/1) and
+      // better than `const E &' ([over.ics.rank]/3.2.3).  Bind like a
+      // materialized temporary below, with no rank penalty.
+      if(expr.id() == ID_compound_literal && expr.type().id() == ID_struct_tag)
       {
-        exprt tmp = expr;
-        tmp.remove(ID_C_lvalue);
-        tmp.set(ID_statement, ID_temporary_object);
-        if(reference_compatible(tmp, reference_type, rank))
-        {
-          new_expr = tmp;
-          rank += 4;
-          return true;
-        }
+        expr.remove(ID_C_lvalue);
       }
-      return false;
+      else
+      {
+        typet base = reference_type.base_type();
+        base.remove(ID_C_constant);
+        typet expr_base = expr.type();
+        expr_base.remove(ID_C_constant);
+        if(base == expr_base)
+        {
+          exprt tmp = expr;
+          tmp.remove(ID_C_lvalue);
+          tmp.set(ID_statement, ID_temporary_object);
+          if(reference_compatible(tmp, reference_type, rank))
+          {
+            new_expr = tmp;
+            rank += 4;
+            return true;
+          }
+        }
+        return false;
+      }
     }
   }
 
@@ -3978,6 +3990,24 @@ bool cpp_typecheckt::reference_binding(
     (!reference_type.base_type().get_bool(ID_C_constant) ||
      reference_type.base_type().get_bool(ID_C_volatile)))
     return false;
+
+  // N5008 [dcl.init.ref]/5.4.1: when T1 is reference-related to T2 (the
+  // same class, or a base of it), cv1 shall be the same as or greater than
+  // cv2 -- `E &&' does not bind to a `const E' prvalue by copying it into
+  // a non-const temporary (`push_back(c ? neg(op) : op)' with `const E
+  // &op', a `const E' prvalue by [expr.cond]/4.3, was ambiguous between
+  // push_back(const E &) and push_back(E &&)).
+  if(
+    expr.type().id() == ID_struct_tag &&
+    reference_type.base_type().id() == ID_struct_tag &&
+    reference_related(expr, reference_type))
+  {
+    c_qualifierst qual_from, qual_to;
+    qual_from.read(expr.type());
+    qual_to.read(reference_type.base_type());
+    if(!qual_from.is_subset_of(qual_to))
+      return false;
+  }
 
   exprt arg_expr = expr;
 
