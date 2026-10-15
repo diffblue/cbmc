@@ -1,0 +1,15 @@
+CORE wide-pointer-encoding
+main.c
+--wide-pointer-encoding --refine
+^\[main.assertion.1\] line 21 I2P dereference reads correct value: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+Combining --wide-pointer-encoding with --refine must apply the wide
+encoding in the refinement solver as well, rather than silently running
+the standard encoding. The integer-to-pointer reconstruction (#8103) is
+resolved via the backward-constraint hook in the bv_refinement loop, so
+the assertion is proven only when the flag is propagated to
+get_bv_refinement().
