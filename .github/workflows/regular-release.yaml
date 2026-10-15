@@ -40,7 +40,7 @@ jobs:
           draft: false
           prerelease: false
           body: |
-            This is CBMC version ${{ env.CBMC_VERSION }}.
+            This is CBMC version ${{ env.CBMC_VERSION }}. See the [CHANGELOG](https://github.com/diffblue/cbmc/blob/cbmc-${{ env.CBMC_VERSION }}/CHANGELOG) for what changed in this release.
 
             ## MacOS
 

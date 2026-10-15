@@ -1,7 +1,7 @@
 \page release-process Release Process
 
 **Date**: 2020-10-08
-**Updated**: 2023-03-29
+**Updated**: 2026-03-30
 **Author**: Fotis Koutoulakis, fotis.koutoulakis@diffblue.com
 **Domain**: Release & Packaging
 
@@ -20,13 +20,31 @@ The current process we follow through to make a new release is the following:
 
    (This needs to be pushed as a PR, and after it gets merged we move on to:)
 
-2. Then we make a `git tag` out of that commit, and push it to github. The
+2. Update the `CHANGELOG` file at the repository root before pushing the
+   release tag, so that the GitHub release that is auto-created on the tag
+   push (and the `CHANGELOG` link in its body) describes this release
+   accurately. A draft entry can be generated using:
+
+       scripts/draft_release_notes.py cbmc-<version>
+
+   where `cbmc-<version>` is the tag to be created (it need not exist yet;
+   the script will use the latest existing tag as the base). If auto-detection
+   picks the wrong base, pass `--previous cbmc-<old-version>` explicitly.
+
+   This calls the GitHub release-notes API to produce a PR list in the same
+   format already used in `CHANGELOG`, and prepends a draft summary paragraph.
+   The summary is heuristic and must be reviewed and edited. The release
+   manager should then manually prepend the generated entry to the top of
+   `CHANGELOG` and commit it (conveniently as part of the version-bump PR in
+   step 1). See `scripts/draft_release_notes.py --help` for options.
+
+3. Then we make a `git tag` out of that commit, and push it to github. The
    tag needs to be of the form `cbmc-<version>` with version being a version
    number of the form of `x.y.z`, with `x` denoting the major version, `y`
    denoting the minor version, and `z` identifying the patch version (useful
    for a hotfix or patch.)
 
-3. Pushing the Rust crate, which is documented [here](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
+4. Pushing the Rust crate, which is documented [here](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
    but effectively entails logging in with an API token generated from
    https://crates.io with `cargo login`, and then issuing `cargo publish`.
 
@@ -42,12 +60,12 @@ The current process we follow through to make a new release is the following:
 At this point, the rest of the process is automated, so we don't need to do
 anything more, but the process is described below for reference:
 
-3. `.github/workflows/regular-release.yaml` gets triggered on the `push`
+5. `.github/workflows/regular-release.yaml` gets triggered on the `push`
    of the tag, and creates a Github release of the version that was
    described in the tag pushed (so, tag `cbmc-5.15.20` is going to
    create the release titled `cbmc-5.15.20` on the release page).
 
-4. `.github/workflows/release-packages.yaml` gets triggered automatically
+6. `.github/workflows/release-packages.yaml` gets triggered automatically
    at the creation of the release, and its job is to build packages for
    Windows, Ubuntu 18.04 and Ubuntu 20.04 (for now, we may support more
    specific Ubuntu versions later) and attaches them (after it has finished
