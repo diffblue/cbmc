@@ -60,6 +60,7 @@ SRC += java_bytecode/ci_lazy_methods/lazy_load_lambdas.cpp \
        java_bytecode/java_string_literals.cpp \
        java_bytecode/java_utils_test.cpp \
        java_bytecode/java_virtual_functions/virtual_functions.cpp \
+       java_bytecode/lazy_goto_functions_map.cpp \
        java_bytecode/load_method_by_regex.cpp \
        pointer-analysis/custom_value_set_analysis.cpp \
        solvers/strings/string_constraint_instantiation/instantiate_not_contains.cpp \

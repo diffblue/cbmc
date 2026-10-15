@@ -102,6 +102,11 @@ public:
   ///   goto_functionst
   static get_goto_functiont get_goto_function(abstract_goto_modelt &goto_model);
 
+  /// Validate that the entry point function exists in the given model.
+  /// \param goto_model: The goto model to check
+  /// \throw invalid_input_exceptiont if the entry point cannot be produced
+  static void validate_entry_point(const abstract_goto_modelt &goto_model);
+
   /// \brief Symbolically execute the entire program starting from entry point
   /// \remarks
   /// The state that goto_symext maintains uses a lot of memory.
@@ -189,6 +194,9 @@ protected:
   /// the beginning of the entry point function.
   /// \param get_goto_function: producer for GOTO functions
   /// \return Initialized symex state.
+  /// \pre The entry point function must exist in the model provided by
+  ///   get_goto_function. Callers should validate this before calling this
+  ///   method to ensure proper error reporting.
   std::unique_ptr<statet>
   initialize_entry_point_state(const get_goto_functiont &get_goto_function);
 

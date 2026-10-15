@@ -74,6 +74,10 @@ operator()(propertiest &properties)
 
 void multi_path_symex_only_checkert::generate_equation()
 {
+  // Validate that the entry point exists before doing any work, so that we
+  // fail fast without performing unnecessary work.
+  goto_symext::validate_entry_point(goto_model);
+
   // Gather fields for shadow memory instrumentation
   const auto fields =
     shadow_memoryt::gather_field_declarations(goto_model, ui_message_handler);
