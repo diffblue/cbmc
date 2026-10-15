@@ -1,0 +1,11 @@
+CORE
+main.c
+--mmio-region 0xFFFFFFFFFFFFFF00:256 --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+--
+A region ending exactly at 2^64 covers the top of the address space. The
+in-range upper bound must be omitted rather than wrapping to 0, so the access
+at 0xFFFFFFFFFFFFFFFF resolves to the region instead of falling through.

@@ -1,0 +1,15 @@
+KNOWNBUG
+main.c
+-DCMDLINE --mmio-region 0x9:1 --pointer-overflow-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+\[main.pointer_arithmetic.1\] line \d+ pointer arithmetic: invalid integer address in p - (\(signed long (long )?int\))?1: SUCCESS
+\[main.pointer_arithmetic.2\] line \d+ pointer arithmetic: invalid integer address in p \+ (\(signed long (long )?int\))?1: SUCCESS
+\[main.pointer_arithmetic.3\] line \d+ pointer arithmetic: invalid integer address in p \+ (\(signed long (long )?int\))?-1: SUCCESS
+\[main.pointer_arithmetic.4\] line \d+ pointer arithmetic: invalid integer address in p - (\(signed long (long )?int\))?-1: SUCCESS
+--
+^warning: ignoring
+--
+The per-region MMIO model does not mark integer addresses as valid for
+pointer arithmetic checks. Unlike __CPROVER_allocated_memory, it only
+redirects dereferences to the backing byte array.

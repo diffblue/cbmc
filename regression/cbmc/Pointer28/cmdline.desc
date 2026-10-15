@@ -1,0 +1,11 @@
+KNOWNBUG no-new-smt
+main.c
+-DCMDLINE --mmio-region 0x4:4 --mmio-region 0x8:8 --little-endian --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+The per-region byte-array model does not support storing and loading
+pointer values through MMIO regions, so the **q test case fails.

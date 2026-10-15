@@ -1,0 +1,7 @@
+CORE
+main.c
+--mmio-region 0x1000:512 --mmio-region 0x1100:256
+^EXIT=1$
+^SIGNAL=0$
+MMIO regions overlap
+--

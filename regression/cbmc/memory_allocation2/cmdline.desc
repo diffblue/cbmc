@@ -1,0 +1,10 @@
+CORE
+main.c
+-DCMDLINE --mmio-region 0x1000:400 --mmio-region 0x11000:400 --mmio-region 0x21000:400 --mmio-region 0x31000:400 --no-pointer-check --no-bounds-check
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.assertion\.1\] .* assertion buffers\[0\]->buffer\[0\] == 42: SUCCESS$
+^\[main\.assertion\.2\] .* assertion buffers\[1\]->buffer\[BUFFER_SIZE - 1\] == 99: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
