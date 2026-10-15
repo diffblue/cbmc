@@ -1,0 +1,98 @@
+{
+  "symbolTable": {
+    "func": {
+      "baseName": "func",
+      "mode": "C",
+      "name": "func",
+      "prettyName": "func",
+      "type": {
+        "id": "code",
+        "namedSub": {
+          "parameters": {
+            "sub": [
+              {
+                "id": "parameter",
+                "namedSub": {
+                  "#base_name": {
+                    "id": "1_x"
+                  },
+                  "#identifier": {
+                    "id": "1_x"
+                  },
+                  "type": {
+                    "id": "signedbv",
+                    "namedSub": {
+                      "width": {
+                        "id": "32"
+                      }
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "return_type": {
+            "id": "signedbv",
+            "namedSub": {
+              "width": {
+                "id": "32"
+              }
+            }
+          }
+        }
+      },
+      "value": {
+        "id": "code",
+        "namedSub": {
+          "statement": {
+            "id": "decl"
+          }
+        },
+        "sub": [
+          {
+            "id": "symbol",
+            "namedSub": {
+              "identifier": {
+                "id": "2_x"
+              },
+              "type": {
+                "id": "unsignedbv",
+                "namedSub": {
+                  "width": {
+                    "id": "32"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      }
+    },
+    "1_x": {
+      "baseName": "x",
+      "mode": "C",
+      "name": "1_x",
+      "type": {
+        "id": "signedbv",
+        "namedSub": {
+          "width": {
+            "id": "32"
+          }
+        }
+      }
+    },
+    "2_x": {
+      "baseName": "x",
+      "mode": "C",
+      "name": "2_x",
+      "type": {
+        "id": "unsignedbv",
+        "namedSub": {
+          "width": {
+            "id": "32"
+          }
+        }
+      }
+    }
+  }
+}

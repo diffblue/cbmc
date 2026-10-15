@@ -1,0 +1,15 @@
+CORE
+test.json
+
+^EXIT=0$
+^SIGNAL=0$
+^int func\(int x\)$
+^  unsigned int x\$1;$
+--
+^  unsigned int x;$
+--
+Regression test for #6268: a symtab2gb-imported symbol table whose identifiers
+lack the function:: scoping convention (here the parameter "1_x" and the local
+"2_x", both with base name "x"). goto-instrument --dump-c must rename the
+colliding local so the emitted C is valid; the chain recompiles the dump with
+goto-cc and the patterns assert the local no longer shares the parameter name.
