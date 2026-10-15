@@ -4,7 +4,8 @@ typedef __CPROVER_fixedbv[32][16] fbvt;
 
 int main()
 {
-  fbvt f;
+  fbvt nondet_fbvt(void);
+  fbvt f = nondet_fbvt();
 
   // addition
   assert(100.0+10==110);

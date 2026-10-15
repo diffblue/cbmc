@@ -8,7 +8,8 @@ struct Y {
 
 int main()
 {
-  struct X foo1;
+  struct X nondet_X(void);
+  struct X foo1 = nondet_X();
   struct Y foo2;
 
   foo2=(struct Y){ foo1 };

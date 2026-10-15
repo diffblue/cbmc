@@ -2,7 +2,7 @@ int nondet_int();
 
 int f1()
 {
-  int ret;
+  int ret = __VERIFIER_nondet_int();
   return ret;
 }
 

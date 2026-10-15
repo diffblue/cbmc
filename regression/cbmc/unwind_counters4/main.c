@@ -1,6 +1,6 @@
 int main()
 {
-  int x;
+  int x = __VERIFIER_nondet_int();
   int y;
 
   do
@@ -9,7 +9,7 @@ int main()
     goto label;
     x = 1; // dead code, makes sure the above goto is not removed
   label:;
-    _Bool nondet;
+    _Bool nondet = __VERIFIER_nondet__Bool();
     if(nondet)
       __CPROVER_assert(y != 10, "violated via first loop");
     else

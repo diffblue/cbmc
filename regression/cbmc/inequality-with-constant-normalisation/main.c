@@ -3,7 +3,7 @@
 #include <assert.h>
 
 int main (void) {
-  int x;
+  int x = __VERIFIER_nondet_int();
 
   while ((x >= 10) && (x < 10)) {}
   while ((x >= 10) && (x <= 9)) {}

@@ -2,7 +2,7 @@
 
 int main()
 {
-  int *p, v, x, x_before;
+  int *p, v = __VERIFIER_nondet_int(), x = __VERIFIER_nondet_int(), x_before;
   x_before = x;
   p = &x;
 

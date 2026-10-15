@@ -3,7 +3,7 @@ int isnan(double);
 
 int main()
 {
-  double my_d, dabs;
+  double my_d = __VERIFIER_nondet_double(), dabs;
 
   __CPROVER_assume(!isnan(my_d));
 

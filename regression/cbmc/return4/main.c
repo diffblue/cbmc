@@ -69,7 +69,7 @@ short f1_wh(short x)
 
 int main()
 {
-  int flag;
+  int flag = __VERIFIER_nondet_int();
   short a;
   short res0, res1;
 

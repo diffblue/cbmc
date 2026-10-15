@@ -40,7 +40,8 @@ unsigned foo(union U u, struct S0 s)
 int main()
 {
   struct S0 main_s = { 0, 1, 2, 3, 4, 5, 6, 7, 8 };
-  union U main_u;
+  union U nondet_U(void);
+  union U main_u = nondet_U();
 
   assert(8==foo(main_u, main_s));
 

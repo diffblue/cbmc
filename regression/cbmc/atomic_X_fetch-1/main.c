@@ -2,18 +2,18 @@
 
 void int_test()
 {
-  int *p, v, x, x_before;
+  int *p, v = __VERIFIER_nondet_int(), x = __VERIFIER_nondet_int(), x_before;
   x_before = x;
   p = &x;
 
-  int result = __atomic_add_fetch(p, v, 0);
+  int result = __atomic_add_fetch(p, v = __VERIFIER_nondet_int(), 0);
   assert(result == x);
   assert(x == x_before + v);
 }
 
 void long_test()
 {
-  long *p, v, x, x_before;
+  long *p, v = __VERIFIER_nondet_long(), x = __VERIFIER_nondet_long(), x_before;
   x_before = x;
   p = &x;
 
@@ -24,8 +24,8 @@ void long_test()
 
 void mixed_test()
 {
-  int *p, x, x_before;
-  long v;
+  int *p, x = __VERIFIER_nondet_int(), x_before;
+  long v = __VERIFIER_nondet_long();
   x_before = x;
   p = &x;
 
