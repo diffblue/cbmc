@@ -753,6 +753,14 @@ simplify_exprt::resultt<> simplify_exprt::simplify_function_application(
   return unchanged(expr);
 }
 
+/// \return true if \p id is one of the fixed-width bitvector type ids
+/// (signedbv, unsignedbv, bv) for which a same-width cast is a pure bit-pattern
+/// reinterpretation.
+static bool is_bitvector_type_id(const irep_idt &id)
+{
+  return id == ID_unsignedbv || id == ID_signedbv || id == ID_bv;
+}
+
 simplify_exprt::resultt<>
 simplify_exprt::simplify_typecast(const typecast_exprt &expr)
 {
@@ -1352,12 +1360,11 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   }
   else if(operand.id()==ID_typecast) // typecast of typecast
   {
-    // (T1)(T2)x ---> (T1)
-    // where T1 has fewer bits than T2
+    // (T1)(T2)x ---> (T1)x
+    // where T1, T2 are fixed-width bitvector types (signedbv, unsignedbv, bv)
+    // of the same id and T1 has no more bits than T2
     if(
-      op_type_id == expr_type_id &&
-      (expr_type_id == ID_unsignedbv || expr_type_id == ID_signedbv ||
-       expr_type_id == ID_bv) &&
+      op_type_id == expr_type_id && is_bitvector_type_id(expr_type_id) &&
       to_bitvector_type(expr_type).get_width() <=
         to_bitvector_type(operand.type()).get_width())
     {
@@ -1365,6 +1372,17 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
       new_expr.op() = to_typecast_expr(operand).op();
       // might enable further simplification
       return changed(simplify_typecast(new_expr)); // recursive call
+    }
+    // (T1)(T2)x where T1, T2 are fixed-width bitvector types (signedbv,
+    // unsignedbv, bv) of the same width and the type of x is T1 --> x
+    const exprt &inner_op = to_typecast_expr(operand).op();
+    if(
+      is_bitvector_type_id(expr_type_id) && is_bitvector_type_id(op_type_id) &&
+      inner_op.type() == expr_type &&
+      to_bitvector_type(expr_type).get_width() ==
+        to_bitvector_type(operand.type()).get_width())
+    {
+      return inner_op;
     }
   }
   else if(operand.id()==ID_address_of)
