@@ -45,7 +45,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison ccache
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison ccache libgoogle-perftools-dev
 
       - name: Prepare ccache
         uses: actions/cache/restore@v6
