@@ -80,6 +80,11 @@ public:
   {
     os << "(Array " << array.index_sort() << " " << array.element_sort() << ")";
   }
+
+  void visit(const smt_int_sortt &) override
+  {
+    os << "Int";
+  }
 };
 
 std::ostream &operator<<(std::ostream &os, const smt_sortt &sort)
@@ -156,6 +161,7 @@ private:
   void visit(const smt_bool_literal_termt &bool_literal) override;
   void visit(const smt_identifier_termt &identifier_term) override;
   void visit(const smt_bit_vector_constant_termt &bit_vector_constant) override;
+  void visit(const smt_int_constant_termt &int_constant) override;
   void
   visit(const smt_function_application_termt &function_application) override;
   void visit(const smt_forall_termt &forall) override;
@@ -271,6 +277,20 @@ void smt_term_to_string_convertert::visit(
   auto value = integer2string(bit_vector_constant.value());
   auto bit_width = std::to_string(bit_vector_constant.get_sort().bit_width());
   push_outputs("(_ bv", std::move(value), " ", std::move(bit_width), ")");
+}
+
+void smt_term_to_string_convertert::visit(
+  const smt_int_constant_termt &int_constant)
+{
+  const auto &int_value = int_constant.value();
+  if(int_value.is_negative())
+  {
+    push_outputs("(- ", integer2string(-int_value), ")");
+  }
+  else
+  {
+    push_outputs(integer2string(int_value));
+  }
 }
 
 void smt_term_to_string_convertert::visit(
