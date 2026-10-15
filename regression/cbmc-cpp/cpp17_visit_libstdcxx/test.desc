@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx13
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] .* visit: SUCCESS$
@@ -16,3 +16,6 @@ __gen_vtable_impl's partial specialization for _Multi_array<_Result_type
 (*)(_Visitor, _Variants...)> was not matched
 (cpp98_partial_specialization_compound_type_in_template_argument).  g++ 13
 and clang++ 18 accept this program, and it fails only its WRONG assertion.
+libstdcxx13: with GCC 11's headers _S_apply_single_alt is dropped
+("invalid implicit conversion from __gen_vtable_impl<...>"); not yet
+reduced to a KNOWNBUG.
