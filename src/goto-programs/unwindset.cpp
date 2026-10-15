@@ -180,11 +180,11 @@ void unwindsett::parse_unwindset_one_loop(
   }
 }
 
-/// Every unwindset entry ends in `:<limit>'.  A loop identifier of a C++
+/// Every unwindset entry ends in `:\<limit\>'.  A loop identifier of a C++
 /// function contains commas (`fill<signed_int,3>(ptr_signed_int).0', the
 /// template arguments and parameter types of the function), and splitting
 /// the option at every comma cuts such an entry into pieces; join the pieces
-/// of \p elements up to the one that ends in `:<digits>'.
+/// of \p elements up to the one that ends in `:\<digits\>'.
 static std::vector<std::string>
 join_loop_identifiers(const std::vector<std::string> &elements)
 {

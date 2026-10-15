@@ -790,7 +790,7 @@ protected:
   /// is laid out (the `this' adjustments are base-subobject offsets).
   void finalize_virtual_thunks(const symbolt &symbol);
 
-  /// Fill in the `@vbase_offset::<V>' entries of the class's vtable objects
+  /// Fill in the `\@vbase_offset::\<V\>' entries of the class's vtable objects
   /// (Itanium C++ ABI 2.5.2): the position of each virtual base in this
   /// complete object relative to the subobject owning the pointer.  Needs
   /// the final layout, so runs after padding.
@@ -803,7 +803,7 @@ protected:
 
   /// For the base subobject \p base_id of the complete object \p symbol:
   /// each virtual pointer of the subobject with the address of the
-  /// construction vtable (`virtual_table::X@B@D') to hold while the base is
+  /// construction vtable (`virtual_table::X\@B\@D') to hold while the base is
   /// constructed or destroyed.
   std::vector<std::pair<struct_typet::componentt, exprt>>
   construction_vtable_installs(const symbolt &symbol, const irep_idt &base_id)
@@ -1950,7 +1950,7 @@ private:
   /// the translation unit); the narrower predicate stays in force for the
   /// end-of-unit re-conversion sweep, whose candidates are stdlib instances
   /// only and which must not touch bodies converted without the
-  /// #cpp_converted stamp (nested lambdas).
+  /// \#cpp_converted stamp (nested lambdas).
   static bool is_library_body_file(const std::string &file);
 
   /// True while instantiating a template that was referenced from within a

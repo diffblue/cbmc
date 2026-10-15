@@ -66,7 +66,7 @@ static std::string get_cprover_library_text(
 }
 
 /// \p model with every occurrence of the identifier \p from (as a whole
-/// word, outside `#include' lines) replaced by \p to.
+/// word, outside `\#include' lines) replaced by \p to.
 static std::string rename_in_model(
   const std::string &model,
   const std::string &from,

@@ -2347,7 +2347,7 @@ void cpp_typecheckt::drop_unreferenced_held_back_bodies()
 /// N5008 [temp.inst]/1, [temp.spec.partial.match]: bind the template
 /// parameters of the class template instance \p class_sym in \p map -- the
 /// recorded arguments positionally, then the deduction-time pack bindings
-/// persisted on the instance (#spec_template_packs; a partial
+/// persisted on the instance (\#spec_template_packs; a partial
 /// specialization's non-trailing or multiple packs cannot be recovered from
 /// the flat argument list), non-overriding.  Used wherever a member of the
 /// instance is type-checked outside the instance's own instantiation: the

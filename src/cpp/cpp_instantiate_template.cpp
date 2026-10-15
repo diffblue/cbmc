@@ -4063,7 +4063,7 @@ irep_idt cpp_typecheckt::existing_function_template_instance(
 /// \p pack_var_name, every pack expansion over it yields no arguments.
 /// Remove, in the parsed \p node, the pack's call-argument references
 /// (`f(a...)', `f(static_cast<A &&>(a)...)') and new-initializer references
-/// (`::new(p) T(forward<A>(a)...)').
+/// (`\::new (p) T(forward<A>(a)...)').
 static void
 strip_empty_pack_references(const irep_idt &pack_var_name, irept &node)
 {

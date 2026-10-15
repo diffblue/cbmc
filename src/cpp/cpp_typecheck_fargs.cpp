@@ -59,7 +59,7 @@ void cpp_typecheck_fargst::build(
 ///
 /// We intentionally skip recursive `implicit_conversion_sequence`
 /// calls during viability — that pathway both blew up the stack on
-/// `<chrono>`/`<future>` template machinery and isn't necessary for
+/// `\<chrono\>`/`\<future\>` template machinery and isn't necessary for
 /// viability per [over.match.list]: viability is about the *kind*
 /// of conversion (default-init / init_list-ctor / aggregate-init),
 /// the actual conversion is the typecheck step's job.
@@ -67,7 +67,7 @@ void cpp_typecheck_fargst::build(
 /// N5008 [over.ics.list]/7: the empty `{}' is viable for a class with a
 /// default constructor whatever its name; the former exclusion of
 /// std::chrono, std::ratio and std::__detail classes (a guard against an
-/// elaboration-depth problem in <chrono> / <future> that the chrono, future
+/// elaboration-depth problem in \<chrono\> / \<future\> that the chrono, future
 /// and thread regression tests no longer show) dropped libstdc++'s
 /// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})').
 /// N5008 [over.best.ics]/4.5: \p operand is the only element, itself a

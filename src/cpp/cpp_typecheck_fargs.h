@@ -75,10 +75,19 @@ public:
     build(function_call);
   }
 
+  /// Whether the arguments can be passed to a function of type \p code_type.
+  /// \param code_type: the candidate's type
+  /// \param [out] distance: the sum of the implicit conversion sequences'
+  ///   ranks
+  /// \param cpp_typecheck: the type checker
+  /// \param [out] cv_distance: if given, the tie-breakers of
+  ///   [over.ics.rank]/3.2 and /4 (qualification, reference binding, pointer
+  ///   conversions)
   /// \param cv_per_argument: if given, receives each argument's share of
   ///   \p cv_distance (the reference-binding tie-breakers of
   ///   [over.ics.rank]/3.2.3 and /3.2.6), for the per-argument comparison of
   ///   [over.match.best.general]/2.1
+  /// \return whether every argument has an implicit conversion sequence
   bool match(
     const code_typet &code_type,
     unsigned &distance,

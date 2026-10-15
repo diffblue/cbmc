@@ -501,7 +501,7 @@ static exprt provide_classic_ctype_char_model(
 }
 
 /// Set the component of \p value (of type \p type) whose name is or ends in
-/// `::<name>', looking into base class components too.  \return whether
+/// `::\<name\>', looking into base class components too.  \return whether
 /// such a component was found.
 static bool set_struct_component(
   exprt &value,

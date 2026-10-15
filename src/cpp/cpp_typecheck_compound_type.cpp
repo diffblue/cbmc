@@ -6529,7 +6529,7 @@ bool cpp_typecheckt::subtype_typecast(
 /// N5008 [over.match.viable]/3, [temp.inst]/17, [temp.constr.decl]/3: the
 /// associated constraints of a non-template member of a class template
 /// specialization are its trailing requires-clause (recorded as
-/// #member_requires by typecheck_compound_declarator), checked with the
+/// \#member_requires by typecheck_compound_declarator), checked with the
 /// parameter mapping of the class: its template parameters bound to the
 /// specialization's arguments, in the class's scope.  The result depends
 /// on the member alone and is cached.  An `it(it<!Const> i) requires Const'

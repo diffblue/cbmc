@@ -26,7 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// Whether \p vtptr is the virtual pointer of a base class subobject, in the
 /// non-virtual part, of a class occurring more than once in the lattice:
 /// add_base_components renames every such occurrence but the first
-/// (`name@/<path>').
+/// (`name@/\<path\>').
 static bool
 is_repeated_subobject_vtable_pointer(const struct_typet::componentt &vtptr)
 {
