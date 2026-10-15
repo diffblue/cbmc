@@ -73,46 +73,73 @@ void smt2_solvert::define_constants()
 
 void smt2_solvert::expand_function_applications(exprt &expr)
 {
-  for(exprt &op : expr.operands())
-    expand_function_applications(op);
-
-  if(expr.id()==ID_function_application)
+  // Post-order walk, but iterative: the recursive form would overflow the
+  // call stack on deeply-nested expressions produced by the parser (e.g.
+  // chains of thousands of bvand / store operations in SMT-COMP QF_ABV
+  // benchmarks). We do the rewrite in two passes over an explicit stack
+  // of exprt pointers: first collect every node in post-order, then
+  // process them bottom-up. Each node's operands have already been
+  // rewritten by the time we get to it, matching the old recursive
+  // semantics.
+  std::vector<exprt *> post_order;
   {
-    auto &app=to_function_application_expr(expr);
-
-    if(app.function().id() == ID_symbol)
+    std::vector<exprt *> work;
+    work.push_back(&expr);
+    while(!work.empty())
     {
-      // look up the symbol
-      auto identifier = to_symbol_expr(app.function()).identifier();
-      auto f_it = id_map.find(identifier);
-
-      if(f_it != id_map.end())
-      {
-        const auto &f = f_it->second;
-
-        DATA_INVARIANT(
-          f.type.id() == ID_mathematical_function,
-          "type of function symbol must be mathematical_function_type");
-
-        const auto &domain = to_mathematical_function_type(f.type).domain();
-
-        DATA_INVARIANT(
-          domain.size() == app.arguments().size(),
-          "number of parameters must match number of arguments");
-
-        // Does it have a definition? It's otherwise uninterpreted.
-        if(!f.definition.is_nil())
-        {
-          exprt body = f.definition;
-
-          if(body.id() == ID_lambda)
-            body = to_lambda_expr(body).application(app.arguments());
-
-          expand_function_applications(body); // rec. call
-          expr = body;
-        }
-      }
+      exprt *cur = work.back();
+      work.pop_back();
+      post_order.push_back(cur);
+      for(exprt &op : cur->operands())
+        work.push_back(&op);
     }
+  }
+  // post_order now has the root first and leaves last; reverse-iterate
+  // to process leaves before their ancestors.
+  for(auto it = post_order.rbegin(); it != post_order.rend(); ++it)
+  {
+    exprt &e = **it;
+    if(e.id() != ID_function_application)
+      continue;
+
+    auto &app = to_function_application_expr(e);
+
+    if(app.function().id() != ID_symbol)
+      continue;
+
+    // look up the symbol
+    auto identifier = to_symbol_expr(app.function()).identifier();
+    auto f_it = id_map.find(identifier);
+
+    if(f_it == id_map.end())
+      continue;
+
+    const auto &f = f_it->second;
+
+    DATA_INVARIANT(
+      f.type.id() == ID_mathematical_function,
+      "type of function symbol must be mathematical_function_type");
+
+    const auto &domain = to_mathematical_function_type(f.type).domain();
+
+    DATA_INVARIANT(
+      domain.size() == app.arguments().size(),
+      "number of parameters must match number of arguments");
+
+    // Does it have a definition? It's otherwise uninterpreted.
+    if(f.definition.is_nil())
+      continue;
+
+    exprt body = f.definition;
+
+    if(body.id() == ID_lambda)
+      body = to_lambda_expr(body).application(app.arguments());
+
+    // The body may itself contain function applications that need
+    // expanding. It has not been part of our walk, so recurse here.
+    // Bodies are typically shallow — this is the pre-existing behaviour.
+    expand_function_applications(body);
+    e = body;
   }
 }
 
