@@ -10,14 +10,14 @@ void __CPROVER_assert(_Bool, const char *);
 int main()
 {
   unsigned a = 1u << 20;
-  unsigned long b = 1ul << 40;
+  unsigned long long b = 1ull << 40;
   unsigned __int128 c = ((unsigned __int128)1) << 100;
   __CPROVER_assert(__builtin_clz(a) == 11, "clz");
   __CPROVER_assert(__builtin_clzg(a) == 11, "clzg unsigned");
-  __CPROVER_assert(__builtin_clzg(b) == 23, "clzg unsigned long");
+  __CPROVER_assert(__builtin_clzg(b) == 23, "clzg unsigned long long");
   __CPROVER_assert(__builtin_clzg(c) == 27, "clzg unsigned __int128");
   __CPROVER_assert(__builtin_clzg(0u, 32) == 32, "clzg zero with fallback");
   __CPROVER_assert(__builtin_ctzg(a) == 20, "ctzg");
-  __CPROVER_assert(__builtin_ctzg(0ul, 64) == 64, "ctzg zero with fallback");
+  __CPROVER_assert(__builtin_ctzg(0ull, 64) == 64, "ctzg zero with fallback");
   __CPROVER_assert(__builtin_clzg(a) == 12, "WRONG (must FAIL)");
 }
