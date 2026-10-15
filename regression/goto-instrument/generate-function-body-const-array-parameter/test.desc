@@ -1,0 +1,17 @@
+CORE
+main.c
+--generate-function-body havoc_const_array --generate-function-body-options havoc,params:.*
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion data\[0\] == 1: SUCCESS$
+^\[main.assertion.2\] .* assertion data\[1\] == 2: SUCCESS$
+^\[main.assertion.3\] .* assertion data\[2\] == 3: SUCCESS$
+^\[main.assertion.4\] .* assertion data\[3\] == 4: SUCCESS$
+^\[main.assertion.5\] .* assertion data\[4\] == 5: SUCCESS$
+^\[main.assertion.6\] .* assertion data\[0\] == 1: SUCCESS$
+^\[main.assertion.7\] .* assertion data\[1\] == 2: SUCCESS$
+^\[main.assertion.8\] .* assertion data\[2\] == 3: SUCCESS$
+^\[main.assertion.9\] .* assertion data\[3\] == 4: SUCCESS$
+^\[main.assertion.10\] .* assertion data\[4\] == 5: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--

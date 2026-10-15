@@ -1,0 +1,11 @@
+CORE
+main.c
+--generate-function-body havoc_const_pointer_to_const --generate-function-body-options havoc,params:.*
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion x == 55: SUCCESS$
+^\[main.assertion.2\] .* assertion \*ptr == 55: SUCCESS$
+^\[main.assertion.3\] .* assertion x == 55: SUCCESS$
+^\[main.assertion.4\] .* assertion \*ptr == 55: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--

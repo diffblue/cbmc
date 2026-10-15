@@ -1,0 +1,11 @@
+CORE
+main.c
+--generate-function-body havoc_volatile_const_pointer --generate-function-body-options havoc,params:.*
+^EXIT=0$
+^SIGNAL=0$
+^\[main.assertion.1\] .* assertion x == 77: SUCCESS$
+^\[main.assertion.2\] .* assertion \*ptr == 77: SUCCESS$
+^\[main.assertion.3\] .* assertion x == 77: SUCCESS$
+^\[main.assertion.4\] .* assertion \*ptr == 77: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
