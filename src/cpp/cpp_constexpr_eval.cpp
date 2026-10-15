@@ -13,7 +13,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
-#include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/simplify_expr.h>

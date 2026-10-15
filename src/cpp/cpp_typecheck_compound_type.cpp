@@ -14,7 +14,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck_resolve.h"
 
 #include <functional>
-#include <memory>
 #include <optional>
 
 #ifdef DEBUG

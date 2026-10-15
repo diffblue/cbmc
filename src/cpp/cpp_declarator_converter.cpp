@@ -13,11 +13,9 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/c_types.h>
 #include <util/source_location.h>
-#include <util/std_expr.h>
 #include <util/std_types.h>
 #include <util/symbol_table_base.h>
 
-#include "cpp_sfinae_context.h"
 #include "cpp_type2name.h"
 #include "cpp_typecheck.h"
 #include "cpp_typecheck_fargs.h"

@@ -21,7 +21,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/message.h>
 #include <util/symbol_table_base.h>
 
-#include "cpp_sfinae_context.h"
 #include "cpp_typecheck.h"
 
 /// Per N5008 [temp.variadic]/7: the instantiation of a pack expansion whose

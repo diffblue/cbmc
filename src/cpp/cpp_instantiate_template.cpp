@@ -22,7 +22,6 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/prefix.h>
 #include <util/simplify_expr.h>
-#include <util/std_code.h>
 #include <util/symbol_table_base.h>
 
 #include "cpp_constexpr_eval.h"
