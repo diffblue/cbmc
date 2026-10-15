@@ -173,6 +173,12 @@ bool cpp_typecheckt::standard_conversion_qualification(
     sub_to.swap(tmp2);
   }
 
+  // [conv.qual]/3 requires similar types; operator== above ignores the
+  // #c_type comment, which distinguishes char8_t from an unsigned char
+  // (aarch64), and char from signed char
+  if(sub_from.get(ID_C_c_type) != sub_to.get(ID_C_c_type))
+    return false;
+
   c_qualifierst qual_from(sub_from);
   c_qualifierst qual_to(sub_to);
   ignore_restrict(qual_from);
