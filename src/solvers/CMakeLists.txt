@@ -61,6 +61,18 @@ add_library(solvers ${sources})
 
 include("${CBMC_SOURCE_DIR}/cmake/DownloadProject.cmake")
 
+# Declare an IMPORTED static library for an IPASIR solver at the given location.
+#
+# GLOBAL is essential here: by default IMPORTED targets are scoped to the
+# directory that declares them, so without it the sibling directory
+# src/libcprover-cpp/ cannot see the target via if(TARGET ...) when it iterates
+# over solvers' LINK_LIBRARIES to aggregate the static archives. It would then
+# fall through to find_library() and fail with a "-NOTFOUND" error. See #8249.
+function(add_imported_ipasir_solver name location)
+    add_library(${name} STATIC IMPORTED GLOBAL)
+    set_property(TARGET ${name} PROPERTY IMPORTED_LOCATION ${location})
+endfunction()
+
 foreach(SOLVER ${sat_impl})
     if("${SOLVER}" STREQUAL "minisat2")
         message(STATUS "Building solvers with minisat2")
@@ -146,6 +158,11 @@ foreach(SOLVER ${sat_impl})
         download_project(PROJ cadical
             URL https://github.com/arminbiere/cadical/archive/rel-3.0.0.tar.gz
             PATCH_COMMAND patch -p1 -i ${CBMC_SOURCE_DIR}/scripts/cadical-3.0.0-patch
+            # The patch makes CaDiCaL's make-build-header.sh read the version
+            # from VERSION.txt (rather than VERSION); provide that file so the
+            # native build below can generate build.hpp. The CMake-driven
+            # cadical build above avoids this via -DNBUILD instead.
+            COMMAND cmake -E copy_if_different VERSION VERSION.txt
             COMMAND ./configure
             URL_HASH SHA256=282b1c9422fde8631cb721b86450ae94df4e8de0545c17a69a301aaa4bf92fcf
         )
@@ -157,10 +174,8 @@ foreach(SOLVER ${sat_impl})
             SATCHECK_IPASIR HAVE_IPASIR IPASIR=${cadical_SOURCE_DIR}/src
         )
 
-        add_library(cadical_ipasir STATIC IMPORTED)
-        set_property(TARGET cadical_ipasir
-            PROPERTY IMPORTED_LOCATION ${cadical_SOURCE_DIR}/build/libcadical.a
-        )
+        add_imported_ipasir_solver(cadical_ipasir
+            ${cadical_SOURCE_DIR}/build/libcadical.a)
 
         target_include_directories(solvers
             PUBLIC
@@ -202,10 +217,7 @@ foreach(SOLVER ${sat_impl})
             SATCHECK_IPASIR HAVE_IPASIR IPASIR=${IPASIR}
         )
 
-        add_library(ipasir_custom STATIC IMPORTED)
-        set_property(TARGET ipasir_custom
-            PROPERTY IMPORTED_LOCATION ${IPASIR_LIB}
-        )
+        add_imported_ipasir_solver(ipasir_custom ${IPASIR_LIB})
 
         target_include_directories(solvers
             PUBLIC
