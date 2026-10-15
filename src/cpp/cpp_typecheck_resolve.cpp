@@ -4366,14 +4366,13 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
           // This handles cases where the current scope (e.g., a
           // template instantiation scope) doesn't have the target
           // namespace in its parent chain.
-          for(auto &entry : cpp_typecheck.cpp_scopes.id_map)
+          const auto range =
+            cpp_typecheck.cpp_scopes.namespaces_by_base_name.equal_range(
+              final_base_name);
+          for(auto it = range.first; it != range.second; ++it)
           {
-            if(
-              entry.second->base_name == final_base_name &&
-              entry.second->is_namespace())
-            {
-              id_set.insert(entry.second);
-            }
+            if(it->second->is_namespace())
+              id_set.insert(it->second);
           }
         }
 
