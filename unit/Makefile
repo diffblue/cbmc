@@ -80,6 +80,7 @@ SRC += analyses/ai/ai.cpp \
        goto-programs/restrict_function_pointers.cpp \
        goto-programs/structured_trace_util.cpp \
        goto-programs/remove_returns.cpp \
+       goto-programs/write_goto_binary.cpp \
        goto-programs/xml_expr.cpp \
        goto-symex/apply_condition.cpp \
        goto-symex/complexity_limiter.cpp \
