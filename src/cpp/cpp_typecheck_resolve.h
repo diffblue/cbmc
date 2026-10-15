@@ -115,12 +115,6 @@ public:
     const exprt &template_parameter,
     const exprt &desired_expr);
 
-  /// Deduce a function parameter pack ([temp.deduct.type]/9-10): match the
-  /// pack pattern against each remaining desired parameter and record the
-  /// element types in the template map for later expansion.
-  /// \param pack_decl: pre-conversion cpp_declaration of the pack parameter
-  /// \param desired_code_type: the desired (argument) code type
-  /// \param start_index: index of the first desired parameter the pack covers
   void deduce_from_call_arguments(
     const irept::subt &parameters,
     const cpp_typecheck_fargst &fargs,
@@ -173,6 +167,12 @@ public:
     irep_idt &pack_param_name,
     bool &variadic_pack_empty);
 
+  /// Deduce a function parameter pack ([temp.deduct.type]/9-10): match the
+  /// pack pattern against each remaining desired parameter and record the
+  /// element types in the template map for later expansion.
+  /// \param pack_decl: pre-conversion cpp_declaration of the pack parameter
+  /// \param desired_code_type: the desired (argument) code type
+  /// \param start_index: index of the first desired parameter the pack covers
   void deduce_function_parameter_pack(
     const cpp_declarationt &pack_decl,
     const typet &desired_code_type,

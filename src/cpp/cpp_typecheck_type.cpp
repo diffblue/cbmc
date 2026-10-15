@@ -1527,7 +1527,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
 /// (cpp_declaration), which typecheck_type keeps (the partial-specialization
 /// matcher compares that form); the typedef form's declarator is converted to
 /// `parameter's, and its noexcept to #C_noexcept.  Convert them, so that F is
-/// the type of a function declared `void cb(int)' (`F *p = &cb;').
+/// the type of a function declared `void cb(int)' (`F *p = \&cb;').
 void cpp_typecheckt::convert_parsed_parameters(code_typet &code_type)
 {
   code_typet::parameterst converted;

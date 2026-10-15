@@ -4299,7 +4299,7 @@ void cpp_typecheckt::typecheck_braced_argument_elements(exprt &init_list)
 }
 
 /// The thunk a pointer to the virtual member function \p function
-/// designates ([expr.mptr.oper]/4): `R C::vf@virtual(C *this, Ps... ps)
+/// designates ([expr.mptr.oper]/4): `R C::vf\@virtual(C *this, Ps... ps)
 /// { return this->vf(ps...); }' -- the call in the body dispatches through
 /// the object's virtual table, so the final overrider of the object's
 /// dynamic type runs.  Created on first use, in the function's class.
@@ -10000,7 +10000,6 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     expr.swap(tmp);
 } // NOLINT(readability/fn_size)
 
-/// \param expr: function call whose arguments need to be checked
 /// N5008 [class.mem.general]/7-8, [dcl.fct.default]: a default argument
 /// declared in a class member-specification is a complete-class context.
 /// typecheck_type kept it unchecked (wrapped with the declaring scope); this
@@ -10008,6 +10007,8 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
 /// when the class is a template specialization ([temp.inst]/4 names in the
 /// default argument refer to the specialization's arguments) -- and converts
 /// it to the parameter type ([dcl.init]).
+/// \param deferred: the deferred default argument
+/// \return the type-checked default argument
 exprt cpp_typecheckt::typecheck_deferred_default_argument(const exprt &deferred)
 {
   PRECONDITION(deferred.id() == ID_cpp_deferred_default_argument);
@@ -10039,6 +10040,7 @@ exprt cpp_typecheckt::typecheck_deferred_default_argument(const exprt &deferred)
   return value;
 }
 
+/// \param expr: function call whose arguments need to be checked
 void cpp_typecheckt::typecheck_function_call_arguments(
   side_effect_expr_function_callt &expr)
 {

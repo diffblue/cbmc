@@ -53,6 +53,12 @@ public:
     Z3
   };
 
+  /// \param _ns: namespace for looking up symbols and types
+  /// \param _benchmark: benchmark name, for the header
+  /// \param _notes: notes, for the header
+  /// \param _logic: the SMT-LIB logic to declare
+  /// \param _solver: the solver the output is meant for
+  /// \param _out: the output stream
   /// \param _complete_problem: the output is a complete problem, written
   ///   in one go when solving (and on destruction): a quantifier-free
   ///   logic declared in the header (`QF_...`) is then replaced by its

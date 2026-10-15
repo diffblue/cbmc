@@ -32,7 +32,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <set>
 
 /// \return the name of template parameter \p parameter (`C' of
-///   `template::3::C', or `anon#1' for an unnamed one)
+///   `template\::3\::C', or `anon\#1' for an unnamed one)
 static irep_idt template_parameter_base_name(const template_parametert &p)
 {
   const irep_idt &identifier =
@@ -114,12 +114,12 @@ void cpp_typecheckt::salvage_default_arguments(
 /// Also handles partial specializations per [temp.spec.partial.general]
 /// and explicit specializations per [temp.expl.spec].
 /// N5008 [temp.mem.class]/1, [temp.inst]/3: a member class of a class
-/// template defined outside it, `template <class C> struct S<C>::N { ... };',
+/// template defined outside it, `template \<class C> struct S<C>::N { ... };',
 /// is instantiated for a specialization S<X> when the completeness of
 /// S<X>::N is required, from the definition reachable at that point.  The
 /// definition is grafted into the class template's parse tree, which covers
 /// the specializations instantiated later; an S<X> instantiated BEFORE the
-/// definition (libstdc++ <istream> explicitly instantiates
+/// definition (libstdc++ \<istream\> explicitly instantiates
 /// basic_istream<char>::ignore before istream.tcc defines
 /// basic_istream::sentry) still has S<X>::N incomplete.  Instantiate the
 /// definition, \p member_type, for each such S<X> of \p outer_template now:
@@ -1103,7 +1103,7 @@ void cpp_typecheckt::typecheck_variable_template(cpp_declarationt &declaration)
 
 /// typecheck class template members; these can be methods or static members
 /// N5008 [temp.mem]/1, [class.mfct]/1: an out-of-line definition of a member
-/// function template of a non-template class (`template <class E> auto
+/// function template of a non-template class (`template \<class E> auto
 /// path::_S_convert(const E *__f, const E *__l) { ... }') completes the
 /// in-class declaration with the same signature ([temp.over.link]/6, the
 /// template parameters compared by position).  The body uses the
@@ -2502,7 +2502,7 @@ void cpp_typecheckt::convert_template_function_or_member_specialization(
 
 /// Whether \p name names a concept ([temp.concept]) visible from the current
 /// scope: the parser records a concept as a template `constexpr bool C = ...'
-/// whose declarator carries `#concept'.  A qualified name is looked up from
+/// whose declarator carries `\#concept'.  A qualified name is looked up from
 /// its scope.
 bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
 {
@@ -2560,7 +2560,7 @@ bool cpp_typecheckt::is_concept_name(const cpp_namet &name)
 /// constraint-expression `C<T>' (`C<T, A1, ..., An>') into the
 /// template's associated constraints ([temp.constr.decl]/3, conjoined with
 /// a requires-clause).  Build that expression and record it on the
-/// parameter (`#C_type_constraint'), so that function overload resolution
+/// parameter (`\#C_type_constraint'), so that function overload resolution
 /// decides satisfaction with the same evaluator as a requires-clause --
 /// `template<Integral T> int g(T)' vs `template<Floating T> int g(T)' picked
 /// the first declared for every call.  (Class template partial
@@ -2829,7 +2829,9 @@ static void strip_function_type_parameter_names(typet &type)
   }
 }
 
-/// \par parameters: location, non-typechecked template arguments
+/// \param source_location: location for diagnostics
+/// \param template_symbol: the template whose parameters are bound
+/// \param template_args: the non-typechecked template arguments
 /// \return typechecked template arguments
 cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   const source_locationt &source_location,

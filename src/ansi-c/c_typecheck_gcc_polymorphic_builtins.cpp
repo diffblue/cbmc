@@ -491,7 +491,7 @@ static symbol_exprt typecheck_atomic_fetch_op(
   return result;
 }
 
-/// Clang's `__c11_atomic_*' intrinsics (used by libc++'s <atomic> and by
+/// Clang's `__c11_atomic_*' intrinsics (used by libc++'s \<atomic\> and by
 /// <stdatomic.h>) take the same arguments as the GCC `__atomic_*_n' /
 /// `__atomic_fetch_*' builtins -- `T __c11_atomic_load(_Atomic(T) *, int
 /// order)' is `__atomic_load_n' -- so they share the typing and the
