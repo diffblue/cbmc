@@ -1,0 +1,25 @@
+CORE gcc-only
+main.c
+--show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+^ *CALL __asm_mfence\(\)$
+^ *CALL __asm_lfence\(\)$
+^ *CALL __asm_sfence\(\)$
+^ *CALL __asm_fstcw\(
+^ *CALL __asm_fldcw\(
+^ *FENCE WW RR RW WR$
+^ *FENCE WW RR RW$
+^ *FENCE$
+^ *ATOMIC_BEGIN$
+^ *ATOMIC_END$
+--
+^warning: ignoring
+--
+Pins the documented translation of recognized inline-assembly instructions by
+the remove_asm pass (see doc/cprover-manual/modeling-inline-asm.md):
+x86 mfence/lfence/sfence -> __asm_* fence helper calls; ARM dmb/dsb and Power
+sync -> full fence (WW RR RW WR); Power lwsync -> fence without WR; ARM isb /
+Power isync -> empty fence; fstcw/fldcw -> __CPROVER_rounding_mode helpers;
+lock-prefixed recognized instruction -> atomic section with a full fence.
+See GitHub issue diffblue/cbmc#6374.
