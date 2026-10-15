@@ -5,9 +5,10 @@ else()
   set(gcc_only "")
 endif()
 
-# Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN: cbmc
-# preprocesses with the HOST gcc (not necessarily the compiler cmake builds
-# with), so ask it, and exclude the tags whose requirement it does not meet.
+# Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (13:
+# <format>): cbmc preprocesses with the HOST gcc (not necessarily the
+# compiler cmake builds with), so ask it, and exclude the tags whose
+# requirement it does not meet.
 find_program(HOST_GCC gcc)
 if(HOST_GCC)
   execute_process(
@@ -15,7 +16,7 @@ if(HOST_GCC)
     OUTPUT_VARIABLE HOST_GCC_VERSION
     OUTPUT_STRIP_TRAILING_WHITESPACE
     ERROR_QUIET)
-  foreach(libstdcxx_version 12 16)
+  foreach(libstdcxx_version 12 13 16)
     if(HOST_GCC_VERSION AND
        HOST_GCC_VERSION VERSION_LESS "${libstdcxx_version}")
       list(APPEND gcc_only -X libstdcxx${libstdcxx_version})
@@ -27,7 +28,7 @@ if(HOST_GCC)
     list(APPEND gcc_only -X broken-libstdcxx16)
   endif()
 else()
-  list(APPEND gcc_only -X libstdcxx12 -X libstdcxx16)
+  list(APPEND gcc_only -X libstdcxx12 -X libstdcxx13 -X libstdcxx16)
 endif()
 
 # On GCC < 13, system header processing leaves more incomplete template
