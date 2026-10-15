@@ -1,0 +1,13 @@
+CORE
+pure_calls.c
+--evaluation-order-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^\[main\.evaluation-order
+--
+Calls without conflicting side effects are evaluation-order independent:
+the check explores both argument orders and finds no difference, and no
+evaluation-order property is generated for operands without memory reads.

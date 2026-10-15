@@ -1,0 +1,14 @@
+CORE
+four_conflicting_writes.c
+--evaluation-order-check
+^\[main\.assertion\.1\] line 27 n == 14 regardless of order: FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Four calls with non-commuting side effects on the same global: the value of n
+depends on which of the 24 possible evaluation orders the compiler chooses.
+The nondeterministic round-based scheduling explores all orders without a
+bound on the number of unsequenced side effects.
