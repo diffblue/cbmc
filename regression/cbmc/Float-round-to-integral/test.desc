@@ -1,0 +1,12 @@
+CORE no-new-smt
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Round-to-integral (rintf, rint) under all rounding modes, with coverage
+of special values (NaN, ±Inf, ±0), denormals, negative ties, and
+already-integral inputs that hit the exp_ge_f early-out.
