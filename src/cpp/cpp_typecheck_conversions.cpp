@@ -896,9 +896,12 @@ bool cpp_typecheckt::standard_conversion_sequence(
       type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
       type.id() == ID_c_enum_tag)
     {
+      // [conv.prom]: the promoted type must be the target type itself, not
+      // merely of the same representation (int vs. a 32-bit long)
       if(
         !standard_conversion_integral_promotion(curr_expr, new_expr) ||
-        new_expr.type() != type)
+        new_expr.type() != type ||
+        new_expr.type().get(ID_C_c_type) != type.get(ID_C_c_type))
       {
         if(!standard_conversion_integral_conversion(curr_expr, type, new_expr))
         {
@@ -916,7 +919,8 @@ bool cpp_typecheckt::standard_conversion_sequence(
     {
       if(
         !standard_conversion_floating_point_promotion(curr_expr, new_expr) ||
-        new_expr.type() != type)
+        new_expr.type() != type ||
+        new_expr.type().get(ID_C_c_type) != type.get(ID_C_c_type))
       {
         if(
           !standard_conversion_floating_point_conversion(
