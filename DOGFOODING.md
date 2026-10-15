@@ -2033,8 +2033,11 @@ contracts/utils.cpp (qualified member call in a lambda),
 goto_instrument_parse_options.cpp (a block-scope object suppresses ADL;
 it needs ~975 s, above the sweep's 900 s TIMEOUT).
 
-A fresh sweep with the HEAD goto-cc runs in
-/tmp/dogfood-snapshots/74d53f4318-* (DONE marker when finished).
+A fresh sweep with the HEAD goto-cc (74d53f4318) runs in
+/tmp/dogfood-snapshots/74d53f4318-* (DONE marker when finished).  After
+516 files its only real failure was instrument_spec_assigns.cpp
+(`and_exprt{{a, b, c, d}}', fixed by f54b0be291); goto_instrument_parse_
+options.cpp hits the 900 s TIMEOUT.
 Another snapshot artifact: dogfood_goto_cc.sh passes only the -I flags of
 util/irep_hash.cpp, no -D flags, so files that need SATCHECK_* (satcheckt
 in bv_minimize.h: counterexample_found.cpp, inductiveness.cpp,
