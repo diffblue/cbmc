@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20 --arch arm64
+^\[main\.assertion\.1\] line \d+ char: SUCCESS$
+^\[main\.assertion\.2\] line \d+ signed char: SUCCESS$
+^\[main\.assertion\.3\] line \d+ unsigned char: SUCCESS$
+^\[main\.assertion\.4\] line \d+ char8_t: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+As test.desc, for aarch64 (char is unsigned): u8"a" matched both
+f(const char8_t *) and f(const char *) (cpp20_char8_t_distinct_type).
