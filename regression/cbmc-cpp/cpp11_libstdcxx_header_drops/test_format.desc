@@ -1,4 +1,4 @@
-CORE
+THOROUGH
 format.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ format: SUCCESS$
@@ -22,5 +22,7 @@ make_format_args was destroyed before vformat read the argument through
 basic_format_args (cpp98_temporary_lives_until_end_of_full_expression), and
 comparisons of the _Spec bit-fields of enumeration type stayed symbolic
 (cpp11_enum_bit_field_constant_comparison_simplified).  It now verifies in
-about 70 s.  g++ 13 accepts this program, and it fails only its WRONG
+about 70 s and 2.7 GB, which ran out of memory on CI's runners, hence
+THOROUGH; test_format_typecheck.desc keeps the conversion in CORE.  g++ 13
+accepts this program, and it fails only its WRONG
 assertion.

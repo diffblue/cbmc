@@ -1,0 +1,13 @@
+CORE
+format.cpp
+--cpp20 --show-goto-functions
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body of system-header function
+could not fully type-check
+--
+libstdc++ 13 <format>: std::format("{}", 42) is converted without dropping a
+system-header body.  The verification (test_format.desc) is THOROUGH.
