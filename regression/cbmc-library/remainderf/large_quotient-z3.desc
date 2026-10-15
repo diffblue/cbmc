@@ -1,0 +1,11 @@
+CORE smt-backend no-new-smt
+large_quotient.c
+--z3
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Exercises the float_bvt (bit-vector SMT) remainder/fmod encoding via z3,
+which the default boolbv path does not cover.

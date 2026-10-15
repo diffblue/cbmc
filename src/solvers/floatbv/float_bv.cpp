@@ -143,6 +143,16 @@ exprt float_bvt::convert(const exprt &expr) const
       fma_expr.rounding_mode(),
       spec);
   }
+  else if(expr.id() == ID_floatbv_mod)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return mod(float_expr.lhs(), float_expr.rhs());
+  }
+  else if(expr.id() == ID_floatbv_rem)
+  {
+    const auto &float_expr = to_binary_expr(expr);
+    return rem(float_expr.lhs(), float_expr.rhs());
+  }
   else if(expr.id()==ID_isnan)
   {
     const auto &op = to_unary_expr(expr).op();
@@ -980,6 +990,136 @@ exprt float_bvt::fma(
     and_exprt(not_exprt(result.NaN), or_exprt(prod_inf, unpacked_add.infinity));
 
   return rounder(result, rm, spec);
+}
+
+exprt float_bvt::fmod_via_significand(
+  const exprt &x,
+  const exprt &y,
+  exprt &trunc_q_odd) const
+{
+  // fmod via integer significand arithmetic.  With |x| = t * 2^ex and
+  // |y| = u * 2^ey (t, u the unpacked significands), the fmod significand
+  // is r = (t * 2^(ex-ey)) mod u for ex >= ey, and fmod = r * 2^ey.  We
+  // align the significands and take a single integer remainder, which is
+  // correct for arbitrarily large exponent differences -- unlike
+  // truncating the floating-point quotient x/y to a fixed width, which
+  // overflows when floor(x/y) exceeds that width.  Mirrors the naive
+  // float_utilst::rem.
+  const ieee_float_spect spec = get_spec(x);
+  const unbiased_floatt unpacked1 = unpack(x, spec);
+  const unbiased_floatt unpacked2 = unpack(y, spec);
+
+  const std::size_t frac = spec.f + 1; // significand width (incl. hidden bit)
+  // Max exponent difference is emax - emin_subnormal = 2^e + p - 4; plus p
+  // significand bits and 2 guard bits gives 2^e + 2p - 2.
+  const std::size_t int_width = (std::size_t(1) << spec.e) + 2 * frac - 2;
+  const unsignedbv_typet iwt(int_width);
+
+  const exprt d_signed = subtract_exponents(unpacked1, unpacked2);
+  const std::size_t dw = to_signedbv_type(d_signed.type()).get_width();
+  const exprt ex_ge_ey =
+    binary_relation_exprt(d_signed, ID_ge, from_integer(0, d_signed.type()));
+  const exprt dist = limit_distance(
+    typecast_exprt(abs_exprt(d_signed), unsignedbv_typet(dw)),
+    mp_integer(int_width));
+
+  // Align: shift the operand with the larger exponent left.
+  const exprt mx = typecast_exprt(unpacked1.fraction, iwt);
+  const exprt my = typecast_exprt(unpacked2.fraction, iwt);
+  const exprt mx_aligned = if_exprt(ex_ge_ey, shl_exprt(mx, dist), mx);
+  const exprt my_aligned = if_exprt(ex_ge_ey, my, shl_exprt(my, dist));
+
+  // Integer remainder = fmod significand; quotient LSB = tie-break parity.
+  const exprt r_int = mod_exprt(mx_aligned, my_aligned);
+  trunc_q_odd = extractbit_exprt(div_exprt(mx_aligned, my_aligned), 0);
+
+  const exprt min_exp =
+    if_exprt(ex_ge_ey, unpacked2.exponent, unpacked1.exponent);
+
+  // value = r_int * 2^(min_exp - (frac-1)); with fraction width int_width,
+  // the exponent is min_exp + int_width - frac.
+  unbiased_floatt result;
+  result.fraction = r_int;
+  result.exponent = plus_exprt(
+    typecast_exprt(min_exp, signedbv_typet(spec.e + 2)),
+    from_integer(int_width - frac, signedbv_typet(spec.e + 2)));
+  result.sign = unpacked1.sign;
+  result.zero = equal_exprt(r_int, from_integer(0, iwt));
+
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+  exprt fmod_result = rounder(result, round_to_zero, spec);
+
+  // IEEE 754 fmod special cases (cf. float_utilst::rem):
+  //   fmod(x, +-0) = NaN, fmod(+-inf, y) = NaN, fmod(NaN, .) = NaN,
+  //   fmod(., NaN) = NaN, fmod(+-0, y) = x, fmod(x, +-inf) = x.
+  const exprt nan_result = disjunction(
+    {unpacked1.infinity, unpacked1.NaN, unpacked2.NaN, unpacked2.zero});
+  const exprt nan_bv = ieee_float_valuet::NaN(spec).to_expr();
+  fmod_result = if_exprt(nan_result, nan_bv, fmod_result);
+  fmod_result =
+    if_exprt(and_exprt(unpacked1.zero, not_exprt(nan_result)), x, fmod_result);
+  fmod_result = if_exprt(
+    and_exprt(unpacked2.infinity, not_exprt(nan_result)), x, fmod_result);
+
+  return fmod_result;
+}
+
+exprt float_bvt::mod(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+
+  // fmod: x - trunc(x / y) * y, the remainder with quotient truncated
+  // toward zero (C99 7.12.10.1).  Computed exactly via integer significand
+  // arithmetic (correct for arbitrarily large exponent differences).
+  exprt trunc_q_odd;
+  return fmod_via_significand(x, y, trunc_q_odd);
+}
+
+exprt float_bvt::rem(const exprt &x, const exprt &y) const
+{
+  PRECONDITION(x.type() == y.type());
+  const floatbv_typet &type = to_floatbv_type(x.type());
+  const ieee_float_spect spec{type};
+
+  const constant_exprt round_to_zero =
+    from_integer(ieee_floatt::ROUND_TO_ZERO, unsignedbv_typet{2});
+
+  // Step 1: fmod(x, y) via integer significand arithmetic, and the parity
+  // of the truncated quotient floor(x/y) (for tie-breaking).
+  exprt trunc_q_odd;
+  exprt fmod_result = fmod_via_significand(x, y, trunc_q_odd);
+
+  // Step 2: conditional subtract for IEEE remainder.  Since |fmod| < |y|,
+  // the nearest-integer quotient is in {-1, 0, 1}:
+  //   2*|fmod| < |y|  -> remainder = fmod
+  //   2*|fmod| > |y|  -> remainder = fmod -+ y (preserving sign)
+  //   2*|fmod| = |y|  -> tie: correct iff floor(x/y) is odd
+  exprt abs_fmod = abs(fmod_result, spec);
+  exprt abs_y = abs(y, spec);
+  exprt two = from_integer(2, type);
+  // Use round-to-nearest here: when 2*|fmod| overflows the format it must
+  // become +inf (so the > |y| comparison holds), not saturate to fltmax as
+  // round-to-zero would, which would misclassify the case as a tie.
+  const constant_exprt round_to_even =
+    from_integer(ieee_floatt::ROUND_TO_EVEN, unsignedbv_typet{2});
+  exprt two_abs_fmod =
+    convert(ieee_float_op_exprt{abs_fmod, ID_floatbv_mult, two, round_to_even});
+
+  exprt sign_fmod = extractbit_exprt{fmod_result, type.get_width() - 1};
+  exprt sign_y = extractbit_exprt{y, type.get_width() - 1};
+  exprt signs_equal = equal_exprt{sign_fmod, sign_y};
+  exprt fmod_minus_y = convert(
+    ieee_float_op_exprt{fmod_result, ID_floatbv_minus, y, round_to_zero});
+  exprt fmod_plus_y = convert(
+    ieee_float_op_exprt{fmod_result, ID_floatbv_plus, y, round_to_zero});
+  exprt corrected = if_exprt{signs_equal, fmod_minus_y, fmod_plus_y};
+
+  exprt gt_half = relation(two_abs_fmod, relt::GT, abs_y, spec);
+  exprt eq_half = relation(two_abs_fmod, relt::EQ, abs_y, spec);
+  exprt use_corrected = or_exprt{gt_half, and_exprt{eq_half, trunc_q_odd}};
+
+  return if_exprt{use_corrected, corrected, fmod_result};
 }
 
 exprt float_bvt::relation(

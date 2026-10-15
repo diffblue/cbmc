@@ -1,0 +1,11 @@
+CORE
+special_cases.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Exhaustive _Float16 verification of IEEE 754 fmod special cases.
+(Coq: special case handling in float_utilst::rem)

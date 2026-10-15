@@ -1,0 +1,11 @@
+CORE
+fmod_bound.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Exhaustive _Float16 verification: |fmod(x,y)| < |y| for all
+finite inputs. (Coq: fmod_then_remainder, int_remainder_in_format)
