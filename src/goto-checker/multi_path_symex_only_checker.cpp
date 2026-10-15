@@ -11,6 +11,8 @@ Author: Daniel Kroening, Peter Schrammel
 
 #include "multi_path_symex_only_checker.h"
 
+#include <util/console.h>
+#include <util/memory_info.h>
 #include <util/ui_message.h>
 
 #include <goto-symex/shadow_memory.h>
@@ -18,6 +20,9 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-symex/show_vcc.h>
 
 #include "bmc_util.h"
+
+#include <algorithm>
+#include <fstream>
 
 multi_path_symex_only_checkert::multi_path_symex_only_checkert(
   const optionst &options,
@@ -41,8 +46,8 @@ multi_path_symex_only_checkert::multi_path_symex_only_checkert(
     options.get_list_option("unwindset"), goto_model, ui_message_handler);
 }
 
-incremental_goto_checkert::resultt multi_path_symex_only_checkert::
-operator()(propertiest &properties)
+incremental_goto_checkert::resultt
+multi_path_symex_only_checkert::operator()(propertiest &properties)
 {
   generate_equation();
 
@@ -51,6 +56,21 @@ operator()(propertiest &properties)
     goto_model,
     symex,
     ui_message_handler);
+
+  // Write callgrind-format symex profile if requested
+  {
+    const std::string callgrind_file = options.get_option("symex-callgrind");
+    if(!callgrind_file.empty())
+    {
+      std::ofstream out(callgrind_file);
+      if(out)
+      {
+        symex.write_callgrind(out);
+        log.status() << "Symex callgrind data written to " << callgrind_file
+                     << messaget::eom;
+      }
+    }
+  }
 
   if(options.get_bool_option("show-vcc"))
   {
@@ -80,14 +100,64 @@ void multi_path_symex_only_checkert::generate_equation()
 
   const auto symex_start = std::chrono::steady_clock::now();
 
+  symex.interactive_display_enabled =
+    options.get_bool_option("show-symex-progress");
+
   symex_symbol_table = symex.symex_from_entry_point_of(
     goto_symext::get_goto_function(goto_model), fields);
+
+  // Clear interactive display before printing final stats
+  if(symex.interactive_display_enabled && consolet::is_terminal())
+  {
+    auto &out = consolet::out();
+    for(std::size_t i = 0; i < symex.interactive_display_lines; ++i)
+      out << consolet::cursorup << consolet::cleareol;
+    symex.interactive_display_lines = 0;
+  }
 
   const auto symex_stop = std::chrono::steady_clock::now();
   std::chrono::duration<double> symex_runtime =
     std::chrono::duration<double>(symex_stop - symex_start);
   log.statistics() << "Runtime Symex: " << symex_runtime.count() << "s"
                    << messaget::eom;
+
+  // Report per-function symex step counts (top contributors)
+  const auto &step_counts = symex.get_function_step_counts();
+  if(!step_counts.empty())
+  {
+    // Sort by step count descending
+    std::vector<std::pair<irep_idt, std::size_t>> sorted(
+      step_counts.begin(), step_counts.end());
+    std::sort(
+      sorted.begin(),
+      sorted.end(),
+      [](const auto &a, const auto &b) { return a.second > b.second; });
+
+    std::size_t total = 0;
+    for(const auto &entry : sorted)
+      total += entry.second;
+
+    log.statistics() << "Symex steps: " << total << " total" << messaget::eom;
+
+    if(symex.interactive_display_enabled)
+    {
+      log.statistics() << "Max call depth: " << symex.max_call_depth_seen
+                       << ", max active loops: " << symex.max_active_loops_seen
+                       << messaget::eom;
+    }
+
+    const std::size_t max_entries = 10;
+    for(std::size_t i = 0; i < std::min(max_entries, sorted.size()); ++i)
+    {
+      log.statistics() << "  " << sorted[i].first << ": " << sorted[i].second
+                       << " steps ("
+                       << (100 * sorted[i].second + total / 2) / total << "%)"
+                       << messaget::eom;
+    }
+  }
+
+  log.statistics() << "Peak memory: " << peak_memory_bytes() / (1024 * 1024)
+                   << " MB" << messaget::eom;
 
   postprocess_equation(symex, equation, options, ns, ui_message_handler);
 }

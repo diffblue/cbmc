@@ -22,9 +22,8 @@ Author: Daniel Kroening, kroening@kroening.com
 static std::function<void(solver_hardnesst &)>
 hardness_register_ssa(std::size_t step_index, const SSA_stept &step)
 {
-  return [step_index, &step](solver_hardnesst &hardness) {
-    hardness.register_ssa(step_index, step.cond_expr, step.source.pc);
-  };
+  return [step_index, &step](solver_hardnesst &hardness)
+  { hardness.register_ssa(step_index, step.cond_expr, step.source.pc); };
 }
 
 void symex_target_equationt::shared_read(
@@ -34,11 +33,11 @@ void symex_target_equationt::shared_read(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SHARED_READ);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_object;
-  SSA_step.atomic_section_id=atomic_section_id;
+  SSA_step.guard = guard;
+  SSA_step.ssa_lhs = ssa_object;
+  SSA_step.atomic_section_id = atomic_section_id;
 
   merge_ireps(SSA_step);
 }
@@ -50,23 +49,21 @@ void symex_target_equationt::shared_write(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SHARED_WRITE);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_object;
-  SSA_step.atomic_section_id=atomic_section_id;
+  SSA_step.guard = guard;
+  SSA_step.ssa_lhs = ssa_object;
+  SSA_step.atomic_section_id = atomic_section_id;
 
   merge_ireps(SSA_step);
 }
 
 /// spawn a new thread
-void symex_target_equationt::spawn(
-  const exprt &guard,
-  const sourcet &source)
+void symex_target_equationt::spawn(const exprt &guard, const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::SPAWN);
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
+  SSA_stept &SSA_step = SSA_steps.back();
+  SSA_step.guard = guard;
 
   merge_ireps(SSA_step);
 }
@@ -76,8 +73,8 @@ void symex_target_equationt::memory_barrier(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::MEMORY_BARRIER);
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
+  SSA_stept &SSA_step = SSA_steps.back();
+  SSA_step.guard = guard;
 
   merge_ireps(SSA_step);
 }
@@ -89,9 +86,9 @@ void symex_target_equationt::atomic_begin(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ATOMIC_BEGIN);
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
-  SSA_step.atomic_section_id=atomic_section_id;
+  SSA_stept &SSA_step = SSA_steps.back();
+  SSA_step.guard = guard;
+  SSA_step.atomic_section_id = atomic_section_id;
 
   merge_ireps(SSA_step);
 }
@@ -103,9 +100,9 @@ void symex_target_equationt::atomic_end(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ATOMIC_END);
-  SSA_stept &SSA_step=SSA_steps.back();
-  SSA_step.guard=guard;
-  SSA_step.atomic_section_id=atomic_section_id;
+  SSA_stept &SSA_step = SSA_steps.back();
+  SSA_step.guard = guard;
+  SSA_step.atomic_section_id = atomic_section_id;
 
   merge_ireps(SSA_step);
 }
@@ -121,13 +118,14 @@ void symex_target_equationt::assignment(
 {
   PRECONDITION(ssa_lhs.is_not_nil());
 
-  SSA_steps.emplace_back(SSA_assignment_stept{source,
-                                              guard,
-                                              ssa_lhs,
-                                              ssa_full_lhs,
-                                              original_full_lhs,
-                                              ssa_rhs,
-                                              assignment_type});
+  SSA_steps.emplace_back(SSA_assignment_stept{
+    source,
+    guard,
+    ssa_lhs,
+    ssa_full_lhs,
+    original_full_lhs,
+    ssa_rhs,
+    assignment_type});
 
   merge_ireps(SSA_steps.back());
 }
@@ -142,17 +140,17 @@ void symex_target_equationt::decl(
   PRECONDITION(ssa_lhs.is_not_nil());
 
   SSA_steps.emplace_back(source, goto_trace_stept::typet::DECL);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.ssa_lhs=ssa_lhs;
+  SSA_step.guard = guard;
+  SSA_step.ssa_lhs = ssa_lhs;
   SSA_step.ssa_full_lhs = initializer;
-  SSA_step.original_full_lhs=ssa_lhs.get_original_expr();
-  SSA_step.hidden=(assignment_type!=assignment_typet::STATE);
+  SSA_step.original_full_lhs = ssa_lhs.get_original_expr();
+  SSA_step.hidden = (assignment_type != assignment_typet::STATE);
 
   // the condition is trivially true, and only
   // there so we see the symbols
-  SSA_step.cond_expr=equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_lhs);
+  SSA_step.cond_expr = equal_exprt(SSA_step.ssa_lhs, SSA_step.ssa_lhs);
 
   merge_ireps(SSA_step);
 }
@@ -166,14 +164,12 @@ void symex_target_equationt::dead(
   // we currently don't record these
 }
 
-void symex_target_equationt::location(
-  const exprt &guard,
-  const sourcet &source)
+void symex_target_equationt::location(const exprt &guard, const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::LOCATION);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guard;
 
   merge_ireps(SSA_step);
 }
@@ -186,7 +182,7 @@ void symex_target_equationt::function_call(
   const bool hidden)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::FUNCTION_CALL);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
   SSA_step.guard = guard;
   SSA_step.called_function = function_id;
@@ -204,7 +200,7 @@ void symex_target_equationt::function_return(
   const bool hidden)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::FUNCTION_RETURN);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
   SSA_step.guard = guard;
   SSA_step.called_function = function_id;
@@ -220,12 +216,12 @@ void symex_target_equationt::output(
   const std::list<renamedt<exprt, L2>> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guard;
   for(const auto &arg : args)
     SSA_step.io_args.emplace_back(arg.get());
-  SSA_step.io_id=output_id;
+  SSA_step.io_id = output_id;
 
   merge_ireps(SSA_step);
 }
@@ -238,13 +234,13 @@ void symex_target_equationt::output_fmt(
   const std::list<exprt> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.io_args=args;
-  SSA_step.io_id=output_id;
-  SSA_step.formatted=true;
-  SSA_step.format_string=fmt;
+  SSA_step.guard = guard;
+  SSA_step.io_args = args;
+  SSA_step.io_id = output_id;
+  SSA_step.formatted = true;
+  SSA_step.format_string = fmt;
 
   merge_ireps(SSA_step);
 }
@@ -256,11 +252,11 @@ void symex_target_equationt::input(
   const std::list<exprt> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::INPUT);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.io_args=args;
-  SSA_step.io_id=input_id;
+  SSA_step.guard = guard;
+  SSA_step.io_args = args;
+  SSA_step.io_id = input_id;
 
   merge_ireps(SSA_step);
 }
@@ -271,10 +267,10 @@ void symex_target_equationt::assumption(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSUME);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
+  SSA_step.guard = guard;
+  SSA_step.cond_expr = cond;
 
   merge_ireps(SSA_step);
 }
@@ -287,11 +283,11 @@ void symex_target_equationt::assertion(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::ASSERT);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
-  SSA_step.cond_expr=cond;
-  SSA_step.comment=msg;
+  SSA_step.guard = guard;
+  SSA_step.cond_expr = cond;
+  SSA_step.comment = msg;
   SSA_step.property_id = property_id;
 
   merge_ireps(SSA_step);
@@ -303,9 +299,9 @@ void symex_target_equationt::goto_instruction(
   const sourcet &source)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::GOTO);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=guard;
+  SSA_step.guard = guard;
   SSA_step.cond_expr = cond.get();
 
   merge_ireps(SSA_step);
@@ -318,11 +314,11 @@ void symex_target_equationt::constraint(
 {
   // like assumption, but with global effect
   SSA_steps.emplace_back(source, goto_trace_stept::typet::CONSTRAINT);
-  SSA_stept &SSA_step=SSA_steps.back();
+  SSA_stept &SSA_step = SSA_steps.back();
 
-  SSA_step.guard=true_exprt();
-  SSA_step.cond_expr=cond;
-  SSA_step.comment=msg;
+  SSA_step.guard = true_exprt();
+  SSA_step.cond_expr = cond;
+  SSA_step.comment = msg;
 
   merge_ireps(SSA_step);
 }
@@ -330,9 +326,10 @@ void symex_target_equationt::constraint(
 void symex_target_equationt::convert_without_assertions(
   decision_proceduret &decision_procedure)
 {
-  with_solver_hardness(decision_procedure, [&](solver_hardnesst &hardness) {
-    hardness.register_ssa_size(SSA_steps.size());
-  });
+  with_solver_hardness(
+    decision_procedure,
+    [&](solver_hardnesst &hardness)
+    { hardness.register_ssa_size(SSA_steps.size()); });
 
   convert_guards(decision_procedure);
   convert_assignments(decision_procedure);
@@ -362,21 +359,39 @@ void symex_target_equationt::convert_assignments(
   decision_proceduret &decision_procedure)
 {
   std::size_t step_index = 0;
+  std::size_t converted_count = 0;
+  const std::size_t total = SSA_steps.size();
+  auto last_report = std::chrono::steady_clock::now();
+
   for(auto &step : SSA_steps)
   {
     if(step.is_assignment() && !step.ignore && !step.converted)
     {
-      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
-        step.output(mstream);
-        mstream << messaget::eom;
-      });
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream)
+        {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
+      ++converted_count;
       with_solver_hardness(
         decision_procedure, hardness_register_ssa(step_index, step));
     }
     ++step_index;
+
+    // Periodic progress during SSA conversion
+    const auto now = std::chrono::steady_clock::now();
+    if(std::chrono::duration<double>(now - last_report).count() >= 2.0)
+    {
+      last_report = now;
+      log.statistics() << "Converting SSA: " << step_index << "/" << total
+                       << " steps (" << converted_count << " assignments)"
+                       << messaget::eom;
+    }
   }
 }
 
@@ -411,16 +426,19 @@ void symex_target_equationt::convert_guards(
       step.guard_handle = false_exprt();
     else
     {
-      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
-        step.output(mstream);
-        mstream << messaget::eom;
-      });
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream)
+        {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
 
       step.guard_handle = decision_procedure.handle(step.guard);
       with_solver_hardness(
-        decision_procedure, [step_index, &step](solver_hardnesst &hardness) {
-          hardness.register_ssa(step_index, step.guard, step.source.pc);
-        });
+        decision_procedure,
+        [step_index, &step](solver_hardnesst &hardness)
+        { hardness.register_ssa(step_index, step.guard, step.source.pc); });
     }
     ++step_index;
   }
@@ -439,7 +457,9 @@ void symex_target_equationt::convert_assumptions(
       else
       {
         log.conditional_output(
-          log.debug(), [&step](messaget::mstreamt &mstream) {
+          log.debug(),
+          [&step](messaget::mstreamt &mstream)
+          {
             step.output(mstream);
             mstream << messaget::eom;
           });
@@ -467,7 +487,9 @@ void symex_target_equationt::convert_goto_instructions(
       else
       {
         log.conditional_output(
-          log.debug(), [&step](messaget::mstreamt &mstream) {
+          log.debug(),
+          [&step](messaget::mstreamt &mstream)
+          {
             step.output(mstream);
             mstream << messaget::eom;
           });
@@ -489,10 +511,13 @@ void symex_target_equationt::convert_constraints(
   {
     if(step.is_constraint() && !step.ignore && !step.converted)
     {
-      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
-        step.output(mstream);
-        mstream << messaget::eom;
-      });
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream)
+        {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
 
       decision_procedure.set_to_true(step.cond_expr);
       step.converted = true;
@@ -511,9 +536,9 @@ void symex_target_equationt::convert_assertions(
   // we find out if there is only _one_ assertion,
   // which allows for a simpler formula
 
-  std::size_t number_of_assertions=count_assertions();
+  std::size_t number_of_assertions = count_assertions();
 
-  if(number_of_assertions==0)
+  if(number_of_assertions == 0)
     return;
 
   if(number_of_assertions == 1 && optimized_for_single_assertions)
@@ -553,7 +578,7 @@ void symex_target_equationt::convert_assertions(
   or_exprt::operandst disjuncts;
   disjuncts.reserve(number_of_assertions);
 
-  exprt assumption=true_exprt();
+  exprt assumption = true_exprt();
 
   std::vector<goto_programt::const_targett> involved_steps;
 
@@ -567,23 +592,23 @@ void symex_target_equationt::convert_assertions(
     {
       step.converted = true;
 
-      log.conditional_output(log.debug(), [&step](messaget::mstreamt &mstream) {
-        step.output(mstream);
-        mstream << messaget::eom;
-      });
+      log.conditional_output(
+        log.debug(),
+        [&step](messaget::mstreamt &mstream)
+        {
+          step.output(mstream);
+          mstream << messaget::eom;
+        });
 
-      implies_exprt implication(
-        assumption,
-        step.cond_expr);
+      implies_exprt implication(assumption, step.cond_expr);
 
       // do the conversion
       step.cond_handle = decision_procedure.handle(implication);
 
       with_solver_hardness(
         decision_procedure,
-        [&involved_steps, &step](solver_hardnesst &hardness) {
-          involved_steps.push_back(step.source.pc);
-        });
+        [&involved_steps, &step](solver_hardnesst &hardness)
+        { involved_steps.push_back(step.source.pc); });
 
       // store disjunct
       disjuncts.push_back(not_exprt(step.cond_handle));
@@ -592,16 +617,15 @@ void symex_target_equationt::convert_assertions(
     {
       // the assumptions have been converted before
       // avoid deep nesting of ID_and expressions
-      if(assumption.id()==ID_and)
+      if(assumption.id() == ID_and)
         assumption.copy_to_operands(step.cond_handle);
       else
         assumption = and_exprt(assumption, step.cond_handle);
 
       with_solver_hardness(
         decision_procedure,
-        [&involved_steps, &step](solver_hardnesst &hardness) {
-          involved_steps.push_back(step.source.pc);
-        });
+        [&involved_steps, &step](solver_hardnesst &hardness)
+        { involved_steps.push_back(step.source.pc); });
     }
   }
 
@@ -625,16 +649,17 @@ void symex_target_equationt::convert_function_calls(
     if(!step.ignore)
     {
       and_exprt::operandst conjuncts;
-      step.converted_function_arguments.reserve(step.ssa_function_arguments.size());
+      step.converted_function_arguments.reserve(
+        step.ssa_function_arguments.size());
 
       for(const auto &arg : step.ssa_function_arguments)
       {
-        if(arg.is_constant() ||
-           arg.id()==ID_string_constant)
+        if(arg.is_constant() || arg.id() == ID_string_constant)
           step.converted_function_arguments.push_back(arg);
         else
         {
-          const irep_idt identifier="symex::args::"+std::to_string(argument_count++);
+          const irep_idt identifier =
+            "symex::args::" + std::to_string(argument_count++);
           symbol_exprt symbol(identifier, arg.type());
 
           equal_exprt eq(arg, symbol);
@@ -666,8 +691,7 @@ void symex_target_equationt::convert_io(decision_proceduret &decision_procedure)
       and_exprt::operandst conjuncts;
       for(const auto &arg : step.io_args)
       {
-        if(arg.is_constant() ||
-           arg.id()==ID_string_constant)
+        if(arg.is_constant() || arg.id() == ID_string_constant)
           step.converted_io_args.push_back(arg);
         else
         {

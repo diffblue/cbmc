@@ -19,6 +19,9 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "symex_config.h"
 #include "symex_target_equation.h"
 
+#include <chrono>
+#include <map>
+
 class address_of_exprt;
 class function_application_exprt;
 class goto_symex_statet;
@@ -89,8 +92,8 @@ public:
   /// \remarks
   /// This allows goto_symext to be divorced from the particular type of
   /// goto_modelt that provides the function bodies
-  typedef
-    std::function<const goto_functionst::goto_functiont &(const irep_idt &)>
+  typedef std::function<const goto_functionst::goto_functiont &(
+    const irep_idt &)>
     get_goto_functiont;
 
   /// Return a function to get/load a goto function from the given goto model
@@ -305,10 +308,7 @@ protected:
     statet &state,
     bool write,
     bool is_in_quantifier);
-  exprt address_arithmetic(
-    const exprt &,
-    statet &,
-    bool keep_array);
+  exprt address_arithmetic(const exprt &, statet &, bool keep_array);
 
   /// Symbolically execute a GOTO instruction
   /// \param state: Symbolic execution state for current instruction
@@ -831,6 +831,47 @@ protected:
   unsigned _total_vccs, _remaining_vccs;
   ///@}
 
+  /// Per-function symex step counts, populated when resource monitoring
+  /// is enabled. Maps function identifier to number of symex steps.
+  std::map<irep_idt, std::size_t> function_step_counts;
+
+  /// Per-source-location step counts for callgrind output.
+  /// Key is (file, function, line) tuple.
+  struct source_keyt
+  {
+    irep_idt file;
+    irep_idt function;
+    irep_idt line;
+    bool operator<(const source_keyt &o) const
+    {
+      if(file != o.file)
+        return file < o.file;
+      if(function != o.function)
+        return function < o.function;
+      return line < o.line;
+    }
+  };
+  std::map<source_keyt, std::size_t> source_location_step_counts;
+
+  /// Total symex steps and timestamp for periodic progress reporting.
+  std::size_t total_symex_steps = 0;
+  std::size_t last_equation_size = 0;
+  std::chrono::steady_clock::time_point last_progress_report =
+    std::chrono::steady_clock::now();
+
+public:
+  /// When true, show live call stack and loop nesting on the terminal.
+  /// Enabled by --show-symex-progress.
+  bool interactive_display_enabled = false;
+
+  /// Maximum call stack depth and loop nesting observed during symex.
+  std::size_t max_call_depth_seen = 0;
+  std::size_t max_active_loops_seen = 0;
+
+  /// Number of lines drawn by the last interactive display, for redrawing.
+  std::size_t interactive_display_lines = 0;
+
+protected:
   complexity_limitert complexity_module;
 
   /// Shadow memory instrumentation API
@@ -854,6 +895,16 @@ public:
       "attempting to read remaining_vccs");
     return _remaining_vccs;
   }
+
+  /// Get per-function symex step counts for resource monitoring.
+  const std::map<irep_idt, std::size_t> &get_function_step_counts() const
+  {
+    return function_step_counts;
+  }
+
+  /// Write symex step counts in callgrind format for visualization
+  /// with KCachegrind/QCachegrind.
+  void write_callgrind(std::ostream &out) const;
 
   void validate(const validation_modet vm) const
   {
