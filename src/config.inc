@@ -32,14 +32,14 @@ endif
 #CHAFF = ../../zChaff
 #BOOLEFORCE = ../../booleforce-0.4
 #MINISAT = ../../MiniSat-p_v1.14
-#MINISAT2 = ../../minisat-2.2.1
+#MINISAT2 = ../../3p/minisat-2.2.1-patched
 #IPASIR = ../../ipasir
 #GLUCOSE = ../../glucose-syrup
 #CADICAL = ../../cadical
 
 # select default solver to be minisat2 if no other is specified
 ifeq ($(BOOLEFORCE)$(CHAFF)$(GLUCOSE)$(IPASIR)$(LINGELING)$(MINISAT)$(MINISAT2)$(PICOSAT)$(CADICAL),)
-  MINISAT2 = ../../minisat-2.2.1
+  MINISAT2 = ../../3p/minisat-2.2.1-patched
 endif
 
 # Signing identity for MacOS Gatekeeper

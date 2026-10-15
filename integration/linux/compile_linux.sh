@@ -14,7 +14,6 @@ readonly SCRIPTDIR
 cd "$SCRIPTDIR/../.."
 
 # Build CBMC tools
-make -C src minisat2-download
 make -C src CXX='ccache /usr/bin/g++' cbmc.dir goto-cc.dir goto-diff.dir -j$(nproc)
 
 # Get one-line-scan, if we do not have it already

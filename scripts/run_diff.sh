@@ -37,7 +37,7 @@ then
     echo "Ensure cpplint.py is inside the $script_folder directory then run again"
     exit 1
   else
-    cmd='${script_folder}/cpplint.py --exclude=jbmc/src/miniz/* --filter=-whitespace/operators,-readability/identifier_spacing $file 2>&1 >/dev/null'
+    cmd='${script_folder}/cpplint.py --exclude=3p/* --filter=-whitespace/operators,-readability/identifier_spacing $file 2>&1 >/dev/null'
   fi
 else
   echo "Mode $mode not recognized"
