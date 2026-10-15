@@ -1,4 +1,4 @@
-THOROUGH
+THOROUGH libstdcxx13
 format.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ format: SUCCESS$

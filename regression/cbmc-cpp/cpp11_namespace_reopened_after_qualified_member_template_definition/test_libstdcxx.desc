@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx13
 libstdcxx.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$

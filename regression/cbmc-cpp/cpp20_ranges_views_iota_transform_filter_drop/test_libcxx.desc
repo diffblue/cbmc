@@ -1,4 +1,4 @@
-CORE
+CORE libcxx
 main.cpp
 --cpp20 --stdlib libc++ --unwind 6 --object-bits 10
 ^\[main\.assertion\.1\] .* iota: SUCCESS$
