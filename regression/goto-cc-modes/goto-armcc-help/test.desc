@@ -1,0 +1,8 @@
+CORE
+dummy.c
+goto-armcc --help
+^EXIT=0$
+^SIGNAL=0$
+goto-armcc understands the options of armcc
+--
+^warning: ignoring
