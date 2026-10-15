@@ -157,6 +157,10 @@ INPUT inputVal: 15
 The value chosen by JBMC is arbitrary, and could as well be 9
 or 2084569161.
 
+For a comprehensive guide on using assertions, non-determinism, and assumptions
+in Java for JBMC, see the [Java Modeling Constructs](../java-modeling-constructs/)
+documentation.
+
 ## Java Library support
 
 The examples above only involve primitive types. In order to analyse code
@@ -260,6 +264,10 @@ then be reported like any other uncaught exception.
 
 
 ## Further documentation
+
+For more detailed information on fundamental modeling constructs in Java for
+JBMC (assertions, non-determinism, and assumptions), see:
+- [Java Modeling Constructs](../java-modeling-constructs/) - Comprehensive guide with examples
 
 JBMC has a wealth of other options that can either constrain the model (to
 cope with complexity issues), or output more relevant information. The list
