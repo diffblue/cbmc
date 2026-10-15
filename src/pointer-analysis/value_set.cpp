@@ -40,7 +40,7 @@ Author: Daniel Kroening, kroening@kroening.com
 const value_sett::object_map_dt value_sett::empty_object_map{};
 object_numberingt value_sett::object_numbering;
 
-bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
+bool value_sett::field_sensitive(irep_idt id, const typet &type)
 {
   // we always track fields on these
   if(
@@ -52,7 +52,7 @@ bool value_sett::field_sensitive(const irep_idt &id, const typet &type)
   return type.id() == ID_struct || type.id() == ID_struct_tag;
 }
 
-const value_sett::entryt *value_sett::find_entry(const irep_idt &id) const
+const value_sett::entryt *value_sett::find_entry(irep_idt id) const
 {
   auto found = values.find(id);
   return !found.has_value() ? nullptr : &(found->get());
@@ -137,81 +137,83 @@ bool value_sett::insert(
 
 void value_sett::output(std::ostream &out, const std::string &indent) const
 {
-  values.iterate([&](const irep_idt &, const entryt &e) {
-    irep_idt identifier, display_name;
+  values.iterate(
+    [&](irep_idt, const entryt &e)
+    {
+      irep_idt identifier, display_name;
 
-    if(e.identifier.starts_with("value_set::dynamic_object"))
-    {
-      display_name = id2string(e.identifier) + e.suffix;
-      identifier.clear();
-    }
-    else if(e.identifier == "value_set::return_value")
-    {
-      display_name = "RETURN_VALUE" + e.suffix;
-      identifier.clear();
-    }
-    else
-    {
+      if(e.identifier.starts_with("value_set::dynamic_object"))
+      {
+        display_name = id2string(e.identifier) + e.suffix;
+        identifier.clear();
+      }
+      else if(e.identifier == "value_set::return_value")
+      {
+        display_name = "RETURN_VALUE" + e.suffix;
+        identifier.clear();
+      }
+      else
+      {
 #if 0
         const symbolt &symbol=ns.lookup(e.identifier);
         display_name=id2string(symbol.display_name())+e.suffix;
         identifier=symbol.name;
 #else
-      identifier = id2string(e.identifier);
-      display_name = id2string(identifier) + e.suffix;
+        identifier = id2string(e.identifier);
+        display_name = id2string(identifier) + e.suffix;
 #endif
-    }
-
-    out << indent << display_name << " = { ";
-
-    const object_map_dt &object_map = e.object_map.read();
-
-    std::size_t width = 0;
-
-    for(object_map_dt::const_iterator o_it = object_map.begin();
-        o_it != object_map.end();
-        o_it++)
-    {
-      const exprt &o = object_numbering[o_it->first];
-
-      std::ostringstream stream;
-
-      if(o.id() == ID_invalid || o.id() == ID_unknown)
-        stream << format(o);
-      else
-      {
-        stream << "<" << format(o) << ", ";
-
-        if(o_it->second)
-          stream << format(*o_it->second);
-        else
-          stream << '*';
-
-        if(o.type().is_nil())
-          stream << ", ?";
-        else
-          stream << ", " << format(o.type());
-
-        stream << '>';
       }
 
-      const std::string result = stream.str();
-      out << result;
-      width += result.size();
+      out << indent << display_name << " = { ";
 
-      object_map_dt::const_iterator next(o_it);
-      next++;
+      const object_map_dt &object_map = e.object_map.read();
 
-      if(next != object_map.end())
+      std::size_t width = 0;
+
+      for(object_map_dt::const_iterator o_it = object_map.begin();
+          o_it != object_map.end();
+          o_it++)
       {
-        out << ", ";
-        if(width >= 40)
-          out << "\n" << std::string(indent.size(), ' ') << "      ";
-      }
-    }
+        const exprt &o = object_numbering[o_it->first];
 
-    out << " } \n";
-  });
+        std::ostringstream stream;
+
+        if(o.id() == ID_invalid || o.id() == ID_unknown)
+          stream << format(o);
+        else
+        {
+          stream << "<" << format(o) << ", ";
+
+          if(o_it->second)
+            stream << format(*o_it->second);
+          else
+            stream << '*';
+
+          if(o.type().is_nil())
+            stream << ", ?";
+          else
+            stream << ", " << format(o.type());
+
+          stream << '>';
+        }
+
+        const std::string result = stream.str();
+        out << result;
+        width += result.size();
+
+        object_map_dt::const_iterator next(o_it);
+        next++;
+
+        if(next != object_map.end())
+        {
+          out << ", ";
+          if(width >= 40)
+            out << "\n" << std::string(indent.size(), ' ') << "      ";
+        }
+      }
+
+      out << " } \n";
+    });
 }
 
 xmlt value_sett::output_xml(void) const
@@ -409,10 +411,12 @@ value_sett::object_mapt value_sett::get_value_set(
   if(includes_nondet_pointer && expr.type().id() == ID_pointer)
   {
     // we'll take the union of all objects we see, with unspecified offsets
-    values.iterate([this, &dest](const irep_idt &key, const entryt &value) {
-      for(const auto &object : value.object_map.read())
-        insert(dest, object.first, offsett());
-    });
+    values.iterate(
+      [this, &dest](irep_idt key, const entryt &value)
+      {
+        for(const auto &object : value.object_map.read())
+          insert(dest, object.first, offsett());
+      });
 
     // we'll add null, in case it's not there yet
     insert(
@@ -1785,7 +1789,7 @@ void value_sett::assign_rec(
 }
 
 void value_sett::do_function_call(
-  const irep_idt &function,
+  irep_idt function,
   const exprt::operandst &arguments,
   const namespacet &ns)
 {
@@ -1995,7 +1999,7 @@ void value_sett::guard(
 }
 
 void value_sett::erase_values_from_entry(
-  const irep_idt &index,
+  irep_idt index,
   const std::unordered_set<exprt, irep_hash> &values_to_erase)
 {
   if(values_to_erase.empty())

@@ -44,8 +44,7 @@ protected:
   std::list<std::pair<std::string, exprt>> function_calls;
   std::list<exprt> clusters;
 
-  void
-  write_dot_subgraph(std::ostream &, const irep_idt &, const goto_programt &);
+  void write_dot_subgraph(std::ostream &, irep_idt, const goto_programt &);
 
   void do_dot_function_calls(std::ostream &);
 
@@ -70,7 +69,7 @@ protected:
 /// \param goto_program: goto program the dot graph of which is written
 void dott::write_dot_subgraph(
   std::ostream &out,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program)
 {
   clusters.push_back(exprt("cluster"));

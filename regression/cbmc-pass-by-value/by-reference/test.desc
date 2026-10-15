@@ -1,0 +1,7 @@
+CORE
+main.cpp
+
+main\.cpp:7:.*has type 'const irep_idt &' which is cheap to copy
+^EXIT=0$
+^SIGNAL=0$
+--

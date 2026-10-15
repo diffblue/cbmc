@@ -47,7 +47,7 @@ void show_properties(
 /// \return optional<source_locationt> the location of the
 ///   property, if found.
 std::optional<source_locationt>
-find_property(const irep_idt &property, const goto_functionst &goto_functions);
+find_property(irep_idt property, const goto_functionst &goto_functions);
 
 /// \brief Collects the properties in the goto program into a `json_arrayt`
 /// \param json_properties: JSON array to hold the properties
@@ -57,7 +57,7 @@ find_property(const irep_idt &property, const goto_functionst &goto_functions);
 void convert_properties_json(
   json_arrayt &json_properties,
   const namespacet &ns,
-  const irep_idt &identifier,
+  irep_idt identifier,
   const goto_programt &goto_program);
 
 #endif // CPROVER_GOTO_PROGRAMS_SHOW_PROPERTIES_H

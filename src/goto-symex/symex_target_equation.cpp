@@ -180,7 +180,7 @@ void symex_target_equationt::location(
 
 void symex_target_equationt::function_call(
   const exprt &guard,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const std::vector<renamedt<exprt, L2>> &function_arguments,
   const sourcet &source,
   const bool hidden)
@@ -199,7 +199,7 @@ void symex_target_equationt::function_call(
 
 void symex_target_equationt::function_return(
   const exprt &guard,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const sourcet &source,
   const bool hidden)
 {
@@ -216,7 +216,7 @@ void symex_target_equationt::function_return(
 void symex_target_equationt::output(
   const exprt &guard,
   const sourcet &source,
-  const irep_idt &output_id,
+  irep_idt output_id,
   const std::list<renamedt<exprt, L2>> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
@@ -233,8 +233,8 @@ void symex_target_equationt::output(
 void symex_target_equationt::output_fmt(
   const exprt &guard,
   const sourcet &source,
-  const irep_idt &output_id,
-  const irep_idt &fmt,
+  irep_idt output_id,
+  irep_idt fmt,
   const std::list<exprt> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::OUTPUT);
@@ -252,7 +252,7 @@ void symex_target_equationt::output_fmt(
 void symex_target_equationt::input(
   const exprt &guard,
   const sourcet &source,
-  const irep_idt &input_id,
+  irep_idt input_id,
   const std::list<exprt> &args)
 {
   SSA_steps.emplace_back(source, goto_trace_stept::typet::INPUT);
@@ -282,7 +282,7 @@ void symex_target_equationt::assumption(
 void symex_target_equationt::assertion(
   const exprt &guard,
   const exprt &cond,
-  const irep_idt &property_id,
+  irep_idt property_id,
   const std::string &msg,
   const sourcet &source)
 {

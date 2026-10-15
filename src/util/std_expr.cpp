@@ -288,7 +288,7 @@ exprt conjunction(const exprt::operandst &op)
 
 // Implementation of struct_exprt::component for const / non const overloads.
 template <typename T>
-auto component(T &struct_expr, const irep_idt &name, const namespacet &ns)
+auto component(T &struct_expr, irep_idt name, const namespacet &ns)
   -> decltype(struct_expr.op0())
 {
   static_assert(
@@ -305,14 +305,13 @@ auto component(T &struct_expr, const irep_idt &name, const namespacet &ns)
 }
 
 /// \return The expression for a named component of this struct.
-exprt &struct_exprt::component(const irep_idt &name, const namespacet &ns)
+exprt &struct_exprt::component(irep_idt name, const namespacet &ns)
 {
   return ::component(*this, name, ns);
 }
 
 /// \return The expression for a named component of this struct.
-const exprt &
-struct_exprt::component(const irep_idt &name, const namespacet &ns) const
+const exprt &struct_exprt::component(irep_idt name, const namespacet &ns) const
 {
   return ::component(*this, name, ns);
 }

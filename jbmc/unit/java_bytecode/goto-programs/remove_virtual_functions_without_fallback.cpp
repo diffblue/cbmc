@@ -19,7 +19,7 @@ Author: Diffblue Ltd.
 /// classid has value `actual_class_id`
 exprt resolve_classid_test(
   const exprt &expr,
-  const irep_idt &actual_class_id,
+  irep_idt actual_class_id,
   const namespacet &ns)
 {
   if(expr.id() == ID_or || expr.id() == ID_and)
@@ -56,8 +56,7 @@ exprt resolve_classid_test(
   return expr;
 }
 
-static bool is_call_to(
-  goto_programt::const_targett inst, const irep_idt &callee)
+static bool is_call_to(goto_programt::const_targett inst, irep_idt callee)
 {
   if(!inst->is_function_call())
     return false;
@@ -78,7 +77,7 @@ static bool is_assume_false(goto_programt::const_targett inst)
 /// way.
 static goto_programt::const_targett interpret_classid_comparison(
   const goto_programt &program,
-  const irep_idt &actual_class_id,
+  irep_idt actual_class_id,
   const namespacet &ns)
 {
   REQUIRE(!program.instructions.empty());

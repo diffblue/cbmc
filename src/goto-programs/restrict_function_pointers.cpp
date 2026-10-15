@@ -39,7 +39,7 @@ void for_each_function_call(GotoFunctionT &&goto_function, Handler handler)
   message_handlert &message_handler,
   symbol_tablet &symbol_table,
   goto_programt &goto_program,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const function_pointer_restrictionst &restrictions,
   const goto_programt::targett &location)
 {

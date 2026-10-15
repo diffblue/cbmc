@@ -16,7 +16,7 @@
 #include <stack>
 #include <string>
 
-static std::string escape_identifier(const irep_idt &identifier)
+static std::string escape_identifier(irep_idt identifier)
 {
   return smt2_convt::convert_identifier(identifier);
 }

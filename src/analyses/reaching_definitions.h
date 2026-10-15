@@ -96,7 +96,7 @@ struct reaching_definitiont
   range_spect bit_end;
 
   reaching_definitiont(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const ai_domain_baset::locationt &definition_at,
     const range_spect &bit_begin,
     const range_spect &bit_end)
@@ -182,9 +182,9 @@ public:
   /// \param ai: A reference to 'reaching_definitions_analysist' instance.
   /// \param ns: Just passed to callees.
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) final override;
@@ -252,8 +252,8 @@ public:
   typedef std::map<locationt, rangest, goto_programt::target_less_than>
     ranges_at_loct;
 
-  const ranges_at_loct &get(const irep_idt &identifier) const;
-  void clear_cache(const irep_idt &identifier) const
+  const ranges_at_loct &get(irep_idt identifier) const;
+  void clear_cache(irep_idt identifier) const
   {
     export_cache[identifier].clear();
   }
@@ -296,7 +296,7 @@ private:
   /// moved to the `output` method or removed entirely.
   mutable export_cachet export_cache;
 
-  void populate_cache(const irep_idt &identifier) const;
+  void populate_cache(irep_idt identifier) const;
 
   void transform_dead(
     const namespacet &ns,
@@ -306,34 +306,32 @@ private:
     reaching_definitions_analysist &rd);
   void transform_function_call(
     const namespacet &ns,
-    const irep_idt &function_from,
+    irep_idt function_from,
     locationt from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     reaching_definitions_analysist &rd);
   void transform_end_function(
     const namespacet &ns,
-    const irep_idt &function_from,
+    irep_idt function_from,
     locationt from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     locationt to,
     reaching_definitions_analysist &rd);
   void transform_assign(
     const namespacet &ns,
     locationt from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     locationt to,
     reaching_definitions_analysist &rd);
 
   void kill(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const range_spect &range_start,
     const range_spect &range_end);
-  void kill_inf(
-    const irep_idt &identifier,
-    const range_spect &range_start);
+  void kill_inf(irep_idt identifier, const range_spect &range_start);
   bool gen(
     locationt from,
-    const irep_idt &identifier,
+    irep_idt identifier,
     const range_spect &range_start,
     const range_spect &range_end);
 

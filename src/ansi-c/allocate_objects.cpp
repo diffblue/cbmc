@@ -36,7 +36,7 @@ exprt allocate_objectst::allocate_object(
   const exprt &target_expr,
   const typet &allocate_type,
   const lifetimet lifetime,
-  const irep_idt &basename_prefix)
+  irep_idt basename_prefix)
 {
   switch(lifetime)
   {
@@ -73,7 +73,7 @@ exprt allocate_objectst::allocate_automatic_local_object(
   code_blockt &assignments,
   const exprt &target_expr,
   const typet &allocate_type,
-  const irep_idt &basename_prefix)
+  irep_idt basename_prefix)
 {
   return allocate_non_dynamic_object(
     assignments, target_expr, allocate_type, false, basename_prefix);
@@ -94,7 +94,7 @@ exprt allocate_objectst::allocate_static_global_object(
   code_blockt &assignments,
   const exprt &target_expr,
   const typet &allocate_type,
-  const irep_idt &basename_prefix)
+  irep_idt basename_prefix)
 {
   return allocate_non_dynamic_object(
     assignments, target_expr, allocate_type, true, basename_prefix);
@@ -108,7 +108,7 @@ exprt allocate_objectst::allocate_static_global_object(
 /// \return A symbol expression denoting the variable
 symbol_exprt allocate_objectst::allocate_automatic_local_object(
   const typet &allocate_type,
-  const irep_idt &basename_prefix)
+  irep_idt basename_prefix)
 {
   symbolt &aux_symbol = get_fresh_aux_symbol(
     allocate_type,
@@ -185,7 +185,7 @@ exprt allocate_objectst::allocate_non_dynamic_object(
   const exprt &target_expr,
   const typet &allocate_type,
   const bool static_lifetime,
-  const irep_idt &basename_prefix)
+  irep_idt basename_prefix)
 {
   symbolt &aux_symbol = get_fresh_aux_symbol(
     allocate_type,

@@ -124,7 +124,7 @@ public:
     const std::set<std::string> &to_exclude_from_nondet_init = {});
 
   void check_apply_loop_contracts(
-    const irep_idt &function_name,
+    irep_idt function_name,
     goto_functionst::goto_functiont &goto_function,
     const local_may_aliast &local_may_alias,
     goto_programt::targett loop_head,
@@ -133,7 +133,7 @@ public:
     exprt assigns_clause,
     exprt invariant,
     exprt decreases_clause,
-    const irep_idt &mode);
+    irep_idt mode);
 
   std::unordered_map<goto_programt::const_targett, unsigned, const_target_hash>
   get_original_loop_number_map() const
@@ -177,22 +177,22 @@ protected:
 
 public:
   /// \brief Enforce contract of a single function
-  void enforce_contract(const irep_idt &function);
+  void enforce_contract(irep_idt function);
 
   /// Instrument functions to check frame conditions.
-  void check_frame_conditions_function(const irep_idt &function);
+  void check_frame_conditions_function(irep_idt function);
 
   /// Apply loop contracts, whenever available, to all loops in `function`.
   /// Loop invariants, loop variants, and loop assigns clauses.
   void apply_loop_contract(
-    const irep_idt &function,
+    irep_idt function,
     goto_functionst::goto_functiont &goto_function);
 
   /// Replaces function calls with assertions based on requires clauses,
   /// non-deterministic assignments for the write set, and assumptions
   /// based on ensures clauses.
   void apply_function_contract(
-    const irep_idt &function,
+    irep_idt function,
     const source_locationt &location,
     goto_programt &function_body,
     goto_programt::targett &target);
@@ -200,8 +200,8 @@ public:
   /// Instruments `wrapper_function` adding assumptions based on requires
   /// clauses and assertions based on ensures clauses.
   void add_contract_check(
-    const irep_idt &wrapper_function,
-    const irep_idt &mangled_function,
+    irep_idt wrapper_function,
+    irep_idt mangled_function,
     goto_programt &dest);
 };
 

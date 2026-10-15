@@ -36,9 +36,10 @@ lazy_goto_modelt::lazy_goto_modelt(
       language_files,
       symbol_table,
       [this](
-        const irep_idt &function_name,
+        irep_idt function_name,
         goto_functionst::goto_functiont &function,
-        journalling_symbol_tablet &journalling_symbol_table) -> void {
+        journalling_symbol_tablet &journalling_symbol_table) -> void
+      {
         goto_model_functiont model_function(
           journalling_symbol_table,
           goto_model->goto_functions,
@@ -67,9 +68,10 @@ lazy_goto_modelt::lazy_goto_modelt(lazy_goto_modelt &&other)
       language_files,
       symbol_table,
       [this](
-        const irep_idt &function_name,
+        irep_idt function_name,
         goto_functionst::goto_functiont &function,
-        journalling_symbol_tablet &journalling_symbol_table) -> void {
+        journalling_symbol_tablet &journalling_symbol_table) -> void
+      {
         goto_model_functiont model_function(
           journalling_symbol_table,
           goto_model->goto_functions,
@@ -170,7 +172,7 @@ void lazy_goto_modelt::initialize(
   set_up_custom_entry_point(
     language_files,
     symbol_table,
-    [this](const irep_idt &id) { return goto_functions.unload(id); },
+    [this](irep_idt id) { return goto_functions.unload(id); },
     options,
     false,
     message_handler);
@@ -234,7 +236,7 @@ bool lazy_goto_modelt::finalize()
   return post_process_functions(*goto_model);
 }
 
-bool lazy_goto_modelt::can_produce_function(const irep_idt &id) const
+bool lazy_goto_modelt::can_produce_function(irep_idt id) const
 {
   return goto_functions.can_produce_function(id);
 }

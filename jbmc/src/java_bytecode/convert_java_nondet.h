@@ -64,6 +64,6 @@ void convert_nondet(
   goto_model_functiont &function,
   message_handlert &message_handler,
   const java_object_factory_parameterst &object_factory_parameters,
-  const irep_idt &mode);
+  irep_idt mode);
 
 #endif // CPROVER_JAVA_BYTECODE_CONVERT_NONDET_H

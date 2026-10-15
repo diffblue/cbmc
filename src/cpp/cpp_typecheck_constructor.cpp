@@ -25,8 +25,8 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \param [out] block: non-typechecked block
 static void copy_parent(
   const source_locationt &source_location,
-  const irep_idt &parent_base_name,
-  const irep_idt &arg_name,
+  irep_idt parent_base_name,
+  irep_idt arg_name,
   exprt &block)
 {
   exprt op0(
@@ -56,8 +56,8 @@ static void copy_parent(
 /// \param [out] block: non-typechecked block
 static void copy_member(
   const source_locationt &source_location,
-  const irep_idt &member_base_name,
-  const irep_idt &arg_name,
+  irep_idt member_base_name,
+  irep_idt arg_name,
   exprt &block)
 {
   cpp_namet op0(member_base_name, source_location);
@@ -84,9 +84,9 @@ static void copy_member(
 /// \param [out] block: non-typechecked block
 static void copy_array(
   const source_locationt &source_location,
-  const irep_idt &member_base_name,
+  irep_idt member_base_name,
   mp_integer i,
-  const irep_idt &arg_name,
+  irep_idt arg_name,
   exprt &block)
 {
   // Build the index expression
@@ -117,7 +117,7 @@ static void copy_array(
 /// Generate code for implicit default constructors
 void cpp_typecheckt::default_ctor(
   const source_locationt &source_location,
-  const irep_idt &base_name,
+  irep_idt base_name,
   cpp_declarationt &ctor) const
 {
   cpp_declaratort decl;

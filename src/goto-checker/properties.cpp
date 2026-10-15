@@ -100,14 +100,13 @@ void update_properties_from_goto_model(
   }
 }
 
-std::string
-as_string(const irep_idt &property_id, const property_infot &property_info)
+std::string as_string(irep_idt property_id, const property_infot &property_info)
 {
   return "[" + id2string(property_id) + "] " + property_info.description +
          ": " + as_string(property_info.status);
 }
 
-xmlt xml(const irep_idt &property_id, const property_infot &property_info)
+xmlt xml(irep_idt property_id, const property_infot &property_info)
 {
   xmlt xml_result("result");
   xml_result.set_attribute("property", id2string(property_id));
@@ -119,7 +118,7 @@ xmlt xml(const irep_idt &property_id, const property_infot &property_info)
 template <class json_objectT>
 static void json(
   json_objectT &result,
-  const irep_idt &property_id,
+  irep_idt property_id,
   const property_infot &property_info)
 {
   result["property"] = json_stringt(property_id);
@@ -128,8 +127,7 @@ static void json(
   result["sourceLocation"] = json(property_info.pc->source_location());
 }
 
-json_objectt
-json(const irep_idt &property_id, const property_infot &property_info)
+json_objectt json(irep_idt property_id, const property_infot &property_info)
 {
   json_objectt result;
   json<json_objectt>(result, property_id, property_info);
@@ -138,7 +136,7 @@ json(const irep_idt &property_id, const property_infot &property_info)
 
 void json(
   json_stream_objectt &result,
-  const irep_idt &property_id,
+  irep_idt property_id,
   const property_infot &property_info)
 {
   json<json_stream_objectt>(result, property_id, property_info);

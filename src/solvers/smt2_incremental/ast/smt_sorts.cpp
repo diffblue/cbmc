@@ -84,7 +84,7 @@ const smt_sortt &smt_array_sortt::element_sort() const
 }
 
 template <typename visitort>
-void accept(const smt_sortt &sort, const irep_idt &id, visitort &&visitor)
+void accept(const smt_sortt &sort, irep_idt id, visitort &&visitor)
 {
 #define SORT_ID(the_id)                                                        \
   if(id == ID_smt_##the_id##_sort)                                             \

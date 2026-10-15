@@ -26,7 +26,7 @@ void goto_check_c(
   message_handlert &message_handler);
 
 void goto_check_c(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functionst::goto_functiont &goto_function,
   const namespacet &ns,
   const optionst &options,

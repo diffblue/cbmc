@@ -65,13 +65,13 @@ public:
 struct template_parameter_symbol_typet : public typet
 {
 public:
-  explicit template_parameter_symbol_typet(const irep_idt &identifier)
+  explicit template_parameter_symbol_typet(irep_idt identifier)
     : typet(ID_template_parameter_symbol_type)
   {
     set_identifier(identifier);
   }
 
-  void set_identifier(const irep_idt &identifier)
+  void set_identifier(irep_idt identifier)
   {
     set(ID_identifier, identifier);
   }

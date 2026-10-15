@@ -15,7 +15,7 @@ Author: Diffblue Ltd
 
 namespace
 {
-symbolt create_new_symbol(const irep_idt &name, const irep_idt &file_name)
+symbolt create_new_symbol(irep_idt name, irep_idt file_name)
 {
   symbolt symbol;
   symbol.name = name;

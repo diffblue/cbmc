@@ -55,9 +55,9 @@ ssa_exprt::ssa_exprt(const exprt &expr) : symbol_exprt(expr.type())
 /// and add "..component_name" or "[[index]]" to \p os.
 static void build_ssa_identifier_rec(
   const exprt &expr,
-  const irep_idt &l0,
-  const irep_idt &l1,
-  const irep_idt &l2,
+  irep_idt l0,
+  irep_idt l1,
+  irep_idt l2,
   std::ostream &os,
   std::ostream &l1_object_os)
 {
@@ -110,11 +110,8 @@ static void build_ssa_identifier_rec(
     UNREACHABLE;
 }
 
-static std::pair<irep_idt, irep_idt> build_identifier(
-  const exprt &expr,
-  const irep_idt &l0,
-  const irep_idt &l1,
-  const irep_idt &l2)
+static std::pair<irep_idt, irep_idt>
+build_identifier(const exprt &expr, irep_idt l0, irep_idt l1, irep_idt l2)
 {
   std::ostringstream oss;
   std::ostringstream l1_object_oss;

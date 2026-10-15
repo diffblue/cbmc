@@ -283,10 +283,7 @@ void mp_max(mp_integer &a, const mp_integer &b)
 /// \param src: the bitvector representation
 /// \param width: the number of bits in the bitvector
 /// \param bit_index: index (0 is the least significant)
-bool get_bvrep_bit(
-  const irep_idt &src,
-  std::size_t width,
-  std::size_t bit_index)
+bool get_bvrep_bit(irep_idt src, std::size_t width, std::size_t bit_index)
 {
   PRECONDITION(bit_index < width);
 
@@ -372,8 +369,8 @@ make_bvrep(const std::size_t width, const std::function<bool(std::size_t)> f)
 /// \param f: the functor
 /// \return new bitvector representation
 irep_idt bvrep_bitwise_op(
-  const irep_idt &a,
-  const irep_idt &b,
+  irep_idt a,
+  irep_idt b,
   const std::size_t width,
   const std::function<bool(bool, bool)> f)
 {
@@ -389,7 +386,7 @@ irep_idt bvrep_bitwise_op(
 /// \param f: the functor
 /// \return new bitvector representation
 irep_idt bvrep_bitwise_op(
-  const irep_idt &a,
+  irep_idt a,
   const std::size_t width,
   const std::function<bool(bool)> f)
 {
@@ -423,7 +420,7 @@ irep_idt integer2bvrep(const mp_integer &src, std::size_t width)
 }
 
 /// convert a bit-vector representation (possibly signed) to integer
-mp_integer bvrep2integer(const irep_idt &src, std::size_t width, bool is_signed)
+mp_integer bvrep2integer(irep_idt src, std::size_t width, bool is_signed)
 {
   if(is_signed)
   {

@@ -53,7 +53,7 @@ depends_on(const exprt &expr, std::unordered_set<irep_idt> identifiers)
 /// 2. there is no write or read of it outside the loop.
 /// 3. it is not used in loop contracts.
 std::unordered_set<irep_idt> gen_loop_locals_set(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_functiont &goto_function,
   const dfcc_loop_nesting_graph_nodet &loop_node,
   message_handlert &message_handler,

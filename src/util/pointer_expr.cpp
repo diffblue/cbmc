@@ -148,7 +148,7 @@ symbol_exprt object_address_exprt::object_expr() const
 
 field_address_exprt::field_address_exprt(
   exprt compound_ptr,
-  const irep_idt &component_name,
+  irep_idt component_name,
   pointer_typet _type)
   : unary_exprt(ID_field_address, std::move(compound_ptr), std::move(_type))
 {

@@ -25,7 +25,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <atomic>
 
 static symbol_exprt typecheck_sync_with_pointer_parameter(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -64,7 +64,7 @@ static symbol_exprt typecheck_sync_with_pointer_parameter(
 }
 
 static symbol_exprt typecheck_sync_compare_swap(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -107,7 +107,7 @@ static symbol_exprt typecheck_sync_compare_swap(
 }
 
 static symbol_exprt typecheck_sync_lock_release(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -142,7 +142,7 @@ static symbol_exprt typecheck_sync_lock_release(
 }
 
 static symbol_exprt typecheck_atomic_load_n(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -177,7 +177,7 @@ static symbol_exprt typecheck_atomic_load_n(
 }
 
 static symbol_exprt typecheck_atomic_store_n(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -215,7 +215,7 @@ static symbol_exprt typecheck_atomic_store_n(
 }
 
 static symbol_exprt typecheck_atomic_exchange_n(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -253,7 +253,7 @@ static symbol_exprt typecheck_atomic_exchange_n(
 }
 
 static symbol_exprt typecheck_atomic_load_store(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -298,7 +298,7 @@ static symbol_exprt typecheck_atomic_load_store(
 }
 
 static symbol_exprt typecheck_atomic_exchange(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -351,7 +351,7 @@ static symbol_exprt typecheck_atomic_exchange(
 }
 
 static symbol_exprt typecheck_atomic_compare_exchange(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -417,7 +417,7 @@ static symbol_exprt typecheck_atomic_compare_exchange(
 }
 
 static symbol_exprt typecheck_atomic_op_fetch(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -454,7 +454,7 @@ static symbol_exprt typecheck_atomic_op_fetch(
 }
 
 static symbol_exprt typecheck_atomic_fetch_op(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location,
   message_handlert &message_handler)
@@ -492,7 +492,7 @@ static symbol_exprt typecheck_atomic_fetch_op(
 
 std::optional<symbol_exprt>
 c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const exprt::operandst &arguments,
   const source_locationt &source_location)
 {
@@ -608,7 +608,7 @@ c_typecheck_baset::typecheck_gcc_polymorphic_builtin(
 }
 
 static symbolt result_symbol(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const typet &type,
   const source_locationt &source_location,
   symbol_table_baset &symbol_table)
@@ -626,8 +626,8 @@ static symbolt result_symbol(
 }
 
 static void instantiate_atomic_fetch_op(
-  const irep_idt &identifier,
-  const irep_idt &identifier_with_type,
+  irep_idt identifier,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -689,8 +689,8 @@ static void instantiate_atomic_fetch_op(
 }
 
 static void instantiate_atomic_op_fetch(
-  const irep_idt &identifier,
-  const irep_idt &identifier_with_type,
+  irep_idt identifier,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -753,8 +753,8 @@ static void instantiate_atomic_op_fetch(
 }
 
 static void instantiate_sync_fetch(
-  const irep_idt &identifier,
-  const irep_idt &identifier_with_type,
+  irep_idt identifier,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -777,7 +777,7 @@ static void instantiate_sync_fetch(
 }
 
 static void instantiate_sync_bool_compare_and_swap(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -805,7 +805,7 @@ static void instantiate_sync_bool_compare_and_swap(
 }
 
 static void instantiate_sync_val_compare_and_swap(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -855,7 +855,7 @@ static void instantiate_sync_val_compare_and_swap(
 }
 
 static void instantiate_sync_lock_test_and_set(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -911,7 +911,7 @@ static void instantiate_sync_lock_test_and_set(
 }
 
 static void instantiate_sync_lock_release(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -951,7 +951,7 @@ static void instantiate_sync_lock_release(
 }
 
 static void instantiate_atomic_load(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -985,7 +985,7 @@ static void instantiate_atomic_load(
 }
 
 static void instantiate_atomic_load_n(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1013,7 +1013,7 @@ static void instantiate_atomic_load_n(
 }
 
 static void instantiate_atomic_store(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1047,7 +1047,7 @@ static void instantiate_atomic_store(
 }
 
 static void instantiate_atomic_store_n(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1068,7 +1068,7 @@ static void instantiate_atomic_store_n(
 }
 
 static void instantiate_atomic_exchange(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1104,7 +1104,7 @@ static void instantiate_atomic_exchange(
 }
 
 static void instantiate_atomic_exchange_n(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1135,7 +1135,7 @@ static void instantiate_atomic_exchange_n(
 }
 
 static void instantiate_atomic_compare_exchange(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1213,7 +1213,7 @@ static void instantiate_atomic_compare_exchange(
 }
 
 static void instantiate_atomic_compare_exchange_n(
-  const irep_idt &identifier_with_type,
+  irep_idt identifier_with_type,
   const code_typet &code_type,
   const source_locationt &source_location,
   const std::vector<symbol_exprt> &parameter_exprs,
@@ -1236,7 +1236,7 @@ static void instantiate_atomic_compare_exchange_n(
 }
 
 code_blockt c_typecheck_baset::instantiate_gcc_polymorphic_builtin(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const symbol_exprt &function_symbol)
 {
   const irep_idt &identifier_with_type = function_symbol.identifier();

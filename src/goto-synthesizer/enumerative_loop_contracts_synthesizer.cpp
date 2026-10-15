@@ -307,7 +307,7 @@ exprt enumerative_loop_contracts_synthesizert::synthesize_same_object_predicate(
 exprt enumerative_loop_contracts_synthesizert::synthesize_strengthening_clause(
   const std::vector<exprt> terminal_symbols,
   const loop_idt &cause_loop_id,
-  const irep_idt &violation_id,
+  irep_idt violation_id,
   const std::vector<cext> &cexs)
 {
   // Synthesis of strengthening clauses is a enumerate-and-check process.

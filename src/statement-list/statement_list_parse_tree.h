@@ -122,7 +122,7 @@ public:
     /// Create the module \p name with a specific \p version.
     /// \param name: Name of the module.
     /// \param version: Version of the module.
-    tia_modulet(const irep_idt &name, const std::string &version);
+    tia_modulet(irep_idt name, const std::string &version);
   };
 
   /// Structure for a simple function in Statement List. Includes fields for
@@ -138,7 +138,7 @@ public:
     /// \param version: Version of the function.
     /// \param return_type: Type of the function's return value.
     functiont(
-      const irep_idt &name,
+      irep_idt name,
       const std::string &version,
       const typet &return_type);
   };
@@ -154,7 +154,7 @@ public:
     /// Create the function block \p name with a specific \p version.
     /// \param name: Name of the function block.
     /// \param version: Version of the function block.
-    function_blockt(const irep_idt &name, const std::string &version);
+    function_blockt(irep_idt name, const std::string &version);
 
     /// Adds a variable declaration to the list of static variables.
     /// \param declaration: Variable declaration to be added.

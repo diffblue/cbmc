@@ -28,25 +28,23 @@ require_pointer(const typet &type, const std::optional<typet> &subtype);
 [[gnu::no_dangling]]
 #endif
 const struct_tag_typet &
-require_struct_tag(const typet &type, const irep_idt &identifier = "");
+require_struct_tag(const typet &type, irep_idt identifier = "");
 
-pointer_typet require_pointer_to_tag(
-  const typet &type,
-  const irep_idt &identifier = irep_idt());
+pointer_typet
+require_pointer_to_tag(const typet &type, irep_idt identifier = irep_idt());
 
 java_class_typet::componentt require_component(
   const java_class_typet &java_class_type,
-  const irep_idt &component_name);
+  irep_idt component_name);
 
-struct_typet::componentt require_component(
-  const struct_typet &struct_type,
-  const irep_idt &component_name);
+struct_typet::componentt
+require_component(const struct_typet &struct_type, irep_idt component_name);
 
 code_typet require_code(const typet &type);
 java_method_typet require_java_method(const typet &type);
 
 code_typet::parametert
-require_parameter(const code_typet &function_type, const irep_idt &param_name);
+require_parameter(const code_typet &function_type, irep_idt param_name);
 
 code_typet require_code(const typet &type, const size_t num_params);
 java_method_typet
@@ -75,9 +73,8 @@ java_generic_typet require_java_generic_type(
 
 java_generic_parametert require_java_generic_parameter(const typet &type);
 
-java_generic_parametert require_java_generic_parameter(
-  const typet &type,
-  const irep_idt &parameter);
+java_generic_parametert
+require_java_generic_parameter(const typet &type, irep_idt parameter);
 
 const typet &require_java_non_generic_type(
   const typet &type,

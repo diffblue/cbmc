@@ -215,7 +215,7 @@ private:
   void typecheck_function_block_var_decls(
     const statement_list_parse_treet::var_declarationst &var_decls,
     struct_union_typet::componentst &components,
-    const irep_idt &var_property);
+    irep_idt var_property);
 
   /// Performs a typecheck on a variable declaration list and saves the result
   /// to the given component element.
@@ -228,8 +228,8 @@ private:
   void typecheck_function_var_decls(
     const statement_list_parse_treet::var_declarationst &var_decls,
     code_typet::parameterst &params,
-    const irep_idt &function_name,
-    const irep_idt &var_property);
+    irep_idt function_name,
+    irep_idt var_property);
 
   /// Performs a typecheck on the temp variables of a TIA module and saves the
   /// result to the given symbol value.
@@ -667,7 +667,7 @@ private:
   /// Performs a typecheck on an STL comparison instruction. Modifies the RLO.
   /// \param comparison: ID of the compare expression that should be pushed to
   ///   the RLO.
-  void typecheck_accumulator_compare_instruction(const irep_idt &comparison);
+  void typecheck_accumulator_compare_instruction(irep_idt comparison);
 
   /// Checks if the given label is already present and compares the current
   /// state with it. If there is no entry for the label, a new jump location
@@ -675,14 +675,13 @@ private:
   /// \param label: Label to check.
   /// \param sets_fc_false: Whether the encountered jump instruction sets the
   ///   /FC bit to false.
-  void typecheck_label_reference(const irep_idt &label, bool sets_fc_false);
+  void typecheck_label_reference(irep_idt label, bool sets_fc_false);
 
   /// Performs a typecheck on the given identifier and returns its symbol.
   /// \param identifier: Identifier that should be checked.
   /// \param tia_element: Symbol representation of the current TIA module.
   /// \return Expression including the symbol's name and type.
-  exprt
-  typecheck_identifier(const symbolt &tia_element, const irep_idt &identifier);
+  exprt typecheck_identifier(const symbolt &tia_element, irep_idt identifier);
 
   /// Performs a typecheck on a call of __CPOVER_ASSERT and saves the result
   /// to the given symbol.

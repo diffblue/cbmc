@@ -171,7 +171,7 @@ bool symex_bmct::should_stop_unwind(
 }
 
 bool symex_bmct::get_unwind_recursion(
-  const irep_idt &id,
+  irep_idt id,
   unsigned thread_nr,
   unsigned unwind)
 {

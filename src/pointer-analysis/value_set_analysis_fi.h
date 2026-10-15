@@ -53,17 +53,15 @@ protected:
     std::list<value_set_fit::entryt> &dest);
 
   void get_entries_rec(
-    const irep_idt &identifier,
+    irep_idt identifier,
     const std::string &suffix,
     const typet &type,
     std::list<value_set_fit::entryt> &dest);
 
 public:
   // interface value_sets
-  std::vector<exprt> get_values(
-    const irep_idt &function_id,
-    locationt l,
-    const exprt &expr) override;
+  std::vector<exprt>
+  get_values(irep_idt function_id, locationt l, const exprt &expr) override;
 };
 
 #endif // CPROVER_POINTER_ANALYSIS_VALUE_SET_ANALYSIS_FI_H

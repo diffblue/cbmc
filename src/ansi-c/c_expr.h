@@ -118,7 +118,7 @@ class side_effect_expr_overflowt : public side_effect_exprt
 {
 public:
   side_effect_expr_overflowt(
-    const irep_idt &kind,
+    irep_idt kind,
     exprt _lhs,
     exprt _rhs,
     exprt _result,
@@ -205,7 +205,7 @@ inline side_effect_expr_overflowt &to_side_effect_expr_overflow(exprt &expr)
 class history_exprt : public unary_exprt
 {
 public:
-  explicit history_exprt(exprt variable, const irep_idt &id)
+  explicit history_exprt(exprt variable, irep_idt id)
     : unary_exprt(id, std::move(variable))
   {
   }
@@ -216,8 +216,7 @@ public:
   }
 };
 
-inline const history_exprt &
-to_history_expr(const exprt &expr, const irep_idt &id)
+inline const history_exprt &to_history_expr(const exprt &expr, irep_idt id)
 {
   PRECONDITION(id == ID_old || id == ID_loop_entry);
   PRECONDITION(expr.id() == id);

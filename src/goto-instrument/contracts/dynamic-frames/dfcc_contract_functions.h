@@ -74,7 +74,7 @@ public:
   /// Instruments the given function without loop contracts and checks that no
   /// function pointer contracts were discovered.
   void instrument_without_loop_contracts_check_no_pointer_contracts(
-    const irep_idt &spec_function_id);
+    irep_idt spec_function_id);
 
   /// Returns the contract::c_assigns function symbol
   const symbolt &get_spec_assigns_function_symbol() const;
@@ -107,7 +107,7 @@ public:
   const irep_idt spec_frees_function_id;
 
   /// Language mode of the contract symbol
-  const irep_idt &language_mode;
+  irep_idt language_mode;
 
 protected:
   goto_modelt &goto_model;

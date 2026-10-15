@@ -86,7 +86,7 @@ static bool is_access_expr(const exprt &expr)
          expr.id() == ID_dereference;
 }
 
-static bool is_object_creation(const irep_idt &id)
+static bool is_object_creation(irep_idt id)
 {
   return id == ID_array || id == ID_struct || id == ID_constant ||
          id == ID_address_of;

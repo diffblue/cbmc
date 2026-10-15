@@ -40,7 +40,7 @@ public:
 
   // interface value_sets
   std::vector<exprt>
-  get_values(const irep_idt &, locationt l, const exprt &expr) override
+  get_values(irep_idt, locationt l, const exprt &expr) override
   {
     auto s = this->abstract_state_before(l);
     auto d = std::dynamic_pointer_cast<const domaint>(s);

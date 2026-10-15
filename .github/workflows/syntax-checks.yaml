@@ -59,3 +59,25 @@ jobs:
           rustup toolchain install stable --profile minimal --no-self-update -c clippy -c rustfmt
       - name: Run `cargo fmt` on top of Rust API project
         run: cd src/libcprover-rust; cargo fmt --all -- --check
+
+  # This job takes approximately 3 minutes
+  check-pass-by-value:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq \
+            cmake g++ flex bison clang-18 llvm-18-dev libclang-18-dev \
+            libclang-cpp18-dev
+      - name: Configure
+        run: cmake -S . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Check for pass-by-const-reference of cheap-to-copy types
+        run: ./scripts/run_pass_by_value_check.sh build
+      - name: Run the pass-by-value checker self-tests
+        run: make -C regression/cbmc-pass-by-value test

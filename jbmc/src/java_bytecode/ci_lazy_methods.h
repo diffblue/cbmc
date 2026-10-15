@@ -50,7 +50,7 @@ private:
   mapt map;
 
 public:
-  bool contains_method(const irep_idt &method_id) const
+  bool contains_method(irep_idt method_id) const
   {
     return map.count(method_id) != 0;
   }
@@ -63,8 +63,8 @@ public:
   }
 
   void add(
-    const irep_idt &class_id,
-    const irep_idt &method_id,
+    irep_idt class_id,
+    irep_idt method_id,
     const java_bytecode_parse_treet::methodt &method)
   {
     add(class_method_and_bytecodet{class_id, method_id, method});
@@ -79,7 +79,7 @@ public:
     return map.end();
   }
 
-  opt_reft get(const irep_idt &method_id)
+  opt_reft get(irep_idt method_id)
   {
     const auto it = map.find(method_id);
     if(it == map.end())
@@ -88,8 +88,7 @@ public:
   }
 };
 
-typedef std::function<
-  bool(const irep_idt &function_id, ci_lazy_methods_neededt)>
+typedef std::function<bool(irep_idt function_id, ci_lazy_methods_neededt)>
   method_convertert;
 
 typedef std::function<std::vector<irep_idt>(const symbol_table_baset &)>
@@ -100,7 +99,7 @@ class ci_lazy_methodst
 public:
   ci_lazy_methodst(
     const symbol_table_baset &symbol_table,
-    const irep_idt &main_class,
+    irep_idt main_class,
     const std::vector<irep_idt> &main_jar_classes,
     const std::vector<load_extra_methodst> &lazy_methods_extra_entry_points,
     java_class_loadert &java_class_loader,
@@ -138,13 +137,13 @@ private:
 
   irep_idt get_virtual_method_target(
     const std::unordered_set<irep_idt> &instantiated_classes,
-    const irep_idt &call_basename,
-    const irep_idt &classname,
+    irep_idt call_basename,
+    irep_idt classname,
     const symbol_table_baset &symbol_table);
 
   static irep_idt build_virtual_method_name(
-    const irep_idt &class_name,
-    const irep_idt &component_method_name);
+    irep_idt class_name,
+    irep_idt component_method_name);
 
   class_hierarchyt class_hierarchy;
   irep_idt main_class;
@@ -169,7 +168,7 @@ private:
     const method_convertert &method_converter,
     std::unordered_set<irep_idt> &methods_already_populated,
     const bool class_initializer_already_seen,
-    const irep_idt &method_name,
+    irep_idt method_name,
     symbol_table_baset &symbol_table,
     std::unordered_set<irep_idt> &methods_to_convert_later,
     std::unordered_set<irep_idt> &instantiated_classes,

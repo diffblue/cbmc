@@ -60,19 +60,18 @@ struct java_boxed_type_infot
 
 /// If \p type_name is a Java boxed type tag, return information about it,
 /// otherwise return null
-const java_boxed_type_infot *
-get_boxed_type_info_by_name(const irep_idt &type_name);
+const java_boxed_type_infot *get_boxed_type_info_by_name(irep_idt type_name);
 
 /// Returns true iff the argument is the symbol-table identifier of a Java
 /// primitive wrapper type (for example, java::java.lang.Byte)
-bool is_primitive_wrapper_type_id(const irep_idt &id);
+bool is_primitive_wrapper_type_id(irep_idt id);
 
 /// Returns true iff the argument is the fully qualified name of a Java
 /// primitive wrapper type (for example, java.lang.Byte)
 bool is_primitive_wrapper_type_name(const std::string &type_name);
 
 void generate_class_stub(
-  const irep_idt &class_name,
+  irep_idt class_name,
   symbol_table_baset &symbol_table,
   message_handlert &message_handler,
   const struct_union_typet::componentst &componentst);
@@ -104,7 +103,7 @@ void merge_source_location_rec(
 
 /// \param id: any string
 /// \return Returns true if 'id' identifies a string literal symbol
-bool is_java_string_literal_id(const irep_idt &id);
+bool is_java_string_literal_id(irep_idt id);
 
 /// Resolves a user-friendly method name (like packagename.Class.method)
 /// into an internal name (like java::packagename.Class.method:()V)
@@ -144,23 +143,23 @@ size_t find_closing_delimiter(
   char close_char);
 
 exprt make_function_application(
-  const irep_idt &function_name,
+  irep_idt function_name,
   const exprt::operandst &arguments,
   const typet &range,
   symbol_table_baset &symbol_table);
 
-irep_idt strip_java_namespace_prefix(const irep_idt &to_strip);
+irep_idt strip_java_namespace_prefix(irep_idt to_strip);
 
 std::string pretty_print_java_type(const std::string &fqn_java_type);
 
 std::optional<resolve_inherited_componentt::inherited_componentt>
 get_inherited_component(
-  const irep_idt &component_class_id,
-  const irep_idt &component_name,
+  irep_idt component_class_id,
+  irep_idt component_name,
   const symbol_table_baset &symbol_table,
   bool include_interfaces);
 
-bool is_non_null_library_global(const irep_idt &);
+bool is_non_null_library_global(irep_idt);
 
 extern const std::unordered_set<std::string> cprover_methods_to_ignore;
 
@@ -172,7 +171,7 @@ fresh_java_symbol(
   const typet &type,
   const std::string &basename_prefix,
   const source_locationt &source_location,
-  const irep_idt &function_name,
+  irep_idt function_name,
   symbol_table_baset &symbol_table);
 
 /// Gets the identifier of the class which declared a given \p symbol. If the
@@ -183,7 +182,7 @@ std::optional<irep_idt> declaring_class(const symbolt &symbol);
 
 /// Sets the identifier of the class which declared a given \p symbol to \p
 /// declaring_class.
-void set_declaring_class(symbolt &symbol, const irep_idt &declaring_class);
+void set_declaring_class(symbolt &symbol, irep_idt declaring_class);
 
 /// Get JVM type name of the class in which \p method_name is defined.
 /// Returns an empty optional if the class name cannot be retrieved,

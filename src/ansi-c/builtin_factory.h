@@ -16,7 +16,7 @@ class symbol_table_baset;
 
 //! \return 'true' in case of error
 bool builtin_factory(
-  const irep_idt &identifier,
+  irep_idt identifier,
   bool support_float16_type,
   symbol_table_baset &,
   message_handlert &);

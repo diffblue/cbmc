@@ -28,7 +28,7 @@ unified_difft::unified_difft(
 }
 
 unified_difft::goto_program_difft
-unified_difft::get_diff(const irep_idt &function) const
+unified_difft::get_diff(irep_idt function) const
 {
   differences_mapt::const_iterator entry = differences_map_.find(function);
   if(entry == differences_map_.end())
@@ -101,7 +101,7 @@ unified_difft::goto_program_difft unified_difft::get_diff(
 }
 
 void unified_difft::output_diff(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program,
   const differencest &differences,
@@ -303,7 +303,7 @@ unified_difft::differencest unified_difft::lcss(
 }
 
 void unified_difft::unified_diff(
-  const irep_idt &identifier,
+  irep_idt identifier,
   const goto_programt &old_goto_program,
   const goto_programt &new_goto_program)
 {

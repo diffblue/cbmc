@@ -22,7 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 class nullary_exprt : public expr_protectedt
 {
 public:
-  nullary_exprt(const irep_idt &_id, typet _type)
+  nullary_exprt(irep_idt _id, typet _type)
     : expr_protectedt(_id, std::move(_type))
   {
   }
@@ -68,12 +68,7 @@ class ternary_exprt : public expr_protectedt
 {
 public:
   // constructor
-  ternary_exprt(
-    const irep_idt &_id,
-    exprt _op0,
-    exprt _op1,
-    exprt _op2,
-    typet _type)
+  ternary_exprt(irep_idt _id, exprt _op0, exprt _op1, exprt _op2, typet _type)
     : expr_protectedt(
         _id,
         std::move(_type),
@@ -138,7 +133,7 @@ public:
 
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
-  symbol_exprt(const irep_idt &identifier, typet type)
+  symbol_exprt(irep_idt identifier, typet type)
     : nullary_exprt{ID_symbol, std::move(type)}
   {
     this->identifier(identifier);
@@ -146,18 +141,18 @@ public:
 
   /// Generate a symbol_exprt without a proper type. Use if, and only if, the
   /// type either cannot be determined just yet (such as before type checking).
-  static symbol_exprt typeless(const irep_idt &id)
+  static symbol_exprt typeless(irep_idt id)
   {
     return symbol_exprt{id, typet{}};
   }
 
   DEPRECATED(SINCE(2026, 1, 18, "use identifier(...) instead"))
-  void set_identifier(const irep_idt &identifier)
+  void set_identifier(irep_idt identifier)
   {
     this->identifier(identifier);
   }
 
-  void identifier(const irep_idt &identifier)
+  void identifier(irep_idt identifier)
   {
     set(ID_identifier, identifier);
   }
@@ -254,7 +249,7 @@ class decorated_symbol_exprt:public symbol_exprt
 public:
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
-  decorated_symbol_exprt(const irep_idt &identifier, typet type)
+  decorated_symbol_exprt(irep_idt identifier, typet type)
     : symbol_exprt(identifier, std::move(type))
   {
   }
@@ -296,7 +291,7 @@ class nondet_symbol_exprt : public nullary_exprt
 public:
   /// \param identifier: Name of symbol
   /// \param type: Type of symbol
-  nondet_symbol_exprt(const irep_idt &identifier, typet type)
+  nondet_symbol_exprt(irep_idt identifier, typet type)
     : nullary_exprt(ID_nondet_symbol, std::move(type))
   {
     set_identifier(identifier);
@@ -315,7 +310,7 @@ public:
     add_source_location() = std::move(location);
   }
 
-  void set_identifier(const irep_idt &identifier)
+  void set_identifier(irep_idt identifier)
   {
     set(ID_identifier, identifier);
   }
@@ -363,12 +358,12 @@ inline nondet_symbol_exprt &to_nondet_symbol_expr(exprt &expr)
 class unary_exprt : public expr_protectedt
 {
 public:
-  unary_exprt(const irep_idt &_id, const exprt &_op)
+  unary_exprt(irep_idt _id, const exprt &_op)
     : expr_protectedt(_id, _op.type(), {_op})
   {
   }
 
-  unary_exprt(const irep_idt &_id, exprt _op, typet _type)
+  unary_exprt(irep_idt _id, exprt _op, typet _type)
     : expr_protectedt(_id, std::move(_type), {std::move(_op)})
   {
   }
@@ -556,8 +551,7 @@ inline unary_plus_exprt &to_unary_plus_expr(exprt &expr)
 class predicate_exprt : public expr_protectedt
 {
 public:
-  explicit predicate_exprt(const irep_idt &_id)
-    : expr_protectedt(_id, bool_typet())
+  explicit predicate_exprt(irep_idt _id) : expr_protectedt(_id, bool_typet())
   {
   }
 
@@ -573,7 +567,7 @@ public:
 class unary_predicate_exprt:public unary_exprt
 {
 public:
-  unary_predicate_exprt(const irep_idt &_id, exprt _op)
+  unary_predicate_exprt(irep_idt _id, exprt _op)
     : unary_exprt(_id, std::move(_op), bool_typet())
   {
   }
@@ -648,12 +642,12 @@ inline sign_exprt &to_sign_expr(exprt &expr)
 class binary_exprt : public expr_protectedt
 {
 public:
-  binary_exprt(const exprt &_lhs, const irep_idt &_id, exprt _rhs)
+  binary_exprt(const exprt &_lhs, irep_idt _id, exprt _rhs)
     : expr_protectedt(_id, _lhs.type(), {_lhs, std::move(_rhs)})
   {
   }
 
-  binary_exprt(exprt _lhs, const irep_idt &_id, exprt _rhs, typet _type)
+  binary_exprt(exprt _lhs, irep_idt _id, exprt _rhs, typet _type)
     : expr_protectedt(_id, std::move(_type), {std::move(_lhs), std::move(_rhs)})
   {
   }
@@ -736,7 +730,7 @@ inline binary_exprt &to_binary_expr(exprt &expr)
 class binary_predicate_exprt:public binary_exprt
 {
 public:
-  binary_predicate_exprt(exprt _op0, const irep_idt &_id, exprt _op1)
+  binary_predicate_exprt(exprt _op0, irep_idt _id, exprt _op1)
     : binary_exprt(std::move(_op0), _id, std::move(_op1), bool_typet())
   {
   }
@@ -783,7 +777,7 @@ inline binary_predicate_exprt &to_binary_predicate_expr(exprt &expr)
 class binary_relation_exprt:public binary_predicate_exprt
 {
 public:
-  binary_relation_exprt(exprt _lhs, const irep_idt &_id, exprt _rhs)
+  binary_relation_exprt(exprt _lhs, irep_idt _id, exprt _rhs)
     : binary_predicate_exprt(std::move(_lhs), _id, std::move(_rhs))
   {
   }
@@ -907,13 +901,13 @@ inline bool can_cast_expr<less_than_or_equal_exprt>(const exprt &base)
 class multi_ary_exprt : public expr_protectedt
 {
 public:
-  multi_ary_exprt(const irep_idt &_id, operandst _operands, typet _type)
+  multi_ary_exprt(irep_idt _id, operandst _operands, typet _type)
     : expr_protectedt(_id, std::move(_type))
   {
     operands() = std::move(_operands);
   }
 
-  multi_ary_exprt(const irep_idt &_id, operandst _operands)
+  multi_ary_exprt(irep_idt _id, operandst _operands)
     : expr_protectedt(_id, typet{})
   {
     PRECONDITION(!_operands.empty());
@@ -921,12 +915,12 @@ public:
     operands() = std::move(_operands);
   }
 
-  multi_ary_exprt(const exprt &_lhs, const irep_idt &_id, exprt _rhs)
+  multi_ary_exprt(const exprt &_lhs, irep_idt _id, exprt _rhs)
     : expr_protectedt(_id, _lhs.type(), {_lhs, std::move(_rhs)})
   {
   }
 
-  multi_ary_exprt(exprt _lhs, const irep_idt &_id, exprt _rhs, typet _type)
+  multi_ary_exprt(exprt _lhs, irep_idt _id, exprt _rhs, typet _type)
     : expr_protectedt(_id, std::move(_type), {std::move(_lhs), std::move(_rhs)})
   {
   }
@@ -1723,7 +1717,7 @@ inline vector_exprt &to_vector_expr(exprt &expr)
 class union_exprt:public unary_exprt
 {
 public:
-  union_exprt(const irep_idt &_component_name, exprt _value, typet _type)
+  union_exprt(irep_idt _component_name, exprt _value, typet _type)
     : unary_exprt(ID_union, std::move(_value), std::move(_type))
   {
     set_component_name(_component_name);
@@ -1734,7 +1728,7 @@ public:
     return get(ID_component_name);
   }
 
-  void set_component_name(const irep_idt &component_name)
+  void set_component_name(irep_idt component_name)
   {
     set(ID_component_name, component_name);
   }
@@ -1824,8 +1818,8 @@ public:
   {
   }
 
-  exprt &component(const irep_idt &name, const namespacet &ns);
-  const exprt &component(const irep_idt &name, const namespacet &ns) const;
+  exprt &component(irep_idt name, const namespacet &ns);
+  const exprt &component(irep_idt name, const namespacet &ns) const;
 };
 
 template <>
@@ -2634,7 +2628,7 @@ inline index_designatort &to_index_designator(exprt &expr)
 class member_designatort : public expr_protectedt
 {
 public:
-  explicit member_designatort(const irep_idt &_component_name)
+  explicit member_designatort(irep_idt _component_name)
     : expr_protectedt(ID_member_designator, typet())
   {
     set(ID_component_name, _component_name);
@@ -2865,7 +2859,7 @@ inline array_update_exprt &to_array_update_expr(exprt &expr)
 class member_exprt:public unary_exprt
 {
 public:
-  member_exprt(exprt op, const irep_idt &component_name, typet _type)
+  member_exprt(exprt op, irep_idt component_name, typet _type)
     : unary_exprt(ID_member, std::move(op), std::move(_type))
   {
     const auto &compound_type_id = compound().type().id();
@@ -2890,7 +2884,7 @@ public:
     return get(ID_component_name);
   }
 
-  void set_component_name(const irep_idt &component_name)
+  void set_component_name(irep_idt component_name)
   {
     set(ID_component_name, component_name);
   }
@@ -3006,7 +3000,7 @@ inline type_exprt &to_type_expr(exprt &expr)
 class constant_exprt : public nullary_exprt
 {
 public:
-  constant_exprt(const irep_idt &_value, typet _type)
+  constant_exprt(irep_idt _value, typet _type)
     : nullary_exprt(ID_constant, std::move(_type))
   {
     set_value(_value);
@@ -3017,7 +3011,7 @@ public:
     return get(ID_value);
   }
 
-  void set_value(const irep_idt &value)
+  void set_value(irep_idt value)
   {
     set(ID_value, value);
   }

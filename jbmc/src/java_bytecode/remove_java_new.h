@@ -19,14 +19,14 @@ class message_handlert;
 class symbol_table_baset;
 
 void remove_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_programt::targett target,
   goto_programt &goto_program,
   symbol_table_baset &symbol_table,
   message_handlert &_message_handler);
 
 void remove_java_new(
-  const irep_idt &function_identifier,
+  irep_idt function_identifier,
   goto_functionst::goto_functiont &function,
   symbol_table_baset &symbol_table,
   message_handlert &_message_handler);

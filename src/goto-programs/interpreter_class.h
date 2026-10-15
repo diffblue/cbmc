@@ -201,7 +201,7 @@ protected:
   struct_typet::componentt
   get_component(const typet &object_type, const mp_integer &offset);
 
-  typet get_type(const irep_idt &id) const;
+  typet get_type(irep_idt id) const;
 
   exprt get_value(
     const typet &type,
@@ -213,7 +213,7 @@ protected:
     mp_vectort &rhs,
     const mp_integer &offset=0);
 
-  exprt get_value(const irep_idt &id);
+  exprt get_value(irep_idt id);
 
   void step();
 

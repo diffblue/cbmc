@@ -29,7 +29,7 @@ add_one_function(
     const symbol_tablet &,
     symbol_tablet &,
     message_handlert &)> &library,
-  const irep_idt &missing_function)
+  irep_idt missing_function)
 {
   goto_modelt library_model;
   library(

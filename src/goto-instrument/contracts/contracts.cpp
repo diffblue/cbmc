@@ -38,7 +38,7 @@ Date: February 2016
 #include <map>
 
 void code_contractst::check_apply_loop_contracts(
-  const irep_idt &function_name,
+  irep_idt function_name,
   goto_functionst::goto_functiont &goto_function,
   const local_may_aliast &local_may_alias,
   goto_programt::targett loop_head,
@@ -47,7 +47,7 @@ void code_contractst::check_apply_loop_contracts(
   exprt assigns_clause,
   exprt invariant,
   exprt decreases_clause,
-  const irep_idt &mode)
+  irep_idt mode)
 {
   const auto loop_head_location = loop_head->source_location();
   const auto loop_number = loop_end->loop_number;
@@ -553,7 +553,7 @@ static void generate_contract_constraints(
   symbol_tablet &symbol_table,
   goto_convertt &converter,
   exprt &instantiated_clause,
-  const irep_idt &mode,
+  irep_idt mode,
   const std::function<void(goto_programt &)> &is_fresh_update,
   goto_programt &program,
   const source_locationt &location)
@@ -577,7 +577,7 @@ static void generate_contract_constraints(
 }
 
 static const code_with_contract_typet &
-get_contract(const irep_idt &function, const namespacet &ns)
+get_contract(irep_idt function, const namespacet &ns)
 {
   const std::string &function_str = id2string(function);
   const auto &function_symbol = ns.lookup(function);
@@ -598,7 +598,7 @@ get_contract(const irep_idt &function, const namespacet &ns)
 }
 
 void code_contractst::apply_function_contract(
-  const irep_idt &function,
+  irep_idt function,
   const source_locationt &location,
   goto_programt &function_body,
   goto_programt::targett &target)
@@ -629,7 +629,7 @@ void code_contractst::apply_function_contract(
   }
 
   // Isolate each component of the contract.
-  const auto &type = get_contract(target_function, ns);
+  const auto type = get_contract(target_function, ns);
 
   // Prepare to instantiate expressions in the callee
   // with expressions from the call site (e.g. the return value).
@@ -839,7 +839,7 @@ void code_contractst::apply_function_contract(
 }
 
 void code_contractst::apply_loop_contract(
-  const irep_idt &function_name,
+  irep_idt function_name,
   goto_functionst::goto_functiont &goto_function)
 {
   const bool may_have_loops = std::any_of(
@@ -1121,7 +1121,7 @@ void code_contractst::apply_loop_contract(
   }
 }
 
-void code_contractst::check_frame_conditions_function(const irep_idt &function)
+void code_contractst::check_frame_conditions_function(irep_idt function)
 {
   // Get the function object before instrumentation.
   auto function_obj = goto_functions.function_map.find(function);
@@ -1186,7 +1186,8 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
     instantiation_values.push_back(
       ns.lookup(param.get_identifier()).symbol_expr());
   }
-  for(auto &target : get_contract(function, ns).c_assigns())
+  const auto contract_type = get_contract(function, ns);
+  for(auto &target : contract_type.c_assigns())
   {
     goto_programt payload;
     instrument_spec_assigns.track_spec_target(
@@ -1212,7 +1213,7 @@ void code_contractst::check_frame_conditions_function(const irep_idt &function)
     function_body, instruction_it, function_body.instructions.end());
 }
 
-void code_contractst::enforce_contract(const irep_idt &function)
+void code_contractst::enforce_contract(irep_idt function)
 {
   // Add statements to the source function
   // to ensure assigns clause is respected.
@@ -1269,8 +1270,8 @@ void code_contractst::enforce_contract(const irep_idt &function)
 }
 
 void code_contractst::add_contract_check(
-  const irep_idt &wrapper_function,
-  const irep_idt &mangled_function,
+  irep_idt wrapper_function,
+  irep_idt mangled_function,
   goto_programt &dest)
 {
   PRECONDITION(!dest.instructions.empty());
@@ -1283,7 +1284,7 @@ void code_contractst::add_contract_check(
   // ret=function(parameter1, ...)
   // assert(ensures)
 
-  const auto &code_type = get_contract(wrapper_function, ns);
+  const auto code_type = get_contract(wrapper_function, ns);
   goto_programt check;
 
   // prepare function call including all declarations

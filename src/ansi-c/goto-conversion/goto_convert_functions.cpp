@@ -137,7 +137,7 @@ void goto_convert_functionst::add_return(
 }
 
 void goto_convert_functionst::convert_function(
-  const irep_idt &identifier,
+  irep_idt identifier,
   goto_functionst::goto_functiont &f)
 {
   const symbolt &symbol = ns.lookup(identifier);
@@ -264,7 +264,7 @@ void goto_convert(
 }
 
 void goto_convert(
-  const irep_idt &identifier,
+  irep_idt identifier,
   symbol_table_baset &symbol_table,
   goto_functionst &functions,
   message_handlert &message_handler)

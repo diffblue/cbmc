@@ -27,7 +27,7 @@ class typet;
 void shadow_memory_log_set_field(
   const namespacet &ns,
   const messaget &log,
-  const irep_idt &field_name,
+  irep_idt field_name,
   const exprt &expr,
   const exprt &value);
 
@@ -44,7 +44,7 @@ void shadow_memory_log_value_set(
 void shadow_memory_log_get_field(
   const namespacet &ns,
   const messaget &log,
-  const irep_idt &field_name,
+  irep_idt field_name,
   const exprt &expr);
 
 /// Logs a successful match between an address and a value within the value set.
@@ -94,7 +94,7 @@ void replace_invalid_object_by_null(exprt &expr);
 ///   expression.
 /// \returns The expression the field was initialised with.
 const exprt &
-get_field_init_expr(const irep_idt &field_name, const goto_symex_statet &state);
+get_field_init_expr(irep_idt field_name, const goto_symex_statet &state);
 
 /// Get a list of `(condition, value)` pairs for a certain pointer from
 /// the shadow memory, where each pair denotes the `value` of the pointer
@@ -120,7 +120,7 @@ std::vector<std::pair<exprt, exprt>> get_shadow_dereference_candidates(
 ///    the type of the value the field currently is associated with, but it's
 ///    invariant since the declaration).
 const typet &
-get_field_init_type(const irep_idt &field_name, const goto_symex_statet &state);
+get_field_init_type(irep_idt field_name, const goto_symex_statet &state);
 
 /// Given a pointer expression check to see if it can be a null pointer or an
 /// invalid object within value_set.

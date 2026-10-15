@@ -17,7 +17,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "cpp_typecheck.h"
 
 void cpp_typecheckt::convert_parameter(
-  const irep_idt &current_mode,
+  irep_idt current_mode,
   code_typet::parametert &parameter)
 {
   irep_idt base_name=id2string(parameter.get_base_name());
@@ -66,7 +66,7 @@ void cpp_typecheckt::convert_parameter(
 }
 
 void cpp_typecheckt::convert_parameters(
-  const irep_idt &current_mode,
+  irep_idt current_mode,
   code_typet &function_type)
 {
   code_typet::parameterst &parameters=

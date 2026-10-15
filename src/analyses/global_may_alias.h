@@ -27,9 +27,9 @@ public:
 
   /// Abstract Interpretation domain transform function.
   void transform(
-    const irep_idt &function_from,
+    irep_idt function_from,
     trace_ptrt trace_from,
-    const irep_idt &function_to,
+    irep_idt function_to,
     trace_ptrt trace_to,
     ai_baset &ai,
     const namespacet &ns) final override;

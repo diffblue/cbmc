@@ -44,8 +44,8 @@ public:
 protected:
   void strengthen(exprt &dest);
   void weaken(exprt &dest);
-  bool is_used_address_of(const exprt &expr, const irep_idt &identifier);
-  bool is_used(const exprt &expr, const irep_idt &identifier);
+  bool is_used_address_of(const exprt &expr, irep_idt identifier);
+  bool is_used(const exprt &expr, irep_idt identifier);
 };
 
 void postcondition(
@@ -67,9 +67,7 @@ void postcondition(
   }
 }
 
-bool postconditiont::is_used_address_of(
-  const exprt &expr,
-  const irep_idt &identifier)
+bool postconditiont::is_used_address_of(const exprt &expr, irep_idt identifier)
 {
   if(expr.id()==ID_symbol)
   {
@@ -144,9 +142,7 @@ void postconditiont::strengthen(exprt &dest)
   }
 }
 
-bool postconditiont::is_used(
-  const exprt &expr,
-  const irep_idt &identifier)
+bool postconditiont::is_used(const exprt &expr, irep_idt identifier)
 {
   if(expr.id()==ID_address_of)
   {

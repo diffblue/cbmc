@@ -15,7 +15,7 @@ Author: Daniel Kroening
 #include "cover_filter.h"
 
 void cover_location_instrumentert::instrument(
-  const irep_idt &function_id,
+  irep_idt function_id,
   goto_programt &goto_program,
   goto_programt::targett &i_it,
   const cover_blocks_baset &basic_blocks,

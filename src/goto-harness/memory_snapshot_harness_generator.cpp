@@ -228,7 +228,7 @@ code_blockt memory_snapshot_harness_generatort::add_assignments_to_globals(
       {
         collect_references(
           snapshot_pair.second.value,
-          [&reference_relation, &snapshot_pair](const irep_idt &id) {
+          [&reference_relation, &snapshot_pair](irep_idt id) {
             reference_relation.insert(std::make_pair(snapshot_pair.first, id));
           });
         selected_snapshot_symbols.push_back(snapshot_pair);
@@ -368,7 +368,7 @@ void memory_snapshot_harness_generatort::get_memory_snapshot(
 
 void memory_snapshot_harness_generatort::generate(
   goto_modelt &goto_model,
-  const irep_idt &harness_function_name)
+  irep_idt harness_function_name)
 {
   symbol_tablet snapshot;
   get_memory_snapshot(memory_snapshot_file, snapshot);

@@ -35,8 +35,8 @@ const std::string thread_id = CPROVER_PREFIX "_thread_id";// NOLINT(*)
 /// /return returns new or existing symbol.
 static symbolt add_or_get_symbol(
   symbol_table_baset &symbol_table,
-  const irep_idt &name,
-  const irep_idt &base_name,
+  irep_idt name,
+  irep_idt base_name,
   const typet &type,
   const exprt &value,
   const bool is_thread_local,

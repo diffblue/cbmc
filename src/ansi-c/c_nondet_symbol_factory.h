@@ -35,7 +35,7 @@ public:
   symbol_factoryt(
     symbol_table_baset &_symbol_table,
     const source_locationt &loc,
-    const irep_idt &name_prefix,
+    irep_idt name_prefix,
     const c_object_factory_parameterst &object_factory_params,
     const lifetimet lifetime)
     : symbol_table(_symbol_table),

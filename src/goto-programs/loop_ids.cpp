@@ -27,7 +27,7 @@ void show_loop_ids(
 
 void show_loop_ids(
   ui_message_handlert::uit ui,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program)
 {
   switch(ui)
@@ -72,7 +72,7 @@ void show_loop_ids(
 
 void show_loop_ids_json(
   ui_message_handlert::uit ui,
-  const irep_idt &function_id,
+  irep_idt function_id,
   const goto_programt &goto_program,
   json_arrayt &loops)
 {

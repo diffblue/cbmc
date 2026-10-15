@@ -120,7 +120,7 @@ protected:
   namespacet ns;
   message_handlert &message_handler;
 
-  irep_idt rename(const symbol_table_baset &, const irep_idt &);
+  irep_idt rename(const symbol_table_baset &, irep_idt);
 
   // the new IDs created by renaming
   std::unordered_set<irep_idt> renamed_ids;

@@ -43,7 +43,7 @@ class goto_harness_generatort
 public:
   /// Generate a harness according to the set options
   virtual void
-  generate(goto_modelt &goto_model, const irep_idt &harness_function_name) = 0;
+  generate(goto_modelt &goto_model, irep_idt harness_function_name) = 0;
 
   virtual ~goto_harness_generatort() = default;
   friend class goto_harness_generator_factoryt;

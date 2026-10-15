@@ -229,13 +229,13 @@ public:
   void load(std::set<irep_idt> &to_instrument);
 
   /// Returns the dfcc_funt that corresponds to the given id if any.
-  std::optional<dfcc_funt> get_dfcc_fun(const irep_idt &id) const;
+  std::optional<dfcc_funt> get_dfcc_fun(irep_idt id) const;
 
   /// Returns the name of the given dfcc_funt.
   const irep_idt &get_dfcc_fun_name(dfcc_funt fun) const;
 
   /// True iff the given id is one of the library symbols.
-  bool is_dfcc_library_symbol(const irep_idt &id) const;
+  bool is_dfcc_library_symbol(irep_idt id) const;
 
   /// Specializes the library by unwinding loops in library functions
   /// to the given assigns clause size.
@@ -260,17 +260,17 @@ public:
   /// Returns true iff the given function_id is one of `__CPROVER_assignable`,
   /// `__CPROVER_object_whole`, `__CPROVER_object_from`,
   /// `__CPROVER_object_upto`, `__CPROVER_freeable`
-  bool is_front_end_builtin(const irep_idt &function_id) const;
+  bool is_front_end_builtin(irep_idt function_id) const;
 
   /// Returns the library instrumentation hook for the given front-end function.
   /// \pre  \p function_id is a front end built-in as defined by
   /// \ref is_front_end_builtin.
-  dfcc_funt get_hook(const irep_idt &function_id) const;
+  dfcc_funt get_hook(irep_idt function_id) const;
 
   /// Returns the library instrumentation hook for the given built-in.
   /// function_id must be one of `__CPROVER_assignable`,
   /// `__CPROVER_object_whole`, `__CPROVER_object_from`, `__CPROVER_object_upto`
-  std::optional<dfcc_funt> get_havoc_hook(const irep_idt &function_id) const;
+  std::optional<dfcc_funt> get_havoc_hook(irep_idt function_id) const;
 
   /// \brief Returns the "__dfcc_instrumented_functions" symbol or creates it if
   /// it does not exist already.

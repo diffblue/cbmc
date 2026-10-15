@@ -221,7 +221,7 @@ smt_exists_termt::bound_variables() const
 }
 
 template <typename visitort>
-void accept(const smt_termt &term, const irep_idt &id, visitort &&visitor)
+void accept(const smt_termt &term, irep_idt id, visitort &&visitor)
 {
 #define TERM_ID(the_id)                                                        \
   if(id == ID_smt_##the_id##_term)                                             \
