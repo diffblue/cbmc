@@ -28,6 +28,9 @@ void rename_symbolt::insert(
 
 bool rename_symbolt::rename(exprt &dest) const
 {
+  if(empty())
+    return true;
+
   bool result=true;
 
   for(auto it = dest.depth_begin(), end = dest.depth_end(); it != end; ++it)
@@ -82,7 +85,7 @@ bool rename_symbolt::rename(exprt &dest) const
 
 bool rename_symbolt::have_to_rename(const exprt &dest) const
 {
-  if(expr_map.empty() && type_map.empty())
+  if(empty())
     return false;
 
   // first look at type
@@ -222,7 +225,7 @@ bool rename_symbolt::rename(typet &dest) const
 
 bool rename_symbolt::have_to_rename(const typet &dest) const
 {
-  if(expr_map.empty() && type_map.empty())
+  if(empty())
     return false;
 
   if(dest.has_subtype())
