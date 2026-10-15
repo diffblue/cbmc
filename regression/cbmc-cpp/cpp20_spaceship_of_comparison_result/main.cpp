@@ -1,3 +1,4 @@
+// clang-format off
 #include <compare>
 extern "C" void __CPROVER_assert(bool, const char *);
 int main()
@@ -11,3 +12,4 @@ int main()
   __CPROVER_assert(s == 0, "comparison result <=> true");
   __CPROVER_assert(r2 == 0, "WRONG (must FAIL)");
 }
+// clang-format on

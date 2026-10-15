@@ -1,3 +1,4 @@
+// clang-format off
 #include <compare>
 extern "C" void __CPROVER_assert(bool, const char *);
 #include <type_traits>
@@ -36,3 +37,4 @@ int main()
     r != 0 && 5 < r && !(r == 64), "reversed and converted operands");
   __CPROVER_assert(r > bits, "WRONG (must FAIL)");
 }
+// clang-format on

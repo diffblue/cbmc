@@ -2,19 +2,26 @@
 // copy-initialized from its initializer; an element of class type is
 // constructed, not assigned to
 extern "C" void __CPROVER_assert(bool, const char *);
-struct conv {
+struct conv
+{
   int v;
-  conv(int x) : v(2 * x) {}
+  conv(int x) : v(2 * x)
+  {
+  }
   conv &operator=(const conv &) = delete;
 };
-struct agg {
+struct agg
+{
   conv c;
   int k;
 };
-template <class H> struct leaf {
+template <class H>
+struct leaf
+{
   H value;
 };
-int main() {
+int main()
+{
   agg a(3, 4);
   __CPROVER_assert(a.c.v == 6 && a.k == 4, "parenthesized");
   leaf<conv> l(5);

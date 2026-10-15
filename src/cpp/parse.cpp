@@ -1705,10 +1705,10 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
   {
   case tdk_decl:
 #ifdef DEBUG
-    std::cout << std::string(__indent, ' ') << "BODY: "
-              << body.pretty() << '\n';
-    std::cout << std::string(__indent, ' ') << "TEMPLATE_TYPE: "
-              << template_type.pretty() << '\n';
+    std::cout << std::string(__indent, ' ') << "BODY: " << body.pretty()
+              << '\n';
+    std::cout << std::string(__indent, ' ')
+              << "TEMPLATE_TYPE: " << template_type.pretty() << '\n';
 #endif
     body.add(ID_template_type).swap(template_type);
     body.set(ID_is_template, true);
@@ -1719,7 +1719,7 @@ bool Parser::rTemplateDecl(cpp_declarationt &decl)
     // Repackage the decl; N5008 [temp.explicit]: `template decl;' is an
     // explicit instantiation, which the typechecker instantiates rather
     // than declares.
-    decl=body;
+    decl = body;
     decl.set("#explicit_instantiation", true);
     break;
 
@@ -1784,35 +1784,35 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
 {
   cpp_tokent tk;
 
-  if(lex.get_token(tk)!=TOK_TEMPLATE)
+  if(lex.get_token(tk) != TOK_TEMPLATE)
     return false;
 
-  decl=typet(ID_template);
+  decl = typet(ID_template);
   set_location(decl, tk);
 
-  if(lex.LookAhead(0)!='<')
+  if(lex.LookAhead(0) != '<')
   {
     // template instantiation
-    kind=tdk_instantiation;
-    return true;        // ignore TEMPLATE
+    kind = tdk_instantiation;
+    return true; // ignore TEMPLATE
   }
 
-  if(lex.get_token(tk)!='<')
+  if(lex.get_token(tk) != '<')
     return false;
 
-  irept &template_parameters=decl.add(ID_template_parameters);
+  irept &template_parameters = decl.add(ID_template_parameters);
 
   if(!rTempArgList(template_parameters))
     return false;
 
-  if(lex.get_token(tk)!='>')
+  if(lex.get_token(tk) != '>')
     return false;
 
   // merge nested template parameters (e.g., template<T> template<U>)
-  while(lex.LookAhead(0)==TOK_TEMPLATE)
+  while(lex.LookAhead(0) == TOK_TEMPLATE)
   {
     lex.get_token(tk);
-    if(lex.LookAhead(0)!='<')
+    if(lex.LookAhead(0) != '<')
       break;
 
     lex.get_token(tk);
@@ -1820,7 +1820,7 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
     if(!rTempArgList(inner_args))
       return false;
 
-    if(lex.get_token(tk)!='>')
+    if(lex.get_token(tk) != '>')
       return false;
 
     for(auto &sub : inner_args.get_sub())
@@ -1829,10 +1829,10 @@ bool Parser::rTemplateDecl2(typet &decl, TemplateDeclKind &kind)
 
   if(template_parameters.get_sub().empty())
     // template < > declaration
-    kind=tdk_specialization;
+    kind = tdk_specialization;
   else
     // template < ... > declaration
-    kind=tdk_decl;
+    kind = tdk_decl;
 
   return true;
 }

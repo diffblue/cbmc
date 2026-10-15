@@ -9,12 +9,16 @@ enum plain
   first = 0,
   second = 1
 };
-errc make() { return {}; }
+errc make()
+{
+  return {};
+}
 int main()
 {
   errc e = errc::bad;
   e = {};
-  __CPROVER_assert(e == errc::ok, "assignment of {} value-initializes a scoped enum");
+  __CPROVER_assert(
+    e == errc::ok, "assignment of {} value-initializes a scoped enum");
   int i = 5;
   i = {};
   __CPROVER_assert(i == 0, "assignment of {} to an int");
