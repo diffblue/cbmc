@@ -410,26 +410,7 @@ void cpp_typecheckt::typecheck_compound_type(struct_union_typet &type)
               // be looked up directly.)
               symbolt *template_symbol = nullptr;
               if(!param_id.empty())
-              {
-                for(const auto &tsp : symbol_table)
-                {
-                  if(!tsp.second.type.get_bool(ID_is_template))
-                    continue;
-                  const auto &cand_tt = static_cast<const template_typet &>(
-                    tsp.second.type.find(ID_template_type));
-                  if(cand_tt.template_parameters().empty())
-                    continue;
-                  const auto &cp = cand_tt.template_parameters().front();
-                  const irep_idt cp_id = cp.id() == ID_type
-                                           ? cp.type().get(ID_identifier)
-                                           : cp.get(ID_identifier);
-                  if(id2string(cp_id) == param_id)
-                  {
-                    template_symbol = symbol_table.get_writeable(tsp.first);
-                    break;
-                  }
-                }
-              }
+                template_symbol = template_by_first_parameter(param_id);
               if(template_symbol != nullptr)
               {
                 irept &instantiated_with =
@@ -6961,4 +6942,61 @@ void cpp_typecheckt::make_ptr_typecast(
   }
 
   expr = typecast_exprt(expr, dest_type);
+}
+
+/// The template symbol whose first template parameter has the identifier
+/// \p param_id, or nullptr.  Template-parameter identifiers carry their
+/// (numbered) template scope, so at most one template declares a given one.
+/// A whole-symbol-table scan per completed class-template instance took a
+/// third of the type-checking time of large translation units
+/// (goto_instrument_parse_options.cpp); the answers are cached and
+/// confirmed on use, and a miss rescans.
+symbolt *
+cpp_typecheckt::template_by_first_parameter(const std::string &param_id)
+{
+  const auto lookup_cached = [this, &param_id]() -> symbolt *
+  {
+    const auto it = templates_by_first_parameter.find(param_id);
+    if(it == templates_by_first_parameter.end())
+      return nullptr;
+    symbolt *s = symbol_table.get_writeable(it->second);
+    return s != nullptr && s->type.get_bool(ID_is_template) ? s : nullptr;
+  };
+  if(symbolt *s = lookup_cached())
+  {
+    // the template's parameters may have been replaced since (a
+    // declaration followed by the definition): confirm
+    const auto &tt =
+      static_cast<const template_typet &>(s->type.find(ID_template_type));
+    if(!tt.template_parameters().empty())
+    {
+      const auto &cp = tt.template_parameters().front();
+      const irep_idt cp_id = cp.id() == ID_type ? cp.type().get(ID_identifier)
+                                                : cp.get(ID_identifier);
+      if(id2string(cp_id) == param_id)
+        return s;
+    }
+  }
+  // a miss (or a stale entry): rescan -- template symbols change their
+  // parameters when a declaration is followed by the definition
+  ++templates_by_first_parameter_scanned;
+  templates_by_first_parameter.clear();
+  for(const auto &tsp : symbol_table)
+  {
+    if(!tsp.second.type.get_bool(ID_is_template))
+      continue;
+    const auto &cand_tt = static_cast<const template_typet &>(
+      tsp.second.type.find(ID_template_type));
+    if(cand_tt.template_parameters().empty())
+      continue;
+    const auto &cp = cand_tt.template_parameters().front();
+    const irep_idt cp_id =
+      cp.id() == ID_type ? cp.type().get(ID_identifier) : cp.get(ID_identifier);
+    if(!cp_id.empty())
+      templates_by_first_parameter.emplace(id2string(cp_id), tsp.first);
+  }
+  const auto it = templates_by_first_parameter.find(param_id);
+  return it == templates_by_first_parameter.end()
+           ? nullptr
+           : symbol_table.get_writeable(it->second);
 }
