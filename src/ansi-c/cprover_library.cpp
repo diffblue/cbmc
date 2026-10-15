@@ -170,8 +170,17 @@ std::string get_cprover_library_text(
       else if(plain == e->function)
         of_plain = e;
     }
-    if(own != nullptr || of_plain == nullptr)
+    // A model taking a va_list (vsnprintf, ...) is not reused: where
+    // va_list is a struct (aarch64), the C++ declaration of __builtin_X and
+    // the C model then have different parameter types, and linking left
+    // the model's va_list typedef dangling (--validate-goto-model:
+    // "va_list not found").
+    if(
+      own != nullptr || of_plain == nullptr ||
+      std::string{of_plain->model}.find("va_list") != std::string::npos)
+    {
       continue;
+    }
     const auto old = symbol_table.symbols.find(id);
     if(
       force_load ||
