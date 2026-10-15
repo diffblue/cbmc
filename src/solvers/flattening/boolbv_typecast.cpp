@@ -6,6 +6,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 \*******************************************************************/
 
+#include <util/arith_tools.h>
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/namespace.h>
@@ -200,12 +201,36 @@ bool boolbvt::type_conversion(
         dest.resize(dest_width);
       return false;
 
+    case bvtypet::IS_FIXED: // fixed to float
+    {
+      // fixedbv is a signed integer scaled by 2^fraction_bits.
+      // Convert: treat as signed integer, convert to float, divide by
+      // 2^fraction_bits.
+      const fixedbv_typet &fixedbv_type = to_fixedbv_type(src_type);
+      std::size_t fraction_bits = fixedbv_type.get_fraction_bits();
+
+      float_utils.spec = ieee_float_spect(to_floatbv_type(dest_type));
+
+      // Convert the raw signed integer to float
+      bvt as_float = float_utils.from_signed_integer(src);
+
+      // Build 2^fraction_bits as a float constant and divide
+      ieee_floatt divisor_float(
+        ieee_float_spect(to_floatbv_type(dest_type)),
+        ieee_floatt::ROUND_TO_EVEN);
+      divisor_float.from_integer(
+        power(mp_integer(2), mp_integer(fraction_bits)));
+      bvt divisor_bv = convert_bv(divisor_float.to_expr());
+
+      dest = float_utils.div(as_float, divisor_bv);
+      return false;
+    }
+
     case bvtypet::IS_C_BIT_FIELD:
     case bvtypet::IS_UNKNOWN:
     case bvtypet::IS_RANGE:
     case bvtypet::IS_VERILOG_UNSIGNED:
     case bvtypet::IS_VERILOG_SIGNED:
-    case bvtypet::IS_FIXED:
       if(src_type.id() == ID_bool)
       {
         // bool to float
@@ -306,6 +331,26 @@ bool boolbvt::type_conversion(
 
         dest.push_back(l);
       }
+
+      return false;
+    }
+    else if(src_bvtype == bvtypet::IS_FLOAT)
+    {
+      // float to fixed: multiply by 2^fraction_bits, convert to signed integer
+      float_utilst float_utils(prop, to_floatbv_type(src_type));
+      float_utils.rounding_mode_bits.set(ieee_floatt::ROUND_TO_ZERO);
+
+      const fixedbv_typet &dest_fixedbv_type = to_fixedbv_type(dest_type);
+      std::size_t dest_fraction_bits = dest_fixedbv_type.get_fraction_bits();
+
+      ieee_floatt scale_float(
+        to_floatbv_type(src_type), ieee_floatt::ROUND_TO_EVEN);
+      scale_float.from_integer(
+        power(mp_integer(2), mp_integer(dest_fraction_bits)));
+      bvt scale_bv = convert_bv(scale_float.to_expr());
+
+      bvt scaled_float = float_utils.mul(src, scale_bv);
+      dest = float_utils.to_signed_integer(scaled_float, dest_width);
 
       return false;
     }
