@@ -29,6 +29,16 @@ class symbol_factoryt
 
   const lifetimet lifetime;
 
+  /// Running count of dynamic objects this factory has allocated.  A fresh
+  /// `symbol_factoryt` is constructed for each nondet-init root (see
+  /// `c_nondet_symbol_factory`), so this count -- which is never reset and
+  /// accumulates across the whole object tree of one root -- gives a per-root
+  /// cap when compared against
+  /// `object_factory_params.max_dynamic_object_instances`.  When the cap is
+  /// hit, pointers are initialised to NULL instead of recursively expanded.
+  /// See the parameter's docstring for the kernel-struct motivation.
+  std::size_t dynamic_object_instance_count = 0;
+
 public:
   typedef std::set<irep_idt> recursion_sett;
 
