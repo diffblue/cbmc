@@ -1,0 +1,17 @@
+CORE dfcc-only
+main.c
+--dfcc main --enforce-contract foo --apply-loop-contracts _ --no-standard-checks --unwinding-assertions --unwind 5
+^EXIT=10$
+^SIGNAL=0$
+^\[foo.loop_assigns.\d+\] line 19 Check assigns clause inclusion for loop .*: FAILURE$
+^VERIFICATION FAILED$
+--
+^\[foo.assigns.\d+\] .*: FAILURE$
+unwinding assertion .*: FAILURE$
+--
+This test checks that a loop with a contract nested in a loop without a contract
+is checked against the write set of the enclosing function: the inner loop may
+assign `g`, but `foo` has no assigns clause permitting this, so the assigns
+clause inclusion check of the inner loop must fail. Before the fix, the inclusion
+check was performed against the write set of the outer loop, which is never
+initialised because the outer loop is not instrumented.

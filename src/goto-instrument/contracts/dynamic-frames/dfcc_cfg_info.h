@@ -272,8 +272,8 @@ public:
   const std::unordered_set<irep_idt> &
   get_tracked_set(goto_programt::const_targett target) const;
 
-  /// \brief Returns the write set of the outer loop of that loop or the top
-  /// level write set if that loop has no outer loop.
+  /// \brief Returns the write set of the first outer loop of that loop that is
+  /// not [must_skip], or the top level write set if there is no such loop.
   const exprt &get_outer_write_set(std::size_t loop_id) const;
 
   const std::vector<std::size_t> &get_loops_toposorted() const
@@ -335,10 +335,6 @@ private:
 
   /// Loop identifiers sorted from most deeply nested to less deeply nested
   std::vector<std::size_t> topsorted_loops;
-
-  /// Loop identifiers for top level loops (ie for loops that are not nested in
-  /// in another loop).
-  std::vector<std::size_t> top_level_loops;
 
   /// Set of identifiers DECL at top level
   std::unordered_set<irep_idt> top_level_local;
