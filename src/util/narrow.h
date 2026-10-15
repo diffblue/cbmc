@@ -44,7 +44,15 @@ template <typename output_type, typename input_type>
 output_type narrow_or_throw_out_of_range(input_type input)
 {
   auto const result = narrow_cast<output_type>(input);
-  if(static_cast<input_type>(result) != input)
+  // The round trip alone misses a sign change when the two types have the
+  // same width (unsigned(-1L) converts back to -1L where long is 32 bits).
+  bool sign_changed = false;
+  if constexpr(
+    std::is_signed<input_type>::value != std::is_signed<output_type>::value)
+  {
+    sign_changed = (input < input_type{}) != (result < output_type{});
+  }
+  if(static_cast<input_type>(result) != input || sign_changed)
   {
     throw std::out_of_range{"narrowing gave a different value than expected"};
   }
