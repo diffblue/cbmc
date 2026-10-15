@@ -215,9 +215,18 @@ void linkingt::duplicate_code_symbol(
           n_it!=new_t.parameters().end();
           ++o_it, ++n_it)
       {
-        if(o_it->type() != n_it->type())
+        if(o_it->type() == n_it->type())
+          continue;
+
+        adjust_type_infot info(old_symbol, new_symbol);
+        bool failed = adjust_object_type_rec(o_it->type(), n_it->type(), info);
+        replace |= info.set_to_new;
+
+        if(failed)
+        {
           conflicts.push_back(
             std::make_pair(o_it->type(), n_it->type()));
+        }
       }
       if(o_it!=old_t.parameters().end())
       {
@@ -344,8 +353,12 @@ void linkingt::duplicate_code_symbol(
       }
       else
       {
-        // warns about the first inconsistency
-        diag.warning(old_symbol, new_symbol, warn_msg);
+        // Warn about the first inconsistency. The message may be empty when a
+        // parameter mismatch was already diagnosed by adjust_object_type_rec
+        // (and hence not pushed onto conflicts); in that case there is nothing
+        // to add here, so skip the otherwise-blank warning.
+        if(!warn_msg.empty())
+          diag.warning(old_symbol, new_symbol, warn_msg);
 
         if(replace)
         {
@@ -490,22 +503,20 @@ bool linkingt::adjust_object_type_rec(
   if(t1.id()==ID_pointer)
   {
     linking_diagnosticst diag{message_handler, ns};
-#if 0
-    bool s=info.set_to_new;
-    if(adjust_object_type_rec(t1.subtype(), t2.subtype(), info))
+    if(info.old_symbol.type.id() == ID_code)
+    {
+      diag.warning(
+        info.old_symbol,
+        info.new_symbol,
+        "pointer parameter types differ between declaration and definition");
+    }
+    else
     {
       diag.warning(
         info.old_symbol,
         info.new_symbol,
         "conflicting pointer types for variable");
-      info.set_to_new=s;
     }
-#else
-    diag.warning(
-      info.old_symbol,
-      info.new_symbol,
-      "conflicting pointer types for variable");
-#endif
 
     if(info.old_symbol.is_extern && !info.new_symbol.is_extern)
     {
@@ -1006,7 +1017,7 @@ void linkingt::copy_symbols(
   }
 
   // Move over all the non-colliding ones
-  std::unordered_set<irep_idt> collisions;
+  std::unordered_set<irep_idt> type_collisions, non_type_collisions;
 
   for(const auto &named_symbol : src_symbols)
   {
@@ -1023,22 +1034,34 @@ void linkingt::copy_symbols(
         // new
         main_symbol_table.add(named_symbol.second);
       }
+      else if(named_symbol.second.is_type)
+        type_collisions.insert(named_symbol.first);
       else
-        collisions.insert(named_symbol.first);
+        non_type_collisions.insert(named_symbol.first);
     }
   }
 
-  // Now do the collisions
-  for(const irep_idt &collision : collisions)
+  // Resolve type collisions first so that any tag renaming is established
+  // before functions and objects -- whose parameter and member types may refer
+  // to those tags -- are processed; then resolve everything else.
+  auto resolve_collisions =
+    [&](const std::unordered_set<irep_idt> &collisions, auto duplicate)
   {
-    symbolt &old_symbol = main_symbol_table.get_writeable_ref(collision);
-    symbolt &new_symbol=src_symbols.at(collision);
-
-    if(new_symbol.is_type)
-      duplicate_type_symbol(old_symbol, new_symbol);
-    else
-      duplicate_non_type_symbol(old_symbol, new_symbol);
-  }
+    for(const irep_idt &collision : collisions)
+    {
+      symbolt &old_symbol = main_symbol_table.get_writeable_ref(collision);
+      symbolt &new_symbol = src_symbols.at(collision);
+      duplicate(old_symbol, new_symbol);
+    }
+  };
+  resolve_collisions(
+    type_collisions,
+    [this](symbolt &old_symbol, symbolt &new_symbol)
+    { duplicate_type_symbol(old_symbol, new_symbol); });
+  resolve_collisions(
+    non_type_collisions,
+    [this](symbolt &old_symbol, symbolt &new_symbol)
+    { duplicate_non_type_symbol(old_symbol, new_symbol); });
 
   // Apply type updates to initializers
   for(auto it = main_symbol_table.begin(); it != main_symbol_table.end(); ++it)
