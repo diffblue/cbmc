@@ -1,0 +1,17 @@
+CORE
+i386-bytes.i
+--i386-linux --floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Verifies the byte layout of x86 80-bit extended `long double` on i386
+(12-byte storage container).  The 80-bit value layout is identical to
+x86_64; only the storage container size differs.
+
+The source is provided as a pre-processed `main.i` so CBMC parses it
+without invoking the host preprocessor; combined with `--i386-linux`,
+this lets the test run on any host (in particular hosts without i386
+multilib system headers and ARM hosts whose gcc lacks `-m32`).

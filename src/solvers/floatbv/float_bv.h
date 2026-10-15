@@ -32,6 +32,18 @@ public:
   static exprt isnormal(const exprt &, const ieee_float_spect &);
   static exprt isfinite(const exprt &, const ieee_float_spect &);
 
+  /// Returns the lowest `spec.value_width()` bits of `src`, so any
+  /// storage padding above the value (used by x86 80-bit extended
+  /// `long double` in 96-/128-bit storage) is dropped before the
+  /// caller does a bit-wise comparison.  For formats with no padding
+  /// this is a no-op and `src` is returned unchanged.
+  static exprt value_bits(const exprt &src, const ieee_float_spect &spec);
+
+  /// Bitwise equality of two floatbv values that ignores any storage
+  /// padding above `spec.value_width()`.  See `value_bits`.
+  static exprt
+  value_bits_equal(const exprt &, const exprt &, const ieee_float_spect &);
+
   // add/sub
   exprt add_sub(
     bool subtract,
