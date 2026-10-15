@@ -1,0 +1,8 @@
+(set-logic QF_BV)
+(declare-fun p () (_ BitVec 12))
+(declare-fun q () (_ BitVec 12))
+(assert (bvugt p (_ bv1 12)))
+(assert (bvugt q (_ bv1 12)))
+(assert (= (bvmul p q) (_ bv143 12)))
+(check-sat)
+(exit)
