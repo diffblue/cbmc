@@ -1197,3 +1197,167 @@ TEST_CASE(
 
   CHECK(test.sent_commands == expected_commands);
 }
+
+TEST_CASE("array to array typecast commands", "[core][smt2_incremental]")
+{
+  // The test environment sets up i386 (little-endian) by default; some
+  // SECTIONs override the endianness setting before invoking set_to.
+  // We build the precise expected sequence of smt_commandt values so a
+  // regression in lane ordering, extract bounds, source-index ordering,
+  // or array sort would surface immediately.
+  auto test = decision_procedure_test_environmentt::make();
+  const signedbv_typet i32{32};
+  const signedbv_typet i64{64};
+  const unsignedbv_typet u32{32};
+  const auto i32_4 = array_typet{i32, from_integer(4, i32)};
+  const auto i64_2 = array_typet{i64, from_integer(4, i32)};
+  // Note: the array_typet's size type is the "index type"; using i32 for
+  // both source and target keeps the converted index sort uniform.
+  const auto i64_2_with_2 = array_typet{i64, from_integer(2, i32)};
+  const auto u32_4 = array_typet{u32, from_integer(4, i32)};
+  const symbolt src_i32_4 = make_test_symbol("src", i32_4);
+  test.symbol_table.insert(src_i32_4);
+  const smt_identifier_termt src_term{
+    "src", smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{32}}};
+  const symbolt src_i64_2 = make_test_symbol("src64", i64_2_with_2);
+  test.symbol_table.insert(src_i64_2);
+  const smt_identifier_termt src64_term{
+    "src64",
+    smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{64}}};
+
+  SECTION("Widening int32[4] -> int64[2] on little-endian")
+  {
+    test.sent_commands.clear();
+    const typecast_exprt cast{src_i32_4.symbol_expr(), i64_2_with_2};
+    test.procedure.set_to(equal_exprt{cast, cast}, true);
+    const smt_identifier_termt array_term{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{64}}};
+    auto sel_src = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        src_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    auto sel_target = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        array_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{src_term, {}},
+      smt_declare_function_commandt{array_term, {}},
+      // target[0] = concat(src[1], src[0])  -- LE: low source idx -> low bits
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(0), smt_bit_vector_theoryt::concat(sel_src(1), sel_src(0)))},
+      // target[1] = concat(src[3], src[2])
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(1), smt_bit_vector_theoryt::concat(sel_src(3), sel_src(2)))},
+      // The trivial equality (cast == cast) appears as the substituted
+      // array == itself; no extra commands beyond the common-sub-expression
+      // de-duplication are added here.
+      smt_assert_commandt{smt_core_theoryt::equal(array_term, array_term)}};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+
+  SECTION("Widening int32[4] -> int64[2] on big-endian")
+  {
+    // Switch endianness for this section only; restore at the end.
+    const auto saved_endianness = config.ansi_c.endianness;
+    config.ansi_c.endianness = configt::ansi_ct::endiannesst::IS_BIG_ENDIAN;
+    test.sent_commands.clear();
+    const typecast_exprt cast{src_i32_4.symbol_expr(), i64_2_with_2};
+    test.procedure.set_to(equal_exprt{cast, cast}, true);
+    const smt_identifier_termt array_term{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{64}}};
+    auto sel_src = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        src_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    auto sel_target = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        array_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{src_term, {}},
+      smt_declare_function_commandt{array_term, {}},
+      // target[0] = concat(src[0], src[1])  -- BE: low source idx -> high bits
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(0), smt_bit_vector_theoryt::concat(sel_src(0), sel_src(1)))},
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(1), smt_bit_vector_theoryt::concat(sel_src(2), sel_src(3)))},
+      smt_assert_commandt{smt_core_theoryt::equal(array_term, array_term)}};
+    REQUIRE(test.sent_commands == expected_commands);
+    config.ansi_c.endianness = saved_endianness;
+  }
+
+  SECTION("Narrowing int64[2] -> int32[4] on little-endian")
+  {
+    test.sent_commands.clear();
+    const typecast_exprt cast{src_i64_2.symbol_expr(), i32_4};
+    test.procedure.set_to(equal_exprt{cast, cast}, true);
+    const smt_identifier_termt array_term{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{32}}};
+    auto sel_src = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        src64_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    auto sel_target = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        array_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    const std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{src64_term, {}},
+      smt_declare_function_commandt{array_term, {}},
+      // target[0] = extract(31, 0)  src[0]   -- LE: lowest target lane = LSBs
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(0), smt_bit_vector_theoryt::extract(31, 0)(sel_src(0)))},
+      // target[1] = extract(63, 32) src[0]
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(1), smt_bit_vector_theoryt::extract(63, 32)(sel_src(0)))},
+      // target[2] = extract(31, 0)  src[1]
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(2), smt_bit_vector_theoryt::extract(31, 0)(sel_src(1)))},
+      // target[3] = extract(63, 32) src[1]
+      smt_assert_commandt{smt_core_theoryt::equal(
+        sel_target(3), smt_bit_vector_theoryt::extract(63, 32)(sel_src(1)))},
+      smt_assert_commandt{smt_core_theoryt::equal(array_term, array_term)}};
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+
+  SECTION("Equal-width pass-through int32[4] -> uint32[4]")
+  {
+    test.sent_commands.clear();
+    const typecast_exprt cast{src_i32_4.symbol_expr(), u32_4};
+    test.procedure.set_to(equal_exprt{cast, cast}, true);
+    const smt_identifier_termt array_term{
+      "array_0",
+      smt_array_sortt{smt_bit_vector_sortt{32}, smt_bit_vector_sortt{32}}};
+    auto sel_src = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        src_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    auto sel_target = [&](unsigned i)
+    {
+      return smt_array_theoryt::select(
+        array_term, smt_bit_vector_constant_termt{i, 32});
+    };
+    std::vector<smt_commandt> expected_commands{
+      smt_declare_function_commandt{src_term, {}},
+      smt_declare_function_commandt{array_term, {}}};
+    for(unsigned i = 0; i < 4; ++i)
+    {
+      expected_commands.push_back(smt_assert_commandt{
+        smt_core_theoryt::equal(sel_target(i), sel_src(i))});
+    }
+    expected_commands.push_back(
+      smt_assert_commandt{smt_core_theoryt::equal(array_term, array_term)});
+    REQUIRE(test.sent_commands == expected_commands);
+  }
+}

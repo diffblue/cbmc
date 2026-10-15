@@ -23,6 +23,7 @@
 class namespacet;
 class smt_base_solver_processt; // IWYU pragma: keep
 class string_constantt;
+class typecast_exprt;
 class union_tag_typet;
 
 class smt2_incremental_decision_proceduret final
@@ -77,6 +78,10 @@ protected:
   /// `array_of_exprt`.
   template <typename t_exprt>
   void define_array_function(const t_exprt &array);
+  /// \brief Defines a function of array sort for a typecast between two
+  ///   array types and asserts element-by-element reinterpretation
+  ///   constraints.
+  void define_array_typecast_function(const typecast_exprt &typecast);
   /// \brief Generate and send to the SMT solver clauses asserting that each
   /// array element is as specified by \p array.
   void initialize_array_elements(

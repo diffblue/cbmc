@@ -4,8 +4,10 @@
 
 #include <util/arith_tools.h>
 #include <util/bitvector_expr.h>
+#include <util/bitvector_types.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/config.h>
 #include <util/range.h>
 #include <util/simplify_expr.h>
 #include <util/std_expr.h>
@@ -21,6 +23,7 @@
 #include <solvers/smt2_incremental/encoding/nondet_padding.h>
 #include <solvers/smt2_incremental/smt_solver_process.h>
 #include <solvers/smt2_incremental/theories/smt_array_theory.h>
+#include <solvers/smt2_incremental/theories/smt_bit_vector_theory.h>
 #include <solvers/smt2_incremental/theories/smt_core_theory.h>
 #include <solvers/smt2_incremental/type_size_mapping.h>
 
@@ -59,6 +62,18 @@ get_problem_messages(const smt_responset &response)
   return {};
 }
 
+/// \brief Predicate identifying typecasts whose source and target are both
+///   array types. Such typecasts are routed through
+///   \ref smt2_incremental_decision_proceduret::define_array_typecast_function
+///   and must therefore be reported as dependent expressions by
+///   \ref gather_dependent_expressions, so the two sites cannot drift apart.
+static bool is_array_to_array_typecast(const exprt &expr)
+{
+  const auto *typecast = expr_try_dynamic_cast<typecast_exprt>(expr);
+  return typecast && can_cast_type<array_typet>(typecast->type()) &&
+         can_cast_type<array_typet>(typecast->op().type());
+}
+
 /// \brief Find all sub expressions of the given \p expr which need to be
 ///   expressed as separate smt commands.
 /// \return A collection of sub expressions, which need to be expressed as
@@ -69,8 +84,9 @@ get_problem_messages(const smt_responset &response)
 ///   `convert_expr_to_smt`. This is because any sub expressions which
 ///   `convert_expr_to_smt` translates into function applications, must also be
 ///   returned by this`gather_dependent_expressions` function.
-/// \details `symbol_exprt`, `array_exprt` and `nondet_symbol_exprt` add
-///   dependant expressions.
+/// \details `symbol_exprt`, `nondet_symbol_exprt`, `array_exprt`,
+///   `array_of_exprt`, `string_constantt`, and array-to-array
+///   `typecast_exprt` add dependent expressions.
 static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
 {
   std::vector<exprt> dependent_expressions;
@@ -87,7 +103,8 @@ static std::vector<exprt> gather_dependent_expressions(const exprt &root_expr)
       can_cast_expr<array_exprt>(expr_node) ||
       can_cast_expr<array_of_exprt>(expr_node) ||
       can_cast_expr<nondet_symbol_exprt>(expr_node) ||
-      can_cast_expr<string_constantt>(expr_node))
+      can_cast_expr<string_constantt>(expr_node) ||
+      is_array_to_array_typecast(expr_node))
     {
       dependent_expressions.push_back(expr_node);
     }
@@ -163,6 +180,177 @@ void smt2_incremental_decision_proceduret::define_array_function(
   expression_identifiers.emplace(array, array_identifier);
 }
 
+/// Equal-width pass-through: target[i] is just source[i].
+static smt_termt array_typecast_passthrough_lane(
+  const smt_termt &source_term,
+  const smt_termt &source_index_i)
+{
+  return smt_array_theoryt::select(source_term, source_index_i);
+}
+
+/// Widening: target[i] is the concatenation of `ratio` consecutive source
+/// elements starting at `i*ratio`. On little-endian targets, the lowest
+/// source index occupies the least significant bits; on big-endian
+/// targets, it occupies the most significant bits.
+static smt_termt array_typecast_widening_lane(
+  const smt_termt &source_term,
+  const std::vector<smt_termt> &source_indices,
+  std::size_t target_index,
+  std::size_t ratio,
+  bool big_endian)
+{
+  const std::size_t base = target_index * ratio;
+  std::vector<smt_termt> lanes;
+  lanes.reserve(ratio);
+  for(std::size_t j = 0; j < ratio; ++j)
+    lanes.push_back(
+      smt_array_theoryt::select(source_term, source_indices[base + j]));
+  if(big_endian)
+    std::reverse(lanes.begin(), lanes.end());
+  // smt_bit_vector_theoryt::concat(hi, lo) is most-significant first;
+  // build the result by iterating from the highest source-index lane
+  // down to the lowest.
+  smt_termt result = lanes.front();
+  for(std::size_t j = 1; j < ratio; ++j)
+    result = smt_bit_vector_theoryt::concat(lanes[j], result);
+  return result;
+}
+
+/// Narrowing: each source element is split into `ratio` target elements.
+/// On little-endian targets the lowest target lane (i % ratio == 0) takes
+/// the least significant bits of the corresponding source element; on
+/// big-endian targets it takes the most significant ones.
+static smt_termt array_typecast_narrowing_lane(
+  const smt_termt &source_term,
+  const std::vector<smt_termt> &source_indices,
+  std::size_t target_index,
+  std::size_t ratio,
+  std::size_t target_elem_width,
+  bool big_endian)
+{
+  const std::size_t src_idx = target_index / ratio;
+  const std::size_t lane = target_index % ratio;
+  const std::size_t lane_from_lsb = big_endian ? (ratio - 1 - lane) : lane;
+  const std::size_t offset = lane_from_lsb * target_elem_width;
+  const smt_termt src_elem =
+    smt_array_theoryt::select(source_term, source_indices[src_idx]);
+  return smt_bit_vector_theoryt::extract(
+    offset + target_elem_width - 1, offset)(src_elem);
+}
+
+/// \brief Defines a function of array sort for a typecast between two
+///   array types and asserts element-by-element reinterpretation
+///   constraints. Both widening (target elements wider than source
+///   elements, multiple source elements packed into one target element)
+///   and narrowing (target elements narrower than source elements, one
+///   source element split across multiple target elements) are
+///   supported, as well as the equal-width pass-through case.
+/// \details The lane convention follows the configured target endianness:
+///   on little-endian targets, lower-indexed source elements occupy the
+///   least significant bit positions of the corresponding target element
+///   when widening, and the lower halves of a source element when
+///   narrowing; on big-endian targets, lower-indexed source elements
+///   occupy the most significant bit positions instead.
+/// \param typecast: an array-to-array typecast whose source and target
+///   element types are both `bitvector_typet`s, whose source and target
+///   sizes are constant, whose total bit widths match, and whose element
+///   widths are non-zero and one divides the other; non-bitvector element
+///   types are reported via UNIMPLEMENTED_FEATURE.
+void smt2_incremental_decision_proceduret::define_array_typecast_function(
+  const typecast_exprt &typecast)
+{
+  const auto &source_array_type =
+    type_checked_cast<array_typet>(typecast.op().type());
+  const auto &target_array_type =
+    type_checked_cast<array_typet>(typecast.type());
+
+  // Non-bitvector element types (struct, union, nested array, etc.) would
+  // not work with the concat/extract encoding below; surface a targeted
+  // UNIMPLEMENTED_FEATURE rather than the generic "is not a
+  // bitvector_typet" invariant from the to_bitvector_type calls further
+  // down.
+  if(
+    !can_cast_type<bitvector_typet>(source_array_type.element_type()) ||
+    !can_cast_type<bitvector_typet>(target_array_type.element_type()))
+  {
+    UNIMPLEMENTED_FEATURE(
+      "array typecast with non-bitvector elements: " + typecast.pretty());
+  }
+
+  const auto source_elem_width =
+    to_bitvector_type(source_array_type.element_type()).get_width();
+  const auto target_elem_width =
+    to_bitvector_type(target_array_type.element_type()).get_width();
+  INVARIANT(
+    source_elem_width != 0 && target_elem_width != 0,
+    "array typecast requires non-zero element widths");
+  INVARIANT(
+    source_array_type.size().is_constant() &&
+      target_array_type.size().is_constant(),
+    "array typecast requires constant source and target sizes");
+  const auto source_size =
+    numeric_cast_v<std::size_t>(to_constant_expr(source_array_type.size()));
+  const auto target_size =
+    numeric_cast_v<std::size_t>(to_constant_expr(target_array_type.size()));
+  INVARIANT(
+    source_size * source_elem_width == target_size * target_elem_width,
+    "array typecast requires matching total bit widths");
+  INVARIANT(
+    target_elem_width % source_elem_width == 0 ||
+      source_elem_width % target_elem_width == 0,
+    "array typecast element widths must be multiples of each other");
+
+  const smt_sortt target_sort = convert_type_to_smt_sort(target_array_type);
+  const smt_identifier_termt array_id{
+    "array_" + std::to_string(array_sequence()), target_sort};
+  solver_process->send(smt_declare_function_commandt{array_id, {}});
+  identifier_table.emplace(array_id.identifier(), array_id);
+
+  const smt_termt source_term = convert_expr_to_smt(typecast.op());
+
+  // Pre-convert source-/target-index terms once each.
+  std::vector<smt_termt> source_indices;
+  source_indices.reserve(source_size);
+  for(std::size_t i = 0; i < source_size; ++i)
+    source_indices.push_back(
+      convert_expr_to_smt(from_integer(i, source_array_type.index_type())));
+  std::vector<smt_termt> target_indices;
+  target_indices.reserve(target_size);
+  for(std::size_t i = 0; i < target_size; ++i)
+    target_indices.push_back(
+      convert_expr_to_smt(from_integer(i, target_array_type.index_type())));
+
+  const bool big_endian =
+    config.ansi_c.endianness == configt::ansi_ct::endiannesst::IS_BIG_ENDIAN;
+
+  for(std::size_t i = 0; i < target_size; ++i)
+  {
+    smt_termt element_value = [&]()
+    {
+      if(target_elem_width == source_elem_width)
+        return array_typecast_passthrough_lane(source_term, source_indices[i]);
+      if(target_elem_width > source_elem_width)
+        return array_typecast_widening_lane(
+          source_term,
+          source_indices,
+          i,
+          target_elem_width / source_elem_width,
+          big_endian);
+      return array_typecast_narrowing_lane(
+        source_term,
+        source_indices,
+        i,
+        source_elem_width / target_elem_width,
+        target_elem_width,
+        big_endian);
+    }();
+    solver_process->send(smt_assert_commandt{smt_core_theoryt::equal(
+      smt_array_theoryt::select(array_id, target_indices[i]), element_value)});
+  }
+
+  expression_identifiers.emplace(typecast, array_id);
+}
+
 void send_function_definition(
   const exprt &expr,
   const irep_idt &symbol_identifier,
@@ -228,6 +416,10 @@ void smt2_incremental_decision_proceduret::define_dependent_functions(
       const auto string = expr_try_dynamic_cast<string_constantt>(current))
     {
       define_array_function(*string);
+    }
+    else if(is_array_to_array_typecast(current))
+    {
+      define_array_typecast_function(to_typecast_expr(current));
     }
     else if(
       const auto nondet_symbol =
