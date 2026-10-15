@@ -2901,6 +2901,19 @@ void cpp_typecheckt::typecheck_friend_declaration(
         if(nested)
           scope->add_secondary_scope(*class_scope);
       }
+      // the templates of that name before the conversion: a template the
+      // conversion ADDS is the one this friend declaration introduced
+      std::set<irep_idt> templates_before;
+      irep_idt friend_base;
+      if(declaration.declarators().size() == 1)
+      {
+        friend_base = declaration.declarators().front().name().get_base_name();
+        for(const auto *id_ptr : cpp_scopes.current_scope().lookup(
+              friend_base, cpp_scopet::SCOPE_ONLY))
+        {
+          templates_before.insert(id_ptr->identifier);
+        }
+      }
       convert_template_declaration(declaration);
 
       // N5008 [class.friend]/1 + [temp.friend]/1: the befriended
@@ -2934,6 +2947,33 @@ void cpp_typecheckt::typecheck_friend_declaration(
           friend_entry.set(ID_identifier, cand->name);
           symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
           break;
+        }
+      }
+      // [temp.friend]/1: a friend declaration that introduces the template
+      // (no previous declaration) befriends it as well.  Its declarators
+      // were consumed by the conversion, so the scan above did not run, and
+      // the later definition's body was denied access (`template <class F>
+      // friend int peek(const loc &);' defined after the class, the shape
+      // of libstdc++'s __try_use_facet in locale)
+      else if(!friend_base.empty())
+      {
+        std::vector<irep_idt> added;
+        for(const auto *id_ptr : cpp_scopes.current_scope().lookup(
+              friend_base, cpp_scopet::SCOPE_ONLY))
+        {
+          const symbolt *cand = symbol_table.lookup(id_ptr->identifier);
+          if(
+            cand != nullptr && cand->type.get_bool(ID_is_template) &&
+            templates_before.count(id_ptr->identifier) == 0)
+          {
+            added.push_back(cand->name);
+          }
+        }
+        if(added.size() == 1)
+        {
+          irept friend_entry;
+          friend_entry.set(ID_identifier, added.front());
+          symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
         }
       }
     }
