@@ -1,4 +1,4 @@
-CORE broken-smt-backend no-new-smt
+CORE broken-smt-backend no-new-smt paths-lifo-expected-failure
 quantifier_free.c
 --smt2 --outfile -
 ^\(set-logic QF_AUFBV\)$
@@ -8,3 +8,5 @@ quantifier_free.c
 forall
 --
 Without a quantifier the declared logic stays quantifier-free.
+With --paths lifo the assertion is decided during symbolic execution and no
+formula is written, hence paths-lifo-expected-failure.
