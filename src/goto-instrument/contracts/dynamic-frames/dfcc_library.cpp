@@ -27,6 +27,7 @@ Author: Remi Delmas, delmarsd@amazon.com
 #include <ansi-c/c_object_factory_parameters.h>
 #include <ansi-c/cprover_library.h>
 #include <ansi-c/goto-conversion/goto_convert_functions.h>
+#include <goto-instrument/contracts/utils.h>
 #include <goto-instrument/generate_function_bodies.h>
 #include <goto-instrument/unwind.h>
 #include <linking/static_lifetime_init.h>
@@ -562,7 +563,7 @@ void dfcc_libraryt::inhibit_front_end_builtins()
 
 const symbolt &dfcc_libraryt::get_instrumented_functions_map_symbol()
 {
-  const irep_idt map_name = "__dfcc_instrumented_functions";
+  const irep_idt map_name = INSTRUMENTED_FUNCTIONS_MAP_NAME;
 
   if(goto_model.symbol_table.has_symbol(map_name))
     return goto_model.symbol_table.lookup_ref(map_name);
@@ -574,7 +575,7 @@ const symbolt &dfcc_libraryt::get_instrumented_functions_map_symbol()
     goto_model.symbol_table,
     map_type,
     "",
-    "__dfcc_instrumented_functions",
+    INSTRUMENTED_FUNCTIONS_MAP_NAME,
     source_locationt{},
     ID_C,
     "<built-in-library>",
