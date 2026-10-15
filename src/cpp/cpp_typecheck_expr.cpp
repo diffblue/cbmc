@@ -7062,6 +7062,16 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
       {
         exprt::operandst expanded = std::move(e.operands().front().operands());
         e.operands() = std::move(expanded);
+        // [over.best.ics]/4.5, as in convert_initializer: `X{{...}}'
+        if(
+          e.operands().size() == 1 &&
+          e.operands().front().id() == ID_initializer_list &&
+          e.type().id() == ID_struct_tag)
+        {
+          e.operands().front().set(
+            ID_C_no_user_defined_conversion_to,
+            to_struct_tag_type(e.type()).get_identifier());
+        }
       }
     }
 

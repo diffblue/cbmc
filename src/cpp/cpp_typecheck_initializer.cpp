@@ -1080,6 +1080,21 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       }
       else
         ops = symbol.value.operands();
+      // N5008 [over.best.ics]/4.5: in this second phase, when the list's
+      // only element is itself a braced-init-list, a constructor's first
+      // parameter of type X or reference to cv X (the copy and move
+      // constructors) is not reached by a user-defined conversion -- `conj
+      // c{{1, 2, 3, 4}}' selects conj(vec), not the copy constructor from a
+      // conj built by conj(int, int, int, int) (CBMC's own
+      // instrument_spec_assigns.cpp, `and_exprt{{a, b, c, d}}', dog-fooding)
+      if(
+        ops.size() == 1 && ops.front().id() == ID_initializer_list &&
+        symbol.type.id() == ID_struct_tag)
+      {
+        ops.front().set(
+          ID_C_no_user_defined_conversion_to,
+          to_struct_tag_type(symbol.type).get_identifier());
+      }
     }
     else
     {
