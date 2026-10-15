@@ -1460,7 +1460,7 @@ static_assert(__is_signed(const int));
 static_assert(__is_signed(volatile int));
 static_assert(!__is_signed(unsigned));
 static_assert(!__is_signed(bool));
-static_assert(__is_signed(char));
+static_assert(__is_signed(char) == (char(-1) < 0)); // unsigned on aarch64
 static_assert(__is_signed(float));
 static_assert(__is_signed(double));
 static_assert(!__is_signed(int *));
@@ -1754,7 +1754,7 @@ static_assert(!__is_unsigned(const int));
 static_assert(!__is_unsigned(volatile int));
 static_assert(__is_unsigned(unsigned));
 static_assert(__is_unsigned(bool));
-static_assert(!__is_unsigned(char));
+static_assert(__is_unsigned(char) == !(char(-1) < 0));
 static_assert(!__is_unsigned(float));
 static_assert(!__is_unsigned(double));
 static_assert(!__is_unsigned(int *));
