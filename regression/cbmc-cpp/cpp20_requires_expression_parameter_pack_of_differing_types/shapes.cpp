@@ -9,19 +9,24 @@ long k(int &, long)
 template <class T>
 concept same_long = __is_same(T, long);
 template <class A, class B>
-concept k_long2 = requires(A &&a, B &&b) {
-                    {
-                      k(static_cast<A &&>(a), static_cast<B &&>(b))
-                      } -> same_long;
-                  };
+concept k_long2 = requires(A && a, B &&b)
+{
+  {
+    k(static_cast<A &&>(a), static_cast<B &&>(b))
+    } -> same_long;
+};
 template <class... A>
-concept k_long = requires(A &&...a) {
-                   {
-                     k(static_cast<A &&>(a)...)
-                     } -> same_long;
-                 };
+concept k_long = requires(A && ...a)
+{
+  {
+    k(static_cast<A &&>(a)...)
+    } -> same_long;
+};
 template <class... A>
-concept k_call = requires(A &&...a) { k(static_cast<A &&>(a)...); };
+concept k_call = requires(A && ...a)
+{
+  k(static_cast<A &&>(a)...);
+};
 int h()
 {
   return 0;
@@ -31,7 +36,10 @@ int h(int, char)
   return 1;
 }
 template <class... A>
-concept callable_h = requires(A... a) { h(a...); };
+concept callable_h = requires(A... a)
+{
+  h(a...);
+};
 int main()
 {
   __CPROVER_assert(k_long2<int &, long>, "two parameters");

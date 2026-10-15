@@ -15,8 +15,7 @@ struct bc
 template <class T>
 struct traits;
 template <class T>
-  requires(T::is_special)
-struct traits<T>
+requires(T::is_special) struct traits<T>
 {
   static constexpr int kind = 1;
 };

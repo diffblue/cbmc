@@ -24,34 +24,46 @@ struct W
   T t;
   int how = 0;
   W()
-  requires requires { T{}; } = default;
+  requires requires
+  {
+    T{};
+  }
+  = default;
   W(int)
-  requires requires(const T &x) { x.ok(); } : how(1)
+  requires requires(const T &x)
+  {
+    x.ok();
+  } : how(1)
   {
   }
   W(long) : how(2)
   {
   }
-  int f() const
-    requires requires(const T &x) { x.ok(); }
+  int f() const requires requires(const T &x)
+  {
+    x.ok();
+  }
   {
     return 1;
   }
-  int g() const
-    requires(sizeof(T) > 100)
+  int g() const requires(sizeof(T) > 100)
   {
     return 2;
   }
-  explicit operator bool() const
-    requires requires(const T &x) { x.ok(); }
+  explicit operator bool() const requires requires(const T &x)
+  {
+    x.ok();
+  }
   {
     return true;
   }
 };
 // [basic.scope.param]/1: the function parameters are in scope
 template <class T>
-int both_ok(const T &a, const T &b)
-  requires requires { a.ok() && b.ok(); }
+int both_ok(const T &a, const T &b) requires requires
+{
+  a.ok() && b.ok();
+}
 {
   return 1;
 }
@@ -61,11 +73,20 @@ inline int both_ok(...)
 }
 
 template <class X>
-concept has_f = requires(X x) { x.f(); };
+concept has_f = requires(X x)
+{
+  x.f();
+};
 template <class X>
-concept has_g = requires(X x) { x.g(); };
+concept has_g = requires(X x)
+{
+  x.g();
+};
 template <class X>
-concept testable = requires(X x) { static_cast<bool>(x); };
+concept testable = requires(X x)
+{
+  static_cast<bool>(x);
+};
 static_assert(has_f<W<Yes>>, "f, satisfied");
 static_assert(!has_f<W<No>>, "f, requires-expression unsatisfied");
 static_assert(!has_g<W<Yes>>, "g, unsatisfied");

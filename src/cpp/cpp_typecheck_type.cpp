@@ -898,7 +898,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
     if(type.get_bool("#auto"))
       return;
 
-    exprt e=static_cast<const exprt &>(type.find(ID_expr_arg));
+    exprt e = static_cast<const exprt &>(type.find(ID_expr_arg));
 
     // N5008 [expr.prim.fold] in a trailing-return-type decltype
     // ([dcl.fct]/8): fold-expressions are normally reduced in the

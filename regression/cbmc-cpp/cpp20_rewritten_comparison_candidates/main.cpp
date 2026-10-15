@@ -1,3 +1,4 @@
+// clang-format off
 #include <compare>
 extern "C" void __CPROVER_assert(bool, const char *);
 struct P
@@ -24,3 +25,4 @@ int main()
     noexcept(p < q) == false, "noexcept of rewritten (not noexcept here)");
   __CPROVER_assert(q < p, "WRONG (must FAIL)");
 }
+// clang-format on

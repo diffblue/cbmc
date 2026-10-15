@@ -18,9 +18,7 @@ struct iterator
   iterator(int c) : cur(c)
   {
   }
-  iterator(iterator<!Const> i)
-    requires Const
-    : cur(i.cur + 1)
+  iterator(iterator<!Const> i) requires Const : cur(i.cur + 1)
   {
   }
 };

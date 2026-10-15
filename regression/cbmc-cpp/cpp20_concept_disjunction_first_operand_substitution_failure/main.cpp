@@ -15,8 +15,7 @@ struct Templ
 // ([temp.constr.atomic]/3), so the second operand decides -- libstdc++ 16's
 // views::__adaptor::__adaptor_has_simple_extra_args
 template <typename A, typename... Args>
-concept has_simple = A::simple || A::template
-simple<Args...>;
+concept has_simple = A::simple || A::template simple<Args...>;
 template <typename A>
 concept missing_or_true = A::nonexistent || true;
 int main()

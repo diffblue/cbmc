@@ -37,14 +37,12 @@ template <class Tp>
 struct closure_base
 {
   template <viewable_range View, closure C>
-    requires same_as<Tp, C>
-  friend int operator|(View &&, C)
+  requires same_as<Tp, C> friend int operator|(View &&, C)
   {
     return 1;
   }
   template <closure C, closure Other>
-    requires same_as<Tp, C>
-  friend int operator|(C, Other)
+  requires same_as<Tp, C> friend int operator|(C, Other)
   {
     return 2;
   }

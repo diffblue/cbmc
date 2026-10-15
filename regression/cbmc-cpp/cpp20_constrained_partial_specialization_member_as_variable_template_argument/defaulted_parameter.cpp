@@ -8,14 +8,12 @@ struct impl
   using type = char;
 };
 template <typename T1, typename T2>
-  requires(sizeof(T1) > 0)
-struct impl<T1, T2>
+requires(sizeof(T1) > 0) struct impl<T1, T2>
 {
   using type = T2;
 };
 template <typename T1, typename T2>
-  requires(sizeof(T1) > 99)
-struct impl<T1 *, T2>
+requires(sizeof(T1) > 99) struct impl<T1 *, T2>
 {
   using type = T1;
 };

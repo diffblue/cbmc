@@ -17,8 +17,11 @@ struct pick : pick<T, Bullet + 1>
 // [temp.constr.op]/2: the second operand of the conjunction is not
 // substituted into when the first is not satisfied
 template <typename T>
-  requires requires { typename ref_of_t<T>; } && conv_v<ref_of_t<T>, T>
-struct pick<T, 1>
+requires requires
+{
+  typename ref_of_t<T>;
+}
+&&conv_v<ref_of_t<T>, T> struct pick<T, 1>
 {
   static constexpr int value = 1;
 };

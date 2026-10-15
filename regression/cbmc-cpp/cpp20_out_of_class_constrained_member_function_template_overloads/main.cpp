@@ -11,29 +11,22 @@ concept small = sizeof(T) <= 4;
 template <class T>
 concept big = sizeof(T) > 4;
 template <class T>
-  requires small<T>
-struct S
+requires small<T> struct S
 {
   template <class U>
-    requires small<U>
-  int f(U);
+  requires small<U> int f(U);
   template <class U>
-    requires big<U>
-  int f(U);
+  requires big<U> int f(U);
 };
 template <class T>
-  requires small<T>
-template <class U>
-  requires small<U>
-int S<T>::f(U)
+requires small<T> template <class U>
+requires small<U> int S<T>::f(U)
 {
   return 1;
 }
 template <class Q>
-  requires small<Q>
-template <class V>
-  requires big<V>
-int S<Q>::f(V)
+requires small<Q> template <class V>
+requires big<V> int S<Q>::f(V)
 {
   return 2;
 }

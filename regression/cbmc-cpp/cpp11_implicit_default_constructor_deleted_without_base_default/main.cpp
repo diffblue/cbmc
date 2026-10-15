@@ -38,7 +38,10 @@ struct N
 };
 
 template <class T>
-concept default_constructible = requires { T(); };
+concept default_constructible = requires
+{
+  T();
+};
 
 static_assert(!__is_constructible(E));
 static_assert(!default_constructible<E>);

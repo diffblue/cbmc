@@ -7,7 +7,10 @@ bool g(const int &, int &)
 // declares one parameter per element of A, the k-th of type A_k &&; libc++'s
 // std::invocable has this shape (requires(_Fn &&__fn, _Args &&...__args))
 template <class... A>
-concept invocable_g = requires(A &&...a) { g(static_cast<A &&>(a)...); };
+concept invocable_g = requires(A && ...a)
+{
+  g(static_cast<A &&>(a)...);
+};
 int main()
 {
   __CPROVER_assert(invocable_g<const int &, int &>, "differing element types");

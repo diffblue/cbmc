@@ -3,7 +3,10 @@
 // ill-formed, so the requirement is not satisfied
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class I>
-concept subtractable = requires(I a, I b) { a - b; };
+concept subtractable = requires(I a, I b)
+{
+  a - b;
+};
 template <class T>
 struct wrapper;
 template <class T>

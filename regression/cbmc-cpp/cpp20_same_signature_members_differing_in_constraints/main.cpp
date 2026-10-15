@@ -18,8 +18,7 @@ struct wrapper
   wrapper(T v) : value(v)
   {
   }
-  wrapper(const wrapper &other)
-    requires(sizeof(T) > 100)
+  wrapper(const wrapper &other) requires(sizeof(T) > 100)
     : value(other.value + 1000)
   {
   }
@@ -31,8 +30,7 @@ struct wrapper
   {
     return 1;
   }
-  int end() const
-    requires small<T>
+  int end() const requires small<T>
   {
     return 2;
   }

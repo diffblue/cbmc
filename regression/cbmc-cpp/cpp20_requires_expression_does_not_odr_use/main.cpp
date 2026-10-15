@@ -9,17 +9,23 @@ struct wrap
   typedef int reference;
 };
 template <class It>
-concept cpp17_iterator =
-  requires(It it) { typename wrap<decltype(it++)>::reference; };
+concept cpp17_iterator = requires(It it)
+{
+  typename wrap<decltype(it++)>::reference;
+};
 // libstdc++'s __cpp17_iterator: a compound requirement
 template <class T>
-concept can_reference = requires { typename wrap<T>; };
+concept can_reference = requires
+{
+  typename wrap<T>;
+};
 template <class It>
-concept compound_iterator = requires(It it) {
-                              {
-                                it++
-                                } -> can_reference;
-                            };
+concept compound_iterator = requires(It it)
+{
+  {
+    it++
+    } -> can_reference;
+};
 // libstdc++'s __normal_iterator over a pointer to an incomplete class
 template <class P>
 struct normal_iterator

@@ -1,14 +1,18 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
-concept pointer_like = requires(T p) { *p; };
+concept pointer_like = requires(T p)
+{
+  *p;
+};
 // a requires-expression whose body is a single compound requirement with a
 // type-constraint
 template <class T>
-concept has_begin = requires(T &t) {
-                      {
-                        t.begin()
-                        } -> pointer_like;
-                    };
+concept has_begin = requires(T & t)
+{
+  {
+    t.begin()
+    } -> pointer_like;
+};
 struct range
 {
   int *begin();

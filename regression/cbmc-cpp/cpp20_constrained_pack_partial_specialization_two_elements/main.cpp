@@ -8,14 +8,12 @@ struct P
   static constexpr int v = 0;
 };
 template <class A, class... Args>
-  requires(sizeof(A) > 0)
-struct P<A, Args...>
+requires(sizeof(A) > 0) struct P<A, Args...>
 {
   static constexpr int v = 1;
 };
 template <class A, class Arg>
-  requires(sizeof(A) > 0)
-struct P<A, Arg>
+requires(sizeof(A) > 0) struct P<A, Arg>
 {
   static constexpr int v = 2;
 };
