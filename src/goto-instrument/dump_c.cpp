@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/find_symbols.h>
 #include <util/get_base_name.h>
 #include <util/invariant.h>
+#include <util/pointer_expr.h>
 #include <util/prefix.h>
 #include <util/replace_symbol.h>
 #include <util/string_utils.h>
@@ -1595,6 +1596,39 @@ void dump_ct::cleanup_expr(exprt &expr)
     member_exprt &member_expr = to_member_expr(expr);
     member_expr.set_component_name(
       clean_identifier(member_expr.get_component_name()));
+  }
+  else if(expr.id() == ID_pointer_offset)
+  {
+    // Convert pointer_offset(p) to ((char*)(p) - (char*)&root_object)
+    // so that dump-c produces valid C code instead of
+    // __CPROVER_POINTER_OFFSET.
+    const exprt &ptr = to_pointer_offset_expr(expr).pointer();
+
+    // Find the root object by unwrapping address_of, index, member,
+    // and typecast operations
+    const exprt *obj = &ptr;
+    if(obj->id() == ID_address_of)
+      obj = &to_address_of_expr(*obj).object();
+    const exprt *root = obj;
+    while(root->id() == ID_index || root->id() == ID_typecast ||
+          root->id() == ID_member)
+    {
+      if(root->id() == ID_index)
+        root = &to_index_expr(*root).array();
+      else if(root->id() == ID_member)
+        root = &to_member_expr(*root).compound();
+      else
+        root = &to_typecast_expr(*root).op();
+    }
+
+    const typet char_ptr = pointer_type(char_type());
+    const typet result_type = expr.type();
+
+    exprt cast_ptr = typecast_exprt(ptr, char_ptr);
+    exprt cast_base = typecast_exprt(address_of_exprt(*root), char_ptr);
+    exprt diff = minus_exprt(cast_ptr, cast_base);
+    expr = typecast_exprt(diff, result_type);
+    cleanup_expr(expr);
   }
 }
 
