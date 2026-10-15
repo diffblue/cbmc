@@ -345,11 +345,18 @@ void cbmc_parse_optionst::get_command_line_options(optionst &options)
   if(cmdline.isset("depth"))
   {
     options.set_option("depth", cmdline.get_value("depth"));
-    log.warning()
-      << "**** WARNING: Depth-bounded analysis may yield unsound verification "
-         "results"
-      << messaget::eom;
+    if(
+      !cmdline.isset("no-depth-assertions") &&
+      !cmdline.isset("depth-assertions"))
+    {
+      options.set_option("depth-assertions", true);
+    }
   }
+
+  if(cmdline.isset("depth-assertions"))
+    options.set_option("depth-assertions", true);
+  else if(cmdline.isset("no-depth-assertions"))
+    options.set_option("depth-assertions", false);
 
   if(cmdline.isset("slice-by-trace"))
   {

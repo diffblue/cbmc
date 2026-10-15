@@ -283,15 +283,17 @@ performs. There are two ways to do so:
 Given the option `--unwinding-assertions`, CBMC checks whether the
 argument to `--unwind` is large enough to cover all program paths. If
 the argument is too small, CBMC will detect that not enough unwinding is
-done reports that an unwinding assertion has failed.
+done reports that an unwinding assertion has failed. Similarly, when
+using `--depth`, CBMC generates depth bounding assertions by default
+that will fail if any execution path reaches the depth limit.
 
 Reconsider the example. For a loop unwinding bound of one, no bug is
 found. But for a bound of two, CBMC detects a trace that
-violates an assertion. Without unwinding assertions, or when using the
-`--depth` command line switch, CBMC does not prove the program correct,
-but it can be helpful to find program bugs. The various command line
-options that CBMC offers for loop unwinding are described in the section
-on [understanding loop unwinding](../../cbmc/unwinding/).
+violates an assertion. Without unwinding assertions (or, when using
+`--depth`, without depth assertions), CBMC does not prove the program
+correct, but it can be helpful to find program bugs. The various command
+line options that CBMC offers for loop unwinding are described in the
+section on [understanding loop unwinding](../../cbmc/unwinding/).
 
 ## A Note About Compilers and the ANSI-C Library
 

@@ -1,0 +1,8 @@
+CORE paths-lifo-expected-failure
+main.c
+--depth 5 --no-standard-checks --no-unwinding-assertions
+^EXIT=10$
+^SIGNAL=0$
+depth assertion: FAILURE
+--
+^warning: ignoring
