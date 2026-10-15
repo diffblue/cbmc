@@ -430,6 +430,11 @@ static void extract_bytes_of_expr(
 /// \return A newly constructed or_exprt over the possible values given.
 static exprt or_values(const exprt::operandst &values, const typet &field_type)
 {
+  if(values.empty())
+  {
+    // Return false (zero) for empty values (e.g., when all fields are ZSTs)
+    return from_integer(0, field_type);
+  }
   if(values.size() == 1)
   {
     return values[0];
@@ -461,6 +466,13 @@ exprt compute_or_over_bytes(
     for(const auto &component : components)
     {
       if(component.get_is_padding())
+      {
+        continue;
+      }
+      // Skip zero-sized types (ZSTs) to avoid creating expressions with
+      // zero-width bitvectors that violate solver invariants
+      auto component_bits = pointer_offset_bits(component.type(), ns);
+      if(component_bits.has_value() && *component_bits == 0)
       {
         continue;
       }
@@ -608,6 +620,12 @@ exprt compute_max_over_bytes(
 
   // Compute how many bytes are in `expr`
   std::size_t byte_count = size / config.ansi_c.char_width;
+
+  // Handle zero-sized types (ZSTs) - return the default value (zero)
+  if(byte_count == 0)
+  {
+    return from_integer(0, field_type);
+  }
 
   // Extract each byte of `expr` by using byte_extract.
   std::vector<exprt> extracted_bytes;
