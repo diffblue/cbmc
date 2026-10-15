@@ -13,6 +13,7 @@ Date: April 2016
 #include <util/cprover_prefix.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
 #include <algorithm>
@@ -416,6 +417,82 @@ bool variable_sensitivity_domaint::ignore_function_call_transform(
          ignored_internal_function.cend();
 }
 
+// Helper function to recursively collect all modified sub-paths within an
+// object
+static void collect_modified_paths(
+  const abstract_object_pointert &start_value,
+  const abstract_object_pointert &end_value,
+  const exprt &base_expr,
+  std::vector<exprt> &modified_paths,
+  const abstract_environmentt &env,
+  const namespacet &ns)
+{
+  // If the objects themselves are different at this level
+  if(start_value->has_been_modified(end_value))
+  {
+    // Check if this is a struct or array that we should descend into
+    const typet &obj_type = start_value->type();
+
+    if(obj_type.id() == ID_struct || obj_type.id() == ID_struct_tag)
+    {
+      // Get the struct type
+      const struct_typet &struct_type =
+        obj_type.id() == ID_struct
+          ? to_struct_type(obj_type)
+          : ns.follow_tag(to_struct_tag_type(obj_type));
+
+      // Track if any field was modified
+      bool any_field_modified = false;
+
+      // Check each field
+      for(const auto &component : struct_type.components())
+      {
+        member_exprt member_expr(
+          base_expr, component.get_name(), component.type());
+
+        abstract_object_pointert start_field =
+          start_value->expression_transform(
+            member_expr, {start_value}, env, ns);
+        // Both transforms use the start environment `env`. This is fine even
+        // for end_value: evaluating a member_exprt reads the field from the
+        // operand object passed in `{...}` (here {end_value}), not from `env`.
+        abstract_object_pointert end_field =
+          end_value->expression_transform(member_expr, {end_value}, env, ns);
+
+        // Recursively check if this field was modified
+        if(start_field->has_been_modified(end_field))
+        {
+          any_field_modified = true;
+
+          // Recurse: the recursive call's own top-level dispatch handles the
+          // scalar case (pushes member_expr via the final else), the struct
+          // case (descends further) and the array case (pushes member_expr).
+          collect_modified_paths(
+            start_field, end_field, member_expr, modified_paths, env, ns);
+        }
+      }
+
+      // If no field-specific modifications were found but the struct was marked
+      // as modified, fall back to updating the whole struct
+      if(!any_field_modified)
+      {
+        modified_paths.push_back(base_expr);
+      }
+    }
+    else if(obj_type.id() == ID_array)
+    {
+      // For arrays, we can't enumerate all possible indices
+      // So we fall back to marking the entire array as modified
+      modified_paths.push_back(base_expr);
+    }
+    else
+    {
+      // It's a simple value type that was modified
+      modified_paths.push_back(base_expr);
+    }
+  }
+}
+
 void variable_sensitivity_domaint::merge_three_way_function_return(
   const ai_domain_baset &function_start,
   const ai_domain_baset &function_end,
@@ -431,19 +508,44 @@ void variable_sensitivity_domaint::merge_three_way_function_return(
     abstract_environmentt::modified_symbols(
       cast_function_start.abstract_state, cast_function_end.abstract_state);
 
-  std::vector<symbol_exprt> modified_symbols;
-  modified_symbols.reserve(modified_symbol_names.size());
-  std::transform(
-    modified_symbol_names.begin(),
-    modified_symbol_names.end(),
-    std::back_inserter(modified_symbols),
-    [&ns](const irep_idt &id) { return ns.lookup(id).symbol_expr(); });
-
-  for(const auto &symbol : modified_symbols)
+  for(const auto &symbol_name : modified_symbol_names)
   {
-    abstract_object_pointert value =
+    symbol_exprt symbol = ns.lookup(symbol_name).symbol_expr();
+
+    abstract_object_pointert function_start_value =
+      cast_function_start.abstract_state.eval(symbol, ns);
+    abstract_object_pointert function_end_value =
       cast_function_end.abstract_state.eval(symbol, ns);
-    abstract_state.assign(symbol, value, ns);
+
+    // Collect all modified sub-paths (fields/elements) within this symbol
+    std::vector<exprt> modified_paths;
+    collect_modified_paths(
+      function_start_value,
+      function_end_value,
+      symbol,
+      modified_paths,
+      cast_function_start.abstract_state,
+      ns);
+
+    // Apply updates only for the modified paths
+    if(modified_paths.empty())
+    {
+      // No sub-path was identified as modified. This happens only when the
+      // top-level start/end values do not compare as modified (eval() of the
+      // symbol disagrees with what modified_symbols() reported); fall back to
+      // conservatively assigning the whole symbol.
+      abstract_state.assign(symbol, function_end_value, ns);
+    }
+    else
+    {
+      // Update only the modified sub-paths
+      for(const auto &path : modified_paths)
+      {
+        abstract_object_pointert value =
+          cast_function_end.abstract_state.eval(path, ns);
+        abstract_state.assign(path, value, ns);
+      }
+    }
   }
 
   return;
