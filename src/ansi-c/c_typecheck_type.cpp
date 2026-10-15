@@ -1705,9 +1705,14 @@ void c_typecheck_baset::adjust_function_parameter(typet &type) const
 {
   if(type.id()==ID_array)
   {
+    // Preserve the vla-unspecified flag ([*]) through array-to-pointer
+    // decay so it can be detected in function definitions.
+    bool has_vla_unspecified = type.get_bool(ID_C_array_vla_unspecified);
     source_locationt source_location=type.source_location();
     type = pointer_type(to_array_type(type).element_type());
     type.add_source_location()=source_location;
+    if(has_vla_unspecified)
+      type.set(ID_C_array_vla_unspecified, true);
   }
   else if(type.id()==ID_code)
   {
