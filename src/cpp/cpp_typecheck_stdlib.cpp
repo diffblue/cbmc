@@ -1712,7 +1712,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
         }
       }
       else if(
-        base.find("__try_use_facet") == 0 &&
+        (base.find("__try_use_facet") == 0 || base.find("use_facet") == 0) &&
         name.find("<std::tag-num_put<") != std::string::npos &&
         to_code_type(symbol.type).return_type().id() == ID_pointer &&
         classic_num_put(symbol).is_not_nil())
@@ -1789,15 +1789,22 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // libstdc++ 11's has_facet<_Facet>(const locale&) reads the same
         // internal __loc._M_impl->_M_facets table (libstdc++ 13's goes
         // through __try_use_facet, modelled above).  Answer as that model
-        // does: the classic ctype<char> facet is present, every other facet
-        // is absent ([locale.general]/8; _M_cache_locale then caches a null
-        // num_put/num_get pointer instead of failing on the table read).
+        // does: the classic ctype<char> and num_put facets are present,
+        // every other facet is absent ([locale.general]/8; _M_cache_locale
+        // then caches a null num_get pointer instead of failing on the
+        // table read).
         ensure_parameter_symbols(symbol, symbol_table);
         code_blockt block;
         const typet &ret_type = to_code_type(symbol.type).return_type();
-        block.add(code_frontend_returnt{from_integer(
-          name.find("<std::tag-ctype<char>>") != std::string::npos ? 1 : 0,
-          ret_type)});
+        // (also num_put, see classic_num_put: libstdc++ 11's use_facet
+        // returns that object, and the stream's cached _M_num_put must not
+        // be null -- __check_facet then calls the bodyless
+        // __throw_bad_cast)
+        const bool present =
+          name.find("<std::tag-ctype<char>>") != std::string::npos ||
+          name.find("<std::tag-num_put<") != std::string::npos;
+        block.add(
+          code_frontend_returnt{from_integer(present ? 1 : 0, ret_type)});
         symbol.value = std::move(block);
         symbol.value.type() = symbol.type;
         deferred_typechecking.erase(symbol.name);
