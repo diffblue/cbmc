@@ -28,11 +28,10 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
 
     if(has_byte_operator(expr))
     {
-      return record_array_equality(
-        to_equal_expr(lower_byte_operators(expr, ns)));
+      return record_equality(to_equal_expr(lower_byte_operators(expr, ns)));
     }
 
-    return record_array_equality(expr);
+    return record_equality(expr);
   }
 
   const bvt &lhs_bv = convert_bv(expr.lhs());
