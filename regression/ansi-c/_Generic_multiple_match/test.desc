@@ -1,0 +1,13 @@
+CORE gcc-only
+main.c
+
+^CONVERSION ERROR$
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+^VERIFICATION
+--
+C11 6.5.1.1p2: a generic selection whose controlling type is compatible with
+more than one association is a constraint violation (here int(*)[5] matches
+both int(*)[] and int(*)[5]). GCC and Clang reject this; CBMC must diagnose it
+rather than silently selecting one association.
