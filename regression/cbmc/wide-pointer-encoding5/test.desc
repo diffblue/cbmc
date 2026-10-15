@@ -1,0 +1,12 @@
+CORE no-new-smt broken-smt-backend wide-pointer-encoding
+main.c
+--wide-pointer-encoding --model-stack-layout --no-standard-checks
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Tests --model-stack-layout: downward stack growth direction,
+adjacent variable placement, and buffer overflow into adjacent
+stack variable.

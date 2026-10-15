@@ -1,4 +1,4 @@
-CORE
+CORE no-wide-pointer-encoding
 main.c
 --no-standard-checks
 ^Replaced MMIO operations: 3 read\(s\), 1 write\(s\)
@@ -7,3 +7,5 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Broken under --wide-pointer-encoding: memory-mapped I/O dispatch not yet supported. Needs further work.
