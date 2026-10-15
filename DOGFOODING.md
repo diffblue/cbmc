@@ -2063,3 +2063,10 @@ satcheck_zcore.cpp).  Real ones, all failing with W100 too:
   smt2irep.cpp, prop_minimize.cpp, smt_sorts.cpp.
 goto_instrument_parse_options.cpp: 345 s (was ~1000 s) after three
 profiling-driven commits; under the sweep's 900 s TIMEOUT now.
+
+## CI round 2026-10-15 (round 186, after merging develop)
+
+No dog-food change.  The CI fixes of this round are listed in
+.kiro/decltype_tuple_apply_findings.md, "Round 186 (CI)".  The cbmc-cpp
+suite now also runs locally under a 32-bit build (build-32), with the
+GCC 11 headers (/tmp/r186/gcc11/bin) and with --arch arm64.
