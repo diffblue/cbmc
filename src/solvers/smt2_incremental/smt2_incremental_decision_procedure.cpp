@@ -432,7 +432,7 @@ smt2_incremental_decision_proceduret::convert_expr_to_smt(const exprt &expr)
     is_dynamic_object_function.make_application);
 }
 
-exprt smt2_incremental_decision_proceduret::handle(const exprt &expr)
+exprt smt2_incremental_decision_proceduret::do_handle(const exprt &expr)
 {
   log.conditional_output(log.debug(), [&](messaget::mstreamt &debug) {
     debug << "`handle`  -\n  " << expr.pretty(2, 0) << messaget::eom;
@@ -644,7 +644,7 @@ smt2_incremental_decision_proceduret::get_number_of_solver_calls() const
   return number_of_solver_calls;
 }
 
-void smt2_incremental_decision_proceduret::set_to(
+void smt2_incremental_decision_proceduret::do_set_to(
   const exprt &in_expr,
   bool value)
 {

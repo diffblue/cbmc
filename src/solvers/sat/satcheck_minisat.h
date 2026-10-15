@@ -27,7 +27,7 @@ public:
   std::string solver_text() const override;
   tvt l_get(literalt a) const override;
 
-  void lcnf(const bvt &bv) final;
+  void do_lcnf(const bvt &bv) final;
 
   void set_assignment(literalt a, bool value) override;
 

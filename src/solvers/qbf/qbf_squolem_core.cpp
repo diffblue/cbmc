@@ -123,7 +123,7 @@ qbf_squolem_coret::modeltypet qbf_squolem_coret::m_get(literalt a) const
     return M_DONTCARE;
 }
 
-void qbf_squolem_coret::lcnf(const bvt &bv)
+void qbf_squolem_coret::do_lcnf(const bvt &bv)
 {
   if(early_decision)
     return; // we don't need no more...

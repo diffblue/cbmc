@@ -53,7 +53,7 @@ public:
     return "DIMACS CNF Dumper";
   }
 
-  void lcnf(const bvt &bv) override;
+  void do_lcnf(const bvt &bv) override;
 
   tvt l_get(literalt) const override
   {

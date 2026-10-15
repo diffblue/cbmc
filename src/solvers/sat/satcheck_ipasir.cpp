@@ -64,7 +64,7 @@ std::string satcheck_ipasirt::solver_text() const
   return std::string(ipasir_signature());
 }
 
-void satcheck_ipasirt::lcnf(const bvt &bv)
+void satcheck_ipasirt::do_lcnf(const bvt &bv)
 {
   for(const auto &literal : bv)
   {
