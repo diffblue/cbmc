@@ -1,5 +1,5 @@
 extern "C" void __CPROVER_assert(bool, const char *);
-typedef unsigned long size_t;
+typedef decltype(sizeof(0)) size_t;
 // libc++'s __libcpp_datasizeof<_Tp> (when __datasizeof is unavailable): a
 // static data member's in-class initializer instantiates a member class
 // template of the enclosing class template
@@ -27,7 +27,7 @@ static_assert(datasizeof<char>::value == 1, "char");
 static_assert(datasizeof<int>::value == 4, "int");
 static_assert(datasizeof<S>::value == 8, "S: its size, 4 + 1 + 3 padding");
 static_assert(
-  datasizeof<long>::size() == 16,
+  datasizeof<long>::size() == 2 * sizeof(long),
   "the member instance is complete");
 int main()
 {

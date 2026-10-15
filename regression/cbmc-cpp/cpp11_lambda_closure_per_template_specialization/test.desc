@@ -13,9 +13,9 @@ main.cpp
 --
 N5008 [expr.prim.lambda.closure]/1, [temp.spec.general]/1: the lambda in
 size_of<C> has a distinct closure type, with its own call operator, in
-size_of<char> and size_of<long>.  The closure cache (lambda_closure_map)
+size_of<char> and size_of<long long>.  The closure cache (lambda_closure_map)
 was keyed on the parser's lambda number alone, which the specializations
-share, so size_of<long> reused size_of<char>'s closure and both calls
+share, so size_of<long long> reused size_of<char>'s closure and both calls
 returned sizeof(char) (bin53).  The key now includes the enclosing scope.
 In libstdc++'s <format> the wchar_t _Formatting_scanner used the char
 scanner's visitor closure, and basic_format_arg::_M_visit and the
