@@ -708,6 +708,10 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   exprt size = static_cast<const exprt &>(type.find(ID_size));
   const source_locationt source_location = size.find_source_location();
 
+  // neon_vector_type gives the size as a lane count, whereas vector_size (and
+  // hence the default below) gives it in bytes.
+  const bool size_is_lane_count = type.get_bool(ID_C_vector_size_is_lanes);
+
   typecheck_expr(size);
 
   typet subtype = to_type_with_subtype(type).subtype();
@@ -770,14 +774,17 @@ void c_typecheck_baset::typecheck_vector_type(typet &type)
   }
 
   // adjust by width of base type
-  if(s % *sub_size != 0)
+  if(!size_is_lane_count)
   {
-    throw errort().with_location(source_location)
-      << "vector size (" << s << ") expected to be multiple of base type size ("
-      << *sub_size << ")";
-  }
+    if(s % *sub_size != 0)
+    {
+      throw errort().with_location(source_location)
+        << "vector size (" << s
+        << ") expected to be multiple of base type size (" << *sub_size << ")";
+    }
 
-  s /= *sub_size;
+    s /= *sub_size;
+  }
 
   // produce the type with ID_vector
   vector_typet new_type(
