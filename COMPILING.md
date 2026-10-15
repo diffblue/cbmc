@@ -227,7 +227,11 @@ Follow these instructions:
    make -C src
    ```
 4. To compile JBMC, you additionally need Maven 3, which has to be installed
-   manually. Then do
+   manually, and a JDK with a version between 8 and 21. JDK 22 and newer fail
+   to compile the Java models library. Homebrew's `maven` package uses the
+   newest Homebrew OpenJDK unless `JAVA_HOME` is set, so set `JAVA_HOME` to a
+   supported JDK in the shell that runs the build. `/usr/libexec/java_home -V`
+   lists the JDKs that macOS knows about. Then do
    ```
    make -C jbmc/src setup-submodules
    make -C jbmc/src
