@@ -1,0 +1,12 @@
+CORE
+main.c
+--validate-goto-model
+^\[main\.assertion\.1\] line \d+ swapped: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+parameter type inconsistency
+--
+remove_complex did not lower code types, so the type of a function taking
+a complex number disagreed with its parameter symbols.
