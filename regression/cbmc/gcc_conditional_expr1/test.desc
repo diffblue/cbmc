@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.c
 
 ^EXIT=0$
@@ -6,3 +6,9 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+^CONVERSION ERROR$
+--
+GCC's `a ? : b` (omitted middle operand): `a` is evaluated exactly once at
+run time, and the expression constant-folds in constant contexts (aligned
+attribute, array dimension, enum value), as used by the Linux kernel
+cache-line alignment macros.
