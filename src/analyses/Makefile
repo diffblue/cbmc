@@ -44,6 +44,7 @@ SRC = ai.cpp \
       variable-sensitivity/full_struct_abstract_object.cpp \
       variable-sensitivity/interval_abstract_value.cpp \
       variable-sensitivity/liveness_context.cpp \
+      variable-sensitivity/predicate_tracking_domain.cpp \
       variable-sensitivity/three_way_merge_abstract_interpreter.cpp \
       variable-sensitivity/two_value_pointer_abstract_object.cpp \
       variable-sensitivity/value_set_abstract_object.cpp \

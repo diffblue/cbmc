@@ -8,21 +8,22 @@ Author: Martin Brain, martin.brain@cs.ox.ac.uk
 
 #include "build_analyzer.h"
 
+#include <util/options.h>
+
+#include <goto-programs/goto_model.h>
+
 #include <analyses/ai.h>
 #include <analyses/call_stack_history.h>
 #include <analyses/constant_propagator.h>
 #include <analyses/dependence_graph.h>
 #include <analyses/interval_domain.h>
 #include <analyses/local_control_flow_history.h>
+#include <analyses/variable-sensitivity/predicate_tracking_domain.h>
 #include <analyses/variable-sensitivity/three_way_merge_abstract_interpreter.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_configuration.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_dependence_graph.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_domain.h>
 #include <analyses/variable-sensitivity/variable_sensitivity_object_factory.h>
-
-#include <goto-programs/goto_model.h>
-
-#include <util/options.h>
 
 /// Ideally this should be a pure function of options.
 /// However at the moment some domains require the goto_model or parts of it
@@ -76,6 +77,11 @@ std::unique_ptr<ai_baset> build_analyzer(
     else if(options.get_bool_option("vsd"))
     {
       df = std::make_unique<variable_sensitivity_domain_factoryt>(
+        vs_object_factory, vsd_config);
+    }
+    else if(options.get_bool_option("predicate-tracking"))
+    {
+      df = util_make_unique<predicate_tracking_domain_factoryt>(
         vs_object_factory, vsd_config);
     }
     // non-null is not fully supported, despite the historical options
@@ -135,6 +141,12 @@ std::unique_ptr<ai_baset> build_analyzer(
       auto df = std::make_unique<variable_sensitivity_domain_factoryt>(
         vs_object_factory, vsd_config);
       return std::make_unique<ait<variable_sensitivity_domaint>>(std::move(df));
+    }
+    else if(options.get_bool_option("predicate-tracking"))
+    {
+      auto df = util_make_unique<predicate_tracking_domain_factoryt>(
+        vs_object_factory, vsd_config);
+      return util_make_unique<ait<predicate_tracking_domaint>>(std::move(df));
     }
     else if(options.get_bool_option("intervals"))
     {
