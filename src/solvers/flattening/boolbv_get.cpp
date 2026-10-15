@@ -232,9 +232,6 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
   switch(bvtype)
   {
   case bvtypet::IS_UNKNOWN:
-    PRECONDITION(
-      type.id() == ID_string || type.id() == ID_empty ||
-      type.id() == ID_enumeration);
     if(type.id()==ID_string)
     {
       mp_integer int_value=binary2integer(value, false);
@@ -259,6 +256,18 @@ exprt boolbvt::bv_get_rec(const exprt &expr, const bvt &bv, std::size_t offset)
       else
         return constant_exprt{
           elements[numeric_cast_v<std::size_t>(int_value)].id(), type};
+    }
+    else
+    {
+      // Types without a genuine bit-vector representation reach this point,
+      // e.g. mathematical integers (ID_integer), rationals, reals and
+      // naturals, to which boolbv_widtht assigns only a dummy width. The
+      // flattening back-end cannot reconstruct a concrete value for such a
+      // type, so emit a graceful "unknown" placeholder (rendered as '*' by
+      // expr2c and '?' as a trace value) rather than aborting -- matching
+      // the exprt(ID_unknown) placeholder used elsewhere in this file for
+      // values we cannot determine.
+      return exprt{ID_unknown, type};
     }
     break;
 
