@@ -29,7 +29,7 @@ int do_format()
 int main()
 {
   int (*narrow)() = do_format<char>;
-  __CPROVER_assert(do_format<long>() == 15, "second specialization");
+  __CPROVER_assert(do_format<long long>() == 15, "second specialization");
   __CPROVER_assert(narrow() == 8, "first specialization");
   __CPROVER_assert(narrow() == 15, "WRONG (must FAIL)");
 }

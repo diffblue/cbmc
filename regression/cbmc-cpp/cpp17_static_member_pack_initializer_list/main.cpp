@@ -44,16 +44,16 @@ struct Y
 };
 
 static_assert(X::c == 2 && X::t == 42, "non-template static members");
-static_assert(Y<int, char, long>::n == 3, "count of a pack expansion");
-static_assert(Y<int, char, long>::s == 13, "sum of a pack expansion");
-static_assert(Y<int, char, long>::m == 4, "element before the expansion");
-static_assert(Y<int, char, long>::t == 6, "sizeof...");
+static_assert(Y<int, char, long long>::n == 3, "count of a pack expansion");
+static_assert(Y<int, char, long long>::s == 13, "sum of a pack expansion");
+static_assert(Y<int, char, long long>::m == 4, "element before the expansion");
+static_assert(Y<int, char, long long>::t == 6, "sizeof...");
 static_assert(Y<>::n == 0, "empty pack");
 
 int main()
 {
-  __CPROVER_assert(Y<int, char, long>::rt == 3, "run-time static member");
+  __CPROVER_assert(Y<int, char, long long>::rt == 3, "run-time static member");
   __CPROVER_assert(
-    Y<int, char, long>::n + Y<int, char, long>::s == 16, "folded");
-  __CPROVER_assert(Y<int, char, long>::rt == 1, "WRONG (must FAIL)");
+    Y<int, char, long long>::n + Y<int, char, long long>::s == 16, "folded");
+  __CPROVER_assert(Y<int, char, long long>::rt == 1, "WRONG (must FAIL)");
 }

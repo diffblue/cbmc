@@ -20,8 +20,9 @@ struct S
 int main()
 {
   __CPROVER_assert(
-    size_of<char>() == 1 && size_of<long>() == 8, "function template");
+    size_of<char>() == 1 && size_of<long long>() == 8, "function template");
   __CPROVER_assert(
-    S<char>().f() == 1 && S<long>().f() == 8, "member of a class template");
-  __CPROVER_assert(size_of<long>() == 1, "WRONG (must FAIL)");
+    S<char>().f() == 1 && S<long long>().f() == 8,
+    "member of a class template");
+  __CPROVER_assert(size_of<long long>() == 1, "WRONG (must FAIL)");
 }

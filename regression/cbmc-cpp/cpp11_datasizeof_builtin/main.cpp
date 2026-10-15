@@ -56,13 +56,15 @@ struct Ref
 // ABI 2.4-II.1: a POD for the purpose of layout has dsize == sizeof
 static_assert(__datasizeof(E) == 1, "empty POD");
 static_assert(__datasizeof(A) == 8, "POD: sizeof");
-static_assert(__datasizeof(C) == 16, "POD with interior and tail padding");
-static_assert(__datasizeof(Ref) == 8, "");
+static_assert(
+  __datasizeof(C) == 2 * sizeof(long),
+  "POD with interior and tail padding");
+static_assert(__datasizeof(Ref) == sizeof(void *), "");
 // otherwise dsize is the end of the last non-static data member
 static_assert(__datasizeof(NP) == 5, "non-POD: without the tail padding");
 static_assert(__datasizeof(NP2) == 12, "non-POD without tail padding");
 static_assert(__datasizeof(NE) == 0, "non-POD empty class");
-static_assert(__datasizeof(NC) == 12, "");
+static_assert(__datasizeof(NC) == sizeof(long) + 4, "");
 // non-class types: sizeof
 static_assert(__datasizeof(int) == 4, "");
 static_assert(__datasizeof(char[7]) == 7, "");

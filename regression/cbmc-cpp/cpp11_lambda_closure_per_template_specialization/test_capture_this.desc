@@ -13,7 +13,7 @@ capture_this.cpp
 ^Invariant check failed$
 --
 As test.desc, with a lambda capturing `this' in a virtual member function
-of a class template: formatting_scanner<long>::format_arg uses the closure
+of a class template: formatting_scanner<long long>::format_arg uses the closure
 of formatting_scanner<char>, whose captured pointer has the other type, and
 symex stops with an invariant violation (equal_exprt operand types, bin53
 too).  Found by reducing libstdc++'s <format> with cvise in 41 lines.
