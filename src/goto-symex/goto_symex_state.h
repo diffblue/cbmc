@@ -26,6 +26,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "shadow_memory_state.h"
 
 #include <functional>
+#include <unordered_set>
 
 class incremental_dirtyt;
 class symex_target_equationt;
@@ -174,6 +175,12 @@ public:
   ssa_exprt declare(ssa_exprt ssa, const namespacet &ns);
 
   void print_backtrace(std::ostream &) const;
+
+  /// Pointers for which rw_ok was assumed, keyed by failed symbol name.
+  /// Used to restrict auto-object initialization to only those failed
+  /// symbols that the user explicitly assumed valid. Tracked per-state
+  /// so that path exploration does not leak across branches.
+  std::unordered_set<irep_idt> rw_ok_failed_symbols;
 
   // threads
   typedef std::pair<unsigned, std::list<guardt> > a_s_r_entryt;
