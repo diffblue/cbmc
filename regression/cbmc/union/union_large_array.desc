@@ -1,6 +1,6 @@
 CORE thorough-smt-backend no-new-smt
 union_large_array.c
-
+--arrays-uf-never
 ^EXIT=10$
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line \d+ should fail: FAILURE$
