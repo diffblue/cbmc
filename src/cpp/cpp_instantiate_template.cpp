@@ -3551,6 +3551,19 @@ static std::string normalized_parameter_signature(
   }
   std::function<void(irept &)> walk = [&](irept &n)
   {
+    // N5008 [dcl.type.elab]/3, [temp.over.link]/6: an elaborated-type-
+    // specifier `struct S' without a body names the same class as `S'
+    // (`template <class T> int g(const struct S &);' declared before S and
+    // defined as `g(const S &)') -- the spellings differed, the definition
+    // became a second template and calls used the bodiless declaration
+    if(
+      (n.id() == ID_struct || n.id() == ID_union) &&
+      n.find(ID_tag).id() == ID_cpp_name && n.find(ID_body).is_nil() &&
+      n.get_sub().empty())
+    {
+      irept tag = n.find(ID_tag);
+      n.swap(tag);
+    }
     if(n.id() == ID_name)
     {
       const auto it = rename.find(id2string(n.get(ID_identifier)));
