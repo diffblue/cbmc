@@ -5,4 +5,14 @@ main.c
 ^SIGNAL=0$
 ^VERIFICATION FAILED$
 --
-The result spuriously is VERIFICATION SUCCESSFUL.
+--
+The outer loop terminates with x == 0x0ffffffe (even), so assert(x % 2)
+genuinely fails -- this is a real unsafe program. It is a KNOWNBUG because the
+loop accelerator only handles innermost loops: the outer loop (while x <
+0x0ffffffe) contains a nested inner loop (while y < 10), so it is skipped by the
+contains_nested_loops check in accelerate_loop. Only the inner loop is
+accelerated, the outer loop is not reduced, and the assertion after it is not
+reached within the --unwind bound -- so the bug is missed and the result is a
+(vacuous) VERIFICATION SUCCESSFUL. Supporting this requires nested-loop
+acceleration (composing the inner-loop summary when accelerating the outer
+loop).
