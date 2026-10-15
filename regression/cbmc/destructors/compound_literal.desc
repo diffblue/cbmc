@@ -1,4 +1,4 @@
-CORE
+CORE paths-lifo-expected-failure
 main.c
 --unwind 10 --show-goto-functions --no-standard-checks
 activate-multi-line-match
@@ -20,3 +20,7 @@ Checks for:
 
 This asserts that when you've created a compound literal that both temp and real
 variable gets killed.
+
+Tagged paths-lifo-expected-failure: under --paths the if-conversion pass
+rewrites branches into conditional assignments, changing the --show-goto-functions
+output this test pins; the behaviour under test is unaffected.

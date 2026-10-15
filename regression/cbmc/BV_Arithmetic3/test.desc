@@ -1,4 +1,4 @@
-CORE
+CORE paths-lifo-expected-failure
 main.c
 --verbosity 8
 ^EXIT=0$
@@ -7,3 +7,7 @@ main.c
 ^VERIFICATION SUCCESSFUL$
 --
 ^warning: ignoring
+--
+Tagged paths-lifo-expected-failure: under --paths the if-conversion pass
+rewrites branches into conditional assignments, which changes the number of
+generated VCCs (68 vs 73); the verification result is unchanged.

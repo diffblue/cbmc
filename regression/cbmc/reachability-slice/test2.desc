@@ -1,4 +1,4 @@
-CORE
+CORE paths-lifo-expected-failure
 test.c
 --no-standard-checks --reachability-slice-fb --show-goto-functions --cover location --property foo.coverage.2
 ^EXIT=0$
@@ -9,3 +9,7 @@ test.c
 = 1005
 --
 = 1004
+--
+Tagged paths-lifo-expected-failure: under --paths the if-conversion pass
+removes branches, which changes the --cover location output; the slicing
+behaviour under test is unaffected.
