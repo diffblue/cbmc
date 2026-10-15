@@ -509,7 +509,8 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         {
           if(
             comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
-            comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
+            comp.get_bool(ID_is_static) || comp.type().id() == ID_code ||
+            comp.get_is_padding()) // [dcl.init.aggr]/2: not an element
             continue;
           member_exprt member(object_tc, comp.get_name(), comp.type());
           member.set(ID_C_lvalue, true);
@@ -1039,7 +1040,8 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
         {
           if(
             comp.get_bool(ID_from_base) || comp.get_bool(ID_is_type) ||
-            comp.get_bool(ID_is_static) || comp.type().id() == ID_code)
+            comp.get_bool(ID_is_static) || comp.type().id() == ID_code ||
+            comp.get_is_padding()) // [dcl.init.aggr]/2: not an element
             continue;
           member_exprt member(object_tc, comp.get_name(), comp.type());
           member.set(ID_C_lvalue, true);
