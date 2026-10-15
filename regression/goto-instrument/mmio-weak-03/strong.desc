@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio-weak-variable cmd
+^EXIT=0$
+^SIGNAL=0$
+data committed before GO: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Per-register memory-type tagging: the data register is strongly ordered (only
+cmd is marked weak), so the write to data is observed in program order before
+the command, and the ordering assertion holds. Same source as test.desc,
+showing that only the memory type of the data register changes the outcome.

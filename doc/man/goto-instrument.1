@@ -382,11 +382,145 @@ cbmc --function get_message_test get_message_test-mod.gb
 
 Now the final invocation of \fBcbmc\fR(1) reports verification success.
 .TP
+\fB\-\-nondet\-volatile\-write\-model\fR \fIvariable\fR:\fImodel\fR
+Symmetrically to \fB\-\-nondet\-volatile\-model\fR, writes to a volatile variable
+can be routed to a model. This is useful to observe or check the values a driver
+writes to a device register. The model must be a \fBvoid\fR function taking a
+single parameter of the variable's type, which receives the written value. For
+example, to check that a driver only ever writes values with the \fIENABLE\fR
+bit set to a control register:
+
+.EX
+.in +4n
+\fBextern\fP \fBvolatile\fP uint32_t control;
+
+\fB// model for writes to the variable control\fP
+void \fBcontrol_write_model\fP(uint32_t value) {
+  \fB__CPROVER_assert\fP(value & 1, "ENABLE bit is set");
+}
+.in
+.EE
+
+.EX
+.in +4n
+goto-instrument --nondet-volatile-write-model control:control_write_model \\
+  driver.gb driver-mod.gb
+.in
+.EE
+
+Each write to \fIcontrol\fR is then followed by a call to
+\fIcontrol_write_model\fR with the written value. Even without a model, writes
+to a volatile variable that is modelled as a device (via \fB\-\-nondet\-volatile\fR
+or \fB\-\-nondet\-volatile\-variable\fR) are preserved as observable side effects,
+so that they are not removed as dead code once reads are non-deterministic.
+.TP
 \fB\-\-isr\fR \fIfunction\fR
 instruments an interrupt service routine
 .TP
 \fB\-\-mmio\fR
-instruments memory\-mapped I/O
+Model memory\-mapped I/O soundly with no further configuration. All volatile
+accesses are treated as the weakest device\-memory type -- reads become
+non\-deterministic and writes are posted with reordering, write combining and
+early acknowledgement -- which is a sound over\-approximation of any actual
+device mapping, so a program verified under \fB\-\-mmio\fR is correct for any
+mapping. Barrier strength is taken from the program, including inline\-assembly
+fences (ARM \fBdmb\fR/\fBdsb\fR, Power \fBsync\fR/\fBlwsync\fR, x86
+\fBmfence\fR/\fBsfence\fR), recognised by mnemonic and so independent of
+\fB\-\-arch\fR. The individual \fB\-\-mmio\-*\fR and
+\fB\-\-nondet\-volatile\-*\fR options refine this (e.g. to mark only some regions
+weak, or to recover precision when a region's memory type is known).
+.TP
+\fB\-\-mmio\-weak\fR
+Model weakly ordered device memory (posted writes). A write to a register that
+has a write model (see \fB\-\-nondet\-volatile\-write\-model\fR) is
+non\-deterministically either observed immediately or posted, i.e. deferred so
+that its write\-model call is delivered only at the next barrier (a full fence or
+a call to \fB__sync_synchronize\fR) or at the end of the enclosing function. A
+later write to a different register can therefore be observed before an earlier
+posted one, which exposes bugs that rely on write ordering without a barrier; a
+barrier between the writes restores program order. This is the first increment
+of the ordering model and is bounded to per\-function, per\-register posting. It
+marks every write\-modelled register as weakly ordered; use
+\fB\-\-mmio\-weak\-variable\fR to mark individual registers instead.
+.TP
+\fB\-\-mmio\-weak\-variable\fR \fIvariable\fR
+Mark the given register as weakly ordered (see \fB\-\-mmio\-weak\fR), leaving all
+other registers strongly ordered. This models per\-region device\-memory types:
+strongly\-ordered regions (ARM Device\-nGnRnE, x86 uncacheable) preserve program
+order, whereas weakly\-ordered regions (ARM Device\-GRE, x86 write\-combining) may
+reorder. May be given multiple times.
+.TP
+\fB\-\-mmio\-weak\-depth\fR \fIn\fR
+Set the depth of the per\-register posted\-write buffer used by the weak MMIO
+model (default 1). Writes to a single register are always observed in program
+order, but with a buffer of depth \fIn\fR up to \fIn\fR writes to a register can
+be outstanding, so that a write may be delayed past that many writes to other
+registers. A larger depth models deeper reordering at the cost of a larger state
+space. If a write burst to a single register exceeds the buffer depth, it is
+reported as a property violation (\(lqMMIO write burst exceeds the modelled
+reorder depth\(rq) rather than silently under\-approximated, so the bound is
+never a hidden source of unsoundness.
+.TP
+\fB\-\-mmio\-gather\fR
+Model write combining (the gather attribute of weak device memory). A write to a
+weakly\-ordered register may be merged into the most recent not\-yet\-observed
+write to the same register, so the device observes only the merged (latest)
+value and an intermediate write may never be observed. Without this option each
+write is observed (in program order per register).
+.TP
+\fB\-\-mmio\-early\-ack\fR
+Model early write acknowledgement (the E attribute of weak device memory). A
+lightweight fence (e.g. \fB__CPROVER_fence("WWfence","RWfence","RRfence")\fR, an
+ARM \fBDMB\fR) then acts as an ordering barrier only: it orders posted writes but
+does not complete them, so a write may still be in flight after it. A full fence
+or \fB__sync_synchronize\fR (an ARM \fBDSB\fR) is a completion barrier that
+completes all posted writes. Without this option every recognised barrier
+completes posted writes. Barriers written as inline assembly are recognised too:
+an ARM \fBdmb\fR (and Power \fBlwsync\fR) is an ordering barrier, while an ARM
+\fBdsb\fR (and Power \fBsync\fR, or \fB__sync_synchronize\fR) is a completion
+barrier.
+.TP
+\fB\-\-mmio\-region\fR \fIaddress\fR:\fIsize\fR[:\fItype\fR]
+Define a contiguous memory\-mapped I/O region starting at \fIaddress\fR with the
+given \fIsize\fR in bytes. The \fIaddress\fR may use a \fB0x\fR prefix for
+hexadecimal notation. This option may be repeated to define multiple regions.
+Regions must not overlap. An optional \fItype\fR (\fBstrong\fR, the default, or
+\fBweak\fR) gives the region's device\-memory type: a \fBstrong\fR region (ARM
+Device\-nGnRnE, x86 uncacheable) is modelled precisely by its backing array,
+whereas a \fBweak\fR region (ARM Device\-GRE, x86 write\-combining) returns a
+non\-deterministic value on read, soundly over\-approximating reordering and
+staleness. Because regions are identified by address, this recovers the
+per\-region memory type without a points\-to analysis.
+.IP
+Each region is modeled as an individual byte\-array object in the symbol table.
+Reads from and writes to constant addresses that fall within a declared region
+are mapped directly to the corresponding array element. Symbolic addresses are
+handled via a conditional dispatch over all declared regions.
+.IP
+This per\-region model avoids the scalability problems of the single unbounded
+\fB__CPROVER_memory\fR array used by the \fB\-\-mmio\fR callback model: each
+write only updates the targeted region object rather than the entire memory
+array. Both options can be combined.
+.IP
+Example:
+.EX
+.in +4n
+goto\-cc \-o firmware.gb firmware.c
+goto\-instrument \-\-mmio\-region 0x40000000:256 \\
+  \-\-mmio\-region 0x40001000:64 firmware.gb firmware\-mod.gb
+cbmc \-\-no\-pointer\-check \-\-no\-bounds\-check firmware\-mod.gb
+.in
+.EE
+.TP
+\fB\-\-mmio\-ioremap\fR
+Derive memory\-mapped I/O regions and their device\-memory types automatically
+from calls to the \fBioremap\fR family (\fBioremap\fR, \fBioremap_wc\fR, ...),
+requiring no manual \fB\-\-mmio\-region\fR declarations. Each call with a constant
+address and size becomes a region whose type is taken from the mapping variant
+(write\-combining variants such as \fBioremap_wc\fR are weak, the rest strong),
+and the call is rewritten to an identity mapping so that accesses through the
+returned pointer target the region. Calls with non\-constant arguments are left
+unchanged and fall under the whole\-program weak model.
 .TP
 \fB\-\-nondet\-static\fR
 add nondeterministic initialization of variables with static lifetime

@@ -1,0 +1,16 @@
+CORE
+main.c
+--mmio
+^EXIT=10$
+^SIGNAL=0$
+^Instrumenting memory-mapped I/O$
+^VERIFICATION FAILED$
+OUTPUT address_of\("volatile-write"
+--
+^Unknown option
+--
+--mmio is the entry point for the memory-mapped I/O memory model. It must be a
+registered option (not "Unknown option") and currently applies the device
+environment model to volatile accesses: the read-back of reg is
+non-deterministic (so the assertion fails) and the write to reg is preserved as
+an observable side effect (an OUTPUT).

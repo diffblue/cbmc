@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd --mmio
+^EXIT=10$
+^SIGNAL=0$
+data committed before GO: FAILURE$
+^VERIFICATION FAILED$
+--
+--
+--mmio alone applies the sound (weakest) device-memory model -- weak ordering,
+gather and early acknowledgement -- so the missing-barrier ordering bug is found
+without any of the individual --mmio-weak/--mmio-gather/--mmio-early-ack flags.
+Compare strong.desc, which omits --mmio.

@@ -1,0 +1,13 @@
+CORE
+test.c
+--nondet-volatile-write-model data:observe_data --nondet-volatile-write-model cmd:observe_cmd
+^EXIT=0$
+^SIGNAL=0$
+data committed before GO: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+--
+--
+Strongly-ordered device memory (the default, no --mmio-weak): the write models
+are called in program order, so the write to the data register is observed
+before the command and the ordering assertion holds. Same source as the weak
+case, demonstrating that the reordering is what exposes the bug.
