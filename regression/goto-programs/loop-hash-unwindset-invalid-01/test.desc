@@ -1,0 +1,13 @@
+CORE
+main.c
+--chain chain.sh
+^Reason: invalid loop hash in main\.hash_xyz$
+^EXIT=1$
+^SIGNAL=0$
+--
+^VERIFICATION
+--
+A malformed hash-based loop identifier (the hash part is not a number) must be
+rejected with an "invalid loop hash" error rather than silently accepted. The
+chain.sh passes --unwindset main.hash_xyz:6; cbmc exits with an error before
+verification.
