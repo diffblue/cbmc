@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 harness.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
