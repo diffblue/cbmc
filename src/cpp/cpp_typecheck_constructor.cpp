@@ -752,6 +752,18 @@ void cpp_typecheckt::full_member_initialization(
       mem_init.set(ID_member, cppname);
       final_initializers.move_to_sub(mem_init);
     }
+    // Handle C++11 default member initializers for POD types
+    else if(
+      !found && cpp_is_pod(c.type()) && c.find(ID_C_default_value).is_not_nil())
+    {
+      cpp_namet cppname(mem_name);
+
+      codet mem_init(ID_member_initializer);
+      mem_init.set(ID_member, cppname);
+      mem_init.copy_to_operands(
+        static_cast<const exprt &>(c.find(ID_C_default_value)));
+      final_initializers.move_to_sub(mem_init);
+    }
   }
 
   initializers.swap(final_initializers);

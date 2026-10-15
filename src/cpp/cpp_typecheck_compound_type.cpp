@@ -754,6 +754,13 @@ void cpp_typecheckt::typecheck_compound_declarator(
     }
   }
 
+  // Handle C++11 default member initializers for non-static members
+  if(!is_static && !is_method && value.is_not_nil())
+  {
+    // Store the default initializer value in the component
+    component.add(ID_C_default_value) = value;
+  }
+
   // array members must have fixed size
   check_fixed_size_array(component.type());
 
@@ -1097,7 +1104,25 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
   if(symbol.type.id()==ID_struct)
     do_virtual_table(symbol);
 
-  if(!found_ctor && !cpp_is_pod(symbol.type))
+  // Check if any component has a C++11 default member initializer
+  bool has_default_member_initializer = false;
+  for(const auto &component : type.components())
+  {
+    if(
+      !component.get_bool(ID_from_base) && component.type().id() != ID_code &&
+      !component.get_bool(ID_is_type) && !component.get_bool(ID_is_static) &&
+      component.find(ID_C_default_value).is_not_nil())
+    {
+      has_default_member_initializer = true;
+      break;
+    }
+  }
+
+  // Generate a default constructor if:
+  // - No constructor was found, AND
+  // - Either the type is not POD OR it has C++11 default member initializers
+  if(
+    !found_ctor && (!cpp_is_pod(symbol.type) || has_default_member_initializer))
   {
     // it's public!
     exprt cpp_public("cpp-public");
