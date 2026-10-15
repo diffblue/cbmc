@@ -1,9 +1,15 @@
 // Author: Diffblue Ltd.
 
+#include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/cmdline.h>
+#include <util/config.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_predicates.h>
+#include <util/std_expr.h>
+#include <util/std_types.h>
 
+#include <testing-utils/empty_namespace.h>
 #include <testing-utils/invariant.h>
 #include <testing-utils/use_catch.h>
 
@@ -181,4 +187,42 @@ TEST_CASE("object_size_exprt", "[core][util]")
       }
     }
   }
+}
+
+TEST_CASE(
+  "object_descriptor_exprt::build with uncomputable member offset",
+  "[core][util]")
+{
+  // size_of_expr needs a configured architecture (char width, etc.).
+  cmdlinet cmdline;
+  config.set(cmdline);
+
+  const signedbv_typet int_type{32};
+
+  // INNER { int a[]; int x; }: the leading member 'a' is an incomplete array,
+  // so size_of_expr(a) is empty and member_offset_expr(x) returns nullopt,
+  // which is what drives the fallback under test.
+  struct_typet inner_type;
+  inner_type.components().emplace_back("a", array_typet{int_type, nil_exprt{}});
+  inner_type.components().emplace_back("x", int_type);
+
+  // OUTER { int pad; INNER inner; }: the leading 'pad' means descending into
+  // o.inner accumulates a non-zero offset before the fallback fires, so this
+  // also guards against the offset being double-counted.
+  struct_typet outer_type;
+  outer_type.components().emplace_back("pad", int_type);
+  outer_type.components().emplace_back("inner", inner_type);
+
+  const symbol_exprt o{"o", outer_type};
+  const member_exprt inner_access{o, "inner", inner_type};
+  const member_exprt x_access{inner_access, "x", int_type};
+
+  object_descriptor_exprt odt;
+  odt.build(x_access, empty_namespace);
+
+  // The member access itself becomes the (precise) object, and the offset is
+  // reset to zero -- not left at the offset of 'inner' accumulated while
+  // descending into the struct operand.
+  CHECK(odt.object() == x_access);
+  CHECK(odt.offset() == from_integer(0, c_index_type()));
 }
