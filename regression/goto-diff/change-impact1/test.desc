@@ -1,0 +1,16 @@
+CORE
+a.c
+b.c --change-impact
+^EXIT=0$
+^SIGNAL=0$
+\*\* helper \*\*
+^-.*function helper
+^\+.*function helper
+^D.*function helper
+--
+^warning: ignoring
+//
+// --change-impact reports both forward and backward impact. Beyond the
+// function header, assert the syntactic-diff markers (-/+) and the
+// data-dependence marker (D) so the test fails if the dependence analysis
+// stops producing output.
