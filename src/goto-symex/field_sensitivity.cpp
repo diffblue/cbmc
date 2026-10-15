@@ -19,6 +19,31 @@ Author: Michael Tautschnig
 
 #define ENABLE_ARRAY_FIELD_SENSITIVITY
 
+/// Helper function to safely convert a constant expression to mp_integer.
+/// Handles c_enum_tag types by following the tag to get the underlying enum type.
+/// \param expr: constant expression to convert
+/// \param ns: namespace for resolving tags
+/// \return mp_integer value
+static mp_integer safe_numeric_cast(
+  const constant_exprt &expr,
+  const namespacet &ns)
+{
+  // If the type is c_enum_tag, we need to follow the tag to get the actual
+  // c_enum type before conversion
+  if(expr.type().id() == ID_c_enum_tag)
+  {
+    // Create a new constant expression with the followed type
+    const c_enum_typet &followed_enum =
+      ns.follow_tag(to_c_enum_tag_type(expr.type()));
+    constant_exprt tmp(expr.get_value(), followed_enum);
+    return numeric_cast_v<mp_integer>(tmp);
+  }
+  else
+  {
+    return numeric_cast_v<mp_integer>(expr);
+  }
+}
+
 exprt field_sensitivityt::apply(
   const namespacet &ns,
   goto_symex_statet &state,
@@ -109,8 +134,8 @@ exprt field_sensitivityt::apply_byte_extract(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
         if(
           !to_array_type(parent->type()).size().is_constant() ||
-          numeric_cast_v<mp_integer>(
-            to_constant_expr(to_array_type(parent->type()).size())) >
+          safe_numeric_cast(
+            to_constant_expr(to_array_type(parent->type()).size()), ns) >
             max_field_sensitivity_array_size)
         {
           for_ssa = parent;
@@ -256,7 +281,7 @@ exprt field_sensitivityt::apply(
 
       if(
         l2_size.is_constant() &&
-        numeric_cast_v<mp_integer>(to_constant_expr(l2_size)) <=
+        safe_numeric_cast(to_constant_expr(l2_size), ns) <=
           max_field_sensitivity_array_size)
       {
         if(l2_index.is_constant())
@@ -344,8 +369,8 @@ exprt field_sensitivityt::get_fields(
     ssa_expr.type().id() == ID_array &&
     to_array_type(ssa_expr.type()).size().is_constant())
   {
-    const mp_integer mp_array_size = numeric_cast_v<mp_integer>(
-      to_constant_expr(to_array_type(ssa_expr.type()).size()));
+    const mp_integer mp_array_size = safe_numeric_cast(
+      to_constant_expr(to_array_type(ssa_expr.type()).size()), ns);
     if(mp_array_size < 0 || mp_array_size > max_field_sensitivity_array_size)
       return ssa_expr;
 
@@ -400,7 +425,7 @@ void field_sensitivityt::field_assignments(
     // Erase the composite symbol from our working state. Note that we need to
     // have it in the propagation table and the value set while doing the field
     // assignments, thus we cannot skip putting it in there above.
-    if(is_divisible(lhs, true))
+    if(is_divisible(ns, lhs, true))
     {
       state.propagation.erase_if_exists(lhs.identifier());
       state.value_set.erase_symbol(lhs, ns);
@@ -446,7 +471,7 @@ void field_sensitivityt::field_assignments_rec(
     // Erase the composite symbol from our working state. Note that we need to
     // have it in the propagation table and the value set while doing the field
     // assignments, thus we cannot skip putting it in there above.
-    if(is_divisible(l1_lhs, true))
+    if(is_divisible(ns, l1_lhs, true))
     {
       state.propagation.erase_if_exists(l1_lhs.identifier());
       state.value_set.erase_symbol(l1_lhs, ns);
@@ -544,8 +569,8 @@ void field_sensitivityt::field_assignments_rec(
 #ifdef ENABLE_ARRAY_FIELD_SENSITIVITY
   else if(const auto &type = type_try_dynamic_cast<array_typet>(ssa_rhs.type()))
   {
-    const std::size_t array_size =
-      numeric_cast_v<std::size_t>(to_constant_expr(type->size()));
+    const std::size_t array_size = numeric_cast_v<std::size_t>(
+      safe_numeric_cast(to_constant_expr(type->size()), ns));
     PRECONDITION(lhs_fs.operands().size() == array_size);
 
     if(array_size > max_field_sensitivity_array_size)
@@ -615,6 +640,7 @@ void field_sensitivityt::field_assignments_rec(
 }
 
 bool field_sensitivityt::is_divisible(
+  const namespacet &ns,
   const ssa_exprt &expr,
   bool disjoined_fields_only) const
 {
@@ -625,8 +651,8 @@ bool field_sensitivityt::is_divisible(
   if(
     expr.type().id() == ID_array &&
     to_array_type(expr.type()).size().is_constant() &&
-    numeric_cast_v<mp_integer>(to_constant_expr(
-      to_array_type(expr.type()).size())) <= max_field_sensitivity_array_size)
+    safe_numeric_cast(to_constant_expr(
+      to_array_type(expr.type()).size()), ns) <= max_field_sensitivity_array_size)
   {
     return true;
   }

@@ -392,7 +392,7 @@ bool goto_symex_statet::l2_thread_read_encoding(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivity.is_divisible(expr, true))
+  if(field_sensitivity.is_divisible(ns, expr, true))
     return false;
 
   const ssa_exprt ssa_l1 = remove_level_2(expr);
@@ -528,7 +528,7 @@ goto_symex_statet::write_is_shared_resultt goto_symex_statet::write_is_shared(
   }
 
   // only continue if an indivisible object is being accessed
-  if(field_sensitivity.is_divisible(expr, true))
+  if(field_sensitivity.is_divisible(ns, expr, true))
     return write_is_shared_resultt::NOT_SHARED;
 
   if(atomic_section_id != 0)
