@@ -158,16 +158,20 @@ exprt abstract_objectt::to_constant() const
   return nil_exprt();
 }
 
-exprt abstract_objectt::to_predicate(const exprt &name) const
+exprt abstract_objectt::to_predicate(
+  const exprt &name,
+  const std::set<exprt> &scope) const
 {
   if(is_top())
     return true_exprt();
   if(is_bottom())
     return false_exprt();
-  return to_predicate_internal(name);
+  return to_predicate_internal(name, scope);
 }
 
-exprt abstract_objectt::to_predicate_internal(const exprt &name) const
+exprt abstract_objectt::to_predicate_internal(
+  const exprt &name,
+  const std::set<exprt> &) const
 {
   UNREACHABLE;
   return nil_exprt();

@@ -142,7 +142,8 @@ protected:
 
   CLONE
 
-  exprt to_predicate_internal(const exprt &name) const override;
+  exprt to_predicate_internal(const exprt &name, const std::set<exprt> &scope)
+    const override;
 
 private:
   bool same_target(abstract_object_pointert other) const;
