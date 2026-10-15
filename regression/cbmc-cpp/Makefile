@@ -19,6 +19,9 @@ ifeq ($(shell test -n "$(host_gcc_major)" && test $(host_gcc_major) -ge 12 && ec
 else
   excluded_libstdcxx = -X libstdcxx12
 endif
+ifneq ($(shell test -n "$(host_gcc_major)" && test $(host_gcc_major) -ge 13 && echo yes),yes)
+  excluded_libstdcxx += -X libstdcxx13
+endif
 ifneq ($(shell test -n "$(host_gcc_major)" && test $(host_gcc_major) -ge 16 && echo yes),yes)
   excluded_libstdcxx += -X libstdcxx16
 else

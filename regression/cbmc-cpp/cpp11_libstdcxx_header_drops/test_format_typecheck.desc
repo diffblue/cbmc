@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx13
 format.cpp
 --cpp20 --show-goto-functions
 ^EXIT=0$

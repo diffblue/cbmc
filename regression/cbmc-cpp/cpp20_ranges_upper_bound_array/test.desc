@@ -1,4 +1,4 @@
-CORE
+CORE libcxx
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges::upper_bound on a built-in array: SUCCESS$
