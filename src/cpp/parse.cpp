@@ -3319,22 +3319,20 @@ bool Parser::optMemberSpec(cpp_member_spect &member_spec)
     case TOK_FRIEND:   member_spec.set_friend(true); break;
     case TOK_EXPLICIT:
       member_spec.set_explicit(true);
-      // C++20 explicit(expr): skip the condition
+      // N5008 [dcl.fct.spec]/3 (C++20): explicit(constant-expression) --
+      // the function is explicit iff the converted expression is true.  The
+      // condition is kept and evaluated when the member is declared (it is
+      // usually dependent: `explicit(!is_convertible_v<U, T>)').
       if(lex.LookAhead(0) == '(')
       {
         cpp_tokent op;
         lex.get_token(op);
-        int depth = 1;
-        while(depth > 0)
-        {
-          int t = lex.get_token(op);
-          if(t == '(')
-            ++depth;
-          else if(t == ')')
-            --depth;
-          else if(t == 0)
-            return false;
-        }
+        exprt condition;
+        if(!rCommaExpression(condition))
+          return false;
+        if(lex.get_token(op) != ')')
+          return false;
+        member_spec.add(ID_C_explicit_condition) = condition;
       }
       break;
     default: UNREACHABLE;

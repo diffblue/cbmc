@@ -1563,6 +1563,30 @@ void cpp_typecheckt::typecheck_compound_declarator(
   bool is_destructor = declaration.is_destructor();
   bool is_virtual = declaration.member_spec().is_virtual();
   bool is_explicit = declaration.member_spec().is_explicit();
+  // N5008 [dcl.fct.spec]/3: explicit(false) declares a converting
+  // constructor -- every `explicit(...)' was taken as explicit, so the
+  // conditionally-explicit constructors of std::pair, std::tuple and
+  // std::optional rejected copy-initialization
+  if(
+    is_explicit &&
+    declaration.member_spec().find(ID_C_explicit_condition).is_not_nil())
+  {
+    exprt condition = static_cast<const exprt &>(
+      declaration.member_spec().find(ID_C_explicit_condition));
+    try
+    {
+      sfinae_contextt guard{*this};
+      typecheck_expr(condition);
+      implicit_typecast_bool(condition);
+      make_constant(condition);
+      if(condition.is_false())
+        is_explicit = false;
+    }
+    catch(...)
+    {
+      // not evaluable here: keep the conservative `explicit'
+    }
+  }
   bool is_inline = declaration.member_spec().is_inline();
 
   final_type.set(ID_C_member_name, symbol.name);
@@ -1711,7 +1735,7 @@ void cpp_typecheckt::typecheck_compound_declarator(
   if(is_cast_operator)
     component.set(ID_is_cast_operator, true);
 
-  if(declaration.member_spec().is_explicit())
+  if(is_explicit)
     component.set(ID_is_explicit, true);
 
   // either blank, const, volatile, or const volatile
