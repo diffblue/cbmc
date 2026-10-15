@@ -135,7 +135,7 @@ void goto_symext::process_array_expr(statet &state, exprt &expr)
   lift_lets(state, expr);
 
   ::process_array_expr(expr, ns);
-  do_simplify(expr, state.value_set);
+  do_simplify(expr, state);
 }
 
 /// Rewrite index/member expressions in byte_extract to offset
@@ -178,7 +178,7 @@ void goto_symext::lift_let(statet &state, const let_exprt &let_expr)
 {
   exprt let_value = clean_expr(let_expr.value(), state, false);
   let_value = state.rename(std::move(let_value), ns).get();
-  do_simplify(let_value, state.value_set);
+  do_simplify(let_value, state);
 
   exprt::operandst value_assignment_guard;
   symex_assignt{

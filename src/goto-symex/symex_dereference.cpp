@@ -9,12 +9,11 @@ Author: Daniel Kroening, kroening@kroening.com
 /// \file
 /// Symbolic Execution of ANSI-C
 
-#include "goto_symex.h"
-
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
 #include <util/exception_utils.h>
+#include <util/expr_iterator.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/invariant.h>
@@ -23,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <pointer-analysis/value_set_dereference.h>
 
 #include "expr_skeleton.h"
+#include "goto_symex.h"
 #include "path_storage.h"
 #include "symex_assign.h"
 #include "symex_dereference_state.h"
@@ -101,7 +101,7 @@ exprt goto_symext::address_arithmetic(
     // recursive call
     result = address_arithmetic(be, state, keep_array);
 
-    do_simplify(result, state.value_set);
+    do_simplify(result, state);
   }
   else if(expr.id()==ID_dereference)
   {
@@ -158,7 +158,7 @@ exprt goto_symext::address_arithmetic(
 
       result = address_arithmetic(be, state, keep_array);
 
-      do_simplify(result, state.value_set);
+      do_simplify(result, state);
     }
     else
       result=address_of_exprt(result);
@@ -249,6 +249,62 @@ goto_symext::cache_dereference(exprt &dereference_result, statet &state)
   return cache_symbol_expr;
 }
 
+/// Check that \p expr can be dereferenced soundly in a concurrent setting,
+/// i.e. that it does not read a potentially-shared pointer. \p ns and \p dirty
+/// identify potentially-shared objects (those marked shared or address-taken).
+///
+/// \throws unsupported_operation_exceptiont if a potentially-shared pointer is
+///   reached; callers must be prepared to handle this (the
+///   `--allow-pointer-unsoundness` option suppresses the check at the call
+///   site).
+///
+/// This runs only after nested dereferences in \p expr have already been
+/// resolved by the caller (the preceding `dereference_rec`/`do_simplify` steps;
+/// an invariant there asserts no `dereference` remains), so any shared pointer
+/// reached *through* a dereference has already been checked in its own right.
+/// We can therefore skip `address_of` subtrees: an `&...` only takes the
+/// address of an object, it does not read a pointer value to be dereferenced
+/// here.
+static void check_concurrency_soundness(
+  const exprt &expr,
+  const incremental_dirtyt &dirty,
+  const namespacet &ns)
+{
+  // Make sure we are not trying to dereference a shared pointer, as this may be
+  // unsound: see #305 on GitHub for a simple example and possible discussion.
+  for(auto it = expr.depth_cbegin(); it != expr.depth_cend(); /* no ++it */)
+  {
+    if(it->id() == ID_address_of)
+    {
+      // Skip the entire &... subtree (see the rationale above): advance past it
+      // to the next sibling/parent instead of descending, and do not ++it.
+      it.next_sibling_or_parent();
+      continue;
+    }
+    else if(auto sym_expr = expr_try_dynamic_cast<symbol_exprt>(*it))
+    {
+      const irep_idt obj_name = is_ssa_expr(*sym_expr)
+                                  ? to_ssa_expr(*sym_expr).get_object_name()
+                                  : sym_expr->get_identifier();
+      // Use the not-found-tolerant lookup: a symbol that is absent from the
+      // symbol table (e.g. a synthetic symbol) is treated as not-shared rather
+      // than triggering a hard abort inside the namespace lookup.
+      const symbolt *symbol = nullptr;
+      const bool is_shared =
+        !ns.lookup(obj_name, symbol) && symbol->is_shared();
+      if(
+        obj_name != goto_symex_statet::guard_identifier() &&
+        (is_shared || dirty(obj_name)))
+      {
+        throw unsupported_operation_exceptiont(
+          "pointer handling for concurrency is unsound: " +
+          id2string(obj_name));
+      }
+    }
+    ++it;
+  }
+}
+
 /// If \p expr is a \ref dereference_exprt, replace it with explicit references
 /// to the objects it may point to. Otherwise recursively apply this function to
 /// \p expr's operands, with special cases for address-of (handled by \ref
@@ -308,7 +364,7 @@ void goto_symext::dereference_rec(
 
     tmp1 = state.rename<L1_WITH_CONSTANT_PROPAGATION>(tmp1, ns).get();
 
-    do_simplify(tmp1, state.value_set);
+    do_simplify(tmp1, state);
 
     if(symex_config.run_validation_checks)
     {
@@ -320,6 +376,9 @@ void goto_symext::dereference_rec(
     }
 
     tmp1 = state.field_sensitivity.apply(ns, state, std::move(tmp1), false);
+
+    if(state.threads.size() > 1 && !symex_config.allow_pointer_unsoundness)
+      check_concurrency_soundness(tmp1, path_storage.dirty, ns);
 
     // we need to set up some elaborate call-backs
     symex_dereference_statet symex_dereference_state(state, ns);
@@ -515,7 +574,7 @@ void goto_symext::dereference(exprt &expr, statet &state, bool write)
   // when all we need is
   // s1 := s1 with (member := X) [and guard b]
   // s2 := s2 with (member := X) [and guard !b]
-  do_simplify(expr, state.value_set);
+  do_simplify(expr, state);
 
   if(symex_config.run_validation_checks)
   {
