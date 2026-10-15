@@ -162,6 +162,50 @@ static YYSTYPE merge(const YYSTYPE src1, const YYSTYPE src2)
 
 /*******************************************************************\
 
+Function: strip_ignored_attributes
+
+  Inputs:
+
+ Outputs:
+
+ Purpose: Remove `packed` and `aligned` attributes that GCC accepts but
+          ignores in a struct/union/enum declaration specifier context
+          (Clang warns that they will be ignored). \p irep is set to nil
+          when nothing other than ignored attributes remains, so that the
+          caller can drop it.
+
+\*******************************************************************/
+
+static void strip_ignored_attributes(irept &irep)
+{
+  if(irep.id() == ID_packed || irep.id() == ID_aligned)
+  {
+    irep.make_nil();
+    return;
+  }
+
+  if(irep.id() != ID_merged_type)
+    return;
+
+  irept::subt &sub = irep.get_sub();
+  irept::subt filtered_sub;
+  filtered_sub.reserve(sub.size());
+  for(const auto &s : sub)
+  {
+    if(s.id() != ID_packed && s.id() != ID_aligned)
+      filtered_sub.push_back(s);
+  }
+
+  if(filtered_sub.empty())
+    irep.make_nil();
+  else if(filtered_sub.size() == 1)
+    irep.swap(filtered_sub.front());
+  else
+    sub.swap(filtered_sub);
+}
+
+/*******************************************************************\
+
 Function: make_subtype
 
   Inputs:
