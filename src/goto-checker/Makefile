@@ -11,6 +11,7 @@ SRC = bmc_util.cpp \
       multi_path_symex_only_checker.cpp \
       properties.cpp \
       report_util.cpp \
+      sarif_report.cpp \
       single_loop_incremental_symex_checker.cpp \
       single_path_symex_checker.cpp \
       single_path_symex_only_checker.cpp \

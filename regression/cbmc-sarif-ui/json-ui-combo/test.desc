@@ -1,0 +1,12 @@
+CORE
+test.c
+--json-ui --sarif-result sarif.out
+activate-multi-line-match
+^EXIT=10$
+^SIGNAL=0$
+"cProverStatus": "failure"
+"property": "main\.assertion\.1"
+"status": "FAILURE"
+--
+--
+Checks that --sarif-result combined with --json-ui produces JSON UI on stdout.

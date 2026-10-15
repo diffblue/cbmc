@@ -54,6 +54,7 @@ class optionst;
   "(no-assertions)(no-assumptions)" \
   OPT_XML_INTERFACE \
   OPT_JSON_INTERFACE \
+  OPT_SARIF_RESULT \
   "(smt1)" /* rejected, will eventually disappear */ \
   OPT_SOLVER \
   OPT_STRING_REFINEMENT \

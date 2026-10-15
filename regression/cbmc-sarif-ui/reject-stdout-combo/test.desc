@@ -1,0 +1,12 @@
+CORE
+test.c
+--sarif-result - --json-ui
+^EXIT=1$
+^SIGNAL=0$
+cannot be combined with another
+--
+"\$schema"
+--
+Checks that --sarif-result - is rejected with a usage error when combined with
+a stdout-based UI mode (here --json-ui), rather than interleaving SARIF and
+JSON into invalid output. No SARIF document is produced.
