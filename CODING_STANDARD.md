@@ -62,12 +62,19 @@ formatting rules is given below:
 # Comments
 - Do not use `/* */`
 - Each source and header file must start with a comment block stating the
-  author. See existing source for an example of the format of this block. This
-  should be followed by a Doxygen `\file` comment:
+  author, followed by a Doxygen comment about the file:
+
   ```c++
+  /*******************************************************************\
+
+  Author: Author Name
+
+  \*******************************************************************/
+
   /// \file
   /// <Some information about this file goes here>
   ```
+
   Note that the `\file` tag must be immediately followed by a newline in order
   for Doxygen to relate the comment to the current file.
 - Each class, member variable and function should be preceded by a Doxygen
