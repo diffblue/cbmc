@@ -1197,3 +1197,41 @@ TEST_CASE(
 
   CHECK(test.sent_commands == expected_commands);
 }
+
+TEST_CASE(
+  "smt2_incremental_decision_proceduret defines array dependencies that are "
+  "only reached via an internal convert_expr_to_smt call (regression for "
+  "#8080).",
+  "[core][smt2_incremental]")
+{
+  auto test = decision_procedure_test_environmentt::make();
+  const signedbv_typet index_type{32};
+  const signedbv_typet value_type{8};
+
+  // An array literal embedded inside the *index* of a with-expression. The
+  // index is integer-typed (a select from the literal) yet transitively
+  // depends on an array_exprt. define_index_identifiers converts this index via
+  // an internal convert_expr_to_smt call, which runs before the outer
+  // define_dependent_functions -- this is the exact path that regressed in
+  // issue #8080, where the array_exprt reached the UNHANDLED_CASE free
+  // ::convert_expr_to_smt overload because it had not been defined and
+  // substituted out first. Unlike set_to/handle of an array literal, no entry
+  // point pre-defines the dependency on this route.
+  const array_typet inner_array_type{index_type, from_integer(2, index_type)};
+  const array_exprt inner_array{
+    {from_integer(5, index_type), from_integer(6, index_type)},
+    inner_array_type};
+  const index_exprt array_index{inner_array, from_integer(0, index_type)};
+  const array_typet array_type{value_type, from_integer(2, index_type)};
+  const auto array_symbol = make_test_symbol("the_array", array_type);
+  const with_exprt with_expr{
+    array_symbol.symbol_expr(), array_index, from_integer(7, value_type)};
+
+  // With invariants configured to throw, conversion would raise
+  // invariant_failedt ("Unhandled case") without the fix.
+  cbmc_invariants_should_throwt invariants_throw;
+  REQUIRE_NOTHROW(test.procedure.handle(with_expr));
+  // The conversion really ran and emitted SMT commands (incl. defining the
+  // array dependency), rather than short-circuiting.
+  REQUIRE_FALSE(test.sent_commands.empty());
+}
