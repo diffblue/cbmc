@@ -1,0 +1,18 @@
+CORE
+main.c
+--enforce-contract foo
+R_OK\(p, 1ul?l?\)
+^EXIT=10$
+^SIGNAL=0$
+--
+^Invariant check failed
+^CONVERSION ERROR$
+--
+Exercises all_dereferences_are_valid (goto-instrument/contracts/utils.cpp) on a
+dereference of an incomplete-array pointer.  Building the history variable for
+__CPROVER_old((*p)[i]) checks validity of the dereference *p; the element size
+of the incomplete array is unknown, so the minimal-size fall-back is used,
+emitting R_OK(p, 1).  Before the fall-back goto-instrument aborted on the
+unset size; the R_OK(p, 1) check (and absence of an invariant/conversion
+error) confirms the path is handled.  Verification then fails only because the
+global pointer p is unconstrained, which is incidental to this test.
