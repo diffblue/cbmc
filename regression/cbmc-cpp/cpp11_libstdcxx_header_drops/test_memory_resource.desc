@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx13
 memory_resource.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ pool_options: SUCCESS$
@@ -21,3 +21,6 @@ incomplete, instantiated them.  Requirements are now unevaluated operands
 (cpp20_requires_expression_does_not_odr_use), also for constexpr functions
 (cpp20_constexpr_function_in_requirement_not_instantiated).  g++ 13 accepts
 this program, and it fails only its WRONG assertion.
+libstdcxx13: with GCC 11's headers __pool_resource::resource() is dropped
+(no get_allocator in pmr::vector<_BigBlock>); not yet reduced to a
+KNOWNBUG.

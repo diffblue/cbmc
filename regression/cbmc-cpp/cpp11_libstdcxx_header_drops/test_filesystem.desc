@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx13
 filesystem.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ path: SUCCESS$
@@ -21,3 +21,6 @@ With the libstdc++ 16 headers the front end crashed instead
 (cpp11_partial_specialization_const_T_matching_const_array).  bin53:
 dropped bodies.  g++ 13 accepts this program, and it fails only its WRONG
 assertion.
+libstdcxx13: with GCC 11's headers path(const Source &) is dropped
+(__effective_range of a char array: no match for _S_convert); not yet
+reduced to a KNOWNBUG.
