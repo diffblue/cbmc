@@ -12,10 +12,6 @@ Author: Daniel Kroening, kroening@kroening.com
 #ifndef CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 #define CPROVER_GOTO_SYMEX_SYMEX_TARGET_EQUATION_H
 
-#include <algorithm>
-#include <iosfwd>
-#include <list>
-
 #include <util/invariant.h>
 #include <util/merge_irep.h>
 #include <util/message.h>
@@ -23,6 +19,11 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "ssa_step.h"
 #include "symex_target.h"
+
+#include <algorithm>
+#include <iosfwd>
+#include <list>
+#include <optional>
 
 class decision_proceduret;
 class namespacet;
@@ -206,6 +207,17 @@ public:
     decision_proceduret &decision_procedure,
     bool optimized_for_single_assertions = true);
 
+  /// Convert assertions incrementally, returning a goal extender variable.
+  /// The caller should assume the returned symbol to be false when invoking
+  /// the solver. On subsequent calls, new assertions are linked to the
+  /// previous goal extender, enabling incremental extension of the
+  /// assertion disjunction without rebuilding it from scratch.
+  /// \param decision_procedure: A handle to a decision procedure interface
+  /// \return The goal extender symbol that should be assumed false, or
+  ///   empty if there are no assertions to convert
+  std::optional<symbol_exprt>
+  convert_assertions_incremental(decision_proceduret &decision_procedure);
+
   /// Converts constraints: set the represented condition to _True_.
   /// \param decision_procedure: A handle to a decision procedure interface
   void convert_constraints(decision_proceduret &decision_procedure);
@@ -282,6 +294,19 @@ public:
       step.validate(ns, vm);
   }
 
+  void set_message_handler(message_handlert &mh)
+  {
+    log.set_message_handler(mh);
+  }
+
+  /// Swap the merge_irep instance. Returns the old one.
+  /// Used to isolate irep sharing during concurrent access.
+  merge_irept swap_merge_irep(merge_irept other)
+  {
+    std::swap(merge_irep, other);
+    return other;
+  }
+
 protected:
   messaget log;
 
@@ -294,6 +319,11 @@ protected:
 
   // for unique function call argument identifiers
   std::size_t argument_count = 0;
+
+  // for incremental goal construction
+  std::size_t goal_extender_counter = 0;
+  std::optional<symbol_exprt> current_goal_extender;
+  std::optional<SSA_stepst::iterator> incremental_last_converted;
 };
 
 inline bool operator<(

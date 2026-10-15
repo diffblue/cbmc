@@ -266,3 +266,63 @@ void revert_slice(symex_target_equationt &equation)
     step.ignore = false;
   }
 }
+
+std::vector<const SSA_stept *> cone_of_influence(
+  const std::list<SSA_stept> &steps,
+  std::list<SSA_stept>::const_iterator assertion_step,
+  std::size_t num_steps)
+{
+  PRECONDITION(assertion_step->is_assert());
+
+  symbol_sett depends;
+  find_symbols(assertion_step->cond_expr, depends);
+  find_symbols(assertion_step->guard, depends);
+
+  // Collect iterators up to num_steps into a vector for reverse traversal.
+  std::vector<std::list<SSA_stept>::const_iterator> step_iters;
+  step_iters.reserve(num_steps);
+  {
+    auto it = steps.begin();
+    for(std::size_t i = 0; i < num_steps && it != steps.end(); ++i, ++it)
+      step_iters.push_back(it);
+  }
+
+  // Walk backwards, collecting steps in the cone.
+  std::vector<const SSA_stept *> cone;
+  cone.push_back(&*assertion_step);
+
+  for(auto rit = step_iters.rbegin(); rit != step_iters.rend(); ++rit)
+  {
+    const SSA_stept &step = **rit;
+    if(&step == &*assertion_step || step.ignore)
+      continue;
+
+    if(step.is_assignment() || step.is_decl())
+    {
+      const irep_idt &id = step.ssa_lhs.get_identifier();
+      auto entry = depends.find(id);
+      if(entry != depends.end())
+      {
+        depends.erase(entry);
+        find_symbols(step.ssa_rhs, depends);
+        find_symbols(step.guard, depends);
+        cone.push_back(&step);
+      }
+    }
+    else if(step.is_assume())
+    {
+      // Include assumptions — they constrain the path.
+      find_symbols(step.cond_expr, depends);
+      find_symbols(step.guard, depends);
+      cone.push_back(&step);
+    }
+    else if(step.is_constraint())
+    {
+      // Constraints are always relevant.
+      find_symbols(step.cond_expr, depends);
+      cone.push_back(&step);
+    }
+  }
+
+  return cone;
+}

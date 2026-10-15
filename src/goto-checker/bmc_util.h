@@ -164,6 +164,21 @@ void run_property_decider(
   std::chrono::duration<double> solver_runtime,
   bool set_pass = true);
 
+/// Prepare the property decider using incremental goal construction.
+/// Converts the equation without assertions (only new steps are
+/// converted), then converts assertions incrementally and sets up
+/// goals.
+/// \param [in,out] properties: The property statuses to update
+/// \param [in,out] equation: The equation to convert
+/// \param [in,out] property_decider: The property decider to set up
+/// \param [in,out] ui_message_handler: For logging
+/// \return The runtime for converting the equation
+std::chrono::duration<double> prepare_property_decider_incremental(
+  propertiest &properties,
+  symex_target_equationt &equation,
+  goto_symex_property_decidert &property_decider,
+  ui_message_handlert &ui_message_handler);
+
 #define OPT_BMC                                                                \
   "(program-only)"                                                             \
   "(show-byte-ops)"                                                            \
@@ -184,6 +199,9 @@ void run_property_decider(
   "(symex-complexity-limit):"                                                  \
   "(symex-complexity-failed-child-loops-limit):"                               \
   "(incremental-loop):"                                                        \
+  "(incremental-check-interval):"                                              \
+  "(concurrent-incremental)"                                                   \
+  "(speculative-check)"                                                        \
   "(unwind-min):"                                                              \
   "(unwind-max):"                                                              \
   "(ignore-properties-before-unwind-min)"                                      \
@@ -208,6 +226,16 @@ void run_property_decider(
   " {y--incremental-loop} {uL} \t "                                            \
   "check properties after each unwinding of loop {uL} (use {y--show-loops} "   \
   "to get the loop IDs)\n"                                                     \
+  " {y--incremental-check-interval} {uN} \t "                                  \
+  "invoke the SAT solver every {uN} symex steps to check properties "          \
+  "discovered so far\n"                                                        \
+  " {y--concurrent-incremental} \t "                                           \
+  "run symbolic execution and SAT solving concurrently in separate "           \
+  "threads (use with {y--incremental-check-interval})\n"                       \
+  " {y--speculative-check} \t "                                                \
+  "speculatively check assertions on partial equations using "                 \
+  "cone-of-influence slicing (use with "                                       \
+  "{y--incremental-check-interval})\n"                                         \
   " {y--unwind-min} {unr} \t "                                                 \
   "start incremental-loop after {unr} unwindings but before solving that "     \
   "iteration. If for example it is 1, then the loop will be unwound once, "    \

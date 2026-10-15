@@ -1,0 +1,8 @@
+CORE
+main.c
+--no-standard-checks --incremental-check-interval 15 --unwinding-assertions --unwind 10
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
