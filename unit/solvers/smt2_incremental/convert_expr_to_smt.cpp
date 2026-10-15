@@ -1765,3 +1765,90 @@ TEST_CASE(
     CHECK(test.convert(assignment) == expected);
   }
 }
+
+TEST_CASE(
+  "expr to smt conversion for bswap_exprt expressions",
+  "[core][smt2_incremental]")
+{
+  auto test =
+    expr_to_smt_conversion_test_environmentt::make(test_archt::x86_64);
+
+  // Builds the expected byte-reversed term: extract each byte and concatenate
+  // so that byte 0 (originally least significant) becomes most significant,
+  // mirroring the conversion under test. Keeps the wide cases readable and
+  // easy to extend (e.g. to 128-bit).
+  const auto expected_bswap =
+    [](const smt_termt &op, std::size_t width, std::size_t byte_bits)
+  {
+    const std::size_t num_bytes = width / byte_bits;
+    const auto byte = [&](std::size_t i)
+    {
+      return smt_bit_vector_theoryt::extract(
+        (i + 1) * byte_bits - 1, i * byte_bits)(op);
+    };
+    smt_termt result = byte(0);
+    for(std::size_t i = 1; i < num_bytes; ++i)
+      result = smt_bit_vector_theoryt::concat(result, byte(i));
+    return result;
+  };
+
+  SECTION("16-bit byte swap")
+  {
+    const symbol_exprt operand{"my_value", unsignedbv_typet{16}};
+    const bswap_exprt byte_swap{operand, 8, unsignedbv_typet{16}};
+    INFO("Expression being converted: " + byte_swap.pretty(2, 0));
+    const smt_identifier_termt operand_smt{
+      "my_value", smt_bit_vector_sortt{16}};
+    // For 16-bit bswap, we extract [7:0] and [15:8], then concat in reverse
+    // order
+    // concat([7:0], [15:8]) puts [7:0] as most significant
+    const smt_termt expected = smt_bit_vector_theoryt::concat(
+      smt_bit_vector_theoryt::extract(7, 0)(operand_smt),
+      smt_bit_vector_theoryt::extract(15, 8)(operand_smt));
+    CHECK(test.convert(byte_swap) == expected);
+  }
+  SECTION("32-bit byte swap")
+  {
+    const symbol_exprt operand{"my_value", unsignedbv_typet{32}};
+    const bswap_exprt byte_swap{operand, 8, unsignedbv_typet{32}};
+    INFO("Expression being converted: " + byte_swap.pretty(2, 0));
+    const smt_identifier_termt operand_smt{
+      "my_value", smt_bit_vector_sortt{32}};
+    // For 32-bit bswap, we extract 4 bytes and concat in reverse order
+    CHECK(test.convert(byte_swap) == expected_bswap(operand_smt, 32, 8));
+  }
+  SECTION("64-bit byte swap")
+  {
+    const symbol_exprt operand{"my_value", unsignedbv_typet{64}};
+    const bswap_exprt byte_swap{operand, 8, unsignedbv_typet{64}};
+    INFO("Expression being converted: " + byte_swap.pretty(2, 0));
+    const smt_identifier_termt operand_smt{
+      "my_value", smt_bit_vector_sortt{64}};
+    // For 64-bit bswap, we extract 8 bytes and concat in reverse order
+    CHECK(test.convert(byte_swap) == expected_bswap(operand_smt, 64, 8));
+  }
+  SECTION("Single byte (no swap needed)")
+  {
+    const symbol_exprt operand{"my_value", unsignedbv_typet{8}};
+    const bswap_exprt byte_swap{operand, 8, unsignedbv_typet{8}};
+    INFO("Expression being converted: " + byte_swap.pretty(2, 0));
+    const smt_identifier_termt operand_smt{"my_value", smt_bit_vector_sortt{8}};
+    // Single byte should return operand unchanged
+    CHECK(test.convert(byte_swap) == operand_smt);
+  }
+  SECTION("Non-default byte width (two 16-bit halves)")
+  {
+    const symbol_exprt operand{"my_value", unsignedbv_typet{32}};
+    const bswap_exprt byte_swap{operand, 16, unsignedbv_typet{32}};
+    INFO("Expression being converted: " + byte_swap.pretty(2, 0));
+    const smt_identifier_termt operand_smt{
+      "my_value", smt_bit_vector_sortt{32}};
+    // With bits_per_byte == 16 the operand has two "bytes": extract [15:0] and
+    // [31:16] and concat in reverse so [15:0] becomes most significant. This
+    // exercises the byte_bits-parameterised extraction arithmetic.
+    const smt_termt expected = smt_bit_vector_theoryt::concat(
+      smt_bit_vector_theoryt::extract(15, 0)(operand_smt),
+      smt_bit_vector_theoryt::extract(31, 16)(operand_smt));
+    CHECK(test.convert(byte_swap) == expected);
+  }
+}
