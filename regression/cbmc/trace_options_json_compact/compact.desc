@@ -1,0 +1,14 @@
+CORE
+test.c
+--trace --compact-trace --json-ui
+^EXIT=10$
+^SIGNAL=0$
+"stepType": "failure"
+"stepType": "assignment"
+--
+"assignmentType": "actual-parameter"
+"hidden": true
+--
+With --compact-trace, the JSON trace must apply the same filtering as the
+plain-text compact trace: no hidden steps and no actual-parameter
+assignments, while retaining regular assignments and the violated property.
