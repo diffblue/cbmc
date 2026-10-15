@@ -513,7 +513,11 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     }
     // read before type-checking rebuilds the node (see decltype_of)
     const bool parenthesized = symbol.value.get_bool(ID_C_parenthesized);
-    typecheck_expr(symbol.value);
+    // N5008 [over.over]/1.1: a name of an overload set initializing a
+    // pointer to function is resolved against the target type -- `int
+    // (*g)(int) = pick;' with two overloads of pick did not uniquely resolve
+    const typet target_type = symbol.type;
+    typecheck_expr(symbol.value, target_typet{target_type});
 
     // C++17: auto x{v} deduces to decltype(v) ([dcl.type.auto.deduct]/2.2.2)
     if(
@@ -696,7 +700,9 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
       exprt val = symbol.value;
       try
       {
-        typecheck_expr(val);
+        // [over.over]/1.1, as above
+        const typet target_type = symbol.type;
+        typecheck_expr(val, target_typet{target_type});
       }
       catch(...)
       {
