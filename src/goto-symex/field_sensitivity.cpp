@@ -11,6 +11,7 @@ Author: Michael Tautschnig
 #include <util/arith_tools.h>
 #include <util/byte_operators.h>
 #include <util/c_types.h>
+#include <util/mathematical_expr.h>
 #include <util/pointer_offset_size.h>
 
 #include "goto_symex_state.h"
@@ -157,6 +158,22 @@ exprt field_sensitivityt::apply(
   exprt expr,
   bool write) const
 {
+  if(expr.id() == ID_forall || expr.id() == ID_exists)
+  {
+    // Only apply field sensitivity to the body of a quantifier, never to its
+    // bound variables: decomposing a struct- or array-typed bound-variable
+    // symbol into a non-symbol expression would violate the invariant that
+    // quantifier bound variables are symbols. We handle only the forall/exists
+    // quantifiers produced by __CPROVER_forall/__CPROVER_exists; the other
+    // binding_exprts (lambda_exprt, array_comprehension_exprt) are not produced
+    // on the symex paths that reach field sensitivity (e.g. an
+    // array_comprehension_exprt originates from byte-operator lowering), so
+    // they are out of scope here.
+    auto &quantifier = to_quantifier_expr(expr);
+    quantifier.where() = apply(ns, state, std::move(quantifier.where()), write);
+    return expr;
+  }
+
   if(expr.id() != ID_address_of)
   {
     Forall_operands(it, expr)
