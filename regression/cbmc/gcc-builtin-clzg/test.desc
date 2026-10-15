@@ -5,7 +5,7 @@ main.c
 ^SIGNAL=0$
 ^\[main\.assertion\.1\] line \d+ clz: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ clzg unsigned: SUCCESS$
-^\[main\.assertion\.3\] line \d+ clzg unsigned long: SUCCESS$
+^\[main\.assertion\.3\] line \d+ clzg unsigned long long: SUCCESS$
 ^\[main\.assertion\.4\] line \d+ clzg unsigned __int128: SUCCESS$
 ^\[main\.assertion\.5\] line \d+ clzg zero with fallback: SUCCESS$
 ^\[main\.assertion\.6\] line \d+ ctzg: SUCCESS$
