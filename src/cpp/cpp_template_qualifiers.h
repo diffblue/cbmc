@@ -11,7 +11,7 @@
 /// wchar_t, char16_t and char32_t, and long and long long are distinct types
 /// even where they have the same representation (wchar_t and int, char16_t
 /// and unsigned short).  The front end represents them by the same bit-vector
-/// type with a different `#c_type' comment, which irept::operator== ignores.
+/// type with a different `\#c_type' comment, which irept::operator== ignores.
 /// \return false if \p a and \p b are integer or floating-point types naming
 ///   different fundamental types
 inline bool same_fundamental_type_name(const typet &a, const typet &b)

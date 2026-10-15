@@ -5808,7 +5808,7 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
 
 /// Whether naming the alias template \p alias leaves the completeness of its
 /// arguments to the aliased type ([temp.inst]/2): the alias denotes a pointer
-/// or reference to one of its parameters (`template <class U> using rebind =
+/// or reference to one of its parameters (`template \<class U> using rebind =
 /// U *;', pointer_traits<T *>::rebind), or forwards to a member template-id
 /// of another class (`typename pointer_traits<From>::template rebind<To>',
 /// libc++'s __rebind_pointer_t), whose own alias then decides.
@@ -11716,6 +11716,14 @@ void cpp_typecheck_resolvet::expand_value_function_parameter_pack(
 /// \p parameters at a time -- P/A pairs, forwarding references, a trailing
 /// function parameter pack (its element types are collected in
 /// \p pack_deduced_types, its size in \p pack_expansion_size).
+/// \param parameters: the function template's parameter declarations
+/// \param fargs: the call arguments
+/// \param it: the first argument to deduce from
+/// \param [out] pack_expansion_size: the number of arguments the trailing
+///   function parameter pack matches
+/// \param [out] has_non_empty_pack: whether that pack matched an argument
+/// \param [out] pack_deduced_types: the pack's deduced element types
+/// \param template_type: the template's parameter list, if known
 void cpp_typecheck_resolvet::deduce_from_call_arguments(
   const irept::subt &parameters,
   const cpp_typecheck_fargst &fargs,
@@ -13075,7 +13083,7 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 /// correspond to the parameters in declaration order; when
 /// typecheck_template_args grouped them for a pack followed by further packs
 /// ([temp.arg.explicit]/6: every argument from the first pack on belongs to
-/// it), #explicit_pack_size gives the number of pack elements, which are
+/// it), \#explicit_pack_size gives the number of pack elements, which are
 /// bound as the pack's argument sequence.
 void cpp_typecheck_resolvet::bind_explicit_template_arguments(
   const cpp_declarationt &declaration,
