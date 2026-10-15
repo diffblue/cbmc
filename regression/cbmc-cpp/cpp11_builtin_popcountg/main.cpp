@@ -12,7 +12,9 @@ struct limits
     __builtin_popcountg(static_cast<make_unsigned_t<T>>(~make_unsigned_t<T>()));
 };
 static_assert(limits<int>::digits == 32, "popcountg of an unsigned int");
-static_assert(limits<long>::digits == 64, "popcountg of an unsigned long");
+static_assert(
+  limits<long long>::digits == 64,
+  "popcountg of an unsigned long long");
 int main()
 {
   __CPROVER_assert(limits<char>::digits == 8, "char");
