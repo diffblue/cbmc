@@ -10,6 +10,7 @@ SRC = bmc_util.cpp \
       multi_path_symex_checker.cpp \
       multi_path_symex_only_checker.cpp \
       properties.cpp \
+      proof_explanation.cpp \
       report_util.cpp \
       single_loop_incremental_symex_checker.cpp \
       single_path_symex_checker.cpp \

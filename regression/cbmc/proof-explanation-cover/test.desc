@@ -1,0 +1,22 @@
+CORE
+main.c
+--cover location --proof-explanation
+^EXIT=0$
+^SIGNAL=0$
+withdraw.coverage.*line 10.*FAILED
+withdraw.coverage.*line 13.*FAILED
+withdraw.coverage.*line 16.*FAILED
+Proof explanation:
+balance = 100
+is_locked = 0
+amount.*= 50
+Per-property proof explanations:
+Property withdraw.coverage.3:
+Property withdraw.coverage.5:
+Property withdraw.coverage.8:
+--
+^warning: ignoring
+--
+Tests per-coverage-goal proof explanations. Three branches in
+withdraw() are unreachable. Each gets its own explanation showing
+which assignments make it unreachable.
