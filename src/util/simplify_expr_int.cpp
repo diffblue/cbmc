@@ -858,6 +858,65 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
   if(new_expr.operands().size() == 1)
     return new_expr.op0();
 
+  // distribute bitwise op over concatenation when the other operand is
+  // constant: apply the op point-wise to each concatenation operand and the
+  // matching slice of the constant, so that constant operands (or all-zero /
+  // all-one slices of the mask) yield simplified slices
+  if(
+    new_expr.operands().size() == 2 &&
+    (new_expr.operands().front().is_constant() ||
+     new_expr.operands().back().is_constant()) &&
+    (new_expr.operands().front().id() == ID_concatenation ||
+     new_expr.operands().back().id() == ID_concatenation))
+  {
+    const exprt &op0 = new_expr.operands().front();
+    const exprt &op1 = new_expr.operands().back();
+    const exprt &constant = op0.is_constant() ? op0 : op1;
+    const auto svalue = expr2bits(constant, true, ns);
+    if(!svalue.has_value() || svalue->size() != width)
+      return unchanged(expr);
+
+    concatenation_exprt new_concat =
+      to_concatenation_expr(op0.id() == ID_concatenation ? op0 : op1);
+    // the most-significant bit comes first in an concatenation_exprt, hence we
+    // count down
+    std::size_t offset = width;
+    // only rewrite if at least one slice actually simplifies, to avoid growing
+    // the expression for a "neutral" mask over non-constant operands
+    bool any_simplified = false;
+    for(auto &op : new_concat.operands())
+    {
+      auto op_width = pointer_offset_bits(op.type(), ns);
+      if(!op_width.has_value() || *op_width <= 0 || *op_width > offset)
+        return unchanged(expr);
+      std::size_t op_width_int = numeric_cast_v<std::size_t>(*op_width);
+
+      std::string extracted_value =
+        svalue->substr(offset - op_width_int, op_width_int);
+
+      // a slice of all-zeros or all-ones, or a constant concatenation operand,
+      // collapses under the bitwise op
+      if(
+        extracted_value.find('1') == std::string::npos ||
+        extracted_value.find('0') == std::string::npos || op.is_constant())
+      {
+        any_simplified = true;
+      }
+
+      auto op_bits = bits2expr(extracted_value, op.type(), true, ns);
+      if(!op_bits.has_value())
+        return unchanged(expr);
+      op = simplify_bitwise(multi_ary_exprt{op, expr.id(), *op_bits}).expr;
+
+      offset -= op_width_int;
+    }
+
+    if(!any_simplified)
+      return unchanged(expr);
+
+    return changed(simplify_concatenation(new_concat));
+  }
+
   if(no_change)
     return unchanged(expr);
   else
