@@ -11,6 +11,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "cpp_typecheck_resolve.h"
 
+#include <cstdint>
 #include <deque>
 #include <unordered_map>
 
@@ -2698,7 +2699,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
   old_identifiers.swap(identifiers);
 
   // sort according to distance
-  std::multimap<std::size_t, exprt> distance_map;
+  std::multimap<std::uint64_t, exprt> distance_map;
   // per candidate, in the order of distance_map's entries (a multimap
   // keeps equal keys in insertion order): the reference-binding
   // tie-breaker and the number of template arguments, a last resort when
@@ -2713,7 +2714,7 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     // template specialization first)
     std::vector<unsigned> cv_per_argument;
   };
-  std::multimap<std::size_t, rankt> rank_map;
+  std::multimap<std::uint64_t, rankt> rank_map;
 
   for(const auto &old_id : old_identifiers)
   {
@@ -2844,7 +2845,9 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       // reference binding by the (non-template) copy/move special member --
       // e.g. selecting `operator=(_Up)` over the copy assignment for `x = y`
       // with `x`, `y` of the same class.
-      std::size_t total_distance =
+      // 64 bits also on 32-bit hosts: a std::size_t wrapped around from
+      // args_distance 5 on, and the worse candidate could win
+      const std::uint64_t total_distance =
         // NOLINTNEXTLINE(whitespace/operators)
         1000000000ULL * args_distance + 100000000ULL * undeduced_auto_penalty +
         1000 * template_distance;
