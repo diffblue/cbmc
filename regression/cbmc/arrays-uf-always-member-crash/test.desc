@@ -1,0 +1,12 @@
+CORE
+main.c
+--arrays-uf-always --no-standard-checks
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Verify that --arrays-uf-always handles array-of-structs containing array
+members accessed through a nondet index. The arrays theory must accept member
+expressions where the struct operand is an index expression.
