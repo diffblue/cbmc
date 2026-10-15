@@ -14398,10 +14398,13 @@ the commit messages cite the N5008 clauses.
 - 9b55d68d33 `(obj)(arg)' with a class-type argument is a call.
 - 16ffe70efc unary + on a pointer ([expr.unary.op]/7; C's rule was used).
 - 74d53f4318 a qualified member call in a lambda uses the captured this.
+- f54b0be291 [over.best.ics]/4.5: `X{{a, b, c, d}}' does not reach the copy
+  constructor through a user-defined conversion
+  (instrument_spec_assigns.cpp's and_exprt).
 
-Verification: W120 (through cb809092e0's predecessor) and W121 suites,
-lint exit 0 (after a fixup of d7daa27f0d's address-of-cast), cc_check over
-3729283994..HEAD (log /tmp/r185/cc_check.log).  Remaining dog-food noise:
+Verification: W123 (HEAD) cbmc-cpp 1905, cpp 246, regression/cbmc 1208,
+goto-instrument 298, all exit 0; lint exit 0; cc_check: every commit of
+3729283994..HEAD compiles (/tmp/r185/cc_check.log and a tail run).  Remaining dog-food noise:
 contracts/utils.cpp compiles but prints a recovered
 `_Maybe_unary_or_binary_function' error; goto_instrument_parse_options.cpp
 needs about 975 s with goto-cc (sweep TIMEOUT 900).  A fresh sweep with
