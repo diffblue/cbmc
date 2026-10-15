@@ -1,0 +1,15 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* direct call: SUCCESS$
+^\[main\.assertion\.2\] .* virtual call: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^\[.*pointer_dereference.*: FAILURE$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.  Currently both assertions fail.
