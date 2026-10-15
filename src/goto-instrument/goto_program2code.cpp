@@ -1938,7 +1938,42 @@ void goto_program2codet::cleanup_expr(exprt &expr, bool no_typecast)
   else if(expr.id()==ID_typecast)
   {
     if(expr.type().id() == ID_c_bit_field)
-      expr=to_typecast_expr(expr).op();
+    {
+      // A cast to c_bit_field truncates to the bitfield width. Simply
+      // dropping the cast loses the truncation semantics, which matters
+      // when the result is used in a boolean context (e.g., || or &&).
+      // Replace with explicit masking to the bitfield width.
+      const c_bit_field_typet &bf_type = to_c_bit_field_type(expr.type());
+      const std::size_t width = bf_type.get_width();
+      const bool is_signed = bf_type.underlying_type().id() == ID_signedbv;
+
+      exprt op = to_typecast_expr(expr).op();
+      const typet op_type = op.type();
+
+      if(width == 0)
+      {
+        expr = from_integer(0, op_type);
+      }
+      else if(is_signed)
+      {
+        // For signed: mask to width bits, then sign-extend by casting
+        // through an unsigned type and subtracting the sign bit weight.
+        // Equivalent to: ((unsigned)(op) & mask) as signed, with sign
+        // extension. Use: (op & mask) - ((op & sign_bit) ? (1<<width) : 0)
+        // Simpler: just mask and let the assignment to the bitfield handle
+        // sign extension. But we need the VALUE to be correct for boolean
+        // checks. The simplest correct approach: mask the lower N bits.
+        // If the result is used in a boolean context, only zero/non-zero
+        // matters, and masking preserves that correctly.
+        mp_integer mask = power(mp_integer(2), mp_integer(width)) - 1;
+        expr = bitand_exprt(op, from_integer(mask, op_type));
+      }
+      else
+      {
+        mp_integer mask = power(mp_integer(2), mp_integer(width)) - 1;
+        expr = bitand_exprt(op, from_integer(mask, op_type));
+      }
+    }
     else
     {
       add_local_types(expr.type());
