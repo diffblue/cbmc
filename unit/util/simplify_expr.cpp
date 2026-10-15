@@ -353,6 +353,31 @@ TEST_CASE("simplify_expr boolean expressions", "[core][util]")
   {
     REQUIRE(simplify_expr(not_exprt{true_exprt()}, ns) == false_exprt());
     REQUIRE(simplify_expr(not_exprt{false_exprt()}, ns) == true_exprt());
+
+    const symbol_exprt a{"a", bool_typet{}};
+    const symbol_exprt b{"b", bool_typet{}};
+
+    // double negation: !!a == a. Note the inner negation is held as an exprt
+    // so that the outer not_exprt nests it (rather than copy-constructing).
+    const exprt not_a = not_exprt{a};
+    REQUIRE(simplify_expr(not_exprt{not_a}, ns) == a);
+
+    // De Morgan: !(a && b) == !a || !b
+    REQUIRE(
+      simplify_expr(not_exprt{and_exprt{a, b}}, ns) ==
+      simplify_expr(or_exprt{not_exprt{a}, not_exprt{b}}, ns));
+
+    // De Morgan: !(a || b) == !a && !b
+    REQUIRE(
+      simplify_expr(not_exprt{or_exprt{a, b}}, ns) ==
+      simplify_expr(and_exprt{not_exprt{a}, not_exprt{b}}, ns));
+
+    // !(x != y) == x == y
+    const symbol_exprt x{"x", integer_typet{}};
+    const symbol_exprt y{"y", integer_typet{}};
+    REQUIRE(
+      simplify_expr(not_exprt{notequal_exprt{x, y}}, ns) ==
+      simplify_expr(equal_exprt{x, y}, ns));
   }
   SECTION("Nested boolean expressions")
   {
@@ -619,6 +644,32 @@ TEST_CASE("Simplify quantifier", "[core][util]")
     REQUIRE(simplify_expr(forall_exprt{a, false_exprt{}}, ns) == false_exprt{});
 
     REQUIRE(simplify_expr(forall_exprt{a, true_exprt{}}, ns) == true_exprt{});
+  }
+
+  SECTION("Negation of quantifiers")
+  {
+    const symbol_exprt x{"x", integer_typet{}};
+    const symbol_exprt y{"y", integer_typet{}};
+    const exprt body = equal_exprt{x, y};
+
+    // single variable: !(exists x. x==y) <-> forall x. !(x==y)
+    REQUIRE(
+      simplify_expr(not_exprt{exists_exprt{x, body}}, ns) ==
+      simplify_expr(forall_exprt{x, not_exprt{body}}, ns));
+    REQUIRE(
+      simplify_expr(not_exprt{forall_exprt{x, body}}, ns) ==
+      simplify_expr(exists_exprt{x, not_exprt{body}}, ns));
+
+    // multiple variables: regression for the symbol()/variables() narrowing --
+    // a multi-variable quantifier must be rewritten, not trip the single
+    // variable PRECONDITION of quantifier_exprt::symbol().
+    const binding_exprt::variablest vars{x, y};
+    REQUIRE(
+      simplify_expr(not_exprt{forall_exprt{vars, body}}, ns) ==
+      simplify_expr(exists_exprt{vars, not_exprt{body}}, ns));
+    REQUIRE(
+      simplify_expr(not_exprt{exists_exprt{vars, body}}, ns) ==
+      simplify_expr(forall_exprt{vars, not_exprt{body}}, ns));
   }
 }
 
