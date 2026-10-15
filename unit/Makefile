@@ -87,6 +87,7 @@ SRC += analyses/ai/ai.cpp \
        goto-symex/goto_symex_state.cpp \
        goto-symex/ssa_equation.cpp \
        goto-symex/is_constant.cpp \
+       goto-symex/rewrite_quantifiers.cpp \
        goto-symex/shadow_memory_util.cpp \
        goto-symex/symex_assign.cpp \
        goto-symex/symex_level0.cpp \
