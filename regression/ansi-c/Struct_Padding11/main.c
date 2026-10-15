@@ -8,7 +8,8 @@
 #define CONCAT2(a, b) CONCAT(a, b)
 
 #define STATIC_ASSERT(condition)                                               \
-  int CONCAT2(some_array, __LINE__)[(condition) ? 1 : -1]
+  int CONCAT2(                                                                 \
+    some_array, __LINE__)[(sizeof(void *) != 8 || (condition)) ? 1 : -1]
 
 // The values are those of x86-64 (LP64, the x86-64 psABI bit-field and
 // alignment rules); elsewhere the test is vacuous.

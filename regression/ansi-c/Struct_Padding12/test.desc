@@ -8,5 +8,7 @@ main.c
 ^CONVERSION ERROR$
 --
 The expected sizes and offsets are those of x86-64 (LP64 and the x86-64
-psABI); the source is guarded by __x86_64__, so the 32-bit and arm64 CI
-builds run it vacuously (`-m64' is not accepted by the aarch64 gcc).
+psABI); the source is guarded by __x86_64__, so the arm64 CI build runs it
+vacuously (`-m64' is not accepted by the aarch64 gcc).  A 32-bit goto-cc
+preprocesses with the 64-bit host gcc (__x86_64__ is defined) but lays out
+for i386, so STATIC_ASSERT is vacuous unless sizeof(void *) is 8.
