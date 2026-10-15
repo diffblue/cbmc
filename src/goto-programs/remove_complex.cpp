@@ -91,6 +91,17 @@ static bool have_to_remove_complex(const typet &type)
     return have_to_remove_complex(to_type_with_subtype(type).subtype());
   else if(type.id()==ID_complex)
     return true;
+  else if(type.id() == ID_code)
+  {
+    // a function taking or returning a complex number (the type of a
+    // function symbol, or of a pointer to function)
+    const code_typet &code_type = to_code_type(type);
+    if(have_to_remove_complex(code_type.return_type()))
+      return true;
+    for(const auto &p : code_type.parameters())
+      if(have_to_remove_complex(p.type()))
+        return true;
+  }
 
   return false;
 }
@@ -295,6 +306,16 @@ static void remove_complex(typet &type)
           type.id()==ID_array)
   {
     remove_complex(to_type_with_subtype(type).subtype());
+  }
+  else if(type.id() == ID_code)
+  {
+    // the parameter symbols are lowered with the rest of the symbol table:
+    // the function type must agree with them (--validate-goto-model:
+    // "parameter type inconsistency")
+    code_typet &code_type = to_code_type(type);
+    remove_complex(code_type.return_type());
+    for(auto &p : code_type.parameters())
+      remove_complex(p.type());
   }
   else if(type.id()==ID_complex)
   {
