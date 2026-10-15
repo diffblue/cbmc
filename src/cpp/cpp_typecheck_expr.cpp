@@ -2722,9 +2722,16 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           }
           // the initializer itself (or its base class subobject), or the
           // glvalue result of a conversion function returning a reference:
-          // bound directly
-          const bool direct = object->get_bool("#reference_binds_probe") ||
-                              is_reference(object->type());
+          // bound directly -- unless the initializer was converted to a type
+          // of the same representation, which retypes it without a typecast
+          // (int from a 32-bit long, /5.4.2)
+          const bool retyped =
+            object->get_bool("#reference_binds_probe") &&
+            from_type.id() != ID_struct_tag &&
+            object->type().get(ID_C_c_type) != from_type.get(ID_C_c_type);
+          const bool direct =
+            !retyped && (object->get_bool("#reference_binds_probe") ||
+                         is_reference(object->type()));
           result = !direct;
         }
       }
