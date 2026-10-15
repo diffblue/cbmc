@@ -14470,3 +14470,53 @@ reproduced by hand yet.
 Verification: W126 (HEAD minus the last KNOWNBUG commit) cbmc-cpp 1920,
 cpp 246, regression/cbmc 1208, goto-instrument 298, all exit 0; lint exit
 0; every commit of ab85c714d6..HEAD compiles.
+
+## Round 186 (CI): getting PR 8878 green after merging develop (cca717a833)
+
+The CI run of cca717a833 failed 15 jobs; develop passes at the merge base
+d1451f2330, so all failures came from the branch.  Fixed, one commit each:
+- Style and tooling: clang-format (093bb31965), doxygen (a7911ae886), the
+  22 IWYU removals that CI's filter reports (a162658971).
+- All Linux jobs: remove_complex lowers code types (1f75836afd, a develop
+  bug as well); std::format verification THOROUGH (dd552a8052); profile
+  tags (d74b5d6875); trace-XML exclusions (ca87c9e5c6).
+- Ubuntu 22.04 (GCC 11 headers; reproduce with /tmp/r186/gcc11/bin first
+  on PATH): libstdcxx13 tag for <format>, libcxx tag for three libc++
+  tests (99443b5324); has_facet/use_facet<num_put> model for libstdc++ 11
+  (db34f3858c); [class.copy.assign]/7 deleted implicit copy assignment
+  (b8efacde6b, map<int, int> via assignable_from of pair<const K, V>).
+  path(const Source &), __pool_resource::resource() and variant's
+  _S_apply_single_alt are still dropped with GCC 11 headers; tagged
+  libstdcxx13 (18c08ad009) without a KNOWNBUG yet (hand reductions did
+  not reproduce; clang accepts the cvise output of the pmr case only
+  because it skips the missing `template').
+- 32-bit (reproduce with build-32, -DCMAKE_CXX_FLAGS=-m32): the template
+  candidate distance overflowed a 32-bit std::size_t (2d49c9c04b, about 35
+  tests); long/long long ranks by #c_type (1ee0b5cbd5), promotion to int
+  is not to a same-width long (b15fc08cf1), __reference_binds_to_temporary
+  of a retyped probe (2c43cf36d3), deductions of int and long conflict
+  (07649e39dc; found by the full local 32-bit run, which passes now);
+  tests assuming an 8-byte long
+  (7daf454962, 5d441b2ee0, 0d29679839, 312cfad029, ffef1ea43b);
+  string2optional needs GCC 13's from_chars (2832996c22).
+- ARM: a __builtin_X reusing a va_list model left va_list dangling
+  (93b11fcc7e, all stream tests under --validate-goto-model); the
+  qualification conversion ignored #c_type (d6c99e54b5, char8_t vs an
+  unsigned char); signed-char assumption (395475a8e7).
+- Windows: narrow_or_throw_out_of_range missed same-width sign changes
+  (433c32a567); gcc-only tags (17b7064510); unit proofs gcc-only
+  (a3866a2032).
+- macOS: constexpr_skip_stmt needs -std=c++11 (dda18caa43); goto-cc-cbmc
+  libstdc++ tests gcc-only (73b2965c82).
+- benchcomp: faeaa02a7a's null-pointer guard applied to C as well; now C++
+  only (4de92f85cc).  All nine AWS proofs are back to develop's VCC
+  counts (e.g. 403 -> 367, 481 -> 440).
+
+Not fixed: macOS (Apple libc++ of Xcode 16.4, LLVM 19: __hermite<double>
+in __math/special_functions.h and __get_property in
+extended_grapheme_cluster_table.h are dropped; 213 of 1923 cbmc-cpp
+tests failed on macos-15-intel-make), the cbmc-cpp timeouts on
+macos-14-cmake (about 390 of 1900 tests in 4800 s, 5 failing) and on
+vs-2026-cmake (510 OK, 60 failed with the MSVC STL in 4800 s), and z3's
+complex2 (identical SMT2 to develop's; z3 4.8.12 needs 6.2 GB and 148 s,
+the CI run ended after 17 s with no solver answer).
