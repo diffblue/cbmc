@@ -1,0 +1,14 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests that may-alias correctly handles type-compatible (same bit-width)
+types. shared_ptr is int* but points to unsigned int. Without the type
+compatibility relaxation, the may-alias object would not alias with
+val_unsigned and the assertion would incorrectly fail.

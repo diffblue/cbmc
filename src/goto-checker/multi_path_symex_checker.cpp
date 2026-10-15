@@ -17,6 +17,7 @@ Author: Daniel Kroening, Peter Schrammel
 #include <goto-programs/remove_vector.h>
 
 #include <assembler/remove_asm.h>
+#include <goto-symex/memory_model_sc.h>
 #include <goto-symex/solver_hardness.h>
 
 #include "bmc_util.h"
@@ -37,8 +38,8 @@ multi_path_symex_checkert::multi_path_symex_checkert(
   PRECONDITION(!has_vector(goto_model.get_goto_functions()));
 }
 
-incremental_goto_checkert::resultt multi_path_symex_checkert::
-operator()(propertiest &properties)
+incremental_goto_checkert::resultt
+multi_path_symex_checkert::operator()(propertiest &properties)
 {
   resultt result(resultt::progresst::DONE);
 
@@ -90,8 +91,96 @@ void multi_path_symex_checkert::run_property_decider(
   propertiest &properties,
   std::chrono::duration<double> solver_runtime)
 {
-  ::run_property_decider(
-    result, properties, property_decider, ui_message_handler, solver_runtime);
+  if(options.get_bool_option("refine-concurrency") && equation.has_threads())
+  {
+    // Incremental concurrency refinement: solve with progressively
+    // more memory model constraints. The SAT simplifier is disabled
+    // (see solver_factory.cpp) so we can add clauses between solves.
+    messaget log(ui_message_handler);
+
+    std::unique_ptr<memory_model_baset> mm = get_memory_model(options, ns);
+    // prepare() was already called in postprocess_equation
+    mm->prepare(equation, ui_message_handler);
+
+    using stage = memory_model_baset::refinement_staget;
+    const stage stages[] = {
+      stage::READ_FROM,
+      stage::PROGRAM_ORDER,
+      stage::WRITE_SERIALIZATION,
+      stage::FROM_READ};
+    const char *stage_names[] = {
+      "read-from", "program-order", "write-serialization", "from-read"};
+
+    property_decider.add_constraint_from_goals(
+      [&properties](const irep_idt &property_id)
+      { return is_property_to_check(properties.at(property_id).status); });
+
+    for(std::size_t i = 0; i <= 4; ++i)
+    {
+      if(i > 0)
+      {
+        log.statistics() << "Concurrency refinement: adding "
+                         << stage_names[i - 1] << " constraints"
+                         << messaget::eom;
+
+        // Add this stage's constraints to the equation
+        const auto before = equation.SSA_steps.size();
+        mm->add_stage(stages[i - 1], equation);
+
+        // Convert newly added constraint steps to the solver
+        auto it = equation.SSA_steps.begin();
+        std::advance(it, static_cast<std::ptrdiff_t>(before));
+        for(; it != equation.SSA_steps.end(); ++it)
+        {
+          if(it->is_constraint())
+          {
+            property_decider.get_decision_procedure().set_to_true(
+              it->cond_expr);
+          }
+        }
+      }
+
+      log.statistics() << "Concurrency refinement: solving (stage " << i
+                       << "/4)" << messaget::eom;
+
+      auto const start = std::chrono::steady_clock::now();
+      decision_proceduret::resultt dec_result = property_decider.solve();
+      auto const stop = std::chrono::steady_clock::now();
+      solver_runtime += std::chrono::duration<double>(stop - start);
+
+      if(dec_result == decision_proceduret::resultt::D_UNSATISFIABLE)
+      {
+        log.statistics() << "Concurrency refinement: UNSAT at stage " << i
+                         << "/4" << messaget::eom;
+        property_decider.update_properties_status_from_goals(
+          properties, result.updated_properties, dec_result, true);
+        break;
+      }
+
+      if(i == 4)
+      {
+        // All stages added, SAT is genuine
+        log.statistics() << "Concurrency refinement: SAT with all constraints"
+                         << messaget::eom;
+        property_decider.update_properties_status_from_goals(
+          properties, result.updated_properties, dec_result, true);
+        result.progress =
+          incremental_goto_checkert::resultt::progresst::FOUND_FAIL;
+        break;
+      }
+
+      log.statistics() << "Concurrency refinement: SAT at stage " << i
+                       << "/4, refining" << messaget::eom;
+    }
+
+    log.statistics() << "Runtime decision procedure: " << solver_runtime.count()
+                     << "s" << messaget::eom;
+  }
+  else
+  {
+    ::run_property_decider(
+      result, properties, property_decider, ui_message_handler, solver_runtime);
+  }
 }
 
 goto_tracet multi_path_symex_checkert::build_full_trace() const

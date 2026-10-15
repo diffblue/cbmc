@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Soundness test: writer() changes ptr to point to val2 (=99), so
+*ptr == 42 must fail. This verifies that may-alias constraints
+correctly propagate pointer aliasing through the memory model.

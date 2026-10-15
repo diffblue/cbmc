@@ -1,0 +1,13 @@
+CORE
+main.c
+
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+pointer handling for concurrency is unsound
+^warning: ignoring
+--
+Tests different-size type access: char* reading from an int through
+a shared pointer. The byte_extract mechanism reinterprets the int
+value as a char.

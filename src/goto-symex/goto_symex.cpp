@@ -18,6 +18,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/mathematical_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 #include <util/simplify_utils.h>
 #include <util/std_code.h>
 #include <util/string_expr.h>
@@ -29,11 +30,17 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include <climits>
 
-void goto_symext::do_simplify(exprt &expr, const value_sett &value_set)
+void goto_symext::do_simplify(exprt &expr, const statet &state)
 {
   if(symex_config.simplify_opt)
   {
-    simplify_expr_with_value_sett{value_set, language_mode, ns}.simplify(expr);
+    if(state.threads.size() == 1)
+    {
+      simplify_expr_with_value_sett{state.value_set, language_mode, ns}
+        .simplify(expr);
+    }
+    else
+      simplify(expr, ns);
   }
 }
 
@@ -63,7 +70,7 @@ void goto_symext::symex_assign(
   // "byte_extract <type> from an_lvalue offset this_rvalue") can affect whether
   // we use field-sensitive symbols or not, so L2-rename them up front:
   lhs = state.l2_rename_rvalues(lhs, ns);
-  do_simplify(lhs, state.value_set);
+  do_simplify(lhs, state);
   lhs = state.field_sensitivity.apply(ns, state, std::move(lhs), true);
 
   if(rhs.id() == ID_side_effect)
