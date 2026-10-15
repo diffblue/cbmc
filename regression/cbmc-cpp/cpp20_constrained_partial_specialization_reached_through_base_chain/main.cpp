@@ -9,8 +9,7 @@ struct impl : impl<T, B + 1>
 {
 };
 template <typename T>
-  requires true
-struct impl<T, 4>
+requires true struct impl<T, 4>
 {
   using type = T;
 };

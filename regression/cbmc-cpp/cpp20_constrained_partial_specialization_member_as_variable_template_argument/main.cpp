@@ -14,7 +14,10 @@ struct impl;
 // [temp.spec.partial.match]/1, [temp.constr.decl]: a constrained partial
 // specialization, selected for impl<int, long>
 template <typename T1, typename T2>
-  requires requires { typename cond_res<T1, T2>; }
+requires requires
+{
+  typename cond_res<T1, T2>;
+}
 struct impl<T1, T2>
 {
   using type = cond_res<T1, T2>;

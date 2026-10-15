@@ -61,8 +61,7 @@ constexpr int kind<T> = 1;
 template <class T>
 constexpr int req = 0;
 template <class T>
-  requires small<T>
-constexpr int req<T> = 2;
+requires small<T> constexpr int req<T> = 2;
 
 int main()
 {

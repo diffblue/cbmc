@@ -8,20 +8,17 @@ struct impl : impl<T, B + 1>
 {
 };
 template <typename T>
-  requires false
-struct impl<T, 1>
+requires false struct impl<T, 1>
 {
   using type = void;
 };
 template <typename T>
-  requires false
-struct impl<T, 2>
+requires false struct impl<T, 2>
 {
   using type = void;
 };
 template <typename T>
-  requires true
-struct impl<T, 3>
+requires true struct impl<T, 3>
 {
   using type = T;
 };
