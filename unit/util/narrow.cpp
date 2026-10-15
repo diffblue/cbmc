@@ -38,4 +38,10 @@ TEST_CASE(
   REQUIRE_THROWS_AS(
     narrow_or_throw_out_of_range<unsigned>(-1L), std::out_of_range);
   REQUIRE(narrow_or_throw_out_of_range<int>(-1L) == -1);
+  // same width, different signedness
+  REQUIRE_THROWS_AS(
+    narrow_or_throw_out_of_range<unsigned>(-1), std::out_of_range);
+  REQUIRE_THROWS_AS(
+    narrow_or_throw_out_of_range<int>(0xffffffffu), std::out_of_range);
+  REQUIRE(narrow_or_throw_out_of_range<unsigned>(7) == 7u);
 }
