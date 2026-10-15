@@ -83,7 +83,11 @@ private:
     const function_application_exprt &f);
 
 public:
-  std::pair<exprt, string_constraintst> add_axioms_for_concat(
+  /// Convenience overload equivalent to
+  /// `add_axioms_for_concat_substr(res, s1, s2, 0, |s2|)`, i.e. full-string
+  /// concatenation. Replaces the previously deprecated `add_axioms_for_concat`
+  /// while keeping concat-style call sites readable as one-liners.
+  std::pair<exprt, string_constraintst> add_axioms_for_concat_substr(
     const array_string_exprt &res,
     const array_string_exprt &s1,
     const array_string_exprt &s2);

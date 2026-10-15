@@ -384,14 +384,15 @@ static std::pair<exprt, string_constraintst> add_axioms_for_format(
     const array_string_exprt &intermediary = intermediary_strings[i];
     const array_string_exprt fresh =
       array_pool.fresh_string(index_type, char_type);
-    auto result = generator.add_axioms_for_concat(fresh, str, intermediary);
+    auto result =
+      generator.add_axioms_for_concat_substr(fresh, str, intermediary);
     return_code = maximum(return_code, result.first);
     merge(constraints, std::move(result.second));
     str = fresh;
   }
 
-  auto result =
-    generator.add_axioms_for_concat(res, str, intermediary_strings.back());
+  auto result = generator.add_axioms_for_concat_substr(
+    res, str, intermediary_strings.back());
   merge(constraints, std::move(result.second));
   return {maximum(result.first, return_code), std::move(constraints)};
 }
