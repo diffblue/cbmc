@@ -19,8 +19,9 @@ Author: Peter Schrammel
 #include <util/pointer_expr.h>
 #include <util/string_constant.h>
 
+#include <goto-programs/initialize_function.h>
+
 #include <langapi/language_util.h>
-#include <linking/static_lifetime_init.h>
 
 #include "goto_symex_state.h"
 #include "shadow_memory_util.h"

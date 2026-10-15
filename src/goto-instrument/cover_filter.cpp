@@ -14,7 +14,7 @@ Author: Peter Schrammel
 #include <util/prefix.h>
 #include <util/symbol.h>
 
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 /// Filter out functions that are not considered provided by the user
 /// \param function: the function under consideration

@@ -14,9 +14,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/simplify_expr.h>
 #include <util/source_location.h>
 
+#include <goto-programs/initialize_function.h>
 #include <goto-programs/unwindset.h>
-
-#include <linking/static_lifetime_init.h>
 
 #include <limits>
 

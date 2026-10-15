@@ -24,11 +24,12 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/replace_symbol.h>
 #include <util/string_utils.h>
 
+#include <goto-programs/initialize_function.h>
+
 #include <ansi-c/expr2c.h>
 #include <ansi-c/type2name.h>
 #include <cpp/cpp_type2name.h>
 #include <cpp/expr2cpp.h>
-#include <linking/static_lifetime_init.h>
 
 #include "goto_program2code.h"
 

@@ -12,8 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/config.h>
 
 #include <goto-programs/adjust_float_expressions.h>
-
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 #include "ansi_c_parser.h"
 

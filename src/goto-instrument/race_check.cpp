@@ -15,9 +15,8 @@ Date: February 2006
 
 #include <util/pointer_predicates.h>
 
+#include <goto-programs/initialize_function.h>
 #include <goto-programs/remove_skip.h>
-
-#include <linking/static_lifetime_init.h>
 
 #include "rw_set.h"
 

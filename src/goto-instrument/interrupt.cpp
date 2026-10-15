@@ -16,7 +16,7 @@ Date: September 2011
 #include <util/range.h>
 #include <util/std_code.h>
 
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 #ifdef LOCAL_MAY
 #include <analyses/local_may_alias.h>

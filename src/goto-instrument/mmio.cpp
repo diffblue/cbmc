@@ -13,7 +13,7 @@ Date: September 2011
 
 #include "mmio.h"
 
-#include <linking/static_lifetime_init.h>
+#include <goto-programs/initialize_function.h>
 
 #include "rw_set.h"
 
