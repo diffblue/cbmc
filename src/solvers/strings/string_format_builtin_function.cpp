@@ -26,6 +26,51 @@ static exprt format_arg_from_string(
   const irep_idt &id,
   array_poolt &array_pool);
 
+/// Add the axioms describing the result of formatting a Boolean argument
+/// as a string under the BOOLEAN format specifier (`%b`): the returned
+/// string equals `"true"` when `b` is true and `"false"` when it is
+/// false. This logic was previously the public, Java-specific
+/// `string_constraint_generatort::add_axioms_from_bool(const
+/// array_string_exprt &, const exprt &)` helper; the current home is
+/// local to this TU because the only caller is
+/// `add_axioms_for_format_specifier` below and the semantics are tied
+/// to `java.lang.String.format` / `java.util.Formatter`.
+/// \param constraints: the constraint set to extend
+/// \param res: the result string slot
+/// \param b: the Boolean argument; must be of `bool_typet` or `c_bool`
+/// \param array_pool: array pool of the calling solver
+/// \param char_type: element type of \p res
+static void add_axioms_for_format_bool(
+  string_constraintst &constraints,
+  const array_string_exprt &res,
+  const exprt &b,
+  array_poolt &array_pool,
+  const typet &char_type)
+{
+  INVARIANT(
+    b.type() == bool_typet{} || b.type().id() == ID_c_bool,
+    "format_arg_from_string with ID_boolean must yield a Boolean");
+
+  // a1 : eq         => |res| = |"true"|
+  // a2 : forall i < |"true"|.  eq => res[i] = "true"[i]
+  // a3 : !eq        => |res| = |"false"|
+  // a4 : forall i < |"false"|. !eq => res[i] = "false"[i]
+  const typecast_exprt eq{b, bool_typet{}};
+
+  auto emit_literal = [&](const exprt &guard, const std::string &lit)
+  {
+    constraints.existential.push_back(implies_exprt{
+      guard, equal_to(array_pool.get_or_create_length(res), lit.length())});
+    for(std::size_t i = 0; i < lit.length(); ++i)
+    {
+      constraints.existential.push_back(implies_exprt{
+        guard, equal_exprt{res[i], from_integer(lit[i], char_type)}});
+    }
+  };
+  emit_literal(eq, "true");
+  emit_literal(not_exprt{eq}, "false");
+}
+
 string_format_builtin_functiont::string_format_builtin_functiont(
   const exprt &return_code,
   const std::vector<exprt> &fun_args,
@@ -172,9 +217,13 @@ add_axioms_for_format_specifier(
     return {res, constraints};
   }
   case format_specifiert::BOOLEAN:
-    return_code = generator.add_axioms_from_bool(
-      res, format_arg_from_string(string_arg, ID_boolean, array_pool));
-    return {res, std::move(return_code.second)};
+    add_axioms_for_format_bool(
+      constraints,
+      res,
+      format_arg_from_string(string_arg, ID_boolean, array_pool),
+      array_pool,
+      char_type);
+    return {res, constraints};
   case format_specifiert::STRING:
   {
     const exprt arg_string = string_arg;

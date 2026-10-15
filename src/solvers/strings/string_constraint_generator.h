@@ -189,10 +189,6 @@ public:
   std::pair<exprt, string_constraintst>
   add_axioms_from_long(const function_application_exprt &f);
   std::pair<exprt, string_constraintst>
-  add_axioms_from_bool(const function_application_exprt &f);
-  std::pair<exprt, string_constraintst>
-  add_axioms_from_bool(const array_string_exprt &res, const exprt &b);
-  std::pair<exprt, string_constraintst>
   add_axioms_from_char(const function_application_exprt &f);
   std::pair<exprt, string_constraintst>
   add_axioms_from_char(const array_string_exprt &res, const exprt &c);
