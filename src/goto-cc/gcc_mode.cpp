@@ -590,7 +590,7 @@ int gcc_modet::doit()
 
   // -fsingle-precision-constant makes floating-point constants "float"
   // instead of double
-  if(cmdline.isset("-fsingle-precision-constant"))
+  if(cmdline.isset("fsingle-precision-constant"))
     config.ansi_c.single_precision_constant=true;
 
   // -fshort-double makes double the same as float

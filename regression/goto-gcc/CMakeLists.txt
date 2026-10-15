@@ -1,5 +1,7 @@
 if("${CMAKE_SYSTEM_NAME}" STREQUAL "Darwin")
-  set(not_gnu_ld -X gnu-ld-only)
+  # On macOS goto-gcc wraps clang, which does not support gcc-only compiler
+  # flags (e.g. -fsingle-precision-constant), so exclude gcc-only tests too.
+  set(not_gnu_ld -X gnu-ld-only -X gcc-only)
 else()
   set(not_gnu_ld "")
 endif()
