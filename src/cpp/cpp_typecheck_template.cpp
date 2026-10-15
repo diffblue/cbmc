@@ -4818,9 +4818,17 @@ cpp_template_args_tct cpp_typecheckt::typecheck_template_args(
   // Remove trailing empty_typet arguments produced by empty parameter
   // pack expansion.  These void arguments cause downstream template
   // instantiations to map non-pack parameters to empty_typet.
+  // Only the arguments matched by the pack can be such sentinels: a
+  // genuine `void' for a parameter before the pack (`R' of libstdc++'s
+  // _Maybe_unary_or_binary_function<_Res, _ArgTypes...>, the base of
+  // std::function<void()>) is a template argument ([temp.arg.type]) and was
+  // popped too -- "'_Maybe_unary_or_binary_function' is a template; thus,
+  // expected template arguments" (CBMC's own contracts/utils.cpp,
+  // dog-fooding).
   if(!parameters.empty() && parameters.back().get_bool(ID_ellipsis))
   {
-    while(!args.empty() && args.back().id() == ID_type &&
+    const std::size_t non_pack_parameters = parameters.size() - 1;
+    while(args.size() > non_pack_parameters && args.back().id() == ID_type &&
           args.back().type().id() == ID_empty)
     {
       args.pop_back();
