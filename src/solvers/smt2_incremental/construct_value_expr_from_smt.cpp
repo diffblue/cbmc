@@ -117,6 +117,12 @@ private:
       false, "Unexpected conversion of exists quantifier to value expression.");
   }
 
+  void visit(const smt_const_array_termt &const_array) override
+  {
+    INVARIANT(
+      false, "Unexpected conversion of constant array to value expression.");
+  }
+
 public:
   /// \brief This function is complete the external interface to this class. All
   ///   construction of this class and construction of expressions should be

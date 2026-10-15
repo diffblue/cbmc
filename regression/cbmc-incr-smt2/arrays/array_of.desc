@@ -10,5 +10,6 @@ line \d+ Valid array condition: SUCCESS
 --
 Test using __CPROVER_array_set consisting in an `array_of` node which sets all values of a given
 array to a given value.
-This test uses a forall SMT statement. Requires --slice-formula for the time
-being, but this is a workaround.
+The `array_of` is encoded as an SMT-LIB constant array. --slice-formula is
+retained here but, unlike the previous forall encoding, is no longer required
+(see array_of_multiple_indices for the variant without it).

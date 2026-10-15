@@ -82,12 +82,15 @@ protected:
   void initialize_array_elements(
     const array_exprt &array,
     const smt_identifier_termt &array_identifier);
-  /// \brief Generate and send to the SMT solver clauses asserting that each
-  /// array element is as specified by \p array.
-  /// \note This function uses a forall SMT2 term. Using it in combination with
-  /// arrays, bit vectors and uninterpreted functions requires the `ALL` SMT
-  /// logic that is not in the SMT 2.6 standard, but that it has been tested
-  /// working on Z3 and CVC5.
+  /// \brief Generate and send to the SMT solver a clause defining \p array as
+  ///   a constant array whose every element is the fill value of \p array.
+  /// \details
+  ///   This uses the SMT-LIB constant-array form `((as const (Array I E)) v)`
+  ///   rather than a `forall` quantifier. It is quantifier-free, defines the
+  ///   array fully at declaration time (so the definition survives being bound
+  ///   to a symbol and accessed indirectly), and avoids the solver performance
+  ///   and `unknown`-result issues that quantifiers combined with arrays and
+  ///   bit vectors can cause.
   void initialize_array_elements(
     const array_of_exprt &array,
     const smt_identifier_termt &array_identifier);

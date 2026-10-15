@@ -86,10 +86,12 @@ irep_idt smt_identifier_termt::identifier() const
 std::vector<std::reference_wrapper<const smt_indext>>
 smt_identifier_termt::indices() const
 {
-  return make_range(get_sub()).map([](const irept &index) {
-    return std::cref(
-      smt_indext::storert<smt_identifier_termt>::downcast(index));
-  });
+  return make_range(get_sub()).map(
+    [](const irept &index)
+    {
+      return std::cref(
+        smt_indext::storert<smt_identifier_termt>::downcast(index));
+    });
 }
 
 smt_bit_vector_constant_termt::smt_bit_vector_constant_termt(
@@ -147,9 +149,9 @@ smt_function_application_termt::function_identifier() const
 std::vector<std::reference_wrapper<const smt_termt>>
 smt_function_application_termt::arguments() const
 {
-  return make_range(get_sub()).map([](const irept &argument) {
-    return std::cref(static_cast<const smt_termt &>(argument));
-  });
+  return make_range(get_sub()).map(
+    [](const irept &argument)
+    { return std::cref(static_cast<const smt_termt &>(argument)); });
 }
 
 smt_forall_termt::smt_forall_termt(
@@ -164,9 +166,8 @@ smt_forall_termt::smt_forall_termt(
     std::make_move_iterator(bound_variables.begin()),
     std::make_move_iterator(bound_variables.end()),
     std::back_inserter(get_sub()),
-    [](smt_identifier_termt &&bound_variable) {
-      return irept{std::move(bound_variable)};
-    });
+    [](smt_identifier_termt &&bound_variable)
+    { return irept{std::move(bound_variable)}; });
   INVARIANT(
     predicate.get_sort().cast<smt_bool_sortt>(),
     "Predicate of forall quantifier is expected to have bool sort.");
@@ -181,9 +182,9 @@ const smt_termt &smt_forall_termt::predicate() const
 std::vector<std::reference_wrapper<const smt_identifier_termt>>
 smt_forall_termt::bound_variables() const
 {
-  return make_range(get_sub()).map([](const irept &variable) {
-    return std::cref(static_cast<const smt_identifier_termt &>(variable));
-  });
+  return make_range(get_sub()).map(
+    [](const irept &variable)
+    { return std::cref(static_cast<const smt_identifier_termt &>(variable)); });
 }
 
 smt_exists_termt::smt_exists_termt(
@@ -198,9 +199,8 @@ smt_exists_termt::smt_exists_termt(
     std::make_move_iterator(bound_variables.begin()),
     std::make_move_iterator(bound_variables.end()),
     std::back_inserter(get_sub()),
-    [](smt_identifier_termt &&bound_variable) {
-      return irept{std::move(bound_variable)};
-    });
+    [](smt_identifier_termt &&bound_variable)
+    { return irept{std::move(bound_variable)}; });
   INVARIANT(
     predicate.get_sort().cast<smt_bool_sortt>(),
     "Predicate of exists quantifier is expected to have bool sort.");
@@ -215,9 +215,25 @@ const smt_termt &smt_exists_termt::predicate() const
 std::vector<std::reference_wrapper<const smt_identifier_termt>>
 smt_exists_termt::bound_variables() const
 {
-  return make_range(get_sub()).map([](const irept &variable) {
-    return std::cref(static_cast<const smt_identifier_termt &>(variable));
-  });
+  return make_range(get_sub()).map(
+    [](const irept &variable)
+    { return std::cref(static_cast<const smt_identifier_termt &>(variable)); });
+}
+
+smt_const_array_termt::smt_const_array_termt(
+  smt_array_sortt sort,
+  smt_termt value)
+  : smt_termt{ID_smt_const_array_term, sort}
+{
+  INVARIANT(
+    value.get_sort() == sort.element_sort(),
+    "The value of a constant array must have the element sort of the array.");
+  set(ID_value, std::move(value));
+}
+
+const smt_termt &smt_const_array_termt::value() const
+{
+  return static_cast<const smt_termt &>(find(ID_value));
 }
 
 template <typename visitort>
