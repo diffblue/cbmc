@@ -1,0 +1,12 @@
+CORE
+main.c
+
+redeclaration of 'main::1::a' with no linkage$
+CONVERSION ERROR
+^EXIT=(1|64)$
+^SIGNAL=0$
+--
+A genuine local redeclaration with initializers on both declarations must be
+rejected. regression/ansi-c/duplicate_local1 only covers the no-initializer
+case; this guards the with-initializer case that the nested-__auto_type fix
+must not regress.
