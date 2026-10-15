@@ -109,6 +109,77 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "accelerate/accelerate.h"
 
+/// \return true if the requested operation writes a transformed goto binary and
+///   therefore needs an output file as the second positional argument; false
+///   for read-only operations that produce their result without writing a goto
+///   binary.
+/// \remark This list must be kept in sync with the operations in
+///   goto_instrument_parse_optionst::doit() that return CPROVER_EXIT_SUCCESS
+///   before the write_goto_binary section near the end of that function: any
+///   such operation needs no output file and must appear here.
+static bool requires_output_file(const cmdlinet &cmdline)
+{
+  // Operations that complete without writing a goto binary (they print to
+  // stdout, emit a report/graph, validate, run the interpreter, etc.).
+  static const char *const read_only_options[] = {
+    "call-graph",
+    "check-call-sequence",
+    "count-eloc",
+    "custom-bitvector-analysis",
+    "document-claims-html",
+    "document-claims-latex",
+    "document-properties-html",
+    "document-properties-latex",
+    "dot",
+    "dump-c",
+    "dump-c-type-header",
+    "dump-cpp",
+    "horn",
+    "interpreter",
+    "list-calls-args",
+    "list-eloc",
+    "list-goto-functions",
+    "list-symbols",
+    "list-undefined-functions",
+    "print-global-state-size",
+    "print-internal-representation",
+    "print-path-lengths",
+    "reachable-call-graph",
+    "show-call-sequences",
+    "show-claims",
+    "show-class-hierarchy",
+    "show-custom-bitvector-analysis",
+    "show-dependence-graph",
+    "show-escape-analysis",
+    "show-global-may-alias",
+    "show-goto-function-call-graph",
+    "show-goto-functions",
+    "show-intervals",
+    "show-lexical-loops",
+    "show-local-bitvector-analysis",
+    "show-local-safe-pointers",
+    "show-locations",
+    "show-loops",
+    "show-natural-loops",
+    "show-points-to",
+    "show-properties",
+    "show-reaching-definitions",
+    "show-rw-set",
+    "show-safe-dereferences",
+    "show-sese-regions",
+    "show-struct-alignment",
+    "show-symbol-table",
+    "show-threaded",
+    "show-uninitialized",
+    "show-value-sets",
+    "validate-goto-binary"};
+
+  for(const char *const opt : read_only_options)
+    if(cmdline.isset(opt))
+      return false;
+  return true;
+}
+
 /// invoke main modules
 int goto_instrument_parse_optionst::doit()
 {
@@ -121,6 +192,19 @@ int goto_instrument_parse_optionst::doit()
   if(cmdline.args.size()!=1 && cmdline.args.size()!=2)
   {
     help();
+    return CPROVER_EXIT_USAGE_ERROR;
+  }
+
+  // Fail fast: operations that write a transformed goto binary need an output
+  // file as the second positional argument. Reject a missing output file here,
+  // before the (potentially very expensive) analysis runs. See
+  // requires_output_file() above for the read-only operations that are exempt;
+  // it must be kept in sync with the early CPROVER_EXIT_SUCCESS returns below.
+  if(cmdline.args.size() < 2 && requires_output_file(cmdline))
+  {
+    log.error() << "missing output file name; usage: "
+                   "goto-instrument input.gb output.gb [options]"
+                << messaget::eom;
     return CPROVER_EXIT_USAGE_ERROR;
   }
 
@@ -930,11 +1014,12 @@ int goto_instrument_parse_optionst::doit()
     }
     else if(cmdline.args.size() < 2)
     {
-      throw invalid_command_line_argument_exceptiont(
-        "Invalid number of positional arguments passed",
-        "[in] [out]",
-        "goto-instrument needs one input and one output file, aside from other "
-        "flags");
+      // Unreachable: a missing output file for an operation that needs one is
+      // rejected up front by the requires_output_file() check near the top of
+      // this function, and read-only operations return before reaching here.
+      UNREACHABLE_BECAUSE(
+        "a missing output file is rejected early via requires_output_file(); "
+        "read-only operations return before this point");
     }
 
     help();
