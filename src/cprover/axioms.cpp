@@ -55,6 +55,19 @@ typet axiomst::replace(typet src)
     return src;
 }
 
+/// True if a same-width \ref typecast_exprt between values of type \p t and
+/// another such type is a bit-preserving reinterpretation (two's-complement),
+/// rather than a value conversion. This holds for the bit-vector-encoded
+/// scalar types (and pointers), but not for float/fixed-point (value
+/// conversion) or aggregates (the cast may not even be well-formed).
+static bool is_bv_reinterpretable(const typet &t)
+{
+  const irep_idt &id = t.id();
+  return id == ID_signedbv || id == ID_unsignedbv || id == ID_bv ||
+         id == ID_c_bool || id == ID_c_enum || id == ID_c_enum_tag ||
+         id == ID_pointer;
+}
+
 void axiomst::evaluate_fc()
 {
   // quadratic
@@ -64,6 +77,31 @@ void axiomst::evaluate_fc()
     {
       if(a_it->state() != b_it->state())
         continue;
+
+      // Two reads at the same address may only be equated when the
+      // conditional_cast below is a bit-preserving reinterpretation rather
+      // than a (lossy or numeric) value conversion.
+      //   - Identical read types: the cast is a no-op, always safe (this also
+      //     covers reads differing only in signedness/qualifiers once they
+      //     have the same type).
+      //   - Differing types: only safe when both are bit-vector-encoded
+      //     scalars (or pointers) of the same statically-known width, where
+      //     the typecast is a two's-complement reinterpretation. Differing
+      //     widths (e.g. a 4-byte int and a 1-byte char), float/fixed-point
+      //     (numeric conversion, e.g. (float)3 == 3.0f), or aggregates are
+      //     not equal at the bit level and must not be equated.
+      // Skipping a pair only ever removes a constraint, so it is sound.
+      if(a_it->type() != b_it->type())
+      {
+        if(
+          !is_bv_reinterpretable(a_it->type()) ||
+          !is_bv_reinterpretable(b_it->type()))
+          continue;
+        const auto a_bits = pointer_offset_bits(a_it->type(), ns);
+        const auto b_bits = pointer_offset_bits(b_it->type(), ns);
+        if(!a_bits.has_value() || !b_bits.has_value() || *a_bits != *b_bits)
+          continue;
+      }
 
       auto a_op = a_it->address();
       auto b_op = typecast_exprt::conditional_cast(
