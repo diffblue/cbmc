@@ -26,11 +26,11 @@ struct limits<unsigned>
   }
 };
 template <>
-struct limits<long>
+struct limits<long long>
 {
-  static constexpr long max() noexcept
+  static constexpr long long max() noexcept
   {
-    return 9223372036854775807L;
+    return 9223372036854775807LL;
   }
 };
 template <class T>
@@ -50,7 +50,8 @@ struct checker
   }
   bool at_run_time() const
   {
-    return limits<unsigned>::max() == 4294967295U && limits<long>::max() > 0;
+    return limits<unsigned>::max() == 4294967295U &&
+           limits<long long>::max() > 0;
   }
 };
 int main()
