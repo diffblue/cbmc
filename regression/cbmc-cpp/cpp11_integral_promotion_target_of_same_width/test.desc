@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ char32_t promotes to unsigned int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ unsigned short promotes to int: SUCCESS$
+^\[main\.assertion\.3\] line \d+ float promotes to double: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The promoted type was compared with the parameter type ignoring #c_type,
+so where long has the width of int a promotion to int also matched long
+as a promotion (and float to double matched a 64-bit long double).
