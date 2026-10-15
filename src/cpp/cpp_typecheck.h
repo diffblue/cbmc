@@ -320,6 +320,25 @@ protected:
   /// which the constructor-template trial of user_defined_conversion_sequence
   /// found no conversion; see there
   std::unordered_set<std::string> failed_template_conversions;
+  /// The class templates that have out-of-class member definitions
+  /// (ID_template_methods), in the order they received the first one.  The
+  /// searches for a member's out-of-class definition consider only these;
+  /// scanning the whole symbol table for them on every bodiless member of
+  /// every instantiation dominated the type-checking time of large
+  /// translation units (goto_instrument_parse_options.cpp).
+  std::vector<irep_idt> templates_with_out_of_class_members;
+
+  std::unordered_set<irep_idt> templates_with_out_of_class_members_set;
+  /// A (name, symbol) entry of templates_with_out_of_class_member_symbols,
+  /// shaped like a symbol-table entry
+  struct template_with_members_entryt
+  {
+    const irep_idt &first;
+    const symbolt &second;
+  };
+  /// The symbols of templates_with_out_of_class_members
+  std::vector<template_with_members_entryt>
+  templates_with_out_of_class_member_symbols() const;
   irep_idt pending_no_viable_base_name;
   source_locationt pending_no_viable_location;
 
