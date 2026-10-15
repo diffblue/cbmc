@@ -1,0 +1,15 @@
+CORE no-new-smt broken-smt-backend wide-pointer-encoding
+main.i
+--wide-pointer-encoding --32
+^EXIT=10$
+^SIGNAL=0$
+^\[main.overflow.1\] line 8 arithmetic overflow on signed - in iThird - iFirst: FAILURE$
+^\*\* 1 of 2 failed
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Wide pointer encoding: addresses can be in the upper half of the
+32-bit address space, so (int)pointer can be negative and the
+signed subtraction iThird - iFirst can overflow. This is correct
+behavior — casting pointers to signed int is implementation-defined.

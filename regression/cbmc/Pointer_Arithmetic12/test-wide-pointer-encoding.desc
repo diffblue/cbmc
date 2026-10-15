@@ -1,0 +1,8 @@
+CORE wide-pointer-encoding
+main.i
+--wide-pointer-encoding --32 --little-endian
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
