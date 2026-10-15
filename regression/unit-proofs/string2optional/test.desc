@@ -1,4 +1,4 @@
-CORE libstdcxx13
+CORE gcc-only libstdcxx13
 harness.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 8 --no-unwinding-assertions
 ^VERIFICATION SUCCESSFUL$
