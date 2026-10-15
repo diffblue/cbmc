@@ -3285,7 +3285,7 @@ std::optional<exprt> cpp_typecheckt::instantiate_matching_member_body(
   const cpp_declarationt *match = nullptr;
   bool current_def_found = false;
   std::size_t current_def_param_count = 0;
-  for(const auto &tsp : symbol_table.symbols)
+  for(const auto &tsp : templates_with_out_of_class_member_symbols())
   {
     if(!tsp.second.type.get_bool(ID_is_template) || tsp.second.value.is_nil())
       continue;
@@ -6658,7 +6658,7 @@ skip_pack_removal_ft:
           // template out of line, in either order.
           int pass = 0;
         next_pass:
-          for(const auto &tsp : symbol_table)
+          for(const auto &tsp : templates_with_out_of_class_member_symbols())
           {
             if(!tsp.second.type.get_bool(ID_is_template))
               continue;
@@ -7075,7 +7075,7 @@ skip_pack_removal_ft:
     if(new_decl.declarators()[0].find(ID_value).is_nil())
     {
       // Find the class template symbol
-      for(const auto &sp : symbol_table)
+      for(const auto &sp : templates_with_out_of_class_member_symbols())
       {
         if(
           sp.second.type.get_bool(ID_is_template) &&
@@ -7521,7 +7521,7 @@ skip_pack_removal_ft:
       // `template <class F> function(F)'.  Among the candidate definitions
       // prefer the one with the most template parameters.
       std::size_t most_template_parameters = 0;
-      for(const auto &tsp : symbol_table)
+      for(const auto &tsp : templates_with_out_of_class_member_symbols())
       {
         if(
           !tsp.second.type.get_bool(ID_is_template) ||
@@ -7547,7 +7547,7 @@ skip_pack_removal_ft:
         }
       }
       bool attached = false;
-      for(const auto &tsp : symbol_table)
+      for(const auto &tsp : templates_with_out_of_class_member_symbols())
       {
         if(attached)
           break;

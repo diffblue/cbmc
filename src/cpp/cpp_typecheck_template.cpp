@@ -1560,6 +1560,11 @@ void cpp_typecheckt::typecheck_class_template_member(
     static_cast<exprt &>(template_symbol.value.add(ID_template_methods));
 
   template_methods.copy_to_operands(declaration);
+  if(templates_with_out_of_class_members_set.insert(template_symbol.name)
+       .second)
+  {
+    templates_with_out_of_class_members.push_back(template_symbol.name);
+  }
 
   // save current scope
   cpp_save_scopet cpp_saved_scope(cpp_scopes);
@@ -5099,4 +5104,18 @@ void cpp_typecheckt::convert_template_declaration(cpp_declarationt &declaration)
     typecheck_function_template(declaration);
     return;
   }
+}
+
+std::vector<cpp_typecheckt::template_with_members_entryt>
+cpp_typecheckt::templates_with_out_of_class_member_symbols() const
+{
+  std::vector<template_with_members_entryt> result;
+  result.reserve(templates_with_out_of_class_members.size());
+  for(const irep_idt &name : templates_with_out_of_class_members)
+  {
+    const auto it = symbol_table.symbols.find(name);
+    if(it != symbol_table.symbols.end())
+      result.push_back({it->first, it->second});
+  }
+  return result;
 }
