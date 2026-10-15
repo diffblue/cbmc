@@ -176,8 +176,7 @@ exprt struct_encodingt::encode_member(const member_exprt &member_expr) const
     }
     const auto &struct_type =
       compound_type.id() == ID_struct_tag
-        ? ns.get().follow_tag(
-            type_checked_cast<struct_tag_typet>(compound_type))
+        ? ns.follow_tag(type_checked_cast<struct_tag_typet>(compound_type))
         : type_checked_cast<struct_typet>(compound_type);
     return count_trailing_bit_width(
       struct_type, member_expr.get_component_name(), *boolbv_width);
@@ -243,7 +242,7 @@ exprt struct_encodingt::decode(
   INVARIANT(
     can_cast_type<bv_typet>(encoded.type()),
     "Structs are expected to be encoded into bit vectors.");
-  const struct_typet definition = ns.get().follow_tag(original_type);
+  const struct_typet definition = ns.follow_tag(original_type);
   exprt::operandst encoded_fields;
   for(const auto &component : definition.components())
   {
@@ -261,7 +260,7 @@ exprt struct_encodingt::decode(
   INVARIANT(
     can_cast_type<bv_typet>(encoded.type()),
     "Unions are expected to be encoded into bit vectors.");
-  const union_typet definition = ns.get().follow_tag(original_type);
+  const union_typet definition = ns.follow_tag(original_type);
   const auto &components = definition.components();
   if(components.empty())
     return empty_union_exprt{original_type};

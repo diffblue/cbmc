@@ -266,10 +266,6 @@ public:
   {
     auto d = std::make_unique<variable_sensitivity_domaint>(
       object_factory, configuration);
-    // The dynamic type is exactly variable_sensitivity_domaint; the
-    // qualified call also keeps gcc 16 from speculatively devirtualizing to
-    // the derived variable_sensitivity_dependence_domaint::is_bottom and
-    // reporting -Warray-bounds on the member it would read.
     CHECK_RETURN(d->variable_sensitivity_domaint::is_bottom());
     return std::unique_ptr<statet>(d.release());
   }

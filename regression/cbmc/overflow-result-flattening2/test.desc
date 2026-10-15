@@ -1,0 +1,18 @@
+CORE no-new-smt
+main.c
+
+^\[main.assertion.1\] line 23 expected to FAIL: the product always overflows: FAILURE$
+^\[main.assertion.2\] line 24 expected to FAIL: truncated product can be 0: FAILURE$
+^\*\* 2 of 2 failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+Unsoundness in the other direction: with the fields of the flattened
+overflow_result_exprt struct swapped, the overflow flag is read from the top
+bit of the truncated result. Bit 31 is 0 for every product allowed here, so
+--cprover-smt2 / --bitwuzla / --boolector used to report VERIFICATION SUCCESSFUL
+and silently miss both failures. The new SMT back-end does not support the
+overflow expressions yet.

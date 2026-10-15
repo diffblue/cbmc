@@ -192,7 +192,7 @@ static array_exprt bv_to_array_expr(
   }
   DATA_INVARIANT(
     !num_elements.has_value() || !subtype_bits.has_value() ||
-      *subtype_bits * *num_elements == total_bits,
+      *num_elements == 0 || *subtype_bits * *num_elements == total_bits,
     "subtype width times array size should be total bitvector width");
 
   exprt::operandst operands;
@@ -1484,8 +1484,21 @@ exprt lower_byte_extract(const byte_extract_exprt &src, const namespacet &ns)
 
   if(width_bytes == 1)
   {
+    const typet &result_type = src.type();
+    if(
+      result_type.id() == ID_struct || result_type.id() == ID_struct_tag ||
+      result_type.id() == ID_union || result_type.id() == ID_union_tag ||
+      result_type.id() == ID_array || result_type.id() == ID_vector ||
+      result_type.id() == ID_complex)
+    {
+      // A composite result type cannot be produced by a plain typecast (the
+      // SMT2 back-end has no bit-vector -> struct/union/array typecast); build
+      // the aggregate from the single byte instead.
+      endianness_mapt map{op.front().type(), little_endian, ns};
+      return bv_to_expr(op.front(), result_type, map, ns);
+    }
     return simplify_expr(
-      typecast_exprt::conditional_cast(op.front(), src.type()), ns);
+      typecast_exprt::conditional_cast(op.front(), result_type), ns);
   }
   else // width_bytes>=2
   {

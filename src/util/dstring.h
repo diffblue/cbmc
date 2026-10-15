@@ -91,7 +91,7 @@ public:
 #ifdef __GNUC__
   constexpr
 #endif
-    dstringt(dstringt &&other)
+    dstringt(dstringt &&other) noexcept
     : no(other.no)
   {
   }
@@ -179,7 +179,7 @@ public:
 
   /// Move assignment. There is no need and no point in actually destroying the
   /// source object \p other, this is effectively just an assignment.
-  dstringt &operator=(dstringt &&other)
+  dstringt &operator=(dstringt &&other) noexcept
   {
     no = other.no;
     return *this;

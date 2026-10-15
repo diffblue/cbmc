@@ -20,6 +20,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/exception_utils.h>
 #include <util/expr_iterator.h>
 #include <util/expr_util.h>
+#include <util/find_symbols.h>
 #include <util/fixedbv.h>
 #include <util/floatbv_expr.h>
 #include <util/format_expr.h>
@@ -2398,32 +2399,39 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << " ((_ sign_extend 1) ";
       convert_expr(op1);
       out << ")))) "; // sign_extend, bvadd/sub
+
+      const std::string overflow_condition =
+        "(not (= ((_ extract " + std::to_string(width) + " " +
+        std::to_string(width) + ") ?sum) ((_ extract " +
+        std::to_string(width - 1) + " " + std::to_string(width - 1) +
+        ") ?sum)))";
+
       if(keep_result)
       {
+        const std::string result =
+          "((_ extract " + std::to_string(width - 1) + " 0) ?sum)";
+
         if(use_datatypes)
         {
           const std::string &smt_typename = datatype_map.at(expr.type());
 
           // use the constructor for the Z3 datatype
-          out << "(mk-" << smt_typename;
+          out << "(mk-" << smt_typename << ' ' << result << ' '
+              << overflow_condition << ')';
         }
         else
-          out << "(concat";
+        {
+          // The struct is flattened into a bit-vector. The first component
+          // (the result) occupies the least-significant bits, so the overflow
+          // flag is the first operand of the concatenation -- cf. flatten2bv,
+          // convert_struct and convert_member.
+          out << "(concat (ite " << overflow_condition << " #b1 #b0) " << result
+              << ')';
+        }
+      }
+      else
+        out << overflow_condition;
 
-        out << " ((_ extract " << width - 1 << " 0) ?sum) ";
-        if(!use_datatypes)
-          out << "(ite ";
-      }
-      out << "(not (= "
-                   "((_ extract " << width << " " << width << ") ?sum) "
-                   "((_ extract " << (width-1) << " " << (width-1) << ") ?sum)";
-      out << "))"; // =, not
-      if(keep_result)
-      {
-        if(!use_datatypes)
-          out << " #b1 #b0)";
-        out << ")"; // concat
-      }
       out << ")"; // let
     }
     else if(op_type.id()==ID_unsignedbv ||
@@ -2438,7 +2446,12 @@ void smt2_convt::convert_expr(const exprt &expr)
       convert_expr(op1);
       out << "))))"; // zero_extend, bvsub/bvadd
       if(keep_result && !use_datatypes)
+      {
+        // ?sum is already the correct flattening of the struct: the result
+        // occupies the least-significant `width` bits and the carry-out (the
+        // overflow flag) is the most-significant bit.
         out << " ?sum";
+      }
       else
       {
         if(keep_result && use_datatypes)
@@ -2491,33 +2504,39 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ") ((_ sign_extend " << width << ") ";
       convert_expr(op1);
       out << ")) )) ";
+
+      const std::string bound = "(_ bv" + integer2string(power(2, width - 1)) +
+                                " " + std::to_string(width * 2) + ")";
+      const std::string overflow_condition =
+        "(or (bvsge prod " + bound + ") (bvslt prod (bvneg " + bound + ")))";
+
       if(keep_result)
       {
+        const std::string result =
+          "((_ extract " + std::to_string(width - 1) + " 0) prod)";
+
         if(use_datatypes)
         {
           const std::string &smt_typename = datatype_map.at(expr.type());
 
           // use the constructor for the Z3 datatype
-          out << "(mk-" << smt_typename;
+          out << "(mk-" << smt_typename << ' ' << result << ' '
+              << overflow_condition << ')';
         }
         else
-          out << "(concat";
+        {
+          // The struct is flattened into a bit-vector. The first component
+          // (the result) occupies the least-significant bits, so the overflow
+          // flag is the first operand of the concatenation -- cf. flatten2bv,
+          // convert_struct and convert_member.
+          out << "(concat (ite " << overflow_condition << " #b1 #b0) " << result
+              << ')';
+        }
+      }
+      else
+        out << overflow_condition;
 
-        out << " ((_ extract " << width - 1 << " 0) prod) ";
-        if(!use_datatypes)
-          out << "(ite ";
-      }
-      out << "(or (bvsge prod (_ bv" << power(2, width-1) << " "
-          << width*2 << "))";
-      out << " (bvslt prod (bvneg (_ bv" << power(2, width - 1) << " "
-          << width * 2 << "))))";
-      if(keep_result)
-      {
-        if(!use_datatypes)
-          out << " #b1 #b0)";
-        out << ")"; // concat
-      }
-      out << ")";
+      out << ")"; // let
     }
     else if(op_type.id()==ID_unsignedbv)
     {
@@ -2526,30 +2545,38 @@ void smt2_convt::convert_expr(const exprt &expr)
       out << ") ((_ zero_extend " << width << ") ";
       convert_expr(op1);
       out << ")))) ";
+
+      const std::string overflow_condition =
+        "(bvuge prod (_ bv" + integer2string(power(2, width)) + " " +
+        std::to_string(width * 2) + "))";
+
       if(keep_result)
       {
+        const std::string result =
+          "((_ extract " + std::to_string(width - 1) + " 0) prod)";
+
         if(use_datatypes)
         {
           const std::string &smt_typename = datatype_map.at(expr.type());
 
           // use the constructor for the Z3 datatype
-          out << "(mk-" << smt_typename;
+          out << "(mk-" << smt_typename << ' ' << result << ' '
+              << overflow_condition << ')';
         }
         else
-          out << "(concat";
+        {
+          // The struct is flattened into a bit-vector. The first component
+          // (the result) occupies the least-significant bits, so the overflow
+          // flag is the first operand of the concatenation -- cf. flatten2bv,
+          // convert_struct and convert_member.
+          out << "(concat (ite " << overflow_condition << " #b1 #b0) " << result
+              << ')';
+        }
+      }
+      else
+        out << overflow_condition;
 
-        out << " ((_ extract " << width - 1 << " 0) prod) ";
-        if(!use_datatypes)
-          out << "(ite ";
-      }
-      out << "(bvuge prod (_ bv" << power(2, width) << " " << width * 2 << "))";
-      if(keep_result)
-      {
-        if(!use_datatypes)
-          out << " #b1 #b0)";
-        out << ")"; // concat
-      }
-      out << ")";
+      out << ")"; // let
     }
     else
       INVARIANT_WITH_DIAGNOSTICS(
@@ -3002,29 +3029,19 @@ void smt2_convt::convert_expr(const exprt &expr)
   }
   else if(expr.id() == ID_reduction_and)
   {
-    // This is true iff all bits in the operand are true
-    auto &op = to_reduction_and_expr(expr).op();
-    auto all_ones = to_bitvector_type(op.type()).all_ones_expr();
-    convert_expr(equal_exprt{op, all_ones});
+    convert_expr(to_reduction_and_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_nand)
   {
-    // This is the negation of "reduction and"
-    auto &op = to_reduction_nand_expr(expr).op();
-    convert_expr(not_exprt{reduction_and_exprt{op}});
+    convert_expr(to_reduction_nand_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_or)
   {
-    // This is true iff the operand is not zero
-    auto &op = to_reduction_or_expr(expr).op();
-    auto all_zeros = to_bitvector_type(op.type()).all_zeros_expr();
-    convert_expr(notequal_exprt{op, all_zeros});
+    convert_expr(to_reduction_or_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_nor)
   {
-    // This is the negation of "reduction or"
-    auto &op = to_reduction_nor_expr(expr).op();
-    convert_expr(not_exprt{reduction_or_exprt{op}});
+    convert_expr(to_reduction_nor_expr(expr).lower());
   }
   else if(expr.id() == ID_reduction_xor)
   {
@@ -5602,9 +5619,15 @@ void smt2_convt::set_to(const exprt &expr, bool value)
       const irep_idt &identifier =
         to_symbol_expr(equal_expr.lhs()).identifier();
 
+      // A symbol that is not yet declared and that is equated to an
+      // expression is defined by that expression. This is not possible
+      // when the expression refers to the symbol itself, e.g.,
+      // x == (x & y) | z: such an equality is a constraint on x, and is
+      // asserted below.
       if(
         identifier_map.find(identifier) == identifier_map.end() &&
-        equal_expr.lhs() != equal_expr.rhs())
+        equal_expr.lhs() != equal_expr.rhs() &&
+        !has_symbol_expr(equal_expr.rhs(), identifier, true))
       {
         auto id_entry = identifier_map.insert(
           {identifier, identifiert{equal_expr.lhs().type(), false}});

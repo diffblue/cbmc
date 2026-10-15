@@ -4,11 +4,11 @@
 #define CPROVER_SOLVERS_SMT2_INCREMENTAL_STRUCT_ENCODING_H
 
 #include <util/expr.h> // For passing exprt by value. // IWYU pragma: keep
-#include <util/namespace.h> // std::reference_wrapper<const namespacet> below
 #include <util/type.h> // For passing `typet` by value. // IWYU pragma: keep
 
 #include <memory>
 
+class namespacet;
 class boolbv_widtht;
 class member_exprt;
 class struct_tag_typet;
@@ -33,11 +33,7 @@ public:
 
 private:
   std::unique_ptr<boolbv_widtht> boolbv_width;
-  // The referenced type must be complete here: reference_wrapper's
-  // constraints inspect it, and instantiating them for a forward-declared
-  // namespacet had gcc 16 report -Wsfinae-incomplete when the class was
-  // defined afterwards.
-  std::reference_wrapper<const namespacet> ns;
+  const namespacet &ns;
 
   exprt encode_member(const member_exprt &member_expr) const;
 };
