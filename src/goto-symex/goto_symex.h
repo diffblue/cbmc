@@ -21,6 +21,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 class address_of_exprt;
 class function_application_exprt;
+class stack_decision_proceduret;
 class goto_symex_statet;
 class path_storaget;
 class shadow_memory_field_definitionst;
@@ -39,6 +40,18 @@ class goto_symext
 public:
   /// A type abbreviation for \ref goto_symex_statet
   typedef goto_symex_statet statet;
+
+  /// Optional solver for pruning infeasible branches in --paths mode.
+  stack_decision_proceduret *branch_worklist_solver = nullptr;
+  bool branch_pruning_disabled = false;
+  std::size_t last_pruning_equation_size = 0;
+  std::size_t cumulative_pruning_ms = 0;
+
+  /// Set the solver used for branch pruning.
+  void set_branch_worklist_solver(stack_decision_proceduret &solver)
+  {
+    branch_worklist_solver = &solver;
+  }
 
   /// Construct a goto_symext to execute a particular program
   /// \param mh: The message handler to use for log messages

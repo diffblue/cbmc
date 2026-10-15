@@ -55,6 +55,7 @@ class optionst;
   OPT_SHOW_PROPERTIES \
   "(show-symbol-table)(show-parse-tree)" \
   "(drop-unused-functions)" \
+  "(no-branch-pruning)" \
   "(property):(stop-on-fail)(trace)" \
   "(verbosity):(no-library)" \
   "(nondet-static)" \

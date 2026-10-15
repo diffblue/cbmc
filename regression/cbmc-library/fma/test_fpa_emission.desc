@@ -1,6 +1,6 @@
 CORE smt-backend
 precision.c
---smt2 --fpa --outfile -
+--smt2 --fpa --outfile - --no-branch-pruning
 fp\.fma
 ^EXIT=0$
 ^SIGNAL=0$
