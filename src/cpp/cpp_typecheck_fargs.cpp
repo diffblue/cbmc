@@ -70,6 +70,23 @@ void cpp_typecheck_fargst::build(
 /// elaboration-depth problem in <chrono> / <future> that the chrono, future
 /// and thread regression tests no longer show) dropped libstdc++'s
 /// __atomic_futex_unsigned::_M_load_and_test (`_M_load_and_test_until({})').
+/// N5008 [over.best.ics]/4.5: \p operand is the only element, itself a
+/// braced-init-list, of a list in the second phase of [over.match.list] for
+/// class X (recorded as ID_C_no_user_defined_conversion_to); a parameter of
+/// type X or reference to cv X is then not reached by a user-defined
+/// conversion.
+static bool
+excluded_by_over_best_ics_4_5(const exprt &operand, const typet &type)
+{
+  const irep_idt &excluded = operand.get(ID_C_no_user_defined_conversion_to);
+  if(excluded.empty())
+    return false;
+  const typet &target =
+    is_reference(type) ? to_reference_type(type).base_type() : type;
+  return target.id() == ID_struct_tag &&
+         to_struct_tag_type(target).get_identifier() == excluded;
+}
+
 static bool brace_init_is_viable(
   const exprt &operand,
   const typet &target_type,
@@ -711,6 +728,7 @@ bool cpp_typecheck_fargst::match(
     }
     else if(
       operand.id() == ID_initializer_list &&
+      !excluded_by_over_best_ics_4_5(operand, type) &&
       brace_init_is_viable(operand, type, cpp_typecheck))
     {
       // C++11 [over.match.list] list-initialization: brace-init
