@@ -11390,6 +11390,37 @@ void cpp_typecheckt::typecheck_expr(exprt &expr, const target_typet &target)
 
 void cpp_typecheckt::typecheck_expr(exprt &expr)
 {
+  // N5008 [over.over]/1.3: the target of an explicit type conversion selects
+  // the function of an overload set -- `static_cast<const symbol_exprt
+  // &(*)(const exprt &)>(to_symbol_expr)' (CBMC's own
+  // statement_list_parser.cpp, dog-fooding)
+  if(
+    (expr.id() == ID_static_cast || expr.id() == ID_reinterpret_cast) &&
+    expr.operands().size() == 1 &&
+    (to_unary_expr(expr).op().id() == ID_cpp_name ||
+     (to_unary_expr(expr).op().id() == ID_address_of &&
+      to_unary_expr(expr).op().operands().size() == 1 &&
+      to_unary_expr(to_unary_expr(expr).op()).op().id() == ID_cpp_name)))
+  {
+    typet target_type = expr.type();
+    try
+    {
+      typecheck_type(target_type);
+    }
+    catch(...)
+    {
+      target_type.make_nil();
+    }
+    if(
+      target_type.id() == ID_pointer &&
+      to_pointer_type(target_type).base_type().id() == ID_code)
+    {
+      exprt &op = to_unary_expr(expr).op();
+      typecheck_expr(op, target_typet{target_type});
+      already_typechecked_exprt::make_already_typechecked(op);
+    }
+  }
+
   // A braced-init-list is type-checked again when a call's arguments are
   // converted, after the generic operand walk type-checked its elements in
   // place: leave a resolved call among them alone (see
