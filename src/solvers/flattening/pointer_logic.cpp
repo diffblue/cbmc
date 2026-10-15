@@ -64,39 +64,15 @@ exprt pointer_logict::pointer_expr(
   return pointer_expr({object, 0}, type);
 }
 
-exprt pointer_logict::pointer_expr(
-  const pointert &pointer,
-  const pointer_typet &type) const
+exprt pointer_expr_for_object(
+  const exprt &object_expr,
+  const mp_integer &offset,
+  const pointer_typet &type,
+  const namespacet &ns)
 {
-  if(pointer.object==null_object) // NULL?
-  {
-    if(pointer.offset==0)
-    {
-      return null_pointer_exprt(type);
-    }
-    else
-    {
-      null_pointer_exprt null(type);
-      return plus_exprt(null,
-        from_integer(pointer.offset, pointer_diff_type()));
-    }
-  }
-  else if(pointer.object==invalid_object) // INVALID?
-  {
-    return constant_exprt("INVALID", type);
-  }
-
-  if(pointer.object>=objects.size())
-  {
-    return constant_exprt("INVALID-" + integer2string(pointer.object), type);
-  }
-
-  const exprt &object_expr =
-    objects[numeric_cast_v<std::size_t>(pointer.object)];
-
   typet subtype = type.base_type();
-  // In a counterexample we may up with void pointers with an offset; handle
-  // this just like GCC does and treat them as char pointers:
+  // In a counterexample we may end up with void pointers with an offset;
+  // handle this just like GCC does and treat them as char pointers:
   // https://gcc.gnu.org/onlinedocs/gcc-4.8.0/gcc/Pointer-Arith.html
   if(subtype.id() == ID_empty)
     subtype = char_type();
@@ -108,14 +84,14 @@ exprt pointer_logict::pointer_expr(
     const array_typet &array_type = to_array_type(object_expr.type());
     mp_integer array_size =
       numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
-    if(array_size > pointer.offset)
+    if(array_size > offset)
     {
       to_array_type(subtype).size() =
-        from_integer(array_size - pointer.offset, array_type.size().type());
+        from_integer(array_size - offset, array_type.size().type());
     }
   }
   auto deep_object_opt =
-    get_subexpression_at_offset(object_expr, pointer.offset, subtype, ns);
+    get_subexpression_at_offset(object_expr, offset, subtype, ns);
   CHECK_RETURN(deep_object_opt.has_value());
   exprt deep_object = deep_object_opt.value();
   simplify(deep_object, ns);
@@ -136,14 +112,13 @@ exprt pointer_logict::pointer_expr(
   if(object_size.has_value() && *object_size <= 1)
   {
     return typecast_exprt::conditional_cast(
-      plus_exprt(base, from_integer(pointer.offset, pointer_diff_type())),
-      type);
+      plus_exprt(base, from_integer(offset, pointer_diff_type())), type);
   }
-  else if(object_size.has_value() && pointer.offset % *object_size == 0)
+  else if(object_size.has_value() && offset % *object_size == 0)
   {
     return typecast_exprt::conditional_cast(
       plus_exprt(
-        base, from_integer(pointer.offset / *object_size, pointer_diff_type())),
+        base, from_integer(offset / *object_size, pointer_diff_type())),
       type);
   }
   else
@@ -151,9 +126,42 @@ exprt pointer_logict::pointer_expr(
     return typecast_exprt::conditional_cast(
       plus_exprt(
         typecast_exprt(base, pointer_type(char_type())),
-        from_integer(pointer.offset, pointer_diff_type())),
+        from_integer(offset, pointer_diff_type())),
       type);
   }
+}
+
+exprt pointer_logict::pointer_expr(
+  const pointert &pointer,
+  const pointer_typet &type) const
+{
+  if(pointer.object == null_object) // NULL?
+  {
+    if(pointer.offset == 0)
+    {
+      return null_pointer_exprt(type);
+    }
+    else
+    {
+      null_pointer_exprt null(type);
+      return plus_exprt(
+        null, from_integer(pointer.offset, pointer_diff_type()));
+    }
+  }
+  else if(pointer.object == invalid_object) // INVALID?
+  {
+    return constant_exprt("INVALID", type);
+  }
+
+  if(pointer.object >= objects.size())
+  {
+    return constant_exprt("INVALID-" + integer2string(pointer.object), type);
+  }
+
+  const exprt &object_expr =
+    objects[numeric_cast_v<std::size_t>(pointer.object)];
+
+  return pointer_expr_for_object(object_expr, pointer.offset, type, ns);
 }
 
 pointer_logict::pointer_logict(const namespacet &_ns):ns(_ns)
