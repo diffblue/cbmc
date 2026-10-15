@@ -1364,12 +1364,19 @@ void goto_check_ct::pointer_rel_check(
       expr,
       guard);
 
-    // When both operands of a pointer subtraction are NULL,
-    // NULL - NULL = 0 is well-defined in practice (used by libstdc++
-    // vector::_M_realloc_insert for empty vectors). Guard each
-    // pointer check with "or both operands are NULL".
-    const auto both_null =
-      and_exprt(null_object(expr.op0()), null_object(expr.op1()));
+    // In C++, two null pointers may be subtracted (N5008 [expr.add]/5.1:
+    // the result is 0; libstdc++'s vector::_M_realloc_insert does so for an
+    // empty vector) and compared ([expr.rel]/5: they compare equal, so p < q
+    // is false; basic_filebuf::_M_terminate_output tests pbase() < pptr()),
+    // so each pointer check is guarded with "or both operands are null".
+    // Not in C (C11 6.5.6/9, 6.5.8/5: both shall point into the same
+    // object), where the extra disjunct only enlarged the verification
+    // conditions.  (A C++ function with C language linkage, main included,
+    // has mode C.)
+    const exprt both_null =
+      mode == ID_cpp
+        ? exprt{and_exprt{null_object(expr.op0()), null_object(expr.op1())}}
+        : exprt{false_exprt{}};
 
     for(const auto &pointer : expr.operands())
     {
@@ -1381,7 +1388,7 @@ void goto_check_ct::pointer_rel_check(
       for(const auto &c : conditions)
       {
         add_guarded_property(
-          or_exprt(c.assertion, both_null),
+          both_null.is_false() ? c.assertion : or_exprt{c.assertion, both_null},
           "pointer relation: " + c.description,
           "pointer arithmetic",
           true, // fatal
