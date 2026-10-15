@@ -5152,6 +5152,7 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
       assignop.declarators().push_back(declarator);
       assignop.declarators()[0].value() = exprt(ID_cpp_not_typechecked);
 
+      const std::size_t components_before = components.size();
       typecheck_compound_declarator(
         symbol,
         assignop,
@@ -5161,6 +5162,26 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
         false,
         false,
         false);
+
+      // N5008 [class.copy.assign]/7: the defaulted copy assignment operator
+      // is defined as deleted if X has a non-static data member of const
+      // non-class type or of reference type, or a direct base class whose
+      // copy assignment operator is deleted.  It was declared usable, so a
+      // requires-expression over it (libstdc++ 11's assignable_from for
+      // pair<const K, V>, whose base __pair_base deletes its operator=) was
+      // satisfied and defining it failed ("has inaccessible copy assignment
+      // operator").  A deleted function is a component without access.
+      if(
+        components.size() > components_before &&
+        symbol.type.id() == ID_struct &&
+        implicit_copy_assignment_is_deleted(to_struct_type(symbol.type)))
+      {
+        components.back().set(ID_access, ID_noaccess);
+        // and has no definition (as for `= delete', see
+        // typecheck_compound_declarator)
+        symbol_table.get_writeable_ref(components.back().get_name())
+          .value.make_nil();
+      }
     }
 
     if(declare_implicit_move)
@@ -6998,4 +7019,61 @@ cpp_typecheckt::template_by_first_parameter(const std::string &param_id)
   return it == templates_by_first_parameter.end()
            ? nullptr
            : symbol_table.get_writeable(it->second);
+}
+
+/// N5008 [class.copy.assign]/7: whether the implicitly-declared copy
+/// assignment operator of \p type is defined as deleted -- a non-static data
+/// member of const non-class type or of reference type, or a direct base
+/// class whose copy assignment operator is deleted (a component without
+/// access).  The rules for member classes, ambiguity and access are not
+/// modelled.
+bool cpp_typecheckt::implicit_copy_assignment_is_deleted(
+  const struct_typet &type)
+{
+  for(const auto &c : type.components())
+  {
+    if(
+      c.get_bool(ID_from_base) || c.get_bool(ID_is_static) ||
+      c.get_bool(ID_is_type) || c.type().id() == ID_code || c.get_is_padding())
+    {
+      continue;
+    }
+    if(is_reference(c.type()) || is_rvalue_reference(c.type()))
+      return true;
+    if(
+      c.type().get_bool(ID_C_constant) && c.type().id() != ID_struct_tag &&
+      c.type().id() != ID_union_tag)
+    {
+      return true;
+    }
+  }
+  for(const auto &b : type.bases())
+  {
+    if(b.type().id() != ID_struct_tag)
+      continue;
+    const symbolt *base = symbol_table.lookup(b.type().get(ID_identifier));
+    if(base == nullptr || base->type.id() != ID_struct)
+      continue;
+    for(const auto &c : to_struct_type(base->type).components())
+    {
+      if(
+        c.get_base_name() != "operator=" || c.get_bool(ID_from_base) ||
+        c.get_bool(ID_is_static) || c.type().id() != ID_code)
+      {
+        continue;
+      }
+      const auto &parameters = to_code_type(c.type()).parameters();
+      if(
+        parameters.size() == 2 && is_reference(parameters[1].type()) &&
+        !is_rvalue_reference(parameters[1].type()) &&
+        to_reference_type(parameters[1].type())
+            .base_type()
+            .get(ID_identifier) == base->name &&
+        c.get(ID_access) == ID_noaccess)
+      {
+        return true;
+      }
+    }
+  }
+  return false;
 }

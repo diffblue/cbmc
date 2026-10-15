@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ copy constructed: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+inaccessible copy assignment operator
+--
+N5008 [class.copy.assign]/7: the implicit copy assignment operator of a class
+whose direct base deletes its own is defined as deleted, so a
+requires-expression using it is not satisfied ([expr.prim.req.general]/5).
+libstdc++ 11's assignable_from<pair<const K, V> &, ...> (cpp20_map_basic on
+GCC 11) failed to define it instead.
