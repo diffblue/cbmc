@@ -32,11 +32,11 @@ files.
    --version`. To install CMake:
    - On Debian-like distributions, do
      ```
-     apt-get install g++ gcc flex bison make git curl patch cmake
+     apt-get install g++ gcc flex bison make git curl patch cmake z3
      ```
    - On Red Hat/Fedora or derivates, do
      ```
-     dnf install gcc gcc-c++ flex bison curl patch cmake
+     dnf install gcc gcc-c++ flex bison curl patch cmake z3
      ```
    - On macOS, do
      ```
@@ -144,11 +144,11 @@ We assume that you have a Debian/Ubuntu or Red Hat-like distribution.
    The GNU Make needs to be version 3.81 or higher.
    On Debian-like distributions, do as root:
    ```
-   apt-get install g++ gcc flex bison make git curl patch
+   apt-get install g++ gcc flex bison make git curl patch z3
    ```
    On Red Hat/Fedora or derivates, do as root:
    ```
-   dnf install gcc gcc-c++ flex bison curl patch
+   dnf install gcc gcc-c++ flex bison curl patch z3
    ```
    Note that you need g++ version 7.0 or newer.
 
@@ -231,7 +231,7 @@ Maven 3 manually.
 
 1. As root, get the necessary development tools:
    ```
-   pkg install gcc-c++-7 bison flex
+   pkg install gcc-c++-7 bison flex z3
    ```
 2. As a user, get the CBMC source via
    ```
