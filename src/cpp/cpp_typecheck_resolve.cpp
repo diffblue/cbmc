@@ -9846,10 +9846,14 @@ void cpp_typecheck_resolvet::guess_template_args_simple_name(
           // of the irep, which operator== ignores, so compare them too.
           const typet &existing = t;
           const typet &incoming = desired_type;
-          const bool same_cv = existing.get_bool(ID_C_constant) ==
-                                 incoming.get_bool(ID_C_constant) &&
-                               existing.get_bool(ID_C_volatile) ==
-                                 incoming.get_bool(ID_C_volatile);
+          // #c_type is a comment as well: int and a long of the same
+          // width (i386, Windows) are distinct types
+          const bool same_cv =
+            existing.get_bool(ID_C_constant) ==
+              incoming.get_bool(ID_C_constant) &&
+            existing.get_bool(ID_C_volatile) ==
+              incoming.get_bool(ID_C_volatile) &&
+            existing.get(ID_C_c_type) == incoming.get(ID_C_c_type);
           // [temp.type]/1: a function type in parsed and in converted form
           // (`same<decltype(cb), void(int)>' against `same<A, A>')
           if(
