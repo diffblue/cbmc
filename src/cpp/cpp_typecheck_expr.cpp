@@ -14,13 +14,11 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/bitvector_types.h>
 #include <util/c_types.h>
 #include <util/config.h>
-#include <util/expr_initializer.h>
 #include <util/floatbv_expr.h>
 #include <util/mathematical_types.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
 #include <util/prefix.h>
-#include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>

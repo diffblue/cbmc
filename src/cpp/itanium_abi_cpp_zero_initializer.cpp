@@ -11,13 +11,9 @@ Author: Kiro
 
 #include "itanium_abi_cpp_zero_initializer.h"
 
-#include <util/arith_tools.h>
-#include <util/c_types.h>
 #include <util/expr_initializer.h>
-#include <util/expr_iterator.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
-#include <util/std_expr.h>
 #include <util/symbol.h>
 
 #include <set>
