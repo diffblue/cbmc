@@ -1,0 +1,12 @@
+CORE
+main.c
+assertion-check compile-and-link
+^EXIT=10$
+^SIGNAL=0$
+^\[foo.assertion.1\] .* reachable: FAILURE$
+--
+^warning: ignoring
+^\*\*\*\* WARNING: no body for function
+--
+Check that when files are compiled together with --export-file-local-symbols
+the local_bitvector_analysis does not crash with an invariant violation
