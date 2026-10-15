@@ -2342,6 +2342,20 @@ bool cpp_typecheckt::user_defined_conversion_sequence(
 
   if(from == to)
     rank += 0;
+  else if(
+    from.id() == ID_struct_tag && to.id() == ID_struct_tag &&
+    subtype_typecast(
+      follow_tag(to_struct_tag_type(from)), follow_tag(to_struct_tag_type(to))))
+  {
+    // N5008 [over.best.ics]/7: a parameter of class type initialized from
+    // an argument of a derived class type is a derived-to-base Conversion
+    // (rank 3), not a user-defined conversion sequence -- it was ranked
+    // with them, so `g(ex)' and `g(other)' (other(if_ex)) tied for an
+    // if_ex argument, and `return r;' into resultt<> tied resultt(exprt)
+    // with the copy constructor (CBMC's own simplify_expr_*.cpp,
+    // dog-fooding)
+    rank += 3;
+  }
   else
     rank += 4; // higher than all the standard conversions
 
