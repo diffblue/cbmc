@@ -14409,3 +14409,64 @@ contracts/utils.cpp compiles but prints a recovered
 `_Maybe_unary_or_binary_function' error; goto_instrument_parse_options.cpp
 needs about 975 s with goto-cc (sweep TIMEOUT 900).  A fresh sweep with
 the HEAD goto-cc runs in /tmp/dogfood-snapshots/74d53f4318-*.
+
+## Round 186: contracts/utils.cpp, goto-cc profiling, untested gaps
+
+Requests: start the leftover contracts/utils.cpp error as a KNOWNBUG and
+reduce it; profile goto_instrument_parse_options.cpp; find issues and
+feature gaps without a KNOWNBUG.
+
+contracts/utils.cpp: bisected (definitions of the file, then a one-line
+declaration) instead of cvise -- `void h(const std::function<void()> &);'.
+Fixed directly, so no KNOWNBUG was needed:
+- aed5f1f57a a `void' template argument bound to R before an empty pack
+  (`base<R, A...>', std::function<void()>'s _Maybe_unary_or_binary_function
+  base) was stripped as an empty-pack sentinel.
+Side findings while reducing (both fixed, CORE tests):
+- edc045092f `template <class T> int g(const struct S &)' and the
+  definition `g(const S &)' became two templates (bodiless call).
+- 3a4fde5d42 a friend declaration that introduces a function template did
+  not befriend it (libstdc++'s __try_use_facet; visible with `g++ -E -P').
+
+goto_instrument_parse_options.cpp (preprocessed, 134k lines): perf with
+DWARF call graphs on a RelWithDebInfo goto-cc.  Three whole-table scans per
+template instance dominated:
+- 0e38e8fb42 out-of-class member definitions: index the templates that
+  have ID_template_methods (1008 s -> 875 s).
+- 3208450b55 resolve_scope's namespace fallback walked id_map.
+- e5df41b1de the owning template of an instance's first parameter
+  (irept::get_bool at cpp_typecheck_compound_type.cpp:416, 31%).
+Together 1008-1074 s -> 345 s; the goto program is identical
+(goto-instrument --show-goto-functions).  The remaining profile is spread
+over template-argument checking and resolve_scope's own code.
+
+Feature probes (/tmp/r186/feat) and dog-food re-checks, fixed:
+- 8a0177ff85 `A a(1, 2.0)' (C++20 parenthesized aggregate) wrote 2.0 into
+  padding.
+- f57ba4792f explicit(false) constructors were explicit.
+- 27fdb57d65 derived-to-base class parameter has Conversion rank
+  ([over.best.ics]/7; simplify_expr*.cpp's resultt<>).
+- 4fb9736014 [over.over]/1.1, /1.3: target type selects an overload
+  (statement_list_parser.cpp).
+New KNOWNBUGs: libstdc++ char specializations defined only in the .so
+(`in >> s', `out << sb'), friend of D accessing a private-base member
+through a class derived from D (the round-177 note had it backwards: a
+valid program is rejected), coroutine semantics, [[no_unique_address]]
+layout, alias-template CTAD, covariant return override (separate vtable
+entry), protected member named in a braced functional cast (smt2_dec.cpp).
+Guard test e8f0ea656a: ranges views iota/transform/filter/drop with both
+libraries (open in round 176, working now, untested).
+
+Still open without a test: the libc++ 19+ layer (apply, variant, visit,
+functional, bind_back, ranges, optional monadic -- reproducible only with
+the Docker images' headers; /tmp/r185/docker/ii19, ii21; a cvise of the
+apply case stalled at 7655 lines, /tmp/r186/cv_apply), gcc 15's
+std::format giving a wrong value (header drops of __write_escaped_char;
+ii21), and pre-existing dog-food failures interval.cpp (`out << *this'),
+string_refinement.cpp (`get' ambiguous), expr2statement_list.cpp,
+smt_response_validation.cpp, smt2_parser.cpp and smt2irep.cpp, none
+reproduced by hand yet.
+
+Verification: W126 (HEAD minus the last KNOWNBUG commit) cbmc-cpp 1920,
+cpp 246, regression/cbmc 1208, goto-instrument 298, all exit 0; lint exit
+0; every commit of ab85c714d6..HEAD compiles.

@@ -2043,3 +2043,23 @@ util/irep_hash.cpp, no -D flags, so files that need SATCHECK_* (satcheckt
 in bv_minimize.h: counterexample_found.cpp, inductiveness.cpp,
 counterexample_beautification.cpp, ...) fail in the sweep and compile with
 their real compile_commands flags (/tmp/r185/df.sh).
+
+## Sweep 2026-10-15 (round 186, HEAD 74d53f4318 goto-cc)
+
+The sweep started in round 185 finished: 846 files, 788 clean, 3 noisy,
+55 FAIL, no crash.  Most FAILs are snapshot artifacts: generated files
+missing from the worktree (.inc, ansi_c_y.tab.h, api.h), and the -I-only
+flags (no SATCHECK_* -D, so satcheckt is unknown: cprover/, goto-checker/,
+accelerate/, refine_arrays.cpp, string_constraint.cpp,
+satcheck_zcore.cpp).  Real ones, all failing with W100 too:
+- simplify_expr*.cpp (8 files, resultt<> ambiguity) and float_bv.cpp:
+  fixed (27fdb57d65).
+- statement_list_parser.cpp: fixed (4fb9736014).
+- smt2_dec.cpp: KNOWNBUG cpp11_protected_member_in_braced_functional_cast.
+- contracts/utils.cpp's `_Maybe_unary_or_binary_function' message: fixed
+  (aed5f1f57a).
+- Open, not reduced: interval.cpp, string_refinement.cpp,
+  expr2statement_list.cpp, smt_response_validation.cpp, smt2_parser.cpp,
+  smt2irep.cpp, prop_minimize.cpp, smt_sorts.cpp.
+goto_instrument_parse_options.cpp: 345 s (was ~1000 s) after three
+profiling-driven commits; under the sweep's 900 s TIMEOUT now.
