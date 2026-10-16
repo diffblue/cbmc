@@ -1,4 +1,4 @@
-THOROUGH
+KNOWNBUG
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ regex constructed: SUCCESS$
@@ -16,3 +16,7 @@ the parser had spelled differently); with the front end now
 deterministic and the body present, symex of the NFA compiler exceeds
 30 minutes at --unwind 5.  The CORE conversion gate is in
 test_conversion.desc.
+KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
+the ctype facet's vtable pointer in regex_traits::translate_nocase reads
+as null ("dereference failure: pointer NULL in ... do_tolower"); not
+reduced yet.
