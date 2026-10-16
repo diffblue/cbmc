@@ -86,24 +86,7 @@ sub run($$$$$$) {
     if($ENV{CBMC_TEST_MEMLIMIT}) {
       $memlimit_prefix = "ulimit -v $ENV{CBMC_TEST_MEMLIMIT} ; ";
     }
-    # Without fork/alarm (Windows), enforce a timeout through coreutils'
-    # timeout where bash provides it (Git for Windows does); it exits with
-    # 124, or 137 when the -k grace period expires.
-    my $timeout_prefix = "";
-    if($timeout) {
-      $timeout_prefix = "if command -v timeout >/dev/null 2>&1 ; then " .
-        "timeout -k 10 $timeout bash -c \"\$0\" ; else bash -c \"\$0\" ; fi";
-    }
-    if($timeout_prefix ne "") {
-      system("bash", "-c", "${memlimit_prefix}cd '$name' ; $timeout_prefix",
-        "MSYS_NO_PATHCONV=1 $cmdline");
-      my $code = $? >> 8;
-      if($code == 124 || $code == 137) {
-        $timed_out = 1;
-      }
-    } else {
-      system("bash", "-c", "${memlimit_prefix}cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
-    }
+    system("bash", "-c", "${memlimit_prefix}cd '$name' ; MSYS_NO_PATHCONV=1 $cmdline");
   }
 
   $exit_value = $? >> 8;
