@@ -3,7 +3,7 @@ main.cpp
 --cpp20 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-^.*std::optional<signed_int>::optional\(this,rref_signed_int\).*$
+^.*std::(__1::)?optional<signed_int>::optional\(this,rref_signed_int\).*$
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
