@@ -9694,6 +9694,22 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         functions_being_typechecked.count(callee_symbol->name) == 0)
       {
         cpp_saved_template_mapt saved_map(template_map);
+        // N5008 [temp.inst]/4: a member of a class template specialization
+        // is instantiated with the class's template arguments.  Its queued
+        // entry (add_method_body) records them; under the CALLER's map the
+        // class's parameters were unbound (`is_same_v<_Result_type, ...>' in
+        // GCC 11's static __gen_vtable_impl::_S_apply calling
+        // __visit_invoke: "no match for symbol 'is_same_v'").
+        for(const auto &queued : method_bodies)
+        {
+          if(
+            queued.method_symbol != nullptr &&
+            queued.method_symbol->name == callee_symbol->name)
+          {
+            template_map = queued.template_map;
+            break;
+          }
+        }
         prepare_deferred_method_body(*callee_symbol);
         try
         {
