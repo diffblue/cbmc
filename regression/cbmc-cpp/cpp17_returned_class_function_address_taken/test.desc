@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17 --validate-goto-model
+^\[main\.assertion\.1\] line \d+ call through function pointer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+elide_cpp_returned_temporaries gives a function that returns a class with
+a constructor or destructor a hidden result parameter.  References to the
+function outside calls, such as its address stored in a table, kept the old
+type and failed --validate-goto-model (CBMC's own abstract_environment.cpp,
+cpp17_abstract_environment_tu).
