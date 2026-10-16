@@ -3200,6 +3200,17 @@ void cpp_typecheck_resolvet::disambiguate_functions(
             Di, Dj, ti, tj);
         if(j_aas_i && !i_aas_j)
           dominated[i] = true;
+        // N5008 [temp.func.order]/6.4: of two templates that are equally
+        // specialized, the more constrained one ([temp.constr.order]) is
+        // more specialized -- libc++'s CPO fallback `void operator()(auto
+        // &&) const = delete;' loses to the constrained operator().
+        else if(
+          j_aas_i && i_aas_j &&
+          template_constraint_strictly_subsumes(
+            cpp_typecheck.symbol_table, Dj, Di))
+        {
+          dominated[i] = true;
+        }
       }
     }
 
