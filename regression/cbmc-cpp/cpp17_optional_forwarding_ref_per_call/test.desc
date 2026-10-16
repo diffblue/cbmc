@@ -3,8 +3,8 @@ main.cpp
 --cpp17 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-^.*std::optional<tag-S>::optional\(this,rref_struct_tag\(identifier=tag-S\)\).*$
-^.*std::optional<tag-S>::optional\(this,ref_struct_tag\(identifier=tag-S\)\).*$
+optional<tag-S>::optional\(this,rref_struct_tag\(identifier=tag-S\)\)
+optional<tag-S>::optional\(this,ref_struct_tag\(identifier=tag-S\)\)
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
