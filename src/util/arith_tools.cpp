@@ -70,6 +70,13 @@ bool to_integer(const constant_exprt &expr, mp_integer &int_value)
       int_value = bvrep2integer(value, width, false);
       return false;
     }
+    else if(underlying_type.id() == ID_c_bool)
+    {
+      // C++ `enum class E : bool' (N5008 [dcl.enum]/2)
+      const auto width = to_c_bool_type(underlying_type).get_width();
+      int_value = bvrep2integer(value, width, false);
+      return false;
+    }
   }
   else if(type_id==ID_c_bit_field)
   {
