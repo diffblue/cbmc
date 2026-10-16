@@ -1065,9 +1065,15 @@ simplify_exprt::simplify_typecast(const typecast_exprt &expr)
   {
     const irep_idt &value=to_constant_expr(operand).get_value();
 
-    // preserve the sizeof type annotation
-    typet c_sizeof_type=
-      static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
+    // preserve the sizeof type annotation, the cast's own first (simplify_mult
+    // moves that of a `sizeof(char)' factor of one onto `(size_t)n')
+    typet c_sizeof_type =
+      static_cast<const typet &>(expr.find(ID_C_c_sizeof_type));
+    if(c_sizeof_type.is_nil())
+    {
+      c_sizeof_type =
+        static_cast<const typet &>(operand.find(ID_C_c_sizeof_type));
+    }
 
     if(op_type_id==ID_integer ||
        op_type_id==ID_natural)
