@@ -2123,6 +2123,15 @@ void template_mapt::apply(typet &type) const
 static bool is_type_side_node(const irept &n)
 {
   const irep_idt &id = n.id();
+  // `array', `struct' and `union' also name expressions (an array or
+  // struct constant: GCC 16's `_Widen<_CharT>(S, L##S)' passes L"..." as an
+  // array constant), which carry a type of their own
+  if(
+    (id == ID_array || id == ID_struct || id == ID_union) &&
+    n.find(ID_type).is_not_nil())
+  {
+    return false;
+  }
   return id == ID_cpp_name || id == ID_name || id == ID_scope_resolution ||
          id == ID_template_args || id == ID_operator || id == ID_decltype ||
          id == ID_array || id == ID_pointer || id == ID_frontend_pointer ||
