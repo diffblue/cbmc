@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ the exact pointer type: SUCCESS$
+^\[main\.assertion\.2\] line \d+ a different parameter type: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+--
+The identity check of a standard conversion compared #c_type at the top
+level only, so pointers to functions whose parameter types differed only in
+it (long and a 64-bit long long) converted as identical.
