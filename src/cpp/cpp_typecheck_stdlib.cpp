@@ -1498,6 +1498,17 @@ static const std::map<std::string, std::string> &library_source_models()
      " if(__prime) return __p; } }"},
     // libc++ src/support/runtime/exception_fallback.ipp, N5008
     // [exception]
+    // libstdc++ config/os/gnu-linux/ctype_noninline.h: the "C" locale's
+    // ctype<char> case mappings ([locale.ctype.virtuals]/7, /9); keyed by
+    // the full identifier, for the two overloads each
+    {"std::ctype<char>::do_tolower($constthis,char)",
+     "{ return __c >= 'A' && __c <= 'Z' ? char(__c - 'A' + 'a') : __c; }"},
+    {"std::ctype<char>::do_toupper($constthis,char)",
+     "{ return __c >= 'a' && __c <= 'z' ? char(__c - 'a' + 'A') : __c; }"},
+    {"std::ctype<char>::do_tolower($constthis,ptr_char,ptr_const_char)",
+     "{ for(; __lo < __hi; ++__lo) *__lo = do_tolower(*__lo); return __hi; }"},
+    {"std::ctype<char>::do_toupper($constthis,ptr_char,ptr_const_char)",
+     "{ for(; __lo < __hi; ++__lo) *__lo = do_toupper(*__lo); return __hi; }"},
     {"std::exception::~exception", "{ }"},
     {"std::exception::what", "{ return \"std::exception\"; }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
@@ -1524,8 +1535,9 @@ void cpp_typecheckt::provide_library_source_models()
       continue;
     }
     const std::string name = id2string(symbol.name);
-    const auto model =
-      library_source_models().find(name.substr(0, name.find('(')));
+    auto model = library_source_models().find(name);
+    if(model == library_source_models().end())
+      model = library_source_models().find(name.substr(0, name.find('(')));
     if(model != library_source_models().end())
       to_define.emplace_back(entry.first, &model->second);
   }
@@ -1699,6 +1711,34 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // returns `const _Facet&' (a pointer here), so it is overridden the
         // same way.
         exprt facet = provide_classic_ctype_char_model(symbol_table, ns);
+        // N5008 [locale.ctype.members]: tolower/toupper call the virtual
+        // do_tolower/do_toupper; the modelled object needs the vtable
+        // pointer of a complete ctype<char> (the virtuals are modelled in
+        // library_source_models)
+        if(facet.is_not_nil())
+        {
+          symbolt &fs = symbol_table.get_writeable_ref(
+            to_symbol_expr(facet).get_identifier());
+          const symbolt *facet_class =
+            fs.type.id() == ID_struct_tag
+              ? symbol_table.lookup(
+                  to_struct_tag_type(fs.type).get_identifier())
+              : nullptr;
+          if(facet_class != nullptr && facet_class->type.id() == ID_struct)
+          {
+            for(const auto &c : to_struct_type(facet_class->type).components())
+            {
+              if(!c.get_bool(ID_is_vtptr))
+                continue;
+              const exprt address = vtable_pointer_value(*facet_class, c);
+              if(address.is_not_nil())
+              {
+                set_struct_component(
+                  fs.value, fs.type, id2string(c.get_name()), address, ns);
+              }
+            }
+          }
+        }
         if(facet.is_not_nil())
         {
           const typet &ret_type = to_code_type(symbol.type).return_type();
