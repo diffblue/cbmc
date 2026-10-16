@@ -133,6 +133,9 @@ void cpp_typecheckt::convert(cpp_namespace_spect &namespace_spec)
 
     // C++11: inline namespaces make their names visible in the parent
     if(namespace_spec.get_is_inline())
+    {
+      cpp_scopes.current_scope().is_inline_namespace = true;
       parent_scope.add_using_scope(cpp_scopes.current_scope());
+    }
   }
 }

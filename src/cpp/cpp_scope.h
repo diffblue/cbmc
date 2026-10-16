@@ -150,6 +150,17 @@ public:
     using_scopes.push_back(&other);
   }
 
+  /// The inline namespaces directly enclosed by this namespace (N5008
+  /// [namespace.def.general]/3), which are among its using-scopes.
+  std::vector<cpp_scopet *> inline_namespaces() const
+  {
+    std::vector<cpp_scopet *> result;
+    for(cpp_idt *scope : using_scopes)
+      if(scope->is_inline_namespace)
+        result.push_back(static_cast<cpp_scopet *>(scope));
+    return result;
+  }
+
   class cpp_scopet &new_scope(const irep_idt &new_scope_name);
 
   /// Global generation counter, incremented on any scope mutation.
