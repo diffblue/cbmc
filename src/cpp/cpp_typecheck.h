@@ -359,8 +359,7 @@ protected:
   void convert(cpp_declarationt &);
   void convert(cpp_declaratort &);
   void convert(cpp_static_assertt &);
-  static void
-  propagate_constants(exprt &expr, const symbol_table_baset &symbol_table);
+  void propagate_constants(exprt &expr, const symbol_table_baset &symbol_table);
 
   void convert_initializer(symbolt &symbol);
   bool has_non_pod_class_member(const struct_union_typet &type);
@@ -1201,6 +1200,7 @@ protected:
   void typecheck_ifthenelse(code_ifthenelset &) override;
   void typecheck_while(code_whilet &) override;
   void typecheck_switch(codet &) override;
+  void typecheck_switch_case(code_switch_caset &) override;
 
   const struct_typet &this_struct_type();
 

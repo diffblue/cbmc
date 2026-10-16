@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
 
+#include "cpp_constexpr_eval.h"
 #include "cpp_typecheck.h"
 
 /// Replace symbol expressions that refer to constant variables with their
@@ -52,6 +53,42 @@ void cpp_typecheckt::propagate_constants(
 
   for(auto &op : expr.operands())
     propagate_constants(op, symbol_table);
+
+  // N5008 [expr.const]/5: with its operands folded, a call of a constexpr
+  // function or a temporary built by a constexpr constructor is evaluated
+  // (try_evaluate_constexpr), so that a member of it, or a member function
+  // called on it, folds as well: `Q(2).n', `make().sum()', GCC 16's
+  // `_Escapes<_CharT>::_S_tab()[0]' as a case label.
+  if(
+    expr.id() == ID_side_effect &&
+    (expr.get(ID_statement) == ID_function_call ||
+     expr.get(ID_statement) == ID_temporary_object))
+  {
+    exprt value = try_evaluate_constexpr(
+      expr,
+      symbol_table,
+      *this,
+      [this](const irep_idt &callee) -> bool
+      {
+        const symbolt *csym = this->symbol_table.lookup(callee);
+        if(csym == nullptr || !csym->is_macro)
+          return false;
+        if(csym->value.type().id() == ID_code)
+          return true;
+        if(
+          functions_being_typechecked.count(callee) != 0 ||
+          deferred_typechecking.count(callee) != 0)
+        {
+          return false;
+        }
+        return convert_deferred_method_now(callee);
+      });
+    if(value.is_not_nil())
+    {
+      value.add_source_location() = expr.source_location();
+      expr.swap(value);
+    }
+  }
 }
 
 void cpp_typecheckt::convert(cpp_static_assertt &cpp_static_assert)
