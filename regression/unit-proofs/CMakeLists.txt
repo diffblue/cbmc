@@ -21,7 +21,11 @@ if(HOST_GCC)
 else()
   list(APPEND libstdcxx_exclusions -X libstdcxx13)
 endif()
+# A per-test timeout: the KNOWNBUG entries for scaling limits
+# (edit_distance) do not terminate in reasonable time; under -K a [TIMEOUT]
+# is the expected failure, instead of the whole profile's TIMEOUT.  The CORE
+# proofs take under 20 s.
 add_test_pl_tests(
-    "$<TARGET_FILE:cbmc>" ${libstdcxx_exclusions}
+    "$<TARGET_FILE:cbmc>" ${libstdcxx_exclusions} -t 300
 )
 set_tests_properties("unit-proofs-CORE" PROPERTIES TIMEOUT 900)
