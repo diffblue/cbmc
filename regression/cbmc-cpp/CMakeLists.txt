@@ -41,8 +41,13 @@ else()
   set(cbmc_cmd "$<TARGET_FILE:cbmc> --validate-goto-model --validate-ssa-equation")
 endif()
 
+# A per-test timeout (-t) so that a single hanging test fails with
+# [TIMEOUT] and its name instead of exhausting the whole suite's TIMEOUT
+# (the slowest passing test took 339 s on the macOS CI runner).
+set(cbmc_cpp_test_timeout -t 900)
+
 add_test_pl_tests(
-    "${cbmc_cmd}" ${gcc_only} -X libcxx
+    "${cbmc_cmd}" ${gcc_only} -X libcxx ${cbmc_cpp_test_timeout}
 )
 set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 4800)
 
@@ -58,6 +63,7 @@ if(CLANG_FOUND AND LIBCXX_FOUND)
       -C CORE
       -I libcxx
       ${gcc_only}
+      ${cbmc_cpp_test_timeout}
   )
   # ~15 minutes of libc++ header-heavy tests on the CI runners
   set_tests_properties("cbmc-cpp-libcxx-CORE" PROPERTIES TIMEOUT 2400)
