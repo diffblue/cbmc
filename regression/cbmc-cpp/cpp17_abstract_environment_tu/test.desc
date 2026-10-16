@@ -14,5 +14,8 @@ conversion + property-restricted BMC take ~7m45s, beyond the CORE
 >1h" on the FULL property set; --property restricts to the harness
 assertion (the rest is sound havoc of out-of-TU functions).
 KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
---validate-goto-model fails "symbol_expr_type_matches_symbol_table"; not
-reduced yet.
+--validate-goto-model fails "symbol_expr_type_matches_symbol_table" on
+assume_not in the dynamic initialization of abstract_environment.cpp's
+`static auto assume_functions = std::map<irep_idt, assume_function>{{ID_not,
+assume_not}, ...}' (line 290; assume_not is declared static and defined
+later).  Hand-made programs of that shape pass; not reduced yet.

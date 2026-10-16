@@ -18,4 +18,7 @@ _Executor is built over basic_regex<char, ...>.  Remaining cost is
 symbolic execution of the NFA compiler and executor (> 30 min at
 --unwind 5).  The CORE conversion gate is in test_conversion.desc.
 KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
-the same null ctype facet as cpp11_regex_construct/test.desc.
+the classic ctype<char> facet now has a vtable pointer and case mappings
+(cpp11_locale_ctype_char_tolower), but a call of ctype<char>::tolower on
+another ctype<char> object still dispatches to no target
+("dereferenced function pointer must be ...do_tolower"); not reduced yet.
