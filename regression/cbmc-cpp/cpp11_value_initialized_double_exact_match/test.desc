@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ double\(\) selects test\(double\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ float\(\) selects test\(float\): SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+from_integer built a floating-point constant whose type had lost the
+#c_type comment, so the value 0.0 of double() had a type that was neither
+double nor long double and every overload needed a conversion.  libc++
+19's __promote (`decltype((__test(_Args()) + ...))') then deduced no
+type, and std::__hermite in <cmath> lost its body (macOS CI job).
