@@ -1,4 +1,4 @@
-KNOWNBUG
+THOROUGH
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line 8 regex match: SUCCESS$
@@ -17,8 +17,6 @@ partial specialisation (value_type `char`, not `const char`), so the
 _Executor is built over basic_regex<char, ...>.  Remaining cost is
 symbolic execution of the NFA compiler and executor (> 30 min at
 --unwind 5).  The CORE conversion gate is in test_conversion.desc.
-KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
-the classic ctype<char> facet now has a vtable pointer and case mappings
-(cpp11_locale_ctype_char_tolower), but a call of ctype<char>::tolower on
-another ctype<char> object still dispatches to no target
-("dereferenced function pointer must be ...do_tolower"); not reduced yet.
+THOROUGH again 2026-10-16 (about 40 s, 0.7 GB): the failure was a
+block-scope static (_AnyMatcher's `__nul') initialized at program start
+(cpp11_block_scope_static_dynamic_initialization), not ctype dispatch.

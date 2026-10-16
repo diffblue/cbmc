@@ -3625,6 +3625,44 @@ codet cpp_typecheckt::static_local_initialization(
   return std::move(guarded);
 }
 
+/// N5008 [expr.const]/2, [basic.start.static]/2: is \p expr, simplified, a
+/// constant initializer -- built from constants, string literals and the
+/// addresses of objects with static storage duration and of functions?
+bool cpp_typecheckt::is_static_constant_initializer(const exprt &expr) const
+{
+  if(expr.is_constant() || expr.id() == ID_string_constant || expr.is_nil())
+    return true;
+  if(expr.id() == ID_address_of)
+  {
+    const exprt &object = to_address_of_expr(expr).object();
+    const exprt *root = &object;
+    while(root->id() == ID_member || root->id() == ID_index)
+    {
+      if(root->id() == ID_index && !to_index_expr(*root).index().is_constant())
+        return false;
+      root = &to_multi_ary_expr(*root).op0();
+    }
+    if(root->id() == ID_string_constant)
+      return true;
+    if(root->id() != ID_symbol)
+      return false;
+    const symbolt *symbol =
+      symbol_table.lookup(to_symbol_expr(*root).get_identifier());
+    return symbol != nullptr &&
+           (symbol->is_static_lifetime || symbol->type.id() == ID_code);
+  }
+  if(
+    expr.id() == ID_struct || expr.id() == ID_array || expr.id() == ID_union ||
+    expr.id() == ID_typecast || expr.id() == ID_array_of)
+  {
+    for(const auto &op : expr.operands())
+      if(!is_static_constant_initializer(op))
+        return false;
+    return true;
+  }
+  return false;
+}
+
 void cpp_typecheckt::typecheck_decl(codet &code)
 {
   if(code.operands().size() != 1)
@@ -3756,6 +3794,29 @@ void cpp_typecheckt::typecheck_decl(codet &code)
 
     code_frontend_declt decl_statement(cpp_symbol_expr(symbol));
     decl_statement.add_source_location() = symbol.location;
+
+    // N5008 [stmt.dcl]/3, [basic.start.static]/2: a block-scope variable
+    // with static storage duration whose initializer is not a constant is
+    // initialized the first time control passes through its declaration,
+    // where `this' and the parameters are those of that call.  As a symbol
+    // value, __CPROVER_initialize evaluated it at program start (libstdc++'s
+    // `static auto __nul = _M_translator._M_translate('\\0');' in
+    // _AnyMatcher::operator() dereferenced an undefined `this').
+    if(
+      symbol.is_static_lifetime && symbol.value.is_not_nil() &&
+      symbol.value.id() != ID_code &&
+      !is_static_constant_initializer(simplify_expr(symbol.value, *this)))
+    {
+      const exprt value = symbol.value;
+      symbol_table.get_writeable_ref(symbol.name).value.make_nil();
+      code_frontend_declt decl_statement{cpp_symbol_expr(symbol)};
+      decl_statement.add_source_location() = symbol.location;
+      new_code.add_to_operands(std::move(decl_statement));
+      code_frontend_assignt assignment{cpp_symbol_expr(symbol), value};
+      assignment.add_source_location() = symbol.location;
+      new_code.add_to_operands(static_local_initialization(symbol, assignment));
+      continue;
+    }
 
     // Do we have an initializer that's not code?
     if(symbol.value.is_not_nil() && symbol.value.id() != ID_code)
