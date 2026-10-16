@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ box<char>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A template template parameter deduced from ns::box<int> was substituted by
+the bare name `box', unknown in the scope of replace_first: "symbol 'box'
+is unknown".  libstdc++'s __replace_first_arg rebinds
+std::pmr::polymorphic_allocator this way (GCC 11 <memory_resource>).
