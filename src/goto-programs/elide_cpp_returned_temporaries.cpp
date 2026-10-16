@@ -20,6 +20,7 @@ Author: Kiro
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/replace_symbol.h>
+#include <util/std_expr.h>
 #include <util/symbol_table_base.h>
 
 #include "goto_model.h"
@@ -364,6 +365,47 @@ static void lower_returns_in_body(
   }
 }
 
+/// Give each reference to a lowered function in \p expr the function's new
+/// type.  The address of such a function (N5008 [conv.func]/1, e.g. stored
+/// in a table of function pointers) keeps its original pointer type through
+/// a cast: calls through function pointers have been resolved to direct
+/// calls already, and those are rewritten separately.
+/// \return true if \p expr was changed
+static bool retype_lowered_function_symbols(
+  exprt &expr,
+  const std::set<irep_idt> &lowered,
+  const namespacet &ns)
+{
+  if(expr.id() == ID_symbol)
+  {
+    const irep_idt &identifier = to_symbol_expr(expr).get_identifier();
+    if(!lowered.count(identifier))
+      return false;
+    const typet &new_type = ns.lookup(identifier).type;
+    if(expr.type() == new_type)
+      return false;
+    expr.type() = new_type;
+    return true;
+  }
+  if(
+    expr.id() == ID_address_of &&
+    to_address_of_expr(expr).object().id() == ID_symbol &&
+    lowered.count(
+      to_symbol_expr(to_address_of_expr(expr).object()).get_identifier()))
+  {
+    exprt object = to_address_of_expr(expr).object();
+    if(!retype_lowered_function_symbols(object, lowered, ns))
+      return false;
+    const typet original_pointer_type = expr.type();
+    expr = typecast_exprt{address_of_exprt{object}, original_pointer_type};
+    return true;
+  }
+  bool changed = false;
+  for(auto &op : expr.operands())
+    changed |= retype_lowered_function_symbols(op, lowered, ns);
+  return changed;
+}
+
 void elide_cpp_returned_temporaries(goto_modelt &goto_model)
 {
   symbol_table_baset &symbol_table = goto_model.symbol_table;
@@ -535,6 +577,23 @@ void elide_cpp_returned_temporaries(goto_modelt &goto_model)
       else
         arguments.push_back(address_of_exprt{result_slot});
       i_it->call_function().type() = callee_type;
+    }
+  }
+
+  // Other references to a lowered function: its address taken for a
+  // function pointer (`std::map<irep_idt, assume_function>{{ID_not,
+  // assume_not}}' in CBMC's own abstract_environment.cpp).
+  for(auto &gf_entry : goto_model.goto_functions.function_map)
+  {
+    for(auto &instruction : gf_entry.second.body.instructions)
+    {
+      instruction.transform(
+        [&lowered, &ns](exprt expr) -> std::optional<exprt>
+        {
+          if(retype_lowered_function_symbols(expr, lowered, ns))
+            return expr;
+          return {};
+        });
     }
   }
 
