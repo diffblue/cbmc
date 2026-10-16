@@ -1644,8 +1644,41 @@ void template_mapt::apply(typet &type) const
                   // For simple cpp_names with no scope chain in the
                   // sub (sub = [name(_SomeTemplate), template_args]),
                   // the result is sub = [name(<base>), template_args].
-                  sub.front() = irept{ID_name};
-                  sub.front().set(ID_identifier, base_name);
+                  // N5008 [temp.arg.template]/1: the argument names the
+                  // class template wherever it is declared -- keep the
+                  // namespace qualification of the identifier
+                  // (`ns::tag-box<int>' -> `ns::box<...>'): the bare name
+                  // is not visible from the template being instantiated
+                  // (std::pmr::polymorphic_allocator rebound by the
+                  // global-scope __replace_first_arg)
+                  const std::string prefix = ident.substr(0, tag_pos - 4);
+                  irept::subt new_subs;
+                  bool qualified = prefix.find("tag-") == std::string::npos;
+                  for(std::size_t pos = 0; qualified && pos < prefix.size();)
+                  {
+                    const auto next = prefix.find("::", pos);
+                    if(next == std::string::npos)
+                    {
+                      qualified = false; // not a `name::' sequence
+                      break;
+                    }
+                    irept part{ID_name};
+                    part.set(ID_identifier, prefix.substr(pos, next - pos));
+                    new_subs.push_back(std::move(part));
+                    new_subs.push_back(irept{ID_scope_resolution});
+                    pos = next + 2;
+                  }
+                  irept base_sub{ID_name};
+                  base_sub.set(ID_identifier, base_name);
+                  if(qualified && !new_subs.empty())
+                  {
+                    new_subs.push_back(std::move(base_sub));
+                    for(std::size_t si = 1; si < sub.size(); si++)
+                      new_subs.push_back(sub[si]);
+                    sub = std::move(new_subs);
+                  }
+                  else
+                    sub.front() = std::move(base_sub);
                   break; // exit for(entry : type_map); fall through
                          // to the args-substitution loop below.
                 }
