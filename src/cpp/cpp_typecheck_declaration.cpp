@@ -416,23 +416,36 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         {
           const cpp_template_args_tct ta =
             template_map.build_template_args(class_decl.template_type());
-          if(!ta.has_unassigned())
+          // N5008 [over.match.class.deduct]/1, [temp.deduct.general]/5: a
+          // trailing template parameter not deduced from the guide takes its
+          // default argument (`template <class C, class D = C> struct view
+          // { C *p; }': view{s} is view<const char>); pass the deduced prefix
+          // and let the class template supply the rest
+          const auto &tparams =
+            class_decl.template_type().template_parameters();
+          std::vector<typet> dt;
+          bool usable = true;
+          for(std::size_t i = 0; i < ta.arguments().size(); ++i)
           {
-            std::vector<typet> dt;
-            bool all_type_args = true;
-            for(const auto &a : ta.arguments())
+            const exprt &a = ta.arguments()[i];
+            cpp_template_args_tct one;
+            one.arguments().push_back(a);
+            if(one.has_unassigned())
             {
-              if(a.id() == ID_type)
-                dt.push_back(a.type());
-              else
-              {
-                all_type_args = false;
-                break;
-              }
+              for(std::size_t j = i; j < tparams.size(); ++j)
+                if(!tparams[j].has_default_argument())
+                  usable = false;
+              break;
             }
-            if(all_type_args && !dt.empty())
-              deduced_types = std::move(dt);
+            if(a.id() != ID_type)
+            {
+              usable = false;
+              break;
+            }
+            dt.push_back(a.type());
           }
+          if(usable && !dt.empty())
+            deduced_types = std::move(dt);
         }
       }
     }
@@ -519,23 +532,36 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
         {
           const cpp_template_args_tct ta =
             template_map.build_template_args(class_decl.template_type());
-          if(!ta.has_unassigned())
+          // N5008 [over.match.class.deduct]/1, [temp.deduct.general]/5: a
+          // trailing template parameter not deduced from the guide takes its
+          // default argument (`template <class C, class D = C> struct view
+          // { C *p; }': view{s} is view<const char>); pass the deduced prefix
+          // and let the class template supply the rest
+          const auto &tparams =
+            class_decl.template_type().template_parameters();
+          std::vector<typet> dt;
+          bool usable = true;
+          for(std::size_t i = 0; i < ta.arguments().size(); ++i)
           {
-            std::vector<typet> dt;
-            bool all_type_args = true;
-            for(const auto &a : ta.arguments())
+            const exprt &a = ta.arguments()[i];
+            cpp_template_args_tct one;
+            one.arguments().push_back(a);
+            if(one.has_unassigned())
             {
-              if(a.id() == ID_type)
-                dt.push_back(a.type());
-              else
-              {
-                all_type_args = false;
-                break;
-              }
+              for(std::size_t j = i; j < tparams.size(); ++j)
+                if(!tparams[j].has_default_argument())
+                  usable = false;
+              break;
             }
-            if(all_type_args && !dt.empty())
-              deduced_types = std::move(dt);
+            if(a.id() != ID_type)
+            {
+              usable = false;
+              break;
+            }
+            dt.push_back(a.type());
           }
+          if(usable && !dt.empty())
+            deduced_types = std::move(dt);
         }
       }
     }
