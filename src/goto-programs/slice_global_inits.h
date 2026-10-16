@@ -35,4 +35,16 @@ void slice_global_inits(
   goto_modelt &goto_model,
   message_handlert &message_handler);
 
+/// Remove the initialization of the C++ virtual tables (symbols named
+/// `virtual_table::...') that no reachable code refers to.  Unlike
+/// slice_global_inits this does not require function pointers to have been
+/// removed: a function is reachable if it is named (called or its address
+/// taken) in reachable code or in the initializer of a global that is kept.
+/// The functions named only in the removed tables are then no longer
+/// address-taken, so a later function pointer removal does not consider
+/// them as targets.
+void slice_unused_virtual_tables(
+  goto_modelt &goto_model,
+  message_handlert &message_handler);
+
 #endif

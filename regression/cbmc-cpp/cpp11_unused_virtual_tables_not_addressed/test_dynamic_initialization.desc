@@ -1,0 +1,15 @@
+CORE
+dynamic_initialization.cpp
+--cpp11 --validate-goto-model
+^\[main\.assertion\.1\] line \d+ global: SUCCESS$
+^\[main\.assertion\.2\] line \d+ static local: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+A class constructed only during dynamic initialization (a global, and a
+block-scope static reached from a global's initializer) keeps its virtual
+table.
