@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.c
 --validate-goto-model
 ^\[main\.assertion\.1\] line \d+ swapped: SUCCESS$

@@ -1,6 +1,6 @@
 CORE
 harness.cpp
---cpp17 -I ../../../src
+--cpp17 -I ../../../src --object-bits 12
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
