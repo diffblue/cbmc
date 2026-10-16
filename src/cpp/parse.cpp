@@ -6826,6 +6826,35 @@ bool Parser::rArgDeclListOrInit(
   cpp_token_buffert::post pos=lex.Save();
   if(maybe_init)
   {
+    // N5008 [dcl.ambig.res]/1: what can be a parameter-declaration-clause is
+    // one.  A list that begins with a name the parser knows as a type (a
+    // typedef, class or type template parameter) followed by what can only
+    // continue a parameter declaration is the parameters of a function
+    // declarator, not an initializer: `int (*p)(A) = f;' with `using A =
+    // long' declared p as an int * initialized from A.
+    cpp_tokent first;
+    if(is_identifier(lex.LookAhead(0, first)))
+    {
+      const new_scopet *entry = lookup_id(first.data.get(ID_C_base_name));
+      const int next = lex.LookAhead(1);
+      if(
+        entry != nullptr &&
+        (entry->kind == new_scopet::kindt::TYPEDEF ||
+         entry->kind == new_scopet::kindt::TAG ||
+         entry->kind == new_scopet::kindt::TYPE_TEMPLATE_PARAMETER) &&
+        (next == ')' || next == ',' || next == '*' || next == '&' ||
+         next == TOK_ANDAND || next == '[' || is_identifier(next)))
+      {
+        if(rArgDeclList(arglist) && lex.LookAhead(0) == ')')
+        {
+          is_args = true;
+          return true;
+        }
+        lex.Restore(pos);
+        arglist.clear();
+      }
+    }
+
     if(rFunctionArguments(arglist))
       if(lex.LookAhead(0)==')')
       {
