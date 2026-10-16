@@ -13100,6 +13100,14 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
             lambda_member_function_names,
             lambda_qualifying_classes);
         }
+        // N5008 [expr.prim.lambda.closure]/5: the function call operator is
+        // a constexpr function if it satisfies the requirements of one; the
+        // constant evaluator attempts it and gives up otherwise.  Not yet
+        // for a generic lambda: its operator() template's instance is
+        // constant-evaluated with the pack folds unexpanded (`(xs + ... +
+        // 0)' for one argument gave 1)
+        if(!is_generic_lambda)
+          op_decl.storage_spec().set_constexpr();
         op_decl.declarators().push_back(op_dtor);
         body.push_back(op_decl);
       }
