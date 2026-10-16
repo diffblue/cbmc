@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ default template argument: SUCCESS$
@@ -11,8 +11,8 @@ main.cpp
 ^CONVERSION ERROR$
 could not be evaluated
 --
-The constant evaluator does not evaluate a call of a closure's function
-call operator: "expected constant expression, but got '(unsigned
-int)plus_one(0)'" (also on develop).  In libstdc++ 16, <format>'s
-__do_vformat_to loses its body (cpp11_libstdcxx_header_drops/
-test_format_typecheck with GCC 16).
+The closure's function call operator was not marked constexpr, so the
+constant evaluator did not evaluate its call: "expected constant
+expression, but got '(unsigned int)plus_one(0)'" (also on develop).  In
+libstdc++ 16, <format>'s __do_vformat_to lost its body through
+__literal_encoding_is_unicode.
