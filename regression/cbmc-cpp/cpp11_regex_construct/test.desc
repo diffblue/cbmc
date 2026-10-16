@@ -17,6 +17,7 @@ deterministic and the body present, symex of the NFA compiler exceeds
 30 minutes at --unwind 5.  The CORE conversion gate is in
 test_conversion.desc.
 KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
-the ctype facet's vtable pointer in regex_traits::translate_nocase reads
-as null ("dereference failure: pointer NULL in ... do_tolower"); not
-reduced yet.
+the classic ctype<char> facet now has a vtable pointer and case mappings
+(cpp11_locale_ctype_char_tolower), but a call of ctype<char>::tolower on
+another ctype<char> object still dispatches to no target
+("dereferenced function pointer must be ...do_tolower"); not reduced yet.
