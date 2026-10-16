@@ -251,21 +251,27 @@ simplify_exprt::resultt<> simplify_exprt::simplify_mult(const mult_exprt &expr)
   }
   else
   {
-    // if the constant is a one and there are other factors; a one that is
-    // `sizeof(T)' (T a character type) is kept: it records the element type
-    // of an allocation `malloc(sizeof(T) * n)' (see symex_allocate) once n
-    // has a value of its own, which may carry the annotation of another
-    // sizeof
-    if(
-      constant_found && *constant == 1 &&
-      constant->find(ID_C_c_sizeof_type).is_nil())
+    // if the constant is a one and there are other factors, delete it; a
+    // one that is `sizeof(T)' (T a character type) leaves its annotation on
+    // the product: it records the element type of an allocation
+    // `malloc(sizeof(T) * n)' (see symex_allocate) also once n has a value
+    // of its own, which may carry the annotation of another sizeof.  (Kept
+    // as a factor, it left `1 * n' in the formula of every char allocation:
+    // 260 more variables in benchcomp's aws_byte_buf_cat.)
+    if(constant_found && *constant == 1)
     {
-      // just delete it
+      // just delete it, but keep a sizeof annotation on the product
+      const irept sizeof_type = constant->find(ID_C_c_sizeof_type);
       new_operands.erase(constant);
       no_change = false;
 
       if(new_operands.size() == 1)
-        return new_operands.front();
+      {
+        exprt result = new_operands.front();
+        if(sizeof_type.is_not_nil())
+          result.set(ID_C_c_sizeof_type, sizeof_type);
+        return result;
+      }
     }
   }
 
