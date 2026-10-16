@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ default argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ explicit: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+to_integer did not accept an enumeration constant with a bool underlying
+type: "template argument expression expected to be scalar constant, but
+got '/*enum*/1'" (also on develop; GCC 14's <format> via subrange).
