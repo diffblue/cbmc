@@ -13,11 +13,24 @@ endif
 
 # Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (cbmc
 # preprocesses with the host gcc); exclude those the host cannot provide.
+# `gcc' may be clang (macOS), whose standard library is libc++: then no test
+# that needs the libstdc++ headers can run (`libstdcxx', `libstdcxxNN').
+# With MSVC, cbmc preprocesses with cl (the MSVC STL) whatever gcc is
+# installed.
+ifeq ($(BUILD_ENV_),MSVC)
+host_gcc_major =
+else ifeq ($(shell gcc --version 2>/dev/null | grep -c clang),0)
 host_gcc_major = $(shell gcc -dumpversion 2>/dev/null | cut -d. -f1)
+else
+host_gcc_major =
+endif
 ifeq ($(shell test -n "$(host_gcc_major)" && test $(host_gcc_major) -ge 12 && echo yes),yes)
   excluded_libstdcxx =
 else
   excluded_libstdcxx = -X libstdcxx12
+endif
+ifeq ($(host_gcc_major),)
+  excluded_libstdcxx += -X libstdcxx
 endif
 ifneq ($(shell test -n "$(host_gcc_major)" && test $(host_gcc_major) -ge 13 && echo yes),yes)
   excluded_libstdcxx += -X libstdcxx13
