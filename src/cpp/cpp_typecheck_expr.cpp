@@ -8469,6 +8469,22 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
   // it to the explicit-constructor-call form the rest of the type
   // checker expects; otherwise the raw type node reaches expression
   // type-checking and fails with "unexpected expression: signedbv".
+  // The fold-expression expansion (expand_folds_over_pack) substitutes a
+  // type pack element as an `ID_type` expression wrapping the type:
+  // `(test(Args()) + ...)' in libc++ 19's __promote, behind copysign and
+  // hence __hermite in <cmath> (the macOS CI job).
+  if(
+    expr.function().id() == ID_type && expr.function().operands().empty() &&
+    expr.function().type().is_not_nil())
+  {
+    exprt ctor_call("explicit-constructor-call");
+    ctor_call.type() = expr.function().type();
+    ctor_call.operands() = expr.arguments();
+    ctor_call.add_source_location() = expr.source_location();
+    expr.swap(ctor_call);
+    typecheck_expr(expr);
+    return;
+  }
   if(
     expr.function().id() != ID_cpp_name && expr.function().id() != ID_symbol &&
     (expr.function().id() == ID_signedbv ||
