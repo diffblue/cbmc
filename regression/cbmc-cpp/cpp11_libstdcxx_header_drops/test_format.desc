@@ -1,4 +1,4 @@
-KNOWNBUG libstdcxx13
+KNOWNBUG libstdcxx13 libstdcxx
 format.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ format: SUCCESS$

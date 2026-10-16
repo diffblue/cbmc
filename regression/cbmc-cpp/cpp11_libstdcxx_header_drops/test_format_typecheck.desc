@@ -1,4 +1,4 @@
-CORE libstdcxx13 broken-libstdcxx16
+CORE libstdcxx13 broken-libstdcxx16 libstdcxx
 format.cpp
 --cpp20 --show-goto-functions
 ^EXIT=0$

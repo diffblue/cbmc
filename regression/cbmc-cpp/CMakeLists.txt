@@ -10,7 +10,21 @@ endif()
 # compiler cmake builds with), so ask it, and exclude the tags whose
 # requirement it does not meet.
 find_program(HOST_GCC gcc)
-if(HOST_GCC)
+# `gcc' may be clang (macOS), whose standard library is libc++: then no test
+# that needs the libstdc++ headers can run (`libstdcxx', `libstdcxxNN').
+# With MSVC, cbmc preprocesses with cl (the MSVC STL) whatever gcc is
+# installed (Strawberry Perl ships one).
+set(host_gcc_is_gnu FALSE)
+if(HOST_GCC AND NOT "${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  execute_process(
+    COMMAND ${HOST_GCC} --version
+    OUTPUT_VARIABLE HOST_GCC_VERSION_TEXT
+    ERROR_QUIET)
+  if(NOT HOST_GCC_VERSION_TEXT MATCHES "clang")
+    set(host_gcc_is_gnu TRUE)
+  endif()
+endif()
+if(host_gcc_is_gnu)
   execute_process(
     COMMAND ${HOST_GCC} -dumpversion
     OUTPUT_VARIABLE HOST_GCC_VERSION
@@ -28,7 +42,7 @@ if(HOST_GCC)
     list(APPEND gcc_only -X broken-libstdcxx16)
   endif()
 else()
-  list(APPEND gcc_only -X libstdcxx12 -X libstdcxx13 -X libstdcxx16)
+  list(APPEND gcc_only -X libstdcxx -X libstdcxx12 -X libstdcxx13 -X libstdcxx16)
 endif()
 
 # On GCC < 13, system header processing leaves more incomplete template

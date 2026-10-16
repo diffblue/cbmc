@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 atomic.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ atomic: SUCCESS$
