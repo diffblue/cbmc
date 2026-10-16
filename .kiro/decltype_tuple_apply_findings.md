@@ -14570,3 +14570,55 @@ Verification (W140 at e8bff354c0, before the doxygen fixup): cbmc-cpp
 limit), cpp 246, regression/cbmc 1213, ansi-c 270, goto-instrument 298,
 cbmc-library 522, unit-proofs 13, unit 620, all exit 0; lint 0,
 clang-format 0, doxygen 0; all 50 commits since cca717a833 compile.
+
+## Round 186 (CI follow-up 2)
+
+CI run 3 (a1a1c3b9a7) failures and the fixes on top of it:
+
+- gcc-14 cbmc-cpp (test_chrono, test_format_typecheck,
+  namespace_reopened test_libstdcxx): <format>'s _M_parse_fill_and_align
+  lost its body.  eede47526a let __literal_encoding_is_unicode evaluate,
+  which made `_Utf32_view<subrange<iterator>> __uv({__first, __last})'
+  reachable; subrange's constructor `subrange(auto __first, _Sent __last)'
+  is an abbreviated function template, and only namespace-scope ones were
+  recognized (5417270ab5, [dcl.fct]/22).  Reduced from GCC 13 headers too
+  (cvise, /tmp/r186/cv_sr3).  That change exposed libc++'s CPO pattern
+  `void operator()(auto &&) const = delete;' next to a constrained
+  operator(): equally specialized templates were not ordered by their
+  constraints (d3f8f3f456, [temp.func.order]/6.4).
+- macOS 14: no single hanging test, the cbmc-cpp suite takes about 4700 s
+  serially; CORE now runs in four ctest shards (daacb15f9e).
+- VS 2026: Windows' timeout.exe in test.pl produced no output
+  (e4d7006ba9).
+- THOROUGH: unit-proofs/strip_string needs 3.1 GB (896cba3c4e).
+- macOS 15 make (117 of 1945 failed): mostly libc++ 19 __get_property,
+  apply and std::function/bind/variant through __invoke; bd5bdb6dbe fixes
+  the __invoke ambiguity (no dropped bodies in the libc++ 19 .ii files
+  with --stdlib libc++).  Needs the next CI run to confirm.
+- VS 2022 make: the MSVC STL failures (_Atomic_lock_release, _Incref_nz,
+  ...) known from earlier runs.
+- benchcomp aws_byte_buf_cat 1.58x: same VCCs, program steps, CNF size;
+  clause order differs and local solver times overlap.  Not resolved.
+
+#5: a non-generic lambda's operator() is constexpr (58f8b77df2), with
+a31dce9661 (defaulted non-type template argument) and c1584b2052
+(reference-returning calls, __builtin_is_constant_evaluated).
+
+GCC 16: deducing this on a const object (`this Self &&self') was
+rejected by member_template_object_viable (5c30dc9bd7).  Still open and
+tagged broken-libstdcxx16: views::transform/filter (__invoke_impl now
+fails constructing _Partial from the view: "template 'forward' not
+found"), __should_escape_ascii (constant evaluation of
+`*operator[](&_S_bslash(), 0ul)'), test_chrono.  Their reductions need the
+gcc16-gate container and did not converge this round.
+
+Also: the classic ctype<char> facet model (a3704d693a), bool-based
+enumeration template arguments (b6197b04fe).
+
+Verification (W144 at 5417270ab5): cbmc-cpp 1953, libcxx profile 1953,
+KNOWNBUG profile (test_format passes only above CI's memory limit and
+reports OK under CBMC_TEST_MEMLIMIT=2500000), cpp 246, regression/cbmc
+1213, ansi-c 270, goto-instrument 298, cbmc-library 522, unit-proofs 13,
+unit 620, all 0 failures; platform_check gcc11/m32/arm64 pass; the
+validate, paths, cprover-smt2, new-smt and z3 profiles pass; lint 0,
+clang-format 0, doxygen 0; every commit since cca717a833 compiles.

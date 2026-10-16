@@ -2076,3 +2076,10 @@ GCC 11 headers (/tmp/r186/gcc11/bin) and with --arch arm64.
 No dog-food change.  Before pushing, run scripts/platform_check.sh
 (GCC 11 headers, 32-bit, arm64); details in
 .kiro/decltype_tuple_apply_findings.md, "Round 186 (CI follow-up)".
+
+## CI follow-up 2 2026-10-16 (round 186)
+
+No dog-food change.  The cprover-smt2 profile needs smt2_solver on PATH;
+without it three regression/cbmc tests fail with VERIFICATION ERROR.
+Details in .kiro/decltype_tuple_apply_findings.md, "Round 186 (CI
+follow-up 2)".
