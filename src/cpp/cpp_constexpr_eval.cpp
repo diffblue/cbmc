@@ -278,6 +278,14 @@ static std::optional<mp_integer> integer_constant(const exprt &e)
 static std::optional<array_pointert>
 array_pointer(const exprt &e, const symbol_table_baset &symbol_table)
 {
+  // a qualification conversion (`char *' to `const char *', [conv.qual]):
+  // the same pointer
+  if(
+    e.id() == ID_typecast && e.type().id() == ID_pointer &&
+    to_typecast_expr(e).op().type().id() == ID_pointer)
+  {
+    return array_pointer(to_typecast_expr(e).op(), symbol_table);
+  }
   // `&a[i] + n' (the simplifier's form of `&a[i + n]')
   if(
     (e.id() == ID_plus || e.id() == ID_minus) && e.operands().size() == 2 &&
@@ -531,7 +539,8 @@ public:
       if(e.operands().size() != 2)
         return false;
       exprt rhs = eval(e.operands()[1]);
-      if(!is_constant_value(rhs))
+      // also a pointer into a constant array (`e = "U8"')
+      if(!is_constant_value(rhs, symbol_table))
         return false;
       vars[var] = rhs;
       return true;
@@ -653,6 +662,21 @@ public:
       e.type() == to_unary_expr(e).op().type())
     {
       return eval(to_unary_expr(e).op());
+    }
+    // N5008 [expr.unary.op]/3: `&a[i]' denotes an object, not a value: only
+    // the index is evaluated (evaluating `a[i]' read the element and made
+    // `const char *e = "U8"' the address of a character constant)
+    if(
+      e.id() == ID_address_of && e.operands().size() == 1 &&
+      to_address_of_expr(e).object().id() == ID_index &&
+      is_constant_array_object(
+        to_index_expr(to_address_of_expr(e).object()).array(), symbol_table))
+    {
+      exprt result = e;
+      exprt &index = to_index_expr(to_address_of_expr(result).object()).index();
+      index = eval(index);
+      simplify(index, ns);
+      return result;
     }
     if(const auto idx = this_member_index(e))
     {
