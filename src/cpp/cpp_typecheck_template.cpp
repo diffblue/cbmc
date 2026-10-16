@@ -2241,26 +2241,64 @@ void cpp_typecheckt::convert_class_template_specialization(
 
   // get the template symbol
 
-  auto id_set = cpp_scopes.current_scope().lookup(
-    base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
-
   // remove any specializations and non-class templates (e.g., constructor
   // templates that share the class name)
-  for(cpp_scopest::id_sett::iterator it = id_set.begin();
-      it != id_set.end();) // no it++
+  const auto primary_class_templates = [&](cpp_scopet &scope)
   {
-    cpp_scopest::id_sett::iterator next = it;
-    next++;
-
-    const symbolt &sym = lookup((*it)->identifier);
-    if(
-      sym.type.find(ID_specialization_of).is_not_nil() ||
-      !to_cpp_declaration(sym.type).is_class_template())
+    auto id_set = scope.lookup(
+      base_name, cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE);
+    for(cpp_scopest::id_sett::iterator it = id_set.begin();
+        it != id_set.end();) // no it++
     {
-      id_set.erase(it);
-    }
+      cpp_scopest::id_sett::iterator next = it;
+      next++;
 
-    it = next;
+      const symbolt &sym = lookup((*it)->identifier);
+      if(
+        sym.type.find(ID_specialization_of).is_not_nil() ||
+        !to_cpp_declaration(sym.type).is_class_template())
+      {
+        id_set.erase(it);
+      }
+
+      it = next;
+    }
+    return id_set;
+  };
+
+  auto id_set = primary_class_templates(cpp_scopes.current_scope());
+
+  // N5008 [namespace.def.general]/7: a member of an inline namespace (and,
+  // transitively, of an inline namespace of that) can be explicitly
+  // specialized as though it were a member of the enclosing namespace --
+  // `namespace std { template <> struct hash<K> ... }' for libc++'s
+  // std::__1::hash.
+  // The specialization is then declared in that inline namespace, next to
+  // its primary template, so that naming the template through either
+  // namespace finds it.
+  if(id_set.empty())
+  {
+    std::vector<cpp_scopet *> pending =
+      cpp_scopes.current_scope().inline_namespaces();
+    cpp_scopet *found_in = nullptr;
+    while(!pending.empty() && found_in == nullptr)
+    {
+      std::vector<cpp_scopet *> next_level;
+      for(cpp_scopet *scope : pending)
+      {
+        const auto found = primary_class_templates(*scope);
+        if(!found.empty() && found_in == nullptr)
+        {
+          id_set = found;
+          found_in = scope;
+        }
+        for(cpp_scopet *inner : scope->inline_namespaces())
+          next_level.push_back(inner);
+      }
+      pending.swap(next_level);
+    }
+    if(found_in != nullptr)
+      cpp_scopes.go_to(*found_in);
   }
 
   // only one should be left
