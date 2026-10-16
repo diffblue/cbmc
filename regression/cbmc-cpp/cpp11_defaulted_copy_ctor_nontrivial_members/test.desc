@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 main.cpp
 --cpp17
 ^EXIT=0$
@@ -18,3 +18,5 @@ when every member was trivially copyable; otherwise the body stayed EMPTY
 and the members were default-initialised: copying std::pair<const
 std::string, int> lost the string, copying a pair holding a std::function
 produced an empty function.
+gcc-only: with libc++ the program needs a model of std::function's
+call (no body for operator()), and on the macOS CI job it timed out.

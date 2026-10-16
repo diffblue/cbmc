@@ -46,10 +46,15 @@ endif()
 # (the slowest passing test took 339 s on the macOS CI runner).
 set(cbmc_cpp_test_timeout -t 900)
 
-add_test_pl_tests(
-    "${cbmc_cmd}" ${gcc_only} -X libcxx ${cbmc_cpp_test_timeout}
-)
-set_tests_properties("cbmc-cpp-CORE" PROPERTIES TIMEOUT 4800)
+# CORE as four shards that ctest runs in parallel: run serially, the suite
+# exceeded the 4800 s TIMEOUT on the macOS CI runner (about 2900 s of
+# passing tests there), with no single test at fault.
+set(cbmc_cpp_flags ${gcc_only} -X libcxx ${cbmc_cpp_test_timeout})
+add_sharded_test_pl_profile(
+    "cbmc-cpp" "${cbmc_cmd}" "-C;${cbmc_cpp_flags}" CORE "cbmc-cpp" 4 4800)
+add_test_pl_profile("cbmc-cpp" "${cbmc_cmd}" -T THOROUGH ${cbmc_cpp_flags})
+add_test_pl_profile("cbmc-cpp" "${cbmc_cmd}" -F FUTURE ${cbmc_cpp_flags})
+add_test_pl_profile("cbmc-cpp" "${cbmc_cmd}" -K KNOWNBUG ${cbmc_cpp_flags})
 
 # libc++ tests run without --validate-goto-model because system header
 # processing may leave missing symbols in the goto model.
