@@ -15,6 +15,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <util/c_types.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
+#include <util/prefix.h>
 #include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/symbol_table_base.h>
@@ -876,6 +877,18 @@ public:
     }
     if(e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
     {
+      // N5008 [meta.const.eval]/1: within a constant evaluation,
+      // is_constant_evaluated() is true (libstdc++'s char_traits::length
+      // takes its constexpr loop on it)
+      const exprt &callee = to_side_effect_expr_function_call(e).function();
+      if(
+        callee.id() == ID_symbol &&
+        has_prefix(
+          id2string(to_symbol_expr(callee).get_identifier()),
+          "__builtin_is_constant_evaluated"))
+      {
+        return typecast_exprt::conditional_cast(true_exprt{}, e.type());
+      }
       // Recursively evaluate nested function calls (their ARGUMENTS
       // evaluated first, so a call on tracked variables folds too)
       exprt call_copy = e;
@@ -890,6 +903,24 @@ public:
     exprt result = e;
     for(auto &op : result.operands())
       op = eval(op);
+    // the implicit dereference of a reference-returning call: the call's
+    // value is the referenced object itself (try_evaluate_constexpr unwraps
+    // `&constant'), or its address
+    if(
+      result.id() == ID_dereference && result.operands().size() == 1 &&
+      e.get_bool(ID_C_implicit) &&
+      to_dereference_expr(e).pointer().id() == ID_side_effect)
+    {
+      const exprt &value = to_dereference_expr(result).pointer();
+      if(value.type().id() != ID_pointer && is_constant_value(value))
+        return value;
+      if(
+        value.id() == ID_address_of &&
+        is_constant_value(to_address_of_expr(value).object()))
+      {
+        return to_address_of_expr(value).object();
+      }
+    }
     // N5008 [expr.add]/4: pointer +/- integer on a tracked array pointer;
     // [expr.eq]/3, [expr.rel]/4: two pointers into the same array compare
     // by element index

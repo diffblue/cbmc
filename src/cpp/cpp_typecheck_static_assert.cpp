@@ -9,6 +9,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 /// \file
 /// C++ Language Type Checking
 
+#include <util/pointer_expr.h>
 #include <util/simplify_expr.h>
 #include <util/string_constant.h>
 #include <util/symbol_table_base.h>
@@ -53,6 +54,22 @@ void cpp_typecheckt::propagate_constants(
 
   for(auto &op : expr.operands())
     propagate_constants(op, symbol_table);
+
+  // the implicit dereference of a reference-returning call
+  // (`s.at(1)' with `const char &at(int) const'): the evaluator yields the
+  // referenced value itself, not its address
+  if(
+    expr.id() == ID_dereference && expr.get_bool(ID_C_implicit) &&
+    expr.operands().size() == 1 &&
+    to_dereference_expr(expr).pointer().id() != ID_side_effect &&
+    to_dereference_expr(expr).pointer().type().id() != ID_pointer &&
+    (to_dereference_expr(expr).pointer().is_constant() ||
+     to_dereference_expr(expr).pointer().id() == ID_struct))
+  {
+    exprt value = to_dereference_expr(expr).pointer();
+    expr.swap(value);
+    return;
+  }
 
   // N5008 [expr.const]/5: with its operands folded, a call of a constexpr
   // function or a temporary built by a constexpr constructor is evaluated
