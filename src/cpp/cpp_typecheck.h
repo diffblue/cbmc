@@ -357,6 +357,7 @@ protected:
   void convert(cpp_usingt &);
   void convert(cpp_itemt &);
   void convert(cpp_declarationt &);
+  void make_abbreviated_function_template(cpp_declarationt &);
   void convert(cpp_declaratort &);
   void convert(cpp_static_assertt &);
   void propagate_constants(exprt &expr, const symbol_table_baset &symbol_table);
