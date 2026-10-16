@@ -3,7 +3,7 @@ main.cpp
 --cpp17 --show-goto-functions
 ^EXIT=0$
 ^SIGNAL=0$
-^.*std::optional<std::tag-pair<signed_int,signed_int>>::optional\(this,(ref|rref).*$
+optional<std::(__1::)?tag-pair<signed_int,signed_int>>::optional\(this,r?ref
 --
 ^CONVERSION ERROR$
 ^PARSING ERROR$
