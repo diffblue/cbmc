@@ -10845,7 +10845,21 @@ bool cpp_typecheck_resolvet::apply_default_template_arguments(
             exprt default_val = param.default_argument();
             expand_own_pack_folds(default_val);
             cpp_typecheck.template_map.apply(default_val);
-            cpp_typecheck.typecheck_expr(default_val);
+            {
+              // N5008 [temp.arg.nontype]/1: a converted constant expression;
+              // evaluated as such (constexpr calls, is_constant_evaluated()
+              // true), so that the instance's parameter is its value and not
+              // a run-time call
+              cpp_typecheckt::constant_expression_contextt constant_guard{
+                cpp_typecheck};
+              cpp_typecheck.typecheck_expr(default_val);
+            }
+            exprt folded = default_val;
+            cpp_typecheck.propagate_constants(
+              folded, cpp_typecheck.symbol_table);
+            simplify(folded, cpp_typecheck);
+            if(folded.is_constant())
+              default_val = folded;
             return default_val;
           };
           exprt default_val;
