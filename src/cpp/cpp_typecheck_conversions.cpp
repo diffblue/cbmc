@@ -1260,12 +1260,28 @@ bool cpp_typecheckt::function_template_at_least_as_specialised(
   const code_typet::parameterst &F_params = to_code_type(F_ft).parameters();
   const code_typet::parameterst &G_params = to_code_type(G_ft).parameters();
 
-  // Only compare when the parameter-type-lists correspond (same arity).
-  // (Partial ordering across differing arities -- packs, default args --
-  // is out of scope here; such candidates are left to the other tie-
-  // breakers / reported as ambiguous, never wrongly ordered.)
-  if(F_params.empty() || F_params.size() != G_params.size())
+  // N5008 [temp.deduct.partial]/8, /11: a function parameter pack of G
+  // (`Args &&...') deduces from every remaining parameter of F, while a
+  // pack of F matches no non-pack parameter of G.  Handle the case of a G
+  // whose whole parameter-type-list is one pack of a forwarding reference
+  // or a plain type parameter -- libc++'s fall-back `__nat
+  // __invoke(_Args&&...)' against `__invoke(_Fp&&, _Args&&...)': every F is
+  // at least as specialized as it, and it as no F with a non-pack
+  // parameter.
+  const auto is_pack = [](const code_typet::parametert &p)
+  { return p.get_bool(ID_ellipsis) || p.type().get_bool(ID_ellipsis); };
+  const auto only_pack = [&](const code_typet::parameterst &ps)
+  { return ps.size() == 1 && is_pack(ps.front()); };
+  if(F_params.size() != G_params.size() || F_params.empty())
+  {
+    if(only_pack(G_params) && !only_pack(F_params))
+      return true;
+    // Partial ordering across other differing arities (default arguments,
+    // packs in other positions) is out of scope here; such candidates are
+    // left to the other tie-breakers / reported as ambiguous, never wrongly
+    // ordered.
     return false;
+  }
 
   auto strip_top_reference = [](typet &t)
   {
