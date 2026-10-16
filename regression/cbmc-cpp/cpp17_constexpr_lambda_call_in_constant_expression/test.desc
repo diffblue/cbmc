@@ -1,0 +1,18 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ default template argument: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+could not be evaluated
+--
+The constant evaluator does not evaluate a call of a closure's function
+call operator: "expected constant expression, but got '(unsigned
+int)plus_one(0)'" (also on develop).  In libstdc++ 16, <format>'s
+__do_vformat_to loses its body (cpp11_libstdcxx_header_drops/
+test_format_typecheck with GCC 16).
