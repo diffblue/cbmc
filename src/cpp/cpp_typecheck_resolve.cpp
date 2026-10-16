@@ -2516,9 +2516,24 @@ bool cpp_typecheck_resolvet::member_template_object_viable(
   const cpp_declarationt &decl = to_cpp_declaration(tsym->type);
   if(decl.declarators().empty())
     return true;
-  // static member templates have no implicit object parameter
-  if(decl.storage_spec().is_static())
+  // static member templates have no implicit object parameter, nor does a
+  // member with an explicit object parameter ([dcl.fct]/6, `this Self
+  // &&self': Self deduces const for a const object, [over.match.funcs]/4)
+  if(decl.storage_spec().is_static() || cand.type().get_bool("explicit_this"))
     return true;
+  {
+    const irept &first_param =
+      decl.declarators().front().type().find(ID_parameters).get_sub().empty()
+        ? get_nil_irep()
+        : decl.declarators()
+            .front()
+            .type()
+            .find(ID_parameters)
+            .get_sub()
+            .front();
+    if(first_param.get_bool("explicit_this"))
+      return true;
+  }
   const typet &mq = static_cast<const typet &>(
     decl.declarators().front().find(ID_method_qualifier));
   const bool member_const = cpp_typecheck.has_const(mq);
