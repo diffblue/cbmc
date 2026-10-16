@@ -1,0 +1,19 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ called: SUCCESS$
+^\[main\.assertion\.2\] line \d+ deduced: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+decltype(invoke()) in a static data member's initializer, where invoke
+calls a member template with a deduced return type, is not int while the
+class is instantiated ("template 'element' not found"; assertion 2 fails).
+GCC 11's std::visit (cpp17_visit_libstdcxx) has this shape (_S_apply's
+decltype(__visit_invoke(...)) in __gen_vtable's static _S_vtable) and drops
+declval<decltype()>; not confirmed to be the same cause.
