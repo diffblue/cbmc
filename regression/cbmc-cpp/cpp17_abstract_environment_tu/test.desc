@@ -1,4 +1,4 @@
-KNOWNBUG
+THOROUGH
 main.cpp
 --cpp17 -I ../../../src --object-bits 12 --unwind 1 --no-unwinding-assertions --property main.assertion.1 ../../../src/analyses/variable-sensitivity/abstract_environment.cpp
 ^\[main\.assertion\.1\] line \d+ abstract_environment converts: SUCCESS$
@@ -13,9 +13,7 @@ conversion + property-restricted BMC take ~7m45s, beyond the CORE
 -t 300 budget, hence THOROUGH.  Previously parked as "solver timeout
 >1h" on the FULL property set; --property restricts to the harness
 assertion (the rest is sound havoc of out-of-TU functions).
-KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
---validate-goto-model fails "symbol_expr_type_matches_symbol_table" on
-assume_not in the dynamic initialization of abstract_environment.cpp's
-`static auto assume_functions = std::map<irep_idt, assume_function>{{ID_not,
-assume_not}, ...}' (line 290; assume_not is declared static and defined
-later).  Hand-made programs of that shape pass; not reduced yet.
+THOROUGH again 2026-10-16 (82 s, 0.8 GB): the --validate-goto-model
+failure on assume_not, whose address the static map initializer takes,
+was elide_cpp_returned_temporaries leaving the old type on non-call
+references (cpp17_returned_class_function_address_taken).
