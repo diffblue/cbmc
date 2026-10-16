@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only gcc16
 main.ii
 --cpp23
 ^\[main\.assertion\.1\] line \d+ has value: SUCCESS$

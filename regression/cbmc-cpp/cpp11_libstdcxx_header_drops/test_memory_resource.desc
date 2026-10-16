@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 memory_resource.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ pool_options: SUCCESS$

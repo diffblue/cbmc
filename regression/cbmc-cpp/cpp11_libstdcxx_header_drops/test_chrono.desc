@@ -1,4 +1,4 @@
-CORE broken-libstdcxx16
+CORE broken-libstdcxx16 libstdcxx
 chrono.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ duration: SUCCESS$

@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 libstdcxx.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ invoke: SUCCESS$

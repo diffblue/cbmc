@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 istream.cpp
 --cpp11
 ^\[main\.assertion\.1\] line \d+ header: SUCCESS$

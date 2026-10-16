@@ -1,4 +1,4 @@
-CORE gcc-only
+CORE gcc-only libstdcxx
 ostream_int.cpp
 --cpp17 --unwind 8 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ int inserted: SUCCESS$

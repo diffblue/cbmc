@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 main.cpp
 --cpp11 --show-symbol-table
 ^Symbol\.+: std::__detail::_Compiler<std::__cxx11::tag-regex_traits<char>>::_M_disjunction\(this\)::\$tmp::return_value__M_insert_alt$
