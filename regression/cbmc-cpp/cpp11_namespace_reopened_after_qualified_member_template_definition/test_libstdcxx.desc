@@ -1,4 +1,4 @@
-CORE libstdcxx13
+CORE libstdcxx13 broken-libstdcxx16
 libstdcxx.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ the translation unit converts: SUCCESS$
@@ -20,3 +20,5 @@ fixed too: format:1422 and format:3124 _M_visit
 (cpp11_member_template_argument_converted_to_non_deduced_parameter); bin53
 dropped more than ten bodies.  g++ 13 accepts this program, and it fails
 only its WRONG assertion.
+broken-libstdcxx16: with libstdc++ 16, __do_vformat_to loses its body
+(cpp17_constexpr_lambda_call_in_constant_expression).

@@ -1,4 +1,4 @@
-CORE
+CORE broken-libstdcxx16
 main.cpp
 --cpp20 --unwind 6
 ^\[main\.assertion\.1\] .* iota: SUCCESS$
@@ -15,3 +15,6 @@ main.cpp
 --
 g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
 and it fails only its WRONG assertion.
+broken-libstdcxx16: with libstdc++ 16, std::__invoke of the
+views::transform and views::filter range adaptor closures loses its body;
+not reduced yet.
