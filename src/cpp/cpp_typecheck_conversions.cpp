@@ -118,6 +118,33 @@ bool cpp_typecheckt::standard_conversion_function_to_pointer(
   return true;
 }
 
+/// Whether \p a and \p b, which operator== already found equal, also
+/// agree in the \#c_type comment of every subtree.  operator== ignores
+/// comments, but \#c_type tells distinct fundamental types of the same
+/// representation apart (int and a 32-bit long, char and signed char, char8_t
+/// and unsigned char; N5008 [basic.fundamental]), including in the parameter
+/// types of a function type: int(*)(long) is not int(*)(long long).
+static bool same_c_types(const irept &a, const irept &b)
+{
+  if(a.get(ID_C_c_type) != b.get(ID_C_c_type))
+    return false;
+  const auto &sa = a.get_sub();
+  const auto &sb = b.get_sub();
+  if(sa.size() != sb.size())
+    return false;
+  for(std::size_t i = 0; i < sa.size(); ++i)
+    if(!same_c_types(sa[i], sb[i]))
+      return false;
+  for(const auto &named : a.get_named_sub())
+  {
+    if(irept::is_comment(named.first))
+      continue;
+    if(!same_c_types(named.second, b.find(named.first)))
+      return false;
+  }
+  return true;
+}
+
 /// Qualification conversion
 /// \par parameters: A typechecked expression 'expr', a destination
 /// type 'type'
@@ -176,7 +203,7 @@ bool cpp_typecheckt::standard_conversion_qualification(
   // [conv.qual]/3 requires similar types; operator== above ignores the
   // #c_type comment, which distinguishes char8_t from an unsigned char
   // (aarch64), and char from signed char
-  if(sub_from.get(ID_C_c_type) != sub_to.get(ID_C_c_type))
+  if(!same_c_types(sub_from, sub_to))
     return false;
 
   c_qualifierst qual_from(sub_from);
@@ -893,10 +920,9 @@ bool cpp_typecheckt::standard_conversion_sequence(
     }
   }
 
-  // need to consider #c_type
-  if(
-    curr_expr.type() != type ||
-    curr_expr.type().get(ID_C_c_type) != type.get(ID_C_c_type))
+  // need to consider #c_type, also below the top level (pointers to
+  // functions whose parameter types differ only in it)
+  if(curr_expr.type() != type || !same_c_types(curr_expr.type(), type))
   {
     if(
       type.id() == ID_signedbv || type.id() == ID_unsignedbv ||
