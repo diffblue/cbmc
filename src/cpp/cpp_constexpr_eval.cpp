@@ -262,9 +262,34 @@ is_constant_array_object(const exprt &e, const symbol_table_baset &symbol_table)
 }
 
 /// The array and index a tracked array pointer denotes, or nothing
+/// The value of an integer constant, also through integer conversions
+/// (`(int)1')
+static std::optional<mp_integer> integer_constant(const exprt &e)
+{
+  if(e.is_constant())
+    return numeric_cast<mp_integer>(to_constant_expr(e));
+  if(
+    e.id() == ID_typecast &&
+    (e.type().id() == ID_signedbv || e.type().id() == ID_unsignedbv))
+    return integer_constant(to_typecast_expr(e).op());
+  return std::nullopt;
+}
+
 static std::optional<array_pointert>
 array_pointer(const exprt &e, const symbol_table_baset &symbol_table)
 {
+  // `&a[i] + n' (the simplifier's form of `&a[i + n]')
+  if(
+    (e.id() == ID_plus || e.id() == ID_minus) && e.operands().size() == 2 &&
+    e.type().id() == ID_pointer)
+  {
+    auto ap = array_pointer(to_binary_expr(e).op0(), symbol_table);
+    const auto n = integer_constant(to_binary_expr(e).op1());
+    if(!ap.has_value() || !n.has_value())
+      return std::nullopt;
+    ap->index += e.id() == ID_plus ? *n : -*n;
+    return ap;
+  }
   if(e.id() != ID_address_of || e.operands().size() != 1)
     return std::nullopt;
   const exprt &object = to_address_of_expr(e).object();
@@ -272,13 +297,11 @@ array_pointer(const exprt &e, const symbol_table_baset &symbol_table)
     return array_pointert{object, 0};
   if(
     object.id() != ID_index ||
-    !is_constant_array_object(to_index_expr(object).array(), symbol_table) ||
-    !to_index_expr(object).index().is_constant())
+    !is_constant_array_object(to_index_expr(object).array(), symbol_table))
   {
     return std::nullopt;
   }
-  const auto index =
-    numeric_cast<mp_integer>(to_constant_expr(to_index_expr(object).index()));
+  const auto index = integer_constant(to_index_expr(object).index());
   if(!index.has_value())
     return std::nullopt;
   return array_pointert{to_index_expr(object).array(), *index};
@@ -388,6 +411,25 @@ public:
     return false;
   }
 
+  /// As is_constant_value, also for an aggregate with aggregate members or
+  /// members that point into a constant array ([expr.const]/14: a pointer
+  /// to an element of a string literal is a permitted result) -- the
+  /// `const C *' of a string_view built from a literal.
+  static bool
+  is_constant_value(const exprt &e, const symbol_table_baset &symbol_table)
+  {
+    if(e.is_constant() || array_pointer(e, symbol_table).has_value())
+      return true;
+    if(e.id() == ID_array || e.id() == ID_struct)
+    {
+      for(const auto &op : e.operands())
+        if(!is_constant_value(op, symbol_table))
+          return false;
+      return true;
+    }
+    return false;
+  }
+
   // Set when a statement's effect could not be tracked or a condition could
   // not be decided: the evaluation is then abandoned as a whole.  Continuing
   // with stale variable values produced WRONG results (`++p; return *p'
@@ -434,7 +476,7 @@ public:
       if(const auto idx = this_member_index(e.operands()[0]))
       {
         exprt rhs = eval(e.operands()[1]);
-        if(!is_constant_value(rhs))
+        if(!is_constant_value(rhs, symbol_table))
           return false;
         exprt &obj = vars.at(this_id);
         if(*idx >= obj.operands().size())
@@ -603,6 +645,15 @@ public:
 
   exprt eval(const exprt &e)
   {
+    // N5008 [expr.type.conv]/2: `T{...}' is a prvalue of class type T whose
+    // value is its initializer; the front end wraps the struct in a compound
+    // literal (`return P{1, 2};' in a constexpr function)
+    if(
+      e.id() == ID_compound_literal && e.operands().size() == 1 &&
+      e.type() == to_unary_expr(e).op().type())
+    {
+      return eval(to_unary_expr(e).op());
+    }
     if(const auto idx = this_member_index(e))
     {
       const exprt &obj = vars.at(this_id);
@@ -759,6 +810,45 @@ public:
       }
       simplify(result, ns);
       return result;
+    }
+    if(e.id() == ID_side_effect && e.get(ID_statement) == ID_temporary_object)
+    {
+      // N5008 [expr.type.conv]/2, [class.temporary]: `return T(args)' -- a
+      // temporary constructed from arguments that may name tracked variables
+      // (`sv(p + pos, len)' in string_view::substr): evaluate the arguments
+      // of the initializing constructor call, then the temporary
+      exprt temporary = e;
+      irept &init = temporary.add(ID_initializer);
+      if(
+        init.id() == ID_code &&
+        to_code(static_cast<exprt &>(init)).get_statement() == ID_expression &&
+        static_cast<exprt &>(init).operands().size() == 1)
+      {
+        exprt &call = static_cast<exprt &>(init).operands().front();
+        if(
+          call.id() == ID_side_effect &&
+          call.get(ID_statement) == ID_function_call)
+        {
+          auto &args = to_side_effect_expr_function_call(call).arguments();
+          for(std::size_t i = 1; i < args.size(); ++i) // 0: &new_object
+          {
+            // a pointer into a constant array (`&"..."[0]') is a value as
+            // it stands; evaluating it would read the element
+            if(!array_pointer(args[i], symbol_table).has_value())
+              args[i] = eval(args[i]);
+          }
+        }
+      }
+      for(auto &op : temporary.operands())
+        op = eval(op);
+      exprt evaluated = evaluate_temporary_object(
+        temporary, symbol_table, ns, ensure_definition);
+      if(evaluated.is_not_nil())
+        return evaluated;
+      // not evaluable here: left as it is, as before (an unused tag object
+      // argument such as `__is_move_insertable<_Alloc>{}' must not fail the
+      // whole evaluation)
+      return e;
     }
     if(e.id() == ID_side_effect && e.get(ID_statement) == ID_function_call)
     {
@@ -1203,7 +1293,17 @@ exprt try_evaluate_constexpr(
         obj.operands()[0].is_constant())
         vars[params[i].get_identifier()] = obj.operands()[0];
       else
-        vars[params[i].get_identifier()] = arguments[i];
+      {
+        // `&"ab"[(int)1]': fold the index so that the pointer is tracked as
+        // a pointer into the array (array_pointer)
+        // (only the index: the simplifier rewrites the whole address to
+        // `&"ab"[0] + 1')
+        exprt argument = arguments[i];
+        exprt &object = to_address_of_expr(argument).object();
+        if(object.id() == ID_index)
+          simplify(to_index_expr(object).index(), ns);
+        vars[params[i].get_identifier()] = std::move(argument);
+      }
     }
     else
     {
@@ -1230,7 +1330,7 @@ exprt try_evaluate_constexpr(
     // the constructor's result is the constructed object; a `return;` (or
     // falling off the end) leaves the tracked value as it is
     const exprt &obj = interpreter.vars.at(this_id);
-    return constexpr_interpretert::is_constant_value(obj)
+    return constexpr_interpretert::is_constant_value(obj, symbol_table)
              ? obj
              : static_cast<exprt>(nil_exprt());
   }
@@ -1238,6 +1338,15 @@ exprt try_evaluate_constexpr(
   {
     if(result->is_constant())
       return *result;
+    // a class prvalue ([expr.const]/14: a constant expression of class type
+    // whose members are constants), `return P{1, 2};' or a string_view built
+    // by a consteval function (GCC 16's _Escapes<_CharT>::_S_tab())
+    if(
+      result->id() == ID_struct &&
+      constexpr_interpretert::is_constant_value(*result, symbol_table))
+    {
+      return *result;
+    }
     // a pointer into a constant array ([expr.const]/11: the address of an
     // element of a static object; initializer_list::begin())
     if(array_pointer(*result, symbol_table))

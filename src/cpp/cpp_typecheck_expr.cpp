@@ -9987,6 +9987,17 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       if(r.is_not_nil())
       {
         r.add_source_location() = expr.source_location();
+        // a class prvalue: as for `T()' (typecheck_expr_explicit_typecast),
+        // a compound literal, which a member access or member call on the
+        // result (`make().sum()') can bind to
+        if(r.id() == ID_struct)
+        {
+          exprt tmp(ID_compound_literal, r.type());
+          tmp.add_source_location() = expr.source_location();
+          tmp.add_to_operands(std::move(r));
+          tmp.set(ID_C_lvalue, true);
+          r = std::move(tmp);
+        }
         expr.swap(r);
         return;
       }

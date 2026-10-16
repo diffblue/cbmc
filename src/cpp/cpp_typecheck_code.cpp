@@ -2114,6 +2114,31 @@ void cpp_typecheckt::typecheck_while(code_whilet &code)
     c_typecheck_baset::typecheck_while(code);
 }
 
+/// N5008 [stmt.switch]/2: a case label is a converted constant expression
+/// ([expr.const]); type-check it in a constant-expression context, so that a
+/// call of a constexpr or consteval function in it is evaluated -- GCC 16's
+/// __should_escape_ascii switches over `case _Esc::_S_tab()[0]:'.
+void cpp_typecheckt::typecheck_switch_case(code_switch_caset &code)
+{
+  if(code.operands().size() != 2 || code.is_default() || !case_is_allowed)
+  {
+    c_typecheck_baset::typecheck_switch_case(code); // diagnostics, default
+    return;
+  }
+
+  typecheck_code(code.code());
+
+  exprt &case_expr = code.case_op();
+  {
+    constant_expression_contextt constant_expression_guard{*this};
+    typecheck_expr(case_expr);
+  }
+  implicit_typecast(case_expr, switch_op_type);
+  // as for static_assert: fold the constexpr calls before make_constant
+  propagate_constants(case_expr, symbol_table);
+  make_constant(case_expr);
+}
+
 void cpp_typecheckt::typecheck_switch(codet &code)
 {
   // In addition to the C syntax, C++ also allows a declaration
