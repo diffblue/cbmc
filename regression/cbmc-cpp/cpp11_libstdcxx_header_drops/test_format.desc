@@ -1,4 +1,4 @@
-THOROUGH libstdcxx13
+KNOWNBUG libstdcxx13
 format.cpp
 --cpp20 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ format: SUCCESS$
@@ -26,3 +26,6 @@ about 70 s and 2.7 GB, which ran out of memory on CI's runners, hence
 THOROUGH; test_format_typecheck.desc keeps the conversion in CORE.  g++ 13
 accepts this program, and it fails only its WRONG
 assertion.
+KNOWNBUG (scaling limit): it needs 2.65 GB, above the 2.5 GB that CI's
+CBMC_TEST_MEMLIMIT allows ("SAT checker ran out of memory" in the THOROUGH
+job); test_format_typecheck.desc covers the type checking.

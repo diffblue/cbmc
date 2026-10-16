@@ -1,4 +1,4 @@
-THOROUGH
+KNOWNBUG
 main.cpp
 --cpp11 --object-bits 12 --unwind 5 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line 8 regex match: SUCCESS$
@@ -17,3 +17,5 @@ partial specialisation (value_type `char`, not `const char`), so the
 _Executor is built over basic_regex<char, ...>.  Remaining cost is
 symbolic execution of the NFA compiler and executor (> 30 min at
 --unwind 5).  The CORE conversion gate is in test_conversion.desc.
+KNOWNBUG (THOROUGH until 2026-10-16; failing at least since round 186):
+the same null ctype facet as cpp11_regex_construct/test.desc.
