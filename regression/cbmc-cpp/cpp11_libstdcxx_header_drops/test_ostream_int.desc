@@ -1,4 +1,4 @@
-CORE
+CORE gcc-only
 ostream_int.cpp
 --cpp17 --unwind 8 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ int inserted: SUCCESS$
@@ -21,3 +21,5 @@ and the num_put and numpunct facets of the "C" locale, which libstdc++.so
 provides, are modelled ([locale.general]/8,
 cpp11_ostream_integer_insertion_classic_locale).  g++ 13 accepts this
 program, and it fails only its WRONG assertion.
+gcc-only: a libstdc++ test; with libc++ it needs 7.7 GB (macOS CI job:
+timed out).
