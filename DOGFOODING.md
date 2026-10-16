@@ -2070,3 +2070,9 @@ No dog-food change.  The CI fixes of this round are listed in
 .kiro/decltype_tuple_apply_findings.md, "Round 186 (CI)".  The cbmc-cpp
 suite now also runs locally under a 32-bit build (build-32), with the
 GCC 11 headers (/tmp/r186/gcc11/bin) and with --arch arm64.
+
+## CI follow-up 2026-10-16 (round 186)
+
+No dog-food change.  Before pushing, run scripts/platform_check.sh
+(GCC 11 headers, 32-bit, arm64); details in
+.kiro/decltype_tuple_apply_findings.md, "Round 186 (CI follow-up)".
