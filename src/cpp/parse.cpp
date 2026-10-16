@@ -4491,12 +4491,9 @@ bool Parser::rConstructorDecl(
 
     case TOK_DEFAULT: // C++0x
     {
-      if(!cpp11)
-      {
-        SyntaxError();
-        return false;
-      }
-
+      // N5008 [dcl.fct.def.default]; accepted before C++11 as g++ and
+      // clang++ do (an extension, -Wc++11-extensions): libc++ declares
+      // `exception(const exception &) _NOEXCEPT = default;' in every mode
       constructor.value() = codet(ID_default);
       set_location(constructor.value(), value);
     }
@@ -4504,24 +4501,19 @@ bool Parser::rConstructorDecl(
 
     case TOK_DELETE: // C++0x
       {
-        if(!cpp11)
-        {
-          SyntaxError();
-          return false;
-        }
+      // N5008 [dcl.fct.def.delete]; accepted before C++11 as for default
+      constructor.value() = codet(ID_cpp_delete);
+      set_location(constructor.value(), value);
 
-        constructor.value()=codet(ID_cpp_delete);
-        set_location(constructor.value(), value);
-
-        // C++26 = delete("message") — skip optional message
-        if(lex.LookAhead(0) == '(')
-        {
-          cpp_tokent lp, msg, rp;
-          lex.get_token(lp);
-          lex.get_token(msg); // string literal
-          if(lex.get_token(rp) != ')')
+      // C++26 = delete("message") — skip optional message
+      if(lex.LookAhead(0) == '(')
+      {
+        cpp_tokent lp, msg, rp;
+        lex.get_token(lp);
+        lex.get_token(msg); // string literal
+        if(lex.get_token(rp) != ')')
           return false;
-        }
+      }
       }
       break;
 
@@ -4725,24 +4717,14 @@ bool Parser::rDeclaratorWithInit(
 
       if(lex.LookAhead(0)==TOK_DEFAULT) // C++0x
       {
-        if(!cpp11)
-        {
-          SyntaxError();
-          return false;
-        }
-
+        // accepted before C++11 as g++ and clang++ do (see rConstructorDecl)
         lex.get_token(tk);
         declarator.value()=codet(ID_default);
         set_location(declarator.value(), tk);
       }
       else if(lex.LookAhead(0)==TOK_DELETE) // C++0x
       {
-        if(!cpp11)
-        {
-          SyntaxError();
-          return false;
-        }
-
+        // accepted before C++11 as g++ and clang++ do (see rConstructorDecl)
         lex.get_token(tk);
         declarator.value()=codet(ID_cpp_delete);
         set_location(declarator.value(), tk);
