@@ -3785,6 +3785,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
           continue; // done
         }
 
+        make_abbreviated_function_template(declaration);
+
         if(declaration.is_template())
         {
           if(declaration.is_constructor())

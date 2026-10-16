@@ -609,14 +609,14 @@ std::optional<typet> cpp_typecheckt::deduce_class_template_arguments(
   return result;
 }
 
-void cpp_typecheckt::convert(cpp_declarationt &declaration)
+/// N5008 [dcl.fct]/22: a function declaration with a placeholder (`auto')
+/// parameter type is an abbreviated function template; each such parameter
+/// introduces an invented template type parameter.  Applied to namespace-
+/// scope declarations and to member declarations (a constructor
+/// `subrange(auto __first, _Sent __last)' in libstdc++'s ranges header).
+void cpp_typecheckt::make_abbreviated_function_template(
+  cpp_declarationt &declaration)
 {
-  // see if the declaration is empty
-  if(declaration.is_empty())
-    return;
-
-  // C++20 abbreviated function templates: if a non-template function
-  // has 'auto' parameters, synthesize template type parameters.
   if(!declaration.is_template())
   {
     for(auto &d : declaration.declarators())
@@ -674,6 +674,15 @@ void cpp_typecheckt::convert(cpp_declarationt &declaration)
       break;
     }
   }
+}
+
+void cpp_typecheckt::convert(cpp_declarationt &declaration)
+{
+  // see if the declaration is empty
+  if(declaration.is_empty())
+    return;
+
+  make_abbreviated_function_template(declaration);
 
   // The function bodies must not be checked here,
   // but only at the very end when all declarations have been
