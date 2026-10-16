@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ virtual call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+too many addressed objects
+--
+The virtual tables of classes that are never constructed were initialized,
+so each of their virtual functions was an addressed object: 100 unused
+classes exceed the 256 objects of the default --object-bits 8.  With
+libc++ the locale facets declared through <vector> had the same effect.
