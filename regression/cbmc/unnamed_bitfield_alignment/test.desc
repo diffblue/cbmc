@@ -1,0 +1,10 @@
+CORE gcc-only
+main.c
+--c17 --arch x86_64 --os linux
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+FAILURE
+^CONVERSION ERROR$
