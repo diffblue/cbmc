@@ -46,7 +46,7 @@ static inline mathematical_function_typet state_predicate_type()
 
 static inline symbol_exprt state_expr()
 {
-  return symbol_exprt(u8"\u03c2", state_typet());
+  return symbol_exprt("\u03c2", state_typet());
 }
 
 class evaluate_exprt : public binary_exprt
@@ -714,7 +714,7 @@ void state_encodingt::function_call_symbol(
   const auto &type = to_code_type(function.type());
   auto identifier = function.identifier();
 
-  auto new_annotation = annotation + u8" \u2192 " + id2string(identifier);
+  auto new_annotation = annotation + " \u2192 " + id2string(identifier);
   dest.annotation(new_annotation);
 
   // malloc is special-cased
