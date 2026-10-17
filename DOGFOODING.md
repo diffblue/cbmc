@@ -2083,3 +2083,12 @@ No dog-food change.  The cprover-smt2 profile needs smt2_solver on PATH;
 without it three regression/cbmc tests fail with VERIFICATION ERROR.
 Details in .kiro/decltype_tuple_apply_findings.md, "Round 186 (CI
 follow-up 2)".
+
+## Round 187 2026-10-16
+
+abstract_environment_tu converts and verifies again (THOROUGH, 82 s,
+0.8 GB): elide_cpp_returned_temporaries now retypes references to the
+functions it lowers.  To mirror macOS locally, run cbmc-cpp CORE with
+`--stdlib libc++' appended to the cbmc command and `-X gcc-only -X libcxx
+-X libstdcxx -X libstdcxx12 -X libstdcxx13 -X libstdcxx16'.  Details in
+.kiro/decltype_tuple_apply_findings.md, "Round 187".
