@@ -7204,7 +7204,12 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
 {
   // [expr.typeid]/4: the program is ill-formed unless <typeinfo> has been
   // included before the use of typeid.
-  const struct_tag_typet ti_type{"std::tag-type_info"};
+  // the MSVC STL declares type_info in the global namespace (vcruntime's
+  // `class type_info', and `using ::type_info;' in std)
+  const struct_tag_typet ti_type{
+    symbol_table.has_symbol("std::tag-type_info")
+      ? irep_idt{"std::tag-type_info"}
+      : irep_idt{"tag-type_info"}};
   if(!symbol_table.has_symbol(ti_type.get_identifier()))
   {
     error().source_location = expr.find_source_location();

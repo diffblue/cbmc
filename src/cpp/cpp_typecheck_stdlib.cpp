@@ -1509,6 +1509,15 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ for(; __lo < __hi; ++__lo) *__lo = do_tolower(*__lo); return __hi; }"},
     {"std::ctype<char>::do_toupper($constthis,ptr_char,ptr_const_char)",
      "{ for(; __lo < __hi; ++__lo) *__lo = do_toupper(*__lo); return __hi; }"},
+    // the MSVC runtime's type_info support (vcruntime_typeinfo.h): cbmc
+    // gives each type one type_info object (typecheck_expr_typeid), so
+    // their data compare equal iff they are the same object, as N5008
+    // [type.info]/2 requires; the order of before() is unspecified
+    // ([type.info]/4), the hash equal for equal objects ([type.info]/7)
+    {"__std_type_info_compare",
+     "{ return _Lhs == _Rhs ? 0 :"
+     " ((unsigned long long)_Lhs < (unsigned long long)_Rhs ? -1 : 1); }"},
+    {"__std_type_info_hash", "{ return (unsigned long long)_Data; }"},
     {"std::exception::~exception", "{ }"},
     {"std::exception::what", "{ return \"std::exception\"; }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
@@ -1528,9 +1537,11 @@ void cpp_typecheckt::provide_library_source_models()
   for(const auto &entry : symbol_table.symbols)
   {
     const symbolt &symbol = entry.second;
+    // extern "C" functions declared in C++ (the MSVC runtime's
+    // __std_type_info_compare) have mode C
     if(
       symbol.type.id() != ID_code || symbol.value.is_not_nil() ||
-      symbol.is_type || symbol.mode != ID_cpp)
+      symbol.is_type || (symbol.mode != ID_cpp && symbol.mode != ID_C))
     {
       continue;
     }
