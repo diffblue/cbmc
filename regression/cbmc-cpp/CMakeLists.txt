@@ -6,8 +6,10 @@ else()
 endif()
 # GNU extensions (__attribute__, __alignof__, GNU builtins), which g++ and
 # clang++ accept and cbmc's Visual Studio mode does not
+# and layouts of the Itanium C++ ABI (bit fields), which MSVC's ABI does not
+# share
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
-  list(APPEND gcc_only -X gnu-extensions)
+  list(APPEND gcc_only -X gnu-extensions -X itanium-abi)
 endif()
 
 # Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (13:

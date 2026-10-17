@@ -48,6 +48,10 @@ This folder contains the CProver regression test-suite.
 - `gnu-extensions`:
   Tests of GNU extensions (`__attribute__`, `__alignof__`, GNU builtins,
   `__complex__`) that both gcc and clang accept; excluded with MSVC.
+- `itanium-abi`:
+  Tests of class layouts that the Itanium C++ ABI (gcc and clang) defines and
+  the MSVC ABI defines differently, such as bit-field allocation; excluded
+  with MSVC.
 - `gcc-only`:
   Tests that need `goto-cc` in gcc mode (excluded with MSVC or a non-GNU
   build compiler).
