@@ -3469,31 +3469,55 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
             // zero-assignments so that type-check succeeds.
             if(inner.type().id() == ID_array)
             {
-              const auto &array_type = to_array_type(inner.type());
-              const exprt &size_expr = array_type.size();
-              exprt tmp_size = size_expr;
-              make_constant_index(tmp_size);
-              mp_integer s;
-              if(!to_integer(to_constant_expr(tmp_size), s))
+              // the elements of an array of arrays (`_Elem _Data[100][2]'
+              // in the MSVC STL's _Digit_pair_table, `: _Data{}') are
+              // arrays too: zero them element-wise in turn
+              const source_locationt &loc = code.source_location();
+              code_blockt block;
+              std::function<bool(const exprt &)> zero_elements =
+                [&](const exprt &array) -> bool
               {
-                code_blockt block;
-                auto elem_zero = itanium_abi_cpp_zero_initializer(
-                  array_type.element_type(), code.source_location(), *this);
-                if(elem_zero.has_value())
+                const auto &array_type = to_array_type(array.type());
+                exprt tmp_size = array_type.size();
+                make_constant_index(tmp_size);
+                mp_integer s;
+                if(
+                  tmp_size.id() != ID_constant ||
+                  to_integer(to_constant_expr(tmp_size), s))
                 {
-                  for(mp_integer i = 0; i < s; ++i)
-                  {
-                    index_exprt element{inner, from_integer(i, c_index_type())};
-                    element.add_source_location() = code.source_location();
-                    element.set(ID_C_lvalue, true);
-                    side_effect_expr_assignt elem_assign(
-                      element, *elem_zero, typet(), code.source_location());
-                    typecheck_side_effect_assignment(elem_assign);
-                    block.add(code_expressiont{elem_assign});
-                  }
-                  code.swap(block);
-                  return;
+                  return false;
                 }
+                const typet &element_type = array_type.element_type();
+                std::optional<exprt> elem_zero;
+                if(element_type.id() != ID_array)
+                {
+                  elem_zero =
+                    itanium_abi_cpp_zero_initializer(element_type, loc, *this);
+                  if(!elem_zero.has_value())
+                    return false;
+                }
+                for(mp_integer i = 0; i < s; ++i)
+                {
+                  index_exprt element{array, from_integer(i, c_index_type())};
+                  element.add_source_location() = loc;
+                  element.set(ID_C_lvalue, true);
+                  if(element_type.id() == ID_array)
+                  {
+                    if(!zero_elements(element))
+                      return false;
+                    continue;
+                  }
+                  side_effect_expr_assignt elem_assign(
+                    element, *elem_zero, typet(), loc);
+                  typecheck_side_effect_assignment(elem_assign);
+                  block.add(code_expressiont{elem_assign});
+                }
+                return true;
+              };
+              if(zero_elements(inner))
+              {
+                code.swap(block);
+                return;
               }
               // Fall through to skip if size not constant or no
               // element zero initializer.
