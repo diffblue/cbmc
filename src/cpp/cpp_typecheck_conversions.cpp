@@ -5404,7 +5404,8 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
               result,
               struct_type,
               *size_comp,
-              from_integer(n, size_comp->type()));
+              initializer_list_extent(
+                arr_ref, elem_type, n, size_comp->type()));
             result.add_source_location() = orig_expr.source_location();
             expr = sequence_before(
               std::move(prefix),
