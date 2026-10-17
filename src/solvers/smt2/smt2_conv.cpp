@@ -65,9 +65,16 @@ smt2_convt::smt2_convt(
   const std::string &_notes,
   const std::string &_logic,
   solvert _solver,
-  std::ostream &_out)
+  std::ostream &_out,
+  bool _complete_problem)
   : ns(_ns),
-    out(_out),
+    final_out(_out),
+    // only solvers whose header declares the (quantifier-free) logic
+    defer_output(
+      _complete_problem && _solver != solvert::BITWUZLA &&
+      _solver != solvert::CPROVER_SMT2 && _solver != solvert::Z3 &&
+      _solver != solvert::CVC5 && _logic.rfind("QF_", 0) == 0),
+    out(defer_output ? deferred_output : _out),
     benchmark(_benchmark),
     notes(_notes),
     logic(_logic),
@@ -109,6 +116,7 @@ smt2_convt::smt2_convt(
     use_FPA_theory = true;
     use_array_of_bool = true;
     use_as_const = true;
+    as_const_requires_value = true;
     use_check_sat_assuming = true;
     use_datatypes = true;
     break;
@@ -133,7 +141,8 @@ smt2_convt::smt2_convt(
     break;
   }
 
-  write_header();
+  if(!defer_output)
+    write_header();
 }
 
 std::string smt2_convt::decision_procedure_text() const
@@ -164,8 +173,69 @@ tvt smt2_convt::l_get(literalt l) const
   return tvt(boolean_assignment[l.var_no()]^l.sign());
 }
 
+void smt2_convt::flush_deferred_output()
+{
+  if(!defer_output)
+    return;
+  if(!header_written)
+  {
+    if(quantifier_emitted && logic.rfind("QF_", 0) == 0)
+      logic = logic.substr(3);
+    write_header();
+  }
+  final_out << deferred_output.str();
+  deferred_output.str(std::string{});
+}
+
+bool smt2_convt::as_const_admits(const exprt &what) const
+{
+  if(!as_const_requires_value)
+    return true;
+  // a literal converts to a value; a pointer constant (an object/offset
+  // encoding) or a compound term does not
+  return what.is_constant() &&
+         (what.type().id() == ID_bool || what.type().id() == ID_signedbv ||
+          what.type().id() == ID_unsignedbv || what.type().id() == ID_bv ||
+          what.type().id() == ID_c_bool || what.type().id() == ID_c_enum_tag ||
+          what.type().id() == ID_floatbv);
+}
+
+void smt2_convt::convert_zero_value(const typet &type)
+{
+  if(type.id() == ID_bool)
+    out << "false";
+  else if(type.id() == ID_array)
+  {
+    out << "((as const ";
+    convert_type(type);
+    out << ") ";
+    convert_zero_value(to_array_type(type).element_type());
+    out << ")";
+  }
+  else if(
+    (type.id() == ID_struct || type.id() == ID_struct_tag) && use_datatypes)
+  {
+    out << "(mk-" << datatype_map.at(type);
+    const struct_typet &struct_type =
+      type.id() == ID_struct_tag ? ns.follow_tag(to_struct_tag_type(type))
+                                 : to_struct_type(type);
+    for(const auto &component : struct_type.components())
+    {
+      if(is_zero_width(component.type(), ns))
+        continue;
+      out << ' ';
+      convert_zero_value(component.type());
+    }
+    out << ")";
+  }
+  else
+    out << "(_ bv0 " << boolbv_width(type) << ")";
+}
+
 void smt2_convt::write_header()
 {
+  header_written = true;
+  std::ostream &out = final_out;
   out << "; SMT 2" << "\n";
 
   switch(solver)
@@ -266,7 +336,8 @@ void smt2_convt::define_object_size(
     auto size_expr = size_of_expr(type, ns);
 
     if(
-      (o.id() != ID_symbol && o.id() != ID_string_constant) ||
+      (o.id() != ID_symbol && o.id() != ID_string_constant &&
+       o.id() != ID_array) ||
       !size_expr.has_value())
     {
       ++number;
@@ -297,7 +368,8 @@ decision_proceduret::resultt smt2_convt::dec_solve(const exprt &assumption)
     assumptions.pop_back();
   }
 
-  out.flush();
+  flush_deferred_output();
+  final_out.flush();
   return decision_proceduret::resultt::D_ERROR;
 }
 
@@ -848,7 +920,8 @@ void smt2_convt::convert_address_of_rec(
 {
   if(
     expr.id() == ID_symbol || expr.is_constant() ||
-    expr.id() == ID_string_constant || expr.id() == ID_label)
+    expr.id() == ID_string_constant || expr.id() == ID_label ||
+    expr.id() == ID_array)
   {
     const std::size_t object_bits = config.bv_encoding.object_bits;
     const std::size_t max_objects = std::size_t(1) << object_bits;
@@ -1112,6 +1185,19 @@ std::string smt2_convt::convert_identifier(const irep_idt &identifier)
   result += '|';
 
   return result;
+}
+
+/// Build the name of a datatype field selector (or member-update helper)
+/// for component \p component_name of the datatype named \p smt_typename.
+/// Component names may contain characters that are not permitted in SMT2
+/// simple symbols (e.g. "::" in C++ qualified names, which cvc5 rejects
+/// with a parse error); quote via convert_identifier as for any other
+/// identifier.
+std::string smt2_convt::datatype_selector_name(
+  const std::string &smt_typename,
+  const irep_idt &component_name)
+{
+  return convert_identifier(smt_typename + "." + id2string(component_name));
 }
 
 std::string smt2_convt::type2id(const typet &type) const
@@ -1759,7 +1845,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       array_of_expr.type().id() == ID_array,
       "array of expression shall have array type");
 
-    if(use_as_const)
+    if(use_as_const && as_const_admits(array_of_expr.what()))
     {
       out << "((as const ";
       convert_type(array_of_expr.type());
@@ -2592,6 +2678,7 @@ void smt2_convt::convert_expr(const exprt &expr)
       // NOLINTNEXTLINE(readability/throw)
       throw "MathSAT does not support quantifiers";
 
+    quantifier_emitted = true;
     if(quantifier_expr.id() == ID_forall)
       out << "(forall ";
     else if(quantifier_expr.id() == ID_exists)
@@ -3009,6 +3096,31 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
   {
     convert_expr(src);
     return;
+  }
+
+  // Array types that differ only in how their (equal, constant) size is
+  // spelt, e.g. with a signed or an unsigned index type of the same width,
+  // have the same SMT sort: the typecast is the identity (the SAT back end
+  // copies the bits, boolbvt::type_conversion).
+  if(dest_type.id() == ID_array && src.type().id() == ID_array)
+  {
+    const array_typet &dest_array = to_array_type(dest_type);
+    const array_typet &src_array = to_array_type(src.type());
+    const auto dest_size = numeric_cast<mp_integer>(dest_array.size());
+    const auto src_size = numeric_cast<mp_integer>(src_array.size());
+    const typet &dest_index = dest_array.index_type();
+    const typet &src_index = src_array.index_type();
+    if(
+      dest_array.element_type() == src_array.element_type() &&
+      dest_size.has_value() && dest_size == src_size &&
+      can_cast_type<bitvector_typet>(dest_index) &&
+      can_cast_type<bitvector_typet>(src_index) &&
+      to_bitvector_type(dest_index).get_width() ==
+        to_bitvector_type(src_index).get_width())
+    {
+      convert_expr(src);
+      return;
+    }
   }
 
   if(dest_type.id()==ID_c_enum_tag)
@@ -4917,7 +5029,9 @@ void smt2_convt::convert_with(const with_exprt &expr)
     {
       const std::string &smt_typename = datatype_map.at(expr_type);
 
-      out << "(update-" << smt_typename << "." << component_name << " ";
+      out << "("
+          << datatype_selector_name("update-" + smt_typename, component_name)
+          << " ";
       convert_expr(expr.old());
       out << " ";
       convert_expr(value);
@@ -5142,8 +5256,9 @@ void smt2_convt::convert_member(const member_exprt &expr)
     {
       const std::string &smt_typename = datatype_map.at(struct_type);
 
-      out << "(" << smt_typename << "."
-          << struct_type.get_component(name).get_name()
+      out << "("
+          << datatype_selector_name(
+               smt_typename, struct_type.get_component(name).get_name())
           << " ";
       convert_expr(struct_op);
       out << ")";
@@ -5332,6 +5447,32 @@ void smt2_convt::unflatten(
         "cannot unflatten arrays of non-constant size");
       mp_integer size =
         numeric_cast_v<mp_integer>(to_constant_expr(array_type.size()));
+
+      // A solver that takes only a VALUE under `as const' (cvc5) gets an
+      // all-zero base array, and every element 0..N-1 is stored.
+      if(use_as_const && as_const_requires_value)
+      {
+        for(mp_integer i = 0; i < size; ++i)
+          out << "(store ";
+        out << "((as const ";
+        convert_type(array_type);
+        out << ") ";
+        convert_zero_value(array_type.element_type());
+        out << ") ";
+        std::size_t offset = 0;
+        for(mp_integer i = 0; i < size; ++i, offset += subtype_width)
+        {
+          convert_expr(from_integer(i, array_type.index_type()));
+          out << ' ';
+          unflatten(wheret::BEGIN, array_type.element_type(), nesting + 1);
+          out << "((_ extract " << offset + subtype_width - 1 << " " << offset
+              << ") ?ufop" << nesting << ")";
+          unflatten(wheret::END, array_type.element_type(), nesting + 1);
+          out << ")"; // store
+        }
+        out << ")"; // let
+        return;
+      }
 
       for(mp_integer i = 1; i < size; ++i)
         out << "(store ";
@@ -5817,7 +5958,7 @@ void smt2_convt::find_symbols(const exprt &expr)
   }
   else if(expr.id() == ID_array_of)
   {
-    if(!use_as_const)
+    if(!use_as_const || !as_const_admits(to_array_of_expr(expr).what()))
     {
       if(defined_expressions.find(expr) == defined_expressions.end())
       {
@@ -5834,6 +5975,7 @@ void smt2_convt::find_symbols(const exprt &expr)
         if(!is_zero_width(array_type.element_type(), ns))
         {
           // use a quantifier-based initialization instead of lambda
+          quantifier_emitted = true;
           out << "(assert (forall ((i ";
           convert_type(array_type.index_type());
           out << ")) (= (select " << id << " i) ";
@@ -5872,6 +6014,7 @@ void smt2_convt::find_symbols(const exprt &expr)
 
         out << "; the following is a substitute for lambda i . x(i)\n";
         out << "; universally quantified initialization of the array\n";
+        quantifier_emitted = true;
         out << "(assert (forall ((";
         convert_expr(array_comprehension.arg());
         out << " ";
@@ -6551,8 +6694,8 @@ void smt2_convt::find_symbols_rec(
         if(is_zero_width(component.type(), ns))
           continue;
 
-        out << "(" << smt_typename << "." << component.get_name()
-                      << " ";
+        out << "(" << datatype_selector_name(smt_typename, component.get_name())
+            << " ";
         convert_type(component.type());
         out << ") ";
       }
@@ -6583,10 +6726,12 @@ void smt2_convt::find_symbols_rec(
           continue;
 
         const struct_union_typet::componentt &component=*it;
-        out << "(define-fun update-" << smt_typename << "."
-            << component.get_name() << " "
+        out << "(define-fun "
+            << datatype_selector_name(
+                 "update-" + smt_typename, component.get_name())
+            << " "
             << "((s " << smt_typename << ") "
-            <<  "(v ";
+            << "(v ";
         convert_type(component.type());
         out << ")) " << smt_typename << " "
             << "(mk-" << smt_typename
@@ -6601,8 +6746,8 @@ void smt2_convt::find_symbols_rec(
             out << "v ";
           else if(!is_zero_width(it2->type(), ns))
           {
-            out << "(" << smt_typename << "."
-                << it2->get_name() << " s) ";
+            out << "(" << datatype_selector_name(smt_typename, it2->get_name())
+                << " s) ";
           }
         }
 

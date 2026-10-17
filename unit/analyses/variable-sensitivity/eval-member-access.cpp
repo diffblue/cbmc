@@ -159,8 +159,19 @@ exprt integer_expression(int i)
   return (i == TOP) ? top_expression() : from_integer(i, integer_typet());
 }
 
+// GCC 16 reports -Warray-bounds here after speculatively devirtualizing
+// to_constant() to context_abstract_objectt's override, which reads a
+// member that abstract_objectt does not have; that path is never taken.
+// A false positive (GCC PR 122197), disabled for this function only.
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 16
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#endif
 exprt top_expression()
 {
   abstract_objectt top_value(integer_typet(), true, false);
   return top_value.abstract_objectt::to_constant();
 }
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ >= 16
+#  pragma GCC diagnostic pop
+#endif

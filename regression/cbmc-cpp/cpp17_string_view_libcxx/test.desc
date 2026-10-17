@@ -1,0 +1,12 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^PARSING ERROR$
+dropped the body
+--
+libc++ CONVERSION ERROR: incomplete type, missing symbol, or
+implicit conversion failure.

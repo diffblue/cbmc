@@ -1,0 +1,14 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* two: SUCCESS$
+^\[main\.assertion\.2\] .* empty: SUCCESS$
+^\[main\.assertion\.3\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

@@ -1,0 +1,18 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ lockstep: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+CBMC reported "template scope 'Tr' not found": with two or more packs,
+template_mapt::build kept the deduction-time pack bindings and bound
+nothing positionally, so the explicitly specified Tr was never bound,
+although the parameters before the first pack correspond to the leading
+arguments one to one ([temp.arg.general]/1).  libc++'s
+__tuple_sfinae_base::__do_test has this shape.  g++ 13 and clang++ 18
+accept this program, and it fails only its WRONG assertion.

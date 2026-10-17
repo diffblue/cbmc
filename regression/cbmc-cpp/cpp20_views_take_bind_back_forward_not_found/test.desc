@@ -1,0 +1,27 @@
+CORE libcxx
+main.cpp
+--cpp20 --stdlib libc++ --object-bits 12
+^\[main\.assertion\.1\] line \d+ views::take\(3\) converts: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+take_view\.h line 348: C\+\+ front-end dropped the body
+--
+libc++'s views::take(n) (take_view.h:348) returns
+`__range_adaptor_closure_t(std::__bind_back(*this, std::forward<_Np>(__n)))';
+in __bind_back_op::operator()'s noexcept and trailing return types
+(bind_back.h:60) the front end reports "template 'forward' not found" and
+drops take's call operator (cpp20_views_take_call_crash).  cvise
+reduction running in /tmp/r163/red/kb_U6.  clang++ 18 with libc++ accepts
+the program.  Pre-existing (fails on bin52).
+Fixed (round 163v): the suppressed error was "found no match for symbol
+'forward_as_tuple'" for `decltype(forward_as_tuple(__args...))' in
+__bind_back's trailing return type: guess_function_template_args took
+`_Args' as an empty pack because an older, empty pack of another template
+had the same short name ([basic.scope.temp]/2: the innermost declaration is
+the one named).  The program still drops the __tuple_impl and tuple
+constructors (tuple:469/488/713; cpp20_libcxx_header_drops/
+test_functional.desc), which this test does not check.

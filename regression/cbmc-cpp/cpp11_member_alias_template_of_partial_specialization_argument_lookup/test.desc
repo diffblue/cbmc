@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ local typedef: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member typedef: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [basic.lookup.unqual]/1: the template argument vt of
+`at<al<int>>::rebind_alloc<vt>' is looked up from its point of use.
+Selecting the partial specialization at<al<T>> deduces T with the same
+resolver, which recorded the specialization's template scope as the point
+of use, so vt was looked up there ("symbol 'vt' is unknown", bin53).
+libstdc++'s path::generic_string uses `allocator_traits<_Allocator>::
+template rebind_alloc<value_type>'.  g++ 13 and clang++ 18 accept this
+program, and it fails only its WRONG assertion.

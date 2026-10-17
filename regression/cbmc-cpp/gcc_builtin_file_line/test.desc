@@ -1,0 +1,11 @@
+CORE gcc-only
+main.cpp
+--gcc
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+dropped the body
+--
+no body for callee

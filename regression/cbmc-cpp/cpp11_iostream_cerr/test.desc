@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11 --object-bits 9 --unwind 3 --no-unwinding-assertions
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+--
+Round 163d: the stream sentry (a member class of basic_ostream defined
+outside it, [temp.mem.class]/1) is no longer dropped, so its constructor
+and the tie()/flush() and locale code behind it are executed; the loop and
+recursion bound keeps symbolic execution within the time limit.
+iostream with cerr, operator<<, and std::endl in C++11.
+Invariant violation: std::less<std::_V2::error_category>::~less
+destructor symbol not found. Triggered by <system_error> header
+on some g++ 13 header versions (Ubuntu 24.04 CI).

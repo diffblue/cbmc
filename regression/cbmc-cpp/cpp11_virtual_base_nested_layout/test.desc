@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11 --64
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Itanium C++ ABI 2.4 II.3 layout with a virtual base that itself has a
+virtual base (`V : virtual W', `B1 : virtual V', `B2 : virtual X',
+`D : B1, B2'): the virtual bases follow the non-virtual part in inheritance
+graph order (V, W, X), each with its own virtual pointer where it is a
+dynamic class; sizes and offsets are those of g++ 13 and clang 18 on
+x86-64 (D = 56 bytes).

@@ -1,0 +1,11 @@
+CORE
+main.cpp
+--cpp11
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^CONVERSION ERROR$
+dropped the body
+--
+Disambiguate char vs wchar_t overloads when used as function pointer.

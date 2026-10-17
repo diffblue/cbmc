@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^found no match
+dropped the body
+--
+A constructor template's constraint evaluates an is_convertible probe whose
+parameter copy-initialization needs another class's converting constructor
+template.  Nested re-entry of the template-constructor conversion fallback is
+now permitted inside a substitution (sfinae_context_depth), not only inside
+a constant-expression context, which sfinae_contextt suspends.  Distilled
+from cpp17_unique_ptr_derived_return failing with libstdc++ 11 (whose
+is_convertible is the SFINAE probe, not the __is_convertible builtin).

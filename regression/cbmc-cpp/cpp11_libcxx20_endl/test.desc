@@ -1,0 +1,12 @@
+CORE libcxx
+main.cpp
+--cpp11 --stdlib libc++ --object-bits 12 --depth 400
+^VERIFICATION
+^EXIT=(0|10)$
+^SIGNAL=0$
+--
+--
+Round 163d: the stream sentry (a member class of basic_ostream defined
+outside it, [temp.mem.class]/1) is no longer dropped, so its constructor
+and the tie()/flush() and locale code behind it are executed; the lower --depth
+(400, was 1000) keeps symbolic execution within the time limit.

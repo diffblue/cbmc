@@ -1,0 +1,28 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ implicit constructor: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member function reads them: SUCCESS$
+^\[main\.assertion\.3\] line \d+ user-provided constructor: SUCCESS$
+^\[main\.assertion\.4\] line \d+ most derived class initializes it: SUCCESS$
+^\[main\.assertion\.5\] line \d+ hiding member: SUCCESS$
+^\[main\.assertion\.6\] line \d+ its own mem-initializer: SUCCESS$
+^\[main\.assertion\.7\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [class.base.init]/9.1, [class.default.ctor]/4: a virtual base not
+named in the most derived class's mem-initializer-list is
+default-initialized, which applies its default member initializers.  The
+front end constructs virtual bases only when they are non-POD (cpp_is_pod
+ignores NSDMIs), so the members of a POD virtual base with NSDMIs were
+nondeterministic (bin53).  full_member_initialization now applies them to
+the virtual base's members in the `@most_derived' block.  Found from
+libstdc++'s basic_ios (`_M_num_put = nullptr' etc.), a virtual base of
+basic_ostream (cpp11_libstdcxx_header_drops/test_ostream_int.desc).  g++
+13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.

@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ parameter type spelled with decltype of a previous parameter: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown$
+dropped the body
+--
+N5008 [basic.scope.param]/1: a function parameter's scope begins at its
+declaration and includes the rest of the parameter-declaration-clause, so a
+later parameter's type may be spelled `decltype(f(orig_iter))' where
+`orig_iter' is an earlier parameter (an unevaluated operand,
+[expr.prim.id.unqual]).  The front end resolved the parameter list before
+the earlier parameters were in scope: "symbol 'orig_iter' is unknown", and
+the enclosing function template's body was dropped.  Fixed in round 163:
+while a parameter type containing a decltype is type-checked, the earlier
+parameters are bound in a block scope (usable for their type only).  This is libc++'s
+`__unwrap_range_impl<Iter, Iter>::__rewrap(Iter __orig_iter,
+decltype(std::__unwrap_iter(__orig_iter)) __iter)', reached from every
+std::copy / std::equal on pointers (44 `__rewrap_range' drops in the
+round-162 audit, residue item 6).

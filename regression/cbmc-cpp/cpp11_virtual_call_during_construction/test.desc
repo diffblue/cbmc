@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [class.cdtor]/4: a virtual call from a constructor or destructor
+dispatches to the overrider of the class whose constructor/destructor runs.
+Destructors used to install their virtual pointers AFTER the body, so ~B saw
+D::f; a class with virtual bases installs nothing in its base-object
+destructor, and its bases' pointers now hold the complete object's
+construction vtables (Itanium C++ ABI 2.6.2) while it is constructed or
+destroyed.

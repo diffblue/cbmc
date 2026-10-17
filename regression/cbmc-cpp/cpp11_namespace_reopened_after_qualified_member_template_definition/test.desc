@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ fmt:: names the namespace: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [namespace.memdef]/2: a member of a namespace may be defined outside
+it by a qualified name (`template <class, class...> class fmt::arg_store
+{};'); [namespace.def]/2: a later `namespace fmt { }' is an extension of
+the SAME namespace; [basic.lookup.qual.general]/1: `fmt::' then names that
+one namespace.  After the qualified class template definition followed by
+the reopening, the front end reported "scope 'fmt' is ambiguous" and
+rejected the unit, because the qualified definition left the current
+scope inside fmt and the reopening created fmt::fmt; either ingredient alone is fine.  This is libstdc++ 13's
+<format>: `template<typename _Context, typename... _Args> class
+__format::_Arg_store' is defined at namespace std scope and std::__format
+reopened later, so the four inline std::vformat overloads
+(`__format::_Str_sink<char> __buf;', format:3784-3811) are dropped;
+test_libstdcxx.desc includes <format>.  Header-free (from the cvise
+reduction in /tmp/r163/red/kb_K).  Fails on the round-163 build bin52.

@@ -51,6 +51,14 @@ protected:
   const namespacet ns;
   symbol_tablet &symbol_table;
 
+  /// Candidates for a call through an entry of a C++ virtual table (a
+  /// struct type marked ID_C_virtual_table): the values of that entry in
+  /// the program's virtual-table objects.
+  /// \return true if \p pointer is such an entry and candidates were found
+  bool virtual_table_entries(
+    const exprt &pointer,
+    remove_const_function_pointerst::functionst &functions) const;
+
   // We can optionally halt the FP removal if we aren't able to use
   // remove_const_function_pointerst to successfully narrow to a small
   // subset of possible functions and just leave the function pointer
@@ -299,6 +307,14 @@ void remove_function_pointerst::remove_function_pointer(
     }
   }
 
+  // A call through a virtual-table entry (`this->vptr->f' in C++): the
+  // pointer to the table only ever points into one of the program's
+  // virtual-table objects, so the candidates are the values of that entry
+  // in those objects.  The assertion added below for a pointer matching
+  // none of them keeps this sound.
+  if(!found_functions && !only_resolve_const_fps)
+    found_functions = virtual_table_entries(pointer, functions);
+
   if(!found_functions)
   {
     if(only_resolve_const_fps)
@@ -342,6 +358,78 @@ void remove_function_pointerst::remove_function_pointer(
     function_id,
     target,
     functions);
+}
+
+/// Collect, from the static objects of \p symbol_table, the values of the
+/// component \p component of every (sub)object of type \p table_type.
+static void collect_virtual_table_entries(
+  const exprt &value,
+  const irep_idt &table_tag,
+  const irep_idt &component,
+  const namespacet &ns,
+  remove_const_function_pointerst::functionst &functions)
+{
+  if(value.id() == ID_struct && value.type().id() == ID_struct_tag)
+  {
+    const struct_typet &struct_type =
+      ns.follow_tag(to_struct_tag_type(value.type()));
+    if(to_struct_tag_type(value.type()).get_identifier() == table_tag)
+    {
+      const auto &components = struct_type.components();
+      for(std::size_t i = 0;
+          i < components.size() && i < value.operands().size();
+          ++i)
+      {
+        if(components[i].get_name() != component)
+          continue;
+        exprt entry = value.operands()[i];
+        while(entry.id() == ID_typecast)
+          entry = to_typecast_expr(entry).op();
+        if(
+          entry.id() == ID_address_of &&
+          to_address_of_expr(entry).object().id() == ID_symbol)
+        {
+          functions.insert(to_symbol_expr(to_address_of_expr(entry).object()));
+        }
+      }
+    }
+  }
+  for(const auto &op : value.operands())
+    collect_virtual_table_entries(op, table_tag, component, ns, functions);
+}
+
+bool remove_function_pointerst::virtual_table_entries(
+  const exprt &pointer,
+  remove_const_function_pointerst::functionst &functions) const
+{
+  const exprt *p = &pointer;
+  while(p->id() == ID_typecast)
+    p = &to_typecast_expr(*p).op();
+  if(p->id() != ID_member)
+    return false;
+  const member_exprt &member = to_member_expr(*p);
+  const typet &compound_type = member.compound().type();
+  if(compound_type.id() != ID_struct_tag)
+    return false;
+  const struct_typet &table = ns.follow_tag(to_struct_tag_type(compound_type));
+  if(!table.get_bool(ID_C_virtual_table))
+    return false;
+
+  const irep_idt &table_tag =
+    to_struct_tag_type(compound_type).get_identifier();
+  remove_const_function_pointerst::functionst found;
+  for(const auto &entry : symbol_table)
+  {
+    const symbolt &symbol = entry.second;
+    if(!symbol.is_static_lifetime || symbol.value.is_nil())
+      continue;
+    collect_virtual_table_entries(
+      symbol.value, table_tag, member.get_component_name(), ns, found);
+  }
+  if(found.empty())
+    return false;
+  functions.insert(found.begin(), found.end());
+  return true;
 }
 
 static std::string
@@ -412,6 +500,15 @@ void remove_function_pointer(
     // call function
     auto new_call =
       code_function_callt(target->call_lhs(), fun, target->call_arguments());
+
+    // A call-site unwind cleanup emitted by the C++ goto conversion follows
+    // the original call ([except.ctor] destructors + re-dispatch); the C++
+    // exception lowering must not add its own dispatch after the concrete
+    // calls either (it would jump to a handler before those destructors run).
+    // Each concrete call jumps to t_final, which precedes the cleanup, so the
+    // cleanup still guards every branch.
+    if(target->code().get_bool("#cpp_unwind_cleanup_follows"))
+      new_call.set("#cpp_unwind_cleanup_follows", true);
 
     // the signature of the function might not match precisely
     fix_argument_types(new_call);

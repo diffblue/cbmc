@@ -20,7 +20,7 @@ irep_idt cpp_namet::get_base_name() const
 
   for(std::size_t i=0; i<sub.size(); i++)
   {
-    if(sub[i].id()=="::")
+    if(sub[i].id() == ID_scope_resolution)
       base=i+1;
   }
 
@@ -30,7 +30,11 @@ irep_idt cpp_namet::get_base_name() const
   if(sub[base].id()==ID_name)
     return sub[base].get(ID_identifier);
   else if(base+1<sub.size() && sub[base].id()==ID_operator)
-    return "operator"+sub[base+1].id_string();
+  {
+    if(sub[base + 1].id() == ID_name)
+      return "operator" + sub[base + 1].get_string(ID_identifier);
+    return "operator" + sub[base + 1].id_string();
+  }
   else if(base+1<sub.size() && sub[base].id()=="~" && sub[base+1].id()==ID_name)
     return "~"+sub[base+1].get_string(ID_identifier);
 
@@ -62,7 +66,7 @@ void cpp_namet::convert(
 
     identifier+=name_component;
 
-    if(id=="::")
+    if(id == ID_scope_resolution)
       base_name.clear();
     else
       base_name+=name_component;
@@ -76,7 +80,7 @@ std::string cpp_namet::to_string() const
 
   for(const auto &irep : get_sub())
   {
-    if(irep.id() == "::")
+    if(irep.id() == ID_scope_resolution)
       str += irep.id_string();
     else if(irep.id() == ID_template_args)
       str += "<...>";

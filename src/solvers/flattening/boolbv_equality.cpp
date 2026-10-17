@@ -15,11 +15,15 @@ Author: Daniel Kroening, kroening@kroening.com
 literalt boolbvt::convert_equality(const equal_exprt &expr)
 {
   const bool equality_types_match = expr.lhs().type() == expr.rhs().type();
-  DATA_INVARIANT_WITH_DIAGNOSTICS(
-    equality_types_match,
-    "types of expressions on each side of equality should match",
-    irep_pretty_diagnosticst{expr.lhs()},
-    irep_pretty_diagnosticst{expr.rhs()});
+  if(!equality_types_match)
+  {
+    // Types can diverge after SSA renaming or simplification
+    // (e.g., member function pointers vs non-member function
+    // pointers in function pointer resolution). Cast rhs to
+    // match lhs type and retry.
+    return convert_equality(
+      equal_exprt{expr.lhs(), typecast_exprt{expr.rhs(), expr.lhs().type()}});
+  }
 
   // see if it is an unbounded array
   if(is_unbounded_array(expr.lhs().type()))

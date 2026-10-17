@@ -26,18 +26,24 @@ std::pair<symbolt &, bool> symbol_tablet::insert(symbolt symbol)
     {
       symbol_base_mapt::iterator base_result=
         internal_symbol_base_map.emplace(new_symbol.base_name, new_symbol.name);
-      if(!new_symbol.module.empty())
+      index_entryt index_entry{
+        base_result, internal_symbol_module_map.end(), false};
+      try
       {
-        try
+        if(!new_symbol.module.empty())
         {
-          internal_symbol_module_map.emplace(
+          index_entry.module_entry = internal_symbol_module_map.emplace(
             new_symbol.module, new_symbol.name);
+          index_entry.has_module_entry = true;
         }
-        catch(...)
-        {
-          internal_symbol_base_map.erase(base_result);
-          throw;
-        }
+        internal_index.emplace(new_symbol.name, index_entry);
+      }
+      catch(...)
+      {
+        if(index_entry.has_module_entry)
+          internal_symbol_module_map.erase(index_entry.module_entry);
+        internal_symbol_base_map.erase(base_result);
+        throw;
       }
     }
     catch(...)
@@ -91,37 +97,63 @@ void symbol_tablet::erase(const symbolst::const_iterator &entry)
 {
   const symbolt &symbol=entry->second;
 
-  auto base_it = symbol_base_map.lower_bound(symbol.base_name);
-  const auto base_it_end = symbol_base_map.upper_bound(symbol.base_name);
-  while(base_it!=base_it_end && base_it->second!=symbol.name)
-    ++base_it;
+  const auto index_it = internal_index.find(symbol.name);
   INVARIANT(
-    base_it!=base_it_end,
+    index_it != internal_index.end(),
+    "symbol table index out of step with the symbols (name: " +
+      id2string(symbol.name) + ")");
+  const index_entryt &index_entry = index_it->second;
+
+  INVARIANT(
+    index_entry.base_entry->first == symbol.base_name,
     "symbolt::base_name should not be changed "
     "after it is added to the symbol_table "
-    "(name: "+id2string(symbol.name)+", "
-    "current base_name: "+id2string(symbol.base_name)+")");
-  internal_symbol_base_map.erase(base_it);
+    "(name: " +
+      id2string(symbol.name) +
+      ", "
+      "current base_name: " +
+      id2string(symbol.base_name) + ")");
+  internal_symbol_base_map.erase(index_entry.base_entry);
 
-  if(!symbol.module.empty())
-  {
-    auto module_it = symbol_module_map.lower_bound(symbol.module);
-    auto module_it_end = symbol_module_map.upper_bound(symbol.module);
-    while(module_it != module_it_end && module_it->second != symbol.name)
-      ++module_it;
-    INVARIANT(
-      module_it != module_it_end,
-      "symbolt::module should not be changed "
-      "after it is added to the symbol_table "
-      "(name: " +
-        id2string(symbol.name) +
-        ", "
-        "current module: " +
-        id2string(symbol.module) + ")");
-    internal_symbol_module_map.erase(module_it);
-  }
+  INVARIANT(
+    index_entry.has_module_entry == !symbol.module.empty() &&
+      (!index_entry.has_module_entry ||
+       index_entry.module_entry->first == symbol.module),
+    "symbolt::module should not be changed "
+    "after it is added to the symbol_table "
+    "(name: " +
+      id2string(symbol.name) +
+      ", "
+      "current module: " +
+      id2string(symbol.module) + ")");
+  if(index_entry.has_module_entry)
+    internal_symbol_module_map.erase(index_entry.module_entry);
 
+  internal_index.erase(index_it);
   internal_symbols.erase(entry);
+}
+
+void symbol_tablet::rebuild_index()
+{
+  internal_index.clear();
+  for(auto it = internal_symbol_base_map.begin();
+      it != internal_symbol_base_map.end();
+      ++it)
+  {
+    internal_index[it->second] =
+      index_entryt{it, internal_symbol_module_map.end(), false};
+  }
+  for(auto it = internal_symbol_module_map.begin();
+      it != internal_symbol_module_map.end();
+      ++it)
+  {
+    auto index_it = internal_index.find(it->second);
+    INVARIANT(
+      index_it != internal_index.end(),
+      "every module-map entry names a symbol with a base-name entry");
+    index_it->second.module_entry = it;
+    index_it->second.has_module_entry = true;
+  }
 }
 
 /// Check whether the symbol table is in a valid state

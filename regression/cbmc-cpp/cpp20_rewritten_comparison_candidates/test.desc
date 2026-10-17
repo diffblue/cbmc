@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ rewritten < from <=>: SUCCESS$
+^\[main\.assertion\.2\] line \d+ other rewritten comparisons: SUCCESS$
+^\[main\.assertion\.3\] line \d+ noexcept of rewritten \(not noexcept here\): SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static assertion failed
+dropped the body
+--
+N5008 [over.match.oper]/3.4: for `x @ y' with @ relational the candidate
+set includes the rewritten `(x <=> y) @ 0' and reversed `0 @ (y <=> x)';
+for `!=' the rewritten `!(x == y)'; the operator<=> / operator== may be a
+friend or namespace-scope function.  Previously only a MEMBER operator<=>
+was tried and the synthesized comparison against 0 was left un-type-checked
+("warning: ignoring <"), so std::three_way_comparable_with (whose
+requires-expression tests `__t < __u') was false for every class with a
+defaulted or friend <=>.  [expr.unary.noexcept]/3: the operand is
+potentially-throwing if any call in it, at any depth, is -- `noexcept(p <
+q)' rewritten to `(p <=> q) < 0' must see the potentially-throwing <=>
+under the category's noexcept operator<.

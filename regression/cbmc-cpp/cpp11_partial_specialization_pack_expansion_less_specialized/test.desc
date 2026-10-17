@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ Example 4: #3: SUCCESS$
+^\[main\.assertion\.2\] line \d+ non-pack is more specialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ only the pack matches: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.deduct.type]/9.2, [temp.spec.partial.order]: during partial
+ordering, if A_i was originally a pack expansion and P_i is not, deduction
+fails, so R<int, T> is more specialized than R<int, T...>.
+partial_specialization_at_least_as_specialised deduced T from `T...', both
+specializations were at least as specialized as the other, and the sorted
+keys picked the pack (bin53).  libstdc++ 13's views::__adaptor::_Partial has
+this shape (the pack and the single-argument constrained specializations).
+S<int, const int &, const int &> (Example 4, #2, with two elements):
+cpp11_partial_specialization_reference_pack_two_elements.  g++ 13 and
+clang++ 18 accept this program, and it fails only its WRONG assertion.

@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ char branch: SUCCESS$
+^\[main\.assertion\.2\] line \d+ converted branch: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+is unknown$
+dropped the body
+could not fully type-check
+--
+N5008 [temp.mem]/1, [dcl.fct]/3: the out-of-line definition of a member
+function template of a non-template class names its parameters differently
+from the in-class declaration (`__f, __l' vs `first, last'); the body refers
+to the definition's names.  The definition's parameter list must be grafted
+together with its body.  Previously the body kept the declaration's names, so
+the instantiated body failed with "symbol '__f' is unknown" (libstdc++'s
+std::filesystem::path::_S_convert).  The `if constexpr' chain and the
+deduced return type are the header's shape.

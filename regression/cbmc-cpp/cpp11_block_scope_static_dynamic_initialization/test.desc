@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--pointer-check --validate-goto-model
+^\[main\.assertion\.1\] line \d+ initialized once: SUCCESS$
+^\[main\.assertion\.2\] line \d+ initializer uses this: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A block-scope static whose initializer is not a constant expression kept
+that initializer as its symbol value, so __CPROVER_initialize evaluated it
+at program start, before any call: with undefined parameters and `this'.
+This was the remaining failure of std::regex_match (libstdc++'s
+_AnyMatcher::operator(), `static auto __nul = _M_translator._M_translate(0)').

@@ -9,6 +9,18 @@ env:
   z3-version: "4.8.10"
   linux-vcpus: 4
   windows-vcpus: 4
+  # cbmc-cpp tests to preprocess for the macOS and Windows artifacts in
+  # addition to the failed ones (scripts/preprocess_cpp_tests.*): those that
+  # time out there, and so are excluded or missing from test.pl's logs
+  cpp-preprocess-tests: >-
+    cpp11_stream_setw cpp11_ostream_integer_insertion_classic_locale
+    cpp11_stream_destructor_chain cpp11_pair_from_function_pointer_rvalue
+    cpp11_nested_braces_user_ctor_class
+    cpp11_rvalue_reference_from_converting_constructor
+  # Per-test virtual memory limit (KB) for test.pl.
+  # CI runners have ~10 GB RAM; with 4 parallel jobs, each test
+  # gets ~2.5 GB. This prevents OOM kills from masking real failures.
+  CBMC_TEST_MEMLIMIT: 2500000
 
 jobs:
   # This job takes approximately 15 to 40 minutes
@@ -25,7 +37,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3
+          sudo apt-get install --no-install-recommends -yq gcc gdb g++ maven jq flex bison libxml2-utils ccache cmake z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Install cvc5
@@ -114,7 +126,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3 libc++-dev libc++abi-dev
           make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -190,7 +202,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang-19 clang++-19 gdb maven jq flex bison libxml2-utils cpanminus ccache z3 libc++-dev libc++abi-dev
           make -C src minisat2-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -237,7 +249,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Install cvc5
@@ -318,7 +330,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3
+          sudo apt-get install --no-install-recommends -yq clang clang-14 gdb maven jq flex bison libxml2-utils cpanminus ccache z3 libc++-dev libc++abi-dev
           make -C src minisat2-download cadical-download
           cpanm Thread::Pool::Simple
       - name: Confirm z3 solver is available and log the version installed
@@ -391,7 +403,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Install cvc5
@@ -449,7 +461,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 gdb g++-14 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 gdb g++-14 maven flex bison libxml2-utils dpkg-dev ccache doxygen z3 clang libc++-dev libc++abi-dev
           # Update symlinks so that any use of gcc (including our regression
           # tests) will use GCC 14.
           sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-14 110 \
@@ -492,6 +504,71 @@ jobs:
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+  # C++ front end against the libstdc++ headers of GCC 16 (ppa:ubuntu-toolchain-r/
+  # test).  cbmc preprocesses with the host gcc, so `update-alternatives` makes
+  # gcc-16 the host compiler; regression/cbmc-cpp's CMakeLists.txt then keeps
+  # the tests tagged `libstdcxx16` (excluded elsewhere, where gcc < 16) and the
+  # whole C++ corpus is type-checked against the newest headers.  Sequenced
+  # after check-ubuntu-24_04-cmake-gcc-14 to share its ccache.
+  check-ubuntu-24_04-cmake-gcc-16-cbmc-cpp:
+    runs-on: ubuntu-24.04
+    needs: check-ubuntu-24_04-cmake-gcc-14
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          # This is needed in addition to -yq to prevent apt-get from asking for
+          # user input
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq software-properties-common
+          sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc-14 g++-14 gcc-16 g++-16 flex bison libxml2-utils ccache clang libc++-dev libc++abi-dev cpanminus
+          cpanm Thread::Pool::Simple
+          # The build itself uses gcc-14 (the ccache key); gcc-16 becomes the
+          # HOST compiler cbmc preprocesses with, so `gcc -dumpversion` is 16
+          # and the libstdcxx16-tagged tests run.
+          sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-16 110 \
+            --slave /usr/bin/g++ g++ /usr/bin/g++-16 \
+            --slave /usr/bin/gcov gcov /usr/bin/gcov-16
+          sudo ln -sf cpp-16 /usr/bin/cpp
+          gcc --version
+      - name: Restore ccache
+        uses: actions/cache/restore@v6
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-24.04-Release-gcc-14-${{ github.ref }}
+            ${{ runner.os }}-24.04-Release-gcc-14
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure using CMake
+        run: cmake -S . -Bbuild -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc-14 -DCMAKE_CXX_COMPILER=/usr/bin/g++-14 -DCMAKE_CXX_FLAGS=-Wp,-D_GLIBCXX_ASSERTIONS -DWITH_JBMC=OFF
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build with Ninja
+        run: ninja -C build -j${{env.linux-vcpus}} cbmc goto-cc goto-instrument
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run the C++ regression tests against the GCC 16 headers
+        run: |
+          cd regression/cbmc-cpp
+          # test.pl directly: exclude what CMakeLists.txt excludes for gcc 16
+          ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -X libcxx -X broken-libstdcxx16 -j${{env.linux-vcpus}}
+      - name: Run the libstdcxx16-tagged tests on their own
+        run: |
+          cd regression/cbmc-cpp
+          ../test.pl -e -p -c "../../../build/bin/cbmc --validate-goto-model --validate-ssa-equation" -I libstdcxx16
+
+      # No "Save ccache" step here: the cache is produced by
+      # check-ubuntu-24_04-cmake-gcc-14, which this job depends on.
   # This job takes approximately 17 to 41 minutes
   check-ubuntu-24_04-arm-cmake-gcc:
     runs-on: ubuntu-24.04-arm
@@ -506,7 +583,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils dpkg-dev ccache doxygen graphviz z3 clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Install cvc5
@@ -564,7 +641,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc gdb g++ maven flex bison libxml2-utils ccache doxygen z3 g++-multilib clang libc++-dev libc++abi-dev
       - name: Confirm z3 solver is available and log the version installed
         run: z3 --version
       - name: Install cvc5
@@ -620,7 +697,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3 clang libc++-dev libc++abi-dev
       - name: Restore ccache
         uses: actions/cache/restore@v6
         with:
@@ -673,7 +750,7 @@ jobs:
           DEBIAN_FRONTEND: noninteractive
         run: |
           sudo apt-get update
-          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ maven flex bison libxml2-utils ccache z3 clang libc++-dev libc++abi-dev
       - name: Restore ccache
         uses: actions/cache/restore@v6
         with:
@@ -751,6 +828,17 @@ jobs:
         run: |
           export PATH=$PATH:`pwd`/src/solvers
           make -C regression test-parallel JOBS=4
+      - name: Preprocess the failing cbmc-cpp tests for debugging
+        if: always()
+        # the failed tests and env.cpp-preprocess-tests
+        run: scripts/preprocess_cpp_tests.sh src/cbmc/cbmc macos-preprocessed ${{env.cpp-preprocess-tests}}
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-preprocessed-headers
+          path: macos-preprocessed/
+          retention-days: 7
       - name: Run JBMC regression tests
         run: make -C jbmc/regression test-parallel JOBS=4
 
@@ -801,6 +889,17 @@ jobs:
         run: ccache -s
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
+      - name: Preprocess the failing cbmc-cpp tests for debugging
+        if: always()
+        # the failed tests and env.cpp-preprocess-tests
+        run: scripts/preprocess_cpp_tests.sh build/bin/cbmc macos-preprocessed ${{env.cpp-preprocess-tests}}
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-14-preprocessed-headers
+          path: macos-preprocessed/
+          retention-days: 7
 
       - name: Save ccache
         if: always()
@@ -901,10 +1000,22 @@ jobs:
       - name: Print ccache stats
         run: clcache -s
       - uses: ilammy/msvc-dev-cmd@v1
-      - name: Test cbmc
+      - name: Run tests
         run: |
           Set-Location build
-          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}}
+          $env:CBMC_TEST_MEMLIMIT = "3000000"
+          ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
+      - name: Preprocess the failing cbmc-cpp tests for debugging
+        if: always()
+        # the failed tests and env.cpp-preprocess-tests
+        run: pwsh -ExecutionPolicy Bypass -File scripts/preprocess_cpp_tests.ps1 build\bin\Release\cbmc.exe msvc-preprocessed ${{env.cpp-preprocess-tests}}
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msvc-preprocessed-headers
+          path: msvc-preprocessed/
+          retention-days: 7
 
       - name: Save ccache
         if: always()
@@ -1030,7 +1141,20 @@ jobs:
           make CXX=clcache BUILD_ENV=MSVC -C unit test TAGS="[z3]"
           make CXX=clcache BUILD_ENV=MSVC -C jbmc/unit test
       - name: Run CBMC regression tests
-        run: make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
+        run: |
+          $env:CBMC_TEST_MEMLIMIT = "3000000"
+          make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
+      - name: Preprocess the failing cbmc-cpp tests for debugging
+        if: always()
+        # the failed tests and env.cpp-preprocess-tests
+        run: pwsh -ExecutionPolicy Bypass -File scripts/preprocess_cpp_tests.ps1 src\cbmc\cbmc.exe msvc-preprocessed ${{env.cpp-preprocess-tests}}
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msvc-2022-preprocessed-headers
+          path: msvc-preprocessed/
+          retention-days: 7
 
       - name: Save ccache
         if: always()
@@ -1121,12 +1245,58 @@ jobs:
           echo "msi_installer=build/$msi_name" >> $env:GITHUB_OUTPUT
           echo "msi_name=$msi_name" >> $env:GITHUB_OUTPUT
 
+  # This job takes approximately 10 to 15 minutes
+  check-dogfood-goto-cc:
+    # Compile a curated sample of CBMC's own .cpp files with
+    # goto-cc itself ("dog-fooding"): the baseline is expected to
+    # produce clean goto binaries.  New entries are added to the
+    # baseline as the underlying front-end bugs are fixed.  The
+    # expanded sample is reported for visibility but does not
+    # fail the job.
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq cmake ninja-build gcc g++ flex bison libxml2-utils ccache python3
+      - name: Restore ccache
+        id: restore-ccache
+        uses: actions/cache/restore@v6
+        with:
+          path: .ccache
+          key: ${{ runner.os }}-24.04-dogfood-${{ github.ref }}-${{ github.sha }}-PR
+          restore-keys: |
+            ${{ runner.os }}-24.04-dogfood-${{ github.ref }}
+            ${{ runner.os }}-24.04-dogfood
+      - name: ccache environment
+        run: |
+          echo "CCACHE_BASEDIR=$PWD" >> $GITHUB_ENV
+          echo "CCACHE_DIR=$PWD/.ccache" >> $GITHUB_ENV
+      - name: Configure using CMake
+        run: cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=/usr/bin/gcc -DCMAKE_CXX_COMPILER=/usr/bin/g++ -DCMAKE_EXPORT_COMPILE_COMMANDS=1
+      - name: Zero ccache stats and limit in size
+        run: ccache -z --max-size=500M
+      - name: Build goto-cc
+        run: ninja -C build -j${{env.linux-vcpus}} goto-cc
+      - name: Print ccache stats
+        run: ccache -s
+      - name: Run dog-food harness on baseline (gate)
+        run: ./scripts/dogfood_goto_cc.sh --baseline
+      - name: Run dog-food harness on extended sample (report only)
+        continue-on-error: true
+        run: ./scripts/dogfood_goto_cc.sh
       - name: Save ccache
         if: always()
         uses: actions/cache/save@v6
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+
   # This job takes approximately 2 to 3 minutes
   check-string-table:
     runs-on: ubuntu-latest

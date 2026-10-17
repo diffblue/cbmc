@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp98
+^\[main\.assertion\.1\] line \d+ initializer: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member access: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.cond]/1, /7: `b ? D(1) : D(2)' evaluates one operand; the
+result is a prvalue initialized from it.  The front end materialized both
+prvalues as temporaries and selected between them, so both constructors
+ran (bin53).  The conditional is now one temporary whose initializer
+initializes it from the selected operand.  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

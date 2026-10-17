@@ -106,6 +106,13 @@ simplify_exprt::simplify_member(const member_exprt &expr)
       }
     }
   }
+  else if(op.id() == ID_compound_literal)
+  {
+    // Look through compound_literal to the underlying struct
+    auto new_expr = expr;
+    new_expr.struct_op() = to_unary_expr(op).op();
+    return changed(simplify_member(new_expr));
+  }
   else if(op.id() == ID_struct)
   {
     // pull out the right member
@@ -115,7 +122,7 @@ simplify_exprt::simplify_member(const member_exprt &expr)
         : to_struct_type(op.type());
     if(struct_type.has_component(component_name))
     {
-      std::size_t number = struct_type.component_number(component_name);
+      std::size_t number = struct_type.data_component_number(component_name);
       DATA_INVARIANT(
         op.operands().size() > number,
         "struct expression must have sufficiently many operands");

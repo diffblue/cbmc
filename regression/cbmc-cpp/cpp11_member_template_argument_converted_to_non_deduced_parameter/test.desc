@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ non-template member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member template: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [temp.arg.explicit]/7: "Implicit conversions will be performed on
+a function argument to convert it to the type of the corresponding
+function parameter if the parameter type contains no template parameters
+that participate in template argument deduction."  In the member template
+fstr<char>::format<O>(sv<char>, O) only O is deduced, so "a" converts to
+sv<char> by its constructor.  When the argument is not a class,
+guess_template_args_template_id marked every template parameter named in
+sv<C> as a deduction failure -- including C, a parameter of the
+enclosing class that is not being deduced ([temp.deduct]/5) -- so there
+was no match (bin53).  Only the deduced template's own parameters are
+marked now.  This was the drop of libstdc++'s formatter<const char *,
+char>::format (format:1899), reduced from
+cpp11_libstdcxx_header_drops/test_format.  g++ 13 and clang++ 18 accept
+this program, and it fails only its WRONG assertion.

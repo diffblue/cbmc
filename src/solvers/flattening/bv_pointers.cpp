@@ -960,8 +960,14 @@ bv_pointerst::prepare_postponed_object_size(
   {
     const exprt &expr = *it;
 
-    if(expr.id() != ID_symbol && expr.id() != ID_string_constant)
+    // an array constant is an object, too: a wide string literal (C11
+    // 6.4.5/6, C++ [lex.string]/9) is an array of static storage duration
+    if(
+      expr.id() != ID_symbol && expr.id() != ID_string_constant &&
+      expr.id() != ID_array)
+    {
       continue;
+    }
 
     const auto size_expr = size_of_expr(expr.type(), ns);
     if(!size_expr.has_value())

@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+Was KNOWNBUG (2026-09-22, found while reducing the gcc 16 failure of
+cpp20_concept_conjunction_requires_params): "static assertion failed:
+cv-differing lvalue references".  Fixed 2026-09-23: the conditional operator
+over two lvalues differing in cv now yields an lvalue of the cv-combined type
+([expr.cond]/4.1), which COND-RES / __common_ref rest on.

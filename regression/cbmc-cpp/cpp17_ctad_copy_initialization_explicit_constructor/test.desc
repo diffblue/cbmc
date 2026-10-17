@@ -1,0 +1,24 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=6$
+^SIGNAL=0$
+^CONVERSION ERROR$
+--
+^warning: ignoring
+^VERIFICATION
+could not fully type-check
+requires an explicit constructor
+--
+N5008 [over.match.class.deduct]/5, [over.match.copy]/1.1: the notional
+constructor formed from an explicit constructor keeps its explicit-specifier,
+and in copy-initialization only converting constructors are candidates, so
+`E e = 1;' has no viable deduction guide and the program is ill-formed.  The
+front end deduced E<int> anyway (through the positional fallback) and then
+rejected the initialization by dropping main's body ("could not fully
+type-check 'main'", after ef2a71f448).  deduce_class_template_arguments now
+skips explicit constructors for `C x = e' and fails the deduction ("found
+no match for symbol 'E'", as on bin53, which passes this test).
+test_converting.desc: the guide from a converting constructor with default
+arguments is chosen ([over.match.viable]/2.3; failed on bin53).  g++ 13 and
+clang++ 18 reject this program.

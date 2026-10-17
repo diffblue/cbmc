@@ -309,6 +309,20 @@ typet c_typecastt::follow_with_qualifiers(const typet &src_type)
 c_typecastt::c_typet c_typecastt::get_c_type(
   const typet &type) const
 {
+  // C11 6.3.1.1 and C++ [conv.rank]: long and long long have ranks above int
+  // and long even where they have the same width (32-bit long on i386 and
+  // Windows, 64-bit long long on LP64), so the usual arithmetic conversions
+  // of `1 + l' yield long, not int.
+  const irep_idt &c_type = type.get(ID_C_c_type);
+  if(c_type == ID_signed_long_int)
+    return LONG;
+  else if(c_type == ID_unsigned_long_int)
+    return ULONG;
+  else if(c_type == ID_signed_long_long_int)
+    return LONGLONG;
+  else if(c_type == ID_unsigned_long_long_int)
+    return ULONGLONG;
+
   if(type.id()==ID_signedbv)
   {
     const std::size_t width = to_bitvector_type(type).get_width();
@@ -467,6 +481,26 @@ void c_typecastt::implicit_typecast_arithmetic(
 
   if(new_type != expr.type())
     do_typecast(expr, new_type);
+  else
+  {
+    // C++ [conv.prom]/2: wchar_t, char16_t and char32_t are distinct types
+    // promoted to their underlying type even when it has the same
+    // representation (char32_t to unsigned int); operator== ignores the
+    // #c_type comment that tells them apart.
+    // Likewise int and a long of the same width (C11 6.3.1.8, C++
+    // [expr.arith.conv]/1.5: the operand of lesser rank is converted).
+    const irep_idt &c_type_name = expr.type().get(ID_C_c_type);
+    const irep_idt &new_c_type_name = new_type.get(ID_C_c_type);
+    if(
+      c_type_name == ID_wchar_t || c_type_name == ID_char16_t ||
+      c_type_name == ID_char32_t ||
+      ((c_type == LONG || c_type == ULONG || c_type == LONGLONG ||
+        c_type == ULONGLONG) &&
+       c_type_name != new_c_type_name))
+    {
+      expr = typecast_exprt{expr, new_type};
+    }
+  }
 }
 
 c_typecastt::c_typet c_typecastt::minimum_promotion(
@@ -733,6 +767,27 @@ void c_typecastt::implicit_typecast_arithmetic(
   {
     errors.push_back("implicit arithmetic conversion not permitted");
     return;
+  }
+  else if(max_type == LONG || max_type == LONGLONG)
+  {
+    // C11 6.3.1.8 and C++ [expr.arith.conv]/1.5.5: if the signed type of
+    // higher rank cannot represent all values of the other, unsigned type,
+    // both are converted to the unsigned type of the signed one (`1u + l'
+    // is unsigned long where long and int have the same width)
+    const auto width = [](c_typet t) -> std::size_t
+    {
+      if(t == UINT)
+        return config.ansi_c.int_width;
+      else if(t == LONG || t == ULONG)
+        return config.ansi_c.long_int_width;
+      else
+        return config.ansi_c.long_long_int_width;
+    };
+    const c_typet other = max_type == c_type1 ? c_type2 : c_type1;
+    if((other == UINT || other == ULONG) && width(other) >= width(max_type))
+    {
+      max_type = max_type == LONG ? ULONG : ULONGLONG;
+    }
   }
 
   implicit_typecast_arithmetic(expr1, max_type);

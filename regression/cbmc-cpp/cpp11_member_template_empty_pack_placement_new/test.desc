@@ -1,0 +1,29 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ value-initialization through an empty pack: new\(\(void\*\)p\) int\(\): SUCCESS$
+^\[main\.assertion\.2\] line \d+ default constructor through an empty pack: SUCCESS$
+^\[main\.assertion\.3\] line \d+ arguments forwarded: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+no body for callee
+--
+N5008 [expr.new]/1 + [temp.variadic]/5,7: a new-initializer's expression
+list is a pack-expansion context; with an EMPTY pack `::new((void *)p)
+U(forward<Args>(args)...)' is `::new((void *)p) U()' (value-initialization,
+[dcl.init.general]/9).  For a namespace-scope function template
+(std::construct_at) this works since round 162
+(cpp20_construct_at_empty_pack_placement_new); for a MEMBER function
+template of a class template -- libc++'s `allocator<T>::construct(U *,
+Args &&...)' -- the instance with no arguments was dropped silently (no
+diagnostic), so every libc++ C++11 vector/list push_back read the new
+element as nondet (audit residue item 5, round 162).  The member-template
+instantiation path removed the empty pack from call arguments only; it
+now shares the function-template path's strip, which also covers
+new-initializers (round 163).

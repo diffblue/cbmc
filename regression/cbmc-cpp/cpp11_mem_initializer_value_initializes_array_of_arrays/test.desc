@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ two-dimensional array member: SUCCESS$
+^\[main\.assertion\.2\] line \d+ one-dimensional array member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+direct assignments to arrays not permitted
+--
+A mem-initializer `data{}' for an array of arrays assigned each element's
+zero value to the element, an array ("direct assignments to arrays not
+permitted").  The MSVC STL's _Digit_pair_table (<xutility>) has
+`_Elem _Data[100][2]' and `: _Data{}'.

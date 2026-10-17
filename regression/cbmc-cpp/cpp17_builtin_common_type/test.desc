@@ -1,0 +1,27 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] .* int, long: SUCCESS$
+^\[main\.assertion\.2\] .* promotion: SUCCESS$
+^\[main\.assertion\.3\] .* single: SUCCESS$
+^\[main\.assertion\.4\] .* decayed: SUCCESS$
+^\[main\.assertion\.5\] .* array decays: SUCCESS$
+^\[main\.assertion\.6\] .* derived to base: SUCCESS$
+^\[main\.assertion\.7\] .* three: SUCCESS$
+^\[main\.assertion\.8\] .* user specialization: SUCCESS$
+^\[main\.assertion\.9\] .* user specialization via decay: SUCCESS$
+^\[main\.assertion\.10\] .* user specialization in fold: SUCCESS$
+^\[main\.assertion\.11\] .* no common type: SUCCESS$
+^\[main\.assertion\.12\] .* empty: SUCCESS$
+^\[main\.assertion\.13\] .* pointer qualification: SUCCESS$
+^\[main\.assertion\.14\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The builtin exists in clang 20 and later only (g++ 13 and clang++ 18
+reject the program), so there is no harness check.  The program fails
+only its WRONG assertion.

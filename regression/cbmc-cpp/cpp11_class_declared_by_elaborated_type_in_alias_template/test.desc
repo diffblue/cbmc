@@ -1,0 +1,14 @@
+KNOWNBUG
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] .* elaborated type in alias template: SUCCESS$
+^\[main\.assertion\.2\] .* WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+g++ 13 (-fsanitize=address,undefined) and clang++ 18 accept this program,
+and it fails only its WRONG assertion.  Currently "found no match".

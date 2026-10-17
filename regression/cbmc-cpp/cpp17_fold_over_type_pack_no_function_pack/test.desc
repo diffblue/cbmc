@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+N5008 [expr.prim.fold]/1-2: a fold over the parameter pack of a variable
+template or of a function template WITHOUT a function parameter pack
+(`(__is_same(T, Ts) || ...)`, `(sizeof(Ts) + ...)`) expands against
+the template pack's elements; the pattern's pack reference may sit in a
+type position (sizeof operand, builtin-trait argument).  Before, the fold
+node reached the residual fallback and degraded to `true`.

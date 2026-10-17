@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ forwarding reference kinds: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+static assertion failed
+static_assert condition could not be evaluated
+^warning: ignoring
+dropped the body
+--
+N5008 [dcl.ref], [meta.rel] (is_same).  Non-vacuous: the last assertion is
+deliberately wrong and must FAIL.  Before the fix: "static assertion failed:
+rvalue vs lvalue reference" (and the std::is_same twin).

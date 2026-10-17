@@ -251,15 +251,27 @@ simplify_exprt::resultt<> simplify_exprt::simplify_mult(const mult_exprt &expr)
   }
   else
   {
-    // if the constant is a one and there are other factors
+    // if the constant is a one and there are other factors, delete it; a
+    // one that is `sizeof(T)' (T a character type) leaves its annotation on
+    // the product: it records the element type of an allocation
+    // `malloc(sizeof(T) * n)' (see symex_allocate) also once n has a value
+    // of its own, which may carry the annotation of another sizeof.  (Kept
+    // as a factor, it left `1 * n' in the formula of every char allocation:
+    // 260 more variables in benchcomp's aws_byte_buf_cat.)
     if(constant_found && *constant == 1)
     {
-      // just delete it
+      // just delete it, but keep a sizeof annotation on the product
+      const irept sizeof_type = constant->find(ID_C_c_sizeof_type);
       new_operands.erase(constant);
       no_change = false;
 
       if(new_operands.size() == 1)
-        return new_operands.front();
+      {
+        exprt result = new_operands.front();
+        if(sizeof_type.is_not_nil())
+          result.set(ID_C_c_sizeof_type, sizeof_type);
+        return result;
+      }
     }
   }
 
@@ -601,6 +613,15 @@ simplify_exprt::simplify_minus(const minus_exprt &expr)
     is_number(minus_expr.type()) && operands[0].type().id() == ID_pointer &&
     operands[1].type().id() == ID_pointer)
   {
+    // p - p == 0 for syntactically identical pointer operands (including two
+    // null pointers): the difference of a pointer with itself is zero whatever
+    // it points to.  This lets, for instance, an empty container's
+    // size() == _M_finish - _M_start (both null) fold to a constant rather than
+    // staying a symbolic pointer difference -- which in turn keeps a subsequent
+    // allocation size constant instead of symbolic.
+    if(operands[0] == operands[1])
+      return changed(from_integer(0, minus_expr.type()));
+
     exprt ptr_op0 = simplify_object(operands[0]).expr;
     exprt ptr_op1 = simplify_object(operands[1]).expr;
 

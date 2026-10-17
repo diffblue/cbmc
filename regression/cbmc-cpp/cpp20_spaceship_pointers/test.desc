@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp20
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ less: SUCCESS$
+^\[main\.assertion\.2\] line \d+ equal: SUCCESS$
+^\[main\.assertion\.3\] line \d+ greater: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+found no match for symbol
+dropped the body
+--
+N5008 [expr.spaceship]/8: three-way comparison of pointers.  Non-vacuous: the
+last assertion is deliberately wrong and must FAIL.  Before the fix:
+"found no match for symbol 'strong_ordering'", CONVERSION ERROR.

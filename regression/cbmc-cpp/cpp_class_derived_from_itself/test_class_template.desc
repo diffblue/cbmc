@@ -1,0 +1,14 @@
+CORE
+class_template.cpp
+
+^CONVERSION ERROR$
+^EXIT=6$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+See test.desc.  The diagnostic "base class ... is incomplete" was issued
+but recovered from (typecheck_compound_body tolerates base errors inside an
+instantiation, for system headers), so the program was accepted; bin53
+crashed.  The self-derivation error is no longer recovered from.  g++ 13 and
+clang++ 18 reject it.

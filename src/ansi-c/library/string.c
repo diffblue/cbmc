@@ -400,6 +400,29 @@ __CPROVER_HIDE:;
 #endif
 }
 
+/* FUNCTION: __builtin_strcmp */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+int __builtin_strcmp(const char *s1, const char *s2)
+{
+__CPROVER_HIDE:;
+  __CPROVER_size_t i = 0;
+  unsigned char ch1, ch2;
+  do
+  {
+    ch1 = s1[i];
+    ch2 = s2[i];
+    if(ch1 != ch2)
+      return ch1 < ch2 ? -1 : 1;
+    i++;
+  } while(ch1 != 0 && ch2 != 0);
+  return 0;
+}
+
 /* FUNCTION: strcasecmp */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -572,6 +595,22 @@ size_t strlen(const char *s)
   #endif
 }
 
+/* FUNCTION: __builtin_strlen */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+__CPROVER_size_t __builtin_strlen(const char *s)
+{
+__CPROVER_HIDE:;
+  __CPROVER_size_t len = 0;
+  while(s[len] != 0)
+    len++;
+  return len;
+}
+
 /* FUNCTION: strdup */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -651,6 +690,42 @@ __CPROVER_HIDE:;
     __CPROVER_array_replace((unsigned char *)dst, src_n);
   }
 #endif
+
+  return dst;
+}
+
+/* FUNCTION: __builtin_memcpy */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+void *__builtin_memcpy(void *dst, const void *src, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+  __CPROVER_precondition(
+    __CPROVER_POINTER_OBJECT(dst) != __CPROVER_POINTER_OBJECT(src) ||
+      ((const char *)src >= (const char *)dst + n) ||
+      ((const char *)dst >= (const char *)src + n),
+    "memcpy src/dst overlap");
+  // The compiler builtin (unlike C17's memcpy, 7.24.1/2) accepts a null
+  // pointer with a zero length: GCC and Clang document that behaviour for
+  // their builtins, C2y (N3322) makes zero-length operations on null
+  // pointers well-defined, and libc++'s vector relocation relies on it
+  // (`__builtin_memcpy(new, old_begin, 0)' with old_begin == nullptr for an
+  // empty vector).
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memcpy source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dst, n), "memcpy destination region writeable");
+
+  if(n > 0)
+  {
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dst, src_n);
+  }
 
   return dst;
 }
@@ -867,6 +942,32 @@ void *memmove(void *dest, const void *src, size_t n)
   return dest;
 }
 
+/* FUNCTION: __builtin_memmove */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+void *__builtin_memmove(void *dest, const void *src, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+  // a null pointer with a zero length is accepted, as for __builtin_memcpy
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_r_ok(src, n), "memmove source region readable");
+  __CPROVER_precondition(
+    n == 0 || __CPROVER_w_ok(dest, n), "memmove destination region writeable");
+
+  if(n > 0)
+  {
+    char src_n[n];
+    __CPROVER_array_copy(src_n, (char *)src);
+    __CPROVER_array_replace((char *)dest, src_n);
+  }
+
+  return dest;
+}
+
 /* FUNCTION: __builtin___memmove_chk */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -948,6 +1049,120 @@ int memcmp(const void *s1, const void *s2, size_t n)
   return res;
 }
 
+/* FUNCTION: __builtin_memcmp */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+int __builtin_memcmp(const void *s1, const void *s2, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+  int res = 0;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(s1) >= n, "memcmp buffer overflow of 1st argument");
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(s2) >= n, "memcmp buffer overflow of 2nd argument");
+#else
+  __CPROVER_precondition(__CPROVER_r_ok(s1, n), "memcmp region 1 readable");
+  __CPROVER_precondition(__CPROVER_r_ok(s2, n), "memcmp region 2 readable");
+
+  const unsigned char *sc1 = s1, *sc2 = s2;
+  for(; n != 0; n--)
+  {
+    res = (*sc1++) - (*sc2++);
+    if(res != 0)
+      return res;
+  }
+#endif
+  return res;
+}
+
+/* FUNCTION: memchr */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef memchr
+
+void *memchr(const void *s, int c, size_t n)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(s) >= n, "memchr buffer overflow");
+#else
+  __CPROVER_precondition(__CPROVER_r_ok(s, n), "memchr region readable");
+#endif
+
+  // C23 7.26.5.2: locate the first occurrence of (unsigned char)c in the
+  // initial n characters (each interpreted as unsigned char) of the object
+  // pointed to by s; return a pointer to it, or a null pointer if absent.
+  // The scan returns a pointer INTO s so pointer provenance is preserved
+  // (callers subtract the base pointer, e.g. char_traits<char>::find).
+  const unsigned char *sc = s;
+  for(; n != 0; n--, sc++)
+  {
+    if(*sc == (unsigned char)c)
+      return (void *)sc;
+  }
+  return 0;
+}
+
+/* FUNCTION: __builtin_memchr */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+void *__builtin_memchr(const void *s, int c, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(s) >= n, "memchr buffer overflow");
+#else
+  __CPROVER_precondition(__CPROVER_r_ok(s, n), "memchr region readable");
+#endif
+
+  // see memchr above (C23 7.26.5.2)
+  const unsigned char *sc = s;
+  for(; n != 0; n--, sc++)
+  {
+    if(*sc == (unsigned char)c)
+      return (void *)sc;
+  }
+  return 0;
+}
+
+/* FUNCTION: __builtin_char_memchr */
+
+// Clang's __builtin_char_memchr is memchr for char objects, returning
+// `char *' (libc++'s __constexpr_memchr uses it).
+char *__builtin_char_memchr(const char *s, int c, __CPROVER_size_t n)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_buffer_size(s) >= n, "memchr buffer overflow");
+#else
+  __CPROVER_precondition(__CPROVER_r_ok(s, n), "memchr region readable");
+#endif
+
+  // see memchr above (C23 7.26.5.2)
+  for(; n != 0; n--, s++)
+  {
+    if(*(const unsigned char *)s == (unsigned char)c)
+      return (char *)s;
+  }
+  return 0;
+}
+
 /* FUNCTION: strchr */
 
 #ifndef __CPROVER_STRING_H_INCLUDED
@@ -1004,6 +1219,73 @@ char *strrchr(const char *src, int c)
   }
   return res;
   #endif
+}
+
+/* FUNCTION: strstr */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef strstr
+
+char *strstr(const char *haystack, const char *needle)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(haystack),
+    "strstr zero-termination of first argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(needle),
+    "strstr zero-termination of second argument");
+#endif
+  // C23 7.26.5.8: the first occurrence of the sequence of characters of
+  // needle (without its terminating null character) in haystack; haystack
+  // itself if needle is empty
+  for(__CPROVER_size_t i = 0;; i++)
+  {
+    __CPROVER_size_t j = 0;
+    while(needle[j] != 0 && haystack[i + j] == needle[j])
+      j++;
+    if(needle[j] == 0)
+      return ((char *)haystack) + i; // cast away const-ness
+    if(haystack[i] == 0)
+      break;
+  }
+  return 0;
+}
+
+/* FUNCTION: strpbrk */
+
+#ifndef __CPROVER_STRING_H_INCLUDED
+#  include <string.h>
+#  define __CPROVER_STRING_H_INCLUDED
+#endif
+
+#undef strpbrk
+
+char *strpbrk(const char *s1, const char *s2)
+{
+__CPROVER_HIDE:;
+#ifdef __CPROVER_STRING_ABSTRACTION
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(s1), "strpbrk zero-termination of first argument");
+  __CPROVER_precondition(
+    __CPROVER_is_zero_string(s2),
+    "strpbrk zero-termination of second argument");
+#endif
+  // C23 7.26.5.5: the first character in s1 that is any character of s2
+  for(__CPROVER_size_t i = 0; s1[i] != 0; i++)
+  {
+    for(__CPROVER_size_t j = 0; s2[j] != 0; j++)
+    {
+      if(s1[i] == s2[j])
+        return ((char *)s1) + i; // cast away const-ness
+    }
+  }
+  return 0;
 }
 
 /* FUNCTION: strerror */

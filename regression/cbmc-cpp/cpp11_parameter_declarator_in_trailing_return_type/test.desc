@@ -1,0 +1,16 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ pointer declarator: SUCCESS$
+^\[main\.assertion\.2\] line \d+ reference declarator: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+substitute_function_type and convert_function_template_declaration built
+the parameters' placeholder symbols from pdecl.type(); they now merge the
+declarator.  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

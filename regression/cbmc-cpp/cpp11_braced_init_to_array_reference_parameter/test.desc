@@ -1,0 +1,22 @@
+CORE
+main.cpp
+--cpp17
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ const int \(&\)\[3\] from \{1, 2, 3\}: SUCCESS$
+^\[main\.assertion\.2\] line \d+ \[dcl\.init\.aggr\]/5\.2: a\[2\] value-initialized: SUCCESS$
+^\[main\.assertion\.3\] line \d+ int \(&&\)\[2\]: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+static_assert condition could not be evaluated
+found no match for symbol
+dropped the body
+--
+N5008 [over.ics.list]/6 + [dcl.init.list]/3.4: a braced-init-list converts to a
+reference to an array of known bound when it fits and every element converts;
+the temporary array is what the reference binds to ([dcl.init.ref]/5.4.2).
+Also covers `{T{}}' -- a compound literal element type-checked a second time
+when the call's arguments are converted.

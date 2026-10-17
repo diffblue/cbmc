@@ -1,0 +1,23 @@
+CORE
+deduced_bool.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ auto from <: SUCCESS$
+^\[main\.assertion\.2\] line \d+ const auto from !: SUCCESS$
+^\[main\.assertion\.3\] line \d+ decltype &&: SUCCESS$
+^\[main\.assertion\.4\] line \d+ decltype ==: SUCCESS$
+^\[main\.assertion\.5\] line \d+ overloads: SUCCESS$
+^\[main\.assertion\.6\] line \d+ deduced T: SUCCESS$
+^\[main\.assertion\.7\] line \d+ overloaded ==: SUCCESS$
+^\[main\.assertion\.8\] line \d+ lambda: SUCCESS$
+^\[main\.assertion\.9\] line \d+ values: SUCCESS$
+^\[main\.assertion\.10\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+N5008 [expr.rel]/2, [expr.eq]/1, [dcl.type.decltype]/1, [temp.deduct.call];
+see test.desc.  g++ 13 and clang++ 18 accept this program (-std=c++14), and
+it fails only its WRONG assertion.

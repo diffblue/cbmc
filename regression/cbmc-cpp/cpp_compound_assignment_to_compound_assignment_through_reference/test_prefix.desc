@@ -1,0 +1,16 @@
+CORE
+prefix.cpp
+
+^\[main\.assertion\.1\] line \d+ prefix increment of prefix increment: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assignment to assignment: SUCCESS$
+^\[main\.assertion\.3\] line \d+ through a pointer: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+See test.desc.  g++ 13 and clang++ 18 accept this program, and it fails only
+its WRONG assertion.

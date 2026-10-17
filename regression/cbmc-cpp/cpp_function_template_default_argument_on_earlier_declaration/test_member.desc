@@ -1,0 +1,19 @@
+CORE
+member.cpp
+
+^\[main\.assertion\.1\] line \d+ member function template: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+no body for callee
+--
+N5008 [dcl.fct.default]/4, [temp.mem]/1, [dcl.fct]/5 (default arguments are
+not part of the parameter-type-list): the default on the in-class
+declaration of S::m made the declaration's and the definition's parameter
+lists compare unequal, so the definition's body was never attached ("no
+body for callee", bin53).  g++ 13 and clang++ 18 accept this program
+(-std=c++98), and it fails only its WRONG assertion.

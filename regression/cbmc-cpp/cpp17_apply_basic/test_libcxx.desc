@@ -1,0 +1,41 @@
+CORE libcxx
+main.cpp
+--cpp17 --stdlib libc++
+^\[main\.assertion\.1\].*: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+--
+After the 2026 "template-only no-match silently throws" fix
+(resolve: silently discard template-only no-match per [temp.deduct]/8),
+the surface symptom changed: std::apply's
+`decltype(auto)` tuple-based forwarding path that previously failed
+with CONVERSION ERROR is now caught by the enclosing convert_function
+catch, leaving an empty main() that verifies vacuously (the
+__CPROVER_assert(r == 3, "apply") never makes it into the goto
+program).  Expected-when-fixed now requires the main assertion line
+to be SUCCESS in the output; until the libc++ tuple deduction path
+actually completes, this test stays on the KNOWNBUG list.
+Minimal header-free reproducer: cpp11_tuple_leaf_no_body.
+Round-11 third batch (2026-08-04): the get redirect now compares
+parameter TYPES position-normalized ([dcl.fct]/5, [temp.over.link]/6);
+the whole family RUNS BMC end-to-end.  Remaining layer visible as
+no-body FAILUREs: std::__1::get<0,...>'s DEFINITION body is not
+instantiated for the call (apply_basic reaches VERIFICATION SUCCESSFUL
+but main is still dropped -- props=0, caught by this desc).
+Round-16 (2026-08-06): the get layer is FIXED (multi-pack spec
+absorption + lockstep value substitution; CORE
+cpp11_tuple_get_return_type_body).  Remaining layer: the tuple
+CONSTRUCTOR itself has no body
+(tuple(this, rref_signed_int, rref_signed_int) -- the _EnableUTypesCtor
+enable-if ctor machinery); get assertions still fail through the
+unconstructed object.
+Round-19 (2026-08-07): FIXED end-to-end -- the constructor layer fell
+in three stages: has_conflict candidate gates ([temp.deduct.type]/2),
+multi-pack function templates ([temp.variadic]/5,7,8, the five-pack
+__tuple_impl ctor), and multi-pack lockstep in mem-inits and base
+specifiers (heterogeneous leaf types).  CORE with non-vacuous
+assertions; g++/clang++ replicas verified along the way
+(cpp11_multi_pack_ctor, cpp11_tuple_size_alias_spec,
+cpp11_member_alias_empty_pack).

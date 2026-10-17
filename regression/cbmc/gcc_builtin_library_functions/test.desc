@@ -1,0 +1,13 @@
+CORE gcc-only no-new-smt broken-cprover-smt-backend
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+no body for callee
+The incremental SMT2 back end does not finish on the floating-point models
+(sqrt, ceil on long double) within the CI timeout, hence no-new-smt; the
+cprover SMT2 solver fails an invariant in flatten2bv on them
+(broken-cprover-smt-backend).

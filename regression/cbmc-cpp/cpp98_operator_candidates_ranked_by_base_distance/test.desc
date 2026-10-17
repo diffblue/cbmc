@@ -1,0 +1,17 @@
+CORE
+main.cpp
+
+^\[main\.assertion\.1\] line \d+ nearer base wins: SUCCESS$
+^\[main\.assertion\.2\] line \d+ nearer member wins: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+N5008 [over.ics.rank]/4.4.4: nonmember_operator_is_better compared only the
+ranks of implicit_conversion_sequence, which are equal for derived-to-base
+reference bindings to bases at different distances, so the member was kept.
+g++ 13 and clang++ 18 accept this program, and it fails only its WRONG
+assertion.
