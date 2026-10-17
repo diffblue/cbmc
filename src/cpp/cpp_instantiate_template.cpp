@@ -8445,16 +8445,20 @@ skip_pack_removal_ft:
 
           if(partial_tc == full_args_resolved)
           {
-            // Also check #c_type to distinguish e.g. char from
-            // signed char.
+            // irept equality ignores the `#' attributes that tell char from
+            // signed char (#c_type) and int & from int && (#reference,
+            // #rvalue_reference): compare the types' mangled names, which
+            // include them ([temp.spec.partial.match]/2 needs the deduced
+            // arguments to make the specialization's arguments IDENTICAL to
+            // the given ones -- `same_v<int &&, int &>' matched `<T, T>').
             bool c_type_match = true;
             for(std::size_t j = 0; j < partial_tc.arguments().size(); j++)
             {
               const exprt &p = partial_tc.arguments()[j];
               const exprt &f = full_args_resolved.arguments()[j];
               if(
-                p.id() == ID_type &&
-                p.type().get(ID_C_c_type) != f.type().get(ID_C_c_type))
+                p.id() == ID_type && f.id() == ID_type &&
+                cpp_type2name(p.type()) != cpp_type2name(f.type()))
               {
                 c_type_match = false;
                 break;
