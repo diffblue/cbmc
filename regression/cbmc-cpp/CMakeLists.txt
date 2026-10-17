@@ -4,6 +4,11 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" OR
 else()
   set(gcc_only "")
 endif()
+# GNU extensions (__attribute__, __alignof__, GNU builtins), which g++ and
+# clang++ accept and cbmc's Visual Studio mode does not
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+  list(APPEND gcc_only -X gnu-extensions)
+endif()
 
 # Tests tagged `libstdcxxNN' need the libstdc++ headers of GCC >= NN (13:
 # <format>): cbmc preprocesses with the HOST gcc (not necessarily the
