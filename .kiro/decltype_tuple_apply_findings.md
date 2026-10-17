@@ -14695,3 +14695,55 @@ under CBMC_TEST_MEMLIMIT=2500000), unit 620, all 0 failures;
 platform_check gcc11/m32/arm64 and the validate, paths, cprover-smt2,
 new-smt and z3 profiles pass; lint 0, clang-format 0, doxygen 0; every
 commit since cca717a833 compiles.
+
+## Round 188 (CI run 5, preprocessed artifacts)
+
+CI run 5 (60215d14a0): macOS 15 make 32 of 1963 failed (81 in run 4),
+VS 2022 make 181 (200), VS 2026 cmake about 215 over four shards that now
+finish (no shard timeout), macOS 14 cmake 26 plus one shard timeout (four
+tests at -t 900: cpp11_nested_braces_user_ctor_class,
+cpp11_rvalue_reference_from_converting_constructor,
+cpp17_deque_copy_constructor, cpp17_filesystem_path_from_string; they pass
+on macOS 15 and locally in 5 s with libc++ 18, also with --arch arm64).
+
+Reproducing from the artifacts (macos-preprocessed-headers,
+msvc-preprocessed-headers): /tmp/r186/pp/run_pp.sh runs each test_X.ii
+against X/test.desc.  Apple libc++ needs `--os macos' (clang builtins such
+as __is_trivially_relocatable are keywords only in clang mode); MSVC needs
+`--winx64'.  With --winx64 on Linux the C library model is preprocessed
+with the Linux headers ("/usr/include/string.h: syntax error" and "no body
+for callee memcpy"): ignore those, they do not occur on Windows.  Run-4
+artifacts at HEAD: MSVC 14.51 31 of 106 pass (12 at 60215d14a0), Apple
+libc++ 19 44 of 74 (9 without --os macos).
+
+Fixes, each reproduced from the MSVC artifacts:
+- std::initializer_list with an end pointer (MSVC's _First/_Last):
+  from_integer precondition, 26 tests on VS 2022 (ac831410e3).
+- __builtin_bit_cast in Visual Studio mode: _Bit_cast dropped, 44 drops
+  on VS 2022 (71f07a40d9).
+- reinterpret_cast to a same-width type kept the source type (irept
+  equality ignores #c_type): _Incref_nz and _Atomic_lock_release, 26 and
+  15 drops (e55d191dc1); reproduced on Linux with long/long long.
+- `: _Data{}' for an array of arrays (_Digit_pair_table) (db61acffb7).
+- out-of-class members of a partial specialization with a parameter pack
+  (std::function<int()>::operator() with libc++): the KNOWNBUG is CORE
+  (ec7fd43cf5).
+
+CI (192781ba51): scripts/preprocess_cpp_tests.sh/.ps1 replace the inline
+steps; macOS 14 cmake and VS 2022 make upload artifacts too
+(macos-14-preprocessed-headers, msvc-2022-preprocessed-headers);
+env.cpp-preprocess-tests adds the tests that time out (not in test.pl's
+logs).  The .ps1 was run with PowerShell 7 (docker) and a stub cbmc only.
+
+Open: MSVC std::function construction ("no match for symbol 'function'",
+5 tests; the constraint's pieces evaluate true, a hand-written shape
+passes, cvise degenerated), libc++ std::function<int()>'s converting
+constructor has no body (KNOWNBUG cpp11_std_function_call_libcxx), GCC
+attribute-syntax tests that run on MSVC (aligned, packed, __alignof__),
+std::bind, typeid of distinct classes.
+
+Verification (W157 at ec7fd43cf5): cbmc-cpp 1968, libcxx profile 1968,
+KNOWNBUG profile, cpp 246, regression/cbmc 1213, ansi-c 270,
+goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
+CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; lint 0, clang-format
+0, doxygen 0; every commit compiles.

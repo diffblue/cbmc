@@ -2092,3 +2092,9 @@ functions it lowers.  To mirror macOS locally, run cbmc-cpp CORE with
 `--stdlib libc++' appended to the cbmc command and `-X gcc-only -X libcxx
 -X libstdcxx -X libstdcxx12 -X libstdcxx13 -X libstdcxx16'.  Details in
 .kiro/decltype_tuple_apply_findings.md, "Round 187".
+
+## Round 188 2026-10-17
+
+No dog-food change.  macOS and Windows failures can be reproduced on Linux
+from the CI artifacts; see .kiro/decltype_tuple_apply_findings.md,
+"Round 188".
