@@ -53,6 +53,7 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
 
     std::size_t distance;
 
+    // no attempt is made to handle negative shift distances
     if(i<0 || i>std::numeric_limits<signed>::max())
       distance=0;
     else
@@ -66,6 +67,7 @@ bvt boolbvt::convert_shift(const binary_exprt &expr)
   }
   else
   {
+    // no attempt is made to handle negative shift distances
     const bvt &distance=convert_bv(expr.op1());
     return bv_utils.shift(op, shift, distance);
   }
