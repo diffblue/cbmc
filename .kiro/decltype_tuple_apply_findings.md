@@ -14747,3 +14747,24 @@ KNOWNBUG profile, cpp 246, regression/cbmc 1213, ansi-c 270,
 goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
 CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; lint 0, clang-format
 0, doxygen 0; every commit compiles.
+
+## Round 188, continued (CI run 6)
+
+CI run 6 (50ea70b671): the new artifact steps ran on all three finished
+jobs (msvc-2022-preprocessed-headers is new; each artifact includes the
+env.cpp-preprocess-tests).  macOS 15 make 30 of 1967 failed, VS 2022 141
+(181), VS 2026 150 over four shards (about 215).
+
+- `b ? p : cp' with int * and const int * had type int * (irept equality
+  ignores the nested #constant): fixed, 48220088af.
+- variable-template partial specializations matched int && against int &
+  (std::is_same in the MSVC STL): 1f000d46cd, which needed the fix above
+  (cpp17_builtin_common_type).
+- gnu-extensions tag for 21 tests of GNU syntax, excluded with MSVC only
+  (77e758890d).
+- The MSVC stream tests (cpp11_stream_setw, cpp11_stream_destructor_chain)
+  hang in symbolic execution even at --unwind 1 (5000+ steps through
+  basic_string and the locale machinery in 60 s); not resolved.
+- Next MSVC groups (VS 2022 artifact, 29 of 146 pass locally):
+  _Construct_in_place dropped ("symbol '_Args' is unknown", 9 tests; the
+  hand-written shape passes), std::function construction (6), tuple (4).
