@@ -5038,10 +5038,16 @@ const symbolt &cpp_typecheckt::instantiate_template(
       // std::pair's delegating piecewise constructor: that argument must
       // be KEPT, or the delegation call's arguments shift and the target
       // constructor no longer resolves.
-      std::function<bool(const irept &)> refs_ep_outside_sizeof =
-        [&](const irept &n) -> bool
+      // Likewise a pack expansion NESTED in the argument, in a template
+      // argument list (`index_sequence_for<_Types2...>{}', std::pair's
+      // piecewise constructor in the MSVC STL): it expands to an empty list
+      // there ([temp.variadic]/7), and the argument remains.
+      std::function<bool(const irept &, bool)> refs_ep_outside_sizeof =
+        [&](const irept &n, bool nested) -> bool
       {
         if(n.get_bool("#sizeof_pack"))
+          return false;
+        if(nested && n.get_bool(ID_ellipsis))
           return false;
         if(n.id() == ID_template_parameter_symbol_type)
         {
@@ -5053,10 +5059,10 @@ const symbolt &cpp_typecheckt::instantiate_template(
         if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
           return true;
         for(const auto &sn : n.get_sub())
-          if(refs_ep_outside_sizeof(sn))
+          if(refs_ep_outside_sizeof(sn, true))
             return true;
         for(const auto &ns : n.get_named_sub())
-          if(refs_ep_outside_sizeof(ns.second))
+          if(refs_ep_outside_sizeof(ns.second, true))
             return true;
         return false;
       };
@@ -5067,7 +5073,7 @@ const symbolt &cpp_typecheckt::instantiate_template(
           std::remove_if(
             subs.begin(),
             subs.end(),
-            [&](const irept &s) { return refs_ep_outside_sizeof(s); }),
+            [&](const irept &s) { return refs_ep_outside_sizeof(s, false); }),
           subs.end());
       }
     }
@@ -5283,10 +5289,13 @@ skip_pack_removal:
       // std::pair's delegating piecewise constructor: that argument must
       // be KEPT, or the delegation call's arguments shift and the target
       // constructor no longer resolves.
-      std::function<bool(const irept &)> refs_ep_outside_sizeof =
-        [&](const irept &n) -> bool
+      // see the matching predicate above: a nested pack expansion stays
+      std::function<bool(const irept &, bool)> refs_ep_outside_sizeof =
+        [&](const irept &n, bool nested) -> bool
       {
         if(n.get_bool("#sizeof_pack"))
+          return false;
+        if(nested && n.get_bool(ID_ellipsis))
           return false;
         if(n.id() == ID_template_parameter_symbol_type)
         {
@@ -5298,10 +5307,10 @@ skip_pack_removal:
         if(n.id() == ID_name && ep_names.count(id2string(n.get(ID_identifier))))
           return true;
         for(const auto &sn : n.get_sub())
-          if(refs_ep_outside_sizeof(sn))
+          if(refs_ep_outside_sizeof(sn, true))
             return true;
         for(const auto &ns : n.get_named_sub())
-          if(refs_ep_outside_sizeof(ns.second))
+          if(refs_ep_outside_sizeof(ns.second, true))
             return true;
         return false;
       };
@@ -5312,7 +5321,7 @@ skip_pack_removal:
           std::remove_if(
             subs.begin(),
             subs.end(),
-            [&](const irept &s) { return refs_ep_outside_sizeof(s); }),
+            [&](const irept &s) { return refs_ep_outside_sizeof(s, false); }),
           subs.end());
       }
     }
@@ -6371,12 +6380,44 @@ skip_pack_removal_ft:
           for(auto &init : mi.get_sub())
           {
             auto &subs = init.get_sub();
+            // N5008 [temp.variadic]/7: an argument that IS an expansion of
+            // the empty pack is dropped; one that merely CONTAINS such an
+            // expansion, in a template argument list or a nested call
+            // (`sizes(list<T1...>{}, list<T2...>{}, 0)'), is kept: the
+            // nested expansion yields an empty list there
+            const auto drops = [&](const irept &arg)
+            {
+              std::function<bool(const irept &)> contains_ep_outside_nested =
+                [&](const irept &n) -> bool
+              {
+                if(&n != &arg && n.get_bool(ID_ellipsis))
+                  return false;
+                if(n.get_bool("#sizeof_pack"))
+                  return false;
+                if(
+                  n.id() == ID_name &&
+                  ep_names.count(id2string(n.get(ID_identifier))))
+                  return true;
+                if(n.id() == ID_template_parameter_symbol_type)
+                {
+                  const std::string f = id2string(n.get(ID_identifier));
+                  const auto p = f.rfind("::");
+                  if(ep_names.count(
+                       p != std::string::npos ? f.substr(p + 2) : f))
+                    return true;
+                }
+                for(const auto &sn : n.get_sub())
+                  if(contains_ep_outside_nested(sn))
+                    return true;
+                for(const auto &ns : n.get_named_sub())
+                  if(contains_ep_outside_nested(ns.second))
+                    return true;
+                return false;
+              };
+              return has_ep(arg) && contains_ep_outside_nested(arg);
+            };
             subs.erase(
-              std::remove_if(
-                subs.begin(),
-                subs.end(),
-                [&](const irept &s) { return has_ep(s); }),
-              subs.end());
+              std::remove_if(subs.begin(), subs.end(), drops), subs.end());
           }
         }
       }
@@ -7435,12 +7476,44 @@ skip_pack_removal_ft:
           for(auto &init : mi.get_sub())
           {
             auto &subs = init.get_sub();
+            // N5008 [temp.variadic]/7: an argument that IS an expansion of
+            // the empty pack is dropped; one that merely CONTAINS such an
+            // expansion, in a template argument list or a nested call
+            // (`sizes(list<T1...>{}, list<T2...>{}, 0)'), is kept: the
+            // nested expansion yields an empty list there
+            const auto drops = [&](const irept &arg)
+            {
+              std::function<bool(const irept &)> contains_ep_outside_nested =
+                [&](const irept &n) -> bool
+              {
+                if(&n != &arg && n.get_bool(ID_ellipsis))
+                  return false;
+                if(n.get_bool("#sizeof_pack"))
+                  return false;
+                if(
+                  n.id() == ID_name &&
+                  ep_names.count(id2string(n.get(ID_identifier))))
+                  return true;
+                if(n.id() == ID_template_parameter_symbol_type)
+                {
+                  const std::string f = id2string(n.get(ID_identifier));
+                  const auto p = f.rfind("::");
+                  if(ep_names.count(
+                       p != std::string::npos ? f.substr(p + 2) : f))
+                    return true;
+                }
+                for(const auto &sn : n.get_sub())
+                  if(contains_ep_outside_nested(sn))
+                    return true;
+                for(const auto &ns : n.get_named_sub())
+                  if(contains_ep_outside_nested(ns.second))
+                    return true;
+                return false;
+              };
+              return has_ep(arg) && contains_ep_outside_nested(arg);
+            };
             subs.erase(
-              std::remove_if(
-                subs.begin(),
-                subs.end(),
-                [&](const irept &s) { return has_ep(s); }),
-              subs.end());
+              std::remove_if(subs.begin(), subs.end(), drops), subs.end());
           }
         }
       }
