@@ -35,6 +35,13 @@ literalt boolbvt::convert_equality(const equal_exprt &expr)
     return record_array_equality(expr);
   }
 
+  // see if it is a function
+  if(expr.lhs().type().id() == ID_mathematical_function)
+  {
+    functions.record(expr);
+    return prop.new_variable();
+  }
+
   const bvt &lhs_bv = convert_bv(expr.lhs());
   const bvt &rhs_bv = convert_bv(expr.rhs());
 

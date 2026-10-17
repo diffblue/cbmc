@@ -1,0 +1,11 @@
+CORE
+basic1.c
+
+^\[.*\] line \d+ \(1\): FAILURE$
+^\[.*\] line \d+ \(2\): FAILURE$
+^\[.*\] line \d+ \(0\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
