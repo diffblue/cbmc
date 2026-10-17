@@ -70,6 +70,12 @@ public:
   /// Clear the static resolve_scope cache. Must be called between
   /// type-checking different translation units.
 
+  void bind_trailing_pack(
+    const irept &pattern_with_ellipsis,
+    const template_typet &template_type,
+    const cpp_template_args_tct &arguments,
+    std::size_t first);
+
   void deduce_trailing_type_pack_pattern(
     const typet &pattern_with_ellipsis,
     const template_typet &template_type,
