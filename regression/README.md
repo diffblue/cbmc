@@ -21,10 +21,13 @@ This folder contains the CProver regression test-suite.
   These tests need the libc++ headers (`--stdlib libc++`); they are run only
   where libc++ is installed.
 - `libstdcxx`:
-  These tests check details of the libstdc++ headers (internal names, or the
-  header shapes the test was reduced from).  `regression/cbmc-cpp`'s CMake and
-  Makefile exclude them, and the `libstdcxxNN` tags, when cbmc does not
-  preprocess with GNU gcc: with MSVC, or where `gcc` is clang (macOS).
+  These tests pass only with the libstdc++ headers: they check details of
+  those headers (internal names, or the header shapes the test was reduced
+  from), or with libc++ or the MSVC STL they fail for a known bug, named in
+  the desc (with its KNOWNBUG where it could be reduced).
+  `regression/cbmc-cpp`'s CMake and Makefile exclude them, and the
+  `libstdcxxNN` tags, when cbmc does not preprocess with GNU gcc: with
+  MSVC, or where `gcc` is clang (macOS).
 - `libstdcxx12`, `libstdcxx16`:
   These tests need the libstdc++ headers of GCC 12 (resp. GCC 16) or later.
   cbmc preprocesses with the host `gcc`, so `regression/cbmc-cpp`'s CMake and
