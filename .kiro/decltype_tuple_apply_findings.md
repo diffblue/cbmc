@@ -14622,3 +14622,76 @@ reports OK under CBMC_TEST_MEMLIMIT=2500000), cpp 246, regression/cbmc
 unit 620, all 0 failures; platform_check gcc11/m32/arm64 pass; the
 validate, paths, cprover-smt2, new-smt and z3 profiles pass; lint 0,
 clang-format 0, doxygen 0; every commit since cca717a833 compiles.
+
+## Round 187 (after pushing ddb17b684e)
+
+#4 KNOWNBUG reductions:
+
+- abstract_environment_tu: elide_cpp_returned_temporaries changed the type
+  of functions returning a non-trivially-copyable class but kept the old
+  type on non-call references (the address of assume_not stored in the
+  static map); --validate-goto-model rejected it.  Fixed (161fcd36b4,
+  cpp17_returned_class_function_address_taken); the dog-food test is
+  THOROUGH again (82 s, 0.8 GB).
+- regex: the "do_tolower dispatch" lines were passing properties.  The
+  failure was _AnyMatcher's `static auto __nul =
+  _M_translator._M_translate('\0')', a block-scope static initialized in
+  __CPROVER_initialize with an undefined `this' ([stmt.dcl]/3).  Fixed
+  (d7c99f3c2e); both regex tests THOROUGH again (about 40 s, 0.7 GB).
+- GCC 11 visit: a static member with a deduced return type, called from a
+  static member of the same class template specialization, was converted
+  under the caller's template map (a4c538ecd9); std::visit verifies with
+  GCC 11.  declval<decltype()> is still instantiated and dropped; the
+  related shape is KNOWNBUG fef69f2d2d (cause not confirmed).
+
+CI run 4 (ddb17b684e):
+
+- check-clang-format: cpp20_partial_ordering_more_constrained_tie, which I
+  had formatted with the c++20 style; tests with concepts use plain
+  `clang-format-15 -i' (1e8299f8c3).
+- gcc-16 (ran for the first time): exactly the four broken-libstdcxx16
+  tests; the job calls test.pl directly and missed the exclusion
+  (bfdd942139).
+- macOS 14 (55 failed, shard 2 timeout), macOS 15 make (81 failed).
+  Reproduced with libc++ 18 (`--stdlib libc++', macOS's tag exclusions):
+  67 failures, 29 after this round.  Fixed: explicit specialization of a
+  member of an inline namespace (std::__1::hash, c8de5f67de); `= default'
+  before C++11 (libc++'s exception, 26914cf3a8); virtual tables of classes
+  that are never constructed (the locale facets <vector> declares) are no
+  longer initialized, which removed "too many addressed objects" from 28
+  tests and ~490 bogus targets from std::function's destroy() call
+  (e9811eceba); libstdc++-specific tests and the libstdcxxNN tags are no
+  longer run where gcc is clang or with MSVC (d594a42462); six optional
+  tests matched libstdc++ names only (7aaa814c34).
+- Timeouts (macOS 14, VS 2022, VS 2026): cpp11_stream_setw,
+  cpp11_ostream_integer_insertion_classic_locale,
+  cpp11_stream_destructor_chain, cpp11_pair_from_function_pointer_rvalue
+  are now libstdcxx-tagged with the cause in each desc (881d475645):
+  libc++ formats integers with vsnprintf, whose model writes a
+  nondeterministic string (KNOWNBUG cpp11_ostream_integer_insertion_libcxx);
+  libc++'s std::function<int()> has no call operator (KNOWNBUG
+  cpp11_partial_specialization_member_defined_outside_empty_pack, its
+  libc++ shape cpp11_std_function_call_libcxx).  The MSVC STL hangs were
+  not reduced.  macOS 14 also timed out on
+  cpp11_nested_braces_user_ctor_class and
+  cpp11_rvalue_reference_from_converting_constructor, which verify in 5 s
+  with libc++ 18; not understood.
+- VS 2026: Strawberry Perl cannot fork, so -t was not enforced.
+  17fabd98da enforces it with system(1, ...), waitpid(WNOHANG) and
+  taskkill; not run on Windows before pushing.
+- VS 2022 make: 200 of 1952 failed, the MSVC STL failures known from
+  earlier runs, plus the two stream timeouts above.
+- benchcomp passed.
+
+Not done: the GCC 16 items (views::transform/filter, __should_escape_ascii,
+test_chrono), and the 29 remaining libc++ 18 failures (std::bind,
+std::pair construction, typeid of distinct classes, the C library model
+of vsnprintf, ...).
+
+Verification (W152 at 17fabd98da before a whitespace fixup): cbmc-cpp 1964,
+libcxx profile 1964, KNOWNBUG profile, cpp 246, regression/cbmc 1213,
+ansi-c 270, goto-instrument 298, cbmc-library 522, unit-proofs 13 (all
+under CBMC_TEST_MEMLIMIT=2500000), unit 620, all 0 failures;
+platform_check gcc11/m32/arm64 and the validate, paths, cprover-smt2,
+new-smt and z3 profiles pass; lint 0, clang-format 0, doxygen 0; every
+commit since cca717a833 compiles.
