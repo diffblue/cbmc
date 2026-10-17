@@ -385,6 +385,12 @@ void cpp_typecheckt::typecheck_class_template(cpp_declarationt &declaration)
       // Also handles MSVC STL patterns where calling conventions
       // produce identical mangled names.
       previous_symbol.type.swap(declaration);
+      // The replacing declaration's template parameters belong to the
+      // template scope created for it, as for any replacement below: with
+      // the old scope kept, `R' and `A' of a second `_Get_function_impl<_Ret
+      // __vectorcall(_Types...)>' were unbound and the specialization never
+      // matched (MSVC std::function: "no match for symbol 'function'").
+      cpp_scopes.id_map[symbol_name] = &template_scope;
       return;
 
       error().source_location = cpp_name.source_location();
