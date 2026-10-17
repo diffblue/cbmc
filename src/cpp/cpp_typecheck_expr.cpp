@@ -3433,10 +3433,13 @@ void cpp_typecheckt::typecheck_expr_trinary(if_exprt &expr)
   qual2.read(plain2);
   c_qualifierst{}.write(plain1);
   c_qualifierst{}.write(plain2);
-  // operator== ignores the #c_type comment, which distinguishes int from a
-  // long of the same width ([basic.fundamental]/2: distinct types)
+  // operator== ignores the `#' attributes: #c_type, which distinguishes int
+  // from a long of the same width ([basic.fundamental]/2: distinct types),
+  // and the qualifiers below the top level -- `int *' and `const int *' are
+  // different types, whose composite pointer type is `const int *'
+  // ([expr.cond]/7.3, [expr.type]/4), not the first operand's type
   const bool same_underlying =
-    plain1 == plain2 && plain1.get(ID_C_c_type) == plain2.get(ID_C_c_type);
+    plain1 == plain2 && cpp_type2name(plain1) == cpp_type2name(plain2);
 
   if(same_underlying)
   {
