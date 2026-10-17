@@ -1,0 +1,20 @@
+KNOWNBUG libcxx
+main.cpp
+--cpp11 --stdlib libc++
+^\[main\.assertion\.1\] line \d+ call: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+too many addressed objects
+no body for callee
+--
+libc++ defines std::function<int()>'s members outside the class, in the
+partial specialization function<_Rp(_ArgTypes...)>, and an empty pack
+loses them (cpp11_partial_specialization_member_defined_outside_empty_pack):
+the call returns a nondeterministic value.  Until virtual tables that no
+reachable code uses were dropped before function pointer removal, the
+call ~__value_func makes through __base::destroy() also had about 400
+candidate targets and exceeded the default --object-bits.  With libstdc++
+the program verifies in under a second.
