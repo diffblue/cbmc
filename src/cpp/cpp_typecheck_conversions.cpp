@@ -5942,6 +5942,20 @@ bool cpp_typecheckt::reinterpret_typecast(
 {
   exprt e = expr;
 
+  // N5008 [expr.reinterpret.cast]/1: the result has type T.  conditional_cast
+  // leaves the operand alone when the types compare equal, and irept's
+  // comparison ignores #c_type: `long long *' to `long *' (or, on Windows,
+  // `long *' to `int *') kept the source type, and overload resolution,
+  // which does distinguish them, found no match (the MSVC STL's
+  // `__iso_volatile_load32(reinterpret_cast<volatile int *>(&_Uses))' with
+  // a `long' _Uses).
+  const auto cast_to = [&type](const exprt &op)
+  {
+    exprt result = typecast_exprt::conditional_cast(op, type);
+    result.type() = type;
+    return result;
+  };
+
   if(check_constantness && type.id() == ID_pointer)
   {
     if(e.id() == ID_dereference && e.get_bool(ID_C_implicit))
@@ -5987,7 +6001,7 @@ bool cpp_typecheckt::reinterpret_typecast(
     (type.id() == ID_unsignedbv || type.id() == ID_signedbv))
   {
     // pointer to integer, always ok
-    new_expr = typecast_exprt::conditional_cast(e, type);
+    new_expr = cast_to(e);
     return true;
   }
 
@@ -6006,7 +6020,7 @@ bool cpp_typecheckt::reinterpret_typecast(
     }
     else
     {
-      new_expr = typecast_exprt::conditional_cast(e, type);
+      new_expr = cast_to(e);
     }
     return true;
   }
@@ -6023,7 +6037,7 @@ bool cpp_typecheckt::reinterpret_typecast(
     // aligned-storage idiom) produced a typecast of an array value, which
     // symbolic execution cannot relate to the object's address (pointer
     // differences UNKNOWN, reads through it FAILURE).
-    new_expr = typecast_exprt::conditional_cast(e, type);
+    new_expr = cast_to(e);
     return true;
   }
 
@@ -6049,7 +6063,7 @@ bool cpp_typecheckt::reinterpret_typecast(
   // lvalues, even when constexpr has replaced the symbol with a constant)
   if(is_reference(type) && e.type().id() == ID_array)
   {
-    new_expr = typecast_exprt::conditional_cast(address_of_exprt(e), type);
+    new_expr = cast_to(address_of_exprt(e));
     return true;
   }
 
