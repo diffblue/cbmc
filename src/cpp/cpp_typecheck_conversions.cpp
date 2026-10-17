@@ -6005,9 +6005,13 @@ bool cpp_typecheckt::reinterpret_typecast(
     return true;
   }
 
+  // N5008 [expr.reinterpret.cast]/5: a value of integral type or
+  // enumeration type can be converted to a pointer (the MSVC STL's
+  // `reinterpret_cast<void *>(_Handle)' for an enum __std_fs_file_handle)
   if(
     (e.type().id() == ID_unsignedbv || e.type().id() == ID_signedbv ||
-     e.type().id() == ID_c_bool || e.is_boolean()) &&
+     e.type().id() == ID_c_bool || e.is_boolean() ||
+     e.type().id() == ID_c_enum_tag || e.type().id() == ID_c_enum) &&
     type.id() == ID_pointer && !is_reference(type))
   {
     // integer to pointer
