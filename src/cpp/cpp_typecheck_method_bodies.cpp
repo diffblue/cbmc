@@ -289,9 +289,16 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
       }
       if(!empty_pack_shorts.empty())
       {
+        // an argument that merely contains an expansion of the empty pack
+        // nested in a template argument list or a call (`sizes(list<T1...>{},
+        // list<T2...>{}, 0)', the MSVC STL pair's `index_sequence_for<
+        // _Types2...>{}') is kept: the nested expansion is empty there
+        const irept *current_arg = nullptr;
         std::function<bool(const irept &)> refs_ep = [&](const irept &n)
         {
           if(n.get_bool("#sizeof_pack"))
+            return false;
+          if(&n != current_arg && n.get_bool(ID_ellipsis))
             return false;
           if(
             n.id() == ID_name &&
@@ -314,7 +321,11 @@ void cpp_typecheckt::prepare_deferred_method_body(symbolt &method_symbol)
               std::remove_if(
                 args.begin(),
                 args.end(),
-                [&](const irept &a) { return refs_ep(a); }),
+                [&](const irept &a)
+                {
+                  current_arg = &a;
+                  return refs_ep(a);
+                }),
               args.end());
             return;
           }
