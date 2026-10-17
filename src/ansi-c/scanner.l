@@ -766,7 +766,15 @@ enable_or_disable ("enable"|"disable")
                     TOK_BUILTIN_VA_ARG);
                 }
 
-"__builtin_offsetof" |
+"__builtin_offsetof" { /* also an MSVC intrinsic (vcruntime.h's offsetof
+                          expands to it for C++) */
+                  return conditional_keyword(
+                    PARSER.mode==configt::ansi_ct::flavourt::GCC ||
+                    PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
+                    PARSER.mode==configt::ansi_ct::flavourt::ARM ||
+                    PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO,
+                    TOK_OFFSETOF);
+                }
 "__offsetof__" |
 "offsetof"      { return conditional_keyword(
                     PARSER.mode==configt::ansi_ct::flavourt::GCC ||
