@@ -1,0 +1,14 @@
+CORE
+copy1.c
+--safety
+^EXIT=0$
+^SIGNAL=0$
+^\[main\.invariant\.1\] line \d+ loop invariant: SUCCESS$
+^\[main\.invariant\.2\] line \d+ loop invariant: SUCCESS$
+^\[main\.invariant\.3\] line \d+ loop invariant: SUCCESS$
+^\[main\.invariant\.4\] line \d+ loop invariant: SUCCESS$
+^\[main\.invariant\.5\] line \d+ loop invariant: SUCCESS$
+^\[main\.pointer\.1\] line \d+ pointer output \+ .*i safe: SUCCESS$
+^\[main\.pointer\.2\] line \d+ pointer input \+ .*i safe: SUCCESS$
+--
+--

@@ -1,0 +1,12 @@
+CORE
+r_ok2.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[int_assignment\.pointer\.1\] line \d+ pointer p safe: SUCCESS$
+^\[int_assignment\.pointer\.2\] line \d+ pointer p safe: SUCCESS$
+^\[int_pointer_assignment\.pointer\.1\] line \d+ pointer p safe: SUCCESS$
+^\[int_pointer_assignment\.pointer\.2\] line \d+ pointer p safe: SUCCESS$
+^\[pointer_assignment\.pointer\.1\] line \d+ pointer p safe: SUCCESS$
+^\[pointer_assignment\.pointer\.2\] line \d+ pointer p safe: REFUTED$
+--

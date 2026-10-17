@@ -1,0 +1,11 @@
+CORE
+malloc1.c
+--safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ property 1: SUCCESS$
+^\[main\.assertion\.2\] line \d+ property 2: SUCCESS$
+^\[main\.assertion\.3\] line \d+ property 3: SUCCESS$
+^\[main\.assertion\.4\] line \d+ property 4: SUCCESS$
+^\[main\.assertion\.5\] line \d+ property 5: REFUTED$
+--

@@ -1,0 +1,7 @@
+CORE
+check_precondition2.c
+
+^EXIT=0$
+^SIGNAL=0$
+^\[caller\.precondition\.1\] line \d+ callee precondition parameter >= 10: SUCCESS$
+--
