@@ -7295,11 +7295,23 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
         continue;
       }
 
-      if(comp.get_base_name() == "__name" && comp.type().id() == ID_pointer)
+      // the name member: libstdc++'s `__name', libc++'s `__type_name'
+      // (a pointer, or with the non-unique ARM RTTI an integer holding the
+      // address, [type.info]/1 leaves the representation open)
+      const bool name_member = comp.get_base_name() == "__name" ||
+                               comp.get_base_name() == "__type_name";
+      if(name_member && comp.type().id() == ID_pointer)
       {
         address_of_exprt name_addr{first_char};
         name_addr.type() = to_pointer_type(comp.type());
         field_values.push_back(std::move(name_addr));
+      }
+      else if(
+        name_member &&
+        (comp.type().id() == ID_unsignedbv || comp.type().id() == ID_signedbv))
+      {
+        field_values.push_back(
+          typecast_exprt{address_of_exprt{first_char}, comp.type()});
       }
       else
       {
