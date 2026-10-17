@@ -1,4 +1,4 @@
-CORE
+CORE libstdcxx
 main.cpp
 --cpp11 --unwind 8 --object-bits 12
 ^\[main\.assertion\.1\] line \d+ negative decimal: SUCCESS$
@@ -16,3 +16,5 @@ N5008 [locale.general]/8, [facet.numpunct.virtuals]: the "C"-locale
 num_put<char> and numpunct<char> data live in libstdc++.so; the front end
 models them (cpp_typecheck_stdlib.cpp classic_num_put and
 classic_numpunct_cache).
+libstdcxx: with libc++ integer insertion does not terminate
+(cpp11_ostream_integer_insertion_libcxx); it timed out on macOS 14.
