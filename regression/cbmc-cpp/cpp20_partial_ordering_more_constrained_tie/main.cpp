@@ -1,11 +1,13 @@
 extern "C" void __CPROVER_assert(bool, const char *);
 template <class T>
-concept has_begin = requires(T &t) { t.begin(); };
+concept has_begin = requires(T & t)
+{
+  t.begin();
+};
 struct fn
 {
   template <class T>
-    requires has_begin<T>
-  int operator()(T &&t) const
+  requires has_begin<T> int operator()(T &&t) const
   {
     return t.begin();
   }
