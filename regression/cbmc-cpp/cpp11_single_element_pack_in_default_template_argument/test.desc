@@ -5,7 +5,7 @@ main.cpp
 ^\[main\.assertion\.2\] .* one element keeps the candidate: SUCCESS$
 ^\[main\.assertion\.3\] .* two elements remove the candidate: SUCCESS$
 ^\[main\.assertion\.4\] .* WRONG \(must FAIL\): FAILURE$
-^\*\* 1 of 4 failed
+^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

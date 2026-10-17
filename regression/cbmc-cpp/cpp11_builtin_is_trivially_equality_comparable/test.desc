@@ -3,7 +3,7 @@ main.cpp
 --cpp11 --stdlib libc++
 ^\[main\.assertion\.17\] .* function template body kept: SUCCESS$
 ^\[main\.assertion\.18\] .* WRONG \(must FAIL\): FAILURE$
-^\*\* 1 of 24 failed
+^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

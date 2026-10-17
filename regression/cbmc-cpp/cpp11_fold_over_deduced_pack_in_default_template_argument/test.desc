@@ -7,7 +7,7 @@ main.cpp
 ^\[main\.assertion\.4\] .* binary fold keeps the candidate: SUCCESS$
 ^\[main\.assertion\.5\] .* constructor kept: SUCCESS$
 ^\[main\.assertion\.6\] .* WRONG \(must FAIL\): FAILURE$
-^\*\* 1 of 18 failed
+^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$

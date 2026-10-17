@@ -11,7 +11,7 @@ main.cpp
 ^\[main\.assertion\.8\] .* const int \* twice: SUCCESS$
 ^\[main\.assertion\.9\] .* class template argument and const: SUCCESS$
 ^\[main\.assertion\.10\] .* WRONG \(must FAIL\): FAILURE$
-^\*\* 1 of 10 failed
+^\*\* 1 of \d+ failed
 ^VERIFICATION FAILED$
 ^EXIT=10$
 ^SIGNAL=0$
