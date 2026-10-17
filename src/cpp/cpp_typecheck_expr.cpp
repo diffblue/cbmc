@@ -130,6 +130,21 @@ void cpp_typecheckt::expand_requires_parameter_packs(exprt &expr)
       if(op.id() == ID_arguments)
         expand_type_pack_arguments(op, /*with_requires_parameters=*/true);
   }
+  // N5008 [temp.variadic]/5: a new-initializer's expression-list is a
+  // pack-expansion context too -- the MSVC STL's std::construct_at is
+  // constrained by `requires(_Ty *_Location, _Types &&..._Args) { ::new
+  // (static_cast<void *>(_Location)) _Ty(forward<_Types>(_Args)...); }'
+  // ("symbol '_Args' is unknown", and _Construct_in_place lost its body)
+  if(expr.id() == ID_side_effect && expr.get(ID_statement) == ID_cpp_new)
+  {
+    exprt &initializer = static_cast<exprt &>(expr.add(ID_initializer));
+    if(initializer.is_not_nil())
+    {
+      expand_requires_parameter_packs(initializer);
+      expand_type_pack_arguments(
+        initializer, /*with_requires_parameters=*/true);
+    }
+  }
 }
 
 /// A fresh symbol for an element of the parameter pack \p name, of type

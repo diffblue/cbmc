@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ pointer constructed in place: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+dropped the body
+--
+A requires-expression whose parameter pack is expanded in a new-initializer
+(`::new(loc) T(forward<Types>(_Args)...)', as in the MSVC STL's
+std::construct_at) left the pack unexpanded: "symbol '_Args' is unknown",
+and the caller lost its body (_Construct_in_place, 9 cbmc-cpp tests on
+VS 2022).
