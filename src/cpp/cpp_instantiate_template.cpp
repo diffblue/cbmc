@@ -8345,9 +8345,26 @@ skip_pack_removal_ft:
           const cpp_template_args_non_tct &partial_args =
             spec_decl.partial_specialization_args();
 
-          if(
-            partial_args.arguments().size() !=
-            full_args_resolved.arguments().size())
+          // N5008 [temp.spec.partial.match], [temp.deduct.type]/9: an
+          // argument list ending in a pack expansion (`v0<true,
+          // tup<_Dests...>, _Srcs...>', the MSVC STL's
+          // _Tuple_constructible_v0) matches the remaining arguments, as for
+          // class templates (disambiguate_template_classes)
+          const auto pattern_of = [](const exprt &arg) -> const irept &
+          {
+            if(arg.id() == ID_ambiguous)
+              return arg.find(ID_type);
+            if(arg.id() == ID_type)
+              return arg.type();
+            return arg;
+          };
+          const std::size_t n_partial = partial_args.arguments().size();
+          const std::size_t n_full = full_args_resolved.arguments().size();
+          const bool trailing_pack =
+            n_partial > 0 &&
+            (partial_args.arguments().back().get_bool(ID_ellipsis) ||
+             pattern_of(partial_args.arguments().back()).get_bool(ID_ellipsis));
+          if(trailing_pack ? n_full + 1 < n_partial : n_partial != n_full)
             continue;
 
           cpp_saved_template_mapt saved_map2(template_map);
@@ -8365,8 +8382,17 @@ skip_pack_removal_ft:
           // cpp_typecheck_resolve.h).
           resolver.strict_cv_deduction = true;
 
-          for(std::size_t i = 0; i < full_args_resolved.arguments().size(); i++)
+          for(std::size_t i = 0; i < n_partial; i++)
           {
+            if(trailing_pack && i + 1 == n_partial)
+            {
+              resolver.bind_trailing_pack(
+                pattern_of(partial_args.arguments()[i]),
+                spec_decl.template_type(),
+                full_args_resolved,
+                i);
+              break;
+            }
             if(full_args_resolved.arguments()[i].id() == ID_type)
               resolver.guess_template_args(
                 partial_args.arguments()[i].type(),

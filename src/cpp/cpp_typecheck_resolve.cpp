@@ -4677,6 +4677,79 @@ cpp_scopet &cpp_typecheck_resolvet::resolve_scope(
 } // NOLINT(readability/fn_size)
 
 /// disambiguate partial specialization
+/// N5008 [temp.deduct.type]/9-10, [temp.variadic]: bind the trailing
+/// pattern \p pattern_with_ellipsis of a partial specialization's argument
+/// list (a template parameter pack, or a pattern naming packs) to the
+/// arguments of \p arguments from \p first on.
+void cpp_typecheck_resolvet::bind_trailing_pack(
+  const irept &pattern_with_ellipsis,
+  const template_typet &template_type,
+  const cpp_template_args_tct &arguments,
+  std::size_t first)
+{
+  const std::size_t n_full = arguments.arguments().size();
+  const std::size_t i = first;
+  const typet &parg_t = static_cast<const typet &>(pattern_with_ellipsis);
+  // Bind the trailing parameter pack to the remaining instantiation
+  // arguments ([temp.variadic]), mirroring the template-id pack
+  // deduction in guess_template_args: record its element types and
+  // count so build_template_args / typecheck_template_args expand it to
+  // the deduced arity.
+  irep_idt pack_id;
+  if(parg_t.id() == ID_cpp_name)
+  {
+    const cpp_namet &pn = to_cpp_name(parg_t);
+    if(!pn.is_qualified() && !pn.has_template_args())
+    {
+      const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+        pn.get_base_name(), cpp_scopet::RECURSIVE);
+      for(const auto &id_ptr : ids)
+        if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+          pack_id = id_ptr->identifier;
+    }
+  }
+  if(!pack_id.empty())
+  {
+    // N5008 [temp.deduct.type]/9-10: the trailing pack binds the
+    // remaining arguments -- TYPES for a type parameter pack, VALUES
+    // for a non-type one (`template<int H, int... T> struct
+    // sum_t<H, T...>`).  A value pack is recorded in pack_expr_map
+    // (see the template-id deduction in guess_template_args); it used
+    // to be recorded as an EMPTY type pack, so `sum_t<1, 2, 3>`
+    // matched the specialization with T = {} and had no `v`.
+    std::vector<typet> pack_elems;
+    exprt::operandst pack_exprs;
+    for(std::size_t j = i; j < n_full; j++)
+    {
+      const exprt &a = arguments.arguments()[j];
+      if(a.id() == ID_type)
+      {
+        if(a.type().id() != ID_empty)
+          pack_elems.push_back(a.type());
+      }
+      else
+        pack_exprs.push_back(a);
+    }
+    cpp_typecheck.template_map.set_pack_size(
+      pack_id, pack_elems.size() + pack_exprs.size());
+    if(pack_exprs.empty())
+    {
+      cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
+      if(!pack_elems.empty())
+        cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
+    }
+    else
+    {
+      cpp_typecheck.template_map.pack_expr_map[pack_id] = pack_exprs;
+      cpp_typecheck.template_map.expr_map[pack_id] = pack_exprs.front();
+    }
+  }
+  else
+  {
+    deduce_trailing_type_pack_pattern(parg_t, template_type, arguments, i);
+  }
+}
+
 typet cpp_typecheck_resolvet::disambiguate_template_classes(
   const irep_idt &base_name,
   const cpp_scopest::id_sett &id_set,
@@ -5265,66 +5338,8 @@ typet cpp_typecheck_resolvet::disambiguate_template_classes(
         parg.get_bool(ID_ellipsis) || parg_pat.get_bool(ID_ellipsis);
       if(is_pack)
       {
-        // Bind the trailing parameter pack to the remaining instantiation
-        // arguments ([temp.variadic]), mirroring the template-id pack
-        // deduction in guess_template_args: record its element types and
-        // count so build_template_args / typecheck_template_args expand it to
-        // the deduced arity.
-        const typet &parg_t = static_cast<const typet &>(parg_pat);
-        irep_idt pack_id;
-        if(parg_t.id() == ID_cpp_name)
-        {
-          const cpp_namet &pn = to_cpp_name(parg_t);
-          if(!pn.is_qualified() && !pn.has_template_args())
-          {
-            const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
-              pn.get_base_name(), cpp_scopet::RECURSIVE);
-            for(const auto &id_ptr : ids)
-              if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
-                pack_id = id_ptr->identifier;
-          }
-        }
-        if(!pack_id.empty())
-        {
-          // N5008 [temp.deduct.type]/9-10: the trailing pack binds the
-          // remaining arguments -- TYPES for a type parameter pack, VALUES
-          // for a non-type one (`template<int H, int... T> struct
-          // sum_t<H, T...>`).  A value pack is recorded in pack_expr_map
-          // (see the template-id deduction in guess_template_args); it used
-          // to be recorded as an EMPTY type pack, so `sum_t<1, 2, 3>`
-          // matched the specialization with T = {} and had no `v`.
-          std::vector<typet> pack_elems;
-          exprt::operandst pack_exprs;
-          for(std::size_t j = i; j < n_full; j++)
-          {
-            const exprt &a = full_template_args_tc.arguments()[j];
-            if(a.id() == ID_type)
-            {
-              if(a.type().id() != ID_empty)
-                pack_elems.push_back(a.type());
-            }
-            else
-              pack_exprs.push_back(a);
-          }
-          cpp_typecheck.template_map.set_pack_size(
-            pack_id, pack_elems.size() + pack_exprs.size());
-          if(pack_exprs.empty())
-          {
-            cpp_typecheck.template_map.pack_args_map[pack_id] = pack_elems;
-            if(!pack_elems.empty())
-              cpp_typecheck.template_map.type_map[pack_id] = pack_elems.front();
-          }
-          else
-          {
-            cpp_typecheck.template_map.pack_expr_map[pack_id] = pack_exprs;
-            cpp_typecheck.template_map.expr_map[pack_id] = pack_exprs.front();
-          }
-        }
-        else
-        {
-          deduce_trailing_type_pack_pattern(
-            parg_t, cpp_declaration.template_type(), full_template_args_tc, i);
-        }
+        bind_trailing_pack(
+          parg_pat, cpp_declaration.template_type(), full_template_args_tc, i);
         break;
       }
       if(i >= n_full)
