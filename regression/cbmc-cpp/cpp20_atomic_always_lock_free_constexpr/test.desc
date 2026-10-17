@@ -1,4 +1,4 @@
-CORE
+CORE gnu-extensions
 main.cpp
 --cpp20 --64
 ^\[main\.assertion\.1\] line \d+ alias picks lock-free type: SUCCESS$
