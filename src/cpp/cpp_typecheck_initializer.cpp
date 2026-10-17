@@ -76,7 +76,7 @@ std::optional<exprt> cpp_typecheckt::build_init_list_argument(
 /// Build a `std::initializer_list<E>` value from a braced-init-list, per N5008
 /// [dcl.init.list]/5: a backing `const E[N]` array is synthesised from the list
 /// elements and the initializer_list object is constructed to refer to it (its
-/// modelled `{begin pointer, size}` layout).  \p il_type must be a
+/// layout, see initializer_list_extent).  \p il_type must be a
 /// `std::initializer_list<E>` struct-tag type.
 typet cpp_typecheckt::initializer_list_element_type(
   const struct_tag_typet &il_type)
@@ -96,14 +96,35 @@ typet cpp_typecheckt::initializer_list_element_type(
   return typet(ID_nil);
 }
 
+/// The second data member of a `std::initializer_list` over the \p n
+/// elements of \p array.  N5008 [support.initlist]/1 leaves the layout to
+/// the implementation: libstdc++ and libc++ store the size, the MSVC STL a
+/// pointer past the last element (`const _Elem *_First, *_Last;').
+exprt cpp_typecheckt::initializer_list_extent(
+  const exprt &array,
+  const typet &element_type,
+  std::size_t n,
+  const typet &member_type)
+{
+  if(member_type.id() == ID_pointer)
+  {
+    address_of_exprt end{
+      index_exprt{array, from_integer(n, c_index_type()), element_type}};
+    end.type() = member_type;
+    return std::move(end);
+  }
+  return from_integer(n, member_type);
+}
+
 std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
   const struct_tag_typet &il_type,
   const exprt &init_list)
 {
   const struct_typet &il_struct = follow_tag(il_type);
 
-  // The std::initializer_list<U> layout is modelled as a {begin pointer,
-  // size} pair; extract the element type U from the pointer member.
+  // The std::initializer_list<U> layout is a begin pointer followed by a
+  // size or an end pointer; extract the element type U from the begin
+  // pointer.
   // a default-constructed typet is NOT nil (empty id); the is_nil()
   // test below needs an explicit nil
   typet elem_type(ID_nil);
@@ -161,9 +182,12 @@ std::optional<exprt> cpp_typecheckt::build_initializer_list_value(
     index_exprt first{arr_ref, from_integer(0, c_index_type()), elem_type};
     address_of_exprt addr{first};
     addr.type() = ptr_comp->type();
-    set_struct_member_value(il_val, il_struct, *ptr_comp, std::move(addr));
+    set_struct_member_value(il_val, il_struct, *ptr_comp, addr);
     set_struct_member_value(
-      il_val, il_struct, *size_comp, from_integer(n, size_comp->type()));
+      il_val,
+      il_struct,
+      *size_comp,
+      initializer_list_extent(arr_ref, elem_type, n, size_comp->type()));
     il_val.add_source_location() = init_list.source_location();
     return sequence_before(
       std::move(prefix), std::move(il_val), init_list.source_location());

@@ -1732,6 +1732,11 @@ public:
   /// `__begin_`, MSVC `_begin`).  Nil when \p il_type is not such a layout.
   typet initializer_list_element_type(const struct_tag_typet &il_type);
 
+  exprt initializer_list_extent(
+    const exprt &array,
+    const typet &element_type,
+    std::size_t n,
+    const typet &member_type);
   std::optional<exprt> build_initializer_list_value(
     const struct_tag_typet &il_type,
     const exprt &init_list);
