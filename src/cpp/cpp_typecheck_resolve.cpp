@@ -7970,6 +7970,35 @@ resolved_after_strip:
 
   filter(identifiers, want);
 
+  // N5008 [class.ctor.general]/1: constructors do not have names, and
+  // [class.pre]/2, [temp.local]/1: the injected-class-name names the class.
+  // Outside the construction of an object (want == VAR, above) a lookup
+  // that found the class does not also find its constructors: in
+  // `alignof(_Func_impl_no_alloc)' (the MSVC STL's std::function), a type
+  // or an expression, the copy constructor made the name ambiguous.
+  if(
+    want != wantt::VAR && std::any_of(
+                            identifiers.begin(),
+                            identifiers.end(),
+                            [](const exprt &e)
+                            {
+                              return e.id() == ID_type &&
+                                     (e.type().id() == ID_struct_tag ||
+                                      e.type().id() == ID_union_tag);
+                            }))
+  {
+    identifiers.erase(
+      std::remove_if(
+        identifiers.begin(),
+        identifiers.end(),
+        [](const exprt &e)
+        {
+          return e.id() != ID_type && e.type().id() == ID_code &&
+                 to_code_type(e.type()).return_type().id() == ID_constructor;
+        }),
+      identifiers.end());
+  }
+
 #ifdef DEBUG
   std::cout << "P0 " << base_name << " " << identifiers.size() << '\n';
   show_identifiers(base_name, identifiers, std::cout);
