@@ -9,6 +9,14 @@ env:
   z3-version: "4.8.10"
   linux-vcpus: 4
   windows-vcpus: 4
+  # cbmc-cpp tests to preprocess for the macOS and Windows artifacts in
+  # addition to the failed ones (scripts/preprocess_cpp_tests.*): those that
+  # time out there, and so are excluded or missing from test.pl's logs
+  cpp-preprocess-tests: >-
+    cpp11_stream_setw cpp11_ostream_integer_insertion_classic_locale
+    cpp11_stream_destructor_chain cpp11_pair_from_function_pointer_rvalue
+    cpp11_nested_braces_user_ctor_class
+    cpp11_rvalue_reference_from_converting_constructor
   # Per-test virtual memory limit (KB) for test.pl.
   # CI runners have ~10 GB RAM; with 4 parallel jobs, each test
   # gets ~2.5 GB. This prevents OOM kills from masking real failures.
@@ -822,26 +830,8 @@ jobs:
           make -C regression test-parallel JOBS=4
       - name: Preprocess the failing cbmc-cpp tests for debugging
         if: always()
-        run: |
-          # Every cbmc-cpp test that failed, preprocessed with the host
-          # toolchain (Apple libc++), so that the failure can be reproduced
-          # on Linux from the artifact (`cbmc <flags> test_X.ii')
-          mkdir -p macos-preprocessed
-          cbmc=src/cbmc/cbmc
-          for hdr in vector iterator; do
-            echo "#include <$hdr>" > pp_$hdr.cpp
-            echo "int main() {}" >> pp_$hdr.cpp
-            $cbmc --cpp11 --preprocess pp_$hdr.cpp > macos-preprocessed/$hdr.ii 2>/dev/null || true
-          done
-          # test.pl's log: a "Test 'NAME'" block per test, "[FAILED]" lines within
-          for t in $(awk -v q="'" '/^Test / { t = $2; gsub(q, "", t) } /\[FAILED\]/ { print t }' regression/cbmc-cpp/tests*.log 2>/dev/null | sort -u); do
-            for src in regression/cbmc-cpp/$t/main.cpp regression/cbmc-cpp/$t/main.ii; do
-              if [ -f "$src" ]; then
-                flags=$(sed -n '3p' "regression/cbmc-cpp/$t/test.desc")
-                $cbmc $flags --preprocess "$src" > "macos-preprocessed/test_$t.ii" 2>/dev/null || true
-              fi
-            done
-          done
+        # the failed tests and env.cpp-preprocess-tests
+        run: scripts/preprocess_cpp_tests.sh src/cbmc/cbmc macos-preprocessed ${{env.cpp-preprocess-tests}}
       - name: Upload preprocessed headers
         if: always()
         uses: actions/upload-artifact@v4
@@ -899,6 +889,17 @@ jobs:
         run: ccache -s
       - name: Run CTest
         run: cd build; ctest -V -L CORE . -j3
+      - name: Preprocess the failing cbmc-cpp tests for debugging
+        if: always()
+        # the failed tests and env.cpp-preprocess-tests
+        run: scripts/preprocess_cpp_tests.sh build/bin/cbmc macos-preprocessed ${{env.cpp-preprocess-tests}}
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-14-preprocessed-headers
+          path: macos-preprocessed/
+          retention-days: 7
 
       - name: Save ccache
         if: always()
@@ -1006,33 +1007,8 @@ jobs:
           ctest -V -L CORE -C Release . -j${{env.windows-vcpus}} --timeout 600
       - name: Preprocess the failing cbmc-cpp tests for debugging
         if: always()
-        run: |
-          # Every cbmc-cpp test that failed, preprocessed with the MSVC
-          # toolchain, so that the failure can be reproduced on Linux from
-          # the artifact (`cbmc --winx64 <flags> test_X.ii')
-          New-Item -ItemType Directory -Force -Path msvc-preprocessed
-          $cbmc = "build\bin\Release\cbmc.exe"
-          foreach ($hdr in @("tuple", "string_view", "variant", "any", "string", "map", "optional", "vector", "list", "set", "thread", "mutex", "filesystem", "chrono", "valarray", "iostream", "memory", "functional")) {
-            $src = "#include <$hdr>`nint main() {}"
-            $src | Set-Content "pp_$hdr.cpp"
-            & $cbmc --cpp17 --preprocess "pp_$hdr.cpp" 2>$null | Set-Content "msvc-preprocessed\$hdr.ii"
-          }
-          # test.pl's log: a "Test 'NAME'" block per test, "[FAILED]" lines within
-          $tests = @()
-          $current = ""
-          foreach ($line in (Get-ChildItem "regression\cbmc-cpp\tests*.log" -ErrorAction SilentlyContinue | Get-Content)) {
-            if ($line -match "^Test '([^']+)'") { $current = $Matches[1] }
-            elseif ($line -match "\[FAILED\]" -and $current -ne "") { $tests += $current }
-          }
-          $tests = $tests | Sort-Object -Unique
-          foreach ($t in $tests) {
-            foreach ($src in @("regression\cbmc-cpp\$t\main.cpp", "regression\cbmc-cpp\$t\main.ii")) {
-              if (Test-Path $src) {
-                $flags = (Get-Content "regression\cbmc-cpp\$t\test.desc" | Select-Object -Index 2).Trim()
-                & $cbmc $flags.Split(" ") --preprocess $src 2>$null | Set-Content "msvc-preprocessed\test_$t.ii"
-              }
-            }
-          }
+        # the failed tests and env.cpp-preprocess-tests
+        run: pwsh -ExecutionPolicy Bypass -File scripts/preprocess_cpp_tests.ps1 build\bin\Release\cbmc.exe msvc-preprocessed ${{env.cpp-preprocess-tests}}
       - name: Upload preprocessed headers
         if: always()
         uses: actions/upload-artifact@v4
@@ -1168,6 +1144,17 @@ jobs:
         run: |
           $env:CBMC_TEST_MEMLIMIT = "3000000"
           make CXX=clcache BUILD_ENV=MSVC -j${{env.windows-vcpus}} -C regression test-parallel-jobs
+      - name: Preprocess the failing cbmc-cpp tests for debugging
+        if: always()
+        # the failed tests and env.cpp-preprocess-tests
+        run: pwsh -ExecutionPolicy Bypass -File scripts/preprocess_cpp_tests.ps1 src\cbmc\cbmc.exe msvc-preprocessed ${{env.cpp-preprocess-tests}}
+      - name: Upload preprocessed headers
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: msvc-2022-preprocessed-headers
+          path: msvc-preprocessed/
+          retention-days: 7
 
       - name: Save ccache
         if: always()
