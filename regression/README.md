@@ -45,6 +45,9 @@ This folder contains the CProver regression test-suite.
   Tests motivated by the libstdc++ 16 header shapes; a grouping tag only (the
   test may pass with older headers too).  Combine with `libstdcxx16` when the
   newer headers are required.
+- `gnu-extensions`:
+  Tests of GNU extensions (`__attribute__`, `__alignof__`, GNU builtins,
+  `__complex__`) that both gcc and clang accept; excluded with MSVC.
 - `gcc-only`:
   Tests that need `goto-cc` in gcc mode (excluded with MSVC or a non-GNU
   build compiler).

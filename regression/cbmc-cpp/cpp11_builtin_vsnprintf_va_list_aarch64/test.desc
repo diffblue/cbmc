@@ -1,4 +1,4 @@
-CORE
+CORE gnu-extensions
 main.cpp
 --arch arm64 --validate-goto-model
 ^\[main\.assertion\.1\] line \d+ returns: SUCCESS$
