@@ -3688,9 +3688,24 @@ bool cpp_typecheckt::out_of_line_definition_matches(
   }
   const auto &dparams = def_ftype.find(ID_parameters).get_sub();
   std::size_t def_arity = 0;
+  // N5008 [temp.variadic]/5: a function parameter pack (`_ArgTypes...
+  // __arg') expands to any number of parameters, none for an empty pack
+  // (libc++'s `function<_Rp(_ArgTypes...)>::operator()' for
+  // std::function<int()>, which had no body)
+  bool def_has_pack = false;
   for(const auto &dp : dparams)
-    if(dp.id() == ID_cpp_declaration)
+  {
+    if(dp.id() != ID_cpp_declaration)
+      continue;
+    const auto &dpd = static_cast<const cpp_declarationt &>(dp);
+    if(
+      !dpd.declarators().empty() &&
+      (dpd.declarators().front().get_has_ellipsis() ||
+       dpd.declarators().front().type().get_bool(ID_ellipsis)))
+      def_has_pack = true;
+    else
       ++def_arity;
+  }
   // `(void)' declares no parameters ([dcl.fct]/4)
   if(
     def_arity == 1 &&
@@ -3699,7 +3714,7 @@ bool cpp_typecheckt::out_of_line_definition_matches(
   {
     def_arity = 0;
   }
-  if(def_arity != member_arity)
+  if(def_has_pack ? member_arity < def_arity : def_arity != member_arity)
     return false;
   // [over.load]/2.3: `f(const K &)' and `f(const K &) const' are different
   // members; the definition's cv-qualifier must be the member's
@@ -3713,7 +3728,8 @@ bool cpp_typecheckt::out_of_line_definition_matches(
     if(member_const != def_const)
       return false;
   }
-  if(class_args == nullptr)
+  // with a pack the definition's parameters do not correspond one to one
+  if(class_args == nullptr || def_has_pack)
     return true;
   cpp_saved_template_mapt saved_map(template_map);
   template_map.build(def.template_type(), *class_args);
@@ -3776,6 +3792,30 @@ void cpp_typecheckt::adopt_definition_parameter_names(
     const auto &dpd = static_cast<const cpp_declarationt &>(dp);
     if(i >= mparams.size())
       break;
+    // N5008 [temp.variadic]/5: a function parameter pack `_ArgTypes... __arg'
+    // names all remaining parameters; the instantiated body refers to them
+    // as __arg$0, __arg$1, ... -- or as __arg for a single element
+    // (template_mapt's pack expansion of the parameter list)
+    if(
+      !dpd.declarators().empty() &&
+      (dpd.declarators().front().get_has_ellipsis() ||
+       dpd.declarators().front().type().get_bool(ID_ellipsis)))
+    {
+      const irep_idt base = dpd.declarators().front().name().get_base_name();
+      if(base.empty())
+        break;
+      const bool single = mparams.size() - i == 1;
+      for(std::size_t k = 0; i < mparams.size(); ++i, ++k)
+      {
+        const irep_idt new_name =
+          single ? base : irep_idt{id2string(base) + "$" + std::to_string(k)};
+        mparams[i].set_base_name(new_name);
+        symbolt *psym = symbol_table.get_writeable(mparams[i].get_identifier());
+        if(psym != nullptr)
+          psym->base_name = new_name;
+      }
+      break;
+    }
     if(!dpd.declarators().empty())
     {
       const irep_idt new_name =

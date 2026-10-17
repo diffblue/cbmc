@@ -10,11 +10,12 @@ main.cpp
 too many addressed objects
 no body for callee
 --
-libc++ defines std::function<int()>'s members outside the class, in the
-partial specialization function<_Rp(_ArgTypes...)>, and an empty pack
-loses them (cpp11_partial_specialization_member_defined_outside_empty_pack):
-the call returns a nondeterministic value.  Until virtual tables that no
-reachable code uses were dropped before function pointer removal, the
-call ~__value_func makes through __base::destroy() also had about 400
-candidate targets and exceeded the default --object-bits.  With libstdc++
-the program verifies in under a second.
+libc++ defines std::function's members outside the class, in the partial
+specialization function<_Rp(_ArgTypes...)>.  For std::function<int()> the
+converting constructor template `function(_Fp)' still has no body, so the
+call returns a nondeterministic value (not reduced; the hand-written shape
+works).  Its call operator was fixed by
+cpp11_partial_specialization_member_defined_outside_parameter_pack, and
+dropping the virtual tables that no reachable code uses removed the 400
+candidate targets of `__f_->destroy()' that exceeded the default
+--object-bits.  With libstdc++ the program verifies in under a second.
