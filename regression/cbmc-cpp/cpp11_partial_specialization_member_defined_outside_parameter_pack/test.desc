@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ calls: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+no body for callee
+--
+Members of the partial specialization fn<R(Args...)> defined outside the
+class: the definition's parameter pack `Args... args' was counted as one
+parameter, so for fn<int()> and fn<int(int, int)> the definition did not
+match the member and the member had no body; once matched, the body's
+args$0 and args$1 had no parameters of those names.  libc++ defines
+std::function's members this way.

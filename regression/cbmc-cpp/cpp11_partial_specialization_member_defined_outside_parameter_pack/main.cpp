@@ -31,11 +31,16 @@ int twice(int x)
 {
   return 2 * x;
 }
+int add(int x, int y)
+{
+  return x + y;
+}
 int main()
 {
   fn<int()> f = one;
   fn<int(int)> g = twice;
-  __CPROVER_assert(f() == 1 && g(3) == 6, "calls");
+  fn<int(int, int)> h = add;
+  __CPROVER_assert(f() == 1 && g(3) == 6 && h(2, 3) == 5, "calls");
   __CPROVER_assert(f() == 0, "WRONG (must FAIL)");
   return 0;
 }

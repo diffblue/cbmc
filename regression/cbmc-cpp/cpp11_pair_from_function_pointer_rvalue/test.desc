@@ -14,4 +14,4 @@ user_defined_conversion_sequence (cpp_typecheck_conversions.cpp).  Exposed
 once std::__and_ evaluated correctly (cpp11_libstdcxx_and_conjunction).
 libstdcxx: with libc++ std::function<int()>'s members, defined outside the
 partial specialization, have no body
-(cpp11_partial_specialization_member_defined_outside_empty_pack).
+(cpp11_partial_specialization_member_defined_outside_parameter_pack).
