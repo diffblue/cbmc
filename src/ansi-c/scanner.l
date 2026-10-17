@@ -1573,9 +1573,12 @@ enable_or_disable ("enable"|"disable")
                     TOK_NODISCARD);
                 }
 
-"__builtin_bit_cast" { return conditional_keyword(
+"__builtin_bit_cast" { /* also MSVC since VS 2019 16.8: the MSVC STL's
+                          _Bit_cast (<type_traits>) is built on it */
+                       return conditional_keyword(
                          PARSER.mode==configt::ansi_ct::flavourt::GCC ||
-                         PARSER.mode==configt::ansi_ct::flavourt::CLANG,
+                         PARSER.mode==configt::ansi_ct::flavourt::CLANG ||
+                         PARSER.mode==configt::ansi_ct::flavourt::VISUAL_STUDIO,
                          TOK_BIT_CAST);
                      }
 
