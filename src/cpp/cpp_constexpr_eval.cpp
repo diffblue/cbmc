@@ -707,8 +707,20 @@ public:
       // enumerator) is a macro whose initializer is its value
       const symbolt *var_sym =
         symbol_table.lookup(to_symbol_expr(e).get_identifier());
+      // N5008 [expr.const]/8-9: so is a non-volatile const variable of
+      // integral or enumeration type initialized with a constant
+      // (`const int value = 1;' read by a constexpr function)
+      const auto potentially_constant = [](const symbolt &sym)
+      {
+        const typet &t = sym.type;
+        return t.get_bool(ID_C_constant) && !t.get_bool(ID_C_volatile) &&
+               (t.id() == ID_signedbv || t.id() == ID_unsignedbv ||
+                t.id() == ID_c_bool || t.id() == ID_bool ||
+                t.id() == ID_c_enum_tag);
+      };
       if(
-        var_sym != nullptr && var_sym->is_macro && !var_sym->is_type &&
+        var_sym != nullptr && !var_sym->is_type &&
+        (var_sym->is_macro || potentially_constant(*var_sym)) &&
         var_sym->value.is_not_nil() && var_sym->value.id() != ID_code)
       {
         exprt value = var_sym->value;
