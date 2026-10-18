@@ -26,9 +26,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include <algorithm>
 #include <functional>
 
-/// \return whether the class has no storage member (an empty class: its
-///   base subobjects have zero size, [intro.object]/9)
-static bool class_is_empty(const struct_typet &type)
+bool cpp_typecheckt::class_is_empty(const struct_typet &type)
 {
   for(const auto &c : type.components())
   {
@@ -1535,6 +1533,25 @@ void cpp_typecheckt::full_member_initialization(
           }
           if(!names_this_base)
             continue;
+
+          // N5008 [intro.object]/9: an empty base subobject has zero size
+          // and may share its address with other subobjects; the trivial
+          // initialization from the expression-list stores nothing.
+          // Assigning the class's one-byte complete-object representation
+          // overwrote the first byte of what the derived object stores
+          // there (libc++'s __tuple_leaf<1, placeholders::__ph<1>> over the
+          // bound pointer of std::bind(&S::f, &s, _1)).  The operands are
+          // still evaluated, for their side effects.
+          if(class_is_empty(follow_tag(to_struct_tag_type(b.type()))))
+          {
+            for(const auto &op : init_expr.operands())
+            {
+              code_expressiont evaluate{op};
+              evaluate.add_source_location() = source_location_of(initializer);
+              final_initializers.move_to_sub(evaluate);
+            }
+            break;
+          }
 
           typet base_t = b.type();
           base_t.remove(ID_C_base_name);
