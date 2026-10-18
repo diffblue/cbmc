@@ -14768,3 +14768,52 @@ env.cpp-preprocess-tests).  macOS 15 make 30 of 1967 failed, VS 2022 141
 - Next MSVC groups (VS 2022 artifact, 29 of 146 pass locally):
   _Construct_in_place dropped ("symbol '_Args' is unknown", 9 tests; the
   hand-written shape passes), std::function construction (6), tuple (4).
+
+## Round 189 (fixes from the CI run 6 artifacts)
+
+Reproduction (scripts in /tmp/r186/pp): the run-6 artifacts with
+`--winx64` (MSVC) and `--os macos [--arch arm64]` (Apple libc++).  Locally
+the failed-test artifacts now pass: VS 2022 (MSVC 14.44) 54 of 146 (29
+before this round), VS 2026 (14.51) 50 of 155; the remaining ones include
+tests now excluded there by tag.
+
+Fixes, each with a test that fails on the old build:
+- macOS 14 timeouts: libc++'s alternate string layout (Apple arm64) keeps
+  the short size in a 7-bit field; it stayed symbolic after the
+  characters were written and string comparison was an unbounded memcmp.
+  cpp11_nested_braces_user_ctor_class and
+  cpp11_rvalue_reference_from_converting_constructor now take 3-5 s; of
+  the other two, cpp17_deque_copy_constructor still runs out of
+  memory (7.4 GB) and cpp17_filesystem_path_from_string fails an
+  assertion.
+  Simplifier: a member of a
+  byte_extract through byte updates of other bytes, bit fields at a struct
+  value's bits, integer-address pointer constants (758b464b63).
+- typeid: libc++'s `__type_name' (c520e862ad); the MSVC runtime's global
+  type_info and __std_type_info_compare/_hash models (7745c428d0).
+- MSVC STL: requires-expression parameter pack in a new-initializer
+  (std::construct_at, 8217785c58); a redefined partial specialization's
+  template scope (calling conventions, std::function's
+  _Get_function_impl, 597cb05e2a); the injected-class-name with a
+  constructor template in alignof/sizeof (ff7f8ae88a); __builtin_offsetof
+  (d7cced2763); variable-template partial specialization ending in a pack
+  (_Tuple_constructible_v0, b93a803732); reinterpret_cast from an
+  enumeration to a pointer (37400e31c8); a mem-initializer argument with a
+  nested empty pack expansion (pair's piecewise constructor, b35303b32f).
+- Tags and descs: gnu-extensions for four more tests, itanium-abi for
+  cpp_class_layout_abi_padding (ae1603bf18); five descs no longer fix the
+  total number of properties (1f0cb4cb99).
+
+Open: MSVC pair piecewise construction still drops
+`pair(_Tuple1&, _Tuple2&, index_sequence...)' (_Tuple_get declared with
+`auto&&' before its definition: "already declared with different type";
+hand-written shapes pass); libc++ std::bind (reduced to 45 lines in
+/tmp/r186/cv_bind, not yet understood); libc++ std::function<int()>'s
+converting constructor; the stream hangs.
+
+Verification (W167 at b35303b32f): cbmc-cpp 1980, libcxx profile 1980,
+KNOWNBUG profile, cpp 246, regression/cbmc 1214, ansi-c 270,
+goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
+CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; platform_check
+gcc11/m32/arm64 and the validate, paths, cprover-smt2, new-smt and z3
+profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
