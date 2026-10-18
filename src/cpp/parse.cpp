@@ -1928,13 +1928,20 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
   // (to avoid misinterpreting template<typename Ty, Ty V>).
   // When followed by ::, try non-type parameter parsing first (for
   // qualified types like std::size_t), falling back to concept path.
+  // N5008 [temp.param]/2, [expr.prim.id.qual]: the nested-name-specifier
+  // of a type-constraint may start with `::' (the MSVC STL's
+  // `template <::std::ranges::contiguous_range _Rng>')
+  const bool leading_scope = (cpp20 || msvc_concepts) && t0 == TOK_SCOPE &&
+                             is_identifier(lex.LookAhead(1)) &&
+                             lex.LookAhead(2) == TOK_SCOPE;
   if(
-    (cpp20 || msvc_concepts) && is_identifier(t0) &&
-    (is_identifier(lex.LookAhead(1)) || lex.LookAhead(1) == TOK_ELLIPSIS ||
-     lex.LookAhead(1) == '<' || lex.LookAhead(1) == TOK_SCOPE))
+    leading_scope ||
+    ((cpp20 || msvc_concepts) && is_identifier(t0) &&
+     (is_identifier(lex.LookAhead(1)) || lex.LookAhead(1) == TOK_ELLIPSIS ||
+      lex.LookAhead(1) == '<' || lex.LookAhead(1) == TOK_SCOPE)))
   {
     // For qualified names (id::), try non-type parameter first
-    if(lex.LookAhead(1) == TOK_SCOPE)
+    if(leading_scope || lex.LookAhead(1) == TOK_SCOPE)
     {
       // If the qualified name's final component names a known concept, this is
       // a concept-constrained TYPE parameter ([temp.param]/4) -- e.g.
@@ -1945,6 +1952,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       bool qualified_concept = false;
       {
         cpp_token_buffert::post peek = lex.Save();
+        if(leading_scope)
+        {
+          cpp_tokent sc;
+          lex.get_token(sc);
+        }
         irep_idt last_component;
         bool scan_ok = true;
         while(true)
@@ -2039,8 +2051,11 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
       {
         // Consume the qualified name
         cpp_tokent concept_tk;
+        if(leading_scope)
+          lex.get_token(concept_tk); // ::
         lex.get_token(concept_tk);
-        std::string cname = id2string(concept_tk.data.get(ID_C_base_name));
+        std::string cname = (leading_scope ? "::" : "") +
+                            id2string(concept_tk.data.get(ID_C_base_name));
         while(lex.LookAhead(0) == TOK_SCOPE)
         {
           cpp_tokent tmp;
