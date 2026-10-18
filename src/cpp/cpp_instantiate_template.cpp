@@ -7632,6 +7632,61 @@ skip_pack_removal_ft:
       // definition precedes that of the converting constructor template
       // `template <class F> function(F)'.  Among the candidate definitions
       // prefer the one with the most template parameters.
+      // N5008 [over.load], [dcl.fct]/3: the definition belonging to this
+      // member is the one whose SIGNATURE matches; base-name matching
+      // alone confuses same-named overloaded member templates (std::
+      // pair's two piecewise constructors).  Compare the function
+      // parameter count as a cheap faithful discriminator.
+      const auto signature_matches = [&](const cpp_declarationt &md) -> bool
+      {
+        const typet &d_ftype = new_decl.declarators()[0].type();
+        const typet &m_ftype = md.declarators()[0].type();
+        // [temp.variadic]/5: a function parameter pack of the definition
+        // stands for any number of parameters of the declaration -- none
+        // for an empty pack (`construct<>()' against `construct(R
+        // &&...)')
+        std::function<bool(const irept &)> has_ellipsis =
+          [&has_ellipsis](const irept &node)
+        {
+          if(node.get_bool(ID_ellipsis))
+            return true;
+          for(const auto &sub : node.get_sub())
+            if(has_ellipsis(sub))
+              return true;
+          for(const auto &named : node.get_named_sub())
+            if(has_ellipsis(named.second))
+              return true;
+          return false;
+        };
+        if(d_ftype.id() == ID_function_type && m_ftype.id() == ID_function_type)
+        {
+          const auto &m_params = m_ftype.find(ID_parameters).get_sub();
+          const std::size_t d_count =
+            d_ftype.find(ID_parameters).get_sub().size();
+          const bool m_pack =
+            !m_params.empty() && has_ellipsis(m_params.back());
+          if(
+            m_pack ? d_count + 1 < m_params.size() : d_count != m_params.size())
+          {
+            return false;
+          }
+        }
+        // [over.load]/2.3, [class.mfct.non.static]: `find(const K &)' and
+        // `find(const K &) const' are different members
+        if(
+          has_const(static_cast<const typet &>(
+            new_decl.declarators()[0].find(ID_method_qualifier))) !=
+          has_const(static_cast<const typet &>(
+            md.declarators()[0].find(ID_method_qualifier))))
+        {
+          return false;
+        }
+        return true;
+      };
+      // (among the definitions with this member's signature: libc++'s
+      // std::function has both `template <class F, class> function(F)' and
+      // `template <class, class, class> function()' defined out of line,
+      // and the latter's longer list hid the former's definition)
       std::size_t most_template_parameters = 0;
       for(const auto &tsp : templates_with_out_of_class_member_symbols())
       {
@@ -7649,7 +7704,7 @@ skip_pack_removal_ft:
             md.declarators().empty() ||
             md.declarators()[0].name().get_base_name() != member_base_name ||
             md.declarators()[0].find(ID_value).is_nil() ||
-            md.find(ID_template_type).is_nil())
+            md.find(ID_template_type).is_nil() || !signature_matches(md))
           {
             continue;
           }
@@ -7679,58 +7734,8 @@ skip_pack_removal_ft:
             continue;
           if(md.declarators()[0].find(ID_value).is_nil())
             continue;
-          // N5008 [over.load], [dcl.fct]/3: the definition belonging to this
-          // member is the one whose SIGNATURE matches; base-name matching
-          // alone confuses same-named overloaded member templates (std::
-          // pair's two piecewise constructors).  Compare the function
-          // parameter count as a cheap faithful discriminator.
-          {
-            const typet &d_ftype = new_decl.declarators()[0].type();
-            const typet &m_ftype = md.declarators()[0].type();
-            // [temp.variadic]/5: a function parameter pack of the definition
-            // stands for any number of parameters of the declaration -- none
-            // for an empty pack (`construct<>()' against `construct(R
-            // &&...)')
-            std::function<bool(const irept &)> has_ellipsis =
-              [&has_ellipsis](const irept &node)
-            {
-              if(node.get_bool(ID_ellipsis))
-                return true;
-              for(const auto &sub : node.get_sub())
-                if(has_ellipsis(sub))
-                  return true;
-              for(const auto &named : node.get_named_sub())
-                if(has_ellipsis(named.second))
-                  return true;
-              return false;
-            };
-            if(
-              d_ftype.id() == ID_function_type &&
-              m_ftype.id() == ID_function_type)
-            {
-              const auto &m_params = m_ftype.find(ID_parameters).get_sub();
-              const std::size_t d_count =
-                d_ftype.find(ID_parameters).get_sub().size();
-              const bool m_pack =
-                !m_params.empty() && has_ellipsis(m_params.back());
-              if(
-                m_pack ? d_count + 1 < m_params.size()
-                       : d_count != m_params.size())
-              {
-                continue;
-              }
-            }
-            // [over.load]/2.3, [class.mfct.non.static]: `find(const K &)' and
-            // `find(const K &) const' are different members
-            if(
-              has_const(static_cast<const typet &>(
-                new_decl.declarators()[0].find(ID_method_qualifier))) !=
-              has_const(static_cast<const typet &>(
-                md.declarators()[0].find(ID_method_qualifier))))
-            {
-              continue;
-            }
-          }
+          if(!signature_matches(md))
+            continue;
           // Only adopt from an entry that carries its own template-parameter
           // list (an out-of-line member function template definition always
           // does) and whose OWNING class template matches this member's

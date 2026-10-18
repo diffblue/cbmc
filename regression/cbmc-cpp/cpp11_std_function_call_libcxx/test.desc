@@ -1,4 +1,4 @@
-KNOWNBUG libcxx
+CORE libcxx
 main.cpp
 --cpp11 --stdlib libc++
 ^\[main\.assertion\.1\] line \d+ call: SUCCESS$
@@ -11,11 +11,12 @@ too many addressed objects
 no body for callee
 --
 libc++ defines std::function's members outside the class, in the partial
-specialization function<_Rp(_ArgTypes...)>.  For std::function<int()> the
-converting constructor template `function(_Fp)' still has no body, so the
-call returns a nondeterministic value (not reduced; the hand-written shape
-works).  Its call operator was fixed by
+specialization function<_Rp(_ArgTypes...)>.  The converting constructor
+template `function(_Fp)' had no body: the definition of an allocator-
+extended constructor template, which has more template parameters, hid
+its definition (cpp11_partial_specialization_member_templates_defined_
+outside).  Its call operator was fixed by
 cpp11_partial_specialization_member_defined_outside_parameter_pack, and
 dropping the virtual tables that no reachable code uses removed the 400
 candidate targets of `__f_->destroy()' that exceeded the default
---object-bits.  With libstdc++ the program verifies in under a second.
+--object-bits.
