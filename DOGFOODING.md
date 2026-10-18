@@ -2103,3 +2103,8 @@ from the CI artifacts; see .kiro/decltype_tuple_apply_findings.md,
 
 No dog-food change.  Fixes from the CI run 6 artifacts; see
 .kiro/decltype_tuple_apply_findings.md, "Round 189".
+
+## Round 190 2026-10-18
+
+No dog-food change.  Fixes for the open libc++ and MSVC items; see
+.kiro/decltype_tuple_apply_findings.md, "Round 190".

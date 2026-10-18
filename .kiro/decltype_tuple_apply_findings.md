@@ -14817,3 +14817,55 @@ goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
 CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; platform_check
 gcc11/m32/arm64 and the validate, paths, cprover-smt2, new-smt and z3
 profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
+
+## Round 190 (open items after 9223514088)
+
+Fixes, each with a test that fails on the old build:
+- Pack expansion with a compound pattern (`A &&...', `A *...',
+  `const A...') in a template argument substituted during deduction
+  (libc++ std::bind's operator() return type, 50a83633f1).
+- libc++ library models: std::to_string for integers (7823e943b9),
+  std::stoi to std::stoull (4a3a43d0f8; the ERANGE case is not
+  modelled, errno being a macro).
+- constexpr evaluation reads a const integral variable
+  ([expr.const]/8-9, a093daf708).
+- Initializing an empty base subobject stores nothing ([intro.object]/9;
+  std::bind(&S::f, &s, _1) called through &s + 1, 6a61290b4e).
+- `template <int &...>' is a template parameter pack (libc++ pair's
+  default constructor, f11a79d086).
+- A class with a constructor template is not an aggregate; constructor
+  templates must take the list's element count (98d917ada6).
+- [over.best.ics]/4.5 for `return {{...}}' (libc++ optional, 8083a4af24).
+- Type-constraint qualified from `::' (MSVC std::span guide, caf1abaacc).
+- Out-of-line member template definitions matched by signature before
+  template-head length (libc++ std::function's converting constructor,
+  2e1b84b1c1; KNOWNBUG cpp11_std_function_call_libcxx is now CORE).
+- Tags: cpp11_std_bind_invocable_traits_first needs libstdc++; ten more
+  gnu-extensions tests; cpp98_dynamic_cast_reference_throws_bad_cast runs
+  as C++11 (the MSVC STL is C++14 code).
+
+Local runs of the run-6 failed-test artifacts, counting only tests that
+still run on that platform: VS 2022 60 -> 49 failing, macOS 15 18 -> 9.
+The local macOS mirror (Linux libc++ 18) went from 21 to 12 failures.
+
+Open:
+- libc++ std::string::find(char): the explicit instantiation declaration
+  of basic_string<char>::npos, before find's out-of-line definition, leaves
+  find without a body (found by bisecting the 112 extern templates;
+  hand-written shapes pass; partial reduction /tmp/r186/cv_sf).
+- libc++ std::function copy: __compressed_pair_elem's empty allocator base
+  gets a garbage `this' (cpp11_pair_from_function_pointer_rvalue, the
+  bad_function_call assertion; trace in /tmp/r186/pf2_trace.txt).
+- MSVC: pair piecewise `_Tuple_get' (auto&& declared before definition),
+  std::function _Tidy, _Find_last, ranges `arr | views::take', variant,
+  filesystem _Fs_file, from_chars.
+- macOS: locale use_facet (dylib), string_find (above), ranges, expected,
+  concept_iterator_chain; libc++ `too many addressed objects' in
+  cpp20_vector_find and erase_if on Linux libc++ only.
+
+Verification (W168 at 2e1b84b1c1): cbmc-cpp 1990, libcxx profile 1990,
+KNOWNBUG profile 1990, cpp 246, regression/cbmc 1214, ansi-c 270,
+goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
+CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; platform_check
+gcc11/m32/arm64 and the validate, paths, cprover-smt2, new-smt and z3
+profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
