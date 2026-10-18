@@ -2098,3 +2098,8 @@ functions it lowers.  To mirror macOS locally, run cbmc-cpp CORE with
 No dog-food change.  macOS and Windows failures can be reproduced on Linux
 from the CI artifacts; see .kiro/decltype_tuple_apply_findings.md,
 "Round 188".
+
+## Round 189 2026-10-18
+
+No dog-food change.  Fixes from the CI run 6 artifacts; see
+.kiro/decltype_tuple_apply_findings.md, "Round 189".
