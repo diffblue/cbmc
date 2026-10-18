@@ -2118,11 +2118,13 @@ bool cpp_typecheckt::find_cpctor(const symbolt &symbol) const
   return false;
 }
 
-/// Whether a constructor template of \p class_type can be called with a
-/// single argument: it has at most one parameter without a default argument,
-/// or a parameter pack.  (Unknown shapes count as callable.)
-bool cpp_typecheckt::has_unary_constructor_template(
-  const struct_tag_typet &class_type)
+/// Whether a constructor template of \p class_type can be called with
+/// \p argument_count arguments: it has at most that many parameters without
+/// a default argument, and at least that many parameters or a parameter
+/// pack ([over.match.viable]/2).  (Unknown shapes count as callable.)
+bool cpp_typecheckt::has_constructor_template_for_arguments(
+  const struct_tag_typet &class_type,
+  std::size_t argument_count)
 {
   const irep_idt &class_id = class_type.get_identifier();
   const auto scope_it = cpp_scopes.id_map.find(class_id);
@@ -2144,21 +2146,25 @@ bool cpp_typecheckt::has_unary_constructor_template(
       return true;
     const irept &params = decl.declarators().front().type().find(ID_parameters);
     std::size_t required = 0;
+    std::size_t total = 0;
     bool variadic = false;
     for(const auto &p : params.get_sub())
     {
+      if(p.id() == ID_ellipsis)
+        variadic = true;
       if(p.id() != ID_cpp_declaration)
         continue;
       const cpp_declarationt &pd = to_cpp_declaration(p);
       if(pd.declarators().empty())
         continue;
       const cpp_declaratort &pdecl = pd.declarators().front();
+      ++total;
       if(pdecl.get_bool(ID_ellipsis) || pdecl.type().get_bool(ID_ellipsis))
         variadic = true;
       else if(pdecl.value().is_nil())
         ++required;
     }
-    if(variadic || required <= 1)
+    if(required <= argument_count && (variadic || argument_count <= total))
       return true;
   }
   return false;
