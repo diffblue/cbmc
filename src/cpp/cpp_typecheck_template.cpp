@@ -1887,10 +1887,27 @@ void cpp_typecheckt::typecheck_class_template_member(
               cls_pfx += "::";
               for(auto &sp : symbol_table)
               {
+                // N5008 [temp.mem]/1, [temp.spec.general]/2: the definition
+                // of a member TEMPLATE defines its specializations
+                // (`find<T>(...)'), not a non-template member of the same
+                // name and arity -- libc++'s basic_string, instantiated by
+                // `extern template ... basic_string<char>::npos' before its
+                // members' definitions, gave `find(value_type, size_type)'
+                // the body of `template <class _Tp, ...> find(const _Tp &,
+                // size_type)'
+                const auto is_specialization = [&](const irep_idt &id)
+                {
+                  const std::string &n = id2string(id);
+                  return n.compare(
+                           cls_pfx.size(),
+                           id2string(mbase2).size() + 1,
+                           id2string(mbase2) + "<") == 0;
+                };
                 if(
                   sp.second.base_name == mbase2 &&
                   sp.second.type.id() == ID_code && sp.second.value.is_nil() &&
                   id2string(sp.first).find(cls_pfx) == 0 &&
+                  is_specialization(sp.first) &&
                   out_of_line_definition_matches(sp.second, mcopy, nullptr))
                 {
                   symbolt &csym = symbol_table.get_writeable_ref(sp.first);
