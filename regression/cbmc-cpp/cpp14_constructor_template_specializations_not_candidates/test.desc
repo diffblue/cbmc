@@ -1,4 +1,4 @@
-CORE
+CORE gnu-extensions
 main.cpp
 --cpp14
 ^\[main\.assertion\.1\] line \d+ argument converted by the deduced specialization: SUCCESS$

@@ -1,4 +1,4 @@
-CORE gcc16
+CORE gcc16 gnu-extensions
 main.cpp
 --cpp17
 ^EXIT=10$

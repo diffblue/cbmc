@@ -1,4 +1,4 @@
-CORE
+CORE gnu-extensions
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ explicit conversion to a satisfying type: SUCCESS$
