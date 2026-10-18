@@ -1557,6 +1557,43 @@ static const std::map<std::string, std::string> &library_source_models()
      " : (unsigned long long)__val;"
      " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
      " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
+    // libc++ src/string.cpp: N5008 [string.conversions]/1-3, stoi to stoull
+    // call strtol, strtoul, strtoll or strtoull on str.c_str(), store the
+    // index of the first unconverted character in *idx, and throw
+    // invalid_argument if no conversion could be performed, out_of_range if
+    // the value does not fit the return type (checked for stoi).  The
+    // out_of_range of an ERANGE result is not modelled: errno is a macro,
+    // which these unpreprocessed bodies cannot use.  The models are keyed by
+    // the name, so they also meet the wstring overloads, which then do not
+    // type-check (they would need wcsto*) and remain without a body.
+    {"std::__1::stoi",
+     "{ const char *__p = __str.c_str(); char *__e = nullptr;"
+     " long __r = strtol(__p, &__e, __base);"
+     " if(__e == __p) throw invalid_argument(\"stoi: no conversion\");"
+     " if(__r < -2147483647 - 1 || __r > 2147483647)"
+     " throw out_of_range(\"stoi: out of range\");"
+     " if(__idx) *__idx = (size_t)(__e - __p); return (int)__r; }"},
+    {"std::__1::stol",
+     "{ const char *__p = __str.c_str(); char *__e = nullptr;"
+     " long __r = strtol(__p, &__e, __base);"
+     " if(__e == __p) throw invalid_argument(\"stol: no conversion\");"
+     " if(__idx) *__idx = (size_t)(__e - __p); return (long)__r; }"},
+    {"std::__1::stoul",
+     "{ const char *__p = __str.c_str(); char *__e = nullptr;"
+     " unsigned long __r = strtoul(__p, &__e, __base);"
+     " if(__e == __p) throw invalid_argument(\"stoul: no conversion\");"
+     " if(__idx) *__idx = (size_t)(__e - __p); return (unsigned long)__r; }"},
+    {"std::__1::stoll",
+     "{ const char *__p = __str.c_str(); char *__e = nullptr;"
+     " long long __r = strtoll(__p, &__e, __base);"
+     " if(__e == __p) throw invalid_argument(\"stoll: no conversion\");"
+     " if(__idx) *__idx = (size_t)(__e - __p); return (long long)__r; }"},
+    {"std::__1::stoull",
+     "{ const char *__p = __str.c_str(); char *__e = nullptr;"
+     " unsigned long long __r = strtoull(__p, &__e, __base);"
+     " if(__e == __p) throw invalid_argument(\"stoull: no conversion\");"
+     " if(__idx) *__idx = (size_t)(__e - __p); return (unsigned long long)__r; "
+     "}"},
     {"std::exception::~exception", "{ }"},
     {"std::exception::what", "{ return \"std::exception\"; }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
