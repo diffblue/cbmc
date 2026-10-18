@@ -268,6 +268,7 @@ protected:
   bool rTemplateDecl2(typet &, TemplateDeclKind &kind);
   bool rTempArgList(irept &);
   bool rTempArgDeclaration(cpp_declarationt &);
+  void hoist_template_parameter_pack_ellipsis(cpp_declarationt &);
   bool rExternTemplateDecl(cpp_declarationt &);
 
   bool rDeclaration(cpp_declarationt &);
@@ -1886,6 +1887,32 @@ bool Parser::rTempArgList(irept &args)
 
   C++11 [temp.param] (A.12)
 */
+/// N5008 [temp.param]/17: in a non-type template parameter `int *...P' or
+/// `int &...' the ellipsis makes the parameter a template parameter pack.
+/// rDeclarator attaches an ellipsis that follows a ptr-operator to that
+/// pointer or reference type (the form of a function parameter's pack
+/// expansion pattern); move it to the declarator, where a pack is recorded
+/// (as for `int ...P').
+void Parser::hoist_template_parameter_pack_ellipsis(
+  cpp_declarationt &declaration)
+{
+  if(declaration.declarators().size() != 1)
+    return;
+  cpp_declaratort &declarator = declaration.declarators().front();
+  if(declarator.get_has_ellipsis())
+    return;
+  for(typet *t = &declarator.type(); t->id() == ID_frontend_pointer;
+      t = &t->add_subtype())
+  {
+    if(t->get_bool(ID_ellipsis))
+    {
+      t->remove(ID_ellipsis);
+      declarator.set_has_ellipsis();
+      return;
+    }
+  }
+}
+
 bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 {
 #ifdef DEBUG
@@ -1999,6 +2026,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
             }
           }
           nttp_decl.set(ID_is_type, false);
+          hoist_template_parameter_pack_ellipsis(nttp_decl);
           declaration.swap(nttp_decl);
           return true;
         }
@@ -2425,6 +2453,7 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
 
     if(is_pack)
       declarator.set_has_ellipsis();
+    hoist_template_parameter_pack_ellipsis(declaration);
 
 #ifdef DEBUG
     std::cout << std::string(__indent, ' ')
