@@ -463,6 +463,20 @@ symbolt &cpp_declarator_convertert::convert(
   }
 }
 
+/// N5008 [dcl.spec.auto.general]/3: whether \p type is or contains, under
+/// pointer and reference declarators, an undeduced placeholder (`auto',
+/// `auto &&', `const auto *'); [dcl.spec.auto.general]/13: a redeclaration
+/// of a function with a deduced return type uses the placeholder, so its
+/// type does not conflict with the deduced one
+static bool placeholder_return_type(const typet &type)
+{
+  if(type.id() == ID_auto)
+    return true;
+  if(type.id() == ID_pointer)
+    return placeholder_return_type(to_pointer_type(type).base_type());
+  return false;
+}
+
 void cpp_declarator_convertert::combine_types(
   const source_locationt &source_location,
   const typet &decl_type,
@@ -533,8 +547,8 @@ void cpp_declarator_convertert::combine_types(
     const auto &existing_ret = symbol_code_type.return_type();
     const auto &new_ret = decl_code_type.return_type();
     if(
-      existing_ret.id() != ID_auto &&
-      (new_ret.id() == ID_auto ||
+      !placeholder_return_type(existing_ret) &&
+      (placeholder_return_type(new_ret) ||
        id2string(new_ret.id()).find("decltype") != std::string::npos))
     {
       return;
@@ -565,13 +579,9 @@ void cpp_declarator_convertert::combine_types(
     // doesn't.
     const auto &existing_ret = to_code_type(symbol.type).return_type();
     const auto &new_ret = to_code_type(decl_type).return_type();
-    if(existing_ret.id() != ID_auto && new_ret.id() == ID_auto)
-    {
-      return; // keep existing resolved type
-    }
     if(
-      existing_ret.id() != ID_auto &&
-      (new_ret.id() == ID_auto ||
+      !placeholder_return_type(existing_ret) &&
+      (placeholder_return_type(new_ret) ||
        id2string(new_ret.id()).find("decltype") != std::string::npos))
     {
       return; // keep existing resolved type

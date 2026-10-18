@@ -1,0 +1,19 @@
+CORE
+main.cpp
+--cpp14
+^\[main\.assertion\.1\] line \d+ deduced return: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+already declared with different type
+--
+A function template with the return type `auto &&', declared before its
+definition, was instantiated twice with the same arguments; the second
+instantiation, from the declaration, had the undeduced return type and was
+rejected as a conflicting redeclaration of the first.  Only a bare `auto'
+was accepted.  The MSVC STL's _Tuple_get, used by std::pair's piecewise
+constructor (std::map::emplace), has this shape.
