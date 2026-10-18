@@ -1962,6 +1962,14 @@ void cpp_typecheckt::typecheck_compound_declarator(
           arg_symb.location = func_symb.location;
 
           arg.set_identifier(arg_symb.name);
+          // the thunk's body names the parameter by this identifier; a
+          // parameter left without a base name was renamed when the
+          // thunk's type was converted later (convert_parameter's
+          // `#anon_arg'), so the call it makes forwarded an unset variable
+          // (libc++'s `__clone(__base *)', declared with an unnamed
+          // parameter: the clone of a copied std::function went to a
+          // nondeterministic address)
+          arg.set_base_name(param_base_name);
 
           // add the parameter to the symbol table
           const bool failed = !symbol_table.insert(std::move(arg_symb)).second;
