@@ -11072,8 +11072,36 @@ void cpp_typecheckt::typecheck_side_effect_assignment(side_effect_exprt &expr)
   const bool is_class_type = type0.id() == ID_struct_tag ||
                              type0.id() == ID_union_tag ||
                              type0.id() == ID_struct || type0.id() == ID_union;
-  const bool needs_overloaded_operator =
-    is_class_type && statement != ID_assign;
+  bool needs_overloaded_operator = is_class_type && statement != ID_assign;
+  // N5008 [over.match.oper]/1, [over.ass]: a plain `=' with a class operand
+  // is resolved among the class's assignment operators; a POD class whose
+  // only user-declared one is an assignment operator TEMPLATE (never a copy
+  // assignment operator, [class.copy.assign]/1, so the class stays POD)
+  // still offers it: `g = [] { ... }' for a std::function-like class.  For
+  // an operand of the class type itself the implicit copy or move
+  // assignment operator, a non-template with an identity conversion, is
+  // the better candidate ([over.match.best]/2.4); the built-in path below
+  // is that member-wise assignment.
+  typet type1 = to_binary_expr(expr).op1().type();
+  if(is_reference(type1))
+    type1 = to_reference_type(type1).base_type();
+  const bool same_class = type1.id() == ID_struct_tag &&
+                          type0.id() == ID_struct_tag &&
+                          to_struct_tag_type(type1).get_identifier() ==
+                            to_struct_tag_type(type0).get_identifier();
+  if(!needs_overloaded_operator && type0.id() == ID_struct_tag && !same_class)
+  {
+    const irep_idt &class_id = to_struct_tag_type(type0).get_identifier();
+    const auto scope_it = cpp_scopes.id_map.find(class_id);
+    if(scope_it != cpp_scopes.id_map.end())
+    {
+      needs_overloaded_operator =
+        !static_cast<cpp_scopet &>(*scope_it->second)
+           .lookup(
+             "operator=", cpp_scopet::SCOPE_ONLY, cpp_idt::id_classt::TEMPLATE)
+           .empty();
+    }
+  }
 
   if(cpp_is_pod(type0) && !needs_overloaded_operator)
   {

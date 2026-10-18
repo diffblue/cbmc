@@ -53,8 +53,17 @@ bool cpp_typecheckt::cpp_is_pod(const typet &type) const
       if(c.get_is_padding())
         continue;
 
-      if(c.get_base_name() == "operator=")
+      // N5008 [class.copy.assign]/1: a specialization of an assignment
+      // operator TEMPLATE is never a copy assignment operator; the class
+      // keeps its implicit, trivial copy assignment (`pod::operator=<double>'
+      // instantiated for `c = 1.0', after which `c = static_cast<pod &&>(b)'
+      // found no assignment operator taking a pod)
+      if(
+        c.get_base_name() == "operator=" &&
+        id2string(c.get_name()).find("::operator=<") == std::string::npos)
+      {
         return false;
+      }
 
       if(c.get_bool(ID_is_virtual))
         return false;
