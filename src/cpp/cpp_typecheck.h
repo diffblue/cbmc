@@ -1163,6 +1163,9 @@ protected:
     const code_typet &type,
     exprt &value);
 
+  /// \return whether the class has no storage member (an empty class: its
+  ///   base subobjects have zero size, N5008 [intro.object]/9)
+  static bool class_is_empty(const struct_typet &type);
   static bool has_const(const typet &type);
   static bool has_volatile(const typet &type);
   static bool has_auto(const typet &type);

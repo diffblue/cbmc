@@ -2953,6 +2953,19 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
         }
       }
     }
+    // N5008 [intro.object]/9: an empty base subobject has zero size and
+    // may overlap other subobjects; its trivial initialization stores
+    // nothing (see full_member_initialization).  Only the (already
+    // type-checked) operands are evaluated.
+    if(is_base && class_is_empty(follow_tag(to_struct_tag_type(base_t))))
+    {
+      code_blockt evaluate;
+      for(const auto &op : code.operands())
+        evaluate.add(code_expressiont{op});
+      evaluate.add_source_location() = code.source_location();
+      code.swap(evaluate);
+      return;
+    }
     if(is_base)
     {
       exprt lhs_ptr("explicit-typecast", pointer_type(base_t));
