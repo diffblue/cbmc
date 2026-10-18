@@ -3733,6 +3733,52 @@ bool cpp_typecheckt::out_of_line_definition_matches(
     return true;
   cpp_saved_template_mapt saved_map(template_map);
   template_map.build(def.template_type(), *class_args);
+  // N5008 [temp.local]/1: in the definition of a member of a class
+  // template (or of a partial specialization) the injected-class-name
+  // without template arguments denotes the class itself -- the class of
+  // the member's `this'.  Type-checked in the current scope it may name
+  // the primary template instead, or nothing, and an unchecked parameter
+  // type matched anything: `function &operator=(const function &)''s
+  // definition was attached to `operator=(nullptr_t)' of libc++'s
+  // std::function.
+  typet injected_class{ID_nil};
+  irep_idt injected_name;
+  if(
+    first == 1 && mparams.front().type().id() == ID_pointer &&
+    to_pointer_type(mparams.front().type()).base_type().id() == ID_struct_tag)
+  {
+    injected_class = to_pointer_type(mparams.front().type()).base_type();
+    injected_class.remove(ID_C_constant);
+    injected_class.remove(ID_C_volatile);
+    const symbolt *class_symbol =
+      symbol_table.lookup(to_struct_tag_type(injected_class).get_identifier());
+    if(class_symbol != nullptr)
+      injected_name = class_symbol->base_name;
+  }
+  std::function<void(typet &)> replace_injected = [&](typet &t)
+  {
+    if(
+      t.id() == ID_cpp_name && t.get_sub().size() == 1 &&
+      t.get_sub().front().id() == ID_name &&
+      t.get_sub().front().get(ID_identifier) == injected_name)
+    {
+      const bool is_constant = t.get_bool(ID_C_constant);
+      const bool is_volatile = t.get_bool(ID_C_volatile);
+      t = injected_class;
+      if(is_constant)
+        t.set(ID_C_constant, true);
+      if(is_volatile)
+        t.set(ID_C_volatile, true);
+      return;
+    }
+    for(auto &sub : t.get_sub())
+      replace_injected(static_cast<typet &>(sub));
+    for(auto &named : t.get_named_sub())
+    {
+      if(named.first == ID_type)
+        replace_injected(static_cast<typet &>(named.second));
+    }
+  };
   std::size_t i = first;
   for(const auto &dp : dparams)
   {
@@ -3742,6 +3788,8 @@ bool cpp_typecheckt::out_of_line_definition_matches(
     typet dtype = dpd.declarators().empty()
                     ? dpd.type()
                     : dpd.declarators().front().merge_type(dpd.type());
+    if(!injected_name.empty())
+      replace_injected(dtype);
     template_map.apply(dtype);
     bool typechecked = true;
     try
