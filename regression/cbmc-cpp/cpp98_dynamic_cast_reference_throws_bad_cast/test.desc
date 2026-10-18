@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp98
+--cpp11
 ^\[main\.assertion\.1\] line \d+ reference cast succeeds: SUCCESS$
 ^\[main\.assertion\.2\] line \d+ bad_cast thrown: SUCCESS$
 ^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
