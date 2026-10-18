@@ -231,6 +231,15 @@ void cpp_typecheckt::typecheck_return(code_frontend_returnt &code)
     // type-checker's implicit_typecast knows no conversion from a list.
     if(code.return_value().id() == ID_initializer_list)
     {
+      // [over.best.ics]/4.5: the copy and move constructors' `X &' / `X &&'
+      // parameter is not reached by a user-defined conversion from that
+      // single inner list (as for `T x{{...}}', do_initializer)
+      if(return_type.id() == ID_struct_tag)
+      {
+        code.return_value().set(
+          ID_C_no_user_defined_conversion_to,
+          to_struct_tag_type(return_type).get_identifier());
+      }
       exprt temporary;
       new_temporary(
         code.return_value().source_location(),
