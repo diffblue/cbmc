@@ -203,6 +203,19 @@ static bool brace_init_is_viable(
     ++data_field_count;
   }
 
+  // N5008 [dcl.init.aggr]/1.1: a class with a user-declared or inherited
+  // constructor is not an aggregate -- also when the only such constructor
+  // is a constructor TEMPLATE, which is no component of the class.
+  // Counted as an aggregate, `struct holder { chk value; int which;
+  // template <class U = chk> holder(U); }' accepted `{b, e}' for its copy
+  // constructor's `const holder &' parameter.
+  if(
+    class_type.get_bool("has_template_constructor") ||
+    class_type.get_bool("has_inherited_constructor"))
+  {
+    has_user_ctor = true;
+  }
+
   if(operand.operands().empty())
   {
     // Empty `{}`: default-init or aggregate-with-no-fields.
@@ -326,17 +339,19 @@ static bool brace_init_is_viable(
   // -- is wrongly rejected with "found no match for symbol '...'".
   if(class_type.get_bool("has_template_constructor"))
   {
-    // A single element can be the argument of a constructor template only
-    // through a template with ONE required parameter; when a template of
-    // the class has none such (the iterator-pair constructors of
-    // std::vector), do not accept: `pick({e})' with overloads for
-    // std::vector<E> and std::vector<S> was ambiguous because the vector<S>
-    // candidate was declared viable here (CBMC's own propagate.cpp,
-    // dog-fooding).  Several elements keep the deferred check.
-    if(operand.operands().size() != 1 || base.id() != ID_struct_tag)
+    // N5008 [over.match.list]/1.2 with [over.match.viable]/2: the elements
+    // are the arguments, so only a constructor template that takes that
+    // many arguments can make the list viable.  A single element with only
+    // the iterator-pair constructors of std::vector: `pick({e})' with
+    // overloads for std::vector<E> and std::vector<S> was ambiguous (CBMC's
+    // own propagate.cpp, dog-fooding).  Two elements with only a one-
+    // parameter constructor template (`template <class U = chk> holder(U)'
+    // for a `const holder &' parameter, from `holder h({b, e})') made the
+    // copy constructor viable, and it was chosen.
+    if(base.id() != ID_struct_tag)
       return true;
-    return cpp_typecheck.has_unary_constructor_template(
-      to_struct_tag_type(base));
+    return cpp_typecheck.has_constructor_template_for_arguments(
+      to_struct_tag_type(base), operand.operands().size());
   }
   return false;
 }
