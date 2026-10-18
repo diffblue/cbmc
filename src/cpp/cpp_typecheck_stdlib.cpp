@@ -1518,6 +1518,45 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ return _Lhs == _Rhs ? 0 :"
      " ((unsigned long long)_Lhs < (unsigned long long)_Rhs ? -1 : 1); }"},
     {"__std_type_info_hash", "{ return (unsigned long long)_Data; }"},
+    // libc++ src/string.cpp: N5008 [string.conversions]/7, to_string of an
+    // integer is its decimal representation, with a '-' if negative
+    // (format("{}", val): [format.string.std]/21, Table 105, type none = d)
+    {"std::__1::to_string(signed_int)",
+     "{ char __b[21]; char *__e = __b + 21; char *__p = __e;"
+     " unsigned long long __u = __val < 0 ? 0ull - (unsigned long long)__val"
+     " : (unsigned long long)__val;"
+     " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
+     " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
+    {"std::__1::to_string(unsigned_int)",
+     "{ char __b[21]; char *__e = __b + 21; char *__p = __e;"
+     " unsigned long long __u = __val < 0 ? 0ull - (unsigned long long)__val"
+     " : (unsigned long long)__val;"
+     " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
+     " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
+    {"std::__1::to_string(signed_long_int)",
+     "{ char __b[21]; char *__e = __b + 21; char *__p = __e;"
+     " unsigned long long __u = __val < 0 ? 0ull - (unsigned long long)__val"
+     " : (unsigned long long)__val;"
+     " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
+     " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
+    {"std::__1::to_string(unsigned_long_int)",
+     "{ char __b[21]; char *__e = __b + 21; char *__p = __e;"
+     " unsigned long long __u = __val < 0 ? 0ull - (unsigned long long)__val"
+     " : (unsigned long long)__val;"
+     " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
+     " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
+    {"std::__1::to_string(signed_long_long_int)",
+     "{ char __b[21]; char *__e = __b + 21; char *__p = __e;"
+     " unsigned long long __u = __val < 0 ? 0ull - (unsigned long long)__val"
+     " : (unsigned long long)__val;"
+     " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
+     " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
+    {"std::__1::to_string(unsigned_long_long_int)",
+     "{ char __b[21]; char *__e = __b + 21; char *__p = __e;"
+     " unsigned long long __u = __val < 0 ? 0ull - (unsigned long long)__val"
+     " : (unsigned long long)__val;"
+     " do { *--__p = char('0' + __u % 10); __u /= 10; } while(__u != 0);"
+     " if(__val < 0) *--__p = '-'; return string(__p, __e - __p); }"},
     {"std::exception::~exception", "{ }"},
     {"std::exception::what", "{ return \"std::exception\"; }"},
     // libc++ src/new.cpp, N5008 [bad.alloc], [new.badlength]
