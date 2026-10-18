@@ -1924,10 +1924,17 @@ void template_mapt::apply(typet &type) const
           // reference *inside* the pattern.  The cases above only handle a
           // pattern that is itself the bare pack; without this a pattern
           // like make_tuple's `tuple<typename __decay_and_strip<E>::__type
-          // ...>` collapses to a single element.
+          // ...>` collapses to a single element.  The pattern may also be a
+          // compound type around the pack, `A &&...', `A *...' or
+          // `const A...' (libc++'s bind: `__bind_return<..., tuple<_Args
+          // &&...>>' in the return type of operator(), substituted during
+          // deduction, [temp.deduct]/5).
           if(
-            !was_pack && arg.id() == "ambiguous" &&
-            static_cast<const exprt &>(arg).type().id() == ID_cpp_name &&
+            !was_pack && (arg.id() == "ambiguous" || arg.id() == ID_type) &&
+            (static_cast<const exprt &>(arg).type().id() == ID_cpp_name ||
+             static_cast<const exprt &>(arg).type().id() ==
+               ID_frontend_pointer ||
+             static_cast<const exprt &>(arg).type().id() == ID_merged_type) &&
             static_cast<const exprt &>(arg).type().get_bool(ID_ellipsis))
           {
             // Collect the parameter packs referenced anywhere in the
