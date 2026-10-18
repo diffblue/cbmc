@@ -12388,6 +12388,32 @@ void cpp_typecheck_resolvet::record_deduced_function_parameter_pack(
         break;
       }
     }
+    // [temp.arg.explicit]/4: the same for a trailing NON-TYPE parameter
+    // pack whose only occurrence is a non-deduced context -- a
+    // braced-init-list argument for `seq<I...>' ([temp.deduct.call]/1),
+    // the MSVC STL pair's delegation `pair(_Val1, _Val2, {}, {})' shape.
+    // Left as its unassigned placeholder, the substituted parameter type
+    // `seq<I...>' could not be formed and the candidate was dropped.
+    const auto &t_params =
+      cpp_declaration.template_type().template_parameters();
+    if(
+      !t_params.empty() && t_params.back().id() != ID_type &&
+      t_params.back().get_bool(ID_ellipsis))
+    {
+      const irep_idt pack_id = t_params.back().get(ID_identifier);
+      auto &map = cpp_typecheck.template_map;
+      const auto em_it = map.expr_map.find(pack_id);
+      const bool bound = em_it != map.expr_map.end() &&
+                         em_it->second.id() != ID_unassigned &&
+                         em_it->second.is_not_nil();
+      if(
+        !pack_id.empty() && !bound &&
+        map.pack_expr_map.find(pack_id) == map.pack_expr_map.end() &&
+        map.pack_size_map.find(pack_id) == map.pack_size_map.end())
+      {
+        map.set_pack_size(pack_id, 0);
+      }
+    }
   }
 }
 
