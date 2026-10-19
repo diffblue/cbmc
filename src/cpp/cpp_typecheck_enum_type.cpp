@@ -278,6 +278,11 @@ void cpp_typecheckt::typecheck_enum_type(typet &type)
       }
     }
 
+    // N5008 [dcl.enum]/5: a scoped enumeration, or one with an
+    // enum-base, has a fixed underlying type ([dcl.init.list]/3.8)
+    if(!underlying_defaulted)
+      type.set(ID_C_fixed_underlying_type, true);
+
     type_symbolt symbol{symbol_name, type, ID_cpp};
     symbol.base_name=base_name;
     symbol.value.make_nil();

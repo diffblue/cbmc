@@ -778,6 +778,17 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
     // bound from the literal for `const wchar_t w[] = L"de"') -- the
     // generic conversion below rejected it ("invalid implicit conversion
     // from 'int [3l]' to 'const int []'").
+    // N5008 [dcl.init.list]/3.8: `E e{v};' for an enumeration E with a
+    // fixed underlying type
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      symbol.value.operands().size() == 1 &&
+      symbol.value.get_bool(ID_C_direct_list_init))
+    {
+      exprt element = to_unary_expr(symbol.value).op();
+      if(list_initialize_fixed_enum(element, symbol.type))
+        symbol.value = std::move(element);
+    }
     if(
       symbol.value.id() == ID_initializer_list ||
       symbol.value.id() == ID_string_constant ||
@@ -1366,4 +1377,37 @@ void cpp_typecheckt::zero_initializer(
     typecheck_code(assign);
     ops.push_back(assign);
   }
+}
+
+bool cpp_typecheckt::list_initialize_fixed_enum(
+  exprt &element,
+  const typet &target)
+{
+  // N5008 [dcl.init.list]/3.8: if T is an enumeration with a fixed
+  // underlying type, the initializer-list has a single element v of scalar
+  // type that can be implicitly converted to the underlying type, and the
+  // initialization is direct-list-initialization, the object is
+  // initialized with the value T(v); narrowing ([dcl.init.list]/7) is not
+  // diagnosed here.
+  if(
+    target.id() != ID_c_enum_tag || !follow_tag(to_c_enum_tag_type(target))
+                                       .get_bool(ID_C_fixed_underlying_type))
+  {
+    return false;
+  }
+  exprt value = element.id() == ID_already_typechecked
+                  ? to_already_typechecked_expr(element).get_expr()
+                  : element;
+  if(value.type().is_nil() || value.type().id().empty())
+    typecheck_expr(value);
+  const typet &t = value.type();
+  const bool convertible =
+    t.id() == ID_signedbv || t.id() == ID_unsignedbv || t.id() == ID_c_bool ||
+    t.id() == ID_bool ||
+    (t.id() == ID_c_enum_tag &&
+     !follow_tag(to_c_enum_tag_type(t)).get_bool(ID_C_class));
+  if(!convertible)
+    return false;
+  element = already_typechecked_exprt{typecast_exprt{value, target}};
+  return true;
 }
