@@ -287,6 +287,18 @@ jobs:
           python3 scripts/solver_bugs.py run --cvc5 "$VERSION"
           --ci-cvc5 "$CVC5_VERSION"
 
+  solver-bugs-report:
+    needs: [solver-bugs-witness, solver-bugs]
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - name: Write the solver-bug report
+        env:
+          CVC5_VERSION: ${{ env.cvc5-version }}
+        run: >
+          python3 scripts/solver_bugs.py report --ci-cvc5 "$CVC5_VERSION"
+          >> "$GITHUB_STEP_SUMMARY"
+
   # This job takes approximately 17 to 42 minutes
   check-ubuntu-24_04-cmake-gcc:
     runs-on: ubuntu-24.04
