@@ -12776,6 +12776,38 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
 
   cpp_typecheck.template_map.build_unassigned(cpp_declaration.template_type());
 
+  // N5008 [basic.scope.temp]/2, [temp.local]/6: within this template its
+  // own parameters hide same-named packs bound by the context of the call
+  // (the class template `X<class... Ts>' whose member names
+  // `at_impl<void *>::eval<T, Ts...>'); the flat map matches packs by short
+  // name, and such a stale binding sized the callee's own pack.
+  {
+    std::set<std::string> own;
+    for(const auto &tp : cpp_declaration.template_type().template_parameters())
+    {
+      const std::string pid = id2string(
+        tp.id() == ID_type ? tp.type().get(ID_identifier)
+                           : tp.get(ID_identifier));
+      const auto sep = pid.rfind("::");
+      own.insert(sep == std::string::npos ? pid : pid.substr(sep + 2));
+    }
+    const auto shadow = [&own](auto &m)
+    {
+      for(auto it = m.begin(); it != m.end();)
+      {
+        const std::string k = id2string(it->first);
+        const auto sep = k.rfind("::");
+        if(own.count(sep == std::string::npos ? k : k.substr(sep + 2)) != 0)
+          it = m.erase(it);
+        else
+          ++it;
+      }
+    };
+    shadow(cpp_typecheck.template_map.pack_args_map);
+    shadow(cpp_typecheck.template_map.pack_size_map);
+    shadow(cpp_typecheck.template_map.pack_expr_map);
+  }
+
   // N5008 [temp.deduct]/5: restrict unqualified-name deduction to THIS
   // template's parameters (see current_deduction_parameters).
   deduction_parameters_guardt deduction_parameters_guard{
