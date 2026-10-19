@@ -9547,7 +9547,36 @@ skip_pack_removal_ft:
         if(pack_arg.id() == ID_type)
         {
           auto &d = static_cast<cpp_declarationt &>(param_copy);
-          d.type() = pack_arg.type();
+          // N5008 [temp.variadic]/5: the element replaces the pack's name in
+          // the pattern; the pattern's cv-qualifiers stay (`const T &...t'
+          // with T = int is `const int &t$k')
+          bool substituted = false;
+          if(d.type().id() == ID_merged_type)
+          {
+            irept *name = nullptr;
+            bool only_cv = true;
+            for(auto &sub : d.type().get_sub())
+            {
+              if(sub.id() == ID_const || sub.id() == ID_volatile)
+                continue;
+              if(
+                name == nullptr && sub.id() == ID_cpp_name &&
+                sub.get_sub().size() == 1 &&
+                sub.get_sub().front().id() == ID_name)
+              {
+                name = &sub;
+                continue;
+              }
+              only_cv = false;
+            }
+            if(only_cv && name != nullptr)
+            {
+              *name = pack_arg.type();
+              substituted = true;
+            }
+          }
+          if(!substituted)
+            d.type() = pack_arg.type();
         }
         // N5008 [temp.variadic]/5: a pattern naming a NON-type pack
         // (`const char (&...s)[N]') gets that pack's k-th value
