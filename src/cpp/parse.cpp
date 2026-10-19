@@ -11294,6 +11294,45 @@ bool Parser::rPrimaryExpr(exprt &exp)
         if(lex.LookAhead(0) == ',')
           lex.get_token(tk);
       }
+      // N5008 [expr.prim.req.general]/1: the requirement-parameter-list is
+      // a parameter-declaration-clause; a declarator such as `int (&b)[5]'
+      // or `int (*fp)(int)' is not a type-id followed by a name (the
+      // latter parses as an unnamed `int (*)(int)').  Parse the parameter
+      // declarations properly when the simple form fails or leaves a
+      // parameter unnamed.
+      bool unnamed = false;
+      for(const auto &param : requires_params.get_sub())
+        unnamed |= param.get(ID_name).empty();
+      if(!parsed_params || lex.LookAhead(0) != ')' || unnamed)
+      {
+        lex.Restore(param_saved);
+        lex.get_token(tk); // consume '('
+        requires_params.clear();
+        parsed_params = true;
+        while(lex.LookAhead(0) != ')' && lex.LookAhead(0) != 0)
+        {
+          cpp_declarationt declaration;
+          if(
+            !rArgDeclaration(declaration) ||
+            declaration.declarators().size() != 1)
+          {
+            parsed_params = false;
+            break;
+          }
+          const cpp_declaratort &declarator = declaration.declarators().front();
+          typet param_type = declarator.merge_type(declaration.type());
+          if(declarator.get_has_ellipsis())
+            param_type.set(ID_ellipsis, true);
+          irept param;
+          param.add(ID_type).swap(param_type);
+          const irep_idt param_name = declarator.name().get_base_name();
+          if(!param_name.empty())
+            param.set(ID_name, param_name);
+          requires_params.get_sub().push_back(std::move(param));
+          if(lex.LookAhead(0) == ',')
+            lex.get_token(tk);
+        }
+      }
       if(parsed_params && lex.LookAhead(0) == ')')
       {
         lex.get_token(tk); // consume ')'
