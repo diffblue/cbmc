@@ -6659,6 +6659,33 @@ bool cpp_typecheckt::member_constraints_satisfied(const exprt &candidate)
     cpp_save_scopet saved_scope{cpp_scopes};
     bind_class_instance_parameters(*class_symbol, template_map);
     cpp_scopes.go_to(*scope_it->second);
+    // [temp.constr.decl]/3, [temp.constr.atomic]/1: for a specialization of
+    // a member function TEMPLATE the parameter mapping also binds the
+    // template's own parameters (`template <class O> int m(O) requires
+    // requires { sizeof(O); }'), which are looked up in the template's
+    // parameter scope
+    const irept &fn_template = candidate.type().find("#fn_template_type");
+    const irept &fn_args = candidate.type().find("#fn_template_args");
+    if(fn_template.is_not_nil() && fn_args.is_not_nil())
+    {
+      const template_typet &template_type =
+        static_cast<const template_typet &>(fn_template);
+      template_map.build(
+        template_type, static_cast<const cpp_template_args_tct &>(fn_args));
+      if(!template_type.template_parameters().empty())
+      {
+        const auto &first = template_type.template_parameters().front();
+        const std::string pid = id2string(
+          first.id() == ID_type ? first.type().get(ID_identifier)
+                                : first.get(ID_identifier));
+        const auto sep = pid.rfind("::");
+        const auto template_scope =
+          sep == std::string::npos ? cpp_scopes.id_map.end()
+                                   : cpp_scopes.id_map.find(pid.substr(0, sep));
+        if(template_scope != cpp_scopes.id_map.end())
+          cpp_scopes.go_to(*template_scope->second);
+      }
+    }
     // [basic.scope.param]/1: the clause is in the scope of the parameters
     if(candidate.type().id() == ID_code)
     {
