@@ -2244,6 +2244,29 @@ void cpp_typecheckt::typecheck_compound_declarator(
             {
               c_typecheck_baset::do_initializer(*new_symbol);
             }
+            // N5008 [dcl.array]/5: an array of unknown bound takes its bound
+            // from the initializer, also as the type of the member
+            // (`static constexpr bool _Bools[] = {is_same_v<_First, _Ty>,
+            // is_same_v<_Rest, _Ty>...}', the MSVC STL's
+            // _Meta_find_unique_index_)
+            if(
+              new_symbol->type.id() == ID_array &&
+              to_array_type(new_symbol->type).size().is_nil() &&
+              new_symbol->value.type().id() == ID_array &&
+              to_array_type(new_symbol->value.type()).size().is_not_nil())
+            {
+              to_array_type(new_symbol->type).size() =
+                to_array_type(new_symbol->value.type()).size();
+            }
+            if(
+              component.type().id() == ID_array &&
+              to_array_type(component.type()).size().is_nil() &&
+              new_symbol->type.id() == ID_array &&
+              to_array_type(new_symbol->type).size().is_not_nil())
+            {
+              to_array_type(component.type()).size() =
+                to_array_type(new_symbol->type).size();
+            }
           }
           catch(...)
           {
