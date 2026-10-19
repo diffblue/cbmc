@@ -7731,6 +7731,34 @@ skip_pack_removal_ft:
         }
         return true;
       };
+      // template_symbol.name is `<class-instance>::template.<member>...`;
+      // the owner id is `[ns::]template.<class><params>`.  Compare the
+      // class base names (strip the template-argument/parameter lists).
+      const auto owned_by_member_class = [&](const irep_idt &owner_id)
+      {
+        const std::string tmpl_name = id2string(template_symbol.name);
+        const auto member_sep = tmpl_name.find("::template.");
+        std::string class_part = member_sep != std::string::npos
+                                   ? tmpl_name.substr(0, member_sep)
+                                   : std::string{};
+        const auto args_pos = class_part.find('<');
+        if(args_pos != std::string::npos)
+          class_part.resize(args_pos);
+        const auto ns_pos = class_part.rfind("::");
+        if(ns_pos != std::string::npos)
+          class_part.erase(0, ns_pos + 2);
+        std::string owner = id2string(owner_id);
+        const auto tpos = owner.rfind("template.");
+        if(tpos != std::string::npos)
+          owner.erase(0, tpos + std::string("template.").size());
+        const auto owner_args = owner.find('<');
+        if(owner_args != std::string::npos)
+          owner.resize(owner_args);
+        return !class_part.empty() && owner == class_part;
+      };
+      // (only definitions of members of this member's class count: an
+      // out-of-class operator= of std::unordered_multimap, five template
+      // parameters, hid that of std::function's operator= template)
       // (among the definitions with this member's signature: libc++'s
       // std::function has both `template <class F, class> function(F)' and
       // `template <class, class, class> function()' defined out of line,
@@ -7752,7 +7780,8 @@ skip_pack_removal_ft:
             md.declarators().empty() ||
             md.declarators()[0].name().get_base_name() != member_base_name ||
             md.declarators()[0].find(ID_value).is_nil() ||
-            md.find(ID_template_type).is_nil() || !signature_matches(md))
+            md.find(ID_template_type).is_nil() || !signature_matches(md) ||
+            !owned_by_member_class(tsp.first))
           {
             continue;
           }
@@ -7791,31 +7820,8 @@ skip_pack_removal_ft:
           // is not attached (the known hazard of base-name matching).
           if(md.find(ID_template_type).is_nil())
             continue;
-          {
-            // template_symbol.name is `<class-instance>::template.<member>...`;
-            // the owner id is `[ns::]template.<class><params>`.  Compare the
-            // class base names (strip the template-argument/parameter lists).
-            const std::string tmpl_name = id2string(template_symbol.name);
-            const auto member_sep = tmpl_name.find("::template.");
-            std::string class_part = member_sep != std::string::npos
-                                       ? tmpl_name.substr(0, member_sep)
-                                       : std::string{};
-            const auto args_pos = class_part.find('<');
-            if(args_pos != std::string::npos)
-              class_part.resize(args_pos);
-            const auto ns_pos = class_part.rfind("::");
-            if(ns_pos != std::string::npos)
-              class_part.erase(0, ns_pos + 2);
-            std::string owner = id2string(tsp.first);
-            const auto tpos = owner.rfind("template.");
-            if(tpos != std::string::npos)
-              owner.erase(0, tpos + std::string("template.").size());
-            const auto owner_args = owner.find('<');
-            if(owner_args != std::string::npos)
-              owner.resize(owner_args);
-            if(class_part.empty() || owner != class_part)
-              continue;
-          }
+          if(!owned_by_member_class(tsp.first))
+            continue;
           if(
             md.template_type().template_parameters().size() <
             most_template_parameters)
