@@ -11305,6 +11305,18 @@ void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
   }
 
   exprt &op = to_dereference_expr(expr).pointer();
+  // N5008 [expr.type]/1: an operand of reference type is adjusted to the
+  // lvalue it refers to before `*' applies to the pointer.  A cast to a
+  // reference type (`static_cast<int *&>(p)', `static_cast<T &&>(v)' in the
+  // MSVC STL's ranges::iter_move) is the address of its operand, typed as
+  // the reference; the front end's own dereferences of a reference (the
+  // implicit one, those of structured bindings) already are the adjustment.
+  if(
+    !expr.get_bool(ID_C_implicit) && op.id() == ID_address_of &&
+    (is_reference(op.type()) || is_rvalue_reference(op.type())))
+  {
+    add_implicit_dereference(op);
+  }
   const typet &op_type = op.type();
 
   if(op_type.id() == ID_pointer && op_type.find(ID_to_member).is_not_nil())
