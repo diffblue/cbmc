@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp11
+^\[main\.assertion\.1\] line \d+ found through the base: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+in expression
+--
+Argument-dependent lookup did not visit the base classes of an argument's
+class, so an operator| declared in the namespace of closure's base was not
+found and `arr | c' was checked as the built-in operator.
