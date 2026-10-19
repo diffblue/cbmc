@@ -2113,3 +2113,8 @@ No dog-food change.  Fixes for the open libc++ and MSVC items; see
 
 No dog-food change.  Fixes for libc++ std::function and string, and the
 MSVC pair; see .kiro/decltype_tuple_apply_findings.md, "Round 191".
+
+## Round 192 2026-10-19
+
+No dog-food change.  A value-set fix for field-sensitive unions (C and
+C++); see .kiro/decltype_tuple_apply_findings.md, "Round 192".

@@ -14918,3 +14918,40 @@ goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
 CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; platform_check
 gcc11/m32/arm64 and the validate, paths, cprover-smt2, new-smt and z3
 profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
+
+## Round 192 (open items after 28733b04da)
+
+Fixes, each with a test that fails on the old build:
+- A friend function template first declared in a class is found only by
+  ADL with that class associated ([class.friend]/7,
+  [basic.lookup.argdep]/4.2).  libc++'s unreachable_sentinel_t friend
+  operator== made `a == b' valid for any iterator and cached a wrong
+  __is_primary_template<iterator_traits<It>> (cpp20_concept_iterator_chain,
+  b93199917b).
+- Out-of-line member template definitions: the longest template-head is
+  preferred only among the member's own class's definitions (libc++'s
+  unordered_multimap::operator= hid std::function's; `g = lambda',
+  74b629a044).
+- Value sets: a field-sensitive member (`fn..st..ptrs[[0]]') read through a
+  member expression built by the value-set analysis (union case of
+  byte_extract) is looked up under its field-sensitive name.  A plain C
+  test reproduces it; MSVC std::function's target in its union buffer
+  failed every call and _Tidy (7 VS 2022 tests, da6effbd23).
+- KNOWNBUG cpp20_template_lambda_reference_parameter: `[]<class T>(const
+  T &)' -- the parser skips a lambda's template-parameter-list; libc++'s
+  __synth_three_way, so cpp20_ranges_basic on macOS.
+
+Local runs of the run-6 failed-test artifacts (tests still run there):
+VS 2022 46 -> 39 failing, macOS 15 7 -> 5.
+
+Open: template lambdas (above); MSVC std::bind to std::function, _Find_last,
+variant, filesystem _Fs_file, from_chars; macOS locale use_facet (dylib
+facets), expected; libc++ "too many addressed objects" (Linux libc++).
+
+Verification (W170 at the value-set commit): cbmc-cpp 1999, libcxx and
+KNOWNBUG profiles 1999, cpp 246, regression/cbmc 1214, ansi-c 270,
+goto-instrument 298, cbmc-library 522, unit-proofs 13, contracts and
+cbmc-concurrency CORE, unit 620, 0 failures (no runtime change: cbmc-cpp
+811 s -> 796 s); platform_check gcc11/m32/arm64 and the validate, paths,
+cprover-smt2, new-smt and z3 profiles pass; lint 0, clang-format 0,
+doxygen 0; every commit compiles.
