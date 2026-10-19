@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ deduced as int: SUCCESS$
@@ -9,13 +9,11 @@ main.cpp
 --
 ^warning: ignoring
 ^CONVERSION ERROR$
+inconsistent deduction
 --
-When the call's type is needed, the placeholder return type of the member
-function template is deduced with the condition `choice<T>.strategy == 1'
-(a static data member template of class type of the enclosing class) not
-evaluated, so the discarded `return 1.0' fixes the type as double.  The
-same condition in a function with a declared return type, or naming a
-namespace-scope variable template, is evaluated.  On MSVC this makes
-ranges::iter_move return void for `int *&', so indirectly_readable<int *>
-and every iterator concept above it are false (std::span's iterator
-constructor, views::take).
+A constexpr static data member (template) of class type was not const
+([dcl.constexpr]/6), so the member read in the if constexpr condition did
+not fold, both branches were kept and the discarded `return 1.0' took
+part in the deduction.  On MSVC this made ranges::iter_move return void
+for `int *&', so indirectly_readable<int *> and every iterator concept
+above it were false (std::span's iterator constructor).
