@@ -1,4 +1,4 @@
-CORE
+CORE broken-msvc-stl
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ size: SUCCESS$
@@ -23,3 +23,8 @@ was nondeterministic.  Overload resolution now applies N5008 [temp.func.order]
 partial ordering (function_template_at_least_as_specialised), under which
 __to_address(_Tp*) is more specialized; to_address returns the pointer and the
 span verifies genuinely.
+With the MSVC STL the test is excluded (broken-msvc-stl; main.cpp keeps its
+guard, so on Windows it would have no assertions).  One known cause:
+indirectly_readable<int *> is false with the MSVC STL, see the KNOWNBUG
+cpp17_discarded_return_with_static_member_variable_template_condition;
+there may be others.

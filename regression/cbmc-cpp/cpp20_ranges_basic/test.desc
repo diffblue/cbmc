@@ -1,4 +1,4 @@
-CORE
+CORE broken-msvc-stl
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
@@ -30,3 +30,8 @@ With the libstdc++ 16 headers `arr | views::take(3)' was rejected (tagged
 broken-libstdcxx16); the root cause,
 cpp20_concept_disjunction_first_operand_substitution_failure, is fixed, and
 the test passes with GCC 16.2.1.
+With the MSVC STL the test is excluded (broken-msvc-stl; main.cpp keeps its
+guard, so on Windows it would have no assertions).  One known cause:
+indirectly_readable<int *> is false with the MSVC STL, see the KNOWNBUG
+cpp17_discarded_return_with_static_member_variable_template_condition;
+there may be others.

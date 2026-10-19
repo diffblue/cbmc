@@ -1,0 +1,21 @@
+KNOWNBUG
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ deduced as int: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+When the call's type is needed, the placeholder return type of the member
+function template is deduced with the condition `choice<T>.strategy == 1'
+(a static data member template of class type of the enclosing class) not
+evaluated, so the discarded `return 1.0' fixes the type as double.  The
+same condition in a function with a declared return type, or naming a
+namespace-scope variable template, is evaluated.  On MSVC this makes
+ranges::iter_move return void for `int *&', so indirectly_readable<int *>
+and every iterator concept above it are false (std::span's iterator
+constructor, views::take).
