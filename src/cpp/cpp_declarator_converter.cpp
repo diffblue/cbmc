@@ -565,6 +565,24 @@ void cpp_declarator_convertert::combine_types(
     symbol.type = decl_type;
     return; // ok
   }
+  // N5008 [basic.link]/11: declarations of an array object may differ in
+  // the presence of the major array bound.  A variable template's
+  // instantiation from a primary template declared `T v[] = {...}' meets an
+  // explicit specialization `template <> T v<char>[200]' declared first
+  // (the MSVC STL's __DIGIT_TABLE, [temp.expl.spec]/7: that specialization
+  // is the entity named); keep the declared bound.
+  else if(
+    symbol.type.id() == ID_array && decl_type.id() == ID_array &&
+    to_array_type(decl_type).size().is_nil() &&
+    to_array_type(symbol.type).size().is_not_nil())
+  {
+    typet existing_element = to_array_type(symbol.type).element_type();
+    typet new_element = to_array_type(decl_type).element_type();
+    existing_element.remove(ID_C_constant);
+    new_element.remove(ID_C_constant);
+    if(existing_element == new_element)
+      return; // ok
+  }
 
   else if(
     symbol.type.id() == ID_code && decl_type.id() == ID_code &&
@@ -866,22 +884,31 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   {
     symbol.is_lvalue = !is_reference(symbol.type);
 
+    // N5008 [temp.expl.spec]/2, [basic.stc.static]/1: an explicit
+    // specialization of a variable template declared at namespace scope (in
+    // the scope of its empty template-parameter-list, `template <>') is a
+    // namespace-scope variable with static storage duration
+    const cpp_scopet *declaring_scope =
+      &cpp_typecheck.cpp_scopes.current_scope();
+    while(declaring_scope->id_class == cpp_idt::id_classt::TEMPLATE_SCOPE &&
+          !declaring_scope->is_root_scope())
+    {
+      declaring_scope = &declaring_scope->get_parent();
+    }
+    const bool at_namespace_scope = declaring_scope->is_global_scope();
+
     symbol.is_static_lifetime =
       !symbol.is_macro && !symbol.is_type &&
-      (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() ||
-       storage_spec.is_static());
+      (at_namespace_scope || storage_spec.is_static());
 
     symbol.is_thread_local =
       (!symbol.is_static_lifetime && !storage_spec.is_extern()) ||
       storage_spec.is_thread_local();
 
-    symbol.is_file_local =
-      (symbol.is_macro && !storage_spec.is_constexpr()) ||
-      (!cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
-       !storage_spec.is_extern()) ||
-      (cpp_typecheck.cpp_scopes.current_scope().is_global_scope() &&
-       storage_spec.is_static()) ||
-      symbol.is_parameter;
+    symbol.is_file_local = (symbol.is_macro && !storage_spec.is_constexpr()) ||
+                           (!at_namespace_scope && !storage_spec.is_extern()) ||
+                           (at_namespace_scope && storage_spec.is_static()) ||
+                           symbol.is_parameter;
   }
 
   if(symbol.is_static_lifetime)
