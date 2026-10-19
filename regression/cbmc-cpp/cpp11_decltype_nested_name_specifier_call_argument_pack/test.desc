@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ one argument per element: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The call-argument pack expansion in a decltype operand was expanded only
+when the decltype-specifier was the whole type, not when it was the
+nested-name-specifier of `typename decltype(...)::type'; the call then had
+a single argument.

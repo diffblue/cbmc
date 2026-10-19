@@ -1006,6 +1006,17 @@ void template_mapt::apply(typet &type) const
   // untouched.
   if(type.id() == ID_decltype)
     expand_call_argument_packs(type);
+  // likewise for a decltype-specifier in a nested-name-specifier
+  // ([expr.prim.id.qual]/1: `typename decltype(f(g<Ts>()...))::type',
+  // the MSVC STL's _Meta_at_)
+  else if(type.id() == ID_cpp_name)
+  {
+    for(auto &component : type.get_sub())
+    {
+      if(component.id() == ID_decltype)
+        expand_call_argument_packs(component);
+    }
+  }
 
   if(type.id()==ID_array)
   {
