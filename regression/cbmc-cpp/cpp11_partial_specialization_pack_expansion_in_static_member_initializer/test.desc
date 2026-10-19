@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ each element of R: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The bindings of a partial specialization's deduced packs were replayed
+with a scalar entry for the first element even for a longer pack, so the
+member's initializer had R replaced by char before its pack expansion was
+expanded.
