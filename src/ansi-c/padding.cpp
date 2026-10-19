@@ -20,12 +20,11 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/pointer_offset_size.h>
 #include <util/simplify_expr.h>
 
-/// Whether the AMD64 System V rule excludes this field from aggregate alignment.
-static bool is_sysv_unnamed_bit_field(
-  const struct_union_typet::componentt &component)
+/// Whether System V x86-64 excludes this field from aggregate alignment.
+static bool
+is_sysv_unnamed_bit_field(const struct_union_typet::componentt &component)
 {
-  return component.get_anonymous() &&
-         component.type().id() == ID_c_bit_field &&
+  return component.get_anonymous() && component.type().id() == ID_c_bit_field &&
          config.ansi_c.arch == "x86_64" &&
          config.ansi_c.os == configt::ansi_ct::ost::OS_LINUX &&
          config.ansi_c.mode != configt::ansi_ct::flavourt::VISUAL_STUDIO;
@@ -76,11 +75,20 @@ mp_integer alignment(const typet &type, const namespacet &ns)
 
     // get the max
     // (should really be the smallest common denominator)
-    for(const auto &c : to_struct_union_type(type).components())
+    const auto &components = to_struct_union_type(type).components();
+
+    // Neither unnamed bit-fields nor the padding they introduce count here.
+    const bool has_sysv_unnamed_bit_field = std::any_of(
+      components.begin(), components.end(), is_sysv_unnamed_bit_field);
+
+    for(const auto &c : components)
     {
-      // Padding does not impose alignment requirements of its own.
-      if(c.get_is_padding() || is_sysv_unnamed_bit_field(c))
+      if(
+        is_sysv_unnamed_bit_field(c) ||
+        (has_sysv_unnamed_bit_field && c.get_is_padding()))
+      {
         continue;
+      }
 
       result = std::max(result, alignment(c.type(), ns));
     }

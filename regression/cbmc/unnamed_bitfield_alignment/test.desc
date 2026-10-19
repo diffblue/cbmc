@@ -1,6 +1,6 @@
 CORE gcc-only
 main.c
---c17 --arch x86_64 --os linux
+--c17
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$
 ^SIGNAL=0$
