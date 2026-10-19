@@ -2725,6 +2725,8 @@ void cpp_typecheck_resolvet::disambiguate_functions(
   {
     unsigned cv_distance;
     std::size_t template_argument_count;
+    // the non-template preference ([over.match.best]/2.4): 0 or 1
+    std::size_t template_distance;
     // cv_distance per argument (the implicit object argument of a member
     // template specialization first)
     std::vector<unsigned> cv_per_argument;
@@ -2870,22 +2872,40 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       distance_map.insert({total_distance, old_id});
       rank_map.insert(
         {total_distance,
-         {cv_distance, template_argument_count, std::move(cv_per_argument)}});
+         {cv_distance,
+          template_argument_count,
+          template_distance,
+          std::move(cv_per_argument)}});
     }
   }
 
   old_identifiers.clear();
 
-  // put in the top ones
+  // put in the top ones: N5008 [over.match.best]/2.1 compares the implicit
+  // conversion sequences -- including [over.ics.rank]/3.2.3 and /3.2.6 for
+  // reference bindings, below -- before /2.4 prefers a non-template, so
+  // the group is those of the best conversion distance whatever their
+  // template distance, which decides only afterwards.  (The MSVC STL's
+  // unique_ptr has a move assignment TEMPLATE and a deleted copy
+  // assignment; `p = unique_ptr(...)' chose the latter.)
   std::vector<rankt> ranks;
   if(!distance_map.empty())
   {
-    auto range = distance_map.equal_range(distance_map.begin()->first);
-    for(auto it = range.first; it != range.second; ++it)
+    const std::uint64_t best_conversions =
+      distance_map.begin()->first / 100000000ULL;
+    for(auto it = distance_map.begin();
+        it != distance_map.end() &&
+        it->first / 100000000ULL == best_conversions;
+        ++it)
+    {
       old_identifiers.push_back(it->second);
-    auto rank_range = rank_map.equal_range(distance_map.begin()->first);
-    for(auto it = rank_range.first; it != rank_range.second; ++it)
+    }
+    for(auto it = rank_map.begin();
+        it != rank_map.end() && it->first / 100000000ULL == best_conversions;
+        ++it)
+    {
       ranks.push_back(it->second);
+    }
   }
 
   // N5008 [over.ics.rank]/3.2.3, /3.2.6: of two REFERENCE bindings, one
@@ -2904,9 +2924,15 @@ void cpp_typecheck_resolvet::disambiguate_functions(
       std::vector<bool> shape;
       if(candidate.type().id() == ID_code)
       {
+        // (the implicit object parameter is not among a member template
+        // specialization's parameters yet; it is compared separately)
         for(const auto &p : to_code_type(candidate.type()).parameters())
+        {
+          if(p.get_this())
+            continue;
           shape.push_back(
             is_reference(p.type()) || is_rvalue_reference(p.type()));
+        }
       }
       return shape;
     };
@@ -2919,6 +2945,18 @@ void cpp_typecheck_resolvet::disambiguate_functions(
           i == j || ranks[j].cv_distance >= ranks[i].cv_distance ||
           reference_shape(old_identifiers[i]) !=
             reference_shape(old_identifiers[j]))
+        {
+          continue;
+        }
+        // A template beats a non-template here only when the latter was
+        // declared: an implicit copy constructor or copy assignment stands
+        // in for the implicit move operation as well, which the front end
+        // declares only when needed, and which would tie with the template
+        // and win by [over.match.best]/2.4.
+        if(
+          ranks[j].template_distance > ranks[i].template_distance &&
+          (old_identifiers[i].type().get_bool("#is_implicit_ctor") ||
+           old_identifiers[i].type().get_bool("#is_implicit_assign")))
         {
           continue;
         }
@@ -2948,6 +2986,26 @@ void cpp_typecheck_resolvet::disambiguate_functions(
     for(std::size_t i = 0; i < old_identifiers.size(); ++i)
     {
       if(!dominated[i])
+      {
+        kept.push_back(old_identifiers[i]);
+        kept_ranks.push_back(ranks[i]);
+      }
+    }
+    old_identifiers.swap(kept);
+    ranks.swap(kept_ranks);
+  }
+  // [over.match.best]/2.4: then a non-template is better than a template
+  // specialization
+  if(!ranks.empty())
+  {
+    std::size_t least = ranks.front().template_distance;
+    for(const auto &r : ranks)
+      least = std::min(least, r.template_distance);
+    resolve_identifierst kept;
+    std::vector<rankt> kept_ranks;
+    for(std::size_t i = 0; i < old_identifiers.size(); ++i)
+    {
+      if(ranks[i].template_distance == least)
       {
         kept.push_back(old_identifiers[i]);
         kept_ranks.push_back(ranks[i]);
