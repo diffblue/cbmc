@@ -852,6 +852,10 @@ void code_contractst::apply_loop_contract(
   if(!may_have_loops)
     return;
 
+  // Functions processed earlier may have been instrumented, and the inliner
+  // relies on the location numbers of the callees it copies, so restore them.
+  goto_functions.update();
+
   inlining_decoratort decorated(log.get_message_handler());
   goto_function_inline(goto_functions, function_name, ns, decorated);
 
