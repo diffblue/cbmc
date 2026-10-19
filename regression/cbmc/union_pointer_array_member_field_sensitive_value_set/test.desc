@@ -1,0 +1,18 @@
+CORE
+main.c
+--pointer-check
+^\[main\.assertion\.1\] line \d+ assertion g->vptr->call\(\) == 2: SUCCESS$
+^\[main\.assertion\.2\] line \d+ assertion g->vptr->call\(\) == 3: FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+dereference failure: .*: FAILURE$
+--
+With field sensitivity the members of a union and the elements of a small
+array are separate symbols whose value sets are recorded under their own
+names (`fn..st..ptrs[[0]]').  A pointer read through the union as another
+type looked the member up as `fn.st.ptrs[]', found nothing and assumed an
+unknown target, so the call through the read vtable pointer failed its
+dereference checks.
