@@ -9350,6 +9350,9 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
       // Check if the template name is a template template parameter.
       // If so, assign it to the desired type's template.
       bool is_tt_param = false;
+      // the name of the template an explicitly given template template
+      // parameter is bound to: A may be derived from its specialization
+      irep_idt search_name = tmpl_base_name;
       const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
         tmpl_base_name, cpp_scopet::RECURSIVE);
       for(const auto &id_ptr : ids)
@@ -9366,6 +9369,38 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
             // template that the desired type was instantiated from.
             it->second = desired_type;
             is_tt_param = true;
+          }
+          // N5008 [temp.arg.explicit]/2, [temp.deduct.type]/8: a template
+          // template parameter given explicitly (`impl<one>(o)' for
+          // `template <template <class...> class T, class... A> void impl(
+          // const T<A...> &)', the MSVC STL's
+          // _Derived_from_specialization_impl<_Template>) is not deduced;
+          // the remaining arguments are deduced from A when A is a
+          // specialization of that template
+          else if(
+            it != cpp_typecheck.template_map.type_map.end() &&
+            it->second.id() == ID_template_parameter_symbol_type)
+          {
+            const std::string bound = id2string(
+              to_template_parameter_symbol_type(it->second).get_identifier());
+            const auto marker = bound.rfind("template.", bound.find('<'));
+            if(marker != std::string::npos)
+            {
+              const std::string bound_base = bound.substr(marker + 9);
+              search_name = bound_base.substr(0, bound_base.find('<'));
+            }
+            const std::string instance = id2string(desired_sym->name);
+            const auto tag = instance.rfind("tag-", instance.find('<'));
+            if(
+              marker != std::string::npos && tag != std::string::npos &&
+              bound.compare(0, marker, instance, 0, tag) == 0 &&
+              bound.compare(
+                marker + 9,
+                desired_sym->base_name.size() + 1,
+                id2string(desired_sym->base_name) + "<") == 0)
+            {
+              is_tt_param = true;
+            }
           }
         }
       }
@@ -9408,7 +9443,7 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
           const symbolt *base_sym = cpp_typecheck.symbol_table.lookup(base_id);
           if(base_sym == nullptr)
             continue;
-          if(base_sym->base_name != tmpl_base_name)
+          if(base_sym->base_name != search_name)
           {
             // not this one: enqueue ITS bases (indirect derivation)
             const irept &sub_bases = base_sym->type.find(ID_bases);
