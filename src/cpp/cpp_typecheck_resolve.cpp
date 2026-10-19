@@ -11760,7 +11760,38 @@ void cpp_typecheck_resolvet::expand_function_parameter_pack(
             }
             // For heterogeneous packs, set the type from the
             // individually deduced types
-            if(i < pack_deduced_types.size())
+            // N5008 [temp.variadic]/5: the element is substituted for the
+            // pack's name in the pattern, keeping the cv-qualifiers in the
+            // pattern's decl-specifiers (`const T &...' with T = int is
+            // `const int &'); a bare `T' is replaced by it
+            bool substituted = false;
+            if(
+              i < pack_deduced_types.size() &&
+              decl.type().id() == ID_merged_type)
+            {
+              irept *name = nullptr;
+              bool only_cv = true;
+              for(auto &sub : decl.type().get_sub())
+              {
+                if(sub.id() == ID_const || sub.id() == ID_volatile)
+                  continue;
+                if(
+                  name == nullptr && sub.id() == ID_cpp_name &&
+                  sub.get_sub().size() == 1 &&
+                  sub.get_sub().front().id() == ID_name)
+                {
+                  name = &sub;
+                  continue;
+                }
+                only_cv = false;
+              }
+              if(only_cv && name != nullptr)
+              {
+                *name = pack_deduced_types[i];
+                substituted = true;
+              }
+            }
+            if(!substituted && i < pack_deduced_types.size())
               decl.type() = pack_deduced_types[i];
             expanded.push_back(std::move(copy));
           }
@@ -12082,9 +12113,70 @@ void cpp_typecheck_resolvet::deduce_from_call_arguments(
           }
           continue;
         }
+        // N5008 [temp.deduct.call]/1: each argument deduces the NEXT
+        // element of the pack the pattern expands; for a compound pattern
+        // (`T *...') that element is what the argument deduces for T (int
+        // for an `int *' argument), not the argument's type.  Elements are
+        // recorded from the deduced binding of that pack.
+        irep_idt pattern_pack;
+        if(
+          template_type != nullptr && !is_forwarding_ref &&
+          arg_type.id() != ID_cpp_name)
+        {
+          std::set<std::string> names;
+          std::function<void(const irept &)> collect = [&](const irept &n)
+          {
+            if(
+              n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+              n.get_sub().front().id() == ID_name)
+            {
+              names.insert(id2string(n.get_sub().front().get(ID_identifier)));
+            }
+            for(const auto &sub : n.get_sub())
+              collect(sub);
+            for(const auto &ns : n.get_named_sub())
+              collect(ns.second);
+          };
+          collect(arg_declaration.type());
+          std::size_t own_packs = 0;
+          for(const auto &tp : template_type->template_parameters())
+          {
+            if(!tp.get_bool(ID_ellipsis) || tp.id() != ID_type)
+              continue;
+            const std::string pid = id2string(tp.type().get(ID_identifier));
+            const auto sep = pid.rfind("::");
+            if(
+              names.count(
+                sep == std::string::npos ? pid : pid.substr(sep + 2)) != 0)
+            {
+              pattern_pack = tp.type().get(ID_identifier);
+              ++own_packs;
+            }
+          }
+          if(own_packs != 1)
+            pattern_pack.clear();
+        }
         // Collect each argument's type for heterogeneous packs
         for(; it != fargs.operands.end(); ++it)
         {
+          if(!pattern_pack.empty())
+          {
+            typet &slot = cpp_typecheck.template_map.type_map[pattern_pack];
+            slot = typet{ID_unassigned};
+            slot.set(ID_identifier, pattern_pack);
+            typet actual = it->type();
+            if(is_reference(actual) || is_rvalue_reference(actual))
+              actual = to_reference_type(actual).base_type();
+            guess_template_args(arg_type, actual);
+            const typet &element =
+              cpp_typecheck.template_map.type_map[pattern_pack];
+            if(element.id() != ID_unassigned)
+            {
+              pack_deduced_types.push_back(element);
+              continue;
+            }
+          }
+
           // [temp.deduct.call]/3 applied per pack element: for a
           // forwarding-reference pack (Args&&... args), an lvalue
           // argument of type A deduces the corresponding pack element
