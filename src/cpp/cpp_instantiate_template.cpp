@@ -8416,8 +8416,14 @@ skip_pack_removal_ft:
     new_decl.type().id() != ID_struct && new_decl.type().id() != ID_union &&
     !new_decl.is_typedef())
   {
-    // Check for a better-matching partial specialization.
-    if(template_symbol.type.get(ID_specialization_of).empty())
+    // Check for a better-matching partial specialization -- not for an
+    // explicit specialization (`template <> char v<int> = 0;'), which
+    // declares the specialization itself ([temp.expl.spec]/1) and is no
+    // instance of a partial specialization; its own declarator was dropped
+    // and the partial specialization's initializer used instead.
+    if(
+      template_symbol.type.get(ID_specialization_of).empty() &&
+      !specialization_given)
     {
       // Resolve symbol references in full_template_args so that
       // expressions like "x % y" (where x, y are const symbols)
