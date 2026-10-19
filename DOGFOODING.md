@@ -2108,3 +2108,8 @@ No dog-food change.  Fixes from the CI run 6 artifacts; see
 
 No dog-food change.  Fixes for the open libc++ and MSVC items; see
 .kiro/decltype_tuple_apply_findings.md, "Round 190".
+
+## Round 191 2026-10-19
+
+No dog-food change.  Fixes for libc++ std::function and string, and the
+MSVC pair; see .kiro/decltype_tuple_apply_findings.md, "Round 191".
