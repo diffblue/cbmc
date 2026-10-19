@@ -3283,6 +3283,13 @@ void cpp_typecheckt::typecheck_member_initializer(codet &code)
           // one braced-init-list argument (phase 1): `std::vector<E>
           // ops{a, b}' with class-type elements selected no constructor
           // (the iterator-pair template was tried with E, E).
+          // N5008 [dcl.init.list]/3.8: `m{v}' for an enumeration with a
+          // fixed underlying type (the MSVC STL's _Fs_file:
+          // `_Raw{reinterpret_cast<intptr_t>(_Handle)}')
+          if(code.get_bool(ID_C_braced_init) && code.operands().size() == 1)
+          {
+            list_initialize_fixed_enum(code.op0(), inner_se.type());
+          }
           if(
             code.get_bool(ID_C_braced_init) &&
             inner_se.type().id() == ID_struct_tag &&

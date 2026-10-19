@@ -1166,6 +1166,13 @@ protected:
   /// \return whether the class has no storage member (an empty class: its
   ///   base subobjects have zero size, N5008 [intro.object]/9)
   static bool class_is_empty(const struct_typet &type);
+  /// N5008 [dcl.init.list]/3.8: when \p target is an enumeration with a
+  /// fixed underlying type and \p element an integral (or unscoped
+  /// enumeration) value, replace \p element by the enumeration value it
+  /// direct-list-initializes.
+  /// \return whether \p element was replaced
+  bool list_initialize_fixed_enum(exprt &element, const typet &target);
+
   static bool has_const(const typet &type);
   static bool has_volatile(const typet &type);
   static bool has_auto(const typet &type);
