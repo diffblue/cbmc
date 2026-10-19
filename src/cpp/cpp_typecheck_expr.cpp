@@ -11956,6 +11956,47 @@ void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
     break;
   }
 
+  // N5008 [expr.rel]/2, [expr.eq]/2: the built-in relational and equality
+  // operators take operands of arithmetic, enumeration, pointer (and, for
+  // equality, pointer-to-member and std::nullptr_t) type; with an operand
+  // of class type and no operator function found ([over.match.oper]/3,
+  // tried before this point), the expression is ill-formed.  C's
+  // member-wise struct comparison made `requires { a == b; }' true for a
+  // class without operator== (libc++'s equality_comparable, and so
+  // __cpp17_input_iterator, held for such an iterator).
+  // A class with a conversion function may still reach a built-in
+  // candidate ([over.built], [over.match.oper]/3.3); the conversion is
+  // applied below.
+  const auto has_conversion_function = [this](const typet &t)
+  {
+    if(t.id() != ID_struct_tag && t.id() != ID_union_tag)
+      return true;
+    const struct_union_typet &class_type =
+      t.id() == ID_struct_tag ? static_cast<const struct_union_typet &>(
+                                  follow_tag(to_struct_tag_type(t)))
+                              : static_cast<const struct_union_typet &>(
+                                  follow_tag(to_union_tag_type(t)));
+    for(const auto &c : class_type.components())
+    {
+      if(id2string(c.get_base_name()).rfind("operator(", 0) == 0)
+        return true;
+    }
+    return class_type.get_bool("has_template_conversion_operator");
+  };
+  for(const exprt *op : {&expr.op0(), &expr.op1()})
+  {
+    const typet &t = op->type();
+    if(
+      (t.id() == ID_struct_tag || t.id() == ID_union_tag) &&
+      !has_conversion_function(t))
+    {
+      error().source_location = expr.source_location();
+      error() << "no comparison operator for an operand of class type '"
+              << to_string(t) << "'" << eom;
+      throw 0;
+    }
+  }
+
   c_typecheck_baset::typecheck_expr_rel(expr);
 
   // Ensure both operands of pointer comparisons have exactly the same
