@@ -288,6 +288,10 @@ protected:
   void make_constructors(
     resolve_identifierst &identifiers);
 
+  cpp_declaratort expand_enclosing_class_packs(
+    const template_typet &template_type,
+    const cpp_declaratort &declarator);
+
   void expand_value_function_parameter_pack(
     const template_typet &template_type,
     typet &function_type);
