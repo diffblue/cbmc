@@ -342,6 +342,18 @@ protected:
     const resolve_identifierst &identifiers,
     std::ostream &out);
 
+  /// The associated classes ([basic.lookup.argdep]/3) of the types of the
+  /// arguments \p fargs; nothing when an argument's type is unknown (an
+  /// overload set, a braced-init-list), as then any class may be associated.
+  std::optional<std::set<irep_idt>>
+  associated_classes(const cpp_typecheck_fargst &fargs);
+
+  /// Remove the hidden friends ([class.friend]/7) of classes that are not
+  /// associated with the arguments \p fargs ([basic.lookup.argdep]/4.2).
+  void filter_hidden_friends(
+    cpp_scopest::id_sett &id_set,
+    const cpp_typecheck_fargst &fargs);
+
   void resolve_with_arguments(
     cpp_scopest::id_sett &id_set,
     const irep_idt &base_name,
