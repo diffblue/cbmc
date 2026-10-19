@@ -44,9 +44,10 @@ struct num_get
 int main()
 {
   __CPROVER_assert(
-    numpunct<char>::probe() == 100 + 40 + 2,
+    numpunct<char>::probe() == 100 + 10 * sizeof(wchar_t) + 2,
     "defaults bind the named template's own _CharT");
   __CPROVER_assert(
-    numpunct<wchar_t>::probe() == 100 + 40 + 2, "again from a wchar_t context");
+    numpunct<wchar_t>::probe() == 100 + 10 * sizeof(wchar_t) + 2,
+    "again from a wchar_t context");
   return 0;
 }
