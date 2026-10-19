@@ -4828,8 +4828,15 @@ const symbolt &cpp_typecheckt::instantiate_template(
         elems.push_back(static_cast<const typet &>(t));
       template_map.set_pack_size(pid, elems.size());
       template_map.pack_args_map[pid] = elems;
-      if(!elems.empty())
+      // [temp.variadic]/7: the scalar entry is the convenience binding of
+      // a SINGLE-element pack only (as everywhere else); for a longer pack
+      // it made apply() substitute the first element for the pack's name
+      // before a pack expansion in a member's initializer was expanded
+      // (`{sizeof(R)...}' became `{sizeof(char)...}')
+      if(elems.size() == 1)
         template_map.type_map[pid] = elems.front();
+      else
+        template_map.type_map.erase(pid);
     }
     else if(entry.id() == "pack_exprs")
     {
