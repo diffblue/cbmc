@@ -4517,8 +4517,14 @@ void cpp_typecheckt::typecheck_expr_sizeof(exprt &expr)
 
         if(symbol_expr.id() != ID_type)
         {
-          // _NOT_ a type
-          index_exprt index_expr(symbol_expr, to_array_type(type).size());
+          // _NOT_ a type.  N5008 [expr.sub]/1, [over.sub]: the subscript of
+          // a class object is an operator[] call (`sizeof(__r[0])' in a
+          // requires-expression of the MSVC STL's ranges), so type-check it
+          // as a subscript expression rather than build an array index
+          exprt index_expr{
+            ID_index, typet{}, {symbol_expr, to_array_type(type).size()}};
+          index_expr.add_source_location() = expr.source_location();
+          typecheck_expr(index_expr);
           expr.copy_to_operands(index_expr);
           expr.remove(ID_type_arg);
         }
