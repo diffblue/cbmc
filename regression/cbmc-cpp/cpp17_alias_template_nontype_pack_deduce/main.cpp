@@ -24,6 +24,8 @@
 // assertion is a concrete function of the deduced pack.
 
 extern "C" void __CPROVER_assert(int, const char *);
+// a portable spelling of the size type (cl does not define __SIZE_TYPE__)
+typedef decltype(sizeof(0)) size_t;
 
 int add(int a, int b)
 {
@@ -36,10 +38,10 @@ struct iseq
 };
 
 // non-type parameter pack through an alias (std::index_sequence shape)
-template <__SIZE_TYPE__... I>
-using idxseq = iseq<__SIZE_TYPE__, I...>;
+template <size_t... I>
+using idxseq = iseq<size_t, I...>;
 
-template <__SIZE_TYPE__... J>
+template <size_t... J>
 int sum_impl(idxseq<J...>)
 {
   return add(J...);
