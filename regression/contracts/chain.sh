@@ -27,7 +27,22 @@ else
 fi
 
 rm -f "${name}-mod.gb"
-$goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"
+# Several goto-instrument invocations can be chained by separating their
+# arguments with " -- "; each one reads the output of the previous one.
+if [[ "$args_inst" != *" -- "* ]]
+then
+  $goto_instrument ${args_inst} "${name}.gb" "${name}-mod.gb"
+else
+  cp "${name}.gb" "${name}-step.gb"
+  rest="$args_inst"
+  while [[ "$rest" == *" -- "* ]]
+  do
+    $goto_instrument ${rest%%" -- "*} "${name}-step.gb" "${name}-step.gb"
+    rest="${rest#*" -- "}"
+  done
+  $goto_instrument ${rest} "${name}-step.gb" "${name}-mod.gb"
+  rm -f "${name}-step.gb"
+fi
 if [ ! -e "${name}-mod.gb" ] ; then
   cp "$name.gb" "${name}-mod.gb"
 elif echo $args_inst | grep -q -- "--dump-c" ; then
