@@ -1,0 +1,21 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ hidden friend not found for X: SUCCESS$
+^\[main\.assertion\.2\] line \d+ found for sentinel: SUCCESS$
+^\[main\.assertion\.3\] line \d+ friend template found by ADL: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A friend function template first declared in a class was entered into the
+enclosing namespace and found by ordinary lookup for any arguments, so
+`a == b' was valid for an unrelated class.  libc++'s unreachable_sentinel_t
+has such an operator==, and evaluating it for an iterator during the
+instantiation of iterator_traits<It> cached a wrong
+__is_primary_template<iterator_traits<It>> ("already declared with
+different type", cpp20_concept_iterator_chain on macOS).

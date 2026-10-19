@@ -7242,6 +7242,20 @@ exprt cpp_typecheck_resolvet::resolve(
     }
   }
 
+  // N5008 [class.friend]/7, [basic.lookup.argdep]/4.2: a function template
+  // first declared as a friend in a class (a "hidden friend") is visible
+  // only to argument-dependent lookup, and only when that class is an
+  // associated class of an argument.  CBMC enters it into the enclosing
+  // namespace, where ordinary lookup and the namespace part of ADL would
+  // otherwise find it for any arguments: libc++'s unreachable_sentinel_t
+  // befriends `template <weakly_incrementable _Iter> operator==(
+  // unreachable_sentinel_t, const _Iter &)', and evaluating `a == b' for
+  // an iterator `It' inside iterator_traits<It>'s own instantiation then
+  // checked weakly_incrementable<It> and cached a wrong
+  // __is_primary_template<iterator_traits<It>>.
+  if(!qualified && fargs.in_use && !fargs.has_object)
+    filter_hidden_friends(id_set, fargs);
+
   // Apply the [class.member.lookup]/4 hiding rule to the combined
   // candidate set: if the set contains members declared in distinct
   // classes B and D, and D derives (directly or transitively) from B,
@@ -13980,6 +13994,127 @@ void cpp_typecheck_resolvet::filter_for_namespaces(cpp_scopest::id_sett &id_set)
       it++;
       id_set.erase(old);
     }
+  }
+}
+
+std::optional<std::set<irep_idt>>
+cpp_typecheck_resolvet::associated_classes(const cpp_typecheck_fargst &fargs)
+{
+  std::set<irep_idt> classes;
+  std::function<void(const typet &)> add = [&](const typet &type)
+  {
+    if(type.id() == ID_pointer)
+    {
+      add(to_pointer_type(type).base_type());
+      return;
+    }
+    if(type.id() == ID_array)
+    {
+      add(to_array_type(type).element_type());
+      return;
+    }
+    if(type.id() == ID_code)
+    {
+      for(const auto &p : to_code_type(type).parameters())
+        add(p.type());
+      add(to_code_type(type).return_type());
+      return;
+    }
+    irep_idt name;
+    if(type.id() == ID_struct_tag)
+      name = to_struct_tag_type(type).get_identifier();
+    else if(type.id() == ID_union_tag)
+      name = to_union_tag_type(type).get_identifier();
+    else if(type.id() == ID_c_enum_tag)
+      name = to_c_enum_tag_type(type).get_identifier();
+    if(name.empty() || !classes.insert(name).second)
+      return;
+    // the class of which it is a member
+    auto scope_it = cpp_typecheck.cpp_scopes.id_map.find(name);
+    if(scope_it != cpp_typecheck.cpp_scopes.id_map.end())
+    {
+      const cpp_idt *outer = scope_it->second;
+      while(outer->has_parent())
+      {
+        outer = &outer->get_parent();
+        if(
+          outer->is_namespace() ||
+          outer->id_class == cpp_idt::id_classt::ROOT_SCOPE)
+          break;
+        if(outer->id_class == cpp_idt::id_classt::CLASS)
+        {
+          classes.insert(outer->identifier);
+          break;
+        }
+      }
+    }
+    const symbolt *class_symbol = cpp_typecheck.symbol_table.lookup(name);
+    if(class_symbol == nullptr)
+      return;
+    // its direct and indirect base classes
+    for(const auto &b : class_symbol->type.find(ID_bases).get_sub())
+      add(static_cast<const typet &>(b.find(ID_type)));
+    // those of the template type arguments of a specialization
+    const irept &template_args =
+      class_symbol->type.find(ID_C_template_arguments);
+    if(template_args.is_not_nil())
+    {
+      for(const auto &targ :
+          static_cast<const cpp_template_args_tct &>(template_args).arguments())
+      {
+        if(targ.id() == ID_type)
+          add(targ.type());
+      }
+    }
+  };
+  for(const auto &op : fargs.operands)
+  {
+    const typet &t = op.type();
+    if(t.is_nil() || t.id().empty() || op.id() == ID_initializer_list)
+      return std::nullopt;
+    add(is_reference(t) ? to_reference_type(t).base_type() : t);
+  }
+  return classes;
+}
+
+void cpp_typecheck_resolvet::filter_hidden_friends(
+  cpp_scopest::id_sett &id_set,
+  const cpp_typecheck_fargst &fargs)
+{
+  std::optional<std::set<irep_idt>> classes;
+  bool computed = false;
+  for(auto it = id_set.begin(); it != id_set.end();)
+  {
+    const symbolt *symbol =
+      cpp_typecheck.symbol_table.lookup((*it)->identifier);
+    const irept &befriending = symbol == nullptr
+                                 ? get_nil_irep()
+                                 : symbol->type.find(ID_C_hidden_friend_of);
+    if(befriending.is_nil())
+    {
+      ++it;
+      continue;
+    }
+    if(!computed)
+    {
+      classes = associated_classes(fargs);
+      computed = true;
+    }
+    if(!classes.has_value())
+      return;
+    bool associated = false;
+    for(const auto &c : befriending.get_sub())
+    {
+      if(classes->count(c.get(ID_identifier)) != 0)
+      {
+        associated = true;
+        break;
+      }
+    }
+    if(associated)
+      ++it;
+    else
+      it = id_set.erase(it);
   }
 }
 

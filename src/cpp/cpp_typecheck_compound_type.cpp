@@ -2958,6 +2958,16 @@ void cpp_typecheckt::typecheck_friend_declaration(
           irept friend_entry;
           friend_entry.set(ID_identifier, cand->name);
           symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
+          // a friend template first declared in a class (see below) is
+          // also declared by each further instance of a class template
+          if(cand->type.find(ID_C_hidden_friend_of).is_not_nil())
+          {
+            irept entry{ID_symbol};
+            entry.set(ID_identifier, symbol.name);
+            symbol_table.get_writeable_ref(cand->name)
+              .type.add(ID_C_hidden_friend_of)
+              .move_to_sub(entry);
+          }
           break;
         }
       }
@@ -2986,6 +2996,19 @@ void cpp_typecheckt::typecheck_friend_declaration(
           irept friend_entry;
           friend_entry.set(ID_identifier, added.front());
           symbol.type.add(ID_C_friends).move_to_sub(friend_entry);
+        }
+        // N5008 [class.friend]/7, [basic.lookup.argdep]/4.2: a friend
+        // function first declared in a class is not found by ordinary
+        // lookup, only by argument-dependent lookup with that class among
+        // the associated classes (cpp_typecheck_resolvet::resolve, which
+        // filters on this mark)
+        for(const auto &id : added)
+        {
+          irept entry{ID_symbol};
+          entry.set(ID_identifier, symbol.name);
+          symbol_table.get_writeable_ref(id)
+            .type.add(ID_C_hidden_friend_of)
+            .move_to_sub(entry);
         }
       }
     }
