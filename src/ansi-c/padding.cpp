@@ -536,10 +536,21 @@ static void add_padding_msvc(struct_typet &type, const namespacet &ns)
         underlying_bits = bit_field_bits = 0;
       }
 
-      // pad up to underlying type unless the struct is packed
+      // pad up to underlying type unless the struct is packed.  A member
+      // flattened in from a C++ base class keeps its offset within the base
+      // subobject (the base's own padding components are here); only the
+      // subobject as a whole is aligned, for the base, at its first
+      // component (ID_C_base_alignment, cpp_typecheck_bases.cpp) -- as in
+      // add_padding_gcc.  Re-aligning a base member placed padding inside
+      // the subobject and moved its later members, while the subobject's
+      // own offset (a virtual base's offset in the vtable) stayed unaligned.
       if(!is_packed)
       {
-        const bytest a = alignment(it->type(), ns);
+        const bytest base_alignment = base_subobject_alignment(*it);
+        const bytest a = base_alignment > bytest{1} ? base_alignment
+                         : it->get_bool(ID_from_base)
+                           ? bytest{1}
+                           : alignment(it->type(), ns);
         if(a > bytest{1})
         {
           const bytest displacement = offset % a;
