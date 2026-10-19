@@ -14955,3 +14955,75 @@ cbmc-concurrency CORE, unit 620, 0 failures (no runtime change: cbmc-cpp
 811 s -> 796 s); platform_check gcc11/m32/arm64 and the validate, paths,
 cprover-smt2, new-smt and z3 profiles pass; lint 0, clang-format 0,
 doxygen 0; every commit compiles.
+
+## Round 193 (open items after a636368132)
+
+Fixes, each with a hand-written test that fails on an older binary
+(binW170); the MSVC-only shape uses a `.ii' test with --winx64:
+- Test portability: `__SIZE_TYPE__' (cl does not define it) and a 4-byte
+  wchar_t (2 bytes on Windows) in four tests.
+- Visual Studio layout: a member flattened in from a base keeps its
+  offset; only the base subobject is aligned (cf3aa04470,
+  cpp11_virtual_base_default_member_initializer on VS 2022).
+- [dcl.init.list]/3.8: `E{v}' for an enumeration with a fixed underlying
+  type (MSVC _Fs_file, 0fc2069d99).
+- Explicit specializations of variable templates: static lifetime at
+  namespace scope, `T x[]' vs `T x[N]' ([basic.link]/11), and no
+  partial-specialization search for them (MSVC __DIGIT_TABLE and
+  _Classify_category, so three_way_comparable; fc1a5005fa, 65f260bae1).
+- [over.match.best]/2.1 before /2.4: reference binding is compared before
+  the non-template preference (MSVC unique_ptr's move-assignment
+  template vs the deleted copy assignment, ada851cd56).  An implicit copy
+  constructor or assignment keeps the old precedence, because the
+  implicit move operations are declared only when needed.
+- A hidden friend template's non-type parameter type naming the
+  enclosing template's parameter (MSVC reverse_iterator::_Verify_range,
+  fa29123ead).
+- std::variant on MSVC, five front-end gaps found from one artifact:
+  compound pack patterns `T *...' deduce the element (9bd7d27a7c); the
+  enclosing class's pack `V...' in a member template's parameter list is
+  expanded before deduction (d06366b917); a callee's own packs hide
+  same-named packs of the calling context (3d40e3981c); call-argument
+  packs in `typename decltype(...)::type' (4a6f8bd8b6); a static member
+  array of unknown bound in a class template (2faa8b26ee); no scalar
+  binding for a multi-element pack of a partial specialization
+  (ccb55250b5).  The variant artifact now passes.
+- ADL visits the base classes of an argument's class
+  ([basic.lookup.argdep]/3.2): `arr | views::take(3)' on MSVC
+  (1f16356695).
+
+- ADL-found operator| reached `sizeof(__r[0])' in a requires-expression:
+  sizeof of a subscript of a class object crashed in index_exprt.
+- `*static_cast<int *&>(p)' read p instead of *p: a cast to a reference
+  is the address of its operand, and `*' applied to that address (a wrong
+  value, also on Linux).
+- KNOWNBUG cpp17_discarded_return_with_static_member_variable_template_condition:
+  a member template's placeholder return type is deduced with an
+  if-constexpr condition naming a static data member template of class
+  type unevaluated, so the discarded return wins.  On MSVC
+  ranges::iter_move(int *&) is void and indirectly_readable<int *> false.
+- cpp20_span, cpp20_span_basic, cpp20_ranges_basic: their bodies are
+  guarded with !defined(_MSC_VER), so on Windows they have no assertions
+  and fail their descs (VS 2022 and VS 2026 in run 6).  Tagged
+  broken-msvc-stl, excluded with MSVC (Makefile, CMakeLists.txt, README).
+
+Run-6 artifacts at 1f16356695 (before the last three items), counted
+without gnu-extensions, itanium-abi, gcc-only, libcxx, libstdcxx*,
+KNOWNBUG, THOROUGH and FUTURE tests: VS 2022 37 -> 33 failing of 103 (the
+same count at a636368132 gives 37).  Of the 33, four come from test
+sources fixed since run 6 (wchar_t, __SIZE_TYPE__) and three are the
+broken-msvc-stl tests; a new CI run is needed to see the rest.  macOS 15
+unchanged at 5 of 24.
+
+Found on the way and not fixed: `template <class... T> int f(const T
+&...t)' with a body: `f(i, 2)' (two or more elements, one a prvalue)
+instantiates `f(int &, int &)' -- the const is lost when template_mapt
+expands the named parameter pack -- and `sizeof...(t)' with a single
+prvalue argument fails.  Pre-existing (binW100).
+
+Open: MSVC std::bind (4 tests), std::span with the constrained iterator
+constructor in a `.ii' (reduction in /tmp/r186/cv_ms_span stopped at 254
+lines), chrono common_type, _Find_last pointer arithmetic, _Unwrapped's
+static_cast in std::equal over reverse_iterator, __msvc_int128,
+filesystem string_view drops; macOS locale facets, expected, template
+lambdas; libc++ "too many addressed objects".

@@ -2118,3 +2118,8 @@ MSVC pair; see .kiro/decltype_tuple_apply_findings.md, "Round 191".
 
 No dog-food change.  A value-set fix for field-sensitive unions (C and
 C++); see .kiro/decltype_tuple_apply_findings.md, "Round 192".
+
+## Round 193 2026-10-19
+
+No dog-food change.  Fixes reproduced from the CI run 6 MSVC artifacts;
+see .kiro/decltype_tuple_apply_findings.md, "Round 193".
