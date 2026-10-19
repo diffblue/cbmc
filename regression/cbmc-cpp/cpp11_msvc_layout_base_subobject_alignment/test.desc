@@ -1,0 +1,19 @@
+CORE
+main.ii
+--winx64
+^\[main\.assertion\.1\] line \d+ virtual base members: SUCCESS$
+^\[main\.assertion\.2\] line \d+ virtual base aligned: SUCCESS$
+^\[main\.assertion\.3\] line \d+ non-virtual base: SUCCESS$
+^\[main\.assertion\.4\] line \d+ base subobject aligned: SUCCESS$
+^\[main\.assertion\.5\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The Visual Studio layout re-aligned each member flattened in from a base
+class, putting padding inside the base subobject, while the subobject
+(and a virtual base's offset in the virtual table) started unaligned:
+writes through the base went to the wrong bytes.
