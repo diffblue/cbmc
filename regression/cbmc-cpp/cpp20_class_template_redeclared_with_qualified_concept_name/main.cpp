@@ -31,7 +31,7 @@ int main()
   fmt::fptr<char> p;
   fmt::fptr<wchar_t> q;
   __CPROVER_assert(
-    p.width == 8 && q.width == 32,
+    p.width == 8 && q.width == sizeof(wchar_t) * 8,
     "redeclaration with equivalently spelled constraint");
   __CPROVER_assert(false, "WRONG (must FAIL)");
   return 0;
