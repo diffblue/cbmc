@@ -2065,6 +2065,18 @@ void cpp_typecheckt::typecheck_compound_declarator(
           .set(ID_C_constant, true);
         component.type() = static_symbol.type;
       }
+      // likewise a class-type one: `if constexpr(choice<T>.strategy ==
+      // ...)' reads a member of a constexpr static data member (template)
+      // of class type, the MSVC STL's ranges::iter_move; it did not fold,
+      // both branches were kept and the discarded return statement took
+      // part in the return type deduction ([dcl.spec.auto.general]/10)
+      else if(
+        static_symbol.type.id() == ID_struct_tag ||
+        static_symbol.type.id() == ID_union_tag)
+      {
+        static_symbol.type.set(ID_C_constant, true);
+        component.type() = static_symbol.type;
+      }
     }
     else if(declaration.member_spec().is_inline() && value.is_not_nil())
     {
