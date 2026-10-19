@@ -1370,6 +1370,16 @@ void cpp_typecheck_resolvet::guess_function_template_args(
                 // viable for span(ptr, count), is selected, and its `__last -
                 // __first` body is ill-formed).
                 simplify(req_copy, cpp_typecheck);
+                // N5008 [expr.const]/5: a member of a constexpr object of
+                // class type (`_Choice<_Ty &>._Strategy != _St::_None', the
+                // MSVC STL's range access customization point objects) is
+                // read from the object's initializer
+                if(!req_copy.is_constant())
+                {
+                  cpp_typecheck.propagate_constants(
+                    req_copy, cpp_typecheck.symbol_table);
+                  simplify(req_copy, cpp_typecheck);
+                }
               }
               catch(...)
               {
