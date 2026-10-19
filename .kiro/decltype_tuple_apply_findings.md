@@ -14869,3 +14869,52 @@ goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
 CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; platform_check
 gcc11/m32/arm64 and the validate, paths, cprover-smt2, new-smt and z3
 profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
+
+## Round 191 (open items after c14906c86c)
+
+Fixes, each with a test that fails on the old build:
+- this-adjusting virtual thunk with an unnamed parameter forwarded an
+  unset variable (libc++ `__clone(__base *)': copying a std::function
+  failed with bad_function_call, 9c61193b44).
+- The injected-class-name in an out-of-class member definition's
+  parameter types ([temp.local]/1): the copy assignment's definition was
+  also given to operator=(nullptr_t) of libc++'s std::function
+  (7c0d2b5657).
+- A member template's out-of-class definition is not that of a
+  same-arity non-template member ([temp.mem]/1; libc++ string::find(char)
+  after `extern template ... npos', found by bisecting the 112 extern
+  templates, 4c72776d49).
+- Assignment operator templates of a POD class are candidates
+  ([over.match.oper]/1), and their specializations keep the class POD
+  ([class.copy.assign]/1) (83db5f12e5).
+- A trailing non-type pack not otherwise deduced is empty
+  ([temp.arg.explicit]/4; braced-init-list argument, dffee27dc1).
+- `auto &&' (placeholder under a declarator) in a redeclared deduced
+  return type ([dcl.spec.auto.general]/13): MSVC _Tuple_get, so pair's
+  piecewise constructor and std::map::emplace (ea2b446b88).
+- No built-in comparison of class-type operands ([expr.eq]/2,
+  [expr.rel]/2; libc++ equality_comparable held without operator==,
+  047b68ee06).
+
+Local runs of the run-6 failed-test artifacts (tests still run there):
+VS 2022 49 -> 46 failing, macOS 15 9 -> 7; the Linux libc++ mirror of
+macOS 12 -> 10.
+
+Open:
+- libc++ std::function `g = lambda' (cpp17_function_reference_param):
+  operator=<lambda> still has no body; reduction stopped at 349 lines
+  (/tmp/r186/cv_fa/v.cpp).
+- libc++ concept chain: `_IsValidExpansion<__test_for_primary_template,
+  iterator_traits<It>>' is computed with two different results
+  ("already declared with different type"), so iter_difference_t's
+  type-requirement fails (cpp20_concept_iterator_chain).
+- MSVC: std::function _Tidy, _Find_last, ranges, variant, filesystem,
+  from_chars; macOS: locale use_facet, expected; libc++ "too many
+  addressed objects" in cpp20_vector_find / erase_if (Linux libc++).
+
+Verification (W169 at 047b68ee06): cbmc-cpp 1997, libcxx profile 1997,
+KNOWNBUG profile 1997, cpp 246, regression/cbmc 1214, ansi-c 270,
+goto-instrument 298, cbmc-library 522, unit-proofs 13 (all under
+CBMC_TEST_MEMLIMIT=2500000), unit 620, 0 failures; platform_check
+gcc11/m32/arm64 and the validate, paths, cprover-smt2, new-smt and z3
+profiles pass; lint 0, clang-format 0, doxygen 0; every commit compiles.
