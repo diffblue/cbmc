@@ -1,4 +1,4 @@
-#if !defined(_MSC_VER) && __has_include(<span>)
+#if __has_include(<span>)
 // C++20 std::span
 #  include <span>
 int main()
