@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ constraint decided: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The requires-clause `choice<T>.size == 1' type-checked to a member read of
+the static data member template, which was not folded; the clause stayed
+undecided, so the constrained candidate was kept for an int argument and
+beat the ellipsis.
