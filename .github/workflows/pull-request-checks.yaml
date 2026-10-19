@@ -214,6 +214,12 @@ jobs:
         run: make -C src -j${{env.linux-vcpus}}
       - name: Print ccache stats
         run: ccache -s
+      - name: Upload CBMC for solver-bug jobs
+        uses: actions/upload-artifact@v7
+        with:
+          name: cbmc-ubuntu-24_04-make-clang
+          path: src/cbmc/cbmc
+          retention-days: 1
       - name: Run regression/cbmc tests with z3 as the backend
         run: make -C regression/cbmc test-z3
 
@@ -223,6 +229,64 @@ jobs:
         with:
           path: .ccache
           key: ${{ steps.restore-ccache.outputs.cache-primary-key }}
+
+  # Test every recorded cvc5 version and the version CI currently uses.
+  solver-bugs-plan:
+    runs-on: ubuntu-24.04
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Check the tests and print the cvc5 version matrix
+        id: plan
+        env:
+          CVC5_VERSION: ${{ env.cvc5-version }}
+        run: |
+          matrix=$(python3 scripts/solver_bugs.py matrix --ci-cvc5 "$CVC5_VERSION")
+          echo "matrix=$matrix" | tee -a "$GITHUB_OUTPUT"
+
+  solver-bugs-witness:
+    needs: check-ubuntu-24_04-make-clang-smt-z3
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: cbmc-ubuntu-24_04-make-clang
+          path: src/cbmc
+      - name: Restore the executable bit
+        run: chmod +x src/cbmc/cbmc
+      - name: Run sat.desc
+        run: python3 scripts/solver_bugs.py run
+
+  solver-bugs:
+    needs: [solver-bugs-plan, check-ubuntu-24_04-make-clang-smt-z3]
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.solver-bugs-plan.outputs.matrix) }}
+    name: solver-bugs (cvc5 ${{ matrix.version }})
+    env:
+      VERSION: ${{ matrix.version }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/download-artifact@v8
+        with:
+          name: cbmc-ubuntu-24_04-make-clang
+          path: src/cbmc
+      - name: Restore the executable bit
+        run: chmod +x src/cbmc/cbmc
+      - name: Install cvc5
+        uses: ./.github/actions/install-cvc5
+        with:
+          version: ${{ matrix.version }}
+      - name: Run the tests with this cvc5 version
+        env:
+          CVC5_VERSION: ${{ env.cvc5-version }}
+        run: >
+          python3 scripts/solver_bugs.py run --cvc5 "$VERSION"
+          --ci-cvc5 "$CVC5_VERSION"
+
   # This job takes approximately 17 to 42 minutes
   check-ubuntu-24_04-cmake-gcc:
     runs-on: ubuntu-24.04
