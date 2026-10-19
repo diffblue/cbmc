@@ -11806,6 +11806,142 @@ void cpp_typecheck_resolvet::expand_function_parameter_pack(
   }
 }
 
+/// N5008 [temp.variadic]/5, [temp.inst]/3: a member function template of a
+/// class template specialization has the class's parameter packs already
+/// bound, so a function parameter pack whose pattern names only such an
+/// enclosing pack (`static T eval(V..., T *)', a member template over T of
+/// a class template over the pack V) is a list of ordinary parameters, one
+/// per element; it is neither deduced nor required to be trailing
+/// ([temp.deduct.call]/1 applies to the template's own packs).  Expand it
+/// before deduction, so the later parameters line up with their arguments.
+/// \param template_type: the member function template's own parameters
+/// \param declarator: the function declarator
+/// \return \p declarator with those parameters expanded
+cpp_declaratort cpp_typecheck_resolvet::expand_enclosing_class_packs(
+  const template_typet &template_type,
+  const cpp_declaratort &declarator)
+{
+  if(declarator.type().id() != ID_function_type)
+    return declarator;
+  const auto short_name = [](const irep_idt &id)
+  {
+    const std::string s = id2string(id);
+    const auto sep = s.rfind("::");
+    return sep == std::string::npos ? s : s.substr(sep + 2);
+  };
+  std::set<std::string> own;
+  for(const auto &tp : template_type.template_parameters())
+    own.insert(short_name(tp.get(ID_identifier)));
+  // the type packs bound by the enclosing class, by short name
+  std::map<std::string, std::vector<typet>> enclosing;
+  for(const auto &ps : cpp_typecheck.template_map.pack_size_map)
+  {
+    const std::string name = short_name(ps.first);
+    if(own.count(name) != 0)
+      continue;
+    const auto pa = cpp_typecheck.template_map.pack_args_map.find(ps.first);
+    if(ps.second == 0)
+      enclosing[name];
+    else if(
+      pa != cpp_typecheck.template_map.pack_args_map.end() &&
+      pa->second.size() == ps.second)
+      enclosing[name] = pa->second;
+  }
+  if(enclosing.empty())
+    return declarator;
+  // the pack names a parameter's pattern mentions
+  const auto names_in = [](const irept &node)
+  {
+    std::set<std::string> names;
+    std::function<void(const irept &)> rec = [&](const irept &n)
+    {
+      if(n.id() == ID_name)
+        names.insert(id2string(n.get(ID_identifier)));
+      for(const auto &sub : n.get_sub())
+        rec(sub);
+      for(const auto &ns : n.get_named_sub())
+        rec(ns.second);
+    };
+    rec(node);
+    return names;
+  };
+  const irept::subt &parameters =
+    declarator.type().find(ID_parameters).get_sub();
+  irept::subt expanded;
+  bool changed = false;
+  for(const auto &p : parameters)
+  {
+    const cpp_declarationt *decl =
+      p.id() == ID_cpp_declaration ? &to_cpp_declaration(p) : nullptr;
+    if(
+      decl == nullptr || decl->declarators().size() != 1 ||
+      (!decl->declarators().front().get_bool(ID_ellipsis) &&
+       !decl->declarators().front().type().get_bool(ID_ellipsis)))
+    {
+      expanded.push_back(p);
+      continue;
+    }
+    // the pattern must name exactly one enclosing pack and none of the
+    // template's own parameters
+    std::set<std::string> names = names_in(decl->type());
+    const std::set<std::string> in_declarator =
+      names_in(decl->declarators().front().type());
+    names.insert(in_declarator.begin(), in_declarator.end());
+    const std::vector<typet> *elements = nullptr;
+    std::string pack;
+    bool usable = true;
+    for(const auto &n : names)
+    {
+      if(own.count(n) != 0)
+        usable = false;
+      const auto e = enclosing.find(n);
+      if(e == enclosing.end())
+        continue;
+      if(elements != nullptr)
+        usable = false;
+      elements = &e->second;
+      pack = n;
+    }
+    if(!usable || elements == nullptr)
+    {
+      expanded.push_back(p);
+      continue;
+    }
+    changed = true;
+    for(const auto &element : *elements)
+    {
+      irept copy = p;
+      auto &cdecl = static_cast<cpp_declarationt &>(copy);
+      auto &d = cdecl.declarators().front();
+      d.remove(ID_ellipsis);
+      d.type().remove(ID_ellipsis);
+      std::function<void(irept &)> subst = [&](irept &n)
+      {
+        if(
+          n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+          n.get_sub().front().id() == ID_name &&
+          id2string(n.get_sub().front().get(ID_identifier)) == pack)
+        {
+          n = element;
+          return;
+        }
+        for(auto &sub : n.get_sub())
+          subst(sub);
+        for(auto &ns : n.get_named_sub())
+          subst(ns.second);
+      };
+      subst(cdecl.type());
+      subst(d.type());
+      expanded.push_back(std::move(copy));
+    }
+  }
+  if(!changed)
+    return declarator;
+  cpp_declaratort result = declarator;
+  result.type().add(ID_parameters).get_sub() = std::move(expanded);
+  return result;
+}
+
 /// N5008 [temp.variadic]/5, [temp.deduct.call]/1: a function parameter pack
 /// whose pattern names a NON-type template parameter pack (`const char
 /// (&...s)[N]') expands to one parameter per element of that pack, the
@@ -12772,8 +12908,8 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
   // there should be exactly one declarator
   PRECONDITION(cpp_declaration.declarators().size() == 1);
 
-  const cpp_declaratort &function_declarator =
-    cpp_declaration.declarators().front();
+  const cpp_declaratort function_declarator = expand_enclosing_class_packs(
+    cpp_declaration.template_type(), cpp_declaration.declarators().front());
 
   // and that needs to have function type
   if(function_declarator.type().id() != ID_function_type)
