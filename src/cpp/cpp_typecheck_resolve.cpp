@@ -14538,6 +14538,16 @@ void cpp_typecheck_resolvet::resolve_with_arguments(
       }
     }
 
+    // N5008 [basic.lookup.argdep]/3.2: the associated entities of a class
+    // include its direct and indirect base classes (their namespaces and
+    // friends): `arr | closure' finds the operator| of the namespace of
+    // closure's base (the MSVC STL's ranges::_Pipe::_Base)
+    if(final_type.id() == ID_struct)
+    {
+      for(const auto &b : to_struct_type(final_type).bases())
+        add_associated_class(b.type());
+    }
+
     auto scope_it = cpp_typecheck.cpp_scopes.id_map.find(struct_name);
     if(scope_it == cpp_typecheck.cpp_scopes.id_map.end())
       return;
