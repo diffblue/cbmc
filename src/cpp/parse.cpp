@@ -1901,6 +1901,21 @@ void Parser::hoist_template_parameter_pack_ellipsis(
   cpp_declaratort &declarator = declaration.declarators().front();
   if(declarator.get_has_ellipsis())
     return;
+  // N5008 [temp.param]/1, [dcl.fct]/1: in `N::T... I' the ellipsis
+  // belongs to the declarator-id; the declarator parser recorded it on the
+  // (non-pointer) declarator type or on the declaration's type
+  if(declarator.type().get_bool(ID_ellipsis))
+  {
+    declarator.type().remove(ID_ellipsis);
+    declarator.set_has_ellipsis();
+    return;
+  }
+  if(declaration.type().get_bool(ID_ellipsis))
+  {
+    declaration.type().remove(ID_ellipsis);
+    declarator.set_has_ellipsis();
+    return;
+  }
   for(typet *t = &declarator.type(); t->id() == ID_frontend_pointer;
       t = &t->add_subtype())
   {
