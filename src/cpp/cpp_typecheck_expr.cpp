@@ -2265,31 +2265,39 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           from.set(ID_C_temporary_avoided, true);
           if(is_reference(t2) && !is_rvalue_reference(t2))
             from.set(ID_C_lvalue, true);
-          assignable = implicit_conversion_sequence(from, dest, tmp);
-          // N5008 [meta.unary.prop]: `declval<T>() = declval<U>()' is also
-          // well-formed through a user-declared `operator=' of the class
-          // taking U ([over.match.oper]; `FromInt &operator=(int)'), which
-          // the conversion-to-T probe above does not see
-          if(!assignable && dest.id() == ID_struct_tag)
+          // N5008 [meta.unary.prop]: for a class T the expression
+          // `declval<T>() = declval<U>()' calls an operator= of T
+          // ([over.match.oper]/3, [class.copy.assign]); check that call --
+          // a deleted or inaccessible one makes it ill-formed, which a
+          // conversion of U to T does not see
+          if(dest.id() == ID_struct_tag || dest.id() == ID_union_tag)
           {
             elaborate_class_template(dest);
-            for(const auto &c :
-                follow_tag(to_struct_tag_type(dest)).components())
+            const std::size_t errors_before =
+              get_message_handler().get_message_count(messaget::M_ERROR);
+            try
             {
-              if(c.get_base_name() != "operator=" || c.type().id() != ID_code)
-                continue;
-              const auto &params = to_code_type(c.type()).parameters();
-              if(params.size() != 2)
-                continue;
-              exprt converted;
-              if(implicit_conversion_sequence(
-                   from, params[1].type(), converted))
-              {
-                assignable = true;
-                break;
-              }
+              sfinae_contextt sfinae_guard{*this};
+              symbol_exprt lhs{irep_idt{}, dest};
+              lhs.set(ID_C_lvalue, true);
+              exprt rhs = from;
+              exprt assignment{ID_side_effect, typet{}, {lhs, rhs}};
+              assignment.set(ID_statement, ID_assign);
+              assignment.add_source_location() = expr.source_location();
+              for(auto &op : assignment.operands())
+                already_typechecked_exprt::make_already_typechecked(op);
+              typecheck_expr(assignment);
+              assignable = true;
             }
+            catch(...)
+            {
+              assignable = false;
+            }
+            get_message_handler().set_message_count(
+              messaget::M_ERROR, errors_before);
           }
+          else
+            assignable = implicit_conversion_sequence(from, dest, tmp);
         }
       }
       // else: non-reference T: assignment to an rvalue is not valid for
