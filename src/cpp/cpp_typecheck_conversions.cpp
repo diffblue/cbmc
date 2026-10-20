@@ -6412,6 +6412,32 @@ bool cpp_typecheckt::static_typecast(
     return true;
   }
 
+  // N5008 [expr.static.cast]/4, [dcl.init.general]/16.6.2.1: for a class T,
+  // `static_cast<T>(e)' is the direct-initialization `T t(e);', for which
+  // explicit constructors are candidates ([over.match.ctor]/1) -- the
+  // implicit conversion sequence above only considered converting ones
+  // (`static_cast<reverse_iterator<int *>>(p)' in the MSVC STL's
+  // reverse_iterator::_Unwrapped)
+  if(type.id() == ID_struct_tag && !cpp_is_pod(type))
+  {
+    const std::size_t errors_before =
+      get_message_handler().get_message_count(messaget::M_ERROR);
+    try
+    {
+      sfinae_contextt sfinae_guard{*this};
+      exprt temporary;
+      new_temporary(
+        e.source_location(), type, already_typechecked_exprt{e}, temporary);
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+      new_expr.swap(temporary);
+      return true;
+    }
+    catch(...)
+    {
+      get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    }
+  }
+
   if(type.id() == ID_pointer && e.type().id() == ID_pointer)
   {
     const pointer_typet &pointer_type = to_pointer_type(type);
