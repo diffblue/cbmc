@@ -13524,8 +13524,11 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
       closure_declaration.type() = closure_struct;
       convert(closure_declaration);
 
-      closure_sym_name =
-        id2string(cpp_scopes.current_scope().prefix) + "tag-" + closure_tag;
+      // the name typecheck_compound_type gives it: in an instantiation the
+      // current scope carries the specialization's suffix
+      closure_sym_name = id2string(cpp_scopes.current_scope().prefix) + "tag-" +
+                         closure_tag +
+                         id2string(cpp_scopes.current_scope().suffix);
       if(!symbol_table.has_symbol(closure_sym_name))
         closure_sym_name.clear();
       else
