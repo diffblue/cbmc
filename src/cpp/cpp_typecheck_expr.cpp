@@ -1840,7 +1840,7 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = ret_val;
       return;
     }
-    // N5008 [temp.arg.general]/2 resolves a type-id/expression ambiguity in
+    // N5008 [temp.arg.general]/3 resolves a type-id/expression ambiguity in
     // a template-argument to a type-id; `f(A::x, B::y)' with dependent
     // qualified names parses as a function type whose "return type" names
     // f.  That is a type-id only if f names a type; for a function f (the
