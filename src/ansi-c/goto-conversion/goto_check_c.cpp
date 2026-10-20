@@ -1957,7 +1957,17 @@ void goto_check_ct::check_rec_arithmetic_op(
 {
   if(expr.type().id() == ID_signedbv || expr.type().id() == ID_unsignedbv)
   {
-    integer_overflow_check(expr, guard);
+    // A pointer difference p - q has result type signedbv (ptrdiff_t),
+    // but its operands are pointers.  integer_overflow_check builds
+    // overflow-(p, q) which tests the operand type (unsigned / pointer),
+    // not the result type, and therefore flags every case where q > p.
+    // Skip the check: the result is already range-checked by the
+    // pointer-arithmetic bounds checks.
+    const bool is_pointer_difference =
+      expr.id() == ID_minus && expr.operands().size() == 2 &&
+      expr.operands()[0].type().id() == ID_pointer;
+    if(!is_pointer_difference)
+      integer_overflow_check(expr, guard);
 
     if(
       expr.operands().size() == 2 && expr.id() == ID_minus &&
