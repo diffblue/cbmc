@@ -1,4 +1,4 @@
-CORE broken-msvc-stl
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ ranges take: SUCCESS$
@@ -30,8 +30,7 @@ With the libstdc++ 16 headers `arr | views::take(3)' was rejected (tagged
 broken-libstdcxx16); the root cause,
 cpp20_concept_disjunction_first_operand_substitution_failure, is fixed, and
 the test passes with GCC 16.2.1.
-With the MSVC STL the test is excluded (broken-msvc-stl; main.cpp keeps its
-guard, so on Windows it would have no assertions).  One known cause:
-indirectly_readable<int *> is false with the MSVC STL, see the KNOWNBUG
-cpp17_discarded_return_with_static_member_variable_template_condition;
-there may be others.
+With the MSVC STL (VS 2022 14.44 and VS 2026 14.51, checked from the CI
+artifacts) the test runs too; it needed the fixes for constexpr static
+data members of class type, requires-clauses, explicit template template
+arguments and requires-expression parameters.
