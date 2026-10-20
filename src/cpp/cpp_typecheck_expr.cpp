@@ -3954,9 +3954,27 @@ void cpp_typecheckt::expand_type_pack_arguments(
       const auto it = requires_parameter_packs.find(id);
       // only while a requirement is checked, and only if the name is not
       // bound otherwise (a pack parameter has no symbol of its own name)
+      // N5008 [basic.scope.param]/1: a synthetic parameter symbol that
+      // substitute_function_type left in a function template's scope for
+      // an earlier specialization (one with a one-element pack, checked as
+      // a plain parameter) is no binding of this pack's name
+      const auto bound_otherwise = [&]()
+      {
+        for(const auto *found :
+            cpp_scopes.current_scope().lookup(id, cpp_scopet::RECURSIVE))
+        {
+          const symbolt *symbol = symbol_table.lookup(found->identifier);
+          if(
+            symbol == nullptr || !symbol->is_parameter || !symbol->is_auxiliary)
+          {
+            return true;
+          }
+        }
+        return false;
+      };
       if(
         with_requires_parameters && it != requires_parameter_packs.end() &&
-        cpp_scopes.current_scope().lookup(id, cpp_scopet::RECURSIVE).empty())
+        !bound_otherwise())
       {
         param = it->first;
         return &it->second;
