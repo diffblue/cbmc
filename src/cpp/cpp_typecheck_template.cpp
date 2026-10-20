@@ -653,13 +653,38 @@ void cpp_typecheckt::typecheck_function_template(cpp_declarationt &declaration)
 
   // Per [temp.variadic]/5: set pack_size_map for variadic
   // parameters so that add_method_body captures it.
+  // N5008 [basic.scope.temp]/1: the binding belongs to this template's
+  // declaration only; left in the map it outlived the declaration, and a
+  // same-named function parameter pack of another template (`args' in
+  // `-> decltype(c(args...))') was expanded as this empty pack.
+  struct pack_size_scopet
+  {
+    template_mapt &map;
+    std::vector<irep_idt> added;
+    ~pack_size_scopet()
+    {
+      for(const auto &pid : added)
+      {
+        map.pack_size_map.erase(pid);
+        map.generation_map.erase(pid);
+      }
+    }
+  } pack_size_scope{template_map, {}};
   for(const auto &p : declaration.template_type().template_parameters())
   {
     if(p.get_bool(ID_ellipsis))
     {
       irep_idt pid = p.type().get(ID_identifier);
       if(!pid.empty())
+      {
+        if(
+          template_map.pack_size_map.find(pid) ==
+          template_map.pack_size_map.end())
+        {
+          pack_size_scope.added.push_back(pid);
+        }
         template_map.set_pack_size(pid, 0);
+      }
     }
   }
 
