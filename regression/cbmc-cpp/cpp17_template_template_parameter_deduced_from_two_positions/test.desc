@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ specializations recognised: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+Deducing Tm from `Tm<A...>' bound it to the class template specialization
+(the argument's type), while the template template argument `Tm' binds it
+to the template; the two deductions conflicted and the partial
+specialization never matched.
