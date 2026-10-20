@@ -4924,6 +4924,9 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
     }
   }
 
+  if(found_dtor)
+    select_prospective_destructor(components);
+
   // Add the default dtor, if needed
   // (we have to do the destructor before building the virtual tables,
   //  as the destructor may be virtual!)
@@ -6622,6 +6625,76 @@ bool cpp_typecheckt::subtype_typecast(
   get_bases(from, bases);
 
   return bases.find(to.get(ID_name)) != bases.end();
+}
+
+/// N5008 [class.dtor]/4: at the end of the definition of a class, overload
+/// resolution among the prospective destructors with an empty argument list
+/// selects the destructor.  Candidates whose trailing requires-clause is not
+/// satisfied are not viable ([over.match.viable]/3); of several viable ones
+/// a constrained one is preferred over an unconstrained one
+/// ([over.match.best]/2.6).  The selected destructor becomes the first
+/// destructor component; the definitions of the others are not instantiated
+/// ([temp.inst]/4) -- `~X() requires(!trivial) { destroy(); }' of a
+/// trivially destructible specialization calls a member whose own
+/// constraint fails (libc++'s std::expected::__repr).
+void cpp_typecheckt::select_prospective_destructor(
+  struct_union_typet::componentst &components)
+{
+  const auto is_prospective_destructor =
+    [](const struct_union_typet::componentt &c)
+  {
+    return !c.get_bool(ID_from_base) && c.type().id() == ID_code &&
+           to_code_type(c.type()).return_type().id() == ID_destructor &&
+           c.type().get("#thunk_target").empty();
+  };
+  std::vector<std::size_t> prospective;
+  for(std::size_t i = 0; i < components.size(); ++i)
+    if(is_prospective_destructor(components[i]))
+      prospective.push_back(i);
+  if(prospective.size() < 2)
+    return;
+
+  std::size_t selected = prospective.front();
+  bool selected_viable = false;
+  bool selected_constrained = false;
+  for(const std::size_t i : prospective)
+  {
+    const auto &c = components[i];
+    const bool constrained = c.type().find("#member_requires").is_not_nil();
+    if(!member_constraints_satisfied(symbol_exprt{c.get_name(), c.type()}))
+      continue;
+    if(!selected_viable || (constrained && !selected_constrained))
+    {
+      selected = i;
+      selected_viable = true;
+      selected_constrained = constrained;
+    }
+  }
+  if(!selected_viable)
+    return;
+
+  // the destructor calls (cpp_destructor, and get_destructor in goto
+  // conversion) take the first destructor component
+  std::swap(components[prospective.front()], components[selected]);
+  std::set<irep_idt> removed;
+  for(const std::size_t i : prospective)
+  {
+    if(i != prospective.front())
+      removed.insert(components[i].get_name());
+  }
+  for(auto it = method_bodies.begin(); it != method_bodies.end();)
+  {
+    if(removed.count(it->method_symbol->name) != 0)
+      it = method_bodies.erase(it);
+    else
+      ++it;
+  }
+  for(const auto &name : removed)
+  {
+    deferred_method_bodies.erase(name);
+    if(symbolt *symbol = symbol_table.get_writeable(name))
+      symbol->value.make_nil();
+  }
 }
 
 /// N5008 [over.match.viable]/3, [temp.inst]/17, [temp.constr.decl]/3: the
