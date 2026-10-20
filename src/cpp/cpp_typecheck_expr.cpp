@@ -12087,6 +12087,13 @@ void cpp_typecheckt::typecheck_expr_comma(exprt &expr)
 
 void cpp_typecheckt::typecheck_expr_rel(binary_relation_exprt &expr)
 {
+  // N5008 [expr.type]/1: an expression of type "reference to T" is
+  // adjusted to T prior to any further analysis -- `static_cast<T &>(x) ==
+  // static_cast<T &>(y)' (the MSVC STL's equal_to<void>::operator(), and so
+  // std::equal) compares the referred objects, not their addresses
+  add_implicit_dereference(expr.op0());
+  add_implicit_dereference(expr.op1());
+
   // N5008 [expr.eq]/3, [expr.rel]/3, [expr.type]/4: pointers to classes C1
   // and C2, C1 derived from C2, are compared after converting both to the
   // composite pointer type, pointer to (cv-combined) C2 -- the
