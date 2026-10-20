@@ -536,6 +536,17 @@ bvt float_utilst::fma(
       unpacked_rhs.exponent, unpacked_rhs.exponent.size() + 2));
   prod_exponent = bv_utils.inc(prod_exponent);
 
+  // When either multiplicand is zero, the product fraction is all zeros
+  // but prod_exponent is still the sum of the operand exponents, which can
+  // be very large.  During alignment the addend would then be treated as
+  // the smaller operand and shifted out, losing its bits.  Force
+  // prod_exponent to the minimum representable value in that case so the
+  // addend always dominates.
+  literalt product_is_zero = prop.lor(unpacked_lhs.zero, unpacked_rhs.zero);
+  bvt min_exponent = bv_utils.build_constant(
+    -(mp_integer(1) << (prod_exponent.size() - 2)), prod_exponent.size());
+  prod_exponent = bv_utils.select(product_is_zero, min_exponent, prod_exponent);
+
   literalt prod_sign = prop.lxor(unpacked_lhs.sign, unpacked_rhs.sign);
 
   // --- Align c's fraction to the product's wider format ---
