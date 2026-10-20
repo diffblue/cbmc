@@ -10964,7 +10964,30 @@ bool Parser::rLambdaExpr(exprt &exp)
     return false;
 
   // C++20 template lambda: []<typename T>(T x) { ... }
-  // Skip template parameters for verification purposes.
+  // N5008 [expr.prim.lambda.general]/6: a template-parameter-list makes the
+  // lambda generic; it becomes the template-parameter-list of the closure
+  // type's function call operator template ([expr.prim.lambda.closure]/4),
+  // so its names are template parameters in the declarator and body.
+  save_scopet lambda_template_scope(current_scope);
+  if(lex.LookAhead(0) == '<')
+  {
+    const auto before_list = lex.Save();
+    cpp_tokent lt;
+    lex.get_token(lt);
+    make_sub_scope("#lambda_template", new_scopet::kindt::TEMPLATE);
+    irept template_parameters;
+    if(
+      rTempArgList(template_parameters) && lex.LookAhead(0) == '>' &&
+      !template_parameters.get_sub().empty())
+    {
+      lex.get_token(tk);
+      exp.add(ID_template_parameters).swap(template_parameters);
+    }
+    else
+    {
+      lex.Restore(before_list);
+    }
+  }
   if(lex.LookAhead(0) == '<')
   {
     lex.get_token(tk);

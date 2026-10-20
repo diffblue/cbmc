@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp20
 ^\[main\.assertion\.1\] line \d+ const T & parameter: SUCCESS$
@@ -11,10 +11,7 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-The parser skips a lambda's template-parameter-list, and the type checker
-treats a lambda as generic only when a parameter's type is `auto' or a
-bare name: `const T &' is neither, so T is "unknown".  Generic lambdas are
-compiled as an int instance plus per-call substitution rather than as a
-closure with an operator() template.  libc++'s __synth_three_way (used by
-std::tuple's operator<=> and so by views::take) has this shape, and
-cpp20_ranges_basic fails on macOS.
+The parser skipped a lambda's template-parameter-list, and the type checker
+treated a lambda as generic only when a parameter's type was `auto' or a
+bare name, so `const T &' left T unknown.  libc++'s __synth_three_way
+(std::tuple's operator<=>, views::take) has this shape.
