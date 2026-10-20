@@ -2960,6 +2960,8 @@ bool Parser::rIntegralDeclaration(
       declaration.declarators().front().type().add_subtype().make_nil();
       declaration.declarators().front().type().remove(
         ID_C_trailing_return_type);
+      // the type is still in the parameters' scope ([basic.scope.param]/1)
+      declaration.set(ID_C_trailing_return_type, true);
     }
 
 #ifdef DEBUG

@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ calls: SUCCESS$
+^\[main\.assertion\.2\] line \d+ member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ partial specialization: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The parser moves a member's trailing return type into the declaration's
+type, which the class body type-checked before the member's parameters
+existed: `decltype(obj)' failed with "symbol 'obj' is unknown".

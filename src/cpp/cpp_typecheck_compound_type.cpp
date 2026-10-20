@@ -4002,6 +4002,8 @@ void cpp_typecheckt::typecheck_compound_body(symbolt &symbol)
               break;
             }
         }
+        if(declaration.get_bool(ID_C_trailing_return_type))
+          typecheck_member_trailing_return_type(declaration);
         bool kept_unresolved_cpp_name = false;
         if(instantiation_stack.empty() && type_is_tpl_cpp_name)
         {
@@ -6625,6 +6627,53 @@ bool cpp_typecheckt::subtype_typecast(
   get_bases(from, bases);
 
   return bases.find(to.get(ID_name)) != bases.end();
+}
+
+/// N5008 [basic.scope.param]/1, [dcl.fct]/1: a parameter's scope extends
+/// to the end of its declarator, so a trailing-return-type names the
+/// parameters (`static auto _Call(_Callable _Obj) -> decltype(_Obj)', the
+/// MSVC STL's _Invoker1).  The parser moved a member's trailing return type
+/// into \p declaration's type, which the class body type-checks before the
+/// member's parameters exist; type-check it with them bound as local
+/// symbols of a block scope, usable in unevaluated operands.  On failure the
+/// type is left for the ordinary member path.
+void cpp_typecheckt::typecheck_member_trailing_return_type(
+  cpp_declarationt &declaration)
+{
+  if(declaration.declarators().size() != 1)
+    return;
+  const typet &function_type = declaration.declarators().front().type();
+  if(function_type.id() != ID_function_type)
+    return;
+  const typet saved_type = declaration.type();
+  const std::size_t errors_before =
+    get_message_handler().get_message_count(messaget::M_ERROR);
+  cpp_save_scopet saved_scope{cpp_scopes};
+  cpp_scopes.new_block_scope();
+  try
+  {
+    for(const auto &p : function_type.find(ID_parameters).get_sub())
+    {
+      if(p.id() != ID_cpp_declaration)
+        continue;
+      const cpp_declarationt &parameter = to_cpp_declaration(p);
+      if(parameter.declarators().empty())
+        continue;
+      const cpp_declaratort &d = parameter.declarators().front();
+      const irep_idt name = d.name().get_base_name();
+      if(name.empty())
+        continue;
+      typet type = d.merge_type(parameter.type());
+      typecheck_type(type);
+      bind_requires_parameter(name, type);
+    }
+    typecheck_type(declaration.type());
+  }
+  catch(...)
+  {
+    get_message_handler().set_message_count(messaget::M_ERROR, errors_before);
+    declaration.type() = saved_type;
+  }
 }
 
 /// N5008 [class.dtor]/4: at the end of the definition of a class, overload
