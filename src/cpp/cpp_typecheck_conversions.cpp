@@ -1673,12 +1673,64 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
               return &sub.find(ID_arguments);
           return nullptr;
         };
+        // N5008 [temp.deduct.type]/1, [temp.deduct.partial]/10: deduction
+        // succeeds only if the deduced P is identical to A, so a part of P
+        // that names none of G's parameters must equal A as written --
+        // `int *' (from `b<A, int *>') does not match `C *' (from
+        // `b<A, C *>', C one of F's unique types)
+        std::set<irep_idt> g_parameter_names;
+        for(const auto &param : G.template_type().template_parameters())
+        {
+          const std::string pid = id2string(
+            param.id() == ID_type ? param.type().get(ID_identifier)
+                                  : param.get(ID_identifier));
+          const auto sep = pid.rfind("::");
+          g_parameter_names.insert(
+            sep == std::string::npos ? pid : pid.substr(sep + 2));
+        }
+        std::function<bool(const irept &)> names_g_parameter =
+          [&](const irept &node)
+        {
+          if(node.id() == ID_cpp_name)
+          {
+            for(const auto &sub : node.get_sub())
+              if(
+                sub.id() == ID_name &&
+                g_parameter_names.count(sub.get(ID_identifier)) != 0)
+              {
+                return true;
+              }
+          }
+          for(const auto &sub : node.get_sub())
+            if(names_g_parameter(sub))
+              return true;
+          for(const auto &named : node.get_named_sub())
+            if(names_g_parameter(named.second))
+              return true;
+          return false;
+        };
+        std::function<void(irept &)> strip_locations = [&](irept &node)
+        {
+          node.remove(ID_C_source_location);
+          for(auto &sub : node.get_sub())
+            strip_locations(sub);
+          for(auto &named : node.get_named_sub())
+            strip_locations(named.second);
+        };
         std::function<bool(const typet &, const typet &)> deduce_from =
           [&](const typet &pattern, const typet &argument)
         {
           const irept *p_args = template_id_args(pattern);
           if(p_args == nullptr)
           {
+            if(!names_g_parameter(pattern))
+            {
+              irept p_plain = pattern, a_plain = argument;
+              strip_locations(p_plain);
+              strip_locations(a_plain);
+              if(p_plain != a_plain)
+                return false;
+            }
             resolver.guess_template_args(pattern, argument);
             return true;
           }
@@ -1686,10 +1738,63 @@ bool cpp_typecheckt::partial_specialization_at_least_as_specialised(
           if(
             a_args == nullptr ||
             pattern.get_sub().front().get(ID_identifier) !=
-              argument.get_sub().front().get(ID_identifier) ||
-            p_args->get_sub().size() != a_args->get_sub().size())
+              argument.get_sub().front().get(ID_identifier))
           {
             return false;
+          }
+          // N5008 [temp.arg.general]/9 (default template arguments): a
+          // template-id written with fewer arguments (`equal_to<>') stands
+          // for the one with the defaults filled in (`equal_to<void>')
+          irept p_padded, a_padded;
+          if(p_args->get_sub().size() != a_args->get_sub().size())
+          {
+            const auto pad = [&](const irept &args, irept &padded) -> bool
+            {
+              padded = args;
+              const auto ids = cpp_scopes.current_scope().lookup(
+                pattern.get_sub().front().get(ID_identifier),
+                cpp_scopet::RECURSIVE,
+                cpp_idt::id_classt::TEMPLATE);
+              if(ids.empty())
+                return false;
+              const symbolt *template_symbol =
+                symbol_table.lookup((*ids.begin())->identifier);
+              if(
+                template_symbol == nullptr ||
+                template_symbol->type.id() != ID_cpp_declaration)
+              {
+                return false;
+              }
+              const auto &parameters = to_cpp_declaration(template_symbol->type)
+                                         .template_type()
+                                         .template_parameters();
+              for(std::size_t k = padded.get_sub().size();
+                  k < parameters.size();
+                  ++k)
+              {
+                if(
+                  !parameters[k].has_default_argument() ||
+                  parameters[k].default_argument().id() != ID_type)
+                {
+                  return false;
+                }
+                padded.get_sub().push_back(parameters[k].default_argument());
+              }
+              return true;
+            };
+            if(
+              p_args->get_sub().size() < a_args->get_sub().size()
+                ? !pad(*p_args, p_padded)
+                : !pad(*a_args, a_padded))
+            {
+              return false;
+            }
+            if(p_padded.is_not_nil() && !p_padded.get_sub().empty())
+              p_args = &p_padded;
+            if(a_padded.is_not_nil() && !a_padded.get_sub().empty())
+              a_args = &a_padded;
+            if(p_args->get_sub().size() != a_args->get_sub().size())
+              return false;
           }
           for(std::size_t k = 0; k < p_args->get_sub().size(); ++k)
           {
