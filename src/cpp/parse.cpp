@@ -10732,6 +10732,11 @@ bool Parser::rTypePredicate(exprt &expr)
   lex.get_token(tk);
 
   expr.id(irep_idt(tk.text));
+  // MSVC's __is_assignable_no_precondition_check(T, U) is __is_assignable
+  // without the completeness checks of its preconditions (the MSVC STL's
+  // _Is_copy_assignable_no_precondition_check, [meta.unary.prop])
+  if(expr.id() == "__is_assignable_no_precondition_check")
+    expr.id("__is_assignable");
   set_location(expr, tk);
 
   typet tname1;
