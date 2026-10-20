@@ -12335,9 +12335,50 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
     // accesses a member of the parameter fails with "member operator requires
     // struct/union type ... but got 'signed int'".  Decide genericity by
     // resolving a cpp_name parameter type: a concrete type means not generic.
+    // N5008 [expr.prim.lambda.general]/6: the names of an explicit
+    // template-parameter-list (`[]<class T>(const T &t)')
+    std::set<irep_idt> explicit_template_parameters;
+    for(const auto &tp : expr.find(ID_template_parameters).get_sub())
+    {
+      const cpp_declarationt &tpdecl =
+        static_cast<const cpp_declarationt &>(tp);
+      if(!tpdecl.declarators().empty())
+      {
+        const irep_idt name =
+          tpdecl.declarators().front().name().get_base_name();
+        if(!name.empty())
+          explicit_template_parameters.insert(name);
+      }
+    }
+    const auto names_template_parameter = [&](const irept &type)
+    {
+      std::function<bool(const irept &)> rec = [&](const irept &n)
+      {
+        if(
+          n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+          n.get_sub().front().id() == ID_name &&
+          explicit_template_parameters.count(
+            n.get_sub().front().get(ID_identifier)) != 0)
+        {
+          return true;
+        }
+        for(const auto &sub : n.get_sub())
+          if(rec(sub))
+            return true;
+        for(const auto &ns : n.get_named_sub())
+          if(rec(ns.second))
+            return true;
+        return false;
+      };
+      return rec(type);
+    };
+    if(!explicit_template_parameters.empty())
+      is_generic_lambda = true;
     auto is_generic_param_type = [&](const typet &pt) -> bool
     {
       if(has_auto(pt) || pt.id() == ID_auto)
+        return true;
+      if(names_template_parameter(pt))
         return true;
       if(pt.id() != ID_cpp_name)
         return false;
@@ -12377,7 +12418,28 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
         if(pdecl.get_bool("explicit_this"))
           continue;
         if(is_generic_param_type(pdecl.type()))
+        {
           replace_auto_in_type(pdecl.type(), signed_int_type());
+          // the explicit template parameters likewise, for the lowered
+          // function (the closure's operator() template keeps them)
+          std::function<void(irept &)> replace_names = [&](irept &n)
+          {
+            if(
+              n.id() == ID_cpp_name && n.get_sub().size() == 1 &&
+              n.get_sub().front().id() == ID_name &&
+              explicit_template_parameters.count(
+                n.get_sub().front().get(ID_identifier)) != 0)
+            {
+              n = signed_int_type();
+              return;
+            }
+            for(auto &sub : n.get_sub())
+              replace_names(sub);
+            for(auto &ns : n.get_named_sub())
+              replace_names(ns.second);
+          };
+          replace_names(pdecl.type());
+        }
       }
     }
   }
@@ -13233,6 +13295,20 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
           irept template_parameters;
           std::set<irep_idt> seen_type_params;
           std::size_t auto_index = 0;
+          // N5008 [expr.prim.lambda.closure]/4: the explicit
+          // template-parameter-list comes first, followed by the invented
+          // parameters of `auto' parameters
+          for(const auto &tp : expr.find(ID_template_parameters).get_sub())
+          {
+            template_parameters.get_sub().push_back(tp);
+            const cpp_declarationt &tpdecl =
+              static_cast<const cpp_declarationt &>(tp);
+            if(!tpdecl.declarators().empty())
+              seen_type_params.insert(
+                tpdecl.declarators().front().name().get_base_name());
+          }
+          const bool has_explicit_template_parameters =
+            !template_parameters.get_sub().empty();
           auto add_type_param = [&](const irep_idt &tpname, bool is_pack)
           {
             if(!seen_type_params.insert(tpname).second)
@@ -13304,6 +13380,7 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
                 pdecl.type() = cn;
             }
             else if(
+              !has_explicit_template_parameters &&
               pdecl.type().id() == ID_cpp_name &&
               !pdecl.type().get_sub().empty())
             {
