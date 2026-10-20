@@ -2054,6 +2054,16 @@ bool Parser::rTempArgDeclaration(cpp_declarationt &declaration)
           }
           nttp_decl.set(ID_is_type, false);
           hoist_template_parameter_pack_ellipsis(nttp_decl);
+          // a template parameter, not a function parameter: declare it as
+          // the generic path below does, so `I...' in a later
+          // template-argument-list is parsed as a non-type pack expansion
+          if(nttp_decl.declarators().size() == 1)
+          {
+            nttp_decl.declarators().front().set_is_parameter(false);
+            add_id(
+              nttp_decl.declarators().front().name(),
+              new_scopet::kindt::NON_TYPE_TEMPLATE_PARAMETER);
+          }
           declaration.swap(nttp_decl);
           return true;
         }
@@ -6299,7 +6309,7 @@ bool Parser::rName(irept &name)
       }
 
       // done unless template args are next
-      if(lex.LookAhead(0)!='<')
+      if(lex.LookAhead(0) != '<')
         return true;
       break;
 
