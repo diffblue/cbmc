@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ friend definition: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+found no match
+--
+The friend declaration recorded the class on the function, and the
+namespace-scope definition kept it, so the body looked names up in the
+class first and the member status() hid fs::status().
