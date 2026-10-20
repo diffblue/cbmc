@@ -540,6 +540,11 @@ protected:
   std::set<irep_idt> elaborations_in_progress;
   void elaborate_class_template(const typet &type) override;
 
+  /// N5008 [expr.add]/1, [temp.inst]/2: pointer arithmetic requires a
+  /// completely-defined object type, which instantiates a class template
+  /// specialization named as the pointee.
+  void typecheck_arithmetic_pointer(exprt &expr) override;
+
   const symbolt &instantiate_template(
     const source_locationt &source_location,
     const symbolt &symbol,

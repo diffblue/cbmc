@@ -11410,6 +11410,21 @@ void cpp_typecheckt::typecheck_side_effect_inc_dec(side_effect_exprt &expr)
   expr.swap(new_expr);
 }
 
+void cpp_typecheckt::typecheck_arithmetic_pointer(exprt &expr)
+{
+  // `v.first[b + 1]' with `first' of type `it<K> *' where it<K> was named
+  // only as a template argument so far (the MSVC STL's _Hash_vec of
+  // list iterators, std::unordered_map::_Find_last): the pointee is
+  // instantiated here, as in any context that needs a complete type
+  if(expr.type().id() == ID_pointer)
+  {
+    const typet &base_type = to_pointer_type(expr.type()).base_type();
+    if(base_type.id() == ID_struct_tag || base_type.id() == ID_union_tag)
+      elaborate_class_template(base_type);
+  }
+  c_typecheck_baset::typecheck_arithmetic_pointer(expr);
+}
+
 void cpp_typecheckt::typecheck_expr_dereference(exprt &expr)
 {
   if(expr.operands().size() != 1)
