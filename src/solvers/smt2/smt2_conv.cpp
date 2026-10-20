@@ -6622,12 +6622,16 @@ void smt2_convt::find_symbols_rec(
   }
   else if(type.id()==ID_code)
   {
-    const code_typet::parameterst &parameters=
-      to_code_type(type).parameters();
-    for(const auto &param : parameters)
-      find_symbols_rec(param.type(), recstack);
-
-    find_symbols_rec(to_code_type(type).return_type(), recstack);
+    // Code (function) types are converted to Bool in convert_type, so
+    // their parameter and return types do not need to be declared as
+    // prerequisites for the enclosing struct.  Traversing into them
+    // can discover struct types through recursive type chains (e.g., a
+    // vtable function pointer whose parameter references the enclosing
+    // struct), causing inner struct declarations to be emitted before
+    // outer ones -- the inner struct references a sort that has not
+    // been declared yet.  Skip the traversal here; these types will be
+    // discovered independently when expressions of the relevant types
+    // appear in the formula.
   }
   else if(type.id()==ID_pointer)
   {
@@ -6644,6 +6648,20 @@ void smt2_convt::find_symbols_rec(
       recstack.insert(id);
       find_symbols_rec(base_struct, recstack);
       datatype_map[type] = datatype_map[base_struct];
+    }
+    else if(use_datatypes)
+    {
+      // The tag refers to a struct type currently being processed (its
+      // identifier is already in recstack).  The underlying struct type
+      // was registered in datatype_map at the top of the struct handler
+      // before recursing into components, but this particular struct_tag
+      // type was not.  Register the alias so that convert_type can
+      // resolve it when emitting a component of another struct that
+      // directly embeds this tagged type.
+      const auto &base_struct = ns.follow_tag(struct_tag);
+      auto base_it = datatype_map.find(base_struct);
+      if(base_it != datatype_map.end())
+        datatype_map[type] = base_it->second;
     }
   }
   else if(type.id() == ID_union_tag)

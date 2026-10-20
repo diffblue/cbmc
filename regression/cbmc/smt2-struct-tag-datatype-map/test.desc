@@ -1,0 +1,11 @@
+CORE smt-backend broken-cprover-smt-backend no-new-smt
+main.c
+--z3
+^EXIT=10$
+^SIGNAL=0$
+^VERIFICATION FAILED$
+--
+^warning: ignoring
+--
+Regression test for issue #9190: map::at exception when converting structs
+with type cycles through function pointer parameters to SMT-LIB datatypes.
