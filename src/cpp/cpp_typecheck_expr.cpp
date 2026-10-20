@@ -290,6 +290,22 @@ void cpp_typecheckt::bind_requires_parameter(
       existing->identifier = id;
       return;
     }
+    // N5008 [basic.scope.param]/1: a function parameter of the same name
+    // and type already declared in this scope (put there to check a
+    // trailing return type, as for `decltype(auto) operator|(L &&l, R &&r)
+    // requires requires { r(l); }') is the parameter the trailing
+    // requires-clause names; a second binding made the name ambiguous
+    if(existing->id_class == cpp_idt::id_classt::SYMBOL)
+    {
+      const symbolt *existing_symbol =
+        symbol_table.lookup(existing->identifier);
+      if(
+        existing_symbol != nullptr && existing_symbol->is_parameter &&
+        existing_symbol->type == type)
+      {
+        return;
+      }
+    }
   }
   cpp_idt &scope_id = scope.insert(name);
   scope_id.identifier = id;
