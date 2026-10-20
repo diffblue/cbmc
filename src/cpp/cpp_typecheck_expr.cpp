@@ -1840,6 +1840,66 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
       expr = ret_val;
       return;
     }
+    // N5008 [temp.arg.general]/2 resolves a type-id/expression ambiguity in
+    // a template-argument to a type-id; `f(A::x, B::y)' with dependent
+    // qualified names parses as a function type whose "return type" names
+    // f.  That is a type-id only if f names a type; for a function f (the
+    // MSVC STL's `ratio<_Gcd(_Period1::num, _Period2::num), ...>') it is the
+    // call expression -- rebuild and check it as such.
+    if(expr.find(ID_return_type).id() == ID_cpp_name)
+    {
+      const cpp_namet &callee =
+        to_cpp_name(static_cast<const irept &>(expr.find(ID_return_type)));
+      exprt::operandst arguments;
+      bool all_names = true;
+      for(const auto &parameter : expr.find(ID_parameters).get_sub())
+      {
+        if(parameter.id() != ID_cpp_declaration)
+        {
+          all_names = false;
+          break;
+        }
+        const cpp_declarationt &declaration = to_cpp_declaration(parameter);
+        if(
+          declaration.type().id() != ID_cpp_name ||
+          declaration.declarators().size() != 1 ||
+          declaration.declarators().front().type().is_not_nil() ||
+          declaration.declarators().front().name().is_not_nil())
+        {
+          all_names = false;
+          break;
+        }
+        exprt argument = static_cast<const exprt &>(
+          static_cast<const irept &>(declaration.type()));
+        arguments.push_back(std::move(argument));
+      }
+      bool names_function = false;
+      if(all_names)
+      {
+        sfinae_contextt probe{*this};
+        cpp_typecheck_fargst no_fargs;
+        try
+        {
+          const exprt resolved = resolve(
+            callee, cpp_typecheck_resolvet::wantt::BOTH, no_fargs, false);
+          names_function = resolved.is_not_nil() && resolved.id() != ID_type;
+        }
+        catch(...)
+        {
+        }
+      }
+      if(names_function)
+      {
+        side_effect_expr_function_callt call{
+          static_cast<const exprt &>(static_cast<const irept &>(callee)),
+          std::move(arguments),
+          typet{},
+          expr.source_location()};
+        expr.swap(call);
+        typecheck_expr(expr);
+        return;
+      }
+    }
     error().source_location = expr.source_location();
     error() << "unexpected ID_code expression" << eom;
     throw 0;
