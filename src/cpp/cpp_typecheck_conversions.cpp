@@ -2067,8 +2067,28 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
         // be instantiated, producing a spurious "operator ... is
         // unknown" error.
         bool constraint_ok = true;
-        const exprt &req_clause = static_cast<const exprt &>(
+        // N5008 [temp.param]/4, [temp.constr.decl]/3: the type-constraints
+        // of the template parameters (`template <integral _Ty> explicit
+        // operator _Ty()', the MSVC STL's _Base128) are part of the
+        // associated constraints, conjoined with the requires-clause
+        exprt req_clause = static_cast<const exprt &>(
           cand_decl.template_type().find(ID_C_requires_clause));
+        for(const auto &param : cand_decl.template_type().template_parameters())
+        {
+          const exprt &type_constraint =
+            static_cast<const exprt &>(param.find("#C_type_constraint"));
+          if(type_constraint.is_nil())
+            continue;
+          if(req_clause.is_nil() || req_clause.id() == ID_nil)
+            req_clause = type_constraint;
+          else
+          {
+            exprt conjunction{ID_and, bool_typet{}};
+            conjunction.add_to_operands(
+              std::move(req_clause), exprt{type_constraint});
+            req_clause = std::move(conjunction);
+          }
+        }
         if(req_clause.is_not_nil() && req_clause.id() != ID_nil)
         {
           exprt req_copy = req_clause;
