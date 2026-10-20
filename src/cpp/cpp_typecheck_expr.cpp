@@ -6812,7 +6812,11 @@ void cpp_typecheckt::typecheck_expr_explicit_constructor_call(exprt &expr)
     else
       ctad_args = expr.operands();
 
-    if(!ctad_args.empty())
+    // `less{}' / `less()' with no initializer arguments also deduces: the
+    // guide of a default constructor, or of the hypothetical constructor
+    // C() ([over.match.class.deduct]/1.1, /1.2), deduces nothing, and the
+    // default template arguments supply the rest ([temp.deduct.general]/5)
+    // -- `less<void>' in the MSVC STL's <charconv>
     {
       if(auto deduced = deduce_class_template_arguments(ctad_name, ctad_args))
       {
