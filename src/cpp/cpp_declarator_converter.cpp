@@ -692,6 +692,15 @@ void cpp_declarator_convertert::handle_initializer(
     // no initial value yet
     symbol.value.swap(value);
 
+    // N5008 [class.friend]/6 (note 3): "If a friend function is defined
+    // outside a class, it is not in the scope of the class."  A function
+    // first declared as a friend and defined at namespace scope (the MSVC
+    // STL's filesystem::_Copy_impl, a friend of directory_entry) looks names
+    // up from there: the class's members must not hide namespace-scope
+    // functions.
+    if(is_code && !(is_friend && friend_class_scope != nullptr))
+      symbol.type.remove(ID_C_class);
+
     if(!is_code)
     {
       // N5008 [temp.constr.atomic]/3, [temp.constr.op]: a concept's
