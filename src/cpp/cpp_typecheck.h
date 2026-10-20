@@ -1936,6 +1936,11 @@ private:
   // reroute again, recursing forever.
   std::set<irep_idt> paren_aggregate_in_progress;
   std::map<irep_idt, exprt> generic_lambda_map;
+  /// The functions a lambda-expression is lowered to (its closure type's
+  /// function call operator, called directly); N5008
+  /// [expr.prim.lambda.closure]/5 makes them constexpr functions when they
+  /// are constexpr-suitable, so calls in constant expressions are evaluated.
+  std::set<irep_idt> lambda_functions;
   /// Maps a lambda-expression's source location to the symbol name of its
   /// synthesised closure type ([expr.prim.lambda.closure]/1: each lambda has a
   /// unique closure type).  A lambda may be type-checked more than once (e.g.

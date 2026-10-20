@@ -9975,7 +9975,9 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
       symbol_ptr != nullptr && (symbol_ptr->value.type().id() == ID_code ||
                                 symbol_ptr->value.id() == ID_code);
     bool eligible_constexpr =
-      symbol_ptr != nullptr && symbol_ptr->is_macro &&
+      symbol_ptr != nullptr &&
+      (symbol_ptr->is_macro ||
+       lambda_functions.count(sym_expr->get_identifier()) != 0) &&
       constant_expression_context != 0 &&
       !functions_being_typechecked.count(sym_expr->get_identifier()) &&
       !deferred_typechecking.count(sym_expr->get_identifier()) && body_is_code;
@@ -10144,8 +10146,12 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
         [this](const irep_idt &callee) -> bool
         {
           const symbolt *csym = symbol_table.lookup(callee);
-          if(csym == nullptr || !csym->is_macro)
+          if(
+            csym == nullptr ||
+            (!csym->is_macro && lambda_functions.count(callee) == 0))
+          {
             return false;
+          }
           if(csym->value.type().id() == ID_code)
             return true; // already converted
           if(
@@ -10878,6 +10884,17 @@ void cpp_typecheckt::instantiate_generic_lambda(
   func_sym.module = module;
   func_sym.location = loc;
   func_sym.is_file_local = true;
+  // N5008 [expr.prim.lambda.closure]/5: the function call operator (or
+  // operator template specialization) is a constexpr function when it is
+  // constexpr-suitable; this function is that operator, called directly for
+  // `[] { ... }()'.  Record it so a call in a constant expression is
+  // evaluated (libc++'s __fits_in_tail_padding, a variable template
+  // initialized by an immediately invoked lambda); a call whose evaluation
+  // yields no constant stays a run-time call.  As for a converted function
+  // (convert_function), the body's type is the function's.
+  lambda_functions.insert(func_sym.name);
+  if(func_sym.value.id() == ID_code)
+    func_sym.value.type() = func_sym.type;
   symbol_table.insert(std::move(func_sym));
 
   // Redirect the call to the new instantiation
@@ -13187,6 +13204,17 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
   func_sym.module = module;
   func_sym.location = loc;
   func_sym.is_file_local = true;
+  // N5008 [expr.prim.lambda.closure]/5: the function call operator (or
+  // operator template specialization) is a constexpr function when it is
+  // constexpr-suitable; this function is that operator, called directly for
+  // `[] { ... }()'.  Record it so a call in a constant expression is
+  // evaluated (libc++'s __fits_in_tail_padding, a variable template
+  // initialized by an immediately invoked lambda); a call whose evaluation
+  // yields no constant stays a run-time call.  As for a converted function
+  // (convert_function), the body's type is the function's.
+  lambda_functions.insert(func_sym.name);
+  if(func_sym.value.id() == ID_code)
+    func_sym.value.type() = func_sym.type;
   symbol_table.insert(std::move(func_sym));
 
   {
