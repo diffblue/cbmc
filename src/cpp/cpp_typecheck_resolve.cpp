@@ -9367,7 +9367,23 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
           {
             // Assign the template template parameter to the
             // template that the desired type was instantiated from.
-            it->second = desired_type;
+            // N5008 [temp.arg.template]/1, [temp.deduct.type]/8: the
+            // deduced argument is the class template itself, represented as
+            // an explicitly given one is (template_parameter_symbol_typet of
+            // the template's symbol), so that the same parameter appearing
+            // as a template template argument elsewhere in P
+            // (`is_spec_v<Tm<A...>, Tm>', the MSVC STL's
+            // _Is_specialization_v) deduces consistently
+            const irep_idt &template_name =
+              desired_sym->type.get(ID_identifier);
+            if(
+              !template_name.empty() &&
+              cpp_typecheck.symbol_table.has_symbol(template_name))
+            {
+              it->second = template_parameter_symbol_typet{template_name};
+            }
+            else
+              it->second = desired_type;
             is_tt_param = true;
           }
           // N5008 [temp.arg.explicit]/2, [temp.deduct.type]/8: a template
