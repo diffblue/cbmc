@@ -13,7 +13,7 @@ struct ratio
 template <class P1, class P2>
 struct common_period
 {
-  // N5008 [temp.arg.general]/2: the type-id interpretation of
+  // N5008 [temp.arg.general]/3: the type-id interpretation of
   // `gcd(P1::num, P2::num)' requires gcd to name a type; gcd is a function,
   // so the template-argument is a call expression (the MSVC STL's
   // common_type for chrono::duration)
