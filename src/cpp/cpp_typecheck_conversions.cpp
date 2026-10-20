@@ -1896,6 +1896,21 @@ const symbolt *cpp_typecheckt::find_template_conversion_specialisation(
     const cpp_declarationt cand_decl = to_cpp_declaration(cand_sym->type);
     const cpp_declaratort &declarator = cand_decl.declarators()[0];
 
+    // N5008 [over.match.copy]/1.2, [over.match.conv]/1: an explicit
+    // conversion function (template) is a candidate only in a
+    // direct-initialization (and a contextual conversion to bool); as for
+    // the non-template ones in implicit_conversion_sequence.  A
+    // conditionally explicit one (`explicit(cond)') is kept.
+    if(
+      cand_decl.member_spec().is_explicit() &&
+      cand_decl.member_spec().find(ID_C_explicit_condition).is_nil() &&
+      direct_initialization == 0 &&
+      !(contextual_bool_conversion > 0 &&
+        (to.id() == ID_bool || to.id() == ID_c_bool)))
+    {
+      continue;
+    }
+
     // P = return type of the conversion-function template per
     // [temp.deduct.conv]/1.  For a template cast operator, the
     // return type is stored in the second sub-element of the
