@@ -12,6 +12,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "goto_convert_class.h"
 
 #include <util/config.h>
+#include <util/exception_utils.h>
 #include <util/expr_util.h>
 #include <util/fresh_symbol.h>
 #include <util/mathematical_expr.h>
@@ -65,9 +66,56 @@ static exprt convert_statement_expression(
   symbol_table_baset &symbol_table,
   message_handlert &message_handler)
 {
+  // When the body contains short-circuit operators (&&, ||, ==>) with
+  // side effects, goto_convert treats the final expression statement as
+  // void (result_is_used = false).  That causes the short-circuit value
+  // to be optimised away, so the path-walking below never sees that
+  // path.  Fix: replace the expression-statement with an assignment to
+  // a fresh temp, so that goto_convert processes the RHS with
+  // result_is_used = true and both branches are generated.
+  code_expressiont body_code = code;
+  symbolt *result_sym = nullptr;
+  auto &se = to_side_effect_expr_statement_expression(body_code.expression());
+  auto &block = to_code_block(se.statement());
+  auto &last_stmt = block.find_last_statement();
+  if(last_stmt.get_statement() == ID_expression)
+  {
+    exprt last_value = to_code_expression(last_stmt).expression();
+    typet result_type = last_value.type();
+    // Strip a (void) cast on the result.
+    if(
+      last_value.id() == ID_typecast &&
+      to_typecast_expr(last_value).type().id() == ID_empty)
+    {
+      result_type = to_typecast_expr(last_value).op().type();
+      last_value = to_typecast_expr(last_value).op();
+    }
+    result_sym = &get_fresh_aux_symbol(
+      result_type,
+      id2string(mode),
+      "quantifier_result",
+      code.source_location(),
+      mode,
+      symbol_table);
+    // Replace the expression statement with an assignment.
+    source_locationt loc = last_stmt.source_location();
+    code_declt decl{result_sym->symbol_expr()};
+    decl.add_source_location() = loc;
+    last_stmt =
+      code_assignt{result_sym->symbol_expr(), std::move(last_value), loc};
+    // Insert DECL before the ASSIGN and an expression statement after.
+    auto &ops = block.statements();
+    auto assign_it = std::prev(ops.end());
+    ops.insert(assign_it, std::move(decl));
+    code_expressiont final_expr{
+      typecast_exprt{result_sym->symbol_expr(), empty_typet{}}};
+    final_expr.add_source_location() = loc;
+    ops.push_back(std::move(final_expr));
+  }
+
   goto_programt where;
   goto_convertt converter{symbol_table, message_handler};
-  converter.goto_convert(code, where, mode);
+  converter.goto_convert(body_code, where, mode);
   where.compute_location_numbers();
 
   natural_loops_mutablet natural_loops(where);
@@ -176,8 +224,16 @@ static exprt convert_statement_expression(
 
     if(current_it == where.instructions.end())
     {
-      paths.pop_back();
-      continue;
+      // This path does not reach the final expression, so the body has no
+      // value on it. Short-circuit evaluation in the final expression no
+      // longer causes this, as the value is assigned to a temporary above.
+      // Any other cause, such as a jump past the final expression, is not
+      // supported: treating such a path as either true or false would be
+      // unsound for assertions or for assumptions, respectively.
+      throw invalid_source_file_exceptiont{
+        "quantifier body has a path that does not reach its final "
+        "expression",
+        qex.source_location()};
     }
 
     switch(current_it->type())
