@@ -3547,6 +3547,33 @@ static std::string normalized_parameter_signature(
         d.type().set(ID_ellipsis, true);
       }
     }
+    // N5008 [dcl.fct]/5: a cv-qualifier that applies to the parameter
+    // itself (`const _NoThrowSentinel _Last' in the MSVC STL's
+    // _Destroy_range definition, declared earlier without it) is removed
+    // when the parameter-type-list is formed.  It is a top-level const of
+    // the decl-specifiers when the declarator adds no pointer, reference
+    // or array part.
+    auto &declaration = static_cast<cpp_declarationt &>(pdecl);
+    const bool plain_declarator =
+      declaration.declarators().size() == 1 &&
+      declaration.declarators().front().type().is_nil();
+    if(plain_declarator && declaration.type().id() == ID_merged_type)
+    {
+      auto &specifiers = declaration.type().get_sub();
+      specifiers.erase(
+        std::remove_if(
+          specifiers.begin(),
+          specifiers.end(),
+          [](const irept &specifier) {
+            return specifier.id() == ID_const || specifier.id() == ID_volatile;
+          }),
+        specifiers.end());
+      if(specifiers.size() == 1)
+      {
+        irept only = specifiers.front();
+        declaration.type().swap(only);
+      }
+    }
   }
   std::function<void(irept &)> walk = [&](irept &n)
   {
