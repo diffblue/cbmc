@@ -2591,6 +2591,19 @@ void cpp_typecheckt::typecheck_expr_main(exprt &expr)
           if(is_reference(t2) && !is_rvalue_reference(t2))
             from.set(ID_C_lvalue, true);
           bool constructible = implicit_conversion_sequence(from, t1, tmp);
+          // N5008 [meta.unary.prop]/9, [dcl.init.general]/16.7: for a
+          // non-class T the direct-initialization `T t(declval<U>())' from
+          // a class U considers U's explicit conversion functions too
+          // ([over.match.conv]/1); the conversion sequence above is the
+          // copy-initialization one
+          if(
+            !constructible && class_t1.id() != ID_struct_tag &&
+            class_t1.id() != ID_union_tag && from_type.id() == ID_struct_tag)
+          {
+            direct_initialization_contextt direct_guard{*this};
+            exprt from_direct = from;
+            constructible = implicit_conversion_sequence(from_direct, t1, tmp);
+          }
           // N5008 [meta.unary.prop]/9: `T t(declval<U>());' is
           // DIRECT-initialization, so an explicit constructor counts
           // ([dcl.init.general]/16.6.2) -- the conversion sequence above
