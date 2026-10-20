@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp20
+^\[main\.assertion\.1\] line \d+ both invoked: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+The first call's specialization has a one-element pack, whose parameter
+a2 was put into invoke's template scope as a plain parameter symbol of
+type int.  For the second call that symbol hid the two-element pack in the
+trailing return type, so static_cast<S &>(a2) was checked against an int
+and the call had no candidate.
