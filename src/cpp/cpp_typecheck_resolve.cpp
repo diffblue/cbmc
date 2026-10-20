@@ -10322,6 +10322,11 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
       const code_typet::parameterst &desired_params = desired_code.parameters();
 
       auto d_it = desired_params.begin();
+      // N5008 [temp.deduct.type]/8 (`T (C::*)(T)'): the code type of a
+      // member function carries its implicit object parameter, which the
+      // pattern's parameter-declaration-clause does not list
+      if(d_it != desired_params.end() && d_it->get_this())
+        ++d_it;
       for(const auto &tp : tmpl_params)
       {
         if(tp.id() == ID_ellipsis)
@@ -10391,6 +10396,14 @@ void cpp_typecheck_resolvet::guess_template_args_compound(
       const auto &tmpl_params = tmpl_code.parameters();
       const auto &desired_params = desired_code.parameters();
       std::size_t d_index = 0;
+      // the implicit object parameter, when only the argument has one
+      // (see the function_type branch above)
+      if(
+        !desired_params.empty() && desired_params.front().get_this() &&
+        (tmpl_params.empty() || !tmpl_params.front().get_this()))
+      {
+        d_index = 1;
+      }
       for(const auto &tp : tmpl_params)
       {
         // [temp.deduct.type]/9-10: a function parameter pack `P...`
