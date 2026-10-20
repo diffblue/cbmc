@@ -212,6 +212,23 @@ void cpp_internal_additions(std::ostream &out)
         << "{ " CPROVER_PREFIX "size_t i=0; while(s[i]!=0) i++; return i; }\n";
     out << "extern \"C\" int __builtin_memcmp"
            "(const void*, const void*, " CPROVER_PREFIX "size_t);\n";
+    // The MSVC STL's char_traits use the compiler's intrinsics for these C
+    // library functions (C23 7.26.5.2 memchr; 7.31.4.6.1 wcslen, 7.31.4.4.5
+    // wmemcmp; 7.12.11.1 copysign).  __builtin_char_memchr is memchr
+    // returning `char *'; its body is in the C library model.
+    out << "extern \"C\" char *__builtin_char_memchr"
+           "(const char *, int, " CPROVER_PREFIX "size_t);\n";
+    out << "extern \"C\" " CPROVER_PREFIX
+        << "size_t __builtin_wcslen(const wchar_t *s)\n"
+        << "{ " CPROVER_PREFIX "size_t i=0; while(s[i]!=0) i++; return i; }\n";
+    out << "extern \"C\" int __builtin_wmemcmp(const wchar_t *a, "
+           "const wchar_t *b, " CPROVER_PREFIX "size_t n)\n"
+        << "{ for(" CPROVER_PREFIX
+           "size_t i=0; i<n; i++) "
+           "if(a[i]!=b[i]) return a[i]<b[i] ? -1 : 1; return 0; }\n";
+    out << "extern \"C\" double __builtin_copysign(double x, double y)\n"
+        << "{ return " CPROVER_PREFIX "signd(x) == " CPROVER_PREFIX
+           "signd(y) ? x : -x; }\n";
     // type_info infrastructure -- the standard wants this to be in the
     // std:: namespace, but MS has it in the root namespace
     out << "class type_info;" << '\n';
