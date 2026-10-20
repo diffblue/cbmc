@@ -19,6 +19,7 @@ Author: Daniel Kroening, kroening@kroening.com
 
 #include "gcc_version.h"
 
+#include <algorithm>
 #include <fstream>
 
 static void error_parse_line(
@@ -298,6 +299,20 @@ bool c_preprocess_visual_studio(
 
     command_file << "/D__CPROVER__" << "\n";
     command_file << "/D__WORDSIZE=" << config.ansi_c.pointer_width << "\n";
+
+    // The MSVC STL's vectorized algorithms (__std_find_trivial_4,
+    // __std_count_trivial_8, ...) are defined in the separately compiled
+    // runtime library, not in the headers, so their calls have no body.
+    // Select the headers' own loops instead, unless the user decides.
+    if(std::none_of(
+         config.ansi_c.defines.begin(),
+         config.ansi_c.defines.end(),
+         [](const std::string &define)
+         { return define.rfind("_USE_STD_VECTOR_ALGORITHMS", 0) == 0; }))
+    {
+      command_file << "/D_USE_STD_VECTOR_ALGORITHMS=0"
+                   << "\n";
+    }
 
     if(pointer_diff_type()==signed_long_long_int_type())
     {
