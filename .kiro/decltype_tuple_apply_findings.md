@@ -15027,3 +15027,66 @@ lines), chrono common_type, _Find_last pointer arithmetic, _Unwrapped's
 static_cast in std::equal over reverse_iterator, __msvc_int128,
 filesystem string_view drops; macOS locale facets, expected, template
 lambdas; libc++ "too many addressed objects".
+
+## Round 194 (open items after 74be5502bc)
+
+Each fix has a hand-written test that fails on binW171 (MSVC-only shapes
+as `.ii' tests with --winx64), checked with g++ 13 and clang++ 18.
+- [dcl.constexpr]/6: a constexpr static data member (template) of class
+  type is const, so `if constexpr(choice<T>.strategy == ...)' folds; the
+  round-193 KNOWNBUG is CORE (MSVC ranges::iter_move, 55fbabea3a).
+- Requires-clauses: reads of constexpr objects fold (5d19d14e9b); a member
+  template's trailing requires-clause is checked with its own parameters
+  (4a0d1bd047); requires-expression parameters are parameter declarations,
+  `int (&a)[5]', `int (*fp)(int)' (f0a9885404); a trailing requires-clause
+  reuses parameters already in scope (f180875f16).
+- Deduction: an explicit template template argument in `T<A...>' with A
+  deduced, also from a base (089366ed08); `R (C::*)(A...)' skips the
+  implicit object parameter (342b85a816); a template template parameter
+  deduces the template, not the specialization (d999e3bfa6).
+- Named pack `const T &...t' keeps its const (c43211349e).
+- Conversion function templates: type-constraints checked (e1dea72c56);
+  explicit ones only in direct-initialization (7c498e66e2).
+- Parenthesized aggregate initialization copy-initializes its elements
+  (abe37e3492).
+- A function template's empty-pack binding no longer outlives its
+  declaration; it expanded another template's same-named function
+  parameter pack to nothing (d7796bc9e4, MSVC std::invoke).
+- Parser: `N::T... I' is a pack, declared as a non-type template parameter
+  (82deac59ee, a5d72c447f).
+- static_cast to a class may use an explicit constructor (b2e641dac5).
+- `ratio<gcd(P1::num, P2::num)>': the type-id reading needs gcd to name a
+  type; rebuild the call (6608d9e299, MSVC chrono common_type).
+- __is_assignable for a class checks the operator= call (b9adeff100).
+- Visual Studio mode: _USE_STD_VECTOR_ALGORITHMS=0 when preprocessing
+  with cl (the vectorized helpers live in the runtime library,
+  83f1a308a3); __builtin_char_memchr, __builtin_wcslen, __builtin_wmemcmp,
+  __builtin_copysign (46437ea151); __is_assignable_no_precondition_check
+  (08d9daac90).
+- cpp20_span, cpp20_span_basic, cpp20_ranges_basic run with the MSVC STL
+  again (02c55dfa94, c79d65ddc4); broken-msvc-stl is gone.
+- cpp11_libstdcxx_header_drops/test_format.desc is CORE again: 29 s and
+  0.7 GB (50 s and 2.6 GB with binW171).
+
+Run-6 VS 2022 artifacts at 08d9daac90, same count as before: 33 -> 31
+failing of 103.  Fixed here: chrono (2), std::bind basic, zipped packs,
+concept_iterator_chain, iterator_t.  Of the 31, 7 are stale artifacts of
+test sources fixed since run 6 (wchar_t, __SIZE_TYPE__, the span/ranges
+guards); cpp20_vector_find, cpp20_erase_if, cpp20_vector_erase_if and
+cpp20_vector_push_back now reach the vectorized algorithms and memmove,
+which have no body here: the artifacts were preprocessed before
+83f1a308a3, and memmove's model is lost only when the library is
+preprocessed with the Linux headers.  macOS 15 unchanged at 5 of 24.
+VS 2026 artifacts: span and ranges pass with the 14.51 headers too.
+
+Open:
+- MSVC std::bind with a member pointer after another binder was called:
+  the second _Binder::operator() specialization is bodyless.  C-Vise
+  reduction (320 lines, weak gate) in /tmp/r193t/bind_red.ii; a
+  hand-written shape does not reproduce it.
+- std::equal over reverse_iterator (MSVC): still dropped after the
+  static_cast fix (_Verify_range / is_volatile_v probes).
+- std::list deallocated `_Ptr' (cpp11_non_member_compound_assignment_
+  operators, now also cpp11_range_for_variable_scope), _Find_last,
+  filesystem _Copy_impl, from_chars, _Lockit, ofstream timeout; macOS
+  locale facets, expected, template lambdas.

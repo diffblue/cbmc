@@ -2123,3 +2123,9 @@ C++); see .kiro/decltype_tuple_apply_findings.md, "Round 192".
 
 No dog-food change.  Fixes reproduced from the CI run 6 MSVC artifacts;
 see .kiro/decltype_tuple_apply_findings.md, "Round 193".
+
+## Round 194 2026-10-20
+
+No dog-food change.  Fixes reproduced from the CI run 6 MSVC artifacts
+(std::span, ranges, chrono, std::variant shapes); see
+.kiro/decltype_tuple_apply_findings.md, "Round 194".
