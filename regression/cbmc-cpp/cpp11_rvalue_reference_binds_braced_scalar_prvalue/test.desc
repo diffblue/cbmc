@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ temporary bound: SUCCESS$
+^\[main\.assertion\.2\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+^\[.*pointer_dereference.*\] .* pointer NULL .*: FAILURE$
+--
+`pointer{}' is represented as a C compound literal; binding `U &&' to it
+passed the literal's value (a null pointer) as the reference, so
+`v = static_cast<U &&>(n)' dereferenced null.

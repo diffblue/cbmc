@@ -4014,6 +4014,21 @@ bool cpp_typecheckt::reference_binding(
       {
         expr.remove(ID_C_lvalue);
       }
+      // ... and `T{}' of a scalar type T (`pointer{}' in the MSVC STL's
+      // `exchange(_Ptr, pointer{})') is the prvalue of its value
+      // ([expr.type.conv]/2, [dcl.init.list]/3.11); the rvalue reference
+      // binds to a temporary materialized from it ([dcl.init.ref]/5.3.1,
+      // [conv.rval]), below.  Binding to the compound literal passed its
+      // value where the reference's address belongs.
+      else if(
+        expr.id() == ID_compound_literal && expr.operands().size() == 1 &&
+        expr.type().id() != ID_array && expr.type().id() != ID_union_tag &&
+        expr.type().id() != ID_struct_tag)
+      {
+        exprt value = to_unary_expr(expr).op();
+        value.remove(ID_C_lvalue);
+        expr.swap(value);
+      }
       else
       {
         typet base = reference_type.base_type();
