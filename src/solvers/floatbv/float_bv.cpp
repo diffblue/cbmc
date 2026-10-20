@@ -1442,7 +1442,7 @@ void float_bvt::round_fraction(
     result.fraction=bitor_exprt(
       result.fraction,
       if_exprt(overflow,
-               from_integer(1<<(fraction_size-1), result.fraction.type()),
+               from_integer(power(2, fraction_size - 1), result.fraction.type()),
                from_integer(0, result.fraction.type())));
 #endif
   }
