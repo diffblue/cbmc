@@ -288,6 +288,12 @@ protected:
   void make_constructors(
     resolve_identifierst &identifiers);
 
+  bool match_template_template_parameter(
+    const irep_idt &tmpl_base_name,
+    const symbolt &desired_sym,
+    const typet &desired_type,
+    irep_idt &search_name);
+
   cpp_declaratort expand_enclosing_class_packs(
     const template_typet &template_type,
     const cpp_declaratort &declarator);
