@@ -1089,6 +1089,11 @@ protected:
   /// function \p candidate of a class template specialization is satisfied
   /// (true when there is none or it cannot be decided).
   bool member_constraints_satisfied(const exprt &candidate);
+  /// N5008 [class.dtor]/4: select the destructor among the prospective
+  /// destructors in \p components at the end of the class definition and
+  /// make it the first destructor component; the definitions of the others
+  /// are not instantiated.
+  void select_prospective_destructor(struct_union_typet::componentst &);
   std::unordered_map<irep_idt, bool> member_constraint_cache;
   /// Expand the fold-expressions over the pack named \p short_name in
   /// \p node, for the elements \p pack_args ([expr.prim.fold]/2-3).
