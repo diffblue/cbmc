@@ -572,8 +572,21 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
               ++idx;
               continue;
             }
-            val =
-              typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+            // [dcl.init.aggr]/4.2: a scalar element is copy-initialized;
+            // see the parenthesized-aggregate branch below
+            if(
+              op_probe.type().id() == ID_struct_tag &&
+              comp.type().id() != ID_struct_tag &&
+              comp.type().id() != ID_union_tag)
+            {
+              val = operands_tc[idx];
+              implicit_typecast(val, comp.type());
+            }
+            else
+            {
+              val =
+                typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+            }
           }
           else
           {
@@ -1170,8 +1183,24 @@ std::optional<codet> cpp_typecheckt::cpp_constructor(
                 ++idx;
                 continue;
               }
-              val =
-                typecast_exprt::conditional_cast(operands_tc[idx], comp.type());
+              // N5008 [dcl.init.aggr]/4.2, [dcl.init.general]/16.6.3: a
+              // scalar element is COPY-initialized from its initializer;
+              // from a class object that is an implicit conversion, which
+              // does not consider explicit conversion functions
+              // ([over.match.copy]/1.2) -- an explicit cast accepted them
+              if(
+                op_probe.type().id() == ID_struct_tag &&
+                comp.type().id() != ID_struct_tag &&
+                comp.type().id() != ID_union_tag)
+              {
+                val = operands_tc[idx];
+                implicit_typecast(val, comp.type());
+              }
+              else
+              {
+                val = typecast_exprt::conditional_cast(
+                  operands_tc[idx], comp.type());
+              }
             }
             ++idx;
           }
