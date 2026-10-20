@@ -9188,6 +9188,93 @@ static const exprt::operandst *deducible_instance_arguments(
   return &arguments;
 }
 
+/// N5008 [temp.deduct.type]/8, [temp.arg.template]/1, [temp.arg.explicit]/2:
+/// \p tmpl_base_name, the template-name of a pattern `TT<...>', names a
+/// template template parameter TT.  If TT is not yet deduced, bind it to
+/// the class template \p desired_sym was instantiated from; if TT was given
+/// explicitly, check that \p desired_sym is a specialization of it.
+/// \param tmpl_base_name: the template-name in the pattern
+/// \param desired_sym: the class of the argument type
+/// \param desired_type: the argument type
+/// \param [out] search_name: the name of the class template TT stands for,
+///   to find a base class of \p desired_sym that is a specialization of it
+/// \return whether the pattern's template matches the argument's
+bool cpp_typecheck_resolvet::match_template_template_parameter(
+  const irep_idt &tmpl_base_name,
+  const symbolt &desired_sym,
+  const typet &desired_type,
+  irep_idt &search_name)
+{
+  bool is_tt_param = false;
+  search_name = tmpl_base_name;
+  const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
+    tmpl_base_name, cpp_scopet::RECURSIVE);
+  for(const auto &id_ptr : ids)
+  {
+    if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
+    {
+      auto it = cpp_typecheck.template_map.type_map.find(id_ptr->identifier);
+      if(
+        it != cpp_typecheck.template_map.type_map.end() &&
+        it->second.id() == ID_unassigned)
+      {
+        // Assign the template template parameter to the
+        // template that the desired type was instantiated from.
+        // N5008 [temp.arg.template]/1, [temp.deduct.type]/8: the
+        // deduced argument is the class template itself, represented as
+        // an explicitly given one is (template_parameter_symbol_typet of
+        // the template's symbol), so that the same parameter appearing
+        // as a template template argument elsewhere in P
+        // (`is_spec_v<Tm<A...>, Tm>', the MSVC STL's
+        // _Is_specialization_v) deduces consistently
+        const irep_idt &template_name = desired_sym.type.get(ID_identifier);
+        if(
+          !template_name.empty() &&
+          cpp_typecheck.symbol_table.has_symbol(template_name))
+        {
+          it->second = template_parameter_symbol_typet{template_name};
+        }
+        else
+          it->second = desired_type;
+        is_tt_param = true;
+      }
+      // N5008 [temp.arg.explicit]/2, [temp.deduct.type]/8: a template
+      // template parameter given explicitly (`impl<one>(o)' for
+      // `template <template <class...> class T, class... A> void impl(
+      // const T<A...> &)', the MSVC STL's
+      // _Derived_from_specialization_impl<_Template>) is not deduced;
+      // the remaining arguments are deduced from A when A is a
+      // specialization of that template
+      else if(
+        it != cpp_typecheck.template_map.type_map.end() &&
+        it->second.id() == ID_template_parameter_symbol_type)
+      {
+        const std::string bound = id2string(
+          to_template_parameter_symbol_type(it->second).get_identifier());
+        const auto marker = bound.rfind("template.", bound.find('<'));
+        if(marker != std::string::npos)
+        {
+          const std::string bound_base = bound.substr(marker + 9);
+          search_name = bound_base.substr(0, bound_base.find('<'));
+        }
+        const std::string instance = id2string(desired_sym.name);
+        const auto tag = instance.rfind("tag-", instance.find('<'));
+        if(
+          marker != std::string::npos && tag != std::string::npos &&
+          bound.compare(0, marker, instance, 0, tag) == 0 &&
+          bound.compare(
+            marker + 9,
+            desired_sym.base_name.size() + 1,
+            id2string(desired_sym.base_name) + "<") == 0)
+        {
+          is_tt_param = true;
+        }
+      }
+    }
+  }
+  return is_tt_param;
+}
+
 /// guess_template_args for a template-id pattern `C<args...>' against a
 /// class template specialization ([temp.deduct.type]/8-9, with the
 /// derived-to-base step of [temp.deduct.call]/4.3): each argument of the
@@ -9349,77 +9436,9 @@ void cpp_typecheck_resolvet::guess_template_args_template_id(
     {
       // Check if the template name is a template template parameter.
       // If so, assign it to the desired type's template.
-      bool is_tt_param = false;
-      // the name of the template an explicitly given template template
-      // parameter is bound to: A may be derived from its specialization
-      irep_idt search_name = tmpl_base_name;
-      const auto ids = cpp_typecheck.cpp_scopes.current_scope().lookup(
-        tmpl_base_name, cpp_scopet::RECURSIVE);
-      for(const auto &id_ptr : ids)
-      {
-        if(id_ptr->id_class == cpp_idt::id_classt::TEMPLATE_PARAMETER)
-        {
-          auto it =
-            cpp_typecheck.template_map.type_map.find(id_ptr->identifier);
-          if(
-            it != cpp_typecheck.template_map.type_map.end() &&
-            it->second.id() == ID_unassigned)
-          {
-            // Assign the template template parameter to the
-            // template that the desired type was instantiated from.
-            // N5008 [temp.arg.template]/1, [temp.deduct.type]/8: the
-            // deduced argument is the class template itself, represented as
-            // an explicitly given one is (template_parameter_symbol_typet of
-            // the template's symbol), so that the same parameter appearing
-            // as a template template argument elsewhere in P
-            // (`is_spec_v<Tm<A...>, Tm>', the MSVC STL's
-            // _Is_specialization_v) deduces consistently
-            const irep_idt &template_name =
-              desired_sym->type.get(ID_identifier);
-            if(
-              !template_name.empty() &&
-              cpp_typecheck.symbol_table.has_symbol(template_name))
-            {
-              it->second = template_parameter_symbol_typet{template_name};
-            }
-            else
-              it->second = desired_type;
-            is_tt_param = true;
-          }
-          // N5008 [temp.arg.explicit]/2, [temp.deduct.type]/8: a template
-          // template parameter given explicitly (`impl<one>(o)' for
-          // `template <template <class...> class T, class... A> void impl(
-          // const T<A...> &)', the MSVC STL's
-          // _Derived_from_specialization_impl<_Template>) is not deduced;
-          // the remaining arguments are deduced from A when A is a
-          // specialization of that template
-          else if(
-            it != cpp_typecheck.template_map.type_map.end() &&
-            it->second.id() == ID_template_parameter_symbol_type)
-          {
-            const std::string bound = id2string(
-              to_template_parameter_symbol_type(it->second).get_identifier());
-            const auto marker = bound.rfind("template.", bound.find('<'));
-            if(marker != std::string::npos)
-            {
-              const std::string bound_base = bound.substr(marker + 9);
-              search_name = bound_base.substr(0, bound_base.find('<'));
-            }
-            const std::string instance = id2string(desired_sym->name);
-            const auto tag = instance.rfind("tag-", instance.find('<'));
-            if(
-              marker != std::string::npos && tag != std::string::npos &&
-              bound.compare(0, marker, instance, 0, tag) == 0 &&
-              bound.compare(
-                marker + 9,
-                desired_sym->base_name.size() + 1,
-                id2string(desired_sym->base_name) + "<") == 0)
-            {
-              is_tt_param = true;
-            }
-          }
-        }
-      }
+      irep_idt search_name;
+      const bool is_tt_param = match_template_template_parameter(
+        tmpl_base_name, *desired_sym, desired_type, search_name);
       if(!is_tt_param)
       {
         // Per [temp.deduct.call]/4.3: if P is a class template-id
