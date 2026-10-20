@@ -3082,7 +3082,10 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
         convert_expr(src); // ignore
       else if(from_width<to_width) // extend
       {
-        if(src_type.id()==ID_signedbv)
+        if(
+          src_type.id() == ID_signedbv ||
+          (src_type.id() == ID_c_enum &&
+           to_c_enum_type(src_type).underlying_type().id() == ID_signedbv))
           out << "((_ sign_extend ";
         else
           out << "((_ zero_extend ";
