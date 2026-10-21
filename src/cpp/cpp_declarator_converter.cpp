@@ -440,8 +440,16 @@ symbolt &cpp_declarator_convertert::convert(
     if(declarator.get_bool(ID_C_template_case))
       return symbol;
 
+    const irept hidden_friend_of = symbol.type.find(ID_C_hidden_friend_of);
     combine_types(declarator.name().source_location(), final_type, symbol);
     enforce_rules(symbol);
+    // [dcl.meaning.general]/2.1: a namespace-scope declaration of a function
+    // first declared as a friend binds its name; another friend declaration
+    // does not
+    if(is_friend && hidden_friend_of.is_not_nil())
+      symbol.type.add(ID_C_hidden_friend_of) = hidden_friend_of;
+    else if(!is_friend)
+      symbol.type.remove(ID_C_hidden_friend_of);
 
     // initializer?
     handle_initializer(symbol, declarator);
@@ -930,6 +938,23 @@ symbolt &cpp_declarator_convertert::convert_new_symbol(
   // class so that the class scope is visible during body type-checking.
   if(is_friend && friend_class_scope != nullptr)
     symbol.type.set(ID_C_class, friend_class_scope->identifier);
+
+  // N5008 [dcl.meaning.general]/2.1, [basic.lookup.argdep]/4.2: a friend
+  // declaration does not bind a name, so a function first declared by one
+  // is found only by argument-dependent lookup with the befriending class
+  // among the associated classes (filter_hidden_friends); a later
+  // namespace-scope declaration makes it visible (see below).  A friend
+  // `operator==(const __shared_count &, const __shared_count &)' was a
+  // candidate for `__ti == typeid(...)' in libstdc++'s
+  // _Sp_counted_ptr_inplace::_M_get_deleter.
+  if(
+    is_friend && is_code && friend_class_scope != nullptr &&
+    !declarator.name().is_qualified())
+  {
+    irept entry{ID_symbol};
+    entry.set(ID_identifier, friend_class_scope->identifier);
+    symbol.type.add(ID_C_hidden_friend_of).move_to_sub(entry);
+  }
 
   if(cpp_typecheck.symbol_table.move(symbol, new_symbol))
   {

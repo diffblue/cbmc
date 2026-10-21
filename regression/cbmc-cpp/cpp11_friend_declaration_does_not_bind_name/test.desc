@@ -1,0 +1,17 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ hidden friend not found by ordinary lookup: SUCCESS$
+^\[main\.assertion\.2\] line \d+ found by argument-dependent lookup: SUCCESS$
+^\[main\.assertion\.3\] line \d+ declared at namespace scope: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A non-template friend function defined in a class was entered into the
+enclosing namespace and found by ordinary lookup, so h(0) chose the exact
+match h(int) over ::h(long).
