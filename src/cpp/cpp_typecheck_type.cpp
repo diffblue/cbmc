@@ -652,9 +652,7 @@ void cpp_typecheckt::typecheck_type(typet &type)
   }
   else if(type.id()==ID_code)
   {
-    code_typet &code_type=to_code_type(type);
-    typecheck_type(code_type.return_type());
-
+    code_typet &code_type = to_code_type(type);
     code_typet::parameterst &parameters=code_type.parameters();
 
     // N5008 [basic.scope.param]/1: a parameter's scope begins at its
@@ -683,6 +681,23 @@ void cpp_typecheckt::typecheck_type(typet &type)
       };
       return walk(t);
     };
+    // N5008 [basic.scope.param]/1, [dcl.fct]/1: a parameter's scope extends
+    // to the end of its declarator, so a trailing return type may name the
+    // parameters in an unevaluated operand (`auto _Call_binder(..., _Cv_FD
+    // &_Obj, ...) -> decltype(_Invoker_ret<_Ret>::_Call(_Obj, ...))', the
+    // MSVC STL's std::bind, when the substituted function type of a
+    // candidate is formed during deduction).  Such a return type is
+    // type-checked after the parameters, with them bound as below.
+    const bool return_type_names_parameters =
+      contains_decltype(code_type.return_type()) &&
+      std::any_of(
+        parameters.begin(),
+        parameters.end(),
+        [](const code_typet::parametert &p)
+        { return !p.get_base_name().empty(); });
+    if(!return_type_names_parameters)
+      typecheck_type(code_type.return_type());
+
     for(std::size_t i = 0; i < parameters.size(); ++i)
     {
       auto &param = parameters[i];
@@ -787,6 +802,29 @@ void cpp_typecheckt::typecheck_type(typet &type)
           implicit_typecast(param.default_value(), param.type());
         }
       }
+    }
+
+    if(return_type_names_parameters)
+    {
+      if(!parameter_scope.has_value())
+      {
+        parameter_scope.emplace(cpp_scopes);
+        cpp_scopes.new_block_scope();
+      }
+      for(const auto &p : parameters)
+      {
+        const irep_idt &name = p.get_base_name();
+        if(
+          !name.empty() && p.type().is_not_nil() &&
+          p.type().id() != ID_cpp_name &&
+          cpp_scopes.current_scope()
+            .lookup(name, cpp_scopet::SCOPE_ONLY)
+            .empty())
+        {
+          bind_requires_parameter(name, p.type());
+        }
+      }
+      typecheck_type(code_type.return_type());
     }
   }
   else if(type.id()==ID_template)
