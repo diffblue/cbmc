@@ -15090,3 +15090,63 @@ Open:
   operators, now also cpp11_range_for_variable_scope), _Find_last,
   filesystem _Copy_impl, from_chars, _Lockit, ofstream timeout; macOS
   locale facets, expected, template lambdas.
+
+## Round 195 (open items after 4f74be95a2)
+
+Each fix has a hand-written test that fails on binW173, checked with g++ 13
+and clang++ 18 (the template-lambda and destructor tests with -std=c++20).
+- Partial ordering: a part of P naming none of G's parameters must equal A
+  ([temp.deduct.type]/1, [temp.deduct.partial]/10); `equal_to<>' is padded
+  to `equal_to<void>' (2b0ffc265d, MSVC _Can_memcmp_elements_with_pred).
+- A stale parameter symbol no longer hides a function parameter pack
+  (a8f3559cec, MSVC std::bind with a member pointer after another binder).
+- An rvalue reference binds to a temporary of a braced scalar prvalue
+  ([dcl.init.ref]/5.3.1, 679e97ac09, MSVC std::list `exchange(_Ptr,
+  pointer{})').
+- A top-level const parameter does not change a function template's
+  signature ([dcl.fct]/5, [temp.over.link]/6, 63b0fe43ff, _Destroy_range).
+- Pointer arithmetic instantiates the pointee class template ([expr.add]/1,
+  [temp.inst]/2, fae90dc188, _Hash_vec / _Find_last).
+- A lambda's template-parameter-list is its call operator's
+  ([expr.prim.lambda.closure]/4, 5b92cdea6b); the KNOWNBUG
+  cpp20_template_lambda_reference_parameter is CORE.
+- The function a lambda is lowered to is evaluated in constant expressions
+  ([expr.prim.lambda.closure]/5, 10b94cc5bd), and the closure type of a
+  lambda in a variable template specialization is found (bbff2ef16d);
+  libc++ __fits_in_tail_padding.
+- Destructor selection among constrained prospective destructors
+  ([class.dtor]/4, 959a02a691, libc++ expected::__repr).
+- CTAD for `C{}' without arguments ([over.match.class.deduct]/1.2,
+  e9a67f2e49, MSVC <charconv> `less{}').
+- A member's trailing return type names its parameters
+  ([basic.scope.param]/1, 5975c232c8, MSVC _Invoker1::_Call).
+- A friend defined outside its class is not in the class scope
+  ([class.friend]/6 note 3, 8db665fbee, MSVC filesystem::_Copy_impl).
+- `==' and `<' on reference-typed operands compare the referred objects
+  ([expr.type]/1, 4d482a66e6); `static_cast<int &>(a) ==
+  static_cast<int &>(b)' compared addresses, so MSVC std::equal with
+  equal_to<> was false.
+- KNOWNBUG cpp11_alias_template_parameter_not_hidden_by_later_namespace_name
+  (ab648ca2ff): an alias template's body is resolved in its declaration's
+  scope, where a later namespace-scope name hides the parameter.
+- Citation fix [temp.arg.general]/2 -> /3 as a separate commit
+  (46e5781a8f); the round-194 history is unchanged.
+
+Artifacts (CI run 6), same harness for both binaries (run_pp_mem.sh adds
+memmove/memcpy/memcmp/memset/strlen bodies, which the Linux-preprocessed
+library lacks under --winx64; macOS runs use --os macos, i.e. clang mode,
+which the macOS CI uses natively; earlier macOS counts were in GCC mode):
+VS 2022 27 -> 16 of 103, VS 2026 30 -> 22 of 108, macOS 15 5 -> 4 of 24,
+macOS 14 8 -> 8 of 26 (binW173 -> binW174).
+
+Open:
+- MSVC std::function from std::bind (cpp11_std_bind_to_std_function,
+  cpp11_std_bind_two_result_types): `_Invoker_functor::_Call(declval<B
+  &>(), declval<int>())' is "no match" while `declval<B &>()(declval<int>())'
+  resolves; C-Vise reductions so far landed on ill-formed or unrelated
+  variants (the alias-template KNOWNBUG above).
+- libc++ 19 ranges (`arr | views::take(3)', 4 macOS tests): operator| is
+  not selected; a 216-line reduction is in /tmp/r193t/cv_rg/v.ii.
+- _Lockit (cpp11_locale_ctype_facet), cpp11_ofstream_from_string timeout,
+  macOS 14 deque/typeid tests, and artifacts that predate source fixes
+  (7 on VS 2022) or _USE_STD_VECTOR_ALGORITHMS=0 (3).
