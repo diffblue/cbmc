@@ -4118,12 +4118,25 @@ bool cpp_typecheckt::function_template_signatures_equivalent(
     // non-const `_M_access<_Tp>()` differ ONLY there -- unifying them
     // broke std::function's manager chain).  Compare both, with the
     // same positional normalization for the return type.
-    const irept &f_ret = f_type.find(ID_return_type);
-    const irept &c_ret = c_type.find(ID_return_type);
+    // a parsed function type keeps its return type as the subtype; a
+    // converted code type in ID_return_type
+    const auto return_type = [](const typet &t) -> const irept &
+    {
+      if(t.id() == ID_function_type)
+        return static_cast<const irept &>(to_type_with_subtype(t).subtype());
+      return t.find(ID_return_type);
+    };
+    const irept &f_ret = return_type(f_type);
+    const irept &c_ret = return_type(c_type);
+    // [temp.alias]/2: differently spelled return types may denote the
+    // same type through an alias template; see same_name_spelling
     if(
+      same_name_spelling(f_ret, c_ret) &&
       normalized(f_ret, forward.template_type()) !=
-      normalized(c_ret, candidate.template_type()))
+        normalized(c_ret, candidate.template_type()))
+    {
       return false;
+    }
     if(
       forward.declarators().front().method_qualifier() !=
       candidate.declarators().front().method_qualifier())
@@ -7323,6 +7336,21 @@ skip_pack_removal_ft:
                       sp.second.type.find(ID_template_type)),
                     m_ftype.find(ID_parameters),
                     md_tt))
+                {
+                  continue;
+                }
+                // [temp.over.link]/3: and the return types
+                // (`enable_if_t<!fwd<I>::value> put(I, I)' beside
+                // `enable_if_t<fwd<I>::value> put(I, I)', libc++'s
+                // __split_buffer::__construct_at_end)
+                if(
+                  !raw_decl.declarators().empty() &&
+                  !member_template_return_types_match(
+                    raw_decl,
+                    static_cast<const template_typet &>(
+                      sp.second.type.find(ID_template_type)),
+                    md,
+                    md))
                 {
                   continue;
                 }

@@ -72,6 +72,10 @@ class incomplete_dependency_exceptiont
 /// comparison or logical expression); any other type unchanged.
 typet cpp_bool_type(const typet &type);
 
+/// Whether the parsed types \p a and \p b are spelled with the same
+/// qualified names (template arguments and declarators ignored).
+bool same_name_spelling(const irept &a, const irept &b);
+
 class cpp_typecheckt:public c_typecheck_baset
 {
 public:
@@ -1314,6 +1318,11 @@ protected:
     const template_typet &class_tt,
     const template_typet &decl_tt);
 
+  bool member_template_return_types_match(
+    const cpp_declarationt &decl,
+    const template_typet &class_tt,
+    const cpp_declarationt &def,
+    const cpp_declarationt &def_head);
   bool member_template_parameters_match(
     const irept &decl_params,
     const template_typet &decl_tt,

@@ -1132,6 +1132,73 @@ void cpp_typecheckt::typecheck_variable_template(cpp_declarationt &declaration)
   cpp_scopes.id_map[symbol_name] = &template_scope;
 }
 
+/// Whether the parsed types \p a and \p b are spelled with the same
+/// qualified names (template arguments and declarators ignored).
+bool same_name_spelling(const irept &a, const irept &b)
+{
+  const auto names = [](const irept &t)
+  {
+    std::string result = t.id_string();
+    if(t.id() == ID_cpp_name)
+    {
+      for(const auto &sub : t.get_sub())
+      {
+        if(sub.id() == ID_name)
+          result += "::" + id2string(sub.get(ID_identifier));
+      }
+    }
+    return result;
+  };
+  return names(a) == names(b);
+}
+
+/// N5008 [temp.over.link]/3, [defns.signature.member.templ]: the signature
+/// of a member function template includes its return type, so the
+/// out-of-line definition \p def (whose template-head is \p def_head, with
+/// the enclosing class template's parameters \p class_tt first) belongs to
+/// the in-class declaration \p decl only if the return types agree, the
+/// template parameters compared by position.
+bool cpp_typecheckt::member_template_return_types_match(
+  const cpp_declarationt &decl,
+  const template_typet &class_tt,
+  const cpp_declarationt &def,
+  const cpp_declarationt &def_head)
+{
+  if(decl.declarators().empty() || def.declarators().empty())
+    return true;
+  // a trailing return type is the function type's subtype, otherwise the
+  // return type is the decl-specifier type
+  const auto return_type = [](const cpp_declarationt &d) -> irept
+  {
+    const typet &f = d.declarators().front().type();
+    if(
+      f.id() == ID_function_type && f.has_subtype() &&
+      to_type_with_subtype(f).subtype().is_not_nil())
+    {
+      return to_type_with_subtype(f).subtype();
+    }
+    return d.type();
+  };
+  // A return type naming an alias template is the type it denotes
+  // ([temp.alias]/2): `_Require<...>' and `typename enable_if<...>::type'
+  // may be the same type (libstdc++'s std::swap is declared with one and
+  // defined with the other).  Without expanding aliases, only return types
+  // spelled with the same names, differing in their template arguments,
+  // are told apart.
+  if(!same_name_spelling(return_type(decl), return_type(def)))
+    return true;
+  irept decl_ret{ID_parameters};
+  decl_ret.get_sub().push_back(return_type(decl));
+  irept def_ret{ID_parameters};
+  def_ret.get_sub().push_back(return_type(def));
+  return member_template_parameters_match(
+    decl_ret,
+    decl.template_type(),
+    class_tt,
+    def_ret,
+    def_head.template_type());
+}
+
 /// typecheck class template members; these can be methods or static members
 /// N5008 [temp.mem]/1, [class.mfct]/1: an out-of-line definition of a member
 /// function template of a non-template class (`template \<class E> auto
@@ -1225,6 +1292,16 @@ void cpp_typecheckt::define_member_template_of_class(
          class_tt,
          def_ftype.find(ID_parameters),
          declaration.template_type()))
+    {
+      continue;
+    }
+    // N5008 [temp.over.link]/3, [defns.signature.member.templ]: the
+    // signature of a member function template includes its return type;
+    // `enable_if_t<!fwd<I>::value> put(I, I)' and `enable_if_t<fwd<I>::value>
+    // put(I, I)' are different templates (libc++'s
+    // __split_buffer::__construct_at_end)
+    if(!member_template_return_types_match(
+         tmpl_decl, class_tt, declaration, declaration))
     {
       continue;
     }
@@ -1796,6 +1873,12 @@ void cpp_typecheckt::typecheck_class_template_member(
                     class_tt,
                     def_ftype.find(ID_parameters),
                     decl_tmp.template_type()))
+                {
+                  continue;
+                }
+                // [temp.over.link]/3: so do the return types
+                if(!member_template_return_types_match(
+                     td, class_tt, decl_tmp, decl_tmp))
                 {
                   continue;
                 }
