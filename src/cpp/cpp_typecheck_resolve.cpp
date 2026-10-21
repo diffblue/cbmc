@@ -6650,6 +6650,34 @@ void cpp_typecheck_resolvet::show_identifiers(
   }
 }
 
+/// The class of which the member \p member_id is a member: the class named
+/// by the member symbol's type (ID_C_member_name), otherwise the
+/// identifier's prefix -- `ns::tag-C' for `ns::C::f', the class symbol is
+/// named with the `tag-' marker before the class's own name.
+static const symbolt *member_class_symbol(
+  const symbol_table_baset &symbol_table,
+  const irep_idt &member_id)
+{
+  if(const symbolt *member = symbol_table.lookup(member_id))
+  {
+    const irep_idt &class_id = member->type.get(ID_C_member_name);
+    if(!class_id.empty())
+      if(const symbolt *class_symbol = symbol_table.lookup(class_id))
+        return class_symbol;
+  }
+  const std::string id_str = id2string(member_id);
+  const auto pos = id_str.rfind("::");
+  if(pos == std::string::npos)
+    return nullptr;
+  const std::string class_name = id_str.substr(0, pos);
+  const auto ns = class_name.rfind("::");
+  const std::string tagged =
+    ns == std::string::npos
+      ? "tag-" + class_name
+      : class_name.substr(0, ns + 2) + "tag-" + class_name.substr(ns + 2);
+  return symbol_table.lookup(tagged);
+}
+
 exprt cpp_typecheck_resolvet::resolve(
   const cpp_namet &cpp_name,
   const wantt want,
@@ -8491,9 +8519,8 @@ resolved_after_strip:
       auto pos = id_str.rfind("::");
       if(pos != std::string::npos)
       {
-        const std::string class_name = "tag-" + id_str.substr(0, pos);
         const symbolt *class_sym =
-          cpp_typecheck.symbol_table.lookup(class_name);
+          member_class_symbol(cpp_typecheck.symbol_table, result_id);
         if(class_sym != nullptr && class_sym->type.id() == ID_struct)
         {
           const struct_typet &struct_type = to_struct_type(class_sym->type);
@@ -8554,9 +8581,8 @@ resolved_after_strip:
         auto pos = id_str.rfind("::");
         if(pos != std::string::npos)
         {
-          const std::string class_name = "tag-" + id_str.substr(0, pos);
           const symbolt *class_sym =
-            cpp_typecheck.symbol_table.lookup(class_name);
+            member_class_symbol(cpp_typecheck.symbol_table, comp_name);
           if(class_sym != nullptr && class_sym->type.id() == ID_struct)
           {
             const struct_typet &struct_type = to_struct_type(class_sym->type);
