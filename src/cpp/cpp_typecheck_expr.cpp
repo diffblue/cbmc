@@ -7963,11 +7963,18 @@ void cpp_typecheckt::typecheck_expr_member(
 
   if(expr.type().id() == ID_code)
   {
-    // Check if the function body has to be typechecked
-    symbolt &component_symbol = symbol_table.get_writeable_ref(component_name);
+    // Check if the function body has to be typechecked.  A data member of
+    // type "reference to function" ([dcl.ref]/1, `long (&f)(long, long)')
+    // also has a function type once dereferenced, but it is no member
+    // function and has no symbol of its own.
+    symbolt *component_symbol = symbol_table.get_writeable(component_name);
 
-    if(component_symbol.value.id() == ID_cpp_not_typechecked)
-      component_symbol.value.set(ID_is_used, true);
+    if(
+      component_symbol != nullptr &&
+      component_symbol->value.id() == ID_cpp_not_typechecked)
+    {
+      component_symbol->value.set(ID_is_used, true);
+    }
   }
 }
 
