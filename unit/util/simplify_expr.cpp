@@ -631,6 +631,20 @@ TEST_CASE("Simplify all-zero constant in bitand", "[core][util]")
   REQUIRE(simplify_expr(band, empty_namespace) == zero);
 }
 
+TEST_CASE("Simplify merges constants behind a non-constant", "[core][util]")
+{
+  const unsignedbv_typet u8{8};
+  const symbol_exprt x{"x", u8};
+  // (x & 0x7f) & 0x80, flattened to x & 0x7f & 0x80, is 0
+  multi_ary_exprt band{ID_bitand, {x, from_integer(0x7f, u8)}, u8};
+  band.add_to_operands(from_integer(0x80, u8));
+  REQUIRE(simplify_expr(band, empty_namespace) == from_integer(0, u8));
+  // x | 0x0f | 0xf0 is all ones
+  multi_ary_exprt bor{ID_bitor, {x, from_integer(0x0f, u8)}, u8};
+  bor.add_to_operands(from_integer(0xf0, u8));
+  REQUIRE(simplify_expr(bor, empty_namespace) == from_integer(0xff, u8));
+}
+
 TEST_CASE("Simplify all-ones constant in bitor", "[core][util]")
 {
   const unsignedbv_typet u8{8};

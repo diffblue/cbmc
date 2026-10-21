@@ -744,6 +744,34 @@ simplify_exprt::simplify_bitwise(const multi_ary_exprt &expr)
 
   const std::size_t width = to_bitvector_type(expr.type()).get_width();
 
+  // The operators are associative and commutative: move the constant
+  // operands (of the expression's type) to the front, keeping their order
+  // and that of the other operands, so that the loop below merges all of
+  // them -- `(x & c1) & c2', flattened to `x & c1 & c2', has them behind x.
+  {
+    exprt::operandst constants, others;
+    for(const auto &op : new_expr.operands())
+    {
+      if(op.is_constant() && op.type() == new_expr.type())
+        constants.push_back(op);
+      else
+        others.push_back(op);
+    }
+    bool constants_in_front = true;
+    for(std::size_t i = 0; i < constants.size(); ++i)
+    {
+      const exprt &op = new_expr.operands()[i];
+      if(!op.is_constant() || op.type() != new_expr.type())
+        constants_in_front = false;
+    }
+    if(constants.size() >= 2 && !constants_in_front)
+    {
+      constants.insert(constants.end(), others.begin(), others.end());
+      new_expr.operands() = std::move(constants);
+      no_change = false;
+    }
+  }
+
   while(new_expr.operands().size() >= 2)
   {
     if(!new_expr.op0().is_constant())
