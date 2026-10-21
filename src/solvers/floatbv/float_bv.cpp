@@ -895,6 +895,18 @@ exprt float_bvt::fma(
     typecast_exprt(unpacked_rhs.exponent, wide_exp_type));
   prod_exponent = plus_exprt(prod_exponent, from_integer(1, wide_exp_type));
 
+  // When either multiplicand is zero, the product fraction is all zeros
+  // but prod_exponent is still the sum of the operand exponents, which can
+  // be very large.  During alignment the addend would then be treated as
+  // the smaller operand and shifted out, losing its bits.  Force
+  // prod_exponent to the minimum representable value in that case so the
+  // addend always dominates.
+  exprt product_is_zero = or_exprt{unpacked_lhs.zero, unpacked_rhs.zero};
+  prod_exponent = if_exprt{
+    product_is_zero,
+    from_integer(-(mp_integer(1) << (spec.e)), wide_exp_type),
+    prod_exponent};
+
   exprt prod_sign = notequal_exprt(unpacked_lhs.sign, unpacked_rhs.sign);
 
   // Align addend fraction to product width (pad on the right)
@@ -958,11 +970,6 @@ exprt float_bvt::fma(
     typecast_exprt(bigger_exp, signedbv_typet(spec.e + 3)),
     from_integer(2, signedbv_typet(spec.e + 3)));
 
-  // Sign
-  exprt add_sub_sign = notequal_exprt(
-    if_exprt(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
-  result.sign = add_sub_sign;
-
   // NaN
   exprt prod_inf = or_exprt(unpacked_lhs.infinity, unpacked_rhs.infinity);
   result.NaN = disjunction(
@@ -978,6 +985,28 @@ exprt float_bvt::fma(
   // Infinity
   result.infinity =
     and_exprt(not_exprt(result.NaN), or_exprt(prod_inf, unpacked_add.infinity));
+
+  // An exact zero result: as in add_sub, this can be decided before rounding.
+  result.zero = and_exprt{
+    not_exprt{or_exprt{result.infinity, result.NaN}},
+    equal_exprt{result.fraction, from_integer(0, result.fraction.type())}};
+
+  // Sign. As for addition, an infinite result takes the sign of the infinite
+  // operand, and an exact zero result is negative only if both the product
+  // and the addend are, or, when rounding towards minus infinity, if either
+  // of them is.
+  exprt add_sub_sign = notequal_exprt(
+    if_exprt(c_bigger, unpacked_add.sign, prod_sign), fraction_sign);
+  exprt infinity_sign = if_exprt{prod_inf, prod_sign, unpacked_add.sign};
+  rounding_mode_bitst rounding_mode_bits{rm};
+  exprt zero_sign = if_exprt{
+    rounding_mode_bits.round_to_minus_inf,
+    or_exprt{prod_sign, unpacked_add.sign},
+    and_exprt{prod_sign, unpacked_add.sign}};
+  result.sign = if_exprt{
+    result.infinity,
+    infinity_sign,
+    if_exprt{result.zero, zero_sign, add_sub_sign}};
 
   return rounder(result, rm, spec);
 }
