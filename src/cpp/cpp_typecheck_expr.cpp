@@ -7455,8 +7455,17 @@ void cpp_typecheckt::typecheck_expr_typeid(exprt &expr)
         name_member &&
         (comp.type().id() == ID_unsignedbv || comp.type().id() == ID_signedbv))
       {
-        field_values.push_back(
-          typecast_exprt{address_of_exprt{first_char}, comp.type()});
+        // libc++'s non-unique ARM RTTI (arm64 Darwin) marks a name that may
+        // not be unique by the most significant bit and compares such names
+        // with strcmp.  This object is the only one of its type, so its
+        // name is unique: clear that bit, which user-space addresses on
+        // that platform never have, so that the test folds to "unique"
+        // ([expr.typeid]/1, [type.info]/2: equality is type identity).
+        const std::size_t width = to_bitvector_type(comp.type()).get_width();
+        const exprt address =
+          typecast_exprt{address_of_exprt{first_char}, comp.type()};
+        field_values.push_back(bitand_exprt{
+          address, from_integer(power(2, width - 1) - 1, comp.type())});
       }
       else
       {
