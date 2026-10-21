@@ -16,6 +16,7 @@
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/pointer_offset_size.h>
+#include <util/simplify_expr.h>
 #include <util/std_code.h>
 #include <util/std_expr.h>
 #include <util/symbol_table_base.h>
@@ -290,6 +291,87 @@ static exprt component_value(const exprt &new_value, const typet &type)
   return typecast_exprt::conditional_cast(new_value, type);
 }
 
+/// Where a standard library keeps the classification table of the
+/// ctype<char> facet ([facet.ctype.special]): libstdc++'s `_M_table', libc++'s
+/// `__tab_', the MSVC STL's `_Ctype._Table'.
+struct ctype_char_layoutt
+{
+  irep_idt class_name;
+  std::string ctype_base_prefix;
+  std::string table_member;
+  typet mask_type;
+  bool glibc_masks;
+};
+
+/// The ctype<char> layout of the library in \p symbol_table, if any.
+static std::optional<ctype_char_layoutt>
+ctype_char_layout(const symbol_table_baset &symbol_table)
+{
+  struct candidatet
+  {
+    const char *ns;
+    const char *table_member;
+    bool glibc_masks;
+  };
+  for(const candidatet &c :
+      {candidatet{"std::", "_M_table", true},
+       candidatet{"std::__1::", "__tab_", false},
+       candidatet{"std::", "_Table", false}})
+  {
+    const std::string class_name = std::string{c.ns} + "tag-ctype<char>";
+    const symbolt *s = symbol_table.lookup(class_name);
+    if(s == nullptr || s->type.id() != ID_struct)
+      continue;
+    const namespacet ns{symbol_table};
+    // the element type of the (possibly nested) table pointer member
+    std::function<std::optional<typet>(const typet &)> find =
+      [&](const typet &t) -> std::optional<typet>
+    {
+      const typet &f =
+        t.id() == ID_struct_tag
+          ? static_cast<const typet &>(ns.follow_tag(to_struct_tag_type(t)))
+          : t;
+      if(f.id() != ID_struct)
+        return {};
+      for(const auto &component : to_struct_type(f).components())
+      {
+        if(
+          component.type().id() == ID_code ||
+          component.get_bool(ID_is_static) || component.get_bool(ID_is_type))
+        {
+          continue;
+        }
+        const std::string name = id2string(component.get_name());
+        const std::string suffix = std::string{"::"} + c.table_member;
+        if(
+          component.type().id() == ID_pointer &&
+          (name == c.table_member ||
+           (name.size() > suffix.size() &&
+            name.compare(name.size() - suffix.size(), suffix.size(), suffix) ==
+              0)))
+        {
+          typet element = to_pointer_type(component.type()).base_type();
+          element.remove(ID_C_constant);
+          return element;
+        }
+        if(auto r = find(component.type()))
+          return r;
+      }
+      return {};
+    };
+    const auto element = find(s->type);
+    if(!element.has_value())
+      continue;
+    return ctype_char_layoutt{
+      class_name,
+      std::string{c.ns} + "ctype_base::",
+      c.table_member,
+      *element,
+      c.glibc_masks};
+  }
+  return {};
+}
+
 /// Create a no-op body for an I/O function that returns a reference
 /// to its first parameter (e.g., std::endl returns its ostream& argument,
 /// ostream::_M_insert returns *this).
@@ -312,14 +394,15 @@ static exprt component_value(const exprt &new_value, const typet &type)
 /// table (translation unit does not use `<locale>`).
 static exprt provide_classic_ctype_char_model(
   symbol_table_baset &symbol_table,
-  const namespacet &ns)
+  const namespacet &ns,
+  const ctype_char_layoutt &layout)
 {
   const irep_idt facet_symbol_name =
     "std::" CPROVER_PREFIX "classic_ctype_char";
   if(const symbolt *existing = symbol_table.lookup(facet_symbol_name))
     return existing->symbol_expr();
 
-  const symbolt *ctype_char = symbol_table.lookup("std::tag-ctype<char>");
+  const symbolt *ctype_char = symbol_table.lookup(layout.class_name);
   if(
     ctype_char == nullptr || ctype_char->type.id() != ID_struct ||
     to_struct_type(ctype_char->type).is_incomplete())
@@ -327,62 +410,172 @@ static exprt provide_classic_ctype_char_model(
     return nil_exprt{};
   }
 
-  // glibc _ISbit(bit): (bit) < 8 ? ((1 << (bit)) << 8) : ((1 << (bit)) >> 8)
+  // N5008 [category.ctype.general]: the classes are the ctype_base::mask
+  // constants of the library.  libstdc++ and libc++ declare them as static
+  // data members and the MSVC STL as enumerators, with library-specific
+  // bit values (glibc's _ISbit, Darwin's _CTYPE_*, the UCRT's _DIGIT, ...);
+  // read them from the translation unit, falling back to glibc's _ISbit
+  // encoding for libstdc++ when they were folded away.
   auto isbit = [](int bit) -> unsigned
   { return bit < 8 ? (1u << bit) << 8 : (1u << bit) >> 8; };
-  const unsigned m_upper = isbit(0), m_lower = isbit(1), m_alpha = isbit(2),
-                 m_digit = isbit(3), m_xdigit = isbit(4), m_space = isbit(5),
-                 m_print = isbit(6), m_graph = isbit(7), m_blank = isbit(8),
-                 m_cntrl = isbit(9), m_punct = isbit(10), m_alnum = isbit(11);
+  // the masks may be declared in a base class of ctype_base (the MSVC STL
+  // of VS 2026: _Ctype_constants_base)
+  std::vector<std::string> prefixes{layout.ctype_base_prefix};
+  {
+    const std::string ctype_base = layout.ctype_base_prefix.substr(
+      0, layout.ctype_base_prefix.size() - std::string{"ctype_base::"}.size());
+    const symbolt *base_class =
+      symbol_table.lookup(ctype_base + "tag-ctype_base");
+    if(base_class != nullptr && base_class->type.id() == ID_struct)
+    {
+      for(const auto &b : to_struct_type(base_class->type).bases())
+      {
+        const std::string id = id2string(b.type().get_identifier());
+        const auto tag = id.rfind("tag-");
+        if(tag != std::string::npos)
+          prefixes.push_back(id.substr(0, tag) + id.substr(tag + 4) + "::");
+      }
+    }
+  }
+  const auto mask_value = [&](const char *name, int glibc_bit)
+  {
+    for(const std::string &prefix : prefixes)
+    {
+      const symbolt *constant = symbol_table.lookup(prefix + name);
+      if(constant != nullptr && constant->value.is_not_nil())
+      {
+        exprt value = constant->value;
+        simplify(value, ns);
+        const auto v = numeric_cast<mp_integer>(value);
+        if(v.has_value())
+          return std::optional<unsigned>{numeric_cast_v<unsigned>(*v)};
+      }
+      // an enumerator of an (anonymous) enumeration member
+      const std::string enum_prefix = prefix + "tag-";
+      for(const auto &entry : symbol_table.symbols)
+      {
+        if(
+          entry.second.type.id() != ID_c_enum ||
+          id2string(entry.first).compare(0, enum_prefix.size(), enum_prefix) !=
+            0)
+        {
+          continue;
+        }
+        // the enumerator symbols are named after the enumeration
+        const symbolt *enumerator =
+          symbol_table.lookup(id2string(entry.first) + "::" + name);
+        if(enumerator == nullptr || !enumerator->value.is_constant())
+          continue;
+        exprt as_integer = typecast_exprt{enumerator->value, size_type()};
+        simplify(as_integer, ns);
+        const auto v = numeric_cast<mp_integer>(as_integer);
+        if(v.has_value())
+          return std::optional<unsigned>{numeric_cast_v<unsigned>(*v)};
+      }
+    }
+    if(layout.glibc_masks)
+      return std::optional<unsigned>{isbit(glibc_bit)};
+    return std::optional<unsigned>{};
+  };
+  const auto m_upper = mask_value("upper", 0), m_lower = mask_value("lower", 1),
+             m_alpha = mask_value("alpha", 2), m_digit = mask_value("digit", 3),
+             m_xdigit = mask_value("xdigit", 4),
+             m_space = mask_value("space", 5), m_print = mask_value("print", 6),
+             m_graph = mask_value("graph", 7), m_blank = mask_value("blank", 8),
+             m_cntrl = mask_value("cntrl", 9),
+             m_punct = mask_value("punct", 10),
+             m_alnum = mask_value("alnum", 11);
+  for(const auto &m :
+      {m_upper,
+       m_lower,
+       m_alpha,
+       m_digit,
+       m_xdigit,
+       m_space,
+       m_print,
+       m_graph,
+       m_cntrl,
+       m_punct,
+       m_alnum})
+  {
+    if(!m.has_value())
+      return nil_exprt{};
+  }
 
   // C99 7.4 "C" locale classification for the 256 unsigned-char values;
   // bytes 128..255 are in no class in the "C" locale.
-  const typet mask_type = unsignedbv_typet{16}; // ctype_base::mask
+  const typet mask_type = layout.mask_type; // the table's element type
   const std::size_t table_size = 256;
   array_typet table_type{mask_type, from_integer(table_size, size_type())};
   exprt::operandst entries;
   entries.reserve(table_size);
+  // A mask may combine the bits of several classes (libstdc++'s graph is
+  // alpha | digit | punct, the MSVC STL's alpha is _ALPHA | _LOWER | _UPPER).
+  // Set a bit for a character only when the character is in every class
+  // whose mask has that bit, so that `(entry & mask) != 0' holds exactly
+  // for the classes of the character.  A mask equal to another one (the
+  // MSVC STL's blank, which is its space) does not constrain the bits.
+  struct classt
+  {
+    unsigned mask;
+    std::function<bool(unsigned)> contains;
+  };
+  const auto is_upper = [](unsigned c) { return c >= 'A' && c <= 'Z'; };
+  const auto is_lower = [](unsigned c) { return c >= 'a' && c <= 'z'; };
+  const auto is_digit = [](unsigned c) { return c >= '0' && c <= '9'; };
+  const auto is_graph = [](unsigned c) { return c >= 0x21 && c <= 0x7e; };
+  const auto is_alnum = [&](unsigned c)
+  { return is_upper(c) || is_lower(c) || is_digit(c); };
+  std::vector<classt> classes{
+    {*m_upper, is_upper},
+    {*m_lower, is_lower},
+    {*m_alpha, [&](unsigned c) { return is_upper(c) || is_lower(c); }},
+    {*m_digit, is_digit},
+    {*m_xdigit,
+     [&](unsigned c) {
+       return is_digit(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+     }},
+    {*m_space,
+     [](unsigned c)
+     {
+       return c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' ||
+              c == '\r';
+     }},
+    {*m_print, [](unsigned c) { return c >= 0x20 && c <= 0x7e; }},
+    {*m_graph, is_graph},
+    {*m_cntrl, [](unsigned c) { return c <= 0x1f || c == 0x7f; }},
+    {*m_punct, [&](unsigned c) { return is_graph(c) && !is_alnum(c); }},
+    {*m_alnum, is_alnum}};
+  if(m_blank.has_value())
+  {
+    bool duplicate = false;
+    for(const auto &k : classes)
+      duplicate = duplicate || k.mask == *m_blank;
+    if(!duplicate)
+    {
+      classes.push_back(
+        {*m_blank, [](unsigned c) { return c == ' ' || c == '\t'; }});
+    }
+  }
+  unsigned all_bits = 0;
+  for(const auto &k : classes)
+    all_bits |= k.mask;
   for(unsigned c = 0; c < table_size; ++c)
   {
     unsigned m = 0;
-    const bool upper = c >= 'A' && c <= 'Z';
-    const bool lower = c >= 'a' && c <= 'z';
-    const bool digit = c >= '0' && c <= '9';
-    const bool alpha = upper || lower;
-    const bool space =
-      c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f' || c == '\r';
-    const bool print = c >= 0x20 && c <= 0x7e;
-    const bool graph = c >= 0x21 && c <= 0x7e;
-    const bool cntrl = c <= 0x1f || c == 0x7f;
-    const bool xdigit =
-      digit || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
-    const bool alnum = alpha || digit;
-    const bool punct = graph && !alnum;
-    const bool blank = c == ' ' || c == '\t';
-    if(upper)
-      m |= m_upper;
-    if(lower)
-      m |= m_lower;
-    if(alpha)
-      m |= m_alpha;
-    if(digit)
-      m |= m_digit;
-    if(xdigit)
-      m |= m_xdigit;
-    if(space)
-      m |= m_space;
-    if(print)
-      m |= m_print;
-    if(graph)
-      m |= m_graph;
-    if(blank)
-      m |= m_blank;
-    if(cntrl)
-      m |= m_cntrl;
-    if(punct)
-      m |= m_punct;
-    if(alnum)
-      m |= m_alnum;
+    for(unsigned bit = 1; bit != 0 && bit <= all_bits; bit <<= 1)
+    {
+      if((all_bits & bit) == 0)
+        continue;
+      bool in_all = true;
+      for(const auto &k : classes)
+      {
+        if((k.mask & bit) != 0 && !k.contains(c))
+          in_all = false;
+      }
+      if(in_all && c < 128)
+        m |= bit;
+    }
     entries.push_back(from_integer(m, mask_type));
   }
   array_exprt table_value{std::move(entries), table_type};
@@ -463,8 +656,11 @@ static exprt provide_classic_ctype_char_model(
     }
     return false;
   };
-  if(!set_component(*facet_zero, facet_type, "_M_table", table_address))
+  if(!set_component(
+       *facet_zero, facet_type, layout.table_member, table_address))
+  {
     return nil_exprt{};
+  }
 
   // N5008 [facet.ctype.char.virtuals]/1, [facet.ctype.virtuals]/11: in the
   // "C" locale do_widen and do_narrow apply the simplest reasonable
@@ -1769,6 +1965,7 @@ void cpp_typecheckt::provide_stdlib_bodies()
       function_names.push_back(named_symbol.first);
   }
 
+  const auto ctype_layout = ctype_char_layout(symbol_table);
   for(const irep_idt &function_name : function_names)
   {
     symbolt &symbol = symbol_table.get_writeable_ref(function_name);
@@ -1785,7 +1982,9 @@ void cpp_typecheckt::provide_stdlib_bodies()
     {
       if(
         (base.find("__try_use_facet") == 0 || base.find("use_facet") == 0) &&
-        name.find("<std::tag-ctype<char>>") != std::string::npos &&
+        ctype_layout.has_value() &&
+        name.find("<" + id2string(ctype_layout->class_name) + ">") !=
+          std::string::npos &&
         to_code_type(symbol.type).return_type().id() == ID_pointer)
       {
         // Override the header-inline body, which reads the invisible
@@ -1797,7 +1996,8 @@ void cpp_typecheckt::provide_stdlib_bodies()
         // use_facet<_Facet>(const locale&) reads the table itself and
         // returns `const _Facet&' (a pointer here), so it is overridden the
         // same way.
-        exprt facet = provide_classic_ctype_char_model(symbol_table, ns);
+        exprt facet =
+          provide_classic_ctype_char_model(symbol_table, ns, *ctype_layout);
         // N5008 [locale.ctype.members]: tolower/toupper call the virtual
         // do_tolower/do_toupper; the modelled object needs the vtable
         // pointer of a complete ctype<char> (the virtuals are modelled in
@@ -2155,6 +2355,26 @@ void cpp_typecheckt::provide_stdlib_bodies()
     //     __locale_ is null (the global "C" locale, [locale.cons]/2) or the
     //     other's ([locale.cons]/7); the destructor releases a reference
     //     ([locale.cons]/9): no-op.
+    // The MSVC STL's locale::_Init(bool), defined in its runtime library,
+    // yields the implementation object of the global locale.  As for
+    // libc++ below, a null implementation denotes the global "C" locale
+    // ([locale.cons]/1, [locale.general]/8); the facet accessors are modelled
+    // (provide_classic_ctype_char_model) and ~locale() releases nothing
+    // for a null pointer.
+    if(
+      symbol.value.is_nil() && name == "std::locale::_Init(bool)" &&
+      to_code_type(symbol.type).return_type().id() == ID_pointer)
+    {
+      ensure_parameter_symbols(symbol, symbol_table);
+      code_blockt block;
+      block.add(code_frontend_returnt{null_pointer_exprt{
+        to_pointer_type(to_code_type(symbol.type).return_type())}});
+      symbol.value = std::move(block);
+      symbol.value.type() = symbol.type;
+      deferred_typechecking.erase(symbol.name);
+      continue;
+    }
+
     if(
       symbol.value.is_nil() &&
       (name == "std::__1::ios_base::init(this,ptr_void)" ||
