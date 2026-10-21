@@ -1,0 +1,18 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ 1 reference variable: SUCCESS$
+^\[main\.assertion\.2\] line \d+ 2 reference member: SUCCESS$
+^\[main\.assertion\.3\] line \d+ 3 function name: SUCCESS$
+^\[main\.assertion\.4\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+A member access whose type was a function type was taken to name a member
+function, whose symbol was then looked up; a reference-to-function data
+member has none, so type checking stopped ("name not found in
+symbol_table").
