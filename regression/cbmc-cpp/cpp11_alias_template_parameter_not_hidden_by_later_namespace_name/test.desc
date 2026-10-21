@@ -1,4 +1,4 @@
-KNOWNBUG
+CORE
 main.cpp
 --cpp17
 ^\[main\.assertion\.1\] line \d+ call: SUCCESS$
@@ -10,14 +10,8 @@ main.cpp
 ^warning: ignoring
 ^CONVERSION ERROR$
 --
-Root cause: when enable_if_t<...> is instantiated here, its body
-`typename enable_if<B, T>::type' is resolved in the scope of the template's
-declaration (the global namespace), not in a scope holding the template
-parameters, so `B' finds the namespace-scope `using B = binder<...>'
-("symbol 'B' does not uniquely resolve"), deduction fails and R2 is
-unknown.  Renaming the global B makes the test pass.  The fix belongs in
-instantiate_template's handling of alias and function templates, which
-must look template parameters up before the enclosing scope.  Found while
-reducing the MSVC std::function-from-std::bind failure
-(cpp11_std_bind_to_std_function); that failure persists when MSVC's
-enable_if_t parameters are renamed, so it has another cause.
+The instantiation scope of a template uses the namespace enclosing the
+template (sub_scope_for_instantiation), and lookup searched that using
+scope before the template parameter scope, so `B' in enable_if_t's body
+found the later namespace-scope `using B = binder<...>' instead of the
+parameter.

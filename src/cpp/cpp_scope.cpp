@@ -64,6 +64,17 @@ void cpp_scopet::lookup_rec(
   if(kind == SCOPE_ONLY)
     return;
 
+  // N5008 [basic.scope.temp]/2, [basic.lookup.unqual]/1: an instantiation
+  // scope of a template is nested in the template parameter scope, so an
+  // unqualified name finds a template parameter before the declarations of
+  // the namespace the template's scope uses (sub_scope_for_instantiation).
+  if(kind == RECURSIVE && parameters_hide_using_scopes(base_name_to_lookup))
+  {
+    get_parent().lookup_rec(base_name_to_lookup, SCOPE_ONLY, id_set, visited);
+    if(!id_set.empty())
+      return;
+  }
+
   // Use cached lookups for using/secondary scopes.
   for(const auto &s_ptr : using_scopes)
   {
@@ -140,6 +151,18 @@ void cpp_scopet::lookup_rec(
   if(kind==SCOPE_ONLY)
     return; // done
 
+  // see the unfiltered lookup_rec: template parameters first
+  if(
+    !already_visited && kind == RECURSIVE &&
+    identifier_class == id_classt::TEMPLATE_PARAMETER &&
+    parameters_hide_using_scopes(base_name_to_lookup))
+  {
+    get_parent().lookup_rec(
+      base_name_to_lookup, SCOPE_ONLY, identifier_class, id_set, visited);
+    if(!id_set.empty())
+      return;
+  }
+
   if(!already_visited)
   {
     // using scopes
@@ -189,6 +212,23 @@ void cpp_scopet::lookup_rec(
   if(!is_root_scope())
     get_parent().lookup_rec(
       base_name_to_lookup, kind, identifier_class, id_set, visited);
+}
+
+/// Whether this is the scope of a template instantiation whose parent, the
+/// template parameter scope, declares \p base_name: such a parameter is
+/// found before anything in the using scopes.
+bool cpp_scopet::parameters_hide_using_scopes(
+  const irep_idt &base_name_to_lookup) const
+{
+  if(
+    id_class != id_classt::TEMPLATE_SCOPE || using_scopes.empty() ||
+    is_root_scope())
+  {
+    return false;
+  }
+  const cpp_scopet &parent = get_parent();
+  return parent.id_class == id_classt::TEMPLATE_SCOPE &&
+         parent.sub.find(base_name_to_lookup) != parent.sub.end();
 }
 
 cpp_scopet::id_sett cpp_scopet::lookup_identifier(
