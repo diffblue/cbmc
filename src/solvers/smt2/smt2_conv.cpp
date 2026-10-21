@@ -3317,10 +3317,12 @@ void smt2_convt::convert_typecast(const typecast_exprt &expr)
           from_width < to_integer_bits,
           "from_width should be smaller than to_integer_bits as other case "
           "have been handled above");
-        if(dest_type.id()==ID_unsignedbv)
+        if(
+          src_type.id() == ID_unsignedbv ||
+          (src_type.id() == ID_c_enum &&
+           to_c_enum_type(src_type).underlying_type().id() == ID_unsignedbv))
         {
-          out << "(_ zero_extend "
-              << (to_integer_bits-from_width) << ") ";
+          out << "((_ zero_extend " << (to_integer_bits - from_width) << ") ";
           convert_expr(src);
           out << ")";
         }
