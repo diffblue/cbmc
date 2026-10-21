@@ -212,6 +212,8 @@ public:
   }
 
 protected:
+  bool parameters_hide_using_scopes(const irep_idt &base_name_to_lookup) const;
+
   typedef std::unordered_set<const cpp_scopet *> visited_sett;
 
   void lookup_rec(const irep_idt &base_name, lookup_kindt kind, id_sett &);
