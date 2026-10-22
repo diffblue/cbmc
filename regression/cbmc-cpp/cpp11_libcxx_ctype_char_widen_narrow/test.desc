@@ -1,0 +1,19 @@
+CORE libcxx
+main.cpp
+--stdlib libc++ --cpp11 --object-bits 12
+^\[main\.assertion\.1\] line \d+ widen: SUCCESS$
+^\[main\.assertion\.2\] line \d+ narrow: SUCCESS$
+^\[main\.assertion\.3\] line \d+ widen of a range returns its end: SUCCESS$
+^\[main\.assertion\.4\] line \d+ widened range: SUCCESS$
+^\[main\.assertion\.5\] line \d+ narrowed range: SUCCESS$
+^\[main\.assertion\.6\] line \d+ WRONG \(must FAIL\): FAILURE$
+^\*\* 1 of \d+ failed
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+libc++ defines ctype<char>'s do_widen and do_narrow in its shared library;
+without a model the calls of the classic facet returned arbitrary values.

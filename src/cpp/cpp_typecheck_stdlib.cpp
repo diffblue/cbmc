@@ -1755,6 +1755,24 @@ static const std::map<std::string, std::string> &library_source_models()
     // data release storage only; the program cannot observe it (their
     // parameters are unnamed, so the storage is not freed here)
     {"std::ios_base::_Ios_base_dtor", "{ }"},
+    // the MSVC runtime's exception data (vcruntime_exception.h, the
+    // runtime's std_exception.cpp): a message the exception owns
+    // (_DoFree) is a copy it frees on destruction; N5008 [exception]/2, an
+    // exception and its copy have equal what() strings.  A failed allocation
+    // of the copy leaves the message null, as the runtime does.
+    {"__std_exception_copy",
+     "{ if(!_From->_DoFree || _From->_What == nullptr) {"
+     " _To->_What = _From->_What; _To->_DoFree = false; return; }"
+     " " CPROVER_PREFIX "size_t __n = 0; while(_From->_What[__n] != 0) ++__n;"
+     " char *__p = (char *)malloc(__n + 1);"
+     " if(__p == nullptr) { _To->_What = nullptr; _To->_DoFree = false;"
+     " return; }"
+     " for(" CPROVER_PREFIX "size_t __i = 0; __i <= __n; ++__i)"
+     " __p[__i] = _From->_What[__i];"
+     " _To->_What = __p; _To->_DoFree = true; }"},
+    {"__std_exception_destroy",
+     "{ if(_Data->_DoFree) free(const_cast<char *>(_Data->_What));"
+     " _Data->_What = nullptr; _Data->_DoFree = false; }"},
     {"std::locale::_Locimp::_Locimp_dtor", "{ }"},
     // the MSVC runtime's filesystem conversions (xfilesystem_abi.h),
     // MultiByteToWideChar / WideCharToMultiByte: N5008 [fs.path.type.cvt]/1,
@@ -1782,6 +1800,28 @@ static const std::map<std::string, std::string> &library_source_models()
      " for(int __i = 0; __i < _Input_len; ++__i)"
      " _Output_str[__i] = (char)_Input_str[__i]; }"
      " return {_Input_len, (__std_win_error)0}; }"},
+    // the MSVC runtime's code page of the narrow encoding (GetACP, or UTF-8
+    // with the UTF-8 process code page): N5008 [fs.path.type.cvt]/1, the
+    // native narrow encoding is the operating system's current one, so any
+    // code page.  The conversion models above treat every code page alike.
+    {"__std_fs_code_page",
+     "{ unsigned int __c; " CPROVER_PREFIX "havoc_object(&__c);"
+     " return (__std_code_page)__c; }"},
+    // libc++ src/locale.cpp, the virtuals of ctype<char>: N5008
+    // [facet.ctype.char.virtuals]/1, [locale.ctype.virtuals]/11 and /13:
+    // do_widen and do_narrow apply the simplest reasonable transformation,
+    // for char to char the identity.
+    {"std::__1::ctype<char>::do_widen($constthis,char)", "{ return __c; }"},
+    {"std::__1::ctype<char>::do_widen($constthis,ptr_const_char,ptr_const_char,"
+     "ptr_char)",
+     "{ for(; __low != __high; ++__low, ++__to) *__to = *__low;"
+     " return __high; }"},
+    {"std::__1::ctype<char>::do_narrow($constthis,char,char)",
+     "{ return __c; }"},
+    {"std::__1::ctype<char>::do_narrow($constthis,ptr_const_char,"
+     "ptr_const_char,char,ptr_char)",
+     "{ for(; __low != __high; ++__low, ++__to) *__to = *__low;"
+     " return __high; }"},
     // libc++ src/string.cpp: N5008 [string.conversions]/7, to_string of an
     // integer is its decimal representation, with a '-' if negative
     // (format("{}", val): [format.string.std]/21, Table 105, type none = d)
