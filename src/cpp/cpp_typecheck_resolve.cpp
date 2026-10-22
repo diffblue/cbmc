@@ -13185,11 +13185,16 @@ exprt cpp_typecheck_resolvet::guess_function_template_args(
       // Outside every function body (a namespace-scope alias or
       // variable's `decltype(f(tup<int, char>()))') there is no such call
       // to fold, and the instance must have the deduced arity as well.
+      // So must a call that is not in a constant expression at all, such as
+      // one in the body of a function with a deduced return type converted
+      // early to form a type at namespace scope ([dcl.spec.auto.general]/12:
+      // `using R = decltype(g())').
       if(
         derived_to_base_deduced_packs.find(pack_id) ==
           derived_to_base_deduced_packs.end() &&
         !cpp_typecheck.instantiating_deferred_body &&
-        !cpp_typecheck.functions_being_typechecked.empty())
+        !cpp_typecheck.functions_being_typechecked.empty() &&
+        cpp_typecheck.constant_expression_context > 0)
         continue;
       const auto pa_it = cpp_typecheck.template_map.pack_args_map.find(pack_id);
       if(pa_it == cpp_typecheck.template_map.pack_args_map.end())
