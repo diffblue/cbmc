@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp14 --unwind 1 --no-unwinding-assertions
+^\[main\.assertion\.1\] line 46 local array: SUCCESS$
+^\[main\.assertion\.2\] line 47 member array: SUCCESS$
+^\[main\.assertion\.3\] line 48 through a pointer: SUCCESS$
+^\[main\.assertion\.4\] line 49 WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The three constants are constant-initialized ([basic.start.static]/2);
+--unwind 1 would cut their loops if they ran at run time, making main
+unreachable.
