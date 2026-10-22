@@ -1709,6 +1709,11 @@ public:
     const typet &to,
     exprt &new_expr);
 
+  std::optional<exprt> construct_elements_in_place(
+    const exprt::operandst &elements,
+    const symbol_exprt &array,
+    const array_typet &array_type,
+    const source_locationt &source_location);
   symbol_exprt initializer_list_backing_array(
     exprt::operandst elements,
     const array_typet &array_type,

@@ -75,8 +75,8 @@ int main()
   __CPROVER_assert(count_points({{1, 2}, {3, 4}}) == 10, "class elements");
   __CPROVER_assert(count_aggregates({{1, 2}, {3, 4}}) == 2, "aggregates");
   __CPROVER_assert(count_pairs({{1, 2}, {3, 4}}) == 14, "std::pair elements");
-  json_objectt o({{"name", jsont(2)}, {"loc", jsont(3)}});
+  json_objectt o({{"n", jsont(2)}, {"l", jsont(3)}});
   __CPROVER_assert(o.object.size() == 2, "map value_type elements");
-  __CPROVER_assert(o.object["loc"].kind == 3, "the entries");
+  __CPROVER_assert(o.object["l"].kind == 3, "the entries");
   return 0;
 }

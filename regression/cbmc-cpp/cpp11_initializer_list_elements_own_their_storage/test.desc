@@ -1,0 +1,15 @@
+CORE
+main.cpp
+--cpp11 --object-bits 12 --unwind 4 --no-unwinding-assertions
+^\[main.assertion.1\] line 45 own buffer: SUCCESS$
+^\[main.assertion.2\] line 46 through the pointer: SUCCESS$
+^\[main.assertion.3\] line 49 string: SUCCESS$
+^\[main.assertion.4\] line 53 map from a list bound to a reference: SUCCESS$
+^\[main.assertion.5\] line 54 WRONG \(must FAIL\): FAILURE$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+The backing array's elements are constructed in place; copying the
+constructor temporaries kept their pointers into the temporaries.
