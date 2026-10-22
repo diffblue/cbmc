@@ -12030,8 +12030,9 @@ cpp_declaratort cpp_typecheck_resolvet::expand_enclosing_class_packs(
     for(const auto &element : *elements)
     {
       irept copy = p;
-      auto &cdecl = static_cast<cpp_declarationt &>(copy);
-      auto &d = cdecl.declarators().front();
+      // not `cdecl': Visual Studio defines it as a calling convention
+      auto &declaration = static_cast<cpp_declarationt &>(copy);
+      auto &d = declaration.declarators().front();
       d.remove(ID_ellipsis);
       d.type().remove(ID_ellipsis);
       std::function<void(irept &)> subst = [&](irept &n)
@@ -12049,7 +12050,7 @@ cpp_declaratort cpp_typecheck_resolvet::expand_enclosing_class_packs(
         for(auto &ns : n.get_named_sub())
           subst(ns.second);
       };
-      subst(cdecl.type());
+      subst(declaration.type());
       subst(d.type());
       expanded.push_back(std::move(copy));
     }
