@@ -288,6 +288,13 @@ jobs:
           ls *.deb
       - name: Run tests
         run: cd build; ctest . -V -L CORE -j${{env.linux-vcpus}}
+      - name: Check that C++ tests expecting success are not vacuous
+        # The end of main must be reachable: a test whose bounds cut every
+        # path passes whatever it asserts (scripts/check_vacuity.py).
+        run: |
+          python3 scripts/check_vacuity.py -c build/bin/cbmc \
+            -j${{env.linux-vcpus}} -X libstdcxx16 -X broken-libstdcxx16 \
+            regression/cbmc-cpp regression/systemc
       - name: Check cleanup
         run: |
           cmake --build build --target clean
