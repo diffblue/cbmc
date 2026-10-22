@@ -15150,3 +15150,50 @@ Open:
 - _Lockit (cpp11_locale_ctype_facet), cpp11_ofstream_from_string timeout,
   macOS 14 deque/typeid tests, and artifacts that predate source fixes
   (7 on VS 2022) or _USE_STD_VECTOR_ALGORITHMS=0 (3).
+
+## Round 196 (open items after 671b606d65)
+
+Each fix has a hand-written test that fails on binW174 (or binW175 before
+the fix), checked with g++ 13 and clang++ 18; MSVC- and Darwin-only shapes
+are hand-written headers run with --winx64 / --os macos --arch arm64.
+- Lookup in an instantiation scope finds a template parameter before the
+  namespace the template's scope uses ([basic.scope.temp]/2,
+  [basic.lookup.unqual]/1, e99acef994); the round-195 KNOWNBUG is CORE.
+- A function type's trailing return type names its parameters when it is
+  formed during deduction ([basic.scope.param]/1, 62824540f6, MSVC
+  _Call_binder: std::function from std::bind verifies).
+- A reference-to-function data member ([expr.ref]/7, 5a6ebff3ae, _Binder).
+- A friend declaration does not bind the name of a non-template function
+  either ([dcl.meaning.general]/2.1, 06d18488bf); Friend1 was ill-formed
+  and is corrected.
+- The access check of a resolved member found the class of `ns::C::f' as
+  `tag-ns::C'; deleted members of namespace classes were callable, so
+  libc++'s ranges::range held for every class ([dcl.fct.def.delete]/2,
+  025e9645e6, macOS `arr | views::take(3)').
+- The classic ctype<char> model reads the library's table member and masks
+  (libc++ __tab_, MSVC _Ctype._Table, enumerators, VS 2026's
+  _Ctype_constants_base), and MSVC's locale::_Init returns the "C" locale
+  ([locale.cons]/1, 5f8dfcf2d7).
+- Simplifier: bitwise operators merge all constant operands (c6c5eba0cb);
+  typeid's integer name on arm64 Darwin is marked unique ([type.info]/2,
+  a99fbc2e28): cpp17_typeid_basic no longer unwinds strcmp forever.
+- Member function templates differing only in the return type
+  ([temp.over.link]/3, 5b52ac75fe, libc++ __split_buffer, macOS 14 deque).
+- `auto x{e}' deduces the type of e ([dcl.type.auto.deduct]/2.2.2,
+  429a732349); at block scope it was an array of one element, which
+  dropped <__msvc_int128.hpp> bodies in every VS 2026 translation unit.
+- --object-bits 12 for two std::vector tests under libc++ 17 (c311413f38).
+
+Artifacts (CI run 6, same harness as round 195, binW174 -> binW175):
+VS 2022 16 -> 13 of 103, VS 2026 19 -> 11 of 108, macOS 15 4 -> 0 of 24,
+macOS 14 8 -> 0 of 26.
+
+Open:
+- MSVC: is_invocable_v over a std::bind result at namespace scope (inside
+  a function it holds); the C-Vise reductions are ill-formed under strict
+  clang.  cpp11_ofstream_from_string now finishes but fails in the
+  filebuf/locale paths of the runtime library (locale::_Locimp is null in
+  the "C"-locale model).  cpp17_string_find (_Traits_find_ch pointer
+  subtraction), cpp11_nested_braces_user_ctor_class (memcmp harness).
+- Artifacts that predate source fixes (7 on each VS set) or
+  _USE_STD_VECTOR_ALGORITHMS=0 (cpp20_vector_find, cpp20_erase_if).
