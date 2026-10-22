@@ -1,4 +1,4 @@
-KNOWNBUG x86-preprocessing
+KNOWNBUG
 main.ii
 --winx64 --cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
