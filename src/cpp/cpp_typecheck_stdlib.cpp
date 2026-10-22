@@ -1714,6 +1714,18 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ return _Lhs == _Rhs ? 0 :"
      " ((unsigned long long)_Lhs < (unsigned long long)_Rhs ? -1 : 1); }"},
     {"__std_type_info_hash", "{ return (unsigned long long)_Data; }"},
+    // the MSVC runtime's locale implementation (locale0.cpp): N5008
+    // [locale.cons]/1, [locale.general]/8 -- the global locale is the "C"
+    // locale.  It is one implementation object with no facets of its own
+    // (_Getfacet then yields none, and use_facet the facets modelled
+    // separately, provide_classic_ctype_char_model), constructed once and
+    // never released: the reference of its construction is the global
+    // locale's own, which no locale gives up, so the count of the locales
+    // denoting it never reaches zero.
+    {"std::locale::_Init",
+     "{ static _Locimp __global(false); if(_Do_incref) __global._Incref();"
+     " return &__global; }"},
+    {"std::locale::_Getgloballocale", "{ return _Init(false); }"},
     // the MSVC runtime's filesystem conversions (xfilesystem_abi.h),
     // MultiByteToWideChar / WideCharToMultiByte: N5008 [fs.path.type.cvt]/1,
     // the native narrow encoding is converted to the native wide one.  For
@@ -2381,26 +2393,6 @@ void cpp_typecheckt::provide_stdlib_bodies()
     //     __locale_ is null (the global "C" locale, [locale.cons]/2) or the
     //     other's ([locale.cons]/7); the destructor releases a reference
     //     ([locale.cons]/9): no-op.
-    // The MSVC STL's locale::_Init(bool), defined in its runtime library,
-    // yields the implementation object of the global locale.  As for
-    // libc++ below, a null implementation denotes the global "C" locale
-    // ([locale.cons]/1, [locale.general]/8); the facet accessors are modelled
-    // (provide_classic_ctype_char_model) and ~locale() releases nothing
-    // for a null pointer.
-    if(
-      symbol.value.is_nil() && name == "std::locale::_Init(bool)" &&
-      to_code_type(symbol.type).return_type().id() == ID_pointer)
-    {
-      ensure_parameter_symbols(symbol, symbol_table);
-      code_blockt block;
-      block.add(code_frontend_returnt{null_pointer_exprt{
-        to_pointer_type(to_code_type(symbol.type).return_type())}});
-      symbol.value = std::move(block);
-      symbol.value.type() = symbol.type;
-      deferred_typechecking.erase(symbol.name);
-      continue;
-    }
-
     if(
       symbol.value.is_nil() &&
       (name == "std::__1::ios_base::init(this,ptr_void)" ||
