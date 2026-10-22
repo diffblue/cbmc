@@ -473,11 +473,75 @@ public:
     return st.data_component_number(to_member_expr(e).get_component_name());
   }
 
+  /// The tracked value an lvalue \p e designates: a local variable, a
+  /// member of the object under construction (`this->m'), or an element
+  /// of an array designated so (`this->d[i][j]', `a[i]'), with constant
+  /// in-bounds indices; nullptr otherwise.  An array that is all one value
+  /// (`array_of', from value-initialization) is expanded first.
+  exprt *tracked_object(const exprt &e)
+  {
+    if(const auto idx = this_member_index(e))
+    {
+      exprt &obj = vars.at(this_id);
+      return *idx < obj.operands().size() ? &obj.operands()[*idx] : nullptr;
+    }
+    if(e.id() == ID_symbol)
+    {
+      const auto it = vars.find(to_symbol_expr(e).get_identifier());
+      return it == vars.end() ? nullptr : &it->second;
+    }
+    if(e.id() != ID_index)
+      return nullptr;
+    exprt *array = tracked_object(to_index_expr(e).array());
+    if(array == nullptr)
+      return nullptr;
+    if(array->id() == ID_array_of && array->type().id() == ID_array)
+    {
+      const auto size =
+        numeric_cast<mp_integer>(to_array_type(array->type()).size());
+      if(!size.has_value() || *size > 65536)
+        return nullptr;
+      const exprt element = to_array_of_expr(*array).what();
+      exprt::operandst elements(numeric_cast_v<std::size_t>(*size), element);
+      *array = array_exprt{std::move(elements), to_array_type(array->type())};
+    }
+    if(array->id() != ID_array)
+      return nullptr;
+    const exprt index = eval(to_index_expr(e).index());
+    const auto i = index.is_constant()
+                     ? numeric_cast<mp_integer>(to_constant_expr(index))
+                     : std::nullopt;
+    // [expr.const]/5.8: undefined behaviour is not a constant expression
+    if(!i.has_value() || *i < 0 || *i >= mp_integer{array->operands().size()})
+      return nullptr;
+    return &array->operands()[numeric_cast_v<std::size_t>(*i)];
+  }
+
   bool apply_side_effect(const exprt &e)
   {
     if(e.id() != ID_side_effect)
       return true; // no effect to apply (e.g. a plain expression)
     const irep_idt &st = e.get(ID_statement);
+    // N5008 [expr.const]/5 (C++14 relaxed constexpr), [expr.ass]: an
+    // assignment to an element of an array member of the object under
+    // construction or of a local array, also of a multidimensional one
+    // (`this->_Data[_Idx][0] = c' in the MSVC STL's _Digit_pair_table
+    // constructor)
+    if(
+      st == ID_assign && e.operands().size() == 2 &&
+      e.operands()[0].id() == ID_index)
+    {
+      exprt *element = tracked_object(e.operands()[0]);
+      if(element == nullptr)
+        return false;
+      exprt rhs = eval(e.operands()[1]);
+      if(!is_constant_value(rhs, symbol_table))
+        return false;
+      const typet element_type = element->type();
+      *element = typecast_exprt::conditional_cast(rhs, element_type);
+      simplify(*element, ns);
+      return true;
+    }
     // `this->m = v` ([class.base.init]: a mem-initializer, lowered to an
     // assignment through `this`; or an assignment in the constructor body)
     if(st == ID_assign && e.operands().size() == 2)
@@ -1122,7 +1186,7 @@ public:
     if(code.get_statement() == ID_assign)
     {
       const auto &lhs = code.op0();
-      if(this_member_index(lhs))
+      if(this_member_index(lhs) || lhs.id() == ID_index)
       {
         side_effect_exprt as_effect{
           ID_assign, lhs.type(), code.source_location()};
