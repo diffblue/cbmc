@@ -15197,3 +15197,48 @@ Open:
   subtraction), cpp11_nested_braces_user_ctor_class (memcmp harness).
 - Artifacts that predate source fixes (7 on each VS set) or
   _USE_STD_VECTOR_ALGORITHMS=0 (cpp20_vector_find, cpp20_erase_if).
+
+## Round 197 (open items after dfac5ff07e)
+
+Each fix has a hand-written test that fails on binW175, checked with g++ 13
+and clang++ 18 where it is portable C++ (MSVC-runtime shapes are run with
+--winx64).
+- Byte-operator lowering clamps a negative constant offset
+  (96823f7108): the solver aborted in unpack_array_vector.
+- Constant evaluation assigns to elements of member arrays
+  ([basic.start.static]/2, [expr.const]/5, 0b291507dc).  The MSVC STL's
+  constexpr _Digit_pairs was initialized at startup instead, and its
+  100-iteration loop was cut by --unwind 8/10: every VS 2026 artifact
+  using <xutility> had an unreachable main, so W175's VS 2026 passes of
+  cpp17_string_find and cpp11_ofstream_from_string were vacuous.
+- MSVC runtime models: __std_fs_convert_narrow_to_wide / _wide_to_narrow
+  ([fs.path.type.cvt]/1, ae870e6fb2); locale::_Init and _Getgloballocale
+  return one static _Locimp ([locale.cons]/1, 3f257a6971), replacing the
+  null implementation of round 196.
+- A deduced pack is expanded outside constant expressions
+  ([temp.deduct.call]/1, c07ba1063f): is_invocable_v over an MSVC
+  std::bind result at namespace scope holds.
+- The C library's _InterlockedIncrement model was never linked (its
+  FUNCTION marker read __InterlockedIncrement, eca287a58d).
+- `delete p' with p null calls no destructor ([expr.delete]/5,
+  4a6d2c1b85); with a virtual destructor it read the vtable through p.
+
+Harness (/tmp/r186/pp/run_pp_mem.sh): the inserted memmove/memcpy use
+__CPROVER_array_copy/replace like CBMC's own models (the loops were cut by
+--unwind), __builtin_memcmp is defined, and the original #line numbering
+is kept after the inserted lines (insert_memdefs.py).  With it,
+cpp11_nested_braces_user_ctor_class and cpp17_function_optional_lambda
+pass.
+
+Artifacts (CI run 6, the updated harness for both binaries, W175 -> W176):
+VS 2022 10 -> 10 failing (cpp17_filesystem_path_from_string now counted
+and passing), VS 2026 9 -> 10, where W175's 9 includes two vacuous passes
+(see above); macOS 15 0 of 24, macOS 14 0 of 26.
+
+Open: all remaining VS failures except cpp11_ofstream_from_string are
+artifacts made before source fixes (the wchar_t-size/guard edits of 7
+tests) or before _USE_STD_VECTOR_ALGORITHMS=0 (cpp20_vector_find,
+cpp17_string_find).  cpp11_ofstream_from_string with the MSVC STL: the
+dereference failures in _Tidy, setp/setg and swap follow reads of the
+filebuf through a virtual-base offset of the unmodelled _Fiopen result;
+there is no small reproducer yet.  The test passes with libstdc++.
