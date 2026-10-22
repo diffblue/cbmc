@@ -1714,6 +1714,32 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ return _Lhs == _Rhs ? 0 :"
      " ((unsigned long long)_Lhs < (unsigned long long)_Rhs ? -1 : 1); }"},
     {"__std_type_info_hash", "{ return (unsigned long long)_Data; }"},
+    // the MSVC runtime's filesystem conversions (xfilesystem_abi.h),
+    // MultiByteToWideChar / WideCharToMultiByte: N5008 [fs.path.type.cvt]/1,
+    // the native narrow encoding is converted to the native wide one.  For
+    // the characters of the basic character set ([lex.charset]/2), which
+    // every code page encodes as in ASCII, a character converts to the wide
+    // character of the same value; others are reported as unconvertible
+    // (ERROR_NO_UNICODE_TRANSLATION, 1113).  With no output buffer the
+    // result is the required length.
+    {"__std_fs_convert_narrow_to_wide",
+     "{ for(int __i = 0; __i < _Input_len; ++__i)"
+     " if((unsigned char)_Input_str[__i] >= 0x80)"
+     " return {0, (__std_win_error)1113};"
+     " if(_Output_len != 0) { if(_Output_len < _Input_len)"
+     " return {0, (__std_win_error)122};"
+     " for(int __i = 0; __i < _Input_len; ++__i)"
+     " _Output_str[__i] = (wchar_t)_Input_str[__i]; }"
+     " return {_Input_len, (__std_win_error)0}; }"},
+    {"__std_fs_convert_wide_to_narrow",
+     "{ for(int __i = 0; __i < _Input_len; ++__i)"
+     " if((unsigned)_Input_str[__i] >= 0x80)"
+     " return {0, (__std_win_error)1113};"
+     " if(_Output_len != 0) { if(_Output_len < _Input_len)"
+     " return {0, (__std_win_error)122};"
+     " for(int __i = 0; __i < _Input_len; ++__i)"
+     " _Output_str[__i] = (char)_Input_str[__i]; }"
+     " return {_Input_len, (__std_win_error)0}; }"},
     // libc++ src/string.cpp: N5008 [string.conversions]/7, to_string of an
     // integer is its decimal representation, with a '-' if negative
     // (format("{}", val): [format.string.std]/21, Table 105, type none = d)
