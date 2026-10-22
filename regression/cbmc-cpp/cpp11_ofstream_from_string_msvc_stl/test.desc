@@ -1,0 +1,22 @@
+KNOWNBUG x86-preprocessing
+main.ii
+--winx64 --cpp11 --object-bits 12 --unwind 10 --no-unwinding-assertions
+^\[main\.assertion\.1\] line \d+ ofstream from string converts: SUCCESS$
+^VERIFICATION SUCCESSFUL$
+^EXIT=0$
+^SIGNAL=0$
+--
+^warning: ignoring
+--
+cpp11_ofstream_from_string preprocessed with the MSVC STL of VS 2022
+(14.44.35207, CI artifact), with definitions of memcpy, memmove, memcmp,
+memset and strlen inserted before main: on Linux, --winx64 has no bodies
+for them.  It needs about 9 GB and 370 s, and reports 356 dereference
+failures; under CI's 2.5 GB limit it runs out of memory.
+Root cause, not yet isolated: basic_ofstream's move constructor swaps
+ios_base::_Ploc through the virtual base (_Assign_rv -> swap ->
+basic_ostream::swap -> basic_ios::swap); afterwards ~locale drops a
+reference count to zero and deletes the ctype<char> facet through a
+garbage locale pointer.  Hand-written virtual-base swaps verify.
+--unwind 10: with --unwind 5 the strlen of "out.txt" is cut and the end
+of main is unreachable.
