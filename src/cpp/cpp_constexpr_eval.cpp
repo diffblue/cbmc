@@ -13,6 +13,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include <util/arith_tools.h>
 #include <util/c_types.h>
+#include <util/expr_initializer.h>
 #include <util/namespace.h>
 #include <util/pointer_expr.h>
 #include <util/prefix.h>
@@ -405,7 +406,11 @@ public:
 
   // A tracked value: a scalar constant, or an aggregate of constants (the
   // `constexpr bool found[] = {__is_same(T, Ts)...}` local of libstdc++'s
-  // __find_uniq_type_in_pack, read back through `found[i]`).
+  // __find_uniq_type_in_pack, read back through `found[i]`).  N5008
+  // [expr.const]/2: the constituent values of an object are those of its
+  // subobjects, so an aggregate of aggregates of constants is a constant
+  // (the `type __table;' with an array member that libstdc++'s
+  // __from_chars_alnum_to_val_table<false>::_S_make_table fills in a loop).
   static bool is_constant_value(const exprt &e)
   {
     if(e.is_constant())
@@ -413,7 +418,7 @@ public:
     if(e.id() == ID_array || e.id() == ID_struct)
     {
       for(const auto &op : e.operands())
-        if(!op.is_constant())
+        if(!is_constant_value(op))
           return false;
       return true;
     }
@@ -490,6 +495,22 @@ public:
       const auto it = vars.find(to_symbol_expr(e).get_identifier());
       return it == vars.end() ? nullptr : &it->second;
     }
+    // a member of a tracked object of class type (`t.data' of a local `t')
+    if(e.id() == ID_member)
+    {
+      exprt *object = tracked_object(to_member_expr(e).compound());
+      if(object == nullptr || object->id() != ID_struct)
+        return nullptr;
+      const typet &object_type = object->type();
+      if(object_type.id() != ID_struct_tag)
+        return nullptr;
+      const struct_typet &st = ns.follow_tag(to_struct_tag_type(object_type));
+      const irep_idt &name = to_member_expr(e).get_component_name();
+      if(!st.has_component(name))
+        return nullptr;
+      const std::size_t n = st.data_component_number(name);
+      return n < object->operands().size() ? &object->operands()[n] : nullptr;
+    }
     if(e.id() != ID_index)
       return nullptr;
     exprt *array = tracked_object(to_index_expr(e).array());
@@ -529,7 +550,9 @@ public:
     // constructor)
     if(
       st == ID_assign && e.operands().size() == 2 &&
-      e.operands()[0].id() == ID_index)
+      (e.operands()[0].id() == ID_index ||
+       (e.operands()[0].id() == ID_member &&
+        !this_member_index(e.operands()[0]))))
     {
       exprt *element = tracked_object(e.operands()[0]);
       if(element == nullptr)
@@ -1186,7 +1209,9 @@ public:
     if(code.get_statement() == ID_assign)
     {
       const auto &lhs = code.op0();
-      if(this_member_index(lhs) || lhs.id() == ID_index)
+      if(
+        this_member_index(lhs) || lhs.id() == ID_index ||
+        (lhs.id() == ID_member && tracked_object(lhs) != nullptr))
       {
         side_effect_exprt as_effect{
           ID_assign, lhs.type(), code.source_location()};
@@ -1236,8 +1261,19 @@ public:
         }
         else if(sym.type().id() == ID_array || sym.type().id() == ID_struct_tag)
         {
-          failed = true;
-          return std::nullopt;
+          // N5008 [basic.indet]/1.2: the object starts with erroneous values,
+          // and reading one is not a constant expression ([expr.const]/10.8);
+          // assigning its elements first is (libstdc++'s `type __table;' in
+          // __from_chars_alnum_to_val_table<false>::_S_make_table).  Track it
+          // with nondet leaves: a result that still has one is not constant.
+          const auto erroneous =
+            nondet_initializer(sym.type(), code.source_location(), ns);
+          if(!erroneous.has_value())
+          {
+            failed = true;
+            return std::nullopt;
+          }
+          vars[sym.get_identifier()] = *erroneous;
         }
         else
           vars[sym.get_identifier()] = from_integer(0, sym.type());
