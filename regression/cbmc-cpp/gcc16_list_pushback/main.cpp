@@ -1,4 +1,4 @@
-// GCC 16's <list> implementation causes CBMC to time out.
+// std::list<int>::push_back with GCC 16's <list>
 #include <list>
 int main()
 {
