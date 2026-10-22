@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp11 --unwind 8 --no-unwinding-assertions
+--cpp11 --unwind 22 --no-unwinding-assertions
 ^\[main\.assertion\.1\] line \d+ raw string content length: SUCCESS$
 ^VERIFICATION SUCCESSFUL$
 ^EXIT=0$

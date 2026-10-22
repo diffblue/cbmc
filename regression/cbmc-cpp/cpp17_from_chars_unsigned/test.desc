@@ -1,6 +1,6 @@
 CORE
 main.cpp
---cpp17 --object-bits 12 --unwind 10 --no-unwinding-assertions
+--cpp17 --object-bits 12 --unwind 257 --no-unwinding-assertions
 ^EXIT=0$
 ^SIGNAL=0$
 ^VERIFICATION SUCCESSFUL$
@@ -11,3 +11,6 @@ main.cpp
 dropped the body
 --
 See cpp11_variadic_pack_element_under_cast for the header-free form.
+--unwind 257: libstdc++'s __from_chars_alnum_to_val_table<false> is built
+at run time by loops of 256, 10 and 26 iterations; a lower bound made the
+end of main unreachable.
