@@ -1,4 +1,4 @@
-CORE
+CORE x86-preprocessing
 main.ii
 --winx64 --cpp17
 ^\[main\.assertion\.1\] line \d+ intrinsics: SUCCESS$

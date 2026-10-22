@@ -55,6 +55,10 @@ This folder contains the CProver regression test-suite.
 - `gcc-only`:
   Tests that need `goto-cc` in gcc mode (excluded with MSVC or a non-GNU
   build compiler).
+- `x86-preprocessing`:
+  Tests that preprocess for an x86 target (`--winx64` makes cbmc run
+  `gcc -m64`), which GNU gcc for another architecture rejects; excluded on
+  such hosts (aarch64 Linux).
 
 ### Solver
 
