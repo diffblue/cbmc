@@ -2149,3 +2149,11 @@ facets, typeid on arm64, <__msvc_int128.hpp>); see
 No dog-food change.  Fixes reproduced from the CI run 6 MSVC artifacts
 (filesystem paths, std::bind traits, locales, delete of null); see
 .kiro/decltype_tuple_apply_findings.md, "Round 197".
+
+## Round 198 2026-10-22
+
+No dog-food change.  CI fixes (Windows build, systemc/EqualOp1, a lambda
+use-after-free on macOS, aarch64 preprocessing, a 32-bit byte-extract
+bound), a vacuity check over the cbmc-cpp suite and the CI artifacts, and
+the initializer_list backing-array fix it led to; see
+.kiro/decltype_tuple_apply_findings.md, "Round 198".

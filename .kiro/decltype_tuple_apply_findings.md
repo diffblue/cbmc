@@ -15242,3 +15242,92 @@ cpp17_string_find).  cpp11_ofstream_from_string with the MSVC STL: the
 dereference failures in _Tidy, setp/setg and swap follow reads of the
 filebuf through a virtual-base offset of the unmodelled _Fiopen result;
 there is no small reproducer yet.  The test passes with libstdc++.
+
+## Round 198
+
+CI for 25e5ae0517 ("Build and Test CBMC", run 39767421181): 13 of 21 jobs
+failed.  Causes and fixes:
+- All 3 Windows builds: `cdecl' is a calling-convention macro in Visual
+  Studio; a local of that name (460ec4f942) broke the build (7f1d45c869).
+- Every Linux and macOS job: systemc/EqualOp1 compares class objects
+  without operator==, which [expr.eq]/2 rejects since 047b68ee06; g++ and
+  clang++ reject it too.  The test now expects the error (21d5266646).
+  systemc was not in the local suite list; it is now.
+- Both macOS jobs: cpp11_lambda_returning_lambda and
+  cpp14_lambda_feature_matrix crashed (EXIT=139).  typecheck_expr_lambda
+  kept a reference to the expression's source location across replacing
+  the expression; valgrind showed the read of freed memory with this run's
+  macOS 15 artifact (3dfb527424).
+- ubuntu-24.04-arm: six --winx64 tests fail because gcc for aarch64 rejects
+  `-m64'.  New tag x86-preprocessing, excluded on such hosts (efbbceea95).
+- 32-bit job: byte_extract_negative_constant_offset ran out of memory.  The
+  byte bound offset+size was computed in a 32-bit size_t and wrapped to
+  4294967292 (41d22685f3; test-32.desc runs it with --32).
+- Every CMake job's new-SMT profile: union_pointer_array_member_field_
+  sensitive_value_set hits an invariant of the incremental SMT backend, on
+  develop as well; tagged no-new-smt (04c0cae0eb).
+- Performance Benchmarking: aws_priority_queue_push solver time 136 s ->
+  241 s, same 8365 steps and 440 VCCs.  Locally (develop d1451f2330 vs
+  W176, each with its own goto-cc, two runs each): 157 s vs 144 s solver,
+  identical 1502952 variables and 7927295 clauses; W173-W176 166-170 s.  No
+  regression is reproducible; the CI difference is runner noise.
+
+Vacuity check (/tmp/r198/vac.py: assert(0) before main's final return,
+which must fail).  Linux cbmc-cpp, 1055 CORE tests expecting VERIFICATION
+SUCCESSFUL: 1038 reached, 10 unreached; not checked: Linking1/2 (two
+source files) and 5 tests that expect a conversion error (selected by
+mistake).  A first pass also reported 43 tests whose main has `#if'
+alternatives, which the script now instruments in each.  The unreached:
+- --depth cut every path: cpp11_list_pushback, cpp11_shared_ptr,
+  cpp14_unique_ptr_basic, cpp17_memory_basic, gcc16_list_pushback.  Each
+  now runs without --depth in under 6 s with libstdc++ 13 and 16, libc++
+  and the MSVC STL.
+- --unwind below a literal's strlen: cpp11_string_basic,
+  cpp11_raw_string_embedded_quote; and the run-time construction of
+  libstdc++'s __from_chars_alnum_to_val_table: cpp17_from_chars_unsigned
+  (4104bbb1a8).
+- cpp11_initializer_list_of_class_elements_argument: with its strlen cut
+  removed, its map assertions FAILED.  A real bug: the elements of an
+  initializer_list's backing array were copies of constructor temporaries,
+  so std::string's pointer to its local buffer pointed into the dead
+  temporary, and map keys compared equal.  Elements are now constructed in
+  place ([dcl.init.list]/5), and a list bound to a reference to
+  initializer_list no longer drops their construction (3207a6420e).
+- catch_reference: false positive (every path returns inside try).
+Also found: the constexpr evaluator rejected a local of class type with an
+array member, or without initializer ([basic.indet]/1.2,
+[expr.const]/10.8; a5959441a1).  _S_make_table itself still is not folded:
+it writes through range-for references, which the evaluator does not
+track.
+
+Artifacts (W176): VS 2022 and VS 2026 1 and 4 unreached.  On VS 2026,
+cpp11_algorithm_verify and cpp17_algorithm_basic reach the end with
+--unwind 3 / without --depth, but then report a signed-overflow failure of
+`_First_ptr - _Last_ptr' in _Copy_backward_memmove: CBMC's pointer
+difference overflow check is wrong for a negative difference
+(`arr - (arr + 1)' in C fails it on develop d1451f2330 too).  origin/develop
+fixed it in #9229 (5a591ce68b, not yet in this branch), so these bounds stay
+until the branch is rebased.  cpp17_umap_emplace_mixed_categories needs
+more than --unwind 17 with the MSVC STL.
+
+Bodiless MSVC/UCRT functions reached (--no-body-assertions, W176): one test
+each except _Ios_base_dtor (2): the 11 of cpp11_ofstream_from_string
+(_Fiopen, _get_stream_buffer_pointers, fclose, _Lockit, _Facet_Register,
+_Locinfo_ctor/_dtor, _Locimp_dtor, _Ios_base_dtor, _Xruntime_error),
+__std_exception_destroy, __std_fs_code_page, __std_find_trivial_1/_4
+(stale artifacts).  macOS: libc++'s ctype<char>::do_narrow/do_widen and
+locale::use_facet (2 tests).  0290b3270d models _Fiopen,
+_get_stream_buffer_pointers, the lock guard, the facet registry and two
+runtime destructors.  With W177, four remain reached:
+__std_exception_destroy, __std_fs_code_page, __std_find_trivial_1/_4.
+
+Artifacts with W177 (run_pp_mem.sh / run_pp.sh): VS 2022 10 of 104 and
+VS 2026 10 of 113 fail (CI run 6 artifacts; this run built no Windows
+artifacts), the same tests as with W176; macOS 15 and macOS 14 0 of 4 (this
+run's artifacts).
+
+cpp11_ofstream_from_string (VS 2022, with the models): 8.9 GB, 382 s, still
+fails.  ~locale drops a reference count to zero and deletes a ctype<char>
+facet through a garbage locale pointer, after std::swap of
+ios_base::_Ploc in basic_ofstream's move constructor through a virtual
+base.  Hand-written reproducers of the virtual-base swap pass; not reduced.
