@@ -2143,3 +2143,9 @@ No dog-food change.  Fixes reproduced from the CI run 6 MSVC and macOS
 artifacts (std::bind to std::function, libc++ ranges and deque, locale
 facets, typeid on arm64, <__msvc_int128.hpp>); see
 .kiro/decltype_tuple_apply_findings.md, "Round 196".
+
+## Round 197 2026-10-22
+
+No dog-food change.  Fixes reproduced from the CI run 6 MSVC artifacts
+(filesystem paths, std::bind traits, locales, delete of null); see
+.kiro/decltype_tuple_apply_findings.md, "Round 197".
