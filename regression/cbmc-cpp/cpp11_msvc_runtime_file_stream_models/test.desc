@@ -1,4 +1,4 @@
-CORE
+CORE x86-preprocessing
 main.cpp
 --winx64 --cpp17 --no-body-assertions
 ^\[main\.assertion\.1\] line \d+ empty stream buffer: SUCCESS$

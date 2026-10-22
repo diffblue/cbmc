@@ -42,6 +42,14 @@ else
   excluded_libstdcxx += -X broken-libstdcxx16
 endif
 
+# `x86-preprocessing': the test preprocesses for an x86 target (--winx64:
+# gcc -m64), which GNU gcc for another architecture (aarch64) rejects
+ifneq ($(host_gcc_major),)
+  ifeq ($(filter x86_64 amd64 i386 i486 i586 i686,$(shell uname -m)),)
+    excluded_libstdcxx += -X x86-preprocessing
+  endif
+endif
+
 # Exclude libc++ tests when libc++ headers are not installed
 ifeq ($(wildcard /usr/include/c++/v1/vector),)
   ifeq ($(wildcard /Library/Developer/CommandLineTools/SDKs/*/usr/include/c++/v1/vector),)

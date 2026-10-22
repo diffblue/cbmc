@@ -52,6 +52,13 @@ else()
   list(APPEND gcc_only -X libstdcxx -X libstdcxx12 -X libstdcxx13 -X libstdcxx16)
 endif()
 
+# `x86-preprocessing': the test preprocesses for an x86 target (--winx64:
+# gcc -m64), which GNU gcc for another architecture (aarch64) rejects
+if(host_gcc_is_gnu AND
+   NOT CMAKE_SYSTEM_PROCESSOR MATCHES "^(x86_64|AMD64|amd64|i[3-6]86)$")
+  list(APPEND gcc_only -X x86-preprocessing)
+endif()
+
 # On GCC < 13, system header processing leaves more incomplete template
 # symbols that cause --validate-goto-model to crash. Run validation
 # only on GCC 13+ where headers are well-supported.
