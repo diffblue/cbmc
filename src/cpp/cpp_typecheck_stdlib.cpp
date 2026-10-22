@@ -1726,6 +1726,36 @@ static const std::map<std::string, std::string> &library_source_models()
      "{ static _Locimp __global(false); if(_Do_incref) __global._Incref();"
      " return &__global; }"},
     {"std::locale::_Getgloballocale", "{ return _Init(false); }"},
+    // the MSVC runtime's file streams (fiopen.cpp, the UCRT): N5008
+    // [filebuf.members]/2-4, opening a file may fail, and then open returns
+    // a null pointer.  As CBMC's model of fopen, _Fiopen either fails or
+    // yields a fresh FILE object; whether the named file exists is not
+    // known.
+    {"std::_Fiopen",
+     "{ bool __fail; " CPROVER_PREFIX "havoc_object(&__fail);"
+     " if(__fail) return nullptr; return (FILE *)malloc(sizeof(FILE)); }"},
+    // the UCRT's stream buffer of a FILE, which basic_filebuf<char> uses as
+    // its get and put areas ([streambuf.general]/2): a newly opened stream
+    // has an empty buffer (null base and current pointers, count zero), so
+    // the filebuf's own overflow and underflow do the input and output
+    {"_get_stream_buffer_pointers",
+     "{ static char *__b; static char *__p; static int __n;"
+     " __b = nullptr; __p = nullptr; __n = 0;"
+     " if(_Base) *_Base = &__b; if(_Pointer) *_Pointer = &__p;"
+     " if(_Count) *_Count = &__n; return 0; }"},
+    // the MSVC runtime's lock guard of the locale and stream machinery and
+    // its registry of facets destroyed at exit: within one thread of
+    // execution they have no effect the program can observe ([intro.races]
+    // concerns several threads; a program with several threads using
+    // locales is not modelled by these)
+    {"std::_Lockit::_Lockit", "{ }"},
+    {"std::_Lockit::~_Lockit", "{ }"},
+    {"std::_Facet_Register", "{ }"},
+    // the MSVC runtime's destructors of ios_base and locale implementation
+    // data release storage only; the program cannot observe it (their
+    // parameters are unnamed, so the storage is not freed here)
+    {"std::ios_base::_Ios_base_dtor", "{ }"},
+    {"std::locale::_Locimp::_Locimp_dtor", "{ }"},
     // the MSVC runtime's filesystem conversions (xfilesystem_abi.h),
     // MultiByteToWideChar / WideCharToMultiByte: N5008 [fs.path.type.cvt]/1,
     // the native narrow encoding is converted to the native wide one.  For
