@@ -23,6 +23,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 
 #include "itanium_abi_cpp_zero_initializer.h"
 
+#include <functional>
 #include <map>
 #include <optional>
 
@@ -619,6 +620,35 @@ public:
       vars.erase(scratch);
       return applied;
     }
+    // an assignment, compound assignment or increment through a reference
+    // or pointer to a subobject of a tracked local (`*e = 127' of a
+    // range-for over an array, see is_subobject_alias): apply it to the
+    // subobject through a scratch variable
+    if(
+      !e.operands().empty() && e.operands()[0].id() == ID_dereference &&
+      to_dereference_expr(e.operands()[0]).pointer().id() == ID_symbol)
+    {
+      const auto pointer_it =
+        vars.find(to_symbol_expr(to_dereference_expr(e.operands()[0]).pointer())
+                    .get_identifier());
+      exprt *object =
+        pointer_it == vars.end() ? nullptr : aliased_object(pointer_it->second);
+      if(object == nullptr)
+        return false;
+      const irep_idt scratch{"#constexpr_aliased_object"};
+      vars[scratch] = *object;
+      exprt on_scratch = e;
+      on_scratch.operands()[0] = symbol_exprt{scratch, object->type()};
+      const bool applied = apply_side_effect(on_scratch);
+      // the scratch variable is erased before the subobject is written, as
+      // the assignment may have invalidated `object' (vars is a map, so it
+      // does not)
+      exprt result = vars.at(scratch);
+      vars.erase(scratch);
+      if(applied)
+        *object = std::move(result);
+      return applied;
+    }
     if(e.operands().empty() || e.operands()[0].id() != ID_symbol)
       return false;
     const irep_idt var = to_symbol_expr(e.operands()[0]).get_identifier();
@@ -719,14 +749,40 @@ public:
     return it == vars.end() ? static_cast<exprt>(nil_exprt()) : it->second;
   }
 
+  /// Is \p value the address of a subobject of a tracked local -- an
+  /// element `&a[k]' (constant k) or a member `&o.m', also nested -- i.e.,
+  /// a reference or pointer bound to it?  N5008 [expr.const]/5: such an
+  /// object's lifetime began within the evaluation, so reads and writes
+  /// through it are permitted (`for(auto &e : t.data) e = 127;' in
+  /// libstdc++'s __from_chars_alnum_to_val_table<false>::_S_make_table).
+  bool is_subobject_alias(const exprt &value)
+  {
+    if(value.id() != ID_address_of || value.operands().size() != 1)
+      return false;
+    const exprt &object = to_address_of_expr(value).object();
+    if(object.id() != ID_index && object.id() != ID_member)
+      return false;
+    if(object.id() == ID_index && !to_index_expr(object).index().is_constant())
+      return false;
+    return tracked_object(object) != nullptr;
+  }
+
+  /// The object an alias (see is_subobject_alias) denotes, or nullptr.
+  exprt *aliased_object(const exprt &value)
+  {
+    if(!is_subobject_alias(value))
+      return nullptr;
+    return tracked_object(to_address_of_expr(value).object());
+  }
+
   /// Can \p value be tracked as a variable's value?  A constant, an aggregate
   /// of constants, a pointer into a constant array, or a reference to a
-  /// tracked variable.
-  bool is_trackable(const exprt &value) const
+  /// tracked variable or to a subobject of one.
+  bool is_trackable(const exprt &value)
   {
     return is_constant_value(value) ||
            array_pointer(value, symbol_table).has_value() ||
-           referenced_value(value).is_not_nil();
+           referenced_value(value).is_not_nil() || is_subobject_alias(value);
   }
 
   /// The value to store for `lhs = rhs' / `T x = rhs': a reference bound to
@@ -737,7 +793,60 @@ public:
   {
     if(referenced_value(rhs).is_not_nil())
       return rhs;
+    if(const auto alias = subobject_address(rhs))
+      return *alias;
     return eval(rhs);
+  }
+
+  /// \p e as the address of a subobject of a tracked local with its
+  /// indices evaluated to constants (`&d[__range_i]' becomes `&d[2]'), if it
+  /// is one.
+  std::optional<exprt> subobject_address(const exprt &e)
+  {
+    if(e.id() != ID_address_of || e.operands().size() != 1)
+      return {};
+    const exprt &object = to_address_of_expr(e).object();
+    if(object.id() != ID_index && object.id() != ID_member)
+      return {};
+    std::function<std::optional<exprt>(const exprt &)> evaluate_indices =
+      [&](const exprt &o) -> std::optional<exprt>
+    {
+      if(o.id() == ID_symbol)
+        return vars.count(to_symbol_expr(o).get_identifier()) != 0
+                 ? std::optional<exprt>{o}
+                 : std::nullopt;
+      if(o.id() == ID_member)
+      {
+        auto compound = evaluate_indices(to_member_expr(o).compound());
+        if(!compound.has_value())
+          return {};
+        member_exprt result = to_member_expr(o);
+        result.compound() = std::move(*compound);
+        return std::move(result);
+      }
+      if(o.id() == ID_index)
+      {
+        auto array = evaluate_indices(to_index_expr(o).array());
+        if(!array.has_value())
+          return {};
+        exprt index = eval(to_index_expr(o).index());
+        if(!index.is_constant())
+          return {};
+        index_exprt result = to_index_expr(o);
+        result.array() = std::move(*array);
+        result.index() = std::move(index);
+        return std::move(result);
+      }
+      return {};
+    };
+    auto evaluated = evaluate_indices(object);
+    if(!evaluated.has_value())
+      return {};
+    exprt result = e;
+    to_address_of_expr(result).object() = std::move(*evaluated);
+    if(!is_subobject_alias(result))
+      return {};
+    return result;
   }
 
   exprt eval(const exprt &e)
@@ -835,6 +944,14 @@ public:
         const exprt referenced = referenced_value(it->second);
         if(referenced.is_not_nil())
           return referenced;
+        // ... and one to a subobject of a tracked variable that subobject
+        if(const exprt *object = aliased_object(it->second))
+        {
+          if(is_constant_value(*object))
+            return *object;
+          failed = true; // an erroneous value ([expr.const]/10.8)
+          return e;
+        }
         // N5008 [dcl.init.ref]: a REFERENCE TO ARRAY parameter
         // (`const bool (&m)[N]', libc++'s `__find_idx') bound to a static
         // constexpr array denotes the whole array -- its constant value --
