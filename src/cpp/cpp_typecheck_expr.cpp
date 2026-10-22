@@ -36,6 +36,7 @@ Author: Daniel Kroening, kroening@cs.cmu.edu
 #include "expr2cpp.h"
 #include "itanium_abi_cpp_zero_initializer.h"
 
+#include <algorithm>
 #include <functional>
 #include <optional>
 #include <set>
@@ -9991,6 +9992,32 @@ void cpp_typecheckt::typecheck_side_effect_function_call(
     // its type field is empty).  Accept both — the second case
     // matters when we are about to eagerly convert the body so it
     // gets resolved in its own (class) scope.
+    // N5008 [temp.inst]/5 and [expr.const]/5: an inline constexpr member of
+    // a class template specialization whose definition is parked until
+    // used (deferred_typechecking, see typecheck_compound_declarator) is
+    // instantiated when a constant expression calls it -- the initializer
+    // `static constexpr type value = _S_make_table();' of libstdc++'s
+    // __from_chars_alnum_to_val_table<false>.  Queue it with its class's
+    // template map and convert it now; on failure it stays queued and the
+    // call a run-time one.
+    if(
+      symbol_ptr != nullptr && symbol_ptr->is_macro &&
+      constant_expression_context != 0 &&
+      deferred_typechecking.count(sym_expr->get_identifier()) != 0 &&
+      symbol_ptr->value.id() == ID_code &&
+      std::all_of(
+        expr.arguments().begin(),
+        expr.arguments().end(),
+        [this](const exprt &arg)
+        { return is_constexpr_call_argument(arg, symbol_table); }))
+    {
+      symbolt &deferred =
+        symbol_table.get_writeable_ref(sym_expr->get_identifier());
+      deferred_typechecking.erase(deferred.name);
+      add_method_body(&deferred);
+      convert_deferred_method_now(deferred.name);
+      symbol_ptr = symbol_table.lookup(sym_expr->get_identifier());
+    }
     bool body_is_code =
       symbol_ptr != nullptr && (symbol_ptr->value.type().id() == ID_code ||
                                 symbol_ptr->value.id() == ID_code);
