@@ -42,23 +42,44 @@ struct ctype_base : _Ctype_constants_base
 class locale
 {
 public:
-  struct _Locimp;
+  class facet
+  {
+  public:
+    void _Incref() noexcept
+    {
+      ++_Myrefs;
+    }
+    facet *_Decref() noexcept
+    {
+      return --_Myrefs == 0 ? this : nullptr;
+    }
+
+  protected:
+    explicit facet(unsigned long refs = 0) noexcept : _Myrefs(refs)
+    {
+    }
+
+  private:
+    unsigned long _Myrefs;
+  };
+  class _Locimp : public facet
+  {
+  public:
+    explicit _Locimp(bool) : facet(1)
+    {
+    }
+  };
   locale() noexcept : _Ptr(_Init(true))
   {
   }
-  ~locale() noexcept;
+  ~locale() noexcept
+  {
+    if(_Ptr)
+      _Ptr->_Decref();
+  }
   _Locimp *_Ptr;
-  static _Locimp *_Init(bool);
+  static _Locimp *_Init(bool _Do_incref = false);
 };
-struct locale::_Locimp
-{
-  int refs;
-};
-locale::~locale() noexcept
-{
-  if(_Ptr)
-    --_Ptr->refs;
-}
 template <class>
 class ctype;
 template <>
