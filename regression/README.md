@@ -55,6 +55,12 @@ This folder contains the CProver regression test-suite.
 - `gcc-only`:
   Tests that need `goto-cc` in gcc mode (excluded with MSVC or a non-GNU
   build compiler).
+- `no-vacuity-check`:
+  A CORE test expecting `VERIFICATION SUCCESSFUL` whose `main` legitimately
+  never reaches its end (it returns inside a `try` block, say), which
+  `scripts/check_vacuity.py` therefore skips.  That script, run in CI over
+  `cbmc-cpp` and `systemc`, fails for a test whose bounds cut every path to
+  the end of `main`: such a test passes whatever it asserts.
 
 ### Solver
 
