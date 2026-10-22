@@ -473,6 +473,83 @@ bool c_preprocess_codewarrior(
   return false;
 }
 
+/// The architecture family of \p arch, as far as gcc's data-model options
+/// (-m32, -m64, -mabi=, ...) are concerned.
+static std::string architecture_family(const irep_idt &arch)
+{
+  if(arch == "i386" || arch == "x86_64" || arch == "x32")
+    return "x86";
+  if(arch.starts_with("mips"))
+    return "mips";
+  if(arch == "powerpc" || arch == "ppc64" || arch == "ppc64le")
+    return "powerpc";
+  if(arch == "s390" || arch == "s390x")
+    return "s390";
+  if(arch == "sparc" || arch == "sparc64")
+    return "sparc";
+  if(arch == "arm64" || arch == "arm" || arch == "armel" || arch == "armhf")
+    return "arm";
+  return id2string(arch);
+}
+
+/// The architecture family of the `gcc' that preprocesses, from its
+/// predefined macros (asked once); empty if unknown.
+static const std::string &host_gcc_architecture_family()
+{
+  static const std::string family = []() -> std::string
+  {
+    temporary_filet in_file("tmp.arch", ".c");
+    temporary_filet out_file("tmp.arch", ".out");
+    temporary_filet err_file("tmp.arch", ".err");
+    {
+      std::ofstream out(in_file());
+      out << "#if defined(__x86_64__) || defined(__i386__)\n"
+             "cprover_family x86\n"
+             "#elif defined(__aarch64__) || defined(__arm__)\n"
+             "cprover_family arm\n"
+             "#elif defined(__mips__)\n"
+             "cprover_family mips\n"
+             "#elif defined(__powerpc__) || defined(__powerpc64__)\n"
+             "cprover_family powerpc\n"
+             "#elif defined(__s390__)\n"
+             "cprover_family s390\n"
+             "#elif defined(__sparc__)\n"
+             "cprover_family sparc\n"
+             "#endif\n";
+    }
+    if(
+      run(
+        "gcc",
+        {"gcc", "-E", in_file(), "-o", out_file()},
+        "",
+        "",
+        err_file()) != 0)
+    {
+      return {};
+    }
+    std::ifstream in(out_file());
+    std::string line;
+    while(std::getline(in, line))
+    {
+      if(line.rfind("cprover_family ", 0) == 0)
+        return line.substr(std::string("cprover_family ").size());
+    }
+    return {};
+  }();
+  return family;
+}
+
+/// The architecture macros that gcc for \p family predefines and CBMC's
+/// library models test, to be undefined when preprocessing for another
+/// target (`__aarch64__' selects the AArch64 va_list in stdio.c).
+static std::vector<std::string>
+host_architecture_macros(const std::string &family)
+{
+  if(family == "arm")
+    return {"__aarch64__", "__arm__", "__ARM_PCS_VFP"};
+  return {};
+}
+
 /// ANSI-C preprocessing
 bool c_preprocess_gcc_clang(
   const std::string &file,
@@ -501,7 +578,33 @@ bool c_preprocess_gcc_clang(
 
   const irep_idt &arch = config.ansi_c.arch;
 
-  if(config.ansi_c.pointer_width == 16)
+  // GNU gcc accepts the options that select a data model only for its own
+  // architecture family; gcc for x86 accepts -m16/-m32/-m64/-mx32 whatever
+  // the target, and so does clang.  With gcc for another family (gcc for
+  // aarch64 rejects `-m64'), pass none and undefine that family's
+  // architecture macros; the target's own come from config.ansi_c.defines.
+  const std::string host_family =
+    preprocessor == configt::ansi_ct::preprocessort::GCC
+      ? host_gcc_architecture_family()
+      : std::string{};
+  if(
+    !host_family.empty() && host_family != "x86" &&
+    host_family != architecture_family(arch))
+  {
+    for(const auto &host_macro : host_architecture_macros(host_family))
+    {
+      // keep those the target defines itself
+      if(
+        std::find(
+          config.ansi_c.defines.begin(),
+          config.ansi_c.defines.end(),
+          host_macro) == config.ansi_c.defines.end())
+      {
+        argv.push_back("-U" + host_macro);
+      }
+    }
+  }
+  else if(config.ansi_c.pointer_width == 16)
   {
     if(arch == "i386" || arch == "x86_64" || arch == "x32")
       argv.push_back("-m16");

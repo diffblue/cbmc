@@ -1,4 +1,4 @@
-CORE x86-preprocessing
+CORE
 main.cpp
 --winx64 --cpp11
 ^\[main\.assertion\.1\] line \d+ 5 is a digit: SUCCESS$
