@@ -4552,7 +4552,19 @@ symbol_exprt cpp_typecheckt::initializer_list_backing_array(
   symbol_exprt arr_ref{arr_id, arr_sym.type};
   arr_ref.set(ID_C_lvalue, true);
   arr_ref.add_source_location() = source_location;
-  if(all_constant)
+  // An element that is a constructor call on a temporary is constructed in
+  // place instead ([dcl.init.list]/5: each element is copy-initialized as an
+  // object of the array).  Copying the temporary into the array kept the
+  // pointers it holds into itself: the elements of an
+  // initializer_list<std::string> read the characters of a dead temporary.
+  std::optional<exprt> in_place =
+    construct_elements_in_place(elements, arr_ref, array_type, source_location);
+  if(in_place.has_value())
+  {
+    prefix = std::move(*in_place);
+    arr_sym.value = nil_exprt{};
+  }
+  else if(all_constant)
     arr_sym.value = array_exprt{std::move(elements), array_type};
   else
   {
@@ -4569,6 +4581,71 @@ symbol_exprt cpp_typecheckt::initializer_list_backing_array(
   }
   symbol_table.add(arr_sym);
   return arr_ref;
+}
+
+/// The constructor calls that build each element of \p elements, all of
+/// them temporary objects (`S(args)' on a new object), in place as element
+/// \p array [k] instead, as a comma expression; nothing if any element is
+/// of another form.
+std::optional<exprt> cpp_typecheckt::construct_elements_in_place(
+  const exprt::operandst &elements,
+  const symbol_exprt &array,
+  const array_typet &array_type,
+  const source_locationt &source_location)
+{
+  if(elements.empty())
+    return {};
+  exprt::operandst calls;
+  for(std::size_t k = 0; k < elements.size(); ++k)
+  {
+    const exprt &e = elements[k];
+    if(e.id() != ID_side_effect || e.get(ID_statement) != ID_temporary_object)
+    {
+      return {};
+    }
+    const exprt &init = static_cast<const exprt &>(e.find(ID_initializer));
+    if(
+      init.id() != ID_code || to_code(init).get_statement() != ID_expression ||
+      init.operands().size() != 1)
+    {
+      return {};
+    }
+    const exprt &call = init.operands().front();
+    if(
+      call.id() != ID_side_effect || call.get(ID_statement) != ID_function_call)
+    {
+      return {};
+    }
+    const auto &arguments = to_side_effect_expr_function_call(call).arguments();
+    if(
+      arguments.empty() || arguments.front().id() != ID_address_of ||
+      to_address_of_expr(arguments.front()).object().id() != ID_new_object)
+    {
+      return {};
+    }
+    symbol_exprt assignable = array;
+    assignable.type() = array_type;
+    side_effect_expr_function_callt in_place =
+      to_side_effect_expr_function_call(call);
+    in_place.arguments().front() = address_of_exprt{
+      index_exprt{
+        std::move(assignable),
+        from_integer(k, c_index_type()),
+        array_type.element_type()},
+      to_pointer_type(arguments.front().type())};
+    calls.push_back(std::move(in_place));
+  }
+  exprt result = std::move(calls.back());
+  calls.pop_back();
+  while(!calls.empty())
+  {
+    exprt comma{ID_comma, result.type()};
+    comma.add_to_operands(std::move(calls.back()), std::move(result));
+    comma.add_source_location() = source_location;
+    result = std::move(comma);
+    calls.pop_back();
+  }
+  return result;
 }
 
 /// \p prefix (see initializer_list_backing_array) sequenced before \p result
@@ -5447,14 +5524,25 @@ void cpp_typecheckt::implicit_typecast(exprt &expr, const typet &type)
         il_sym.is_static_lifetime = true;
         il_sym.is_lvalue = true;
         il_sym.location = orig_expr.source_location();
-        il_sym.value = il_value;
+        // the construction of the backing array's elements (the prefix of
+        // the conversion, see initializer_list_backing_array) is evaluated
+        // here, where the list is, not as part of a static initializer
+        std::optional<exprt> prefix;
+        if(il_value.id() == ID_comma && il_value.operands().size() == 2)
+        {
+          prefix = to_binary_expr(il_value).op0();
+          il_sym.value = to_binary_expr(il_value).op1();
+        }
+        else
+          il_sym.value = il_value;
         symbol_table.add(il_sym);
         symbol_exprt il_ref(il_id, il_type);
         il_ref.set(ID_C_lvalue, true);
         il_ref.add_source_location() = orig_expr.source_location();
         address_of_exprt bound{il_ref, to_pointer_type(type)};
         bound.add_source_location() = orig_expr.source_location();
-        expr = std::move(bound);
+        expr = sequence_before(
+          std::move(prefix), std::move(bound), orig_expr.source_location());
         return;
       }
     }
