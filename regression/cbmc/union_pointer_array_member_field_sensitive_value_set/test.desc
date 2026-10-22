@@ -1,4 +1,4 @@
-CORE
+CORE no-new-smt
 main.c
 --pointer-check
 ^\[main\.assertion\.1\] line \d+ assertion g->vptr->call\(\) == 2: SUCCESS$
