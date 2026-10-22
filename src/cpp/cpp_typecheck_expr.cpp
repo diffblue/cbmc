@@ -12304,7 +12304,8 @@ void cpp_typecheckt::typecheck_expr_lambda(exprt &expr)
 
   static unsigned lambda_count = 0;
   const std::string lambda_id = "__lambda_" + std::to_string(lambda_count++);
-  const source_locationt &loc = expr.source_location();
+  // a copy: `expr' is replaced at the end, which may free its location
+  const source_locationt loc = expr.source_location();
   const std::string func_sym_name =
     id2string(cpp_scopes.current_scope().prefix) + lambda_id;
 
