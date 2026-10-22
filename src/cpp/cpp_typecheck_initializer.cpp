@@ -510,7 +510,19 @@ void cpp_typecheckt::convert_initializer(symbolt &symbol)
   else if(has_auto(symbol.type) && !is_reference(symbol.type))
   {
     // auto type deduction for non-reference types
+    // N5008 [dcl.type.auto.deduct]/2.2.2: for `auto x{e}' (a braced-init-list
+    // that is not preceded by `=') E is the single element e, and T is
+    // deduced from it as for `auto x = e'
+    if(
+      symbol.value.id() == ID_initializer_list &&
+      symbol.value.operands().size() == 1 &&
+      symbol.value.get_bool(ID_C_direct_list_init))
+    {
+      exprt element = to_unary_expr(symbol.value).op();
+      symbol.value = std::move(element);
+    }
     // C++11: auto x = {1, 2, 3} deduces std::initializer_list<int>
+    // ([dcl.type.auto.deduct]/4: copy-list-initialization)
     if(
       symbol.value.id() == ID_initializer_list &&
       !symbol.value.operands().empty())

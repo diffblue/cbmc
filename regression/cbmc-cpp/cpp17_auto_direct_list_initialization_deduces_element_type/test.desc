@@ -1,0 +1,16 @@
+CORE
+main.cpp
+--cpp17
+^\[main\.assertion\.1\] line \d+ auto brace: SUCCESS$
+^\[main\.assertion\.2\] line \d+ scalar: SUCCESS$
+^\[main\.assertion\.3\] line \d+ WRONG \(must FAIL\): FAILURE$
+^VERIFICATION FAILED$
+^EXIT=10$
+^SIGNAL=0$
+--
+^warning: ignoring
+^CONVERSION ERROR$
+--
+`auto t{l}' at block scope was deduced as an array of one element, as for
+copy-list-initialization, so `t.shl(1)' failed with "member operator
+requires struct/union type".
