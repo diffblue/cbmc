@@ -1140,6 +1140,19 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
   else
     UNREACHABLE;
 
+  // N5008 [expr.delete]/5: the destructor is invoked only if the value of
+  // the operand is not a null pointer value (`delete p' with p null does
+  // nothing, also when the class has a virtual destructor, whose call would
+  // read the vtable pointer through p)
+  goto_programt::targett skip_destructor;
+  const bool guard_destructor = destructor.is_not_nil();
+  if(guard_destructor)
+  {
+    skip_destructor = dest.add(goto_programt::make_incomplete_goto(
+      equal_exprt{tmp_op, null_pointer_exprt{to_pointer_type(tmp_op.type())}},
+      code.source_location()));
+  }
+
   if(destructor.is_not_nil())
   {
     if(code.get_statement() == ID_cpp_delete_array)
@@ -1222,6 +1235,13 @@ void goto_convertt::convert_cpp_delete(const codet &code, goto_programt &dest)
     }
     else
       UNREACHABLE;
+  }
+
+  if(guard_destructor)
+  {
+    goto_programt::targett after_destructor =
+      dest.add(goto_programt::make_skip(code.source_location()));
+    skip_destructor->complete_goto(after_destructor);
   }
 
   // now do "free"
