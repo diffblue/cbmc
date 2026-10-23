@@ -6,8 +6,8 @@
 #define __CPROVER_STDIO_H_INCLUDED
 #endif
 
-/* undefine macros in OpenBSD's stdio.h that are problematic to the checker. */
-#if defined(__OpenBSD__)
+#if defined(__FreeBSD__) || defined(__OpenBSD__)
+/* undefine macros in stdio.h that are problematic to the checker. */
 #undef getchar
 #undef putchar
 #undef getc
