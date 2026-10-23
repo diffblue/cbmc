@@ -59,3 +59,25 @@ jobs:
           rustup toolchain install stable --profile minimal --no-self-update -c clippy -c rustfmt
       - name: Run `cargo fmt` on top of Rust API project
         run: cd src/libcprover-rust; cargo fmt --all -- --check
+
+  # This job scans every (non-test) translation unit and takes several minutes
+  check-irep-copies:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          submodules: recursive
+      - name: Fetch dependencies
+        env:
+          DEBIAN_FRONTEND: noninteractive
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -yq \
+            cmake g++ flex bison clang-18 llvm-18-dev libclang-18-dev \
+            libclang-cpp18-dev
+      - name: Self-test the checker
+        run: ./regression/check-irep-copies/run_self_test.sh
+      - name: Configure
+        run: cmake -S . -Bbuild -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+      - name: Check for unnecessary irept copies
+        run: ./scripts/run_irep_copies_check.sh build

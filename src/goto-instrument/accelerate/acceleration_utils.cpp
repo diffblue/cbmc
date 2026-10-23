@@ -1090,7 +1090,7 @@ bool acceleration_utilst::assign_array(
   int stride=poly.coeff(loop_counter);
   exprt not_touched;
   exprt lower_bound=idx;
-  exprt upper_bound=idx;
+  exprt upper_bound = std::move(idx);
 
   if(stride > 0)
   {
