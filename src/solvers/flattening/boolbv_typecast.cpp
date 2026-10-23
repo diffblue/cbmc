@@ -182,9 +182,22 @@ bool boolbvt::type_conversion(
       break;
 
     case bvtypet::IS_SIGNED: // signed to float
-    case bvtypet::IS_C_ENUM:
       float_utils.spec = ieee_float_spect(to_floatbv_type(dest_type));
       dest = float_utils.from_signed_integer(src);
+      return false;
+
+    case bvtypet::IS_C_ENUM: // enum to float
+      float_utils.spec = ieee_float_spect(to_floatbv_type(dest_type));
+      if(
+        src_type.id() == ID_c_enum &&
+        to_c_enum_type(src_type).underlying_type().id() == ID_unsignedbv)
+      {
+        dest = float_utils.from_unsigned_integer(src);
+      }
+      else
+      {
+        dest = float_utils.from_signed_integer(src);
+      }
       return false;
 
     case bvtypet::IS_UNSIGNED: // unsigned to float
@@ -298,7 +311,8 @@ bool boolbvt::type_conversion(
         {
           if(
             src_bvtype == bvtypet::IS_SIGNED ||
-            src_bvtype == bvtypet::IS_C_ENUM)
+            (src_bvtype == bvtypet::IS_C_ENUM && src_type.id() == ID_c_enum &&
+             to_c_enum_type(src_type).underlying_type().id() != ID_unsignedbv))
             l = src[src_width - 1]; // sign extension
           else
             l = const_literal(false); // zero extension
@@ -381,7 +395,9 @@ bool boolbvt::type_conversion(
       // destination type.
       // E.g., ((short)(ulong)(short)-1)==-1
       bool sign_extension =
-        src_bvtype == bvtypet::IS_SIGNED || src_bvtype == bvtypet::IS_C_ENUM;
+        src_bvtype == bvtypet::IS_SIGNED ||
+        (src_bvtype == bvtypet::IS_C_ENUM && src_type.id() == ID_c_enum &&
+         to_c_enum_type(src_type).underlying_type().id() != ID_unsignedbv);
 
       for(std::size_t i = 0; i < dest_width; i++)
       {
