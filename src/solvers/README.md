@@ -455,8 +455,8 @@ This is described in more detail \link string_builtin_functiont here. \endlink
     \copybrief string_set_char_builtin_functiont::constraints
     \link string_set_char_builtin_functiont::constraints More... \endlink
   * `cprover_string_concat` :
-    \copybrief string_constraint_generatort::add_axioms_for_concat
-    \link string_constraint_generatort::add_axioms_for_concat More... \endlink
+    \copybrief string_concatenation_builtin_functiont::constraints
+    \link string_concatenation_builtin_functiont::constraints More... \endlink
   * `cprover_string_delete` :
     \copybrief string_constraint_generatort::add_axioms_for_delete(const function_application_exprt &f)
     \link string_constraint_generatort::add_axioms_for_delete(const function_application_exprt &f) More... \endlink

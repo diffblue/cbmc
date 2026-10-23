@@ -372,8 +372,6 @@ string_constraint_generatort::add_axioms_for_delete_char_at(
 /// These axioms are the same as would be generated for:
 /// `concat(substring(str, 0, start), substring(end, |str|))`
 /// (see \ref add_axioms_for_substring and \ref add_axioms_for_concat_substr).
-/// \todo Should use add_axioms_for_concat_substr instead
-///       of add_axioms_for_concat
 /// \param res: array of characters expression
 /// \param str: array of characters expression
 /// \param start: integer expression
@@ -400,7 +398,12 @@ string_constraint_generatort::add_axioms_for_delete(
     combine_results(
       add_axioms_for_substring(
         sub2, str, end, array_pool.get_or_create_length(str)),
-      add_axioms_for_concat(res, sub1, sub2)));
+      add_axioms_for_concat_substr(
+        res,
+        sub1,
+        sub2,
+        from_integer(0, sub2.length_type()),
+        array_pool.get_or_create_length(sub2))));
 }
 
 /// Remove a portion of a string
