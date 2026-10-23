@@ -16,7 +16,7 @@
 
 #include <cstddef>
 #include <optional>
-#include <string>
+#include <string_view>
 
 /// Simple automaton that can detect whether a string can be transformed into
 /// another with a limited number of deletions, insertions or substitutions.
@@ -30,11 +30,11 @@ private:
 
 public:
   levenshtein_automatont(
-    const std::string &string,
+    std::string_view string,
     std::size_t allowed_errors = 2);
 
-  bool matches(const std::string &string) const;
-  std::optional<std::size_t> get_edit_distance(const std::string &string) const;
+  bool matches(std::string_view string) const;
+  std::optional<std::size_t> get_edit_distance(std::string_view string) const;
 
   void dump_automaton_dot_to(std::ostream &out)
   {
