@@ -11,5 +11,7 @@ could not fully type-check
 --
 libstdc++ 13 <format>: std::format("{}", 42) is converted without dropping a
 system-header body.  The verification (test_format.desc) is THOROUGH.
-broken-libstdcxx16: with libstdc++ 16, __do_vformat_to loses its body
-(cpp17_constexpr_lambda_call_in_constant_expression).
+broken-libstdcxx16: with libstdc++ 16 (16-20260315), _M_reserve and _M_span
+of _Seq_sink (no match for span's constructor and for _M_reset),
+__should_escape_ascii (a read of _S_bslash()[0] is not folded to a
+constant) and __write_escaped_char lose their bodies; not yet reduced.
