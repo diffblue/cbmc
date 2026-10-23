@@ -64,6 +64,10 @@ operator()(propertiest &properties)
 
 void single_path_symex_only_checkert::initialize_worklist()
 {
+  // Validate that the entry point exists before doing any work, so that we
+  // fail fast without performing unnecessary work.
+  goto_symext::validate_entry_point(goto_model);
+
   // Put initial state into the work list
   symex_target_equationt equation(ui_message_handler);
   symex_bmct symex(
