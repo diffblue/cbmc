@@ -1,0 +1,13 @@
+CORE no-new-smt broken-cprover-smt-backend
+main.c
+--floatbv
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Rounding overflow for double: when the rounding increment carries out of
+the significand (fraction_size=53), the MSB must be set via
+power(2, 52) rather than the C++ expression 1<<52, which is undefined
+for int.  Regression test for GitHub issue #9200.
