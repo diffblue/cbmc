@@ -199,6 +199,7 @@ SRC += analyses/ai/ai.cpp \
        util/pointer_offset_size.cpp \
        util/prefix_filter.cpp \
        util/range.cpp \
+       util/rename_symbol.cpp \
        util/replace_symbol.cpp \
        util/run.cpp \
        util/sharing_map.cpp \
