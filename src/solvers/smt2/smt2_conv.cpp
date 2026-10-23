@@ -204,6 +204,10 @@ void smt2_convt::write_footer()
   for(const auto &object : object_sizes)
     define_object_size(object.second, object.first);
 
+  // Output is_dynamic_object definitions
+  for(const auto &entry : is_dynamic_objects)
+    define_is_dynamic_object(entry.second, entry.first);
+
   if(use_check_sat_assuming && !assumptions.empty())
   {
     out << "(check-sat-assuming (";
@@ -4115,39 +4119,49 @@ void smt2_convt::convert_mod(const mod_exprt &expr)
 
 void smt2_convt::convert_is_dynamic_object(const unary_exprt &expr)
 {
-  std::vector<mp_integer> dynamic_objects;
-  pointer_logic.get_dynamic_objects(dynamic_objects);
+  // The auxiliary symbol was declared by find_symbols; the definition
+  // is deferred to write_footer where all objects are known.
+  auto it = is_dynamic_objects.find(expr);
+  INVARIANT(
+    it != is_dynamic_objects.end(),
+    "is_dynamic_object symbol must have been declared by find_symbols");
+  out << it->second;
+}
 
-  if(dynamic_objects.empty())
-    out << "false";
-  else
+/// Define the auxiliary symbol \p id standing for the is_dynamic_object
+/// expression \p expr. This is done in the footer, where all objects are
+/// known: the symbol is true if the pointer refers to a known dynamic object
+/// and false if it refers to a known object that is not dynamic. Object
+/// numbers that do not belong to any known object are left unconstrained, as
+/// in the propositional back-end.
+void smt2_convt::define_is_dynamic_object(
+  const irep_idt &id,
+  const unary_exprt &expr)
+{
+  if(pointer_logic.objects.size() == 0)
+    return;
+
+  const std::size_t pointer_width = boolbv_width(expr.op().type());
+  const std::size_t object_bits = config.bv_encoding.object_bits;
+
+  out << "(assert (let ((?obj ((_ extract " << pointer_width - 1 << " "
+      << pointer_width - object_bits << ") ";
+  convert_expr(expr.op());
+  out << "))) (and true";
+
+  std::size_t number = 0;
+  for(const auto &o : pointer_logic.objects)
   {
-    std::size_t pointer_width = boolbv_width(expr.op().type());
-
-    out << "(let ((?obj ((_ extract "
-        << pointer_width-1 << " "
-        << pointer_width-config.bv_encoding.object_bits << ") ";
-    convert_expr(expr.op());
-    out << "))) ";
-
-    if(dynamic_objects.size()==1)
-    {
-      out << "(= (_ bv" << dynamic_objects.front()
-          << " " << config.bv_encoding.object_bits << ") ?obj)";
-    }
+    out << " (=> (= ?obj (_ bv" << number << " " << object_bits << ")) ";
+    if(pointer_logic.is_dynamic_object(o))
+      out << id;
     else
-    {
-      out << "(or";
-
-      for(const auto &object : dynamic_objects)
-        out << " (= (_ bv" << object
-            << " " << config.bv_encoding.object_bits << ") ?obj)";
-
-      out << ")"; // or
-    }
-
-    out << ")"; // let
+      out << "(not " << id << ")";
+    out << ")";
+    ++number;
   }
+
+  out << ")))\n"; // and, let, assert
 }
 
 void smt2_convt::convert_relation(const binary_relation_exprt &expr)
@@ -5984,6 +5998,18 @@ void smt2_convt::find_symbols(const exprt &expr)
           << "\n";
 
       object_sizes[*object_size] = id;
+    }
+  }
+  else if(expr.id() == ID_is_dynamic_object)
+  {
+    const auto &dyn_expr = to_unary_expr(expr);
+    if(is_dynamic_objects.find(dyn_expr) == is_dynamic_objects.end())
+    {
+      const irep_idt id = convert_identifier(
+        "is_dynamic_object." + std::to_string(is_dynamic_objects.size()));
+      out << "(declare-fun " << id << " () Bool)"
+          << "\n";
+      is_dynamic_objects[dyn_expr] = id;
     }
   }
   // clang-format off
