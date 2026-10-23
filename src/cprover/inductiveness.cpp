@@ -20,12 +20,15 @@ Author: Daniel Kroening, dkr@amazon.com
 #include "axioms.h"
 #include "bv_pointers_wide.h"
 #include "counterexample_found.h"
+#include "cprover_smt2_dec.h"
 #include "propagate.h"
 #include "solver.h"
+#include "state_encoding_solver_factory.h"
 
 #include <algorithm>
 #include <iomanip>
 #include <iostream>
+#include <memory>
 
 bool is_subsumed(
   const std::unordered_set<exprt, irep_hash> &a1,
@@ -34,7 +37,8 @@ bool is_subsumed(
   const exprt &b,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,
   bool verbose,
-  const namespacet &ns)
+  const namespacet &ns,
+  const std::string &smt2_solver_binary)
 {
   if(b == true)
     return true; // anything subsumes 'true'
@@ -51,8 +55,11 @@ bool is_subsumed(
 #else
   message_handler.set_verbosity(1);
 #endif
-  satcheckt satcheck(message_handler);
-  bv_pointers_widet solver(ns, satcheck, message_handler);
+
+  auto solver_bundle =
+    make_state_encoding_solver(ns, smt2_solver_binary, message_handler);
+  decision_proceduret &solver = solver_bundle.solver();
+
   axiomst axioms(solver, address_taken, verbose, ns);
 
   // check if a => b is valid,
@@ -82,6 +89,14 @@ bool is_subsumed(
   case decision_proceduret::resultt::D_UNSATISFIABLE:
     return true;
   case decision_proceduret::resultt::D_ERROR:
+    // For the external SMT2 solver, treating unknown/error as "not subsumed"
+    // is conservative: at worst we keep an obligation we could have pruned,
+    // which is sound.  This is the deliberate *opposite* of
+    // counterexample_found(), where swallowing a D_ERROR would be unsound (it
+    // must not be reported as "no counterexample").  A hard error from the SAT
+    // backend is still surfaced.
+    if(!smt2_solver_binary.empty())
+      return false;
     throw "error reported by solver";
   }
 
@@ -173,7 +188,8 @@ inductiveness_resultt inductiveness_check(
                 invariant,
                 address_taken,
                 solver_options.verbose,
-                ns))
+                ns,
+                solver_options.smt2_solver_binary))
       {
         if(solver_options.verbose)
           std::cout << "subsumed " << format(invariant) << '\n';
@@ -231,7 +247,12 @@ inductiveness_resultt inductiveness_check(
 #endif
 
     auto counterexample_found = ::counterexample_found(
-      frames, work, address_taken, solver_options.verbose, ns);
+      frames,
+      work,
+      address_taken,
+      solver_options.verbose,
+      ns,
+      solver_options.smt2_solver_binary);
 
     if(counterexample_found)
     {

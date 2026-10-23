@@ -1,0 +1,14 @@
+CORE
+main.c
+--external-smt2-solver z3 --solve --inline --no-safety
+^EXIT=10$
+^SIGNAL=0$
+^\[main\.assertion\.1\] line \d+ holds: SUCCESS$
+^\[main\.assertion\.2\] line \d+ may fail: REFUTED$
+--
+^warning: ignoring
+--
+Exercises the external SMT2 solver backend (--external-smt2-solver) end to end:
+the state-encoding queries are discharged by an external z3 process instead of
+the built-in SAT backend, and the per-property results are as expected.  z3 is
+installed on every CI platform that runs this (CORE) suite.

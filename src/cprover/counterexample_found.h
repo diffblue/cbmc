@@ -14,6 +14,7 @@ Author: Daniel Kroening, dkr@amazon.com
 
 #include "solver_types.h"
 
+#include <string>
 #include <unordered_set>
 
 std::optional<propertyt::tracet> counterexample_found(
@@ -21,10 +22,11 @@ std::optional<propertyt::tracet> counterexample_found(
   const workt &,
   const std::unordered_set<symbol_exprt, irep_hash> &address_taken,
   bool verbose,
-  const namespacet &);
+  const namespacet &,
+  const std::string &smt2_solver_binary = "");
 
-class bv_pointers_widet;
+class decision_proceduret;
 
-void show_assignment(const bv_pointers_widet &);
+void show_assignment(const decision_proceduret &);
 
 #endif // CPROVER_CPROVER_COUNTEREXAMPLE_FOUND_H
