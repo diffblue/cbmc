@@ -49,6 +49,11 @@ add_dependencies(util generate_version_cpp)
 generic_includes(util)
 
 target_link_libraries(util big-int langapi)
+# Link the selected memory allocator (see CBMC_ALLOCATOR in the top-level
+# CMakeLists.txt) via util, so every executable and test binary that links
+# util picks it up. cprover_allocator is an empty interface library when the
+# system allocator is used.
+target_link_libraries(util cprover_allocator)
 if(WIN32)
   target_link_libraries(util dbghelp)
 endif()
