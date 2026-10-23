@@ -1702,17 +1702,74 @@ void c_typecheck_baset::typecheck_expr_trinary(if_exprt &expr)
     exprt tmp1=simplify_expr(operands[1], *this);
     exprt tmp2=simplify_expr(operands[2], *this);
 
+    // C standard: a "null pointer constant" is an integer
+    // constant expression (ICE) with value 0, or such an
+    // expression cast to `void *`.  An ICE does not contain
+    // any non-constant leaves (variable reads, function calls,
+    // …), so `(long)argc * 0L`, while it simplifies to 0, is
+    // NOT a null pointer constant even though simplification
+    // masks that.  The __is_constexpr kernel macro exploits
+    // this exact distinction:
+    //
+    //   sizeof(int) == sizeof(*(8 ? ((void *)((long)(x) * 0l))
+    //                              : (int *)8))
+    //
+    // and relies on the compiler treating the first branch as
+    // `void *` (non-null-ptr-const) when x is runtime, making
+    // the conditional's type `void *` and the sizeof of its
+    // dereference differ from sizeof(int).  Previously CBMC
+    // simplified before checking, losing the distinction and
+    // misreporting runtime `x` as constant.  The helper below
+    // walks the PRE-simplification operand looking for any
+    // symbol read; we only recognise the operand as a null
+    // pointer constant if it is both (a) a constant after
+    // simplification and (b) free of non-constant leaves
+    // originally.
+    //
+    // The leaf-scan is a sound proxy for "not an ICE" here only
+    // because by this point sizeof/_Alignof have been folded to
+    // constants and enumeration constants resolved via
+    // follow_macros; the only remaining leaves are genuinely
+    // non-ICE constructs (variable reads, dereferences, calls,
+    // side effects).  A const-qualified local is also correctly
+    // rejected, as it is not an ICE in C.
+    const auto contains_non_constant_leaf = [](const exprt &e)
+    {
+      return has_subexpr(
+        e,
+        [](const exprt &sub)
+        {
+          return sub.id() == ID_symbol || sub.id() == ID_side_effect ||
+                 sub.id() == ID_function_application ||
+                 sub.id() == ID_dereference;
+        });
+    };
+
+    // an operand is a null pointer constant if it is null after
+    // simplification AND was an integer constant expression originally (i.e.
+    // free of non-constant leaves)
+    const auto is_null_pointer_constant =
+      [&](const exprt &original, const exprt &simplified)
+    {
+      return simplified.is_constant() &&
+             to_constant_expr(simplified).is_null_pointer() &&
+             !contains_non_constant_leaf(original);
+    };
+
+    const bool op1_ice_zero = is_null_pointer_constant(operands[1], tmp1);
+    const bool op2_ice_zero = is_null_pointer_constant(operands[2], tmp2);
+
     // is one of them void * AND null? Convert that to the other.
     // (at least that's how GCC behaves)
     if(
       to_pointer_type(operands[1].type()).base_type().id() == ID_empty &&
-      tmp1.is_constant() && to_constant_expr(tmp1).is_null_pointer())
+      op1_ice_zero)
     {
       implicit_typecast(operands[1], operands[2].type());
     }
     else if(
       to_pointer_type(operands[2].type()).base_type().id() == ID_empty &&
-      tmp2.is_constant() && to_constant_expr(tmp2).is_null_pointer())
+      op2_ice_zero)
     {
       implicit_typecast(operands[2], operands[1].type());
     }

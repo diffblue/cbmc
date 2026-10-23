@@ -1,0 +1,16 @@
+CORE gcc-only
+main.c
+
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+LIM-014 regression: the conditional-operator typechecker
+distinguishes an ORIGINAL integer constant expression with
+value 0 from a runtime expression that merely simplifies to 0.
+The Linux kernel's __is_constexpr macro depends on this
+distinction.  Pre-fix, CBMC reported __is_constexpr(x) == 1
+for both x=5 and x=argc; this test requires 1 and 0
+respectively.
