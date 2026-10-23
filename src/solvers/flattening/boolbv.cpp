@@ -37,6 +37,70 @@ endianness_mapt boolbvt::endianness_map(const typet &type) const
 /// Convert expression to vector of literalts, using an internal
 /// cache to speed up conversion if available. Also assert the resultant
 /// vector is of a specific size, and freeze any elements if appropriate.
+static bool is_prepass_convertible(const exprt &expr)
+{
+  // Conservative whitelist of operations whose bit-vector conversion is a pure
+  // function of the converted operand bit-vectors (per-bit gates only): no
+  // array-theory axioms, uninterpreted-function congruence, quantifier or
+  // let-binding side effects, and no ordering dependence. Only such operations
+  // may be converted eagerly and out of the normal top-down order by the
+  // cache-priming pre-pass without changing the generated constraints. These
+  // are exactly the ids handled by boolbvt::convert_bitwise.
+  const irep_idt &id = expr.id();
+  return id == ID_bitand || id == ID_bitor || id == ID_bitxor ||
+         id == ID_bitnand || id == ID_bitnor || id == ID_bitxnor ||
+         id == ID_bitnot;
+}
+
+void boolbvt::prime_subexpression_cache(const exprt &expr)
+{
+  // If the outermost expression is not a pure bitwise operation, there is
+  // nothing we can safely pre-convert here; fall back to the normal recursive
+  // path.
+  if(!is_prepass_convertible(expr))
+    return;
+
+  // Visit the pure-bitwise sub-expressions of `expr` (excluding `expr` itself,
+  // whose cache entry is being populated by the calling convert_bv) in
+  // post-order using an explicit stack, converting each so that it is cached
+  // before its parent. The boolean on the stack records the post-order phase.
+  // Only pure-bitwise children are descended into / pre-converted; any other
+  // operand (e.g. a leaf symbol) is left to be converted shallowly by the
+  // parent's convert_bitwise, which no longer recurses deeply once its
+  // bitwise children are cached.
+  std::vector<std::pair<const exprt *, bool>> stack;
+
+  for(const auto &op : expr.operands())
+    if(is_prepass_convertible(op))
+      stack.emplace_back(&op, false);
+
+  while(!stack.empty())
+  {
+    const exprt *const e = stack.back().first;
+
+    if(bv_cache.find(*e) != bv_cache.end())
+    {
+      stack.pop_back();
+      continue;
+    }
+
+    if(!stack.back().second)
+    {
+      stack.back().second = true;
+      for(const auto &op : e->operands())
+        if(is_prepass_convertible(op))
+          stack.emplace_back(&op, false);
+      continue;
+    }
+
+    stack.pop_back();
+
+    // All pure-bitwise children are cached now, so this conversion does not
+    // recurse deeply.
+    convert_bv(*e);
+  }
+}
+
 const bvt &boolbvt::convert_bv(
   const exprt &expr,
   std::optional<std::size_t> expected_width)
@@ -52,6 +116,21 @@ const bvt &boolbvt::convert_bv(
   {
     // Found in cache
     return cache_entry;
+  }
+
+  // For deeply nested expressions, converting top-down recurses once per
+  // nesting level and can overflow the call stack. At the outermost conversion
+  // entry, first prime the cache for all (non-binder) sub-expressions
+  // bottom-up, so that the recursive convert_bitvector dispatch below only ever
+  // encounters already-converted operands. Nested convert_bv calls (including
+  // those issued by the pre-pass itself) take the normal path and hit the
+  // now-primed cache. References into bv_cache remain valid across the
+  // insertions performed by the pre-pass (only iterators are invalidated).
+  if(!in_conversion_prepass)
+  {
+    in_conversion_prepass = true;
+    prime_subexpression_cache(expr);
+    in_conversion_prepass = false;
   }
 
   // Iterators into hash_maps do not remain valid when inserting
