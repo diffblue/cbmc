@@ -1423,6 +1423,7 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
       using make_typet = std::function<typet(std::size_t)>;
       const make_typet make_unsigned = constructor_oft<unsignedbv_typet>{};
       const make_typet make_signed = constructor_oft<signedbv_typet>{};
+      const make_typet make_c_bool = constructor_oft<c_bool_typet>{};
       using make_extensiont =
         std::function<std::function<smt_termt(smt_termt)>(std::size_t)>;
       const make_extensiont zero_extend = smt_bit_vector_theoryt::zero_extend;
@@ -1435,7 +1436,8 @@ TEST_CASE("expr to smt conversion for type casts", "[core][smt2_incremental]")
           types_rowt{make_unsigned, make_unsigned, zero_extend},
           types_rowt{make_signed, make_signed, sign_extend},
           types_rowt{make_signed, make_unsigned, sign_extend},
-          types_rowt{make_unsigned, make_signed, zero_extend});
+          types_rowt{make_unsigned, make_signed, zero_extend},
+          types_rowt{make_c_bool, make_unsigned, zero_extend});
       const typecast_exprt cast{
         from_integer(42, make_source_type(from_width)),
         make_destination_type(to_width)};
