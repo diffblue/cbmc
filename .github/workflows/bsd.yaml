@@ -69,6 +69,7 @@ jobs:
             # gmake -C regression test-parallel JOBS=2
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
+            # gmake -C regression/cbmc test-wide-pointer-encoding
             # # gmake -C jbmc/regression test-parallel JOBS=2
 
       - name: Save ccache
@@ -137,6 +138,7 @@ jobs:
             # gmake -C regression test-parallel JOBS=2
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
+            # gmake -C regression/cbmc test-wide-pointer-encoding
             # # gmake -C jbmc/regression test-parallel JOBS=2
 
       - name: Save ccache
@@ -208,6 +210,7 @@ jobs:
             # gmake -C regression test-parallel JOBS=2
             # gmake -C regression/cbmc test-paths-lifo
             # env PATH=$PATH:`pwd`/src/solvers gmake -C regression/cbmc test-cprover-smt2
+            # gmake -C regression/cbmc test-wide-pointer-encoding
             # # gmake -C jbmc/regression test-parallel JOBS=2
 
       - name: Save ccache
