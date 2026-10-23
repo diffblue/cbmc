@@ -46,6 +46,18 @@ bool process_goto_program(
                << messaget::eom;
   remove_function_pointers(log.get_message_handler(), goto_model, false);
 
+  // Per-region MMIO instrumentation runs first so that declared regions
+  // get precise array-backed modeling. The callback model
+  // (__CPROVER_mm_io_r / __CPROVER_mm_io_w) runs second and can handle
+  // any remaining dereferences not covered by declared regions.
+  const auto &mmio_regions = options.get_list_option("mmio-region");
+  if(!mmio_regions.empty())
+  {
+    const auto regions =
+      parse_mmio_regions(mmio_regions, log.get_message_handler());
+    mm_io(goto_model, regions, log.get_message_handler());
+  }
+
   mm_io(goto_model, log.get_message_handler());
 
   // instrument library preconditions
