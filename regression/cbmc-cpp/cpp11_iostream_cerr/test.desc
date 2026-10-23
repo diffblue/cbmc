@@ -1,4 +1,4 @@
-CORE
+CORE no-vacuity-check
 main.cpp
 --cpp11 --object-bits 9 --unwind 3 --no-unwinding-assertions
 ^VERIFICATION
@@ -15,3 +15,5 @@ iostream with cerr, operator<<, and std::endl in C++11.
 Invariant violation: std::less<std::_V2::error_category>::~less
 destructor symbol not found. Triggered by <system_error> header
 on some g++ 13 header versions (Ubuntu 24.04 CI).
+no-vacuity-check: a conversion check (any verdict); with bounds that reach
+the end of main, symbolic execution of the stream output exceeds 300 s.

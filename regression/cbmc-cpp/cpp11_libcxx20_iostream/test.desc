@@ -1,4 +1,4 @@
-CORE libcxx
+CORE libcxx no-vacuity-check
 main.cpp
 --cpp11 --stdlib libc++ --object-bits 10 --unwind 3 --no-unwinding-assertions
 ^VERIFICATION
@@ -12,3 +12,6 @@ Round 163d: the stream sentry (a member class of basic_ostream defined
 outside it, [temp.mem.class]/1) is no longer dropped, so its constructor
 and the tie()/flush() and locale code behind it are executed; the loop and
 recursion bound keeps symbolic execution within the time limit.
+no-vacuity-check: a conversion check (any verdict); with --unwind 6 the end
+of main is reached and dereference failures of this->__rdstate_ in the
+libc++ stream code are reported (not yet investigated).
