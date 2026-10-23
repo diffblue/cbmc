@@ -1,0 +1,12 @@
+CORE
+four_independent_writes.c
+--evaluation-order-check
+^EXIT=0$
+^SIGNAL=0$
+^VERIFICATION SUCCESSFUL$
+--
+^warning: ignoring
+--
+Four calls whose side effects target distinct objects commute, so all 24
+evaluation orders yield the same state and the verification succeeds without
+false alarms.

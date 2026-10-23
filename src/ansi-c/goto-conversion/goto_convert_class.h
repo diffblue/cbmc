@@ -61,6 +61,10 @@ protected:
   std::string tmp_symbol_prefix;
   lifetimet lifetime = lifetimet::STATIC_GLOBAL;
 
+  /// Nesting depth of expression-cleaning contexts; used to identify the
+  /// outermost context of a full expression for --evaluation-order-check.
+  unsigned clean_expr_depth = 0;
+
   struct clean_expr_resultt
   {
     /// Identifiers of temporaries introduced while cleaning an expression. The
@@ -86,6 +90,25 @@ protected:
       temporaries.push_front(id);
     }
   };
+
+  /// For --evaluation-order-check: emit the per-operand side-effect blocks of
+  /// one full expression such that any evaluation-order dependence between
+  /// sibling operands is either explored (by evaluating independent blocks in
+  /// several orders) or refuted (by assertions that the values of
+  /// side-effect-free sibling operands are invariant under the side effects).
+  /// \param blocks: side-effect implementations of those operands that carry
+  ///   side effects, in source order
+  /// \param pure_reads: side-effect-free sibling operands whose value could
+  ///   be affected by the side effects
+  /// \param source_location: location of the full expression
+  /// \param mode: language mode
+  /// \return statements to be emitted in place of the concatenation of \p
+  ///   blocks, and the temporaries introduced
+  [[nodiscard]] clean_expr_resultt emit_evaluation_order_checked_blocks(
+    std::vector<goto_programt> &&blocks,
+    const exprt::operandst &pure_reads,
+    const source_locationt &source_location,
+    const irep_idt &mode);
 
   void goto_convert_rec(
     const codet &code,
